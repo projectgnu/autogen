@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.1 2003/11/23 02:10:55 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.2 2003/11/23 04:28:37 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -124,9 +124,11 @@ optionSort( tOptions* pOpts )
              *  option processing.  Otherwise the character must be a
              *  short (i.e. single character) option.
              */
-            if ((pOpts->fOptSet & OPTPROC_SHORTOPT) != 0) 
-                 res = longOptionFind( pOpts, pzArg+1, &os );
-            else res = shortOptionFind( pOpts, pzArg[1], &os );
+            if ((pOpts->fOptSet & OPTPROC_SHORTOPT) == 0) {
+                res = longOptionFind( pOpts, pzArg+1, &os );
+            } else {
+                res = shortOptionFind( pOpts, pzArg[1], &os );
+            }
             break;
         }
         if (FAILED( res )) {
@@ -141,7 +143,7 @@ optionSort( tOptions* pOpts )
          */
         ppzOpts[ optsIdx++ ] = pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
 
-        switch (os.argType) {
+        switch (os.pOD->optArgType) {
         case ARG_MUST:
             /*
              *  An option argument is required.  Long options can either have
@@ -240,7 +242,7 @@ optionSort( tOptions* pOpts )
                     errno = EIO;
                     goto freeTemps;
                 }
-                switch (os.argType) {
+                switch (os.pOD->optArgType) {
                 case ARG_MUST:
                     /*
                      *  IF we need another argument, be sure it is there and
@@ -290,10 +292,6 @@ optionSort( tOptions* pOpts )
  freeTemps:
     free( ppzOpts );
     free( ppzOpds );
-
-    for (ppzOpts = pOpts->origArgVect, optsIdx = 0;
-         optsIdx < pOpts->origArgCt;)
-        fprintf( stderr, "%3d -> '%s'\n", ++optsIdx, *(ppzOpts++));
     return;
 
  exit_no_mem:

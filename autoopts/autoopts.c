@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.27 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: autoopts.c,v 3.28 2003/11/23 04:28:37 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1638,6 +1638,9 @@ optionProcess(
 
         if (FAILED( doPresets( pOpts )))
             return 0;
+
+        if ((pOpts->fOptSet & OPTPROC_REORDER) != 0)
+            optionSort( pOpts );
 
         pOpts->curOptIdx = 1;
         pOpts->pzCurOpt = (char*)NULL;

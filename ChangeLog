@@ -35,6 +35,12 @@
 	(doVersion): export this function for ao use
 	* doc/autogen.texi: many cleanups.
 
+	* autoopts/autoopts.c(optionProcess): call optionSort if REORDER set
+	* autoopts/putshell.c(putBourneShell): If the args were sorted, then
+	reset the argument list.
+	* autoopts/sort.c(optionSort): correct the sense of the test.
+	* autoopts/test/errors.test(reorder-opts): test functionality.
+
 2003-11-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(serverSetup): do not depend upon the shell understand-

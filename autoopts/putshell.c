@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.14 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: putshell.c,v 3.15 2003/11/23 04:28:37 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -241,6 +241,29 @@ putBourneShell( tOptions* pOpts )
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
         }
     } while (++optIx < pOpts->presetOptCt );
+
+    if (  ((pOpts->fOptSet & OPTPROC_REORDER) != 0)
+       && (pOpts->curOptIdx < pOpts->origArgCt)) {
+        fputs( "set --", stdout );
+        for (optIx = pOpts->curOptIdx; optIx < pOpts->origArgCt; optIx++) {
+            char* pzArg = pOpts->origArgVect[ optIx ];
+            if (strchr( pzArg, '\'' ) == NULL)
+                printf( " '%s'", pzArg );
+            else {
+                fputs( " '", stdout );
+                for (;;) {
+                    char ch = *(pzArg++);
+                    switch (ch) {
+                    case '\'':  fputs( "'\\''", stdout ); break;
+                    case NUL:   goto arg_done;
+                    default:    fputc( ch, stdout ); break;
+                    }
+                } arg_done:;
+                fputc( '\'', stdout );
+            }
+        }
+        fputs( "\nOPTION_CT=0\n", stdout );
+    }
 }
 
 /*

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-09 09:53:05 bkorb"
+# Time-stamp:        "2003-11-22 20:17:22 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.5 2003/03/09 19:53:52 bkorb Exp $
+# $Id: errors.test,v 3.6 2003/11/23 04:28:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -93,7 +93,7 @@ echo "allow_errors;" >> ${testname}.def
 
 echo $AGEN ${testname}.def
 $AGEN ${testname}.def || \
-  failure AutoGen could not process
+  failure AutoGen could not process allow-errors
 
 compile "--help"
 
@@ -104,6 +104,35 @@ cmp -s ${testname}.h*lp || \
 #
 ./${testname} -s foo -o -s bar mumble 2> /dev/null 1>&2 || \
   failure ${testname} should not object to multiple options
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "reorder-opts;" >> ${testname}.def
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
+  failure AutoGen could not process gnu-usage
+
+compile "--help"
+
+# # # # # # # # # # SORTED ARGS OUTPUT FILE # # # # # # # # #
+
+echo creating ${testname}-sh.samp
+cat > ${testname}-sh.samp <<'_EOF_'
+OPTION_CT=2
+export OPTION_CT
+TEST_ERRORS_OPTION=1 # 0x1
+export TEST_ERRORS_OPTION
+TEST_ERRORS_SECOND='foo'
+export TEST_ERRORS_SECOND
+set -- 'mum'\''ble' 'stumble'
+OPTION_CT=0
+_EOF_
+
+./${testname} "mum'ble" -os foo stumble > ${testname}-sh.out
+
+cmp -s ${testname}-sh.out ${testname}-sh.samp || \
+  failure "`diff ${testname}-sh.out ${testname}-sh.samp`"
 
 cleanup
 # end of errors.test
