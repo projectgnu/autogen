@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.14 2000/09/11 00:36:43 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.15 2000/09/11 00:46:41 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -30,7 +30,8 @@ GENLIST="agen5/autogen.1
 	 agen5/autogen.menu
 	 agen5/autogen.texi
 	 autoopts/genshell.c
-	 autoopts/genshell.h"
+	 autoopts/genshell.h
+	 compat/strsignal.h"
 
 for f in ${GENLIST}
 do
@@ -45,7 +46,10 @@ touch_list="`egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
 if ${update_cvs} && [ -d CVS ]
 then
   rm -f ./configure
-  cvs update configure > /dev/null 2>&1
+  cvs update configure > /dev/null 2>&1 || \
+    update_cvs=false
+else
+  update_cvs=false
 fi
 
 [ -f doc/autogen.texi ] || {
