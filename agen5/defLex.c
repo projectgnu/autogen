@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.18 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: defLex.c,v 1.19 2000/10/11 16:19:19 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -387,12 +387,15 @@ loadScheme( void )
     pzEnd = resolveSCM( res, &mustFree );
     if (strlen( pzEnd ) >= schemeLen) {
         if (! mustFree)
-            yylval = (YYSTYPE)strdup( pzEnd );
+            AGDUPSTR( yylval, pzEnd, "SCM Result" );
         else
             yylval = (YYSTYPE)pzEnd;
     }
 
     else {
+        /*
+         *  We know the result is smaller than the source.  Copy in place.
+         */
         strcpy( pzText, pzEnd );
         if (mustFree)
             AGFREE( (void*)pzEnd );

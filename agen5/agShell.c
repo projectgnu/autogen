@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.7 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: agShell.c,v 1.8 2000/10/11 16:19:19 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -486,4 +486,8 @@ runShell( const char*  pzCmd )
         return pz;
     }
 }
-/* end of agShell.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of agShell.c */

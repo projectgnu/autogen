@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.7 2000/09/28 04:12:13 bkorb Exp $
+ *  $Id: agUtils.c,v 1.8 2000/10/11 16:19:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -139,7 +139,7 @@ doOptions( int arg_ct, char** arg_vec )
                 size_t siz = strlen( pz )+3;
                 char*  p   = AGALOC( siz, "env define" );
                 strcpy( p, pz );
-                strcat( p, "=1" );
+                strcpy( p+siz-3, "=1" );
                 pz = p;
             }
 
@@ -664,4 +664,8 @@ ag_strdup( const char* pz, const char* pzDupFrom, const char* pzWhat )
     return pzRes;
 }
 #endif
-/* end of agUtils.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of agUtils.c */

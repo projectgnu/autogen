@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.29 2000/09/29 02:59:40 bkorb Exp $
+ *  $Id: expFormat.c,v 1.30 2000/10/11 16:19:19 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -678,7 +678,6 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         for (;;) {
             switch (*(pzOut++) = *(pzScan++)) {
             case NUL:
-                free( (void*)pzPfx );
                 goto exit_copy;
 
             case '\n':
