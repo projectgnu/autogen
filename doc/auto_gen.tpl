@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.10 2002/08/11 17:36:13 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.11 2002/09/13 03:08:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -217,10 +217,13 @@ FOR gfunc =][=
   (if (not (exist? "name")) (error "NO NAME")) =][=
   IF (not (exist? "general_use")) =][=
     set-func-name =]
-* SCM [= (sprintf "%-20s" (string-append func-str "::"))
+* SCM [= (sprintf "%-22s" (string-append func-str "::"))
   =][= (string-append "@file{" func-name "} - " (get "what")) =][=
   ENDIF =][=
 ENDFOR gfunc =]
+* SCM make-header-guard::   @file{make-header-guard} - protect a header file
+* SCM html-escape-encode::  @file{html-escape-encode} - escape special chars
+* SCM autogen-version::     @file{autogen-version} - ``[= version =]''
 @end menu
 
 [=
@@ -257,6 +260,53 @@ This Scheme function takes no arguments.[=
   ENDIF general_use =][=
 ENDFOR gfunc
 =]
+@ignore
+Generated [= (tpl-file-line) =].
+@end ignore
+
+@node SCM make-header-guard
+@subsection @file{make-header-guard} - protect a header file
+@findex make-header-guard
+
+Usage:  (make-header-guard prefix)
+@*
+Emit a @code{#ifndef}/@code{#define} sequence based upon the output
+file name and the provided prefix.  It will also define a scheme
+variables named, @code{header-file} and @code{header-guard}.
+These are intended to be used as follows:
+
+@example
+#endif /* [+ (. header-guard) +] */
+...
+#include "[+ (. header-file)  +]"
+@end example
+
+@noindent
+Though generally in separate files.
+
+Arguments:
+@*
+prefix - first segment of @code{#define} name
+
+@node SCM html-escape-encode
+@subsection @file{html-escape-encode} - escape special chars
+@findex html-escape-encode
+
+Usage:  (html-escape-encode str)
+@*
+Substitute escape sequences for characters that are special to HTML/XML.
+It will replace @code{&}, @code{<} and @code{>} with the strings,
+"@code{&amp;}", "@code{&lt;}", and "@code{&gt;}", respectively.
+
+Arguments:
+@*
+str - string to transform
+
+@node SCM autogen-version
+@subsection @file{autogen-version} - ``[= version =]''
+This is a simple string value that, for this release, contains
+the string, ``[= version =]''.
+
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -434,7 +484,7 @@ cat ${top_srcdir}/agen5/autogen.texi ` =]
 
 AutoOpts [=`
 eval "\`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION\`" 2> /dev/null
-echo ${AO_CURRENT:-17}.${AO_REVISION:-0}
+echo ${AO_CURRENT}.${AO_REVISION}
 `=] is bundled with AutoGen.  It is a tool that virtually eliminates
 the hassle of processing options and keeping man pages, info docs and
 usage text up to date.  This package allows you to specify several program

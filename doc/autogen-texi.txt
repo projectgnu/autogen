@@ -2670,6 +2670,9 @@ has been specified.  When present, the @code{descrip} attribute will be
 displayed only when the @code{--help} option has been specified.  It
 will be displayed flush to the left hand margin and may consist of one
 or more lines of text.  The name of the option will not be printed.
+
+Documentation options are for clarifying the usage text and will not
+appear in generated man pages or in the generated invoking texinfo doc.
 @end table
 
 @node Immediate Action
@@ -2919,7 +2922,8 @@ Call a special library routine to stack the option's arguments.  Special
 macros in the interface file are provided for determining how many of
 the options were found (@code{STACKCT_OPT(NAME)}) and to obtain a
 pointer to a list of pointers to the argument values
-(@code{STACKLST_OPT(NAME)}).
+(@code{STACKLST_OPT(NAME)}).  Obviously, for a stackable argument,
+the @code{max} attribute needs to be set higher than @code{1}.
 
 If two options are equivalenced (@pxref{Special Option Handling}) and
 specify this attribute, then the ``equivalenced-to'' option will add
@@ -2933,6 +2937,10 @@ If the stacked option has a disablement prefix, then the entire
 stack of arguments will be cleared even more efficiently than the
 "@code{.*}" regular expression.  A stacked, equivalencing option with
 a disablement prefix will cause undefined results.
+
+If all of this is confusing, then don't mess with equivalenced stacked
+option arguments.  If you really want to know, @xref{autogen define} is
+a stacked argument and @xref{autogen undefine} is equivalenced to it.
 @end table
 
 @node documentation attributes
@@ -2947,13 +2955,18 @@ option definitions.
 @table @samp
 @cindex option documentation
 @item doc
-First, every @code{flag} definition must have a @code{doc} attribute
-defined and many will need an @code{arg-name} attribute as well.  The
+First, every @code{flag} definition @emph{other than} ``documentation''
+definitions, must have a @code{doc} attribute defined.  If the option takes
+an argument, then it will need an @code{arg-name} attribute as well.  The
 @code{doc} text should be in plain sentences with minimal formatting.  The
-Texinfo commands @code{@@code}, and @code{@@var} will have its enclosed
-text made into @strong{\fB} entries in the man page, and the @code{@@file}
-text will be made into @strong{\fI} entries.  The @code{arg-name} attribute
-is used to display the option's argument in the man page.
+Texinfo commands @code{@@code}, and @code{@@var} will have its enclosed text
+made into @strong{\fB} entries in the man page, and the @code{@@file} text
+will be made into @strong{\fI} entries.  The @code{arg-name} attribute is
+used to display the option's argument in the man page.
+
+Options marked with the ``documentation'' attribute are for documenting
+the usage text.  All other options should have the ``doc'' attribute in
+order to document the usage of the option in the generated man pages.
 
 @cindex option argument name
 @item arg-name
@@ -3064,8 +3077,8 @@ pre-scanning of the options, environment and rc files.
 @cindex standard options
 
 AutoOpts has developed a set of standardized options.
-You may incorporate these options in your program simply by adding
-a @code{#define} for the options you want, and the line,
+You may incorporate these options in your program simply by @emph{first}
+adding a @code{#define} for the options you want, and then the line,
 
 @example
 #include stdoptions.def
@@ -3713,6 +3726,8 @@ In all your source files where you need to refer to option state,
 In your main routine, code something along the lines of:
 
 @example
+#define ARGC_MIN some-lower-limit
+#define ARGC_MAX some-upper-limit
 main( int argc, char** argv )
 @{
     @{

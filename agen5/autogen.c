@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.15 2002/06/01 17:56:14 bkorb Exp $
+ *  $Id: autogen.c,v 3.16 2002/09/13 03:08:06 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -32,7 +32,9 @@
 
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)\n"
+
 "(define header-file \"\")  (define header-guard \"\")\n"
+
 "(define (make-header-guard hdr-pfx)\n"
 "   (begin\n"
 "      (set! header-file  (out-name))\n"
@@ -41,9 +43,16 @@ tSCC zSchemeInit[] =
 "             \"_\" header-file \"_GUARD\" ))))\n"
 "      (sprintf \"#ifndef %1$s\\n#define %1$s\" header-guard)\n"
 ")  )\n"
+
 "(define autogen-version \"" AUTOGEN_VERSION "\")\n"
+
 "(define-macro (defined-as predicate symbol)\n"
-"  `(and (defined? ',symbol) (,predicate ,symbol)))";
+"  `(and (defined? ',symbol) (,predicate ,symbol)))"
+
+"(define html-escape-encode (lambda (str)\n"
+"    (string-substitute str\n"
+"          '(\"&\"      \"<\"     \">\")\n"
+"          '(\"&amp;\"  \"&lt;\"  \"&gt;\") )))";
 
 STATIC sigjmp_buf  abendJumpEnv;
 

@@ -37,6 +37,15 @@ ENDDEF   preamble
 =][=
 
 DEFINE  emit-macro      =][=
+(out-push-new)
+(define (protect-text t)
+    (string-substitute t
+        '("["     "]"     "$"     "#"     )
+		'("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))  )
+
+(dne "dnl " "dnl ") =]
+dnl
+dnl @synopsis  [=(. mac-name)=][=
 
   CASE    type   =][=
   ~~  compile|run|link|test   =][=
@@ -48,7 +57,7 @@ DEFINE  emit-macro      =][=
   ~~  with|without       =][=
       (define bad-define-name   "WITHOUT_%s")
       (define good-define-name  "WITH_%s")     =][=
-  ==  withlib            =][=
+  ~~  withlib|withconf   =][=
       (define bad-define-name   "WITHOUT_LIB%s")
       (define good-define-name  "WITH_LIB%s")     =][=
   ESAC  =][=
@@ -136,7 +145,7 @@ AC_DEFUN([[=
 
   ELSE   =]
 
-ERROR:  invalid conftest function:   [= (. fcn-name) =][=
+ERROR:  invalid conftest function:   ``[= (. fcn-name) =]''[=
 
   ENDIF  =]
 ]) # end of AC_DEFUN of [=(. mac-name)=]
