@@ -2,45 +2,44 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-02 17:50:23 bkorb"
+## Time-stamp:      "2004-02-14 15:07:57 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.31 2004/02/03 04:57:41 bkorb Exp $
+## $Id: Makefile.am,v 3.32 2004/02/15 02:42:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-SUBDIRS     = test
-INCLUDES    = @INCLIST@
+SUBDIRS         = test
+INCLUDES        = @INCLIST@
 
-GETDEFS     = $(top_builddir)/getdefs/@GDEXE@
-AGEXE       = $(top_builddir)/agen5/@AGEXE@
+GETDEFS         = $(top_builddir)/getdefs/@GDEXE@
+AGEXE           = $(top_builddir)/agen5/@AGEXE@
 
-TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
-DEFINITIONS = cgi.def opts.def pseudo.def defParse.def
-GENDOCS     = autogen.texi autogen.menu autogen.1
-CLEANFILES  = $(GENDOCS)
-STAMPS      = stamp-directive stamp-exprini stamp-opts stamp-fsm
-GEN_CSRC    = opts.c opts.h directive.h expr.ini expr.h proto.h \
-	cgi-fsm.c cgi-fsm.h pseudo-fsm.h
-GEN_SRC = $(GEN_CSRC) $(GENDOCS)
+TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
+DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
+GENDOCS         = autogen.texi autogen.menu autogen.1
+CLEANFILES      = $(GENDOCS)
+STAMPS          = stamp-directive stamp-exprini stamp-opts stamp-fsm
+GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
+GEN_SRC         = $(GEN_CSRC) $(GENDOCS)
 
-pkgdata_DATA = fsm.tpl fsm-macro.tpl fsm-trans.tpl
-man_MANS     = autogen.1
+pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
+man_MANS        = autogen.1
 
 MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 
-bin_PROGRAMS = autogen
+bin_PROGRAMS    = autogen
 
 csrc = \
-  autogen.c      agCgi.c       agShell.c     agUtils.c     defParse-fsm.h \
-  autogen.h      defDirect.c   defFind.c     defLoad.c     defParse-fsm.c \
-  defLex.c       expExtract.c  expFormat.c   expGperf.c    expString.c    \
-  expGuile.c     expMake.c     expOutput.c   expPrint.c    expState.c \
-  fmemopen.c     funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
-  funcIf.c       functions.c   functions.h   loadPseudo.c  tpLoad.c   \
-  tpParse.c      tpProcess.c
+  autogen.c   agCgi.c       agShell.c    agUtils.c     defParse-fsm.h \
+  autogen.h   defDirect.c   defFind.c    defLoad.c     defParse-fsm.c \
+  defLex.c    expExtract.c  expFormat.c  expGperf.c    expString.c    \
+  expGuile.c  expMake.c     expOutput.c  expPrint.c    expState.c \
+  fmemopen.c  funcCase.c    funcDef.c    funcEval.c    funcFor.c  \
+  funcIf.c    functions.c   functions.h  loadPseudo.c  tpLoad.c   \
+  tpParse.c   tpProcess.c   cgi-fsm.c    cgi-fsm.h     opts.c
 
 EXTRA_DIST = $(csrc) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
 

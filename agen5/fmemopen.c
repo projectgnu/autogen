@@ -2,6 +2,8 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
+ * Time-stamp:      "2004-02-14 18:39:32 bkorb"
+ *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
  * and completely rewritten by Bruce Korb, bkorb@gnu.org
@@ -276,6 +278,10 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
     if (pFMC->next_ix > pFMC->high_water) {
         pFMC->high_water = pFMC->next_ix;
         if (add_nul_char)
+            /*
+             *  There is space for this NUL.  The "add_nul_char" is not part of
+             *  the "sz" that was added to "next_ix".
+             */
             pFMC->buffer[ pFMC->high_water ] = NUL;
     }
 
@@ -284,25 +290,26 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
 
 
 static seek_pos_t
-fmem_seek (void *cookie, fmem_off_t *p, int dir)
+fmem_seek (void *cookie, fmem_off_t *p_offset, int dir)
 {
     fmem_off_t new_pos;
     fmem_cookie_t *pFMC = cookie;
 
     switch (dir) {
-    case SEEK_SET: new_pos = *p;  break;
-    case SEEK_CUR: new_pos = pFMC->next_ix  + *p;  break;
-    case SEEK_END: new_pos = pFMC->buf_size - *p;  break;
+    case SEEK_SET: new_pos = *p_offset;  break;
+    case SEEK_CUR: new_pos = pFMC->next_ix  + *p_offset;  break;
+    case SEEK_END: new_pos = pFMC->buf_size - *p_offset;  break;
 
     case FMEM_IOCTL_SAVE_BUF:
-        pFMC->mode.allocated = 0;
+        pFMC->mode &= ~FLAG_BIT(allocated);
         /* FALLTHROUGH */
 
     case FMEM_IOCTL_BUF_ADDR:
         *(char**)p_offset = pFMC->buffer;
         return 0;
 
-    default:       goto seek_oops;
+    default:
+        goto seek_oops;
     }
 
     if ((signed)new_pos < 0)
@@ -531,10 +538,10 @@ fmemopen(void *buf, size_t len, const char *pMode)
                    ? len : strlen(pFMC->buffer);
 
     {
-        cookie_read_function_t* pRd =
-            (pFMC->mode & FLAG_BIT(read))  ? fmem_read  : NULL;
-        cookie_write_function_t* pWr =
-            (pFMC->mode & FLAG_BIT(write)) ? fmem_write : NULL;
+        cookie_read_function_t* pRd = (pFMC->mode & FLAG_BIT(read))
+             ? (cookie_read_function_t*)fmem_read  : NULL;
+        cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
+            ? (cookie_write_function_t*)fmem_write : NULL;
 #if defined(HAVE_FOPENCOOKIE)
         cookie_io_functions_t iof;
         iof.read  = pRd;
@@ -542,7 +549,7 @@ fmemopen(void *buf, size_t len, const char *pMode)
         iof.seek  = (cookie_seek_function_t* )fmem_seek;
         iof.close = (cookie_close_function_t*)fmem_close;
 
-        return fopencookie( pFMC, mode, iof );
+        return fopencookie( pFMC, pMode, iof );
 #elif defined(HAVE_FUNOPEN)
         return funopen( pFMC, pRd, pWr,
                         (cookie_seek_function_t* )fmem_seek,
@@ -553,3 +560,4 @@ fmemopen(void *buf, size_t len, const char *pMode)
     }
 }
 #endif /* ENABLE_FMEMOPEN */
+/* end of fmemopen.c */

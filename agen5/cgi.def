@@ -34,15 +34,20 @@ cookie = "int inlen";
 cookie = "char* pzOut";
 cookie = "int outlen";
 
-state = name, value;
-event = alpha, name_char, equal, space, escape, other, separator, end;
+state  = name, value;
+event  = alpha, name_char, equal, space, escape, other, separator, end;
 
-transition = 
- { tst = init;  tev = alpha; next = name; ttype = stash; },
- { tst = name;  tev = alpha, name_char;   ttype = stash; },
+equal       = "=";
+space       = "+";
+escape      = "%";
+separator   = "&";
+
+transition  = 
+ { tst = init;  tev = alpha; next = name;     ttype = stash; },
+ { tst = name;  tev = alpha, name_char;       ttype = stash; },
  { tst = name;  tev = equal; next = value; },
- { tst = value; tev = *;                  ttype = stash; },
- { tst = value; tev = space; },
+ { tst = value; tev = *;                      ttype = stash; },
+ { tst = value; tev = space;                  ttype = stash; },
  { tst = value; tev = escape; },
  { tst = value; tev = end;       next = done; ttype = separate; },
  { tst = value; tev = separator; next = init; ttype = separate; };

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.23 2004/02/14 22:12:45 bkorb Exp $
+ *  $Id: expOutput.c,v 3.24 2004/02/15 02:42:36 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -338,10 +338,10 @@ ag_scm_out_push_new( SCM new_file )
 #   endif
     {
         /*
-         *  IF we do not have fopencookie, then this block is a pure "else"
-         *  clause.  If we do have that routine, then the block is executed
-         *  when a file name is not s specified *and* --no-fmemopen was *not*
-         *  selected on the command line.
+         *  IF we do not have fopencookie(3GNU) or funopen(3BSD), then this
+         *  block is a pure "else" clause.  If we do have one of those, then
+         *  the block is executed when a file name is not s specified *and*
+         *  --no-fmemopen was *not* selected.
          */
         tSCC* pzTemp = NULL;
         int tmpfd;
@@ -367,18 +367,19 @@ ag_scm_out_push_new( SCM new_file )
         p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
         close( tmpfd );
     }
-#   ifdef HAVE_FOPENCOOKIE
+#   ifdef ENABLE_FMEMOPEN
     else {
         /*
-         *  This block is a pure "else" clause that is only compiled if
-         *  "fopencookie" is available in the local c library.  Anonymous
-         *  files without --no-fmemopen being selected will get us here.
+         *  This block is a pure "else" clause that is only compiled if neither
+         *  "fopencookie" nor "funopen" is available in the local C library.
+         *  Otherwise, anonymous output without --no-fmemopen being selected
+         *  will get us here.
          */
-        p->pFile  = fmemopen( NULL, 0, "w" FOPEN_BINARY_FLAG "+" );
+        p->pFile  = fmemopen( NULL, 0, "wb+" );
         pzNewFile = "in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
     }
-#   endif /* HAVE_FOPENCOOKIE */
+#   endif /* ENABLE_FMEMOPEN */
 
     if (p->pFile == NULL)
         AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,

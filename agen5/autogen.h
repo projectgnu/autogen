@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.30 2004/02/14 22:22:17 bkorb Exp $
+ *  $Id: autogen.h,v 3.31 2004/02/15 02:42:36 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -27,11 +27,13 @@
 #ifndef AUTOGEN_HDR_H
 #define AUTOGEN_HDR_H
 
+#include "compat/compat.h"
+#include "config.h"
+
 #if defined(HAVE_FOPENCOOKIE) || defined(HAVE_FUNOPEN)
 #  define ENABLE_FMEMOPEN
 #endif
 
-#include "compat/compat.h"
 #include REGEX_HEADER
 #include <guile/gh.h>
 
@@ -74,7 +76,7 @@ typedef struct {
 #define NOPROCESS   ((pid_t)-1)
 #define NULLPROCESS ((pid_t)0)
 
-typedef char* tpChar;
+typedef unsigned char* tpChar;
 
 #include "expr.h"
 #include "autoopts/autoopts.h"
@@ -82,8 +84,9 @@ typedef char* tpChar;
 
 #include "cgi-fsm.h"
 #include "defParse-fsm.h"
+
 typedef union {
-    char*       pzStr;
+    tpChar      pzStr;
     char        ch;
 } def_token_u_t;
 

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.25 2004/02/14 22:12:45 bkorb Exp $
+ *   $Id: opts.def,v 3.26 2004/02/15 02:42:36 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -59,8 +59,6 @@ version = `
     echo $AG_VERSION `;
 
 #ifndef XML2AG
-config-header  = config.h;
-
 include = <<-  _END_INCLUDE
 	#include "autogen.h"
 	#ifdef HAVE_DLOPEN

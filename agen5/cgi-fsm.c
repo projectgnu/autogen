@@ -218,7 +218,7 @@ cgi_run_fsm(
             else switch (curCh) {
             case '_': trans_evt = CGI_EV_NAME_CHAR; break;
             case '=': trans_evt = CGI_EV_EQUAL;     break;
-            case '+': trans_evt = CGI_EV_SPACE;     break;
+            case '+': trans_evt = CGI_EV_SPACE;     curCh = ' '; break;
             case '%': trans_evt = CGI_EV_ESCAPE;    break;
             case '&': trans_evt = CGI_EV_SEPARATOR; break;
             default:  trans_evt = CGI_EV_OTHER;     break;
@@ -285,6 +285,10 @@ cgi_run_fsm(
             z[2] = NUL;
             inlen -= 2;
 
+            /*
+             *  We must backslash quote certain characters that are %-quoted
+             *  in the input string:
+             */
             switch (*(pzOut++) = (int)strtol( z, NULL, 16 )) {
             case '\'':
             case '\\':

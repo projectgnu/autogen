@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/02/14 22:12:45 $
+# Last Modified:     $Date: 2004/02/15 02:42:36 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.18 2004/02/14 22:12:45 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.19 2004/02/15 02:42:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -250,6 +250,12 @@ do
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def
     ${AG} ${eopt} ./opts.def
+    ;;
+
+  fmemopen.3 )
+    ${GD} templ=agman3.tpl linenum output=fmemopen.def fmemopen.c
+    ${AG} -L ${top_srcdir}/autoopts fmemopen.def
+    rm -f fmemopen.def
     ;;
 
   proto.h )
