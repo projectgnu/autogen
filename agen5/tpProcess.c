@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.11 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.12 2001/08/23 03:22:05 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -105,7 +105,8 @@ processTemplate( tTemplate* pTF )
             pzCurSfx      = zNone;
             pCurFp        = &fpRoot;
             fpRoot.pFile  = stdout;
-            AGDUPSTR( fpRoot.pzOutName, "stdout", "processTemplate" );
+            fpRoot.pzOutName = "stdout";
+            fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
             generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
             break;
         }
@@ -183,26 +184,33 @@ closeOutput( ag_bool purge )
 
     fclose( pCurFp->pFile );
 
-    /*
-     *  IF we are told to purge the file OR the file is an AutoGen temp
-     *  file, then get rid of the output.
-     */
-    if (purge || ((pCurFp->flags & FPF_UNLINK) != 0))
-        unlink( pCurFp->pzOutName );
+    if ((pCurFp->flags & FPF_NOUNLINK) == 0) {
+        /*
+         *  IF we are told to purge the file OR the file is an AutoGen temp
+         *  file, then get rid of the output.
+         */
+        if (purge || ((pCurFp->flags & FPF_UNLINK) != 0))
+            unlink( pCurFp->pzOutName );
 
-    else {
-        struct utimbuf tbuf;
+        else {
+            struct utimbuf tbuf;
 
-        tbuf.actime  = time( (time_t*)NULL );
-        tbuf.modtime = outTime;
+            tbuf.actime  = time( (time_t*)NULL );
+            tbuf.modtime = outTime;
 
-        utime( pCurFp->pzOutName, &tbuf );
+            utime( pCurFp->pzOutName, &tbuf );
+        }
     }
+
+    /*
+     *  Do not deallocate statically allocated names
+     */
+    if ((pCurFp->flags & FPF_STATIC_NM) == 0)
+        AGFREE( (void*)pCurFp->pzOutName );
 
     /*
      *  Do not deallocate the root entry.  It is not allocated!!
      */
-    AGFREE( (void*)pCurFp->pzOutName );
     if ((pCurFp->flags & FPF_FREE) != 0) {
         tFpStack* p = pCurFp;
         pCurFp = p->pPrev;
@@ -223,12 +231,15 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      */
     pzDefFile = OPT_ARG( BASE_NAME );
 
+    /*
+     *  Remove any suffixes in the last file name
+     */
     {
         char*  p = strrchr( pzDefFile, '/' );
-        if (p != (char*)NULL)
-            pzDefFile = p + 1;
+        if (p == (char*)NULL)
+            p = pzDefFile;
 
-        p = strchr( pzDefFile, '.' );
+        p = strchr( p, '.' );
         if (p != (char*)NULL)
             *p = NUL;
         /*
@@ -243,6 +254,9 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
     pCurFp = pStk;
 
+    if (strcmp( pOutSpec->zSuffix, "null" ) == 0)
+        goto openNull;
+
     /*
      *  IF we are to skip the current suffix,
      *  we will redirect the output to /dev/null and
@@ -254,12 +268,15 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
         while (--ct >= 0) {
             if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0) {
+                tSCC zDevNull[] = "/dev/null";
+
+            openNull:
                 /*
                  *  Make the output a no-op, but perform the operations.
                  */
-                tSCC zDevNull[] = "/dev/null";
                 pStk->pzOutName = (char*)zDevNull;
-                pStk->pFile  = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
+                pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK;
+                pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
                 if (pStk->pFile != (FILE*)NULL)
                     return;
 

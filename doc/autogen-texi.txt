@@ -265,6 +265,11 @@ functions are available for saving text or values for later use.
 @cindex example, simple
 @cindex simple example
 
+This is just one simple example that shows a few basic features.
+If you are interested, you also may run "make check" with the
+@code{VERBOSE} enviornment variable set and see a number of other
+examples in the @file{agen5/test/testdir} directory.
+
 Assume you have an enumeration of names and you wish to associate some
 string with each name.  Assume also, for the sake of this example,
 that it is either too complex or too large to maintain easily by hand.
@@ -4336,34 +4341,184 @@ but uses getopt_long to parse the command line options.
 
 @end enumerate
 
-@format
-package                 1       2       3       4       5       6
-C language app         yes     yes     yes     yes     yes     yes
-shell script app       yes     no      no      no      no      no
-package result         parser  parser  parser  parser  main.c  parser
+@multitable @columnfractions .26 .1 .1 .1 .1 .1 .1
 
-config file input      yes     no      no      yes     no      yes
-environment input      yes     no      no      no      no      no
-config file output     yes     no      no      no      no      no
-command line           yes     yes     yes     yes     yes     yes
+@item package
+@tab 1
+@tab 2
+@tab 3
+@tab 4
+@tab 5
+@tab 6
 
-parameter types        [1]     4       5       5       11      4
-callback functions     yes     no      yes     yes     yes     no
-multiple parameters    yes     yes     no      no      no      no
-optional parameters    yes     yes     no      no      no      no
-default values         yes     yes     yes     yes     no      yes
-range checks           no      yes     yes     no      no      no
-enumeration options    yes     no      no      no      no      no
-option data            struct  struct  struct  struct  vars    struct
+@item C language app
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
 
-usage()                yes     yes     yes     yes     yes     yes
-man page               yes     yes     no      no      no      no
-texinfo usage          yes     no      no      no      no      no
-makefile               no      no      no      no      no      no
+@item shell script app
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
 
-developer dependencies none    tcl     none    none    none    bison,flex
-user dependencies      [2]     none    none    none    none    none
-@end format
+@item package result
+@tab parser
+@tab parser
+@tab parser
+@tab parser
+@tab main.c
+@tab parser
+
+@item config file input
+@tab yes
+@tab no
+@tab no
+@tab yes
+@tab no
+@tab yes
+
+@item environment input
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item config file output
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item command line
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+
+@item parameter types
+@tab [1]
+@tab 4
+@tab 5
+@tab 5
+@tab 11
+@tab 4
+
+@item callback functions
+@tab yes
+@tab no
+@tab yes
+@tab yes
+@tab yes
+@tab no
+
+@item multiple parameters
+@tab yes
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item optional parameters
+@tab yes
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item default values
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab no
+@tab yes
+
+@item range checks
+@tab no
+@tab yes
+@tab yes
+@tab no
+@tab no
+@tab no
+
+@item enumeration options
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item option data
+@tab struct
+@tab struct
+@tab struct
+@tab struct
+@tab vars
+@tab struct
+
+@item usage()
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+@tab yes
+
+@item man page
+@tab yes
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item texinfo usage
+@tab yes
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item makefile
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+@tab no
+
+@item developer dependencies
+@tab Guile
+@tab tcl
+@tab none
+@tab none
+@tab none
+@tab bison,flex
+
+@item user dependencies
+@tab [2]
+@tab none
+@tab none
+@tab none
+@tab none
+@tab none
+@end multitable
 
  [1] See the lengthy list of features @xref{Features}.
 
@@ -4372,6 +4527,8 @@ dynamic link to the libopts.so library.  Developers are free to either
 link statically or ship libopts.so with their product.  A Debian
 package would need only a dependency on the package supplying libopts
 (libopts9, at present).
+
+ The Guile library is now generally pre-installed on all GNU/Linux systems.
 
  -- James R. Van Zandt
 

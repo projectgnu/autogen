@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2000/09/30 15:09:43 $
+# Last Modified:     $Date: 2001/08/23 03:22:05 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 1.6 2000/09/30 15:09:43 bkorb Exp $
+# $Id: error.test,v 1.7 2001/08/23 03:22:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -63,7 +63,8 @@ _EOF_
 
 $AGEXE $testname.def 2> $testname.err1 && failure unexpected success
 grep -v 'Giving up in' $testname.err1 >  $testname.err
-cmp -s  $testname.err  $testname.out1 || failure unexpected output
+cmp -s  $testname.err  $testname.out1 || \
+  failure "actual->expected `diff -c $testname.err  $testname.out1`"
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 
@@ -72,7 +73,7 @@ echo creating $testname.out2
 cat > $testname.out2 <<_EOF_
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
-DEFINITIONS ERROR in error.tpl line 13 for error.null:
+DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
 	This is a multi-line
 	error to show how to exit
 	your template
@@ -84,7 +85,8 @@ $AGEXE --no-def -T$testname.tpl --base=$testname \
   2> $testname.err2 \
   && failure Unexpected success for AutoGen
 
-cmp -s $testname.err2 $testname.out2 || failure unexpected output
+cmp -s $testname.err2 $testname.out2 || \
+  failure "actual->expected `diff -c $testname.err2 $testname.out2`"
 
 cleanup
 # end of error.test

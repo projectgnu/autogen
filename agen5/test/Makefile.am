@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2001/07/22 20:03:56 $
+## Last Modified:   $Date: 2001/08/23 03:22:05 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.25 2001/07/22 20:03:56 bkorb Exp $
+## $Id: Makefile.am,v 1.26 2001/08/23 03:22:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
@@ -16,7 +16,7 @@ TESTS      = \
 	directives.test dynref.test  endmac.test  error.test \
 	expr.test       extract.test for.test     forfrom.test \
 	get.test        gperf.test   heredef.test include.test \
-	license.test    match.test   nestmac.test opts.test \
+	license.test    match.test   opts.test    \
 	output.test     reorder.test snarf.test   stack.test \
 	string.test     suffix.test  shell.test   in.test
 

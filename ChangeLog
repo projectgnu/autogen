@@ -1,3 +1,32 @@
+2001-08-21  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c: make the index database be ordinarily read-only
+	(loadStdin): new - when the input file is specified as "-", instead
+	read file names from stdin and save the names via SET_OPT(INPUT).
+	* getdefs/opts.def(input): allow it to be a settable option
+	* agen5/autogen.c(signalSetup): catch SIGCHLD with a null procedure.
+	* agen5/autogen.h(FPF_): add bit markers for deallocation handling
+	* agen5/funcDef.c(anonymousTemplate): obsolete
+	(build_defs): remove anonymous template handling code.  Obsolete.
+	agen5/tpProcess.c: use the new deallocation handling flags
+	* VERSION: bump the minor version
+	
+2001-08-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c(openOutFile): always open /dev/null when the
+	suffix is "null".
+	* agen5/autogen.c(signalSetup): assign an empty procedure to handle
+	SIGCHLD so that child processes do not inherit SIG_IGN and so we also
+	do not leave zombie children lying around.
+	* agen5/test/error.test: handle redirection of output to /dev/null
+	
+2001-08-16  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpParse.c(whichFunc): don't do a strcmp when subtraction works
+	* agen5/funcDef.c(skipNestedExpression): obsolete
+	(spanTemplate): obsolete
+	(parseMacroArgs): remove support for nested macros.  Never worked.
+
 2001-08-11  Bruce Korb  <bkorb@gnu.org>
 
 	* snprintfv/ChangeLog: fixed up some mis-allocation issues

@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 2.6 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: getdefs.h,v 2.7 2001/08/23 03:22:05 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/06/24 00:47:56 $
+ *  Last Modified:     $Date: 2001/08/23 03:22:05 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -106,10 +106,10 @@ typedef int tSuccess;
 /*
  *  Index database string pointers.
  */
-MODE char*    pzIndexText VALUE( (char*)NULL );
-MODE char*    pzEndIndex  VALUE( (char*)NULL );
-MODE char*    pzIndexEOF  VALUE( (char*)NULL );
-MODE size_t   indexAlloc  VALUE( 0 );
+MODE char*    pzIndexText VALUE( (char*)NULL ); /* all the text    */
+MODE char*    pzEndIndex  VALUE( (char*)NULL ); /* end of current  */
+MODE char*    pzIndexEOF  VALUE( (char*)NULL ); /* end of file     */
+MODE size_t   indexAlloc  VALUE( 0 );           /* allocation size */
 
 /*
  *  Name of program to process output (normally ``autogen'')

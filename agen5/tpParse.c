@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.8 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: tpParse.c,v 1.9 2001/08/23 03:22:05 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -43,9 +43,7 @@ STATIC tCC* findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark );
 whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 {
     const char*   pzFuncName = *ppzScan;
-    int           hi;
-    int           lo;
-    int           av;
+    int           hi, lo, av;
     tNameType*    pNT;
     int           cmp;
 
@@ -59,7 +57,7 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
         do  {
             av  = (hi + lo)/2;
             pNT = nameTypeTable + av;
-            cmp = strncmp( pNT->pName, pzFuncName, pNT->cmpLen );
+            cmp = (int)(*(pNT->pName)) - (int)(*pzFuncName);
 
             /*
              *  For strings that start with a punctuation, we
@@ -73,36 +71,37 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
                  hi = av - 1;
             else lo = av + 1;
         } while (hi >= lo);
-
-    } else {
-        hi = FUNC_NAMES_HIGH_INDEX;
-        lo = FUNC_NAMES_LOW_INDEX;
-        do  {
-            av  = (hi + lo)/2;
-            pNT = nameTypeTable + av;
-            cmp = strneqvcmp( pNT->pName, pzFuncName, pNT->cmpLen );
-            if (cmp == 0) {
-                /*
-                 *  Make sure we matched to the end of the token.
-                 */
-                if (ISNAMECHAR( pzFuncName[pNT->cmpLen] ))
-                    return FTYP_BOGUS;
-
-                /*
-                 *  Advance the scanner past the macro name.
-                 *  The name is encoded in the "fType".
-                 */
-                *ppzScan = pzFuncName + pNT->cmpLen;
-                return pNT->fType;
-            }
-            if (cmp > 0)
-                 hi = av - 1;
-            else lo = av + 1;
-        } while (hi >= lo);
+        return FTYP_BOGUS;
     }
 
     if (! isalpha( *pzFuncName ))
         return FTYP_BOGUS;
+
+    hi = FUNC_NAMES_HIGH_INDEX;
+    lo = FUNC_NAMES_LOW_INDEX;
+
+    do  {
+        av  = (hi + lo)/2;
+        pNT = nameTypeTable + av;
+        cmp = strneqvcmp( pNT->pName, pzFuncName, pNT->cmpLen );
+        if (cmp == 0) {
+            /*
+             *  Make sure we matched to the end of the token.
+             */
+            if (ISNAMECHAR( pzFuncName[pNT->cmpLen] ))
+                return FTYP_BOGUS;
+
+            /*
+             *  Advance the scanner past the macro name.
+             *  The name is encoded in the "fType".
+             */
+            *ppzScan = pzFuncName + pNT->cmpLen;
+            return pNT->fType;
+        }
+        if (cmp > 0)
+             hi = av - 1;
+        else lo = av + 1;
+    } while (hi >= lo);
 
     /*
      *  Save the name for later lookup
@@ -170,6 +169,7 @@ skipMacro( tCC* pzStartMark )
             pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
         }
     }
+
     return pzEndMark;
 }
 

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.26 2001/05/09 05:25:59 bkorb Exp $
+ *   $Id: opts.def,v 2.27 2001/08/23 03:22:05 bkorb Exp $
  */
 
 /*
@@ -71,14 +71,20 @@ flag = {
     arg_name  = file;
     max       = NOLIMIT;
     min       = 1;
+    settable;
     stack_arg;
     default;
     descrip   = "Input file to search for defs";
-    doc =
-    "All files that are to be searched for definitions must be named\n"
-    "on the command line.  If an option name is not mentioned in the\n"
-    "command line argument, it is presumed to be this option.  There must\n"
-    "be at least one.";
+
+    doc = <<-  _EOF_
+	All files that are to be searched for definitions must be named on
+	the command line or read from @code{stdin}.  If there is only one
+	@code{input} option and it is the string, "-", then the input file
+	list is read from @code{stdin}.  If a command line argument is not
+	an option name and does not contain an assignment operator
+	(@code{=}), then it defaults to being an input file name.
+	At least one input file must be specified.
+	_EOF_;
 };
 
 flag = {

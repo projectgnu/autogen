@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.36 2001/08/12 03:07:03 bkorb Exp $
+ *  $Id: funcDef.c,v 1.37 2001/08/23 03:22:05 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -31,6 +31,8 @@
 #include "expr.h"
 #include "autogen.h"
 
+tSCC zNil[] = "";
+
 typedef int (tCmpProc)( const void*, const void* );
 
 typedef struct def_list tDefList;
@@ -46,10 +48,7 @@ tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
 STATIC tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
 
 STATIC int   orderDefList( const void* p1, const void* p2 );
-STATIC char* skipNestedExpression( char* pzScan, size_t len );
-STATIC void  spanTemplate( char* pzQte, tDefList* pDefList );
 STATIC void  prepInvokeArgs( tMacro* pMac );
-STATIC char* anonymousTemplate( void* p );
 
 
     STATIC int
@@ -106,230 +105,6 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
 
 
 /*
- *  skipNestedExpression
- *
- *  This is a wrapper around "skipExpression" that has a special purpose:
- *  We are now allowing templates to appear inside of a quoted string
- *  passed as an argument to a user macro invocation.  That is a tricky
- *  thing to parse and not needed everywhere.  Not even doable everywhere.
- *  It can only be done during the initial parse of a template because
- *  that is the only time when the start/end macro markers are known.
- */
-    STATIC char*
-skipNestedExpression( char* pzScan, size_t len )
-{
-    char* pzStartMark   = pCurTemplate->zStartMac;
-
-    tSCC zOnlyStrings[] = "Only strings may contain nested templates";
-    char* pzStartMacro  = strstr( pzScan, pzStartMark );
-    char* pzExpEnd      = (char*)skipExpression( pzScan, len );
-    char q;
-
-    if ((pzStartMacro == (char*)NULL) || (pzExpEnd < pzStartMacro))
-        return pzExpEnd;
-
-    switch (*pzScan) {
-    case '"':
-    case '\'':
-        break;
-    default:
-        LOAD_ABORT( pCurTemplate, pCurMacro, zOnlyStrings );
-    }
-
-    q = *pzScan++;        /*  Save the quote character type */
-
-    /*
-     *  skipMacro() needs whatever the correct mark is for the
-     *  macro when it was originally defined.
-     */
-    strcpy( zStartMac, pzStartMark );
-    startMacLen = strlen( pzStartMark );
-    strcpy( zEndMac, pCurTemplate->zEndMac );
-    endMacLen = strlen( zEndMac );
-
-    while (*pzScan != q) {
-        /*
-         *  IF we are at the start of a macro invocation,
-         *  THEN it is time to skip over it.
-         */
-        if (pzScan == pzStartMacro) {
-            pzScan = (char*)skipMacro( pzStartMacro ) + endMacLen;
-            pzStartMacro = strstr( pzScan, pzStartMark );
-            continue;
-        }
-
-        switch (*pzScan++) {
-        case NUL:
-            return pzScan-1;      /* Return address of terminating NUL */
-
-        case '\\':
-            if (q == '\'') {
-                /*
-                 *  Single quoted strings process the backquote specially
-                 *  only in fron of these three characters:
-                 */
-                switch (*pzScan) {
-                case '\\':
-                case '\'':
-                case '#':
-                    pzScan++;
-                }
-
-            } else {
-                char p[10];  /* provide a scratch pad for escape processing */
-                unsigned int ct = doEscapeChar( pzScan, p );
-                /*
-                 *  IF the advance is zero,
-                 *  THEN we either have end of string (caught above),
-                 *       or we have an escaped new-line,
-                 *       which is to be ignored.
-                 *  ELSE advance the quote scanning pointer by ct
-                 */
-                if (ct == 0) {
-                    pzScan++; /* skip over new-line character        */
-                } else
-                    pzScan += ct;
-            } /* if (q == '\'')      */
-        }     /* switch (*pzScan++)   */
-    }         /* while (*pzScan != q) */
-
-    return pzScan+1; /* Return addr of char after the terminating quote */
-}
-
-
-/*
- *  The following routine scans over quoted text, shifting
- *  it in the process and eliminating the starting quote,
- *  ending quote and any embedded backslashes.  They may
- *  be used to embed the quote character in the quoted text.
- *  The quote character is whatever character the argument
- *  is pointing at when this procedure is called.
- */
-    STATIC void
-spanTemplate( char* pzQte, tDefList* pDefList )
-{
-    char* pzStartMark   = pCurTemplate->zStartMac;
-
-    char* pzStartMacro  = strstr( pzQte, pzStartMark );
-    char* pzExpEnd = (char*)skipNestedExpression( pzQte, strlen( pzQte ));
-    char* pzText = pzQte;
-    char* p;
-    char  q;
-    int   mac_ct = 1;
-
-    /*
-     *  IF there are no more macros *OR* the current macro ends before
-     *     the start of the next macro,
-     *  THEN we don't have to worry about macros within quoted strings.
-     */
-    if (  (pzStartMacro == (char*)NULL)
-       || (pzExpEnd < pzStartMacro)) {
-        (void)spanQuote( pzQte );
-        return;
-    }
-
-    q = *pzQte;          /*  Save the quote character type */
-    p = pzQte++;         /*  Destination pointer           */
-
-    /*
-     *  skipMacro() needs whatever the correct mark is for the
-     *  macro when it was originally defined.
-     */
-    strcpy( zStartMac, pzStartMark );
-    startMacLen = strlen( pzStartMark );
-    strcpy( zEndMac, pCurTemplate->zEndMac );
-    endMacLen = strlen( zEndMac );
-
-    while (*pzQte != q) {
-        /*
-         *  IF we are at the start of a macro invocation,
-         *  THEN it is time to skip over it.
-         */
-        if (pzQte == pzStartMacro) {
-            mac_ct += 2;
-            pzQte = (char*)skipMacro( pzStartMacro ) + endMacLen;
-
-            /*
-             *  skipMacro has moved the macro text off elsewhere.
-             *  Shift the remainder of the string down, find next start.
-             */
-            memcpy( (void*)p, pzStartMacro, (pzQte - pzStartMacro) );
-            p += (pzQte - pzStartMacro);
-            pzStartMacro = strstr( pzQte, pzStartMark );
-            continue;
-        }
-
-        switch (*p++ = *pzQte++) {
-        case NUL:
-            pzQte--;      /* Return address of terminating NUL */
-            goto NUL_termination;
-
-        case '\\':
-            if (q != '\'') {
-                unsigned int ct = doEscapeChar( pzQte, p-1 );
-                /*
-                 *  IF the advance is zero,
-                 *  THEN we either have end of string (caught above),
-                 *       or we have an escaped new-line,
-                 *       which is to be ignored.
-                 *  ELSE advance the quote scanning pointer by ct
-                 */
-                if (ct == 0) {
-                    p--;     /* move destination back one character */
-                    pzQte++; /* skip over new-line character        */
-                } else
-                    pzQte += ct;
-
-            } else {
-                switch (*pzQte) {
-                case '\\':
-                case '\'':
-                case '#':
-                    p[-1] = *pzQte++;
-                }
-            }
-            break;
-
-        default:
-            ;
-        }
-    }
-    pzQte++; /* Return addr of char after the terminating quote */
-    *p = NUL;
-
- NUL_termination:
-
-    /*
-     *  We found the end of the string before we found the end of the quote.
-     */
-    {
-        tSCC zAnon[] = "* anonymous *";
-        size_t alocSize = sizeof( tTemplate ) + sizeof( zAnon )
-            + (mac_ct * sizeof( tMacro))
-            + (pzQte - pzText) + strlen( pCurTemplate->pzFileName ) + 16;
-        tTemplate* pNewT;
-        alocSize &= ~0x0F;
-        pNewT = (void*)AGALOC( alocSize, "anonymous template" );
-        memset( (void*)pNewT, 0, alocSize );
-        pNewT->descSize = alocSize;
-        pNewT->macroCt  = mac_ct;
-        pNewT->fd       = -1;
-        strcpy( pNewT->zStartMac, pCurTemplate->zStartMac );
-        strcpy( pNewT->zEndMac, pCurTemplate->zEndMac );
-        loadMacros( pNewT, pCurTemplate->pzFileName, zAnon, pzText );
-        pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize,
-                                      "resize anonymous template" );
-        pNewT = templateFixup( pNewT, pNewT->descSize );
-
-        /*
-         *  Replace the template text with a string containing its address.
-         */
-        sprintf( pzText, "[ 0x%08lX ]", (unsigned long)pNewT );
-    }
-}
-
-
-/*
  *  parseMacroArgs
  *
  *  This routine is called just before the first call to mFunc_Define
@@ -349,7 +124,6 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
      *  If there is no argument text, then the arg count is zero.
      */
     if (pMac->ozText == 0) {
-        pMac->ozText = 0;
         pMac->res = 0;
         return;
     }
@@ -370,7 +144,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         if (*pzScan != '=')
             continue;
         while (isspace( *++pzScan ))   ;
-        pzScan = (char*)skipNestedExpression( pzScan, strlen( pzScan ));
+        pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
         while (isspace( *pzScan ))     pzScan++;
     }
 
@@ -399,24 +173,14 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         pDL->de.pzDefName = pzScan;
         while (ISNAMECHAR( *pzScan ))  pzScan++;
 
-        /*
-         *  IF there is an immediate assignment character,
-         *  THEN terminate the name
-         *  ELSE ...
-         */
-        if (*pzScan == '=')
-            *(pzScan++) = NUL;
-        else {
-            /*
-             *  IF there is no value, then there is no value
-             */
-            if (*pzScan == NUL) {
-                pDL->de.pzValue = "";
-                break;
-            }
-            if (! isspace( *pzScan ))
-                LOAD_ABORT( pT, pMac, "name not followed by '='" );
+        switch (*pzScan) {
+        case NUL:
+            pDL->de.pzValue = (char*)zNil; goto fill_in_array_done;
 
+        default:
+            LOAD_ABORT( pT, pMac, "name not followed by '='" );
+
+        case ' ': case '\t': case '\n': case '\f':
             *(pzScan++) = NUL;
             while (isspace( *pzScan )) pzScan++;
 
@@ -424,17 +188,24 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  The name was separated by space, but has no value
              */
             if (*pzScan != '=') {
-                pDL->de.pzValue = "";
+                pDL->de.pzValue = (char*)zNil;
                 if (*pzScan == NUL)
-                    break;
-                continue;
+                    goto fill_in_array_done;
+                goto fill_in_array_continue;
             }
-            *(pzScan++) = NUL;  /* clobber the '=' */
+            /* FALLTHROUGH */
+        case '=':
+            *(pzScan++) = NUL;
         }
+
+        /*
+         *  When we arrive here, we have just clobbered a '=' char.
+         *  Now we have gather up the assigned value.
+         */
         while (isspace( *pzScan ))     pzScan++;
         pDL->pzExpr = pzScan;
         pDL->de.valType = VALTYP_TEXT;
-        pzScan = (char*)skipNestedExpression( pzScan, strlen( pzScan ));
+        pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
 
         /*
          *  Figure out what kind of expression we have
@@ -469,14 +240,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
                 memcpy( (void*)pz, pDL->pzExpr, (pzScan - pDL->pzExpr) );
                 pDL->pzExpr = pz;
             }
-            spanTemplate( pDL->pzExpr, pDL );
-
-            /*
-             *  IF this is an anonymous template reference,
-             *  THEN we must leave it as an expression!!
-             */
-            if (*pDL->pzExpr == '[')
-                break;
+            spanQuote( pDL->pzExpr );
             /* FALLTHROUGH */
 
         default:
@@ -502,7 +266,8 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
          */
         *(pzScan++) = NUL;
         while (isspace( *pzScan ))     pzScan++;
-    }
+    fill_in_array_continue:;
+    } fill_in_array_done:;
 
     if (ct > 1) {
         /*
@@ -603,7 +368,7 @@ mFunc_Debug( tTemplate* pT, tMacro* pMac )
                  : forInfo.fi_data[ forInfo.fi_depth - 1].for_index );
     /*
      *  The case element values were chosen to thwart most
-     *  optimizer that might be too bright for its own good.
+     *  optimizers that might be too bright for its own good.
      *  (`dummy' is write-only and could be ignored)
      */
     switch (atoi( pT->pzTemplText + pMac->ozText )) {
@@ -623,65 +388,6 @@ mFunc_Debug( tTemplate* pT, tMacro* pMac )
     return pMac+1;
 }
 #endif
-
-    STATIC char*
-anonymousTemplate( void* p )
-{
-    tSCC zTFil[] = "/tmp/.AutoGenTemp";
-
-    tTemplate*  pSavT = pCurTemplate;
-    tMacro*     pCurM = pCurMacro;
-    tTemplate*  pT    = (tTemplate*)p;
-    tFpStack*   pfp;
-    tFpStack*   psav  = pCurFp;
-
-    long fpos;
-    char*  res;
-
-    pfp = (tFpStack*)AGALOC( sizeof( tFpStack ), "anonymous template" );
-    pfp->pPrev = NULL;
-    pfp->pzOutName = (char*)zTFil;
-    pCurFp = pfp;
-
-    unlink( zTFil );
-    pfp->pFile = fopen( zTFil, "w+" FOPEN_BINARY_FLAG );
-    if (pfp->pFile == (FILE*)NULL) {
-        fprintf( stderr, "Error %d (%s) creating %s for read-write\n",
-                 errno, strerror( errno ), zTFil );
-        LOAD_ABORT( pSavT, pCurM, "Creating temp file" );
-    }
-    unlink( zTFil );
-
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        fprintf( pfTrace, zTplInvoked, "anonymous", pCurM->sibIndex );
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pSavT->pzFileName,
-                     pCurM->lineNo );
-    }
-
-    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt );
-
-    /*
-     *  Pop any output files pushed since the anonymous template started.
-     *  IF the anonymous template was popped, then ag_scm_out_pop will
-     *  choke when the output stack becomes empty.
-     */
-    while (pCurFp != pfp)
-        ag_scm_out_pop( SCM_UNDEFINED );
-
-    fpos = ftell( pfp->pFile );
-    res = (char*)AGALOC( fpos + 1, "anonymous template output"  );
-    rewind( pfp->pFile );
-    fread( res, 1, fpos, pfp->pFile );
-    fclose( pfp->pFile );
-    pCurFp = psav;
-
-    res[ fpos ] = NUL;
-
-    pCurTemplate = pSavT;
-    pCurMacro    = pCurM;
-    return res;
-}
 
 
 /*
@@ -717,17 +423,7 @@ build_defs( int defCt, tDefList* pList )
         }
         case NUL:
             pList->pzExpr = (char*)NULL;
-            pList->de.pzValue = "";
-            break;
-
-        case '[':
-            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                fprintf( pfTrace, "anonymus template arg %d\n",
-                         pCurMacro->sibIndex - defCt );
-
-            pList->de.pzValue =
-                anonymousTemplate(
-                    (void*)strtoul( pList->pzExpr + 2, (char**)NULL, 0 ));
+            pList->de.pzValue = (char*)zNil;
             break;
 
         case '(':
@@ -752,7 +448,7 @@ build_defs( int defCt, tDefList* pList )
                 snprintf( pList->de.pzValue, 16, "%d", gh_scm2ulong( res ));
             }
             else
-                pList->de.pzValue = strdup( "" );
+                pList->de.pzValue = strdup( zNil );
             break;
         }
 
@@ -1052,11 +748,6 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         if (*ppzScan == (char*)NULL)
             LOAD_ABORT( pT, pMac, "parse ended unexpectedly" );
 
-        /*
-         *  FIXME:  this expression does not work!!
-         *
-         *  pMacEnd - pNewT->aMacros
-         */
         pNewT->macroCt = pMacEnd - &(pNewT->aMacros[0]);
 
         /*

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.22 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: autogen.h,v 1.23 2001/08/23 03:22:05 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -205,8 +205,10 @@ struct outSpec {
     char        zSuffix[ 1 ];
 };
 
-#define FPF_FREE       0x0001
-#define FPF_UNLINK     0x0002
+#define FPF_FREE       0x0001  /* free the fp structure   */
+#define FPF_UNLINK     0x0002  /* unlink file (temp file) */
+#define FPF_NOUNLINK   0x0004  /* do not unlink file      */
+#define FPF_STATIC_NM  0x0008  /* name statically alloced */
 
 struct fpStack {
 	int         flags;

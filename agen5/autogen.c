@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: autogen.c,v 1.15 2001/08/23 03:22:05 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -101,6 +101,13 @@ main( int    argc,
 
 
     STATIC void
+ignoreSignal( int sig )
+{
+    return;
+}
+
+
+    STATIC void
 abendSignal( int sig )
 {
     tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
@@ -171,8 +178,6 @@ doneCheck( void )
     case PROC_STATE_OPTIONS:
     case PROC_STATE_DONE:
         return;
-
-    default: break;
     }
 
     _exit( EXIT_FAILURE );
@@ -204,7 +209,15 @@ signalSetup( void )
         sigaction( ++sigNo,  &sa, (struct sigaction*)NULL );
     } while (sigNo < NSIG);
 
-    sa.sa_handler = SIG_DFL;
+    /*
+     *  Signal handling for SIGCHLD needs to be ignored.  Do *NOT* use
+     *  SIG_IGN to do this.  That gets inherited by programs that need
+     *  to be able to use wait(2) calls.  At the same time, we don't want
+     *  our children to become zombies.  We may run out of zombie space.
+     *  Therefore, set the handler to an empty procedure.
+     *  POSIX oversight.  Fixed for next POSIX rev.
+     */
+    sa.sa_handler = ignoreSignal;
     sigaction( SIGCHLD,  &sa, (struct sigaction*)NULL );
 }
 /*
