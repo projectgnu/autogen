@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.8 1999/07/07 15:46:45 bkorb Exp $
+ *  $Id: autoopts.c,v 2.9 1999/07/07 19:41:00 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.8 1999/07/07 15:46:45 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.9 1999/07/07 19:41:00 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -1247,3 +1247,4 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
 
     return pOpts->curOptIdx;
 }
+/* autoopts.c ends here */

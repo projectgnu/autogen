@@ -1,13 +1,13 @@
 
 /*
- *  $Id: version.c,v 2.2 1999/06/03 19:43:28 bkorb Exp $
+ *  $Id: version.c,v 2.3 1999/07/07 19:41:00 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -111,3 +111,4 @@ doVersion( tOptions*  pOpts, tOptDesc* pOD )
 
     exit( EXIT_SUCCESS );
 }
+/* version.c ends here */

@@ -1,13 +1,13 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.6 1999/07/07 15:43:11 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.7 1999/07/07 19:41:00 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -61,7 +61,7 @@
  *  argument, conventionally "tOptDesc* pOD".  2.  Outside of an option
  *  procedure (or to reference a different option descriptor), use
  *  either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".  See the
- *  relevent generated header file to determine which and what values
+ *  relevant generated header file to determine which and what values
  *  for "opt_name" are available.
  */
 
@@ -304,3 +304,4 @@ tOptProc stackOptArg, unstackOptArg;
 }
 #endif
 #endif /* AUTOGEN_OPTIONS_H */
+/* options.h ends here */

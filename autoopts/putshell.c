@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 2.1 1999/07/07 15:46:46 bkorb Exp $
+ *  $Id: putshell.c,v 2.2 1999/07/07 19:41:00 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -154,3 +154,4 @@ putBourneShell( tOptions* pOpts )
         }
     }
 }
+/* putshell.c ends here */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.3 1998/09/15 17:19:51 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.4 1999/07/07 19:41:00 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -11,7 +11,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -184,3 +184,4 @@ strtransform( char* d, char* s )
         *(d++) = (char)charmap[ (unsigned)*s ];
     } while (*(s++) != NUL);
 }
+/* streqvcmp.c ends here */

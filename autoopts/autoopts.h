@@ -1,13 +1,13 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.8 1999/06/11 14:51:42 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.9 1999/07/07 19:41:00 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -170,3 +170,4 @@ extern tePagerState pagerState;
 #endif
 
 #endif /* AUTOGEN_AUTOOPTS_H */
+/* autoopts.h ends here */

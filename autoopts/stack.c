@@ -1,13 +1,13 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.2 1999/06/15 14:46:33 bkorb Exp $
+ *  $Id: stack.c,v 2.3 1999/07/07 19:41:00 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
 
 /*
- *  Automated Options copyright 1992-1998 Bruce Korb
+ *  Automated Options copyright 1992-1999 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -174,3 +174,4 @@ stackOptArg( tOptions*  pOpts, tOptDesc* pOptDesc )
     pAL->apzArgs[ (pAL->useCt)++ ] = pOptDesc->pzLastArg;
     pOptDesc->optCookie = (void*)pAL;
 }
+/* stack.c ends here */
