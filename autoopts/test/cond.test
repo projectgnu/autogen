@@ -1,0 +1,84 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# argument.test ---  test argument program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/09/22 19:48:13 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: cond.test,v 1.1 2001/09/22 19:48:13 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating $testname.def in `pwd`"
+testname="$testname" test_main="${test_main}" \
+argument="${argument}" long_opt="${long_opt}" \
+${SHELL-sh} ${stdopts} option:'opt init' second=020
+cat >> $testname.def <<EOF
+flag = {
+  name = cond;
+  value = c;
+  ifdef = COND;
+  descrip = "cond test";
+  doc = mumble;
+};
+EOF
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_cond - Test AutoOpts for cond
+USAGE:  cond [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o YES option         The option option descrip
+   -s Num second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure "`diff $testname.h*lp`"
+
+INC="${INC} -DCOND=1"
+compile "-?"
+cat > $testname.hlp <<'_EOF_'
+test_cond - Test AutoOpts for cond
+USAGE:  cond [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o YES option         The option option descrip
+   -s Num second         The second option descrip
+   -c no  cond           cond test
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure "`diff $testname.h*lp`"
+
+cleanup
+# end of argument.test
