@@ -10,6 +10,14 @@
    test those for POSIX compliance with the other macros, falling back to
    the included regex files if these tests fail.
 
+** Definition arguments are made invisible inside of FOR loops
+   by the static lexical scope.  AG definitions should be made
+   to have dynamic scope.
+
+** There is some sort of argument processing problem when invoking
+   AG defined macros the first time when you do not use the 'INVOKE'
+   key word.
+
 * In Progress
 
 *** Need to replace use of sprintf w/ snprintf throughout!

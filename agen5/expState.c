@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.17 2000/07/26 22:53:58 bkorb Exp $
+ *  $Id: expState.c,v 1.18 2000/08/09 14:56:25 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -38,8 +38,6 @@
 
 STATIC int     entry_length(   char* pzName, tDefEntry* pCurDef );
 STATIC int     count_entries(  char* pzName, tDefEntry* pCurDef );
-STATIC ag_bool find_any_entry( char* pzName, tDefEntry* pCurDef );
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION SUPPORT ROUTINES
@@ -56,7 +54,7 @@ entry_length( char* pzName, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
 
     if (pzField != (char*)NULL)
         pzField[-1] = '.';
@@ -84,6 +82,10 @@ entry_length( char* pzName, tDefEntry* pCurDef )
         /*
          *  IF we found a specific index
          *  THEN the result is the string length
+         *
+         *  Of course, if one set of "twins" was indexed and another not,
+         *  then you won't get what you want, but you *will* get what
+         *  you deserve  :-)
          */
         if (isIndexed)
             return strlen( pE->pzValue );
@@ -148,7 +150,7 @@ count_entries( char* pzName, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
 
     if (pzField != (char*)NULL)
         pzField[-1] = '.';
@@ -232,57 +234,6 @@ count_entries( char* pzName, tDefEntry* pCurDef )
 }
 
 
-    STATIC ag_bool
-find_any_entry( char* pzName, tDefEntry* pCurDef )
-{
-    ag_bool     isIndexed;
-    tDefEntry*  pE;
-
-    char* pzField = strchr( pzName, '.' );
-
-    if (pzField != (char*)NULL)
-        *(pzField++) = NUL;
-
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
-
-    /*
-     *  No such entry?  return zero
-     */
-    if (pE == (tDefEntry*)NULL) {
-        if (pzField != (char*)NULL)
-            pzField[-1] = '.';
-        return AG_FALSE;
-    }
-
-    /*
-     *  No subfield?  return one
-     */
-    if (pzField == (char*)NULL)
-        return AG_TRUE;
-
-    /*
-     *  a subfield for a text macro?  return zero
-     */
-    if (pE->valType == VALTYP_TEXT)
-        return AG_FALSE;
-
-    pzField[-1] = '.';
-
-    if (isIndexed) {
-        tDefEntry*  pMemberList = (tDefEntry*)(void*)(pE->pzValue);
-        if (find_any_entry( pzField, pMemberList ))
-            return AG_TRUE;
-    }
-    else do  {
-        tDefEntry*  pMemberList = (tDefEntry*)(void*)(pE->pzValue);
-        if (find_any_entry( pzField, pMemberList ))
-            return AG_TRUE;
-        pE = pE->pTwin;
-    } while (pE != (tDefEntry*)NULL);
-    return AG_FALSE;
-}
-
-
     STATIC SCM
 find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 {
@@ -302,7 +253,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
 
     /*
      *  No such entry?  return FALSE
@@ -470,12 +421,15 @@ ag_scm_def_file( void )
     SCM
 ag_scm_exist_p( SCM obj )
 {
+    ag_bool x;
+
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    return (find_any_entry( SCM_CHARS( obj ), pDefContext ))
-           ? SCM_BOOL_T
-           : SCM_BOOL_F;
+    if (findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE ) == NULL)
+        return SCM_BOOL_F;
+
+    return SCM_BOOL_T;
 }
 
 
@@ -545,12 +499,12 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
 ag_scm_get( SCM obj )
 {
     tDefEntry*  pE;
-    ag_bool     isIndexed;
+    ag_bool     x;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE );
 
     if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
         return gh_str02scm( "" );
@@ -576,7 +530,7 @@ ag_scm_high_lim( SCM obj )
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed, AG_TRUE );
 
     /*
      *  IF we did not find the entry we are looking for
@@ -631,23 +585,20 @@ ag_scm_len( SCM obj )
 ag_scm_low_lim( SCM obj )
 {
     tDefEntry*  pE;
-    ag_bool     isIndexed;
+    ag_bool     x;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE );
 
     /*
      *  IF we did not find the entry we are looking for
      *  THEN return zero
-     *  ELSE search the twin list for the high entry
+     *  ELSE we have the low index.
      */
     if (pE == (tDefEntry*)NULL)
         return gh_int2scm( 0 );
-
-    if (isIndexed)
-        return gh_int2scm( pE->index );
 
     return gh_int2scm( pE->index );
 }

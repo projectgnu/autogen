@@ -4,6 +4,18 @@
 	* autoopts/options.h:  Fixed to match.
 	* autoopts/Makefile.am: Use it.
 
+2000-08-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defFind.c(findDefEntry): if a compound definition cannot
+	be found within a block definition, check a twin also  :-)
+	* agen5/expState.c: change references to findDefEntry and replace
+	references to "find_any_entry" to this procedure, since it now works
+	for that purpose.
+	* agen5/funcEval.c: ditto
+	* agen5/funcFor.c: ditto
+	* autoopts/test/shell.test: Fixed some brokenness in example output!!
+	* agen5/test/opts.test: Inverted sense on DEBUG options check
+
 2000-07-31  Bruce Korb  <bkorb@gnu.org>
 
 	* autogen/options.tpl:  Clarified messages about when 'value' option
@@ -100,7 +112,7 @@
 
 	* autoopts/optlib.tpl:  add USAGE_LINE.  Omits square brackets
 	around option syntax if there are required arguments.
-	* autoopts/optcode.tpl:  Make the usage invocation syntax a 
+	* autoopts/optcode.tpl:  Make the usage invocation syntax a
 	subroutine "USAGE_LINE" in optlib.tpl
 
 2000-03-12  Bruce Korb  <bkorb@gnu.org>
@@ -193,7 +205,7 @@
 	* agen5/defReduce.c:  Implementation
 	* agen5/defLex.c:  commas are now a special token
 	* autoopts/optlib.tpl:  OSR5 regex cannot grok "^(|:|=)$"  :-(
-	
+
 1999-11-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c:  Template structure needed more space.
@@ -209,7 +221,7 @@
 	* agen5/*:  Documentation rework
 	* getdefs/getdefs.c:  allow for empty string definitions
 	* getdefs/test/*:  Created a test case for getdefs
-	
+
 1999-10-27  Bruce Korb  <bkorb@gnu.org>
 
 	AutoGen Version 5:

@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.6 2000/03/21 03:05:22 bruce Exp $
+ *  $Id: defFind.c,v 1.7 2000/08/09 14:56:25 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -379,7 +379,8 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
  *  to traverse the list of twins).
  */
     EXPORT tDefEntry*
-findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
+findDefEntry( char* pzName, tDefEntry* pDefs,
+              ag_bool* pIsIndexed, ag_bool may_change_level )
 {
     char*      pcBrace;
     char       breakCh;
@@ -412,7 +413,7 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
              *  THEN break out of the double loop
              */
             if (strcmp( pE->pzName, zDefName ) == 0)
-                goto findTwin;
+                goto def_entry_found;
 
             pE = pE->pNext;
         } while (pE != (tDefEntry*)NULL);
@@ -420,11 +421,14 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
         /*
          *  Advance and check for finish (not found in root defs)
          */
-        pDefs = pDefs->pDad ;
-    }
+        if (! may_change_level)
+            return (tDefEntry*)NULL;
 
-findTwin:
+        pDefs = pDefs->pDad ;
+    } def_entry_found:;
+
     *pcBrace = breakCh;
+
     switch (breakCh) {
     case NUL:
         return pE;
@@ -471,7 +475,19 @@ findTwin:
     if (pE->valType != VALTYP_BLOCK)
         return (tDefEntry*)NULL;
 
-    pDefs = (tDefEntry*)pE->pzValue;
-    goto findDefEntryRecurse;
+    /*
+     *  Loop through all the twins of the entry we found until
+     *  we find the entry we want.  We ignore twins if we just
+     *  used a subscript.
+     */
+    do  {
+        tDefEntry* res = findDefEntry( pzName, (tDefEntry*)pE->pzValue,
+                                       pIsIndexed, AG_FALSE );
+        if ((res != (tDefEntry*)NULL) || (breakCh == '['))
+            return res;
+        pE = pE->pTwin;
+    } while (pE != (tDefEntry*)NULL);
+
+    return (tDefEntry*)NULL;
 }
 /* end of defFind.c */

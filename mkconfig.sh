@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.10 2000/06/22 17:05:59 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.11 2000/08/09 14:56:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "+CVS" ]
@@ -20,6 +20,8 @@ exec 5> temp.config
 
 GENLIST="agen5/autogen.1
 	 agen5/directive.h
+	 agen5/defParse.c
+	 agen5/defParse.h
 	 agen5/expr.h
 	 agen5/expr.ini
 	 agen5/functions.h

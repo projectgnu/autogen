@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.22 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: funcEval.c,v 1.23 2000/08/09 14:56:25 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -138,7 +138,7 @@ evalExpression( ag_bool* pMustFree )
          *  Get the named definition entry, maybe
          */
         pDef = findDefEntry( pT->pzTemplText + pMac->ozName,
-                             pCurDef, &isIndexed );
+                             pCurDef, &isIndexed, AG_TRUE );
 
         if (pDef == (tDefEntry*)NULL) {
             /*
