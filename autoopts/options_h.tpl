@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.1 1998/09/14 14:33:51 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.2 1998/10/08 17:38:24 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -26,13 +26,12 @@
  *             Boston,  MA  02111-1307, USA.
  *
  * As a special exception, Bruce Korb gives permission for additional
- * uses of the text contained in his release of AutoOpts.
+ * uses of the text contained in his release of options.h.
  *
- * The exception is that, if you link the AutoOpts library with other
- * files to produce an executable, this does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * Your use of that executable is in no way restricted on account of
- * linking the AutoOpts library code into it.
+ * The exception is that, if you reference this file with a #include
+ * statement when compiling a C or C++ source file, this does not
+ * cause the resulting object file or linked executable to be covered
+ * by the GNU General Public License.
  *
  * This exception does not however invalidate any other reasons why
  * the executable file might be covered by the GNU General Public License.
