@@ -3,7 +3,7 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 2.0 1998/09/22 22:17:24 bkorb Exp $
+ *  $Id: strsignal.def,v 2.1 1999/08/03 22:51:37 bkorb Exp $
  */
 
 #shell
@@ -77,7 +77,7 @@ else
     then continue ; fi
 
     eval HAVE_${NUM}=1
-    f=`echo "$f" | sed -e's;/\*[   ]*;;' -e's;[    ]*\*/;;'`
+    f=`echo "$f" | sed -e 's;/\*[ 	]*;;' -e 's;[ 	]*\*/;;'`
     if test -z "$f"
     then f="Undescribed signal ${NUM}" ; fi
 

@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Fri Jul 30 08:51:54 1999                                
+## Last Modified:     Tue Aug  3 15:52:04 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.26 1999/07/30 15:54:26 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.27 1999/08/03 22:52:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -749,8 +749,8 @@ Extracted from $top_srcdir/src/agParse.y
 @end ignore
 @example
 [=_eval
-  "sed -n -e'/^definitions/,$p' $top_srcdir/src/agParse.y |
-  sed -e's/{/@{/g' -e's/}/@}/g' "
+  "sed -n -e '/^definitions/,$p' $top_srcdir/src/agParse.y |
+  sed -e 's/{/@{/g' -e 's/}/@}/g' "
   _shell=]
 @end example
 
