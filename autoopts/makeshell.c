@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.24 2000/04/04 13:22:18 bkorb Exp $
+ *  $Id: makeshell.c,v 2.25 2000/07/26 23:10:40 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -372,8 +372,8 @@ typedef enum { TEXTTO_TABLE COUNT_TT } teTextTo;
 extern tOptProc doVersion;
 extern tOptProc doPagedUsage;
 extern tOptProc doLoadOpt;
-char*  pzShell;
-char*  pzTrailer = (char*)NULL;
+STATIC char*  pzShell   = (char*)NULL;
+STATIC char*  pzTrailer = (char*)NULL;
 
 STATIC void  emitFlag(  tOptions* pOpts );
 STATIC void  emitLong(  tOptions* pOpts );
@@ -476,7 +476,7 @@ putShellParse( tOptions* pOpts )
 }
 
 
-    void
+    STATIC void
 textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 {
     int  nlHoldCt = 0;
@@ -570,6 +570,8 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
     STATIC void
 emitUsage( tOptions* pOpts )
 {
+    char     zTimeBuf[ 128 ];
+
     /*
      *  First, switch stdout to the output file name.
      *  Then, change the program name to the one defined
@@ -578,7 +580,6 @@ emitUsage( tOptions* pOpts )
      */
     {
         char*    pzOutName;
-        char     zTimeBuf[ 128 ];
         char*    pz;
 
         {
@@ -592,7 +593,7 @@ emitUsage( tOptions* pOpts )
         else pzOutName = "stdout";
 
         if (pzShell != (char*)NULL)
-            printf( "#!%s\n", pzShell );
+            printf( "#! %s\n", pzShell );
 
         printf( zPreamble, zStartMarker, pzOutName, zTimeBuf );
 
@@ -605,9 +606,11 @@ emitUsage( tOptions* pOpts )
             if ((*pzOutName++ = tolower( *pz++ )) == '\0')
                 break;
         }
-        printf( zEndPreamble, zTimeBuf, pOpts->pzPROGNAME );
     }
 
+    printf( zEndPreamble, zTimeBuf, pOpts->pzPROGNAME );
+
+    pOpts->pzProgPath = pOpts->pzProgName = zTimeBuf;
     textToVariable( pOpts, TT_LONGUSAGE,  (tOptDesc*)NULL );
     textToVariable( pOpts, TT_USAGE, (tOptDesc*)NULL );
 
