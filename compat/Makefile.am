@@ -5,12 +5,12 @@
 ## Copyright (C) 1997 Gary V Vaughan
 ## 
 ## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
-## Maintainer:       Bruce Korb <autogen@linuxbox.com>
+## Maintainer:       Bruce Korb <bkorb@gnu.org>
 ## Created:          Mon Jun 30 15:35:12 1997	
 ## Last Modified:    Thu Jul 29 08:30:10 1999				      
-##            by:    Bruce Korb <autogen@linuxbox.com>			      
+##            by:    Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.8 1999/10/28 03:36:29 bruce Exp $
+## $Id: Makefile.am,v 2.9 2000/04/04 13:22:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

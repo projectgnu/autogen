@@ -6,9 +6,9 @@
 # Copyright (C) 1999 Bruce Korb
 #
 # Last Modified:     Tue Sep 28 07:01:05 1999				      
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
-# by:                Bruce Korb <autogen@linuxbox.com>			      
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# by:                Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
@@ -32,7 +32,7 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 AO_LIBRARY=libopts.la
 AO_VERSION=3
 AO_REVISION=3
-AO_PATCHLEVEL="1"
+AO_PATCHLEVEL="2"
 if [ -z "${AO_PATCHLEVEL}" ]
 then
   AO_ANNOUNCE_LEVEL="${AO_VERSION}.${AO_REVISION}"
@@ -41,7 +41,7 @@ else
 fi
 AO_RELEASE=$AO_VERSION.$AO_REVISION
 
-MAINTAINER='Bruce Korb <autogen@linuxbox.com>'
+MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 
 # For automake
 #

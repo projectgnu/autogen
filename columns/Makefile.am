@@ -4,13 +4,13 @@
 ## 
 ##    AutoGen copyright 1992-1999 Bruce Korb
 ## 
-## Author:	    Bruce Korb <autogen@linuxbox.com>
-## Maintainer:	    Bruce Korb <autogen@linuxbox.com>
+## Author:	    Bruce Korb <bkorb@gnu.org>
+## Maintainer:	    Bruce Korb <bkorb@gnu.org>
 ## Created:	    Mon Jun 30 15:35:12 1997
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.25 2000/03/23 02:57:18 bruce Exp $
+## $Id: Makefile.am,v 1.26 2000/04/04 13:22:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -19,7 +19,7 @@ columns_SOURCES = columns.c opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
-AGEXE		= $(top_builddir)/agen5/AutoGen
+AGEXE		= $(top_builddir)/agen5/@AGEXE@
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
 

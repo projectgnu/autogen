@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 1.11 1999/09/22 15:15:49 bkorb Exp $
+ *  $Id: columns.c,v 1.12 2000/04/04 13:22:19 bkorb Exp $
  */
 
 /*
@@ -104,8 +104,8 @@ main( int    argc,
             } else if (firstSize < indentSize) {
                 char* tmp = (char*)malloc( indentSize + 1 );
                 char  z[10];
-                sprintf( z, "%%-%ds", indentSize );
-                sprintf( tmp, z, pzFirstPfx );
+                snprintf( z, sizeof(z), "%%-%ds", indentSize );
+                snprintf( tmp, indentSize + 1, z, pzFirstPfx );
                 pzFirstPfx = tmp;
             }
         }
@@ -252,7 +252,8 @@ readLines( void )
          */
         if (HAVE_OPT( FORMAT )) {
             pzText = zFmtLine;
-            len = sprintf( zFmtLine, OPT_ARG( FORMAT ), zLine );
+            len = snprintf( zFmtLine, sizeof(zFmtLine), OPT_ARG( FORMAT ),
+                            zLine );
         } else {
             pzText = zLine;
         }
@@ -369,7 +370,7 @@ writeColumns( void )
     tpPrintList pPL;
 
     colCt = columnCt;
-    sprintf( zFmt, "%%-%ds", columnSz );
+    snprintf( zFmt, sizeof(zFmt), "%%-%ds", columnSz );
 
     if (colCt == 1) {
         writeRows();
@@ -426,7 +427,7 @@ writeColumns( void )
             fsz = maxEntryWidth;
         else
             fsz = maxEntryWidth + (rem / (colCt-1));
-        sprintf( zFmt, "%%-%ds", fsz );
+        snprintf( zFmt, sizeof(zFmt), "%%-%ds", fsz );
     }
 
     /*
@@ -511,7 +512,7 @@ writeRows( void )
     int  colCt;
 
     colCt = columnCt;
-    sprintf( zFmt, "%%-%ds", columnSz );
+    snprintf( zFmt, sizeof(zFmt), "%%-%ds", columnSz );
 
     /*
      *  IF we have a separator,

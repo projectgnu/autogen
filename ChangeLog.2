@@ -1,22 +1,22 @@
-1999-10-06  Bruce Korb  <autogen@linuxbox.com>
+1999-10-06  Bruce Korb  <bkorb@gnu.org>
 
 	* snprintfv/snprintfv/filaments.c:  NUL terminate asprintf output.
 	* autoopts/makeshell.c: provide an opton to strip the #!/bin/sh magic.
 	* autoopts/genshell.def: specify the new option
 
-1999-10-01  Bruce Korb  <autogen@linuxbox.com>
+1999-10-01  Bruce Korb  <bkorb@gnu.org>
 
 	* src/autoopts/streqvcmp.c(streqvmap): resetting the map
 	never worked :)
 
-1999-09-28  Bruce Korb  <autogen@linuxbox.com>
+1999-09-28  Bruce Korb  <bkorb@gnu.org>
 
 	* src/opts.def: force consistency in DEBUG define usage
 	* src/agGetDef.c: don't use debug options unless DEBUG defined
 	* src/agShell.c: ditto
 	* src/agTempl.c: ditto
 
-1999-09-22  Bruce Korb  <autogen@linuxbox.com>
+1999-09-22  Bruce Korb  <bkorb@gnu.org>
 
 	* columns/opts.def(first-indent):  New option
 	* columns/columns.c(main): implemented it.
@@ -40,14 +40,14 @@
 	* configure.in (AM_PROG_CC_STDC): Required to put native compilers
 	into ANSI compatible mode.
 	
-1999-08-05  Bruce Korb <autogen@linuxbox.com>
+1999-08-05  Bruce Korb <bkorb@gnu.org>
 
 	* config/bootstrap.local: Fixed the hack for inserting
 	code at the beginning of the configure script.
 
 	* NOTES:  described what I did and why.
 
-1999-08-04  Bruce Korb <autogen@linuxbox.com>
+1999-08-04  Bruce Korb <bkorb@gnu.org>
 
 	* config/bootstrap.local: Add a hack to insert code at
 	the start of configure.  This code will make the build
@@ -92,7 +92,7 @@
 	AC_CHECK_LIB_REGEX is a superset of the other, and is the only one
 	which provides the configure script cli options. Reapplied.
 	
-1999-07-29  Bruce Korb <autogen@linuxbox.com>
+1999-07-29  Bruce Korb <bkorb@gnu.org>
 
 	* config/bootstrap.local: Add checks for working AutoGen.
 	Bootstrapping AutoGen requires itself!
@@ -186,7 +186,7 @@
 	listing the macro files.
 	* config/Makefile.am (EXTRA_DIST): s/@M4_SRC@/<list of m4 files>/.
 
-1999-07-07  Bruce Korb  <autogen@linuxbox.com>
+1999-07-07  Bruce Korb  <bkorb@gnu.org>
 
 	* all files everywhere: generally make everything configure with
 	the snprintfv stuff.
@@ -534,7 +534,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* tests/evalstr.test: a bug in bash 2.02(1) prevents
 	\177 from being quoted properly =(O|
 
-1998-12-01  Bruce Korb  <autogen@linuxbox.com>
+1998-12-01  Bruce Korb  <bkorb@gnu.org>
 
 	* src/agGetDef.c (findDefEntry): split the routine
 	and enabled qualified definition names.
@@ -623,7 +623,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	reflect that illegal C identifiers for `prog_name' will be
 	massaged.
 
-1998-10-30  Bruce Korb <autogen@linuxbox.com>
+1998-10-30  Bruce Korb <bkorb@gnu.org>
 
 	* MakeRules.in
 	`test x$i(srcdir)' *had* to be a mistype of `test x$(srcdir)'!!
@@ -643,7 +643,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* autoopts/Makefile.am
 	genshell.def, genshell.c, and genshell.h need distributing.
 
-1998-10-26  Bruce Korb <autogen@linuxbox.com>
+1998-10-26  Bruce Korb <bkorb@gnu.org>
 	* autoopts/optcode.tpl
 	* autoopts/autoopts.texi
 	* columns/opts.def
@@ -667,7 +667,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* columns/columns.c
 	Fixed problem with specifying column count
 
-1998-10-21  Bruce Korb <autogen@linuxbox.com>
+1998-10-21  Bruce Korb <bkorb@gnu.org>
 	* Installed all the Gary stuff below
 	* columns/* I now actually have it working completely.
 	* src/agGetDef.c if reading definitions from stdin,
@@ -714,7 +714,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* doc/depend.eps: New file.  Encapsulated postscript dependency
 	diagram for the printed manual.
 
-1998-10-08  Bruce Korb <autogen@linuxbox.com>
+1998-10-08  Bruce Korb <bkorb@gnu.org>
 	* autoopts/makeshell.c
 	Developed a special "TEST_MAIN" procedure putShellParse
 	which emits a portable shell script that will parse the
@@ -731,7 +731,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* config/acconfig.h: Added HAVE_SNPRINTF and HAVE_VSNPRINTF
 	macros.
 
-1998-09-28  Bruce Korb <autogen@linuxbox.com>
+1998-09-28  Bruce Korb <bkorb@gnu.org>
 	* columns/*
 	New program to columnize a list of text.
 	* autoopts/opthead.tpl
@@ -749,7 +749,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	Added some code to make clearer what may have failed,
 	should the shell command go away or abend.
 
-1998-09-23  Bruce Korb <autogen@linuxbox.com>
+1998-09-23  Bruce Korb <bkorb@gnu.org>
 	* autoopts/Makefile.am
 	* autoopts/opthead.tpl
 	* autoopts/autoopts.texi
@@ -850,7 +850,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	* src/autogen.c: #include signal.h to get a definition for struct
 	sigaction [as used in main()].
 
-1998-09-14  Bruce Korb <autogen@linuxbox.com>
+1998-09-14  Bruce Korb <bkorb@gnu.org>
 	* */*
 	Corrected most of the problems engendered by below :-}
 
@@ -869,7 +869,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 
 	* VERSION: Bumped patchlevel to .6
 
-1998-08-21  Bruce Korb <autogen@linuxbox.com>
+1998-08-21  Bruce Korb <bkorb@gnu.org>
 	* src/*
 	Reworked most everything to separate the  template parsing from
 	the text emission.  A massive data structure now points to all

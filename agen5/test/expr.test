@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Author:	     Bruce Korb <autogen@linuxbox.com>
-# Maintainer:	     Bruce Korb <autogen@linuxbox.com>
+# Author:	     Bruce Korb <bkorb@gnu.org>
+# Maintainer:	     Bruce Korb <bkorb@gnu.org>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2000/03/26 17:04:45 $
-#            by:     Bruce Korb <autogen@linuxbox.com>
+# Last Modified:  $Date: 2000/04/04 13:21:58 $
+#            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: expr.test,v 1.13 2000/03/26 17:04:45 bruce Exp $
+# $Id: expr.test,v 1.14 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,15 +25,14 @@ fi
 #
 #  We construct this by pulling down the sources from the
 #  AutoGen source directory.  We will also copy out the same
-#  commands as are used there.
+#  commands as are used there.  ${top_srcdir} is a full path.
 
-workdir=`pwd`
 cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
-   ${top_srcdir}/agen5/func*.c $workdir
+   ${top_srcdir}/agen5/func*.c .
 
 cat > ./${testname}.sh <<- _EOF_
-GD="${top_builddir}/getdefs/getdefs"
-AG="${top_builddir}/agen5/AutoGen"
+GD="${GDEXE}"
+AG="${AGEXE}"
 
 _EOF_
 sed -n '/  expr.ini /,/date > stamp-exprini/p' \
@@ -42,7 +41,7 @@ sed -n '/  expr.ini /,/date > stamp-exprini/p' \
 
 #  Remove the lines that *will* be different, always...
 #
-sh -x ./${testname}.sh
+srcdir=. ${SHELL} -x ./${testname}.sh
 sed '/DO NOT EDIT/,/and the template/d' ./expr.ini > expr.out
 sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
     > expr.base

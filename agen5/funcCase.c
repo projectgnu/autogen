@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.18 2000/03/29 04:51:06 bruce Exp $
+ *  $Id: funcCase.c,v 1.19 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -57,19 +57,20 @@ STATIC void     compile_re( regex_t* pRe, char* pzPat, int flags );
 STATIC void     upString( char* pz );
 
 typedef tSuccess (tSelectProc)( char* pzText, char* pzMatch );
-tSelectProc Select_Compare,
-            Select_Compare_End,
-            Select_Compare_Start,
-            Select_Compare_Full,
-            Select_Equivalent,
-            Select_Equivalent_End,
-            Select_Equivalent_Start,
-            Select_Equivalent_Full,
-            Select_Match,
-            Select_Match_End,
-            Select_Match_Start,
-            Select_Match_Full,
-            Select_Match_Always;
+STATIC tSelectProc
+    Select_Compare,
+    Select_Compare_End,
+    Select_Compare_Start,
+    Select_Compare_Full,
+    Select_Equivalent,
+    Select_Equivalent_End,
+    Select_Equivalent_Start,
+    Select_Equivalent_Full,
+    Select_Match,
+    Select_Match_End,
+    Select_Match_Start,
+    Select_Match_Full,
+    Select_Match_Always;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

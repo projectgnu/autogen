@@ -1,14 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.22 1999/10/31 18:31:17 bruce Exp $
+ *  $Id: getdefs.c,v 2.23 2000/04/04 13:23:32 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
-   Author:            Bruce Korb <autogen@linuxbox.com>
-   Maintainer:        Bruce Korb <autogen@linuxbox.com>
+   Author:            Bruce Korb <bkorb@gnu.org>
+   Maintainer:        Bruce Korb <bkorb@gnu.org>
    Created:           Mon Jun 30 15:35:12 1997
    Last Modified:     Tue Aug  3 16:09:54 1999                              */
-/*            by:     Bruce Korb <autogen@linuxbox.com>                     */
+/*            by:     Bruce Korb <bkorb@gnu.org>                     */
 
 #include <errno.h>
 #include <sys/types.h>
@@ -259,7 +259,7 @@ validateOptions( void )
          *  IF a pattern has been supplied, enclose it with
          *  the '/' '*' '=' part of the pattern.
          */
-        sprintf( pzDefPat, "/\\*=(%s)", pz );
+        snprintf( pzDefPat, len, "/\\*=(%s)", pz );
     }
 
     /*
@@ -964,6 +964,8 @@ emitDefinition( char* pzDef, char* pzOut )
     case '{':
         /*
          *  Quoted entries or subblocks do their own stringification
+         *  sprintf is safe because we are copying strings around
+         *  and *always* making the result smaller than the original
          */
         pzOut += sprintf( pzOut, " =%c%s;\n", sep_char, pzDef );
         break;
@@ -1456,7 +1458,7 @@ startAutogen( void )
     FILE*  agFp;
 
     char zSrch[  MAXPATHLEN ];
-    char zBase[  MAXPATHLEN ];
+    char zBase[  68 ];
 
     /*
      *  Compute the base name.
@@ -1467,7 +1469,7 @@ startAutogen( void )
      *  If neither of these work, then use the current directory name.
      */
     if (HAVE_OPT( BASE_NAME ))
-        sprintf( zBase, "-b%s", OPT_ARG( BASE_NAME ));
+        snprintf( zBase, sizeof(zBase), "-b%s", OPT_ARG( BASE_NAME ));
 
     else {
         /*
@@ -1481,6 +1483,10 @@ startAutogen( void )
             while (isalnum( *pzS ) || (*pzS == '_'))
                 *pz++ = *pzS++;
             *pz = NUL;
+            if (pz >= zBase + sizeof(zBase)) {
+                fputs( "base name length exceeds 64\n", stderr );
+                exit( EXIT_FAILURE );
+            }
         }
 
         /*
@@ -1497,7 +1503,7 @@ startAutogen( void )
             if (pz == (char*)NULL)
                  pz = zSrch;
             else pz++;
-            strcpy( zBase+2, pz );
+            snprintf( zBase+2, sizeof(zBase)-2, "%s", pz );
         }
     }
 

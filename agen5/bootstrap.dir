@@ -9,15 +9,28 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
+#  Dump the bootstrap recursive argument.  We're not interested.
+#
+if [ "$1" = recursive ]
+then
+  shift
+fi
+
+#  Check for a "force" option
+#
+if [ "$1" = "-f" ]
+then force=true  ; shift
+else force=false ; fi
+
 #  Make sure we have a default for top build and source.
 #  Some of the templates need this information.
 #
-if [ -z "$top_srcdir" ]
-then
-  top_builddir=..
-  top_srcdir=..
-  export top_builddir top_srcdir
-fi
+top_srcdir=${top_srcdir:-..}
+top_builddir=${top_builddir:-..}
+srcdir=${srcdir:-.}
+builddir=${builddir:-.}
+
+export top_builddir top_srcdir builddir srcdir
 
 #  disable any $HOME defaults
 #
@@ -43,19 +56,20 @@ fi
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # For the following to work, we must temporarily find or install
-# AutoGen, columns and getdefs from wherever they are found:
+# autogen, columns and getdefs from wherever they are found:
 #
 rmlist=
 
 #  Name our executable in one place and disable any $HOME defaults
 #  Use the local ${AG}, if available.  Otherwise, look for it.
 #
-AG=AutoGen
+AGEXE=${AGEXE-autogen}
+AG=${builddir}/${AGEXE}
 if [ ! -x ${AG} ]
 then
-  f=`type ${AG} | sed -e "s;${AG} is ;;" `
+  f=`type ${AGEXE} | sed -e "s;${AGEXE} is ;;" `
   case ${f} in
-  */AutoGen )
+  */${AGEXE} )
      AG=${f}
      ;;
 
@@ -80,38 +94,27 @@ then
      ;;
 
   * )
-    echo "Cannot locate ${GD}.  Giving up"
+    GD=""
+    echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD}).  Giving up"
     exit 1
     ;;
   esac
 fi
 
-COLS=../columns/columns
-if [ ! -x ${COLS} ]
+COL=../columns/columns
+if [ ! -x ${COL} ]
 then
   f=`type columns | sed "s/columns is //" `
   case ${f} in
   */columns )
-     ln -s ${f} ${COLS}
-     rmlist="$rmlist ${COLS}"
+     ln -s ${f} ${COL}
+     rmlist="$rmlist ${COL}"
      ;;
-
-  * )
-    echo "Cannot locate ${COLS}.  Giving up"
-    exit 1
-    ;;
   esac
 fi
 
 # # # # # # # # # # # # # # # # # # # # # # #
 #
-#  Dump the bootstrap recursive argument.  We're not interested.
-#
-if [ "$1" = recursive ]
-then
-  shift
-fi
-
 #  IF we have no remaining argument, then do everything unbuilt
 #
 if [ $# -eq 0 ]
@@ -119,12 +122,19 @@ then
   echo Looking in ${top_srcdir}/agen5/Makefile.am for GEN-RULE
   set -- `egrep '##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
           sed 's/.*## *\(.*\) GEN-RULE/\1/' `
-  t=""
-  for f
-  do if [ ! -s $f ]
-     then t="$t $f" ; fi
-  done
-  set -- $t
+  if ! $force
+  then
+    t=""
+    for f
+    do if [ ! -f $f ]
+       then
+         echo "Bootstrapping $f"
+         t="$t $f"
+       fi
+    done
+    set -- $t
+  fi
+
   echo building $*
 fi
 
@@ -181,11 +191,17 @@ do
   stamp-exprini | \
   expr.h | \
   expr.ini )
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
+    if ! ksh -c : 2> /dev/null
+    then
+      echo "Reconstructing expr.h and expr.ini requires ksh.  Giving up."
+      exit 1
+    fi
+    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd` ; export AUTOGEN_TEMPL_DIRS
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="$eopt defs=gfunc templ=snarf srcfile"
     eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
@@ -196,6 +212,11 @@ do
     ;;
 
   expr.def )
+    if [ -z "${GD}" ]
+    then
+      echo "Cannot locate autogen or getdefs.  Giving up"
+      exit 1
+    fi
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="assign=group=ag $eopt defs=gfunc templ=snarf srcfile"
     SHELL=ksh ${GD} $eopt out=expr.def exp*.c func*.c
@@ -203,11 +224,12 @@ do
 
   stamp-functions | \
   functions.h )
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
+    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
     eopt="template=functions defs=macfunc linenum srcfile filelist"
     eopt="$eopt autogen=${AG} base-name=functions"
     echo ${GD} $eopt func*.c
@@ -217,11 +239,12 @@ do
 
   stamp-directive | \
   directive.h )
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
+    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
     eopt="template=directive autogen=${AG} base-name=directive"
     echo ${GD} $eopt ${top_srcdir}/agen5/defDirect.c
     ${GD} $eopt defDirect.c
@@ -231,9 +254,9 @@ do
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
@@ -246,7 +269,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate autogen.  Giving up"
       exit 1
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
@@ -255,7 +278,6 @@ do
     ;;
 
   proto.h )
-    rm -f proto.h
     ( cat <<-	_EOF_
 	/*
 	 * AutoGen Globally exported prototypes
@@ -273,7 +295,12 @@ _EOF_
     done
     echo
     echo "#endif /* AUTOGEN_PROTOTYPES_H */"
-    ) > proto.h
+    ) > proto.h.new
+
+    if cmp proto.h proto.h.new
+    then rm -f proto.h.new
+    else mv -f proto.h.new proto.h ; fi
+
     chmod 444 proto.h
     ;;
 

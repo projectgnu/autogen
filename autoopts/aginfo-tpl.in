@@ -4,13 +4,13 @@
 ## 
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
 ## 
-## Author:            Bruce Korb <autogen@linuxbox.com>
-## Maintainer:        Bruce Korb <autogen@linuxbox.com>
+## Author:            Bruce Korb <bkorb@gnu.org>
+## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
-##            by:     Bruce Korb <autogen@linuxbox.com>			      
+##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.15 2000/03/25 17:23:41 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.16 2000/04/04 13:22:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -104,7 +104,9 @@ This is the automatically generated usage text for [=prog_name=]:
     then PROG='echo %1$s is unavailable - no' ; fi
 
     ${PROG} %2$s 2>&1 | \
-        sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g' "
+        sed -e 's/USAGE:  lt-/USAGE:  /' \
+            -e 's/{/@{/g' -e 's/}/@}/g' \
+            -e 's/\t/        /g' "
 
     (if (exist? "prog_file_name")
         (get "prog_file_name")

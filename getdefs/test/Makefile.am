@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Author:          Bruce Korb <autogen@linuxbox.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 1999/11/30 02:37:45 bruce Exp $
+## $Id: Makefile.am,v 1.7 2000/04/04 13:23:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = subblock.test

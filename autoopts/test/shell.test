@@ -5,13 +5,13 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.7 2000/03/31 05:15:49 bruce Exp $
+# $Id: shell.test,v 1.8 2000/04/04 13:22:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

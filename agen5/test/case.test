@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # case.test --- test CASE functionality
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
 # Last Modified:     Fri Oct  1 11:00:24 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: case.test,v 1.4 1999/11/06 19:56:17 bruce Exp $
+# $Id: case.test,v 1.5 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -101,7 +101,7 @@ EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #
 
-$AGEN $testname.def ||  failure autogen failed
+$AGEXE $testname.def ||  failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
 

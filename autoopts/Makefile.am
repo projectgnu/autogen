@@ -4,18 +4,18 @@
 ## 
 ##  Autoopts copyright 1992-1999 Bruce Korb
 ## 
-## Author:          Bruce Korb <autogen@linuxbox.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.24 2000/03/11 23:18:59 bruce Exp $
+## $Id: Makefile.am,v 2.25 2000/04/04 13:22:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 SUBDIRS		= test
-include $(top_srcdir)/MakeRules.in
+
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
@@ -47,6 +47,8 @@ include_HEADERS = options.h
 
 makeshell.o : genshell.c
 genshell.c : genshell.def
+	@AGEXE=`cd $(top_builddir)/agen5; pwd`/@AGEXE@ ; cd $(srcdir) ; \
+	  AGEXE="$$AGEXE" $(SHELL) ./bootstrap.dir $@
 
 ../snprintfv/snprintfv.h :
 	if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \

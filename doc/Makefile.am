@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Author:          Bruce Korb <autogen@linuxbox.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.39 2000/03/19 23:01:47 bruce Exp $
+## $Id: Makefile.am,v 2.40 2000/04/04 13:23:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -83,7 +83,8 @@ GET_OPTS	= srcfile linenum filelist template=auto_gen
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS) $(BLOCKOPT)
 
-AGEXE		= AutoGen
+AGEXE		= `cd $(top_builddir)/agen5 ; pwd`/@AGEXE@
+
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
 
@@ -125,7 +126,9 @@ $(top_srcdir)/columns/columns.texi :
 	@cd $(top_srcdir)/columns/ ; $(MAKE) -f ./Makefile gen
 
 LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
-	top_srcdir=$(top_srcdir) \
+	top_builddir=$(top_builddir) \
 	$(AGEXE) -T $(srcdir)/LSM.tpl $(OPTIONS_DEF)
+
+clobber : maintainer-clean
 
 # Makefile.am ends here

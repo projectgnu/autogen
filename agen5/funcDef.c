@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.25 2000/03/12 20:41:17 bruce Exp $
+ *  $Id: funcDef.c,v 1.26 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -213,6 +213,11 @@ spanTemplate( char* pzQte, tDefList* pDefList )
     char  q;
     int   mac_ct = 1;
 
+    /*
+     *  IF there are no more macros *OR* the current macro ends before
+     *     the start of the next macro,
+     *  THEN we don't have to worry about macros within quoted strings.
+     */
     if (  (pzStartMacro == (char*)NULL)
        || (pzExpEnd < pzStartMacro)) {
         (void)spanQuote( pzQte );
@@ -239,6 +244,11 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         if (pzQte == pzStartMacro) {
             mac_ct += 2;
             pzQte = (char*)skipMacro( pzStartMacro ) + endMacLen;
+
+            /*
+             *  skipMacro has moved the macro text off elsewhere.
+             *  Shift the remainder of the string down, find next start.
+             */
             memcpy( (void*)p, pzStartMacro, (pzQte - pzStartMacro) );
             p += (pzQte - pzStartMacro);
             pzStartMacro = strstr( pzQte, pzStartMark );
@@ -285,6 +295,9 @@ spanTemplate( char* pzQte, tDefList* pDefList )
 
  NUL_termination:
 
+    /*
+     *  We found the end of the string before we found the end of the quote.
+     */
     {
         tSCC zAnon[] = "* anonymous *";
         size_t alocSize = sizeof( tTemplate ) + sizeof( zAnon )
@@ -302,6 +315,10 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         loadMacros( pNewT, pCurTemplate->pzFileName, zAnon, pzText );
         pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize );
         pNewT = templateFixup( pNewT, pNewT->descSize );
+
+        /*
+         *  Replace the template text with a string containing its address.
+         */
         sprintf( pzText, "[ 0x%08X ]", pNewT );
     }
 }
@@ -798,7 +815,7 @@ MAKE_HANDLER_PROC( Define )
                 }
                 else if (gh_number_p( res )) {
                     pList->de.pzValue = (char*)AGALOC( 16 );
-                    sprintf( pList->de.pzValue, "%ld", gh_scm2long( res ));
+                    snprintf( pList->de.pzValue, 16, "%ld", gh_scm2long( res ));
                 }
                 else
                     pList->de.pzValue = strdup( "" );

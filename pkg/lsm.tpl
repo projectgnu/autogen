@@ -27,10 +27,10 @@ Description:    AutoGen is a tool for automatically generating
 Keywords:       macro, m4, cpp, code generation, preprocessor,
                 options, getopts
 
-Author:         autogen@linuxbox.com (Bruce Korb)
+Author:         bkorb@gnu.org (Bruce Korb)
                 gary@oranda.demon.co.uk (Gary V. Vaughan)
 
-Maintained-by:  autogen@linuxbox.com (Bruce Korb)
+Maintained-by:  bkorb@gnu.org (Bruce Korb)
 
 Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
                 [= `
@@ -39,7 +39,7 @@ set -- autogen*.gz
 if [ $# -gt 1 ]
 then shift \`expr $# - 1\` ; fi
 if [ ! -f $1 ]
-then ct=564
+then ct=810
 else ct="\`expr \\\\( \\\`wc -c < $1\\\` + 1023 \\\\) / 1024\`"
 fi
 echo $ct KB $1

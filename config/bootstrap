@@ -7,9 +7,9 @@
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
 # Last Modified:     Mon Aug 30 12:29:52 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.28 1999/10/28 03:36:29 bruce Exp $
+# @(#) $Id: bootstrap,v 1.29 2000/04/04 13:22:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:

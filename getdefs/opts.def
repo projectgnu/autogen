@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.18 2000/03/12 23:49:25 bruce Exp $
+ *   $Id: opts.def,v 2.19 2000/04/04 13:23:32 bkorb Exp $
  */
 
 /*
@@ -31,7 +31,7 @@ copyright = {
     owner  = "Bruce Korb";
 };
 
-eaddr          = "AutoGen@linuxbox.com";
+eaddr          = "AutoGen@linuxave.org";
 prog_name      = "getdefs";
 prog_title     = "AutoGen Definition Extraction Tool";
 

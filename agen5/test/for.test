@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # for.test --- test functionality of `for' function
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: for.test,v 1.4 2000/03/11 20:02:16 bruce Exp $
+# $Id: for.test,v 1.5 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -55,7 +55,7 @@ MIDDLE: three,
 LAST:   four
 _EOF_
 
-$AGEN $testname.def || failure AutoGen failed
+$AGEXE $testname.def || failure AutoGen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

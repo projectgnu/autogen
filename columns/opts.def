@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.20 2000/03/12 23:50:23 bruce Exp $
+ *   $Id: opts.def,v 1.21 2000/04/04 13:22:19 bkorb Exp $
  */
 
 /*
@@ -30,7 +30,7 @@ copyright = {
     owner  = "Bruce Korb";
 };
 
-eaddr          = "autogen@linuxbox.com";
+eaddr          = "bkorb@gnu.org";
 prog_name      = "columns";
 prog_title     = "Columnize Input Text";
 long_opts;

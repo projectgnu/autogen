@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999				
 dnl            by:     Gary V. Vaughan <gary@oranda.goldfish>		
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 2.2 2000/03/21 03:05:22 bruce Exp $
+dnl @(#) $Id: autoopts.m4,v 2.3 2000/04/04 13:22:18 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl 
 dnl Code:
@@ -164,7 +164,7 @@ main ()
             printf("*** You need a version of autoopts newer than %d:%d:%d.  "
                    "The latest version of\n", current, revision, age);
 	    printf("*** autoopts is always available from "
-		   "ftp://autogen.linuxbox.com.\n");
+		   "ftp://autogen.linuxave.org.\n");
             printf("***\n");
             printf("*** If you have already installed a sufficiently new "
                    "version, this error\n");

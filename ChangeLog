@@ -1,23 +1,33 @@
-2000-03-28  Bruce Korb  <autogen@linuxbox.com>
+2000-03-28  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am's & bootstrap.dir's throughout:  Use the configured
+	value `AGEXE' for the executable name of autogen.  Also,
+	finished the implementation of the ``configure'' shar archive
+	of AutoGen-ed source files (solves chicken-and-egg problem).
+	* everything: changed <autogen@linuxbox.com> to <bkorb@gnu.org>
+	* autoopts/stack.c:  We need to completely clear the option
+	state when "unstack" empties the argument stack.
+
+2000-03-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c(ag_scm_match_value_p):  New Guile expr function.
 	* agen5/funcCase.c:  add expression processing tracing
 
-2000-03-18  Bruce Korb  <autogen@linuxbox.com>
+2000-03-18  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/doc.tpl:  Highlighted and documented the AutoMan and
 	AutoInfo capabilities :-)
 	* autoopts/agman1.tpl:  minor cleanup
 	* autoopts/aginfo.tpl:  ditto
 
-2000-03-18  Bruce Korb  <autogen@linuxbox.com>
+2000-03-18  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optlib.tpl:  add USAGE_LINE.  Omits square brackets
 	around option syntax if there are required arguments.
 	* autoopts/optcode.tpl:  Make the usage invocation syntax a 
 	subroutine "USAGE_LINE" in optlib.tpl
 
-2000-03-12  Bruce Korb  <autogen@linuxbox.com>
+2000-03-12  Bruce Korb  <bkorb@gnu.org>
 
 	* *: cleaned up comments so docs are prettier
 	* agen5/autogen.h(pfTrace): `stderr' is no longer static
@@ -46,18 +56,18 @@
 	* autoopts/optlib.tpl:  new copyright layout and change the
 	numeric OPT_VALUE_xxx macro for picky compilers
 
-2000-03-12  Bruce Korb  <autogen@linuxbox.com>
+2000-03-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/*:  Added automated option testing
 	* agen5/defLoad.c:  zero out the definition context struct before use
 	* agen5/defDirect.c:  ditto
 	* agen5/test/reorder.test:  corrected template name
 
-2000-03-09  Bruce Korb  <autogen@linuxbox.com>
+2000-03-09  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl: simplified a minor expression
 
-2000-03-07  Bruce Korb  <autogen@linuxbox.com>
+2000-03-07  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optlib.tpl: Corrected improper l-value reference
 	* agen5/proto.h: removed.  It is now generated.
@@ -65,24 +75,24 @@
 	invoked in the top level directory.
 	* agen5/tpLoad.c: added ``#include <sys/types.h>'' for sys/mmap.h.
 
-2000-03-05  Bruce Korb  <autogen@linuxbox.com>
+2000-03-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*:  reworked prototyping
 	* agen5/proto.h:  is now generated
 
-2000-03-04  Bruce Korb  <autogen@linuxbox.com>
+2000-03-04  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcEval.c: The '?%' macro function failed.
 	* agen5/tests/forfrom.test: added.  Tests the above.
 	* agen5/tests/Makefile.am: added forfrom to test list
 
-2000-02-29  Bruce Korb  <autogen@linuxbox.com>
+2000-02-29  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defFind.c: Added routine to copy a definition reference
 	* agen5/functions.c: use the routine
 	* agen5/funcEval.c: ditto
 
-2000-02-28  Bruce Korb  <autogen@linuxbox.com>
+2000-02-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defLex.c: Added comma to list of token characters.
 	* agen5/defReduce.c: reworked `addSibMacro' so the logic is
@@ -100,7 +110,7 @@
 	* agen5/test/Makefile.am:  Added error.test and for.test
 	* agen5/test/error.test, agen5/test/for.test: new
 
-2000-02-14  Bruce Korb  <autogen@linuxbox.com>
+2000-02-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defParse.y:  Added syntax to allow for comma separated
 	value lists.
@@ -108,23 +118,23 @@
 	* agen5/defLex.c:  commas are now a special token
 	* autoopts/optlib.tpl:  OSR5 regex cannot grok "^(|:|=)$"  :-(
 	
-1999-11-08  Bruce Korb  <autogen@linuxbox.com>
+1999-11-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c:  Template structure needed more space.
 
-1999-11-05  Bruce Korb  <autogen@linuxbox.com>
+1999-11-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/*:  recreated a number of tests that were in
 	the tests/* directory.
 
-1999-10-31  Bruce Korb  <autogen@linuxbox.com>
+1999-10-31  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/auto_gen.tpl:  Reworked
 	* agen5/*:  Documentation rework
 	* getdefs/getdefs.c:  allow for empty string definitions
 	* getdefs/test/*:  Created a test case for getdefs
 	
-1999-10-27  Bruce Korb  <autogen@linuxbox.com>
+1999-10-27  Bruce Korb  <bkorb@gnu.org>
 
 	AutoGen Version 5:
 	* agen5/*:  Reworked virtually everything.  See NEWS.

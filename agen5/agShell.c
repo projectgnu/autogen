@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.4 2000/03/05 20:58:12 bruce Exp $
+ *  $Id: agShell.c,v 1.5 2000/04/04 13:21:41 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -353,8 +353,7 @@ loadData( FILE* fp )
     pzScan   =
     pzText   = AGALOC( textSize );
     if (pzText == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 textSize, zTxtBlock );
+        fprintf( stderr, zAllocErr, pzProg, textSize, zTxtBlock );
         AG_ABEND;
     }
 

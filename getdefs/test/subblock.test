@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # subblock.test --- test the subblock parameter to getdefs
 #
-# Author:	     Bruce Korb <autogen@linuxbox.com>
-# Maintainer:	     Bruce Korb <autogen@linuxbox.com>
+# Author:	     Bruce Korb <bkorb@gnu.org>
+# Maintainer:	     Bruce Korb <bkorb@gnu.org>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2000/03/05 13:15:34 $
-#            by:     Bruce Korb <autogen@linuxbox.com>
+# Last Modified:  $Date: 2000/04/04 13:23:32 $
+#            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: subblock.test,v 1.4 2000/03/05 13:15:34 bruce Exp $
+# $Id: subblock.test,v 1.5 2000/04/04 13:23:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

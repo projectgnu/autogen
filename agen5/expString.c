@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.15 2000/03/28 01:57:03 bruce Exp $
+ *  $Id: expString.c,v 1.16 2000/04/04 13:21:41 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -50,16 +50,30 @@ makeString( tCC*    pzText,
     char*    pzDta;
     tCC*     pzScn   = pzText;
     SCM      res;
+
+    /*
+     *  Start by counting the start and end quotes, plus the NUL.
+     */
     size_t   dtaSize = sizeof( "\"\"" );
 
     for (;;) {
         char ch = *(pzScn++);
         if ((ch >= ' ') && (ch <= '~')) {
+
+            /*
+             *  One for each character, plus a backquote when needed
+             */
             dtaSize++;
             if ((ch == '"') || (ch == '\\'))
                 dtaSize++;
 
-        } else switch (ch) {
+        }
+
+        /*
+         *  When not a normal character, then count the characters
+         *  required to represent whatever it is.
+         */
+	else switch (ch) {
         case NUL:
             goto loopBreak;
 
@@ -81,7 +95,10 @@ makeString( tCC*    pzText,
         }
     } loopBreak:;
 
-
+    /*
+     *  We now know how big the string is going to be.
+     *  Allocate what we need.
+     */
     res   = scm_makstr( (scm_sizet)dtaSize, 0 );
     pzDta = SCM_CHARS( res );
     pzScn = pzText;
@@ -151,6 +168,10 @@ makeString( tCC*    pzText,
             break;
 
         default:
+            /*
+             *  sprintf is safe here, because we already computed
+             *  the amount of space we will be using.
+             */
             pzDta += sprintf( pzDta, "\\%03o", ch );
         }
 

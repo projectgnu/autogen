@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.4 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: tpParse.c,v 1.5 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -182,7 +182,7 @@ findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
     tCC* pzEndMark;
     int  depth;
     tSCC zOop[] = "Error:  a %s macro contains a nested macro\n";
-    char zOops[ 1024 ];
+    char z[ 1024 ];
 
     /*
      *  Set our pointers to the start of the macro text
@@ -217,8 +217,8 @@ findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
             break;
 
         default:
-            sprintf( zOops, zOop, apzFuncNames[ pM->funcCode ]);
-            LOAD_ABORT( pT, pM, zOops );
+            snprintf( z, sizeof(z), zOop, apzFuncNames[ pM->funcCode ]);
+            LOAD_ABORT( pT, pM, z );
         }
 
         /*

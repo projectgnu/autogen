@@ -4,13 +4,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-1999 Bruce Korb
 dnl
-dnl Author:           Bruce Korb <autogen@linuxbox.com>
-dnl Maintainer:       Bruce Korb <autogen@linuxbox.com>
+dnl Author:           Bruce Korb <bkorb@gnu.org>
+dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
-dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
+dnl            by:    Bruce Korb <bkorb@gnu.org>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.33 2000/03/19 01:27:32 bruce Exp $
+dnl Code: $Id: configure.in,v 2.34 2000/04/04 13:20:47 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.33 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.34 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -177,6 +177,12 @@ AC_SUBST(GUILE_LINK)
 AC_SUBST(M4_SRC)
 [AGFUN_LIST=`cd $srcdir/agen5 ; echo func*.c`]
 AC_SUBST(AGFUN_LIST)
+AGEXE=autogen${ac_exeext}
+AC_SUBST(AGEXE)
+GDEXE=getdefs${ac_exeext}
+AC_SUBST(GDEXE)
+COLEXE=columns${ac_exeext}
+AC_SUBST(COLEXE)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)

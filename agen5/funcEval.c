@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.21 2000/03/12 21:12:12 bruce Exp $
+ *  $Id: funcEval.c,v 1.22 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -75,14 +75,15 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
         pzRes = "** Pair **"; break;
 
     case GH_TYPE_NUMBER:
-        sprintf( z, "%ld", gh_scm2long(s) ); break;
+        snprintf( z, sizeof(z), "%ld", gh_scm2long(s) ); break;
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY
-        sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(s) ); break;
+        snprintf( z, sizeof(z), "** Procedure 0x%08X **", SCM_SUBR_ENTRY(s) );
 #else
-        pzRes = "** PROCEDURE **"; break;
+        pzRes = "** PROCEDURE **";
 #endif
+        break;
 
     case GH_TYPE_LIST:
         pzRes = "** LIST **"; break;

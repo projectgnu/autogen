@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.3 2000/03/05 20:58:12 bruce Exp $
+ *  $Id: agUtils.c,v 1.4 2000/04/04 13:21:41 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -48,7 +48,7 @@ doOptions( int arg_ct, char** arg_vec )
      */
     {
         tSCC zOnlyOneSrc[] = "%s ERROR:  Too many definition files\n";
-        int  optCt = optionProcess( &AutoGenOptions, arg_ct, arg_vec );
+        int  optCt = optionProcess( &autogenOptions, arg_ct, arg_vec );
 
         /*
          *  Make sure we have a source file, even if it is "-" (stdin)

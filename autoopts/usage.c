@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.5 1999/07/07 19:41:00 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.6 2000/04/04 13:22:18 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -421,36 +421,48 @@ optionUsage( tOptions*  pOptions, int exitCode )
         if (  (pOptions->pzDetailFile != (char*)NULL)
            && (! UNUSED_OPT( pOptions->pOptDesc
                            + pOptions->specOptIdx.more_help ))) {
-            char  zCmd[ MAXPATHLEN + 64 ];
+            char* pzPath = getenv( "PATH" );
             char* pzHelpPath;
+
+            char  zCmd[ MAXPATHLEN + 64 ];
             char  zDetFile[ MAXPATHLEN ];
 
             do {
-                char*  pz = zDetFile + sprintf( zDetFile, "%s.README",
-                                                pOptions->pzDetailFile );
-                pzHelpPath = pathfind( getenv( "PATH" ), zDetFile, "r" );
+                char*  pz = zDetFile
+                    + snprintf( zDetFile, sizeof(zDetFile), "%s.README",
+                                pOptions->pzDetailFile );
+                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
 
                 if (pzHelpPath != (char*)NULL) {
                     tSCC zCmdFmt[] = "cat %s >&2";
-                    sprintf( zCmd, zCmdFmt, pzHelpPath );
+                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
                     break;
                 }
 
                 strcpy( pz, ".Z" );
-                pzHelpPath = pathfind( getenv( "PATH" ), zDetFile, "r" );
+                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
 
                 if (pzHelpPath != (char*)NULL) {
                     tSCC zCmdFmt[] = "uncompress -c < %s >&2";
-                    sprintf( zCmd, zCmdFmt, pzHelpPath );
+                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
                     break;
                 }
 
                 strcpy( pz, ".gz" );
-                pzHelpPath = pathfind( getenv( "PATH" ), zDetFile, "r" );
+                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
 
                 if (pzHelpPath != (char*)NULL) {
                     tSCC zCmdFmt[] = "gunzip -c %s >&2";
-                    sprintf( zCmd, zCmdFmt, pzHelpPath );
+                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
+                    break;
+                }
+
+                strcpy( pz, ".bz2" );
+                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
+
+                if (pzHelpPath != (char*)NULL) {
+                    tSCC zCmdFmt[] = "bunzip2 -c %s >&2";
+                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
                     break;
                 }
 

@@ -8,16 +8,16 @@ AutoGen5 template man=%s.1
 ##  AutoOpts copyright 1992-2000 Bruce Korb
 ## 
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
-##            by:     Bruce Korb <autogen@linuxbox.com>			      
+##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.11 2000/03/19 22:03:31 bruce Exp $
+## $Id: agman1-tpl.in,v 2.12 2000/04/04 13:22:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
-1999-06-28 modified to be template  Bruce Korb <autogen@linuxbox.com>
+1999-06-28 modified to be template  Bruce Korb <bkorb@gnu.org>
 1999-07-04 nroff tweaks, Jim Van Zandt <jrv@vanzandt.mv.com>
 1999-10-18 reworked as AutoGen5 template
 

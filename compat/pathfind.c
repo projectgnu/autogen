@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 1999/10/28 03:36:29 $
- *            by:    Bruce Korb <autogen@linuxbox.com>
+ * Last Modified:    $Date: 2000/04/04 13:22:36 $
+ *            by:    Bruce Korb <bkorb@gnu.org>
  *
- * $Id: pathfind.c,v 2.1 1999/10/28 03:36:29 bruce Exp $
+ * $Id: pathfind.c,v 2.2 2000/04/04 13:22:36 bkorb Exp $
  */
 
 /* Code: */

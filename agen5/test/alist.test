@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # alist.test --- test evalstack functionality
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: alist.test,v 1.7 2000/03/11 21:36:44 bruce Exp $
+# $Id: alist.test,v 1.8 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -58,9 +58,9 @@ cat > $testname.out <<_EOF_
   2 name is last
 _EOF_
 
-AGEN="$AGEN -L ${srcdir}/.."
-echo $AGEN $testname.def
-$AGEN $testname.def || failure $AGEN failed
+AGEXE="$AGEXE -L ${srcdir}/.."
+echo $AGEXE $testname.def
+$AGEXE $testname.def || failure $AGEXE failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Author:          Bruce Korb <autogen@linuxbox.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
 ## Last Modified:   Feb 27, 2000
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.16 2000/03/31 05:03:54 bruce Exp $
+## $Id: Makefile.am,v 1.17 2000/04/04 13:21:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
@@ -28,11 +28,13 @@ EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 
 testsubdir = ./testdir
 
-TESTS_ENVIRONMENT = GETDEFS=`cd $(top_builddir)/getdefs; pwd`/getdefs \
-	AGEN=`cd $(top_builddir)/agen5 ; pwd`/AutoGen \
-	testsubdir=$(testsubdir) srcdir=`cd $(srcdir) ; pwd` \
-	top_srcdir=`cd $(top_srcdir) ; pwd` \
-	EXPRLIST="$(EXPRLIST)"
+TESTS_ENVIRONMENT = \
+	GDEXE=`cd $(top_builddir)/getdefs; pwd`/@GDEXE@ \
+	AGEXE=`cd $(top_builddir)/agen5  ; pwd`/@AGEXE@ \
+	testsubdir=$(testsubdir) \
+	top_srcdir=`cd $(top_srcdir) ; pwd` srcdir=`cd $(srcdir) ; pwd` \
+	top_builddir=`cd $(top_builddir) ; pwd` builddir=`cd $(builddir) ; pwd` \
+	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 2.3 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: pgusage.c,v 2.4 2000/04/04 13:22:18 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -78,7 +78,7 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
     case PAGER_STATE_INITIAL:
     {
         my_pid  = getpid();
-        sprintf( zPageUsage, "/tmp/use.%lu", my_pid );
+        snprintf( zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", my_pid );
         unlink( zPageUsage );
 
         /*
@@ -117,8 +117,9 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
         /*
          *  Page the file and remove it when done.
          */
-        sprintf( zPageUsage, "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
-                 pzPager, my_pid );
+        snprintf( zPageUsage, sizeof(zPageUsage),
+                  "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
+                  pzPager, my_pid );
         fclose( stderr );
         dup2( STDOUT_FILENO, STDERR_FILENO );
 

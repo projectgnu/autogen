@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.4 2000/03/11 18:31:30 bruce Exp $
+ *  $Id: stack.c,v 2.5 2000/04/04 13:22:18 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -80,8 +80,16 @@ unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
     char*     pzEq;
     int       res;
 
-    if (pAL == (tArgList*)NULL)
+    /*
+     *  IF we don't have any stacked options,
+     *  THEN indicate that we don't have any of these options
+     */
+    if (pAL == (tArgList*)NULL) {
+        pOptDesc->fOptState &= OPTST_PERSISTENT;
+        if ( (pOptDesc->fOptState & OPTST_INITENABLED) == 0)
+            pOptDesc->fOptState |= OPTST_DISABLED;
         return;
+    }
 
     if (regcomp( &re, pOptDesc->pzLastArg, REG_NOSUB ) != 0)
         return;
@@ -123,6 +131,18 @@ unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
                 pAL->apzArgs[ dIdx ] = pzSrc;
             dIdx++;
         }
+    }
+
+    /*
+     *  IF we have unstacked everything,
+     *  THEN indicate that we don't have any of these options
+     */
+    if (pAL->useCt == 0) {
+        pOptDesc->fOptState &= OPTST_PERSISTENT;
+        if ( (pOptDesc->fOptState & OPTST_INITENABLED) == 0)
+            pOptDesc->fOptState |= OPTST_DISABLED;
+        free( (void*)pAL );
+        pOptDesc->optCookie = (void*)NULL;
     }
 
     regfree( &re );

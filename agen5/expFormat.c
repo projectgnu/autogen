@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.12 2000/03/12 23:39:34 bruce Exp $
+ *  $Id: expFormat.c,v 1.13 2000/04/04 13:21:41 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -203,7 +203,7 @@ ag_scm_error( SCM res )
         long val = gh_scm2long( res );
         if (val == 0)
             abort = PROBLEM;
-        sprintf( zNum, "%d", val );
+        snprintf( zNum, sizeof( zNum ), "%d", val );
         pzMsg = zNum;
         break;
     }

@@ -1,13 +1,13 @@
 
 /*
- *  $Id: version.c,v 2.3 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: version.c,v 2.4 2000/04/04 13:22:18 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2000 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -57,7 +57,7 @@
     void
 doVersion( tOptions*  pOpts, tOptDesc* pOD )
 {
-    tSCC zAO[] = "Automated Options version %s, copyright (c) 1999 "
+    tSCC zAO[] = "Automated Options version %s, copyright (c) 1999-2000 "
                  "Bruce Korb\n";
     char swCh;
 

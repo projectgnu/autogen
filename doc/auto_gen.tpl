@@ -4,13 +4,13 @@
 ##
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
 ##
-## Author:            Bruce Korb <autogen@linuxbox.com>
-## Maintainer:        Bruce Korb <autogen@linuxbox.com>
+## Author:            Bruce Korb <bkorb@gnu.org>
+## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
-##            by:     Bruce Korb <autogen@linuxbox.com>                        
+##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.52 2000/03/26 02:52:56 bruce Exp $
+## $Id: auto_gen.tpl,v 2.53 2000/04/04 13:23:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -60,7 +60,7 @@ notice identical to this one except for the removal of this paragraph
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{autogen@@linuxbox.com}
+@author @email{autogen@@linuxave.org}
 
 @page
 @vskip 0pt plus 1filll
@@ -91,7 +91,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
-* AutoGen Invocation::   Invoking AutoGen
+* autogen Invocation::   Invoking AutoGen
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
@@ -830,7 +830,7 @@ external definitions.  Such a template would likely have an unvarying
 output, but be convenient nonetheless because of an external library
 of either AutoGen or Scheme functions, or both.  This can be accommodated
 by providing the @code{--override-tpl} and @code{--no-definitions}
-options on the command line.  @xref{AutoGen Invocation}.
+options on the command line.  @xref{autogen Invocation}.
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

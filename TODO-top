@@ -14,15 +14,17 @@
 
 *** Need to replace use of sprintf w/ snprintf throughout!
 *** ANSI format specifiers: ceEfgG with conversion quals h and l
-*** rewrite expressions to use Guile (instead of the reverse
-    polish stuff originally hacked together :)
 
 * Pending
 
-** new arg for setting time of output files
 ** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 ** All errors from autogen/getdefs etc. should start with,
    `options.pzProgName' (aka 'basename(argv[0])').
+** Change the invocations of getdefs to send output to stdout in
+   preference to invoking autogen internally.  The current method is ugly.
+** In AutoOpts, add another(!) attribute that says an option is active
+   IFF a flag is set.  E.g.  ``ifdef = DEBUG;''
+** autoopts/libhead.tpl is autogen-4 style.
 
 *  Possibilities for the (distant) future:
 

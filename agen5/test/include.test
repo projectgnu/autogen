@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # include.test --- test include functionality
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: include.test,v 1.3 2000/03/11 19:45:21 bruce Exp $
+# $Id: include.test,v 1.4 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -43,9 +43,9 @@ cat > $testname.out <<_EOF_
 Verify:  This is an $testname test
 _EOF_
 
-AGEN="$AGEN --no-def -T $testname.tpl -b $testname"
-echo $AGEN
-$AGEN || failure $AGEN failed
+AGEXE="$AGEXE --no-def -T $testname.tpl -b $testname"
+echo $AGEXE
+$AGEXE || failure $AGEXE failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

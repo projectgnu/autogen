@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.6 1999/07/07 19:41:00 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.7 2000/04/04 13:22:18 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -196,10 +196,11 @@ findFileName( tOptions*  pOpts )
      *  THEN tack on the RC file name
      */
     if (S_ISDIR( stBuf.st_mode )) {
-            char*  pzPath = (char*)AGALOC(( strlen( pzDir )
-                                          + strlen( pOpts->pzRcName )));
-            sprintf( pzPath, "%s%c%s", pzDir, DIR_SEP_CHAR, pOpts->pzRcName );
-            pzDir = pzPath;
+        size_t sz     = strlen( pzDir ) + strlen( pOpts->pzRcName );
+        char*  pzPath = (char*)AGALOC( sz );
+
+        pzDir = pzPath;
+        snprintf( pzPath, sz, "%s%c%s", pzDir, DIR_SEP_CHAR, pOpts->pzRcName );
 
         /*
          *  IF we cannot stat the object for any reason other than

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.19 2000/03/19 00:36:12 bruce Exp $
+ *   $Id: opts.def,v 1.20 2000/04/04 13:21:41 bkorb Exp $
  */
 
 /*
@@ -32,8 +32,8 @@ copyright = {
     type  = gpl;
 };
 
-eaddr          = "AutoGen@linuxbox.com";
-prog_name      = "AutoGen";
+eaddr          = "bkorb@gnu.org";
+prog_name      = "autogen";
 prog_title     = "The Automated Program Generator";
 argument       = "[ <def-file> ]";
 homerc         = $HOME, ".";
@@ -196,6 +196,18 @@ flag = {
     "files specified in the template.  (For example, only the @file{.h}\n"
     "header file, but not the @file{.c} program text.)  To do this\n"
     "specify @code{--skip-suffix=c} on the command line.";
+};
+
+flag = {
+    name       = source_time;
+    descrip    = "set mod times to latest source";
+    disable    = no;
+    doc =
+"If you stamp your output files with the `DNE' macro output, then your output
+files will always be different, even if the content has not really changed.
+If you use this option, then the modification time of the output files will
+change only if the input files change.  This will help reduce unneeded builds.";
+
 };
 
 flag = {

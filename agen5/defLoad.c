@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.7 2000/03/21 03:05:22 bruce Exp $
+ *  $Id: defLoad.c,v 1.8 2000/04/04 13:21:41 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -151,7 +151,7 @@ massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
 
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
     if (HAVE_OPT( SHOW_DEFS ))
-        sprintf( zFmt, "%%%dd %%-%ds = ", 3 + (lvl * 2), 20 - (lvl * 2) );
+        snprintf( zFmt, 64, "%%%dd %%-%ds = ", 3 + (lvl * 2), 20 - (lvl * 2) );
 #endif
 
     do  {
@@ -331,12 +331,17 @@ readDefines( void )
         }
 
         /*
-         *  Our output file mod time will start as one second after
+         *  IF the source-time option has been enabled, then
+         *  our output file mod time will start as one second after
          *  the mod time on this file.  If any of the template files
          *  are more recent, then it will be adjusted.
          */
         dataSize = stbf.st_size;
-        outTime  = stbf.st_mtime + 1;
+
+        if (ENABLED_OPT( SOURCE_TIME ))
+             outTime = stbf.st_mtime + 1;
+        else outTime = time( (time_t*)NULL );
+
         useStdin = AG_FALSE;
     }
 

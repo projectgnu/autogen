@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # config/bootstrap.local --- maintainer's bootstrap script
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug 30 12:28:33 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+# Last Modified:     Mon Aug 30 12:28:33 1999
+#            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.28 1999/11/06 22:11:50 bruce Exp $
+# @(#) $Id: bootstrap.local,v 1.29 2000/04/04 13:22:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -62,12 +62,12 @@ pre )
     cp -fp ${srcdir}/config/bootstrap ${srcdir}/snprintfv/config
     rm -f ${srcdir}/configure
 
-    ( AutoGen --version && \
+    ( autogen --version && \
       columns --version && \
       getdefs --version ) > /dev/null 2>&1 || \
-        missing autogen ftp://autogen.linuxbox.com/pub/autogen-4.5.5.tar.gz
+        missing autogen ftp://autogen.linuxave.org/pub/autogen.tar.gz
 
-    ( cd ${srcdir}/config; AutoGen misc.def; )
+    ( cd ${srcdir}/config; autogen misc.def; )
 
     test -f doc/autogen.texi \
         || echo '@setfilename fnord' > doc/autogen.texi

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.12 2000/03/11 19:44:04 bruce Exp $
+ *  $Id: functions.c,v 1.13 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -301,8 +301,8 @@ MAKE_LOAD_PROC( Bogus )
     const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
     long           srcLen = (long)pMac->res;           /* macro len  */
     char z[ 128 ];
-    sprintf( z, "%s function (%d) out of context",
-             apzFuncNames[ pMac->funcCode ], pMac->funcCode );
+    snprintf( z, sizeof(z), "%s function (%d) out of context",
+              apzFuncNames[ pMac->funcCode ], pMac->funcCode );
     fprintf( stderr, zTplErr, pT->pzFileName,
              pMac->lineNo, z );
 

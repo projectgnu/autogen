@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # endmac.test --- test variations on the end macro marker
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
 # Last Modified:     Fri Oct  1 11:17:56 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: endmac.test,v 1.6 1999/11/30 02:26:30 bruce Exp $
+# $Id: endmac.test,v 1.7 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -28,7 +28,7 @@ ENDMAC 1 <=`pwd`=>>
 This is a test
 EOF
 
-$AGEN -T${testname}1 --no-def 2> /dev/null && \
+$AGEXE -T${testname}1 --no-def 2> /dev/null && \
   failure $testname failure test was successful.  Oops.
 echo $testname failure test failed correctly
 
@@ -39,7 +39,7 @@ ENDMAC 2 <=`echo print this message` =>>
 This is a test
 EOF
 
-$AGEN -T${testname}2 --no-def || \
+$AGEXE -T${testname}2 --no-def || \
    failure $testname success test was a failure
 echo first successful $testname test succeeded
 
@@ -51,7 +51,7 @@ ENDMAC 3 <+(define foo "print this message")  (. foo) +>>
 This is a test
 EOF
 
-$AGEN -T${testname}3 --no-def || \
+$AGEXE -T${testname}3 --no-def || \
    failure second $testname success test was a failure
 echo second successful $testname test succeeded
 

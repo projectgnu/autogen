@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.23 2000/03/11 19:23:07 bruce Exp $
+ *  $Id: makeshell.c,v 2.24 2000/04/04 13:22:18 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -649,7 +649,7 @@ emitSetup( tOptions* pOpts )
         else pzFmt = zSingleDef;
 
         if (pOptDesc->fOptState & OPTST_NUMERIC) {
-            sprintf( zVal, "%d", pOptDesc->pzLastArg );
+            snprintf( zVal, sizeof( zVal ), "%d", pOptDesc->pzLastArg );
             pzValue = zVal;
         } else if (pOptDesc->pzLastArg == (char*)NULL)
             pzValue = "";

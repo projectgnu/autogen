@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.6 2000/03/11 21:38:38 bruce Exp $
+ *  $Id: tpLoad.c,v 1.7 2000/04/04 13:21:41 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -95,7 +95,7 @@ findFile( tCC* pzFName, char* pzFullName )
          *  Add stuff after the expanded name IFF there is stuff
          */
         if (pzEnd != (char*)NULL) {
-            sprintf( pzFullName, "%s/%s", pzDef, pzEnd );
+            snprintf( pzFullName, MAXPATHLEN, "%s/%s", pzDef, pzEnd );
             /*
              *  FIXME:  this is a memory leak
              */
@@ -133,11 +133,11 @@ findFile( tCC* pzFName, char* pzFullName )
      *  Check for an immediately accessible suffixed file
      */
     if (pzSfx == (char*)NULL) {
-        sprintf( pzFullName, "%s.agl", pzFName );
+        snprintf( pzFullName, MAXPATHLEN, "%s.agl", pzFName );
         if (access( pzFullName, R_OK ) == 0)
             return SUCCESS;
 
-        sprintf( pzFullName, "%s.tpl", pzFName );
+        snprintf( pzFullName, MAXPATHLEN, "%s.tpl", pzFName );
         if (access( pzFullName, R_OK ) == 0)
             return SUCCESS;
     }
@@ -158,7 +158,7 @@ findFile( tCC* pzFName, char* pzFullName )
             char*   pzDir  = *(ppzDir--);
             char*   pzEnd  = pzFullName;
 
-            pzEnd += sprintf( pzFullName, zDirFmt, pzDir, pzFName );
+            pzEnd += snprintf( pzFullName, MAXPATHLEN, zDirFmt, pzDir, pzFName );
 
             if (access( pzFullName, R_OK ) == 0)
                 return SUCCESS;
@@ -198,11 +198,11 @@ findFile( tCC* pzFName, char* pzFullName )
 
         pzFound = pathfind( pzPath, pzFName, "rs" );
         if ((pzFound == (char*)NULL) && (pzSfx == (char*)NULL)) do {
-            sprintf( pzFullName, "%s.agl", pzFName );
+            snprintf( pzFullName, MAXPATHLEN, "%s.agl", pzFName );
             pzFound = pathfind( pzPath, pzFullName, "rs" );
             if (pzFound != (char*)NULL)
                 break;
-            sprintf( pzFullName, "%s.tpl", pzFName );
+            snprintf( pzFullName, MAXPATHLEN, "%s.tpl", pzFName );
             pzFound = pathfind( pzPath, pzFullName, "rs" );
         } while (AG_FALSE);
 

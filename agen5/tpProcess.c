@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.6 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: tpProcess.c,v 1.7 2000/04/04 13:21:41 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -239,8 +239,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Now formulate the output file name in the buffer
          *  porvided as the input argument.
          */
-        sprintf( pStk->pzName, pOutSpec->pzFileFmt, pzDefFile,
-                 pOutSpec->zSuffix );
+        snprintf( pStk->pzName, MAXPATHLEN, pOutSpec->pzFileFmt,
+                  pzDefFile, pOutSpec->zSuffix );
         if (p != (char*)NULL)
             *p = '.';
     }

@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # define.test --- test evalstack functionality
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: define.test,v 1.2 1999/11/09 04:58:14 bruce Exp $
+# $Id: define.test,v 1.3 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -101,8 +101,8 @@ cat > $testname.out <<_EOF_
 This is the last (number 6) macro.
 _EOF_
 
-echo $AGEN --lib=$testname.tlib $testname.def
-$AGEN --lib=$testname.tlib $testname.def || failure $AGEN failed
+echo $AGEXE --lib=$testname.tlib $testname.def
+$AGEXE --lib=$testname.tlib $testname.def || failure $AGEXE failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

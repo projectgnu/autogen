@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.12 2000/03/15 02:45:19 bruce Exp $
+ *  $Id: autogen.h,v 1.13 2000/04/04 13:21:41 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -229,7 +229,7 @@ struct for_info {
  *
  *  General Processing Globals
  */
-#define pzProg   AutoGenOptions.pzProgName
+#define pzProg   autogenOptions.pzProgName
 MODE teProcState procState        VALUE( PROC_STATE_INIT );
 MODE char*       pzTemplFileName  VALUE( (char*)NULL );
 MODE tTemplate*  pNamedTplList    VALUE( (tTemplate*)NULL );

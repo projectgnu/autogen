@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defref.test --- definition reference testing
 #
-# Author:            Bruce Korb <autogen@linuxbox.com>
-# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Wed Mar 1 2000
-#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: defref.test,v 1.3 2000/03/11 20:01:53 bruce Exp $
+# $Id: defref.test,v 1.4 2000/04/04 13:21:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -82,7 +82,7 @@ The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)
 _EOF_
 
-$AGEN $testname.def || failure AutoGen failed
+$AGEXE $testname.def || failure AutoGen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

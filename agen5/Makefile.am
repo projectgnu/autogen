@@ -4,13 +4,13 @@
 ## 
 ##    AutoGen Copyright (C) 1992-1999 Bruce Korb
 ## 
-## Author:          Bruce Korb <autogen@linuxbox.com>
-## Maintainer:      Bruce Korb <autogen@linuxbox.com>
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
-##            by:   Bruce Korb <autogen@linuxbox.com>			      
+##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.22 2000/03/19 22:01:07 bruce Exp $
+## $Id: Makefile.am,v 1.23 2000/04/04 13:21:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -20,7 +20,7 @@ INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
 
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS         = $(top_builddir)/getdefs/getdefs
-AGEXE		= $(top_builddir)/agen5/AutoGen
+AGEXE		= $(top_builddir)/agen5/@AGEXE@
 
 AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
@@ -37,8 +37,8 @@ man_MANS        = autogen.1
 EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
 		$(GEN_SRC) bootstrap.dir schemedef.scm
 
-bin_PROGRAMS	= AutoGen
-AutoGen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
+bin_PROGRAMS	= autogen
+autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
 		autogen.h   defDirect.c defFind.c   defLex.c    defLoad.c \
 		defParse.y  defReduce.c directive.h expFormat.c expGuile.c \
 		expGuile.h  expOutput.c expPrint.c  expState.c  expString.c \
@@ -46,7 +46,7 @@ AutoGen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
 		funcIf.c    functions.c functions.h opts.c      opts.h \
 		proto.h     tpLoad.c    tpParse.c   tpProcess.c
 
-AutoGen_LDADD	= $(top_builddir)/autoopts/libopts.la \
+autogen_LDADD	= $(top_builddir)/autoopts/libopts.la \
 		@GUILE_LINK@
 
 FARGS = base-name=functions template=functions filelist agarg=$(OPTDBG)
@@ -58,69 +58,63 @@ EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 
 YFLAGS = -d
 
-all : AutoGen
+all : @AGEXE@
 
 clean :
-	rm -f *.o AutoGen $(STAMPS) $(GEN_SRC) *~
+	rm -f *.o autogen $(STAMPS) $(GEN_SRC) *~
 
 ##  Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
+STAMPS   = stamp-directive stamp-exprini stamp-functions stamp-opts
 GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
+BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	srcdir=$(srcdir) builddir=$(builddir) DEBUG_OPTS=$(OPTDBG) \
+	AGEXE=@AGEXE@ GDEXE=@GDEXE@ COLEXE=@COLEXE@
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	AUTOGEN_TEMPL_DIRS=$(srcdir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-functions GEN-RULE
 stamp-functions: $(FUNCLIST) functions.tpl
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	AUTOGEN_TEMPL_DIRS=$(srcdir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	AUTOGEN_TEMPL_DIRS=$(srcdir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE
-proto.h : defParse.y
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+proto.h :
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## autogen.texi GEN-RULE
-autogen.texi : ./AutoGen ../getdefs/getdefs ../columns/columns
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
- 
+autogen.texi : $(STAMPS) @AGEXE@ ../getdefs/getdefs ../columns/columns
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+
 ## autogen.1 GEN-RULE
 autogen.1 : opts.def
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## defParse.c GEN-RULE
 defParse.c defParse.h : defParse.y
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	YACC="$(YACC) $(YFLAGS)" sh $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) YACC="$(YACC) $(YFLAGS)" \
+	$(SHELL) $(srcdir)/bootstrap.dir $@
 
+check : $(GEN_LIST)
 gen : $(GEN_LIST)
 
 ../getdefs/getdefs :
-	cd ../getdefs ; $(MAKE)
+	cd ../getdefs ; $(MAKE) getdefs
 
 ../columns/columns :
-	cd ../columns ; $(MAKE)
+	cd ../columns ; $(MAKE) columns
 
 dist : autogen.texi autogen.1
 
