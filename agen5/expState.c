@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: expState.c,v 1.2 1999/10/30 18:12:46 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -281,7 +281,7 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
 
 /*=gfunc count
  *
- *doc:  Count the number of entries for a definition.
+ * doc:  Count the number of entries for a definition.
  *      The input argument must be a string containing the name
  *      of the AutoGen values to be counted.  If there is no
  *      value associated with the name, the result is an SCM
@@ -317,7 +317,7 @@ ag_scm_def_file( void )
 
 /*=gfunc exist_p
  *
- *doc: return SCM_BOOL_T iff a specified name has a value.
+ * doc: return SCM_BOOL_T iff a specified name has a value.
  *     The name may include indexes and/or member names.
  *     All but the last member name must be an aggregate definition.
  *     For example:
@@ -346,7 +346,7 @@ ag_scm_exist_p( SCM obj )
 
 /*=gfunc get
  *
- *doc:  get the first string value associated with the name.
+ * doc:  get the first string value associated with the name.
 =*/
     SCM
 ag_scm_get( SCM obj )
@@ -368,7 +368,7 @@ ag_scm_get( SCM obj )
 
 /*=gfunc high_lim
  *
- *doc:  Returns the highest index associated with an array of definitions.
+ * doc:  Returns the highest index associated with an array of definitions.
 =*/
     SCM
 ag_scm_high_lim( SCM obj )
@@ -401,7 +401,7 @@ ag_scm_high_lim( SCM obj )
 
 /*=gfunc len
  *
- *doc: If the named object is a group definition, then "len" is
+ * doc: If the named object is a group definition, then "len" is
  *     the same as "count".  Otherwise, if it is one or more text
  *     definitions, then it is the sum of their string lengths.
 =*/
@@ -420,7 +420,7 @@ ag_scm_len( SCM obj )
 
 /*=gfunc low_lim
  *
- *doc:  Returns the lowest index associated with an array of definitions.
+ * doc:  Returns the lowest index associated with an array of definitions.
 =*/
     SCM
 ag_scm_low_lim( SCM obj )
@@ -452,7 +452,7 @@ ag_scm_low_lim( SCM obj )
  *
  * req: 0
  *
- *doc:
+ * doc:
  *
  *  Returns the current active suffix.  See @code{generate} in the
  *  @code{Declarations Input} section above.
@@ -468,7 +468,7 @@ ag_scm_suffix( void )
  *
  * req:  0
  *
- *doc:  DOC STRING
+ * doc:  Returns the name of the current template file.
 =*/
     SCM
 ag_scm_tpl_file( void )
