@@ -1,3 +1,7 @@
+2000-09-17  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c: replace ancient error messages with new macros
+
 2000-09-16  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expFormat.c(dne): added second optional argument to indicate

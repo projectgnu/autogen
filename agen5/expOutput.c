@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.9 2000/03/12 20:25:48 bruce Exp $
+ *  $Id: expOutput.c,v 1.10 2000/09/18 00:41:49 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -133,7 +133,7 @@ ag_scm_out_pop( void )
     if (pCurFp->pPrev == (tFpStack*)NULL) {
         fputs( "ERROR:  Cannot pop output with no output pushed\n",
                stderr );
-        longjmp( fileAbort, PROBLEM );
+        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
     }
 
     outputDepth--;
@@ -163,12 +163,6 @@ ag_scm_out_push_add( SCM new_file )
     pzNewFile = SCM_CHARS( new_file );
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ));
-    if (p == (tFpStack*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 sizeof( tFpStack ), "file ptr stack entry" );
-        longjmp( fileAbort, FAILURE );
-    }
-
     p->pPrev  = pCurFp;
     p->pzName = strdup( pzNewFile );
     addWriteAccess( pzNewFile );
@@ -201,12 +195,6 @@ ag_scm_out_push_new( SCM new_file )
     pzNewFile = SCM_CHARS( new_file );
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ));
-    if (p == (tFpStack*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 sizeof( tFpStack ), "file ptr stack entry" );
-        longjmp( fileAbort, FAILURE );
-    }
-
     p->pPrev  = pCurFp;
     p->pzName = strdup( pzNewFile );
     unlink( pzNewFile );
@@ -257,7 +245,7 @@ ag_scm_out_switch( SCM new_file )
         tSCC zOpen[] = "%s ERROR %d (%s): cannot open %s\n";
         fprintf( stderr, zOpen, pzProg,
                  errno, strerror( errno ), pzNewFile );
-        longjmp( fileAbort, FAILURE );
+        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
     }
 
     /*
