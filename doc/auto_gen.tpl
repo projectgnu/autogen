@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Wed Jul  7 11:48:50 1999                                
+## Last Modified:     Thu Jul  8 09:52:25 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.19 1999/07/07 19:42:33 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.20 1999/07/08 16:52:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -92,6 +92,9 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 This file documents AutoGen, a tool designed for generating program
 files that contain repetitive text with varied substitutions.
+This document is very long because it is intended as a reference
+document.  For a quick start example, @xref{Example Usage}.
+For a simple example of Automated Option processing, @xref{Quick Start}.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
@@ -141,9 +144,9 @@ a line in the usage text.
 @end enumerate
 
 @noindent
-You will need more things besides this if you choose to implement
-long option names, rc/ini file processing, environment variables
-and so on.
+You will need more things besides this if you choose to implement long
+option names, rc/ini file processing, environment variables and so on.
+For a simple example of Automated Option processing, @xref{Quick Start}.
 
 All of this can be done mechanically; with the proper templates and this
 program.  In fact, it has already been done and AutoGen itself uses it:
@@ -226,6 +229,8 @@ functions are available for saving text or values for later use.
 Assume you have an enumeration of names and you wish to associate some
 string with each name.  Assume also, for the sake of this example,
 that it is either too complex or too large to maintain easily by hand.
+We will start by writing an abbreviated version of what the result
+is supposed to be.  We will use that to construct our output templates.
 
 @noindent
 In a header file, @file{list.h}, you define the enumeration
@@ -267,11 +272,11 @@ list = @{ list_element = omega;
 @end example
 
 The @code{autogen definitions list;} entry defines the file as an
-AutoGen definition file.  That is followed by three @code{list}
-entries that define the associations between the enumeration
-names and the strings.  The order of the differently named
-elements inside of list is unimportant.  They are reversed inside
-of the @code{beta} entry and the output is unaffected.
+AutoGen definition file that uses a template named @code{list}.  That is
+followed by three @code{list} entries that define the associations
+between the enumeration names and the strings.  The order of the
+differently named elements inside of list is unimportant.  They are
+reversed inside of the @code{beta} entry and the output is unaffected.
 
 Now, to actually create the output, we need a template or two that can
 be expanded into the files you want.  In this program, we use a single
@@ -922,23 +927,24 @@ The installed files are:
 
 @enumerate
 @item
-The executables in @code{bin/*} (autogen, getdefs and columns).
+The executables in @file{bin} (autogen, getdefs and columns).
 
 @item
-The link library(ies) in @code{lib/libopts.*}.
+The link library(ies) as @file{lib/libopts.*}.
 
 @item
-An include file in @code{include/options.h}, needed for
+An include file in @file{include/options.h}, needed for
 Automated Option Processing (see next chapter).
 
 @item
-Four template files in @code{share/autogen/*.tpl}, needed for
-Automated Option Processing (see next chapter).
+Six template files in @file{share/autogen}, needed for
+Automated Option Processing (@xref{AutoOpts}.) and for documenting
+your program.  (@xref{documentation attributes}.)
 
 @item
-Info-style help files in @code{info/autogen.info*}.
-These files document both AutoGen and the option processing
-library AutoOpts.
+Info-style help files as @file{info/autogen.info*}.
+These files document AutoGen, the option processing
+library AutoOpts, and several add-on components.
 @end enumerate
 
 This program, library and supporting files can be installed
