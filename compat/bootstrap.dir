@@ -2,4 +2,4 @@
 
 top_srcdir=.. top_builddir=..
 export top_srcdir top_builddir
-autogen strsignal.def
+AutoGen strsignal.def

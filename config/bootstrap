@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:29:52 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.26 1999/08/31 00:16:09 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.27 1999/10/26 03:04:47 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -158,8 +158,9 @@ do
   # directory.
   initfile=`fgrep AC_INIT $top/configure.in | sed 's,^.*(,,;s,).*$,,'`
   if test -z "$initfile" || test ! -f $top/$initfile; then
-    cat <<- 'EOF'
-	**Error**: Directory \`$top\' does not look like a valid
+    cat <<- EOF
+	\$initfile is \`$initfile'
+	**Error**: Directory \`$top' does not look like a valid
 	top-level directory.
 	EOF
     exit 1

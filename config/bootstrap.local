@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:28:33 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.24 1999/08/30 19:28:42 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.25 1999/10/26 03:04:47 bruce Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -62,12 +62,12 @@ pre )
     cp -fp ${srcdir}/config/bootstrap ${srcdir}/snprintfv/config
     rm -f ${srcdir}/configure
 
-    ( autogen --version && \
+    ( AutoGen --version && \
       columns --version && \
       getdefs --version ) > /dev/null 2>&1 || \
         missing autogen ftp://autogen.linuxbox.com/pub/autogen-4.5.5.tar.gz
 
-    ( cd ${srcdir}/config; autogen misc.def; )
+    ( cd ${srcdir}/config; AutoGen misc.def; )
 
     test -f doc/autogen.texi \
         || echo '@setfilename fnord' > doc/autogen.texi

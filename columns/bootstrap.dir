@@ -4,4 +4,4 @@
 #  These files are distributed, so it is not necessary to invoke
 #  AutoGen before building AutoGen.  (Like I had to do long ago :)
 
-autogen -L ../autoopts opts.def
+AutoGen -L ../autoopts opts.def

@@ -30,10 +30,10 @@ rmlist=
 if type whence 2>&1 | grep 'not found' > /dev/null
 then whence=which ; else whence=whence ; fi
 
-if [ ! -x ./autogen ]
+if [ ! -x ./AutoGen ]
 then
-    ln -s `$whence autogen` .
-    rmlist=./autogen
+    ln -s `$whence AutoGen` .
+    rmlist=./AutoGen
 fi
 
 if [ ! -x ../getdefs/getdefs ]
@@ -50,25 +50,25 @@ fi
 
 # Construct the info doc
 #
-i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bautogen"
-echo autogen ${i} opts.def
-autogen ${i} opts.def
+i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bAutoGen"
+echo AutoGen ${i} opts.def
+AutoGen ${i} opts.def
 
 # Make the option processing files:
 #
-autogen -L ../autoopts ${DEBUG_OPTS} opts.def
+AutoGen -L ../autoopts ${DEBUG_OPTS} opts.def
 date > stamp-opts
 
-getdefs autogen=autogen base-name=directive template=directive defDirect.c
+getdefs AutoGen=autogen base-name=directive template=directive defDirect.c
 date > stamp-directive
 
-getdefs autogen=autogen base-name=functions template=functions \
+getdefs AutoGen=autogen base-name=functions template=functions \
 		defs=macfunc func*.c
 date > stamp-functions
 
 getdefs assign=group=ag defs=gfunc templ=snarf out=expr.def \
 		srcfile exp*.c func*.c
-SHELL=ksh autogen expr.def
+SHELL=ksh AutoGen expr.def
 date > stamp-exprini
 
 if [ ! -z "$rmlist" ]
