@@ -7,15 +7,15 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Wed Feb 24 11:01:57 1999
+## Last Modified:   Fri Mar 19 12:48:50 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.9 1999/02/24 19:04:54 bkorb Exp $
+## $Id: Makefile.am,v 2.10 1999/03/19 20:58:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
 
-getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h opts.def
+getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu
 EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.texi getdefs.tpl

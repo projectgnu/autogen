@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Fri Feb 26 08:55:14 1999
+## Last Modified:   Fri Mar 19 12:48:32 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.11 1999/03/17 16:55:18 bkorb Exp $
+## $Id: Makefile.am,v 2.12 1999/03/19 20:58:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,7 +21,7 @@ all : $(INFO_DEPS) LSM
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl LSM LSM.tpl depend.fig depend.eps
+EXTRA_DIST	= auto_gen.tpl autogen.info* LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 ODEF            = $(top_srcdir)/src/opts.def

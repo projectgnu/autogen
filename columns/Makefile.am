@@ -10,12 +10,12 @@
 ## Last Modified:   Wed Feb 24 11:03:51 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 1999/02/24 19:04:51 bkorb Exp $
+## $Id: Makefile.am,v 1.7 1999/03/19 20:58:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
 
-columns_SOURCES = columns.c opts.c opts.h opts.def
+columns_SOURCES = columns.c opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi
 EXTRA_DIST	= $(GEN_SRC) opts.def columns.tpl columns.texi

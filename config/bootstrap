@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Tue Nov 24 08:57:45 1998
+# Last Modified:     Fri Mar 19 12:47:18 1999
 #            by:     Bruce Korb <korb@datadesign.com>
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.5 1999/03/17 16:55:18 bkorb Exp $
+# $Id: bootstrap,v 1.6 1999/03/19 20:58:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -131,6 +131,9 @@ do
         cd $top
         echo bootstrapping in `pwd`
 
+        # remove any stale config stuff
+        doit rm -f config.cache config.status
+
         # Use auxdir if set in configure.in.
         auxdir=${auxdir-`fgrep CONFIG_AUX_DIR configure.in | \
             sed 's,^.*(,,;s,).*$,,'`}
@@ -139,7 +142,21 @@ do
 
         doit $LIBTOOLIZE    --force
         doit $ACLOCAL       -I $auxdir
+
+	# automake wants this stuff now, but we generate it later!
+	test -f doc/autogen.texi \
+	    || echo '@setfilename fnord' > doc/autogen.texi
+	test -f config.h.in \
+	    || cp config/acconfig.h config.h.in
+	    
         doit $AUTOMAKE      --gnu --add-missing
+
+	# remove the fake files so we don't forget to generate them later.
+	test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
+	    || rm -f doc/autogen.texi
+	diff config/acconfig.h config.h.in >/dev/null 2>&1 \
+	    || rm -f config.h.in
+
         doit $AUTOCONF
         doit $AUTOHEADER    -l $auxdir
     )

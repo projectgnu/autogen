@@ -1,3 +1,25 @@
+1999-03-18  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* src/Makefile.am (autogen_SOURCES): moved opts.def from here
+	into EXTRA_DIST.  automake generates a bad OBJECTS list otherwise.
+	* getdefs/Makefile.am (getdefs_SOURCES): ditto.
+	* columns/Makefile.am (columns_SOURCES): ditto.
+
+	* config/bootstrap: Remove the config.cache file.
+	Add some transitory dummy files to quieten automake if necessary.
+
+	* autoopts/optcode.tpl: GNU tr chokes on '\\-', so reverted
+	Bruce's change back to '-'.  (`-' isn't a meta-character anyway
+	and shouldn't need quoting!).
+
+	* src/Makefile.am: Use GNU inspired `stamp-foo' files as time
+	stamp markers for make.
+	(stamp-opts): new timestamp file to manage rebuilding of opts.c
+	and opts.h.
+
+	* Makefile.am (EXTRA_DIST): Don't forget to distribute
+	MakeRules.in.
+
 1999-03-16  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* MakeRules.in (SUFFIXES): automake uses a variable to name
