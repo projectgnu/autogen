@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Wed Jun 30 09:12:51 1999				      
+## Last Modified:   Thu Jul 29 12:44:28 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.15 1999/07/07 14:23:16 bkorb Exp $
+## $Id: Makefile.am,v 2.16 1999/07/29 19:44:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -90,5 +90,9 @@ autogen.info : doc
 
 doc :
 	ln -s $(top_srcdir)/snprintfv/doc ./doc
+
+html : autogen.texi
+	cd www/doc ; ln -s ../../autogen.texi ; \
+	texi2html -menu -split_node
 
 # Makefile.am ends here
