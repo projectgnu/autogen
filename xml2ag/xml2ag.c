@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.6 2002/06/28 02:48:05 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.7 2002/07/12 23:41:20 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -274,7 +274,7 @@ printHeader( xmlDocPtr pDoc )
         }
 
         pzTpl = pTpl;
-        if (strchr( pzTpl, '.' ) != NULL)
+        if (strchr( (char*)pzTpl, '.' ) != NULL)
             pzSfx = "";
     }
 
@@ -304,10 +304,10 @@ STATIC void
 printAttrs( xmlAttrPtr pAttr )
 {
     while (pAttr != NULL) {
-        char* pzCont = pAttr->children->content;
+        char* pzCont = (char*)pAttr->children->content;
 
         emitIndentation();
-        fputs( pAttr->name, outFp );
+        fputs( (char*)pAttr->name, outFp );
         fputs( " = ", outFp );
         if (pAttr->children->children == NULL)
             fprintf( outFp, "'%s';\n", TRIM( pzCont, NULL ));
@@ -338,7 +338,7 @@ printNode( xmlNodePtr pNode )
         size_t sz;
         char*  pzTxt;
         emitIndentation();
-        fputs( pNode->name, outFp );
+        fputs( (char*)pNode->name, outFp );
         pzTxt = TRIM( pNode->content, &sz );
 
         if (  (pNode->properties == NULL)
