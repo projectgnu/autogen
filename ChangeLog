@@ -1,3 +1,7 @@
+1999-11-08  Bruce Korb  <autogen@linuxbox.com>
+
+	* agen5/funcDef.c:  Template structure needed more space.
+
 1999-11-05  Bruce Korb  <autogen@linuxbox.com>
 
 	* agen5/test/*:  recreated a number of tests that were in
