@@ -1,14 +1,14 @@
 (-: AutoGen5 template 
 
-# $Id: strsignal.tpl,v 2.6 1999/10/28 02:27:10 bruce Exp $
+# $Id: strsignal.tpl,v 2.7 1999/10/28 02:28:00 bruce Exp $
 
 h :-)
 /*
-[=(dne " *  ")=]
+(-:(dne " *  "):-)
  *
  *  copyright 1992-1999 Bruce Korb
  *
-[=(gpl "AutoGen" " *  ")=]
+(-:(gpl "AutoGen" " *  "):-)
  */
 #ifndef MAX_SIGNAL_NUMBER
 #define MAX_SIGNAL_NUMBER (-: (high-lim "signal") :-)
