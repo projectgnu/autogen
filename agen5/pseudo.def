@@ -5,17 +5,19 @@
  *  This defines the finite state transition table for parsing the
  *  pseudo-macro at the head of every template
  *
- *  $Id: pseudo.def,v 1.1 2000/09/16 05:42:20 bkorb Exp $
+ *  $Id: pseudo.def,v 1.2 2001/06/06 04:19:57 uid24370 Exp $
  */
 AutoGen Definitions fsm;
 
-token = ed_mode;     /* the -*- mode marker */
-token = marker;      /* a start or end macro mark */
-token = end_pseudo;  /* newline found in end_mark state */
+prefix = pm;
 
-token = "autogen";   /* "autogen" */
-token = template;    /* "template" */
-token = suffix;      /* a string other than the above */
+event = ed_mode;     /* the -*- mode marker */
+event = marker;      /* a start or end macro mark */
+event = end_pseudo;  /* newline found in end_mark state */
+
+event = "autogen";   /* "autogen" */
+event = template;    /* "template" */
+event = suffix;      /* a string other than the above */
 
 state = st_mark;     /* start marker processed */
 state = agen;        /* "autogen5" processed   */
@@ -25,20 +27,20 @@ state = end_mark;    /* end marker processed   */
 /*
  *  No-op transition.  Applies to all states and does not change state.
  */
-transition = { t_st = '*';         ttkn = ed_mode;  };
+transition = { tst = '*';       tev = ed_mode;  };
 /*
  *  Disable the ed_mode transition in the end_mark state tho
  */
-transition = { t_st = end_mark;    ttkn = ed_mode;    next = invalid;    };
+transition = { tst = end_mark;  tev = ed_mode;    next = invalid;    };
 
 /*
  *  Meaningful transitions
  */
-transition = { t_st = init;      ttkn = marker;     next = st_mark; };
-transition = { t_st = st_mark;   ttkn = "autogen";  next = agen;       };
-transition = { t_st = agen;      ttkn = template;   next = templ;      };
-transition = { t_st = templ;     ttkn = suffix;     next = templ;      };
-transition = { t_st = templ;     ttkn = marker;     next = end_mark;   };
-transition = { t_st = end_mark;  ttkn = end_pseudo; next = done;       };
+transition = { tst = init;      tev = marker;     next = st_mark; };
+transition = { tst = st_mark;   tev = "autogen";  next = agen;       };
+transition = { tst = agen;      tev = template;   next = templ;      };
+transition = { tst = templ;     tev = suffix;     next = templ;      };
+transition = { tst = templ;     tev = marker;     next = end_mark;   };
+transition = { tst = end_mark;  tev = end_pseudo; next = done;       };
 
 /* pseudo.def ends here */

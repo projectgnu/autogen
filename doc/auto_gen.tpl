@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.64 2001/05/09 05:25:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.65 2001/06/06 04:19:57 uid24370 Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -638,11 +638,12 @@ unquoted.  The string must not contain any of the characters special to
 the definition text (i.e. @code{"}, @code{#}, @code{'}, @code{(},
 @code{)}, @code{,}, @code{;}, @code{<}, @code{=}, @code{>}, @code{[},
 @code{]}, @code{`}, @code{@{}, or @code{@}}).  This list is subject to
-change, but it will never contain period (@code{.}), slash (@code{/}),
-colon (@code{:}), hyphen (@code{-}) or backslash (@code{\}).  Basically,
-if the string looks like it is a normal DOS or UNIX file or variable
-name, and it is not one of two keywords (@samp{autogen} or
-@samp{definitions}) then it is OK to not quote it, otherwise you should.
+change, but it will never contain underscore (@code{_}), period
+(@code{.}), slash (@code{/}), colon (@code{:}), hyphen (@code{-}) or
+backslash (@code{\\}).  Basically, if the string looks like it is a
+normal DOS or UNIX file or variable name, and it is not one of two
+keywords (@samp{autogen} or @samp{definitions}) then it is OK to not
+quote it, otherwise you should.
 
 @node scheme-generated
 @subsection Scheme Result String

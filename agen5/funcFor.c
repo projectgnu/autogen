@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.19 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: funcFor.c,v 1.20 2001/06/06 04:19:57 uid24370 Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -702,7 +702,7 @@ MAKE_LOAD_PROC( For )
 
     pEndMac = parseTemplate( pT, pMac + 1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "parse error" );
+        LOAD_ABORT( pT, pMac, "ENDFOR not found" );
 
     pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;
 

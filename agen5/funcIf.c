@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.12 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: funcIf.c,v 1.13 2001/06/06 04:19:57 uid24370 Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -372,10 +372,8 @@ MAKE_LOAD_PROC( If )
      *  to the remaining text.
      */
     pEndifMac = parseTemplate( pT, pMac+1, ppzScan );
-    if (*ppzScan == (char*)NULL) {
-        fputs( "Unterminated IF block\n", stderr );
-        LOAD_ABORT( pT, pMac, "parse err" );
-    }
+    if (*ppzScan == (char*)NULL)
+        LOAD_ABORT( pT, pMac, "ENDIF not found" );
 
     current_if.pIf->endIndex   = \
     current_if.pElse->sibIndex = pEndifMac - pT->aMacros;
@@ -425,15 +423,14 @@ MAKE_LOAD_PROC( While )
     (void)mLoad_Expr( pT, pMac, ppzScan );
 
     /*
-     *  Now, do a nested parse of the template.
-     *  When the matching 'ENDIF' macro is encountered,
-     *  the handler routine will cause 'parseTemplate()'
-     *  to return with the text scanning pointer pointing
-     *  to the remaining text.
+     *  Now, do a nested parse of the template.  When the matching 'ENDWHILE'
+     *  macro is encountered, the handler routine will cause 'parseTemplate()'
+     *  to return with the text scanning pointer pointing to the remaining
+     *  text.
      */
     pEndMac = parseTemplate( pT, pMac+1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "parse err" );
+        LOAD_ABORT( pT, pMac, "ENDWHILE not found" );
 
     pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;
 

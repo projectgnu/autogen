@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.14 2000/12/11 23:02:14 bkorb Exp $
+# $Id: shell.test,v 1.15 2001/06/06 04:19:57 uid24370 Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -22,6 +22,8 @@ if test -z "$srcdir"; then
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
+SHELL=/bin/sh
+export SHELL
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -31,7 +33,7 @@ echo "creating $testname.def in `pwd`"
 test_main="${test_main}"    \
  argument="reg-arg [ ... ]" \
 long_opts=true  \
-${SHELL-sh} ${stdopts} option: second
+${SHELL} ${stdopts} option: second
 
 echo $AGEN $testname.def
 $AGEN $testname.def || \

@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.10 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: agShell.c,v 1.11 2001/06/06 04:19:57 uid24370 Exp $
  *  Manage a server shell process
  */
 
@@ -62,10 +62,10 @@ closeServer( void )
     if (serverId == NULLPROCESS)
         return;
 
-    kill( serverId, SIGKILL );
+    (void)kill( serverId, SIGKILL );
     serverId = NULLPROCESS;
-    fclose( serverPair.pfRead );
-    fclose( serverPair.pfWrite );
+    (void)fclose( serverPair.pfRead );
+    (void)fclose( serverPair.pfWrite );
     serverPair.pfRead = serverPair.pfWrite = (FILE*)NULL;
 }
 
@@ -77,11 +77,13 @@ sigHandler( int signo )
     fprintf( stderr, "Closing server:  %s signal (%d) received\n",
              strsignal( signo ), signo );
     errClose = AG_TRUE;
-    if (pzLastCmd == (const char*)NULL)
-        pzLastCmd = "?? unknown ??\n";
 
-    fputs( "\nLast command issued:\n", stderr );
-    fprintf( stderr, zCmdFmt, pCurDir, pzLastCmd, zShDone );
+    (void)fputs( "\nLast command issued:\n", stderr );
+    {
+        const char* pz = (pzLastCmd == (const char*)NULL)
+            ? "?? unknown ??\n" : pzLastCmd;
+        fprintf( stderr, zCmdFmt, pCurDir, pz, zShDone );
+    }
     pzLastCmd = (const char*)NULL;
     closeServer();
 }
@@ -97,7 +99,7 @@ serverSetup( void )
     {
         static int doneOnce = 0;
         if (doneOnce++ == 0) {
-            atexit( &closeServer );
+            (void)atexit( &closeServer );
             pCurDir = getcwd( (char*)NULL, MAXPATHLEN+1 );
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
             if (HAVE_OPT( SHOW_SHELL ))
@@ -111,9 +113,9 @@ serverSetup( void )
 
     saNew.sa_handler = sigHandler;
     saNew.sa_flags   = 0;
-    sigemptyset( &saNew.sa_mask );
-    sigaction( SIGPIPE, &saNew, &saSave1 );
-    sigaction( SIGALRM, &saNew, &saSave2 );
+    (void)sigemptyset( &saNew.sa_mask );
+    (void)sigaction( SIGPIPE, &saNew, &saSave1 );
+    (void)sigaction( SIGALRM, &saNew, &saSave2 );
 
     errClose = AG_FALSE;
 
@@ -123,7 +125,7 @@ serverSetup( void )
         char* pz;
         pzLastCmd = zTrap;
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
-        fflush( serverPair.pfWrite );
+        (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
         if (HAVE_OPT( SHOW_SHELL ) && (*pz != NUL))
@@ -141,7 +143,7 @@ serverSetup( void )
         fputs( "Server traps set\n", stderr );
         pzLastCmd = zSetup;
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
-        fflush( serverPair.pfWrite );
+        (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
         if (HAVE_OPT( SHOW_SHELL ))
             fprintf( stderr, "Trap state:\n%s\n", pz );

@@ -1,3 +1,12 @@
+2001-06-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm.tpl: reworked
+	* agen5/fsm-macor.tpl: new, macro library
+	* agen5/fsm-trans.tpl: ditto
+	* agen5/loadPseudo.c: changed names of generated constants
+	* agen5/pseudo.def: adjust to new templates
+	* autoopts/options.h: fix version number
+	
 2001-05-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(doEnvPresets): correct size computation

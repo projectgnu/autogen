@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/05/09 05:25:59 $
+## Last Modified:   $Date: 2001/06/06 04:19:57 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.29 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 1.30 2001/06/06 04:19:57 uid24370 Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -34,14 +34,13 @@ MAINTAINERCLEANFILES = Makefile.in
 GEN_CSRC = opts.c opts.h directive.h functions.h expr.ini expr.h proto.h
 GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
-pkgdata_DATA	= schemedef.scm fsm.tpl fsm-example.tpl fsm-state.tpl
-man_MANS        = autogen.1
+pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
+man_MANS     = autogen.1
 
-EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
-	pseudo.def pseudo-fsm.c pseudo-fsm.h \
-	$(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
+EXTRA_DIST	 = directive.tpl functions.tpl opts.def snarf.tpl \
+	pseudo.def pseudo-fsm.h $(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
 
-bin_PROGRAMS	= autogen
+bin_PROGRAMS = autogen
 
 autogen_SOURCES = $(GEN_CSRC) \
         agShell.c   agUtils.c    agUtils.h   autogen.c  autogen.h \

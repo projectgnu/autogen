@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.25 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: funcCase.c,v 1.26 2001/06/06 04:19:57 uid24370 Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1136,7 +1136,7 @@ MAKE_LOAD_PROC( Case )
      */
     pEsacMac = parseTemplate( pT, pMac+1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "parse err" );
+        LOAD_ABORT( pT, pMac, "ESAC not found" );
 
     /*
      *  Tell the last select macro where its end is.

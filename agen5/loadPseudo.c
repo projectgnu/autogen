@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.11 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.12 2001/06/06 04:19:57 uid24370 Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -39,7 +39,8 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  */
-#include "pseudo-fsm.c"
+#define DEFINE_FSM
+#include "pseudo-fsm.h"
 
 tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
@@ -138,11 +139,11 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
  *  Skiping leading white space, figure out what sort of token is under
  *  the scan pointer (pzData).
  */
-    STATIC te_fsm_token
-findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
+    STATIC te_pm_event
+findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
 {
     tCC* pzData = *ppzData;
-    te_fsm_token res_tkn;
+    te_pm_event res_tkn;
 
  skipWhiteSpace:
     while (isspace( *pzData )) {
@@ -154,9 +155,9 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
              *  IF we are done with the macro markers,
              *  THEN we skip white space only thru the first new line.
              */
-            if (fsm_state == FSS_END_MARK) {
+            if (fsm_state == PM_ST_END_MARK) {
                 *ppzData = pzData;
-                return FST_END_PSEUDO;
+                return PM_EV_END_PSEUDO;
             }
         }
     }
@@ -165,9 +166,9 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
      *  After the end marker has been found,
      *  anything else is really the start of the data.
      */
-    if (fsm_state == FSS_END_MARK) {
+    if (fsm_state == PM_ST_END_MARK) {
         *ppzData = pzData;
-        return FST_END_PSEUDO;
+        return PM_EV_END_PSEUDO;
     }
 
     /*
@@ -177,14 +178,14 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
     if (isalnum( *pzData )) {
         if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
             res_tkn = isspace( pzData[ sizeof(zAgName)-1 ])
-                ? FST_AUTOGEN : FST_SUFFIX;
+                ? PM_EV_AUTOGEN : PM_EV_SUFFIX;
 
         } else if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0) {
             res_tkn = isspace( pzData[ sizeof(zAgName)-1 ])
-                ? FST_TEMPLATE : FST_SUFFIX;
+                ? PM_EV_TEMPLATE : PM_EV_SUFFIX;
 
         } else
-            res_tkn = FST_SUFFIX;
+            res_tkn = PM_EV_SUFFIX;
     }
 
     /*
@@ -194,7 +195,7 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
     else if ((*pzData == '#') && line_start) {
         pzData = strchr( pzData+1, '\n' );
         if (pzData == (char*)NULL)
-            return FST_INVALID;
+            return PM_EV_INVALID;
 
         goto skipWhiteSpace;
 
@@ -205,30 +206,30 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
      *  THEN we found an edit mode marker
      */
     else if (strncmp( pzData, "-*-", 3 ) == 0)
-        res_tkn = FST_ED_MODE;
+        res_tkn = PM_EV_ED_MODE;
 
     /*
      *  IF we are accepting suffixes at this point, then we will
      *  accept these three characters as the start of a suffix
      */
-    else if (  (fsm_state == FSS_TEMPL)
+    else if (  (fsm_state == PM_ST_TEMPL)
             && (  (*pzData == '.')
                || (*pzData == '-')
                || (*pzData == '_')
             )  )
-        res_tkn = FST_SUFFIX;
+        res_tkn = PM_EV_SUFFIX;
     /*
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
     else if (ispunct( *pzData ))
-        res_tkn = FST_MARKER;
+        res_tkn = PM_EV_MARKER;
 
     /*
      *  Otherwise, it is just junk.
      */
     else
-        res_tkn = FST_INVALID;
+        res_tkn = PM_EV_INVALID;
 
     *ppzData = pzData;
     return res_tkn;
@@ -276,30 +277,30 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC         zMarkErr[] = "start/end macro mark too long";
 
-    te_fsm_state fsm_state  = FSS_INIT;
+    te_pm_state fsm_state  = PM_ST_INIT;
     ag_bool      line_start = AG_TRUE;  /* set TRUE first time only */
 
     templLineNo  = 1;
 
-    while (fsm_state != FSS_DONE) {
-        te_fsm_token fsm_tkn = findTokenType( &pzData, fsm_state, line_start );
-        te_fsm_state  nxt_state;
-        te_transition trans;
+    while (fsm_state != PM_ST_DONE) {
+        te_pm_event fsm_tkn = findTokenType( &pzData, fsm_state, line_start );
+        te_pm_state nxt_state;
+        te_pm_trans trans;
 
         line_start = AG_FALSE;
-        nxt_state  = trans_table[ fsm_state ][ fsm_tkn ].next_state;
-        trans      = trans_table[ fsm_state ][ fsm_tkn ].trans_type;
+        nxt_state  = pm_trans_table[ fsm_state ][ fsm_tkn ].next_state;
+        trans      = pm_trans_table[ fsm_state ][ fsm_tkn ].transition;
 
         /*
-         *  There are only so many "FSX_<state-name>_<token-name>"
+         *  There are only so many "PM_TR_<state-name>_<token-name>"
          *  transitions that are legal.  See which one we got.
          *  It is legal to alter "nxt_state" while processing these.
          */
         switch (trans) {
-        case FSX_AGEN_ED_MODE:
-        case FSX_INIT_ED_MODE:
-        case FSX_ST_MARK_ED_MODE:
-        case FSX_TEMPL_ED_MODE:
+        case PM_TR_AGEN_ED_MODE:
+        case PM_TR_INIT_ED_MODE:
+        case PM_TR_ST_MARK_ED_MODE:
+        case PM_TR_TEMPL_ED_MODE:
         {
             char* pzEnd = strstr( pzData + 3, "-*-" );
             char* pzNL  = strchr( pzData + 3, '\n' );
@@ -312,11 +313,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             break;
         }
 
-        case FSX_AGEN_TEMPLATE:
+        case PM_TR_AGEN_TEMPLATE:
             pzData += sizeof( zTpName )-1;
             break;
 
-        case FSX_INIT_MARKER:
+        case PM_TR_INIT_MARKER:
             pzData = copyMarker( pzData, zStartMac, &startMacLen );
             if (pzData == (tCC*)NULL) {
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, zMarkErr );
@@ -324,11 +325,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             }
             break;
 
-        case FSX_ST_MARK_AUTOGEN:
+        case PM_TR_ST_MARK_AUTOGEN:
             pzData += sizeof( zAgName )-1;
             break;
 
-        case FSX_TEMPL_MARKER:
+        case PM_TR_TEMPL_MARKER:
             pzData = copyMarker( pzData, zEndMac, &endMacLen );
             if (pzData == (tCC*)NULL) {
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, zMarkErr );
@@ -336,28 +337,28 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             }
             break;
 
-        case FSX_TEMPL_SUFFIX:
+        case PM_TR_TEMPL_SUFFIX:
             pzData = doSuffixSpec( pzData, pzFileName, templLineNo );
             break;
 
-        case FSX_END_MARK_ED_MODE:
-        case FSX_INVALID:
+        case PM_TR_END_MARK_ED_MODE:
+        case PM_TR_INVALID:
         {
             tCC*  pzWhich;
 
-            fsm_invalid_transition( fsm_state, fsm_tkn );
+            pm_invalid_transition( fsm_state, fsm_tkn );
             switch (fsm_state) {
-            case FSS_INIT:     pzWhich = "need start marker";    break;
-            case FSS_ST_MARK:  pzWhich = "need autogen5 marker"; break;
-            case FSS_AGEN:     pzWhich = "need template marker"; break;
-            case FSS_TEMPL:    pzWhich = "need end marker";      break;
-            case FSS_END_MARK: pzWhich = "need end of line";     break;
-            default:           pzWhich = "BROKEN FSM";           break;
+            case PM_ST_INIT:     pzWhich = "need start marker";    break;
+            case PM_ST_ST_MARK:  pzWhich = "need autogen5 marker"; break;
+            case PM_ST_AGEN:     pzWhich = "need template marker"; break;
+            case PM_ST_TEMPL:    pzWhich = "need end marker";      break;
+            case PM_ST_END_MARK: pzWhich = "need end of line";     break;
+            default:             pzWhich = "BROKEN FSM";           break;
             }
             fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
             AG_ABEND;
         }
-        case FSX_END_MARK_END_PSEUDO:
+        case PM_TR_END_MARK_END_PSEUDO:
             /* we be done now */;
         }
 
