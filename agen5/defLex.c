@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.15 2000/09/27 20:38:54 bkorb Exp $
+ *  $Id: defLex.c,v 1.16 2000/09/28 03:12:27 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -419,6 +419,7 @@ alist_to_autogen_def( void )
     char*  pzEnd   = (char*)skipScheme( pzText, pzText + strlen( pzText ));
 
     SCM    res;
+    int    res_len;
     tScanCtx*  pCtx;
 
     if (! schemedefLoaded) {
@@ -442,9 +443,6 @@ alist_to_autogen_def( void )
      */
     procState = PROC_STATE_GUILE_PRELOAD;
     res       = gh_eval_str( pzText );
-    procState = PROC_STATE_LOAD_DEFS;
-    pCurCtx->pzScan = pzEnd;
-    AGFREE( (void*)pzText );
 
     /*
      *  The result *must* be a string, or we choke.
@@ -455,20 +453,15 @@ alist_to_autogen_def( void )
         AG_ABEND;
     }
 
+    res_len   = SCM_LENGTH( res );
+    procState = PROC_STATE_LOAD_DEFS;
+    pCurCtx->pzScan = pzEnd;
+    AGFREE( (void*)pzText );
+
     /*
      *  Now, push the resulting string onto the input stack.
      */
-    {
-        int  len;
-        pzText = gh_scm2newstr( res, &len );
-
-        pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + len );
-        if (pCtx == (tScanCtx*)NULL) {
-            fprintf( stderr, zAllocErr, pzProg,
-                     sizeof( tScanCtx ) + 4 + len, "scheme expression" );
-            AG_ABEND;
-        }
-    }
+    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + res_len, "lex scan ctx" );
 
     /*
      *  Link the new scan data into the context stack
@@ -483,8 +476,8 @@ alist_to_autogen_def( void )
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
-    strcpy( pCtx->pzScan, pzText );
-    free( (void*)pzText );  /* use free() directly here */
+    memcpy( (void*)(pCtx->pzScan), (void*)SCM_CHARS( res ), res_len );
+    pCtx->pzScan[ res_len ] = NUL;
 
     /*
      *  At this point, the next token will be obtained

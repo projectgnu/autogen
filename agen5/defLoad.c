@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.8 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: defLoad.c,v 1.9 2000/09/28 03:12:27 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -91,13 +91,7 @@ fixTwins( tDefEntry** ppNode )
     if (twinCt <= 16) {
         p = ap;
     } else {
-        p = AGALOC( twinCt * sizeof( void* ));
-
-        if (p == (void**)NULL) {
-            fprintf( stderr, zAllocErr, pzProg,
-                     twinCt * sizeof( void* ), "twin sort pointer array" );
-            AG_ABEND;
-        }
+        p = AGALOC( twinCt * sizeof( void* ), "twin sort pointer array" );
     }
 
     /*
@@ -292,7 +286,7 @@ readDefines( void )
     rootEntry.pzName  = "@@ROOT@@";
     rootEntry.valType = VALTYP_BLOCK;
     if (! ENABLED_OPT( DEFINITIONS )) {
-        pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ));
+        pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "scan context" );
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
         pBaseCtx->lineNo     = 1;
         pBaseCtx->pzFileName = "@@ No-Definitions @@";
@@ -349,12 +343,7 @@ readDefines( void )
      *  Allocate the space we need for our definitions.
      */
     sizeLeft = dataSize+4+sizeof( *pBaseCtx );
-    pBaseCtx = (tScanCtx*)AGALOC( sizeLeft );
-    if (pBaseCtx == (tScanCtx*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 dataSize+4+sizeof( *pBaseCtx ), "file buffer" );
-        AG_ABEND;
-    }
+    pBaseCtx = (tScanCtx*)AGALOC( sizeLeft, "file buffer" );
     memset( (void*)pBaseCtx, 0, sizeLeft );
     pBaseCtx->lineNo     = 1;
     sizeLeft = dataSize;
@@ -429,13 +418,8 @@ readDefines( void )
              */
             dataSize += (sizeLeft = 0x1000);
             p = (tScanCtx*)AGREALOC( (void*)pBaseCtx,
-                                     dataSize+4+sizeof( *pBaseCtx ));
-            if (p == (tScanCtx*)NULL) {
-                fprintf( stderr, zAllocErr, pzProg,
-                         dataSize+4+sizeof( *pBaseCtx ),
-                         "expanded file buffer" );
-                AG_ABEND;
-            }
+                                     dataSize+4+sizeof( *pBaseCtx ),
+                                     "expanded file buffer" );
 
             /*
              *  The buffer may have moved.  Set the data pointer at an

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.6 2000/09/19 01:45:30 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.7 2000/09/28 03:12:27 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -85,14 +85,8 @@ skipSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
     /*
      *  Allocate the suffix structure
      */
-    pOS = (tOutSpec*)AGALOC( sizeof( *pOS ) + (size_t)spn + 1);
-    if (pOS == (tOutSpec*)NULL) {
-        tSCC zOutSpec[] = "Output Specification";
-
-        fprintf( stderr, zAllocErr, pzProg,
-                 sizeof( *pOS ) + spn + 1, zOutSpec );
-        AG_ABEND;
-    }
+    pOS = (tOutSpec*)AGALOC( sizeof( *pOS ) + (size_t)spn + 1,
+                             "Output Specification" );
 
     /*
      *  Link it into the global list
@@ -347,11 +341,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case FSX_END_MARK_ED_MODE:
         case FSX_INVALID:
-	{
-	    tCC*  pzWhich;
+        {
+            tCC*  pzWhich;
 
             fsm_invalid_transition( fsm_state, fsm_tkn );
-	    switch (fsm_state) {
+            switch (fsm_state) {
             case FSS_INIT:     pzWhich = "need start marker";    break;
             case FSS_ST_MARK:  pzWhich = "need autogen5 marker"; break;
             case FSS_AGEN:     pzWhich = "need template marker"; break;
@@ -361,7 +355,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             }
             fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
             AG_ABEND;
-	}
+        }
         case FSX_END_MARK_END_PSEUDO:
             /* we be done now */;
         }

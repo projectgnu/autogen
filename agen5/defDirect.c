@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.9 2000/08/11 13:45:47 bkorb Exp $
+ *  $Id: defDirect.c,v 1.10 2000/09/28 03:12:27 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -613,12 +613,7 @@ doDir_include( char* pzArg, char* pzScan )
      */
     {
         size_t sz = sizeof( tScanCtx ) + 4 + inclSize;
-        pCtx = (tScanCtx*)AGALOC( sz );
-        if (pCtx == (tScanCtx*)NULL) {
-            fprintf( stderr, zAllocErr, pzProg,
-                     sz, "include def header" );
-            AG_ABEND;
-        }
+        pCtx = (tScanCtx*)AGALOC( sz, "include def header" );
 
         memset( (void*)pCtx, 0, sz );
         pCtx->lineNo = 1;
@@ -786,12 +781,8 @@ doDir_shell( char* pzArg, char* pzScan )
      *  This is an extra allocation and copy, but easier than rewriting
      *  'loadData()' for this special context.
      */
-    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + strlen( pzText ) + 4);
-    if (pCtx == (tScanCtx*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 sizeof( tScanCtx ), "shell output" );
-        AG_ABEND;
-    }
+    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + strlen( pzText ) + 4,
+                              "shell output" );
 
     /*
      *  Link the new scan data into the context stack

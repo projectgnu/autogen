@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.20 2000/04/07 13:28:31 bkorb Exp $
+ *  $Id: funcCase.c,v 1.21 2000/09/28 03:12:27 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -480,7 +480,7 @@ Select_Match( char* pzText, char* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == (void*)NULL) {
-        regex_t*  pRe = AGALOC( sizeof( *pRe ));
+        regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
     }
@@ -571,7 +571,7 @@ Select_Match_End( char* pzText, char* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == (void*)NULL) {
-        regex_t*  pRe = AGALOC( sizeof( *pRe ));
+        regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match end re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
     }
@@ -679,7 +679,7 @@ Select_Match_Start( char* pzText, char* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == (void*)NULL) {
-        regex_t*  pRe = AGALOC( sizeof( *pRe ));
+        regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match start re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
     }
@@ -786,7 +786,7 @@ Select_Match_Full( char* pzText, char* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == (void*)NULL) {
-        regex_t*  pRe = AGALOC( sizeof( *pRe ));
+        regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match full re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = pRe;
     }

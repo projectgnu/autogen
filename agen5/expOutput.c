@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.11 2000/09/27 20:38:54 bkorb Exp $
+ *  $Id: expOutput.c,v 1.12 2000/09/28 03:12:27 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -165,7 +165,7 @@ ag_scm_out_push_add( SCM new_file )
 
     pzNewFile = gh_scm2newstr( new_file, NULL );
 
-    p = (tFpStack*)AGALOC( sizeof( tFpStack ));
+    p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
     p->pPrev  = pCurFp;
     p->pzName = pzNewFile;  /* memory leak */
     addWriteAccess( pzNewFile );
@@ -197,7 +197,7 @@ ag_scm_out_push_new( SCM new_file )
 
     pzNewFile = gh_scm2newstr( new_file, NULL );
 
-    p = (tFpStack*)AGALOC( sizeof( tFpStack ));
+    p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
     p->pPrev  = pCurFp;
     p->pzName = pzNewFile;  /* memory leak */
     unlink( pzNewFile );

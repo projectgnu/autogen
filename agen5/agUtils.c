@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.4 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: agUtils.c,v 1.5 2000/09/28 03:12:27 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -113,7 +113,9 @@ doOptions( int arg_ct, char** arg_vec )
         /*
          *  Otherwise, use the basename of the definitions file
          */
-        pzD = OPT_ARG( BASE_NAME ) = AGALOC( strlen( pz )+1 );
+        OPT_ARG( BASE_NAME ) = \
+        pzD = AGALOC( strlen( pz )+1, "def file name" );
+
         while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
         *pzD = NUL;
     } while (AG_FALSE);
@@ -453,21 +455,56 @@ skipExpression( const char* pzSrc, size_t len )
 }
 
 
-#ifdef MEMDEBUG
+#ifndef MEMDEBUG
+
+
+    void*
+ag_alloc( size_t sz, const char* pzWhat )
+{
+    void* p = malloc( sz );
+    if ((p == (void*)NULL) && (pzWhat != NULL)) {
+        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+    }
+    return p;
+}
+
+
+    void*
+ag_realloc( void* p, size_t sz, const char* pzWhat )
+{
+    void* np = p ? realloc( p, sz ) : malloc( sz );
+    if (np == (void*)NULL) {
+        if (pzWhat != NULL) {
+            fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+            LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+        }
+        if (p != NULL)
+            free( p );
+    }
+
+    return np;
+}
+
+#else
 STATIC tMemMgmt memHead = { &memHead, &memHead, (char*)NULL, "ROOT" };
 #define CHECK_CT 128
 #define SPARE    128
 
 
-
     void*
-ag_alloc( size_t sz, const char* pz )
+ag_alloc( size_t sz, const char* pzWhat, const char* pz )
 {
     size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
     tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
 
-    if (p == (tMemMgmt*)NULL)
-        return (void*)NULL;
+    if (p == (tMemMgmt*)NULL) {
+        if (pzWhat == NULL)
+            return (void*)NULL;
+
+        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+    }
 
     /*
      *  Link new entry to end of chain
@@ -482,6 +519,48 @@ ag_alloc( size_t sz, const char* pz )
     p->pzWhence = pz;
 
     return (void*)(p+1);
+}
+
+
+    void*
+ag_realloc( void* p, size_t sz, const char* pzWhat, const char* pz )
+{
+    size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
+    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
+    tMemMgmt    sv  = *np;
+
+    checkMem( np );
+    np = (tMemMgmt*)(p ? realloc( (void*)np, asz & ~0x3F )
+                       : malloc( asz & ~0x3F ));
+
+    if (np == (tMemMgmt*)NULL) {
+        if (pzWhat == NULL) {
+            if (p != NULL)
+                free( (void*)p );
+
+            /*
+             *  Unlink old entry
+             */
+            sv.pPrev->pNext = sv.pNext;
+            sv.pNext->pPrev = sv.pPrev;
+            return (void*)NULL;
+        }
+
+        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+    }
+
+    /*
+     *  Link other entries to new allocation
+     */
+    np->pPrev->pNext = np;
+    np->pNext->pPrev = np;
+
+    np->pEnd = ((char*)(np+1)) + sz;
+    memset( (void*)np->pEnd, '~', CHECK_CT );
+    np->pzWhence = pz;
+
+    return (void*)(np+1);
 }
 
 
@@ -503,39 +582,6 @@ checkMem( tMemMgmt* pMM )
             _exit( EXIT_FAILURE );
         }
     } while (--ct > 0);
-}
-
-
-    void*
-ag_realloc( void* p, size_t sz, const char* pz )
-{
-    size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
-    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
-    tMemMgmt    sv  = *np;
-
-    checkMem( np );
-    np = (tMemMgmt*)realloc( (void*)np, asz & ~0x3F );
-
-    if (np == (tMemMgmt*)NULL) {
-        /*
-         *  Unlink old entry
-         */
-        sv.pPrev->pNext = sv.pNext;
-        sv.pNext->pPrev = sv.pPrev;
-        return (void*)NULL;
-    }
-
-    /*
-     *  Link other entries to new allocation
-     */
-    np->pPrev->pNext = np;
-    np->pNext->pPrev = np;
-
-    np->pEnd = ((char*)(np+1)) + sz;
-    memset( (void*)np->pEnd, '~', CHECK_CT );
-    np->pzWhence = pz;
-
-    return (void*)(np+1);
 }
 
 

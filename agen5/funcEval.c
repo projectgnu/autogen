@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.24 2000/08/13 21:20:24 bkorb Exp $
+ *  $Id: funcEval.c,v 1.25 2000/09/28 03:12:27 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -57,7 +57,7 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
     case GH_TYPE_SYMBOL:
         len = SCM_LENGTH(s);
         if (len >= sizeof( z )) {
-            pzRes = AGALOC( len + 1 );
+            pzRes = AGALOC( len + 1, "SCM string extraction" );
             *pMustFree = AG_TRUE;
         }
 

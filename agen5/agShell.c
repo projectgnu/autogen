@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.6 2000/06/21 14:46:06 bkorb Exp $
+ *  $Id: agShell.c,v 1.7 2000/09/28 03:12:27 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -346,74 +346,71 @@ loadData( FILE* fp )
     char    zLine[ 1024 ];
 
     textSize = 4096;
-    pzScan   =
-    pzText   = AGALOC( textSize );
-    if (pzText == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg, textSize, zTxtBlock );
-        AG_ABEND;
+    pzScan   = \
+    pzText   = AGALOC( textSize, zTxtBlock );
+
+    *pzText  = NUL;
+
+    for (;;) {
+        size_t  usedCt;
+
+        /*
+         *  Set a timeout so we do not wait forever.
+         */
+        alarm( OPT_VALUE_TIMEOUT );
+
+        if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
+            break;
+
+        alarm( 0 );
+
+        /*
+         *  Check for magic character sequence indicating 'DONE'
+         */
+        if (strncmp( zLine, zShDone, STRSIZE( zShDone )) == 0)
+            break;
+
+        strcpy( pzScan, zLine );
+
+        /*
+         *  Stop now if we are at EOF
+         */
+        if (feof( fp ))
+            break;
+
+        pzScan += strlen( zLine );
+        usedCt = (size_t)(pzScan - pzText);
+
+        /*
+         *  IF we are running low on space in our line buffer,
+         *  THEN expand the line
+         */
+        if (textSize - usedCt < sizeof(zLine)) {
+
+            size_t off = (size_t)(pzScan - pzText);
+            void*  p;
+            textSize += 4096;
+            p = AGREALOC( (void*)pzText, textSize, NULL );
+            if (p == (void*)NULL) {
+                fprintf( stderr, zAllocErr, pzProg,
+                         textSize, "Realloc Text Block" );
+                AGFREE( (void*)pzText );
+                return (char*)NULL;
+            }
+
+            pzText   = (char*)p;
+            pzScan = pzText + off;
+        }
     }
 
-     *pzText  = NUL;
-
-     for (;;) {
-         size_t  usedCt;
-
-         /*
-          *  Set a timeout so we do not wait forever.
-          */
-         alarm( OPT_VALUE_TIMEOUT );
-
-         if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
-             break;
-
-         alarm( 0 );
-
-         /*
-          *  Check for magic character sequence indicating 'DONE'
-          */
-         if (strncmp( zLine, zShDone, STRSIZE( zShDone )) == 0)
-             break;
-
-         strcpy( pzScan, zLine );
-
-         /*
-          *  Stop now if we are at EOF
-          */
-         if (feof( fp ))
-             break;
-
-         pzScan += strlen( zLine );
-         usedCt = (size_t)(pzScan - pzText);
-
-         /*
-          *  IF we are running low on space in our line buffer,
-          *  THEN expand the line
-          */
-         if (textSize - usedCt < sizeof(zLine)) {
-
-             size_t off = (size_t)(pzScan - pzText);
-             void*  p;
-             textSize += 4096;
-             p = AGREALOC( (void*)pzText, textSize );
-             if (p == (void*)NULL) {
-                 fprintf( stderr, zAllocErr, pzProg,
-                          textSize, "Realloc Text Block" );
-                 AGFREE( (void*)pzText );
-                 return (char*)NULL;
-             }
-
-             pzText   = (char*)p;
-             pzScan = pzText + off;
-         }
-     }
-
-     /*
-      *  Trim off all trailing white space and shorten the buffer
-      *  to the size actually used.
-      */
-     while ((pzScan > pzText) && isspace( pzScan[-1] )) pzScan--;
-     *pzScan = NUL;
-     return AGREALOC( (void*)pzText, (int)(pzScan - pzText) + 1 );
+    /*
+     *  Trim off all trailing white space and shorten the buffer
+     *  to the size actually used.
+     */
+    while ((pzScan > pzText) && isspace( pzScan[-1] )) pzScan--;
+    *pzScan = NUL;
+    return AGREALOC( (void*)pzText, (int)(pzScan - pzText) + 1,
+                     "resizing text output" );
 }
 
 
@@ -443,12 +440,7 @@ runShell( const char*  pzCmd )
      *  THEN return the nil string.
      */
     if (serverId <= 0) {
-        char* pz = (char*)AGALOC( 1 );
-        if (pz == (char*)NULL) {
-            fprintf( stderr, zAllocErr, pzProg,
-                     1, zTxtBlock );
-            AG_ABEND;
-        }
+        char* pz = (char*)AGALOC( 1, zTxtBlock );
 
         *pz = NUL;
         return pz;
@@ -483,12 +475,7 @@ runShell( const char*  pzCmd )
         if (pz == (char*)NULL) {
             fprintf( stderr, zCmdFail, pzCmd );
             closeServer();
-            pz = (char*)AGALOC( 1 );
-            if (pz == (char*)NULL) {
-                fprintf( stderr, zAllocErr, pzProg,
-                         1, zTxtBlock );
-                AG_ABEND;
-            }
+            pz = (char*)AGALOC( 1, zTxtBlock );
 
             *pz = NUL;
 

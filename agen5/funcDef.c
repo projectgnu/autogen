@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.28 2000/04/10 13:25:06 bkorb Exp $
+ *  $Id: funcDef.c,v 1.29 2000/09/28 03:12:27 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -226,7 +226,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
     if (  (pzStartMacro == (char*)NULL)
        || (pzExpEnd < pzStartMacro)) {
         (void)spanQuote( pzQte );
-	return;
+        return;
     }
 
     q = *pzQte;          /*  Save the quote character type */
@@ -310,7 +310,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
             + (pzQte - pzText) + strlen( pCurTemplate->pzFileName ) + 16;
         tTemplate* pNewT;
         alocSize &= ~0x0F;
-        pNewT = (void*)AGALOC( alocSize );
+        pNewT = (void*)AGALOC( alocSize, "allocated template" );
         memset( (void*)pNewT, 0, alocSize );
         pNewT->descSize = alocSize;
         pNewT->macroCt  = mac_ct;
@@ -318,7 +318,8 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         strcpy( pNewT->zStartMac, pCurTemplate->zStartMac );
         strcpy( pNewT->zEndMac, pCurTemplate->zEndMac );
         loadMacros( pNewT, pCurTemplate->pzFileName, zAnon, pzText );
-        pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize );
+        pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize,
+                                      "realloc template" );
         pNewT = templateFixup( pNewT, pNewT->descSize );
 
         /*
@@ -388,7 +389,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
      *  Allocate the array of definition descriptors
      */
     pzScan = pT->pzTemplText + pMac->ozText;
-    pDL = (tDefList*)AGALOC( ct * sizeof( tDefList ));
+    pDL = (tDefList*)AGALOC( ct * sizeof( tDefList ), "macro arg defs" );
     memset( (void*)pDL, 0, ct * sizeof( tDefList ));
     pMac->res = (long)pDL;
 
@@ -465,7 +466,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  Process the quoted strings now
              */
             if ((pzScan - pDL->pzExpr) < 24) {
-                char* pz = (char*)AGALOC( 24 );
+                char* pz = (char*)AGALOC( 24, "macro arg quoted string" );
                 memcpy( (void*)pz, pDL->pzExpr, (pzScan - pDL->pzExpr) );
                 pDL->pzExpr = pz;
             }
@@ -644,7 +645,7 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
     long fpos;
     char*  res;
 
-    pfp = (tFpStack*)AGALOC( sizeof( tFpStack ));
+    pfp = (tFpStack*)AGALOC( sizeof( tFpStack ), "anonymous template" );
     pfp->pPrev = NULL;
     pfp->pzName = (char*)zTFil;
     pCurFp = pfp;
@@ -667,11 +668,15 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
 
     generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
 
+    /*
+     *  Unwind any output contexts until we have unwound the current one.
+     *  There will be an error abort if ag_scm_out_pop tries to pop everything.
+     */
     while (pCurFp != pfp)
         ag_scm_out_pop();
 
     fpos = ftell( pfp->pFile );
-    res = (char*)AGALOC( fpos + 1 );
+    res = (char*)AGALOC( fpos + 1, "anon template output" );
     rewind( pfp->pFile );
     fread( res, 1, fpos, pfp->pFile );
     fclose( pfp->pFile );
@@ -820,7 +825,7 @@ MAKE_HANDLER_PROC( Define )
                     pList->de.pzValue = strdup( SCM_CHARS( res ));
                 }
                 else if (gh_number_p( res )) {
-                    pList->de.pzValue = (char*)AGALOC( 16 );
+                    pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
                     snprintf( pList->de.pzValue, 16, "%ld", gh_scm2long( res ));
                 }
                 else
@@ -981,7 +986,8 @@ ag_scm_ag_invoke( SCM macName, SCM list )
     }
 
     else {
-        pDefList = pDE = (tDefEntry*)AGALOC( sizeof( *pDE ) * len );
+        pDefList = \
+        pDE = (tDefEntry*)AGALOC( sizeof( *pDE ) * len, "invoke def list" );
         memset( (void*)pDE, 0, sizeof( *pDE ) * len );
         for (;;) {
             if (len-- <= 0)
@@ -1124,7 +1130,7 @@ MAKE_LOAD_PROC( Define )
         /*
          *  Allocate a new template block that is much larger than needed.
          */
-        pNewT = (tTemplate*)AGALOC( alocSize );
+        pNewT = (tTemplate*)AGALOC( alocSize, "template block" );
         memset( (void*)pNewT, 0, alocSize );
         memcpy( (void*)&(pNewT->magic), (void*)&(pT->magic),
                 sizeof( pNewT->magic ));
@@ -1190,7 +1196,8 @@ MAKE_LOAD_PROC( Define )
     pNewT->pzFileName  -= (long)pNewT;
     pNewT->pzTplName   -= (long)pNewT;
     pNewT->pzTemplText -= (long)pNewT;
-    pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize );
+    pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize,
+                                  "resize new template" );
     pNewT->pzFileName  += (long)pNewT;
     pNewT->pzTplName   += (long)pNewT;
     pNewT->pzTemplText += (long)pNewT;

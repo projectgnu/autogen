@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.11 2000/09/27 20:38:54 bkorb Exp $
+ *  $Id: expPrint.c,v 1.12 2000/09/28 03:12:27 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -112,10 +112,22 @@ run_printf( char* pzFmt, int len, SCM alist )
     void**  arglist;
     void**  argp;
     char*   pzBuf;
-    size_t  bfSize = (len * 64) + strlen( pzFmt );
+    size_t  bfSize = (len * 128) + strlen( pzFmt );
 
-    arglist = argp = (void**)AGALOC( len * sizeof( void* ));
-    pzBuf = (char*)AGALOC( bfSize );
+    void**  freelist;
+    void**  freep;
+
+    /*
+     *  Allocate everything we need at once.  Round up to next 4096 bytes.
+     *  Most likely, we allocate and free a page every time.
+     */
+    bfSize += 2 * len * sizeof( void* ) + 0x0FFF;
+    bfSize &= ~0x0FFF;
+
+    arglist  = argp  = (void**)AGALOC( bfSize, "sprintf buffer" );
+    freelist = freep = arglist + len;
+    pzBuf    = (char*)(freelist + len);
+    bfSize  -= 2 * len * sizeof( void* );
 
     do  {
         SCM  car = SCM_CAR( alist );
@@ -144,7 +156,7 @@ run_printf( char* pzFmt, int len, SCM alist )
 
         case GH_TYPE_SYMBOL:
         case GH_TYPE_STRING:
-            *(argp++) = (void*)gh_scm2newstr( car, NULL );
+            *(freep++) = *(argp++) = (void*)gh_scm2newstr( car, NULL );
             break;
 
         case GH_TYPE_PROCEDURE:
@@ -157,9 +169,17 @@ run_printf( char* pzFmt, int len, SCM alist )
             break;
         }
     } while (--len > 0);
+
+    /*
+     *  Do the formatting and allocate a new SCM to hold the result.
+     *  Free up any allocations made by ``gh_scm2newstr''
+     */
     bfSize = safePrintf( pzBuf, bfSize, pzFmt, arglist );
     res = gh_str2scm( pzBuf, bfSize );
-    AGFREE( (void*)pzBuf );
+
+    while (freelist < freep)
+        free( *(freelist++) );
+
     AGFREE( (void*)arglist );
     return res;
 }
@@ -212,6 +232,7 @@ ag_scm_printf( SCM fmt, SCM alist )
     SCM   res;
     int   list_len = scm_ilength( alist );
     char* pzFmt;
+    int   len;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
@@ -219,9 +240,17 @@ ag_scm_printf( SCM fmt, SCM alist )
     if (list_len <= 0)
         return fmt;
 
-    pzFmt = gh_scm2newstr( fmt, NULL );
+    len   = SCM_LENGTH( fmt );
+    if (len < sizeof( zScribble ))
+         pzFmt = zScribble;
+    else pzFmt = (char*)AGALOC( len + 1, "printf buffer" );
+
+    memcpy( (void*)pzFmt, (void*)SCM_CHARS( fmt ), len );
+    pzFmt[ len ] = NUL;
+
     res   = run_printf( pzFmt, list_len, alist );
-    free( (void*)pzFmt );
+    if (pzFmt != zScribble)
+        AGFREE( (void*)pzFmt );
 
     gh_display( res );
     return SCM_UNDEFINED;
@@ -246,16 +275,16 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
     SCM   res;
     int   list_len = scm_ilength( alist );
     char* pzFmt;
+    int   len;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
 
-    if (len <= 0)
-        return fmt;
+    len   = SCM_LENGTH( fmt );
+    memcpy( (void*)zScribble, (void*)SCM_CHARS( fmt ), len );
+    zScratch[ len ] = NUL;
 
-    pzFmt = gh_scm2newstr( fmt, NULL );
-    res   = run_printf( pzFmt, list_len, alist );
-    free( (void*)pzFmt );
+    res   = run_printf( zScribble, list_len, alist );
 
     return  scm_display( res, port );
 }
