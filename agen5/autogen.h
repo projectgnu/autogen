@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.22 2003/12/27 15:06:39 bkorb Exp $
+ *  $Id: autogen.h,v 3.23 2004/01/17 18:00:04 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -27,12 +27,61 @@
 #ifndef AUTOGEN_HDR_H
 #define AUTOGEN_HDR_H
 
-#include "agUtils.h"
+#include "compat/compat.h"
+#include REGEX_HEADER
+#include <guile/gh.h>
+
+#include "opts.h"
+#include "directive.h"
+#include "snprintfv/printf.h"
+
+#ifndef STR
+#  define _STR(s) #s
+#  define STR(s)  _STR(s)
+#endif
+
+#define ISNAMECHAR( c ) (isalnum(c) || ((c) == '_') || ((c) == '-'))
+
+#define STRSIZE( s )  (sizeof(s)-1)
+
+#ifdef DEFINING
+#  define VALUE( s )  = s
+#  define MODE
+#else
+#  define VALUE( s )
+#  define MODE extern
+#endif
+
+#define YYSTYPE t_word
+
+/*
+ *  Dual pipe opening of a child process
+ */
+typedef struct {
+    int     readFd;
+    int     writeFd;
+}  tFdPair;
+
+typedef struct {
+    FILE*   pfRead;  /* parent read fp  */
+    FILE*   pfWrite; /* parent write fp */
+}  tpfPair;
+
+#define NOPROCESS   ((pid_t)-1)
+#define NULLPROCESS ((pid_t)0)
+
+typedef char* tpChar;
+
 #include "expr.h"
 #include "autoopts/autoopts.h"
 #include "streqv.h"
 
 #include "cgi-fsm.h"
+#include "defParse-fsm.h"
+typedef union {
+    char*       pzStr;
+    char        ch;
+} def_token_u_t;
 
 #define STATE_TABLE           /* set up `atexit' and load Guile   */  \
     _State_( INIT )           /* processing command line options  */  \
@@ -237,6 +286,16 @@ struct for_state {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
+ *  Parsing stuff
+ */
+typedef struct {
+    int     entryCt;
+    int     allocCt;
+    char*   entries[1];
+} tList;
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
  *  GLOBAL VARIABLES
  *
  *  General Processing Globals
@@ -312,6 +371,8 @@ MODE char        zStartMac[  8 ]  VALUE( "" );
  */
 MODE char*       pzDefineData     VALUE( NULL );
 MODE size_t      defineDataSize   VALUE( 0 );
+MODE char*       pz_token         VALUE( NULL );
+MODE te_dp_event lastToken        VALUE( DP_EV_INVALID );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.21 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: defLex.c,v 3.22 2004/01/17 18:00:04 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -24,10 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-extern YYSTYPE yylval;
-static YYSTYPE lastToken;
-
 tSCC zErrMsg[] = "%s Error:  %s in %s on line %d\n";
 
 /*
@@ -47,7 +43,7 @@ KEYWORD_TABLE
 tSCC*  apzKeywords[] = { KEYWORD_TABLE };
 #undef _KW_
 
-#define _KW_(w) TK_ ## w,
+#define _KW_(w) DP_EV_ ## w,
 int    aKeywordTkn[] = { KEYWORD_TABLE };
 #undef _KW_
 
@@ -56,9 +52,11 @@ int    aKeywordTkn[] = { KEYWORD_TABLE };
 #define ERROR  (-1)
 #define FINISH (-1)
 
+#define SET_LIT_TKN(t) lastToken = DP_EV_LIT_ ## t; *(pCurCtx->pzScan++) = NUL;
+
 STATIC void  loadScheme( void );
 STATIC void  alist_to_autogen_def( void );
-STATIC char* assembleName( char* pzScan, YYSTYPE* pRetVal );
+STATIC char* assembleName( char* pzScan, te_dp_event* pRetVal );
 STATIC char* assembleString( char* pzScan );
 STATIC char* assembleHereString( char* pzScan );
 
@@ -66,10 +64,10 @@ STATIC char* assembleHereString( char* pzScan );
  *
  *   LEXICAL SCANNER
  */
-EXPORT int
+EXPORT te_dp_event
 yylex( void )
 {
-    lastToken = ERROR;
+    lastToken = DP_EV_INVALID;
 
 scanAgain:
     /*
@@ -129,28 +127,13 @@ scanAgain:
         goto scanAgain;
     }
 
-    case '{':
-    case '=':
-    case '}':
-    case '[':
-    case ']':
-    case ';':
-    case ',':
-        /*
-         *  The character itself is the token value.
-         *  We NUL it out in the text to ensure that any
-         *  names encountered are NUL terminated.
-         */
-        lastToken = *(pCurCtx->pzScan);
-        *(pCurCtx->pzScan++) = NUL;
-
-        /*
-         *  IF the next character is an out of context preprocessing directive
-         *  THEN call "assembleName" now to generate an error message.
-         */
-        if (*pCurCtx->pzScan == '#')
-            pCurCtx->pzScan = assembleName( pCurCtx->pzScan, &lastToken );
-        break;
+    case '{': SET_LIT_TKN( O_BRACE );   break;
+    case '=': SET_LIT_TKN( EQ );        break;
+    case '}': SET_LIT_TKN( C_BRACE );   break;
+    case '[': SET_LIT_TKN( OPEN_BKT );  break;
+    case ']': SET_LIT_TKN( CLOSE_BKT ); break;
+    case ';': SET_LIT_TKN( SEMI );      break;
+    case ',': SET_LIT_TKN( COMMA );     break;
 
     case '\'':
     case '"':
@@ -159,7 +142,7 @@ scanAgain:
         if (pz == NULL)
             goto NUL_error;
 
-        lastToken = TK_STRING;
+        lastToken = DP_EV_STRING;
         pCurCtx->pzScan = pz;
         break;
     }
@@ -172,11 +155,11 @@ scanAgain:
 
         pz = assembleHereString( pCurCtx->pzScan + 2 );
         if (pz == NULL) {
-            lastToken = ERROR;
-            return ERROR;
+            lastToken = DP_EV_INVALID;
+            return DP_EV_INVALID;
         }
 
-        lastToken = TK_STRING;
+        lastToken = DP_EV_STRING;
         pCurCtx->pzScan = pz;
         break;
     }
@@ -206,8 +189,8 @@ scanAgain:
                 pz = strchr( pz+1, ';' );
             }
 
-            lastToken = TK_STRING;
-            yylval = (YYSTYPE)pz;
+            lastToken = DP_EV_STRING;
+            pz_token = pz;
             break;
         }
 
@@ -223,12 +206,12 @@ scanAgain:
         if (pzShellProgram == NULL)
             pzShellProgram = getDefine( zShellEnv );
 
-        lastToken = TK_STRING;
-        pz = runShell( (const char*)yylval );
+        lastToken = DP_EV_STRING;
+        pz = runShell( (const char*)pz_token );
         if (pz == NULL)
             goto scanAgain;
         TAGMEM( pz, "shell definition string" );
-        yylval = (YYSTYPE)pz;
+        pz_token = pz;
         break;
     }
 
@@ -278,38 +261,35 @@ NUL_error:
 
     AG_ABEND( aprf( zErrMsg, pzProg, "unterminated quote in definition",
                     pCurCtx->pzFileName, pCurCtx->lineNo ));
-    return ERROR;
+    return DP_EV_INVALID;
 
 lex_done:
     {
         tSCC zDone[] = "";
 
         /*
-         *  First time through, return the TK_END token.
+         *  First time through, return the DP_EV_END token.
          *  Second time through, we really finish.
          */
         if (pCurCtx->pzScan == zDone) {
             pCurCtx->pCtx = pDoneCtx;
             pDoneCtx      = pCurCtx;
 
-            return FINISH;
+            return DP_EV_INVALID;
         }
 
         pCurCtx->pzScan = (char*)zDone;
-        return TK_END;
+        return DP_EV_END;
     }
 }
 
 
-
+tSCC* apzEvents[ DP_EVENT_CT+1 ];
 EXPORT void
 yyerror( char* s )
 {
-    tSCC zVN[] = "VAR_NAME %s\n";
-    tSCC zON[] = "OTHER_NAME %s\n";
-    tSCC zSt[] = "STRING %s\n";
-    tSCC zNo[] = "NUMBER %s\n";
-    tSCC zDf[] = "`%1$c' (%1$d)\n";
+    tSCC zErrTkn[] = "%s %s\n";
+    tSCC zDf[] = "`%s'\n";
 
     char* pz;
 
@@ -317,14 +297,18 @@ yyerror( char* s )
         pCurCtx->pzScan[64] = NUL;
 
     switch (lastToken) {
-    case TK_AUTOGEN:     pz = "AUTOGEN\n";     break;
-    case TK_DEFINITIONS: pz = "DEFINITIONS\n"; break;
-    case TK_END:         pz = "END\n";         break;
-    case TK_VAR_NAME:    pz = aprf( zVN, (char*)yylval ); break;
-    case TK_OTHER_NAME:  pz = aprf( zON, (char*)yylval ); break;
-    case TK_STRING:      pz = aprf( zSt, (char*)yylval ); break;
-    case TK_NUMBER:      pz = aprf( zNo, (char*)yylval ); break;
-    default:             pz = aprf( zDf, lastToken );     break;
+    case DP_EV_VAR_NAME:
+    case DP_EV_OTHER_NAME:
+    case DP_EV_STRING:
+    case DP_EV_NUMBER:
+        if (strlen( pz_token ) > 64 )
+            pz_token[64] = NUL;
+
+        pz = aprf( zErrTkn, DP_EVT_NAME( lastToken ), pz_token );
+        break;
+
+    default:
+        pz = aprf( zDf, DP_EVT_NAME( lastToken ));
     }
     AG_ABEND( aprf( "%s:  in %s on line %d\n"
                     "\ttoken in error:  %s\n"
@@ -361,7 +345,7 @@ loadScheme( void )
     if (strlen( pzEnd ) >= schemeLen) {
         AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
 
-        yylval = (YYSTYPE)pzEnd;
+        pz_token = pzEnd;
     }
 
     else {
@@ -369,10 +353,10 @@ loadScheme( void )
          *  We know the result is smaller than the source.  Copy in place.
          */
         strcpy( pzText, pzEnd );
-        yylval = (YYSTYPE)pzText;
+        pz_token = pzText;
     }
 
-    lastToken = TK_STRING;
+    lastToken = DP_EV_STRING;
 }
 
 /*
@@ -456,7 +440,7 @@ alist_to_autogen_def( void )
  *  Figure out which.
  */
 STATIC char*
-assembleName( char* pzScan, YYSTYPE* pRetVal )
+assembleName( char* pzScan, te_dp_event* pRetVal )
 {
     /*
      *  Check for a number.
@@ -466,9 +450,9 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
        || (  (*pzScan == '-')
           && isdigit( pzScan[1] )
        )  )  {
-        yylval = (YYSTYPE)pzScan;
+        pz_token = pzScan;
         (void)strtol( pzScan, &pzScan, 0 );
-        *pRetVal = TK_NUMBER;
+        *pRetVal = DP_EV_NUMBER;
         return pzScan;
     }
 
@@ -521,9 +505,9 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
                                 "in %s on line %d\n", pzProg, *pzScan,
                                 pCurCtx->pzFileName, pCurCtx->lineNo ));
 
-            *pRetVal = TK_VAR_NAME;
+            *pRetVal = DP_EV_VAR_NAME;
         } else {
-            *pRetVal = TK_OTHER_NAME;
+            *pRetVal = DP_EV_OTHER_NAME;
             while (zNameChars[ *pz ] != 0) pz++;
         }
 
@@ -532,22 +516,22 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
          *  If the name is actually a keyword,
          *  we will return that token code instead.
          */
-        yylval   = (YYSTYPE)pzScan;
+        pz_token   = pzScan;
         pzScan   = (char*)pz;
     }
 
     /*
      *  Now scan the keyword table.
      */
-    if (*pRetVal == TK_VAR_NAME) {
+    if (*pRetVal == DP_EV_VAR_NAME) {
         char sv_ch = *pzScan;  /* preserve the following character */
         int  kw_ix = 0;
         *pzScan = NUL;         /* NUL terminate the name           */
 
         do  {
-            if (streqvcmp( apzKeywords[ kw_ix ], (char*)yylval ) == 0) {
+            if (streqvcmp( apzKeywords[ kw_ix ], (char*)pz_token ) == 0) {
                 /*
-                 *  Return the keyword token code instead of TK_NAME
+                 *  Return the keyword token code instead of DP_EV_NAME
                  */
                 *pRetVal = aKeywordTkn[ kw_ix ];
                 break;
@@ -611,7 +595,7 @@ assembleHereString( char* pzScan )
     }
 
     pzDest = pzScan;
-    yylval = (YYSTYPE)pzDest;
+    pz_token = pzDest;
 
     /*
      *  Skip forward to the EOL after the marker.
@@ -654,9 +638,9 @@ assembleHereString( char* pzScan )
     } /* while strncmp ... */
 
     /*
-     *  pzDest may still equal yylval, if no data were copied
+     *  pzDest may still equal pz_token, if no data were copied
      */
-    if (pzDest > (char*)yylval)
+    if (pzDest > (char*)pz_token)
          pzDest[-1] = NUL;
     else pzDest[0]  = NUL;
 
@@ -681,7 +665,7 @@ assembleString( char* pzScan )
     char* pzD = pzScan;
     char* pzS = pzScan;
 
-    yylval = (YYSTYPE)pzD;
+    pz_token = pzD;
 
     for (;;) {
         /*
@@ -742,7 +726,7 @@ assembleString( char* pzScan )
                  *  THEN ensure it is in the first column!!
                  */
                 if (pzS[-1] != '\n')
-                    return assembleName( pzS, &yylval );
+                    return assembleName( pzS, &lastToken );
                 /* FALLTHROUGH */
 
             default:

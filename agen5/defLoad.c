@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.17 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: defLoad.c,v 3.18 2004/01/17 18:00:04 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -270,10 +270,7 @@ parseDefinitions( void )
     }
 #endif
     pCurCtx = pBaseCtx;
-    {
-        extern int yyparse( void );
-        (void)yyparse();
-    }
+    dp_run_fsm();
     massageDefTree( &(rootDefCtx.pDefs) );
 }
 

@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-12-07 11:28:30 bkorb"
+## Time-stamp:      "2004-01-17 08:01:51 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.26 2003/12/27 15:06:39 bkorb Exp $
+## $Id: Makefile.am,v 3.27 2004/01/17 18:00:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -28,7 +28,7 @@ STAMPS      = stamp-directive stamp-exprini stamp-opts stamp-fsm
 #
 GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h \
 	cgi-fsm.c cgi-fsm.h pseudo-fsm.h
-GEN_SRC = $(GEN_CSRC) defParse.c defParse.h $(GENDOCS)
+GEN_SRC = $(GEN_CSRC) $(GENDOCS)
 
 pkgdata_DATA = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS     = autogen.1
@@ -38,18 +38,18 @@ MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 bin_PROGRAMS = autogen
 
 csrc = \
-  autogen.c     agCgi.c       agShell.c     agUtils.c     agUtils.h  \
-  autogen.h     defDirect.c   defFind.c     defLex.c      defLoad.c  \
-  defParse.y    defReduce.c   expExtract.c  expFormat.c   expGperf.c \
-  expGuile.c    expMake.c     expOutput.c   expPrint.c    expState.c \
-  expString.c   funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
-  funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
-  tpParse.c     tpProcess.c
+  autogen.c      agCgi.c       agShell.c     agUtils.c     defParse-fsm.h \
+  autogen.h      defDirect.c   defFind.c     defLoad.c     defParse-fsm.c \
+  defLex.c       defReduce.c   expExtract.c  expFormat.c   expGperf.c \
+  expGuile.c     expMake.c     expOutput.c   expPrint.c    expState.c \
+  expString.c    funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
+  funcIf.c       functions.c   functions.h   loadPseudo.c  tpLoad.c   \
+  tpParse.c      tpProcess.c
 
 EXTRA_DIST = $(csrc) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
 
 nodist_autogen_SOURCES = ag.c
-autogen_SOURCES = defParse.y $(GEN_CSRC)
+autogen_SOURCES = $(GEN_CSRC)
 autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
@@ -68,11 +68,6 @@ ag.c : $(csrc)
 	  *.c ) echo "#include \"$$f\"" ;; \
 	  esac ; done ) > $@
 
-##  This is a LIE:  only defLex.o depends upon defParse.h.  However, automake
-##  is unable to cope with that and they don't provide another way to do it.
-##
-$(autogen_OBJECTS) : defParse.h defParse.c
-
 SUFFIXES = .i
 .c.i :
 	$(COMPILE) -E $< > $@
@@ -82,12 +77,10 @@ SUFFIXES = .i
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-GEN_LIST = $(STAMPS) $(GENDOCS) defParse.c defParse.h
+GEN_LIST = $(STAMPS) $(GENDOCS)
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \
 	AGEXE=$(AGEXE) GDEXE=$(GDEXE) COLEXE=$(COLEXE)
-
-defLex.o : defParse.h
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION
@@ -102,7 +95,11 @@ stamp-exprini : $(EXPRLIST) snarf.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-fsm GEN-RULE
-stamp-fsm : pseudo.def fsm.tpl
+stamp-fsm : pseudo.def fsm.tpll fsm-macro.tpl fsm-trans.tpl
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+
+## stamp-parse GEN-RULE
+stamp-parse : defParse.def fsm.tpl fsm-macro.tpl fsm-trans.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE

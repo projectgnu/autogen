@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Saturday January 17, 2004 at 09:47:13 AM PST
+ *  It has been AutoGen-ed  Saturday January 17, 2004 at 09:56:10 AM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -73,14 +73,6 @@ typedef te_dp_state (dp_callback_t)(
     te_dp_event trans_evt );
 
 static dp_callback_t
-    dp_do_FSM_TRANS_HAVE_NAME_LIT_OPEN_BKT={,
-    dp_do_FSM_TRANS_HAVE_VALUE_LIT_SEMI={,
-    dp_do_FSM_TRANS_INDX_NAME_LIT_EQ={,
-    dp_do_FSM_TRANS_INDX_NAME_LIT_SEMI={,
-    dp_do_FSM_TRANS_INIT_AUTOGEN={,
-    dp_do_FSM_TRANS_NEED_CBKT_LIT_CLOSE_BKT={,
-    dp_do_FSM_TRANS_NEED_DEF_DEFINITIONS={,
-    dp_do_FSM_TRANS_NEED_SEMI_LIT_SEMI={,
     dp_do_have_name_lit_eq,
     dp_do_have_name_lit_semi,
     dp_do_have_value_lit_comma,
@@ -335,94 +327,6 @@ dp_invalid_transition( te_dp_state st, te_dp_event evt )
     /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
 
     return EXIT_FAILURE;
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_HAVE_NAME_LIT_OPEN_BKT={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS HAVE NAME LIT OPEN BKT={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS HAVE NAME LIT OPEN BKT={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_HAVE_VALUE_LIT_SEMI={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS HAVE VALUE LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS HAVE VALUE LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_INDX_NAME_LIT_EQ={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS INDX NAME LIT EQ={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS INDX NAME LIT EQ={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_INDX_NAME_LIT_SEMI={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS INDX NAME LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS INDX NAME LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_INIT_AUTOGEN={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS INIT AUTOGEN={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS INIT AUTOGEN={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_NEED_CBKT_LIT_CLOSE_BKT={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS NEED CBKT LIT CLOSE BKT={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS NEED CBKT LIT CLOSE BKT={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_NEED_DEF_DEFINITIONS={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS NEED DEF DEFINITIONS={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS NEED DEF DEFINITIONS={ == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_FSM_TRANS_NEED_SEMI_LIT_SEMI={(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == FSM TRANS NEED SEMI LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == FSM TRANS NEED SEMI LIT SEMI={ == DO NOT CHANGE THIS COMMENT  */
 }
 
 static te_dp_state

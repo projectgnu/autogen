@@ -5,50 +5,57 @@
 =][=
 
 DEFINE emit-invalid-msg =]
+#ifndef HAVE_ZBOGUS
+#define HAVE_ZBOGUS
 /*
- *  Define all the event and state names
+ *  Define all the event and state names, once per compile unit.
  */
 tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zStInit[]    = "init";
-tSCC zEvInvalid[] = "* Invalid Event *";
 tSCC zFsmErr[]    =
     "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
-[=
+#endif /* HAVE_ZBOGUS */
+tSCC z[=(. Pfx)=]StInit[]    = "init";[=
+
   FOR state
 =]
-tSCC zSt[=(string-capitalize! (get "state"))=][] = [=
+tSCC z[=(. Pfx)=]St[=(string-capitalize! (get "state"))=][] = [=
         (c-string (string-downcase! (get "state")))=];[=
   ENDFOR
 
 =]
-tSCC* apzStates[] = {
+tSCC* apz[=(. Pfx)=]States[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zSt%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'z%sSt%%s' <<'_EOF_'
 Init
 %s
 _EOF_"
+  Pfx
   (string-capitalize! (join "\n" (stack "state")))  )=] };
-[=
+
+tSCC z[=(. Pfx)=]EvInvalid[] = "* Invalid Event *";[=
 
   FOR event =]
-tSCC zEv[=(string-capitalize! (get "event"))=][] = [=
-       (c-string (string-downcase! (get "event")))=];[=
+tSCC z[=(. Pfx)=]Ev[=(string-capitalize! (get "event"))=][] = [=
+       (c-string (if (exist? (get "event"))
+                     (get (get "event"))
+                     (string-downcase! (get "event"))  ))=];[=
   ENDFOR
 
 =]
-tSCC* apzEvents[] = {
+tSCC* apz[=(. Pfx)=]Events[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zEv%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'z%sEv%%s' <<'_EOF_'
 %s
 Invalid
 _EOF_"
+  Pfx
   (string-capitalize! (join "\n" (stack "event")))  )=] };
 
 #define [=(. PFX)=]_EVT_NAME(t) ( (((unsigned)(t)) >= [=(. PFX)=]_EV_INVALID) \
-    ? zBogus : apzEvents[ t ])
+    ? zBogus : apz[=(. Pfx)=]Events[ t ])
 
 #define [=(. PFX)=]_STATE_NAME(s) ( (((unsigned)(s)) > [=(. PFX)=]_ST_INVALID) \
-    ? zBogus : apzStates[ s ])
+    ? zBogus : apz[=(. Pfx)=]States[ s ])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1
@@ -64,7 +71,8 @@ int
 {
 [=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
   (sprintf
-"    fprintf( stderr, zFsmErr, st, %s_STATE_NAME( st ), evt, %s_EVT_NAME( evt ));" PFX PFX) )=]
+"    fprintf( stderr, zFsmErr, st, %s_STATE_NAME(st), evt, %s_EVT_NAME(evt));"
+     PFX PFX) )=]
 
     return EXIT_FAILURE;
 }
@@ -82,19 +90,26 @@ ENDDEF emit-cookie-args   =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE build-callback     =]
+DEFINE build-callback     =][=
+
+  CASE cb-name =][=
+  =  noop      =][=
+  *            =]
 static te_[=(. pfx)=]_state
 [=cb_prefix=]_[=cb_name=]([= emit-cookie-args =]
     te_[=(. pfx)=]_state initial,
     te_[=(. pfx)=]_state maybe_next,
     te_[=(. pfx)=]_event trans_evt )
 {
-[=(extract fsm-source (string-append
+[= (extract fsm-source (string-append
 "/*  %s == " (string-tr! (get "cb_name") "a-z_-" "A-Z  ") " == %s  */" )
 ""
-"    return maybe_next;" )=]
+(if (= (get "cb-name") "invalid")
+    (sprintf "    exit( %s_invalid_transition( initial, trans_evt ));" pfx)
+    "    return maybe_next;" )) =]
 }
 [=
+  ESAC =][=
 ENDDEF build-callback  =][=
 
 DEFINE run-callback
@@ -159,6 +174,8 @@ DEFINE preamble
         (define pfx     (string->c-name! (string-downcase!
                         (if (exist? "prefix") (get "prefix") (base-name))  )))
         (define PFX     (string-upcase pfx))
+        (define Pfx     (string-capitalize pfx))
+        (define t-trans (string-append "t_" pfx "_transition"))
         (define fsm-source ".fsm.head") )
   )
   (dne " *  " "/*  ")  =]
@@ -212,7 +229,11 @@ DEFINE compute-transitions     =][=
 (define tst   "")
 (define ttype "")
 (define next  "")
-
+(define proc-ptr-type
+  (lambda (tp)
+    (if (= tp "noop") "NULL"
+        (string-downcase! (string-append "&" pfx "_do_" tp))  )))
+=][=#
 ;;; Now replace the initial values with proper ones gotten from
 ;;; the trasition definitions.
 ;;;
@@ -235,7 +256,7 @@ FOR   transition              =][=
                      (string-append "${f}_" tev)  ))
 
      (set! tr_name (if (=* (get "method") "call")
-                   (string-downcase! (string-append "&" pfx "_do_" ttype))
+                   (proc-ptr-type ttype)
                    (string-upcase!   (string-append PFX "_TR_" ttype))  ))
      (set! next (if (exist? "next") (string-upcase! (get "next")) "${f}"))
 
@@ -254,7 +275,7 @@ FOR   transition              =][=
            (string-upcase! (get "ttype")) (string-append tst "_${f}")  ))
 
      (set! tr_name (if (=* (get "method") "call")
-                   (string-downcase! (string-append "&" pfx "_do_" ttype))
+                   (proc-ptr-type ttype)
                    (string-append PFX "_TR_" ttype)  ))
 
      (set! next (if (exist? "next") (string-upcase! (get "next")) tst))
@@ -280,7 +301,7 @@ FOR   transition              =][=
                      (string-append tst "_" tev)  )))
 
          (set! tr_name (if (=* (get "method") "call")
-                   (string-downcase! (string-append "&" pfx "_do_" ttype))
+                   (proc-ptr-type ttype)
                    (string-upcase!   (string-append PFX "_TR_" ttype))  ))
 
          (shellf "FSM_TRANS_%s_%s=\"{ %s_ST_%s, %s }\""
@@ -294,7 +315,7 @@ ENDFOR   transition           =][=
 (define trans-ct
   (shellf
     "env | egrep '^FSM_TRANS_' | \
-    sed 's/^.*%s//;s/ .*$/,/'  | \
+    sed '/, NULL }/d;s/^.*%s//;s/ .*$/,/' | \
     sort -u > .fsm.xlist
     echo `wc -l < .fsm.xlist` "
     (if (=* (get "method") "call")

@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2003/12/27 15:06:39 $
+# Last Modified:     $Date: 2004/01/17 18:00:04 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.14 2003/12/27 15:06:39 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.15 2004/01/17 18:00:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -117,50 +117,20 @@ for t
 do
   echo Re-building "$t"
   case "$t" in
-  defParse.[ch] )
-    #  Set a default for YACC
+  stamp-parse | \
+  defParse-fsm.h )
+    # Make the definition parser
     #
-    set +e
-    if [ "x${YACC}" = x ]
+    if [ -z "${AG}" ]
     then
-      f="`type byacc 2>/dev/null`"
-
-      case "${f}" in
-      "byacc is "* )
-        YACC="byacc -d"
-        ;;
-
-      * )
-        f="`type yacc 2>/dev/null`"
-
-        case "${f}" in
-        "yacc is "* )
-          YACC="yacc -d"
-          ;;
-
-        * )
-          echo "NO WORKABLE yacc"
-          exit 1
-          ;;
-        esac
-        ;;
-      esac
+      echo "Cannot locate ${AG}"
+      $force && exit 1
+      continue
     fi
 
-    echo YACC: ${YACC} defParse.y
-    ${YACC} defParse.y
-    rm -f defParse.c defParse.h
-    if test -f y.out.c; then
-      mv -f y.out.c defParse.c
-      mv -f y.out.h defParse.h
-    elif test -f y.tab.c; then
-      mv -f y.tab.c defParse.c
-      mv -f y.tab.h defParse.h
-    elif test -f y_tab.c; then
-      mv -f y_tab.c defParse.c
-      mv -f y_tab.h defParse.h
-    fi
-    set -e
+    cmd="${AG} defParse.def"
+    echo ${cmd}
+    ${cmd}
     ;;
 
   stamp-opts | \
@@ -172,7 +142,7 @@ do
       echo "Cannot locate ${AG}"
       $force && exit 1
       continue
-   fi
+    fi
     echo ${AG} -L ../autoopts opts.def
     ${AG} -L ../autoopts opts.def
     date > stamp-opts

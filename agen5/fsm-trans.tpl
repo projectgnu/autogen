@@ -42,8 +42,8 @@ typedef enum {
  *  the new state and the transition enumeration code (in that order).
  *  It is indexed by first the current state and then the event code.
  */
-typedef struct transition t_transition;
-struct transition {
+typedef struct [=(. pfx)=]_transition [= (. t-trans) =];
+struct [=(. pfx)=]_transition {
     te_[=(. pfx)=]_state  next_state;
     te_[=(. pfx)=]_trans  transition;
 };
@@ -53,7 +53,7 @@ struct transition {
 
 =]
 #ifndef DEFINE_FSM
-extern const t_transition [=(. pfx)=]_trans_table[ [=(. PFX)
+extern const [= (. t-trans) =] [=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ];
 
 extern int
@@ -67,7 +67,7 @@ extern int
 =]static [=
   ENDIF
 
-=]const t_transition
+=]const [= (. t-trans) =]
 [=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
   state-table
@@ -107,7 +107,7 @@ static [=(. pfx)=]_callback_t
 /*
  *  This declares all the state transition handling routines
  */
-typedef struct transition t_transition;
+typedef struct transition [= (. t-trans) =];
 struct transition {[=
     (set! fmt (sprintf "\n    %%-%ds %%s;"
                 (+ (string-length pfx) 14) ))
@@ -121,7 +121,7 @@ struct transition {[=
  *  the new state and the transition enumeration code (in that order).
  *  It is indexed by first the current state and then the event code.
  */
-static const t_transition
+static const [= (. t-trans) =]
 [=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
 
@@ -151,7 +151,7 @@ DEFINE machine-step  =][=
         nxtSt = [=(. PFX)=]_ST_INVALID;
         [=(. trans-name)=] = [=(. trans-valu)=];
     } else {
-        const t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)
+        const [= (. t-trans) =]* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)
                                   =]_state ] + trans_evt;
         nxtSt = firstNext = pTT->next_state;
         [=(. trans-name)=] = pTT->[=(. trans-field)=];
