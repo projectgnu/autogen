@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: autogen.c,v 1.3 1999/10/14 22:35:51 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -130,8 +130,12 @@ doneCheck( void )
     fflush( stderr );
 
     if (pfTrace != stderr ) {
-        if (* OPT_ARG( TRACE_OUT ) == '|')
-             pclose( pfTrace );
+        if (* OPT_ARG( TRACE_OUT ) == '|') {
+            int status;
+
+            pclose( pfTrace );
+            while (wait( &status ) > 0)  ;
+        }
         else fclose( pfTrace );
     }
     _exit( EXIT_FAILURE );
