@@ -1,5 +1,20 @@
 [= autogen template texi=%s.texi =]
-@node [=prog_name=] Invocation
+[=
+##  Documentation template
+## 
+##  AutoGen Copyright (C) 1992-1999 Bruce Korb
+## 
+## Author:            Bruce Korb <korbb@datadesign.com>
+## Maintainer:        Bruce Korb <korbb@datadesign.com>
+## Created:           Tue Sep 15 13:13:48 1998
+## Last Modified:     Thu Jul  8 14:35:10 1999				      
+##            by:     Bruce Korb <korb@datadesign.com>			      
+## ---------------------------------------------------------------------
+## $Id: aginfo-tpl.in,v 2.3 1999/07/08 21:35:37 bkorb Exp $
+## ---------------------------------------------------------------------
+##
+
+=]@node [=prog_name=] Invocation
 @[=_EVAL LEVEL _env=] Invoking [=prog_name=]
 @cindex [=prog_name _down=] invocation
 @ignore
@@ -81,4 +96,6 @@ _FOR flag=][=
 
 [=doc=]
 [=_ENDIF=][=
-/flag=]
+/flag=][=
+
+aginfo.tpl ends here =]
