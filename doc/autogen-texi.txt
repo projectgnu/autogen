@@ -1313,62 +1313,6 @@ START == MACROS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
-@node SCM make-header-guard
-@subsection @file{make-header-guard} - make self-inclusion guard
-@findex make-header-guard
-@findex header-file
-@findex header-guard
-
-Usage:  (make-header-guard prefix)
-@*
-This function will insert the @code{#ifndef} and @code{#define} C preprocessing
-directives that will cause a header file to exclude itself once it has been
-sourced in a compilation.  The @code{#define} name is composed as follows:
-
-@enumerate
-@item
-The first element is the string argument and a separating underscore.
-@item
-That is followed by the name of the header file with illegal characters
-mapped to underscores.
-@item
-The end of the name is always, "@code{_GUARD}".
-@item
-Finally, the entire string is mapped to upper case.
-@end enumerate
-
-The final @code{#define} name is stored in an SCM symbol named
-@code{header-guard}.  Consequently, the concluding @code{#endif} for the
-file should read something like:
-
-@example
-#endif /* [+ (. header-guard) +] */
-@end example
-
-The name of the header file (the current output file) is also stored in an SCM
-symbol, @code{header-file}.  Therefore, if you are also generating a
-C file that uses the previously generated header file, you can put
-this into that generated file:
-
-@example
-#include "[+ (. header-file) +]"
-@end example
-
-Obviously, if you are going to produce more than one header file from
-a particular template, you will need to be careful how these SCM symbols
-get handled.
-
-Arguments:
-@*
-prefix - prefix for @code{#define} name.
-
-@node SCM autogen-version
-@subsection @file{autogen-version} - autogen version number
-@findex autogen-version
-
-This is a symbol defining the current AutoGen version number string.
-It was first defined in AutoGen-5.2.14.
-
 @node native macros
 @section AutoGen Native Macros
 @cindex native macros
@@ -2939,8 +2883,9 @@ stack of arguments will be cleared even more efficiently than the
 a disablement prefix will cause undefined results.
 
 If all of this is confusing, then don't mess with equivalenced stacked
-option arguments.  If you really want to know, @xref{autogen define} is
-a stacked argument and @xref{autogen undefine} is equivalenced to it.
+option arguments.  If you really want to know, the AutoGen @code{--define}
+option (@pxref{autogen define}) has a stacked argument, and @code{--undefine}
+(@xref{autogen undefine}) is equivalenced to it.
 @end table
 
 @node documentation attributes
@@ -3445,8 +3390,9 @@ too.  Beware that the argument is not reallocated, so the value must not
 be on the stack or deallocated in any other way for as long as the value
 might get referenced.
 
-If you have supplied at least one @file{homerc} file (@pxref{}),
-this macro will be emitted for the @code{--save-opts} option.
+If you have supplied at least one @file{homerc} file
+(@pxref{program attributes}), this macro will be emitted for the
+@code{--save-opts} option.
 
 @example
 SET_OPT_SAVE_OPTS( "filename" );
