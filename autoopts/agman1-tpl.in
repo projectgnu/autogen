@@ -9,11 +9,13 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/12/10 01:13:09 $
+## Last Modified:   $Date: 2001/12/10 04:33:14 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.1 2001/12/10 01:13:09 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.2 2001/12/10 04:33:14 bkorb Exp $
 ## ---------------------------------------------------------------------
+
+(setenv "SHELL" "/bin/sh")
 
 :+]
 .TH [+: % prog_name (string-upcase! "%s") :+] 1 [+:

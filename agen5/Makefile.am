@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/12/10 03:48:27 $
+## Last Modified:   $Date: 2001/12/10 04:33:14 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/10 03:48:27 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2001/12/10 04:33:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -36,7 +36,7 @@ GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS     = autogen.1
 
-EXTRA_DIST	 = directive.tpl opts.def snarf.tpl \
+EXTRA_DIST	 = directive.tpl opts.def snarf.tpl cgi.def \
 	pseudo.def pseudo-fsm.h $(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
 
 bin_PROGRAMS = autogen

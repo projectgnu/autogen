@@ -1,3 +1,13 @@
+2001-12-09  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agCgi.c: new - reads in GET and POST CGI values
+	* agen5/cgi.def: new - FSM for processing CGI text
+	* agen5/cgi-fsm.c: new - preserved text for generated FSM
+	* agen5/defLoad.c(readDefines): call loadCgi when input is stdin
+	and the correct environment variables are set.
+	* agen5/bootstrap.dir: regenerate cgi-fsm
+	* agen5/Makefile.am: distribute the new sources
+
 2001-12-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c(parseMacroArgs): run argument names through

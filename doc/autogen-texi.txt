@@ -2337,10 +2337,14 @@ of the remaining options :-).
 
 @cindex immed_disable
 @item immed-disable
-Use this option attribute to specify that the disabled form of the option
-is to be processed immediately.  The @code{load-opts} option is so
-specified so that the @code{--no-load-opts} command line option will
+Use this option attribute to specify that the disabled form of the
+option is to be processed immediately.  The @code{load-opts} option is
+so specified.  The @code{--no-load-opts} command line option will
 suppress the processing of RC files and environment variables.
+Contrariwise, the @code{--load-opts} command line option is
+processed normally.  That means that the options specified in that file
+will be processed after all the @code{homerc} files and, in fact, after
+options that precede it on the command line.
 @end table
 
 @node Option Conflict Attributes
