@@ -2,22 +2,22 @@
 
 ##  Documentation template
 ## 
-##  Autogen Copyright (C) 1992-1998 Bruce Korb
+##  AutoGen Copyright (C) 1992-1998 Bruce Korb
 ## 
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Tue Oct 13 07:59:40 1998
+## Last Modified:     Fri Jan 29 07:12:38 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.6 1998/10/26 15:33:40 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.7 1999/02/24 18:53:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
 \input texinfo
 @c %**start of header
 @setfilename autogen.info
-@settitle Autogen
+@settitle AutoGen
 @setchapternewpage off
 @c %**end of header
 
@@ -45,15 +45,15 @@ _EVAL '
 
 @dircategory GNU programming tools
 @direntry
-* autogen: (autogen).         [=prog_title=]
+* AutoGen: (autogen).         [=prog_title=]
 @end direntry
 
 @ifinfo
 This file documents [=package=] Version @value{VERSION}
 
-Autogen copyright @copyright{} [=copyright=] Bruce Korb
+AutoGen copyright @copyright{} [=copyright=] Bruce Korb
 
-[=_eval Autogen "" _gpl=]
+[=_eval AutoGen "" _gpl=]
 
 @ignore
 Permission is granted to process this file through TeX and print the
@@ -70,14 +70,14 @@ notice identical to this one except for the removal of this paragraph
 
 @page
 @vskip 0pt plus 1filll
-[=_eval Autogen copyright _get owner _get
+[=_eval AutoGen copyright _get owner _get
        "#3$%s copyright %s %s" _printf=]
 @sp 2
-This is the first edition of the GNU Autogen documentation,
+This is the first edition of the GNU AutoGen documentation,
 @sp 2
 Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
-[=_eval Autogen "" _gpl=]
+[=_eval AutoGen "" _gpl=]
 @end titlepage
 
 @ifinfo
@@ -91,15 +91,15 @@ text files containing repetitive text with varying substitutions.
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
 @menu
-* Introduction::         Autogen's Purpose
+* Introduction::         AutoGen's Purpose
 * Generalities::         General Ideas
 * Example Usage::        A Simple Example
 * Definitions File::     Macro Definitions File
 * Template File::        Output Template
-* Invocation::           Running Autogen
+* Invocation::           Running AutoGen
 * Installation::         What Gets Installed Where
 * Autoopts::             Automated Option Processing
-* Add-Ons::              Add-on packages for Autogen
+* Add-Ons::              Add-on packages for AutoGen
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::	 Function index
@@ -115,7 +115,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 @chapter Introduction
 @cindex Introduction
 
-Autogen is a tool for automatically generating arbitrary text
+AutoGen is a tool for automatically generating arbitrary text
 files that contain repetitive text with varying substitutions.
 This is particularly useful if you have several types of repetitive
 text that all need to be kept in sync with each other.
@@ -142,7 +142,7 @@ long option names, rc/ini file processing, and environment variables.
 
 All of these things can be kept in sync mechanically,
 with the proper templates and this program.
-In fact, I have already done so and @code{autogen} already
+In fact, I have already done so and AutoGen already
 uses the AutoOpt facility.
 
 @ignore
@@ -158,12 +158,12 @@ program text.  If there is a single block of text that needs repetitive
 substitutions, @code{#define} macros frequently fill the bill.  They do
 not always work because they are inflexible and even sometimes obscure.
 In many of these cases, @code{M4} will work quite well.  When
-appropriate, those approaches are much simpler than autogen.  Even then
+appropriate, those approaches are much simpler than AutoGen.  Even then
 @code{M4} is often inadequate because the entire substitution lists must
 be repeated in the proper contexts throughout the base text (template).
 
 @cindex design goals
-Autogen addresses these problems by being extremely flexible in the
+AutoGen addresses these problems by being extremely flexible in the
 kinds of substitutions that can be performed and by separating the
 substitution text (macro definitions) from the template text.  The
 template text makes references to the definitions in order to compute
@@ -285,7 +285,7 @@ we can always write a new set of definitions for the old template.
 @cindex .def file
 
 This file consists of an identity statement that identifies it as a
-autogen file, followed by block and text macro definitions.
+AutoGen file, followed by block and text macro definitions.
 Intermingled may be C-style comments and C preprocessing directives.
 All C preprocessing directives are identified, but many
 (notably @code{if}) are ignored.
@@ -304,7 +304,7 @@ All C preprocessing directives are identified, but many
 @cindex identification
 
 The first definition in this file is used to identify it as a
-autogen file.  It consists of the two keywords,
+AutoGen file.  It consists of the two keywords,
 @samp{autogen} and @samp{definitions} followed by the default
 template name and a terminating semi-colon @code{;}.
 
@@ -327,7 +327,7 @@ in the @code{Templ-Dirs} options on the command line,
 in the order specified.
 @item
 If the file is not found in any of these locations,
-a message is printed and @code{autogen} exits.
+a message is printed and AutoGen exits.
 @end enumerate
 
 For a @code{foobar} template, your identification definition will look
@@ -492,7 +492,7 @@ backslash @samp{\}, or by embedding it in the string as in @code{"\n#"}.
 
 All of the normal C preprocessing directives are recognized,
 plus an additional @code{#shell} @code{#endshell} pair.
-One minor difference though is that autogen
+One minor difference though is that AutoGen
 directives must have the hash character @code{#} in column 1.
 Another difference is that several of them are ignored.  They are:
 [=
@@ -505,7 +505,7 @@ Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
 including the @code{#else} clause.
 
-The autogen directives that affect the processing of
+The AutoGen directives that affect the processing of
 definitions are:
 
 @table @code[=
@@ -613,7 +613,7 @@ It is followed by the template proper.
 @cindex pseudo macro
 @cindex macro, pseudo
 This pseudo macro is special.  It is used to identify the file as a
-autogen template file, fixing the starting and ending marks for
+AutoGen template file, fixing the starting and ending marks for
 the macro invocations in the rest of the file, and specifying the list
 of suffixes to be generated by the template.
 
@@ -675,7 +675,7 @@ Intermixed may be comment lines (completely blank or starting with the
 hash character @code{#} in column 1), and file content markers (text
 between @code{-*-} pairs on a single line).  This may be used to
 establish editing "modes" for the file.  These are ignored by
-autogen.
+AutoGen.
 
 The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
@@ -742,7 +742,7 @@ _FOR macfunc =][=
 @end ignore
 @page
 @node Invocation
-@chapter Running Autogen
+@chapter Running AutoGen
 @cindex invocation
 
 [=_EVAL 'cat ${top_builddir}/src/autogen.texi' _shell
@@ -760,7 +760,7 @@ installed.  The following assumes that everything is installed
 relative to @code{$prefix}.  You can, of course, use
 @code{configure} to place these files where you wish.
 
-@strong{NB}:  Autogen does not contain any compiled-in path names.
+@strong{NB}:  AutoGen does not contain any compiled-in path names.
 All support directories are located via option processing
 and the environment variable @code{HOME}.
 
@@ -783,8 +783,8 @@ Automated Option Processing (see next chapter).
 
 @item
 Info-style help files in @code{info/autogen.info*}.
-These files document both autogen and the option processing
-library autoopts.
+These files document both AutoGen and the option processing
+library AutoOpts.
 @end enumerate
 
 This program, library and supporting files can be installed
@@ -812,7 +812,7 @@ variable, thus:
 make TESTS=test-name.test check
 @end example
 
-All of the Autogen tests are written to honor the contents of the
+All of the AutoGen tests are written to honor the contents of the
 @t{VERBOSE} environment variable.  Normally, any commentary generated
 during a test run is discarded unless the @t{VERBOSE} environment
 variable is set.  So, to see what is happening during the test, you
@@ -841,16 +841,16 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 @end ignore
 @page
 @node Add-Ons
-@chapter Add-on packages for Autogen
+@chapter Add-on packages for AutoGen
 
 This chapter includes several programs that either work closely
-with autogen (extracting definitions or providing special formatting
+with AutoGen (extracting definitions or providing special formatting
 functions), or else it is @code{mkmerge}.  I want to promote the
 latter as an alternative to the builddir/srcdir schitzophrenia.
 I hate it. :(
 
 AutoOpts ought to appear in this list also, but since it is
-the primary reason why many people would even look into Autogen
+the primary reason why many people would even look into AutoGen
 at all, I decided to leave it in the list of chapters.
 
 @menu
