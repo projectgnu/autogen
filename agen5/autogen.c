@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.14 2002/05/02 03:23:44 bkorb Exp $
+ *  $Id: autogen.c,v 3.15 2002/06/01 17:56:14 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -369,5 +369,6 @@ signalSetup( void )
  * Local Variables:
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
+ * tab-width: 4
  * End:
  * end of autogen.c */
