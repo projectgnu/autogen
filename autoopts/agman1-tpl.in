@@ -10,10 +10,10 @@ autogen template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   Fri Jun  4 07:52:27 1999
-##            by:   Bruce Korb <korb@datadesign.com>			      
+## Last Modified:     Wed Jul  7 14:43:54 1999				      
+##            by:     Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.2 1999/07/07 14:01:22 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.3 1999/07/07 21:45:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -176,9 +176,9 @@ _FOR flag
           )}
 .BR {(name #_^ #-- _tr _down)}{(
         _IF arg_name _exist)} {(
-          _IF flag_arg _len 0 = )} [ ={(
+          _IF flag_arg _len 0 = )} [ {(
           _ELSE )} "" {(
-          _ENDIF )}\fI{(arg_name)}\fP{(
+          _ENDIF )}=\fI{(arg_name)}\fP{(
           _IF flag_arg _len 0 = )}]{(
           _ENDIF )}{(
         _ENDIF)}{(
