@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.6 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: defFind.c,v 3.7 2003/01/23 21:45:31 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -41,14 +41,9 @@ tSC zDefinitionName[ MAXPATHLEN ];
 
 STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
-
-STATIC void
-illFormedName( void )
-{
-    char* pz = aprf( zNameRef, zDefinitionName,
-                     pCurTemplate->pzFileName, pCurMacro->lineNo );
-    AG_ABEND( pz );
-}
+#define ILLFORMEDNAME() \
+    AG_ABEND( aprf( zNameRef, zDefinitionName, \
+              pCurTemplate->pzFileName, pCurMacro->lineNo ));
 
 
 STATIC tDefEntry*
@@ -476,7 +471,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
          */
         pcBrace = strchr( pcBrace, ']' );
         if (pcBrace == NULL)
-            illFormedName();
+            ILLFORMEDNAME();
 
         /*
          *  IF we are at the end of the definition,
@@ -490,7 +485,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
             break;
 
         default:
-            illFormedName();
+            ILLFORMEDNAME();
         }
         /* FALLTHROUGH */
 
@@ -504,7 +499,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
         break;
 
     default:
-        illFormedName();
+        ILLFORMEDNAME();
     }
 
     /*
@@ -604,7 +599,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
              */
         not_found:
             if (defList.nestLevel != 0)
-                illFormedName();
+                ILLFORMEDNAME();
 
             /*
              *  Don't bother returning zero entry list.  Just return NULL.
@@ -668,7 +663,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
          */
         pcBrace = strchr( pcBrace, ']' );
         if (pcBrace == NULL)
-            illFormedName();
+            ILLFORMEDNAME();
 
         /*
          *  IF we are at the end of the definition,
@@ -682,7 +677,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
             break;
 
         default:
-            illFormedName();
+            ILLFORMEDNAME();
         }
         /* FALLTHROUGH */
 
@@ -696,7 +691,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
         break;
 
     default:
-        illFormedName();
+        ILLFORMEDNAME();
     }
 
     /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.11 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: funcDef.c,v 3.12 2003/01/23 21:45:31 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -632,6 +632,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
             if (pMac->funcPrivate == NULL) {
                 pzText = aprf( zNoResolution, pT->pzTemplText + pMac->ozName );
                 AG_ABEND_IN( pT, pMac, pzText );
+                /* NOTREACHED */
             }
 
             return mFunc_Define( pT, pMac );
@@ -648,6 +649,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
     if (pInv == NULL) {
         pzText = aprf( zNoResolution, ag_scm2zchars( macName, "macro name" ));
         AG_ABEND_IN( pT, pMac, pzText );
+        /* NOTREACHED */
     }
 
     pMac->funcPrivate = (void*)pInv;

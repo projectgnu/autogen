@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.11 2003/01/14 05:04:21 bkorb Exp $
+ *  $Id: expFormat.c,v 3.12 2003/01/23 21:45:31 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -372,9 +372,6 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      */
     pzRes = aprf( zGpl, pzPrg, pzPfx );
 
-    if (pzRes == NULL)
-        AG_ABEND( "Cannot allocate GPL string" );
-
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
     return res;
@@ -424,9 +421,6 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = aprf( zLgpl, pzPrg, pzPfx, pzOwner );
-
-    if (pzRes == NULL)
-        AG_ABEND( "Cannot allocate LGPL string" );
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -485,9 +479,6 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = aprf( zBsd, pzPrg, pzPfx, pzOwner );
-
-    if (pzRes == NULL)
-        AG_ABEND( "Cannot allocate BSD license string" );
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -582,9 +573,6 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  Reformat the string with the given arguments
      */
     pzRes = aprf( (char*)mi.pData, pzPrg, pzOwner );
-    if (pzRes == NULL)
-        AG_ABEND( "Cannot allocate generic license string" );
-
     {
         int     pfx_size = strlen( pzPfx );
         char*   pzScan   = pzRes;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.11 2003/01/14 05:04:21 bkorb Exp $
+ *  $Id: defLex.c,v 3.12 2003/01/23 21:45:31 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -330,12 +330,8 @@ yyerror( char* s )
     case TK_OTHER_NAME:  pz = aprf( zON, (char*)yylval ); break;
     case TK_STRING:      pz = aprf( zSt, (char*)yylval ); break;
     case TK_NUMBER:      pz = aprf( zNo, (char*)yylval ); break;
-    default:             pz = aprf( zDf, lastToken );
-                         if (pz == NULL) pz = "lastToken"; break;
+    default:             pz = aprf( zDf, lastToken );     break;
     }
-
-    if (pz == NULL)
-        pz = (char*)yylval;
     AG_ABEND( aprf( "%s:  in %s on line %d\n"
                     "\ttoken in error:  %s\n"
                     "\t[[...<error-text>]] %s\n\n"

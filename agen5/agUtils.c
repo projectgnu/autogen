@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.9 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: agUtils.c,v 3.10 2003/01/23 21:45:31 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -90,9 +90,18 @@ aprf( const char* pzFmt, ... )
     {
         char* pzDup;
         AGDUPSTR( pzDup, pz, "aprf" );
+        free( pz );
         pz = pzDup;
     }
 #endif
+    if (pz == NULL) {
+        tSCC zMsg[] = "could not allocate for or formatting failed on:\n";
+        char z[ 256 ];
+        strcpy( z, zMsg );
+        strncpy( z + sizeof( zMsg )-1, pzFmt, sizeof(z) - sizeof(zMsg));
+        z[ sizeof(z)-1 ] = NUL;
+        AG_ABEND( z );
+    }
     return pz;
 }
 

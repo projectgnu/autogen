@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.11 2003/01/14 05:04:21 bkorb Exp $
+ *  $Id: defDirect.c,v 3.12 2003/01/23 21:45:31 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -204,7 +204,7 @@ skipToEndif( char* pzScan )
             pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
                 AG_ABEND( aprf( zNoEndif, pCurCtx->pzFileName,
-                                    pCurCtx->lineNo ));
+                                pCurCtx->lineNo ));
 
             pzScan = pz + STRSIZE( zCheckList );
         }
@@ -264,7 +264,7 @@ skipToElseEnd( char* pzScan )
             pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
                 AG_ABEND( aprf( zNoEndif, pCurCtx->pzFileName,
-                                    pCurCtx->lineNo ));
+                                pCurCtx->lineNo ));
 
             pzScan = pz + STRSIZE( zCheckList );
         }

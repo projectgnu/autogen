@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.8 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: expOutput.c,v 3.9 2003/01/23 21:45:31 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -257,6 +257,7 @@ ag_scm_out_resume( SCM suspName )
 
     AG_ABEND( aprf( "ERROR: no output file was suspended as ``%s''\n",
                     pzName ));
+    /* NOTREACHED */
     return SCM_UNDEFINED;
 }
 
@@ -352,8 +353,6 @@ ag_scm_out_push_new( SCM new_file )
             }
 
             pzTemp = aprf( "%s/agtmp.XXXXXX", pz );
-            if (pzTemp == NULL)
-                AG_ABEND( "cannot allocate temp file template" );
             TAGMEM( pzTemp, "Saved temp file template" );
         }
 

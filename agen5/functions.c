@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: functions.c,v 3.11 2003/01/23 21:45:31 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -198,7 +198,7 @@ mFunc_Bogus( tTemplate* pT, tMacro* pMac )
     char* pz = aprf( z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
                      ? apzFuncNames[ pMac->funcCode ] : "??" );
     AG_ABEND_IN( pT, pMac, pz );
-    longjmp( fileAbort, FAILURE );
+    /* NOTREACHED */
     return pMac;
 }
 

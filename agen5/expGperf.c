@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.5 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: expGperf.c,v 3.6 2003/01/23 21:45:31 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -133,8 +133,6 @@ ag_scm_make_gperf( SCM name, SCM hlist )
     {
         char* pzCmd;
         pzCmd = aprf( zMakeGperf, pzList, pzName, getpid() );
-        if (pzCmd == NULL)
-            AG_ABEND( "allocating make gperf script" );
 
         /*
          *  Run the command and ignore the results.
