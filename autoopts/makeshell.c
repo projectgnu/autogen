@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.1 1998/10/01 21:04:53 bkorb Exp $
+ *  $Id: makeshell.c,v 2.2 1998/10/02 16:08:48 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -77,17 +77,26 @@ static const char zOptTrail[] =
             "        USAGE 1\n"
             "    esac\n}\n";
 
-static const char zInvokeLongUsage[] = "        LONGUSAGE\n";
-static const char zArgType[] =
-    "        %s_%s=1\n"
-    "        ARGUMENT='%s'\n";
+static const char zCmdFmt[] =
+    "        %s\n";
+
+static const char zMultiArg[] =
+    "        ARG_ELEMENT=\"[${%1$s_%2$s_CT}]\"\n"
+    "        %1$s_%2$s_CT=`expr ${%1$s_%2$s_CT} + 1`\n"
+    "        ARGUMENT='%2$s'\n";
+
+static const char zSingleArg[] =
+    "        ARG_ELEMENT=''\n"
+    "        %1$s_%2$s=1\n"
+    "        ARGUMENT='%2$s'\n";
+
 static const char zMayArg[]  = "        ARGARG=OK\n";
 static const char zMustArg[] = "        ARGARG=YES\n";
 static const char zCantArg[] = "        ARGARG=NO\n";
 static const char zEndCaseElement[] = "        ;;\n\n";
 
 
-static const char zLoopStart[] =
+static const char zLoopCase[] =
 "doingargs=true\n"
 "arg=\"$1\"\n\n"
 "while $doingargs && [ $# -gt 0 ]\ndo\n"
@@ -101,8 +110,17 @@ static const char zLoopStart[] =
 "         shift\n"
 "         ;;\n\n";
 
-static const char zLongOpt[] =
+static const char zLoopOnly[] =
+"arg=\"$1\"\n\n"
+"while [ $# -gt 0 ]\ndo\n"
+"    arg=\"${1}\"\n";
+
+static const char zLongOptCase[] =
 "    --* )\n"
+"%s"
+"         ;;\n\n";
+
+static const char zLongOpt[] =
 "         shift\n"
 "         argname=`echo \"$arg\"|sed 's/^--//'`\n"
 "         arg=\"$1\"\n\n"
@@ -113,7 +131,9 @@ static const char zLongOpt[] =
 "         esac\n\n"
 "         decipher_long_opt $argname\n\n"
 "         case $ARGARG in\n"
-"         NO ) ;;\n\n"
+"         NO )\n"
+"             haveargarg=0\n"
+"             ;;\n\n"
 "         YES )\n"
 "             if [ $haveargarg -eq 0 ]\n"
 "             then\n"
@@ -137,8 +157,7 @@ static const char zLongOpt[] =
 "                     haveargarg=1 ;; esac\n"
 "             fi\n"
 "             ;;\n"
-"         esac\n"
-"         ;;\n\n";
+"         esac\n";
 
 static const char zFlagOpt[] =
 "    -* )\n"
@@ -195,21 +214,27 @@ static const char zFlagOpt[] =
 "         esac\n"
 "         ;;\n\n";
 
-static const char zLoopEnd[] =
+static const char zCaseEnd[] =
 "    * )\n"
 "         doingargs=false\n"
 "         ;;\n"
-"    esac\n\n"
+"    esac\n\n";
+
+static const char zLoopEnd[] =
 "    if [ $haveargarg -gt 0 ]\n"
 "    then\n"
-"        eval \\$%s_${ARGUMENT}=\"'${argarg}'\"\n"
+"        eval \\$%s_${ARGUMENT}${ARG_ELEMENT}=\"'${argarg}'\"\n"
 "    fi\n"
 "done\n";
 
+extern tOptProc doVersion;
+extern tOptProc doPagedUsage;
+extern tOptProc doLoadOpt;
 
-STATIC void emitFlag( tOptions* pOpts );
-STATIC void emitLong( tOptions* pOpts );
-
+STATIC void emitFlag(  tOptions* pOpts );
+STATIC void emitLong(  tOptions* pOpts );
+STATIC void emitUsage( tOptions* pOpts );
+STATIC void emitSetup( tOptions* pOpts );
 
 
     void
@@ -218,6 +243,63 @@ putShellParse( tOptions* pOpts )
     tOptDesc* pOptDesc = pOpts->pOptDesc;
     int       optionCt = pOpts->optCt;
 
+    emitUsage( pOpts );
+
+    switch (pOpts->fOptSet & (OPTPROC_LONGOPT|OPTPROC_SHORTOPT)) {
+    case OPTPROC_LONGOPT:
+        emitLong( pOpts );
+
+        emitSetup( pOpts );
+        fputs( zLoopCase,  stdout );
+        printf( zLongOptCase, zLongOpt );
+        fputs( zCaseEnd,   stdout );
+        break;
+
+    case 0:
+        emitLong( pOpts );
+
+        emitSetup( pOpts );
+        fputs( zLoopOnly,  stdout );
+        fputs( zLongOpt,   stdout );
+        break;
+
+    case OPTPROC_SHORTOPT:
+        emitFlag( pOpts );
+
+        emitSetup( pOpts );
+        fputs( zLoopCase,  stdout );
+        fputs( zFlagOpt,   stdout );
+        fputs( zCaseEnd,   stdout );
+        break;
+
+    case OPTPROC_LONGOPT|OPTPROC_SHORTOPT:
+        emitLong( pOpts );
+        emitFlag( pOpts );
+
+        emitSetup( pOpts );
+        fputs( zLoopCase,  stdout );
+        printf( zLongOptCase, zLongOpt );
+        fputs( zFlagOpt,   stdout );
+        fputs( zCaseEnd,   stdout );
+        break;
+    }
+
+    printf( zLoopEnd, pOpts->pzPROGNAME );
+    fflush( stdout );
+    fchmod( STDOUT_FILENO, 0444 );
+    fclose( stdout );
+}
+
+
+    STATIC void
+emitUsage( tOptions* pOpts )
+{
+    /*
+     *  First, switch stdout to the output file name.
+     *  Then, change the program name to the one defined
+     *  by the definitions (rather than the current
+     *  executable name).  Down case the upper cased name.
+     */
     {
         static const char zOptFile[] = "%sopt.sh";
         char* pz = (char*)malloc( strlen( pOpts->pzPROGNAME )
@@ -250,6 +332,7 @@ putShellParse( tOptions* pOpts )
     case -1:
         printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
         break;
+
     case 0:
         dup2( STDOUT_FILENO, STDERR_FILENO );
         (*(pOpts->pUsageProc))( pOpts, EXIT_SUCCESS );
@@ -268,6 +351,7 @@ putShellParse( tOptions* pOpts )
     case -1:
         printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
         break;
+
     case 0:
         dup2( STDOUT_FILENO, STDERR_FILENO );
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
@@ -281,29 +365,75 @@ putShellParse( tOptions* pOpts )
 
     fputs( "__USAGE__EOF__\n    exit $1\n}\n", stdout );
 
-    switch (pOpts->fOptSet & (OPTPROC_LONGOPT|OPTPROC_SHORTOPT)) {
-    case OPTPROC_LONGOPT:
-    case 0:
-        emitLong( pOpts );
-        printf( "%s%s", zLoopStart, zLongOpt );
-        break;
+    {
+        tOptDesc* pOptDesc = pOpts->pOptDesc;
+        int       optionCt = pOpts->optCt;
 
-    case OPTPROC_SHORTOPT:
-        emitFlag( pOpts );
-        printf( "%s%s", zLoopStart, zFlagOpt );
-        break;
+        for (;;) {
+            if (pOptDesc->pOptProc == doVersion) {
+                static const char zVProc[] =
+                    "\nVERSION()\n{\n    cat <<'__VERSION_EOF__'\n";
+                static const char zEndVer[] =
+                    "__VERSION_EOF__\n    exit 0\n}\n";
 
-    case OPTPROC_LONGOPT|OPTPROC_SHORTOPT:
-        emitLong( pOpts );
-        emitFlag( pOpts );
-        printf( "%s%s%s", zLoopStart, zLongOpt, zFlagOpt );
-        break;
+                fputs( zVProc, stdout );
+                fflush( stdout );
+
+                switch (fork()) {
+                case -1:
+                    printf( "Cannot obtain %s version\n", pOpts->pzProgName );
+                    break;
+
+                case 0:
+                    dup2( STDOUT_FILENO, STDERR_FILENO );
+                    pOptDesc->pzLastArg = "notice";
+                    doVersion( pOpts, pOptDesc );
+
+                default:
+                {
+                    int  stat;
+                    wait( &stat );
+                }
+                }
+                fputs( zEndVer, stdout );
+                break;
+            }
+
+            if (--optionCt <= 0)
+                break;
+            pOptDesc++;
+        }
     }
-    printf( zLoopEnd, pOpts->pzPROGNAME );
-    fflush( stdout );
-    fchmod( STDOUT_FILENO, 0444 );
-    fclose( stdout );
 }
+
+
+    STATIC void
+emitSetup( tOptions* pOpts )
+{
+    static const char zMultiDef[] = "\n"
+        "%1$s_%2$s_CT = 0\n"
+        "set -a %1$s_%2$s\n"
+        "export %1$s_%2$s %1$s_%2$s_CT\n";
+
+    static const char zSingleDef[] = "\n"
+        "%1$s_%2$s\n"
+        "export %1$s_%2$s\n";
+
+    tOptDesc* pOptDesc = pOpts->pOptDesc;
+    int       optionCt = pOpts->optCt;
+
+    for (;optionCt > 0; pOptDesc++, --optionCt) {
+
+        if (  ((pOptDesc->fOptState & OPTST_DOCUMENT) != 0)
+           || (pOptDesc->pz_NAME == (char*)NULL) )
+            continue;
+
+        if (pOptDesc->optMaxCt > 1)
+             printf( zMultiDef,  pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+        else printf( zSingleDef, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+    }
+}
+
 
 
     STATIC void
@@ -322,12 +452,30 @@ emitFlag( tOptions* pOpts )
 
         if (isprint( pOptDesc->optValue )) {
             printf( "    '%c' )\n", pOptDesc->optValue );
-            if (pOptDesc->pz_NAME == (char*)NULL)
-                fputs( zInvokeLongUsage, stdout );
 
-            else {
-                printf( zArgType, pOpts->pzPROGNAME, pOptDesc->pz_NAME,
-                        pOptDesc->pz_NAME );
+            if (pOptDesc->pz_NAME == (char*)NULL) {
+
+                if (pOptDesc->pOptProc == doVersion)
+                    printf( zCmdFmt, "VERSION" );
+
+                else if (pOptDesc->pOptProc == doPagedUsage)
+                    printf( zCmdFmt, "LONGUSAGE" );
+
+                else if (pOptDesc->pOptProc == doLoadOpt)
+                    printf( zCmdFmt, "echo Warning:  "
+                            "Cannot load options files >&2" );
+
+                else if (pOptDesc->pOptProc == (tOptProc*)NULL)
+                    printf( zCmdFmt, "echo Warning:  "
+                            "Cannot save options files >&2" );
+                else
+                    printf( zCmdFmt, "LONGUSAGE" );
+
+            } else {
+                const char* pzFmt = (pOptDesc->optMaxCt > 1)
+                                    ? zMultiArg : zSingleArg;
+
+                printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
 
                 switch (pOptDesc->optArgType) {
                 case ARG_MAY:
@@ -342,10 +490,7 @@ emitFlag( tOptions* pOpts )
             fputs( zEndCaseElement, stdout );
         }
     }
-    printf( "    * )\n"
-            "        echo Unknown flag: $1 >&2\n"
-            "        %s_USAGE 1\n"
-            "    esac\n}\n", pOpts->pzPROGNAME );
+    printf( zOptTrail, "flag" );
 }
 
 
@@ -423,12 +568,30 @@ emitLong( tOptions* pOpts )
                 }
             }
         }
-        if (pOptDesc->pz_NAME == (char*)NULL)
-             fputs( zInvokeLongUsage, stdout );
 
-        else {
-            printf( zArgType, pOpts->pzPROGNAME, pOptDesc->pz_NAME,
-                    pOptDesc->pz_NAME );
+        if (pOptDesc->pz_NAME == (char*)NULL) {
+
+            if (pOptDesc->pOptProc == doVersion)
+                printf( zCmdFmt, "VERSION" );
+
+            else if (pOptDesc->pOptProc == doPagedUsage)
+                printf( zCmdFmt, "LONGUSAGE" );
+
+            else if (pOptDesc->pOptProc == doLoadOpt)
+                printf( zCmdFmt, "echo Warning:  "
+                        "Cannot load options files >&2" );
+
+            else if (pOptDesc->pOptProc == (tOptProc*)NULL)
+                printf( zCmdFmt, "echo Warning:  "
+                        "Cannot save options files >&2" );
+            else
+                printf( zCmdFmt, "LONGUSAGE" );
+
+        } else {
+            const char* pzFmt = (pOptDesc->optMaxCt > 1)
+                                ? zMultiArg : zSingleArg;
+
+            printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
 
             switch (pOptDesc->optArgType) {
             case ARG_MAY:
