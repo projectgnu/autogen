@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.12 1999/11/11 04:49:05 bruce Exp $
+ *  $Id: funcEval.c,v 1.13 1999/11/16 05:27:01 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -233,7 +233,7 @@ eval( const char* pzExpr )
     switch (*pzExpr) {
     case '(':
     case ';':
-        res = gh_eval_str( pzExpr );
+        res = gh_eval_str( (char*)pzExpr );
         break;
 
     case '`':
