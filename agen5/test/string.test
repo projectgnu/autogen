@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: string.test,v 1.1 2000/03/26 18:53:55 bruce Exp $
+# $Id: string.test,v 1.2 2000/03/29 03:09:51 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -49,7 +49,7 @@ fi
 
 echo creating $testname.tpl
 cat > $testname.tpl <<_EOF_
-[= AutoGen5 Template test =]
+[= AutoGen5 Template c sh =]
 [=
 
 CASE (suffix)  =][=
@@ -67,7 +67,7 @@ CASE (suffix)  =][=
   ;;  Create a file containing nothing but the
   ;;  autogen internal contents of the string
   ;;
-  (out-push-new ${testname}.raw)
+  (out-push-new "${testname}.raw")
 
   =][=string=][=
 
@@ -145,7 +145,8 @@ int main( int argc, char** argv )
   == sh
 
 =]#! /bin/sh
-
+_EOF_
+cat >> ${testname}.tpl <<_EOF_
 ./${testname} [=(raw-shell-str (get "string"))
            =] [=(shell-str (get "string"))=] > ${testname}.out
 res=\$?
@@ -161,7 +162,7 @@ then
   echo All string comparisons pass
 else
   echo There were \$res string test failures
-  exit $res
+  exit \$res
 fi[=
 
 ESAC
@@ -172,8 +173,8 @@ _EOF_
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 echo creating $testname.def
-cat > $testname.def <<_EOF_
-autogen definitions $testname;
+echo "autogen definitions $testname.tpl;" > $testname.def
+cat >> $testname.def <<'_EOF_'
 
 string =
     "'\f\r\b\v\t\a\n
