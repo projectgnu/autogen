@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2003/04/04 04:44:53 $
+# Last Modified:     $Date: 2003/05/18 17:15:30 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.11 2003/04/04 04:44:53 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.12 2003/05/18 17:15:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -43,6 +43,7 @@ top_srcdir=${top_srcdir:-..}
 top_builddir=${top_builddir:-..}
 srcdir=${srcdir:-.}
 builddir=${builddir:-.}
+eval "`egrep ^AG_ ${top_srcdir}/VERSION | sed 's,^AG,export AG,'`"
 
 export top_builddir top_srcdir builddir srcdir
 
