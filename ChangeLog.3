@@ -1,3 +1,196 @@
+2002-09-28  Bruce Korb  <bkorb@gnu.org>
+
+	5.4.4 Release.
+	* configure.in(error.h): check for this header, too
+	* agen5/defReduce.c(addSibMacro): work around a GCC 3.x aliasing bug
+	* agen5/expString.c(string-substitute): expand the example
+	* agen5/opts.def(load_functions): clean up the invocation appearance
+	* agen5/snarf.tpl(string_content): quote the echoed string
+	* autoopts/optcode.tpl(patch-text): new function to convert texi-isms
+	to ``whatever'' for usage display.
+	* autoopts/options.tpl: ditto + reorganization
+
+2002-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c: correct mishandling of common-assign option
+	* getdefs/test/cfg.test(new): test it
+	* getdefs/test/Makefile.am(cfg.test): add to test list
+	* autoopts/enumeration.c(optionEnumerationVal): Let a program option
+	descriptor of "2UL" be a request to convert an enum value to a string
+	* autoopts/save.c(optionSaveFile): Before printing an enum to the save
+	state file, convert it back to a string.
+	* autoopts/test/keyword.test: test this functionality
+	* autoopts/makeshell.c(emitSetup): Similarly for default values for
+	emitting a shell script parser.
+
+2002-09-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(SUFFIXES = .i): rule for preprocessing
+	* agen5/agUtils.c(alloc): move MEMDEBUG stuff to autoopts
+	* agen5/agUtils.h(SUCCESS): move this to autoopts.h
+	* agen5/autogen.c(ag_alloc): renamed these routines to aopts_alloc, ...
+	* agen5/autogen.h(autoopts.h): include this header for all compiles
+	(mem_mgmt): move this struct and allocation defines to autoopts.h
+	* agen5/*: use the moved macros consistently
+	* autoopts/*.c(include): regularize header usage & allocation macros too
+	* autoopts/streqvcmp.c(streqvmap): use 'char' type for args
+	(aopts_alloc): move the memory debugging code here
+	* compat/compat.h: bring in sync with new demands
+	* config/confmacs.tpl: syncronize a little better with network form
+	* configure.in(AUTOGEN_BUILD): define this always
+	* getdefs/getdefs.h: use compat.h to handle inconsistent header files
+	and the SUCCESS/FAILURE stuff
+	* pkg/libopts/mklibsrc.sh: strip out parts of files that should not be
+	exported from the tear-off library
+
+2002-09-14  Bruce Korb  <bkorb@gnu.org>
+
+	* config/confmacs.tpl(try-test): preserve exit status for invoking shell
+	* config/misc.def(xml2): ditto
+	* pkg/libopts/mklibsrc.sh: distribute the "compat" dir, too
+	(autoopts.h): strip the #include of snprintf.h for tear-off library
+	* autoopts/autoopts-config.in(autogen): add exeext
+	* pkg/libopts/README: clarify what happens some more
+
+2002-09-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(html-escape-encode): new scheme function.
+	* config/confmacs.tpl(protect-text): function for escaping
+	autoconf special characters.
+	* doc/auto_gen.tpl: doc the new and old scheme functions.
+
+2002-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in: variables are very order dependent.
+	* pkg/libopts/mklibsrc.sh(Makefile.am): make sure various files are
+	redistributed by the host project
+
+2002-09-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.tpl(set-flag-names): new scheme func for setting up
+	the variations for option names.  Invoked on every iteration over "flag"
+	* autoopts/optcode.tpl(define): define Scheme variables globally and use
+	`set-flag-names'.
+	* autoopts/optlib.tpl: ditto
+	* autoopts/optmain.tpl: ditto
+	* autoopts/opthead.tpl: ditto
+
+2002-09-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in: Correctly print the path to autogen.
+	Organize the list of configure values that get printed
+	* autoopts/autoopts-config.1: doc the values and their names
+
+2002-08-22  Bruce Korb  <bkorb@gnu.org>
+
+	= AutoGen 5.4.2 released
+	* pkg/libopts/README: reworked w/ help of
+	Alexandre Duret-Lutz <duret_g@lrde.epita.fr>
+	* pkg/libopts/mklibsrc.sh: use a fixed subdirectory name and
+	create an automake fragment file, `MakeDefs.inc'
+	* autoopts/autoopts.m4(AUTOOPTS_LDFLAGS): misnamed.  It is the
+	AutoGen template library directory --> AUTOGEN_TPLIB
+
+2002-08-18  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(libsrc): Make this a non-distributed but
+	installable pkgdata_DATA file
+	* autoopts/autoopts-config.in: rework to use a list of options
+	* config/bootstrap(missing): use working directory, don't insist
+	upon "config" as the configury directory.
+	* config/conftest.tpl(Makefile.am): don't generate, move text to ..
+	* Makefile.am(DIST): distribute files from config/ directory
+	* configure.in(AC_INIT): update the version tag and bug address
+	* doc/Makefile.am(autogen.def): Put this in the standard build sequence
+	and kludge the source directory so the .info file can get rebuilt when
+	we are doing a "make distcheck".  Ick.
+	* pkg/libopts/mklibsrc.sh(if): use "test" instead of "[" - M4 quoting
+	* pkg/libopts/README: add more details about what one needs to do.
+	**NINE** steps are now enumerated.
+	* pkg/libopts/mklibsrc.sh(LIBOPTS_DIST): needed as "extra dist" stuff
+	for when libopts is already installed.
+	* autoopts/agman1.tpl(default): When an option is the default option
+	for a named-option-mode program, say so in the man page.
+
+2002-08-12  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/libopts/mklibsrc.sh: genshell.[ch] are not relevant
+	Add a --with-autoopts-config, in case someone has to specify the script
+	Create LDADD and CFLAGS substitutions, too.
+	* pkg/libopts/README: make the instructions current
+
+2002-08-11  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def: use ifdef rather than sed
+	* doc/Makefile.am(compete): remove competition stuff.  Web only.
+	* doc/auto_gen.tpl(compete): ditto
+	* doc/autogen.texi(compete): ditto
+	* pkg/libopts/README(LIBOPTS_DIR): use a substitution variable
+	* pkg/libopts/mklibsrc.sh(autoopts.m4): don't extract from autoopts
+	(AUTOOPTS_CHECK): insert a macro to check for pre-existing installation
+
+2002-08-10  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/*: new directory structure for managing the building of packages
+	* pkg/libopts/*: added files needed by the tear-off libopts source
+	* config/misc.def: removed macros needed by the libopts tear-off
+	* config/libopts.def: new
+
+2002-07-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(eaddr): use "eaddr" instead of inventing new attr.
+	* autoopts/optcode.tpl: ditto
+	* columns/opts.def: ditto
+	* doc/auto_gen.tpl: ditto
+	* getdefs/opts.def: ditto
+	* agen5/opts.def: ditto
+	* agen5/loadPseudo.c(doSchemeExpr): count newlines in the scheme expr
+
+2002-07-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: Remove redundant doc
+	* autoopts/putshell.c: enabled but unused options have their default
+	values printed to the shell script output
+	* autoopts/options_h.tpl(pzBugAddr): string pointer for a
+	"mail-bug-reports-to" copyright attribute
+	* autoopts/optcode.tpl(copyright.bugs): create string when attr present
+	* autoopts/usage.c(pzBugAddr): print it when present
+	* autoopts/version.c(pzBugAddr): print it for long version
+	* autoopts/aginfo.tpl(USAGE): double the '@' chars for texi
+	* doc/auto_gen.tpl: ditto
+	* agen5/opts.def(copyright): add new field
+	* columns/opts.def(copyright): add new field
+	* getdefs/opts.def(copyright): add new field
+
+2002-07-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optmain.tpl(main): allow clients to specify the contents
+	of the main procedure.
+	* doc/autogen.texi(main-text): doc it
+	* autoopts/options_h.tpl(OPTIONS_MINIMUM_VERSION): derive from VERSION
+	* autoopts/autoopts.c(optionProcess): use the new value
+	* autoopts/autoopts.h(MIN_OPTION_VERSION): remove #define
+	* autoopts/bootstrap.dir(funcs.def): create a definition for this.
+
+2002-07-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doImmediateOpts): put the version into the
+	source in string format so "strings(1)" can find it.
+	* autoopts/bootstrap.dir: compute the value for that purpose
+	* autoopts/options_h.tpl: insert the computed value
+	* config/confmacs.tpl: restore CPPFLAGS and LDFLAGS on failure
+	* config/misc.def: only specify libxml includes and lib for the
+	xml2ag directory.  Do this with XML2AG_* substitution variables.
+	* xml2ag/Makefile.am: use the substitution variables
+	* snprintfv/Makefile.am: restore the old version.  New is broken.
+	* snprintfv/snprintfv/Makefile.am: bootstrap.dir is not distributed
+
+2002-07-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defDirect.c(doDir_option): new procedure to allow embedded
+	options in definitions files.
+	* agen5/expState.c(ag_scm_set_option): similar for template files
+	* agen5/test/directives.test: test it for finding a template.
 
 2002-06-27  Bruce Korb  <bkorb@gnu.org>
 
