@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.17 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.18 2001/05/28 00:23:28 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -140,13 +140,13 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
              *  IF one of our template paths starts with '$', then expand it.
              */
             if (*pzDir == '$') {
-                if (! optionMakePath( pzFullName, MAXPATHLEN, pzFName,
+                if (! optionMakePath( pzFullName, MAXPATHLEN, pzDir,
                                       autogenOptions.pzProgPath ))
                     pzDir = ".";
                 else
                     AGDUPSTR( pzDir, pzFullName, "find directory name" );
 
-                ppzDir[-1] = pzDir;
+                ppzDir[1] = pzDir; /* save the computed name for later */
             }
 
             pzEnd  = pzFullName

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.31 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: autoopts.c,v 2.32 2001/05/28 00:23:28 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -752,7 +752,7 @@ optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
         if (pzDir == (char*)NULL)
             return AG_FALSE;
 
-        if (strlen( pzDir ) + 1 + strlen( --pzName ) >= bufSize)
+        if (strlen( pzDir ) + 1 + strlen( pzName ) >= bufSize)
             return AG_FALSE;
 
         sprintf( pzBuf, "%s%s", pzDir, pzName );
@@ -1093,9 +1093,10 @@ DEF_PROC_3( STATIC void filePreset,
  *  doEnvPresets - check for preset values from the envrionment
  *  This routine should process in all, immediate or normal modes....
  */
-DEF_PROC_2( STATIC void doEnvPresets,
-            tOptions*,       pOpts,
-            teEnvPresetType, type )
+    STATIC void
+doEnvPresets( pOpts, type )
+    tOptions*       pOpts;
+    teEnvPresetType type;
 {
     int        ct;
     tOptState  st;
@@ -1115,7 +1116,7 @@ DEF_PROC_2( STATIC void doEnvPresets,
 
     pzFlagName = zEnvName
         + snprintf( zEnvName, sizeof( zEnvName ), "%s_", pOpts->pzPROGNAME );
-    spaceLeft = (zEnvName - pzFlagName) - 1;
+    spaceLeft = sizeof( zEnvName ) - (pzFlagName - zEnvName) - 1;
 
     for (;ct-- > 0; st.pOD++) {
         /*

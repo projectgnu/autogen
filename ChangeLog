@@ -1,3 +1,8 @@
+2001-05-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doEnvPresets): correct size computation
+	* agen5/tpLoad.c(findFile): fix counters
+
 2001-03-10  Alexandre Duret-Lutz  <duret_g@epita.fr>
 
         * autoopts/optlib.tpl: Use string-length to compute the usage
