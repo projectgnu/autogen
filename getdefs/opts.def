@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.6 1998/10/26 15:48:44 bkorb Exp $
+ *   $Id: opts.def,v 2.7 1998/11/16 23:02:04 bkorb Exp $
  */
 
 /*
@@ -142,16 +142,29 @@ flag = {
 };
 
 flag = {
-    name        = file;
+    name        = srcfile;
     flag_arg;     /* optional */
     descrip     = "Insert source file name into each def";
     doc =
     "Inserts the name of the input file where a definition was found\n"
     "into the output definition.\n"
     "If no argument is supplied, the format will be:\n"
-    "@example\nfile = '%s';\n@end example\n"
+    "@example\nsrcfile = '%s';\n@end example\n"
     "If an argument is supplied, that string will be used for the entry\n"
-    "name instead of @var{infile}.";
+    "name instead of @var{srcfile}.";
+};
+
+flag = {
+    name        = linenum;
+    flag_arg;     /* optional */
+    descrip     = "Insert source line number into each def";
+    doc =
+    "Inserts the line number in the input file where a definition\n"
+    "was found into the output definition.\n"
+    "If no argument is supplied, the format will be:\n"
+    "@example\nlinenum = '%s';\n@end example\n"
+    "If an argument is supplied, that string will be used for the entry\n"
+    "name instead of @var{linenum}.";
 };
 
 flag = {

@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.8 1998/10/26 15:42:16 bkorb Exp $
+ *  $Id: getdefs.c,v 2.9 1998/11/16 23:02:02 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -1205,11 +1205,18 @@ buildDefinition(
         *pzOut++ = '\n';
     }
 
-    if (HAVE_OPT( FILE )) {
-        char* pz = OPT_ARG( FILE );
+    if (HAVE_OPT( SRCFILE )) {
+        char* pz = OPT_ARG( SRCFILE );
         if (pz == (char*)NULL)
-            pz = "file";
+            pz = "srcfile";
         pzOut += sprintf( pzOut, "    %s = '%s';\n", pz, pzFile );
+    }
+
+    if (HAVE_OPT( LINENUM )) {
+        char* pz = OPT_ARG( LINENUM );
+        if (pz == (char*)NULL)
+            pz = "linenum";
+        pzOut += sprintf( pzOut, "    %s = '%d';\n", pz, line );
     }
 
     *pzOut++ = '}'; *pzOut++ = ';'; *pzOut++ = '\n';
