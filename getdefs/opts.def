@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.24 2000/10/17 03:14:58 bkorb Exp $
+ *   $Id: opts.def,v 2.25 2000/10/17 04:09:40 bkorb Exp $
  */
 
 /*
@@ -105,7 +105,8 @@ flag = {
 
 flag = {
     name        = filelist;
-    flag_arg;     /* optional */
+    arg_type    = string;
+    arg_optional;
     arg_name    = file;
     descrip     = "Insert source file names into defs";
     doc =

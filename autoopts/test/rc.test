@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.1 2000/08/29 12:48:59 bkorb Exp $
+# $Id: rc.test,v 1.2 2000/10/17 04:12:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -52,7 +52,7 @@ USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
    -> opt save-opts      Save the option state to an rc file
    -< YES load-opts      Load options from an rc file
 				- disabled as --no-load-opts
-				- may appear without limit
+				- may appear multiple times
 
 Options may be specified by doubled hyphens and their name
 or by a single hyphen and the flag character/option value.
