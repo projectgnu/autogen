@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2000/10/03 19:14:08 $
+## Last Modified:   $Date: 2000/10/15 22:13:41 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.31 2000/10/03 19:14:08 bkorb Exp $
+## $Id: Makefile.am,v 2.32 2000/10/15 22:13:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,8 +22,8 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
 pkgdata_DATA	= \
-	aginfo.tpl   agman1.tpl   doc.tpl      libhead.tpl  optcode.tpl \
-	opthead.tpl  options.tpl  optlib.tpl   optmain.tpl
+        aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \
+        optlib.tpl    optmain.tpl
 
 GENSRC		= genshell.c genshell.h
 EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) \
