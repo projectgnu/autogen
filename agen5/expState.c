@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.3 1999/10/30 20:25:28 bruce Exp $
+ *  $Id: expState.c,v 1.4 1999/10/31 19:07:07 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -281,7 +281,7 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
 
 /*=gfunc count
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc:  Count the number of entries for a definition.
  *      The input argument must be a string containing the name
@@ -319,7 +319,7 @@ ag_scm_def_file( void )
 
 /*=gfunc exist_p
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc:  return SCM_BOOL_T iff a specified name has a value.
  *       The name may include indexes and/or member names.
@@ -350,7 +350,7 @@ ag_scm_exist_p( SCM obj )
 
 /*=gfunc get
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc:  get the first string value associated with the name.
 =*/
@@ -374,7 +374,7 @@ ag_scm_get( SCM obj )
 
 /*=gfunc high_lim
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc:  Returns the highest index associated with an array of definitions.
 =*/
@@ -409,7 +409,7 @@ ag_scm_high_lim( SCM obj )
 
 /*=gfunc len
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc: If the named object is a group definition, then "len" is
  *     the same as "count".  Otherwise, if it is one or more text
@@ -430,7 +430,7 @@ ag_scm_len( SCM obj )
 
 /*=gfunc low_lim
  *
- * exparg: ag-name
+ * exparg: ag-name, name of AutoGen value
  *
  * doc:  Returns the lowest index associated with an array of definitions.
 =*/
