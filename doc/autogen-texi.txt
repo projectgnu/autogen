@@ -11,12 +11,13 @@ Extraction from autogen.texi
 @top The Automated Program Generator
 @comment  node-name,  next,  previous,  up
 
-This file documents AutoGen, a tool designed for generating program
-files that contain repetitive text with varied substitutions.
-This document is very long because it is intended as a reference
-document.  For a quick start example, @xref{Example Usage}.
-For a simple example of Automated Option processing, @xref{Quick Start}.
-For a full list of the Automated Option features, @xref{Features}.
+This file documents AutoGen version @value{VERSION}.  It is a tool
+designed for generating program files that contain repetitive text with
+varied substitutions.  This document is very long because it is intended
+as a reference document.  For a quick start example, @xref{Example
+Usage}.  For a simple example of Automated Option processing,
+@xref{Quick Start}.  For a full list of the Automated Option features,
+@xref{Features}.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
