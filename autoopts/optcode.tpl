@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.3 2005/01/22 04:48:33 bkorb Exp $
+#$Id: optcode.tpl,v 4.4 2005/01/22 16:21:16 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -397,7 +397,7 @@ ENDIF "test/guile main"
 #if ENABLE_NLS
 #include <string.h>
 #include <stdio.h>
-#include <usage-txt.h>
+#include <autoopts/usage-txt.h>
 
 static char*
 AO_gettext( const char* pz )

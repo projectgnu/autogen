@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.2 2005/01/19 01:49:59 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.3 2005/01/22 16:21:16 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:
@@ -85,7 +85,7 @@ changequote([,])dnl
       dnl
       rm -f confopts.def conf.optstest
       AC_TRY_RUN([
-#include <options.h>
+#include <autoopts/options.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -184,7 +184,7 @@ _EOF_
          AC_LANG_SAVE
          AC_LANG_C
          AC_TRY_LINK([
-#include <options.h>
+#include <autoopts/options.h>
 #include <stdio.h>
 ], [return strcmp("$aocfg_current:$aocfg_revision:$aocfg_age", optionVersion());],
         [ cat << _EOF_

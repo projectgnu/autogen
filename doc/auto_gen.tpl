@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.2 2005/01/22 04:48:33 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.3 2005/01/22 16:21:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -557,7 +557,7 @@ the hassle of processing options and keeping man pages, info docs and
 usage text up to date.  This package allows you to specify several program
 attributes, up to a hundred option types and many option attributes.
 From this, it then produces all the code necessary to parse and handle
-the command line and initialization file options, and the documentation
+the command line and configuration file options, and the documentation
 that should go with your program as well.
 
 [= get-text tag = autoopts =]
@@ -645,9 +645,10 @@ exec 3>&1
     kill -TERM $AG_pid
     exit 1
   fi
+  true
 ) > ${tempdir}/default-test.log 2>&1
 
-test -x ${tempdir}/default-test || exit 1
+test $? -eq 0 || exit 1
 
 HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
    sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'

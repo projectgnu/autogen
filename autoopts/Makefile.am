@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-01-14 10:37:50 bkorb"
+## Time-stamp:      "2005-01-21 21:41:10 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2005/01/14 20:37:31 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2005/01/22 16:21:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -33,7 +33,7 @@ TEXI_STAMP  = texi-stamp
 
 libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
-GENHDRS     = options.h usage-txt.h genshell.h
+GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h
 HDRS        = $(GENHDRS) autoopts.h proto.h
 
 ## The primary source (autoopts.c) must be listed first and on a separate
@@ -92,7 +92,7 @@ libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
 bin_SCRIPTS               = autoopts-config
 
-include_HEADERS           = options.h usage-txt.h
+nobase_include_HEADERS    = autoopts/options.h autoopts/usage-txt.h
 
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 	$(MISC_FILES) $(DEF_FILES) mk-autoopts-pc.in

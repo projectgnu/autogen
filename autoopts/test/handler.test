@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/22 04:48:33 $
+# Last Modified:     $Date: 2005/01/22 16:21:16 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.3 2005/01/22 04:48:33 bkorb Exp $
+# $Id: handler.test,v 4.4 2005/01/22 16:21:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -193,7 +193,7 @@ doOptSixth(
 #if ENABLE_NLS
 #include <string.h>
 #include <stdio.h>
-#include <usage-txt.h>
+#include <autoopts/usage-txt.h>
 
 static char*
 AO_gettext( const char* pz )

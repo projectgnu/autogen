@@ -6,7 +6,13 @@
 	* agen5/test/heredef.test: tweak test
 	* agen5/test/opts.test: ditto
 	* autoopts/opt*.tpl: add tpl-file-line functions here and there.
-
+	* autoopts/Makefile.am(include_HEADERS): make them "nobase" as both
+	options.h and usage-txt.h are to be installed in an an "autoopts" subdir.
+	* */*: change #include directives
+	* doc/*: change references from "rc files" and "ini files" to
+	"configuration files".
+	* pkg/libopts/mklibsrc.sh: cope with the new header subdirectory
+	
 2004-01-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/opt*.tpl: Remove all the #line stuff.  Bad idea for AutoOpts.

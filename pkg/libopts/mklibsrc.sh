@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-01-18 17:27:56 bkorb"
+## Time-stamp:      "2005-01-21 21:51:25 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.3 2005/01/19 01:49:59 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.4 2005/01/22 16:21:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,8 +23,7 @@ tag=libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
 
 cd ${top_builddir}/pkg
 [ ! -d ${tag} ] || rm -rf ${tag}
-mkdir ${tag}
-mkdir ${tag}/compat
+mkdir ${tag} ${tag}/compat ${tag}/autoopts
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -35,9 +34,9 @@ files=`fgrep '#include' libopts.c | \
        sed 's,"$,,;s,#.*",,;/^streqvcmp.c$/d;/^autoopts.h$/d'`
 for f in libopts.c ${files}
 do
-  if test -f $f
-  then cp -f $f ${top_builddir}/pkg/${tag}/.
-  else cp -f ${top_srcdir}/autoopts/$f ${top_builddir}/pkg/${tag}/.
+  if test -f ${f}
+  then cp -f ${f} ${top_builddir}/pkg/${tag}/${f}
+  else cp -f ${top_srcdir}/autoopts/${f} ${top_builddir}/pkg/${tag}/${f}
   fi
 done
 

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 4.2 2005/01/22 04:48:33 bkorb Exp $
+# $Id: opthead.tpl,v 4.3 2005/01/22 16:21:16 bkorb Exp $
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =]
@@ -13,7 +13,7 @@
 [= (make-header-guard "autoopts") =]
 [= Option_Copyright =][=
 % config-header "\n#include \"%s\""=]
-#include <options.h>
+#include <autoopts/options.h>
 
 /*
  *  Enumeration of each option:

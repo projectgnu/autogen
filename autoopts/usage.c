@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 4.3 2005/01/22 16:21:16 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -54,8 +54,6 @@
 #ifndef tSC
 #  define tSC static char
 #endif
-
-#include "usage-txt.h"
 
 static arg_types_t argTypes;
 

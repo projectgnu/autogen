@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-01-09 14:41:26 bkorb"
+ *  Time-stamp:      "2005-01-21 21:43:00 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.4 2005/01/14 20:37:31 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.5 2005/01/22 16:21:16 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -261,7 +261,7 @@ typedef struct {
  *  the client will provide a callback for that purpose.
  */
 #undef DO_TRANSLATIONS
-#include "usage-txt.h"
+#include "autoopts/usage-txt.h"
 
 /*
  *  File pointer for usage output

@@ -1916,11 +1916,11 @@ are recognized without case sensitivity, and they may be abbreviated.
 Environment variable initializations, @xref{environrc}.
 
 @item
-Initialization from RC or INI files, and
+Initialization from configuration files (aka RC or INI files), and
 saving the option state back into one, @xref{loading rcfile}.
 
 @item
-INI files may be partitioned.  One INI file may be used by several
+Config files may be partitioned.  One config file may be used by several
 programs by partitioning it with lines containing,
 ``@code{[PROGRAM_NAME]}'', @xref{loading rcfile}.
 
@@ -2283,7 +2283,7 @@ into a single program.
 
 @cindex rcfile
 @item rcfile
-Specifies the initialization file name.  This is only useful if you
+Specifies the configuration file name.  This is only useful if you
 have provided at least one @code{homerc} attribute.
 @noindent
 default: .<prog-name>rc
@@ -4104,14 +4104,14 @@ in the option descriptor file (@pxref{program attributes}) with the
 @code{rcfile} or @code{environrc} attributes.
 
 @menu
-* loading rcfile::      RC or INI file presets
-* saving rcfile::       Saving the presets in an RC or INI file
-* sample rcfile::       Creating a sample RC or INI file
+* loading rcfile::      configuration file presets
+* saving rcfile::       Saving the presets into a configuration file
+* sample rcfile::       Creating a sample configuration file
 * environrc::           environment variable presets
 @end menu
 
 @node loading rcfile
-@subsection RC or INI file presets
+@subsection configuration file presets
 @cindex rcfile
 
 Initialization files are enabled by specifying the program attribute
@@ -4134,9 +4134,9 @@ homerc = "$$/../share/autogen";
 
 @noindent
 will cause the AutoOpts library to look in the normal autogen datadir
-for an initialization file.
+for an configuration file.
 
-The initialization files are processed in the order they are specified by
+The configuration files are processed in the order they are specified by
 the @code{homerc} attribute, so that each new file will normally override
 the settings of the previous files.  This may be overridden by marking some
 options for @code{immediate action} (@pxref{Immediate Action}).  Any such
@@ -4150,11 +4150,11 @@ Initialization file processing can be completely suppressed by specifying
 @code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
 the environment (if @code{environrc} has been specified).
 
-Initialization files may be sectioned.
-@cindex sectioned ini file
+Configuration files may be sectioned.
+@cindex sectioned config file
 If, for example, you have a collection of programs that work closely
 together and, likely, have a common set of options, these programs may use a
-single, sectioned, initialization file.  It may be partitioned by lines that
+single, sectioned, configuration file.  It may be partitioned by lines that
 commence with the square open bracket (@code{[}).  All text before the first
 such a line is always processed.  Once such a line is found, the
 @strong{upper-cased} c-variable-syntax program name will be compared against
@@ -4167,16 +4167,16 @@ For example, if the @code{fumble-stumble} options had a sectioned RC file,
 then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
 
 @node saving rcfile
-@subsection Saving the presets in an RC or INI file
+@subsection Saving the presets into a configuration file
 
-When initialization files are enabled for an application, the user is
+When configuration files are enabled for an application, the user is
 also provided with an automatically supplied @code{--save-opts} option.
 All of the known option state will be written to either the specified
 output file or, if it is not specified, then to the last specified
 @code{homerc} file.
 
 @node sample rcfile
-@subsection Creating a sample RC or INI file
+@subsection Creating a sample configuration file
 @cindex sample rcfile
 
 AutoOpts is shipped with a template named, @file{rc-sample.tpl}.
