@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: agCgi.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -165,7 +165,7 @@ loadCgi( void )
     }
 
     pBaseCtx->lineNo     = 1;
-    pBaseCtx->pzFileName = "@@ CGI Definitions @@";
+    pBaseCtx->pzCtxFname = "@@ CGI Definitions @@";
     pBaseCtx->pzScan     = pBaseCtx->pzData;
 }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: defLex.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -121,7 +121,6 @@ scanAgain:
         {
             tScanCtx* pCX = pCurCtx;
             pCurCtx = pCurCtx->pCtx;
-            AGFREE( (void*)pCX->pzFileName );
             pCX->pCtx = pDoneCtx;
             pDoneCtx  = pCX;
         }
@@ -272,7 +271,7 @@ scanAgain:
 NUL_error:
 
     AG_ABEND( aprf( zErrMsg, pzProg, "unterminated quote in definition",
-                    pCurCtx->pzFileName, pCurCtx->lineNo ));
+                    pCurCtx->pzCtxFname, pCurCtx->lineNo ));
     return DP_EV_INVALID;
 
 lex_done:
@@ -326,7 +325,7 @@ yyerror( char* s )
                     "\t[[...<error-text>]] %s\n\n"
                     "Likely causes:  a mismatched quote, a value that needs "
                     "quoting,\n\t\tor a missing semi-colon\n",
-                    s, pCurCtx->pzFileName, pCurCtx->lineNo, pz,
+                    s, pCurCtx->pzCtxFname, pCurCtx->lineNo, pz,
                     pCurCtx->pzScan ));
 }
 
@@ -347,7 +346,7 @@ loadScheme( void )
     *pzEnd = NUL;
     procState = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
-        pzText, pCurCtx->pzFileName, pCurCtx->lineNo );
+        pzText, pCurCtx->pzCtxFname, pCurCtx->lineNo );
     procState = PROC_STATE_LOAD_DEFS;
     *pzEnd = endCh;
 
@@ -403,7 +402,7 @@ alist_to_autogen_def( void )
      */
     procState = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
-        pzText, pCurCtx->pzFileName, pCurCtx->lineNo );
+        pzText, pCurCtx->pzCtxFname, pCurCtx->lineNo );
 
     /*
      *  The result *must* be a string, or we choke.
@@ -429,7 +428,7 @@ alist_to_autogen_def( void )
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR( pCtx->pzFileName, zSchemeText, "scheme text" );
+    AGDUPSTR( pCtx->pzCtxFname, zSchemeText, "scheme text" );
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
@@ -514,7 +513,7 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
             if (pz == (unsigned char*)pzScan)
                 AG_ABEND( aprf( "%s Error: Invalid input char '%c' "
                                 "in %s on line %d\n", pzProg, *pzScan,
-                                pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                pCurCtx->pzCtxFname, pCurCtx->lineNo ));
 
             *pRetVal = DP_EV_VAR_NAME;
         } else {
@@ -583,7 +582,7 @@ assembleHereString( char* pzScan )
     while (isspace( *pzScan )) {
         if (*pzScan++ == '\n')
             AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
-                            pCurCtx->pzFileName, pCurCtx->lineNo ));
+                            pCurCtx->pzCtxFname, pCurCtx->lineNo ));
     }
 
     /*
@@ -595,13 +594,13 @@ assembleHereString( char* pzScan )
             if (++markLen >= sizeof(zMark))
                 AG_ABEND( aprf( zErrMsg, pzProg, "HereString mark "
                                 STR( MAX_HEREMARK_LEN ) " or more chars",
-                                pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                pCurCtx->pzCtxFname, pCurCtx->lineNo ));
 
             *(pz++) = *(pzScan++);
         }
         if (markLen == 0)
             AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
-                            pCurCtx->pzFileName, pCurCtx->lineNo ));
+                            pCurCtx->pzCtxFname, pCurCtx->lineNo ));
         *pz = NUL;
     }
 
@@ -614,11 +613,12 @@ assembleHereString( char* pzScan )
     pzScan = strchr( pzScan, '\n' );
     if (pzScan == NULL)
         AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                        pCurCtx->pzFileName, pCurCtx->lineNo ));
+                        pCurCtx->pzCtxFname, pCurCtx->lineNo ));
 
     /*
      *  And skip the first new line + conditionally skip tabs
      */
+    pCurCtx->lineNo++;
     pzScan++;
 
     if (trimTabs)
@@ -640,7 +640,7 @@ assembleHereString( char* pzScan )
 
             case NUL:
                 AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                                pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                pCurCtx->pzCtxFname, pCurCtx->lineNo ));
             }
         } lineDone:;
 

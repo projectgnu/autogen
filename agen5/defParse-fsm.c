@@ -576,8 +576,8 @@ dp_do_tpl_name(
     if (rootDefCtx.pDefs == NULL) {
         tSCC   zBogus[] = "@BOGUS@";
         static tDefEntry seed = {
-            NULL, NULL, NULL, NULL, (char*)zBogus, VALTYP_BLOCK, 0,
-            { NULL } };
+            NULL, NULL, NULL, NULL, (char*)zBogus, 0, { NULL },
+            (char*)zBogus, 0, VALTYP_BLOCK };
 
         rootDefCtx.pDefs = &seed;
 

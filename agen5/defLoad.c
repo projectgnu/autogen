@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: defLoad.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -225,7 +225,9 @@ findPlace( char* name, tCC* pzIndex )
     }
 
     strtransform( pE->pzDefName, pE->pzDefName );
-    pE->valType   = VALTYP_UNKNOWN;
+    pE->valType     = VALTYP_UNKNOWN;
+    pE->pzSrcFile   = (char*)pCurCtx->pzCtxFname;
+    pE->srcLineNum  = pCurCtx->lineNo;
     return (pCurrentEntry = insertDef( pE ));
 }
 
@@ -247,7 +249,7 @@ readDefines( void )
         pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "scan context" );
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
         pBaseCtx->lineNo     = 1;
-        pBaseCtx->pzFileName = "@@ No-Definitions @@";
+        pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
         return;
     }
 
@@ -398,7 +400,7 @@ readDefines( void )
         AG_ABEND( "No definition data were read" );
 
     *pzData = NUL;
-    AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ), "def file name" );
+    AGDUPSTR( pBaseCtx->pzCtxFname, OPT_ARG( DEFINITIONS ), "def file name" );
 
     /*
      *  Close the input file, parse the data

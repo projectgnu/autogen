@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.2 2005/01/09 03:20:27 bkorb Exp $
+ *  $Id: autogen.h,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -214,8 +214,8 @@ typedef enum {
 
 typedef struct sDefCtx tDefCtx;
 struct sDefCtx {
-    tDefEntry* pDefs;        /* ptr to current def set     */
-    tDefCtx*   pPrev;        /* ptr to previous def set    */
+    tDefEntry* pDefs;           /* ptr to current def set     */
+    tDefCtx*   pPrev;           /* ptr to previous def set    */
 };
 
 typedef union {
@@ -224,20 +224,22 @@ typedef union {
 } uDefValue;
 
 struct defEntry {
-    tDefEntry* pNext;        /* next member of same level  */
-    tDefEntry* pTwin;        /* next member with same name */
-    tDefEntry* pPrevTwin;    /* previous memb. of level    */
-    tDefEntry* pEndTwin;     /* head of chain to end ptr   */
-    char*      pzDefName;    /* name of this member        */
-    teValType  valType;      /* text/block/not defined yet */
-    long       index;        /* index among twins          */
-    uDefValue  val;          /* string or list of children */
+    tDefEntry* pNext;           /* next member of same level  */
+    tDefEntry* pTwin;           /* next member with same name */
+    tDefEntry* pPrevTwin;       /* previous memb. of level    */
+    tDefEntry* pEndTwin;        /* head of chain to end ptr   */
+    char*      pzDefName;       /* name of this member        */
+    long       index;           /* index among twins          */
+    uDefValue  val;             /* string or list of children */
+    char*      pzSrcFile;       /* definition file name       */
+    int        srcLineNum;      /* def file source line       */
+    teValType  valType;         /* text/block/not defined yet */
 };
 
 struct scanContext {
     tScanCtx*   pCtx;
     char*       pzScan;
-    tCC*        pzFileName;
+    tCC*        pzCtxFname;
     char*       pzData;
     int         lineNo;
 };
@@ -248,11 +250,11 @@ struct outSpec {
     char        zSuffix[ 1 ];
 };
 
-#define FPF_FREE       0x0001  /* free the fp structure   */
-#define FPF_UNLINK     0x0002  /* unlink file (temp file) */
-#define FPF_NOUNLINK   0x0004  /* do not unlink file      */
-#define FPF_STATIC_NM  0x0008  /* name statically alloced */
-#define FPF_NOCHMOD    0x0010  /* do not chmod(2) file    */
+#define FPF_FREE       0x0001   /* free the fp structure   */
+#define FPF_UNLINK     0x0002   /* unlink file (temp file) */
+#define FPF_NOUNLINK   0x0004   /* do not unlink file      */
+#define FPF_STATIC_NM  0x0008   /* name statically alloced */
+#define FPF_NOCHMOD    0x0010   /* do not chmod(2) file    */
 
 struct fpStack {
     int         flags;

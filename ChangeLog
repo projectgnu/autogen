@@ -1,3 +1,19 @@
+2004-01-16  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h(tDefCtx): change name of file name to be unique
+	(tDefEntry): reorder to put int values at end and add definition
+	file name and line number.
+	* agen5/*: s/tDefCtx.pzFileName/tDefCtx.pzCtxFname/
+	* agen5/autogen.c(signalSetup): parameterize the functions to call
+	upon signal receipt so that core dumps can happen.
+	* agen5/defLoad.c(findPlace): insert def file name and line number
+	* agen5/defParse-fsm.c(dp_do_tpl_name): modify definitions root init.
+	* agen5/expState.c(ag_scm_def_file_line): new function to take advantage
+	of the new fields in the tDefEntry structure.
+	* agen5/test/heredef.test: test the definition file/line stuff
+	* agen5/defLex.c(assembleHereString): count the newline at the end
+	of the here string token, too.
+
 2004-01-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am(configfile.c): new file

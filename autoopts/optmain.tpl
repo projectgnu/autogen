@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+# $Id: optmain.tpl,v 4.2 2005/01/17 01:12:08 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -263,7 +263,7 @@ static int
 [= handler-proc =]( const char* pz_entry )
 {
     int res = 0;
-[= (prefix "    " (get (string-append (get "handler-proc") "-code"))) =]
+[= (get (string-append (get "handler-proc") "-code")) =]
     return res;
 }[=
 

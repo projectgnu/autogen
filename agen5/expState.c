@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: expState.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -263,7 +263,7 @@ ag_scm_count( SCM obj )
 SCM
 ag_scm_def_file( void )
 {
-    return gh_str02scm( (char*)(void*)pBaseCtx->pzFileName );
+    return gh_str02scm( (char*)(void*)pBaseCtx->pzCtxFname );
 }
 
 
@@ -546,7 +546,7 @@ ag_scm_tpl_file( SCM full )
 
 /*=gfunc tpl_file_line
  *
- * what:   get the template file and line number
+ * what:   get the template file+line number
  *
  * exparg: msg-fmt, formatting for line message, optional
  *
@@ -554,11 +554,10 @@ ag_scm_tpl_file( SCM full )
  *
  *  Returns the file and line number of the current template macro using either
  *  the default format, "from %s line %d", or else the format you supply.
- *  For example, if you want to insert a "C" language file-line directive,
- *  you would supply the format "# %2$d %1$s".  With the current version of
+ *  For example, if you want to insert a "C" language file-line directive, you
+ *  would supply the format "# %2$d \"%1$s\"".  With the current version of
  *  AutoGen, it is even safe to use the formatting string, "%2$d".  AutoGen
- *  uses an argument vector version of printf:  @xref{snprintfv}.
-=*/
+ *  uses an argument vector version of printf: @xref{snprintfv}.  =*/
 SCM
 ag_scm_tpl_file_line( SCM fmt )
 {
@@ -589,6 +588,68 @@ ag_scm_tpl_file_line( SCM fmt )
         SCM res = gh_str02scm( pz );
         if (pz != zScribble)
             AGFREE( (void*)pz );
+
+        return res;
+    }
+}
+
+
+/*=gfunc def_file_line
+ *
+ * what:   get a definition file+line number
+ *
+ * exparg: ag-name, name of AutoGen value
+ * exparg: msg-fmt, formatting for line message, optional
+ *
+ * doc:
+ *
+ *  Returns the file and line number of a AutoGen defined value, using either
+ *  the default format, "from %s line %d", or else the format you supply.
+ *  For example, if you want to insert a "C" language file-line directive, you
+ *  would supply the format "# %2$d \"%1$s\"".  With the current version of
+ *  AutoGen, it is even safe to use the formatting string, "%2$d".  AutoGen
+ *  uses an argument vector version of printf: @xref{snprintfv}.  =*/
+SCM
+ag_scm_def_file_line( SCM obj, SCM fmt )
+{
+    tSCC    zFmt[]  = "from %s line %d";
+    tCC*    pzFmt   = zFmt;
+    char    zScribble[ 1024 ];
+    char*   pzScrib = zScribble;
+
+    tDefEntry*  pE;
+    ag_bool     x;
+
+    pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &x );
+
+    /*
+     *  IF we did not find the entry we are looking for
+     *  THEN return UNDEFINED
+     */
+    if (pE == NULL)
+        return SCM_UNDEFINED;
+
+    if (gh_string_p( fmt ))
+        pzFmt = ag_scm2zchars( fmt, "file/line format" );
+
+    {
+        size_t  maxlen = strlen( pE->pzSrcFile )
+                       + strlen( pzFmt ) + 4 * sizeof( int );
+        if (maxlen >= sizeof( zScribble ))
+            pzScrib = (char*)AGALOC( maxlen, "file-line buffer" );
+    }
+
+    {
+        void* args[2];
+        args[0] = (void*)pE->pzSrcFile;
+        args[1] = (void*)pE->srcLineNum;
+        sprintfv( pzScrib, pzFmt, (snv_constpointer*)args  );
+    }
+
+    {
+        SCM res = gh_str02scm( pzScrib );
+        if (pzScrib != zScribble)
+            AGFREE( (void*)pzScrib );
 
         return res;
     }

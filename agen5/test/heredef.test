@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Time-stamp:        "2005-01-16 14:16:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
+# Last Modified:     $Date: 2005/01/17 01:12:08 $
 #            by: bkorb
 #
-# $Id: heredef.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: heredef.test,v 4.2 2005/01/17 01:12:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -35,18 +35,25 @@ cat > ${testname}.tpl <<'_EOF_'
     (error (sprintf "`%s' <> `%s'"
                     (get "string1") (get "string2") ))  )
 =>OKAY:  <= (c-string (get "string3")) =>
+FROM:  string1 extracted <= (def-file-line "string1") =>
+       string2 extracted<=  (def-file-line "string2" "\n#line %2$d \"%s\"") =>
+       string3 extracted <= (def-file-line "string3") =>
 _EOF_
 
 # # # # # # # # # # SAMPLE FILE # # # # # # # # #
 cat > ${testname}.sample <<\_EOF_
 OKAY:  "\"`Testing'"
+FROM:  string1 extracted from heredef.def line 3
+       string2 extracted
+#line 7 "heredef.def"
+       string3 extracted from heredef.def line 11
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 # Create the files we need in the test environment
 echo "AutoGen definitions ${testname};" > ${testname}.def
-cat >> ${testname}.def <<'_EOF_'
+cat >> ${testname}.def <<\_EOF_
 
 string1 = <<- AG_EOF
 	"`Testing'

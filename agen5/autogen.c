@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: autogen.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -32,6 +32,8 @@ tSCC* apzStateName[] = { STATE_TABLE };
 #undef _State_
 
 static sigjmp_buf  abendJumpEnv;
+typedef void (sighandler_proc_t)( int sig );
+static sighandler_proc_t ignoreSignal, abendSignal;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -42,16 +44,10 @@ static void
 signalExit( int sig );
 
 static void
-abendSignal( int sig );
-
-static void
-ignoreSignal( int sig );
-
-static void
 doneCheck( void );
 
 static void
-signalSetup( void );
+signalSetup( sighandler_proc_t*, sighandler_proc_t* );
 /* = = = END-STATIC-FORWARD = = = */
 
 static void
@@ -96,13 +92,12 @@ main( int    argc,
             signalExit( signo );
     }
 
-    signalSetup();
+    signalSetup( ignoreSignal, abendSignal );
 
     gh_enter( argc, argv, inner_main );
     /* NOT REACHED */
     return 0;
 }
-
 
 static void
 signalExit( int sig )
@@ -158,7 +153,8 @@ signalExit( int sig )
         fprintf( stderr, zAt, pzFl, line, pzFn, fnCd );
     }
 
-    exit( sig + 128 );
+    signalSetup( SIG_DFL, SIG_DFL );
+    abort();
 }
 
 
@@ -345,12 +341,14 @@ ag_abend_at( tCC* pzMsg
 
 
 static void
-signalSetup( void )
+signalSetup( sighandler_proc_t* chldHandler,
+             sighandler_proc_t* dfltHandler )
 {
     struct sigaction  sa;
     int    sigNo = 1;
 
     atexit( doneCheck );
+
     sa.sa_flags   = 0;
     sigemptyset( &sa.sa_mask );
 
@@ -369,7 +367,7 @@ signalSetup( void )
 #  define SIGCHLD SIGCLD
 #endif
         case SIGCHLD:
-            sa.sa_handler = ignoreSignal;
+            sa.sa_handler = chldHandler;
             break;
 
             /*
@@ -409,7 +407,7 @@ signalSetup( void )
 #endif
 
         default:
-            sa.sa_handler = abendSignal;
+            sa.sa_handler = dfltHandler;
         }
         sigaction( sigNo,  &sa, NULL );
     } while (++sigNo < NSIG);
