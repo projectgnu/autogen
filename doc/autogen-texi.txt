@@ -936,29 +936,75 @@ these by defining their own macros.  @xref{DEFINE}.
 @section Format of the Pseudo Macro
 @cindex pseudo macro
 
-The pseudo-macro starts with up to seven (7) punctuation characters used
-for the template start-macro marker, followed by the autogen magic
-marker (@code{autogen5}), the template marker (@code{template}), zero or
-more suffix specifications, scheme expressions and the end-macro marker.
-It may also consist of up to seven (7) punctuation characters.  Interspersed
-may be comment lines (blank lines or lines starting with a hash mark
-[@code{#}]) and edit mode markers (text between pairs of @code{-*-}
-characters).
+The pseudo macro is used to tell AutoGen how to process a template.
+It tells autogen:
 
-As an example, assume we want to use @code{[+} and @code{+]} as the start
-and end macro markers, and we wish to produce a @file{.c} and a @file{.h}
-file, then the first macro invocation will look something like this:
+@enumerate
+@item
+The punctuation characters used to demarcate the start of a macro.
+It may be up to seven characters long and must be the first non-whitespace
+characters in the file.
+
+@item
+That start marker must be immediately followed by the marker strings
+"AutoGen5" and then "template", though capitalization is not important.
+@end enumerate
+
+@noindent
+The next several components may be intermingled:
+
+@enumerate 3
+@item
+Zero, one or more suffix specifications tell AutoGen how many times to
+process the template file.  No suffix specifications mean that it is to
+be processed once and that the generated text is to be written to
+stdout.  The current suffix for each pass can be determined with the
+@code{(suffix)} scheme function (@pxref{SCM suffix}).
+
+The suffix specification consists of a sequence of POSIX compliant file name
+characters and, optionally, an equal sign and a file name "printf"-style
+formatting string.  Two string arguments are allowed for that string:
+the base name of the definition file and the current suffix (that being
+the text to the left of the equal sign).  (Note:  "POSIX compliant file
+name characters" consist of alphanumerics plus the period (@code{.}),
+hyphen (@code{-}) and underscore (@code{_}) characters.)
+
+@item
+Comment lines:  blank lines, lines starting with a hash mark [@code{#}]),
+and edit mode comments (text between pairs of @code{-*-} strings).
+
+@item
+Scheme expressions may be inserted in order to make configuration
+changes before template processing begins.
+It is used, for example, to allow the template writer to specify
+the shell program that must be used to interpret the shell commands in
+the template.  It can have no effect on any shell commands in the 
+definitions file, as that file will have been processed by the time
+the pseudo macro is interpreted. 
 
 @example
-[+ AutoGen5 template -*- Mode: emacs-mode-of-choice -*-
-h=chk-%s.h
-c
-# make sure we don't use csh:
-(setenv "SHELL" "/bin/sh")  +]
+(setenv "SHELL" "/bin/sh")
 @end example
 
 @noindent
-Note@:  It is generally a good idea to use some sort of opening
+This is extremely useful to ensure that the shell used is the one the
+template was written to use.  By default, AutoGen determines the shell
+to use by user preferences.  Sometimes, that can be the "csh", though.
+
+The scheme expression can also be used to save a pre-existing output
+file for later text extraction (@pxref{SCM extract}).
+
+@example
+(shellf "mv -f %1$s.c %1$s.sav" (base-name))
+@end example
+
+@item
+Finally, the end-macro marker must be last.  It must not begin with a
+POSIX file name character, and if it begins with an equal sign, then it
+must be separated from any suffix specification by white space.
+@end enumerate
+
+It is generally a good idea to use some sort of opening
 bracket in the starting macro and closing bracket in the ending
 macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
 in the starting macro).  It helps both visually and with editors
@@ -973,59 +1019,21 @@ advisable to avoid using any of the quote characters@:  double,
 single or back-quote.  But there is no special check for any of
 these advisories.
 
-@noindent
-Detailed description:
-
-The starting macro marker must be the first non-white space characters
-encountered in the file.  The marker consists of all the contiguous
-ASCII punctuation characters found there.  With optional intervening
-white space, this marker must be immediately followed by the keywords,
-"autogen5" and "template".  Capitalization of these words is not
-important.  This is followed by zero, one or more suffix specifications
-and, possibly, a scheme expression.
-
-Suffix specifications consist of a sequence of POSIX compliant file name
-characters and, optionally, an equal sign and a file name "printf"-style
-formatting string.  Two string arguments are allowed for that string:
-the base name of the definition file and the current suffix (that being
-the text to the left of the equal sign).  (Note@: "POSIX compliant file
-name characters" consist of alphanumerics plus the period (@code{.}),
-hyphen (@code{-}) and underscore (@code{_}) characters.)  If there are
-no suffix specifications, then the generated file will be written to the
-stdout file descriptor.
-
-The scheme expression is intended to allow the template writer to specify
-the shell program that must be used to interpret the shell commands in
-the template.  It can have no effect on any shell commands in the 
-definitions file, as that file will have been processed by the time
-the pseudo macro is interpreted.  You can specify the shell as follows:
+As an example, assume we want to use @code{[+} and @code{+]} as the start
+and end macro markers, and we wish to produce a @file{.c} and a @file{.h}
+file, then the first macro invocation will look something like this:
 
 @example
-(setenv "SHELL" "/bin/sh")
+[+ AutoGen5 template -*- Mode: emacs-mode-of-choice -*-
+h=chk-%s.h
+c
+# make sure we don't use csh:
+(setenv "SHELL" "/bin/sh")  +]
 @end example
-
-@noindent
-This works because AutoGen examines the value of the SHELL environment
-variable in order to select the shell to run.  If that shell is allowed
-to be @code{csh}, AutoGen will break.  If it is allowed to be @code{zsh},
-AutoGen may break.  Your milage may vary.
-
-The pseudo macro ends with an end macro marker.  Like the starting macro
-marker, it consists of a contiguous sequence of arbitrary punctuation
-characters.  However, additionally, it may not begin with any of the
-POSIX file name characters and it may not contain the start macro
-marker.
-
-This pseudo macro may appear on one or several lines of text.
-Intermixed may be comment lines (completely blank or starting with the
-hash character @code{#} in column 1), and file content markers (text
-between @code{-*-} pairs on a single line).  This may be used to
-establish editing "modes" for the file.  These are ignored by
-AutoGen.
 
 The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
-character after the new-line that follows the end macro marker.
+character after the newline that follows the end macro marker.
 
 @node naming values
 @section Naming a value
