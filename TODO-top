@@ -1,5 +1,15 @@
 #  -*- Mode: Outline -*-
 
+* Known Bugs
+
+** There is a bug in the regex library config code, where the macros for
+   determining whether a posix regcomp/regexec are present, and whether
+   the user has specified a library explicity with --with-regex-prefix
+   (et. al.) don't cooperate, so you don't always get the option you ask
+   for.   We should test for user specified libraries first, and then
+   test those for POSIX compliance with the other macros, falling back to
+   the included regex files if these tests fail.
+
 * In Progress
 
 *** Need to replace use of sprintf w/ snprintf throughout!
@@ -8,6 +18,7 @@
 
 * Pending
 
+** Manual pages should be installed.
 ** new arg for setting time of output files
 ** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 ** Rework the shell string processing in the definitions file so
