@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.6 1999/10/30 18:10:20 bruce Exp $
+ *  $Id: funcDef.c,v 1.7 1999/10/30 21:45:58 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -570,14 +570,18 @@ MAKE_HANDLER_PROC( Invoke )
     return mFunc_Define( pT, pMac, pCurDef );
 }
 
-/*=gfunc invoke
+/*=gfunc ag_invoke
+ *
+ * exparg: macro, name of macro to invoke
+ * exparg: args,  macro arguments, optional, ellipsis
+ * ellipsis:
  *
  * opt:  0
  * var:  1
  * doc:  Invoke an AutoGen macro and put the results into a string.
 =*/
     SCM
-ag_scm_invoke( SCM macName, SCM list )
+ag_scm_ag_invoke( SCM macName, SCM list )
 {
     SCM         res = SCM_UNDEFINED, car;
     tTemplate*  pT;
