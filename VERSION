@@ -11,10 +11,10 @@
 # by:                Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
 
-AG_MAJOR_VERSION=4
-AG_MINOR_VERSION=5
+AG_MAJOR_VERSION=5
+AG_MINOR_VERSION=0
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".10"
+AG_PATCHLEVEL=""
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -37,7 +37,7 @@ AO_LIBRARY=libopts.la
 AO_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 
 AO_CURRENT=5
-AO_REVISION=1
+AO_REVISION=0
 AO_AGE=2
 
 MAINTAINER='Bruce Korb <autogen@linuxbox.com>'
