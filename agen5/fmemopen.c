@@ -294,12 +294,12 @@ fmem_seek (void *cookie, fmem_off_t *p, int dir)
     case SEEK_CUR: new_pos = pFMC->next_ix  + *p;  break;
     case SEEK_END: new_pos = pFMC->buf_size - *p;  break;
 
-    case FMEM_IOCTL_BUF_ADDR:
-        *(char**)p_offset = pFMC->buffer;
-        return 0;
-
     case FMEM_IOCTL_SAVE_BUF:
         pFMC->mode.allocated = 0;
+        /* FALLTHROUGH */
+
+    case FMEM_IOCTL_BUF_ADDR:
+        *(char**)p_offset = pFMC->buffer;
         return 0;
 
     default:       goto seek_oops;
