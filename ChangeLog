@@ -1,3 +1,9 @@
+2003-02-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/equiv.test: Some seds leave no space at
+	the start of the line.  Accommodate.
+	* pkg/libopts/mklibsrc.sh: Accommodate systems without gzip
+
 2003-02-04  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/heredef.test: quote the heredoc marker and compare
