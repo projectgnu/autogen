@@ -29,6 +29,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
+* FAQ::                  Hints, helps and FAQs
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::       Function index
@@ -952,7 +953,7 @@ file, then the first macro invocation will look something like this:
 h=chk-%s.h
 c
 # make sure we don't use csh:
-(setup "SHELL" "/bin/sh")  +]
+(setenv "SHELL" "/bin/sh")  +]
 @end example
 
 @noindent
@@ -1059,121 +1060,137 @@ If someone rewrites this, I'll incorporate it.  :-)
 @section Macro Expression Syntax
 @cindex expression syntax
 
+AutoGen has two types of expressions:  full expressions and basic ones.
+A full AutoGen expression can appear by itself, or as the argument
+to certain AutoGen built-in macros:  CASE, IF, ELIF, INCLUDE,
+INVOKE (explicit invocation, @pxref{INVOKE}), and WHILE.
+If it appears by itself, the result is inserted into the output.
+If it is an argument to one of these macros, the macro code
+will act on it sensibly.
+
+You are constrained to basic expressions only when passing
+arguments to user defined macros, @xref{DEFINE}.
+
 The syntax of a full AutoGen expression is:
 
 @example
-[[ <apply-code> ] <value-name> ] [ <simple-expr-1> [ <simple-expr-2> ]]
+[[ <apply-code> ] <value-name> ] [ <basic-expr-1> [ <basic-expr-2> ]]
 @end example
-@noindent
-Where
+
+How the expression is evaluated depends upon the presence or absence
+of the apply code and value name.  The "value name" is the name of
+an AutoGen defined value, or not.  If it does not name such a value,
+the expression result is generally the empty string.  All expressions
+must contain either a @code{value-name} or a @code{basic-expr}.
+
+@menu
+* apply code::           Apply Code
+* basic expression::     Basic Expression
+@end menu
+
+@node apply code
+@subsection Apply Code
+
+The "apply code" selected determines the method of evaluating the
+expression.  There are five apply codes, including the non-use
+of an apply code.
+
 @table @samp
-@item <apply-code>
-is any of @code{-}, @code{?}, @code{%} or @code{?%} (see below).
+@item no apply code
+This is the most common expression type.
+Expressions of this sort come in three flavors:
+
+@table @samp
 @item <value-name>
-is a (possibly unknown) AutoGen value name (@xref{naming values},
-and @pxref{EXPR}).  In this context, the name may not contain any
-white space.
-@item <simple-expr-1>
-is either a Scheme expression starting with @code{;} or @code{(};
-a shell expression surrounded with @code{`}; or a string, quoted or
-unquoted.
-@item <simple-expr-2>
-is as above, but only if the @code{?} or @code{?%} apply-code has
-been specified.
+The result is the value of @code{value-name}, if defined.
+Otherwise it is the empty string.
+
+@item <basic-expr>
+The result of the basic expression is the result of the full expression,
+@xref{basic expression}.
+
+@item <value-name> <basic-expr>
+If there is a defined value for @code{value-name}, then the @code{basic-expr}
+is evaluated.  Otherwise, the result is the empty string.
 @end table
 
-There are some places where only a simple expression (i.e. just the
-@code{<simple-expr-1>} clause) is allowed.  I hope I have clearly
-marked which macros have those requirements.  Otherwise, in the
-macro descriptions that follow, a @i{full expression} refers to
-what we are describing here.
+@item % <value-name> <basic-expr>
+If @code{value-name} is defined, use @code{basic-expr} as a format
+string for sprintf.  Then, if the @code{basic-expr} is either a back-quoted
+string or a parenthesized expression, then hand the result to the
+appropriate interpreter for further evaluation.  Otherwise, for single
+and double quote strings, the result is the result of the sprintf operation.
+Naturally, if @code{value-name} is not defined, the result is the empty
+string.
 
-The result of the expression evaluation will depend on what apply code
-has been provided, whether or not there is an associated value
-for the value name, and whether or not expressions are specified.
+For example, assume that @code{foo} had the string value, @code{bar}:
+@example
+[+ % foo `printf '%%x\\n' $%s` +]
+@end example
+This would cause the shell to evaluate "@code{printf '%x\n' $bar}".
+Assuming that the shell variable @code{bar} had a numeric value,
+the expression result would be that number, in hex.  Note the need
+for doubled percent characters and backslashes.
 
-The syntax rules are:
+@item ? <value-name> <basic-expr-1> <basic-expr-2>
+Two @code{basic-expr}-s are required.  If the @code{value-name} is
+defined, then the first @code{basic-expr-1} is evaluated, otherwise
+@code{basic-expr-2} is.
 
-@enumerate
-@item
-The expression may not be empty.
-@item
-If no value name is provided, then the rest of the macro is presumed to
-be an expression and is evaluated.  It usually must start with one of
-the expression processing characters.  See below.
-@item
-If no expression is provided, then there must be a value name
-and there may not be an apply code.  The result will either be
-the empty string, or the AutoGen value associated with value name.
-@item
-If the apply code is either @code{?} or @code{?%}, then two
-expressions must be provided, otherwise only one expression
-may be provided.
-@end enumerate
+@item - <value-name> <basic-expr>
+Evaluate @code{basic-expr} only if @code{value-name} is @i{not} defined.
 
-The apply codes used are as follows:
+@item ?% <value-name> <basic-expr-1> <basic-expr-2>
+This combines the functions of @samp{?} and @samp{%}.  If @code{value-name} is
+defined, it behaves exactly like @samp{%}, above, using @code{basic-expr-1}.
+If not defined, then @code{basic-expr-2} is evaluated.
 
-@table @samp
-@item @code{-}
-The expression that follows the value name will be processed
-only if the named value is @strong{not} found.
-
-@item @code{?}
-There must be @strong{two} space separated expressions following
-the value name.  The first is selected if the value name is found,
-otherwise the second expression is selected.
-
-@item @code{%}
-The first expression that follows the name will be used as a
-format string to sprintf.  The data argument will be the value
-named after the @code{%} character.
-
-@item @code{?%}
-This combines the functions of @code{?}and @code{%}, but for
-obvious reasons, only the first expression will be used as a
-format argument.
-
-@item not-supplied
-The macro will be skipped if there is no AutoGen value associated with
-the @code{<value-name>}.  If there is an associated value, then the
-expression result is the result of evaluating @code{<expression-1>}
-(if present), otherwise it is the value associated with
-@code{<value-name>}.
+For example, assume again that @code{foo} had the string value, @code{bar}:
+@example
+[+ ?% foo `cat $%s` `pwd` +]
+@end example
+This would cause the shell to evaluate "@code{cat $bar}".
+If @code{foo} were not defined, then the result would be the name
+of our current directory.
 @end table
 
-The simple expression clauses are interpreted differently,
-depending on the first character:
+@node basic expression
+@subsection Basic Expression
+
+A basic expression can have one of the following forms:
 
 @table @samp
-@item @code{;} (semi-colon)
-This is a Scheme comment character and must preceed Scheme code.
-AutoGen will strip it and pass the result to the Guile Scheme
-interpreter.
+@item 'STRING'
+A single quoted string.  Backslashes can be used to protect single
+quotes (@code{'}), hash characters (@code{#}), or backslashes (@code{\})
+in the string.  All other characters of STRING are output as-is when the
+single quoted string is evaluated.  Backslashes are processed before the hash
+character for consistency with the definition syntax.  It is needed there
+to avoid preprocessing conflicts.
 
-@item @code{(} (open parenthesis)
-This is a Scheme expression.  Guile will interpret it.
-The expression must end before the end macro marker.
+@item "STRING"
+A double quoted string.  This is a cooked text string as in C,
+except that they are not concatenated with adjacent strings.
+Evaluating "@code{STRING}" will output STRING with all
+backslash sequences interpreted.
 
-@item @code{'} (single quote)
-This is a @i{fairly} raw text string.  It is not completely raw
-because backslash escapes are processed before 3 special characters:
-single quote (@code{'}), the hash character (@code{#}) and
-backslash (@code{\}).
+@item `STRING`
+A back quoted string.  When this expression is evaluated, STRING
+is first interpreted as a cooked string (as in `"STRING"') and
+evaluated as a shell expression by the AutoGen server shell.  This
+expression is replaced by the stdout output of
+the shell.
 
-@item @code{"} (double quote)
-This is a cooked text string.  The string is processed as in a
-K and R quoted string.  That is to say, adjacent strings are not
-concatenated together.
+@item (STRING)
+A parenthesized expression.  It will be passed to the Guile
+interpreter for evaluation and replaced by the resulting value.
 
-@item @code{`} (back quote)
-This is a shell expression.  The AutoGen server shell will
-interpret it.  The result of the expression will be the
-output of the shell script.  The string is processed as in
-the cooked string before being passed to the shell.
-
-@item anything else
-Is presumed to be a literal string.  It becomes the result
-of the expression.
+Additionally, other than in the @code{%} and @code{?%} expressions, the
+Guile expressions may be introduced with the Guile comment character
+(@code{;}) and you may put a series of Guile expressions within a single
+macro.  They will be implicitly evaluated as if they were arguments
+to the @code{(begin ...)} expression.  The result will be the the
+result of the last Guile expression evaluated.
 @end table
 
 @ignore
@@ -1695,10 +1712,12 @@ Since it is generally easier to start with a simple example than it is
 to look at the options that AutoGen uses itself, here is a very simple
 AutoOpts example.  You can copy this example out of the Info file and
 into a source file to try it.  You can then embellish it into what you
-really need.
+really need.  For more extensive examples, you can also examine the help
+output and option definitions for the commands @code{columns},
+@code{getdefs} and @code{autogen} itself.
 
-Assume you have a program named @code{check} that takes
-two options:
+For our simple example, assume you have a program named @code{check}
+that takes two options:
 
 @enumerate
 @item
@@ -2696,7 +2715,7 @@ The user interface for access to the argument information is completely
 defined in the generated header file and in the portions of the
 distributed file "options.h" that are marked "public".
 
-In the following macros, text marked @code{<OPT_NAME>} or @code{optname}
+In the following macros, text marked @code{<NAME>} or @code{name}
 is the name of the option @strong{in upper case} and @strong{segmented
 with underscores @code{_}}.  The macros and enumerations defined in the
 options header (interface) file are used as follows:
@@ -3594,6 +3613,48 @@ Extraction from autogen.texi
 START == FUTURE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
+
+@page
+@node FAQ
+@chapter Hints, helps and FAQs
+@cindex FAQ
+
+This is a collection of issues that have come up and some approaches
+to them.  As I collect more, I'll add some organization, too.
+
+@table @samp
+@item version string
+@cindex version string
+Q:  ``One [consistency issue] is the version string. It is set in configure.in
+for autoconf and in the defs file for autogen, where they really are the
+same value.''
+
+A:  There are several possible approaches.  Well, lots of approaches, but
+I'll enumerate a few here:
+
+@enumerate
+@item
+AutoGen definitions can derive their string value from the output of a
+shell script.  Therefore, you can @code{grep} and @code{sed} the
+@file{configure.ac} file.
+
+@item
+@file{configure} (@file{configure.ac}) is just a shell script, too.
+It can run a script whose purpose is to @code{echo} out the version, so
+@strong{both} @file{configure} and AutoGen can easily use the same script.
+
+@item
+You can make an @file{configure.ac.tpl} template and generate
+@file{configure.ac} from AutoGen.  This would mean, however,
+you could not run configure before this.
+
+@item
+You can make a @file{version.def.in} file and create @file{version.def}
+when you run configure.  Likewise, this would mean you would have
+to configure the product before generating any files that needed
+the version from @file{version.def}.
+@end enumerate
+@end table
 
 @page
 @node Future

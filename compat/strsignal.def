@@ -3,7 +3,7 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 2.3 2000/03/16 02:25:43 bruce Exp $
+ *  $Id: strsignal.def,v 2.4 2001/12/01 20:26:20 bkorb Exp $
  */
 
 #shell
@@ -51,8 +51,51 @@ done
 
 if test $num -lt $threshold
 then
-  echo "ERROR: cannot find signal definitions in $seen" >&2
-  echo "#error cannot find signal definitions in $seen"
+  echo "WARNING: cannot find signal definitions in $seen" >&2
+  echo "using POSIX + ANSI signal definitions" >&2
+  cat <<- _EOF_
+	signal[  1 ] = { signame = SIGHUP;
+	                 sigtext = "Hangup (POSIX)."; };
+	signal[  2 ] = { signame = SIGINT;
+	                 sigtext = "Interrupt (ANSI)."; };
+	signal[  3 ] = { signame = SIGQUIT;
+	                 sigtext = "Quit (POSIX)."; };
+	signal[  4 ] = { signame = SIGILL;
+	                 sigtext = "Illegal instruction (ANSI)."; };
+	signal[  5 ] = { signame = SIGTRAP;
+	                 sigtext = "Trace trap (POSIX)."; };
+	signal[  6 ] = { signame = SIGABRT;
+	                 sigtext = "Abort (ANSI)."; };
+	signal[  8 ] = { signame = SIGFPE;
+	                 sigtext = "Floating-point exception (ANSI)."; };
+	signal[  9 ] = { signame = SIGKILL;
+	                 sigtext = "Kill, unblockable (POSIX)."; };
+	signal[ 10 ] = { signame = SIGUSR1;
+	                 sigtext = "User-defined signal 1 (POSIX)."; };
+	signal[ 11 ] = { signame = SIGSEGV;
+	                 sigtext = "Segmentation violation (ANSI)."; };
+	signal[ 12 ] = { signame = SIGUSR2;
+	                 sigtext = "User-defined signal 2 (POSIX)."; };
+	signal[ 13 ] = { signame = SIGPIPE;
+	                 sigtext = "Broken pipe (POSIX)."; };
+	signal[ 14 ] = { signame = SIGALRM;
+	                 sigtext = "Alarm clock (POSIX)."; };
+	signal[ 15 ] = { signame = SIGTERM;
+	                 sigtext = "Termination (ANSI)."; };
+	signal[ 17 ] = { signame = SIGCHLD;
+	                 sigtext = "Child status has changed (POSIX)."; };
+	signal[ 18 ] = { signame = SIGCONT;
+	                 sigtext = "Continue (POSIX)."; };
+	signal[ 19 ] = { signame = SIGSTOP;
+	                 sigtext = "Stop, unblockable (POSIX)."; };
+	signal[ 20 ] = { signame = SIGTSTP;
+	                 sigtext = "Keyboard stop (POSIX)."; };
+	signal[ 21 ] = { signame = SIGTTIN;
+	                 sigtext = "Background read from tty (POSIX)."; };
+	signal[ 22 ] = { signame = SIGTTOU;
+	                 sigtext = "Background write to tty (POSIX)."; };
+_EOF_
+
 else
   echo "$sigs" |
   while read SIG NUM f
@@ -73,7 +116,7 @@ else
     #  We also know we are not interested in super large numbers
     #  (e.g. SIGSTKSZ 8192)
     #
-    if test ${NUM} -gt 128
+    if test ${NUM} -gt 127
     then continue ; fi
 
     eval HAVE_${NUM}=1

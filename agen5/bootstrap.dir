@@ -1,15 +1,15 @@
 #! /bin/sh
 #
 # ----------------------------------------------------------------------
-# config/bootstrap.dir --- maintainer's bootstrap script
+# agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/10/13 18:48:48 $
+# Last Modified:     $Date: 2001/12/01 20:26:19 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 1.35 2001/10/13 18:48:48 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 1.36 2001/12/01 20:26:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -251,7 +251,7 @@ do
       exit 1
     fi
     echo ${AG} pseudo.def
-    ${AG} pseudo.def
+    ${AG} pseudo.def && rm -f .fsm.*
     date > stamp-fsm
     ;;
 

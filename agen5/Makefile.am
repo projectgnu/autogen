@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/07/28 17:11:00 $
+## Last Modified:   $Date: 2001/12/01 20:26:19 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.34 2001/07/28 17:11:00 bkorb Exp $
+## $Id: Makefile.am,v 1.35 2001/12/01 20:26:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -24,7 +24,8 @@ AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 		  then echo -DDEBUG=1 ; else echo -UDEBUG ; fi`
 
-MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
+CONFIG_CLEAN_FILES = autogen.texi autogen.menu autogen.1
+DISTCLEANFILES = Makefile.in
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
@@ -105,6 +106,9 @@ autogen.1 : opts.def
 defParse.c defParse.h : defParse.y
 	@$(BOOTENV) YACC="$(YACC) $(YFLAGS)" \
 	$(SHELL) $(srcdir)/bootstrap.dir $@
+
+AGEN_LIST = opts.[ch] expr.ini expr.h pseudo-fsm.h directive.h
+MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC) $(AGEN_LIST)
 
 check : $(GEN_LIST)
 gen : $(GEN_LIST)

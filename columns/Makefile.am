@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.29 2001/07/12 02:20:42 bkorb Exp $
+## $Id: Makefile.am,v 1.30 2001/12/01 20:26:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -25,7 +25,8 @@ man_MANS        = columns.1
 
 INCLUDES 	= @INCLIST@
 
-MAINTAINERCLEANFILES = Makefile.in columns.texi
+CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1
+MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
 
 gen : $(GEN_SRC)
 

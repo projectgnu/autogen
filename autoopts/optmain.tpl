@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.16 2001/10/13 18:48:48 bkorb Exp $
+# $Id: optmain.tpl,v 2.17 2001/12/01 20:26:20 bkorb Exp $
 
 =]
 [=
@@ -19,7 +19,13 @@ char** original_argv;
 
 
     static void
+#ifdef __cplusplus
 inner_main( int argc, char** argv )
+#else
+inner_main( argc, argv )
+      int    argc;
+      char** argv;
+#endif
 {
     original_argc = argc;
     original_argv = argv;
@@ -58,8 +64,14 @@ inner_main( int argc, char** argv )
 }
 
     int
+#ifdef __cplusplus
 main( int    argc,
       char** argv )
+#else
+main( argc, argv )
+      int    argc;
+      char** argv;
+#endif
 {[=
     % before-guile-boot "\n    %s\n"
  =]
@@ -217,9 +229,15 @@ DEFINE callback-proc-header     =]
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
 static void
+#ifdef __cplusplus
+doOpt[=(. cap-name) =](
+    tOptions*   pOptions,
+    tOptDesc*   pOptDesc )
+#else
 doOpt[=(. cap-name) =]( pOptions, pOptDesc )
     tOptions*   pOptions;
     tOptDesc*   pOptDesc;
+#endif
 {
 [=
 

@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 2.7 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: getdefs.h,v 2.8 2001/12/01 20:26:20 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/08/23 03:22:05 $
+ *  Last Modified:     $Date: 2001/12/01 20:26:20 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -41,6 +41,13 @@
 #else
 #  include <regex.h>
 #endif
+
+#ifdef DEBUG
+#  define STATIC
+#else
+#  define STATIC static
+#endif
+#define EXPORT
 
 #include "opts.h"
 
@@ -85,6 +92,10 @@
 #  define __STR(s)  #s
 #  define STR(s)    __STR(s)
 #endif
+
+#define AG_NAME_CHAR(c) (zUserNameCh[(unsigned)(c)] & 2)
+#define USER_NAME_CH(c) (zUserNameCh[(unsigned)(c)] & 1)
+MODE char zUserNameCh[ 256 ] VALUE( { '\0' } );
 
 /*
  *  Procedure success codes
@@ -174,5 +185,7 @@ MODE size_t  blkUseCt   VALUE(  0 );
 MODE size_t  blkAllocCt VALUE(  0 );
 
 MODE pid_t   agPid      VALUE( -1 );
+
+#include "proto.h"
 
 #endif /* GETDEFS_HEADER */

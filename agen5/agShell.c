@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.15 2001/10/27 17:33:17 bkorb Exp $
+ *  $Id: agShell.c,v 1.16 2001/12/01 20:26:19 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -129,14 +129,18 @@ serverSetup( void )
     errClose = AG_FALSE;
 
     {
-        tSCC zTrap[] =
+        static char zTrap[] =
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=%d\n";
+            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=\000000000000\n";
+        static char* pzPid = NULL;
         char* pz;
         pzLastCmd = zTrap;
+        if (pzPid == NULL)
+            pzPid = zTrap + strlen( zTrap );
+        sprintf( pzPid, "%d\n", getpid() );
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir,
-                 pzLastCmd, zShDone, getpid() );
+                 pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
@@ -231,6 +235,8 @@ chainOpen( int       stdinFd,
         fprintf( stderr, "Starting shell `%s'\n", pzPath );
     }
 #endif
+    fflush( stdout );
+    fflush( stderr );
 
     /*
      *  Call fork() and see which process we become
@@ -251,6 +257,10 @@ chainOpen( int       stdinFd,
 
         close( stdinFd );
         close( stdoutPair.writeFd );
+#if defined( DEBUG )
+        if (HAVE_OPT( SHOW_SHELL ))
+            fprintf( stderr, "Server shell is pid %d\n", chId );
+#endif
         return stdoutPair.readFd;
 
     case NULLPROCESS:  /* child - continue processing */
@@ -281,6 +291,10 @@ chainOpen( int       stdinFd,
      */
     setvbuf( stdout, (char*)NULL, _IONBF, 0 );
 
+#if defined( DEBUG )
+    if (HAVE_OPT( SHOW_SHELL ))
+        fprintf( stderr, "Server shell %s starts\n", pzShell );
+#endif
     execvp( (char*)pzShell, (char**)ppArgs );
     fprintf( stderr, "Error %d:  Could not execvp( '%s', ... ):  %s\n",
              errno, pzShell, strerror( errno ));

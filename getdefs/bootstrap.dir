@@ -1,0 +1,122 @@
+#! /bin/sh
+#
+# ----------------------------------------------------------------------
+# getdefs/bootstrap.dir --- maintainer's bootstrap script
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Thu Jul 29 09:32:11 1999
+# Last Modified:     $Date: 2001/12/01 20:26:20 $
+#            by:     Bruce Korb <bkorb@gnu.org>
+# ----------------------------------------------------------------------
+# @(#) $Id: bootstrap.dir,v 2.4 2001/12/01 20:26:20 bkorb Exp $
+# ----------------------------------------------------------------------
+
+#  This script rebuilds sources not kept in the CVS repository.
+#  These files are distributed, so it is not necessary to invoke
+#  AutoGen before building AutoGen.  (Like I had to do long ago :)
+
+#  Dump the bootstrap recursive argument.  We're not interested.
+#
+if [ "$1" = recursive ]
+then
+    shift
+fi
+
+#  Check for a "force" option
+#
+if [ "$1" = "-f" ]
+then force=true  ; shift
+else force=false ; fi
+
+targets="$@"
+[ -z "$targets" ] && targets=proto.h
+
+for f in $targets
+do
+  case $f  in
+
+  proto.h )
+    rm -f $f
+    exec 4> $f
+    cat >&4 <<- _EOF_
+		/*
+		 * Getdefs Globally exported prototypes `date`
+		 */
+		#ifndef GETDEFS_PROTOTYPES_H
+		#define GETDEFS_PROTOTYPES_H
+		_EOF_
+
+    set -x
+    for g in `egrep -l '^EXPORT' *.c`
+    do
+      echo
+      echo "/* exports from $g */"
+      sed -n '/^EXPORT /,/)$/p' $g | \
+        sed 's/^EXPORT */\
+extern /;s/)$/);/'
+    done >&4
+    set +x
+    echo >&4
+    echo "#endif /* GETDEFS_PROTOTYPES_H */" >&4
+    exec 4>&-
+
+    chmod 444 $f
+    ;;
+
+  forward )
+    for g in *.c
+    do
+      ( sed -n '1,/^\/\* FORWARD/p'     $g
+        sed -n '/^\/\* END-FORWARD/,$p' $g | \
+          sed -n '/^STATIC /,/)$/p' | \
+          sed 's/^STATIC /\
+STATIC /;s/)$/);/'
+        sed -n '/^\/\* END-FORWARD/,$p' $g
+      ) > $g.new
+
+      if cmp $g $g.new > /dev/null
+      then
+        rm -f $g.new
+      else
+        mv -f $g.new $g
+        echo "New forward declarations in $g"
+      fi
+    done
+    ;;
+
+  sort )
+    set -x
+    for g in *.c
+    do
+      blocksort input=$g out=$g.new \
+                pattern='^/\*$' \
+                start='END-FORWARD' \
+                key='^([a-zA-Z0-9_]+)\(' trail='^/\* emacs'
+      if [ -s $g.new ]
+      then
+        if cmp $g $g.new > /dev/null
+        then
+          rm -f $g.new
+        else
+          echo "Declarations reordered in $g"
+          mv -f $g.new $g
+        fi
+      fi
+    done
+    ;;
+
+  * )
+    echo "Don't know how to make $f"
+    exit 1
+    ;;
+  esac
+done
+
+# Local Variables:
+# mode:             shell-script
+# sh-indentation:   2
+# indent-tabs-mode: nil
+# End:
+
+# bootstrap.dir ends here

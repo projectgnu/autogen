@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.19 2001/06/07 02:55:19 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.20 2001/12/01 20:26:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -33,7 +33,12 @@ GENLIST="agen5/autogen.1
 	 autoopts/genshell.c
 	 autoopts/genshell.h
 	 compat/strsignal.h
-	 config/misc.m4"
+	 config/ag_check_allocated_ctime.m4
+	 config/ag_check_posix_regcomp.m4
+	 config/ag_check_posix_sysinfo.m4
+	 config/ag_check_strftime.m4
+	 config/ag_check_sys_siglist.m4
+	 config/ag_check_uname_syscall.m4"
 
 for f in ${GENLIST}
 do

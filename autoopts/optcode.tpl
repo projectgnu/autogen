@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.52 2001/10/01 23:51:33 bkorb Exp $
+#$Id: optcode.tpl,v 2.53 2001/12/01 20:26:20 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -350,9 +350,15 @@ tOptions [=(. pname)=]Options = {
  *  Create the static procedure(s) declared above.
  */
 static void
+#ifdef __cplusplus
+doUsageOpt(
+    tOptions*   pOptions,
+    tOptDesc*   pOptDesc )
+#else
 doUsageOpt( pOpts, pOD )
     tOptions*  pOpts;
     tOptDesc*  pOD;
+#endif
 {
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=

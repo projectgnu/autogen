@@ -120,7 +120,7 @@ struct transition {[=
  *  the new state and the transition enumeration code (in that order).
  *  It is indexed by first the current state and then the event code.
  */
-static const t_transition trans_table[ [=(. PFX)
+static const t_transition [=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
 
   state-table
@@ -143,7 +143,7 @@ DEFINE machine-step  =][=
         nxtSt = [=(. PFX)=]_ST_INVALID;
         trans = [=(. PFX)=]_TR_INVALID;
     } else {
-        const t_transition* pTT = trans_table[ [=(. pfx)=]_state ] + trans_evt;
+        const t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
         nxtSt = firstNext = pTT->next_state;
         trans = pTT->transition;
     }
@@ -154,7 +154,7 @@ DEFINE machine-step  =][=
         nxtSt = [=(. PFX)=]_ST_INVALID;
         pT    = [=(. pfx)=]_do_invalid;
     } else {
-        t_transition* pTT = trans_table[ [=(. pfx)=]_state ] + trans_evt;
+        t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
         nxtSt = firstNext = pTT->next_state;
         pT    = pTT->trans_proc;
     }

@@ -9,10 +9,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/07/22 20:03:56 $
+# Last Modified:     $Date: 2001/12/01 20:26:19 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.1 2001/07/22 20:03:56 bkorb Exp $
+# $Id: shell.test,v 1.2 2001/12/01 20:26:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -62,19 +62,45 @@ cat > $testname.tpl <<_EOF_
    (setenv "SHELL" "./$testname") =>
 <=\` echo SHELL=\$SHELL \`=>
 Some <=dummy=> text
+<= FOR foo =>
+foo[<=(for-index)=>]       = <=foo=>
+raw-shell-str: <=(raw-shell-str (get "foo"))=>
+shell-str:     <=(shell-str (get "foo"))=>
+sub-shell-str: <=(sub-shell-str (get "foo"))=>
+<= ENDFOR =>
 <=\`   : This is a final test \`=>
 _EOF_
 
 echo creating $testname.def
-exec 4> $testname.def
-echo 'AutoGen Definitions shell.tpl;' >&4
-echo 'dummy = `echo "mumble"`;' >&4
-exec 4>&-
+cat >$testname.def <<'EOF'
+AutoGen Definitions shell.tpl;
+
+foo = "'foo' \"foo\" `foo` $foo";
+foo = '\\\'bar\\\' \\"bar\\" \`bar\` \$bar';
+foo = '\\\\\'BAZ\\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ';
+EOF
+echo 'dummy = `echo "mumble"`;' >> $testname.def
 
 # this is the output we should expect to see
 cat > $testname.sample <<'_EOF_'
 SHELL=$SHELL
 Some mumble text
+
+foo[0]       = 'foo' "foo" `foo` $foo
+raw-shell-str: ''\''foo'\'' "foo" `foo` $foo'
+shell-str:     "'foo' \"foo\" `foo` $foo"
+sub-shell-str: `'foo' "foo" \`foo\` $foo`
+
+foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
+raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
+shell-str:     "\\'bar\\' \\"bar\\" \`bar\` \$bar"
+sub-shell-str: `\\'bar\\' \"bar\" \\`bar\\` \$bar`
+
+foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
+raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
+shell-str:     "\\\\'BAZ\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ"
+sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\`BAZ\\\\` \\\$BAZ`
+
 : This is a final test
 _EOF_
 

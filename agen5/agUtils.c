@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.16 2001/10/27 17:33:17 bkorb Exp $
+ *  $Id: agUtils.c,v 1.17 2001/12/01 20:26:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -261,7 +261,7 @@ addSysEnv( char* pzEnvName )
     }
     if (getenv( pzEnvName ) == NULL) {
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
-            fprintf( stderr, "Adding ``%s'' to environment\n", pzEnvName );
+            fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
         putenv( asprintf( zFmt, pzEnvName ));
     }
 }

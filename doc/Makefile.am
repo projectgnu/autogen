@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.47 2001/10/13 18:48:48 bkorb Exp $
+## $Id: Makefile.am,v 2.48 2001/12/01 20:26:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -75,18 +75,13 @@ TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 ##  in its dependency checking on files that it "knows" are source files
 ##
 autogen.texi : $(DOC_DEPENDS)
-	@set -x ; if [ -x $(AGEXE) ] ; \
-	then $(AGEXE) -L$(top_srcdir)/doc $(top_srcdir)/doc/compete.def ; \
-	else autogen -L$(top_srcdir)/doc $(top_srcdir)/doc/compete.def ; fi
-	@-[ -f $(top_srcdir)/doc/$@ ] && cp -f $(top_srcdir)/doc/$@ $@.ori
-	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ...
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
+	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" \
 	ADDON_MENU="$(ADDON_MENU)" \
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
-	@-sleep 1 ; touch $@ ; [ -s $@ ] && [ -f $@.ori ] && rm -f $@.ori
 
 ##  The following rule is for debugging generation problems:
 ##

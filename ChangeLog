@@ -1,5 +1,40 @@
+2001-12-01  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/*: largely reworked to implement option extraction from
+	input files.
+	* getdefs/bootstrap.dir: new
+	* getdefs/gdinit.c: new
+
+2001-11-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c(ag_scm_find_file): new scheme function
+	* agen5/test/extract.test: test (find-file)
+
+2001-11-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c(shell_stringify): code from ag_scm_shell_str
+	(ag_scm_shell_str): use that procedure
+	(ag_scm_sub_shell_str): new procedure that uses it, too.
+	This procedure emits a back quoted shell string.
+	* agen5/test/shell.test: add testing for the new function.
+	Expand the testing for all three flavors of shell strings.
+	* autoopts/autoopts.c(optionVersion): use a non-empty string
+	* autoopts/optcode.tpl(doUsageOpt): accommodate C++
+	* autoopts/optmain.tpl(main): ditto
+	* autoopts/test/handler.test: adjust for C++ accommodations
+
+2001-11-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optmain.tpl: allow output to be compiled by C++
+
 2001-11-03  Bruce Korb  <bkorb@gnu.org>
 
+	* compat/strsignal.def: supply defaults, in case the search fails
+
+2001-11-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(optionVersion): replace AO_ANNOUNCE_LEVEL
+	with AO values that are maintained.
 	* agen5/funcCase.c: 'load_proc:' is obsolete
 	Protect against segfaults when macro arguments are missing.
 	* agen5/funcDef.c: ditto

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.13 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.14 2001/12/01 20:26:19 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -97,8 +97,8 @@ processTemplate( tTemplate* pTF )
      *  With output going to stdout, we don't try to remove output on errors.
      */
     if (pOutSpecList == (tOutSpec*)NULL) {
-
-        switch (setjmp( fileAbort )) {
+        int jmpcode = setjmp( fileAbort );
+        switch (jmpcode) {
         case SUCCESS:
         {
             tSCC zNone[]  = "* NONE *";
@@ -108,6 +108,10 @@ processTemplate( tTemplate* pTF )
             fpRoot.pFile  = stdout;
             fpRoot.pzOutName = "stdout";
             fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
+            if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+                fprintf( pfTrace, "Starting stdout template\n" );
+                fflush( pfTrace );
+            }
             generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
             break;
         }
@@ -116,7 +120,7 @@ processTemplate( tTemplate* pTF )
             break;
 
         default:
-            fputs( "Bogus return from setjmp\n", stderr );
+            fprintf( stderr, "Bogus return from setjmp:  %d\n", jmpcode );
         case FAILURE:
             exit( EXIT_FAILURE );
         }
@@ -141,6 +145,10 @@ processTemplate( tTemplate* pTF )
 
             pzCurSfx = pOS->zSuffix;
             currDefCtx = rootDefCtx;
+            if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+                fprintf( pfTrace, "Starting %s template\n", pzCurSfx );
+                fflush( pfTrace );
+            }
             generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
 
             do  {
@@ -149,6 +157,9 @@ processTemplate( tTemplate* pTF )
         }
 
         else {
+            if ((jumpCd != PROBLEM) && (jumpCd != FAILURE))
+                fprintf( stderr, "Bogus return from setjmp:  %d\n", jumpCd );
+
             /*
              *  We got here by a long jump.  Close/purge the open files.
              */

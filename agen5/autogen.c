@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.20 2001/11/03 21:45:44 bkorb Exp $
+ *  $Id: autogen.c,v 1.21 2001/12/01 20:26:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -227,12 +227,17 @@ signalSetup( void )
              *  POSIX oversight.  Fixed for next POSIX rev.
              */
         case SIGCHLD:
+            sa.sa_handler = ignoreSignal;
+            break;
+
 #ifdef SIGWINCH
         case SIGWINCH:
 #endif
         case SIGSTOP:  /* suspended */
-            sa.sa_handler = ignoreSignal;
-            break;
+#ifdef SIGTSTP
+        case SIGTSTP:  /* suspended */
+#endif
+            continue;
 
         default:
             sa.sa_handler = abendSignal;

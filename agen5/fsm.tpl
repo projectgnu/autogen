@@ -5,6 +5,8 @@ h=%s-fsm.h
 c=%s-fsm.c
 
 (setenv "SHELL" "/bin/sh")
+(shellf "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
+[ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
 =]
 [=
@@ -175,6 +177,8 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
     stepping-machine    =][=
   ESAC                  =][=
 
+  `rm -f .fsm.*`        =][=
+
 ESAC (suffix)           =][=
 
 trailer =][=
@@ -247,6 +251,4 @@ int
 [=
 
 
-
 ENDDEF                  =]
-

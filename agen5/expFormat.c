@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.36 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: expFormat.c,v 1.37 2001/12/01 20:26:19 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -129,8 +129,8 @@ tSCC zNil[]      = "";
  *
  * doc:  Generate a "DO NOT EDIT" or "EDIT WITH CARE" warning string.
  *       Which depends on whether or not the @code{--writable} command line
- *       option was set.  The argument is a per-line string prefix.
- *       The optional second argument is a first-line prefix and,
+ *       option was set.  The first argument is a per-line string prefix.
+ *       The optional second argument is a prefix for the first-line and,
  *       in read-only mode, activates the editor hints:
  *       @*
  *       @example

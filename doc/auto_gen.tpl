@@ -10,13 +10,13 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.75 2001/11/03 21:45:44 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.76 2001/12/01 20:26:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
 
 (setenv "SHELL" "/bin/sh")
-
+(shell "[ -f autogen.texi ] && mv -f autogen.texi autogen.texi.ori")
 =]
 \input texinfo
 @ignore
@@ -438,7 +438,7 @@ the command line and initialization file options, and the documentation
 that should go with your program as well.
 
 [= get-text tag = autoopts =]
-[=`${AGEXE} -L ${top_srcdir}/doc compete.def
+[=`${AGEXE} -L ${top_srcdir}/doc ${top_srcdir}/doc/compete.def
    cat compete.texi`=]
 [= get-text tag = "end-autoopts" =]
 
@@ -494,4 +494,5 @@ do
 done
 
 ` =]
-[= get-text tag = Future =]
+[= get-text tag = Future =][=
+`[ -f autogen.texi.ori ] && rm -f autogen.texi.ori` =]

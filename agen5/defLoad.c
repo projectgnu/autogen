@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.13 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: defLoad.c,v 1.14 2001/12/01 20:26:19 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -376,7 +376,7 @@ readDefines( void )
              *  IF it is because we are at EOF, then break out
              *  ELSE abend.
              */
-            if (feof( fp ))
+            if (feof( fp ) || useStdin)
                 break;
 
             fprintf( stderr, "%s ERROR %d (%s):  cannot read %d bytes "
@@ -426,6 +426,11 @@ readDefines( void )
         }
     }
 
+    if (pzData == pBaseCtx->pzData) {
+        fprintf( stderr, "No definition data were read.\n" );
+        AG_ABEND;
+    }
+
     *pzData = NUL;
     AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ), "def file name" );
 
@@ -435,6 +440,12 @@ readDefines( void )
      */
     if (fp != stdin)
         fclose( fp );
+#if defined( VALUE_OPT_SHOW_DEFS )
+    if (HAVE_OPT( SHOW_DEFS )) {
+        printf( "%d bytes of definition\n\n", strlen( pBaseCtx->pzData ));
+        fputs( pBaseCtx->pzData, stdout );
+    }
+#endif
     pCurCtx = pBaseCtx;
     {
         extern int yyparse( void );
@@ -445,5 +456,6 @@ readDefines( void )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of defLoad.c */

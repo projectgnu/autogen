@@ -8,24 +8,23 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2001/11/03 21:45:44 $
+dnl Last Modified:    $Date: 2001/12/01 20:26:19 $
 dnl            by:    Bruce Korb <bkorb@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.61 2001/11/03 21:45:44 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.62 2001/12/01 20:26:19 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
-AC_INIT
+
+AC_INIT([autogen],5.2,[bug-autogen@gnu.org])
+
 AC_CONFIG_SRCDIR(agen5/autogen.c)
-
-. $srcdir/VERSION
-
 AC_CONFIG_AUX_DIR(config)
-
 AC_CANONICAL_TARGET
+. $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.61 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.62 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -39,7 +38,6 @@ AC_SUBST(AO_AGE)
 AC_SUBST(GO_CURRENT)
 AC_SUBST(GO_REVISION)
 AC_SUBST(GO_AGE)
-AC_SUBST(AO_ANNOUNCE_LEVEL)
 AC_DEFINE_UNQUOTED(AO_CURRENT,$AO_CURRENT,
                    [Define this to the autoopts current interface number])
 AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,
@@ -47,8 +45,6 @@ AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,
 AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,
                    [Define this to the autoopts interface age number])
 
-AC_DEFINE_UNQUOTED(AO_ANNOUNCE_LEVEL,$AO_ANNOUNCE_LEVEL,
-                   [AutoOpts will announce itself at this level])
 # ----------------------------------------------------------------------
 # Set up the environment to configure the snprintv subpackage using
 # this version of AutoGen (as opposed to any installed version).
@@ -179,6 +175,18 @@ AG_CHECK_SYS_SIGLIST
 AG_CHECK_POSIX_SYSINFO
 AG_CHECK_UNAME_SYSCALL
 
+if ! test x$ag_cv_sys_siglist = xyes
+then
+  if ! test x$ac_cv_func_strsignal = xyes
+  then
+    echo "WARNING:  strsignal will use POSIX names and Linux signal numbers"
+  fi
+  if ! test x$ac_cv_func_psignal = xyes
+  then
+    echo "WARNING:  psignal will use POSIX names and Linux signal numbers"
+  fi
+fi >&2
+
 # ----------------------------------------------------------------------
 # Generate the make files.
 # ----------------------------------------------------------------------
@@ -234,11 +242,11 @@ echo \
 "------------------------------------------------------------------------
 Configuration:
 
-  Source code location:       ${srcdir}
-  Compiler:	              ${CC}
-  Compiler flags:             ${CFLAGS}
-  Host System Type:           ${host}
-  Install path:		      ${prefix}
+  Source code location:   ${srcdir}
+  Compiler:               ${CC}
+  Compiler flags:         ${CFLAGS}
+  Host System Type:       ${host}
+  Install path:           ${prefix}
 
   See config.h for further configuration information.
 ------------------------------------------------------------------------"

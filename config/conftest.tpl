@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2001/11/13 02:37:40 $
+#  Last Modified:     $Date: 2001/12/01 20:26:20 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -188,6 +188,37 @@ DEFINE  try-test      =][=
   [=(. subst-name)=]="$[=(. cache-name)=]"
   AC_SUBST([=(. subst-name)=])[=
 
-ENDDEF  try-test      =][=
+ENDDEF  try-test             =][=
 
-# end config.tpl  =]
+(out-push-new "Makefile.am") =][=
+(dne "#  " "#  ")            =]      
+## ---------------------------------------------------------------------
+## $Id: conftest.tpl,v 1.6 2001/12/01 20:26:20 bkorb Exp $
+## ---------------------------------------------------------------------
+
+GENERATED_M4 = \
+[=
+(out-push-new) =][=
+FOR test "\n"  =][=
+  (string-downcase! (string-append
+        group-prefix "check_" (get "name"))) =].m4[=
+ENDFOR =]
+[=
+
+(shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
+          (out-pop #t) )=]
+
+EXTRA_DIST	= byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) \
+		missing release bootstrap config.tpl misc.def bootstrap.local
+
+pkgdata_DATA = config.tpl
+
+MAINTAINERCLEANFILES = Makefile.in config.guess config.sub install-sh \
+		ltconfig ltmain.sh missing mkinstalldirs $(GENERATED_M4)
+all:
+	:
+[=
+
+(out-pop)
+
+;; end config.tpl  =]

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.35 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: autoopts.c,v 2.36 2001/12/01 20:26:20 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1484,7 +1484,7 @@ const char*
 optionVersion()
 {
     static const char zVersion[] =
-        STR( AO_ANNOUNCE_LEVEL );
+        STR( AO_CURRENT.AO_REVISION );
 
     return zVersion;
 }

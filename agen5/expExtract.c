@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 1.4 2001/10/27 17:33:17 bkorb Exp $
+ *  $Id: expExtract.c,v 1.5 2001/12/01 20:26:19 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -189,6 +189,8 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * This function is used to help construct output files that may contain
  * text that is carried from one version of the output to the next.
  *
+ * The first two arguments are required, the second are optional:
+ *
  * @itemize @bullet
  * @item
  *      The @code{file-name} argument is used to name the file that
@@ -229,6 +231,25 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * the next generation of the output, @strong{@i{provided}} the output
  * is not named "@code{fname}" @i{and} the old output is renamed to
  * "@code{fname}" before AutoGen-eration begins.
+ *
+ * @table @strong
+ * @item NOTE:
+ * You can set aside previously generated source files inside the pseudo
+ * macro with a Guile/scheme function, extract the text you want to keep
+ * with this extract function.  Just remember you should delete it at the
+ * end, too.  Here is an example from my Finite State Machine generator:
+ * @end table
+ *
+ * @example
+ * [+ AutoGen5 Template  -*- Mode: text -*-
+ *    h=%s-fsm.h   c=%s-fsm.c
+ *    (shellf
+ *    "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
+ *     [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name)) +]
+ * @end example
+ *
+ * This code will move the two output files name, ".fsm.head" and ".fsm.code".
+ * At the end of the 'c' output processing, I delete them.
 =*/
     SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
@@ -264,6 +285,50 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
         AGFREE( (void*)pzEnd );
         return res;
     }
+}
+
+
+/*=gfunc find_file
+ *
+ * what:   locate a file in the search path
+ * general_use:
+ * exparg: file-name,  name of file with text
+ * exparg: @suffix  @  file suffix to try, too   @ opt @
+ *
+ * doc:
+ *
+ * AutoGen has a search path that it uses to locate template and definition
+ * files.  This function will search the same list for @file{file-name}, both
+ * with and without the @file{.suffix}, if provided.
+=*/
+    SCM
+ag_scm_find_file( SCM file, SCM suffix )
+{
+    tSCC  zFun[] = "ag_scm_find_file";
+    SCM res = SCM_UNDEFINED;
+
+    if (! gh_string_p( file ))
+        scm_wrong_type_arg( zFun, 1, file );
+
+    {
+        char z[ MAXPATHLEN+1 ];
+        char* pz = ag_scm2zchars( file, "file-name" );
+
+        /*
+         *  The suffix is optional.  If provided, it will be a string.
+         */
+        if (gh_string_p( suffix )) {
+            char* apz[2];
+            apz[0] = ag_scm2zchars( suffix, "file suffix" );
+            apz[1] = NULL;
+            if (SUCCESSFUL( findFile( pz, z, (tCC**)apz )))
+                res = gh_str02scm( z );
+
+        } else if (SUCCESSFUL( findFile( pz, z, NULL )))
+            res = gh_str02scm( z );
+    }
+
+    return res;
 }
 
 /*

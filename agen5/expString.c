@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.36 2001/09/29 20:42:44 bkorb Exp $
+ *  $Id: expString.c,v 1.37 2001/12/01 20:26:19 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -191,6 +191,88 @@ makeString( tCC*    pzText,
      */
     *(pzDta++) = '"';
     *pzDta = NUL;
+    return res;
+}
+
+
+    STATIC SCM
+shell_stringify( SCM obj, char qt )
+{
+    size_t     dtaSize;
+    char*      pzDta;
+    char*      pz;
+    char*      pzNew;
+    SCM        res;
+
+    pzDta = ag_scm2zchars( obj, "AG Object" );
+    dtaSize = 3;
+    pz = pzDta;
+    for (;;) {
+        char c = *(pz++);
+
+        switch (c) {
+        case NUL:
+            goto loopDone1;
+
+        case '"':
+        case '`':
+        case '\\':
+            dtaSize += 2;
+            break;
+
+        default:
+            dtaSize++;            
+        }
+    } loopDone1:;
+
+    pz  = pzNew = AGALOC( dtaSize, "shell string" );
+    *(pz++) = qt;
+
+    for (;;) {
+        char c = (*(pz++) = *(pzDta++));
+        switch (c) {
+        case NUL:
+            goto loopDone2;
+
+        case '\\':
+            /*
+             *  If someone went to the trouble to escape a backquote or a
+             *  dollar sign, then we should not neutralize it.  Note that we
+             *  handle a following backslash as a normal character.
+             *  ALSO, now that this routine does both `xx` and "xx" strings,
+             *  we have to worry about this stuff differently.  I.e., in ""
+             *  strings, preserve a single \ in front of `, and in ``
+             *  preserve a single \ in front of ".  Icky.
+             *
+             * i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
+             */
+            switch (*pzDta) {
+            case '$':             /* \$  -->  \$    */
+                break;
+            case '`':             /* \`  -->  \`    */
+            case '"':             /* \"  -->  \"    */
+                if (c != qt)
+                    break;
+            default:              /* otherwise:     */
+                *(pz++) = '\\';   /* \   -->  \\    */
+            }
+            break;
+
+        case '"':
+        case '`':
+            if (c == qt) {
+                pz[-1]  = '\\';       /* "   -->   \"   */
+                *(pz++) = c;
+            }
+        }
+    } loopDone2:;
+
+    pz[-1]  = qt;
+    dtaSize = (pz - pzNew);
+    res     = scm_makstr( (scm_sizet)dtaSize, 0 );
+    memcpy( SCM_CHARS( res ), pzNew, dtaSize );
+    AGFREE( pzNew );
+
     return res;
 }
 
@@ -585,8 +667,12 @@ ag_scm_raw_shell_str( SCM obj )
  *
  *  Convert the text of the string into a double quoted string that a normal
  *  shell will process into the original string, almost.  It will add the
- *  escape character @code{\\} before two special characters to accomplish
- *  this: the backslash @code{\\} and double quote @code{"}.
+ *  escape character @code{\\} before two special characters to
+ *  accomplish this: the backslash @code{\\} and double quote @code{"}.
+ *
+ *  @strong{NOTE}: some shells will not correctly handle unusual
+ *  non-printing characters.  This routine works for most reasonably
+ *  conventional ASCII strings.
  *
  *  @strong{WARNING}:
  *@*
@@ -598,73 +684,62 @@ ag_scm_raw_shell_str( SCM obj )
  *
  *  All others characters are copied directly into the output.
  *
- *  @strong{NOTE}: some shells will not correctly handle unusual
- *  non-printing characters.  This routine works for most reasonably
- *  conventional ASCII strings.
+ *  The @code{sub-shell-str} variation of this routine behaves identically,
+ *  except that the extra backslash is omitted in front of @code{"} instead
+ *  of @code{`}.  You have to think about it.  I'm open to suggestions.
+ *
+ *  Meanwhile, the best way to document is with a detailed output example.
+ *  If the backslashes make it through the texinfo processing correctly,
+ *  below you will see what happens with three example strings.  The first
+ *  example string contains a list of quoted @code{foo}s, the second is
+ *  the same with a single backslash before the quote characters and the
+ *  last is with two backslash escapes.  Below each is the result of the
+ *  @code{raw-shell-str}, @code{shell-str} and @code{sub-shell-str} functions.
+ *
+ *  @example
+ *  foo[0]       = 'foo' "foo" `foo` $foo
+ *  raw-shell-str: ''\''foo'\'' "foo" `foo` $foo'
+ *  shell-str:     "'foo' \"foo\" `foo` $foo"
+ *  sub-shell-str: `'foo' "foo" \`foo\` $foo`
+ *   
+ *  foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
+ *  raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
+ *  shell-str:     "\\'bar\\' \\"bar\\" \`bar\` \$bar"
+ *  sub-shell-str: `\\'bar\\' \"bar\" \\`bar\\` \$bar`
+ *   
+ *  foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
+ *  raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
+ *  shell-str:     "\\\\'BAZ\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ"
+ *  sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\`BAZ\\\\` \\\$BAZ`
+ *  @end example
+ *
+ *  There should be triple and quadruple backslashes in the last two lines of
+ *  the example.  If this was not accurately reproduced, take a look at the
+ *  agen5/test/shell.test test.  Notice the backslashes in front of the dollar
+ *  signs.  It goes from zero to one to three for the "cooked" string examples.
 =*/
     SCM
 ag_scm_shell_str( SCM obj )
 {
-    size_t     dtaSize;
-    char*      pzDta;
-    char*      pz;
-    SCM        res;
+    return shell_stringify( obj, '"' );
+}
 
-    pzDta = ag_scm2zchars( obj, "AG Object" );
-    dtaSize = 3;
-    pz = pzDta;
-    for (;;) {
-        switch (*(pz++)) {
-        case NUL:
-            goto loopDone1;
-
-        case '\\':
-        case '"':
-            dtaSize += 2;
-            break;
-
-        default:
-            dtaSize++;            
-        }
-    } loopDone1:;
-
-    res = scm_makstr( (scm_sizet)dtaSize, 0 );
-    pz  = SCM_CHARS( res );
-
-    *(pz++) = '"';
-
-    for (;;) {
-        switch (*(pz++) = *(pzDta++)) {
-        case NUL:
-            goto loopDone2;
-
-        case '\\':
-            /*
-             *  If someone went to the trouble to escape a backquote or a
-             *  dollar sign, then we should not neutralize it.  Note that we
-             *  handle a following backslash as a normal character.
-             *
-             * i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
-             */
-            switch (*pzDta) {
-            case '`':             /* \`  -->  \`    */
-            case '$':             /* \$  -->  \$    */
-                break;
-            default:              /* otherwise:     */
-                *(pz++) = '\\';   /* \   -->  \\    */
-            }
-            break;
-
-        case '"':
-            pz[-1]  = '\\';       /* "   -->   \"   */
-            *(pz++) = '"';
-        }
-    } loopDone2:;
-
-    pz[-1] = '"';
-    *pz    = NUL;
-
-    return res;
+/*=gfunc sub_shell_str
+ *
+ * what:  back quoted (sub-)shell string
+ * general_use:
+ *
+ * exparg: string, string to transform
+ *
+ * doc:
+ *   This function is substantially identical to @code{shell-str}, except
+ *   that the quoting character is @code{`} and the "leave the escape alone"
+ *   character is @code{"}.
+=*/
+    SCM
+ag_scm_sub_shell_str( SCM obj )
+{
+    return shell_stringify( obj, '`' );
 }
 
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.40 2001/11/03 21:45:44 bkorb Exp $
+ *  $Id: funcDef.c,v 1.41 2001/12/01 20:26:19 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -492,7 +492,7 @@ build_defs( int defCt, tDefList* pList )
  *
  *  Any remaining text in the macro invocation will be used to create new
  *  name/value pairs that only persist for the duration of the processing of
- *  the macro.  The expressions are evaluated the same way simple
+ *  the macro.  The expressions are evaluated the same way basic
  *  expressions are evaluated.  @xref{expression syntax}.
  *
  *  The resulting definitions are handled much like regular
@@ -590,14 +590,14 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
  *  name of the defined macro.  Consequently, this may @strong{not}
  *  be a computed value.  If you explicitly invoke a user defined macro,
  *  the macro begins with the macro name @code{INVOKE} followed by
- *  a @i{simple expression} that must yield a known user defined macro.
+ *  a @i{basic expression} that must yield a known user defined macro.
  *  A macro name _must_ be found, or AutoGen will issue a diagnostic
  *  and exit.
  *
  *  Arguments are passed to the invoked macro by name.
  *  The text following the macro name must consist of a series of
  *  names each of which is followed by an equal sign (@code{=}) and
- *  a @i{simple expression} that yields a string.
+ *  a @i{basic expression} that yields a string.
  *
  *  The string values may contain template macros that are parsed
  *  the first time the macro is processed and evaluated again every

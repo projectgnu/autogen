@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.28 2001/09/21 03:09:48 bkorb Exp $
+ *   $Id: opts.def,v 2.29 2001/12/01 20:26:20 bkorb Exp $
  */
 
 /*
@@ -26,16 +26,17 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2000";
+    date   = "1999-2001";
     type   = gpl;
     owner  = "Bruce Korb";
+    eaddr  = "bkorb@gnu.org";
 };
 
-eaddr         = "bkorb@gnu.org";
 prog_name     = "getdefs";
 prog_title    = "AutoGen Definition Extraction Tool";
 
-version       = "1.2";
+version       = "1.3";
+homerc        = /dev/null;
 
 flag = {
     name      = "defs_to_get";
@@ -108,19 +109,50 @@ flag = {
     max       = NOLIMIT;
     stack_arg;
     descrip   = "subblock definition names";
-    doc =
-    "This option is used to create shorthand entries for nested definitions.\n"
-    "For example, with:\n"
-    "@*\n@code{subblock=arg=argname,type,null} defined, the text:\n"
-    "@*\n@code{arg: this, char *} will then expand to:\n"
-    "@*\n@code{arg = @{ argname = this; type = \"char *\"; @};}.\n"
-    "@*\nThe \"this, char *\" string is separated at the commas, with the\n"
-    "white space removed.  You may use characters other than commas by\n"
-    "starting the value string with a punctuation character other than\n"
-    "a single or double quote character.  You may also omit intermediate\n"
-    "values by placing the commas next to each other with no intervening\n"
-    "white space.  For example, \"+mumble++yes+\" will expand to:\n"
-    "@*\n@code{arg = @{ argname = mumble; null = \"yes\"; @};}.\n" ;
+    doc = <<- _EOF_
+		This option is used to create shorthand entries for nested definitions.
+		For example, with:
+		@*
+		@code{subblock=arg=argname,type,null} defined, the text:
+		@*
+		@code{arg: this, char *} will then expand to:
+		@*
+		@code{arg = @{ argname = this; type = "char *"; @};}
+		@*
+		The "this, char *" string is separated at the commas, with the
+		white space removed.  You may use characters other than commas by
+		starting the value string with a punctuation character other than
+		a single or double quote character.  You may also omit intermediate
+		values by placing the commas next to each other with no intervening
+		white space.  For example, "+mumble++yes+" will expand to:
+		@*
+		@code{arg = @{ argname = mumble; null = "yes"; @};}.
+		_EOF_;
+};
+
+flag = {
+    name      = listattr;
+    arg_type  = string;
+    arg_name  = def;
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "attribute with list of values";
+    doc = <<- _EOF_
+		This option is used to create shorthand entries for definitions
+		that generally appear several times.  That is, they tend to be
+		a list of values.  For example, with:
+		@*
+		@code{listattr=foo} defined, the text:
+		@*
+		@code{foo: this, is, a, multi-list} will then expand to:
+		@*
+		@code{foo = 'this', 'is', 'a', 'multi-list';}
+		@*
+		The texts are separated by the commas, with the
+		white space removed.  You may use characters other than commas by
+		starting the value string with a punctuation character other than
+		a single or double quote character.
+		_EOF_;
 };
 
 flag = {

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.9 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: tpParse.c,v 1.10 2001/12/01 20:26:19 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -126,54 +126,6 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 }
 
 
-    EXPORT tCC*
-skipMacro( tCC* pzStartMark )
-{
-    tCC* pzEndMark;
-    int  depth;
-
-    depth = 1;
-    pzEndMark   = strstr( pzStartMark + startMacLen, zEndMac );
-    pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
-
-    /*
-     *  Starting state:
-     *  pzStartMark  points to start macro mark for the macro we must skip
-     */
-    for (;;) {
-        tCC zBadNest[] = "Improperly nested macro invocations";
-
-        /*
-         *  FOR as long as we hunt, we must find an end marker
-         */
-        if (pzEndMark == (char*)NULL)
-            LOAD_ABORT( pCurTemplate, pCurMacro, zBadNest );
-
-        /*
-         *  IF the next start marker is past the end marker,
-         *  THEN advance past the end marker.
-         */
-        if (  (pzStartMark == (char*)NULL)
-           || (pzStartMark > pzEndMark)) {
-            if (--depth == 0)
-                break;
-
-            pzEndMark = strstr( pzEndMark + endMacLen, zEndMac );
-
-        /*
-         *  Otherwise, we found another start marker before the end marker.
-         *  Increase our depth and look for the next start marker.
-         */
-        } else {
-            depth++;
-            pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
-        }
-    }
-
-    return pzEndMark;
-}
-
-
     STATIC tCC*
 findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
 {
@@ -195,37 +147,18 @@ findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
     pM->lineNo   = templLineNo;
     *ppzMark     = pzMark;
 
-    for (;;) {
-        pzEndMark = strstr( pzMark, zEndMac );
-        if (pzEndMark == (char*)NULL)
-            LOAD_ABORT( pT, pM, "macro has no end" );
+    pzEndMark = strstr( pzMark, zEndMac );
+	if (pzEndMark == (char*)NULL)
+		LOAD_ABORT( pT, pM, "macro has no end" );
 
-        pzNextMark = strstr( pzMark, zStartMac );
-        if ((pzNextMark == (tCC*)NULL) || (pzNextMark > pzEndMark))
-            return pzEndMark;
+	pzNextMark = strstr( pzMark, zStartMac );
+	if (pzNextMark == NULL)
+		return pzEndMark;
 
-        switch (pM->funcCode) {
-        case FTYP_UNKNOWN:
-            /*
-             *  By virtue of containing nested macros,
-             *  this macro, perforce, must be an INVOKE macro.
-             */
-            pM->funcCode = FTYP_INVOKE;
-            /* FALLTHROUGH */
-        case FTYP_INVOKE:
-            break;
+	if (pzEndMark > pzNextMark)
+		LOAD_ABORT( pT, pM, "macros cannot nest" );
 
-        default:
-            snprintf( z, sizeof(z), zOop, apzFuncNames[ pM->funcCode ]);
-            LOAD_ABORT( pT, pM, z );
-        }
-
-        /*
-         *  Skip past the macro we found at the start marker
-         *  then go back and try to find the end again.
-         */
-        pzMark = skipMacro( pzNextMark ) + endMacLen;
-    }
+	return pzEndMark;
 }
 
 
@@ -382,5 +315,6 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of tpParse.c */

@@ -10,12 +10,12 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.28 2001/07/12 02:20:42 bkorb Exp $
+## $Id: Makefile.am,v 2.29 2001/12/01 20:26:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS	= getdefs
 SUBDIRS		= test
-getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
+getdefs_SOURCES = getdefs.c gdemit.c gdinit.c getdefs.h opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
@@ -26,7 +26,8 @@ man_MANS        = getdefs.1
 getdefs_LDFLAGS = -static
 INCLUDES = @INCLIST@
 
-MAINTAINERCLEANFILES = Makefile.in
+CONFIG_CLEAN_FILES = getdefs.texi getdefs.menu getdefs.1
+MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
 
 gen : $(GEN_SRC)
 

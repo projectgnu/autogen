@@ -136,8 +136,7 @@ DEFINE trailer
  * c-file-style: "stroustrup"
  * tab-width: 4
  * End:
- * end of [=(if (= (suffix) "c") (shell "rm -f .fsm.*"))
-            (out-name)=] */[=
+ * end of [=(out-name)=] */[=
 
 ENDDEF  trailer  =][=
 
@@ -215,7 +214,7 @@ FOR   transition              =][=
        "for f in ${ev_list} ; do
        eval FSM_TRANS_%s_${f}=\"'{ %s_ST_%s, %s }'\"
        done"
-       tst PFX next tr_name) )=][=
+       tst PFX next tr_name)  =][=
 
    ELSE                       =][=
 
