@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.14 1999/03/19 20:58:50 bkorb Exp $
+#$Id: optcode.tpl,v 2.15 1999/03/30 23:09:04 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -89,12 +89,12 @@ tSCC    z[=name _cap "#_NAME[] =" + %-28s _printf =] "[=name _up=]";[=
 
     _IF disable _len 0 > =]
 tSCC    zNot[=name _cap "#_Name[] =" + %-25s _printf =] "[=disable _down=]-[=
-    name _down "echo '%s'|tr '_\^' '--'" _printf _shell=]";
+    name "A-Z_^" "a-z--" _tr =]";
 tSCC    zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] "[=disable _down=]";[=
 
       _IF enable _len 0 > =]
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
-    name _down "echo '%s'|tr '_\^' '--'" _printf _shell=]";[=
+    name "A-Z_^" "a-z--" _tr =]";[=
 
       _ELSE "Enable does not exist" =]
 #define z[=name _cap "#_Name" + %-28s _printf
@@ -105,7 +105,7 @@ tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
 #define zNot[=name _cap "#_Pfx"   + %-25s _printf =] (const char*)NULL
 #define zNot[=name _cap "#_Name"  + %-25s _printf =] (const char*)NULL
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down #- +=][=
-    name _down "echo '%s'|tr '_\^' '--'" _printf _shell=]";[=
+    name "A-Z_^" "a-z--" _tr =]";[=
 
     _ENDIF "disable" =][=
 

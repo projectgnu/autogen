@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.10 1999/02/26 23:09:01 bkorb Exp $
+#$Id: opthead.tpl,v 2.11 1999/03/30 23:09:04 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -21,8 +21,8 @@ _ENDIF =][=
 
 # "The #define name we use to self-exclude the header" =][=
 
-_SETENV DEFNAME prog_name _get _outfile
-    "#2$echo '%s_%s'|tr -- '-./[a-z]' '___[A-Z]'" _printf _shell=][=
+_SETENV DEFNAME prog_name _get #_ _outfile + +
+    "#-./a-z" "#___A-Z" _tr =][=
 
 # "Let the real output begin..."
 #
