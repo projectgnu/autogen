@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2002-08-09 20:00:19 bkorb"
-# Version:    "$Revision: 3.4 $
+# Time-stamp: "2002-10-12 14:29:29 bkorb"
+# Version:    "$Revision: 3.5 $
 
 eval "`egrep '^AG_' ../VERSION`"
 [ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
@@ -56,6 +56,17 @@ cp   -f autogen.txt    autogen-${AG_VERSION}/text/.
 
 echo generating doc page
 cd autogen-${AG_VERSION}
-autogen --no-def -T ../gnudoc.tpl
+cat > TAG <<EOF
+<p align="center"><a href="http://www.anybrowser.org/campaign/"
+   ><img src="http://software/autogen/pix/abrowser.png"
+   width="118" height="32" alt="Viewable With Any Browser"
+   border="0"></a>
+&nbsp;&nbsp;<a href="http://software/autogen/"
+><img src="/graphics/gnu-head-sm.jpg"
+     width="88" height="31" border="0" alt="GNU Head"></a></p>
+EOF
+body-end -i TAG */*.html
+autogen --no-def -T ${pkgsrcdir}/gnudoc.tpl
+rm -f TAG
 cd ..
 tar cvf - autogen-${AG_VERSION} | gzip > autogen-${AG_VERSION}-doc.tar.gz
