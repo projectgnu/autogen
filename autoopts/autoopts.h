@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.7 1999/06/11 14:26:39 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.8 1999/06/11 14:51:42 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -169,7 +169,4 @@ extern tePagerState pagerState;
 #  define AGFREE( p )      free( p )
 #endif
 
-#ifdef  __cplusplus
-}
-#endif
 #endif /* AUTOGEN_AUTOOPTS_H */
