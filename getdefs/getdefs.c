@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.4 1998/09/22 20:53:45 bkorb Exp $
+ *  $Id: getdefs.c,v 2.5 1998/09/22 21:13:35 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -22,6 +22,10 @@
 #include <utime.h>
 
 #define MAXNAMELEN 256
+#ifndef MAXPATHLEN
+#  define MAXPATHLEN 4096
+#endif
+
 /*
  *  static global strings
  */
