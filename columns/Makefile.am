@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Thu Jul 29 08:24:37 1999				      
+## Last Modified:   Thu Jul 29 12:02:20 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.16 1999/07/29 15:48:18 bkorb Exp $
+## $Id: Makefile.am,v 1.17 1999/07/29 19:02:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -35,7 +35,7 @@ opts.c opts.h: opts.def
 	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/columns/opts.def
 
-columns.texi : opts.def columns
+columns.menu columns.texi : opts.def columns
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -Taginfo -bcolumns \
 		-L $(top_srcdir)/autoopts -DLEVEL=section \
