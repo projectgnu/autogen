@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.43 1999/11/05 02:58:53 bruce Exp $
+## $Id: auto_gen.tpl,v 2.44 1999/11/07 03:02:23 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -816,13 +816,16 @@ these by defining their own macros.  @xref{DEFINE}.
 @section Format of the Pseudo Macro
 @cindex pseudo macro
 
-The template file must begin with a pseudo-macro.  The pseudo-macro
-is used to identify the file as an AutoGen template file,
-define the starting and ending macro markers and specify the
-list of output files the template is to create.
+The pseudo-macro starts with up to seven (7) punctuation characters used
+for the template start-macro marker, followed by the autogen magic marker
+(@code{autogen5}), the template marker (@code{template}), zero or more
+suffix specifications and the end-macro marker, also consisting of up to
+seven (7) punctuation characters.  Interspersed may be comment lines (blank
+lines or lines starting with a hash mark [@code{#}]) and edit mode markers
+(text between pairs of @code{-*-} characters).
 
-Assuming we want to use @code{[+} and @code{+]} as the start and
-end macro markers, and we wish to produce a @file{.c} and a @file{.h}
+As an example, assume we want to use @code{[+} and @code{+]} as the start
+and end macro markers, and we wish to produce a @file{.c} and a @file{.h}
 file, then the first macro invocation will look something like this:
 
 @example
@@ -840,9 +843,12 @@ macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
 in the starting macro).  It helps both visually and with editors
 capable of finding a balancing parenthesis.
 
-It is also helpful to avoid using the comment marker (@code{#})
-and the POSIXly acceptable file name characters period (@code{.}),
-hyphen (@code{-}) and underscore (@code{_}).
+It is also helpful to avoid using the comment marker (@code{#});
+the POSIXly acceptable file name characters period (@code{.}),
+hyphen (@code{-}) and underscore (@code{_}); and finally, it is
+advisable to avoid using any of the quote characters:  double,
+single or backquote.  But there is no special check for any of
+these advisories.
 
 @noindent
 Detailed description:
