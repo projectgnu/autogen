@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
+ *  $Id: funcIf.c,v 1.4 1999/10/15 02:57:34 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -126,7 +126,7 @@ MAKE_HANDLER_PROC( If )
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf( pfTrace, zIfFmt, (pMac->funcCode == FTYP_ELSE)
                          ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
-			 pMac->lineNo );
+                         pMac->lineNo );
 
                 if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
                     fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
@@ -140,7 +140,8 @@ MAKE_HANDLER_PROC( If )
     } while (pMac < pRet);
 
     if ((OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) && (pMac >= pRet)) {
-        fputs( "IF macro selected no clause\n", pfTrace );
+        fprintf( pfTrace, "IF `%s' macro selected no clause\n",
+                 pCurTemplate->pzTemplText + pCurMacro->ozText );
 
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
             fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
@@ -187,7 +188,8 @@ MAKE_HANDLER_PROC( While )
     int     ct   = 0;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf( pfTrace, "WHILE loop in %s on line %d begins:\n",
+        fprintf( pfTrace, "WHILE `%s' loop in %s on line %d begins:\n",
+                 pCurTemplate->pzTemplText + pCurMacro->ozText,
                  pT->pzFileName, pMac->lineNo );
 
     for (;;) {

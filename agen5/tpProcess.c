@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: tpProcess.c,v 1.3 1999/10/15 02:57:34 bruce Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -43,7 +43,7 @@ generateBlock( tTemplate*   pT,
                tMacro*      pEnd,
                tDefEntry*   pCurDef )
 {
-    tSCC zFmt[] = "%-10s (%2X) in %s at line %d";
+    tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
     int  fc;
 #   define HANDLE_FUNCTIONS
 #   include "functions.h"
@@ -68,7 +68,7 @@ generateBlock( tTemplate*   pT,
             if (pMac->ozText > 0) {
                 int   ct;
                 char* pz = pT->pzTemplText + pMac->ozText;
-                fputs( "  ", stderr );
+                fputs( "  ", pfTrace );
                 for (ct=0; ct < 32; ct++) {
                     char ch = *(pz++);
                     if (ch == '\0')
@@ -77,8 +77,8 @@ generateBlock( tTemplate*   pT,
                         break;
                     putc( ch, pfTrace );
                 }
+                putc( '\n', pfTrace );
             }
-            putc( '\n', pfTrace );
         }
 
         pCurMacro = pMac;

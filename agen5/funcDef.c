@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
+ *  $Id: funcDef.c,v 1.4 1999/10/15 02:57:34 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -149,6 +149,7 @@ MAKE_HANDLER_PROC( Define )
     int         defCt  = pMac->sibIndex;
     SCM         res;
     tDefEntry*  pDefs;
+    tTemplate*  pOldTpl = pCurTemplate;
 
     pT = (tTemplate*)pMac->funcPrivate;
 
@@ -223,7 +224,10 @@ MAKE_HANDLER_PROC( Define )
         } while (pList++, --defCt > 0);
     }
 
+    pCurTemplate = pT;
     generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pDefs );
+    pCurTemplate = pOldTpl;
+
     if ((defCt = pMac->sibIndex) > 0) {
         pList = (tDefList*)pMac->res;
         while (defCt-- > 0) {
@@ -533,6 +537,13 @@ MAKE_HANDLER_PROC( Invoke )
             pMac->funcCode    = FTYP_DEFINE;
             pMac->funcPrivate = (void*)findTemplate(
                 pT->pzTemplText + pMac->ozName );
+
+            if (pMac->funcPrivate == (void*)NULL) {
+                pzText = asprintf( zNoResolution,
+                                   pT->pzTemplText + pMac->ozName );
+                LOAD_ABORT( pT, pMac, pzText );
+            }
+
             return mFunc_Define( pT, pMac, pCurDef );
         }
     }
