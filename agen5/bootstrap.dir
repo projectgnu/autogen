@@ -19,9 +19,6 @@ then
   export top_builddir top_srcdir
 fi
 
-if [ -z "$whence" ]
-then whence=whence ; fi
-
 #  Name our executable in one place and disable any $HOME defaults
 #
 ag=AutoGen
@@ -31,7 +28,7 @@ HOME=/dev/null
 #
 if [ ! -x ./${ag} ]
 then
-  AG=`$whence ${ag}`
+  AG=`type ${ag} | sed "s/${ag} is //" `
   if [ -z "$AG" ]
   then
     echo "Cannot locate ${ag}.  Giving up"
