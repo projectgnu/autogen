@@ -1,3 +1,8 @@
+2000-09-14  Bruce Korb  <bkorb@gnu.org>
+
+	* */bootstrap*: use one authoritative decision about whether or
+	not we have a valid autogen to use for bootstrap.
+
 2000-09-13  Bruce Korb  <bkorb@gnu.org>
 
 	* getdefs/*:  Moved all global vars to getdefs.h.

@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:29:52 1999                                 
 #            by:     Bruce Korb <bkorb@gnu.org>                       
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.31 2000/09/10 23:56:25 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.32 2000/09/15 03:17:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -57,6 +57,25 @@ done
 #
 MISSING="`cd ${srcdir}/config ; pwd`/missing"
 export MISSING
+
+#  Check for AutoGen version 5.
+#
+AUTOGEN=`type autogen 2>/dev/null`
+case "${AUTOGEN}" in
+  *" is /"* )
+     AUTOGEN=`echo $AUTOGEN|sed 's,autogen is /,/,'`
+     case "`$AUTOGEN --version`" in
+       *"Ver. 5."* )
+           export AUTOGEN ;;
+       * ) echo OUT OF DATE AutoGen: `$AUTOGEN --version` >&2
+           unset AUTOGEN ;;
+     esac
+     ;;
+
+  * )
+     unset AUTOGEN
+     ;;
+esac
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP

@@ -63,14 +63,14 @@ rmlist=
 #  Name our executable in one place and disable any $HOME defaults
 #  Use the local ${AG}, if available.  Otherwise, look for it.
 #
-AGEXE=${AGEXE-autogen}
-AG=${builddir}/${AGEXE}
+AUTOGEN=${AUTOGEN-autogen}
+AG=${builddir}/autogen
 if [ ! -x ${AG} ]
 then
-  f=`type ${AGEXE} | sed -e "s;${AGEXE} is ;;" `
+  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is /;/;" `
 
   case ${f} in
-  */${AGEXE} )
+  */${AUTOGEN} )
      AG=${f}
      ;;
 

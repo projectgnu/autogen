@@ -1,30 +1,13 @@
 #! /bin/sh
 
-#  Name our executable in one place and disable any $HOME defaults
-#  Use the local ${AGEXE}, if available.  Otherwise, look for it.
-#
-AGEXE=${AGEXE:-autogen}
-AG=${AGEXE}
-if [ ! -x ${AG} ]
-then
-  f=`type ${AGEXE} | sed -e "s;${AGEXE} is ;;" `
-  case ${f} in
-  */${AGEXE} )
-     AG=${f}
-     ;;
-
-  * )
-    test "X$BOOTSTRAP" = X && echo "Cannot locate autogen.  Giving up"
-    exit 1
-    ;;
-  esac
-fi 2>/dev/null
+AUTOGEN=${AUTOGEN-autogen}
 
 case "$1" in
 *genshell.c )
   #  We were probably invoked by make
   #
-  ${AGEXE} -L. genshell.def
+  set -e
+  ${AUTOGEN} -L. genshell.def
   ;;
 
 * )
@@ -32,7 +15,7 @@ case "$1" in
   #
   if [ ! -f genshell.c ]
   then
-    ${AGEXE} -L. genshell.def
+    ${AUTOGEN} -L. genshell.def
   fi
   ;;
 esac

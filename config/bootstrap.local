@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:28:33 1999
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.30 2000/09/10 22:50:41 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.31 2000/09/15 03:17:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -69,8 +69,8 @@ pre )
 
     #  This is OKAY because we prime it via the fake configure file
     #
-    ( autogen --version && \
-      columns --version && \
+    ( test -n "$AUTOGEN" && \
+      columns --version  && \
       getdefs --version ) > /dev/null 2>&1 || exit 0
 
     ( cd ${srcdir}/config; autogen misc.def; )
