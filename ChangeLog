@@ -4,3 +4,4 @@
 	length.  Accommodate for that.
 	* compat/strcspn.c(strcspn): End the scan when the source string ends.
 	* ChangeLog: moved old entries to ChangeLog.3
+	* snprintfv/snprintfv/Makefile.am: clean up the stamp files
