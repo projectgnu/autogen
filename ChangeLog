@@ -1,3 +1,8 @@
+2000-06-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c( ag_scm_prefix ): return the result SCM instead
+	of the source SCM  :-}
+
 2000-05-15  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defLex.c(assembleName): use the ISNAMECHAR() macro to

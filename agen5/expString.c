@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.16 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: expString.c,v 1.17 2000/06/21 14:42:15 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -373,7 +373,7 @@ ag_scm_prefix( SCM prefix, SCM text )
         }
     } exit_copy:;
 
-    return text;
+    return res;
 }
 
 
