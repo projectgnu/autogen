@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.10 1999/11/04 04:36:55 bruce Exp $
+ *  $Id: funcEval.c,v 1.11 1999/11/11 04:45:34 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -134,12 +134,7 @@ evalExpression( ag_bool* pMustFree )
     {
         static char z[ 32 ];
 
-        SCM res = scm_internal_stack_catch(
-                      SCM_BOOL_T,
-                      (scm_catch_body_t)gh_eval_str,
-                      (void*)pzText,
-                      ag_eval_handler,
-                      (void*)pzText );
+        SCM res = gh_eval_str( pzText );
 
         if (*pMustFree) {
             AGFREE( (void*)pzText );
@@ -197,31 +192,22 @@ evalExpression( ag_bool* pMustFree )
 }
 
 
+/*=gfunc error_source_line
+ *
+ * what: display current file/line before SCM error
+ * doc: This function should only be invoked just before
+ *      Guile displays an error message.  It displays the
+ *      file name and line number that triggered the evaluation error.
+=*/
     SCM 
-ag_eval_handler( void *data, SCM tag, SCM throw_args )
+ag_scm_error_source_line( void )
 {
     SCM port = scm_current_error_port();
-    fprintf( stderr, "\nScheme evaluation error; tag is\n        ");
-    scm_display( tag, port );
 
     fprintf( stderr, "\nin %s line %d:  %s\n", pCurTemplate->pzTplName,
              pCurMacro->lineNo,
              pCurTemplate->pzTemplText + pCurMacro->ozText );
 
-#ifdef LATER
-    if (scm_ilength( throw_args ) >= 3) {
-        SCM stack = SCM_CDR(   scm_the_last_stack_var );
-        SCM subr  = SCM_CAR(   throw_args );
-        SCM msg   = SCM_CADR(  throw_args );
-        SCM args  = SCM_CADDR( throw_args );
-        scm_display_backtrace( stack, port, SCM_UNDEFINED, SCM_UNDEFINED );
-        scm_newline( port );
-        scm_display_error( stack, port, subr, msg, args, SCM_EOL );
-    }
-#endif /* LATER */
-
-    AG_ABEND;
-    /* NOTREACHED */
     return SCM_UNDEFINED;
 }
 
