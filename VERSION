@@ -1,10 +1,11 @@
-#! /bin/echo Version_4.2,_but_it_should_be_sourced -*- Mode: Shell-Script -*-
+#! /bin/echo Version_4.2,_but_it_should_be_sourced
+# -*- Mode: Ksh -*-
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:  $Date: 1998/06/01 18:50:48 $
+# Last Modified:  $Date: 1998/06/05 14:53:13 $
 # Author:         Bruce Korb <korbb@datadesign.com>
 # Maintainer:     Bruce Korb <korbb@datadesign.com>
 #          by:    Bruce Korb <korbb@datadesign.com>
@@ -12,9 +13,9 @@
 
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=2
-AG_MICRO_VERSION=-
-AG_PATCHLEVEL=1
-AG_VERSION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION$AG_MICRO_VERSION$AG_PATCHLEVEL
+AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
+AG_PATCHLEVEL=2
+AG_VERSION=$AG_REVISION-$AG_PATCHLEVEL
 
 MAINTAINER='Bruce Korb <korbb@datadesign.com>'
 

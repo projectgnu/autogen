@@ -1,3 +1,17 @@
+1998-06-03  Gary V Vaughan  <garyv@aethos.co.uk>
+
+	* tests/casenest.test:  new test... based on some old old email
+	about a bug with CASE inside a FOR loop... I suspect this test
+	does not trigger the bug as it works right back to release 4.1 (at
+	least): MORE INVESTIGATION REQUIRED.
+
+	* doc/autogen.def: include the opts.def file directly to make sure
+	the version info is defined for the info file.
+
+	* MakeRules.in (.def.texi): use the location of the included
+	opts.def file as the template search directory so that the new
+	#include directive (above) will work.
+
 1998-05-31  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* mkupdate.sh: Convert to bourne shell (not sure about the

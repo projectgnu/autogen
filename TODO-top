@@ -18,6 +18,9 @@
 * edit sources to use xmalloc and friends throughout for better recovery
   from failed allocation
 * Write an argv style parsing agPrint.c
+* Document the use of autoopts
+* Try to sort out the server chaining stuff once and for all... I
+  suspect the pipeline will need to be built up in reverse like bash...
 
 Possibilities for the future:
 
