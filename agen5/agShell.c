@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.8 2002/02/23 21:05:26 bkorb Exp $
+ *  $Id: agShell.c,v 3.9 2002/02/28 00:50:18 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -402,8 +402,10 @@ loadData( FILE* fp )
          *  Set a timeout so we do not wait forever.
          */
         alarm( OPT_VALUE_TIMEOUT );
-        if (fgets( zLine, sizeof( zLine ), fp ) == NULL)
+        if (fgets( zLine, sizeof( zLine ), fp ) == NULL) {
+            alarm( 0 );
             break;
+        }
         alarm( 0 );
 
 #else
