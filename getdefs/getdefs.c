@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.21 1999/10/31 00:29:13 bruce Exp $
+ *  $Id: getdefs.c,v 2.22 1999/10/31 18:31:17 bruce Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
@@ -179,7 +179,7 @@ main( int    argc,
         } while (--ct > 0);
     }
 
-    if (ENABLED_OPT( ORDERING ))
+    if (ENABLED_OPT( ORDERING ) && (blkUseCt > 1))
         qsort( (void*)papzBlocks, blkUseCt, sizeof( char* ),
                &compar_text );
 
@@ -759,7 +759,10 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
 
     /*
      *  Look for the character that separates this entry text
-     *  from the entry text for the next attribute
+     *  from the entry text for the next attribute.  Leave 'pcComma'
+     *  pointing to the character _before_ the character where we
+     *  are to resume our text scan.  (i.e. at the comma, or the
+     *  last character in the string)
      */
     pcComma = strchr( pzText, sepChar );
     if (pcComma == (char*)NULL) {
@@ -779,7 +782,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
      */
     *pzOut++ = '\'';
     {
-        char ch = *pcEnd;
+        char svch = *pcEnd;
         *pcEnd = NUL;
         for (;;) {
             char ch = *pzText++;
@@ -795,7 +798,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
         } copyDone: ;
 
         pzText = pcComma+1;
-        *pcEnd = ch;
+        *pcEnd = svch;
     }
 
     *pzOut++ = '\''; *pzOut++ = ';';
@@ -808,10 +811,11 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
     char*
 emitSubblock( char* pzDefList, char* pzText, char* pzOut )
 {
-    tSCC  zStart[] = " = {\n        ";
-    tSCC  zEnd[]   = "\n    };\n";
-    int   newlineDone = 1;
-    char  sepChar = ',';
+    tSCC  zStart[]  = " = {";
+    tSCC  zAttr[]   = "\n        ";
+    tSCC  zEnd[]    = "\n    };\n";
+    char  sepChar   = ',';
+    int   FirstAttr = 1;
 
     /*
      *  Advance past subblock name to the entry name list
@@ -839,38 +843,64 @@ emitSubblock( char* pzDefList, char* pzText, char* pzOut )
          */
         if (*pzText == sepChar) {
             pzText++;
-            while ((! isspace( *pzDefList )) && (*pzDefList != NUL))
-                pzDefList++;
+            for (;;) {
+                switch (*++pzDefList) {
+                case ' ':
+                    pzDefList++;
+                case NUL:
+                    goto def_list_skip_done;
+                }
+            } def_list_skip_done:;
             continue;
+        }
+
+        /*
+         *  Skip leading white space in the attribute and check for done.
+         */
+        while (isspace( *pzText )) pzText++;
+        if (*pzText == NUL) {
+            /*
+             *  IF there were no definitions, THEN emit one anyway
+             */
+            if (FirstAttr) {
+                strcpy( pzOut, zAttr );
+                pzOut += sizeof( zAttr );
+                for (;;) {
+                    *pzOut++ = *pzDefList++;
+                    switch (*pzDefList) {
+                    case ' ':
+                    case NUL:
+                        goto single_def_entry_done;
+                    }
+                } single_def_entry_done:;
+                *pzOut++ = ';';
+            }
+            break;
         }
 
         /*
          *  Copy out the attribute name
          */
-        if (! newlineDone) {
-            strcpy( pzOut, zStart + 4 );
-            pzOut += sizeof( zStart ) - 5;
-        }
+        strcpy( pzOut, zAttr );
+        pzOut += sizeof( zAttr )-1;
+        FirstAttr = 0;
 
         for (;;) {
             *pzOut++ = *pzDefList++;
-            if (*pzDefList == ' ') {
+            switch (*pzDefList) {
+            case ' ':
                 pzDefList++;
-                break;
+            case NUL:
+                goto def_name_copied;
             }
-            if (*pzDefList == NUL)
-                break;
-        }
+        } def_name_copied:;
 
         /*
-         *  Skip leading white space in the attribute
+         *  IF there are no data for this attribute,
+         *  THEN we emit an empty definition.
          */
-        while (isspace( *pzText )) pzText++;
-        if ((*pzText == NUL) || (*pzText == sepChar)) {
+        if (*pzText == sepChar) {
             *pzOut++ = ';';
-            *pzOut++ = '\n';
-            if (*pzText == NUL)
-                break;
             pzText++;
             continue;
         }
@@ -880,7 +910,6 @@ emitSubblock( char* pzDefList, char* pzText, char* pzOut )
          */
         *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
         pzOut = emitSubblockString( &pzText, sepChar, pzOut );
-        newlineDone = 0;
 
     } while (isalpha( *pzDefList ));
     strcpy( pzOut, zEnd );
@@ -916,10 +945,8 @@ emitDefinition( char* pzDef, char* pzOut )
 
         do  {
             p = *ppz++;
-            if (strcmp( p, zEntryName ) == 0) {
-                pzOut = emitSubblock( p, pzDef, pzOut );
-                return pzOut;
-            }
+            if (strcmp( p, zEntryName ) == 0)
+                return emitSubblock( p, pzDef, pzOut );
         } while (--ct > 0);
     }
 
