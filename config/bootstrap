@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Sun Jul  1 11:58:02 BST 2001
+# Last Modified:     $Date: 2001/07/15 23:07:21 $
 #            by:     Gary V. Vaughan <gary@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.35 2001/07/12 02:20:42 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.36 2001/07/15 23:07:21 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -38,6 +38,7 @@
 # can be generated after checkout using this bootstrap procedure.
 
 # Code:
+set -e
 
 # Figure out the absolute path to the working directory.
 #

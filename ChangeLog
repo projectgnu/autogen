@@ -1,3 +1,10 @@
+2001-07-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcEval.c: fflush output after write
+	* agen5/funcFor.c: ditto
+	* autoopts/optlib.tpl(USAGE_LINE): rewrote to take advantage of temp
+	files and avoid Sun bug where sed cannot see a last line without a \n
+
 2001-07-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/in.test: added to test above.

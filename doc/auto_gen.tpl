@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.67 2001/06/24 00:32:52 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.68 2001/07/15 23:07:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -29,19 +29,32 @@ directories:
 [= ` for f in ${DOC_DEPENDS} ; do echo "    $f" ; done ` =]
 
 @end ignore
+[=(shellf "
+COPYRIGHT='%s'
+TITLE='%s'
+PACKAGE='%s'"
 
-@set EDITION [=`echo ${AG_REVISION}`=]
-@set VERSION [=`echo ${AG_REVISION}`=]
-@set UPDATED [=`date "+%B %Y"`=]
-@set COPYRIGHT [=(get "copyright.date")=]
+  (get "copyright.date")
+  (get "prog_title")
+  (get "package"))
+
+=][=`
+cat <<_EOF_
+@set EDITION   ${AG_REVISION}
+@set VERSION   ${AG_REVISION}
+@set UPDATED   \`date '+%B %Y'\`
+@set COPYRIGHT $COPYRIGHT
+@set TITLE     $TITLE
+@set PACKAGE   $PACKAGE
+_EOF_`=]
 
 @dircategory GNU programming tools
 @direntry
-* AutoGen: (autogen).         [=prog_title=]
+* AutoGen: (autogen).         @value{TITLE}
 @end direntry
 
 @ifinfo
-This file documents [=package=] Version @value{VERSION}
+This file documents @value{PACKAGE} Version @value{VERSION}
 
 AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
 AutoOpts copyright @copyright{} @value{COPYRIGHT} Bruce Korb
@@ -52,16 +65,16 @@ snprintfv copyright @copyright{} 1999-2000 Gary V. Vaughan
 @ignore
 Permission is granted to process this file through TeX and print the
 results, provided the printed document carries copying permission
-notice identical to this one except for the removal of this paragraph
+notice identical to this one except for the removal of this paragraph.
 @end ignore
 @end ifinfo
 
 @finalout
 @titlepage
-@title AutoGen - [=prog_title=]
+@title AutoGen - @value{TITLE}
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{[=% eaddr `echo %s|sed 's/@/@@/g'`=]}
+@author @email{bkorb@@gnu.org}
 
 @page
 @vskip 0pt plus 1filll
@@ -73,13 +86,9 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 [=(gpl "AutoGen" "")=]
 @end titlepage
-
-@ifinfo
-@node Top, Introduction, , (dir)
-@top [=prog_title=]
-@comment  node-name,  next,  previous,  up
-
 [=
+
+
 (define text-tag "")=][=
 
 DEFINE get-text     =][=
@@ -95,23 +104,6 @@ DEFINE get-text     =][=
 ENDDEF get-text     =][=
 
 get-text tag = main =]
-
-@node Directives
-@section Controlling What Gets Processed
-@cindex directives
-
-Definition processing directives can @strong{only} be processed
-if the '#' character is the first character on a line.  Also, if you
-want a '#' as the first character of a line in one of your string
-assignments, you should either escape it by preceding it with a
-backslash @samp{\}, or by embedding it in the string as in @code{"\n#"}.
-
-All of the normal C preprocessing directives are recognized, though
-several are ignored.  There is also an additional @code{#shell} -
-@code{#endshell} pair.  Another minor difference is that AutoGen
-directives must have the hash character (@code{#}) in column 1.
-
-The ignored directives are:
 [=
 FOR directive =][=
   (if (exist? "dummy")
@@ -223,7 +215,7 @@ Usage:  ([=(. func-str)=][=
       arg_optional " ]" =][=
     ENDFOR exparg =])
 @*
-[= string (string-append func-name ":  ") =][=doc=]
+[= string (string-append func-name "@:  ") =][=doc=]
 [=
     IF (exist? "exparg") =]
 Arguments:[=

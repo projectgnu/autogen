@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.30 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: funcEval.c,v 1.31 2001/07/15 23:07:21 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -386,6 +386,7 @@ MAKE_HANDLER_PROC( Expr )
     char* pz = evalExpression( &needFree );
 
     fputs( pz, pCurFp->pFile );
+    fflush( pCurFp->pFile );
     if (needFree)
         AGFREE( (void*)pz );
 

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.28 2001/06/28 02:09:37 bkorb Exp $
+# $Id: optlib.tpl,v 1.29 2001/07/15 23:07:21 bkorb Exp $
 
 =]
 [=
@@ -203,9 +203,9 @@ tSCC    z[= (sprintf "%-25s" (string-append cap-name
     #  =][=
     IF (> (len "disable") 0) =]
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Name[]"))
-             =]= "[=(string-downcase! (get "disable"))=]-[=
-          (shell (sprintf "echo '%s'|tr '_\^' '\\-\\-'"
-                        (string-downcase! (get "name")) )) =]";
+             =]= "[=
+       (string-tr! (string-append (get "disable") "-" (get "name"))
+                   "A-Z_^" "a-z--") =]";
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
              =]= "[=(string-downcase! (get "disable"))=]";[=
 
@@ -213,10 +213,9 @@ tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
       #  See if we can use a substring for the option name:
       #  =][=
       IF (> (len "enable") 0) =]
-tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
-         (shell (sprintf "echo '%s-%s'|tr '_\^' '\\-\\-'"
-                        (string-downcase! (get "enable"))
-                        (string-downcase! (get "name")) )) =]";[=
+tSCC    z[=(sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
+        (string-tr! (string-append (get "enable") "-" (get "name"))
+                    "A-Z_^" "a-z--") =]";[=
       ELSE =]
 #define z[=(sprintf "%-28s" (string-append cap-name
         "_Name")) =](zNot[= (. cap-name) =]_Name + [=
@@ -231,9 +230,9 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
 #define zNot[= (sprintf "%-24s" (string-append cap-name "_Name"))
              =] (const char*)NULL
 tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
-             =]= "[=enable 
-         (string-append (string-downcase! (get "enable")) "-") =][=
-         (string-tr! (string-downcase! (get "name")) "_^" "--" ) =]";[=
+             =]= "[= (string-tr! (string-append
+        (if (exist? "enable") (string-append (get "enable") "-") "")
+        (get "name"))   "A-Z_^" "a-z--") =]";[=
 
     ENDIF (> (len "disable") 0) =][=
 
@@ -334,7 +333,7 @@ DEFINE Option_Descriptor =][=
           IF (== (string-upcase! (get "equivalence")) UP-name)
               =]NO_EQUIVALENT, 0,[=
           ELIF (exist? "equivalence")
-              =]~0, ~0,[=
+              =]NOLIMIT, NOLIMIT,[=
           ELSE
               =][=(for-index)=], VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=],[=
           ENDIF=]
@@ -429,59 +428,53 @@ syntax. =][=
 
 DEFINE USAGE_LINE   =][=
 
-  #  Compute the option arguments           =][=
+  ;;  Compute the option arguments
+  ;;
+  (if (exist? "flag.arg_type")
+      (begin
+        (define flag-arg " [<val>]")
+        (define  opt-arg "[{=| }<val>]") )
+      (begin
+        (define flag-arg "")
+        (define  opt-arg "") )  )
 
-  (out-push-new ".usAGe_line")
+  (define usage-line (string-append "USAGE:  %s "
 
-=][=(. prog-name)=] - [=prog_title=][= % version " - Ver. %s" =]
-USAGE:  %s [=
-  IF  (exist? "flag.arg_type")              =][=
-      (define flag-arg " [<val>]")
-      (define  opt-arg "[{=| }<val>]")      =][=
-  ELSE                                      =][=
-      (define flag-arg "")
-      (define  opt-arg "")                  =][=
-  ENDIF                                     =][=
+      ;; If at least one option has a minimum occurrence count
+      ;; we use curly brackets around the option syntax.
+      ;;
+      (if (not (exist? "flag.min")) "[ " "{ ")
 
-  IF (not (exist? "flag.min")) =][[= ELSE =]{[= ENDIF =] [=
+    (if (exist? "flag.value")
+        (string-append "-<flag>" flag-arg
+           (if (exist? "long_opts") " | " "") )
+        (if (not (exist? "long_opts"))
+           (string-append "<option-name>" opt-arg))  )
 
-  #  At least one option has a minimum occurrence count.
-     Therefore, we omit the square brackets around the option
-     syntax.
-  =][=
-  IF   (exist? "flag.value")
-     =]-<flag>[=(. flag-arg)=][=
+    (if (exist? "long_opts")
+        (string-append "--<name>" opt-arg) "" )
 
-     IF (exist? "long_opts")
-        =] | [=ENDIF=][=
-  ELIF (not (exist? "long_opts")) =]<option-name>[=(. opt-arg)=][=
-  ENDIF                                     =][=
+    (if (not (exist? "flag.min")) " ]..." " }...")
+  ) )
 
-  IF (exist? "long_opts")
-     =]--<name>[=(. opt-arg)                =][=
-  ENDIF                                     =] [=
+  (if (exist? "argument")
 
-  IF (not (exist? "flag.min")) =]][= ELSE =]}[= ENDIF =]...[=
+    (set! usage-line (string-append usage-line
 
-  IF (exist? "argument")                    =] [=
-
-    #  IF the USAGE line plus the program name plus the argument
-    #  goes past 80 columns, then break the line.  =][=
-
-    IF (< 80 (+ (string-length (shell
-                "sed -n -e 2p -e 2q .usAGe_line"))
+          ;; the USAGE line plus the program name plus the argument goes
+          ;; past 80 columns, then break the line, else separate with space
+          ;;
+          (if (< 80 (+ (string-length usage-line)
                 (len "argument")
-                (len "prog_name") )) =]\
-		[=
-    ENDIF
+                (len "prog_name") ))
+              " \\\n\t\t"  " ")
+          (get "argument")  ))
+  )
 
-    =][=argument=]
-[=
-  ENDIF=][=
-
-(out-pop)
-(kr-string (string-append (shell
-"cat .usAGe_line ; rm -f .usAGe_line") "\n" )) =][=
+  (kr-string (string-append prog-name " - " (get "prog_title")
+           (if (exist? "version") (string-append " - Ver. " (get "version"))
+               "" )
+           "\n" usage-line "\n" ))    =][=
 
 ENDDEF
 =]

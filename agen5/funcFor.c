@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.20 2001/06/06 04:19:57 uid24370 Exp $
+ *  $Id: funcFor.c,v 1.21 2001/07/15 23:07:21 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -416,6 +416,7 @@ doForByStep( tTemplate* pT,
             break;
 
         fputs( pFS->for_pzSep, pCurFp->pFile );
+        fflush( pCurFp->pFile );
         pFS->for_firstFor = AG_FALSE;
         pFS->for_index = nextIdx;
     }
@@ -478,6 +479,7 @@ doForEach( tTemplate*   pT,
          *  Emit the iteration separation
          */
         fputs( pFS->for_pzSep, pCurFp->pFile );
+        fflush( pCurFp->pFile );
     }
 
     currDefCtx = stack;  /* Restore the def context */

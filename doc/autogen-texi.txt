@@ -8,7 +8,7 @@
 @ignore
 EDIT THIS FILE WITH CAUTION  (autogen.texi)
 
-It has been AutoGen-ed  Saturday June 23, 2001 at 05:28:15 PM PDT
+It has been AutoGen-ed  Sunday July 15, 2001 at 03:41:56 PM PDT
 From the definitions    stdin
 and the template file   auto_gen
 
@@ -43,19 +43,20 @@ directories:
     ../agen5/defDirect.c
 
 @end ignore
-
-@set EDITION 5.2
-@set VERSION 5.2
-@set UPDATED June 2001
+@set EDITION   5.2
+@set VERSION   5.2
+@set UPDATED   July 2001
 @set COPYRIGHT 1992-2001
+@set TITLE     The Automated Program Generator
+@set PACKAGE
 
 @dircategory GNU programming tools
 @direntry
-* AutoGen: (autogen).         The Automated Program Generator
+* AutoGen: (autogen).         @value{TITLE}
 @end direntry
 
 @ifinfo
-This file documents  Version @value{VERSION}
+This file documents @value{PACKAGE} Version @value{VERSION}
 
 AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
 AutoOpts copyright @copyright{} @value{COPYRIGHT} Bruce Korb
@@ -81,13 +82,13 @@ write to:  The Free Software Foundation, Inc.,
 @ignore
 Permission is granted to process this file through TeX and print the
 results, provided the printed document carries copying permission
-notice identical to this one except for the removal of this paragraph
+notice identical to this one except for the removal of this paragraph.
 @end ignore
 @end ifinfo
 
 @finalout
 @titlepage
-@title AutoGen - The Automated Program Generator
+@title AutoGen - @value{TITLE}
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
 @author @email{bkorb@@gnu.org}
@@ -117,16 +118,15 @@ write to:  The Free Software Foundation, Inc.,
            59 Temple Place - Suite 330,
            Boston,  MA  02111-1307, USA.
 @end titlepage
+@ignore
+START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
 @ifinfo
 @node Top, Introduction, , (dir)
 @top The Automated Program Generator
 @comment  node-name,  next,  previous,  up
-
-@ignore
-START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
 
 This file documents AutoGen, a tool designed for generating program
 files that contain repetitive text with varied substitutions.
@@ -184,12 +184,13 @@ a line in the usage text.
 @end enumerate
 
 @noindent
-You will need more things besides this if you choose to implement long option
-names, rc/ini file processing, environment variables and so on.  All of this
-can be done mechanically; with the proper templates and this program.
-In fact, it has already been done and AutoGen itself uses it:  @xref{AutoOpts}.
-For a simple example of Automated Option processing, @xref{Quick Start}.
-For a full list of the Automated Option features, @xref{Features}.
+You will need more things besides this if you choose to implement long
+option names, rc/ini file processing, environment variables and so on.
+All of this can be done mechanically; with the proper templates and this
+program.  In fact, it has already been done and AutoGen itself uses it@:
+@xref{AutoOpts}.  For a simple example of Automated Option processing,
+@xref{Quick Start}.  For a full list of the Automated Option features,
+@xref{Features}.
 
 @menu
 * Generalities::         The Purpose of AutoGen
@@ -673,7 +674,7 @@ except that there is no concatenation of strings and the resulting string is
 written to a shell server process.  The definition takes on the value of
 the output string.
 
-NB:  The text is interpreted by a server shell.  There may be
+NB@:  The text is interpreted by a server shell.  There may be
 left over state from previous @code{`} processing and it may
 leave state for subsequent processing.  However, a @code{cd}
 to the original directory is always issued before the new
@@ -746,7 +747,7 @@ then you also have the option, a la ANSI-C syntax,
 of implicitly concatenating a series of them together,
 with intervening white space ignored.
 
-NOTE: You @strong{cannot} use directives to alter the string
+NB@:  You @strong{cannot} use directives to alter the string
 content.  That is,
 
 @example
@@ -817,11 +818,6 @@ named @code{alist->autogen-def} in an expression that looks like this:
     ( (name (value-expression))  (name2 (another-expr)) ) )
 @end example
 
-@ignore
-END   == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
-
 @node Directives
 @section Controlling What Gets Processed
 @cindex directives
@@ -838,6 +834,10 @@ several are ignored.  There is also an additional @code{#shell} -
 directives must have the hash character (@code{#}) in column 1.
 
 The ignored directives are:
+@ignore
+END   == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 @samp{#assert}, @samp{#ident}, @samp{#pragma},  and @samp{#if}.
 Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
@@ -970,7 +970,7 @@ Extracted from ../agen5/defDirect.c on line 717.
 Invokes @code{$SHELL} or @file{/bin/sh} on a script that should
 generate AutoGen definitions.  It does this using the same server
 process that handles the back-quoted @code{`} text.
-@strong{CAUTION}:  let not your @code{$SHELL} be @code{csh}.
+@strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
 
 @item #undef name-to-undefine
 @cindex #undef
@@ -1200,7 +1200,7 @@ c +]
 @end example
 
 @noindent
-Note:  It is generally a good idea to use some sort of opening
+Note@:  It is generally a good idea to use some sort of opening
 bracket in the starting macro and closing bracket in the ending
 macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
 in the starting macro).  It helps both visually and with editors
@@ -1209,7 +1209,7 @@ capable of finding a balancing parenthesis.
 It is also helpful to avoid using the comment marker (@code{#});
 the POSIXly acceptable file name characters period (@code{.}),
 hyphen (@code{-}) and underscore (@code{_}); and finally, it is
-advisable to avoid using any of the quote characters:  double,
+advisable to avoid using any of the quote characters@:  double,
 single or back-quote.  But there is no special check for any of
 these advisories.
 
@@ -1227,7 +1227,7 @@ Suffix specifications consist of a sequence of POSIX compliant file name
 characters and, optionally, an equal sign and a file name "printf"-style
 formatting string.  Two string arguments are allowed for that string:
 the base name of the definition file and the current suffix (that being
-the text to the left of the equal sign).  (Note: "POSIX compliant file
+the text to the left of the equal sign).  (Note@: "POSIX compliant file
 name characters" consist of alphanumerics plus the period (@code{.}),
 hyphen (@code{-}) and underscore (@code{_}) characters.)  If there are
 no suffix specifications, then the generated file will be written to the
@@ -1560,7 +1560,7 @@ DEFINITIONS ERROR in %s line %d for %s:  %s\n
 @end example
 
 The first three arguments to this format are provided by the
-routine and are: The name of the template file, the line within
+routine and are@:  The name of the template file, the line within
 the template where the error was found, and the current output
 file name.
 
@@ -1931,7 +1931,7 @@ This Scheme function takes no arguments.
 @subsection @file{stack} - make list of AutoGen values
 @findex stack
 @ignore
-Extracted from ../agen5/expString.c on line 645.
+Extracted from ../agen5/expString.c on line 669.
 @end ignore
 Usage:  (stack ag-name)
 @*
@@ -2052,11 +2052,10 @@ Extracted from ../agen5/expFormat.c on line 446.
 @end ignore
 Usage:  (bsd prog_name owner prefix)
 @*
-Emit a string that contains the Free BSD Public License.  It
-takes three arguments: @code{prefix} contains the string to start
-each output line.  @code{owner} contains the copyright owner.
-@code{prog_name} contains the name of the program the copyright is
-about.
+Emit a string that contains the Free BSD Public License.  It takes three
+arguments@:  @code{prefix} contains the string to start each output line.
+@code{owner} contains the copyright owner.  @code{prog_name} contains the
+name of the program the copyright is about.
 
 Arguments:
 @*
@@ -2069,7 +2068,7 @@ prefix - String for starting each output line
 @subsection @file{c-string} - emit string for ANSI C
 @findex c-string
 @ignore
-Extracted from ../agen5/expString.c on line 717.
+Extracted from ../agen5/expString.c on line 741.
 @end ignore
 Usage:  (c-string string)
 @*
@@ -2172,10 +2171,9 @@ Extracted from ../agen5/expFormat.c on line 300.
 @end ignore
 Usage:  (gpl prog-name prefix)
 @*
-Emit a string that contains the GNU Public License.  It
-takes two arguments: @code{prefix} contains the string to start
-each output line, and
-@code{prog_name} contains the name of the program the copyright is
+Emit a string that contains the GNU Public License.  It takes two
+arguments@:  @code{prefix} contains the string to start each output line,
+and @code{prog_name} contains the name of the program the copyright is
 about.
 
 Arguments:
@@ -2203,7 +2201,7 @@ string-list - list of strings to check
 @subsection @file{join} - join string list with separator
 @findex join
 @ignore
-Extracted from ../agen5/expString.c on line 242.
+Extracted from ../agen5/expString.c on line 266.
 @end ignore
 Usage:  (join separator list ...)
 @*
@@ -2221,7 +2219,7 @@ list - list of strings to join
 @subsection @file{kr-string} - emit string for K&R C
 @findex kr-string
 @ignore
-Extracted from ../agen5/expString.c on line 690.
+Extracted from ../agen5/expString.c on line 714.
 @end ignore
 Usage:  (kr-string string)
 @*
@@ -2242,11 +2240,10 @@ Extracted from ../agen5/expFormat.c on line 366.
 @end ignore
 Usage:  (lgpl prog_name owner prefix)
 @*
-Emit a string that contains the GNU Library Public License.  It
-takes three arguments: @code{prefix} contains the string to start
-each output line.  @code{owner} contains the copyright owner.
-@code{prog_name} contains the name of the program the copyright is
-about.
+Emit a string that contains the GNU Library Public License.  It takes
+three arguments@:  @code{prefix} contains the string to start each output
+line.  @code{owner} contains the copyright owner.  @code{prog_name}
+contains the name of the program the copyright is about.
 
 Arguments:
 @*
@@ -2330,7 +2327,7 @@ list - list of values.  Strings are converted to numbers
 @subsection @file{prefix} - prefix lines with a string
 @findex prefix
 @ignore
-Extracted from ../agen5/expString.c on line 341.
+Extracted from ../agen5/expString.c on line 365.
 @end ignore
 Usage:  (prefix prefix text)
 @*
@@ -2374,7 +2371,7 @@ format-arg - Optional - list of arguments to formatting string
 @subsection @file{raw-shell-str} - single quote shell string
 @findex raw-shell-str
 @ignore
-Extracted from ../agen5/expString.c on line 485.
+Extracted from ../agen5/expString.c on line 509.
 @end ignore
 Usage:  (raw-shell-str string)
 @*
@@ -2385,7 +2382,7 @@ Contained single quotes become tripled, with the middle quote
 escaped with a backslash.  Normal shells will reconstitute the
 original string.
 
-@strong{NOTE}: some shells will not correctly handle unusual
+@strong{NOTE}@:  some shells will not correctly handle unusual
 non-printing characters.  This routine works for most reasonably
 conventional ASCII strings.
 
@@ -2396,7 +2393,7 @@ string - string to transform
 @subsection @file{shell} - invoke a shell script
 @findex shell
 @ignore
-Extracted from ../agen5/expString.c on line 419.
+Extracted from ../agen5/expString.c on line 443.
 @end ignore
 Usage:  (shell command)
 @*
@@ -2413,7 +2410,7 @@ command - shell command - the result value is stdout
 @subsection @file{shell-str} - double quote shell string
 @findex shell-str
 @ignore
-Extracted from ../agen5/expString.c on line 549.
+Extracted from ../agen5/expString.c on line 573.
 @end ignore
 Usage:  (shell-str string)
 @*
@@ -2428,7 +2425,7 @@ string - string to transform
 @subsection @file{shellf} - format a string, run shell
 @findex shellf
 @ignore
-Extracted from ../agen5/expString.c on line 454.
+Extracted from ../agen5/expString.c on line 478.
 @end ignore
 Usage:  (shellf format [ format-arg ... ])
 @*
@@ -2800,7 +2797,7 @@ str - input/output string
 @subsection @file{string-tr!} - convert characters
 @findex string-tr!
 @ignore
-Extracted from ../agen5/expString.c on line 749.
+Extracted from ../agen5/expString.c on line 773.
 @end ignore
 Usage:  (string-tr! source match translation)
 @*
@@ -3098,7 +3095,7 @@ For a complete description @xref{DEFINE}.
 @node ENDFOR
 @subsection ENDFOR - Terminates the @code{FOR} function template block
 @ignore
-Extracted from ../agen5/funcFor.c on line 557.
+Extracted from ../agen5/funcFor.c on line 559.
 @end ignore
 @findex ENDFOR
 
@@ -3151,7 +3148,7 @@ macro is inferred.  The result of the expression evaluation
 @node FOR
 @subsection FOR - Emit a template block multiple times
 @ignore
-Extracted from ../agen5/funcFor.c on line 489.
+Extracted from ../agen5/funcFor.c on line 491.
 @end ignore
 @findex FOR
 @cindex looping, for
@@ -3479,7 +3476,7 @@ beginning of the @file{agen5/snarf.tpl} template file.
 @node AutoGen macros
 @section AutoGen Macros
 
-There are two kinds:  those you define yourself and AutoGen native.
+There are two kinds@:  those you define yourself and AutoGen native.
 The user-defined macros may be defined in your templates or loaded
 with the @code{--lib-template} option
 (See @ref{DEFINE} and  @ref{autogen lib-template}).
@@ -3509,7 +3506,7 @@ Invocation section from ../agen5/autogen.texi
 
 # DO NOT EDIT THIS FILE   (autogen.texi)
 # 
-# It has been AutoGen-ed  Saturday June 23, 2001 at 05:08:12 PM PDT
+# It has been AutoGen-ed  Sunday July 15, 2001 at 03:41:46 PM PDT
 # From the definitions    opts.def
 # and the template file   aginfo
 
@@ -3549,7 +3546,93 @@ This software is released under the GNU General Public License.
 This is the automatically generated usage text for autogen:
 
 @format
-autogen is unavailable - no --help
+autogen - The Automated Program Generator - Ver. 5.2.6
+USAGE:  autogen [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]... [ <def-file> ]
+  Flg Arg Option-Name    Description
+   -L YES templ-dirs     Template search directory list
+                                - may appear multiple times
+   -T YES override-tpl   Override template file
+                                - may not be preset
+   -l YES lib-template   Library template file
+                                - may appear multiple times
+   -b YES base-name      Base name for output file(s)
+                                - may not be preset
+      YES definitions    Definitions input file
+                                - disabled as --no-definitions
+                                - enabled by default
+                                - may not be preset
+   -S YES load-scheme    Scheme code file to load
+   -F YES load-functions Load scheme callout library
+   -s YES skip-suffix    Omit the file with this suffix
+                                - may not be preset
+                                - may appear multiple times
+   -o opt select-suffix  specify this output suffix
+                                - may not be preset
+                                - may appear multiple times
+      no  source-time    set mod times to latest source
+                                - disabled as --no-source-time
+      YES equate         characters considered equivalent
+      no  writable       Allow output files to be writable
+                                - disabled as --not-writable
+                                - may not be preset
+
+The following options are often useful while debugging new templates:
+
+  Flg Arg Option-Name    Description
+      Num loop-limit     Limit on increment loops
+   -t Num timeout        Time limit for servers
+      KWd trace          tracing level of detail
+      YES trace-out      tracing output file or filter
+
+These options can be used to control what gets processed
+in the definitions files and template files.
+
+  Flg Arg Option-Name    Description
+   -D YES define         name to add to definition list
+                                - may appear multiple times
+   -U YES undefine       definition list removal pattern
+                                - an alternate for define
+
+Auto-supported Options:
+
+  Flg Arg Option-Name    Description
+   -v opt version        Output version information and exit
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+   -> opt save-opts      Save the option state to an rc file
+   -< YES load-opts      Load options from an rc file
+                                - disabled as --no-load-opts
+                                - may appear multiple times
+
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character (option value).
+
+AutoGen creates text files from templates using external definitions.
+
+The following option preset mechanisms are supported:
+ - reading file $HOME/.autogenrc
+ - reading file ./.autogenrc
+ - examining environment variables named AUTOGEN_*
+
+The valid trace option keywords are:
+        nothing
+        templates
+        block-macros
+        expressions
+        everything
+
+The definitions file (`<def-file>') can be specified with the
+`definitions' option or as the command argument, but not both.
+Omitting it or specifying `-' will result in reading definitions from
+standard input.
+
+The output file names are based on the template, but generally use the
+base name of the definition file.  If standard in is read for the
+definitions, then `stdin' will be used for that base name.  The
+suffixes to the base name are gotten from the template.  However, the
+template file may specify the entire output file name.
+
+`loop-limit' is used in debugging to stop runaway expansions.
 @end format
 
 @node autogen templ-dirs
@@ -3841,7 +3924,7 @@ installed.  The following assumes that everything is installed
 relative to @code{$prefix}.  You can, of course, use
 @code{configure} to place these files where you wish.
 
-@strong{NB}:  AutoGen does not contain any compiled-in path names.
+@strong{NB}@:  AutoGen does not contain any compiled-in path names.
 All support directories are located via option processing
 and the environment variable @code{HOME}.
 
@@ -3925,7 +4008,7 @@ Extraction from autogen.texi
 @chapter Automated Option Processing
 @cindex autoopts
 
-AutoOpts 9.3 is bundled with AutoGen.  It is a tool that virtually eliminates
+AutoOpts 10.0 is bundled with AutoGen.  It is a tool that virtually eliminates
 the hassle of processing options and keeping man pages, info docs and
 usage text up to date.  This package allows you to specify several program
 attributes, up to a hundred option types and many option attributes.
@@ -4638,7 +4721,7 @@ U's or L's.
 
 @item bool[@i{ean}]
 The argument will be interpreted and always yield either AG_TRUE or
-AG_FALSE.  False values are: the empty string, the number zero, or a
+AG_FALSE.  False values are@:  the empty string, the number zero, or a
 string that starts with @code{f}, @code{F}, @code{n} or @code{N}
 (representing False or No).  Anything else will be interpreted as True.
 
@@ -4906,7 +4989,7 @@ the option has not been specified yet and initializes as @code{disabled}.)
 
 @cindex pzLastArg
 @item pzLastArg
-Pointer to the latest argument string.  BEWARE: If the argument type is
+Pointer to the latest argument string.  BEWARE@:  If the argument type is
 numeric or an enumeration.  This will be the argument @strong{value} and
 not a pointer to a string.
 @end table
@@ -4927,7 +5010,7 @@ the current program, as retrieved from the argument vector.
 
 @end table
 
-Note:  these fields get filled in during the first call to
+Note@:  these fields get filled in during the first call to
 @code{optionProcess()}.  All other fields are private, for the exclusive
 use of AutoOpts code and is subject to change.
 
@@ -5374,7 +5457,7 @@ This macro invokes the procedure registered to display
 the usage text.  Normally, this will be @code{optionUsage} from the
 AutoOpts library, but you may select another procedure by specifying
 @code{usage = "proc_name"} program attribute.  This procedure must
-take two arguments: first, a pointer to the option descriptor, and
+take two arguments@:  first, a pointer to the option descriptor, and
 second the exit code.  The macro supplies the option descriptor
 automatically.  This routine is expected to call @code{exit(3)} with
 the provided exit code.
@@ -5897,7 +5980,7 @@ Copy of text from ../columns/columns.texi
 
 # DO NOT EDIT THIS FILE   (columns.texi)
 # 
-# It has been AutoGen-ed  Saturday June 23, 2001 at 05:11:12 PM PDT
+# It has been AutoGen-ed  Sunday July 15, 2001 at 03:34:22 PM PDT
 # From the definitions    ../columns/opts.def
 # and the template file   aginfo
 
@@ -6131,7 +6214,7 @@ Copy of text from ../getdefs/getdefs.texi
 
 # DO NOT EDIT THIS FILE   (getdefs.texi)
 # 
-# It has been AutoGen-ed  Saturday June 23, 2001 at 05:11:07 PM PDT
+# It has been AutoGen-ed  Sunday July 15, 2001 at 03:34:17 PM PDT
 # From the definitions    ../getdefs/opts.def
 # and the template file   aginfo
 
@@ -6573,7 +6656,7 @@ Many thanks!!
 
    For further details, the reader is referred to the snprintfv
 documentation.  These functions are also available in the template
-processing as: `sprintf' (@pxref{SCM sprintf}), `printf'
+processing as@:  `sprintf' (@pxref{SCM sprintf}), `printf'
 (@pxref{SCM printf}), `fprintf' (@pxref{SCM fprintf}), and `shellf'
 (@pxref{SCM shellf}).
 @ignore
