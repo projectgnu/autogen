@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.6 1998/09/23 20:29:10 bkorb Exp $
+ *  $Id: getdefs.c,v 2.7 1998/10/26 15:33:41 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -21,6 +21,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <utime.h>
+
+#ifndef HAVE_STRSIGNAL
+#  include <compat/strsignal.c>
+#endif
 
 #define MAXNAMELEN 256
 #ifndef MAXPATHLEN

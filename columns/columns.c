@@ -113,7 +113,8 @@ readLines( void )
         /*
          *  Allocate a string and space in the pointer array.
          */
-        pzL = (char*)malloc( len+1+sepLen );
+        len += sepLen + 1;
+        pzL = (char*)malloc( len );
         if (++usedCt > allocCt) {
             allocCt += 128;
             papzLines = (char**)realloc( (void*)papzLines,
@@ -137,7 +138,7 @@ readLines( void )
             maxEntryWidth = len;
     }
 
-    if (maxEntryWidth++ == 0) {
+    if (maxEntryWidth == 0) {
         fputs( "Warning:  no input text was read\n", stderr );
         exit( EXIT_SUCCESS );
     }
@@ -168,8 +169,12 @@ readLines( void )
              */
             if (sz >= maxEntryWidth)
                 columnSz = sz;
-            else
+            else {
                 columnCt = (spreadwidth / maxEntryWidth) + 1;
+                if (columnCt > 1)
+                     columnSz = spreadwidth / (columnCt - 1);
+                else columnSz = lineWidth;
+            }
         }
 
         /*

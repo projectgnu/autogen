@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.5 1998/10/21 14:28:13 bkorb Exp $
+ *   $Id: opts.def,v 1.6 1998/10/26 15:33:37 bkorb Exp $
  */
 
 /*
@@ -88,8 +88,8 @@ flag = {
     doc =
     "Causes the input text to be sorted.  If an argument is supplied,\n"
     "it is presumed to be a pattern and the sort is based upon the\n"
-    "matched text.  If the pattern starts with an asterisk (@code{*}),\n"
-    "then the sort is case insensitive.";
+    "matched text.  If the pattern starts with or consists of an asterisk\n"
+    "an asterisk (@code{*}), then the sort is case insensitive.";
 };
 
 flag = {

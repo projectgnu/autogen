@@ -10,7 +10,7 @@
 ## Last Modified:     Tue Oct 13 07:59:40 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.5 1998/10/13 15:30:48 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.6 1998/10/26 15:33:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -27,8 +27,15 @@ texi=autogen.texi =]
 Plus bits and pieces gathered from all over the source/build
 directories:
 [=_FOR infile=]
-        [=infile=][=
-/infile=]
+	[=infile=][=
+/infile =]
+[=
+_EVAL '
+  echo "	${top_srcdir}/autoopts/autoopts.texi"
+  for f in ${top_builddir}/*/*.menu
+  do echo "	$f"
+     echo "	`echo $f|sed \'s/\.menu$/\.texi/\'`"
+  done' _shell =]
 
 @end ignore
 
@@ -630,7 +637,7 @@ their argument lists.  The entries have been alphabatized:
 
 @menu[=
 _FOR macfunc =][=
-  _IF desc _exist deprecated _exist ! & =]
+  _IF desc _exist =]
 * [=name #:: + "#%-16s" _printf=] [=name _up=] - [=what=][=
   _ENDIF =][=
 /macfunc=]
@@ -702,7 +709,7 @@ capable of finding a balancing parenthesis.
       this code will insert the extracted documentation =][=
 
 _FOR macfunc =][=
-  _IF desc _exist deprecated _exist ! & =]
+  _IF desc _exist =]
 
 @node [=name=]
 @section [=name _up=] - [=what=]
@@ -761,7 +768,7 @@ The installed files are:
 
 @enumerate
 @item
-The executable in @code{bin/autogen}.
+The executables in @code{bin/*} (autogen, getdefs and columns).
 
 @item
 The link library(ies) in @code{lib/libopts.*}.
@@ -793,26 +800,23 @@ make install
 However, you may wish to insert @code{make}
 and @code{make check} before the second command.
 
-If you do perform a @code{make check} and there are any failures,
-you will find the results in @code{tests/FAILURES}.  Needless to say,
-I would be interested in seeing the contents of those files and
-any associated messages.  If you choose to go on and analyze
-one of these failures, you will have to invoke the test script
-by hand.  Automake generates rules to do this, using the make variable
-@t{TESTS}.
-
-So, you must invoke the @samp{test-name.test} file thus, from either the
-@t{tests} directory itself, or the toplevel directory:
+If you do perform a @code{make check} and there are any failures, you
+will find the results in @code{tests/FAILURES}.  Needless to say, I
+would be interested in seeing the contents of those files and any
+associated messages.  If you choose to go on and analyze one of these
+failures, you will need to invoke the test scripts individually.  You
+may do so by specifying the test (or list of test) in the TESTS make
+variable, thus:
 
 @example
 make TESTS=test-name.test check
 @end example
 
-All of the Autogen tests are written to honour the contents of
-the @t{VERBOSE} environment variable.  Normally, any commentary generated
-during a test run is discarded unless the @t{VERBOSE} environment variable is
-set.  So, to see what is happening during the test, you might invoke the
-following with @i{bash} or @i{ksh}:
+All of the Autogen tests are written to honor the contents of the
+@t{VERBOSE} environment variable.  Normally, any commentary generated
+during a test run is discarded unless the @t{VERBOSE} environment
+variable is set.  So, to see what is happening during the test, you
+might invoke the following with @i{bash} or @i{ksh}:
 
 @example
 VERBOSE=1 make TESTS="for.test forcomma.test" check

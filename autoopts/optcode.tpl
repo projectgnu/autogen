@@ -1,11 +1,11 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.6 1998/09/28 19:32:59 bkorb Exp $
+#$Id: optcode.tpl,v 2.7 1998/10/26 15:33:34 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
        [=prog_name _cap copyright _get owner _get
-       "#3$%s copyright %s %s" _printf _str=];[=
+       "#3$%s copyright %s %s, all rights reserved" _printf _str=];[=
   _ELSE =]
 #define zCopyright (const char*)NULL[=
   _ENDIF=][=
@@ -226,8 +226,10 @@ _ENDIF "flag.flag_code _exist flag.call_proc _exist |" =]
  *  These are always callable, whether
  *  TEST_[=prog_name _up #_ +=]OPTS is defined or not
  */
-static tOptProc doUsageOpt;[=_IF version _exist=]
-extern tOptProc doVersion[=_ENDIF=];
+static tOptProc doUsageOpt;[=
+_IF version _exist=]
+extern tOptProc doVersion;[=
+_ENDIF=]
 extern tOptProc doPagedUsage;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
