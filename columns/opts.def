@@ -1,0 +1,136 @@
+autogen definitions options;
+
+/*
+ *   $Id: opts.def,v 1.2 1998/09/28 19:26:10 bkorb Exp $
+ */
+
+/*
+ *  Autogen copyright 1992-1998 Bruce Korb
+ *
+ *  Autogen is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  Autogen is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Autogen.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
+copyright = "1998";
+copyright_gpl;
+
+owner          = "Bruce Korb";
+prog_name      = "columns";
+prog_title     = "Columnize Input Text";
+long_opts;
+
+version = 1;
+
+flag = {
+    name      = line_width;
+    value     = W;
+    flag_arg  = "=80";
+    descrip   = "Maximum Line Width";
+    doc       =
+    "This option specifies the full width of the output line,\n"
+    "including any start-of-line indentation.  The output will fill\n"
+    "each line as completely as possible, unless the column width has\n"
+    "been explicitly specified.  If the maximum width is less than\n"
+    "the length of the widest input, you will get a single column\n"
+    "of output.";
+};
+
+flag = {
+    name      = columns;
+    value     = c;
+    flag_arg  = "=0";
+    descrip   = "Desired number of columns";
+    flags_cant = col_width;
+    doc =
+    "Use this option to specify exactly how many columns to produce.\n"
+    "If that many columns will not fit within @var{line_width}, then\n"
+    "the number will automatically be reduced to that which will fit.";
+};
+
+flag = {
+    name      = col_width;
+    value     = w;
+    flag_arg  = "=0";
+    descrip   = "Maximum Line Width";
+    flags_cant = columns;
+    doc =
+    "Use this option to specify exactly how many characters are to be\n"
+    "allocated for each column.  If it is narrower than the widest entry,\n"
+    "it will be over-ridden with the required width.";
+};
+
+flag = {
+    name      = indent;
+    value     = I;
+    flag_arg  = "=0";
+    descrip   = "Line indentation";
+    doc =
+    "This many spaces will be inserted at the start of every line.\n"
+    "It defaults to zero.";
+};
+
+flag = {
+    name      = sort;
+    value     = s;
+    flag_arg;
+    descrip   = "Sort input text";
+    doc =
+    "Causes the input text to be sorted.  If an argument is supplied,\n"
+    "it is presumed to be a pattern and the sort is based upon the\n"
+    "matched text.  If the pattern starts with an asterisk (@code{*}),\n"
+    "then the sort is case insensitive.";
+};
+
+flag = {
+    name      = format;
+    value     = f;
+    flag_arg  = ':';
+    descrip   = "Formatting string for each input";
+    doc =
+    "If you need to reformat each input text, the argument to this\n"
+    "option is interpreted as an @code{sprintf(3)} format that is used\n"
+    "to produce each output entry.";
+};
+
+flag = {
+    name      = separation;
+    value     = s;
+    flag_arg  = ':';
+    descrip   = "Separation string - follows all but last";
+    doc =
+    "Use this option if, for example, you wish a comma to appear after\n"
+    "each entry except the last.";
+};
+
+flag = {
+    name      = input;
+    value     = i;
+    flag_arg  = ":";
+    descrip   = "Input file (if not stdin)";
+    flag_code =
+'    FILE* fp = freopen( pOptDesc->pzLastArg, "r", stdin );
+    if (fp == (FILE*)NULL) {
+        fprintf( stderr, "Error %d (%s) opening %s\n",
+                 errno, strerror( errno ), pOptDesc->pzLastArg );
+        USAGE( EXIT_FAILURE );
+    }';
+    doc =
+    "This program normally runs as a @code{filter}, reading from standard\n"
+    "input, columnizing and writing to standard out.  This option redirects\n"
+    "input to a file.";
+};
+
+include = "#include <stdio.h>\n#include <errno.h>";
