@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.12 2000/08/11 13:27:46 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.13 2000/09/11 00:26:21 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -42,8 +42,13 @@ done
 touch_list="`egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
              sed 's@.*## *\(.*\) GEN-RULE@agen5/\1@' `"
 
-rm -f ./configure
+mv ./configure config.save
 cvs update configure > /dev/null 2>&1
+
+[ -f doc/autogen.texi ] || {
+  echo '@setfilename completely.bogus' > doc/autogen.texi
+  touch -t 200001010000 doc/autogen.texi
+}
 
 #  Make sure the new file removes the current collection of files
 #

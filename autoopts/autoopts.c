@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.19 2000/09/10 22:50:41 bkorb Exp $
+ *  $Id: autoopts.c,v 2.20 2000/09/11 00:26:21 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -611,7 +611,7 @@ valid_path( char*  pzBuf,  size_t  bufSize,
          *  The result may be either a file or a directory.
          */
         memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
-        strcpy( pzBuf (pz - pzPath)+1, pzName );
+        strcpy( pzBuf + (pz - pzPath) + 1, pzName );
     }
 
     /*
