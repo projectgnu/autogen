@@ -48,6 +48,9 @@ DEFINE  emit-macro      =][=
   ~~  with|without       =][=
       (define bad-define-name   "WITHOUT_%s")
       (define good-define-name  "WITH_%s")     =][=
+  ==  withlib            =][=
+      (define bad-define-name   "WITHOUT_LIB%s")
+      (define good-define-name  "WITH_LIB%s")     =][=
   ESAC  =][=
 
   IF  (define good-text  "")
