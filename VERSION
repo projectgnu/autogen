@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Copyright (C) 1999 Bruce Korb
+# Copyright (C) 1999, 2000 Bruce Korb
 #
-# Last Modified:     Tue Sep 28 07:01:05 1999				      
+# Last Modified:     Wed Aug  9 02:24:41 2000
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# by:                Bruce Korb <bkorb@gnu.org>			      
+# by:                Gary V. Vaughan <gvv@techie.com>
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
@@ -23,23 +23,21 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #
 # If the autoopts sources have changed
 #   AO_REVISION += 1
-# if any autoopts API interfaces have been added, removed or changed
-#   AO_REVISION =0
-#   AO_VERSION += 1
+# If new autoopts interfaces have been removed or changed
+#   AO_CURRENT += 1
+#   AO_REVISION = 0
+#   AO_AGE = 0
+# if any autoopts interfaces have been added
+#   AO_CURRENT += 1
+#   AO_REVISION = 0
+#   AO_AGE += 1
 
 # autoopts version
 #
 AO_LIBRARY=libopts.la
-AO_VERSION=3
-AO_REVISION=3
-AO_PATCHLEVEL="2"
-if [ -z "${AO_PATCHLEVEL}" ]
-then
-  AO_ANNOUNCE_LEVEL="${AO_VERSION}.${AO_REVISION}"
-else
-  AO_ANNOUNCE_LEVEL="${AO_VERSION}.${AO_REVISION}.${AO_PATCHLEVEL}"
-fi
-AO_RELEASE=$AO_VERSION.$AO_REVISION
+AO_CURRENT=6
+AO_REVISION=0
+AO_AGE=0
 
 MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 
@@ -53,7 +51,8 @@ PACKAGE=autogen
 if [ -n "$srcdir" ] && [ -s $srcdir/autoopts/options.h ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr '(' $AO_VERSION '*' 4096 ')' + $AO_REVISION`
+  lib=`expr $AO_CURRENT '*' 4096`
+  lib=`expr '(' $AO_REVISION  '*' 128 ')' + $AO_AGE + $lib`
   if [ ${hdr}0 -ne ${lib}0 ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
@@ -63,7 +62,7 @@ fi
 
 # Display version numbers banner for my sanity!
 #
-soname=$AO_LIBRARY.$AO_VERSION.$AO_REVISION$AO_PATCHLEVEL
+soname=$AO_LIBRARY-$AO_CURRENT:$AO_REVISION:$AO_AGE
 spaces="                                        "
 while :
 do

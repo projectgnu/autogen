@@ -175,7 +175,7 @@
 	added $(top_srcdir)/autoopts/options.tpl to the list of
 	dependencies for autogen.texi.
 
-1998-07-02  Gary V. Vaughan  <garyv@oranda.demon.co.uk>
+1998-07-02  Gary V. Vaughan  <gvv@techie.com>
 	* VERSION: removed a spurious hyphen, and bumped patchlevel
 	to 4.3.3
 
@@ -191,7 +191,7 @@
 	misapplied patch.  Added autogen.texi to the list of files to be
 	removed on a maintainer-clean, now that BUILT_SOURCES is not set.
 
-1998-06-30  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-06-30  Gary V. Vaughan  <gvv@techie.com>
 
 	* src/makedef.sh: replace a lot of hairy shell script with a
 	little hairy awk script... this also removes the dependency on
@@ -199,7 +199,7 @@
 	field before emitting the blocks.
 	(_EOF_): added a missing heredoc end marker to the header.
 
-1998-06-23  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-06-23  Gary V. Vaughan  <gvv@techie.com>
 
 	* config/release: extra code to make sure we always release with
 	an up to date set of generated opts files.
@@ -213,7 +213,7 @@
 	* src/agEval.c: ditto.
 	* autoopts/stack.c: ditto.
 
-1998-06-17  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-06-17  Gary V. Vaughan  <gvv@techie.com>
 
 	* configure.in (with_regex_lib): accept and use configure options
 	to determine a suitable regular expression library.
@@ -350,7 +350,7 @@
 	opts.def file as the template search directory so that the new
 	#include directive (above) will work.
 
-1998-05-31  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-05-31  Gary V. Vaughan  <gvv@techie.com>
 
 	* mkupdate.sh: Convert to bourne shell (not sure about the
 	basetime calculation tho'...)
@@ -409,7 +409,7 @@
 	* src/agPrint.c
 	indentation fixes
 	
-1998-05-08  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-05-08  Gary V. Vaughan  <gvv@techie.com>
 
 	* tests/reorder.test: New test to hilight the (now fixed)
 	block macro reordering bug.
@@ -478,7 +478,7 @@
 	using a glob expression so that maintainer additions will
 	be picked up in the rule even though the dependency won't notice.
 
-1998-04-07  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-04-07  Gary V. Vaughan  <gvv@techie.com>
 
 	* tests/defs: replaced non-portable code (vis. "x || { y; z }",
 	and "${x:-y}" and fixed a bug where testsubdir was used before
@@ -507,17 +507,17 @@
 	automake to add a pseudo target "recheck-TESTS" that
 	only runs the tests that failed.
 
-1998-04-02  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-04-02  Gary V. Vaughan  <gvv@techie.com>
 
 	* src/agExpr.c (evalExpr_IN): HILIM->IN typo in error messages.
 
-1998-03-31  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-03-31  Gary V. Vaughan  <gvv@techie.com>
 
 	* tests/*.test: New test-suite files!
 
 	* Makefile.am: Changed to reflect and use new test-suite.
 
-1998-03-18  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-03-18  Gary V Vaughan  <gvv@techie.com>
 
 	  * AUTHORS: Resynchronised with recent file removals/additions.
 
@@ -709,7 +709,7 @@
 	* changed src/tokenize.c so the '...' quoting rules match
 	those in the definition file processing.
 
-1998-01-30  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-01-30  Gary V Vaughan  <gvv@techie.com>
 
 	* configure.in, MakeRules.in, */Makefile.am:
 	Utilise the DEFS variable correctly (and consequently shuffle
@@ -735,7 +735,7 @@
 	Fixed a conditional compilation expression from "A || B"
 	to "! A || ! B".
 
-1998-01-29  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1998-01-29  Gary V Vaughan  <gvv@techie.com>
 
 	* compat/compat.h (STATIC):
 	Added a the #define STATIC block so that modules in compat work
@@ -784,7 +784,7 @@
 	* Fixed bug in src/agDirect.c where a directive that immediately
 	followed a failing conditional was not seen.
 
-1997-10-16  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1997-10-16  Gary V Vaughan  <gvv@techie.com>
 
 	* autoopts/Makefile.am (lib_LTLIBRARIES):
 	Changed lib_LIBRARIES to lib_LTLIBRARIES to build a libtool lib.
@@ -801,7 +801,7 @@
 	is installed (required by "autoopts.h").  This caused changes
 	to MakeRules.in and (src|autoopts)/Makefile.am.
 
-1997-10-15  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1997-10-15  Gary V Vaughan  <gvv@techie.com>
 
 	* autoopts/Makefile.am (datadir):
 	Need this to `activate' the data_DATA rules and installation.
@@ -825,7 +825,7 @@
 	* configure.in (idtype_t):
 	Removed idtype_t check -- already handled from compat.h
 
-1997-10-15  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+1997-10-15  Gary V Vaughan  <gvv@techie.com>
 
 	* src/agShell.c:
 	Removed duplicate definition of sigsend() stub.
@@ -897,13 +897,13 @@ Mon Sep  8 11:05:31 1997  Gary V Vaughan  <gvaughan@tewkux93>
 	need to build a sigsend workalike if none is provided by libc.
 	(AC_CHECK_TYPE): idtype_t check removed.
 
-Mon Sep  8 09:39:42 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Mon Sep  8 09:39:42 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* configure.in (AM_MAINTAINER_MODE):
 	This is deprecated from automake-1.2 onwards, in favour of the
 	`missing' script (which we were using anyway)!
 
-Sun Sep  7 09:24:45 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Sun Sep  7 09:24:45 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* configure.in (idtype_t):
 	Define type if we didn't find it yet.
@@ -952,7 +952,7 @@ Thu Sep  4 15:39:41 1997  Gary V Vaughan  <gvaughan@tewkux93>
 	Fixed paramater 2 type mismatch, where int != YYSTYPE (e.g. AXP).
 	All callers changed.
 
-Thu Sep  4 14:31:54 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Thu Sep  4 14:31:54 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* MakeRules.in (.texi.info):
 	Removed rule overridden in doc dir Makefile to prevent warnings.
@@ -961,7 +961,7 @@ Thu Sep  4 14:31:54 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	* tests/Makefile.am (TEST_ENVIRONMENT):
 	Fixed bug in VPATH build.
 
-Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/Makefile.am (@MAKEINCLUDE@):
 	* src/Makefile.am (autogen_LDADD):
@@ -969,7 +969,7 @@ Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	* Makefile.am (@MAKEINCLUDE@):
 	Fixed bug in VPATH build.
 
-Tue Sep  2 15:59:39 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Tue Sep  2 15:59:39 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/agFunOut.c (S_IAMB):
 	Dummy macro definition.  Hopefully I read the context correctly?
@@ -992,7 +992,7 @@ Tue Sep  2 15:59:39 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	* tests/opts.sh:
 	Usually, there is no /usr/bin/sh: changed to #! /bin/sh
 
-Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/Makefile.am (@MAKEINCLUDE@):
 	* src/Makefile.am (autogen_LDADD):
@@ -1000,7 +1000,7 @@ Wed Sep  3 15:12:13 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	* Makefile.am (@MAKEINCLUDE@):
 	Fixed bug in VPATH build.
 
-Tue Sep  2 15:59:39 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Tue Sep  2 15:59:39 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/agFunOut.c (S_IAMB):
 	Dummy macro definition.  Hopefully I read the context correctly?
@@ -1036,7 +1036,7 @@ Tue Jul 22 07:37:45 1997 PST Bruce Korb
 	* src/autogen.README:
 	Deleted the descriptions that are now in the documentation.
 
-Tue Jul 22 09:47:45 1997 GMT Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Tue Jul 22 09:47:45 1997 GMT Gary V Vaughan  <gvv@techie.com>
 
 	* */Makefile.am:
 	Oops. That should be `include $top_builddir/MakeRules'.  `make
@@ -1083,7 +1083,7 @@ Tue Jul 22 09:47:45 1997 GMT Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	Define TEXI2HTML to texi2html and substitute, iff it is on the
 	user's PATH.
 
-Mon Jul 21 16:54:26 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Mon Jul 21 16:54:26 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* tests/opts.sh:
 	Changed magic number to #!/bin/sh incase we don't have ksh.
@@ -1194,7 +1194,7 @@ Wed Jul 16 11:35:48 1997  Gary V Vaughan  <gvaughan@tewkux73>
 	Removed duplicate `#include's already added by compat.h.  Moved
 	sys/param.h above compat.h to fix redefinition warning on AXP.
 
-Wed Jul 16 10:15:45 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Wed Jul 16 10:15:45 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* options/save.c (optionSave):
 	Changed ctime_r to ctime.
@@ -1220,7 +1220,7 @@ Wed Jul 16 10:15:45 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	* src/Makefile.am (EXTRA_DIST):
 	Added opts.X to the distribution (oops!).
 
-Tue Jul 15 09:54:03 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Tue Jul 15 09:54:03 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* options/options.tpl:
 	Changed reference to ksh into sh.
@@ -1266,7 +1266,7 @@ Sun Jul 13 Bruce Korb
 
 		src/autogen -b autogen -T autogen.tpl src/opts.X
 
-Thu Jul 10 09:30:05 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Thu Jul 10 09:30:05 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/tmTempl.c (startTemplate):
 	K&R prototype dirname function explicitly, as it is rarely
@@ -1284,7 +1284,7 @@ Thu Jul 10 09:30:05 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	New file.  A simple basename implementation for libc's which lack
 	it, and config to use it when required.
 
-Wed Jul  9 17:46:59 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Wed Jul  9 17:46:59 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* configure.in:
 	* compat/dirname.c (dirname):
@@ -1300,7 +1300,7 @@ Wed Jul  9 17:46:59 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	Wrapped libgen.h include in ifdef wrapper, for those machines that
 	don't have it.  Perhaps it can be removed altogether?
 
-Tue Jul  1 13:02:54 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
+Tue Jul  1 13:02:54 1997  Gary V Vaughan  <gvv@techie.com>
 
 	* src/tmFunCase.c (CASE_Func):
 	Use POSIX entrypoints to regex if available.
