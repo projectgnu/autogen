@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.5 1999/09/28 13:53:45 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.6 1999/09/28 14:43:56 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -142,8 +142,8 @@ streqvcmp( const char* s1,
 
 
     void
-streqvmap( char chFrom,
-           char chTo,
+streqvmap( int  chFrom,
+           int  chTo,
            int  ct )
 {
     if (ct == 0) {
@@ -154,11 +154,17 @@ streqvmap( char chFrom,
     }
 
     else {
-        int delta = chTo - chFrom;
+        int delta;
+
+        chTo   &= 0xFF;
+        chFrom &= oxFF;
+        delta   = chTo - chFrom;
 
         do  {
             charmap[ (unsigned)chFrom ] = (unsigned)((int)chFrom + delta);
             chFrom++;
+            if ((chFrom + delta) > 0xFF) || (chFrom > 0xFF))
+                break;
         } while (--ct > 0);
     }
 }
