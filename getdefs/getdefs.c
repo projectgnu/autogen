@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.5 1998/09/22 21:13:35 bkorb Exp $
+ *  $Id: getdefs.c,v 2.6 1998/09/23 20:29:10 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
  * Author:            Bruce Korb <korbb@datadesign.com>
  * Maintainer:        Bruce Korb <korbb@datadesign.com>
  * Created:           Mon Jun 30 15:35:12 1997
- * Last Modified:     Wed Sep 16 12:58:23 1998
+ * Last Modified:     Wed Sep 23 12:12:19 1998
  *            by:     Bruce Korb <korb@datadesign.com>
  *
  */
@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <utime.h>
 
@@ -55,6 +56,7 @@ char* pzIndexText = (char*)NULL;
 char* pzEndIndex  = (char*)NULL;
 char* pzIndexEOF  = (char*)NULL;
 size_t indexAlloc = 0;
+char*  pzAutogen = "autogen";
 
 #define MARK_CHAR ':'
 
@@ -103,6 +105,8 @@ tPz*    papzBlocks = (tPz*)NULL;
 size_t  blkUseCt   = 0;
 size_t  blkAllocCt = 0;
 
+pid_t   agPid      = -1;
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -116,6 +120,7 @@ void  processFile( char* pzFile );
 void  sortEntries( void );
 void  validateOptions( void );
 void  printEntries( FILE* defFp );
+void  doPreamble( FILE* outFp );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -132,41 +137,7 @@ main( int    argc,
 
     outFp = startAutogen();
 
-    /*
-     *  Emit the "autogen definitions xxx;" line
-     */
-    fprintf( outFp, zAgDef, zTemplName );
-
-    /*
-     *  IF there are global assignments, then emit them
-     *  (these do not get sorted, so we write directly now.)
-     */
-    if (HAVE_OPT( ASSIGN )) {
-        int    ct  = STACKCT_OPT(  ASSIGN );
-        char** ppz = STACKLST_OPT( ASSIGN );
-        do  {
-            fprintf( outFp, "%s;\n", *ppz++ );
-        } while (--ct > 0);
-        fputc( '\n', outFp );
-    }
-
-    /*
-     *  IF there are global assignments to be gotten from
-     *  an include (copy) file, insert it here and now.
-     */
-    if (HAVE_OPT( COPY )) {
-        char* pz = loadFile( OPT_ARG( COPY ));
-        if (pz == (char*)NULL) {
-            fprintf( stderr, "Error %d (%s) read opening %s\n",
-                     errno, strerror( errno ), OPT_ARG( COPY ));
-            exit( EXIT_FAILURE );
-        }
-
-        fprintf( outFp, "#line 1 \"%s\"\n", OPT_ARG( COPY ));
-        fputs( pz, outFp );
-        fputc( '\n', outFp );
-        free( (void*)pz );
-    }
+    doPreamble( outFp );
 
     /*
      *  Process each input file
@@ -210,6 +181,27 @@ main( int    argc,
         fclose( fp );
     }
 
+    if (agPid != -1) {
+        int  status;
+        waitpid( agPid, &status, 0 );
+        if (WIFEXITED( status )) {
+            status = WEXITSTATUS( status );
+            if (status != EXIT_SUCCESS) {
+                fprintf( stderr, "ERROR:  %s exited with status %d\n",
+                         pzAutogen, status );
+                return status;
+            }
+        } else if (WIFSIGNALED( status )) {
+            status = WTERMSIG( status );
+            fprintf( stderr, "ERROR:  %s exited due to %s signal (%s)\n",
+                     pzAutogen, status, strsignal( status ));
+            return EXIT_FAILURE;
+        } else {
+            fprintf( stderr, "ERROR:  %s exited due to unknown reason %d\n",
+                     pzAutogen, status );
+            return EXIT_FAILURE;
+        }
+    }
     return EXIT_SUCCESS;
 }
 
@@ -361,6 +353,7 @@ validateOptions( void )
                 errno = EINVAL;
                 break;
             }
+            stb.st_mtime += 60;
             if (stb.st_mtime > modtime)
                 modtime = stb.st_mtime;
         } while (--ct > 0);
@@ -396,6 +389,69 @@ validateOptions( void )
          *  This call will map these three characters to '_'.
          */
         strequate( "_-^" );
+    }
+}
+
+
+    void
+doPreamble( FILE* outFp )
+{
+    char* pzName;
+
+    /*
+     *  Emit the "autogen definitions xxx;" line
+     */
+    fprintf( outFp, zAgDef, zTemplName );
+
+    if (HAVE_OPT( FILELIST )) {
+        tSCC   zFmt[] = "%-12s = '%s';\n";
+
+        int    ct  = STACKCT_OPT(  INPUT );
+        char** ppz = STACKLST_OPT( INPUT );
+
+        pzName = OPT_ARG( FILELIST );
+
+        if (pzName == (char*)NULL)
+            pzName = "infile";
+
+        do  {
+            fprintf( outFp, zFmt, pzName, *ppz++ );
+        } while (--ct > 0);
+
+        if (HAVE_OPT( COPY )) {
+            ct  = STACKCT_OPT(  COPY );
+            ppz = STACKLST_OPT( COPY );
+            do  {
+                fprintf( outFp, zFmt, pzName, *ppz++ );
+            } while (--ct > 0);
+        }
+        fputc( '\n', outFp );
+    }
+
+    /*
+     *  IF there are COPY files to be included,
+     *  THEN emit the '#include' directives
+     */
+    if (HAVE_OPT( COPY )) {
+        int    ct  = STACKCT_OPT(  COPY );
+        char** ppz = STACKLST_OPT( COPY );
+        do  {
+            fprintf( outFp, "#include %s\n", *ppz++ );
+        } while (--ct > 0);
+        fputc( '\n', outFp );
+    }
+
+    /*
+     *  IF there are global assignments, then emit them
+     *  (these do not get sorted, so we write directly now.)
+     */
+    if (HAVE_OPT( ASSIGN )) {
+        int    ct  = STACKCT_OPT(  ASSIGN );
+        char** ppz = STACKLST_OPT( ASSIGN );
+        do  {
+            fprintf( outFp, "%s;\n", *ppz++ );
+        } while (--ct > 0);
+        fputc( '\n', outFp );
     }
 }
 
@@ -1301,7 +1357,6 @@ startAutogen( void )
 {
     char*  pz;
     FILE*  agFp;
-    char*  pzAutogen = "autogen";
 
     char zSrch[  MAXPATHLEN ];
     char zBase[  MAXPATHLEN ];
@@ -1372,6 +1427,9 @@ startAutogen( void )
         switch (WHICH_IDX_AUTOGEN) {
         case INDEX_OPT_OUTPUT:
         {
+            tSCC   zFileFmt[] = " *      %s\n";
+            const char* pzFmt;
+
             int    ct  = STACKCT_OPT(  INPUT );
             char** ppz = STACKLST_OPT( INPUT );
             FILE*  fp;
@@ -1380,14 +1438,13 @@ startAutogen( void )
                 return stdout;
 
             unlink( OPT_ARG( OUTPUT ));
-
             fp = fopen( OPT_ARG( OUTPUT ), "w" );
-
             fprintf( fp, zDne, OPT_ARG( OUTPUT ));
 
             do  {
-                fprintf( fp, " *      %s\n", *ppz++ );
+                fprintf( fp, zFileFmt, *ppz++ );
             } while (--ct > 0);
+
             fputs( " */\n", fp );
             return fp;
         }
@@ -1412,7 +1469,9 @@ startAutogen( void )
             exit( EXIT_FAILURE );
         }
 
-        switch (fork()) {
+        agPid = fork();
+
+        switch (agPid) {
         case 0:
             /*
              *  We are the child.  Close the write end of the pipe
@@ -1448,29 +1507,55 @@ startAutogen( void )
     }
 
     {
-        char*  args[6];
-        char** pparg     = args+2;
-
-        args[0] = pzAutogen;
-        args[1] = zBase;
+        char** paparg;
+        char** pparg;
+        int    argCt = 5;
 
         /*
-         *  IF we have a template search directory,
-         *  THEN insert it into the option portion of the arg list.
+         *  IF we don't have template search directories,
+         *  THEN allocate the default arg counter of pointers and
+         *       set the program name into it.
+         *  ELSE insert each one into the arg list.
          */
-        if (HAVE_OPT( TEMPL_DIRS )) {
-            sprintf( zSrch, "-L%s", OPT_ARG( TEMPL_DIRS ));
-            *pparg++ = zSrch;
+        if (! HAVE_OPT( AGARG )) {
+            paparg = pparg = (char**)malloc( argCt * sizeof( char* ));
+            *pparg++ = pzAutogen;
+
+        } else {
+            int    ct  = STACKCT_OPT(  AGARG );
+            char** ppz = STACKLST_OPT( AGARG );
+
+            argCt += ct;
+            paparg = pparg = (char**)malloc( argCt * sizeof( char* ));
+            *pparg++ = pzAutogen;
+
+            do  {
+                *pparg++ = *ppz++;
+            } while (--ct > 0);
         }
 
+        *pparg++ = zBase;
         *pparg++ = "--";
         *pparg++ = "-";
         *pparg++ = (char*)NULL;
 
-        execvp( pzAutogen, args );
+#ifdef DEBUG
+        fputc( '\n', stderr );
+        pparg = paparg;
+        for (;;) {
+            fputs( *pparg++, stderr );
+            if (*pparg == (char*)NULL)
+                break;
+            fputc( ' ', stderr );
+        }
+        fputc( '\n', stderr );
+        fputc( '\n', stderr );
+#endif
+
+        execvp( pzAutogen, paparg );
         fprintf( stderr, "Error %d (%s) exec of %s %s %s %s\n",
                  errno, strerror( errno ),
-                 args[0], args[1], args[2], args[3] );
+                 paparg[0], paparg[1], paparg[2], paparg[3] );
         exit( EXIT_FAILURE );
     }
 

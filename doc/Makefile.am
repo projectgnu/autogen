@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:   Tue Sep 15 14:55:24 1998
+## Last Modified:   Wed Sep 23 12:18:53 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.3 1998/09/22 22:15:53 bkorb Exp $
+## $Id: Makefile.am,v 2.4 1998/09/23 20:29:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -19,31 +19,44 @@ INFO_DEPS     = autogen.info
 
 all : $(INFO_DEPS) LSM
 
-@MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
-DOCDIRS         = -L$(top_srcdir)
-
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= autogen.def auto_gen.tpl LSM LSM.tpl
+EXTRA_DIST	= auto_gen.tpl LSM LSM.tpl
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
-gendir          = $(top_builddir)/src
-optdir          = $(top_srcdir)/src
+ODEF            = $(top_srcdir)/src/opts.def
 
-AODEFS          = $(top_srcdir)/autoopts/options.tpl
-AOHEAD          = $(top_srcdir)/autoopts/opthead.tpl
-ODEF            = $(optdir)/opts.def
-DIRECT          = $(gendir)/agdirect.def
-EXPR            = $(gendir)/agexpr.def
-FUNC            = $(gendir)/agfunc.def
-AGDEPS          = $(ODEF) $(DIRECT) $(EXPR) $(FUNC) $(AODEFS) $(AOHEAD) \
-		$(top_srcdir)/src/agParse.y \
+DEFSRC		= $(top_srcdir)/src/agFun*.c \
+		$(top_srcdir)/src/agDirect.c \
+		$(top_srcdir)/src/agExpr.c \
+		$(top_srcdir)/autoopts/opthead.tpl
+
+DEFCOPY		= copy=$(ODEF)
+
+TEMPLATE	= $(srcdir)/auto_gen.tpl
+TPLINC		= $(top_srcdir)/src/agParse.y \
+		$(top_builddir)/src/opts.h \
 		$(top_srcdir)/autoopts/autoopts.texi \
 		$(top_srcdir)/getdefs/getdefs.texi
 
-autogen.texi : auto_gen.tpl autogen.def $(AGDEPS)
+GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
+AGEXE		= $(top_builddir)/src/autogen
+AGARGS		= autogen=$(AGEXE) \
+		agarg=--templ-dirs=$(top_srcdir) \
+		base-name=autogen
 
-LSM : $(top_srcdir)/VERSION $(top_srcdir)/src/opts.def LSM.tpl
+autogen.def:	$(DEFSRC) $(ODEF)
+	$(GETDEFS) output=$@ template=auto_gen $(DEFCOPY) $(DEFSRC)
+	@-touch $@
+
+autogen.texi : auto_gen.tpl autogen.def $(TPLINC)
+	$(top_builddir)/src/autogen -L$(top_srcdir) -bautogen \
+		autogen.def
+
+##  This really should be the build rule:
+##	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
+
+LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	@if $(AGEXE) --version >&- 2>&- ; then \
 	  echo $(AGEXE) -L $(srcdir) -T LSM.tpl $(ODEF) ; \
 	  top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \

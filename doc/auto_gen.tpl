@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Tue Sep 15 14:48:25 1998
+## Last Modified:     Wed Sep 23 10:44:02 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.0 1998/09/16 20:46:18 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.1 1998/09/23 20:29:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -25,15 +25,15 @@ texi=autogen.texi =]
 [=_eval "" _DNE=]
 
 Plus bits and pieces gathered from all over the source/build
-directories.  See the dependencies in doc/Makefile.am,
-and note that some of them are, in turn, generated:
-
-[=_EVAL "for f in ${AGDEPS} ; do echo \"\t$f\" ; done" _shell=]
+directories:
+[=_FOR infile=]
+        [=infile=][=
+/infile=]
 
 @end ignore
 
-@set EDITION [=version=]
-@set VERSION [=version=]
+@set EDITION [=_EVAL "echo ${AG_REVISION}" _shell=]
+@set VERSION [=_EVAL "echo ${AG_REVISION}" _shell=]
 @set UPDATED [=_EVAL 'date "+%B %Y"' _shell =]
 
 @dircategory GNU programming tools

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.1 1998/09/14 14:34:03 bkorb Exp $
+ *   $Id: opts.def,v 2.2 1998/09/23 20:29:11 bkorb Exp $
  */
 
 /*
@@ -64,6 +64,12 @@ flag = {
     descrip   = "subblock definition names";
 };
 
+flag = {
+    name        = filelist;
+    flag_arg;     /* optional */
+    descrip     = "Insert source file name into each def";
+};
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Definition Insertion Options:
@@ -93,7 +99,9 @@ flag = {
 flag = {
     name        = copy;
     flag_arg    = ":";
-    descrip     = "File to copy to output defs";
+    max         = NOLIMIT;
+    stack_arg;
+    descrip     = "File(s) to copy into definitions";
 };
 
 flag = {
@@ -141,10 +149,11 @@ flag = {
 };
 
 flag = {
-    name        = templ_dirs;
+    name        = agarg;
     flag_arg    = ":";
-    descrip     = "Template search directory list";
-    setable;
+    max         = NOLIMIT;
+    stack_arg;
+    descrip     = "Autogen Argument";
     flags_cant  = output;
 };
 

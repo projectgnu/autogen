@@ -1,3 +1,37 @@
+1998-09-23  Bruce Korb <korbb@datadesign.com>
+	* autoopts/Makefile.am
+	* autoopts/opthead.tpl
+	* autoopts/autoopts.texi
+	* autoopts/options.tpl
+	* doc/Makefile.am
+	* doc/auto_gen.tpl
+	* getdefs/getdefs.c
+	* getdefs/opts.def
+	* src/agGetDef.c
+	* src/agShell.c
+	* src/opts.def
+	* src/Makefile.am
+	Did a *whole* bunch of stuff to eliminate distribution of
+	doc/autogen.def.  The entire documentation is now extracted
+ 	directly from source files, instead of relying on intermediates.
+	More work that it was worth.
+
+	* src/agGetDef.c
+	Fixed stdin file allocation bug.
+
+	* src/agShell.c
+	* src/opts.def
+	Added debug option 'show-shell' to display the commands to stderr.
+	I still cannot figure out why the shell sometimes dies when
+	autogen reads its definitions from stdin.  :(
+
+	* src/agExpr.c
+	Fixed the name of the definitions file for the _DNE function.
+
+	* src/Makefile.am
+	Hacked the creation of opts.[ch] such that -DDEBUG is set
+	whenever 'DDEBUG' is found in the $(CPPFLAGS).
+
 1998-09-14  Bruce Korb <korbb@datadesign.com>
 	* */*
 	Corrected most of the problems engendered by below :-}

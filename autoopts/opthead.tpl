@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.4 1998/09/22 20:53:41 bkorb Exp $
+#$Id: opthead.tpl,v 2.5 1998/09/23 20:29:03 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -63,30 +63,30 @@ _ENDIF "copyright exists" =]
  *  Enumeration of each option:
  */[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = teOptIndex;
-
-title = "Option Index and Enumeration";
-
-description =
-        "This enum defines the complete set of options, both
-user specified and automatically provided.  This can be used,
-for example, to distinguish which of the equivalenced options
-was actually used.
-
-@example
-switch (pOptDesc->optActualIndex) @{
-case INDEX_FIRST:
-    stuff;
-case INDEX_DIFFERENT:
-    different-stuff;
-default:
-    unknown-things;
-@}
-@end example";
-
-end-component.
+/*=usermac teOptIndex
+ *
+ *  title:  Option Index and Enumeration
+ *
+ *  description:
+ *
+ *  "This enum defines the complete set of options, both
+ *  user specified and automatically provided.  This can be used,
+ *  for example, to distinguish which of the equivalenced options
+ *  was actually used.
+ *
+ *  @example
+ *  switch (pOptDesc->optActualIndex) @{
+ *  case INDEX_OPT_FIRST:\n"
+ *  "    stuff;
+ *  case INDEX_OPT_DIFFERENT:\n"
+ *  "    different-stuff;\n"
+ *  "default:\n"
+ *  "    unknown-things;
+ *  @}
+ *  @end example"
+=*/
 =]
 typedef enum {[=
 _FOR flag=][=
@@ -116,35 +116,37 @@ _ENDIF=]
 } te[=prefix _cap=]OptIndex;
 [=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = OPTION_CT;
-
-title = "Full Count of Options";
-
-description = "The full count of all options, both those defined
-and those generated automatically by AutoOpts.  This is primarily
-used to initialize the program option descriptor structure.";
-
-end-component
+/*=usermac OPTION_CT
+ *
+ *  title:  Full Count of Options
+ *
+ *  description:
+ *
+ *  The full count of all options, both those defined
+ *  and those generated automatically by AutoOpts.  This is primarily
+ *  used to initialize the program option descriptor structure.
+=*/
 =]
 #define [=prefix _up #_ +=]OPTION_CT    [=_eval "echo $OPTCT" _shell =][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = VERSION;
-
-title = "Version and Full Version";
-
-description = "If the @code{version} attribute is defined for the program,
-then a stringified version will be #defined as PROGRAM_VERSION and
-PROGRAM_FULL_VERSION.  PROGRAM_FULL_VERSION is used for printing
-the program version in response to the version option.  The version
-option is automatically supplied in response to this attribute, too.
-
-You may access PROGRAM_VERSION via @code{programOptions.pzFullVersion}.";
-
-end-component
+/*=usermac VERSION
+ *
+ *  title:  Version and Full Version
+ *
+ *  description:
+ *
+ *  If the @code{version} attribute is defined for the program,
+ *  then a stringified version will be #defined as PROGRAM_VERSION and
+ *  PROGRAM_FULL_VERSION.  PROGRAM_FULL_VERSION is used for printing
+ *  the program version in response to the version option.  The version
+ *  option is automatically supplied in response to this attribute, too.
+ *
+ *  You may access PROGRAM_VERSION via @code{programOptions.pzFullVersion}.
+=*/
 =][=
 
 _IF version _exist =]
@@ -161,243 +163,278 @@ _ENDIF version-exists =]
     _FOR flag[0]=][=name _up=][=/flag=] )
  */[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "DESC(<OPTION>)";
-
-title = "Option Descriptor";
-
-description = "This macro is used internally by other AutoOpt macros.
-It is not for general use.  It is used to obtain the option description
-corresponding to its @strong{UPPER CASED} option name argument.
-This is primarily used in the following macro definitions:";
-
-end-component
+/*=usermac DESC
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Option Descriptor
+ *
+ *  description:
+ *
+ *  This macro is used internally by other AutoOpt macros.
+ *  It is not for general use.  It is used to obtain the option description
+ *  corresponding to its @strong{UPPER CASED} option name argument.
+ *  This is primarily used in the following macro definitions:
+=*/
 =]
 #define     [=prefix _up #_ +=]DESC(n)     [=prog_name
                  =]Options.pOptDesc[INDEX_[=
                  prefix _up #_ +=]OPT_ ## n][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "HAVE_OPT(<OPTION>)";
-
-title = "Have this option?";
-
-description = "This macro yields true if the option has been specified
-in any fashion at all.  It is used thus:
-
-@example
-if (HAVE_OPT( OPT_NAME )) @{
-    <do-things-associated-with-opt-name>;
-@}
-@end example";
-
-end-component
+/*=usermac HAVE_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Have this option?
+ *
+ *  description:
+ *
+ *  "This macro yields true if the option has been specified
+ *  in any fashion at all.  It is used thus:
+ *
+ *  @example
+ *  if (HAVE_OPT( OPT_NAME )) @{\n"
+ *  "    <do-things-associated-with-opt-name>;
+ *  @}
+ *  @end example"
+=*/
 =]
 #define     HAVE_[=prefix _up #_ +=]OPT(n) (! UNUSED_OPT(&[=prefix _up #_ +
                  =]DESC(n)))[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "OPT_ARG(<OPTION>)";
-
-title = "Option Argument String";
-
-description = "The option argument value as a pointer to string.
-Note that argument values that have been specified as numbers
-are stored as numbers.  For such options, use instead the
-OPT_VALUE_<OPTION> define.  It is used thus:
-
-@example
-if (HAVE_OPT( OPT_NAME )) @{
-    char* p = OPT_ARG( OPT_NAME );
-    <do-things-with-opt-name-argument-string>;
-@}
-@end example";
-
-end-component
+/*=usermac OPT_ARG
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Option Argument String
+ *
+ *  description:
+ *
+ *  "The option argument value as a pointer to string.
+ *  Note that argument values that have been specified as numbers
+ *  are stored as numbers.  For such options, use instead the
+ *  OPT_VALUE_<OPTION> define.  It is used thus:
+ *
+ *  @example
+ *  if (HAVE_OPT( OPT_NAME )) @{\n"
+ *  "    char* p = OPT_ARG( OPT_NAME );\n"
+ *  "    <do-things-with-opt-name-argument-string>;
+ *  @}
+ *  @end example"
+=*/
 =]
 #define      [=prefix _up #_ +=]OPT_ARG(n) ([=prefix _up #_ +
                  =]DESC(n).pzLastArg)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "STATE_OPT(<OPTION>)";
-
-title = "Option State";
-
-description = "If you need to know if an option was set because of
-presetting actions (RC/INI processing or environment variables),
-versus a command line entry versus one of the SET/DISABLE macros,
-then use this macro.  It will contain one of four values:
-@code{OPTST_INIT}, @code{OPTST_SET}, @code{OPTST_PRESET}
-or @code{OPTST_DEFINED}.  It is used thus:
-
-@example
-switch (STATE_OPT( OPT_NAME )) @{
-    case OPTST_INIT:
-        not-preset, set or on the command line.  (unless CLEAR-ed)
-
-    case OPTST_SET:
-        option set via the SET_OPT_OPT_NAME() macro.
-
-    case OPTST_PRESET:
-        option set via an RC/INI file or environment variable
-
-    case OPTST_DEFINED:
-        option set via a command line option.
-
-    default:
-        cannot happen :)
-@}
-@end example";
-
-end-component
+/*=usermac STATE_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Option State
+ *
+ *  description:
+ *
+ *  "If you need to know if an option was set because of
+ *  presetting actions (RC/INI processing or environment variables),
+ *  versus a command line entry versus one of the SET/DISABLE macros,
+ *  then use this macro.  It will contain one of four values:
+ *  @code{OPTST_INIT}, @code{OPTST_SET}, @code{OPTST_PRESET}
+ *  or @code{OPTST_DEFINED}.  It is used thus:
+ *
+ *  @example
+ *  switch (STATE_OPT( OPT_NAME )) @{\n"
+ *  "    case OPTST_INIT:\n"
+ *  "        not-preset, set or on the command line.  (unless CLEAR-ed)\n\n"
+ *
+ *  "    case OPTST_SET:\n"
+ *  "        option set via the SET_OPT_OPT_NAME() macro.\n\n"
+ *
+ *  "    case OPTST_PRESET:\n"
+ *  "        option set via an RC/INI file or environment variable\n\n"
+ *
+ *  "    case OPTST_DEFINED:\n"
+ *  "        option set via a command line option.\n\n"
+ *
+ *  "    default:\n"
+ *  "        cannot happen :)
+ *  @}
+ *  @end example"
+=*/
 =]
 #define    STATE_[=prefix _up #_ +=]OPT(n) ([=prefix _up #_ +
                  =]DESC(n).fOptState & OPTST_SET_MASK)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "COUNT_OPT(<OPTION>)";
-
-title = "Definition Count";
-
-description = "This macro will tell you how many times the option was
-specified on the command line.  It does not include counts of preset options.
-
-@example
-if (COUNT_OPT( OPT_NAME ) != desired-count) @{
-    make-an-undesireable-message.
-@}
-@end example";
-
-end-component
+/*=usermac COUNT_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Definition Count
+ *
+ *  description:
+ *
+ *  "This macro will tell you how many times the option was
+ *  specified on the command line.  It does not include counts
+ *  of preset options.
+ *
+ *  @example
+ *  if (COUNT_OPT( OPT_NAME ) != desired-count) @{\n"
+ *  "    make-an-undesireable-message.
+ *  @}
+ *  @end example"
+=*/
 =]
 #define    COUNT_[=prefix _up #_ +=]OPT(n) ([=prefix _up #_ +
                  =]DESC(n).optOccCt)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "ISSEL_OPT(<OPTION>)";
-
-title = "Is Option Selected?";
-
-description = "This macro yields true if the option has been
-specified either on the command line or via a SET/DISABLE macro.";
-
-end-component
+/*=usermac ISSEL_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Is Option Selected?
+ *
+ *  description:
+ *
+ *  This macro yields true if the option has been
+ *  specified either on the command line or via a SET/DISABLE macro.
+=*/
 =]
 #define    ISSEL_[=prefix _up #_ +=]OPT(n) (SELECTED_OPT(&[=prefix _up #_ +
                  =]DESC(n)))[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "ISUNUSED_OPT(<OPTION>)";
-
-title = "Never Specified?";
-
-description = "This macro yields true if the option has
-never been specified, or has been cleared via the @code{CLEAR_OPT()} macro.";
-
-end-component
+/*=usermac ISUNUSED_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Never Specified?
+ *
+ *  description:
+ *
+ *  This macro yields true if the option has
+ *  never been specified, or has been cleared via the
+ *  @code{CLEAR_OPT()} macro.
+=*/
 =]
 #define ISUNUSED_[=prefix _up #_ +=]OPT(n) (UNUSED_OPT(& [=prefix _up #_ +
                  =]DESC(n)))[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "ENABLED(<OPTION>)";
-
-title = "Is Option Enabled?";
-
-description = "Yields true if the option defaults to disabled and
-@code{ISUNUSED_OPT()} would yield true.  It also yields true if
-the option has been specified with a disablement prefix,
-disablement value or the @code{DISABLE_OPT_<OPTION>} macro was invoked.";
-
-end-component
+/*=usermac ENABLED
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Is Option Enabled?
+ *
+ *  description:
+ *
+ *  Yields true if the option defaults to disabled and
+ *  @code{ISUNUSED_OPT()} would yield true.  It also yields true if
+ *  the option has been specified with a disablement prefix,
+ *  disablement value or the @code{DISABLE_OPT_<OPTION>} macro was invoked.
+=*/
 =]
 #define  ENABLED_[=prefix _up #_ +=]OPT(n) (! DISABLED_OPT(& [=prefix _up #_ +
                  =]DESC(n)))[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "STACKCT_OPT(<OPTION>)";
-
-title = "Stacked Arg Count";
-
-description = "When the option handling attribute is specified
-as @code{stack_arg}, this macro may be used to determine how
-many of them actually got stacked.
-
-Do not use this on options that have not been stacked or has not been
-specified (the @code{stack_arg} attribute must have been specified,
-and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
-Otherwise, you will likely page fault.
-
-@example
-if (HAVE_OPT( OPT_NAME )) @{
-    int     ct = STACKCT_OPT(  OPT_NAME );
-    char**  pp = STACKLST_OPT( OPT_NAME );
-
-    do  @{
-        char* p = *pp++;
-        do-things-with-p;
-    @} while (--ct > 0);
-@}
-@end example";
-
-end-component
+/*=usermac STACKCT_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Stacked Arg Count
+ *
+ *  description:
+ *
+ *  "When the option handling attribute is specified
+ *  as @code{stack_arg}, this macro may be used to determine how
+ *  many of them actually got stacked.
+ *
+ *  Do not use this on options that have not been stacked or has not been
+ *  specified (the @code{stack_arg} attribute must have been specified,
+ *  and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
+ *  Otherwise, you will likely page fault.
+ *
+ *  @example
+ *  if (HAVE_OPT( OPT_NAME )) @{\n"
+ *  "    int     ct = STACKCT_OPT(  OPT_NAME );\n"
+ *  "    char**  pp = STACKLST_OPT( OPT_NAME );\n\n"
+ *
+ *  "    do  @{\n"
+ *  "        char* p = *pp++;\n"
+ *  "        do-things-with-p;\n"
+ *  "    @} while (--ct > 0);
+ *  @}
+ *  @end example"
+=*/
 =]
 #define  STACKCT_[=prefix _up #_ +=]OPT(n) (((tArgList*)([=prefix _up #_ +
                          =]DESC(n).optCookie))->useCt)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "STACKLST_OPT(<OPTION>)";
-
-title = "Argument Stack";
-
-description = "The address of the list of pointers to the
-option arguments.  The pointers are ordered by the order in
-which they were encountered in the option presets and
-command line processing.
-
-Do not use this on options that have not been stacked or has not been
-specified (the @code{stack_arg} attribute must have been specified,
-and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
-Otherwise, you will likely page fault.
-
-@example
-if (HAVE_OPT( OPT_NAME )) @{
-    int     ct = STACKCT_OPT(  OPT_NAME );
-    char**  pp = STACKLST_OPT( OPT_NAME );
-
-    do  @{
-        char* p = *pp++;
-        do-things-with-p;
-    @} while (--ct > 0);
-@}
-@end example";
-
-end-component
+/*=usermac STACKLST_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Argument Stack
+ *
+ *  description:
+ *
+ *  "The address of the list of pointers to the
+ *  option arguments.  The pointers are ordered by the order in
+ *  which they were encountered in the option presets and
+ *  command line processing.
+ *
+ *  Do not use this on options that have not been stacked or has not been
+ *  specified (the @code{stack_arg} attribute must have been specified,
+ *  and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
+ *  Otherwise, you will likely page fault.
+ *
+ *  @example
+ *  if (HAVE_OPT( OPT_NAME )) @{\n"
+ *  "    int     ct = STACKCT_OPT(  OPT_NAME );\n"
+ *  "    char**  pp = STACKLST_OPT( OPT_NAME );\n\n"
+ *
+ *  "    do  @{\n"
+ *  "        char* p = *pp++;\n"
+ *  "        do-things-with-p;\n"
+ *  "    @} while (--ct > 0);
+ *  @}
+ *  @end example"
+=*/
 =]
 #define STACKLST_[=prefix _up #_ +=]OPT(n) (((tArgList*)([=prefix _up #_ +
                          =]DESC(n).optCookie))->apzArgs)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "CLEAR_OPT(<OPTION>)";
-
-title = "Clear Option Markings";
-
-description = "Make as if the option had never been specified.
-@code{HAVE_OPT(<OPTION>)} will yield @code{FALSE}
-after invoking this macro.";
-
-end-component
+/*=usermac CLEAR_OPT
+ *
+ *  macro_arg:  <OPT_NAME>
+ *
+ *  title:  Clear Option Markings
+ *
+ *  description:
+ *
+ *  Make as if the option had never been specified.
+ *  @code{HAVE_OPT(<OPTION>)} will yield @code{FALSE}
+ *  after invoking this macro.
+=*/
 =]
 #define    CLEAR_[=prefix _up #_ +=]OPT(n) STMTS( \
                 [=prefix _up #_ +=]DESC(n).fOptState &= OPTST_PERSISTENT;   \
@@ -427,29 +464,30 @@ _FOR flag =][=
 
  _ELSE "not a documentation option" =][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "VALUE_OPT_<OPTION>";
-
-title = "Option Flag Value";
-
-description = "This is a #define for the flag character used to
-specify an option on the command line.  If @code{value} was not
-specified for the option, then it is a unique number associated
-with the option.  @code{option value} refers to this value,
-@code{option argument} refers to the (optional) argument to the
-option.
-
-@example
-switch (WHICH_OPT_OTHER_OPT) @{
-case VALUE_OPT_OPT_NAME:
-    this-option-was-really-opt-name;
-case VALUE_OPT_OTHER_OPT:
-    this-option-was-really-other-opt;
-@}
-@end example";
-
-end-component
+/*=usermac VALUE_OPT_optname
+ *
+ *  title:  Option Flag Value
+ *
+ *  description:
+ *
+ *  "This is a #define for the flag character used to
+ *  specify an option on the command line.  If @code{value} was not
+ *  specified for the option, then it is a unique number associated
+ *  with the option.  @code{option value} refers to this value,
+ *  @code{option argument} refers to the (optional) argument to the
+ *  option.
+ *
+ *  @example
+ *  switch (WHICH_OPT_OTHER_OPT) @{
+ *  case VALUE_OPT_OPT_NAME:\n"
+ *  "    this-option-was-really-opt-name;
+ *  case VALUE_OPT_OTHER_OPT:\n"
+ *  "    this-option-was-really-other-opt;
+ *  @}
+ *  @end example"
+=*/
 =]
 #define VALUE_[=prefix _up #_ +=]OPT_[=name _up "#%-14s" _printf=] [=
 
@@ -465,21 +503,22 @@ end-component
         _ENDIF=][=#
 
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "OPT_VALUE_<OPTION>";
-
-title = "Option Argument Value";
-
-description = "This macro gets emitted only for options that
-take numeric arguments.  The macro yields a word-sized integer
-containing the numeric value of the option argument.
-
-@example
-int opt_val = OPT_VALUE_OPT_NAME;
-@end example";
-
-end-component
+/*=usermac OPT_VALUE_optname
+ *
+ *  title:  Option Argument Value
+ *
+ *  description:
+ *
+ *  This macro gets emitted only for options that
+ *  take numeric arguments.  The macro yields a word-sized integer
+ *  containing the numeric value of the option argument.
+ *
+ *  @example
+ *  int opt_val = OPT_VALUE_OPT_NAME;
+ *  @end example
+=*/
 =][=
   _IF flag_arg _get #=.* ~
 =]
@@ -487,26 +526,27 @@ end-component
                 =] ((t_word)([=prefix _up #_ +=]OPT_ARG([=name _up=])))[=
   _ENDIF=][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "WHICH_OPT_<OPTION>";
-
-title = "Which Equivalenced Option";
-
-description = "This macro gets emitted only for equivalenced-to
-options.  It is used to distinguish which of the several
-equivalence class members set the equivalenced-to option.
-
-@example
-switch (WHICH_OPT_OTHER_OPT) @{
-case VALUE_OPT_OPT_NAME:
-    this-option-was-really-opt-name;
-case VALUE_OPT_OTHER_OPT:
-    this-option-was-really-other-opt;
-@}
-@end example";
-
-end-component
+/*=usermac WHICH_OPT_optname
+ *
+ *  title:  Which Equivalenced Option
+ *
+ *  description:
+ *
+ *  "This macro gets emitted only for equivalenced-to
+ *  options.  It is used to distinguish which of the several
+ *  equivalence class members set the equivalenced-to option.
+ *
+ *  @example
+ *  switch (WHICH_OPT_OTHER_OPT) @{
+ *  case VALUE_OPT_OPT_NAME:\n"
+ *  "    this-option-was-really-opt-name;
+ *  case VALUE_OPT_OTHER_OPT:\n"
+ *  "    this-option-was-really-other-opt;
+ *  @}
+ *  @end example"
+=*/
 =][=
   _IF equivalence _get _UP name _get _UP = =]
 #define WHICH_[=prefix _up #_ +=]OPT_[=name _up "#%-14s" _printf
@@ -515,24 +555,26 @@ end-component
                 =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualIndex)[=
   _ENDIF=][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "SET_OPT_<OPTION>";
-
-title = "Force an option to be set";
-
-description = "This macro gets emitted only when the given
-option has the @code{setable} attribute specified.
-
-The form of the macro will actually depend on whether the
-option is equivalenced to another, has an option argument
-and/or has an assigned handler procedure.
-
-@example
-SET_OPT_OPT_NAME( \"string-value\" );
-@end example";
-
-end-component
+/*=usermac SET_OPT_optname
+ *
+ *  title:  Force an option to be set
+ *
+ *  description:
+ *
+ *  This macro gets emitted only when the given
+ *  option has the @code{setable} attribute specified.
+ *
+ *  The form of the macro will actually depend on whether the
+ *  option is equivalenced to another, has an option argument
+ *  and/or has an assigned handler procedure.  If the option has
+ *  an argument, then this macro will too.
+ *
+ *  @example
+ *  SET_OPT_OPT_NAME( "string-value" );
+ *  @end example
+=*/
 =][=
   _IF setable _exist =][=
     _IF  equivalence _exist !
@@ -594,26 +636,27 @@ end-component
 
   _ENDIF setable =][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "DISABLE_OPT_<OPTION>";
-
-title = "Disable an option";
-
-description = "This macro is emitted if it is both setable
-and it can be disabled.  If it cannot be disabled, it may
-always be CLEAR-ed (see above).
-
-The form of the macro will actually depend on whether the
-option is equivalenced to another, and/or has an assigned
-handler procedure.  Unlike the @code{SET_OPT} macro,
-this macro does not allow an option argument.
-
-@example
-DISABLE_OPT_OPT_NAME;
-@end example";
-
-end-component
+/*=usermac DISABLE_OPT_optname
+ *
+ *  title:  Disable an option
+ *
+ *  description:
+ *
+ *  This macro is emitted if it is both setable
+ *  and it can be disabled.  If it cannot be disabled, it may
+ *  always be CLEAR-ed (see above).
+ *
+ *  The form of the macro will actually depend on whether the
+ *  option is equivalenced to another, and/or has an assigned
+ *  handler procedure.  Unlike the @code{SET_OPT} macro,
+ *  this macro does not allow an option argument.
+ *
+ *  @example
+ *  DISABLE_OPT_OPT_NAME;
+ *  @end example
+=*/
 =][=
   _IF setable _exist disable _exist & =]
 #define DISABLE_[=prefix _up #_ +=]OPT_[=name _up=]   STMTS( \
@@ -686,16 +729,18 @@ _ELSE "flag.value *DOES NOT* exist" =][=
                                       prefix _up #_ +=]OPT_MORE_HELP[=
 _ENDIF=][=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "ERRSKIP_OPTERR";
-
-title = "Ignore Option Errors";
-
-description = "When it is necessary to continue (return to caller)
-on option errors, invoke this option.  It is reversable.";
-
-end-component
+/*=usermac ERRSKIP_OPTERR
+ *
+ *  title:  Ignore Option Errors
+ *
+ *  description:
+ *
+ *  When it is necessary to continue (return to caller)
+ *  on option errors, invoke this option.  It is reversable.
+ *  @xref{ERRSTOP_OPTERR}.
+=*/
 =]
 
 /*
@@ -704,72 +749,84 @@ end-component
 #define  ERRSKIP_[=prefix _up #_ +=]OPTERR STMTS( [=prog_name
                          =]Options.fOptSet &= ~OPTPROC_ERRSTOP )[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "ERRSTOP_OPTERR";
-
-title = "Stop on Errors";
-
-description = "After invoking this macro, if @code{optionProcess()}
-encounters an error, it will call @code{exit(1)} rather than return.
-This is the default processing mode.";
-
-end-component
+/*=usermac ERRSTOP_OPTERR
+ *
+ *  title:  Stop on Errors
+ *
+ *  description:
+ *
+ *  After invoking this macro, if @code{optionProcess()}
+ *  encounters an error, it will call @code{exit(1)} rather than return.
+ *  This is the default processing mode.  It can be overridden by
+ *  specifying @code{allow_errors} in the definitions file,
+ *  or invoking the macro @xref{ERRSKIP_OPTERR}.
+=*/
 =]
 #define  ERRSTOP_[=prefix _up #_ +=]OPTERR STMTS( [=prog_name
                          =]Options.fOptSet |= OPTPROC_ERRSTOP )[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "RESTART_OPT(n)";
-
-title = "Resume Option Processing";
-
-description = "If option processg stopped (either because of an error
-or something was encountered that looked like a program argument),
-it can be resumed by providing this macro with the index @code{n}
-of the next option to process and calling @code{optionProcess()} again.";
-
-end-component
+/*=usermac RESTART_OPT
+ *
+ *  macro_arg:  n
+ *
+ *  title:  Resume Option Processing
+ *
+ *  description:
+ *
+ *  If option processing has stopped (either because of an error
+ *  or something was encountered that looked like a program argument),
+ *  it can be resumed by providing this macro with the index @code{n}
+ *  of the next option to process and calling @code{optionProcess()} again.
+=*/
 =]
 #define  RESTART_[=prefix _up #_ +=]OPT(n) STMTS( \
                 [=prog_name=]Options.curOptIdx = (n); \
                 [=prog_name=]Options.pzCurOpt  = (char*)NULL )[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "START_OPT(n)";
-
-title = "Restart Option Processing";
-
-description = "This is just a shortcut for RESTART(1).";
-
-end-component
+/*=usermac START_OPT
+ *
+ *  title:  Restart Option Processing
+ *
+ *  description:
+ *
+ *  This is just a shortcut for @xref{RESTART_OPT(n)},
+ *  where @code{n} equals @code{1}.
+=*/
 =]
-#define    START_[=prefix _up #_ +=]OPT    RESTART_[=prefix _up #_ +=]OPT(1)[=#
+#define    START_[=prefix _up #_ +=]OPT    RESTART_[=prefix _up #_ +
+                =]OPT(1)[=#
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-component = "USAGE(exit-code)";
-
-title = "Usage invocation macro";
-
-description = "This macro invokes the procedure registered to display
-the usage text.  Normally, this will be @code{optionUsage} from the
-Autoopts library, but you may select another procedure by specifying
-@code{usage = \"proc_name\"} program attribute.  This procedure must
-take two arguments: first, a pointer to the option descriptor, and
-second the exit code.  The macro supplies the option descriptor
-automatically.  This routine is expected to call @code{exit()} with
-the provided exit code.
-
-The @code{optionUsage} routine also behaves differently depending
-on the exit code.  If the exit code is zero, it is assumed that
-assistance has been requested.  Consequently, a little more
-information is provided than when displaying usage and exiting
-with a non-zero exit code.";
-
-end-component
+/*=usermac USAGE
+ *
+ *  macro_arg:  exit-code
+ *
+ *  title:  Usage invocation macro
+ *
+ *  description:
+ *
+ *  This macro invokes the procedure registered to display
+ *  the usage text.  Normally, this will be @code{optionUsage} from the
+ *  Autoopts library, but you may select another procedure by specifying
+ *  @code{usage = "proc_name"} program attribute.  This procedure must
+ *  take two arguments: first, a pointer to the option descriptor, and
+ *  second the exit code.  The macro supplies the option descriptor
+ *  automatically.  This routine is expected to call @code{exit()} with
+ *  the provided exit code.
+ *
+ *  The @code{optionUsage} routine also behaves differently depending
+ *  on the exit code.  If the exit code is zero, it is assumed that
+ *  assistance has been requested.  Consequently, a little more
+ *  information is provided than when displaying usage and exiting
+ *  with a non-zero exit code.
+=*/
 =]
 #define     [=prefix _up #_ +=]USAGE(c)    (*[=prog_name
                  =]Options.pUsageProc)( &[=prog_name=]Options, c )[=#
