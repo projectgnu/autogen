@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.14 2000/10/07 22:52:08 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.15 2000/10/27 15:18:19 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -122,14 +122,6 @@
 #  define STATIC static
 #endif
 
-#ifndef MSDOS
-#  define DIR_SEP_CHAR   '/'
-#  define OPT_CHAR       '-'
-#else
-#  define DIR_SEP_CHAR   '\\'
-#  define OPT_CHAR       '/'
-#endif
-
 #ifndef STR
 #  define _STR(s) #s
 #  define STR(s)  _STR(s)
@@ -137,6 +129,15 @@
 
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
+
+typedef int tSuccess;
+#define SUCCESS         ((tSuccess)0)
+#define FAILURE         ((tSuccess)-1)
+#define PROBLEM         ((tSuccess)1)
+#define SUCCEEDED(r)    ((r)==SUCCESS)
+#define SUCCESSFUL(r)   SUCCEEDED(r)
+#define FAILED(r)       ((r)<SUCCESS)
+#define GLITCH(r)       ((r)>SUCCESS)
 
 /*
  *  The pager state is used by doPagedUsage() procedure.
@@ -153,6 +154,20 @@ typedef enum {
 } tePagerState;
 
 extern tePagerState pagerState;
+
+typedef enum {
+    ENV_ALL,
+    ENV_IMM,
+    ENV_NON_IMM
+} teEnvPresetType;
+
+typedef struct {
+    tOptDesc*  pOD;
+    u_long     flags;
+    int        argType;
+    char*      pzOptArg;
+    ag_bool    isLongOpt;
+} tOptState;
 
 #ifdef MEMDEBUG
    extern void* ag_alloc( size_t, const char* );

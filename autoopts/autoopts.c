@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.25 2000/10/17 17:09:19 bkorb Exp $
+ *  $Id: autoopts.c,v 2.26 2000/10/27 15:18:19 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -72,28 +72,30 @@
 #include "autoopts.h"
 #include "compat/compat.h"
 
-tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
-tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
-tSCC zIllOptChr[]   = "%s: illegal option -- %c\n";
-tSCC zIllOptStr[]   = "%s: %s option -- %s\n";
-tSCC zIllegal[]     = "illegal";
-tSCC zAmbiguous[]   = "ambiguous";
 
 tSCC zBadVer[] = "Automated Options Processing Error!\n\
 \t%s called optionProcess with structure version %d.%d.%d.\n\
 \tThis library was compiled with version %d.%d.%d\n\
 \tand requires a minimum structure version of %d.%d.%d\n";
 
-STATIC ag_bool loadValue( tOptions* pOpts, tOptDesc* pOD );
-STATIC void loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD );
-STATIC tOptDesc* longOptionFind( tOptions*  pOpts, char* pzOptName,
-                                 u_long* pFlags );
-STATIC tOptDesc* shortOptionFind( tOptions*  pOpts, tUC optValue );
-STATIC void filePreset( tOptions*  pOpts, const char* pzFileName );
-STATIC void doPresets( tOptions*  pOpts );
-STATIC tOptDesc* optionGet( tOptions* pOpts, int argCt, char** argVect );
 
-#define NO_OPT_DESC (tOptDesc*)(~0)
+tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
+tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
+tSCC zIllOptChr[]   = "%s: illegal option -- %c\n";
+tSCC zIllegal[]     = "illegal";
+tSCC zIllOptStr[]   = "%s: %s option -- %s\n";
+tSCC zAmbiguous[]   = "ambiguous";
+
+tSCC zOnlyOne[]     = "one %s%s option allowed\n";
+tSCC zAtMost[]      = "%4$d %1$s%s options allowed\n";
+tSCC zEquiv[]       = "-equivalence";
+tSCC zErrOnly[]     = "ERROR:  only ";
+
+typedef int tDirection;
+#define DIRECTION_PRESET   1
+#define DIRECTION_PROCESS -1
+#define PROCESSING(d)     ((d)<0)
+#define PRESETTING(d)     ((d)>0)
 
 /*
  *  loadValue
@@ -101,15 +103,18 @@ STATIC tOptDesc* optionGet( tOptions* pOpts, int argCt, char** argVect );
  *  This routine handles equivalencing and invoking the handler procedure,
  *  if any.
  */
-DEF_PROC_2( STATIC, ag_bool, loadValue,
+DEF_PROC_2( STATIC tSuccess loadValue,
             tOptions*,  pOpts,
-            tOptDesc*,  pOD )
+            tOptState*, pOptState )
 {
     /*
      *  Save a copy of the option procedure pointer.
      *  If this is an equivalence class option, we still want this proc.
      */
+    tOptDesc* pOD = pOptState->pOD;
     tOptProc* pOP = pOD->pOptProc;
+
+    pOD->pzLastArg =  pOptState->pzOptArg;
 
     /*
      *  IF this is an equivalence class option,
@@ -123,19 +128,10 @@ DEF_PROC_2( STATIC, ag_bool, loadValue,
         tOptDesc*  p = pOpts->pOptDesc + pOD->optEquivIndex;
 
         /*
-         *  Record the non-persistent options from the original option
-         *  and add in the OPTST_EQUIVALENCE flag.
+         *  Add in the equivalence flag
          */
-        u_short f = (pOD->fOptState & ~OPTST_PERSISTENT) | OPTST_EQUIVALENCE;
-
-        /*
-         *  clear out non-persistent options and
-         *  insert the options saved in 'f'.
-         */
-        p->fOptState &= OPTST_PERSISTENT;
-        p->fOptState |= f;
-        p->pzLastArg  = pOD->pzLastArg;
-
+        pOptState->flags |= OPTST_EQUIVALENCE;
+        p->pzLastArg      = pOD->pzLastArg;
         p->optActualValue = pOD->optValue;
         p->optActualIndex = pOD->optIndex;
         pOD = p;
@@ -145,18 +141,17 @@ DEF_PROC_2( STATIC, ag_bool, loadValue,
         pOD->optActualIndex = pOD->optIndex;
     }
 
+    pOD->fOptState &= OPTST_PERSISTENT;
+    pOD->fOptState |= (pOptState->flags & ~OPTST_PERSISTENT);
+
     /*
      *  Keep track of count only for DEFINED (command line) options.
      *  IF we have too many, build up an error message and bail.
      */
     if (  (pOD->fOptState & OPTST_DEFINED)
        && (++pOD->optOccCt > pOD->optMaxCt)  )  {
-        tSCC zOnlyOne[]   = "one %s%s option allowed\n";
-        tSCC zAtMost[]    = "%4$d %1$s%s options allowed\n";
-        tSCC zEquiv[]     = "-equivalence";
         const char* pzEqv = (pOD->optEquivIndex != NO_EQUIVALENT)
                           ? zEquiv : zEquiv + sizeof( zEquiv )-1;
-        tSCC zErrOnly[]   = "ERROR:  only ";
 
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
             const char* pzFmt = (pOD->optMaxCt > 1) ? zAtMost : zOnlyOne;
@@ -165,7 +160,7 @@ DEF_PROC_2( STATIC, ag_bool, loadValue,
                      pOD->optMaxCt );
         }
 
-        return AG_FALSE;
+        return FAILURE;
     }
 
     /*
@@ -173,45 +168,20 @@ DEF_PROC_2( STATIC, ag_bool, loadValue,
      */
     if (pOP != (tpOptProc)NULL)
         (*pOP)( pOpts, pOD );
-    return AG_TRUE;
+
+    return SUCCESS;
 }
 
 
 /*
- *  For preset values, we will always have an argument pointer.
+ *  longOptionFind
+ *
+ *  Find the long option descriptor for the current option
  */
-DEF_PROC_2( STATIC, void, loadPresetValue, tOptions*, pOpts, tOptDesc*, pOD )
-{
-    /*
-     *  The interpretation of the option value depends
-     *  on the type of value argument the option takes
-     */
-    switch (pOD->optArgType ) {
-    case ARG_MAY:
-        if (pOD->pzLastArg == NULL)
-            break;
-        /*FALLTHROUGH*/
-
-    case ARG_MUST:
-        if (*pOD->pzLastArg == NUL)
-             pOD->pzLastArg = "";
-        else pOD->pzLastArg = strdup( pOD->pzLastArg );
-
-        break;
-
-    default: /* no argument allowed */
-        pOD->pzLastArg = (char*)NULL;
-        break;
-    }
-
-    loadValue( pOpts, pOD );
-}
-
-
-DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
-            tOptions*,  pOpts,
-            char*,      pzOptName,
-            u_long*,    pFlags )
+DEF_PROC_3( STATIC tSuccess longOptionFind,
+            tOptions*,   pOpts,
+            char*,       pzOptName,
+            tOptState*,  pOptState )
 {
     ag_bool    disable  = AG_FALSE;
     char*      pzEq     = strchr( pzOptName, '=' );
@@ -238,21 +208,14 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
 
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
             /*
-             *  Remember the index for later.
-             */
-            matchIdx = idx;
-
-            /*
              *  IF we have a complete match
              *  THEN it takes priority over any already located partial
              */
             if (pOD->pz_Name[ nameLen ] == NUL) {
-                matchCt = 1;
+                matchCt  = 1;
+                matchIdx = idx;
                 break;
             }
-
-            if (++matchCt > 1)
-                break;
         }
 
         /*
@@ -262,14 +225,9 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
          *     *AND* the option name matches the disable name
          *  THEN ...
          */
-        else
-            if (  (pOD->pz_DisableName != (char*)NULL)
-               && (strneqvcmp( pzOptName, pOD->pz_DisableName, nameLen ) == 0)
-               )  {
-            /*
-             *  Remember the index for later.
-             */
-            matchIdx = idx;
+        else if (  (pOD->pz_DisableName != (char*)NULL)
+                && (strneqvcmp( pzOptName, pOD->pz_DisableName, nameLen ) == 0)
+                )  {
             disable  = AG_TRUE;
 
             /*
@@ -277,13 +235,24 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
              *  THEN it takes priority over any already located partial
              */
             if (pOD->pz_DisableName[ nameLen ] == NUL) {
-                matchCt = 1;
+                matchCt  = 1;
+                matchIdx = idx;
                 break;
             }
-
-            if (++matchCt > 1)
-                break;
         }
+
+        else
+            continue;
+
+        /*
+         *  We found a partial match, either regular or disabling.
+         *  Remember the index for later.
+         */
+        matchIdx = idx;
+
+        if (++matchCt > 1)
+            break;
+
     } while (pOD++, (++idx < idxLim));
 
     if (pzEq != (char*)NULL)
@@ -298,13 +267,14 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
          *  THEN set the bit in the callers' flag word
          */
         if (disable)
-            *pFlags |= OPTST_DISABLED;
-        pOD = pOpts->pOptDesc + matchIdx;
-        if (pzEq != (char*)NULL)
-             pOD->pzLastArg = pzEq+1;
-        else pOD->pzLastArg = (char*)NULL;
+            pOptState->flags |= OPTST_DISABLED;
 
-        return pOD;
+        pOptState->pOD = pOpts->pOptDesc + matchIdx;
+        if (pzEq != (char*)NULL)
+             pOptState->pzOptArg = pzEq+1;
+        else pOptState->pzOptArg = (char*)NULL;
+
+        return SUCCESS;
     }
 
     /*
@@ -316,11 +286,11 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
     if (  (pzEq == (char*)NULL)
        && NAMED_OPTS(pOpts)
        && (pOpts->specOptIdx.default_opt != NO_EQUIVALENT)) {
-        pOD = pOpts->pOptDesc + pOpts->specOptIdx.default_opt;
+        pOptState->pOD = pOpts->pOptDesc + pOpts->specOptIdx.default_opt;
 
-        pOD->pzLastArg = pzOptName;
+        pOptState->pzOptArg = pzOptName;
 
-        return pOD;
+        return SUCCESS;
     }
 
     /*
@@ -333,13 +303,19 @@ DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
         (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
     }
 
-    return (tOptDesc*)NULL;
+    return FAILURE;
 }
 
 
-DEF_PROC_2( STATIC, tOptDesc*, shortOptionFind,
-            tOptions*,  pOpts,
-            tUC,        optValue )
+/*
+ *  shortOptionFind
+ *
+ *  Find the short option descriptor for the current option
+ */
+DEF_PROC_3( STATIC tSuccess shortOptionFind,
+            tOptions*,   pOpts,
+            tUC,         optValue,
+            tOptState*,  pOptState )
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
     int        ct   = pOpts->optCt;
@@ -354,8 +330,8 @@ DEF_PROC_2( STATIC, tOptDesc*, shortOptionFind,
          */
         if (  ((pRes->fOptState & OPTST_DOCUMENT) == 0)
            && (optValue == pRes->optValue)  )  {
-            pRes->pzLastArg = (char*)NULL;
-            return pRes;
+            pOptState->pOD = pRes;
+            return SUCCESS;
         }
 
         /*
@@ -366,39 +342,485 @@ DEF_PROC_2( STATIC, tOptDesc*, shortOptionFind,
         /*
          *  IF we have searched everything, ...
          */
-        if (--ct <= 0) {
-            /*
-             *  IF    the character value is a digit
-             *    AND there is a special number option ("-nn")
-             *  THEN the result is the "option" itself and the
-             *       option is the specially marked "number" option.
-             */
-            if (   isdigit( optValue )
-               && (pOpts->specOptIdx.number_option != NO_EQUIVALENT) ) {
-                pRes = pOpts->pOptDesc + pOpts->specOptIdx.number_option;
-                (pOpts->pzCurOpt)--;
-                pRes->pzLastArg = (char*)NULL;
-                return pRes;
-            }
-
-            /*
-             *  IF we are to stop on errors (the default, actually)
-             *  THEN call the usage procedure.
-             */
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-                fprintf( stderr, zIllOptChr, pOpts->pzProgPath, optValue );
-                (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            }
-            return (tOptDesc*)NULL;
-        }
+        if (--ct <= 0)
+            break;
     }
+
+    /*
+     *  IF    the character value is a digit
+     *    AND there is a special number option ("-n")
+     *  THEN the result is the "option" itself and the
+     *       option is the specially marked "number" option.
+     */
+    if (  isdigit( optValue )
+       && (pOpts->specOptIdx.number_option != NO_EQUIVALENT) ) {
+        pOptState->pOD = pOpts->pOptDesc + pOpts->specOptIdx.number_option;
+        (pOpts->pzCurOpt)--;
+        return SUCCESS;
+    }
+
+    /*
+     *  IF we are to stop on errors (the default, actually)
+     *  THEN call the usage procedure.
+     */
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
+        fprintf( stderr, zIllOptChr, pOpts->pzProgPath, optValue );
+        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    }
+    return FAILURE;
 }
 
 
-DEF_PROC_3( STATIC, void, loadOptionLine,
+/*
+ *  findOptDesc
+ *
+ *  Find the option descriptor for the current option
+ */
+DEF_PROC_2( STATIC tSuccess findOptDesc,
             tOptions*,  pOpts,
-            u_long,     optFlag,
-            char*,      pzLine )
+            tOptState*, pOptState )
+{
+    /*
+     *  IF we are continuing a short option list (e.g. -xyz...)
+     *  THEN continue a single flag option.
+     *  OTHERWISE see if there is room to advance and then do so.
+     */
+    if ((pOpts->pzCurOpt != (char*)NULL) && (*pOpts->pzCurOpt != NUL))
+        return shortOptionFind( pOpts, *pOpts->pzCurOpt, pOptState );
+
+    if (pOpts->curOptIdx >= pOpts->origArgCt)
+        return PROBLEM; /* NORMAL COMPLETION */
+
+    pOpts->pzCurOpt = pOpts->origArgVect[ pOpts->curOptIdx ];
+
+    /*
+     *  IF all arguments must be named options, ...
+     */
+    if (NAMED_OPTS(pOpts)) {
+        char* pz = pOpts->pzCurOpt;
+        pOpts->curOptIdx++;
+
+        /*
+         *  Skip over any flag/option markers.
+         *  In this mode, they are not required.
+         */
+        while (*pz == '-') pz++;
+
+        pOptState->isLongOpt = AG_TRUE;
+        return longOptionFind( pOpts, pz, pOptState );
+    }
+
+    /*
+     *  Note the kind of flag/option marker
+     */
+    if (*((pOpts->pzCurOpt)++) != '-')
+        return PROBLEM; /* NORMAL COMPLETION - rest are args */
+
+    /*
+     *  The current argument is to be processed as an option argument
+     */
+    pOpts->curOptIdx++;
+
+    /*
+     *  We have an option marker.
+     *  Test the next character for long option indication
+     */
+    if (pOpts->pzCurOpt[0] == '-') {
+        if (*++(pOpts->pzCurOpt) == NUL)
+            return PROBLEM; /* NORMAL COMPLETION */
+
+        if ((pOpts->fOptSet & OPTPROC_LONGOPT) == 0) {
+            fprintf( stderr, zIllOptStr, pOpts->pzProgPath,
+                     zIllegal, pOpts->pzCurOpt-2 );
+            return FAILURE;
+        }
+
+        pOptState->isLongOpt = AG_TRUE;
+        return longOptionFind( pOpts, pOpts->pzCurOpt, pOptState );
+    }
+
+    /*
+     *  If short options are not allowed, then do long
+     *  option processing.  Otherwise the character must be a
+     *  short (i.e. single character) option.
+     */
+    if ((pOpts->fOptSet & OPTPROC_SHORTOPT) != 0)
+        return shortOptionFind( pOpts, *pOpts->pzCurOpt, pOptState );
+
+    pOptState->isLongOpt = AG_TRUE;
+    return longOptionFind( pOpts, pOpts->pzCurOpt, pOptState );
+}
+
+
+/*
+ *  nextOption
+ *
+ *  Find the option descriptor and option argument (if any) for the
+ *  next command line argument.  DO NOT modify the descriptor.  Put
+ *  all the state in the state argument so that the option can be skipped
+ *  without consequence (side effect).
+ */
+DEF_PROC_2( STATIC tSuccess nextOption,
+            tOptions*,   pOpts,
+            tOptState*,  pOptState )
+{
+    tSuccess res;
+
+    memset( (void*)pOptState, 0, sizeof( *pOptState ));
+    res = findOptDesc( pOpts, pOptState );
+    if (! SUCCESSFUL( res ))
+        return res;
+
+    /*
+     *  Figure out what to do about option  arguments.
+     *  An argument may be required, not associated with the option,
+     *  or be optional.  We detect the latter by examining for an option
+     *  marker on the next possible argument.
+     */
+    if ((pOptState->flags & OPTST_DISABLED) != 0)
+         pOptState->argType = ARG_NONE;
+    else pOptState->argType = pOptState->pOD->optArgType;
+
+    switch (pOptState->argType) {
+    case ARG_MUST:
+        /*
+         *  An option argument is required.  Long options can either have
+         *  a separate command line argument, or an argument attached by
+         *  the '=' character.  Figure out which.
+         */
+        if (pOptState->isLongOpt) {
+            char* pz = strchr( pOpts->pzCurOpt, '=' );
+
+            /*
+             *  IF the argument is attached to the long name,
+             *  THEN set the pointer
+             *  ELSE get the next argumet because we consumed the
+             *       entire argument with the option name
+             */
+            if (pz != (char*)NULL) {
+                pOptState->pzOptArg = pz+1;
+            } else {
+                pOptState->pzOptArg = pOpts->origArgVect[ pOpts->curOptIdx++ ];
+            }
+        } else {
+            if (*++pOpts->pzCurOpt == NUL)
+                pOpts->pzCurOpt = pOpts->origArgVect[ pOpts->curOptIdx++ ];
+            pOptState->pzOptArg = pOpts->pzCurOpt;
+        }
+
+        /*
+         *  Make sure we did not overflow the argument list.
+         */
+        if (pOpts->curOptIdx > pOpts->origArgCt) {
+            fprintf( stderr, zMisArg, pOpts->pzProgPath,
+                     pOptState->pOD->pz_Name );
+            return FAILURE;
+        }
+
+        pOpts->pzCurOpt = (char*)NULL;  /* next time advance to next arg */
+        break;
+
+    case ARG_MAY:
+        /*
+         *  An option argument is optional.
+         */
+        if (pOptState->isLongOpt) {
+            char* pz = strchr( pOpts->pzCurOpt, '=' );
+
+            /*
+             *  IF the argument is attached to the long name,
+             *  THEN set the pointer
+             */
+            if (pz != (char*)NULL) {
+                pOptState->pzOptArg = pz+1;
+            }
+
+            /*
+             *  ELSE if we are *not* using named arguments,
+             *  THEN the next argument is our argument, unless
+             *       it starts with one of the flag characters.
+             */
+            else if (! NAMED_OPTS(pOpts)) {
+                char* pzLA =
+                    pOptState->pzOptArg = pOpts->origArgVect[ pOpts->curOptIdx ];
+
+                /*
+                 *  BECAUSE it is optional, we must make sure
+                 *  we did not find another flag and that there
+                 *  is such an argument.
+                 */
+                if ( pzLA != (char*)NULL) {
+                    if ((*pzLA == '-') || (*pzLA == '+'))
+                        pOptState->pzOptArg = (char*)NULL;
+                    else pOpts->curOptIdx++; /* argument found */
+                }
+            }
+
+        } else {
+            if (*++pOpts->pzCurOpt != NUL)
+                pOptState->pzOptArg = pOpts->pzCurOpt;
+            else {
+                char* pzLA = pOptState->pzOptArg =
+                    pOpts->origArgVect[ pOpts->curOptIdx ];
+
+                /*
+                 *  BECAUSE it is optional, we must make sure
+                 *  we did not find another flag and that there
+                 *  is such an argument.
+                 */
+                if ( pzLA != (char*)NULL) {
+                    if ((*pzLA == '-') || (*pzLA == '+'))
+                        pOptState->pzOptArg = (char*)NULL;
+                    else pOpts->curOptIdx++; /* argument found */
+                }
+            }
+        }
+
+        /*
+         *  After an option with an optional argument, we will
+         *  *always* start with the next option because if there
+         *  were any characters following the option name/flag,
+         *  they would be interpreted as the argument.
+         */
+        pOpts->pzCurOpt = (char*)NULL;
+        break;
+
+    default: /* CANNOT */
+        /*
+         *  No option argument.  Make sure next time around we find
+         *  the correct flag (next argument for long options,
+         *  maybe the next character for short flags).
+         */
+        if (! pOptState->isLongOpt) {
+            (pOpts->pzCurOpt)++;
+        } else {
+            if (strchr( pOpts->pzCurOpt, '=' ) != (char*)NULL) {
+                fprintf( stderr, zNoDisableArg, pOpts->pzProgPath,
+                         pOptState->pOD->pz_Name );
+                return FAILURE;
+            }
+            pOpts->pzCurOpt = (char*)NULL;
+        }
+    }
+
+    return SUCCESS;
+}
+
+
+/*
+ *  make_path  --  translate and construct a path
+ *
+ *  This routine does environment variable expansion if the first character
+ *  is a ``$''.  If it starts with two dollar characters, then the path
+ *  is relative to the location of the executable.
+ */
+DEF_PROC_4( STATIC ag_bool make_path,
+            char*,   pzBuf,
+            size_t,  bufSize,
+            tCC*,    pzName,
+            tCC*,    pzProgPath )
+{
+    if (bufSize <= strlen( pzName ))
+        return AG_FALSE;
+
+    /*
+     *  IF not an environment variable, just copy the data
+     */
+    if (*pzName != '$') {
+        strcpy( pzBuf, pzName );
+        return AG_TRUE;
+    }
+
+    /*
+     *  IF the name starts with "$$", then it must start be "$$" or
+     *  it must start with "$$/".  In either event, replace the "$$"
+     *  with the path to the executable and append a "/" character.
+     */
+    if (pzName[1] == '$') {
+        tCC*  pzPath;
+        tCC*  pz;
+
+        if (strchr( pzProgPath, '/' ) != (char*)NULL)
+            pzPath = pzProgPath;
+        else
+            pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
+
+        if (pzPath == (char*)NULL)
+            return AG_FALSE;
+
+        pz = strrchr( pzPath, '/' );
+
+        /*
+         *  IF we cannot find a directory name separator,
+         *  THEN we do not have a path name to our executable file.
+         */
+        if (pz == (char*)NULL)
+            return AG_FALSE;
+
+        /*
+         *  Skip past the "$$" and, maybe, the "/".  Anything else is invalid.
+         */
+        pzName += 2;
+        switch (*pzName) {
+        case '/':
+            pzName++;
+        case NUL:
+            break;
+        default:
+            return AG_FALSE;
+        }
+
+        /*
+         *  Concatenate the file name to the end of the executable path.
+         *  The result may be either a file or a directory.
+         */
+        if ((pz - pzPath)+1 + strlen(pzName) >= bufSize)
+            return AG_FALSE;
+
+        memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
+        strcpy( pzBuf + (pz - pzPath) + 1, pzName );
+    }
+
+    /*
+     *  See if the env variable is followed by specified directories
+     *  (We will not accept any more env variables.)
+     */
+    else {
+        char* pzDir = strchr( pzName+1, '/' );
+
+        if (pzDir != (char*)NULL)
+            *pzDir = NUL;
+
+        {
+            char* pzEnv = getenv( pzName+1 );
+
+            /*
+             *  Environment value not found -- skip the home list entry
+             */
+            if (pzEnv == (char*)NULL)
+                return AG_FALSE;
+
+            if (strlen( pzEnv ) >= bufSize)
+                return AG_FALSE;
+
+            strcpy( pzBuf, pzEnv );
+        }
+
+        /*
+         *  IF we found a directory that followed the env variable,
+         *  THEN tack it onto the value we found
+         */
+        if (pzDir != (char*)NULL) {
+            if (strlen( pzBuf ) + 1 + strlen( pzDir+1 ) >= bufSize)
+                return AG_FALSE;
+
+            pzBuf += strlen( pzBuf );
+
+            if (pzBuf[-1] != '/')
+                *(pzBuf++) = '/';
+            strcpy( pzBuf, pzDir+1 );
+            *pzDir = '/';
+        }
+    }
+
+    return AG_TRUE;
+}
+
+
+/*
+ *  doPresets - check for preset values from an rc file or the envrionment
+ */
+DEF_PROC_1( STATIC tSuccess doImmediateOpts,
+            tOptions*,  pOpts )
+{
+    tOptState optState;
+
+    /*
+     *  IF the struct version is not the current, and also
+     *     either too large (?!) or too small,
+     *  THEN emit error message and fail-exit
+     */
+    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION )
+       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
+          || (pOpts->structVersion < MIN_OPTION_VERSION     )
+       )  )  {
+        fprintf( stderr, zBadVer, pOpts->origArgVect[0],
+                 NUM_TO_VER( pOpts->structVersion ),
+                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ),
+                 NUM_TO_VER( MIN_OPTION_VERSION ));
+        exit( EXIT_FAILURE );
+    }
+
+    {
+        const char* pz = strrchr( *pOpts->origArgVect, '/' );
+
+        if (pz == (char*)NULL)
+             pOpts->pzProgName = *pOpts->origArgVect;
+        else pOpts->pzProgName = pz+1;
+
+        pOpts->pzProgPath = *pOpts->origArgVect;
+    }
+
+    pOpts->curOptIdx = 1;     /* start by skipping program name */
+    pOpts->pzCurOpt  = NULL;
+
+    /*
+     *  when comparing long names, these are equivalent
+     */
+    strequate( (const char*)"-_^" );
+
+    /*
+     *  Examine all the options from the start.  We process any options that
+     *  are marked for immediate processing.
+     */
+    for (;;) {
+        switch (nextOption( pOpts, &optState )) {
+        case FAILURE:
+            goto optionsDone;
+
+        case PROBLEM:
+            return SUCCESS; /* no more args */
+
+        case SUCCESS:
+            break;
+        }
+
+        /*
+         *  IF this is not an immediate-attribute option, then do it.
+         */
+        switch (optState.pOD->fOptState & (OPTST_DISABLE_IMM|OPTST_IMM)) {
+        case 0:                   /* never */
+            continue;
+
+        case OPTST_DISABLE_IMM:   /* do enabled options later */
+            if ((optState.flags & OPTST_DISABLED) == 0)
+                continue;
+            break;
+
+        case OPTST_IMM:           /* do disabled options later */
+            if ((optState.flags & OPTST_DISABLED) != 0)
+                continue;
+            break;
+
+        case OPTST_DISABLE_IMM|OPTST_IMM: /* always */
+            break;
+        }
+
+        if (! SUCCESSFUL( loadValue( pOpts, &optState )))
+            break;
+    } optionsDone:;
+
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    return FAILURE;
+}
+
+
+DEF_PROC_4( STATIC void loadOptionLine,
+            tOptions*,  pOpts,
+            tOptState*, pOS,
+            char*,      pzLine,
+            tDirection, direction )
 {
     char*  pzOptionArg;
 
@@ -426,26 +848,98 @@ DEF_PROC_3( STATIC, void, loadOptionLine,
     }
 
     /*
-     *  IF    we can find the option
-     *    AND the option set limit has not been reached,
-     *  THEN ...
+     *  Make sure we can find the option in our tables.
      */
-    {
-        tOptDesc*  pOD = longOptionFind( pOpts, pzLine, &optFlag );
-        if (  (pOD != (tOptDesc*)NULL)
-           && (pOD->optOccCt < pOD->optMaxCt) ) {
-            /*
-             *  Clear out the SET_MASK bits.  "optFlag" contains these
-             *  bits.  However, "fOptState" contains the equivalence/
-             *  disabled bits.
-             */
-            pOD->fOptState &= OPTST_SET_MASK;
-            pOD->fOptState |= optFlag;
-            pOD->pzLastArg  = pzOptionArg;
+    if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
+        return;
 
-            loadPresetValue( pOpts, pOD );
+    if (pOS->pOD->fOptState & OPTST_NO_INIT)
+        return;
+
+    switch (pOS->pOD->fOptState & (OPTST_IMM|OPTST_DISABLE_IMM)) {
+    case 0:
+        /*
+         *  The selected option has no immediate action.
+         *  THEREFORE, if the direction is PRESETTING
+         *  THEN we skip this option.
+         */
+        if (PRESETTING(direction))
+            return;
+        break;
+
+    case OPTST_IMM:
+        if (PRESETTING(direction)) {
+            /*
+             *  We are in the presetting direction with an option we handle
+             *  immediately for enablement, but normally for disablement.
+             *  Therefore, skip if disabled.
+             */
+            if ((pOS->flags & OPTST_DISABLED) == 0)
+                return;
+        } else {
+            /*
+             *  We are in the processing direction with an option we handle
+             *  immediately for enablement, but normally for disablement.
+             *  Therefore, skip if NOT disabled.
+             */
+            if ((pOS->flags & OPTST_DISABLED) != 0)
+                return;
         }
+        break;
+
+    case OPTST_DISABLE_IMM:
+        if (PRESETTING(direction)) {
+            /*
+             *  We are in the presetting direction with an option we handle
+             *  immediately for disablement, but normally for disablement.
+             *  Therefore, skip if NOT disabled.
+             */
+            if ((pOS->flags & OPTST_DISABLED) != 0)
+                return;
+        } else {
+            /*
+             *  We are in the processing direction with an option we handle
+             *  immediately for disablement, but normally for disablement.
+             *  Therefore, skip if disabled.
+             */
+            if ((pOS->flags & OPTST_DISABLED) == 0)
+                return;
+        }
+        break;
+
+    case OPTST_IMM|OPTST_DISABLE_IMM:
+        /*
+         *  The selected option is always for immediate action.
+         *  THEREFORE, if the direction is PROCESSING
+         *  THEN we skip this option.
+         */
+        if (PROCESSING(direction))
+            return;
+        break;
     }
+
+    /*
+     *  Fix up the args.
+     */
+    switch (pOS->pOD->optArgType) {
+    case ARG_NONE:
+        if (*pzOptionArg != NUL)
+            return;
+        pzOptionArg = NULL;
+        break;
+
+    case ARG_MAY:
+        if (*pzOptionArg == NUL)
+            pzOptionArg = NULL;
+
+    case ARG_MUST:
+        if (*pzOptionArg == NUL)
+             pzOptionArg = "";
+        else pzOptionArg = strdup( pzOptionArg );
+        break;
+    }
+
+    loadValue( pOpts, pOS );
 }
 
 
@@ -455,17 +949,26 @@ DEF_PROC_3( STATIC, void, loadOptionLine,
  *  This is a user callable routine for setting options from, for
  *  example, the contents of a file that they read in.
  */
-DEF_PROC_2( , void, optionLoadLine,
+DEF_PROC_2( void optionLoadLine,
             tOptions*,  pOpts,
             char*,      pzLine )
 {
-    loadOptionLine( pOpts, OPTST_SET, pzLine );
+    tOptState st;
+    memset( (void*)&st, 0, sizeof( st ));
+    st.flags = OPTST_SET;
+    loadOptionLine( pOpts, &st, pzLine, DIRECTION_PROCESS );
 }
 
 
-DEF_PROC_2( STATIC, void, filePreset,
+/*
+ *  filePreset
+ *
+ *  Load a file containing presetting information (an RC file).
+ */
+DEF_PROC_3( STATIC void filePreset,
             tOptions*,    pOpts,
-            const char*,  pzFileName )
+            const char*,  pzFileName,
+            int,          direction )
 {
     FILE*  fp  = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
     u_int saveOpt = pOpts->fOptSet;
@@ -485,7 +988,6 @@ DEF_PROC_2( STATIC, void, filePreset,
      */
     while (fgets( zLine, sizeof( zLine ), fp ) != (char*)NULL) {
         char*  pzLine = zLine;
-        u_long optFlag = OPTST_PRESET;
 
         for (;;) {
             pzLine += strlen( pzLine );
@@ -520,8 +1022,10 @@ DEF_PROC_2( STATIC, void, filePreset,
          */
         if ((*pzLine == NUL) || (*pzLine == '#'))
             continue;
-
-        loadOptionLine( pOpts, optFlag, pzLine );
+        {
+            tOptState st   = { 0, OPTST_PRESET, 0, 0, 0 };
+            loadOptionLine( pOpts, &st, pzLine, direction );
+        }
     }
 
     pOpts->fOptSet = saveOpt;
@@ -535,7 +1039,7 @@ DEF_PROC_2( STATIC, void, filePreset,
  *  This is callable from the option descriptor.
  *  It is referenced when homerc files are enabled.
  */
-DEF_PROC_2( , void, doLoadOpt,
+DEF_PROC_2( void doLoadOpt,
             tOptions*,  pOpts,
             tOptDesc*,  pOptDesc )
 {
@@ -547,152 +1051,187 @@ DEF_PROC_2( , void, doLoadOpt,
      *  of ini/rc files.)
      */
     if (! DISABLED_OPT( pOptDesc ))
-        filePreset( pOpts, pOptDesc->pzLastArg );
+        filePreset( pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS );
 }
 
 
 /*
- *  valid_path  --  validate and translate a path
- *
- *  This routine does environment variable expansion if the first character
- *  is a ``$''.  If it starts with two dollar characters, then the path
- *  is relative to the location of the executable.
+ *  doEnvPresets - check for preset values from the envrionment
+ *  This routine should process in all, immediate or normal modes....
  */
-DEF_PROC_4( STATIC, ag_bool, valid_path,
-            char*,   pzBuf,
-            size_t,  bufSize,
-            tCC*,    pzName,
-            tCC*,    pzProgPath )
+DEF_PROC_2( STATIC void doEnvPresets,
+            tOptions*,       pOpts,
+            teEnvPresetType, type )
 {
-    /*
-     *  IF not an environment variable, just copy the data
-     */
-    if (*pzName != '$') {
-        if (bufSize <= strlen( pzName ))
-            return AG_FALSE;
-
-        strcpy( pzBuf, pzName );
-        return AG_TRUE;
-    }
+    int        ct;
+    tOptState  st;
+    char*      pzFlagName;
+    size_t     spaceLeft;
+    char       zEnvName[ 128 ];
 
     /*
-     *  IF the name starts with "$$", then it must start be "$$" or
-     *  it must start with "$$/".  In either event, replace the "$$"
-     *  with the path to the executable and append a "/" character.
+     *  Finally, see if we are to look at the environment
+     *  variables for initial values.
      */
-    if (pzName[1] == '$') {
-        tCC*  pzPath;
-        tCC*  pz;
+    if ((pOpts->fOptSet & OPTPROC_ENVIRON) == 0)
+        return;
 
-        if (strchr( pzProgPath, DIR_SEP_CHAR ) != (char*)NULL)
-            pzPath = pzProgPath;
-        else
-            pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "x" );
+    ct  = pOpts->presetOptCt;
+    st.pOD = pOpts->pOptDesc;
 
-        if (pzPath == (char*)NULL)
-            return AG_FALSE;
+    pzFlagName = zEnvName
+        + snprintf( zEnvName, sizeof( zEnvName ), "%s_", pOpts->pzPROGNAME );
+    spaceLeft = (zEnvName - pzFlagName) - 1;
 
-        pz = strrchr( pzPath, DIR_SEP_CHAR );
+    for (;ct-- > 0; st.pOD++) {
+        char*  pz;
 
         /*
-         *  IF we cannot find a directory name separator,
-         *  THEN we do not have a path name to our executable file.
+         *  If presetting is disallowed, then skip this entry
          */
+        if ((st.pOD->fOptState & OPTST_NO_INIT) != 0)
+            continue;
+
+        /*
+         *  IF there is no such environment variable,
+         *  THEN skip this entry, too.
+         */
+        if (strlen( st.pOD->pz_NAME ) >= spaceLeft)
+            continue;
+
+        strcpy( pzFlagName, st.pOD->pz_NAME );
+        pz = getenv( zEnvName );
         if (pz == (char*)NULL)
-            return AG_FALSE;
+            continue;
 
         /*
-         *  Skip past the "$$" and, maybe, the "/".  Anything else is invalid.
+         *  Set the method flag
          */
-        pzName += 2;
-        switch (*pzName) {
-        case DIR_SEP_CHAR:
-            pzName++;
-        case NUL:
-            break;
-        default:
-            return AG_FALSE;
+        st.flags = OPTST_PRESET;
+
+        if (  (st.pOD->pz_DisablePfx != (char*)NULL)
+           && (streqvcmp( pz, st.pOD->pz_DisablePfx ) == 0)) {
+            st.flags |= OPTST_DISABLED;
+            pz = (char*)NULL;
         }
 
-        /*
-         *  Concatenate the file name to the end of the executable path.
-         *  The result may be either a file or a directory.
-         */
-        memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
-        strcpy( pzBuf + (pz - pzPath) + 1, pzName );
-    }
-
-    /*
-     *  See if the env variable is followed by specified directories
-     *  (We will not accept any more env variables.)
-     */
-    else {
-        char* pzDir = strchr( pzName+1, DIR_SEP_CHAR );
-
-        if (pzDir != (char*)NULL)
-            *pzDir = NUL;
-
-        {
-            char* pzEnv = getenv( pzName+1 );
-
+        switch (type) {
+        case ENV_IMM:
             /*
-             *  Environment value not found -- skip the home list entry
+             *  Process only immediate actions
              */
-            if (pzEnv == (char*)NULL)
-                return AG_FALSE;
+            if (st.flags & OPTST_DISABLED) {
+                if ((st.pOD->fOptState & OPTST_DISABLE_IMM) == 0)
+                    continue;
+            } else {
+                if ((st.pOD->fOptState & OPTST_IMM) == 0)
+                    continue;
+            }
+            break;
 
-            strcpy( pzBuf, pzEnv );
+        case ENV_NON_IMM:
+            /*
+             *  Process only NON immediate actions
+             */
+            if (st.flags & OPTST_DISABLED) {
+                if ((st.pOD->fOptState & OPTST_DISABLE_IMM) != 0)
+                    continue;
+            } else {
+                if ((st.pOD->fOptState & OPTST_IMM) != 0)
+                    continue;
+            }
+            break;
+
+        default: /* process everything */
+            break;
         }
 
         /*
-         *  IF we found a directory that followed the env variable,
-         *  THEN tack it onto the value we found
+         *  Make sure the option value string is persistent and consistent.
+         *  This may be a memory leak, but we cannot do anything about it.
+         *
+         *  The interpretation of the option value depends
+         *  on the type of value argument the option takes
          */
-        if (pzDir != (char*)NULL) {
-            pzBuf += strlen( pzBuf );
+        if (pz != NULL)
+            switch (st.pOD->optArgType) {
+            case ARG_MAY:
+                if (*pz == NUL) {
+                    pz = NULL;
+                    break;
+                }
+                /* FALLTHROUGH */
 
-            if (pzBuf[-1] != DIR_SEP_CHAR)
-                *(pzBuf++) = DIR_SEP_CHAR;
-            strcpy( pzBuf, pzDir+1 );
-            *pzDir = DIR_SEP_CHAR;
-        }
+            case ARG_MUST:
+                if (*pz == NUL)
+                     pz = "";
+                else pz = strdup( st.pOD->pzLastArg );
+                break;
+
+            default: /* no argument allowed */
+                pz = (char*)NULL;
+                break;
+            }
+
+        st.pzOptArg = pz;
+
+        loadValue( pOpts, &st );
     }
-
-    return AG_TRUE;
 }
 
 
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-DEF_PROC_1( STATIC, void, doPresets,
+DEF_PROC_1( STATIC tSuccess doPresets,
             tOptions*,  pOpts )
 {
-    u_int fOptSet = pOpts->fOptSet;
-    char        zFileName[ 4096 ];
+#   define SKIP_RC_FILES \
+    DISABLED_OPT(&(pOpts->pOptDesc[ pOpts->specOptIdx.save_opts+1]))
+
+    tSuccess  res;
+
+    res = doImmediateOpts( pOpts );
+    if (! SUCCESSFUL( res ))
+        return res;
 
     /*
-     *  when comparing long names, these are equivalent
+     *  IF there are no RC files,
+     *  THEN do any environment presets and leave.
      */
-    strequate( (const char*)"-_^" );
+    if (  (pOpts->papzHomeList == (const char**)NULL)
+       || SKIP_RC_FILES )  {
+        doEnvPresets( pOpts, ENV_ALL );
+        return;
+    }
 
-    /*
-     *  Next, search the list of "home" directories.
-     *  Each entry will either be an environment variable name
-     *  with a '$' prefixed (e.g. "$HOME"), or a path name
-     *  (either relative or absolute, the file system interprets).
-     */
-    if (pOpts->papzHomeList != (const char**)NULL) {
-        const char** papzHL = pOpts->papzHomeList;
-        const char*  pzPath;
+    doEnvPresets( pOpts, ENV_IMM );
+
+    {
+        int   idx = 0;
+        int   inc = DIRECTION_PRESET;
+        tCC*  pzPath;
+        char  zFileName[ 4096 ];
 
         /*
-         *  For every path in the home list, ...
+         *  For every path in the home list, ...  *TWICE*
          */
-        while ( pzPath  = *(papzHL++),
-                pzPath != (char*)NULL) {
-            if (! valid_path( zFileName, sizeof( zFileName ),
-                              pzPath, pOpts->pzProgPath ))
+        while (idx >= 0) {
+            struct stat StatBuf;
+            pzPath = pOpts->papzHomeList[ idx ];
+
+            /*
+             *  IF we've reached the top end, change direction
+             */
+            if (pzPath == (char*)NULL) {
+                inc = DIRECTION_PROCESS;
+                pzPath = pOpts->papzHomeList[ --idx ];
+            }
+
+            idx += inc;
+
+            if (! make_path( zFileName, sizeof( zFileName ),
+                             pzPath, pOpts->pzProgPath ))
                 continue;
 
             /*
@@ -700,389 +1239,37 @@ DEF_PROC_1( STATIC, void, doPresets,
              *  THEN append the Resource Configuration file name
              *  ELSE we must have the complete file name
              */
-            {
-                struct stat StatBuf;
-                if (stat( zFileName, &StatBuf ) != 0)
-                    continue; /* bogus name - skip the home list entry */
+            if (stat( zFileName, &StatBuf ) != 0)
+                continue; /* bogus name - skip the home list entry */
 
-                if (S_ISDIR( StatBuf.st_mode )) {
-                    char* pz = zFileName + strlen( zFileName );
-                    if (pz[-1] != DIR_SEP_CHAR)
-                        *(pz++) = DIR_SEP_CHAR;
+            if (S_ISDIR( StatBuf.st_mode )) {
+                size_t len = strlen( zFileName );
+                char* pz;
 
-                    strcpy( pz, pOpts->pzRcName );
-                }
+                if (len + 1 + strlen( pOpts->pzRcName ) >= sizeof( zFileName ))
+                    continue;
+
+                pz = zFileName + len;
+                if (pz[-1] != '/')
+                    *(pz++) = '/';
+                strcpy( pz, pOpts->pzRcName );
             }
 
-            filePreset( pOpts, zFileName );
-        }
-    }
-
-    /*
-     *  Finally, see if we are to look at the environment
-     *  variables for initial values.
-     */
-    if ((pOpts->fOptSet & OPTPROC_ENVIRON) != 0) {
-        int           ct  = pOpts->presetOptCt;
-        tOptDesc*     pOD = pOpts->pOptDesc;
-        char          zEnvName[ 64 ];
-        char*         pzFlagName;
-        strcpy( zEnvName, pOpts->pzPROGNAME );
-        pzFlagName = zEnvName + strlen( zEnvName );
-        *(pzFlagName++) = '_';
-
-        for (;ct-- > 0; pOD++) {
-            char*  pz;
+            filePreset( pOpts, zFileName, inc );
 
             /*
-             *  If presetting is disallowed, then skip this entry
+             *  IF we are now to skip RC files AND we are on the way up,
+             *  THEN change direction.  We must go down now.
              */
-            if ((pOD->fOptState & OPTST_NO_INIT) != 0)
-                continue;
-
-            /*
-             *  IF there is no such environment variable,
-             *  THEN skip this entry, too.
-             */
-            strcpy( pzFlagName, pOD->pz_NAME );
-            pz = getenv( zEnvName );
-            if (pz == (char*)NULL)
-                continue;
-
-            /*
-             *  Strip the mutable state
-             */
-            pOD->fOptState &= OPTST_PERSISTENT;
-
-            /*
-             *  IF the content of the variable is exactly the disablement
-             *  prefix,  THEN forget everything we know about preset values
-             */
-            if (  (pOD->pz_DisablePfx != (char*)NULL)
-               && (streqvcmp( pz, pOD->pz_DisablePfx ) == 0)) {
-                if ((pOD->fOptState & OPTST_INITENABLED) == 0)
-                     pOD->fOptState |= OPTST_DISABLED;
-                pOD->optCookie = (void*)NULL;
-
-            } else {
-                /*
-                 *  Environment options *CANNOT* be disable prefixed,
-                 *  so we will look for the value to contain
-                 *  the disablement prefix
-                 */
-                pOD->fOptState |= OPTST_PRESET;
-                pOD->pzLastArg  = pz;
-
-                loadPresetValue( pOpts, pOD );
-            }
-        }
-    }
-}
-
-
-DEF_PROC_3( STATIC, tOptDesc*, optionGet,
-            tOptions*,   pOpts,
-            int,         argCt,
-            char**,      argVect )
-{
-    ag_bool   isLongOpt      = AG_FALSE;
-    tOptDesc* pRes           = (tOptDesc*)NULL;
-    u_long    optFlags       = OPTST_DEFINED;
-    tUC       argType;
-
-    /*
-     *  IF we are starting,
-     *  THEN reset values
-     */
-    if (pOpts->curOptIdx <= 0) {
-        pOpts->curOptIdx = 1;
-        pOpts->pzCurOpt = (char*)NULL;
-    }
-
-    /*
-     *  IF we are continuing a short option list (i.e. -xyz...)
-     *  THEN continue a single flag option.
-     *  OTHERWISE see if there is room to advance and then do so.
-     */
-    if ((pOpts->pzCurOpt != (char*)NULL) && (*pOpts->pzCurOpt != NUL)) {
-        if ((pOpts->fOptSet & OPTPROC_DISABLEDOPT) != 0)
-            optFlags |= OPTST_DISABLED;
-
-        pRes = shortOptionFind( pOpts, *pOpts->pzCurOpt );
-    }
-
-    else {
-        char  firstChar, secondChar;
-
-        if (pOpts->curOptIdx >= argCt)
-            return pRes; /* NORMAL COMPLETION */
-
-        pOpts->pzCurOpt = argVect[ pOpts->curOptIdx ];
-
-        /*
-         *  IF all arguments must be named options, ...
-         */
-        if (NAMED_OPTS(pOpts)) {
-            char* pz = pOpts->pzCurOpt;
-            pOpts->curOptIdx++;
-
-            /*
-             *  Skip over any flag/option markers.
-             *  In this mode, they are not required.
-             */
-            while (*pz == '-') pz++;
-
-            isLongOpt = AG_TRUE;
-            pRes = longOptionFind( pOpts, pz, &optFlags );
-        }
-
-        else {
-            /*
-             *  Note the kind of flag/option marker
-             */
-            firstChar = *((pOpts->pzCurOpt)++);
-            switch (firstChar) {
-            case '-':
-                break;
-
-            case '+':
-                if (pOpts->fOptSet & OPTPROC_PLUSMARKS) {
-                    optFlags |= OPTST_DISABLED;
-                    break;
-                }
-                /* FALLTHROUGH */
-            default:
-                return pRes; /* NORMAL COMPLETION - rest are args */
-            }
-
-            /*
-             *  The current argument is to be processed as an option argument
-             */
-            pOpts->curOptIdx++;
-
-            /*
-             *  We have an option marker.
-             *  Test the next character for long option indication
-             */
-            secondChar = *pOpts->pzCurOpt;
-            switch (secondChar) {
-            case '-':
-                if (firstChar == secondChar) {
-                    if (*++(pOpts->pzCurOpt) == NUL)
-                        return pRes; /* NORMAL COMPLETION */
-
-                    if ((pOpts->fOptSet & OPTPROC_LONGOPT) == 0) {
-                        fprintf( stderr, zIllOptStr, pOpts->pzProgPath,
-                                 zIllegal, pOpts->pzCurOpt-2 );
-                        break;
-                    }
-
-                    pRes = longOptionFind( pOpts, pOpts->pzCurOpt, &optFlags );
-                    isLongOpt = AG_TRUE;
-                    break;
-                }
-                /* FALLTHROUGH */ /* option marker was "-+" or "+-" */
-
-            case ':':
-            case '+':
-            case NUL:
-                fprintf( stderr, zIllOptChr, pOpts->pzProgPath,
-                         zIllegal, secondChar ? secondChar : ' ' );
-                break;  /* ERROR COMPLETION */
-
-            default:
-                /*
-                 *  The character is a legal flag character.
-                 *  If short options are not allowed, then do long
-                 *  option processing.  Otherwise the character must be a
-                 *  short (i.e. single character) option.
-                 */
-                if ((pOpts->fOptSet & OPTPROC_SHORTOPT) == 0) {
-                    isLongOpt = AG_TRUE;
-                    pRes = longOptionFind( pOpts, pOpts->pzCurOpt, &optFlags );
-
-                } else {
-                    pRes = shortOptionFind( pOpts, *pOpts->pzCurOpt );
-
-                    /*
-                     *  Whenever we want to save the "Disablement Opt" state,
-                     *  we will pass through here.  It happens when:
-                     *  1) a new option flag is detected
-                     *  2) it is a short flag, and
-                     *  3) we are not in long-option-only mode.
-                     */
-                    if ((optFlags & OPTST_DISABLED) != 0)
-                         pOpts->fOptSet |=  OPTPROC_DISABLEDOPT;
-                    else pOpts->fOptSet &= ~OPTPROC_DISABLEDOPT;
-                }
-
-                break;
+            if ((SKIP_RC_FILES) && (inc > 0)) {
+                idx -= 2;
+                inc = -1;
             }
         }
     }
 
-    /*
-     *  IF we could not find a descriptor,
-     *  THEN bail out.
-     */
-    if (pRes == (tOptDesc*)NULL) {
-    errorBail:
-        pOpts->curOptIdx = argCt;
-        pOpts->pzCurOpt  = (char*)NULL;
-        return NO_OPT_DESC;  /* ERROR COMPLETION */
-    }
-
-    /*
-     *  Figure out what to do about option  arguments.
-     *  An argument may be required, not associated with the option,
-     *  or be optional.  We detect the latter by examining for an option
-     *  marker on the next possible argument.
-     */
-    if ((optFlags & OPTST_DISABLED) != 0)
-         argType = ARG_NONE;
-    else argType = pRes->optArgType;
-
-    pRes->fOptState &= OPTST_PERSISTENT;
-    pRes->fOptState |= optFlags;
-
-    /*
-     *  In the event of a "default" argument,
-     *  then we do not need to look for an argument.
-     */
-    if (pRes->pzLastArg != (char*)NULL)
-      pOpts->pzCurOpt  = (char*)NULL;
-    else
-      switch (argType) {
-      case ARG_MUST:
-          /*
-           *  An option argument is required.
-           */
-          if (isLongOpt) {
-              char* pz = strchr( pOpts->pzCurOpt, '=' );
-
-              /*
-               *  IF the argument is attached to the long name,
-               *  THEN set the pointer
-               *  ELSE get the next argumet because we consumed the
-               *       entire argument with the option name
-               */
-              if (pz != (char*)NULL) {
-                  pRes->pzLastArg = pz+1;
-              } else {
-                  pRes->pzLastArg = argVect[ pOpts->curOptIdx++ ];
-              }
-          } else {
-              if (*++pOpts->pzCurOpt == NUL)
-                  pOpts->pzCurOpt = argVect[ pOpts->curOptIdx++ ];
-              pRes->pzLastArg = pOpts->pzCurOpt;
-          }
-
-          if (pOpts->curOptIdx > argCt) {
-              fprintf( stderr, zMisArg, pOpts->pzProgPath, pRes->pz_Name );
-              pOpts->curOptIdx = argCt;
-              pOpts->pzCurOpt  = (char*)NULL;
-
-              return NO_OPT_DESC;
-          }
-
-          pOpts->pzCurOpt = (char*)NULL;  /* next time advance to next arg */
-          break;
-
-      case ARG_MAY:
-          /*
-           *  An option argument is optional.
-           */
-          if (isLongOpt) {
-              char* pz = strchr( pOpts->pzCurOpt, '=' );
-
-              /*
-               *  IF the argument is attached to the long name,
-               *  THEN set the pointer
-               */
-              if (pz != (char*)NULL) {
-                  pRes->pzLastArg = pz+1;
-              }
-
-              /*
-               *  ELSE if we are *not* using named arguments,
-               *  THEN the next argument is our argument, unless
-               *       it starts with one of the flag characters.
-               */
-              else if (! NAMED_OPTS(pOpts)) {
-                  char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
-
-                  /*
-                   *  BECAUSE it is optional, we must make sure
-                   *  we did not find another flag and that there
-                   *  is such an argument.
-                   */
-                  if ( pzLA != (char*)NULL) {
-                      if ((*pzLA == '-') || (*pzLA == '+'))
-                           pRes->pzLastArg = (char*)NULL;
-                      else pOpts->curOptIdx++; /* argument found */
-                  }
-              }
-
-          } else {
-              if (*++pOpts->pzCurOpt != NUL)
-                  pRes->pzLastArg = pOpts->pzCurOpt;
-              else {
-                  char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
-
-                  /*
-                   *  BECAUSE it is optional, we must make sure
-                   *  we did not find another flag and that there
-                   *  is such an argument.
-                   */
-                  if ( pzLA != (char*)NULL) {
-                      if ((*pzLA == '-') || (*pzLA == '+'))
-                           pRes->pzLastArg = (char*)NULL;
-                      else pOpts->curOptIdx++; /* argument found */
-                  }
-              }
-          }
-
-          /*
-           *  After an option with an optional argument, we will
-           *  *always* start with the next option because if there
-           *  were any characters following the option name/flag,
-           *  they would be interpreted as the argument.
-           */
-          pOpts->pzCurOpt = (char*)NULL;
-          break;
-
-      default: /* CANNOT */
-          /*
-           *  No option argument.  Make sure next time around we find
-           *  the correct flag (next argument for long options,
-           *  maybe the next character for short flags).
-           */
-          if (! isLongOpt) {
-              (pOpts->pzCurOpt)++;
-          } else {
-              if (strchr( pOpts->pzCurOpt, '=' ) != (char*)NULL) {
-                  fprintf( stderr, zNoDisableArg, pOpts->pzProgPath,
-                           pRes->pz_Name );
-                  goto errorBail;
-              }
-              pOpts->pzCurOpt = (char*)NULL;
-          }
-      }
-
-    return pRes;  /* SUCCESSFUL RETURN */
-}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Return the compiled version number.
- */
-DEF_PROC_0( , const char*, optionVersion )
-{
-    static const char zVersion[] =
-        STR( AO_ANNOUNCE_LEVEL );
-
-    return zVersion;
+    doEnvPresets( pOpts, ENV_NON_IMM );
+    return SUCCESS;
 }
 
 
@@ -1090,9 +1277,8 @@ DEF_PROC_0( , const char*, optionVersion )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-DEF_PROC_2( STATIC, int, checkConsistency,
-            tOptions*,  pOpts,
-            int,        argCt )
+DEF_PROC_1( STATIC int checkConsistency,
+            tOptions*,  pOpts )
 {
     int       errCt = 0;
 
@@ -1101,13 +1287,6 @@ DEF_PROC_2( STATIC, int, checkConsistency,
 
     tOptDesc*  pOD = pOpts->pOptDesc;
     int        oCt = pOpts->presetOptCt;
-
-    /*
-     *  IF there was a processing error,
-     *  THEN it is time to call usage exit.
-     */
-    if (errCt != 0)
-        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
 
     /*
      *  FOR each of "oCt" options, ...
@@ -1182,7 +1361,7 @@ DEF_PROC_2( STATIC, int, checkConsistency,
          *  Check for prohibition
          */
         if ((pOpts->fOptSet & OPTPROC_NO_ARGS) != 0) {
-            if (argCt > pOpts->curOptIdx) {
+            if (pOpts->origArgCt > pOpts->curOptIdx) {
                 fprintf( stderr, "%s: Command line arguments not allowed\n",
                          pOpts->pzProgName );
                 ++errCt;
@@ -1193,7 +1372,7 @@ DEF_PROC_2( STATIC, int, checkConsistency,
          *  ELSE not prohibited, check for being required
          */
         else if ((pOpts->fOptSet & OPTPROC_ARGS_REQ) != 0) {
-            if (argCt <= pOpts->curOptIdx) {
+            if (pOpts->origArgCt <= pOpts->curOptIdx) {
                 fprintf( stderr, "%s: Command line arguments required\n",
                          pOpts->pzProgName );
                 ++errCt;
@@ -1207,47 +1386,49 @@ DEF_PROC_2( STATIC, int, checkConsistency,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
+ *  Return the compiled version number.
+ */
+DEF_PROC_0( const char* optionVersion )
+{
+    static const char zVersion[] =
+        STR( AO_ANNOUNCE_LEVEL );
+
+    return zVersion;
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
  *  Define the option processing routine
  */
-DEF_PROC_3( , int, optionProcess,
+DEF_PROC_3( int optionProcess,
             tOptions*,  pOpts,
             int,        argCt,
             char**,     argVect )
 {
-    tOptDesc* pOD;
-    int       errCt = 0;
-
-    /*
-     *  IF the struct version is not the current, and also
-     *     either too large (?!) or too small,
-     *  THEN emit error message and fail-exit
-     */
-    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION )
-       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-          || (pOpts->structVersion < MIN_OPTION_VERSION     )
-       )  )  {
-        fprintf( stderr, zBadVer, argVect[0],
-                 NUM_TO_VER( pOpts->structVersion ),
-                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ),
-                 NUM_TO_VER( MIN_OPTION_VERSION ));
-        exit( EXIT_FAILURE );
-    }
-
     /*
      *  Establish the real program name, the program full path,
      *  and do all the presetting the first time thru only.
      */
     if ((pOpts->fOptSet & OPTPROC_INITDONE) == 0) {
-        const char* pz = strrchr( *argVect, DIR_SEP_CHAR );
+        pOpts->origArgCt   = argCt;
+        pOpts->origArgVect = argVect;
+        pOpts->fOptSet    |= OPTPROC_INITDONE;
 
-        if (pz == (char*)NULL)
-             pOpts->pzProgName = *argVect;
-        else pOpts->pzProgName = pz+1;
+        if (FAILED( doPresets( pOpts )))
+            return 0;
 
-        pOpts->pzProgPath = *argVect;
-        doPresets( pOpts );
+        pOpts->curOptIdx = 1;
+        pOpts->pzCurOpt = (char*)NULL;
+    }
 
-        pOpts->fOptSet |= OPTPROC_INITDONE;
+    /*
+     *  IF we are (re)starting,
+     *  THEN reset option location
+     */
+    else if (pOpts->curOptIdx <= 0) {
+        pOpts->curOptIdx = 1;
+        pOpts->pzCurOpt = (char*)NULL;
     }
 
     /*
@@ -1255,18 +1436,55 @@ DEF_PROC_3( , int, optionProcess,
      *  (This allows interspersed options and arguments for the few
      *  non-standard programs that require it.)
      */
-    while (pOD = optionGet( pOpts, argCt, argVect ),
-           pOD != (tOptDesc*)NULL )  {
+    for (;;) {
+        tOptState optState;
 
-        if (pOD == NO_OPT_DESC) {
-            errCt++;
-            break;
+        switch (nextOption( pOpts, &optState )) {
+        case FAILURE:
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+                (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            goto optionsBad;
+
+        case PROBLEM:
+            goto optionsDone;
+
+        case SUCCESS:
+            optState.flags |= OPTST_DEFINED;
         }
 
-        if (! loadValue( pOpts, pOD ))
-            errCt++;
+        /*
+         *  IF this is not an immediate-attribute option, then do it.
+         */
+        switch (optState.pOD->fOptState & (OPTST_DISABLE_IMM|OPTST_IMM)) {
+        case 0:                   /* always */
+            break;
+
+        case OPTST_DISABLE_IMM:   /* disabled options already done */
+            if ((optState.flags & OPTST_DISABLED) != 0)
+                continue;
+            break;
+
+        case OPTST_IMM:           /* enabled options already done */
+            if ((optState.flags & OPTST_DISABLED) == 0)
+                continue;
+            break;
+
+        case OPTST_DISABLE_IMM|OPTST_IMM: /* opt already done */
+            continue;
+        }
+
+        if (! SUCCESSFUL( loadValue( pOpts, &optState ))) {
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+                (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            break;
+        }
     }
 
+ optionsBad:
+    return pOpts->origArgCt;
+
+ optionsDone:
+    
     /*
      *  IF    there were no errors
      *    AND we have RC/INI files
@@ -1274,27 +1492,21 @@ DEF_PROC_3( , int, optionProcess,
      *  THEN do that now before testing for conflicts.
      *       (conflicts are ignored in preset options)
      */
-    if (  (errCt == 0)
-       && (pOpts->specOptIdx.save_opts != 0) )  {
+    if (pOpts->specOptIdx.save_opts != 0) {
         tOptDesc*  pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts;
 
         if (SELECTED_OPT( pOD )) {
             optionSave( pOpts );
-
-            /*
-             *  Unless this option was marked with a '+', we bail now.
-             */
-            if (! DISABLED_OPT( pOD ))
-                exit( EXIT_SUCCESS );
-    }   }
+            exit( EXIT_SUCCESS );
+        }
+    }
 
     /*
      *  IF we are checking for errors,
      *  THEN look for too few occurrences of required options
      */
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-        errCt += checkConsistency( pOpts, argCt );
-        if (errCt != 0)
+        if (checkConsistency( pOpts ) != 0)
             (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
     }
 

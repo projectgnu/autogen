@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.19 2000/10/17 17:09:19 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.20 2000/10/27 15:18:20 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -83,6 +83,8 @@
 #define OPTST_ENUMERATION  0x04000  /* opt is an enum (keyword list)     */
 #define OPTST_BOOLEAN      0x08000  /* opt is boolean-valued             */
 #define OPTST_NUMERIC      0x10000  /* option has numeric value          */
+#define OPTST_IMM          0x20000  /* process option on first pass      */
+#define OPTST_DISABLE_IMM  0x40000  /* process disablement on first pass */
 
 #define OPTST_PERSISTENT   0xFFF00  /* mask of flags that do not change  */
 
@@ -238,7 +240,7 @@ struct specOptIndex {
  *  fields.  This way, the "optionProcess()" routine may exit with an
  *  informative message instead of, for example, page faulting.
  */
-#define  OPTIONS_STRUCT_VERSION  32768
+#define  OPTIONS_STRUCT_VERSION  32896
 
 struct options {
     const int         structVersion;
@@ -262,6 +264,9 @@ struct options {
     const int         optCt;
     const int         presetOptCt;
     tOptDesc*         pOptDesc;
+    int               origArgCt;
+    char**            origArgVect;
+    void*             futureUse;
 };
 
 #ifdef  __cplusplus
@@ -278,41 +283,46 @@ extern "C" {
  *  processing code with a K&R compiler.  Yuck.  Don't use them unless
  *  you really have to.  (Still better than ugly if-defs, tho.)
  */
-#define DEF_PROC_0( mode, type, name ) \
-          mode type name( void )
+#define DEF_PROC_0( id ) \
+          id( void ); \
+          id( void )
 
-#define DEF_PROC_1( mode, type, name, a1_type, a1_name ) \
-          mode type name( a1_type a1_name )
+#define DEF_PROC_1( id, a1_type, a1_name ) \
+          id( a1_type a1_name ); \
+          id( a1_type a1_name )
 
-#define DEF_PROC_2( mode, type, name, a1t, a1n, a2t, a2n ) \
-          mode type name( a1t a1n, a2t a2n )
+#define DEF_PROC_2( id, a1t, a1n, a2t, a2n ) \
+          id( a1t a1n, a2t a2n ); \
+          id( a1t a1n, a2t a2n )
 
-#define DEF_PROC_3( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n ) \
-          mode type name( a1t a1n, a2t a2n, a3t a3n )
+#define DEF_PROC_3( id, a1t, a1n, a2t, a2n, a3t, a3n ) \
+          id( a1t a1n, a2t a2n, a3t a3n ); \
+          id( a1t a1n, a2t a2n, a3t a3n )
 
-#define DEF_PROC_4( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
-          mode type name( a1t a1n, a2t a2n, a3t a3n, a4t a4n )
+#define DEF_PROC_4( id, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
+          id( a1t a1n, a2t a2n, a3t a3n, a4t a4n ); \
+          id( a1t a1n, a2t a2n, a3t a3n, a4t a4n )
 
 #else
 #  ifndef PROTO
 #    define PROTO(s) ()
 #  endif
 
-#define DEF_PROC_0( mode, type, name ) \
-          mode type name()
+#define DEF_PROC_0( id ) \
+          id()
 
-#define DEF_PROC_1( mode, type, name, a1_type, a1_name ) \
-          mode type name( a1_name ) a1_type a1_name;
+#define DEF_PROC_1( id, a1_type, a1_name ) \
+          id( a1_name ) a1_type a1_name;
 
-#define DEF_PROC_2( mode, type, name, a1t, a1n, a2t, a2n ) \
-          mode type name( a1n, a2n ) a1t a1n; a2t a2n;
+#define DEF_PROC_2( id, a1t, a1n, a2t, a2n ) \
+          id( a1n, a2n ) a1t a1n; a2t a2n;
 
-#define DEF_PROC_3( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n ) \
-          mode type name( a1n, a2n, a3n ) \
+#define DEF_PROC_3( id, a1t, a1n, a2t, a2n, a3t, a3n ) \
+          id( a1n, a2n, a3n ) \
           a1t a1n; a2t a2n; a3t a3n;
 
-#define DEF_PROC_4( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
-          mode type name( a1n, a2n, a3n ) \
+#define DEF_PROC_4( id, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
+          id( a1n, a2n, a3n ) \
           a1t a1n; a2t a2n; a3t a3n; a4t a4n;
 
 #  ifndef void

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 2.1 2000/10/17 02:57:00 bkorb Exp $
+ *  $Id: boolean.c,v 2.2 2000/10/27 15:18:19 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -62,7 +62,7 @@
  *  The value is true, unless it starts with 'n' or 'f' or "#f" or
  *  it is an empty string or it is a number that evaluates to zero
  */
-DEF_PROC_2( , void, optionBooleanVal,
+DEF_PROC_2( void optionBooleanVal,
             tOptions*, pOpts,
             tOptDesc*, pOD )
 {

@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.2 2000/10/17 04:12:49 bkorb Exp $
+# $Id: rc.test,v 1.3 2000/10/27 15:18:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -34,7 +34,7 @@ homerc = "\$\$/${testname}.rc";
 rcfile = ${testname}.file;
 _EOF_
 
-echo $AGEN ${testname}.def
+set -x
 $AGEN ${testname}.def || \
   failure AutoGen could not process
 

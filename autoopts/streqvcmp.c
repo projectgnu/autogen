@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.11 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.12 2000/10/27 15:18:20 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -102,7 +102,7 @@ static unsigned char charmap[] = {
 };
 
 
-DEF_PROC_3( , int, strneqvcmp,
+DEF_PROC_3( int strneqvcmp,
             const char*, s1,
             const char*, s2,
             size_t,      ct )
@@ -123,7 +123,7 @@ DEF_PROC_3( , int, strneqvcmp,
 }
 
 
-DEF_PROC_2( , int, streqvcmp,
+DEF_PROC_2( int streqvcmp,
             const char*, s1,
             const char*, s2 )
 {
@@ -141,7 +141,7 @@ DEF_PROC_2( , int, streqvcmp,
 }
 
 
-DEF_PROC_3( , void, streqvmap,
+DEF_PROC_3( void streqvmap,
             int,  chFrom,
             int,  chTo,
             int,  ct )
@@ -171,7 +171,8 @@ DEF_PROC_3( , void, streqvmap,
 }
 
 
-DEF_PROC_1( , void, strequate, const char*, s )
+DEF_PROC_1( void strequate,
+            const char*, s )
 {
     if ((s != (char*)NULL) && (*s != NUL)) {
         unsigned char equiv = (unsigned)*s;
@@ -181,7 +182,9 @@ DEF_PROC_1( , void, strequate, const char*, s )
 }
 
 
-DEF_PROC_2( , void, strtransform, char*, d, const char*, s )
+DEF_PROC_2( void strtransform,
+            char*, d,
+            const char*, s )
 {
     do  {
         *(d++) = (char)charmap[ (unsigned)*s ];

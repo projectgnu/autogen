@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.8 2000/10/07 22:52:08 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.9 2000/10/27 15:18:20 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -58,7 +58,7 @@
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
-DEF_PROC_1( STATIC, char*, findDirName,
+DEF_PROC_1( STATIC char* findDirName,
             tOptions*,  pOpts )
 {
     char*  pzDir;
@@ -90,7 +90,7 @@ DEF_PROC_1( STATIC, char*, findDirName,
         return pzDir;
 
     {
-        char* pzEndDir = strchr( ++pzDir, DIR_SEP_CHAR );
+        char* pzEndDir = strchr( ++pzDir, '/' );
         char* pzFileName;
         char* pzEnv;
 
@@ -123,15 +123,15 @@ DEF_PROC_1( STATIC, char*, findDirName,
         strcpy( pzFileName, pzEnv );
         pzDir = pzFileName + strlen( pzFileName );
 
-        while ((pzDir > pzFileName) && (pzDir[-1] == DIR_SEP_CHAR)) pzDir--;
-        *(pzDir++) = DIR_SEP_CHAR;
+        while ((pzDir > pzFileName) && (pzDir[-1] == '/')) pzDir--;
+        *(pzDir++) = '/';
         strcpy( pzDir, pzEndDir );
         return pzFileName;
     }
 }
 
 
-DEF_PROC_1( STATIC, char*, findFileName,
+DEF_PROC_1( STATIC char* findFileName,
             tOptions*,  pOpts )
 {
     char*  pzDir;
@@ -159,7 +159,7 @@ DEF_PROC_1( STATIC, char*, findFileName,
              *  stat the remaining string
              *  and that string must name a directory
              */
-            char*  pzDirCh = strrchr( pzDir, DIR_SEP_CHAR );
+            char*  pzDirCh = strrchr( pzDir, '/' );
                         if (pzDirCh == (char*)NULL) {
                 stBuf.st_mode = S_IFREG;
                 break;
@@ -175,7 +175,7 @@ DEF_PROC_1( STATIC, char*, findFileName,
                      *  Restore the file name and mark the
                      *  full name as a regular file
                      */
-                    *pzDirCh = DIR_SEP_CHAR;
+                    *pzDirCh = '/';
                     stBuf.st_mode = S_IFREG;
 
                     break;  /* bail out of error condition */
@@ -200,7 +200,7 @@ DEF_PROC_1( STATIC, char*, findFileName,
         char*  pzPath = (char*)AGALOC( sz );
 
         pzDir = pzPath;
-        snprintf( pzPath, sz, "%s%c%s", pzDir, DIR_SEP_CHAR, pOpts->pzRcName );
+        snprintf( pzPath, sz, "%s%c%s", pzDir, '/', pOpts->pzRcName );
 
         /*
          *  IF we cannot stat the object for any reason other than
@@ -239,7 +239,7 @@ DEF_PROC_1( STATIC, char*, findFileName,
 }
 
 
-DEF_PROC_3( STATIC, void, printEntry,
+DEF_PROC_3( STATIC void printEntry,
             FILE*,      fp,
             tOptDesc*,  p,
             char*,      pzLA )
@@ -291,7 +291,7 @@ DEF_PROC_3( STATIC, void, printEntry,
 }
 
 
-DEF_PROC_1( , void, optionSave,
+DEF_PROC_1( void optionSave,
             tOptions*, pOpts )
 {
     char*  pzFName;

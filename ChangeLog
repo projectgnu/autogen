@@ -1,3 +1,13 @@
+2000-10-28  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.h: Join the mode, type and procedure names in the
+	DEF_PROC_* macros.
+	* autoopts/*:  Adjust for this
+
+	* autoopts/autoopts.c: rewrite for improved flexibility.  We need to
+	run through the option lists twice.  In one direction looking for
+	"immediate action" options, then the other handling the rest.
+
 2000-10-17  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expGuile.c: add string->c-name function

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.43 2000/10/17 19:46:15 bkorb Exp $
+#$Id: optcode.tpl,v 2.44 2000/10/27 15:18:19 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -193,7 +193,7 @@ ENDIF=]
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
-     /* opt state flags  */ OPTST_INIT,
+     /* opt state flags  */ OPTST_IMM,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
@@ -208,7 +208,7 @@ ENDIF=]
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
-     /* opt state flags  */ OPTST_INIT,
+     /* opt state flags  */ OPTST_IMM,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
@@ -352,7 +352,7 @@ tOptions [=(. pname)=]Options = {
 /*
  *  Create the static procedure(s) declared above.
  */
-DEF_PROC_2( static, void, doUsageOpt,
+DEF_PROC_2( static void doUsageOpt,
             tOptions*,  pOpts, tOptDesc*,  pOD )
 {
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.4 2000/10/19 23:00:19 bkorb Exp $
+ *  $Id: enumeration.c,v 2.5 2000/10/27 15:18:20 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -60,7 +60,7 @@
 
 tSCC*  pz_fmt;
 
-DEF_PROC_4( static, void, enumError,
+DEF_PROC_4( static void enumError,
             tOptions*, pOpts,
             tOptDesc*, pOD,
             tCC**, paz_names,
@@ -88,7 +88,7 @@ DEF_PROC_4( static, void, enumError,
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
  */
-DEF_PROC_4( , char*, optionEnumerationVal,
+DEF_PROC_4( char* optionEnumerationVal,
             tOptions*, pOpts,
             tOptDesc*, pOD,
             tCC**, paz_names,

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.13 2000/10/20 02:46:37 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.14 2000/10/27 15:18:20 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -100,7 +100,7 @@ tSCC zNoFlags[]    =
 or doubled %ss.  Flag characters are not interpreted.\n";
 
 
-DEF_PROC_2( , void, optionUsage,
+DEF_PROC_2( void optionUsage,
             tOptions*,  pOptions,
             int,        exitCode )
 {
@@ -137,12 +137,11 @@ DEF_PROC_2( , void, optionUsage,
     }
 
     /*
-     *  IF we are NOT going to start the option list with a documentation opt,
-     *  THEN emit the title here.
-     *  Doc options are emitted only if the exitCode is SUCCESS.
+     *  When we exit with EXIT_SUCCESS and the first option is a doc option,
+     *  we do *NOT* want to emit the column headers.  Otherwise, we do.
      */
     if (  (exitCode != EXIT_SUCCESS)
-       || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) != 0) )
+       || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) == 0) )
 
         fputs( pOptTitle, fp );
 

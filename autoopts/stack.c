@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.6 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: stack.c,v 2.7 2000/10/27 15:18:20 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -64,7 +64,7 @@
 
 #include "autoopts.h"
 
-DEF_PROC_2( , void, unstackOptArg,
+DEF_PROC_2( void unstackOptArg,
             tOptions*,  pOpts,
             tOptDesc*,  pOptDesc )
 {
@@ -150,7 +150,7 @@ DEF_PROC_2( , void, unstackOptArg,
 }
 
 
-DEF_PROC_2( , void, stackOptArg,
+DEF_PROC_2( void stackOptArg,
             tOptions*,  pOpts,
             tOptDesc*,  pOptDesc )
 {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: version.c,v 2.5 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: version.c,v 2.6 2000/10/27 15:18:20 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -64,7 +64,7 @@ tSCC zBadArg[] =
 \t'n' - version and copyright notice\n";
 
 
-DEF_PROC_2( , void, doVersion,
+DEF_PROC_2( void doVersion,
             tOptions*,  pOpts,
             tOptDesc*,  pOD )
 {
