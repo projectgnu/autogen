@@ -5,8 +5,11 @@
 	* agen5/expString.c: syntax cleanup
 	* autoopts/optcode.tpl: Remove K&R-isms
 	* autoopts/optmain.tpl: ditto + fix default optional argument handling
-	for keyword options.
+	for keyword options.  also, use the up-c-name macro more
 	* autoopts/test/handler.test: test default optional keyword arguments
+	* autoopts/options.tpl: use the up-c-name macro more
+	* autoopts/optlib.tpl: ditto
+	* doc/autogen.texi: correct doc for using arg-optional with keyword opts
 
 2003-04-28  Bruce Korb  <bkorb@gnu.org>
 

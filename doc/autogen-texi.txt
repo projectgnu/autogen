@@ -2795,8 +2795,8 @@ This attribute indicates that the user does not have to supply an
 argument for the option.  This is only valid if the @var{arg-type} is
 @code{string} or @code{keyword}.  If it is @code{keyword}, then
 this attribute may also specify the default keyword to assume when
-the argument is not supplied.  Without such a specification, the
-default keyword will be the zero-valued keyword.
+the argument is not supplied.  If left empty, @var{arg-default} or
+the zero-valued keyword will be used.
 
 @cindex arg-default
 @item arg-default

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.10 2003/05/02 01:01:59 bkorb Exp $
+# $Id: optmain.tpl,v 3.11 2003/05/02 01:52:58 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -339,7 +339,7 @@ DEFINE define-option-callbacks  =][=
 
   FOR  flag  =][=
 
-    (set! UP-name    (string->c-name! (string-upcase! (get "name"))) )
+    (set! UP-name    (up-c-name "name"))
     (set! cap-name   (string-capitalize UP-name))
     (set! low-name   (string-downcase UP-name))      =][=
 
@@ -395,8 +395,10 @@ DEFINE define-option-callbacks  =][=
     IF (exist? "arg-optional") =]
     if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)[=
-         (string-append UP-name "_" (if (exist? "arg-default")
-            (up-c-name "arg-default") "UNDEFINED"  )) =];
+         (string-append UP-name "_"    (if (> (len "arg-optional") 0)
+            (up-c-name "arg-optional") (if (exist? "arg-default")
+            (up-c-name "arg-default")
+            "UNDEFINED"  ))) =];
     else[=
     ENDIF =]
     pOptDesc->pzLastArg =

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.7 2003/04/04 04:44:54 bkorb Exp $
+# $Id: optlib.tpl,v 3.8 2003/05/02 01:52:58 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -280,8 +280,8 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
          =]((tCC*)[=
           IF (=* (get "arg-default") (string-append Cap-prefix cap-name))
             =][= arg-default    =][=
-          ELSE  =][=(string-append UP-prefix UP-name)=]_[=
-                    (string-upcase! (get "arg-default"))=][=
+          ELSE  =][=(string-append UP-prefix UP-name "_"
+                    (up-c-name "arg-default")) =][=
           ENDIF =])[=
 
        =* str                   =]
