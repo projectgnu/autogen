@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.24 2000/08/11 13:45:47 bkorb Exp $
+ *   $Id: opts.def,v 1.25 2000/10/17 03:14:57 bkorb Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ template file may specify the entire output file.
 flag = {
     name      = templ_dirs;
     value     = L;
-    flag_arg  = ":";
+    arg_type  = string;
     descrip   = "Template search directory list";
     max       = NOLIMIT;
     arg_name  = dir;
@@ -87,7 +87,7 @@ flag = {
 flag = {
     name      = override_tpl;
     value     = T;
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = tpl-file;
     no_preset;
     descrip   = "Override template file";
@@ -103,7 +103,7 @@ flag = {
 flag = {
     name      = lib_template;
     value     = l;
-    flag_arg  = ":";
+    arg_type  = string;
     max       = NOLIMIT;
     arg_name  = tpl-file;
     descrip   = "Library template file";
@@ -123,7 +123,7 @@ flag = {
 flag = {
     name      = base_name;
     value     = b;
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = name;
     no_preset;
     descrip   = "Base name for output file(s)";
@@ -137,7 +137,7 @@ flag = {
 
 flag = {
     name      = "definitions";
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = file;
     no_preset;
     descrip   = "Definitions input file";
@@ -155,7 +155,7 @@ flag = {
 flag = {
     name      = "load_scheme";
     value     = S;
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = file;
     descrip   = "Scheme code file to load";
     settable;
@@ -188,7 +188,7 @@ flag = {
 flag = {
     name       = skip_suffix;
     value      = s;
-    flag_arg   = ":";
+    arg_type   = string;
     arg_name   = suffix;
     no_preset;
     descrip    = "Omit the file with this suffix";
@@ -217,7 +217,8 @@ flag = {
     name        = equate;
     descrip     = "characters considered equivalent";
     arg_name    = char-list;
-    flag_arg    = "_-^" /* default equivalence */;
+    arg_type    = string;
+    arg_default = "_-^" /* default equivalence */;
     doc =
     "This option will alter the list of characters considered equivalent.\n"
     "The default are the three characters, \"_-^\".  (The latter is\n"
@@ -233,7 +234,8 @@ flag = {
 
 flag = {
     name        = loop_limit;
-    flag_arg    = "=256";
+    arg_type    = number;
+    arg_default = 256;
     arg_name    = lim;
     descrip     = "Limit on increment loops";
     doc =
@@ -247,7 +249,8 @@ flag = {
 flag = {
     name        = timeout;
     value       = t;
-    flag_arg    = "=10";
+    arg_type    = number;
+    arg_default = 10;
     arg_name    = time-lim;
     descrip     = "Time limit for servers";
     doc =
@@ -258,7 +261,7 @@ flag = {
 
 flag = {
     name        = trace;
-    flag_arg    = "=0";
+    arg_type    = number;
     arg_name    = level;
     descrip     = "tracing level of detail";
 
@@ -288,7 +291,7 @@ export = "#define TRACE_NOTHING        0\n"
 
 flag = {
     name        = trace_out;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = file;
     descrip     = "tracing output file or filter";
 
@@ -352,7 +355,7 @@ in the definitions files and template files.';
 flag = {
     name        = define;
     value       = D;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = value;
     max         = NOLIMIT;
     descrip     = "name to add to definition list";
@@ -382,7 +385,7 @@ flag = {
 flag = {
     name        = undefine;
     value       = U;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = name-pat;
     max         = NOLIMIT;
     descrip     = "definition list removal pattern";

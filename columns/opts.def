@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.22 2000/04/04 16:44:12 bkorb Exp $
+ *   $Id: opts.def,v 1.23 2000/10/17 03:14:58 bkorb Exp $
  */
 
 /*
@@ -38,12 +38,13 @@ long_opts;
 version = "1.1";
 
 flag = {
-    name      = width;
-    value     = W;
-    flag_arg  = "=79";
-    arg_name  = num;
-    descrip   = "Maximum Line Width";
-    doc       =
+    name        = width;
+    value       = W;
+    arg_type    = number;
+    arg_default = 79;
+    arg_name    = num;
+    descrip     = "Maximum Line Width";
+    doc         =
     "This option specifies the full width of the output line,\n"
     "including any start-of-line indentation.  The output will fill\n"
     "each line as completely as possible, unless the column width has\n"
@@ -53,11 +54,12 @@ flag = {
 };
 
 flag = {
-    name      = columns;
-    value     = c;
-    flag_arg  = "=0";
-    arg_name  = count;
-    descrip   = "Desired number of columns";
+    name        = columns;
+    value       = c;
+    arg_type    = number;
+    arg_default = 0;
+    arg_name    = count;
+    descrip     = "Desired number of columns";
     doc =
     "Use this option to specify exactly how many columns to produce.\n"
     "If that many columns will not fit within @var{line_width}, then\n"
@@ -65,11 +67,12 @@ flag = {
 };
 
 flag = {
-    name      = col_width;
-    value     = w;
-    flag_arg  = "=0";
-    arg_name  = num;
-    descrip   = "Set width of each column";
+    name        = col_width;
+    value       = w;
+    arg_type    = number;
+    arg_default = 0;
+    arg_name    = num;
+    descrip     = "Set width of each column";
     doc =
     "Use this option to specify exactly how many characters are to be\n"
     "allocated for each column.  If it is narrower than the widest entry,\n"
@@ -77,10 +80,11 @@ flag = {
 };
 
 flag = {
-    name      = spread;
-    flag_arg  = "=0";
-    arg_name  = num;
-    descrip   = "maximum spread added to column width";
+    name        = spread;
+    arg_type    = number;
+    arg_default = 0;
+    arg_name    = num;
+    descrip     = "maximum spread added to column width";
     doc =
     "Use this option to specify exactly how many characters may be\n"
     "added to each column.  It allows you to prevent columns from\n"
@@ -88,11 +92,11 @@ flag = {
 };
 
 flag = {
-    name      = indent;
-    value     = I;
-    flag_arg  = ":";
-    arg_name  = l-pfx;
-    descrip   = "Line prefix or indentation";
+    name        = indent;
+    value       = I;
+    arg_type    = string;
+    arg_name    = l-pfx;
+    descrip     = "Line prefix or indentation";
     doc =
     "If a number, then this many spaces will be inserted at the start of\n"
     "every line.  Otherwise, it is a line prefix that will be inserted\n"
@@ -100,11 +104,11 @@ flag = {
 };
 
 flag = {
-    name      = first_indent;
-    flag_arg  = ":";
-    flags_must= indent;
-    arg_name  = l-pfx;
-    descrip   = "First line prefix";
+    name        = first_indent;
+    arg_type    = string;
+    flags_must  = indent;
+    arg_name    = l-pfx;
+    descrip     = "First line prefix";
     doc =
     "If a number, then this many spaces will be inserted at the start of\n"
     "the first line.  Otherwise, it is a line prefix that will be inserted\n"
@@ -112,21 +116,23 @@ flag = {
 };
 
 flag = {
-    name      = tab_width;
-    flag_arg  = "=8";
-    arg_name  = num;
-    descrip   = "tab width";
+    name        = tab_width;
+    arg_type    = number;
+    arg_default = 8;
+    arg_name    = num;
+    descrip     = "tab width";
     doc =
     "If an indentation string contains tabs, then this value is used to\n"
     "compute the ending column of the prefix string.";
 };
 
 flag = {
-    name      = sort;
-    value     = s;
-    flag_arg;
-    arg_name  = key-pat;
-    descrip   = "Sort input text";
+    name        = sort;
+    value       = s;
+    arg_type    = string;
+    arg_optional;
+    arg_name    = key-pat;
+    descrip     = "Sort input text";
     doc =
     "Causes the input text to be sorted.  If an argument is supplied,\n"
     "it is presumed to be a pattern and the sort is based upon the\n"
@@ -135,11 +141,11 @@ flag = {
 };
 
 flag = {
-    name      = format;
-    value     = f;
-    flag_arg  = ':';
-    arg_name  = fmt-str;
-    descrip   = "Formatting string for each input";
+    name        = format;
+    value       = f;
+    arg_type    = string;
+    arg_name    = fmt-str;
+    descrip     = "Formatting string for each input";
     doc =
     "If you need to reformat each input text, the argument to this\n"
     "option is interpreted as an @code{sprintf(3)} format that is used\n"
@@ -147,29 +153,29 @@ flag = {
 };
 
 flag = {
-    name      = separation;
-    value     = S;
-    flag_arg  = ':';
-    arg_name  = sep-str;
-    descrip   = "Separation string - follows all but last";
+    name        = separation;
+    value       = S;
+    arg_type    = string;
+    arg_name    = sep-str;
+    descrip     = "Separation string - follows all but last";
     doc =
     "Use this option if, for example, you wish a comma to appear after\n"
     "each entry except the last.";
 };
 
 flag = {
-    name      = line_separation;
-    flag_arg  = ':';
-    arg_name  = sep-str;
-    descrip   = "string at end of all lines but last";
+    name        = line_separation;
+    arg_type    = string;
+    arg_name    = sep-str;
+    descrip     = "string at end of all lines but last";
     doc =
     "Use this option if, for example, you wish a backslash to appear at\n"
     "the end of every line, except the last.";
 };
 
 flag = {
-    name      = by_columns;
-    descrip   = "Print entries in column order";
+    name        = by_columns;
+    descrip     = "Print entries in column order";
     doc =
 "Normally, the entries are printed out in order by rows and then columns.
 This option will cause the entries to be ordered within columns.  The final
@@ -178,10 +184,10 @@ column, instead of the final row, may be shorter than the others.";
 
 #ifdef LATER
 flag = {
-    name      = page_len;
-    flag_arg  = "=0";
-    arg_name  = num;
-    descrip   = "Page Length";
+    name        = page_len;
+    arg_type    = number;
+    arg_name    = num;
+    descrip     = "Page Length";
     doc =
     "This many lines will be printed before a form feed is emitted.\n"
     "The 'by_columns' ordering will wrap columns within a page.";
@@ -189,12 +195,12 @@ flag = {
 #endif
 
 flag = {
-    name      = input;
-    value     = i;
-    flag_arg  = ":";
-    arg_name  = file;
-    descrip   = "Input file (if not stdin)";
-    flag_code =
+    name        = input;
+    value       = i;
+    arg_type    = string;
+    arg_name    = file;
+    descrip     = "Input file (if not stdin)";
+    flag_code   =
 '    FILE* fp = freopen( pOptDesc->pzLastArg, "r" FOPEN_BINARY_FLAG, stdin );
     if (fp == (FILE*)NULL) {
         fprintf( stderr, "Error %d (%s) opening %s\n",

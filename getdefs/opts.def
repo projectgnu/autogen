@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.23 2000/09/18 20:15:54 bkorb Exp $
+ *   $Id: opts.def,v 2.24 2000/10/17 03:14:58 bkorb Exp $
  */
 
 /*
@@ -31,15 +31,15 @@ copyright = {
     owner  = "Bruce Korb";
 };
 
-eaddr          = "AutoGen@linuxave.org";
-prog_name      = "getdefs";
-prog_title     = "AutoGen Definition Extraction Tool";
+eaddr         = "bkorb@gnu.org";
+prog_name     = "getdefs";
+prog_title    = "AutoGen Definition Extraction Tool";
 
-version        = "1.1";
+version       = "1.1";
 
 flag = {
     name      = "defs_to_get";
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = reg-ex;
     descrip   = 'Regexp to look for after the "/*="';
     doc =
@@ -49,12 +49,13 @@ flag = {
 };
 
 flag = {
-    name      = ordering;
-    flag_arg; /* optional */
-    arg_name  = file-name;
-    disable   = no;
+    name        = ordering;
+    arg_type    = string;
+    arg_optional;
+    arg_name    = file-name;
+    disable     = no;
     enabled;
-    descrip   = "Alphabetize or use named file";
+    descrip     = "Alphabetize or use named file";
     doc =
     "By default, ordering is alphabetical by the entry name.\n"
     "Use, @code{no-ordering} if order is unimportant.\n"
@@ -66,7 +67,7 @@ flag = {
 
 flag = {
     name      = input;
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = file;
     max       = NOLIMIT;
     min       = 1;
@@ -82,7 +83,7 @@ flag = {
 
 flag = {
     name      = subblock;
-    flag_arg  = ":";
+    arg_type  = string;
     arg_name  = sub-def;
     max       = NOLIMIT;
     stack_arg;
@@ -126,24 +127,24 @@ flag = {
 };
 
 flag = {
-    name      = assign;
-    flag_arg  = ":";
-    arg_name  = ag-def;
-    max       = NOLIMIT;
+    name        = assign;
+    arg_type    = string;
+    arg_name    = ag-def;
+    max         = NOLIMIT;
     stack_arg;
-    descrip   = "Global assignments";
+    descrip     = "Global assignments";
     doc =
     "The argument to each copy of this option will be inserted into\n"
     "the output definitions, with only a semicolon attached.";
 };
 
 flag = {
-    name      = common_assign;
-    flag_arg  = ":";
-    arg_name  = ag-def;
-    max       = NOLIMIT;
+    name        = common_assign;
+    arg_type    = string;
+    arg_name    = ag-def;
+    max         = NOLIMIT;
     stack_arg;
-    descrip   = "Assignments common to all blocks";
+    descrip     = "Assignments common to all blocks";
     doc =
     "The argument to each copy of this option will be inserted into\n"
     "each output definition, with only a semicolon attached.";
@@ -151,7 +152,7 @@ flag = {
 
 flag = {
     name        = copy;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = file;
     max         = NOLIMIT;
     stack_arg;
@@ -163,7 +164,8 @@ flag = {
 
 flag = {
     name        = srcfile;
-    flag_arg;     /* optional */
+    arg_type    = string;
+    arg_optional;
     arg_name    = file;
     descrip     = "Insert source file name into each def";
     doc =
@@ -177,7 +179,8 @@ flag = {
 
 flag = {
     name        = linenum;
-    flag_arg;     /* optional */
+    arg_type    = string;
+    arg_optional;
     arg_name    = def-name;
     descrip     = "Insert source line number into each def";
     doc =
@@ -202,7 +205,7 @@ flag = {
 flag = {
     name        = output;
     equivalence = "autogen";
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = file;
     descrip     = "Output file to open";
     doc =
@@ -213,7 +216,8 @@ flag = {
 flag = {
     name        = "autogen";
     equivalence = "autogen";
-    flag_arg;     /* optional */
+    arg_type    = string;
+    arg_optional;
     arg_name    = ag-cmd;
     disable     = "no";
     enabled;
@@ -227,7 +231,7 @@ flag = {
 
 flag = {
     name        = template;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = file;
     descrip     = "Template Name";
     doc =
@@ -236,7 +240,7 @@ flag = {
 
 flag = {
     name        = agarg;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = ag-opt;
     max         = NOLIMIT;
     stack_arg;
@@ -249,7 +253,7 @@ flag = {
 
 flag = {
     name        = base_name;
-    flag_arg    = ":";
+    arg_type    = string;
     arg_name    = name;
     descrip     = "Base name for output file(s)";
     flags_cant  = output;
