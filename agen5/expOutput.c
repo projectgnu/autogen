@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.2 1999/10/30 20:31:20 bruce Exp $
+ *  $Id: expOutput.c,v 1.3 1999/10/31 19:03:51 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -98,7 +98,7 @@ ag_scm_out_delete( void )
 
 /*=gfunc out_move
  *
- * exparg: new-name
+ * exparg: new-name, new name for the current output file
  *
  * doc:  
  *  Rename current output file.
@@ -141,7 +141,7 @@ ag_scm_out_pop( void )
 
 /*=gfunc out_push_add
  *
- * exparg: file-name
+ * exparg: file-name, name of the file to append text to
  *
  * doc: 
  *  Identical to @code{push-new}, except the contents are @strong{not}
@@ -177,7 +177,7 @@ ag_scm_out_push_add( SCM new_file )
 
 /*=gfunc out_push_new
  *
- * exparg: file-name
+ * exparg: file-name, name of the file to create
  *
  * doc:
  *  Leave the current output file open, but purge and create
@@ -214,11 +214,13 @@ ag_scm_out_push_new( SCM new_file )
 
 /*=gfunc out_switch
  *
- * exparg: file-name
+ * exparg: file-name, name of the file to create
  *
  * doc:
  *  Switch output files - close current file and make the current
- *  file pointer refer to the new file
+ *  file pointer refer to the new file.  This is equivalent to
+ *  @code{out-pop} followed by @code{out-push-new}, except that
+ *  you may not pop the base level output file.
 =*/
     SCM
 ag_scm_out_switch( SCM new_file )
