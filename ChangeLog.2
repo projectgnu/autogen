@@ -1,3 +1,63 @@
+1998-06-17  Bruce Korb <korbb@datadesign.com>
+	* Most files listed below:
+	Began the implementation of enable/disable by changing references
+	to "invert" to "disable"
+
+	* autoopts/autoopts.c
+	Replaced "'\0'" with "NUL".
+	Deleted stuff dealing with "NEGATIONS", since it is unused
+	and is to become obsolete.
+
+	* autoopts/optcode.tpl
+	"negatable" no longer is used.  If a "disable" prefix is
+	specified, then "negatable" is presumed.  Probably should
+	find a reasonable synonym for "disableable" :)
+	Options are now initialized as "disabled", unless "enabled"
+	is specified in the definition.
+	Initialize the pz_DisabledName pointer to (const char*)NULL.
+	Cleaned up the usage text construction.
+	The global "invertedopts" is no longer used.  Any usage
+	of "disable" in an option definition is used instead.
+
+	* autoopts/options.h
+	Rename invert to disable and redefine the "UNUSED_OPT" to
+	check the option set type bits (SET, PRESET and DEFINED).
+	Added the pz_DisableName pointer to the option descriptor.
+
+	* autoopts/options.tpl
+	Added commentary describing what I have done.
+
+	* autoopts/save.c
+	* autoopts/stack.c
+	* autoopts/usage.c
+	Changes to #define names
+
+	* autoopts/opthead.tpl
+	Created a #define so that the CLEAR_OPT() macro can work.
+	Set the "OPTST_DISABLED" as needed in the CLEAR_OPT() macro.
+	Change references from "invert" to "disable".
+
+	* doc/autogen.def
+	I had forgotten that I changed the syntax to ignore
+	duplicate "autogen definition xxx;" statements for the
+	very purpose of directly including definition files...
+
+	* src/opts.def
+	Reduce the length of some of the descriptions so they fit on a line.
+
+	* src/agLex.c
+	Numbers are now kept as strings and converted later.
+
+	* src/agParse.y
+	xlateName is no longer needed.
+	findPlace() now uses a pointer to a string instead of the
+	converted number as an argument.
+
+	* src/agReduce.c
+	xlateName has been removed.
+	findPlace() now uses a pointer to a string instead of the
+	converted number as an argument.
+	
 1998-06-05  Bruce Korb <korbb@datadesign.com>
 	* autoopts/opthead.tpl
 	Sanity check flag values when long options are disallowed

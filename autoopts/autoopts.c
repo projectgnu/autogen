@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: autoopts.c,v 1.2 1998/06/17 20:21:07 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,7 +70,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.2 1998/06/17 20:21:07 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";
@@ -176,7 +176,7 @@ loadValue( tOptions* pOpts, tOptDesc* pOD )
  *  For preset values, we will allways have an argument pointer.
  *  We do a special hack:  when arguments are prohibited, we use
  *  the argument for an indicator to say if it should be regarded
- *  as an inverted option ('+' marked), regular option ('-' marked),
+ *  as a disabled option ('+' marked), regular option ('-' marked),
  *  or purged from the set of preset options.  Thus, if you run the
  *  following in your Bourne shell:
  *
@@ -189,10 +189,10 @@ loadValue( tOptions* pOpts, tOptDesc* pOD )
  *
  *     MYPROG_FOO_OPT=FALSE ; export MYPROG_FOO_OPT
  *
- *  This will cause Foo-Opt to be marked as a inverted option,
+ *  This will cause Foo-Opt to be marked as a disabled option,
  *  whether or not '+' options are normally processed.
  *  ALSO:  options that take arguments cannot be deleted or marked
- *  as 'inverted'.  These options should use empty/non-existent
+ *  as 'disabled'.  These options should use empty/non-existent
  *  arguments to indicate such things.
  */
     STATIC void
@@ -222,7 +222,7 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
         /*
          *  OPTIONAL ARGUMENT
          */
-        if (*pOD->pzLastArg == '\0')
+        if (*pOD->pzLastArg == NUL)
              pOD->pzLastArg = (char*)NULL;
         else pOD->pzLastArg = strdup( pOD->pzLastArg );
         break;
@@ -231,7 +231,7 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
         /*
          *  REQUIRED ARGUMENT
          */
-        if (*pOD->pzLastArg == '\0')
+        if (*pOD->pzLastArg == NUL)
              pOD->pzLastArg = "";
         else pOD->pzLastArg = strdup( pOD->pzLastArg );
         break;
@@ -254,10 +254,10 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
             /*
              *  Set this option to 'F'alse (opposite of '-' option)
              */
-            pOD->fOptState |= OPTST_INVERTED;
+            pOD->fOptState |= OPTST_DISABLED;
             break;
 
-        case '-': case '\0':
+        case '-': case NUL:
         case 'y': case 'Y': case 't': case 'T':
             /*
              *  'Y'es, it is 'T'rue we want this regular option.
@@ -284,8 +284,7 @@ longOptionFind( tOptions*  pOpts,
                 char*      pzOptName,
                 u_long*    pFlags )
 {
-    ag_bool    noStart  = (strneqvcmp( pzOptName, "no", 2 ) == 0);
-    ag_bool    invert   = AG_FALSE;
+    ag_bool    disable  = AG_FALSE;
     char*      pzEq     = strchr( pzOptName, '=' );
     tOptDesc*  pOD      = pOpts->pOptDesc;
     int        idx      = 0;
@@ -301,91 +300,31 @@ longOptionFind( tOptions*  pOpts,
      */
     if (pzEq != (char*)NULL) {
         nameLen = (int)(pzEq - pzOptName);
-        *pzEq = '\0';
+        *pzEq = NUL;
     } else nameLen = strlen( pzOptName );
 
-    /*
-     *  IF we have to mess with negated options, ...
-     */
-    if (noStart && ((pOpts->fOptSet & OPTPROC_NEGATIONS) != 0)) {
-        for (;;) {
-            /*
-             *  Check first for a normal match
-             */
-            if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
-
-                /*
-                 *  Remember the index for later.
-                 */
-                matchIdx = idx;
-
-                /*
-                 *  IF we have a complete match
-                 *  THEN it takes priority over any already located partial
-                 */
-                if (pOD->pz_Name[ nameLen ] == '\0') {
-                    matchCt = 1;
-                    invert  = AG_FALSE;  /* force off inversion */
-                    break;
-                }
-    
-                matchCt++;
-            }
+    for (;;) {
+        if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
 
             /*
-             *  Now check for a negated match
+             *  Remember the index for later.
              */
-            if (  ((pOD->fOptState & OPTST_NEGATABLE) != 0)
-               && (strneqvcmp( pzOptName+2, pOD->pz_Name, nameLen-2 ) == 0)) {
-
-                /*
-                 *  Remember the index for later.
-                 *  Note that we made an inverted match.
-                 */
-                matchIdx = idx;
-                invert   = AG_TRUE;
-
-                /*
-                 *  IF we have a complete match
-                 *  THEN it takes priority over any already located partial
-                 */
-                if (pOD->pz_Name[ nameLen ] == '\0') {
-                    matchCt = 1;
-                    break;
-                }
+            matchIdx = idx;
     
-                matchCt++;
-            }
-
-            if (++idx >= idxLim)
+            /*
+             *  IF we have a complete match
+             *  THEN it takes priority over any already located partial
+             */
+            if (pOD->pz_Name[ nameLen ] == NUL) {
+                matchCt = 1;
                 break;
-            pOD++;
-        }
-
-    } else {
-        for (;;) {
-            if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
-
-                /*
-                 *  Remember the index for later.
-                 */
-                matchIdx = idx;
-    
-                /*
-                 *  IF we have a complete match
-                 *  THEN it takes priority over any already located partial
-                 */
-                if (pOD->pz_Name[ nameLen ] == '\0') {
-                    matchCt = 1;
-                    break;
-                }
-    
-                matchCt++;
             }
-            if (++idx >= idxLim)
-                break;
-            pOD++;
+    
+            matchCt++;
         }
+        if (++idx >= idxLim)
+            break;
+        pOD++;
     }
 
     if (pzEq != (char*)NULL)
@@ -396,11 +335,11 @@ longOptionFind( tOptions*  pOpts,
      */
     if (matchCt == 1) {
         /*
-         *  IF we found an inverted name,
+         *  IF we found a disablement name,
          *  THEN set the bit in the callers' flag word
          */
-        if (invert)
-            *pFlags |= OPTST_INVERTED;
+        if (disable)
+            *pFlags |= OPTST_DISABLED;
         pOD = pOpts->pOptDesc + matchIdx;
 
         return pOD;
@@ -481,7 +420,7 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
     char*  pzOptionArg;
 
     if (*pzLine == '+') {
-        optFlag |= OPTST_INVERTED;
+        optFlag |= OPTST_DISABLED;
         while (isspace( *++pzLine )) /*NULL*/;
     }
     else if (*pzLine == '-')
@@ -494,7 +433,7 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
     {
         char* pz = pzLine;
         while (  (! isspace( *pz ))
-              && (*pz != '\0')
+              && (*pz != NUL)
               && (*pz != '=' )  ) pz++;
 
         /*
@@ -502,8 +441,8 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
          *  THEN terminate the name (clobbering either a space or '=')
          *       and scan over any more white space that follows.
          */
-        if (*pz != '\0') {
-            *pz++ = '\0';
+        if (*pz != NUL) {
+            *pz++ = NUL;
             while (isspace( *pz )) pz++;
         }
 
@@ -572,7 +511,7 @@ filePreset( tOptions*  pOpts, const char* pzFileName )
              *  Trim of trailing white space.
              */
             while ((pzLine > zLine) && isspace(pzLine[-1])) pzLine--;
-            *pzLine = '\0';
+            *pzLine = NUL;
             /*
              *  IF the line is not continued, then exit the loop
              */
@@ -591,7 +530,7 @@ filePreset( tOptions*  pOpts, const char* pzFileName )
         /*
          *  Ignore blank and comment lines
          */
-        if ((*pzLine == '\0') || (*pzLine == '#'))
+        if ((*pzLine == NUL) || (*pzLine == '#'))
             continue;
 
         loadOptionLine( pOpts, optFlag, pzLine );
@@ -636,7 +575,7 @@ doPresets( tOptions*  pOpts )
         if (pz == (char*)NULL)
             break;
 
-        *pz = '\0';
+        *pz = NUL;
 
         /*
          *  Concatenate the rc file name to the end of the executable path and
@@ -683,7 +622,7 @@ doPresets( tOptions*  pOpts )
                 char* pzEnv;
 
                 if (pzDir != (char*)NULL)
-                    *pzDir = '\0';
+                    *pzDir = NUL;
 
                 pzEnv = getenv( pzPath+1 );
 
@@ -792,9 +731,9 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
      *  THEN continue a single flag option.
      *  OTHERWISE see if there is room to advance and then do so.
      */
-    if ((pOpts->pzCurOpt != (char*)NULL) && (*pOpts->pzCurOpt != '\0')) {
-        if ((pOpts->fOptSet & OPTPROC_INVERTOPT) != 0)
-            optFlags |= OPTST_INVERTED;
+    if ((pOpts->pzCurOpt != (char*)NULL) && (*pOpts->pzCurOpt != NUL)) {
+        if ((pOpts->fOptSet & OPTPROC_DISABLEDOPT) != 0)
+            optFlags |= OPTST_DISABLED;
 
         pRes = shortOptionFind( pOpts, *pOpts->pzCurOpt );
     }
@@ -818,9 +757,9 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
              *  Skip over any flag/option markers.
              *  In this mode, they are not required.
              */
-            if (pOpts->fOptSet & OPTPROC_INVERTOK) {
+            if (pOpts->fOptSet & OPTPROC_DISABLEOK) {
                 if (*pz == '+')
-                    optFlags |= OPTST_INVERTED;
+                    optFlags |= OPTST_DISABLED;
 
                 while ((*pz == '+') || (*pz == '-')) pz++;
             }
@@ -841,8 +780,8 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                 break;
 
             case '+':
-                if (pOpts->fOptSet & OPTPROC_INVERTOK) {
-                    optFlags |= OPTST_INVERTED;
+                if (pOpts->fOptSet & OPTPROC_DISABLEOK) {
+                    optFlags |= OPTST_DISABLED;
                     break;
                 }
                 /* FALLTHROUGH */
@@ -864,7 +803,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
             case '+':
             case '-':
                 if (firstChar == secondChar) {
-                    if (*++(pOpts->pzCurOpt) == '\0')
+                    if (*++(pOpts->pzCurOpt) == NUL)
                         return pRes; /* NORMAL COMPLETION */
 
                     if ((pOpts->fOptSet & OPTPROC_LONGOPT) == 0) {
@@ -880,7 +819,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                 /* FALLTHROUGH */ /* option marker was "-+" or "+-" */
 
             case ':':
-            case '\0':
+            case NUL:
                 fprintf( stderr, zIllOptChr, pOpts->pzProgPath,
                          zIllegal, secondChar ? secondChar : ' ' );
                 break;  /* ERROR COMPLETION */
@@ -900,15 +839,15 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                     pRes = shortOptionFind( pOpts, *pOpts->pzCurOpt );
 
                     /*
-                     *  Whenever we want to save the "Inverted Opt" state,
+                     *  Whenever we want to save the "Disablement Opt" state,
                      *  we will pass through here.  It happens when:
                      *  1) a new option flag is detected
                      *  2) it is a short flag, and
                      *  3) we are not in long-option-only mode.
                      */
-                    if ((optFlags & OPTST_INVERTED) != 0)
-                         pOpts->fOptSet |=  OPTPROC_INVERTOPT;
-                    else pOpts->fOptSet &= ~OPTPROC_INVERTOPT;
+                    if ((optFlags & OPTST_DISABLED) != 0)
+                         pOpts->fOptSet |=  OPTPROC_DISABLEDOPT;
+                    else pOpts->fOptSet &= ~OPTPROC_DISABLEDOPT;
                 }
 
                 break;
@@ -953,7 +892,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                 pRes->pzLastArg = argVect[ pOpts->curOptIdx++ ];
             }
         } else {
-            if (*++pOpts->pzCurOpt == '\0')
+            if (*++pOpts->pzCurOpt == NUL)
                 pOpts->pzCurOpt = argVect[ pOpts->curOptIdx++ ];
             pRes->pzLastArg = pOpts->pzCurOpt;
         }
@@ -997,7 +936,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
             }
 
         } else {
-            if (*++pOpts->pzCurOpt != '\0')
+            if (*++pOpts->pzCurOpt != NUL)
                 pRes->pzLastArg = pOpts->pzCurOpt;
             else {
                 char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
@@ -1118,7 +1057,7 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
             /*
              *  Unless this option was marked with a '+', we bail now.
              */
-            if (! INVERTED_OPT( pOD ))
+            if (! DISABLED_OPT( pOD ))
                 exit( EXIT_SUCCESS );
     }   }
 

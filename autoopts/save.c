@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  save.c  $Id: save.c,v 1.2 1998/06/17 20:21:09 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -244,7 +244,7 @@ printEntry( FILE* fp, tOptDesc* p, char*  pzLA )
     /*
      *  There is an argument.  Pad the name so values line up
      */
-    fprintf( fp, "%c%-18s  ", (INVERTED_OPT( p )) ? '+' : ' ', p->pz_Name );
+    fprintf( fp, "%c%-18s  ", (DISABLED_OPT( p )) ? '+' : ' ', p->pz_Name );
 
     /*
      *  IF the option is numeric only,
@@ -364,7 +364,7 @@ optionSave( tOptions* pOpts )
              *  THEN just print the name and continue
              */
             if (p->optArgType == ARG_NONE) {
-                fprintf( fp, "%c%s\n", (INVERTED_OPT( p )) ? '+' : ' ',
+                fprintf( fp, "%c%s\n", (DISABLED_OPT( p )) ? '+' : ' ',
                          p->pz_Name );
                 continue;
             }

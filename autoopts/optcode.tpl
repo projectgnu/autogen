@@ -1,4 +1,4 @@
-{@autogen template include $Id: optcode.tpl,v 1.1 1998/04/29 23:14:31 bkorb Exp $ @}
+{@autogen template include $Id: optcode.tpl,v 1.2 1998/06/17 20:21:06 bkorb Exp $ @}
 {@_IF copyright _exist
 @}
 static const char zCopyright[] =
@@ -195,8 +195,9 @@ static tOptDesc optDesc[ {@prefix _up #_ +@}OPTION_CT ] = {{@_FOR flag@}
      /* actual cnt, fill */ 0, 0,
      /* opt state flags  */ {@
          _IF flag_arg _get #=.* ~@}OPTST_NUMERIC | {@  _ENDIF@}{@
-         _IF negatable _exist    @}OPTST_NEGATABLE | {@_ENDIF@}{@
+         _IF disable   _exist    @}OPTST_NEGATABLE | {@_ENDIF@}{@
          _IF stack_arg _exist    @}OPTST_STACKED | {@  _ENDIF@}{@
+         _IF enabled   _exist !  @}OPTST_DISABLED | {@ _ENDIF@}{@
          _IF no_preset _exist    @}OPTST_NO_INIT{@
          _ELSE                   @}OPTST_INIT{@        _ENDIF@},
      /* last opt argumnt */ {@
@@ -226,8 +227,8 @@ static tOptDesc optDesc[ {@prefix _up #_ +@}OPTION_CT ] = {{@_FOR flag@}
                       @}stackOptArg{@
                _ELSE  @}unstackOptArg{@_ENDIF@}{@
          _ELSE               @}(tpOptProc)NULL{@_ENDIF@},
-     /* opt name & text  */ z{@name _cap@}Text, z{@name _cap@}_NAME,
-                            z{@name _cap@}_Name },
+     /* opt name & text  */ z{@name _cap@}Text,  z{@name _cap@}_NAME,
+                            z{@name _cap@}_Name, (const char*)NULL },
 {@/flag@}{@
 
 _IF version _exist@}
@@ -243,8 +244,8 @@ _IF version _exist@}
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
      /* option proc      */ doVersion,
-     /* opt name & text  */ zVersionText, (const char*)NULL,
-                            zVersion_Name },
+     /* opt name & text  */ zVersionText,  (const char*)NULL,
+                            zVersion_Name, (const char*)NULL },
 {@_ENDIF@}
   {  /* entry idx, value */ INDEX_{@prefix _up #_ +@}OPT_HELP, VALUE_{@
                                     prefix _up #_ +@}OPT_HELP,
@@ -258,7 +259,8 @@ _IF version _exist@}
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
      /* option proc      */ doUsageOpt,
-     /* opt name & text  */ zHelpText, (const char*)NULL, zHelp_Name },
+     /* opt name & text  */ zHelpText,  (const char*)NULL,
+                            zHelp_Name, (const char*)NULL },
 
   {  /* entry idx, value */ INDEX_{@prefix _up #_ +@}OPT_MORE_HELP, VALUE_{@
                                     prefix _up #_ +@}OPT_MORE_HELP,
@@ -272,8 +274,8 @@ _IF version _exist@}
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
      /* option proc      */ doPagedUsage,
-     /* opt name & text  */ zMore_HelpText, (const char*)NULL,
-                            zMore_Help_Name }{@
+     /* opt name & text  */ zMore_HelpText,  (const char*)NULL,
+                            zMore_Help_Name, (const char*)NULL }{@
 
 _IF homerc _exist
 @},
@@ -290,8 +292,8 @@ _IF homerc _exist
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
      /* option proc      */ (tOptProc*)NULL,
-     /* opt name & text  */ zSave_OptsText, (const char*)NULL,
-                            zSave_Opts_Name }{@
+     /* opt name & text  */ zSave_OptsText,  (const char*)NULL,
+                            zSave_Opts_Name, (const char*)NULL }{@
 _ENDIF@}  };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -307,14 +309,23 @@ tSCC   zPROGNAME[]   = "{@prog_name _up@}";{@
 tSCC   zUsageTitle[] = "{@prog_name@} - " {@prog_title _str@}
     "\nUSAGE:  %s {@
         _IF flag.value _exist @}[-<flag> [<val>]]... {@
-        _ELIF long_opts _exist !@}[<option-name>[=<value>]] ...{@_ENDIF@}{@
-        _IF long_opts  _exist @}[--<name>[=<val>]]... {@
-        _ENDIF@}{@_IF flag.value _exist long_opts _exist |
-              @}{@_IF flag.value _exist
-                      long_opts _exist &
-                      argument _len 16 >= &
+        _ELIF long_opts _exist !@}[<option-name>[{=| }<value>]] ...{@
+        _ENDIF@}{@
+        _IF long_opts  _exist @}[--<name>[{=| }<val>]]... {@
+        _ENDIF@}{@
+        _IF argument _exist @}{@
+
+          #  IF the argument description is not likely to fit on a line ...
+          @}{@
+          _IF flag.value _exist
+              long_opts _exist &
+              argument _len 16 >= &
               @}\\\n"
-    "\t\t{@_ENDIF@}" {@argument _str@} "{@_ENDIF@}\n";{@
+    "\t\t{@_ENDIF@}" {@argument _str@} "{@
+        _ELIF flag.value _exist ! long_opts _exist ! && @}{@
+            _ERROR _dfile
+                " definitions allow neither option flags nor long options" + @}{@
+        _ENDIF@}\n";{@
 
 _IF homerc  _exist@}
 tSCC   zRcName[]     = "{@_IF rcfile _len          @}{@rcfile@}{@
@@ -371,12 +382,12 @@ tOptions {@prog_name@}Options = {
     zDetailFile,
     {@_IF usage _exist@}{@usage@}{@_ELSE@}optionUsage{@_ENDIF@},
     ( OPTPROC_NONE{@                 _IF allow_errors   _exist ! @}
-    + OPTPROC_ERRSTOP{@    _ENDIF@}{@_IF invertedopts   _exist   @}
-    + OPTPROC_INVERTOK{@   _ENDIF@}{@_IF exerc          _exist   @}
+    + OPTPROC_ERRSTOP{@    _ENDIF@}{@_IF flag.disable   _exist   @}
+    + OPTPROC_DISABLEOK{@  _ENDIF@}{@_IF exerc          _exist   @}
     + OPTPROC_EXERC{@      _ENDIF@}{@_IF flag.value     _exist   @}
     + OPTPROC_SHORTOPT{@   _ENDIF@}{@_IF long_opts      _exist   @}
     + OPTPROC_LONGOPT{@    _ENDIF@}{@_IF flag.min       _exist ! @}
-    + OPTPROC_NO_REQ_OPT{@ _ENDIF@}{@_IF flag.negatable _exist   @}
+    + OPTPROC_NO_REQ_OPT{@ _ENDIF@}{@_IF flag.disable   _exist   @}
     + OPTPROC_NEGATIONS{@  _ENDIF@}{@_IF NUMBER_OPTION  _env     @}
     + OPTPROC_NUM_OPT{@    _ENDIF@}{@_IF environrc      _exist   @}
     + OPTPROC_ENVIRON{@    _ENDIF@} ),

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.2 1998/06/17 20:21:11 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -306,12 +306,12 @@ optionUsage( tOptions*  pOptions, int exitCode )
         u_int  fOptSet = pOptions->fOptSet;
         tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;
 
-        if ((fOptSet & OPTPROC_INVERTOK) != 0)
+        if ((fOptSet & OPTPROC_DISABLEOK) != 0)
             fputs( zInverted, fp );
 
         if ((fOptSet & OPTPROC_LONGOPT) != 0)
             fprintf( fp, pzFmt,
-                     (fOptSet & OPTPROC_INVERTOK) ? "marker" : "hyphen" );
+                     (fOptSet & OPTPROC_DISABLEOK) ? "marker" : "hyphen" );
 
         else if ((fOptSet & OPTPROC_SHORTOPT) == 0)
             fputs( zOptsOnly, fp );

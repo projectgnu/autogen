@@ -1,4 +1,4 @@
-{@autogen template include $Id: opthead.tpl,v 1.2 1998/06/05 16:49:17 bkorb Exp $ @}
+{@autogen template include $Id: opthead.tpl,v 1.3 1998/06/17 20:21:05 bkorb Exp $ @}
 {@ # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." @}{@
 
@@ -66,7 +66,7 @@ _IF homerc _exist@},
  *  indexes, values and total count
  */
 #define {@prefix _up #_ +@}OPTION_CT    {@_eval
-                  flag _len    2 +
+                  flag _count 2 +
                   version _exist +
                   homerc  _exist + @}{@
 
@@ -84,7 +84,10 @@ _ENDIF@}
  *  Define the option values, and, for numerically valued options,
  *  the (argument) value of the option, and, for equivalenced-to
  *  options, a macro to identify the actual option value used.
+ *  The AODFT_* define is for internal use only.
  */{@  _FOR flag@}
+#define AODFT_{@prefix _up #_ +@}OPT_{@name _up "#%-14s" _printf@} {@
+        _IF enabled _exist @}0{@_ELSE@}OPTST_DISABLED{@_ENDIF@}
 #define VALUE_{@prefix _up #_ +@}OPT_{@name _up "#%-14s" _printf@} {@
 
         _IF   value _len 1 = @}'{@value@}'{@
@@ -153,13 +156,13 @@ _ENDIF@}
             _ENDIF "callout procedure exists" @} ){@_ENDIF@}{@
 
 
-            _IF invertedopts _exist negatable _exist | @}
+            _IF invertedopts _exist disable _exist | @}
 #define NEG_{@prefix _up #_ +@}OPT_{@name _up@}{@
             _IF flag_arg _exist@}(a){@
             _ENDIF@}   STMTS( \
         {@prefix _up #_ +@}DESC({@name _up@}).fOptState &= OPTST_PERSISTENT; \
         {@prefix _up #_ +@}DESC({@name _up
-            @}).fOptState |= OPTST_SET | OPTST_INVERTED{@
+            @}).fOptState |= OPTST_SET | OPTST_DISABLED{@
             _IF flag_arg _exist@}; \
         {@prefix _up #_ +@}DESC({@name _up@}).pzLastArg  = {@
                  _IF flag_arg _get #=.* ~@}(char*)atoi{@_ENDIF@}(a){@
@@ -172,12 +175,12 @@ _ENDIF@}
                          {@prog_name@}Options.pOptDesc + INDEX_{@
                          prefix _up #_ +@}OPT_{@name _up@} ){@
             _ENDIF "callout procedure exists" @} ){@
-        _ENDIF "invertedopts _exist negatable _exist |" @}
+        _ENDIF "invertedopts _exist disable _exist |" @}
 {@      _ENDIF setable exists @}{@
 
-    /flag@}{@_IF flag.value _exist@}{@
+    /flag@}{@
 
-
+  _IF flag.value _exist @}{@
     _IF version _exist@}
 #define VALUE_{@prefix _up #_ +@}OPT_VERSION        'v'{@
     _ENDIF @}{@
@@ -190,7 +193,7 @@ _ENDIF@}
 #define VALUE_{@prefix _up #_ +@}OPT_MORE_HELP      '!'{@
 
 
-    _ELSE "flag.value *DOES NOT* exist" @}{@
+  _ELSE "flag.value *DOES NOT* exist" @}{@
 
     _IF version _exist @}
 #define VALUE_{@prefix _up #_ +@}OPT_VERSION        INDEX_{@
@@ -199,7 +202,7 @@ _ENDIF@}
     _IF homerc _exist @}
 #define VALUE_{@prefix _up #_ +@}OPT_SAVE_OPTS      INDEX_{@
                                       prefix _up #_ +@}OPT_SAVE_OPTS{@
-    _ENDIF@}
+  _ENDIF@}
 #define VALUE_{@prefix _up #_ +@}OPT_HELP           INDEX_{@
                                       prefix _up #_ +@}OPT_HELP
 #define VALUE_{@prefix _up #_ +@}OPT_MORE_HELP      INDEX_{@
@@ -233,9 +236,11 @@ _ENDIF@}
  *  RESTART - Resume option processing from given argument index
  *    START - Start option processing from the beginning (index == 1)
  */
-#define    CLEAR_{@prefix _up #_ +@}OPT(n) STMTS( {@prefix _up #_ +
-                 @}DESC(n).fOptState &= ~OPTST_SET_MASK; \
-                               {@prefix _up #_ +@}DESC(n).fOptState |= OPTST_INIT )
+#define    CLEAR_{@prefix _up #_ +@}OPT(n) STMTS( \
+                 {@prefix _up #_ +@}DESC(n).fOptState &= ~OPTST_SET_MASK; \
+                 {@prefix _up #_ +@}DESC(n).fOptState |= OPTST_INIT | AODFT_{@
+                           prefix _up #_ +@}OPT_{@name _up@}; \
+                 {@prefix _up #_ +@}DESC(n).optCookie = (void*)NULL )
 #define    STATE_{@prefix _up #_ +@}OPT(n) ({@prefix _up #_ +
                  @}DESC(n).fOptState & OPTST_SET_MASK)
 #define    COUNT_{@prefix _up #_ +@}OPT(n) ({@prefix _up #_ +@}DESC(n).optOccCt)
@@ -243,7 +248,7 @@ _ENDIF@}
 #define     HAVE_{@prefix _up #_ +@}OPT(n) (! UNUSED_OPT(&   {@prefix _up #_ +@}DESC(n)))
 #define    ISSEL_{@prefix _up #_ +@}OPT(n) (SELECTED_OPT(&   {@prefix _up #_ +@}DESC(n)))
 #define ISUNUSED_{@prefix _up #_ +@}OPT(n) (UNUSED_OPT(&     {@prefix _up #_ +@}DESC(n)))
-#define ISINVERT_{@prefix _up #_ +@}OPT(n) (INVERTED_OPT(& {@prefix _up #_ +@}DESC(n)))
+#define  ENABLED_{@prefix _up #_ +@}OPT(n) (! DISABLED_OPT(& {@prefix _up #_ +@}DESC(n)))
 #define  STACKCT_{@prefix _up #_ +@}OPT(n) (((tArgList*)({@prefix _up #_ +
                          @}DESC(n).optCookie))->useCt)
 #define STACKLST_{@prefix _up #_ +@}OPT(n) (((tArgList*)({@prefix _up #_ +

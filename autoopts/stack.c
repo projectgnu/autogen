@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: stack.c,v 1.2 1998/06/17 20:21:12 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -116,7 +116,7 @@ stackOptArg( tOptions*  pOpts, tOptDesc* pOptDesc )
      *  IF this is a negated ('+'-marked) option
      *  THEN we unstack the argument
      */
-    if (INVERTED_OPT( pOptDesc )) {
+    if (DISABLED_OPT( pOptDesc )) {
         unstackOptArg( pOpts, pOptDesc );
         return;
     }
