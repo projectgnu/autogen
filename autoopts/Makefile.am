@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Mon Sep 21 14:26:21 1998
+## Last Modified:   Thu Oct  1 07:32:47 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.2 1998/09/22 20:53:43 bkorb Exp $
+## $Id: Makefile.am,v 2.3 1998/10/01 21:04:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,7 +20,7 @@ lib_LTLIBRARIES = libopts.la
 libopts_la_SOURCES = \
 		autoopts.c pgusage.c putshell.c save.c \
 		stack.c usage.c version.c streqvcmp.c \
-                autoopts.h options.h streqv.h
+                autoopts.h options.h streqv.h makeshell.c
 
 datadir		= $(prefix)/share
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl
