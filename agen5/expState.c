@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.11 2000/03/29 03:06:32 bruce Exp $
+ *  $Id: expState.c,v 1.12 2000/03/29 03:08:30 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -458,7 +458,7 @@ ag_scm_exist_p( SCM obj )
 
 /*=gfunc match_value_p
  *
- * what:   test for value name
+ * what:   test for matching value
  *
  * exparg: op,       boolean result operator
  * exparg: ag-name,  name of AutoGen value
