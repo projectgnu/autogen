@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.2 2000/09/16 06:19:50 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.3 2000/09/16 06:25:29 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -164,6 +164,15 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
                 return FST_END_PSEUDO;
             }
         }
+    }
+
+    /*
+     *  After the end marker has been found,
+     *  anything else is really the start of the data.
+     */
+    if (fsm_state == FSS_END_MARK) {
+        *ppzData = pzData;
+        return FST_END_PSEUDO;
     }
 
     /*
