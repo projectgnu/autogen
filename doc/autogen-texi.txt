@@ -4219,9 +4219,9 @@ honored before other backslashes, apostrophes, newlines and cr/newline
 pairs.  The options must be introduced with hyphens in the same way as
 the command line.
 
-Some options are not presettable.  Members of equivalence classes of
-options are not presettable, as are options specified with the
-@code{no-preset} attribute.
+Note that not all options may be preset.  Options that are specified with the
+@code{no-preset} attribute and the @code{--help}, @code{--more-help},
+and @code{--save-opts} auto-supported options may not be preset.
 
 @c === SECTION MARKER
 
