@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.28 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: funcEval.c,v 1.29 2000/10/11 16:24:42 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -51,7 +51,7 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
 
     switch (gh_type_e( s )) {
     case GH_TYPE_BOOLEAN:         
-        strcpy( z, SCM_NFALSEP(s) ? "1" : "0" ); break;
+        z[0] = SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL; break;
 
     case GH_TYPE_STRING:
     case GH_TYPE_SYMBOL:
