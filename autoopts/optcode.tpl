@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.10 1999/02/24 16:23:13 bkorb Exp $
+#$Id: optcode.tpl,v 2.11 1999/02/24 17:51:13 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -261,7 +261,7 @@ _FOR flag "\n" =][=
      /* equiv idx, value */ 0, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
+     /* min, max, act ct */ 0, 0, 0,
      /* opt state flags  */ OPTST_DOCUMENT | OPTST_NO_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
