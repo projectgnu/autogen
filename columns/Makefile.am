@@ -8,9 +8,9 @@
 ## Maintainer:	    Bruce Korb <bkorb@gnu.org>
 ## Created:	    Mon Jun 30 15:35:12 1997
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2002/02/23 01:57:47 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -44,6 +44,7 @@ gen-stamp : opts.def columns
 	@touch $@
 
 clean : columns-clean
+distclean : columns-clean
 
 columns-clean :
 	rm -f *-stamp
