@@ -180,6 +180,12 @@ do
     date > stamp-exprini
     ;;
 
+  expr.def )
+    eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
+    eopt="assign=group=ag $eopt defs=gfunc templ=snarf srcfile"
+    SHELL=ksh ${GD} $eopt out=expr.def exp*.c func*.c
+    ;;
+
   stamp-functions | \
   functions.h )
     eopt="template=functions defs=macfunc linenum srcfile filelist"
