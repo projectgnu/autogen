@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.13 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: functions.c,v 1.14 2000/04/10 13:25:06 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -255,6 +255,7 @@ MAKE_LOAD_PROC( Unknown )
         break;
 
     case '[':
+    case '.':
         pzCopy = pT->pzTemplText + pMac->ozName;
         pzCopy += strlen( pzCopy );
         srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );

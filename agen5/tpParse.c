@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.5 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: tpParse.c,v 1.6 2000/04/10 13:25:06 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -31,7 +31,8 @@
 #include "autogen.h"
 #include "streqv.h"
 
-STATIC teFuncType whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan );
+STATIC teFuncType whichFunc( tTemplate* pT, tMacro* pMac,
+                             const char** ppzScan );
 STATIC tCC* findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark );
 
 

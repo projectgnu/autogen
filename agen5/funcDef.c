@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.27 2000/04/07 13:28:31 bkorb Exp $
+ *  $Id: funcDef.c,v 1.28 2000/04/10 13:25:06 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -83,21 +83,26 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
 
     for (;;) {
         pNext->de.index = idx++;
-        if (--ct <= 0)
+        pN = pNext + 1; /* We return this, valid or not */
+        if (--ct <= 0)  /* count each successive twin   */
             break;
-        pN = pNext + 1;
         if (streqvcmp( pNext->de.pzName, pN->de.pzName ) != 0)
             break;
-        pN->de.pPrevTwin = &(pNext->de);
+
+        /*
+         *  We have found another twin.  Link it in and advance
+         */
         pNext->de.pTwin  = &(pN->de);
+        pN->de.pPrevTwin = &(pNext->de);
         pNext = pN;
     }
 
-    pDL->de.pPrevTwin = \
     pDL->de.pEndTwin  = &(pNext->de);
     pNext->de.pTwin   = (tDefEntry*)NULL; /* NULL terminated list */
     pDL->de.pPrevTwin = (tDefEntry*)NULL; /* NULL terminated list */
     *pCt = ct;
+    pDL->de.pNext = (tDefEntry*)NULL;     /* in case ct == 0      */
+    return pN; /* If ct is zero, then this is invalid */
 }
 
 
@@ -452,6 +457,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             spanQuote( pz );
             strcpy( pDL->pzExpr+1, pz );
             AGFREE( (void*)pz );
+            break;
         }
         case '"':
         case '\'':
@@ -526,7 +532,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             if (streqvcmp( pDL->de.pzName, pN->de.pzName ) == 0) {
                 pN = linkTwins( pDL, pN, &ct );
                 if (ct <= 0)
-                    break;
+                    break;  /* pN is now invalid */
             }
 
             pDL->de.pNext = &(pN->de);

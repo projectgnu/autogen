@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.15 2000/04/07 13:28:31 bkorb Exp $
+ *  $Id: expState.c,v 1.16 2000/04/10 13:25:06 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -479,6 +479,26 @@ ag_scm_exist_p( SCM obj )
 }
 
 
+/*=gfunc ag_function_p
+ *
+ * what:   test for function
+ *
+ * exparg: ag-name, name of AutoGen function
+ *
+ * doc:  return SCM_BOOL_T iff a specified name has an AutoGen function.
+=*/
+    SCM
+ag_scm_ag_function_p( SCM obj )
+{
+    if (! gh_string_p( obj ))
+        return SCM_UNDEFINED;
+
+    return (findTemplate( SCM_CHARS( obj )) != (tTemplate*)NULL)
+           ? SCM_BOOL_T
+           : SCM_BOOL_F;
+}
+
+
 /*=gfunc match_value_p
  *
  * what:   test for matching value
@@ -658,6 +678,19 @@ ag_scm_suffix( void )
 ag_scm_tpl_file( void )
 {
     return gh_str02scm( pzTemplFileName );
+}
+
+
+/*=gfunc tpl_line_num
+ *
+ * what:   get the template line number
+ *
+ * doc:  Returns the line number of the current template macro.
+=*/
+    SCM
+ag_scm_tpl_line_num( void )
+{
+    return gh_int2scm( pCurMacro->lineNo );
 }
 
 #include "expr.ini"

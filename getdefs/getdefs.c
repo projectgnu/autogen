@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.23 2000/04/04 13:23:32 bkorb Exp $
+ *  $Id: getdefs.c,v 2.24 2000/04/10 13:25:06 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
@@ -243,7 +243,7 @@ validateOptions( void )
      *  the '/' '*' '=' character sequence
      */
     if ((! HAVE_OPT( DEFS_TO_GET )) || (*OPT_ARG( DEFS_TO_GET ) == NUL)) {
-        pzDefPat = "/\\*=([a-z][a-z0-9.]*)[ \t][ \t]*[a-z]";
+        pzDefPat = "/\\*=([a-zA-Z][a-zA-Z0-9_]*)[ \t][ \t]*[a-z]";
 
     } else {
         char*  pz  = OPT_ARG( DEFS_TO_GET );

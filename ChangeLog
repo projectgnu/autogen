@@ -1,3 +1,10 @@
+2000-04-09  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcDef.c:  Fixed bug in assembling arg lists
+	* agen5/expState.c:  Added ag-function? and tpl-line Scheme functions
+	* getdefs/getdefs.c:  Allow underscores in the default pattern
+	* agen5/tpParse.c:  allow dotted names in macro names
+
 2000-04-06  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/auto_gen.tpl:  Document the "here string" construct
