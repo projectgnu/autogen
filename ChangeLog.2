@@ -3,11 +3,37 @@
 	* autoopts/optcode.tpl
 	Simplified the formation of the initialization by
 	#defining variable names to (const char*)NULL when not present
+	Added pzDisablePfx, used as a special value for environment
+	variable presetting.  Not used anywhere else.
 
 	* autoopts/options.tpl
 	Reformatted the descriptions of the macros to make them
 	more human readable.  Used 'sed' to convert the text back
 	to something texinfo can use.
+
+	* autoopts/Makefile.am
+	Distribute the TODO file, too.
+
+	* autoopts/autoopts.c
+	Since all disable-able (negatable) options now have a special
+	prefix assigned, "yes", "no", "true", "false" "-" and "+"
+	values no longer need have special meanings.  A bunch of code
+	was removed.  The RC/INI files no longer need the +/- prefix
+	to the option name, either.
+
+	* autoopts/options.h
+	Changed "NEGATABLE" to "DISABLEOK".
+	Added "INITENABLED".  Removed the "AODFT_*" defines.
+	Fixed the CLEAR_OPT() macro accordingly.
+	Added pzDisablePfx, used as a special value for environment
+	variable presetting.  Not used anywhere else.
+
+	* autoopts/save.c
+	Removed the '+' prefix for disabled options.
+	We use the prefixed long option name now.
+
+	* autoopts/usage.c
+	Print the disablement long option name, when applicable.
 
 	* doc/auto_gen.tpl
 	Documented the options that autoopts maintains automatically.

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.4 1998/07/09 17:15:37 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.5 1998/07/09 17:34:49 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -212,7 +212,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
              *  THEN print the disablement info
              */
             if (pOD->pz_DisableName != (char*)NULL )  {
-                tSCC zDis[] = "\t\t\t\t- may be disabled as option --%s\n";
+                tSCC zDis[] = "\t\t\t\t- disabled as --%s\n";
                 fprintf( fp, zDis, pOD->pz_DisableName );
             }
 
@@ -236,11 +236,6 @@ optionUsage( tOptions*  pOptions, int exitCode )
                     tSCC zNoPreset[] = "\t\t\t\t- may not be preset\n";
                     fputs( zNoPreset, fp );
                 }
-            }
-
-            if ((pOD->fOptState & OPTST_DISABLEOK) != 0) {
-                tSCC zCanDisable[] = "\t\t\t\t- may be negated as 'NO%s'\n";
-                fprintf( fp, zCanDisable, pOD->pz_Name );
             }
 
             /*
