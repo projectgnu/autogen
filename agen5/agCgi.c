@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: agCgi.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -27,15 +27,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#include "autogen.h"
-
-#include "cgi-fsm.h"
-
-#ifdef HAVE_FCNTL_H
-#  include <fcntl.h>
-#else
-#  error NEED  <fcntl.h>
-#endif
 
 typedef struct {
     const char*  pzName;
@@ -85,8 +76,6 @@ static const char zOops[] =
 "Content-type: text/plain\n\n"
 "AutoGen form processing error:\n";
 
-#define zNil     ((char*)(zOops + sizeof( zOops ) - 1))
-
 static char* parseInput( char* pzSrc, int len );
 
 EXPORT void
@@ -105,7 +94,7 @@ loadCgi( void )
         do  {
             pNM->pzValue = getenv( pNM->pzName );
             if (pNM->pzValue == NULL)
-                pNM->pzValue = zNil;
+                pNM->pzValue = "";
         } while (pNM++, ++ix < NAME_CT);
     }
 
@@ -166,6 +155,8 @@ parseInput( char* pzSrc, int len )
     }
 
     AG_ABEND( pzRes );
+    /* NOTREACHED */
+    return pzRes;
 }
 
 /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.6 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: pgusage.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -50,8 +50,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
 
 tePagerState pagerState = PAGER_STATE_INITIAL;
 
@@ -109,6 +107,7 @@ doPagedUsage( pOptions, pOD )
 
     case PAGER_STATE_READY:
     {
+        tSCC zPage[]  = "%1$s /tmp/use.%2$lu ; rm -f /tmp/use.%2$lu";
         char* pzPager = getenv( "PAGER" );
 
         /*
@@ -121,12 +120,9 @@ doPagedUsage( pOptions, pOD )
          *  Page the file and remove it when done.
          */
 #ifdef HAVE_SNPRINTF
-        snprintf( zPageUsage, sizeof(zPageUsage),
-                  "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
-                  pzPager, (tUL)my_pid );
+        snprintf( zPageUsage, sizeof(zPageUsage), zPage, pzPager, (tUL)my_pid );
 #else
-        sprintf( zPageUsage, "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
-                  pzPager, (tUL)my_pid );
+        sprintf( zPageUsage, zPage, pzPager, (tUL)my_pid );
 #endif
         fclose( stderr );
         dup2( STDOUT_FILENO, STDERR_FILENO );

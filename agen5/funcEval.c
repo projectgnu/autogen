@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: funcEval.c,v 3.15 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -24,23 +24,14 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
-
-#include REGEX_HEADER
-
-tSCC        zNil[] = "";
 
 STATIC int exprType( char* pz );
-
 
 EXPORT char*
 resolveSCM( SCM s )
 {
     static char z[32];
     char*  pzRes = z;
-    int    len;
 
     switch (gh_type_e( s )) {
     case GH_TYPE_BOOLEAN:         
@@ -62,16 +53,21 @@ resolveSCM( SCM s )
         pzRes = "** Pair **"; break;
 
     case GH_TYPE_NUMBER:
-        snprintf( z, sizeof(z), "%d", gh_scm2ulong(s) ); break;
+        snprintf( z, sizeof(z), "%ld", gh_scm2ulong(s) ); break;
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY
+    {
+        void* x = &SCM_SUBR_ENTRY(s);
+
         snprintf( z, sizeof(z), "** Procedure 0x%08lX **",
-                  SCM_SUBR_ENTRY(s) );
+                  (unsigned long)x );
+        break;
+    }
 #else
         pzRes = "** PROCEDURE **";
-#endif
         break;
+#endif
 
     case GH_TYPE_LIST:
         pzRes = "** LIST **"; break;
@@ -157,6 +153,7 @@ evalExpression( ag_bool* pMustFree )
                  *  Emit inconsistently :-}
                  */
                 AG_ABEND_IN( pT, pMac, "PROGRAM ERROR:  ambiguous expr code" );
+                /* NOTREACHED */
             }
         }
 
@@ -369,7 +366,6 @@ mFunc_Expr( tTemplate* pT, tMacro* pMac )
 
     return pMac + 1;
 }
-#endif /* DEFINE_LOAD_FUNCTIONS */
 
 
 STATIC int

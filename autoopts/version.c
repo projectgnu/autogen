@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.6 2003/04/19 02:40:33 bkorb Exp $
+/*  $Id: version.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -47,8 +47,6 @@ static const char zAOV[] =
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
 
 tSCC zBadArg[] =
 "ERROR: version option argument '%c' invalid.  Use:\n\

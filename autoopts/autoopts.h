@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-01-05 11:20:13 bkorb"
+ *  Time-stamp:      "2003-04-20 18:35:05 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.13 2003/04/19 02:40:33 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.14 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -59,6 +59,9 @@
 #include "config.h"
 #include "compat/compat.h"
 #include <sys/param.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <utime.h>
 
 #include "options.h"
 #include "streqv.h"
@@ -218,6 +221,8 @@ ag_bool optionMakePath PROTO((
     size_t   bufSize,
     tCC*     pzName,
     tCC*     pzProgPath ));
+
+extern tOptProc doVersion, doPagedUsage, doLoadOpt;
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*

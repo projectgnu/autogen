@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expOutput.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -24,8 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
 
 #ifndef S_IAMB
 /*
@@ -197,7 +195,6 @@ ag_scm_out_pop( SCM ret_contents )
 ag_scm_out_suspend( SCM suspName )
 {
     SCM res = SCM_UNDEFINED;
-    tCC* pzSuspName = ag_scm2zchars( suspName, "suspend name" );
 
     if (pCurFp->pPrev == NULL)
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed" );

@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: defLoad.c,v 3.15 2003/04/21 03:35:34 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -24,7 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#include "autogen.h"
 
 STATIC int compareIndex( const void* p1, const void* p2 );
 STATIC void fixTwins( tDefEntry** ppNode );
@@ -325,8 +324,8 @@ readDefines( void )
      *  find out how big it was and when it was last modified.
      */
     else {
-        char* pz;
         struct stat stbf;
+
         if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0)
             AG_ABEND( aprf( zCannot, errno, "stat", OPT_ARG( DEFINITIONS ),
                             strerror( errno )));

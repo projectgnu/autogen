@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.11 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: tpParse.c,v 3.12 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -26,9 +26,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#define LOAD_FUNCTIONS
-#include "autogen.h"
 
 STATIC teFuncType whichFunc( tCC** ppzScan );
 STATIC tCC* findMacroEnd( tCC** ppzMark );
@@ -131,8 +128,6 @@ findMacroEnd( tCC** ppzMark )
     tCC* pzMark = *ppzMark + startMacLen;
     tCC* pzNextMark;
     tCC* pzEndMark;
-    tSCC zOop[] = "Error:  a %s macro contains a nested macro\n";
-    char z[ 1024 ];
 
     /*
      *  Set our pointers to the start of the macro text

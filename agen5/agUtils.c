@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: agUtils.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,23 +25,9 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <ctype.h>
-#include <assert.h>
-
-#include "autogen.h"
-
-#if defined( HAVE_POSIX_SYSINFO )
-#  include <sys/systeminfo.h>
-
-#elif defined( HAVE_UNAME_SYSCALL )
-#  include <sys/utsname.h>
-
-#endif
-
 STATIC void addSysEnv( char* pzEnvName );
 
 #ifdef MEMDEBUG
-#  include "snprintfv/mem.h"
    static void finalMemCheck( void );
 #endif
 

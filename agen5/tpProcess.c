@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.16 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.17 2003/04/21 03:35:35 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -25,9 +25,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#define HANDLE_FUNCTIONS
-#include "autogen.h"
-
 STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
 
 STATIC tFpStack fpRoot = { 0, NULL, NULL, NULL };
@@ -45,8 +42,6 @@ generateBlock( tTemplate*   pT,
 {
     tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
     int  fc;
-#   define HANDLE_FUNCTIONS
-#   include "functions.h"
 
     /*
      *  Set up the processing context for this block of macros.

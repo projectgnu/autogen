@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: defDirect.c,v 3.15 2003/04/21 03:35:34 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#include "autogen.h"
-#include "directive.h"
-
 
 tSCC zNoEndif[]   = "Definition error:  in %s line %d, #endif not found\n";
 tSCC zNoMatch[]   = "Definition error:  in %s line %d, "
@@ -422,6 +419,8 @@ doDir_elif( char* pzArg, char* pzScan )
         "`#elif' directive encountered out of context\n\tin %s on line %d\n";
 
     AG_ABEND( aprf( z, pCurCtx->pzFileName, pCurCtx->lineNo ));
+    /* NOTREACHED */
+    return NULL;
 }
 
 
@@ -474,6 +473,8 @@ doDir_endshell( char* pzArg, char* pzScan )
      */
     AG_ABEND( aprf( zNoMatch, pCurCtx->pzFileName, pCurCtx->lineNo,
                     "endshell" ));
+    /* NOTREACHED */
+    return NULL;
 }
 
 
@@ -490,6 +491,8 @@ doDir_error( char* pzArg, char* pzScan )
 {
     AG_ABEND( aprf( "#error directive -- in %s on line %d\n\t%s\n",
                     pCurCtx->pzFileName, pCurCtx->lineNo, pzArg ));
+    /* NOTREACHED */
+    return NULL;
 }
 
 

@@ -95,7 +95,6 @@ forkAutogen( char* pzInput )
             if (p == NULL) {
                 strcpy( pz, zAg );
             } else {
-                struct stat sbf;
                 size_t len = (p - xml2agOptions.pzProgPath) + 1;
                 memcpy( pz, xml2agOptions.pzProgPath, len );
                 strcpy( pz + len, zAg );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.15 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: funcDef.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -24,11 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
-
-tSCC zNil[] = "";
 
 typedef int (tCmpProc)( const void*, const void* );
 
@@ -38,9 +33,8 @@ struct def_list {
     char*      pzExpr;
 };
 
-tSCC  zNoResolution[] = "Could not resolve macro name: ``%s''";
+tSCC zNoResolution[] = "Could not resolve macro name: ``%s''";
 tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
-#endif /* not defined DEFINE_LOAD_FUNCTIONS */
 
 STATIC tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
 
@@ -343,7 +337,6 @@ prepInvokeArgs( tMacro* pMac )
 }
 
 
-#ifndef DEFINE_LOAD_FUNCTIONS
 #ifdef DEBUG_ENABLED
 /*=macfunc DEBUG, ifdef DEBUG_ENABLED
  *
@@ -528,9 +521,6 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
 {
     tDefList*   pList  = (tDefList*)pMac->res;
     int         defCt  = pMac->sibIndex;
-    SCM         res;
-    tDefEntry*  pDefs;
-    tDefStack*  pStack;
     tDefStack   stack;
 
     pT = (tTemplate*)pMac->funcPrivate;
@@ -653,7 +643,6 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
 
     return mFunc_Define( pT, pMac );
 }
-#endif /* DEFINE_LOAD_FUNCTIONS not defined */
 
 
 /* Load Debug

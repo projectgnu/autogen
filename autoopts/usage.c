@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.19 2003/04/19 02:40:33 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.20 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -49,7 +49,6 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#include "autoopts.h"
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
 tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
 tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";

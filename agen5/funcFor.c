@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.11 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: funcFor.c,v 3.12 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
 
 #define ENTRY_END  INT_MAX
 
@@ -525,7 +522,6 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
 
     do  {
         tDefEntry* pDef = getEntry();
-        int foundComma  = 0;
 
         pDef->pzDefName = pzName;
         pDef->index     = ix++;
@@ -754,7 +750,6 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
     return pMRet;
 }
 
-#endif /* DEFINE_LOAD_FUNCTIONS defined */
 
     tMacro*
 mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: makeshell.c,v 3.10 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -48,13 +48,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-#ifdef __STDC__
-
-#include "autoopts.h"
-
-#include <sys/wait.h>
-#include <time.h>
-#include <utime.h>
 
 #include "genshell.c"
 
@@ -200,7 +193,7 @@ static const char zCmdFmt[] =
 static const char zCountTest[] =
 "            if [ $%1$s_%2$s_CT -ge %3$d ] ; then\n"
 "                echo Error:  more than %3$d %2$s options >&2\n"
-"                echo \"$%s_USAGE_TEXT\"\n"
+"                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n";
 
 static const char zMultiArg[] =
@@ -211,7 +204,7 @@ static const char zMultiArg[] =
 static const char zSingleArg[] =
 "            if [ -n \"${%1$s_%2$s}\" ] ; then\n"
 "                echo Error:  duplicate %2$s option >&2\n"
-"                echo \"$%s_USAGE_TEXT\"\n"
+"                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n"
 "            OPT_NAME='%2$s'\n";
 
@@ -225,7 +218,7 @@ static const char zNoMultiArg[] =
 static const char zNoSingleArg[] =
 "            if [ -n \"${%1$s_%2$s}\" ] ; then\n"
 "                echo Error:  duplicate %2$s option >&2\n"
-"                echo \"$%s_USAGE_TEXT\"\n"
+"                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n"
 "            %1$s_%2$s='%3$s'\n"
 "            export %1$s_%2$s\n"
@@ -357,9 +350,6 @@ typedef enum { TEXTTO_TABLE COUNT_TT } teTextTo;
 
 #undef _TT_
 
-extern tOptProc doVersion;
-extern tOptProc doPagedUsage;
-extern tOptProc doLoadOpt;
 STATIC char*  pzShell   = (char*)NULL;
 STATIC char*  pzLeader  = (char*)NULL;
 STATIC char*  pzTrailer = (char*)NULL;
@@ -599,7 +589,7 @@ emitUsage( tOptions* pOpts )
         }
     }
 
-    printf( zEndPreamble, zTimeBuf, pOpts->pzPROGNAME );
+    printf( zEndPreamble, pOpts->pzPROGNAME );
 
     pOpts->pzProgPath = pOpts->pzProgName = zTimeBuf;
     textToVariable( pOpts, TT_LONGUSAGE,  (tOptDesc*)NULL );
@@ -1074,14 +1064,6 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
 
     exit( EXIT_SUCCESS );
 }
-#else
-int putShellParse( pOpts )
-    char* pOpts;
-{
-    fputs( "putShellParse disabled for pre-ANSI C\n", stderr );
-    exit( EXIT_FAILURE );
-}
-#endif
 
 /*
  * Local Variables:

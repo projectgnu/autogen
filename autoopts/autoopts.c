@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.23 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: autoopts.c,v 3.24 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -50,8 +50,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
 
 #ifndef HAVE_PATHFIND
 #  include "compat/pathfind.c"
@@ -1027,7 +1025,6 @@ filePreset( pOpts, pzFileName, direction )
     teSec   sec     = SEC_NONE;
     FILE*   fp      = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
     u_int   saveOpt = pOpts->fOptSet;
-    size_t  secNameLen;
     char    zLine[ 0x1000 ];
 
     if (fp == (FILE*)NULL)
@@ -1092,15 +1089,17 @@ filePreset( pOpts, pzFileName, direction )
             switch (sec) {
             case SEC_NONE:
                 sec = SEC_LOOKING;
-                secNameLen = strlen( pOpts->pzPROGNAME );
                 /* FALLTHROUGH */
 
             case SEC_LOOKING:
+            {
+                int secNameLen = strlen( pOpts->pzPROGNAME );
                 if (  (strncmp( pzLine+1, pOpts->pzPROGNAME, secNameLen ) != 0)
                    || (pzLine[secNameLen+1] != ']')  )
                     continue;
                 sec = SEC_PROCESS;
                 break;
+            }
 
             case SEC_PROCESS:
                 goto fileDone;

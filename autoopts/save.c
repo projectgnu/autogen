@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.11 2003/04/19 02:40:33 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.12 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -49,9 +49,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
-#include <time.h>
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
@@ -265,7 +262,7 @@ printEntry( fp, p, pzLA )
      *  THEN the char pointer is really the number
      */
     if ((p->fOptState & OPTST_NUMERIC) != 0)
-        fprintf( fp, "  %ld\n", (t_word)pzLA );
+        fprintf( fp, "  %d\n", (t_word)pzLA );
 
     /*
      *  OTHERWISE, FOR each line of the value text, ...

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.12 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.13 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -25,13 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <sys/param.h>
-#include <fcntl.h>
-
-#include "autogen.h"
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
+/*
  *  loadPseudoMacro
  *
  *  Find the start and end macro markers.  In btween we must find the

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.7 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: funcIf.c,v 3.8 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
 
 tSCC zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
 tSCC zNoIfExpr[] = "expressionless IF";
@@ -240,7 +237,6 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
     return pRet;
 }
 
-#endif /* DEFINE_LOAD_FUNCTIONS defined */
 
 typedef struct if_stack tIfStack;
 struct if_stack {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.16 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.17 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -24,11 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <sys/param.h>
-#include <fcntl.h>
-
-#include "autogen.h"
 
 static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
@@ -185,7 +180,6 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
         } while (--ct > 0);
     }
 
- findFileReturnFailure:
     res = FAILURE;
 
  findFileReturn:
@@ -360,7 +354,6 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      *  The template file must really be a file.
      */
     {
-        char* pz;
         struct stat stbf;
         if (stat( zRealFile, &stbf ) != 0)
             AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile,

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: funcCase.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -24,11 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
-
-#include REGEX_HEADER
 
 #undef  IS_LOW
 #define IS_LOW(c)  (((c) <= 'z') && ((c) >= 'a'))
@@ -690,7 +685,7 @@ Select_Match_Full( char* pzText, char* pzMatch )
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match full re" );
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
-            fprintf( pfTrace, "Compiling ``%s'' with bits 0x%X\n",
+            fprintf( pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
                      pzMatch, pCurMacro->res );
         }
         compile_re( pRe, pzMatch, pCurMacro->res );
@@ -934,10 +929,6 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
 
     return pEnd;
 }
-
-#endif /* DEFINE_LOAD_FUNCTIONS */
-
-#include REGEX_HEADER
 
 /*
  *  This is global data used to keep track of the current CASE

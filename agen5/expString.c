@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.12 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expString.c,v 3.13 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -25,13 +25,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
-
-#ifndef HAVE_STRFTIME
-#  include "compat/strftime.c"
-#endif
-
 
 STATIC SCM
 makeString( tCC*    pzText,

@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.9 2003/04/19 02:40:34 bkorb Exp $
+ *  $Id: getdefs.c,v 3.10 2003/04/21 03:35:35 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
- *  Time-stamp:        "2003-04-18 19:25:14 bkorb"
+ *  Time-stamp:        "2003-04-20 19:49:14 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -150,7 +150,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
 {
     char*  pzMatch;
     size_t len = strlen( pzDef );
-    long   idx;
+    int    idx;
 
     /*
      *  Make the source text all lower case and map
@@ -503,11 +503,8 @@ compar_defname( const void* p1, const void* p2 )
 {
     char* pzS1 = *(char**)p1;
     char* pz1  = strstr( pzS1, zNameTag );
-    char* pe1;
     char* pzS2 = *(char**)p2;
     char* pz2  = strstr( pzS2, zNameTag );
-    char* pe2;
-    int   res;
 
     if (pz1 == (char*)NULL) {
         if (strncmp( *(char**)p1, zGlobal, sizeof( zGlobal )-1 ) == 0)
@@ -804,7 +801,7 @@ processFile( char* pzFile )
          */
         if (matches[1].rm_so == -1) {
             char* pz;
-            char  ch;
+            char  ch = NUL;
 
             pzDef = pzScan + matches[0].rm_so;
             if (strlen( pzDef ) > 30) {
@@ -812,10 +809,10 @@ processFile( char* pzFile )
                 ch  = *pz;
                 *pz = NUL;
             } else
-                pz = (char*)NULL;
+                ch  = NUL;
 
             fprintf( stderr, zNoSubexp, pzFile, lineNo, pzDef );
-            if (pz != (char*)NULL)
+            if (ch != NUL)
                 *pz = ch;
             continue;
         }
@@ -922,7 +919,7 @@ setFirstIndex( void )
             if (*pzOld != '[') {
                 pzNew = (char*)malloc( strlen( pzOld ) + nmLn + 10 );
                 sprintf( pzNew, "%s[%d]%s", zNm,
-                         OPT_VALUE_FIRST_INDEX, pzOld );
+                         (int)OPT_VALUE_FIRST_INDEX, pzOld );
                 free( (void*)(*ppz) );
                 *ppz = pzNew;
             }
@@ -969,7 +966,7 @@ startAutogen( void )
             pz = pzBase + 2;
             while (isalnum( *pzS ) || (*pzS == '_'))
                 *pz++ = *pzS++;
-            if (pz = pzBase + 2) {
+            if (pz == pzBase + 2) {
                 free( pzBase );
                 pzBase = NULL;
             }
@@ -1019,8 +1016,6 @@ startAutogen( void )
         case INDEX_OPT_OUTPUT:
         {
             tSCC   zFileFmt[] = " *      %s\n";
-            const char* pzFmt;
-
             FILE*  fp;
 
             if (strcmp( OPT_ARG( OUTPUT ), "-") == 0)

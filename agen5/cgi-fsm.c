@@ -209,9 +209,11 @@ cgi_run_fsm(
         /* START == FIND TRANSITION == DO NOT CHANGE THIS COMMENT */
 
         char  curCh;
-        if (--inlen < 0)
+        if (--inlen < 0) {
             trans_evt = CGI_EV_END;
-        else {
+            curCh = NUL;
+
+        } else {
             if (outlen < 4) {
                 strcpy( pzOut, "output space exhausted\n" );
                 return CGI_ST_INVALID;

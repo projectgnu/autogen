@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.17 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: agShell.c,v 3.18 2003/04/21 03:35:34 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -23,14 +23,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
-#include <fcntl.h>
-#include <signal.h>
-
-#if HAVE_SYS_PROCSET_H
-#  include <sys/procset.h>
-#endif
 
 #ifndef SHELL_ENABLED
  void closeServer( void ) { }
@@ -330,6 +322,8 @@ chainOpen( int       stdinFd,
     execvp( (char*)pzShell, (char**)ppArgs );
     AG_ABEND( aprf( "Could not execvp( '%s', ... ):  %d - %s\n",
                     pzShell, errno, strerror( errno )));
+    /* NOTREACHED */
+    return -1;
 }
 
 

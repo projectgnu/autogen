@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-03 17:21:40 bkorb"
+## Time-stamp:      "2003-04-20 17:23:05 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.18 2003/04/04 04:44:53 bkorb Exp $
+## $Id: Makefile.am,v 3.19 2003/04/21 03:35:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -29,14 +29,14 @@ pkgdata_DATA	= stdoptions.def \
     aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
     options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 
-GENSRC		= genshell.c genshell.h
 HDRS        = autoopts.h options.h  streqv.h
 CSRC        = \
 	autoopts.c boolean.c enumeration.c makeshell.c \
 	numeric.c  pgusage.c putshell.c    restore.c   \
 	save.c     stack.c   streqvcmp.c   usage.c     version.c
+ALLSRC		= genshell.c genshell.h $(CSRC)
 
-EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING $(man_MANS) options_h.tpl \
+EXTRA_DIST	= $(pkgdata_DATA) $(ALLSRC) COPYING $(man_MANS) options_h.tpl \
 	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def
 
 m4datadir	= $(datadir)/aclocal
@@ -46,7 +46,8 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
 ##  It is compiled as a part of the makeshell module.
 ##
-libopts_la_SOURCES = $(HDRS) $(CSRC)
+nodist_libopts_la_SOURCES = libopts.c
+libopts_la_SOURCES = $(HDRS)
 
 libopts_la_LIBADD  = ../snprintfv/libsnprintfv.la
 libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ -lm
@@ -58,6 +59,9 @@ libguileopts_la_LDFLAGS  = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 bin_SCRIPTS	= autoopts-config
 
 include_HEADERS = options.h
+
+libopts.c : autoopts.h $(CSRC)
+	( for f in autoopts.h $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
 genshell.c : genshell.def

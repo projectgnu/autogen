@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.2 2003/02/16 00:04:39 bkorb Exp $
+# $Id: directive.tpl,v 3.3 2003/04/21 03:35:34 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -11,6 +11,7 @@ h =]
 [=(gpl "AutoGen" " *  ")=]
  */
 [=(make-header-guard "directive")=]
+#ifdef DEFINING
 
 typedef char* (tDirProc)( char* pzArg, char* pzScan );
 
@@ -50,7 +51,7 @@ FOR directive , =]
 ENDFOR directive=]
 } teDirectives;
 
-#define DIRECTIVE_CT  [= (+ ( high-lim "directive") 1) =]
+#define DIRECTIVE_CT  [= (+ (high-lim "directive") 1) =]
 static tDirTable dirTable[ DIRECTIVE_CT ] = {[=
 FOR directive , =]
     { sizeof( z[=% name (string-capitalize! (sprintf "%%-14s" "%s )-1,"))
@@ -60,7 +61,7 @@ FOR directive , =]
   ELSE =][=% name (string-downcase! (sprintf "%%-10s" "%s,")) =][=
   ENDIF=]0 }[=
 ENDFOR directive=] };
-
+#endif /* DEFINING */
 #endif /* [=(. header-guard)=] */[= #
 
 end of directive.tpl  =]

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: numeric.c,v 3.4 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: numeric.c,v 3.5 2003/04/21 03:35:35 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -50,8 +50,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
 
 /*
  *  The value is true, unless it starts with 'n' or 'f' or "#f" or

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.6 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -52,8 +52,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "autoopts.h"
 
 /*
  * This array is designed for mapping upper and lower case letter
@@ -141,16 +139,8 @@ streqvcmp( s1, s2 )
 }
 
 
-#ifdef __STDC__
 void
 streqvmap( char From, char To, int ct )
-#else
-void
-streqvmap( From, To, ct )
-    char From;
-    char To;
-    int  ct;
-#endif
 {
     if (ct == 0) {
         ct = sizeof( charmap ) - 1;
@@ -162,7 +152,6 @@ streqvmap( From, To, ct )
     else {
         int  chTo   = (int)To   & 0xFF;
         int  chFrom = (int)From & 0xFF;
-        int  delta  = chTo - chFrom;
 
         do  {
             charmap[ chFrom ] = (unsigned)chTo;
@@ -426,8 +415,10 @@ aopts_strdup( tCC* pz, tCC* pzWhat )
 
     return pzRes;
 }
+
 #endif /* MEMDEBUG */
 #endif /* AUTOGEN_BUILD */
+
 /*
  * Local Variables:
  * mode: C

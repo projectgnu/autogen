@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expGperf.c,v 3.10 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -23,8 +23,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
 
 tSCC zMakeGperf[] =
 "gperf_%2$s=.ZZPURGE.$$/%2$s\n"
@@ -162,11 +160,9 @@ ag_scm_make_gperf( SCM name, SCM hlist )
     SCM
 ag_scm_gperf( SCM name, SCM str )
 {
-    ag_bool mustFree = AG_FALSE;
-    int     nameLen, strLen;
     char*   pzCmd;
-    char*   pzStr    = ag_scm2zchars( str,  "key-to-hash" );
-    char*   pzName   = ag_scm2zchars( name, "gperf name" );
+    char*   pzStr  = ag_scm2zchars( str,  "key-to-hash" );
+    char*   pzName = ag_scm2zchars( name, "gperf name" );
 
     /*
      *  Format the gperf command and check the result.  If it fits in

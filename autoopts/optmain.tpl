@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.8 2003/04/04 04:44:54 bkorb Exp $
+# $Id: optmain.tpl,v 3.9 2003/04/21 03:35:35 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -345,6 +345,7 @@ DEFINE range-option-code
 
     [=(. UP-prefix)=]USAGE( EXIT_FAILURE );
     /* NOTREACHED */
+    return;
 
   valid_return:
     pOptDesc->pzLastArg = (char*)val;[=

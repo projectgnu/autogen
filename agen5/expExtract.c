@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.7 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expExtract.c,v 3.8 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -24,8 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
 
 /*
  *  loadExtractData
@@ -91,7 +89,7 @@ loadExtractData( const char* pzNewFile )
             size_t sz = fread( pzIn, 1, sbuf.st_size, fp );
             if (sz == 0) {
                 fprintf( stderr, "Error %d (%s) reading %d bytes of %s\n",
-                         errno, strerror( errno ), sbuf.st_size, pzFile );
+                         errno, strerror( errno ), (int)sbuf.st_size, pzFile );
                 AG_ABEND( "read failure" );
             }
 

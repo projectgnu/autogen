@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.14 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: autogen.h,v 3.15 2003/04/21 03:35:34 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -32,6 +32,8 @@
 #include "expr.h"
 #include "autoopts/autoopts.h"
 #include "streqv.h"
+
+#include "cgi-fsm.h"
 
 #define STATE_TABLE           /* set up `atexit' and load Guile   */  \
     _State_( INIT )           /* processing command line options  */  \
@@ -90,7 +92,7 @@ typedef tHdlrProc* tpHdlrProc;
 #include "functions.h"
 
 #define TEMPLATE_REVISION     1
-#define TEMPLATE_MAGIC_MARKER {{'A', 'G', 'L', 'B'}, \
+#define TEMPLATE_MAGIC_MARKER {{{'A', 'G', 'L', 'B'}}, \
                                TEMPLATE_REVISION, FUNCTION_CKSUM }
 
 struct template_lib_marker {
@@ -327,6 +329,7 @@ MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( NotStr,    "ERROR: %s is not a string\n" );
 MKSTRING( DevNull,   "/dev/null" );
 MKSTRING( ShellEnv,  "SHELL" );
+MKSTRING( Nil,       "" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

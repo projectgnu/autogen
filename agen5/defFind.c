@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.10 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: defFind.c,v 3.11 2003/04/21 03:35:34 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
-#include <assert.h>
 
 struct defEntryList {
     size_t         allocCt;
@@ -191,8 +188,6 @@ badName( char* pzD, const char* pzS, size_t srcLen )
 EXPORT int
 canonicalizeName( char* pzD, const char* pzS, int srcLen )
 {
-    tSCC zNil[] = "";
-
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
         CN_NAME_ENDED,       /* must find '[' or '.' or we end */

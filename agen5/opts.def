@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.19 2003/04/13 21:42:13 bkorb Exp $
+ *   $Id: opts.def,v 3.20 2003/04/21 03:35:35 bkorb Exp $
  *
  *  AutoGen copyright 1992-2003 Bruce Korb
  *
@@ -310,7 +310,6 @@ flag = {
 	    }
 	    proc = (init_proc_t*)dlsym( hdl, "scm_init" );
 	    if (proc == NULL) {
-	        const char* pzErr = dlerror();
 	        fprintf( stderr, "dlsym(scm_init) not found in %s\n"
 	                 "\tyou must initialize the library yourself\n",
 	                 pOptDesc->pzLastArg );

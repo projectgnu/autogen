@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expState.c,v 3.10 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -25,12 +25,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "autogen.h"
-
-#ifndef HAVE_STRFTIME
-#  include "compat/strftime.c"
-#endif
 
 STATIC int     entry_length(   char* pzName );
 STATIC int     count_entries(  char* pzName );

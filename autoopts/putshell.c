@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: putshell.c,v 3.10 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -49,9 +49,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#ifdef __STDC__
-#include "autoopts.h"
 
 /*
  *  Make sure embedded single quotes come out okay
@@ -200,7 +197,7 @@ putBourneShell( tOptions* pOpts )
                 || (pOD->pzLastArg[0] == NUL) )
 
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    pOD->optOccCt );
+                    (int)pOD->optOccCt );
 
         /*
          *  This option has a text value
@@ -212,14 +209,7 @@ putBourneShell( tOptions* pOpts )
         }
     } while (++optIx < pOpts->presetOptCt );
 }
-#else
-int putBourneShell( pOpts )
-    char* pOpts;
-{
-    fputs( "putBourneShell disabled for pre-ANSI C\n", stderr );
-    exit( EXIT_FAILURE );
-}
-#endif
+
 /*
  * Local Variables:
  * mode: C

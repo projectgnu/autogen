@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: functions.c,v 3.15 2003/04/21 03:35:35 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#ifndef DEFINE_LOAD_FUNCTIONS
-
-#include "autogen.h"
 
 tSCC zCantInc[] = "cannot include file";
 tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
@@ -175,7 +172,7 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
         }
 
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf( pfTrace, "\tcode %X -- %s\n", pMac->res, pzExpr );
+            fprintf( pfTrace, "\tcode %lX -- %s\n", pMac->res, pzExpr );
     }
 
     return mFunc_Expr( pT, pMac );
@@ -214,7 +211,6 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
     return pMac + 1;
 }
 
-#endif /* DEFINE_LOAD_FUNCTIONS defined */
 
 /*=macfunc COMMENT
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.15 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expPrint.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -28,14 +28,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <signal.h>
-
-#ifndef HAVE_STRSIGNAL
-#  include <compat/strsignal.c>
-#endif
-
-#include "autogen.h"
 
 STATIC sigjmp_buf printJumpEnv;
 STATIC void   printFault( int sig );
@@ -287,7 +279,6 @@ ag_scm_hide_email( SCM display, SCM eaddr )
 
     {
         char* pz = SCM_CHARS( res );
-        char* p  = pz;
 
         strcpy( pz, zStrt );
         pz += sizeof( zStrt ) - 1;
@@ -320,7 +311,7 @@ ag_scm_hide_email( SCM display, SCM eaddr )
  *         "arguments to provide for in the macro. e.g. for this extraction\n"
  *         "text:\n"
  *         "@example\n\n"
- *         " /*=fumble bumble\n"
+ *         " /" "*=fumble bumble\n"
  *         "  * fmt: 'stumble %s: %d\\n'\n"
  *         " =*" "/\n"
  *         "@end example\n\n"

@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-02-03 11:55:38 bkorb"
+## Time-stamp:      "2003-04-20 17:58:22 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.21 2003/04/11 21:40:23 bkorb Exp $
+## $Id: Makefile.am,v 3.22 2003/04/21 03:35:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -35,12 +35,10 @@ man_MANS     = autogen.1
 
 MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 
-EXTRA_DIST = $(GEN_CSRC) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
-
 bin_PROGRAMS = autogen
 
-autogen_SOURCES = $(GEN_CSRC) \
-  agCgi.c       agShell.c     agUtils.c     agUtils.h     autogen.c  \
+CSRC = \
+  autogen.c     agCgi.c       agShell.c     agUtils.c     agUtils.h  \
   autogen.h     defDirect.c   defFind.c     defLex.c      defLoad.c  \
   defParse.y    defReduce.c   expExtract.c  expFormat.c   expGperf.c \
   expGuile.c    expMake.c     expOutput.c   expPrint.c    expState.c \
@@ -48,6 +46,10 @@ autogen_SOURCES = $(GEN_CSRC) \
   funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
   tpParse.c     tpProcess.c
 
+EXTRA_DIST = $(CSRC) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
+
+nodist_autogen_SOURCES = ag.c
+autogen_SOURCES = defParse.y $(GEN_CSRC)
 autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
@@ -60,11 +62,12 @@ AM_YFLAGS = -d
 
 all : @AGEXE@
 
+ag.c : $(CSRC)
+	(for f in $(CSRC) ; do case "$$f" in *.c ) \
+	  echo "#include \"$$f\"" ; esac ; done) > $@
+
 ##  This is a LIE:  only defLex.o depends upon defParse.h.  However, automake
-##  is too bloody stupid to be able to cope with that and they don't provide
-##  you with another way to make the dependency explicit.  Well, okay, this
-##  doesn't cost much other than the cost of non-obvious screwing around
-##  to make it work correctly and not squawk.
+##  is unable to cope with that and they don't provide another way to do it.
 ##
 $(autogen_OBJECTS) : defParse.h defParse.c
 

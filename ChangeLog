@@ -1,3 +1,9 @@
+2003-04-20  Bruce Korb  <bkorb@gnu.org>
+
+	* */*.[ch]: warning patrol
+	* */Makefile.am: speed up:  use monolithic compilations
+	(speeds build + speeds execution)
+
 2003-04-18  Bruce Korb  <bkorb@gnu.org>
 
 	* */*.[ch]: retag the ending of source files.

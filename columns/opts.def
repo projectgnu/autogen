@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.5 2003/02/16 00:04:40 bkorb Exp $
+ *   $Id: opts.def,v 3.6 2003/04/21 03:35:35 bkorb Exp $
  */
 
 /*
@@ -216,6 +216,7 @@ flag = {
 
 include = "#include <stdio.h>\n"
           "#include <errno.h>\n"
+          "#include <string.h>\n"
           "#ifdef HAVE_CONFIG_H\n"
           '#  include "config.h"'  "\n"
           "#endif\n";

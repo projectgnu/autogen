@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.9 2003/04/19 02:40:34 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.10 2003/04/21 03:35:35 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -29,6 +29,7 @@
 #include <libxml/tree.h>
 
 #include "xmlopts.h"
+#include <string.h>
 
 tSCC zConflict[] =
     "the file name operand conflicts with the definitions option.\n";
@@ -88,7 +89,7 @@ printHeader( xmlDocPtr pDoc );
 STATIC void
 printAttrs( xmlAttrPtr pAttr );
 
-STATIC int
+STATIC void
 printNode( xmlNodePtr pNode );
 
 STATIC void
@@ -96,6 +97,8 @@ printChildren( xmlNodePtr pNode );
 
 /* = = = END-STATIC-FORWARD = = = */
 #define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
+
+extern void forkAutogen( char* pzInput );
 
 
 int
@@ -212,7 +215,6 @@ STATIC char*
 trim( const char* pzSrc, size_t* pSz )
 {
     static char z[ 4096 * 16 ];
-    size_t len;
     const char* pzEnd;
 
     if (pzSrc == NULL) {
@@ -329,7 +331,7 @@ printAttrs( xmlAttrPtr pAttr )
 }
 
 
-STATIC int
+STATIC void
 printNode( xmlNodePtr pNode )
 {
     switch (pNode->type) {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.8 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expGuile.c,v 3.9 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -25,15 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include "autogen.h"
-
-#ifndef HAVE_STRFTIME
-#  include "compat/strftime.c"
-#endif
-
-
-
-    teGuileType
+teGuileType
 gh_type_e( SCM typ )
 {
     if (gh_boolean_p( typ ))

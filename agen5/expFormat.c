@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.15 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: expFormat.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -103,19 +103,12 @@ static const char zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-#include "autogen.h"
-
-#ifndef HAVE_STRFTIME
-#  include "compat/strftime.c"
-#endif
-
 tSCC zOwnLen[]  = "owner length";
 tSCC zPfxLen[]  = "prefix length";
 tSCC zProgLen[] = "program name length";
 tSCC zPfxMsg[]  = "%s may not exceed %d chars\n";
 
 tSCC zFmtAlloc[] = "asprintf allocation";
-tSCC zNil[]      = "";
 
 /*=gfunc dne
  *
@@ -274,7 +267,7 @@ ag_scm_error( SCM res )
         unsigned long val = gh_scm2ulong( res );
         if (val == 0)
             abort = PROBLEM;
-        snprintf( zNum, sizeof( zNum ), "%d", val );
+        snprintf( zNum, sizeof( zNum ), "%d", (int)val );
         pzMsg = zNum;
         break;
     }
@@ -351,7 +344,6 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
     char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
     char*   pzRes;
     SCM     res;
-    int     len;
 
     /*
      *  Get the addresses of the program name and prefix strings.
@@ -451,7 +443,6 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
     char*   pzOwner = ag_scm2zchars( owner, "owner" );
     char*   pzRes;
     SCM     res;
-    int     len;
 
     if (! (   gh_string_p( prog_name )
            && gh_string_p( owner )
@@ -511,7 +502,6 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 
     char*     pzRes;
     SCM       res;
-    int       len;
 
     if (! gh_string_p( license ))
         return SCM_UNDEFINED;

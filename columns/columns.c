@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.4 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: columns.c,v 3.5 2003/04/21 03:35:35 bkorb Exp $
  */
 
 /*
@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,11 +139,11 @@ main( int    argc,
 }
 
 
-    int
+int
 handleIndent( char* pzIndentArg )
 {
     char* pz;
-    long  colCt = strtol( pzIndentArg, &pz, 0 );
+    int   colCt = strtol( pzIndentArg, &pz, 0 );
 
     /*
      *  IF the indent argument is a number
@@ -216,7 +217,6 @@ handleIndent( char* pzIndentArg )
 readLines( void )
 {
     int   sepLen;
-    char* pzText;
 
     if (HAVE_OPT( SEPARATION ))
          sepLen = strlen( OPT_ARG( SEPARATION ));

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.21 2003/04/19 02:40:33 bkorb Exp $
+ *  $Id: autogen.c,v 3.22 2003/04/21 03:35:34 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,12 +25,8 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <sys/types.h>
 #define DEFINING
 #include "autogen.h"
-#include <sys/wait.h>
-#include <signal.h>
-#include <assert.h>
 
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)\n"
@@ -379,6 +375,11 @@ signalSetup( void )
         sigaction( sigNo,  &sa, NULL );
     } while (++sigNo < NSIG);
 }
+
+#ifndef HAVE_STRFTIME
+#  include "compat/strftime.c"
+#endif
+
 /*
  * Local Variables:
  * mode: C
