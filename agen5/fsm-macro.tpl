@@ -250,12 +250,13 @@ FOR   transition              =][=
      ;;  This transition applies for all transitions in a certain state
      ;;
      (set! tst  (string-upcase! (get "tst")))
-     (set! ttype (string-downcase! (if (exist? "ttype")
-           (get "ttype") (string-append tst "_${f}")  )))
+     (set! ttype (if (exist? "ttype")
+           (string-upcase! (get "ttype")) (string-append tst "_${f}")  ))
 
      (set! tr_name (if (=* (get "method") "call")
                    (string-downcase! (string-append "&" pfx "_do_" ttype))
-                   (string-upcase!   (string-append PFX "_TR_" ttype))  ))
+                   (string-append PFX "_TR_" ttype)  ))
+
      (set! next (if (exist? "next") (string-upcase! (get "next")) tst))
 
      (shellf

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.5 2002/09/29 00:16:20 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.6 2002/11/08 16:56:57 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -257,7 +257,7 @@ printEntry( fp, p, pzLA )
     /*
      *  There is an argument.  Pad the name so values line up
      */
-    fprintf( fp, "%-18s  ",
+    fprintf( fp, "%-18s",
              (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
 
     /*
@@ -265,12 +265,16 @@ printEntry( fp, p, pzLA )
      *  THEN the char pointer is really the number
      */
     if ((p->fOptState & OPTST_NUMERIC) != 0)
-        fprintf( fp, "%ld\n", (t_word)pzLA );
+        fprintf( fp, "  %ld\n", (t_word)pzLA );
 
     /*
      *  OTHERWISE, FOR each line of the value text, ...
      */
+    else if (pzLA == NULL)
+        fputc( '\n', fp );
+
     else {
+        fputc( ' ', fp ); fputc( ' ', fp );
         for (;;) {
             char* pzNl = strchr( pzLA, '\n' );
 
@@ -435,7 +439,12 @@ optionSaveFile( pOpts )
             case OPTST_ENUMERATION:
             {
                 int enumVal = (int)(p->pzLastArg);
-                (*(p->pOptProc))( (tOptDesc*)2UL, pOD );
+                /*
+                 *  This is a magic incantation that will convert the
+                 *  enumeration value back into a string suitable for printing.
+                 *  We restore the numeric value after printing.
+                 */
+                (*(p->pOptProc))( (tOptDesc*)2UL, p );
                 printEntry( fp, p, p->pzLastArg );
                 p->pzLastArg = (char*)enumVal;
                 break;

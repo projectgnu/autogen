@@ -1,3 +1,6 @@
+New in 5.4.8 - November 10, 2002
+* Freed AutoOpts from libguile.  It was never really dependent.
+
 New in 5.4.4 5.4.3 and 5.4.2
 * The libopts.tar.gz file is now installed
 * Miscelleaneous option state saving bugs were fixed

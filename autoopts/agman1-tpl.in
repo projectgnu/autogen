@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-08-18 19:45:16 bkorb"
+## Time-stamp:      "2002-11-07 08:49:38 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.15 2002/08/19 02:51:14 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.16 2002/11/08 16:56:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -25,14 +25,16 @@ AutoGen5 template man=%s.1
 ;; The following "dne" argument is a string of 5 characters:
 ;; '.' '\\' '"' and two spaces.  It _is_ hard to read.
 ;;
-(dne ".\\\"  ")
+(dne ".\\\"  ") :+][+:  # balance quotes for emacs: "
 
 :+]
 .\"
 .SH NAME
 [+: % prog_name (string-downcase! "%s") :+] \- [+:prog_title:+]
 .SH SYNOPSIS
-.B [+: (string-downcase! (get "prog_name"))
+.B [+:
+  (define use-flags (if (exist? "flag.value") #t #f))
+  (string-downcase! (get "prog_name"))
 :+][+:
     ;; * * * * * * * * * * * * * * * * * * * * * * * * *
     ;;
@@ -64,9 +66,8 @@ sed \
  -e 's/``\([a-zA-Z0-9:~=_ -]*\)'"''"'/\\fI\1\\fP/g' \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 [+:
-  IF (define named-mode (not (or (exist? "flag.value")
-                                 (exist? "long_opts") )))
-     (exist? "flag.value")  :+][+:
+  IF (define named-mode (not (or use-flags (exist? "long_opts") )))
+     use-flags  :+][+:
 
     IF (exist? "long_opts") :+][+:
 
@@ -111,7 +112,7 @@ All arguments are named options.[+:
 .br
 .in +8
 [+:argument:+][+:
-  ELIF (or (exist? "long_opts") (exist? "flag.value")) :+]
+  ELIF (or (exist? "long_opts") use-flags) :+]
 .PP
 All arguments must be options.[+:
   ENDIF :+][+:
@@ -282,9 +283,6 @@ This option is enabled by default.[+:ENDIF:+][+:
       IF (exist? "no_preset") :+]
 This option may not be preset with environment variables
 or in initialization (rc) files.[+:ENDIF:+][+:
-      IF (exist? "arg-default") :+]
-The default [+:(. opt-arg):+] for this opton is \fI[+: arg-default :+]\fP.[+:
-      ENDIF:+][+:
       IF (and (exist? "default") named-mode) :+]
 This option is the default option.[+:
       ENDIF:+][+:
@@ -296,6 +294,11 @@ This opton must appear in combination with the following options:
       IF (exist? "flags_cant") :+]
 This option must not appear in combination with any of the following options:
 [+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:
+      ENDIF:+][+:
+      IF (exist? "arg-default") :+]
+The default [+:(. opt-arg):+] for this opton is:
+.ti +4
+[+: arg-default :+][+:
       ENDIF:+]
 .sp
 [+: doc :+][+:
@@ -307,28 +310,51 @@ ENDFOR flag
 
 :+]
 .TP
-.BR [+:IF (exist? "flag.value") :+]\-[+: ?% help-value "%s" "?" :+] , " --[+:
-      ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]help
+.BR [+:
+
+  IF (. use-flags)  :+]\-[+: ?% help-value "%s" "?" :+][+:
+     IF (exist? "long-opts") :+] , " \--help"[+: ENDIF :+][+:
+  ELSE   :+][+:
+     IF (exist? "long-opts") :+]\--[+: ENDIF :+]help[+:
+  ENDIF  :+]
 Display usage information and exit.
 .TP
-.BR [+:IF (exist? "flag.value") :+]-[+: ?% more-help-value "%s" "!" :+] , " --[+:
-      ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]more-help
+.BR [+:
+
+  IF (. use-flags)  :+]\-[+: ?% more-help-value "%s" "!" :+][+:
+     IF (exist? "long-opts") :+] , " \--more-help"[+: ENDIF :+][+:
+  ELSE   :+][+:
+     IF (exist? "long-opts") :+]\--[+: ENDIF :+]more-help[+:
+  ENDIF  :+]
 Extended usage information passed thru pager.[+:
 
 
 IF (exist? "homerc") :+]
 .TP
-.BR [+: IF (exist? "flag.value") :+]-[+: ?% save-opts-value "%s" ">" :+] " \fIrcfile\fP, --" [+:
-      ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]save-opts "[=\fIrcfile\fP]
+.BR [+:
+
+  IF (. use-flags)  :+]\-[+: ?% save-opts-value "%s" ">"
+     :+] " [\fIrcfile\fP][+:
+     IF (exist? "long-opts") :+]," " \--save-opts" "[=\fIrcfile\fP][+:
+     ENDIF :+]"[+:
+  ELSE     :+][+:
+     IF (exist? "long-opts") :+]\--[+:
+     ENDIF :+]save-opts "[=\fIrcfile\fP]"[+:
+  ENDIF    :+]
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 rc file listed in the \fBOPTION PRESETS\fP section, below.
 .TP
-.BR [+: IF (exist? "flag.value") :+]-[+: ?% load-opts-value "%s" "<" :+] " \fIrcfile\fP, --" [+:
-      ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]load-opts "=\fIrcfile\fP", " \fB--no-load-opts\fP"
+.BR [+:
+
+  IF (. use-flags)  :+]\-[+: ?% load-opts-value "%s" "<"
+     :+] " \fIrcfile\fP[+:
+     IF (exist? "long-opts")
+           :+]," " \--load-opts" "=\fIrcfile\fP," " --no-load-opts[+:
+     ENDIF :+]"[+:
+  ELSE     :+][+:
+     IF (exist? "long-opts") :+]\--[+:
+     ENDIF :+]load-opts "=\fIrcfile\fP," " --no-load-opts"[+:
+  ENDIF    :+]
 Load options from \fIrcfile\fP.
 The \fIno-load-opts\fP form will disable the loading
 of earlier RC/INI files.  \fI--no-load-opts\fP is handled early,
@@ -338,8 +364,16 @@ ENDIF (exist? "homerc") :+][+:
 
 IF (exist? "version") :+]
 .TP
-.BR [+:  IF (exist? "flag.value") :+]\-v " \fI[v|c|n]\fP, " --[+:
-      ELIF (exist? "long_opt") :+]--[+:ENDIF:+]version "\fI[=v|c|n]\fP"
+.BR [+:
+
+  IF (. use-flags)  :+]\-[+: ?% version-value "%s" "v"
+     :+] " [{\fIv|c|n\fP}][+:
+     IF (exist? "long-opts") :+]," " \--version" "[=\fI{v|c|n}\fP][+:
+     ENDIF :+]"[+:
+  ELSE     :+][+:
+     IF (exist? "long-opts") :+]\--[+:
+     ENDIF :+]version "[=\fI{v|c|n}\fP]"[+:
+  ENDIF    :+]
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.[+:
