@@ -1,7 +1,0 @@
-#! /bin/sh
-
-#  This script rebuilds sources not kept in the CVS repository.
-#  These files are distributed, so it is not necessary to invoke
-#  AutoGen before building AutoGen.  (Like I had to do long ago :)
-
-AutoGen -L ../autoopts opts.def
