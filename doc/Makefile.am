@@ -6,9 +6,9 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2002/02/05 02:23:22 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2002/03/02 01:46:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,6 +26,7 @@ EXTRA_DIST	= auto_gen.tpl autogen.info LSM.tpl \
 		snprintfv.texi snprintfv.menu compete.def compete.tpl
 
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
+DISTCLEANFILES = autogen.lsm
 
 AGSRCDIR	= $(top_srcdir)/agen5
 
