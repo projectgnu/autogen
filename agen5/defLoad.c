@@ -1,6 +1,7 @@
 /*
- *  agGetDef.c
- *  $Id: defLoad.c,v 1.4 2000/03/05 20:58:13 bruce Exp $
+ *  defLoad.c
+ *
+ *  $Id: defLoad.c,v 1.5 2000/03/11 01:49:24 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -308,7 +309,7 @@ readDefines( void )
     else if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
         OPT_ARG( DEFINITIONS )  = "stdin";
         outTime  = time( (time_t*)NULL );
-        sizeLeft = dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
+        dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
     }
 
@@ -335,7 +336,7 @@ readDefines( void )
          *  the mod time on this file.  If any of the template files
          *  are more recent, then it will be adjusted.
          */
-        sizeLeft = dataSize = stbf.st_size;
+        dataSize = stbf.st_size;
         outTime  = stbf.st_mtime + 1;
         useStdin = AG_FALSE;
     }
@@ -343,12 +344,16 @@ readDefines( void )
     /*
      *  Allocate the space we need for our definitions.
      */
-    pBaseCtx = (tScanCtx*)AGALOC( dataSize+4+sizeof( *pBaseCtx ));
+    sizeLeft = dataSize+4+sizeof( *pBaseCtx );
+    pBaseCtx = (tScanCtx*)AGALOC( sizeLeft );
     if (pBaseCtx == (tScanCtx*)NULL) {
         fprintf( stderr, zAllocErr, pzProg,
                  dataSize+4+sizeof( *pBaseCtx ), "file buffer" );
         AG_ABEND;
     }
+    memset( (void*)pBaseCtx, 0, sizeLeft );
+    pBaseCtx->lineNo = 1;
+    sizeLeft = dataSize;
 
     /*
      *  Our base context will have its currency pointer set to this
@@ -364,7 +369,8 @@ readDefines( void )
     /*
      *  Set the input file pointer, as needed
      */
-    fp = useStdin ? stdin : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
+    fp = useStdin ? stdin
+                  : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
     if (fp == (FILE*)NULL) {
         fprintf( stderr, "%s ERROR %d (%s):  cannot open %s\n",
                  pzProg, errno, strerror( errno ),

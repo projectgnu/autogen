@@ -1,7 +1,7 @@
 
 /*
- *  agDirect.c
- *  $Id: defDirect.c,v 1.3 2000/03/05 20:58:13 bruce Exp $
+ *  defDirect.c
+ *  $Id: defDirect.c,v 1.4 2000/03/11 01:49:29 bruce Exp $
  *  This module processes definition file directives.
  */
 
@@ -602,6 +602,8 @@ doDir_include( char* pzArg, char* pzScan )
                      sz, "include def header" );
             AG_ABEND;
         }
+        memset( (void*)pCtx, 0, sz );
+        pCtx->lineNo = 1;
     }
 
     /*
