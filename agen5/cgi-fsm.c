@@ -44,6 +44,9 @@
  *  comments, or it will be removed the next time it is generated.
  */
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
+
+#include "autogen.h"
+
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
 #ifndef NULL
@@ -157,8 +160,10 @@ cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
     static const char zOops[] =
         "Content-type: text/plain\n\n"
         "Form processing error:\n";
-    fputs( zOops, stdout );
-    printf( zFsmErr, st, CGI_STATE_NAME( st ), evt, CGI_EVT_NAME( evt ));
+    fputs( zOops, stderr );
+    fprintf( stderr, zFsmErr, st, CGI_STATE_NAME( st ),
+             evt, CGI_EVT_NAME( evt ));
+    AG_ABEND;
     /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
 
     return EXIT_FAILURE;
