@@ -4,6 +4,16 @@
 	option is okay, too.
 	* autoopts/configfile.c: more work on it.
 	* autoopts/test/errors.test: test the consistency fix
+	* agen5/autogen.c(doneCheck): run any 'shell-cleanup's
+	* agen5/autogen.h(fmemopen): rename to ag_fmemopen
+	* agen5/expGperf.c: append gperf cleanup stuff to 'shell-cleanup'
+	* agen5/expOutput.c: rename of fmemopen
+	* agen5/fmemopen.c: reworked
+	* agen5/schemedef.scm(shell-cleanup): new text SCM variable
+	* README: with-libguile-link and not with-libguile-libdir
+	* agen5/agShell.c(zTrap): move to directive.tpl and rename
+	* agen5/directive.tpl(zShellInit): write as a straight-up shell script
+	and use the "c-string" macro to convert into a C initialization string.
 
 2004-02-20  Bruce Korb  <bkorb@gnu.org>
 

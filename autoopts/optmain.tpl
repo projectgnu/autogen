@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.9 2005/02/20 02:15:48 bkorb Exp $
+# $Id: optmain.tpl,v 4.10 2005/04/02 09:03:51 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-14 08:22:12 bkorb"
+# Time-stamp:      "2005-04-01 11:58:25 bkorb"
 
 =][=
 
@@ -657,7 +657,8 @@ static tOptProc
   IF (. make-test-main)   =][=
 
     FOR     flag          =][=
-      IF (not (= (hash-ref cb-proc-name   flg-name)
+      IF (set! flg-name (get "name"))
+         (not (= (hash-ref cb-proc-name   flg-name)
                  (hash-ref test-proc-name flg-name))) =]
 #define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
       ENDIF               =][=
