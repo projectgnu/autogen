@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.7 1998/11/06 20:24:16 bkorb Exp $
+ *   $Id: opts.def,v 1.8 1998/11/27 22:28:09 bkorb Exp $
  */
 
 /*
@@ -35,7 +35,7 @@ long_opts;
 version = 1;
 
 flag = {
-    name      = line_width;
+    name      = width;
     value     = W;
     flag_arg  = "=79";
     descrip   = "Maximum Line Width";
@@ -83,11 +83,21 @@ flag = {
 flag = {
     name      = indent;
     value     = I;
-    flag_arg  = "=0";
-    descrip   = "Line indentation";
+    flag_arg  = ":";
+    descrip   = "Line prefix or indentation";
     doc =
-    "This many spaces will be inserted at the start of every line.\n"
-    "It defaults to zero.";
+    "If a number, then this many spaces will be inserted at the start of\n"
+    "every line.  Otherwise, it is a line prefix that will be inserted\n"
+    "at the start of every line.";
+};
+
+flag = {
+    name      = tab_width;
+    flag_arg  = "=8";
+    descrip   = "tab width";
+    doc =
+    "If an indentation string contains tabs, then this value is used to\n"
+    "compute the ending column of the prefix string.";
 };
 
 flag = {
@@ -124,13 +134,33 @@ flag = {
 };
 
 flag = {
+    name      = line_separation;
+    flag_arg  = ':';
+    descrip   = "string at end of all lines but last";
+    doc =
+    "Use this option if, for example, you wish a backslash to appear at\n"
+    "the end of every line, except the last.";
+};
+
+flag = {
     name      = by_columns;
     descrip   = "Print entries in column order";
     doc =
 "Normally, the entries are printed out in order by rows and then columns.
-This option will cause the entries to be printed in rows.  The final
-column may be shorter than the others.";
+This option will cause the entries to be ordered within columns.  The final
+column, instead of the final row, may be shorter than the others.";
 };
+
+#ifdef LATER
+flag = {
+    name      = page_len;
+    flag_arg  = "=0";
+    descrip   = "Page Length";
+    doc =
+    "This many lines will be printed before a form feed is emitted.\n"
+    "The 'by_columns' ordering will wrap columns within a page.";
+};
+#endif
 
 flag = {
     name      = input;
@@ -138,7 +168,7 @@ flag = {
     flag_arg  = ":";
     descrip   = "Input file (if not stdin)";
     flag_code =
-'    FILE* fp = freopen( pOptDesc->pzLastArg, "r", stdin );
+'    FILE* fp = freopen( pOptDesc->pzLastArg, "r" FOPEN_BINARY_FLAG, stdin );
     if (fp == (FILE*)NULL) {
         fprintf( stderr, "Error %d (%s) opening %s\n",
                  errno, strerror( errno ), pOptDesc->pzLastArg );
@@ -150,4 +180,13 @@ flag = {
     "input to a file.";
 };
 
-include = "#include <stdio.h>\n#include <errno.h>";
+include = "#include <stdio.h>\n"
+          "#include <errno.h>\n"
+          "#ifdef HAVE_CONFIG_H\n"
+          '#  include "config.h"'  "\n"
+          "#endif\n"
+          "#ifdef USE_FOPEN_BINARY\n"
+          '#  define FOPEN_BINARY_FLAG "b"'  "\n"
+          "#else\n"
+          "#  define FOPEN_BINARY_FLAG\n"
+          "#endif";

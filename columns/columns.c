@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 1.7 1998/11/06 20:24:15 bkorb Exp $
+ *  $Id: columns.c,v 1.8 1998/11/27 22:28:07 bkorb Exp $
  */
 
 /*
@@ -47,6 +47,7 @@ char zLine[ 133 ];
 char zFmtLine[ 133 ];
 
 char**  papzLines = (char**)NULL;
+char*   pzLinePfx = (char*)NULL;
 size_t  allocCt   = 0;
 size_t  usedCt    = 0;
 size_t  lineWidth = 79;
@@ -56,6 +57,7 @@ size_t  columnSz  = 0;
 void readLines( void );
 void writeRows( void );
 void writeColumns( void );
+int  handleIndent( void );
 
 
     int
@@ -67,14 +69,23 @@ main( int    argc,
         USAGE( EXIT_FAILURE );
     }
 
-    if (HAVE_OPT( LINE_WIDTH ))
-        lineWidth = OPT_VALUE_LINE_WIDTH;
+    if (HAVE_OPT( WIDTH ))
+        lineWidth = OPT_VALUE_WIDTH;
+
+    if (HAVE_OPT( INDENT ))
+        lineWidth -= handleIndent();
+
+    if (HAVE_OPT( LINE_SEPARATION ))
+        lineWidth -= strlen( OPT_ARG( LINE_SEPARATION ));
 
     if (HAVE_OPT( COL_WIDTH ))
         columnSz = OPT_VALUE_COL_WIDTH;
 
     if (HAVE_OPT( COLUMNS ))
         columnCt = OPT_VALUE_COLUMNS;
+
+    if (lineWidth <= 16)
+        lineWidth = 16;
 
     readLines();
 
@@ -85,7 +96,81 @@ main( int    argc,
          writeColumns();
     else writeRows();
 
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+
+    int
+handleIndent( void )
+{
+    char* pz;
+    long  colCt = strtol( OPT_ARG( INDENT ), &pz, 0 );
+
+    /*
+     *  IF the indent argument is a number
+     */
+    if (*pz == '\0') {
+        /*
+         *  AND that number is reasonable, ...
+         */
+        if (colCt <= 0)
+            return 0;
+
+        /*
+         *  Allocate a string to hold the line prefix
+         */
+        pzLinePfx = (char*)malloc( colCt + 1 );
+        if (pzLinePfx == (char*)NULL) {
+            fprintf( stderr, "Cannot malloc %d bytes\n", colCt + 1 );
+            exit( EXIT_FAILURE );
+        }
+
+        /*
+         *  Set it to a NUL terminated string of spaces
+         */
+        memset( (void*)pzLinePfx, ' ', colCt );
+        pzLinePfx[ colCt ] = '\0';
+
+    } else {
+        /*
+         *  Otherwise, set the line prefix to whatever the string is.
+         *  It will not be the empty string because that is handled
+         *  as an indent count of zero and is ignored.
+         */
+        pz = pzLinePfx = OPT_ARG( INDENT );
+        colCt =  0;
+        for (;;) {
+            /*
+             *  Figure out how much of the line is taken up by
+             *  the prefix.  We might consider restricted format
+             *  strings some time in the future, but not now.
+             */
+            switch (*pz++) {
+            case '\0':
+                goto colsCounted;
+
+            case '\t':
+                colCt += OPT_VALUE_TAB_WIDTH
+                       - (colCt % OPT_VALUE_TAB_WIDTH);
+                break;
+
+            case '\n':
+            case '\f':
+            case '\r':
+                colCt = 0;
+                break;
+
+            default:
+                colCt++;
+                break;
+
+            case '\a':
+                break;
+            }
+        } colsCounted:;
+    }
+
+    return colCt;
 }
 
 
@@ -170,9 +255,7 @@ readLines( void )
 
     /*
      *  Set the line width to the amount of space we have to play with.
-     *  OPT_VALUE_INDENT defaults to zero.
      */
-    lineWidth -= OPT_VALUE_INDENT;
     if (lineWidth < maxEntryWidth)
         lineWidth = maxEntryWidth;
 
@@ -308,15 +391,15 @@ writeColumns( void )
         sprintf( zFmt, "%%-%ds", fsz );
     }
 
-
+    /*
+     *  Now, actually print each row...
+     */
     for ( row = 0 ;; ) {
         char*  pzL;
         char*  pzE;
 
-        if (OPT_VALUE_INDENT > 0) {
-            int ct = OPT_VALUE_INDENT;
-            do { fputc( ' ', stdout ); } while (--ct > 0);
-        }
+        if (pzLinePfx != (char*)NULL)
+            fputs( pzLinePfx, stdout );
 
         /*
          *  Increment the index of the current entry in the last column.
@@ -332,9 +415,15 @@ writeColumns( void )
         pzE = *(pPL[colCt-1].papz++);
 
         col = 0;
+
         /*
          *  FOR every column except the last,
          *     print the entry with the width format
+         *
+         *  No need to worry about referring to a non-existent
+         *  entry.  Only the last column might have that problem,
+         *  and we addressed it above where the column count got
+         *  decremented.
          */
         while (++col < colCt) {
             pzL = *(pPL[col-1].papz++);
@@ -343,9 +432,9 @@ writeColumns( void )
         }
 
         /*
-         *  Print the last entry on the line, without the width format.
-         *  IF it is also the last entry, see if we should strip the
-         *  separation string.
+         *  See if we are on the last row.  If so, then
+         *  this is the last entry.  Strip any separation
+         *  characters, emit the entry and break out.
          */
         if (++row == rowCt) {
             /*
@@ -362,7 +451,15 @@ writeColumns( void )
             break;
         }
 
+        /*
+         *  Print the last entry on the line, without the width format.
+         *  If we have line separation (which does not apply to the last
+         *  line), then emit those characters, too.
+         */
         fputs( pzE, stdout );
+        if (HAVE_OPT( LINE_SEPARATION ))
+            fputs( OPT_ARG( LINE_SEPARATION ), stdout );
+
         fputc( '\n', stdout );
         free( (void*)pzE );
     }
@@ -388,18 +485,24 @@ writeRows( void )
         *pz = '\0';
     }
 
-    if (OPT_VALUE_INDENT > 0) {
-        int ct = OPT_VALUE_INDENT;
-        do { fputc( ' ', stdout ); } while (--ct > 0);
-    }
+    if (pzLinePfx != (char*)NULL)
+        fputs( pzLinePfx, stdout );
 
     {
         char**  ppzLL = papzLines;
         size_t  left  = usedCt;
         int     lnNo  = 0;
 
+        /*
+         *  FOR every entry we are to emit, ...
+         */
         for (;;) {
             char* pzL = *ppzLL++;
+
+            /*
+             *  IF this is the last entry,
+             *  THEN emit it and a new line and break out
+             */
             if (--left <= 0) {
                 fputs( pzL, stdout );
                 fputc( '\n', stdout );
@@ -407,17 +510,32 @@ writeRows( void )
                 break;
             }
 
+            /*
+             *  IF the count of entries on this line is still less
+             *     than the number of columns,
+             *  THEN emit the padded entry
+             *  ELSE ...
+             */
             if (++lnNo < colCt)
                 fprintf( stdout, zFmt, pzL );
 
             else {
                 lnNo = 0;
+                /*
+                 *  Last entry on the line.  Emit the string without padding.
+                 *  IF we have a line separation string, emit that too.
+                 */
                 fputs( pzL, stdout );
+                if (HAVE_OPT( LINE_SEPARATION ))
+                    fputs( OPT_ARG( LINE_SEPARATION ), stdout );
+
                 fputc( '\n', stdout );
-                if (OPT_VALUE_INDENT > 0) {
-                    int ct = OPT_VALUE_INDENT;
-                    do { fputc( ' ', stdout ); } while (--ct > 0);
-                }
+
+                /*
+                 *  Start the next line with any required indentation
+                 */
+                if (pzLinePfx != (char*)NULL)
+                    fputs( pzLinePfx, stdout );
             }
 
             free( (void*)pzL );
@@ -426,6 +544,9 @@ writeRows( void )
 }
 
 
+/*
+ *  Line comparison procedure
+ */
     int
 compProc( const void* p1, const void* p2 )
 {
