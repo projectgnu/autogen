@@ -1065,7 +1065,7 @@ Tue Jul 22 09:47:45 1997 GMT Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	/usr/bin/sh (and who does?). ;-)
 
 	* doc/Makefile.am (autogen.tpl, autogen.texi):
-	Split Autogen.info rule to take advantage of Automake-1.2 default
+	Split autogen.info rule to take advantage of Automake-1.2 default
 	rules and to create more GNU-like filenames (hope this is ok
 	=)O|).
 	(gendir, optdir):
@@ -1125,7 +1125,7 @@ Mon Jul 21 Bruce Korb
 	* autogen.tpl
 	This is a template file that uses autoopts.tpl declarations
 	and src/opts.X definitions to generate an autogen.texi that
-	can then be processed into Autogen.info.  The rule to make
+	can then be processed into autogen.info.  The rule to make
 	autogen.texi was added to doc/Makefile.am:
 
 	# Extract the option declarations into a template file
@@ -1261,7 +1261,7 @@ Sun Jul 13 Bruce Korb
 	* autogen.tpl
 	This is a template file that uses autoopts.tpl declarations
 	and src/opts.X definitions to generate an autogen.texi that
-	can then be processed into Autogen.info.  The rule to make
+	can then be processed into autogen.info.  The rule to make
 	autogen.texi was added to Makefile.am:
 
 		src/autogen -b autogen -T autogen.tpl src/opts.X

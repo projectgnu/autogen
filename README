@@ -1,4 +1,4 @@
-This is Autogen, an automated text file generator.  It was inspired
+This is AutoGen, an automated text file generator.  It was inspired
 out of frustration and hassle with maintaining syncronization between
 option flag lists, global variables and usage information.  The desire
 for more than #define macros came about when it became apparent that
@@ -19,7 +19,7 @@ Until a mailing list is organized, direct email to the author:
     Bruce Korb <ddsinc09@ix.netcom.com>
 
 
-Autogen requires a POSIX regular expression library, and an ANSI C
+AutoGen requires a POSIX regular expression library, and an ANSI C
 compiler to build correctly.  Use the --with-regex-prefix and
 --with-regex-lib, or the --with-included-regex  options to autoconf if
 it cannot otherwise locate a suitable library.

@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.14 1999/07/07 15:43:11 bkorb Exp $
+#$Id: opthead.tpl,v 2.15 1999/07/07 19:42:32 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -30,7 +30,7 @@ _SETENV DEFNAME prog_name _get #_ _outfile + +
 /*
  *  This file contains the programmatic interface to the
  *  Automated Options generated for the [=prog_name=] program.
- *  These macros are documented in the Autogen info file
+ *  These macros are documented in the AutoGen info file
  *  in the "Autoopts" chapter.  Please refer to that doc
  *  for usage help.
  */
@@ -306,7 +306,7 @@ _ENDIF version-exists =]
  *
  *  @example
  *  if (COUNT_OPT( NAME ) != desired-count) @{\n"
- *  "    make-an-undesireable-message.
+ *  "    make-an-undesirable-message.
  *  @}
  *  @end example"
 =*/
@@ -802,7 +802,7 @@ _ENDIF=][=#
  *  description:
  *
  *  When it is necessary to continue (return to caller)
- *  on option errors, invoke this option.  It is reversable.
+ *  on option errors, invoke this option.  It is reversible.
  *  @xref{ERRSTOP_OPTERR}.
 =*/
 =]
@@ -877,7 +877,7 @@ _ENDIF=][=#
  *
  *  This macro invokes the procedure registered to display
  *  the usage text.  Normally, this will be @code{optionUsage} from the
- *  Autoopts library, but you may select another procedure by specifying
+ *  AutoOpts library, but you may select another procedure by specifying
  *  @code{usage = "proc_name"} program attribute.  This procedure must
  *  take two arguments: first, a pointer to the option descriptor, and
  *  second the exit code.  The macro supplies the option descriptor

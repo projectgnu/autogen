@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.12 1999/07/07 14:23:17 bkorb Exp $
+ *   $Id: opts.def,v 2.13 1999/07/07 19:42:33 bkorb Exp $
  */
 
 /*
@@ -265,7 +265,7 @@ From that, this program creates a definition of the following form:\n
         name = entry_name;
         ...
     };\n
-The elipsis '...' is filled in by text found between the two delimiters,
+The ellipsis '...' is filled in by text found between the two delimiters,
 with everything up through the first sequence of asterisks deleted
 on every line.";
 
@@ -282,7 +282,7 @@ a definition of the following form:
         ...
     };
 
-The elipsis '...' is filled in by text found between the two delimiters,
+The ellipsis '...' is filled in by text found between the two delimiters,
 with everything up through the first sequence of asterisks deleted
 on every line.";
 
@@ -306,6 +306,6 @@ From that, this program creates a definition of the following form:
     @};
 @end format
 
-The elipsis '...' is filled in by text found between the two delimiters,
+The ellipsis '...' is filled in by text found between the two delimiters,
 with everything up through the first sequence of asterisks deleted
 on every line.";

@@ -2,7 +2,7 @@
 
 ##  Documentation template
 ## 
-##  AutoGen Copyright (C) 1992-1998 Bruce Korb
+##  AutoGen Copyright (C) 1992-1999 Bruce Korb
 ## 
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
@@ -10,7 +10,7 @@
 ## Last Modified:     Wed Jul  7 11:48:50 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.18 1999/07/07 19:12:49 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.19 1999/07/07 19:42:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -198,7 +198,7 @@ doc}.  These markers are not fixed strings.  They are specified at the
 start of each template.  Template designers know best what fits into their
 syntax and can avoid marker conflicts.
 
-We did this because it is burdonsome and difficult to avoid conflicts
+We did this because it is burdensome and difficult to avoid conflicts
 using the pure C preprocessor substitution rules.  It also makes it
 easier to specify expressions that transform the value.  Of course, our
 expressions are less cryptic than the shell methods.
@@ -369,7 +369,7 @@ automatically from just the tabular data.  AutoGen in fact already ships
 with such a template... AutoOpts.
 
 One final consequence of the good separation in the design of AutoGen is
-that it is retargettable to a greater extent.  The
+that it is retargetable to a greater extent.  The
 egcs/gcc/fixinc/inclhack.def can equally be used (with different
 templates) to create a shell script (inclhack.sh) or a c program
 (fixincl.c).
@@ -635,7 +635,7 @@ an escape @code{\} or join them with previous lines:
 Definition processing directives can @strong{only} be processed
 if the '#' character is the first character on a line.  Also, if you
 want a '#' as the first character of a line in one of your string
-assignments, you should either escape it by preceeding it with a
+assignments, you should either escape it by preceding it with a
 backslash @samp{\}, or by embedding it in the string as in @code{"\n#"}.
 
 All of the normal C preprocessing directives are recognized, though
@@ -1000,7 +1000,7 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 This chapter includes several programs that either work closely
 with AutoGen (extracting definitions or providing special formatting
 functions), or else it is @code{mkmerge}.  I want to promote the
-latter as an alternative to the builddir/srcdir schitzophrenia.
+latter as an alternative to the builddir/srcdir schizophrenia.
 I hate it. :(
 
 AutoOpts ought to appear in this list also, but since it is
@@ -1033,11 +1033,11 @@ Here are some things that might happen in the distant future.
 Rewrite in Guile.
 
 @item
-Write code for "autogetopt" (GNU getopt), or
+Write code for "AutoGetopts" (GNU getopt), or
 possibly the new glibc argp parser.
 
 @item
-Fixup current tools that contain
+Fix up current tools that contain
 miserably complex perl, shell, sed, awk and m4 scripts
 to instead use this tool.
 @end itemize

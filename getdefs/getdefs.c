@@ -1,8 +1,8 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.16 1999/07/07 14:23:17 bkorb Exp $
+ *  $Id: getdefs.c,v 2.17 1999/07/07 19:42:33 bkorb Exp $
  *
- *    getdefs copyright 1998 Bruce Korb
+ *    getdefs copyright 1999 Bruce Korb
  * 
    Author:            Bruce Korb <korbb@datadesign.com>
    Maintainer:        Bruce Korb <korbb@datadesign.com>
