@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.27 2000/03/12 00:53:25 bruce Exp $
+#$Id: optcode.tpl,v 2.28 2000/03/12 22:04:14 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -395,19 +395,20 @@ tOptions [=(. pname)=]Options = {
     zExplain,       zDetail,        zDetailFile,
     [=IF (exist? "usage")=][=usage=][=
       ELSE               =]optionUsage[=ENDIF=],
-    ( OPTPROC_NONE[=                IF (not (exist? "allow_errors")) =]
-    + OPTPROC_ERRSTOP[=    ENDIF=][=IF 	    (exist? "flag.disable")  =]
-    + OPTPROC_DISABLEOK[=  ENDIF=][=IF 	    (exist? "exerc")         =]
-    + OPTPROC_EXERC[=      ENDIF=][=IF 	    (exist? "flag.value")    =]
-    + OPTPROC_SHORTOPT[=   ENDIF=][=IF 	    (exist? "long_opts")     =]
-    + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))     =]
-    + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF 	    (exist? "flag.disable")  =]
-    + OPTPROC_NEGATIONS[=  ENDIF=][=IF (>= number-opt-index 0)       =]
-    + OPTPROC_NUM_OPT[=    ENDIF=][=IF 	    (exist? "environrc")     =]
+    ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
+    + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.disable")      =]
+    + OPTPROC_DISABLEOK[=  ENDIF=][=IF      (exist? "exerc")             =]
+    + OPTPROC_EXERC[=      ENDIF=][=IF      (exist? "flag.value")        =]
+    + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long_opts")         =]
+    + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
+    + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]
+    + OPTPROC_NEGATIONS[=  ENDIF=][=IF (>=   number-opt-index 0)         =]
+    + OPTPROC_NUM_OPT[=    ENDIF=][=IF      (exist? "environrc")         =]
     + OPTPROC_ENVIRON[=    ENDIF=][=IF (and (exist? "plus_marks")
-                                            (exist? "flag.disable")) =]
-    + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))     =]
-    + OPTPROC_NO_ARGS[=    ENDIF=] ),
+                                            (exist? "flag.disable"))     =]
+    + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
+    + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
+    + OPTPROC_ARGS_REQ[=   ENDIF=] ),
     0, (char*)NULL,
     { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
       [=IF (exist? "homerc") 
