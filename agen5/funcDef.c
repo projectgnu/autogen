@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.10 1999/10/31 22:10:07 bruce Exp $
+ *  $Id: funcDef.c,v 1.11 1999/10/31 22:52:21 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -107,14 +107,18 @@ MAKE_HANDLER_PROC( Debug )
  *      [# define foo #]
  *      ... macro body with macro functions ...
  *      [# enddef #]
- *      ... [# foo bar='raw text' baz="cooked\nstring" #]
+ *      ... [# foo bar='raw text' baz=<<text expression>> #]
  *      @end example
  *
  *      Once the macro has been defined, this new macro can be invoked by
  *      specifying the macro name as the first token after the start
  *      macro marker.  Any remaining text in the macro invocation will be
  *      used to create new name/value pairs that only persist for the
- *      duration of the processing of the macro.  They are handled much
+ *      duration of the processing of the macro.  The expressions are
+ *      evaluated the same way expressions are evaluated in expression
+ *      functions.  @xref{EXPR}.
+ *
+ *      The resulting definitions are handled much
  *      like regular definitions, except:
  *
  *      @enumerate
@@ -123,9 +127,6 @@ MAKE_HANDLER_PROC( Debug )
  *      nested name/value pairs.
  *      @item
  *      The bindings go away when the macro is complete.
- *      @item
- *      The value may be a parenthesized Guile expression that is
- *      evaluated once when the macro is invoked.
  *      @item
  *      The name/value pairs are separated by whitespace instead of
  *      semi-colons.
