@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.13 2000/09/11 00:26:21 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.14 2000/09/11 00:36:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -42,8 +42,11 @@ done
 touch_list="`egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
              sed 's@.*## *\(.*\) GEN-RULE@agen5/\1@' `"
 
-mv ./configure config.save
-cvs update configure > /dev/null 2>&1
+if ${update_cvs} && [ -d CVS ]
+then
+  rm -f ./configure
+  cvs update configure > /dev/null 2>&1
+fi
 
 [ -f doc/autogen.texi ] || {
   echo '@setfilename completely.bogus' > doc/autogen.texi
@@ -130,8 +133,11 @@ else
     mv -f temp.config configure
     cvs commit -m'CVS-ed configure script update' configure
   else
-    echo configure would change:
-    diff -c configure temp.config
+    (
+      echo configure would change:
+      echo diff -c configure temp.config
+      diff -c configure temp.config
+    ) | ${PAGER-more}
   fi
 fi
 
