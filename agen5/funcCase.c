@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.6 2002/03/19 04:11:41 bkorb Exp $
+ *  $Id: funcCase.c,v 3.7 2002/04/20 00:51:32 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -45,9 +45,6 @@
 #define PTRUP(p) STMTS(if(IS_LOW(*(p)))*(p)=_toupper(*(p));(p)++)
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
-tSCC zTrue[]   = "TRUE ";
-tSCC zFalse[]  = "FALSE";
-tSCC zTrFmt[]  = "\t%s that `%s' %s `%s'\n";
 
 STATIC void     compile_re( regex_t* pRe, char* pzPat, int flags );
 STATIC void     upString( char* pz );
@@ -116,14 +113,8 @@ ag_scm_string_contains_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
     char* pzSubstr = ag_scm2zchars( substr, "match expr" );
-    SCM   res;
 
-    res = (strstr( pzText, pzSubstr) == NULL) ? SCM_BOOL_F : SCM_BOOL_T;
-
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
-                 pzText, "*==*", pzSubstr );
-    return res;
+    return (strstr( pzText, pzSubstr) == NULL) ? SCM_BOOL_F : SCM_BOOL_T;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -153,9 +144,6 @@ Select_Compare_End( char* pzText, char* pzMatch )
          res = SUCCESS;
     else res = FAILURE;
 
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "*==", pzMatch );
     return res;
 }
 
@@ -192,9 +180,6 @@ Select_Compare_Start( char* pzText, char* pzMatch )
          res = SUCCESS;
     else res = FAILURE;
 
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "==*", pzMatch );
     return res;
 }
 
@@ -224,12 +209,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
 STATIC tSuccess
 Select_Compare_Full( char* pzText, char* pzMatch )
 {
-    tSuccess res = (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
-
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "==", pzMatch );
-    return res;
+    return (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
 }
 
     SCM
@@ -237,14 +217,8 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
     char* pzSubstr = ag_scm2zchars( substr, "match expr" );
-    SCM   res;
 
-    res = (strcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
-
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
-                 pzText, "==", pzSubstr );
-    return res;
+    return (strcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -275,9 +249,6 @@ Select_Equivalent( char* pzText, char* pzMatch )
         res = FAILURE;
     AGFREE( (void*)pz );
 
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "*=*", pzMatch );
     return res;
 }
 
@@ -318,17 +289,13 @@ Select_Equivalent_End( char* pzText, char* pzMatch )
 {
     size_t   vlen = strlen( pzMatch );
     size_t   tlen = strlen( pzText );
-    tSuccess res;
-    if (tlen < vlen)
-        res = FAILURE;
-    if (streqvcmp( pzText + (tlen - vlen), pzMatch ) == 0)
-         res = SUCCESS;
-    else res = FAILURE;
 
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "*=", pzMatch );
-    return res;
+    if (tlen < vlen)
+        return FAILURE;
+
+    return (streqvcmp( pzText + (tlen - vlen), pzMatch ) == 0)
+           ? SUCCESS
+           : FAILURE;
 }
 
     SCM
@@ -358,16 +325,10 @@ STATIC tSuccess
 Select_Equivalent_Start( char* pzText, char* pzMatch )
 {
     size_t   vlen = strlen( pzMatch );
-    tSuccess res;
 
-    if (strneqvcmp( pzText, pzMatch, vlen ) == 0)
-         res = SUCCESS;
-    else res = FAILURE;
-
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
-                 pzText, "*==*", pzMatch );
-    return res;
+    return (strneqvcmp( pzText, pzMatch, vlen ) == 0)
+           ? SUCCESS
+           : FAILURE;
 }
 
     SCM
@@ -411,7 +372,6 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 {
     char* pzText;
     char* pzSubstr;
-    SCM   res;
 
     /*
      *  We are overloading the "=" operator.  Our arguments may be
@@ -423,12 +383,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
     pzText   = ag_scm2zchars( text, "text to match" );
     pzSubstr = ag_scm2zchars( substr, "match expr" );
 
-    res = (streqvcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
-
-    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
-        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
-                 pzText, "*==*", pzSubstr );
-    return res;
+    return (streqvcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -735,6 +690,10 @@ Select_Match_Full( char* pzText, char* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match full re" );
+        if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
+            fprintf( pfTrace, "Compiling ``%s'' with bits 0x%X\n",
+                     pzMatch, pCurMacro->res );
+        }
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = pRe;
     }
@@ -962,6 +921,12 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
 
             generateBlock( pT, pMac + 1, pT->aMacros + pMac->sibIndex );
             break;
+        }
+        else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
+            fprintf( pfTrace, "CASE no match: `%s' %s vs. `%s'\n",
+                     pzSampleText,
+                     apzMatchName[ pMac->funcCode & 0x0F ],
+                     pT->pzTemplText + pMac->ozText );
         }
     }
 
