@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.27 2001/06/24 00:32:52 bkorb Exp $
+ *  $Id: funcCase.c,v 1.28 2001/07/17 02:35:14 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -280,8 +280,8 @@ ag_scm_string_equals_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string contains an equivalent string.
  *       `equivalent' means the strings match, but without regard
- *       to character case.  In other words, it is a case insensitive
- *       compare.
+ *       to character case and certain characters are considered `equivalent'.
+ *       Viz., '-', '_' and '^' are equivalent.
 =*/
     STATIC tSuccess
 Select_Equivalent( char* pzText, char* pzMatch )
@@ -415,6 +415,9 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
  * string: "="
  *
  * doc:  Test to see if two strings are equivalent.
+ *       `equivalent' means the strings match, but without regard
+ *       to character case and certain characters are considered `equivalent'.
+ *       Viz., '-', '_' and '^' are equivalent.
  *       If the arguments are not strings, then
  *       the result of the numeric comparison is returned.
 =*/
@@ -775,7 +778,8 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  * string: "~"
  *
  * doc:  Test to see if a string fully matches a pattern.
- *       Case is not significant.
+ *       Case is not significant, but any character equivalences
+ *       must be expressed in your regular expression.
 =*/
     STATIC tSuccess
 Select_Match_Full( char* pzText, char* pzMatch )
