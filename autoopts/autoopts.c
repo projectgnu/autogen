@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.41 2004/10/15 01:48:34 bkorb Exp $
+ *  $Id: autoopts.c,v 3.42 2004/11/13 18:38:57 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -120,6 +120,11 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
     if (pOD->optEquivIndex != NO_EQUIVALENT) {
         tOptDesc* p = pOpts->pOptDesc + pOD->optEquivIndex;
 
+        /*
+         * IF the current option state has not been defined (set on the
+         *    command line), THEN we will allow continued resetting of
+         *    the value.  Once "defined", then it must not change.
+         */
         if (p->optActualIndex == NO_EQUIVALENT) {
             /*
              *  First time through, copy over the state
