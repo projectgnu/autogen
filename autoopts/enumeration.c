@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.1 2000/10/17 02:57:00 bkorb Exp $
+ *  $Id: enumeration.c,v 2.2 2000/10/17 04:25:31 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -58,6 +58,22 @@
 
 #include "autoopts.h"
 
+tSCC*  pz_fmt;
+
+DEF_PROC_4( static, void, enumError,
+            tOptions*, pOpts,
+            tOptDesc*, pOD,
+            tCC**, paz_names,
+            int, name_ct )
+{
+    fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg, pOD->pz_Name );
+    fputs( "The valid keywords are:\n", stderr );
+    do  {
+        fprintf( stderr, "\t%s\n", *(paz_names++) );
+    } while (--name_ct > 0);
+    (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+}
+
 /*
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
@@ -77,18 +93,16 @@ DEF_PROC_4( , char*, optionEnumerationVal,
             if (paz_names[idx][len] == NUL)
                 return (char*)idx;
             if (res != -1) {
-                fprintf( stderr, "%s error:  `%s' is ambiguous for %s option\n",
-                         pOpts->pzProgName, pOD->pzLastArg, pOD->pz_Name );
-                (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+                pz_fmt = "%s error:  `%s' is ambiguous for %s option\n";
+                enumError( pOpts, pOD, paz_names, name_ct );
             }
             res = idx;
         }
     }
 
     if (res < 0) {
-        fprintf( stderr, "%s error:  `%s' does not match any %s keywords\n",
-                 pOpts->pzProgName, pOD->pzLastArg, pOD->pz_Name );
-        (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+        pz_fmt = "%s error:  `%s' does not match any %s keywords\n";
+        enumError( pOpts, pOD, paz_names, name_ct );
     }
 
     return (char*)res;
