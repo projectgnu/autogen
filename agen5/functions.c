@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.8 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: functions.c,v 1.9 2000/02/27 23:51:44 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -36,42 +36,6 @@
 
 
 tSCC zCantInc[] = "cannot include file";
-
-
-/*=macfunc ERROR
- *
- *  what:      Cease processing
- *  cindex:    error handling
- *  handler_proc:
- *  load_proc:     Expr
- *
- *  desc:
- *  The arguments are evaluated and printed to the stderr,
- *  the current output file is removed and AutoGen exits
- *  with the EXIT_FAILURE error code.  IF, however, the argument
- *  is the number 0 (zero), then the output file is silently
- *  removed and processing continues with the next suffix.
- *
- *  @noindent
- *  For example, the following will print the quoted error
- *  message and AutoGen will exit:
- *
- *  @example
- *  [+ ERROR "You did not have enough values to continue" +]
- *  @end example
-=*/
-MAKE_HANDLER_PROC( Error )
-{
-    tSCC    zErr[] = "DEFINITIONS ERROR for %s:  %s\n";
-    tSCC    zEmptyError[] = "** EMPTY ERROR MESSAGE **";
-    ag_bool needFree;
-    char* pz = evalExpression( &needFree );
-
-    fprintf( stderr, zErr, pT->pzFileName, pz );
-    longjmp( fileAbort, FAILURE );
-    /* NOT REACHED */
-    return (tMacro*)NULL;
-}
 
 
 /*=macfunc INCLUDE
