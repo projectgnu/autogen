@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.24 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: autogen.c,v 3.25 2003/05/03 15:29:38 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -48,7 +48,25 @@ tSCC zSchemeInit[] =
 "    (string-substitute str\n"
 "          '(\"&\"      \"<\"     \">\")\n"
 "          '(\"&amp;\"  \"&lt;\"  \"&gt;\") )))";
+#ifdef LATER
 
+    >> (define (eval-client-input str)
+    >>   (stack-catch #t
+    >>     (lambda ()
+    >>       (call-with-input-string str
+    >>         (lambda (p)
+    >>           (set-port-filename! p (tpl-file))
+    >>           (set-port-line! p (string->number (tpl-file-line "%2$d")))
+    >>           (list (primitive-eval (read p))))))
+    >>     (lambda (key . args)
+    >>       ;; [1]
+    >>       (apply display-error (fluid-ref the-last-stack)
+    >>                            (current-error-port)
+    >>                            args)
+    >>       (set! stack-saved? #f)
+    >>       #f)))
+
+#endif
 STATIC sigjmp_buf  abendJumpEnv;
 
 /*
