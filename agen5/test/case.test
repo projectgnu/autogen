@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 11:00:24 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: case.test,v 1.3 1999/11/06 04:24:16 bruce Exp $
+# $Id: case.test,v 1.4 1999/11/06 19:56:17 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -107,5 +107,6 @@ $AGEN $testname.def ||  failure autogen failed
 
 cmp -s $testname.test $testname.out || failure unexpected output
 
+cleanup
 echo $testname done
 # end of case.test

@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:     $Date: 1999/11/06 04:09:55 $
+# Last Modified:     $Date: 1999/11/06 19:57:31 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: opts.test,v 1.1 1999/11/06 04:09:55 bruce Exp $
+# $Id: opts.test,v 1.2 1999/11/06 19:57:31 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -55,4 +55,5 @@ echo diff opts.h.base opts.h.res
 diff opts.h.base opts.h.res || \
   failure differ opts.h.base opts.h.res
 
+cleanup
 # opts.test ends here

@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 11:17:56 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: endmac.test,v 1.3 1999/11/06 04:31:41 bruce Exp $
+# $Id: endmac.test,v 1.4 1999/11/06 19:56:58 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -52,4 +52,5 @@ EOF
 $AGEN -T$testname --no-def || exit 1
 echo second successful $testname test succeeded
 
+cleanup
 # end of endmac.test
