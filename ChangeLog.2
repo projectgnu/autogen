@@ -1,3 +1,46 @@
+1998-07-14  Bruce Korb <korbb@datadesign.com>
+
+	* autoopts/optcode.tpl
+	Moved in the declarations of the callout procedures.
+	They do not need to be exported to the world.  They should be
+	called via the pointers only.
+
+	Removed the initialization of the filler field.  It has
+	been rendered useless now.
+
+	* autoopts/opthead.tpl
+	Removed the declarations of the callout procedures.
+	Cleaned up the commentary and documentation.  Greatly.
+
+	* autoopts/usage.c
+	A couple of innocuous changes to try to avoid the shared library
+	problem with formatting output to stderr.
+
+	* autoopts/options.tpl
+	Expanded commentary on the valid use of arguments in "flag_code".
+
+	* autoopts/options.h
+	Removed a useless fill field.  Bumped the revision field.
+
+	* doc/Makefile.am
+	Added autoopts/opthead.tpl to the dependency list for
+	autogen.texi.  The opts.h header documentation is now intertwined
+	with the code to emit the file.
+
+	* doc/auto_gen.tpl
+	Added documentation of the opts.h macro usage (extracting
+	the body of it from definitions gotten from autoopts/opthead.tpl).
+
+	* doc/autogen.def
+	Added shell code for extracting definitions from autoopts/opthead.tpl).
+
+	* src/opts.def
+	Simplified the syntax of the definition for `explain'.
+
+	* src/opts.[ch]sav
+	I am retaining these because this mutual dependency is more
+	problematical than the ag*.def ones.
+
 1998-07-08  Bruce Korb <korbb@datadesign.com>
 
 	* autoopts/optcode.tpl

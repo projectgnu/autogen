@@ -1,4 +1,4 @@
-[=autogen template include $Id: optcode.tpl,v 1.6 1998/07/09 17:15:32 bkorb Exp $ =]
+[=autogen template include $Id: optcode.tpl,v 1.7 1998/07/14 13:35:06 bkorb Exp $ =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
@@ -28,6 +28,14 @@ static const char zCopyrightNotice[] =
 _ENDIF "copyright notes"
 =]
 #include "[=_eval HDRNAME _env=]"
+[=
+_FOR flag=][=
+  _IF call_proc _exist=]
+extern tOptProc   [=call_proc=];[=
+  _ENDIF=][=
+/flag=]
+extern tUsageProc [=_IF usage _exist=][=usage=][=_ELSE=]optionUsage[=_ENDIF=];
+
 #ifndef NULL
 #  define NULL 0x0
 #endif
@@ -227,9 +235,8 @@ static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
          _IF equivalence _exist equivalence _get name _get != &
              =]INDEX_[=prefix _up #_ +=]OPT_[=equivalence _up=][=
          _ELSE =]NO_EQUIVALENT[=_ENDIF=],
-     /* min, max count   */ [=_eval min _get _val=], [=
-         _IF max _exist=][=max=][=_ELSE=]1[=_ENDIF=],
-     /* actual cnt, fill */ 0, 0,
+     /* min, max, act ct */ [=_eval min _get _val=], [=
+         _IF max _exist=][=max=][=_ELSE=]1[=_ENDIF=], 0,
      /* opt state flags  */ [=
          _IF flag_arg _get #=.* ~=]OPTST_NUMERIC | [=     _ENDIF=][=
          _IF disable   _exist    =]OPTST_DISABLEOK | [=   _ENDIF=][=
@@ -276,8 +283,7 @@ _IF version _exist=]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_MAY,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max count   */ 0, 1,
-     /* actual cnt, fill */ 0, 0,
+     /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
@@ -292,8 +298,7 @@ _IF version _exist=]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max count   */ 0, 1,
-     /* actual cnt, fill */ 0, 0,
+     /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
@@ -308,8 +313,7 @@ _IF version _exist=]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max count   */ 0, 1,
-     /* actual cnt, fill */ 0, 0,
+     /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
@@ -327,8 +331,7 @@ _IF homerc _exist
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max count   */ 0, 1,
-     /* actual cnt, fill */ 0, 0,
+     /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
@@ -337,7 +340,8 @@ _IF homerc _exist
      /* opt name & text  */ zSave_OptsText,    (const char*)NULL,
                             zSave_Opts_Name,
      /* disablement strs */ (const char*)NULL, (const char*)NULL, }[=
-_ENDIF=]  };
+_ENDIF=]
+};
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

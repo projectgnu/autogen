@@ -18,7 +18,6 @@
 * edit sources to use xmalloc and friends throughout for better recovery
   from failed allocation
 * Write an argv style parsing agPrint.c
-* Document the use of autoopts
 * Try to sort out the server chaining stuff once and for all... I
   suspect the pipeline will need to be built up in reverse like bash...
 * Use the libtool versioning stuff for libopts
@@ -28,7 +27,6 @@
 
 Possibilities for the future:
 
-* think about changing the tokenizer to do more sophisticated token typing.
 * rewrite in guile (instead of C)
 * parse the autogen macros with a guile translator
 * write code for "autogetopt" (GNU getopt), or

@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/07/02 23:00:27 $
+## Last Modified:  $Date: 1998/07/14 13:35:13 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.7 1998/07/02 23:00:27 bkorb Exp $
+## $Id: Makefile.am,v 1.8 1998/07/14 13:35:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -30,11 +30,12 @@ gendir	= $(top_builddir)/src
 optdir  = $(top_builddir)/src
 
 AODEFS  = $(top_srcdir)/autoopts/options.tpl
+AOHEAD  = $(top_srcdir)/autoopts/opthead.tpl
 ODEF            = $(optdir)/opts.def
 DIRECT          = $(gendir)/agdirect.def
 EXPR            = $(gendir)/agexpr.def
 FUNC            = $(gendir)/agfunc.def
-AGINCLUDE       = $(ODEF) $(DIRECT) $(EXPR) $(FUNC) $(AODEFS)
+AGINCLUDE       = $(ODEF) $(DIRECT) $(EXPR) $(FUNC) $(AODEFS) $(AOHEAD)
 
 autogen.texi : auto_gen.tpl autogen.def $(AGINCLUDE)
 

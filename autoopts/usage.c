@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.5 1998/07/09 17:34:49 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.6 1998/07/14 13:35:05 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -62,7 +62,7 @@
 optionUsage( tOptions*  pOptions, int exitCode )
 {
     tSCC  zReqOptFmt[]   = " %3s %-14s %-5s%s\n";
-    tSCC  zNrmOptFmt[]   = " %3s %-14s %4$s\n";
+    tSCC  zNrmOptFmt[]   = " %1$3s %2$-14s %4$s\n";
     tCC*  pOptFmt;
     FILE* fp = stderr;
 
@@ -296,12 +296,12 @@ optionUsage( tOptions*  pOptions, int exitCode )
 
     {
         tSCC zOptsOnly[]  = "All arguments are named options.\n";
-        tSCC zInverted[]  = "Options may be inverted with '+'.\n";
+        tSCC zInverted[]  = "Options may be disabled with a '+' marker.\n";
         tSCC zNumberOpt[] = "The '-#<number>' option may omit the hash char\n";
 
         tSCC zFlagOkay[]    =
-            "Options may be specified by doubled %ss and their name\n"
-            "or by a single %1$s and the option character.\n";
+            "Options may be specified by doubled %1$ss and their name\n"
+            "or by a single %1$s and the option character value.\n";
 
         tSCC zNoFlags[]     =
             "Options are specified by their name and either single\n"
@@ -324,9 +324,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
             fputs( zNumberOpt, fp );
     }
 
-    if (pOptions->pzExplain != (char*)NULL) {
+    if (pOptions->pzExplain != (char*)NULL)
         fputs( pOptions->pzExplain, fp );
-    }
 
 
     if (exitCode == EXIT_SUCCESS) {

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.5 1998/07/09 20:57:31 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 1.6 1998/07/14 13:35:09 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -194,16 +194,15 @@ struct optDesc {
     tCUC              optMaxCt;
 
     tUC               optOccCt;
-    tUC               optFill;
     tUS               fOptState;
-
     char*             pzLastArg;
     void*             optCookie;
+
     const int *       pOptMust;
     const int *       pOptCant;
     tpOptProc         pOptProc;
-
     const char*       pzText;
+
     const char*       pz_NAME;
     const char*       pz_Name;
     const char*       pz_DisableName;
@@ -224,7 +223,7 @@ struct specOptIndex {
  *  routine may exit with an informative message instead of,
  *  for example, page faulting.
  */
-#define OPTIONS_STRUCT_VERSION 3
+#define OPTIONS_STRUCT_VERSION 4
 
 struct options {
     const int         structVersion;
