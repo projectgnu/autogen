@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.6 2000/03/23 02:29:46 bruce Exp $
+# @(#) $Id: mkconfig.sh,v 2.7 2000/03/23 02:40:47 bruce Exp $
 # ----------------------------------------------------------------------
 
 exec 5> temp.config
@@ -29,7 +29,7 @@ GENLIST="agen5/autogen.1
 for f in ${GENLIST}
 do
   [ -f $f ] || {
-    print -u2 "Error:  cannot generate configure without $f"
+    echo "Error:  cannot generate configure without $f" >&2
     exit 1
   }
 done
