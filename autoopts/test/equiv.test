@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/10 01:13:09 $
+# Last Modified:     $Date: 2001/12/10 01:25:16 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: equiv.test,v 3.1 2001/12/10 01:13:09 bkorb Exp $
+# $Id: equiv.test,v 3.2 2001/12/10 01:25:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -153,26 +153,26 @@ OPTION_CT=4
 export OPTION_CT
 TEST_EQUIV_OPTION='opt'
 export TEST_EQUIV_OPTION
-TEST_EQUIV_ALPHA='BETA'
-export TEST_EQUIV_ALPHA
+TEST_EQUIV_ALPHA_MODE='BETA'
+export TEST_EQUIV_ALPHA_MODE
 TEST_EQUIV_BETA=5
 export TEST_EQUIV_BETA
 OPTION_CT=2
 export OPTION_CT
-TEST_EQUIV_ALPHA='GAMMA'
-export TEST_EQUIV_ALPHA
+TEST_EQUIV_ALPHA_MODE='GAMMA'
+export TEST_EQUIV_ALPHA_MODE
 TEST_EQUIV_GAMMA='true'
 export TEST_EQUIV_GAMMA
 OPTION_CT=2
 export OPTION_CT
-TEST_EQUIV_ALPHA='GAMMA'
-export TEST_EQUIV_ALPHA
+TEST_EQUIV_ALPHA_MODE='GAMMA'
+export TEST_EQUIV_ALPHA_MODE
 TEST_EQUIV_GAMMA='false'
 export TEST_EQUIV_GAMMA
 OPTION_CT=2
 export OPTION_CT
-TEST_EQUIV_ALPHA='OMEGA'
-export TEST_EQUIV_ALPHA
+TEST_EQUIV_ALPHA_MODE='OMEGA'
+export TEST_EQUIV_ALPHA_MODE
 TEST_EQUIV_OMEGA='tres'
 export TEST_EQUIV_OMEGA
 _EOF_
