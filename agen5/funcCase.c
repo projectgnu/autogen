@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.3 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: funcCase.c,v 1.4 1999/10/31 19:10:34 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -57,6 +57,9 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
 
 /*=gfunc string_contains_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "*==*"
  *
@@ -81,6 +84,9 @@ ag_scm_string_contains_p( SCM text, SCM substr )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*=gfunc string_ends_with_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "*=="
@@ -114,6 +120,9 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
 
 /*=gfunc string_starts_with_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "==*"
  *
@@ -142,6 +151,9 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
 
 /*=gfunc string_equals_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "=="
  *
@@ -165,6 +177,9 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*=gfunc string_contains_eqv_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "*=*"
@@ -208,6 +223,9 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_ends_eqv_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "*="
  *
@@ -239,6 +257,9 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_starts_eqv_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "=*"
  *
@@ -267,6 +288,9 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_eqv_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "="
  *
@@ -294,6 +318,9 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_has_match_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "*~~*"
  *
@@ -301,6 +328,9 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
  *       Case is significant.
 =*/
 /*=gfunc string_has_eqv_match_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "*~*"
@@ -368,6 +398,9 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_end_match_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "*~~"
  *
@@ -375,6 +408,9 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
  *       Case is significant.
 =*/
 /*=gfunc string_end_eqv_match_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "*~"
@@ -456,6 +492,9 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_start_match_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "~~*"
  *
@@ -463,6 +502,9 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
  *       Case is significant.
 =*/
 /*=gfunc string_start_eqv_match_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "~*"
@@ -540,6 +582,9 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_match_p
  *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
+ *
  * req: 2
  * string: "~~"
  *
@@ -547,6 +592,9 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  *       Case is significant.
 =*/
 /*=gfunc string_eqv_match_p
+ *
+ * exparg: text, text to test for pattern
+ * exparg: match, pattern/substring to search for
  *
  * req: 2
  * string: "~"
