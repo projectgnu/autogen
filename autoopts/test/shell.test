@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: shell.test,v 1.6 2000/03/21 03:05:22 bruce Exp $
+# $Id: shell.test,v 1.7 2000/03/31 05:15:49 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -96,7 +96,7 @@ compile "-?"
 echo creating $testname.hlp
 cat > $testname.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
-USAGE:  shell [-<flag> [<val>] | --<name>[{=| }<val>]] ...
+USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o YES script         Output Script File
    -s YES shell          Shell name (follows "#!" magic)
