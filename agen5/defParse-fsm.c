@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday January 18, 2004 at 09:22:32 AM PST
+ *  It has been AutoGen-ed  Saturday January 31, 2004 at 09:35:40 PM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -46,11 +46,6 @@
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
 static char*        pz_new_name   = NULL;
-static tDefEntry*   pCurrentEntry = NULL;
-static int          stackDepth    = 0;
-static int          stackSize     = 16;
-static tDefEntry*   defStack[16];
-static tDefEntry**  ppDefStack    = defStack;
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
@@ -171,7 +166,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
   },
 
   /* STATE :  need_name */
-  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+  { { DP_ST_NEED_DEF, NULL },                       /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_DONE, &dp_do_need_name_end },           /* EVT:  End-Of-File */
     { DP_ST_HAVE_NAME, &dp_do_need_name_var_name }, /* EVT:  var_name */
@@ -374,9 +369,8 @@ dp_do_empty_val(
      *  end of statement.  It is a string value with an empty string.
      */
     tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    pCurrentEntry  = addSibMacro( pDE, pCurrentEntry );
-    pDE->pzValue = zNil;
-    pDE->valType = VALTYP_TEXT;
+    pDE->val.pzText = (char*)zNil;
+    pDE->valType    = VALTYP_TEXT;
     return maybe_next;
 /*  END   == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
 }
@@ -391,8 +385,7 @@ dp_do_end_block(
     if (--stackDepth < 0)
         yyerror( "Too many close braces" );
 
-    makeMacroList( ppDefStack[ stackDepth ], pCurrentEntry, VALTYP_BLOCK );
-    pCurrentEntry = ppDefStack[ stackDepth ];
+    pCurrentEntry = ppParseStack[ stackDepth ];
     return maybe_next;
 /*  END   == END BLOCK == DO NOT CHANGE THIS COMMENT  */
 }
@@ -408,10 +401,7 @@ dp_do_have_name_lit_eq(
      *  Create a new entry but defer "makeMacro" call until we have the
      *  assigned value.
      */
-    tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    if (pCurrentEntry != NULL)
-        addSibMacro( pDE, pCurrentEntry );
-    pCurrentEntry = pDE;
+    findPlace( pz_new_name, NULL );
     return maybe_next;
 /*  END   == HAVE NAME LIT EQ == DO NOT CHANGE THIS COMMENT  */
 }
@@ -427,8 +417,7 @@ dp_do_indexed_name(
      *  Create a new entry with a specified indes, but defer "makeMacro" call
      *  until we have the assigned value.
      */
-    tDefEntry* pDE = findPlace( pz_new_name, pz_token );
-    pCurrentEntry = addSibMacro( pDE, pCurrentEntry );
+    findPlace( pz_new_name, pz_token );
     return maybe_next;
 /*  END   == INDEXED NAME == DO NOT CHANGE THIS COMMENT  */
 }
@@ -454,6 +443,19 @@ dp_do_need_name_end(
 /*  START == NEED NAME END == DO NOT CHANGE THIS COMMENT  */
     if (stackDepth != 0)
         yyerror( "definition blocks were left open" );
+
+    /*
+     *  We won't be using the parse stack any more.
+     *  We only process definitions once.
+     */
+    if (ppParseStack != parseStack)
+        AGFREE( ppParseStack );
+
+    /*
+     *  The seed has now done its job.  The real root of the
+     *  definitions is the first entry off of the seed.
+     */
+    rootDefCtx.pDefs = rootDefCtx.pDefs->val.pDefEntry;
     return maybe_next;
 /*  END   == NEED NAME END == DO NOT CHANGE THIS COMMENT  */
 }
@@ -478,12 +480,9 @@ dp_do_next_val(
 {
 /*  START == NEXT VAL == DO NOT CHANGE THIS COMMENT  */
     /*
-     *  Create a new entry but defer "makeMacro" call until we have the
-     *  assigned value.
+     *  Clone the entry name of the current entry.
      */
-    tDefEntry* pDE = findPlace( pCurrentEntry->pzDefName, NULL );
-    addSibMacro( pDE, pCurrentEntry );
-    pCurrentEntry = pDE;
+    findPlace( pCurrentEntry->pzDefName, NULL );
     return maybe_next;
 /*  END   == NEXT VAL == DO NOT CHANGE THIS COMMENT  */
 }
@@ -497,22 +496,23 @@ dp_do_start_block(
 /*  START == START BLOCK == DO NOT CHANGE THIS COMMENT  */
     if (pCurrentEntry->valType == VALTYP_TEXT)
         yyerror( "assigning a block value to text name" );
+    pCurrentEntry->valType = VALTYP_BLOCK; /* in case not yet determined */
 
-    if (++stackDepth > stackSize) {
+    if (++stackDepth >= stackSize) {
         tDefEntry** ppDE;
         stackSize += stackSize / 2;
 
-        if (ppDefStack == defStack) {
+        if (ppParseStack == parseStack) {
             ppDE = AGALOC( stackSize * sizeof(void*), "def stack" );
-            memcpy( ppDE, defStack, sizeof( defStack ));
+            memcpy( ppDE, parseStack, sizeof( parseStack ));
         } else {
-            ppDE = AGREALOC( ppDefStack, stackSize * sizeof(void*),
+            ppDE = AGREALOC( ppParseStack, stackSize * sizeof(void*),
                              "stretch def stack" );
         }
-        ppDefStack = ppDE;
+        ppParseStack = ppDE;
     }
-    pCurrentEntry->valType = VALTYP_BLOCK;
-    ppDefStack[ stackDepth-1 ] = pCurrentEntry;
+    ppParseStack[ stackDepth ] = pCurrentEntry;
+    pCurrentEntry = NULL;
     return maybe_next;
 /*  END   == START BLOCK == DO NOT CHANGE THIS COMMENT  */
 }
@@ -527,7 +527,7 @@ dp_do_str_value(
     if (pCurrentEntry->valType == VALTYP_BLOCK)
         yyerror( "assigning a block value to text name" );
 
-    pCurrentEntry->pzValue = pz_token;
+    pCurrentEntry->val.pzText = pz_token;
     pCurrentEntry->valType = VALTYP_TEXT;
     return maybe_next;
 /*  END   == STR VALUE == DO NOT CHANGE THIS COMMENT  */
@@ -540,7 +540,24 @@ dp_do_tpl_name(
     te_dp_event trans_evt )
 {
 /*  START == TPL NAME == DO NOT CHANGE THIS COMMENT  */
-    identify( pz_token );
+    /*
+     *  Allow this routine to be called multiple times.
+     *  This may happen if we include another definition file.
+     */
+    if (rootDefCtx.pDefs == NULL) {
+        tSCC   zBogus[] = "@BOGUS@";
+        static tDefEntry seed = {
+            NULL, NULL, NULL, NULL, (char*)zBogus, VALTYP_BLOCK, 0,
+            { NULL } };
+
+        rootDefCtx.pDefs = &seed;
+
+        if (! HAVE_OPT(OVERRIDE_TPL))
+             pzTemplFileName = pz_token;
+
+        stackDepth = 0;
+        ppParseStack[0] = &seed;
+    }
     return maybe_next;
 /*  END   == TPL NAME == DO NOT CHANGE THIS COMMENT  */
 }
