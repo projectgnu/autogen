@@ -8,7 +8,7 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2005/01/23 23:52:49 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2005/01/31 02:29:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -137,12 +137,12 @@ $(TEXI_STAMP) : ../agen5/autogen funcs.def
 	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
-gettext         : usage-txt.po
-usage-txt.po    : usage-txt.h
+gettext po      : usage-txt.po
+usage-txt.po    : autoopts/usage-txt.h
 	gt=`which xgettext | sed 's,.* ,,'` ; \
 	test -x $${gt} || exit 0 ; \
 	opts='--omit-header -a -s ' ; \
-	$${gt} -o $@ $${opts} usage-txt.h
+	$${gt} -o $@ $${opts} autoopts/usage-txt.h
 
 libsrc : $(libsrc)
 $(libsrc) :

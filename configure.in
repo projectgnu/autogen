@@ -1,28 +1,26 @@
-dnl  -*- Mode: M4 -*-
-dnl
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2005 Bruce Korb
 dnl
-dnl Time-stamp:      "2005-01-23 15:50:50 bkorb"
+dnl Time-stamp:      "2005-01-30 17:23:30 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.4 2005/01/23 23:52:49 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.5 2005/01/31 02:29:39 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
-AC_INIT([autogen],[5.6.6],[autogen-users@lists.sf.net])
+AC_INIT([AutoGen],[5.6.6],[autogen-users@lists.sf.net])
 AC_CONFIG_SRCDIR(agen5/autogen.c)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
 . $srcdir/VERSION
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.4 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.5 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -226,7 +224,7 @@ AC_SUBST(DYNAMIC_AG)
 # Do all our own macros
 # ----------------------------------------------------------------------
 INVOKE_AG_MACROS
-
+[
 if ! test x$ag_cv_sys_siglist = xyes
 then
   if ! test x$ac_cv_func_strsignal = xyes
@@ -234,7 +232,7 @@ then
     echo "WARNING:  strsignal will use POSIX names and Linux signal numbers"
   fi
 fi >&2
-
+]
 # ----------------------------------------------------------------------
 # Do SNPRINTFV macros
 # ----------------------------------------------------------------------
@@ -298,5 +296,13 @@ Configuration:
 
   See config.h for further configuration information.
 ------------------------------------------------------------------------"
+dnl Local Variables:
+dnl mode: autoconf-mode
+dnl tab-width: 4
+dnl indent-tabs-mode: nil
+dnl sh-indentation: 2
+dnl End:
+dnl
+dnl end of configure.am
 
 dnl configure.in ends here
