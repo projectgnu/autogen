@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.1 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expGperf.c,v 3.2 2002/01/15 16:55:10 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -133,13 +133,8 @@ ag_scm_make_gperf( SCM name, SCM hlist )
     {
         char* pzCmd;
         pzCmd = asprintf( zMakeGperf, pzList, pzName, getpid() );
-        if (pzCmd == (char*)NULL) {
-            fprintf( stderr, "Error using %s list:  ``%s''\n\n",
-                     pzName, pzList );
-            fprintf( stderr, zMakeGperf, pzList, pzName, getpid() );
-
-            AG_ABEND( "formatting shell command" );
-        }
+        if (pzCmd == (char*)NULL)
+            AG_ABEND( asprintf( "asprintf( %s, ...", zMakeGperf ));
 
         /*
          *  Run the command and ignore the results.

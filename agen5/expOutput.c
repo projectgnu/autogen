@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expOutput.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -112,7 +112,7 @@ ag_scm_out_delete( void )
     /*
      *  Delete the current output file
      */
-    fprintf( stderr, zSkipMsg, pCurFp->pzOutName );
+    fprintf( pfTrace, zSkipMsg, pCurFp->pzOutName );
     outputDepth = 1;
     longjmp( fileAbort, PROBLEM );
     /* NOTREACHED */
@@ -163,11 +163,8 @@ ag_scm_out_pop( SCM ret_contents )
 {
     SCM res = SCM_UNDEFINED;
 
-    if (pCurFp->pPrev == (tFpStack*)NULL) {
-        fputs( "ERROR:  Cannot pop output with no output pushed\n",
-               stderr );
-        AG_ABEND( "expr failed" );
-    }
+    if (pCurFp->pPrev == (tFpStack*)NULL)
+        AG_ABEND( "ERROR:  Cannot pop output with no output pushed\n" );
 
 
     if (gh_boolean_p( ret_contents ) && SCM_NFALSEP( ret_contents )) {
@@ -175,11 +172,9 @@ ag_scm_out_pop( SCM ret_contents )
         pos = ftell( pCurFp->pFile );
         res = scm_makstr( pos, 0 );
         rewind( pCurFp->pFile );
-        if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1) {
-            fprintf( stderr, "Error %d (%s) rereading output\n", errno,
-                     strerror( errno ));
-            res = SCM_UNDEFINED;
-        }
+        if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
+            AG_ABEND( asprintf( "Error %d (%s) rereading output\n",
+                                errno, strerror( errno )));
     }
 
     outputDepth--;
@@ -206,11 +201,8 @@ ag_scm_out_suspend( SCM suspName )
     SCM res = SCM_UNDEFINED;
     tCC* pzSuspName = ag_scm2zchars( suspName, "suspend name" );
 
-    if (pCurFp->pPrev == (tFpStack*)NULL) {
-        fputs( "ERROR:  Cannot pop output with no output pushed\n",
-               stderr );
-        AG_ABEND( "expr failed" );
-    }
+    if (pCurFp->pPrev == (tFpStack*)NULL)
+        AG_ABEND( "ERROR:  Cannot pop output with no output pushed" );
 
     if (++suspendCt > suspAllocCt) {
         suspAllocCt += 8;
@@ -261,9 +253,8 @@ ag_scm_out_resume( SCM suspName )
         }
     }
 
-    fprintf( stderr, "ERROR: no output file was suspended as ``%s''\n",
-             pzName );
-    AG_ABEND( "resume failed" );
+    AG_ABEND( asprintf( "ERROR: no output file was suspended as ``%s''\n",
+                        pzName ));
     return SCM_UNDEFINED;
 }
 
@@ -330,9 +321,30 @@ ag_scm_out_push_new( SCM new_file )
         addWriteAccess( pzNewFile );
         p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     } else {
-        AGDUPSTR( pzNewFile, ".agtmp.XXXXXX", "temp file name" );
+        tSCC* pzTemp = NULL;
+        int tmpfd;
+
+        if (pzTemp == NULL) {
+            char* pz = getenv( "TEMP" );
+            if (pz == NULL) {
+                pz = getenv( "TMP" );
+                if (pz == NULL)
+                    pz = "/tmp";
+            }
+
+            pzTemp = asprintf( "%s/agtmp.XXXXXX", pz );
+            if (pzTemp == NULL)
+                AG_ABEND( "cannot allocate temp file template" );
+        }
+
+        AGDUPSTR( pzNewFile, pzTemp, "temp file name" );
         p->flags |= FPF_UNLINK;
-        p->pFile  = fdopen( mkstemp( pzNewFile ), "a" FOPEN_BINARY_FLAG "+" );
+        tmpfd = mkstemp( pzNewFile );
+        if (tmpfd < 0)
+            AG_ABEND( asprintf( "failed to create temp file from `%s'",
+                                pzTemp ));
+
+        p->pFile  = fdopen( tmpfd, "a" FOPEN_BINARY_FLAG "+" );
     }
 
     p->pzOutName = pzNewFile;
@@ -381,12 +393,10 @@ ag_scm_out_switch( SCM new_file )
      */
     unlink( pzNewFile );
     if (   freopen( pzNewFile, "w" FOPEN_BINARY_FLAG, pCurFp->pFile )
-        != pCurFp->pFile) {
-        tSCC zOpen[] = "%s ERROR %d (%s): cannot open %s\n";
-        fprintf( stderr, zOpen, pzProg,
-                 errno, strerror( errno ), pzNewFile );
-        AG_ABEND( "expr failed" );
-    }
+        != pCurFp->pFile)
+
+        AG_ABEND( asprintf( zCannot, errno, "freopen", pzNewFile,
+                            strerror( errno )));
 
     /*
      *  Set the mod time on the old file.

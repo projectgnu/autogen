@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: funcEval.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -177,7 +177,7 @@ evalExpression( ag_bool* pMustFree )
 
             if (  (pDef->valType != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
-                fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
+                fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                          zBlock );
                 return (char*)zNil;
             }
@@ -198,7 +198,7 @@ evalExpression( ag_bool* pMustFree )
                  *  And make sure what we found is a text value
                  */
                 if (pDef->valType != VALTYP_TEXT) {
-                    fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
+                    fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                              zBlock );
                     return (char*)zNil;
                 }
@@ -216,7 +216,7 @@ evalExpression( ag_bool* pMustFree )
                  *  And make sure what we found is a text value
                  */
                 if (pDef->valType != VALTYP_TEXT) {
-                    fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
+                    fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                              zBlock );
                     return (char*)zNil;
                 }

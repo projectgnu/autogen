@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: defLex.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -289,9 +289,8 @@ scanAgain:
 
 NUL_error:
 
-    fprintf( stderr, zErrMsg, pzProg, "unterminated quote in definition",
-             pCurCtx->pzFileName, pCurCtx->lineNo );
-    lastToken = ERROR;
+    AG_ABEND( asprintf( zErrMsg, pzProg, "unterminated quote in definition",
+                        pCurCtx->pzFileName, pCurCtx->lineNo ));
     return ERROR;
 
 lex_done:
@@ -319,50 +318,33 @@ lex_done:
 EXPORT void
 yyerror( char* s )
 {
-    fprintf( stderr, "%s:  in %s on line %d\n    token in error:  ",
-             s, pCurCtx->pzFileName, pCurCtx->lineNo );
+    tSCC zVN[] = "VAR_NAME %s\n";
+    tSCC zON[] = "OTHER_NAME %s\n";
+    tSCC zSt[] = "STRING %s\n";
+    tSCC zNo[] = "NUMBER %s\n";
+    tSCC zDf[] = "`%1$c' (%1$d)\n";
+
+    char* pz;
 
     if (strlen( pCurCtx->pzScan ) > 64 )
         pCurCtx->pzScan[64] = NUL;
 
     switch (lastToken) {
-    case TK_AUTOGEN:
-        fputs( "AUTOGEN\n", stderr );
-        break;
-
-    case TK_DEFINITIONS:
-        fputs( "DEFINITIONS\n", stderr );
-        break;
-
-    case TK_END:
-        fputs( "END\n", stderr );
-        break;
-
-    case TK_VAR_NAME:
-        fprintf( stderr, "VAR_NAME %s\n", (char*)yylval );
-        break;
-
-    case TK_OTHER_NAME:
-        fprintf( stderr, "OTHER_NAME %s\n", (char*)yylval );
-        break;
-
-    case TK_STRING:
-        fprintf( stderr, "STRING %s\n", (char*)yylval );
-        break;
-
-    case TK_NUMBER:
-        fprintf( stderr, "NUMBER %s\n", (char*)yylval );
-        break;
-
-    default:
-        fprintf( stderr, "`%1$c' (%1$d)\n", lastToken );
+    case TK_AUTOGEN:     pz = "AUTOGEN\n";     break;
+    case TK_DEFINITIONS: pz = "DEFINITIONS\n"; break;
+    case TK_END:         pz = "END\n";         break;
+    case TK_VAR_NAME:    pz = asprintf( zVN, (char*)yylval ); break;
+    case TK_OTHER_NAME:  pz = asprintf( zON, (char*)yylval ); break;
+    case TK_STRING:      pz = asprintf( zSt, (char*)yylval ); break;
+    case TK_NUMBER:      pz = asprintf( zNo, (char*)yylval ); break;
+    default:             pz = asprintf( zDf, lastToken );     break;
     }
 
-    {
-        char* pz = asprintf( "invalid definition token"
-                             "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
-        AG_ABEND( pz );
-    }
+    AG_ABEND( asprintf( "%s:  in %s on line %d\n"
+                        "\ttoken in error:  %s\n"
+                        "\t[[...<error-text>]] %s\n\n",
+                        s, pCurCtx->pzFileName, pCurCtx->lineNo, pz,
+                        pCurCtx->pzScan ));
 }
 
 
@@ -549,13 +531,11 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
          *  ELSE skip over the rest of the OTHER_NAME
          */
         if (zNameChars[ *pz ] == 0) {
-            if (pz == (unsigned char*)pzScan) {
-                fprintf( stderr, "%s Error: Invalid input char '%c' "
-                         "in %s on line %d\n", pzProg, *pzScan,
-                         pCurCtx->pzFileName, pCurCtx->lineNo );
-                *pRetVal = FINISH;
-                return pzScan;
-            }
+            if (pz == (unsigned char*)pzScan)
+                AG_ABEND( asprintf( "%s Error: Invalid input char '%c' "
+                                    "in %s on line %d\n", pzProg, *pzScan,
+                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
+
             *pRetVal = TK_VAR_NAME;
         } else {
             *pRetVal = TK_OTHER_NAME;
@@ -605,7 +585,7 @@ STATIC char*
 assembleHereString( char* pzScan )
 {
     ag_bool  trimTabs = AG_FALSE;
-    char     zMark[ 64 ];
+    char     zMark[ MAX_HEREMARK_LEN ];
     int      markLen = 0;
     char*    pzDest;
 
@@ -621,11 +601,9 @@ assembleHereString( char* pzScan )
      *  Skip white space up to the marker or EOL
      */
     while (isspace( *pzScan )) {
-        if (*pzScan++ == '\n') {
-            fprintf( stderr, zErrMsg, pzProg, "HereString missing the mark",
-                     pCurCtx->pzFileName, pCurCtx->lineNo );
-            return (char*)NULL;
-        }
+        if (*pzScan++ == '\n')
+            AG_ABEND( asprintf( zErrMsg, pzProg, "HereString missing the mark",
+                                pCurCtx->pzFileName, pCurCtx->lineNo ));
     }
 
     /*
@@ -634,20 +612,16 @@ assembleHereString( char* pzScan )
     {
         char* pz = zMark;
         while (ISNAMECHAR( *pzScan )) {
-            if (++markLen >= sizeof(zMark)) {
-                fprintf( stderr, zErrMsg, pzProg,
-                         "HereString mark over 63 chars",
-                         pCurCtx->pzFileName, pCurCtx->lineNo );
-                return (char*)NULL;
-            }
+            if (++markLen >= sizeof(zMark))
+                AG_ABEND( asprintf( zErrMsg, pzProg, "HereString mark "
+                                    STR( MAX_HEREMARK_LEN ) " or more chars",
+                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
 
             *(pz++) = *(pzScan++);
         }
-        if (markLen == 0) {
-            fprintf( stderr, zErrMsg, pzProg, "HereString missing the mark",
-                     pCurCtx->pzFileName, pCurCtx->lineNo );
-            return (char*)NULL;
-        }
+        if (markLen == 0)
+            AG_ABEND( asprintf( zErrMsg, pzProg, "HereString missing the mark",
+                                pCurCtx->pzFileName, pCurCtx->lineNo ));
         *pz = NUL;
     }
 
@@ -658,11 +632,9 @@ assembleHereString( char* pzScan )
      *  Skip forward to the EOL after the marker.
      */
     pzScan = strchr( pzScan, '\n' );
-    if (pzScan == (char*)NULL) {
-        fprintf( stderr, zErrMsg, pzProg, "Unterminated HereString",
-                 pCurCtx->pzFileName, pCurCtx->lineNo );
-        return (char*)NULL;
-    }
+    if (pzScan == (char*)NULL)
+        AG_ABEND( asprintf( zErrMsg, pzProg, "Unterminated HereString",
+                            pCurCtx->pzFileName, pCurCtx->lineNo ));
 
     /*
      *  And skip the first new line + conditionally skip tabs
@@ -686,9 +658,8 @@ assembleHereString( char* pzScan )
                 goto lineDone;
 
             case NUL:
-                fprintf( stderr, zErrMsg, pzProg, "Unterminated HereString",
-                         pCurCtx->pzFileName, pCurCtx->lineNo );
-                return (char*)NULL;
+                AG_ABEND( asprintf( zErrMsg, pzProg, "Unterminated HereString",
+                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
             }
         } lineDone:;
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: funcDef.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -785,7 +785,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  the entries are all linked together and
      *  realloc-ing it may cause it to move.
      */
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
+#if defined( DEBUG )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";

@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: defDirect.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -89,6 +89,13 @@ processDirective( char* pzScan )
     }
 
     /*
+     *  Ignore ``#!'' as a comment, enabling a definition file to behave
+     *  as a script that gets interpreted by autogen.  :-)
+     */
+    if (*pzScan == '!')
+        return pzEnd;
+
+    /*
      *  Find the start of the directive name
      */
     while (isspace(*pzScan)) pzScan++;
@@ -161,7 +168,7 @@ findDirective( char* pzDirName )
             ch = NUL;
         }
 
-        fprintf( stderr, "WARNING:  in %s on line %d unknown directive:\n"
+        fprintf( pfTrace, "WARNING:  in %s on line %d unknown directive:\n"
                  "\t#%s\n", pCurCtx->pzFileName, pCurCtx->lineNo, pzDirName );
 
         if (ch != NUL)
@@ -196,8 +203,7 @@ skipToEndif( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == (char*)NULL) {
-                pz = asprintf( stderr, zNoEndif,
-                               pCurCtx->pzFileName, pCurCtx->lineNo );
+                pz = asprintf( zNoEndif, pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND( pz );
             }
 
@@ -258,8 +264,7 @@ skipToElseEnd( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == (char*)NULL) {
-                pz = asprintf( stderr, zNoEndif,
-                               pCurCtx->pzFileName, pCurCtx->lineNo );
+                pz = asprintf( zNoEndif, pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND( pz );
             }
 
@@ -433,7 +438,7 @@ STATIC char*
 doDir_else( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
-        char* pz = asprintf( stderr, zNoMatch,
+        char* pz = asprintf( zNoMatch,
                              pCurCtx->pzFileName, pCurCtx->lineNo, "else" );
         AG_ABEND( pz );
     }
@@ -452,7 +457,7 @@ STATIC char*
 doDir_endif( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
-        char* pz = asprintf( stderr, zNoMatch, pCurCtx->pzFileName,
+        char* pz = asprintf( zNoMatch, pCurCtx->pzFileName,
                              pCurCtx->lineNo, "endif" );
         AG_ABEND( pz );
     }
@@ -473,7 +478,7 @@ doDir_endshell( char* pzArg, char* pzScan )
      *  In actual practice, the '#endshell's must be consumed inside
      *  the 'doDir_shell()' procedure.
      */
-    char* pz = asprintf( stderr, zNoMatch, pCurCtx->pzFileName,
+    char* pz = asprintf( zNoMatch, pCurCtx->pzFileName,
                          pCurCtx->lineNo, "endshell" );
     AG_ABEND( pz );
 }
@@ -583,7 +588,7 @@ doDir_include( char* pzArg, char* pzScan )
 
     if (! SUCCESSFUL( findFile( pzArg, zFullName, apzSfx ))) {
         tSCC zFmt[] = "WARNING:  cannot find `%s' definitions file\n";
-        fprintf( stderr, zFmt, pzArg );
+        fprintf( pfTrace, zFmt, pzArg );
         return pzScan;
     }
 
@@ -594,12 +599,12 @@ doDir_include( char* pzArg, char* pzScan )
     {
         struct stat stbf;
         if (stat( zFullName, &stbf ) != 0) {
-            fprintf( stderr, "WARNING %d (%s):  cannot stat `%s' "
+            fprintf( pfTrace, "WARNING %d (%s):  cannot stat `%s' "
                      "for include\n", errno, strerror( errno ), zFullName );
             return pzScan;
         }
         if (! S_ISREG( stbf.st_mode )) {
-            fprintf( stderr, "WARNING:  `%s' must be regular file to "
+            fprintf( pfTrace, "WARNING:  `%s' must be regular file to "
                      "include\n", zFullName );
             return pzScan;
         }
@@ -752,7 +757,7 @@ doDir_shell( char* pzArg, char* pzScan )
 
     pzScan = strstr( pzScan, zEndShell );
     if (pzScan == (char*)NULL) {
-        pzScan = asprintf( stderr, "Missing #endshell after '#shell' "
+        pzScan = asprintf( "Missing #endshell after '#shell' "
                            "in %s on line %d\n", pCurCtx->pzFileName,
                            pCurCtx->lineNo );
         AG_ABEND( pzScan );

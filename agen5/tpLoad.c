@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -49,6 +49,18 @@ findTemplate( tCC* pzTemplName )
     return pT;
 }
 
+STATIC ag_bool
+canReadFile( tCC* pzFName )
+{
+    struct stat stbf;
+    if (stat( pzFName, &stbf ) != 0)
+        return AG_FALSE;
+    if (! S_ISREG( stbf.st_mode ))
+        return AG_FALSE;
+    return (access( pzFName, R_OK) == 0);
+}
+
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Starting with the current directory, search the directory
@@ -60,6 +72,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
     char*   pzRoot;
     char*   pzSfx;
     void*   deallocAddr = NULL;
+
     tSuccess res = SUCCESS;
 
     /*
@@ -84,7 +97,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
     /*
      *  Check for an immediately accessible file
      */
-    if (access( pzFName, R_OK ) == 0) {
+    if (canReadFile( pzFName )) {
         strlcpy( pzFullName, pzFName, MAXPATHLEN );
         goto findFileReturn;
     }
@@ -111,7 +124,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 
         do  {
             strcpy( pzEnd, *(papSL++) ); /* must fit */
-            if (access( pzFullName, R_OK ) == 0) {
+            if (canReadFile( pzFullName )) {
                 goto findFileReturn;
             }
         } while (*papSL != NULL);
@@ -153,7 +166,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
                 + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
                             zDirFmt, pzDir, pzFName );
 
-            if (access( pzFullName, R_OK ) == 0)
+            if (canReadFile( pzFullName ))
                 goto findFileReturn;
 
             /*
@@ -166,7 +179,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 
                 do  {
                     strcpy( pzEnd, *(papSL++) ); /* must fit */
-                    if (access( pzFullName, R_OK ) == 0)
+                    if (canReadFile( pzFullName ))
                         goto findFileReturn;
 
                 } while (*papSL != NULL);
@@ -283,7 +296,7 @@ loadMacros( tTemplate* pT,
      *  the entries are all linked together and
      *  realloc-ing it may cause it to move.
      */
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
+#if defined( DEBUG )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";

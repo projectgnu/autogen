@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: agUtils.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -575,10 +575,8 @@ skipExpression( tCC* pzSrc, size_t len )
 ag_alloc( size_t sz, tCC* pzWhat )
 {
     void* p = malloc( sz );
-    if ((p == (void*)NULL) && (pzWhat != NULL)) {
-        pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-        AG_ABEND( pzWhat );
-    }
+    if ((p == (void*)NULL) && (pzWhat != NULL))
+        AG_ABEND( asprintf( zAllocErr, pzProg, sz, pzWhat ));
     return p;
 }
 
@@ -588,10 +586,9 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat )
 {
     void* np = p ? realloc( p, sz ) : malloc( sz );
     if (np == (void*)NULL) {
-        if (pzWhat != NULL) {
-            pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-            AG_ABEND( pzWhat );
-        }
+        if (pzWhat != NULL)
+            AG_ABEND( sprintf( zAllocErr, pzProg, sz, pzWhat ));
+
         if (p != NULL)
             free( p );
     }
@@ -684,8 +681,7 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
             return (void*)NULL;
         }
 
-        pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-        AG_ABEND( pzWhat );
+        AG_ABEND( asprintf( zAllocErr, pzProg, sz, pzWhat ));
     }
 
     /*
@@ -710,10 +706,11 @@ checkMem( tMemMgmt* pMM )
 
     do  {
         if (*(p++) != '~') {
-            fprintf( stderr, "Stray pointer %d bytes after %d-byte %s end\n",
+            fprintf( pfTrace, "Stray pointer %d bytes after %d-byte %s end\n",
                      CHECK_CT - ct, pMM->pEnd - (char*)(pMM+1),
                      pMM->pzWhence );
             fclose( stderr );
+            fclose( pfTrace );
             fclose( stdout );
             p = (char*)NULL;
             *p = '~'; /* PAGE FAULT */
@@ -743,10 +740,10 @@ finalMemCheck( void )
 {
     tMemMgmt*  pMM = memHead.pNext;
 
-    fputs( "\nResidual allocation list:\n", stderr );
+    fputs( "\nResidual allocation list:\n", pfTrace );
     while (pMM != &memHead) {
         checkMem( pMM );
-        fprintf( stderr, "%12d bytes from %s\n",
+        fprintf( pfTrace, "%12d bytes from %s\n",
                  pMM->pEnd - (char*)(pMM+1), pMM->pzWhence );
         pMM = pMM->pNext;
     }

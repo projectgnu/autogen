@@ -7,37 +7,35 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/01/13 08:14:27 $
+## Last Modified:   $Date: 2002/01/15 16:55:09 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/01/13 08:14:27 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/01/15 16:55:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
 INCLUDES    = @INCLIST@ $(GUILE_INC)
 
-BLOCKOPT    = subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS     = $(top_builddir)/getdefs/getdefs
 AGEXE       = $(top_builddir)/agen5/@AGEXE@
 
-AGARGS      = autogen=$(AGEXE)
-OPTDBG      = `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
-		  then echo -DDEBUG=1 ; else echo -UDEBUG ; fi`
-
-CONFIG_CLEAN_FILES = autogen.texi autogen.menu autogen.1
-DISTCLEANFILES = Makefile.in
+TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
+DEFINITIONS = cgi.def opts.def pseudo.def
+GENDOCS     = autogen.texi autogen.menu autogen.1
+CLEANFILES  = $(GENDOCS)
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
 GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h \
-	cgi-fsm.c cgi-fsm.h
-GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
+	cgi-fsm.c cgi-fsm.h pseudo-fsm.h
+GEN_SRC = $(GEN_CSRC) defParse.c defParse.h $(GENDOCS)
 
 pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS     = autogen.1
 
-EXTRA_DIST	 = directive.tpl opts.def snarf.tpl cgi.def \
-	pseudo.def pseudo-fsm.h $(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
+MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
+
+EXTRA_DIST = $(GEN_CSRC) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
 
 bin_PROGRAMS = autogen
 
@@ -63,15 +61,15 @@ YFLAGS = -d
 
 all : @AGEXE@
 
-##  Funny build rules for extracting definitions.  "Makefile.in"
+## Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
 STAMPS   = stamp-directive stamp-exprini stamp-opts stamp-fsm
-GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
+GEN_LIST = $(STAMPS) $(GENDOCS) defParse.c defParse.h
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	srcdir=$(srcdir) builddir=$(builddir) DEBUG_OPTS=$(OPTDBG) \
+	srcdir=$(srcdir) builddir=$(builddir) \
 	AGEXE=@AGEXE@ GDEXE=@GDEXE@ COLEXE=@COLEXE@
 
 defLex.o : defParse.h
@@ -109,10 +107,6 @@ defParse.c defParse.h : defParse.y
 	@$(BOOTENV) YACC="$(YACC) $(YFLAGS)" \
 	$(SHELL) $(srcdir)/bootstrap.dir $@
 
-AGEN_LIST = opts.[ch] expr.ini expr.h pseudo-fsm.h directive.h
-MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC) $(AGEN_LIST)
-
-check : $(GEN_LIST)
 gen : $(GEN_LIST)
 
 ../getdefs/getdefs :

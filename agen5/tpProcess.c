@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.5 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.6 2002/01/15 16:55:10 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -91,7 +91,6 @@ STATIC void
 doStdoutTemplate( tTemplate* pTF )
 {
     tSCC zNone[]  = "* NONE *";
-    tSCC zCont[]  = "content-type:";
     int  jmpcode  = setjmp( fileAbort );
     SCM  res;
     tCC* pzRes;
@@ -102,12 +101,12 @@ doStdoutTemplate( tTemplate* pTF )
 
     case PROBLEM:
         if (*pzOopsPrefix != NUL)
-            fprintf( stdout, "%soutput was abandoned\n", pzOopsPrefix );
+            fprintf( pfTrace, "%soutput was abandoned\n", pzOopsPrefix );
         fclose( stdout );
         return;
 
     default:
-        fprintf( stderr, "%sBogus return from setjmp:  %d\n",
+        fprintf( pfTrace, "%sBogus return from setjmp:  %d\n",
                  pzOopsPrefix, jmpcode );
 
     case FAILURE:
@@ -132,6 +131,7 @@ doStdoutTemplate( tTemplate* pTF )
         generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
 
     else {
+        tSCC zCont[]  = "content-type:";
         (void)ag_scm_out_push_new( SCM_UNDEFINED );
 
         generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
@@ -140,7 +140,7 @@ doStdoutTemplate( tTemplate* pTF )
          *  Read back in the spooled output.  Make sure it starts with
          *  a content-type: prefix.  If not, we supply our own HTML prefix.
          */
-        res = ag_scm_out_pop( SCM_BOOL_T );
+        res   = ag_scm_out_pop( SCM_BOOL_T );
         pzRes = SCM_CHARS( res );
 
         if (strneqvcmp( pzRes, zCont, sizeof( zCont ) - 1) != 0)
@@ -196,8 +196,11 @@ processTemplate( tTemplate* pTF )
         }
 
         else {
-            if ((jumpCd != PROBLEM) && (jumpCd != FAILURE))
-                fprintf( stderr, "Bogus return from setjmp:  %d\n", jumpCd );
+            if ((jumpCd != PROBLEM) && (jumpCd != FAILURE)) {
+                fprintf( pfTrace, "%sBogus return from setjmp:  %d\n",
+                         pzOopsPrefix, jumpCd );
+                pzOopsPrefix = "";
+            }
 
             /*
              *  We got here by a long jump.  Close/purge the open files.
@@ -344,9 +347,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
     if (pStk->pFile == (FILE*)NULL) {
     openError:
-        fprintf( stderr, zCannot, pzProg, errno,
-                 "create", pStk->pzOutName, strerror( errno ));
-        AG_ABEND( "file creation error" );
+        AG_ABEND( asprintf( zCannot, pzProg, errno, "create",
+                            pStk->pzOutName, strerror( errno )));
     }
 }
 /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: funcIf.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -463,7 +463,7 @@ ag_scm_set_writable( SCM set )
     switch (STATE_OPT( WRITABLE )) {
     case OPTST_DEFINED:
     case OPTST_PRESET:
-        fprintf( stderr, zWarn, pCurTemplate->pzFileName, pCurMacro->lineNo );
+        fprintf( pfTrace, zWarn, pCurTemplate->pzFileName, pCurMacro->lineNo );
         break;
 
     default:

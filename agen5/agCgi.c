@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.6 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: agCgi.c,v 3.7 2002/01/15 16:55:09 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -110,10 +110,11 @@ loadCgi( void )
     }
 
     textLen = atoi( nameValueMap[ CONTENT_LENGTH_IDX ].pzValue );
-    if (textLen == 0)
-        AG_ABEND( "No CGI data were received" );
 
     if (strcasecmp( pzMethod, "POST" ) == 0) {
+        if (textLen == 0)
+            AG_ABEND( "No CGI data were received" );
+
         pzText  = malloc( (textLen + 32) & ~0x000F );
         if (pzText == NULL) {
             char* pz = asprintf( "%s: %d bytes for CGI input",
@@ -133,6 +134,8 @@ loadCgi( void )
 		AGFREE( pzQuery );
 
     } else if (strcasecmp( pzMethod, "GET" ) == 0) {
+        if (textLen == 0)
+            textLen = strlen( pzQuery );
         pzText = parseInput( pzQuery, textLen );
 
     } else

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.2 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: autogen.h,v 3.3 2002/01/15 16:55:09 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -57,7 +57,8 @@ typedef struct for_info      tForInfo;
 typedef struct for_state     tForState;
 typedef struct template_lib_marker tTlibMark;
 
-#define MAX_SUFFIX_LEN  8  /* maximum length of a file name suffix */
+#define MAX_SUFFIX_LEN    8  /* maximum length of a file name suffix */
+#define MAX_HEREMARK_LEN 64  /* max length of a here mark */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -136,8 +137,8 @@ struct template_desc {
     char*       pzFileName;  /* Name of Macro File       */
     char*       pzTplName;   /* Template Name Pointer    */
     char*       pzTemplText; /* offset of the text       */
-    char        zStartMac[8];
-    char        zEndMac[8];
+    char        zStartMac[MAX_SUFFIX_LEN];
+    char        zEndMac[MAX_SUFFIX_LEN];
     tMacro      aMacros[1];  /* Array of Macros          */
 /*  char        text[...];    * strings at end of macros */
 };
@@ -382,6 +383,8 @@ struct mem_mgmt {
 size_t strlcpy( char* dest, const char* src, size_t n );
 #endif
 
+#include "proto.h"
+
 #ifdef DEBUG
 # define AG_ABEND(s)  ag_abend_at(s,__FILE__,__LINE__)
 #else
@@ -402,7 +405,6 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
     return SCM_CHARS(s);
 }
 
-#include "proto.h"
 #endif /* AUTOGEN_HDR */
 /*
  * Local Variables:

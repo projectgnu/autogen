@@ -1,5 +1,12 @@
 2002-01-12  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/*.c: handle error messages better
+	* agen5/defDirect.c(processDirective): handle ``#!'' as a comment
+	directive.  In this fashion, definition files can be made executable,
+	to be interpreted by autogen.
+
+2002-01-12  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/bootstrap.dir: write a function to compute AG, GD and COL
 	(set +e): some testing winds up causing a failing false in error
 	* agen5/expFormat.c(ag_scm_error): send error messages to pfTrace

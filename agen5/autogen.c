@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.5 2002/01/13 08:14:27 bkorb Exp $
+ *  $Id: autogen.c,v 3.6 2002/01/15 16:55:09 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -161,8 +161,10 @@ EXTERN void
 ag_abend( tCC* pzMsg )
 #endif
 {
-    if (*pzOopsPrefix != NUL)
+    if (*pzOopsPrefix != NUL) {
         fputs( pzOopsPrefix, stderr );
+        pzOopsPrefix = "";
+    }
 
 #ifdef DEBUG
     fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
@@ -174,7 +176,9 @@ ag_abend( tCC* pzMsg )
                  pCurTemplate->pzFileName, line );
     }
     fputs( pzMsg, stderr );
-    fputc( '\n', stderr );
+    pzMsg += strlen( pzMsg );
+    if (pzMsg[-1] != '\n')
+        fputc( '\n', stderr );
 
     {
         teProcState oldState = procState;

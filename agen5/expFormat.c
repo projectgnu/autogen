@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expFormat.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -145,10 +145,8 @@ ag_scm_dne( SCM prefix, SCM first )
     tCC*     pzFirst = zNil;
     SCM      res;
     tCC*     pzPrefix = ag_scm2zchars( prefix, "prefix" );
-    if (strlen( pzPrefix ) > 128 ) {
-        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        AG_ABEND( zPfxLen );
-    }
+    if (strlen( pzPrefix ) > 128 )
+        AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
 
     /*
      *  IF we also have a 'first' prefix string,
@@ -156,10 +154,8 @@ ag_scm_dne( SCM prefix, SCM first )
      */
     if (gh_string_p( first )) {
         int len = SCM_LENGTH( first );
-        if (len >= 128) {
-            fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-            AG_ABEND( zPfxLen );
-        }
+        if (len >= 128)
+            AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
 
         pzFirst = asprintf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
                             ag_scm2zchars( first, "first-prefix" ), pzPrefix );
@@ -175,10 +171,8 @@ ag_scm_dne( SCM prefix, SCM first )
                       pzPrefix, pCurFp->pzOutName, zScribble,
                       OPT_ARG( DEFINITIONS ), pzTemplFileName, pzFirst );
 
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg, -1, "Do-Not-Edit string" );
-        AG_ABEND( zFmtAlloc );
-    }
+    if (pzRes == (char*)NULL)
+        AG_ABEND( asprintf( zAllocErr, pzProg, -1, "Do-Not-Edit string" ));
 
     res = gh_str02scm( pzRes );
 
@@ -325,25 +319,19 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      *  Make sure they are reasonably sized (<256 for program name
      *  and <128 for a line prefix).  Copy them to the scratch buffer.
      */
-    if (SCM_LENGTH( prog_name ) >= 256) {
-        fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        AG_ABEND( zProgLen );
-    }
+    if (SCM_LENGTH( prog_name ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zProgLen, 256 ));
 
-    if (SCM_LENGTH( prefix ) >= 128) {
-        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        AG_ABEND( zPfxLen );
-    }
+    if (SCM_LENGTH( prefix ) >= 128)
+        AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = asprintf( zGpl, pzPrg, pzPfx );
 
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzPrg, -1, "GPL string" );
-        AG_ABEND( zFmtAlloc );
-    }
+    if (pzRes == (char*)NULL)
+        AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "GPL string" ));
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -381,30 +369,22 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
      *  Make sure they are reasonably sized (<256 for program name
      *  and <128 for a line prefix).  Copy them to the scratch buffer.
      */
-    if (SCM_LENGTH( prog_name ) >= 256) {
-        fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        AG_ABEND( zProgLen );
-    }
+    if (SCM_LENGTH( prog_name ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zProgLen, 256 ));
 
-    if (SCM_LENGTH( prefix ) >= 128) {
-        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        AG_ABEND( zPfxLen );
-    }
+    if (SCM_LENGTH( prefix ) >= 128)
+        AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
 
-    if (SCM_LENGTH( owner ) >= 256) {
-        fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        AG_ABEND( zOwnLen );
-    }
+    if (SCM_LENGTH( owner ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zOwnLen, 256 ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = asprintf( zLgpl, pzPrg, pzPfx, pzOwner );
 
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzPrg, -1, "LGPL string" );
-        AG_ABEND( zFmtAlloc );
-    }
+    if (pzRes == (char*)NULL)
+        AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "LGPL string" ));
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -450,30 +430,22 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
      *  Make sure they are reasonably sized (<256 for program name
      *  and <128 for a line prefix).  Copy them to the scratch buffer.
      */
-    if (SCM_LENGTH( prog_name ) >= 256) {
-        fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        AG_ABEND( zProgLen );
-    }
+    if (SCM_LENGTH( prog_name ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zProgLen, 256 ));
 
-    if (SCM_LENGTH( prefix ) >= 128) {
-        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        AG_ABEND( zPfxLen );
-    }
+    if (SCM_LENGTH( prefix ) >= 128)
+        AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
 
-    if (SCM_LENGTH( owner ) >= 256) {
-        fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        AG_ABEND( zOwnLen );
-    }
+    if (SCM_LENGTH( owner ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zOwnLen, 256 ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = asprintf( zBsd, pzPrg, pzPfx, pzOwner );
 
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzPrg, -1, "BSD string" );
-        AG_ABEND( zFmtAlloc );
-    }
+    if (pzRes == (char*)NULL)
+        AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "BSD string" ));
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -552,27 +524,21 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  Make sure they are reasonably sized (<256 for program name
      *  and <128 for a line prefix).  Copy them to the scratch buffer.
      */
-    if (SCM_LENGTH( prog_name ) >= 256) {
-        fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        AG_ABEND( zProgLen );
-    }
-    if (SCM_LENGTH( prefix ) >= 128) {
-        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        AG_ABEND( zPfxLen );
-    }
-    if (SCM_LENGTH( owner ) >= 256) {
-        fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        AG_ABEND( zOwnLen );
-    }
+    if (SCM_LENGTH( prog_name ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zProgLen, 256 ));
+
+    if (SCM_LENGTH( prefix ) >= 128)
+        AG_ABEND( asprintf( zPfxMsg, zPfxLen, 128 ));
+
+    if (SCM_LENGTH( owner ) >= 256)
+        AG_ABEND( asprintf( zPfxMsg, zOwnLen, 256 ));
 
     /*
      *  Reformat the string with the given arguments
      */
     pzRes = asprintf( (char*)mi.pData, pzPrg, pzOwner );
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzPrg, -1, "license string" );
-        AG_ABEND( zFmtAlloc );
-    }
+    if (pzRes == (char*)NULL)
+        AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "license string" ));
 
     {
         int     pfx_size = strlen( pzPfx );

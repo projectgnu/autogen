@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2002/01/13 08:04:33 $
+# Last Modified:     $Date: 2002/01/15 16:55:10 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 3.3 2002/01/13 08:04:33 bkorb Exp $
+# $Id: error.test,v 3.4 2002/01/15 16:55:10 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -60,7 +60,6 @@ echo creating ${testname}.out1
 cat > ${testname}.out1 <<'_EOF_'
 #error directive -- in error.def on line 3
 	The definitions file has a `#error' directive
-
 _EOF_
 
 echo $AGEXE ${testname}.def
@@ -81,7 +80,6 @@ Error in template error.tpl, line 13
 	This is a multi-line
 	error to show how to exit
 	your template
-
 _EOF_
 
 # this is *supposed* to exit with a failure status
@@ -124,11 +122,10 @@ echo creating ${testname}.out4
 # this is the output we should expect to see
 cat > ${testname}.out4 <<'_EOF_'
 syntax error:  in error2.def on line 2
-    token in error:  VAR_NAME is broken;
+	token in error:  VAR_NAME is broken;
 
-invalid definition token
-[[...<error-text>]]  broken;
 
+	[[...<error-text>]]  broken;
 
 
 _EOF_

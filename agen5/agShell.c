@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: agShell.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -100,15 +100,15 @@ STATIC void
 sigHandler( int signo )
 {
     extern char* strsignal PROTO(( int ));
-    fprintf( stderr, "Closing server:  %s signal (%d) received\n",
+    fprintf( pfTrace, "Closing server:  %s signal (%d) received\n",
              strsignal( signo ), signo );
     errClose = AG_TRUE;
 
-    (void)fputs( "\nLast command issued:\n", stderr );
+    (void)fputs( "\nLast command issued:\n", pfTrace );
     {
         const char* pz = (pzLastCmd == (const char*)NULL)
             ? "?? unknown ??\n" : pzLastCmd;
-        fprintf( stderr, zCmdFmt, pCurDir, pz, zShDone );
+        fprintf( pfTrace, zCmdFmt, pCurDir, pz, zShDone );
     }
     pzLastCmd = (const char*)NULL;
     closeServer();
@@ -127,12 +127,12 @@ serverSetup( void )
         if (doneOnce++ == 0) {
             (void)atexit( &closeServer );
             pCurDir = getcwd( (char*)NULL, MAXPATHLEN+1 );
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
+#if defined( DEBUG )
             if (HAVE_OPT( SHOW_SHELL ))
-                fputs( "\nServer First Start\n", stderr );
+                fputs( "\nServer First Start\n", pfTrace );
         }
         else {
-            fputs( "\nServer Restart\n", stderr );
+            fputs( "\nServer Restart\n", pfTrace );
 #endif
         }
     }
@@ -160,9 +160,9 @@ serverSetup( void )
                  pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
+#if defined( DEBUG )
         if (HAVE_OPT( SHOW_SHELL ) && (*pz != NUL))
-            fprintf( stderr, "Trap set result:  `%s'\n", pz );
+            fprintf( pfTrace, "Trap set result:  `%s'\n", pz );
         AGFREE( (void*)pz );
     }
 
@@ -173,12 +173,12 @@ serverSetup( void )
                         "echo server setup done\n";
         char* pz;
 
-        fputs( "Server traps set\n", stderr );
+        fputs( "Server traps set\n", pfTrace );
         pzLastCmd = zSetup;
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
-        fprintf( stderr, "Trap state:\n%s\n", pz );
+        fprintf( pfTrace, "Trap state:\n%s\n", pz );
 #endif
         AGFREE( (void*)pz );
     }
@@ -235,7 +235,7 @@ chainOpen( int       stdinFd,
         return -1;
     }
 
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
+#if defined( DEBUG )
     if (HAVE_OPT( SHOW_SHELL )) {
         tSCC   zPath[] = "PATH";
         tCC*   pzPath  = getenv( zPath );
@@ -249,7 +249,7 @@ chainOpen( int       stdinFd,
                 pzPath = pzShell;
         }
 
-        fprintf( stderr, "Starting shell `%s'\n", pzPath );
+        fprintf( pfTrace, "Starting shell `%s'\n", pzPath );
     }
 #endif
     fflush( stdout );
@@ -276,7 +276,7 @@ chainOpen( int       stdinFd,
         close( stdoutPair.writeFd );
 #if defined( DEBUG )
         if (HAVE_OPT( SHOW_SHELL ))
-            fprintf( stderr, "Server shell is pid %d\n", chId );
+            fprintf( pfTrace, "Server shell is pid %d\n", chId );
 #endif
         return stdoutPair.readFd;
 
@@ -310,7 +310,7 @@ chainOpen( int       stdinFd,
 
 #if defined( DEBUG )
     if (HAVE_OPT( SHOW_SHELL ))
-        fprintf( stderr, "Server shell %s starts\n", pzShell );
+        fprintf( pfTrace, "Server shell %s starts\n", pzShell );
 #endif
     execvp( (char*)pzShell, (char**)ppArgs );
     {
@@ -498,17 +498,17 @@ runShell( const char*  pzCmd )
      *  have it output a special marker that we can find.
      */
     pzLastCmd = pzCmd;
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
+#if defined( DEBUG )
     if (HAVE_OPT( SHOW_SHELL )) {
-        fputc( '\n', stderr );
-        fprintf( stderr, zCmdFmt, pCurDir, pzCmd, zShDone );
+        fputc( '\n', pfTrace );
+        fprintf( pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone );
     }
 #endif
     fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzCmd, zShDone );
     fflush( serverPair.pfWrite );
 
     if (errClose) {
-        fprintf( stderr, zCmdFail, pzCmd );
+        fprintf( pfTrace, zCmdFail, pzCmd );
         return (char*)NULL;
     }
 
@@ -519,14 +519,14 @@ runShell( const char*  pzCmd )
     {
         char* pz = loadData( serverPair.pfRead );
         if (pz == (char*)NULL) {
-            fprintf( stderr, zCmdFail, pzCmd );
+            fprintf( pfTrace, zCmdFail, pzCmd );
             closeServer();
             pz = (char*)AGALOC( 1, zTxtBlock );
 
             *pz = NUL;
 
         } else if (errClose)
-            fprintf( stderr, zCmdFail, pzCmd );
+            fprintf( pfTrace, zCmdFail, pzCmd );
 
         pzLastCmd = (char*)NULL;
         return pz;
