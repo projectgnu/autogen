@@ -3,11 +3,11 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.16 2000/03/11 21:37:09 bruce Exp $
+ *   $Id: opts.def,v 1.17 2000/03/12 23:33:14 bruce Exp $
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2000 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -26,10 +26,12 @@ autogen definitions options;
  *             Boston,  MA  02111-1307, USA.
  */
 
-copyright = "1992-1999";
-copyright_gpl;
+copyright = {
+    date  = "1992-2000";
+    owner = "Bruce Korb";
+    type  = gpl;
+};
 
-owner          = "Bruce Korb";
 eaddr          = "AutoGen@linuxbox.com";
 prog_name      = "AutoGen";
 prog_title     = "The Automated Program Generator";
