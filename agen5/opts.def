@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.7 1999/10/31 23:23:20 bruce Exp $
+ *   $Id: opts.def,v 1.8 1999/10/31 23:28:38 bruce Exp $
  */
 
 /*
@@ -135,8 +135,8 @@ flag = {
     "Use this argument to specify the input definitions file with a\n"
     "command line option.  If you do not specify this option, then\n"
     "there must be a command line argument that specifies the file,\n"
-    "even if only to specify stdin with a hyphen (\"-\").\n"
-    "Specify, \"--no-definitions\" when you wish to process\n"
+    "even if only to specify stdin with a hyphen (@code{-}).\n"
+    "Specify, @code{--no-definitions} when you wish to process\n"
     "a template without any active AutoGen definitions.\n";
 };
 
@@ -203,8 +203,9 @@ flag = {
     descrip     = "Limit on increment loops";
     doc =
     "This option prevents runaway loops.  For example, if you accidentally\n"
-    "specify, \"_FOR x FROM 1 TO -1 BY 1\", it will take a long time to\n"
-    "finish.  If you do have more than 256 entries in tables, you will\n"
+    "specify, \"FOR x (for-from 1) (for-to -1) (for-by 1)\",\n"
+    "it will take a long time to finish.\n"
+    "If you do have more than 256 entries in tables, you will\n"
     "need to specify a new limit with this option.";
 };
 
@@ -260,7 +261,7 @@ flag = {
     "The output specified may be either a file name, or, if the option\n"
     "argument begins with the @code{pipe} operator (@code{|}),\n"
     "a command that will receive the tracing output as standard in.\n"
-    "For example, \"@code{--traceout='| less'}\" will run the trace output\n"
+    "For example, @code{--traceout='| less'} will run the trace output\n"
     "through the @code{less} program.";
 
     flag_code =
