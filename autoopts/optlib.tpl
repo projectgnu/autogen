@@ -422,8 +422,8 @@ DEFINE USAGE_LINE   =][=
 
   IF (exist? "argument") =] [=
 
-    IF (< 80 (+ (string->number (shell "echo $line_len"))
-                (len "argument"))) =]\\\n"
+    IF (< 82 (+ (string->number (shell "echo $line_len"))
+                (len "argument") (len "prog_name") )) =]\\\n"
       "\t\t[=
     ENDIF
     =]" [=(c-string (get "argument"))=] "[=
