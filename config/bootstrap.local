@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Wed Aug  4 09:59:04 1999				      
+# Last Modified:     Wed Aug  4 10:02:34 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.14 1999/08/04 16:59:13 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.15 1999/08/04 17:02:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -65,11 +65,14 @@ post )
 	  ( cd $SRCDIR
 	    find . -type d ) |
 	  egrep -v CVS/ |
-	  while read f ; do mkdir $f ; done
+	  while read f
+          do test -d $f || mkdir $f
+          done
+
 	  ( cd $SRCDIR
-	    find . -type f ) |
+	    find . -type f -o -type l ) |
 	  egrep -v CVS/ |
-	  while read f ; do ln -s $SRCDIR/$f $f ; done
+	  while read f ; do rm -f $f ; ln -s $SRCDIR/$f $f ; done
 	  sh ./configure $@
 	  exit 0
 	}
