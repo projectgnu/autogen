@@ -10,7 +10,7 @@
 ## Last Modified:   Tue Aug 18 09:16:51 1998
 ##            by:   Caldera Openlinux User <bkorb@ellen>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 1998/08/21 21:17:07 bkorb Exp $
+## $Id: Makefile.am,v 2.0 1998/09/10 20:29:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 @MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
