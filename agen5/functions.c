@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: functions.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -116,6 +116,16 @@ MAKE_HANDLER_PROC( Include )
     }
 
     pT = loadTemplate( SCM_CHARS( res ));
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        tSCC zTplFmt[] = "Template %s included\n";
+        tSCC zLinFmt[] = "\tfrom %s line %d\n";
+        fprintf( pfTrace, zTplFmt, pT->pzFileName );
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
+                     pMac->lineNo );
+    }
+
     generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
     unloadTemplate( pT );
 

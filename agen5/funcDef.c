@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcDef.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -150,6 +150,15 @@ MAKE_HANDLER_PROC( Define )
     tDefEntry*  pDefs;
 
     pT = (tTemplate*)pMac->funcPrivate;
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        tSCC zTplFmt[] = "Template macro %s invoked with %d args\n";
+        tSCC zLinFmt[] = "\tfrom %s line %d\n";
+        fprintf( pfTrace, zTplFmt, pT->pzTplName, defCt );
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
+                     pMac->lineNo );
+    }
 
     /*
      *  IF we have no special definitions, then do not nest definitions

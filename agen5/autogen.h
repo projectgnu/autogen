@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: autogen.h,v 1.2 1999/10/14 17:05:55 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -231,6 +231,7 @@ MODE char*       pzCurStart       VALUE( (char*)NULL );
 MODE off_t       curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE ag_bool     for_loading      VALUE( AG_FALSE );
+MODE FILE*       pfTrace          VALUE( stderr );
 MODE tDefEntry   rootEntry;
 
 /*

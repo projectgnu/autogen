@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: tpProcess.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -43,7 +43,7 @@ generateBlock( tTemplate*   pT,
                tMacro*      pEnd,
                tDefEntry*   pCurDef )
 {
-    tSCC zFmt[] = "%-10s (%2x) at line %d";
+    tSCC zFmt[] = "%-10s (%2X) in %s at line %d";
     int  fc;
 #   define HANDLE_FUNCTIONS
 #   include "functions.h"
@@ -61,14 +61,10 @@ generateBlock( tTemplate*   pT,
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
-        /*
-         *  FIXME:  make this a trace option.  Max level trace  :-)
-         */
-        if (HAVE_OPT( SHOW_DEFS )) {
+        if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
 
-            fprintf( stderr, zFmt, apzFuncNames[ fc ], pMac->funcCode,
-                     pMac->lineNo );
+            fprintf( pfTrace, zFmt, apzFuncNames[ fc ], pMac->funcCode,
+                     pT->pzFileName, pMac->lineNo );
             if (pMac->ozText > 0) {
                 int   ct;
                 char* pz = pT->pzTemplText + pMac->ozText;
@@ -79,12 +75,12 @@ generateBlock( tTemplate*   pT,
                         break;
                     if (ch == '\n')
                         break;
-                    putc( ch, stderr );
+                    putc( ch, pfTrace );
                 }
             }
-            putc( '\n', stderr );
+            putc( '\n', pfTrace );
         }
-#endif
+
         pCurMacro = pMac;
         pMac = (*(apHdlrProc[ fc ]))( pT, pMac, pCurDef );
     }
@@ -288,7 +284,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
     openError:
         fprintf( stderr, zCannot, pzProg, errno,
                  "create", pStk->pzName, strerror( errno ));
-	LOAD_ABORT( pCurTemplate, pCurMacro, "file creation error" );
+        LOAD_ABORT( pCurTemplate, pCurMacro, "file creation error" );
     }
 }
 /* end of tpProcess.c */

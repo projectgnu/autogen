@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcIf.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -92,9 +92,9 @@ MAKE_HANDLER_PROC( If )
     tMacro* pRet = pT->aMacros + pMac->endIndex;
 
     do  {
-	/*
-	 *  The current macro becomes the 'ELIF' or 'ELSE' macro
-	 */
+        /*
+         *  The current macro becomes the 'ELIF' or 'ELSE' macro
+         */
         pCurMacro = pMac;
 
         /*

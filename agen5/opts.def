@@ -1,7 +1,9 @@
+/* -*- Mode: C -*- */
+
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.2 1999/10/14 01:16:03 bruce Exp $
+ *   $Id: opts.def,v 1.3 1999/10/14 17:06:32 bruce Exp $
  */
 
 /*
@@ -212,6 +214,62 @@ flag = {
     "AutoGen works with a shell server process.  Most normal commands\n"
     "will complete in less than 10 seconds.  If, however, your commands\n"
     "need more time than this, use this option.";
+};
+
+flag = {
+    name        = trace;
+    flag_arg    = "=0";
+    arg_name    = level;
+    descrip     = "tracing level of detail";
+
+    doc =
+    "This option will cause AutoGen to display a trace of its template\n"
+    "processing.  There are five levels:\n"
+    "@ennumerate 0\n"
+    "@item\nDoes no tracing at all (default)\n"
+    "@item\n"
+    "Traces the invocation of @code{DEFINE}d macros and @code{INCLUDE}s\n"
+    "@item\nTraces all block macros.  The above, plus @code{IF}, @code{FOR},\n"
+    "@code{CASE} and @code{WHILE}.\n"
+    "@item\nDisplays the results of expression evaluations\n"
+    "@item\n"
+    "Displays the invocation of every AutoGen macro, even @code{TEXT}macros."
+    "@end ennumerate";
+
+    flag_code =
+'    if ((unsigned)OPT_VALUE_TRACE > TRACE_EVERYTHING)
+        OPT_VALUE_TRACE = TRACE_EVERYTHING;';
+};
+export = "#define TRACE_NOTHING        0\n"
+         "#define TRACE_TEMPLATES      1\n"
+         "#define TRACE_BLOCK_MACROS   2\n"
+         "#define TRACE_EXPRESSIONS    3\n"
+         "#define TRACE_EVERYTHING     4\n";
+
+flag = {
+    name        = trace_out;
+    flag_arg    = ":";
+    arg_name    = file;
+    descrip     = "tracing output file or filter";
+
+    doc =
+    "The output specified may be either a file name, or, if the option\n"
+    "argument begins with the @code{pipe} operator (@code{|}),\n"
+    "a command that will receive the tracing output as standard in.\n"
+    "For example, \"@code{--traceout='| less'}\" will run the trace output\n"
+    "through the @code{less} program.";
+
+    flag_code =
+'    if (*pOptDesc->pzLastArg == \'|\')
+        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
+    else
+        pfTrace = fopen( pOptDesc->pzLastArg, "w" );
+
+    if (pfTrace == (FILE*)NULL) {
+        fprintf( stderr, "Error %d (%s) opening `%s\' for output",
+                 errno, strerror( errno ), pOptDesc->pzLastArg );
+        exit( EXIT_FAILURE );
+    }';
 };
 
 #ifdef DEBUG
