@@ -8,7 +8,7 @@
 ## Last Modified:   Tue Sep 15 14:55:24 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.1 1998/09/22 21:25:32 bkorb Exp $
+## $Id: Makefile.am,v 2.2 1998/09/22 21:26:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -45,7 +45,7 @@ autogen.texi : auto_gen.tpl autogen.def $(AGDEPS)
 
 LSM : $(top_srcdir)/VERSION $(top_srcdir)/src/opts.def LSM.tpl
 	@if $(AGEXE) --version >&- 2>&- ; then \
-	  echo $(AGEXE) -T LSM.tpl ; \
+	  echo $(AGEXE) -T LSM.tpl $(ODEF) ; \
 	  top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	    $(AGEXE) -T LSM.tpl $(ODEF) ; \
 	else \
