@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: alist.test,v 1.6 2000/03/11 11:02:19 bruce Exp $
+# $Id: alist.test,v 1.7 2000/03/11 21:36:44 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -58,7 +58,7 @@ cat > $testname.out <<_EOF_
   2 name is last
 _EOF_
 
-AGEN="$AGEN -L ${srcdir}/.. --load-Scheme=schemedef.scm"
+AGEN="$AGEN -L ${srcdir}/.."
 echo $AGEN $testname.def
 $AGEN $testname.def || failure $AGEN failed
 cmp -s $testname.test $testname.out || failure unexpected output
