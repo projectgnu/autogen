@@ -1,13 +1,13 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# Time-stamp:        "2002-06-20 14:45:38 bkorb"
+# Time-stamp:        "2002-06-25 17:56:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 3.3 2002/06/20 22:05:07 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 3.4 2002/06/26 01:22:06 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -17,6 +17,7 @@ else update_cvs=true ; fi
 exec 5> temp.config
 
 GENLIST="agen5/directive.h
+	 agen5/cgi-fsm.h
 	 agen5/defParse.c
 	 agen5/defParse.h
 	 agen5/expr.h

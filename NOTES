@@ -1,10 +1,8 @@
-1.  If you are reconfiguring this product, you _must_ use
-    the config/bootstrap script.  The standard "configure"
-    script is edited to produce a working script.  Specifically,
-    this product will not build correctly when the source
-    and build directories are different.  The following
-    text is inserted at the beginning of the configure
-    script:
+1.  If you are reconfiguring this product, you _must_ use the config/
+    bootstrap script.  The standard "configure" script is edited to
+    produce a working script.  Specifically, this product will not build
+    correctly when the source and build directories are different.  The
+    following text is inserted at the beginning of the configure script:
 
         top_builddir=`pwd`
         top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
@@ -28,9 +26,13 @@
           exit $?
         fi
 
-    This script basically turns the build directory into a symlink
-    copy of the source directory.
+    This script basically turns the build directory into a symlink copy
+    of the source directory.
 
-2.  You _must_ have a very recent libtool
-    There are always more fixes, but it is still easier than trying
-    to write your own link commands....
+2.  You _must_ have a very recent libtool.  There are always more fixes,
+    but it is still easier than trying to write your own link
+    commands....
+
+3.  If you have pulled the sources from CVS, there are a number of files
+    that are required to build, but not part of the archive.  The needed
+    sources are contained within a shar archive named "noag-boot.sh".

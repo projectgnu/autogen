@@ -1,6 +1,11 @@
+New in 5.3.8
+* xml2ag was added.  This is a wrapper program that will convert
+  XML documentation into AutoGen definitions and pass them through
+  to autogen.  It accepts all the AutoGen command line options and
+  passes them through, too.
+
 New in 5.0
-* Everything you knew about templates is mostly wrong.
-  Template expressions were made simpler and much more powerful.
+* Template expressions were made simpler and much more powerful.
   An expression may be AutoGen defined values, shell scripts,
   Scheme expressions, or the latter two formatted with an
   AutoGen definition value.  AutoGen now depends on Guile.

@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Thursday March 28, 2002 at 06:40:17 PM PST
+ *  It has been AutoGen-ed  Tuesday June 25, 2002 at 05:42:14 PM PDT
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -105,7 +105,8 @@ struct transition {
     te_cgi_state  next_state;
     te_cgi_trans  transition;
 };
-static const t_transition cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
+static const t_transition
+cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
   { { CGI_ST_NAME, CGI_TR_STASH },                  /* init state */
     { CGI_ST_INVALID, CGI_TR_INVALID },
     { CGI_ST_INVALID, CGI_TR_INVALID },
