@@ -1,0 +1,28 @@
+#!/bin/echo This_file_must_be_sourced,_not_executed
+#  -*- Mode: Shell-script -*- 
+# ----------------------------------------------------------------------
+# config/bootstrap.local --- maintainer's bootstrap script
+#
+# Author:            Bruce Korb <korb@datadesign.com>
+# Maintainer:        Bruce Korb <korb@datadesign.com>
+# Created:           Thu Jul 29 09:32:11 1999
+# Last Modified:     Thu Jul 29 09:35:34 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+# ----------------------------------------------------------------------
+# @(#) $Id: bootstrap.local,v 1.1 1999/07/29 16:35:52 bkorb Exp $
+# ----------------------------------------------------------------------
+
+case ${BOOTSTRAP} in
+
+pre )
+    cp -fp ${srcdir}/config/bootstrap ${srcdir}/snprintfv/config
+    if [ ! -f ${srcdir}/doc/autogen.texi ]
+    then touch 0101000070 ${srcdir}/doc/autogen.texi ; fi
+
+post )
+    if [ ! -s ${srcdir}/doc/autogen.texi ]
+    then rm -f ${srcdir}/doc/autogen.texi ; fi
+
+esac
+
+# config/bootstrap.local ends here
