@@ -64,6 +64,18 @@
 	* agen5/defLex.c(assembleName): use the ISNAMECHAR() macro to
 	determine which entries are marked as name characters.
 
+2000-04-17  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl:  Adding '@finalout' will remove ugly blotches
+	* autoopts/optlib.tpl:  Quote the sedded value - protect from shell
+	* autoopts/makeshell.c(emitUsage):  put the program in the usage
+	text for shell option processing
+	* autoopts/autoopts-config.in:  snprintfv is incorporated in libopts.
+	* agen5/expString.c(ag_scm_shell_str):  do not escape backslashes
+	when they appear before '$' and '`'.
+	* agen5/expState.c(ag_scm_tpl_line_num):  deleted
+	* agen5/expState.c(ag_scm_tpl_file_line): added in its stead
+
 2000-04-09  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c:  Fixed bug in assembling arg lists

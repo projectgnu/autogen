@@ -1,4 +1,4 @@
-#! /bin/echo AutoGen_Version_4.5,_but_this_should_be_sourced
+#! /bin/echo AutoGen_Version_5.0,_but_this_should_be_sourced
 # -*- Mode: sh -*-
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use

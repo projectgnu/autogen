@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.57 2000/08/04 15:45:55 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.58 2000/08/11 13:27:47 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -56,7 +56,7 @@ notice identical to this one except for the removal of this paragraph
 @end ignore
 @end ifinfo
 
-
+@finalout
 @titlepage
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}

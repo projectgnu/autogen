@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.8 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: funcIf.c,v 1.9 2000/08/11 13:27:47 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -35,18 +35,48 @@ tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
 STATIC ag_bool eval_true( void );
 
 
+/*
+ *  eval_true - should a string be interpreted as TRUE?
+ *
+ *  It is always true unless:
+ *
+ *  1.  it is the empty string
+ *  2.  it starts with a digit and the number evaluates to zero
+ *  3.  it starts with either "#f" or "#F"
+ *  4.  For its length or its first five characters (whichever is less)
+ *      it matches the string "false"
+ */
     STATIC ag_bool
 eval_true( void )
 {
     ag_bool needFree;
-    ag_bool res;
+    ag_bool res = AG_TRUE;
     char* pz = evalExpression( &needFree );
 
-    if (*pz == '\0')
+    if (isdigit( *pz ))
+        res = atoi( pz );
+
+    else switch (*pz) {
+    case NUL:
         res = AG_FALSE;
-    else if (! isdigit( *pz ))
-        res = AG_TRUE;
-    else res = (atoi( pz ) != 0);
+        break;
+
+    case '#':
+        if ((pz[1] == 'f') || (pz[1] == 'F'))
+            res = AG_FALSE;
+        break;
+
+    case 'f':
+    case 'F':
+    {
+        int len = strlen( pz );
+        if (len > 5)
+            len = 5;
+        if (strneqvcmp( "false", pz, len ) == 0)
+            res = AG_FALSE;
+        break;
+    }
+    }
 
     if (needFree)
         AGFREE( pz );
@@ -194,6 +224,9 @@ MAKE_HANDLER_PROC( While )
                  pT->pzFileName, pMac->lineNo );
 
     for (;;) {
+        pCurTemplate = pT;
+        pCurMacro    = pMac;
+
         if (! eval_true())
             break;
         ct++;

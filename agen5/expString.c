@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.18 2000/06/22 16:25:39 bkorb Exp $
+ *  $Id: expString.c,v 1.19 2000/08/11 13:27:47 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -520,11 +520,17 @@ ag_scm_raw_shell_str( SCM obj )
  * exparg: string, string to transform
  *
  * doc:
- *  Convert the text of the string into a double quoted string
- *  that a normal shell will process into the original string.
- *  (Before doing macro expansion, that is.)
- *  The escaped characters are the backslash and double quote @code{"}.
- *  All others are copied directly into the output.
+ *
+ *  Convert the text of the string into a double quoted string that a normal
+ *  shell will process into the original string, almost.  It will add the escape
+ *  character before two special characters to accomplish this: the backslash
+ *  and double quote @code{"}.  It omits the extra backslash, however, if a
+ *  backslash is followed by either a backquote or a dollar sign.  This makes it
+ *  impossible to render the sequence of a backslash followed by a dollar sign,
+ *  but it does make it possible to protect that dollar sign from shell
+ *  evaluation.  The lesser of two evils.
+ *
+ *  All others characters are copied directly into the output.
 =*/
     SCM
 ag_scm_shell_str( SCM obj )
@@ -538,16 +544,20 @@ ag_scm_shell_str( SCM obj )
         return SCM_UNDEFINED;
 
     pzDta = SCM_CHARS( obj );
-    dtaSize = strlen( pzDta ) + 3;
+    dtaSize = 3;
     pz = pzDta;
     for (;;) {
         switch (*(pz++)) {
         case NUL:
             goto loopDone1;
 
-        case '"':
         case '\\':
-            dtaSize++;
+        case '"':
+            dtaSize += 2;
+            break;
+
+        default:
+            dtaSize++;            
         }
     } loopDone1:;
 
@@ -561,12 +571,29 @@ ag_scm_shell_str( SCM obj )
         case NUL:
             goto loopDone2;
 
-        case '"':
         case '\\':
-            pz[-1]  = '\\';
-            *(pz++) = pzDta[-1];
+            /*
+             *  This deserves a bit of explanation.  Basically, if someone went
+             *  to the trouble to escape a backquote or a dollar sign, then we
+             *  should not neutralize it.  Note that we handle a following
+             *  backslash as a normal character.  i.e.  \\ --> \\\\
+             *  *BUT*   \\$ --> \\\$
+             */
+            switch (*pzDta) {
+            case '`':             /* \`  -->  \`    */
+            case '$':             /* \$  -->  \$    */
+                break;
+            default:              /* otherwise:     */
+                *(pz++) = '\\';   /* \   -->  \\    */
+            }
+            break;
+
+        case '"':
+            pz[-1]  = '\\';       /* "   -->   \"   */
+            *(pz++) = '"';
         }
     } loopDone2:;
+
     pz[-1] = '"';
     *pz    = NUL;
 

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: C -*-
 
-# $Id: optlib.tpl,v 1.11 2000/03/21 03:05:22 bruce Exp $
+# $Id: optlib.tpl,v 1.12 2000/08/11 13:27:47 bkorb Exp $
 
 =]
 [=
@@ -218,10 +218,14 @@ tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name)
          =]((tCC*)[=(shell (sprintf "echo %s | sed 's@^=@@'"
                          (get "flag_arg") ))=])[=
 
+    ==*  :         =][= # String init value =]
+tSCC    z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg[]" ))
+         =]= [=(c-string (shell (sprintf "echo '%s' | sed 's@^:@@'"
+                         (get "flag_arg") ))) =];[=
+
     *              =][= # String init value =]
 tSCC    z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg[]" ))
-         =]= [=(c-string (shell (sprintf "echo %s | sed 's@^:@@'"
-                         (get "flag_arg") ))) =];[=
+         =]= [=(c-string (get "flag_arg"))=];[=
     ESAC =][=
 
 
