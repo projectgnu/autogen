@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.27 1999/10/31 16:23:29 bruce Exp $
+dnl Code: $Id: configure.in,v 2.28 1999/10/31 16:25:44 bruce Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.27 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.28 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -161,7 +161,7 @@ test -f ./snprintfv/snprintfv/snprintfv.h \
 
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
 AC_SUBST(M4_SRC)
-[AGFUN_LIST=`cd $srcdir/src ; echo agFun*.c`]
+[AGFUN_LIST=`cd $srcdir/agen5 ; echo func*.c`]
 AC_SUBST(AGFUN_LIST)
 [TEST_LIST=`cd $srcdir/tests ; echo [a-z]*.test`]
 AC_SUBST(TEST_LIST)
