@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.4 2002/03/23 05:06:56 bkorb Exp $
+ *  $Id: getdefs.h,v 3.5 2002/06/15 18:24:59 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/03/23 05:06:56 $
+ *  Last Modified:     $Date: 2002/06/15 18:24:59 $
  *            by: bkorb
  */
 
@@ -27,10 +27,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <utime.h>
-
-#ifndef HAVE_SNPRINTF
-#  include "snprintfv/snprintfv.h"
-#endif
 
 #include REGEX_HEADER
 

@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.0 2001/12/09 19:46:01 bkorb Exp $
+ *  $Id: columns.c,v 3.1 2002/06/15 18:24:59 bkorb Exp $
  */
 
 /*
@@ -31,10 +31,6 @@
 #include <string.h>
 
 #include "opts.h"
-
-#ifndef HAVE_SNPRINTF
-# include "snprintfv/snprintfv.h"
-#endif
 
 struct print_list {
     char**     papz;
