@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.4 1999/11/03 05:19:57 bruce Exp $
+ *  $Id: expPrint.c,v 1.5 1999/11/04 05:19:55 bruce Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -161,6 +161,7 @@ run_printf( char* pzFmt, int len, SCM alist )
 
 
 /*=gfunc sprintf
+ * what:  format a string
  *
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
@@ -183,6 +184,7 @@ ag_scm_sprintf( SCM fmt, SCM alist )
 
 
 /*=gfunc printf
+ * what:  format to stdout
  *
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
@@ -210,6 +212,7 @@ ag_scm_printf( SCM fmt, SCM alist )
 
 
 /*=gfunc fprintf
+ * what:  format to a file
  *
  * exparg: port, output port
  * exparg: format, formatting string
