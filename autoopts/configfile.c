@@ -1,7 +1,7 @@
 
 /*
- *  $Id: configfile.c,v 4.7 2005/02/14 16:52:31 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:50:30 bkorb"
+ *  $Id: configfile.c,v 4.8 2005/02/14 19:02:37 bkorb Exp $
+ * Time-stamp:      "2005-02-14 10:58:37 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -364,7 +364,7 @@ handleDirective(
     tOptions*     pOpts,
     char*         pzText )
 {
-    char   ztitle[16] = "<?";
+    char   ztitle[32] = "<?";
     size_t title_len = strlen( zProg );
     size_t name_len;
 
