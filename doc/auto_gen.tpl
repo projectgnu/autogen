@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.32 1999/10/30 16:40:27 bruce Exp $
+## $Id: auto_gen.tpl,v 2.33 1999/10/30 19:18:53 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -905,12 +905,11 @@ FOR gfunc =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
-[=descrip=]
-[=
-ENDFOR evalexpr
-=]
-@end table[=
+[=descrip=][=
 
+ENDFOR gfunc
+=]
+@end table
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1005,13 +1004,13 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-autoopts.texi input
+Sourced from [= ` echo ${top_srcdir}/autoopts/doc.tpl ` =]
 @end ignore
 @page
 @node AutoOpts
 @chapter Automated Option Processing
 @cindex autoopts
-[=# INCLUDE autoopts/autoopts.texi =]
+[= INCLUDE ` echo ${top_srcdir}/autoopts/doc.tpl ` =]
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Absorbed documents from the add-ons
