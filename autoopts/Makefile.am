@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.26 2000/08/11 15:05:47 gvv Exp $
+## $Id: Makefile.am,v 2.27 2000/09/29 03:21:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,7 +22,7 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl \
-		aginfo.tpl agman1.tpl optlib.tpl
+		aginfo.tpl agman1.tpl optlib.tpl optmain.tpl
 
 EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 doc.tpl \
 		bootstrap.dir autoopts-config.in config-opts.def \
