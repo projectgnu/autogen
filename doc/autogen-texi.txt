@@ -3312,7 +3312,7 @@ many of them actually got stacked.
 Do not use this on options that have not been stacked or has not been
 specified (the @code{stack_arg} attribute must have been specified,
 and @code{HAVE_OPT(<NAME>)} must yield TRUE).
-Otherwise, you will likely page fault.
+Otherwise, you will likely seg fault.
 
 @example
 if (HAVE_OPT( NAME )) @{
@@ -3338,7 +3338,7 @@ command line processing.
 Do not use this on options that have not been stacked or has not been
 specified (the @code{stack_arg} attribute must have been specified,
 and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
-Otherwise, you will likely page fault.
+Otherwise, you will likely seg fault.
 
 @example
 if (HAVE_OPT( NAME )) @{

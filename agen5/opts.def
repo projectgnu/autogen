@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.2 2002/01/19 07:35:24 bkorb Exp $
+ *   $Id: opts.def,v 3.3 2002/03/27 04:45:29 bkorb Exp $
  *
  *  AutoGen copyright 1992-2001 Bruce Korb
  *
@@ -370,7 +370,7 @@ flag = {
     arg_range   = "0->3600"; /* one hour limit */
     arg_name    = time-lim;
     descrip     = "Time limit for servers";
-    ifdef       = ENABLE_SHELL;
+    ifdef       = SHELL_ENABLED;
     doc =
     "AutoGen works with a shell server process.  Most normal commands\n"
     "will complete in less than 10 seconds.  If, however, your commands\n"

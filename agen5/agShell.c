@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.10 2002/03/21 04:20:19 bkorb Exp $
+ *  $Id: agShell.c,v 3.11 2002/03/27 04:45:29 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -129,7 +129,7 @@ serverSetup( void )
         if (doneOnce++ == 0) {
             (void)atexit( &closeServer );
             pCurDir = getcwd( NULL, MAXPATHLEN+1 );
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
             if (HAVE_OPT( SHOW_SHELL ))
                 fputs( "\nServer First Start\n", pfTrace );
         }
@@ -177,7 +177,7 @@ serverSetup( void )
                  pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
         if (HAVE_OPT( SHOW_SHELL ) && (*pz != NUL))
             fprintf( pfTrace, "Trap set result:  `%s'\n", pz );
         AGFREE( (void*)pz );
@@ -252,7 +252,7 @@ chainOpen( int       stdinFd,
         return -1;
     }
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_SHELL )) {
         tSCC   zPath[] = "PATH";
         tCC*   pzPath  = getenv( zPath );
@@ -291,7 +291,7 @@ chainOpen( int       stdinFd,
 
         close( stdinFd );
         close( stdoutPair.writeFd );
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
         if (HAVE_OPT( SHOW_SHELL ))
             fprintf( pfTrace, "Server shell is pid %d\n", chId );
 #endif
@@ -325,7 +325,7 @@ chainOpen( int       stdinFd,
      */
     setvbuf( stdout, NULL, _IONBF, 0 );
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_SHELL ))
         fprintf( pfTrace, "Server shell %s starts\n", pzShell );
 #endif
@@ -513,7 +513,7 @@ runShell( const char*  pzCmd )
      *  have it output a special marker that we can find.
      */
     pzLastCmd = pzCmd;
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_SHELL )) {
         fputc( '\n', pfTrace );
         fprintf( pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone );

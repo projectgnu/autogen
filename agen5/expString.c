@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.6 2002/01/31 02:45:31 bkorb Exp $
+ *  $Id: expString.c,v 3.7 2002/03/27 04:45:29 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -719,7 +719,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
     int   len = scm_ilength( alist );
     char* pz;
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
     if (len < 0)
         AG_ABEND( "invalid alist to shellf" );
 #endif

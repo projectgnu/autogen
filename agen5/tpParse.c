@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.5 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: tpParse.c,v 3.6 2002/03/27 04:45:29 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -167,7 +167,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
     tCC* pzScan = *ppzText;
     tTemplate* pT = pCurTemplate;
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
     tSCC zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
@@ -206,7 +206,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             pM->ozText    = pzCopy - pT->pzTemplText;
             pM->funcCode  = FTYP_TEXT;
             pM->lineNo    = templLineNo;
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
             if (HAVE_OPT( SHOW_DEFS )) {
                 int ct = level;
                 fprintf( pfTrace, "%3d ", pM - pT->aMacros );
@@ -273,7 +273,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *       will be non-NULL.
          */
         {
-#if ! defined( DEBUG )
+#if ! defined( DEBUG_ENABLED )
             tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pT, pM, &pzScan );
 #else
             teFuncType ft = pM->funcCode;

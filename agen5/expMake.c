@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.2 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: expMake.c,v 3.3 2002/03/27 04:45:29 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -39,27 +39,54 @@
  * doc:
  *  This function will take ordinary shell script text and reformat it
  *  so that it will work properly inside of a shell script.
- *  It does this by:
+ *  Not every shell construct can be supported; the intent is to have
+ *  most ordinary scripts work without much, if any, alteration.
+ *
+ *  The following transformations are performed on the source text:
  *
  *  @enumerate
  *  @item
- *  Except for the last line, putting the string, " ; \" on the end of every
- *  line that does not end with a backslash.
+ *  Trailing whitespace on each line is stripped.
  *
  *  @item
- *  Doubling the dollar sign character, unless it immediately precedes an
+ *  Except for the last line, the string, " ; \\" is appended to the end of
+ *  every line that does not end with a backslash, semi-colon,
+ *  conjunction operator or pipe.  Note that this will mutilate multi-line
+ *  quoted strings, but @command{make} renders it impossible to use multi-line
+ *  constructs anyway.
+ *
+ *  @item
+ *  If the line ends with a backslash, it is left alone.
+ *
+ *  @item
+ *  If the line ends with one of the excepted operators, then a space and
+ *  backslash is added.
+ *
+ *  @item
+ *  The dollar sign character is doubled, unless it immediately precedes an
  *  opening parenthesis or the single character make macros '*', '<', '@@',
- *  '?' or '%'.  Other single character make macros without enclosing
+ *  '?' or '%'.  Other single character make macros that do not have enclosing
  *  parentheses will fail.  For shell usage of the "$@@", "$?" and "$*"
- *  macros, you must enclose them with curly braces, i.e., "$@{?@}".
+ *  macros, you must enclose them with curly braces, e.g., "$@{?@}".
+ *  The ksh construct @code{(<command>)} will not work.  Though some
+ *  @command{make}s accept @code{$@{var@}} constructs, this function will
+ *  assume it is for shell interpretation and double the dollar character.
+ *  You must use @code{$(var)} for all @command{make} substitutions.
  *
  *  @item
- *  Prefixes every line with a tab, unless the first line
+ *  Double dollar signs are replaced by four before the next character
+ *  is examined.
+ *
+ *  @item
+ *  Every line is prefixed with a tab, unless the first line
  *  already starts with a tab.
  *
  *  @item
  *  The newline character on the last line, if present, is suppressed.
  *  @end enumerate
+ *
+ *  @item
+ *  Blank lines are stripped.
  *
  *  @noindent
  *  This function is intended to be used approximately as follows:
@@ -67,7 +94,7 @@
  *  @example
  *  $(TARGET) : $(DEPENDENCIES)
  *  <+ (out-push-new) +>
- *  ....arbitrary shell script text....
+ *  ....mostly arbitrary shell script text....
  *  <+ (makefile-script (out-pop #t)) +>
  *  @end example
 =*/
@@ -86,6 +113,8 @@ ag_scm_makefile_script( SCM text )
      *  in the source string.
      */
     while (isspace( *pzText ))  pzText++;
+    if (*pzText == NUL)
+        return gh_str02scm( "" );
 
     {
         char*  pz  = strchr( pzText, '\n' );
@@ -118,14 +147,21 @@ ag_scm_makefile_script( SCM text )
             switch (ch) {
             case '\n':
                 /*
-                 *  If the newline is already escaped, then we won't
-                 *  insert our extra command termination
+                 *  Backup past trailing white space (other than newline).
                  */
-                if (pzOut[-1] == '\\') {
-                    *(pzOut++) = ch;
-                    if (tabch)
-                        *(pzOut++) = tabch;
-                    break;
+                while (isspace( pzOut[ -1 ]) && (pzOut[ -1 ] != '\n'))
+                    pzOut--;
+
+                /*
+                 *  Skip over empty lines, but leave leading white space
+                 *  on the next non-empty line.
+                 */
+                {
+                    char* pz = pzScn;
+                    while (isspace( *pz )) {
+                        if (*(pz++) == '\n')
+                            pzScn = pz;
+                    }
                 }
 
                 /*
@@ -134,12 +170,48 @@ ag_scm_makefile_script( SCM text )
                 if (*pzScn == NUL)
                     goto copy_done;
 
+                switch (pzOut[-1]) {
+                case '\\':
+                    /*
+                     *  The newline is already escaped, so don't
+                     *  insert our extra command termination.
+                     */
+                    *(pzOut++) = '\n';
+                    break;
+
+                case '&':
+                    /*
+                     *  A single ampersand is a backgrounded command.
+                     *  We must terminate those statements, but not
+                     *  statements conjoined with '&&'.
+                     */
+                    if ('&' != pzOut[-2])
+                        goto append_statement_end;
+                    /* FALLTHROUGH */
+
+                case '|':
+                case ';':
+                    /*
+                     *  Whatever the reason for a final '|' or ';' we will not
+                     *  add a semi-colon after it.
+                     */
+                    strcpy( pzOut, zNl + 2 );
+                    pzOut += sizeof( zNl ) - 3;
+                    break;
+
+                default:
+                append_statement_end:
+                    /*
+                     *  Terminate the current command and escape the newline.
+                     */
+                    strcpy( pzOut, zNl );
+                    pzOut += sizeof( zNl ) - 1;
+                }
+
                 /*
-                 *  Terminate the current command and escape the newline
-                 *  Indent, too, but only if the first line was *not*.
+                 *  We have now started our next output line and there are
+                 *  still data.  Indent with a tab, if called for.
                  */
-                strcpy( pzOut, zNl );
-                pzOut += sizeof( zNl ) - 1;
                 if (tabch)
                     *(pzOut++) = tabch;
                 break;
@@ -161,12 +233,10 @@ ag_scm_makefile_script( SCM text )
                      *  Avoid having to do a backward scan on the second '$'
                      *  by handling the next '$' now.  We get FOUR '$' chars.
                      */
-                    *(pzOut++) = '$';
-                    *(pzOut++) = '$';
-                    *(pzOut++) = '$';
-                    *(pzOut++) = '$';
                     pzScn++;
-                    continue;
+                    *(pzOut++) = '$';
+                    *(pzOut++) = '$';  /* two down, two to go */
+                    /* FALLTHROUGH */
 
                 default:
                     *(pzOut++) = '$';
@@ -178,17 +248,6 @@ ag_scm_makefile_script( SCM text )
             }
         } copy_done:;
 
-        /*
-         *  Strip trailing white space
-         */
-        while (   (pzOut > pzRes)
-               && isspace( pzOut[-1] ) )  pzOut--;
-
-        /*
-         *  IF the text does not start with a tab, we insert our own.
-         *  However, so far we have not accommodated the first one.
-         *  Add it to the allocation requirement.
-         */
         sz    = (pzOut - pzRes);
         res   = scm_makstr( sz, 0 );
         pzOut = SCM_CHARS( res );

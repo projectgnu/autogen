@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.8 2002/01/29 03:05:55 bkorb Exp $
+ *  $Id: defLoad.c,v 3.9 2002/03/27 04:45:29 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -30,7 +30,7 @@ STATIC int compareIndex( const void* p1, const void* p2 );
 STATIC void fixTwins( tDefEntry** ppNode );
 STATIC void massageDefTree( tDefEntry** ppNode );
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
 static char zFmt[ 64 ];
 #endif
 
@@ -140,7 +140,7 @@ massageDefTree( tDefEntry** ppNode )
     static int lvl = 0;
     tDefEntry*  pNode;
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_DEFS ))
         snprintf( zFmt, 64, "%%%dd %%-%ds = ", 3 + (lvl * 2), 20 - (lvl * 2) );
 #endif
@@ -188,13 +188,13 @@ massageDefTree( tDefEntry** ppNode )
         ppNode = &(pNode->pNext);
 
     skipTwinFix:
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
         if (HAVE_OPT(SHOW_DEFS))
             fprintf( pfTrace, zFmt, pNode->index, pNode->pzDefName );
 #endif
 
         if (pNode->valType == VALTYP_BLOCK) {
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
             if (HAVE_OPT(SHOW_DEFS))
                 fputs( "{...}\n", pfTrace );
 #endif
@@ -207,7 +207,7 @@ massageDefTree( tDefEntry** ppNode )
             lvl--;
         }
 
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
         /*
          *  IF we are displaying definitions,
          *  THEN show what we can on a single line for this text definition
@@ -264,7 +264,7 @@ massageDefTree( tDefEntry** ppNode )
 STATIC void
 parseDefinitions( void )
 {
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_DEFS )) {
         fprintf( pfTrace, "%d bytes of definition\n\n",
                  strlen( pBaseCtx->pzData ));

@@ -67,7 +67,7 @@
 
 #include "autogen.h"
 #ifndef DEBUG_FSM
-#  undef DEBUG
+#  undef DEBUG_ENABLED
 #endif
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
@@ -236,7 +236,7 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
             trans = pTT->transition;
         }
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
         printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
             CGI_STATE_NAME( cgi_state ), cgi_state,
             CGI_EVT_NAME( trans_evt ), trans_evt,
@@ -316,7 +316,7 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
             exit( cgi_invalid_transition( cgi_state, trans_evt ));
             /* END   == BROKEN MACHINE == DO NOT CHANGE THIS COMMENT */
         }
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
         if (nxtSt != firstNext)
             printf( "transition code changed destination state to %s(%d)\n",
                 CGI_STATE_NAME( nxtSt ), nxtSt );

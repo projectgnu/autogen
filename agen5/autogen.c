@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.11 2002/01/31 02:49:31 bkorb Exp $
+ *  $Id: autogen.c,v 3.12 2002/03/27 04:45:29 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -184,7 +184,7 @@ abendSignal( int sig )
 STATIC void
 ignoreSignal( int sig )
 {
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
     fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
 #endif
     return;
@@ -230,7 +230,7 @@ doneCheck( void )
          *  We got here because someone called exit early.
          */
         do  {
-#ifndef DEBUG
+#ifndef DEBUG_ENABLED
             closeOutput( AG_FALSE );
 #else
             closeOutput( AG_TRUE );
@@ -249,7 +249,7 @@ doneCheck( void )
 }
 
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
 EXPORT void
 ag_abend_at( tCC* pzMsg, tCC* pzFile, int line )
 #else
@@ -262,7 +262,7 @@ ag_abend( tCC* pzMsg )
         pzOopsPrefix = "";
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
     fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
 #endif
 

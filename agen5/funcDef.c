@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.6 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: funcDef.c,v 3.7 2002/03/27 04:45:29 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -347,8 +347,8 @@ prepInvokeArgs( tMacro* pMac )
 
 
 #ifndef DEFINE_LOAD_FUNCTIONS
-#ifdef DEBUG
-/*=macfunc DEBUG, ifdef DEBUG
+#ifdef DEBUG_ENABLED
+/*=macfunc DEBUG, ifdef DEBUG_ENABLED
  *
  *  handler_proc:
  *  what:  Provide break point spots
@@ -785,7 +785,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  the entries are all linked together and
      *  realloc-ing it may cause it to move.
      */
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: agUtils.c,v 3.6 2002/03/27 04:45:29 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -713,7 +713,7 @@ checkMem( tMemMgmt* pMM )
             fclose( pfTrace );
             fclose( stdout );
             p = NULL;
-            *p = '~'; /* PAGE FAULT */
+            *p = '~'; /* SEG FAULT */
             _exit( EXIT_FAILURE );
         }
     } while (--ct > 0);

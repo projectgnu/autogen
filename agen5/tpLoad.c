@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.8 2002/01/31 02:29:13 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.9 2002/03/27 04:45:29 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -296,7 +296,7 @@ loadMacros( tTemplate* pT,
      *  the entries are all linked together and
      *  realloc-ing it may cause it to move.
      */
-#if defined( DEBUG )
+#if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";

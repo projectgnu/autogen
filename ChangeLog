@@ -1,5 +1,12 @@
 2002-03-22  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/*: sed 's/DEBUG/DEBUG_ENABLED/g' -- well, almost.
+	* agen5/opts.def(timeout): respelled ENABLE_SHELL as SHELL_ENABLED
+	* agen5/expMake.c(ag_scm_makefile_script): reworked to handle
+	implicit command continuations.
+
+2002-03-22  Bruce Korb  <bkorb@gnu.org>
+
 	* config/confmacs.tpl: make it possible to dump all the macros into
 	a single output file.  More convenient.
 	* config/conftest.tpl: ditto.
