@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.28 1999/10/30 16:46:35 bruce Exp $
+## $Id: Makefile.am,v 2.29 1999/10/30 19:19:07 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,7 +48,7 @@ EXPRSRC		= \
 
 DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 
-GETDEF_SRC	= $(FUNCSRC) $(EXPRSRC) $(DIRECTIVESRC)
+GETDEF_SRC	= $(EXPRSRC) $(DIRECTIVESRC)
 
 ADDON_MENU	= \
 		$(top_srcdir)/columns/columns.menu \
@@ -85,7 +85,9 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
 
 autogen.texi : $(DOC_DEPENDS)
-	top_srcdir=$(top_srcdir) CC="$(CC)" \
+	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ...
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	AGEXE=$(AGEXE) CC="$(CC)" \
 	ADDON_MENU="$(ADDON_MENU)" \
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
@@ -109,7 +111,5 @@ $(top_srcdir)/columns/columns.texi :
 LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	top_srcdir=$(top_srcdir) \
 	$(AGEXE) -T LSM.tpl $(OPTIONS_DEF)
-
-autogen.info : doc
 
 # Makefile.am ends here
