@@ -1,4 +1,29 @@
 
+/*
+ *  columns.c
+ *  $Id: columns.c,v 1.7 1998/11/06 20:24:15 bkorb Exp $
+ */
+
+/*
+ *  Columns copyright 1992-1998 Bruce Korb
+ *
+ *  Columns is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  Columns is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Columns.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -157,7 +182,14 @@ readLines( void )
      */
     if (columnSz == 0) {
         /*
-         *  IF the column count is set, then that dictates it.
+         *  IF the column count has not been set,
+         *  THEN compute it.
+         */
+        if (columnCt == 0)
+            columnCt = lineWidth / maxEntryWidth;
+
+        /*
+         *  IF there are to be multiple columns, ...
          */
         if (columnCt > 1) {
             int  spreadwidth = lineWidth - maxEntryWidth;
@@ -176,37 +208,35 @@ readLines( void )
                 else columnSz = lineWidth;
             }
         }
-
-        /*
-         *  ELSE neither the column size or count have been set:
-         */
-        else {
-            columnCt = ((lineWidth - maxEntryWidth) / maxEntryWidth) + 1;
-            columnSz = ((lineWidth - maxEntryWidth) / columnCt);
-        }
     }
 
     /*
      *  Otherwise, the column size has been set.  Ensure it is sane.
      */
     else {
+        /*
+         *  Increase the column size to the width of the widest entry
+         */
         if (maxEntryWidth > columnSz)
             columnSz = maxEntryWidth;
 
+        /*
+         *  IF     we have not been provided a column count
+         *    *OR* we are set to overfill the output line,
+         *  THEN compute the number of columns.
+         */
         if (  (columnCt == 0)
            || ( ((columnSz * (columnCt-1)) + maxEntryWidth) > lineWidth ))
             columnCt = ((lineWidth - maxEntryWidth) / columnSz) + 1;
     }
 
     /*
-     *  Make sure the output line length is big enough
+     *  Ensure that any "spread" we added to the column size
+     *  does not exceed the parameterized limit.
      */
-    if (lineWidth < maxEntryWidth) {
-        fprintf( stderr, "Warning:  line width of %3d is smaller than\n"
-                         "          longest line  %3d\n",
-                 lineWidth, maxEntryWidth );
-        lineWidth = maxEntryWidth;
-    }
+    if (   HAVE_OPT( SPREAD )
+        && ((maxEntryWidth + OPT_VALUE_SPREAD - 1) < columnSz))
+        columnSz = maxEntryWidth + OPT_VALUE_SPREAD - 1;
 }
 
 
@@ -232,6 +262,14 @@ writeColumns( void )
      *  IF, however, we would  produce an empty final column,
      *  we will reduce our column count and line width and then
      *  try the top-of-column pointer computation again.
+     *
+     *  The problem solved here is that sometimes, when the
+     *  number of entries in a row is greater than the number of rows,
+     *  it is possible that all the entries that would have been
+     *  in the last column are, instead, essentially put on the
+     *  last row.  That will leave the final column empty.
+     *  We could regroup at that point and spread the columns some more,
+     *  but, if done, is an exercise for later.
      */
     for (;;) {
         int  rem;

@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.6 1998/10/26 15:33:37 bkorb Exp $
+ *   $Id: opts.def,v 1.7 1998/11/06 20:24:16 bkorb Exp $
  */
 
 /*
@@ -68,6 +68,16 @@ flag = {
     "Use this option to specify exactly how many characters are to be\n"
     "allocated for each column.  If it is narrower than the widest entry,\n"
     "it will be over-ridden with the required width.";
+};
+
+flag = {
+    name      = spread;
+    flag_arg  = "=0";
+    descrip   = "maximum spread added to column width";
+    doc =
+    "Use this option to specify exactly how many characters may be\n"
+    "added to each column.  It allows you to prevent columns from\n"
+    "becoming too far apart.";
 };
 
 flag = {
