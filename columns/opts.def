@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.11 1999/02/26 15:57:13 bkorb Exp $
+ *   $Id: opts.def,v 1.12 1999/02/26 15:58:33 bkorb Exp $
  */
 
 /*
@@ -34,7 +34,7 @@ long_opts;
 
 explain =
 'This program will read a list of text items from standard in
-or a specified input and produce a columnized listing of all
+or a specified input file and produce a columnized listing of all
 the non-blank lines.';
 
 version = 1;
