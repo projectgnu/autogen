@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 3.3 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: strsignal.c,v 3.4 2003/05/17 22:32:36 bkorb Exp $
  */
 
 #include "compat.h"
@@ -51,11 +51,11 @@
 
 #ifdef __STDC__
 # include <stddef.h>
-#else	/* !__STDC__ */
+#else   /* !__STDC__ */
 #  ifndef const
 #    define const
 #  endif
-#endif	/* __STDC__ */
+#endif  /* __STDC__ */
 
 #ifdef HAVE_SYS_SIGLIST
 #  include <signal.h>
@@ -73,29 +73,29 @@
 
 NAME
 
-	strsignal -- map a signal number to a signal message string
+    strsignal -- map a signal number to a signal message string
 
 SYNOPSIS
 
-	char *strsignal (int signo)
+    char *strsignal (int signo)
 
 DESCRIPTION
 
-	Maps an signal number to an signal message string, the contents of
-	which are implementation defined.  On systems which have the external
-	variable sys_siglist, these strings will be the same as the ones used
-	by psignal().
+    Maps an signal number to an signal message string, the contents of
+    which are implementation defined.  On systems which have the external
+    variable sys_siglist, these strings will be the same as the ones used
+    by psignal().
 
-	If the supplied signal number is within the valid range of indices
-	for the sys_siglist, but no message is available for the particular
-	signal number, then returns the string "Signal NUM", where NUM is the
-	signal number.
+    If the supplied signal number is within the valid range of indices
+    for the sys_siglist, but no message is available for the particular
+    signal number, then returns the string "Signal NUM", where NUM is the
+    signal number.
 
-	If the supplied signal number is not a valid index into sys_siglist,
-	returns NULL.
+    If the supplied signal number is not a valid index into sys_siglist,
+    returns NULL.
 
-	The returned string is only guaranteed to be valid only until the
-	next call to strsignal.
+    The returned string is only guaranteed to be valid only until the
+    next call to strsignal.
 
 */
 

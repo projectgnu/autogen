@@ -8,13 +8,13 @@
 ## Maintainer:       Bruce Korb <bkorb@gnu.org>
 ## Created:          Mon Jun 30 15:35:12 1997	
 ## Last Modified:    Thu Jul 29 08:30:10 1999				      
-##            by:    Bruce Korb <bkorb@gnu.org>			      
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2003/02/16 00:04:40 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2003/05/17 22:32:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-EXTRA_DIST = bootstrap.dir compat.h libgen.h ndir.h pathfind.c strftime.c \
+EXTRA_DIST = bootstrap.dir compat.h libgen.h pathfind.c strftime.c \
 	strcspn.c strsignal.c strsignal.def strsignal.h strsignal.tpl
 
 GEN_SRC    = strsignal.h
