@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.20 2001/07/22 20:03:56 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.21 2001/09/21 03:09:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -52,7 +52,7 @@ This software is released under [=
    =  gpl =]the GNU General Public License[=
    = lgpl =]the GNU General Public License with Library Extensions[=
    =  bsd =]the Free BSD License[=
-   *      =]a proprietary [= % copyright.type "%s " =]copyright[=
+   *      =]a specialized copyright license[=
   ESAC =].[=
 ENDIF =]
 
@@ -107,9 +107,7 @@ This is the automatically generated usage text for [=prog_name=]:
             -e 's/{/@{/g' -e 's/}/@}/g' \
             -e 's/\t/        /g' "
 
-    (if (exist? "prog_file_name")
-        (get "prog_file_name")
-        (get "prog_name"))
+    (get "prog_name")
 
     (if (exist? "long_opts")       "--help"
         (if (exist? "flag.value")  "-?"

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.29 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: expState.c,v 1.30 2001/09/21 03:09:48 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -275,10 +275,10 @@ ag_scm_exist_p( SCM obj )
  *
  * what:   test for function
  *
- * exparg: ag-name, name of AutoGen function
+ * exparg: ag-name, name of AutoGen macro
  *
- * doc:  return SCM_BOOL_T if a specified name is an AutoGen function,
- *       otherwise return SCM_BOOL_F.
+ * doc:  return SCM_BOOL_T if a specified name is a user-defined AutoGen
+ *       macro, otherwise return SCM_BOOL_F.
 =*/
     SCM
 ag_scm_ag_function_p( SCM obj )
@@ -390,9 +390,11 @@ ag_scm_high_lim( SCM obj )
  *
  * exparg: ag-name, name of AutoGen value
  *
- * doc: If the named object is a group definition, then "len" is
- *     the same as "count".  Otherwise, if it is one or more text
- *     definitions, then it is the sum of their string lengths.
+ * doc:  If the named object is a group definition, then "len" is
+ *       the same as "count".  Otherwise, if it is one or more text
+ *       definitions, then it is the sum of their string lengths.
+ *       If it is a single text definition, then it is equivalent to
+ *       @code{(string-length (get "ag-name"))}.
 =*/
     SCM
 ag_scm_len( SCM obj )

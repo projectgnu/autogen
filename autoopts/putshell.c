@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 2.4 2000/10/20 03:32:04 bkorb Exp $
+ *  $Id: putshell.c,v 2.5 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -93,7 +93,7 @@ putBourneShell( tOptions* pOpts )
         if (UNUSED_OPT( pOD ))
             continue;
 
-        if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
+        if (SKIP_OPT(pOD))
             continue;
 
         /*

@@ -5,7 +5,7 @@ AutoGen5 template man=%s.1
 ## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
 ## 
-##  AutoOpts copyright 1992-2000 Bruce Korb
+##  AutoOpts copyright 1992-2001 Bruce Korb
 ## 
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
@@ -13,7 +13,7 @@ AutoGen5 template man=%s.1
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.14 2000/10/17 15:34:36 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.15 2001/09/21 03:09:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -40,11 +40,9 @@ AutoGen5 template man=%s.1
       #  based only on the argument processing type.
       #
       :+]
-.B [+: (if (exist? "prog_file_name")
-           (get "prog_file_name")
-           (string-downcase! (get "prog_name") )) :+][+:
+.B [+: (string-downcase! (get "prog_name")) :+][+:
   DEBUG 0 :+][+:
-  IF (exist? "flag.value") :+][+:
+  IF (exist? "flag.value")  :+][+:
     IF (exist? "long_opts") :+][+:
 
       # * * * * *
@@ -295,24 +293,43 @@ ENDIF
 
 
 :+][+:
-IF explain _exist :+]
+IF (exist? "explain") :+]
 .PP
 [+:explain:+][+:
 ENDIF:+][+:
-IF man_doc _exist :+]
+IF (exist? "man_doc") :+]
 [+:man_doc:+][+:
-ENDIF:+]
+ENDIF:+][+:
+
+IF (or (exist? "copyright.author") (exist? "copyright.owner")) :+]
 .SH AUTHOR
 [+: ?% copyright.author '%s' (get "copyright.owner")
-  :+][+:% eaddr "<%s>" :+]
+  :+][+:% eaddr " <%s>" :+][+:
+  CASE copyright.type :+][+:
+   =  gpl  :+]
 .PP
-Released under [+:
-CASE copyright.type :+][+:
- =  gpl :+]the GNU General Public License[+:
- = lgpl :+]the GNU General Public License with Library Extensions[+:
- =  bsd :+]the Free BSD License[+:
- *      :+]a proprietary [= % copyright.type "%s " =]copyright[+:
-ESAC :+].
+Released under the GNU General Public License.[+:
+   = lgpl  :+]
+.PP
+Released under the GNU General Public License with Library Extensions.[+:
+   =  bsd  :+]
+.PP
+Released under the Free BSD License.[+:
+   *       :+][+:
+     IF (exist? "copyright.text")
+           :+]
+.PP
+.nf
+.na
+[+: copyright.text :+]
+.fi
+.ad[+:
+     ELIF (exist? "copyright.date") :+]
+.PP
+Released under an unspecified copyright license.[+:
+     ENDIF :+][+:
+  ESAC     :+][+:
+ENDIF      :+]
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fB[+:prog_name:+]\fP
 option definitions.[+: #

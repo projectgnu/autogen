@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.68 2001/07/15 23:07:21 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.69 2001/09/21 03:09:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -397,6 +397,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
 @menu
 * AutoFSM::                        Automated Finite State Machine
 * AutoXDR::                        Combined RPC Marshalling
+* AutoEvents::                     Automated Event Management
 [=`cat  ${ADDON_MENU}`=]
 @end menu
 

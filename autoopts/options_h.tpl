@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.28 2001/07/12 02:20:42 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.29 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -84,6 +84,7 @@
 #define OPTST_DOCUMENT     0x08000  /* opt is for documentation only     */
 #define OPTST_IMM          0x10000  /* process option on first pass      */
 #define OPTST_DISABLE_IMM  0x20000  /* process disablement on first pass */
+#define OPTST_OMITTED      0x40000  /* compiled out of program           */
 
 #define OPTST_PERSISTENT   0xFFF00  /* mask of flags that do not change  */
 

@@ -8,7 +8,7 @@
 @ignore
 EDIT THIS FILE WITH CAUTION  (autogen.texi)
 
-It has been AutoGen-ed  Sunday July 15, 2001 at 03:41:56 PM PDT
+It has been AutoGen-ed  Saturday September  8, 2001 at 03:06:30 AM PDT
 From the definitions    stdin
 and the template file   auto_gen
 
@@ -45,7 +45,7 @@ directories:
 @end ignore
 @set EDITION   5.2
 @set VERSION   5.2
-@set UPDATED   July 2001
+@set UPDATED   September 2001
 @set COPYRIGHT 1992-2001
 @set TITLE     The Automated Program Generator
 @set PACKAGE
@@ -520,6 +520,7 @@ C macro substitution is @strong{not} performed.
 * Definitions::     Named Definitions
 * Dynamic Text::    Dynamic Text
 * Directives::      Controlling What Gets Processed
+* Predefines::      Pre-defined Names
 * Comments::        Commenting Your Definitions
 * Example::         What it all looks like.
 * Full Syntax::     YACC Language Grammar
@@ -872,7 +873,6 @@ The AutoGen directives that affect the processing of
 definitions are:
 
 @table @code
-
 @item #define name [ <text> ]
 @cindex #define
 @cindex define directive
@@ -1015,6 +1015,33 @@ Extraction from autogen.texi
 @ignore
 Resume input from autogen.texi
 @end ignore
+
+@node Predefines
+@section Pre-defined Names
+@cindex predefines
+
+When AutoGen starts, it tries to determine several names from the
+operating environment and put them into environment variables for use in
+both @code{#ifdef} tests in the definitions files and in shell scripts
+with environment variable tests.  For these names, it will first try to
+use the POSIX version of the @code{sysinfo(2)} system call.  Failing
+that, it will try for the POSIX @code{uname(2)} call.  If neither is
+available, then this feature is not supported.
+
+If @code{sysinfo(2)} is available, the strings associated with
+@code{SI_SYSNAME} (e.g., "__sunos__"), @code{SI_HOSTNAME} (e.g.,
+"__ellen__"), @code{SI_ARCHITECTURE} (e.g., "__sparc__"),
+@code{SI_HW_PROVIDER} (e.g., "__sun_microsystems__"), @code{SI_PLATFORM}
+(e.g., "__sun_ultra_5_10__"), and @code{SI_MACHINE} (e.g., "__sun4u__")
+are used.  The associated names are converted to lower case, surrounded
+by doubled underscores and non-symbol characters are replaced with
+underscores.  For example, for Solaris on a sparc platform, you would
+get these definitions:
+
+For Linux and other operating systems that only support the
+@code{uname(2)} call, AutoGen will use the @code{sysname} (e.g.,
+"__linux__"), @code{machine} (e.g., "__i586__"), and @code{nodename}
+(e.g., "__bach__") values.
 
 @node Comments
 @section Commenting Your Definitions
@@ -1502,6 +1529,8 @@ but they cannot be invoked.
 * SCM out-pop::           @file{out-pop} - close current output file
 * SCM out-push-add::      @file{out-push-add} - append output to file
 * SCM out-push-new::      @file{out-push-new} - purge and create output file
+* SCM out-resume::        @file{out-resume} - resume current output file
+* SCM out-suspend::       @file{out-suspend} - suspend current output file
 * SCM out-switch::        @file{out-switch} - close and create new output
 * SCM set-writable::      @file{set-writable} - Make the output file be writable
 * SCM stack::             @file{stack} - make list of AutoGen values
@@ -1515,16 +1544,16 @@ but they cannot be invoked.
 @subsection @file{ag-function?} - test for function
 @findex ag-function?
 @ignore
-Extracted from ../agen5/expState.c on line 288.
+Extracted from ../agen5/expState.c on line 274.
 @end ignore
 Usage:  (ag-function? ag-name)
 @*
-return SCM_BOOL_T if a specified name is an AutoGen function,
-otherwise return SCM_BOOL_F.
+return SCM_BOOL_T if a specified name is a user-defined AutoGen
+macro, otherwise return SCM_BOOL_F.
 
 Arguments:
 @*
-ag-name - name of AutoGen function
+ag-name - name of AutoGen macro
 @node SCM base-name
 @subsection @file{base-name} - base output name
 @findex base-name
@@ -1558,7 +1587,7 @@ ag-name - name of AutoGen value
 @subsection @file{def-file} - definitions file name
 @findex def-file
 @ignore
-Extracted from ../agen5/expState.c on line 231.
+Extracted from ../agen5/expState.c on line 224.
 @end ignore
 Usage:  (def-file)
 @*
@@ -1594,7 +1623,7 @@ first_prefix - Optional - for the first output line
 @subsection @file{error} - display message and exit
 @findex error
 @ignore
-Extracted from ../agen5/expFormat.c on line 205.
+Extracted from ../agen5/expFormat.c on line 197.
 @end ignore
 Usage:  (error message)
 @*
@@ -1606,14 +1635,14 @@ DEFINITIONS ERROR in %s line %d for %s:  %s\n
 @end example
 
 The first three arguments to this format are provided by the
-routine and are@:  The name of the template file, the line within
+routine and are:  The name of the template file, the line within
 the template where the error was found, and the current output
 file name.
 
 After displaying the message, the current output file is removed
 and autogen exits with the EXIT_FAILURE error code.  IF, however,
-the argument is the number 0 (zero), then processing continues
-with the next suffix.
+the argument begins with the number 0 (zero), or the string is the
+empty string, then processing continues with the next suffix.
 
 Arguments:
 @*
@@ -1622,7 +1651,7 @@ message - message to display before exiting
 @subsection @file{error-source-line} - display of file & line
 @findex error-source-line
 @ignore
-Extracted from ../agen5/funcEval.c on line 289.
+Extracted from ../agen5/funcEval.c on line 283.
 @end ignore
 Usage:  (error-source-line)
 @*
@@ -1636,7 +1665,7 @@ This Scheme function takes no arguments.
 @subsection @file{exist?} - test for value name
 @findex exist?
 @ignore
-Extracted from ../agen5/expState.c on line 246.
+Extracted from ../agen5/expState.c on line 239.
 @end ignore
 Usage:  (exist? ag-name)
 @*
@@ -1678,12 +1707,14 @@ for_var - Optional - which for loop
 @subsection @file{for-by} - set iteration step
 @findex for-by
 @ignore
-Extracted from ../agen5/funcFor.c on line 203.
+Extracted from ../agen5/funcFor.c on line 207.
 @end ignore
 Usage:  (for-by by)
 @*
 This function records the "step by" information
-for an AutoGen FOR function.  @xref{FOR}.
+for an AutoGen FOR function.
+Outside of the FOR macro itself, this function will emit an error.
+@xref{FOR}.
 
 Arguments:
 @*
@@ -1697,7 +1728,9 @@ Extracted from ../agen5/funcFor.c on line 167.
 Usage:  (for-from from)
 @*
 This function records the initial index information
-for an AutoGen FOR function.  @xref{FOR}.
+for an AutoGen FOR function.
+Outside of the FOR macro itself, this function will emit an error.
+@xref{FOR}.
 
 Arguments:
 @*
@@ -1722,13 +1755,14 @@ for_var - Optional - which for loop
 @subsection @file{for-sep} - set loop separation string
 @findex for-sep
 @ignore
-Extracted from ../agen5/funcFor.c on line 222.
+Extracted from ../agen5/funcFor.c on line 227.
 @end ignore
 Usage:  (for-sep separator)
 @*
 This function records the separation string that is to be inserted
 between each iteration of an AutoGen FOR function.  This is often
-nothing more than a comma.  @xref{FOR}.
+nothing more than a comma.
+Outside of the FOR macro itself, this function will emit an error.
 
 Arguments:
 @*
@@ -1738,12 +1772,14 @@ each FOR iteration
 @subsection @file{for-to} - set ending index
 @findex for-to
 @ignore
-Extracted from ../agen5/funcFor.c on line 185.
+Extracted from ../agen5/funcFor.c on line 187.
 @end ignore
 Usage:  (for-to to)
 @*
 This function records the terminating value information
-for an AutoGen FOR function.  @xref{FOR}.
+for an AutoGen FOR function.
+Outside of the FOR macro itself, this function will emit an error.
+@xref{FOR}.
 
 Arguments:
 @*
@@ -1752,7 +1788,7 @@ to - the final index for the AutoGen FOR macro
 @subsection @file{get} - get named value
 @findex get
 @ignore
-Extracted from ../agen5/expState.c on line 354.
+Extracted from ../agen5/expState.c on line 330.
 @end ignore
 Usage:  (get ag-name)
 @*
@@ -1765,7 +1801,7 @@ ag-name - name of AutoGen value
 @subsection @file{high-lim} - get highest value index
 @findex high-lim
 @ignore
-Extracted from ../agen5/expState.c on line 383.
+Extracted from ../agen5/expState.c on line 353.
 @end ignore
 Usage:  (high-lim ag-name)
 @*
@@ -1794,13 +1830,15 @@ for_var - Optional - which for loop
 @subsection @file{len} - get count of values
 @findex len
 @ignore
-Extracted from ../agen5/expState.c on line 423.
+Extracted from ../agen5/expState.c on line 387.
 @end ignore
 Usage:  (len ag-name)
 @*
 If the named object is a group definition, then "len" is
 the same as "count".  Otherwise, if it is one or more text
 definitions, then it is the sum of their string lengths.
+If it is a single text definition, then it is equivalent to
+@code{(string-length (get "ag-name"))}.
 
 Arguments:
 @*
@@ -1809,7 +1847,7 @@ ag-name - name of AutoGen value
 @subsection @file{low-lim} - get lowest value index
 @findex low-lim
 @ignore
-Extracted from ../agen5/expState.c on line 449.
+Extracted from ../agen5/expState.c on line 410.
 @end ignore
 Usage:  (low-lim ag-name)
 @*
@@ -1822,7 +1860,7 @@ ag-name - name of AutoGen value
 @subsection @file{match-value?} - test for matching value
 @findex match-value?
 @ignore
-Extracted from ../agen5/expState.c on line 317.
+Extracted from ../agen5/expState.c on line 296.
 @end ignore
 Usage:  (match-value? op ag-name test-str)
 @*
@@ -1848,13 +1886,13 @@ test-str - string to test against
 @subsection @file{out-delete} - delete current output file
 @findex out-delete
 @ignore
-Extracted from ../agen5/expOutput.c on line 89.
+Extracted from ../agen5/expOutput.c on line 98.
 @end ignore
 Usage:  (out-delete)
 @*
 Remove the current output file.  Cease processing the template for
 the current suffix.  It is an error if there are @code{push}-ed
-output files.  Use the @code{[#_ERROR 0#]} function instead.
+output files.  Use the @code{(error "0")} scheme function instead.
 @xref{output controls}.
 
 This Scheme function takes no arguments.
@@ -1862,7 +1900,7 @@ This Scheme function takes no arguments.
 @subsection @file{out-depth} - output file stack depth
 @findex out-depth
 @ignore
-Extracted from ../agen5/expOutput.c on line 313.
+Extracted from ../agen5/expOutput.c on line 403.
 @end ignore
 Usage:  (out-depth)
 @*
@@ -1874,11 +1912,14 @@ This Scheme function takes no arguments.
 @subsection @file{out-move} - change name of output file
 @findex out-move
 @ignore
-Extracted from ../agen5/expOutput.c on line 114.
+Extracted from ../agen5/expOutput.c on line 123.
 @end ignore
 Usage:  (out-move new-name)
 @*
 Rename current output file.  @xref{output controls}.
+Please note: changing the name will not save a temporary
+file from being deleted.  It @i{may}, however, be used on the
+root output file.
 
 Arguments:
 @*
@@ -1887,11 +1928,13 @@ new-name - new name for the current output file
 @subsection @file{out-name} - current output file name
 @findex out-name
 @ignore
-Extracted from ../agen5/expOutput.c on line 326.
+Extracted from ../agen5/expOutput.c on line 416.
 @end ignore
 Usage:  (out-name)
 @*
-Returns the name of the current output file.
+Returns the name of the current output file.  If the current file
+is a temporary, unnamed file, then it will scan up the chain until
+a real output file name is found.
 @xref{output controls}.
 
 This Scheme function takes no arguments.
@@ -1899,7 +1942,7 @@ This Scheme function takes no arguments.
 @subsection @file{out-pop} - close current output file
 @findex out-pop
 @ignore
-Extracted from ../agen5/expOutput.c on line 142.
+Extracted from ../agen5/expOutput.c on line 148.
 @end ignore
 Usage:  (out-pop [ disp ])
 @*
@@ -1918,7 +1961,7 @@ disp - Optional - return contents of the file
 @subsection @file{out-push-add} - append output to file
 @findex out-push-add
 @ignore
-Extracted from ../agen5/expOutput.c on line 185.
+Extracted from ../agen5/expOutput.c on line 271.
 @end ignore
 Usage:  (out-push-add file-name)
 @*
@@ -1932,29 +1975,66 @@ file-name - name of the file to append text to
 @subsection @file{out-push-new} - purge and create output file
 @findex out-push-new
 @ignore
-Extracted from ../agen5/expOutput.c on line 218.
+Extracted from ../agen5/expOutput.c on line 304.
 @end ignore
 Usage:  (out-push-new [ file-name ])
 @*
 Leave the current output file open, but purge and create
 a new file that will remain open until a @code{pop} @code{delete}
-or @code{switch} closes it.  @xref{output controls}.
+or @code{switch} closes it.  The file name is optional and, if omitted,
+the output will be sent to a temporary file that will be deleted when
+it is closed.
+@xref{output controls}.
 
 Arguments:
 @*
 file-name - Optional - name of the file to create
+@node SCM out-resume
+@subsection @file{out-resume} - resume current output file
+@findex out-resume
+@ignore
+Extracted from ../agen5/expOutput.c on line 237.
+@end ignore
+Usage:  (out-resume suspName)
+@*
+If there has been a suspended output, then make that output descriptor
+current again.  That output must have been suspended with the same tag
+name given to this routine as its argument.
+
+Arguments:
+@*
+suspName - A name tag for reactivating
+@node SCM out-suspend
+@subsection @file{out-suspend} - suspend current output file
+@findex out-suspend
+@ignore
+Extracted from ../agen5/expOutput.c on line 191.
+@end ignore
+Usage:  (out-suspend suspName)
+@*
+If there has been a @code{push} on the output, then set aside the
+output descriptor for later reactiviation with @code{(out-resume "xxx")}.
+The tag name need not reflect the name of the output file.  In fact,
+the output file may be an anonymous temporary file.  You may also
+change the tag every time you suspend output to a file, because the
+tag names are forgotten as soon as the file has been "resumed".
+
+Arguments:
+@*
+suspName - A name tag for reactivating
 @node SCM out-switch
 @subsection @file{out-switch} - close and create new output
 @findex out-switch
 @ignore
-Extracted from ../agen5/expOutput.c on line 256.
+Extracted from ../agen5/expOutput.c on line 345.
 @end ignore
 Usage:  (out-switch file-name)
 @*
 Switch output files - close current file and make the current
 file pointer refer to the new file.  This is equivalent to
 @code{out-pop} followed by @code{out-push-new}, except that
-you may not pop the base level output file.  @xref{output controls}.
+you may not pop the base level output file, but you may
+@code{switch} it.  @xref{output controls}.
 
 Arguments:
 @*
@@ -1963,25 +2043,27 @@ file-name - name of the file to create
 @subsection @file{set-writable} - Make the output file be writable
 @findex set-writable
 @ignore
-Extracted from ../agen5/funcIf.c on line 445.
+Extracted from ../agen5/funcIf.c on line 452.
 @end ignore
-Usage:  (set-writable)
+Usage:  (set-writable [ set? ])
 @*
-This function will set the current output file to be writable.
-This is only effective if the command line option
-@code{--not-writable} has not been specified.  This state
+This function will set the current output file to be writable
+(or not).  This is only effective if neither the @code{--writable}
+nor @code{--not-writable} have been specified.  This state
 is reset when the current suffix's output is complete.
 
-This Scheme function takes no arguments.
+Arguments:
+@*
+set? - Optional - boolean arg, false to make output non-writable
 @node SCM stack
 @subsection @file{stack} - make list of AutoGen values
 @findex stack
 @ignore
-Extracted from ../agen5/expString.c on line 669.
+Extracted from ../agen5/expString.c on line 664.
 @end ignore
 Usage:  (stack ag-name)
 @*
-Create a list of all the strings that are associated
+Create a scheme list of all the strings that are associated
 with a name.  They must all be text values or we choke.
 
 Arguments:
@@ -1991,7 +2073,7 @@ ag-name - AutoGen value name
 @subsection @file{suffix} - get the current suffix
 @findex suffix
 @ignore
-Extracted from ../agen5/expState.c on line 483.
+Extracted from ../agen5/expState.c on line 438.
 @end ignore
 Usage:  (suffix)
 @*
@@ -2003,7 +2085,7 @@ This Scheme function takes no arguments.
 @subsection @file{tpl-file} - get the template file name
 @findex tpl-file
 @ignore
-Extracted from ../agen5/expState.c on line 498.
+Extracted from ../agen5/expState.c on line 453.
 @end ignore
 Usage:  (tpl-file)
 @*
@@ -2014,7 +2096,7 @@ This Scheme function takes no arguments.
 @subsection @file{tpl-file-line} - get the template file and line number
 @findex tpl-file-line
 @ignore
-Extracted from ../agen5/expState.c on line 511.
+Extracted from ../agen5/expState.c on line 466.
 @end ignore
 Usage:  (tpl-file-line [ msg-fmt ])
 @*
@@ -2094,14 +2176,11 @@ these functions are available for direct use during definition load time.
 @subsection @file{bsd} - Free BSD public license
 @findex bsd
 @ignore
-Extracted from ../agen5/expFormat.c on line 446.
+Extracted from ../agen5/expFormat.c on line 410.
 @end ignore
 Usage:  (bsd prog_name owner prefix)
 @*
 Emit a string that contains the Free BSD Public License.  It takes three
-arguments@:  @code{prefix} contains the string to start each output line.
-@code{owner} contains the copyright owner.  @code{prog_name} contains the
-name of the program the copyright is about.
 
 Arguments:
 @*
@@ -2114,7 +2193,7 @@ prefix - String for starting each output line
 @subsection @file{c-string} - emit string for ANSI C
 @findex c-string
 @ignore
-Extracted from ../agen5/expString.c on line 741.
+Extracted from ../agen5/expString.c on line 730.
 @end ignore
 Usage:  (c-string string)
 @*
@@ -2135,7 +2214,7 @@ string - string to reformat
 @subsection @file{extract} - extract text from another file
 @findex extract
 @ignore
-Extracted from ../agen5/expExtract.c on line 193.
+Extracted from ../agen5/expExtract.c on line 189.
 @end ignore
 Usage:  (extract file-name marker-fmt [ caveat ] [ default ])
 @*
@@ -2172,7 +2251,7 @@ default - Optional - default initial text
 @subsection @file{fprintf} - format to a file
 @findex fprintf
 @ignore
-Extracted from ../agen5/expPrint.c on line 273.
+Extracted from ../agen5/expPrint.c on line 235.
 @end ignore
 Usage:  (fprintf port format [ format-arg ... ])
 @*
@@ -2191,7 +2270,7 @@ format-arg - Optional - list of arguments to formatting string
 @subsection @file{gperf} - perform a perfect hash function
 @findex gperf
 @ignore
-Extracted from ../agen5/expGperf.c on line 182.
+Extracted from ../agen5/expGperf.c on line 155.
 @end ignore
 Usage:  (gperf name str)
 @*
@@ -2213,14 +2292,11 @@ str - string to hash
 @subsection @file{gpl} - GNU public license
 @findex gpl
 @ignore
-Extracted from ../agen5/expFormat.c on line 300.
+Extracted from ../agen5/expFormat.c on line 292.
 @end ignore
 Usage:  (gpl prog-name prefix)
 @*
 Emit a string that contains the GNU Public License.  It takes two
-arguments@:  @code{prefix} contains the string to start each output line,
-and @code{prog_name} contains the name of the program the copyright is
-about.
 
 Arguments:
 @*
@@ -2231,12 +2307,12 @@ prefix - String for starting each output line
 @subsection @file{in?} - test for string in list
 @findex in?
 @ignore
-Extracted from ../agen5/expString.c on line 199.
+Extracted from ../agen5/expString.c on line 203.
 @end ignore
 Usage:  (in? test-string string-list ...)
 @*
-Return SCM_BOOL_T if the first argument is duplicated
-in one of the entries in the second (list) argument.
+Return SCM_BOOL_T if the first argument string is found
+in one of the entries in the second (list-of-strings) argument.
 
 Arguments:
 @*
@@ -2247,7 +2323,7 @@ string-list - list of strings to check
 @subsection @file{join} - join string list with separator
 @findex join
 @ignore
-Extracted from ../agen5/expString.c on line 266.
+Extracted from ../agen5/expString.c on line 270.
 @end ignore
 Usage:  (join separator list ...)
 @*
@@ -2265,7 +2341,7 @@ list - list of strings to join
 @subsection @file{kr-string} - emit string for K&R C
 @findex kr-string
 @ignore
-Extracted from ../agen5/expString.c on line 714.
+Extracted from ../agen5/expString.c on line 706.
 @end ignore
 Usage:  (kr-string string)
 @*
@@ -2282,12 +2358,12 @@ string - string to reformat
 @subsection @file{lgpl} - GNU lib public license
 @findex lgpl
 @ignore
-Extracted from ../agen5/expFormat.c on line 366.
+Extracted from ../agen5/expFormat.c on line 348.
 @end ignore
 Usage:  (lgpl prog_name owner prefix)
 @*
 Emit a string that contains the GNU Library Public License.  It takes
-three arguments@:  @code{prefix} contains the string to start each output
+three arguments:  @code{prefix} contains the string to start each output
 line.  @code{owner} contains the copyright owner.  @code{prog_name}
 contains the name of the program the copyright is about.
 
@@ -2302,7 +2378,7 @@ prefix - String for starting each output line
 @subsection @file{license} - an arbitrary license
 @findex license
 @ignore
-Extracted from ../agen5/expFormat.c on line 526.
+Extracted from ../agen5/expFormat.c on line 478.
 @end ignore
 Usage:  (license lic_name prog_name owner prefix)
 @*
@@ -2360,7 +2436,7 @@ list - list of values.  Strings are converted to numbers
 @subsection @file{min} - minimum value in list
 @findex min
 @ignore
-Extracted from ../agen5/expGuile.c on line 138.
+Extracted from ../agen5/expGuile.c on line 139.
 @end ignore
 Usage:  (min list ...)
 @*
@@ -2373,7 +2449,7 @@ list - list of values.  Strings are converted to numbers
 @subsection @file{prefix} - prefix lines with a string
 @findex prefix
 @ignore
-Extracted from ../agen5/expString.c on line 365.
+Extracted from ../agen5/expString.c on line 369.
 @end ignore
 Usage:  (prefix prefix text)
 @*
@@ -2400,7 +2476,7 @@ text - multi-line block of text
 @subsection @file{printf} - format to stdout
 @findex printf
 @ignore
-Extracted from ../agen5/expPrint.c on line 230.
+Extracted from ../agen5/expPrint.c on line 212.
 @end ignore
 Usage:  (printf format [ format-arg ... ])
 @*
@@ -2428,7 +2504,7 @@ Contained single quotes become tripled, with the middle quote
 escaped with a backslash.  Normal shells will reconstitute the
 original string.
 
-@strong{NOTE}@:  some shells will not correctly handle unusual
+@strong{NOTE}:  some shells will not correctly handle unusual
 non-printing characters.  This routine works for most reasonably
 conventional ASCII strings.
 
@@ -2439,7 +2515,7 @@ string - string to transform
 @subsection @file{shell} - invoke a shell script
 @findex shell
 @ignore
-Extracted from ../agen5/expString.c on line 443.
+Extracted from ../agen5/expString.c on line 445.
 @end ignore
 Usage:  (shell command)
 @*
@@ -2456,7 +2532,7 @@ command - shell command - the result value is stdout
 @subsection @file{shell-str} - double quote shell string
 @findex shell-str
 @ignore
-Extracted from ../agen5/expString.c on line 573.
+Extracted from ../agen5/expString.c on line 570.
 @end ignore
 Usage:  (shell-str string)
 @*
@@ -2471,7 +2547,7 @@ string - string to transform
 @subsection @file{shellf} - format a string, run shell
 @findex shellf
 @ignore
-Extracted from ../agen5/expString.c on line 478.
+Extracted from ../agen5/expString.c on line 480.
 @end ignore
 Usage:  (shellf format [ format-arg ... ])
 @*
@@ -2502,7 +2578,7 @@ format-arg - Optional - list of arguments to formatting string
 @subsection @file{string-capitalize} - make a new string be capitalized
 @findex string-capitalize
 @ignore
-Extracted from ../agen5/expGuile.c on line 392.
+Extracted from ../agen5/expGuile.c on line 386.
 @end ignore
 Usage:  (string-capitalize str)
 @*
@@ -2517,7 +2593,7 @@ str - input string
 @subsection @file{string-capitalize!} - capitalize a string
 @findex string-capitalize!
 @ignore
-Extracted from ../agen5/expGuile.c on line 349.
+Extracted from ../agen5/expGuile.c on line 343.
 @end ignore
 Usage:  (string-capitalize! str)
 @*
@@ -2531,14 +2607,14 @@ str - input/output string
 @findex string-contains-eqv?
 @findex *=*
 @ignore
-Extracted from ../agen5/funcCase.c on line 271.
+Extracted from ../agen5/funcCase.c on line 256.
 @end ignore
 Usage:  (*=* text match)
 @*
 string-contains-eqv?:  Test to see if a string contains an equivalent string.
 `equivalent' means the strings match, but without regard
-to character case.  In other words, it is a case insensitive
-compare.
+to character case and certain characters are considered `equivalent'.
+Viz., '-', '_' and '^' are equivalent.
 
 Arguments:
 @*
@@ -2566,7 +2642,7 @@ match - pattern/substring to search for
 @subsection @file{string-downcase} - make a new string be lower case
 @findex string-downcase
 @ignore
-Extracted from ../agen5/expGuile.c on line 452.
+Extracted from ../agen5/expGuile.c on line 446.
 @end ignore
 Usage:  (string-downcase str)
 @*
@@ -2580,7 +2656,7 @@ str - input string
 @subsection @file{string-downcase!} - make a string be lower case
 @findex string-downcase!
 @ignore
-Extracted from ../agen5/expGuile.c on line 421.
+Extracted from ../agen5/expGuile.c on line 415.
 @end ignore
 Usage:  (string-downcase! str)
 @*
@@ -2594,7 +2670,7 @@ str - input/output string
 @findex string-end-eqv-match?
 @findex *~
 @ignore
-Extracted from ../agen5/funcCase.c on line 553.
+Extracted from ../agen5/funcCase.c on line 534.
 @end ignore
 Usage:  (*~ text match)
 @*
@@ -2611,7 +2687,7 @@ match - pattern/substring to search for
 @findex string-end-match?
 @findex *~~
 @ignore
-Extracted from ../agen5/funcCase.c on line 540.
+Extracted from ../agen5/funcCase.c on line 521.
 @end ignore
 Usage:  (*~~ text match)
 @*
@@ -2628,7 +2704,7 @@ match - pattern/substring to search for
 @findex string-ends-eqv?
 @findex *=
 @ignore
-Extracted from ../agen5/funcCase.c on line 323.
+Extracted from ../agen5/funcCase.c on line 308.
 @end ignore
 Usage:  (*= text match)
 @*
@@ -2644,7 +2720,7 @@ match - pattern/substring to search for
 @findex string-ends-with?
 @findex *==
 @ignore
-Extracted from ../agen5/funcCase.c on line 141.
+Extracted from ../agen5/funcCase.c on line 135.
 @end ignore
 Usage:  (*== text match)
 @*
@@ -2661,7 +2737,7 @@ match - pattern/substring to search for
 @findex string-equals?
 @findex ==
 @ignore
-Extracted from ../agen5/funcCase.c on line 226.
+Extracted from ../agen5/funcCase.c on line 216.
 @end ignore
 Usage:  (== text match)
 @*
@@ -2677,12 +2753,13 @@ match - pattern/substring to search for
 @findex string-eqv-match?
 @findex ~
 @ignore
-Extracted from ../agen5/funcCase.c on line 767.
+Extracted from ../agen5/funcCase.c on line 718.
 @end ignore
 Usage:  (~ text match)
 @*
 string-eqv-match?:  Test to see if a string fully matches a pattern.
-Case is not significant.
+Case is not significant, but any character equivalences
+must be expressed in your regular expression.
 
 Arguments:
 @*
@@ -2694,13 +2771,18 @@ match - pattern/substring to search for
 @findex string-eqv?
 @findex =
 @ignore
-Extracted from ../agen5/funcCase.c on line 407.
+Extracted from ../agen5/funcCase.c on line 388.
 @end ignore
 Usage:  (= text match)
 @*
-string-eqv?:  Test to see if two strings are equivalent.
-If the arguments are not strings, then
-the result of the numeric comparison is returned.
+string-eqv?:  Test to see if two strings are equivalent.  `equivalent' means the
+strings match, but without regard to character case and certain
+characters are considered `equivalent'.  Viz., '-', '_' and '^' are
+equivalent.  If the arguments are not strings, then the result of the
+numeric comparison is returned.
+
+This is an overloaded operation.  If the arguments are not both
+strings, then the query is passed through to @code{scm_num_eq_p()}.
 
 Arguments:
 @*
@@ -2712,7 +2794,7 @@ match - pattern/substring to search for
 @findex string-has-eqv-match?
 @findex *~*
 @ignore
-Extracted from ../agen5/funcCase.c on line 463.
+Extracted from ../agen5/funcCase.c on line 453.
 @end ignore
 Usage:  (*~* text match)
 @*
@@ -2729,7 +2811,7 @@ match - pattern/substring to search for
 @findex string-has-match?
 @findex *~~*
 @ignore
-Extracted from ../agen5/funcCase.c on line 450.
+Extracted from ../agen5/funcCase.c on line 440.
 @end ignore
 Usage:  (*~~* text match)
 @*
@@ -2746,7 +2828,7 @@ match - pattern/substring to search for
 @findex string-match?
 @findex ~~
 @ignore
-Extracted from ../agen5/funcCase.c on line 754.
+Extracted from ../agen5/funcCase.c on line 705.
 @end ignore
 Usage:  (~~ text match)
 @*
@@ -2763,7 +2845,7 @@ match - pattern/substring to search for
 @findex string-start-eqv-match?
 @findex ~*
 @ignore
-Extracted from ../agen5/funcCase.c on line 661.
+Extracted from ../agen5/funcCase.c on line 626.
 @end ignore
 Usage:  (~* text match)
 @*
@@ -2780,7 +2862,7 @@ match - pattern/substring to search for
 @findex string-start-match?
 @findex ~~*
 @ignore
-Extracted from ../agen5/funcCase.c on line 648.
+Extracted from ../agen5/funcCase.c on line 613.
 @end ignore
 Usage:  (~~* text match)
 @*
@@ -2797,7 +2879,7 @@ match - pattern/substring to search for
 @findex string-starts-eqv?
 @findex =*
 @ignore
-Extracted from ../agen5/funcCase.c on line 366.
+Extracted from ../agen5/funcCase.c on line 349.
 @end ignore
 Usage:  (=* text match)
 @*
@@ -2813,7 +2895,7 @@ match - pattern/substring to search for
 @findex string-starts-with?
 @findex ==*
 @ignore
-Extracted from ../agen5/funcCase.c on line 185.
+Extracted from ../agen5/funcCase.c on line 177.
 @end ignore
 Usage:  (==* text match)
 @*
@@ -2828,7 +2910,7 @@ match - pattern/substring to search for
 @subsection @file{string->c-name!} - map non-name chars to underscore
 @findex string->c-name!
 @ignore
-Extracted from ../agen5/expGuile.c on line 246.
+Extracted from ../agen5/expGuile.c on line 242.
 @end ignore
 Usage:  (string->c-name! str)
 @*
@@ -2843,7 +2925,7 @@ str - input/output string
 @subsection @file{string-tr!} - convert characters
 @findex string-tr!
 @ignore
-Extracted from ../agen5/expString.c on line 773.
+Extracted from ../agen5/expString.c on line 759.
 @end ignore
 Usage:  (string-tr! source match translation)
 @*
@@ -2866,7 +2948,7 @@ translation - conversion list
 @subsection @file{string-upcase} - make a new string be upper case
 @findex string-upcase
 @ignore
-Extracted from ../agen5/expGuile.c on line 321.
+Extracted from ../agen5/expGuile.c on line 318.
 @end ignore
 Usage:  (string-upcase str)
 @*
@@ -2880,7 +2962,7 @@ str - input string
 @subsection @file{string-upcase!} - make a string be upper case
 @findex string-upcase!
 @ignore
-Extracted from ../agen5/expGuile.c on line 290.
+Extracted from ../agen5/expGuile.c on line 287.
 @end ignore
 Usage:  (string-upcase! str)
 @*
@@ -2893,7 +2975,7 @@ str - input/output string
 @subsection @file{sum} - sum of values in list
 @findex sum
 @ignore
-Extracted from ../agen5/expGuile.c on line 204.
+Extracted from ../agen5/expGuile.c on line 199.
 @end ignore
 Usage:  (sum list ...)
 @*
@@ -2997,7 +3079,7 @@ Extraction from autogen.texi
 @node CASE
 @subsection CASE - Select one of several template blocks
 @ignore
-Extracted from ../agen5/funcCase.c on line 877.
+Extracted from ../agen5/funcCase.c on line 814.
 @end ignore
 @findex CASE
 
@@ -3005,15 +3087,15 @@ The arguments are evaluated and converted to a string, if necessary.
 (@pxref{EXPR})  The scope of the macro is up to the matching ESAC
 function.  Within the scope of a CASE, this string is matched against
 case selection macros.  There are sixteen match macros that are derived
-from four different ways the test may be performed.
-The code for each selection expression is formed as follows:
+from four different ways the test may be performed, plus an "always
+true" match.  The code for each selection expression is formed as follows:
 
 @enumerate
 @item
 Must the match start matching from the beginning of the string?
 If not, then the match macro code starts with an asterisk (@code{*}).
 @item
-Must the match finish matching from the end of the string?
+Must the match finish matching at the end of the string?
 If not, then the match macro code ends with an asterisk (@code{*}).
 @item
 Is the match a pattern match or a string comparison?
@@ -3022,6 +3104,9 @@ If a pattern match, use a tilde (@code{~}).
 @item
 Is the match case sensitive?
 If alphabetic case is important, double the tilde or equal sign.
+@item
+Do you need a default match when none of the others match?
+Use a single asterisk (@code{*}).
 @end enumerate
 
 @noindent
@@ -3048,7 +3133,7 @@ Scheme expression functions using the same codes
 @node COMMENT
 @subsection COMMENT - A block of comment to be ignored
 @ignore
-Extracted from ../agen5/functions.c on line 194.
+Extracted from ../agen5/functions.c on line 210.
 @end ignore
 @findex COMMENT
 
@@ -3058,7 +3143,7 @@ entire macro function is treated as a comment and ignored.
 @node DEFINE
 @subsection DEFINE - Define a user AutoGen macro
 @ignore
-Extracted from ../agen5/funcDef.c on line 770.
+Extracted from ../agen5/funcDef.c on line 467.
 @end ignore
 @findex DEFINE
 @cindex define macro
@@ -3106,7 +3191,7 @@ Sequences of strings are not concatenated.
 @node ELIF
 @subsection ELIF - Alternate Conditional Template Block
 @ignore
-Extracted from ../agen5/funcIf.c on line 257.
+Extracted from ../agen5/funcIf.c on line 259.
 @end ignore
 @findex ELIF
 
@@ -3119,7 +3204,7 @@ the arguments to @code{IF}.  For a complete description @xref{IF}.
 @node ELSE
 @subsection ELSE - Alternate Template Block
 @ignore
-Extracted from ../agen5/funcIf.c on line 282.
+Extracted from ../agen5/funcIf.c on line 285.
 @end ignore
 @findex ELSE
 
@@ -3131,7 +3216,7 @@ the @code{IF} function.  For a complete description @xref{IF}.
 @node ENDDEF
 @subsection ENDDEF - Ends a macro definition.
 @ignore
-Extracted from ../agen5/funcDef.c on line 819.
+Extracted from ../agen5/funcDef.c on line 516.
 @end ignore
 @findex ENDDEF
 
@@ -3141,7 +3226,7 @@ For a complete description @xref{DEFINE}.
 @node ENDFOR
 @subsection ENDFOR - Terminates the @code{FOR} function template block
 @ignore
-Extracted from ../agen5/funcFor.c on line 559.
+Extracted from ../agen5/funcFor.c on line 564.
 @end ignore
 @findex ENDFOR
 
@@ -3161,7 +3246,7 @@ For a complete description @xref{IF}.
 @node ENDWHILE
 @subsection ENDWHILE - Terminate the @code{WHILE} Template Block
 @ignore
-Extracted from ../agen5/funcIf.c on line 206.
+Extracted from ../agen5/funcIf.c on line 207.
 @end ignore
 @findex ENDWHILE
 
@@ -3171,7 +3256,7 @@ For a complete description @xref{WHILE}.
 @node ESAC
 @subsection ESAC - Terminate the @code{CASE} Template Block
 @ignore
-Extracted from ../agen5/funcCase.c on line 929.
+Extracted from ../agen5/funcCase.c on line 869.
 @end ignore
 @findex ESAC
 
@@ -3181,7 +3266,7 @@ For a complete description, @xref{CASE}.
 @node EXPR
 @subsection EXPR - Evaluate and emit an Expression
 @ignore
-Extracted from ../agen5/funcEval.c on line 359.
+Extracted from ../agen5/funcEval.c on line 353.
 @end ignore
 @findex EXPR
 
@@ -3194,7 +3279,7 @@ macro is inferred.  The result of the expression evaluation
 @node FOR
 @subsection FOR - Emit a template block multiple times
 @ignore
-Extracted from ../agen5/funcFor.c on line 491.
+Extracted from ../agen5/funcFor.c on line 496.
 @end ignore
 @findex FOR
 @cindex looping, for
@@ -3298,7 +3383,7 @@ is interpreted as @i{false}.
 @node INCLUDE
 @subsection INCLUDE - Read in and emit a template block
 @ignore
-Extracted from ../agen5/functions.c on line 37.
+Extracted from ../agen5/functions.c on line 38.
 @end ignore
 @findex INCLUDE
 
@@ -3314,7 +3399,7 @@ macro functions.
 @node INVOKE
 @subsection INVOKE - Invoke a User Defined Macro
 @ignore
-Extracted from ../agen5/funcDef.c on line 886.
+Extracted from ../agen5/funcDef.c on line 584.
 @end ignore
 @findex INVOKE
 
@@ -3339,7 +3424,7 @@ time the macro is evaluated.
 @node SELECT
 @subsection SELECT - Selection block for CASE function
 @ignore
-Extracted from ../agen5/funcCase.c on line 1168.
+Extracted from ../agen5/funcCase.c on line 1110.
 @end ignore
 @findex SELECT
 
@@ -3350,7 +3435,7 @@ macro.  @xref{CASE}.
 @node UNKNOWN
 @subsection UNKNOWN - Either a user macro or a value name.
 @ignore
-Extracted from ../agen5/functions.c on line 103.
+Extracted from ../agen5/functions.c on line 105.
 @end ignore
 @findex UNKNOWN
 
@@ -3364,7 +3449,7 @@ You may not specify @code{UNKNOWN} explicitly.
 @node WHILE
 @subsection WHILE - Conditionally loop over a Template Block
 @ignore
-Extracted from ../agen5/funcIf.c on line 179.
+Extracted from ../agen5/funcIf.c on line 180.
 @end ignore
 @findex WHILE
 @cindex conditional emit
@@ -3549,13 +3634,13 @@ Invocation section from ../agen5/autogen.texi
 @chapter Invoking autogen
 @cindex autogen invocation
 @ignore
-
+#  -*- buffer-read-only: t -*- vi: set ro:
+# 
 # DO NOT EDIT THIS FILE   (autogen.texi)
 # 
-# It has been AutoGen-ed  Sunday July 15, 2001 at 03:41:46 PM PDT
+# It has been AutoGen-ed  Saturday September  8, 2001 at 02:36:01 AM PDT
 # From the definitions    opts.def
 # and the template file   aginfo
-
 @end ignore
 
 This chapter documents the @code{AutoOpts}
@@ -3591,95 +3676,10 @@ This software is released under the GNU General Public License.
 
 This is the automatically generated usage text for autogen:
 
-@format
-autogen - The Automated Program Generator - Ver. 5.2.6
-USAGE:  autogen [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]... [ <def-file> ]
-  Flg Arg Option-Name    Description
-   -L YES templ-dirs     Template search directory list
-                                - may appear multiple times
-   -T YES override-tpl   Override template file
-                                - may not be preset
-   -l YES lib-template   Library template file
-                                - may appear multiple times
-   -b YES base-name      Base name for output file(s)
-                                - may not be preset
-      YES definitions    Definitions input file
-                                - disabled as --no-definitions
-                                - enabled by default
-                                - may not be preset
-   -S YES load-scheme    Scheme code file to load
-   -F YES load-functions Load scheme callout library
-   -s YES skip-suffix    Omit the file with this suffix
-                                - may not be preset
-                                - may appear multiple times
-   -o opt select-suffix  specify this output suffix
-                                - may not be preset
-                                - may appear multiple times
-      no  source-time    set mod times to latest source
-                                - disabled as --no-source-time
-      YES equate         characters considered equivalent
-      no  writable       Allow output files to be writable
-                                - disabled as --not-writable
-                                - may not be preset
-
-The following options are often useful while debugging new templates:
-
-  Flg Arg Option-Name    Description
-      Num loop-limit     Limit on increment loops
-   -t Num timeout        Time limit for servers
-      KWd trace          tracing level of detail
-      YES trace-out      tracing output file or filter
-
-These options can be used to control what gets processed
-in the definitions files and template files.
-
-  Flg Arg Option-Name    Description
-   -D YES define         name to add to definition list
-                                - may appear multiple times
-   -U YES undefine       definition list removal pattern
-                                - an alternate for define
-
-Auto-supported Options:
-
-  Flg Arg Option-Name    Description
-   -v opt version        Output version information and exit
-   -? no  help           Display usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to an rc file
-   -< YES load-opts      Load options from an rc file
-                                - disabled as --no-load-opts
-                                - may appear multiple times
-
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
-
-AutoGen creates text files from templates using external definitions.
-
-The following option preset mechanisms are supported:
- - reading file $HOME/.autogenrc
- - reading file ./.autogenrc
- - examining environment variables named AUTOGEN_*
-
-The valid trace option keywords are:
-        nothing
-        templates
-        block-macros
-        expressions
-        everything
-
-The definitions file (`<def-file>') can be specified with the
-`definitions' option or as the command argument, but not both.
-Omitting it or specifying `-' will result in reading definitions from
-standard input.
-
-The output file names are based on the template, but generally use the
-base name of the definition file.  If standard in is read for the
-definitions, then `stdin' will be used for that base name.  The
-suffixes to the base name are gotten from the template.  However, the
-template file may specify the entire output file name.
-
-`loop-limit' is used in debugging to stop runaway expansions.
-@end format
+@exampleindent 0
+@example
+autogen is unavailable - no --help
+@end example
 
 @node autogen templ-dirs
 @section templ-dirs option (-L)
@@ -4296,12 +4296,13 @@ white space is trimmed from the value, but otherwise new lines are
 not discarded.  The caller is expected to have NUL terminated the
 string at the correct point.
 
+@page
 @node Comparison
 @section Competitive Feature Analysis
 
 Here is a feature comparison of AutoOpts and five other command line
 parser generators.  They all read a file that describes the program
-options and produces code to parse command line options.  Each has their
+options and produce code to parse command line options.  Each has their
 own format for describing options.
 
 All versions support both short options (flags) and GNU-type long
@@ -4338,11 +4339,9 @@ any such changes.
 @item
 wyg uses flex and bison to generate a configuration file parser,
 but uses getopt_long to parse the command line options.
-
 @end enumerate
 
 @multitable @columnfractions .26 .1 .1 .1 .1 .1 .1
-
 @item package
 @tab 1
 @tab 2
@@ -4350,7 +4349,6 @@ but uses getopt_long to parse the command line options.
 @tab 4
 @tab 5
 @tab 6
-
 @item C language app
 @tab yes
 @tab yes
@@ -4358,7 +4356,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab yes
 @tab yes
-
 @item shell script app
 @tab yes
 @tab no
@@ -4366,7 +4363,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item package result
 @tab parser
 @tab parser
@@ -4374,7 +4370,6 @@ but uses getopt_long to parse the command line options.
 @tab parser
 @tab main.c
 @tab parser
-
 @item config file input
 @tab yes
 @tab no
@@ -4382,7 +4377,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab no
 @tab yes
-
 @item environment input
 @tab yes
 @tab no
@@ -4390,7 +4384,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item config file output
 @tab yes
 @tab no
@@ -4398,7 +4391,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item command line
 @tab yes
 @tab yes
@@ -4406,7 +4398,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab yes
 @tab yes
-
 @item parameter types
 @tab [1]
 @tab 4
@@ -4414,7 +4405,6 @@ but uses getopt_long to parse the command line options.
 @tab 5
 @tab 11
 @tab 4
-
 @item callback functions
 @tab yes
 @tab no
@@ -4422,7 +4412,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab yes
 @tab no
-
 @item multiple parameters
 @tab yes
 @tab yes
@@ -4430,7 +4419,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item optional parameters
 @tab yes
 @tab yes
@@ -4438,7 +4426,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item default values
 @tab yes
 @tab yes
@@ -4446,7 +4433,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab no
 @tab yes
-
 @item range checks
 @tab no
 @tab yes
@@ -4454,7 +4440,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item enumeration options
 @tab yes
 @tab no
@@ -4462,7 +4447,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item option data
 @tab struct
 @tab struct
@@ -4470,7 +4454,6 @@ but uses getopt_long to parse the command line options.
 @tab struct
 @tab vars
 @tab struct
-
 @item usage()
 @tab yes
 @tab yes
@@ -4478,7 +4461,6 @@ but uses getopt_long to parse the command line options.
 @tab yes
 @tab yes
 @tab yes
-
 @item man page
 @tab yes
 @tab yes
@@ -4486,7 +4468,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item texinfo usage
 @tab yes
 @tab no
@@ -4494,7 +4475,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item makefile
 @tab no
 @tab no
@@ -4502,7 +4482,6 @@ but uses getopt_long to parse the command line options.
 @tab no
 @tab no
 @tab no
-
 @item developer dependencies
 @tab Guile
 @tab tcl
@@ -4510,7 +4489,6 @@ but uses getopt_long to parse the command line options.
 @tab none
 @tab none
 @tab bison,flex
-
 @item user dependencies
 @tab [2]
 @tab none
@@ -4531,7 +4509,7 @@ package would need only a dependency on the package supplying libopts
  The Guile library is now generally pre-installed on all GNU/Linux systems.
 
  -- James R. Van Zandt
-
+@page
 @node Quick Start
 @section Quick Start
 @cindex Quick Start
@@ -4684,10 +4662,8 @@ copy of each of these definitions:
 @table @samp
 @cindex prog-name
 @item prog-name
-This attribute is required and its value must follow legal C syntax for
-variables.  Because of this constraint, if the file name of your program
-is different from this, then use the @var{prog-file-name}, described
-below.
+This attribute is required.  Variable names derived from this name will
+be transformed via @code{string->c_name!} (@pxref{SCM string->c-name!}).
 
 @cindex prog-title
 @item prog-title
@@ -4759,12 +4735,6 @@ copyright = @{
     type  = GPL;
 @};
 @end example
-
-@cindex prog-file-name
-@item prog-file-name
-If the @var{prog-name} attribute does not match the program
-file name, then this attribute must be supplied so that where
-a file name is required, it can be correctly supplied.
 
 @cindex detail
 @item detail
@@ -4931,12 +4901,12 @@ is disabled.  Otherwise, the value must be set to a single character.
 
 For each option you wish to specify, you must have a block macro named
 @code{flag} defined.  It @strong{MUST} contain at least two defined text
-macros named @code{name} and @code{descrip}.  If any options do not have a
+values named @code{name} and @code{descrip}.  If any options do not have a
 @code{value} macro, then the @code{long-opts} global text macro must be
 defined.  As a special exception, if no options have a @code{value}
 @strong{and} @code{long-opts} is not defined @strong{and} @code{argument} is
-not defined, then all arguments to the program are named.  The @code{-}
-and @code{--} command line option markers are then optional.
+not defined, then all arguments to the program are named.  In this case, the
+@code{-} and @code{--} command line option markers are optional.
 
 There are four categories of option attributes.  The fifth section below
 describes what data are available for writing option processing code.
@@ -4998,10 +4968,6 @@ pointers.
 @cindex value
 @item value
 The flag character to specify for traditional option flags.  e.g. @code{-L}.
-
-@item flag_arg
-This attribute has been eliminated.  Please use the appropriate
-combination of @var{arg_type}, @var{arg_default} and @var{arg_optional}.
 
 @cindex arg_type
 @item arg_type
@@ -5196,8 +5162,8 @@ structures may be accessed.  @xref{Option Processing Data}.
 @item extract_code
 This is effectively identical to @code{flag_code}, except that the
 source is kept in the output file instead of the definitions file.
-A long comment is used to demarkcate the code.  You must not modify
-that marker.  Before regenerating the option code file, you must
+A long comment is used to demarcate the code.  You must not modify
+that marker.  @i{Before} regenerating the option code file, you must
 rename the old file from MUMBLE.c to MUMBLE.c.save.  The template
 will be looking there for the text to copy into the new output file.
 
@@ -5286,10 +5252,34 @@ This bit is set if the option is to be disabled.
 the option has not been specified yet and initializes as @code{disabled}.)
 @end table
 
+As an example of how this might be used, in AutoGen I want to allow
+template writers to specify that the template output can be left
+in a writable or read-only state.  To support this, there is a Guile
+function named @code{set-writable} (@pxref{SCM set-writable}).
+Also, I provide for command options @code{--writable} and
+@code{--not-writable}.  I give precedence to command line and RC
+file options, thus:
+
+@example
+switch (STATE_OPT( WRITABLE )) @{
+case OPTST_DEFINED:
+case OPTST_PRESET:
+    fprintf( stderr, zOverrideWarn, pCurTemplate->pzFileName,
+             pCurMacro->lineNo );
+    break;
+
+default:
+    if (gh_boolean_p( set ) && (set == SCM_BOOL_F))
+        CLEAR_OPT( WRITABLE );
+    else
+        SET_OPT_WRITABLE;
+@}
+@end example
+
 @cindex pzLastArg
 @item pzLastArg
 Pointer to the latest argument string.  BEWARE@:  If the argument type is
-numeric or an enumeration.  This will be the argument @strong{value} and
+numeric or an enumeration, then this will be the argument @strong{value} and
 not a pointer to a string.
 @end table
 
@@ -6224,6 +6214,7 @@ Extraction from autogen.texi
 @menu
 * AutoFSM::                        Automated Finite State Machine
 * AutoXDR::                        Combined RPC Marshalling
+* AutoEvents::                     Automated Event Management
 * columns Invocation::             Invoking columns
 * getdefs Invocation::             Invoking getdefs
 * snprintfv::	The extensible format printing library.
@@ -6263,6 +6254,32 @@ RPC calls.  There is a brief example
 @uref{http://www.gnu.org/software/autogen/xdr/index.html,on the web}, but
 you should @uref{http://download.sourceforge.net/autogen/,download AutoXDR}.
 
+@node AutoEvents
+@section Automated Event Management
+@cindex AutoEvents
+
+Large software development projects invariably have a need to manage
+the distribution and display of state information and state changes.
+In other words, they need to manage their software events.  Generally,
+each such project invents its own way of accomplishing this and then
+struggles to get all of its components to play the same way.  It is a
+difficult process and not always completely successful.  This project
+helps with that.
+
+AutoEvents completely separates the tasks of supplying the data
+needed for a particular event from the methods used to manage the
+distribution and display of that event.  Consequently, the programmer
+writing the code no longer has to worry about that part of the
+problem.  Likewise the persons responsible for designing the event
+management and distribution no longer have to worry about getting
+programmers to write conforming code.
+
+This is a work in progress.  See my
+@uref{http://www.gnu.org/software/autogen/autoevents.html,web page}
+on the subject, if you are interested.
+I have some useful things put together, but it is not ready
+to call a product.
+
 @ignore
 END   == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
@@ -6276,13 +6293,13 @@ Copy of text from ../columns/columns.texi
 @section Invoking columns
 @cindex columns invocation
 @ignore
-
+#  -*- buffer-read-only: t -*- vi: set ro:
+# 
 # DO NOT EDIT THIS FILE   (columns.texi)
 # 
-# It has been AutoGen-ed  Sunday July 15, 2001 at 03:34:22 PM PDT
+# It has been AutoGen-ed  Saturday September  8, 2001 at 02:39:03 AM PDT
 # From the definitions    ../columns/opts.def
 # and the template file   aginfo
-
 @end ignore
 
 This program was designed for the purpose of generating compact,
@@ -6296,7 +6313,8 @@ See the formatting and separation arguments below.
 This program is used by AutoGen to help clean up and organize
 its output.
 
-See @file{autogen/agen5/functions.tpl}.
+See @file{autogen/agen5/fsm.tpl} and the generated output
+@file{pseudo-fsm.h}.
 
 This function was not implemented as an expression function because
 either it would have to be many expression functions, or a provision
@@ -6331,7 +6349,8 @@ This software is released under the GNU General Public License.
 
 This is the automatically generated usage text for columns:
 
-@format
+@exampleindent 0
+@example
 columns - Columnize Input Text - Ver. 1.1
 USAGE:  columns [ -<flag> [<val>] | --<name>[@{=| @}<val>] ]...
   Flg Arg Option-Name    Description
@@ -6367,7 +6386,7 @@ See the formatting and separation arguments below.
 
 This program is used by AutoGen to help clean up and organize
 its output.
-@end format
+@end example
 
 @node columns width
 @subsection width option (-W)
@@ -6510,13 +6529,13 @@ Copy of text from ../getdefs/getdefs.texi
 @section Invoking getdefs
 @cindex getdefs invocation
 @ignore
-
+#  -*- buffer-read-only: t -*- vi: set ro:
+# 
 # DO NOT EDIT THIS FILE   (getdefs.texi)
 # 
-# It has been AutoGen-ed  Sunday July 15, 2001 at 03:34:17 PM PDT
+# It has been AutoGen-ed  Saturday September  8, 2001 at 02:38:58 AM PDT
 # From the definitions    ../getdefs/opts.def
 # and the template file   aginfo
-
 @end ignore
 
 This program extracts AutoGen definitions from a list of source files.
@@ -6614,7 +6633,8 @@ This software is released under the GNU General Public License.
 
 This is the automatically generated usage text for getdefs:
 
-@format
+@exampleindent 0
+@example
 getdefs - AutoGen Definition Extraction Tool - Ver. 1.1
 USAGE:  getdefs @{ <option-name>[@{=| @}<val>] @}...
    Arg Option-Name   Req?  Description
@@ -6685,7 +6705,7 @@ asterisks deleted on every line.
 Also, if ``<entry-type>'' is an asterisk (``*''), then the entry_type
 enclosure and the name entry will be omitted and the ellipsis will
 become top-level definitions.
-@end format
+@end example
 
 @node getdefs defs-to-get
 @subsection defs-to-get option
@@ -6720,10 +6740,13 @@ Input file to search for defs.
 This option is required to appear.
 This option may appear an unlimited number of times.
 
-All files that are to be searched for definitions must be named
-on the command line.  If an option name is not mentioned in the
-command line argument, it is presumed to be this option.  There must
-be at least one.
+All files that are to be searched for definitions must be named on
+the command line or read from @code{stdin}.  If there is only one
+@code{input} option and it is the string, "-", then the input file
+list is read from @code{stdin}.  If a command line argument is not
+an option name and does not contain an assignment operator
+(@code{=}), then it defaults to being an input file name.
+At least one input file must be specified.
 
 @node getdefs subblock
 @subsection subblock option

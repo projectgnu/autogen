@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.13 2001/06/28 02:09:37 bkorb Exp $
+# $Id: optmain.tpl,v 2.14 2001/09/21 03:09:48 bkorb Exp $
 
 =]
 [=
@@ -210,8 +210,10 @@ DEFINE callback-proc-header     =]
  *
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
-DEF_PROC_2( static void doOpt[=(. cap-name) =],
-            tOptions*, pOptions, tOptDesc*, pOptDesc )
+static void
+doOpt[=(. cap-name) =]( pOptions, pOptDesc )
+    tOptions*   pOptions;
+    tOptDesc*   pOptDesc;
 {
 [=
 

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.27 2001/08/23 03:22:05 bkorb Exp $
+ *   $Id: opts.def,v 2.28 2001/09/21 03:09:48 bkorb Exp $
  */
 
 /*
@@ -35,7 +35,7 @@ eaddr         = "bkorb@gnu.org";
 prog_name     = "getdefs";
 prog_title    = "AutoGen Definition Extraction Tool";
 
-version       = "1.1";
+version       = "1.2";
 
 flag = {
     name      = "defs_to_get";
@@ -56,13 +56,27 @@ flag = {
     disable     = no;
     enabled;
     descrip     = "Alphabetize or use named file";
-    doc =
-    "By default, ordering is alphabetical by the entry name.\n"
-    "Use, @code{no-ordering} if order is unimportant.\n"
-    "Use @code{ordering} with no argument to order without case sensitivity.\n"
-    "Use @code{ordering=<file-name>} if chronological order is important.\n"
-    "getdefs will maintain the text content of @code{file-name}.\n"
-    "@code{file-name} need not exist.\n";
+    doc = <<-  _EOF_
+	By default, ordering is alphabetical by the entry name.  Use,
+	@code{no-ordering} if order is unimportant.  Use @code{ordering}
+	with no argument to order without case sensitivity.  Use
+	@code{ordering=<file-name>} if chronological order is important.
+	getdefs will maintain the text content of @code{file-name}.
+	@code{file-name} need not exist.
+	_EOF_;
+};
+
+flag = {
+    name        = first_index;
+	arg_type    = number;
+    arg_default = 0;
+    arg_name    = first-index;
+    descrip     = "The first index to apply to groups";
+	doc = <<-  _EOF_
+	By default, the first occurrance of a named definition will have an
+	index of zero.  Sometimes, that needs to be a reserved value.  Provide
+	this option to specify a different starting point.
+	_EOF_;
 };
 
 flag = {

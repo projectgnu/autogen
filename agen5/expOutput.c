@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.17 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: expOutput.c,v 1.18 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -101,7 +101,7 @@ addWriteAccess( char* pzFileName )
  * doc:  
  *  Remove the current output file.  Cease processing the template for
  *  the current suffix.  It is an error if there are @code{push}-ed
- *  output files.  Use the @code{[#_ERROR 0#]} function instead.
+ *  output files.  Use the @code{(error "0")} scheme function instead.
  *  @xref{output controls}.
 =*/
     SCM
@@ -126,6 +126,9 @@ ag_scm_out_delete( void )
  * exparg: new-name, new name for the current output file
  *
  * doc:    Rename current output file.  @xref{output controls}.
+ *         Please note: changing the name will not save a temporary
+ *         file from being deleted.  It @i{may}, however, be used on the
+ *         root output file.
 =*/
     SCM
 ag_scm_out_move( SCM new_file )
@@ -306,7 +309,10 @@ ag_scm_out_push_add( SCM new_file )
  * doc:
  *  Leave the current output file open, but purge and create
  *  a new file that will remain open until a @code{pop} @code{delete}
- *  or @code{switch} closes it.  @xref{output controls}.
+ *  or @code{switch} closes it.  The file name is optional and, if omitted,
+ *  the output will be sent to a temporary file that will be deleted when
+ *  it is closed.
+ *  @xref{output controls}.
 =*/
     SCM
 ag_scm_out_push_new( SCM new_file )
@@ -345,7 +351,8 @@ ag_scm_out_push_new( SCM new_file )
  *  Switch output files - close current file and make the current
  *  file pointer refer to the new file.  This is equivalent to
  *  @code{out-pop} followed by @code{out-push-new}, except that
- *  you may not pop the base level output file.  @xref{output controls}.
+ *  you may not pop the base level output file, but you may
+ *  @code{switch} it.  @xref{output controls}.
 =*/
     SCM
 ag_scm_out_switch( SCM new_file )

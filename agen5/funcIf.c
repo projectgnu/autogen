@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.14 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: funcIf.c,v 1.15 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -453,19 +453,38 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *
  * what:   Make the output file be writable
  *
- * doc:    This function will set the current output file to be writable.
- *         This is only effective if the command line option
- *         @code{--not-writable} has not been specified.  This state
+ * exparg: + set? + boolean arg, false to make output non-writable + opt
+ *
+ * doc:    This function will set the current output file to be writable
+ *         (or not).  This is only effective if neither the @code{--writable}
+ *         nor @code{--not-writable} have been specified.  This state
  *         is reset when the current suffix's output is complete.
 =*/
     SCM
-ag_scm_set_writable( void )
+ag_scm_set_writable( SCM set )
 {
-    SET_OPT_WRITABLE;
+    tSCC zWarn[] =
+        "Warning: (set-writable) function in %s on line %d:\n"
+        "\toverridden by invocation option\n";
+
+    switch (STATE_OPT( WRITABLE )) {
+    case OPTST_DEFINED:
+    case OPTST_PRESET:
+        fprintf( stderr, zWarn, pCurTemplate->pzFileName, pCurMacro->lineNo );
+        break;
+
+    default:
+        if (gh_boolean_p( set ) && (set == SCM_BOOL_F))
+            CLEAR_OPT( WRITABLE );
+        else
+            SET_OPT_WRITABLE;
+    }
+
     return SCM_UNDEFINED;
 }
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of funcIf.c */

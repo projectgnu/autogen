@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.10 2000/11/03 03:11:30 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.11 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -58,8 +58,9 @@
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
-DEF_PROC_1( STATIC char* findDirName,
-            tOptions*,  pOpts )
+STATIC char*
+findDirName( pOpts )
+	tOptions*  pOpts;
 {
     char*  pzDir;
 
@@ -131,8 +132,9 @@ DEF_PROC_1( STATIC char* findDirName,
 }
 
 
-DEF_PROC_1( STATIC char* findFileName,
-            tOptions*,  pOpts )
+STATIC char*
+findFileName( pOpts )
+	tOptions*  pOpts;
 {
     char*  pzDir;
     tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
@@ -239,10 +241,11 @@ DEF_PROC_1( STATIC char* findFileName,
 }
 
 
-DEF_PROC_3( STATIC void printEntry,
-            FILE*,      fp,
-            tOptDesc*,  p,
-            char*,      pzLA )
+STATIC void
+printEntry( fp, p, pzLA )
+	FILE*      fp;
+    tOptDesc*  p;
+    char*      pzLA;
 {
     /*
      *  There is an argument.  Pad the name so values line up
@@ -348,10 +351,8 @@ DEF_PROC_1( void optionSave,
             if (UNUSED_OPT( pOD ))
                 continue;
 
-            if ((pOD->fOptState & OPTST_NO_INIT) != 0)
-                continue;
-
-            if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
+            if ((pOD->fOptState & (OPTST_NO_INIT|OPTST_DOCUMENT|OPTST_OMITTED))
+                 != 0)
                 continue;
 
             if (  (pOD->optEquivIndex != NO_EQUIVALENT)

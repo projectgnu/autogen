@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.13 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: agUtils.c,v 1.14 2001/09/21 03:09:48 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -32,13 +32,26 @@
 
 #include "autogen.h"
 
+#if defined( HAVE_POSIX_SYSINFO )
+#  include <sys/systeminfo.h>
+   STATIC void addSysEnv( char* pzEnvName );
+#  define NEED_ADDSYSENV
+
+#elif defined( HAVE_UNAME_SYSCALL )
+#  include <sys/utsname.h>
+   STATIC void addSysEnv( char* pzEnvName );
+#  define NEED_ADDSYSENV
+
+#else
+#  undef  NEED_ADDSYSENV
+#endif
+
 #ifdef MEMDEBUG
 #  include "snprintfv/mem.h"
    static void finalMemCheck( void );
 #endif
 
 STATIC tCC* skipQuote( tCC* pzQte );
-
 
 #ifndef HAVE_STRLCPY
     size_t
@@ -184,7 +197,78 @@ doOptions( int arg_ct, char** arg_vec )
             putenv( pz );
         } while (--ct > 0);
     }
+
+#if defined( HAVE_POSIX_SYSINFO )
+    {
+        static const int nm[] = {
+            SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
+            SI_PLATFORM, SI_MACHINE };
+        int ix;
+        long sz;
+        char z[ 128 ];
+        char* pz = z+2;
+
+        z[0] = z[1] = '_';
+
+        for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
+            sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
+            if (sz > 0) {
+                sz += 2;
+                while (z[sz-1] == NUL)  sz--;
+                strcpy( z + sz, "__" );
+                addSysEnv( z );
+            }
+        }
+    }
+
+#elif defined( HAVE_UNAME_SYSCALL )
+    {
+        char z[ 128 ];
+        struct utsname unm;
+
+        if (uname( &unm ) != 0) {
+            fprintf( stderr, "Error %d (%s) making uname(2) call\n",
+                     errno, strerror( errno ));
+            exit( EXIT_FAILURE );
+        }
+
+        z[0] = z[1] = '_';
+        sprintf( z+2, "%s__", unm.sysname );
+        addSysEnv( z );
+
+        sprintf( z+2, "%s__", unm.machine );
+        addSysEnv( z );
+
+        sprintf( z+2, "%s__", unm.nodename );
+        addSysEnv( z );
+    }
+#endif
 }
+
+
+#ifdef NEED_ADDSYSENV
+    STATIC void
+addSysEnv( char* pzEnvName )
+{
+    tSCC zFmt[] = "%s=1";
+    int i = 2;
+
+    for (;;) {
+        if (isupper( pzEnvName[i] ))
+            pzEnvName[i] = tolower( pzEnvName[i] );
+        else if (! isalnum( pzEnvName[i] ))
+            pzEnvName[i] = '_';
+
+        if (pzEnvName[ ++i ] == NUL)
+            break;
+    }
+    if (getenv( pzEnvName ) == NULL) {
+        if (OPT_VALUE_TRACE > TRACE_NOTHING)
+            fprintf( stderr, "Adding ``%s'' to environment\n", pzEnvName );
+        putenv( asprintf( zFmt, pzEnvName ));
+    }
+}
+#endif /* NEED_ADDSYSENV */
 
 
     EXPORT tCC*
@@ -702,5 +786,6 @@ ag_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of agUtils.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.23 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: funcFor.c,v 1.24 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -170,7 +170,9 @@ ag_scm_for_index( SCM which )
  * exparg: from, the initial index for the AutoGen FOR macro
  *
  * doc:  This function records the initial index information
- *       for an AutoGen FOR function.  @xref{FOR}.
+ *       for an AutoGen FOR function.
+ *       Outside of the FOR macro itself, this function will emit an error.
+ *       @xref{FOR}.
 =*/
     SCM
 ag_scm_for_from( SCM from )
@@ -188,7 +190,9 @@ ag_scm_for_from( SCM from )
  * exparg: to, the final index for the AutoGen FOR macro
  *
  * doc:  This function records the terminating value information
- *       for an AutoGen FOR function.  @xref{FOR}.
+ *       for an AutoGen FOR function.
+ *       Outside of the FOR macro itself, this function will emit an error.
+ *       @xref{FOR}.
 =*/
     SCM
 ag_scm_for_to( SCM to )
@@ -205,9 +209,10 @@ ag_scm_for_to( SCM to )
  * what:   set iteration step
  * exparg: by, the iteration increment for the AutoGen FOR macro
  *
- * doc:
- *    This function records the "step by" information
- *    for an AutoGen FOR function.  @xref{FOR}.
+ * doc:  This function records the "step by" information
+ *       for an AutoGen FOR function.
+ *       Outside of the FOR macro itself, this function will emit an error.
+ *       @xref{FOR}.
 =*/
     SCM
 ag_scm_for_by( SCM by )
@@ -225,10 +230,10 @@ ag_scm_for_by( SCM by )
  * exparg: separator, the text to insert between the output of
  *         each FOR iteration
  *
- * doc:
- *  This function records the separation string that is to be inserted
- *  between each iteration of an AutoGen FOR function.  This is often
- *  nothing more than a comma.  @xref{FOR}.
+ * doc:  This function records the separation string that is to be inserted
+ *       between each iteration of an AutoGen FOR function.  This is often
+ *       nothing more than a comma.
+ *       Outside of the FOR macro itself, this function will emit an error.
 =*/
     SCM
 ag_scm_for_sep( SCM obj )

@@ -1,3 +1,46 @@
+2001-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(copyright): clean up licensing comment
+	* autoopts/autoopts.h(SKIP_OPT): add a macro for testing for _either_
+	the DOCUMENT or OMITTED bits being set.  "OMITTED" is now used for
+	compiled-out options.
+	* autoopts/autoopts.c: use the macro
+	* autoopts/guileopt.c: ditto
+	* autoopts/makeshell.c: ditto
+	* autoopts/putshell.c: ditto
+	* autoopts/save.c: ditto
+	* autoopts/usage.c: ditto
+	* autoopts/options.h: add the OMITTED bit to the flag list
+	* autoopts/optlib.tpl: use the flag to indicate compiled out code
+	(DefaultArg): fix spacing issue
+	* doc/autogen.texi(sysinfo): document the new pre-defined names
+	* agen5/agUtils.c(doOptions): add some system information to the
+	environment before starting any server processes.
+	* config/misc.def(posix_sysinfo): test for a POSIX (non-Linux) sysinfo
+	(uname_syscall): test for a POSIX uname call
+	* configure.in: use the new tests
+
+2001-09-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(signalSetup): ignore SIGWINCH and SIGSTOP, too.
+
+2001-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c: finished implementation of self-indexed defs
+	* getdefs/test/index.test: new test for this feature
+
+2001-09-08  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/autogen.texi: General cleanup + add AutoEvents section
+	* doc/auto_gen.tpl: add index entry for AutoEvents
+	* agen5/funcIf.c(set-writable): add optional argument to clear
+	the writable output state.
+
+2001-08-30  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(proprietary): fix macro marks
+	* */*: many doc changes all over.
+
 2001-08-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpProcess.c(processTemplate): supply the definitions for non-

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.16 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: autogen.c,v 1.17 2001/09/21 03:09:48 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -101,41 +101,6 @@ main( int    argc,
 
 
     STATIC void
-ignoreSignal( int sig )
-{
-    return;
-}
-
-
-    STATIC void
-abendSignal( int sig )
-{
-    tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
-    tSCC zAt[]  = "processing template %s\n"
-                  "            on line %d\n"
-                  "       for function %s (%d)\n";
-
-    fprintf( stderr, zErr, sig, strsignal( sig ));
-
-    /*
-     *  IF there is a current template, then we should report where we are
-     *  so that the template writer knows where to look for their problem.
-     */
-    if (pCurTemplate != (tTemplate*)NULL) {
-        int f;
-        assert( pCurMacro != NULL );
-        f = (pCurMacro->funcCode > FUNC_CT)
-                ? FTYP_SELECT : pCurMacro->funcCode;
-        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
-                 apzFuncNames[ f ], pCurMacro->funcCode );
-    }
-
-    procState = PROC_STATE_ABORTING;
-    siglongjmp( abendJumpEnv, sig );
-}
-
-
-    STATIC void
 doneCheck( void )
 {
     fflush( stdout );
@@ -185,10 +150,45 @@ doneCheck( void )
 
 
     STATIC void
+ignoreSignal( int sig )
+{
+    return;
+}
+
+
+    STATIC void
+abendSignal( int sig )
+{
+    tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
+    tSCC zAt[]  = "processing template %s\n"
+                  "            on line %d\n"
+                  "       for function %s (%d)\n";
+
+    fprintf( stderr, zErr, sig, strsignal( sig ));
+
+    /*
+     *  IF there is a current template, then we should report where we are
+     *  so that the template writer knows where to look for their problem.
+     */
+    if (pCurTemplate != (tTemplate*)NULL) {
+        int f;
+        assert( pCurMacro != NULL );
+        f = (pCurMacro->funcCode > FUNC_CT)
+                ? FTYP_SELECT : pCurMacro->funcCode;
+        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
+                 apzFuncNames[ f ], pCurMacro->funcCode );
+    }
+
+    procState = PROC_STATE_ABORTING;
+    siglongjmp( abendJumpEnv, sig );
+}
+
+
+    STATIC void
 signalSetup( void )
 {
     struct sigaction  sa;
-    int    sigNo = 0;
+    int    sigNo = 1;
 
     atexit( doneCheck );
 
@@ -201,22 +201,33 @@ signalSetup( void )
     snv_free    = (void(*)SNV_PARAMS((snv_pointer)))ag_free;
 #endif
 
-    sa.sa_handler = abendSignal;
     sa.sa_flags   = 0;
     sigemptyset( &sa.sa_mask );
 
     do  {
-        sigaction( ++sigNo,  &sa, (struct sigaction*)NULL );
-    } while (sigNo < NSIG);
+        switch (sigNo) {
+            /*
+             *  Signal handling for SIGCHLD needs to be ignored.  Do *NOT* use
+             *  SIG_IGN to do this.  That gets inherited by programs that need
+             *  to be able to use wait(2) calls.  At the same time, we don't
+             *  want our children to become zombies.  We may run out of zombie
+             *  space.  Therefore, set the handler to an empty procedure.
+             *  POSIX oversight.  Fixed for next POSIX rev.
+             */
+        case SIGCHLD:
+#ifdef SIGWINCH
+        case SIGWINCH:
+#endif
+        case SIGSTOP:  /* suspended */
+            sa.sa_handler = ignoreSignal;
+            break;
 
-    /*
-     *  Signal handling for SIGCHLD needs to be ignored.  Do *NOT* use
-     *  SIG_IGN to do this.  That gets inherited by programs that need
-     *  to be able to use wait(2) calls.  At the same time, we don't want
-     *  our children to become zombies.  We may run out of zombie space.
-     *  Therefore, set the handler to an empty procedure.
-     *  POSIX oversight.  Fixed for next POSIX rev.
-     */
+        default:
+            sa.sa_handler = abendSignal;
+        }
+        sigaction( sigNo,  &sa, (struct sigaction*)NULL );
+    } while (++sigNo < NSIG);
+
     sa.sa_handler = ignoreSignal;
     sigaction( SIGCHLD,  &sa, (struct sigaction*)NULL );
 }

@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.44 2001/07/22 20:03:56 bkorb Exp $
+## $Id: Makefile.am,v 2.45 2001/09/21 03:09:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,7 +22,7 @@ all : $(INFO_DEPS) LSM
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps \
+EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl \
 		snprintfv.texi snprintfv.menu
 
 MAINTAINERCLEANFILES = Makefile.in autogen.texi

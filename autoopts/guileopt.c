@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 1.4 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: guileopt.c,v 1.5 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -62,7 +62,7 @@ DEF_PROC_1( void export_options_to_guile,
     char z[ 4096 ];
 
     for (;--ct >= 0;pOD++) {
-        if (pOD->fOptState & OPTST_DOCUMENT)
+        if (SKIP_OPT(pOD))
             continue;
 
         /*

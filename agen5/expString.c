@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.34 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: expString.c,v 1.35 2001/09/21 03:09:48 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -207,8 +207,8 @@ makeString( tCC*    pzText,
  * exparg: test-string, string to look for
  * exparg: string-list, list of strings to check,, list
  *
- * doc:  Return SCM_BOOL_T if the first argument is duplicated
- *      in one of the entries in the second (list) argument.
+ * doc:  Return SCM_BOOL_T if the first argument string is found
+ *      in one of the entries in the second (list-of-strings) argument.
 =*/
     SCM
 ag_scm_in_p( SCM obj, SCM list )
@@ -521,7 +521,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
  *  escaped with a backslash.  Normal shells will reconstitute the
  *  original string.
  *
- *  @strong{NOTE}@:  some shells will not correctly handle unusual
+ *  @strong{NOTE}:  some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/
@@ -579,9 +579,10 @@ ag_scm_raw_shell_str( SCM obj )
  *  Convert the text of the string into a double quoted string that a normal
  *  shell will process into the original string, almost.  It will add the
  *  escape character @code{\\} before two special characters to accomplish
- *  this@: the backslash @code{\\} and double quote @code{"}.
+ *  this: the backslash @code{\\} and double quote @code{"}.
+ *
+ *  @strong{WARNING}:
  *@*
- *  @strong{WARNING}@:
  *  This function omits the extra backslash in front of a backslash, however,
  *  if it is followed by either a backquote or a dollar sign.  It must do this
  *  because otherwise it would be impossible to protect the dollar sign or
@@ -590,7 +591,7 @@ ag_scm_raw_shell_str( SCM obj )
  *
  *  All others characters are copied directly into the output.
  *
- *  @strong{NOTE}@: some shells will not correctly handle unusual
+ *  @strong{NOTE}: some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/
@@ -666,7 +667,7 @@ ag_scm_shell_str( SCM obj )
  *
  * exparg: ag-name, AutoGen value name
  *
- * doc:  Create a list of all the strings that are associated
+ * doc:  Create a scheme list of all the strings that are associated
  *       with a name.  They must all be text values or we choke.
 =*/
     SCM

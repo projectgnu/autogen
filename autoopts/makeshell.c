@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.28 2000/11/09 16:06:20 bkorb Exp $
+ *  $Id: makeshell.c,v 2.29 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -644,8 +644,7 @@ emitSetup( tOptions* pOpts )
     for (;optionCt > 0; pOptDesc++, --optionCt) {
         char zVal[20];
 
-        if (  ((pOptDesc->fOptState & OPTST_DOCUMENT) != 0)
-           || (pOptDesc->pz_NAME == (char*)NULL) )
+        if (SKIP_OPT(pOptDesc) || (pOptDesc->pz_NAME == (char*)NULL))
             continue;
 
         if (pOptDesc->optMaxCt > 1)
@@ -745,7 +744,7 @@ emitFlag( tOptions* pOpts )
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
 
-        if ((pOptDesc->fOptState & OPTST_DOCUMENT) != 0)
+        if (SKIP_OPT(pOptDesc))
             continue;
 
         if (isprint( pOptDesc->optValue )) {
@@ -773,14 +772,13 @@ emitLong( tOptions* pOpts )
         char      zName[ 256 ];
         char*     pz = zName;
 
-        if ((pOptDesc->fOptState & OPTST_DOCUMENT) != 0)
+        if (SKIP_OPT(pOptDesc))
             continue;
 
         for (;;) {
             matchCt = 0;
 
-            if (  (pOD == pOptDesc)
-               || ((pOD->fOptState & OPTST_DOCUMENT) != 0)  ){
+            if ((pOD == pOptDesc) || SKIP_OPT(pOptDesc)){
                 if (--oCt <= 0)
                     break;
                 pOD++;
@@ -842,8 +840,7 @@ emitLong( tOptions* pOpts )
         for (;;) {
             matchCt = 0;
 
-            if (  (pOD == pOptDesc)
-               || ((pOD->fOptState & OPTST_DOCUMENT) != 0)  ){
+            if ((pOD == pOptDesc) || SKIP_OPT(pOptDesc)){
                 if (--oCt <= 0)
                     break;
                 pOD++;

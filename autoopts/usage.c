@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.16 2000/10/31 22:16:56 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.17 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -161,6 +161,9 @@ DEF_PROC_2( void optionUsage,
             tSCC  zAuto[]    = "Auto-supported Options:";
 
             tCC*  pzArgType;
+
+            if ((pOD->fOptState & OPTST_OMITTED) != 0)
+                continue;
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
                 if (exitCode == EXIT_SUCCESS) {

@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2001/08/25 00:18:17 $
+dnl Last Modified:    $Date: 2001/09/21 03:09:48 $
 dnl            by:    Bruce Korb <bkorb@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.51 2001/08/25 00:18:17 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.52 2001/09/21 03:09:48 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -25,7 +25,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.51 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.52 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -176,6 +176,8 @@ AG_FUNC_FOPEN_TEXT
 AG_CHECK_ALLOCATED_CTIME
 AG_CHECK_STRFTIME
 AG_CHECK_SYS_SIGLIST
+AG_CHECK_POSIX_SYSINFO
+AG_CHECK_UNAME_SYSCALL
 
 # ----------------------------------------------------------------------
 # Generate the make files.

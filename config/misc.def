@@ -7,7 +7,7 @@ autogen definitions m4;
  *  Last Modified:     Wed Jul  7 10:33:11 1999				      
  *             by:     Bruce Korb <bkorb@gnu.org>			      
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 1.3 2000/04/04 13:22:50 bkorb Exp $
+ *  $Id: misc.def,v 1.4 2001/09/21 03:09:48 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
@@ -91,6 +91,36 @@ int main()
     doc =
     "Check that the POSIX compliant regular expression compiler\n"
     "is available in the POSIX specified manner, and it works.";
+};
+
+test = {
+    name  = posix_sysinfo;
+    type  = run;
+    check = "sysinfo(2) is POSIX";
+    code  = <<- _EOF_
+		#include <sys/systeminfo.h>
+		int main() { char z[ 256 ];
+		long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
+		return (sz > 0) ? 0 : 1;
+		}
+		_EOF_;
+    doc =
+    "Check that the POSIX compliant sysinfo(2) call works properly.\n"
+    "Linux has its own weirdo alternative.";
+};
+
+test = {
+    name  = uname_syscall;
+    type  = run;
+    check = "uname(2) is POSIX";
+    code  = <<- _EOF_
+		#include <sys/utsname.h>
+		int main() { struct utsname unm;
+		return uname( &unm );
+		}
+		_EOF_;
+    doc =
+    "Check that the POSIX compliant uname(2) call works properly.";
 };
 
 /* ctime.def ends here */

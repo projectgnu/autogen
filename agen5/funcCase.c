@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.31 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: funcCase.c,v 1.32 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -395,12 +395,14 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
  *
  * string: "="
  *
- * doc:  Test to see if two strings are equivalent.
- *       `equivalent' means the strings match, but without regard
- *       to character case and certain characters are considered `equivalent'.
- *       Viz., '-', '_' and '^' are equivalent.
- *       If the arguments are not strings, then
- *       the result of the numeric comparison is returned.
+ * doc:  Test to see if two strings are equivalent.  `equivalent' means the
+ *       strings match, but without regard to character case and certain
+ *       characters are considered `equivalent'.  Viz., '-', '_' and '^' are
+ *       equivalent.  If the arguments are not strings, then the result of the
+ *       numeric comparison is returned.
+ *
+ *       This is an overloaded operation.  If the arguments are not both
+ *       strings, then the query is passed through to @code{scm_num_eq_p()}.
 =*/
     STATIC tSuccess
 Select_Equivalent_Full( char* pzText, char* pzMatch )
@@ -821,15 +823,15 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  (@pxref{EXPR})  The scope of the macro is up to the matching ESAC
  *  function.  Within the scope of a CASE, this string is matched against
  *  case selection macros.  There are sixteen match macros that are derived
- *  from four different ways the test may be performed.
- *  The code for each selection expression is formed as follows:
+ *  from four different ways the test may be performed, plus an "always
+ *  true" match.  The code for each selection expression is formed as follows:
  *
  *  @enumerate
  *  @item
  *  Must the match start matching from the beginning of the string?
  *  If not, then the match macro code starts with an asterisk (@code{*}).
  *  @item
- *  Must the match finish matching from the end of the string?
+ *  Must the match finish matching at the end of the string?
  *  If not, then the match macro code ends with an asterisk (@code{*}).
  *  @item
  *  Is the match a pattern match or a string comparison?
@@ -838,6 +840,9 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  @item
  *  Is the match case sensitive?
  *  If alphabetic case is important, double the tilde or equal sign.
+ *  @item
+ *  Do you need a default match when none of the others match?
+ *  Use a single asterisk (@code{*}).
  *  @end enumerate
  *
  *  @noindent

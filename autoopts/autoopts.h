@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.19 2001/05/19 22:18:56 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.20 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -129,6 +129,8 @@
 
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
+
+#define SKIP_OPT(p)  (((p)->fOptState & (OPTST_DOCUMENT|OPTST_OMITTED)) != 0)
 
 typedef int tSuccess;
 #define SUCCESS         ((tSuccess)0)

@@ -8,10 +8,10 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.7 2000/04/04 13:23:32 bkorb Exp $
+## $Id: Makefile.am,v 1.8 2001/09/21 03:09:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-TESTS      = subblock.test
+TESTS      = index.test subblock.test
 EXTRA_DIST = defs $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in

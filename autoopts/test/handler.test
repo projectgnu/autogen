@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/05/09 05:28:51 $
+# Last Modified:     $Date: 2001/09/21 03:09:48 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: handler.test,v 1.1 2001/05/09 05:28:51 bkorb Exp $
+# $Id: handler.test,v 1.2 2001/09/21 03:09:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -84,8 +84,10 @@ sed '1,/Create the static procedure(s) declared above/d' \
 echo creating $testname.sample
 cat > $testname.sample <<'_EOF_'
  */
-DEF_PROC_2( static void doUsageOpt,
-            tOptions*,  pOpts, tOptDesc*,  pOD )
+static void
+doUsageOpt( pOpts, pOD )
+    tOptions*  pOpts;
+    tOptDesc*  pOD;
 {
     USAGE( EXIT_SUCCESS );
 }
@@ -94,8 +96,10 @@ DEF_PROC_2( static void doUsageOpt,
  *
  *   For the "First Option".
  */
-DEF_PROC_2( static void doOptFirst,
-            tOptions*, pOptions, tOptDesc*, pOptDesc )
+static void
+doOptFirst( pOptions, pOptDesc )
+    tOptions*   pOptions;
+    tOptDesc*   pOptDesc;
 {
 /*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
     SampleCode();
@@ -106,8 +110,10 @@ DEF_PROC_2( static void doOptFirst,
  *
  *   For the "Second Option".
  */
-DEF_PROC_2( static void doOptSecond,
-            tOptions*, pOptions, tOptDesc*, pOptDesc )
+static void
+doOptSecond( pOptions, pOptDesc )
+    tOptions*   pOptions;
+    tOptDesc*   pOptDesc;
 {
     tSCC zDef[2] = { 0x7F, 0 };
     tSCC* az_names[] = { zDef,
@@ -122,8 +128,10 @@ DEF_PROC_2( static void doOptSecond,
  *
  *   For the "Third Option".
  */
-DEF_PROC_2( static void doOptThird,
-            tOptions*, pOptions, tOptDesc*, pOptDesc )
+static void
+doOptThird( pOptions, pOptDesc )
+    tOptions*   pOptions;
+    tOptDesc*   pOptDesc;
 {
     SomeCodeOrOther();
 }

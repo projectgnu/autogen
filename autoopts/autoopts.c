@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.32 2001/05/28 00:23:28 bkorb Exp $
+ *  $Id: autoopts.c,v 2.33 2001/09/21 03:09:48 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -75,7 +75,6 @@
 
 #define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
-
 tSCC zBadVer[] = "Automated Options Processing Error!\n\
 \t%s called optionProcess with structure version %d.%d.%d.\n\
 \tThis library was compiled with version %d.%d.%d\n\
@@ -106,9 +105,10 @@ typedef int tDirection;
  *  This routine handles equivalencing and invoking the handler procedure,
  *  if any.
  */
-DEF_PROC_2( STATIC tSuccess loadValue,
-            tOptions*,  pOpts,
-            tOptState*, pOptState )
+STATIC tSuccess
+loadValue( pOpts, pOptState )
+    tOptions*  pOpts;
+    tOptState* pOptState;
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -188,10 +188,11 @@ DEF_PROC_2( STATIC tSuccess loadValue,
  *
  *  Find the long option descriptor for the current option
  */
-DEF_PROC_3( STATIC tSuccess longOptionFind,
-            tOptions*,   pOpts,
-            char*,       pzOptName,
-            tOptState*,  pOptState )
+STATIC tSuccess
+longOptionFind( pOpts, pzOptName, pOptState )
+    tOptions*   pOpts;
+    char*       pzOptName;
+    tOptState*  pOptState;
 {
     ag_bool    disable  = AG_FALSE;
     char*      pzEq     = strchr( pzOptName, '=' );
@@ -213,7 +214,7 @@ DEF_PROC_3( STATIC tSuccess longOptionFind,
     } else nameLen = strlen( pzOptName );
 
     do  {
-        if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
+        if (SKIP_OPT(pOD))
             continue;
 
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
@@ -320,10 +321,11 @@ DEF_PROC_3( STATIC tSuccess longOptionFind,
  *
  *  Find the short option descriptor for the current option
  */
-DEF_PROC_3( STATIC tSuccess shortOptionFind,
-            tOptions*,   pOpts,
-            tUC,         optValue,
-            tOptState*,  pOptState )
+STATIC tSuccess
+shortOptionFind( pOpts, optValue, pOptState )
+    tOptions*   pOpts;
+    tUC         optValue;
+    tOptState*  pOptState;
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
     int        ct   = pOpts->optCt;
@@ -336,8 +338,7 @@ DEF_PROC_3( STATIC tSuccess shortOptionFind,
          *  IF the values match,
          *  THEN we stop here
          */
-        if (  ((pRes->fOptState & OPTST_DOCUMENT) == 0)
-           && (optValue == pRes->optValue)  )  {
+        if ((! SKIP_OPT(pRes)) && (optValue == pRes->optValue)) {
             pOptState->pOD = pRes;
             pOptState->optType = TOPT_SHORT;
             return SUCCESS;
@@ -765,8 +766,9 @@ optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
 /*
  *  doImmediateOpts - scan the command line for immediate action options
  */
-DEF_PROC_1( STATIC tSuccess doImmediateOpts,
-            tOptions*,  pOpts )
+STATIC tSuccess
+doImmediateOpts( pOpts )
+    tOptions*  pOpts;
 {
     /*
      *  IF the struct version is not the current, and also
@@ -1491,10 +1493,11 @@ DEF_PROC_0( const char* optionVersion )
  *
  *  Define the option processing routine
  */
-DEF_PROC_3( int optionProcess,
-            tOptions*,  pOpts,
-            int,        argCt,
-            char**,     argVect )
+int
+optionProcess( pOpts, argCt, argVect )
+    tOptions*  pOpts;
+    int        argCt;
+    char**     argVect;
 {
     /*
      *  Establish the real program name, the program full path,
