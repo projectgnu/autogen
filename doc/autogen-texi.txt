@@ -2632,11 +2632,24 @@ ifdef = WITH_MUMBLING;
 @end example
 
 @noindent
-Note that case and spelling must match whatever you are using.
+Take care when using these.  There are several caveats:
+@itemize @bullet
+@item
+The case and spelling must match whatever is specified.
+@item
 Do not confuse these attributes with the AutoGen directives of the
 same names, @xref{Directives}.  These cause C preprocessing directives
-to be inserted into the generated C text.  Also note that only one
-of these attributes may apply to any particular option.
+to be inserted into the generated C text.
+@item
+Only one of these attributes may apply to any given option.
+@item
+The @code{VALUE_OPT_} values are @code{#define}-d.  If @code{WITH_MUMBLING}
+is not defined, then the associated @code{VALUE_OPT_} value will not be
+@code{#define}-d either.  So, if you have an option named, @code{MUMBLING}
+that is active only if @code{WITH_MUMBLING} is @code{#define}-d, then
+@code{VALUE_OPT_MUMBLING} will be @code{#define}-d iff @code{WITH_MUMBLING}
+is @code{#define}-d.  Watch those switch statements.
+@end itemize
 @end table
 
 @node Special Option Handling

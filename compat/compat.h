@@ -3,12 +3,12 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2004-04-02 11:21:26 bkorb"
+ *  Time-stamp:      "2004-08-14 16:04:21 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.8 2004/04/03 17:18:57 bkorb Exp $
+ * $Id: compat.h,v 3.9 2004/08/15 00:52:47 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -71,6 +71,13 @@
 #  include <sys/systeminfo.h>
 #elif defined( HAVE_UNAME_SYSCALL )
 #  include <sys/utsname.h>
+#endif
+
+#include <sys/stropts.h>
+#include <sys/poll.h>
+
+#if HAVE_SYS_SELECT_H
+#include <sys/select.h>
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -237,6 +244,10 @@
 #ifndef STR
 #  define _STR(s) #s
 #  define STR(s)  _STR(s)
+#endif
+
+#ifndef O_NONBLOCK
+# define O_NONBLOCK FNDELAY
 #endif
 
 /* ##### Pointer sized word ##### */

@@ -1,3 +1,20 @@
+2004-08-14  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: add some daemon-related headers to the header list
+	* compat/compat.h: conditionally incorporate daemon related headers
+	* agen5/expState.c(tpl-file): doc
+	* agen5/funcEval.c(emit): strings seem to show up as pairs.
+	* autoopts/autoopts.h: describe how all the bits are used to determine
+	if an option is processed early or inline (normal time).
+	* autoopts/options_h.tpl: add two more timing bits: TWICE and
+	DISABLE_TWICE.
+	* autoopts/optcode.tpl: rework the handling of ifdef/ifndef options
+	* autoopts/options.tpl: also
+	* autoopts/optlib.tpl:  also
+	* autoopts/optmain.tpl: also
+	* doc/autogen.texi: cleanups
+	* agen5/agInit.c: new code for handling daemons.
+
 2004-08-07  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/auto_gen.tpl(temp-dir): new scheme variable.  If the pseudo

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.21 2004/07/22 02:48:10 bkorb Exp $
+ *  $Id: funcEval.c,v 3.22 2004/08/15 00:52:47 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -321,6 +321,7 @@ ag_scm_emit( SCM val )
 
         switch (gh_type_e( val )) {
         case GH_TYPE_LIST:
+        case GH_TYPE_PAIR:
             ag_scm_emit( SCM_CAR( val ));
             val = SCM_CDR( val );
             continue;

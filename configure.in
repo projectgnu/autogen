@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2004-07-31 11:18:22 bkorb"
+dnl Time-stamp:      "2004-08-13 16:41:30 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.25 2004/08/12 03:27:50 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.26 2004/08/15 00:52:47 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.25 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.26 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -118,7 +118,7 @@ AC_HEADER_DIRENT
 # AC_CHECK_HEADERS Check for list of headers.
 # ----------------------------------------------------------------------
 AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/param.h \
- libgen.h sys/time.h setjmp.h sys/select.h )
+ libgen.h sys/time.h setjmp.h sys/select.h sys/procset.h dlfcn.h)
 
 if   test "${ac_cv_header_stdint_h+set}" = set \
   || test "${ac_cv_header_inttypes_h+set}" = set
@@ -147,11 +147,6 @@ AC_CHECK_HEADERS(limits.h sys/limits.h values.h, break)
 # =================
 AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
 
-# =================
-# Check for P_PID definition in <sys/procset.h>
-# =================
-AC_CHECK_HEADERS(sys/procset.h)
-
 # ----------------------------------------------------------------------
 # AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
 # ----------------------------------------------------------------------
@@ -160,7 +155,6 @@ AC_CHECK_LIB(gen, pathfind)
 # ----------------------------------------------------------------------
 # Check for Dynamic library stuff
 # ----------------------------------------------------------------------
-AC_CHECK_HEADERS(dlfcn.h)
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_FUNCS(dlopen)
 if test $ac_cv_func_dlopen = yes

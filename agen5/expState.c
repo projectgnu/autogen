@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.21 2004/07/31 18:51:31 bkorb Exp $
+ *  $Id: expState.c,v 3.22 2004/08/15 00:52:47 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -541,10 +541,14 @@ ag_scm_tpl_file( SCM full )
  *
  * exparg: msg-fmt, formatting for line message, optional
  *
- * doc: Returns the file and line number of the current template macro
- *      using either the default format, "from %s line %d", or else
- *      the format you supply.  For example, if you want to insert a "C"
- *      language file-line directive, you would supply the format "# %2$d %1$s".
+ * doc:
+ *
+ *  Returns the file and line number of the current template macro using either
+ *  the default format, "from %s line %d", or else the format you supply.
+ *  For example, if you want to insert a "C" language file-line directive,
+ *  you would supply the format "# %2$d %1$s".  With the current version of
+ *  AutoGen, it is even safe to use the formatting string, "%2$d".  AutoGen
+ *  uses an argument vector version of printf:  @xref{snprintfv}.
 =*/
 SCM
 ag_scm_tpl_file_line( SCM fmt )
@@ -580,8 +584,6 @@ ag_scm_tpl_file_line( SCM fmt )
         return res;
     }
 }
-
-#include "expr.ini"
 /*
  * Local Variables:
  * mode: C

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agInit.c,v 3.1 2004/07/31 18:51:31 bkorb Exp $
+ *  $Id: agInit.c,v 3.2 2004/08/15 00:52:47 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -26,19 +26,18 @@
  */
 STATIC void addSysEnv( char* pzEnvName );
 #ifdef DAEMON_ENABLED
-#ifdef HAVE_FATTACH
-STATIC void spawnFattach( const char* pzFile );
-#endif
-
+STATIC void spawnPipe( const char* pzFile );
+#ifndef HAVE_SYS_SELECT_H
 STATIC void spawnListens( long port );
+#endif
 STATIC void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
 #endif
 
+#include "expr.ini"
 
 EXPORT void
 initialize( int arg_ct, char** arg_vec )
 {
-    void ag_init( void );
     /*
      *  Initialize all the Scheme functions.
      */
@@ -126,14 +125,13 @@ initialize( int arg_ct, char** arg_vec )
     if (! HAVE_OPT( DAEMON ))
         return;
 
-    {
+    if (0) {
 #ifndef DEBUG_ENABLED
         tSCC zDevNull[] = "/dev/null";
-        if (0) becomeDaemon( "/", zDevNull, zDevNull, zDevNull );
 #else
         tSCC zDevNull[] = "/tmp/AutoGenDebug.txt";
+#endif /* DEBUG_ENABLED */
         becomeDaemon( "/", zDevNull, zDevNull, zDevNull );
-#endif
     }
 
     {
@@ -144,16 +142,17 @@ initialize( int arg_ct, char** arg_vec )
         port  = strtol( pzS, &pzE, 0 );
 
         if ((errno != 0) || (*pzE != NUL)) {
-#ifdef HAVE_FATTACH
-            spawnFattach( pzS );
+            spawnPipe( pzS );
+        }
+        else {
+#ifndef HAVE_SYS_SELECT_H
+            spawnListens( port );
 #else
-            AG_ABEND( aprf( "invalid port id:  %s", pzS ));
+            AG_ABEND( "You cannot listen on a port." );
 #endif
         }
-        else
-            spawnListens( port );
     }
-#endif
+#endif /* DAEMON_ENABLED */
 }
 
 
@@ -196,15 +195,17 @@ handleSighup( int sig )
     redoOptions = AG_TRUE;
 }
 
-#ifdef HAVE_FATTACH
+
 STATIC void
-spawnFattach( tCC* pzFile )
+spawnPipe( tCC* pzFile )
 {
 #   define S_IRW_ALL \
         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 
-    ag_bool removeDaemonFile = AG_FALSE;
+#ifdef HAVE_FATTACH
+
     tFdPair fdpair;
+    ag_bool removeDaemonFile = AG_FALSE;
 
     if (pipe( (int*)&fdpair ) != 0)
         AG_ABEND( aprf( zCannot, errno, "create", "a pipe", strerror(errno)));
@@ -232,6 +233,7 @@ spawnFattach( tCC* pzFile )
 
     if (fattach( fdpair.writeFd, pzFile ) != 0)
         AG_ABEND( aprf( zCannot, errno, "fattach", pzFile, strerror(errno)));
+
     close( fdpair.writeFd );
 
     {
@@ -242,20 +244,27 @@ spawnFattach( tCC* pzFile )
         for (;;) {
             int ct = poll( polls, 1, -1 );
             struct strrecvfd recvfd;
+            pid_t child;
 
             switch (ct) {
             case -1:
                 if ((errno != EINTR) || (! redoOptions))
-                    goto finish;
+                    goto finish_with_fattach;
 
                 optionRestore( &autogenOptions );
                 doOptions( autogenOptions.origArgCt,
                            autogenOptions.origArgVect );
+                SET_OPT_DEFINITIONS("-");
                 break;
 
             case 1:
-                switch (fork()) {
+                if ((polls[0].revents & POLLIN) == 0)
+                    continue;
+
+                child = fork();
+                switch (child) {
                 default:
+                    waitpid( child, &ct, 0 );
                     continue;
 
                 case -1:
@@ -263,32 +272,216 @@ spawnFattach( tCC* pzFile )
 
                 case 0:
                 }
+#ifdef HAVE_CONNLD
                 if (ioctl( fdpair.readFd, I_RECVFD, &recvfd ) != 0)
                     AG_ABEND( aprf(zCannot, errno, "I_RECVFD", "on a pipe",
                                    strerror(errno)));
+#else
+                recvfd.fd = fdpair.readFd;
+#endif /* ! HAVE_FATTACH */
 
                 if (dup2( recvfd.fd, STDIN_FILENO ) != STDIN_FILENO)
                     AG_ABEND( aprf(zCannot, errno, "dup2", "stdin",
+                                   strerror(errno)));
+
+                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO)
+                    AG_ABEND( aprf(zCannot, errno, "dup2", "stdout",
                                    strerror(errno)));
                 return;
             }
         }
     }
 
- finish:
+ finish_with_fattach:
     if (removeDaemonFile)
         unlink( pzFile );
-    exit( EXIT_SUCCESS );
 #   undef S_IRW_ALL
+
+/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
+
+#else  /* ! HAVE_FATTACH */
+    tFdPair fdpair;
+    char* pzIn;
+    char* pzOut;
+
+    {
+        size_t len = 2 * (strlen(pzFile) + 5);
+        pzIn = AGALOC( len + 5, "fifo file name" );
+        pzOut = pzIn + sprintf( pzIn, "%s-in", pzFile ) + 1;
+    }
+
+    if ((mkfifo( pzIn, S_IRW_ALL ) != 0) && (errno != EEXIST))
+        AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzIn, strerror(errno)));
+
+    (void)sprintf( pzOut, "%s-out", pzFile );
+    if ((mkfifo( pzOut, S_IRW_ALL ) != 0) && (errno != EEXIST))
+        AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzOut, strerror(errno)));
+
+    fdpair.readFd = open( pzIn, O_RDONLY );
+    if (fdpair.readFd < 0)
+        AG_ABEND( aprf( zCannot, errno, "open fifo", pzIn, strerror(errno)));
+
+
+    {
+        struct pollfd polls[1];
+        polls[0].fd     = fdpair.readFd;
+        polls[0].events = POLLIN | POLLPRI;
+
+        for (;;) {
+            int ct = poll( polls, 1, -1 );
+            struct strrecvfd recvfd;
+            pid_t child;
+
+            switch (ct) {
+            case -1:
+                if ((errno != EINTR) || (! redoOptions))
+                    goto no_fattach_finish;
+
+                optionRestore( &autogenOptions );
+                doOptions( autogenOptions.origArgCt,
+                           autogenOptions.origArgVect );
+                SET_OPT_DEFINITIONS("-");
+                break;
+
+            case 1:
+                if ((polls[0].revents & POLLIN) == 0)
+                    continue;
+
+                child = fork();
+                switch (child) {
+                default:
+                    waitpid( child, &ct, 0 );
+                    continue;
+
+                case -1:
+                    AG_ABEND( aprf(zCannot, errno, "fork", "", strerror(errno)));
+
+                case 0:
+                }
+
+                if (dup2( fdpair.readFd, STDIN_FILENO ) != STDIN_FILENO)
+                    AG_ABEND( aprf(zCannot, errno, "dup2", "stdin",
+                                   strerror(errno)));
+
+                fdpair.writeFd = open( pzOut, O_WRONLY );
+                if (fdpair.writeFd < 0)
+                    AG_ABEND( aprf( zCannot, errno, "open fifo", pzOut,
+                                    strerror(errno)));
+
+                polls[0].fd = fdpair.writeFd;
+                polls[0].events = POLLOUT;
+                if (poll( polls, 1, -1 ) != 1)
+                    AG_ABEND( aprf(zCannot, errno, "poll", "write pipe",
+                                   strerror( errno )));
+
+                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO)
+                    AG_ABEND( aprf(zCannot, errno, "dup2", pzOut,
+                                   strerror(errno)));
+                return;
+            }
+        }
+    }
+
+ no_fattach_finish:
+    unlink( pzIn );
+    unlink( pzOut );
+    AGFREE( pzIn );
+#endif /* ! HAVE_FATTACH */
+#   undef S_IRW_ALL
+
+    exit( EXIT_SUCCESS );
 }
-#endif
 
 
+#ifndef HAVE_SYS_SELECT_H
 STATIC void
 spawnListens( long port )
 {
-    return;
+    tSCC zPortFmt[] = "to port %d on INET stream sock";
+    int socket_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    if (socket_fd < 0)
+        AG_ABEND( aprf( zCannot, errno, "socket", "AF_INET/SOCK_STREAM",
+                        strerror( errno )));
+    {
+        struct sockaddr_in addr;
+        addr.sin_family      = AF_INET;
+        addr.sin_addr.s_addr = INADDR_ANY;
+        addr.sin_port        = htons( (short)port );
+        if (bind( socket_fd, &addr, sizeof(addr) ) < 0) {
+            char* pz = aprf( zPortFmt, port );
+            AG_ABEND( aprf( zCannot, errno, "bind", pz, strerror( errno )));
+        }
+    }
+
+    if (fcntl( socket_fd, F_SETFL, O_NONBLOCK ) < 0) {
+        AG_ABEND( aprf( zCannot, errno, "socket-fcntl", "FNDELAY",
+                        strerror( errno )));
+    }
+
+    if (listen( socket_fd, 5 ) < 0) {
+        char* pz = aprf( zPortFmt, port );
+        AG_ABEND( aprf( zCannot, errno, "listen", pz, strerror( errno )));
+    }
+
+    for (;;) {
+        fd_set fds;
+        int    max_fd = socket_fd;
+        int    new_conns;
+
+        FD_ZERO( &fds );
+        FD_SET( socket_fd, &fds );
+
+        new_conns = select( max_fd, &fds, NULL, NULL, NULL );
+        if (new_conns < 0) {
+            if (errno == EINTR)
+                continue;
+
+            if (! redoOptions)
+                exit( EXIT_SUCCESS );
+
+            optionRestore( &autogenOptions );
+            doOptions( autogenOptions.origArgCt,
+                       autogenOptions.origArgVect );
+            SET_OPT_DEFINITIONS("-");
+
+            continue;
+        }
+
+        if (new_conns > 0) {
+            switch (fork()) {
+            default: continue;
+            case -1: AG_ABEND(aprf(zCannot, errno, "fork", "", strerror(errno)));
+            case 0:  break;
+            }
+            break;
+        }
+    }
+
+    for (;;) {
+        static int try_ct = 0;
+        struct sockaddr addr;
+        socklen_t addr_len;
+        int fd = accept( socket_fd, &addr, &addr_len );
+        if (fd < 0)
+            switch (errno) {
+            case EINTR:
+            case EAGAIN:
+            case EWOULDBLOCK:
+                if (try_ct++ < 10000) {
+                    sleep(1);
+                    continue;
+                }
+            }
+        socket_fd = fd;
+        break;
+    }
+
+    if (dup2( socket_fd, STDOUT_FILENO ) != STDOUT_FILENO)
+        AG_ABEND( aprf(zCannot, errno, "dup2", pzOut, strerror(errno)));
+    if (dup2( socket_fd, STDIN_FILENO ) != STDIN_FILENO)
+        AG_ABEND( aprf(zCannot, errno, "dup2", pzOut, strerror(errno)));
 }
+#endif
 
 
 STATIC void
