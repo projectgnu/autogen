@@ -101,7 +101,7 @@ DEFINE Option_Defines =]
   IF (==* (get "flag_arg") "=")
 =]
 #define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
-                =] ((int)([=(. UP-prefix)=]OPT_ARG([=(. UP-name)=])))[=
+                =] (*(long*)(&[=(. UP-prefix)=]OPT_ARG([=(. UP-name)=])))[=
   ENDIF=][=
   IF (= (string-upcase! (get "equivalence")) UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
