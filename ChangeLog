@@ -1,4 +1,4 @@
-2000-08-12  Bruce Korb  <bkorb@gnu.org>
+2000-08-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(valid_path):  new procedure.  If a path is
 	prefixed with "$$", replace it with the path to the executable.
