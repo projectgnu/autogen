@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/04/29 01:51:05 $
+ *  Last Modified:     $Date: 2003/05/18 17:16:35 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.26 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: misc.def,v 3.27 2003/05/18 17:16:35 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.26 $";
+version = "$Revision: 3.27 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -94,12 +94,12 @@ test   = {
 
   config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
   action = { yes; act-type = script;
-             act-text = '    CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
-                        '    LIBS="${ag_save_LIBS}"';
+             act-text = '  CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
+                        '  LIBS="${ag_save_LIBS}"';
            };
 
-  action = { no; act-type = script;
-             act-text = '    AC_MSG_ERROR([Cannot find working libguile])';
+  action = { no; act-type = script; asis;
+             act-text = '  AC_MSG_ERROR([Cannot find working libguile])';
            };
 
   doc = <<- _END_OF_DOC_
