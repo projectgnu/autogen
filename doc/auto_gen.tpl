@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Fri Feb 26 14:20:12 1999
+## Last Modified:     Wed Mar 10 11:07:00 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.13 1999/03/01 14:56:15 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.14 1999/03/10 19:07:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -172,7 +172,7 @@ modifications are specified rather less cryptically than the shell methods.
 It would also need a way to indicate sections of text that were to be
 skipped and for sections of text that were to be repeated.  This is a
 major improvement over using C preprocessing macros.  With the C
-preprocessor, you have no way of selecting output text.  It is an
+preprocessor, you have no way of selecting output text because it is an
 @i{un}varying, mechanical substitution process.
 
 @item
