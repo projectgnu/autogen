@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2002-09-21 15:22:33 bkorb"
+## Time-stamp:      "2003-02-05 21:10:35 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.16 2002/09/29 00:16:20 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.17 2003/02/06 05:10:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -151,6 +151,15 @@ ls -1 *.[ch] | \
 
 exec 3>&-
 
+if gzip --version > /dev/null 2>&1
+then
+  gz=gzip
+  sfx=tar.gz
+else
+  gz=compress
+  sfx=tar.Z
+fi
+
 cd ..
-tar cvf - ${tag} | gzip --best > ${top_builddir}/autoopts/${tag}.tar.gz
+tar cvf - ${tag} | $gz --best > ${top_builddir}/autoopts/${tag}.${sfx}
 rm -rf ${tag}
