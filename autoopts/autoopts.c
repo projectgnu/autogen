@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.33 2004/02/16 22:20:45 bkorb Exp $
+ *  $Id: autoopts.c,v 3.34 2004/05/22 00:15:45 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -138,8 +138,8 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      */
     if (  (pOD->fOptState & OPTST_DEFINED)
        && (++pOD->optOccCt > pOD->optMaxCt)  )  {
-        const char* pzEqv = (pOD->optEquivIndex != NO_EQUIVALENT)
-                          ? zEquiv : zEquiv + sizeof( zEquiv )-1;
+        const char* pzEqv =
+            (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
 
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
             const char* pzFmt = (pOD->optMaxCt > 1) ? zAtMost : zOnlyOne;

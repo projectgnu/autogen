@@ -4,16 +4,16 @@
 #
 # Copyright (C) 1999-2004 Bruce Korb
 #
-# Time-stamp:        "2004-05-18 20:39:39 bkorb"
+# Time-stamp:        "2004-05-21 15:05:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2004/05/19 03:41:04 $
+# Last Committed:    $Date: 2004/05/22 00:15:44 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=6
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".2"
+AG_PATCHLEVEL=".3pre1"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -30,7 +30,7 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #
 AO_LIBRARY=libopts.la
 AO_CURRENT=22
-AO_REVISION=2
+AO_REVISION=3
 AO_AGE=13
 
 GO_LIBRARY=libguileopts.la
@@ -48,9 +48,13 @@ PACKAGE=autogen
 soname=$AO_LIBRARY-$AO_CURRENT:$AO_REVISION:$AO_AGE
 h='*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 
-printf "$h$h*\n\n" || :
-printf "                 A      U      T      O      G      E      N\n\n" || :
-printf "%-38s %38s\n" "$PACKAGE-$VERSION" "$soname" || :
-printf "$h$h*\n" || :
+cat <<EOF
+$h$h*
+
+                 A      U      T      O      G      E      N
+
+`printf "%-38s %38s\n" "$PACKAGE-$VERSION" "$soname" || :`
+$h$h*
+EOF
 
 # VERSION ends here

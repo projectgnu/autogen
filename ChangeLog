@@ -1,3 +1,19 @@
+2004-05-21  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(membership bits): expand usage
+	* autoopts/enumeration.c(enumError): columnize keyword list in usage
+	(optionSetMembers): clear the membership bits at config file load time
+	* autoopts/optcode.tpl: simplify some string computations
+	* autoopts/opthead.tpl: likewise
+	* autoopts/putshell.c(putBourneShell): skip the "none + " prefix
+	when constructing the list of bit defines.
+	* autoopts/test/equiv.test: adjust for new keyword list format
+	* autoopts/test/keyword.test: ditto
+	* autoopts/test/stdopts.test: ditto
+	* autoopts/test/errors.test: add a double-ifdef test
+	* autoopts/test/handler.test: adjust for new template format
+	* autoopts/usage-txt.def(SetMemberSettings): new string
+
 2004-05-18  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/auto_gen.tpl(libs): add ${LIBS} to the end of it for -lgen, etc.

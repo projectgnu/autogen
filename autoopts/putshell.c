@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.19 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: putshell.c,v 3.20 2004/05/22 00:15:45 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -175,7 +175,12 @@ putBourneShell( tOptions* pOpts )
                     (uintptr_t)(pOD->optCookie) );
             pOD->optCookie = (void*)(uintptr_t)~0UL;
             (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
-            pz = (char*)pOD->pzLastArg;
+
+            /*
+             *  We are building the typeset list.  The list returned starts with
+             *  'none + ' for use by option saving stuff.  We must ignore that.
+             */
+            pz = (char*)pOD->pzLastArg + 7;
             while (*pz != NUL) {
                 printf( "typeset -x -i %s_", pOD->pz_NAME );
                 pz += strspn( pz, " +\t\n\f" );

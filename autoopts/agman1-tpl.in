@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-01-08 10:37:04 bkorb"
+## Time-stamp:      "2004-05-21 16:12:15 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.27 2004/02/01 21:26:45 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.28 2004/05/22 00:15:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -308,11 +308,26 @@ This option must not appear in combination with any of the following options:
       ENDIF     :+][+:
       IF (~* (get "arg-type") "key|set") :+]
 This option takes a keyword as its argument[+:
-         IF (=* (get "arg-type") "set")  :+] list.  Each entry turns on or off
-membership bits.  These bits can be tested with bit tests against[+:
-         ELSE   :+].  The argument sets an enumeration value that can
-be tested by comparing[+:
-         ENDIF  :+] the option value macro.  The available keywords are:
+
+         IF (=* (get "arg-type") "set")
+
+:+] list.  Each entry turns on or off
+membership bits.  The bits are set by name or numeric value and cleared
+by preceding the name or number with an exclamation character ('!').
+They can all be cleared with the magic name \fInone\fR and they can all be set
+with
+.IR all .
+A single option will process a list of these values.[+:
+
+         ELSE
+
+:+].  The argument sets an enumeration value that can
+be tested by comparing the option value macro.[+:
+
+         ENDIF
+
+:+]
+The available keywords are:
 .in +4
 .nf
 .na
@@ -329,7 +344,7 @@ The default [+:(. opt-arg):+] for this option is:
 .sp
 [+: (if (exist? "doc")
         (string-substitute (get "doc") "\\" "\\\\")
-        "This option has not beed fully documented." ) :+][+:
+        "This option has not been fully documented." ) :+][+:
 
   ENDIF (not (exist? "documentation")) :+][+:
 

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2003-07-05 18:37:00 bkorb"
+# Time-stamp:        "2004-05-21 14:40:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 3.4 2003/07/06 16:34:59 bkorb Exp $
+# $Id: stdopts.test,v 3.5 2004/05/22 00:15:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -67,11 +67,7 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
 The valid "verbose" option keywords are:
-	silent
-	quiet
-	brief
-	informative
-	verbose
+  silent quiet brief informative verbose
 _EOF_
 
 cmp -s $testname.h*lp || \

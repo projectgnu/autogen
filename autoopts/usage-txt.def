@@ -8,7 +8,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 3.1 2004/01/01 22:21:55 bkorb Exp $
+   $Id: usage-txt.def,v 3.2 2004/05/22 00:15:45 bkorb Exp $
  */
 
 /*
@@ -424,6 +424,16 @@ utxt = { ut-type = cch_t;
 utxt = { ut-type = cch_t;
          ut-name = SepChars;
          ut-text = "-_^";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = SetMemberSettings;
+         ut-text = <<E_O_F
+or you may use a numeric representation.  Preceding these with a '!' will
+clear the bits, specifying 'none' will clear all bits, and 'all' will set them
+all.  Multiple entries may be passed as an option argument list.
+
+E_O_F ;
 };
 
 utxt = { ut-type = cch_t;

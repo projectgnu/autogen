@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.23 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: enumeration.c,v 3.24 2004/05/22 00:15:45 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -78,6 +78,9 @@ enumError(
     tCC**     paz_names,
     int       name_ct )
 {
+    size_t max_len = 0;
+    size_t ttl_len = 0;
+
     if (pOpts != NULL)
         fprintf( option_usage_fp, pz_enum_err_fmt,
                  pOpts->pzProgName, pOD->pzLastArg );
@@ -89,12 +92,80 @@ enumError(
         name_ct--;
     }
 
-    do  {
-        fprintf( option_usage_fp, "\t%s\n", *(paz_names++) );
-    } while (--name_ct > 0);
+    /*
+     *  Figure out the maximum length of any name, plus the total length
+     *  of all the names.
+     */
+    {
+        tCC** paz = paz_names;
+        int   ct  = name_ct;
 
+        do  {
+            size_t len = strlen( *(paz++) ) + 1;
+            if (len > max_len)
+                max_len = len;
+            ttl_len += len;
+        } while (--ct > 0);
+    }
+
+    /*
+     *  IF any one entry is about 1/2 line or longer, print one per line
+     */
+    if (max_len > 35) {
+        do  {
+            fprintf( option_usage_fp, "  %s\n", *(paz_names++) );
+        } while (--name_ct > 0);
+    }
+
+    /*
+     *  ELSE IF they all fit on one line, then do so.
+     */
+    else if (ttl_len < 76) {
+        fputc( ' ', option_usage_fp );
+        do  {
+            fputc( ' ', option_usage_fp );
+            fputs( *(paz_names++), option_usage_fp );
+        } while (--name_ct > 0);
+        fputc( '\n', option_usage_fp );
+    }
+
+    /*
+     *  Otherwise, columnize the output
+     */
+    else {
+        int   ent_no = 0;
+        char  zFmt[16];  /* format for all-but-last entries on a line */
+
+        sprintf( zFmt, "%%-%ds", max_len );
+        max_len = 78 / max_len; /* max_len is now max entries on a line */
+        fputs( "  ", option_usage_fp );
+
+        /*
+         *  Loop through all but the last entry
+         */
+        while (--name_ct > 0) {
+            if (++ent_no == max_len) {
+                /*
+                 *  Last entry on a line.  Start next line, too.
+                 */
+                fprintf( option_usage_fp, "%s\n  ", *(paz_names++) );
+                ent_no = 0;
+            }
+
+            else
+                fprintf( option_usage_fp, zFmt, *(paz_names++) );
+        }
+        fprintf( option_usage_fp, "%s\n", *paz_names );
+    }
+
+    /*
+     *  IF we do not have a pOpts pointer, then this output is being requested
+     *  by the usage procedure.  Let's not re-invoke it recursively.
+     */
     if (pOpts != NULL)
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+    if (pOD->fOptState & OPTST_MEMBER_BITS)
+        fputs( zSetMemberSettings, option_usage_fp );
 }
 
 
@@ -269,21 +340,26 @@ optionSetMembers(
          */
         while (bits != 0) {
             if (bits & 1)
-                len += strlen( paz_names[ res ]) + 3;
+                len += strlen( paz_names[ res ]) + 8;
             if (++res >= name_ct) break;
             bits >>= 1;
         }
+
         pOD->pzLastArg = pz = malloc( len );
+        /*
+         *  Start by clearing all the bits.  We want to turn off any defaults
+         *  because we will be restoring to current state, not adding to
+         *  the default set of bits.
+         */
+        strcpy( pz, "none" );
+        pz += 4;
         bits = (uintptr_t)pOD->optCookie;
         res = 0;
         while (bits != 0) {
             if (bits & 1) {
-                if (pz != pOD->pzLastArg) {
-                    strcpy( pz, " + " );
-                    pz += 3;
-                }
-                strcpy( pz, paz_names[ res ]);
-                pz += strlen( paz_names[ res ]);
+                strcpy( pz, " + " );
+                strcpy( pz+3, paz_names[ res ]);
+                pz += strlen( paz_names[ res ]) + 3;
             }
             if (++res >= name_ct) break;
             bits >>= 1;

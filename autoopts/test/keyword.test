@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2004-01-14 20:40:45 bkorb"
+# Time-stamp:        "2004-05-21 16:35:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.8 2004/01/15 05:04:25 bkorb Exp $
+# $Id: keyword.test,v 3.9 2004/05/22 00:15:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -49,8 +49,10 @@ cat >> ${testname}.def <<- _EndOfDef_
 	    arg-default = second, fourth;
 	    arg-name    = member-list;
 	    descrip     = "set membership testing";
-	    keyword     = first, second, third, fourth, fifth, sixth, seventh,
-                      eighth, ninth, tenth;
+	    keyword     = first, second, third, fourth, fifth,
+	                  sixth, seventh, eighth, ninth, tenth,
+	                  eleventh, twelfth, thirteenth, fourteenth, fifteenth,
+	                  sixteenth, seventeenth, eighteenth;
 	};
 	_EndOfDef_
 
@@ -86,22 +88,14 @@ The following option preset mechanisms are supported:
  - reading file ./keyword.cfg
 
 The valid "trace" option keywords are:
-	nothing
-	templates
-	block-macros
-	expressions
-	explanations
+  nothing templates block-macros expressions explanations
 The valid "sets" option keywords are:
-	first
-	second
-	third
-	fourth
-	fifth
-	sixth
-	seventh
-	eighth
-	ninth
-	tenth
+  first       second      third       fourth      fifth       sixth
+  seventh     eighth      ninth       tenth       eleventh    twelfth
+  thirteenth  fourteenth  fifteenth   sixteenth   seventeenth eighteenth
+or you may use a numeric representation.  Preceding these with a '!' will
+clear the bits, specifying 'none' will clear all bits, and 'all' will set them
+all.  Multiple entries may be passed as an option argument list.
 _EOF_
 
 cmp -s ${testname}.h*lp || \
@@ -110,10 +104,10 @@ cmp -s ${testname}.h*lp || \
 ./${testname} --trace=exp > /dev/null 2>&1 && \
   failure ${testname} accepted ambiguous keyword
 
-./${testname} --trace=expr --set=0 > ${testname}.t1-s || \
+./${testname} --trace=expr --set=thirteen,ninth,third > ${testname}.t1-s || \
   failure ${testname} did not handle its options
 
-./${testname} --trace=expr --save=${testname}.cfg || \
+./${testname} --trace=expr --set=thirteen,ninth,third --save=${testname}.cfg || \
   failure ${testname} could not save its options
 
 egrep -v '^#' ${testname}.cfg > ${testname}res.cfg || \
@@ -121,6 +115,7 @@ egrep -v '^#' ${testname}.cfg > ${testname}res.cfg || \
 
 cat > ${testname}base.cfg <<- _EndIni_
 	trace               expressions
+	sets                none + second + third + fourth + ninth + thirteenth
 	_EndIni_
 
 cmp -s ${testname}base.cfg ${testname}res.cfg || \
@@ -131,7 +126,7 @@ cat > ${testname}.t1-b <<- _EndTst_
 	export OPTION_CT
 	TEST_KEYWORD_TRACE='expressions'
 	export TEST_KEYWORD_TRACE
-	TEST_KEYWORD_SETS=10 # 0xA
+	TEST_KEYWORD_SETS=4366 # 0x110E
 	export TEST_KEYWORD_SETS
 	typeset -x -i SETS_FIRST=1 # 0x1
 	typeset -x -i SETS_SECOND=2 # 0x2
@@ -143,6 +138,14 @@ cat > ${testname}.t1-b <<- _EndTst_
 	typeset -x -i SETS_EIGHTH=128 # 0x80
 	typeset -x -i SETS_NINTH=256 # 0x100
 	typeset -x -i SETS_TENTH=512 # 0x200
+	typeset -x -i SETS_ELEVENTH=1024 # 0x400
+	typeset -x -i SETS_TWELFTH=2048 # 0x800
+	typeset -x -i SETS_THIRTEENTH=4096 # 0x1000
+	typeset -x -i SETS_FOURTEENTH=8192 # 0x2000
+	typeset -x -i SETS_FIFTEENTH=16384 # 0x4000
+	typeset -x -i SETS_SIXTEENTH=32768 # 0x8000
+	typeset -x -i SETS_SEVENTEENTH=65536 # 0x10000
+	typeset -x -i SETS_EIGHTEENTH=131072 # 0x20000
 	_EndTst_
 
 cmp -s ${testname}.t1-* || \
@@ -168,12 +171,13 @@ The default \fIstring\fP for this option is:
 .ti +4
  opt init
 .sp
-This option has not beed fully documented.
+This option has not been fully documented.
 .TP
 .BR --trace "=\fIlevel\fP"
 tracing level of detail.
 This option takes a keyword as its argument.  The argument sets an enumeration value that can
-be tested by comparing the option value macro.  The available keywords are:
+be tested by comparing the option value macro.
+The available keywords are:
 .in +4
 .nf
 .na
@@ -186,17 +190,26 @@ The default \fIlevel\fP for this option is:
 .ti +4
  nothing
 .sp
-This option has not beed fully documented.
+This option has not been fully documented.
 .TP
 .BR --sets "=\fImember-list\fP"
 set membership testing.
 This option takes a keyword as its argument list.  Each entry turns on or off
-membership bits.  These bits can be tested with bit tests against the option value macro.  The available keywords are:
+membership bits.  The bits are set by name or numeric value and cleared
+by preceding the name or number with an exclamation character ('!').
+They can all be cleared with the magic name \fInone\fR and they can all be set
+with
+.IR all .
+A single option will process a list of these values.
+The available keywords are:
 .in +4
 .nf
 .na
-first   second  third   fourth  fifth   sixth
-seventh eighth  ninth   tenth
+first       second      third       fourth
+fifth       sixth       seventh     eighth
+ninth       tenth       eleventh    twelfth
+thirteenth  fourteenth  fifteenth   sixteenth
+seventeenth eighteenth
 .fi
 .in -4
 .sp
@@ -204,7 +217,7 @@ The default \fImember-list\fP for this option is:
 .ti +4
  second
 .sp
-This option has not beed fully documented.
+This option has not been fully documented.
 .TP
 .BR \-X , " \--help"
 Display usage information and exit.
