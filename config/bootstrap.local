@@ -1,15 +1,15 @@
-#!/bin/echo This_file_must_be_sourced,_not_executed
-#  -*- Mode: Shell-script -*- 
+#! /bin/echo This_file_must_be_sourced,_not_executed
+#
 # ----------------------------------------------------------------------
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug 30 12:28:33 1999
+# Last Modified:     $Date: 2000/09/22 15:54:19 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.31 2000/09/15 03:17:46 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.32 2000/09/22 15:54:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -55,8 +55,48 @@ _EOF_
   chmod +x configure
 }
 
-[ -z ${srcdir} ] && {
-  srcdir=`echo $0 | sed 's;/[^/]*/[^/]*$;;'`
+locate_exe()
+{
+    if [ -x "$1" ]
+    then
+        echo "$1"
+        return 0
+    fi
+
+    case "${1}" in
+    */* )
+        echo "Cannot find ${1}" >&2
+        return 1
+        ;;
+    "" )
+        echo "USAGE:  locate_exe <exe-name>" >&2
+        exit 1
+        ;;
+    * )
+        name="${1}"
+        ;;
+    esac
+
+    SV="${IFS}"
+    IFS=" :"
+    set -- ${PATH}
+    for f
+    do
+        if [ -x ${f}/${name} ]
+        then
+            echo ${f}/${name}
+            return 0
+	fi
+    done
+    return 1
+}
+
+#  IF the source dir is not known,
+#  THEN it is the directory above the directory that
+#       contains this file.
+#
+[ -z "${srcdir}" ] && {
+    srcdir=`echo $0 | sed 's;/[^/]*/[^/]*$;;'`
 }
 
 MISSING=${MISSING-${srcdir}/config/missing}
@@ -78,21 +118,19 @@ pre )
     test -f doc/autogen.texi \
         || echo '@setfilename fnord' > doc/autogen.texi
 
-    if type whence 2>&1 | grep 'not found' > /dev/null
-    then whence=which ; else whence=whence ; fi
-
-    f=`$whence byacc 2>/dev/null`
-    if [ -z "$f" ]
+    byacc=`locate_exe byacc`
+    if [ -z "$byacc" ]
     then
-        f=`$whence yacc 2>/dev/null`
-        if [ -z "$f" ]
+        byacc=`locate_exe yacc`
+        if [ -z "$byacc" ]
         then
-            f=`$whence bison 2>/dev/null`
+            byacc=`locate_exe bison`
+            if [ -z "$byacc" ]
+            then
+                echo cannot bootstrap -- no yacc parser
+                exit 1
+            fi
         fi
-    fi
-    if [ ! -z "$f" ]
-    then byacc=$f
-    else byacc="echo cannot bootstrap -- no yacc parser ; exit 1"
     fi
     export byacc
 
@@ -114,5 +152,10 @@ addlink )
     ;;
 
 esac
+
+# Local Variables:
+# mode:shell-script
+# sh-indentation:4
+# End:
 
 # config/bootstrap.local ends here

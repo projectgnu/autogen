@@ -6,14 +6,12 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Aug 30 12:29:52 1999                                 
-#            by:     Bruce Korb <bkorb@gnu.org>                       
+# Last Modified:     $Date"$
+#            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.33 2000/09/16 05:44:18 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.34 2000/09/22 15:54:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Commentary:
-#
 # This script is designed to find any directories which contain a
 # configure.in in script, and to run the autotools programs from each
 # of those directories to make sure they are in a state ready to
@@ -52,6 +50,7 @@ wd=`cd $wd ; pwd`
 for srcdir in $wd $wd/.. .. .; do
     test -f $srcdir/configure.in && break
 done
+export srcdir
  
 #  This missing function is used in many places
 #
@@ -247,5 +246,10 @@ done
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
 test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
+
+# Local Variables:
+# mode:shell-script
+# sh-indentation:4
+# End:
 
 # bootstrap ends here
