@@ -1,18 +1,18 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
 # for.test --- test functionality of switching shells
+#
+# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2004/05/16 19:12:48 $
+#            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/12/27 15:06:40 $
-#            by: bkorb
-#
-# $Id: shell.test,v 3.4 2003/12/27 15:06:40 bkorb Exp $
+# $Id: shell.test,v 3.5 2004/05/16 19:12:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2

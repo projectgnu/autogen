@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
-# load.test --- test the shared library loading
+# snarf.test --- test the extraction of scm-type definitions
 #
+# Time-stamp:        "2004-02-01 13:51:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2004/02/01 21:26:45 $
+# Last Modified:     $Date: 2004/05/16 19:12:48 $
 #            by: bkorb
 # Copyright:         1999-2004 by Bruce Korb
-# $Id: snarf.test,v 3.6 2004/02/01 21:26:45 bkorb Exp $
+# $Id: snarf.test,v 3.7 2004/05/16 19:12:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

@@ -1,15 +1,14 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
 # include.test --- test include functionality
 #
+# Time-stamp:        "2004-05-16 11:35:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+#            by: bkorb
 #
-# $Id: include.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: include.test,v 3.1 2004/05/16 19:12:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,13 +24,18 @@ fi
 
 echo creating $testname.in
 cat > $testname.in <<_EOF_
-<= AutoGen5 Template test =>
+<= AutoGen5 Template
+# this is just a test
+test =>
 Verify:  <= \`echo This is an $testname test\` =>
 _EOF_
 
 echo creating $testname.tpl
 cat > $testname.tpl <<_EOF_
-[= AutoGen5 Template test =]
+[= AutoGen5 Template
+# this is just a test
+
+test =]
 [= Include "$testname.in" =]
 _EOF_
 

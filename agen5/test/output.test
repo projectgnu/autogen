@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
 # include.test --- test include functionality
 #
+# Time-stamp:        "2004-02-01 13:51:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/05/30 01:31:08 $
+# Last Modified:     $Date: 2004/05/16 19:12:48 $
 #            by: bkorb
 #
-# $Id: output.test,v 3.1 2002/05/30 01:31:08 bkorb Exp $
+# $Id: output.test,v 3.2 2004/05/16 19:12:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
