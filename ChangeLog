@@ -1,8 +1,19 @@
+2003-03-10  Bruce Korb  <bkorb@gnu.org>
+
+	* VERSION: clean out cruft
+	* autoopts/usage.c: break up monolithic procedure & rework option
+	argument handling for GNU format usage.
+	* autoopts/test/usage.test: accommodate changes
+
 2003-03-09  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/usage.c(optionUsage): Separate more completely the GNU vs.
 	std option description format strings.
 	* autoopts/test/*.test: formatting tweaks
+	* AUTHORS: added Daniel Schregenberger as a new contributor
+	* agen5/expPrint.c: use asprintfv instead of trying to compute buf size
+	* snprintfv/printf.in(SNV_EMIT): force characters to be unsigned so we
+	don't confuse ourselves with error results.
 
 2003-03-08  Bruce Korb  <bkorb@gnu.org>
 
