@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.5 2000/03/08 03:49:35 bruce Exp $
+ *  $Id: tpLoad.c,v 1.6 2000/03/11 21:38:38 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -57,7 +57,7 @@ findTemplate( tCC* pzTemplName )
  *  list trying to find the base template file name.
  */
     EXPORT tSuccess
-findFile( tCC* pzTempl, char* pzFullName )
+findFile( tCC* pzFName, char* pzFullName )
 {
     char*   pzRoot;
     char*   pzSfx;
@@ -66,8 +66,8 @@ findFile( tCC* pzTempl, char* pzFullName )
      *  Expand leading environment variables.
      *  We will not mess with embedded ones.
      */
-    if (*pzTempl == '$') {
-        char* pzDef = (char*)(pzTempl+1);
+    if (*pzFName == '$') {
+        char* pzDef = (char*)(pzFName+1);
         char* pzEnd = strchr( pzDef, '/' );
 
         /*
@@ -87,7 +87,7 @@ findFile( tCC* pzTempl, char* pzFullName )
             if (pzEnd != (char*)NULL)
                 pzEnd[-1] = '/';
 
-            fprintf( stderr, "NOTE: cannot expand %s\n", pzTempl );
+            fprintf( stderr, "NOTE: cannot expand %s\n", pzFName );
             return FAILURE;
         }
 
@@ -99,13 +99,13 @@ findFile( tCC* pzTempl, char* pzFullName )
             /*
              *  FIXME:  this is a memory leak
              */
-            AGDUPSTR( pzTempl, pzFullName );
+            AGDUPSTR( pzFName, pzFullName );
             pzEnd[-1] = '/';
         } else {
-            pzTempl = pzDef;
+            pzFName = pzDef;
         }
         /*
-         *  pzTempl now points to the name the file system can use.
+         *  pzFName now points to the name the file system can use.
          *  It must _not_ point to pzFullName because we will likely
          *  rewrite that value using this pointer!
          */
@@ -114,8 +114,8 @@ findFile( tCC* pzTempl, char* pzFullName )
     /*
      *  Check for an immediately accessible file
      */
-    if (access( pzTempl, R_OK ) == 0) {
-        strcpy( pzFullName, pzTempl );
+    if (access( pzFName, R_OK ) == 0) {
+        strcpy( pzFullName, pzFName );
         return SUCCESS;
     }
 
@@ -124,25 +124,25 @@ findFile( tCC* pzTempl, char* pzFullName )
      *  a suffix for the file name, then append ".tpl".
      *  Check for immediate access once again.
      */
-    pzRoot = strrchr( pzTempl, '/' );
+    pzRoot = strrchr( pzFName, '/' );
     pzSfx  = (pzRoot != (char*)NULL)
              ? strchr( ++pzRoot, '.' )
-             : strchr( pzTempl, '.' );
+             : strchr( pzFName, '.' );
 
     /*
      *  Check for an immediately accessible suffixed file
      */
     if (pzSfx == (char*)NULL) {
-        sprintf( pzFullName, "%s.agl", pzTempl );
+        sprintf( pzFullName, "%s.agl", pzFName );
         if (access( pzFullName, R_OK ) == 0)
             return SUCCESS;
 
-        sprintf( pzFullName, "%s.tpl", pzTempl );
+        sprintf( pzFullName, "%s.tpl", pzFName );
         if (access( pzFullName, R_OK ) == 0)
             return SUCCESS;
     }
 
-    if (*pzTempl == '/')
+    if (*pzFName == '/')
         return FAILURE;
 
     /*
@@ -158,7 +158,7 @@ findFile( tCC* pzTempl, char* pzFullName )
             char*   pzDir  = *(ppzDir--);
             char*   pzEnd  = pzFullName;
 
-            pzEnd += sprintf( pzFullName, zDirFmt, pzDir, pzTempl );
+            pzEnd += sprintf( pzFullName, zDirFmt, pzDir, pzFName );
 
             if (access( pzFullName, R_OK ) == 0)
                 return SUCCESS;
@@ -196,13 +196,13 @@ findFile( tCC* pzTempl, char* pzFullName )
         if (pzPath == (char*)NULL)
             return FAILURE;
 
-        pzFound = pathfind( pzPath, pzTempl, "rs" );
+        pzFound = pathfind( pzPath, pzFName, "rs" );
         if ((pzFound == (char*)NULL) && (pzSfx == (char*)NULL)) do {
-            sprintf( pzFullName, "%s.agl", pzTempl );
+            sprintf( pzFullName, "%s.agl", pzFName );
             pzFound = pathfind( pzPath, pzFullName, "rs" );
             if (pzFound != (char*)NULL)
                 break;
-            sprintf( pzFullName, "%s.tpl", pzTempl );
+            sprintf( pzFullName, "%s.tpl", pzFName );
             pzFound = pathfind( pzPath, pzFullName, "rs" );
         } while (AG_FALSE);
 
