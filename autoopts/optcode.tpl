@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.15 1999/03/30 23:09:04 bkorb Exp $
+#$Id: optcode.tpl,v 2.16 1999/06/30 14:45:44 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -522,7 +522,8 @@ tOptions [=prog_name=]Options = {
     + OPTPROC_NUM_OPT[=    _ENDIF=][=_IF environrc      _exist   =]
     + OPTPROC_ENVIRON[=    _ENDIF=][=_IF plus_marks     _exist
                                          flag.disable   _exist & =]
-    + OPTPROC_PLUSMARKS[=  _ENDIF=] ),
+    + OPTPROC_PLUSMARKS[=  _ENDIF=][=_IF argument       _exist ! =]
+    + OPTPROC_NO_ARGS[=    _ENDIF=] ),
     0, (char*)NULL,
     { INDEX_[=prefix _up #_ +=]OPT_MORE_HELP,
       [=_IF homerc _exist=]INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS[=
