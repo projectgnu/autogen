@@ -1,3 +1,8 @@
+2000-06-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c( makeString ): Place contiguous newline
+	representations on a single line
+
 2000-06-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expString.c( ag_scm_prefix ): return the result SCM instead

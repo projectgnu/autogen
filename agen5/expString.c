@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.17 2000/06/21 14:42:15 bkorb Exp $
+ *  $Id: expString.c,v 1.18 2000/06/22 16:25:39 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -120,6 +120,15 @@ makeString( tCC*    pzText,
             goto copyDone;
 
         case '\n':
+            /*
+             *  place contiguous new-lines on a single line
+             */
+            while (pzScn[1] == '\n') {
+                *(pzDta++) = '\\';
+                *(pzDta++) = 'n';
+                pzScn++;
+            }
+
             /*
              *  Replace the new-line with its escaped representation.
              *  Also, break and restart the output string, indented
