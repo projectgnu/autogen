@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.5 1999/12/01 04:17:21 bruce Exp $
+ *  $Id: defLex.c,v 1.6 2000/02/15 04:25:34 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -150,6 +150,7 @@ scanAgain:
     case '[':
     case ']':
     case ';':
+    case ',':
         /*
          *  The character itself is the token value.
          *  We NUL it out in the text to ensure that any
@@ -335,7 +336,7 @@ yyerror( char* s )
         break;
 
     default:
-        fprintf( stderr, "`%c' (%d)\n", lastToken );
+        fprintf( stderr, "`%1$c' (%1$d)\n", lastToken );
     }
 
     fprintf( stderr, "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
