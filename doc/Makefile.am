@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-05-18 20:37:29 bkorb"
+## Time-stamp:      "2004-10-13 21:02:51 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.28 2004/05/22 00:15:45 bkorb Exp $
+## $Id: Makefile.am,v 3.29 2004/10/15 01:48:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -116,11 +116,11 @@ $(COLUMNS_EXE) :
 
 ../getdefs/getdefs.menu : ../getdefs/getdefs.texi
 ../getdefs/getdefs.texi :
-	@cd ../getdefs/ ; $(MAKE) doc-stamp
+	@cd ../getdefs ; $(MAKE) doc-stamp
 
 ../columns/columns.menu : ../columns/columns.texi
 ../columns/columns.texi :
-	@cd ../columns/ ; $(MAKE) gen-stamp
+	@cd ../columns ; $(MAKE) gen-stamp
 
 ../xml2ag/xml2ag.menu : ../xml2ag/xml2ag.texi
 ../xml2ag/xml2ag.texi :

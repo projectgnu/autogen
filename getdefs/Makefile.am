@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-05-29 12:44:36 bkorb"
+## Time-stamp:      "2004-10-13 21:03:35 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.16 2004/07/02 18:31:04 bkorb Exp $
+## $Id: Makefile.am,v 3.17 2004/10/15 01:48:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -50,10 +50,10 @@ opts.h : opts.def $(COLUMNS_EXE) $(AGEXE)
 $(DOCFILES) : doc-stamp
 
 $(AGEXE) :
-	@cd ../agen5 ; $(MAKE) autogen
+	@cd ../agen5 ; $(MAKE) @AGEXE@
 
 $(COLUMNS_EXE) :
-	@cd ../columns ; $(MAKE) columns
+	@cd ../columns ; $(MAKE) @COLEXE@
 
 doc-stamp : opts.def $(COLUMNS_EXE) $(TARG)$(EXEEXT) $(AGEXE)
 	$(AG_ENV) ; $(AGEXE_LIB) -Tagman1 -b$(TARG) $(srcdir)/opts.def ; \

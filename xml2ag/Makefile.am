@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-05-29 12:45:29 bkorb"
+## Time-stamp:      "2004-10-13 21:04:17 bkorb"
 ## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.17 2004/07/02 18:30:56 bkorb Exp $
+## $Id: Makefile.am,v 1.18 2004/10/15 01:48:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -40,7 +40,7 @@ x.c : $(csrcs)
 
 xmlopts.c $(xml2ag_OBJECTS) : xmlopts.h
 
-xmlopts.h : xmlopts.def ../columns/columns$(EXEEXT)
+xmlopts.h : xmlopts.def ../columns/@COLEXE@
 	$(AG_ENV) ; $(AGEXE) $(srcdir)/xmlopts.def
 
 fork.c : fork.tpl xmlopts.def ../columns/columns$(EXEEXT)
@@ -51,7 +51,7 @@ fork.c : fork.tpl xmlopts.def ../columns/columns$(EXEEXT)
 
 $(DOCFILES) : doc-stamp
 ../columns/columns$(EXEEXT) :
-	cd ../columns ; $(MAKE) columns$(EXEEXT)
+	cd ../columns ; $(MAKE) @COLEXE@
 
 doc-stamp : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(AG_ENV) ; $(AGEXE) -Tagman1 -b$(TARG) $(srcdir)/xmlopts.def ; \

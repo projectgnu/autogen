@@ -3785,6 +3785,7 @@ The recognized values for @code{main-type} are:
 * main include::            include: code emitted from included template
 * main invoke::             invoke: code emitted from AutoGen macro
 * main for-each::           for-each: perform function on each argument
+* main each-or-stdin::      each-or-stdin: each argument or on stdin
 @end menu
 
 Here is an example of an @code{include} variation:
@@ -3941,6 +3942,11 @@ are lines that begin with a hash ('#') character.  (If anyone ever asks,
 I could make it specifiable, as the code to do this is emitted into
 the output and is not part of libopts.)
 
+@strong{NB}:
+The @code{argument} program attribute (@pxref{program attributes})
+must either begin with the @code{[} character, or be omitted and
+default to "@code{[ <file> [...]]}".
+
 The name of the procedure must be specified with the
 @code{handler-proc} attribute.  That procedure is presumed to be
 external, but if you provide the code for it, then the procedure is
@@ -3991,6 +3997,42 @@ of the emitted code:
             res |= @i{my_handler}( *(argv++) );
         @} while (--argc > 0);
     @} else @{ ...
+@end example
+
+You may also specify some main procedure start up code with the
+@code{main-init} attribute.  Any code specified by that attribute will
+be inserted immediately after the option processing call.
+
+@node main each-or-stdin
+@subsection each-or-stdin: each argument or on stdin
+
+This is very similar to the for-each main procedure (@pxref{main for-each}).
+The difference is that the callout procedure is passed a read-only
+@code{FILE*} pointer and a pointer to the file name:
+
+@example
+extern int @i{my_handler}( FILE* in_fp, const char* pz_file_name );
+@end example
+@noindent
+If there are no command line operands, then this function is invoked
+much like:
+
+@example
+res = @i{my_handler}( stdin, "stdin" );
+exit( res );
+@end example
+
+If there are command line operands, then each operand is processed as follows:
+@example
+const char* pzF = *(argv++);
+FILE* fp = fopen( pzF, "r" );
+if (fp == NULL) @{
+    fprintf( stderr, "prog-name fs ERROR:  %d (%s) opening %s\n",
+             errno, strerror( errno ), pzF );
+    return EXIT_FAILURE;
+@}
+res |= @i{my_handler}( fp, pzF );
+fclose( fp );
 @end example
 
 @c === SECTION MARKER

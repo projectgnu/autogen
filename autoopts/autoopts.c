@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.40 2004/10/10 00:40:02 bkorb Exp $
+ *  $Id: autoopts.c,v 3.41 2004/10/15 01:48:34 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -52,7 +52,6 @@
  */
 
 #ifndef HAVE_PATHFIND
-#  define  pathfind  option_pathfind
 #  include "compat/pathfind.c"
 #endif
 

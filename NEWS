@@ -1,4 +1,7 @@
 New in 5.6.4 - October, 2004
+General:
+* various cleanups for -Wall and Cygwin builds
+
 AutoGen:
 * -Wall warning cleanups
 * exist and not-exist selection macros -- the CASE macro can now
@@ -13,6 +16,12 @@ AutoOpts:
   "${PROGNAME}" environment variable will be processed tokenizing it
   and processing it as a list of command line options.  It may not
   contain any command line operands.
+* New case SELECT macros:  !E (CASE value does not exist) and, more for
+  symmetry than usefulness, +E (CASE value does exist).  Now, they can
+  distinguish between a non-existent value and the empty string value.
+* a new main procedure type:  each-or-stdin  This will fopen() each
+  command line operand and pass the FILE* pointer to the callout procedure.
+  If there are no operands, then stdin is passed.
 
 getdefs:
 * With "listed" attributes, if you quote an entry, then the scanning code

@@ -1,16 +1,26 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.9 2004/08/31 02:35:14 bkorb Exp $
+# $Id: directive.tpl,v 3.10 2004/10/15 01:48:34 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
 h =]
-[=(dne " *  " "/*  ")=]
- *
- *  copyright 1992-2004 Bruce Korb
- *
-[=(gpl "AutoGen" " *  ")=]
- */
-[=(make-header-guard "directive")=]
+[=
+
+  (define ix 0)
+  (define tmp-txt "")
+  (define dir-tbl "")
+  (define dir-enm "_EOF_\n")
+  (define dir-nms "_EOF_\n")
+
+  (string-append
+     (dne " *  " "/*  ")
+     "\n *\n *  copyright 1992-2004 Bruce Korb\n *\n"
+     (gpl "AutoGen" " *  ")
+     "\n */\n"
+     (make-header-guard "directive")
+  )
+
+=]
 #ifdef DEFINING
 
 typedef char* (tDirProc)( char* pzArg, char* pzScan );
@@ -28,39 +38,52 @@ struct dir_table {
  */
 static tDirProc doDir_IGNORE;[=
 FOR directive    =][=
+
+  (set! tmp-txt (get "name"))
+
+  (set! dir-tbl (string-append dir-tbl
+        (sprintf "    { %2d, zDirectives +%3d, doDir_%-10s 0 }"
+                 (string-length tmp-txt) ix
+                 (string-downcase! (string-append (get "name") ","))  )
+        (if (last-for?) " };" ",\n")
+  )     )
+
+  (set! dir-enm (string-append dir-enm
+                "DIR_" (string-upcase! (get "name")) "\n" ))
+
+  (set! dir-nms (string-append dir-nms
+                 " \"" tmp-txt "\\0\"\n" ))
+
+  (set! ix (+ ix (string-length tmp-txt) 1))
+
+=][=
+
   IF (not (exist? "dummy")) =]
 static tDirProc doDir_[=name=];[=
+  ELSE           =]
+#define         doDir_[=name=] doDir_IGNORE[=
   ENDIF          =][=
 ENDFOR directive =]
 
 /*
  *  Define the constant string names for each directive
- */[=
-FOR directive    =]
-static const char z[=% name (string-capitalize! (sprintf "%%-12s" "%s[]"))
-       =] = "[=% name (string-downcase! "%s") =]";[=
-ENDFOR directive
-=]
+ */
+static const char zDirectives[] =
+[= (shellf "columns --spread=1 -I3 <<%s_EOF_" dir-nms) =];
 
 /*
  *  Enumerate the directives
  */
-typedef enum {[=
-FOR directive , =]
-    DIR_[=% name (string-upcase! "%s") =][=
-ENDFOR directive=]
+typedef enum {
+[= (shellf "columns -I4 -S, --spread=1 <<%s_EOF_" dir-enm) =]
 } teDirectives;
 
+/*
+ *  Set up the table for handling each directive.
+ */
 #define DIRECTIVE_CT  [= (+ (high-lim "directive") 1) =]
-static tDirTable dirTable[ DIRECTIVE_CT ] = {[=
-FOR directive , =]
-    { sizeof( z[=% name (string-capitalize! (sprintf "%%-14s" "%s )-1,"))
-        =]z[=% name (string-capitalize! (sprintf "%%-10s" "%s,"))
-        =]doDir_[=
-  IF (exist? "dummy") =]IGNORE,   [=
-  ELSE  =][=% name (string-downcase! (sprintf "%%-10s" "%s,")) =][=
-  ENDIF =]0 }[=
-ENDFOR directive=] };
+static tDirTable dirTable[ DIRECTIVE_CT ] = {
+[= (. dir-tbl) =]
 
 /*
  *  This text has been extracted from [=`echo ${srcdir}/schemedef.scm`=]
@@ -73,7 +96,8 @@ tSCC zSchemeInit[] =
 "sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
-=]; /* for emacs: " */
+ ;; "
+=][= # " =]; /* for emacs: ' */ /* " */
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {
@@ -82,26 +106,30 @@ typedef struct inet_family_map_s {
     unsigned short  family;
 } inet_family_map_t;
 
-inet_family_map_t inet_family_map[] = {
-[=`
+[= `
 
-find /usr/include -follow -name socket.h | \
-xargs egrep '^#define[ \t]+AF_[A-Z0-9]+[ \t]+[0-9]' | \
-sed 's,^.*#define[ \t]*AF_,,;s,[ \t].*,,' | \
- while read f
- do
-   case $f in
-   MAX ) echo '    { NULL, 0, 0 } };'
-         break ;;
-   esac
+list=\`find /usr/include -follow -name socket.h | \
+ xargs egrep '^#define[ \t]+AF_[A-Z0-9]+[ \t]+[0-9]' | \
+ sed 's,^.*#define[ \t]*AF_,,;s,[ \t].*,,;/^MAX$/d'\`
 
-   g=\`echo $f | tr '[A-Z]' '[a-z]'\`:
-   echo "    { \\\"${g}\\\", ${#g}, AF_${f} },"
- done
+set -- $list
+echo "#define INET_FAMILY_TYPE_CT $#"
+echo "inet_family_map_t inet_family_map[ \`expr $# + 1\` ] = {"
+
+for f
+do
+   g=\`echo $f | tr '[A-Z]' '[a-z]'\`':'
+   ct=\`echo $g | wc -c\`
+   printf "    { %-14s %3d, AF_${f} },\\n" "\\\"${g}\\\"," ${ct}
+done | sort -u
 
 `=]
+    { NULL, 0, 0 } };
+
 #endif /* DAEMON_ENABLED */
 #endif /* DEFINING */
-#endif /* [=(. header-guard)=] */[= #
+#endif /* [=(. header-guard)=] */
+/*
+ *  End of [= (out-name) =] */[= #
 
 end of directive.tpl  =]

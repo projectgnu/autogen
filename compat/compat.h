@@ -2,12 +2,12 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2004-08-15 09:54:52 bkorb"
+ *  Time-stamp:      "2004-10-14 18:35:54 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.11 2004/08/31 02:35:14 bkorb Exp $
+ * $Id: compat.h,v 3.12 2004/10/15 01:48:34 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -167,7 +167,7 @@
 
 /* some systems #def errno! and others do not declare it!! */
 #ifndef errno
-   extern       int     errno;
+   extern int errno;
 #endif
 
 /* Some machines forget this! */
@@ -179,6 +179,10 @@
 
 #ifndef NUL
 #  define NUL '\0'
+#endif
+
+#ifndef NULL
+#  define NULL 0
 #endif
 
 #if !defined (MAXPATHLEN) && defined (HAVE_SYS_PARAM_H)
@@ -212,11 +216,8 @@
 #endif
 
 #ifndef HAVE_PATHFIND
-  EXTERN char *pathfind(const char *, const char *, const char *);
-#endif
-
-#ifndef NULL
-#  define NULL 0
+#  define  pathfind  option_pathfind
+   EXTERN char *pathfind(const char *, const char *, const char *);
 #endif
 
 #ifdef USE_FOPEN_BINARY

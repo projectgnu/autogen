@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/02/16 22:20:45 $
+# Last Modified:     $Date: 2004/10/15 01:48:34 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.20 2004/02/16 22:20:45 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.21 2004/10/15 01:48:34 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -139,7 +139,7 @@ do
   opts.[ch] )
     # Make the option processing files:
     #
-    if [ -z "${AG}" ] || [ -z "${COL}" ]
+    if test -z "${AG}" -o -z "${COL}"
     then
       echo "Cannot locate either autogen or columns"
       $force && exit 1
@@ -171,7 +171,7 @@ do
   expr.h | \
   expr.def | \
   expr.ini )
-    if [ -z "${AG}" ] || [ -z "${COL}" ] || [ -z "${GD}" ]
+    if test -z "${AG}" -o -z "${COL}" -o -z "${GD}"
     then
       echo "Cannot locate autogen or columns or getdefs"
       $force && exit 1
@@ -204,7 +204,7 @@ do
   stamp-directive | \
   directive.def | \
   directive.h )
-    if [ -z "${AG}" ] || [ -z "${COL}" ]
+    if test -z "${AG}" -o -z "${COL}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1
@@ -217,7 +217,7 @@ do
 		linenum
 		_EOConfig_
     ${GD} load=directive.cfg ${srcdir}/defDirect.c
-    ${AG} directive.def
+    ${AG} -t30 directive.def
     rm -f directive.def directive.cfg
     date > stamp-directive
     ;;
@@ -225,7 +225,7 @@ do
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
-    if [ -z "${AG}" ] || [ -z "${COL}" ]
+    if test -z "${AG}" -o -z "${COL}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1
@@ -239,7 +239,7 @@ do
   autogen.1 )
     # Construct the man page
     #
-    if [ -z "${AG}" ] || [ -z "${COL}" ]
+    if test -z "${AG}" -o -z "${COL}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-07-30 20:51:38 bkorb"
+## Time-stamp:      "2004-10-13 21:05:43 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.35 2004/07/31 18:51:31 bkorb Exp $
+## $Id: Makefile.am,v 3.36 2004/10/15 01:48:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -117,10 +117,10 @@ autogen.1 : opts.def @AGEXE@ ../getdefs/getdefs ../columns/columns
 gen : $(GEN_LIST)
 
 ../getdefs/getdefs :
-	cd ../getdefs ; $(MAKE) getdefs
+	cd ../getdefs ; $(MAKE) @GDEXE@
 
 ../columns/columns :
-	cd ../columns ; $(MAKE) columns
+	cd ../columns ; $(MAKE) @COLEXE@
 
 dist : autogen.texi autogen.1
 

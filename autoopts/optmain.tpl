@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.28 2004/08/31 02:35:14 bkorb Exp $
+# $Id: optmain.tpl,v 3.29 2004/10/15 01:48:34 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -129,11 +129,104 @@ ENDDEF  build-test-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-   BUILD MAIN
+   BUILD EACH-OR-STDIN MAIN
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE for-each-main    =][=
+DEFINE each-or-stdin-main       =][=
+
+(if (not (==* (get "argument") "[" ))
+  (error "command line arguments must be optional for a 'each-or-stdin' main"))
+
+(if (not (exist? "handler-proc"))
+  (error "'each-or-stdin' mains require a handler proc") )
+
+=]
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <unistd.h>
+[=
+
+IF (exist? (string-append (get "handler-proc") "-code")) =]
+
+static int
+[= handler-proc =]( FILE* in_fp, const char* pz_file )
+{
+    int res = 0;
+[= (prefix "    " (get (string-append (get "handler-proc") "-code"))) =]
+    return res;
+}[=
+
+  ELSE
+
+=]
+
+extern int [= handler-proc =]( FILE*, const char* pz_file );[=
+
+  ENDIF
+=]
+
+int
+main( int argc, char** argv )
+{
+    int res = 0;
+    {
+        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
+        argc -= ct;
+        argv += ct;
+    }[=
+
+  IF (exist? "main-init") =]
+[= main-init =][=
+  ENDIF =]
+
+    /*
+     *  Input list from command line
+     */
+    if (argc > 0) {
+        do  {
+            const char* pzF = *(argv++);
+            FILE* fp = fopen( pzF, "r" );
+            if (fp == NULL) {
+                fprintf( stderr, "[= prog-name
+             =] fs ERROR:  %d (%s) opening %s\n",
+                         errno, strerror( errno ), pzF );
+                return EXIT_FAILURE;
+            }
+            res |= [= handler-proc =]( fp, pzF );
+            fclose( fp );
+        } while (--argc > 0);
+    }
+
+    /*
+     *  Input file must not be a tty.
+     */
+    else if (isatty( STDIN_FILENO )) {
+        fputs( "[= prog-name =] ERROR: input list is a tty\n", stderr );
+        [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
+        /* NOTREACHED */
+    }
+
+    /*
+     *  Input list from a pipe or file or some such
+     */
+    else {
+        res = [= handler-proc =]( stdin, "stdin" );
+    }
+
+    return res;
+}[=
+
+ENDDEF each-or-stdin-main
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+   BUILD FOR-EACH MAIN
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE for-each-main            =][=
 
   (if (not (==* (get "argument") "[" ))
       (error "command line arguments must be optional for a 'for-each' main"))
@@ -142,10 +235,10 @@ DEFINE for-each-main    =][=
       (error "'for-each' mains require a handler proc") )
 
 =]
-#include <ctype.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 static char*
 trim_input_line( char* pz_s )
@@ -212,6 +305,7 @@ main( int argc, char** argv )
     else if (isatty( STDIN_FILENO )) {
         fputs( "[=(. prog-name)=] ERROR: input list is a tty\n", stderr );
         [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
+        /* NOTREACHED */
     }
 
     /*
@@ -256,31 +350,34 @@ ENDDEF  for-each-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE build-main       =][= FOR main[] =][=
+DEFINE build-main               =][= FOR main[] =][=
 
- CASE main-type         =][=
-  == guile               =][=
-     build-guile-main    =][=
+ CASE main-type                 =][=
+  == guile                      =][=
+     build-guile-main           =][=
 
-  == shell-process       =][=
+  == shell-process              =][=
      INVOKE build-test-main  test-main = "putBourneShell"
 
-  == shell-parser        =][=
+  == shell-parser               =][=
      INVOKE build-test-main  test-main = "putShellParse" =][=
 
-  == main                =][=
-     INVOKE build-test-main =][=
+  == main                       =][=
+     INVOKE build-test-main     =][=
 
-  == include             =][=
-     INCLUDE tpl         =][=
+  == include                    =][=
+     INCLUDE tpl                =][=
 
-  == invoke              =][=
-     INVOKE (get "func") =][=
+  == invoke                     =][=
+     INVOKE (get "func")        =][=
 
-  == for-each            =][=
-     INVOKE for-each-main=][=
+  == for-each                   =][=
+     INVOKE for-each-main       =][=
  
-  *                      =][=
+  == each-or-stdin              =][=
+     INVOKE each-or-stdin-main  =][=
+ 
+  *                             =][=
      (error (sprintf "unknown/invalid main-type: '%s'" (get "main-type"))) =][=
 
   ESAC =][= ENDFOR =][=

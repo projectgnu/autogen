@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: genshell.def,v 3.4 2004/02/01 21:26:45 bkorb Exp $
+ *   $Id: genshell.def,v 3.5 2004/10/15 01:48:34 bkorb Exp $
  */
 
 /*
@@ -28,7 +28,7 @@ autogen definitions options;
 copyright = {
     date  = "1999-2002";
     owner = "Bruce Korb";
-    eaddr = "autogen-bugs@lists.sf.net";
+    eaddr = "autogen-users@lists.sf.net";
     type  = lgpl;
 };
 

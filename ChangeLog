@@ -1,3 +1,20 @@
+2004-10-14  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.6.3 Released
+
+2004-10-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am: Refer to executables with the corrected substitute
+	names (that may include the .exe extensions).
+	* doc/Makefile.am: likewise
+	* getdefs/Makefile.am: likewise
+	* xml2ag/Makefile.am: likewise
+	* autoopts/optlib.tpl(VALUE_): take advantage of the "!E" macro
+	* autoopts/optmain.tpl(each-or-stdin): new main procedure format
+	* pkg/gnudoc.tpl: resync with the FSF's gnudocs_template
+	* global-replace:  autogen-bugs@.. with autogen-users@...
+	* lcl-ag/compat/compat.h(pathfind): fix the reference
+
 2004-10-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h(zDefaultNil): new global to distinguish defaulted/

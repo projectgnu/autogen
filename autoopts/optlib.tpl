@@ -1,10 +1,13 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.26 2004/10/02 21:40:57 bkorb Exp $
+# $Id: optlib.tpl,v 3.27 2004/10/15 01:48:34 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =][=
+
+(define get-opt-value (lambda (val)
+        (if (<= val 32) val (+ val 96))  ))
 
 (define have-proc   #f)
 (define proc-name   "")
@@ -276,19 +279,30 @@ typedef enum {[=
              full-prefix "_MEMBERSHIP_MASK"))
              (- (ash 1 (count "keyword")) 1) )  =][=
 
-  ESAC  (get "arg-type")          =]
-#define VALUE_[=(sprintf "%-18s" opt-name)=] [=
-     IF (exist? "value") =][=
-        CASE (get "value") =][=
-        ==  '       =]'\''[=
-        ~   .       =]'[=value=]'[=
-        *           =][=(error (sprintf
-          "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
-          (get "name") (get "value")))=][=
-        ESAC =][=
-     ELIF (<= (for-index) 32) =][= (for-index) =][=
-     ELSE                 =][= (+ (for-index) 96) =][=
-     ENDIF =][=
+  ESAC  (get "arg-type")
+
+=]
+#define VALUE_[=
+  (set! tmp-val (for-index))
+  (sprintf "%-18s" opt-name)=] [=
+
+  CASE  value =][=
+  !E          =][= (get-opt-value tmp-val) =][=
+  ==  "'"     =]'\''[=
+  ==  "\\"    =]'\\'[=
+  ~~  "[ -~]" =]'[=value=]'[=
+
+  =*  num     =][=
+      (if (>= number-opt-index 0)
+          (error "only one number option is allowed")  )
+      (set! number-opt-index tmp-val)
+      (get-opt-value tmp-val)   =][=
+
+  *           =][=(error (sprintf
+    "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
+    (get "name") (get "value")))=][=
+
+  ESAC =][=
 
   CASE arg-type  =][=
 
@@ -311,6 +325,8 @@ typedef enum {[=
                  =] (*(ag_bool*)(&[=(. value-desc)=].pzLastArg))[=
 
   ESAC           =][=
+
+
   IF (== (up-c-name "equivalence") UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
                 =] ([=(. descriptor)=].optActualValue)
