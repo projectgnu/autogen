@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2001/12/01 20:26:20 $
+#  Last Modified:     $Date: 2001/12/09 19:46:03 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -22,6 +22,10 @@ null
 (setenv "SHELL" "/bin/sh")
 
 =][=
+
+(define true-txt   "")
+(define false-txt  "")
+(define both-txt   "")
 
 (define down-name  "")
 (define up-name    "")
@@ -43,9 +47,9 @@ FOR test  =][=
   (set! cache-name (string-append group-prefix "cv_" down-name))
   (set! subst-name (string-upcase! (string-append group-prefix up-name)))
   (set! c-code (if (exist? "bracket-imbalance")
-        (string-append "changequote(<<===,===>>)<<==="
+        (string-append "changequote(,)"
                        (get "code")
-                       "===>>changequote([,])")
+                       "changequote([,])")
         (string-append "[" (get "code") "]") ))
   (out-switch (string-downcase! (string-append test-name ".m4")))
   (dne "dnl " "dnl ") =]
@@ -70,10 +74,22 @@ AC_DEFUN([[=(. test-name)=]],[[= % require AC_REQUIRE([%s])=]
   IF (set! fcn-name (string-append "try-" (get "type")))
      (ag-function? fcn-name) =][=
     INVOKE (. fcn-name) =][=
-  ELSE =][=
+
+  ELSE   =][=
     (error (string-append "invalid conftest function:  " fcn-name)) =][=
-  ENDIF =]
-]) # end of AC_DEFUN of [=(. test-name)=][=
+
+  ENDIF  =]
+  if test x$[=(. cache-name)=] = xyes
+  then[=
+  (. true-txt) =][=
+  (if (> (string-length false-txt) 0)
+      (string-append "\n  else" false-txt))      =]
+  fi[=
+  (if (> (string-length both-txt) 0)
+      both-txt)
+=]
+]) # end of AC_DEFUN of [=(. test-name)=]
+[=
 
 ENDFOR test       =][=
 
@@ -89,12 +105,37 @@ DEFINE  c-feature
   AC_LANG_POP([=language=])[=
   ENDIF  =]]) # end of CACHE_VAL
 
-  AC_MSG_RESULT([$[=(. cache-name)=]])
-  if test x$[=(. cache-name)=] = xyes
-  then
-    AC_DEFINE(HAVE_[=% name (string-upcase! "%s")=], 1,
-       [Define this if [=check=]])
-  fi[=
+  AC_MSG_RESULT([$[=(. cache-name)=]])[=
+
+  (set! true-txt  (if (exist? "ok-do")  (get "ok-do") ""))
+  (set! false-txt (if (exist? "bad-do")
+                  (prefix "    " (string-append "\n" (get "bad-do"))) ""))
+  (set! both-txt  "")
+  (set! fcn-name  (string-append "_" (string-upcase! (get "name")) )) =][=
+
+  FOR action      =][=
+
+    CASE action   =][=
+
+    =*   sub      =][=
+    (set! true-txt  (string-append true-txt  "\n    NEED" fcn-name "=false" ))
+    (set! false-txt (string-append false-txt "\n    NEED" fcn-name "=true"  ))
+    (set! both-txt  (string-append both-txt  "\n  AC_SUBST(NEED"
+                    fcn-name ")" ))  =][=
+
+    =*   def      =][=
+    (set! true-txt  (string-append true-txt "\n    AC_DEFINE(HAVE" 
+                    fcn-name ", 1,
+       [Define this if " (get "check") "])" ))  =][=
+
+    *             =][=
+    (error (string-append (get "action") " is an undefined action")) =][=
+
+    ESAC action   =][=
+
+  ENDFOR
+
+=][=
 
 ENDDEF  c-feature =][=
 
@@ -193,7 +234,7 @@ ENDDEF  try-test             =][=
 (out-push-new "Makefile.am") =][=
 (dne "#  " "#  ")            =]      
 ## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 1.6 2001/12/01 20:26:20 bkorb Exp $
+## $Id: conftest.tpl,v 3.0 2001/12/09 19:46:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 GENERATED_M4 = \
@@ -208,7 +249,7 @@ ENDFOR =]
 (shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
           (out-pop #t) )=]
 
-EXTRA_DIST	= byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) \
+EXTRA_DIST	= byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) autogen.spec \
 		missing release bootstrap config.tpl misc.def bootstrap.local
 
 pkgdata_DATA = config.tpl

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: numeric.c,v 2.4 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: numeric.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

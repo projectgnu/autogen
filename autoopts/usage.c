@@ -1,13 +1,13 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.18 2001/10/01 23:51:33 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -53,32 +53,25 @@
 
 #include "autoopts.h"
 
-#ifndef HAVE_PATHFIND
-/*
- *  The pathfind() routine either does not work or is not SVR4
- */
-#  include <compat/pathfind.c>
-#endif
-
-tSCC zOptsOnly[]   = "All arguments are named options.\n";
-tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
-tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
+tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
+tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";
+tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
+tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
 tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
+tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
 tSCC zMust[]       = "\t\t\t\t- must appear between %d and %d times\n";
 tSCC zNoLim[]      = "\t\t\t\t- may appear multiple times\n";
-tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
-tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
 tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
-tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
-tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
-tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
-tSCC zRange[]      = "\t\t\t\t- must lie within the range:\n";
-tSCC zTabout[]     = "\t\t\t\t%s\n";
-tSCC zTabHyp[]     = "\t\t\t\t- ";
-tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
-tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";
-tSCC zReqThese[]   = "requires these options:\n";
+tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
+tSCC zOptsOnly[]   = "All arguments are named options.\n";
+tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
 tSCC zProhib[]     = "prohibits these options:\n";
+tSCC zRange[]      = "\t\t\t\t- must lie within the range:\n";
+tSCC zReqThese[]   = "requires these options:\n";
+tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
+tSCC zTabHyp[]     = "\t\t\t\t- ";
+tSCC zTabout[]     = "\t\t\t\t%s\n";
+tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
 
 tSCC zNoReq_Short_Title[]   = "  Flg Arg Option-Name    Description\n";
 tSCC zNoReq_NoShort_Title[] = "   Arg Option-Name    Description\n";
@@ -100,9 +93,10 @@ tSCC zNoFlags[]    =
 or doubled %ss.  Flag characters are not interpreted.\n";
 
 
-DEF_PROC_2( void optionUsage,
-            tOptions*,  pOptions,
-            int,        exitCode )
+void
+optionUsage( pOptions, exitCode )
+    tOptions* pOptions;
+    int       exitCode;
 {
     tCC*    pOptFmt;
     tCC*    pOptTitle;
@@ -452,8 +446,10 @@ DEF_PROC_2( void optionUsage,
 
     exit( exitCode );
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * usage.c ends here */

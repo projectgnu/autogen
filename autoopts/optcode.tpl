@@ -1,6 +1,8 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.53 2001/12/01 20:26:20 bkorb Exp $
+#$Id: optcode.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+
+# Automated Options copyright 1992-2001 Bruce Korb
 
 =]
 #include "[=(. hdrname)=]"
@@ -326,7 +328,8 @@ tOptions [=(. pname)=]Options = {
                                             (exist? "flag.disable"))     =]
     + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
-    + OPTPROC_ARGS_REQ[=   ENDIF=] ),
+    + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-opts")      =]
+    + OPTPROC_REORDER[=    ENDIF=] ),
     0, (char*)NULL,
     { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
       [=IF (exist? "homerc")

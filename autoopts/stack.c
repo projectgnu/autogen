@@ -1,13 +1,13 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.8 2001/09/29 17:08:56 bkorb Exp $
+ *  $Id: stack.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -83,7 +83,6 @@ void unstackOptArg( pOpts, pOptDesc )
         return;
     }
 
-#ifdef HAVE_POSIX_REGCOMP
     {
         regex_t   re;
         int       ct, dIdx;
@@ -132,36 +131,6 @@ void unstackOptArg( pOpts, pOptDesc )
 
         regfree( &re );
     }
-#else
-    /*
-     *  search the list for the entry(s) to remove.  Entries that
-     *  are removed are *not* copied into the result.  The source
-     *  index is incremented every time.  The destination only when
-     *  we are keeping a define.
-     */
-    for (i = 0, ct = pAL->useCt; i < ct; i++) {
-        char*     pzSrc = pAL->apzArgs[ i ];
-        char*     pzEq  = strchr( pzSrc, '=' );
-        if (pzEq != (char*)NULL) {
-            *pzEq = NUL;
-            res = strcmp( pzSrc, pOptDesc->pzLastArg );
-            *pzEq = '=';
-        } else
-            res = strcmp( pzSrc, pOptDesc->pzLastArg );
-
-        if (res == 0) {
-            /*
-             *  Remove this entry by reducing the in-use count
-             *  and *not* putting the string pointer back into
-             *  the list.
-             */
-            if (i != --ct)
-                pAL->apzArgs[ i ] = pAL->apzArgs[ --ct ];
-            pAL->useCt = ct;
-            break;
-        }
-    }
-#endif
 
     /*
      *  IF we have unstacked everything,

@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2001/12/01 20:26:19 $
+dnl Last Modified:    $Date: 2001/12/09 19:43:40 $
 dnl            by:    Bruce Korb <bkorb@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.62 2001/12/01 20:26:19 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.0 2001/12/09 19:43:40 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.62 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.0 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -68,16 +68,19 @@ MAKEFLAGS=
 MAKELEVEL=
 unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 
+ifdef([AC_LIBTOOL_WIN32_DLL], AC_LIBTOOL_WIN32_DLL)
+AM_WITH_DMALLOC
+
 # ----------------------------------------------------------------------
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
 AC_PROG_CC
-AM_PROG_CC_STDC
+AC_PROG_CC_STDC
 AC_EXEEXT
 ifdef([AC_LIBTOOL_WIN32_DLL],
    AC_LIBTOOL_WIN32_DLL)
 AC_PROG_INSTALL
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 AG_PROG_BYACC
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 
@@ -102,8 +105,6 @@ changequote([,])
 fi])
 AC_MSG_RESULT([$ag_cv_debug])
 
-AM_WITH_DMALLOC
-
 # ----------------------------------------------------------------------
 # Check for standard headers.
 # ----------------------------------------------------------------------
@@ -127,11 +128,6 @@ AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
 
 # Check for P_PID definition in <sys/procset.h>
 AC_CHECK_HEADERS(sys/procset.h)
-
-# ----------------------------------------------------------------------
-# Check for SVR4 libgen, and use it if it defines pathfind.
-# ----------------------------------------------------------------------
-AC_CHECK_LIB(gen, pathfind)
 
 # ----------------------------------------------------------------------
 # Check for Dynamic library stuff
@@ -163,6 +159,11 @@ AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int, 4)
 
 # ----------------------------------------------------------------------
+# Check for SVR4 libgen, and use it if it defines pathfind.
+# ----------------------------------------------------------------------
+AC_CHECK_LIB(gen, pathfind)
+
+# ----------------------------------------------------------------------
 # Checks for standard functions.
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal psignal pathfind strlcpy)
@@ -170,10 +171,13 @@ AC_CHECK_FUNCS(snprintf)
 AG_FUNC_FOPEN_BINARY
 AG_FUNC_FOPEN_TEXT
 AG_CHECK_ALLOCATED_CTIME
+## AG_CHECK_POSIX_REGCOMP done within AG_CHECK_LIB_REGEX
+AG_CHECK_POSIX_SYSINFO
+AG_CHECK_STRCSPN
 AG_CHECK_STRFTIME
 AG_CHECK_SYS_SIGLIST
-AG_CHECK_POSIX_SYSINFO
 AG_CHECK_UNAME_SYSCALL
+AG_CHECK_PATHFIND
 
 if ! test x$ag_cv_sys_siglist = xyes
 then
@@ -187,6 +191,7 @@ then
   fi
 fi >&2
 
+AC_SUBST(COMPATOBJ)
 # ----------------------------------------------------------------------
 # Generate the make files.
 # ----------------------------------------------------------------------
@@ -219,11 +224,11 @@ AC_SUBST(LIBS)
 [
 if test "$top_srcdir" = "$top_builddir"
 then
- INCLIST="-I${top_builddir} -I${top_srcdir}/autoopts -I${top_srcdir}/snprintfv"
+ INCLIST='-I${top_builddir} -I${top_srcdir}/autoopts -I${top_srcdir}/snprintfv'
 else
- INCLIST="-I${top_builddir} -I${top_srcdir}"
- INCLIST="${INCLIST} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts"
- INCLIST="${INCLIST} -I${top_builddir}/snprintfv -I${top_srcdir}/snprintfv"
+ INCLIST='-I${top_builddir} -I${top_srcdir}'
+ INCLIST="${INCLIST} -I\${top_builddir}/autoopts -I\${top_srcdir}/autoopts"
+ INCLIST="${INCLIST} -I\${top_builddir}/snprintfv -I\${top_srcdir}/snprintfv"
 fi
 ]
 AC_SUBST(INCLIST)

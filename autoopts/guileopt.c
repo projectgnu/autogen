@@ -1,12 +1,12 @@
 
 /*
- *  $Id: guileopt.c,v 1.5 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: guileopt.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -54,8 +54,9 @@
 
 #include "autoopts.h"
 
-DEF_PROC_1( void export_options_to_guile,
-            tOptions*,  pOpts )
+void
+export_options_to_guile( pOpts )
+    tOptions* pOpts;
 {
     tOptDesc*  pOD = pOpts->pOptDesc;
     int        ct  = pOpts->presetOptCt;
@@ -164,8 +165,10 @@ DEF_PROC_1( void export_options_to_guile,
         }
     }
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * guileopt.c ends here */

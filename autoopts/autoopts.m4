@@ -2,13 +2,13 @@ dnl  -*- Mode: M4 -*-
 dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
 dnl 
-dnl Author:	       Gary V. Vaughan <gvaughan@localhost>
+dnl Author:	           Gary V. Vaughan <gvaughan@localhost>
 dnl Maintainer:	       Gary V. Vaughan <gvaughan@localhost>
 dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999				
 dnl            by:     Gary V. Vaughan <gary@oranda.goldfish>		
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 2.3 2000/04/04 13:22:18 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.0 2001/12/09 19:43:58 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl 
 dnl Code:
@@ -255,5 +255,5 @@ _EOF_
   AC_SUBST(AUTOOPTS_LIBS)
   rm -f confopts.def conf.optstest
 ])
-
+dnl
 dnl autoopts.m4 ends here

@@ -1,6 +1,8 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.34 2001/10/01 23:51:33 bkorb Exp $
+# $Id: optlib.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+
+# Automated Options copyright 1992-2001 Bruce Korb
 
 =][=
 
@@ -317,9 +319,10 @@ static const int
          =*   bool      =]OPTST_BOOLEAN | [=
          =*   key       =]OPTST_ENUMERATION | [=
          ESAC           =][=
-         stack_arg      "OPTST_STACKED | "     =][=
+         stack-arg      "OPTST_STACKED | "     =][=
          immediate      "OPTST_IMM | "         =][=
          immed_disable  "OPTST_DISABLE_IMM | " =][=
+         must-set       "OPTST_MUST_SET | "    =][=
          ? enabled      "OPTST_INITENABLED"
                         "OPTST_DISABLED"    =] | [=
          ? no_preset    "OPTST_NO_INIT"
@@ -411,8 +414,7 @@ DEFINE Option_Descriptor =][=
      /* option proc      */ [=
          IF   (exist? "call_proc")        =][=call_proc=][=
          ELIF (or (exist? "extract_code")
-                  (exist? "flag_code")
-                  (exist? "arg_range"))   =]doOpt[=(. cap-name)=][=
+                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
          ELSE                             =](tpOptProc)NULL[=
          ENDIF =],
      /* desc, NAME, name */ z[=(. cap-name)=]Text, (const char*)NULL,

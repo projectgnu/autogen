@@ -8,7 +8,7 @@
  * Last Modified:     Fri Jul 30 12:34:46 1999
  *            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>
  *
- * $Id: compat.h,v 2.7 2001/06/24 00:47:56 bkorb Exp $
+ * $Id: compat.h,v 3.0 2001/12/09 19:46:02 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1

@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 2.1 2001/12/01 20:26:20 bkorb Exp $
+ *  $Id: gdinit.c,v 3.0 2001/12/09 19:46:06 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2001/12/01 20:26:20 $
+ *  Last Modified:     $Date: 2001/12/09 19:46:06 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 #include "getdefs.h"

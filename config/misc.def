@@ -2,21 +2,23 @@
 autogen definitions config.tpl;
 
 /*
- *  Maintainer:        Bruce Korb <bkorb@gnu.org>
- *  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2001/09/29 20:42:44 $
+ */ author =           "Bruce Korb <bkorb@gnu.org>";
+/*  Created:           Tue Nov 24 01:07:30 1998
+ *  Last Modified:     $Date: 2001/12/09 19:46:03 $
  *             by:     Bruce Korb <bkorb@gnu.org>
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 1.6 2001/09/29 20:42:44 bkorb Exp $
+ *  $Id: misc.def,v 3.0 2001/12/09 19:46:03 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
+version = "$Revision: 3.0 $";
 
 test = {
-    name  = allocated_ctime;
-    type  = run;
-    check = "ctime() allocates memory for its result";
-    code  = <<-  _EOF_
+    name   = allocated_ctime;
+    type   = run;
+    check  = "ctime() allocates memory for its result";
+    action = define;
+    code   = <<-  _EOF_
 		#include <time.h>
 		int main (int argc, char** argv) {
 		   time_t  timeVal = time( (time_t*)NULL );
@@ -30,9 +32,106 @@ test = {
 };
 
 test = {
+    name   = pathfind;
+    type   = run;
+    check  = "pathfind(3) works";
+    bad-do = <<-  _EOF_
+		if test x$ac_cv_lib_gen_pathfind = xyes
+		then :
+		else
+		  COMPATOBJ="$COMPATOBJ pathfind.lo"
+		fi
+		_EOF_ ;
+    action = define;
+
+    code   = <<-  _EOF_
+		#include <string.h>
+		#include <stdlib.h>
+		int main (int argc, char** argv) {
+		   char* pz = pathfind( getenv( "PATH" ), "sh", "x" );
+		   return (pz == 0) ? 1 : 0;
+		}
+		_EOF_;
+
+    doc =
+    "Not all systems have pathfind(3).  See if we need to substitute.\n"
+    "To make this work, you have to do horrible things.  See the doc\n"
+    "for AG_CHECK_STRCSPN.";
+};
+
+test = {
+    name   = posix_regcomp;
+    type   = run;
+    check  = "POSIX compliant regcomp()/regexec()";
+    action = define;
+    code   = <<-  _EOF_
+		#include <sys/types.h>
+		#include <regex.h>
+		int main() {
+		  int flags = REG_EXTENDED|REG_ICASE|REG_NEWLINE;
+		  regex_t  re;
+		  if (regcomp( &re, "^.*$", flags ) != 0)
+		    return 1;
+		  return regcomp( &re, "|no.*", flags ); }
+		_EOF_;
+
+    doc =
+    "Check that the POSIX compliant regular expression compiler\n"
+    "is available in the POSIX specified manner, and it works.\n"
+    "If it fails, we have a backup -- use gnu-regex.";
+};
+
+test = {
+    name   = posix_sysinfo;
+    type   = run;
+    check  = "sysinfo(2) is POSIX";
+    action = define;
+    code   = <<- _EOF_
+		#include <sys/systeminfo.h>
+		int main() { char z[ 256 ];
+		long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
+		return (sz > 0) ? 0 : 1; }
+		_EOF_;
+    doc =
+    "Check that the POSIX compliant sysinfo(2) call works properly.\n"
+    "Linux has its own weirdo alternative.";
+};
+
+test = {
+    name   = strcspn;
+    type   = run;
+    check  = "strcspn matches prototype and works";
+    bad-do =
+       'COMPATOBJ="$COMPATOBJ strcspn.lo"';
+
+    code   = <<-  _EOF_
+		#include <string.h>
+		int main (int argc, char** argv) {
+		   char zRej[] = "reject";
+		   char zAcc[] = "a-ok-eject";
+		   return strcspn( zAcc, zRej ) - 5;
+		}
+		_EOF_;
+    action = define;
+
+    doc =
+    "Not all systems have strcspn(3).  See if we need to substitute.\n"
+    "To make this work, you have to do horrible things.  In one of your\n"
+    "Makefile.am files, you must make an explicit rule to make this object.\n"
+    "It should look like this:\n"
+    "  strcspn.lo : $(top_srcdir)/compat/strcspn.c\n"
+    "      $(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c\n"
+    "and you must include ``@COMPATOBJ@'' in a LIBADD somewhere and,\n"
+    "finally, you must add another artificial dependency, something like:\n"
+    "  makeshell.lo : genshell.c @COMPATOBJ@\n"
+    "It is all pretty horrific, but I have found nothing else that works.";
+};
+
+test = {
     name  = strftime;
     type  = run;
     check = "strftime() works";
+    action = define;
     code  = <<-  _EOF_
 		#include <time.h>
 		char t_buf[ 64 ];
@@ -57,27 +156,11 @@ test = {
 };
 
 test = {
-    name  = posix_regcomp;
-    type  = run;
-    check = "POSIX compliant regcomp()/regexec()";
-    code  = <<-  _EOF_
-		#include <sys/types.h>
-		#include <regex.h>
-		int main() {
-		  regex_t  re;
-		  return regcomp( &re, "^.*$", REG_EXTENDED|REG_ICASE|REG_NEWLINE ); }
-		_EOF_;
-
-    doc =
-    "Check that the POSIX compliant regular expression compiler\n"
-    "is available in the POSIX specified manner, and it works.";
-};
-
-test = {
-    name  = sys_siglist;
-    type  = run;
-    check = "there is a global text array sys_siglist";
-    code  = <<-  _EOF_
+    name   = sys_siglist;
+    type   = run;
+    check  = "there is a global text array sys_siglist";
+    action = define, substitute;
+    code   = <<-  _EOF_
 		#include <signal.h>
 		int main() {
 		  const char* pz = sys_siglist[1];
@@ -90,25 +173,11 @@ test = {
 };
 
 test = {
-    name  = posix_sysinfo;
-    type  = run;
-    check = "sysinfo(2) is POSIX";
-    code  = <<- _EOF_
-		#include <sys/systeminfo.h>
-		int main() { char z[ 256 ];
-		long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
-		return (sz > 0) ? 0 : 1; }
-		_EOF_;
-    doc =
-    "Check that the POSIX compliant sysinfo(2) call works properly.\n"
-    "Linux has its own weirdo alternative.";
-};
-
-test = {
-    name  = uname_syscall;
-    type  = run;
-    check = "uname(2) is POSIX";
-    code  = <<- _EOF_
+    name   = uname_syscall;
+    type   = run;
+    check  = "uname(2) is POSIX";
+    action = define;
+    code   = <<- _EOF_
 		#include <sys/utsname.h>
 		int main() { struct utsname unm;
 		return uname( &unm ); }

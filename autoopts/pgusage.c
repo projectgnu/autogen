@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 2.7 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: pgusage.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -63,9 +63,10 @@ tePagerState pagerState = PAGER_STATE_INITIAL;
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
  */
-DEF_PROC_2( void doPagedUsage,
-            tOptions*, pOptions,
-            tOptDesc*, pOD )
+void
+doPagedUsage( pOptions, pOD )
+    tOptions* pOptions;
+    tOptDesc* pOD;
 {
     static pid_t     my_pid;
     char zPageUsage[ 1024 ];
@@ -135,8 +136,10 @@ DEF_PROC_2( void doPagedUsage,
         break;
     }
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * pgusage.c ends here */

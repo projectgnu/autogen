@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.24 2001/09/21 03:09:48 bkorb Exp $
+ *   $Id: opts.def,v 3.0 2001/12/09 19:46:01 bkorb Exp $
  */
 
 /*

@@ -1649,6 +1649,10 @@ For example:
 homerc = "$$/../share/autogen";
 @end example
 
+@noindent
+will cause the AutoOpts library to look in the normal autogen datadir
+for an initialization file.
+
 The initialization files are processed in the order they are specified
 by the @code{homerc} attribute, so that each new file will normally
 override the settings of the previous files.  A few options may be
@@ -1662,10 +1666,6 @@ Further initialization file processing can be @strong{suppressed} by
 specifying @code{--no-load-opts} on the command line, or
 @code{PROGRAM_LOAD_OPTS=no} in the environment, or @code{no-load-opts}
 in any of the specified @code{homerc} files.
-
-@noindent
-will cause the AutoOpts library to look in the normal autogen datadir
-for an initialization file.
 
 @node saving rc files
 @unnumberedsubsec saving rc files
@@ -2183,15 +2183,20 @@ definition of a flag, may appear only once.
 @item value
 The flag character to specify for traditional option flags.  e.g. @code{-L}.
 
+@cindex max
+@item max
+Maximum occurrence count (invalid if @var{disable} present).
+
 @cindex min
 @item min
 Minimum occurrence count.  If present, then the option @strong{must}
 appear on the command line.  Preset values do not count towards the
 minimum occurrence count.
 
-@cindex max
-@item max
-Maximum occurrence count (invalid if @var{disable} present).
+@cindex must-set
+@item must-set
+If an option must be specified, but it need not be specified on
+the command line, then specify this attribute for the option.
 
 @cindex enable
 @item enable
@@ -2331,7 +2336,7 @@ completion, so they @strong{do} have an effect on the processing
 of the remaining options :-).
 
 @cindex immed_disable
-@item immed_disable
+@item immed-disable
 Use this option attribute to specify that the disabled form of the option
 is to be processed immediately.  The @code{load-opts} option is so
 specified so that the @code{--no-load-opts} command line option will
@@ -2499,8 +2504,8 @@ The first two attributes interact with the @code{documentation} and
 @code{settable} attributes, @xref{Special Option Handling}.
 
 @table @samp
-@cindex flag_code
-@item flag_code
+@cindex flag-code
+@item flag-code
 statements to execute when the option is encountered.
 The generated procedure will look like this:
 
@@ -2515,8 +2520,8 @@ doOpt<name>( tOptions* pOptions, tOptDesc* pOptDesc )
 Only certain fields within the @code{tOptions} and @code{tOptDesc}
 structures may be accessed.  @xref{Option Processing Data}.
 
-@cindex extract_code
-@item extract_code
+@cindex extract-code
+@item extract-code
 This is effectively identical to @code{flag_code}, except that the
 source is kept in the output file instead of the definitions file.
 A long comment is used to demarcate the code.  You must not modify
@@ -2524,21 +2529,21 @@ that marker.  @i{Before} regenerating the option code file,
 the old file is renamed from MUMBLE.c to MUMBLE.c.save.  The template
 will be looking there for the text to copy into the new output file.
 
-@cindex call_proc
-@item call_proc
+@cindex call-proc
+@item call-proc
 external procedure to call when option is encountered.  The calling
 sequence must conform to the sequence defined above for the generated
 procedure, @code{doOpt<name>}.  It has the same restrictions
 regarding the fields within the structures passed in as arguments.
 @xref{Option Processing Data}.
 
-@cindex flag_proc
-@item flag_proc
+@cindex flag-proc
+@item flag-proc
 Name of another option whose @code{flag_code} can be executed
 when this option is encountered.
 
-@cindex stack_arg
-@item stack_arg
+@cindex stack-arg
+@item stack-arg
 Call a special library routine to stack the option's arguments.  Special
 macros in the interface file are provided for determining how many of
 the options were found (@code{STACKCT_OPT(NAME)}) and to obtain a

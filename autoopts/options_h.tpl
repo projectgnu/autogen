@@ -1,13 +1,13 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.30 2001/09/23 01:30:02 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -85,8 +85,9 @@
 #define OPTST_IMM          0x10000  /* process option on first pass      */
 #define OPTST_DISABLE_IMM  0x20000  /* process disablement on first pass */
 #define OPTST_OMITTED      0x40000  /* compiled out of program           */
+#define OPTST_MUST_SET     0x80000  /* must be set or pre-set            */
 
-#define OPTST_PERSISTENT   0xFFF00  /* mask of flags that do not change  */
+#define OPTST_PERSISTENT  0xFFFF00  /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)
@@ -116,6 +117,7 @@
 #define OPTPROC_ENVIRON     0x0100 /* check environment?              */
 #define OPTPROC_NO_ARGS     0x0200 /* Disallow remaining arguments    */
 #define OPTPROC_ARGS_REQ    0x0400 /* Require arguments after options */
+#define OPTPROC_REORDER     0x0800 /* reorder argunemts after options */
 
 #define STMTS(s)  do { s; } while (0)
 

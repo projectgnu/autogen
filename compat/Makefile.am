@@ -10,12 +10,12 @@
 ## Last Modified:    Thu Jul 29 08:30:10 1999				      
 ##            by:    Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.10 2000/06/22 16:32:47 bkorb Exp $
+## $Id: Makefile.am,v 3.0 2001/12/09 19:46:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 EXTRA_DIST	= bootstrap.dir compat.h gnu-regex.c gnu-regex.h \
-		libgen.h ndir.h pathfind.c strftime.c \
+		libgen.h ndir.h pathfind.c strftime.c strcspn.c \
 		strsignal.c strsignal.def strsignal.h strsignal.tpl
 
 GEN_SRC    = strsignal.h
@@ -37,6 +37,5 @@ strsignal.h : strsignal.def strsignal.tpl
 	   echo "ERROR: $(srcdir)/$@ has been corrupted"; \
 	  fi; \
 	fi
-
 
 # Makefile.am ends here

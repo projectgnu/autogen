@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.9 2001/12/01 20:26:20 bkorb Exp $
+## $Id: Makefile.am,v 3.0 2001/12/09 19:46:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = index.test option.test subblock.test

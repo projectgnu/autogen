@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/06/24 00:47:56 $
+# Last Modified:     $Date: 2001/12/09 19:44:06 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: guile.test,v 1.6 2001/06/24 00:47:56 bkorb Exp $
+# $Id: guile.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

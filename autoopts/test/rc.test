@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.7 2001/10/13 22:16:33 bkorb Exp $
+# $Id: rc.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

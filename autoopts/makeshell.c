@@ -1,13 +1,13 @@
 
 /*
- *  $Id: makeshell.c,v 2.30 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: makeshell.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -384,7 +384,7 @@ STATIC void  emitSetup( tOptions* pOpts );
 STATIC char* loadTrailer( const char* );
 
 
-    void
+void
 putShellParse( tOptions* pOpts )
 {
     /*
@@ -475,7 +475,7 @@ putShellParse( tOptions* pOpts )
 }
 
 
-    STATIC void
+STATIC void
 textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 {
     int  nlHoldCt = 0;
@@ -568,7 +568,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 }
 
 
-    STATIC void
+STATIC void
 emitUsage( tOptions* pOpts )
 {
     char     zTimeBuf[ 128 ];
@@ -633,7 +633,7 @@ emitUsage( tOptions* pOpts )
 }
 
 
-    STATIC void
+STATIC void
 emitSetup( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -664,7 +664,7 @@ emitSetup( tOptions* pOpts )
 }
 
 
-    STATIC void
+STATIC void
 printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doVersion)
@@ -715,7 +715,7 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-    STATIC void
+STATIC void
 printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doLoadOpt) {
@@ -734,7 +734,7 @@ printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-    STATIC void
+STATIC void
 emitFlag( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -756,7 +756,7 @@ emitFlag( tOptions* pOpts )
 }
 
 
-    STATIC void
+STATIC void
 emitLong( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -896,7 +896,7 @@ emitLong( tOptions* pOpts )
 }
 
 
-    char*
+char*
 setShell( char** ppzData, char* pzEndMarker )
 {
     char* pz;
@@ -977,7 +977,7 @@ setShell( char** ppzData, char* pzEndMarker )
 }
 
 
-    STATIC char*
+STATIC char*
 loadTrailer( const char* pzFile )
 {
     FILE* fp;
@@ -1048,7 +1048,7 @@ loadTrailer( const char* pzFile )
 }
 
 
-    void
+void
 genshelloptUsage( tOptions*  pOptions, int exitCode )
 {
     /*
@@ -1135,8 +1135,10 @@ int putShellParse( pOpts )
     exit( EXIT_FAILURE );
 }
 #endif
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * makeshell.c ends here */

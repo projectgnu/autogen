@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.6 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: enumeration.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -60,11 +60,12 @@
 
 tSCC*  pz_fmt;
 
-DEF_PROC_4( static void enumError,
-            tOptions*, pOpts,
-            tOptDesc*, pOD,
-            tCC**, paz_names,
-            int, name_ct )
+static void
+enumError( pOpts, pOD, paz_names, name_ct )
+    tOptions* pOpts;
+    tOptDesc* pOD;
+    tCC**     paz_names;
+    int       name_ct;
 {
     if (pOpts != NULL)
         fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
@@ -88,11 +89,12 @@ DEF_PROC_4( static void enumError,
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
  */
-DEF_PROC_4( char* optionEnumerationVal,
-            tOptions*, pOpts,
-            tOptDesc*, pOD,
-            tCC**, paz_names,
-            int, name_ct )
+char*
+optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
+    tOptions* pOpts;
+    tOptDesc* pOD;
+    tCC**     paz_names;
+    int       name_ct;
 {
     size_t  len;
     int     idx;
@@ -146,8 +148,10 @@ DEF_PROC_4( char* optionEnumerationVal,
      */
     return (char*)res;
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * pgusage.c ends here */

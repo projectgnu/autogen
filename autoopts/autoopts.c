@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.36 2001/12/01 20:26:20 bkorb Exp $
+ *  $Id: autoopts.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -469,9 +469,10 @@ STATIC tSuccess findOptDesc( pOpts, pOptState )
  *  all the state in the state argument so that the option can be skipped
  *  without consequence (side effect).
  */
-DEF_PROC_2( STATIC tSuccess nextOption,
-            tOptions*,   pOpts,
-            tOptState*,  pOptState )
+STATIC tSuccess
+nextOption( pOpts, pOptState )
+    tOptions*   pOpts;
+    tOptState*  pOptState;
 {
     tSuccess res;
 
@@ -854,11 +855,12 @@ doImmediateOpts( pOpts )
 }
 
 
-DEF_PROC_4( STATIC void loadOptionLine,
-            tOptions*,  pOpts,
-            tOptState*, pOS,
-            char*,      pzLine,
-            tDirection, direction )
+STATIC void
+loadOptionLine( pOpts, pOS, pzLine, direction )
+    tOptions*  pOpts;
+    tOptState* pOS;
+    char*      pzLine;
+    tDirection direction;
 {
     /*
      *  Strip off the first token on the line.
@@ -983,10 +985,11 @@ DEF_PROC_4( STATIC void loadOptionLine,
  *
  *  Load a file containing presetting information (an RC file).
  */
-DEF_PROC_3( STATIC void filePreset,
-            tOptions*,    pOpts,
-            const char*,  pzFileName,
-            int,          direction )
+STATIC void
+filePreset( pOpts, pzFileName, direction )
+    tOptions*     pOpts;
+    const char*   pzFileName;
+    int           direction;
 {
     typedef enum { SEC_NONE, SEC_LOOKING, SEC_PROCESS } teSec;
     teSec   sec     = SEC_NONE;
@@ -1444,9 +1447,9 @@ STATIC int checkConsistency( pOpts )
  *  This is a user callable routine for setting options from, for
  *  example, the contents of a file that they read in.
  */
-DEF_PROC_2( void optionLoadLine,
-            tOptions*,  pOpts,
-            char*,      pzLine )
+void optionLoadLine( pOpts, pzLine )
+    tOptions*  pOpts;
+    char*      pzLine;
 {
     tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
     loadOptionLine( pOpts, &st, pzLine, DIRECTION_PROCESS );
@@ -1459,9 +1462,9 @@ DEF_PROC_2( void optionLoadLine,
  *  This is callable from the option descriptor.
  *  It is referenced when homerc files are enabled.
  */
-DEF_PROC_2( void doLoadOpt,
-            tOptions*,  pOpts,
-            tOptDesc*,  pOptDesc )
+void doLoadOpt( pOpts, pOptDesc )
+    tOptions*  pOpts;
+    tOptDesc*  pOptDesc;
 {
     /*
      *  IF the option is not being disabled,
@@ -1606,6 +1609,7 @@ optionProcess( pOpts, argCt, argVect )
 
     return pOpts->curOptIdx;
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"

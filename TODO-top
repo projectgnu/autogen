@@ -27,20 +27,11 @@
    `options.pzProgName' (aka 'basename(argv[0])').
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
-** add a homerc attribute to getdefs options.
+
 ** devise a clean way for multiple flavors of definition input:
    XML
    CGI-POST
    different documentation extractors, akin to "getdefs"
-** What if getdefs presumed that any entries that followed
-   the last named entry were additional copies of the last named entry.
-   viz.,  --subblock=foo=bar
-   
-   and:     * foo: one, two, three
-   
-   yields:  foo = { bar='one', 'two', 'three'; };
-   
-   *that* could be done without disrupting the world.
 
 ** How about writing a function, (set-cl-option "text")
    grep for ``/\*=gfunc [a-z]'' in the sources for an example

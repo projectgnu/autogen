@@ -1,3 +1,23 @@
+2001-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcDef.c(parseMacroArgs): run argument names through
+	strtransform();
+	* autoopts/Makefile.am(config-opts.def):obsolete
+	(@COMPATOBJ@): new config substitution
+	(strcspn.lo): configurable object
+	(pathfind.lo): configurable object
+	* autoopts/*: removed DEF_PROC_* cruft + updated copyright
+	* autoopts/optcode.tpl(reorder-opts): new global option attribute
+	* autoopts/options.h(OPTST_MUST_SET): new option attribute
+	(OPTPROC_REORDER): new option processing attribute
+	* autoopts/optlib.tpl(must-set): new option attribute
+	(option proc): arg_range is invalid for doc option
+	* autoopts/stack.c: we always HAVE_POSIX_REGCOMP now
+	* autoopts/stdoptions.def: add copyright
+	* autoopts/usage.c: we always HAVE_PATHFIND now.
+	Alphabatized formatting strings.
+	* autoopts/version.c: update copyright and move to top of file
+
 2001-12-01  Bruce Korb  <bkorb@gnu.org>
 
 	* getdefs/*: largely reworked to implement option extraction from

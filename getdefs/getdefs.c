@@ -1,12 +1,12 @@
 /*
- *  $Id: getdefs.c,v 2.31 2001/12/01 20:26:20 bkorb Exp $
+ *  $Id: getdefs.c,v 3.0 2001/12/09 19:46:06 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/12/01 20:26:20 $
+ *  Last Modified:     $Date: 2001/12/09 19:46:06 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 

@@ -8,7 +8,7 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.19 2001/10/13 22:16:33 bkorb Exp $
+## $Id: Makefile.am,v 3.0 2001/12/09 19:44:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test cond.test errors.test guile.test handler.test \

@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <bkorb@gnu.org>
 # Maintainer:	     Bruce Korb <bkorb@gnu.org>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2001/12/01 20:26:20 $
+# Last Modified:  $Date: 2001/12/09 19:46:07 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: index.test,v 1.2 2001/12/01 20:26:20 bkorb Exp $
+# $Id: index.test,v 3.0 2001/12/09 19:46:07 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2000/09/30 15:09:43 $
+# Last Modified:     $Date: 2001/12/09 19:44:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: directives.test,v 1.3 2000/09/30 15:09:43 bkorb Exp $
+# $Id: directives.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

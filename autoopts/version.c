@@ -1,15 +1,14 @@
 
-/*
- *  $Id: version.c,v 2.7 2001/10/01 23:51:33 bkorb Exp $
+/*  $Id: version.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
-/*
- *  Automated Options copyright 1992-2001 Bruce Korb
- *
- *  Automated Options is free software.
+static const char zAOV[] =
+    "Automated Options version %s, copyright (c) 1999-2001 Bruce Korb\n";
+
+/*  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
  *  GNU General Public License, as published by the Free Software
  *  Foundation; either version 2, or (at your option) any later version.
@@ -54,19 +53,16 @@
 
 #include "autoopts.h"
 
-tSCC zAO[] =
-    "Automated Options version %s, copyright (c) 1999-2001 Bruce Korb\n";
-
 tSCC zBadArg[] =
 "ERROR: version option argument '%c' invalid.  Use:\n\
 \t'v' - version only\n\
 \t'c' - version and copyright\n\
 \t'n' - version and copyright notice\n";
 
-
-DEF_PROC_2( void doVersion,
-            tOptions*,  pOpts,
-            tOptDesc*,  pOD )
+void
+doVersion( pOpts, pOD )
+    tOptions*  pOpts;
+    tOptDesc*  pOD;
 {
     char swCh;
 
@@ -91,7 +87,7 @@ DEF_PROC_2( void doVersion,
             fputs( pOpts->pzCopyright, stdout );
             fputc( '\n', stdout );
         }
-        printf( zAO, optionVersion() );
+        printf( zAOV, optionVersion() );
         break;
 
     case 'n':
@@ -107,7 +103,7 @@ DEF_PROC_2( void doVersion,
             fputc( '\n', stdout );
         }
 
-        printf( zAO, optionVersion() );
+        printf( zAOV, optionVersion() );
         break;
 
     default:
@@ -117,8 +113,10 @@ DEF_PROC_2( void doVersion,
 
     exit( EXIT_SUCCESS );
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * version.c ends here */

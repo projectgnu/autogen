@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     $Date: 2001/07/15 23:07:21 $
+# Last Modified:     $Date: 2001/12/09 19:46:03 $
 #            by:     Gary V. Vaughan <gary@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.36 2001/07/15 23:07:21 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.0 2001/12/09 19:46:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -167,7 +167,7 @@ ${DIE}
 doit ()
 {
   if test "x$1" != x: ; then 
-    echo "$@"
+    echo "RUN:  $@"
     eval "$@"
   fi
 }
@@ -227,7 +227,7 @@ _EOF_
     fi
 
     doit $AUTOCONF
-  )
+  ) || exit 1
 done
 
 # Execute (NOTE: not source!) any bootstrap.dir scripts we find in

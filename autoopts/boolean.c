@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 2.2 2000/10/27 15:18:19 bkorb Exp $
+ *  $Id: boolean.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -62,9 +62,10 @@
  *  The value is true, unless it starts with 'n' or 'f' or "#f" or
  *  it is an empty string or it is a number that evaluates to zero
  */
-DEF_PROC_2( void optionBooleanVal,
-            tOptions*, pOpts,
-            tOptDesc*, pOD )
+void
+optionBooleanVal( pOpts, pOD )
+    tOptions* pOpts;
+    tOptDesc* pOD;
 {
     long  val;
     char* pz;
@@ -94,5 +95,6 @@ DEF_PROC_2( void optionBooleanVal,
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * pgusage.c ends here */

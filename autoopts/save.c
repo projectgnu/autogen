@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.11 2001/09/21 03:09:48 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -60,7 +60,7 @@ tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
 STATIC char*
 findDirName( pOpts )
-	tOptions*  pOpts;
+    tOptions*  pOpts;
 {
     char*  pzDir;
 
@@ -134,7 +134,7 @@ findDirName( pOpts )
 
 STATIC char*
 findFileName( pOpts )
-	tOptions*  pOpts;
+    tOptions*  pOpts;
 {
     char*  pzDir;
     tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
@@ -243,7 +243,7 @@ findFileName( pOpts )
 
 STATIC void
 printEntry( fp, p, pzLA )
-	FILE*      fp;
+    FILE*      fp;
     tOptDesc*  p;
     char*      pzLA;
 {
@@ -294,8 +294,9 @@ printEntry( fp, p, pzLA )
 }
 
 
-DEF_PROC_1( void optionSave,
-            tOptions*, pOpts )
+void
+optionSave( pOpts )
+    tOptions* pOpts;
 {
     char*  pzFName;
 
@@ -401,5 +402,6 @@ DEF_PROC_1( void optionSave,
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * save.c ends here */

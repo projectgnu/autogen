@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2001/09/21 03:09:48 $
+# Last Modified:     $Date: 2001/12/09 19:44:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: snarf.test,v 1.2 2001/09/21 03:09:48 bkorb Exp $
+# $Id: snarf.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

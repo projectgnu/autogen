@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.12 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -11,7 +11,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-1999 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -102,10 +102,11 @@ static unsigned char charmap[] = {
 };
 
 
-DEF_PROC_3( int strneqvcmp,
-            const char*, s1,
-            const char*, s2,
-            size_t,      ct )
+int
+strneqvcmp( s1, s2, ct )
+    const char* s1;
+    const char* s2;
+    size_t      ct;
 {
     for (; ct != 0; --ct) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -123,9 +124,10 @@ DEF_PROC_3( int strneqvcmp,
 }
 
 
-DEF_PROC_2( int streqvcmp,
-            const char*, s1,
-            const char*, s2 )
+int
+streqvcmp( s1, s2 )
+    const char* s1;
+    const char* s2;
 {
     for (;;) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -141,10 +143,11 @@ DEF_PROC_2( int streqvcmp,
 }
 
 
-DEF_PROC_3( void streqvmap,
-            int,  chFrom,
-            int,  chTo,
-            int,  ct )
+void
+streqvmap( chFrom, chTo, ct )
+    int  chFrom;
+    int  chTo;
+    int  ct;
 {
     if (ct == 0) {
         ct = sizeof( charmap ) - 1;
@@ -171,8 +174,9 @@ DEF_PROC_3( void streqvmap,
 }
 
 
-DEF_PROC_1( void strequate,
-            const char*, s )
+void
+strequate( s )
+    const char* s;
 {
     if ((s != (char*)NULL) && (*s != NUL)) {
         unsigned char equiv = (unsigned)*s;
@@ -182,16 +186,19 @@ DEF_PROC_1( void strequate,
 }
 
 
-DEF_PROC_2( void strtransform,
-            char*, d,
-            const char*, s )
+void
+strtransform( d, s )
+    char*       d;
+    const char* s;
 {
     do  {
         *(d++) = (char)charmap[ (unsigned)*s ];
     } while (*(s++) != NUL);
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * streqvcmp.c ends here */

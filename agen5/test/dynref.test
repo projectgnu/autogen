@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/05/09 05:27:55 $
+# Last Modified:     $Date: 2001/12/09 19:44:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: dynref.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# $Id: dynref.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,13 +32,13 @@ DEFINE nest         =][=
 
   FOR nesting        =][=
     IF (first-for?)
-=]The un-nested value is:  [=value=].[=
+=]The un-nested value is:  [=val_u=].[=
     ENDIF           =][=
   ENDFOR            =][=
 
 ENDDEF              =][=
 
-nest value = "hidden value"
+nest Val-u = "hidden value"
 
 =]
 _EOF_
@@ -63,7 +63,8 @@ _EOF_
 
 echo $AGEXE $testname.def
 $AGEXE $testname.def || failure $AGEXE failed
-cmp -s $testname.test $testname.out || failure unexpected output
+cmp -s $testname.test $testname.out || \
+  failure "`diff $testname.test $testname.out`"
 
 cleanup
 # end of dynref.test

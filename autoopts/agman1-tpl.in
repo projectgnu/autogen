@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/12/01 20:26:20 $
+## Last Modified:   $Date: 2001/12/09 19:43:58 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.20 2001/12/01 20:26:20 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.0 2001/12/09 19:43:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 :+]

@@ -1,12 +1,23 @@
-[= AutoGen5 template lsm=LSM =]
-Begin3
-Title:          AutoGen - [=prog_title=]
+[= AutoGen5 template lsm=LSM
+
+=][=
+
+;; Submit this (with your software package) via ftp to:
+;; ftp://ibiblio.org/incoming/Linux
+
+(out-push-new "autogen.lsm")
+
+=]
+Begin4
+Title:          AutoGen
 
 Version:        [=version=]
 
-Entered-date:   [=`date +%d%b%y`=]
+Entered-date:   [=`date +%Y-%m-%d`=]
 
-Description:    AutoGen is a tool for automatically generating
+Description:    AutoGen - [=prog_title=]
+
+                AutoGen is a tool for automatically generating
                 arbitrary text files that contain repetitive text
                 with varying substitutions.  This is particularly
                 useful if you have several types of repetitive
@@ -14,42 +25,32 @@ Description:    AutoGen is a tool for automatically generating
                 other.  The goal is to try to simplify the process
                 of maintaining repetitive program text.
 
-                Included with autogen is a tool that virtually
-                eliminates the hassle of processing options,
-                keeping usage text up to date and so on.  This
-                package allows you to specify several program
-                attributes, innumerable options and option
-                attributes, then it produces all the code
-                necessary to parse and handle the command line and
-                initialization file options.
-                For a more complete description, @xref{features}.
-
-Keywords:       macro, m4, cpp, code generation, preprocessor,
-                options, getopts
+Keywords:       macro, m4, preprocessor, source generator,
+                command line option parser
 
 Author:         bkorb@gnu.org (Bruce Korb)
-                gary@oranda.demon.co.uk (Gary V. Vaughan)
 
 Maintained-by:  bkorb@gnu.org (Bruce Korb)
 
-Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
+Primary-site:   sunsite.unc.edu /pub/Linux/devel
                 [= `
 cd $top_builddir
 set -- autogen*.gz
 if [ $# -gt 1 ]
 then shift \`expr $# - 1\` ; fi
 if [ ! -f $1 ]
-then ct=810
+then ct=1025
 else ct="\`expr \\\\( \\\`wc -c < $1\\\` + 1023 \\\\) / 1024\`"
 fi
-echo $ct KB $1
+echo ${ct}K $1
 ` =]
+                1K autogen.lsm
 
-Alternate-site:
+Alternate-site: ftp://ftp.gnu.org/pub/autogen
 
-Original-site:
+Original-site:  http://autogen.sourceforge.net
 
-Platforms:      gunzip and ANSI-C
+Platforms:      gunzip, Guile and ANSI-C
 
 Copying-policy: GPL and LGPL
 
