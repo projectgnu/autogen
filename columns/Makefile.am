@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Wed Oct 21 07:11:19 1998
+## Last Modified:   Wed Feb 24 11:03:51 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 1999/02/24 18:53:00 bkorb Exp $
+## $Id: Makefile.am,v 1.6 1999/02/24 19:04:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -33,6 +33,7 @@ all : gen
 columns.texi : columns.tpl opts.def columns
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -T columns.tpl \
+		-L $(top_srcdir)/columns \
 		$(top_srcdir)/columns/opts.def
 
 columns.menu : opts.def

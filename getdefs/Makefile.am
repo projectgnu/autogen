@@ -7,10 +7,10 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Wed Oct 21 07:13:30 1998
+## Last Modified:   Wed Feb 24 11:01:57 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.8 1999/02/24 18:52:36 bkorb Exp $
+## $Id: Makefile.am,v 2.9 1999/02/24 19:04:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -33,6 +33,7 @@ all : gen
 getdefs.texi : getdefs.tpl opts.def getdefs
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -T getdefs.tpl \
+		-L $(top_srcdir)/getdefs \
 		$(top_srcdir)/getdefs/opts.def
 
 getdefs.menu : opts.def
