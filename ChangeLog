@@ -1,3 +1,14 @@
+2004-05-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/aginfo3.tpl(lib-name): handle the library name consistently
+	* autoopts/bootstrap.dir(funcs.def): specify the library name
+	* doc/autogen.texi(generated main): doc the new preferred method
+	* pkg/libopts/mklibsrc.sh(SOURCE DIRECTORY): get file list from
+	authoritative source rather than hard-wiring it.  (Thanks to
+	Rodolfo Schulz de Lima)
+	* doc/Makefile.am(autogen.def): Make sure all the utilities have been
+	built before reconstructing the documentation.  It uses them.
+
 2004-04-03  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: Some platforms put all float functions in -lm
@@ -23,7 +34,7 @@
 	* autoopts/optmain.tpl: more for the above
 	* autoopts/test/argument.test: accommodate changes to templates
 	* autoopts/test/handler.test: ditto
-	* compat/strsignal.tpl: put strings into single globeal
+	* compat/strsignal.tpl: put strings into single global
 	* compat/strsignal.c: use new mechanism
 	* doc/autogen.texi: doc the new main procedure stuff.
 
