@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.17 2000/03/05 20:58:12 bruce Exp $
+## $Id: Makefile.am,v 1.18 2000/03/05 21:19:19 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -54,6 +54,8 @@ FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
 EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 		expString.c $(FUNCLIST)
+
+YFLAGS = -d
 
 all : AutoGen
 
@@ -106,7 +108,7 @@ autogen.1 : opts.def
 ## defParse.c GEN-RULE
 defParse.c defParse.h : defParse.y
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	YACC="$(YACC)" sh ./bootstrap.dir $@
+	YACC="$(YACC) $(YFLAGS)" sh ./bootstrap.dir $@
 
 gen : $(GEN_LIST)
 
