@@ -88,7 +88,7 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   AC_CHECK_TYPE(wint_t,  unsigned int)
   AC_CHECK_TYPE(long double)
   AC_CHECK_TYPE(intmax_t)
-  if [ X$ac_cv_c_long_double != Xno ] ; then
+  if test X$ac_cv_c_long_double != Xno ; then
     AC_CHECK_FUNCS(ldexpl)
   fi
   AC_TYPE_SIZE_T
