@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.13 1999/07/07 19:42:33 bkorb Exp $
+ *   $Id: opts.def,v 2.14 1999/09/29 16:00:21 bkorb Exp $
  */
 
 /*
@@ -270,6 +270,8 @@ with everything up through the first sequence of asterisks deleted
 on every line.";
 
 
+/* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */
+
 prog_man_descrip =
 "This program extracts \\fBAutoGen\\fP definitions from a list of source files.
 Definitions are delimited by `/*=<entry-type> <entry-name>
@@ -282,9 +284,21 @@ a definition of the following form:
         ...
     };
 
-The ellipsis '...' is filled in by text found between the two delimiters,
+The ellipsis `...' is filled in by text found between the two delimiters,
 with everything up through the first sequence of asterisks deleted
-on every line.";
+on every line.  Additionally, if the `<entry-name>' is followed
+by a comma, the word `if' and a name `if_name', then the above entry
+will appear as:
+
+@format
+    #ifdef if_name
+    #line nnn \"source-file-name\"
+    entry_type = @{
+        name = entry_name;
+        ...
+    @};
+    #endif
+@end format";
 
 man_doc = '.SH "SEE ALSO"
 This program is documented more fully in the Getdefs section
@@ -292,6 +306,8 @@ of the Add-On chapter in the
 .IR AutoGen
 Info system documentation.';
 
+
+/* * * * * INFO DOC DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
 prog_info_descrip =
 "This program extracts AutoGen definitions from a list of source files.
@@ -306,6 +322,18 @@ From that, this program creates a definition of the following form:
     @};
 @end format
 
-The ellipsis '...' is filled in by text found between the two delimiters,
+The ellipsis `...' is filled in by text found between the two delimiters,
 with everything up through the first sequence of asterisks deleted
-on every line.";
+on every line.  Additionally, if the `<entry-name>' is followed
+by a comma, the word `if' and a name `if_name', then the above entry
+will appear as:
+
+@format
+    #ifdef if_name
+    #line nnn \"source-file-name\"
+    entry_type = @{
+        name = entry_name;
+        ...
+    @};
+    #endif
+@end format";
