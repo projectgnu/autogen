@@ -12,7 +12,5 @@
 
 *  Possibilities for the (distant) future:
 
-** implement [= FOR x IN a, b, c, ... =]
-
 ** write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.
