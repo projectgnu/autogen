@@ -1,6 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.8 2005/02/13 16:17:18 bkorb Exp $
+ *  $Id: load.c,v 4.9 2005/02/14 14:50:10 bkorb Exp $
+ *  Time-stamp:      "2005-02-14 06:49:22 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -232,6 +233,68 @@ optionMakePath(
 }
 
 
+static char*
+findArg( char* pzTxt, load_mode_t mode )
+{
+    tSCC zBrk[] = " \t:=";
+    char* pzEnd = strpbrk( pzTxt, zBrk );
+    int   space_break;
+
+    /*
+     *  Not having an argument to a configurable name is okay.
+     */
+    if (pzEnd == NULL)
+        return pzTxt + strlen(pzTxt);
+
+    /*
+     *  If we are keeping all whitespace, then the value starts with the
+     *  character that follows the end of the configurable name, regardless
+     *  of which character caused it.
+     */
+    if (mode == LOAD_KEEP) {
+        *(pzEnd++) = NUL;
+        return pzEnd;
+    }
+
+    /*
+     *  If the name ended on a white space character, remember that
+     *  because we'll have to skip over an immediately following ':' or '='
+     *  (and the white space following *that*).
+     */
+    space_break = isspace(*pzEnd);
+    *(pzEnd++) = NUL;
+    while (isspace(*pzEnd))  pzEnd++;
+    if (space_break) {
+        if ((*pzEnd == ':') || (*pzEnd == '='))
+            while (isspace(*++pzEnd))   ;
+    }
+
+    /*
+     *  Trim off trailing white space
+     */
+    {
+        char* pz = pzEnd + strlen(pzEnd);
+        while (isspace(pz[-1]) && (pz > pzEnd))  pz--;
+        *pz = NUL;
+
+        if ((mode == LOAD_UNCOOKED) || (pzEnd == pz))
+            return pzEnd;
+
+        if ((pz[-1] != '"') && (pz[-1] != '\''))
+            return pzEnd;
+    }
+    if ((*pzEnd != '"') && (*pzEnd != '\''))
+        return pzEnd;
+
+    /*
+     *  If we got to here, the text starts and ends with a quote character and
+     *  we are cooking our quoted strings.
+     */
+    (void)ao_string_cook( pzEnd, NULL );
+    return pzEnd;
+}
+
+
 /*
  *  Load an option from a block of text.  The text must start with the
  *  configurable/option name and be followed by its associated value.
@@ -246,44 +309,16 @@ loadOptionLine(
     tDirection  direction,
     load_mode_t load_mode )
 {
-    /*
-     *  Strip off the first token on the line.
-     *  No quoting, space separation only.
-     */
+    while (isspace( *pzLine ))  pzLine++;
+
     {
-        char* pz = pzLine;
-        while (  (! isspace( *pz ))
-              && (*pz != NUL)
-              && (*pz != '=' )
-              && (*pz != ':' )  ) pz++;
+        char* pzArg = findArg( pzLine, load_mode );
 
-        /*
-         *  IF we exited because we found a character other than NUL
-         *  THEN terminate the name (clobbering our scan stop character)
-         *       and scan over any more white space that follows.
-         */
-        if (*pz != NUL) {
-            int stopped_on_space = (isspace(*pz));
-            *pz++ = NUL;
-            while (isspace(*pz))   pz++;
-
-            if (  stopped_on_space
-               && ((*pz == '=') || (*pz == ':'))  )  {
-
-                while (isspace(*(++pz)))   ;
-
-            }
-        }
-
-        /*
-         *  Make sure we can find the option in our tables and initing it is OK
-         */
         if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
             return;
         if (pOS->flags & OPTST_NO_INIT)
             return;
-
-        pOS->pzOptArg = pz;
+        pOS->pzOptArg = pzArg;
     }
 
     switch (pOS->flags & (OPTST_IMM|OPTST_DISABLE_IMM)) {
