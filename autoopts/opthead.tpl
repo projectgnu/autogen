@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.13 1999/06/14 18:07:55 bkorb Exp $
+#$Id: opthead.tpl,v 2.14 1999/07/07 15:43:11 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -575,9 +575,9 @@ _FOR flag =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * =][=
 
-  _IF setable _exist =][=
+  _IF settable _exist =][=
 
-  #  These two are skipped if the option is not setable.
+  #  These two are skipped if the option is not settable.
 
 
 /*=usermac SET_OPT_name
@@ -587,7 +587,7 @@ _FOR flag =][=
  *  description:
  *
  *  This macro gets emitted only when the given
- *  option has the @code{setable} attribute specified.
+ *  option has the @code{settable} attribute specified.
  *
  *  The form of the macro will actually depend on whether the
  *  option is equivalenced to another, has an option argument
@@ -604,7 +604,7 @@ _FOR flag =][=
  *
  *  description:
  *
- *  This macro is emitted if it is both setable
+ *  This macro is emitted if it is both settable
  *  and it can be disabled.  If it cannot be disabled, it may
  *  always be CLEAR-ed (see above).
  *
@@ -736,7 +736,7 @@ _FOR flag =][=
 
     _ENDIF is/not equivalenced =][=
 
-  _ENDIF setable =][=
+  _ENDIF settable =][=
 
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * *

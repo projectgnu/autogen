@@ -5,16 +5,16 @@
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:     Tue Apr 13 09:20:32 1999
+# Last Modified:     Wed Jul  7 07:39:44 1999				      
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
-# by:                Bruce Korb <korb@datadesign.com>
+# by:                Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".4"
+AG_PATCHLEVEL=".5pre"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -36,11 +36,11 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 AO_LIBRARY=libopts.la
 AO_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 
-AO_CURRENT=4
+AO_CURRENT=5
 AO_REVISION=0
 AO_AGE=2
 
-MAINTAINER='Bruce Korb <autogen@autogen.freeservers.com>'
+MAINTAINER='Bruce Korb <autogen@linuxbox.com>'
 
 # For automake
 #
