@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2004-01-14 20:50:09 bkorb"
+# Time-stamp:        "2004-01-14 21:18:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: nls.test,v 3.3 2004/01/15 05:04:25 bkorb Exp $
+# $Id: nls.test,v 3.4 2004/01/15 05:24:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -31,15 +31,6 @@ ${SHELL-sh} ${stdopts} option:'opt init' second=020
 echo 'export = "extern char* gettext( const char* );";' >> ${testname}.def
 
 echo $AGEN ${testname}.def
-CFLAGS="${CFLAGS} -I${top_builddir}/autoopts"
-lib=`cd ${top_builddir}/autoopts > /dev/null ; pwd`
-lib=`cd ${top_builddir}/autoopts > /dev/null
-if [ -f .libs/libopts.a ]
-then echo $lib/.libs/libopts.a
-else echo $lib/libopts.a
-fi`
-
-LDFLAGS="${LDFLAGS} ${lib}"
 $AGEN ${testname}.def || \
   failure AutoGen could not process
 

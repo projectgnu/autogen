@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2004-01-01 10:41:51 bkorb"
+## Time-stamp:      "2004-01-14 21:15:58 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2004/01/14 02:41:16 $
+## Last Modified:   $Date: 2004/01/15 05:24:40 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.10 2004/01/14 02:41:16 bkorb Exp $
+## $Id: Makefile.am,v 3.11 2004/01/15 05:24:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -26,9 +26,10 @@ TESTS_ENVIRONMENT = \
 	PATH="`cd $(top_builddir)/columns > /dev/null ; pwd`:$$PATH" \
 	AGEN="`cd $(top_builddir)/agen5   > /dev/null ; pwd`/$(AGEXE)" \
 	COLUMNS_EXE="`cd $(top_builddir)/columns > /dev/null ; pwd`/$(COLEXE)" \
-	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/; \
+	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/ > /dev/null ; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
-	INC="$(INCLIST) $(CPPFLAGS) $(LIBGUILE_CFLAGS) $(LIBGUILE_LIBS)" \
+	INC="-I`cd $(top_builddir)/autoopts > /dev/null ; pwd` \
+	    $(INCLIST) $(CPPFLAGS) $(LIBGUILE_CFLAGS) $(LIBGUILE_LIBS)" \
 	testsubdir=$(testsubdir) \
 	srcdir=`pwd` \
 	top_srcdir=`cd $(top_srcdir) > /dev/null ; pwd`
