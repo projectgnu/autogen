@@ -5,6 +5,7 @@ h=%s-fsm.h
 c=%s-fsm.c
 
 (setenv "SHELL" "/bin/sh")
+(define fmt "")
 (shellf "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
 [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
@@ -23,14 +24,14 @@ CASE (suffix) =][=
 
 =]
 /*
- *  This file enumerates the states and transition tokens for a FSM.
+ *  This file enumerates the states and transition events for a FSM.
  *
  *  te_[=(. pfx)=]_state
  *      The available states.  FSS_INIT is always defined to be zero
  *      and FSS_INVALID and FSS_DONE are always made the last entries.
  *
- *  te_[=(. pfx)=]_token
- *      The transition tokens.  These enumerate the token values used
+ *  te_[=(. pfx)=]_event
+ *      The transition events.  These enumerate the event values used
  *      to select the next state from the current state.
  *      [=(. PFX)=]_EV_INVALID is always defined at the end.
  */
@@ -40,8 +41,8 @@ CASE (suffix) =][=
 /*
  *  Finite State machine States
  *
- *  Count of non-terminal states.  [=(. PFX)=]_ST_INVALID and [=(. PFX)=]_ST_DONE
- *  are terminal, [=(. PFX)=]_ST_INIT is not  :-).
+ *  Count of non-terminal states.  The generated states INVALID and DONE
+ *  are terminal, but INIT is not  :-).
  */
 #define [=(. PFX)=]_STATE_CT  [=(+ 1 (count "state"))=]
 typedef enum {
@@ -71,43 +72,40 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 
   CASE method  =][=
 
-  =*  call     =][=
+  ~*  call|case=][=
 
-  =*  case     =][=
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #
+    #   We are implementing the machine.  Declare the external  =][=
+
+    CASE type  =][=
+
+    =* step    =][= make-step-proc mode = "extern " =];[=
+
+    =* loop    =][= make-loop-proc mode = "extern " =];[=
+
+    *          =][=
+    (error (sprintf
+           "invalid FSM type:  ``%s'' must be ``looping'' or ``stepping''"
+           (get "type"))) =][=
+    ESAC       =][=
+
+    #  End external procedure declarations
+    #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  #
+  #   We are *NOT* implementing the machine.  Define the table  =][=
 
   ==  ""       =][=
     enumerate-transitions  use_ifdef = yes  =][=
   =*  no       =][=
     enumerate-transitions  use_ifdef = yes  =][=
   *            =][=
-    (error (string-append "unknown/invalid FSM method:  " (get "method"))) =][=
-  ESAC         =][=
-
-  CASE type    =][=
-
-  =* step      =]
-/*
- *  Step the FSM.  Returns the resulting state.  If the current state is
- *  [=(. PFX)=]_ST_DONE or [=(. PFX)=]_ST_INVALID, it resets to
- *  [=(. PFX)=]_ST_INIT and returns [=(. PFX)=]_ST_INVALID.
- */
-extern te_[=(. pfx)=]_state [=(. pfx)=]_step( te_[=(. pfx)
-          =]_event[= % cookie[0] ", %s"=] );[=
-
-  =* loop      =]
-/*
- *  Call the FSM.  Will return [=(. PFX)=]_ST_DONE or [=(. PFX)=]_ST_INVALID
- */
-extern te_[=(. pfx)=]_state [=(. pfx)=]_run_fsm( [=
-  IF (exist? "cookie") =][=
-    FOR cookie ", " =][=cookie=][=ENDFOR=][=
-  ELSE=]void[=ENDIF=] );[=
-
-  == ""        =][=
-
-  *            =][=
-    (error (string-append "unknown/invalid FSM type:  " (get "type"))) =][=
+    (error (sprintf
+        "invalid FSM method:  ``%s'' must be ``callout'', ``case'' or ``none''"
+        (get "method"))) =][=
   ESAC         =]
+
 #endif /* [=(. guard)=] */[=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -118,7 +116,8 @@ extern te_[=(. pfx)=]_state [=(. pfx)=]_run_fsm( [=
 
 == c =][=
 
-  (if (~ (get "method") "(no.*){0,1}") (out-delete)) =][=
+  (if (~ (get "method") "(no.*){0,1}")
+      (begin (shell "rm -f .fsm.*") (out-delete))  ) =][=
 
   preamble     
 
@@ -180,76 +179,6 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 
   `rm -f .fsm.*`        =][=
 
-ESAC (suffix)           =][=
+ESAC (suffix) =][=
 
-trailer =][=
-
-
-DEFINE emit-invalid-msg =]
-/*
- *  Define all the event and state names
- */
-tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zStInit[]    = "init";
-tSCC zEvInvalid[] = "* Invalid Event *";
-tSCC zFsmErr[]    =
-    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
-[=
-  FOR state
-=]
-tSCC zSt[=(string-capitalize! (get "state"))=][] = [=
-        (c-string (string-downcase! (get "state")))=];[=
-  ENDFOR
-
-=]
-tSCC* apzStates[] = {
-[=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zSt%%s' <<'_EOF_'
-Init
-%s
-_EOF_"
-  (string-capitalize! (join "\n" (stack "state")))  )=] };
-[=
-
-  FOR event =]
-tSCC zEv[=(string-capitalize! (get "event"))=][] = [=
-       (c-string (string-downcase! (get "event")))=];[=
-  ENDFOR
-
-=]
-tSCC* apzEvents[] = {
-[=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zEv%%s' <<'_EOF_'
-%s
-Invalid
-_EOF_"
-  (string-capitalize! (join "\n" (stack "event")))  )=] };
-
-#define [=(. PFX)=]_EVT_NAME(t) ( (((unsigned)(t)) >= [=(. PFX)=]_EV_INVALID) \
-    ? zBogus : apzEvents[ t ])
-
-#define [=(. PFX)=]_STATE_NAME(s) ( (((unsigned)(s)) > [=(. PFX)=]_ST_INVALID) \
-    ? zBogus : apzStates[ s ])
-
-#ifndef EXIT_FAILURE
-# define EXIT_FAILURE 1
-#endif
-
-/* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
- *
- *  Print out an invalid transition message and return EXIT_FAILURE
- */
-int
-[=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
-  (. pfx)=]_event evt )
-{
-[=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
-  (sprintf
-"    fprintf( stderr, zFsmErr, st, %s_STATE_NAME( st ), evt, %s_EVT_NAME( evt ));" PFX PFX) )=]
-
-    return EXIT_FAILURE;
-}
-[=
-
-
-ENDDEF                  =]
+trailer =]

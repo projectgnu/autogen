@@ -1,5 +1,9 @@
 2002-01-12  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/*fsm*.tpl: reworked to eliminate some inconsistencies
+
+2002-01-21  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/*.c: handle error messages better
 	* agen5/defDirect.c(processDirective): handle ``#!'' as a comment
 	directive.  In this fashion, definition files can be made executable,

@@ -1,10 +1,8 @@
-[= AutoGen5 Template  -*- Mode: Text -*-=]
-[=
-(define fmt "")
+[= AutoGen5 Template  -*- Mode: Text -*-
 
-;;;  AutoGen copyright 1992-2002 Bruce Korb
+#  AutoGen copyright 1992-2002 Bruce Korb
 
-;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+=][=
 
 DEFINE state-table  =]
   { [=
@@ -100,7 +98,7 @@ typedef te_[=(. pfx)=]_state ([=(. pfx)=]_callback_t)([=
     emit-cookie-args =]
     te_[=(. pfx)=]_state initial,
     te_[=(. pfx)=]_state maybe_next,
-    te_[=(. pfx)=]_event input_evt );
+    te_[=(. pfx)=]_event trans_evt );
 
 static [=(. pfx)=]_callback_t
 [=(shellf "sed '$s/,$/;/;s/^/    %s_do_/' .fsm.xlist" pfx)=]
@@ -139,30 +137,24 @@ ENDDEF       =][=
 
 DEFINE machine-step  =][=
 
-
-  IF (=* (get "method") "case")  =]
+  (if (=* (get "method") "case")
+      (begin (define trans-name "trans")
+             (define trans-field "transition")
+             (define trans-valu (string-append PFX "_TR_INVALID"))  )
+      (begin (define trans-name "pT   ")
+             (define trans-field "trans_proc")
+             (define trans-valu (string-append pfx "_do_invalid"))  ))
+=]
     if (trans_evt >= [=(. PFX)=]_EV_INVALID) {
         nxtSt = [=(. PFX)=]_ST_INVALID;
-        trans = [=(. PFX)=]_TR_INVALID;
+        [=(. trans-name)=] = [=(. trans-valu)=];
     } else {
-        const t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
+        const t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)
+                                  =]_state ] + trans_evt;
         nxtSt = firstNext = pTT->next_state;
-        trans = pTT->transition;
+        [=(. trans-name)=] = pTT->[=(. trans-field)=];
     }
-[=
 
-  ELSE       =]
-    if (trans_evt >= [=(. PFX)=]_EV_INVALID) {
-        nxtSt = [=(. PFX)=]_ST_INVALID;
-        pT    = [=(. pfx)=]_do_invalid;
-    } else {
-        t_transition* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
-        nxtSt = firstNext = pTT->next_state;
-        pT    = pTT->trans_proc;
-    }
-[=
-
-  ENDIF      =]
 #ifdef DEBUG
     printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
             [=(. PFX)=]_STATE_NAME( [=(. pfx)=]_state ), [=(. pfx)=]_state,
@@ -184,7 +176,6 @@ ENDDEF       =][=
 DEFINE fsm-proc-variables
 
   =]
-    te_[=(. pfx)=]_event trans_evt;
     te_[=(. pfx)=]_state nxtSt, firstNext;[=
     IF (=* (get "method") "call")  =]
     [=(. pfx)=]_callback_t* pT;[=
@@ -196,17 +187,25 @@ ENDDEF       =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE make-loop-proc  =]
+/*
+ *  Run the FSM.  Will return [=(. PFX)=]_ST_DONE or [=(. PFX)=]_ST_INVALID
+ */
+[=mode=]te_[=(. pfx)=]_state
+[=(. pfx)=]_run_fsm([=
+  IF (exist? "cookie") =][=
+    FOR cookie "," =]
+    [=cookie=][=
+    ENDFOR=][=
+  ELSE=] void[=ENDIF=] )[=
+ENDDEF make-loop-proc  =][=
+
 DEFINE looping-machine
 
-  =]
-
-te_[=(. pfx)=]_state
-[=(. pfx)=]_run_fsm( [=
-  IF (exist? "cookie") =][=
-    FOR cookie ", " =][=cookie=][=ENDFOR=][=
-  ELSE=]void[=ENDIF=] )
+  =][= make-loop-proc mode = "" =]
 {
-    te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;[=
+    te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
+    te_[=(. pfx)=]_event trans_evt;[=
     fsm-proc-variables  =]
 
     while ([=(. pfx)=]_state < [=(. PFX)=]_ST_INVALID) {
@@ -226,19 +225,30 @@ ENDDEF       =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE make-step-proc  =]
+/*
+ *  Step the FSM.  Returns the resulting state.  If the current state is
+ *  [=(. PFX)=]_ST_DONE or [=(. PFX)=]_ST_INVALID, it resets to
+ *  [=(. PFX)=]_ST_INIT and returns [=(. PFX)=]_ST_INIT.
+ */
+[=mode=]te_[=(. pfx)=]_state
+[=(. pfx)=]_step(
+    te_[= (. pfx) =]_event trans_evt[=
+  FOR cookie =],
+    [=cookie=][=
+  ENDFOR=] )[=
+
+ENDDEF make-step-proc  =][=
+
 DEFINE stepping-machine
 
-  =]
-
-te_[=(. pfx)=]_state
-[=(. pfx)=]_step( te_[=(. pfx)=]_event trans_evt[=
-   % cookie[0] ", %s"=] )
+  =][= make-step-proc mode = "" =]
 {[=
     fsm-proc-variables  =]
 
     if ((unsigned)[=(. pfx)=]_state >= [=(. PFX)=]_ST_INVALID) {
         [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
-        return [=(. PFX)=]_ST_INVALID;
+        return [=(. PFX)=]_ST_INIT;
     }
 [=  machine-step =]
 

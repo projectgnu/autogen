@@ -1,7 +1,78 @@
-[= AutoGen5 Template  -*- Mode: Text -*-=]
+[= AutoGen5 Template
+
+#  AutoGen copyright 1992-2002 Bruce Korb
+
+=][=
+
+DEFINE emit-invalid-msg =]
+/*
+ *  Define all the event and state names
+ */
+tSCC zBogus[]     = "** OUT-OF-RANGE **";
+tSCC zStInit[]    = "init";
+tSCC zEvInvalid[] = "* Invalid Event *";
+tSCC zFsmErr[]    =
+    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
+[=
+  FOR state
+=]
+tSCC zSt[=(string-capitalize! (get "state"))=][] = [=
+        (c-string (string-downcase! (get "state")))=];[=
+  ENDFOR
+
+=]
+tSCC* apzStates[] = {
+[=(shellf
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zSt%%s' <<'_EOF_'
+Init
+%s
+_EOF_"
+  (string-capitalize! (join "\n" (stack "state")))  )=] };
 [=
 
-#  AutoGen copyright 1992-2002 Bruce Korb =][=
+  FOR event =]
+tSCC zEv[=(string-capitalize! (get "event"))=][] = [=
+       (c-string (string-downcase! (get "event")))=];[=
+  ENDFOR
+
+=]
+tSCC* apzEvents[] = {
+[=(shellf
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zEv%%s' <<'_EOF_'
+%s
+Invalid
+_EOF_"
+  (string-capitalize! (join "\n" (stack "event")))  )=] };
+
+#define [=(. PFX)=]_EVT_NAME(t) ( (((unsigned)(t)) >= [=(. PFX)=]_EV_INVALID) \
+    ? zBogus : apzEvents[ t ])
+
+#define [=(. PFX)=]_STATE_NAME(s) ( (((unsigned)(s)) > [=(. PFX)=]_ST_INVALID) \
+    ? zBogus : apzStates[ s ])
+
+#ifndef EXIT_FAILURE
+# define EXIT_FAILURE 1
+#endif
+
+/* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
+ *
+ *  Print out an invalid transition message and return EXIT_FAILURE
+ */
+int
+[=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
+  (. pfx)=]_event evt )
+{
+[=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
+  (sprintf
+"    fprintf( stderr, zFsmErr, st, %s_STATE_NAME( st ), evt, %s_EVT_NAME( evt ));" PFX PFX) )=]
+
+    return EXIT_FAILURE;
+}
+[=
+
+ENDDEF  emit-invalid-msg  =][=
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE emit-cookie-args   =][=
   FOR cookie              =]
@@ -29,11 +100,12 @@ static te_[=(. pfx)=]_state
 [=cb_prefix=]_[=cb_name=]([= emit-cookie-args =]
     te_[=(. pfx)=]_state initial,
     te_[=(. pfx)=]_state maybe_next,
-    te_[=(. pfx)=]_event input_tkn )
+    te_[=(. pfx)=]_event trans_evt )
 {
 [=(extract fsm-source (string-append
-"/*  %s == " (string-tr! (get "cb_name") "a-z_-" "A-Z  ") " == %s  */" ))=]
-    return maybe_next;
+"/*  %s == " (string-tr! (get "cb_name") "a-z_-" "A-Z  ") " == %s  */" )
+""
+"    return maybe_next;" )=]
 }
 [=
 ENDDEF build-callback  =][=
@@ -41,15 +113,10 @@ ENDDEF build-callback  =][=
 DEFINE run-callback
 =]
     nxtSt = (*pT)( [=
-  IF (exist? "cookie")         =][=
-      (shellf "c=\"`echo '%s'|sed 's,.*[ \t],,'`\"
-                echo ${c}" (get "cookie[0]")) =], [=
+  FOR cookie =][=
+      (shellf "echo '%s'|sed 's,.*[ \t],,'" (get "cookie")) =], [=
 
-    IF (> (count "cookie") 1)  =][=
-      (shellf "c=\"`echo '%s'|sed 's,.*[ \t],,'`\"
-                echo ${c}_%s_save" (get "cookie[$]") pfx) =], [=
-    ENDIF  =][=
-  ENDIF    =][=(. pfx)=]_state, nxtSt, trans_tkn );[=
+  ENDFOR     =][=(. pfx)=]_state, nxtSt, trans_evt );[=
 
   trans-change=]
     [=(. pfx)=]_state = nxtSt;[=
@@ -107,7 +174,8 @@ DEFINE preamble
      (set! fsm-source ".fsm.code")
      (set-writable)     =][=
   ELSE                  =][=
-     (define pfx     (if (exist? "prefix") (get "prefix") (base-name)))
+     (define pfx     (string->c-name! (string-downcase!
+                        (if (exist? "prefix") (get "prefix") (base-name))  )))
      (define PFX     (string-upcase pfx))
      (define hdrname (out-name))
      (define guard   (string-upcase! (string->c-name! 
@@ -115,12 +183,11 @@ DEFINE preamble
      (define fsm-source ".fsm.head")  =][=
   ENDIF                 =][=
 
-  (if (== (suffix) "c") (set-writable))
   (dne " *  " "/*  ")  =]
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001  by  Bruce Korb
+ *  Copyright (c) 2001-2002  by  Bruce Korb
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=
