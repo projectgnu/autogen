@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1999/11/06 19:30:35 bruce Exp $
+## $Id: Makefile.am,v 1.5 1999/11/06 20:08:18 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = case.test define.test endmac.test expr.test opts.test
@@ -32,7 +32,7 @@ TESTS_ENVIRONMENT = GETDEFS=`cd $(top_builddir)/getdefs; pwd`/getdefs \
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
 
-check : perm-stamp
+$(TESTS) : perm-stamp
 
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test
