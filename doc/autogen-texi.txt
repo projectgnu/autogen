@@ -187,8 +187,9 @@ const char* az_name_list[] = @{
 @end example
 
 @noindent
-First, we will define the information that is unique for
-each enumeration name/string pair.
+First, we will define the information that is unique for each enumeration
+name/string pair.  This would be placed in a file named, @file{list.def},
+for example.
 
 @example
 autogen definitions list;
@@ -200,16 +201,17 @@ list = @{ list_element = omega;
          list_info    = "final omega stuff"; @};
 @end example
 
-The @code{autogen definitions list;} entry defines the file as an
-AutoGen definition file that uses a template named @code{list}.  That is
-followed by three @code{list} entries that define the associations
-between the enumeration names and the strings.  The order of the
-differently named elements inside of list is unimportant.  They are
-reversed inside of the @code{beta} entry and the output is unaffected.
+The @code{autogen definitions list;} entry defines the file as an AutoGen
+definition file that uses a template named @code{list}.  That is followed by
+three @code{list} entries that define the associations between the
+enumeration names and the strings.  The order of the differently named
+elements inside of list is unimportant.  They are reversed inside of the
+@code{beta} entry and the output is unaffected.
 
-Now, to actually create the output, we need a template or two that can
-be expanded into the files you want.  In this program, we use a single
-template that is capable of multiple output files.
+Now, to actually create the output, we need a template or two that can be
+expanded into the files you want.  In this program, we use a single template
+that is capable of multiple output files.  The definitions above refer to a
+@file{list} template, so it would normally be named, @file{list.tpl}.
 
 It looks something like this.
 (For a full description, @xref{Template File}.)
@@ -266,9 +268,9 @@ associated with the name @code{list_element}, then change the case of
 all the letters to upper case.  The result will be inserted into the
 output document.
 
-If you have compiled AutoGen, you can copy out the template and
-definitions, run @file{autogen} and produce exactly the hypothesized
-desired output.
+If you have compiled AutoGen, you can copy out the template and definitions
+as described above and run ``@code{autogen list.def}''.  This will produce
+exactly the hypothesized desired output.
 
 One more point, too.  Lets say you decided it was too much trouble to figure
 out how to use AutoGen, so you created this enumeration and string list with
