@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.5 1998/10/26 15:33:42 bkorb Exp $
+ *   $Id: opts.def,v 2.6 1998/10/26 15:48:44 bkorb Exp $
  */
 
 /*
@@ -81,9 +81,9 @@ flag = {
     doc =
     "This option is used to create shorthand entries for subblocks.\n"
     "For example, with:\n"
-    "@break\n@code{subbl=arg=argname,type} defined, the text:\n"
-    "@break\n@code{arg: this, char *} will then expand to:\n"
-    "@break\n@code{arg = @{ argname = this; type = \"char *\" @};}.\n";
+    "@*\n@code{subbl=arg=argname,type} defined, the text:\n"
+    "@*\n@code{arg: this, char *} will then expand to:\n"
+    "@*\n@code{arg = @{ argname = this; type = \"char *\" @};}.\n";
 };
 
 flag = {
