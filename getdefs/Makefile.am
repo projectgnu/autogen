@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.23 1999/10/31 16:21:26 bruce Exp $
+## $Id: Makefile.am,v 2.24 2000/03/19 22:09:33 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS	= getdefs
@@ -21,6 +21,7 @@ GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
 AGEXE		= $(top_builddir)/agen5/AutoGen
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
+man_MANS        = getdefs.1
 
 getdefs_LDFLAGS = -static
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/autoopts -I$(top_srcdir)/snprintfv

@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.22 1999/10/29 02:39:14 bruce Exp $
+## $Id: Makefile.am,v 1.23 2000/03/19 22:08:57 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -21,6 +21,7 @@ GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
 EXTRA_DIST	= $(GEN_SRC) opts.def bootstrap.dir
 AGEXE		= $(top_builddir)/agen5/AutoGen
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la
+man_MANS        = columns.1
 
 INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
 
