@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.5 1998/10/02 17:21:24 bkorb Exp $
+ *  $Id: makeshell.c,v 2.6 1998/10/02 21:11:53 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -87,6 +87,7 @@ static const char zCountTest[] =
 
 static const char zMultiArg[] =
     "        OPT_ELEMENT=\"[${%1$s_%2$s_CT}]\"\n"
+    "        %1$s_%2$s${OPT_ELEMENT}='true'\n"
     "        %1$s_%2$s_CT=`expr ${%1$s_%2$s_CT} + 1`\n"
     "        OPT_NAME='%2$s'\n";
 
@@ -95,7 +96,7 @@ static const char zSingleArg[] =
     "            echo Error:  duplicate %2$s option >&2\n"
     "            USAGE 1 ; fi\n"
     "        OPT_ELEMENT=''\n"
-    "        %1$s_%2$s=1\n"
+    "        %1$s_%2$s='true'\n"
     "        OPT_NAME='%2$s'\n";
 
 static const char zMayArg[]  = "        OPT_ARG=OK\n";
@@ -104,7 +105,7 @@ static const char zCantArg[] = "        OPT_ARG=NO\n";
 static const char zEndCaseElement[] = "        ;;\n\n";
 
 
-static const char zLoopCase[] =
+static const char zLoopCase[] = "\n"
 "doingargs=true\n"
 "arg=\"$1\"\n\n"
 "while $doingargs && [ $# -gt 0 ]\ndo\n"
@@ -118,7 +119,7 @@ static const char zLoopCase[] =
 "         shift\n"
 "         ;;\n\n";
 
-static const char zLoopOnly[] =
+static const char zLoopOnly[] = "\n"
 "arg=\"$1\"\n\n"
 "while [ $# -gt 0 ]\ndo\n"
 "    arg=\"${1}\"\n";
@@ -224,7 +225,7 @@ static const char zCaseEnd[] =
 static const char zLoopEnd[] =
 "    if [ -n \"${OPT_ARG_VAL}\" ]\n"
 "    then\n"
-"        eval \\$%s_${OPT_NAME}${OPT_ELEMENT}=\"'${OPT_ARG_VAL}'\"\n"
+"        %s_${OPT_NAME}${OPT_ELEMENT}=\"${OPT_ARG_VAL}\"\n"
 "    fi\n"
 "done\n";
 
@@ -412,16 +413,18 @@ emitUsage( tOptions* pOpts )
 emitSetup( tOptions* pOpts )
 {
     static const char zMultiDef[] = "\n"
-        "%1$s_%2$s_CT = 0\n"
-        "set -a %1$s_%2$s\n"
+        "%1$s_%2$s_CT=0\n"
+        "unset %1$s_%2$s\n"
+        "%1$s_%2$s[0]=''\n"
         "export %1$s_%2$s %1$s_%2$s_CT\n";
 
     static const char zSingleDef[] = "\n"
-        "%1$s_%2$s\n"
+        "unset %1$s_%2$s\n"
+        "%1$s_%2$s=''\n"
         "export %1$s_%2$s\n";
 
     tOptDesc* pOptDesc = pOpts->pOptDesc;
-    int       optionCt = pOpts->optCt;
+    int       optionCt = pOpts->presetOptCt;
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
 
@@ -454,19 +457,19 @@ emitFlag( tOptions* pOpts )
         if (isprint( pOptDesc->optValue )) {
             printf( "    '%c' )\n", pOptDesc->optValue );
 
-            if (pOptDesc->pz_NAME == (char*)NULL) {
+            if (pOptDesc->pOptProc == doVersion)
+                printf( zCmdFmt, "VERSION" );
 
-                if (pOptDesc->pOptProc == doVersion)
-                    printf( zCmdFmt, "VERSION" );
+            else if (pOptDesc->pOptProc == doPagedUsage)
+                printf( zCmdFmt, "LONGUSAGE" );
 
-                else if (pOptDesc->pOptProc == doPagedUsage)
-                    printf( zCmdFmt, "LONGUSAGE" );
+            else if (pOptDesc->pOptProc == doLoadOpt)
+                printf( zCmdFmt, "echo Warning:  "
+                        "Cannot load options files >&2" );
 
-                else if (pOptDesc->pOptProc == doLoadOpt)
-                    printf( zCmdFmt, "echo Warning:  "
-                            "Cannot load options files >&2" );
+            else if (pOptDesc->pz_NAME == (char*)NULL) {
 
-                else if (pOptDesc->pOptProc == (tOptProc*)NULL)
+                if (pOptDesc->pOptProc == (tOptProc*)NULL)
                     printf( zCmdFmt, "echo Warning:  "
                             "Cannot save options files >&2" );
                 else
@@ -575,19 +578,19 @@ emitLong( tOptions* pOpts )
             }
         }
 
-        if (pOptDesc->pz_NAME == (char*)NULL) {
+        if (pOptDesc->pOptProc == doVersion)
+            printf( zCmdFmt, "VERSION" );
 
-            if (pOptDesc->pOptProc == doVersion)
-                printf( zCmdFmt, "VERSION" );
+        else if (pOptDesc->pOptProc == doPagedUsage)
+            printf( zCmdFmt, "LONGUSAGE" );
 
-            else if (pOptDesc->pOptProc == doPagedUsage)
-                printf( zCmdFmt, "LONGUSAGE" );
+        else if (pOptDesc->pOptProc == doLoadOpt)
+            printf( zCmdFmt, "echo Warning:  "
+                    "Cannot load options files >&2" );
 
-            else if (pOptDesc->pOptProc == doLoadOpt)
-                printf( zCmdFmt, "echo Warning:  "
-                        "Cannot load options files >&2" );
+        else if (pOptDesc->pz_NAME == (char*)NULL) {
 
-            else if (pOptDesc->pOptProc == (tOptProc*)NULL)
+            if (pOptDesc->pOptProc == (tOptProc*)NULL)
                 printf( zCmdFmt, "echo Warning:  "
                         "Cannot save options files >&2" );
             else
