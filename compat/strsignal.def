@@ -1,0 +1,95 @@
+autogen definitions strsignal;
+
+/*
+ *  Dynamic definitions for creating the strsignal.h header file
+ *
+ *  $Id: strsignal.def,v 1.1 1998/04/29 23:14:32 bkorb Exp $
+ */
+
+#shell
+
+RE_sigfind='[A-Z]+[ 	]+[1-9][0-9]*'
+RE_sigdef='^#[ 	]*define[ 	][ 	]*SIG'
+RE_inc='^#[ 	]*include[ 	][ 	]*<'
+
+threshold=5             # minimum number of signals to accept
+num=0                   # number of signals defined in this file
+seen=""                 # include files already searched
+files="sys/signal.h"    # initial files to search
+
+cd /usr/include
+while test -n "$files"
+do
+    for file in $files; do
+        # look for $threshold or more matches in one of the search files
+        test -f $file || continue
+        sigs=`egrep "$RE_sigdef$RE_sigfind" $file|sed "s,$RE_sigdef,,"`
+        test -z "$sigs" || num=`echo "$sigs" | wc -l`
+        test $num -lt $threshold || break
+        seen="$file $seen"
+    done
+    test $num -lt $threshold || break
+
+    # IF no file has $threshold or better SIG matches;
+    # generate a new search list from all files #included from the old list
+    newfiles=""
+    for file in $files; do
+        test -f $file || continue
+        new=`egrep "$RE_inc" $file|sed "s,$RE_inc,,"';s,>.*$,,'`
+        newfiles=" $new $newfiles"
+    done
+
+    # remove any files that have been searched previously
+    for file in $seen; do
+        newfiles=`echo "$newfiles"|sed "s, $file , ,g"`
+    done
+
+    # set the search list for the next iteration
+    files="$newfiles"
+    num=0
+done
+
+if test $num -lt $threshold
+then
+  echo "ERROR: cannot find signal definitions in $seen" >&2
+  echo "#error cannot find signal definitions in $seen"
+else
+  echo "$sigs" |
+  while read SIG NUM f
+  do
+    #  IF the "signal number" is octal or hex or non-numeric,
+    #  THEN we know it is a value we are not interested in
+    #
+    case ${NUM} in
+    *[A-Za-z_] )
+       continue ;;
+    esac
+
+    #  Sometimes, there are aliases.  Accept only the first.
+    #
+    if eval test ! -z \"\$HAVE_${NUM}\"
+    then continue ; fi
+
+    #  We also know we are not interested in super large numbers
+    #  (e.g. SIGSTKSZ 8192)
+    #
+    if test ${NUM} -gt 128
+    then continue ; fi
+
+    eval HAVE_${NUM}=1
+    f=`echo "$f" | sed -e's;/\*[   ]*;;' -e's;[    ]*\*/;;'`
+    if test -z "$f"
+    then f="Undescribed signal ${NUM}" ; fi
+
+    cat  <<-    _EOF_
+	signal[ ${NUM} ] = {
+	    signame = ${SIG};
+	    sigtext = "$f";
+	};
+
+	_EOF_
+  done
+fi
+#endshell
+
+date = `date`;

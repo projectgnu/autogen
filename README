@@ -1,0 +1,27 @@
+This is Autogen, an automated text file generator.  It was inspired
+out of frustration and hassle with maintaining syncronization between
+option flag lists, global variables and usage information.  The desire
+for more than #define macros came about when it became apparent that
+macros alone were insufficient for reducing the maintenance into a
+single option list.  The impetus to actually start something finally
+came when I had to maintain a large callout procedure table and
+associated lookup tables.
+
+Rev 1 of this utility was a set of #define macro expansions.
+Rev 2 was a shell script that sort-of did a prototype.
+      Much better than just #defines, but still clearly lacking.
+Rev 3 had a very kludgy macro definition syntax.
+Rev 4 a reworking and simplification of the declarations
+Rev 5 (?) the addition of Guile expression processing
+
+Until a mailing list is organized, direct email to the author:
+
+    Bruce Korb <korbb@datadesign.com>
+
+
+Note to SCO/OS5 users:
+	This product uses libtool.  It apparently behaves incorrectly
+	in the presence of gcc and consequently needs to use /bin/cc.
+	Configure this program with:
+
+		CC=/bin/cc ./configre

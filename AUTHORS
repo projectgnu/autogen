@@ -1,0 +1,25 @@
+
+Bruce Korb:
+src/*[ch] and autoopts/*.[chtd]*
+rehacked compat/pathfind.c to be SVR4 compatible.
+reworked compat/strsignal to use a shell script to extract the local
+information and generate a static version.  (It uses autogen,
+so a generated version must be distributed also. :)
+
+Gary V. Vaughan:
+Changes throughout to aid portability of C code.
+Wrote the autoconf files, Makefile.am and configure.in.
+In the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
+sigsend.c, libgen.h
+
+Brian Fox, Chet Ramey:
+Files borrowed from bash-2.0; posixstat.h, posixjmp.h
+
+Fred Fish, Gary V. Vaughan and Bruce Korb:
+In the directory compat; strsignal.c
+
+Doug Gwyn, Richard Stallman:
+in the directory compat, ndir.h
+
+FSF:
+In the directory compat; regex.c, regex.h

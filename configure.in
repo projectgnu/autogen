@@ -1,0 +1,158 @@
+dnl  -*- Mode: Shell-script -*- 
+dnl --------------------------------------------------------------------
+dnl configure.in --- GNU autoconf source for toplevel directory.
+dnl
+dnl Copyright (C) 1997-1998 Bruce Korb
+dnl
+dnl Author:           Bruce Korb <korbb@datadesign.com>
+dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
+dnl Created:          Mon Jun 30 15:10:13 1997
+dnl Last Modified:    1998/04/09 at 14:50:34
+dnl            by:    Bruce Korb <korbb@datadesign.com>
+dnl --------------------------------------------------------------------
+dnl Code: @(#)configure.in	2.7
+dnl --------------------------------------------------------------------
+
+AC_INIT(src/autogen.c)
+AC_CONFIG_AUX_DIR(config)
+AC_CANONICAL_SYSTEM
+
+. $srcdir/VERSION
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+ifdef([AC_REVISION],AC_REVISION($Revision: 1.1 $),)dnl
+
+# ----------------------------------------------------------------------
+# If `configure' is invoked (in)directly via `make', ensure that it
+# encounters no `make' conflicts.  Ignore error if shell does not have
+# unset, but at least set these to empty values.
+# ----------------------------------------------------------------------
+MFLAGS=
+MAKEFLAGS=
+MAKELEVEL=
+unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
+
+# ----------------------------------------------------------------------
+# check for various programs used during the build.
+# ----------------------------------------------------------------------
+AC_PROG_CC
+AM_CYGWIN32
+AM_PROG_INSTALL
+AM_PROG_LIBTOOL
+AC_PROG_YACC
+AG_PROG_MAKE_INCLUDE
+AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
+
+# ----------------------------------------------------------------------
+# Set up and process configure options
+# ----------------------------------------------------------------------
+AC_MSG_CHECKING([whether runtime debugging is wanted])
+ag_cv_debug=no
+AC_ARG_ENABLE(debug,
+[  --enable-debug          enable/disable debugging code [default=no]],[
+ag_cv_debug=$enable_debug
+if test x$enable_debug = xyes; then
+  CPPFLAGS="-DDEBUG $CPPFLAGS"
+  CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g'`"
+  if test x$GCC != xyes; then
+changequote(,)
+    CFLAGS=`echo $CFLAGS|sed 's%-O[0-9]* *%%g'`
+changequote([,])
+  fi
+fi])
+AC_MSG_RESULT([$ag_cv_debug])
+
+AM_WITH_DMALLOC
+
+CPPFLAGS="$ac_debug $CPPFLAGS"
+if test x$enable_debug = xyes; then
+  CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g'`"
+  if test x$GCC != xyes; then
+    CFLAGS=`echo $CFLAGS|sed 's%-O[0-9]* *%%g'`
+  fi
+fi
+
+# ----------------------------------------------------------------------
+# Check for SVR4 libgen, and use it if it defines pathfind.
+# ----------------------------------------------------------------------
+AC_CHECK_LIB(gen, pathfind)
+
+# ----------------------------------------------------------------------
+# On most SVR3's, alloca() is tucked inside libPW.
+# ----------------------------------------------------------------------
+AC_CHECK_LIB(PW, alloca)
+
+# ----------------------------------------------------------------------
+# Check for standard headers.
+# ----------------------------------------------------------------------
+AC_HEADER_STDC
+AC_HEADER_DIRENT
+AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h)
+AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h setjmp.h)
+
+# If varargs.h is present define HAVE_VARARGS_H, otherwise if stdarg.h
+# is present define HAVE_STDARG_H.
+AC_CHECK_HEADERS(varargs.h stdarg.h, break)
+
+# Similarly for the string.h and strings.h headers
+AC_CHECK_HEADERS(string.h strings.h, break)
+
+# ...and limits headers
+AC_CHECK_HEADERS(limits.h sys/limits.h, break)
+
+# ...and directory read headers
+AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
+
+# Check for P_PID definition in <sys/procset.h>
+AC_CHECK_HEADERS(sys/procset.h)
+
+# ----------------------------------------------------------------------
+# Checks for typedefs, structures, and compiler characteristics.
+# ----------------------------------------------------------------------
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+AC_TYPE_SIGNAL
+AC_CHECK_TYPE(u_short, unsigned short int)
+AC_CHECK_TYPE(u_int, unsigned int)
+AC_CHECK_TYPE(u_long, unsigned long int)
+AC_C_CONST
+AC_C_INLINE
+AC_CHECK_SIZEOF(char*)
+AC_CHECK_SIZEOF(int)
+
+# ----------------------------------------------------------------------
+# Checks for standard functions.
+# ----------------------------------------------------------------------
+AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend pathfind)
+AG_FUNC_REGCOMP
+AG_FUNC_CTIME_HEAP
+
+# ----------------------------------------------------------------------
+# Substitute these here, so that they can be used by the Makefile
+# ----------------------------------------------------------------------
+AC_SUBST(TM_VERSION)
+AC_SUBST(TM_MAJOR_VERSION)
+AC_SUBST(TM_MINOR_VERSION)
+
+# -----------------------------------------------------------------------
+# Generate the make files.
+# -----------------------------------------------------------------------
+[COMPAT_SRC=`cd $srcdir/compat ; echo [a-z]*[!~]`]
+AC_SUBST(COMPAT_SRC)
+[M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
+AC_SUBST(M4_SRC)
+[AGFUN_LIST=`cd $srcdir/src ; echo agFun*.c`]
+AC_SUBST(AGFUN_LIST)
+[TEST_LIST=`cd $srcdir/tests ; echo [a-z]*.test`]
+AC_SUBST(TEST_LIST)
+AC_SUBST(ac_aux_dir)
+AC_SUBST(LIBS)
+AC_SUBST(INCLUDES)
+AM_CONFIG_HEADER(config.h)
+AC_OUTPUT(Makefile MakeRules doc/Makefile compat/Makefile \
+autoopts/Makefile src/Makefile tests/Makefile config/Makefile,
+ [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+
+dnl configure.in ends here

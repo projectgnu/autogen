@@ -1,0 +1,17 @@
+-*- Mode: Outline -*-
+
+* Use compat.h vararg/stdarg macros.
+* Convert my (Gary's) code to match your (Bruce's) coding style.
+  (Stroustrup's style, actually)
+* need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
+* persuade FSF to patch autoconf so that the AC_CHECK_TYPE(id_t) code doesn't
+  pick up `pid_t` (just a change to the regular expression), then fix
+  compat/sigsend.c to use id_t.
+* when the dust has settled on glibc-2, try an AXP build against it.  Autogen
+  exposes some (well, one, at least) bugs in Digital's libc.
+* Rework the shell string processing in the definitions file so
+  that backquoted text is immediately passed to the shell and
+  then concatenated with the surrounding text.  This will require
+  constructing arrays of string pointers and knowing whether they
+  point to contiguous source text or to allocated memory.
+* ANSI format specifiers: cdeEfgGiosuxX with conversion quals h and l

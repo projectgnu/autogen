@@ -1,0 +1,56 @@
+This is an analysis of every remaining allocation
+at the end of a large run:
+
+ 
+    Residual allocation list
+
+String duplications from somewhere:
+
+      32 bytes from autogen.c at 243
+      32 bytes from autogen.c at 243
+      64 bytes from autogen.c at 243
+
+Somebody did not release the result of running a shell command:
+
+      18 bytes from agShell.c at 347
+
+
+Argument stack lists:
+
+      32 bytes from stack.c at 134
+      32 bytes from stack.c at 134
+
+Definitions file:
+
+   18076 bytes from agGetDef.c at 331
+
+Template data:
+
+    2485 bytes from agTempl.c at 469
+
+Definition entry structures.
+Each page is filled with tiny structs:
+
+    4068 bytes from agReduce.c at 59
+    4068 bytes from agReduce.c at 59
+    4068 bytes from agReduce.c at 59
+    4068 bytes from agReduce.c at 59
+    4068 bytes from agReduce.c at 59
+
+SETENV calls:
+
+      27 bytes from agFunc.c at 542
+      18 bytes from agFunc.c at 542
+
+
+
+
+	* configure.in (AC_SUBST): Calculate the glob match for
+	agFun*.c in the src directory here (see below) and substitute
+	with AGFUN_SOURCES.
+	
+	* src/Makefile.am (agfunc.def): Removed agFun*.c dependency,
+	as it is not valid (and breaks ground up maint-rebuild). 
+	Substitute for AGFUN_SOURCES instead.  I left the rule itself
+	using a glob expression so that maintainer additions will
+	be picked up in the rule even though the dependency won't notice.
