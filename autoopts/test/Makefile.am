@@ -8,10 +8,10 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 2000/03/12 01:45:47 bruce Exp $
+## $Id: Makefile.am,v 1.5 2000/03/12 04:17:24 bruce Exp $
 ## ---------------------------------------------------------------------
 
-TESTS   = argument.test errors.test vers.test
+TESTS   = argument.test errors.test shell.test vers.test
 
 EXTRA_DIST = defs $(TESTS)
 
