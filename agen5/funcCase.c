@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcCase.c,v 1.1.1.1 1999/10/14 00:33:53 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */

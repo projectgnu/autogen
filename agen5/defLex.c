@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: defLex.c,v 1.1.1.1 1999/10/14 00:33:53 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */

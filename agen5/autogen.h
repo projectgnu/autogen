@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: autogen.h,v 1.1.1.1 1999/10/14 00:33:53 bruce Exp $
  *  Global header file for AutoGen
  */
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: autogen.c,v 1.1.1.1 1999/10/14 00:33:53 bruce Exp $
  *  This is the main routine for autogen.
  */
 
