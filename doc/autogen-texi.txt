@@ -126,7 +126,7 @@ each template.  Template designers know best what fits into their
 syntax and can avoid marker conflicts.
 
 We did this because it is burdensome and difficult to avoid conflicts
-using either M4 tokenizaion or C preprocessor substitution rules.  It
+using either M4 tokenization or C preprocessor substitution rules.  It
 also makes it easier to specify expressions that transform the value.
 Of course, our expressions are less cryptic than the shell methods.
 
@@ -152,7 +152,7 @@ functions are available for saving text or values for later use.
 
 This is just one simple example that shows a few basic features.
 If you are interested, you also may run "make check" with the
-@code{VERBOSE} enviornment variable set and see a number of other
+@code{VERBOSE} environment variable set and see a number of other
 examples in the @file{agen5/test/testdir} directory.
 
 Assume you have an enumeration of names and you wish to associate some
@@ -287,7 +287,7 @@ AutoGen tries to use your normal shell so that you can supply shell code
 in a manner you are accustomed to using.  If, however, you use csh or
 zsh, you cannot do this.  Csh is sufficiently difficult to program that
 it is unsupported.  Zsh, though largely programmable, also has some
-anomolies that make it incompatible with AutoGen usage.  Therefore, when
+anomalies that make it incompatible with AutoGen usage.  Therefore, when
 invoking AutoGen from these environments, you must be certain to set the
 SHELL environment variable to a Bourne-derived shell.  e.g., sh, ksh or
 bash.
@@ -386,7 +386,7 @@ name-value pairs.  An array may not contain both simple and compound
 members.  Fundamentally, it is as simple as:
 
 @example
-prog_name = "autogen";
+prog-name = "autogen";
 flag = @{
     name      = templ_dirs;
     value     = L;
@@ -630,10 +630,10 @@ The first string contains no new line characters.
 The first character is the dollar sign, the last the back quote.
 
 The second string contains one new line character.  The first character
-is the tab character preceeding the dollar sign.  The last character is
+is the tab character preceding the dollar sign.  The last character is
 the semicolon after the @code{STR_END}.  That @code{STR_END} does not
 end the string because it is not at the beginning of the line.  In the
-preceeding case, the leading tab was stripped.
+preceding case, the leading tab was stripped.
 
 @node concat-string
 @subsection Concatenated Strings
@@ -748,7 +748,7 @@ Another method uses the @code{#shell} processing directive.
 It will be discussed in the next section (@pxref{Directives}).
 Guile/Scheme may also be used to yield to create definitions.
 
-When the Scheme expression is preceeded by a backslash and single
+When the Scheme expression is preceded by a backslash and single
 quote, then the expression is expected to be an alist of
 names and values that will be used to create AutoGen definitions.
 
@@ -794,7 +794,7 @@ directives must have the hash character (@code{#}) in column 1.
 
 The final tweak is that @code{#!} is treated as a comment line.
 Using this feature, you can use:  @samp{#! /usr/local/bin/autogen}
-as the first line of a definitons file, set the mode to executable
+as the first line of a definitions file, set the mode to executable
 and "run" the definitions file as if it were a direct invocation of
 AutoGen.  This was done for its hack value.
 
@@ -1378,7 +1378,7 @@ by providing a set of Scheme functions named @code{out-*}
 This allows you to logically "push" output files onto a stack.
 If you supply a string name, then a file by that name is created
 to hold the output.  If you do not supply a name, then the text is
-written to a scratchpad and retrieved by passing a ``@code{#t}'' argument
+written to a scratch pad and retrieved by passing a ``@code{#t}'' argument
 to the @code{out-pop} (@pxref{SCM out-pop}) function.
 
 @item out-pop (@pxref{SCM out-pop})
@@ -1571,7 +1571,7 @@ Extraction from autogen.texi
 @cindex configuring
 
 AutoGen is configured and built using Libtool, Automake and Autoconf.
-Consequently, you can install it whereever you wish using the various
+Consequently, you can install it wherever you wish using the various
 @samp{--prefix} options.  To the various configuration options supplied
 by these tools, AutoGen adds a few of its own:
 
@@ -1878,7 +1878,7 @@ with lines containing, ``@code{[PROGRAM_NAME]}'', @xref{loading rc files}.
 @item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
 Such options may default to either an enabled or a disabled state.  You
-may also provide an enablement prifix, too, e.g., @code{--allow-mumble}
+may also provide an enablement prefix, too, e.g., @code{--allow-mumble}
 and @code{--prevent-mumble}.
 
 @item
@@ -2014,7 +2014,7 @@ after that is a square close bracket (@code{]}), then the section is
 processed and the file closed.  Otherwise, the section is ignored and a
 matching section is searched for.
 
-For exampe, if the @code{fumble-stumble} options had a sectioned RC file,
+For example, if the @code{fumble-stumble} options had a sectioned RC file,
 then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
 
 @node saving rc files
@@ -2633,7 +2633,7 @@ ifdef = WITH_MUMBLING;
 @noindent
 Note that case and spelling must match whatever you are using.
 Do not confuse these attributes with the AutoGen directives of the
-same names, @xref{Directives}.  These cause C pre-processing directives
+same names, @xref{Directives}.  These cause C preprocessing directives
 to be inserted into the generated C text.  Also note that only one
 of these attributes may apply to any particular option.
 @end table
@@ -2743,7 +2743,7 @@ options are so specified.  They will also call @code{exit()} upon
 completion, so they @strong{do} have an effect on the processing
 of the remaining options :-).
 
-@cindex immed_disable
+@cindex immed-disable
 @item immed-disable
 Use this option attribute to specify that the disabled form of the
 option is to be processed immediately.  The @code{load-opts} option is
@@ -2841,7 +2841,7 @@ for this option.  @code{all} will turn on all membership bits and
 @code{none} will turn them all off.  Specifying one of the keywords
 will turn on the corresponding set membership bit.  Literal numbers
 may also be used and may, thereby, set or clear more than one bit.
-Preceeding a keyword or literal number with a bang (@code{!}  -
+Preceding a keyword or literal number with a bang (@code{!}  -
 exclamation point) will turn the bit(s) off.  The number of keywords
 allowed is constrained by the number of bits in a pointer, as the bit
 set is kept in a @code{void*}.
@@ -4328,7 +4328,7 @@ stylized comments (@pxref{getdefs Invocation}).
 @node man1
 @subsection command line man pages
 
-Using the option definitions for an AutoOpt client program,
+Using the option definitions for an AutoOpts client program,
 the @samp{agman1.tpl} template will produce an nroff document
 suitable for use as a @samp{man(1)} page document for a command
 line command.  The description section of the document is either
@@ -4600,7 +4600,7 @@ wasted sending queries and responses when many of them could be bundled.
 The protocol bundles the data, but there is no support for it in rpcgen.
 That means you have to write your own code to do that.  Until now.
 Download this and you will have a large, complex example of how to use
-@code{AutoXDR} for generating the marshalling and unmarshalling of combined
+@code{AutoXDR} for generating the marshaling and unmarshaling of combined
 RPC calls.  There is a brief example
 @uref{http://www.gnu.org/software/autogen/xdr/index.html,on the web}, but
 you should @uref{http://download.sourceforge.net/autogen/,download AutoXDR}.
@@ -4649,10 +4649,6 @@ Extraction from autogen.texi
 Here are some things that might happen in the distant future.
 
 @itemize @bullet
-@item
-Write code for "AutoGetopts" (GNU getopt), or
-possibly the new glibc argp parser.
-
 @item
 Fix up current tools that contain
 miserably complex perl, shell, sed, awk and m4 scripts
