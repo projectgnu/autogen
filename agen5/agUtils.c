@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.3 2005/01/23 23:33:04 bkorb Exp $
+ *  $Id: agUtils.c,v 4.4 2005/02/14 14:09:54 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -226,116 +226,6 @@ getDefine( tCC* pzDefName )
 }
 
 
-LOCAL unsigned int
-doEscapeChar( tCC* pzIn, char* pRes )
-{
-    unsigned int  res = 1;
-
-    switch (*pRes = *pzIn++) {
-    case NUL:         /* NUL - end of input string */
-    case '\n':        /* NL  - Omit newline        */
-        return 0;
-
-    case 't':
-        *pRes = '\t'; /* TAB */
-        break;
-    case 'n':
-        *pRes = '\n'; /* NEWLINE (LineFeed) */
-        break;
-    case 'f':
-        *pRes = '\f'; /* FormFeed (NewPage) */
-        break;
-    case 'r':
-        *pRes = '\r'; /* Carriage Return    */
-        break;
-    case 'v':
-        *pRes = '\v'; /* Vertical Tab       */
-        break;
-    case 'b':
-        *pRes = '\b'; /* backspace          */
-        break;
-    case 'a':
-        *pRes = '\a'; /* Bell               */
-        break;
-
-    case 'x':         /* HEX Escape       */
-        if (isxdigit( *pzIn ))  {
-            unsigned int  val;
-            unsigned char ch = *pzIn++;
-
-            if ((ch >= 'A') && (ch <= 'F'))
-                val = 10 + (ch - 'A');
-            else if ((ch >= 'a') && (ch <= 'f'))
-                val = 10 + (ch - 'a');
-            else val = ch - '0';
-
-            ch = *pzIn;
-
-            if (! isxdigit( ch )) {
-                *pRes = val;
-                res   = 2;
-                break;
-            }
-            val <<= 4;
-            if ((ch >= 'A') && (ch <= 'F'))
-                val += 10 + (ch - 'A');
-            else if ((ch >= 'a') && (ch <= 'f'))
-                val += 10 + (ch - 'a');
-            else val += ch - '0';
-
-            res = 3;
-            *pRes = val;
-        }
-        break;
-
-    default:
-        /*
-         *  IF the character copied was an octal digit,
-         *  THEN set the output character to an octal value
-         */
-        if (isdigit( *pRes ) && (*pRes < '8'))  {
-            unsigned int  val = *pRes - '0';
-            unsigned char ch  = *pzIn++;
-
-            /*
-             *  IF the second character is *not* an octal digit,
-             *  THEN save the value and bail
-             */
-            if ((ch < '0') || (ch > '7')) {
-                *pRes = val;
-                break;
-            }
-
-            val = (val<<3) + (ch - '0');
-            ch  = *pzIn;
-            res = 2;
-
-            /*
-             *  IF the THIRD character is *not* an octal digit,
-             *  THEN save the value and bail
-             */
-            if ((ch < '0') || (ch > '7')) {
-                *pRes = val;
-                break;
-            }
-
-            /*
-             *  IF the new value would not be too large,
-             *  THEN add on the third and last character value
-             */
-            if ((val<<3) < 0xFF) {
-                val = (val<<3) + (ch - '0');
-                res = 3;
-            }
-
-            *pRes = val;
-            break;
-        }
-    }
-
-    return res;
-}
-
 /*
  *  The following routine scans over quoted text, shifting
  *  it in the process and eliminating the starting quote,
@@ -357,7 +247,7 @@ spanQuote( char* pzQte )
 
         case '\\':
             if (q != '\'') {
-                unsigned int ct = doEscapeChar( pzQte, p-1 );
+                unsigned int ct = ao_string_cook_escape_char( pzQte, p-1 );
                 /*
                  *  IF the advance is zero,
                  *  THEN we either have end of string (caught above),
@@ -420,7 +310,7 @@ skipQuote( tCC* pzQte )
 
             } else {
                 char p[10];  /* provide a scratch pad for escape processing */
-                unsigned int ct = doEscapeChar( pzQte, p );
+                unsigned int ct = ao_string_cook_escape_char( pzQte, p );
                 /*
                  *  IF the advance is zero,
                  *  THEN we either have end of string (caught above),

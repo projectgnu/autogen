@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: defLex.c,v 4.5 2005/02/14 14:09:54 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -67,9 +67,6 @@ assembleName( char* pzScan, te_dp_event* pRetVal );
 
 static char*
 assembleHereString( char* pzScan );
-
-static char*
-assembleString( char* pzScan );
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -149,9 +146,11 @@ scanAgain:
     case '\'':
     case '"':
     {
-        char* pz = assembleString( pCurCtx->pzScan );
+        char* pz = ao_string_cook( pCurCtx->pzScan, &(pCurCtx->lineNo));
         if (pz == NULL)
             goto NUL_error;
+
+        pz_token = pCurCtx->pzScan;
 
         lastToken = DP_EV_STRING;
         pCurCtx->pzScan = pz;
@@ -207,10 +206,12 @@ scanAgain:
 
     case '`':
     {
-        char*   pz = assembleString( pCurCtx->pzScan );
+        char* pz = ao_string_cook( pCurCtx->pzScan, &(pCurCtx->lineNo));
 
         if (pz == NULL)
             goto NUL_error;
+
+        pz_token = pCurCtx->pzScan;
 
         pCurCtx->pzScan = pz;
 
@@ -656,140 +657,6 @@ assembleHereString( char* pzScan )
     else pzDest[0]  = NUL;
 
     return pzScan + markLen;
-}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  A quoted string has been found.
- *  Find the end of it and compress any escape sequences.
- */
-static char*
-assembleString( char* pzScan )
-{
-    char  q = *(pzScan++);
-
-    /*
-     *  It is a quoted string.  Process the escape sequence characters
-     *  (in the set "abfnrtv") and make sure we find a closing quote.
-     */
-    char* pzD = pzScan;
-    char* pzS = pzScan;
-
-    pz_token = pzD;
-
-    for (;;) {
-        /*
-         *  IF the next character is the quote character, THEN we may end the
-         *  string.  We end it unless the next non-blank character *after* the
-         *  string happens to also be a quote.  If it is, then we will change
-         *  our quote character to the new quote character and continue
-         *  condensing text.
-         */
-        while (*pzS == q) {
-            *pzD = NUL;
-        scan_for_quote:
-            while (isspace(*(++pzS)))
-                if (*pzS == '\n')
-                    pCurCtx->lineNo++;
-
-            /*
-             *  IF the next character is a quote character,
-             *  THEN we will concatenate the strings.
-             */
-            switch (*pzS) {
-            case '"':
-            case '\'':
-                break;
-
-            case '/':
-                /*
-                 *  Allow for a comment embedded in the concatenated string.
-                 */
-                switch (pzS[1]) {
-                default:  return pzS;
-                case '/':
-                    /*
-                     *  Skip to end of line
-                     */
-                    for (;;) {
-                        char ch = *++pzS;
-                        switch (ch) {
-                        case '\n': goto scan_for_quote;
-                        case '\0': return pzS;
-                        default:   break;
-                        }
-                    }
-                case '*':
-                    /*
-                     *  Skip to terminating star slash
-                     */
-                    pzS = strstr( pzS+2, "*/" );
-                    if (pzS == NULL)
-                        return (char*)zNil;
-                    pzS++;
-                    goto scan_for_quote;
-                }
-
-            case '#':
-                /*
-                 *  IF the next character is a directive,
-                 *  THEN ensure it is in the first column!!
-                 */
-                if (pzS[-1] != '\n')
-                    return assembleName( pzS, &lastToken );
-                /* FALLTHROUGH */
-
-            default:
-                return pzS;
-            }
-            q = *(pzS++);
-        }
-
-        switch (*(pzD++) = *(pzS++)) {
-        case NUL:
-            return NULL;
-
-        case '\n':
-            pCurCtx->lineNo++;
-            break;
-
-        case '\\':
-            /*
-             *  IF we are escaping a new line,
-             *  THEN drop both the escape and the newline from
-             *       the result string.
-             */
-            if (*pzS == '\n') {
-                pzS++;
-                pzD--;
-                pCurCtx->lineNo++;
-            }
-
-            /*
-             *  ELSE IF the quote character is '"' or '`',
-             *  THEN we do the full escape character processing
-             */
-            else if (q != '\'') {
-                int ct = doEscapeChar( pzS, pzD-1 );
-                if (ct == 0)
-                    return NULL;
-
-                pzS += ct;
-            }     /* if (q != '\'')                  */
-
-            /*
-             *  OTHERWISE, we only process "\\", "\'" and "\#" sequences.
-             *  The latter only to easily hide preprocessing directives.
-             */
-            else switch (*pzS) {
-            case '\\':
-            case '\'':
-            case '#':
-                pzD[-1] = *pzS++;
-            }
-        }     /* switch (*(pzD++) = *(pzS++))    */
-    }         /* for (;;)                        */
 }
 /*
  * Local Variables:

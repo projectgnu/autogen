@@ -1,6 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.8 2005/02/13 01:47:59 bkorb Exp $
+ *  $Id: autoopts.c,v 4.9 2005/02/14 14:09:54 bkorb Exp $
+ *  Time-stamp:      "2005-02-13 14:23:59 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -771,8 +772,7 @@ doPresets( tOptions* pOpts )
     }
     else {
         doEnvPresets( pOpts, ENV_IMM );
-        if (internalFileLoad( pOpts ) < 0)
-            return FAILURE;
+        internalFileLoad( pOpts );
         doEnvPresets( pOpts, ENV_NON_IMM );
     }
     pOpts->fOptSet &= ~OPTPROC_PRESETTING;

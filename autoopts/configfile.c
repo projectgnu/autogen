@@ -1,6 +1,6 @@
 
 /*
- *  $Id: configfile.c,v 4.3 2005/02/13 16:17:18 bkorb Exp $
+ *  $Id: configfile.c,v 4.4 2005/02/14 14:09:54 bkorb Exp $
  *
  *  configuration/rc/ini file handling.
  */
@@ -524,7 +524,7 @@ filePreset(
 }
 
 
-LOCAL int
+LOCAL void
 internalFileLoad( tOptions* pOpts )
 {
     int     idx;
@@ -532,7 +532,7 @@ internalFileLoad( tOptions* pOpts )
     char    zFileName[ 4096 ];
 
     if (pOpts->papzHomeList == NULL)
-        return 0;
+        return;
 
     /*
      *  Find the last RC entry (highest priority entry)
@@ -644,7 +644,8 @@ configFileLoad( tOptions* pOpts, const char* pzProgram )
         return -1;
 
     pOpts->pzProgName = pzProgram;
-    return internalFileLoad( pOpts );
+    internalFileLoad( pOpts );
+    return 0;
 }
 
 

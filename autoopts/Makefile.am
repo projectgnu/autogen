@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-12 17:51:42 bkorb"
+## Time-stamp:      "2005-02-14 05:59:50 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.12 2005/02/13 01:58:26 bkorb Exp $
+## $Id: Makefile.am,v 4.13 2005/02/14 14:09:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -42,10 +42,10 @@ HDRS        = $(GENHDRS) autoopts.h proto.h
 ##
 CSRC        = \
     autoopts.c  \
-    boolean.c   configfile.c enumeration.c environment.c genshell.c  \
-    load.c      makeshell.c  numeric.c     pgusage.c     putshell.c  \
-    restore.c   save.c       sort.c        stack.c       streqvcmp.c \
-    text_mmap.c tokenize.c   usage.c       version.c
+    boolean.c   configfile.c cook.c      enumeration.c environment.c \
+    genshell.c  load.c       makeshell.c numeric.c     pgusage.c     \
+    putshell.c  restore.c    save.c      sort.c        stack.c       \
+    streqvcmp.c text_mmap.c  tokenize.c  usage.c       version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
