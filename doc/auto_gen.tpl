@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul  8 09:52:25 1999                                
+## Last Modified:     Thu Jul  8 14:20:45 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.20 1999/07/08 16:52:31 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.21 1999/07/08 21:21:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -896,9 +896,6 @@ _FOR macfunc =][=
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
-@node Invocation
-@chapter Running AutoGen
-@cindex invocation
 
 [=_EVAL '
 if [ -s ${top_builddir}/src/autogen.texi ]
@@ -1015,13 +1012,16 @@ at all, I decided to leave it in the list of chapters.
 
 @menu
 [=_EVAL 'for f in ${top_builddir}/*/*.menu
-do cat $f ; done' _shell =]
+do case $f in *src/autogen.menu ) ;; * ) cat $f ;; esac ;  done' _shell =]
 @end menu
 
 [=_EVAL 'for f in ${top_builddir}/*/*.menu
-do echo \'@page\'
+do 
+   if [ "$f" = ${top_builddir}/src/autogen.menu ] ; then : ; else
+   echo \'@page\'
    sed s/\'${top_builddir}\'/"${top_builddir}"/ `echo $f|
        sed \'s/\.menu$/\.texi/\'`
+   fi
 done' _shell =]
 
 @ignore
