@@ -1,3 +1,10 @@
+2003-11-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(serverSetup): do not depend upon the shell understand-
+	ing "elif", disallow any variation of *csh shells and ensure that there
+	are plenty of characters for writing the AutoGen pid into the init
+	script for the shell.
+
 2003-08-23  Bruce Korb  <bkorb@gnu.org>
 
 	==5.5.6 released.

@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: agShell.c,v 3.20 2003/11/15 18:47:36 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -142,15 +142,15 @@ serverSetup( void )
             "then\n"
             "  emulate sh\n"
             "  NULLCMD=:\n"
-            "elif test -n \"${BASH_VERSION+set}\" "
+            "else if test -n \"${BASH_VERSION+set}\" "
                   "&& (set -o posix) >/dev/null 2>&1\n"
             "then\n"
             "  set -o posix\n"
-            "fi\n"
+            "fi ; fi\n"
 
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=\000000000000\n";
+            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=\000.........\n";
         static char* pzPid = NULL;
         char* pz;
         pzLastCmd = zTrap;
@@ -227,6 +227,22 @@ chainOpen( int       stdinFd,
             if (pzShell == NULL)
                 pzShell = "sh";
             pzShellProgram = pzShell;
+        }
+
+        /*
+         *  Disallow 'csh' and 'tcsh', or any other *csh variation.
+         *  They invariably lead to problems.
+         */
+        {
+            size_t l = strlen( pzShell );
+            if (  (l > 2)
+               && (strcmp( pzShell + l - 3, "csh" ) == 0)  )  {
+                tSCC zBadShell[] =
+                    "Your shell is '%s'.  AutoGen will attempt to use 'sh'\n";
+
+                fprintf( stdout, zBadShell, pzShell );
+                pzShell = "sh";
+            }
         }
 
         *ppArgs = pzShell;

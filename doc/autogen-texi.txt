@@ -2365,7 +2365,7 @@ incorporate the digested options into the shell's environment,
 @xref{shell options}.  You would use it thus:
 @example
 eval "`./programopts $@@`"
-test -z "$@{OPTION_CT@}" ] && exit 1
+test -z "$@{OPTION_CT@}" && exit 1
 test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
 
@@ -2543,8 +2543,7 @@ Maximum occurrence count (invalid if @var{disable} present).
 @cindex min
 @item min
 Minimum occurrence count.  If present, then the option @strong{must}
-appear on the command line.  Preset values do not count towards the
-minimum occurrence count.
+appear on the command line.
 
 @cindex must-set
 @item must-set
@@ -2741,7 +2740,7 @@ It may appear as often as may be needed.
 @item arg-type
 This specifies the type of argument the option will take.
 If not present, the option cannot take an argument.
-If present, it must be one of the following four.
+If present, it must be one of the following five.
 The bracketed part of the name is optional.
 
 @table @samp
@@ -2877,7 +2876,20 @@ The usage procedure displays these ranges by calling the callback
 with the @code{pOptDesc} pointer set to @code{NULL}.  Therefore,
 all callback procedures designed to handle options with numeric
 arguments @strong{must} be prepared to handle a call with that
-pointer set @code{NULL}.
+pointer set @code{NULL}.  When that argument is set @code{NULL},
+you may wish to emit a line of usage information.  Do something
+like this:
+@example
+    if (pOptDesc == NULL) {
+        fprintf( option_usage_fp, "\t\t\t  something\n" );
+        return;
+    }
+@end example
+Note the @code{option_usage_fp}.  Usage text is sometimes redirected
+to pipes or stdout in addition to stderr.  If your validation fails,
+you should set @code{option_usage_fp} to @code{stderr}.  See the
+function, @code{doOptTimeout()} in @file{autogen/agen5/opts.c} for
+a complete example.
 @end table
 
 @node Option Argument Handling
@@ -2885,7 +2897,7 @@ pointer set @code{NULL}.
 @cindex Option Argument Handling
 
 AutoOpts will automatically generate a callback procedure for options
-with enumerated keyword arguments and numeric arguments with range
+with enumerated keyword, set membership and numeric arguments with range
 checking.  If you have specified such an option, you may not specify any
 of the attributes listed here.
 
