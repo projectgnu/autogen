@@ -5,6 +5,7 @@
 	* pkg/libopts/mklibsrc.sh: distribute the "compat" dir, too
 	(autoopts.h): strip the #include of snprintf.h for tear-off library
 	* autoopts/autoopts-config.in(autogen): add exeext
+	* pkg/libopts/README: clarify what happens some more
 
 2002-09-12  Bruce Korb  <bkorb@gnu.org>
 
