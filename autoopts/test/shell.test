@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.11 2000/08/13 21:20:25 bkorb Exp $
+# $Id: shell.test,v 1.12 2000/10/08 00:15:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -44,7 +44,8 @@ compile "-?"
 echo creating $testname.hlp
 cat > $testname.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
-USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... reg-arg [ ... ]
+USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+		reg-arg [ ... ]
   Flg Arg Option-Name    Description
    -o YES option         The option option descrip
    -s no  second         The second option descrip
@@ -104,6 +105,7 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -o YES script         Output Script File
    -s YES shell          Shell name (follows "#!" magic)
 				- disabled as --no-shell
+				- enabled by default
    -v opt version        Output version information and exit
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -125,7 +127,8 @@ This incarnation of genshell will produce
 a shell script to parse the options for test_shell:
 
 test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... reg-arg [ ... ]
+USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+		reg-arg [ ... ]
   Flg Arg Option-Name    Description
    -o YES option         The option option descrip
    -s no  second         The second option descrip
@@ -145,7 +148,8 @@ echo creating $testname.sht
 cat > $testname.sht <<'_EOF_'
 #! /bin/sh
 TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... reg-arg [ ... ]
+USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+		reg-arg [ ... ]
   Flg Arg Option-Name    Description
    -o YES option         The option option descrip
    -s no  second         The second option descrip
@@ -156,7 +160,8 @@ Options may be specified by doubled hyphens and their name
 or by a single hyphen and the flag character/option value.'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... reg-arg [ ... ]
+USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+		reg-arg [ ... ]
   Flg Arg Option-Name    Description
    -o YES option         The option option descrip
    -s no  second         The second option descrip
