@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.13 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: expString.c,v 1.14 2000/03/12 20:40:36 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -210,7 +210,7 @@ ag_scm_in_p( SCM obj, SCM list )
 
 /*=gfunc join
  *
- * what:   join a list of strings with separator
+ * what:   join string list with separator
  * general_use:
  * exparg: separator, string to insert between entries
  * exparg: list, list of strings to join,, list
@@ -358,7 +358,7 @@ ag_scm_prefix( SCM prefix, SCM text )
 
 /*=gfunc shell
  *
- * what:  invoke a shell script for its output
+ * what:  invoke a shell script
  * general_use:
  *
  * exparg: command, shell command - the result value is stdout
@@ -393,7 +393,7 @@ ag_scm_shell( SCM cmd )
 
 /*=gfunc shellf
  *
- * what:  format a string, run shell on result
+ * what:  format a string, run shell
  * general_use:
  *
  * exparg: format, formatting string
@@ -424,7 +424,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
 
 /*=gfunc raw_shell_str
  *
- * what:  emit single quote string for shell
+ * what:  single quote shell string
  * general_use:
  *
  * exparg: string, string to transform
@@ -484,7 +484,7 @@ ag_scm_raw_shell_str( SCM obj )
 
 /*=gfunc shell_str
  *
- * what:  emit double quote string for shell
+ * what:  double quote shell string
  * general_use:
  *
  * exparg: string, string to transform
@@ -546,12 +546,13 @@ ag_scm_shell_str( SCM obj )
 
 /*=gfunc stack
  *
- * what:  stack named AutoGen values
+ * what:  make list of AutoGen values
  *
  * exparg: ag-name, AutoGen value name
  *
  * doc:  Create a list of all the strings that are associated
- *      with a name.
+ *       with a name.  This has been de-implemented for Guile.
+ *       It will be fixed later.
 =*/
     SCM
 ag_scm_stack( SCM obj )
@@ -574,7 +575,7 @@ ag_scm_stack( SCM obj )
 
 /*=gfunc kr_string
  *
- * what:  emit a string for K&R C
+ * what:  emit string for K&R C
  * general_use:
  *
  * exparg: string, string to reformat
@@ -601,7 +602,7 @@ ag_scm_kr_string( SCM str )
 
 /*=gfunc c_string
  *
- * what:  emit a string for ANSI C
+ * what:  emit string for ANSI C
  * general_use:
  *
  * exparg: string, string to reformat
@@ -633,7 +634,7 @@ ag_scm_c_string( SCM str )
 
 /*=gfunc string_tr_x
  *
- * what:  convert letters in a string
+ * what:  convert characters
  * general_use:
  *
  *  exparg:  source, string to transform

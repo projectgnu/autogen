@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.15 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: funcCase.c,v 1.16 2000/03/12 20:40:30 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -95,7 +95,7 @@ upString( char* pz )
 
 /*=gfunc string_contains_p
  *
- * what:   test for substring match
+ * what:   substring match
  * general_use:
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -124,7 +124,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
 
 /*=gfunc string_ends_with_p
  *
- * what:   test string ending
+ * what:   string ending
  * general_use:
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -160,7 +160,7 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
 
 /*=gfunc string_starts_with_p
  *
- * what:   test string starting
+ * what:   string starting
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -193,7 +193,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
 
 /*=gfunc string_equals_p
  *
- * what:   test string matching
+ * what:   string matching
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -222,7 +222,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 
 /*=gfunc string_contains_eqv_p
  *
- * what:   case insensitive test string contains
+ * what:   caseless string contains
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -269,7 +269,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_ends_eqv_p
  *
- * what:   case insenstive test string ending
+ * what:   caseless string ending
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -305,7 +305,7 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_starts_eqv_p
  *
- * what:   case insenstive test string start
+ * what:   caseless string start
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -338,7 +338,7 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_eqv_p
  *
- * what:   case insenstive test string match
+ * what:   caseless string match
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -370,7 +370,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 
 /*=gfunc string_has_match_p
  *
- * what:   regex match within string
+ * what:   contained regex match
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -383,7 +383,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_has_eqv_match_p
  *
- * what:   case insensitive regex match within string
+ * what:   caseless contained regex match
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -454,7 +454,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_end_match_p
  *
- * what:   regex match end of string
+ * what:   regex match end
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -467,7 +467,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_end_eqv_match_p
  *
- * what:   case insensitive regex match end of string
+ * what:   caseless regex match end
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -552,7 +552,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_start_match_p
  *
- * what:   regex match start of string
+ * what:   regex match start
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -565,7 +565,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_start_eqv_match_p
  *
- * what:   case insensitive regex match start of string
+ * what:   caseless regex match start
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -646,7 +646,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 
 /*=gfunc string_match_p
  *
- * what:   regex match string
+ * what:   regex match
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -659,7 +659,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_eqv_match_p
  *
- * what:   case insensitive regex match string
+ * what:   caseless regex match
  * general_use:
  *
  * exparg: text, text to test for pattern

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.24 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: funcDef.c,v 1.25 2000/03/12 20:41:17 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -921,7 +921,7 @@ MAKE_HANDLER_PROC( Invoke )
 
 /*=gfunc ag_invoke
  *
- * what:   Invoke an AutoGen macro
+ * what:   invoke AutoGen macro
  * exparg: macro, name of macro to invoke
  * exparg: args,  macro arguments, optional, ellipsis
  *

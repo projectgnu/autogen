@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.13 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: funcFor.c,v 1.14 2000/03/12 20:44:04 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -49,7 +49,7 @@ doForEach( tTemplate*   pT,
 
 /*=gfunc first_for_p
  *
- * what: detect first for iteration
+ * what: detect first iteration
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
  *       on the first pass through the data.  @xref{FOR}.
 =*/
@@ -63,7 +63,7 @@ ag_scm_first_for_p( void )
 
 /*=gfunc last_for_p
  *
- * what: detect last for iteration
+ * what: detect last iteration
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
  *       on the last pass through the data.  @xref{FOR}.
 =*/
@@ -77,7 +77,7 @@ ag_scm_last_for_p( void )
 
 /*=gfunc for_index
  *
- * what: get current for index
+ * what:  get current loop index
  * doc:   Returns the current index for innermost FOR loop.
  *        Outside of any FOR loop, it returns SCM_UNDEFINED.
  *        @xref{FOR}.
@@ -93,7 +93,7 @@ ag_scm_for_index( void )
 
 /*=gfunc for_from
  *
- * what:   set initial for index
+ * what:   set initial index
  * exparg: from, the initial index for the AutoGen FOR macro
  *
  * doc:  This function records the initial index information
@@ -111,7 +111,7 @@ ag_scm_for_from( SCM from )
 
 /*=gfunc for_to
  *
- * what:   set ending for limit
+ * what:   set ending index
  * exparg: to, the final index for the AutoGen FOR macro
  *
  * doc:  This function records the terminating value information
@@ -129,7 +129,7 @@ ag_scm_for_to( SCM to )
 
 /*=gfunc for_by
  *
- * what:   set for iteration step
+ * what:   set iteration step
  * exparg: by, the iteration increment for the AutoGen FOR macro
  *
  * doc:
@@ -148,7 +148,7 @@ ag_scm_for_by( SCM by )
 
 /*=gfunc for_sep
  *
- * what:   set for loop separation string
+ * what:   set loop separation string
  * exparg: separator, the text to insert between each AutoGen FOR iteration
  *
  * doc:

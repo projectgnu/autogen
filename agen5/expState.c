@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: expState.c,v 1.10 2000/03/12 20:40:41 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -286,9 +286,10 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
 
 /*=gfunc base_name
  *
- * what:   the base name of the output file(s)
+ * what:   base output name
  *
  * doc:  Returns a string containing the base name of the output file(s).
+ *       Generally, this is also the base name of the definitions file.
 =*/
     SCM
 ag_scm_base_name( void )
@@ -299,7 +300,7 @@ ag_scm_base_name( void )
 
 /*=gfunc count
  *
- * what:   number of entries for a definition
+ * what:   definition count
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -324,7 +325,7 @@ ag_scm_count( SCM obj )
 
 /*=gfunc def_file
  *
- * what:   name of the definitions file
+ * what:   definitions file name
  *
  * doc:  Get the name of the definitions file.
  *       Returns the name of the source file containing the AutoGen
@@ -339,7 +340,7 @@ ag_scm_def_file( void )
 
 /*=gfunc exist_p
  *
- * what:   Test for an AutoGen value for a name
+ * what:   test for value name
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -372,7 +373,7 @@ ag_scm_exist_p( SCM obj )
 
 /*=gfunc get
  *
- * what:   get the AutoGen value for a name
+ * what:   get named value
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -398,7 +399,7 @@ ag_scm_get( SCM obj )
 
 /*=gfunc high_lim
  *
- * what:   get the highest index for a name
+ * what:   get highest value index
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -435,7 +436,7 @@ ag_scm_high_lim( SCM obj )
 
 /*=gfunc len
  *
- * what:   get the number of elements for a name
+ * what:   get count of values
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -458,7 +459,7 @@ ag_scm_len( SCM obj )
 
 /*=gfunc low_lim
  *
- * what:   get the lowest index for a name
+ * what:   get lowest value index
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -492,7 +493,7 @@ ag_scm_low_lim( SCM obj )
 
 /*=gfunc suffix
  *
- * what:   get the current active suffix
+ * what:   get the current suffix
  *
  * doc:
  *  Returns the current active suffix.  See @code{generate} in the
