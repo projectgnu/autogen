@@ -1,0 +1,98 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# stdopts.test ---   test standard options
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: stdopts.test,v 1.1 2001/10/13 22:09:34 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating $testname.def in `pwd`"
+cat > $testname.def <<_EOF_
+
+AutoGen Definitions options;
+
+prog-name = test_$testname;
+prog-title = "$testname test";
+test-main;
+long-opts;
+
+#define VERBOSE_ENUM
+#define VERBOSE_FLAG
+
+#include stdoptions
+_EOF_
+
+$AGEN ${testname}.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_stdopts - stdopts test
+USAGE:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+
+The following options are commonly used and are provided and supported
+by AutoOpts:
+
+  Flg Arg Option-Name    Description
+   -V KWd verbose        run program with progress info
+
+Auto-supported Options:
+
+  Flg Arg Option-Name    Description
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character (option value).
+
+The valid verbose option keywords are:
+	silent
+	quiet
+	brief
+	informative
+	verbose
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure "`diff $testname.h*lp`"
+
+./$testname --verbose=exp > /dev/null && \
+  failure $testname accepted ambiguous keyword
+
+./$testname --verbose=inf > $testname.out || \
+  failure $testname did not handle its options
+
+cat > $testname.oex <<_EOF_
+OPTION_CT=1
+export OPTION_CT
+TEST_STDOPTS_VERBOSE='informative'
+export TEST_STDOPTS_VERBOSE
+_EOF_
+
+cmp -s $testname.o* || \
+  failure "`diff $testname.o??`"
+
+cleanup
+# end of keyword.test
