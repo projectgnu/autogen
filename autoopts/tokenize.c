@@ -93,7 +93,7 @@ copy_cooked( ch_t** ppDest, cc_t** ppSrc )
                     } else {
                         chars[1] = NUL;
                     }
-                    ch = (ch_t)strtol( chars, NULL, 16 );
+                    ch = (ch_t)strtol( (char*)chars, NULL, 16 );
                 }
                 break;
 
@@ -203,7 +203,7 @@ string_tokenize( const char* str )
      *  high and we'll squander the space for a few extra pointers.
      */
     {
-        cc_t* pz = str;
+        cc_t* pz = (cc_t*)str;
 
         do {
             max_token_ct++;
