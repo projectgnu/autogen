@@ -1,0 +1,63 @@
+#! /bin/echo this_file_should_be_sourced,_not_executed
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# defs --- define the environment for autogen tests.
+#
+# Author:         Bruce Korb <autogen@linuxbox.com>
+# Maintainer:     Bruce Korb <autogen@linuxbox.com>
+# Created:        Fri Mar 27 21:15:30 1998
+# Last Modified:  $Date: 1999/10/31 16:12:22 $
+#            by:  Bruce Korb <autogen@linuxbox.com>
+# ----------------------------------------------------------------------
+# $Id: defs,v 1.1 1999/10/31 16:12:22 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Make sure srcdir is an absolute path.  Supply the variable
+# if it does not exist.  We want to be able to run the tests
+# stand-alone!!
+#
+srcdir=${srcdir-.}
+if test ! -d $srcdir ; then
+    echo "defs: installation error" 1>&2
+    exit 1
+fi
+
+#  IF the source directory is a Unix or a DOS root directory, ...
+#
+case "$srcdir" in
+    /* | [A-Za-z]:\\*) ;;
+    *) srcdir=`\cd $srcdir && pwd` ;;
+esac
+
+progname=`echo "$0" | sed 's,^.*/,,'`
+testname=`echo "$progname" | sed 's,\..*$,,'`
+testsubdir=${testsubdir-testdir}
+
+# User can set VERBOSE to prevent output redirection
+case x$VERBOSE in
+    xNO | xno | x0 | x)
+        exec > /dev/null 2>&1
+        rm -rf $testsubdir
+        ;;
+esac
+
+test -d $testsubdir || mkdir $testsubdir
+cd $testsubdir
+if test $? != 0 ; then
+    echo "Cannot make or change into $testsubdir"
+    exit 1
+fi
+
+echo "=== Running $progname"
+
+# A standard failure function
+failure()
+{
+    test -d ../FAILURES || mkdir ../FAILURES
+    l=`echo *`
+    ( \cd ../FAILURES ; rm -f $l )
+    mv -f * ../FAILURES
+    echo $*
+    exit 1
+}
+# defs ends here
