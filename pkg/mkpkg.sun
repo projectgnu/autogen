@@ -1,0 +1,120 @@
+#! /bin/sh
+
+set -e
+pkgsrc=`pwd`
+agdir=`cd ../agen5 > /dev/null 2>&1 ; pwd`
+
+mkdir ${DESTDIR} || exit 1
+DESTDIR=`cd ${DESTDIR} > /dev/null && pwd` || exit 1
+
+cd ${top_builddir}
+${MAKE} install DESTDIR=${DESTDIR}
+
+cd ${DESTDIR}
+
+if [ ! -d reloc ]
+then
+  mkdir reloc
+  case "${prefix}" in
+  /* ) : ;;
+  *  ) prefix="/${prefix}" ;;
+  esac
+  mv .${prefix}/* reloc/. || exit 1
+  p=${prefix}
+  while [ -n "$p" ]
+  do rmdir .${p}
+     p=`echo "$p" | sed 's,/[^/]*$,,'`
+  done
+fi
+
+cp -f ${pkgsrc}/../COPYING ./copyright
+
+pkgdst=`pwd`
+[ -f prototype ] && rm -f prototype
+exec 4> prototype
+cat >&4 <<-  EOF
+	#  Prototype file for AutoGen
+	#
+	#  derived by scanning the `pwd` directory
+
+	i copyright
+	i pkginfo
+	i prototype
+	i checkinstall
+	! default 0755 root sys
+
+	# pt tp ????  obj-name
+	EOF
+
+cd reloc
+
+find * -type d | \
+while read d
+do
+  case "$d" in
+  *autogen* ) mod="0775 root sys" ;;
+  *         ) mod="? ? ?" ;;
+  esac
+
+  print -u4 "  1  d  none ${d} ${mod}"
+done
+
+print -u4 "! default 0644 root sys"
+
+find * -type f | \
+while read f
+do
+  if [ -x "$f" ]
+  then mod=0755
+  else mod=0644 ; fi
+  print -u4 "  1  f  none ${f} $mod root sys"
+done
+
+find * -type l | \
+while read l
+do
+  f=`ls -l $l | sed 's,.* -> ,,'`
+  print -u4 "  1  s  none ${l}=${f}"
+done
+
+exec 4>&-
+cd ${pkgdst}
+
+cat > checkinstall <<- EOF
+	PATH=${PATH}:${prefix}/bin
+	guile-config compile > /dev/null 2>&1 && exit 0
+	guile -c '(quit "bye")' && exit 0
+	echo "The guile library does not seem to be present."
+	echo "I have searched the PATH ${PATH}"
+	echo "If it is, please ensure it is in the search path and retry."
+	exit 1
+	EOF
+
+[ -f pkginfo.tpl ] && rm -f pkginfo.tpl
+cat > pkginfo.tpl <<- EOF
+	[= AutoGen5 Template info=pkginfo =]
+	PKG="GNUagen"
+	NAME="AutoGen - [=prog-title=]"
+	VERSION="[= version =]"
+	BASEDIR="${prefix}"
+	DESC="AutoGen - [=prog-title=]"
+	VENDOR="[= copyright.owner =] http://autogen.sf.net"
+	ARCH="sparc"
+	CATEGORY="Development"
+	EMAIL="[= copyright.eaddr =]"
+	CONTACT="[= copyright.owner =]"
+	CLASSES=none
+	PSTAMP="[= version =] `date '+%Y-%m-%d %H:%M:%S'`"
+	EOF
+
+cd ${agdir}
+${AGEXE} --writable -L${pkgdst} -Tpkginfo.tpl opts.def
+mv -f pkginfo ${pkgdst}/.
+cd ${pkgdst}
+rm -f pkginfo.tpl
+cd ..
+rm -rf GNUagen*
+pkgmk -d. -r ${pkgdst}/reloc,${pkgdst} -f ${pkgdst}/prototype
+pkgtrans -s . GNUagen.pkg GNUagen
+gzip --best GNUagen.pkg
+rm -rf ${pkgdst}

@@ -1,0 +1,27 @@
+#! /bin/sh
+
+eval "`egrep ^AG_ ${top_srcdir}/VERSION`" > /dev/null
+
+builddir=`pwd`
+cd ${top_builddir}
+mkdir BUILD SOURCES SPECS RPMS SRPMS
+${MAKE} dist
+printf "\n\nPACKAGING RPM FOR LINUX\n\n"
+set -x
+mv autogen-${AG_VERSION}.tar.gz SOURCES/.
+
+cd ${builddir}
+AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
+rpmfile=autogen-${AG_VERSION}.spec
+agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
+${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def
+
+cd ${top_builddir}
+rpm --buildroot . -ba ${builddir}/${rpmfile}
+
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## tab-width: 4
+## End:
+## end of mkpkg.linux

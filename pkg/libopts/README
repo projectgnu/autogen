@@ -37,27 +37,21 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 3. Add the following to your top level ``Makefile.am'' file:
 
       include $(srcdir)/libopts/MakeDefs.inc
-      EXTRA_DIST = $(LIBOPTS_REDIST) <...>
-      SUBDIRS = <...> $(LIBOPTS_DIR) <...>
       if NEED_LIBOPTS
+         SUBDIRS = <...> libopts <...>
          <<Makefile.am text for when building libopts>>
       else
+         SUBDIRS = <...>
          <<Makefile.am text for when libopts not needed>>
       endif
 
    where ``<...>'' can be whatever other files or directories
    you may need.  The SUBDIRS must be properly ordered.
-   ``LIBOPTS_CHECK'' will ensure that ``$(LIBOPTS_DIR)''
-   is empty if compiling libopts is not necessary.
-
-   Unfortunately, the "redist" stuff is all necessary to get the
-   correct set of files in your distribution.  If you simply add,
-   "libopts", you'll include unmodifiable files that will cause
-   distcheck to fail.  If you try to name all the files yourself,
-   you'll miss some when the distribution changes.  Therefore,
-   we have the magic "MakeDefs.inc" file in the distribution.
-
-   You may not need the "NEED_LIBOPTS" construct, but it's there.
+   *PLEASE NOTE* it is crucial that the SUBDIRS be set under the
+   control of an automake conditional.  To work correctly,
+   automake has to know the range of possible values of SUBDIRS.
+   It's a magical name with magical properties.  ``NEED_LIBOPTS''
+   will be correctly set by the ``LIBOPTS_CHECK'' macro, above.
 
 4. Add ``$(LIBOPTS_CFLAGS)'' to relevant compiler flags and
    ``$(LIBOPTS_LDADD)'' to relevant link options whereever
