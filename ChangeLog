@@ -1,3 +1,9 @@
+2000-11-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c( strlcpy ): correct signature
+	* configure.in: test for strlcpy
+	* agen5/autogen.h( strlcpy ): add declaration when needed
+
 2000-11-04  Bruce Korb  <bkorb@gnu.org>
 
 	* VERSION: bump the versions

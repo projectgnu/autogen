@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.9 2000/10/13 02:18:46 bkorb Exp $
+ *  $Id: agUtils.c,v 1.10 2000/11/29 16:44:28 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -28,6 +28,7 @@
 #include <time.h>
 #include <utime.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "autogen.h"
 
@@ -39,17 +40,33 @@
 STATIC const char* skipQuote( const char* pzQte );
 
 
-    EXPORT char*
+#ifndef HAVE_STRLCPY
+    size_t
 strlcpy( char* dest, const char* src, size_t n )
 {
     char* pz = dest;
-    while ((*(pz++) = *(src++)) != NUL)
+    char* ps = src;
+    size_t sz = 0;
+
+    for (;;) {
+        if ((*(pz++) = *(src++)) == NUL)
+            break;
+
+        /*
+         *  This is the unusual condition.  Do the exceptional work here.
+         */
         if (--n <= 0) {
             pz[-1] = NUL;
+            sz = strlen( src ) + 1; /* count of chars not copied out */
             break;
         }
-    return dest;
+    }
+
+    assert( sz + (src - ps) == strlen( ps ) + 1 );
+
+    return sz + (src - ps);
 }
+#endif
 
 
     EXPORT void
