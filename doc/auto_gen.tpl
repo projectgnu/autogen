@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Mon Sep 28 11:44:58 1998
+## Last Modified:     Tue Sep 29 07:50:20 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.3 1998/09/28 19:33:03 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.4 1998/09/29 15:34:47 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -80,6 +80,7 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 This file documents the [=prog_title=] package for creating an arbitrary
 text files containing repetitive text with varying substitutions.
+
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
 @menu
@@ -737,15 +738,8 @@ _FOR macfunc =][=
 @chapter Running Autogen
 @cindex invocation
 
-@code{Autogen} accepts the following options,
-as shown in this AutoOpts generated usage text:
-
-@example
-[=_eval "#${top_builddir}/src/autogen --help 2>&1 |
-        sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g'"  _shell=]
-@end example
-
-@ignore
+[=_EVAL 'cat ${top_builddir}/src/autogen.texi' _shell
+=]@ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
