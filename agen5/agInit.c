@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agInit.c,v 3.2 2004/08/15 00:52:47 bkorb Exp $
+ *  $Id: agInit.c,v 3.3 2004/08/15 12:25:28 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -26,10 +26,9 @@
  */
 STATIC void addSysEnv( char* pzEnvName );
 #ifdef DAEMON_ENABLED
+STATIC ag_bool evalProto( tCC** ppzS, uint16_t* pProto );
 STATIC void spawnPipe( const char* pzFile );
-#ifndef HAVE_SYS_SELECT_H
-STATIC void spawnListens( long port );
-#endif
+STATIC void spawnListens( tCC* pzPort, sa_family_t af );
 STATIC void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
 #endif
 
@@ -135,22 +134,13 @@ initialize( int arg_ct, char** arg_vec )
     }
 
     {
-        long  port;
+        sa_family_t af = AF_INET;
         tCC*  pzS = OPT_ARG( DAEMON );
-        char* pzE;
-        errno = 0;
-        port  = strtol( pzS, &pzE, 0 );
 
-        if ((errno != 0) || (*pzE != NUL)) {
+        if (evalProto( &pzS, &af ))
+            spawnListens( pzS, af );
+        else
             spawnPipe( pzS );
-        }
-        else {
-#ifndef HAVE_SYS_SELECT_H
-            spawnListens( port );
-#else
-            AG_ABEND( "You cannot listen on a port." );
-#endif
-        }
     }
 #endif /* DAEMON_ENABLED */
 }
@@ -189,6 +179,27 @@ addSysEnv( char* pzEnvName )
 
 
 #ifdef DAEMON_ENABLED
+
+STATIC ag_bool
+evalProto( tCC** ppzS, uint16_t* pProto )
+{
+    tCC* pzS = *ppzS;
+
+    if (isalpha( *pzS )) {
+        inet_family_map_t* pMap = inet_family_map;
+        do  {
+            if (strncmp( pzS, pMap->pz_name, pMap->nm_len ) == 0) {
+                *pProto = pMap->family;
+                *ppzS += pMap->nm_len;
+                return AG_TRUE;
+            }
+        } while ( (++pMap)->pz_name != NULL );
+    }
+
+    return isdigit( *pzS );
+}
+
+
 EXPORT void
 handleSighup( int sig )
 {
@@ -310,10 +321,12 @@ spawnPipe( tCC* pzFile )
         pzOut = pzIn + sprintf( pzIn, "%s-in", pzFile ) + 1;
     }
 
+    unlink( pzIn );
     if ((mkfifo( pzIn, S_IRW_ALL ) != 0) && (errno != EEXIST))
         AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzIn, strerror(errno)));
 
     (void)sprintf( pzOut, "%s-out", pzFile );
+    unlink( pzOut );
     if ((mkfifo( pzOut, S_IRW_ALL ) != 0) && (errno != EEXIST))
         AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzOut, strerror(errno)));
 
@@ -393,24 +406,65 @@ spawnPipe( tCC* pzFile )
 }
 
 
-#ifndef HAVE_SYS_SELECT_H
 STATIC void
-spawnListens( long port )
+spawnListens( tCC* pzPort, sa_family_t addr_family )
 {
-    tSCC zPortFmt[] = "to port %d on INET stream sock";
-    int socket_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    tSCC zPortFmt[] = "to port %s with %d type address";
+    int socket_fd = socket( addr_family, SOCK_STREAM, 0 );
+    union {
+        struct sockaddr     addr;
+        struct sockaddr_in  in_addr;
+        struct sockaddr_un  un_addr;
+    } sa;
+
+    uint32_t        addr_len;
+
     if (socket_fd < 0)
         AG_ABEND( aprf( zCannot, errno, "socket", "AF_INET/SOCK_STREAM",
                         strerror( errno )));
+
+    switch (addr_family) {
+
+    case AF_UNIX:
     {
-        struct sockaddr_in addr;
-        addr.sin_family      = AF_INET;
-        addr.sin_addr.s_addr = INADDR_ANY;
-        addr.sin_port        = htons( (short)port );
-        if (bind( socket_fd, &addr, sizeof(addr) ) < 0) {
-            char* pz = aprf( zPortFmt, port );
-            AG_ABEND( aprf( zCannot, errno, "bind", pz, strerror( errno )));
-        }
+        uint32_t p_len = strlen( pzPort );
+
+        if (p_len > sizeof(sa.un_addr.sun_path))
+            AG_ABEND( aprf( "AF_UNIX path exceeds %d", p_len ));
+        sa.un_addr.sun_family  = AF_UNIX;
+        strncpy( sa.un_addr.sun_path, pzPort, p_len );
+        addr_len = sizeof( sa.un_addr ) - sizeof( sa.un_addr.sun_path ) + p_len;
+    }
+    break;
+
+    case AF_INET:
+    {
+        uint16_t port;
+        char* pz;
+
+        sa.in_addr.sin_family      = AF_INET;
+        sa.in_addr.sin_addr.s_addr = INADDR_ANY;
+
+        errno = 0;
+        if ((unlink( pzPort ) != 0) && (errno != ENOENT))
+            AG_ABEND(aprf( zCannot, errno, "unlink", pzPort, strerror(errno)));
+
+        port = (uint16_t)strtol( pzPort, &pz, 0 );
+        if ((errno != 0) || (*pz != NUL))
+            AG_ABEND( aprf( "Invalid port number:  '%s'", pzPort ));
+
+        sa.in_addr.sin_port = htons( (short)port );
+        addr_len = sizeof( sa.in_addr );
+    }
+    break;
+
+    default:
+        AG_ABEND(aprf("The '%d' address family cannot be handled", addr_family));
+    }
+
+    if (bind( socket_fd, &sa.addr, addr_len ) < 0) {
+        char* pz = aprf( zPortFmt, pzPort, addr_family );
+        AG_ABEND( aprf( zCannot, errno, "bind", pz, strerror( errno )));
     }
 
     if (fcntl( socket_fd, F_SETFL, O_NONBLOCK ) < 0) {
@@ -419,7 +473,7 @@ spawnListens( long port )
     }
 
     if (listen( socket_fd, 5 ) < 0) {
-        char* pz = aprf( zPortFmt, port );
+        char* pz = aprf( zPortFmt, pzPort );
         AG_ABEND( aprf( zCannot, errno, "listen", pz, strerror( errno )));
     }
 
@@ -436,8 +490,10 @@ spawnListens( long port )
             if (errno == EINTR)
                 continue;
 
-            if (! redoOptions)
+            if (! redoOptions) {
+                unlink( pzPort );
                 exit( EXIT_SUCCESS );
+            }
 
             optionRestore( &autogenOptions );
             doOptions( autogenOptions.origArgCt,
@@ -466,7 +522,9 @@ spawnListens( long port )
             switch (errno) {
             case EINTR:
             case EAGAIN:
+#if (EAGAIN != EWOULDBLOCK)
             case EWOULDBLOCK:
+#endif
                 if (try_ct++ < 10000) {
                     sleep(1);
                     continue;
@@ -477,11 +535,12 @@ spawnListens( long port )
     }
 
     if (dup2( socket_fd, STDOUT_FILENO ) != STDOUT_FILENO)
-        AG_ABEND( aprf(zCannot, errno, "dup2", pzOut, strerror(errno)));
+        AG_ABEND( aprf(zCannot, errno, "dup2", "out on socket_fd",
+                       strerror(errno)));
     if (dup2( socket_fd, STDIN_FILENO ) != STDIN_FILENO)
-        AG_ABEND( aprf(zCannot, errno, "dup2", pzOut, strerror(errno)));
+        AG_ABEND( aprf(zCannot, errno, "dup2", "in on socket_fd",
+                       strerror(errno)));
 }
-#endif
 
 
 STATIC void
