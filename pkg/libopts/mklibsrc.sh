@@ -13,8 +13,7 @@ mkdir ${tag}
 mkdir ${tag}/compat
 
 cd ../autoopts
-cp -f COPYING        \
-      autoopts.c     \
+cp -f autoopts.c     \
       autoopts.h     \
       boolean.c      \
       enumeration.c  \
@@ -30,11 +29,12 @@ cp -f COPYING        \
       version.c      \
   ../pkg/${tag}/.
 
+cp -f COPYING ../pkg/${tag}/COPYING.lgpl
+
 cd ../compat
 cp *.h pathfind.c ../pkg/${tag}/compat/.
 
 cd ../pkg/${tag}
-mv COPYING COPYING.lgpl
 
 files=`ls -1 *.[ch] | \
 	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\' `
@@ -48,13 +48,13 @@ ag="${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable"
 
 cat >> libopts.m4 <<-	EOMacro
 
-	dnl @synopsis  AUTOOPTS_CHECK
+	dnl @synopsis  LIBOPTS_CHECK
 	dnl
-	dnl If autoopts-config works, add the linking information to
-	dnl LIBS.  Otherwise, configure the LIBOPTS_DIR subdirectory
-	dnl and run all the config tests that library needs.
+	dnl If autoopts-config works, add the linking information to LIBS.
+	dnl Otherwise, add \`\`libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}''
+	dnl to SUBDIRS and run all the config tests that the library needs.
 	dnl
-	AC_DEFUN([AUTOOPTS_CHECK],[
+	AC_DEFUN([LIBOPTS_CHECK],[
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
 	  AC_ARG_WITH([autoopts-config],
         AC_HELP_STRING([--with-autoopts-config],
@@ -79,15 +79,14 @@ cat >> libopts.m4 <<-	EOMacro
 	  then
 	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
 	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
-	    build_libopts_dir=false
+	    build_libopts_dir=''
 	  else
-	    LIBOPTS_LDADD='\$(top_builddir)/'"${tag}/libopts.la"
-	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/'"${tag}"
+	    LIBOPTS_LDADD='\$(top_builddir)/libopts/libopts.la'
+	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/libopts'
 	    INVOKE_LIBOPTS_MACROS
 	    build_libopts_dir=true
 	  fi
-	  LIBOPTS_VERS=${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
-	  AC_SUBST(LIBOPTS_VERS)
+	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${build_libopts_dir}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
@@ -104,6 +103,18 @@ cat > Makefile.am <<-	EOMakefile
 	lib_LTLIBRARIES = libopts.la
 	libopts_la_SOURCES = \$(SRC)
 	EOMakefile
+
+cat > MakeDefs.inc <<-	EOMakeDefs
+
+	## LIBOPTS Makefile Fragment
+	if NEED_LIBOPTS
+	  LIBOPTS_DIR  = libopts
+	else
+	  LIBOPTS_DIR  =
+	endif
+	LIBOPTS_LDADD  = @LIBOPTS_LDADD@
+	LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
+	EOMakeDefs
 
 sed s,'\${tag}',"${tag}",g ../libopts/README > README
 cp ../libopts/COPYING* .

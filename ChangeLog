@@ -1,3 +1,10 @@
+2002-08-22  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/libopts/README: reworked w/ help of
+	Alexandre Duret-Lutz <duret_g@lrde.epita.fr>
+	* pkg/libopts/mklibsrc.sh: use a fixed subdirectory name and
+	create an automake fragment file, `MakeDefs.inc'
+
 2002-08-18  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am(libsrc): Make this a non-distributed but
