@@ -40,7 +40,7 @@ set -- autogen*.gz
 if [ $# -gt 1 ]
 then shift `expr $# - 1` ; fi
 if [ ! -f $1 ]
-then ct=443
+then ct=564
 else ct="`expr \\( \`wc -c < $1\` + 1023 \\) / 1024`"
 fi
 echo $ct KB $1
