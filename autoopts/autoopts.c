@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.26 2003/07/04 15:12:22 bkorb Exp $
+ *  $Id: autoopts.c,v 3.27 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -69,19 +69,13 @@ tSCC zAtMost[]      = "%4$d %1$s%s options allowed\n";
 tSCC zEquiv[]       = "-equivalence";
 tSCC zErrOnly[]     = "ERROR:  only ";
 
-typedef int tDirection;
-#define DIRECTION_PRESET  -1
-#define DIRECTION_PROCESS  1
-#define PROCESSING(d)     ((d)>0)
-#define PRESETTING(d)     ((d)<0)
-
 /*
  *  loadValue
  *
  *  This routine handles equivalencing and invoking the handler procedure,
  *  if any.
  */
-STATIC tSuccess
+LOCAL tSuccess
 loadValue( tOptions* pOpts, tOptState* pOptState )
 {
     /*
@@ -162,7 +156,7 @@ loadValue( tOptions* pOpts, tOptState* pOptState )
  *
  *  Find the long option descriptor for the current option
  */
-STATIC tSuccess
+LOCAL tSuccess
 longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
 {
     ag_bool    disable  = AG_FALSE;
@@ -292,7 +286,7 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
  *
  *  Find the short option descriptor for the current option
  */
-STATIC tSuccess
+LOCAL tSuccess
 shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
@@ -357,7 +351,7 @@ shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
  *
  *  Find the option descriptor for the current option
  */
-STATIC tSuccess
+LOCAL tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState )
 {
     /*
@@ -450,7 +444,7 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
  *  all the state in the state argument so that the option can be skipped
  *  without consequence (side effect).
  */
-STATIC tSuccess
+LOCAL tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState )
 {
     tSuccess res;
@@ -630,18 +624,29 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
  *  doPresets()     is only called by optionProcess().
  *  loadOptionLine  is used by optionLoadLine() and doPresets()
  *  filePreset      is used by doLoadOpt() and doPresets()
+ */
+
+/*=export_func  optionMakePath
+ * private:
  *
+ * what:  translate and construct a path
+ * arg:   + char* + pzBuf      + The result buffer +
+ * arg:   + int   + bufSize    + The size of this buffer +
+ * arg:   + tCC*  + pzName     + The input name +
+ * arg:   + tCC*  + pzProgPath + The full path of the current program +
  *
- *  optionMakePath  --  translate and construct a path
+ * ret-type: ag_bool
+ * ret-desc: AG_TRUE if the name was handled, otherwise AG_FALSE.
  *
+ * doc:
  *  This routine does environment variable expansion if the first character
  *  is a ``$''.  If it starts with two dollar characters, then the path
  *  is relative to the location of the executable.
- */
+=*/
 ag_bool
 optionMakePath(
     char*    pzBuf,
-    size_t   bufSize,
+    int      bufSize,
     tCC*     pzName,
     tCC*     pzProgPath )
 {
@@ -760,7 +765,7 @@ optionMakePath(
 /*
  *  doImmediateOpts - scan the command line for immediate action options
  */
-STATIC tSuccess
+LOCAL tSuccess
 doImmediateOpts( tOptions* pOpts )
 {
     /*
@@ -865,7 +870,7 @@ doImmediateOpts( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 loadOptionLine(
     tOptions*  pOpts,
     tOptState* pOS,
@@ -997,7 +1002,7 @@ loadOptionLine(
  *
  *  Load a file containing presetting information (an RC file).
  */
-STATIC void
+LOCAL void
 filePreset(
     tOptions*     pOpts,
     const char*   pzFileName,
@@ -1111,7 +1116,7 @@ filePreset(
  *  doEnvPresets - check for preset values from the envrionment
  *  This routine should process in all, immediate or normal modes....
  */
-STATIC void
+LOCAL void
 doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 {
     int        ct;
@@ -1231,7 +1236,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-STATIC tSuccess
+LOCAL tSuccess
 doPresets( tOptions* pOpts )
 {
 #   define SKIP_RC_FILES \
@@ -1342,7 +1347,7 @@ doPresets( tOptions* pOpts )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-STATIC int
+LOCAL int
 checkConsistency( tOptions* pOpts )
 {
     int       errCt = 0;
@@ -1501,9 +1506,10 @@ checkConsistency( tOptions* pOpts )
  * err:   Invalid options are silently ignored.  Invalid option arguments
  *        will cause a warning to print, but the function should return.
 =*/
-void optionLoadLine( pOpts, pzLine )
-    tOptions*  pOpts;
-    tCC*       pzLine;
+void
+optionLoadLine(
+    tOptions*  pOpts,
+    tCC*       pzLine )
 {
     tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
     char* pz;
@@ -1513,13 +1519,18 @@ void optionLoadLine( pOpts, pzLine )
 }
 
 
-/*
- *  doLoadOpt
+/*=export_func  doLoadOpt
+ * private:
  *
- *  This is callable from the option descriptor.
- *  It is referenced when homerc files are enabled.
- */
-void doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
+ * what:  Load an option rc/ini file
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  Processes the options found in the file named with pOptDesc->pzLastArg.
+=*/
+void
+doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     /*
      *  IF the option is not being disabled,

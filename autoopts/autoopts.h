@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-05-26 08:04:30 bkorb"
+ *  Time-stamp:      "2003-11-22 17:22:21 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.17 2003/05/31 23:15:06 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.18 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -76,6 +76,12 @@
 
 #define SKIP_OPT(p)  (((p)->fOptState & (OPTST_DOCUMENT|OPTST_OMITTED)) != 0)
 
+typedef int tDirection;
+#define DIRECTION_PRESET  -1
+#define DIRECTION_PROCESS  1
+#define PROCESSING(d)     ((d)>0)
+#define PRESETTING(d)     ((d)<0)
+
 /*
  *  Procedure success codes
  *
@@ -130,6 +136,32 @@ typedef struct {
     char*      pzOptArg;
 } tOptState;
 
+#define TEXTTO_TABLE \
+        _TT_( LONGUSAGE ) \
+        _TT_( USAGE ) \
+        _TT_( VERSION )
+#define _TT_(n) \
+        TT_ ## n ,
+
+typedef enum { TEXTTO_TABLE COUNT_TT } teTextTo;
+
+#undef _TT_
+
+typedef struct {
+    tCC*    pzStr;
+    tCC*    pzReq;
+    tCC*    pzNum;
+    tCC*    pzKey;
+    tCC*    pzKeyL;
+    tCC*    pzBool;
+    tCC*    pzOpt;
+    tCC*    pzNo;
+    tCC*    pzBrk;
+    tCC*    pzNoF;
+    tCC*    pzSpc;
+    tCC*    pzOptFmt;
+} arg_types_t;
+
 #  define AGALOC( c, w )        malloc( c )
 #  define AGREALOC( p, c, w )   realloc( p, c )
 #  define AGFREE( p )           free( p )
@@ -146,32 +178,174 @@ typedef struct {
  */
 extern FILE* option_usage_fp;
 
-/*
- *  optionUsage print the usage text for the program described by the
- *  option descriptor.  Does not return.  Calls ``exit(3)'' with exitCode.
- */
-extern void optionUsage( tOptions*, int exitCode );
-
-/*
- *  optionSave saves the option state into an RC or INI file in
- *  the *LAST* defined directory in the papzHomeList.
- */
-extern void optionSave( tOptions* pOpts );
-
-/*
- *  optionMakePath  --  translate and construct a path
- *
- *  This routine does environment variable expansion if the first character
- *  is a ``$''.  If it starts with two dollar characters, then the path
- *  is relative to the location of the executable.
- */
-extern ag_bool optionMakePath(
-    char*    pzBuf,
-    size_t   bufSize,
-    tCC*     pzName,
-    tCC*     pzProgPath );
-
 extern tOptProc doVersion, doPagedUsage, doLoadOpt;
+
+#define LOCAL static
+/* === LOCAL PROCEDURES === */
+
+/* autoopts.c */
+static tSuccess
+loadValue( tOptions* pOpts, tOptState* pOptState );
+
+static tSuccess
+longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState );
+
+static tSuccess
+shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState );
+
+static tSuccess
+findOptDesc( tOptions* pOpts, tOptState* pOptState );
+
+static tSuccess
+nextOption( tOptions* pOpts, tOptState* pOptState );
+
+static tSuccess
+doImmediateOpts( tOptions* pOpts );
+
+static void
+loadOptionLine(
+    tOptions*  pOpts,
+    tOptState* pOS,
+    char*      pzLine,
+    tDirection direction );
+
+static void
+filePreset(
+    tOptions*     pOpts,
+    const char*   pzFileName,
+    int           direction );
+
+static void
+doEnvPresets( tOptions* pOpts, teEnvPresetType type );
+
+static tSuccess
+doPresets( tOptions* pOpts );
+
+static int
+checkConsistency( tOptions* pOpts );
+
+
+/* boolean.c */
+
+/* enumeration.c */
+static void
+enumError(
+    tOptions* pOpts,
+    tOptDesc* pOD,
+    tCC**     paz_names,
+    int       name_ct );
+
+static uintptr_t
+findName(
+    tCC*          pzName,
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC**         paz_names,
+    unsigned int  name_ct );
+
+
+/* genshell.c */
+
+/* guileopt.c */
+
+/* makeshell.c */
+static void
+textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD );
+
+static void
+emitUsage( tOptions* pOpts );
+
+static void
+emitSetup( tOptions* pOpts );
+
+static void
+printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc );
+
+static void
+printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc );
+
+static void
+emitFlag( tOptions* pOpts );
+
+static void
+emitLong( tOptions* pOpts );
+
+static void
+openOutput( const char* pzFile );
+
+static void
+genshelloptUsage( tOptions*  pOptions, int exitCode );
+
+
+/* numeric.c */
+
+/* pgusage.c */
+
+/* putshell.c */
+static void
+putQuotedStr( char* pzStr );
+
+
+/* restore.c */
+
+/* save.c */
+static char*
+findDirName( tOptions* pOpts );
+
+static char*
+findFileName( tOptions* pOpts );
+
+static void
+printEntry(
+    FILE*      fp,
+    tOptDesc*  p,
+    char*      pzLA );
+
+
+/* sort.c */
+static void
+optionSort( tOptions* pOpts );
+
+
+/* stack.c */
+
+/* streqvcmp.c */
+
+/* usage.c */
+static void
+printProgramDetails( tOptions* pOptions );
+
+static void
+printExtendedUsage(
+    tOptions*     pOptions,
+    tOptDesc*     pOD,
+    arg_types_t*  pAT );
+
+static void
+printBareUsage(
+    tOptions*     pOptions,
+    tOptDesc*     pOD,
+    arg_types_t*  pAT );
+
+static void
+setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+
+static void
+setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+
+static void
+printInitList(
+    tCC**    papz,
+    ag_bool* pInitIntro,
+    tCC*     pzRc,
+    tCC*     pzPN );
+
+
+/* version.c */
+static void
+printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
+
+/* === END LOCALS === */
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*

@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-07-12 10:57:13 bkorb"
+## Time-stamp:      "2003-11-22 15:37:50 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.20 2003/08/21 02:06:09 bkorb Exp $
+## $Id: Makefile.am,v 3.21 2003/11/23 02:07:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -32,8 +32,8 @@ pkgdata_DATA	= stdoptions.def autoopts.m4 \
 HDRS        = autoopts.h options.h  streqv.h
 CSRC        = \
 	autoopts.c boolean.c enumeration.c makeshell.c \
-	numeric.c  pgusage.c putshell.c    restore.c   \
-	save.c     stack.c   streqvcmp.c   usage.c     version.c
+	numeric.c  pgusage.c putshell.c    restore.c   save.c \
+	sort.c     stack.c   streqvcmp.c   usage.c     version.c
 ALLSRC		= genshell.c genshell.h $(CSRC)
 
 EXTRA_DIST	= $(pkgdata_DATA) $(ALLSRC) COPYING $(man_MANS) options_h.tpl \

@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
+/*  $Id: version.c,v 3.8 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -56,11 +56,8 @@ tSCC zBadArg[] =
 
 tSCC zBugRpt[] = "\nplease send bug reports to:  %s\n";
 
-static void
-printVersion( pOpts, pOD, fp )
-    tOptions*  pOpts;
-    tOptDesc*  pOD;
-    FILE*      fp;
+LOCAL void
+printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
 {
     char swCh;
 
@@ -116,6 +113,16 @@ printVersion( pOpts, pOD, fp )
     exit( EXIT_SUCCESS );
 }
 
+/*=export_func  doVersion
+ * private:
+ *
+ * what:  Print the program version
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  This routine will print the version to stdout.
+=*/
 void
 doVersion( pOpts, pOD )
     tOptions*  pOpts;
@@ -124,6 +131,16 @@ doVersion( pOpts, pOD )
     printVersion( pOpts, pOD, stdout );
 }
 
+/*=export_func  doVersion
+ * private:
+ *
+ * what:  Print the program version to stderr
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  This routine will print the version to stderr.
+=*/
 void
 doVersionStderr( pOpts, pOD )
     tOptions*  pOpts;

@@ -45,5 +45,23 @@ case "$1" in
 		_END_VERS_INFO_
     ${AUTOGEN} funcs.def
   fi
+
+  f=ao$$.h
+  exec 4> $f
+  sed '/=== LOCAL PROCEDURES ===/q' autoopts.h >&4
+  for g in *.c
+  do
+    echo
+    echo "/* $g */"
+    sed -n '/^LOCAL /,/^{$/p' $g | \
+      sed 's/^LOCAL /static /;s/^{//;s/)$/);/'
+  done >&4
+  echo '/* === END LOCALS === */' >&4
+  sed '1,/=== END LOCALS ===/d' autoopts.h >&4
+  exec 4>&-
+  if cmp $f autoopts.h
+  then rm -f $f
+  else mv -f $f autoopts.h
+  fi
   ;;
 esac

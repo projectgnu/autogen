@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.13 2003/07/11 01:03:13 bkorb Exp $
+ *  $Id: putshell.c,v 3.14 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -53,7 +53,7 @@
 /*
  *  Make sure embedded single quotes come out okay
  */
-static void
+LOCAL void
 putQuotedStr( char* pzStr )
 {
     if (pzStr != (char*)NULL) for (;;) {

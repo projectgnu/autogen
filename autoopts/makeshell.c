@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.12 2003/07/11 01:03:13 bkorb Exp $
+ *  $Id: makeshell.c,v 3.13 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -338,29 +338,26 @@ static const char zFlagOptArg[] =
 "            ;;\n"
 "        esac\n";
 
+static char*  pzShell   = (char*)NULL;
+static char*  pzLeader  = (char*)NULL;
+static char*  pzTrailer = (char*)NULL;
 
-#define TEXTTO_TABLE \
-        _TT_( LONGUSAGE ) \
-        _TT_( USAGE ) \
-        _TT_( VERSION )
-#define _TT_(n) \
-        TT_ ## n ,
-
-typedef enum { TEXTTO_TABLE COUNT_TT } teTextTo;
-
-#undef _TT_
-
-STATIC char*  pzShell   = (char*)NULL;
-STATIC char*  pzLeader  = (char*)NULL;
-STATIC char*  pzTrailer = (char*)NULL;
-
-STATIC void  emitFlag(  tOptions* pOpts );
-STATIC void  emitLong(  tOptions* pOpts );
-STATIC void  emitUsage( tOptions* pOpts );
-STATIC void  emitSetup( tOptions* pOpts );
-STATIC void  openOutput( const char* );
+static void  emitFlag(  tOptions* pOpts );
+static void  emitLong(  tOptions* pOpts );
+static void  emitUsage( tOptions* pOpts );
+static void  emitSetup( tOptions* pOpts );
+static void  openOutput( const char* );
 
 
+/*=export_func  putShellParse
+ * private:
+ *
+ * what:  Decipher a boolean value
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ *
+ * doc:
+ *  Emit a shell script that will parse the command line options.
+=*/
 void
 putShellParse( tOptions* pOpts )
 {
@@ -452,7 +449,7 @@ putShellParse( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 {
     int  nlHoldCt = 0;
@@ -545,7 +542,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 }
 
 
-STATIC void
+LOCAL void
 emitUsage( tOptions* pOpts )
 {
     char     zTimeBuf[ 128 ];
@@ -613,7 +610,7 @@ emitUsage( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 emitSetup( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -669,7 +666,7 @@ emitSetup( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doVersion)
@@ -720,7 +717,7 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-STATIC void
+LOCAL void
 printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doLoadOpt) {
@@ -739,7 +736,7 @@ printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-STATIC void
+LOCAL void
 emitFlag( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -761,7 +758,7 @@ emitFlag( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 emitLong( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -901,7 +898,7 @@ emitLong( tOptions* pOpts )
 }
 
 
-STATIC void
+LOCAL void
 openOutput( const char* pzFile )
 {
     FILE* fp;
@@ -980,7 +977,7 @@ openOutput( const char* pzFile )
 }
 
 
-void
+LOCAL void
 genshelloptUsage( tOptions*  pOptions, int exitCode )
 {
     /*

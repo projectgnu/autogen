@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.15 2003/07/04 17:58:14 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.16 2003/11/23 02:07:44 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -255,13 +255,18 @@ struct options {
 #ifdef  __cplusplus
 extern "C" {
 #endif
-[=
 
-FOR export_func  "\n"   =][=
+/*
+ *  The following routines may be coded into AutoOpts client code:
+ */[=
 
-  IF (exist? "private") =]
-/* AutoOpts PRIVATE FUNCTION: */[=
-  ELSE  =]
+ (out-push-new)
+ (out-suspend "priv")   =][=
+
+FOR export_func         =][=
+
+  IF (not (exist? "private")) =]
+
 /* From: [=srcfile=] line [=linenum=]
  *
  * [=name=] - [=what=][=
@@ -283,7 +288,9 @@ FOR export_func  "\n"   =][=
 [=(prefix " *  " (get "doc"))=]
  */[=
 
-   ENDIF exist? private
+  ENDIF =][=
+
+  (if (exist? "private") (out-resume "priv"))
 
 =]
 extern [= ?% ret-type "%s" "void"  =] [=name=]( [=
@@ -292,13 +299,16 @@ extern [= ?% ret-type "%s" "void"  =] [=name=]( [=
    ELSE   =][=(join ", " (stack "arg.arg-type")) =][=
    ENDIF  =] );
 [=
+ (if (exist? "private") (out-suspend "priv"))
+
+=][=
 
 ENDFOR export-func
 
 =]
 /*  AutoOpts PRIVATE FUNCTIONS:  */
 tOptProc stackOptArg, unstackOptArg, optionBooleanVal, optionNumericVal;
-
+[= (out-resume "priv") (out-pop #t) =]
 #ifdef  __cplusplus
 }
 #endif

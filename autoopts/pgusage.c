@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: pgusage.c,v 3.8 2003/11/23 02:07:44 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -53,14 +53,19 @@
 
 tePagerState pagerState = PAGER_STATE_INITIAL;
 
-/*
+/*=export_func  doPagedUsage
+ * private:
+ *
+ * what:  Decipher a boolean value
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
- */
+=*/
 void
-doPagedUsage( pOptions, pOD )
-    tOptions* pOptions;
-    tOptDesc* pOD;
+doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {
     static pid_t     my_pid;
     char zPageUsage[ 1024 ];

@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-05-16 12:14:54 bkorb"
+## Time-stamp:      "2003-11-15 14:29:46 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.24 2003/05/18 17:13:43 bkorb Exp $
+## $Id: Makefile.am,v 3.25 2003/11/23 02:07:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -85,7 +85,7 @@ SUFFIXES = .i
 GEN_LIST = $(STAMPS) $(GENDOCS) defParse.c defParse.h
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \
-	AGEXE=@AGEXE@ GDEXE=@GDEXE@ COLEXE=@COLEXE@
+	AGEXE=$(AGEXE) GDEXE=$(GDEXE) COLEXE=$(COLEXE)
 
 defLex.o : defParse.h
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.18 2003/07/08 02:30:45 bkorb Exp $
+ *  $Id: enumeration.c,v 3.19 2003/11/23 02:07:44 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -53,12 +53,12 @@
 
 tSCC*  pz_enum_err_fmt;
 
-static void
-enumError( pOpts, pOD, paz_names, name_ct )
-    tOptions* pOpts;
-    tOptDesc* pOD;
-    tCC**     paz_names;
-    int       name_ct;
+LOCAL void
+enumError(
+    tOptions* pOpts,
+    tOptDesc* pOD,
+    tCC**     paz_names,
+    int       name_ct )
 {
     if (pOpts != NULL)
         fprintf( option_usage_fp, pz_enum_err_fmt,
@@ -81,7 +81,7 @@ enumError( pOpts, pOD, paz_names, name_ct )
 }
 
 
-static uintptr_t
+LOCAL uintptr_t
 findName(
     tCC*          pzName,
     tOptions*     pOpts,

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.14 2003/07/04 15:12:22 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.15 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -52,9 +52,8 @@
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
-STATIC char*
-findDirName( pOpts )
-    tOptions*  pOpts;
+LOCAL char*
+findDirName( tOptions* pOpts )
 {
     char*  pzDir;
 
@@ -130,9 +129,8 @@ findDirName( pOpts )
 }
 
 
-STATIC char*
-findFileName( pOpts )
-    tOptions*  pOpts;
+LOCAL char*
+findFileName( tOptions* pOpts )
 {
     char*  pzDir;
     tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
@@ -245,11 +243,11 @@ findFileName( pOpts )
 }
 
 
-STATIC void
-printEntry( fp, p, pzLA )
-    FILE*      fp;
-    tOptDesc*  p;
-    char*      pzLA;
+LOCAL void
+printEntry(
+    FILE*      fp,
+    tOptDesc*  p,
+    char*      pzLA )
 {
     /*
      *  There is an argument.  Pad the name so values line up

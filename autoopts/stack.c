@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.11 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: stack.c,v 3.12 2003/11/23 02:07:44 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -51,6 +51,16 @@
 
 #include REGEX_HEADER
 
+/*=export_func  unstackOptArg
+ * private:
+ *
+ * what:  Remove option args from a stack
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  Invoked for options that are equivalenced to stacked options.
+=*/
 void
 unstackOptArg( pOpts, pOptDesc )
     tOptions*  pOpts;
@@ -133,6 +143,16 @@ unstackOptArg( pOpts, pOptDesc )
 }
 
 
+/*=export_func  stackOptArg
+ * private:
+ *
+ * what:  put option args on a stack
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  Keep an entry-ordered list of option arguments.
+=*/
 void
 stackOptArg( pOpts, pOptDesc )
     tOptions*  pOpts;

@@ -1,3 +1,40 @@
+2003-11-22  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(CSRC): add sort.c file
+	* autoopts/autoopts.c: move interface types to autoopts.h and change
+	references to "STATIC" to "LOCAL"
+	(optionMakePath): exported for use by AutoGen, but nobody else
+	* autoopts/autoopts.h: incorporate interface types defined in some
+	of the modules.  Incorporate generated procedure prototypes.
+	* autoopts/bootstrap.dir(LOCAL PROCEDURES): extract their names and
+	insert them into autoopts.h
+
+	* autoopts/boolean.c(optionBooleanVal): export this function for ao use
+	* autoopts/numeric.c(optionNumericVal): ditto
+	* autoopts/pgusage.c(doPagedUsage): ditto
+	* autoopts/stack.c(unstackOptArg, stackOptArg): ditto
+	* autoopts/makeshell.c(putShellParse): ditto, plus convert STATIC usage
+	to LOCAL usage.
+
+	* autoopts/enumeration.c(enumError): LOCAL-ize for static use
+	(findName): ditto
+	* autoopts/putshell.c(putQuotedStr): ditto
+	* autoopts/save.c(findDirName, findFileName, printEntry): ditto
+
+	* autoopts/options_h.tpl(private): separate private use funcs better
+	* autoopts/options.tpl(do-ifdefs): clean up usage
+	* autoopts/optlib.tpl(ifdef-ed): clean up usage
+	* autoopts/sort.c(optionSort): new file/routine to separate options
+	from operands.  Not directly callable by users.
+
+	* autoopts/usage.c(arg_types_t): move to autoopts.h
+	(optionUsage): export this function for ao use
+	LOCAL-ize several functions.
+
+	* autoopts/version.c(printVersion): LOCAL-ize
+	(doVersion): export this function for ao use
+	* doc/autogen.texi: many cleanups.
+
 2003-11-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(serverSetup): do not depend upon the shell understand-

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 3.5 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: boolean.c,v 3.6 2003/11/23 02:07:44 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -51,14 +51,20 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/*
+/*=export_func  optionBooleanVal
+ * private:
+ *
+ * what:  Decipher a boolean value
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  Decipher a true or false value for a boolean valued option argument.
  *  The value is true, unless it starts with 'n' or 'f' or "#f" or
- *  it is an empty string or it is a number that evaluates to zero
- */
+ *  it is an empty string or it is a number that evaluates to zero.
+=*/
 void
-optionBooleanVal( pOpts, pOD )
-    tOptions* pOpts;
-    tOptDesc* pOD;
+optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
 {
     long  val;
     char* pz;

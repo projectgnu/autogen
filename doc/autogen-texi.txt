@@ -2129,10 +2129,13 @@ main( int argc, char** argv )
   @}
 @end example
 
-The options are tested and used as in the following fragment:
+The options are tested and used as in the following fragment.
+``@code{ENABLED_OPT}'' is used instead of ``@code{HAVE_OPT}'' for the
+@code{show-defs} option because it is an enabled/disabled option type:
 
 @example
-  if (HAVE_OPT( SHOW_DEFS ) && HAVE_OPT( CHECK_DIRS )) @{
+  if (  ENABLED_OPT( SHOW_DEFS )
+     && HAVE_OPT( CHECK_DIRS )) @{
     int    dirct = STACKCT_OPT( CHECK_DIRS );
     char** dirs  = STACKLST_OPT( CHECK_DIRS );
     while (dirct-- > 0) @{
@@ -2464,9 +2467,12 @@ finally set these global variables.
 @item usage
 Optionally names the usage procedure, if the library routine
 @code{optionUsage()} does not work for you.  If you specify
-@code{gnu_usage} as the value of this attribute, for example,
-you will use a procedure by that name for displaying usage.
-Of course, you will need to provide that procedure.
+@code{my_usage} as the value of this attribute, for example, you will
+use a procedure by that name for displaying usage.  Of course, you will
+need to provide that procedure and it must conform to this profile:
+@example
+void optionUsage( tOptions* pOptions, int exitCode )
+@end example
 
 @cindex gnu-usage
 @item gnu-usage
@@ -2582,7 +2588,8 @@ ifdef = WITH_MUMBLING;
 Note that case and spelling must match whatever you are using.
 Do not confuse these attributes with the AutoGen directives of the
 same names, @xref{Directives}.  These cause C pre-processing directives
-to be inserted into the generated C text.
+to be inserted into the generated C text.  Also note that only one
+of these attributes may apply to any particular option.
 @end table
 
 @node Special Option Handling
@@ -2880,10 +2887,10 @@ pointer set @code{NULL}.  When that argument is set @code{NULL},
 you may wish to emit a line of usage information.  Do something
 like this:
 @example
-    if (pOptDesc == NULL) {
+    if (pOptDesc == NULL) @{
         fprintf( option_usage_fp, "\t\t\t  something\n" );
         return;
-    }
+    @}
 @end example
 Note the @code{option_usage_fp}.  Usage text is sometimes redirected
 to pipes or stdout in addition to stderr.  If your validation fails,
@@ -2897,13 +2904,12 @@ a complete example.
 @cindex Option Argument Handling
 
 AutoOpts will automatically generate a callback procedure for options
-with enumerated keyword, set membership and numeric arguments with range
-checking.  If you have specified such an option, you may not specify any
-of the attributes listed here.
-
-Otherwise, you may pick zero or one of the following attributes.
-The first two attributes interact with the @code{documentation} and
-@code{settable} attributes, @xref{Special Option Handling}.
+with enumerated keyword, set membership and numeric arguments with
+range checking.  If you have specified such an option, you may not
+specify any of the attributes listed here.  Otherwise, you may pick
+zero or one of the following attributes.  The first two attributes
+interact with the @code{documentation} and @code{settable} attributes,
+@xref{Special Option Handling}.
 
 @table @samp
 @cindex flag-code
@@ -2968,7 +2974,7 @@ a disablement prefix will cause undefined results.
 
 If all of this is confusing, then don't mess with equivalenced stacked
 option arguments.  If you really want to know, the AutoGen @code{--define}
-option (@pxref{autogen define}) has a stacked argument, and @code{--undefine}
+option (@pxref{autogen define}) is a stacked argument, and @code{--undefine}
 (@pxref{autogen undefine}) is equivalenced to it.
 @end table
 
@@ -3291,9 +3297,9 @@ default:
 
 @cindex pzLastArg
 @item pzLastArg
-Pointer to the latest argument string.  BEWARE@:  If the argument type is
-numeric or an enumeration, then this will be the argument @strong{value} and
-not a pointer to a string.
+Pointer to the latest argument string.  BEWARE@: If the argument type
+is numeric, an enumeration or a bit mask, then this will be the
+argument @strong{value} and not a pointer to a string.
 @end table
 
 The following two fields are addressed from the @code{tOptions*} pointer:
@@ -3314,7 +3320,7 @@ the current program, as retrieved from the argument vector.
 
 Note@:  these fields get filled in during the first call to
 @code{optionProcess()}.  All other fields are private, for the exclusive
-use of AutoOpts code and is subject to change.
+use of AutoOpts code and are subject to change.
 
 @node CLEAR_OPT
 @subsection CLEAR_OPT( <NAME> ) - Clear Option Markings

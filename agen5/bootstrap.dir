@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2003/05/18 17:15:30 $
+# Last Modified:     $Date: 2003/11/23 02:07:44 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.12 2003/05/18 17:15:30 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.13 2003/11/23 02:07:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -120,7 +120,7 @@ do
   defParse.[ch] )
     #  Set a default for YACC
     #
-	set +e
+    set +e
     if [ "x${YACC}" = x ]
     then
       f="`type byacc 2>/dev/null`"
@@ -160,7 +160,7 @@ do
       mv -f y_tab.c defParse.c
       mv -f y_tab.h defParse.h
     fi
-	set -e
+    set -e
     ;;
 
   stamp-opts | \
@@ -221,9 +221,9 @@ do
     echo ${GD} load=expr.cfg func*.c exp*.c
     set +e
     ( SHELL=sh ${GD} load=expr.cfg func*.c exp*.c 2>&1 ) | \
-	  egrep -v 'no copies of pattern' >&2
+      egrep -v 'no copies of pattern' >&2
     set -e
-	${AG} expr.def
+    ${AG} expr.def
     [ "$t" = "expr.def" ] || rm -f expr.def
     date > stamp-exprini
     ;;
@@ -278,13 +278,13 @@ do
     ;;
 
   proto.h )
-    ( cat <<-	_EOF_
-	/* -*- buffer-read-only: t -*- vi: set ro:
-	 *
-	 * AutoGen Globally exported prototypes `date`
-	 */
-	#ifndef AUTOGEN_PROTOTYPES_H
-	#define AUTOGEN_PROTOTYPES_H
+    ( cat <<-   _EOF_
+		/* -*- buffer-read-only: t -*- vi: set ro:
+		 *
+		 * AutoGen Globally exported prototypes `date`
+		 */
+		#ifndef AUTOGEN_PROTOTYPES_H
+		#define AUTOGEN_PROTOTYPES_H
 _EOF_
     for f in `egrep -l '^ *EXPORT' *.c`
     do

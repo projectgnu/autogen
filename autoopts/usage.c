@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.22 2003/08/21 02:06:09 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.23 2003/11/23 02:07:44 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -76,48 +76,23 @@ tSCC zReq_NoShort_Title[]   = "   Arg Option-Name   Req?  Description\n";
 tSCC zPresetIntro[]         = "\n\
 The following option preset mechanisms are supported:\n";
 
-typedef struct {
-    tCC*    pzStr;
-    tCC*    pzReq;
-    tCC*    pzNum;
-    tCC*    pzKey;
-    tCC*    pzKeyL;
-    tCC*    pzBool;
-    tCC*    pzOpt;
-    tCC*    pzNo;
-    tCC*    pzBrk;
-    tCC*    pzNoF;
-    tCC*    pzSpc;
-    tCC*    pzOptFmt;
-} arg_types_t;
-
 FILE* option_usage_fp = NULL;
 static char    zOptFmtLine[ 16 ];
 static ag_bool displayEnum;
 
-static void printInitList( tCC** papz, ag_bool*, tCC*, tCC* );
-
-static void setGnuOptFmts(
-    tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
-
-static void setStdOptFmts(
-    tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
-
-static void
-printBareUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT );
-
-static void
-printExtendedUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT );
-
-static void printProgramDetails( tOptions* pOptions );
-
-
+/*=export_func  optionUsage
+ * private:
+ *
+ * what:  Print usage text
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + int       + exitCode + exit code for calling exit(3) +
+ *
+ * doc:
+ *  This routine will print usage in both GNU-standard and AutoOpts-expanded
+ *  formats.  The descriptor specifies the default, but AUTOOPTS_USAGE will
+ *  over-ride this, providing the value of it is set to either "gnu" or
+ *  "autoopts".  This routine will @strong{not} return.
+=*/
 void
 optionUsage(
     tOptions* pOptions,
@@ -266,7 +241,7 @@ or by a single hyphen and the flag character.\n";
  *
  *   PROGRAM DETAILS
  */
-static void
+LOCAL void
 printProgramDetails( tOptions* pOptions )
 {
     ag_bool  initIntro = AG_TRUE;
@@ -316,7 +291,7 @@ printProgramDetails( tOptions* pOptions )
  *
  *   PER OPTION TYPE USAGE INFORMATION
  */
-static void
+LOCAL void
 printExtendedUsage(
     tOptions*     pOptions,
     tOptDesc*     pOD,
@@ -446,7 +421,7 @@ printExtendedUsage(
 }
 
 
-static void
+LOCAL void
 printBareUsage(
     tOptions*     pOptions,
     tOptDesc*     pOD,
@@ -586,7 +561,7 @@ static arg_types_t stdTypes = {
     /* pzSpc  */ zSixSpaces + 4   /* 2 spaces */
 };
 
-static void
+LOCAL void
 setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
 {
     int  flen = 0;
@@ -619,7 +594,7 @@ setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
     sprintf( zOptFmtLine, zFmtFmt, flen );
 }
 
-static void
+LOCAL void
 setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
 {
     int  flen = 22;
@@ -648,12 +623,12 @@ setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
  *   testing to see if a name is a directory or a file.  It's
  *   squishy, but important to tell users how to find these files.
  */
-static void
-printInitList( papz, pInitIntro, pzRc, pzPN )
-    tCC**    papz;
-    ag_bool* pInitIntro;
-    tCC*     pzRc;
-    tCC*     pzPN;
+LOCAL void
+printInitList(
+    tCC**    papz,
+    ag_bool* pInitIntro,
+    tCC*     pzRc,
+    tCC*     pzPN )
 {
     tSCC zPathFmt[] = " - reading file %s";
     char zPath[ MAXPATHLEN+1 ];
