@@ -1,3 +1,12 @@
+2004-02-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(DEFINITIONS): distribute defParse.def, too.
+	* agen5/autogen.h(FMEM_IOCTL_SAVE_BUF): do not deallocate buf ioctl
+	* agen5/expOutput.c(ag_scm_out_push_new): use anonymous temp file
+	if `--no-fmemopen' is indicated
+	* agen5/fmemopen.c: code cleanup
+	* agen5/opts.def(no-fmemopen): new option.
+
 2004-02-01  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am: remove defParse.y, add defParse.def + its FSM

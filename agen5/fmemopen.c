@@ -24,31 +24,29 @@
 /*
  * fmemopen() - "my" version of a string stream
  * Hanno Mueller, kontakt@hanno.de
- * extended by Bruce Korb - bkorb@gnu.org
+ * completely rewritten by Bruce Korb - bkorb@gnu.org
  *
  * - See the man page.
  */
 
 #ifdef HAVE_FOPENCOOKIE
 
-STATIC int fmem_getmode (const char *mode, fmem_io_mode_t *mptr);
+STATIC int fmem_getmode( const char *mode, fmem_io_mode_t *mptr );
+STATIC int fmem_extend(  fmem_cookie_t *pFMC, size_t new_size );
 
 #ifndef __set_errno
 #  define __set_errno(e)  errno = e
 #endif
 
 STATIC int
-fmem_getmode (const char *mode, fmem_io_mode_t *mptr)
+fmem_getmode( const char *mode, fmem_io_mode_t *mptr )
 {
-    unsigned char i;
-
     if (mode == NULL)
         return 1;
 
-    memset ((void *) mptr, 0, sizeof (*mptr));
+    memset( mptr, 0, sizeof (*mptr));
 
-    switch (*mode)
-    {
+    switch (*mode) {
     case 'a':
         mptr->extensible = mptr->write = mptr->create = mptr->append = 1;
         break;
@@ -62,12 +60,10 @@ fmem_getmode (const char *mode, fmem_io_mode_t *mptr)
         return 1;
     }
 
-    for (i = 1; i < 4; ++i)
-    {
-        switch (*++mode)
-        {
+    for (;;) {
+        switch (*++mode) {
         case NUL:
-            break;
+            goto mode_done;
         case '+':
             mptr->extensible = mptr->read = mptr->write = 1;
             continue;
@@ -79,8 +75,7 @@ fmem_getmode (const char *mode, fmem_io_mode_t *mptr)
         default:
             return 1;
         }
-        break;
-    }
+    } mode_done:;
 
     if (!mptr->read && !mptr->write)
         return 1;
@@ -89,9 +84,8 @@ fmem_getmode (const char *mode, fmem_io_mode_t *mptr)
 }
 
 STATIC int
-fmem_extend (fmem_cookie_t *pFMC, size_t new_size)
+fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
 {
-    void* bf;
     size_t ns = (new_size + (pFMC->pg_size - 1)) & (~(pFMC->pg_size - 1));
 
     /*
@@ -103,28 +97,25 @@ fmem_extend (fmem_cookie_t *pFMC, size_t new_size)
     if (pFMC->mode.extensible == 0)
         return -1;
 
-    if (pFMC->mode.allocated == 0)
-    {
+    if (pFMC->mode.allocated == 0) {
         /*
          *  Previously, this was a user supplied buffer.  We now move to one
          *  of our own.  The user is responsible for the earlier memory.
          */
-        bf = malloc (ns);
-        if (bf == NULL)
-        {
-            __set_errno (ENOSPC);
+        void* bf = malloc( ns );
+        if (bf == NULL) {
+            errno = ENOSPC;
             return -1;
         }
-        memcpy (bf, pFMC->buffer, pFMC->size);
+        memcpy( bf, pFMC->buffer, pFMC->size );
         pFMC->buffer = bf;
         pFMC->mode.allocated = 1;
     }
-    else
-    {
-        bf = realloc (pFMC->buffer, ns);
-        if (bf == NULL)
-        {
-            __set_errno (ENOSPC);
+
+    else {
+        void* bf = realloc( pFMC->buffer, ns );
+        if (bf == NULL) {
+            errno = ENOSPC;
             return -1;
         }
         pFMC->buffer = bf;
@@ -133,34 +124,33 @@ fmem_extend (fmem_cookie_t *pFMC, size_t new_size)
     /*
      *  Unallocated file space is set to zeros.  Emulate that.
      */
-    memset (pFMC->buffer + pFMC->size, 0, ns - pFMC->size);
+    memset( pFMC->buffer + pFMC->size, 0, ns - pFMC->size );
     pFMC->size = ns;
     return 0;
 }
 
 STATIC ssize_t
-fmem_read (void *cookie, void *b, size_t s)
+fmem_read( void *cookie, void *buf, size_t rd_ct )
 {
     fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
 
-    if (pFMC->pos + s > pFMC->size)
-    {
+    if (pFMC->pos + rd_ct > pFMC->size) {
         if (pFMC->pos >= pFMC->size)
-            return (s > 0) ? -1 : 0;
-        s = pFMC->size - pFMC->pos;
+            return (rd_ct > 0) ? -1 : 0;
+        rd_ct = pFMC->size - pFMC->pos;
     }
 
-    memcpy (b, &(pFMC->buffer[pFMC->pos]), s);
+    memcpy( buf, &(pFMC->buffer[pFMC->pos]), rd_ct );
 
-    pFMC->pos += s;
+    pFMC->pos += rd_ct;
     if (pFMC->pos > pFMC->maxpos)
         pFMC->maxpos = pFMC->pos;
 
-    return s;
+    return rd_ct;
 }
 
 STATIC ssize_t
-fmem_write (void *cookie, const void *b, size_t s)
+fmem_write( void *cookie, const void *b, size_t wr_ct )
 {
     const char* pBuf = b;
     fmem_cookie_t *pFMC;
@@ -176,91 +166,112 @@ fmem_write (void *cookie, const void *b, size_t s)
      *  * the last character to write is not NUL
      */
     add_nul_char = (pFMC->mode.binary == 0)
-                   && (  (s == 0)
-                      || (pBuf[s - 1] != NUL) );
+                   && (  (wr_ct == 0)
+                      || (pBuf[wr_ct - 1] != NUL) );
 
     if (pFMC->mode.append != 0)
         pFMC->pos = pFMC->maxpos;
 
-    if (  (pFMC->pos + s + add_nul_char > pFMC->size)
-          && (fmem_extend (pFMC, pFMC->pos + s + add_nul_char) != 0)  )
-    {
-        if (pFMC->pos + add_nul_char == pFMC->size)
-        {
-            __set_errno (ENOSPC);
+    /*
+     *  IF we are trying to go past the end of the buffer,
+     *  we might shorten the write or we might fail.  Let's see...
+     */
+    if (pFMC->pos + wr_ct + add_nul_char > pFMC->size) do {
+        if (pFMC->mode.extensible != 0) {
+            /*
+             *  We are allowed to extend.  We either extend or fail with ENOSPC.
+             *  The error is set in "fmem_extend".
+             */
+            if (fmem_extend( pFMC, pFMC->pos + wr_ct + add_nul_char ) != 0)
+                return -1;
+            break;
+        }
+
+        /*
+         *  IF we are already at the end, then signal an error.
+         */
+        if (pFMC->pos + add_nul_char >= pFMC->size) {
+            errno = ENOSPC;
             return -1;
         }
-        s = pFMC->size - pFMC->pos - add_nul_char;
-    }
 
-    memcpy (&(pFMC->buffer[pFMC->pos]), b, s);
+        /*
+         *  Shorten the write.
+         */
+        wr_ct = pFMC->size - pFMC->pos - add_nul_char;
+    } while (0);
 
-    pFMC->pos += s;
-    if (pFMC->pos > pFMC->maxpos)
-    {
+    memcpy( &(pFMC->buffer[pFMC->pos]), pBuf, wr_ct );
+
+    pFMC->pos += wr_ct;
+    if (pFMC->pos > pFMC->maxpos) {
         pFMC->maxpos = pFMC->pos;
         if (add_nul_char)
             pFMC->buffer[pFMC->maxpos] = NUL;
     }
 
-    return s;
+    return wr_ct;
 }
 
 STATIC int
-fmem_seek (void *cookie, _IO_off64_t *p, int w)
+fmem_seek( void *cookie, _IO_off64_t *p_offset, int seek_type )
 {
     _IO_off64_t new_pos;
     fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
 
-    switch (w)
-    {
+    switch (seek_type) {
     case SEEK_SET:
-        new_pos = *p;
+        new_pos = *p_offset;
         break;
 
     case SEEK_CUR:
-        new_pos = pFMC->pos + *p;
+        new_pos = pFMC->pos + *p_offset;
         break;
 
     case SEEK_END:
-        new_pos = pFMC->size - *p;
+        new_pos = pFMC->size - *p_offset;
         break;
 
-    case FMEM_IOCTL_BUFFER:
-        *(char**)p = pFMC->buffer;
+    case FMEM_IOCTL_BUF_ADDR:
+        *(char**)p_offset = pFMC->buffer;
+        return 0;
+
+    case FMEM_IOCTL_SAVE_BUF:
+        pFMC->mode.allocated = 0;
         return 0;
 
     default:
-        __set_errno (EINVAL);
+        errno = EINVAL;
         return -1;
     }
 
-    if (new_pos < 0)
+    if (new_pos < 0) {
+        errno = EINVAL;
         return -1;
+    }
 
-    if (new_pos > pFMC->size)
-    {
-        if (fmem_extend (pFMC, new_pos))
+    if (new_pos > pFMC->size) {
+        if (fmem_extend( pFMC, new_pos ))
             return -1;
     }
 
-    *p = pFMC->pos = new_pos;
+    *p_offset = pFMC->pos = new_pos;
     return 0;
 }
 
 STATIC int
-fmem_close (void *cookie)
+fmem_close( void *cookie )
 {
     fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
 
     if (pFMC->mode.allocated)
-        free (pFMC->buffer);
-    free (pFMC);
+        free( pFMC->buffer );
+    free( pFMC );
 
     return 0;
 }
 
-/*=export_func fmemioctl
+/*=export_func fmem_ioctl
  *
  *  what:  get information about a string stream
  *
@@ -273,17 +284,33 @@ fmem_close (void *cookie)
  *  doc:
  *
  *  This routine surreptitiously slips in a special request.
- *  Currently, the only special request supported is,
- *  @code{FMEM_IOCTL_BUFFER}.  The third argument is never optional
- *  and must be a pointer to where the buffer address is to be stored.
- *  "@code{sizeof long}" must be the same as "@code{sizeof char*}".
+ *  The commands supported are:
+ *  @table @code
+ *  @item FMEM_IOCTL_BUF_ADDR
+ *    Retrieve the address of the buffer.  Future output to the stream
+ *    might cause this buffer to be freed and the contents copied to another
+ *    buffer.  You must ensure that either you have saved the buffer
+ *    (see @code{FMEM_IOCTL_SAVE_BUF} below), or do not do any more I/O to
+ *    it while you are using this address.
+ *
+ *  @item FMEM_IOCTL_SAVE_BUF
+ *    Do not deallocate the buffer on close.  You would likely want to use this
+ *    after writing all the output data and just before closing.  Otherwise,
+ *    the buffer might get relocated.  Once you have specified this, the
+ *    current buffer becomes the client program's resposibility to
+ *    @code{free()}.
+ *  @end table
+ *
+ *  The third argument is never optional and must be a pointer to where data
+ *  are to be retrieved or stored.  It may be NULL if there are no data to
+ *  transfer.
 =*/
 int
-fmemioctl( FILE* fp, int req, void* ptr )
+fmem_ioctl( FILE* fp, int req, void* ptr )
 {
     if (sizeof(long) == sizeof(char*))
         return fseek( fp, (long)ptr, req );
-    __set_errno (EINVAL);
+    errno = EINVAL;
     return -1;
 }
 
@@ -351,22 +378,22 @@ fmemioctl( FILE* fp, int req, void* ptr )
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
  =*/
 FILE *
-fmemopen (void *buf, size_t len, const char *mode)
+fmemopen( void *buf, size_t len, const char *mode )
 {
-    fmem_cookie_t *pFMC = (fmem_cookie_t *) malloc (sizeof (fmem_cookie_t));
+    fmem_cookie_t *pFMC = (fmem_cookie_t *) malloc( sizeof (fmem_cookie_t));
     if (pFMC == NULL) {
-        __set_errno (ENOMEM);
+        errno = ENOMEM;
         return NULL;
     }
 
-    if (fmem_getmode (mode, &pFMC->mode) != 0) {
-        __set_errno (EINVAL);
-        free (pFMC);
+    if (fmem_getmode( mode, &pFMC->mode ) != 0) {
+        errno = EINVAL;
+        free( pFMC );
         return NULL;
     }
 
     pFMC->mode.allocated = ((buf == NULL) || (len == 0));
-    pFMC->pg_size = getpagesize ();
+    pFMC->pg_size = getpagesize();
 
     if (pFMC->mode.allocated == 0) {
         char *p = pFMC->buffer = buf;
@@ -391,8 +418,8 @@ fmemopen (void *buf, size_t len, const char *mode)
         /*
          *  No user supplied buffer and we are reading.  Nonsense.
          */
-        __set_errno (EINVAL);
-        free (pFMC);
+        errno = EINVAL;
+        free( pFMC );
         return NULL;
     }
 
@@ -404,8 +431,8 @@ fmemopen (void *buf, size_t len, const char *mode)
          */
         if (len == 0) {
             if (pFMC->mode.extensible == 0) {
-                __set_errno (EINVAL);
-                free (pFMC);
+                errno = EINVAL;
+                free( pFMC );
                 return NULL;
             }
 
@@ -415,10 +442,10 @@ fmemopen (void *buf, size_t len, const char *mode)
         /*
          *  Unallocated file space is set to zeros.  Emulate that.
          */
-        pFMC->buffer = (char *) calloc (1, len);
+        pFMC->buffer = (char *) calloc( 1, len );
         if (pFMC->buffer == NULL) {
-            __set_errno (ENOMEM);
-            free (pFMC);
+            errno = ENOMEM;
+            free( pFMC );
             return NULL;
         }
 
@@ -426,7 +453,7 @@ fmemopen (void *buf, size_t len, const char *mode)
     }
 
     pFMC->size   = len;
-    pFMC->maxpos = (pFMC->mode.binary) ? len : strlen (pFMC->buffer);
+    pFMC->maxpos = (pFMC->mode.binary) ? len : strlen( pFMC->buffer );
 
     {
         cookie_io_functions_t iof;

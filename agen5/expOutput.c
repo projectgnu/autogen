@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.21 2004/02/02 01:42:18 bkorb Exp $
+ *  $Id: expOutput.c,v 3.22 2004/02/03 04:57:41 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -330,9 +330,19 @@ ag_scm_out_push_new( SCM new_file )
         unlink( pzNewFile );
         addWriteAccess( pzNewFile );
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
-
-    } else {
-#     ifndef HAVE_FOPENCOOKIE
+    }
+#   ifdef HAVE_FOPENCOOKIE
+    else if (! HAVE_OPT( NO_FMEMOPEN ))
+#   else
+    else
+#   endif
+    {
+        /*
+         *  IF we do not have fopencookie, then this block is a pure "else"
+         *  clause.  If we do have that routine, then the block is executed
+         *  when a file name is not s specified *and* --no-fmemopen was *not*
+         *  selected on the command line.
+         */
         tSCC* pzTemp = NULL;
         int tmpfd;
 
@@ -356,13 +366,19 @@ ag_scm_out_push_new( SCM new_file )
 
         p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
         close( tmpfd );
-
-#     else  /* HAVE_FOPENCOOKIE */
+    }
+#   ifdef HAVE_FOPENCOOKIE
+    else {
+        /*
+         *  This block is a pure "else" clause that is only compiled if
+         *  "fopencookie" is available in the local c library.  Anonymous
+         *  files without --no-fmemopen being selected will get us here.
+         */
         p->pFile  = fmemopen( NULL, 0, "w" FOPEN_BINARY_FLAG "+" );
         pzNewFile = "in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
-#     endif /* HAVE_FOPENCOOKIE */
     }
+#   endif /* HAVE_FOPENCOOKIE */
 
     if (p->pFile == NULL)
         AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,

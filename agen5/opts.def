@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.23 2004/02/01 21:26:45 bkorb Exp $
+ *   $Id: opts.def,v 3.24 2004/02/03 04:57:41 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -377,12 +377,30 @@ flag = {
     descrip    = "set mod times to latest source";
 #ifndef XML2AG
     disable    = no;
-    doc =
-"If you stamp your output files with the `DNE' macro output, then your output
-files will always be different, even if the content has not really changed.
-If you use this option, then the modification time of the output files will
-change only if the input files change.  This will help reduce unneeded builds.";
+    doc = <<-  _EOF_
+		If you stamp your output files with the `DNE' macro output, then
+		your output files will always be different, even if the content has
+		not really changed.  If you use this option, then the modification
+		time of the output files will change only if the input files change.
+		This will help reduce unneeded builds.
+		_EOF_;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
 
+flag = {
+    name       = no_fmemopen;
+    descrip    = "Do not use in-mem streams";
+    ifdef      = HAVE_FOPENCOOKIE;
+#ifndef XML2AG
+    doc = <<-  _EOF_
+		If the local C library supports "@code{fopencookie(3GNU)}", then AutoGen
+		prefers to use in-memory stream buffer opens instead of anonymous files.
+		This may lead to problems if there is a shortage of virtual memory.
+		If, for a particular application, you run out of memory, then specify
+		this option.  This is unlikely in a modern virtual memory environment.
+		_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-01 15:54:05 bkorb"
+## Time-stamp:      "2004-02-02 17:50:23 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.30 2004/02/02 01:42:18 bkorb Exp $
+## $Id: Makefile.am,v 3.31 2004/02/03 04:57:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -18,7 +18,7 @@ GETDEFS     = $(top_builddir)/getdefs/@GDEXE@
 AGEXE       = $(top_builddir)/agen5/@AGEXE@
 
 TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
-DEFINITIONS = cgi.def opts.def pseudo.def
+DEFINITIONS = cgi.def opts.def pseudo.def defParse.def
 GENDOCS     = autogen.texi autogen.menu autogen.1
 CLEANFILES  = $(GENDOCS)
 STAMPS      = stamp-directive stamp-exprini stamp-opts stamp-fsm

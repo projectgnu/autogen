@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.27 2004/02/02 01:48:43 bkorb Exp $
+ *  $Id: autogen.h,v 3.28 2004/02/03 04:57:41 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -444,9 +444,14 @@ struct fmem_cookie_s
 typedef struct fmem_cookie_s  fmem_cookie_t;
 
 /*
- *  Special "seek" requests
+ *  Special ioctl/"seek" requests
  */
-#define FMEM_IOCTL_BUFFER  0x80000001
+#define FMEM_IOCTL_BUF_ADDR  0x80000001
+
+/*
+ *  Save the buffer on close
+ */
+#define FMEM_IOCTL_SAVE_BUF  0x80000002
 
 extern FILE * fmemopen (void *buf, size_t len, const char *mode);
 #endif
