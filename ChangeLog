@@ -1,7 +1,12 @@
 2004-01-23  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/enums.test: fix ksh-isms
+	(echo): guard against builtin echo interpreting '\\'
 	* autoopts/test/handler.test: fix ksh-isms
+	* agen5/autogen.c(signalSetup): do not override "RT" signals
+	* agen5/defDirect.c(doDir_define): use "memmove" for memory shift
+	* agen5/tpLoad.c(loadMacros): ditto
+	* autoopts/save.c(optionSaveFile): only free mem that was allocated
 
 2004-01-21  Bruce Korb  <bkorb@gnu.org>
 

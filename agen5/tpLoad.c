@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.4 2005/01/24 20:27:42 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -277,8 +277,8 @@ loadMacros( tTemplate* pT,
         if ((void*)pMacEnd < (void*)(pT->pzFileName)) {
             int  delta = pT->pzFileName - (char*)pMacEnd;
             int  size  = (pT->pNext - pT->pzFileName);
-            memcpy( (void*)pMacEnd, (void*)(pT->pzFileName),
-                    size );
+            memmove( (void*)pMacEnd, (void*)(pT->pzFileName),
+                     size );
             pT->pzFileName  -= delta;
             pT->pzTemplText -= delta;
             pT->pNext       -= delta;

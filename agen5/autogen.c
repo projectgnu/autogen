@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.5 2005/01/23 23:52:49 bkorb Exp $
+ *  $Id: autogen.c,v 4.6 2005/01/24 20:27:42 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -352,8 +352,12 @@ signalSetup( sighandler_proc_t* chldHandler,
              sighandler_proc_t* dfltHandler )
 {
     struct sigaction  sa;
-    int    sigNo = 1;
-
+    int    sigNo  = 1;
+#ifdef SIGRTMIN
+    const int maxSig = SIGRTMIN-1;
+#else
+    const int maxSig = NSIG;
+#endif
     atexit( doneCheck );
 
     sa.sa_flags   = 0;
@@ -417,7 +421,7 @@ signalSetup( sighandler_proc_t* chldHandler,
             sa.sa_handler = dfltHandler;
         }
         sigaction( sigNo,  &sa, NULL );
-    } while (++sigNo < NSIG);
+    } while (++sigNo < maxSig);
 }
 
 #ifndef HAVE_STRFTIME

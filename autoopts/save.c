@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.5 2005/01/23 23:33:06 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.6 2005/01/24 20:27:42 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -398,6 +398,7 @@ optionSaveFile( tOptions* pOpts )
     ct  = pOpts->presetOptCt;
     pOD = pOpts->pOptDesc;
     do  {
+        int arg_state;
         tOptDesc*  p;
 
         /*
@@ -434,7 +435,8 @@ optionSaveFile( tOptions* pOpts )
             continue;
         }
 
-        switch (p->fOptState & ARGTYPE) {
+        arg_state = p->fOptState & ARGTYPE;
+        switch (arg_state) {
         case 0:
         case OPTST_NUMERIC:
             printEntry( fp, p, p->pzLastArg );
@@ -467,7 +469,7 @@ optionSaveFile( tOptions* pOpts )
              */
             (*(p->pOptProc))( (tOptions*)2UL, p );
             printEntry( fp, p, p->pzLastArg );
-            if (p->pzLastArg != NULL)
+            if ((p->pzLastArg != NULL) && (arg_state != OPTST_ENUMERATION))
                 /*
                  *  bit flag and enumeration strings get allocated
                  */

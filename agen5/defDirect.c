@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: defDirect.c,v 4.5 2005/01/24 20:27:42 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -428,10 +428,12 @@ doDir_define( char* pzArg, char* pzScan )
      *       directive itself, giving us the space needed.
      */
     if (! isspace( *pzArg )) {
+        size_t shift_len = strlen(pzName)-1;
         pzName--;
         *pzArg = NUL;
-        strcpy( pzName, pzName+1 );
-        strcat( pzName, "=" );
+        memmove( pzName, pzName+1, shift_len );
+        pzName[shift_len]   = '=';
+        pzName[shift_len+1] = NUL;
 
     } else {
         /*

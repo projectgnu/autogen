@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-01-23 18:06:05 bkorb"
+# Time-stamp:        "2005-01-24 10:49:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: enums.test,v 4.3 2005/01/24 02:30:49 bkorb Exp $
+# $Id: enums.test,v 4.4 2005/01/24 20:27:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -139,7 +139,9 @@ main = {
 _EOF_
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
-
+#
+#  In one case we must not use built in echo.
+#
 cat > ${testname}.tpl <<\__EOF
 [= AutoGen5 Template -*- Mode: C -*- =]
 [=(define proc-list "")=]
@@ -158,7 +160,7 @@ do_proc_t* do_proc[] = {
 do
   p=`echo $p | sed s/,//`
   echo int ${p}'( void ) {'
-  echo 'fputs( \"'${p}'\\\\n\", stdout );'
+  /bin/echo 'fputs( \"'${p}'\\n\", stdout );'
   echo return ${ix}'; }'
   ix=`expr $ix + 1`
 done" proc-list) =]
