@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.2 2001/12/10 01:13:09 bkorb Exp $
+ *  $Id: autoopts.c,v 3.3 2002/03/29 02:22:17 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2001 Bruce Korb
+ *  Automated Options copyright 1992-2002 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

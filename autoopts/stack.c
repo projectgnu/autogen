@@ -1,13 +1,13 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.3 2002/03/19 04:11:41 bkorb Exp $
+ *  $Id: stack.c,v 3.4 2002/03/29 02:22:17 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
 
 /*
- *  Automated Options copyright 1992-2001 Bruce Korb
+ *  Automated Options copyright 1992-2002 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

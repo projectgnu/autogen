@@ -1,8 +1,8 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.2 2002/02/01 03:38:00 bkorb Exp $
+#$Id: optcode.tpl,v 3.3 2002/03/29 02:22:17 bkorb Exp $
 
-# Automated Options copyright 1992-2001 Bruce Korb
+# Automated Options copyright 1992-2002 Bruce Korb
 
 =]
 #include "[=(. header-file)=]"

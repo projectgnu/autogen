@@ -1,13 +1,13 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 3.1 2001/12/10 02:15:45 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 3.2 2002/03/29 02:22:17 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  */
 
 /*
- *  Automated Options copyright 1992-2001 Bruce Korb
+ *  Automated Options copyright 1992-2002 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,12 +1,12 @@
 
-/*  $Id: version.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
+/*  $Id: version.c,v 3.1 2002/03/29 02:22:18 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 static const char zAOV[] =
-    "Automated Options version %s, copyright (c) 1999-2001 Bruce Korb\n";
+    "Automated Options version %s, copyright (c) 1999-2002 Bruce Korb\n";
 
 /*  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

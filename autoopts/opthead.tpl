@@ -1,7 +1,7 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.3 2002/02/01 03:38:00 bkorb Exp $
-# Automated Options copyright 1992-2001 Bruce Korb
+# $Id: opthead.tpl,v 3.4 2002/03/29 02:22:17 bkorb Exp $
+# Automated Options copyright 1992-2002 Bruce Korb
 
 =]
 /*

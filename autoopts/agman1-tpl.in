@@ -4,7 +4,7 @@ AutoGen5 template man=%s.1
 ## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2001 Bruce Korb
+##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
@@ -12,7 +12,7 @@ AutoGen5 template man=%s.1
 ## Time-stamp:      "2002-02-01 16:02:34 bkorb"
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.3 2002/02/21 00:13:52 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.4 2002/03/29 02:22:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")

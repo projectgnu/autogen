@@ -1,8 +1,8 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.1 2002/01/19 07:35:24 bkorb Exp $
+# $Id: optlib.tpl,v 3.2 2002/03/29 02:22:17 bkorb Exp $
 
-# Automated Options copyright 1992-2001 Bruce Korb
+# Automated Options copyright 1992-2002 Bruce Korb
 
 =][=
 
@@ -141,9 +141,9 @@ typedef enum {[=
         CASE (get "value") =][=
         ==  '       =]'\''[=
         ~   .       =]'[=value=]'[=
-        *           =][=ERROR (sprintf
+        *           =][=(error (sprintf
           "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
-          (get "name") (get "value")) =][=
+          (get "name") (get "value")))=][=
         ESAC =][=
      ELIF (<= (for-index) 32) =][= (for-index) =][=
      ELSE                 =][= (+ (for-index) 96) =][=
