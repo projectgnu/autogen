@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.17 2004/02/01 21:26:45 bkorb Exp $
+# $Id: opthead.tpl,v 3.18 2004/05/13 04:27:30 bkorb Exp $
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =]
@@ -83,12 +83,13 @@ ENDIF (exist? version) =]
  */[=
 
 FOR flag              =][=
-  (set-flag-names)
+  (set-flag-names)    =][=
+  save-name-morphs    =][=
   (set! opt-name   (string-append OPT-pfx UP-name))
   (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
  IF (exist? "documentation") =][=
-   IF (or (exist? "call-proc") (exist? "flag-code") (exist? "extract-code"))
+   IF (hash-ref have-cb-procs flg-name)
 =]
 #define SET_[= (string-append OPT-pfx UP-name) =]   STMTS( \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \

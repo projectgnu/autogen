@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2004-02-16 11:36:11 bkorb"
+## Time-stamp:      "2004-05-09 11:41:55 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.20 2004/02/16 22:20:45 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.21 2004/05/13 04:27:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -30,21 +30,18 @@ mkdir ${tag}/compat
 #
 #  WORKING IN SOURCE DIRECTORY
 #
-cd ${top_srcdir}/autoopts
-cp -f autoopts.c     \
-      boolean.c      \
-      enumeration.c  \
-      numeric.c      \
-      options.h      \
-      pgusage.c      \
-      restore.c      \
-      save.c         \
-      stack.c        \
-      streqv.h       \
-      usage.c        \
-      version.c      \
-  ${top_builddir}/pkg/${tag}/.
+cd ${top_builddir}/autoopts
+files=`fgrep '#include' libopts.c | \
+       sed 's,"$,,;s,#.*",,;/^streqvcmp.c$/d;/^autoopts.h$/d'`
+for f in libopts.c ${files}
+do
+  if test -f $f
+  then cp -f $f ${top_builddir}/pkg/${tag}/.
+  else cp -f ${top_srcdir}/autoopts/$f ${top_builddir}/pkg/${tag}/.
+  fi
+done
 
+cd ${top_srcdir}/autoopts
 cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
 
 sed '/#ifdef AUTOGEN_BUILD/,/#endif.* AUTOGEN_BUILD/d' streqvcmp.c > \
@@ -132,10 +129,11 @@ cp ${top_srcdir}/pkg/libopts/COPYING* .
 exec 3> Makefile.am
 cat >&3 <<-	EOMakefile
 	## LIBOPTS Makefile
-	EXTRA_DIST            = `echo COPYING*` compat
 	MAINTAINERCLEANFILES  = Makefile.in
 	lib_LTLIBRARIES       = libopts.la
-	libopts_la_SOURCES    = \\
+	libopts_la_SOURCES    = libopts.c
+	libopts_la_LDFLAGS    = -version-info ${AM_LDFLAGS} ${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
+	EXTRA_DIST            = `echo COPYING*` compat \\
 	EOMakefile
 
 cols="${top_builddir}/columns/columns -I4 --spread=1"

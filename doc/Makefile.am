@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-05-09 19:22:46 bkorb"
+## Time-stamp:      "2004-05-11 20:58:46 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.26 2004/05/10 02:52:35 bkorb Exp $
+## $Id: Makefile.am,v 3.27 2004/05/13 04:27:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -83,7 +83,9 @@ autogen.texi : texi
 
 texi-stamp : autogen.def $(AGEXE) $(COLUMNS_EXE)
 	$(AG_ENV) ; \
-	AGEXE=$(AGEXE) CC="$(CC)" CFLAGS='$(CFLAGS)' \
+	AGEXE=`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@ \
+	COLUMNS_EXE=`cd $(top_builddir)/columns ; pwd`/@COLEXE@ \
+	CC="$(CC)" CFLAGS='$(CFLAGS)' \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	LIBS="$(LIBS)" SHELL=/bin/sh MAKE='$(MAKE)' \
