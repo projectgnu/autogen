@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.5 2002/01/29 03:05:54 bkorb Exp $
+ *  $Id: autogen.h,v 3.6 2002/01/31 02:29:13 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -31,19 +31,22 @@
 #include "agUtils.h"
 #include "streqv.h"
 
-typedef enum {
-    PROC_STATE_INIT,       /* set up `atexit' and load Guile   */
-    PROC_STATE_OPTIONS,    /* processing command line options  */
-    PROC_STATE_GUILE_PRELOAD,
-    PROC_STATE_LOAD_DEFS,  /* Loading value definitions        */
-    PROC_STATE_LIB_LOAD,   /* Loading library template         */
-    PROC_STATE_LOAD_TPL,   /* Loading primary template         */
-    PROC_STATE_EMITTING,   /* processing templates             */
-    PROC_STATE_INCLUDING,  /* loading an included template     */
-    PROC_STATE_CLEANUP,
-    PROC_STATE_ABORTING,   /* Clean up code in error response  */
-    PROC_STATE_DONE        /* `exit' has been called           */
-} teProcState;
+#define STATE_TABLE           /* set up `atexit' and load Guile   */  \
+    _State_( INIT )           /* processing command line options  */  \
+    _State_( OPTIONS )        /* Loading guile at option time     */  \
+    _State_( GUILE_PRELOAD )  /* Loading value definitions        */  \
+    _State_( LOAD_DEFS )      /* Loading library template         */  \
+    _State_( LIB_LOAD )       /* Loading primary template         */  \
+    _State_( LOAD_TPL )       /* processing templates             */  \
+    _State_( EMITTING )       /* loading an included template     */  \
+    _State_( INCLUDING )      /* end of processing before exit()  */  \
+    _State_( CLEANUP )        /* Clean up code in error response  */  \
+    _State_( ABORTING )       /* `exit' has been called           */  \
+    _State_( DONE )
+
+#define _State_(n)  PROC_STATE_ ## n,
+typedef enum { STATE_TABLE COUNT_PROC_STATE } teProcState;
+#undef _State_
 
 #define EXPORT
 

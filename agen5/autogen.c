@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.9 2002/01/30 02:37:37 bkorb Exp $
+ *  $Id: autogen.c,v 3.10 2002/01/31 02:29:13 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -32,6 +32,17 @@
 
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)\n"
+"(define header-file \"\")  (define header-guard \"\")\n"
+"(define (make-header-guard hdr-pfx)\n"
+"   (begin\n"
+"      (set! header-file  (out-name))\n"
+"      (set! header-guard (string-upcase! (string-append\n"
+"             (if (string? hdr-pfx) hdr-pfx \"HEADER\")\n"
+"             \"_\"\n"
+"             (string->c-name! (out-name))\n"
+"             \"_GUARD\"  )))\n"
+"      (sprintf \"#ifndef %1$s\\n#define %1$s\" header-guard)\n"
+")  )\n"
 "(define autogen-version \"" AUTOGEN_VERSION "\")";
 
 STATIC sigjmp_buf  abendJumpEnv;
@@ -115,19 +126,9 @@ signalExit( int sig )
 
     {
         tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
-        tSCC* apzStateName[] = {
-            "INIT",
-            "OPTIONS",
-            "GUILE_PRELOAD"
-            "LOAD_DEFS",
-            "LIB_LOAD",
-            "LOAD_TPL",
-            "EMITTING",
-            "INCLUDING",
-            "CLEANUP",
-            "ABORTING",
-            "DONE"
-        }
+#       define _State_(n)  #n,
+        tSCC* apzStateName[] = { STATE_TABLE };
+#       undef _State_
 
         fprintf( stderr, zErr, sig, strsignal( sig ),
                  ((unsigned)procState <= PROC_STATE_DONE)
@@ -267,7 +268,7 @@ ag_abend( tCC* pzMsg )
     fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
 #endif
 
-    if (procState >= PROC_STATE_LIB_LOAD) {
+    if ((procState >= PROC_STATE_LIB_LOAD) && (pCurTemplate != NULL)) {
         int line = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
         fprintf( stderr, "Error in template %s, line %d\n\t",
                  pCurTemplate->pzFileName, line );

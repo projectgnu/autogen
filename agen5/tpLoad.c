@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.7 2002/01/29 03:05:55 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.8 2002/01/31 02:29:13 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -353,7 +353,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      *  Find the template file somewhere
      */
     if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList )))
-        AG_ABEND( asprintf( zCannot, pzProg, ENOENT, "map data file",
+        AG_ABEND( asprintf( zCannot, ENOENT, "map data file",
                             pzFileName, strerror( ENOENT )));
 
     AGDUPSTR( pMapInfo->pzFileName, zRealFile, "map data file" );

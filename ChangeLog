@@ -1,3 +1,11 @@
+2002-01-30  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(zSchemeInit): add make-header-guard Scheme function
+	(signalExit): use a generated state table
+	(ag_abend): dont print template name if we have no active template
+	* agen5/autogen.h(teProcState): generate the enumeration
+	* agen5/tpLoad.c(mapDataFile): fix arg list
+
 2002-01-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*.[ch]: error message cleanups.
