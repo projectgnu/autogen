@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.5 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expGuile.c,v 3.6 2003/03/02 23:39:10 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -328,9 +328,9 @@ ag_scm_string_upcase_x( SCM str )
     SCM
 ag_scm_string_upcase( SCM str )
 {
-    int   len;
-    char* pz;
-    SCM   res;
+    size_t  len;
+    char*   pz;
+    SCM     res;
 
     pz  = gh_scm2newstr( str, &len );
     res = gh_str2scm( pz, len );
@@ -397,9 +397,9 @@ ag_scm_string_capitalize_x( SCM str )
     SCM
 ag_scm_string_capitalize( SCM str )
 {
-    int   len;
-    char* pz;
-    SCM   res;
+    size_t  len;
+    char*   pz;
+    SCM     res;
 
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
@@ -456,9 +456,9 @@ ag_scm_string_downcase_x( SCM str )
     SCM
 ag_scm_string_downcase( SCM str )
 {
-    int   len;
-    char* pz;
-    SCM   res;
+    size_t  len;
+    char*   pz;
+    SCM     res;
 
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;

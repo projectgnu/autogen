@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2002-12-14 14:56:51 bkorb"
+## Time-stamp:      "2003-02-19 18:54:02 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2002/12/16 03:31:30 bkorb Exp $
+## $Id: Makefile.am,v 3.16 2003/03/02 23:39:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,12 +25,16 @@ MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 distcleancheck_listfiles = \
      find -type f -exec 'test -f $(srcdir)/{} || echo {} ;'
 
-configure : VERSION
+configure   : VERSION
 
-all : .conf-stamp
+all         : .conf-stamp
 
 .conf-stamp : configure
 	BOOTSTRAP=addlink sh ${top_srcdir}/config/bootstrap.local
 	@touch $@
+
+pkg         : package
+package     :
+	cd pkg && $(MAKE) $@
 
 ## Makefile.am ends here

@@ -159,6 +159,8 @@ typedef int snv_wint_t;
 #  endif
 #endif
 
+#undef  _STR
+#undef  _CONC
 #ifdef __STDC__
 #  define _STR(x)		#x
 #  define _CONC(x, y)	x##y

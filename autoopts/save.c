@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.8 2003/02/16 00:04:40 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.9 2003/03/02 23:39:10 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -438,7 +438,7 @@ optionSaveFile( pOpts )
 
             case OPTST_ENUMERATION:
             {
-                int enumVal = (int)(p->pzLastArg);
+                intptr_t enumVal = (int)(p->pzLastArg);
                 /*
                  *  This is a magic incantation that will convert the
                  *  enumeration value back into a string suitable for printing.

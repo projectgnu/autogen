@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.8 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: funcFor.c,v 3.9 2003/03/02 23:39:10 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -67,7 +67,7 @@ ag_scm_first_for_p( SCM which )
         return (pFS->for_firstFor) ? SCM_BOOL_T : SCM_BOOL_F;
 
     {
-        int        ct;
+        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char*      pz  = gh_scm2newstr( which, &ct );
         SCM        res = SCM_UNDEFINED;
@@ -106,7 +106,7 @@ ag_scm_last_for_p( SCM which )
         return (pFS->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
 
     {
-        int        ct;
+        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char*      pz  = gh_scm2newstr( which, &ct );
         SCM        res = SCM_UNDEFINED;
@@ -144,7 +144,7 @@ ag_scm_for_index( SCM which )
         return gh_int2scm( pFS->for_index );
 
     {
-        int        ct;
+        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char*      pz  = gh_scm2newstr( which, &ct );
         SCM        res = SCM_UNDEFINED;
