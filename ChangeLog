@@ -6,6 +6,7 @@
 	* doc/auto_gen.tpl: ditto
 	* getdefs/opts.def: ditto
 	* agen5/opts.def: ditto
+	* agen5/loadPseudo.c(doSchemeExpr): count newlines in the scheme expr
 
 2002-07-25  Bruce Korb  <bkorb@gnu.org>
 
