@@ -1,4 +1,4 @@
-#! /bin/echo this_file_should_be_sourced,_not_executed
+#! /bin/sh
 #  -*- Mode: Shell-script -*-
 
 #  This is the standard set of options for testing option processing
@@ -27,8 +27,6 @@ if [ -n "${long_opts}" ]
 then
   echo "long_opts;" >&5
 fi
-
-echo >&5
 
 for flag
 do

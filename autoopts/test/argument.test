@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: argument.test,v 1.5 2000/04/04 13:22:19 bkorb Exp $
+# $Id: argument.test,v 1.6 2000/06/22 18:04:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -22,11 +22,14 @@ if test -z "$srcdir"; then
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
+set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-. ${stdopts} option second
+echo "creating $testname.def in `pwd`"
+testname="$testname" test_main="${test_main}" \
+argument="${argument}" long_opt="${long_opt}" \
+${SHELL-sh} ${stdopts} option second
 
 echo $AGEN $testname.def
 $AGEN $testname.def || \

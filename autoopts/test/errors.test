@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: errors.test,v 1.5 2000/04/04 13:22:19 bkorb Exp $
+# $Id: errors.test,v 1.6 2000/06/22 18:04:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,10 +25,10 @@ fi
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-argument="arg ..."
-long_opts=yes
-. ${stdopts} option second
+echo "creating $testname.def in `pwd`"
+testname="$testname" test_main="${test_main}" \
+argument="arg ..." long_opt="yes" \
+${SHELL-sh} ${stdopts} option second
 
 echo $AGEN $testname.def
 $AGEN $testname.def || \

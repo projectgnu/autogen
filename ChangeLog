@@ -8,6 +8,8 @@
 	* compat/sigsend.c: removed
 	* :mkconfig: corrected touch format
 	* configure: regenerated with corrected touch format
+	* autoopts/test/*.test: some broken shells do not pass args
+	to dot-sourced functions  >:-(
 
 2000-06-21  Bruce Korb  <bkorb@gnu.org>
 
