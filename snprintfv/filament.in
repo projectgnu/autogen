@@ -134,7 +134,7 @@ filelt (Filament *fil, ssize_t n)
 SNV_INLINE char *
 filncat (Filament *fil, const char *str, size_t n)
 {
-  fil_maybe_extend (fil, n + fil->length, TRUE);
+  fil_maybe_extend (fil, n + fil->length, SNV_TRUE);
   memcpy (fil->value + fil->length, str, n);
   fil->length += n;
   return fil->value;
@@ -179,7 +179,7 @@ filcat (Filament *fil, const char *str)
 SNV_INLINE char *
 filccat (Filament *fil, int c)
 {
-  fil_maybe_extend (fil, 1 + fil->length, TRUE);
+  fil_maybe_extend (fil, 1 + fil->length, SNV_TRUE);
   fil->value[fil->length++] = c;
   return fil->value;
 }

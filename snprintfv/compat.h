@@ -114,9 +114,6 @@ extern "C" {
 #  include "must-have-stdarg-or-varargs"
 #endif
 
-#define MAX_INT MAXINT
-#define MIN_INT MININT
-
 #ifdef HAVE_WCHAR_H
 # include <wchar.h>
 #endif
@@ -133,14 +130,6 @@ typedef wint_t snv_wint_t;
 typedef int snv_wint_t;
 #endif
 
-#if ENABLE_NLS
-# include <libintl.h>
-# define _(Text) gettext (Text)
-#else
-# define textdomain(Domain)
-# define _(Text) Text
-#endif
-
 /* inline and const keywords are (mostly) handled by config.h */
 #ifdef __GNUC__
 #  ifndef const
@@ -149,28 +138,19 @@ typedef int snv_wint_t;
 #  ifndef signed
 #    define signed	__signed
 #  endif
-#  ifndef volatile
-#    define volatile	__volatile
-#  endif
 #else
 #  ifndef __STDC__
 #    undef  signed
 #    define signed
-#    undef  volatile
-#    define volatile
 #  endif
 #endif
 
-#undef  _STR
-#undef  _CONC
 #ifdef __STDC__
-#  define _STR(x)		#x
-#  define _CONC(x, y)	x##y
+#  define _SNV_STR(x)		#x
    typedef void *snv_pointer;
    typedef const void *snv_constpointer;
 #else
-#  define _STR(x)		"x"
-#  define _CONC(x, y)	x/**/y
+#  define _SNV_STR(x)		"x"
    typedef char *snv_pointer;
    typedef char *snv_constpointer;
 #endif
@@ -188,19 +168,10 @@ typedef int snv_wint_t;
 #define SNV_INT_TO_POINTER(i)	((snv_pointer)(long)(i))
 #define SNV_UINT_TO_POINTER(u)	((snv_pointer)(unsigned long)(u))
 
-/* If FALSE is defined, we presume TRUE is defined too.  In this case,
-   merely typedef boolean as being int.  Or else, define these all.  */
-#ifndef FALSE
-/* Do not use `enum boolean': this tag is used in SVR4 <sys/types.h>.  */
-typedef enum
-{ FALSE = 0, TRUE = 1 }
-compatboolean;
-#else
-typedef int compatboolean;
-#endif
-#ifndef boolean
-#  define boolean compatboolean
-#endif
+typedef enum {
+    SNV_FALSE = 0,
+    SNV_TRUE  = 1
+} snv_bool_t;
 
 #ifdef __CYGWIN32__
 #  ifndef __CYGWIN__
@@ -213,11 +184,6 @@ typedef int compatboolean;
 #  endif
 #endif
 
-#ifndef EXIT_SUCCESS
-#  define EXIT_SUCCESS  0
-#  define EXIT_FAILURE  1
-#endif
-
 #ifndef PARAMS
 #  define PARAMS(args)      args
 #endif
@@ -227,14 +193,14 @@ typedef int compatboolean;
 #if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
 #  define SNV_STMT_START	(void)(
 #  define SNV_STMT_END		)
+
+#elif (defined (sun) || defined (__sun__))
+#  define SNV_STMT_START	if (1)
+#  define SNV_STMT_END		else (void)0
+
 #else
-#  if (defined (sun) || defined (__sun__))
-#    define SNV_STMT_START	if (1)
-#    define SNV_STMT_END	else (void)0
-#  else
-#    define SNV_STMT_START	do
-#    define SNV_STMT_END	while (0)
-#  endif
+#  define SNV_STMT_START	do
+#  define SNV_STMT_END		while (0)
 #endif
 
 #ifdef _WIN32
@@ -266,15 +232,11 @@ typedef int compatboolean;
 
 #define SNV_ASSERT_FMT  "file %s: line %d%s%s%s: assertion \"%s\" failed.\n"
 
-#ifndef STR
-#  define STR(s) _STR(s)
-#endif
-
 #define snv_assert(expr)		snv_fassert(stderr, expr)
 #define snv_fassert(stream, expr)   SNV_STMT_START {        \
     if (!(expr))   {                                        \
     fprintf (stream, SNV_ASSERT_FMT, __FILE__, __LINE__,    \
-             SNV_ASSERT_FCN, _STR(expr));                   \
+             SNV_ASSERT_FCN, _SNV_STR(expr));               \
     exit(EXIT_FAILURE);                                     \
     }; } SNV_STMT_END
 
@@ -282,7 +244,7 @@ typedef int compatboolean;
 #define freturn_if_fail(expr)       SNV_STMT_START {        \
     if (!(expr))   {                                        \
     fprintf (stream, SNV_ASSERT_FMT, __FILE__, __LINE__,    \
-             SNV_ASSERT_FCN, _STR(expr));                   \
+             SNV_ASSERT_FCN, _SNV_STR(expr));               \
     return;                                                 \
     }; } SNV_STMT_END
 
@@ -290,7 +252,7 @@ typedef int compatboolean;
 #define freturn_val_if_fail(stream, expr, val)  SNV_STMT_START {    \
     if (!(expr))  {                                                 \
     fprintf (stream, SNV_ASSERT_FMT, __FILE__, __LINE__,            \
-             SNV_ASSERT_FCN, _STR(expr));                           \
+             SNV_ASSERT_FCN, _SNV_STR(expr));                       \
     return val;                                                     \
     }; } SNV_STMT_END
 

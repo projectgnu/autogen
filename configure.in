@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2004-02-14 19:20:15 bkorb"
+dnl Time-stamp:      "2004-04-03 08:28:15 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.23 2004/02/16 22:20:45 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.24 2004/04/03 17:18:57 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.23 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.24 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -176,18 +176,19 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
-# AC_C_LONG_DOUBLE
 AC_C_LONG_DOUBLE
 if test x$ac_cv_type_long_double = xno; then
   snv_long_double=double
 else
   snv_long_double='long double'
 fi
-# AC_DEFINE_UNQUOTED for SNV_LONG_DOUBLE
+
 AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
                    [Define this to the long+double type])
-AC_CHECK_TYPES([u_int])
-AC_CHECK_TYPES([long long, uintmax_t])
+AC_CHECK_TYPES([u_int, long long, uintmax_t])
+AC_CHECK_TYPES([uintptr_t], ,
+               [AC_DEFINE(uintptr_t, unsigned long,
+                          [Alternate uintptr_t for systems without it.])])
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
@@ -196,7 +197,15 @@ AC_CHECK_SIZEOF(long,  4)
 # Checks for standard functions.
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf)
-AC_CHECK_FUNCS(copysign copysignl modfl)
+AC_SEARCH_LIBS(copysign, [m],
+               [AC_DEFINE(HAVE_COPYSIGN, 1,
+                          [Define to 1 if you have the `copysign' function.])])
+AC_SEARCH_LIBS(copysignl, [m],
+               [AC_DEFINE(HAVE_COPYSIGNL, 1,
+                          [Define to 1 if you have the `copysignl' function.])])
+AC_SEARCH_LIBS(modfl, [m],
+               [AC_DEFINE(HAVE_MODFL, 1,
+                          [Define to 1 if you have the `modfl' function.])])
 
 # ----------------------------------------------------------------------
 # Do all our own macros

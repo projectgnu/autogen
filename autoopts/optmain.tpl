@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.23 2004/03/19 20:00:59 bkorb Exp $
+# $Id: optmain.tpl,v 3.24 2004/04/03 17:18:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -163,10 +163,13 @@ IF (exist? (string-append (get "handler-proc") "-code")) =]
 static int
 [= handler-proc =]( const char* pz_entry )
 {
-[= (get (string-append (get "handler-proc") "-code")) =]
+    int res = 0;
+[= (prefix "    " (get (string-append (get "handler-proc") "-code"))) =]
+    return res;
 }[=
 
   ELSE
+
 =]
 
 extern int [= handler-proc =]( const char* );[=
@@ -197,8 +200,7 @@ main( int argc, char** argv )
      *  Input list from tty input
      */
     else if (isatty( STDIN_FILENO )) {
-        fputs( "[=(. prog-name)=] ERROR: input list must not be a tty\n",
-               stderr );
+        fputs( "[=(. prog-name)=] ERROR: input list is a tty\n", stderr );
         [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
     }
 
@@ -210,8 +212,8 @@ main( int argc, char** argv )
         int pg_size = getpagesize();
         char* buf   = malloc( pg_size );
         if (buf == NULL) {
-            fputs( "[=(. prog-name)=] ERROR: no memory for input list buffer\n",
-                   stderr );
+            fputs( "[=(. prog-name)
+                   =] ERROR: no memory for input list\n", stderr );
             return EXIT_FAILURE;
         }
 
@@ -228,8 +230,8 @@ main( int argc, char** argv )
         }
 
         if (in_ct == 0)
-            fputs( "[=(. prog-name)=] Warning:  no input lines were read\n",
-                   stderr );
+            fputs( "[=(. prog-name)
+                   =] Warning:  no input lines were read\n", stderr );
         free( buf );
     }
 

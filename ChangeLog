@@ -1,3 +1,16 @@
+2004-04-03  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: Some platforms put all float functions in -lm
+	* agen5/Makefile.am(COLEXE): define it, too.
+	* compat/compat.h: configure.in now produces a uintptr_t, so
+	it is not fatal to not have a stdint or inttypes header.
+	* doc/Makefile.am: pass CFLAGS through to doc builder template
+	* doc/auto_gen.tpl(default-test): clean up compiler usage
+	(genshellopt): ditto
+	* snprintfv/compat.h: remove a bunch of stuff that is not used and
+	interferes with non-snv name space.
+	* snprintfv/*.c: respell "TRUE" and "FALSE" with "SNV_" prefix
+
 2004-03-19  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fsm-macro.tpl: put strings into one variable and use offsets.

@@ -434,7 +434,7 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
       switch (*pinfo->format)
 	{
 	case '#':
-	  pinfo->alt = TRUE;
+	  pinfo->alt = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
@@ -446,22 +446,22 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 
 	case '-':
 	  pinfo->pad = ' ';
-	  pinfo->left = TRUE;
+	  pinfo->left = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
 	case ' ':
-	  pinfo->space = TRUE;
+	  pinfo->space = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
 	case '+':
-	  pinfo->showsign = TRUE;
+	  pinfo->showsign = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
 	case '\'':
-	  pinfo->group = TRUE;
+	  pinfo->group = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
@@ -579,7 +579,7 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n, int *argty
       if (value < 0)
 	{
 	  pinfo->pad = ' ';
-	  pinfo->left = TRUE;
+	  pinfo->left = SNV_TRUE;
 	  value = -value;
 	}
 
@@ -636,28 +636,28 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'h':
 	  if (*++pinfo->format != 'h')
 	    {
-	      pinfo->is_short = TRUE;
+	      pinfo->is_short = SNV_TRUE;
 	      break;
 	    }
 
-	  pinfo->is_char = TRUE;
+	  pinfo->is_char = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
 	case 'z':
 	  if (sizeof (size_t) > sizeof (char *))
-	    pinfo->is_long_double = TRUE;
+	    pinfo->is_long_double = SNV_TRUE;
 	  else
-	    pinfo->is_long = TRUE;
+	    pinfo->is_long = SNV_TRUE;
 
 	  pinfo->format++;
 	  break;
 
 	case 't':
 	  if (sizeof (ptrdiff_t) > sizeof (char *))
-	    pinfo->is_long_double = TRUE;
+	    pinfo->is_long_double = SNV_TRUE;
 	  else
-	    pinfo->is_long = TRUE;
+	    pinfo->is_long = SNV_TRUE;
 
 	  pinfo->format++;
 	  break;
@@ -665,7 +665,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'l':
 	  if (*++pinfo->format != 'l')
 	    {
-	      pinfo->is_long = TRUE;
+	      pinfo->is_long = SNV_TRUE;
 	      break;
 	    }
 	 /*NOBREAK*/ 
@@ -673,7 +673,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'j':
 	case 'q':
 	case 'L':
-	  pinfo->is_long_double = TRUE;
+	  pinfo->is_long_double = SNV_TRUE;
 	  pinfo->format++;
 	  break;
 
@@ -838,7 +838,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   uintmax_t value = 0L;
   int type, count_or_errorcode = SNV_OK;
   char buffer[256], *p, *end;
-  boolean is_negative = FALSE;
+  snv_bool_t is_negative = SNV_FALSE;
 
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -869,8 +869,8 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   if (type & PA_FLAG_UNSIGNED)
     {
       value = fetch_uintmax (pinfo, args);
-      is_negative = FALSE;
-      pinfo->showsign = pinfo->space = FALSE;
+      is_negative = SNV_FALSE;
+      pinfo->showsign = pinfo->space = SNV_FALSE;
     }
   else
     {

@@ -88,7 +88,7 @@ spec_hash (unsigned spec)
 static void
 spec_init (void)
 {
-  static boolean is_init = FALSE;
+  static snv_bool_t is_init = SNV_FALSE;
 
   if (!is_init)
     {
@@ -105,7 +105,7 @@ spec_init (void)
 #ifdef SNV_LIBRARY_BUILD
       snv_load_all_modules ();
 #endif
-      is_init = TRUE;
+      is_init = SNV_TRUE;
     }
 }
 

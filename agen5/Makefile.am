@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-16 11:47:37 bkorb"
+## Time-stamp:      "2004-04-02 11:19:31 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.33 2004/02/16 22:20:45 bkorb Exp $
+## $Id: Makefile.am,v 3.34 2004/04/03 17:18:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -16,6 +16,7 @@ INCLUDES        = @INCLIST@
 
 GETDEFS         = $(top_builddir)/getdefs/@GDEXE@
 AGEXE           = $(top_builddir)/agen5/@AGEXE@
+COLEXE          = $(top_builddir)/columns/@COLEXE@
 
 TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
@@ -77,6 +78,7 @@ SUFFIXES = .i
 GEN_LIST = $(STAMPS) $(GENDOCS)
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \
+	PATH=`cd ../columns >/dev/null && pwd`:$$PATH \
 	AGEXE=$(AGEXE) GDEXE=$(GDEXE) COLEXE=$(COLEXE)
 
 ## stamp-opts GEN-RULE

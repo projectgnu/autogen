@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.25 2004/02/01 21:26:46 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.26 2004/04/03 17:18:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -581,33 +581,44 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (shell (string-append "
+
 OPTDIR=`cd ${top_builddir}/autoopts >/dev/null; pwd`
 libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
+
 if [ -f ${libs}/libopts.a ]
 then libs=\"${libs}/libopts.a\"
 else libs=\"-L ${libs} -lopts\"
 fi
-libs=\"${libs} ${LIBS}\"
-opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -g -I${OPTDIR}\"
-(
-cd ${tempdir}
-HOME='' ${AGEXE} -L${OPTDIR} default-test.def
-if [ ! -f default-test.c ]
-then
-  echo 'NO default-test.c PROGRAM'
-  kill -TERM $AG_pid
-  exit 1
-fi
 
-${CC} ${opts} default-test.c ${libs}
-if [ ! -x ./default-test ]
-then
-  echo 'NO default-test EXECUTABLE'
-  kill -TERM $AG_pid
-  exit 1
-fi ) >&2
+exec 3>&1
+(
+  cd ${tempdir}
+  HOME='' ${AGEXE} -L${OPTDIR} default-test.def
+  if [ ! -f default-test.c ]
+  then
+    echo 'NO default-test.c PROGRAM' >&3
+    kill -TERM $AG_pid
+    exit 1
+  fi
+
+  libs=\"${libs} ${LIBS}\"
+  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -I${OPTDIR}\"
+  ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
+
+  if [ ! -x ./default-test ]
+  then
+    echo 'NO default-test EXECUTABLE' >&3
+    kill -TERM $AG_pid
+    exit 1
+  fi
+) > ${tempdir}/default-test.log 2>&1
+
+test -x ${tempdir}/default-test || exit 1
+
 HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
-   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g' " ))
+   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
+
+exec 3>&-" ))
 =]
 @end example
 [=
@@ -687,7 +698,7 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
+opts="-o genshellopt -DTEST_GETDEFS_OPTS -I${OPTDIR}"
 
 ( cat ${top_srcdir}/getdefs/opts.def
   echo "test_main = 'putShellParse';"
@@ -695,8 +706,8 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
   cd ${tempdir}
   HOME='' ${AGEXE} -t40 -L${OPTDIR} -bgenshellopt -- -
 
-  ${CC} ${opts} genshellopt.c ${libs}
-) > /dev/null 2>&1
+  ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
+) > ${tempdir}/genshellopt.log 2>&1
 
 if [ ! -x ${tempdir}/genshellopt ]
 then

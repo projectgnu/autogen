@@ -3,12 +3,12 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2004-02-20 09:37:03 bkorb"
+ *  Time-stamp:      "2004-04-02 11:21:26 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.7 2004/02/20 20:18:49 bkorb Exp $
+ * $Id: compat.h,v 3.8 2004/04/03 17:18:57 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -41,10 +41,6 @@
 
 #if (! defined(HAVE_LIMITS_H)) && (! defined(HAVE_SYS_LIMITS_H))
 #  error NEED <limits.h> *OR* <sys/limits.h>
-#endif
-
-#if (! defined(HAVE_STDINT_H)) && (! defined(HAVE_INTTYPES_H))
-#  error NEED <stdint.h> *OR* <inttypes.h>
 #endif
 
 #ifndef HAVE_SETJMP_H
@@ -136,7 +132,7 @@
 
 #if defined( HAVE_STDINT_H )
 #  include <stdint.h>
-#else
+#elif defined( HAVE_INTTYPES_H )
 #  include <inttypes.h>
 #endif
 
