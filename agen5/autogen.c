@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.2 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: autogen.c,v 3.3 2002/01/09 15:51:45 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -31,7 +31,8 @@
 #include <assert.h>
 
 tSCC zSchemeInit[] =
-"(add-hook! before-error-hook error-source-line)";
+"(add-hook! before-error-hook error-source-line)\n"
+"(define autogen-version \"" AUTOGEN_VERSION "\")";
 
 STATIC sigjmp_buf  abendJumpEnv;
 
