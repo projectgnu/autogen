@@ -1,79 +1,86 @@
-[= autogen template ini =]
+[= AutoGen5 template  -*- Mode: C -*-
+
+# $Id: snarf.tpl,v 1.2 1999/10/27 02:19:58 bruce Exp $
+
+ini =]
 /*
-[=_EVAL " *  " _DNE=]
+[=(dne " *  ")=]
  *
- *  Guile Initializations - [=group " " + _CAP =]Global Variables
+ *  copyright 1992-1999 Bruce Korb
+ *
+[=(gpl "AutoGen" " *  ")=]
+ *
+ *  Guile Initializations - [=% group (string-capitalize! "%s ")
+                            =]Global Variables
  */
 typedef SCM (t_scm_callout_proc)();[=
 
-  _FOR gfunc =]
-static const char s_[=name #[] + %-26s _printf =] = [=
-    _IF string _exist =][=string _str=][=
-    _ELSE =][=
-      name _str "echo %s |
-                 sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/_to_/->/'"
-           _printf _shell _str =][=
-    _ENDIF =];[=
-  /gfunc =][=
+DEFINE string_content =]
+static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
+    IF (exist? "string") =][=(c-string (get "string"))=][=
+    ELSE =]"[= % name `echo %s |
+       sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/_to_/->/'` =]"[=
+    ENDIF =];[=
+ENDDEF =][=
 
-  _FOR gfunc =]
-extern t_scm_callout_proc [=group #_ + =]scm_[=name=];[=
-  /gfunc =][=
+  FOR gfunc =][=
+    string_content =][=
+  ENDFOR gfunc =][=
 
-  _FOR syntax =]
-static const char s_[=name #[] + %-26s _printf =] = [=
-    _IF string _exist =][=string _str=][=
-    _ELSE =][=
-      name _str "echo %s |
-                 sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/_to_/->/'"
-           _printf _shell _str =][=
-    _ENDIF =];[=
-  /syntax =][=
+  FOR gfunc =]
+extern t_scm_callout_proc [=% group %s_ =]scm_[=name=];[=
+  ENDFOR gfunc =][=
 
-  _FOR symbol =]
-[=  _IF global _exist=]      [=_ELSE=]static[=_ENDIF
-    =] SCM sym_[=name %-18s _printf =] = SCM_BOOL_F;[=
-  /symbol =]
+  FOR syntax =][=
+    string_content =][=
+  ENDFOR syntax =][=
+
+  FOR symbol =]
+[=  IF (exist? "global") =]      [=ELSE=]static[=ENDIF
+    =] SCM sym_[=% name %-18s =] = SCM_BOOL_F;[=
+  ENDFOR symbol =]
 
 /*
- *  [=group " " + _CAP =]Initialization procedure
+ *  [=% group "%s " =]Initialization procedure
  */
 void
-[=group #_ + =]init( void )
+[=% group %s_=]init( void )
 {[=
-  _IF init_code _exist=]
+  IF (exist? "init_code") =]
   [=init_code=][=
-  _ENDIF =][=
+  ENDIF =][=
 
-  _FOR gfunc =]
+  FOR gfunc =]
   gh_new_procedure( (char*)s_[=name=],
-                      [=group #_ + =]scm_[=name #, + %-28s _printf=] [=
-      _IF req _exist =][=req=][=_ELSE=]1[=_ENDIF=], [=
-      _IF opt _exist =][=opt=][=_ELSE=]0[=_ENDIF=], [=
-      _IF var _exist =][=var=][=_ELSE=]0[=_ENDIF=] );[=
-  /gfunc =][=
+                      [=
+      % group %s_=]scm_[=% name (sprintf "%%-28s" "%s,")=] [=
+      IF (exist? "req") =][=req=][=ELSE=]1[=ENDIF=], [=
+      IF (exist? "opt") =][=opt=][=ELSE=]0[=ENDIF=], [=
+      IF (exist? "var") =][=var=][=ELSE=]0[=ENDIF=] );[=
+  ENDFOR gfunc =][=
 
-  _FOR syntax =]
-  scm_make_synt( s_[=name #, + %-16s _printf =] [=type=], [=cfn=] );[=
-  /syntax =][=
+  FOR syntax =]
+  scm_make_synt( s_[=% name (sprintf "%%-16s" "%s,")=] [=type=], [=cfn=] );[=
+  ENDFOR syntax =][=
 
-  _FOR symbol =][=
-    _IF vcell _exist ! =]
+  FOR symbol =][=
+    IF (not (exist? "vcell")) =]
   sym_[=name=] = scm_permanent_object (SCM_CAR (scm_intern0 ([=
                  scheme_name=])));[=
-    _ELSE =]
+    ELSE =]
   sym_[=name=] = scm_permanent_object (scm_intern0 ([=scheme_name=]));
   SCM_SETCDR (sym_[=name=], [=
-      _IF    init_val _exist =][=init_val=][=
-      _ELIF const_val _exist =]scm_long2num([=const_val=])[=
-      _ELSE                  =]SCM_BOOL_F[=_ENDIF=]);[=
-    _ENDIF =][=
-  /symbol =][=
+      IF    (exist? "init_val") =][=init_val=][=
+      ELIF (exist? "const_val") =]scm_long2num([=const_val=])[=
+      ELSE                      =]SCM_BOOL_F[=
+      ENDIF=]);[=
+    ENDIF =][=
+  ENDFOR symbol =][=
 
 
-  _IF fini_code _exist=]
+  IF (exist? "fini_code") =]
   [=fini_code=][=
-  _ENDIF =]
-}[=
+  ENDIF =]
+}[= #
 
 end of snarf.tpl =]
