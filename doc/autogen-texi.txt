@@ -2120,7 +2120,7 @@ Then perform the following steps:
 
 @enumerate
 @item
-@code{autogen -L $prefix/share/autogen checkopt.def}
+@code{autogen checkopt.def}
 @item
 @code{cc -o check -DTEST_CHECK_OPTS -g checkopt.c -L $prefix/lib -lopts}
 @end enumerate
@@ -3698,7 +3698,7 @@ Run AutoGen to create the option interface file (@code{myopts.h})
 and the option descriptor code (@code{myopts.c}):
 
 @example
-autogen -L $prefix/share/autogen myopts.def
+autogen myopts.def
 @end example
 
 @item
