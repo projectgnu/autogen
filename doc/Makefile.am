@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/06/01 18:50:58 $
+## Last Modified:  $Date: 1998/06/01 20:57:46 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 1998/06/01 18:50:58 bkorb Exp $
+## $Id: Makefile.am,v 1.4 1998/06/01 20:57:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -31,8 +31,9 @@ AGEN	= $(gendir)/autogen
 ODEF	= $(gendir)/opts.def
 DIRECT  = $(top_builddir)/src/agdirect.def
 EXPR    = $(top_builddir)/src/agexpr.def
+FUNC    = $(top_builddir)/src/agfunc.def
 
-autogen.texi: auto_gen.tpl autogen.def $(ODEF) $(DIRECT) $(EXPR)
+autogen.texi: auto_gen.tpl autogen.def $(ODEF) $(DIRECT) $(EXPR) $(FUNC)
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
 		$(AGEN) autogen.def
 
