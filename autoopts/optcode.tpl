@@ -1,8 +1,12 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.34 2000/08/28 19:15:49 bkorb Exp $
+#$Id: optcode.tpl,v 2.35 2000/09/27 20:44:00 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
+
+INCLUDE "optmain.tpl"
+
+=][=
 IF (not (exist? "copyright") )
 =]
 #define zCopyright       (const char*)NULL
@@ -120,64 +124,9 @@ ENDIF (exist? "homerc") =][=
 
 IF (or (exist? "flag.flag_code") (exist? "flag.call_proc")) =][=
 
-   # "For test builds, no need to call option procs" =][=
+  invoke declare-option-callbacks  =][=
 
-  IF (exist? "test_main") =]
-#if ! defined( TEST_[=(. pname-up)=]_OPTS )[=
-  ENDIF
-
-  =]
-/*
- *  Procedures to call when option(s) are encountered
- */[=
-
-
-  FOR flag =][=
-    (set! cap-name (string-capitalize! (get "name"))) =][=
-
-    IF (exist? "call_proc") =]
-extern tOptProc [=(get "call_proc")=];[=
-
-    ELIF (exist? "flag_code") =]
-static tOptProc doOpt[=(. cap-name)=];[=
-
-    ENDIF =][=
-  ENDFOR flag   =][=
- 
-  IF (exist? "test_main") =][=
-
-     # "A test environment is to be generated" =]
-
-#else /* *is*  defined( TEST_[=(. pname-up)=]_OPTS ) */
-/*
- *  Under test, omit argument processing, or call stackOptArg,
- *  if multiple copies are allowed.
- */[=
-    FOR flag =][=
-    (set! cap-name (string-capitalize! (get "name"))) =][=
-
-      IF (exist? "call_proc") =]
-#define [=(get "call_proc")=] [=
-          IF   (not (exist? "max")) =](tpOptProc)NULL[=
-          ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
-          ELSE =](tpOptProc)NULL[=
-          ENDIF=][=
-
-      ELIF (exist? "flag_code") =]
-#define doOpt[=(. cap-name)=] [=
-          IF   (not (exist? "max")) =](tpOptProc)NULL[=
-          ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
-          ELSE =](tpOptProc)NULL[=
-          ENDIF=][=
-
-      ENDIF=][=
-    ENDFOR flag=]
-#endif /* defined( TEST_[=(. pname-up)=]_OPTS ) */[=
-  ENDIF (exist? "test_main") =]
-[=
-
-
-ENDIF  (or (exist? "flag.flag_code") (exist? "flag.call_proc"))  =]
+ENDIF   =]
 /*
  *  These are always callable, whether
  *  TEST_[=(. pname-up)=]_OPTS is defined or not
@@ -412,75 +361,25 @@ doUsageOpt( tOptions*  pOpts, tOptDesc* pOD )
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=
 
-IF (exist? "flag.flag_code") =][=
+IF (exist? "flag.flag_code")       =][=
 
-  IF (exist? "test_main") =]
+  invoke  define-option-callbacks  =][=
 
-#if ! defined( TEST_[= (. pname-up) =]_OPTS )[=
+ENDIF                              =][=
 
-  ENDIF =][=
+IF (exist? "test_main")            =][=
 
-  FOR flag =][=
+  IF (exist? "guile-main")         =][=
+     (error "both ``test_main'' and ``guile-main'' have been defined") =][=
 
-    IF (exist? "flag_code") =]
+  ELSE                             =][=
+     invoke build-test-main        =][=
+  ENDIF                            =][=
 
-/* * * * * * *
- *
- *   For the "[=(string-capitalize! (get "name"))=] Option".
- */
-    static void
-doOpt[=(string-capitalize (get "name"))
-     =]( tOptions* pOptions, tOptDesc* pOptDesc )
-{
-[=flag_code=]
-}[=
-    ENDIF "flag_code _exist" =][=
-  ENDFOR flag =][=
-ENDIF "flag.flag_code _exist"
-=][=
+ELIF (exist? "guile-main")         =][=
 
-IF (exist? "test_main") =][=
-  IF (exist? "flag.flag_code") =]
+     invoke build-guile-main       =][=
 
-#else /* *is* defined TEST_[= (. pname-up) =]_OPTS */[=
-
-  ELSE=]
-#if defined( TEST_[= (. pname-up) =]_OPTS )[=
-
-  ENDIF
+ENDIF "test/guile main"
 
 =]
-    int
-main( int argc, char** argv )
-{[=
-
-  IF (= (get "test_main") "putShellParse") =]
-    extern tOptions  genshelloptOptions;
-    extern void      putShellParse( tOptions* );
-    extern tOptions* pShellParseOptions;
-
-    /*
-     *  Stash a pointer to the options we are generating.
-     *  `genshellUsage()' will use it.
-     */
-    pShellParseOptions = &[=prog_name=]Options;
-    (void)optionProcess( &genshelloptOptions, argc, argv );
-    putShellParse( &[=prog_name=]Options );[=
-
-  ELSE=]
-    (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
-    IF (> (string-length (get "test_main")) 3) =]
-
-    {
-        void [=test_main=]( tOptions* );
-        [=test_main=]( &[=prog_name=]Options );
-    }
-[=  ELSE=]
-    putBourneShell( &[=prog_name=]Options );[=
-
-    ENDIF =][=
-  ENDIF=]
-    return EXIT_SUCCESS;
-}
-#endif  /* defined TEST_[= (. pname-up) =]_OPTS */[=
-ENDIF "test_main"=]
