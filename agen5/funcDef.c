@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.22 1999/11/09 04:58:14 bruce Exp $
+ *  $Id: funcDef.c,v 1.23 1999/11/11 04:38:06 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -778,12 +778,7 @@ MAKE_HANDLER_PROC( Define )
                     fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
                              pMac->sibIndex - defCt, pList->pzExpr );
                 }
-                res = scm_internal_stack_catch(
-                    SCM_BOOL_T,
-                    (scm_catch_body_t)gh_eval_str,
-                    (void*)pList->pzExpr,
-                    ag_eval_handler,
-                    (void*)pList->pzExpr );
+                res = gh_eval_str( pList->pzExpr );
 
                 if (gh_string_p( res )) {
                     pList->de.pzValue = strdup( SCM_CHARS( res ));
