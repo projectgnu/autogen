@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:28:33 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.26 1999/10/28 03:36:29 bruce Exp $
+# @(#) $Id: bootstrap.local,v 1.27 1999/11/06 22:11:02 bruce Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -91,7 +91,9 @@ pre )
     export byacc
 
     if echo $@ | egrep -i debug >/dev/null 2>&1
-    then DEBUG_OPTS="-DDEBUG=1" ; export DEBUG_OPTS ; fi
+    then DEBUG_OPTS="-DDEBUG=1"
+    else DEBUG_OPTS="" ; fi
+    export DEBUG_OPTS
     ;;
 
 post )
