@@ -1,4 +1,4 @@
-New in 4.5.5
+New in 4.5.6
 * Finally, really, finished the portability issues and it now
   included a complete implementation of the printf family of
   formatting routines.
