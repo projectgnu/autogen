@@ -5,15 +5,15 @@
 ## Author:          Bruce Korb <autogen@linuxbox.com>
 ## Maintainer:      Bruce Korb <autogen@linuxbox.com>
 ## Created:         Fri July 18
-## Last Modified:   Thu Jul 29 13:42:18 1999				      
+## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.8 2000/02/28 00:23:25 bruce Exp $
+## $Id: Makefile.am,v 1.9 2000/02/28 07:04:45 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
 	alist.test case.test define.test endmac.test error.test expr.test \
-	nestmac.test  opts.test
+	for.test nestmac.test opts.test
 
 EXTRA_DIST = defs $(TESTS)
 
