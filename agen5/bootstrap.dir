@@ -51,7 +51,7 @@ fi
 # Construct the info doc
 #
 i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bautogen"
-echo autogen ${i} opts.def
+echo AutoGen ${i} opts.def
 AutoGen ${i} opts.def
 
 # Make the option processing files:
@@ -66,8 +66,9 @@ getdefs AutoGen=AutoGen base-name=functions template=functions \
         defs=macfunc linenum srcfile filelist func*.c
 date > stamp-functions
 
-( getdefs assign=group=ag defs=gfunc templ=snarf out=expr.def \
-		srcfile exp*.c func*.c 2>&1 
+eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
+eopt="$eopt defs=gfunc templ=snarf out=expr.def srcfile"
+( getdefs assign=group=ag $eopt exp*.c func*.c 2>&1 
 ) | egrep -v 'no copies of pattern'
 
 SHELL=ksh AutoGen expr.def
