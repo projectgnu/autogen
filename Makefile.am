@@ -7,14 +7,14 @@
 ## Last Modified:    Tue Sep 28 07:17:04 1999				      
 ##            by:    Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.12 1999/10/28 03:36:28 bruce Exp $
+## $Id: Makefile.am,v 2.13 1999/10/28 04:00:46 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 include $(top_srcdir)/MakeRules.in
 
 SUBDIRS		= compat config snprintfv autoopts \
-		src getdefs columns tests doc
+		agen5 getdefs columns tests doc
 
 EXTRA_DIST	= MakeRules.in VERSION TODO NOTES configure ChangeLog.1
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config.h.in \
