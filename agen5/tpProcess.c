@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.1 2001/12/10 03:38:48 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -36,7 +36,7 @@ STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
  *  know the exact bounds of the block.  "pEnd" actually
  *  must point to the first entry that is *not* to be emitted.
  */
-    EXPORT void
+void
 generateBlock( tTemplate*   pT,
                tMacro*      pMac,
                tMacro*      pEnd )
@@ -84,7 +84,7 @@ generateBlock( tTemplate*   pT,
 }
 
 
-    EXPORT void
+void
 processTemplate( tTemplate* pTF )
 {
     tFpStack fpRoot = { 0, (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
@@ -189,7 +189,7 @@ processTemplate( tTemplate* pTF )
 }
 
 
-    EXPORT void
+void
 closeOutput( ag_bool purge )
 {
     removeWriteAccess( fileno( pCurFp->pFile ));
@@ -234,7 +234,7 @@ closeOutput( ag_bool purge )
 }
 
 
-    STATIC void
+STATIC void
 openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 {
     char*  pzDefFile;

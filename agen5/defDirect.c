@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: defDirect.c,v 3.1 2001/12/10 03:42:58 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -48,7 +48,7 @@ STATIC char* skipToElseEnd( char* pzScan );
  *  Decide what to do and return a pointer to the character
  *  where scanning is to resume.
  */
-    EXPORT char*
+EXPORT char*
 processDirective( char* pzScan )
 {
     const tDirTable* pTbl  = dirTable;
@@ -136,7 +136,7 @@ processDirective( char* pzScan )
  *  count if it is a bogus name.
  */
 
-    STATIC teDirectives
+STATIC teDirectives
 findDirective( char* pzDirName )
 {
     teDirectives res = (teDirectives)0;
@@ -180,7 +180,7 @@ findDirective( char* pzDirName )
  *  accepting the preceeding text) or when encountering a "#if*def"
  *  while skipping a block of text due to a failed test.
  */
-    STATIC char*
+STATIC char*
 skipToEndif( char* pzScan )
 {
     for (;;) {
@@ -241,7 +241,7 @@ skipToEndif( char* pzScan )
  *  "#elif*def".  We do this when we are skipping code due to a failed
  *  "#if*def" test.
  */
-    STATIC char*
+STATIC char*
 skipToElseEnd( char* pzScan )
 {
     for (;;) {
@@ -320,7 +320,7 @@ skipToElseEnd( char* pzScan )
  *  needs or may take arguments (e.g. '#define'), then there should
  *  also be an 'arg:' section describing the argument(s).
  */
-    STATIC char*
+STATIC char*
 doDir_IGNORE( char* pzArg, char* pzScan )
 {
     return pzScan;
@@ -345,7 +345,7 @@ doDir_IGNORE( char* pzArg, char* pzScan )
  *  After the definitions file has been processed, any remaining entries
  *  in the define list will be added to the environment.
 =*/
-    STATIC char*
+STATIC char*
 doDir_define( char* pzArg, char* pzScan )
 {
     char*  pzName = pzArg;
@@ -409,7 +409,7 @@ doDir_define( char* pzArg, char* pzScan )
  *  otherwise it will generate an error.
  *  It will be ignored.
 =*/
-    STATIC char*
+STATIC char*
 doDir_elif( char* pzArg, char* pzScan )
 {
     fputs( "`#elif' directive encountered out of context\n", stderr );
@@ -424,7 +424,7 @@ doDir_elif( char* pzArg, char* pzScan )
  *  If it follows the @code{#if}, then it will be ignored.  Otherwise,
  *  it will change the processing state to the reverse of what it was.
 =*/
-    STATIC char*
+STATIC char*
 doDir_else( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
@@ -442,7 +442,7 @@ doDir_else( char* pzArg, char* pzScan )
  *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
  *  In all cases, this will resume normal processing of text.
 =*/
-    STATIC char*
+STATIC char*
 doDir_endif( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
@@ -459,7 +459,7 @@ doDir_endif( char* pzArg, char* pzScan )
  *  text:
  *  Ends the text processed by a command shell into autogen definitions.
 =*/
-    STATIC char*
+STATIC char*
 doDir_endshell( char* pzArg, char* pzScan )
 {
     /*
@@ -481,7 +481,7 @@ doDir_endshell( char* pzArg, char* pzScan )
  *  This directive will cause AutoGen to stop processing
  *  and exit with a status of EXIT_FAILURE.
 =*/
-    STATIC char*
+STATIC char*
 doDir_error( char* pzArg, char* pzScan )
 {
     fprintf( stderr, "#error directive -- %s\n", pzArg );
@@ -503,7 +503,7 @@ doDir_error( char* pzArg, char* pzScan )
  *  @code{#if} expressions are not analyzed.  @strong{Everything} from here
  *  to the matching @code{#endif} is skipped.
 =*/
-    STATIC char*
+STATIC char*
 doDir_if( char* pzArg, char* pzScan )
 {
     return skipToEndif( pzScan );
@@ -519,7 +519,7 @@ doDir_if( char* pzArg, char* pzScan )
  *  processed only if there is a corresponding @code{-Dname} command line
  *  option.
 =*/
-    STATIC char*
+STATIC char*
 doDir_ifdef( char* pzArg, char* pzScan )
 {
     if (getDefine( pzArg ) == (char*)NULL)
@@ -538,7 +538,7 @@ doDir_ifdef( char* pzArg, char* pzScan )
  *  processed only if there is @strong{not} a corresponding @code{-Dname}
  *  command line option or there was a canceling @code{-Uname} option.
 =*/
-    STATIC char*
+STATIC char*
 doDir_ifndef( char* pzArg, char* pzScan )
 {
     if (getDefine( pzArg ) != (char*)NULL)
@@ -558,7 +558,7 @@ doDir_ifndef( char* pzArg, char* pzScan )
  *  double quotes or angle brackets (as in a C program), then the
  *  include is ignored.
 =*/
-    STATIC char*
+STATIC char*
 doDir_include( char* pzArg, char* pzScan )
 {
     tSCC*      apzSfx[] = { "def", NULL };
@@ -674,7 +674,7 @@ doDir_include( char* pzArg, char* pzScan )
  *  file and approximate line number of any errors found in extracted
  *  definitions.
 =*/
-    STATIC char*
+STATIC char*
 doDir_line( char* pzArg, char* pzScan )
 {
     /*
@@ -722,7 +722,7 @@ doDir_line( char* pzArg, char* pzScan )
  *  process that handles the back-quoted @code{`} text.
  *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
 =*/
-    STATIC char*
+STATIC char*
 doDir_shell( char* pzArg, char* pzScan )
 {
     tSCC       zShellText[] = "Computed Definitions";
@@ -813,7 +813,7 @@ doDir_shell( char* pzArg, char* pzScan )
  *  Will remove any entries from the define list
  *  that match the undef name pattern.
 =*/
-    STATIC char*
+STATIC char*
 doDir_undef( char* pzArg, char* pzScan )
 {
     SET_OPT_UNDEFINE( pzArg );

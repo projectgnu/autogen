@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: defFind.c,v 3.1 2001/12/10 03:44:35 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -44,7 +44,7 @@ tSC zDefinitionName[ MAXPATHLEN ];
 STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
 
-    STATIC tDefEntry*
+STATIC tDefEntry*
 findEntryByIndex( tDefEntry* pE, char* pzScan )
 {
     int  idx;
@@ -165,7 +165,7 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
 }
 
 
-    STATIC size_t
+STATIC size_t
 badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
 {
     memcpy( (void*)pzD, (void*)pzS, srcLen );
@@ -185,7 +185,7 @@ badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
  *      (always skipping white space).
  *  We start in CN_START.
  */
-    EXPORT int
+EXPORT int
 canonicalizeName( char* pzD, const char* pzS, int srcLen )
 {
     tSCC zNil[] = "";
@@ -371,7 +371,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
  *  the element has been indexed (so the caller will not try
  *  to traverse the list of twins).
  */
-    STATIC tDefEntry*
+STATIC tDefEntry*
 defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
 {
     char*        pcBrace;
@@ -541,7 +541,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
 }
 
 
-    EXPORT tDefEntry*
+EXPORT tDefEntry*
 findDefEntry( char* pzName, ag_bool* pIsIndexed )
 {
     return defEntrySearch( pzName, &currDefCtx, pIsIndexed );
@@ -557,7 +557,7 @@ findDefEntry( char* pzName, ag_bool* pIsIndexed )
  *  indicator saying if the element has been indexed (so the caller will
  *  not try to traverse the list of twins).
  */
-    STATIC tDefEntry**
+STATIC tDefEntry**
 entryListSearch( char* pzName, tDefStack* pDefStack )
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
@@ -740,7 +740,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
 }
 
 
-    EXPORT tDefEntry**
+EXPORT tDefEntry**
 findEntryList( char* pzName )
 {
     return entryListSearch( pzName, &currDefCtx );
