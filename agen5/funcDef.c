@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.7 1999/10/30 21:45:58 bruce Exp $
+ *  $Id: funcDef.c,v 1.8 1999/10/30 21:49:03 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -574,7 +574,6 @@ MAKE_HANDLER_PROC( Invoke )
  *
  * exparg: macro, name of macro to invoke
  * exparg: args,  macro arguments, optional, ellipsis
- * ellipsis:
  *
  * opt:  0
  * var:  1
