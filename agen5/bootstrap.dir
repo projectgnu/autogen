@@ -8,17 +8,17 @@ top_builddir=..
 top_srcdir=..
 export top_builddir top_srcdir
 
-byacc -d agParse.y && {
-    rm -f agParse.c agParse.h
+byacc -d defParse.y && {
+    rm -f defParse.c defParse.h
     if test -f y.out.c; then
-      mv -f y.out.c agParse.c
-      mv -f y.out.h agParse.h
+      mv -f y.out.c defParse.c
+      mv -f y.out.h defParse.h
     elif test -f y.tab.c; then
-      mv -f y.tab.c agParse.c
-      mv -f y.tab.h agParse.h
+      mv -f y.tab.c defParse.c
+      mv -f y.tab.h defParse.h
     elif test -f y_tab.c; then
-      mv -f y_tab.c agParse.c
-      mv -f y_tab.h agParse.h
+      mv -f y_tab.c defParse.c
+      mv -f y_tab.h defParse.h
     fi
 }
 
