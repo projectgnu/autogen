@@ -351,23 +351,27 @@ fmem_close( void *cookie )
  *
  *  @table @code
  *  @item FMEM_IOCTL_BUF_ADDR
- *    Retrieve the address of the buffer.  Future output to the stream
- *    might cause this buffer to be freed and the contents copied to another
- *    buffer.  You must ensure that either you have saved the buffer
- *    (see @code{FMEM_IOCTL_SAVE_BUF} below), or do not do any more I/O to
- *    it while you are using this address.
+ *
+ *    Retrieve the address of the buffer.  Future output to the stream might
+ *    cause this buffer to be freed and the contents copied to another buffer.
+ *    You must ensure that either you have saved the buffer (see
+ *    @code{FMEM_IOCTL_SAVE_BUF} below), or do not do any more I/O to it while
+ *    you are using this address.  "ptr" must point to a @code{char*} pointer.
  *
  *  @item FMEM_IOCTL_SAVE_BUF
- *    Do not deallocate the buffer on close.  You would likely want to use this
- *    after writing all the output data and just before closing.  Otherwise,
- *    the buffer might get relocated.  Once you have specified this, the
- *    current buffer becomes the client program's resposibility to
- *    @code{free()}.
+ *
+ *    Do not deallocate the buffer on close.  You would likely want to use
+ *    this after writing all the output data and just before closing.
+ *    Otherwise, the buffer might get relocated.  Once you have specified
+ *    this, the current buffer becomes the client program's resposibility to
+ *    @code{free()}.  "ptr" must point to a @code{char*} pointer.
+ *
  *  @end table
  *
  *  The third argument is never optional and must be a pointer to where data
  *  are to be retrieved or stored.  It may be NULL if there are no data to
- *  transfer.
+ *  transfer, but both of these functions currently return the address of the
+ *  buffer.
 =*/
 int
 fmem_ioctl( FILE* fp, int req, void* ptr )
@@ -526,24 +530,26 @@ fmemopen(void *buf, size_t len, const char *pMode)
     pFMC->high_water = (pFMC->mode & FLAG_BIT(binary))
                    ? len : strlen(pFMC->buffer);
 
-#if defined(HAVE_FOPENCOOKIE)
     {
+        cookie_read_function_t* pRd =
+            (pFMC->mode & FLAG_BIT(read))  ? fmem_read  : NULL;
+        cookie_read_function_t* pWr =
+            (pFMC->mode & FLAG_BIT(write)) ? fmem_write : NULL;
+#if defined(HAVE_FOPENCOOKIE)
         cookie_io_functions_t iof;
-        iof.read  = (cookie_read_function_t* )fmem_read;
-        iof.write = (cookie_write_function_t*)fmem_write;
+        iof.read  = pRd;
+        iof.write = pWr;
         iof.seek  = (cookie_seek_function_t* )fmem_seek;
         iof.close = (cookie_close_function_t*)fmem_close;
 
         return fopencookie( pFMC, mode, iof );
-    }
 #elif defined(HAVE_FUNOPEN)
-    return funopen( pFMC,
-                    (cookie_read_function_t* )fmem_read,
-                    (cookie_write_function_t*)fmem_write,
-                    (cookie_seek_function_t* )fmem_seek,
-                    (cookie_close_function_t*)fmem_close );
+        return funopen( pFMC, pRd, pWr,
+                        (cookie_seek_function_t* )fmem_seek,
+                        (cookie_close_function_t*)fmem_close );
 #else
 #  error We have neither fopencookie(3GNU) nor funopen(3BSD)
 #endif
+    }
 }
 #endif /* ENABLE_FMEMOPEN */
