@@ -10,13 +10,14 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 1999/10/29 02:47:37 bruce Exp $
+## $Id: Makefile.am,v 1.4 1999/11/02 05:22:18 bruce Exp $
 ## ---------------------------------------------------------------------
 
 INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
 		-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
 		-I$(top_builddir) -I$(top_srcdir) -I. -I$(srcdir)
 
+BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS         = $(top_builddir)/getdefs/getdefs
 AGEXE		= $(top_builddir)/agen5/AutoGen
 
@@ -82,9 +83,9 @@ stamp-functions: $(FUNCLIST) functions.tpl
 
 expr.def : $(EXPRLIST)
 	@echo $(GETDEFS) assign=group=ag defs=gfunc templ=snarf \
-		out=expr.def srcfile $(EXPRLIST)
+		out=expr.def srcfile $(EXPRLIST) $(BLOCKOPT)
 	@res=`$(GETDEFS) assign=group=ag defs=gfunc templ=snarf \
-		out=expr.def srcfile $(EXPRLIST) 2>&1 ` ; \
+		out=expr.def srcfile $(EXPRLIST) $(BLOCKOPT) 2>&1 ` ; \
 	( echo $$res | egrep -v 'no copies of pattern' ) || :
 
 stamp-exprini : expr.def snarf.tpl
