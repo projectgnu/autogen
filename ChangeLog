@@ -1,3 +1,14 @@
+2001-12-24  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am(SUBDIRS): list configured based on --disable-shell
+	* configure.in(DEBUG): use a configure test function
+	* agen5/agCgi.c(stderr): reopen as stdout.
+	* agen5/*.c: rework all error messages.  Ensure that they all
+	start with text/plain for CGI output
+	* agen5/autogen.h(pzOopsPrefix): new global pointer to prefix
+	for all error messages.  empty for non-CGI, "text/plain" for CGI.
+	(AG_ABEND_STR): new macro for ABENDing with a string argument
+
 2001-12-20  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/opts.def(config-header): use new attribute
