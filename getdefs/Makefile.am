@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##    AutoGen copyright 1992-1999 Bruce Korb
+##    AutoGen copyright 1992-2002 Bruce Korb
 ## 
 ## Author:	   Bruce Korb <bkorb@gnu.org>
 ## Maintainer:	   Bruce Korb <bkorb@gnu.org>
 ## Created:	   Mon Jun 30 15:35:12 1997
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2002/02/23 01:57:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs
@@ -18,7 +18,7 @@ SUBDIRS         = test
 getdefs_SOURCES = getdefs.c gdemit.c gdinit.c getdefs.h proto.h
 nodist_getdefs_SOURCES = opts.c opts.h
 
-BUILT_SOURCES   = opts.c opts.h getdefs.texi getdefs.menu getdefs.1
+BUILT_SOURCES   = opts.c opts.h
 EXTRA_DIST      = opts.def
 AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
@@ -27,9 +27,11 @@ man_MANS        = getdefs.1
 getdefs_LDFLAGS = -static
 INCLUDES        = @INCLIST@
 
-MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
+GENFILES        = getdefs.texi getdefs.menu getdefs.1
+MAINTAINERCLEANFILES = Makefile.in
+DISTCLEANFILES  = $(GENFILES)
 
-gen : $(BUILT_SOURCES)
+gen : $(BUILT_SOURCES) $(GENFILES)
 
 all : gen
 
@@ -42,7 +44,7 @@ opts-stamp : opts.def
 	$(AGEXE) -L $(top_srcdir)/autoopts $(srcdir)/opts.def
 	@touch $@
 
-getdefs.1 getdefs.menu getdefs.texi : gen-stamp
+$(GENFILES) : gen-stamp
 
 gen-stamp : opts.def getdefs
 	top_builddir=$(top_builddir) \
@@ -52,6 +54,7 @@ gen-stamp : opts.def getdefs
 	@touch $@
 
 clean : getdef-clean
+distclean : getdef-clean
 
 getdef-clean :
 	rm -f *-stamp
