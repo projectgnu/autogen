@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.16 2000/04/04 13:22:18 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.17 2000/04/05 14:39:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -53,7 +53,7 @@ This software is released under [=
    =  gpl =]the GNU General Public License[=
    = lgpl =]the GNU General Public License with Library Extensions[=
    =  bsd =]the Free BSD License[=
-   *      =]a proprietary copyright[=
+   *      =]a proprietary [= % copyright.type "%s " =]copyright[=
   ESAC =].[=
 ENDIF =]
 

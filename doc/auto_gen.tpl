@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.54 2000/04/04 16:44:12 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.55 2000/04/05 14:39:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -33,6 +33,7 @@ directories:
 @set EDITION [=`echo ${AG_REVISION}`=]
 @set VERSION [=`echo ${AG_REVISION}`=]
 @set UPDATED [=`date "+%B %Y"`=]
+@set CDATE   1992-[=`date +%Y`=]
 
 @dircategory GNU programming tools
 @direntry
@@ -42,8 +43,8 @@ directories:
 @ifinfo
 This file documents [=package=] Version @value{VERSION}
 
-AutoGen copyright @copyright{} [=copyright.date=] Bruce Korb
-AutoOpts copyright @copyright{} [=copyright.date=] Bruce Korb
+AutoGen copyright @copyright{} @value{CDATE} Bruce Korb
+AutoOpts copyright @copyright{} @value{CDATE} Bruce Korb
 snprintfv copyright @copyright{} 1999 Gary V. Vaughan
 
 [=(gpl "AutoGen" "")=]
@@ -60,11 +61,11 @@ notice identical to this one except for the removal of this paragraph
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{autogen@@linuxave.org}
+@author @email{bkorb@@gnu.org}
 
 @page
 @vskip 0pt plus 1filll
-AutoGen copyright @copyright{} [=copyright.date=] Bruce Korb
+AutoGen copyright @copyright{} @value{CDATE} Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,
 @sp 2
@@ -149,10 +150,10 @@ For a full list of the Automated Option features, @xref{Features}.
 @node Generalities
 @section The Purpose of AutoGen
 
-The idea of this program is to have a text file, a template if
-you will, that contains the general text of the desired output file.
-That file includes substitution expressions and sections of text that are
-replicated under the control of separate definition files.
+The idea of this program is to to construct an output file by instantiating
+a template file that contains the general text of the desired output file.
+That template includes substitution expressions and sections of text that
+are replicated under the control of separate definition files.
 
 @cindex design goals
 
@@ -937,12 +938,11 @@ characters.  However, additionally, it may not begin with any of the
 POSIX file name characters and it may not contain the start macro
 marker.
 
-This pseudo macro may appear on one or several lines of text.
-Intermixed may be comment lines (completely blank or starting with the
-hash character @code{#} in column 1), and file content markers (text
-between @code{-*-} pairs on a single line).  This may be used to
-establish editing "modes" for the file.  These are ignored by
-AutoGen.
+This pseudo macro may appear on one or several lines of text.  Intermixed
+may be comment lines (completely blank or starting with the hash character
+@code{#} in column 1), and file content type markers (text between
+@code{-*-} pairs on a single line).  This may be used to establish editing
+"modes" for the file.  These are ignored by AutoGen.
 
 The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
@@ -983,7 +983,7 @@ The result of the expression evaluation will depend on what apply code
 has been provided, whether or not there is an associated value
 for the value name, and whether or not expressions are specified.
 
-The syntax rules are:
+The semantic rules are:
 
 @enumerate
 @item
