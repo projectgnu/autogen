@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.18 1999/09/22 16:15:32 bkorb Exp $
+ *   $Id: opts.def,v 1.19 1999/09/23 16:51:17 bkorb Exp $
  */
 
 /*
@@ -33,7 +33,7 @@ prog_name      = "columns";
 prog_title     = "Columnize Input Text";
 long_opts;
 
-version = 1;
+version = "1.1";
 
 flag = {
     name      = width;
