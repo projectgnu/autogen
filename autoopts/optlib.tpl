@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.24 2000/11/01 15:26:23 bkorb Exp $
+# $Id: optlib.tpl,v 1.25 2000/11/10 16:31:37 bkorb Exp $
 
 =]
 [=
@@ -269,7 +269,7 @@ tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
 
        *                        =][=
           (error (string-append cap-name
-                 " has arg_default, but no arg_type"))  =][=
+                 " has arg_default, but no valid arg_type"))  =][=
        ESAC                     =][=
     ENDIF                       =][=
 
