@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2003-05-05 20:52:47 bkorb"
-# Version:    "$Revision: 3.9 $
+# Time-stamp: "2004-07-30 15:39:55 bkorb"
+# Version:    "$Revision: 3.10 $
 
 MAKE=${MAKE:-make}
 
@@ -13,9 +13,10 @@ mkdir autogen-${AG_VERSION} || {
 }
 
 cd autogen-${AG_VERSION}
-mkdir html_mono html_chapter html_node info text dvi pdf ps texi || {
+dirlist='html_mono html_chapter html_node info text dvi pdf ps texi'
+mkdir ${dirlist} || {
   echo cannot make subdirectories: >&2
-  echo html_mono html_chapter html_node info text dvi ps texi >&2
+  echo ${dirlist} >&2
   exit 1
 }
 
@@ -26,15 +27,15 @@ cd ..
 [ -f autogen.info ] || ${MAKE}
 
 texi2html -menu -split=none    -verbose autogen.texi
-mv -f autogen.html autogen-${AG_VERSION}/html_mono
+mv -f autogen.html autogen-${AG_VERSION}/html_mono/.
 echo mono done
 
 texi2html -menu -split=chapter -verbose autogen.texi
-mv -f autogen*.html autogen-${AG_VERSION}/html_chapter
+mv -f autogen*.html autogen-${AG_VERSION}/html_chapter/.
 echo chapter done
 
 texi2html -menu -split=section -verbose autogen.texi
-mv -f autogen*.html autogen-${AG_VERSION}/html_node
+mv -f autogen*.html autogen-${AG_VERSION}/html_node/.
 echo node done
 
 for f in autogen*.info*
