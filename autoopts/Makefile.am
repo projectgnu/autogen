@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-01-08 19:40:22 bkorb"
+## Time-stamp:      "2005-01-14 10:37:50 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2005/01/09 04:05:39 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2005/01/14 20:37:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -42,10 +42,10 @@ HDRS        = $(GENHDRS) autoopts.h proto.h
 ##
 CSRC        = \
     autoopts.c  \
-    boolean.c   enumeration.c environment.c genshell.c  load.c     \
-    makeshell.c numeric.c     pgusage.c     putshell.c  restore.c  \
-    save.c      sort.c        stack.c       streqvcmp.c tokenize.c \
-    usage.c     version.c
+    boolean.c   configfile.c enumeration.c environment.c genshell.c  \
+    load.c      makeshell.c  numeric.c     pgusage.c     putshell.c  \
+    restore.c   save.c       sort.c        stack.c       streqvcmp.c \
+    tokenize.c  usage.c      version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
@@ -75,7 +75,7 @@ m4datadir                 = $(datadir)/aclocal
 m4data_DATA               = autoopts.m4
 
 nodist_pkgdata_DATA       = $(libsrc)
-nobase_pkgconfig_SCRIPTS  = autoopts.pc
+pkgconfig_SCRIPTS         = autoopts.pc
 pkgdata_DATA              = autoopts.m4 $(CLIENT_TPLS)
 
 lib_LTLIBRARIES           = libopts.la libguileopts.la

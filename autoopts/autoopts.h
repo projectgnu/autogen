@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-01-08 16:31:51 bkorb"
+ *  Time-stamp:      "2005-01-09 14:41:26 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.3 2005/01/09 03:20:27 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.4 2005/01/14 20:37:31 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -86,6 +86,8 @@ typedef int tDirection;
 #define DIRECTION_PROCESS  1
 #define PROCESSING(d)     ((d)>0)
 #define PRESETTING(d)     ((d)<0)
+
+#define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
 /*
  *  Procedure success codes

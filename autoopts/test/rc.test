@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2004-10-30 12:34:59 bkorb"
+# Time-stamp:        "2005-01-14 10:32:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: rc.test,v 4.2 2005/01/14 20:37:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -39,8 +39,7 @@ ${AG_L} ${testname}.def || \
 
 # # # # # # # # # # VALIDATE HELP # # # # # # # # #
 
-( cat | sed "s@XXXXX@`pwd`@" > ${testname}.hlp
-) <<_EOF_
+cat > ${testname}-base.help <<_EOF_
 test_rc - Test AutoOpts for rc
 USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
   Flg Arg Option-Name    Description
@@ -58,14 +57,15 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
- - reading file XXXXX/rc.rc/rc.file
+ - reading file ..../${testname}.rc/rc.file
 _EOF_
 
 mkdir ${testname}.rc ${testname}.run
 compile "--help"
-
-cmp ${testname}.h*lp || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+    ${testname}.help > ${testname}-res.help
+cmp ${testname}-*.help || \
+  failure "`diff ${testname}-*.help`"
 
 # # # # # # # # # # DO THE REAL TEST # # # # # # # # #
 
@@ -107,11 +107,11 @@ cmp  ${testname}.cmds ${testname}.test || {
 
 cat >> ../${testname}.rc/${testname}.file  <<_EOF_
 [TEST_MUMBLE]
-second  fourth
+second    fourth
 [TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
-second  fifth
+second  = fifth
 [TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
-second  sixth
+second  : sixth
 _EOF_
 
 ../${testname} -t yyy MUMBLE > ${testname}.cmds

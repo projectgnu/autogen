@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2004-11-22 16:30:16 bkorb"
+## Time-stamp:      "2005-01-09 10:43:45 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.2 2005/01/14 20:37:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -98,11 +98,8 @@ cat >&3 <<- \EOMacro
 	  AC_CACHE_VAL([lo_cv_test_autoopts],[
 	    aoconfig=${lo_cv_with_autoopts_config}
 	    lo_cv_test_autoopts=`${aoconfig} --libs` 2> /dev/null
-	    if test $? -ne 0
-	    then lo_cv_test_autoopts=no
-	    else if test -z "$lo_cv_test_autoopts"
-	         then lo_cv_test_autoopts=yes
-	    fi ; fi
+	    if test $? -ne 0 -o -z "${lo_cv_test_autoopts}"
+	    then lo_cv_test_autoopts=no ; fi
 	  ]) # end of CACHE_VAL
 	  AC_MSG_RESULT([${lo_cv_test_autoopts}])
 

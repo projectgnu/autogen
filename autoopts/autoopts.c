@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+ *  $Id: autoopts.c,v 4.3 2005/01/14 20:37:31 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -56,8 +56,6 @@
 #endif
 
 static const char zNil[] = "";
-
-#define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
 #define SKIP_RC_FILES(po) \
     DISABLED_OPT(&((po)->pOptDesc[ (po)->specOptIdx.save_opts+1]))
@@ -756,135 +754,9 @@ doRegularOpts( tOptions* pOpts )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-static void
-doRcFiles( tOptions* pOpts )
-{
-    int     idx;
-    int     inc = DIRECTION_PRESET;
-    char    zFileName[ 4096 ];
-
-    /*
-     *  Find the last RC entry (highest priority entry)
-     */
-    for (idx = 0; pOpts->papzHomeList[ idx+1 ] != NULL; ++idx)  ;
-
-    /*
-     *  For every path in the home list, ...  *TWICE* We start at the last
-     *  (highest priority) entry, work our way down to the lowest priority,
-     *  handling the immediate options.
-     *  Then we go back up, doing the normal options.
-     */
-    for (;;) {
-        struct stat StatBuf;
-        cch_t*  pzPath;
-
-        /*
-         *  IF we've reached the bottom end, change direction
-         */
-        if (idx < 0) {
-            inc = DIRECTION_PROCESS;
-            idx = 0;
-        }
-
-        pzPath = pOpts->papzHomeList[ idx ];
-
-        /*
-         *  IF we've reached the top end, bail out
-         */
-        if (pzPath == NULL)
-            break;
-
-        idx += inc;
-
-        if (! optionMakePath( zFileName, sizeof( zFileName ),
-                              pzPath, pOpts->pzProgPath ))
-            continue;
-
-        /*
-         *  IF the file name we constructed is a directory,
-         *  THEN append the Resource Configuration file name
-         *  ELSE we must have the complete file name
-         */
-        if (stat( zFileName, &StatBuf ) != 0)
-            continue; /* bogus name - skip the home list entry */
-
-        if (S_ISDIR( StatBuf.st_mode )) {
-            size_t len = strlen( zFileName );
-            char* pz;
-
-            if (len + 1 + strlen( pOpts->pzRcName ) >= sizeof( zFileName ))
-                continue;
-
-            pz = zFileName + len;
-            if (pz[-1] != '/')
-                *(pz++) = '/';
-            strcpy( pz, pOpts->pzRcName );
-        }
-
-        filePreset( pOpts, zFileName, inc );
-
-        /*
-         *  IF we are now to skip RC files AND we are presetting,
-         *  THEN change direction.  We must go the other way.
-         */
-        if (SKIP_RC_FILES(pOpts) && PRESETTING(inc)) {
-            idx -= inc;  /* go back and reprocess current file */
-            inc =  DIRECTION_PROCESS;
-        }
-    } /* For every path in the home list, ... */
-}
-
-
-/*
- *  doPresets - check for preset values from an rc file or the envrionment
- */
 static tSuccess
 doPresets( tOptions* pOpts )
 {
-    /*
-     *  IF the struct version is not the current, and also
-     *     either too large (?!) or too small,
-     *  THEN emit error message and fail-exit
-     */
-    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION  )
-       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
-          || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
-       )  )  {
-
-        fprintf( stderr, zAO_Err, pOpts->origArgVect[0],
-                 NUM_TO_VER( pOpts->structVersion ));
-        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-            fputs( zAO_Big, stderr );
-        else
-            fputs( zAO_Sml, stderr );
-
-        exit( EXIT_FAILURE );
-    }
-
-    /*
-     *  IF the client has enabled translation and the translation procedure
-     *  is available, then go do it.
-     */
-    if (  ((pOpts->fOptSet & OPTPROC_TRANSLATE) != 0)
-       && (pOpts->pTransProc != 0) ) {
-        (*pOpts->pTransProc)();
-    }
-
-    /*
-     *  when comparing long names, these are equivalent
-     */
-    strequate( zSepChars );
-
-    {
-        const char* pz = strrchr( *pOpts->origArgVect, '/' );
-
-        if (pz == NULL)
-             pOpts->pzProgName = *pOpts->origArgVect;
-        else pOpts->pzProgName = pz+1;
-
-        pOpts->pzProgPath = *pOpts->origArgVect;
-    }
-
     if (! SUCCESSFUL( doImmediateOpts( pOpts )))
         return FAILURE;
 
@@ -902,7 +774,8 @@ doPresets( tOptions* pOpts )
     }
     else {
         doEnvPresets( pOpts, ENV_IMM );
-        doRcFiles(    pOpts );
+        if (configFileLoad( pOpts, NULL ) < 0)
+            return FAILURE;
         doEnvPresets( pOpts, ENV_NON_IMM );
     }
     pOpts->fOptSet &= ~OPTPROC_PRESETTING;
@@ -1082,6 +955,9 @@ optionProcess(
     int        argCt,
     char**     argVect )
 {
+    if (! SUCCESSFUL( validateOptionsStruct( pOpts, argVect[0] )))
+        exit( EXIT_FAILURE );
+
     /*
      *  Establish the real program name, the program full path,
      *  and do all the presetting the first time thru only.

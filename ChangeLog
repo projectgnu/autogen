@@ -1,3 +1,15 @@
+2004-01-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(configfile.c): new file
+	* autoopts/configfile.c: move config file code here
+	* autoopts/autoopts.c(doRcFiles): move and rename to configFileLoad()
+	(ISNAMECHAR): remove
+	* autoopts/autoopts.h(ISNAMECHAR): add
+	* autoopts/load.c(loadOptionLine): add ':' to list of separation chars
+	* autoopts/usage-txt.def(AO_Bad): new message
+	* autoopts/test/rc.test(cat): fix inconsistent output
+	* pkg/libopts/mklibsrc.sh(lo_cv_test_autoopts): handle test correctly
+
 2004-01-08  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options_h.tpl(streqv*): export these functions for programs

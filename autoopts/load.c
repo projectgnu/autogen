@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+ *  $Id: load.c,v 4.3 2005/01/14 20:37:31 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -232,16 +232,25 @@ loadOptionLine(
         char* pz = pzLine;
         while (  (! isspace( *pz ))
               && (*pz != NUL)
-              && (*pz != '=' )  ) pz++;
+              && (*pz != '=' )
+              && (*pz != ':' )  ) pz++;
 
         /*
-         *  IF we exited because we found either a space char or an '=',
-         *  THEN terminate the name (clobbering either a space or '=')
+         *  IF we exited because we found a character other than NUL
+         *  THEN terminate the name (clobbering our scan stop character)
          *       and scan over any more white space that follows.
          */
         if (*pz != NUL) {
+            int stopped_on_space = (isspace(*pz));
             *pz++ = NUL;
-            while (isspace( *pz )) pz++;
+            while (isspace(*pz))   pz++;
+
+            if (  stopped_on_space
+               && ((*pz == '=') || (*pz == ':'))  )  {
+
+                while (isspace(*(++pz)))   ;
+
+            }
         }
 
         /*
