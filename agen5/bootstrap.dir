@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/07/11 20:28:44 $
+# Last Modified:     $Date: 2002/09/30 03:33:20 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.7 2002/07/11 20:28:44 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.8 2002/09/30 03:33:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -49,6 +49,7 @@ export top_builddir top_srcdir builddir srcdir
 #  disable any $HOME defaults
 #
 HOME=/dev/null
+SHELL=/bin/sh
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -214,12 +215,18 @@ do
     #  funcCase.c must be first file in list.
     #  It has the exparg attribute names.
     #
-    eopt="defs=gfunc templ=snarf srcfile assign=two-phase=yes"
-    eopt="assign=group=ag $eopt out=expr.def"
-    rm -f expr.def
-    echo ${GD} $eopt func*.c exp*.c
+    cat > expr.cfg <<- _EOConfig_
+		defs-to-get    gfunc
+		template       snarf
+		srcfile
+		assign         two-phase=yes
+		assign         group=ag
+		output         expr.def
+		_EOConfig_
+
+    echo ${GD} load=expr.cfg func*.c exp*.c
     set +e
-    ( SHELL=ksh ${GD} $eopt func*.c exp*.c 2>&1 ) | \
+    ( SHELL=sh ${GD} load=expr.cfg func*.c exp*.c 2>&1 ) | \
 	  egrep -v 'no copies of pattern' >&2
     set -e
 	${AG} expr.def
@@ -231,19 +238,25 @@ do
   stamp-directive | \
   directive.def | \
   directive.h )
+    set -x
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
       echo "Cannot locate autogen or getdefs"
       $force && exit 1
       continue
     fi
-    eopt="template=directive out=directive.def"
-    echo "${GD} $eopt ${srcdir}/defDirect.c | ${AG} -b directive"
-    ${GD} $eopt ${srcdir}/defDirect.c
+    cat > directive.cfg <<- _EOConfig_
+		defs-to-get    directive
+		template       directive
+		output         directive.def
+		input          ${srcdir}/defDirect.c
+		srcfile
+		_EOConfig_
+    ${GD} load=directive.cfg ${srcdir}/defDirect.c
     ${AG} directive.def
-    if [ "$t" = "directive.def" ]
-	then : ; else rm -f directive.def ; fi
+    rm -f directive.def directive.cfg
     date > stamp-directive
+    set +x
     ;;
 
   autogen.texi | autogen.menu )
