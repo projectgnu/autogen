@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-07-21 17:07:07 bkorb"
+## Time-stamp:      "2002-07-26 21:27:43 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.11 2002/07/27 04:13:35 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.12 2002/07/27 04:28:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -395,6 +395,8 @@ IF (or (exist? "copyright.author") (exist? "copyright.owner")) :+]
   IF (exist? "copyright.eaddr") :+] <[+: copyright.eaddr :+]>[+:
   ELIF (exist? "eaddr")         :+] <[+: eaddr :+]>[+:
   ENDIF    :+][+:
+
+  % copyright.bugs "\n.br\nPlease send bug reports to:  %s\n"  :+][+:
 
   CASE copyright.type :+][+:
    =  gpl  :+]
