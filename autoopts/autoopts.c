@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.42 2004/11/13 18:38:57 bkorb Exp $
+ *  $Id: autoopts.c,v 3.43 2004/11/16 02:50:21 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -104,9 +104,8 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      *  a different option.
      */
     if (  ((pOpts->fOptSet & OPTPROC_PRESETTING) != 0)
-       && (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
-          || (pOD->optEquivIndex != NO_EQUIVALENT)
-       )  )
+       && ((pOD->fOptState & OPTST_NO_INIT) != 0)
+       )
         return PROBLEM;
 
     /*
@@ -125,30 +124,43 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
          *    command line), THEN we will allow continued resetting of
          *    the value.  Once "defined", then it must not change.
          */
-        if (p->optActualIndex == NO_EQUIVALENT) {
+        if ((pOD->fOptState & OPTST_DEFINED) != 0) {
+            /*
+             *  The equivalenced-to option has been found on the command
+             *  line before.  Make sure new occurrences are the same type.
+             *
+             *  IF this option has been previously equivalenced and
+             *     it was not the same equivalenced-to option,
+             *  THEN we have a usage problem.
+             */
+            if (p->optActualIndex != pOD->optIndex) {
+                fprintf( stderr, (char*)zMultiEquiv, p->pz_Name, pOD->pz_Name,
+                         (pOpts->pOptDesc + p->optActualIndex)->pz_Name);
+                return FAILURE;
+            }
+        } else {
+            /*
+             *  Set the equivalenced-to actual option index to no-equivalent
+             *  so that we set all the entries below.  This option may either
+             *  never have been selected before, or else it was selected by
+             *  some sort of "presetting" mechanism.
+             */
+            p->optActualIndex = NO_EQUIVALENT;
+        }
+
+        if (p->optActualIndex != pOD->optIndex) {
             /*
              *  First time through, copy over the state
              *  and add in the equivalence flag
              */
             p->optActualValue = pOD->optValue;
             p->optActualIndex = pOD->optIndex;
-            p->optCookie      = pOD->optCookie;
             pOptState->flags |= OPTST_EQUIVALENCE;          
         }
 
-        else if (p->optActualIndex != pOD->optIndex) {
-            /*
-             *  IF this option has been previously equivalenced and
-             *     it was not the same equivalenced-to option,
-             *  THEN we have a usage problem.
-             */
-            fprintf( stderr, (char*)zMultiEquiv, p->pz_Name, pOD->pz_Name,
-                     (pOpts->pOptDesc + p->optActualIndex)->pz_Name);
-            return FAILURE;
-        }
-
         /*
-         *  Copy the most recent option argument
+         *  Copy the most recent option argument.  set membership state
+         *  is kept in ``p->optCookie''.  Do not overwrite.
          */
         p->pzLastArg = pOD->pzLastArg;
         pOD = p;

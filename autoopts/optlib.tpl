@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.28 2004/10/30 20:43:56 bkorb Exp $
+# $Id: optlib.tpl,v 3.29 2004/11/16 02:50:21 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -137,10 +137,6 @@ DEFINE save-name-morphs
 
   (if have-proc
       (begin
-        (if (and (not is-priv) (or (exist? "ifdef") (exist? "ifndef")))
-            (error (sprintf
-               "option %s is conditional, but invokes a non-private procedure"
-                       flg-name )))
         (hash-create-handle! have-cb-procs   flg-name #t)
         (hash-create-handle! cb-proc-name    flg-name proc-name)
         (hash-create-handle! test-proc-name  flg-name test-name)
@@ -341,16 +337,17 @@ typedef enum {[=
       set-defines
            set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
            set-index = (for-index)
-           opt-state = OPTST_SET =][=
+           opt-state = OPTST_SET  =][=
 
-    ELSE "not equivalenced"   =][=
+    ELSE  "is equivalenced"       =][=
+
       set-defines
            set-desc  = (string-append UP-prefix "DESC("
                            (up-c-name "equivalence") ")" )
            set-index = (index-name "equivalence")
            opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
-    ENDIF is/not equivalenced =][=
+    ENDIF is/not equivalenced     =][=
 
   ENDIF settable                  =][=
   IF (hash-ref ifdef-ed flg-name) =]
