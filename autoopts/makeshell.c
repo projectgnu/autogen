@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.18 1999/10/06 14:13:34 bkorb Exp $
+ *  $Id: makeshell.c,v 2.19 1999/10/06 21:24:10 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -522,6 +522,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
             exit( EXIT_FAILURE );
 
         case TT_VERSION:
+            pOD->pzLastArg = "c";
             doVersion( pOpts, pOD );
             /* NOTREACHED */
             exit( EXIT_FAILURE );
