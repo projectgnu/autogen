@@ -8,7 +8,7 @@
 ## Last Modified:   Tue Sep 15 14:55:24 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.0 1998/09/16 20:46:20 bkorb Exp $
+## $Id: Makefile.am,v 2.1 1998/09/22 21:25:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -28,7 +28,7 @@ EXTRA_DIST	= autogen.def auto_gen.tpl LSM LSM.tpl
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 gendir          = $(top_builddir)/src
-optdir          = $(top_builddir)/src
+optdir          = $(top_srcdir)/src
 
 AODEFS          = $(top_srcdir)/autoopts/options.tpl
 AOHEAD          = $(top_srcdir)/autoopts/opthead.tpl
