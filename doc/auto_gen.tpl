@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Feb 25 13:31:46 1999
+## Last Modified:     Thu Feb 25 13:44:24 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.9 1999/02/25 21:33:35 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.10 1999/02/25 21:49:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -658,7 +658,7 @@ autogen definitions @samp{template-name};
  *  This is a comment that describes what these
  *  definitions are all about.
  */
-globel = "value for a global text definition.";
+global = "value for a global text definition.";
 
 /*
  *  Include a standard set of definitions
