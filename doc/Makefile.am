@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Thu Jul 29 12:44:28 1999				      
+## Last Modified:   Thu Jul 29 12:45:11 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.16 1999/07/29 19:44:35 bkorb Exp $
+## $Id: Makefile.am,v 2.17 1999/07/29 19:45:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -93,6 +93,6 @@ doc :
 
 html : autogen.texi
 	cd www/doc ; ln -s ../../autogen.texi ; \
-	texi2html -menu -split_node
+	texi2html -menu -split_node autogen.texi
 
 # Makefile.am ends here
