@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.32 2000/03/16 02:25:43 bruce Exp $
+#$Id: optcode.tpl,v 2.33 2000/03/19 00:17:23 bruce Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -305,33 +305,13 @@ ENDIF=]
  *
  *  Define the [= (. pname-cap) =] Option Environment
  */
-tSCC   zPROGNAME[]   = "[= (. pname-up) =]";[=
-
- # "The default Resource Config file name is target OS specific,
-          but only if we have not been provided with a value."
-
-=]
+tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
 tSCC   zUsageTitle[] = [=
 IF (exist? "version") =][= (. pname-up) =]_FULL_VERSION [=
 ELSE                  =]"[=(. prog-name)=] - " [=
        (c-string (get "prog_title")) =][=
 ENDIF =]
-    "\nUSAGE:  %s [=
-        IF   (exist? "flag.value")      =][-<flag> [<val>]]... [=
-        ELIF (not (exist? "long_opts")) =][<option-name>[ =<value>]] ...[=
-        ENDIF =][=
-
-        IF (exist? "long_opts")   =][--<name>[{=| }<val>]]... [=
-        ENDIF=][=
-        IF (exist? "argument")  =][=
-
-          #  IF the argument description is not likely to fit on a line ...
-          =][=
-          IF (and (exist? "flag.value") 
-                  (exist? "long_opts" ) )
-              =]\\\n"
-    "\t\t[=ENDIF=]" [=(c-string (get "argument"))=] "[=
-        ENDIF=]\n";[=
+    "\n[= USAGE_LINE =]\n";[=
 
 IF homerc  _exist=]
 tSCC   zRcName[]     = "[=

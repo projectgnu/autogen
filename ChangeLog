@@ -1,3 +1,10 @@
+2000-03-18  Bruce Korb  <autogen@linuxbox.com>
+
+	* autoopts/optlib.tpl:  add USAGE_LINE.  Omits square brackets
+	around option syntax if there are required arguments.
+	* autoopts/optcode.tpl:  Make the usage invocation syntax a 
+	subroutine "USAGE_LINE" in optlib.tpl
+
 2000-03-07  Bruce Korb  <autogen@linuxbox.com>
 
 	* autoopts/optlib.tpl: Corrected improper l-value reference
