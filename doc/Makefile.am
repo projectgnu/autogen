@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Mon Aug  9 08:54:22 1999				      
+## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.22 1999/08/09 15:54:35 bkorb Exp $
+## $Id: Makefile.am,v 2.23 1999/08/13 00:19:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -59,7 +59,7 @@ autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC) $(SNVDOC)
 	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
 
 www/doc/autogen_toc.html : autogen.texi
-	@mkdir -f www/doc > /dev/null 2>&1
+	@mkdir -f www/doc > /dev/null 2>&1 || :
 	texi2html -menu -split_chapter -verbose autogen.texi
 	mv -f *.html www/doc
 	@touch $@
