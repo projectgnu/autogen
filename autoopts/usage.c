@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.2 1998/09/21 21:37:18 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.3 1998/09/22 23:23:09 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -149,10 +149,10 @@ optionUsage( tOptions*  pOptions, int exitCode )
              *    *AND*  the last one was not a doc option,
              *  THEN document that the remaining options are not user opts
              */
-            if (  (pOptions->presetOptCt == pOD->optIndex)
+            if (  (pOptions->presetOptCt == optNo)
                && (exitCode == EXIT_SUCCESS)
                && (docCt > 0)
-               && (pOD[-1].fOptState & OPTST_DOCUMENT == 0) )
+               && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
                 fprintf( fp, zBreak, zAuto, pOptTitle );
 
             /*
