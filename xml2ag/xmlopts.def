@@ -20,6 +20,7 @@ export = <<-  EOExport
 	#ifndef NUL
 	#  define NUL '\0'
 	#endif
+	extern void forkAutogen( tCC* pzInput );
 	EOExport;
 
 flag = {

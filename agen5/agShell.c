@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.23 2004/02/20 20:18:49 bkorb Exp $
+ *  $Id: agShell.c,v 3.24 2004/02/27 18:45:01 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -113,7 +113,7 @@ serverSetup( void )
                 AG_ABEND( "cannot allocate path name" );
 
             (void)atexit( &closeServer );
-            pCurDir = getcwd( p, MAXPATHLEN );
+            pCurDir = (tpChar)getcwd( p, MAXPATHLEN );
 #if defined( DEBUG_ENABLED )
             if (HAVE_OPT( SHOW_SHELL ))
                 fputs( "\nServer First Start\n", pfTrace );

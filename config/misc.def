@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2004/02/14 22:12:45 $
+ *  Last Modified:     $Date: 2004/02/27 18:45:01 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.32 2004/02/14 22:12:45 bkorb Exp $
+ *  $Id: misc.def,v 3.33 2004/02/27 18:45:01 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.32 $";
+version = "$Revision: 3.33 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -55,12 +55,13 @@ test   = {
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
 		#include <guile/gh.h>
-		#include <libguile.h>
+		#include <libguile/list.h>
 		int main () {
 		  SCM fumble, bumble, stumble;
+		  long lstumble;
 		  stumble = scm_cons( fumble, bumble );
 		  stumble = scm_display( fumble, bumble );
-		  stumble = scm_ilength( fumble );
+		  lstumble = scm_ilength( fumble );
 		  stumble = scm_makstr( 1, 2 );
 		  stumble = gh_eval_str( "stumble" );
 		  scm_misc_error( "oops", "bad", bumble );

@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-16 12:39:34 bkorb"
+## Time-stamp:      "2004-02-20 12:26:55 bkorb"
 ## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.15 2004/02/16 22:20:45 bkorb Exp $
+## $Id: Makefile.am,v 1.16 2004/02/27 18:45:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -28,7 +28,7 @@ MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) *-stamp
 INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 AG_ENV          = top_builddir=$(top_builddir) \
-  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 COL_EXE         = `cd ../columns;pwd`/columns
 

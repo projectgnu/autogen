@@ -11,6 +11,7 @@ set -e
 pkgsrc=`pwd`
 agdir=`cd ../agen5 > /dev/null 2>&1 ; pwd`
 
+[ ! -d ${DESTDIR} ] || rm -rf ${DESTDIR} || exit 1
 mkdir ${DESTDIR} || exit 1
 DESTDIR=`cd ${DESTDIR} > /dev/null && pwd` || exit 1
 

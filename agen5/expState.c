@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.18 2004/02/05 04:48:58 bkorb Exp $
+ *  $Id: expState.c,v 3.19 2004/02/27 18:45:01 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -216,7 +216,7 @@ ag_scm_chdir( SCM dir )
     {
         char* pz = ag_scm2zchars( dir, zChdirDir );
         pCurDir = malloc( SCM_LENGTH( dir ) + 1 );
-        strcpy( pCurDir, pz );
+        strcpy( (char*)pCurDir, pz );
     }
     return dir;
 }

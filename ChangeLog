@@ -1,3 +1,17 @@
+2004-02-27  Bruce Korb  <bkorb@gnu.org>
+
+	* config/misc.def: update to eliminate warnings on some platforms
+	* config/missing: update from Automake 1.8
+	* xml2ag/xmlopts.def(forkAutogen): export function for xml2ag.c
+
+2004-02-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c: the interface to use depends upon HAVE_FOPENCOOKIE
+	and HAVE_FUNOPEN, not __linux or __bsd
+	* */Makefile.am(columns): correct the spelling of the directory
+	* mkconfig.sh: use mktemp to make the temporary directory
+	* noag-boot.sh: regenerate
+
 2004-02-16  Bruce Korb  <bkorb@gnu.org>
 
 	* */Makefile.am: clean up which files need cleaning up and when.

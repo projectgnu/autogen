@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-16 10:55:12 bkorb"
+## Time-stamp:      "2004-02-20 12:26:23 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.22 2004/02/16 22:20:45 bkorb Exp $
+## $Id: Makefile.am,v 3.23 2004/02/27 18:45:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -38,7 +38,7 @@ DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
 
 AG_ENV          = top_builddir=$(top_builddir) \
-  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 
 ADDON_MENU	= \
