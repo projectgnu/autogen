@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: errors.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
+# $Id: errors.test,v 3.1 2001/12/09 21:17:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,16 +25,21 @@ fi
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
+echo "creating ${testname}.def in `pwd`"
 
-testname="$testname" \
+testname="${testname}" \
 test_main="${test_main}" \
 argument="arg ..." \
 long_opts="yes" \
-${SHELL-sh} -x ${stdopts} option second
+${SHELL-sh} -x ${stdopts} option second:fumble
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+sed '/"second"/a\
+    must-set;' ${testname}.def > ${testname}.tmp
+mv -f ${testname}.tmp ${testname}.def
+echo "homerc = ${testname}RC;" >> ${testname}.def
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 set -x
@@ -42,49 +47,65 @@ compile "--help"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 test_errors - Test AutoOpts for errors
-USAGE:  errors [ -<flag> | --<name> ]... arg ...
+USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
-   -s no  second         The second option descrip
+   -s YES second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
+   -> opt save-opts      Save the option state to an rc file
+   -< YES load-opts      Load options from an rc file
+				- disabled as --no-load-opts
+				- may appear multiple times
 
 Options may be specified by doubled hyphens and their name
 or by a single hyphen and the flag character (option value).
+
+The following option preset mechanisms are supported:
+ - reading file errorsRC/.test_errorsrc
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure help output mismatch
+cmp -s ${testname}.h*lp || \
+  failure "help output: `diff ${testname}.h*lp`"
 
-./$testname -s -o -s 2> /dev/null && \
-  failure $testname should not accept multiple options
+./${testname} -s foo -o -s bar 2> /dev/null && \
+  failure ${testname} should not accept multiple options
 
-./$testname -o -s > /dev/null 2>&1 && \
-  failure $testname must have arguments
+./${testname} -o -s foo > /dev/null 2>&1 && \
+  failure ${testname} must have arguments
 
-./$testname -o -s mumble > /dev/null || \
-  failure $testname stumbled somehow
+./${testname} -o -s foo mumble > /dev/null || \
+  failure ${testname} stumbled somehow
+
+./${testname} -o > /dev/null 2>&1 && \
+  failure ${testname} must have second argument
+
+mkdir ${testname}RC
+
+echo "second bumble" > ${testname}RC/.test_errorsrc
+./${testname} -o mumble > /dev/null || \
+  failure ${testname} did not see errorsRC/.test_errorsrc
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "allow_errors;" >> $testname.def
+echo "allow_errors;" >> ${testname}.def
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 compile "--help"
 
-cmp -s $testname.h*lp || \
+cmp -s ${testname}.h*lp || \
   failure help output mismatch
 
 #  This time, having a duplicate should be ignored...
 #
-./$testname -s -o -s 2> /dev/null 1>&2 || \
-  failure $testname should not object to multiple options
+./${testname} -s foo -o -s bar mumble 2> /dev/null 1>&2 || \
+  failure ${testname} should not object to multiple options
 
 cleanup
 # end of errors.test
