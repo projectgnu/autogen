@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: genshell.def,v 2.4 1999/10/06 14:13:34 bkorb Exp $
+ *   $Id: genshell.def,v 2.5 1999/10/06 15:37:51 bkorb Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ flag = {
     flag_arg  = ":";
     descrip   = 'Shell name (follows "#!" magic)';
 };
-
+#ifdef LATER
 flag = {
     name      =  name_prefix;
     disable   =  no;
@@ -67,7 +67,7 @@ flag = {
     enabled;
     descrip   =  "character case of variable names";
 };
-
+#endif /* LATER */
 explain =
 "Note that `shell' is only useful if the output file does not already
 exist.  If it does, then the shell name and optional first argument
