@@ -74,28 +74,22 @@ cat >> libopts.m4 <<-	EOMacro
 	    fi ; fi
 	  ]) # end of CACHE_VAL
 	  AC_MSG_RESULT([\${lo_cv_test_autoopts}])
-	
+
 	  if test "X\${lo_cv_test_autoopts}" != Xno
 	  then
 	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
 	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
-	    LIBOPTS_DIR=''
-	    LIBOPTS_MAKEFILE=''
-	    LIBOPTS_DIST=${tag}
+	    build_libopts_dir=false
 	  else
 	    LIBOPTS_LDADD='\$(top_builddir)/'"${tag}/libopts.la"
 	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/'"${tag}"
 	    INVOKE_LIBOPTS_MACROS
-	    LIBOPTS_DIR=${tag}
-	    LIBOPTS_MAKEFILE='${tag}/Makefile'
-	    LIBOPTS_DIST=''
+	    build_libopts_dir=true
 	  fi
 	  LIBOPTS_VERS=${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
 	  AC_SUBST(LIBOPTS_VERS)
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
-	  AC_SUBST(LIBOPTS_DIR)
-	  AC_SUBST(LIBOPTS_DIST)
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
 
