@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.15 2002/08/10 02:08:35 bkorb Exp $
+ *  $Id: autoopts.c,v 3.16 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -51,26 +51,7 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#define __EXTENSIONS__
-#include <sys/types.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <config.h>
-#include <string.h>
-#include <errno.h>
-
-#ifdef HAVE_LIBGEN
-#  include <libgen.h>
-#endif
-
-#include <streqv.h>
 #include "autoopts.h"
-#include "compat/compat.h"
 
 #ifndef HAVE_PATHFIND
 #  include "compat/pathfind.c"

@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2002 Bruce Korb
 dnl
-dnl Time-stamp:      "2002-08-18 18:14:01 bkorb"
+dnl Time-stamp:      "2002-09-19 21:49:08 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.10 2002/08/19 02:14:09 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.11 2002/09/21 17:27:15 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -22,7 +22,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.10 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.11 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -191,6 +191,7 @@ else
 fi
 ]
 AC_SUBST(INCLIST)
+AC_DEFINE( [AUTOGEN_BUILD], 1, [Define this if we are building AutoGen] )
 
 AM_CONFIG_HEADER(config.h:config-h.in)
 ==ADD_CONFIG_FILES==

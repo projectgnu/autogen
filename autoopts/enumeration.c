@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.2 2002/04/14 20:48:23 bkorb Exp $
+ *  $Id: enumeration.c,v 3.3 2002/09/21 17:27:15 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -50,11 +50,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <memory.h>
 
 #include "autoopts.h"
 

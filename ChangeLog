@@ -1,3 +1,29 @@
+2002-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c: correct mishandling of common-assign option
+	* getdefs/test/cfg.test(new): test it
+	* getdefs/test/Makefile.am(cfg.test): add to test list
+
+2002-09-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(SUFFIXES = .i): rule for preprocessing
+	* agen5/agUtils.c(alloc): move MEMDEBUG stuff to autoopts
+	* agen5/agUtils.h(SUCCESS): move this to autoopts.h
+	* agen5/autogen.c(ag_alloc): renamed these routines to aopts_alloc, ...
+	* agen5/autogen.h(autoopts.h): include this header for all compiles
+	(mem_mgmt): move this struct and allocation defines to autoopts.h
+	* agen5/*: use the moved macros consistently
+	* autoopts/*.c(include): regularize header usage & allocation macros too
+	* autoopts/streqvcmp.c(streqvmap): use 'char' type for args
+	(aopts_alloc): move the memory debugging code here
+	* compat/compat.h: bring in sync with new demands
+	* config/confmacs.tpl: syncronize a little better with network form
+	* configure.in(AUTOGEN_BUILD): define this always
+	* getdefs/getdefs.h: use compat.h to handle inconsistent header files
+	and the SUCCESS/FAILURE stuff
+	* pkg/libopts/mklibsrc.sh: strip out parts of files that should not be
+	exported from the tear-off library
+
 2002-09-14  Bruce Korb  <bkorb@gnu.org>
 
 	* config/confmacs.tpl(try-test): preserve exit status for invoking shell

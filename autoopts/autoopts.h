@@ -1,6 +1,8 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 3.4 2002/07/11 00:48:07 bkorb Exp $
+ *  Time-stamp:      "2002-09-19 21:20:44 bkorb"
+ *
+ *  autoopts.h  $Id: autoopts.h,v 3.5 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -52,25 +54,22 @@
 #ifndef AUTOGEN_AUTOOPTS_H
 #define AUTOGEN_AUTOOPTS_H
 
+#define __EXTENSIONS__
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#  include "compat/compat.h"
+#endif
+
+#include <sys/param.h>
+
 #include "options.h"
+
+#include "streqv.h"
 
 /*
  *  Convert the number to a list usable in a printf call
  */
 #define NUM_TO_VER(n)       ((n) >> 12), ((n) >> 7) & 0x001F, (n) & 0x007F
-
-#ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-#endif
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
-#ifdef HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-#endif
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif
 
 /*
  *  Some systems have broken printf's!!
@@ -78,61 +77,27 @@
  */
 #include "snprintfv/snprintfv.h"
 
-#ifndef NUL
-#  define NUL '\0'
-#endif
-
-#ifndef NULL
-#  define NULL 0x0
-#endif
-
-#ifndef EXIT_SUCCESS
-#  define  EXIT_SUCCESS 0
-#  define  EXIT_FAILURE 1
-#endif
-
-#ifndef FOPEN_BINARY_FLAG
-#  ifdef USE_FOPEN_BINARY
-#    define FOPEN_BINARY_FLAG   "b"
-#  else
-#    define FOPEN_BINARY_FLAG
-#  endif
-#endif
-
-#ifndef FOPEN_TEXT_FLAG
-#  ifdef USE_TEXT_BINARY
-#    define FOPEN_TEXT_FLAG     "t"
-#  else
-#    define FOPEN_TEXT_FLAG
-#  endif
-#endif
-
-#undef STATIC
-
-#ifdef DEBUG
-#  define STATIC
-#else
-#  define STATIC static
-#endif
-
-#ifndef STR
-#  define _STR(s) #s
-#  define STR(s)  _STR(s)
-#endif
-
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
 
 #define SKIP_OPT(p)  (((p)->fOptState & (OPTST_DOCUMENT|OPTST_OMITTED)) != 0)
 
+/*
+ *  Procedure success codes
+ *
+ *  USAGE:  define procedures to return "tSuccess".  Test their results
+ *          with the SUCCEEDED, FAILED and HADGLITCH macros.
+ */
+#define SUCCESS  ((tSuccess) 0)
+#define FAILURE  ((tSuccess)-1)
+#define PROBLEM  ((tSuccess) 1)
+
 typedef int tSuccess;
-#define SUCCESS         ((tSuccess)0)
-#define FAILURE         ((tSuccess)-1)
-#define PROBLEM         ((tSuccess)1)
-#define SUCCEEDED(r)    ((r)==SUCCESS)
-#define SUCCESSFUL(r)   SUCCEEDED(r)
-#define FAILED(r)       ((r)<SUCCESS)
-#define GLITCH(r)       ((r)>SUCCESS)
+
+#define SUCCEEDED( p )     ((p) == SUCCESS)
+#define SUCCESSFUL( p )    SUCCEEDED( p )
+#define FAILED( p )        ((p) <  SUCCESS)
+#define HADGLITCH( p )     ((p) >  SUCCESS)
 
 /*
  *  The pager state is used by doPagedUsage() procedure.
@@ -183,20 +148,59 @@ typedef struct {
 
 #endif
 
-#ifdef MEMDEBUG
-   extern void* ag_alloc( size_t, const char* );
-   extern void* ag_realloc( void*, size_t, const char* );
-   extern void  ag_free( void* );
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  MEMORY DEBUGGING
+ */
 
-#  define AGALOC( c )      ag_alloc( c, __FILE__ " at " STR( __LINE__ ))
-#  define AGREALOC( p, c)  ag_realloc( p, c, __FILE__ " at " STR( __LINE__ ))
-#  define AGFREE( p )      ag_free( p )
-#else
-#  define AGALOC( c )      malloc( c )
-#  define AGREALOC( p, c)  realloc( p, c )
-#  define AGFREE( p )      free( p )
-#endif
+#ifndef AUTOGEN_BUILD
+#  define AGALOC( c, w )        malloc( c )
+#  define AGREALOC( p, c, w )   realloc( p, c )
+#  define AGDUPSTR( p, s, w )   strdup( p )
+#  define AGFREE( p )           free( p )
+#  define TAGMEM( m, t )
 
+#else  /* AUTOGEN_BUILD is defined: */
+#  ifndef MEMDEBUG
+     extern void* aopts_alloc( size_t, const char* );
+     extern void* aopts_realloc( void*, size_t, const char* );
+     extern char* aopts_strdup( const char* pz, const char* );
+
+#    define AGALOC( c, w )      aopts_alloc( c, w )
+#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w )
+#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w )
+#    define AGFREE( p )         free( p )
+#    define TAGMEM( m, t )
+
+#  else  /* MEMDEBUG *IS* defined: */
+     typedef struct mem_mgmt      tMemMgmt;
+     struct mem_mgmt {
+         tMemMgmt*   pNext;
+         tMemMgmt*   pPrev;
+         char*       pEnd;
+         const char* pzWhence;
+     };
+
+     extern void* aopts_alloc( size_t, const char*, const char* );
+     extern void* aopts_realloc( void*, size_t, const char*, const char* );
+     extern char* aopts_strdup( const char* pz, const char*, const char* );
+     extern void  aopts_free( void* );
+
+#    define AO_HERE  __FILE__ " at " STR( __LINE__ )
+#    define AGALOC( c, w )      aopts_alloc( c, w, AO_HERE )
+#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w, AO_HERE )
+#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w, "strdup in " AO_HERE )
+#    define AGFREE( p )         aopts_free( p )
+#    define TAGMEM( m, t )      STMTS( tMemMgmt* p  = ((tMemMgmt*)m)-1; \
+                                tSCC z[] = t " in " AO_HERE; \
+                                p->pzWhence = z; )
+#  endif /* MEMDEBUG */
+#endif /* AUTOGEN_BUILD */
+
+/*
+ *  optionUsage print the usage text for the program described by the
+ *  option descriptor.  Does not return.  Calls ``exit(3)'' with exitCode.
+ */
 extern void optionUsage PROTO(( tOptions*, int exitCode ));
 
 /*

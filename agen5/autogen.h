@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.7 2002/04/06 19:11:44 bkorb Exp $
+ *  $Id: autogen.h,v 3.8 2002/09/21 17:27:15 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -28,6 +28,7 @@
 #define AUTOGEN_HDR_H
 
 #include "compat/compat.h"
+#include "autoopts/autoopts.h"
 #include "agUtils.h"
 #include "streqv.h"
 
@@ -330,52 +331,10 @@ MKSTRING( DevNull,   "/dev/null" );
  */
 #ifdef MEMDEBUG
 
-typedef struct mem_mgmt      tMemMgmt;
-struct mem_mgmt {
-    tMemMgmt*   pNext;
-    tMemMgmt*   pPrev;
-    char*       pEnd;
-    const char* pzWhence;
-};
-
-#  ifdef strdup
-#    undef strdup
-#  endif
-#  define strdup(s) dupString((s), __FILE__ " at " STR( __LINE__ ))
-
-   extern void* ag_alloc( size_t, const char*, const char* );
-   extern void* ag_realloc( void*, size_t, const char*, const char* );
-   extern char* ag_strdup( const char* pz, const char*, const char* );
-
-   extern void  ag_free( void* );
    extern void  unloadTemplate( tTemplate* pT );
    extern void  unloadDefs( void );
 
-#  define AGALOC( c, w )       ag_alloc( c, w, __FILE__ " at " STR( __LINE__ ))
-#  define AGREALOC( p, c, w )  ag_realloc( p, c, w, \
-                                           __FILE__ " at " STR( __LINE__ ))
-#  define AGDUPSTR( p, s, w )  STMTS( \
-                               tSCC z[] = "strdup in " __FILE__ " at " \
-                                          STR( __LINE__ );\
-                               p = ag_strdup( s, z, w ))
-
-#  define AGFREE( p )          ag_free( p )
-#  define TAGMEM( m, t )   STMTS( tMemMgmt* p  = ((tMemMgmt*)m)-1; \
-                           tSCC z[] = t " in " __FILE__ " at " \
-                                  STR( __LINE__ ); \
-                           p->pzWhence = z )
-
 #else
-   extern void* ag_alloc( size_t, const char* );
-   extern void* ag_realloc( void*, size_t, const char* );
-   extern char* ag_strdup( const char*, const char* );
-
-#  define AGALOC( c, w )       ag_alloc( c, w )
-#  define AGREALOC( p, c, w )  ag_realloc( p, c, w )
-#  define AGDUPSTR( p, s, w )  p = ag_strdup( s, w )
-
-#  define AGFREE( p )          free( p )
-#  define TAGMEM( m, t )
 #  define unloadTemplate(pt)
 #  define unloadDefs()
 #endif

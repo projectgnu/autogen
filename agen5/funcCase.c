@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.7 2002/04/20 00:51:32 bkorb Exp $
+ *  $Id: funcCase.c,v 3.8 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -241,9 +241,9 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 STATIC tSuccess
 Select_Equivalent( char* pzText, char* pzMatch )
 {
-    char*    pz  = strdup( pzText );
+    char*    pz;
     tSuccess res = SUCCESS;
-
+    AGDUPSTR( pz, pzText, "equiv chars" );
     upString( pz );
     if (strstr( pz, pzMatch ) == NULL)
         res = FAILURE;

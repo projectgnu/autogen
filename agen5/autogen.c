@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.16 2002/09/13 03:08:06 bkorb Exp $
+ *  $Id: autogen.c,v 3.17 2002/09/21 17:27:15 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -316,9 +316,9 @@ signalSetup( void )
     atexit( &finalMemCheck );
     /* Set the snprintfv library's memory management function pointers
        to use AutoGen's debugging malloc. */
-    snv_malloc  = (snv_pointer(*)SNV_PARAMS((size_t)))ag_alloc;
-    snv_realloc = (snv_pointer(*)SNV_PARAMS((snv_pointer, size_t)))ag_realloc;
-    snv_free    = (void(*)SNV_PARAMS((snv_pointer)))ag_free;
+    snv_malloc  = (snv_pointer(*)SNV_PARAMS((size_t)))aopts_alloc;
+    snv_realloc = (snv_pointer(*)SNV_PARAMS((snv_pointer, size_t)))aopts_realloc;
+    snv_free    = (void(*)SNV_PARAMS((snv_pointer)))aopts_free;
 #endif
 
     sa.sa_flags   = 0;

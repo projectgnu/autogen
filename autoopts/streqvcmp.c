@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.1 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.2 2002/09/21 17:27:15 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -53,8 +53,6 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#include <sys/types.h>
-#include <string.h>
 #include "autoopts.h"
 
 /*
@@ -144,9 +142,9 @@ streqvcmp( s1, s2 )
 
 
 void
-streqvmap( chFrom, chTo, ct )
-    int  chFrom;
-    int  chTo;
+streqvmap( From, To, ct )
+    char From;
+    char To;
     int  ct;
 {
     if (ct == 0) {
@@ -157,11 +155,9 @@ streqvmap( chFrom, chTo, ct )
     }
 
     else {
-        int delta;
-
-        chTo   &= 0xFF;
-        chFrom &= 0xFF;
-        delta   = chTo - chFrom;
+        int  chTo   = (int)To   & 0xFF;
+        int  chFrom = (int)From & 0xFF;
+        int  delta  = chTo - chFrom;
 
         do  {
             charmap[ chFrom ] = (unsigned)chTo;
@@ -196,6 +192,219 @@ strtransform( d, s )
     } while (*(s++) != NUL);
 }
 
+#ifdef AUTOGEN_BUILD
+tSCC zAllocErr[] = "AutoOpts allocation failed for %d bytes of %s\n";
+#ifndef MEMDEBUG
+
+    void*
+aopts_alloc( size_t sz, tCC* pzWhat )
+{
+    void* p = malloc( sz );
+    if ((p == NULL) && (pzWhat != NULL)) {
+        fprintf( stderr, zAllocErr, sz, pzWhat );
+        exit( EXIT_FAILURE );
+    }
+    return p;
+}
+
+
+    void*
+aopts_realloc( void* p, size_t sz, tCC* pzWhat )
+{
+    void* np = p ? realloc( p, sz ) : malloc( sz );
+    if (np == NULL) {
+        if (pzWhat != NULL) {
+            fprintf( stderr, zAllocErr, sz, pzWhat );
+            exit( EXIT_FAILURE );
+        }
+
+        if (p != NULL)
+            free( p );
+    }
+
+    return np;
+}
+
+
+    char*
+aopts_strdup( tCC* pz, tCC* pzWhat )
+{
+    char*   pzRes;
+    size_t  len = strlen( pz )+1;
+
+    /*
+     *  There are some systems out there where autogen is
+     *  broken if "strdup" is allowed to duplicate strings
+     *  smaller than 32 bytes.  This ensures that we work.
+     *  We also round up everything up to 32 bytes.
+     */
+    if (len < 0x20)
+         len = 0x20;
+    else len = (len + 0x20) & ~0x1F;
+
+    pzRes = aopts_alloc( len, pzWhat );
+
+    if (pzRes != NULL)
+        strcpy( pzRes, pz );
+
+    return pzRes;
+}
+
+#else
+STATIC tMemMgmt memHead = { &memHead, &memHead, NULL, "ROOT" };
+#define CHECK_CT 128
+#define SPARE    128
+
+
+    void*
+aopts_alloc( size_t sz, tCC* pzWhat, tCC* pz )
+{
+    size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
+    tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
+
+    if (p == NULL) {
+        if (pzWhat == NULL)
+            return NULL;
+
+        fprintf( stderr, zAllocErr, sz, pzWhat );
+        exit( EXIT_FAILURE );
+    }
+
+    /*
+     *  Link new entry to end of chain
+     */
+    p->pPrev        = memHead.pPrev;
+    p->pPrev->pNext = p;
+    memHead.pPrev   = p;
+    p->pNext        = &memHead;
+
+    p->pEnd = ((char*)(p+1)) + sz;
+    memset( (void*)p->pEnd, '~', CHECK_CT );
+    p->pzWhence = pz;
+
+    return (void*)(p+1);
+}
+
+
+    void*
+aopts_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
+{
+    size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
+    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
+    tMemMgmt    sv  = *np;
+
+    checkMem( np );
+    np = (tMemMgmt*)(p ? realloc( (void*)np, asz & ~0x3F )
+                       : malloc( asz & ~0x3F ));
+
+    if (np == NULL) {
+        if (pzWhat == NULL) {
+            if (p != NULL)
+                free( (void*)p );
+
+            /*
+             *  Unlink old entry
+             */
+            sv.pPrev->pNext = sv.pNext;
+            sv.pNext->pPrev = sv.pPrev;
+            return NULL;
+        }
+
+        fprintf( stderr, zAllocErr, sz, pzWhat );
+        exit( EXIT_FAILURE );
+    }
+
+    /*
+     *  Link other entries to new allocation
+     */
+    np->pPrev->pNext = np;
+    np->pNext->pPrev = np;
+
+    np->pEnd = ((char*)(np+1)) + sz;
+    memset( (void*)np->pEnd, '~', CHECK_CT );
+    np->pzWhence = pz;
+
+    return (void*)(np+1);
+}
+
+
+STATIC void
+checkMem( tMemMgmt* pMM )
+{
+    char* p  = pMM->pEnd;
+    int   ct = CHECK_CT;
+
+    do  {
+        if (*(p++) != '~') {
+            fprintf( pfTrace, "Stray pointer %d bytes after %d-byte %s end\n",
+                     CHECK_CT - ct, pMM->pEnd - (char*)(pMM+1),
+                     pMM->pzWhence );
+            fclose( stderr );
+            fclose( pfTrace );
+            fclose( stdout );
+            p = NULL;
+            *p = '~'; /* SEG FAULT */
+            _exit( EXIT_FAILURE );
+        }
+    } while (--ct > 0);
+}
+
+
+    void
+aopts_free( void* p )
+{
+    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
+    checkMem( np );
+
+    /*
+     *  Unlink old entry
+     */
+    np->pPrev->pNext = np->pNext;
+    np->pNext->pPrev = np->pPrev;
+    free( (void*)np );
+}
+
+
+STATIC void
+finalMemCheck( void )
+{
+    tMemMgmt*  pMM = memHead.pNext;
+
+    fputs( "\nResidual allocation list:\n", pfTrace );
+    while (pMM != &memHead) {
+        checkMem( pMM );
+        fprintf( pfTrace, "%12d bytes from %s\n",
+                 pMM->pEnd - (char*)(pMM+1), pMM->pzWhence );
+        pMM = pMM->pNext;
+    }
+}
+
+
+    char*
+aopts_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
+{
+    char*   pzRes;
+    size_t  len = strlen( pz )+1;
+
+    /*
+     *  There are some systems out there where autogen is
+     *  broken if "strdup" is allowed to duplicate strings
+     *  smaller than 32 bytes.  This ensures that we work.
+     *  We also round up everything up to 32 bytes.
+     */
+    if (len < 0x20)
+         len = 0x20;
+    else len = (len + 0x20) & ~0x1F;
+
+    pzRes = aopts_alloc( len, pzWhat, pzDupFrom );
+
+    if (pzRes != NULL)
+        strcpy( pzRes, pz );
+
+    return pzRes;
+}
+#endif /* MEMDEBUG */
+#endif /* AUTOGEN_BUILD */
 /*
  * Local Variables:
  * c-file-style: "stroustrup"

@@ -3,12 +3,12 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
+ *  Time-stamp:      "2002-09-19 21:21:27 bkorb"
+ *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
- * Last Modified:     Fri Jul 30 12:34:46 1999
- *            by: bkorb
  *
- * $Id: compat.h,v 3.2 2002/07/31 02:44:55 bkorb Exp $
+ * $Id: compat.h,v 3.3 2002/09/21 17:27:15 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -54,10 +54,10 @@
 
 #ifdef STDC_HEADERS
 #  ifndef HAVE_STRING_H
-#     define HAVE_STRING_H	1
+#     define HAVE_STRING_H  1
 #  endif
 #  ifndef HAVE_STDLIB_H
-#     define HAVE_STDLIB_H	1
+#     define HAVE_STDLIB_H  1
 #  endif
 #endif
 
@@ -67,13 +67,21 @@
 #  error NEED <stdlib.h>
 #endif
 
-# ifdef HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-# endif
+#endif
 
-# ifdef HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
 #   include <errno.h>
-# endif
+#else
+#  error NEED <errno.h>
+#endif
+
+#ifdef HAVE_MEMORY_H
+#  include <memory.h>
+#else
+#  error NEED <memory.h>
+#endif
 
 /* some systems #def errno! and others do not declare it!! */
 #ifndef errno
@@ -113,21 +121,21 @@
 #endif /* MAXPATHLEN */
 
 # ifndef LONG_MAX
-#   define LONG_MAX	~(1L << (8*sizeof(long) -1))
-#   define INT_MAX	~(1 << (8*sizeof(int) -1))
-#   define SHORT_MAX	~(1 << (8*sizeof(short) -1))
+#   define LONG_MAX     ~(1L << (8*sizeof(long) -1))
+#   define INT_MAX      ~(1 << (8*sizeof(int) -1))
+#   define SHORT_MAX    ~(1 << (8*sizeof(short) -1))
 # endif
 
 # ifndef ULONG_MAX
-#   define ULONG_MAX	~(OUL)
-#   define UINT_MAX	~(OU)
-#   define USHORT_MAX	~(OUS)
+#   define ULONG_MAX    ~(OUL)
+#   define UINT_MAX     ~(OU)
+#   define USHORT_MAX   ~(OUS)
 # endif
 
 /* redefine these for BSD style string libraries */
 #ifndef HAVE_STRCHR
-#  define strchr		index
-#  define strrchr		rindex
+#  define strchr        index
+#  define strrchr       rindex
 #endif
 
 #if HAVE_STRING_H
@@ -137,6 +145,41 @@
 #else
    extern char *strchr(), *strrchr();
 #endif
+
+#if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
+#  include <libgen.h>
+#endif
+
+#ifndef HAVE_PATHFIND
+  EXTERN char *pathfind PARAMS((const char *, const char *, const char *));
+#endif
+
+#ifndef NULL
+#  define NULL 0
+#endif
+
+#ifndef FOPEN_BINARY_FLAG
+#  ifdef USE_FOPEN_BINARY
+#    define FOPEN_BINARY_FLAG   "b"
+#  else
+#    define FOPEN_BINARY_FLAG
+#  endif
+#endif
+
+#ifndef FOPEN_TEXT_FLAG
+#  ifdef USE_TEXT_BINARY
+#    define FOPEN_TEXT_FLAG     "t"
+#  else
+#    define FOPEN_TEXT_FLAG
+#  endif
+#endif
+
+#ifndef STR
+#  define _STR(s) #s
+#  define STR(s)  _STR(s)
+#endif
+
+/* START AG-ONLY: */
 
 #ifdef HAVE_SETJMP_H
 #  include <setjmp.h>
@@ -157,10 +200,6 @@
    #define WORD_MIN  INT_MIN
 #endif
 
-#ifndef HAVE_PATHFIND
-  EXTERN char *pathfind PARAMS((const char *, const char *, const char *));
-#endif
-
 # if defined (HAVE_DIRENT_H)
 #   include <dirent.h>
 #   define D_NAMLEN(dirent) strlen((dirent)->d_name)
@@ -176,7 +215,9 @@
 #   if defined (HAVE_NDIR_H)
 #     include <ndir.h>
 #   endif /* HAVE_NDIR_H */
-#   if !defined (HAVE_SYS_NDIR_H) && !defined (HAVE_SYS_DIR_H) && !defined (HAVE_NDIR_H)
+#   if !defined (HAVE_SYS_NDIR_H) && \
+       !defined (HAVE_SYS_DIR_H)  && \
+       !defined (HAVE_NDIR_H)
 #     include "ndir.h"
 #   endif /* !HAVE_SYS_NDIR_H && !HAVE_SYS_DIR_H && !HAVE_NDIR_H */
 # endif /* !HAVE_DIRENT_H */
@@ -189,10 +230,12 @@
 #    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
 # endif /* !_POSIX_SOURCE */
 
-#if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
-#  include <libgen.h>
-#endif
+/* END AG-ONLY. */
 
 #endif /* COMPAT_H */
-
-/* compat.h ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * compat.h ends here */

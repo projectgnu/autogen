@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.5 2002/05/05 03:07:06 bkorb Exp $
+ *  $Id: stack.c,v 3.6 2002/09/21 17:27:15 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -49,14 +49,8 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
-#include "compat/compat.h"
-
-#include REGEX_HEADER
 #include "autoopts.h"
+#include REGEX_HEADER
 
 void
 unstackOptArg( pOpts, pOptDesc )
@@ -185,7 +179,7 @@ stackOptArg( pOpts, pOptDesc )
      *  THEN allocate one now
      */
     if (pAL == (tArgList*)NULL) {
-        pAL = (tArgList*)AGALOC( sizeof( *pAL ));
+        pAL = (tArgList*)AGALOC( sizeof( *pAL ), "open file stack entry" );
         if (pAL == (tArgList*)NULL)
             return;
         pAL->useCt   = 0;
@@ -197,15 +191,15 @@ stackOptArg( pOpts, pOptDesc )
      *  THEN make it bigger
      */
     else if (pAL->useCt >= pAL->allocCt) {
+        size_t sz = sizeof( *pAL );
         pAL->allocCt += INCR_ARG_ALLOC_CT;
 
         /*
          *  The base structure contains space for MIN_ARG_ALLOC_CT
          *  pointers.  We subtract it off to find our augment size.
          */
-        pAL = (tArgList*)AGREALOC( (void*)pAL,
-                sizeof(*pAL) + (sizeof(char*) * (pAL->allocCt
-                             - MIN_ARG_ALLOC_CT)) );
+        sz += sizeof(char*) * (pAL->allocCt - MIN_ARG_ALLOC_CT);
+        pAL = (tArgList*)AGREALOC( (void*)pAL, sz, "open file stack entry" );
         if (pAL == (tArgList*)NULL)
             return;
     }

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2002-09-14 11:05:16 bkorb"
+## Time-stamp:      "2002-09-16 21:11:25 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.14 2002/09/14 18:40:41 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.15 2002/09/21 17:27:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -47,7 +47,9 @@ cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
 sed '/broken printf/,/our own/d;/include.*"snprintfv/d' autoopts.h > \
   ${top_builddir}/pkg/${tag}/autoopts.h
 cd ../compat
-cp *.h pathfind.c ${top_builddir}/pkg/${tag}/compat/.
+cp pathfind.c ${top_builddir}/pkg/${tag}/compat/.
+sed '/START AG-ONLY:/,/END AG-ONLY\./d' compat.h > \
+  ${top_builddir}/pkg/${tag}/compat/compat.h
 #
 #  END WORK IN SOURCE DIRECTORY
 #
@@ -73,6 +75,9 @@ cat >> libopts.m4 <<-	EOMacro
 	dnl to SUBDIRS and run all the config tests that the library needs.
 	dnl
 	AC_DEFUN([LIBOPTS_CHECK],[
+	  AC_CHECK_HEADERS(
+         errno.h sys/types.h sys/stat.h stdlib.h libgen.h memory.h )
+	  AC_CHECK_LIB(gen, pathfind)
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
 	  AC_ARG_WITH([autoopts-config],
         AC_HELP_STRING([--with-autoopts-config],

@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.3 2002/07/27 04:13:35 bkorb Exp $
+/*  $Id: version.c,v 3.4 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -47,9 +47,6 @@ static const char zAOV[] =
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "autoopts.h"
 

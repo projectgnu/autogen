@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.2 2002/05/11 20:23:52 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.3 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -72,7 +72,7 @@ optionSaveState( pOpts )
 {
     if (pOpts->pSavedState == NULL) {
         size_t sz = sizeof( *pOpts ) + (pOpts->optCt * sizeof( tOptDesc ));
-        pOpts->pSavedState = AGALOC( sz );
+        pOpts->pSavedState = AGALOC( sz, "saved option state" );
         if (pOpts->pSavedState == NULL) {
             tCC* pzName = pOpts->pzProgName;
             if (pzName == NULL) {

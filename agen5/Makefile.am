@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/07/11 20:28:44 $
+## Last Modified:   $Date: 2002/09/21 17:27:15 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.13 2002/07/11 20:28:44 bkorb Exp $
+## $Id: Makefile.am,v 3.14 2002/09/21 17:27:15 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -60,6 +60,10 @@ EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 YFLAGS = -d
 
 all : @AGEXE@
+
+SUFFIXES = .i
+.c.i :
+	$(COMPILE) -E $< > $@
 
 ## Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the

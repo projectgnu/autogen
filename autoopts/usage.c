@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.5 2002/07/27 04:24:41 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.6 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -48,8 +48,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include <compat/compat.h>
 
 #include "autoopts.h"
 

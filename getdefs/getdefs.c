@@ -1,13 +1,12 @@
 /*
- *  $Id: getdefs.c,v 3.4 2002/05/05 03:07:07 bkorb Exp $
+ *  $Id: getdefs.c,v 3.5 2002/09/21 17:27:16 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
+ *  Time-stamp:        "2002-09-21 10:13:02 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/05/05 03:07:07 $
- *            by: bkorb
  */
 
 #define DEFINE
@@ -367,8 +366,8 @@ buildDefinition(
     }
 
     if (HAVE_OPT( COMMON_ASSIGN )) {
-        int    ct  = STACKCT_OPT(  ASSIGN );
-        char** ppz = STACKLST_OPT( ASSIGN );
+        int    ct  = STACKCT_OPT(  COMMON_ASSIGN );
+        char** ppz = STACKLST_OPT( COMMON_ASSIGN );
         do  {
             pzOut += sprintf( pzOut, "    %s;\n", *ppz++ );
         } while (--ct > 0);

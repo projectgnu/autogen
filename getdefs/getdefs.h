@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.5 2002/06/15 18:24:59 bkorb Exp $
+ *  $Id: getdefs.h,v 3.6 2002/09/21 17:27:16 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/06/15 18:24:59 $
+ *  Last Modified:     $Date: 2002/09/21 17:27:16 $
  *            by: bkorb
  */
 
@@ -15,26 +15,13 @@
 #define GETDEFS_HEADER
 
 #include "config.h"
-
-#include <sys/param.h>
-#include <sys/stat.h>
+#include "compat/compat.h"
 #include <sys/wait.h>
-
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <streqv.h>
-#include <string.h>
-#include <unistd.h>
 #include <utime.h>
+#include "streqv.h"
 
 #include REGEX_HEADER
 
-#ifdef DEBUG
-#  define STATIC
-#else
-#  define STATIC static
-#endif
 #define EXPORT
 
 #include "opts.h"
@@ -50,11 +37,7 @@
 #endif
 
 #define MAXNAMELEN 256
-#ifndef MAXPATHLEN
-#  define MAXPATHLEN 4096
-#endif
 
-#define NUL            '\0'
 #define MAX_SUBMATCH   1
 #define COUNT(a)       (sizeof(a)/sizeof(a[0]))
 
@@ -68,23 +51,6 @@
 #define AG_NAME_CHAR(c) (zUserNameCh[(unsigned)(c)] & 2)
 #define USER_NAME_CH(c) (zUserNameCh[(unsigned)(c)] & 1)
 MODE char zUserNameCh[ 256 ] VALUE( { '\0' } );
-
-/*
- *  Procedure success codes
- *
- *  USAGE:  define procedures to return "tSuccess".  Test their results
- *          with the SUCCEEDED, FAILED and HADGLITCH macros.
- */
-#define SUCCESS  ((tSuccess) 0)
-#define FAILURE  ((tSuccess)-1)
-#define PROBLEM  ((tSuccess) 1)
-
-typedef int tSuccess;
-
-#define SUCCEEDED( p )     ((p) == SUCCESS)
-#define SUCCESSFUL( p )    SUCCEEDED( p )
-#define FAILED( p )        ((p) <  SUCCESS)
-#define HADGLITCH( p )     ((p) >  SUCCESS)
 
 /*
  *  Index database string pointers.

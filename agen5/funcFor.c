@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.3 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: funcFor.c,v 3.4 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -240,7 +240,7 @@ ag_scm_for_sep( SCM obj )
 {
     if (! pFS->for_loading)
         return SCM_UNDEFINED;
-    pFS->for_pzSep = strdup( ag_scm2zchars( obj, "separator str" ));
+    AGDUPSTR( pFS->for_pzSep, ag_scm2zchars( obj, "sep str" ), "sep str" );
     return SCM_BOOL_T;
 }
 

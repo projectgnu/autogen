@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.7 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: funcDef.c,v 3.8 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -225,7 +225,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             /*
              *  Process the quoted string, but leave a '`' marker, too
              */
-            pz = strdup( pDL->pzExpr );
+            AGDUPSTR( pz, pDL->pzExpr, "macro arg expr" );
             spanQuote( pz );
             strcpy( pDL->pzExpr+1, pz );
             AGFREE( (void*)pz );
@@ -441,14 +441,15 @@ build_defs( int defCt, tDefList* pList )
             res = gh_eval_str( pList->pzExpr );
 
             if (gh_string_p( res )) {
-                pList->de.pzValue = strdup( ag_scm2zchars( res, "eval res" ));
+                AGDUPSTR( pList->de.pzValue, ag_scm2zchars( res, "eval res" ),
+                          "dup eval res" );
             }
             else if (gh_number_p( res )) {
                 pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
                 snprintf( pList->de.pzValue, 16, "%d", gh_scm2ulong( res ));
             }
             else
-                pList->de.pzValue = strdup( zNil );
+                AGDUPSTR( pList->de.pzValue, zNil, "empty string" );
             break;
         }
 

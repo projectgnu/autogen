@@ -6,12 +6,12 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:46:07 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2002/09/21 17:27:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-TESTS      = index.test option.test subblock.test
+TESTS      = cfg.test index.test option.test subblock.test
 EXTRA_DIST = defs $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in

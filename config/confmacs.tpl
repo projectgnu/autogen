@@ -1,11 +1,14 @@
-[= AutoGen5 Template =][=
+[=
 
-  (define (protect-text t)
+AutoGen5 Template
+
+=][=
+
+(define restore-flags "")
+(define (protect-text t)
     (string-substitute t
-       '("["     "]"     "$"     "#"     )
-       '("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))
-  )
-
+        '("["     "]"     "$"     "#"     )
+		'("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))  )
 =][=
 
 DEFINE preamble
@@ -36,9 +39,9 @@ ENDDEF   preamble
 
 =][=
 
-DEFINE  emit-macro      =][=
+DEFINE  emit-macro       =][=
 
-  CASE    type   =][=
+  CASE    type           =][=
   ~~  compile|run|link|test   =][=
       (define bad-define-name   "NEED_%s")
       (define good-define-name  "HAVE_%s")     =][=
@@ -48,7 +51,7 @@ DEFINE  emit-macro      =][=
   ~~  with|without       =][=
       (define bad-define-name   "WITHOUT_%s")
       (define good-define-name  "WITH_%s")     =][=
-  ==  withlib            =][=
+  ~~  withlib|withconf   =][=
       (define bad-define-name   "WITHOUT_LIB%s")
       (define good-define-name  "WITH_LIB%s")     =][=
   ESAC  =][=
@@ -57,7 +60,7 @@ DEFINE  emit-macro      =][=
       (define bad-text   "")
       (. separate-macros)    =][=
 
-(dne "dnl " "dnl ") =]
+(dne "dnl " "dnl ")      =]
 dnl
 dnl @synopsis  [=(. mac-name)=]
 dnl

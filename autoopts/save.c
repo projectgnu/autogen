@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.3 2002/06/14 02:11:36 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.4 2002/09/21 17:27:15 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -50,11 +50,8 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#include <compat/compat.h>
-
-#include <time.h>
-
 #include "autoopts.h"
+#include <time.h>
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
@@ -112,8 +109,12 @@ findDirName( pOpts )
         if (pzEndDir == (char*)NULL)
             return pzEnv;
 
-        pzFileName = (char*)AGALOC(( strlen( pzEnv ) + 2 +
-                     (pzEndDir != (char*)NULL) ? strlen( pzEndDir ) : 0 ));
+        {
+            size_t sz = strlen( pzEnv ) + 2;
+            if (pzEndDir != NULL)
+                sz += strlen( pzEndDir );
+            pzFileName = (char*)AGALOC( sz, "dir name" );
+        }
 
         /*
          *  IF we stripped something off, now tack it back on.
@@ -201,8 +202,12 @@ findFileName( pOpts )
         size_t sz = strlen( pzDir ) + strlen( pOpts->pzRcName ) + 2;
 
         {
-            char*  pzPath = (char*)AGALOC( sz );
+            char*  pzPath = (char*)AGALOC( sz, "file name" );
+#ifdef HAVE_SNPRINTF
             snprintf( pzPath, sz, "%s/%s", pzDir, pOpts->pzRcName );
+#else
+            sprintf( pzPath, "%s/%s", pzDir, pOpts->pzRcName );
+#endif
             pzDir = pzPath;
         }
 
