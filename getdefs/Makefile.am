@@ -7,17 +7,17 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Tue Jun  1 08:16:26 1999				      
+## Last Modified:   Wed Jul  7 14:32:03 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.12 1999/07/07 19:42:33 bkorb Exp $
+## $Id: Makefile.am,v 2.13 1999/07/07 21:32:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
 
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 
-GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu
+GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
 EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.texi getdefs.tpl
 
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la \
@@ -50,5 +50,9 @@ opts.c opts.h: opts.def
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/getdefs/opts.def
+
+getdefs.1 : opts.def getdefs
+	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
+		-b getdefs opts.def
 
 # Makefile.am ends here

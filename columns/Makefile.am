@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Tue Jun  1 08:16:50 1999				      
+## Last Modified:   Wed Jul  7 14:32:37 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.9 1999/07/07 19:42:32 bkorb Exp $
+## $Id: Makefile.am,v 1.10 1999/07/07 21:32:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -18,7 +18,7 @@ bin_PROGRAMS = columns
 columns_SOURCES = columns.c opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi
-EXTRA_DIST	= $(GEN_SRC) opts.def columns.tpl columns.texi
+EXTRA_DIST	= $(GEN_SRC) opts.def columns.tpl columns.texi columns.1
 
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la \
 		$(top_builddir)/snprintfv/snprintfv/libsnprintfv.la
@@ -49,5 +49,9 @@ opts.c opts.h: opts.def
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/columns/opts.def
+
+columns.1 : opts.def columns
+	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
+		-b columns opts.def
 
 # Makefile.am ends here
