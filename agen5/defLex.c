@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.2 1999/11/16 06:22:09 bruce Exp $
+ *  $Id: defLex.c,v 1.3 1999/11/30 02:24:45 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -30,6 +30,7 @@
 
 #include "autogen.h"
 #include "defParse.h"
+#include "expGuile.h"
 
 extern YYSTYPE yylval;
 static YYSTYPE lastToken;
@@ -60,10 +61,10 @@ int    aKeywordTkn[] = { KEYWORD_TABLE };
 #define ERROR  (-1)
 #define FINISH (-1)
 
-STATIC char* assembleString( char* );
-STATIC char* assembleName( char*, YYSTYPE* );
-STATIC void  loadSchemeString( void );
-STATIC void  loadSchemeText( void );
+STATIC int   loadScheme( void );
+STATIC void  alist_to_autogen_def( SCM alist );
+STATIC char* assembleName( char* pzScan, YYSTYPE* pRetVal );
+STATIC char* assembleString( char* pzScan );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -144,13 +145,6 @@ scanAgain:
     }
 
     case '{':
-        if (pCurCtx->pzScan[1] == '(') {
-            lastToken = '{';
-            loadSchemeText();
-            break;
-        }
-        /* FALLTHROUGH */
-
     case '=':
     case '}':
     case '[':
@@ -185,7 +179,9 @@ scanAgain:
     }
 
     case '(':
-        loadSchemeString();
+        lastToken = loadScheme();
+        if (lastToken != TK_STRING)
+            goto scanAgain;
         break;
 
     case '`':
@@ -323,13 +319,16 @@ yyerror( char* s )
 }
 
 
-    STATIC SCM
+    STATIC int
 loadScheme( void )
 {
     char* pzText = pCurCtx->pzScan;
     char* pzEnd  = (char*)skipScheme( pzText, pzText + strlen( pzText ));
     char  endCh  = *pzEnd;
-    SCM   str;
+    int   retTok = TK_STRING;
+    int   schemeLen = (pzEnd - pzText);
+    int   stringLen;
+    SCM   res;
 
     /*
      *  NUL terminate the Scheme expression, run it, then restore
@@ -337,105 +336,74 @@ loadScheme( void )
      */
     *pzEnd = NUL;
     procState = PROC_STATE_GUILE_PRELOAD;
-    str = gh_eval_str( pzText );
+    res = gh_eval_str( pzText );
     procState = PROC_STATE_LOAD_DEFS;
     pCurCtx->pzScan = pzEnd;
     *pzEnd = endCh;
+    pCurCtx->pzScan = pzEnd;
 
-    return str;
+    switch (gh_type_e( res )) {
+    case GH_TYPE_BOOLEAN:
+        strcpy( pzText, SCM_NFALSEP( res ) ? "#t" : "#f" );
+        break;
+
+    case GH_TYPE_SYMBOL:
+        /* FIXME */
+        /* res = gh_scm2str( res ); */
+        /* FALLTHROUGH */
+
+    case GH_TYPE_STRING:
+        pzEnd = SCM_CHARS( res );
+        stringLen = strlen( pzEnd );
+        if (stringLen < schemeLen)
+             strcpy( pzText, pzEnd );
+        else AGDUPSTR( pzText, pzEnd );
+        break;
+
+    case GH_TYPE_CHAR:
+        pzText[0] = gh_scm2char( res );
+        pzText[1] = NUL;
+        break;
+
+    case GH_TYPE_NUMBER:
+        if (schemeLen >= 12)
+             sprintf( pzText, "%ld", gh_scm2long( res ));
+        else pzText = asprintf( "%ld", gh_scm2long( res ));
+        break;
+
+    case GH_TYPE_LIST:
+    case GH_TYPE_PAIR:
+        /* FIXME retTok = TK_DEFINITIONS; */
+        /* alist_to_autogen_def( res ) */
+        /* break; */
+
+    case GH_TYPE_VECTOR:
+    case GH_TYPE_PROCEDURE:
+    case GH_TYPE_INEXACT:
+    case GH_TYPE_EXACT:
+    default:
+        /* Emit a complaint */
+        pzText = "";
+    }
+
+    if (retTok == TK_STRING)
+        yylval = (YYSTYPE)pzText;
+    return retTok;
 }
-
-
-/*
- *  process a single scheme expression, yielding a string value
- *  for one of the definitions.
- */
-    STATIC void
-loadSchemeString( void )
-{
-    char*  pzRes    = pCurCtx->pzScan;
-    SCM    str      = loadScheme();
-    size_t exprSize = pCurCtx->pzScan - pzRes;
-
-    /*
-     *  IF we have a string result, then try to overwrite the
-     *  original expression with the result of the expression.
-     *  Resort to allocation if the result is larger, however.
-     */
-    if (gh_string_p( str )) {
-        if (exprSize < exprSize)
-            strcpy( pzRes, SCM_CHARS( str ));
-        else {
-            pzRes = strdup( SCM_CHARS( str ));
-        }
-    }
-
-    /*
-     *  IF the result is a character, then it is certain to fit.
-     */
-    else if (gh_char_p( str )) {
-        pzRes[0] = gh_scm2char( str );
-        pzRes[1] = NUL;
-    }
-
-    /*
-     *  IF the result is a number, it might fit.  Pick a size that
-     *  is sure to accommodate the formatted number.
-     */
-    else if (gh_number_p( str )) {
-        if (exprSize > 16)
-            sprintf( pzRes, "%ld", gh_scm2long( str ));
-        else
-            pzRes = asprintf( "%ld", gh_scm2long( str ));
-    }
-
-    /*
-     *  OTHERWISE, the empty string.
-     */
-    else
-        *pzRes = NUL;
-
-    lastToken = TK_STRING;
-    yylval = (YYSTYPE)pzRes;
-}
-
 
 /*
  *  process a single scheme expression, yielding text that gets processed
  *  into AutoGen definitions.
  */
     STATIC void
-loadSchemeText( void )
+alist_to_autogen_def( SCM alist )
 {
     tSCC   zSchemeText[] = "Computed Definitions";
     char*  pzStart;
     SCM    res;
     tScanCtx*  pCtx;
 
-    *(pCurCtx->pzScan++) = NUL;
-    pzStart = pCurCtx->pzScan;
-
-    {
-        /*
-         *  Find the end of the scheme expression
-         */
-        char*  pzEnd = (char*)skipScheme( pzStart, pzStart + strlen( pzStart ));
-        char   endCh = *pzEnd;
-        char*  pz;
-        *pzEnd  = NUL;
-        /*
-         *  Formulate the function that yields the definitions
-         */
-        pz = asprintf( "(AutoGen-define-list %s )", pzStart );
-        *pzEnd = endCh;
-        /*
-         *  Evaluate the function, free the temporary function buffer
-         *  and set the resumption point to after the Scheme expression.
-         */
-        res = gh_eval_str( pz );
-        free( pz );
-        pCurCtx->pzScan = pzEnd;
-    }
+    /* DO THE RE-EVALUATION */
 
     /*
      *  The result *must* be a string, or we choke.

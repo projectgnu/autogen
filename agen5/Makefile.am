@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.12 1999/11/11 04:07:12 bruce Exp $
+## $Id: Makefile.am,v 1.13 1999/11/30 02:24:45 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -32,7 +32,7 @@ GEN_SRC = opts.c opts.h directive.h functions.h expr.ini \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
 EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
-		$(GEN_SRC) bootstrap.dir
+		$(GEN_SRC) bootstrap.dir schemedef.scm
 
 bin_PROGRAMS	= AutoGen
 AutoGen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
