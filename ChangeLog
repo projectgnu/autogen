@@ -1,3 +1,8 @@
+2002-05-28  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in(static-libs): new option
+	* autoopts/autoopts-config.1(static-libs): doc it
+
 2002-05-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl: filter entire doc for texinfo-isms
