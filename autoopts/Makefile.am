@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.21 1999/10/28 03:50:37 bruce Exp $
+## $Id: Makefile.am,v 2.22 1999/10/31 23:36:13 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,7 +23,7 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl \
 		aginfo.tpl agman1.tpl
 
-EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi \
+EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 doc.tpl \
 		bootstrap.dir autoopts-config.in config-opts.def \
 		genshell.def genshell.c genshell.h
 
