@@ -1,4 +1,8 @@
-[= AutoGen5 Template Library -*- Mode: C -*- =]
+[= AutoGen5 Template Library -*- Mode: C -*-
+
+# $Id: optlib.tpl,v 1.11 2000/03/21 03:05:22 bruce Exp $
+
+=]
 [=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -362,54 +366,35 @@ options are optional), then we put square brackets around the
 syntax. =][=
 
 DEFINE USAGE_LINE   =][=
+  #  Compute the option arguments
+  =][=
+  IF  (exist? "flag.flag_arg") =][=
+      (define flag-arg " [<val>]")
+      (define  opt-arg "[{=| }<val>]") =][=
+  ELSE  =][=
+      (define flag-arg "")
+      (define  opt-arg "") =][=
+  ENDIF =][=
+
   (out-push-new ".usAGe_line") =]USAGE:  %s [=
 
-  IF (exist? "flag.min") =][=
+  IF (not (exist? "flag.min"))
+     =][[= ELSE =]{[= ENDIF =] [=
 
-    #  At least one option has a minimum occurrance count.
-       Therefore, we omit the square brackets around the option
-       syntax.
-    =][=
-    IF (exist? "flag.flag_arg") =][=
-      IF   (exist? "flag.value")      =]-<flag> [<val>]... [=
-      ELIF (not (exist? "long_opts")) =]<option-name>[{=| }<val>] ...[=
-      ENDIF =][=
-
-      IF (exist? "long_opts")   =]--<name>[{=| }<val>]...[=
-      ENDIF=][=
-
-    ELSE  no flag_args exist =][=
-      IF   (exist? "flag.value")      =]-<flag> ... [=
-      ELIF (not (exist? "long_opts")) =]<option-name> ...[=
-      ENDIF =][=
-
-      IF (exist? "long_opts")   =]--<name>...[=
-      ENDIF=][=
-    ENDIF =][=
-
-  ELSE =][=
-
-    #  No options have a minimum occurrance count.
-       Therefore, we place square brackets around the option
-       syntax.
-    =][=
-    IF (exist? "flag.flag_arg") =][=
-      IF   (exist? "flag.value")      =][-<flag> [<val>]]... [=
-      ELIF (not (exist? "long_opts")) =][<option-name>[{=| }<val>]] ...[=
-      ENDIF =][=
-
-      IF (exist? "long_opts")   =][--<name>[{=| }<val>]]...[=
-      ENDIF=][=
-
-    ELSE  no flag_args exist =][=
-      IF   (exist? "flag.value")      =][-<flag>] ... [=
-      ELIF (not (exist? "long_opts")) =][<option-name>] ...[=
-      ENDIF =][=
-
-      IF (exist? "long_opts")   =][--<name>] ...[=
-      ENDIF=][=
-    ENDIF=][=
+  #  At least one option has a minimum occurrance count.
+     Therefore, we omit the square brackets around the option
+     syntax.
+  =][=
+  IF   (exist? "flag.value")      =]-<flag>[=(. flag-arg)=][=
+     IF (exist? "long_opts")       =] | [=ENDIF=][=
+  ELIF (not (exist? "long_opts")) =]<option-name>[=(. opt-arg)=][=
   ENDIF =][=
+
+  IF (exist? "long_opts")   =]--<name>[=(. opt-arg)=][=
+  ENDIF=] [=
+
+  IF (not (exist? "flag.min"))
+     =]][= ELSE =]}[= ENDIF =]...[=
 
   #  Emit the line as it exists so far.  Remember how many characters
      it uses so we can decide if we need to emit a line break

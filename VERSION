@@ -50,14 +50,14 @@ PACKAGE=autogen
 
 #  Validate struct marker in autoopts/options.h
 #
-if [ -f $srcdir/autoopts/options.h ] ; then
+if [ -n "$srcdir" ] && [ -s $srcdir/autoopts/options.h ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
   lib=`expr '(' $AO_VERSION '*' 4096 ')' + $AO_REVISION`
-  if [ $hdr -ne $lib ] ; then
+  if [ ${hdr}0 -ne ${lib}0 ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
-    exit 1
+    return 1
   fi
 fi
 

@@ -1,7 +1,6 @@
 
 /*
- *  agExpr.c
- *  $Id: expGuile.c,v 1.10 2000/03/12 20:22:03 bruce Exp $
+ *  $Id: expGuile.c,v 1.11 2000/03/21 03:05:22 bruce Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */

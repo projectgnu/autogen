@@ -1,6 +1,5 @@
 /*
- *  agGetDef.c
- *  $Id: defFind.c,v 1.5 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: defFind.c,v 1.6 2000/03/21 03:05:22 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).

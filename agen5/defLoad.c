@@ -1,7 +1,5 @@
 /*
- *  defLoad.c
- *
- *  $Id: defLoad.c,v 1.6 2000/03/16 02:25:42 bruce Exp $
+ *  $Id: defLoad.c,v 1.7 2000/03/21 03:05:22 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).

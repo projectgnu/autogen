@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999				
 dnl            by:     Gary V. Vaughan <gary@oranda.goldfish>		
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 2.1 1999/06/03 20:44:52 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 2.2 2000/03/21 03:05:22 bruce Exp $
 dnl --------------------------------------------------------------------
 dnl 
 dnl Code:
@@ -68,6 +68,8 @@ changequote(,)dnl
       sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\3/'`
 changequote([,])dnl
     if test "x$enable_opts_test" != "xno" ; then
+      AC_LANG_SAVE
+      AC_LANG_C
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LDFLAGS="$LDFLAGS"
       ac_save_LIBS="$LIBS"
@@ -186,6 +188,7 @@ main ()
       CFLAGS="$ac_save_CFLAGS"
       LDFLAGS="$ac_save_LDFLAGS"
       LIBS="$ac_save_LIBS"
+      AC_LANG_RESTORE
     fi
   fi
 
@@ -209,7 +212,9 @@ _EOF_
          CFLAGS="$CFLAGS $AUTOOPTS_CFLAGS"
  	 LDFLAGS="$LDFLAGS $AUTOOPTS_LDFLAGS"
          LIBS="$LIBS $AUTOOPTS_LIBS"
-        AC_TRY_LINK([
+         AC_LANG_SAVE
+         AC_LANG_C
+         AC_TRY_LINK([
 #include <options.h>
 #include <stdio.h>
 ],      [ return strcmp("$autoopts_config_current:$autoopts_config_revision:$autoopts_config_age", optionVersion()); ],
@@ -235,6 +240,7 @@ _EOF_
           CFLAGS="$ac_save_CFLAGS"
           LDFLAGS="$ac_save_LDFLAGS"
           LIBS="$ac_save_LIBS"
+          AC_LANG_RESTORE
        fi
      fi
      AUTOGEN=:
