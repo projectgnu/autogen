@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.12 2000/03/12 01:18:27 bruce Exp $
+ *  $Id: autoopts.c,v 2.13 2000/03/12 22:13:42 bruce Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1146,15 +1146,32 @@ checkConsistency( tOptions* pOpts, int argCt )
     }
 
     /*
-     *  IF we are stopping on errors AND no arguments can be left over,
-     *     AND we have left over arguments, THEN usage exit.
+     *  IF we are stopping on errors, check to see if any remaining
+     *  arguments are required to be there or prohibited from being there.
      */
-    if (  (  (pOpts->fOptSet & (OPTPROC_NO_ARGS | OPTPROC_ERRSTOP))
-          == (OPTPROC_NO_ARGS | OPTPROC_ERRSTOP) )
-       && (argCt > pOpts->curOptIdx)) {
-        fprintf( stderr, "%s: Command line arguments not allowed\n",
-                 pOpts->pzProgName );
-        ++errCt;
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
+
+        /*
+         *  Check for prohibition
+         */
+        if ((pOpts->fOptSet & OPTPROC_NO_ARGS) != 0) {
+            if (argCt > pOpts->curOptIdx) {
+                fprintf( stderr, "%s: Command line arguments not allowed\n",
+                         pOpts->pzProgName );
+                ++errCt;
+            }
+        }
+
+        /*
+         *  ELSE not prohibited, check for being required
+         */
+        else if ((pOpts->fOptSet & OPTPROC_ARGS_REQ) != 0) {
+            if (argCt <= pOpts->curOptIdx) {
+                fprintf( stderr, "%s: Command line arguments required\n",
+                         pOpts->pzProgName );
+                ++errCt;
+            }
+        }
     }
 
     return errCt;
@@ -1171,12 +1188,21 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
     tOptDesc* pOD;
     int       errCt = 0;
 
-    if (pOpts->structVersion != OPTIONS_STRUCT_VERSION) {
+    /*
+     *  IF the struct version is not the current, and also
+     *     either too large (?!) or too small,
+     *  THEN emit error message and fail-exit
+     */
+    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION )
+       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
+          || (pOpts->structVersion < MIN_OPTION_VERSION     )
+       )  )  {
         tSCC zBadVer[] = "Automated Options Processing Error!\n"
-            "\toptionProcess was called by %s with structure version %d\n"
-            "\tThis library was compiled with version "
-            STR( OPTIONS_STRUCT_VERSION ) "\n";
-        fprintf( stderr, zBadVer, argVect[0], pOpts->structVersion );
+            "\toptionProcess was called by %s with structure version %d.%d\n"
+            "\tThis library was compiled with version %d.%d\n";
+        fprintf( stderr, zBadVer, argVect[0],
+                 NUM_TO_VER( pOpts->structVersion ),
+                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ));
         exit( EXIT_FAILURE );
     }
 
