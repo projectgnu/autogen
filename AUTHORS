@@ -34,3 +34,6 @@ in the directory compat; ndir.h
 
 James R. Van Zandt:
 The Debianization of AutoGen
+
+Daniel Schregenberger <npfdd@gmx.net>
+More GNU-ish usage text for AutoOpts.

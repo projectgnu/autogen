@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.12 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expPrint.c,v 3.13 2003/03/11 03:35:42 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -40,9 +40,8 @@
 #include "autogen.h"
 
 STATIC sigjmp_buf printJumpEnv;
-STATIC void    printFault( int sig );
-STATIC size_t safePrintf( char* pzBuf, size_t bufSize,
-                          char* pzFmt, void** argV );
+STATIC void   printFault( int sig );
+STATIC ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
 tSCC pzFormatName[] = "format";
 
 STATIC void
@@ -52,55 +51,58 @@ printFault( int sig )
 }
 
 
-STATIC size_t
-safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
+STATIC ssize_t
+safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 {
     tSCC zBadArgs[]  = "Bad args to sprintf";
     tSCC zBadFmt[]   = "%s ERROR:  %s processing printf format:\n\t%s\n";
 
-    size_t printSize;
-    int    faultType;
-
-    struct sigaction  sa;
     struct sigaction  saSave1;
     struct sigaction  saSave2;
 
-    sa.sa_handler = printFault;
-    sa.sa_flags   = 0;
-    sigemptyset( &sa.sa_mask );
+    {
+        struct sigaction  sa;
+        sa.sa_handler = printFault;
+        sa.sa_flags   = 0;
+        sigemptyset( &sa.sa_mask );
 
-    sigaction( SIGBUS,  &sa, &saSave1 );
-    sigaction( SIGSEGV, &sa, &saSave2 );
+        sigaction( SIGBUS,  &sa, &saSave1 );
+        sigaction( SIGSEGV, &sa, &saSave2 );
+    }
 
     /*
      *  IF the sprintfv call below is going to address fault,
      *  THEN ...
      */
-    if (faultType = sigsetjmp( printJumpEnv, 0 ),
-        faultType != 0) {
+    {
+        int faultType = sigsetjmp( printJumpEnv, 0 );
+        if (faultType != 0) {
 #ifndef HAVE_STRSIGNAL
-        extern char* strsignal PARAMS((int signo));
+            extern char* strsignal(int signo);
 #endif
-        /*
-         *  IF the fprintf command in the then clause has not failed yet,
-         *  THEN perform that fprintf
-         */
-        if (sigsetjmp( printJumpEnv, 0 ) == 0)
-            fprintf( pfTrace, zBadFmt, pzProg, strsignal( faultType ), pzFmt );
+            /*
+             *  IF the fprintf command in the then clause has not failed yet,
+             *  THEN perform that fprintf
+             */
+            if (sigsetjmp( printJumpEnv, 0 ) == 0)
+                fprintf(pfTrace, zBadFmt, pzProg, strsignal( faultType ), pzFmt);
 
-        /*
-         *  The "sprintfv" command below faulted, so we exit
-         */
-        AG_ABEND( zBadArgs );
+            /*
+             *  The "sprintfv" command below faulted, so we exit
+             */
+            AG_ABEND( zBadArgs );
+        }
     }
 
-    printSize = snprintfv( pzBuf, bufSize, pzFmt, (void*)argV );
-    if ((printSize & ~0xFFFFFF) != 0)
-        AG_ABEND( aprf( "snprintf returned 0x%08X\n", printSize ));
+    {
+        size_t printSize = asprintfv( ppzBuf, pzFmt, (void*)argV );
+        if ((printSize & ~0xFFFFFF) != 0)
+            AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 
-    sigaction( SIGBUS,  &saSave1, NULL );
-    sigaction( SIGSEGV, &saSave2, NULL );
-    return printSize;
+        sigaction( SIGBUS,  &saSave1, NULL );
+        sigaction( SIGSEGV, &saSave2, NULL );
+        return printSize;
+    }
 }
 
 
@@ -110,23 +112,13 @@ run_printf( char* pzFmt, int len, SCM alist )
     SCM     res;
     void**  arglist;
     void**  argp;
-    char*   pzBuf;
-    size_t  bfSize = (len * 128) + strlen( pzFmt );
 
     void**  freelist;
     void**  freep;
 
-    /*
-     *  Allocate everything we need at once.  Round up to next 4096 bytes.
-     *  Most likely, we allocate and free a page every time.
-     */
-    bfSize += 2 * len * sizeof( void* ) + 0x100F;
-    bfSize &= ~0x0FFF;
-
-    arglist  = argp  = (void**)AGALOC( bfSize, "sprintf buffer" );
-    freelist = freep = arglist + len;
-    pzBuf    = (char*)(freelist + len);
-    bfSize  -= 2 * len * sizeof( void* );
+    arglist  =
+    argp     = (void**)AGALOC( 2 * (len+1) * sizeof(void*), "aprintfv buffer" );
+    freelist = freep = argp + len + 1;
 
     while (len-- > 0) {
         SCM  car = SCM_CAR( alist );
@@ -173,8 +165,12 @@ run_printf( char* pzFmt, int len, SCM alist )
      *  Do the formatting and allocate a new SCM to hold the result.
      *  Free up any allocations made by ``gh_scm2newstr''
      */
-    bfSize = safePrintf( pzBuf, bfSize, pzFmt, arglist );
-    res = gh_str2scm( pzBuf, bfSize );
+    {
+        char*   pzBuf;
+        ssize_t bfSize = safePrintf( &pzBuf, pzFmt, arglist );
+        res = gh_str2scm( pzBuf, bfSize );
+        free( pzBuf );
+    }
 
     while (freelist < freep)
         free( *(freelist++) );

@@ -249,15 +249,11 @@ enum
       { \
 	if (count >= 0) \
 	  { \
-	    int m_status = stream_put((ch), stream); \
+	    int m_status = stream_put((unsigned char)(ch), stream); \
 	    count = m_status < 0 ? m_status : count + m_status; \
 	  } \
       } \
-    else \
-      { \
-        (void)(ch); \
-	count++; \
-      } \
+    else count++; \
   } SNV_STMT_END
 
 @protos format.c

@@ -1,3 +1,10 @@
+New in 5.5.3 - March, 2003
+* AutoOpts' usage procedure has been enhanced to produce either AutoOpts
+  standard usage or usage that looks more like current GNU practices.
+  The latter provides less information and help.
+* I32LPx behavior has improved.  Don't think I can call it "industrial
+  strength" just yet, tho.
+
 New in 5.5.2 - February, 2003
 * Fixes for FreeBSD weirdisms with sed, dlopen(), and the Guile library
 * stash offsets in uintptr_t types so this thing works when
@@ -27,21 +34,8 @@ New in 5.4.1
 * Improved the configurability of the libopts tear-off library.
 
 New in 5.4
-* should have bumped to 5.4 with the release of xml2ag.
-  AutoOpts documentation and usage text now uses the copyright.eaddr value
+* AutoOpts documentation and usage text now uses the copyright.eaddr value
   as the "send bug reports to" address.
   AutoGen command line options may now be embedded in template and definitions
   files.  The template files support the scheme function (set-option "..."),
   and definition files support the directive, "#option ...".
-
-New in 5.3.8
-* xml2ag was added.  This is a wrapper program that will convert
-  XML documentation into AutoGen definitions and pass them through
-  to autogen.  It accepts all the AutoGen command line options and
-  passes them through, too.
-
-New in 5.0
-* Template expressions were made simpler and much more powerful.
-  An expression may be AutoGen defined values, shell scripts,
-  Scheme expressions, or the latter two formatted with an
-  AutoGen definition value.  AutoGen now depends on Guile.
