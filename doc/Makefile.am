@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2002/07/11 20:28:44 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2002/07/27 19:36:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -19,15 +19,15 @@ INFO_DEPS	= autogen.info
 MAKEINFO	= @MAKEINFO@ --no-split
 MAKEINFOFLAGS = -I$(top_srcdir)/autoopts -I../autoopts
 
-all : $(INFO_DEPS) autogen.lsm
+all : $(INFO_DEPS)
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info LSM.tpl \
+EXTRA_DIST	= auto_gen.tpl autogen.info \
 		snprintfv.texi snprintfv.menu compete.def compete.tpl
 
 MAINTAINERCLEANFILES = Makefile.in
-DISTCLEANFILES = autogen.lsm texi-stamp compete.texi
+DISTCLEANFILES = texi-stamp compete.texi
 
 AGSRCDIR	= $(top_srcdir)/agen5
 
