@@ -1,3 +1,9 @@
+2002-03-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c(ag_scm_out_pop): you cannot read one unit of zero
+	length.  Accommodate for that.
+	* compat/strcspn.c(strcspn): End the scan when the source string ends.
+
 2002-02-23  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am: remove a stamp file for DISTCLEAN

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.5 2002/01/29 03:05:55 bkorb Exp $
+ *  $Id: expOutput.c,v 3.6 2002/03/02 01:32:59 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -166,15 +166,15 @@ ag_scm_out_pop( SCM ret_contents )
     if (pCurFp->pPrev == NULL)
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed\n" );
 
-
     if (gh_boolean_p( ret_contents ) && SCM_NFALSEP( ret_contents )) {
-        long pos;
-        pos = ftell( pCurFp->pFile );
+        long pos = ftell( pCurFp->pFile );
         res = scm_makstr( pos, 0 );
-        rewind( pCurFp->pFile );
-        if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
-            AG_ABEND( asprintf( "Error %d (%s) rereading output\n",
-                                errno, strerror( errno )));
+        if (pos != 0) {
+            rewind( pCurFp->pFile );
+            if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
+                AG_ABEND( asprintf( "Error %d (%s) rereading output\n",
+                                    errno, strerror( errno )));
+        }
     }
 
     outputDepth--;
