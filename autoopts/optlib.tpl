@@ -1,4 +1,4 @@
-[= AutoGen5 Template Library =]
+[= AutoGen5 Template Library -*- Mode: C -*- =]
 [=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
