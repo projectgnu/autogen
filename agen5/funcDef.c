@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.9 1999/10/31 19:56:21 bruce Exp $
+ *  $Id: funcDef.c,v 1.10 1999/10/31 22:10:07 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -137,6 +137,10 @@ MAKE_HANDLER_PROC( Debug )
  *
  *  what:   Ends the macro definition started with DEFINE.
  *  situational:
+ *
+ *  desc:
+ *    This macro ends the @code{DEFINE} function template block.
+ *    For a complete description @xref{DEFINE}.
 =*/
 /*
  *  mFunc_Define
