@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.42 1999/11/05 02:36:29 bruce Exp $
+## $Id: auto_gen.tpl,v 2.43 1999/11/05 02:58:53 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1028,8 +1028,11 @@ FOR gfunc =][=
   (set! func-name (shell (sprintf "echo '%s' |
     sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
     (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name))
  =]
-* SCM-[= (sprintf "%-26s" (string-append func-name "::"))
+* SCM [= (sprintf "%-20s" (string-append func-str "::"))
   =][=
   IF (exist? "what") =][=what=][=
   ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
@@ -1046,7 +1049,7 @@ FOR gfunc =][=
   (set! func-str
       (if (exist? "string") (get "string") func-name))
  =]
-@node SCM-[= (. func-name) =]
+@node SCM [= (. func-str) =]
 @subsection [=
   IF (exist? "what") =][=what=][=
   ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
