@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.32 2001/09/23 01:30:02 bkorb Exp $
+ *   $Id: opts.def,v 1.33 2001/09/29 20:42:44 bkorb Exp $
  *
  *  AutoGen copyright 1992-2000 Bruce Korb
  *
@@ -439,20 +439,18 @@ FLAG_CODE_END ;
 flag = {
     name        = show_defs;
     no_preset;
-    descrip     = "DEBUG: Show the definition tree";
+    descrip     = "Show the definition tree";
     ifdef       = DEBUG;
     doc =
-    "This option is only available with a DEBUG build of AutoGen.\n"
     "This will print out the complete definition tree before processing\n"
     "the template.";
 };
 flag = {
     name        = show_shell;
     no_preset;
-    descrip     = "DEBUG: Show shell commands";
+    descrip     = "Show shell commands";
     ifdef       = DEBUG;
     doc =
-    "This option is only available with a DEBUG build of AutoGen.\n"
     "This will cause @code{set -x} to be executed in the shell, with\n"
     "the resultant output printed to /dev/tty.";
 };

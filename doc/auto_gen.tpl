@@ -10,11 +10,12 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.70 2001/09/23 01:30:02 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.71 2001/09/29 20:42:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
 \input texinfo
+@letterpaper
 @c %**start of header
 @setfilename autogen.info
 @settitle AutoGen

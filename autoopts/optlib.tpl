@@ -1,9 +1,14 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.32 2001/09/23 01:30:02 bkorb Exp $
+# $Id: optlib.tpl,v 1.33 2001/09/29 20:42:44 bkorb Exp $
 
-=]
-[=
+=][=
+
+IF (getenv "DOCUMENT_USAGE") =][=
+  (define skip-ifdef #t)     =][=
+ELSE                         =][=
+  (define skip-ifdef #f)     =][=
+ENDIF                        =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -97,14 +102,16 @@ Emit the #define's for a single option
 
 =][=
 
-DEFINE Option_Defines    =][=
+DEFINE Option_Defines      =][=
+  IF (. skip-ifdef)        =][=
+  ELSE                     =][=
 
-  IF   (exist? "ifdef")  =]
-#ifdef [=(get "ifdef")=][=
-  ELIF (exist? "ifndef") =]
-#ifndef [=(get "ifndef")=][=
-  ENDIF ifdef/ifndef     =][=
-
+    IF   (exist? "ifdef")  =]
+#ifdef [=(get "ifdef")     =][=
+    ELIF (exist? "ifndef") =]
+#ifndef [=(get "ifndef")   =][=
+    ENDIF ifdef/ifndef     =][=
+  ENDIF =]
   IF (=* (get "arg_type") "key") =]
 typedef enum {[=
          IF (not (exist? "arg_default")) =] [=
@@ -176,9 +183,10 @@ typedef enum {[=
     ENDIF is/not equivalenced =][=
 
   ENDIF settable =][=
-
-  IF (or (exist? "ifdef") (exist? "ifndef")) =]
+  IF (. skip-ifdef) =][= ELSE =][=
+    IF (or (exist? "ifdef") (exist? "ifndef")) =]
 #endif[=
+    ENDIF =][=
   ENDIF =][=
 
 ENDDEF
@@ -326,11 +334,14 @@ DEFINE   Option_Strings         =][=
   ENDIF =]:
  */[=
 
-  IF   (exist? "ifdef")  =]
-#ifdef [=(get "ifdef")=][=
-  ELIF (exist? "ifndef") =]
-#ifndef [=(get "ifndef")=][=
-  ENDIF ifdef/ifndef     =]
+  IF (. skip-ifdef)        =][=
+  ELSE                     =][=
+    IF   (exist? "ifdef")  =]
+#ifdef [=(get "ifdef")     =][=
+    ELIF (exist? "ifndef") =]
+#ifndef [=(get "ifndef")   =][=
+    ENDIF ifdef/ifndef     =][=
+  ENDIF =]
 tSCC    z[=(. cap-name)=]Text[] =
         [=(kr-string (get "descrip"))=];[=
 
@@ -340,30 +351,33 @@ tSCC    z[=(. cap-name)=]Text[] =
      emit-nondoc-option           =][=
   ENDIF  (exist? "documentation") =][=
 
-  IF (or (exist? "ifdef") (exist? "ifndef")) =]
+  IF (. skip-ifdef)        =][=
+  ELSE                     =][=
+    IF (or (exist? "ifdef") (exist? "ifndef")) =]
 
 #else   /* disable [=(. cap-name)=] */
 #define VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
-    IF (exist? "arg_default") =]
+      IF (exist? "arg_default") =]
 #define z[=(. cap-name)=]DefaultArg NULL[=
-    ENDIF =][=
+      ENDIF =][=
 
-    IF (exist? "flags_must")  =]
+      IF (exist? "flags_must")  =]
 #define a[=(. cap-name)=]MustList   NULL[=
-    ENDIF =][=
+      ENDIF =][=
 
-    IF (exist? "flags_cant")  =]
+      IF (exist? "flags_cant")  =]
 #define a[=(. cap-name)=]CantList   NULL[=
-    ENDIF =]
+      ENDIF =]
 #define z[=(. cap-name)=]Text       NULL
 #define z[=(. cap-name)=]_NAME      NULL
 #define z[=(. cap-name)=]_Name      NULL
 #define zNot[=(. cap-name)=]_Name   NULL
 #define zNot[=(. cap-name)=]_Pfx    NULL
 #endif  /* ifdef/ifndef  */[=
-  ENDIF ifdef/ifndef     =][=
+    ENDIF ifdef/ifndef   =][=
+  ENDIF (. skip-ifdef)   =][=
 
 ENDDEF Option_Strings =][=
 

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.35 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: expString.c,v 1.36 2001/09/29 20:42:44 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -60,7 +60,6 @@ makeString( tCC*    pzText,
             dtaSize++;
             if ((ch == '"') || (ch == '\\'))
                 dtaSize++;
-
         }
 
         /*
@@ -403,7 +402,7 @@ ag_scm_prefix( SCM prefix, SCM text )
     pzDta   = \
     pzText  = ag_scm2zchars( text, "text" );
     pfx_size = strlen( pzPfx );
-    out_size = 1;
+    out_size = pfx_size;
 
     for (;;) {
         switch (*(pzText++)) {
@@ -421,24 +420,32 @@ ag_scm_prefix( SCM prefix, SCM text )
     pzText = pzDta;
     pzDta  = SCM_CHARS( res );
     strcpy( pzDta, pzPfx );
-    pzDta += pfx_size;
+    pzDta    += pfx_size;
+    out_size -= pfx_size;
+    pfx_size++;
 
     for (;;) {
-        switch (*(pzDta++) = *(pzText++)) {
+        char ch = *(pzText++);
+        switch (ch) {
         case NUL:
-            goto exit_copy;
+            if (out_size != 0)
+                LOAD_ABORT( pCurTemplate, pCurMacro, "(prefix ...) failed" );
+
+            return res;
 
         case '\n':
-            strcpy( pzDta, pzPfx );
-            pzDta += pfx_size;
+            *pzDta    = ch;
+            strcpy( pzDta+1, pzPfx );
+            pzDta    += pfx_size;
+            out_size -= pfx_size;
             break;
 
         default:
+            out_size--;
+            *(pzDta++) = ch;
             break;
         }
-    } exit_copy:;
-
-    return res;
+    }
 }
 
 

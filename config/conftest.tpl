@@ -4,7 +4,7 @@ m4
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2001/09/29 17:08:56 $
+#  Last Modified:     $Date: 2001/09/29 20:42:44 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -30,16 +30,17 @@ dnl[=
        (string-append (string-downcase! (get "group")) "_")
        "ac_" )) =][=
 
-FOR test "\n\ndnl # # # # # # # # # # # # #\n" =]
+FOR test "\n\ndnl # # # # # # # # # # # # #\ndnl" =]
 dnl [=
   (set! test-name (string-upcase! (string-append
         group-prefix "CHECK_" (get "name"))))
   (set! down-name (string-downcase! (get "name")))
   (set! cache-name (string-append group-prefix "cv_" down-name))
   (. test-name) =]
-
-[=(shellf "sed 's,^,dnl ,' <<_EOF_\n%s\n_EOF_" (get "doc")) =]
-
+dnl
+[=(shellf "sed 's,^,dnl ,' <<_EOF_\n%s\n_EOF_" (get "doc")) =][=
+  # (prefix "dnl " (get "doc")) =]
+dnl
 AC_DEFUN([=(. test-name)=],[
   AC_MSG_CHECKING([whether [=check=]])
   AC_CACHE_VAL([[=(. cache-name)=]],[[=
@@ -49,12 +50,16 @@ AC_DEFUN([=(. test-name)=],[
     = run =]
   AC_TRY_RUN([[=code=]],[[=(. cache-name)=]=yes],[[=(. cache-name)=]=no],[[=
             (. cache-name)=]=no]
-           ) # end of TRY_RUN
-   for f in core*
+           ) # end of TRY_RUN[=
+
+   #  This _should_ be done, but TRY_RUN blindly obliterates "core.c"
+   #  before we get here, so this is now obsolete:
+   #
+   for f in *core*
    do
      if test -f $f && test $f -nt conftest${ac_exeext}
      then rm -f $f ; fi
-   done[=
+   done=][=
 
     = link =]
   AC_TRY_LINK([[=code=]],[[=(. cache-name)=]=yes],[[=(. cache-name)=]=no]

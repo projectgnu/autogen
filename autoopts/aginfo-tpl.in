@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     $Date: 2001/09/22 04:05:08 $
+## Last Modified:     $Date: 2001/09/29 20:42:44 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.22 2001/09/22 04:05:08 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.23 2001/09/29 20:42:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -100,7 +100,10 @@ This is the automatically generated usage text for [=prog_name=]:
     then PROG=./`echo $PROG | tr x_ x-` ; fi
 
     if [ ! -f ${PROG} ]
-    then PROG='echo %1$s is unavailable - no' ; fi
+    then if %1$s %2$s > /dev/null 2>&1
+         then PROG=%1$s
+         else PROG='echo %1$s is unavailable - no'
+    fi ; fi
 
     ${PROG} %2$s 2>&1 | \
         sed -e 's/USAGE:  lt-/USAGE:  /' \
@@ -120,6 +123,8 @@ This is the automatically generated usage text for [=prog_name=]:
 #  FOR all options, except the `documentation' options, ...  =][=
 
 IF (define opt-name "")
+   (define extra-ct 0)
+   (define extra-text "")
    (exist? "preserve-case")     =][=
    (define optname-from "_^")
    (define optname-to   "--")   =][=
@@ -143,50 +148,82 @@ FOR flag=][=
           % value " (-%s)" =]
 @cindex [=(. down-prog-name)=]-[=(. opt-name)=]
 
-[=descrip=].[=
+This is the ``[=(string-downcase! (get "descrip"))=]'' option.[=
+    (set! extra-ct 0)
+    (out-push-new)  =][=
 
-    IF (exist? "min") =]
-This option is required to appear.[=
+    IF (exist? "min") =]@item
+is required to appear on the command line.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "max") =]
-This option may appear [=
+    IF (exist? "max") =]@item
+may appear [=
       IF % max (= "%s" "NOLIMIT")
-       =]an unlimited number of times[=
+         =]an unlimited number of times[=
       ELSE
-       =]up to [=max=] times[=
-      ENDIF=].[=
+         =]up to [=max=] times[=
+      ENDIF=].
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "enabled") =]
-This option is enabled by default.[=
+    IF (exist? "enabled") =]@item
+is enabled by default.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "no_preset") =]
-This option may not be preset with environment variables
-or in initialization (rc) files.[=
+    IF (exist? "ifdef") =]@item
+must be compiled in by defining @code{[=(get "ifdef")
+      =]} during the compilation.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
+    ENDIF =][=
+
+    IF (exist? "ifndef") =]@item
+must be compiled in by @strong{un}-defining @code{[=(get "ifndef")
+      =]} during the compilation.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "equivalence") =]
-This option is a member of the [=equivalence=] class of options.[=
+    IF (exist? "no_preset") =]@item
+may not be preset with environment variables
+or in initialization (rc) files.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "flags_must") =]
-This opton must appear in combination with the following options:
-[=     FOR flags_must ", " =][=flags_must=][=
-       ENDFOR=].[=
+    IF (exist? "equivalence") =]@item
+is a member of the [=equivalence=] class of options.
+[=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
-    IF (exist? "flags_cant") =]
-This option must not appear in combination with any of the following options:
-[=     FOR flags_cant ", " =][=flags_cant=][=
-       ENDFOR=].[=
-    ENDIF=]
+    IF (exist? "flags_must") =]@item
+must appear in combination with the following options:
+[=    FOR flags_must ", " =][=flags_must=][=
+      ENDFOR=].
+[=    (set! extra-ct (+ extra-ct 1)) =][=
+    ENDIF=][=
 
-[= ?% doc '%s' "This option has no @samp{doc} documentation." =][=
+    IF (exist? "flags_cant") =]@item
+must not appear in combination with any of the following options:
+[=    FOR flags_cant ", " =][=flags_cant=][=
+      ENDFOR=].
+[=    (set! extra-ct (+ extra-ct 1)) =][=
+    ENDIF=][=
+
+    IF (> extra-ct 0) =][=
+      (set! extra-text (out-pop #t)) =]
+
+This option has some usage constraints.  It:
+@itemize @bullet
+[=(. extra-text)
+=]@end itemize
+[=  ELSE  =][=
+      (out-pop) =][=
+    ENDIF =][=
+
+?% doc "\n%s" "\nThis option has no @samp{doc} documentation." =][=
 
 
-  ENDIF  `doc' exists =][=
+  ENDIF  `documentation' exists =][=
 ENDFOR flag=][=
 
 aginfo.tpl ends here =]

@@ -1,12 +1,20 @@
-2001-09-21  Bruce Korb  <bkorb@gnu.org>
+2001-09-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/stack.c(unstack): make it work when we don't have posix
 	regcomp(3).
 	* autoopts/agman1.tpl: map '$*' to '.br'
 	* config/: change name of 'm4.tpl' to 'config.tpl'
-	* config/config.tpl: document needed definitions + beautify
+	* config/config.tpl: document needed definitions + beautify +
+	do not depend on "(prefix ...)" working for now.
+	* agen5/expString.c(ag_scm_prefix): fixed off-by-one bug
+	* autoopts/aginfo.tpl: cleaned up special option attribute doc'ing
+	* agen5/opts.def(show-defs): use this feature
+	* agen5/opts.def(show-shell): ditto
+	* autoopts/optlib.tpl(skip-ifdef): potential new feature, causing
+	usage information to display during documentation generation.
+	* config/Makefile.am: install "config.tpl"
 
-2001-09-21  Bruce Korb  <bkorb@gnu.org>
+2001-09-23  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(main): when aborting due to signal receipt, the
 	exit code should be 128 + signal number
