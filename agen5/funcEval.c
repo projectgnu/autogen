@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.11 1999/11/11 04:45:34 bruce Exp $
+ *  $Id: funcEval.c,v 1.12 1999/11/11 04:49:05 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -233,12 +233,7 @@ eval( const char* pzExpr )
     switch (*pzExpr) {
     case '(':
     case ';':
-        res = scm_internal_stack_catch(
-                  SCM_BOOL_T,
-                  (scm_catch_body_t)gh_eval_str,
-                  (void*)pzExpr,
-                  ag_eval_handler,
-                  (void*)pzExpr );
+        res = gh_eval_str( pzExpr );
         break;
 
     case '`':
