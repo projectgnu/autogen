@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: autogen.h,v 1.3 1999/10/14 22:27:23 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -294,6 +294,7 @@ MKSTRING( Cannot,    "%s ERROR %d: cannot %s %s:  %s\n" );
 MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( TplErr,    "Error in template %s, line %d\n\t%s\n" );
 MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
+MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcCase.c,v 1.2 1999/10/14 22:25:44 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -720,15 +720,42 @@ MAKE_HANDLER_PROC( Case )
         &Select_Match_Always
     };
 
-    tMacro*   pEnd = pT->aMacros + pMac->endIndex;
+    tSCC* apzMatchName[] = {
+        "COMPARE_FULL",
+        "COMPARE_END",
+        "COMPARE_START",
+        "CONTAINS",
 
-    SCM sampleText = eval( pT, pMac, pCurDef );
+        "EQUIVALENT_FULL",
+        "EQUIVALENT_END",
+        "EQUIVALENT_START",
+        "EQUIV_CONTAINS",
+
+        "MATCH_FULL",
+        "MATCH_END",
+        "MATCH_START",
+        "MATCH_WITHIN",
+
+        "MATCH_ALWAYS"
+    };
+
+    tMacro*   pEnd = pT->aMacros + pMac->endIndex;
+    tSCC zLinFmt[] = "\tfrom %s line %d\n";
+
+    SCM sampleText = eval( pT->pzTemplText + pMac->ozText );
 
     /*
      *  If the expression did not result in a string, bail now.
      */
-    if (! gh_string_p( sampleText ))
+    if (! gh_string_p( sampleText )) {
+        if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+            fprintf( pfTrace, "CASE in %s line %d skipped:\n"
+                     "\t`%s' did not yield a string\n",
+                     pT->pzFileName, pMac->lineNo,
+                     pT->pzTemplText + pMac->ozText );
+        }
         return pEnd;
+    }
 
     /*
      *  Search through the selection clauses until we either
@@ -751,6 +778,17 @@ MAKE_HANDLER_PROC( Case )
          *  IF match, THEN generate and stop looking for a match.
          */
         if (SUCCEEDED( mRes )) {
+            if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+                fprintf( pfTrace, "CASE string `%s' %s matched `%s'\n",
+                         SCM_CHARS( sampleText ),
+                         apzMatchName[ pMac->funcCode & 0x0F ],
+                         pT->pzTemplText + pMac->ozText );
+
+                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                             pMac->lineNo );
+            }
+
             generateBlock( pT, pMac + 1, pT->aMacros + pMac->sibIndex,
                            pCurDef );
             break;

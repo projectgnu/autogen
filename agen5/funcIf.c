@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: funcIf.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -28,22 +28,40 @@
 
 #include "autogen.h"
 #include "proto.h"
+#include "expGuile.h"
 
 tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
 
 
     STATIC ag_bool
-eval_true( tTemplate* pT, tMacro* pMac, tDefEntry* pCurDef )
+eval_true( void )
 {
-    SCM res = eval( pT, pMac, pCurDef );
-    if (gh_boolean_p( res ))
+    SCM res = eval( pCurTemplate->pzTemplText + pCurMacro->ozText );
+    char* pz;
+
+    switch (gh_type_e( res )) {
+    case GH_TYPE_BOOLEAN:
         return SCM_NFALSEP( res );
-    if (gh_number_p( res ))
-        return (gh_scm2long( res ) != 0);
-    if (gh_char_p( res ))
+
+    case GH_TYPE_SYMBOL:
+    case GH_TYPE_VECTOR:
+        return AG_TRUE;
+
+    case GH_TYPE_CHAR:
         return (gh_scm2char( res ) != '\0');
-    if (gh_string_p( res ))
-        return (*SCM_CHARS( res ) != '\0');
+
+    case GH_TYPE_NUMBER:
+        return (gh_scm2long( res ) != 0);
+
+    case GH_TYPE_STRING:
+        pz = SCM_CHARS( res );
+        if (*pz == '\0')
+            return AG_FALSE;
+        if (! isdigit( *pz ))
+            return AG_TRUE;
+        return (atoi( pz ) != 0);
+    }
+
     return AG_FALSE;
 }
 
@@ -90,6 +108,8 @@ eval_true( tTemplate* pT, tMacro* pMac, tDefEntry* pCurDef )
 MAKE_HANDLER_PROC( If )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
+    tMacro* pIf  = pMac;
+    tSCC    zIfFmt[] = "IF expression `%s' on line %d yielded true\n";
 
     do  {
         /*
@@ -101,13 +121,31 @@ MAKE_HANDLER_PROC( If )
          *  'ELSE' is equivalent to 'ELIF true'
          */
         if (  (pMac->funcCode == FTYP_ELSE)
-           || eval_true( pT, pMac, pCurDef )) {
+           || eval_true()) {
+
+            if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+                fprintf( pfTrace, zIfFmt, (pMac->funcCode == FTYP_ELSE)
+                         ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
+			 pMac->lineNo );
+
+                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                             pIf->lineNo );
+            }
 
             generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex, pCurDef );
             break;
         }
         pMac = pT->aMacros + pMac->sibIndex;
     } while (pMac < pRet);
+
+    if ((OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) && (pMac >= pRet)) {
+        fputs( "IF macro selected no clause\n", pfTrace );
+
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                     pIf->lineNo );
+    }
 
     return pRet;
 }
@@ -146,12 +184,24 @@ MAKE_HANDLER_PROC( If )
 MAKE_HANDLER_PROC( While )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
+    int     ct   = 0;
+
+    if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
+        fprintf( pfTrace, "WHILE loop in %s on line %d begins:\n",
+                 pT->pzFileName, pMac->lineNo );
 
     for (;;) {
-        if (! eval_true( pT, pMac, pCurDef ))
+        if (! eval_true())
             break;
-
+        ct++;
         generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex, pCurDef );
+    }
+
+    if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+        fprintf( pfTrace, "WHILE macro repeated %d times\n", ct );
+
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
     }
 
     return pRet;

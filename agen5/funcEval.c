@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcEval.c,v 1.2 1999/10/14 22:25:44 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -77,15 +77,11 @@ ag_eval_handler( void *data, SCM tag, SCM throw_args )
  *  the string.
  */
     SCM
-eval( tTemplate*  pT,
-      tMacro*     pMac,
-      tDefEntry*  pCurDef )
+eval( const char* pzExpr )
 {
-    char* pzExpr = pT->pzTemplText + pMac->ozText;
+    ag_bool allocated = AG_FALSE;
+    char*   pzTemp;
     SCM   res;
-
-    if (pMac->ozText == 0)
-        return gh_str02scm("");
 
     switch (*pzExpr) {
     case '(':
@@ -98,17 +94,26 @@ eval( tTemplate*  pT,
                   (void*)pzExpr );
         break;
 
+    case '`':
+        AGDUPSTR( pzTemp, pzExpr );
+        (void)spanQuote( pzTemp );
+        pzExpr = runShell( pzTemp );
+        AGFREE( (void*)pzTemp );
+        res = gh_str02scm( (char*)pzExpr );
+        AGFREE( (void*)pzExpr );
+        break;
+
     case '"':
     case '\'':
-        AGDUPSTR( pzExpr, pzExpr );
-#ifdef LATER
-        (void)spanQuote( pzExpr );
-#endif
+        AGDUPSTR( pzTemp, pzExpr );
+        (void)spanQuote( pzTemp );
+        allocated = AG_TRUE;
+        pzExpr = pzTemp;
         /* FALLTHROUGH */
 
     default:
-        res = gh_str02scm( pzExpr );
-        if (pzExpr != pT->pzTemplText + pMac->ozText)
+        res = gh_str02scm( (char*)pzExpr );
+        if (allocated)
             AGFREE( (void*)pzExpr );
     }
 
@@ -153,7 +158,7 @@ MAKE_HANDLER_PROC( Eval )
         goto try_again;
 
     case '(': /* scheme expression */
-        res = eval( pT, pMac, pCurDef );
+        res = eval( pz );
 
         if (gh_string_p( res ))
             fputs( SCM_CHARS( res ), pCurFp->pFile );

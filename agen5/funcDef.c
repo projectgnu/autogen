@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: funcDef.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -144,6 +144,7 @@ MAKE_HANDLER_PROC( Debug )
  */
 MAKE_HANDLER_PROC( Define )
 {
+    tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
     tDefList*   pList  = (tDefList*)pMac->res;
     int         defCt  = pMac->sibIndex;
     SCM         res;
@@ -152,11 +153,9 @@ MAKE_HANDLER_PROC( Define )
     pT = (tTemplate*)pMac->funcPrivate;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zTplFmt[] = "Template macro %s invoked with %d args\n";
-        tSCC zLinFmt[] = "\tfrom %s line %d\n";
-        fprintf( pfTrace, zTplFmt, pT->pzTplName, defCt );
+        fprintf( pfTrace, zTplInvoked, pT->pzTplName, defCt );
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
+            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
                      pMac->lineNo );
     }
 
@@ -488,7 +487,6 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 MAKE_HANDLER_PROC( Invoke )
 {
     char* pzText;
-    off_t textOffset;
     SCM   macName;
     tTemplate* pInv;
 
@@ -543,11 +541,7 @@ MAKE_HANDLER_PROC( Invoke )
      *  Call `eval' to determine the macro name.  Every invocation
      *  may be different!!
      */
-    textOffset   = pMac->ozText;
-    pMac->ozText = pMac->ozName;
-    macName      = eval( pT, pMac, pCurDef );
-    pMac->ozName = pMac->ozText;
-    pMac->ozText = textOffset;
+    macName = eval( pT->pzTemplText + pMac->ozName );
 
     if (! gh_string_p( macName )) {
         pzText = asprintf( zNoResolution, "??not string??" );

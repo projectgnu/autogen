@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.2 1999/10/14 17:05:55 bruce Exp $
+ *  $Id: functions.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -67,7 +67,7 @@ MAKE_HANDLER_PROC( Error )
     tSCC    zErr[] = "DEFINITIONS ERROR for %s:  %s\n";
     tSCC    zEmptyError[] = "** EMPTY ERROR MESSAGE **";
 
-    SCM   res = eval( pT, pMac, pCurDef );
+    SCM   res = eval( pT->pzTemplText + pMac->ozText );
 
     if (! gh_string_p( res )) {
         tSCC zNotStr[] = "\texpression yields non-string:  %s\n";
@@ -105,7 +105,7 @@ MAKE_HANDLER_PROC( Error )
 =*/
 MAKE_HANDLER_PROC( Include )
 {
-    SCM   res = eval( pT, pMac, pCurDef );
+    SCM res = eval( pT->pzTemplText + pMac->ozText );
 
     if (! gh_string_p( res )) {
         tSCC zNotStr[] = "\texpression yields non-string:  %s\n";

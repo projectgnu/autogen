@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: funcFor.c,v 1.2 1999/10/14 22:25:45 bruce Exp $
  *
  *  This module implements the _FOR text function.
  */
@@ -202,13 +202,14 @@ nextDefinition( ag_bool invert, tDefEntry** ppList )
 }
 
 
-    STATIC void
-do_for_by_step( tTemplate* pT,
-                tMacro*    pMac,
-                tDefEntry* pFoundDef,
-                tDefEntry* pCurDef )
+    STATIC int
+doForByStep( tTemplate* pT,
+             tMacro*    pMac,
+             tDefEntry* pFoundDef,
+             tDefEntry* pCurDef )
 {
-    int  settings = 0;
+    int         settings = 0;
+    int         loopCt   = 0;
     tDefEntry   textDef;
     tDefEntry*  pPassDef;
     ag_bool     invert    = (forInfo.for_by < 0);
@@ -232,10 +233,10 @@ do_for_by_step( tTemplate* pT,
      */
     if (invert) {
         if (forInfo.for_from < forInfo.for_to)
-            return;
+            return 0;
     } else {
         if (forInfo.for_from > forInfo.for_to)
-            return;
+            return 0;
     }
 
     forInfo.for_index = forInfo.for_from;
@@ -300,6 +301,7 @@ do_for_by_step( tTemplate* pT,
             ? (nextIdx < forInfo.for_to)
             : (nextIdx > forInfo.for_to);
         generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex, pPassDef );
+        loopCt++;
 
         if (forInfo.for_lastFor)
             break;
@@ -308,14 +310,17 @@ do_for_by_step( tTemplate* pT,
         forInfo.for_firstFor = AG_FALSE;
         forInfo.for_index = nextIdx;
     }
+    return loopCt;
 }
 
-    STATIC void
-do_for_each( tTemplate*   pT,
-             tMacro*      pMac,
-             tDefEntry*   pFoundDef,
-             tDefEntry*   pCurDef )
+    STATIC int
+doForEach( tTemplate*   pT,
+           tMacro*      pMac,
+           tDefEntry*   pFoundDef,
+           tDefEntry*   pCurDef )
 {
+    int loopCt = 0;
+
     for (;;) {
         tDefEntry  textDef;
         tDefEntry* pIterate;
@@ -351,6 +356,7 @@ do_for_each( tTemplate*   pT,
             forInfo.for_lastFor = AG_TRUE;
 
         generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex, pIterate );
+        loopCt++;
 
         if (pFoundDef == (tDefEntry*)NULL)
             break;
@@ -361,6 +367,7 @@ do_for_each( tTemplate*   pT,
          */
         fputs( forInfo.for_pzSep, pCurFp->pFile );
     }
+    return loopCt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -432,27 +439,42 @@ MAKE_HANDLER_PROC( For )
     ag_bool     isIndexed;
     tDefEntry*  pDef;
     tForInfo    saveFor = forInfo;
+    int         loopCt;
 
     pDef = findDefEntry( pT->pzTemplText + pMac->ozName, pCurDef, &isIndexed );
-    if (pDef == (tDefEntry*)NULL)
+    if (pDef == (tDefEntry*)NULL) {
+        if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+            fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
+                     pT->pzTemplText + pMac->ozName );
+
+            if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+        }
+
         return pMRet;
+    }
 
     memset( (void*)&forInfo, 0, sizeof( forInfo ));
     forInfo.for_depth    = saveFor.for_depth + 1;
     forInfo.for_firstFor = AG_TRUE;
+
+    if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
+        fprintf( pfTrace, "FOR %s loop in %s on line %d begins:\n",
+                 pT->pzTemplText + pMac->ozName, pT->pzFileName,
+                 pMac->lineNo );
 
     if (pT->pzTemplText[ pMac->ozText ] == '(') {
         forInfo.for_from  = \
         forInfo.for_to    = 0x7BAD0BAD;
 
         forInfo.for_loading = AG_TRUE;
-        (void) eval( pT, pMac, pCurDef );
+        (void) eval( pT->pzTemplText + pMac->ozText );
         forInfo.for_loading = AG_FALSE;
-        do_for_by_step( pT, pMac, pDef, pCurDef );
+        loopCt = doForByStep( pT, pMac, pDef, pCurDef );
     }
     else {
         forInfo.for_pzSep = pT->pzTemplText + pMac->ozText;
-        do_for_each( pT, pMac, pDef, pCurDef );
+        loopCt = doForEach( pT, pMac, pDef, pCurDef );
     }
 
     forInfo = saveFor;
@@ -462,6 +484,14 @@ MAKE_HANDLER_PROC( For )
      *  Restore it to the one passed in.
      */
     pDefContext  = pCurDef;
+
+    if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+        fprintf( pfTrace, "FOR %s repeated %d times\n",
+                 pT->pzTemplText + pMac->ozName, loopCt );
+
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+    }
 
     return pMRet;
 }
