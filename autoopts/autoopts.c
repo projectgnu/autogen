@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.6 1999/06/03 19:43:28 bkorb Exp $
+ *  $Id: autoopts.c,v 2.7 1999/06/30 15:32:30 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.6 1999/06/03 19:43:28 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.7 1999/06/30 15:32:30 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -1064,6 +1064,108 @@ optionVersion( void )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
+ *  Make sure that the argument list passes our consistency tests.
+ */
+    const char*
+checkConsistency( tOptions* pOpts, int argCt )
+{
+    int       errCt = 0;
+
+    tSCC zCantFmt[]   = "ERROR:  %s option conflicts with the %s option\n";
+    tSCC zReqFmt[]    = "ERROR:  %s option requires the %s option\n";
+
+    tOptDesc*  pOD = pOpts->pOptDesc;
+    int        oCt = pOpts->presetOptCt;
+
+    /*
+     *  IF there was a processing error,
+     *  THEN it is time to call usage exit.
+     */
+    if (errCt != 0)
+	(*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+
+    /*
+     *  FOR each of "oCt" options, ...
+     */
+    for (;;) {
+	tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
+	tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
+
+	const int*  pMust = pOD->pOptMust;
+	const int*  pCant = pOD->pOptCant;
+
+	/*
+	 *  IF the current option was provided on the command line
+	 *  THEN ensure that any "MUST" requirements are not
+	 *       "DEFAULT" (unspecified) *AND* ensure that any
+	 *       "CANT" options have not been SET or DEFINED.
+	 */
+	if (SELECTED_OPT(pOD)) {
+	    if (pMust != (const int*)NULL) for (;;) {
+		tOptDesc*  p = pOpts->pOptDesc + *(pMust++);
+		if (UNUSED_OPT(p)) {
+		    const tOptDesc* pN = pOpts->pOptDesc + pMust[-1];
+		    errCt++;
+		    fprintf( stderr, zReqFmt, pOD->pz_Name, pN->pz_Name );
+		}
+		
+		if (*pMust == NO_EQUIVALENT)
+		    break;
+	    }
+	    
+	    if (pCant != (const int*)NULL) for (;;) {
+		tOptDesc*  p = pOpts->pOptDesc + *(pCant++);
+		if (SELECTED_OPT(p)) {
+		    const tOptDesc* pN = pOpts->pOptDesc + pCant[-1];
+		    errCt++;
+		    fprintf( stderr, zCantFmt, pOD->pz_Name, pN->pz_Name );
+		}
+
+		if (*pCant == NO_EQUIVALENT)
+		    break;
+	    }
+	}
+
+	/*
+	 *  IF       this option is not equivalenced to another,
+	 *        OR it is equivalenced to itself (is the equiv. root)
+	 *    AND it does not occur often enough
+	 *  THEN note the error
+	 */
+	if (  (  (pOD->optEquivIndex == NO_EQUIVALENT)
+	      || (pOD->optEquivIndex == pOD->optIndex) )
+           && (pOD->optOccCt <  pOD->optMinCt)  )  {
+
+	    errCt++;
+	    if (pOD->optMinCt > 1)
+		fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
+	    else fprintf( stderr, zNeedOne, pOD->pz_Name );
+	}
+
+	if (--oCt <= 0)
+	    break;
+	pOD++;
+    }
+
+    /*
+     *  IF we are stopping on errors AND no arguments can be left over,
+     *     AND we have left over arguments, THEN usage exit.
+     */
+    if (  (  (pOpts->fOptSet & (OPTPROC_NO_ARGS | OPTPROC_ERRSTOP))
+          == (OPTPROC_NO_ARGS | OPTPROC_ERRSTOP) )
+       && (argCt > pOpts->curOptIdx)) {
+        fprintf( stderr, "%s: Command line arguments not allowed\n",
+                 pOpts->pzProgName );
+        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    }
+
+    if (errCt != 0)
+        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
  *  Define the option processing routine
  */
     int
@@ -1140,86 +1242,8 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
      *  IF we are checking for errors,
      *  THEN look for too few occurrances of required options
      */
-    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-        tSCC zCantFmt[]   = "ERROR:  %s option conflicts with the %s option\n";
-        tSCC zReqFmt[]    = "ERROR:  %s option requires the %s option\n";
-
-        tOptDesc*  pOD = pOpts->pOptDesc;
-        int        oCt = pOpts->presetOptCt;
-
-        /*
-         *  IF there was a processing error,
-         *  THEN it is time to call usage exit.
-         */
-        if (errCt != 0)
-            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-
-        /*
-         *  FOR each of "oCt" options, ...
-         */
-        for (;;) {
-            tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
-            tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
-
-            const int*  pMust = pOD->pOptMust;
-            const int*  pCant = pOD->pOptCant;
-
-            /*
-             *  IF the current option was provided on the command line
-             *  THEN ensure that any "MUST" requirements are not
-             *       "DEFAULT" (unspecified) *AND* ensure that any
-             *       "CANT" options have not been SET or DEFINED.
-             */
-            if (SELECTED_OPT(pOD)) {
-                if (pMust != (const int*)NULL) for (;;) {
-                    tOptDesc*  p = pOpts->pOptDesc + *(pMust++);
-                    if (UNUSED_OPT(p)) {
-                        const tOptDesc* pN = pOpts->pOptDesc + pMust[-1];
-                        errCt++;
-                        fprintf( stderr, zReqFmt, pOD->pz_Name, pN->pz_Name );
-                    }
-
-                    if (*pMust == NO_EQUIVALENT)
-                        break;
-                }
-
-                if (pCant != (const int*)NULL) for (;;) {
-                    tOptDesc*  p = pOpts->pOptDesc + *(pCant++);
-                    if (SELECTED_OPT(p)) {
-                        const tOptDesc* pN = pOpts->pOptDesc + pCant[-1];
-                        errCt++;
-                        fprintf( stderr, zCantFmt, pOD->pz_Name, pN->pz_Name );
-                    }
-
-                    if (*pCant == NO_EQUIVALENT)
-                        break;
-                }
-            }
-
-            /*
-             *  IF       this option is not equivalenced to another,
-             *        OR it is equivalenced to itself (is the equiv. root)
-             *    AND it does not occur often enough
-             *  THEN note the error
-             */
-            if (  (  (pOD->optEquivIndex == NO_EQUIVALENT)
-                  || (pOD->optEquivIndex == pOD->optIndex) )
-               && (pOD->optOccCt <  pOD->optMinCt)  )  {
-
-                errCt++;
-                if (pOD->optMinCt > 1)
-                    fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
-                else fprintf( stderr, zNeedOne, pOD->pz_Name );
-            }
-
-            if (--oCt <= 0)
-                break;
-            pOD++;
-        }
-    }
-
-    if (errCt != 0)
-        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+	checkConsistency( pOpts, argCt );
 
     return pOpts->curOptIdx;
 }
