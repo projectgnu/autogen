@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: reorder.test,v 1.3 2000/03/11 02:04:01 bruce Exp $
+# $Id: reorder.test,v 1.4 2000/03/11 02:15:33 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,13 +29,19 @@ cat > $testname.tpl <<'_EOF_'
 From zero:<=
 
 FOR a (for-from 0) (for-by 1) (for-sep ",")=>
-<=(sprintf "%5d: " (for-index))=><=?% elt %s absent =><=
+<=(sprintf "%5d: " (for-index))=><=
+  ?% elt %s absent =><=
+  IF (first-for?) =>  first loop<= ENDIF =><=
+  IF (last-for? ) =>   last loop<= ENDIF =><=
 ENDFOR =>
 
 From start by two:<=
 
 FOR a (for-by 2) (for-sep ",")=>
-<=(sprintf "%5d: " (for-index))=><=?% elt %s absent =><=
+<=(sprintf "%5d: " (for-index)) =><=
+  ?% elt %s absent =><=
+  IF (first-for?) =>  first loop<= ENDIF =><=
+  IF (last-for? ) =>   last loop<= ENDIF =><=
 ENDFOR =>
 _EOF_
 
@@ -46,7 +52,7 @@ cat > $testname.def <<_EOF_
 autogen definitions $testname;
 a[ 3] = { elt = three; };
 a[ 5] = { elt = five; };
-a[13] = { elt = thirteen; };
+a[12] = { elt = twelve; };
 a[ 8] = { elt = eight; };
 a[ 1] = { elt = one; };
 a[ 2] = { elt = two; };
@@ -58,7 +64,7 @@ echo creating $testname.out
 # this is the output we should expect to see
 cat > $testname.out <<_EOF_
 From zero:
-    0: absent,
+    0: absent  first loop,
     1: one,
     2: two,
     3: three,
@@ -70,17 +76,15 @@ From zero:
     9: absent,
    10: absent,
    11: absent,
-   12: absent,
-   13: thirteen
+   12: twelve   last loop
 
 From start by two:
-    1: one,
+    1: one  first loop,
     3: three,
     5: five,
     7: absent,
     9: absent,
-   11: absent,
-   13: thirteen
+   11: absent   last loop
 _EOF_
 
 $AGEN $testname.def || failure $AGEN failed
