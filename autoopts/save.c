@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.4 1999/06/10 19:05:06 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.5 1999/06/15 14:36:35 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -321,7 +321,7 @@ optionSave( tOptions* pOpts )
 
             fprintf( fp, "#  preset/initialization file\n#  %s#\n",
                      pzTime );
-#ifdef ALLOCATED_CTIME
+#ifdef HAVE_ALLOCATED_CTIME
             /*
              *  The return values for ctime(), localtime(), and
              *  gmtime() point to static data whose content is
