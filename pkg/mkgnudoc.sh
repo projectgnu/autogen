@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2003-04-22 17:28:18 bkorb"
-# Version:    "$Revision: 3.8 $
+# Time-stamp: "2003-05-05 20:52:47 bkorb"
+# Version:    "$Revision: 3.9 $
 
 MAKE=${MAKE:-make}
 
@@ -56,7 +56,7 @@ echo generating doc page
 cd autogen-${AG_VERSION}
 cat > TAG <<EOF
 <p align="center"><a href="http://www.anybrowser.org/campaign/"
-   ><img src="http://software/autogen/pix/abrowser.png"
+   ><img src="/software/autogen/pix/abrowser.png"
    width="118" height="32" alt="Viewable With Any Browser"
    border="0"></a>
 &nbsp;&nbsp;<a href="/software/autogen/"
