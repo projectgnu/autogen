@@ -171,7 +171,7 @@ int
 cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
 {
     /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-    char* pz = aprf( zFsmErr, st, CGI_STATE_NAME( st ),
+    char* pz = aprf( zDpStrings + DpFsmErr_off, st, CGI_STATE_NAME( st ),
                      evt, CGI_EVT_NAME( evt ));
 
     AG_ABEND( aprf( "CGI parsing error:  %s", pz ));

@@ -350,10 +350,6 @@ tSCC* apzDpEvents[] = {
 int
 dp_invalid_transition( te_dp_state st, te_dp_event evt )
 {
-    /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-    fprintf( stderr, zFsmErr, st, DP_STATE_NAME(st), evt, DP_EVT_NAME(evt));
-    /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-
     return EXIT_FAILURE;
 }
 
