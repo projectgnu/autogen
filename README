@@ -19,6 +19,12 @@ Until a mailing list is organized, direct email to the author:
     Bruce Korb <korbb@datadesign.com>
 
 
+Autogen requires a POSIX regular expression library, and an ANSI C
+compiler to build correctly.  Use the --with-regex-lib and
+--with-regex-includedir options to autoconf if it cannot otherwise
+locate a suitable library.
+
+
 Note to SCO/OS5 users:
 	This product uses libtool.  It apparently behaves incorrectly
 	in the presence of gcc and consequently needs to use /bin/cc.

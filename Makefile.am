@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <korbb@datadesign.com>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    $Date: 1998/06/01 19:51:39 $
+## Last Modified:    $Date: 1998/06/22 03:10:08 $
 ##            by:    Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1998/06/01 19:51:39 bkorb Exp $
+## $Id: Makefile.am,v 1.5 1998/06/22 03:10:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -15,7 +15,7 @@
 
 SUBDIRS = compat config autoopts src tests doc
 
-EXTRA_DIST	= NOTES VERSION TODO bootstrap configure release
+EXTRA_DIST	= NOTES VERSION TODO
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config.h.in \
 		 configure libtool stamp-h.in
 

@@ -1,7 +1,9 @@
 Original authors are also attributed in each source file...
 
 Bruce Korb:
+mkupdate.sh script
 src/*[ch] and autoopts/*.[chtd]*
+tests/opts.test, tests/stress.test and tests/stress.def
 rehacked compat/pathfind.c to be SVR4 compatible.
 reworked compat/strsignal to use a shell script to extract the local
 information and generate a static version.  (It uses autogen,
@@ -12,14 +14,15 @@ In the directory config, regcomp.m4.
 
 Gary V. Vaughan:
 bootstrap and release scripts.
-Changes throughout to aid portability of C code.
-Wrote the autoconf files, Makefile.am and configure.in.
-In the directory config; ctime.m4 and make.m4.
-In the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
+changes throughout to aid portability of C code.
+wrote the autoconf files, Makefile.am and configure.in.
+in the directory config; bootstrap, ctime.m4, make.m4 and release.
+in the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
 sigsend.c, libgen.h
+in the directory tests; almost *.test
 
 Brian Fox, Chet Ramey:
-Sections of files borrowed from bash-2.0 incorporated into
+sections of files borrowed from bash-2.0 incorporated into
 compat/compat.h; (posixstat.h, posixjmp.h)
 
 Fred Fish, Gary V. Vaughan and Bruce Korb:

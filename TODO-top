@@ -21,11 +21,15 @@
 * Document the use of autoopts
 * Try to sort out the server chaining stuff once and for all... I
   suspect the pipeline will need to be built up in reverse like bash...
+* Use the libtool versioning stuff for libopts
+* release doesn't perform a proper in situ build sanity check because it
+  works from the current source tree, rather than a tree built from the
+  distribution tarball... this should be fixed.
 
 Possibilities for the future:
 
 * think about changing the tokenizer to do more sophisticated token typing.
 * rewrite in guile (instead of C)
-* parse the autogen macros with a guile tranlator
+* parse the autogen macros with a guile translator
 * write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.

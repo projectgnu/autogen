@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/06/02 15:26:20 $
+## Last Modified:  $Date: 1998/06/22 03:10:18 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 1998/06/02 15:26:20 bkorb Exp $
+## $Id: Makefile.am,v 1.6 1998/06/22 03:10:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,16 +25,19 @@ EXTRA_DIST      = autogen.def auto_gen.tpl autogen.texisav
 MAINTAINERCLEANFILES = Makefile.in
 
 info_TEXINFOS   = autogen.texi
-BUILT_SOURCES   = autogen.texi
 
-ODEF            = $(top_builddir)/src/opts.def
-DIRECT          = $(top_builddir)/src/agdirect.def
-EXPR            = $(top_builddir)/src/agexpr.def
-FUNC            = $(top_builddir)/src/agfunc.def
+EXTRA_DIST	= autogen.def auto_gen.tpl
+MAINTAINERCLEANFILES = Makefile.in
+
+gendir	= $(top_builddir)/src
+optdir  = $(top_builddir)/src
+
+ODEF            = $(optdir)/opts.def
+DIRECT          = $(gendir)/agdirect.def
+EXPR            = $(gendir)/agexpr.def
+FUNC            = $(gendir)/agfunc.def
 AGINCLUDE       = $(ODEF) $(DIRECT) $(EXPR) $(FUNC)
 
 autogen.texi : auto_gen.tpl autogen.def $(AGINCLUDE)
-
-autogen.info : autogen.texi
 
 # Makefile.am ends here

@@ -1,3 +1,52 @@
+1998-06-30  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* src/makedef.sh: replace a lot of hairy shell script with a
+	little hairy awk script... this also removes the dependency on
+	blocksort because we do a (suboptimal) insertion sort on the key
+	field before emitting the blocks.
+	(_EOF_): added a missing heredoc end marker to the header.
+
+1998-06-23  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/release: extra code to make sure we always release with
+	an up to date set of generated opts files.
+	Also, we now do a source tree build from the distribution before
+	the VPATH build in make distcheck.
+
+	* configure.in (AG_FUNC_REGCOMP): removed.
+	* config/regcomp.m4: ditto.
+	
+	* src/agFunCase.c: removed compat/regex.h reference.
+	* src/agEval.c: ditto.
+	* autoopts/stack.c: ditto.
+
+1998-06-17  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* configure.in (with_regex_lib): accept and use configure options
+	to determine a suitable regular expression library.
+
+	* README: added a note to point out the requirement for a POSIX
+	regular expression library.
+
+	* compat/regex.c, compat/regex.h: removed.
+
+	* doc/auto_gen.tpl (Top): added the last updated date to the info
+	mode Top node.
+
+	* doc/auto_gen.tpl (Autoopts): New chapter to draw attention to
+	the autoopts code until some more in depth deocumentation is written,
+
+	* doc/autogen.def: replaced the version variable definition with
+	an include directive for (at least) two reasons: the prog_name
+	variable was not defined, and was preventing the info file from
+	having a basename (we were getting a file called .info); identical
+	code was already present in the opts.def file so now it need be
+	maintained only once.
+
+	* MakeRules (.def.*): the -L search path was wrong, and prevented
+	any of the autoregeneration with the newly built autogen binary
+	from working.
+
 1998-06-17  Bruce Korb <korbb@datadesign.com>
 	* Most files listed below:
 	Began the implementation of enable/disable by changing references
@@ -58,6 +107,38 @@
 	findPlace() now uses a pointer to a string instead of the
 	converted number as an argument.
 	
+1998-06-05  Gary V Vaughan  <garyv@aethos.co.uk>
+
+	* MakeRules.in (.def.texi): fixed a dumb bug which prevented
+	autogen.texi generation from VPATH builds.
+
+	* Makefile.am, config/Makefile.am (EXTRA_DIST):
+	Changed to accomodate the movement of bootstrap and release (see
+	below).
+
+	* bootstrap, release: Relegated to the config directory to reduce
+	clutter.   Now we type config/bootstrap and config/release! =)O|
+	
+	* MakeRules.in (.def.*): When the local autogen binary is not
+	yet available, don't mess about with sav files, just warn that the
+	old file will be used.
+
+	* */Makefile.am (EXTRA_DIST, <prog>_SOURCES, BUILT_SOURCES):
+	"Corrected" the values of these variables throughout.
+	Historically, the contents of these make variables have been
+	generated empirically.  No more!  My interpretation of the
+	automake manual is that <prog>_SOURCES should hold the filenames
+	of all distributed files *required* to build <prog>.  Similarly,
+	EXTRA_DIST should hold the filenames of all of those files which
+	are neither in <prog>_SOURCES or automake's magic list of
+	autodistributed files.  BUILT_SOURCES can then be a simple subset
+	of <prog>_SOURCES, where there are make rules to regenerate the
+	files listed somehow.
+
+	* tests/opts.test (FAILURE test): do the failure comparison
+	against the generated opts files to prevent failure every time the
+	version number is bumped.
+
 1998-06-05  Bruce Korb <korbb@datadesign.com>
 	* autoopts/opthead.tpl
 	Sanity check flag values when long options are disallowed
