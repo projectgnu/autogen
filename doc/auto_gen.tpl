@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.7 2002/07/27 04:13:35 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.8 2002/07/27 17:46:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -50,24 +50,27 @@ directories:
 [= ` for f in ${DOC_DEPENDS} ; do echo "    $f" ; done ` =]
 
 @end ignore
-[=(shellf "
+[=
+(define e-addr "bkorb@gnu.org")
+
+(shellf "
 COPYRIGHT='%s'
 TITLE='%s'
-PACKAGE='%s'"
+PACKAGE='%s'
+cat <<_EOF_
+@set EDITION   ${AG_REVISION}
+@set VERSION   ${AG_REVISION}
+@set UPDATED   `date '+%B %Y'`
+@set COPYRIGHT $COPYRIGHT
+@set TITLE     $TITLE
+@set PACKAGE   $PACKAGE
+_EOF_"
 
   (get "copyright.date")
   (get "prog_title")
   (get "package"))
 
-=][=`
-cat <<_EOF_
-@set EDITION   ${AG_REVISION}
-@set VERSION   ${AG_REVISION}
-@set UPDATED   \`date '+%B %Y'\`
-@set COPYRIGHT $COPYRIGHT
-@set TITLE     $TITLE
-@set PACKAGE   $PACKAGE
-_EOF_`=]
+=]
 
 @dircategory GNU programming tools
 @direntry
@@ -95,13 +98,7 @@ notice identical to this one except for the removal of this paragraph.
 @title AutoGen - @value{TITLE}
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{[=(shellf
-"echo '%s' | sed 's,@,@@,'"
-  (if (exist? "copyright.eaddr")
-      (get "copyright.eaddr")
-      (if (exist? "eaddr")
-          (get "eaddr")
-          "bkorb@gnu.org" ))  )=]}
+@author @email{[=(shellf "echo '%s' | sed 's,@,@@,g'" e-addr )=]}
 
 @page
 @vskip 0pt plus 1filll

@@ -1,3 +1,12 @@
+2002-07-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(eaddr): use "eaddr" instead of inventing new attr.
+	* autoopts/optcode.tpl: ditto
+	* columns/opts.def: ditto
+	* doc/auto_gen.tpl: ditto
+	* getdefs/opts.def: ditto
+	* agen5/opts.def: ditto
+
 2002-07-25  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl: Remove redundant doc

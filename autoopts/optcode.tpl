@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.6 2002/07/27 04:13:35 bkorb Exp $
+#$Id: optcode.tpl,v 3.7 2002/07/27 17:46:33 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -288,14 +288,17 @@ ELSE                    =]
 #define apzHomeList NULL[=
 ENDIF                   =][=
 
-IF (exist? "copyright.bugs")   =]
+(define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
 
-tSCC   zBugsAddr[]    = "[= copyright.bugs =]";[=
+(if (exist? "copyright.eaddr")
+    (sprintf bug-text (kr-string (get "copyright.eaddr")))
 
-ELSE                    =]
+(if (exist? "eaddr")
+    (sprintf bug-text (kr-string (get "eaddr")))
 
-#define zBugsAddr NULL[=
-ENDIF                   =][=
+    "\n\n#define zBugsAddr NULL"
+
+))                     =][=
 
 IF (exist? "explain")   =]
 tSCC   zExplain[]     = [=
