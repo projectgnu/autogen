@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2002-09-28 13:25:00 bkorb"
+# Time-stamp:      "2004-02-16 12:44:59 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Sat Mar 28 14:21:31 1998
 #
-# $Id: expr.test,v 3.2 2002/09/29 00:16:20 bkorb Exp $
+# $Id: expr.test,v 3.3 2004/02/16 22:20:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,7 +32,9 @@ cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
 cat > ./${testname}.sh <<- _EOF_
 GD="${GDEXE}"
 AG="${AGEXE}"
-
+COLUMNS_EXE="${COLUMNS_EXE}"
+COL="${COLUMNS_EXE}"
+export GD AG COLUMNS_EXE COL
 _EOF_
 sed -n '/  expr.ini /,/date > stamp-exprini/p' \
   ${top_srcdir}/agen5/bootstrap.dir | \
@@ -44,6 +46,9 @@ srcdir=. ${SHELL} -x ./${testname}.sh
 sed '/DO NOT EDIT/,/and the template/d' ./expr.ini > expr.res
 sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
     > expr.base
+
+test -s expr.res || \
+  failure "${testname} test produced no output"
 
 cmp expr.base expr.res || \
   failure "`diff -c expr.base expr.res`"

@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-05 20:35:21 bkorb"
+## Time-stamp:      "2004-02-16 12:39:34 bkorb"
 ## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.14 2004/02/14 22:12:45 bkorb Exp $
+## $Id: Makefile.am,v 1.15 2004/02/16 22:20:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -30,6 +30,7 @@ INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 AG_ENV          = top_builddir=$(top_builddir) \
   top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
   export top_builddir top_srcdir PATH
+COL_EXE         = `cd ../columns;pwd`/columns
 
 all : gen
 gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
@@ -39,18 +40,20 @@ x.c : $(csrcs)
 
 xmlopts.c $(xml2ag_OBJECTS) : xmlopts.h
 
-xmlopts.h : xmlopts.def
+xmlopts.h : xmlopts.def ../columns/columns$(EXEEXT)
 	$(AG_ENV) ; $(AGEXE) $(srcdir)/xmlopts.def
 
-fork.c : fork.tpl xmlopts.def
+fork.c : fork.tpl xmlopts.def ../columns/columns$(EXEEXT)
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) ; \
 	export top_builddir top_srcdir ; \
-	COLUMNS_EXE=`cd ../columns;pwd`/columns \
+	COLUMNS_EXE=$(COL_EXE) \
 	$(AGEXE) -Tfork.tpl $(srcdir)/xmlopts.def
 
 $(DOCFILES) : doc-stamp
+../columns/columns$(EXEEXT) :
+	cd ../columns ; $(MAKE) columns$(EXEEXT)
 
-doc-stamp : xmlopts.def $(TARG)$(EXEEXT)
+doc-stamp : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(AG_ENV) ; $(AGEXE) -Tagman1 -b$(TARG) $(srcdir)/xmlopts.def ; \
 	$(AGEXE) -Taginfo -b$(TARG) -DLEVEL=section $(srcdir)/xmlopts.def
 	@touch $@

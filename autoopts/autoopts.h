@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-01-01 09:10:28 bkorb"
+ *  Time-stamp:      "2004-02-16 11:22:13 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.23 2004/02/01 21:26:45 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.24 2004/02/16 22:20:45 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -62,9 +62,6 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <utime.h>
-
-#include "options.h"
-#include "streqv.h"
 
 #define AO_NAME_LIMIT    127
 #define AO_NAME_SIZE     (AO_NAME_LIMIT + 1)

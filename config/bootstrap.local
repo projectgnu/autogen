@@ -4,15 +4,15 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2002-12-10 21:49:09 bkorb"
+# Time-stamp:        "2004-02-16 09:25:16 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.11 2003/07/04 15:12:22 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.12 2004/02/16 22:20:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
 {
-  if grep -l 'MAKE LINK TREE' configure > /dev/null 2>&1
+  if grep 'MAKE LINK TREE' configure > /dev/null 2>&1
   then return ; fi
 
   mv configure configure.tmp

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.18 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: makeshell.c,v 3.19 2004/02/16 22:20:45 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -48,8 +48,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include "genshell.c"
 
 tOptions*  pShellParseOptions = NULL;
 

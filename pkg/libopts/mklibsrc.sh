@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2003-02-16 12:04:46 bkorb"
+## Time-stamp:      "2004-02-16 11:36:11 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.19 2003/02/16 22:52:39 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.20 2004/02/16 22:20:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -15,6 +15,9 @@ set -e -x
 
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
+
+[ -x ${top_builddir}/agen5/autogen ] || exit 0
+[ -x ${top_builddir}/columns/columns ] || exit 0
 
 tag=libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
 
@@ -160,6 +163,8 @@ else
 fi
 
 cd ..
+echo ! cd `pwd`
+echo ! tar cvf ${tag}.${sfx} ${tag}
 tar cvf - ${tag} | $gz --best > ${top_builddir}/autoopts/${tag}.${sfx}
 rm -rf ${tag}
 ## end of mklibsrc.sh

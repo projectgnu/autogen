@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2003-12-07 11:02:10 bkorb"
+dnl Time-stamp:      "2004-02-14 19:20:15 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.22 2004/02/01 21:26:44 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.23 2004/02/16 22:20:45 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.22 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.23 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -189,7 +189,8 @@ AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
 AC_CHECK_TYPES([u_int])
 AC_CHECK_TYPES([long long, uintmax_t])
 AC_CHECK_SIZEOF(char*, 4)
-AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(int,   4)
+AC_CHECK_SIZEOF(long,  4)
 
 # ----------------------------------------------------------------------
 # Checks for standard functions.

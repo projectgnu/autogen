@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.11 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: getdefs.h,v 3.12 2004/02/16 22:20:45 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2003-12-20 10:35:05 bkorb"
+ *  Time-stamp:        "2004-02-16 11:43:39 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -17,6 +17,8 @@
 #include "compat/compat.h"
 #include <sys/wait.h>
 #include <utime.h>
+#include "options.h"
+#include "autoopts.h"
 #include "streqv.h"
 
 #include REGEX_HEADER

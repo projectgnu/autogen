@@ -1840,7 +1840,7 @@ commercial programs.
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
-* getopt_long::         Using getopt_long(3GNU)
+* getopt_long::         Using getopt(3C)
 * i18n::                Internationalizing AutoOpts
 @end menu
 
@@ -4223,13 +4223,15 @@ option (@pxref{getdefs subblock}) that tells it how to parse the
 are global definitions that apply to all the documented functions.
 
 @node getopt_long
-@section Using getopt_long(3GNU)
+@section Using getopt(3C)
 @cindex getopt_long
 
 There is now a template named, ``@code{getopt.tpl}'' that is distributed with
 autoopts.  With it, you will have another source file generated for you that
-will utilize the GNU @code{getopt_long(3GNU)} function for parsing the
-command line arguments.  It will save you from being dependent upon the
+will utilize either the standard @code{getopt(3C)} or the GNU
+@code{getopt_long(3GNU)} function for parsing the command line arguments.
+Which is used is selected by the presence or absence of the @code{long-opts}
+program attribute.  It will save you from being dependent upon the
 @code{libopts} library @i{and} it produces code ready for
 internationalization.  However, it also carries with it some limitations on
 the use of AutoOpts features:
@@ -4260,9 +4262,9 @@ emitted @b{before} the @file{getopt.tpl} template gets expanded.
 The usage text is, therefore, statically defined.
 
 @item
-The code is green.  I am sure that more can be done and that there are
+The code is fairly new.  I am sure that more can be done and that there are
 some glitches to be ironed out.  Likely all simple stuff, but as I do not
-use it for my own work, it likely isn't exercised as much as the rest...
+use it for my own work, it likely isn't exercised quite as much as the rest...
 @end enumerate
 
 @noindent

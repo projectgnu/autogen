@@ -2,67 +2,98 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-02-01 13:25:29 bkorb"
+## Time-stamp:      "2004-02-16 12:51:05 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.26 2004/02/01 21:26:45 bkorb Exp $
+## $Id: Makefile.am,v 3.27 2004/02/16 22:20:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-SUBDIRS  = @OPTS_TESTDIR@
+SUBDIRS     = @OPTS_TESTDIR@
+INCLUDES    = @INCLIST@
 
-DISTCLEANFILES = option*.3 libopts.????
-MAINTAINERCLEANFILES = Makefile.in
-
-INCLUDES = @INCLIST@
-GENMAN   = optionFree.3 optionLoadLine.3 optionProcess.3 optionRestore.3 \
+GENMAN      = optionFree.3 optionLoadLine.3 optionProcess.3 optionRestore.3 \
 optionSaveFile.3 optionSaveState.3 optionVersion.3
-man_MANS = autoopts-config.1 $(GENMAN)
-libsrc   = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
+MAN_STAMP   = man3-stamp
 
-nodist_pkgdata_DATA	= $(libsrc)
-pkgdata_DATA	= stdoptions.def autoopts.m4 \
-    getopt.tpl aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
-    options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
+GENTEXI     = libopts.texi libopts.menu
+TEXI_STAMP  = texi-stamp
 
-HDRS        = autoopts.h options.h  streqv.h usage-txt.h
-CSRC        = \
-	autoopts.c boolean.c enumeration.c load.c      makeshell.c \
-	numeric.c  pgusage.c putshell.c    restore.c   save.c \
-	sort.c     stack.c   streqvcmp.c   usage.c     version.c
-ALLSRC		= genshell.c genshell.h $(CSRC)
+libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
-EXTRA_DIST	= $(pkgdata_DATA) $(ALLSRC) COPYING $(man_MANS) options_h.tpl \
-	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def \
-	usage-txt.def usage-txt.tpl
+GENHDRS     = options.h usage-txt.h genshell.h
+HDRS        = $(GENHDRS) autoopts.h streqv.h
 
-m4datadir	= $(datadir)/aclocal
-m4data_DATA	= autoopts.m4
-lib_LTLIBRARIES = libopts.la libguileopts.la
-
-##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
-##  It is compiled as a part of the makeshell module.
+## The primary source (autoopts.c) must be listed first and on a separate
+## line.  'sed' does some magic here to get the list of source files for the
+## documentation.
 ##
+CSRC        = \
+	autoopts.c  \
+    boolean.c enumeration.c genshell.c  load.c    makeshell.c \
+    numeric.c pgusage.c     putshell.c  restore.c save.c      \
+    sort.c    stack.c       streqvcmp.c usage.c   version.c
+
+STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
+LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
+
+CLIENT_TPLS = \
+    aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
+    optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
+PRIVATE_TPL = options_h.tpl usage-txt.tpl
+TPL_FILES   = $(CLIENT_TPLS) $(PRIVATE_TPL)
+DEF_FILES   = genshell.def stdoptions.def usage-txt.def funcs.def
+MISC_FILES  = TODO autoopts.m4 bootstrap.dir autoopts-config.in COPYING
+
+## # # # # # # # # # # # # # #
+##
+##   A U T O M A K E   V A R S
+##
+## # # # # # # # # # # # # # #
+
+CLEANFILES                = tmp-* libopts.c
+DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
+MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) funcs.def
+
+man_MANS                  = autoopts-config.1 $(GENMAN)
+m4datadir	              = $(datadir)/aclocal
+m4data_DATA	              = autoopts.m4
+
+nodist_pkgdata_DATA	      = $(libsrc)
+pkgdata_DATA	          = stdoptions.def autoopts.m4 $(CLIENT_TPLS)
+
+lib_LTLIBRARIES           = libopts.la libguileopts.la
+
 nodist_libopts_la_SOURCES = libopts.c
-libopts_la_SOURCES = $(HDRS)
+libopts_la_SOURCES        = $(HDRS)
+libopts_la_LIBADD         = ../snprintfv/libsnprintfv.la
+libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 
-libopts_la_LIBADD  = ../snprintfv/libsnprintfv.la
-libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ -lm
+libguileopts_la_SOURCES   = guileopt.c
+libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
+libguileopts_la_LIBADD    = libopts.la
+libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
-libguileopts_la_SOURCES  = guileopt.c
-libguileopts_la_CFLAGS   = $(LIBGUILE_CFLAGS)
-libguileopts_la_LDFLAGS  = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
+bin_SCRIPTS	              = autoopts-config
 
-bin_SCRIPTS	= autoopts-config
+include_HEADERS           = options.h usage-txt.h
 
-include_HEADERS = options.h usage-txt.h
+EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
+	$(MISC_FILES) $(DEF_FILES)
 
-libopts.c : autoopts.h $(CSRC)
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##
+##   M A K E F I L E   R U L E S
+##
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+libopts.c : $(HDRS) $(CSRC)
 	( echo '#define AUTOOPTS_INTERNAL' ; \
-	for f in autoopts.h $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
+	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
 genshell.c : genshell.def
@@ -81,21 +112,26 @@ strcspn.lo : $(top_srcdir)/compat/strcspn.c
 
 install-data-local : install-man3
 
-$(GENMAN) : funcs.def
-	if [ -x ../agen5/autogen ] ; then \
-	echo ../agen5/autogen -Tagman3.tpl funcs.def ; \
-	../agen5/autogen -Tagman3.tpl funcs.def ; else true ; fi
+$(GENMAN) : $(MAN_STAMP)
+$(MAN_STAMP) : funcs.def
+	@if [ -x ../agen5/autogen ] ; then \
+	touch tmp-$@ ; \
+	echo ! ../agen5/autogen -Tagman3.tpl funcs.def ; \
+	../agen5/autogen -Tagman3.tpl funcs.def ; \
+	mv -f tmp-$@ $@ ; else true ; fi
 
-libopts.texi : ../agen5/autogen funcs.def
-	../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -b libopts funcs.def
+$(GENTEXI) : $(TEXI_STAMP)
+$(TEXI_STAMP) : ../agen5/autogen funcs.def
+	@touch tmp-$@ ; \
+	cmd="../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def";\
+	echo ! $cmd ; $$cmd ; mv -f tmp-$@ $@
 
 ##  "AutoMake" insists on building this before it is ready to be built.
 ##  Therefore, no-op this (successfully) until the proper time.
 ##
 libsrc : $(libsrc)
 $(libsrc) :
-	if [ ! -x  $(top_builddir)/columns/columns ] ; then exit 0 ; fi ; \
-	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
 	export top_srcdir top_builddir ; \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
 	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh

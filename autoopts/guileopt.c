@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.9 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: guileopt.c,v 3.10 2004/02/16 22:20:45 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -51,6 +51,7 @@
 #include <stdio.h>
 #include <guile/gh.h>
 
+#include "options.h"
 #include "autoopts.h"
 
 /* === STATIC PROCS === */

@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-01 13:25:08 bkorb"
+## Time-stamp:      "2004-02-16 10:57:29 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>                    
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2004/02/01 21:26:46 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2004/02/16 22:20:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -24,8 +24,9 @@ man_MANS        = columns.1
 
 INCLUDES        = @INCLIST@
 
-CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1
+CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1 gen-stamp
 MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
+DISTCLEANFILES  = cols.c
 
 gen : $(BUILT_SOURCES)
 
@@ -35,7 +36,7 @@ all : gen
 
 columns.1 columns.menu columns.texi : gen-stamp
 
-cols.c : $(csrc)
+cols.c : Makefile
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done > $@
 
 gen-stamp : opts.def columns$(EXEEXT)
@@ -44,11 +45,5 @@ gen-stamp : opts.def columns$(EXEEXT)
 		$(top_srcdir)/columns/opts.def
 	$(AGEXE) -T agman1 -b columns $(srcdir)/opts.def
 	@touch $@
-
-clean : columns-clean
-distclean : columns-clean
-
-columns-clean :
-	rm -f *-stamp
 
 # Makefile.am ends here

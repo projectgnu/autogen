@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-14 15:07:57 bkorb"
+## Time-stamp:      "2004-02-16 11:47:37 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.32 2004/02/15 02:42:36 bkorb Exp $
+## $Id: Makefile.am,v 3.33 2004/02/16 22:20:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -21,14 +21,15 @@ TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
 GENDOCS         = autogen.texi autogen.menu autogen.1
 CLEANFILES      = $(GENDOCS)
-STAMPS          = stamp-directive stamp-exprini stamp-opts stamp-fsm
+STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm stamp-parse
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 GEN_SRC         = $(GEN_CSRC) $(GENDOCS)
 
 pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS        = autogen.1
 
-MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
+DISTCLEANFILES  = $(STAMPS) ag.c
+MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
 
 bin_PROGRAMS    = autogen
 

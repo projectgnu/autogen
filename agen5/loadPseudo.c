@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.19 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.20 2004/02/16 22:20:45 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -164,9 +164,17 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
  *  the scan pointer (pzData).
  */
 STATIC te_pm_event
-findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
+findTokenType( tCC**  ppzData, te_pm_state fsm_state )
 {
     tCC* pzData = *ppzData;
+
+    /*
+     *  At the start of processing in this function, we can never be at
+     *  the "start of a line".  A '#' type comment before the initial
+     *  start macro marker is illegal.  Otherwise, our scan pointer is
+     *  after some valid token, which won't be the start of a line, either.
+     */
+    ag_bool line_start = AG_FALSE;
 
  skipWhiteSpace:
     while (isspace( *pzData )) {
@@ -185,6 +193,13 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
         }
     }
 
+    if (line_start && (*pzData == '#')) {
+        pzData = strchr( pzData, '\n' );
+        if (pzData == NULL)
+            AG_ABEND( "Invalid template file" );
+        goto skipWhiteSpace;
+    }
+
     *ppzData = pzData; /* in case we return */
 
     /*
@@ -199,13 +214,25 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
     if (isalnum( *pzData )) {
-        if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0)
-            return isspace( pzData[ sizeof(zAgName)-1 ])
-                   ? PM_EV_AUTOGEN : PM_EV_SUFFIX;
+        if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
 
-        if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0)
-            return isspace( pzData[ sizeof(zAgName)-1 ])
-                   ? PM_EV_TEMPLATE : PM_EV_SUFFIX;
+            if (isspace( pzData[ sizeof(zAgName)-1 ])) {
+                *ppzData = pzData + sizeof(zAgName);
+                return PM_EV_AUTOGEN;
+            }
+
+            return PM_EV_SUFFIX;
+        }
+
+        if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0) {
+
+            if (isspace( pzData[ sizeof(zTpName)-1 ])) {
+                *ppzData = pzData + sizeof(zTpName);
+                return PM_EV_TEMPLATE;
+            }
+
+            return PM_EV_SUFFIX;
+        }
 
         return PM_EV_SUFFIX;
     }
@@ -228,18 +255,6 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
         case '(':
             return PM_EV_SCHEME;
         }
-    }
-
-    /*
-     *  IF the character is '#' and we are at the start of a line,
-     *  THEN the entire line is white space.  Skip it.
-     */
-    if ((*pzData == '#') && line_start) {
-        pzData = strchr( pzData+1, '\n' );
-        if (pzData == NULL)
-            return PM_EV_INVALID;
-
-        goto skipWhiteSpace;
     }
 
     /*
@@ -306,20 +321,18 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";
     tSCC zBadMark[] = "bad template marker in %s on line %d:\n\t%s";
-#   define BAD_MARKER( t ) \
-            AG_ABEND( aprf( zBadMark, pzFileName, templLineNo, t ))
+    tCC* pzBadness;
+#   define BAD_MARKER( t ) { pzBadness = t; goto abort_load; }
 
     te_pm_state fsm_state  = PM_ST_INIT;
-    ag_bool     line_start = AG_TRUE;  /* set TRUE first time only */
 
     templLineNo  = 1;
 
     while (fsm_state != PM_ST_DONE) {
-        te_pm_event fsm_tkn = findTokenType( &pzData, fsm_state, line_start );
+        te_pm_event fsm_tkn = findTokenType( &pzData, fsm_state );
         te_pm_state nxt_state;
         te_pm_trans trans;
 
-        line_start = AG_FALSE;
         nxt_state  = pm_trans_table[ fsm_state ][ fsm_tkn ].next_state;
         trans      = pm_trans_table[ fsm_state ][ fsm_tkn ].transition;
 
@@ -329,10 +342,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
          *  It is legal to alter "nxt_state" while processing these.
          */
         switch (trans) {
-        case PM_TR_AGEN_ED_MODE:
-        case PM_TR_INIT_ED_MODE:
-        case PM_TR_ST_MARK_ED_MODE:
-        case PM_TR_TEMPL_ED_MODE:
+        case PM_TR_SKIP_ED_MODE:
         {
             char* pzEnd = strstr( pzData + 3, "-*-" );
             char* pzNL  = strchr( pzData + 3, '\n' );
@@ -343,19 +353,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             break;
         }
 
-        case PM_TR_AGEN_TEMPLATE:
-            pzData += sizeof( zTpName )-1;
-            break;
-
         case PM_TR_INIT_MARKER:
             pzData = copyMarker( pzData, zStartMac, &startMacLen );
             if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 
-            break;
-
-        case PM_TR_ST_MARK_AUTOGEN:
-            pzData += sizeof( zAgName )-1;
             break;
 
         case PM_TR_TEMPL_MARKER:
@@ -389,7 +391,6 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             pzData = doSchemeExpr( pzData, pzFileName );
             break;
 
-        case PM_TR_END_MARK_ED_MODE:
         case PM_TR_INVALID:
             pm_invalid_transition( fsm_state, fsm_tkn );
             switch (fsm_state) {
@@ -398,11 +399,14 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             case PM_ST_AGEN:     BAD_MARKER( "need template marker" );
             case PM_ST_TEMPL:    BAD_MARKER( "need end marker" );
             case PM_ST_END_MARK: BAD_MARKER( "need end of line" );
-            default:             BAD_MARKER( "BROKEN FSM" );
+            default:             BAD_MARKER( "BROKEN FSM STATE" );
             }
 
-        case PM_TR_END_MARK_END_PSEUDO:
-            /* we be done now */;
+        case PM_TR_NOOP:
+            break;
+
+        default:
+            BAD_MARKER( "broken pseudo-macro FSM" );
         }
 
         fsm_state = nxt_state;
@@ -426,6 +430,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
     }
 
     return pzData;
+
+ abort_load:
+    AG_ABEND( aprf( zBadMark, pzFileName, templLineNo, pzBadness ));
+#   undef BAD_MARKER
+    return NULL;
 }
 /*
  * Local Variables:

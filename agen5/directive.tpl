@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.6 2004/02/01 21:26:45 bkorb Exp $
+# $Id: directive.tpl,v 3.7 2004/02/16 22:20:45 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -70,8 +70,8 @@ ENDFOR directive=] };
 tSCC zSchemeInit[] =
 [= (kr-string (shell
 
-"sed \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//
-/^\\(;\\|$\\)/d\" ${srcdir}/schemedef.scm" ))
+"sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
+     -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
 =];
 #endif /* DEFINING */

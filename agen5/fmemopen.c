@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-02-14 18:39:32 bkorb"
+ * Time-stamp:      "2004-02-14 19:25:42 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -153,11 +153,7 @@ fmem_getmode( const char *pMode, mode_bits_t *pRes )
         break;
     }
 
-    /*
-     *  Either the read or write bit must be set. (both okay, too)
-     */
-    return (*pRes & (FLAG_BIT(read) | FLAG_BIT(write)))
-           ? 0 : EINVAL;
+    return 0;
 }
 
 static int
@@ -300,6 +296,13 @@ fmem_seek (void *cookie, fmem_off_t *p_offset, int dir)
     case SEEK_CUR: new_pos = pFMC->next_ix  + *p_offset;  break;
     case SEEK_END: new_pos = pFMC->buf_size - *p_offset;  break;
 
+#   if SIZEOF_CHARP == SIZEOF_LONG
+    /*
+     *  This is how we get our IOCTL's.  There is no official way.
+     *  We cannot extract our cookie pointer from the FILE* struct
+     *  any other way.  :(  Fortunately, we know that "fmem_off_t"-s are
+     *  long-s and we know that sizeof(char*) == sizeof(long)  :-)
+     */
     case FMEM_IOCTL_SAVE_BUF:
         pFMC->mode &= ~FLAG_BIT(allocated);
         /* FALLTHROUGH */
@@ -307,6 +310,7 @@ fmem_seek (void *cookie, fmem_off_t *p_offset, int dir)
     case FMEM_IOCTL_BUF_ADDR:
         *(char**)p_offset = pFMC->buffer;
         return 0;
+#   endif
 
     default:
         goto seek_oops;
@@ -349,7 +353,10 @@ fmem_close( void *cookie )
  *  arg: + int   + req   + the requested data
  *  arg: + void* + ptr   + ptr to result area
  *
- *  err: non-zero is returned and @code{errno} is set.
+ *  ret-type:  int
+ *  ret-desc:  zero on success
+ *
+ *  err: non-zero is returned and @code{errno} is set to @code{EINVAL}.
  *
  *  doc:
  *
@@ -378,15 +385,14 @@ fmem_close( void *cookie )
  *  The third argument is never optional and must be a pointer to where data
  *  are to be retrieved or stored.  It may be NULL if there are no data to
  *  transfer, but both of these functions currently return the address of the
- *  buffer.
+ *  buffer.  This is implemented as a wrapper around @code{fseek(3C)}, so
+ *  the "req" argument must not conflict with @code{SEEK_SET}, @code{SEEK_CUR}
+ *  or @code{SEEK_END}.
 =*/
 int
 fmem_ioctl( FILE* fp, int req, void* ptr )
 {
-    if (sizeof(long) == sizeof(char*))
-        return fseek( fp, (long)ptr, req );
-    errno = EINVAL;
-    return -1;
+    return fseek( fp, (long)ptr, req );
 }
 
 /*=export_func fmemopen

@@ -1,3 +1,13 @@
+2004-02-16  Bruce Korb  <bkorb@gnu.org>
+
+	* */Makefile.am: clean up which files need cleaning up and when.
+	Make sure the columns and autogen binaries have been built when needed
+	* agen5/directive.tpl(zSchemeInit): BSD sed's work differently
+	* agen5/fmemopen.c: accommodate BSD's funopen() function
+	* agen5/loadPseudo.c(findTokenType): the end marker can *NEVER* start
+	with the hash character.
+	* agen5/pseudo.def(end_mark): transitions from this state need no code
+
 2004-02-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fmemopen.c: more cleanup and adapt for BSD's funopen().

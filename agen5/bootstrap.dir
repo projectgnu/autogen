@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/02/15 02:42:36 $
+# Last Modified:     $Date: 2004/02/16 22:20:45 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.19 2004/02/15 02:42:36 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.20 2004/02/16 22:20:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -118,12 +118,13 @@ do
   echo Re-building "$t"
   case "$t" in
   stamp-parse | \
+  defParse-fsm.c | \
   defParse-fsm.h )
     # Make the definition parser
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}"
+      echo "Cannot locate autogen"
       $force && exit 1
       continue
     fi
@@ -131,20 +132,16 @@ do
     cmd="${AG} defParse.def"
     echo ${cmd}
     ${cmd}
-    ;;
-
-  defParse-fsm.c )
-    autogen defParse.def
-    rm -f defParse-fsm.h
+    date > stamp-parse
     ;;
 
   stamp-opts | \
   opts.[ch] )
     # Make the option processing files:
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${COL}" ]
     then
-      echo "Cannot locate ${AG}"
+      echo "Cannot locate either autogen or columns"
       $force && exit 1
       continue
     fi
@@ -158,7 +155,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}"
+      echo "Cannot locate autogen"
       $force && exit 1
       continue
     fi
@@ -174,9 +171,9 @@ do
   expr.h | \
   expr.def | \
   expr.ini )
-    if [ -z "${AG}" ] || [ -z "${GD}" ]
+    if [ -z "${AG}" ] || [ -z "${COL}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs"
+      echo "Cannot locate autogen or columns or getdefs"
       $force && exit 1
       continue
     fi
@@ -198,6 +195,7 @@ do
     ( SHELL=sh ${GD} load=expr.cfg func*.c exp*.c 2>&1 ) | \
       egrep -v 'no copies of pattern' >&2
     set -e
+    rm -f expr.cfg
     ${AG} expr.def
     [ "$t" = "expr.def" ] || rm -f expr.def
     date > stamp-exprini
@@ -206,9 +204,9 @@ do
   stamp-directive | \
   directive.def | \
   directive.h )
-    if [ -z "${AG}" ] || [ -z "${GD}" ]
+    if [ -z "${AG}" ] || [ -z "${COL}" ]
     then
-      echo "Cannot locate autogen or getdefs"
+      echo "Cannot locate autogen or columns"
       $force && exit 1
       continue
     fi
@@ -227,9 +225,9 @@ do
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${COL}" ]
     then
-      echo "Cannot locate autogen"
+      echo "Cannot locate autogen or columns"
       $force && exit 1
       continue
     fi
@@ -241,9 +239,9 @@ do
   autogen.1 )
     # Construct the man page
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AG}" ] || [ -z "${COL}" ]
     then
-      echo "Cannot locate autogen"
+      echo "Cannot locate autogen or columns"
       $force && exit 1
       continue
     fi
