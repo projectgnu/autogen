@@ -207,9 +207,16 @@ DEFINE define-option-callbacks  =][=
  *
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
+#if defined( __STDC__ ) || defined( __cplusplus )
     static void
 doOpt[=(string-capitalize (get "name"))
      =]( tOptions* pOptions, tOptDesc* pOptDesc )
+#else
+int doOpt[=(string-capitalize (get "name"))
+         =]( pOptions, pOptDesc )
+    tOptions*  pOptions;
+    tOptDesc*  pOptDesc;
+#endif
 {
 [=flag_code=]
 }[=
