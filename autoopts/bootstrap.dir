@@ -6,7 +6,7 @@ noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 make_funcs_def()
 {
     files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
-      sed '/^CSRC/d;s/[=\\]//'`
+      sed '/^CSRC/d;s/[=\\]//'`\ ../compat/pathfind.c
     getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
     eval "`egrep '^AO_' ../VERSION`"
@@ -61,20 +61,6 @@ case "$1" in
   f=ao$$.h
   exec 4> $f
   sed '/=== LOCAL PROCEDURES ===/q' autoopts.h >&4
-  for g in `egrep -l '^LOCAL ' *.c`
-  do
-    echo
-    echo "/* $g */"
-    sed -n '/^LOCAL /,/^{$/p' $g | \
-      sed 's/^LOCAL /static /;s/^{//;s/)$/);/'
-  done >&4
-  tag="=== END LOCALS ==="
-  echo "/* ${tag} */" >&4
-  sed "1,/${tag}/d" autoopts.h >&4
-  exec 4>&-
-  if cmp -s $f autoopts.h
-  then rm -f $f
-  else mv -f $f autoopts.h ; echo UPDATED AUTOOPTS.H >&2
-  fi
+  :mkfwd -p `egrep -l '^LOCAL ' *.c`
   ;;
 esac

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: streqvcmp.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -98,7 +98,7 @@ static unsigned char charmap[] = {
 };
 
 
-int
+LOCAL int
 strneqvcmp( s1, s2, ct )
     const char* s1;
     const char* s2;
@@ -120,7 +120,7 @@ strneqvcmp( s1, s2, ct )
 }
 
 
-int
+LOCAL int
 streqvcmp( s1, s2 )
     const char* s1;
     const char* s2;
@@ -139,7 +139,7 @@ streqvcmp( s1, s2 )
 }
 
 
-void
+LOCAL void
 streqvmap( char From, char To, int ct )
 {
     if (ct == 0) {
@@ -164,7 +164,7 @@ streqvmap( char From, char To, int ct )
 }
 
 
-void
+LOCAL void
 strequate( s )
     const char* s;
 {
@@ -176,7 +176,7 @@ strequate( s )
 }
 
 
-void
+LOCAL void
 strtransform( d, s )
     char*       d;
     const char* s;

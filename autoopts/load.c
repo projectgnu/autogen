@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: load.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -50,15 +50,15 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/* === STATIC PROCS === */
-STATIC void
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
 loadOptionLine(
     tOptions*  pOpts,
     tOptState* pOS,
     char*      pzLine,
     tDirection direction );
-
-/* === END STATIC PROCS === */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
  * private:
@@ -217,7 +217,7 @@ optionMakePath(
 }
 
 
-STATIC void
+static void
 loadOptionLine(
     tOptions*  pOpts,
     tOptState* pOS,

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-08-30 19:09:50 bkorb"
+ *  Time-stamp:      "2005-01-08 16:17:51 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -268,35 +268,19 @@ extern FILE* option_usage_fp;
 
 extern tOptProc doVersion, doPagedUsage, doLoadOpt;
 
+/*
+ *  Hide the interface - it pollutes a POSIX claim
+ */
+#define strneqvcmp      option_strneqvcmp
+#define streqvcmp       option_streqvcmp
+#define equivalent      option_equivalent 
+#define strequate       option_strequate
+#define streqvmap       option_streqvmap
+#define strtransform    option_strtransform
+
 #define LOCAL static
-#ifdef AUTOOPTS_INTERNAL
-/* === LOCAL PROCEDURES === */
+#include "proto.h"
 
-/* autoopts.c */
-static tSuccess
-handleOption( tOptions* pOpts, tOptState* pOptState );
-
-static tSuccess
-longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState );
-
-static tSuccess
-shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState );
-
-
-/* load.c */
-static void
-filePreset(
-    tOptions*     pOpts,
-    const char*   pzFileName,
-    int           direction );
-
-
-/* sort.c */
-static void
-optionSort( tOptions* pOpts );
-
-/* === END LOCALS === */
-#endif /* GUILE_OPTIONS */
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*
  * Local Variables:

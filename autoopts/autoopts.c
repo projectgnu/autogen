@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: autoopts.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -62,23 +62,23 @@ static const char zNil[] = "";
 #define SKIP_RC_FILES(po) \
     DISABLED_OPT(&((po)->pOptDesc[ (po)->specOptIdx.save_opts+1]))
 
-/* === STATIC PROCS === */
-STATIC tSuccess
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
-STATIC tSuccess
+static tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState );
 
-STATIC void
+static void
 doRcFiles( tOptions* pOpts );
 
-STATIC tSuccess
+static tSuccess
 doPresets( tOptions* pOpts );
 
-STATIC int
+static int
 checkConsistency( tOptions* pOpts );
-
-/* === END STATIC PROCS === */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  handleOption
@@ -408,7 +408,7 @@ shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
  *
  *  Find the option descriptor for the current option
  */
-STATIC tSuccess
+static tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState )
 {
     /*
@@ -501,7 +501,7 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
  *  all the state in the state argument so that the option can be skipped
  *  without consequence (side effect).
  */
-STATIC tSuccess
+static tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState )
 {
     tSuccess res;
@@ -756,12 +756,11 @@ doRegularOpts( tOptions* pOpts )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-STATIC void
+static void
 doRcFiles( tOptions* pOpts )
 {
     int     idx;
     int     inc = DIRECTION_PRESET;
-    cch_t*  pzPath;
     char    zFileName[ 4096 ];
 
     /*
@@ -777,6 +776,7 @@ doRcFiles( tOptions* pOpts )
      */
     for (;;) {
         struct stat StatBuf;
+        cch_t*  pzPath;
 
         /*
          *  IF we've reached the bottom end, change direction
@@ -838,7 +838,7 @@ doRcFiles( tOptions* pOpts )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-STATIC tSuccess
+static tSuccess
 doPresets( tOptions* pOpts )
 {
     /*
@@ -917,7 +917,7 @@ doPresets( tOptions* pOpts )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-STATIC int
+static int
 checkConsistency( tOptions* pOpts )
 {
     int        errCt = 0;

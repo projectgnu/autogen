@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+/*  $Id: version.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -48,11 +48,11 @@ static const char zAOV[] =
  * If you do not wish that, delete this exception notice.
  */
 
-/* === STATIC PROCS === */
-STATIC void
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
 printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
-
-/* === END STATIC PROCS === */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionVersion
  *
@@ -73,7 +73,7 @@ optionVersion( void )
 }
 
 
-STATIC void
+static void
 printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
 {
     char swCh;

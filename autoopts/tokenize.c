@@ -27,9 +27,15 @@
 #define ch_t   unsigned char
 
 #include "tokenize.h"
-#ifndef NUL
-#  define NUL '\0'
-#endif
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+copy_cooked( ch_t** ppDest, cc_t** ppSrc );
+
+static void
+copy_raw( ch_t** ppDest, cc_t** ppSrc );
+/* = = = END-STATIC-FORWARD = = = */
 
 static void
 copy_cooked( ch_t** ppDest, cc_t** ppSrc )
@@ -181,11 +187,60 @@ copy_raw( ch_t** ppDest, cc_t** ppSrc )
 }
 
 
+/*=export_func string_tokenize
+ *
+ * what: this is the main option processing routine
+ *
+ * arg:  + const char* + string + string to be tokenized +
+ *
+ * ret_type:  token_list_t*
+ * ret_desc:  pointer to a structure that lists each token
+ *
+ * doc:
+ *
+ * This function will convert one input string into a list of strings.
+ * The list of strings is derived by separating the input based on
+ * white space separation.  However, if the input contains either single
+ * or double quote characters, then the text after that character up to
+ * a matching quote will become the string in the list.
+ *
+ * There are two types of quoted strings: single quoted (@code{'}) and
+ * double quoted (@code{"}).  Singly quoted strings are fairly raw in that
+ * escape characters (@code{\\}) are simply another character, except when
+ * preceeding the following characters:
+ * @example
+ * @code{\\}  double backslashes reduce to one
+ * @code{'}   incorporates the single quote into the string
+ * @code{\n}  suppresses both the backslash and newline character
+ * @end example
+ *
+ * Double quote strings are formed according to the rules of string
+ * constants in ANSI-C programs.
+ *
+ * example:
+ * @example
+ *    #include <stdlib.h>
+ *    int ix;
+ *    token_list_t* ptl = string_tokenize( some_string )
+ *    for (ix = 0; ix < ptl->tkn_ct; ix++)
+ *       do_something_with_tkn( ptl->tkn_list[ix] );
+ *    free( ptl );
+ * @end example
+ * Note that everything is freed with the one call to @code{free(3C)}.
+ *
+ * err:  NULL is returned and @code{errno} will be set to indicate the problem:
+ * @example
+ * ENOENT if the input string contains nothing.
+ * ENOMEM if there is not enough memory.
+ * @end example
+=*/
 token_list_t*
 string_tokenize( const char* str )
 {
     int max_token_ct = 1; /* allow for trailing NUL on string */
     token_list_t* res;
+
+    if (str == NULL)  goto bogus_str;
 
     /*
      *  Trim leading white space.  Use "ENOENT" and a NULL return to indicate
@@ -193,6 +248,7 @@ string_tokenize( const char* str )
      */
     while (isspace( *str ))  str++;
     if (*str == NUL) {
+    bogus_str:
         errno = ENOENT;
         return NULL;
     }

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: guileopt.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -53,9 +53,6 @@
 
 #include "options.h"
 #include "autoopts.h"
-
-/* === STATIC PROCS === */
-/* === END STATIC PROCS === */
 
 /*=export_func  export_options_to_guile
  * what:  put the option state into Guile symbols

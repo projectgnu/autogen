@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: putshell.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -50,11 +50,17 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+putQuotedStr( tCC* pzStr );
+/* = = = END-STATIC-FORWARD = = = */
+
 /*
  *  Make sure embedded single quotes come out okay.  The initial quote has
  *  been emitted and the closing quote will be upon return.
  */
-STATIC void
+static void
 putQuotedStr( tCC* pzStr )
 {
     /*

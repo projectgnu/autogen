@@ -1,6 +1,6 @@
 
 /*
- *  $Id: environment.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: environment.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -51,6 +51,9 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  doPrognameEnv - check for preset values from the ${PROGNAME}

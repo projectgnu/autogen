@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -48,15 +48,27 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/* === STATIC PROCS === */
-/* === END STATIC PROCS === */
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tSuccess
+mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
+               char** ppzOpts, int* pOptsIdx );
+
+static tSuccess
+mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
+              char** ppzOpts, int* pOptsIdx );
+
+static tSuccess
+checkShortOpts( tOptions* pOpts, char* pzArg, tOptState* pOS,
+                char** ppzOpts, int* pOptsIdx );
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  "mustHandleArg" and "mayHandleArg" are really similar.  The biggest
  *  difference is that "may" will consume the next argument only if it
  *  does not start with a hyphen and "must" will consume it, hyphen or not.
  */
-STATIC tSuccess
+static tSuccess
 mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
                char** ppzOpts, int* pOptsIdx )
 {
@@ -94,7 +106,7 @@ mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
     return SUCCESS;
 }
 
-STATIC tSuccess
+static tSuccess
 mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
               char** ppzOpts, int* pOptsIdx )
 {
@@ -137,7 +149,7 @@ mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
  *  Process a string of short options glued together.  If the last one
  *  does or may take an argument, the do the argument processing and leave.
  */
-STATIC tSuccess
+static tSuccess
 checkShortOpts( tOptions* pOpts, char* pzArg, tOptState* pOS,
                 char** ppzOpts, int* pOptsIdx )
 {

@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.2 2005/01/09 00:25:06 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -252,6 +252,14 @@ struct options {
     option_translation_proc_t* pTransProc;
 };
 
+/*
+ *  "token list" structure returned by "string_tokenize()"
+ */
+typedef struct {
+    unsigned long   tkn_ct;
+    unsigned char*  tkn_list[1];
+} token_list_t;
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -259,13 +267,40 @@ extern "C" {
 /*
  *  The following routines may be coded into AutoOpts client code:
  */[=
+ (define if-text   "")
+ (define note-text "")
+ (define end-text  "")
+ (define note-fmt
+    "\n *\n * the %s function is available only if %s is%s defined")
 
  (out-push-new)
  (out-suspend "priv")   =][=
 
 FOR export_func         =][=
 
-  IF (not (exist? "private")) =]
+  IF
+
+  (if (exist? "ifndef")
+      (begin
+        (set! if-text    (string-append "\n#ifndef " (get "ifndef")))
+        (set! note-text  (sprintf note-fmt (get "name") (get "ifndef") " not"))
+	(set! end-text   (sprintf "\n#endif /* %s */" (get "ifndef")))
+      )
+
+  (if (exist? "ifdef")
+      (begin
+        (set! if-text    (string-append "\n#ifdef " (get "ifdef")))
+        (set! note-text  (sprintf note-fmt (get "name") (get "ifdef") ""))
+	(set! end-text   (sprintf "\n#endif /* %s */" (get "ifdef")))
+      )
+
+  (begin
+        (set! if-text    "")
+        (set! note-text  "")
+	(set! end-text   "")
+  )  ))
+
+ (not (exist? "private")) =]
 
 /* From: [=srcfile=] line [=linenum=]
  *
@@ -283,7 +318,7 @@ FOR export_func         =][=
  *
  * Returns: [=ret-type=] - [=ret-desc=][=
 
-    ENDIF  =]
+    ENDIF  =][=(. note-text)=]
  *
 [=(prefix " *  " (get "doc"))=]
  */[=
@@ -292,6 +327,8 @@ FOR export_func         =][=
 
   (if (exist? "private") (out-resume "priv"))
 
+  if-text
+
 =]
 extern [= ?% ret-type "%s" "void"  =] [=name=]( [=
    IF (not (exist? "arg"))
@@ -299,7 +336,14 @@ extern [= ?% ret-type "%s" "void"  =] [=name=]( [=
    ELSE   =][=(join ", " (stack "arg.arg-type")) =][=
    ENDIF  =] );
 [=
- (if (exist? "private") (out-suspend "priv"))
+
+  (if (exist? "ifndef")
+      (sprintf "\n#endif /* %s */" (get "ifndef"))
+  (if (exist? "ifdef")
+      (sprintf "\n#endif /* %s */"  (get "ifdef"))  ))
+
+  (if (exist? "private") (out-suspend "priv"))
+  end-text
 
 =][=
 

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.2 2005/01/01 17:38:03 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.3 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -52,22 +52,22 @@
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
-/* === STATIC PROCS === */
-STATIC tCC*
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tCC*
 findDirName( tOptions* pOpts );
 
-STATIC tCC*
+static tCC*
 findFileName( tOptions* pOpts );
 
-STATIC void
+static void
 printEntry(
     FILE*      fp,
     tOptDesc*  p,
     tCC*       pzLA );
+/* = = = END-STATIC-FORWARD = = = */
 
-/* === END STATIC PROCS === */
-
-STATIC tCC*
+static tCC*
 findDirName( tOptions* pOpts )
 {
     tCC*  pzDir;
@@ -146,7 +146,7 @@ findDirName( tOptions* pOpts )
 }
 
 
-STATIC tCC*
+static tCC*
 findFileName( tOptions* pOpts )
 {
     tCC*   pzDir;
@@ -256,7 +256,7 @@ findFileName( tOptions* pOpts )
 }
 
 
-STATIC void
+static void
 printEntry(
     FILE*      fp,
     tOptDesc*  p,

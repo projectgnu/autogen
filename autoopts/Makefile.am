@@ -2,21 +2,27 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-12-31 19:38:54 bkorb"
+## Time-stamp:      "2005-01-08 16:12:35 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2005/01/01 17:38:03 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2005/01/09 00:25:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 SUBDIRS     = @OPTS_TESTDIR@
 INCLUDES    = @INCLIST@
 
+if  NEED_PATHFIND
+PATHFIND_MAN= pathfind.3
+else
+PATHFIND_MAN=
+endif
+
 GENMAN      = optionFree.3 optionLoadLine.3 optionProcess.3 optionRestore.3 \
-optionSaveFile.3 optionSaveState.3 optionVersion.3
+optionSaveFile.3 optionSaveState.3 optionVersion.3 $(PATHFIND_MAN)
 MAN_STAMP   = man3-stamp
 
 GENTEXI     = libopts.texi libopts.menu
@@ -25,7 +31,7 @@ TEXI_STAMP  = texi-stamp
 libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 GENHDRS     = options.h usage-txt.h genshell.h
-HDRS        = $(GENHDRS) autoopts.h streqv.h tokenize.h
+HDRS        = $(GENHDRS) autoopts.h streqv.h
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the

@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -49,9 +49,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-/* === STATIC PROCS === */
-/* === END STATIC PROCS === */
 
 /*=export_func optionSaveState
  *
