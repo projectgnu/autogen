@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.8 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: stack.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -212,7 +212,9 @@ stackOptArg( pOpts, pOptDesc )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * stack.c ends here */
+ * end of autoopts/stack.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: funcDef.c,v 3.15 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -800,7 +800,9 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of funcDef.c */
+ * end of agen5/funcDef.c */

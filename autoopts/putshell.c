@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.8 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: putshell.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -222,7 +222,9 @@ int putBourneShell( pOpts )
 #endif
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * putshell.c ends here */
+ * end of autoopts/putshell.c */

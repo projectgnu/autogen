@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 3.3 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: gdinit.c,v 3.4 2003/04/19 02:40:34 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2003/02/16 00:04:40 $
+ *  Last Modified:     $Date: 2003/04/19 02:40:34 $
  *            by: bkorb
  */
 #include "getdefs.h"
@@ -411,4 +411,4 @@ validateOptions( void )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of gdinit.c */
+ * end of getdefs/gdinit.c */

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.20 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: autogen.c,v 3.21 2003/04/19 02:40:33 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -210,6 +210,10 @@ ignoreSignal( int sig )
 STATIC void
 doneCheck( void )
 {
+    tSCC zErr[] =
+        "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
+        "\t%s on line %d\n";
+
     fflush( stdout );
     fflush( stderr );
 
@@ -224,20 +228,22 @@ doneCheck( void )
         else fclose( pfTrace );
     }
 
-    /*
-     *  This hook is here  primarily to catch the situation
-     *  where the Guile interpreter decides to call exit.
-     */
     switch (procState) {
     case PROC_STATE_EMITTING:
     case PROC_STATE_INCLUDING:
+        /*
+         *  A library (viz., Guile) procedure has called exit(3C).
+         *  The AutoGen abort paths all set procState to PROC_STATE_ABORTING.
+         */
         if (*pzOopsPrefix != NUL) {
+            /*
+             *  Emit the CGI page header for an error message.
+             */
             fputs( pzOopsPrefix, stderr );
             pzOopsPrefix = "";
         }
 
-        fprintf( stderr, "AutoGen ABENDED in template %s line %d\n",
-                 pCurTemplate->pzFileName, pCurMacro->lineNo );
+        fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
 
         /*
          *  We got here because someone called exit early.
@@ -256,6 +262,8 @@ doneCheck( void )
 
     case PROC_STATE_INIT:
     case PROC_STATE_OPTIONS:
+        break; /* continue failure exit */
+
     case PROC_STATE_DONE:
         break; /* continue normal exit */
     }
@@ -373,8 +381,9 @@ signalSetup( void )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
  * tab-width: 4
+ * indent-tabs-mode: nil
  * End:
- * end of autogen.c */
+ * end of agen5/autogen.c */

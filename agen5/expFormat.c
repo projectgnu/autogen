@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expFormat.c,v 3.15 2003/04/19 02:40:33 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -627,7 +627,9 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 }
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expFormat.c */
+ * end of agen5/expFormat.c */

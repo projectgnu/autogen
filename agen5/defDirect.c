@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.13 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: defDirect.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -853,7 +853,9 @@ doDir_undef( char* pzArg, char* pzScan )
 /*+++ End of Directives +++*/
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of defDirect.c */
+ * end of agen5/defDirect.c */

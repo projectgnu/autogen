@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.4 2003/02/16 00:04:40 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.5 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -163,7 +163,9 @@ optionFree( pOpts )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * restore.c ends here */
+ * end of autoopts/restore.c */

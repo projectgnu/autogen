@@ -2,7 +2,7 @@
 /*
  *  Time-stamp:      "2003-01-05 11:20:13 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.12 2003/02/16 00:04:40 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.13 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -222,7 +222,9 @@ ag_bool optionMakePath PROTO((
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * autoopts.h ends here */
+ * end of autoopts/autoopts.h */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.15 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.16 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -515,7 +515,9 @@ unloadTemplate( tTemplate* pT )
 #endif
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of tpLoad.c */
+ * end of agen5/tpLoad.c */

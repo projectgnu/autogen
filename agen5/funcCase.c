@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.12 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: funcCase.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1198,7 +1198,9 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of funcCase.c */
+ * end of agen5/funcCase.c */

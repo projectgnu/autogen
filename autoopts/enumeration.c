@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.9 2003/04/17 01:23:49 bkorb Exp $
+ *  $Id: enumeration.c,v 3.10 2003/04/19 02:40:33 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -174,7 +174,9 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * enumeration.c ends here */
+ * end of autoopts/enumeration.c */

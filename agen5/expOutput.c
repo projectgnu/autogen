@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.12 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expOutput.c,v 3.13 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -463,7 +463,9 @@ ag_scm_out_name( void )
 
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expOutput.c */
+ * end of agen5/expOutput.c */

@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.6 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expExtract.c,v 3.7 2003/04/19 02:40:33 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -330,7 +330,9 @@ ag_scm_find_file( SCM file, SCM suffix )
 
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expExtract.c */
+ * end of agen5/expExtract.c */

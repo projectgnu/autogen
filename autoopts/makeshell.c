@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.8 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: makeshell.c,v 3.9 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -1085,7 +1085,9 @@ int putShellParse( pOpts )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * makeshell.c ends here */
+ * end of autoopts/makeshell.c */

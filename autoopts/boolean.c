@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 3.3 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: boolean.c,v 3.4 2003/04/19 02:40:33 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -89,7 +89,9 @@ optionBooleanVal( pOpts, pOD )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * pgusage.c ends here */
+ * end of autoopts/boolean.c */

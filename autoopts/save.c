@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.10 2003/04/17 01:23:49 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.11 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -464,7 +464,9 @@ optionSaveFile( pOpts )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * save.c ends here */
+ * end of autoopts/save.c */

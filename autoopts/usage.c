@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.18 2003/03/15 18:02:36 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.19 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -685,8 +685,9 @@ printInitList( papz, pInitIntro, pzRc, pzPN )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
  * tab-width: 4
+ * indent-tabs-mode: nil
  * End:
- * usage.c ends here */
+ * end of autoopts/usage.c */

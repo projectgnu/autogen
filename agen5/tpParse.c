@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.10 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: tpParse.c,v 3.11 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -318,7 +318,9 @@ parseTemplate( tMacro* pM, tCC** ppzText )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of tpParse.c */
+ * end of agen5/tpParse.c */

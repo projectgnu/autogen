@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.13 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: functions.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -379,7 +379,9 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of functions.c */
+ * end of agen5/functions.c */

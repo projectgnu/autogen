@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.7 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expGuile.c,v 3.8 2003/04/19 02:40:33 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -468,7 +468,9 @@ ag_scm_string_downcase( SCM str )
 }
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expGuile.c */
+ * end of agen5/expGuile.c */

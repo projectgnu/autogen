@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.13 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: funcEval.c,v 3.14 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -285,9 +285,10 @@ evalExpression( ag_bool* pMustFree )
     SCM 
 ag_scm_error_source_line( void )
 {
-    fprintf( stderr, "\nin %s line %d:  %s\n", pCurTemplate->pzTplName,
-             pCurMacro->lineNo,
+    tSCC zErr[] = "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
+    fprintf( stderr, zErr, pCurTemplate->pzTplName, pCurMacro->lineNo,
              pCurTemplate->pzTemplText + pCurMacro->ozText );
+    fflush( stderr );
 
     return SCM_UNDEFINED;
 }
@@ -512,7 +513,9 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of funcEval.c */
+ * end of agen5/funcEval.c */

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.11 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expString.c,v 3.12 2003/04/19 02:40:33 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -1125,7 +1125,9 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expString.c */
+ * end of agen5/expString.c */

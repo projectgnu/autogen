@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.8 2003/03/13 04:08:04 bkorb Exp $
+ *  $Id: getdefs.c,v 3.9 2003/04/19 02:40:34 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
- *  Time-stamp:        "2003-03-12 19:57:20 bkorb"
+ *  Time-stamp:        "2003-04-18 19:25:14 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -1185,7 +1185,6 @@ updateDatabase( void )
     chmod( OPT_ARG( ORDERING ), 0444 );
 }
 
-
 /* emacs
  * Local Variables:
  * mode: C
@@ -1193,4 +1192,4 @@ updateDatabase( void )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of getdefs.c */
+ * end of getdefs/getdefs.c */

@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.9 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: expMake.c,v 3.10 2003/04/19 02:40:33 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -267,7 +267,9 @@ ag_scm_makefile_script( SCM text )
 
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of expMake.c */
+ * end of agen5/expMake.c */

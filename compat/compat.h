@@ -8,7 +8,7 @@
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.4 2002/09/29 00:16:20 bkorb Exp $
+ * $Id: compat.h,v 3.5 2003/04/19 02:40:33 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -231,7 +231,9 @@
 #endif /* COMPAT_H */
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * compat.h ends here */

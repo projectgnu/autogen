@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.11 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.12 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -425,7 +425,9 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of loadPseudo.c */
+ * end of agen5/loadPseudo.c */

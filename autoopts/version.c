@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.5 2003/02/16 00:04:40 bkorb Exp $
+/*  $Id: version.c,v 3.6 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -136,7 +136,9 @@ doVersionStderr( pOpts, pOD )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * version.c ends here */
+ * end of autoopts/version.c */

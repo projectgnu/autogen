@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.13 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: autogen.h,v 3.14 2003/04/19 02:40:33 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -373,7 +373,9 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 #endif /* AUTOGEN_HDR */
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of autogen.h */
+ * end of agen5/autogen.h */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.4 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: guileopt.c,v 3.5 2003/04/19 02:40:33 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -176,7 +176,9 @@ export_options_to_guile( pOpts )
 
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * guileopt.c ends here */
+ * end of autoopts/guileopt.c */

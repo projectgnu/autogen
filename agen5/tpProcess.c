@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.15 2003/04/15 01:05:13 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.16 2003/04/19 02:40:33 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -355,7 +355,9 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 }
 /*
  * Local Variables:
- * c-file-style: "Stroustrup"
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of tpProcess.c */
+ * end of agen5/tpProcess.c */

@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.8 2003/03/13 04:08:04 bkorb Exp $
+ *  $Id: getdefs.h,v 3.9 2003/04/19 02:40:34 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2003-03-12 19:42:53 bkorb"
+ *  Time-stamp:        "2003-04-18 19:25:20 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -120,3 +120,12 @@ MODE pid_t   agPid      VALUE( -1 );
 #include "proto.h"
 
 #endif /* GETDEFS_HEADER */
+
+/* emacs
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of getdefs/getdefs.h */

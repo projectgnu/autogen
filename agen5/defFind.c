@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.9 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: defFind.c,v 3.10 2003/04/19 02:40:33 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -738,7 +738,9 @@ findEntryList( char* pzName )
 }
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of defFind.c */
+ * end of agen5/defFind.c */
