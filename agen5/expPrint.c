@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.23 2004/07/31 18:51:31 bkorb Exp $
+ *  $Id: expPrint.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide

@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.13 2004/10/30 20:43:57 bkorb Exp $
+ *  $Id: getdefs.h,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *

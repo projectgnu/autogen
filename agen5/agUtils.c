@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.23 2004/07/31 18:51:31 bkorb Exp $
+ *  $Id: agUtils.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This is the main routine for autogen.
  */
 

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.9 2004/10/15 01:48:34 bkorb Exp $
+ *   $Id: opts.def,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  */
 
 /*

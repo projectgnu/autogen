@@ -8,7 +8,7 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.40 2004/12/01 01:50:19 bkorb Exp $
+## $Id: Makefile.am,v 4.1 2005/01/01 00:20:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test

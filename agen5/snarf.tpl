@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 3.5 2004/02/01 21:26:45 bkorb Exp $
+# $Id: snarf.tpl,v 4.1 2005/01/01 00:20:58 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 

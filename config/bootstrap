@@ -8,7 +8,7 @@
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.8 2004/11/02 04:03:59 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.1 2005/01/01 00:20:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a

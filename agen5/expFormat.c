@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: expFormat.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 

@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.16 2004/02/01 21:26:46 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 

@@ -3,7 +3,7 @@
 html=autogen.html
 
 # Time-stamp: "2004-10-12 20:12:29 bkorb"
-# Version:    "$Revision: 3.5 $
+# Version:    "$Revision: 4.1 $
 
 # AutoGen Options copyright 1992-2004 Bruce Korb
 
@@ -13,7 +13,7 @@ html=autogen.html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 3.5 2004/10/13 03:13:02 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -135,7 +135,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2004/10/13 03:13:02 $ $Author: bkorb $
+$Date: 2005/01/01 00:20:59 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

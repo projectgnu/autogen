@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 3.8 2004/11/02 04:03:59 bkorb Exp $
+# $Id: stdopts.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

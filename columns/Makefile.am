@@ -9,7 +9,7 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>                    
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 4.1 2005/01/01 00:20:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns

@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.18 2004/10/03 02:56:23 bkorb Exp $
+ *  $Id: defDirect.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This module processes definition file directives.
  */
 

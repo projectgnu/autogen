@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2002/08/19 00:47:56 $
+#  Last Modified:     $Date: 2005/01/01 00:20:58 $
 #             by: bkorb
 #
 # This template uses the following definitions:

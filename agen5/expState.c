@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.22 2004/08/15 00:52:47 bkorb Exp $
+ *  $Id: expState.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */

@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 3.6 2004/12/09 04:35:22 bkorb Exp $
+# $Id: strsignal.tpl,v 4.1 2005/01/01 00:20:58 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 

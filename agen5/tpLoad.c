@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.22 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */

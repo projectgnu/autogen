@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.9 2004/02/01 21:26:46 bkorb Exp $
+ *  $Id: columns.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
  */
 
 /*

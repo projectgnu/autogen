@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/10/30 20:43:56 $
+# Last Modified:     $Date: 2005/01/01 00:21:00 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.8 2004/10/30 20:43:56 bkorb Exp $
+# $Id: handler.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2004/10/30 20:43:57 bkorb Exp $
+## $Id: Makefile.am,v 4.1 2005/01/01 00:20:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.38 2004/12/31 23:56:27 bkorb Exp $
+ *  $Id: autogen.h,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  *  Global header file for AutoGen
  */
 

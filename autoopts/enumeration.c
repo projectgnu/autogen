@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.25 2004/10/02 21:40:56 bkorb Exp $
+ *  $Id: enumeration.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *

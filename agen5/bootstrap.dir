@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/11/21 21:31:25 $
+# Last Modified:     $Date: 2005/01/01 00:20:57 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.25 2004/11/21 21:31:25 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.1 2005/01/01 00:20:57 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.

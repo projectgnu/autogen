@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: defLoad.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.

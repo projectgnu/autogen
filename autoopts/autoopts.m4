@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.5 2003/08/21 02:06:09 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.1 2005/01/01 00:20:59 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:

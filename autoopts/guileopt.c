@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.10 2004/02/16 22:20:45 bkorb Exp $
+ *  $Id: guileopt.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */

@@ -5,10 +5,10 @@
 ## Time-stamp:      "2004-10-27 19:57:19 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2004/10/30 20:43:56 $
+## Last Modified:   $Date: 2005/01/01 00:21:00 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 4.1 2005/01/01 00:21:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)

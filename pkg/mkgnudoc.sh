@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Time-stamp: "2004-07-30 15:39:55 bkorb"
-# Version:    "$Revision: 3.10 $
+# Version:    "$Revision: 4.1 $
 
 MAKE=${MAKE:-make}
 

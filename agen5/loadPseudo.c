@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.21 2004/05/16 19:19:09 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */

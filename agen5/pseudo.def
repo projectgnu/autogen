@@ -7,7 +7,7 @@
  *  This defines the finite state transition table for parsing the
  *  pseudo-macro at the head of every template
  *
- *  $Id: pseudo.def,v 3.4 2004/02/16 22:20:45 bkorb Exp $
+ *  $Id: pseudo.def,v 4.1 2005/01/01 00:20:58 bkorb Exp $
  */
 AutoGen Definitions fsm;
 

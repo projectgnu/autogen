@@ -8,7 +8,7 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.31 2004/12/31 23:56:27 bkorb Exp $
+## $Id: Makefile.am,v 4.1 2005/01/01 00:20:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

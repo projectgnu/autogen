@@ -24,7 +24,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 3.3 2004/02/01 21:09:52 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>

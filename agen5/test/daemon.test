@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/11/02 04:03:59 $
+# Last Modified:     $Date: 2005/01/01 00:20:58 $
 #            by: bkorb
 #
-# $Id: daemon.test,v 3.2 2004/11/02 04:03:59 bkorb Exp $
+# $Id: daemon.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 tdir=$( (mktemp -d $PWD/.daemon-XXXXXX.d) 2>/dev/null)
