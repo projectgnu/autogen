@@ -7,7 +7,7 @@ case "${VERBOSE}" in
 esac
 export VERBOSE
 
-eval "`egrep ^AG_ ${top_srcdir}/VERSION`" > /dev/null
+eval "`egrep '^AG_' ${top_srcdir}/VERSION`" > /dev/null
 
 ## Set directories in case they are relative paths
 ##
