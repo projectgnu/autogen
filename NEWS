@@ -3,7 +3,7 @@ New in 5.6.5 - November, 2004
   consistent now.
 * Equivalencing stacked argument options no longer has magical properties.
   "unstack-arg" is now equivalent to that old behavior.
-* Equivalenced arguments may now be preset with rc/ini files and
+* Equivalenced options may now be preset with rc/ini files and
   environment variables.
 * ``autoopts-config ldflags'' will now emit the appropriate ``-R'' link option.
 

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-11-22 15:23:40 bkorb"
+## Time-stamp:      "2004-11-29 18:46:58 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.39 2004/11/22 23:45:16 bkorb Exp $
+## $Id: Makefile.am,v 3.40 2004/12/01 01:50:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -72,7 +72,7 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
 ## stamp-opts GEN-RULE
-stamp-opts: opts.def $(top_srcdir)/VERSION
+stamp-opts: opts.def $(top_srcdir)/VERSION $(CLexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-directive GEN-RULE
@@ -96,7 +96,7 @@ proto.h :
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-texi GEN-RULE
-stamp-texi : $(STAMPS) $(AGnam) $(CLexe) $(GDexe)
+stamp-texi : $(AGnam) $(CLexe) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-man GEN-RULE
