@@ -200,8 +200,8 @@ tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name)
     #  and conflicting or required options
     =][=
     CASE (get "flag_arg") =][=
-    ~~  ^(|:|=)$  =][= # No initial value   =][=
-    ~~* =[0-9]    =][= # Numeric init value =]
+    ~~  ^[:= ]{0,1}$ =][= # No initial value   =][=
+    ~~* =[0-9]       =][= # Numeric init value =]
 #define z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg" ))
          =]((tCC*)[=(shell (sprintf "echo %s | sed 's@^=@@'"
                          (get "flag_arg") ))=])[=
@@ -301,8 +301,8 @@ DEFINE Option_Descriptor =][=
      /* last opt argumnt */ (char*)[=
 
          CASE (get "flag_arg") =][=
-         ~~ ^(|:|=)$   =]NULL[=
-         *             =]z[=(. cap-name)=]DefaultArg[=
+         ~~ ^[:= ]{0,1}$ =]NULL[=
+         *               =]z[=(. cap-name)=]DefaultArg[=
          ESAC =],
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ [=
