@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.5 1999/10/31 19:14:30 bruce Exp $
+ *  $Id: funcFor.c,v 1.6 1999/10/31 23:16:02 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -389,35 +389,42 @@ doForEach( tTemplate*   pT,
  *  load_proc:
  *
  *  desc:
- *  The first argument must be the name of the block.
- *  The scope of the @code{FOR} function extends to a macro marker
- *  that contains a slash @code{/} and this block name, rather
- *  than any other macro function.
+ *  This macro has a slight variation on the standard syntax:
+ *  @example
+ *  FOR <value-name> [ <separator-string> ]
+ *  @end example
+ *  or
+ *  @example
+ *  FOR <value-name> (...Scheme expression list
+ *  @end example
  *
- *  If there are any further arguments, a single argument is interpreted as
- *  an iteration separator (text to be emitted between emitted copies of the
- *  text block).  If there are more arguments, they must be named arguments:
- *  @code{FROM}, @code{TO}, @code{BY} or @code{SEP}.
- *  @code{FROM}, @code{TO} and @code{BY} must be followed by a simple
- *  number or a single pair of parentheses containing an expression
- *  to be evaluated into a number.
+ *  The first argument must be the name of an AutoGen value.
+ *  If there is no value associated with the name,
+ *  the FOR loop block is skipped entirely.
+ *  The scope of the @code{FOR} function extends to the ENDFOR macro
+ *  that contains this name.
  *
- *  Each copy of a text block macro has an associated index number.  If the
- *  definition file specified the index values, the indexes may have gaps in
- *  the sequence.  @code{FROM}, @code{TO} and @code{BY} may be used to
- *  select specific sets of entries.  If @code{TO} is omitted, the default
- *  is to terminate the loop when the index goes outside of the valid range
- *  of indexes.  If @code{BY} is omitted, only extant index values will be
- *  iterated.  If @code{BY} is specified on a sparse block, the block will
- *  be emitted with the block values undefined, but @code{[#_eval _index#]}
- *  still showing the correct value.  If @code{FROM} is omitted, the first
- *  or last defined index value will be used (depending on the sign of
- *  @code{BY}).
+ *  If there are any further arguments, if the first character is either
+ *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
+ *  it is presumed to be a Scheme expression containing the FOR macro
+ *  specific functions @code{for-from}, @code{for-by}, @code{for-to},
+ *  and/or @code{for-sep}.  @xref{Scheme Functions}.  Otherwise, the
+ *  remaining text is presumed to be a string for inserting between
+ *  each iteration of the loop.  This string will be emitted one time
+ *  less than the number of iterations of the loop.  That is, it is
+ *  emitted after each loop, excepting for the last iteration.
+ *
+ *  If the from/by/to functions are invoked, they will specify which
+ *  copies of the named value are to be processed.  If there is no
+ *  copy of the named value associated with a particular index,
+ *  the template has methods for detecting missing definitions and
+ *  emitting default text.  In this fashion, you can insert entries
+ *  from a sparse or non-zero based array into a dense, zero based array.
  *
  *  @example
- *  [#FOR var FROM 0 TO (LIMIT _env) SEP "," #]
+ *  [#FOR var (for-from 0) (for-to <number>) (for-sep ",") #]
  *  ... text with @code{var}ious substitutions ...[#
- *  /var#]
+ *  ENDFOR var#]
  *  @end example
  *
  *  @noindent
@@ -427,9 +434,9 @@ doForEach( tTemplate*   pT,
  *  except for the last, will have a comma @code{,} after it.
  *
  *  @example
- *  [#FOR var "," #]
+ *  [#FOR var ",\n" #]
  *  ... text with @code{var}ious substitutions ...[#
- *  /var#]
+ *  ENDFOR var #]
  *  @end example
  *
  *  @noindent
@@ -438,8 +445,12 @@ doForEach( tTemplate*   pT,
 =*/
 /*=macfunc ENDFOR
  *
- *  what:   Terminates the FOR function template block
+ *  what:   Terminates the @code{FOR} function template block
  *  situational:
+ *
+ *  desc:
+ *    This macro ends the @code{FOR} function template block.
+ *    For a complete description @xref{FOR}.
 =*/
 MAKE_HANDLER_PROC( For )
 {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.5 1999/10/28 04:31:28 bruce Exp $
+ *  $Id: functions.c,v 1.7 1999/10/31 23:19:21 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -87,8 +87,8 @@ MAKE_HANDLER_PROC( Error )
  *  arguments are eval-ed, so you may compute the name of the file to
  *  be included.  The included file must not contain any incomplete
  *  function blocks.  Function blocks are template text beginning with
- *  any of the macro functions @samp{_IF}, @samp{_FOR} and
- *  @samp{_CASE} and extending through the respective terminating
+ *  any of the macro functions @samp{IF}, @samp{FOR}, @samp{WHILE}, and
+ *  @samp{CASE} and extending through the respective terminating
  *  macro functions.
 =*/
 MAKE_HANDLER_PROC( Include )
@@ -137,6 +137,8 @@ MAKE_HANDLER_PROC( Include )
  *  If it is not, then it is a conditional expression that is
  *  evaluated only if the name is defined at the time the macro
  *  is invoked.
+ *
+ *  You may not specify @code{UNKNOWN} specifically.
 =*/
 MAKE_HANDLER_PROC( Unknown )
 {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.7 1999/10/31 22:37:57 bruce Exp $
+ *  $Id: funcEval.c,v 1.8 1999/10/31 23:13:13 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -305,6 +305,7 @@ eval( const char* pzExpr )
  *   [[ <apply-code> ] <value-name> ] [ <expression-1> [ <expression-2> ]]
  *   @end example
  *
+ *   @noindent
  *   the result of the evaluation will depend on what apply code
  *   has been provided, whether or not there is an associated value
  *   for the value name, and whether or not expressions are specified.
