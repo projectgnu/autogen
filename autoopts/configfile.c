@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.12 2005/02/22 02:42:55 bkorb Exp $
- *  Time-stamp:      "2005-02-21 18:32:50 bkorb"
+ *  $Id: configfile.c,v 4.13 2005/02/23 00:09:53 bkorb Exp $
+ *  Time-stamp:      "2005-02-22 08:10:17 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -82,13 +82,6 @@ handleStructure(
     tOptState*    pOS,
     char*         pzText,
     int           direction );
-
-static char*
-parseAttributes(
-    tOptions*           pOpts,
-    char*               pzText,
-    tOptionLoadMode*    pMode,
-    tOptionValue*       pType );
 
 static char*
 parseKeyWordType(
@@ -1038,5 +1031,3 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/configfile.c */
-
-

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.3 2005/02/22 02:42:55 bkorb Exp $
- *  Time-stamp:      "2005-02-21 18:34:28 bkorb"
+ *  $Id: nested.c,v 4.4 2005/02/23 00:09:53 bkorb Exp $
+ *  Time-stamp:      "2005-02-22 12:27:43 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -49,7 +49,34 @@
  * If you do not wish that, delete this exception notice.
  */
 /* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+removeBackslashes( char* pzSrc );
 
+static const char*
+scanQuotedString( const char* pzTxt );
+
+static tNameValue*
+addStringValue( void** pp, const char* pzName, size_t nameLen,
+                const char* pzValue, size_t dataLen );
+
+static tNameValue*
+addBoolValue( void** pp, const char* pzName, size_t nameLen,
+                const char* pzValue, size_t dataLen );
+
+static tNameValue*
+addNumberValue( void** pp, const char* pzName, size_t nameLen,
+                const char* pzValue, size_t dataLen );
+
+static tNameValue*
+addNestedValue( void** pp, const char* pzName, size_t nameLen,
+                char* pzValue, size_t dataLen, tOptionLoadMode mode );
+
+static const char*
+scanNameEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode );
+
+static const char*
+scanXmlEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*  removeBackslashes
@@ -346,11 +373,13 @@ scanNameEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode )
     return pzScan;
 }
 
+
 /*  scanXmlEntry
  *
- *
+ *  We've found a '<' character.  We ignore this if it is a comment or a
+ *  directive.  If it is something else, then whatever it is we are looking
+ *  at is bogus.  Returning NULL stops processing.
  */
-
 static const char*
 scanXmlEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode )
 {
@@ -359,8 +388,26 @@ scanXmlEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode )
     const char* pzVal;
     tOptionValue    valu;
 
-    if (! isalpha(*pzName))
-        return NULL;
+    if (! isalpha(*pzName)) {
+        switch (*pzName) {
+        default:
+            pzName = NULL;
+            break;
+
+        case '!':
+            pzName = strstr( pzName, "-->" );
+            if (pzName != NULL)
+                pzName += 3;
+            break;
+
+        case '?':
+            pzName = strchr( pzName, '>' );
+            if (pzName != NULL)
+                pzName++;
+            break;
+        }
+        return pzName;
+    }
 
     while (isalpha( *++pzScan ))  nameLen++;
     if (nameLen > 64)
@@ -449,6 +496,46 @@ scanXmlEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode )
     }
 
     return pzScan;
+}
+
+
+static void
+unloadNestedArglist( tArgList* pAL )
+{
+    int ct = pAL->useCt;
+    tNameValue** ppNV = (tNameValue**)(pAL->apzArgs);
+
+    while (ct-- > 0) {
+        tNameValue* pNV = *(ppNV++);
+        if (pNV->val.valType == OPARG_TYPE_HIERARCHY)
+            unloadNestedArglist( pNV->val.v.nestVal );
+        free( pNV );
+    }
+
+    free( (void*)pAL );
+}
+
+
+/*=export_func  optionUnloadNested
+ *
+ * what:  Deallocate the memory for a nested value
+ * arg:   + const tOptionValue* + pOptVal + the hierarchical value +
+ *
+ * doc:
+ *  A nested value needs to be deallocated.
+=*/
+void
+optionUnloadNested( const tOptionValue* pOV )
+{
+    if (pOV == NULL) return;
+    if (pOV->valType != OPARG_TYPE_HIERARCHY) {
+        errno = EINVAL;
+        return;
+    }
+
+    unloadNestedArglist( pOV->v.nestVal );
+
+    free( (void*)pOV );
 }
 
 

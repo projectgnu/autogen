@@ -1,6 +1,6 @@
 #! /bin/sh
-# Time-stamp:      "2005-02-14 08:24:09 bkorb"
-# $Id: bootstrap.dir,v 4.4 2005/02/14 16:25:37 bkorb Exp $
+# Time-stamp:      "2005-02-22 08:35:53 bkorb"
+# $Id: bootstrap.dir,v 4.5 2005/02/23 00:09:53 bkorb Exp $
 #
 AGexe=${AGexe-autogen}
 noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
@@ -22,6 +22,6 @@ case "$1" in
 * )
   #  This is likely a bootstrap.
   #
-  :mkfwd -p `egrep -l '^LOCAL ' *.c`
+  :mkfwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c`
   ;;
 esac
