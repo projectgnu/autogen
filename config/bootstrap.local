@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/01/12 05:10:01 $
+# Last Modified:     $Date: 2002/01/25 02:25:03 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.2 2002/01/12 05:10:01 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.3 2002/01/25 02:25:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -111,7 +111,7 @@ pre )
       columns --version  && \
       getdefs --version ) > /dev/null 2>&1 || exit 1
 
-    ( cd ${srcdir}/config; set -x ; ${AUTOGEN} misc.def; ) || exit 1
+    ( cd ${srcdir}/config; set -x ; ${AUTOGEN} -L. misc.def; ) || exit 1
 
     byacc=`locate_exe byacc`
     if [ -z "$byacc" ]

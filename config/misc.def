@@ -1,17 +1,17 @@
 
-autogen definitions config.tpl;
+autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2001/12/24 14:59:22 $
+ *  Last Modified:     $Date: 2002/01/25 02:25:03 $
  *             by:     Bruce Korb <bkorb@gnu.org>
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.2 2001/12/24 14:59:22 bkorb Exp $
+ *  $Id: misc.def,v 3.3 2002/01/25 02:25:03 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.2 $";
+version = "$Revision: 3.3 $";
 
 test = {
     name   = allocated_ctime;
