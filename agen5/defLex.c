@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: defLex.c,v 1.2 1999/11/16 06:22:09 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -62,6 +62,8 @@ int    aKeywordTkn[] = { KEYWORD_TABLE };
 
 STATIC char* assembleString( char* );
 STATIC char* assembleName( char*, YYSTYPE* );
+STATIC void  loadSchemeString( void );
+STATIC void  loadSchemeText( void );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -141,8 +143,15 @@ scanAgain:
         goto scanAgain;
     }
 
-    case '=':
     case '{':
+        if (pCurCtx->pzScan[1] == '(') {
+            lastToken = '{';
+            loadSchemeText();
+            break;
+        }
+        /* FALLTHROUGH */
+
+    case '=':
     case '}':
     case '[':
     case ']':
@@ -176,68 +185,8 @@ scanAgain:
     }
 
     case '(':
-    {
-        char* pzRes = pCurCtx->pzScan;
-        char* pzEnd = (char*)skipScheme( pzRes, pzRes + strlen( pzRes ));
-        char  endCh = *pzEnd;
-        int   expLen;
-        SCM   str;
-
-        /*
-         *  NUL terminate the Scheme expression, run it, then restore
-         *  the NUL-ed character.
-         */
-        *pzEnd = NUL;
-        procState = PROC_STATE_GUILE_PRELOAD;
-        str = gh_eval_str( pzRes );
-        procState = PROC_STATE_LOAD_DEFS;
-        expLen = pzEnd - pzRes;
-        pCurCtx->pzScan = pzEnd;
-        *pzEnd = endCh;
-
-        /*
-         *  IF we have a string result, then try to overwrite the
-         *  original expression with the result of the expression.
-         *  Resort to allocation if the result is larger, however.
-         */
-        if (gh_string_p( str )) {
-            pzEnd = SCM_CHARS( str );
-            if (strlen( pzEnd ) < expLen)
-                strcpy( pzRes, pzEnd );
-            else {
-                pzRes = strdup( pzEnd );
-            }
-        }
-
-        /*
-         *  IF the result is a character, then it is certain to fit.
-         */
-        else if (gh_char_p( str )) {
-            pzRes[0] = gh_scm2char( str );
-            pzRes[1] = NUL;
-        }
-
-        /*
-         *  IF the result is a number, it might fit.  Pick a size that
-         *  is sure to accommodate the formatted number.
-         */
-        else if (gh_number_p( str )) {
-            if (expLen > 16)
-                sprintf( pzRes, "%ld", gh_scm2long( str ));
-            else
-                pzRes = asprintf( "%ld", gh_scm2long( str ));
-        }
-
-        /*
-         *  OTHERWISE, the empty string.
-         */
-        else
-            *pzRes = NUL;
-
-        lastToken = TK_STRING;
-        yylval = (YYSTYPE)pzRes;
+        loadSchemeString();
         break;
-    }
 
     case '`':
     {
@@ -371,6 +320,164 @@ yyerror( char* s )
 
     fprintf( stderr, "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
     AG_ABEND;
+}
+
+
+    STATIC SCM
+loadScheme( void )
+{
+    char* pzText = pCurCtx->pzScan;
+    char* pzEnd  = (char*)skipScheme( pzText, pzText + strlen( pzText ));
+    char  endCh  = *pzEnd;
+    SCM   str;
+
+    /*
+     *  NUL terminate the Scheme expression, run it, then restore
+     *  the NUL-ed character.
+     */
+    *pzEnd = NUL;
+    procState = PROC_STATE_GUILE_PRELOAD;
+    str = gh_eval_str( pzText );
+    procState = PROC_STATE_LOAD_DEFS;
+    pCurCtx->pzScan = pzEnd;
+    *pzEnd = endCh;
+
+    return str;
+}
+
+
+/*
+ *  process a single scheme expression, yielding a string value
+ *  for one of the definitions.
+ */
+    STATIC void
+loadSchemeString( void )
+{
+    char*  pzRes    = pCurCtx->pzScan;
+    SCM    str      = loadScheme();
+    size_t exprSize = pCurCtx->pzScan - pzRes;
+
+    /*
+     *  IF we have a string result, then try to overwrite the
+     *  original expression with the result of the expression.
+     *  Resort to allocation if the result is larger, however.
+     */
+    if (gh_string_p( str )) {
+        if (exprSize < exprSize)
+            strcpy( pzRes, SCM_CHARS( str ));
+        else {
+            pzRes = strdup( SCM_CHARS( str ));
+        }
+    }
+
+    /*
+     *  IF the result is a character, then it is certain to fit.
+     */
+    else if (gh_char_p( str )) {
+        pzRes[0] = gh_scm2char( str );
+        pzRes[1] = NUL;
+    }
+
+    /*
+     *  IF the result is a number, it might fit.  Pick a size that
+     *  is sure to accommodate the formatted number.
+     */
+    else if (gh_number_p( str )) {
+        if (exprSize > 16)
+            sprintf( pzRes, "%ld", gh_scm2long( str ));
+        else
+            pzRes = asprintf( "%ld", gh_scm2long( str ));
+    }
+
+    /*
+     *  OTHERWISE, the empty string.
+     */
+    else
+        *pzRes = NUL;
+
+    lastToken = TK_STRING;
+    yylval = (YYSTYPE)pzRes;
+}
+
+
+/*
+ *  process a single scheme expression, yielding text that gets processed
+ *  into AutoGen definitions.
+ */
+    STATIC void
+loadSchemeText( void )
+{
+    tSCC   zSchemeText[] = "Computed Definitions";
+    char*  pzStart;
+    SCM    res;
+    tScanCtx*  pCtx;
+
+    *(pCurCtx->pzScan++) = NUL;
+    pzStart = pCurCtx->pzScan;
+
+    {
+        /*
+         *  Find the end of the scheme expression
+         */
+        char*  pzEnd = (char*)skipScheme( pzStart, pzStart + strlen( pzStart ));
+        char   endCh = *pzEnd;
+        char*  pz;
+        *pzEnd  = NUL;
+        /*
+         *  Formulate the function that yields the definitions
+         */
+        pz = asprintf( "(AutoGen-define-list %s )", pzStart );
+        *pzEnd = endCh;
+        /*
+         *  Evaluate the function, free the temporary function buffer
+         *  and set the resumption point to after the Scheme expression.
+         */
+        res = gh_eval_str( pz );
+        free( pz );
+        pCurCtx->pzScan = pzEnd;
+    }
+
+    /*
+     *  The result *must* be a string, or we choke.
+     */
+    if (! gh_string_p( res )) {
+        tSCC zEr[] = "Error:  Scheme expression does not yield string:\n"
+            "\tin %s on line %d\n\t%s\n";
+        fprintf( stderr, zEr, pCurCtx->pzFileName, pCurCtx->lineNo, pzStart );
+        exit( EXIT_FAILURE );
+    }
+
+    /*
+     *  Now, push the resulting string onto the input stack.
+     */
+    pzStart = SCM_CHARS( res );
+    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + strlen( pzStart ));
+    if (pCtx == (tScanCtx*)NULL) {
+        fprintf( stderr, zAllocErr, pzProg,
+                 sizeof( tScanCtx ), "scheme expression" );
+        AG_ABEND;
+    }
+
+    /*
+     *  Link the new scan data into the context stack
+     */
+    pCtx->pCtx  = pCurCtx;
+    pCurCtx     = pCtx;
+
+    /*
+     *  Set up the rest of the context structure
+     */
+    AGDUPSTR( pCtx->pzFileName, zSchemeText );
+    pCtx->pzScan = \
+    pCtx->pzData = (char*)(pCtx+1);
+    pCtx->lineNo = 0;
+    strcpy( pCtx->pzScan, pzStart );
+    /*
+     *  At this point, the next token will be obtained
+     *  from the newly allocated context structure.
+     *  When empty, input will resume from the '}' that we
+     *  left as the next input token in the old context.
+     */
 }
 
 
