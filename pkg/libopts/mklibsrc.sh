@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2003-02-15 14:51:21 bkorb"
+## Time-stamp:      "2003-02-16 12:04:46 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.18 2003/02/16 00:04:40 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.19 2003/02/16 22:52:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -107,17 +107,16 @@ cat >> libopts.m4 <<-	EOMacro
 	  then
 	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
 	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
-	    LIBOPTS_DIR=''
+	    NEED_LIBOPTS_DIR=''
 	  else
 	    LIBOPTS_LDADD='\$(top_builddir)/libopts/libopts.la'
 	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/libopts'
 	    INVOKE_LIBOPTS_MACROS
-	    LIBOPTS_DIR=true
+	    NEED_LIBOPTS_DIR=true
 	  fi
-	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${LIBOPTS_DIR}"])
+	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${NEED_LIBOPTS_DIR}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
-	  AC_SUBST(LIBOPTS_DIR)
 	  AC_CONFIG_FILES([libopts/Makefile])
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
@@ -143,9 +142,13 @@ ls -1 *.[ch] | \
 
 exec 3>&-
 
-echo "LIBOPTS_REDIST = libopts/Makefile.in \\" > MakeDefs.inc
-ls -1 | \
-    ${cols} -f'libopts/%s' --line-sep="  \\" >> MakeDefs.inc
+cat > MakeDefs.inc <<- EODefs
+	if NEED_LIBOPTS
+	LIBOPTS_DIR = libopts
+	else
+	LIBOPTS_DIR =
+	endif
+	EODefs
 
 if gzip --version > /dev/null 2>&1
 then
