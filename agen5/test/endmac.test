@@ -9,39 +9,47 @@
 # Last Modified:     Fri Oct  1 11:17:56 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: endmac.test,v 1.2 1999/10/28 03:36:28 bruce Exp $
+# $Id: endmac.test,v 1.3 1999/11/06 04:31:41 bruce Exp $
 # ----------------------------------------------------------------------
 
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
 
 cat > $testname.tpl <<EOF
-<=autogen template test=>>
+<=AutoGen5 template test=>>
 <=`pwd`=>>
 <=# comment this test fails because the '=' is bound to 'test' >>
 This is a test
 EOF
 
-$AUTOGEN -T$testname --no-def 2> /dev/null && exit 1
+$AGEN -T$testname --no-def 2> /dev/null && exit 1
 echo failure $testname test succeeded
 
 cat > $testname.tpl <<EOF
-<=autogen template test =>>
+<=AutoGen5 template test =>>
 <=`echo print this message` =>>
 <=# comment This test succeeds because the '=' is not part of 'test' =>>
 This is a test
 EOF
 
-$AUTOGEN -T$testname --no-def || exit 1
+$AGEN -T$testname --no-def || exit 1
 echo first successful $testname test succeeded
 
 cat > $testname.tpl <<EOF
-<+autogen template test+>>
+<+AutoGen5 template test+>>
 <+(define foo "print this message")  (. foo) +>>
 <+# comment The '+' is not joined because it is neither '=' nor
             a legal file name character +>>
 This is a test
 EOF
 
-$AUTOGEN -T$testname --no-def || exit 1
+$AGEN -T$testname --no-def || exit 1
 echo second successful $testname test succeeded
 
 # end of endmac.test
