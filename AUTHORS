@@ -14,8 +14,8 @@ Gary V. Vaughan:
 changes throughout to aid portability of C code.
 wrote the autoconf files, Makefile.am and configure.in.
 in the directory config; ctime.m4, make.m4 and release.
-in the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
-sigsend.c, libgen.h
+in the directory compat; basename.c, dirname.c, compat.h,
+    pathfind.c, libgen.h
 in the directory tests; almost *.test
 snprintfv/*
 

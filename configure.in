@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <bkorb@gnu.org>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.34 2000/04/04 13:20:47 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.35 2000/06/22 16:32:47 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.34 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.35 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -152,7 +152,7 @@ AC_CHECK_SIZEOF(int, 4)
 # ----------------------------------------------------------------------
 # Checks for standard functions.
 # ----------------------------------------------------------------------
-AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend psignal pathfind)
+AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal psignal pathfind)
 AG_FUNC_FOPEN_BINARY
 AG_FUNC_FOPEN_TEXT
 AG_CHECK_ALLOCATED_CTIME

@@ -10,12 +10,12 @@
 ## Last Modified:    Thu Jul 29 08:30:10 1999				      
 ##            by:    Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.9 2000/04/04 13:22:36 bkorb Exp $
+## $Id: Makefile.am,v 2.10 2000/06/22 16:32:47 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 EXTRA_DIST	= bootstrap.dir compat.h gnu-regex.c gnu-regex.h \
-		libgen.h ndir.h pathfind.c sigsend.c strftime.c \
+		libgen.h ndir.h pathfind.c strftime.c \
 		strsignal.c strsignal.def strsignal.h strsignal.tpl
 
 GEN_SRC    = strsignal.h

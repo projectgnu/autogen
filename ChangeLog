@@ -2,6 +2,10 @@
 
 	* agen5/expString.c( makeString ): Place contiguous newline
 	representations on a single line
+	* AUTHORS: removed reference to sigsend.c
+	* configure.in: removed reference to sigsend.c
+	* compat/Makefile.am: removed reference to sigsend.c
+	* compat/sigsend.c: removed
 
 2000-06-21  Bruce Korb  <bkorb@gnu.org>
 
