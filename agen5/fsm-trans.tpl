@@ -8,7 +8,7 @@
 
 DEFINE state-table  =]
 
-  /* STATE:  [= state =] */
+  /* STATE [= (get "st_ix") =]:  [= state =] */
   { [=
   (shellf "state=%s" (string-upcase! (get "state"))) =][=
 
@@ -21,7 +21,10 @@ DEFINE state-table  =]
                            (get "event")  ))
     (sprintf "%-47s /* EVT:  %s */" fmt event-string ) =][=
 
-  ENDFOR     =] }[=
+  ENDFOR
+
+=]
+  }[=
 ENDDEF       =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
@@ -74,10 +77,11 @@ extern int
 [=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
   state-table
-    state = init =][=
+    state = init
+    st_ix = "0"  =][=
 
   FOR state      =],
-[=  state-table  =][=
+[=  state-table  st_ix = (+ 1 (for-index)) =][=
   ENDFOR         =]
 };[=
 

@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Saturday January 17, 2004 at 10:52:57 AM PST
+ *  It has been AutoGen-ed  Sunday January 18, 2004 at 09:22:32 AM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -102,7 +102,7 @@ struct transition {
 static const t_dp_transition
 dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
 
-  /* STATE:  init */
+  /* STATE :  init */
   { { DP_ST_NEED_DEF, NULL },                       /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -116,9 +116,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_def */
+  /* STATE :  need_def */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_NEED_TPL, NULL },                       /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -132,9 +133,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_tpl */
+  /* STATE :  need_tpl */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -148,9 +150,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_semi */
+  /* STATE :  need_semi */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -164,9 +167,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_name */
+  /* STATE :  need_name */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_DONE, &dp_do_need_name_end },           /* EVT:  End-Of-File */
@@ -180,9 +184,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_HAVE_VALUE, &dp_do_end_block },         /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  have_name */
+  /* STATE :  have_name */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -196,9 +201,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_NEED_IDX, NULL },                       /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_value */
+  /* STATE :  need_value */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -212,9 +218,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_NEED_NAME, &dp_do_start_block },        /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_idx */
+  /* STATE :  need_idx */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -228,9 +235,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  need_cbkt */
+  /* STATE :  need_cbkt */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -244,9 +252,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INDX_NAME, NULL }                       /* EVT:  ] */ },
+    { DP_ST_INDX_NAME, NULL }                       /* EVT:  ] */
+  },
 
-  /* STATE:  indx_name */
+  /* STATE :  indx_name */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -260,9 +269,10 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  },
 
-  /* STATE:  have_value */
+  /* STATE :  have_value */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -276,7 +286,8 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
-    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ }
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
+  }
 };
 
 
@@ -363,10 +374,9 @@ dp_do_empty_val(
      *  end of statement.  It is a string value with an empty string.
      */
     tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    if (pCurrentEntry != NULL)
-        addSibMacro( pDE, pCurrentEntry );
-    pCurrentEntry = pDE;
-    makeMacro( pCurrentEntry, "", VALTYP_TEXT );
+    pCurrentEntry  = addSibMacro( pDE, pCurrentEntry );
+    pDE->pzValue = zNil;
+    pDE->valType = VALTYP_TEXT;
     return maybe_next;
 /*  END   == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
 }
@@ -418,9 +428,7 @@ dp_do_indexed_name(
      *  until we have the assigned value.
      */
     tDefEntry* pDE = findPlace( pz_new_name, pz_token );
-    if (pCurrentEntry != NULL)
-        addSibMacro( pDE, pCurrentEntry );
-    pCurrentEntry = pDE;
+    pCurrentEntry = addSibMacro( pDE, pCurrentEntry );
     return maybe_next;
 /*  END   == INDEXED NAME == DO NOT CHANGE THIS COMMENT  */
 }
@@ -503,7 +511,7 @@ dp_do_start_block(
         }
         ppDefStack = ppDE;
     }
-    makeMacro( pCurrentEntry, NULL, VALTYP_BLOCK );
+    pCurrentEntry->valType = VALTYP_BLOCK;
     ppDefStack[ stackDepth-1 ] = pCurrentEntry;
     return maybe_next;
 /*  END   == START BLOCK == DO NOT CHANGE THIS COMMENT  */
@@ -519,7 +527,8 @@ dp_do_str_value(
     if (pCurrentEntry->valType == VALTYP_BLOCK)
         yyerror( "assigning a block value to text name" );
 
-    makeMacro( pCurrentEntry, pz_token, VALTYP_TEXT );
+    pCurrentEntry->pzValue = pz_token;
+    pCurrentEntry->valType = VALTYP_TEXT;
     return maybe_next;
 /*  END   == STR VALUE == DO NOT CHANGE THIS COMMENT  */
 }
