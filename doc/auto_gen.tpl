@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul 29 12:18:32 1999                                
+## Last Modified:     Thu Jul 29 13:53:30 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.23 1999/07/29 19:18:33 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.24 1999/07/29 20:54:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -67,10 +67,10 @@ notice identical to this one except for the removal of this paragraph
 @titlepage
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
-@author Bruce Korb
+@author Bruce Korb (AutoGen, AutoOpts)
 @author @email{autogen@@linuxbox.com}
 
-@author Gary V. Vaughan
+@author Gary V. Vaughan (snprintfv)
 @author @email{gary@@oranda.demon.co.uk}
 
 @page
