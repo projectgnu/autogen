@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Thu Jan 21 15:28:48 1999
+dnl Last Modified:    Tue Mar 16 07:39:41 1999
 dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.6 1999/01/26 15:41:40 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.7 1999/03/16 15:49:18 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.6 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.7 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -47,8 +47,7 @@ unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
 AC_PROG_CC
-ifdef([AC_EXEEXT],[AC_EXEEXT],[AC_CYGWIN32])
-###ifdef([AC_PROG_INSTALL],[AC_PROG_INSTALL],[AM_PROG_INSTALL])
+AC_EXEEXT
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 AC_PROG_YACC
@@ -123,6 +122,7 @@ AC_TYPE_SIGNAL
 AC_CHECK_TYPE(u_short, unsigned short int)
 AC_CHECK_TYPE(u_int, unsigned int)
 AC_CHECK_TYPE(u_long, unsigned long int)
+AC_CHECK_TYPE(id_t, int)
 # AC_CHECK_TYPE(wchar_t, unsigned in)
 AC_C_CONST
 AC_C_INLINE

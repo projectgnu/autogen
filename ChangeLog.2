@@ -1,3 +1,15 @@
+1999-03-15  Gary V. Vaughan  <gvaughan@pranda.demon.co.uk>
+
+       * configure.in: Use fixed autoconf-2.13 id_t type relplacement.
+       Removed conditional macros which break under automake-1.4:
+       unfortunately AutoGen now *requires* automake-1.4 and autoconf-2.13.
+       * src/proto.h (strdup):  Bogus prototype removed.  A harmless warning
+       about mismatched types will be seen on machines which don't
+       prototype strdup in strings.h, but trying to second guess how strdup
+       is prototyped in the system headers was bound to fail on some targets.
+       * compat/sigsend.c (id_t): configury will typedef this for us if
+       it is missing from the system headers.
+
 1998-12-01  Bruce Korb  <korb@datadesign.com>
 
 	* src/agGetDef.c (findDefEntry): split the routine
