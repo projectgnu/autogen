@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.3 2002/04/04 06:44:26 bkorb Exp $
+# $Id: optmain.tpl,v 3.4 2002/07/11 00:26:01 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -65,7 +65,7 @@ inner_main( argc, argv )
   ENDIF =]
 }
 
-    int
+int
 #ifdef __cplusplus
 main( int    argc,
       char** argv )
@@ -98,7 +98,7 @@ DEFINE build-test-main
 =]
 #if defined( TEST_[= (. pname-up) =]_OPTS )
 
-    int
+int
 main( int argc, char** argv )
 {[=
 
@@ -115,15 +115,25 @@ main( int argc, char** argv )
     (void)optionProcess( &genshelloptOptions, argc, argv );
     putShellParse( &[=prog_name=]Options );[=
 
+  ELIF
+      ;;  Also check to see if the user supplies all the code for main()
+      (exist? "main-text") =]
+[= main-text =][=
+
   ELSE=]
     (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
-    IF (> (string-length (get "test_main")) 3) =]
+
+    IF  ;;  the user is specifying a routine to call, then call that procedure
+
+        (> (string-length (get "test_main")) 3) =]
 
     {
         void [=test_main=]( tOptions* );
         [=test_main=]( &[=prog_name=]Options );
-    }
-[=  ELSE=]
+    }[=
+
+   ELSE  Call our library procedure for emitting shell results
+    =]
     putBourneShell( &[=prog_name=]Options );[=
 
     ENDIF =][=

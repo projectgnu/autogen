@@ -1,3 +1,9 @@
+2002-07-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optmain.tpl(main): allow clients to specify the contents
+	of the main procedure.
+	* doc/autogen.texi(main-text): doc it
+
 2002-07-08  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(doImmediateOpts): put the version into the

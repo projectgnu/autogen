@@ -2,6 +2,8 @@
 
 autogen definitions options;
 
+#option templ-dir  $top_srcdir/autoopts
+
 export = "
 \#include <stdio.h>
 \#include <unistd.h>
@@ -35,7 +37,7 @@ FLAG_CODE_END ;
 };
 
 #define XML2AG
-
+#option templ-dir  $top_srcdir/agen5
 #include opts.def
 
 explain = <<-  END_EXPLAIN

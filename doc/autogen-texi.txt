@@ -2405,6 +2405,19 @@ One of the options may be specified as the default
 (as long as it has a required option argument).
 @end itemize
 
+@cindex main-text
+@item main-text
+If you need to specify the content of the main procedure generated
+for the "option testing" program, you can do that with this attribute.
+The result will be a procedure that looks like this:
+
+@example
+int main( int argc, char** argv ) @{
+[+  main-text  +]
+    return EXIT_SUCCESS;
+@}
+@end example
+
 @cindex prefix
 @item prefix
 This value is inserted into @strong{all} global names.  This will
