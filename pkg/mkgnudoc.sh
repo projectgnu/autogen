@@ -1,14 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2002-02-05 08:28:29 bkorb"
-# Version:    "$Revision: 3.3 $
-
-d=`dirname $0`
-[ -f ${d}/mkgnudoc.sh ] || {
-  echo cannot find home directory for $0 >&2
-  exit 1
-}
-cd ${d}
+# Time-stamp: "2002-08-09 20:00:19 bkorb"
+# Version:    "$Revision: 3.4 $
 
 eval "`egrep '^AG_' ../VERSION`"
 [ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
