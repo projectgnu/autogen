@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/03/29 02:22:17 $
+## Last Modified:   $Date: 2002/04/01 03:19:42 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/03/29 02:22:17 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/04/01 03:19:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -19,20 +19,19 @@ SUBDIRS		= @OPTS_TESTDIR@
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = @INCLIST@ $(GUILE_INC)
+man_MANS        = autoopts-config.1
 
 pkgdata_DATA	= \
         aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \
         optlib.tpl    optmain.tpl   stdoptions.def
 
 GENSRC		= genshell.c genshell.h
-EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING \
+EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING $(man_MANS) \
 	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
-
 lib_LTLIBRARIES = libopts.la libguileopts.la
-CFLAGS = -DREGEX_HEADER='@AG_REGEX_HEADER@'
 
 ##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
 ##  It is compiled as a part of the makeshell module.

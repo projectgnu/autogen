@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.12 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: autogen.c,v 3.13 2002/04/01 03:19:42 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -321,29 +321,47 @@ signalSetup( void )
              *  to be able to use wait(2) calls.  At the same time, we don't
              *  want our children to become zombies.  We may run out of zombie
              *  space.  Therefore, set the handler to an empty procedure.
-             *  POSIX oversight.  Fixed for next POSIX rev.
+             *  POSIX oversight.  Allowed to be fixed for next POSIX rev, tho
+             *  it is "optional" to reset SIGCHLD on exec(2).
              */
+#ifndef SIGCHLD
+#  define SIGCHLD SIGCLD
+#endif
         case SIGCHLD:
             sa.sa_handler = ignoreSignal;
             break;
 
+            /*
+             *  Signals we must leave alone.
+             */
+        case SIGKILL:
+        case SIGSTOP:
+            continue;
+
+            /*
+             *  Signals to ignore with SIG_IGN.
+             */
+        case 0: /* cannot happen, but the following might not be defined */
 #ifdef SIGWINCH
         case SIGWINCH:
 #endif
-        case SIGSTOP:  /* suspended */
 #ifdef SIGTSTP
-        case SIGTSTP:  /* suspended */
+        case SIGTSTP:  /* suspended  */
 #endif
-            continue;
+#ifdef SIGTTIN
+        case SIGTTIN:  /* tty input  */
+#endif
+#ifdef SIGTTOU
+        case SIGTTOU:  /* tty output */
+#endif
+            sa.sa_handler = SIG_IGN;
+            break;
 
         default:
             sa.sa_handler = abendSignal;
         }
         sigaction( sigNo,  &sa, NULL );
     } while (++sigNo < NSIG);
-
-    sa.sa_handler = ignoreSignal;
-    sigaction( SIGCHLD,  &sa, NULL );
 }
 /*
  * Local Variables:

@@ -1,3 +1,8 @@
+2002-03-29  Alexandre Duret-Lutz
+
+	* agen5/autogen.c (signalSetup): Don't set the SIGCHLD handler twice.
+	Don't try to catch SIGKILL, either.
+
 2002-03-28  Bruce Korb  <bkorb@gnu.org>
 
 	* all over:  update copyright dates
@@ -7,6 +12,9 @@
 	(posix_regex): improve the testing and accommodate pedantic regcomp's.
 	* doc/autogen.texi: doc the 'AutoGen as a CGI server' as part of the
 	'Configuring and Installing' chapter.
+	* */Makefile.am: remove -DREGEX_HEADER as it is now in config.h
+	* autoopts/autoopts-config.1: new man page for config script
+	* autoopts/Makefile.am(autoopts-config.1): distribute the page
 
 2002-03-22  Bruce Korb  <bkorb@gnu.org>
 

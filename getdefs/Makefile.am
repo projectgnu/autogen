@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/03/19 04:11:41 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/04/01 03:19:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs
@@ -25,7 +25,6 @@ getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la @AG_REGEX_LIB@
 man_MANS        = getdefs.1
 
 getdefs_LDFLAGS = -static
-getdefs_CFLAGS  = -DREGEX_HEADER='@AG_REGEX_HEADER@'
 
 INCLUDES        = @INCLIST@
 
