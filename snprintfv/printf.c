@@ -139,7 +139,8 @@ spec_lookup (spec)
  * register_printf_function: printf.h
  * @spec: the character which will trigger @func, cast to an unsigned int.
  * @fmt: the handler function to actually print the arguments to the specifier
- * @arg: the handler function to tell %printf about the types of the arguments to the specifier
+ * @arg: the handler function to tell %printf about the types of the arguments
+ *       to the specifier
  * 
  * Register the pair made of @fmt and @arg, so that it is called
  * when @spec is encountered in a format string.
@@ -178,9 +179,9 @@ call_argtype_function (pinfo, argtypes, spec)
      spec_entry *spec;
 {
   int n;
-  int argindex = pinfo->dollar && !spec->modifier_char
-	 ? pinfo->dollar - 1
-	 : pinfo->argindex;
+  int argindex = (pinfo->dollar && !spec->modifier_char)
+         ? pinfo->dollar - 1
+         : pinfo->argindex;
 
   int save_state = pinfo->state;
   char const *save_format = pinfo->format;
@@ -189,14 +190,26 @@ call_argtype_function (pinfo, argtypes, spec)
     {
       n = 1;
       if (pinfo->argc <= argindex)
-	{
+        {
+          /*
+           *  "argtypes" points to a pointer of an array of int values.
+           *  Here, we ensure that there are "argindex + 1" entries in
+           *  that array.
+           */
           *argtypes = snv_renew (int, *argtypes, argindex + 1);
+
+          /*
+           *  IF there are more entries that follow the current argument
+           *  index, then we will clobber all the entries that follow.
+           *  The size of these entries is the size of the array elements,
+           *  not the size of the pointer to the array elements.
+           */
           if (pinfo->argc < argindex)
             memset(*argtypes + pinfo->argc, PA_UNKNOWN,
-                   (argindex - pinfo->argc) * sizeof(*argtypes));
+                   (argindex - pinfo->argc) * sizeof(**argtypes));
 
           pinfo->argc = argindex + 1;
-	}
+        }
 
       (*argtypes) [argindex] = spec->type;
     }
