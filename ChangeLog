@@ -4,6 +4,10 @@
 	* config/missing: update from Automake 1.8
 	* xml2ag/xmlopts.def(forkAutogen): export function for xml2ag.c
 
+2004-02-23  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.6 Released
+
 2004-02-19  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fmemopen.c: the interface to use depends upon HAVE_FOPENCOOKIE
