@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2005-02-03 19:10:33 bkorb"
+# Time-stamp:        "2005-02-05 07:35:09 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.2 2005/02/04 03:57:11 bkorb Exp $
+# $Id: keyword.test,v 4.3 2005/02/05 15:55:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -236,7 +236,7 @@ of earlier RC/INI files.  \fI--no-load-opts\fP is handled early,
 out of order.
 .SH OPTION PRESETS
 Any option that is not marked as \fInot presettable\fP may be preset
-by loading values from RC (.ini) file(s).
+by loading values from configuration ("RC" or ".INI") file(s).
 The \fIhomerc\fP file is "\fI.\fP", unless that is a directory.
 In that case, the file "\fIkeyword.cfg\fP"
 is searched for within that directory.

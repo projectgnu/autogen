@@ -2461,12 +2461,11 @@ variation operates in much the same way as ``@code{include}''
 @node main for-each
 @subsubsection for-each: perform function on each argument
 
-This produces a main procedure that invokes a procedure once for each
-operand on the command line (non-option arguments), @strong{OR} once
-for each non-blank, non-comment @code{stdin} input line.  Leading and
-trailing white space is trimmed from the input line and comment lines
-are lines that begin with a hash ('#') character or a character specified
-with the @code{comment-char} attribute.
+This produces a main procedure that invokes a procedure once for each operand
+on the command line (non-option arguments), @strong{OR} once for each
+non-blank, non-comment @code{stdin} input line.  Leading and trailing white
+space is trimmed from the input line and comment lines are lines that are
+empty or begin with a comment character, defaulting to a hash ('#') character.
 
 @strong{NB}:
 The @code{argument} program attribute (@pxref{program attributes})
@@ -2480,11 +2479,27 @@ There are a number of attributes to @code{main} that may be used:
 This attribute is required.  It is used to name the procedure to call.
 That procedure is presumed to be external, but if you provide the code
 for it, then the procedure is emitted as a static procedure in the
-generated code.  This procedure should return 0 on success, a cumulative
-error code on warning and exit without returning on an unrecoverable error.
-As the cumulative warning codes are @i{or}-ed together, the codes should be
-some sort of bit mask in order to be ultimately decipherable (if you
-need to do that).
+generated code.
+
+This procedure should return 0 on success, a cumulative error code on warning
+and exit without returning on an unrecoverable error.  As the cumulative
+warning codes are @i{or}-ed together, the codes should be some sort of bit
+mask in order to be ultimately decipherable (if you need to do that).
+
+If the called procedure needs to cause a fail-exit, it is expected to call
+@code{exit(3)} directly.  If you want to cause a warning exit code, then this
+handler function should return a non-zero status.  That value will be
+@strong{OR}-ed into a result integer for computing the final exit code.  E.g.,
+here is part of the emitted code:
+
+@example
+  int res = 0;
+  if (argc > 0) @{
+     do  @{
+         res |= @i{my_handler}( *(argv++) );
+     @} while (--argc > 0);
+  @} else @{ ...
+@end example
 
 @item handler-type
 If you do not supply this attribute, your handler procedure must be
@@ -2510,7 +2525,7 @@ where ``X'' may be any of the legal modes for @code{fopen(3C)}.  In this case,
 the profile for your procedure must be:
 
 @example
-int @i{my_handler}( FILE* entry_fp );
+int @i{my_handler}( const char* pz_fname, FILE* entry_fp );
 @end example
 
 @item  text-of-file
@@ -2521,7 +2536,8 @@ disallows empty files.  Both require regular files.  In this case, the profile
 for your procedure must be:
 
 @example
-int @i{my_handler}( char* file_text, size_t text_size );
+int @i{my_handler}( const char* pz_fname, char* file_text,
+                size_t text_size );
 @end example
 
 @noindent
@@ -2532,14 +2548,6 @@ the file contents.  Also, the memory allocated to hold the text is
 The file contents need not be text, as the data are read with the @code{read(2)}
 system call.
 @end table
-
-@item main-init
-This is code that gets inserted after the options have been processed, but
-before the handler procs get invoked.
-
-@item main-fini
-This is code that gets inserted after all the entries have been processed,
-just before returning from @code{main()}.
 
 @item @i{my_handler}-code
 With this attribute, you provide the code for your handler procedure
@@ -2569,27 +2577,21 @@ static int
     return res;
 @}
 @end example
+
+@item main-init
+This is code that gets inserted after the options have been processed, but
+before the handler procs get invoked.
+
+@item main-fini
+This is code that gets inserted after all the entries have been processed,
+just before returning from @code{main()}.
+
+@item comment-char
+If you wish comment lines to start with a character other than a hash
+(@code{#}) character, then specify one character with this attribute.
+If that character is the @code{NUL} byte, then only blank lines will be
+considered comments.
 @end table
-
-Exit code reporting is cumulative.  If the called procedure needs
-to cause a fail-exit, it is expected to call @code{exit(3)} directly.
-If you want to cause a warning exit code, then this handler function
-should return a non-zero status.  That value will be @strong{OR}-ed into
-a result integer for computing the final exit code.  E.g., here is part
-of the emitted code:
-
-@example
-    int res = 0;
-    if (argc > 0) @{
-        do  @{
-            res |= @i{my_handler}( *(argv++) );
-        @} while (--argc > 0);
-    @} else @{ ...
-@end example
-
-You may also specify some main procedure start up code with the
-@code{main-init} attribute.  Any code specified by that attribute will
-be inserted immediately after the option processing call.
 
 @node information attributes
 @subsection Program Information Attributes

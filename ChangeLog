@@ -1,3 +1,23 @@
+2004-02-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(main): doc the new forms of "main" procedures
+	* autoopts/test/Makefile.am(verbose): testing special target
+	* autoopts/test/enums.test(do_proc[]): use printf, echo is unreliable
+
+2004-02-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(configuration): replace "rc" in more places
+	* autoopts/autoopts.c: ditto
+	* autoopts/configfile.c: ditto
+	* autoopts/optcode.tpl: ditto
+	* autoopts/save.c: ditto
+	* autoopts/test/*.test: ditto
+	* autoopts/optmain.tpl(for-each): add a new attribute, "handler-type"
+	It specifies: plain operands, file names only, file pointers to the
+	files named, and content of the files.
+	(each-or-stdin-main): deleted.  Not a useful concept.
+	* doc/autogen.texi: doc this stuff.
+
 2004-01-23  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/enums.test: fix ksh-isms

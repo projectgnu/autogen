@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-02-03 19:10:50 bkorb"
+## Time-stamp:      "2005-02-04 16:29:31 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.4 2005/02/04 03:57:10 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.5 2005/02/05 15:55:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -158,7 +158,32 @@ ELIF (exist? "detail")           :+][+:
   ENDFOR                         :+][+:
 ELSE
   :+]Its description is not documented.[+:
-ENDIF :+]
+ENDIF :+][+:
+
+IF (exist? "main")   :+][+:
+
+  IF (= (get "main.main-type") "for-each")  :+]
+[+:
+    CASE main.handler-type  :+][+:
+    ~* ^(name|file)|.*text  :+]
+This program will perform its function for every file named on the command
+line or every file named in a list read from stdin.  The arguments or input
+names must be pre-existing files.  The input list may contain comments,
+which[+:
+
+    !E        :+]
+This program will perform its function for every command line argument
+or every non-comment line in a list read from stdin.  The input list comments[+:
+
+    ESAC      :+]
+are blank lines or lines beginning with a '[+:
+ ?% comment-char "%s" "#" :+]' character.[+:
+
+  ENDIF       :+][+:
+
+ENDIF - "main" exists
+
+:+]
 .SH OPTIONS[+:
 
 ;; * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -433,7 +458,7 @@ IF (or (exist? "homerc") (exist? "environrc")) :+]
 Any option that is not marked as ``not presettable'' may be preset
 by loading values from [+:
   IF (exist? "homerc")
-    :+]RC (.ini) file(s)[+:
+    :+]configuration ("RC" or ".INI") file(s)[+:
     IF (exist? "environrc")
             :+] and values from
 [+:

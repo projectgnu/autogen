@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2004-10-27 19:57:19 bkorb"
+## Time-stamp:      "2005-02-05 07:34:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/01/01 00:21:00 $
+## Last Modified:   $Date: 2005/02/05 15:55:22 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+## $Id: Makefile.am,v 4.2 2005/02/05 15:55:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -42,5 +42,13 @@ $(TESTS) : perm-stamp
 
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test || :
+
+tests-current :
+	if test -f .sdir ; then for f in $(TESTS) ; do \
+	cp `cat .sdir`/$$f $$f ; done ; fi
+
+verbose : tests-current
+	rm -rf FAILURES testdir ; \
+	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
 
 # Makefile.am ends here

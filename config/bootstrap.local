@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-01-23 15:52:21 bkorb"
+# Time-stamp:        "2005-02-05 07:49:46 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.5 2005/01/23 23:52:49 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.6 2005/02/05 15:55:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -164,10 +164,10 @@ pre )
     export byacc
 
     unset LANG || LANG=''
+    eval "`egrep '^AG_[A-Z_]*=' VERSION`"
     if grep '==ADD_CONFIG_FILES==' ${config_file} > /dev/null
     then
       exec 4> configure.files
-      eval "`egrep '^AG_[A-Z_]*=' VERSION`"
       echo 'AC_CONFIG_FILES([Makefile snprintfv/Makefile' >&4
       find [a-rt-z]* -name 'Makefile.am' -o -name '*.in' | \
           sed 's,\.\(am\|in\)$,,;/^configure$/d' | sort -u | \
@@ -180,6 +180,11 @@ pre )
 
       mv -f configure.tmp ${config_file}
       rm -f configure.files
+    fi
+    if grep '__CURRENT_VERSION__' NEWS > /dev/null
+    then
+      sed "1s/__CURRENT_VERSION__.*/${AG_VERSION} $(date '+%B %Y')/" NEWS > X
+      mv -f X NEWS
     fi
     test -z "${AGexe}" && exit 0
 
