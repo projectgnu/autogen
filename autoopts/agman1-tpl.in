@@ -10,10 +10,10 @@ autogen template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:     Wed Jul  7 14:43:54 1999				      
+## Last Modified:     Thu Jul  8 07:21:52 1999				      
 ##            by:     Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.3 1999/07/07 21:45:07 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.4 1999/07/08 14:22:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -51,7 +51,7 @@ _EVAL '.\"  ' _DNE
       #
       )}
 .\" Mixture of short (flag) options and long options
-.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP [ = "| ]\fIvalue\fP]]..."{(
+.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP " [[=| ]\fIvalue\fP]]..."{(
 
     _ELSE )}{(
 
@@ -88,6 +88,9 @@ All arguments are named options.{(
 .br
 .in +8
 {(argument)}{(
+  _ELIF long_opts _exist flag.value _exist | )}
+.PP
+All arguments must be options.{(
   _ENDIF )}{(
 
       # * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -138,7 +141,7 @@ _FOR flag
           _ENDIF )}{(name #_^ #-- _tr _down)}{(
           _IF arg_name _exist)}{(
             _IF flag_arg _len 0 = )} [ ={(
-            _ELSE )} " " {(
+            _ELSE )} "=" {(
             _ENDIF )}\fI{(arg_name)}\fP{(
             _IF flag_arg _len 0 = )} ]{(
             _ENDIF )}{(
@@ -176,9 +179,9 @@ _FOR flag
           )}
 .BR {(name #_^ #-- _tr _down)}{(
         _IF arg_name _exist)} {(
-          _IF flag_arg _len 0 = )} [ {(
-          _ELSE )} "" {(
-          _ENDIF )}=\fI{(arg_name)}\fP{(
+          _IF flag_arg _len 0 = )} [ ={(
+          _ELSE )} "=" {(
+          _ENDIF )}\fI{(arg_name)}\fP{(
           _IF flag_arg _len 0 = )}]{(
           _ENDIF )}{(
         _ENDIF)}{(
@@ -195,7 +198,7 @@ _FOR flag
 .BR --{(name #_^ #-- _tr _down)}{(
           _IF arg_name _exist)} "{(
             _IF flag_arg _len 0 = )}[{(
-            _ENDIF )}" "=\fI{(arg_name)}\fP{(
+            _ENDIF )}=\fI{(arg_name)}\fP{(
             _IF flag_arg _len 0 = )}]{(
             _ENDIF )}"{(
           _ENDIF)}{(
@@ -272,8 +275,8 @@ _ENDIF)}{(
 
 _IF version _exist )}
 .TP
-.BR {(_IF flag.value _exist)}\-v " [" v | c | n "], " --{(
-      _ELIF long_opt _exist)}--{(_ENDIF)}version [ =v | c | n ]
+.BR {(_IF flag.value _exist)}\-v " \fI[v|c|n]\fP, " --{(
+      _ELIF long_opt _exist)}--{(_ENDIF)}version "\fI[=v|c|n]\fP"
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.{(
