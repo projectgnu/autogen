@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: defLex.c,v 1.10 2000/03/11 21:36:05 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -31,6 +31,9 @@
 #include "autogen.h"
 #include "defParse.h"
 #include "expGuile.h"
+
+tSCC zSchemedefFile[]   = "schemedef.scm";
+ag_bool schemedefLoaded = AG_FALSE;
 
 extern YYSTYPE yylval;
 static YYSTYPE lastToken;
@@ -398,6 +401,11 @@ alist_to_autogen_def( void )
 
     SCM    res;
     tScanCtx*  pCtx;
+
+    if (! schemedefLoaded) {
+        SET_OPT_LOAD_SCHEME( (char*)zSchemedefFile );
+        schemedefLoaded = AG_TRUE;
+    }
 
     /*
      *  Wrap the scheme expression with the `alist->autogen-def' function
