@@ -263,17 +263,8 @@ writeColumns( void )
         sprintf( zFmt, "%%-%ds", fsz );
     }
 
-    /*
-     *  IF we have a separator,
-     *  THEN remove it from the last entry.
-     */
-    if (HAVE_OPT( SEPARATION )) {
-        char* pz = papzLines[ usedCt-1 ];
-        pz += strlen( pz ) - strlen( OPT_ARG( SEPARATION ));
-        *pz = '\0';
-    }
 
-    for (row = 0; row < rowCt; row++) {
+    for ( row = 0 ;; ) {
         char*  pzL;
         char*  pzE;
 
@@ -307,8 +298,25 @@ writeColumns( void )
         }
 
         /*
-         *  Print the last entry on the line, without the width format
+         *  Print the last entry on the line, without the width format.
+         *  IF it is also the last entry, see if we should strip the
+         *  separation string.
          */
+        if (++row == rowCt) {
+            /*
+             *  IF we have a separator,
+             *  THEN remove it from the last entry.
+             */
+            if (HAVE_OPT( SEPARATION )) {
+                char* pz = pzE + strlen( pzE )
+                         - strlen( OPT_ARG( SEPARATION ));
+                *pz = '\0';
+            }
+            fputs( pzE, stdout );
+            fputc( '\n', stdout );
+            break;
+	}
+
         fputs( pzE, stdout );
         fputc( '\n', stdout );
         free( (void*)pzE );
