@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.7 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: expString.c,v 3.8 2002/09/29 00:16:20 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -1090,7 +1090,9 @@ ag_scm_string_tr( SCM Str, SCM From, SCM To )
  *      and all greater than characters, do something like this:
  *
  * @example
- *      (string-substitute str '("<" ">") '("&lt;" "&gt;"))
+ *      (string-substitute source
+ *      ("&"     "<"    ">")
+ *      ("&amp;" "&lt;" "&gt;"))
  * @end example
 =*/
     SCM

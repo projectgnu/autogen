@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2002-09-16 21:11:25 bkorb"
+## Time-stamp:      "2002-09-21 15:22:33 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.15 2002/09/21 17:27:16 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.16 2002/09/29 00:16:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -38,18 +38,23 @@ cp -f autoopts.c     \
       save.c         \
       stack.c        \
       streqv.h       \
-      streqvcmp.c    \
       usage.c        \
       version.c      \
   ${top_builddir}/pkg/${tag}/.
 
 cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
-sed '/broken printf/,/our own/d;/include.*"snprintfv/d' autoopts.h > \
+
+sed '/#ifdef AUTOGEN_BUILD/,/#endif.* AUTOGEN_BUILD/d' streqvcmp.c > \
+  ${top_builddir}/pkg/${tag}/streqvcmp.c
+
+sed '/broken printf/,/our own/d
+     /include.*"snprintfv/d
+     /#ifndef AUTOGEN_BUILD/d
+     /#else.* AUTOGEN_BUILD/,/#endif.* AUTOGEN_BUILD/d' autoopts.h > \
   ${top_builddir}/pkg/${tag}/autoopts.h
+
 cd ../compat
-cp pathfind.c ${top_builddir}/pkg/${tag}/compat/.
-sed '/START AG-ONLY:/,/END AG-ONLY\./d' compat.h > \
-  ${top_builddir}/pkg/${tag}/compat/compat.h
+cp pathfind.c compat.h ${top_builddir}/pkg/${tag}/compat/.
 #
 #  END WORK IN SOURCE DIRECTORY
 #
@@ -75,9 +80,9 @@ cat >> libopts.m4 <<-	EOMacro
 	dnl to SUBDIRS and run all the config tests that the library needs.
 	dnl
 	AC_DEFUN([LIBOPTS_CHECK],[
-	  AC_CHECK_HEADERS(
-         errno.h sys/types.h sys/stat.h stdlib.h libgen.h memory.h )
-	  AC_CHECK_LIB(gen, pathfind)
+	`sed -n '/Check for standard headers/,/gen, pathfind/p' \
+	     ${top_srcdir}/configure.in`
+
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
 	  AC_ARG_WITH([autoopts-config],
         AC_HELP_STRING([--with-autoopts-config],
@@ -137,7 +142,6 @@ cat >&3 <<-	EOMakefile
 	## LIBOPTS Makefile
 	EXTRA_DIST            = `echo COPYING*` MakeDefs.inc compat
 	MAINTAINERCLEANFILES  = Makefile.in
-	INCLUDES              = @INCLIST@
 	lib_LTLIBRARIES       = libopts.la
 	libopts_la_SOURCES    = \\
 	EOMakefile

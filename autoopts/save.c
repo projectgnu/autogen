@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.4 2002/09/21 17:27:15 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.5 2002/09/29 00:16:20 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -322,6 +322,9 @@ printEntry( fp, p, pzLA )
  * and do nothing.  If the output file cannot be created or updated, a message
  * will be printed to @code{stderr} and the routine will return.
 =*/
+#define ARGTYPE \
+  (OPTST_NUMERIC | OPTST_STACKED | OPTST_ENUMERATION | OPTST_BOOLEAN )
+
 void
 optionSaveFile( pOpts )
     tOptions* pOpts;
@@ -406,9 +409,14 @@ optionSaveFile( pOpts )
                 continue;
             }
 
-            if ((p->fOptState & OPTST_STACKED) == 0)
+            switch (p->fOptState & ARGTYPE) {
+            case 0:
+            case OPTST_NUMERIC:
                 printEntry( fp, p, p->pzLastArg );
-            else {
+                break;
+
+            case OPTST_STACKED:
+            {
                 tArgList*  pAL = (tArgList*)p->optCookie;
                 int        uct = pAL->useCt;
                 char**     ppz = pAL->apzArgs;
@@ -421,6 +429,24 @@ optionSaveFile( pOpts )
 
                 while (uct-- > 0)
                     printEntry( fp, p, *(ppz++) );
+                break;
+            }
+
+            case OPTST_ENUMERATION:
+            {
+                int enumVal = (int)(p->pzLastArg);
+                (*(p->pOptProc))( (tOptDesc*)2UL, pOD );
+                printEntry( fp, p, p->pzLastArg );
+                p->pzLastArg = (char*)enumVal;
+                break;
+            }
+
+            case OPTST_BOOLEAN:
+                printEntry( fp, p, (p->pzLastArg != 0) ? "true" : "false" );
+                break;
+
+            default:
+                break; /* bogus - skip it */
             }
         } while ( (pOD++), (--ct > 0));
 

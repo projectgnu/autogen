@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 3.1 2002/03/29 04:11:19 bkorb Exp $
+# $Id: snarf.tpl,v 3.2 2002/09/29 00:16:20 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -136,7 +136,7 @@ ENDFOR =]
 DEFINE string_content =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
     IF (exist? "string") =][=(c-string (get "string"))=][=
-    ELSE =]"[= % name `echo %s |
+    ELSE =]"[= % name `echo '%s' |
        sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'` =]"[=
     ENDIF =];[=
 ENDDEF =][=

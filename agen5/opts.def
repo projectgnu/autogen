@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.10 2002/07/27 17:46:33 bkorb Exp $
+ *   $Id: opts.def,v 3.11 2002/09/29 00:16:20 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -260,20 +260,27 @@ flag = {
 	`snarf.tpl' template.  Read the introductory comment in
 	`snarf.tpl' to see what the `getdefs(1AG)' comment must contain.
 
+	First, create a config file for @code{getdefs},
+	and then invoke @code{getdefs} loading that file:
 	@example
-	GRP_NAME=whateveryoulike
-	eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
-	eopt="$eopt defs=gfunc templ=snarf srcfile"
-	eopt="assign=group=$@{GRP_NAME@} assign=init=_init $eopt"
-	eopt="$eopt autogen=$@{AG@} base-name=expr"
-	getdefs $eopt <<source-file-list>>
+	cat > getdefs.cfg <<EOF
+	subblock    exparg=arg_name,arg_desc,arg_optional,arg_list
+	defs-to-get gfunc
+	template    snarf
+	srcfile
+	linenum
+	assign      group = name_of_some_group
+	assign      init  = _init
+	EOF
+
+	getdefs load=getdefs.cfg <<source-file-list>>
 	@end example
 
 	@noindent
 	Note, however, that your functions must be named:
 
 	@example
-	whateveryoulike_scm_<<function_name>>(...)
+	name_of_some_group_scm_<<function_name>>(...)
 	@end example
 
 	@noindent

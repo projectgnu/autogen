@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
+# Time-stamp:        "2002-09-28 17:14:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/03/29 02:21:47 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: keyword.test,v 3.1 2002/03/29 02:21:47 bkorb Exp $
+# $Id: keyword.test,v 3.2 2002/09/29 00:16:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -24,28 +23,31 @@ set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-testname="$testname" test_main="" \
+echo "creating ${testname}.def in `pwd`"
+testname="${testname}" test_main="" \
 argument="${argument}" long_opts="yes" \
 ${SHELL-sh} ${stdopts} option:'opt init'
-cat >> $testname.def <<'_EOF_'
-help_value = X;
-flag = {
-    name        = trace;
-    arg_type    = keyword;
-    arg_default = nothing;
-    arg_name    = level;
-    descrip     = "tracing level of detail";
-    keyword     = nothing, templates, block-macros, expressions, explanations;
-};
-_EOF_
+cat >> ${testname}.def <<- _EndOfDef_
+	help_value = X;
+	homerc     = '.';
+	rcfile     = ${testname}.cfg;
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+	flag = {
+	    name        = trace;
+	    arg_type    = keyword;
+	    arg_default = nothing;
+	    arg_name    = level;
+	    descrip     = "tracing level of detail";
+	    keyword     = nothing, templates, block-macros, expressions, explanations;
+	};
+	_EndOfDef_
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
-chmod u+w $testname.c
-cat >> $testname.c <<_EOF_
+chmod u+w ${testname}.c
+cat >> ${testname}.c <<_EOF_
 #include <stdio.h>
 int main(int argc, char** argv) {
 optionProcess( &test_${testname}Options, argc, argv );
@@ -56,8 +58,8 @@ compile "-X"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 test_keyword - Test AutoOpts for keyword
 USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -65,9 +67,16 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
       KWd trace          tracing level of detail
    -X no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
+   -> opt save-opts      Save the option state to an rc file
+   -< YES load-opts      Load options from an rc file
+				- disabled as --no-load-opts
+				- may appear multiple times
 
 Options may be specified by doubled hyphens and their name
 or by a single hyphen and the flag character (option value).
+
+The following option preset mechanisms are supported:
+ - reading file ./keyword.cfg
 
 The valid trace option keywords are:
 	nothing
@@ -77,14 +86,27 @@ The valid trace option keywords are:
 	explanations
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure "`diff $testname.h*lp`"
+cmp -s ${testname}.h*lp || \
+  failure "`diff ${testname}.h*lp`"
 
-./$testname --trace=exp > /dev/null && \
-  failure $testname accepted ambiguous keyword
+./${testname} --trace=exp > /dev/null && \
+  failure ${testname} accepted ambiguous keyword
 
-./$testname --trace=expr > /dev/null || \
-  failure $testname did not handle its options
+./${testname} --trace=expr > /dev/null || \
+  failure ${testname} did not handle its options
+
+./${testname} --trace=expr --save=${testname}.cfg || \
+  failure ${testname} could not save its options
+
+egrep -v '^#' ${testname}.cfg > ${testname}res.cfg || \
+  failure ${testname} could not create ${testname}.cfg
+
+cat > ${testname}base.cfg <<- _EndIni_
+	trace               expressions
+	_EndIni_
+
+cmp -s ${testname}base.cfg ${testname}res.cfg || \
+  failure "`diff ${testname}base.cfg ${testname}res.cfg`"
 
 cleanup
 # end of keyword.test

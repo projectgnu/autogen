@@ -3,12 +3,12 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2002-09-19 21:21:27 bkorb"
+ *  Time-stamp:      "2002-09-21 13:38:29 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.3 2002/09/21 17:27:15 bkorb Exp $
+ * $Id: compat.h,v 3.4 2002/09/29 00:16:20 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -179,14 +179,6 @@
 #  define STR(s)  _STR(s)
 #endif
 
-/* START AG-ONLY: */
-
-#ifdef HAVE_SETJMP_H
-#  include <setjmp.h>
-#else
-#  error NEED <setjmp.h>
-#endif
-
 /* ##### Pointer sized word ##### */
 
 /* FIXME:  the MAX stuff in here is broken! */
@@ -199,6 +191,14 @@
    #define WORD_MAX  INT_MAX
    #define WORD_MIN  INT_MIN
 #endif
+
+# if defined (_POSIX_SOURCE)
+/* Posix does not require that the d_ino field be present, and some
+   systems do not provide it. */
+#    define REAL_DIR_ENTRY(dp) 1
+# else /* !_POSIX_SOURCE */
+#    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
+# endif /* !_POSIX_SOURCE */
 
 # if defined (HAVE_DIRENT_H)
 #   include <dirent.h>
@@ -222,15 +222,11 @@
 #   endif /* !HAVE_SYS_NDIR_H && !HAVE_SYS_DIR_H && !HAVE_NDIR_H */
 # endif /* !HAVE_DIRENT_H */
 
-# if defined (_POSIX_SOURCE)
-/* Posix does not require that the d_ino field be present, and some
-   systems do not provide it. */
-#    define REAL_DIR_ENTRY(dp) 1
-# else /* !_POSIX_SOURCE */
-#    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
-# endif /* !_POSIX_SOURCE */
-
-/* END AG-ONLY. */
+#ifdef HAVE_SETJMP_H
+#  include <setjmp.h>
+#else
+#  error NEED <setjmp.h>
+#endif
 
 #endif /* COMPAT_H */
 /*

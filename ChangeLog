@@ -1,8 +1,26 @@
+2002-09-28  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in(error.h): check for this header, too
+	* agen5/defReduce.c(addSibMacro): work around a GCC 3.x aliasing bug
+	* agen5/expString.c(string-substitute): expand the example
+	* agen5/opts.def(load_functions): clean up the invocation appearance
+	* agen5/snarf.tpl(string_content): quote the echoed string
+	* autoopts/optcode.tpl(patch-text): new function to convert texi-isms
+	to ``whatever'' for usage display.
+	* autoopts/options.tpl: ditto + reorganization
+
 2002-09-21  Bruce Korb  <bkorb@gnu.org>
 
 	* getdefs/getdefs.c: correct mishandling of common-assign option
 	* getdefs/test/cfg.test(new): test it
 	* getdefs/test/Makefile.am(cfg.test): add to test list
+	* autoopts/enumeration.c(optionEnumerationVal): Let a program option
+	descriptor of "2UL" be a request to convert an enum value to a string
+	* autoopts/save.c(optionSaveFile): Before printing an enum to the save
+	state file, convert it back to a string.
+	* autoopts/test/keyword.test: test this functionality
+	* autoopts/makeshell.c(emitSetup): Similarly for default values for
+	emitting a shell script parser.
 
 2002-09-20  Bruce Korb  <bkorb@gnu.org>
 

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2002-09-19 21:20:44 bkorb"
+ *  Time-stamp:      "2002-09-21 10:54:11 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.5 2002/09/21 17:27:15 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.6 2002/09/29 00:16:20 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -61,9 +61,7 @@
 #endif
 
 #include <sys/param.h>
-
 #include "options.h"
-
 #include "streqv.h"
 
 /*

@@ -4,13 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2002 Bruce Korb
 ##
+## Time-stamp:      "2002-09-28 13:22:20 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/09/21 17:27:15 $
-##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.14 2002/09/21 17:27:15 bkorb Exp $
+## $Id: Makefile.am,v 3.15 2002/09/29 00:16:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test

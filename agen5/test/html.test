@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/01/12 05:10:01 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Time-stamp:      "2002-09-28 13:23:27 bkorb"
+# Author:          Bruce Korb <bkorb@gnu.org>
+# Maintainer:      Bruce Korb <bkorb@gnu.org>
+# Created:         Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: html.test,v 3.3 2002/01/12 05:10:01 bkorb Exp $
+# $Id: html.test,v 3.4 2002/09/29 00:16:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

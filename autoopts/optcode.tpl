@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.8 2002/09/10 02:15:01 bkorb Exp $
+#$Id: optcode.tpl,v 3.9 2002/09/29 00:16:20 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -289,29 +289,32 @@ ELSE                    =]
 #define apzHomeList NULL[=
 ENDIF                   =][=
 
+(define patch-text (lambda (t-name)
+  (kr-string (string-append "\n" (shellf
+  "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n%s\n_EODetail_"
+  (get t-name)  ) "\n" )) ))
+
 (define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
 
 (if (exist? "copyright.eaddr")
     (sprintf bug-text (kr-string (get "copyright.eaddr")))
 
-(if (exist? "eaddr")
-    (sprintf bug-text (kr-string (get "eaddr")))
+    (if (exist? "eaddr")
+        (sprintf bug-text (kr-string (get "eaddr")))
 
-    "\n\n#define zBugsAddr NULL"
+        "\n\n#define zBugsAddr NULL" )  )
 
-))                     =][=
+                        =][=
 
 IF (exist? "explain")   =]
-tSCC   zExplain[]     = [=
-   (kr-string (string-append "\n" (get "explain") "\n") ) =];[=
+tSCC   zExplain[]     = [= (patch-text "explain") =];[=
 ELSE                    =]
 #define zExplain NULL[=
 ENDIF                   =][=
 
 IF (exist? "detail")    =]
 
-tSCC    zDetail[]     = [=
-       (kr-string (string-append "\n" (get "detail") "\n")) =];[=
+tSCC    zDetail[]     = [= (patch-text "detail") =];[=
 
 ELSE                    =]
 

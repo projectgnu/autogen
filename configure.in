@@ -5,24 +5,23 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2002 Bruce Korb
 dnl
-dnl Time-stamp:      "2002-09-19 21:49:08 bkorb"
+dnl Time-stamp:      "2002-09-21 14:37:55 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.11 2002/09/21 17:27:15 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.12 2002/09/29 00:16:20 bkorb Exp $
 dnl --------------------------------------------------------------------
-
-AC_PREREQ(2.50)
-AC_INIT([autogen],5.4,[autogen-bugs@lists.sf.net])
+dnl
+AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
 AC_CONFIG_SRCDIR(agen5/autogen.c)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.11 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.12 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -84,8 +83,12 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # ----------------------------------------------------------------------
 AC_HEADER_STDC
 AC_HEADER_DIRENT
+
+# ----------------------------------------------------------------------
+# Check for list of headers.
+# ----------------------------------------------------------------------
 AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h \
-    sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
+    error.h sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
 
 # If stdarg.h is present define HAVE_STDARG_H, otherwise if varargs.h
 # is present define HAVE_VARARGS_H.
@@ -102,6 +105,11 @@ AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
 
 # Check for P_PID definition in <sys/procset.h>
 AC_CHECK_HEADERS(sys/procset.h)
+
+# ----------------------------------------------------------------------
+# Check for SVR4 libgen, and use it if it defines pathfind.
+# ----------------------------------------------------------------------
+AC_CHECK_LIB(gen, pathfind)
 
 # ----------------------------------------------------------------------
 # Check for Dynamic library stuff
@@ -131,11 +139,6 @@ AC_C_CONST
 AC_C_INLINE
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int, 4)
-
-# ----------------------------------------------------------------------
-# Check for SVR4 libgen, and use it if it defines pathfind.
-# ----------------------------------------------------------------------
-AC_CHECK_LIB(gen, pathfind)
 
 # ----------------------------------------------------------------------
 # Checks for standard functions.

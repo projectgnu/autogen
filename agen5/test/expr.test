@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Author:	     Bruce Korb <bkorb@gnu.org>
-# Maintainer:	     Bruce Korb <bkorb@gnu.org>
-# Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2002/01/19 07:35:24 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Time-stamp:      "2002-09-28 13:25:00 bkorb"
+# Author:          Bruce Korb <bkorb@gnu.org>
+# Maintainer:      Bruce Korb <bkorb@gnu.org>
+# Created:         Sat Mar 28 14:21:31 1998
 #
-# $Id: expr.test,v 3.1 2002/01/19 07:35:24 bkorb Exp $
+# $Id: expr.test,v 3.2 2002/09/29 00:16:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -37,7 +36,7 @@ AG="${AGEXE}"
 _EOF_
 sed -n '/  expr.ini /,/date > stamp-exprini/p' \
   ${top_srcdir}/agen5/bootstrap.dir | \
-    sed -e 1d -e '$d' >> ./${testname}.sh
+    sed '1d;$d' >> ./${testname}.sh
 
 #  Remove the lines that *will* be different, always...
 #

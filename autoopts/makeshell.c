@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.2 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: makeshell.c,v 3.3 2002/09/29 00:16:20 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -629,6 +629,9 @@ emitUsage( tOptions* pOpts )
 }
 
 
+#define ARGTYPE \
+  (OPTST_NUMERIC | OPTST_STACKED | OPTST_ENUMERATION | OPTST_BOOLEAN )
+
 STATIC void
 emitSetup( tOptions* pOpts )
 {
@@ -659,10 +662,21 @@ emitSetup( tOptions* pOpts )
              pzFmt = zMultiDef;
         else pzFmt = zSingleDef;
 
-        if (pOptDesc->fOptState & OPTST_NUMERIC) {
+        /*
+         *  IF this is an enumeration option, then convert the value
+         *  to a string before printing the default value.
+         */
+        if (pOptDesc->fOptState & OPTST_ENUMERATION) {
+            (*(pOptDesc->pOptProc))( (tOptDesc*)2UL, pOptDesc );
+            pzDefault = pOptDesc->pzLastArg;
+        }
+
+        else if (pOptDesc->fOptState & OPTST_NUMERIC) {
             snprintf( zVal, sizeof( zVal ), "%ld", (tUL)pOptDesc->pzLastArg );
             pzDefault = zVal;
-        } else if (pOptDesc->pzLastArg == (char*)NULL) {
+        }
+
+        else if (pOptDesc->pzLastArg == (char*)NULL) {
             pzFmt     = zSingleNoDef;
             pzDefault = NULL;
         }
