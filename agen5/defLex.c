@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.7 2000/02/28 00:48:11 bruce Exp $
+ *  $Id: defLex.c,v 1.8 2000/03/05 18:27:05 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -347,12 +347,12 @@ yyerror( char* s )
     STATIC void
 loadScheme( void )
 {
-    char* pzText = pCurCtx->pzScan;
-    char* pzEnd  = (char*)skipScheme( pzText, pzText + strlen( pzText ));
-    char  endCh  = *pzEnd;
-    int   schemeLen = (pzEnd - pzText);
-    int   stringLen;
-    SCM   res;
+    char*    pzText    = pCurCtx->pzScan;
+    char*    pzEnd     = (char*)skipScheme( pzText, pzText + strlen( pzText ));
+    char     endCh     = *pzEnd;
+    int      schemeLen = (pzEnd - pzText);
+    ag_bool  mustFree  = AG_FALSE;
+    SCM      res;
 
     /*
      *  NUL terminate the Scheme expression, run it, then restore
@@ -362,44 +362,24 @@ loadScheme( void )
     procState = PROC_STATE_GUILE_PRELOAD;
     res = gh_eval_str( pzText );
     procState = PROC_STATE_LOAD_DEFS;
-    pCurCtx->pzScan = pzEnd;
     *pzEnd = endCh;
 
-    switch (gh_type_e( res )) {
-    case GH_TYPE_BOOLEAN:
-        strcpy( pzText, SCM_NFALSEP( res ) ? "#t" : "#f" );
-        break;
-
-    case GH_TYPE_SYMBOL:
-        /* FIXME */
-        /* res = gh_scm2str( res ); */
-        /* FALLTHROUGH */
-
-    case GH_TYPE_STRING:
-        pzEnd = SCM_CHARS( res );
-        stringLen = strlen( pzEnd );
-        if (stringLen < schemeLen)
-             strcpy( pzText, pzEnd );
-        else AGDUPSTR( pzText, pzEnd );
-        break;
-
-    case GH_TYPE_CHAR:
-        pzText[0] = gh_scm2char( res );
-        pzText[1] = NUL;
-        break;
-
-    case GH_TYPE_NUMBER:
-        if (schemeLen >= 12)
-             sprintf( pzText, "%ld", gh_scm2long( res ));
-        else pzText = asprintf( "%ld", gh_scm2long( res ));
-        break;
-
-    default:
-        /* Emit a complaint */
-        pzText = "";
+    pCurCtx->pzScan = pzEnd;
+    pzEnd = resolveSCM( res, &mustFree );
+    if (strlen( pzEnd ) >= schemeLen) {
+        if (! mustFree)
+            yylval = (YYSTYPE)strdup( pzEnd );
+        else
+            yylval = (YYSTYPE)pzEnd;
     }
 
-    yylval = (YYSTYPE)pzText;
+    else {
+        strcpy( pzText, pzEnd );
+        if (mustFree)
+            AGFREE( (void*)pzEnd );
+        yylval = (YYSTYPE)pzText;
+    }
+
     lastToken = TK_STRING;
 }
 

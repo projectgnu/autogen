@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.9 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: autogen.h,v 1.10 2000/03/05 18:27:04 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -43,7 +43,15 @@ typedef enum {
     PROC_STATE_DONE        /* `exit' has been called           */
 } teProcState;
 
+#ifdef DEBUG
+#  define GIVE_UP(f,l) \
+    fprintf( stderr, zGiveUp, f, l )
+#else
+#  define GIVE_UP(f,l)
+#endif
+
 #define AG_ABEND STMTS( \
+    GIVE_UP( __FILE__, __LINE__ ); \
     if (procState < PROC_STATE_EMITTING) \
         exit(EXIT_FAILURE); \
     procState = PROC_STATE_ABORTING; \
@@ -119,6 +127,7 @@ struct template_lib_marker {
 #define EMIT_STRING         0x0003  /* emit content of expr    */
 #define EMIT_PRIMARY_TYPE   0x0007
 #define EMIT_SECONDARY_TYPE 0x0070
+#define EMIT_SECONDARY_SHIFT     4
 #define EMIT_IF_ABSENT      0x0100
 #define EMIT_ALWAYS         0x0200  /* emit one of two exprs   */
 #define EMIT_FORMATTED      0x0400  /* format, if val present  */
@@ -298,6 +307,9 @@ MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( TplErr,    "Error in template %s, line %d\n\t%s\n" );
 MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
 MKSTRING( FileLine,  "\tfrom %s line %d\n" );
+#ifdef DEBUG
+MKSTRING( GiveUp,    "Giving up in %s line %d\n" );
+#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

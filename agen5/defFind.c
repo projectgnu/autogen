@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defFind.c,v 1.3 2000/03/02 05:48:52 bruce Exp $
+ *  $Id: defFind.c,v 1.4 2000/03/05 18:27:04 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -235,6 +235,7 @@ copyDefReference( tTemplate* pT, tMacro* pMac,
                 LOAD_ABORT( pT, pMac, zInvalRef );
 
             default:
+                pSrc--;
                 goto leaveCopyDefReference;
             }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.17 2000/03/04 23:48:03 bruce Exp $
+ *  $Id: funcEval.c,v 1.18 2000/03/05 18:27:05 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -35,6 +35,67 @@
 #else
 #  include <regex.h>
 #endif
+
+    char*
+resolveSCM( SCM s, ag_bool*  pMustFree )
+{
+    static char z[32];
+    char*  pzRes = z;
+
+    switch (gh_type_e( s )) {
+    case GH_TYPE_BOOLEAN:         
+        strcpy( z, SCM_NFALSEP(res) ? "1" : "0" ); break;
+
+    case GH_TYPE_STRING:
+    case GH_TYPE_SYMBOL:
+        len = SCM_LENGTH(res);
+        if (len >= sizeof( z )) {
+            pzRes = AGALOC( len + 1 );
+            *pMustFree = AG_TRUE;
+        }
+
+        memcpy( pzRes, SCM_CHARS(res), len );
+        pzRes[ len ] = NUL;
+        break;
+
+    case GH_TYPE_CHAR:
+        z[0] = gh_scm2char(res); z[1] = NUL; break;
+
+    case GH_TYPE_VECTOR:
+        pzRes = "** Vector **"; break;
+
+    case GH_TYPE_PAIR:
+        pzRes = "** Pair **"; break;
+
+    case GH_TYPE_NUMBER:
+        sprintf( z, "%ld", gh_scm2long(res) ); break;
+
+    case GH_TYPE_PROCEDURE:
+ef SCM_SUBR_ENTRY
+        sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(res) ); break;
+e
+        pzRes = "** PROCEDURE **"; break;
+if
+
+    case GH_TYPE_LIST:
+        pzRes = "** LIST **"; break;
+
+    case GH_TYPE_INEXACT:
+        pzRes = "** INEXACT **"; break;
+
+    case GH_TYPE_EXACT:
+        pzRes = "** EXACT **"; break;
+
+    case GH_TYPE_UNDEFINED:
+        pzRes = (char*)zNil; break;
+
+    default:
+        pzRes = "** UNKNOWN **"; break;
+    }
+
+    return pzRes;
+}
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -80,40 +141,67 @@ evalExpression( ag_bool* pMustFree )
             if ((code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) == 0)
                 return (char*)zNil;
             pzText =  pT->pzTemplText + pMac->endIndex;
-            code   = ((code & EMIT_SECONDARY_TYPE) >> 4);
+            code   = ((code & EMIT_SECONDARY_TYPE) >> EMIT_SECONDARY_SHIFT);
         }
 
         /*
          *  OTHERWISE, we found an entry.  Make sure we were supposed to.
          */
         else {
+            tSCC zBlock[] = "attempted to use block macro in eval expression";
+
             if ((code & EMIT_IF_ABSENT) != 0)
                 return (char*)zNil;
 
-            /*
-             *  And make sure what we found is a text value
-             */
-            if (pDef->valType != VALTYP_TEXT) {
+            if (  (pDef->valType != VALTYP_TEXT)
+               && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
                 fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
-                         "attempted to use block macro in eval expression" );
+                         zBlock );
                 return (char*)zNil;
             }
 
             /*
-             *  IF this is a formatting macro,
-             *  THEN use the value as the argument to the formatting string
-             *  ELIF there is text associated with this macro
-             *  THEN that text is the value of the expression
-             *  OTHERWISE the value associated with the name becomes the
-             *            expression.
+             *  Compute the expression string.  There are three possibilities:
+             *  1.  There is an expression string in the macro, but it must
+             *      be formatted with the text value.
+             *      Make sure we have a value.
+             *  2.  There is an expression string in the macro, but it is *NOT*
+             *      to be formatted.  Use it as is.  Do *NOT* verify that
+             *      the define value is text.
+             *  3.  There is no expression with the macro invocation.
+             *      The define value *must* be text.
              */
-            if ((code & EMIT_FORMATTED) != 0){
+            if ((code & EMIT_FORMATTED) != 0) {
+                /*
+                 *  And make sure what we found is a text value
+                 */
+                if (pDef->valType != VALTYP_TEXT) {
+                    fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
+                             zBlock );
+                    return (char*)zNil;
+                }
+
                 *pMustFree = AG_TRUE;
                 pzText = asprintf( pT->pzTemplText + pMac->ozText,
                                    pDef->pzValue );
-            } else if (pMac->ozText != 0)
+            }
+
+            else if (pMac->ozText != 0)
                  pzText = pT->pzTemplText + pMac->ozText;
-            else pzText = pDef->pzValue;
+
+            else {
+                /*
+                 *  And make sure what we found is a text value
+                 */
+                if (pDef->valType != VALTYP_TEXT) {
+                    fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
+                             zBlock );
+                    return (char*)zNil;
+                }
+
+                pzText = pDef->pzValue;
+            }
+
             code &= EMIT_PRIMARY_TYPE;
         }
     }
@@ -133,62 +221,14 @@ evalExpression( ag_bool* pMustFree )
 
     case EMIT_EXPRESSION:
     {
-        static char z[ 32 ];
-        int len;
-
         SCM res = gh_eval_str( pzText );
 
         if (*pMustFree) {
             AGFREE( (void*)pzText );
             *pMustFree = AG_FALSE;
         }
-        pzText = z;
 
-        switch (gh_type_e( res )) {
-        case GH_TYPE_BOOLEAN:         
-            strcpy( z, SCM_NFALSEP(res) ? "1" : "0" ); break;
-
-        case GH_TYPE_STRING:
-        case GH_TYPE_SYMBOL:
-            len = SCM_LENGTH(res);
-            memcpy( z, SCM_CHARS(res), len );
-            z[ len ] = NUL;
-            break;
-
-        case GH_TYPE_CHAR:
-            z[0] = gh_scm2char(res); z[1] = NUL; break;
-
-        case GH_TYPE_VECTOR:
-            pzText = "** Vector **"; break;
-
-        case GH_TYPE_PAIR:
-            pzText = "** Pair **"; break;
-
-        case GH_TYPE_NUMBER:
-            sprintf( z, "%ld", gh_scm2long(res) ); break;
-
-        case GH_TYPE_PROCEDURE:
-#ifdef SCM_SUBR_ENTRY
-            sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(res) ); break;
-#else
-            pzText = "** PROCEDURE **"; break;
-#endif
-
-        case GH_TYPE_LIST:
-            pzText = "** LIST **"; break;
-
-        case GH_TYPE_INEXACT:
-            pzText = "** INEXACT **"; break;
-
-        case GH_TYPE_EXACT:
-            pzText = "** EXACT **"; break;
-
-        case GH_TYPE_UNDEFINED:
-            pzText = (char*)zNil; break;
-
-        default:
-            pzText = "** UNKNOWN **"; break;
-        }
+        pzText = resolveSCM( res, pMustFree );
         break;
     }
 
@@ -221,9 +261,10 @@ evalExpression( ag_bool* pMustFree )
 /*=gfunc error_source_line
  *
  * what: display current file/line before SCM error
- * doc: This function should only be invoked just before
- *      Guile displays an error message.  It displays the
- *      file name and line number that triggered the evaluation error.
+ * doc: This function is only invoked just before Guile displays
+ *      an error message.  It displays the file name and line number
+ *      that triggered the evaluation error.  You should not need to
+ *      invoke this routine directly.  Guile will do it automatically.
 =*/
     SCM 
 ag_scm_error_source_line( void )
@@ -459,7 +500,7 @@ MAKE_LOAD_PROC( Expr )
              */
             *(pzNextExpr++) = NUL;
             while (isspace( *pzNextExpr ))  pzNextExpr++;
-            pMac->res |= (exprType( pzNextExpr ) << 4);
+            pMac->res |= (exprType( pzNextExpr ) << EMIT_SECONDARY_SHIFT);
             pMac->endIndex = pzNextExpr - pT->pzTemplText;
         }
 
