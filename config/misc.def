@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/07/09 02:32:25 $
+ *  Last Modified:     $Date: 2002/08/10 02:08:35 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.17 2002/07/09 02:32:25 bkorb Exp $
+ *  $Id: misc.def,v 3.18 2002/08/10 02:08:35 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.17 $";
+version = "$Revision: 3.18 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -263,8 +263,6 @@ test = {
     type   = run;
     check  = "pathfind(3) works";
     action = { act-type = define; };
-    action = { no; act-type = script;
-               act-text = 'COMPATOBJ="$COMPATOBJ pathfind.lo"'; };
 
     code   = <<-  _EOF_
 		#include <string.h>

@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/07/11 20:28:44 $
+## Last Modified:   $Date: 2002/08/10 02:08:35 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.9 2002/07/11 20:28:44 bkorb Exp $
+## $Id: Makefile.am,v 3.10 2002/08/10 02:08:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,7 +48,7 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##
 libopts_la_SOURCES = $(HDRS) $(CSRC)
 
-libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la @COMPATOBJ@
+libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
 libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
 libguileopts_la_SOURCES = guileopt.c
@@ -58,16 +58,13 @@ bin_SCRIPTS	= autoopts-config
 
 include_HEADERS = options.h
 
-makeshell.lo : genshell.c @COMPATOBJ@
+makeshell.lo : genshell.c
 genshell.c : genshell.def
 	@AGEXE=`cd $(top_builddir)/agen5; pwd`/autogen ; cd $(srcdir) ; \
 	  AGEXE="$$AGEXE" $(SHELL) ./bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c
-
-pathfind.lo : $(top_srcdir)/compat/pathfind.c
-	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/pathfind.c
 
 ../snprintfv/snprintfv.h :
 	if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
@@ -85,5 +82,12 @@ $(GENMAN) : funcs.def
 
 libopts.texi : ../agen5/autogen funcs.def
 	../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -b libopts funcs.def
+
+srcdist : libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
+libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz:
+	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
+	export top_srcdir top_builddir ; \
+	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
+	$(SHELL) $(top_srcdir)/pkg/mklibopts-src.sh
 
 # Makefile.am ends here

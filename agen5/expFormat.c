@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.5 2002/02/02 21:19:57 bkorb Exp $
+ *  $Id: expFormat.c,v 3.6 2002/08/10 02:08:35 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -131,11 +131,14 @@ tSCC zNil[]      = "";
  *       Which depends on whether or not the @code{--writable} command line
  *       option was set.  The first argument is a per-line string prefix.
  *       The optional second argument is a prefix for the first-line and,
- *       in read-only mode, activates the editor hints:
+ *       in read-only mode, activates the editor hints.
  *       @*
  *       @example
  *       -*- buffer-read-only: t -*- vi: set ro:
  *       @end example
+ *       @noindent
+ *       The warning string also includes information about the template used
+ *       to construct the file and the definitions used in its instantiation.
 =*/
     SCM
 ag_scm_dne( SCM prefix, SCM first )

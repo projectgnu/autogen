@@ -1,9 +1,13 @@
 #! /bin/sh
 
-set -e
+set -e -x
+
+top_builddir=`cd $top_builddir ; pwd`
+top_srcdir=`cd $top_srcdir ; pwd`
 
 tag=libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
 cd ${top_builddir}/pkg
+[ ! -d ${tag} ] || rm -rf ${tag}
 mkdir ${tag}
 mkdir ${tag}/compat
 
@@ -26,13 +30,25 @@ cp -f COPYING        \
       streqvcmp.c    \
       usage.c        \
       version.c      \
-  ${PKGDIR}/${tag}/.
+  ../pkg/${tag}/.
 
 cd ../compat
-cp *.h pathfind.c ${tag}/compat/.
+cp *.h pathfind.c ../pkg/${tag}/compat/.
 
 cd ../pkg
-cp libopts/* ${tag}/.
+files=`cd ${tag} ; ls -1 *.[ch] | \
+	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\'
+	`
 
-tar cvf - ${tag} | gzip --best > ${top_builddir}/${tag}.tar.gz
+cat > ${tag}/Makefile.am <<-	EOMakefile
+
+	MAINTAINERCLEANFILES = Makefile.in
+	INCLUDES = @INCLIST@
+	SRC      = \\
+	$files
+	lib_LTLIBRARIES = libopts.la
+	libopts_la_SOURCES = \$(SRC)
+	EOMakefile
+
+tar cvf - ${tag} | gzip --best > ${top_builddir}/autoopts/${tag}.tar.gz
 rm -rf ${tag}

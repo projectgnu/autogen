@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.14 2002/07/11 02:06:09 bkorb Exp $
+ *  $Id: autoopts.c,v 3.15 2002/08/10 02:08:35 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -72,6 +72,9 @@
 #include "autoopts.h"
 #include "compat/compat.h"
 
+#ifndef HAVE_PATHFIND
+#  include "compat/pathfind.c"
+#endif
 
 #define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
