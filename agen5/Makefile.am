@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/07/12 02:20:42 $
+## Last Modified:   $Date: 2001/07/28 17:11:00 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.33 2001/07/12 02:20:42 bkorb Exp $
+## $Id: Makefile.am,v 1.34 2001/07/28 17:11:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -28,30 +28,28 @@ MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
-GEN_CSRC = opts.c opts.h directive.h functions.h expr.ini expr.h proto.h
+GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h
 GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
 pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS     = autogen.1
 
-EXTRA_DIST	 = directive.tpl functions.tpl opts.def snarf.tpl \
+EXTRA_DIST	 = directive.tpl opts.def snarf.tpl \
 	pseudo.def pseudo-fsm.h $(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
 
 bin_PROGRAMS = autogen
 
 autogen_SOURCES = $(GEN_CSRC) \
-        agShell.c   agUtils.c    agUtils.h   autogen.c  autogen.h \
-        defDirect.c defFind.c    defLex.c    defLoad.c  defParse.y \
-        defReduce.c expExtract.c expFormat.c expGperf.c expGuile.c \
-        expOutput.c expPrint.c   expState.c  expString.c \
-        funcCase.c  funcDef.c    funcEval.c  funcFor.c  funcIf.c \
-        functions.c loadPseudo.c tpLoad.c    tpParse.c  tpProcess.c
+        agShell.c     agUtils.c     agUtils.h     autogen.c     autogen.h   \
+        defDirect.c   defFind.c     defLex.c      defLoad.c     defParse.y  \
+        defReduce.c   expExtract.c  expFormat.c   expGperf.c    expGuile.c  \
+        expOutput.c   expPrint.c    expState.c    expString.c   funcCase.c  \
+        funcDef.c     funcEval.c    funcFor.c     funcIf.c      functions.c \
+        functions.h   loadPseudo.c  tpLoad.c      tpParse.c     tpProcess.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
 
 autogen_LDFLAGS = @DYNAMIC_AG@
-
-FARGS = base-name=functions template=functions filelist agarg=$(OPTDBG)
 
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
@@ -67,7 +65,7 @@ all : @AGEXE@
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-STAMPS   = stamp-directive stamp-exprini stamp-functions stamp-opts stamp-fsm
+STAMPS   = stamp-directive stamp-exprini stamp-opts stamp-fsm
 GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) DEBUG_OPTS=$(OPTDBG) \
@@ -81,10 +79,6 @@ stamp-opts: opts.def $(top_srcdir)/VERSION
 
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
-
-## stamp-functions GEN-RULE
-stamp-functions: $(FUNCLIST) functions.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-exprini GEN-RULE

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/05/09 05:25:59 $
+# Last Modified:     $Date: 2001/07/28 17:11:00 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 1.32 2001/05/09 05:25:59 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 1.33 2001/07/28 17:11:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -288,24 +288,6 @@ do
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="assign=group=ag $eopt defs=gfunc templ=snarf srcfile"
     SHELL=ksh ${GD} $eopt out=expr.def exp*.c func*.c
-    ;;
-
-  stamp-functions | \
-  functions.h )
-    if [ -z "${AG}" ] || [ -z "${GD}" ]
-    then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen or getdefs.  Giving up"
-      exit 1
-    fi
-    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
-    eopt="template=functions defs=macfunc linenum srcfile filelist"
-    eopt="$eopt autogen=${AG} base-name=functions"
-    if [ -n "${AUTOGEN_DEBUG}" ]
-    then eopt="$eopt agarg='-D${AUTOGEN_DEBUG}'" ; fi
-    echo ${GD} $eopt func*.c
-    ${GD} $eopt func*.c
-    date > stamp-functions
     ;;
 
   stamp-directive | \

@@ -1,3 +1,10 @@
+2001-07-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/functions.h: new - no longer generated
+	* agen5/functions.tpl: obsolete
+	* agen5/bootstrap.dir(functions.h): don't generate any more
+	* agen5/Makefile.am(stamp-functions): ditto
+
 2001-07-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(defArgs) rename to "serverArgs" and export.
