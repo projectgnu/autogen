@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.4 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: tpProcess.c,v 1.5 2000/02/27 23:58:54 bruce Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -97,6 +97,7 @@ processTemplate( tTemplate* pTF )
     /*
      *  IF the template file does not specify any output suffixes,
      *  THEN we will generate to standard out with the suffix set to zNone.
+     *  With output going to stdout, we don't try to remove output on errors.
      */
     if (pOutSpecList == (tOutSpec*)NULL) {
 
@@ -149,7 +150,7 @@ processTemplate( tTemplate* pTF )
                            (tDefEntry*)rootEntry.pzValue );
 
             do  {
-                closeOutput( AG_FALSE );
+                closeOutput( AG_FALSE );  /* keep output */
             } while (pCurFp->pPrev != (tFpStack*)NULL);
         }
 
@@ -158,11 +159,7 @@ processTemplate( tTemplate* pTF )
              *  We got here by a long jump.  Close/purge the open files.
              */
             do  {
-#if defined( DEBUG )
-                closeOutput( AG_FALSE );
-#else
-                closeOutput( AG_TRUE );
-#endif
+                closeOutput( AG_TRUE );  /* discard output */
             } while (pCurFp->pPrev != (tFpStack*)NULL);
 
             /*
