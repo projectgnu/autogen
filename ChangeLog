@@ -1,3 +1,8 @@
+2002-01-10  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c(main): remove warning that is overly common
+	* opts/opts.def: Fix up the man page format definitions
+
 2002-01-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agCgi.c: reopen stderr as stdout so we can direct messages
