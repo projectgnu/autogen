@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.36 2000/03/05 21:50:07 bruce Exp $
+## $Id: Makefile.am,v 2.37 2000/03/06 02:03:26 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -95,6 +95,9 @@ autogen.texi : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
+
+$(AGSRCDIR)/autogen.texi :
+	@cd $(AGSRCDIR) ; echo making $@ in `pwd` ; make autogen.texi
 
 www/doc/autogen_toc.html : autogen.texi
 	@mkdir -p www/doc > /dev/null 2>&1 || :

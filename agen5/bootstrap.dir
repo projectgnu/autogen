@@ -188,7 +188,7 @@ do
   stamp-directive | \
   directive.h )
     eopt="template=directive autogen=${AG} base-name=directive"
-    echo ${GD} $eopt defDirect.c
+    echo ${GD} $eopt ${top_srcdir}/agen5/defDirect.c
     ${GD} $eopt defDirect.c
     date > stamp-directive
     ;;

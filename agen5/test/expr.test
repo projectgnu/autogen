@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2000/03/05 22:24:06 $
+# Last Modified:  $Date: 2000/03/06 02:03:26 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.9 2000/03/05 22:24:06 bruce Exp $
+# $Id: expr.test,v 1.10 2000/03/06 02:03:26 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,8 +32,7 @@ _EOF_
 sed -n '/  expr.ini /,/stamp-exprini/p' ${top_srcdir}/agen5/bootstrap.dir |
   sed -e 1d -e '$d' >> ./${testname}.sh
 
-sh -x ./${testname}.sh 2>&1 || \
-  failure Could not generate output
+sh -x ./${testname}.sh
 sed '1,6d' ./expr.ini > expr.out
 sed '1,6d' ${top_srcdir}/agen5/expr.ini > expr.base
 

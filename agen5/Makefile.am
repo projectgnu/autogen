@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.19 2000/03/05 22:54:06 bruce Exp $
+## $Id: Makefile.am,v 1.20 2000/03/06 02:03:26 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -78,16 +78,19 @@ stamp-opts: opts.def $(top_srcdir)/VERSION
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	AUTOGEN_TEMPL_DIRS=$(srcdir) \
 	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## stamp-functions GEN-RULE
 stamp-functions: $(FUNCLIST) functions.tpl
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	AUTOGEN_TEMPL_DIRS=$(srcdir) \
 	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	AUTOGEN_TEMPL_DIRS=$(srcdir) \
 	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE
@@ -96,7 +99,7 @@ proto.h : defParse.y
 	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## autogen.texi GEN-RULE
-autogen.texi : $(STAMPS) ../getdefs/getdefs ../columns/columns AutoGen
+autogen.texi : ./AutoGen ../getdefs/getdefs ../columns/columns
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
  
