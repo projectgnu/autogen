@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.26 2004/04/03 17:18:58 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.27 2004/05/19 03:41:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -589,6 +589,7 @@ if [ -f ${libs}/libopts.a ]
 then libs=\"${libs}/libopts.a\"
 else libs=\"-L ${libs} -lopts\"
 fi
+libs=\"${libs} ${LIBS}\"
 
 exec 3>&1
 (
@@ -601,7 +602,6 @@ exec 3>&1
     exit 1
   fi
 
-  libs=\"${libs} ${LIBS}\"
   opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -I${OPTDIR}\"
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 

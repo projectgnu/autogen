@@ -35,7 +35,7 @@ The Copyright itself is privately held by Bruce Korb.
 chmod -R +rw *
 
 %build
-./configure --prefix=%{prefix} --infodir=%{infodir}
+./configure --prefix=%{prefix} --infodir=%{_infodir}
 make CFLAGS="$RPM_OPT_FLAGS"
 
 if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd; then
@@ -56,10 +56,10 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 %post
 /sbin/ldconfig
-/sbin/install-info --info-dir=%{infodir} %{infodir}/autogen.info*
+/sbin/install-info --info-dir=%{_infodir} %{_infodir}/autogen.info*
 
 %preun
-/sbin/install-info --delete --info-dir=%{infodir} %{infodir}/autogen.info*
+/sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/autogen.info*
 
 %postun -p /sbin/ldconfig
 
