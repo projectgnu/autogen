@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:29:52 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.25 1999/08/30 19:30:04 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.26 1999/08/31 00:16:09 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -216,6 +216,6 @@ done
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
-# test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
+test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
 
 # bootstrap ends here
