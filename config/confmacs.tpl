@@ -8,7 +8,7 @@ AutoGen5 Template
 (define (protect-text t)
     (string-substitute t
         '("["     "]"     "$"     "#"     )
-		'("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))  )
+        '("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))  )
 =][=
 
 DEFINE preamble
@@ -170,12 +170,14 @@ DEFINE  emit-results   =][=
 
   (define good-subst 0 )
   (define bad-subst  0 )
+  (define TMP-text   "")
   (define tmp-text   "") =][=
 
   FOR     action         =][=
 
     CASE (set! tmp-text (get "act-text"))
-	     (string-append
+         (set! TMP-text (string-upcase tmp-text))
+         (string-append
            (if (exist? "no") "no-" "yes-")
            (get "act-type"))
       =][=
@@ -183,13 +185,13 @@ DEFINE  emit-results   =][=
     == yes-define        =][=
       (set! good-text (string-append good-text
             "\n    AC_DEFINE([" (sprintf good-define-name up-name) "],["
-			(if (> (string-length tmp-text) 0) tmp-text "1")
+            (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if " (protect-text (get "check")) "])" ))
       =][=
 
     == yes-subst         =][=
       (set! good-subst 1)
-	  (set! good-text (string-append good-text
+      (set! good-text (string-append good-text
                    "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
       =][=
 
@@ -199,48 +201,62 @@ DEFINE  emit-results   =][=
       =][=
 
     == yes-libflags      =][=
-      (set! tmp-text (string-upcase! tmp-text))
-      (set! good-text (string-append good-text
-            "\n    CPPFLAGS=\"${ag_save_CPPFLAGS}\"\n"
-            "    LDFLAGS=\"${ag_save_LDFLAGS}\"\n"
-            "    AC_SUBST(" tmp-text "_CPPFLAGS)\n"
-            "    AC_SUBST(" tmp-text "_LDFLAGS)\n"
+      (out-push-new)     =]
+CPPFLAGS="${ag_save_CPPFLAGS}"
+LDFLAGS="${ag_save_LDFLAGS}"
+AC_SUBST([=(. TMP-text)=]_CPPFLAGS)
+AC_SUBST([=(. TMP-text)=]_LDFLAGS)
+case "X${[=(. cv-name)=]_incdir}" in Xyes|Xno|X )
+  case "X${[=(. cv-name)=]_root}" in Xyes|Xno|X )
+    [=(. TMP-text)=]_CPPFLAGS="" ;;
+    * ) [=(. TMP-text)=]_CPPFLAGS="-I${[=(. cv-name)
+        =]_root}/include" ;; esac ;;
+  * ) [=(. TMP-text)=]_CPPFLAGS="${[=(. cv-name)=]_incdir}" ;; esac
 
-            "    case \"X${" cv-name "_incdir}\" in Xyes|Xno|X )\n"
-            "      case \"X${" cv-name "_root}\" in Xyes|Xno|X )\n"
-            "        " tmp-text "_CPPFLAGS=\"\" ;;\n"
-            "        * ) " tmp-text "_CPPFLAGS=\"-I${"
-                   cv-name "_root}/include\" ;; esac ;;\n"
-            "      * ) " tmp-text "_CPPFLAGS=\"-I${"
-                   cv-name "_incdir}\" ;; esac\n"
+case "X${[=(. cv-name)=]_libdir}" in Xyes|Xno|X )
+  case "X${[=(. cv-name)=]_root}" in Xyes|Xno|X )
+    [=(. TMP-text)=]_LDFLAGS="-l[=(. tmp-text)=]" ;;
+    * ) [=(. TMP-text)=]_LDFLAGS="-L${[=(. cv-name)=]_root}/lib -l[=
+        (. tmp-text)=]" ;; esac ;;
+  * ) [=(. TMP-text)=]_LDFLAGS="${[=(. cv-name)=]_libdir}" ;; esac[=
 
-            "\n    case \"X${" cv-name "_libdir}\" in Xyes|Xno|X )\n"
-            "      case \"X${" cv-name "_root}\" in Xyes|Xno|X )\n"
-            "        " tmp-text "_LDFLAGS=\"-l"
-                   down-name "\" ;;\n"
-            "        * ) " tmp-text "_LDFLAGS=\"-L${"
-                   cv-name "_root}/lib -l" down-name "\" ;; esac ;;\n"
-            "      * ) " tmp-text "_LDFLAGS=\"${"
-                   cv-name "_libdir}\" ;; esac\n"   ))
+      (set! good-text (string-append good-text (prefix "    " (out-pop #t))))
       =][=
 
     ==  no-define        =][=
       (set! bad-text (string-append bad-text
             "\n    AC_DEFINE([" (sprintf bad-define-name up-name) "],["
-			(if (> (string-length tmp-text) 0) tmp-text "1")
+            (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if '" (protect-text (get "check"))
                                        "' is not true])" ))
       =][=
 
     ==  no-subst         =][=
       (set! bad-subst  1)
-	  (set! bad-text (string-append bad-text
+      (set! bad-text (string-append bad-text
                    "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
       =][=
 
     ==  no-script        =][=
       (set! bad-text (string-append bad-text "\n    "
             (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
+      =][=
+
+    ~~  (yes|no)-config  =][=
+      (out-push-new)     =]
+f=`[=(. tmp-text)=]-config [= ?% act-link "%s" "link" =]`
+if test -z "$f"
+then
+  AC_MSG_ERROR([Cannot find lib[=(. tmp-text)=]])
+fi
+[=(. TMP-text)=]_LDFLAGS="$f"
+[=(. TMP-text)=]_CPPFLAGS=`[=(. tmp-text)=]-config [=
+   ?% act-incl "%s" "compile" =] | sed 's,-I */usr/include\( |$\),\1,'`
+echo "lib[=(. tmp-text)=] found via [=(. tmp-text)=]-config" >&2
+ag_cv_with_[=(. tmp-text)=]_libdir="${[=(. TMP-text)=]_LDFLAGS}"
+ag_cv_with_[=(. tmp-text)=]_incdir="${[=(. TMP-text)=]_CPPFLAGS}"[=
+
+      (set! bad-text (string-append bad-text (prefix "    " (out-pop #t))))
       =][=
 
     ESAC                 =][=
@@ -336,7 +352,7 @@ ENDDEF  try-without             =][=
 
 DEFINE  try-withlib             =]
   AC_ARG_WITH([lib[=
-    (set! cv-name (string-append group-pfx "cv_with_" down-name))
+    (set! cv-name (string-append group-pfx "cv_with_lib" down-name))
     down-name =]],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
         =]], [lib[=(. down-name)=] installation prefix]),
@@ -382,7 +398,15 @@ DEFINE  try-withlib             =]
                =]_root}/lib -l[=(. down-name)=]";;
     esac
   esac
-  [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"
+  [=(define lib-name "")
+    (if (not (exist? "libname"))
+        (set! lib-name down-name)
+        (if (> (string-length (get "libname")) 0)
+           (set! lib-name (get "libname"))
+           (set! lib-name "")
+    )   )
+
+       group-pfx =]save_CPPFLAGS="${CPPFLAGS}"
   [=(. group-pfx)=]save_LDFLAGS="${LDFLAGS}"[=
   (set! bad-text (sprintf
     "\n    CPPFLAGS=\"${%1$ssave_CPPFLAGS}\"
@@ -395,12 +419,8 @@ DEFINE  try-withlib             =]
 
   case "X${[=(. cv-name)=]_libdir}" in
   Xyes|Xno|X )[=
-    IF (exist? "libname")      =][=
-      IF (> (string-length (get "libname")) 0) =]
-    LDFLAGS="${LDFLAGS} -l[=libname=]"[=
-      ENDIF length of libname =][=
-    ELSE  not exist libname   =]
-    LDFLAGS="${LDFLAGS} -l[=(. down-name)=]"[=
+    IF (> (string-length lib-name) 0) =]
+    LDFLAGS="${LDFLAGS} -l[=(. lib-name)=]"[=
     ENDIF  =] ;;
   * )
     LDFLAGS="${LDFLAGS} ${[=(. cv-name)=]_libdir}" ;;

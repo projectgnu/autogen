@@ -36,7 +36,7 @@
 # USAGE: genproto [debug] <filter> source.h-in > source.h
 #
 # This program scans a C source file for special comments preceding
-# K&R function declarations, and generates PARAMS() wrapped, and commented
+# function declarations, and generates
 # function declarations suitable for use in a header file.
 #
 # See the accompanying README for details of how to format function headers

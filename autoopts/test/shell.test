@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/07/27 19:10:46 $
+# Last Modified:     $Date: 2003/01/14 05:04:21 $
 #            by: bkorb
 #
-# $Id: shell.test,v 3.3 2002/07/27 19:10:46 bkorb Exp $
+# $Id: shell.test,v 3.4 2003/01/14 05:04:21 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -429,10 +429,10 @@ cmp -s $testname.sh* || \
 # # # # # # # # # # SCRIPT PROCESSING TEST # # # # # # # # #
 
 chmod +x $testname.sh
-./$testname.sh  --opt opt-arg -s a1 a2 > $testname.test || \
+./$testname.sh  --opt opt-arg -s a1 a2 | sort > $testname.test || \
   failure $testname did not handle its options
 
-cat > $testname.out <<_EOF_
+sort > $testname.out <<_EOF_
 TEST_SHELL_OPTION=opt-arg
 TEST_SHELL_SECOND=true
 _EOF_

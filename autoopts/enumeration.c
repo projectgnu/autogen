@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.5 2003/01/05 21:00:11 bkorb Exp $
+ *  $Id: enumeration.c,v 3.6 2003/01/14 05:04:21 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -134,7 +134,7 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
         /*
          *  Replace the enumeration value with the name string.
          */
-        return paz_names[ (int)(pOD->pzLastArg) ];
+        return (char*)paz_names[ (int)(pOD->pzLastArg) ];
 
     default:
         break;

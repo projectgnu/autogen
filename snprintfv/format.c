@@ -53,112 +53,11 @@ extern long double ldexpl (long double x, int exp);
 #define ldexpl ldexp
 #endif
 
-
-/* This is where the parsing of FORMAT strings is handled:
-
-   Each of these functions should inspect PPARSER for parser
-   state information;  update PPARSER as necessary based on
-   the state discovered;  possibly put some characters in STREAM, in
-   which case that number of characters must be returned.  If the
-   handler detects that parsing (of the current specifier) is complete,
-   then it must set pinfo->state to SNV_STATE_END.  The library will then
-   copy characters from the format string to STREAM until another unescaped
-   SNV_CHAR_SPEC is detected when the handlers will be called again. */
-
-static int printf_numeric_param_info PARAMS ((struct printf_info * const pinfo,
-				   size_t n, int *argtypes));
-static int printf_flag_info PARAMS ((struct printf_info * const pinfo,
-				 size_t n, int *argtypes));
-static int printf_modifier_info PARAMS ((struct printf_info * const pinfo,
-				     size_t n, int *argtypes));
-
-static int printf_flag PARAMS ((STREAM * stream, 
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_numeric_param PARAMS ((STREAM * stream, 
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_count PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_char PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_float PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_integer PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_pointer PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-static int printf_string PARAMS ((STREAM * stream,
-				   struct printf_info * const pinfo,
-				   union printf_arg const *args));
-
-spec_entry snv_default_spec_table[] = {
-  /* ch  type         function */
-  {' ', TRUE, 0, printf_flag, printf_flag_info},
-  {'#', TRUE, 0, printf_flag, printf_flag_info},
-  {'+', TRUE, 0, printf_flag, printf_flag_info},
-  {'-', TRUE, 0, printf_flag, printf_flag_info},
-  {'\'', TRUE, 0, printf_flag, printf_flag_info},
-  {'*', TRUE, PA_INT, printf_numeric_param, printf_numeric_param_info},
-  {'.', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'0', TRUE, 0, printf_flag, printf_flag_info},
-  {'1', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'2', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'3', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'4', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'5', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'6', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'7', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'8', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'9', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'c', FALSE, PA_CHAR, printf_char, NULL},
-  {'d', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'e', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'E', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'f', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'F', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'g', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'G', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'h', TRUE, 0, printf_flag, printf_modifier_info},
-  {'i', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'j', TRUE, 0, printf_flag, printf_modifier_info},
-  {'l', TRUE, 0, printf_flag, printf_modifier_info},
-  {'L', TRUE, 0, printf_flag, printf_modifier_info},
-  {'n', FALSE, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info},
-  {'o', FALSE, PA_INT | PA_FLAG_UNSIGNED,
-   printf_integer, printf_generic_info, (snv_pointer) 8},
-  {'p', FALSE, PA_POINTER, printf_pointer, NULL, (snv_pointer) 16},
-  {'q', TRUE, 0, printf_flag, printf_modifier_info},
-  {'s', FALSE, PA_STRING, printf_string, NULL},
-  {'t', TRUE, 0, printf_flag, printf_modifier_info},
-  {'u', FALSE, PA_INT | PA_FLAG_UNSIGNED,
-   printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'x', FALSE, PA_INT | PA_FLAG_UNSIGNED,
-   printf_integer, printf_generic_info, (snv_pointer) 16},
-  {'X', FALSE, PA_INT | PA_FLAG_UNSIGNED,
-   printf_integer, printf_generic_info, (snv_pointer) 16},
-  {'z', TRUE, 0, printf_flag, printf_modifier_info},
-  {'\0', FALSE, PA_LAST}
-};
-
-static intmax_t fetch_intmax PARAMS ((struct printf_info * pinfo, union printf_arg const *arg));
-static uintmax_t fetch_uintmax PARAMS ((struct printf_info * pinfo, union printf_arg const *arg));
-static snv_long_double fetch_double PARAMS ((struct printf_info * pinfo, union printf_arg const *arg));
-
-/* Helper functions to print doubles */
-static inline snv_long_double ipow PARAMS ((snv_long_double base, int n));
-static int print_float PARAMS ((struct printf_info * pinfo, char *buf, snv_long_double n));
-
 
-uintmax_t
-fetch_uintmax (pinfo, arg)
-     struct printf_info *pinfo;
-     union printf_arg const *arg;
+static uintmax_t
+fetch_uintmax(
+    struct printf_info *pinfo,
+	union printf_arg const *arg )
 {
   if (pinfo->is_long_double)
     return (uintmax_t) arg->pa_u_long_long_int;
@@ -175,10 +74,10 @@ fetch_uintmax (pinfo, arg)
   return (uintmax_t) arg->pa_u_int;
 }
 
-intmax_t
-fetch_intmax (pinfo, arg)
-     struct printf_info *pinfo;
-     union printf_arg const *arg;
+static intmax_t
+fetch_intmax(
+     struct printf_info *pinfo,
+     union printf_arg const *arg )
 {
   if (pinfo->is_long_double)
     return (intmax_t) arg->pa_long_long_int;
@@ -195,10 +94,10 @@ fetch_intmax (pinfo, arg)
   return (intmax_t) arg->pa_int;
 }
 
-snv_long_double
-fetch_double (pinfo, arg)
-     struct printf_info *pinfo;
-     union printf_arg const *arg;
+static snv_long_double
+fetch_double(
+     struct printf_info *pinfo,
+     union printf_arg const *arg )
 {
   if (pinfo->is_long_double)
     return arg->pa_long_double;
@@ -209,8 +108,8 @@ fetch_double (pinfo, arg)
 
 #ifndef HAVE_COPYSIGNL
 snv_long_double
-copysignl (x, y)
-     snv_long_double x, y;
+copysignl(
+	snv_long_double x, snv_long_double y )
 {
 #ifdef HAVE_COPYSIGN
   return x * (snv_long_double) copysign (1.0, x * y);
@@ -223,10 +122,10 @@ copysignl (x, y)
 }
 #endif
 
-snv_long_double
-ipow (base, n)
-     snv_long_double base;
-     int n;
+static snv_long_double
+ipow(
+     snv_long_double base,
+     int n )
 {
   int k = 1;
   snv_long_double result = 1.0;
@@ -249,11 +148,11 @@ ipow (base, n)
   return result;
 }
 
-int
-print_float (pinfo, buf, n)
-     struct printf_info *pinfo;
-     char *buf;
-     snv_long_double n;
+static int
+print_float(
+     struct printf_info *pinfo,
+     char *buf,
+     snv_long_double n )
 {
   /* Print value of n in a buffer in the given base.
      Based upon the algorithm outlined in:
@@ -576,20 +475,20 @@ print_float (pinfo, buf, n)
 }
 
 
-int
-printf_flag (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_flag(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   return 0;
 }
 
-int
-printf_flag_info (pinfo, n, argtypes)
-     struct printf_info *const pinfo;
-     size_t n;
-     int *argtypes;
+static int
+printf_flag_info(
+     struct printf_info *const pinfo,
+     size_t n,
+     int *argtypes )
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -649,11 +548,11 @@ printf_flag_info (pinfo, n, argtypes)
   return 0;
 }
 
-int
-printf_numeric_param (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_numeric_param(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   /* Called twice if both the width and precision are
      asterisks, in which case we extract the width on
@@ -667,11 +566,11 @@ printf_numeric_param (stream, pinfo, args)
   return 0;
 }
  
-int
-printf_numeric_param_info (pinfo, n, argtypes)
-     struct printf_info *const pinfo;
-     size_t n;
-     int *argtypes;
+static int
+printf_numeric_param_info(
+     struct printf_info *const pinfo,
+     size_t n,
+     int *argtypes )
 {
   char *pEnd = NULL;
   int found = 0, allowed_states, new_state;
@@ -764,11 +663,11 @@ printf_numeric_param_info (pinfo, n, argtypes)
   return found & 4 ? 1 : 0;
 }
 
-int
-printf_modifier_info (pinfo, n, argtypes)
-     struct printf_info *const pinfo;
-     size_t n;
-     int *argtypes;
+static int
+printf_modifier_info(
+     struct printf_info *const pinfo,
+     size_t n,
+     int *argtypes )
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -838,7 +737,6 @@ printf_modifier_info (pinfo, n, argtypes)
   return 0;
 }
 
-
 /**
  * printf_generic_info:
  * @pinfo: the current state information for the format
@@ -856,10 +754,10 @@ printf_modifier_info (pinfo, n, argtypes)
  * Always 1.
  */
 int
-printf_generic_info (pinfo, n, argtypes)
-     struct printf_info *const pinfo;
-     size_t n;
-     int *argtypes;
+printf_generic_info( pinfo, n, argtypes )
+	struct printf_info *const pinfo;
+    size_t n;
+    int *argtypes;
 {
   int type = pinfo->type;
 
@@ -886,11 +784,11 @@ printf_generic_info (pinfo, n, argtypes)
 }
 
 
-int
-printf_char (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_char(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   int count_or_errorcode = SNV_OK;
   char ch = '\0';
@@ -934,11 +832,11 @@ printf_char (stream, pinfo, args)
   return count_or_errorcode;
 }
 
-int
-printf_float (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_float(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   snv_long_double value = 0.0;
   int len, count_or_errorcode = SNV_OK, type = PA_DOUBLE;
@@ -1007,11 +905,11 @@ printf_float (stream, pinfo, args)
   return count_or_errorcode;
 }
 
-int
-printf_count (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_count(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   int type = pinfo->type;
 
@@ -1033,11 +931,11 @@ printf_count (stream, pinfo, args)
   return 0;
 }
 
-int
-printf_integer (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_integer(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   static const char digits_lower[] = "0123456789abcdefghijklmnopqrstuvwxyz";
   static const char digits_upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1177,11 +1075,11 @@ printf_integer (stream, pinfo, args)
   return count_or_errorcode;
 }
 
-int
-printf_pointer (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_pointer(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   int count_or_errorcode = SNV_OK;
 
@@ -1233,11 +1131,11 @@ printf_pointer (stream, pinfo, args)
   return count_or_errorcode;
 }
 
-int
-printf_string (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+static int
+printf_string(
+     STREAM *stream,
+     struct printf_info *const pinfo,
+     union printf_arg const *args )
 {
   int len = 0, count_or_errorcode = SNV_OK;
   const char *p = NULL;
@@ -1311,10 +1209,10 @@ printf_string (stream, pinfo, args)
  * The number of characters output.
  **/
 int
-printf_generic (stream, pinfo, args)
-     STREAM *stream;
-     struct printf_info *const pinfo;
-     union printf_arg const *args;
+printf_generic( stream, pinfo, args )
+	STREAM *stream;
+    struct printf_info *const pinfo;
+    union printf_arg const *args;
 {
   int len = 0, count_or_errorcode = SNV_OK;
   char *p = NULL;
@@ -1379,5 +1277,66 @@ printf_generic (stream, pinfo, args)
   /* Return the number of characters emitted. */
   return count_or_errorcode;
 }
+
+
+/* This is where the parsing of FORMAT strings is handled:
+
+   Each of these functions should inspect PPARSER for parser
+   state information;  update PPARSER as necessary based on
+   the state discovered;  possibly put some characters in STREAM, in
+   which case that number of characters must be returned.  If the
+   handler detects that parsing (of the current specifier) is complete,
+   then it must set pinfo->state to SNV_STATE_END.  The library will then
+   copy characters from the format string to STREAM until another unescaped
+   SNV_CHAR_SPEC is detected when the handlers will be called again. */
+
+spec_entry snv_default_spec_table[] = {
+  /* ch  type         function */
+  {' ', TRUE, 0, printf_flag, printf_flag_info},
+  {'#', TRUE, 0, printf_flag, printf_flag_info},
+  {'+', TRUE, 0, printf_flag, printf_flag_info},
+  {'-', TRUE, 0, printf_flag, printf_flag_info},
+  {'\'', TRUE, 0, printf_flag, printf_flag_info},
+  {'*', TRUE, PA_INT, printf_numeric_param, printf_numeric_param_info},
+  {'.', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'0', TRUE, 0, printf_flag, printf_flag_info},
+  {'1', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'2', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'3', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'4', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'5', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'6', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'7', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'8', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'9', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
+  {'c', FALSE, PA_CHAR, printf_char, NULL},
+  {'d', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
+  {'e', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'E', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'f', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'F', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'g', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'G', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'h', TRUE, 0, printf_flag, printf_modifier_info},
+  {'i', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
+  {'j', TRUE, 0, printf_flag, printf_modifier_info},
+  {'l', TRUE, 0, printf_flag, printf_modifier_info},
+  {'L', TRUE, 0, printf_flag, printf_modifier_info},
+  {'n', FALSE, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info},
+  {'o', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+   printf_integer, printf_generic_info, (snv_pointer) 8},
+  {'p', FALSE, PA_POINTER, printf_pointer, NULL, (snv_pointer) 16},
+  {'q', TRUE, 0, printf_flag, printf_modifier_info},
+  {'s', FALSE, PA_STRING, printf_string, NULL},
+  {'t', TRUE, 0, printf_flag, printf_modifier_info},
+  {'u', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+   printf_integer, printf_generic_info, (snv_pointer) 10},
+  {'x', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+   printf_integer, printf_generic_info, (snv_pointer) 16},
+  {'X', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+   printf_integer, printf_generic_info, (snv_pointer) 16},
+  {'z', TRUE, 0, printf_flag, printf_modifier_info},
+  {'\0', FALSE, PA_LAST}
+};
 
 /* format.c ends here */

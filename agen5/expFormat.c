@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: expFormat.c,v 3.11 2003/01/14 05:04:21 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -554,10 +554,10 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  an AGSTRDUP-ed string there.
      */
     if (mi.pData == NULL) {
-        char* pz = mi.pzFileName;
+        char* pz;
         tSCC*  apzSfx[] = { "lic", NULL };
 
-        mapDataFile( pz, &mi, apzSfx );
+        mapDataFile( mi.pzFileName, &mi, apzSfx );
 
         pz = (char*)mi.pData + mi.size - 1;
         while (isspace( pz[-1] )) pz--;

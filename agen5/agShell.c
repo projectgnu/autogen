@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.13 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: agShell.c,v 3.14 2003/01/14 05:04:21 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -227,15 +227,21 @@ chainOpen( int       stdinFd,
 
     /*
      *  If the arg list does not have a program,
-     *  assume the "SHELL" from the environment, or, failing
+     *  assume the zShellProg from the environment, or, failing
      *  that, then sh.  Set argv[0] to whatever we decided on.
      */
     if (pzShell = *ppArgs,
-       (pzShell == NULL) || (*pzShell == NUL)){
+       (pzShell == NULL) || (*pzShell == NUL)) {
 
-        pzShell = getenv( "SHELL" );
-        if (pzShell == NULL)
-            pzShell = "sh";
+        if (pzShellProgram != NULL)
+            pzShell = pzShellProgram;
+
+        else {
+            pzShell = getenv( zShellEnv );
+            if (pzShell == NULL)
+                pzShell = "sh";
+            pzShellProgram = pzShell;
+        }
 
         *ppArgs = pzShell;
     }

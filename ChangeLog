@@ -1,3 +1,21 @@
+2003-01-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(defParse.c): remove explicit rule 'cuz automake
+	provides it, but make all objects depend on the header 'cuz you cannot
+	specify a single object (defLex.o).
+	* agen5/expFormat.c: warning fix
+	* agen5/funcFor.c: ditto
+	* agen5/loadPseudo.c: ditto
+	* autoopts/aginfo.tpl(invocation): add debugging info until cause of
+	failure has been determined!!
+	* autoopts/enumeration.c(optionEnumerationVal): warning fix
+	* autoopts/pgusage.c(doPagedUsage): sanity check
+	* autoopts/test/shell.test: sort env output for testing consistency
+	* config/confmacs.tpl(try-withlib): add "lib" to the cache variable
+	* snprintfv/compat.h(HAVE_WCHAR_T): only use wchar_t if we have it
+	(HAVE_WINT_T): ditto
+	* snprintfv/*: eliminate accommodations for K&R.  K&R is dead.
+
 2003-01-05  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/usage.c(optionUsage): set option_usage_fp to stdout when

@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-10-12 09:06:46 bkorb"
+## Time-stamp:      "2003-01-12 15:26:21 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.17 2002/10/12 18:12:00 bkorb Exp $
+## $Id: Makefile.am,v 3.18 2003/01/14 05:04:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -60,6 +60,14 @@ AM_YFLAGS = -d
 
 all : @AGEXE@
 
+##  This is a LIE:  only defLex.o depends upon defParse.h.  However, automake
+##  is too bloody stupid to be able to cope with that and they don't provide
+##  you with another way to make the dependency explicit.  Well, okay, this
+##  doesn't cost much other than the cost of non-obvious screwing around
+##  to make it work correctly and not squawk.
+##
+$(autogen_OBJECTS) : defParse.h defParse.c
+
 SUFFIXES = .i
 .c.i :
 	$(COMPILE) -E $< > $@
@@ -103,11 +111,6 @@ autogen.texi : $(STAMPS) @AGEXE@ ../getdefs/getdefs ../columns/columns
 ## autogen.1 GEN-RULE
 autogen.1 : opts.def
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
-
-## defParse.c GEN-RULE
-defParse.c defParse.h : defParse.y
-	@$(BOOTENV) YACC="$(YACC) $(YFLAGS)" \
-	$(SHELL) $(srcdir)/bootstrap.dir $@
 
 gen : $(GEN_LIST)
 

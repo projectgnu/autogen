@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.8 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.9 2003/01/14 05:04:21 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -61,7 +61,7 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
     pzEnd = (char*)skipScheme( pzData, pzEnd );
     ch = *pzEnd;
     *pzEnd = NUL;
-    gh_eval_str( pzData );
+    gh_eval_str( (char*)pzData );
     *pzEnd = ch;
     while (pzData < pzEnd)
         if (*(pzData++) == '\n')
@@ -413,12 +413,13 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
      *  if it has been changed.
      */
     if (serverArgs[0] != NULL) {
-        char* pz = getenv( "SHELL" );
+        char* pz = getenv( zShellEnv );
         if ((pz != NULL) && (strcmp( pz, serverArgs[0] ) != 0)) {
             fprintf( pfTrace, "Changing server shell from %s to %s\n",
                      serverArgs[0], pz );
             closeServer();
             serverArgs[0] = pz;
+            pzShellProgram = pz;
         }
     }
 

@@ -119,13 +119,13 @@ extern "C" {
 # include <wchar.h>
 #endif
 
-#ifndef HAVE_WCHAR_T
+#ifdef HAVE_WCHAR_T
 typedef wchar_t snv_wchar_t;
 #else
 typedef int snv_wchar_t;
 #endif
 
-#ifndef HAVE_WINT_T
+#ifdef HAVE_WINT_T
 typedef wint_t snv_wint_t;
 #else
 typedef int snv_wint_t;
@@ -215,14 +215,7 @@ typedef int compatboolean;
 #endif
 
 #ifndef PARAMS
-#  if __STDC__
-#    ifndef NOPROTOS
-#      define PARAMS(args)      args
-#    endif
-#  endif
-#  ifndef PARAMS
-#    define PARAMS(args)        ()
-#  endif
+#  define PARAMS(args)      args
 #endif
 
 #undef SNV_STMT_START
@@ -310,17 +303,17 @@ typedef int compatboolean;
 typedef SNV_LONG_DOUBLE snv_long_double;
 
 #ifndef HAVE_STRTOUL
-extern unsigned long strtoul PARAMS(( const char *nptrm,
-									  char **endptr,
-									  register int base ));
+extern unsigned long strtoul( const char *nptrm,
+							  char **endptr,
+							  register int base );
 #endif
 
 #ifndef HAVE_LDEXPL
-extern long double ldexpl PARAMS((long double x, int exp));
+extern long double ldexpl(long double x, int exp);
 #endif
 
 #ifndef HAVE_FREXPL
-extern long double frexpl PARAMS((long double x, int *exp));
+extern long double frexpl(long double x, int *exp);
 #endif
 
 SNV_END_EXTERN_C

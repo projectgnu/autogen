@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.8 2003/01/05 21:00:11 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.9 2003/01/14 05:04:21 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -89,9 +89,9 @@ tSCC zNoFlags[]    =
 "Options are specified by their name and either single\n\
 or doubled %ss.  Flag characters are not interpreted.\n";
 
-static void printInitList PROTO(( tCC** papz, ag_bool*, tCC*, tCC* ));
-
 FILE* option_usage_fp = NULL;
+
+static void printInitList PROTO(( tCC** papz, ag_bool*, tCC*, tCC* ));
 
 void
 optionUsage( pOptions, exitCode )

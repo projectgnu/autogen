@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     $Date: 2002/07/27 04:13:35 $
+## Last Modified:     $Date: 2003/01/14 05:04:21 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.4 2002/07/27 04:13:35 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.5 2003/01/14 05:04:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -34,7 +34,10 @@ prog_name
  (. down-prog-name) =] invocation
 @ignore
 [=
-(out-push-new (shellf "echo %s | sed 's/texi$/menu/'" (out-name)) )
+(out-push-new (shellf
+"f=`echo %1$s | sed 's/texi$/menu/'`
+ echo \"out-push-new from %1$s to $f\" >&2
+ echo $f" (out-name)) )
 =]* [= % prog_name (sprintf "%%-32s"  "%s Invocation::")
      =] Invoking [=prog_name=]
 [=(out-pop)

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.9 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: autogen.h,v 3.10 2003/01/14 05:04:21 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -259,6 +259,7 @@ MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( NULL );
 
 MODE tCC*        serverArgs[2]    VALUE( { NULL } );
+MODE tCC*        pzShellProgram   VALUE( NULL );
 
 /*
  *  AutoGen definiton and template context
@@ -324,6 +325,7 @@ MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( NotStr,    "ERROR: %s is not a string\n" );
 MKSTRING( DevNull,   "/dev/null" );
+MKSTRING( ShellEnv,  "SHELL" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -18,13 +18,17 @@ Mailing lists can be found on SourceForge:
 
     autogen-users@lists.sourceforge.net
 
-AutoGen requires:
+
+***  AutoGen requires: ***
+
 1.  POSIX regular expression library.  If not available by default, use
     the --with-regex-* options to specify how to find, use and link to it.
 2.  an ANSI C compiler
 3.  The Guile version of a Scheme processing language.
 
-Installation note:
+
+***  Installation note: ***
+
 AutoGen does *NOT* contain any compiled-in configuration information.
 Therefore, in order to use the templates that come bundled with it,
 you must tell AutoGen how to find those templates when you build
@@ -51,3 +55,37 @@ applications that use those templates.
 and then rebuilding AutoGen.  However, if you do this latter
 "fix", you will have an immobile product.  I hate that, others
 like it.  It is, however, up to you.
+
+
+***  Build note: ***
+
+Sometimes, configure believes it has done a good job when it really
+hasn't.  It is possible to configure a system in such a way that
+the Guile headers and libguile are linked against correctly, but the
+loader cannot find libguile.so.xxx.  This is because GCC will silently
+find the library for linking, but not set the library dependencies
+correctly.  The consequence is that the configure script believes that
+standard links will produce working executables.  It won't.  The
+simplest solution is:
+
+  .../configure --disable-shared
+
+the best solution is to examine the output of ``guile-config link'',
+duplicate the ``-L/path/to/lib'' argument, but changing the "-L" to
+"-R" or "-Wl,-rpath," or "-rpath" or whatever it happens to be that
+works for your platform, and hand that off to configure as the argument
+to ``--with-libguile-libdir''.  "libtool" won't fix it and it's too hard
+for me.  Sorry.  Anyway, for example, assume:
+
+  guile-config link
+
+produces:
+
+  -L/opt/sfw/lib -lguile -lm
+
+now run configure as follows:
+
+  .../configure \
+    --with-libguile-libdir='-L/opt/sfw/lib -lguile -lm -R/opt/sfw/lib'
+
+Isn't that special?

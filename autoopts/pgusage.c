@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.3 2003/01/05 21:00:11 bkorb Exp $
+ *  $Id: pgusage.c,v 3.4 2003/01/14 05:04:21 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -87,6 +87,8 @@ doPagedUsage( pOptions, pOD )
          *  Set usage output to this temporary file
          */
         option_usage_fp = fopen( zPageUsage, "w" FOPEN_BINARY_FLAG );
+        if (option_usage_fp == NULL)
+            _exit( EXIT_FAILURE );
 
         pagerState = PAGER_STATE_READY;
 
@@ -134,8 +136,7 @@ doPagedUsage( pOptions, pOD )
 
     case PAGER_STATE_CHILD:
         /*
-         *  This is a child process.  We are not ready to
-         *  run the pager program yet.
+         *  This is a child process used in creating shell script usage.
          */
         break;
     }

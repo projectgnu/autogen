@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.6 2002/12/16 03:31:31 bkorb Exp $
+ *  $Id: funcFor.c,v 3.7 2003/01/14 05:04:21 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -496,7 +496,7 @@ doForEach( tTemplate*   pT,
 tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
 STATIC void
-load_ForIn( char* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
+load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
 {
     char* pzName = pT->pzTemplText + pMac->ozName;
     int   ix     = 0;
