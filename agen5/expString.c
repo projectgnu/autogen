@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.6 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: expString.c,v 1.7 1999/11/02 04:16:04 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -41,13 +41,13 @@ makeString( tCC*    pzText,
 	    tCC*    pzNewLine,
             size_t  newLineSize )
 {
-    tCC*     pzDta   = pzText;
-    char*    pzScn;
+    char*    pzDta;
+    tCC*     pzScn   = pzText;
     SCM      res;
     size_t   dtaSize = sizeof( "\"\"" );
 
     for (;;) {
-        char ch = *(pzDta++);
+        char ch = *(pzScn++);
         if ((ch >= ' ') && (ch <= '~')) {
             dtaSize++;
             if ((ch == '"') || (ch == '\\'))
@@ -535,7 +535,7 @@ ag_scm_stack( SCM obj )
  *  backslash-n-backslash and newline sequence,
 =*/
     SCM
-evalExpr_kr_string( SCM str )
+ag_scm_kr_string( SCM str )
 {
     tSCC    zNewLine[] = "\\n\\\n";
 
@@ -567,7 +567,7 @@ evalExpr_kr_string( SCM str )
     SCM
 ag_scm_c_string( SCM str )
 {
-    tSCC       zNewline[] = "\\n\"\n       \"";
+    tSCC       zNewLine[] = "\\n\"\n       \"";
 
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
