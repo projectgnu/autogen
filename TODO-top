@@ -2,7 +2,7 @@
 
 * In Progress
 
-*** ANSI format specifiers: ceEfgG with conversion quals h and l
+*** ANSI format specifiers for snprintv: ceEfgG with conversion quals h and l
 
 * Pending
 
@@ -12,16 +12,12 @@
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
 
-** devise a clean way for multiple flavors of definition input:
-   XML
-   different documentation extractors, akin to "getdefs"
-
 ** How about writing a function, (set-cl-option "text")
    grep for ``/\*=gfunc [a-z]'' in the sources for an example
    of how to do that.  THEN:
    
       [= AutoGen5 Template
-         (set-cl-option "subblock arg=type,name,mode,doc")
+         (set-cl-option "<option-description>")
       =]
 
 *  Possibilities for the (distant) future:
