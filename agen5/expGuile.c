@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.11 2000/03/21 03:05:22 bruce Exp $
+ *  $Id: expGuile.c,v 1.12 2000/09/27 01:05:08 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -247,5 +247,66 @@ ag_scm_sum( SCM list )
     } while (--len > 0);
 
     return gh_long2scm( sum );
+}
+
+
+/*=gfunc string_upcase
+ *
+ * what:   make a new string be upper case
+ * general_use:
+ *
+ * exparg: str , input string
+ *
+ * doc:  Create a new SCM string containing the same text as the original,
+ *       only all the lower case letters are changed to upper case.
+=*/
+    SCM
+ag_scm_string_upcase( SCM str )
+{
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    return scm_string_upcase_x( gh_str02scm( SCM_CHARS( str )));
+}
+
+
+/*=gfunc string_capitalize
+ *
+ * what:   make a new string be capitalized
+ * general_use:
+ *
+ * exparg: str , input string
+ *
+ * doc:  Create a new SCM string containing the same text as the original,
+ *       only all the first letter of each word is upper cased and all
+ *       other letters are made lower case.
+=*/
+    SCM
+ag_scm_string_capitalize( SCM str )
+{
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    return scm_string_capitalize_x( gh_str02scm( SCM_CHARS( str )));
+}
+
+
+/*=gfunc string_downcase
+ *
+ * what:   make a new string be lower case
+ * general_use:
+ *
+ * exparg: str , input string
+ *
+ * doc:  Create a new SCM string containing the same text as the original,
+ *       only all the upper case letters are changed to lower case.
+=*/
+    SCM
+ag_scm_string_downcase( SCM str )
+{
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    return scm_string_downcase_x( gh_str02scm( SCM_CHARS( str )));
 }
 /* end of expGuile.c */

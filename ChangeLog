@@ -1,3 +1,8 @@
+2000-09-26  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expGuile.c: add replacements for (string-upcase ...),
+	(string-downcase ...) and (string-capitalize ...) - sometimes missing
+
 2000-09-26  Carlos Henrique Bauer  <bauer@atlas.unisinos.br>
 
 	* configure.in: replace ``[...]'' test expression with ``test ...''
