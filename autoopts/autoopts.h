@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-08-15 18:29:17 bkorb"
+ *  Time-stamp:      "2004-08-30 19:09:50 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.27 2004/08/16 01:30:17 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.28 2004/08/31 02:35:14 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -68,6 +68,8 @@
 #ifndef MAXPATHLEN
 #  define MAXPATHLEN     4096
 #endif
+#undef  EXPORT
+#define EXPORT
 
 /*
  *  Convert the number to a list usable in a printf call

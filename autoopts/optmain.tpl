@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.27 2004/08/16 01:09:21 bkorb Exp $
+# $Id: optmain.tpl,v 3.28 2004/08/31 02:35:14 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -191,7 +191,11 @@ main( int argc, char** argv )
         int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
         argc -= ct;
         argv += ct;
-    }
+    }[=
+
+  IF (exist? "main-init") =]
+[= main-init =][=
+  ENDIF =]
 
     /*
      *  Input list from command line
@@ -313,10 +317,12 @@ DEFINE declare-option-callbacks
     (if (exist? "version") "doVersionStderr\n" "")
   ) )
 
-  (define emit-decl-list (lambda(txt-var)
+  (define emit-decl-list (lambda(txt-var is-extern)
 
-    (set! txt-var (shellf "(egrep -v '^NULL$' | sort -u | \
+    (set! txt-var (shellf "
+      (egrep -v '^%s$' | sort -u | \
       sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
+          (if is-extern "NULL" "(NULL|stackOptArg|unstackOptArg)")
           txt-var ))
 
     (shellf (if (< (string-length txt-var) 72)
@@ -385,31 +391,28 @@ DEFINE declare-option-callbacks
 extern tOptProc
 [=
 
-(emit-decl-list extern-test-list)  =][=
+(emit-decl-list extern-test-list #t)  =][=
 
     IF (> (string-length static-test-list) 0)
 
 =]
 static tOptProc
-[=(emit-decl-list static-test-list)=][=
+[=(emit-decl-list static-test-list #f)=][=
 
-    ENDIF have static test procs
-
-=][=
-
-(out-push-new)
-
-=][=
-
+    ENDIF have static test procs  =][=
+    (set! static-test-list "")    =][=
     FOR     flag          =][=
-      IF (not (= (hash-ref cb-proc-name   flg-name)
-                 (hash-ref test-proc-name flg-name))) =]
-#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref test-proc-name flg-name)=][=
-      ENDIF               =][=
+
+      (set! flg-name (get "name"))
+      (if (not (= (hash-ref cb-proc-name  flg-name)
+                 (hash-ref test-proc-name flg-name)))
+          (set! static-test-list (string-append static-test-list
+                "#define " (up-c-name "name") "_OPT_PROC "
+                       (hash-ref test-proc-name flg-name) "\n"))  )
+    =][=
     ENDFOR  flag          =][=
 
-    IF (set! static-test-list (out-pop #t))
-       (> (string-length static-test-list) 0) =]
+    IF (> (string-length static-test-list) 0) =]
 
 /*
  *  #define map the "normal" callout procs to the test ones...
@@ -429,15 +432,35 @@ static tOptProc
 
 =]
 extern tOptProc
-[=(emit-decl-list extern-proc-list)=][=
+[=(emit-decl-list extern-proc-list #t)=][=
 
   IF (> (string-length static-proc-list) 0)
 
 =]
 static tOptProc
-[=(emit-decl-list static-proc-list)=][=
+[=(emit-decl-list static-proc-list #f)=][=
 
-  ENDIF have static test procs
+  ENDIF have static test procs  =][=
+  (set! static-proc-list "")    =][=
+  FOR     flag           =][=
+
+      (set! flg-name (get "name"))
+      (if (not (= (hash-ref cb-proc-name  flg-name)
+                 (hash-ref test-proc-name flg-name)))
+          (set! static-proc-list (string-append static-proc-list
+                "#define " (up-c-name "name") "_OPT_PROC "
+                       (hash-ref cb-proc-name flg-name) "\n"))  )
+  =][=
+  ENDFOR  flag            =][=
+
+  IF (> (string-length static-proc-list) 0) =]
+
+/*
+ *  #define map the "normal" callout procs
+ */
+[= (. static-proc-list) =][=
+
+  ENDIF  have some #define mappings
 
 =][=
 

@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.8 2004/08/15 11:31:25 bkorb Exp $
+# $Id: directive.tpl,v 3.9 2004/08/31 02:35:14 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -73,7 +73,7 @@ tSCC zSchemeInit[] =
 "sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
- =]; /* for emacs: " */
+=]; /* for emacs: " */
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {

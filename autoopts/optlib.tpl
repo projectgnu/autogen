@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.24 2004/08/16 01:09:21 bkorb Exp $
+# $Id: optlib.tpl,v 3.25 2004/08/31 02:35:14 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -618,7 +618,7 @@ DEFINE Option_Descriptor =][=
      ;;  for the procedure.  There will only be such a difference if
      ;;  make-test-main is #t
      ;;
-     (if (= (hash-ref cb-proc-name flg-name)
+     (if (= (hash-ref cb-proc-name   flg-name)
             (hash-ref test-proc-name flg-name))
 
          (hash-ref test-proc-name flg-name)

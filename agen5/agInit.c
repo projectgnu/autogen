@@ -1,8 +1,11 @@
 
 /*
- *  agUtils.c
- *  $Id: agInit.c,v 3.3 2004/08/15 12:25:28 bkorb Exp $
- *  This is the main routine for autogen.
+ *  agInit.c  $Id: agInit.c,v 3.4 2004/08/31 02:35:14 bkorb Exp $
+ *
+ *  Time-stamp:      "2004-08-15 10:03:08 bkorb"
+ *
+ *  Do all the initialization stuff.  For daemon mode, only
+ *  children will return.
  */
 
 /*
@@ -617,7 +620,7 @@ becomeDaemon( tCC* pzStdin,
 
     /* We are a daemon now */
 }
-#endif
+#endif /* DAEMON_ENABLED */
 /*
  * Local Variables:
  * mode: C

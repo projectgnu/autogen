@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.32 2004/08/16 01:09:21 bkorb Exp $
+#$Id: optcode.tpl,v 3.33 2004/08/31 02:35:14 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -328,7 +328,10 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
-    + OPTPROC_GNUUSAGE[=   ENDIF=] ),
+    + OPTPROC_GNUUSAGE[=   ENDIF=][=IF (or  (exist? "flag.immediate")
+                                            (exist? "flag.immed-disable")
+                                            (exist? "homerc")  )         =]
+    + OPTPROC_HAS_IMMED[=  ENDIF=] ),
     0, NULL,
     { [= (. INDEX-pfx) =]MORE_HELP,
       [=IF (exist? "homerc")

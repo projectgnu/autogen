@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.37 2004/08/16 01:30:17 bkorb Exp $
+ *  $Id: autoopts.c,v 3.38 2004/08/31 02:35:14 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -52,6 +52,7 @@
  */
 
 #ifndef HAVE_PATHFIND
+#  define  pathfind  option_pathfind
 #  include "compat/pathfind.c"
 #endif
 
@@ -68,12 +69,6 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
 STATIC tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState );
-
-STATIC tSuccess
-doImmediateOpts( tOptions* pOpts );
-
-STATIC void
-doEnvPresets( tOptions* pOpts, teEnvPresetType type );
 
 STATIC void
 doRcFiles( tOptions* pOpts );
@@ -642,16 +637,11 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
 /*
  *  doImmediateOpts - scan the command line for immediate action options
  */
-STATIC tSuccess
+LOCAL tSuccess
 doImmediateOpts( tOptions* pOpts )
 {
     pOpts->curOptIdx = 1;     /* start by skipping program name */
     pOpts->pzCurOpt  = NULL;
-
-    /*
-     *  when comparing long names, these are equivalent
-     */
-    strequate( zSepChars );
 
     /*
      *  Examine all the options from the start.  We process any options that
@@ -682,114 +672,39 @@ doImmediateOpts( tOptions* pOpts )
 }
 
 
-/*
- *  doEnvPresets - check for preset values from the envrionment
- *  This routine should process in all, immediate or normal modes....
- */
-STATIC void
-doEnvPresets( tOptions* pOpts, teEnvPresetType type )
+LOCAL tSuccess
+doRegularOpts( tOptions* pOpts )
 {
-    int        ct;
-    tOptState  st;
-    char*      pzFlagName;
-    size_t     spaceLeft;
-    char       zEnvName[ AO_NAME_SIZE ];
-
     /*
-     *  Finally, see if we are to look at the environment
-     *  variables for initial values.
+     *  Now, process all the options from our current position onward.
+     *  (This allows interspersed options and arguments for the few
+     *  non-standard programs that require it.)
      */
-    if ((pOpts->fOptSet & OPTPROC_ENVIRON) == 0)
-        return;
+    for (;;) {
+        tOptState optState = OPTSTATE_INITIALIZER;
 
-    ct  = pOpts->presetOptCt;
-    st.pOD = pOpts->pOptDesc;
-
-    pzFlagName = zEnvName
-        + snprintf( zEnvName, sizeof( zEnvName ), "%s_", pOpts->pzPROGNAME );
-    spaceLeft = AO_NAME_SIZE - (pzFlagName - zEnvName) - 1;
-
-    for (;ct-- > 0; st.pOD++) {
-        /*
-         *  If presetting is disallowed, then skip this entry
-         */
-        if ((st.pOD->fOptState & OPTST_NO_INIT) != 0)
-            continue;
-
-        /*
-         *  IF there is no such environment variable,
-         *  THEN skip this entry, too.
-         */
-        if (strlen( st.pOD->pz_NAME ) >= spaceLeft)
-            continue;
-
-        /*
-         *  Set up the option state
-         */
-        strcpy( pzFlagName, st.pOD->pz_NAME );
-        st.pzOptArg = getenv( zEnvName );
-        if (st.pzOptArg == NULL)
-            continue;
-        st.flags    = OPTST_PRESET | st.pOD->fOptState;
-        st.optType  = TOPT_UNDEFINED;
-        st.argType  = 0;
-
-        if (  (st.pOD->pz_DisablePfx != NULL)
-           && (streqvcmp( st.pzOptArg, st.pOD->pz_DisablePfx ) == 0)) {
-            st.flags |= OPTST_DISABLED;
-            st.pzOptArg = NULL;
+        switch (nextOption( pOpts, &optState )) {
+        case FAILURE: goto optionsDone;
+        case PROBLEM: return SUCCESS; /* no more args */
+        case SUCCESS: break;
         }
 
-        switch (type) {
-        case ENV_IMM:
-            /*
-             *  Process only immediate actions
-             */
-            if (DO_IMMEDIATELY(st.flags))
-                break;
-            continue;
+        /*
+         *  IF this is not being processed normally (i.e. is immediate action)
+         *  THEN skip it (unless we are supposed to do it a second time).
+         */
+        if (! DO_NORMALLY(optState.flags)) {
+            if (! DO_SECOND_TIME(optState.flags))
+                continue;
+            optState.pOD->optOccCt--; /* don't count last time */
+        }
 
-        case ENV_NON_IMM:
-            /*
-             *  Process only NON immediate actions
-             */
-            if (DO_NORMALLY(st.flags) || DO_SECOND_TIME(st.flags))
-                break;
-            continue;
-
-        default: /* process everything */
+        if (! SUCCESSFUL( handleOption( pOpts, &optState )))
             break;
-        }
-
-        /*
-         *  Make sure the option value string is persistent and consistent.
-         *  This may be a memory leak, but we cannot do anything about it.
-         *
-         *  The interpretation of the option value depends
-         *  on the type of value argument the option takes
-         */
-        if (st.pzOptArg != NULL)
-            switch (st.pOD->optArgType) {
-            case ARG_MAY:
-                if (*st.pzOptArg == NUL) {
-                    st.pzOptArg = NULL;
-                    break;
-                }
-                /* FALLTHROUGH */
-
-            case ARG_MUST:
-                if (*st.pzOptArg == NUL)
-                     st.pzOptArg = zNil;
-                else AGDUPSTR( st.pzOptArg, st.pzOptArg, "option argument" );
-                break;
-
-            default: /* no argument allowed */
-                st.pzOptArg = NULL;
-                break;
-            }
-
-        handleOption( pOpts, &st );
-    }
+    } optionsDone:;
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    return FAILURE;
 }
 
 
@@ -909,6 +824,11 @@ doPresets( tOptions* pOpts )
        && (pOpts->pTransProc != 0) ) {
         (*pOpts->pTransProc)();
     }
+
+    /*
+     *  when comparing long names, these are equivalent
+     */
+    strequate( zSepChars );
 
     {
         const char* pz = strrchr( *pOpts->origArgVect, '/' );
@@ -1139,48 +1059,8 @@ optionProcess(
         pOpts->pzCurOpt  = NULL;
     }
 
-    /*
-     *  Now, process all the options from our current position onward.
-     *  (This allows interspersed options and arguments for the few
-     *  non-standard programs that require it.)
-     */
-    for (;;) {
-        tOptState optState = OPTSTATE_INITIALIZER;
-
-        switch (nextOption( pOpts, &optState )) {
-        case FAILURE:
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
-                (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            goto optionsBad;
-
-        case PROBLEM:
-            goto optionsDone;
-
-        case SUCCESS:
-            break;
-        }
-
-        /*
-         *  IF this is not being processed normally (i.e. is immediate action)
-         *  THEN skip it (unless we are supposed to do it a second time).
-         */
-        if (! DO_NORMALLY(optState.flags)) {
-            if (! DO_SECOND_TIME(optState.flags))
-                continue;
-            optState.pOD->optOccCt--; /* don't count last time */
-        }
-
-        if (! SUCCESSFUL( handleOption( pOpts, &optState ))) {
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
-                (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            break;
-        }
-    }
-
- optionsBad:
-    return pOpts->origArgCt;
-
- optionsDone:
+    if (! SUCCESSFUL( doRegularOpts( pOpts )))
+        return pOpts->origArgCt;
 
     /*
      *  IF    there were no errors

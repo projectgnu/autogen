@@ -3899,13 +3899,20 @@ on the second line.
 @node main main
 @subsection main: user supplied main procedure
 
-You must supply a value to the @code{code} attribute.
+You must supply a value for the @code{main-text} attribute.
+You may also supply a value for @code{option-code}.  If you do, then
+the @code{optionProcess} invocation will not be emitted into the code.
 AutoOpts will wrap the text inside of:
 
 @example
 int
 main( int argc, char** argv )
 @{
+    @{
+        int ct = optionProcess( &<<prog-name>>Options, argc, argv );
+        argc -= ct;
+        argv += ct;
+    @}
 <<your text goes here>>
 @}
 @end example

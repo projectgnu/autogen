@@ -74,7 +74,7 @@ case "$1" in
   exec 4>&-
   if cmp -s $f autoopts.h
   then rm -f $f
-  else mv -f $f autoopts.h
+  else mv -f $f autoopts.h ; echo UPDATED AUTOOPTS.H >&2
   fi
   ;;
 esac

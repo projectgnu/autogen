@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.29 2004/08/15 12:23:13 bkorb Exp $
+ *   $Id: opts.def,v 3.30 2004/08/31 02:35:14 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -32,8 +32,8 @@ copyright = {
 };
 
 #ifndef XML2AG
-prog_name      = "autogen";
-prog_title     = "The Automated Program Generator";
+prog-name      = "autogen";
+prog-title     = "The Automated Program Generator";
 homerc         =  $HOME, ".";
 environrc;
 
@@ -43,7 +43,7 @@ prog-title     = "XML to AutoGen Definiton Converter";
 #endif
 
 argument       = "[ <def-file> ]";
-long_opts;
+long-opts;
 
 version = `
     if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
@@ -109,13 +109,13 @@ detail = <<-  _END_DETAIL
 #endif /* XML2AG */
 
 flag = {
-    name      = templ_dirs;
+    name      = templ-dirs;
     value     = L;
-    arg_type  = string;
+    arg-type  = string;
     descrip   = "Template search directory list";
     max       = NOLIMIT;
-    arg_name  = dir;
-    stack_arg;
+    arg-name  = dir;
+    stack-arg;
 #ifndef XML2AG
     settable;
     doc =
@@ -129,10 +129,10 @@ flag = {
 };
 
 flag = {
-    name      = override_tpl;
+    name      = override-tpl;
     value     = T;
-    arg_type  = string;
-    arg_name  = tpl-file;
+    arg-type  = string;
+    arg-name  = tpl-file;
     descrip   = "Override template file";
 #ifndef XML2AG
     no-preset;
@@ -140,17 +140,17 @@ flag = {
     "Definition files specify the standard template that is to be expanded.\n"
     "This option will override that name and expand a different template.";
 
-    flag_code = "    pzTemplFileName = pOptDesc->pzLastArg;";
+    flag-code = "    pzTemplFileName = pOptDesc->pzLastArg;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
 };
 
 flag = {
-    name      = lib_template;
+    name      = lib-template;
     value     = l;
-    arg_type  = string;
-    arg_name  = tpl-file;
+    arg-type  = string;
+    arg-name  = tpl-file;
     descrip   = "Library template file";
     max       = NOLIMIT;
 #ifndef XML2AG
@@ -159,23 +159,24 @@ flag = {
     "the main macro file.  Template text aside from the DEFINE macros is\n"
     "is ignored.";
 
-    flag_code =
-'    tTemplate* pT;
-    procState = PROC_STATE_LIB_LOAD;
-    pT = loadTemplate( pOptDesc->pzLastArg );
-    unloadTemplate( pT );
-    procState = PROC_STATE_OPTIONS;';
+    flag-code = <<- _EOCode_
+	    tTemplate* pT;
+	    procState = PROC_STATE_LIB_LOAD;
+	    pT = loadTemplate( pOptDesc->pzLastArg );
+	    unloadTemplate( pT );
+	    procState = PROC_STATE_OPTIONS;
+	_EOCode_;
 #else
-    stack_arg;
+    stack-arg;
     doc = "Pass-through AutoGen argument";
 #endif
 };
 
 flag = {
-    name      = base_name;
+    name      = base-name;
     value     = b;
-    arg_type  = string;
-    arg_name  = name;
+    arg-type  = string;
+    arg-name  = name;
     descrip   = "Base name for output file(s)";
 #ifndef XML2AG
     no-preset;
@@ -195,8 +196,8 @@ flag = {
 
 flag = {
     name      = "definitions";
-    arg_type  = string;
-    arg_name  = file;
+    arg-type  = string;
+    arg-name  = file;
     descrip   = "Definitions input file";
 #ifndef XML2AG
     disable   = no;
@@ -216,23 +217,23 @@ flag = {
 };
 
 flag = {
-    name      = "load_scheme";
+    name      = load-scheme;
     value     = S;
-    arg_type  = string;
-    arg_name  = file;
+    arg-type  = string;
+    arg-name  = file;
     descrip   = "Scheme code file to load";
 #ifndef XML2AG
     settable;
     doc = <<-  _EOF_
-		Use this option to pre-load Scheme scripts into the Guile
-		interpreter before template processing begins.
-		Please note that the AutoGen specific functions are not loaded
-		until after argument processing.  So, though they may be specified
-		in lambda functions you define, they may not be invoked until after
-		option processing is complete.
+	Use this option to pre-load Scheme scripts into the Guile
+	interpreter before template processing begins.
+	Please note that the AutoGen specific functions are not loaded
+	until after argument processing.  So, though they may be specified
+	in lambda functions you define, they may not be invoked until after
+	option processing is complete.
 	_EOF_;
 
-    flag_code = <<-  _EOF_
+    flag-code = <<-  _EOF_
 	    int saveState = procState;
 	    char* pz;
 	    char  zPath[ MAXPATHLEN ];
@@ -256,10 +257,10 @@ flag = {
 };
 
 flag = {
-    name      = "load_functions";
+    name      = load-functions;
     value     = F;
-    arg_type  = string;
-    arg_name  = file;
+    arg-type  = string;
+    arg-name  = file;
     descrip   = "Load scheme function library";
     ifdef     = HAVE_DLOPEN;
 #ifndef XML2AG
@@ -298,7 +299,7 @@ flag = {
 	so you may wish to use a shorter group name.
 	_EOF_;
 
-    flag_code = <<-  _EOF_
+    flag-code = <<-  _EOF_
 	    void* hdl = dlopen( pOptDesc->pzLastArg, RTLD_NOW|RTLD_GLOBAL );
 	    init_proc_t* proc;
 
@@ -322,13 +323,13 @@ flag = {
 };
 
 flag = {
-    name       = skip_suffix;
+    name       = skip-suffix;
     value      = s;
-    arg_type   = string;
-    arg_name   = suffix;
+    arg-type   = string;
+    arg-name   = suffix;
     descrip    = "Omit the file with this suffix";
     max        = NOLIMIT;
-    stack_arg;
+    stack-arg;
 #ifndef XML2AG
     no-preset;
     doc =
@@ -342,11 +343,11 @@ flag = {
 };
 
 flag = {
-    name       = select_suffix;
+    name       = select-suffix;
     value      = o;
-    arg_type   = string;
-    arg_name   = suffix;
-    arg_optional;
+    arg-type   = string;
+    arg-name   = suffix;
+    arg-optional;
     descrip    = "specify this output suffix";
     max        = NOLIMIT;
 #ifndef XML2AG
@@ -356,48 +357,48 @@ flag = {
 	you can use one or more copies of this option.  See the suffix
 	specification in the @ref{pseudo macro} section of the info doc.
 	_EOF_;
-    flag_code = <<- _EOF_
+    flag-code = <<- _EOF_
 	    if (  (pOptDesc->pzLastArg != NULL)
 	       && (*(pOptDesc->pzLastArg) != NUL))
 	        (void)doSuffixSpec( pOptDesc->pzLastArg, NULL, -1 );
 	_EOF_;
 #else
-    stack_arg;
+    stack-arg;
     doc = "Pass-through AutoGen argument";
 #endif
 };
 
 flag = {
-    name       = source_time;
+    name       = source-time;
     descrip    = "set mod times to latest source";
 #ifndef XML2AG
     disable    = no;
     doc = <<-  _EOF_
-		If you stamp your output files with the `DNE' macro output, then
-		your output files will always be different, even if the content has
-		not really changed.  If you use this option, then the modification
-		time of the output files will change only if the input files change.
-		This will help reduce unneeded builds.
-		_EOF_;
+	If you stamp your output files with the `DNE' macro output, then
+	your output files will always be different, even if the content has
+	not really changed.  If you use this option, then the modification
+	time of the output files will change only if the input files change.
+	This will help reduce unneeded builds.
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
 };
 
 flag = {
-    name       = no_fmemopen;
+    name       = no-fmemopen;
     descrip    = "Do not use in-mem streams";
     value      = m;
     ifdef      = ENABLE_FMEMOPEN;
 #ifndef XML2AG
     doc = <<-  _EOF_
-		If the local C library supports "@code{fopencookie(3GNU)}", or
-		"@code{funopen(3BSD)}" then AutoGen prefers to use in-memory stream
-		buffer opens instead of anonymous files.  This may lead to problems
-		if there is a shortage of virtual memory.  If, for a particular
-		application, you run out of memory, then specify this option.
-		This is unlikely in a modern virtual memory environment.
-		_EOF_;
+	If the local C library supports "@code{fopencookie(3GNU)}", or
+	"@code{funopen(3BSD)}" then AutoGen prefers to use in-memory stream
+	buffer opens instead of anonymous files.  This may lead to problems
+	if there is a shortage of virtual memory.  If, for a particular
+	application, you run out of memory, then specify this option.
+	This is unlikely in a modern virtual memory environment.
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -405,11 +406,11 @@ flag = {
 
 flag = {
     name        = equate;
-    arg_name    = char-list;
-    arg_type    = string;
+    arg-name    = char-list;
+    arg-type    = string;
     descrip     = "characters considered equivalent";
 #ifndef XML2AG
-    arg_default = "_-^" /* default equivalence */;
+    arg-default = "_-^" /* default equivalence */;
     doc =
     "This option will alter the list of characters considered equivalent.\n"
     "The default are the three characters, \"_-^\".  (The latter is\n"
@@ -435,7 +436,7 @@ flag = {
 
 #ifndef XML2AG
 flag = {
-    name        = doc_debug;
+    name        = doc-debug;
     documentation;
     descrip =
 'The following options are often useful while debugging new templates:';
@@ -443,12 +444,12 @@ flag = {
 #endif
 
 flag = {
-    name        = loop_limit;
-    arg_type    = number;
-    arg_default = 256;
-    arg_range   = "-1";
-    arg_range   = "1->0x1000000"; /* 16 million */
-    arg_name    = lim;
+    name        = loop-limit;
+    arg-type    = number;
+    arg-default = 256;
+    arg-range   = "-1";
+    arg-range   = "1->0x1000000"; /* 16 million */
+    arg-name    = lim;
     descrip     = "Limit on increment loops";
 #ifndef XML2AG
     doc =
@@ -465,10 +466,10 @@ flag = {
 flag = {
     name        = timeout;
     value       = t;
-    arg_type    = number;
-    arg_default = 10;
-    arg_range   = "0->3600"; /* one hour limit */
-    arg_name    = time-lim;
+    arg-type    = number;
+    arg-default = 10;
+    arg-range   = "0->3600"; /* one hour limit */
+    arg-name    = time-lim;
     descrip     = "Time limit for servers";
 #ifndef XML2AG
     ifdef       = SHELL_ENABLED;
@@ -485,9 +486,9 @@ flag = {
 
 flag = {
     name        = trace;
-    arg_type    = keyword;
-    arg_default = nothing;
-    arg_name    = level;
+    arg-type    = keyword;
+    arg-default = nothing;
+    arg-name    = level;
     descrip     = "tracing level of detail";
     keyword     = nothing, templates, block-macros, expressions, everything;
 
@@ -520,9 +521,9 @@ flag = {
 };
 
 flag = {
-    name        = trace_out;
-    arg_type    = string;
-    arg_name    = file;
+    name        = trace-out;
+    arg-type    = string;
+    arg-name    = file;
     descrip     = "tracing output file or filter";
 #ifndef XML2AG
 
@@ -533,18 +534,18 @@ flag = {
     "For example, @code{--traceout='| less'} will run the trace output\n"
     "through the @code{less} program.";
 
-    flag_code = << FLAG_CODE_END
-    if (*pOptDesc->pzLastArg == '|')
-        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
-    else
-        pfTrace = fopen( pOptDesc->pzLastArg, "w" );
-
-    if (pfTrace == NULL) {
-        fprintf( stderr, "Error %d (%s) opening `%s' for output",
-                 errno, strerror( errno ), pOptDesc->pzLastArg );
-        exit( EXIT_FAILURE );
-    }
-FLAG_CODE_END ;
+    flag-code = <<- FLAG_CODE_END
+	    if (*pOptDesc->pzLastArg == '|')
+	        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
+	    else
+	        pfTrace = fopen( pOptDesc->pzLastArg, "w" );
+	
+	    if (pfTrace == NULL) {
+	        fprintf( stderr, "Error %d (%s) opening `%s' for output",
+	                 errno, strerror( errno ), pOptDesc->pzLastArg );
+	        exit( EXIT_FAILURE );
+	    }
+	FLAG_CODE_END ;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -554,7 +555,7 @@ FLAG_CODE_END ;
  *  These are for debugging AutoGen itself:
  */
 flag = {
-    name        = show_defs;
+    name        = show-defs;
     descrip     = "Show the definition tree";
 #ifndef XML2AG
     no-preset;
@@ -568,7 +569,7 @@ flag = {
 };
 
 flag = {
-    name        = show_shell;
+    name        = show-shell;
     descrip     = "Show shell commands";
 #ifndef XML2AG
     no-preset;
@@ -586,8 +587,8 @@ flag = {
 flag = {
     name        = daemon;
     value       = d;
-    arg_type    = string;
-    arg_name    = connect-type;
+    arg-type    = string;
+    arg-name    = connect-type;
     descrip     = "TCP port or fattach file name";
 #ifndef XML2AG
     ifdef       = DAEMON_ENABLED;
@@ -629,7 +630,7 @@ flag = {
 
 #ifndef XML2AG
 flag = {
-    name        = doc_control;
+    name        = doc-control;
     documentation;
     descrip = <<-  _EODoc_
 	These options can be used to control what gets processed
@@ -641,12 +642,12 @@ flag = {
 flag = {
     name        = define;
     value       = D;
-    arg_type    = string;
-    arg_name    = value;
+    arg-type    = string;
+    arg-name    = value;
     max         = NOLIMIT;
     descrip     = "name to add to definition list";
     equivalence = define;
-    stack_arg;
+    stack-arg;
 #ifndef XML2AG
     settable;
     doc = <<-  _EODoc_
@@ -682,12 +683,12 @@ flag = {
 flag = {
     name        = undefine;
     value       = U;
-    arg_type    = string;
-    arg_name    = name-pat;
+    arg-type    = string;
+    arg-name    = name-pat;
     max         = NOLIMIT;
     descrip     = "definition list removal pattern";
     equivalence = define;
-    stack_arg;
+    stack-arg;
 #ifndef XML2AG
     no-preset;
     settable;
@@ -706,12 +707,12 @@ flag = {
  */
 
 #ifndef XML2AG
-detail =
-'AutoGen is a tool designed for generating program files
-that contain repetitive text with varied substitutions.
-See the info documentation for details.';
+detail = <<- _EndOfDetail_
+	AutoGen is a tool designed for generating program files that contain
+	repetitive text with varied substitutions.  Details in the info doc.
+	_EndOfDetail_;
 
-prog_man_descrip =<<-  _END_MAN_DESCRIP
+prog-man-descrip = <<-  _END_MAN_DESCRIP
 	\fBAutoGen\fP is designed for generating program files that contain
 	repetitive text with varied substitutions.  The goal is to simplify the
 	maintenance of programs that contain large amounts of repetitious text.
@@ -732,21 +733,23 @@ prog_man_descrip =<<-  _END_MAN_DESCRIP
 	and this program.
 	_END_MAN_DESCRIP;
 
-man_doc = '.SH "SEE ALSO"
-This program is documented more fully in the
-.IR AutoGen
-Info system documentation.
+man-doc = <<- _EndOfMan_
+	.SH "SEE ALSO"
+	This program is documented more fully in the
+	.IR AutoGen
+	Info system documentation.
 
-.SH "EXAMPLES"
-.ti +4
-autogen -T man.tpl --base-name=autogen opts.def
-.sp
+	.SH "EXAMPLES"
+	.ti +4
+	autogen -T man.tpl --base-name=autogen opts.def
+	.sp
 
-This command produced this man page from the AutoGen option definition file.
-It overrides the template specified in \fIopts.def\fP (normally
-\fIoptions.tpl\fP) and uses \fIman.tpl\fP.  It also overrides the
-\fBbase-name\fP of the output file, which is normally derived from the input
-definition file name (viz. \fIopts\fP).';
+	This command produced this man page from the AutoGen option definition
+	file.  It overrides the template specified in \fIopts.def\fP (normally
+	\fIoptions.tpl\fP) and uses \fIman.tpl\fP.  It also overrides the
+	\fBbase-name\fP of the output file, which is normally derived from
+	the input definition file name (viz. \fIopts\fP).
+	_EndOfMan_;
 
 #endif /* XML2AG */
 

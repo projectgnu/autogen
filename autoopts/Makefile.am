@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-05-09 11:08:40 bkorb"
+## Time-stamp:      "2004-08-30 17:46:29 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.28 2004/05/12 02:36:31 bkorb Exp $
+## $Id: Makefile.am,v 3.29 2004/08/31 02:35:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,7 +25,7 @@ TEXI_STAMP  = texi-stamp
 libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 GENHDRS     = options.h usage-txt.h genshell.h
-HDRS        = $(GENHDRS) autoopts.h streqv.h
+HDRS        = $(GENHDRS) autoopts.h streqv.h tokenize.h
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the
@@ -33,9 +33,10 @@ HDRS        = $(GENHDRS) autoopts.h streqv.h
 ##
 CSRC        = \
     autoopts.c  \
-    boolean.c enumeration.c genshell.c  load.c    makeshell.c \
-    numeric.c pgusage.c     putshell.c  restore.c save.c      \
-    sort.c    stack.c       streqvcmp.c usage.c   version.c
+    boolean.c   enumeration.c environment.c genshell.c  load.c     \
+    makeshell.c numeric.c     pgusage.c     putshell.c  restore.c  \
+    save.c      sort.c        stack.c       streqvcmp.c tokenize.c \
+    usage.c     version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@

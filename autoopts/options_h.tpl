@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.21 2004/08/14 20:36:57 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.22 2004/08/31 02:35:14 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -94,6 +94,7 @@ h=options.h
 #define OPTPROC_REORDER     0x0800 /* reorder arguments after options */
 #define OPTPROC_GNUUSAGE    0x1000 /* emit usage in GNU style         */
 #define OPTPROC_TRANSLATE   0x2000 /* Translate strings in tOptions   */
+#define OPTPROC_HAS_IMMED   0x4000 /* program defines immed options   */
 
 #define STMTS(s)  do { s; } while (0)
 

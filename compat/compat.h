@@ -1,14 +1,13 @@
 /*  -*- Mode: C -*-  */
 
 /* --- fake the preprocessor into handlng portability */
-
 /*
- *  Time-stamp:      "2004-08-15 05:08:41 bkorb"
+ *  Time-stamp:      "2004-08-15 09:54:52 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.10 2004/08/15 12:23:50 bkorb Exp $
+ * $Id: compat.h,v 3.11 2004/08/31 02:35:14 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -116,6 +115,10 @@
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #endif
+#ifndef O_NONBLOCK
+# define O_NONBLOCK FNDELAY
+#endif
+
 #if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
 #  include <libgen.h>
 #endif
@@ -235,10 +238,6 @@
 #ifndef STR
 #  define _STR(s) #s
 #  define STR(s)  _STR(s)
-#endif
-
-#ifndef O_NONBLOCK
-# define O_NONBLOCK FNDELAY
 #endif
 
 /* ##### Pointer sized word ##### */

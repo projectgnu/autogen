@@ -1,3 +1,16 @@
+2004-08-30  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doEnvPresets): break out into separate file
+	(doRegularOpts): like doImmediateOpts, but for regular timing.
+	* autoopts/environment.c(doPrognameEnv): implement parsing of $PROGNAME
+	* autoopts/optcode.tpl: mark the OPTPROC_HAS_IMMED flag if any user
+	options are immediate action or if "homerc" is used.
+	* autoopts/options_h.tpl(OPTPROC_HAS_IMMED): new flag
+	* autoopts/streqv.h: prefix external names with "option_"
+	* autoopts/tokenize.c(string_tokenize): new function
+	* autoopts/tokenize.h: and its header
+	* compat/compat.h(O_NONBLOCK): not always defined
+
 2004-08-14  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: add some daemon-related headers to the header list
