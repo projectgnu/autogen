@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.20 1999/10/30 17:09:07 bruce Exp $
+#$Id: optcode.tpl,v 2.21 1999/10/30 17:54:45 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -206,7 +206,7 @@ FOR flag "\n" =][=
     THEN remember this index  =][=
 
   (if (and (exist? "default")
-           (= (len "flag_arg") 0))
+           (> (len "flag_arg") 0))
       (set! default-opt-index (for-index)) ) =][=
 
 ENDFOR flag
