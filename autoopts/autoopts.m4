@@ -6,9 +6,9 @@ dnl Author:	           Gary V. Vaughan <gvaughan@localhost>
 dnl Maintainer:	       Gary V. Vaughan <gvaughan@localhost>
 dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999				
-dnl            by:     Gary V. Vaughan <gary@oranda.goldfish>		
+dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.1 2002/08/24 03:17:33 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl 
 dnl Code:
@@ -16,7 +16,7 @@ dnl Code:
 # serial 1
 
 dnl AG_PATH_AUTOOPTS([MIN-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
-dnl Test for AUTOOPTS, and define AUTOGEN, AUTOOPTS_CFLAGS, AUTOOPTS_LDFLAGS
+dnl Test for AUTOOPTS, and define AUTOGEN, AUTOOPTS_CFLAGS, AUTOGEN_TPLIB
 dnl      and AUTOOPTS_LIBS.
 dnl
 AC_DEFUN(AG_PATH_AUTOOPTS,
@@ -56,7 +56,7 @@ AC_ARG_ENABLE(opts-test,
   else
     AUTOGEN=`$AUTOOPTS_CONFIG $autoopts_config_args --autogen`
     AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --cflags`
-    AUTOOPTS_LDFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
+    AUTOGEN_TPLIB=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
     AUTOOPTS_LIBS=`$AUTOOPTS_CONFIG $autoopts_config_args --libs`
 changequote(,)dnl
     autoopts_config_version=`$AUTOOPTS_CONFIG $autoopts_config_args --version`
@@ -210,7 +210,6 @@ _EOF_
        else
          echo "*** Could not run autoopts test program, checking why..."
          CFLAGS="$CFLAGS $AUTOOPTS_CFLAGS"
- 	 LDFLAGS="$LDFLAGS $AUTOOPTS_LDFLAGS"
          LIBS="$LIBS $AUTOOPTS_LIBS"
          AC_LANG_SAVE
          AC_LANG_C
@@ -238,20 +237,18 @@ _EOF_
 _EOF_
 ])
           CFLAGS="$ac_save_CFLAGS"
-          LDFLAGS="$ac_save_LDFLAGS"
           LIBS="$ac_save_LIBS"
           AC_LANG_RESTORE
        fi
      fi
      AUTOGEN=:
      AUTOOPTS_CFLAGS=""
-     AUTOOPTS_LDFLAGS=""
      AUTOOPTS_LIBS=""
      ifelse([$3], , :, [$3])
   fi
   AC_SUBST(AUTOGEN)
   AC_SUBST(AUTOOPTS_CFLAGS)
-  AC_SUBST(AUTOOPTS_LDFLAGS)
+  AC_SUBST(AUTOGEN_TPLIB)
   AC_SUBST(AUTOOPTS_LIBS)
   rm -f confopts.def conf.optstest
 ])

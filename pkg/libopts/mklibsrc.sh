@@ -1,4 +1,15 @@
 #! /bin/sh
+##  -*- Mode: shell-script -*-
+## mklibsrc.sh --   make the libopts tear-off library source tarball
+##
+## Time-stamp:      "2002-08-23 20:09:20 bkorb"
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
+## Created:         Aug 20, 2002
+##              by: bkorb
+## ---------------------------------------------------------------------
+## $Id: mklibsrc.sh,v 3.12 2002/08/24 03:17:33 bkorb Exp $
+## ---------------------------------------------------------------------
+## Code:
 
 set -e -x
 

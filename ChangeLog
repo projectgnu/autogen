@@ -4,6 +4,8 @@
 	Alexandre Duret-Lutz <duret_g@lrde.epita.fr>
 	* pkg/libopts/mklibsrc.sh: use a fixed subdirectory name and
 	create an automake fragment file, `MakeDefs.inc'
+	* autoopts/autoopts.m4(AUTOOPTS_LDFLAGS): misnamed.  It is the
+	AutoGen template library directory --> AUTOGEN_TPLIB
 
 2002-08-18  Bruce Korb  <bkorb@gnu.org>
 
