@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.17 2000/04/05 14:39:54 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.18 2000/09/11 14:58:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -24,8 +24,8 @@ prog_name
  =] Invoking [=
 prog_name
 =]
-@cindex [=% prog_name
- (define down-prog-name (string-downcase "%s"))
+@cindex [= % prog_name
+ (define down-prog-name (string-downcase! "%s"))
  (. down-prog-name) =] invocation
 @ignore
 [=
