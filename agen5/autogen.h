@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.37 2004/11/02 04:03:59 bkorb Exp $
+ *  $Id: autogen.h,v 3.38 2004/12/31 23:56:27 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -29,10 +29,6 @@
 
 #include "config.h"
 #include "compat/compat.h"
-
-#if defined(HAVE_FOPENCOOKIE) || defined(HAVE_FUNOPEN)
-#  define ENABLE_FMEMOPEN
-#endif
 
 #include REGEX_HEADER
 #include <guile/gh.h>

@@ -85,7 +85,7 @@ DEFINE emit-description =][=
 =]This option may not be preset with environment variables[= #
 =] or in initialization (rc) files.  [=ENDIF=][=
 
-  IF (and (exist? "default") named-mode)
+  IF (exist? "default")
 =]This option is the default option.  [=ENDIF=][=
 
   IF (exist? "equivalence")
@@ -131,23 +131,19 @@ DEFINE emit-description =][=
 
   (set! tmp-txt (out-pop #t))
   (if (> (string-length tmp-txt) 1)
-      (set! tmp-txt (string-append tmp-txt "\n\n")) )
+      (string-append
 
-  (set! tmp-txt (string-append tmp-txt
-        (if (exist? "doc") (get "doc")
-            "This option has not been fully documented." ) ))
+            (shell (string-append "while read line
+            do echo ${line} | fold -s -w76 | sed 's/^/# /'
+               echo '#'
+            done <<'__EndOfText__'\n" tmp-txt "\n__EndOfText__" ))
 
-(set! tmp-txt (string-substitute tmp-txt
-              '("\n\n" "\n")
-              '("<<PARAGRAPH>>" " ")  ))
-(set! tmp-txt (string-substitute tmp-txt "<<PARAGRAPH>>" "\n"))
+            "\n#\n")
+      "" ) =][=
 
-(shell (string-append "while read line
-do echo ${line} | fold -s -w76 | sed 's/^/# /'
-   echo '#'
-done <<'__EndOfText__'\n" tmp-txt "\n__EndOfText__" ))
-
-=][=
+  IF (exist? "doc") =][= (prefix "# " (get "doc")) =][=
+  ELSE =]# This option has not been fully documented.[=
+  ENDIF =][=
 
 ENDDEF emit-description
 

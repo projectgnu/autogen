@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.21 2004/11/24 21:03:15 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.22 2004/12/31 23:56:27 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -369,6 +369,7 @@ optionSaveFile( tOptions* pOpts )
             /*
              *  The return values for ctime(), localtime(), and gmtime()
              *  normally point to static data that is overwritten by each call.
+             *  The test to detect allocated ctime, so we leak the memory.
              */
             free( pzTime );
 #endif

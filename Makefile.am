@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-11-01 08:50:22 bkorb"
+## Time-stamp:      "2004-12-28 22:34:28 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.21 2004/11/02 04:03:59 bkorb Exp $
+## $Id: Makefile.am,v 3.22 2004/12/31 23:56:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -51,6 +51,10 @@ all         : .conf-stamp
 pkg         : package
 package     :
 	cd pkg && $(MAKE) $@ pkgtype="$(pkgtype)"
+
+usage-txt.po: gettext
+gettext     :
+	cd autoopts && $(MAKE) usage-txt.po
 
 if HAVE_XML_LIB
 release     : distcheck

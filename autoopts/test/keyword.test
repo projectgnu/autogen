@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2004-05-21 16:35:47 bkorb"
+# Time-stamp:        "2004-12-17 11:25:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.10 2004/10/30 20:43:56 bkorb Exp $
+# $Id: keyword.test,v 3.11 2004/12/31 23:56:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -176,7 +176,7 @@ This option has not been fully documented.
 .BR --trace "=\fIlevel\fP"
 tracing level of detail.
 This option takes a keyword as its argument.  The argument sets an enumeration value that can
-be tested by comparing the option value macro.
+be tested by comparing them against the option value macro.
 The available keywords are:
 .in +4
 .nf

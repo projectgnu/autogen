@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-10-28 18:41:56 bkorb"
+## Time-stamp:      "2004-12-17 12:47:09 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.31 2004/10/30 20:43:56 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.32 2004/12/31 23:56:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -325,7 +325,7 @@ A single option will process a list of these values.[+:
          ELSE
 
 :+].  The argument sets an enumeration value that can
-be tested by comparing the option value macro.[+:
+be tested by comparing them against the option value macro.[+:
 
          ENDIF
 

@@ -73,24 +73,6 @@ test   = {
 };
 
 test = {
-    name   = allocated_ctime;
-    type   = run;
-    check  = "ctime() allocates memory for its result";
-    action = { act-type = define; };
-    code   = <<-  _EOF_
-	#include <time.h>
-	int main (int argc, char** argv) {
-	   time_t  timeVal = time( (time_t*)NULL );
-	   char*   pzTime  = ctime( &timeVal );
-	   free( (void*)pzTime );
-	   return 0; }
-	_EOF_;
-
-    doc =
-    "Check whether we need to free the memory returned by ctime.";
-};
-
-test = {
     name   = pathfind;
     type   = run;
     check  = "pathfind(3) works";

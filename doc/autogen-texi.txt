@@ -11,13 +11,12 @@ Extraction from autogen.texi
 @top The Automated Program Generator
 @comment  node-name,  next,  previous,  up
 
-This file documents AutoGen version @value{VERSION}.  It is a tool
-designed for generating program files that contain repetitive text with
-varied substitutions.  This document is very long because it is intended
-as a reference document.  For a quick start example, @xref{Example
-Usage}.  For a simple example of Automated Option processing,
-@xref{Quick Start}.  For a full list of the Automated Option features,
-@xref{Features}.
+This file documents AutoGen version @value{VERSION}.  It is a tool designed
+for generating program files that contain repetitive text with varied
+substitutions.  This document is very long because it is intended as a
+reference document.  For a quick start example, @xref{Example Usage}.  For a
+simple example of Automated Option processing, @xref{Quick Start}.  For a
+full list of the Automated Option features, @xref{Features}.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
@@ -69,7 +68,7 @@ a line in the usage text.
 
 @noindent
 You will need more things besides this if you choose to implement long
-option names, rc/ini file processing, environment variables and so on.
+option names, rc/ini/config file processing, environment variables and so on.
 All of this can be done mechanically; with the proper templates and this
 program.  In fact, it has already been done and AutoGen itself uses it@:
 @xref{AutoOpts}.  For a simple example of Automated Option processing,
@@ -151,8 +150,7 @@ functions are available for saving text or values for later use.
 
 @node Example Usage
 @section A Simple Example
-@cindex example, simple
-@cindex simple example
+@cindex example, simple AutoGen
 
 This is just one simple example that shows a few basic features.
 If you are interested, you also may run "make check" with the
@@ -448,9 +446,7 @@ they will be ignored.  This is done so that you may include
 (@pxref{Directives}) other definition files without an identification
 conflict.
 
-@cindex template, file name
-@cindex .tpl, file name
-@cindex tpl, file name
+@cindex template file
 
 @noindent
 AutoGen uses the name of the template to find the corresponding template
@@ -583,11 +579,10 @@ except that there is no concatenation of strings and the resulting string is
 written to a shell server process.  The definition takes on the value of
 the output string.
 
-NB@:  The text is interpreted by a server shell.  There may be
-left over state from previous @code{`} processing and it may
-leave state for subsequent processing.  However, a @code{cd}
-to the original directory is always issued before the new
-command is issued.
+NB@: The text is interpreted by a server shell.  There may be left over
+state from previous server shell processing.  This scriptlet may also leave
+state for subsequent processing.  However, a @code{cd} to the original
+directory is always issued before the new command is issued.
 
 @node simple-string
 @subsection An Unquoted String
@@ -1946,7 +1941,8 @@ presence of other options.
 
 @item
 Provides a callable routine to parse
-a text string as if it were from one of the RC/INI files.
+a text string as if it were from one of the rc/ini/config files,
+hereafter referred to as a configuration file.
 
 @item
 @code{--help} and @code{--version} are automatically supported.
@@ -2015,7 +2011,7 @@ processing code will be localizable (@pxref{i18n}).
 @page
 @node Quick Start
 @section Quick Start
-@cindex Quick Start
+@cindex example, simple AutoOpts
 
 Since it is generally easier to start with a simple example than it is
 to look at the options that AutoGen uses itself, here is a very simple
@@ -2051,7 +2047,7 @@ long-opts;
 test-main;
 
 flag = @{
-    name      = check_dirs;
+    name      = check-dirs;
     value     = L;        /* flag style option character */
     arg-type  = string;   /* option argument indication  */
     max       = NOLIMIT;  /* occurrence limit (none)     */
@@ -2237,6 +2233,7 @@ attribute or the @code{include} attribute, however.  Instead, use
 
 @cindex config-header
 @item config-header
+@cindex configuration file
 The contents of this attribute should be just the name of the configuration
 file.  A "#include" naming this file will be inserted at the top of the
 generated header.
@@ -2708,7 +2705,14 @@ Every option must have exactly one copy of both of these attributes.
 @item name
 Long name for the option.  Even if you are not accepting long options
 and are only accepting flags, it must be provided.  AutoOpts generates
-private, named storage that requires this name.
+private, named storage that requires this name.  This name also causes
+a @code{#define}-d name to be emitted.  It must not conflict with any
+other names you may be using in your program.
+
+For example, if your option name is, @code{debug} or @code{munged-up},
+you must not use the @code{#define} names @code{DEBUG} (or
+@code{MUNGED_UP}) in your program for non-AutoOpts related purposes.
+They are now used by AutoOpts.
 
 @cindex descrip
 @item descrip
@@ -2735,11 +2739,13 @@ The flag character to specify for traditional option flags.  e.g. @code{-L}.
 @cindex max
 @item max
 Maximum occurrence count (invalid if @var{disable} present).
+The default maximum is 1.  @code{NOLIMIT} can be used for the value,
+otherwise it must be a number or a @code{#define} that evaluates to a number.
 
 @cindex min
 @item min
 Minimum occurrence count.  If present, then the option @strong{must}
-appear on the command line.
+appear on the command line.  Do not define it with the value zero (0).
 
 @cindex must-set
 @item must-set
@@ -2804,8 +2810,9 @@ These option attributes do not fit well with other categories.
 @table @samp
 @cindex no-preset
 @item no-preset
+@cindex configuration file
 If presetting this option is not allowed.  (Thus, environment variables
-and values set in rc/ini files will be ignored.)
+and values set in configuration files will be ignored.)
 
 @cindex settable
 @item settable
@@ -3280,13 +3287,14 @@ by the letter @code{n}, then the full copyright notice (if available) will
 be printed.
 
 @item save-opts ->
-This option will cause the option state to be printed in RC/INI file format
-when option processing is done but not yet verified for consistency.  The
-program will terminate successfully without running when this has completed.
-Note that for most shells you will have to quote or escape the flag
-character to restrict special meanings to the shell.
+@cindex configuration file
+This option will cause the option state to be printed in the configuration file
+format when option processing is done but not yet verified for consistency.
+The program will terminate successfully without running when this has
+completed.  Note that for most shells you will have to quote or escape the
+flag character to restrict special meanings to the shell.
 
-The output file will be the RC/INI file name (default or provided by
+The output file will be the configuration file name (default or provided by
 @code{rcfile}) in the last directory named in a @code{homerc} definition.
 
 This option may be set from within your program by invoking the
@@ -3300,13 +3308,14 @@ and @code{optionProcess} will not return.  You may wish to invoke
 @code{CLEAR_OPT( SAVE_OPTS )} (@pxref{CLEAR_OPT}) beforehand.
 
 @item load-opts -<
+@cindex configuration file
 This option will load options from the named file.  They will be treated
-exactly as if they were loaded from the normally found RC/INI files, but
+exactly as if they were loaded from the normally found configuration files, but
 will not be loaded until the option is actually processed.  This can also be
-used within an RC/INI file causing them to nest.
+used within another configuration file, causing them to nest.
 
 It is ultimately intended that specifying the option,
-@code{no-load-opts} will suppress the processing of rc/ini files and
+@code{no-load-opts} will suppress the processing of configuration files and
 environment variables.  To do this, AutoOpts must first implement
 pre-scanning of the options, environment and rc files.
 @end table
@@ -3448,7 +3457,7 @@ the options are members of an equivalence class.
 @item optOccCt
 If AutoOpts is processing command line arguments, then this value will
 contain the current occurrence count.  During the option preset phase
-(reading rc/ini files and examining environment variables), the value is
+(reading configuration files and examining environment variables), the value is
 zero.
 
 @cindex fOptState
@@ -3464,7 +3473,8 @@ Initial compiled value.  As a bit test, it will always yield FALSE.
 The option was set via the @code{SET_OPT()} macro.
 
 @item PRESET
-The option was set via an RC/INI file.
+@cindex configuration file
+The option was set via a configuration file.
 
 @item DEFINED
 The option was set via a command line option.
@@ -3768,12 +3778,11 @@ This is just a shortcut for RESTART_OPT(1) (@xref{RESTART_OPT}.)
 @subsection STATE_OPT( <NAME> ) - Option State
 @findex STATE_OPT
 
-If you need to know if an option was set because of
-presetting actions (RC/INI processing or environment variables),
-versus a command line entry versus one of the SET/DISABLE macros,
-then use this macro.  It will yield one of four values:
-@code{OPTST_INIT}, @code{OPTST_SET}, @code{OPTST_PRESET}
-or @code{OPTST_DEFINED}.  It is used thus:
+If you need to know if an option was set because of presetting actions
+(configuration file processing or environment variables), versus a command
+line entry versus one of the SET/DISABLE macros, then use this macro.  It
+will yield one of four values: @code{OPTST_INIT}, @code{OPTST_SET},
+@code{OPTST_PRESET} or @code{OPTST_DEFINED}.  It is used thus:
 
 @example
 switch (STATE_OPT( NAME )) @{
@@ -3784,7 +3793,7 @@ switch (STATE_OPT( NAME )) @{
         option set via the SET_OPT_NAME() macro.
 
     case OPTST_PRESET:
-        option set via an RC/INI file or environment variable
+        option set via an configuration file or environment variable
 
     case OPTST_DEFINED:
         option set via a command line option.
@@ -4228,6 +4237,7 @@ and @code{--save-opts} auto-supported options may not be preset.
 @node shell options
 @section AutoOpts for Shell Scripts
 @cindex shell options
+@cindex configuration file
 
 AutoOpts may be used with shell scripts either by automatically creating a
 complete program that will process command line options and pass back
@@ -4242,7 +4252,7 @@ if you generate a shell script to do the parsing:
 
 @enumerate
 @item
-You cannot obtain options from RC/INI files.
+You cannot obtain options from configuration files.
 @item
 You cannot obtain options from environment variables.
 @item

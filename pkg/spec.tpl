@@ -4,7 +4,8 @@ Name:    [= prog-name =]
 Version: [= version =]
 Vendor:  [= copyright.owner =] http://autogen.sf.net
 Release: [=`echo $AG_MAJOR_VERSION`=]
-Copyright: GPL
+Copyright: Copyright (c) [= copyright.date =] by [= copyright.owner
+         =].  All rights reserved.  Licensed under GPL, version 2 or later.
 Group: Development/Tools
 Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
 BuildRoot: %{_tmppath}/%{name}-root

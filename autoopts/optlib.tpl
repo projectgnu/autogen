@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.31 2004/11/30 04:00:13 bkorb Exp $
+# $Id: optlib.tpl,v 3.32 2004/12/31 23:56:27 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -226,7 +226,7 @@ IF (exist? "copyright") =]
  *
 [=(prefix " * " (get "copyright.text"))=][=
 
-    *       =] * <<indeterminate copyright type>>[=
+    *       =] * <<indeterminate license type>>[=
 
   ESAC =]
  */[=

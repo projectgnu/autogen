@@ -1,3 +1,11 @@
+2004-12-31  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.6.5 Released
+
+	* autoopts/rc-sample.tpl: new file for producing sample config files
+	* autoopts/mk-autoopts-pc.in: configured script for producing the
+	"autoopts.pc" file
+
 2004-12-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fmemopen.c: comments + superfluous code

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-10-27 20:01:46 bkorb"
+## Time-stamp:      "2004-12-31 07:18:50 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.30 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 3.31 2004/12/31 23:56:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -42,13 +42,14 @@ STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
-CLIENT_TPLS = \
+CLIENT_TPLS = stdoptions.def rc-sample.tpl \
     aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
     optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
 PRIVATE_TPL = options_h.tpl usage-txt.tpl
 TPL_FILES   = $(CLIENT_TPLS) $(PRIVATE_TPL)
 DEF_FILES   = genshell.def stdoptions.def usage-txt.def funcs.def
 MISC_FILES  = TODO autoopts.m4 bootstrap.dir autoopts-config.in COPYING
+pkgconfigdir=$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # #
 ##
@@ -61,11 +62,12 @@ DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
 MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) funcs.def
 
 man_MANS                  = autoopts-config.1 $(GENMAN)
-m4datadir	              = $(datadir)/aclocal
-m4data_DATA	              = autoopts.m4
+m4datadir                 = $(datadir)/aclocal
+m4data_DATA               = autoopts.m4
 
-nodist_pkgdata_DATA	      = $(libsrc)
-pkgdata_DATA	          = stdoptions.def autoopts.m4 $(CLIENT_TPLS)
+nodist_pkgdata_DATA       = $(libsrc)
+nobase_pkgconfig_SCRIPTS  = autoopts.pc
+pkgdata_DATA              = autoopts.m4 $(CLIENT_TPLS)
 
 lib_LTLIBRARIES           = libopts.la libguileopts.la
 
@@ -79,12 +81,12 @@ libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
 libguileopts_la_LIBADD    = libopts.la
 libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
-bin_SCRIPTS	              = autoopts-config
+bin_SCRIPTS               = autoopts-config
 
 include_HEADERS           = options.h usage-txt.h
 
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
-	$(MISC_FILES) $(DEF_FILES)
+	$(MISC_FILES) $(DEF_FILES) mk-autoopts-pc.in
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -126,6 +128,13 @@ $(TEXI_STAMP) : ../agen5/autogen funcs.def
 	cmd="../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def";\
 	echo ! $cmd ; $$cmd ; mv -f tmp-$@ $@
 
+gettext         : usage-txt.po
+usage-txt.po    : usage-txt.h
+	gt=`which xgettext | sed 's,.* ,,'` ; \
+	test -x $${gt} || exit 0 ; \
+	opts='--omit-header -a -s ' ; \
+	$${gt} -o $@ $${opts} usage-txt.h
+
 ##  "AutoMake" insists on building this before it is ready to be built.
 ##  Therefore, no-op this (successfully) until the proper time.
 ##
@@ -135,5 +144,8 @@ $(libsrc) :
 	export top_srcdir top_builddir ; \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
 	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
+
+autoopts.pc : mk-autoopts-pc
+	$(SHELL) mk-autoopts-pc $@
 
 # Makefile.am ends here
