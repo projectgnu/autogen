@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2002-02-02 13:06:03 bkorb"
-# Version:    "$Revision: 3.2 $
+# Time-stamp: "2002-02-05 08:28:29 bkorb"
+# Version:    "$Revision: 3.3 $
 
 d=`dirname $0`
 [ -f ${d}/mkgnudoc.sh ] || {
@@ -57,7 +57,7 @@ done
 
 gzip -c autogen.dvi  > autogen-${AG_VERSION}/dvi/autogen.dvi.gz
 gzip -c autogen.ps   > autogen-${AG_VERSION}/ps/autogen.ps.gz
-gzip -c autogen.texi > autogen-${AG_VERSION}/info/autogen.info.gz
+gzip -c autogen.texi > autogen-${AG_VERSION}/texi/autogen.texi.gz
 gzip -c autogen.txt  > autogen-${AG_VERSION}/text/autogen.txt.gz
 cp   -f autogen.txt    autogen-${AG_VERSION}/text/.
 
