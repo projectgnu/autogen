@@ -7,16 +7,16 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/05/12 00:31:13 $
+## Last Modified:   $Date: 2002/06/13 02:00:40 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.11 2002/05/12 00:31:13 bkorb Exp $
+## $Id: Makefile.am,v 3.12 2002/06/13 02:00:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
 INCLUDES    = @INCLIST@
 
-GETDEFS     = $(top_builddir)/getdefs/getdefs
+GETDEFS     = $(top_builddir)/getdefs/@GDEXE@
 AGEXE       = $(top_builddir)/agen5/@AGEXE@
 
 TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl

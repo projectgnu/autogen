@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/05/06 23:42:02 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/06/13 02:00:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -40,18 +40,20 @@ GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
 ADDON_MENU	= \
 		../columns/columns.menu \
 		../getdefs/getdefs.menu \
+		../xml2ag/xml2ag.menu \
 		$(srcdir)/snprintfv.menu
 
 ADDON_TEXI	= \
 		../columns/columns.texi \
 		../getdefs/getdefs.texi \
+		../xml2ag/xml2ag.texi \
 		$(srcdir)/snprintfv.texi
 
 DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
-		$(AGSRCDIR)/autogen.menu \
+		../agen5/autogen.menu \
 		../autoopts/libopts.texi \
-		$(AGSRCDIR)/autogen.texi compete.def compete.tpl
+		../agen5/autogen.texi compete.def compete.tpl
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
@@ -75,6 +77,10 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
 texi         : texi-stamp
+
+../agen5/autogen.menu : ../agen5/autogen.texi
+../agen5/autogen.texi :
+	cd ../agen5 && $(MAKE) autogen.texi
 
 texi-stamp : $(DOC_DEPENDS)
 	@cd $(srcdir) && chmod u+w .

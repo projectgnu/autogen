@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.5 2002/05/11 20:23:52 bkorb Exp $
+# $Id: opthead.tpl,v 3.6 2002/06/13 02:00:40 bkorb Exp $
 # Automated Options copyright 1992-2002 Bruce Korb
 
 =]
@@ -58,40 +58,30 @@ ENDIF (exist? version) =]
  *  the UPPER_CASED option name (as in the te[=(. Cap-prefix)=]OptIndex
  *  enumeration above).  e.g. HAVE_[=(. UP-prefix)=]OPT( [=
     (string-upcase! (get "flag[].name" ))=] )
- */
+ */[=
+(sprintf "
 #ifdef __STDC__
-#define     [=(. UP-prefix)=]DESC(n)     [=prog_name
-                 =]Options.pOptDesc[INDEX_[=
-                 (. UP-prefix)=]OPT_ ## n]
+#  define       %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_ ## n]
 #else
-#define     [=(. UP-prefix)=]DESC(n)     [=prog_name
-                 =]Options.pOptDesc[INDEX_[=
-                 (. UP-prefix)=]OPT_/**/n]
+#  define       %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_/**/n]
 #endif
-#define     HAVE_[=(. UP-prefix)=]OPT(n) (! UNUSED_OPT(&[=(. UP-prefix)
-                 =]DESC(n)))
-#define      [=(. UP-prefix)=]OPT_ARG(n) ([=(. UP-prefix)
-                 =]DESC(n).pzLastArg)
-#define    STATE_[=(. UP-prefix)=]OPT(n) ([=(. UP-prefix)
-                 =]DESC(n).fOptState & OPTST_SET_MASK)
-#define    COUNT_[=(. UP-prefix)=]OPT(n) ([=(. UP-prefix)
-                 =]DESC(n).optOccCt)
-#define    ISSEL_[=(. UP-prefix)=]OPT(n) (SELECTED_OPT(&[=(. UP-prefix)
-                 =]DESC(n)))
-#define ISUNUSED_[=(. UP-prefix)=]OPT(n) (UNUSED_OPT(& [=(. UP-prefix)
-                 =]DESC(n)))
-#define  ENABLED_[=(. UP-prefix)=]OPT(n) (! DISABLED_OPT(& [=(. UP-prefix)
-                 =]DESC(n)))
-#define  STACKCT_[=(. UP-prefix)=]OPT(n) (((tArgList*)([=(. UP-prefix)
-                         =]DESC(n).optCookie))->useCt)
-#define STACKLST_[=(. UP-prefix)=]OPT(n) (((tArgList*)([=(. UP-prefix)
-                         =]DESC(n).optCookie))->apzArgs)
-#define    CLEAR_[=(. UP-prefix)=]OPT(n) STMTS( \
-                [=(. UP-prefix)=]DESC(n).fOptState &= OPTST_PERSISTENT;   \
-                if ( ([=(. UP-prefix)
-                    =]DESC(n).fOptState & OPTST_INITENABLED) == 0) \
-                    [=(. UP-prefix)=]DESC(n).fOptState |= OPTST_DISABLED; \
-                [=(. UP-prefix)=]DESC(n).optCookie = NULL )
+#define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
+#define      %1$sOPT_ARG(n) (%1$sDESC(n).pzLastArg)
+#define    STATE_%1$sOPT(n) (%1$sDESC(n).fOptState & OPTST_SET_MASK)
+#define    COUNT_%1$sOPT(n) (%1$sDESC(n).optOccCt)
+#define    ISSEL_%1$sOPT(n) (SELECTED_OPT(&%1$sDESC(n)))
+#define ISUNUSED_%1$sOPT(n) (UNUSED_OPT(& %1$sDESC(n)))
+#define  ENABLED_%1$sOPT(n) (! DISABLED_OPT(& %1$sDESC(n)))
+#define  STACKCT_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->useCt)
+#define STACKLST_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->apzArgs)
+#define    CLEAR_%1$sOPT(n) STMTS( \\
+                %1$sDESC(n).fOptState &= OPTST_PERSISTENT;   \\
+                if ( (%1$sDESC(n).fOptState & OPTST_INITENABLED) == 0) \\
+                    %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
+                %1$sDESC(n).optCookie = NULL )"
+
+  UP-prefix (get "prog-name")
+) =]
 
 /*
  *  Interface defines for specific options.

@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-06-10 18:23:30 bkorb"
+## Time-stamp:      "2002-06-12 16:45:07 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.8 2002/06/11 01:27:19 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.9 2002/06/13 02:00:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -148,6 +148,7 @@ ENDIF :+]
 ;; Describe each option
 ;;
 (define opt-arg  "")
+(define dis-name "")
 (define opt-name "")
 (if (exist? "preserve-case")
     (begin
@@ -156,15 +157,23 @@ ENDIF :+]
     (begin
       (define optname-from "A-Z_^")
       (define optname-to   "a-z--") )
-)
-:+][+:
+) :+][+:
 
 FOR flag
 
 :+][+:
   ;;  Skip the documentation options!
   ;;
-  (set! opt-name (string-tr! (get "name") optname-from optname-to))
+  (if (exist? "enable")
+      (set! opt-name (string-append (get "enable") "-" (get "name")))
+      (set! opt-name (get "name")) )
+  (if (exist? "disable")
+      (set! dis-name (string-append (get "disable") "-" (get "name")))
+      (set! dis-name "") )
+
+  (set! opt-name (string-tr! opt-name optname-from optname-to))
+  (set! dis-name (string-tr! dis-name optname-from optname-to))
+
   (if (not (exist? "arg_type"))
       (set! opt-arg "")
       (set! opt-arg (string-append "\\fI"
@@ -192,8 +201,9 @@ FOR flag
               ? arg_optional " [ =" ' "=" '
               :+][+:  (. opt-arg)      :+][+:
               arg_optional " ]"        :+][+:
-          ENDIF:+][+:
-
+          ENDIF :+][+:
+          IF (exist? "disable") :+], " \fB--[+:(. dis-name):+]\fP"[+:
+          ENDIF :+][+:
 
         ELSE   :+][+:
 
@@ -223,11 +233,13 @@ FOR flag
           *
           :+]
 .BR [+: (. opt-name) :+][+:
-           IF (exist? "arg_type") :+] [+:
-              ? arg_optional " [ =" ' "=" '
-              :+][+:(. opt-arg):+][+:
-              arg_optional "]" :+][+:
-           ENDIF:+][+:
+          IF (exist? "arg_type") :+] [+:
+             ? arg_optional " [ =" ' "=" '
+             :+][+:(. opt-arg):+][+:
+             arg_optional "]" :+][+:
+          ENDIF:+][+:
+          IF (exist? "disable") :+], " \fB[+:(. dis-name):+]\fP"[+:
+          ENDIF :+][+:
 
 
         ELSE   :+][+:
@@ -243,6 +255,8 @@ FOR flag
             arg_optional "["     :+]=[+:(. opt-arg):+][+:
             arg_optional "]"     :+]"[+:
           ENDIF:+][+:
+          IF (exist? "disable") :+], " \fB--[+:(. dis-name):+]\fP"[+:
+          ENDIF :+][+:
         ENDIF  :+][+:
       ENDIF :+]
 [+:descrip:+].[+:
@@ -252,7 +266,15 @@ This option is required to appear.[+:ENDIF:+][+:
 This option may appear [+:
           IF % max (= "%s" "NOLIMIT")
           :+]an unlimited number of times[+:ELSE
-          :+]up to [+:max:+] times[+:ENDIF:+].[+:ENDIF:+][+:
+          :+]up to [+:max:+] times[+:
+          ENDIF:+].[+:
+      ENDIF:+][+:
+      IF (exist? "disable") :+]
+The \fI[+:(. dis-name):+]\fP form will [+:
+         IF (exist? "stack-arg") :+]clear the list of option arguments[+:
+         ELSE  :+]disable the option[+:
+         ENDIF :+].[+:
+      ENDIF:+][+:
       IF (exist? "enabled") :+]
 This option is enabled by default.[+:ENDIF:+][+:
       IF (exist? "no_preset") :+]
@@ -360,16 +382,16 @@ the RC files.[+:
   CASE (count "homerc") :+][+:
   == "0"    :+][+:
   == "1"    :+]
-The \fIhomerc\fP file is ``\fB[+:homerc:+]\fP'', unless that is a directory.
-In that case, the file \fI[+: ?% rcfile "%s"
-(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP
+The \fIhomerc\fP file is "\fI[+:homerc:+]\fP", unless that is a directory.
+In that case, the file "\fI[+: ?% rcfile "%s"
+(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP"
 is searched for within that directory.[+:
 
   *         :+]
 The \fIhomerc\fP files are [+:
     FOR homerc ", "  :+][+:
       IF (last-for?) :+]and [+:
-      ENDIF :+]``\fI[+: homerc :+]\fP''[+: ENDFOR :+].
+      ENDIF :+]"\fI[+: homerc :+]\fP"[+: ENDFOR :+].
 If any of these are directories, then the file \fI[+: ?% rcfile "%s"
 (string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP
 is searched for within those directories.[+:

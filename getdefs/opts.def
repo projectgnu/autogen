@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.1 2002/01/10 15:25:05 bkorb Exp $
+ *   $Id: opts.def,v 3.2 2002/06/13 02:00:40 bkorb Exp $
  */
 
 /*
@@ -350,42 +350,42 @@ There are two special ``entry types'':
 
 /* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
-prog_man_descrip =
-"This program extracts \\fBAutoGen\\fP definitions from a list of source files.
-Definitions are delimited by `/*=<entry-type> <entry-name>
-\\\\n\\' and `=*/\\\\n\\'.  From that, this program creates
-a definition of the following form:
+prog_man_descrip = <<- END_MAN_DESCRIP
+	This program extracts \fBAutoGen\fP definitions from a list of source files.
+	Definitions are delimited by "/*=<entry-type> <entry-name>\n" and "=*/\n".
+	From that, this program creates a definition of the following form:
 
-    #line nnn \"source-file-name\"
-    entry_type = {
-        name = entry_name;
-        ...
-    };
+	    #line nnn "source-file-name"
+	    entry_type = {
+	        name = entry_name;
+	        ...
+	    };
 
-The ellipsis `...' is filled in by text found between the two delimiters, with
-everything up through the first sequence of asterisks deleted on every line.
-Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
-(or 'ifndef') and a name `if_name', then the above entry will appear as:
+	The ellipsis `...' is filled in by text found between the two delimiters, with
+	everything up through the first sequence of asterisks deleted on every line.
+	Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
+	(or 'ifndef') and a name `if_name', then the above entry will appear as:
 
-.nf
-.na
-    #ifdef if_name
-    #line nnn \"source-file-name\"
-    entry_type = {
-        name = entry_name;
-        ...
-    };
-    #endif
+	.nf
+	.na
+	    #ifdef if_name
+	    #line nnn "source-file-name"
+	    entry_type = {
+	        name = entry_name;
+	        ...
+	    };
+	    #endif
 
-There are two special ``entry types'':
+	There are two special ``entry types'':
 
-*   The entry_type enclosure and the name entry will be omitted
-    and the ellipsis will become top-level definitions.
+	*   The entry_type enclosure and the name entry will be omitted
+	    and the ellipsis will become top-level definitions.
 
---  The contents of the comment must be a single getdefs option.
-    The option name must follow the double hyphen and its argument
-    will be everything following the name.  This is intended for use
-    with the @code{subblock} and @code{listattr} options.";
+	--  The contents of the comment must be a single getdefs option.
+	    The option name must follow the double hyphen and its argument
+	    will be everything following the name.  This is intended for use
+	    with the @code{subblock} and @code{listattr} options.
+	END_MAN_DESCRIP;
 
 man_doc = '.SH "SEE ALSO"
 This program is documented more fully in the Getdefs section

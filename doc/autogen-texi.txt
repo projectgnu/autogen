@@ -936,8 +936,7 @@ Extraction from autogen.texi
 @section Alternate Definition Forms
 @cindex Alternate Definition
 
-There are two other methods for supplying data values for templates
-and a third in the planning stages.
+There are several methods for supplying data values for templates.
 
 @table @samp
 @item no definitions
@@ -956,9 +955,12 @@ all the values are constrained to strings because there is no way
 to represent nested values.
 
 @item XML
-Someday, I plan to map XML data directly into AutoGen definitions.
-This will enable you to extract information from arbitrary XML source
-and insert it into AutoGen templates.
+AutoGen comes with a program named, @code{xml2ag}.  Its output can
+either be redirected to a file for later use, or the program can
+be used as an AutoGen wrapper.  @xref{xml2ag Invocation}.
+
+@item standard AutoGen definitions
+Of course.  :-)
 
 @end table
 
