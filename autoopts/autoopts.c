@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+ *  $Id: autoopts.c,v 3.1 2001/12/09 20:31:52 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -388,7 +388,8 @@ shortOptionFind( pOpts, optValue, pOptState )
  *
  *  Find the option descriptor for the current option
  */
-STATIC tSuccess findOptDesc( pOpts, pOptState )
+STATIC tSuccess
+findOptDesc( pOpts, pOptState )
     tOptions*  pOpts;
     tOptState* pOptState;
 {
@@ -818,14 +819,18 @@ doImmediateOpts( pOpts )
             goto optionsDone;
 
         case PROBLEM:
-            return 0; /* no more args */
+            /*
+             *  FIXME:  Here is where we have to worry about how to reorder
+             *          arguments.  Not today.
+             */
+            return SUCCESS; /* no more args */
 
         case SUCCESS:
             break;
         }
 
         /*
-         *  IF this is not an immediate-attribute option, then do it.
+         *  IF this *is* an immediate-attribute option, then do it.
          */
         switch (optState.pOD->fOptState & (OPTST_DISABLE_IMM|OPTST_IMM)) {
         case 0:                   /* never */
@@ -1098,7 +1103,7 @@ filePreset( pOpts, pzFileName, direction )
  *  doEnvPresets - check for preset values from the envrionment
  *  This routine should process in all, immediate or normal modes....
  */
-    STATIC void
+STATIC void
 doEnvPresets( pOpts, type )
     tOptions*       pOpts;
     teEnvPresetType type;
@@ -1220,7 +1225,8 @@ doEnvPresets( pOpts, type )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-STATIC tSuccess doPresets( pOpts )
+STATIC tSuccess
+doPresets( pOpts )
     tOptions*  pOpts;
 {
 #   define SKIP_RC_FILES \
@@ -1331,7 +1337,8 @@ STATIC tSuccess doPresets( pOpts )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-STATIC int checkConsistency( pOpts )
+STATIC int
+checkConsistency( pOpts )
     tOptions*  pOpts;
 {
     int       errCt = 0;
@@ -1346,9 +1353,6 @@ STATIC int checkConsistency( pOpts )
      *  FOR each of "oCt" options, ...
      */
     for (;;) {
-        tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
-        tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
-
         const int*  pMust = pOD->pOptMust;
         const int*  pCant = pOD->pOptCant;
 
@@ -1387,18 +1391,33 @@ STATIC int checkConsistency( pOpts )
         /*
          *  IF       this option is not equivalenced to another,
          *        OR it is equivalenced to itself (is the equiv. root)
-         *    AND it does not occur often enough
-         *  THEN note the error
+         *  THEN we need to make sure it occurrs often enough.
          */
-        if (  (  (pOD->optEquivIndex == NO_EQUIVALENT)
-              || (pOD->optEquivIndex == pOD->optIndex) )
-           && (pOD->optOccCt <  pOD->optMinCt)  )  {
+        if (  (pOD->optEquivIndex == NO_EQUIVALENT)
+           || (pOD->optEquivIndex == pOD->optIndex) )   do {
+            tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
+            tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
+
+            /*
+             *  IF the occurrance counts have been satisfied,
+             *  THEN there is no problem.
+             */
+            if (pOD->optOccCt >= pOD->optMinCt)
+                break;
+
+            /*
+             *  IF presetting is okay and it has been preset,
+             *  THEN min occurrance count doesn't count
+             */
+#           define PRESET_OK  (OPTST_PRESET | OPTST_MUST_SET)
+            if ((pOD->fOptState & PRESET_OK) == PRESET_OK)
+                break;
 
             errCt++;
             if (pOD->optMinCt > 1)
                 fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
             else fprintf( stderr, zNeedOne, pOD->pz_Name );
-        }
+           } while (0);
 
         if (--oCt <= 0)
             break;
