@@ -1,3 +1,13 @@
+2002-08-11  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def: use ifdef rather than sed
+	* doc/Makefile.am(compete): remove competition stuff.  Web only.
+	* doc/auto_gen.tpl(compete): ditto
+	* doc/autogen.texi(compete): ditto
+	* pkg/libopts/README(LIBOPTS_DIR): use a substitution variable
+	* pkg/libopts/mklibsrc.sh(autoopts.m4): don't extract from autoopts
+	(AUTOOPTS_CHECK): insert a macro to check for pre-existing installation
+
 2002-08-10  Bruce Korb  <bkorb@gnu.org>
 
 	* pkg/*: new directory structure for managing the building of packages

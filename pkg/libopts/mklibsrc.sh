@@ -16,7 +16,6 @@ cd ../autoopts
 cp -f COPYING        \
       autoopts.c     \
       autoopts.h     \
-      autoopts.m4    \
       boolean.c      \
       enumeration.c  \
       genshell.c     \
@@ -41,11 +40,43 @@ cd ../pkg/${tag}
 files=`ls -1 *.[ch] | \
 	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\' `
 
+ag="${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable"
 ( echo "autogen definitions conftest.tpl;"
   echo "output-file = libopts.m4;"
   echo "group       = libopts;"
   cat ${top_srcdir}/config/libopts.def
-) | ${top_builddir}/agen5/autogen -L ${top_srcdir}/config -- -
+) | $ag -DLIBOPTS=1
+
+cat >> libopts.m4 <<-	EOMacro
+
+	dnl @synopsis  AUTOOPTS_CHECK
+	dnl
+	dnl If autoopts-config works, add the linking information to
+	dnl LIBS.  Otherwise, configure the LIBOPTS_DIR subdirectory
+	dnl and run all the config tests that library needs.
+	dnl
+	AC_DEFUN([AUTOOPTS_CHECK],[
+	  AC_MSG_CHECKING([whether autoopts-config can be found])
+	  AC_CACHE_VAL([lo_cv_test_autoopts],[
+	    lo_cv_test_autoopts=\`autoopts-config --libs\` 2> /dev/null
+	    if [ \$? -ne 0 ]
+	    then lo_cv_test_autoopts=no
+	    else if [ -z "\$lo_cv_test_autoopts" ]
+	         then lo_cv_test_autoopts=yes
+	    fi ; fi
+	  ]) # end of CACHE_VAL
+	  AC_MSG_RESULT([\${lo_cv_test_autoopts}])
+	
+	  if test "X\${lo_cv_test_autoopts}" != Xno
+	  then
+	    LIBS="\${LIBS} \${lo_cv_test_autoopts}"
+	  else
+	    INVOKE_LIBOPTS_MACROS
+	    LIBOPTS_DIR=${tag}
+	    AC_SUBST( LIBOPTS_DIR )
+	  fi
+	]) # end of AC_DEFUN of AUTOOPTS_CHECK
+	EOMacro
 
 [ -f Makefile.am ] && rm -f Makefile.am
 

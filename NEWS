@@ -1,3 +1,6 @@
+New in 5.4.1
+* Improved the configurability of the libopts tear-off library.
+
 New in 5.4
 * should have bumped to 5.4 with the release of xml2ag.
   AutoOpts documentation and usage text now uses the copyright.eaddr value

@@ -1,4 +1,4 @@
-THIS TARBALL IS NOT A FULL DISTRIBUTION.
+        THIS TARBALL IS NOT A FULL DISTRIBUTION.
 
 The contents of this tarball is designed to be incorporated into
 software packages that utilize the AutoOpts option automation
@@ -11,7 +11,9 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 2. Add ''${tag}'' to the list of subdirectories to build
 3. Add ''${tag}/Makefile'' to the list of configured files
 4. Move libopts.m4 to your autoconf macro directory
-5. Add ''INVOKE_LIBOPTS_MACROS'' to your configure.ac file.
+5. Add ''AUTOOPTS_CHECK'' to your configure.ac file.
+6. Add ''@LIBOPTS_DIR@'' to your subdirectory build list.
+   It will be empty if not needed, otherwise ''${tag}''.
 
 If your package does not utilize the auto* tools, then you
 will need to hand craft the rules for building the library.

@@ -5,8 +5,14 @@ test   = {
   check    = "a reg expr header is specified";
 
   action   = { yes; act-type = script; asis;
+#ifdef LIBOPTS
         act-text = 'AC_DEFINE_UNQUOTED([REGEX_HEADER],'
-                   '[<${ag_cv_with_regex_header}>])'; };
+                   '[<${libopts_cv_with_regex_header}>])';
+#else
+        act-text = 'AC_DEFINE_UNQUOTED([REGEX_HEADER],'
+                   '[<${ag_cv_with_regex_header}>])';
+#endif
+  };
 
   action   = { no; act-type = script; asis;
         act-text = 'AC_DEFINE([REGEX_HEADER],[<regex.h>],'

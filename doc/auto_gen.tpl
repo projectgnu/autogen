@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.9 2002/07/27 19:10:46 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.10 2002/08/11 17:36:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -432,10 +432,10 @@ cat ${top_srcdir}/agen5/autogen.texi ` =]
 @chapter Automated Option Processing
 @cindex autoopts
 
-AutoOpts [=
-`( . ${top_srcdir}/VERSION > /dev/null 2>&1 || :
-echo ${AO_CURRENT-8}.${AO_REVISION-0} )`
-=] is bundled with AutoGen.  It is a tool that virtually eliminates
+AutoOpts [=`
+eval "\`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION\`" 2> /dev/null
+echo ${AO_CURRENT:-17}.${AO_REVISION:-0}
+`=] is bundled with AutoGen.  It is a tool that virtually eliminates
 the hassle of processing options and keeping man pages, info docs and
 usage text up to date.  This package allows you to specify several program
 attributes, up to a hundred option types and many option attributes.
@@ -444,9 +444,6 @@ the command line and initialization file options, and the documentation
 that should go with your program as well.
 
 [= get-text tag = autoopts =]
-[=`${AGEXE} -L ${top_srcdir}/doc ${top_srcdir}/doc/compete.def
-   cat compete.texi`=]
-[= get-text tag = "end-autoopts"  =]
 [= `
 f=../autoopts/libopts.texi
 [ ! -f $f ] && f=${top_srcdir}/autoopts/libopts.texi

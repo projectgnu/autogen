@@ -1871,13 +1871,12 @@ START == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
-AutoOpts is distributed under The GNU General Public License with the
-Library extentions (LGPL).  It is in no way a "lesser" license.
-You have greater license with it.
+AutoOpts is distributed under The GNU Lesser General Public License.
+"Lesser" meaning you have greater license with it and may link it into
+commercial programs.
 
 @menu
 * Features::            AutoOpts Features
-* Comparison::          Competitive Feature Analysis
 * Quick Start::         Quick Start
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
@@ -2049,16 +2048,6 @@ followed, optionally, by a string value.
 Leading and trailing white space is trimmed from the value, but
 otherwise new lines are not discarded.  The caller is expected to have
 NUL terminated the string at the correct point.
-
-@ignore
-END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
-
-@ignore
-START == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
 
 @page
 @node Quick Start
@@ -3660,7 +3649,7 @@ to rebuild and recompile your option definitions.  This has rarely been
 necessary.
 
 @ignore
-END   == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 

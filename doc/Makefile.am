@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.10 2002/07/29 03:24:44 bkorb Exp $
+## $Id: Makefile.am,v 3.11 2002/08/11 17:36:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -24,10 +24,10 @@ all : $(INFO_DEPS)
 info_TEXINFOS   = autogen.texi
 
 EXTRA_DIST	= auto_gen.tpl autogen.info \
-		snprintfv.texi snprintfv.menu compete.def compete.tpl
+		snprintfv.texi snprintfv.menu
 
 MAINTAINERCLEANFILES = Makefile.in
-DISTCLEANFILES = texi-stamp compete.texi
+DISTCLEANFILES = texi-stamp
 
 AGSRCDIR	= $(top_srcdir)/agen5
 
@@ -53,7 +53,7 @@ DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
 		../agen5/autogen.menu \
 		../autoopts/libopts.texi \
-		../agen5/autogen.texi compete.def compete.tpl
+		../agen5/autogen.texi
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
