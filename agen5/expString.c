@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expString.c,v 3.6 2002/01/31 02:45:31 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -1077,7 +1077,7 @@ ag_scm_string_tr( SCM Str, SCM From, SCM To )
 
 /*=gfunc string_substitute
  *
- * what:  make global replacements in a string
+ * what:  multiple global replacements
  * general_use:
  *
  *  exparg:  source, string to transform
