@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.20 1999/10/28 03:36:29 bruce Exp $
+## $Id: Makefile.am,v 2.21 1999/10/29 02:34:57 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -18,7 +18,7 @@ bin_PROGRAMS = getdefs
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
-EXTRA_DIST	= $(GEN_SRC) opts.def#  bootstrap.dir
+EXTRA_DIST	= $(GEN_SRC) opts.def
 
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 
@@ -33,17 +33,17 @@ all : gen
 
 opts.c opts.h : opts.def
 	top_builddir=$(top_builddir) \
-	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
+	$(top_builddir)/src/AutoGen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/getdefs/opts.def
 
 getdefs.menu getdefs.texi : opts.def getdefs
 	top_builddir=$(top_builddir) \
-	$(top_builddir)/src/autogen -Taginfo -bgetdefs \
+	$(top_builddir)/src/AutoGen -Taginfo -bgetdefs \
 		-L $(top_srcdir)/autoopts -DLEVEL=section \
 		$(top_srcdir)/getdefs/opts.def
 
 getdefs.1 : opts.def getdefs
-	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
+	${top_builddir}/src/AutoGen -T agman1 -L $(top_srcdir)/autoopts \
 		-b getdefs $(srcdir)/opts.def
 
 # Makefile.am ends here
