@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.2 2005/01/09 03:20:27 bkorb Exp $
+ *  $Id: columns.c,v 4.3 2005/01/09 04:05:39 bkorb Exp $
  */
 
 /*
@@ -33,9 +33,6 @@ struct print_list {
 };
 
 typedef struct print_list tPrintList, *tpPrintList;
-
-typedef int (tCompProc)(const void*, const void*);
-tCompProc compProc;
 
 int maxEntryWidth = 0;
 int fillColumnCt  = 0;

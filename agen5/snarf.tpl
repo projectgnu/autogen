@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: snarf.tpl,v 4.2 2005/01/09 04:05:39 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -99,23 +99,21 @@ typedef enum {
     GH_TYPE_INEXACT,
     GH_TYPE_EXACT
 } teGuileType;
-
-teGuileType gh_type_e( SCM );
 [=
-FOR gfunc =]
+FOR gfunc       =]
 extern SCM [=(. scm-prefix)=][=name=]( [=
   IF (exist? "exparg") =][=
     FOR exparg ", " =]SCM[=
-    ENDFOR =][=
-  ELSE  =]void[=
-  ENDIF =] );[=
-ENDFOR =][=
+    ENDFOR      =][=
+  ELSE          =]void[=
+  ENDIF         =] );[=
+ENDFOR gfunc    =][=
 
-FOR symbol =][=
+FOR symbol      =][=
   IF (exist? "global") =]
 extern SCM [=(. scm-prefix)=]sym_[=name=];[=
-  ENDIF =][=
-ENDFOR =]
+  ENDIF         =][=
+ENDFOR symbol   =]
 
 #endif /* [=(. header-guard)=] */
 [=

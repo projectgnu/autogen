@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: expString.c,v 4.3 2005/01/09 04:05:39 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -775,7 +775,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
  *  escaped with a backslash.  Normal shells will reconstitute the
  *  original string.
  *
- *  @strong{NOTE}:  some shells will not correctly handle unusual
+ *  @strong{Notice}:  some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/

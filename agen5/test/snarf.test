@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2004-10-30 13:16:32 bkorb"
+# Time-stamp:        "2005-01-08 19:56:28 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
+# Last Modified:     $Date: 2005/01/09 04:05:39 $
 #            by: bkorb
 # Copyright:         1999-2004 by Bruce Korb
-# $Id: snarf.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: snarf.test,v 4.2 2005/01/09 04:05:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -177,8 +177,6 @@ typedef enum {
     GH_TYPE_INEXACT,
     GH_TYPE_EXACT
 } teGuileType;
-
-teGuileType gh_type_e( SCM );
 
 extern SCM test_scm_test_to_example_x( SCM );
 extern SCM test_scm_sym_bumble_it;

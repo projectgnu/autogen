@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-01-08 19:12:51 bkorb"
+## Time-stamp:      "2005-01-08 19:40:22 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/01/09 03:20:27 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/01/09 04:05:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -134,8 +134,8 @@ $(MAN_STAMP) : funcs.def
 $(GENTEXI) : $(TEXI_STAMP)
 $(TEXI_STAMP) : ../agen5/autogen funcs.def
 	@touch tmp-$@ ; \
-	cmd="../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def";\
-	echo ! $cmd ; $$cmd ; mv -f tmp-$@ $@
+	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def" ; \
+	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
 gettext         : usage-txt.po
 usage-txt.po    : usage-txt.h
@@ -144,9 +144,6 @@ usage-txt.po    : usage-txt.h
 	opts='--omit-header -a -s ' ; \
 	$${gt} -o $@ $${opts} usage-txt.h
 
-##  "AutoMake" insists on building this before it is ready to be built.
-##  Therefore, no-op this (successfully) until the proper time.
-##
 libsrc : $(libsrc)
 $(libsrc) :
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
