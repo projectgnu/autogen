@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.14 2000/03/05 00:23:30 bruce Exp $
+ *   $Id: opts.def,v 1.15 2000/03/05 00:27:44 bruce Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ flag = {
         USAGE( EXIT_FAILURE );
     }
 
-    pz = asprintf( "(load \"%s\")", pOptDesc->pzLastArg );
+    pz = asprintf( "(load \"%s\")", zPath );
     procState = PROC_STATE_GUILE_PRELOAD;
     gh_eval_str( pz );
     free( pz );
