@@ -1,3 +1,207 @@
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
+	* config/misc.def(guile): add --with-xxx for guile library
+	* configure.in(LN_S): use this macro instead of 'ln -s' directly
+	* */Makefile.am(INCLUDES): GUILE_INC is obsolete
+	* */Makefile.am(LDADD): GUILE_LINK is obsolete
+	* */Makefile.am(LDADD): AG_REGEX_LIB is obsolete
+	* autoopts/aginfo3.tpl(sec-name): fix formatting
+	* autoopts/autoopts.c(optionProcess): change optionSave to optionSaveFile
+	* autoopts/opthead.tpl(SAVE_OPTS): this option is now settable.
+	* autoopts/save.c(optionSaveFile): renamed from optionSave.  exported now
+	* config/confmacs.tpl(withlib): add code to generate withlib testing.
+	* config/misc.def(guile): new withlib test, use for guile and regex.
+	(posix_regcomp): obsolete
+	(regex_lib): obsolete
+	(regex_header_path): obsolete
+	* agen5/fsm*.tpl(reent): implement reentrant FSM
+	
+2002-05-04  Bruce Korb  <bkorb@gnu.org>
+
+	* config/missing(makeinfo): fix syntax
+	* doc/auto_gen.tpl(libopts.texi): hunt for file (schizophrenia)
+	* doc/Makefile.am: config stuff
+
+2002-05-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(libopts.texi): build with correct base name
+	* autoopts/aginfo3.tpl: finish
+	* autoopts/autoopts.c: finish doc-ing the public interfaces
+	* autoopts/bootstrap.dir(libopts.texi): correct build command
+	* autoopts/options_h.tpl(export_func): Make it clear which are private
+	and which are public.
+	* autoopts/stack.c(stackOptArg): a disabled option should just clear
+	the option argument stack.  It doesn't have an argument to process
+	in the "unstack" routine anyway.
+	* doc/Makefile.am(MAINTAINERCLEANFILES): autogen.texi is no longer
+	cleanable.  It contains persistent information.
+	(DISTCLEANFILES): remove generated junk, add a rule for jumping into
+	the autoopts dir to build libopts.texi specifically.
+	* doc/auto_gen.tpl(libopts.texi): suck it up since it is so hard
+	to @include successfully.
+	* doc/autogen.texi: break up the option discussion where we need to
+	"suck up" the user visible functions.
+	(faq): removed from doc, now just part of web site.
+	* getdefs/gdinit.c(validateOptions): allow for "/*=*" definitions.
+	* getdefs/getdefs.c(buildDefinition): do not skip newline for global defs
+	advance from start of entire matched text instead of subexpression.
+
+2002-05-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(zSchemeInit): add macro for determining existence and
+	type of a Scheme definition.
+	* agen5/expState.c(tpl_file_line): change the example format.
+
+2002-04-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c: consolodate the debugging printing
+
+2002-04-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/defref.test(testname.def): verify that the template
+	name can be pieced together from definition strings.
+	* autoopts/Makefile.am: write a rule that evades the insistance of
+	creating the option*.3 man pages at "make all" time.  Instead, we
+	do it at "make install" time.  (../agen5/autogen must pre-exist)
+
+2002-04-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c(ag_scm_makefile_script): trim all leading whitespace
+	and only look for a tab in the last of those characters.
+	* autoopts/agman3.tpl: new library template
+	* autoopts/aginfo3.tpl: ditto
+	* autoopts/Makefile.am: incorporate the new templates and rules for them
+	* autoopts/*.c: doc the visible entry points
+	* autoopts/options.h: obsolete.  Generated from:
+	* autoopts/options_h.tpl: extract external function decs from docs.
+	* autoopts/bootstrap.dir: actual rules for generating options.h and
+	the man pages and the libopts.texi file
+
+2002-04-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h(FPF_NOCHMOD): for marking /dev/null as NO-chmod(2)
+	* agen5/defLex.c(yyerror): add commentary on the likely causes of errors
+	* agen5/defParse.y(filename): allow strings to be used for
+	the template name.
+	* agen5/tpProcess.c(closeOutput): only remove write access if the
+	FPF_NOCHMOD bit is not set.  Mark /dev/null as such a file.
+	* agen5/test/error.test: add likely cause text to end of sample output.
+	* doc/autogen.texi(Index Assignments): new, clearer discussion of how
+	to use them and what they are for.
+	(Naming a Value): obsolete -- folded into above.
+
+2002-04-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl: Allow an empty "rcfile" value to mean that
+	"homerc" is a file name, rather than a directory name.
+	* autoopts/optmain.tpl: clean up the display of the range for usage
+	* autoopts/usage.c(optionUsage): ditto
+	(printInitList): new routine for helping to do this
+	* agen5/opts.def: Add range check for loop-limit option.
+
+2002-04-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c(printInitList): new print the list of RC/INI/config
+	files.  Do not append an rcfile name if there is none or if the
+	homerc value is a directory.
+	* autoopts/optcode.tpl(zRcName): distinguish between an unspecified
+	rcfile value and a supplied empty string.
+	* autoopts/agman1.tpl(doc): fix sed expression (thx to David Bacher)
+	* autoopts/autoopts.c(doLoadOpt): make sure that a file specified
+	for loading actually exists.  Non existence is only okay for RC files.
+
+2002-03-29  Alexandre Duret-Lutz
+
+	* agen5/autogen.c (signalSetup): Don't set the SIGCHLD handler twice.
+	Don't try to catch SIGKILL, either.
+
+2002-03-28  Bruce Korb  <bkorb@gnu.org>
+
+	* all over:  update copyright dates
+	* expExtract.c(find-file): is not general use
+	* config/misc.def(regex_header): fix it some more.  This time, we
+	define REGEX_HEADER directly in the config.h output file.
+	(posix_regex): improve the testing and accommodate pedantic regcomp's.
+	* doc/autogen.texi: doc the 'AutoGen as a CGI server' as part of the
+	'Configuring and Installing' chapter.
+	* */Makefile.am: remove -DREGEX_HEADER as it is now in config.h
+	* autoopts/autoopts-config.1: new man page for config script
+	* autoopts/Makefile.am(autoopts-config.1): distribute the page
+
+2002-03-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*: sed 's/DEBUG/DEBUG_ENABLED/g' -- well, almost.
+	* agen5/opts.def(timeout): respelled ENABLE_SHELL as SHELL_ENABLED
+	* agen5/expMake.c(ag_scm_makefile_script): reworked to handle
+	implicit command continuations.
+
+2002-03-22  Bruce Korb  <bkorb@gnu.org>
+
+	* config/confmacs.tpl: make it possible to dump all the macros into
+	a single output file.  More convenient.
+	* config/conftest.tpl: ditto.
+	* config/misc.def(fopen_binary): new
+	(fopen_text): new
+	* config/openmode.m4: obsolete
+	* getdefs/getdefs.h(FOPEN_BINARY_FLAG): use config.h
+	* compat/compat.h: ditto
+	* columns/opts.def: ditto
+
+2002-03-18  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: remove all the generated macro invocations and invoke
+	them with a collection macro:  INVOKE_AG_MACROS
+	* config/conftest.tpl: generate a macro collection instead of individual
+	macros
+	* agen5/agShell.c(serverSetup): accommodate zsh and bash
+	* compat/strsignal.def: extra protection against non-numeric signal nums
+	* config/confmacs.tpl: fix the argument name for the AC_ARG(name) macro
+
+2002-03-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/error.test: HP/UX delivers `kill -TERM' as a SIGCONT.
+	* agen5/compat/strsignal.def: HP/UX defines many signals as "_SIG..."
+	and then defines the normal name to this.
+	* configure.in: use reworked regex tests
+	* config/misc.def: rework regex testing & with options
+	* */Makefile.am: Add CFLAGS = -DREGEX_HEADER='@AG_REGEX_HEADER@'
+	* agen5/funcCase.c: replace '<regex.h>' with 'REGEX_HEADER'
+	* agen5/funcEval.c: ditto
+	* autoopts/stack.c: ditto
+	* getdefs/getdefs.h: ditto
+	* autoopts/autoopts-config.in: add @AG_REGEX_LIB@ to link info
+	* config/bootstrap.local: avoid build directories when cloning
+	* config/conftest.tpl: libregex.m4 is now obsolete
+	* config/libregex.m4: deleted
+	* config/misc: added regex_header, regex_header_path and regex_lib
+
+2002-03-11  Bruce Korb  <bkorb@gnu.org>
+
+	* compat/gnu-regex.c: deleted.  It is broken on some platforms.
+	Therefore, we'll just abort the configure if we don't have a POSIX regex
+	* agen5/funcCase.c: remove references to deleted source
+	* agen5/funcEval.c: ditto
+	* autoopts/stack.c: ditto
+	* compat/Makefile.am: ditto
+	* getdefs/getdefs.h: ditto
+	* config/confmacs.tpl(c-text): don't overquote.  Unlike other arguments,
+	Autoconf automatically quotes c program text.
+	* config/misc.def(posix_regcomp): bail if we cannot find one.
+
+2002-03-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/functions.c(mLoad_Bogus): handle the case when the text pointer
+	is NULL.
+	* agen5/test/error.test: test for this
+
+2002-03-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c(ag_scm_out_pop): you cannot read one unit of zero
+	length.  Accommodate for that.
+	* compat/strcspn.c(strcspn): End the scan when the source string ends.
+	* ChangeLog: moved old entries to ChangeLog.3
+	* snprintfv/snprintfv/Makefile.am: clean up the stamp files
+
 2002-02-23  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am: remove a stamp file for DISTCLEAN
