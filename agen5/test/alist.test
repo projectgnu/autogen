@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: alist.test,v 1.5 2000/03/05 00:34:01 bruce Exp $
+# $Id: alist.test,v 1.6 2000/03/11 11:02:19 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -33,7 +33,6 @@ FOR value "\n"
 =]  [= (for-index) =] name is [=name=][=
 ENDFOR =]
 _EOF_
-
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
