@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug 30 12:24:10 1999				      
+# Last Modified:     Mon Aug 30 12:28:33 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.23 1999/08/30 19:25:17 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.24 1999/08/30 19:28:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -17,8 +17,10 @@ add_make_links()
   if grep -l 'MAKE LINK TREE' configure > /dev/null 2>&1
   then return ; fi
 
+  mv configure configure.tmp
+
   (
-    sed 2q configure
+    sed 2q configure.tmp
     cat <<-	'_EOF_'
 
 	#MAKE LINK TREE
@@ -46,11 +48,10 @@ add_make_links()
 	fi
 
 _EOF_
-    sed -e 1d -e 2d configure
-  ) > configure.tmp
+    sed -e 1d -e 2d configure.tmp
+  ) > configure
 
-  rm -f configure
-  mv -f configure.tmp configure
+  rm -f configure.tmp
   chmod +x configure
 }
 
