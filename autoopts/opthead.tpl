@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.18 2000/03/05 12:48:35 bruce Exp $
+# $Id: opthead.tpl,v 2.19 2000/10/07 22:52:08 bkorb Exp $
 =]
 [=
 
@@ -74,9 +74,15 @@ ENDIF (exist? version) =]
  *  enumeration above).  e.g. HAVE_[=(. UP-prefix)=]OPT( [=
     (string-upcase! (get "flag[].name" ))=] )
  */
+#ifdef __STDC__
 #define     [=(. UP-prefix)=]DESC(n)     [=prog_name
                  =]Options.pOptDesc[INDEX_[=
                  (. UP-prefix)=]OPT_ ## n]
+#else
+#define     [=(. UP-prefix)=]DESC(n)     [=prog_name
+                 =]Options.pOptDesc[INDEX_[=
+                 (. UP-prefix)=]OPT_/**/n]
+#endif
 #define     HAVE_[=(. UP-prefix)=]OPT(n) (! UNUSED_OPT(&[=(. UP-prefix)
                  =]DESC(n)))
 #define      [=(. UP-prefix)=]OPT_ARG(n) ([=(. UP-prefix)

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.25 2000/07/26 23:10:40 bkorb Exp $
+ *  $Id: makeshell.c,v 2.26 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -48,7 +48,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -58,6 +57,8 @@
 #include <time.h>
 #include <utime.h>
 #include <sys/stat.h>
+
+#ifdef __STDC__
 
 #include "autoopts.h"
 #include "genshell.c"
@@ -756,7 +757,6 @@ emitFlag( tOptions* pOpts )
 }
 
 
-
     STATIC void
 emitLong( tOptions* pOpts )
 {
@@ -1051,7 +1051,6 @@ loadTrailer( const char* pzFile )
 }
 
 
-
     void
 genshelloptUsage( tOptions*  pOptions, int exitCode )
 {
@@ -1131,4 +1130,16 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
 
     exit( EXIT_SUCCESS );
 }
-/* makeshell.c ends here */
+#else
+int putShellParse( pOpts )
+    tOptions* pOpts;
+{
+    fputs( "putShellParse disabled for pre-ANSI C\n", stderr );
+    exit( EXIT_FAILURE );
+}
+#endif
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * makeshell.c ends here */

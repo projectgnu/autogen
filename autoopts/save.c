@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.7 2000/04/04 13:22:18 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.8 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -58,8 +58,8 @@
 
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
-    STATIC char*
-findDirName( tOptions*  pOpts )
+DEF_PROC_1( STATIC, char*, findDirName,
+            tOptions*,  pOpts )
 {
     char*  pzDir;
 
@@ -131,8 +131,8 @@ findDirName( tOptions*  pOpts )
 }
 
 
-    STATIC char*
-findFileName( tOptions*  pOpts )
+DEF_PROC_1( STATIC, char*, findFileName,
+            tOptions*,  pOpts )
 {
     char*  pzDir;
     tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
@@ -239,8 +239,10 @@ findFileName( tOptions*  pOpts )
 }
 
 
-    STATIC void
-printEntry( FILE* fp, tOptDesc* p, char*  pzLA )
+DEF_PROC_3( STATIC, void, printEntry,
+            FILE*,      fp,
+            tOptDesc*,  p,
+            char*,      pzLA )
 {
     /*
      *  There is an argument.  Pad the name so values line up
@@ -289,8 +291,8 @@ printEntry( FILE* fp, tOptDesc* p, char*  pzLA )
 }
 
 
-    void
-optionSave( tOptions* pOpts )
+DEF_PROC_1( , void, optionSave,
+            tOptions*, pOpts )
 {
     char*  pzFName;
 
@@ -396,4 +398,8 @@ optionSave( tOptions* pOpts )
         fclose( fp );
     }
 }
-/* save.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * save.c ends here */

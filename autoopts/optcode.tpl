@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.36 2000/09/30 03:17:37 bkorb Exp $
+#$Id: optcode.tpl,v 2.37 2000/10/07 22:52:08 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -13,22 +13,22 @@ IF (not (exist? "copyright") )
 #define zCopyrightNotice (const char*)NULL[=
 ELSE  =]
 tSCC zCopyright[] =
-       [= (c-string
+       [= (kr-string
        (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
                 (get "copyright.date") (get "copyright.owner") )) =];
 tSCC zCopyrightNotice[] =
        [=
   CASE (get "copyright.type") =][=
 
-    =  gpl  =][=(c-string (gpl  (. prog-name) "" ))=][=
+    =  gpl  =][=(kr-string (gpl  (. prog-name) "" ))=][=
 
-    = lgpl  =][=(c-string (lgpl (. prog-name) (get "copyright.owner")
+    = lgpl  =][=(kr-string (lgpl (. prog-name) (get "copyright.owner")
                                 "" ))=][=
 
-    =  bsd  =][=(c-string (bsd  (. prog-name) (get "copyright.owner")
+    =  bsd  =][=(kr-string (bsd  (. prog-name) (get "copyright.owner")
                                 "" ))=][=
 
-    = note  =][=(c-string (get "copyright.text"))=][=
+    = note  =][=(kr-string (get "copyright.text"))=][=
 
     *       =]"Copyrighted"[=
 
@@ -255,12 +255,8 @@ ENDIF=]
  *  Define the [= (. pname-cap) =] Option Environment
  */
 tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
-tSCC   zUsageTitle[] = [=
-IF (exist? "version") =][= (. pname-up) =]_FULL_VERSION [=
-ELSE                  =]"[=(. prog-name)=] - " [=
-       (c-string (get "prog_title")) =][=
-ENDIF =]
-    "\n[= USAGE_LINE =]\n";[=
+tSCC   zUsageTitle[] =
+[= USAGE_LINE =];[=
 
 IF (or (exist? "homerc") (exist? "exerc")) =]
 tSCC   zRcName[]     = "[=
@@ -271,7 +267,7 @@ tSCC   zRcName[]     = "[=
 tSCC*  apzHomeList[] = {[=
   % exerc "\n       \"$$/%s\"," =][=
   FOR homerc=]
-       [= (c-string (get "homerc")) =],[=
+       [= (kr-string (get "homerc")) =],[=
   ENDFOR homerc=]
        (char*)NULL };[=
 ELSE=]
@@ -280,15 +276,15 @@ ELSE=]
 ENDIF=][=
 
 IF (exist? "explain") =]
-tSCC   zExplain[]    = "\n"
-       [= (c-string (get "explain")) =] "\n";[=
+tSCC   zExplain[]    = [=
+   (kr-string (string-append "\n" (get "explain") "\n") ) =];[=
 ELSE=]
 #define zExplain (const char*)NULL[=
 ENDIF=]
 [=
 IF (exist? "detail") =]
-tSCC    zDetail[]     = "\n"
-       [= (c-string (get "detail")) =] "\n";
+tSCC    zDetail[]     = [=
+       (kr-string (string-append "\n" (get "detail") "\n")) =];
 [=
 ELSE
 =]
@@ -296,7 +292,7 @@ ELSE
 ENDIF=][=
 
 IF (exist? "detail_file") =]
-tSCC    zDetailFile[] = [= (c-string (get "detail_file")) =];[=
+tSCC    zDetailFile[] = [= (kr-string (get "detail_file")) =];[=
 ELSE=]
 #define zDetailFile (const char*)NULL[=
 ENDIF=][=

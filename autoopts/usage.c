@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.7 2000/09/30 20:03:28 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.8 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -60,12 +60,50 @@
 #  include <compat/pathfind.c>
 #endif
 
+tSCC zOptsOnly[]   = "All arguments are named options.\n";
+tSCC zInverted[]   = "Flag options are disabled with a '+' marker.\n";
+tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
+tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
+tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
+tSCC zMust[]       = "\t\t\t\t- must appear between %d and %d times\n";
+tSCC zNoLim[]      = "\t\t\t\t- may appear without limit\n";
+tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
+tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
+tSCC zReqFlag[]    = "\t\t\t\t- a required option\n";
+tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
+tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
+tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
+tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
+tSCC zTabout[]     = "\t\t\t\t%s\n";
+tSCC zTabHyp[]     = "\t\t\t\t- ";
+tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
+tSCC zReqThese[]   = "requires these options:\n";
+tSCC zProhib[]     = "prohibits these options:\n";
 
-    void
-optionUsage( tOptions*  pOptions, int exitCode )
+tSCC zNoReq_Short_Title[]   = "  Flg Arg Option-Name    Description\n";
+tSCC zNoReq_NoShort_Title[] = "   Arg Option-Name    Description\n";
+tSCC zNrmOptFmt[]           = " %1$3s %2$-14s %4$s\n";
+
+tSCC zReq_Short_Title[]     = "  Flg Arg Option-Name   Req?  Description\n";
+tSCC zReq_NoShort_Title[]   = "   Arg Option-Name   Req?  Description\n";
+tSCC zReqOptFmt[]           = " %3s %-14s %-5s%s\n";
+
+tSCC zIntro[]      = "\n\
+The following option preset mechanisms are supported:\n";
+
+tSCC zFlagOkay[]   =
+"Options may be specified by doubled %1$ss and their name\n\
+or by a single %1$s and the flag character/option value.\n";
+
+tSCC zNoFlags[]    =
+"Options are specified by their name and either single\n\
+or doubled %ss.  Flag characters are not interpreted.\n";
+
+
+DEF_PROC_2( , void, optionUsage,
+            tOptions*,  pOptions,
+            int,        exitCode )
 {
-    tSCC  zReqOptFmt[]   = " %3s %-14s %-5s%s\n";
-    tSCC  zNrmOptFmt[]   = " %1$3s %2$-14s %4$s\n";
     tCC*  pOptFmt;
     tCC*  pOptTitle;
     FILE* fp = stderr;
@@ -77,41 +115,24 @@ optionUsage( tOptions*  pOptions, int exitCode )
      */
     switch (pOptions->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
     case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
-    {
-        tSCC zOptTitle[] = "  Flg Arg Option-Name    Description\n";
-
-        pOptTitle = zOptTitle;
+        pOptTitle = zNoReq_Short_Title;
         pOptFmt   = zNrmOptFmt;
         break;
-    }
 
     case OPTPROC_NO_REQ_OPT:
-    {
-        tSCC zOptTitle[] = "   Arg Option-Name    Description\n";
-
-        pOptTitle = zOptTitle;
+        pOptTitle = zNoReq_NoShort_Title;
         pOptFmt   = zNrmOptFmt;
         break;
-    }
 
     case OPTPROC_SHORTOPT:
-    {
-        tSCC zOptTitle[] = "  Flg Arg Option-Name   Req?  Description\n";
-
-        pOptTitle = zOptTitle;
+        pOptTitle = zReq_Short_Title;
         pOptFmt   = zReqOptFmt;
         break;
-    }
 
     default:
     case 0:
-    {
-        tSCC zOptTitle[] = "   Arg Option-Name   Req?  Description\n";
-
-        pOptTitle = zOptTitle;
+        pOptTitle = zReq_NoShort_Title;
         pOptFmt   = zReqOptFmt;
-        break;
-    }
     }
 
     fputs( pOptTitle, fp );
@@ -128,8 +149,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
             tSCC  zOptArg[] = "opt";
             tSCC  zNoArg[]  = "no ";
             tSCC  zBreak[]  = "\n%s\n\n%s";
-            tSCC  zAuto[]   =
-                "Auto-supported Options:";
+            tSCC  zAuto[]   = "Auto-supported Options:";
 
             tCC*  pzArgType;
 
@@ -197,8 +217,6 @@ optionUsage( tOptions*  pOptions, int exitCode )
              */
             if (  (pOD->pOptMust != (int*)NULL)
                || (pOD->pOptCant != (int*)NULL) ) {
-                tSCC zTabout[] = "\t\t\t\t%s\n";
-                tSCC zTabHyp[] = "\t\t\t\t- ";
 
                 fputs( zTabHyp, fp );
 
@@ -206,10 +224,9 @@ optionUsage( tOptions*  pOptions, int exitCode )
                  *  DEPENDENCIES:
                  */
                 if (pOD->pOptMust != (int*)NULL) {
-                    tSCC zReq[]       = "requires these options:\n";
                     const int* pOptNo = pOD->pOptMust;
 
-                    fputs( zReq, fp );
+                    fputs( zReqThese, fp );
                     for (;;) {
                         fprintf( fp, zTabout, pOptions->pOptDesc[
                                  *pOptNo ].pz_Name );
@@ -217,17 +234,14 @@ optionUsage( tOptions*  pOptions, int exitCode )
                             break;
                     }
 
-                    if (pOD->pOptCant != (int*)NULL) {
-                        tSCC zTabHypAnd[] = "\t\t\t\t-- and ";
+                    if (pOD->pOptCant != (int*)NULL)
                         fputs( zTabHypAnd, fp );
-                    }
                 }
 
                 /*
                  *  CONFLICTS:
                  */
                 if (pOD->pOptCant != (int*)NULL) {
-                    tSCC   zProhib[] = "prohibits these options:\n";
                     const int* pOptNo = pOD->pOptCant;
 
                     fputs( zProhib, fp );
@@ -244,19 +258,15 @@ optionUsage( tOptions*  pOptions, int exitCode )
              *  IF there is a disablement string
              *  THEN print the disablement info
              */
-            if (pOD->pz_DisableName != (char*)NULL )  {
-                tSCC zDis[] = "\t\t\t\t- disabled as --%s\n";
+            if (pOD->pz_DisableName != (char*)NULL )
                 fprintf( fp, zDis, pOD->pz_DisableName );
-            }
 
             /*
              *  IF the option defaults to being enabled,
              *  THEN print that out
              */
-            if (pOD->fOptState & OPTST_INITENABLED)  {
-                tSCC zEnab[] = "\t\t\t\t- enabled by default\n";
+            if (pOD->fOptState & OPTST_INITENABLED)
                 fputs( zEnab, fp );
-            }
 
             /*
              *  IF  the option is in an equivalence class
@@ -265,42 +275,37 @@ optionUsage( tOptions*  pOptions, int exitCode )
              */
             if (  (pOD->optEquivIndex != NO_EQUIVALENT)
                && (pOD->optEquivIndex != optNo )  )  {
-                tSCC zAlt[] = "\t\t\t\t- an alternate for %s\n";
                 fprintf( fp, zAlt,
                          pOptions->pOptDesc[ pOD->optEquivIndex ].pz_Name );
                 continue;
             }
 
-            if ((pOD->fOptState & OPTST_NO_INIT) != 0) {
-                if (  ((pOptions->fOptSet & OPTPROC_EXERC) != 0)
-                   || (pOptions->papzHomeList != (const char**)NULL)
-                   || (pOptions->pzPROGNAME != (const char*)NULL)  ) {
-                    tSCC zNoPreset[] = "\t\t\t\t- may not be preset\n";
-                    fputs( zNoPreset, fp );
-                }
-            }
+            /*
+             *  IF this particular option can NOT be preset
+             *    AND some form of presetting IS allowed,
+             *  THEN advise that this option may not be preset.
+             */
+            if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
+               && (  ((pOptions->fOptSet & OPTPROC_EXERC) != 0)
+                  || (pOptions->papzHomeList != (const char**)NULL)
+                  || (pOptions->pzPROGNAME != (const char*)NULL)
+               )  )
+
+                fputs( zNoPreset, fp );
 
             /*
              *  Print the appearance requirements.
              */
             switch (pOD->optMinCt) {
             case 1:
-            {
                 /*
                  *  One is required.
                  *  We mention maximums in the next case element.
                  */
-                tSCC zReqFlag[] = "\t\t\t\t- a required option\n";
                 fputs( zReqFlag, fp );
                 /*FALLTHROUGH*/
-            }
 
             case 0:
-            {
-                tSCC zNoLim[]  = "\t\t\t\t- may appear without limit\n";
-                tSCC zPreset[] = "\t\t\t\t- may NOT appear - preset only\n";
-                tSCC zUpTo[]   = "\t\t\t\t- may appear up to %d times\n";
-
                 /*
                  *  IF the max is more than one, print an "UP TO" message
                  */
@@ -321,17 +326,12 @@ optionUsage( tOptions*  pOptions, int exitCode )
                      break;
                 }
                 break;
-            }
 
             default:
-            {
-                tSCC zMust[] = "\t\t\t\t- must appear between %d and "
-                               "%d times\n";
                 /*
                  *  More than one is required.  Print the range.
                  */
                 fprintf( fp, zMust, pOD->optMinCt, pOD->optMaxCt );
-            }
             }
 
             if (  NAMED_OPTS( pOptions )
@@ -344,18 +344,6 @@ optionUsage( tOptions*  pOptions, int exitCode )
     fputc( '\n', fp );
 
     {
-        tSCC zOptsOnly[]  = "All arguments are named options.\n";
-        tSCC zInverted[]  = "Flag options are disabled with a '+' marker.\n";
-        tSCC zNumberOpt[] = "The '-#<number>' option may omit the hash char\n";
-
-        tSCC zFlagOkay[]    =
-            "Options may be specified by doubled %1$ss and their name\n"
-            "or by a single %1$s and the flag character/option value.\n";
-
-        tSCC zNoFlags[]     =
-            "Options are specified by their name and either single\n"
-            "or doubled %ss.  Flag characters are not interpreted.\n";
-
         u_int  fOptSet = pOptions->fOptSet;
         tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;
 
@@ -380,13 +368,9 @@ optionUsage( tOptions*  pOptions, int exitCode )
     if (exitCode == EXIT_SUCCESS) {
         ag_bool  initIntro = AG_TRUE;
         u_int    fOptSet   = pOptions->fOptSet;
-        tSCC     zIntro[]  = "\nThe following option preset mechanisms "
-                             "are supported:\n";
         tSCC     zPathFmt[] = " - reading file %s/%s\n";
 
         if ((fOptSet & OPTPROC_EXERC) != 0) {
-            tSCC zHomePath[] = " - reading file /... %s's exe directory "
-                               ".../%s \n";
             fputs( zIntro, fp );
             fprintf( fp, zHomePath, pOptions->pzProgName,
                      pOptions->pzRcName );
@@ -411,8 +395,6 @@ optionUsage( tOptions*  pOptions, int exitCode )
         }
 
         if ((pOptions->fOptSet & OPTPROC_ENVIRON) != 0) {
-            tSCC zExamineFmt[] = " - examining environment variables "
-                                 "named %s_*\n";
             if (initIntro)
                 fputs( zIntro, fp );
 
@@ -490,4 +472,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
 
     exit( exitCode );
 }
-/* usage.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * usage.c ends here */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.22 2000/09/11 01:44:18 bkorb Exp $
+ *  $Id: autoopts.c,v 2.23 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -79,6 +79,10 @@ tSCC zIllOptStr[]   = "%s: %s option -- %s\n";
 tSCC zIllegal[]     = "illegal";
 tSCC zAmbiguous[]   = "ambiguous";
 
+tSCC zBadVer[] = "Automated Options Processing Error!\n\
+\t%s called optionProcess with structure version %d.%d.%d.\n\
+\tThis library was compiled with version %d.%d.%d\n\
+\tand requires a minimum structure version of %d.%d.%d\n";
 
 STATIC ag_bool loadValue( tOptions* pOpts, tOptDesc* pOD );
 STATIC void loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD );
@@ -97,8 +101,9 @@ STATIC tOptDesc* optionGet( tOptions* pOpts, int argCt, char** argVect );
  *  This routine handles equivalencing and invoking the handler procedure,
  *  if any.
  */
-    STATIC ag_bool
-loadValue( tOptions* pOpts, tOptDesc* pOD )
+DEF_PROC_2( STATIC, ag_bool, loadValue,
+            tOptions*,  pOpts,
+            tOptDesc*,  pOD )
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -173,10 +178,9 @@ loadValue( tOptions* pOpts, tOptDesc* pOD )
 
 
 /*
- *  For preset values, we will allways have an argument pointer.
+ *  For preset values, we will always have an argument pointer.
  */
-    STATIC void
-loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
+DEF_PROC_2( STATIC, void, loadPresetValue, tOptions*, pOpts, tOptDesc*, pOD )
 {
     /*
      *  IF the option is numeric,
@@ -212,11 +216,10 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
 }
 
 
-
-    STATIC tOptDesc*
-longOptionFind( tOptions*  pOpts,
-                char*      pzOptName,
-                u_long*    pFlags )
+DEF_PROC_3( STATIC, tOptDesc*, longOptionFind,
+            tOptions*,  pOpts,
+            char*,      pzOptName,
+            u_long*,    pFlags )
 {
     ag_bool    disable  = AG_FALSE;
     char*      pzEq     = strchr( pzOptName, '=' );
@@ -342,9 +345,9 @@ longOptionFind( tOptions*  pOpts,
 }
 
 
-    STATIC tOptDesc*
-shortOptionFind( tOptions*  pOpts,
-                 tUC        optValue )
+DEF_PROC_2( STATIC, tOptDesc*, shortOptionFind,
+            tOptions*,  pOpts,
+            tUC,        optValue )
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
     int        ct   = pOpts->optCt;
@@ -400,9 +403,10 @@ shortOptionFind( tOptions*  pOpts,
 }
 
 
-
-    STATIC void
-loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
+DEF_PROC_3( STATIC, void, loadOptionLine,
+            tOptions*,  pOpts,
+            u_long,     optFlag,
+            char*,      pzLine )
 {
     char*  pzOptionArg;
 
@@ -459,15 +463,17 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
  *  This is a user callable routine for setting options from, for
  *  example, the contents of a file that they read in.
  */
-    void
-optionLoadLine( tOptions*  pOpts, char*  pzLine )
+DEF_PROC_2( , void, optionLoadLine,
+            tOptions*,  pOpts,
+            char*,      pzLine )
 {
     loadOptionLine( pOpts, OPTST_SET, pzLine );
 }
 
 
-    STATIC void
-filePreset( tOptions*  pOpts, const char* pzFileName )
+DEF_PROC_2( STATIC, void, filePreset,
+            tOptions*,    pOpts,
+            const char*,  pzFileName )
 {
     FILE*  fp  = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
     u_int saveOpt = pOpts->fOptSet;
@@ -537,8 +543,9 @@ filePreset( tOptions*  pOpts, const char* pzFileName )
  *  This is callable from the option descriptor.
  *  It is referenced when homerc files are enabled.
  */
-    void
-doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
+DEF_PROC_2( , void, doLoadOpt,
+            tOptions*,  pOpts,
+            tOptDesc*,  pOptDesc )
 {
     /*
      *  IF the option is not being disabled,
@@ -552,9 +559,18 @@ doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 }
 
 
-    STATIC ag_bool
-valid_path( char*  pzBuf,  size_t  bufSize,
-            tCC*   pzName, tCC*    pzProgPath )
+/*
+ *  valid_path  --  validate and translate a path
+ *
+ *  This routine does environment variable expansion if the first character
+ *  is a ``$''.  If it starts with two dollar characters, then the path
+ *  is relative to the location of the executable.
+ */
+DEF_PROC_4( STATIC, ag_bool, valid_path,
+            char*,   pzBuf,
+            size_t,  bufSize,
+            tCC*,    pzName,
+            tCC*,    pzProgPath )
 {
     /*
      *  IF not an environment variable, just copy the data
@@ -657,8 +673,8 @@ valid_path( char*  pzBuf,  size_t  bufSize,
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-    STATIC void
-doPresets( tOptions*  pOpts )
+DEF_PROC_1( STATIC, void, doPresets,
+            tOptions*,  pOpts )
 {
     u_int fOptSet = pOpts->fOptSet;
     char        zFileName[ 4096 ];
@@ -786,8 +802,10 @@ doPresets( tOptions*  pOpts )
 }
 
 
-    STATIC tOptDesc*
-optionGet( tOptions*   pOpts, int argCt, char** argVect )
+DEF_PROC_3( STATIC, tOptDesc*, optionGet,
+            tOptions*,   pOpts,
+            int,         argCt,
+            char**,      argVect )
 {
     ag_bool   isLongOpt      = AG_FALSE;
     tOptDesc* pRes           = (tOptDesc*)NULL;
@@ -1094,8 +1112,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
  *
  *  Return the compiled version number.
  */
-    const char*
-optionVersion( void )
+DEF_PROC_0( , const char*, optionVersion )
 {
     static const char zVersion[] =
         STR( AO_ANNOUNCE_LEVEL );
@@ -1108,8 +1125,9 @@ optionVersion( void )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-    STATIC int
-checkConsistency( tOptions* pOpts, int argCt )
+DEF_PROC_2( STATIC, int, checkConsistency,
+            tOptions*,  pOpts,
+            int,        argCt )
 {
     int       errCt = 0;
 
@@ -1226,8 +1244,10 @@ checkConsistency( tOptions* pOpts, int argCt )
  *
  *  Define the option processing routine
  */
-    int
-optionProcess( tOptions*  pOpts, int argCt, char** argVect )
+DEF_PROC_3( , int, optionProcess,
+            tOptions*,  pOpts,
+            int,        argCt,
+            char**,     argVect )
 {
     tOptDesc* pOD;
     int       errCt = 0;
@@ -1241,10 +1261,6 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
        && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
           || (pOpts->structVersion < MIN_OPTION_VERSION     )
        )  )  {
-        tSCC zBadVer[] = "Automated Options Processing Error!\n"
-            "\t%s called optionProcess with structure version %d.%d.%d.\n"
-            "\tThis library was compiled with version %d.%d.%d\n"
-            "\tand requires a minimum structure version of %d.%d.%d\n";
         fprintf( stderr, zBadVer, argVect[0],
                  NUM_TO_VER( pOpts->structVersion ),
                  NUM_TO_VER( OPTIONS_STRUCT_VERSION ),
@@ -1319,4 +1335,8 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
 
     return pOpts->curOptIdx;
 }
-/* autoopts.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * autoopts.c ends here */

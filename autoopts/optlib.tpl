@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: C -*-
 
-# $Id: optlib.tpl,v 1.13 2000/08/13 21:20:25 bkorb Exp $
+# $Id: optlib.tpl,v 1.14 2000/10/07 22:52:08 bkorb Exp $
 
 =]
 [=
@@ -161,7 +161,7 @@ DEFINE Option_Strings =][=
   ENDIF =]:
  */
 tSCC    z[=(. cap-name)=]Text[] =
-        [=(c-string (get "descrip"))=];[=
+        [=(kr-string (get "descrip"))=];[=
 
   IF (not (exist? "documentation")) =][=
   #
@@ -220,12 +220,12 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
 
     ==*  :         =][= # String init value =]
 tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
-         =]= [=(c-string (shell (sprintf "echo '%s' | sed 's@^:@@'"
+         =]= [=(kr-string (shell (sprintf "echo '%s' | sed 's@^:@@'"
                          (get "flag_arg") ))) =];[=
 
     *              =][= # String init value =]
 tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
-         =]= [=(c-string (get "flag_arg"))=];[=
+         =]= [=(kr-string (get "flag_arg"))=];[=
     ESAC =][=
 
 
@@ -370,53 +370,61 @@ options are optional), then we put square brackets around the
 syntax. =][=
 
 DEFINE USAGE_LINE   =][=
-  #  Compute the option arguments
-  =][=
-  IF  (exist? "flag.flag_arg") =][=
+
+  #  Compute the option arguments           =][=
+
+  (out-push-new ".usAGe_line")
+
+=][=(. prog-name)=] - [=prog_title=][= % version " - Ver. %s" =]
+USAGE:  %s [=
+  IF  (exist? "flag.flag_arg")              =][=
       (define flag-arg " [<val>]")
-      (define  opt-arg "[{=| }<val>]") =][=
-  ELSE  =][=
+      (define  opt-arg "[{=| }<val>]")      =][=
+  ELSE                                      =][=
       (define flag-arg "")
-      (define  opt-arg "") =][=
-  ENDIF =][=
+      (define  opt-arg "")                  =][=
+  ENDIF                                     =][=
 
-  (out-push-new ".usAGe_line") =]USAGE:  %s [=
-
-  IF (not (exist? "flag.min"))
-     =][[= ELSE =]{[= ENDIF =] [=
+  IF (not (exist? "flag.min")) =][[= ELSE =]{[= ENDIF =] [=
 
   #  At least one option has a minimum occurrance count.
      Therefore, we omit the square brackets around the option
      syntax.
   =][=
-  IF   (exist? "flag.value")      =]-<flag>[=(. flag-arg)=][=
-     IF (exist? "long_opts")       =] | [=ENDIF=][=
+  IF   (exist? "flag.value")
+     =]-<flag>[=(. flag-arg)=][=
+
+     IF (exist? "long_opts")
+        =] | [=ENDIF=][=
   ELIF (not (exist? "long_opts")) =]<option-name>[=(. opt-arg)=][=
-  ENDIF =][=
+  ENDIF                                     =][=
 
-  IF (exist? "long_opts")   =]--<name>[=(. opt-arg)=][=
-  ENDIF=] [=
+  IF (exist? "long_opts")
+     =]--<name>[=(. opt-arg)                =][=
+  ENDIF                                     =] [=
 
-  IF (not (exist? "flag.min"))
-     =]][= ELSE =]}[= ENDIF =]...[=
+  IF (not (exist? "flag.min")) =]][= ELSE =]}[= ENDIF =]...[=
 
-  #  Emit the line as it exists so far.  Remember how many characters
-     it uses so we can decide if we need to emit a line break
-     before we emit any argument description.
-  =][=
-  (out-pop)
-  (shell "cat .usAGe_line
-          line_len=`wc -c < .usAGe_line`
-          rm -f .usAGe_line") =][=
+  IF (exist? "argument")                    =] [=
 
-  IF (exist? "argument") =] [=
+    #  IF the USAGE line plus the program name plus the argument
+    #  goes past 80 columns, then break the line.  =][=
 
-    IF (< 82 (+ (string->number (shell "echo $line_len"))
-                (len "argument") (len "prog_name") )) =]\\\n"
-      "\t\t[=
+    `f=\`(cat .usAGe_line ; echo) | sed -n -e 2p -e 2q | wc -c\`` =][=
+
+    IF (< 82 (+ (string->number (shell "echo $f"))
+                (len "argument")
+                (len "prog_name") )) =]\
+		[=
     ENDIF
-    =]" [=(c-string (get "argument"))=] "[=
 
+    =][=argument=]
+[=
   ENDIF=][=
+
+(out-pop)
+(kr-string (string-append (shell
+"cat .usAGe_line ; rm -f .usAGe_line") "\n" )) =][=
+
 ENDDEF
 =]

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.15 2000/10/03 18:50:37 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.16 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -265,41 +265,97 @@ struct options {
 extern "C" {
 #endif
 
+#if defined( __STDC__ ) || defined( __cplusplus )
+#  ifndef PROTO
+#    define PROTO(s) s
+#  endif
+
+/*
+ *  All this "DEF_PROC_*" weirdness is so that I can compile the option
+ *  processing code with a K&R compiler.  Yuck.  Don't use them unless
+ *  you really have to.  (Still better than ugly if-defs, tho.)
+ */
+#define DEF_PROC_0( mode, type, name ) \
+          mode type name( void )
+
+#define DEF_PROC_1( mode, type, name, a1_type, a1_name ) \
+          mode type name( a1_type a1_name )
+
+#define DEF_PROC_2( mode, type, name, a1t, a1n, a2t, a2n ) \
+          mode type name( a1t a1n, a2t a2n )
+
+#define DEF_PROC_3( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n ) \
+          mode type name( a1t a1n, a2t a2n, a3t a3n )
+
+#define DEF_PROC_4( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
+          mode type name( a1t a1n, a2t a2n, a3t a3n, a4t a4n )
+
+#else
+#  ifndef PROTO
+#    define PROTO(s) ()
+#  endif
+
+#define DEF_PROC_0( mode, type, name ) \
+          mode type name()
+
+#define DEF_PROC_1( mode, type, name, a1_type, a1_name ) \
+          mode type name( a1_name ) a1_type a1_name;
+
+#define DEF_PROC_2( mode, type, name, a1t, a1n, a2t, a2n ) \
+          mode type name( a1n, a2n ) a1t a1n; a2t a2n;
+
+#define DEF_PROC_3( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n ) \
+          mode type name( a1n, a2n, a3n ) \
+          a1t a1n; a2t a2n; a3t a3n;
+
+#define DEF_PROC_4( mode, type, name, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
+          mode type name( a1n, a2n, a3n ) \
+          a1t a1n; a2t a2n; a3t a3n; a4t a4n;
+
+#  ifndef void
+#    define void int
+#  endif
+
+#  ifndef const
+#    define const
+#  endif
+#endif
+
 /*
  * Return the full version string compiled into the library.
  */
-const char	*optionVersion( void );
+const char	*optionVersion PROTO(( void ));
 
 /*
  *  optionProcess scans the argument flags completely.
  *  The return value is the argument index of the first argument
  *  following the flag list, per "getopt(3)".
  */
-int     optionProcess( tOptions* pOpts, int argCt, char** argVect );
+int     optionProcess PROTO(( tOptions* pOpts, int argCt, char** argVect ));
 
 /*
  *  optionSave saves the option state into an RC or INI file in
  *  the *LAST* defined directory in the papzHomeList.
  */
-void    optionSave(   tOptions* pOpts );
+void    optionSave PROTO((   tOptions* pOpts ));
 
 /*
  *  optionLoadLine will load an option in the text buffer as
  *  a normal (not preset) option.
  */
-void    optionLoadLine( tOptions* pOpts, char*  pzLine );
+void    optionLoadLine PROTO(( tOptions* pOpts, char*  pzLine ));
 
 /*
  *  putBourneShell outputs the option state to standard out in a way
  *  that the Bourne and Korn shells can interpret.
  */
-void    putBourneShell( tOptions* pOpts );
+void    putBourneShell PROTO(( tOptions* pOpts ));
 
 /*
  *  export_options_to_guile will emit a series of guile commands so
  *  that the Scheme code can query the state of any of the defined options.
  */
-void    export_options_to_guile( tOptions* );
+void    export_options_to_guile PROTO(( tOptions* ));
 
 /*
  *  stackOptArg saves the option argument into an option-specific list.
@@ -311,4 +367,8 @@ tOptProc stackOptArg, unstackOptArg;
 }
 #endif
 #endif /* AUTOGEN_OPTIONS_H */
-/* options.h ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * options.h ends here */

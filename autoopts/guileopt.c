@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 1.1 2000/10/03 00:31:49 bkorb Exp $
+ *  $Id: guileopt.c,v 1.2 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -52,8 +52,8 @@
 #include <string.h>
 #include "autoopts.h"
 
-    void
-export_options_to_guile( tOptions* pOpts )
+DEF_PROC_1( , void, export_options_to_guile,
+            tOptions*,  pOpts )
 {
     tOptDesc*  pOD = pOpts->pOptDesc;
     int        ct  = pOpts->presetOptCt;
@@ -166,4 +166,4 @@ export_options_to_guile( tOptions* pOpts )
  * Local Variables:
  * c-file-style: "stroustrup"
  * End:
- * end of guileopt.c */
+ * guileopt.c ends here */

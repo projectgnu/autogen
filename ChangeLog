@@ -1,3 +1,8 @@
+2000-10-07  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*.tpl:  Made the templates emit K&R C
+	* autoopts/*.[ch]:  The sources should now compile with a K&R compiler
+
 2000-09-29  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expGperf.c: new.  Implements (make-gperf ...) and

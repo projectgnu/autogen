@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.13 2000/09/10 19:21:45 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.14 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -169,4 +169,8 @@ extern tePagerState pagerState;
 #endif
 
 #endif /* AUTOGEN_AUTOOPTS_H */
-/* autoopts.h ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * autoopts.h ends here */

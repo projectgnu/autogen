@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.5 2000/04/04 13:22:18 bkorb Exp $
+ *  $Id: stack.c,v 2.6 2000/10/07 22:52:08 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -64,9 +64,9 @@
 
 #include "autoopts.h"
 
-
-    void
-unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
+DEF_PROC_2( , void, unstackOptArg,
+            tOptions*,  pOpts,
+            tOptDesc*,  pOptDesc )
 {
     /*
      *  IF the target system is too feeble to have a POSIX regex,
@@ -150,8 +150,9 @@ unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
 }
 
 
-    void
-stackOptArg( tOptions*  pOpts, tOptDesc* pOptDesc )
+DEF_PROC_2( , void, stackOptArg,
+            tOptions*,  pOpts,
+            tOptDesc*,  pOptDesc )
 {
     tArgList* pAL;
 
@@ -214,4 +215,8 @@ stackOptArg( tOptions*  pOpts, tOptDesc* pOptDesc )
     pAL->apzArgs[ (pAL->useCt)++ ] = pOptDesc->pzLastArg;
     pOptDesc->optCookie = (void*)pAL;
 }
-/* stack.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * stack.c ends here */

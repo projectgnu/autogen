@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.10 1999/10/01 13:46:45 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.11 2000/10/07 22:52:08 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -102,10 +102,10 @@ static unsigned char charmap[] = {
 };
 
 
-    int
-strneqvcmp( const char* s1,
-            const char* s2,
-            size_t      ct )
+DEF_PROC_3( , int, strneqvcmp,
+            const char*, s1,
+            const char*, s2,
+            size_t,      ct )
 {
     for (; ct != 0; --ct) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -123,9 +123,9 @@ strneqvcmp( const char* s1,
 }
 
 
-    int
-streqvcmp( const char* s1,
-           const char* s2 )
+DEF_PROC_2( , int, streqvcmp,
+            const char*, s1,
+            const char*, s2 )
 {
     for (;;) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -141,10 +141,10 @@ streqvcmp( const char* s1,
 }
 
 
-    void
-streqvmap( int  chFrom,
-           int  chTo,
-           int  ct )
+DEF_PROC_3( , void, streqvmap,
+            int,  chFrom,
+            int,  chTo,
+            int,  ct )
 {
     if (ct == 0) {
         ct = sizeof( charmap ) - 1;
@@ -171,8 +171,7 @@ streqvmap( int  chFrom,
 }
 
 
-    void
-strequate( const char* s )
+DEF_PROC_1( , void, strequate, const char*, s )
 {
     if ((s != (char*)NULL) && (*s != NUL)) {
         unsigned char equiv = (unsigned)*s;
@@ -182,11 +181,14 @@ strequate( const char* s )
 }
 
 
-    void
-strtransform( char* d, char* s )
+DEF_PROC_2( , void, strtransform, char*, d, const char*, s )
 {
     do  {
         *(d++) = (char)charmap[ (unsigned)*s ];
     } while (*(s++) != NUL);
 }
-/* streqvcmp.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * streqvcmp.c ends here */

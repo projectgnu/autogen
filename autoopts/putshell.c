@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 2.2 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: putshell.c,v 2.3 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -52,6 +52,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifdef __STDC__
 #include "autoopts.h"
 
 /*
@@ -154,4 +156,16 @@ putBourneShell( tOptions* pOpts )
         }
     }
 }
-/* putshell.c ends here */
+#else
+int putBourneShell( pOpts )
+    tOptions* pOpts;
+{
+    fputs( "putBourneShell disabled for pre-ANSI C\n", stderr );
+    exit( EXIT_FAILURE );
+}
+#endif
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * putshell.c ends here */

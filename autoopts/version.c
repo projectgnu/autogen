@@ -1,6 +1,6 @@
 
 /*
- *  $Id: version.c,v 2.4 2000/04/04 13:22:18 bkorb Exp $
+ *  $Id: version.c,v 2.5 2000/10/07 22:52:08 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -54,11 +54,20 @@
 
 #include "autoopts.h"
 
-    void
-doVersion( tOptions*  pOpts, tOptDesc* pOD )
+tSCC zAO[] =
+    "Automated Options version %s, copyright (c) 1999-2000 Bruce Korb\n";
+
+tSCC zBadArg[] =
+"ERROR: version option argument '%c' invalid.  Use:\n\
+\t'v' - version only\n\
+\t'c' - version and copyright\n\
+\t'n' - version and copyright notice\n";
+
+
+DEF_PROC_2( , void, doVersion,
+            tOptions*,  pOpts,
+            tOptDesc*,  pOD )
 {
-    tSCC zAO[] = "Automated Options version %s, copyright (c) 1999-2000 "
-                 "Bruce Korb\n";
     char swCh;
 
     if (pOD->pzLastArg == (char*)NULL)
@@ -102,13 +111,14 @@ doVersion( tOptions*  pOpts, tOptDesc* pOD )
         break;
 
     default:
-        fprintf( stderr, "ERROR: version option argument '%c' invalid.  Use:\n"
-                 "\t'v' - version only\n"
-                 "\t'c' - version and copyright\n"
-                 "\t'n' - version and copyright notice\n", swCh );
+        fprintf( stderr, zBadArg, swCh );
         exit( EXIT_FAILURE );
     }
 
     exit( EXIT_SUCCESS );
 }
-/* version.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * version.c ends here */
