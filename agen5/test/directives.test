@@ -1,0 +1,106 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# directives.test --- test definition directives
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: directives.test,v 1.1 2000/03/11 18:34:57 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<'_EOF_'
+[= AutoGen5 Template test =]
+Irrelevant [=foo=].
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+cat > $testname.inc <<_EOF_
+autogen definitions $testname;
+
+/*
+#define COMMENT
+#ifdef COMMENT
+# error error in comment
+ */
+
+#ifdef MUMBLE
+#  define MORE
+#else
+#  define FUMBLE
+#endif
+_EOF_
+
+echo creating $testname.def
+cat > $testname.def <<_EOF_
+autogen definitions $testname;
+
+#include $testname.inc
+
+#ifdef FUMBLE
+#  error  we fumbled mumble
+#endif
+
+#ifndef MORE
+#  error  we fumbled more
+#endif
+
+#if (FOO == 1)
+#  error we got iffed
+#elif (FOO == 0)
+#  error we got FOO zeroed
+#else
+#  error we got lost
+#endif
+
+#shell
+
+echo "#line 1 shelltext"
+echo "foo = bar;"
+
+#endshell
+
+#define FUMBLE
+#undef  MORE
+
+#ifndef FUMBLE
+#  error  we goofed fumble
+#endif
+
+#ifdef MORE
+#  error  we mumbled more
+#endif
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating $testname.out
+# this is the output we should expect to see
+cat > $testname.out <<_EOF_
+Irrelevant bar.
+_EOF_
+
+AGEN="$AGEN -DMUMBLE -DFOO=1"
+echo $AGEN $testname.def
+$AGEN $testname.def || failure $AGEN failed
+cmp -s $testname.test $testname.out || failure unexpected output
+
+cleanup
+# end of directives.test
