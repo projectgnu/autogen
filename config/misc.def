@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2004/02/27 18:45:01 $
+ *  Last Modified:     $Date: 2004/07/02 18:31:52 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.33 2004/02/27 18:45:01 bkorb Exp $
+ *  $Id: misc.def,v 3.34 2004/07/02 18:31:52 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.33 $";
+version = "$Revision: 3.34 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -126,7 +126,7 @@ test   = {
 		_END_OF_CODE_;
   config   = { cflags-arg = '--cflags'; libs-arg = '--libs'; };
   action = { yes; act-type = script;
-             act-text = '    CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
+             act-text = 'CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
                         '    LIBS="${ag_save_LIBS}"';
            };
   run-mode   =  "link";
