@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 1998/07/08 18:18:31 $
+## Last Modified:   $Date: 1998/07/14 19:18:54 $
 ##            by:   Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1998/07/08 18:18:31 bkorb Exp $
+## $Id: Makefile.am,v 1.5 1998/07/14 19:18:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,7 +21,7 @@ libopts_la_SOURCES = autoopts.c pgusage.c putshell.c save.c \
 		  stack.c usage.c version.c streqvcmp.c \
                   autoopts.h options.h streqv.h
 
-datadir		= $(prefix)/share/$(PACKAGE)
+datadir		= $(prefix)/share
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl
 EXTRA_DIST      = $(pkgdata_DATA) TODO
 INCLUDES        = -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
