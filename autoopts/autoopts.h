@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-12 09:42:38 bkorb"
+ *  Time-stamp:      "2005-02-13 07:48:14 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.7 2005/02/13 01:48:00 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.8 2005/02/13 16:17:18 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -107,6 +107,33 @@ typedef int tSuccess;
 #define SUCCESSFUL( p )    SUCCEEDED( p )
 #define FAILED( p )        ((p) <  SUCCESS)
 #define HADGLITCH( p )     ((p) >  SUCCESS)
+
+/*
+ *  When loading a line (or block) of text as an option, the value can
+ *  be processed in any of several modes:
+ *
+ *  @table @samp
+ *  @item keep
+ *  Every part of the value between the delimiters is saved.
+ *
+ *  @item uncooked
+ *  Even if the value begins with quote characters, do not do quote processing.
+ *
+ *  @item cooked
+ *  If the value looks like a quoted string, then process it.
+ *  Double quoted strings are processed the way strings are in "C" programs,
+ *  except they are treated as regular characters if the following character
+ *  is not a well-established escape sequence.
+ *  Single quoted strings (quoted with apostrophies) are handled the way
+ *  strings are handled in shell scripts, *except* that backslash escapes
+ *  are honored before backslash escapes and apostrophies.
+ *  @end table
+ */
+typedef enum {
+    LOAD_COOKED,
+    LOAD_UNCOOKED,
+    LOAD_KEEP
+} load_mode_t;
 
 /*
  *  The pager state is used by doPagedUsage() procedure.

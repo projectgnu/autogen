@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.7 2005/02/13 01:48:00 bkorb Exp $
+ *  $Id: load.c,v 4.8 2005/02/13 16:17:18 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -232,12 +232,19 @@ optionMakePath(
 }
 
 
+/*
+ *  Load an option from a block of text.  The text must start with the
+ *  configurable/option name and be followed by its associated value.
+ *  That value may be processed in any of several ways.  See "load_mode_t"
+ *  in autoopts.h.
+ */
 LOCAL void
 loadOptionLine(
-    tOptions*  pOpts,
-    tOptState* pOS,
-    char*      pzLine,
-    tDirection direction )
+    tOptions*   pOpts,
+    tOptState*  pOS,
+    char*       pzLine,
+    tDirection  direction,
+    load_mode_t load_mode )
 {
     /*
      *  Strip off the first token on the line.
@@ -398,7 +405,7 @@ optionLoadLine(
     tOptState st = OPTSTATE_INITIALIZER(SET);
     char* pz;
     AGDUPSTR( pz, pzLine, "user option line" );
-    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
+    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS, LOAD_UNCOOKED );
     AGFREE( pz );
 }
 /*

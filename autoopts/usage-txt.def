@@ -28,7 +28,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.4 2005/02/13 01:48:00 bkorb Exp $
+   $Id: usage-txt.def,v 4.5 2005/02/13 16:17:18 bkorb Exp $
  */
 
 /*
@@ -265,6 +265,21 @@ utxt = { ut-type = cch_t;
 utxt = { ut-type = cch_t;
          ut-name = InvalOptDesc;
          ut-text = "AutoOpts ERROR:  invalid option descriptor for %s\n";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = LoadCooked;
+         ut-text = "cooked>";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = LoadUncooked;
+         ut-text = "uncooked>";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = LoadKeep;
+         ut-text = "keep>";
 };
 
 utxt = { ut-type = cch_t;

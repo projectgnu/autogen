@@ -1,6 +1,6 @@
 
 /*
- *  $Id: configfile.c,v 4.2 2005/02/13 01:48:00 bkorb Exp $
+ *  $Id: configfile.c,v 4.3 2005/02/13 16:17:18 bkorb Exp $
  *
  *  configuration/rc/ini file handling.
  */
@@ -153,7 +153,129 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
 
 
 /*
+ *  handleStructure -- "pzText" points to a '<' character, followed by an alpha.
+ *  The end of the entry is either the "/>" following the name, or else a
+ *  "</name>" string.
+ */
+static char*
+handleStructure(
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction )
+{
+    size_t cooked_len   = strlen(zLoadCooked);
+    size_t uncooked_len = strlen(zLoadUncooked);
+    size_t keep_len     = strlen(zLoadKeep);
+
+    load_mode_t   mode  = LOAD_UNCOOKED;
+    char* pzName        = ++pzText;
+    char* pcNulPoint;
+
+    while (ISNAMECHAR( *pzText ))  pzText++;
+    pcNulPoint = pzText;
+
+    switch (*pzText) {
+    case ' ':
+    case '\t':
+    {
+        char* pzD;
+        pzD = ++pzText;
+
+        while (isspace( *pzText ))    pzText++;
+
+        if (strncmp( pzText, zLoadKeep, keep_len ) == 0) {
+            pzText += keep_len;
+            memmove( pzD, pzText, strlen(pzText)+1 );
+            pzText = pzD;
+            mode = LOAD_KEEP;
+
+        } else if (strncmp( pzText, zLoadCooked, cooked_len ) == 0) {
+            pzText += cooked_len;
+            memset( pzD, ' ', cooked_len );
+            mode = LOAD_COOKED;
+
+        } else if (strncmp( pzText, zLoadUncooked, uncooked_len ) == 0) {
+            pzText += uncooked_len;
+            memset( pzD, ' ', uncooked_len );
+
+        } else while (*pzD != '>') {
+            /*
+             *  Unrecognized attribute.  Skip the attributes.
+             */
+            *(pzD++) = ' ';
+            if (*pzD == NUL)
+                break;
+        }
+        break;
+    }
+
+    case '/':
+        if (pzText[1] != '>')
+            return NULL;
+        *pzText = NUL;
+        pzText += 2;
+        loadOptionLine( pOpts, pOS, pzName, direction, LOAD_KEEP );
+        return pzText;
+
+    case '>':
+        break;
+
+    default:
+        pzText = strchr( pzText, '>');
+        if (pzText != NULL)
+            pzText++;
+        return pzText;
+    }
+
+    /*
+     *  If we are here, we have a value.  Separate the name from the
+     *  value for a moment.
+     */
+    *pcNulPoint = NUL;
+
+    /*
+     *  Find the end of the option text and NUL terminate it
+     */
+    {
+        char   z[64], *pz = z;
+        size_t len = strlen(pzName) + 4;
+        if (len > sizeof(z))
+            pz = AGALOC(len, "scan name");
+
+        sprintf( pz, "</%s>", pzName );
+        *pzText = ' ';
+        pzText = strstr( pzText, pz );
+        if (pz != z) free(pz);
+
+        if (pzText == NULL)
+            return pzText;
+
+        *pzText = NUL;
+        
+        pzText += len-1;
+    }
+
+    /*
+     *  Rejoin the name and value for parsing by "loadOptionLine()".
+     */
+    *pcNulPoint = ' ';
+
+    /*
+     *  "pzName" points to what looks like text for one option/configurable.
+     *  It is NUL terminated.  Process it.
+     */
+    loadOptionLine( pOpts, pOS, pzName, direction, mode );
+
+    return pzText;
+}
+
+
+/*
  *  handleConfig -- "pzText" points to the start of some value name.
+ *  The end of the entry is the end of the line that is not preceded by
+ *  a backslash escape character.  The string value is always processed
+ *  in "cooked" mode.
  */
 static char*
 handleConfig(
@@ -170,7 +292,7 @@ handleConfig(
     if (pzText > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
-        loadOptionLine( pOpts, pOS, pzName, direction );
+        loadOptionLine( pOpts, pOS, pzName, direction, LOAD_UNCOOKED );
         return pzEnd;
     }
 
@@ -228,81 +350,15 @@ handleConfig(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine( pOpts, pOS, pzName, direction );
+    loadOptionLine( pOpts, pOS, pzName, direction, LOAD_UNCOOKED );
 
     return pzEnd;
 }
 
 
 /*
- *  handleStructure -- "pzText" points to a '<' character, followed by an alpha.
- */
-static char*
-handleStructure(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction )
-{
-    char* pzName = ++pzText;
-    while (ISNAMECHAR( *pzText ))  pzText++;
-
-    /*
-     *  The name marker must end in either ">" or "/>".  If not we
-     *  give up on this entry.  We don't know what this file might be.
-     */
-    if (*pzText == '/') {
-        if (pzText[1] != '>')
-            return NULL;
-        *pzText = NUL;
-        pzText += 2;
-        loadOptionLine( pOpts, pOS, pzName, direction );
-        return pzText;
-    }
-
-    if (*pzText != '>') {
-        pzText = strchr( pzText, '>');
-        if (pzText != NULL)
-            pzText++;
-        return pzText;
-    }
-
-    *pzText = NUL;
-
-    /*
-     *  Find the end of the option text and NUL terminate it
-     */
-    {
-        char   z[64], *pz = z;
-        size_t len = (pzText - pzName) + 4;
-        if (len > sizeof(z))
-            pz = AGALOC(len, "scan name");
-
-        sprintf( pz, "</%s>", pzName );
-        *pzText = ' ';
-        pzText = strstr( pzText, pz );
-        if (pz != z) free(pz);
-
-        if (pzText == NULL)
-            return pzText;
-
-        *pzText = NUL;
-        
-        pzText += len-1;
-    }
-
-    /*
-     *  "pzName" points to what looks like text for one option/configurable.
-     *  It is NUL terminated.  Process it.
-     */
-    loadOptionLine( pOpts, pOS, pzName, direction );
-
-    return pzText;
-}
-
-
-/*
- *  handleDirective -- "pzText" points to a "<?" sequence
+ *  handleDirective -- "pzText" points to a "<?" sequence.
+ *  For the moment, we only handle "<?program" directives.
  */
 static char*
 handleDirective(
@@ -345,7 +401,9 @@ handleDirective(
 
 
 /*
- *  handleComment -- "pzText" points to a "<!" sequence
+ *  handleComment -- "pzText" points to a "<!" sequence.
+ *  Theoretically, we should ensure that it begins with "<!--",
+ *  but actually I don't care that much.  It ends with "-->".
  */
 static char*
 handleComment( char* pzText )
@@ -359,6 +417,8 @@ handleComment( char* pzText )
 
 /*
  *  handleProgramSection -- "pzText" points to a '[' character.
+ *  The "traditional" [PROG_NAME] segmentation of the config file.
+ *  Do not ever mix with the "<?program prog-name>" variation.
  */
 static char*
 handleProgramSection(
