@@ -10,18 +10,30 @@
 ## Last Modified:    Mon Sep 14 06:59:22 1998
 ##            by:    Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 1998/09/14 14:33:58 bkorb Exp $
+## $Id: Makefile.am,v 1.7 1998/09/22 22:15:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-@MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
 
 EXTRA_DIST = @COMPAT_SRC@
-GEN_SRC = strsignal.h
+GEN_SRC    = strsignal.h
 MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
+AGEXE      = $(top_builddir)/src/autogen
 
 all:
 
 strsignal.h : strsignal.def strsignal.tpl
+	@if $(AGEXE) --version >&- 2>&- ; then \
+	  echo $(AGEXE) -L $(srcdir) $(srcdir)/strsignal.def ; \
+	  top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	    $(AGEXE) -L $(srcdir) $(srcdir)/strsignal.def ; \
+	else \
+	  if test -s $(srcdir)/$@; then \
+	   echo "WARNING: $(AGEXE) not available, current $(srcdir)/$@ used"; \
+	  else \
+	   echo "ERROR: $(srcdir)/$@ has been corrupted"; \
+	  fi; \
+	fi
+
 
 # Makefile.am ends here
