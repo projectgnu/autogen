@@ -1,3 +1,9 @@
+2003-04-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/enumeration.c(optionEnumerationVal): change intptr_t's to
+	uintptr_t's.  Makes no difference, but we config the latter, not former
+	* autoopts/save.c(optionSaveFile): ditto
+
 2003-04-13  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*: minor cleanups triggered by using a new compiler
