@@ -11,18 +11,19 @@ make_funcs_def()
     chmod u+w funcs.def
     eval "`egrep '^AO_' ../VERSION`"
     cat >> funcs.def <<-	_END_VERS_INFO_
-		vers-info = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
-		vers-curr = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
-		vers-min  = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
-		vers-min-str = "`expr $AO_CURRENT - $AO_AGE`:0:0";
-		/*
-		 *  THIS FILE IS DISTRIBUTED
-		 *
-		 *  This file is used to construct options.h + doc files.  Because it is
-		 *  such a nuisance to get the build ordering correct, we distribute
-		 *  this.  It should be constructed after all binaries are built.
-		 */
-		_END_VERS_INFO_
+	vers-info = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
+	vers-curr = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
+	vers-min  = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
+	vers-min-str = "`expr $AO_CURRENT - $AO_AGE`:0:0";
+	library   = opts;
+	/*
+	 *  THIS FILE IS DISTRIBUTED
+	 *
+	 *  This file is used to construct options.h + doc files.  Because it is
+	 *  such a nuisance to get the build ordering correct, we distribute
+	 *  this.  It should be constructed after all binaries are built.
+	 */
+	_END_VERS_INFO_
     ${AUTOGEN} funcs.def
 }
 
