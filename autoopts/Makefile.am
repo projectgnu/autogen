@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-12-31 07:18:50 bkorb"
+## Time-stamp:      "2004-12-31 19:38:54 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+## $Id: Makefile.am,v 4.2 2005/01/01 17:38:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,7 +48,7 @@ CLIENT_TPLS = stdoptions.def rc-sample.tpl \
 PRIVATE_TPL = options_h.tpl usage-txt.tpl
 TPL_FILES   = $(CLIENT_TPLS) $(PRIVATE_TPL)
 DEF_FILES   = genshell.def stdoptions.def usage-txt.def funcs.def
-MISC_FILES  = TODO autoopts.m4 bootstrap.dir autoopts-config.in COPYING
+MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in COPYING
 pkgconfigdir=$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # #

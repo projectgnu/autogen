@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.2 2005/01/01 17:38:03 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -176,7 +176,7 @@ findFileName( tOptions* pOpts )
             char* pzDirCh = strrchr( pzDir, '/' );
             if (pzDirCh == NULL) {
                 stBuf.st_mode = S_IFREG;
-                break;  /* bail out of error condition */
+                continue;  /* bail out of error condition */
             }
 
             strncpy( z, pzDir, pzDirCh - pzDir );
@@ -190,7 +190,7 @@ findFileName( tOptions* pOpts )
                  *  mark the full name as a regular file
                  */
                 stBuf.st_mode = S_IFREG;
-                break;  /* bail out of error condition */
+                continue;  /* bail out of error condition */
             }
         }
 
@@ -452,7 +452,7 @@ optionSaveFile( tOptions* pOpts )
                     /*
                      *  bit flag strings get allocated
                      */
-                    free( p->pzLastArg );
+                    free( (char*)p->pzLastArg );
                 p->pzLastArg = val;
                 break;
             }

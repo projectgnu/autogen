@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2004-10-30 11:23:29 bkorb"
+# Time-stamp:        "2004-12-31 18:56:58 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.2 2005/01/01 17:38:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -146,6 +146,19 @@ pre )
       ${AGexe} -L. misc.def
     ) || exit 1
     cp ${srcdir}/snprintfv/snprintfv.m4 ${srcdir}/config/.
+
+    marker='=== Component Todo:'
+    rm -f TODO
+    exec 3> TODO
+    sed "/${marker}/,\$d" TODO-top >&3
+    for f in */TODO
+    do
+      test -f $f || continue
+      echo ; echo ${marker} ${f} '==='
+      cat ${f}
+    done >&3
+    exec 3>&-
+
     exit 0
     ;;
 

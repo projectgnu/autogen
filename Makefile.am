@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-12-28 22:34:28 bkorb"
+## Time-stamp:      "2004-12-31 18:51:25 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.1 2005/01/01 00:16:53 bkorb Exp $
+## $Id: Makefile.am,v 4.2 2005/01/01 17:38:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

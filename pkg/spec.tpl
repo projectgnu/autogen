@@ -1,14 +1,16 @@
 [= AutoGen5 Template spec =]
-Summary: AutoGen - [=prog-title=]
-Name:    [= prog-name =]
-Version: [= version =]
-Vendor:  [= copyright.owner =] http://autogen.sf.net
-Release: [=`echo $AG_MAJOR_VERSION`=]
-Copyright: Copyright (c) [= copyright.date =] by [= copyright.owner
-         =].  All rights reserved.  Licensed under GPL, version 2 or later.
-Group: Development/Tools
-Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
-BuildRoot: %{_tmppath}/%{name}-root
+Summary:    AutoGen - [=prog-title=]
+Name:       [= prog-name =]
+Version:    [= version =]
+Vendor:     [= copyright.owner =] http://www.gnu.org/software/autogen
+Release:    [=`echo $AG_MAJOR_VERSION`=]
+Copyright:  Copyright (c) [= copyright.date =] by [= copyright.owner
+		=].  All rights reserved.  Licensed under GPL, [=#
+		=]version 2 or later.
+Group:      Development/Tools
+Source:     ftp://ftp.gnu.org/gnu/autogen/[= version =]/autogen-[= version
+		=].tar.gz
+BuildRoot:  %{_tmppath}/%{name}-root
 
 %description
 AutoGen is a tool designed for generating program files that contain
@@ -42,9 +44,25 @@ fi
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
-mkdir -p $RPM_BUILD_ROOT
+mkdir -p ${RPM_BUILD_ROOT}
 make install DESTDIR=${RPM_BUILD_ROOT}
-rm -f $RPM_BUILD_ROOT/%{_infodir}/dir
+
+# IF we have a valid file list OR the build root is _the_ root,
+# THEN skip the file list generation.
+#
+if test \( -f autogen-filelist \
+        -a -s autogen-filelist \) \
+        -o ${#RPM_BUILD_ROOT} -le 1
+then : ; else
+  ( cd ${RPM_BUILD_ROOT}
+    rm -f usr/share/info/dir
+    find . -type f | grep -v 'usr/share/doc'
+  ) | sed -e 's@^\./@/@' \
+          -e'/usr\/share\/info/s,$,.gz,' \
+          -e'/usr\/share\/man/s,$,.gz,' \
+    | sort \
+    > autogen-filelist
+fi
 
 %post
 /sbin/ldconfig
@@ -58,20 +76,39 @@ rm -f $RPM_BUILD_ROOT/%{_infodir}/dir
 %clean
 rm -rf ${RPM_BUILD_ROOT}
 
-%files -f [= prog-name =]-filelist
+%files -f autogen-filelist
 %defattr(-,root,root)
 
 %doc AUTHORS TODO COPYING NEWS NOTES THANKS README VERSION
 
-%changelog[=`
-nm=\`getpwnam -N 2> /dev/null\`
-if [ -n "${nm}" ]
-then
-  echo
-  echo "* \`date '+%a %b %e %Y'\` ${nm} <\`getpwnam -n\`@\`
-     hostname 2>/dev/null\`>"
-  echo "- Regenerated"
-fi`=]
+%changelog
+[=
+
+;; Run the following script at spec creation time to insert the
+;; "regenerated" change log entry
+;;
+(out-push-new)
+
+=]
+test -z "${LOGNAME}" && {
+  LOGNAME=`logname` 2>/dev/null
+  case "${LOGNAME}" in
+  *"no login name" )
+    LOGNAME=`id | sed 's,).*,,;s,^.*(,,'` ;;
+  esac
+}
+name=`grep ^${LOGNAME}: /etc/passwd | \
+      sed 's,:/.*,,;s,.*:,,'` 2>/dev/null
+date=`date '+%a %b %e %Y'`
+domain=`dnsdomainname` 2>/dev/null
+
+echo \* ${date} ${name} \<${LOGNAME}@${domain}\> Regenerated
+[=
+
+(shell (out-pop #t))
+
+=]
+* Fri Dec 31 2004 Bruce Korb <bkorb@gnu.org> Restored the file list
 * Wed Oct 27 2004 Ed Swierk <eswierk@users.sf.net> fixed up for Fedora
 * Tue Dec 16 2003 Richard Zidlicky <rz@linux-m68k.org> 5.5.7pre5-5
 - fix %%doc
@@ -86,6 +123,5 @@ fi`=]
 ## mode: shell-script
 ## minor-mode: rpm
 ## indent-tabs-mode: nil
-## tab-width: 4
 ## End:
 ## end of spec.tpl =]
