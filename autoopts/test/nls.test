@@ -1,0 +1,81 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# nls.test      ---  test NLS, sort-of
+#
+# Time-stamp:        "2004-01-01 14:04:42 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+#
+# $Id: nls.test,v 3.1 2004/01/01 22:21:55 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating ${testname}.def in `pwd`"
+testname="${testname}" test_main="YES" \
+argument="${argument}" long_opts="YES" \
+${SHELL-sh} ${stdopts} option:'opt init' second=020
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
+  failure AutoGen could not process
+
+chmod u+w ${testname}.[ch]
+CFLAGS="${CFLAGS} -DENABLE_NLS=1"
+echo "extern char* gettext( const char* );" >> ${testname}.h
+cat >> ${testname}.c <<'_EOF_'
+
+char*
+gettext( const char* pzS )
+{
+    static char z[ 4096 ];
+    char* pzD = z + sizeof(z)-1;
+    if (pzS == NULL)
+        return NULL;
+    if (strchr(pzS, '%') != NULL)
+        return (void *)pzS;
+    *--pzD = '\0';
+    while ((*--pzD = *pzS++), *pzS)  ;
+    if (*pzD == '\n') {
+        pzD++;
+        strcpy( z + sizeof(z) - 2, "\n" );
+    }
+    return pzD;
+}
+_EOF_
+
+compile "--pleh"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
+test_nls - Test AutoOpts for nls
+USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+noitpircseD    emaN-noitpO grA glF  
+   -o rtS noitpo         pircsed noitpo noitpo ehT
+   -s muN dnoces         pircsed noitpo dnoces ehT
+   -?  on pleh           tixe dna noitamrofni egasu yalpsiD
+   -!  on pleh-erom      regap urht dessap noitamrofni egasu dednetxE
+
+.retcarahc galf eht dna nehpyh elgnis a yb ro
+eman rieht dna snehpyh delbuod yb deificeps era snoitpO
+_EOF_
+
+cmp -s ${testname}.help ${testname}.hlp || { set +x ; \
+  failure "`diff -c ${testname}.hlp ${testname}.help`" ; }
+
+cleanup
+# end of nls.test
