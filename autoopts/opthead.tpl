@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.17 1999/10/26 02:37:54 bruce Exp $
+# $Id: opthead.tpl,v 2.18 2000/03/05 12:48:35 bruce Exp $
 =]
 [=
 
@@ -163,7 +163,7 @@ ELSE "flag.value *DOES NOT* exist" =][=
   IF (exist? "homerc") =]
 #define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      INDEX_[=
                                       (. UP-prefix)=]OPT_SAVE_OPTS
-#define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      INDEX_[=
+#define VALUE_[=(. UP-prefix)=]OPT_LOAD_OPTS      INDEX_[=
                                       (. UP-prefix)=]OPT_LOAD_OPTS[=
   ENDIF=]
 #define VALUE_[=(. UP-prefix)=]OPT_HELP           INDEX_[=
