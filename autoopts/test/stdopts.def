@@ -18,6 +18,11 @@ then
     echo "test_main = yes;" >&5
 fi
 
+if [ ! -z "${argument}" ]
+then
+  echo "argument = '${argument}';" >&5
+fi
+
 echo >&5
 
 for flag
