@@ -5,23 +5,24 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Fri Mar 19 12:48:32 1999
+## Last Modified:   Fri Mar 26 11:45:51 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.12 1999/03/19 20:58:50 bkorb Exp $
+## $Id: Makefile.am,v 2.13 1999/03/26 19:53:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 # This variable is needed to subvert automake's info rules.
 # They don't work for generated texi files:
 #
-INFO_DEPS     = autogen.info
+INFO_DEPS	= autogen.info
+MAKEINFO	= @MAKEINFO@ --no-split
 
 all : $(INFO_DEPS) LSM
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info* LSM LSM.tpl depend.fig depend.eps
+EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 ODEF            = $(top_srcdir)/src/opts.def

@@ -2,6 +2,9 @@
 
 * In Progress
 
+** create an internal 'tr' function.  There are insoluable
+   incompatibilities between the various implementations.
+   I don't want to configure it :(.
 ** write some autoconf magic to find out whether it is safe to add
    O_BINARY to [f[re]]open calls, and fix up calls in body of code.
 ** Write an argv style parsing agPrint.c

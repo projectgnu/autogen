@@ -1,3 +1,14 @@
+1999-03-26  Bruce Korb <autogen@autogen.freeservers.com>
+
+	* src/agTempl.c(parseTemplate): We need to count lines *before* 
+	we strip the trailing white space :)
+
+1999-03-23  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* doc/Makefile.am (MAKEINFO): pass --no-split to makeinfo so that
+	we can guarantee that the only file name we need to add to
+	EXTRA_DIST is autogen.info.
+
 1999-03-18  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* src/Makefile.am (autogen_SOURCES): moved opts.def from here
