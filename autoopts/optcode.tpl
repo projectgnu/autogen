@@ -1,9 +1,12 @@
-[=autogen template include $Id: optcode.tpl,v 1.4 1998/07/02 23:51:53 bkorb Exp $ =]
+[=autogen template include $Id: optcode.tpl,v 1.5 1998/07/08 17:53:21 bkorb Exp $ =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
        [=prog_name _cap copyright _get owner _get
-       "#3$%s copyright %s %s" _printf _str=];[=_ENDIF=][=
+       "#3$%s copyright %s %s" _printf _str=];[=
+  _ELSE =]
+#define zCopyright (const char*)NULL[=
+  _ENDIF=][=
 
 _IF copyright_note _exist
 =]
@@ -19,6 +22,8 @@ _ELIF copyright_lgpl _exist
 =]
 static const char zCopyrightNotice[] =
        [=prog_name _cap owner _get "#" _lgpl _str=];[=
+  _ELSE =]
+#define zCopyrightNotice (const char*)NULL[=
 
 _ENDIF "copyright notes"
 =]
@@ -395,12 +400,7 @@ _ENDIF=]
 tOptions [=prog_name=]Options = {
     OPTIONS_STRUCT_VERSION,
     (char*)NULL, (char*)NULL, zPROGNAME,
-    zRcName,
-    [=_IF copyright _exist=]zCopyright[=_ELSE=](char*)NULL[=_ENDIF=],
-    [=_IF copyright_note _exist
-          copyright_gpl  _exist |
-          copyright_lgpl _exist | =]zCopyrightNotice[=
-      _ELSE=](char*)NULL[=_ENDIF=],
+    zRcName, zCopyright, zCopyrightNotice,
     zFullVersion,
     apzHomeList,
     zUsageTitle,
