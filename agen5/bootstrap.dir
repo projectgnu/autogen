@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2000/09/27 17:04:05 $
+# Last Modified:     $Date: 2000/09/27 17:22:53 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 1.30 2000/09/27 17:04:05 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 1.31 2000/09/27 17:22:53 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -179,20 +179,31 @@ do
     #
     if [ "x${YACC}" = x ]
     then
-      case "`type byacc 2>/dev/null`" in
+      f="`type byacc 2>/dev/null`"
+
+      case "${f}" in
       "byacc is "* )
-        YACC="byacc -d" ;;
-      esac 2>/dev/null
-      if [ "x$YACC" = x ]
-      then
-        case "`type yacc 2>/dev/null`" in
+        YACC="byacc -d"
+        ;;
+
+      * )
+        f="`type yacc 2>/dev/null`"
+
+        case "${f}" in
         "yacc is "* )
-          YACC="yacc -d" ;;
-        esac 2>/dev/null
-      fi
+          YACC="yacc -d"
+          ;;
+
+        * )
+          echo "NO WORKABLE yacc"
+          exit 1
+          ;;
+        esac
+        ;;
+      esac
     fi
 
-    echo ${YACC} defParse.y
+    echo YACC: ${YACC} defParse.y
     ${YACC} defParse.y
     rm -f defParse.c defParse.h
     if test -f y.out.c; then
