@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.18 2004/02/01 21:26:45 bkorb Exp $
+# $Id: optlib.tpl,v 3.19 2004/03/19 20:00:59 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -52,8 +52,7 @@ DEFINE set-defines set-desc set-index opt-state =]
 
   ENDIF disable exists =][=
 
-ENDDEF
-=][=
+ENDDEF set-defines
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -62,7 +61,8 @@ ENDDEF
   =][=
 
 DEFINE Option_Copyright =][=
-IF (exist? "copyright") =]
+
+  IF (exist? "copyright") =]
 /*
  * [=(sprintf "%s copyright %s %s - all rights reserved"
      prog-name (get "copyright.date") (get "copyright.owner") ) =][=
@@ -89,10 +89,9 @@ IF (exist? "copyright") =]
 
   ESAC =]
  */[=
-ENDIF "copyright exists" =][=
-ENDDEF
+  ENDIF "copyright exists" =][=
 
-=][=
+ENDDEF Option_Copyright
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -209,8 +208,7 @@ typedef enum {[=
     ENDIF =] */[=
   ENDIF =][=
 
-ENDDEF
-=][=
+ENDDEF Option_Defines
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -347,7 +345,7 @@ static const int
          ? enabled      "OPTST_INITENABLED"
                         "OPTST_DISABLED"       =][=
          no-preset      " | OPTST_NO_INIT"     =])[=
-ENDDEF   emit-nondoc-option     =][=
+ENDDEF   emit-nondoc-option
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -404,8 +402,7 @@ tSCC    z[=(. cap-name)=]Text[] =
 #endif  /* [= ifdef =][= ifndef =] */[=
   ENDIF (. ifdef-ed)   =][=
 
-ENDDEF Option_Strings =][=
-
+ENDDEF Option_Strings
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -505,8 +502,7 @@ DEFINE Option_Descriptor =][=
                             =]_Name, zNot[=(. cap-name)=]_Pfx },[=
   ENDIF =][=
 
-ENDDEF Option_Descriptor =][=
-
+ENDDEF Option_Descriptor
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -578,6 +574,6 @@ DEFINE USAGE_LINE   =][=
 
   tmp-text =][=
 
-ENDDEF
+ENDDEF USAGE_LINE
 
 =]

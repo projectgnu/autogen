@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.22 2004/03/19 19:01:29 bkorb Exp $
+# $Id: optmain.tpl,v 3.23 2004/03/19 20:00:59 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -316,9 +316,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
   ENDIF (. make-test-main)      =]
 [=
 
-ENDDEF
-
-=][=
+ENDDEF declare-option-callbacks
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -339,7 +337,7 @@ doOpt[=(. cap-name) =](
 {
 [=
 
-ENDDEF                          =][=
+ENDDEF   callback-proc-header
 
 # # # # # # # # # # # # # # # # =][=
 
@@ -437,7 +435,7 @@ DEFINE range-option-code
   valid_return:
     pOptDesc->pzLastArg = (char*)val;[=
 
-ENDDEF                          =][=
+ENDDEF  range-option-code
 
 # # # # # # # # # # # # # # # # =][=
 
@@ -530,6 +528,6 @@ DEFINE define-option-callbacks  =][=
   ENDFOR flag   =]
 [=
 
-ENDDEF
+ENDDEF define-option-callbacks
 
 =]
