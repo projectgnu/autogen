@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.3 1998/09/21 21:37:15 bkorb Exp $
+#$Id: opthead.tpl,v 2.4 1998/09/22 20:53:41 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=

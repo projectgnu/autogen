@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.3 1998/09/16 20:45:08 bkorb Exp $
+ *  $Id: getdefs.c,v 2.4 1998/09/22 20:53:45 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -556,6 +556,7 @@ compressDef( char* pz )
                 goto compressDone;
 
             default:
+                ;
             }
         } lineDone:;
 
@@ -1443,8 +1444,11 @@ startAutogen( void )
     }
 
     {
-        char*  args[ 6 ] = { pzAutogen, zBase };
+        char*  args[6];
         char** pparg     = args+2;
+
+        args[0] = pzAutogen;
+        args[1] = zBase;
 
         /*
          *  IF we have a template search directory,

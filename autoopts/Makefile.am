@@ -10,7 +10,7 @@
 ## Last Modified:   Mon Sep 21 14:26:21 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.1 1998/09/21 21:37:11 bkorb Exp $
+## $Id: Makefile.am,v 2.2 1998/09/22 20:53:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -24,7 +24,7 @@ libopts_la_SOURCES = \
 
 datadir		= $(prefix)/share
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl
-EXTRA_DIST      = $(pkgdata_DATA) TODO
+EXTRA_DIST      = $(pkgdata_DATA) TODO autoopts.texi
 INCLUDES        = -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
 include_HEADERS = options.h
 MAINTAINERCLEANFILES = Makefile.in

@@ -10,7 +10,7 @@
 ## Last Modified:   Mon Sep 14 06:59:06 1998
 ##            by:   Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.1 1998/09/14 14:34:02 bkorb Exp $
+## $Id: Makefile.am,v 2.2 1998/09/22 20:53:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 @MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
@@ -20,7 +20,7 @@ bin_PROGRAMS = getdefs
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h opts.def
 
 GEN_SRC 	= opts.c opts.h
-EXTRA_DIST	= $(GEN_SRC) opts.def
+EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.texi
 
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 
