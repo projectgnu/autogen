@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.10 1999/11/04 05:27:37 bruce Exp $
+ *  $Id: expString.c,v 1.11 1999/11/05 02:38:40 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -394,7 +394,8 @@ ag_scm_shell( SCM cmd )
     SCM
 ag_scm_shellf( SCM fmt, SCM alist )
 {
-    int len = scm_ilength( alist );
+    int   len = scm_ilength( alist );
+    char* pz;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
@@ -403,12 +404,10 @@ ag_scm_shellf( SCM fmt, SCM alist )
         return fmt;
 
     fmt = run_printf( SCM_CHARS( fmt ), len, alist );
-    {
-        char* pz = runShell( SCM_CHARS( fmt ));
-        cmd   = gh_str02scm( pz );
-        AGFREE( (void*)pz );
-        return cmd;
-    }
+    pz = runShell( SCM_CHARS( fmt ));
+    fmt   = gh_str02scm( pz );
+    AGFREE( (void*)pz );
+    return fmt;
 }
 
 
