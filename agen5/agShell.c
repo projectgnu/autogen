@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.4 2005/01/23 23:33:04 bkorb Exp $
+ *  $Id: agShell.c,v 4.5 2005/02/07 18:19:01 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -160,7 +160,7 @@ serverSetup( void )
             "done\n"
             "test -n \"${CDPATH}\" && { CDPATH=''\n"
             "  unset CDPATH 2>&null\n}\n"
-            "unalias cd 2>/dev/null >&2\n"
+            "( unalias cd ) 2>/dev/null >&2 && unalias cd\n"
             "AG_pid=\000.........\n";
         static char* pzPid = NULL;
         char* pz;

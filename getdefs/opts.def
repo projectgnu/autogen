@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.3 2005/01/23 23:33:06 bkorb Exp $
+ *   $Id: opts.def,v 4.4 2005/02/07 18:19:01 bkorb Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ flag = {
     arg_name    = first-index;
     descrip     = "The first index to apply to groups";
 	doc = <<-  _EOF_
-	By default, the first occurrance of a named definition will have an
+	By default, the first occurrence of a named definition will have an
 	index of zero.  Sometimes, that needs to be a reserved value.  Provide
 	this option to specify a different starting point.
 	_EOF_;

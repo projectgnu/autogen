@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2004-10-02 08:43:24 bkorb"
+# Time-stamp:        "2005-02-05 22:08:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: main.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: main.test,v 4.2 2005/02/07 18:19:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,7 +29,7 @@ testname="${testname}" \
 argument="${argument}" long_opts="${long_opts}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
-exec 4> ${testname}.DEF
+exec 4> ${testname}.def2
 sed '/test_main=/d' ${testname}.def >&4
 cat >&4 <<-  _EOF_
 	explain  = 'This is some explanatory text.';
@@ -41,7 +41,7 @@ cat >&4 <<-  _EOF_
 	};
 	_EOF_
 exec 4>&-
-mv -f ${testname}.DEF ${testname}.def
+mv -f ${testname}.def2 ${testname}.def
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \

@@ -4,7 +4,7 @@
 
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
-  Time-stamp:        "2004-02-01 12:05:01 bkorb"
+  Time-stamp:        "2005-02-07 10:18:18 bkorb"
 _EOF_
 \` `
 +][+
@@ -24,7 +24,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.2 2005/02/07 18:19:01 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -338,7 +338,7 @@ FOR flag +][+
        now check to see if the option has appeared the required number of
        times.  In the absence of a max count, our limit must be one and we
        only check for presence.  If a max count exists, then we will also
-       have kept the occurrance count.  Check that against the limit. +][+
+       have kept the occurrence count.  Check that against the limit. +][+
 
       IF (not (exist? "max"))
         +]! HAVE_OPT( [+ (. OPT-NAME) +] )[+

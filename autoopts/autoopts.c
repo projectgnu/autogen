@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.6 2005/02/04 03:57:11 bkorb Exp $
+ *  $Id: autoopts.c,v 4.7 2005/02/07 18:19:01 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -836,12 +836,12 @@ checkConsistency( tOptions* pOpts )
         /*
          *  IF       this option is not equivalenced to another,
          *        OR it is equivalenced to itself (is the equiv. root)
-         *  THEN we need to make sure it occurrs often enough.
+         *  THEN we need to make sure it occurs often enough.
          */
         if (  (pOD->optEquivIndex == NO_EQUIVALENT)
            || (pOD->optEquivIndex == pOD->optIndex) )   do {
             /*
-             *  IF the occurrance counts have been satisfied,
+             *  IF the occurrence counts have been satisfied,
              *  THEN there is no problem.
              */
             if (pOD->optOccCt >= pOD->optMinCt)
@@ -849,7 +849,7 @@ checkConsistency( tOptions* pOpts )
 
             /*
              *  IF presetting is okay and it has been preset,
-             *  THEN min occurrance count doesn't count
+             *  THEN min occurrence count doesn't count
              */
 #           define PRESET_OK  (OPTST_PRESET | OPTST_MUST_SET)
             if ((pOD->fOptState & PRESET_OK) == PRESET_OK)
