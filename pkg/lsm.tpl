@@ -39,8 +39,10 @@ cd $top_builddir
 set -- autogen*.gz
 if [ $# -gt 1 ]
 then shift `expr $# - 1` ; fi
-
-ct="`expr \\( \`wc -c < $1\` + 1023 \\) / 1024`"
+if [ ! -f $1 ]
+then ct=443
+else ct="`expr \\( \`wc -c < $1\` + 1023 \\) / 1024`"
+fi
 echo $ct KB $1
 ' _shell =]
 
