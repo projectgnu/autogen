@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 1999/10/29 02:30:09 bruce Exp $
+## $Id: Makefile.am,v 1.2 1999/10/29 02:43:57 bruce Exp $
 ## ---------------------------------------------------------------------
 
 INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
@@ -19,7 +19,7 @@ INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
 
 GETDEFS         = $(top_builddir)/getdefs/getdefs
 COLUMNS         = $(top_builddir)/columns/columns
-AGEXE		= $(top_builddir)/src/AutoGen
+AGEXE		= $(top_builddir)/agen5/AutoGen
 
 AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
