@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Tue Jun  1 08:11:23 1999				      
+## Last Modified:   Fri Jun  4 07:52:27 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.13 1999/06/03 19:43:28 bkorb Exp $
+## $Id: Makefile.am,v 2.14 1999/06/04 14:52:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,7 +20,7 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
-EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi \
+EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi bootstrap \
 		autoopts-config.in config-opts.def \
 		genshell.def genshell.c genshell.h
 
