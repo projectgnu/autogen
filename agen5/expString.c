@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.29 2001/07/17 02:35:14 bkorb Exp $
+ *  $Id: expString.c,v 1.30 2001/07/17 02:47:04 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -584,7 +584,7 @@ ag_scm_raw_shell_str( SCM obj )
  *  escape character @code{\\} before two special characters to accomplish
  *  this@: the backslash @code{\\} and double quote @code{"}.
  *@*
- *  @bold{WARNING}@:
+ *  @strong{WARNING}@:
  *  This function omits the extra backslash in front of a backslash, however,
  *  if it is followed by either a backquote or a dollar sign.  It must do this
  *  because otherwise it would be impossible to protect the dollar sign or
@@ -593,7 +593,7 @@ ag_scm_raw_shell_str( SCM obj )
  *
  *  All others characters are copied directly into the output.
  *
- *  @bold{NOTE}@: some shells will not correctly handle unusual
+ *  @strong{NOTE}@: some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/
