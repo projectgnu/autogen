@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/12/07 04:45:03 $
+ *  Last Modified:     $Date: 2003/02/04 00:29:12 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.23 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: misc.def,v 3.24 2003/02/04 00:29:12 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.23 $";
+version = "$Revision: 3.24 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -91,25 +91,15 @@ test   = {
   run-mode   =  "link";
   code-mode  =  "all";
 
-  action   = { no; asis;
-    act-type = script;
-    act-text = <<- _END_OF_SCRIPT_
-		f=`guile-config link`
-		    if test -z "$f"
-		    then
-		      AC_MSG_ERROR([Cannot find Guile])
-		    fi
-		    GUILE_LDFLAGS="$f"
-		    GUILE_CPPFLAGS=`guile-config compile | \
-		        sed 's,-I */usr/include\( |$\),\1,'`
-		    echo "libguile found via guile-config" >&2
-		    ag_cv_with_guile_libdir="${GUILE_LDFLAGS}"
-		    ag_cv_with_guile_incdir="${GUILE_CPPFLAGS}"
-		_END_OF_SCRIPT_; };
+  config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
+  action = { yes; act-type = script;
+             act-text = '    CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
+                        '    LIBS="${ag_save_LIBS}"';
+           };
 
-  action   = { asis;
-    act-type = libflags;
-    act-text = GUILE; };
+  action = { no; act-type = script;
+             act-text = '    AC_MSG_ERROR([Cannot find working libguile])';
+           };
 
   doc = <<- _END_OF_DOC_
 		AutoGen won't work without Guile, so either the methods
@@ -130,35 +120,19 @@ test   = {
 		int main () {
 		xmlDocPtr p = xmlParseFile( "mumble.xml" ); }
 		_END_OF_CODE_;
+  config   = { cflags-arg = '--cflags'; libs-arg = '--libs'; };
+  action = { yes; act-type = script;
+             act-text = '    CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
+                        '    LIBS="${ag_save_LIBS}"';
+           };
   run-mode   =  "link";
   code-mode  =  "all";
-
-  action   = { no; asis;
-    act-type = script;
-    act-text = <<- _END_OF_SCRIPT_
-		f=`exec 2> /dev/null ; xml2-config --libs`
-		    if test X${with_libxml} != Xno && test -n "$f"
-		    then
-		      XML2AG_LDFLAGS="$f"
-		      XML2AG_CPPFLAGS="`xml2-config --cflags`"
-		      XML2AG_DIR=xml2ag
-		      echo "libxml2 found via xml2-config" >&2
-		      ag_cv_with_xml2_libdir="${XML2AG_LDFLAGS}"
-		      ag_cv_with_xml2_incdir="${XML2AG_CPPFLAGS}"
-		    else XML2AG_DIR=""
-		    fi
-		_END_OF_SCRIPT_;
-  };
 
   action   = { asis;
     act-type = script;
     act-text = 'XML2AG_DIR=xml2ag
     AC_SUBST([XML2AG_DIR])';
   };
-
-  action   = { asis;
-    act-type = libflags;
-    act-text = XML2AG; };
 
   doc = <<- _END_OF_DOC_
 		xml2ag won't work without libxml2, so either the methods

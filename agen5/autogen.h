@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.10 2003/01/14 05:04:21 bkorb Exp $
+ *  $Id: autogen.h,v 3.11 2003/02/04 00:29:12 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -126,8 +126,8 @@ struct macro_desc {
     int         endIndex;  /* End of block macro     */
     int         sibIndex;  /* Sibling macro (ELIF or SELECT) */
 
-    off_t       ozName;    /* macro name (sometimes) */
-    off_t       ozText;    /* associated text        */
+    uintptr_t   ozName;    /* macro name (sometimes) */
+    uintptr_t   ozText;    /* associated text        */
     long        res;       /* some sort of result    */
     void*       funcPrivate;
 };
@@ -254,7 +254,7 @@ MODE tFpStack*   pCurFp           VALUE( NULL );
 MODE tOutSpec*   pOutSpecList     VALUE( NULL );
 MODE jmp_buf     fileAbort        VALUE( { 0 } );
 MODE char*       pzCurStart       VALUE( NULL );
-MODE off_t       curStartOff      VALUE( 0 );
+MODE uintptr_t   curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( NULL );
 

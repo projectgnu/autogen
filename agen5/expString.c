@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.8 2002/09/29 00:16:20 bkorb Exp $
+ *  $Id: expString.c,v 3.9 2003/02/04 00:29:12 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -764,7 +764,7 @@ ag_scm_raw_shell_str( SCM obj )
     SCM        res;
 
     pzDta   = ag_scm2zchars( obj, "AG Object" );
-    dtaSize = strlen( pzDta ) + 3;
+    dtaSize = SCM_LENGTH( obj ) + 3;
     pz = pzDta-1;
     for (;;) {
         pz = strchr( pz+1, '\'' );
@@ -784,7 +784,7 @@ ag_scm_raw_shell_str( SCM obj )
             goto loopDone;
 
         case '\'':
-            strcpy( pz-1, zQ );
+            strcpy( pz, zQ+1 );
             pz += STRSIZE( zQ ) - 1;
         }
     } loopDone:;
@@ -836,20 +836,20 @@ ag_scm_raw_shell_str( SCM obj )
  *  @code{raw-shell-str}, @code{shell-str} and @code{sub-shell-str} functions.
  *
  *  @example
- *  foo[0]       = 'foo' "foo" `foo` $foo
- *  raw-shell-str: ''\''foo'\'' "foo" `foo` $foo'
- *  shell-str:     "'foo' \"foo\" `foo` $foo"
- *  sub-shell-str: `'foo' "foo" \`foo\` $foo`
+ *  foo[0]           'foo' "foo" `foo` $foo
+ *  raw-shell-str -> ''\''foo'\'' "foo" `foo` $foo'
+ *  shell-str     -> "'foo' \"foo\" `foo` $foo"
+ *  sub-shell-str -> `'foo' "foo" \`foo\` $foo`
  *
- *  foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
- *  raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
- *  shell-str:     "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
- *  sub-shell-str: `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
+ *  foo[1]           \'bar\' \"bar\" \`bar\` \$bar
+ *  raw-shell-str -> '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
+ *  shell-str     -> "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
+ *  sub-shell-str -> `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
  *
- *  foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
- *  raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
- *  shell-str:     "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
- *  sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
+ *  foo[2]           \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
+ *  raw-shell-str -> '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
+ *  shell-str     -> "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
+ *  sub-shell-str -> `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
  *  @end example
  *
  *  There should be four, three, five and three backslashes for the four

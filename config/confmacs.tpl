@@ -52,6 +52,7 @@ DEFINE  emit-macro       =][=
       (define bad-define-name   "WITHOUT_%s")
       (define good-define-name  "WITH_%s")     =][=
   ~~  withlib|withconf   =][=
+      (define lib-name          (string-append "lib" down-name))
       (define bad-define-name   "WITHOUT_LIB%s")
       (define good-define-name  "WITH_LIB%s")     =][=
   ESAC  =][=
@@ -173,6 +174,22 @@ DEFINE  emit-results   =][=
   (define TMP-text   "")
   (define tmp-text   "") =][=
 
+  IF (and (= (get "type") "withlib") (exist? "config")) =]
+    AC_SUBST([LIB[=(. up-name)=]_CFLAGS])
+    AC_SUBST([LIB[=(. up-name)=]_LIBS])[=
+
+    (define good-subst 1)
+    (define bad-subst  1)
+    (set! good-text (string-append good-text (sprintf "
+      LIB%1$s_CFLAGS=\"${%2$s_cflags}\"
+      LIB%1$s_LIBS=\"${%2$s_libs}\""
+       up-name cv-name )))
+
+    (set! bad-text (string-append bad-text (sprintf
+    "\n      LIB%1$s_CFLAGS=''\n      LIB%1$s_LIBS=''"  up-name )))  =][=
+
+  ENDIF  type is withlib =][=
+
   FOR     action         =][=
 
     CASE (set! tmp-text (get "act-text"))
@@ -200,29 +217,6 @@ DEFINE  emit-results   =][=
             (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
       =][=
 
-    == yes-libflags      =][=
-      (out-push-new)     =]
-CPPFLAGS="${ag_save_CPPFLAGS}"
-LDFLAGS="${ag_save_LDFLAGS}"
-AC_SUBST([=(. TMP-text)=]_CPPFLAGS)
-AC_SUBST([=(. TMP-text)=]_LDFLAGS)
-case "X${[=(. cv-name)=]_incdir}" in Xyes|Xno|X )
-  case "X${[=(. cv-name)=]_root}" in Xyes|Xno|X )
-    [=(. TMP-text)=]_CPPFLAGS="" ;;
-    * ) [=(. TMP-text)=]_CPPFLAGS="-I${[=(. cv-name)
-        =]_root}/include" ;; esac ;;
-  * ) [=(. TMP-text)=]_CPPFLAGS="${[=(. cv-name)=]_incdir}" ;; esac
-
-case "X${[=(. cv-name)=]_libdir}" in Xyes|Xno|X )
-  case "X${[=(. cv-name)=]_root}" in Xyes|Xno|X )
-    [=(. TMP-text)=]_LDFLAGS="-l[=(. tmp-text)=]" ;;
-    * ) [=(. TMP-text)=]_LDFLAGS="-L${[=(. cv-name)=]_root}/lib -l[=
-        (. tmp-text)=]" ;; esac ;;
-  * ) [=(. TMP-text)=]_LDFLAGS="${[=(. cv-name)=]_libdir}" ;; esac[=
-
-      (set! good-text (string-append good-text (prefix "    " (out-pop #t))))
-      =][=
-
     ==  no-define        =][=
       (set! bad-text (string-append bad-text
             "\n    AC_DEFINE([" (sprintf bad-define-name up-name) "],["
@@ -240,23 +234,6 @@ case "X${[=(. cv-name)=]_libdir}" in Xyes|Xno|X )
     ==  no-script        =][=
       (set! bad-text (string-append bad-text "\n    "
             (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
-      =][=
-
-    ~~  (yes|no)-config  =][=
-      (out-push-new)     =]
-f=`[=(. tmp-text)=]-config [= ?% act-link "%s" "link" =]`
-if test -z "$f"
-then
-  AC_MSG_ERROR([Cannot find lib[=(. tmp-text)=]])
-fi
-[=(. TMP-text)=]_LDFLAGS="$f"
-[=(. TMP-text)=]_CPPFLAGS=`[=(. tmp-text)=]-config [=
-   ?% act-incl "%s" "compile" =] | sed 's,-I */usr/include\( |$\),\1,'`
-echo "lib[=(. tmp-text)=] found via [=(. tmp-text)=]-config" >&2
-ag_cv_with_[=(. tmp-text)=]_libdir="${[=(. TMP-text)=]_LDFLAGS}"
-ag_cv_with_[=(. tmp-text)=]_incdir="${[=(. TMP-text)=]_CPPFLAGS}"[=
-
-      (set! bad-text (string-append bad-text (prefix "    " (out-pop #t))))
       =][=
 
     ESAC                 =][=
@@ -350,100 +327,138 @@ ENDDEF  try-without             =][=
 
 # # # # # # # # # # WITHLIB # # # # # # # =][=
 
-DEFINE  try-withlib             =]
-  AC_ARG_WITH([lib[=
-    (set! cv-name (string-append group-pfx "cv_with_lib" down-name))
-    down-name =]],
+DEFINE  try-withlib             =][=
+
+  # # # # # # # # options # # # # # # #
+
+=]
+  AC_ARG_WITH([[=
+    (set! cv-name  (string-append group-pfx "cv_with_lib" down-name))
+    (set! lib-name (string-append "lib" down-name))
+    lib-name =]],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
-        =]], [lib[=(. down-name)=] installation prefix]),
+        =]], [[=(. lib-name)=] installation prefix]),
     [[=(. cv-name)=]_root=${with_lib[=(string-tr down-name "-" "_")=]}],
-    AC_CACHE_CHECK([whether with-lib[=(. down-name)=] was specified], [=
+    AC_CACHE_CHECK([whether with-[=(. lib-name)=] was specified], [=
         (. cv-name)=]_root,
       [=(. cv-name)=]_root=no)
-  ) # end of AC_ARG_WITH lib[=(. down-name)=]
+  ) # end of AC_ARG_WITH [=(. lib-name)=]
 
-  AC_ARG_WITH([lib[=(. down-name)=]-incdir],
+  AC_ARG_WITH([[=(. lib-name)=]-cflags],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
-        =]-incdir], [lib[=(. down-name)=] include dir]),
-    [[=(. cv-name)=]_incdir=${with_[=(string-tr test-name "-A-Z" "_a-z")
-                                   =]_incdir}],
-    AC_CACHE_CHECK([whether with-lib[=(. down-name)=]-incdir was specified], [=
-        (. cv-name)=]_incdir,
-      [=(. cv-name)=]_incdir=no)
-  ) # end of AC_ARG_WITH lib[=(. down-name)=]-incdir
+        =]-cflags], [[=(. lib-name)=] compile flags]),
+    [[=(. cv-name)=]_cflags=${with_[=(string-tr test-name "-A-Z" "_a-z")
+                                   =]_cflags}],
+    AC_CACHE_CHECK([whether with-[=(. lib-name)=]-cflags was specified], [=
+        (. cv-name)=]_cflags,
+      [=(. cv-name)=]_cflags=no)
+  ) # end of AC_ARG_WITH [=(. lib-name)=]-cflags
 
-  AC_ARG_WITH([lib[=(. down-name)=]-libdir],
+  AC_ARG_WITH([[=(. lib-name)=]-libs],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
-        =]-libdir], [lib[=(. down-name)=] library dir]),
-    [[=(. cv-name)=]_libdir=${with_[=(string-tr test-name "-A-Z" "_a-z")
-                                   =]_libdir}],
-    AC_CACHE_CHECK([whether with-lib[=(. down-name)=]-libdir was specified], [=
-        (. cv-name)=]_libdir,
-      [=(. cv-name)=]_libdir=no)
-  ) # end of AC_ARG_WITH lib[=(. down-name)=]-libdir
+        =]-libs], [[=(. lib-name)=] link command arguments]),
+    [[=(. cv-name)=]_libs=${with_[=(string-tr test-name "-A-Z" "_a-z")
+                                   =]_libs}],
+    AC_CACHE_CHECK([whether with-[=(. lib-name)=]-libs was specified], [=
+        (. cv-name)=]_libs,
+      [=(. cv-name)=]_libs=no)
+  ) # end of AC_ARG_WITH [=(. lib-name)=]-libs
+[=
 
-  case "X${[=(. cv-name)=]_incdir}" in
+  # # # # # # set cflags/libs # # # # # #
+
+=]
+  case "X${[=(. cv-name)=]_cflags}" in
   Xyes|Xno|X )
     case "X${[=(. cv-name)=]_root}" in
-    Xyes|Xno|X ) [=(. cv-name)=]_incdir=no ;;
-    * )        [=(. cv-name)=]_incdir=-I${[=(. cv-name)=]_root}/include ;;
+    Xyes|Xno|X ) [=(. cv-name)=]_cflags=no ;;
+    * )        [=(. cv-name)=]_cflags=-I${[=(. cv-name)=]_root}/include ;;
     esac
   esac
-
-  case "X${[=(. cv-name)=]_libdir}" in
+  case "X${[=(. cv-name)=]_libs}" in
   Xyes|Xno|X )
     case "X${[=(. cv-name)=]_root}" in
-    Xyes|Xno|X ) [=(. cv-name)=]_libdir=no ;;
-    * )        [=(. cv-name)=]_libdir="-L${[=(. cv-name)
+    Xyes|Xno|X ) [=(. cv-name)=]_libs=no ;;
+    * )        [=(. cv-name)=]_libs="-L${[=(. cv-name)
                =]_root}/lib -l[=(. down-name)=]";;
     esac
   esac
-  [=(define lib-name "")
-    (if (not (exist? "libname"))
-        (set! lib-name down-name)
-        (if (> (string-length (get "libname")) 0)
-           (set! lib-name (get "libname"))
-           (set! lib-name "")
-    )   )
-
-       group-pfx =]save_CPPFLAGS="${CPPFLAGS}"
-  [=(. group-pfx)=]save_LDFLAGS="${LDFLAGS}"[=
+  [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"
+  [=(. group-pfx)=]save_LIBS="${LIBS}"[=
   (set! bad-text (sprintf
     "\n    CPPFLAGS=\"${%1$ssave_CPPFLAGS}\"
-    LDFLAGS=\"${%1$ssave_LDFLAGS}\"" group-pfx )) =]
+    LIBS=\"${%1$ssave_LIBS}\"" group-pfx )) =][=
 
-  case "X${[=(. cv-name)=]_incdir}" in
-  Xyes|Xno|X ) : ;;
-  * ) CPPFLAGS="${CPPFLAGS} ${[=(. cv-name)=]_incdir}" ;;
+  # # # # # # check config script # # # # # =][=
+
+  IF (exist? "config")
+
+=]
+  case "X${[=
+
+  (define tmp-text (if (exist? "config.script") (get "config.script")
+                       (string-append down-name "-config")  ))
+
+  cv-name =]_cflags}" in
+  Xyes|Xno|X )
+    f=`[=(. tmp-text)=] [= config.cflags-arg =] 2>/dev/null` || f=''
+    test -n "${f}" && [=(. cv-name)=]_cflags="${f}" && \
+      AC_MSG_NOTICE([[=(. tmp-text)=] used for CFLAGS: $f]) ;;
   esac
+  case "X${[=(. cv-name)=]_libs}" in
+  Xyes|Xno|X )
+    f=`[=(. tmp-text)=] [= config.libs-arg =] 2>/dev/null` || f=''
+    test -n "${f}" && [=(. cv-name)=]_libs="${f}" && \
+      AC_MSG_NOTICE([[=(. tmp-text)=] used for LIBS: $f]) ;;
+  esac[=
 
-  case "X${[=(. cv-name)=]_libdir}" in
+  ENDIF (exist? "config")
+
+  =][= # # # # set cflags/libs # # # #
+
+=]
+  case "X${[=(. cv-name)=]_cflags}" in
+  Xyes|Xno|X )
+    [=(. cv-name)=]_cflags="" ;;
+  * ) CPPFLAGS="${CPPFLAGS} ${[=(. cv-name)=]_cflags}" ;;
+  esac
+  case "X${[=(. cv-name)=]_libs}" in
   Xyes|Xno|X )[=
-    IF (> (string-length lib-name) 0) =]
-    LDFLAGS="${LDFLAGS} -l[=(. lib-name)=]"[=
+    IF (not (exist? "libname")) =]
+    LIBS="${LIBS} -l[=(. down-name)=]"
+    [=(. cv-name)=]_libs="-l[=(. down-name)=]"[=
+
+    ELIF (> (string-length (get "libname")) 0) =]
+    LIBS="${LIBS} -l[=(get "libname")=]"
+    [=(. cv-name)=]_libs="-l[=(get "libname")=]"[=
+    ELSE   =]
+    [=(. cv-name)=]_libs=""[=
     ENDIF  =] ;;
   * )
-    LDFLAGS="${LDFLAGS} ${[=(. cv-name)=]_libdir}" ;;
+    LIBS="${LIBS} ${[=(. cv-name)=]_libs}" ;;
   esac[=
+
+  # # # # # # # # testing # # # # # # #
+
+  =]
+  LIB[=(. up-name)=]_CFLAGS=""
+  LIB[=(. up-name)=]_LIBS=""[=
 
   CASE run-mode                 =][=
 
   ==   link                     =]
-  AC_MSG_CHECKING([whether lib[=(. down-name)=] can be linked with])[=
+  AC_MSG_CHECKING([whether [=(. lib-name)=] can be linked with])[=
   set-language                  =]
   AC_LINK_IFELSE([[=(. c-text)=]],
-    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no
-    CPPFLAGS="${[=(. group-pfx)=]save_CPPFLAGS}"
-    LDFLAGS="${[=(. group-pfx)=]save_LDFLAGS}"]
-  ) # end of AC_LINK_IFELSE [=
+    [[=(. cv-name)=]=yes],
+    [[=(. cv-name)=]=no]) # end of AC_LINK_IFELSE [=
 
   ==   run                      =]
-  AC_MSG_CHECKING([whether lib[=(. down-name)=] functions properly])[=
+  AC_MSG_CHECKING([whether [=(. lib-name)=] functions properly])[=
   set-language                  =]
   AC_TRY_RUN([=(. c-text)=],
-    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no],[[=
-        (. cv-name)=]=no]
-  ) # end of AC_TRY_RUN [=
+    [[=(. cv-name)=]=yes], [[=(. cv-name)=]=no],
+    [[=(. cv-name)=]=no]) # end of AC_TRY_RUN [=
 
   ESAC                          =][=
 

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.14 2002/12/19 01:35:37 bkorb Exp $
+ *   $Id: opts.def,v 3.15 2003/02/04 00:29:12 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -70,6 +70,14 @@ include = <<-  _END_INCLUDE
 
 	# ifndef  RTLD_GLOBAL
 	#  define RTLD_GLOBAL 0
+	# endif
+
+	# ifndef  RTLD_NOW
+	#  ifdef  RTLD_LAZY
+	#   define RTLD_NOW DL_LAZY
+	#  else
+	#   define RTLD_NOW 0
+	#  endif
 	# endif
 	#endif
 	typedef void (init_proc_t)( void );

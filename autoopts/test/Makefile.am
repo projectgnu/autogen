@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2003/01/14 05:04:21 $
+## Last Modified:   $Date: 2003/02/04 00:29:12 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2003/01/14 05:04:21 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2003/02/04 00:29:12 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -20,13 +20,13 @@ TESTS      = argument.test cond.test equiv.test errors.test guile.test \
 MAINTAINERCLEANFILES	= Makefile.in
 
 TESTS_ENVIRONMENT = \
-	CC="$(CC)" CFLAGS='@CFLAGS@' \
+	CC="$(CC)" CFLAGS='$(CFLAGS)' \
 	PATH="`cd $(top_builddir)/columns ; pwd`:$$PATH" \
 	AGEN="`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@" \
 	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
 	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
-	INC="@INCLIST@ $(CPPFLAGS) $(GUILE_CPPFLAGS) $(GUILE_LDFLAGS)" \
+	INC="@INCLIST@ $(CPPFLAGS) $(LIBGUILE_CFLAGS) $(LIBGUILE_LIBS)" \
 	testsubdir=$(testsubdir) \
 	srcdir=`pwd` \
 	top_srcdir=`cd $(top_srcdir) ; pwd`
