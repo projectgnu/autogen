@@ -10,12 +10,12 @@
 ## Last Modified:    Tue Apr 13 08:23:43 1999
 ##            by:    Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.3 1999/06/08 21:18:35 bkorb Exp $
+## $Id: Makefile.am,v 2.4 1999/06/08 21:47:11 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 
-EXTRA_DIST = @COMPAT_SRC@ strsignal.h
+EXTRA_DIST = @COMPAT_SRC@ strsignal.h bootstrap
 GEN_SRC    = strsignal.h
 MAINTAINERCLEANFILES = Makefile.in
 AGEXE      = $(top_builddir)/src/autogen
