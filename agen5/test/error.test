@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Time-stamp:        "2002-01-30 15:41:16 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2002/01/31 03:51:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 3.6 2002/01/31 03:51:56 bkorb Exp $
+# $Id: error.test,v 3.7 2002/01/31 03:55:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
