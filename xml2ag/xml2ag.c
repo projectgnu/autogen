@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.4 2002/06/26 23:28:08 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.5 2002/06/27 01:55:17 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -76,6 +76,12 @@ FILE* outFp;
 STATIC char*
 loadFile( FILE* fp, size_t* pzSize );
 
+STATIC void
+emitIndentation( void );
+
+STATIC char*
+trim( const char* pzSrc, size_t* pSz );
+
 STATIC xmlNodePtr
 printHeader( xmlDocPtr pDoc );
 
@@ -89,6 +95,7 @@ STATIC void
 printChildren( xmlNodePtr pNode );
 
 /* = = = END-STATIC-FORWARD = = = */
+#define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
 
 
 int
@@ -192,14 +199,16 @@ loadFile( FILE* fp, size_t* pzSize )
 	return mem;
 }
 
-void
+
+STATIC void
 emitIndentation( void )
 {
     int indent = level * 2;
     while (--indent >= 0) fputc( ' ', outFp );
 }
 
-char*
+
+STATIC char*
 trim( const char* pzSrc, size_t* pSz )
 {
     static char z[ 4096 * 16 ];
