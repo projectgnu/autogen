@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Tuesday March  2, 2004 at 02:09:41 PM PST
+ *  It has been AutoGen-ed  Wednesday March  3, 2004 at 08:58:11 PM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -286,58 +286,84 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
 };
 
 
-#ifndef HAVE_ZBOGUS
-#define HAVE_ZBOGUS
-/*
- *  Define all the event and state names, once per compile unit.
- */
-tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zFsmErr[]    =
-    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
-#endif /* HAVE_ZBOGUS */
-tSCC zDpStInit[]    = "init";
-tSCC zDpStNeed_Def[] = "need_def";
-tSCC zDpStNeed_Tpl[] = "need_tpl";
-tSCC zDpStNeed_Semi[] = "need_semi";
-tSCC zDpStNeed_Name[] = "need_name";
-tSCC zDpStHave_Name[] = "have_name";
-tSCC zDpStNeed_Value[] = "need_value";
-tSCC zDpStNeed_Idx[] = "need_idx";
-tSCC zDpStNeed_Cbkt[] = "need_cbkt";
-tSCC zDpStIndx_Name[] = "indx_name";
-tSCC zDpStHave_Value[] = "have_value";
-tSCC* apzDpStates[] = {
-    zDpStInit,       zDpStNeed_Def,   zDpStNeed_Tpl,   zDpStNeed_Semi,
-    zDpStNeed_Name,  zDpStHave_Name,  zDpStNeed_Value, zDpStNeed_Idx,
-    zDpStNeed_Cbkt,  zDpStIndx_Name,  zDpStHave_Value };
+tSCC zDpStrings[] =
+       "** OUT-OF-RANGE **" "\0"
+       "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" "\0"
+       "invalid" "\0"
+       "init" "\0"
+       "need_def" "\0"
+       "need_tpl" "\0"
+       "need_semi" "\0"
+       "need_name" "\0"
+       "have_name" "\0"
+       "need_value" "\0"
+       "need_idx" "\0"
+       "need_cbkt" "\0"
+       "indx_name" "\0"
+       "have_value" "\0"
+       "autogen" "\0"
+       "definitions" "\0"
+       "End-Of-File" "\0"
+       "var_name" "\0"
+       "other_name" "\0"
+       "string" "\0"
+       "number" "\0"
+       ";" "\0"
+       "=" "\0"
+       "," "\0"
+       "{" "\0"
+       "}" "\0"
+       "[" "\0"
+       "]" "\0";
 
-tSCC zDpEvInvalid[] = "* Invalid Event *";
-tSCC zDpEvAutogen[] = "autogen";
-tSCC zDpEvDefinitions[] = "definitions";
-tSCC zDpEvEnd[] = "End-Of-File";
-tSCC zDpEvVar_Name[] = "var_name";
-tSCC zDpEvOther_Name[] = "other_name";
-tSCC zDpEvString[] = "string";
-tSCC zDpEvNumber[] = "number";
-tSCC zDpEvLit_Semi[] = ";";
-tSCC zDpEvLit_Eq[] = "=";
-tSCC zDpEvLit_Comma[] = ",";
-tSCC zDpEvLit_O_Brace[] = "{";
-tSCC zDpEvLit_C_Brace[] = "}";
-tSCC zDpEvLit_Open_Bkt[] = "[";
-tSCC zDpEvLit_Close_Bkt[] = "]";
-tSCC* apzDpEvents[] = {
-    zDpEvAutogen,       zDpEvDefinitions,   zDpEvEnd,
-    zDpEvVar_Name,      zDpEvOther_Name,    zDpEvString,
-    zDpEvNumber,        zDpEvLit_Semi,      zDpEvLit_Eq,
-    zDpEvLit_Comma,     zDpEvLit_O_Brace,   zDpEvLit_C_Brace,
-    zDpEvLit_Open_Bkt,  zDpEvLit_Close_Bkt, zDpEvInvalid };
+#define DpBogus_off 0
+#define DpFsmErr_off 19
+#define DpEvInvalid_off 75
+#define DpStInit_off 83
+#define DpStNeed_Def_off 88
+#define DpStNeed_Tpl_off 97
+#define DpStNeed_Semi_off 106
+#define DpStNeed_Name_off 116
+#define DpStHave_Name_off 126
+#define DpStNeed_Value_off 136
+#define DpStNeed_Idx_off 147
+#define DpStNeed_Cbkt_off 156
+#define DpStIndx_Name_off 166
+#define DpStHave_Value_off 176
+#define DpEvAutogen_off 187
+#define DpEvDefinitions_off 195
+#define DpEvEnd_off 207
+#define DpEvVar_Name_off 219
+#define DpEvOther_Name_off 228
+#define DpEvString_off 239
+#define DpEvNumber_off 246
+#define DpEvLit_Semi_off 253
+#define DpEvLit_Eq_off 255
+#define DpEvLit_Comma_off 257
+#define DpEvLit_O_Brace_off 259
+#define DpEvLit_C_Brace_off 261
+#define DpEvLit_Open_Bkt_off 263
+#define DpEvLit_Close_Bkt_off 265
+
+
+static const size_t aszDpStates[] = {
+    DpStInit_off,       DpStNeed_Def_off,   DpStNeed_Tpl_off,
+    DpStNeed_Semi_off,  DpStNeed_Name_off,  DpStHave_Name_off,
+    DpStNeed_Value_off, DpStNeed_Idx_off,   DpStNeed_Cbkt_off,
+    DpStIndx_Name_off,  DpStHave_Value_off };
+
+static const size_t aszDpEvents[] = {
+    DpEvAutogen_off,       DpEvDefinitions_off,   DpEvEnd_off,
+    DpEvVar_Name_off,      DpEvOther_Name_off,    DpEvString_off,
+    DpEvNumber_off,        DpEvLit_Semi_off,      DpEvLit_Eq_off,
+    DpEvLit_Comma_off,     DpEvLit_O_Brace_off,   DpEvLit_C_Brace_off,
+    DpEvLit_Open_Bkt_off,  DpEvLit_Close_Bkt_off, DpEvInvalid_off };
 
 #define DP_EVT_NAME(t) ( (((unsigned)(t)) >= DP_EV_INVALID) \
-    ? zBogus : apzDpEvents[ t ])
+    ? zDpStrings : zDpStrings + aszDpEvents[t])
 
 #define DP_STATE_NAME(s) ( (((unsigned)(s)) > DP_ST_INVALID) \
-    ? zBogus : apzDpStates[ s ])
+    ? zDpStrings : zDpStrings + aszDpStates[s])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1
@@ -350,6 +376,11 @@ tSCC* apzDpEvents[] = {
 int
 dp_invalid_transition( te_dp_state st, te_dp_event evt )
 {
+    /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
+    fprintf( stderr, zDpStrings + DpFsmErr_off, st, DP_STATE_NAME(st),
+             evt, DP_EVT_NAME(evt));
+    /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
+
     return EXIT_FAILURE;
 }
 

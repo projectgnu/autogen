@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Monday February 16, 2004 at 02:26:49 PM PST
+ *  It has been AutoGen-ed  Wednesday March  3, 2004 at 08:58:11 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -124,40 +124,51 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
 };
 
 
-#ifndef HAVE_ZBOGUS
-#define HAVE_ZBOGUS
-/*
- *  Define all the event and state names, once per compile unit.
- */
-tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zFsmErr[]    =
-    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
-#endif /* HAVE_ZBOGUS */
-tSCC zCgiStInit[]    = "init";
-tSCC zCgiStName[] = "name";
-tSCC zCgiStValue[] = "value";
-tSCC* apzCgiStates[] = {
-    zCgiStInit,  zCgiStName,  zCgiStValue };
+tSCC zCgiStrings[] =
+       "** OUT-OF-RANGE **" "\0"
+       "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" "\0"
+       "invalid" "\0"
+       "init" "\0"
+       "name" "\0"
+       "value" "\0"
+       "alpha" "\0"
+       "name_char" "\0"
+       "=" "\0"
+       "+" "\0"
+       "%" "\0"
+       "other" "\0"
+       "&" "\0"
+       "end" "\0";
 
-tSCC zCgiEvInvalid[] = "* Invalid Event *";
-tSCC zCgiEvAlpha[] = "alpha";
-tSCC zCgiEvName_Char[] = "name_char";
-tSCC zCgiEvEqual[] = "=";
-tSCC zCgiEvSpace[] = "+";
-tSCC zCgiEvEscape[] = "%";
-tSCC zCgiEvOther[] = "other";
-tSCC zCgiEvSeparator[] = "&";
-tSCC zCgiEvEnd[] = "end";
-tSCC* apzCgiEvents[] = {
-    zCgiEvAlpha,     zCgiEvName_Char, zCgiEvEqual,     zCgiEvSpace,
-    zCgiEvEscape,    zCgiEvOther,     zCgiEvSeparator, zCgiEvEnd,
-    zCgiEvInvalid };
+#define CgiBogus_off 0
+#define CgiFsmErr_off 19
+#define CgiEvInvalid_off 75
+#define CgiStInit_off 83
+#define CgiStName_off 88
+#define CgiStValue_off 93
+#define CgiEvAlpha_off 99
+#define CgiEvName_Char_off 105
+#define CgiEvEqual_off 115
+#define CgiEvSpace_off 117
+#define CgiEvEscape_off 119
+#define CgiEvOther_off 121
+#define CgiEvSeparator_off 127
+#define CgiEvEnd_off 129
+
+
+static const size_t aszCgiStates[] = {
+    CgiStInit_off,  CgiStName_off,  CgiStValue_off };
+
+static const size_t aszCgiEvents[] = {
+    CgiEvAlpha_off,     CgiEvName_Char_off, CgiEvEqual_off,
+    CgiEvSpace_off,     CgiEvEscape_off,    CgiEvOther_off,
+    CgiEvSeparator_off, CgiEvEnd_off,       CgiEvInvalid_off };
 
 #define CGI_EVT_NAME(t) ( (((unsigned)(t)) >= CGI_EV_INVALID) \
-    ? zBogus : apzCgiEvents[ t ])
+    ? zCgiStrings : zCgiStrings + aszCgiEvents[t])
 
 #define CGI_STATE_NAME(s) ( (((unsigned)(s)) > CGI_ST_INVALID) \
-    ? zBogus : apzCgiStates[ s ])
+    ? zCgiStrings : zCgiStrings + aszCgiStates[s])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1

@@ -4,47 +4,57 @@
 
 =][=
 
+(define tmp-text   "")
+(define offset-names "")
+(define next-offset 0)
+(define text-offset 0)  =][=
+
+DEFINE add-text-string  =][=
+  (set! text-offset next-offset)
+  (set! offset-names (string-append offset-names
+        (sprintf "#define %s%s_off %d\n" Pfx (get "name") text-offset)  ))
+  (set! tmp-text (get "text"))
+  (set! next-offset (+ next-offset (string-length tmp-text) 1))
+  (c-string tmp-text) =] "\0"[=
+
+ENDDEF add-text-string  =][=
+
 DEFINE emit-invalid-msg =]
-#ifndef HAVE_ZBOGUS
-#define HAVE_ZBOGUS
-/*
- *  Define all the event and state names, once per compile unit.
- */
-tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zFsmErr[]    =
-    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
-#endif /* HAVE_ZBOGUS */
-tSCC z[=(. Pfx)=]StInit[]    = "init";[=
+tSCC z[=(. Pfx)=]Strings[] =
+       [= INVOKE add-text-string  name = Bogus  text = "** OUT-OF-RANGE **" =]
+       [= INVOKE add-text-string  name = FsmErr
+       text = "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" =]
+       [= INVOKE add-text-string  name = EvInvalid  text = invalid =]
+       [= INVOKE add-text-string  name = StInit     text = init =][=
 
-  FOR state
-=]
-tSCC z[=(. Pfx)=]St[=(string-capitalize! (get "state"))=][] = [=
-        (c-string (string-downcase! (get "state")))=];[=
-  ENDFOR
+  FOR   state   =]
+       [= INVOKE add-text-string
+       name = (string-append "St" (string-capitalize! (get "state")))
+       text = (string-downcase! (get "state")) =][=
+  ENDFOR state  =][=
 
-=]
-tSCC* apz[=(. Pfx)=]States[] = {
+  FOR   event   =]
+       [= INVOKE add-text-string
+       name = (string-append "Ev" (string-capitalize! (get "event")))
+       text = (if (exist? (get "event"))
+                     (get (get "event"))
+                     (string-downcase! (get "event"))  ) =][=
+  ENDFOR event  =];
+
+[=(. offset-names)=]
+
+static const size_t asz[=(. Pfx)=]States[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'z%sSt%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%sSt%%s_off' <<'_EOF_'
 Init
 %s
 _EOF_"
   Pfx
   (string-capitalize! (join "\n" (stack "state")))  )=] };
 
-tSCC z[=(. Pfx)=]EvInvalid[] = "* Invalid Event *";[=
-
-  FOR event =]
-tSCC z[=(. Pfx)=]Ev[=(string-capitalize! (get "event"))=][] = [=
-       (c-string (if (exist? (get "event"))
-                     (get (get "event"))
-                     (string-downcase! (get "event"))  ))=];[=
-  ENDFOR
-
-=]
-tSCC* apz[=(. Pfx)=]Events[] = {
+static const size_t asz[=(. Pfx)=]Events[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'z%sEv%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%sEv%%s_off' <<'_EOF_'
 %s
 Invalid
 _EOF_"
@@ -52,10 +62,12 @@ _EOF_"
   (string-capitalize! (join "\n" (stack "event")))  )=] };
 
 #define [=(. PFX)=]_EVT_NAME(t) ( (((unsigned)(t)) >= [=(. PFX)=]_EV_INVALID) \
-    ? zBogus : apz[=(. Pfx)=]Events[ t ])
+    ? z[=(. Pfx)=]Strings : z[=(. Pfx)
+    =]Strings + asz[=(. Pfx)=]Events[t])
 
 #define [=(. PFX)=]_STATE_NAME(s) ( (((unsigned)(s)) > [=(. PFX)=]_ST_INVALID) \
-    ? zBogus : apz[=(. Pfx)=]States[ s ])
+    ? z[=(. Pfx)=]Strings : z[=(. Pfx)
+    =]Strings + asz[=(. Pfx)=]States[s])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1
@@ -71,8 +83,9 @@ int
 {
 [=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
   (sprintf
-"    fprintf( stderr, zFsmErr, st, %s_STATE_NAME(st), evt, %s_EVT_NAME(evt));"
-     PFX PFX) )=]
+"    fprintf( stderr, z%2$sStrings + %2$sFsmErr_off, st, %1$s_STATE_NAME(st),
+             evt, %1$s_EVT_NAME(evt));"
+     PFX Pfx ) )=]
 
     return EXIT_FAILURE;
 }
