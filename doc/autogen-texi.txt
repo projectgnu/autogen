@@ -2064,14 +2064,33 @@ then a line containing @code{[FOO_BAR]} would be searched for.
 @cindex test-main
 @item test-main
 Creates a test main procedure for testing option processing.  The
-resulting program may also be used to process the arguments of a shell
-script.  You would use it thus:
+resulting program may also be used for several purposes.
 
+@enumerate
+@item
+If the text of @code{test-main} is short (3 or fewer characters), the
+generated main() will call putBourneShell.  That routine will emit
+Bourne shell commands that can be eval-ed by a Bourne-derived shell to
+incorporate the digested options into the shell's environment,
+@xref{shell options}.  You would use it thus:
 @example
 eval `./programopts $@@`
 if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
 shift $@{OPTION_CT@}
 @end example
+
+@item
+If the text of @code{test-main} contains @code{putShellParse}, the
+program will generate portable Bourne shell commands that will parse the
+command line options.  The expectation is that this result will be
+copied into a shell script and used there, @xref{shell options}.
+
+@item
+Any other text must be the name of a routine that you will write yourself.
+That routine will be called after processing the command line options
+and it will be passed the option processing descriptor pointer as its
+sole argument.
+@end enumerate
 
 @cindex usage
 @item usage
@@ -2633,17 +2652,18 @@ a @code{#define} for the options you want, and the line,
 in your option definitions.  The supported options are specified thus:
 
 @example
-#define BRIEF
 #define DEBUG
 #define DIRECTORY
 #define DRY_RUN
 #define INPUT
 #define INTERACTIVE
 #define OUTPUT
-#define QUIET
-#define SILENT
-#define VERBOSE
 #define WARN
+
+#define SILENT
+#define QUIET
+#define BRIEF
+#define VERBOSE
 @end example
 
 By default, only the long form of the option will be available.
@@ -2653,6 +2673,15 @@ e.g.,
 @example
 #define DEBUG_FLAG
 @end example
+
+@code{--silent}, @code{--quiet}, @code{--brief} and @code{--verbose} are
+related in that they all indicate some level of diagnostic output.
+Instead of four different options, however, several levels can be
+incorporated by @code{#define}-ing @code{VERBOSE_ENUM}.  In conjunction
+with @code{VERBOSE}, it incorporates the notion of @i{5} levels in an
+enumeration: @code{silent}, @code{quiet}, @code{brief},
+@code{informative} and @code{verbose}; with the default being
+@code{brief}.
 
 @node AutoOpts API
 @section Programmatic Interface

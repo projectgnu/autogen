@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.6 2001/05/19 22:18:56 bkorb Exp $
+# $Id: rc.test,v 1.7 2001/10/13 22:16:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -63,8 +63,8 @@ _EOF_
 
 compile "--help"
 
-cmp ${testname}.hlp ${testname}.help || \
-  failure "help files do not compare for ${testname} test"
+cmp ${testname}.h*lp || \
+  failure "`diff ${testname}.h*lp`"
 
 # # # # # # # # # # DO THE REAL TEST # # # # # # # # #
 
