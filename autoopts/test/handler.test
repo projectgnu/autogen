@@ -1,0 +1,137 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# handler.test ---   test option handling
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/05/09 05:28:51 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: handler.test,v 1.1 2001/05/09 05:28:51 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating $testname.def in `pwd`"
+cat > $testname.def <<_EOF_
+AutoGen Definitions options;
+prog-name = $testname;
+prog-title = "Testing $testname";
+
+flag = {
+    name = first;
+    descrip = "first description";
+    extract_code;
+};
+
+flag = {
+    name = second;
+    descrip = "second description";
+    arg_type = keyword;
+    keyword = alpha, beta, gamma, omega;
+};
+
+flag = {
+    name = third;
+    descrip = "third description";
+    flag_code = "    SomeCodeOrOther();";
+};
+
+flag = {
+    name = fourth;
+    descrip = "fourth description";
+    stack_arg;
+    arg_type = string;
+};
+
+flag = {
+    name = fifth;
+    descrip = "fifth description";
+    flag_proc = first;
+};
+_EOF_
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+sed '/START =/a\
+    SampleCode();' $testname.c > $testname.tmp
+mv -f $testname.tmp $testname.c
+
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+sed '1,/Create the static procedure(s) declared above/d' \
+    $testname.c > $testname.test
+
+# # # # # # # # # # SAMPLE OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.sample
+cat > $testname.sample <<'_EOF_'
+ */
+DEF_PROC_2( static void doUsageOpt,
+            tOptions*,  pOpts, tOptDesc*,  pOD )
+{
+    USAGE( EXIT_SUCCESS );
+}
+
+/* * * * * * *
+ *
+ *   For the "First Option".
+ */
+DEF_PROC_2( static void doOptFirst,
+            tOptions*, pOptions, tOptDesc*, pOptDesc )
+{
+/*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
+    SampleCode();
+/*  END   =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
+}
+
+/* * * * * * *
+ *
+ *   For the "Second Option".
+ */
+DEF_PROC_2( static void doOptSecond,
+            tOptions*, pOptions, tOptDesc*, pOptDesc )
+{
+    tSCC zDef[2] = { 0x7F, 0 };
+    tSCC* az_names[] = { zDef,
+        "alpha",  "beta",   "gamma",  "omega"
+    };
+
+    pOptDesc->pzLastArg =
+        optionEnumerationVal( pOptions, pOptDesc, az_names, 5 );
+}
+
+/* * * * * * *
+ *
+ *   For the "Third Option".
+ */
+DEF_PROC_2( static void doOptThird,
+            tOptions*, pOptions, tOptDesc*, pOptDesc )
+{
+    SomeCodeOrOther();
+}
+
+_EOF_
+
+cmp -s $testname.test $testname.sample || \
+  failure "`diff -c $testname.test $testname.sample`"
+
+cleanup
+# end of handler.test
