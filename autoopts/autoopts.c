@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.20 2000/09/11 00:26:21 bkorb Exp $
+ *  $Id: autoopts.c,v 2.21 2000/09/11 01:03:44 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -578,8 +578,7 @@ valid_path( char*  pzBuf,  size_t  bufSize,
         if (strchr( pzProgPath, DIR_SEP_CHAR ) != (char*)NULL)
             pzPath = pzProgPath;
         else
-            pzPath = pathfind( getenv( (const char*)"PATH" ),
-                                  pzProgPath, (const char*)"x" );
+            pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "x" );
 
         if (pzPath == (char*)NULL)
             return AG_FALSE;
