@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.22 1999/10/30 17:55:44 bruce Exp $
+#$Id: optcode.tpl,v 2.23 1999/10/30 18:00:29 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -202,9 +202,16 @@ static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 FOR flag "\n" =][=
   Option_Descriptor =][=
 
-  # IF this is the default option AND this option takes an argument,
-    THEN remember this index  =][=
-  (if (>= default-opt-index 0) (error "Duplicate default argument"))
+  ;;  IF this is the default option AND we already have one,...
+  ;;  THEN remember this index
+  ;;
+  (if (and (exist? "default") (>= default-opt-index 0))
+      (error (sprintf "\n\tDefault argument %d duplicates %d\n"
+                      (for-index) default-opt-index) ))
+
+  ;;  IF this is the default option AND this option takes an argument,
+  ;;  THEN remember this index
+  ;;
   (if (and (exist? "default")
            (> (len "flag_arg") 0))
       (set! default-opt-index (for-index)) ) =][=
