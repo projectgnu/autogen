@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 1.9 1999/07/07 19:42:32 bkorb Exp $
+ *  $Id: columns.c,v 1.10 1999/07/28 15:32:40 bkorb Exp $
  */
 
 /*
@@ -201,8 +201,9 @@ readLines( void )
          */
         len = strlen( pzText );
         pzText += len;
-        while ((pzText > zLine) && isspace( pzText[-1] )) {
-            pzText--;
+        while (isspace( pzText[-1] )) {
+            if (--pzText == zLine)
+                goto next_line;
             len--;
         }
 
@@ -246,6 +247,7 @@ readLines( void )
 
         if (len > maxEntryWidth)
             maxEntryWidth = len;
+    next_line:;
     }
 
     if (maxEntryWidth == 0) {
