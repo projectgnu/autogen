@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    1998/04/09 at 14:50:34
+dnl Last Modified:    $Date: 1998/05/26 18:42:09 $
 dnl            by:    Bruce Korb <korbb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: @(#)configure.in	2.7
+dnl Code: $Id: configure.in,v 1.2 1998/05/26 18:42:09 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -20,7 +20,7 @@ AC_CANONICAL_SYSTEM
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 1.1 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 1.2 $),)dnl
 
 # ----------------------------------------------------------------------
 # If `configure' is invoked (in)directly via `make', ensure that it
