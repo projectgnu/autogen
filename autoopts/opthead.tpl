@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.6 2002/06/13 02:00:40 bkorb Exp $
+# $Id: opthead.tpl,v 3.7 2002/09/10 02:15:01 bkorb Exp $
 # Automated Options copyright 1992-2002 Bruce Korb
 
 =]
@@ -19,13 +19,12 @@
  *  Enumeration of each option:
  */
 typedef enum {[=
-FOR flag =][=
+FOR flag    =][=
   IF (not (exist? "documentation")) =]
-        INDEX_[=(. UP-prefix)=]OPT_[=
-                (sprintf "%-16s" (string-upcase! (get "name"))) =] =[=
-                (sprintf "%3d" (for-index))=],[=
-  ENDIF =][=
-ENDFOR flag=][=
+        INDEX_[=(set-flag-names) UP-prefix=]OPT_[=
+                (sprintf "%-16s =%3d," UP-name (for-index)) =][=
+  ENDIF     =][=
+ENDFOR flag =][=
 
 (define option-ct (count "flag")) =][=
 
@@ -86,16 +85,9 @@ ENDIF (exist? version) =]
 /*
  *  Interface defines for specific options.
  */[=
-  (define UP-name "")
-  (define cap-name "")
-  (define low-name "")
-  (define descriptor "")
-  (define opt-name "")   =][=
 
-FOR flag =][=
-  (set! UP-name    (string-upcase! (get "name")))
-  (set! cap-name   (string-capitalize UP-name))
-  (set! low-name   (string-downcase UP-name))
+FOR flag              =][=
+  (set-flag-names)
   (set! opt-name   (string-append UP-prefix "OPT_" UP-name))
   (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
@@ -110,7 +102,7 @@ FOR flag =][=
  ELSE                 =][=
    Option_Defines     =][=
  ENDIF                =][=
-ENDFOR                =][=#
+ENDFOR  flag          =][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

@@ -3674,7 +3674,23 @@ the code generated for implementing the @code{flag_code} construct.
 @section Using AutoOpts
 @cindex using AutoOpts
 
-To use AutoOpts in your application:
+There are actually several levels of ``using'' autoopts.
+Which you choose depends upon how you plan to distribute
+(or not) your application.
+
+@menu
+* local use::               local-only use
+* binary not installed::    binary distro, AutoOpts not installed
+* binary pre-installed::    binary distro, AutoOpts pre-installed
+* source pre-installed::    source distro, AutoOpts pre-installed
+* source not installed::    source distro, AutoOpts not installed
+@end menu
+
+@node local use
+@subsection local-only use
+
+To use AutoOpts in your application where you do not have to
+worry about distribution issues, your issues are simple and few.
 
 @itemize @bullet
 @item
@@ -3722,9 +3738,78 @@ Compile @samp{myopts.c} and link your program
 with the following additional arguments:
 
 @example
-myopts.o -L $prefix/lib -lopts
+myopts.c -I$prefix/include -L $prefix/lib -lopts
+@end example
+
+@noindent
+These values can be derived from the ``autoopts-config'' script:
+
+@example
+myopts.c `autoopts-config cflags` `autoopts-config ldflags`
 @end example
 @end itemize
+
+@node binary not installed
+@subsection binary distro, AutoOpts not installed
+
+If you will be distributing (or copying) your project to a system that
+does not have AutoOpts installed, you will need to statically link the
+AutoOpts library, ``libopts'' into your program.  Add the output from
+the following to your link command:
+
+@example
+autoopts-config static-libs
+@end example
+
+@node binary pre-installed
+@subsection binary distro, AutoOpts pre-installed
+
+If you will be distributing (or copying) your project to a system that
+does have AutoOpts installed, you will still need to ensure that the library
+is findable at program load time, or you will still have to statically
+link.  The former can be accomplished by linking your project with
+@code{--rpath} or by setting the @code{LD_LIBRARY_PATH} appropriately.
+Otherwise, @xref{binary not installed}.
+
+@node source pre-installed
+@subsection source distro, AutoOpts pre-installed
+
+If you will be distributing your project to a system that will build
+your product but it may not be pre-installed with AutoOpts, you will
+need to do some configuration checking before you start the build.
+Assuming you are willing to fail the build if AutoOpts has not been
+installed, you will still need to do a little work.
+
+AutoOpts is distributed with a configuration check M4 script,
+@file{autoopts.m4}.  It will add an @code{autoconf} macro named,
+@code{AG_PATH_AUTOOPTS}.  Add this to your @file{configure.ac} script
+and use the following substitution values:
+
+@table @code
+@item AUTOGEN
+the name of the autogen executable
+@item AUTOGEN_TPLIB
+the directory where AutoGen template library is stored
+@item AUTOOPTS_CFLAGS
+the compile time options needed to find the AutoOpts headers
+@item AUTOOPTS_LIBS
+the link options required to access the @code{libopts} library
+@end table
+
+@node source not installed
+@subsection source distro, AutoOpts not installed
+
+If you will be distributing your project to a system that will build
+your product but it may not be pre-installed with AutoOpts, you may
+wish to incorporate the sources for @code{libopts} in your project.
+To do this, I recommend reading the tear-off libopts library
+@file{README} that you can find in the @file{pkg/libopts} directory.
+You can also examine an example package (blocksort) that incorporates
+this tear off library in the autogen distribution directory.  There is
+also a web page that describes what you need to do:
+@example
+@url{http://autogen.sourceforge.net/blocksort.html}
+@end example
 
 @node shell options
 @section AutoOpts for Shell Scripts

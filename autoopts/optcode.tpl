@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.7 2002/07/27 17:46:33 bkorb Exp $
+#$Id: optcode.tpl,v 3.8 2002/09/10 02:15:01 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -40,13 +40,18 @@ tSCC zCopyrightNotice[] =
 
 ENDIF "copyright notes"=]
 [=
-FOR flag =][=
-  IF (exist? "call_proc") =]
-extern tOptProc   [= call_proc =];[=
-  ENDIF =][=
-ENDFOR flag=]
-extern tUsageProc [=
-  (if (exist? "usage") (get "usage") "optionUsage") =];
+
+IF (exist? "flag.call-proc")
+
+=]
+[= (shell (string-append
+"columns -I16 --first='extern tOptProc ' -S, <<_EOF_\n"
+(join "\n" (stack "flag.call-proc")) "\n_EOF_" )) =][=
+
+ENDIF
+
+=]
+extern tUsageProc [= ?% usage "%s" "optionUsage" =];
 
 [=
 IF (exist? "include") =]
@@ -59,7 +64,7 @@ IF (exist? "include") =]
   ENDFOR include =]
 [=ENDIF "include exists" =]
 #ifndef NULL
-#  define NULL 0x0
+#  define NULL 0
 #endif
 #ifndef EXIT_SUCCESS
 #  define  EXIT_SUCCESS 0
@@ -69,7 +74,6 @@ IF (exist? "include") =]
 #endif[=
 
 (define number-arg (make-regexp "=.*"))
-(define cap-name "")
 
 =][=
 
@@ -78,11 +82,11 @@ IF (exist? "include") =]
 
 =][=
 
-FOR FLAG "\n" =][=
+FOR flag "\n"      =][=
+  (set-flag-names) =][=
+  Option_Strings   =][=
 
-  Option_Strings =][=
-
-ENDFOR FLAG
+ENDFOR flag
 =]
 
 /*
@@ -163,11 +167,8 @@ extern tOptProc doPagedUsage;
  */
 static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 
-(define default-opt-index -1)
-(define up-name "") =][=
-
-FOR flag "\n" =][=
-
+FOR flag "\n"       =][=
+  (set-flag-names)  =][=
   Option_Descriptor =][=
 
   ;;  IF this is the default option AND we already have one,...

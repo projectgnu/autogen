@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.2 2002/03/29 02:22:17 bkorb Exp $
+# $Id: optlib.tpl,v 3.3 2002/09/10 02:15:01 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -218,7 +218,7 @@ DEFINE   emit-nondoc-option     =][=
   #
   #  This is *NOT* a documentation option: =]
 tSCC    z[= (sprintf "%-25s" (string-append cap-name
-                    "_NAME[]" )) =] = "[=(string-upcase! (get "name"))=]";[=
+                    "_NAME[]" )) =] = "[=(. UP-name)=]";[=
 
     #  IF this option can be disabled,
     #  THEN we must create the string for the disabled version
@@ -226,7 +226,7 @@ tSCC    z[= (sprintf "%-25s" (string-append cap-name
     IF (> (len "disable") 0) =]
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Name[]"))
              =]= "[=
-       (string-tr! (string-append (get "disable") "-" (get "name"))
+       (string-tr! (string-append (get "disable") "-" flg-name)
                    optname-from optname-to) =]";
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
              =]= "[=(string-downcase! (get "disable"))=]";[=
@@ -236,7 +236,7 @@ tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
       #  =][=
       IF (> (len "enable") 0) =]
 tSCC    z[=(sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
-        (string-tr! (string-append (get "enable") "-" (get "name"))
+        (string-tr! (string-append (get "enable") "-" flg-name)
                     optname-from optname-to) =]";[=
       ELSE =]
 #define z[=(sprintf "%-27s " (string-append cap-name
@@ -333,10 +333,8 @@ ENDDEF   emit-nondoc-option     =][=
 
 Define the arrays of values associated with an option (strings, etc.) =][=
 
-DEFINE   Option_Strings         =][=
+DEFINE   Option_Strings
 
-(set! cap-name (string-capitalize! (get "name")))
-(set! UP-name  (string-upcase cap-name))
 =]
 /*
  *  [=(. cap-name)=] option description[=
@@ -398,8 +396,6 @@ ENDDEF Option_Strings =][=
 Define the values for an option descriptor   =][=
 
 DEFINE Option_Descriptor =][=
-    (set! UP-name  (string-upcase!     (get "name")))
-    (set! cap-name (string-capitalize! (get "name"))) =][=
 
   IF (exist? "documentation") =]
   {  /* entry idx, value */ 0, 0,

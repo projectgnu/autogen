@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.4 2002/07/11 00:26:01 bkorb Exp $
+# $Id: optmain.tpl,v 3.5 2002/09/10 02:15:01 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -165,7 +165,7 @@ DEFINE declare-option-callbacks      =][=
 
 
   FOR flag                           =][=
-    (set! cap-name (string-capitalize! (get "name"))) =][=
+    (set-flag-names)                 =][=
 
     CASE arg_type                    =][=
     =*  key                          =]
@@ -197,7 +197,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
  *  if multiple copies are allowed.
  */[=
     FOR flag            =][=
-    (set! cap-name (string-capitalize! (get "name"))) =][=
+    (set! cap-name (string->c-name! (string-capitalize! (get "name"))) ) =][=
 
       IF (exist? "call_proc") =]
 #define [=(get "call_proc")   =] [=
@@ -353,7 +353,7 @@ DEFINE define-option-callbacks  =][=
 
   FOR  flag  =][=
 
-    (set! UP-name    (string-upcase! (get "name")))
+    (set! UP-name    (string->c-name! (string-upcase! (get "name"))) )
     (set! cap-name   (string-capitalize UP-name))
     (set! low-name   (string-downcase UP-name))      =][=
 
