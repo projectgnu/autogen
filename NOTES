@@ -1,3 +1,22 @@
+sprintf:
+	This routine must exist on your system and must return
+	the number of bytes of formatted output (excluding the
+	terminating NUL character).
+
+vsprintf:
+	If this routine does not exist on your system or does
+	not return the number of bytes of formatted output,
+	then your "_printf" expression function will be incomplete.
+	It will handle most "simple" format specs, but die
+	miserably if you do things like putting argument specifiers
+	into your format specification.  (e.g., "%2$s" says to
+	take use the second argument as a char* address for this
+	format.)  This also assumes all arguments consume
+	sizeof(char*) bytes of stack space.  It is recommended that
+	you find some way to install a proper "vsprintf()" routine
+	in your libc library.  Good luck.
+
+
 This is an analysis of every remaining allocation
 at the end of a large run:
 
