@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.13 2003/03/13 04:08:04 bkorb Exp $
+#$Id: optcode.tpl,v 3.14 2003/04/04 04:44:54 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -133,7 +133,7 @@ tSCC    zNotLoad_Opts_Pfx[]  = "no";
 ENDIF (exist? "homerc") =][=
 
 
-IF (or (exist? "flag.flag_code")
+IF (or (exist? "flag.flag-code")
        (exist? "flag.extract-code")
        (exist? "flag.call-proc")
        (exist? "flag.arg-range")
@@ -144,18 +144,18 @@ IF (or (exist? "flag.flag_code")
 ENDIF   =]
 /*
  *  These are always callable, whether
- *  TEST_[=(. pname-up)=]_OPTS is defined or not
+ *  [=(. main-guard)=] is defined or not
  */
 static tOptProc doUsageOpt;[=
 IF (exist? "version")       =][=
-  IF (exist? "test_main")   =]
-#ifdef TEST_[=(. pname-up)=]_OPTS
+  IF (exist? "test-main")   =]
+#ifdef [=(. main-guard)=]
   extern tOptProc  doVersionStderr;
 # define DOVERPROC doVersionStderr
 #else
   extern tOptProc  doVersion;
 # define DOVERPROC doVersion
-#endif /* TEST_[=(. pname-up)=]_OPTS */[=
+#endif /* [=(. main-guard)=] */[=
   ELSE  =]
 extern  tOptProc  doVersion;
 #define DOVERPROC doVersion[=
@@ -191,8 +191,8 @@ ENDFOR flag
 
 IF (exist? "version") =]
 
-  {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_VERSION, VALUE_[=
-                                     (. UP-prefix) =]OPT_VERSION,
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_MAY,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -206,8 +206,8 @@ IF (exist? "version") =]
      /* disablement strs */ NULL, NULL },[=
 ENDIF=]
 
-  {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_HELP, VALUE_[=
-                                     (. UP-prefix) =]OPT_HELP,
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -220,8 +220,8 @@ ENDIF=]
      /* desc, NAME, name */ zHelpText, NULL, zHelp_Name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_MORE_HELP, VALUE_[=
-                                     (. UP-prefix) =]OPT_MORE_HELP,
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -237,8 +237,8 @@ ENDIF=]
 IF (exist? "homerc")
 =],
 
-  {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_SAVE_OPTS, VALUE_[=
-                                     (. UP-prefix) =]OPT_SAVE_OPTS,
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -251,8 +251,8 @@ IF (exist? "homerc")
      /* desc, NAME, name */ zSave_OptsText, NULL, zSave_Opts_Name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_LOAD_OPTS, VALUE_[=
-                                     (. UP-prefix) =]OPT_LOAD_OPTS,
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_MUST,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -340,14 +340,14 @@ tOptions [=(. pname)=]Options = {
     zRcName,        zCopyright,     zCopyrightNotice,
     zFullVersion,   apzHomeList,    zUsageTitle,
     zExplain,       zDetail,        NULL,           [= (. usage-proc) =],
-    ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
+    ( OPTPROC_NONE[=                IF (not (exist? "allow-errors"))     =]
     + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
-    + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long_opts")         =]
+    + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long-opts")         =]
     + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
     + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]
     + OPTPROC_NEGATIONS[=  ENDIF=][=IF (>=   number-opt-index 0)         =]
     + OPTPROC_NUM_OPT[=    ENDIF=][=IF      (exist? "environrc")         =]
-    + OPTPROC_ENVIRON[=    ENDIF=][=IF (and (exist? "plus_marks")
+    + OPTPROC_ENVIRON[=    ENDIF=][=IF (and (exist? "plus-marks")
                                             (exist? "flag.disable"))     =]
     + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
@@ -355,9 +355,9 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
     + OPTPROC_GNUUSAGE[=   ENDIF=] ),
     0, NULL,
-    { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
+    { [= (. INDEX-pfx) =]MORE_HELP,
       [=IF (exist? "homerc")
-             =]INDEX_[= (. UP-prefix) =]OPT_SAVE_OPTS[=
+             =][= (. INDEX-pfx) =]SAVE_OPTS[=
         ELSE =] 0 /* no option state saving */[=
         ENDIF=],
       [= IF (>= number-opt-index 0)
@@ -392,19 +392,19 @@ doUsageOpt( pOpts, pOD )
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=
 
-IF (or (exist? "flag.flag_code")
-       (exist? "flag.extract_code")
-       (exist? "flag.arg_range")
-       (match-value? =* "flag.arg_type" "key")) =][=
+IF (or (exist? "flag.flag-code")
+       (exist? "flag.extract-code")
+       (exist? "flag.arg-range")
+       (match-value? =* "flag.arg-type" "key")) =][=
 
   invoke  define-option-callbacks  =][=
 
 ENDIF                              =][=
 
-IF (exist? "test_main")            =][=
+IF (exist? "test-main")            =][=
 
   IF (exist? "guile-main")         =][=
-     (error "both ``test_main'' and ``guile-main'' have been defined") =][=
+     (error "both ``test-main'' and ``guile-main'' have been defined") =][=
 
   ELSE                             =][=
      invoke build-test-main        =][=

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.6 2003/03/13 04:08:04 bkorb Exp $
+# $Id: optlib.tpl,v 3.7 2003/04/04 04:44:54 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -56,7 +56,7 @@ DEFINE set-defines set-desc set-index opt-state =]
            (exist? "extract-code")
            (exist? "flag-proc")
            (exist? "arg-range")
-           (exist? "stack_arg") ) =]; \
+           (exist? "stack-arg") ) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                   (. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
@@ -152,21 +152,20 @@ typedef enum {[=
   CASE arg-type  =][=
 
   =*  num        =]
-#define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(long*)(&[=(. UP-prefix)=]OPT_ARG([=(. UP-name)=])))[=
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] (*(long*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
 
   =*  key        =]
-#define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] (*(te_[=(string-append Cap-prefix cap-name)
-                          =]*)(&[=(. UP-prefix)
-                 =]OPT_ARG([=(. UP-name)=])))[=
+                          =]*)(&[= (. OPT-pfx) =]ARG([=(. UP-name)=])))[=
 
   =*  bool       =]
-#define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(ag_bool*)(&[=(. UP-prefix)=]OPT_ARG([=(. UP-name)=])))[=
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] (*(ag_bool*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
 
   ESAC           =][=
-  IF (= (string-upcase! (get "equivalence")) UP-name) =]
+  IF (== (up-c-name "equivalence") UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
                 =] ([=(. descriptor)=].optActualValue)
 #define WHICH_[=(. UP-prefix)=]IDX_[=(sprintf "%-14s" UP-name)
@@ -175,7 +174,7 @@ typedef enum {[=
   IF (exist? "settable") =][=
 
     IF  (or (not (exist? "equivalence"))
-            (= (get "equivalence") UP-name)) =][=
+            (== (up-c-name "equivalence") UP-name)) =][=
 
       set-defines
            set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
@@ -185,9 +184,8 @@ typedef enum {[=
     ELSE "not equivalenced"   =][=
       set-defines
            set-desc  = (string-append UP-prefix "DESC("
-                           (string-upcase! (get "equivalence")) ")" )
-           set-index = (string-append "INDEX_" UP-prefix "OPT_"
-                           (string-upcase! (get "equivalence")) )
+                           (up-c-name "equivalence") ")" )
+           set-index = (index-name "equivalence")
            opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
     ENDIF is/not equivalenced =][=
@@ -300,18 +298,18 @@ tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
     IF (exist? "flags_must") =]
 static const int
     a[=(. cap-name)=]MustList[] = {[=
-      FOR flags_must =]
-    INDEX_[= (. UP-prefix) =]OPT_[= (string-upcase! (get "flags_must")) =],[=
+      FOR flags-must =]
+    [= (index-name "flags-must") =],[=
       ENDFOR flags_must =] NO_EQUIVALENT };[=
     ENDIF =][=
 
 
-    IF (exist? "flags_cant") =]
+    IF (exist? "flags-cant") =]
 static const int
     a[=(. cap-name)=]CantList[] = {[=
-      FOR flags_cant =]
-    INDEX_[= (. UP-prefix) =]OPT_[= (string-upcase! (get "flags_cant")) =],[=
-      ENDFOR flags_cant =] NO_EQUIVALENT };[=
+      FOR flags-cant =]
+    [= (index-name "flags-cant") =],[=
+      ENDFOR flags-cant =] NO_EQUIVALENT };[=
     ENDIF =]
 #define [=(. UP-name)=]_FLAGS       ([=
          CASE arg-type  =][=
@@ -321,11 +319,11 @@ static const int
          ESAC           =][=
          stack-arg      "OPTST_STACKED | "     =][=
          immediate      "OPTST_IMM | "         =][=
-         immed_disable  "OPTST_DISABLE_IMM | " =][=
+         immed-disable  "OPTST_DISABLE_IMM | " =][=
          must-set       "OPTST_MUST_SET | "    =][=
          ? enabled      "OPTST_INITENABLED"
                         "OPTST_DISABLED"    =] | [=
-         ? no_preset    "OPTST_NO_INIT"
+         ? no-preset    "OPTST_NO_INIT"
                         "OPTST_INIT"           =])[=
 ENDDEF   emit-nondoc-option     =][=
 
@@ -365,18 +363,18 @@ tSCC    z[=(. cap-name)=]Text[] =
     IF (or (exist? "ifdef") (exist? "ifndef")) =]
 
 #else   /* disable [=(. cap-name)=] */
-#define VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=] NO_EQUIVALENT
+#define VALUE_[=(string-append OPT-pfx UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
       IF (exist? "arg-default") =]
 #define z[=(. cap-name)=]DefaultArg NULL[=
       ENDIF =][=
 
-      IF (exist? "flags_must")  =]
+      IF (exist? "flags-must")  =]
 #define a[=(. cap-name)=]MustList   NULL[=
       ENDIF =][=
 
-      IF (exist? "flags_cant")  =]
+      IF (exist? "flags-cant")  =]
 #define a[=(. cap-name)=]CantList   NULL[=
       ENDIF =]
 #define z[=(. cap-name)=]Text       NULL
@@ -420,14 +418,14 @@ DEFINE Option_Descriptor =][=
 
 =]
   {  /* entry idx, value */ [=(for-index)=], VALUE_[=
-                              (. UP-prefix)=]OPT_[=(. UP-name)=],
+                              (string-append OPT-pfx UP-name)=],
      /* equiv idx, value */ [=
-          IF (== (string-upcase! (get "equivalence")) UP-name)
+          IF (== (up-c-name "equivalence") UP-name)
               =]NO_EQUIVALENT, 0,[=
           ELIF (exist? "equivalence")
               =]NOLIMIT, NOLIMIT,[=
           ELSE
-              =][=(for-index)=], VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=],[=
+              =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=],[=
           ENDIF=]
      /* option argument  */ ARG_[=
          IF (not (exist? "arg-type"))  =]NONE[=
@@ -435,13 +433,11 @@ DEFINE Option_Descriptor =][=
          ELSE                          =]MUST[=
          ENDIF =],
      /* equivalenced to  */ [=
-         IF (and (exist? "equivalence")
-                 (not (string-ci=? (string-upcase! (get "equivalence"))
-                                   (. UP-name)) ) )
-               =]INDEX_[=(. UP-prefix)=]OPT_[=(string-upcase!
-                         (get "equivalence"))=][=
-         ELSE  =]NO_EQUIVALENT[=
-         ENDIF =],
+         (if (and (exist? "equivalence")
+                  (not (== (up-c-name "equivalence") UP-name)) )
+             (index-name "equivalence")
+             "NO_EQUIVALENT"
+         ) =],
      /* min, max, act ct */ [=(if (exist? "min") (get "min") "0")=], [=
          (if (exist? "max") (get "max") "1")=], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
@@ -451,12 +447,12 @@ DEFINE Option_Descriptor =][=
          ELSE =]NULL[= ENDIF =],
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ [=
-         IF (exist? "flags_must")=]a[=(. cap-name)=]MustList[=
-         ELSE                    =]NULL[=
-         ENDIF=], [=
-         IF (exist? "flags_cant")=]a[=(. cap-name)=]CantList[=
-         ELSE                    =]NULL[=
-         ENDIF=],
+         (if (exist? "flags-must")
+             (string-append "a" cap-name "MustList, ")
+             "NULL, " ) =][=
+         (if (exist? "flags-cant")
+             (string-append "a" cap-name "CantList")
+             "NULL" ) =],
      /* option proc      */ [=
          IF   (exist? "call-proc")        =][=call-proc=][=
          ELIF (or (exist? "extract-code")
@@ -466,9 +462,9 @@ DEFINE Option_Descriptor =][=
          ELIF (exist? "flag-proc") =]doOpt[= (string-capitalize!
                                              (get "flag-proc")) =][=
 
-         ELIF (exist? "stack_arg") =][=
+         ELIF (exist? "stack-arg") =][=
            IF (or (not (exist? "equivalence"))
-                  (= (get "equivalence") (get "name")) )
+                  (== (up-c-name "equivalence") UP-name) )
 
                           =]stackOptArg[=
            ELSE           =]unstackOptArg[=
@@ -529,11 +525,11 @@ DEFINE USAGE_LINE   =][=
 
     (if (exist? "flag.value")
         (string-append "-<flag>" flag-arg
-           (if (exist? "long_opts") " | " "") )
+           (if (exist? "long-opts") " | " "") )
         (if (not (exist? "long-opts"))
            (string-append "<option-name>" opt-arg) "" )  )
 
-    (if (exist? "long_opts")
+    (if (exist? "long-opts")
         (string-append "--<name>" opt-arg) "" )
 
     (if (not (exist? "flag.min")) " ]..." " }...")
@@ -548,12 +544,12 @@ DEFINE USAGE_LINE   =][=
           ;;
           (if (< 80 (+ (string-length usage-line)
                 (len "argument")
-                (len "prog_name") ))
+                (len "prog-name") ))
               " \\\n\t\t"  " ")
           (get "argument")  ))
   )
 
-  (kr-string (string-append prog-name " - " (get "prog_title")
+  (kr-string (string-append prog-name " - " (get "prog-title")
            (if (exist? "version") (string-append " - Ver. " (get "version"))
                "" )
            "\n" usage-line "\n" ))    =][=

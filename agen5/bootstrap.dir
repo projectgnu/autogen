@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2003/02/16 00:04:39 $
+# Last Modified:     $Date: 2003/04/04 04:44:53 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.10 2003/02/16 00:04:39 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.11 2003/04/04 04:44:53 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -223,8 +223,7 @@ do
 	  egrep -v 'no copies of pattern' >&2
     set -e
 	${AG} expr.def
-    if [ "$t" = "expr.def" ]
-	then : ; else rm -f expr.def ; fi
+    [ "$t" = "expr.def" ] || rm -f expr.def
     date > stamp-exprini
     ;;
 
@@ -254,7 +253,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate autogen or getdefs"
+      echo "Cannot locate autogen"
       $force && exit 1
       continue
     fi

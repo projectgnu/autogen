@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.7 2003/02/16 00:04:40 bkorb Exp $
+# $Id: optmain.tpl,v 3.8 2003/04/04 04:44:54 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -96,13 +96,13 @@ ENDDEF
 DEFINE build-test-main
 
 =]
-#if defined( TEST_[= (. pname-up) =]_OPTS )
+#if defined( [= (. main-guard) =] )
 
 int
 main( int argc, char** argv )
 {[=
 
-  IF (= (get "test_main") "putShellParse") =]
+  IF (= (get "test-main") "putShellParse") =]
     extern tOptions  genshelloptOptions;
     extern void      putShellParse( tOptions* );
     extern tOptions* pShellParseOptions;
@@ -111,9 +111,9 @@ main( int argc, char** argv )
      *  Stash a pointer to the options we are generating.
      *  `genshellUsage()' will use it.
      */
-    pShellParseOptions = &[=prog_name=]Options;
+    pShellParseOptions = &[=prog-name=]Options;
     (void)optionProcess( &genshelloptOptions, argc, argv );
-    putShellParse( &[=prog_name=]Options );[=
+    putShellParse( &[=prog-name=]Options );[=
 
   ELIF
       ;;  Also check to see if the user supplies all the code for main()
@@ -121,26 +121,26 @@ main( int argc, char** argv )
 [= main-text =][=
 
   ELSE=]
-    (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
+    (void)optionProcess( &[=prog-name=]Options, argc, argv );[=
 
     IF  ;;  the user is specifying a routine to call, then call that procedure
 
-        (> (string-length (get "test_main")) 3) =]
+        (> (string-length (get "test-main")) 3) =]
 
     {
-        void [=test_main=]( tOptions* );
-        [=test_main=]( &[=prog_name=]Options );
+        void [=test-main=]( tOptions* );
+        [=test-main=]( &[=prog-name=]Options );
     }[=
 
    ELSE  Call our library procedure for emitting shell results
     =]
-    putBourneShell( &[=prog_name=]Options );[=
+    putBourneShell( &[=prog-name=]Options );[=
 
     ENDIF =][=
   ENDIF=]
     return EXIT_SUCCESS;
 }
-#endif  /* defined TEST_[= (. pname-up) =]_OPTS */[=
+#endif  /* defined [= (. main-guard) =] */[=
 
 ENDDEF  =][=
 
@@ -154,8 +154,8 @@ DEFINE declare-option-callbacks      =][=
 
    #  For test builds, no need to call option procs  =][=
 
-  IF (exist? "test_main")            =]
-#if ! defined( TEST_[=(. pname-up)=]_OPTS )[=
+  IF (exist? "test-main")            =]
+#if ! defined( [=(. main-guard)=] )[=
   ENDIF
 
   =]
@@ -167,31 +167,31 @@ DEFINE declare-option-callbacks      =][=
   FOR flag                           =][=
     (set-flag-names)                 =][=
 
-    CASE arg_type                    =][=
+    CASE arg-type                    =][=
     =*  key                          =]
 static tOptProc doOpt[=(. cap-name)  =];[=
     =*  bool                         =][=
     =*  num                          =][=
-      IF (exist? "arg_range")        =]
+      IF (exist? "arg-range")        =]
 static tOptProc doOpt[=(. cap-name)  =];[=
       ENDIF                          =][=
     *                                =][=
-      IF (exist? "call_proc")        =]
-extern tOptProc [=(get "call_proc")  =];[=
+      IF (exist? "call-proc")        =]
+extern tOptProc [=(get "call-proc")  =];[=
 
-      ELIF (or (exist? "extract_code")
-               (exist? "flag_code")) =]
+      ELIF (or (exist? "extract-code")
+               (exist? "flag-code")) =]
 static tOptProc doOpt[=(. cap-name)  =];[=
 
       ENDIF                          =][=
     ESAC                             =][=
   ENDFOR                             =][=
  
-  IF (exist? "test_main")            =][=
+  IF (exist? "test-main")            =][=
 
      # "A test environment is to be generated" =]
 
-#else /* *is*  defined( TEST_[=(. pname-up)=]_OPTS ) */
+#else /* *is*  defined( [=(. main-guard)=] ) */
 /*
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
@@ -199,29 +199,29 @@ static tOptProc doOpt[=(. cap-name)  =];[=
     FOR flag            =][=
     (set! cap-name (string->c-name! (string-capitalize! (get "name"))) ) =][=
 
-      IF (exist? "call_proc") =]
-#define [=(get "call_proc")   =] [=
+      IF (exist? "call-proc") =]
+#define [=(get "call-proc")   =] [=
           IF (~ (get "max") "1{0,1}")
                         =]NULL[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (or (exist? "flag_code")
-               (exist? "extract_code")
-               (exist? "arg_range")) =]
+      ELIF (or (exist? "flag-code")
+               (exist? "extract-code")
+               (exist? "arg-range")) =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
                         =]NULL[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (=* (get "arg_type") "key")  =]
+      ELIF (=* (get "arg-type") "key")  =]
 static tOptProc doOpt[=(. cap-name)  =];[=
       ENDIF             =][=
 
     ENDFOR flag         =]
-#endif /* defined( TEST_[=(. pname-up)=]_OPTS ) */[=
-  ENDIF (exist? "test_main") =]
+#endif /* defined( [=(. main-guard)=] ) */[=
+  ENDIF (exist? "test-main") =]
 [=
 
 ENDDEF
@@ -261,31 +261,31 @@ DEFINE range-option-code
 
 =][=
 
-(if (not (=* (get "arg_type") "num"))
+(if (not (=* (get "arg-type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
 
-=]    static const struct {const int rmin, rmax;} rng[ [=(count "arg_range")=] ] = {
+=]    static const struct {const int rmin, rmax;} rng[ [=(count "arg-range")=] ] = {
 [=(out-push-new)      =][=
-  FOR arg_range ",\n" =][=
-    CASE arg_range    =][=
+  FOR arg-range ",\n" =][=
+    CASE arg-range    =][=
       *==    "->"     =][=
              (shellf "f=`echo '%s'|sed 's,->$,,'`
-                     echo \"{ $f, INT_MAX }\"" (get "arg_range")) =][=
+                     echo \"{ $f, INT_MAX }\"" (get "arg-range")) =][=
 
       ==*    "->"     =][=
              (shellf "f=`echo '%s'|sed 's,^->,,'`
-                     echo \"{ INT_MIN, $f }\"" (get "arg_range")) =][=
+                     echo \"{ INT_MIN, $f }\"" (get "arg-range")) =][=
 
       *==*   "->"     =][=
              (shellf "f=`echo '%s'|sed 's/->/, /'`
-                     echo \"{ $f }\"" (get "arg_range")) =][=
+                     echo \"{ $f }\"" (get "arg-range")) =][=
 
-      ~~ -{0,1}[0-9]+ =]{ [=arg_range=], INT_MIN }[=
+      ~~ -{0,1}[0-9]+ =]{ [=arg-range=], INT_MIN }[=
 
       *  =][= (error (string-append "Invalid range spec:  ``"
-              (get "arg_range") "''" ))  =][=
+              (get "arg-range") "''" ))  =][=
 
-    ESAC arg_range    =][=
+    ESAC arg-range    =][=
   ENDFOR =][=
   (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
@@ -298,7 +298,7 @@ DEFINE range-option-code
         goto emit_ranges;
 
     val = atoi( pOptDesc->pzLastArg );
-    for (ix = 0; ix < [=(count "arg_range")=]; ix++) {
+    for (ix = 0; ix < [=(count "arg-range")=]; ix++) {
         if (val < rng[ix].rmin)
             continue;  /* ranges need not be ordered. */
         if (val == rng[ix].rmin)
@@ -317,21 +317,21 @@ DEFINE range-option-code
   emit_ranges:[=
 
 
-  IF (> (count "arg_range") 1) =]
+  IF (> (count "arg-range") 1) =]
     fprintf( option_usage_fp, "%sit must lie in one of the ranges:\n", pzIndent );
     for ( ix=0;; ) {
         if (rng[ix].rmax == INT_MIN)
              fprintf( option_usage_fp, "%s%d exactly", pzIndent, rng[ix].rmin );
         else fprintf( option_usage_fp, "%s%d to %d", pzIndent,
                       rng[ix].rmin, rng[ix].rmax );
-        if (++ix >= [=(count "arg_range")=])
+        if (++ix >= [=(count "arg-range")=])
             break;
         fputs( ", or\n", option_usage_fp );
     }
 
     fputc( '\n', option_usage_fp );[=
 
-  ELIF (*==* (get "arg_range") "->")  =]
+  ELIF (*==* (get "arg-range") "->")  =]
     fprintf( option_usage_fp, "%sit must lie in the range: %d to %d\n",
              pzIndent, rng[0].rmin, rng[0].rmax );[=
 
@@ -361,55 +361,55 @@ DEFINE define-option-callbacks  =][=
     (set! cap-name   (string-capitalize UP-name))
     (set! low-name   (string-downcase UP-name))      =][=
 
-    IF (or (exist? "flag_code")
-           (exist? "extract_code")
-           (exist? "arg_range") ) =][=
+    IF (or (exist? "flag-code")
+           (exist? "extract-code")
+           (exist? "arg-range") ) =][=
 
-      IF (exist? "test_main") =]
+      IF (exist? "test-main") =]
 
-#if ! defined( TEST_[= (. pname-up) =]_OPTS )[=
+#if ! defined( [= (. main-guard) =] )[=
 
       ENDIF =][=
 
       invoke callback-proc-header  =][=
 
-      IF (exist? "flag_code")      =][=
-         flag_code                 =][=
+      IF (exist? "flag-code")      =][=
+         flag-code                 =][=
 
-      ELIF (exist? "extract_code") =][=
+      ELIF (exist? "extract-code") =][=
          (extract (string-append (base-name) ".c.save") (string-append
                   "/*  %s =-= " cap-name " Opt Code =-= %s */"))
          =][=
 
-      ELIF (exist? "arg_range")    =][=
+      ELIF (exist? "arg-range")    =][=
          range-option-code         =][=
 
       ENDIF =]
 }[=
 
-  IF (exist? "test_main") =]
+  IF (exist? "test-main") =]
 
-#endif /* ! defined TEST_[= (. pname-up) =]_OPTS */[=
+#endif /* ! defined [= (. main-guard) =] */[=
 
   ENDIF =][=
 
 
-    ELIF (=* (get "arg_type") "key") =][=
+    ELIF (=* (get "arg-type") "key") =][=
 
       invoke callback-proc-header  =][=
-      IF (not (exist? "arg_default"))
+      IF (not (exist? "arg-default"))
 =]    tSCC zDef[2] = { 0x7F, 0 };
 [=    ENDIF =][=
 
-    IF (> (len "arg_optional") 0) =]
+    IF (> (len "arg-optional") 0) =]
     te_[=(string-append Cap-prefix cap-name)=] def_val = [=
-       IF (not (=* (get "arg_optional") low-name))
+       IF (not (=* (get "arg-optional") low-name))
              =][=(. UP-name)=]_[=
-       ENDIF =][=(string-upcase! (string->c-name! (get "arg_optional")))
+       ENDIF =][=(string-upcase! (string->c-name! (get "arg-optional")))
              =];[=
     ENDIF
 =]    tSCC* az_names[] = {[=
-      IF (not (exist? "arg_default")) =] zDef,[=
+      IF (not (exist? "arg-default")) =] zDef,[=
       ENDIF  =]
 [=(shellf
   "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
@@ -417,14 +417,14 @@ DEFINE define-option-callbacks  =][=
     };
 [=
 
-    IF (> (len "arg_optional") 0) =]
+    IF (> (len "arg-optional") 0) =]
     if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)def_val;
     else[=
     ENDIF =]
     pOptDesc->pzLastArg =
         optionEnumerationVal( pOptions, pOptDesc, az_names, [=
-        (+ (count "keyword") (if (exist? "arg_default") 0 1)) =] );
+        (+ (count "keyword") (if (exist? "arg-default") 0 1)) =] );
 }[=
     ENDIF       =][=
   ENDFOR flag   =]

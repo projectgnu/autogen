@@ -1,4 +1,20 @@
+2003-04-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/bootstrap.dir: fix comment
+	* autoopts/Makefile.am: do not install options_h.tpl
+	* autoopts/opt*.tpl: clean up syntax
+
+2003-04-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.tpl: Set up new variables OPT-pfx INDEX-pfx VALUE-pfx
+	* autoopts/optlib.tpl: use them and ensure that flags-cant, flags-must
+	equivalence and other option naming values get transformed the same
+	way "name" gets transformed everywhere.
+	* autoopts/optcode.tpl: ditto.
+	* autoopts/opthead.tpl: ditto.
+
 2003-03-15  Bruce Korb  <bkorb@gnu.org>
+	*** 5.5.3 Released.
 
 	* pkg/mkpkg.linux: Finished.
 	* pkg/spec.tpl(BuildRoot): It must not conflict with %topdir.

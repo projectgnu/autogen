@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.8 2003/02/16 00:04:40 bkorb Exp $
+# $Id: opthead.tpl,v 3.9 2003/04/04 04:44:54 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
@@ -21,26 +21,25 @@
 typedef enum {[=
 FOR flag    =][=
   IF (not (exist? "documentation")) =]
-        INDEX_[=(set-flag-names) UP-prefix=]OPT_[=
-                (sprintf "%-16s =%3d," UP-name (for-index)) =][=
+        [= (sprintf "%-26s =%3d," (index-name "name") (for-index)) =][=
   ENDIF     =][=
 ENDFOR flag =][=
 
 (define option-ct (count "flag")) =][=
 
 IF (exist? "version") =]
-        INDEX_[=(. UP-prefix)=]OPT_VERSION          = [=
+        [= (. INDEX-pfx) =]VERSION          = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
 ENDIF =]
-        INDEX_[=(. UP-prefix)=]OPT_HELP             = [=
+        [= (. INDEX-pfx) =]HELP             = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
-        INDEX_[=(. UP-prefix)=]OPT_MORE_HELP        = [=
+        [= (. INDEX-pfx) =]MORE_HELP        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
 
 IF (exist? "homerc") =],
-        INDEX_[=(. UP-prefix)=]OPT_SAVE_OPTS        = [=
+        [= (. INDEX-pfx) =]SAVE_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
-        INDEX_[=(. UP-prefix)=]OPT_LOAD_OPTS        = [=
+        [= (. INDEX-pfx) =]LOAD_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
 ENDIF =]
 } te[=(. Cap-prefix)=]OptIndex;
@@ -56,7 +55,7 @@ ENDIF (exist? version) =]
  *  Interface defines for all options.  Replace "n" with
  *  the UPPER_CASED option name (as in the te[=(. Cap-prefix)=]OptIndex
  *  enumeration above).  e.g. HAVE_[=(. UP-prefix)=]OPT( [=
-    (string-upcase! (get "flag[].name" ))=] )
+    (up-c-name "flag[].name") =] )
  */[=
 (sprintf "
 #ifdef __STDC__
@@ -88,13 +87,13 @@ ENDIF (exist? version) =]
 
 FOR flag              =][=
   (set-flag-names)
-  (set! opt-name   (string-append UP-prefix "OPT_" UP-name))
+  (set! opt-name   (string-append OPT-pfx UP-name))
   (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
  IF (exist? "documentation") =][=
-   IF (or (exist? "call_proc") (exist? "flag_code") (exist? "extract_code"))
+   IF (or (exist? "call-proc") (exist? "flag-code") (exist? "extract-code"))
 =]
-#define SET_[=(. UP-prefix)=]OPT_[=(. UP-name)=]   STMTS( \
+#define SET_[= (string-append OPT-pfx UP-name) =]   STMTS( \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=(for-index)=] )[=
 
@@ -119,58 +118,58 @@ are used identically to the user-generated VALUE defines.
 [=
 IF (exist? "flag.value") =][=
   IF (exist? "version") =]
-#define VALUE_[=(. UP-prefix)=]OPT_VERSION        [=
-    IF (not (exist? "version_value")) =]'v'[=
+#define [= (. VALUE-pfx) =]VERSION        [=
+    IF (not (exist? "version-value")) =]'v'[=
     ELSE      =][=
-      CASE (get "version_value")  =][=
-      == ""   =]INDEX_[=(. UP-prefix)=]OPT_VERSION[=
+      CASE (get "version-value")  =][=
+      == ""   =][= (. INDEX-pfx) =]VERSION[=
       == "'"  =]'\''[=
-      ~~ .    =]'[=version_value=]'[=
+      ~~ .    =]'[=version-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
     ENDIF     =][=
   ENDIF       =][=
 
   IF (exist? "homerc")=]
-#define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      [=
-    IF (not (exist? "save_opts_value")) =]'>'[=
+#define [= (. VALUE-pfx) =]SAVE_OPTS      [=
+    IF (not (exist? "save-opts-value")) =]'>'[=
     ELSE      =][=
-      CASE (get "save_opts_value")  =][=
-      == ""   =]INDEX_[=(. UP-prefix)=]OPT_SAVE_OPTS[=
+      CASE (get "save-opts-value")  =][=
+      == ""   =][= (. INDEX-pfx) =]SAVE_OPTS[=
       == "'"  =]'\''[=
-      ~~ .    =]'[=save_opts_value=]'[=
+      ~~ .    =]'[=save-opts-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
     ENDIF     =]
-#define VALUE_[=(. UP-prefix)=]OPT_LOAD_OPTS      [=
-    IF (not (exist? "load_opts_value")) =]'<'[=
+#define [= (. VALUE-pfx) =]LOAD_OPTS      [=
+    IF (not (exist? "load-opts-value")) =]'<'[=
     ELSE      =][=
-      CASE (get "load_opts_value")  =][=
-      == ""   =]INDEX_[=(. UP-prefix)=]OPT_LOAD_OPTS[=
+      CASE (get "load-opts-value")  =][=
+      == ""   =][= (. INDEX-pfx) =]LOAD_OPTS[=
       == "'"  =]'\''[=
-      ~~ .    =]'[=load_opts_value=]'[=
+      ~~ .    =]'[=load-opts-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
     ENDIF     =][=
   ENDIF
 =]
-#define VALUE_[=(. UP-prefix)=]OPT_HELP           [=
-    IF (not (exist? "help_value")) =]'?'[=
+#define [= (. VALUE-pfx) =]HELP           [=
+    IF (not (exist? "help-value")) =]'?'[=
     ELSE      =][=
-      CASE (get "help_value")  =][=
-      == ""   =]INDEX_[=(. UP-prefix)=]OPT_HELP[=
+      CASE (get "help-value")  =][=
+      == ""   =][= (. INDEX-pfx) =]HELP[=
       == "'"  =]'\''[=
-      ~~ .    =]'[=help_value=]'[=
+      ~~ .    =]'[=help-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
     ENDIF     =]
-#define VALUE_[=(. UP-prefix)=]OPT_MORE_HELP      [=
-    IF (not (exist? "more_help_value")) =]'!'[=
+#define [= (. VALUE-pfx) =]MORE_HELP      [=
+    IF (not (exist? "more-help-value")) =]'!'[=
     ELSE      =][=
-      CASE (get "more_help_value")  =][=
-      == ""   =]INDEX_[=(. UP-prefix)=]OPT_MORE_HELP[=
+      CASE (get "more-help-value")  =][=
+      == ""   =][= (. INDEX-pfx) =]MORE_HELP[=
       == "'"  =]'\''[=
-      ~~ .    =]'[=more_help_value=]'[=
+      ~~ .    =]'[=more-help-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
     ENDIF     =][=
@@ -178,23 +177,18 @@ IF (exist? "flag.value") =][=
 ELSE "flag.value *DOES NOT* exist" =][=
 
   IF (exist? "version") =]
-#define VALUE_[=(. UP-prefix)=]OPT_VERSION        INDEX_[=
-                                      (. UP-prefix)=]OPT_VERSION[=
+#define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
   ENDIF=][=
   IF (exist? "homerc") =]
-#define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      INDEX_[=
-                                      (. UP-prefix)=]OPT_SAVE_OPTS
-#define VALUE_[=(. UP-prefix)=]OPT_LOAD_OPTS      INDEX_[=
-                                      (. UP-prefix)=]OPT_LOAD_OPTS[=
+#define [= (. VALUE-pfx) =]SAVE_OPTS      [= (. INDEX-pfx) =]SAVE_OPTS
+#define [= (. VALUE-pfx) =]LOAD_OPTS      [= (. INDEX-pfx) =]LOAD_OPTS[=
   ENDIF=]
-#define VALUE_[=(. UP-prefix)=]OPT_HELP           INDEX_[=
-                                      (. UP-prefix)=]OPT_HELP
-#define VALUE_[=(. UP-prefix)=]OPT_MORE_HELP      INDEX_[=
-                                      (. UP-prefix)=]OPT_MORE_HELP[=
+#define [= (. VALUE-pfx) =]HELP           [= (. INDEX-pfx) =]HELP
+#define [= (. VALUE-pfx) =]MORE_HELP      [= (. INDEX-pfx) =]MORE_HELP[=
 ENDIF=][=
 
 IF (exist? "homerc") =]
-#define SET_[=(. UP-prefix)=]OPT_SAVE_OPTS(a)   STMTS( \
+#define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (char*)(a) )[=
@@ -204,7 +198,7 @@ ENDIF
 /*
  *  Interface defines not associated with particular options
  */
-#define  ERRSKIP_[=(. UP-prefix)=]OPTERR STMTS( [=prog_name
+#define  ERRSKIP_[=(. UP-prefix)=]OPTERR STMTS( [=prog-name
                          =]Options.fOptSet &= ~OPTPROC_ERRSTOP )
 #define  ERRSTOP_[=(. UP-prefix)=]OPTERR STMTS( [=prog_name
                          =]Options.fOptSet |= OPTPROC_ERRSTOP )

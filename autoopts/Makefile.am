@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-03-08 10:19:31 bkorb"
+## Time-stamp:      "2003-04-03 17:21:40 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.17 2003/03/08 21:19:52 bkorb Exp $
+## $Id: Makefile.am,v 3.18 2003/04/04 04:44:53 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,7 +25,7 @@ man_MANS = autoopts-config.1 $(GENMAN)
 libsrc   = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 nodist_pkgdata_DATA	= $(libsrc)
-pkgdata_DATA	= stdoptions.def options_h.tpl \
+pkgdata_DATA	= stdoptions.def \
     aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
     options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 
@@ -36,7 +36,7 @@ CSRC        = \
 	numeric.c  pgusage.c putshell.c    restore.c   \
 	save.c     stack.c   streqvcmp.c   usage.c     version.c
 
-EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING $(man_MANS) \
+EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING $(man_MANS) options_h.tpl \
 	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def
 
 m4datadir	= $(datadir)/aclocal
