@@ -7,10 +7,10 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Thu Jul  8 14:45:39 1999				      
+## Last Modified:   Mon Jul 12 14:12:56 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.15 1999/07/08 21:45:46 bkorb Exp $
+## $Id: Makefile.am,v 2.16 1999/07/12 21:13:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -32,12 +32,12 @@ gen : $(GEN_SRC)
 
 all : gen
 
-opts.c opts.h: opts.def
+opts.c opts.h : opts.def
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/getdefs/opts.def
 
-getdefs.texi : opts.def getdefs
+getdefs.menu getdefs.texi : opts.def getdefs
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -Taginfo -bgetdefs \
 		-L $(top_srcdir)/autoopts -DLEVEL=section \
@@ -45,6 +45,6 @@ getdefs.texi : opts.def getdefs
 
 getdefs.1 : opts.def getdefs
 	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
-		-b getdefs opts.def
+		-b getdefs $(srcdir)/opts.def
 
 # Makefile.am ends here
