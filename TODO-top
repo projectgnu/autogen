@@ -2,16 +2,6 @@
 
 * Known Bugs
 
-** There is a bug in the regex library config code, where the macros for
-   determining whether a posix regcomp/regexec are present, and whether
-   the user has specified a library explicity with --with-regex-prefix
-   (et. al.) don't cooperate, so you don't always get the option you ask
-   for.   We should test for user specified libraries first, and then
-   test those for POSIX compliance with the other macros, falling back to
-   the included regex files if these tests fail.
-
-** expOutput.c needs to export "outputShutdown(bool keep)
-
 ** getdefs leaves a NUL at the end of the database file
 
 ** memfrob(3GNU) as a function
@@ -22,7 +12,6 @@
 
 * Pending
 
-** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 ** All errors from autogen/getdefs etc. should start with,
    `options.pzProgName' (aka 'basename(argv[0])').
 ** Change the invocations of getdefs to send output to stdout in
