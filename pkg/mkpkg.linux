@@ -1,5 +1,12 @@
 #! /bin/sh
 
+case "${VERBOSE}" in
+"" | f* | F* | n* | N* )
+   VERBOSE=false ;;
+*) VERBOSE=true  ; set -x ;;
+esac
+export VERBOSE
+
 eval "`egrep ^AG_ ${top_srcdir}/VERSION`" > /dev/null
 
 ## Set directories in case they are relative paths
@@ -22,7 +29,6 @@ echo "%_topdir $PWD" > .rpmmacros
 [ -f ../autogen-${AG_VERSION}.tar.gz ] || (
   cd ..
   ${MAKE} dist || exit 1
-  set -x
 ) || exit 1
 
 ln ../autogen-${AG_VERSION}.tar.gz SOURCES/.
@@ -30,13 +36,16 @@ printf "\n\nPACKAGING RPM FOR LINUX\n\n"
 
 cd ${builddir}
 AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
-rpmfile=autogen-${AG_VERSION}.spec
+specfile=autogen-${AG_VERSION}.spec
 agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
 ${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
 cd ${HOME}
-rpm -ba ${builddir}/${rpmfile} || exit 1
-rm -f .rpmmacros
+rpm -ba ${builddir}/${specfile} || exit 1
+ln `find . -type f -name '*.rpm'` ${builddir}/.
+cd ${builddir}
+rm -rf ${HOME}
+${VERBOSE} || ls -l *.rpm
 
 ## Local Variables:
 ## mode: shell-script

@@ -1,3 +1,10 @@
+2003-03-15  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/mkpkg.linux: Finished.
+	* pkg/spec.tpl(BuildRoot): It must not conflict with %topdir.
+	(strip_binaries): doesn't work for me
+	(gzip_man): this either
+
 2003-03-13  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/opts.def(version): some egreps require '^'-s to be quoted

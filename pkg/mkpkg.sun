@@ -1,5 +1,12 @@
 #! /bin/sh
 
+case "${VERBOSE}" in
+"" | f* | F* | n* | N* )
+   VERBOSE=false ;;
+*) VERBOSE=true  ; set -x ;;
+esac
+export VERBOSE
+
 set -e
 pkgsrc=`pwd`
 agdir=`cd ../agen5 > /dev/null 2>&1 ; pwd`

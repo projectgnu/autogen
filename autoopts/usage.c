@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.17 2003/03/14 01:47:02 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.18 2003/03/15 18:02:36 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -531,26 +531,24 @@ tSCC zFmtFmt[]          = "%%-%ds %%s\n";
 #endif
 
 tSC  zGnuStrArg[]       = "=str";
-tSCC zGnuReqArg[]       = " ";
 tSC  zGnuNumArg[]       = "=num";
 tSC  zGnuKeyArg[]       = "=KWd";
 tSC  zGnuBoolArg[]      = "=T/F";
-tSC  zGnuOptArg[]       = "[=arg]";
-#define zGnuNoArg       zGnuReqArg
+tSCC zGnuOptArg[]       = "[=arg]";
 tSCC zGnuBreak[]        = "\n%s\n\n";
-tSCC zGnuSpace[]        = "      ";  /* 6 spaces */
+tSCC zSixSpaces[]       = "      ";  /* 6 spaces */
 
 static arg_types_t gnuTypes = {
-    zGnuStrArg,
-    zGnuReqArg,
-    zGnuNumArg,
-    zGnuKeyArg,
-    zGnuBoolArg,
-    zGnuOptArg,
-    zGnuNoArg,
-    zGnuBreak,
-    zGnuSpace,     /* 6 spaces */
-    zGnuSpace + 3  /* 3 spaces */
+    /* pzStr  */ zGnuStrArg,
+    /* pzReq  */ zSixSpaces + 5,  /* 1 space  */
+    /* pzNum  */ zGnuNumArg,
+    /* pzKey  */ zGnuKeyArg,
+    /* pzBool */ zGnuBoolArg,
+    /* pzOpt  */ zGnuOptArg,
+    /* pzNo   */ zSixSpaces + 5,  /* 1 space  */
+    /* pzBrk  */ zGnuBreak,
+    /* pzNoF  */ zSixSpaces,      /* 6 spaces */
+    /* pzSpc  */ zSixSpaces + 3   /* 3 spaces */
 };
 
 tSCC zStdStrArg[]       = "Str";
@@ -563,16 +561,16 @@ tSCC zStdNoArg[]        = "no ";
 tSCC zStdBreak[]        = "\n%s\n\n%s";
 
 static arg_types_t stdTypes = {
-    zStdStrArg,
-    zStdReqArg,
-    zStdNumArg,
-    zStdKeyArg,
-    zStdBoolArg,
-    zStdOptArg,
-    zStdNoArg,
-    zStdBreak,
-    zGnuSpace + 1,  /* 5 spaces */
-    zGnuSpace + 4   /* 2 spaces */
+    /* pzStr  */ zStdStrArg,
+    /* pzReq  */ zStdReqArg,
+    /* pzNum  */ zStdNumArg,
+    /* pzKey  */ zStdKeyArg,
+    /* pzBool */ zStdBoolArg,
+    /* pzOpt  */ zStdOptArg,
+    /* pzNo   */ zStdNoArg,
+    /* pzBrk  */ zStdBreak,
+    /* pzNoF  */ zSixSpaces + 1,  /* 5 spaces */
+    /* pzSpc  */ zSixSpaces + 4   /* 2 spaces */
 };
 
 static void

@@ -7,7 +7,8 @@ Release: [=`echo $AG_MAJOR_VERSION`=]
 Copyright: GPL
 Group: Development/Tools
 Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
-BuildRoot: [=`cd ${top_builddir}/AGPKG > /dev/null && pwd`=]
+BuildRoot: [=`cd ${top_builddir}/AGPKG > /dev/null && pwd`
+           =]/BUILD/ROOT
 BuildRequires: gzip texinfo libtool > 1.3 guile
 
 %description
@@ -45,17 +46,6 @@ fi
 mkdir -p $RPM_BUILD_ROOT
 make install DESTDIR=${RPM_BUILD_ROOT}
 
-%if %{strip_binaries}
-{ cd $RPM_BUILD_ROOT
-  strip .%{__prefix}/bin/* || /bin/true
-}
-%endif
-%if %{gzip_man}
-{ cd $RPM_BUILD_ROOT
-  gzip .%{_mandir}/man*/*.[1-9]
-}
-%endif
-
 ( cd $RPM_BUILD_ROOT && find . ! -type d 
 ) | sed "s,^\./,/,g" > [= prog-name =]-filelist
 
@@ -67,6 +57,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %doc [A-T][A-Z]* ChangeLog
 
 %changelog
+* Sat Mar 15 2003 Bruce Korb <bkorb@gnu.org>
+- Rework as a template to automatically produce a properly configured RPM
 * Fri Aug 9 2002 Bruce Korb <bkorb@gnu.org>
 - Pull stuff from Thomas Steudten's version of this file[= #'
 
