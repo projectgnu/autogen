@@ -1,11 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.20 2004/02/01 21:26:45 bkorb Exp $
+# $Id: optmain.tpl,v 3.21 2004/03/19 18:26:15 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
-=]
-[=
+=][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -70,9 +69,7 @@ main( int    argc,
 }
 [=
 
-ENDDEF
-
-=][=
+ENDDEF build-guile-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -83,7 +80,7 @@ ENDDEF
 DEFINE build-test-main
 
 =]
-#if defined( [= (. main-guard) =] )
+#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
 
 int
 main( int argc, char** argv )
@@ -122,7 +119,157 @@ main( int argc, char** argv )
 }
 #endif  /* defined [= (. main-guard) =] */[=
 
-ENDDEF  =][=
+ENDDEF  build-test-main
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+   BUILD MAIN
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE for-each-main    =][=
+
+  (if (not (==* (get "argument") "[" ))
+      (error "command line arguments must be optional for a 'for-each' main"))
+
+  (if (not (exist? "handler-proc"))
+      (error "'for-each' mains require a handler proc") )
+
+=]
+#include <ctype.h>
+#include <unistd.h>
+#include <stdio.h>
+
+static char*
+trim_input_line( char* pz_s )
+{
+    char* pz_e = pz_s + strlen( pz_s );
+    while ((pz_e > pz_s) && isspace( pz_e[-1] ))  pz_e--;
+    *pz_e = '\0';
+    while (isspace( *pz ))  pz++;
+
+    switch (*pz_s) {
+    case '\0':
+    case '#':
+        return NULL;
+    default:
+        return pz_s;
+    }
+}[=
+
+IF (exist? (string-append (get "handler-proc") "-code")) =]
+
+static int
+[= handler-proc =]( const char* pz_entry )
+{
+[= (get (string-append (get "handler-proc") "-code")) =]
+}[=
+
+  ELSE
+=]
+
+extern int [= handler-proc =]( const char* );[=
+
+  ENDIF
+=]
+
+int
+main( int argc, char** argv )
+{
+    int res = 0;
+    {
+        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
+        argc -= ct;
+        argv += ct;
+    }
+
+    /*
+     *  Input list from command line
+     */
+    if (argc > 0) {
+        do  {
+            res |= [= handler-proc =]( *(argv++) );
+        } while (--argc > 0);
+    }
+
+    /*
+     *  Input list from tty input
+     */
+    else if (! isatty( STDIN_FILENO )) {
+        fputs( "[=(. prog-name)=] ERROR: input list must not be a tty\n",
+               stderr );
+        [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
+    }
+
+    /*
+     *  Input list from a pipe or file or some such
+     */
+    else {
+        int in_ct   = 0;
+        int pg_size = getpagesize();
+        char* buf   = malloc( pg_size );
+        if (buf == NULL) {
+            fputs( "[=(. prog-name)=] ERROR: no memory for input list buffer\n",
+                   stderr );
+            return EXIT_FAILURE;
+        }
+
+        for (;;) {
+            char* pz = fgets( buf, pg_size, stdin );
+            if (pz == NULL)
+                break;
+
+            pz = trim_input_line( pz );
+            if (pz != NULL) {
+                 res |= [= handler-proc =]( pz );
+                 in_ct++;
+            }
+        }
+
+        if (in_ct == 0)
+            fputs( "[=(. prog-name)=] Warning:  no input lines were read\n",
+                   stderr );
+        free( buf );
+    }
+
+    return res;
+}[=
+
+ENDDEF  for-each-main
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+   BUILD MAIN
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE build-main       =][= FOR main[] =][=
+
+ CASE main-type         =][=
+ == guile               =][=
+    build-guile-main    =][=
+
+ == shell-process       =][=
+INVOKE build-test-main  test-main = "putBourneShell"
+
+ == shell-parser        =][=
+INVOKE build-test-main  test-main = "putShellParse"
+
+ == main                =][=
+INVOKE build-test-main  main-text = (get "code")
+
+ == include             =][=
+    INCLUDE tpl         =][=
+
+ == invoke              =][=
+    INVOKE (get "func") =][=
+
+ == for-each            =][=
+    INVOKE for-each-main=][=
+ 
+ ESAC =][= ENDFOR =][=
+
+ENDDEF build-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -130,19 +277,12 @@ ENDDEF  =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE declare-option-callbacks      =][=
+DEFINE declare-option-callbacks =][=
 
    #  For test builds, no need to call option procs  =][=
 
-  IF (. make-test-main)                =]
-#if ! defined( [=(. main-guard)=] )[=
-  ENDIF                              =][=
-
-  IF (. make-test-main)            =][=
-
-     # "A test environment is to be generated" =]
-
-#else /* *is*  defined( [=(. main-guard)=] ) */
+  IF (. make-test-main)         =]
+#if defined([=(. main-guard)=])
 /*
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
@@ -171,7 +311,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
       ENDIF                     =][=
 
     ENDFOR flag                 =]
-#endif /* defined( [=(. main-guard)=] ) */[=
+#endif /* defined([=(. main-guard)=]) */[=
   ENDIF (. make-test-main)      =]
 [=
 
@@ -314,7 +454,7 @@ DEFINE define-option-callbacks  =][=
 
       IF (. make-test-main) =]
 
-#if ! defined( [= (. main-guard) =] )[=
+#if ! defined([=(. main-guard)=])[=
 
       ENDIF =][=
 

@@ -40,14 +40,14 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 3.4 2003/05/17 22:32:36 bkorb Exp $
+ *  $Id: strsignal.c,v 3.5 2004/03/19 18:26:15 bkorb Exp $
  */
 
 #include "compat.h"
 
 /*  Routines imported from standard C runtime libraries. */
 
-#if ! defined( HAVE_STRSIGNAL )
+#if ! defined(HAVE_STRSIGNAL)
 
 #ifdef __STDC__
 # include <stddef.h>
@@ -97,17 +97,15 @@ DESCRIPTION
     The returned string is only guaranteed to be valid only until the
     next call to strsignal.
 
+    Also, though not declared "const", it is.
 */
 
 char *
 strsignal( int signo )
 {
-  if ((unsigned)signo > MAX_SIGNAL_NUMBER)
-    {
-      /* Out of range, just return NULL */
-      return (char*)NULL;
-    }
+    if (SIGNAL_IN_RANGE( signo ))
+        return (char*)SIGNAL_INFO( signo );
 
-  return (char*)sys_siglist[ signo ];
+    return NULL;
 }
 #endif  /* HAVE_STRSIGNAL */

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.25 2004/02/01 21:26:45 bkorb Exp $
+#$Id: optcode.tpl,v 3.26 2004/03/19 18:26:15 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -13,8 +13,13 @@ IF (exist? "flag.arg-range")
 =]#include <stdio.h>
 #include <limits.h>[=
 
-ENDIF
+ENDIF  =][=
 
+IF (or (= "putBourneShell" (get "main.shell-process"))
+       (= "putShellParse"  (get "main.shell-parser"))
+       (exist? "main.code")) =]
+#define [= (set! make-test-main #t) main-guard =] 1[=
+ENDIF
 =]
 #include "[= (. header-file) =]"
 
@@ -169,7 +174,7 @@ IF (or (exist? "flag.flag-code")
 ENDIF   =][=
 
 IF (exist? "version")       =][=
-  IF (. make-test-main)       =]
+  IF (. make-test-main)     =]
 #ifdef [=(. main-guard)     =]
 # define DOVERPROC doVersionStderr
 #else
@@ -178,7 +183,7 @@ IF (exist? "version")       =][=
   ELSE  =]
 #define DOVERPROC doVersion[=
   ENDIF =][=
-ENDIF =]
+ENDIF   =]
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -427,6 +432,9 @@ IF (. make-test-main)              =][=
 ELIF (exist? "guile-main")         =][=
   invoke build-guile-main          =][=
 
+ELIF (exist? "main")               =][=
+  invoke build-main                =][=
+
 ENDIF "test/guile main"
 
 =]
@@ -453,14 +461,18 @@ AO_gettext( const char* pz )
     return pzRes;
 }
 
+/*
+ *  This invokes the translation code (e.g. gettext(3)).
+ */
 static void
 translate_option_strings( void )
 {
     /*
-     *  This invokes the translation code (e.g. gettext(3)).
+     *  Guard against re-translation.  It won't work.  The strings will have
+     *  been changed by the first pass through this code.  One shot only.
      */
-    int ix;
-    tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
+    if (option_usage_text.field_ct == 0)
+        return;
 
     /*
      *  Do the translations.  This code gets compiled into the client programs.
@@ -468,30 +480,30 @@ translate_option_strings( void )
      */
     {
         char** ppz = (char**)(void*)&(option_usage_text);
-
-        ix = option_usage_text.field_ct;
-        if (ix == 0)
-            return;
+        int    ix  = option_usage_text.field_ct;
 
         do {
             ppz++;
             *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
     }
-    /*
-     *  Guard against re-translation.  It won't work.  The strings will have
-     *  been changed by the first pass through this code.  One shot only.
-     */
     option_usage_text.field_ct = 0;
 
-    for (ix = [=(. pname)=]Options.optCt; --ix >= 0; pOD++)  {[=
+    {
+        tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
+        int       ix  = [=(. pname)=]Options.optCt
+        for (;;) {[=
 
   FOR field IN pzText pz_NAME pz_Name pz_DisableName pz_DisablePfx  =][=
 
-    (sprintf "\n        pOD->%1$-16s = AO_gettext(pOD->%1$s);"
+    (sprintf "\n            pOD->%1$-16s = AO_gettext(pOD->%1$s);"
              (get "field"))  =][=
 
   ENDFOR =]
+            if (--ix <= 0)
+                break;
+            pOD++;
+        }
     }[=
 
   FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle

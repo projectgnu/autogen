@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-08-20 18:46:11 bkorb"
+# Time-stamp:        "2004-03-19 10:17:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 3.5 2004/01/14 02:41:16 bkorb Exp $
+# $Id: argument.test,v 3.6 2004/03/19 18:26:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -68,7 +68,7 @@ sed '/arg_type = number/a\
 testname=${testname}2
 $AGEN ${testname}.def || \
   failure AutoGen could not process
-( sed '/^#if defined( TEST_TEST_ARGUMENT_OPTS )/,$d' ${testname}.c
+( sed '/^TEST MAIN PROCEDURE:/,$d' ${testname}.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );
