@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Thu Jul 29 12:46:08 1999				      
+## Last Modified:   Tue Aug  3 10:37:36 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.18 1999/07/29 20:43:23 bkorb Exp $
+## $Id: Makefile.am,v 2.19 1999/08/03 17:39:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,7 +26,7 @@ EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 ODEF            = $(top_srcdir)/src/opts.def
-
+SNVDOC          = $(top_srcdir)/snprintfv/doc/version.texi
 DEFSRC		= \
 		$(top_srcdir)/src/agFunCase.c \
 		$(top_srcdir)/src/agFunEval.c \
@@ -54,7 +54,7 @@ AGARGS		= autogen=$(AGEXE) \
 		agarg=--templ-dirs=$(top_srcdir) agarg=-t60 \
 		base-name=autogen
 
-autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC)
+autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC) $(SNVDOC)
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	CC="${CC}" \
 	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
