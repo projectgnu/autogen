@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/12/10 04:33:14 $
-##            by:     Bruce Korb <bkorb@gnu.org>
+## Time-stamp:      "2002-02-01 16:02:34 bkorb"
+##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.2 2001/12/10 04:33:14 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.3 2002/02/21 00:13:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -96,7 +96,11 @@ All arguments must be options.[+:
       #  otherwise use the 'detail' help option.  If not that,
       #  then the thing is undocumented.
       #
-      :+]
+      :+][+:
+IF (exist? "explain") :+]
+.PP
+[+:explain:+][+:
+ENDIF :+]
 .SH "DESCRIPTION"
 This manual page documents, briefly, the \fB[+:
     (string-downcase! (get "prog_name")) :+]\fP command.
@@ -254,13 +258,20 @@ This option must not appear in combination with any of the following options:
         and for nroff to output a backslash, use EIGHT (8)!!!!
 
    ):+][+: % doc `sed \
- -e 's;@\\(code|var|samp\\){\\([^}]*\\)\\};\\\\fB\\2\\\\fP;g' \
+ -e 's;@code{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
+ -e 's;@var{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
+ -e 's;@samp{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
  -e 's;@file{\\([^}]*\\)\\};\\\\fI\\1\\\\fP;g' \
  -e 's/@\\([{}]\\)/\\1/g' \
  -e 's,^\\$\\*$,.br,' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \
  -e '/^ *@ *example/d' \
  -e 's/^ *@ *end *example/.br/' \
+ -e '/^ *@ *enumerate/d' \
+ -e 's/^ *@ *end *enumerate/.br/' \
+ -e '/^ *@ *table/d' \
+ -e 's/^ *@ *end *table/.br/' \
+ -e 's/^@item/.sp 1/' \
  -e 's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_` :+][+:
 
   ENDIF documentation _exist ! :+][+:
