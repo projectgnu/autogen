@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:     $Date: 1999/11/07 03:32:11 $
+# Last Modified:     $Date: 1999/11/07 04:15:20 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: opts.test,v 1.3 1999/11/07 03:32:11 bruce Exp $
+# $Id: opts.test,v 1.4 1999/11/07 04:15:20 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,9 +21,9 @@ if test -z "$srcdir"; then
 fi
 . $srcdir/defs
 workdir=`pwd`
-rm -f VERSION
+rm -f VERSION || :
 agopts=`cd .. ; cd $srcdir/.. ; cp opts.[chd]* $workdir > /dev/null 2>&1
-        cp ../VERSION $workdir/.. ; cd ../autoopts ; pwd`
+        cp -f ../VERSION $workdir/.. ; cd ../autoopts ; pwd`
 
 if grep 'define DEBUG' opts.h > /dev/null 2>&1
 then

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.20 1999/11/04 05:28:32 bruce Exp $
+ *  $Id: funcDef.c,v 1.21 1999/11/07 04:13:25 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -39,220 +39,8 @@ struct def_list {
 };
 
 tSCC  zNoResolution[] = "Could not resolve INVOKE macro name - %s";
-
-#ifdef DEBUG
-/*=macfunc DEBUG, ifdef DEBUG
- *
- *  handler_proc:
- *  load_proc:
- *  what:  Provide break point spots
- *  desc:
- *      By inserting [+DEBUG n+] into your template, you can set
- *      a breakpoint on the #n case element below and step through
- *      the processing of interesting parts of your template.
-=*/
-MAKE_HANDLER_PROC( Debug )
-{
-    static int dummy = 0;
-
-    /*
-     *  The case element values were chosen to thwart any
-     *  optimizer that might be too bright for its own good.
-     */
-    switch (atoi( pT->pzTemplText + pMac->ozText )) {
-    case 0:
-        dummy = 'A'; break;
-    case 1:
-        dummy = 'u'; break;
-    case 2:
-        dummy = 't'; break;
-    case 4:
-        dummy = 'o'; break;
-    case 8:
-        dummy = 'G'; break;
-    case 16:
-        dummy = 'e'; break;
-    case 32:
-        dummy = 'n'; break;
-    case 64:
-        dummy = 'X'; break;
-    case 128:
-        dummy = 'Y'; break;
-    case 256:
-        dummy = 'Z'; break;
-    case 512:
-        dummy = '.'; break;
-    default:
-        dummy++;
-    }
-    return pMac+1;
-}
-#endif
-
-
-/*=macfunc DEFINE
- *
- *  what:    Define a user AutoGen macro
- *  cindex:  define macro
- *  handler_proc:
- *  load_proc:
- *
- *  desc:
- *      This function will define a new macro.  You must provide a
- *      name for the macro.  You do not specify any arguments,
- *      though the invocation may specify a set of name/value pairs
- *      that are to be active during the processing of the macro.
- *
- *      @example
- *      [+ define foo +]
- *      ... macro body with macro functions ...
- *      [+ enddef +]
- *      ... [+ foo bar='raw text' baz=<<text expression>> +]
- *      @end example
- *
- *      Once the macro has been defined, this new macro can be invoked by
- *      specifying the macro name as the first token after the start
- *      macro marker.  Any remaining text in the macro invocation will be
- *      used to create new name/value pairs that only persist for the
- *      duration of the processing of the macro.  The expressions are
- *      evaluated the same way simple expressions are evaluated.
- *      @xref{expression syntax}.
- *
- *      The resulting definitions are handled much
- *      like regular definitions, except:
- *
- *      @enumerate
- *      @item
- *      The values may not be compound.  That is, they may not contain
- *      nested name/value pairs.
- *      @item
- *      The bindings go away when the macro is complete.
- *      @item
- *      The name/value pairs are separated by whitespace instead of
- *      semi-colons.
- *      @item
- *      Sequences of strings are not concatenated.
- *      @end enumerate
-=*/
-/*=macfunc ENDDEF
- *
- *  what:   Ends a macro definition.
- *  situational:
- *
- *  desc:
- *    This macro ends the @code{DEFINE} function template block.
- *    For a complete description @xref{DEFINE}.
-=*/
-/*
- *  mFunc_Define
- *
- *  This routine runs the invocation.
- */
-MAKE_HANDLER_PROC( Define )
-{
-    tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
-    tDefList*   pList  = (tDefList*)pMac->res;
-    int         defCt  = pMac->sibIndex;
-    SCM         res;
-    tDefEntry*  pDefs;
-    tTemplate*  pOldTpl = pCurTemplate;
-
-    pT = (tTemplate*)pMac->funcPrivate;
-
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        fprintf( pfTrace, zTplInvoked, pT->pzTplName, defCt );
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
-                     pMac->lineNo );
-    }
-
-    /*
-     *  IF we have no special definitions, then do not nest definitions
-     */
-    if (defCt == 0)
-        pDefs = pCurDef;
-    else {
-        pDefs = &(pList->de);
-        pList->de.pDad = pCurDef;
-
-        /*
-         *  FOR each definition, evaluate the associated expression
-         *      and set the text value to it.
-         */
-        do  {
-            if (pList->pzExpr == (char*)NULL)
-                continue;
-
-        retryExpression:
-            switch (*(pList->pzExpr)) {
-            case ';':
-            {
-                char* pz = strchr( pList->pzExpr, '\n' );
-                if (pz != (char*)NULL) {
-                    while (isspace( *++pz ))  ;
-                    pList->pzExpr = pz;
-                    goto retryExpression;
-                }
-                /* FALLTHROUGH */
-            }
-            case NUL:
-                pList->pzExpr = (char*)NULL;
-                pList->de.pzValue = "";
-                break;
-
-            case '(':
-                /*
-                 *  It is a scheme expression.  Accept only string
-                 *  and number results.
-                 */
-                res = scm_internal_stack_catch(
-                    SCM_BOOL_T,
-                    (scm_catch_body_t)gh_eval_str,
-                    (void*)pList->pzExpr,
-                    ag_eval_handler,
-                    (void*)pList->pzExpr );
-
-                if (gh_string_p( res )) {
-                    pList->de.pzValue = strdup( SCM_CHARS( res ));
-                }
-                else if (gh_number_p( res )) {
-                    pList->de.pzValue = (char*)AGALOC( 16 );
-                    sprintf( pList->de.pzValue, "%ld", gh_scm2long( res ));
-                }
-                else
-                    pList->de.pzValue = strdup( "" );
-                break;
-
-            case '`':
-                pList->de.pzValue = runShell( pList->pzExpr+1 );
-                break;
-            }
-        } while (pList++, --defCt > 0);
-    }
-
-    pCurTemplate = pT;
-    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pDefs );
-    pCurTemplate = pOldTpl;
-
-    if ((defCt = pMac->sibIndex) > 0) {
-        pList = (tDefList*)pMac->res;
-        while (defCt-- > 0) {
-            if (pList->pzExpr != (char*)NULL) {
-                AGFREE( (void*)pList->de.pzValue );
-                pList->de.pzValue = (char*)NULL;
-            }
-            pList++;
-        }
-    }
-
-    /*
-     *  The DEFINE function changes the global definition context.
-     *  Restore it to the one passed in.
-     */
-    pDefContext  = pCurDef;
-
-    return pMac+1;
-}
+tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
+#endif /* not defined DEFINE_LOAD_FUNCTIONS */
 
 
     STATIC int
@@ -261,6 +49,12 @@ orderDefList( const void* p1, const void* p2 )
     tDefEntry* pDL1 = (tDefEntry*)p1;
     tDefEntry* pDL2 = (tDefEntry*)p2;
     int cmp = streqvcmp( pDL1->pzName, pDL2->pzName );
+
+    /*
+     *  IF the names are the same, then we order them
+     *  based on which name appears first.  We do _not_
+     *  want the entries reordered within the same name!
+     */
     if (cmp == 0)
         cmp = (int)(pDL1->pzName - pDL2->pzName);
     return cmp;
@@ -294,6 +88,208 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
     pNext->de.pTwin   = (tDefEntry*)NULL; /* NULL terminated list */
     pDL->de.pPrevTwin = (tDefEntry*)NULL; /* NULL terminated list */
     *pCt = ct;
+}
+
+
+/*
+ *  skipNestedExpression
+ *
+ *  This is a wrapper around "skipExpression" that has a special purpose:
+ *  We are now allowing templates to appear inside of a quoted string
+ *  passed as an argument to a user macro invocation.  That is a tricky
+ *  thing to parse and not needed everywhere.  Not even doable everywhere.
+ *  It can only be done during the initial parse of a template because
+ *  that is the only time when the start/end macro markers are known.
+ */
+    STATIC char*
+skipNestedExpression( char* pzScan, size_t len )
+{
+    char* pzStartMark   = pCurTemplate->zStartMac;
+
+    tSCC zOnlyStrings[] = "Only strings may contain nested templates";
+    char* pzStartMacro  = strstr( pzScan, pzStartMark );
+    char* pzExpEnd      = (char*)skipExpression( pzScan, len );
+    char q;
+
+    if ((pzStartMacro == (char*)NULL) || (pzExpEnd < pzStartMacro))
+        return pzExpEnd;
+
+    switch (*pzScan) {
+    case '"':
+    case '\'':
+        break;
+    default:
+        LOAD_ABORT( pCurTemplate, pCurMacro, zOnlyStrings );
+    }
+
+    q = *pzScan++;        /*  Save the quote character type */
+
+    /*
+     *  skipMacro() needs whatever the correct mark is for the
+     *  macro when it was originally defined.
+     */
+    strcpy( zStartMac, pzStartMark );
+    startMacLen = strlen( pzStartMark );
+    strcpy( zEndMac, pCurTemplate->zEndMac );
+    endMacLen = strlen( zEndMac );
+
+    while (*pzScan != q) {
+        /*
+         *  IF we are at the start of a macro invocation,
+         *  THEN it is time to skip over it.
+         */
+        if (pzScan == pzStartMacro) {
+            pzScan = (char*)skipMacro( pzStartMacro ) + endMacLen;
+            pzStartMacro = strstr( pzScan, pzStartMark );
+            continue;
+        }
+
+        switch (*pzScan++) {
+        case NUL:
+            return pzScan-1;      /* Return address of terminating NUL */
+
+        case '\\':
+            if (q == '\'') {
+                /*
+                 *  Single quoted strings process the backquote specially
+                 *  only in fron of these three characters:
+                 */
+                switch (*pzScan) {
+                case '\\':
+                case '\'':
+                case '#':
+                    pzScan++;
+                }
+
+            } else {
+                char p[10];  /* provide a scratch pad for escape processing */
+                unsigned int ct = doEscapeChar( pzScan, p );
+                /*
+                 *  IF the advance is zero,
+                 *  THEN we either have end of string (caught above),
+                 *       or we have an escaped new-line,
+                 *       which is to be ignored.
+                 *  ELSE advance the quote scanning pointer by ct
+                 */
+                if (ct == 0) {
+                    pzScan++; /* skip over new-line character        */
+                } else
+                    pzScan += ct;
+            } /* if (q == '\'')      */
+        }     /* switch (*pzScan++)   */
+    }         /* while (*pzScan != q) */
+
+    return pzScan+1; /* Return addr of char after the terminating quote */
+}
+
+
+/*
+ *  The following routine scans over quoted text, shifting
+ *  it in the process and eliminating the starting quote,
+ *  ending quote and any embedded backslashes.  They may
+ *  be used to embed the quote character in the quoted text.
+ *  The quote character is whatever character the argument
+ *  is pointing at when this procedure is called.
+ */
+    STATIC char*
+spanTemplate( char* pzQte, tDefList* pDefList )
+{
+    char* pzStartMark   = pCurTemplate->zStartMac;
+
+    char* pzStartMacro  = strstr( pzQte, pzStartMark );
+    char* pzExpEnd = (char*)skipExpression( pzQte, strlen( pzQte ));
+    char* pzText = pzQte;
+    char* p;
+    char  q;
+    int   mac_ct = 0;
+
+    if ((pzStartMacro == (char*)NULL) || (pzExpEnd < pzStartMacro))
+        return spanQuote( pzQte );
+
+    q = *pzQte;          /*  Save the quote character type */
+    p = pzQte++;         /*  Destination pointer           */
+
+    /*
+     *  skipMacro() needs whatever the correct mark is for the
+     *  macro when it was originally defined.
+     */
+    strcpy( zStartMac, pzStartMark );
+    startMacLen = strlen( pzStartMark );
+    strcpy( zEndMac, pCurTemplate->zEndMac );
+    endMacLen = strlen( zEndMac );
+
+    while (*pzQte != q) {
+        /*
+         *  IF we are at the start of a macro invocation,
+         *  THEN it is time to skip over it.
+         */
+        if (pzQte == pzStartMacro) {
+            mac_ct++;
+            pzQte = (char*)skipMacro( pzStartMacro ) + endMacLen;
+            memcpy( (void*)p, pzStartMacro, (pzQte - pzStartMacro) );
+            p += (pzQte - pzStartMacro);
+            pzStartMacro = strstr( pzQte, pzStartMark );
+            continue;
+        }
+
+        switch (*p++ = *pzQte++) {
+        case NUL:
+            pzQte--;      /* Return address of terminating NUL */
+            goto NUL_termination;
+
+        case '\\':
+            if (q != '\'') {
+                unsigned int ct = doEscapeChar( pzQte, p-1 );
+                /*
+                 *  IF the advance is zero,
+                 *  THEN we either have end of string (caught above),
+                 *       or we have an escaped new-line,
+                 *       which is to be ignored.
+                 *  ELSE advance the quote scanning pointer by ct
+                 */
+                if (ct == 0) {
+                    p--;     /* move destination back one character */
+                    pzQte++; /* skip over new-line character        */
+                } else
+                    pzQte += ct;
+
+            } else {
+                switch (*pzQte) {
+                case '\\':
+                case '\'':
+                case '#':
+                    p[-1] = *pzQte++;
+                }
+            }
+            break;
+
+        default:
+            ;
+        }
+    }
+    pzQte++; /* Return addr of char after the terminating quote */
+    *p = NUL;
+
+ NUL_termination:
+
+    {
+        size_t alocSize = sizeof( tTemplate ) + (mac_ct * sizeof( tMacro))
+            + (pzQte - pzText) + strlen( pCurTemplate->pzFileName ) + 16;
+        tTemplate* pNewT;
+        alocSize &= ~0x0F;
+        pNewT = (void*)AGALOC( alocSize );
+        memset( (void*)pNewT, 0, alocSize );
+        pNewT->descSize = alocSize;
+        pNewT->macroCt  = mac_ct;
+        pNewT->fd       = -1;
+        strcpy( pNewT->zStartMac, pCurTemplate->zStartMac );
+        strcpy( pNewT->zEndMac, pCurTemplate->zEndMac );
+        loadMacros( pNewT, pCurTemplate->pzFileName, (char*)NULL, pzText );
+        pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize );
+        pNewT = templateFixup( pNewT, pNewT->descSize );
+        sprintf( pzText, "[ 0x%08X ]", pNewT );
+    }
+    return pzQte;
 }
 
 
@@ -338,7 +334,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         if (*pzScan != '=')
             continue;
         while (isspace( *++pzScan ))   ;
-        pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
+        pzScan = (char*)skipNestedExpression( pzScan, strlen( pzScan ));
         while (isspace( *pzScan ))     pzScan++;
     }
 
@@ -360,12 +356,24 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
     memset( (void*)pDL, 0, ct * sizeof( tDefList ));
     pMac->res = (long)pDL;
 
+    /*
+     *  Fill in the array of value assignments
+     */
     for (;; pDL++ ) {
         pDL->de.pzName = pzScan;
         while (ISNAMECHAR( *pzScan ))  pzScan++;
+
+        /*
+         *  IF there is an immediate assignment character,
+         *  THEN terminate the name
+         *  ELSE ...
+         */
         if (*pzScan == '=')
             *(pzScan++) = NUL;
         else {
+            /*
+             *  IF there is no value, then there is no value
+             */
             if (*pzScan == NUL) {
                 pDL->de.pzValue = "";
                 break;
@@ -375,19 +383,26 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 
             *(pzScan++) = NUL;
             while (isspace( *pzScan )) pzScan++;
+
+            /*
+             *  The name was separated by space, but has no value
+             */
             if (*pzScan != '=') {
                 pDL->de.pzValue = "";
                 if (*pzScan == NUL)
                     break;
                 continue;
             }
-            *(pzScan++) = NUL;
+            *(pzScan++) = NUL;  /* clobber the '=' */
         }
         while (isspace( *pzScan ))     pzScan++;
         pDL->pzExpr = pzScan;
         pDL->de.valType = VALTYP_TEXT;
         pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
 
+        /*
+         *  Figure out what kind of expression we have
+         */
         switch (*pDL->pzExpr) {
         case ';':
         case '(':
@@ -412,7 +427,14 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             /*
              *  Process the quoted strings now
              */
-            spanQuote( pDL->pzExpr );
+            spanTemplate( pDL->pzExpr, pDL );
+
+            /*
+             *  IF this is an anonymous template reference,
+             *  THEN we must leave it as an expression!!
+             */
+            if (*pDL->pzExpr == '[')
+                break;
             /* FALLTHROUGH */
 
         default:
@@ -478,6 +500,330 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 }
 
 
+    STATIC void
+prepInvokeArgs( tMacro* pMac )
+{
+    char*  pzText;
+    tTemplate* pT = pCurTemplate;
+
+    if (pMac->ozText == 0)
+        LOAD_ABORT( pT, pMac, "The INVOKE macro requires a name" );
+    pMac->ozName = pMac->ozText;
+    pzText = pT->pzTemplText + pMac->ozText;
+    pzText = (char*)skipExpression( pzText, strlen( pzText ));
+    
+    /*
+     *  IF there is no more text,
+     *  THEN there are no arguments
+     */
+    if (*pzText == NUL) {
+        pMac->ozText = 0;
+        pMac->res = 0;
+    }
+    
+    /*
+     *  OTHERWISE, skip to the start of the text and process
+     *  the arguments to the macro
+     */
+    else {
+        if (! isspace( *pzText ))
+            LOAD_ABORT( pT, pMac,
+                        "The INVOKE macro name not space separated" );
+        *pzText = NUL;
+        while (isspace( *++pzText ))  ;
+        pMac->ozText = pzText - pT->pzTemplText;
+        parseMacroArgs( pT, pMac );
+        pCurTemplate = pT;
+    }
+}
+
+
+#ifndef DEFINE_LOAD_FUNCTIONS
+#ifdef DEBUG
+/*=macfunc DEBUG, ifdef DEBUG
+ *
+ *  handler_proc:
+ *  load_proc:
+ *  what:  Provide break point spots
+ *  desc:
+ *      By inserting [+DEBUG n+] into your template, you can set
+ *      a breakpoint on the #n case element below and step through
+ *      the processing of interesting parts of your template.
+=*/
+MAKE_HANDLER_PROC( Debug )
+{
+    static int dummy = 0;
+
+    /*
+     *  The case element values were chosen to thwart any
+     *  optimizer that might be too bright for its own good.
+     */
+    switch (atoi( pT->pzTemplText + pMac->ozText )) {
+    case 0:
+        dummy = 'A'; break;
+    case 1:
+        dummy = 'u'; break;
+    case 2:
+        dummy = 't'; break;
+    case 4:
+        dummy = 'o'; break;
+    case 8:
+        dummy = 'G'; break;
+    case 16:
+        dummy = 'e'; break;
+    case 32:
+        dummy = 'n'; break;
+    case 64:
+        dummy = 'X'; break;
+    case 128:
+        dummy = 'Y'; break;
+    case 256:
+        dummy = 'Z'; break;
+    case 512:
+        dummy = '.'; break;
+    default:
+        dummy++;
+    }
+    return pMac+1;
+}
+#endif
+    STATIC char*
+anonymousTemplate( void* p, tDefEntry* pCurDef )
+{
+    tSCC zTFil[] = "/tmp/.AutoGenTemp";
+
+    tTemplate*  pSavT = pCurTemplate;
+    tMacro*     pCurM = pCurMacro;
+    tTemplate*  pT    = (tTemplate*)p;
+    tFpStack*   pfp;
+    tFpStack*   psav  = pCurFp;
+
+    long fpos;
+    char*  res;
+
+    pfp = (tFpStack*)AGALOC( sizeof( tFpStack ));
+    pfp->pPrev = NULL;
+    pfp->pzName = (char*)zTFil;
+
+    unlink( zTFil );
+    pfp->pFile = fopen( zTFil, "w+" FOPEN_BINARY_FLAG );
+    if (pfp->pFile == (FILE*)NULL) {
+        fprintf( stderr, "Error %d (%s) creating %s for read-write\n",
+                 errno, strerror( errno ), zTFil );
+        LOAD_ABORT( pSavT, pCurM, "Creating temp file" );
+    }
+    unlink( zTFil );
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        fprintf( pfTrace, zTplInvoked, "anonymous", pCurM->sibIndex );
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zFileLine, pSavT->pzFileName,
+                     pCurM->lineNo );
+    }
+
+    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
+
+    while (pCurFp != pfp)
+        ag_scm_out_pop();
+
+    fpos = ftell( pfp->pFile );
+    res = (char*)AGALOC( fpos + 1 );
+    rewind( pfp->pFile );
+    fread( res, 1, fpos, pfp->pFile );
+    fclose( pfp->pFile );
+    pCurFp = psav;
+
+    res[ fpos ] = NUL;
+
+    pCurTemplate = pSavT;
+    pCurMacro    = pCurM;
+    return res;
+}
+
+
+/*=macfunc DEFINE
+ *
+ *  what:    Define a user AutoGen macro
+ *  cindex:  define macro
+ *  handler_proc:
+ *  load_proc:
+ *
+ *  desc:
+ *      This function will define a new macro.  You must provide a
+ *      name for the macro.  You do not specify any arguments,
+ *      though the invocation may specify a set of name/value pairs
+ *      that are to be active during the processing of the macro.
+ *
+ *      @example
+ *      [+ define foo +]
+ *      ... macro body with macro functions ...
+ *      [+ enddef +]
+ *      ... [+ foo bar='raw text' baz=<<text expression>> +]
+ *      @end example
+ *
+ *      Once the macro has been defined, this new macro can be invoked by
+ *      specifying the macro name as the first token after the start
+ *      macro marker.  Any remaining text in the macro invocation will be
+ *      used to create new name/value pairs that only persist for the
+ *      duration of the processing of the macro.  The expressions are
+ *      evaluated the same way simple expressions are evaluated.
+ *      @xref{expression syntax}.
+ *
+ *      The resulting definitions are handled much
+ *      like regular definitions, except:
+ *
+ *      @enumerate
+ *      @item
+ *      The values may not be compound.  That is, they may not contain
+ *      nested name/value pairs.
+ *      @item
+ *      The bindings go away when the macro is complete.
+ *      @item
+ *      The name/value pairs are separated by whitespace instead of
+ *      semi-colons.
+ *      @item
+ *      Sequences of strings are not concatenated.
+ *      @end enumerate
+=*/
+/*=macfunc ENDDEF
+ *
+ *  what:   Ends a macro definition.
+ *  situational:
+ *
+ *  desc:
+ *    This macro ends the @code{DEFINE} function template block.
+ *    For a complete description @xref{DEFINE}.
+=*/
+/*
+ *  mFunc_Define
+ *
+ *  This routine runs the invocation.
+ */
+MAKE_HANDLER_PROC( Define )
+{
+    tDefList*   pList  = (tDefList*)pMac->res;
+    int         defCt  = pMac->sibIndex;
+    SCM         res;
+    tDefEntry*  pDefs;
+    tTemplate*  pOldTpl = pCurTemplate;
+
+    pT = (tTemplate*)pMac->funcPrivate;
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        fprintf( pfTrace, zTplInvoked, pT->pzTplName, defCt );
+        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                     pMac->lineNo );
+    }
+
+    /*
+     *  IF we have no special definitions, then do not nest definitions
+     */
+    if (defCt == 0)
+        pDefs = pCurDef;
+    else {
+        pDefs = &(pList->de);
+        pList->de.pDad = pCurDef;
+
+        /*
+         *  FOR each definition, evaluate the associated expression
+         *      and set the text value to it.
+         */
+        do  {
+            if (pList->pzExpr == (char*)NULL)
+                continue;
+
+        retryExpression:
+            switch (*(pList->pzExpr)) {
+            case ';':
+            {
+                char* pz = strchr( pList->pzExpr, '\n' );
+                if (pz != (char*)NULL) {
+                    while (isspace( *++pz ))  ;
+                    pList->pzExpr = pz;
+                    goto retryExpression;
+                }
+                /* FALLTHROUGH */
+            }
+            case NUL:
+                pList->pzExpr = (char*)NULL;
+                pList->de.pzValue = "";
+                break;
+
+            case '[':
+                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                    fprintf( pfTrace, "anonymus template arg %d\n",
+                             pMac->sibIndex - defCt );
+
+                pList->de.pzValue =
+                    anonymousTemplate(
+                        (void*)strtoul( pList->pzExpr + 2, (char**)NULL, 0 ),
+                        pCurDef );
+                break;
+
+            case '(':
+                /*
+                 *  It is a scheme expression.  Accept only string
+                 *  and number results.
+                 */
+                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
+                    fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
+                             pMac->sibIndex - defCt, pList->pzExpr );
+                }
+                res = scm_internal_stack_catch(
+                    SCM_BOOL_T,
+                    (scm_catch_body_t)gh_eval_str,
+                    (void*)pList->pzExpr,
+                    ag_eval_handler,
+                    (void*)pList->pzExpr );
+
+                if (gh_string_p( res )) {
+                    pList->de.pzValue = strdup( SCM_CHARS( res ));
+                }
+                else if (gh_number_p( res )) {
+                    pList->de.pzValue = (char*)AGALOC( 16 );
+                    sprintf( pList->de.pzValue, "%ld", gh_scm2long( res ));
+                }
+                else
+                    pList->de.pzValue = strdup( "" );
+                break;
+
+            case '`':
+                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
+                    fprintf( pfTrace, "shell eval for arg %d:\n\t`%s'\n",
+                             pMac->sibIndex - defCt, pList->pzExpr+1 );
+                }
+                pList->de.pzValue = runShell( pList->pzExpr+1 );
+                break;
+            }
+        } while (pList++, --defCt > 0);
+    }
+
+    pCurTemplate = pT;
+    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pDefs );
+    pCurTemplate = pOldTpl;
+
+    if ((defCt = pMac->sibIndex) > 0) {
+        pList = (tDefList*)pMac->res;
+        while (defCt-- > 0) {
+            if (pList->pzExpr != (char*)NULL) {
+                AGFREE( (void*)pList->de.pzValue );
+                pList->de.pzValue = (char*)NULL;
+            }
+            pList++;
+        }
+    }
+
+    /*
+     *  The DEFINE function changes the global definition context.
+     *  Restore it to the one passed in.
+     */
+    pDefContext  = pCurDef;
+
+    return pMac+1;
+}
+
+
 /*=macfunc INVOKE
  *
  *  handler_proc:
@@ -498,6 +844,10 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
  *  The text following the macro name must consist of a series of
  *  names each of which is followed by an equal sign (@code{=}) and
  *  a @i{simple expression} that yields a string.
+ *
+ *  The string values may contain template macros that are parsed
+ *  the first time the macro is processed and evaluated again every
+ *  time the macro is evaluated.
 =*/
 MAKE_HANDLER_PROC( Invoke )
 {
@@ -510,34 +860,7 @@ MAKE_HANDLER_PROC( Invoke )
      *  THEN separate the name from the rest of the arguments.
      */
     if (pMac->ozName == 0) {
-        if (pMac->ozText == 0)
-            LOAD_ABORT( pT, pMac, "The INVOKE macro requires a name" );
-        pMac->ozName = pMac->ozText;
-        pzText = pT->pzTemplText + pMac->ozText;
-        pzText = (char*)skipExpression( pzText, strlen( pzText ));
-
-        /*
-         *  IF there is no more text,
-         *  THEN there are no arguments
-         */
-        if (*pzText == NUL) {
-            pMac->ozText = 0;
-            pMac->res = 0;
-        }
-
-        /*
-         *  OTHERWISE, skip to the start of the text and process
-         *  the arguments to the macro
-         */
-        else {
-            if (! isspace( *pzText ))
-                LOAD_ABORT( pT, pMac,
-                            "The INVOKE macro name not space separated" );
-            *pzText = NUL;
-            while (isspace( *++pzText ))  ;
-            pMac->ozText = pzText - pT->pzTemplText;
-            parseMacroArgs( pT, pMac );
-        }
+        prepInvokeArgs( pMac );
 
         /*
          *  IF the name is constant and not an expression,
@@ -781,6 +1104,8 @@ MAKE_LOAD_PROC( Define )
     *(pzCopy++) = NUL;
     pNewT->pzTemplText = pzCopy;
     pNewT->pNext = pzCopy+1;
+    strcpy( pNewT->zStartMac, pT->zStartMac );
+    strcpy( pNewT->zEndMac, pT->zEndMac );
 
     {
         tMacro* pMacEnd = parseTemplate( pNewT, pNewT->aMacros, ppzScan );

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: tpParse.c,v 1.2 1999/11/07 04:13:25 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -60,6 +60,8 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
             /*
              *  For strings that start with a punctuation, we
              *  do not need to test for the end of token
+             *  We will not strip off the marker and the load function
+             *  will figure out what to do with the code.
              */
             if (cmp == 0)
                 return pNT->fType;
@@ -121,10 +123,113 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 }
 
 
-    tMacro*
-parseTemplate( tTemplate* pT, tMacro* pM, const char** ppzText )
+    tCC*
+skipMacro( tCC* pzStartMark )
 {
-    const char* pzScan = *ppzText;
+    tCC* pzEndMark;
+    int  depth;
+
+    depth = 1;
+    pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
+    pzEndMark   = strstr( pzStartMark + startMacLen, zEndMac );
+
+    /*
+     *  Starting state:
+     *  pzStartMark  points to start macro mark for the macro we must skip
+     */
+    for (;;) {
+        tCC zBadNest[] = "Improperly nested macro invocations";
+
+        /*
+         *  FOR as long as we hunt, we must find an end marker
+         */
+        if (pzEndMark == (char*)NULL)
+            LOAD_ABORT( pCurTemplate, pCurMacro, zBadNest );
+
+        /*
+         *  IF the next start marker is past the end marker,
+         *  THEN advance past the end marker.
+         */
+        if (  (pzStartMark == (char*)NULL)
+           || (pzStartMark > pzEndMark)) {
+            if (--depth == 0)
+                break;
+
+            pzEndMark = strstr( pzEndMark + endMacLen, zEndMac );
+
+        /*
+         *  Otherwise, we found another start marker before the end marker.
+         *  Increase our depth and look for the next start marker.
+         */
+        } else {
+            depth++;
+            pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
+        }
+    }
+    return pzEndMark;
+}
+
+
+    STATIC tCC*
+findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
+{
+    tCC* pzMark = *ppzMark + startMacLen;
+    tCC* pzNextMark;
+    tCC* pzEndMark;
+    int  depth;
+    tSCC zOop[] = "Error:  a %s macro contains a nested macro\n";
+    char zOops[ 1024 ];
+
+    /*
+     *  Set our pointers to the start of the macro text
+     */
+    while (isspace( *pzMark )) {
+        if (*(pzMark++) == '\n')
+            templLineNo++;
+    }
+
+    pM->funcCode = whichFunc( pT, pM, &pzMark );
+    pM->lineNo   = templLineNo;
+    *ppzMark     = pzMark;
+
+    for (;;) {
+        pzEndMark = strstr( pzMark, zEndMac );
+        if (pzEndMark == (char*)NULL)
+            LOAD_ABORT( pT, pM, "macro has no end" );
+
+        pzNextMark = strstr( pzMark, zStartMac );
+        if ((pzNextMark == (tCC*)NULL) || (pzNextMark > pzEndMark))
+            return pzEndMark;
+
+        switch (pM->funcCode) {
+        case FTYP_UNKNOWN:
+            /*
+             *  By virtue of containing nested macros,
+             *  this macro, perforce, must be an INVOKE macro.
+             */
+            pM->funcCode = FTYP_INVOKE;
+            /* FALLTHROUGH */
+        case FTYP_INVOKE:
+            break;
+
+        default:
+            sprintf( zOops, zOop, apzFuncNames[ pM->funcCode ]);
+            LOAD_ABORT( pT, pM, zOops );
+        }
+
+        /*
+         *  Skip past the macro we found at the start marker
+         *  then go back and try to find the end again.
+         */
+        pzMark = skipMacro( pzNextMark ) + endMacLen;
+    }
+}
+
+
+    tMacro*
+parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
+{
+    tCC* pzScan = *ppzText;
 
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
     tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
@@ -190,23 +295,9 @@ parseTemplate( tTemplate* pT, tMacro* pM, const char** ppzText )
             break;
 
         /*
-         *  Set our pointers to the start of the macro text
+         *  Find the macro code and the end of the macro invocation
          */
-        pzMark += startMacLen;
-        while (isspace( *pzMark )) {
-            if (*(pzMark++) == '\n')
-                templLineNo++;
-        }
-
-        pM->funcCode = whichFunc( pT, pM, &pzMark );
-        pM->lineNo   = templLineNo;
-
-        /*
-         *  Find the end of the macro invocation
-         */
-        pzScan = strstr( pzMark, zEndMac );
-        if (pzScan == (char*)NULL)
-            LOAD_ABORT( pT, pM, "macro has no end" );
+        pzScan = findMacroEnd( pT, pM, &pzMark );
 
         /*
          *  Count the lines in the macro text and advance the

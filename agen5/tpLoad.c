@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: tpLoad.c,v 1.2 1999/11/07 04:13:25 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -34,7 +34,8 @@
 
 static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
-tTemplate* findTemplate( const char* pzTemplName )
+    tTemplate*
+findTemplate( const char* pzTemplName )
 {
     tTemplate* pT = pNamedTplList;
     while (pT != (tTemplate*)NULL) {
@@ -749,7 +750,7 @@ loadTemplate( const char* pzFileName )
                    + dataSize - (pzData - (const char*)pDataMap)
                    + strlen( zRealFile ) + 0x10;
         alocSize &= ~0x0F;
-        pRes = AGALOC( alocSize );
+        pRes = (tTemplate*)AGALOC( alocSize );
         memset( (void*)pRes, 0, alocSize );
 
         /*
@@ -759,7 +760,8 @@ loadTemplate( const char* pzFileName )
         pRes->descSize  = alocSize;
         pRes->macroCt   = macroCt;
         pRes->fd        = -1;
-
+        strcpy( pRes->zStartMac, zStartMac );
+        strcpy( pRes->zEndMac, zEndMac );
         loadMacros( pRes, zRealFile, (char*)NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize );
 

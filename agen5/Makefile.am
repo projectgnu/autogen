@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.10 1999/11/07 01:12:35 bruce Exp $
+## $Id: Makefile.am,v 1.11 1999/11/07 04:16:21 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -28,10 +28,10 @@ OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-GEN_SRC = opts.c opts.h directive.h functions.h expr.def expr.ini \
+GEN_SRC = opts.c opts.h directive.h functions.h expr.ini \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
-EXTRA_DIST	= directive.tpl expr.def functions.tpl opts.def snarf.tpl \
+EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
 		$(GEN_SRC) bootstrap.dir
 
 bin_PROGRAMS	= AutoGen
