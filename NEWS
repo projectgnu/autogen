@@ -3,6 +3,7 @@ AutoGen:
 * fixed tpl-file-line so that "%2$d" works for the format.
 * Added (emit) function that directly emits its args into output
 * keyword lists are columnized in usage text
+* distributed subdirectories no longer depend on also being built.
 
 AutoOpts:
 * main() procedures can be specified more consistently
