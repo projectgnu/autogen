@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.3 1998/10/02 17:13:42 bkorb Exp $
+ *  $Id: makeshell.c,v 2.4 1998/10/02 17:19:16 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -73,7 +73,7 @@ static const char zUsageFunc[] =
 
 static const char zOptTrail[] =
             "    * )\n"
-            "        echo Unknown %s: $1 >&2\n"
+            "        echo Unknown %s: \"$1\" >&2\n"
             "        USAGE 1\n"
             "    esac\n}\n";
 
@@ -444,7 +444,7 @@ emitFlag( tOptions* pOpts )
     int       optionCt = pOpts->optCt;
 
     fputs( "\ndecipher_flag_opt()\n{\n"
-           "    case $1 in\n", stdout );
+           "    case \"$1\" in\n", stdout );
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
 
