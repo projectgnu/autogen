@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 1999/10/31 16:22:15 bruce Exp $
+## $Id: Makefile.am,v 1.2 1999/10/31 16:27:36 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = subblock.test
@@ -24,5 +24,10 @@ testsubdir = ./testdir
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
+
+check : perm-stamp
+
+perm-stamp :
+	cd $(srcdir) ; chmod +x *.test
 
 # Makefile.am ends here
