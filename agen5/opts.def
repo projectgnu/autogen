@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.5 1999/10/30 18:14:14 bruce Exp $
+ *   $Id: opts.def,v 1.6 1999/10/30 18:20:21 bruce Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ flag = {
     "@code{CASE} and @code{WHILE}.\n"
     "@item\nDisplays the results of expression evaluations\n"
     "@item\n"
-    "Displays the invocation of every AutoGen macro, even @code{TEXT}macros."
+    "Displays the invocation of every AutoGen macro, even @code{TEXT}macros.\n"
     "@end enumerate";
 
     flag_code =
