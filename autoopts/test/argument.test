@@ -1,7 +1,9 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# argument.test --- test argument program attribute
+# argument.test ---  test argument program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
 #
 # Author:            Bruce Korb <autogen@linuxbox.com>
 # Maintainer:        Bruce Korb <autogen@linuxbox.com>
@@ -9,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: argument.test,v 1.1 2000/03/12 00:46:17 bruce Exp $
+# $Id: argument.test,v 1.2 2000/03/12 00:57:12 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -53,7 +55,8 @@ cmp -s $testname.h*lp || \
 ./$testname mumble 2> /dev/null && \
   failure $testname should not accept non-options
 
-./$testname -o -s > /dev/null
+./$testname -o -s > /dev/null || \
+  failure $testname did not handle its options
 
 cleanup
 # end of argument.test
