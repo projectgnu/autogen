@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:     $Date: 1999/11/07 04:15:20 $
+# Last Modified:     $Date: 2000/03/11 20:40:52 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: opts.test,v 1.4 1999/11/07 04:15:20 bruce Exp $
+# $Id: opts.test,v 1.5 2000/03/11 20:40:52 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -20,25 +20,36 @@ if test -z "$srcdir"; then
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
+
+#  Fetch the options files
+#
 workdir=`pwd`
-rm -f VERSION || :
-agopts=`cd .. ; cd $srcdir/.. ; cp opts.[chd]* $workdir > /dev/null 2>&1
-        cp -f ../VERSION $workdir/.. ; cd ../autoopts ; pwd`
+rm -f ../VERSION || :
+agopts=`
+  cd ..
+  cd $srcdir/..
+  sed '1,7d' opts.c > $workdir/opts.c.base
+  sed '1,7d' opts.h > $workdir/opts.h.base
+  cp opts.def $workdir/
+  cp -f ../VERSION $workdir/..
+  cd ../autoopts
+  pwd`
+
+set -x
+ls -l * ../VERSION > $testname.log
 
 if grep 'define DEBUG' opts.h > /dev/null 2>&1
 then
-  agopts="-L $agopts -DDEBUG=1"
+  AGEN="$AGEN -L $agopts"
 else
-  agopts="-L $agopts"
+  AGEN="$AGEN -L $agopts -DDEBUG=1"
 fi
 
-sed '1,7d' opts.c > opts.c.base
-sed '1,7d' opts.h > opts.h.base
-rm -f opts.[ch]
-
-echo $AGEN $agopts opts.def
-$AGEN $agopts opts.def || \
+echo $AGEN opts.def
+$AGEN opts.def || {
+  rm -f ../VERSION
   failure $AGEN $agopts opts.def
+}
 
 rm -f ../VERSION
 
