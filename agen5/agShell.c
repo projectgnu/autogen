@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.11 2001/06/06 04:19:57 uid24370 Exp $
+ *  $Id: agShell.c,v 1.12 2001/06/28 02:09:37 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -120,8 +120,10 @@ serverSetup( void )
     errClose = AG_FALSE;
 
     {
-        tSCC zTrap[] = "for f in 1 2 5 6 7 13 14\n"
-                       "do trap \"echo trapped on $f >&2\" $f ; done";
+        tSCC zTrap[] =
+            "for f in 1 2 5 6 7 13 14\n"
+            "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
+            "done";
         char* pz;
         pzLastCmd = zTrap;
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );

@@ -1,3 +1,12 @@
+2001-06-24  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.tpl(columns): add an environment variable saying
+	which columns program to use.
+	* autoopts/optmain.tpl: use it
+	* autoopts/optlib.tpl: ditto
+	* autoopts/test/Makefile.am: add it to the test environment.
+	* VERSION: fix the broken AO_AGE variable.  Bump the package rev 5.2.6
+
 2001-06-23  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/auto_gen.tpl: use (extract ...) to reduce bulk

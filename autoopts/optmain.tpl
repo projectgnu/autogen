@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.12 2001/05/09 05:25:59 bkorb Exp $
+# $Id: optmain.tpl,v 2.13 2001/06/28 02:09:37 bkorb Exp $
 
 =]
 [=
@@ -265,7 +265,8 @@ DEFINE define-option-callbacks  =][=
 =]    tSCC* az_names[] = {[=
       IF (not (exist? "arg_default")) =] zDef,[=
       ENDIF  =]
-[=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+[=(shellf
+  "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
 [=

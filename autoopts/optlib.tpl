@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.27 2001/05/22 01:56:53 bkorb Exp $
+# $Id: optlib.tpl,v 1.28 2001/06/28 02:09:37 bkorb Exp $
 
 =]
 [=
@@ -105,7 +105,7 @@ typedef enum {[=
             (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
          ENDIF  =]
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
-          columns -I4 --spread=3 --sep=','"
+          ${COLUMNS_EXE} -I4 --spread=3 --sep=','"
           (string-upcase! (string->c-name! (join " " (stack "keyword"))))
           (string-append UP-prefix UP-name) )=]
 } te_[=(string-append Cap-prefix cap-name)=];[=

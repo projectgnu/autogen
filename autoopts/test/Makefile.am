@@ -8,7 +8,7 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.15 2001/06/24 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 1.16 2001/06/28 02:09:37 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test errors.test guile.test handler.test keyword.test \
@@ -23,7 +23,7 @@ testsubdir = ./testdir
 TESTS_ENVIRONMENT = CC="$(CC)" CFLAGS='@CFLAGS@' \
 	PATH="$$PATH:`cd $(top_builddir)/columns ; pwd`" \
 	AGEN="`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@" \
-	COLUMNS="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
+	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
 	LIB="`cd $(top_builddir)/autoopts/.libs/; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
 	INC="-I`cd $(top_builddir)/autoopts; pwd` $(GUILE_INC)" \
