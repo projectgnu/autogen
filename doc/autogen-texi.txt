@@ -2337,6 +2337,10 @@ Specifies the program version and activates the VERSION option,
 @subsection Generated main Procedures
 @cindex generated main
 
+@strong{The following is deprecated.  Users are encouraged to use
+the @i{main} description for specifying the type and content of a generated
+main procedure.}
+
 AutoOpts can generate the main procedure in certain circumstances.
 It will do this to help with integrating with the guile library environment,
 and for creating a program to convert command line options into environment

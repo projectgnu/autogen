@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.27 2004/03/19 19:01:29 bkorb Exp $
+#$Id: optcode.tpl,v 3.28 2004/03/19 19:29:20 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -344,9 +344,9 @@ tSCC   zExplain[]     = [=
  (if (== (get "main.main-type") "for-each")
    (set! tmp-text (string-append tmp-text
 
-   "\n\"If no arguments are provided, input arguments are read from stdin,\\n\"
-\"one per line, blank and '#'-prefixed lines are comments.\\n\"
-\"'stdin' may not be a terminal (tty).\\n\"" ))  )
+"\n\"If no arguments are provided, input arguments are read from stdin,\\n\\
+one per line; blank and '#'-prefixed lines are comments.\\n\\
+'stdin' may not be a terminal (tty).\\n\"" ))  )
 
  tmp-text =];[=
 
@@ -509,7 +509,8 @@ translate_option_strings( void )
 
     {
         tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
-        int       ix  = [=(. pname)=]Options.optCt
+        int       ix  = [=(. pname)=]Options.optCt;
+
         for (;;) {[=
 
   FOR field IN pzText pz_NAME pz_Name pz_DisableName pz_DisablePfx  =][=

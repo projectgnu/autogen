@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/01/15 05:04:25 $
+# Last Modified:     $Date: 2004/03/19 19:29:20 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.5 2004/01/15 05:04:25 bkorb Exp $
+# $Id: handler.test,v 3.6 2004/03/19 19:29:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -206,14 +206,18 @@ AO_gettext( const char* pz )
     return pzRes;
 }
 
+/*
+ *  This invokes the translation code (e.g. gettext(3)).
+ */
 static void
 translate_option_strings( void )
 {
     /*
-     *  This invokes the translation code (e.g. gettext(3)).
+     *  Guard against re-translation.  It won't work.  The strings will have
+     *  been changed by the first pass through this code.  One shot only.
      */
-    int ix;
-    tOptDesc* pOD = handlerOptions.pOptDesc;
+    if (option_usage_text.field_ct == 0)
+        return;
 
     /*
      *  Do the translations.  This code gets compiled into the client programs.
@@ -221,28 +225,29 @@ translate_option_strings( void )
      */
     {
         char** ppz = (char**)(void*)&(option_usage_text);
-
-        ix = option_usage_text.field_ct;
-        if (ix == 0)
-            return;
+        int    ix  = option_usage_text.field_ct;
 
         do {
             ppz++;
             *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
     }
-    /*
-     *  Guard against re-translation.  It won't work.  The strings will have
-     *  been changed by the first pass through this code.  One shot only.
-     */
     option_usage_text.field_ct = 0;
 
-    for (ix = handlerOptions.optCt; --ix >= 0; pOD++)  {
-        pOD->pzText           = AO_gettext(pOD->pzText);
-        pOD->pz_NAME          = AO_gettext(pOD->pz_NAME);
-        pOD->pz_Name          = AO_gettext(pOD->pz_Name);
-        pOD->pz_DisableName   = AO_gettext(pOD->pz_DisableName);
-        pOD->pz_DisablePfx    = AO_gettext(pOD->pz_DisablePfx);
+    {
+        tOptDesc* pOD = handlerOptions.pOptDesc;
+        int       ix  = handlerOptions.optCt;
+
+        for (;;) {
+            pOD->pzText           = AO_gettext(pOD->pzText);
+            pOD->pz_NAME          = AO_gettext(pOD->pz_NAME);
+            pOD->pz_Name          = AO_gettext(pOD->pz_Name);
+            pOD->pz_DisableName   = AO_gettext(pOD->pz_DisableName);
+            pOD->pz_DisablePfx    = AO_gettext(pOD->pz_DisablePfx);
+            if (--ix <= 0)
+                break;
+            pOD++;
+        }
     }
     handlerOptions.pzCopyright   = AO_gettext(handlerOptions.pzCopyright);
     handlerOptions.pzCopyNotice  = AO_gettext(handlerOptions.pzCopyNotice);
