@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
- * Last Modified:     Thu May  6 18:21:59 1999
- *            by:     Bruce Korb <korb@datadesign.com>
+ * Last Modified:     Fri Jul 30 12:34:46 1999
+ *            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>
  *
- * $Id: compat.h,v 2.4 1999/06/03 19:43:28 bkorb Exp $
+ * $Id: compat.h,v 2.5 1999/07/30 14:48:46 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -221,6 +221,7 @@
 
 
 /* variable argument parsing - use VA_START(ap, last) in source files */
+# undef VA_START
 # ifdef HAVE_VARARGS_H
 #   include <varargs.h>
 #   define VA_START(ap, last)	va_start(ap)

@@ -1,3 +1,39 @@
+1999-07-30  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* TODO: Added a Known Bugs section.
+	...and a bug description.
+
+	* compat/compat.h: Be careful about redefining VA_START.
+
+	* config/bootstrap.local:  Fix test for which vs. whence.
+	Reinstate the `@setfilename fnord' hack to prevent:
+	  automake --gnu --add-missing
+          automake: doc/Makefile.am: `autogen.texi' missing @setfilename
+	Make sure we are in the config subdir before `autogen misc.def'.
+	* src/bootstrap.dir:  Fix test for which vs. whence.
+
+	* configure.in:  Reapply patch to pass
+	--enable-snprintfv-convenience to snprintfv subconfigure.
+	
+	* configure.in (AC_CHECK_HEADERS): prefer stdarg.h over varargs.h:
+	Reapply this patch too.
+
+	* src/Makefile.am (autogen_LDADD): Reapply: don't link with
+	libsnprintfv.la anymore; libopts.la now contains it's objects.
+
+	* snprintfv/snprintfv.texi: Reinsert details of the new API entry
+	points.
+
+	* src/Makefile.am (../getdefs/getdefs): Reapply this patch:
+	`$(MAKE) getdefs' is extremely unlikely to match the correct rule
+	since it ignores $(srcdir) etc, so we just use $(MAKE) which will
+	continue to work for future versions of automake.
+	(../columns/columns): ditto.
+
+	* configure.in (AG_CHECK_LIB_REGEX): s/POSIX_REGCOMP/LIB_REGEX/g,
+	AC_CHECK_LIB_REGEX is a superset of the other, and is the only one
+	which provides the configure script cli options. Reapplied.
+	
 1999-07-29  Bruce Korb <autogen@linuxbox.com>
 
 	* config/bootstrap.local: Add checks for working AutoGen.

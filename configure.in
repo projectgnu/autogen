@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Wed Jul  7 10:48:57 1999				      
-dnl            by:    Bruce Korb <korb@datadesign.com>			      
+dnl Last Modified:    Fri Jul 30 12:48:07 1999				      
+dnl            by:    Gary V. Vaughan <gary@oranda.demon.co.uk>		      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.17 1999/07/12 18:45:11 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.18 1999/07/30 14:48:46 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.17 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.18 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -40,10 +40,7 @@ AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,[Define this to the autoopts revisio
 # Set up the environment to configure the snprintv subpackage using
 # this version of AutoGen (as opposed to any installed version).
 # ----------------------------------------------------------------------
-dnl until libtool-1.4 is released to handle interlibrary dependencies
-dnl with respect to uninstalled libraries we need to build snprintfv
-dnl static only:
-ac_configure_args="$ac_configure_args --disable-shared"
+ac_configure_args="$ac_configure_args --enable-snprintfv-convenience"
 ag_srcdir=`\cd $srcdir && pwd`
 if test x$ag_srcdir != x && test -d $ag_srcdir; then
   :
@@ -77,7 +74,7 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # ----------------------------------------------------------------------
 # Set up and process configure options
 # ----------------------------------------------------------------------
-AG_CHECK_POSIX_REGCOMP
+AG_CHECK_LIB_REGEX
 
 AC_MSG_CHECKING([whether runtime debugging is wanted])
 ag_cv_debug=no
@@ -105,9 +102,9 @@ AC_HEADER_DIRENT
 AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h)
 AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
 
-# If varargs.h is present define HAVE_VARARGS_H, otherwise if stdarg.h
-# is present define HAVE_STDARG_H.
-AC_CHECK_HEADERS(varargs.h stdarg.h, break)
+# If stdarg.h is present define HAVE_STDARG_H, otherwise if varargs.h
+# is present define HAVE_VARARGS_H.
+AC_CHECK_HEADERS(stdarg.h varargs.h, break)
 
 # Similarly for the string.h and strings.h headers
 AC_CHECK_HEADERS(string.h strings.h, break)

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Thu Jul 29 13:36:30 1999				      
-#            by:     Bruce Korb <korb@datadesign.com>			      
+# Last Modified:     Fri Jul 30 13:30:45 1999				      
+#            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>		      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.9 1999/07/29 20:36:45 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.10 1999/07/30 14:48:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -19,16 +19,16 @@ pre )
 
     ( autogen --version && \
       columns --version && \
-      getdefs --version ) > /dev/null 2>&2 || \
+      getdefs --version ) > /dev/null 2>&1 || \
         missing autogen ftp://autogen.linuxbox.com/pub/autogen-4.5.5.tar.gz
 
-    autogen misc.def
+    ( cd ${srcdir}/config; autogen misc.def; )
 
-    if [ ! -f ${srcdir}/doc/autogen.texi ]
-    then touch 0101000070 ${srcdir}/doc/autogen.texi ; fi
+    test -f doc/autogen.texi \
+        || echo '@setfilename fnord' > doc/autogen.texi
 
-    if ( type whence | egrep 'not found' ) > /dev/null 2>&1
-    then whence=whence ; else whence=which ; fi
+    if type whence 2>&1 | grep 'not found' > /dev/null
+    then whence=which ; else whence=whence ; fi
 
     f=`$whence byacc 2>/dev/null`
     if [ -z "$f" ]
@@ -47,11 +47,13 @@ pre )
 
     if ( echo $@ | egrep -i debug ) >/dev/null 2>&1
     then DEBUG_OPTS="-DDEBUG=1" ; export DEBUG_OPTS ; fi
+
     ;;
 
 post )
-    if [ ! -s ${srcdir}/doc/autogen.texi ]
-    then rm -f ${srcdir}/doc/autogen.texi ; fi
+    # remove the fake file so we don't forget to generate it later.
+    test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
+        || rm -f doc/autogen.texi
     ;;
 
 esac
