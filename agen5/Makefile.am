@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.7 1999/11/04 02:25:05 bruce Exp $
+## $Id: Makefile.am,v 1.8 1999/11/06 18:53:59 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -26,11 +26,8 @@ AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 		  then echo -DDEBUG=1 ; fi`
 
-TPLDIRS	= -L$(top_srcdir)/autoopts -L$(top_srcdir)/agen5 -L$(top_srcdir)/compat
-
 MAINTAINERCLEANFILES = Makefile.in
 
-STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
 GEN_SRC = opts.c opts.h directive.h functions.h expr.def expr.ini \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
@@ -67,39 +64,36 @@ clean :
 ##  They are to be rebuilt on explicit request:  make gen
 ##
 stamp-opts: opts.def $(top_srcdir)/VERSION
-	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	HOME=/dev/null $(AGEXE) $(OPTDBG) -L ../autoopts opts.def
-	@date > $@
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir opts.c
 
 stamp-directive:
-	HOME=/dev/null $(GETDEFS) $(AGARGS) \
-		base-name=directive template=directive defDirect.c
-	@date > $@
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir directive.h
 
 stamp-functions: $(FUNCLIST) functions.tpl
-	HOME=/dev/null $(GETDEFS) $(AGARGS) $(FARGS) defs=macfunc func*.c
-	@date > $@
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir functions.h
 
-expr.def : $(EXPRLIST)
-	@echo $(GETDEFS) assign=group=ag defs=gfunc templ=snarf \
-		out=expr.def srcfile $(EXPRLIST) $(BLOCKOPT)
-	@res=`$(GETDEFS) assign=group=ag defs=gfunc templ=snarf \
-		out=expr.def srcfile $(EXPRLIST) $(BLOCKOPT) 2>&1 ` ; \
-	( echo $$res | egrep -v 'no copies of pattern' ) || :
+stamp-exprini : $(EXPRLIST) snarf.tpl
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir expr.ini
 
-stamp-exprini : expr.def snarf.tpl
-	HOME=/dev/null SHELL=ksh $(AGEXE) expr.def
-	@date > $@
-
-autogen.texi : opts.def AutoGen ../getdefs/getdefs ../columns/columns
-	top_builddir=$(top_builddir) \
-	$(AGEXE) -L ${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter \
-		-bautogen -DDEBUG=1 ./opts.def
+STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
+autogen.texi : $(STAMPS) ../getdefs/getdefs ../columns/columns AutoGen
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir autogen.texi
  
-autogen.1 : opts.def AutoGen
-	$(AGEXE) -L ${top_srcdir}/autoopts -Tagman1 -bautogen ./opts.def
+autogen.1 : opts.def
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir autogen.1
 
-gen : $(STAMPS) defParse.h autogen.texi autogen.1
+defParse.c defParse.h : defParse.y
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	YACC="$(YACC)" DEBUG_OPTS="$(OPTDBG)" \
+	sh ./bootstrap.dir defParse.h
+
+gen : defParse.h autogen.texi autogen.1
 
 ../getdefs/getdefs :
 	cd ../getdefs ; $(MAKE)
