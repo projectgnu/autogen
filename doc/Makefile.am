@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.38 2000/03/12 22:30:33 bruce Exp $
+## $Id: Makefile.am,v 2.39 2000/03/19 23:01:47 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -112,7 +112,7 @@ $(AGSRCDIR)/autogen.texi :
 www/doc/autogen_toc.html : autogen.texi
 	@mkdir -p www/doc > /dev/null 2>&1 || :
 	texi2html -menu -split_chapter -verbose autogen.texi
-	mv -f *.html www/doc
+	mv -f autogen*.html www/doc
 	@touch $@
 
 html : web
