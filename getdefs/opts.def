@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.14 1999/09/29 16:00:21 bkorb Exp $
+ *   $Id: opts.def,v 2.15 1999/11/02 04:18:23 bruce Exp $
  */
 
 /*
@@ -285,10 +285,9 @@ a definition of the following form:
     };
 
 The ellipsis `...' is filled in by text found between the two delimiters,
-with everything up through the first sequence of asterisks deleted
-on every line.  Additionally, if the `<entry-name>' is followed
-by a comma, the word `if' and a name `if_name', then the above entry
-will appear as:
+with everything up through the first sequence of asterisks deleted on every
+line.  Additionally, if the `<entry-name>' is followed by a comma, the word
+`ifdef' or 'ifndef' and a name `if_name', then the above entry will appear as:
 
 @format
     #ifdef if_name
