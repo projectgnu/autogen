@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.4 2000/09/16 06:27:50 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.5 2000/09/16 06:39:42 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -339,10 +339,21 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case FSX_END_MARK_ED_MODE:
         case FSX_INVALID:
-            fsm_invalid_transition( fsm_state, fsm_tkn );
-            fprintf( stderr, zTplErr, pzFileName, templLineNo, "FSM error" );
-            AG_ABEND;
+	{
+	    tCC*  pzWhich;
 
+            fsm_invalid_transition( fsm_state, fsm_tkn );
+	    switch (fsm_state) {
+            case FSS_INIT:     pzWhich = "need start marker";    break;
+            case FSS_ST_MARK:  pzWhich = "need autogen5 marker"; break;
+            case FSS_AGEN:     pzWhich = "need template marker"; break;
+            case FSS_TEMPL:    pzWhich = "need end marker";      break;
+            case FSS_END_MARK: pzWhich = "need end of line";     break;
+            default:           pzWhich = "BROKEN FSM";           break;
+            }
+            fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
+            AG_ABEND;
+	}
         case FSX_END_MARK_END_PSEUDO:
             /* we be done now */;
         }
