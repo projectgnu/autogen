@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.7 1998/10/26 15:33:41 bkorb Exp $
+ *  $Id: getdefs.c,v 2.8 1998/10/26 15:42:16 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -21,6 +21,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <utime.h>
+
+#include <config.h>
 
 #ifndef HAVE_STRSIGNAL
 #  include <compat/strsignal.c>
