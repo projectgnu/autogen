@@ -10,10 +10,10 @@ autogen template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:     Thu Jul  8 07:21:52 1999				      
+## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.4 1999/07/08 14:22:19 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.5 1999/08/03 22:44:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -232,14 +232,14 @@ See the invocation section in the info document.{(
 
    ))}{(
 doc "sed \
- -e's;@code{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
- -e's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
- -e's;@var{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
- -e's/@\\([{}]\\)/\\1/' \
- -e'/@ *example/,/@ *end *example/s/^/    /' \
- -e'/^ *@ *example/d' \
- -e's/^ *@ *end *example/.br/' \
- -e's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_"
+ -e 's;@code{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e 's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
+ -e 's;@var{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e 's/@\\([{}]\\)/\\1/' \
+ -e '/@ *example/,/@ *end *example/s/^/    /' \
+ -e '/^ *@ *example/d' \
+ -e 's/^ *@ *end *example/.br/' \
+ -e 's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_"
     _printf _shell )}{(
 
   _ENDIF documentation _exist ! )}{(
