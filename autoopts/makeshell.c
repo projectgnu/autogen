@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.10 1998/10/08 17:38:23 bkorb Exp $
+ *  $Id: makeshell.c,v 2.11 1998/10/08 23:20:20 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -229,8 +229,25 @@ static const char zSingleArg[] =
 "                exit 1 ; fi\n"
 "            OPT_NAME='%2$s'\n";
 
+static const char zNoMultiArg[] =
+"            %1$s_%2$s_CT=0\n"
+"            OPT_ELEMENT=''\n"
+"            %1$s_%2$s='%3$s'\n"
+"            export %1$s_%2$s\n"
+"            OPT_NAME='%2$s'\n";
+
+static const char zNoSingleArg[] =
+"            if [ -n \"${%1$s_%2$s}\" ] ; then\n"
+"                echo Error:  duplicate %2$s option >&2\n"
+"                echo \"$%s_USAGE_TEXT\"\n"
+"                exit 1 ; fi\n"
+"            %1$s_%2$s='%3$s'\n"
+"            export %1$s_%2$s\n"
+"            OPT_NAME='%2$s'\n";
+
 static const char zMayArg[]  =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
+"            export %1$s_%2$s${OPT_ELEMENT}\n"
 "            OPT_ARG=OK\n";
 
 static const char zMustArg[] =
@@ -238,6 +255,7 @@ static const char zMustArg[] =
 
 static const char zCantArg[] =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
+"            export %1$s_%2$s${OPT_ELEMENT}\n"
 "            OPT_ARG=NO\n";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -600,6 +618,25 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 
 
     STATIC void
+printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
+{
+    if (pOptDesc->pOptProc == doLoadOpt) {
+        printf( zCmdFmt, "echo 'Warning:  Cannot suppress the loading of "
+                "options files' >&2" );
+
+    } else if (pOptDesc->optMaxCt == 1)
+        printf( zNoSingleArg, pOpts->pzPROGNAME,
+                pOptDesc->pz_NAME, pOptDesc->pz_DisablePfx );
+    else
+        printf( zNoMultiArg, pOpts->pzPROGNAME,
+                pOptDesc->pz_NAME, pOptDesc->pz_DisablePfx );
+
+    printf( zCmdFmt, "OPT_ARG=NO" );
+    fputs( zOptionEndSelect, stdout );
+}
+
+
+    STATIC void
 emitFlag( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -696,6 +733,69 @@ emitLong( tOptions* pOpts )
         }
 
         printOptionAction( pOpts, pOptDesc );
+        if (pOptDesc->pz_DisableName == (char*)NULL)
+	    continue;
+
+        pOD = pOpts->pOptDesc;
+        oCt = pOpts->optCt;
+        min = 1;
+        pz = zName;
+
+        for (;;) {
+            matchCt = 0;
+
+            if (  (pOD == pOptDesc)
+               || ((pOD->fOptState & OPTST_DOCUMENT) != 0)  ){
+                if (--oCt <= 0)
+                    break;
+                pOD++;
+                continue;
+            }
+
+            while (  toupper( pOD->pz_Name[matchCt] )
+                  == toupper( pOptDesc->pz_DisableName[matchCt] ))
+                matchCt++;
+            if (matchCt > min)
+                min = matchCt;
+
+            if (pOD->pz_DisableName != (char*)NULL) {
+                matchCt = 0;
+                while (  toupper( pOD->pz_DisableName[matchCt] )
+                      == toupper( pOptDesc->pz_DisableName[matchCt] ))
+                    matchCt++;
+                if (matchCt > min)
+                    min = matchCt;
+            }
+            if (--oCt <= 0)
+                break;
+            pOD++;
+        }
+
+        /*
+         *  IF the 'min' is all or one short of the name length,
+         *  THEN the entire string must be matched.
+         */
+        if (  (pOptDesc->pz_DisableName[min  ] == NUL)
+           || (pOptDesc->pz_DisableName[min+1] == NUL) )
+            printf( zOptionFullName, pOptDesc->pz_DisableName );
+
+        else {
+            for (matchCt = 0; matchCt <= min; matchCt++)
+                *pz++ = pOptDesc->pz_DisableName[matchCt];
+
+            for (;;) {
+                *pz = NUL;
+                printf( zOptionPartName, zName );
+                *pz++ = pOptDesc->pz_DisableName[matchCt++];
+                if (pOptDesc->pz_DisableName[matchCt] == NUL) {
+                    *pz = NUL;
+                    printf( zOptionFullName, zName );
+                    break;
+                }
+            }
+        }
+
+        printOptionInaction( pOpts, pOptDesc );
     }
     printf( zOptionUnknown, "option", pOpts->pzPROGNAME );
 }
