@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.12 1998/10/30 16:49:12 bkorb Exp $
+ *  $Id: makeshell.c,v 2.13 1998/11/04 22:55:19 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -68,32 +68,17 @@ tOptions*  pShellParseOptions = (tOptions*)NULL;
  *
  *  Setup Format Strings
  */
+static const char zStartMarker[] =
+"# # # # # # # # # # -- do not modify this marker --\n#\n"
+"#  DO NOT EDIT THIS SECTION";
 
 static const char zPreamble[] =
-"#!%s\n#\n"
-"#  DO NOT EDIT THIS SECTION OF %s\n#\n"
-"#  From here to the `-- do not delete this marker --',\n"
+"#!%s\n%s OF %s\n#\n"
+"#  From here to the next `-- do not modify this marker --',\n"
 "#  the text has been generated %s\n";
 
-static const char zLongUsageText[] =
-"#  From the %s option definitions\n"
-"#\n"
-"#  Instead, copy it into the shell script you are maintaining\n"
-"#\n"
-"%s_LONGUSAGE_TEXT=`cat <<'__LONGUSAGE__EOF__'\n";
-
-static const char zShortUsageText[] =
-"__LONGUSAGE__EOF__\n`\n\n"
-"%s_USAGE_TEXT=`cat <<'__USAGE__EOF__'\n";
-
-static const char zEndUsageText[] =
-"__USAGE__EOF__\n`\n\n";
-
-static const char zVersText[] =
-"%s_VERSION_TEXT=`cat <<'__VERSION_EOF__'\n";
-
-static const char zEndVersionText[] =
-"__VERSION_EOF__\n`\n\n";
+static const char zEndPreamble[] =
+"#  From the %s option definitions\n#\n";
 
 static const char zMultiDef[] = "\n"
 "%1$s_%2$s_CT=0\n"
@@ -178,7 +163,7 @@ static const char zLoopEnd[] =
 static const char zTrailerMarker[] = "\n"
 "# # # # # # # # # #\n#\n"
 "#  END OF AUTOMATED OPTION PROCESSING\n"
-"#\n# # # # # # # # # # -- do not delete this marker --\n";
+"#\n# # # # # # # # # # -- do not modify this marker --\n";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -188,10 +173,10 @@ static const char zOptionCase[] =
 "        case \"${OPT_CODE}\" in\n";
 
 static const char zOptionPartName[] =
-"        %s | \\\n";
+"        '%s' | \\\n";
 
 static const char zOptionFullName[] =
-"        %s )\n";
+"        '%s' )\n";
 
 static const char zOptionFlag[] =
 "        '%c' )\n";
@@ -215,6 +200,10 @@ static const char zOptionUnknown[] =
  */
 static const char zTextExit[] =
 "            echo \"$%s_%s_TEXT\"\n"
+"            exit 0\n";
+
+static const char zPagedUsageExit[] =
+"            echo \"$%s_LONGUSAGE_TEXT\" | ${PAGER-more}\n"
 "            exit 0\n";
 
 static const char zCmdFmt[] =
@@ -292,7 +281,7 @@ static const char zLongOptArg[] =
 "                if [ $# -eq 0 ]\n"
 "                then\n"
 "                    echo No argument provided for ${OPT_NAME} option >&2\n"
-"                    echo \"$%s_USAGE\"\n"
+"                    echo \"$%s_USAGE_TEXT\"\n"
 "                    exit 1\n"
 "                fi\n\n"
 "                OPT_ARG_VAL=\"${OPT_ARG}\"\n"
@@ -340,7 +329,7 @@ static const char zFlagOptArg[] =
 "                if [ $# -eq 0 ]\n"
 "                then\n"
 "                    echo No argument provided for ${OPT_NAME} option >&2\n"
-"                    echo \"$%s_USAGE\"\n"
+"                    echo \"$%s_USAGE_TEXT\"\n"
 "                    exit 1\n"
 "                fi\n"
 "                shift\n"
@@ -367,6 +356,18 @@ static const char zFlagOptArg[] =
 "            fi\n"
 "            ;;\n"
 "        esac\n";
+
+
+#define TEXTTO_TABLE \
+        _TT_( LONGUSAGE ) \
+        _TT_( USAGE ) \
+        _TT_( VERSION )
+#define _TT_(n) \
+        TT_ ## n ,
+
+typedef enum { TEXTTO_TABLE COUNT_TT } teTextTo;
+
+#undef _TT_
 
 extern tOptProc doVersion;
 extern tOptProc doPagedUsage;
@@ -461,12 +462,104 @@ putShellParse( tOptions* pOpts )
     }
 
     printf( zLoopEnd, pOpts->pzPROGNAME, zTrailerMarker );
-    if (pzTrailer != (char*)NULL)
+    if ((pzTrailer != (char*)NULL) && (*pzTrailer != '\0'))
         fputs( pzTrailer, stdout );
+    else
+        printf( "\nenv | egrep %s_\n", pOpts->pzPROGNAME );
 
     fflush( stdout );
     fchmod( STDOUT_FILENO, 0755 );
     fclose( stdout );
+}
+
+
+    void
+textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
+{
+    int  nlHoldCt = 0;
+    int  pipeFd[2];
+    FILE* fp;
+
+#   define _TT_(n) static const char z ## n [] = #n;
+    TEXTTO_TABLE
+#   undef _TT_
+#   define _TT_(n) z ## n ,
+      static const char*  apzTTNames[] = { TEXTTO_TABLE };
+#   undef _TT_
+
+    printf( "%s_%s_TEXT='", pOpts->pzPROGNAME, apzTTNames[ whichVar ]);
+    fflush( stdout );
+
+    if (pipe( pipeFd ) != 0) {
+        fprintf( stderr, "Error %d (%s) from the pipe(2) syscall\n",
+                 errno, strerror( errno ));
+        exit( EXIT_FAILURE );
+    }
+
+    switch (fork()) {
+    case -1:
+        printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
+        exit( EXIT_FAILURE );
+        break;
+
+    case 0:
+        dup2( pipeFd[1], STDERR_FILENO );
+        dup2( pipeFd[1], STDOUT_FILENO );
+        close( pipeFd[0] );
+
+        switch (whichVar) {
+        case TT_LONGUSAGE:
+            (*(pOpts->pUsageProc))( pOpts, EXIT_SUCCESS );
+            /* NOTREACHED */
+            exit( EXIT_FAILURE );
+
+        case TT_USAGE:
+            (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+            /* NOTREACHED */
+            exit( EXIT_FAILURE );
+
+        case TT_VERSION:
+            doVersion( pOpts, pOD );
+            /* NOTREACHED */
+            exit( EXIT_FAILURE );
+        }
+
+    default:
+        close( pipeFd[1] );
+        fp = fdopen( pipeFd[0], "r" );
+    }
+
+    for (;;) {
+        int  ch = fgetc( fp );
+        switch (ch) {
+
+        case '\n':
+            nlHoldCt++;
+            break;
+
+        case '\'':
+            while (nlHoldCt > 0) {
+                fputc( '\n', stdout );
+                nlHoldCt--;
+            }
+            fputs( "'\\''", stdout );
+            break;
+
+        case EOF:
+            goto endCharLoop;
+
+        default:
+            while (nlHoldCt > 0) {
+                fputc( '\n', stdout );
+                nlHoldCt--;
+            }
+            fputc( ch, stdout );
+            break;
+        }
+    } endCharLoop:;
+
+    fputs( "'\n\n", stdout );
+    close( pipeFd[0] );
 }
 
 
@@ -494,7 +587,7 @@ emitUsage( tOptions* pOpts )
              pzOutName = OPT_ARG( SCRIPT );
         else pzOutName = "stdout";
 
-        printf( zPreamble, pzShell, pzOutName, zTimeBuf );
+        printf( zPreamble, pzShell, zStartMarker, pzOutName, zTimeBuf );
 
         /*
          *  Get a copy of the original program name in lower case
@@ -505,47 +598,11 @@ emitUsage( tOptions* pOpts )
             if ((*pzOutName++ = tolower( *pz++ )) == '\0')
                 break;
         }
-        printf( zLongUsageText, zTimeBuf, pOpts->pzPROGNAME );
+        printf( zEndPreamble, zTimeBuf, pOpts->pzPROGNAME );
     }
 
-    fflush( stdout );
-
-    switch (fork()) {
-    case -1:
-        printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
-        break;
-
-    case 0:
-        dup2( STDOUT_FILENO, STDERR_FILENO );
-        (*(pOpts->pUsageProc))( pOpts, EXIT_SUCCESS );
-
-    default:
-    {
-        int  stat;
-        wait( &stat );
-    }
-    }
-
-    printf( zShortUsageText, pOpts->pzPROGNAME );
-    fflush( stdout );
-
-    switch (fork()) {
-    case -1:
-        printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
-        break;
-
-    case 0:
-        dup2( STDOUT_FILENO, STDERR_FILENO );
-        (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
-
-    default:
-    {
-        int  stat;
-        wait( &stat );
-    }
-    }
-
-    fputs( zEndUsageText, stdout );
+    textToVariable( pOpts, TT_LONGUSAGE,  (tOptDesc*)NULL );
+    textToVariable( pOpts, TT_USAGE, (tOptDesc*)NULL );
 
     {
         tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -553,26 +610,7 @@ emitUsage( tOptions* pOpts )
 
         for (;;) {
             if (pOptDesc->pOptProc == doVersion) {
-                printf( zVersText, pOpts->pzPROGNAME );
-                fflush( stdout );
-
-                switch (fork()) {
-                case -1:
-                    printf( "Cannot obtain %s version\n", pOpts->pzProgName );
-                    break;
-
-                case 0:
-                    dup2( STDOUT_FILENO, STDERR_FILENO );
-                    pOptDesc->pzLastArg = "copyright";
-                    doVersion( pOpts, pOptDesc );
-
-                default:
-                {
-                    int  stat;
-                    wait( &stat );
-                }
-                }
-                fputs( zEndVersionText, stdout );
+                textToVariable( pOpts, TT_VERSION, pOptDesc );
                 break;
             }
 
@@ -610,7 +648,7 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
         printf( zTextExit, pOpts->pzPROGNAME, "VERSION" );
 
     else if (pOptDesc->pOptProc == doPagedUsage)
-        printf( zTextExit, pOpts->pzPROGNAME, "LONGUSAGE" );
+        printf( zPagedUsageExit, pOpts->pzPROGNAME );
 
     else if (pOptDesc->pOptProc == doLoadOpt) {
         printf( zCmdFmt, "echo 'Warning:  Cannot load options files' >&2" );
@@ -838,6 +876,87 @@ emitLong( tOptions* pOpts )
 }
 
 
+    char*
+setShell( char** ppzData, char* pzEndMarker )
+{
+    char* pz;
+    char* pzRes;
+    char* pzData = *ppzData;
+
+    /*
+     *  IF the file begins with the magic marker (it ought to),
+     *  THEN we will set the `pzShell' pointer to the first
+     *       non-whitespace character on this line.
+     *       (If it is all white, we will leave `pzShell' alone.)
+     */
+    if (strncmp( pzData, "#!", 2 ) != 0)
+        return pzShell;
+
+    pz = pzData + 2 + strspn( pzData+2, " \t\v\f" );
+    if (*pz == '\n')
+        return pzShell;
+
+    pzRes = pz;
+    /*
+     *  We now have the start of the string that we return
+     *  as the result.  Now, we must determine where to end
+     *  the string.
+     */
+    pz = strstr( pz, zStartMarker );
+
+    /*
+     *  IF we can find our start marker (we ought to),
+     *  THEN we will keep everything up to that.
+     *       This allows users to keep initial comments.
+     *       This should be the normal return point.
+     */
+    if ((pz != (char*)NULL) && (pz < pzEndMarker)) {
+        *pz = NUL;
+        return pzRes;
+    }
+
+    /*
+     *  Go back to the result point and scan over entries on this line.
+     */
+    pz = pzRes;
+    while (! isspace( *++pz ))  ;
+
+    /*
+     *  IF there is something else on the line,
+     *  THEN append it to the 'SHELL' value.
+     *       It is used as the first argument to the script.
+     */
+    if ((*pz == ' ') || (*pz == '\t')) {
+        pz += strspn( pz, " \t\v\f" );
+
+        /*
+         *  IF all we have is white space to the newline,
+         *  THEN go back and take only the shell name.
+         */
+        if (*pz == '\n')
+            pz = pzShell;
+
+        while (! isspace( *++pz ))  ;
+    }
+
+    /*
+     *  IF we did not find our marker,
+     *  THEN the 'rest' output starts on the next line.
+     */
+    if (pzEndMarker == (char*)NULL) {
+        *ppzData = strchr( pz, '\n' );
+        if (*ppzData != (char*)NULL)
+            *ppzData++;
+    }
+
+    /*
+     *  NUL terminate the shell name and argument.
+     */
+    *pz = '\0';
+    return pzRes;
+}
+
+
     STATIC char*
 loadTrailer( const char* pzFile )
 {
@@ -892,54 +1011,8 @@ loadTrailer( const char* pzFile )
          */
         *pzScan = '\0';
         fclose( fp );
-        pzScan = strstr( pzData, zTrailerMarker );
-
-        /*
-         *  IF the file begins with the magic marker (it ought to),
-         *  THEN we will set the `pzShell' pointer to the first
-         *       non-whitespace character on this line.
-         *       (If it is all white, we will leave `pzShell' alone.)
-         */
-        if (strncmp( pzData, "#!", 2 ) == 0) {
-            char* pz = pzData + 2 + strspn( pzData+2, " \t\v\f" );
-            if (! isspace( *pz )) {
-                pzShell = pz;
-                while (! isspace( *++pz ))  ;
-
-                /*
-                 *  IF there is something else on the line,
-                 *  THEN append it to the 'SHELL' value.
-                 *       It is used as the first argument to the script.
-                 */
-                if ((*pz == ' ') || (*pz == '\t')) {
-                    pz += strspn( pz, " \t\v\f" );
-
-                    /*
-                     *  IF all we have is white space to the newline,
-                     *  THEN go back and take only the shell name.
-                     */
-                    if (isspace( *pz ))
-                        pz = pzShell;
-
-                    while (! isspace( *++pz ))  ;
-                }
-
-                /*
-                 *  IF we did not find our marker,
-                 *  THEN the 'rest' output starts on the next line.
-                 */
-                if (pzScan == (char*)NULL) {
-                    pzData = strchr( pz, '\n' );
-                    if (pzData != (char*)NULL)
-                        pzData++;
-                }
-
-                /*
-                 *  NUL terminate the shell name and argument.
-                 */
-                *pz = '\0';
-            }
-        }
+        pzScan  = strstr( pzData, zTrailerMarker );
+        pzShell = setShell( &pzData, pzScan );
 
         /*
          *  Check to see if the data contains
