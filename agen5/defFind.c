@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defFind.c,v 1.2 2000/03/01 04:35:12 bruce Exp $
+ *  $Id: defFind.c,v 1.3 2000/03/02 05:48:52 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -31,7 +31,6 @@
 #include "autogen.h"
 
 tSCC zInvalRef[] = "invalid reference";
-tSCC zPartRef[]  = "incomplete reference";
 
 typedef enum {
     CDF_INITIAL = 0,
@@ -71,13 +70,44 @@ copyDefReference( tTemplate* pT, tMacro* pMac,
         *(pDest++) = ch;
         do  {
             if (maxLen-- <= 0)
-                LOAD_ABORT( pT, pMac, zPartRef );
+                LOAD_ABORT( pT, pMac, zInvalRef );
 
             nextCh = *(pSrc++);
         } while (isspace( nextCh ));
 
-        if (! ISNAMECHAR( nextCh ))
-            LOAD_ABORT( pT, pMac, zInvalRef );
+        if (! ISNAMECHAR( nextCh )) {
+            /*
+             *  Not having a name character here is valid IFF
+             *  we are using the "[$]" subscript syntax
+             */
+            if (ch != '[')
+                LOAD_ABORT( pT, pMac, zInvalRef );
+
+            switch (nextCh) {
+            case '$':
+                *(pDest++) = nextCh;
+
+                /*
+                 *  Skip trailing space
+                 */
+                do  {
+                    if (maxLen-- <= 0)
+                        LOAD_ABORT( pT, pMac, zInvalRef );
+                    ch = *(pSrc++);
+                } while (isspace( ch ));
+                if (ch != ']')
+                    LOAD_ABORT( pT, pMac, zInvalRef );
+                goto closeBracket;
+                /* FALLTHROUGH */
+
+            case ']':
+                ch = nextCh;
+                goto closeBracket;
+
+            default:
+                LOAD_ABORT( pT, pMac, zInvalRef );
+            }
+        }
 
         state = (ch == '.') ? CDF_TOPLEVEL_NAME : CDF_INDEX_NAME;
         ch = nextCh;
@@ -91,11 +121,19 @@ copyDefReference( tTemplate* pT, tMacro* pMac,
         /*
          *  FOR each name character, copy it.
          */
-        do  {
+        if ((ch == '$') && (state == CDF_INDEX_NAME)) {
+            *(pDest++) = ch;
+            if (maxLen-- <= 0)
+                LOAD_ABORT( pT, pMac, zInvalRef );
+            ch = *(pSrc++);
+            if ((! isspace( ch )) && (ch != ']'))
+                LOAD_ABORT( pT, pMac, zInvalRef );
+        }
+        else do  {
             *(pDest++) = ch;
             if (maxLen-- <= 0) {
                 if (state == CDF_INDEX_NAME)
-                    LOAD_ABORT( pT, pMac, zPartRef );
+                    LOAD_ABORT( pT, pMac, zInvalRef );
                 goto leaveCopyDefReference;
             }
             ch = *(pSrc++);
@@ -138,13 +176,44 @@ copyDefReference( tTemplate* pT, tMacro* pMac,
             /*
              *  We *must* have a name at this point.
              */
-            if (! ISNAMECHAR( ch ))
-                LOAD_ABORT( pT, pMac, zInvalRef );
+            if (! ISNAMECHAR( ch )) {
+                /*
+                 *  Not having a name character here is valid IFF
+                 *  we are using the "[$]" subscript syntax
+                 */
+                if (state != CDF_INDEX_NAME)
+                    LOAD_ABORT( pT, pMac, zInvalRef );
+
+                switch (ch) {
+                case '$':
+                    *(pDest++) = ch;
+
+                    /*
+                     *  Skip trailing space
+                     */
+                    do  {
+                        if (maxLen-- <= 0)
+                            LOAD_ABORT( pT, pMac, zInvalRef );
+                        ch = *(pSrc++);
+                    } while (isspace( ch ));
+                    if (ch != ']')
+                        LOAD_ABORT( pT, pMac, zInvalRef );
+                    /* FALLTHROUGH */
+
+                case ']':
+                    goto closeBracket;
+
+                default:
+                    LOAD_ABORT( pT, pMac, zInvalRef );
+                }
+            }
             break;
 
         case ']':
             if (state == CDF_TOPLEVEL_NAME)
                 LOAD_ABORT( pT, pMac, zInvalRef );
+
+        closeBracket:
             *(pDest++) = ch;
 
             /*
