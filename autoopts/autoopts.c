@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.21 2000/09/11 01:03:44 bkorb Exp $
+ *  $Id: autoopts.c,v 2.22 2000/09/11 01:44:18 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,6 +70,7 @@
 
 #include <streqv.h>
 #include "autoopts.h"
+#include "compat/compat.h"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -689,13 +690,13 @@ doPresets( tOptions*  pOpts )
      */
     if (pOpts->papzHomeList != (const char**)NULL) {
         const char** papzHL = pOpts->papzHomeList;
-        const char*  pzPath = *(papzHL++);
+        const char*  pzPath;
 
         /*
          *  For every path in the home list, ...
          */
-        while ( pzPath = *(papzHL++),
-               pzPath != (char*)NULL) {
+        while ( pzPath  = *(papzHL++),
+                pzPath != (char*)NULL) {
             if (! valid_path( zFileName, sizeof( zFileName ),
                               pzPath, pOpts->pzProgPath ))
                 continue;
