@@ -20,7 +20,10 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 2. Add the following to your ``configure.ac'' file:
 
       AUTOOPTS_CHECK
-      AC_OUTPUT( [libopts/Makefile] <...> )
+
+   This macro will automatically invoke
+
+      AC_CONFIG_FILES( [libopts/Makefile] )
 
 3. Add the following to your top level ``Makefile.am'' file:
 
@@ -28,7 +31,9 @@ Usage Instructions for autoconf/automake/libtoolized projects:
       SUBDIRS = <...> $(LIBOPTS_DIR) <...>
 
    where ``<...>'' can be whatever other directories you may
-   need.  They must be properly ordered.
+   need.  They must be properly ordered.  ``AUTOOPTS_CHECK''
+   will ensure that ``$(LIBOPTS_DIR)'' is empty if compiling
+   libopts is not necessary.
 
 4. Add ``$(LIBOPTS_CFLAGS)'' to relevant compiler flags and
    ``$(LIBOPTS_LDADD)'' to relevant link options whereever

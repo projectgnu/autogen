@@ -423,12 +423,13 @@ DEFINE  try-test                =][=
 
   start-feat-test               =]
   AC_CACHE_VAL([[=(. cv-name)=]],[
-    [=(. cv-name)=]=[= (sub-shell-str (get "code")) =] 2> /dev/null
+    [=(. cv-name)=]=[= (sub-shell-str
+      (string-append "exec 2> /dev/null ; " (get "code")) ) =]
     if [ $? -ne 0 ]
     then [=(. cv-name)=]=no
-    else if [ -z "$[=(. cv-name)=]" ]
-         then [=(. cv-name)=]=yes
-    fi ; fi
+    elif [ -z "$[=(. cv-name)=]" ]
+    then [=(. cv-name)=]=no
+    fi
   ]) # end of CACHE_VAL
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results         =][=

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2002-09-10 19:39:08 bkorb"
+## Time-stamp:      "2002-09-14 11:05:16 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.13 2002/09/11 02:57:52 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.14 2002/09/14 18:40:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -29,7 +29,6 @@ mkdir ${tag}/compat
 #
 cd ${top_srcdir}/autoopts
 cp -f autoopts.c     \
-      autoopts.h     \
       boolean.c      \
       enumeration.c  \
       numeric.c      \
@@ -45,7 +44,8 @@ cp -f autoopts.c     \
   ${top_builddir}/pkg/${tag}/.
 
 cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
-
+sed '/broken printf/,/our own/d;/include.*"snprintfv/d' autoopts.h > \
+  ${top_builddir}/pkg/${tag}/autoopts.h
 cd ../compat
 cp *.h pathfind.c ${top_builddir}/pkg/${tag}/compat/.
 #
@@ -55,12 +55,14 @@ cp *.h pathfind.c ${top_builddir}/pkg/${tag}/compat/.
 
 cd ${top_builddir}/pkg/${tag}
 
-ag="${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable"
-( echo "autogen definitions conftest.tpl;"
-  echo "output-file = libopts.m4;"
-  echo "group       = libopts;"
-  cat ${top_srcdir}/config/libopts.def
-) | $ag -DLIBOPTS=1
+${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable <<-	'_EOF_'
+
+	autogen definitions conftest.tpl;
+	output-file = libopts.m4;
+	group       = libopts;
+	#define       LIBOPTS  1
+	#include      libopts.def
+	_EOF_
 
 cat >> libopts.m4 <<-	EOMacro
 
@@ -105,6 +107,7 @@ cat >> libopts.m4 <<-	EOMacro
 	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${build_libopts_dir}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
+	  AC_CONFIG_FILES([libopts/Makefile])
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
 
@@ -127,7 +130,7 @@ cp ${top_srcdir}/pkg/libopts/COPYING* .
 exec 3> Makefile.am
 cat >&3 <<-	EOMakefile
 	## LIBOPTS Makefile
-	EXTRA_DIST            = `echo COPYING*` MakeDefs.inc
+	EXTRA_DIST            = `echo COPYING*` MakeDefs.inc compat
 	MAINTAINERCLEANFILES  = Makefile.in
 	INCLUDES              = @INCLIST@
 	lib_LTLIBRARIES       = libopts.la
@@ -135,7 +138,7 @@ cat >&3 <<-	EOMakefile
 	EOMakefile
 
 ls -1 *.[ch] | \
-  ${top_builddir}/columns/columns -I4 --spread=1 --line='  \' >&3
+  ${top_builddir}/columns/columns -I4 --spread=1 --line-sep='  \' >&3
 
 exec 3>&-
 

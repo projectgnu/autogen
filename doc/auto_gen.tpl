@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.11 2002/09/13 03:08:06 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.12 2002/09/14 18:40:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -222,7 +222,6 @@ FOR gfunc =][=
   ENDIF =][=
 ENDFOR gfunc =]
 * SCM make-header-guard::   @file{make-header-guard} - protect a header file
-* SCM html-escape-encode::  @file{html-escape-encode} - escape special chars
 * SCM autogen-version::     @file{autogen-version} - ``[= version =]''
 @end menu
 
@@ -265,47 +264,60 @@ Generated [= (tpl-file-line) =].
 @end ignore
 
 @node SCM make-header-guard
-@subsection @file{make-header-guard} - protect a header file
+@subsection @file{make-header-guard} - make self-inclusion guard
 @findex make-header-guard
+@findex header-file
+@findex header-guard
 
-Usage:  (make-header-guard prefix)
-@*
 Emit a @code{#ifndef}/@code{#define} sequence based upon the output
 file name and the provided prefix.  It will also define a scheme
 variables named, @code{header-file} and @code{header-guard}.
-These are intended to be used as follows:
+The @code{#define} name is composed as follows:
+
+@enumerate
+@item
+The first element is the string argument and a separating underscore.
+@item
+That is followed by the name of the header file with illegal characters
+mapped to underscores.
+@item
+The end of the name is always, "@code{_GUARD}".
+@item
+Finally, the entire string is mapped to upper case.
+@end enumerate
+
+The final @code{#define} name is stored in an SCM symbol named
+@code{header-guard}.  Consequently, the concluding @code{#endif} for the
+file should read something like:
 
 @example
 #endif /* [+ (. header-guard) +] */
-...
-#include "[+ (. header-file)  +]"
 @end example
 
-@noindent
-Though generally in separate files.
+The name of the header file (the current output file) is also stored in an SCM
+symbol, @code{header-file}.  Therefore, if you are also generating a
+C file that uses the previously generated header file, you can put
+this into that generated file:
+
+@example
+#include "[+ (. header-file) +]"
+@end example
+
+Obviously, if you are going to produce more than one header file from
+a particular template, you will need to be careful how these SCM symbols
+get handled.
 
 Arguments:
 @*
 prefix - first segment of @code{#define} name
 
-@node SCM html-escape-encode
-@subsection @file{html-escape-encode} - escape special chars
-@findex html-escape-encode
-
-Usage:  (html-escape-encode str)
-@*
-Substitute escape sequences for characters that are special to HTML/XML.
-It will replace @code{&}, @code{<} and @code{>} with the strings,
-"@code{&amp;}", "@code{&lt;}", and "@code{&gt;}", respectively.
-
-Arguments:
-@*
-str - string to transform
-
 @node SCM autogen-version
-@subsection @file{autogen-version} - ``[= version =]''
-This is a simple string value that, for this release, contains
-the string, ``[= version =]''.
+@subsection @file{autogen-version} - autogen version number
+@findex autogen-version
+
+This is a symbol defining the current AutoGen version number string.
+It was first defined in AutoGen-5.2.14.
+It is currently ``[= version =]''.
 
 @ignore
 
@@ -331,8 +343,7 @@ FOR gfunc =][=
   =][= (string-append "@file{" func-name "} - " (get "what")) =][=
   ENDIF =][=
 ENDFOR gfunc =]
-* SCM make-header-guard:: @file{make-header-guard} - make self-inclusion guard
-* SCM autogen-version::   @file{autogen-version} - autogen version number
+* SCM html-escape-encode::  @file{html-escape-encode} - escape special chars
 @end menu
 
 [=
@@ -369,6 +380,20 @@ This Scheme function takes no arguments.[=
   ENDIF general_use =][=
 ENDFOR gfunc
 =]
+
+@node SCM html-escape-encode
+@subsection @file{html-escape-encode} - escape special chars
+@findex html-escape-encode
+
+Usage:  (html-escape-encode str)
+@*
+Substitute escape sequences for characters that are special to HTML/XML.
+It will replace @code{&}, @code{<} and @code{>} with the strings,
+"@code{&amp;}", "@code{&lt;}", and "@code{&gt;}", respectively.
+
+Arguments:
+@*
+str - string to transform
 
 [= get-text tag = MACROS =]
 @menu
