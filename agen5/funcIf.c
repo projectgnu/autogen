@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.6 1999/10/31 22:49:12 bruce Exp $
+ *  $Id: funcIf.c,v 1.7 1999/11/02 04:08:00 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -71,17 +71,23 @@ eval_true( void )
  *  alternative.
  *
  *  @example
- *  [#IF [[condition]]#]
- *  emit things that are for the true condition[#
+ *  [+IF <full-expression> +]
+ *  emit things that are for the true condition[+
  *
- *  ELIF [[maybe]] #]
- *  emit things that are true maybe[#
+ *  ELIF <full-expression-2> +]
+ *  emit things that are true maybe[+
  *
- *  ELSE "This may be a comment" #]
- *  emit this if all but else fails[#
+ *  ELSE "This may be a comment" +]
+ *  emit this if all but else fails[+
  *
- *  ENDIF "This may *also* be a comment" #]
+ *  ENDIF "This may *also* be a comment" +]
  *  @end example
+ *
+ *  @noindent
+ *  @code{<full-expression>} may be any expression described in the
+ *  @code{EXPR} expression function, including the use of apply-codes
+ *  and value-names.  If the expression yields an empty string, it
+ *  is interpreted as @i{false}.
 =*/
 /*=macfunc ENDIF
  *
@@ -154,11 +160,17 @@ MAKE_HANDLER_PROC( If )
  *  until a matched @code{ENDWHILE} is emitted.
  *
  *  @example
- *  [#WHILE [[condition]]#]
- *  emit things that are for the true condition[#
+ *  [+WHILE <full-expression> +]
+ *  emit things that are for the true condition[+
  *
- *  ENDWHILE #]
+ *  ENDWHILE +]
  *  @end example
+ *
+ *  @noindent
+ *  @code{<full-expression>} may be any expression described in the
+ *  @code{EXPR} expression function, including the use of apply-codes
+ *  and value-names.  If the expression yields an empty string, it
+ *  is interpreted as @i{false}.
 =*/
 /*=macfunc ENDWHILE
  *

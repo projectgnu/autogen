@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.2 1999/10/31 00:27:01 bruce Exp $
+ *  $Id: expFormat.c,v 1.3 1999/11/02 04:08:00 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -218,7 +218,7 @@ ag_scm_error( SCM res )
 
 /*=gfunc gpl
  *
- * exparg: prog_name, name of the program under the GPL
+ * exparg: prog-name, name of the program under the GPL
  * exparg: prefix, String for starting each output line
  *
  * req: 2

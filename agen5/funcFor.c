@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.6 1999/10/31 23:16:02 bruce Exp $
+ *  $Id: funcFor.c,v 1.7 1999/11/02 04:08:00 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -39,7 +39,7 @@
  *
  * req:  0
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
- *       on the first pass through the data.
+ *       on the first pass through the data.  @xref{FOR}.
 =*/
     SCM
 ag_scm_first_for_p( void )
@@ -53,7 +53,7 @@ ag_scm_first_for_p( void )
  *
  * req:  0
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
- *       on the last pass through the data.
+ *       on the last pass through the data.  @xref{FOR}.
 =*/
     SCM
 ag_scm_last_for_p( void )
@@ -65,9 +65,10 @@ ag_scm_last_for_p( void )
 
 /*=gfunc for_index
  *
- * req:     0
- * doc:     Returns the current index for innermost FOR loop.
- *          Outside of any FOR loop, it returns SCM_UNDEFINED.
+ * req:   0
+ * doc:   Returns the current index for innermost FOR loop.
+ *        Outside of any FOR loop, it returns SCM_UNDEFINED.
+ *        @xref{FOR}.
 =*/
     SCM
 ag_scm_for_index( void )
@@ -82,10 +83,8 @@ ag_scm_for_index( void )
  *
  * exparg: from, the initial index for the AutoGen FOR macro
  *
- *doc:  This function records the initial index information for an
- *      AutoGen FOR function.  It returns SCM_BOOL_T.
- *      This function is deactivated outside of the context of the
- *      evaluation of the arguments to the AutoGen FOR macro function.
+ * doc:  This function records the initial index information
+ *       for an AutoGen FOR function.  @xref{FOR}.
 =*/
     SCM
 ag_scm_for_from( SCM from )
@@ -101,10 +100,8 @@ ag_scm_for_from( SCM from )
  *
  * exparg: to, the final index for the AutoGen FOR macro
  *
- *doc:  This function records the terminating value information for an
- *      AutoGen FOR function.  It returns SCM_BOOL_T.
- *      This function is deactivated outside of the context of the
- *      evaluation of the arguments to the AutoGen FOR macro function.
+ * doc:  This function records the terminating value information
+ *       for an AutoGen FOR function.  @xref{FOR}.
 =*/
     SCM
 ag_scm_for_to( SCM to )
@@ -120,12 +117,9 @@ ag_scm_for_to( SCM to )
  *
  * exparg: by, the iteration increment for the AutoGen FOR macro
  *
- *doc:  This function records the "step by" information for an
- *      AutoGen FOR function.  It returns SCM_UNDEFINED if it is
- *      run out of context or if the argument is not a number.
- *      Otherwise, it always returns SCM_BOOL_T.
- *      This function is "out of context" except when evaluating
- *      the arguments to the @code{FOR} AutoGen function.
+ * doc:
+ *    This function records the "step by" information
+ *    for an AutoGen FOR function.  @xref{FOR}.
 =*/
     SCM
 ag_scm_for_by( SCM by )
@@ -141,11 +135,9 @@ ag_scm_for_by( SCM by )
  *
  * exparg: separator, the text to insert between each AutoGen FOR iteration
  *
- *doc:  This function records the separation string that gets
- *      inserted between each iteration of an
- *      AutoGen FOR function.  It returns SCM_BOOL_T.
- *      This function is deactivated outside of the context of the
- *      evaluation of the arguments to the AutoGen FOR macro function.
+ * doc:
+ *  This function records the separation string that gets inserted between
+ *  each iteration of an AutoGen FOR function.  @xref{FOR}.
 =*/
     SCM
 ag_scm_for_sep( SCM obj )
@@ -398,11 +390,10 @@ doForEach( tTemplate*   pT,
  *  FOR <value-name> (...Scheme expression list
  *  @end example
  *
- *  The first argument must be the name of an AutoGen value.
- *  If there is no value associated with the name,
- *  the FOR loop block is skipped entirely.
- *  The scope of the @code{FOR} function extends to the ENDFOR macro
- *  that contains this name.
+ *  The first argument must be the name of an AutoGen value.  If there is
+ *  no value associated with the name, the FOR loop block is skipped
+ *  entirely.  The scope of the @code{FOR} function extends to the ENDFOR
+ *  macro that contains this name.
  *
  *  If there are any further arguments, if the first character is either
  *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
@@ -421,10 +412,16 @@ doForEach( tTemplate*   pT,
  *  emitting default text.  In this fashion, you can insert entries
  *  from a sparse or non-zero based array into a dense, zero based array.
  *
+ *  @string{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
+ *  @code{for-sep} functions are disabled outside of the context of the
+ *  @code{FOR} macro.  Likewise, the @code{first-for}, @code{last-for}
+ *  and @code{for-index} functions are disabled outside of the range
+ *  of a @code{FOR} block.
+ *
  *  @example
- *  [#FOR var (for-from 0) (for-to <number>) (for-sep ",") #]
- *  ... text with @code{var}ious substitutions ...[#
- *  ENDFOR var#]
+ *  [+FOR var (for-from 0) (for-to <number>) (for-sep ",") +]
+ *  ... text with @code{var}ious substitutions ...[+
+ *  ENDFOR var+]
  *  @end example
  *
  *  @noindent
@@ -434,9 +431,9 @@ doForEach( tTemplate*   pT,
  *  except for the last, will have a comma @code{,} after it.
  *
  *  @example
- *  [#FOR var ",\n" #]
- *  ... text with @code{var}ious substitutions ...[#
- *  ENDFOR var #]
+ *  [+FOR var ",\n" +]
+ *  ... text with @code{var}ious substitutions ...[+
+ *  ENDFOR var +]
  *  @end example
  *
  *  @noindent

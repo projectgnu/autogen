@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.7 1999/10/31 23:09:01 bruce Exp $
+ *  $Id: funcCase.c,v 1.8 1999/11/02 04:08:00 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -725,13 +725,16 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  For example:
  *
  *  @example
- *  [# CASE (get "text_mac") #]
- *  [# ~~*  "[Tt]est" #]reg exp must match at start, not at end
- *  [# ==   "TeSt"    #]a full-string, case sensitive compare
- *  [# =    "TEST"    #]a full-string, case insensitive compare
- *  [# *              #]always match - no testing
- *  [# ESAC #]
+ *  [+ CASE (get "text_mac") +]
+ *  [+ ~~*  "[Tt]est" +]reg exp must match at start, not at end
+ *  [+ ==   "TeSt"    +]a full-string, case sensitive compare
+ *  [+ =    "TEST"    +]a full-string, case insensitive compare
+ *  [+ *              +]always match - no testing
+ *  [+ ESAC +]
  *  @end example
+ *
+ *  These case selection codes have also been implemented as
+ *  Scheme expression functions (@xref{Scheme Functions}).
 =*/
 /*=macfunc ESAC
  *

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.5 1999/10/31 19:44:48 bruce Exp $
+ *  $Id: expString.c,v 1.6 1999/11/02 04:08:00 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -279,9 +279,18 @@ ag_scm_join( SCM sep, SCM list )
  * doc:
  *
  *  Prefix every line in the second string with the first string.
- *  E.g. if the first string is "# " and the second contains
- *  "two\nlines", then the result contain "# two\n# lines".
  *
+ *  For example, the first string is "# " and the second contains:
+ *  @example
+ *  two
+ *  lines
+ *  @end example
+ *  @noindent
+ *  The result string will contain:
+ *  @example
+ *  # two
+ *  # lines
+ *  @end example
 =*/
     SCM
 ag_scm_prefix( SCM prefix, SCM text )
@@ -543,14 +552,17 @@ evalExpr_kr_string( SCM str )
  * exparg: string, string to reformat
  *
  * doc:
- *  Reform a string so that, when printed, the C compiler will be able
- *  to compile the data and construct a string that contains exactly
- *  what the current string contains.  Many non-printing characters are
- *  replaced with escape sequences.  New-lines are replaced with a
- *  backslash-n sequence @code{\\n}, followed by a closing quote, a
- *  newline seven spaces and another re-opening quote.  The compiler
- *  will implicitly concatenate them.  The reader will see line breaks.
- *  A K&R compiler will choke.  Use @code{kr-string} for that.
+ *
+ *  Reform a string so that, when printed, the C compiler will be able to
+ *  compile the data and construct a string that contains exactly what the
+ *  current string contains.  Many non-printing characters are replaced with
+ *  escape sequences.  Newlines are replaced with a backslash, an @code{n}, a
+ *  closing quote, a newline, seven spaces and another re-opening quote.  The
+ *  compiler will implicitly concatenate them.  The reader will see line
+ *  breaks.
+ *
+ *  A K&R compiler will choke.  Use @code{kr-string} for that compiler.
+ *
 =*/
     SCM
 ag_scm_c_string( SCM str )

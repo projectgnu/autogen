@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.8 1999/10/31 23:13:13 bruce Exp $
+ *  $Id: funcEval.c,v 1.9 1999/11/02 04:08:00 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -327,7 +327,7 @@ eval( const char* pzExpr )
  *   may be provided.
  *   @end enumerate
  *
- *   The operator codes used are as follows:
+ *   The apply codes used are as follows:
  *
  *   @table @samp
  *   @item @code{-}

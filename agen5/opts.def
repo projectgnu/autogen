@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.8 1999/10/31 23:28:38 bruce Exp $
+ *   $Id: opts.def,v 1.9 1999/11/02 04:08:00 bruce Exp $
  */
 
 /*
@@ -402,6 +402,8 @@ and uses \fIman.tpl\fP.  It also overrides the \fBbase-name\fP of
 the output file, which is normally derived from the input
 definition file name (viz. \fIopts\fP).';
 
-/* prog_info_descrip = ''; */
+prog_info_descrip =
+'This chapter documents the @code{AutoOpts} generated usage text and
+option meanings for the @code{AutoGen} program.';
 
 /* end of opts.def */

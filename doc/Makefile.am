@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.34 1999/10/31 18:36:57 bruce Exp $
+## $Id: Makefile.am,v 2.35 1999/11/02 04:08:08 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,7 +22,9 @@ all : $(INFO_DEPS) LSM
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps
+EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps \
+		snprintfv.texi snprintfv.menu
+
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 AGSRCDIR	= $(top_srcdir)/agen5
@@ -53,12 +55,12 @@ GETDEF_SRC	= $(EXPRSRC) $(DIRECTIVESRC)
 ADDON_MENU	= \
 		$(top_srcdir)/columns/columns.menu \
 		$(top_srcdir)/getdefs/getdefs.menu \
-		$(top_srcdir)/snprintfv/snprintfv.menu
+		$(srcdir)/snprintfv.menu
 
 ADDON_TEXI	= \
 		$(top_srcdir)/columns/columns.texi \
 		$(top_srcdir)/getdefs/getdefs.texi \
-		$(top_srcdir)/snprintfv/snprintfv.texi
+		$(srcdir)/snprintfv.texi
 
 DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \

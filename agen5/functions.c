@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.6 1999/10/31 23:17:24 bruce Exp $
+ *  $Id: functions.c,v 1.8 1999/11/02 04:08:00 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -57,7 +57,7 @@ tSCC zCantInc[] = "cannot include file";
  *  message and AutoGen will exit:
  *
  *  @example
- *  [# ERROR "You did not have enough values to continue" #]
+ *  [+ ERROR "You did not have enough values to continue" +]
  *  @end example
 =*/
 MAKE_HANDLER_PROC( Error )
@@ -137,6 +137,8 @@ MAKE_HANDLER_PROC( Include )
  *  If it is not, then it is a conditional expression that is
  *  evaluated only if the name is defined at the time the macro
  *  is invoked.
+ *
+ *  You may not specify @code{UNKNOWN} specifically.
 =*/
 MAKE_HANDLER_PROC( Unknown )
 {
