@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Thu Jul 29 09:50:14 1999				      
+# Last Modified:     Thu Jul 29 10:49:29 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.19 1999/07/29 16:57:30 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.20 1999/07/29 17:49:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -79,7 +79,7 @@ doit ()
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=pre
-test -f $wd/bootstrap.local && . $wd/bootstrap.local
+test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
