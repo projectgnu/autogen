@@ -1,0 +1,32 @@
+If you are reconfiguring this product, you _must_ use
+the config/bootstrap script.  The standard "configure"
+script is edited to produce a working script.  Specifically,
+this product will not build correctly when the source
+and build directories are different.  The following
+text is inserted at the beginning of the configure
+script:
+
+        top_builddir=`pwd`
+        top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
+        top_srcdir=`cd $top_srcdir && pwd`
+        if test "$top_srcdir" = "$top_builddir" ; then : ; else
+          ( cd $top_srcdir
+            find . -type d -print ) |
+          grep -v '/CVS\|/RCS' |
+          while read f
+          do test -d $f || mkdir $f
+          done
+
+          ( cd $top_srcdir
+            find . -type f -o -type l -print ) |
+          grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
+          while read f
+          do
+             test -f $f || ln -sf $top_srcdir/$f $f
+          done
+          sh ./configure $@
+          exit $?
+        fi
+
+This script basically turns the build directory into a symlink
+copy of the source directory.
