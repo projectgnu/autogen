@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/09/30 03:33:20 $
+# Last Modified:     $Date: 2002/09/30 03:48:00 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.8 2002/09/30 03:33:20 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.9 2002/09/30 03:48:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -205,13 +205,6 @@ do
       continue
     fi
 
-    if ksh -c : 2> /dev/null ; then :
-    else
-      echo "Reconstructing expr.h and expr.ini requires ksh."
-      $force && exit 1
-      continue
-    fi
-
     #  funcCase.c must be first file in list.
     #  It has the exparg attribute names.
     #
@@ -238,7 +231,6 @@ do
   stamp-directive | \
   directive.def | \
   directive.h )
-    set -x
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
       echo "Cannot locate autogen or getdefs"
@@ -249,28 +241,26 @@ do
 		defs-to-get    directive
 		template       directive
 		output         directive.def
-		input          ${srcdir}/defDirect.c
-		srcfile
+		linenum
 		_EOConfig_
     ${GD} load=directive.cfg ${srcdir}/defDirect.c
     ${AG} directive.def
     rm -f directive.def directive.cfg
     date > stamp-directive
-    set +x
     ;;
 
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
-    if [ -z "${AG}" ] || [ -z "${GD}" ]
+    if [ -z "${AG}" ]
     then
       echo "Cannot locate autogen or getdefs"
       $force && exit 1
       continue
     fi
-    eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter"
-    echo ${AG} ${eopt} -bautogen opts.def
-    ${AG} ${eopt} -bautogen opts.def && touch autogen.menu autogen.texi
+    eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter -bautogen"
+    echo ${AG} ${eopt} opts.def
+    ${AG} ${eopt} opts.def
     ;;
 
   autogen.1 )
