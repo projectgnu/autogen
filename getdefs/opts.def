@@ -1,0 +1,99 @@
+
+autogen definitions options;
+
+/*
+ *  $Id: opts.def,v 1.1 1998/08/21 21:17:07 bkorb Exp $
+ */
+
+/*
+ *  Getdefs copyright 1992-1998 Bruce Korb
+ *
+ *  Getdefs is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  Getdefs is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Getdefs.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
+copyright = "1998";
+copyright_gpl;
+
+owner          = "Bruce Korb";
+prog_name      = "getdefs";
+prog_title     = "Autogen Definition Extraction Tool";
+argument       = "<def-file> [ ... ]";
+long_opts;
+
+version = "0.1";
+
+flag = {
+    name      = defs_to_get;
+    flag_arg  = ":";
+    descrip   = 'Regexp to look for after the "/*="';
+};
+
+flag = {
+    name      = "autogen";
+    flag_arg;
+    disable   = "no";
+    enabled;
+    descrip   = "Invoke autogen with defs";
+};
+
+flag = {
+    name      = template;
+    flag_arg  = ":";
+    descrip   = "Template Name";
+};
+
+flag = {
+    name      = templ_dirs;
+    flag_arg  = ":";
+    descrip   = "Template search directory list";
+    setable;
+};
+
+flag = {
+    name      = base_name;
+    flag_arg  = ":";
+    descrip   = "Base name for output file(s)";
+};
+
+flag = {
+    name      = include;
+    flag_arg  = ":";
+    descrip   = "File to copy to output defs";
+};
+
+flag = {
+    name      = assign;
+    flag_arg  = ":";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "Global assignment for output defs";
+};
+
+flag = {
+    name      = block;
+    flag_arg  = ":";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "Block macro for output";
+};
+
+flag = {
+    name      = ordering;
+    flag_arg;
+    disable   = no;
+    descrip   = "Alphabatize or use named file";
+};
