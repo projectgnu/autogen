@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Tuesday June 25, 2002 at 05:42:14 PM PDT
+ *  It has been AutoGen-ed  Thursday February  5, 2004 at 08:40:48 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -80,73 +80,85 @@ typedef enum {
  *  the new state and the transition enumeration code (in that order).
  *  It is indexed by first the current state and then the event code.
  */
-typedef struct transition t_transition;
-struct transition {
+typedef struct cgi_transition t_cgi_transition;
+struct cgi_transition {
     te_cgi_state  next_state;
     te_cgi_trans  transition;
 };
-static const t_transition
+static const t_cgi_transition
 cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
-  { { CGI_ST_NAME, CGI_TR_STASH },                  /* init state */
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID } },
 
-  { { CGI_ST_NAME, CGI_TR_STASH },                  /* name state */
-    { CGI_ST_NAME, CGI_TR_STASH },
-    { CGI_ST_VALUE, CGI_TR_NAME_EQUAL },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID },
-    { CGI_ST_INVALID, CGI_TR_INVALID } },
+  /* STATE 0:  CGI_ST_INIT */
+  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  name_char */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  equal */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  space */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  escape */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  separator */
+    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
+  },
 
-  { { CGI_ST_VALUE, CGI_TR_STASH },                 /* value state */
-    { CGI_ST_VALUE, CGI_TR_STASH },
-    { CGI_ST_VALUE, CGI_TR_STASH },
-    { CGI_ST_VALUE, CGI_TR_VALUE_SPACE },
-    { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },
-    { CGI_ST_VALUE, CGI_TR_STASH },
-    { CGI_ST_INIT, CGI_TR_SEPARATE },
-    { CGI_ST_DONE, CGI_TR_SEPARATE } }
+
+  /* STATE 1:  CGI_ST_NAME */
+  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
+    { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  name_char */
+    { CGI_ST_VALUE, CGI_TR_NAME_EQUAL },            /* EVT:  equal */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  space */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  escape */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  separator */
+    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
+  },
+
+
+  /* STATE 2:  CGI_ST_VALUE */
+  { { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  alpha */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  name_char */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  equal */
+    { CGI_ST_VALUE, CGI_TR_VALUE_SPACE },           /* EVT:  space */
+    { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },          /* EVT:  escape */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  other */
+    { CGI_ST_INIT, CGI_TR_SEPARATE },               /* EVT:  separator */
+    { CGI_ST_DONE, CGI_TR_SEPARATE }                /* EVT:  end */
+  }
 };
 
 
+#ifndef HAVE_ZBOGUS
+#define HAVE_ZBOGUS
 /*
- *  Define all the event and state names
+ *  Define all the event and state names, once per compile unit.
  */
 tSCC zBogus[]     = "** OUT-OF-RANGE **";
-tSCC zStInit[]    = "init";
-tSCC zEvInvalid[] = "* Invalid Event *";
 tSCC zFsmErr[]    =
     "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
+#endif /* HAVE_ZBOGUS */
+tSCC zCgiStInit[]    = "init";
+tSCC zCgiStName[] = "name";
+tSCC zCgiStValue[] = "value";
+tSCC* apzCgiStates[] = {
+    zCgiStInit,  zCgiStName,  zCgiStValue };
 
-tSCC zStName[] = "name";
-tSCC zStValue[] = "value";
-tSCC* apzStates[] = {
-    zStInit,  zStName,  zStValue };
-
-tSCC zEvAlpha[] = "alpha";
-tSCC zEvName_Char[] = "name_char";
-tSCC zEvEqual[] = "equal";
-tSCC zEvSpace[] = "space";
-tSCC zEvEscape[] = "escape";
-tSCC zEvOther[] = "other";
-tSCC zEvSeparator[] = "separator";
-tSCC zEvEnd[] = "end";
-tSCC* apzEvents[] = {
-    zEvAlpha,     zEvName_Char, zEvEqual,     zEvSpace,     zEvEscape,
-    zEvOther,     zEvSeparator, zEvEnd,       zEvInvalid };
+tSCC zCgiEvInvalid[] = "* Invalid Event *";
+tSCC zCgiEvAlpha[] = "alpha";
+tSCC zCgiEvName_Char[] = "name_char";
+tSCC zCgiEvEqual[] = "equal";
+tSCC zCgiEvSpace[] = "space";
+tSCC zCgiEvEscape[] = "escape";
+tSCC zCgiEvOther[] = "other";
+tSCC zCgiEvSeparator[] = "separator";
+tSCC zCgiEvEnd[] = "end";
+tSCC* apzCgiEvents[] = {
+    zCgiEvAlpha,     zCgiEvName_Char, zCgiEvEqual,     zCgiEvSpace,
+    zCgiEvEscape,    zCgiEvOther,     zCgiEvSeparator, zCgiEvEnd,
+    zCgiEvInvalid };
 
 #define CGI_EVT_NAME(t) ( (((unsigned)(t)) >= CGI_EV_INVALID) \
-    ? zBogus : apzEvents[ t ])
+    ? zBogus : apzCgiEvents[ t ])
 
 #define CGI_STATE_NAME(s) ( (((unsigned)(s)) > CGI_ST_INVALID) \
-    ? zBogus : apzStates[ s ])
+    ? zBogus : apzCgiStates[ s ])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1
@@ -219,7 +231,7 @@ cgi_run_fsm(
             nxtSt = CGI_ST_INVALID;
             trans = CGI_TR_INVALID;
         } else {
-            const t_transition* pTT = cgi_trans_table[ cgi_state ] + trans_evt;
+            const t_cgi_transition* pTT = cgi_trans_table[ cgi_state ] + trans_evt;
             nxtSt = firstNext = pTT->next_state;
             trans = pTT->transition;
         }
@@ -313,4 +325,4 @@ cgi_run_fsm(
  * indent-tabs-mode: nil
  * tab-width: 4
  * End:
- * end of agen5/cgi-fsm.c */
+ * end of cgi-fsm.c */
