@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.1 2000/03/19 21:23:19 bruce Exp $
+# @(#) $Id: mkconfig.sh,v 2.2 2000/03/19 21:24:59 bruce Exp $
 # ----------------------------------------------------------------------
 
 exec 5> temp.config
@@ -27,7 +27,7 @@ GENLIST="agen5/autogen.1
 	 autoopts/genshell.h"
 
 rm -f ./configure
-cvs get configure
+(cd ..; cvs get autogen/configure)
 
 sed -n '1,/^SRCDIR/p' configure >&5
 
