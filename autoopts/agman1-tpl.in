@@ -13,7 +13,7 @@ AutoGen5 template man=%s.1
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.9 2000/03/19 19:18:11 bruce Exp $
+## $Id: agman1-tpl.in,v 2.10 2000/03/19 19:20:01 bruce Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -244,7 +244,7 @@ This option must not appear in combination with any of the following options:
         and for nroff to output a backslash, use EIGHT (8)!!!!
 
    ):+][+: % doc `sed \
- -e 's;@\\(code|var|samp\\){\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e 's;@\\(code|var|samp\\){\\([^}]*\\)\};\\\\fB\\2\\\\fP;g' \
  -e 's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
  -e 's/@\\([{}]\\)/\\1/' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \
