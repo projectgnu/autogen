@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.26 1999/10/30 16:35:06 bruce Exp $
+## $Id: Makefile.am,v 2.27 1999/10/30 16:45:19 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,26 +25,28 @@ info_TEXINFOS   = autogen.texi
 EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
-OPTIONS_DEF	= $(top_srcdir)/agen5/opts.def
+AGSRCDIR	= $(top_srcdir)/agen5
+
+OPTIONS_DEF	= $(AGSRCDIR)/opts.def
 
 FUNCSRC		= \
-		$(top_srcdir)/agen5/funcCase.c \
-		$(top_srcdir)/agen5/funcDef.c \
-		$(top_srcdir)/agen5/funcEval.c \
-		$(top_srcdir)/agen5/funcFor.c \
-		$(top_srcdir)/agen5/funcIf.c \
-		$(top_srcdir)/agen5/functions.c
+		$(AGSRCDIR)/funcCase.c \
+		$(AGSRCDIR)/funcDef.c \
+		$(AGSRCDIR)/funcEval.c \
+		$(AGSRCDIR)/funcFor.c \
+		$(AGSRCDIR)/funcIf.c \
+		$(AGSRCDIR)/functions.c
 
 EXPRSRC		= \
-		$(top_srcdir)/agen5/expFormat.c \
-		$(top_srcdir)/agen5/expGuile.c \
-		$(top_srcdir)/agen5/expOutput.c \
-		$(top_srcdir)/agen5/expPrint.c \
-		$(top_srcdir)/agen5/expState.c \
-		$(top_srcdir)/agen5/expString.c \
+		$(AGSRCDIR)/expFormat.c \
+		$(AGSRCDIR)/expGuile.c \
+		$(AGSRCDIR)/expOutput.c \
+		$(AGSRCDIR)/expPrint.c \
+		$(AGSRCDIR)/expState.c \
+		$(AGSRCDIR)/expString.c \
 		$(FUNCSRC)
 
-DIRECTIVESRC	= $(top_srcdir)/agen5/defDirect.c
+DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 
 GETDEF_SRC	= $(FUNCSRC) $(EXPRSRC) $(DIRECTIVESRC)
 
@@ -58,10 +60,10 @@ ADDON_TEXI	= \
 		$(top_srcdir)/getdefs/getdefs.texi \
 		$(top_srcdir)/snprintfv/snprintfv.texi
 
-DOC_INCLUDES	= $(top_srcdir)/src/agParse.y \
-		$(top_srcdir)/src/opts.h \
-		$(top_srcdir)/agen5/autogen.menu \
-		$(top_srcdir)/agen5/autogen.texi \
+DOC_INCLUDES	= $(AGSRCDIR)/agParse.y \
+		$(AGSRCDIR)/opts.h \
+		$(AGSRCDIR)/autogen.menu \
+		$(AGSRCDIR)/autogen.texi \
 		$(top_srcdir)/autoopts/autoopts.texi
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
