@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/02/04 02:59:26 $
+# Last Modified:     $Date: 2003/05/02 01:01:59 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.1 2003/02/04 02:59:26 bkorb Exp $
+# $Id: handler.test,v 3.2 2003/05/02 01:01:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -54,8 +54,10 @@ flag = {
 flag = {
     name = fourth;
     descrip = "fourth description";
-    stack_arg;
-    arg_type = string;
+    arg_type = keyword;
+    keyword = alpha, beta, gamma, omega;
+    arg-default = gamma;
+    arg-optional;
 };
 
 flag = {
@@ -87,15 +89,9 @@ echo creating ${testname}.sample
 cat > ${testname}.sample <<'_EOF_'
  */
 static void
-#ifdef __cplusplus
 doUsageOpt(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doUsageOpt( pOpts, pOD )
-    tOptions*  pOpts;
-    tOptDesc*  pOD;
-#endif
 {
     USAGE( EXIT_SUCCESS );
 }
@@ -105,15 +101,9 @@ doUsageOpt( pOpts, pOD )
  *   For the "First Option".
  */
 static void
-#ifdef __cplusplus
 doOptFirst(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doOptFirst( pOptions, pOptDesc )
-    tOptions*   pOptions;
-    tOptDesc*   pOptDesc;
-#endif
 {
 /*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 SampleCode();
@@ -125,23 +115,17 @@ SampleCode();
  *   For the "Second Option".
  */
 static void
-#ifdef __cplusplus
 doOptSecond(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doOptSecond( pOptions, pOptDesc )
-    tOptions*   pOptions;
-    tOptDesc*   pOptDesc;
-#endif
 {
     tSCC zDef[2] = { 0x7F, 0 };
-    tSCC* az_names[] = { zDef,
+    tSCC* azNames[] = { zDef,
         "alpha",  "beta",   "gamma",  "omega"
     };
 
     pOptDesc->pzLastArg =
-        optionEnumerationVal( pOptions, pOptDesc, az_names, 5 );
+        optionEnumerationVal( pOptions, pOptDesc, azNames, 5 );
 }
 
 /* * * * * * *
@@ -149,19 +133,36 @@ doOptSecond( pOptions, pOptDesc )
  *   For the "Third Option".
  */
 static void
-#ifdef __cplusplus
 doOptThird(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doOptThird( pOptions, pOptDesc )
-    tOptions*   pOptions;
-    tOptDesc*   pOptDesc;
-#endif
 {
     SomeCodeOrOther();
 }
 
+/* * * * * * *
+ *
+ *   For the "Fourth Option".
+ */
+static void
+doOptFourth(
+    tOptions*   pOptions,
+    tOptDesc*   pOptDesc )
+{
+    tSCC* azNames[] = {
+        "alpha",  "beta",   "gamma",  "omega"
+    };
+
+    if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
+        pOptDesc->pzLastArg = (char*)FOURTH_GAMMA;
+    else
+    pOptDesc->pzLastArg =
+        optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
+}
+
+#ifdef  __cplusplus
+}
+#endif
 _EOF_
 
 cmp -s ${testname}.test ${testname}.sample || \

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.9 2003/04/21 03:35:35 bkorb Exp $
+# $Id: optmain.tpl,v 3.10 2003/05/02 01:01:59 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -19,15 +19,8 @@ DEFINE build-guile-main
 int    original_argc;
 char** original_argv;
 
-
-    static void
-#ifdef __cplusplus
+static void
 inner_main( int argc, char** argv )
-#else
-inner_main( argc, argv )
-      int    argc;
-      char** argv;
-#endif
 {
     original_argc = argc;
     original_argv = argv;
@@ -66,14 +59,8 @@ inner_main( argc, argv )
 }
 
 int
-#ifdef __cplusplus
 main( int    argc,
       char** argv )
-#else
-main( argc, argv )
-      int    argc;
-      char** argv;
-#endif
 {[=
     % before-guile-boot "\n    %s\n"
  =]
@@ -241,15 +228,9 @@ DEFINE callback-proc-header     =]
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
 static void
-#ifdef __cplusplus
 doOpt[=(. cap-name) =](
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doOpt[=(. cap-name) =]( pOptions, pOptDesc )
-    tOptions*   pOptions;
-    tOptDesc*   pOptDesc;
-#endif
 {
 [=
 
@@ -400,16 +381,9 @@ DEFINE define-option-callbacks  =][=
       invoke callback-proc-header  =][=
       IF (not (exist? "arg-default"))
 =]    tSCC zDef[2] = { 0x7F, 0 };
-[=    ENDIF =][=
+[=    ENDIF
 
-    IF (> (len "arg-optional") 0) =]
-    te_[=(string-append Cap-prefix cap-name)=] def_val = [=
-       IF (not (=* (get "arg-optional") low-name))
-             =][=(. UP-name)=]_[=
-       ENDIF =][=(string-upcase! (string->c-name! (get "arg-optional")))
-             =];[=
-    ENDIF
-=]    tSCC* az_names[] = {[=
+=]    tSCC* azNames[] = {[=
       IF (not (exist? "arg-default")) =] zDef,[=
       ENDIF  =]
 [=(shellf
@@ -418,13 +392,15 @@ DEFINE define-option-callbacks  =][=
     };
 [=
 
-    IF (> (len "arg-optional") 0) =]
+    IF (exist? "arg-optional") =]
     if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
-        pOptDesc->pzLastArg = (char*)def_val;
+        pOptDesc->pzLastArg = (char*)[=
+         (string-append UP-name "_" (if (exist? "arg-default")
+            (up-c-name "arg-default") "UNDEFINED"  )) =];
     else[=
     ENDIF =]
     pOptDesc->pzLastArg =
-        optionEnumerationVal( pOptions, pOptDesc, az_names, [=
+        optionEnumerationVal( pOptions, pOptDesc, azNames, [=
         (+ (count "keyword") (if (exist? "arg-default") 0 1)) =] );
 }[=
     ENDIF       =][=

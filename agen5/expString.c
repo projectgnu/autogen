@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.13 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expString.c,v 3.14 2003/05/02 01:01:59 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -417,7 +417,7 @@ do_multi_subs(
  * doc:  Return SCM_BOOL_T if the first argument string is found
  *      in one of the entries in the second (list-of-strings) argument.
 =*/
-    SCM
+SCM
 ag_scm_in_p( SCM obj, SCM list )
 {
     int   len;
@@ -486,7 +486,7 @@ ag_scm_in_p( SCM obj, SCM list )
  *       The list may contain nested lists, partly because you
  *       cannot always control that.
 =*/
-    SCM
+SCM
 ag_scm_join( SCM sep, SCM list )
 {
     int        l_len, sv_l_len;
@@ -596,7 +596,7 @@ ag_scm_join( SCM sep, SCM list )
  *  # lines
  *  @end example
 =*/
-    SCM
+SCM
 ag_scm_prefix( SCM prefix, SCM text )
 {
     char*    pzPfx;
@@ -678,7 +678,7 @@ ag_scm_prefix( SCM prefix, SCM text )
  *  @code{cd} to the original directory is always issued before
  *  the new command is issued.
 =*/
-    SCM
+SCM
 ag_scm_shell( SCM cmd )
 {
     if (! gh_string_p( cmd ))
@@ -703,7 +703,7 @@ ag_scm_shell( SCM cmd )
  * doc:  Format a string using arguments from the alist,
  *       then send the result to the shell for interpretation.
 =*/
-    SCM
+SCM
 ag_scm_shellf( SCM fmt, SCM alist )
 {
     int   len = scm_ilength( alist );
@@ -743,7 +743,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/
-    SCM
+SCM
 ag_scm_raw_shell_str( SCM obj )
 {
     static const char zQ[] = "'\\''";
@@ -849,7 +849,7 @@ ag_scm_raw_shell_str( SCM obj )
  *  backslashes in front of the dollar signs.  It goes from zero to one to
  *  three for the "cooked" string examples.
 =*/
-    SCM
+SCM
 ag_scm_shell_str( SCM obj )
 {
     return shell_stringify( obj, '"' );
@@ -867,7 +867,7 @@ ag_scm_shell_str( SCM obj )
  *   that the quoting character is @code{`} and the "leave the escape alone"
  *   character is @code{"}.
 =*/
-    SCM
+SCM
 ag_scm_sub_shell_str( SCM obj )
 {
     return shell_stringify( obj, '`' );
@@ -883,7 +883,7 @@ ag_scm_sub_shell_str( SCM obj )
  * doc:  Create a scheme list of all the strings that are associated
  *       with a name.  They must all be text values or we choke.
 =*/
-    SCM
+SCM
 ag_scm_stack( SCM obj )
 {
     SCM   res;
@@ -930,7 +930,7 @@ ag_scm_stack( SCM obj )
  *  replaced with escape sequences.  New-lines are replaced with a
  *  backslash-n-backslash and newline sequence,
 =*/
-    SCM
+SCM
 ag_scm_kr_string( SCM str )
 {
     tSCC zNewLine[] = "\\n\\\n";
@@ -959,7 +959,7 @@ ag_scm_kr_string( SCM str )
  *  A K&R compiler will choke.  Use @code{kr-string} for that compiler.
  *
 =*/
-    SCM
+SCM
 ag_scm_c_string( SCM str )
 {
     tSCC zNewLine[] = "\\n\"\n       \"";
@@ -986,7 +986,7 @@ ag_scm_c_string( SCM str )
  *      It is too bad this little program has so many different
  *      and incompatible implementations!
 =*/
-    SCM
+SCM
 ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 {
     {
@@ -1054,7 +1054,7 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
  * doc: This is identical to @code{string-tr!}, except that it does not
  *      over-write the previous value.
 =*/
-    SCM
+SCM
 ag_scm_string_tr( SCM Str, SCM From, SCM To )
 {
     scm_sizet lenz  = SCM_LENGTH( Str );
@@ -1085,7 +1085,7 @@ ag_scm_string_tr( SCM Str, SCM From, SCM To )
  *      ("&amp;" "&lt;" "&gt;"))
  * @end example
 =*/
-    SCM
+SCM
 ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
 {
     tCC*       pzStr;

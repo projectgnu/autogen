@@ -1,11 +1,15 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.14 2003/04/04 04:44:54 bkorb Exp $
+#$Id: optcode.tpl,v 3.15 2003/05/02 01:01:59 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
 #include "[=(. header-file)=]"
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
 [=
 
 INCLUDE "optmain.tpl"
@@ -379,15 +383,9 @@ tOptions [=(. pname)=]Options = {
  *  Create the static procedure(s) declared above.
  */
 static void
-#ifdef __cplusplus
 doUsageOpt(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-#else
-doUsageOpt( pOpts, pOD )
-    tOptions*  pOpts;
-    tOptDesc*  pOD;
-#endif
 {
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=
@@ -417,3 +415,6 @@ ELIF (exist? "guile-main")         =][=
 ENDIF "test/guile main"
 
 =]
+#ifdef  __cplusplus
+}
+#endif

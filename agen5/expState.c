@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.10 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expState.c,v 3.11 2003/05/02 01:01:59 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -184,7 +184,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
  * doc:  Returns a string containing the base name of the output file(s).
  *       Generally, this is also the base name of the definitions file.
 =*/
-    SCM
+SCM
 ag_scm_base_name( void )
 {
     return gh_str02scm( OPT_ARG( BASE_NAME ));
@@ -203,7 +203,7 @@ ag_scm_base_name( void )
  *      value associated with the name, the result is an SCM
  *      immediate integer value of zero.
 =*/
-    SCM
+SCM
 ag_scm_count( SCM obj )
 {
     int ent_len = count_entries( ag_scm2zchars( obj, "ag object" ));
@@ -220,7 +220,7 @@ ag_scm_count( SCM obj )
  *       Returns the name of the source file containing the AutoGen
  *       definitions.
 =*/
-    SCM
+SCM
 ag_scm_def_file( void )
 {
     return gh_str02scm( pBaseCtx->pzFileName );
@@ -248,7 +248,7 @@ ag_scm_def_file( void )
  *       There may be multiple entries of @code{bar} within
  *       @code{foo}, only one needs to contain a value for @code{baz}.
 =*/
-    SCM
+SCM
 ag_scm_exist_p( SCM obj )
 {
     ag_bool x;
@@ -271,7 +271,7 @@ ag_scm_exist_p( SCM obj )
  * doc:  return SCM_BOOL_T if a specified name is a user-defined AutoGen
  *       macro, otherwise return SCM_BOOL_F.
 =*/
-    SCM
+SCM
 ag_scm_ag_function_p( SCM obj )
 {
     SCM     res;
@@ -303,7 +303,7 @@ ag_scm_ag_function_p( SCM obj )
  *       The value name must follow the same rules as the
  *       @code{ag-name} argument for @code{exist?} (@pxref{SCM exist?}).
 =*/
-    SCM
+SCM
 ag_scm_match_value_p( SCM op, SCM obj, SCM test )
 {
     if (  (! gh_procedure_p( op   ))
@@ -323,22 +323,29 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
  * what:   get named value
  *
  * exparg: ag-name, name of AutoGen value
+ * exparg: alt-val, value if not present, optional
  *
  * doc:
  *  Get the first string value associated with the name.
- *  It will always return either the associated string value, or
- *  the empty string.
+ *  It will either return the associated string value (if
+ *  the name resolves), the alternate value (if one is provided),
+ *  or else the empty string.
 =*/
-    SCM
-ag_scm_get( SCM obj )
+SCM
+ag_scm_get( SCM agName, SCM altVal )
 {
     tDefEntry*  pE;
     ag_bool     x;
 
-    pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &x );
+    if (! gh_string_p( agName ))
+         pE = NULL;
+    else pE = findDefEntry( ag_scm2zchars( agName, "ag value" ), &x );
 
-    if ((pE == NULL) || (pE->valType != VALTYP_TEXT))
+    if ((pE == NULL) || (pE->valType != VALTYP_TEXT)) {
+        if (gh_string_p( altVal ))
+            return altVal;
         return gh_str02scm( "" );
+    }
 
     return gh_str02scm( pE->pzValue );
 }
@@ -364,7 +371,7 @@ ag_scm_get( SCM obj )
  *  tMyStruct myVals[ [+ (+ 1 (high-lim "my-val-list")) +] ];
  *  @end example
 =*/
-    SCM
+SCM
 ag_scm_high_lim( SCM obj )
 {
     tDefEntry*  pE;
@@ -402,7 +409,7 @@ ag_scm_high_lim( SCM obj )
  *       If it is a single text definition, then it is equivalent to
  *       @code{(string-length (get "ag-name"))}.
 =*/
-    SCM
+SCM
 ag_scm_len( SCM obj )
 {
     int         len;
@@ -421,7 +428,7 @@ ag_scm_len( SCM obj )
  *
  * doc:  Returns the lowest index associated with an array of definitions.
 =*/
-    SCM
+SCM
 ag_scm_low_lim( SCM obj )
 {
     tDefEntry*  pE;
@@ -450,7 +457,7 @@ ag_scm_low_lim( SCM obj )
  * doc:   The text argument must be an option name followed by any needed
  *        option argument.  Returns SCM_UNDEFINED.
 =*/
-    SCM
+SCM
 ag_scm_set_option( SCM opt )
 {
     optionLoadLine( &autogenOptions, ag_scm2zchars( opt, "opt + arg" ));
@@ -465,7 +472,7 @@ ag_scm_set_option( SCM opt )
  * doc:
  *  Returns the current active suffix (@pxref{pseudo macro}).
 =*/
-    SCM
+SCM
 ag_scm_suffix( void )
 {
     return gh_str02scm( (char*)pzCurSfx );
@@ -478,7 +485,7 @@ ag_scm_suffix( void )
  *
  * doc:  Returns the name of the current template file.
 =*/
-    SCM
+SCM
 ag_scm_tpl_file( void )
 {
     return gh_str02scm( pzTemplFileName );
@@ -491,12 +498,12 @@ ag_scm_tpl_file( void )
  *
  * exparg: msg-fmt, formatting for line message, optional
  *
- * doc:  Returns the file and line number of the current template macro
- *       using either the default format, "from %s line %d", or else
- *       the format you supply.  For example, if you want to insert a "C"
- *       language file-line directive, you would supply the format "# %2$d %1$s".
+ * doc: Returns the file and line number of the current template macro
+ *      using either the default format, "from %s line %d", or else
+ *      the format you supply.  For example, if you want to insert a "C"
+ *      language file-line directive, you would supply the format "# %2$d %1$s".
 =*/
-    SCM
+SCM
 ag_scm_tpl_file_line( SCM fmt )
 {
     char    zScribble[ 1024 ];

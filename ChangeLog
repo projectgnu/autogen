@@ -1,3 +1,13 @@
+2003-05-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c(ag_scm_get): add an optional second argument - an
+	alternative string in case the named value is not found.
+	* agen5/expString.c: syntax cleanup
+	* autoopts/optcode.tpl: Remove K&R-isms
+	* autoopts/optmain.tpl: ditto + fix default optional argument handling
+	for keyword options.
+	* autoopts/test/handler.test: test default optional keyword arguments
+
 2003-04-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c(MEMDEBUG): remove this stuff as better tools are around
@@ -14,6 +24,9 @@
 	* config/missing: upgrade to current version
 	* xml2ag/xml2ag.c(trim): rework to avoid fixed size limitations
 	* xml2ag/xmlopts.def(export): Need to define NUL and include ctype.h
+	* Makefile.am: distribute the generated and copied xxx.m4 files, too
+	* configure.in(INCLIST): remove the snprintfv directories.  We include
+	those files with a "snprintfv/" prefix, so it is not needed.
 
 2003-04-26  Bruce Korb  <bkorb@gnu.org>
 
