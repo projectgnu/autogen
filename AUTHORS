@@ -27,8 +27,5 @@ compat/compat.h; (posixstat.h, posixjmp.h)
 Fred Fish, Gary V. Vaughan and Bruce Korb:
 in the directory compat; strsignal.c
 
-Daniel Stenberg, Bjorn Reese, Gary V. Vaughan:
-in the directory compat; snprintf.c
-
 Doug Gwyn, Richard Stallman:
 in the directory compat; ndir.h
