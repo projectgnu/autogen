@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-07-02 13:54:41 bkorb"
+## Time-stamp:      "2004-10-04 09:23:51 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.29 2004/07/22 02:48:10 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.30 2004/10/07 16:07:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -18,7 +18,7 @@ AutoGen5 template man=%s.1
 (setenv "SHELL" "/bin/sh")
 
 :+]
-.TH [+: % prog_name (string-upcase! "%s") :+] 1 [+:
+.TH [+: % prog-name (string-upcase! "%s") :+] 1 [+:
   `date +%Y-%m-%d` :+] "" "Programmer's Manual"
 [+:
 
@@ -30,11 +30,14 @@ AutoGen5 template man=%s.1
 :+]
 .\"
 .SH NAME
-[+: % prog-name (string-downcase! "%s") :+] \- [+: prog-title :+]
+[+: (define prog-name (string-downcase! (get "prog-name")))
+    (define PROG_NAME (string-tr! (get "prog-name") "a-z^-" "A-Z__"))
+    (define prog_name (string-tr! (get "prog-name") "A-Z^-" "a-z__"))
+    prog-name :+] \- [+: prog-title :+]
 .SH SYNOPSIS
 .B [+:
   (define use-flags (if (exist? "flag.value") #t #f))
-  (string-downcase! (get "prog-name"))
+  prog-name
 
 :+][+:
     ;; * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -141,7 +144,7 @@ IF (exist? "explain") :+]
 ENDIF :+]
 .SH "DESCRIPTION"
 This manual page documents, briefly, the \fB[+:
-    (string-downcase! (get "prog-name")) :+]\fP command.
+    (. prog-name) :+]\fP command.
 [+:
 
 IF (exist? "prog-man-descrip")   :+][+:
@@ -437,7 +440,7 @@ by loading values from [+:
   ENDIF     :+][+:
   IF (exist? "environrc") :+]environment variables named:
 .nf
-  \fB[+:(string-tr! (get "prog-name") "a-z^-" "A-Z__") :+]_<option-name>\fP
+  \fB[+: (. PROG_NAME) :+]_<option-name>\fP or \fB[+: (. PROG_NAME) :+]\fP
 .fi
 .aj[+:
     IF (exist? "homerc") :+]
@@ -452,7 +455,7 @@ the RC files.[+:
   == "1"    :+]
 The \fIhomerc\fP file is "\fI[+:homerc:+]\fP", unless that is a directory.
 In that case, the file "\fI[+: ?% rcfile "%s"
-(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP"
+(string-append "." prog_name "rc") :+]\fP"
 is searched for within that directory.[+:
 
   *         :+]
@@ -461,7 +464,7 @@ The \fIhomerc\fP files are [+:
       IF (last-for?) :+]and [+:
       ENDIF :+]"\fI[+: homerc :+]\fP"[+: ENDFOR :+].
 If any of these are directories, then the file \fI[+: ?% rcfile "%s"
-(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP
+(string-append "." prog_name "rc") :+]\fP
 is searched for within those directories.[+:
   ESAC      :+][+:
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.33 2004/07/31 18:51:31 bkorb Exp $
+ *  $Id: autogen.c,v 3.34 2004/10/07 16:07:03 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -388,6 +388,7 @@ signalSetup( void )
             break;
 
 #ifdef DAEMON_ENABLED
+# error DAEMON-ization of AutoGen is not ready for prime time
         case SIGHUP:
             if (HAVE_OPT( DAEMON )) {
                 sa.sa_handler = handleSighup;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.24 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: defLex.c,v 3.25 2004/10/07 16:07:03 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -284,7 +284,6 @@ lex_done:
 }
 
 
-tSCC* apzEvents[ DP_EVENT_CT+1 ];
 EXPORT void
 yyerror( char* s )
 {

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.31 2004/10/03 02:56:23 bkorb Exp $
+ *   $Id: opts.def,v 3.32 2004/10/07 16:07:03 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -31,6 +31,11 @@ copyright = {
     type  = gpl;
 };
 
+/*
+ *  "XML2AG" is a wrapper around AutoGen.  Therefore, this file serves
+ *  to describe the options for both programs.  Which is being described
+ *  depends on the definition state of "XML2AG".
+ */
 #ifndef XML2AG
 prog-name      = "autogen";
 prog-title     = "The Automated Program Generator";
@@ -591,6 +596,7 @@ flag = {
     arg-type    = string;
     arg-name    = connect-type;
     descrip     = "TCP port or fattach file name";
+    woops       = (error "Daemon-ization is not ready for prime time");
 #ifndef XML2AG
     ifdef       = DAEMON_ENABLED;
     no-preset;

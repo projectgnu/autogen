@@ -1,9 +1,18 @@
+2004-10-07  Matt Kraai  <kraai@ftbfs.org>
+
+	* configure.in(AC_TYPE_SIGNAL): deleted, not really used
+	* agen5/autogen.h(fileAbort): omit initialization.  Struct too varied.
+	* agen5/defLex.c(apzEvents): redundant declaration
+	* agen5/fmemopen.c: over-protect flag bit mask
+	* agen5/funcEval.c: remove unused stuff
+	* getdefs/getdefs.c(processFile): fix format argument order
+	
 2004-10-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/directive.tpl: put daemon stuff under ifdef DAEMON_ENABLED
 	* agen5/autogen.c: ditto
 	* agen5/autogen.h: ditto
-	* agen5/opts.def: ditto
+	* agen5/opts.def: ditto, plus ensure "daemonize" is not enabled
 	* agen5/test/Makefile.am: Add disabled daemon test
 	* agen5/test/for.test: exercize tpl-file-line function
 	* autoopts/autoopts.c: disable presetting of equivalenced options
@@ -12,7 +21,6 @@
 	* autoopts/options_h.tpl: add a flag to indicate presetting state
 	* autoopts/optlib.tpl: add OPTNAME_MEMBERSHIP_MASK for set memberships
 	Also, redirect equivalenced option values to the base option
-	* autoopts/streqv.h: Prefix the globals with "option_"
 	* autoopts/test/Makefile.am: add the enums test
 	* autoopts/test/enums.test: more rigorous testing of sets and enums
 	* config/libopts.def: fix warnings in config tests

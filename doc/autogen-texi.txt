@@ -2049,14 +2049,14 @@ AutoGen Definitions options;
 prog-name     = check;
 prog-title    = "Checkout Automated Options";
 long-opts;
-test_main;
+test-main;
 
 flag = @{
     name      = check_dirs;
     value     = L;        /* flag style option character */
-    arg_type  = string;   /* option argument indication  */
+    arg-type  = string;   /* option argument indication  */
     max       = NOLIMIT;  /* occurrence limit (none)     */
-    stack_arg;            /* save opt args in a stack    */
+    stack-arg;            /* save opt args in a stack    */
     descrip   = "Checkout directory list";
 @};
 

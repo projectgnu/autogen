@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2004-02-01 12:13:00 bkorb"
+# Time-stamp:        "2004-10-04 06:04:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 3.4 2004/02/01 21:26:46 bkorb Exp $
+# $Id: getopt.test,v 3.5 2004/10/07 16:07:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -593,4 +593,4 @@ cmp -s ${testname}2-base.c ${testname}2-getopt.c || { set +x ; \
   failure "`diff ${testname}2-base.c ${testname}2-getopt.c`" ; }
 
 cleanup
-# end of argument.test
+# end of getopt.test

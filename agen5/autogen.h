@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.34 2004/08/15 00:52:47 bkorb Exp $
+ *  $Id: autogen.h,v 3.35 2004/10/07 16:07:03 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -324,7 +324,7 @@ MODE tCC*        pzCurSfx         VALUE( NULL );
 MODE time_t      outTime          VALUE( 0 );
 MODE tFpStack*   pCurFp           VALUE( NULL );
 MODE tOutSpec*   pOutSpecList     VALUE( NULL );
-MODE jmp_buf     fileAbort        VALUE( { 0 } );
+MODE jmp_buf     fileAbort;
 MODE char*       pzCurStart       VALUE( NULL );
 MODE uintptr_t   curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );

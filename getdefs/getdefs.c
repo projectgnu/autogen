@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.13 2004/02/01 21:26:46 bkorb Exp $
+ *  $Id: getdefs.c,v 3.14 2004/10/07 16:07:03 bkorb Exp $
  *
  *    getdefs copyright 1999-2004 Bruce Korb
  *
- *  Time-stamp:        "2003-12-20 10:32:56 bkorb"
+ *  Time-stamp:        "2004-10-07 09:04:35 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -807,7 +807,7 @@ processFile( tCC* pzFile )
             } else
                 ch  = NUL;
 
-            fprintf( stderr, zNoSubexp, pzFile, lineNo, pzDef );
+            fprintf( stderr, zNoSubexp, lineNo, pzFile, pzDef );
             if (ch != NUL)
                 *pz = ch;
             continue;

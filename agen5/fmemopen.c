@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-09-01 18:05:45 bkorb"
+ * Time-stamp:      "2004-10-07 08:26:52 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -166,10 +166,10 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
      *  This bit is set with either "a"ppend mode in the open mode string, or
      *  with a '+' flag setting read and write mode.
      */
-    if (pFMC->mode & FLAG_BIT(append) == 0)
+    if ((pFMC->mode & FLAG_BIT(append)) == 0)
         goto no_space;
 
-    if (pFMC->mode & FLAG_BIT(allocated) == 0) {
+    if ((pFMC->mode & FLAG_BIT(allocated)) == 0) {
         /*
          *  Previously, this was a user supplied buffer.  We now move to one
          *  of our own.  The user is responsible for the earlier memory.
@@ -516,7 +516,7 @@ fmemopen(void *buf, size_t len, const char *pMode)
          *  best include "append".
          */
         if (len == 0) {
-            if (pFMC->mode & FLAG_BIT(append) == 0) {
+            if ((pFMC->mode & FLAG_BIT(append)) == 0) {
                 errno = EINVAL;
                 free( pFMC );
                 return NULL;

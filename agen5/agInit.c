@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 3.4 2004/08/31 02:35:14 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 3.5 2004/10/07 16:07:03 bkorb Exp $
  *
- *  Time-stamp:      "2004-08-15 10:03:08 bkorb"
+ *  Time-stamp:      "2004-10-04 06:48:18 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.

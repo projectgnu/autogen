@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.22 2004/08/15 00:52:47 bkorb Exp $
+ *  $Id: funcEval.c,v 3.23 2004/10/07 16:07:03 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -304,8 +304,6 @@ ag_scm_error_source_line( void )
 SCM 
 ag_scm_emit( SCM val )
 {
-    SCM car;
-
     for (;;) {
         if (val == SCM_UNDEFINED)
             break;
@@ -335,7 +333,6 @@ ag_scm_emit( SCM val )
         break;
     }
 
- done:
     return SCM_UNDEFINED;
 }
 
