@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Thu Jul 29 11:20:36 1999				      
+# Last Modified:     Thu Jul 29 13:36:30 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.8 1999/07/29 18:20:42 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.9 1999/07/29 20:36:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -21,6 +21,8 @@ pre )
       columns --version && \
       getdefs --version ) > /dev/null 2>&2 || \
         missing autogen ftp://autogen.linuxbox.com/pub/autogen-4.5.5.tar.gz
+
+    autogen misc.def
 
     if [ ! -f ${srcdir}/doc/autogen.texi ]
     then touch 0101000070 ${srcdir}/doc/autogen.texi ; fi
