@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.31 2000/03/12 23:48:22 bruce Exp $
+#$Id: optcode.tpl,v 2.32 2000/03/16 02:25:43 bruce Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -158,14 +158,14 @@ static tOptProc doOpt[=(. cap-name)=];[=
 
       IF (exist? "call_proc") =]
 #define [=(get "call_proc")=] [=
-          IF (not (exist? "max")) =](tpOptProc)NULL[=
+          IF   (not (exist? "max")) =](tpOptProc)NULL[=
           ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
           ELSE =](tpOptProc)NULL[=
           ENDIF=][=
 
       ELIF (exist? "flag_code") =]
 #define doOpt[=(. cap-name)=] [=
-          IF (not (exist? "max")) =](tpOptProc)NULL[=
+          IF   (not (exist? "max")) =](tpOptProc)NULL[=
           ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
           ELSE =](tpOptProc)NULL[=
           ENDIF=][=

@@ -1,7 +1,7 @@
 /*
  *  defLoad.c
  *
- *  $Id: defLoad.c,v 1.5 2000/03/11 01:49:24 bruce Exp $
+ *  $Id: defLoad.c,v 1.6 2000/03/16 02:25:42 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -296,6 +296,7 @@ readDefines( void )
     if (! ENABLED_OPT( DEFINITIONS )) {
         pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ));
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
+        pBaseCtx->lineNo     = 1;
         pBaseCtx->pzFileName = "@@ No-Definitions @@";
         return;
     }
@@ -352,7 +353,7 @@ readDefines( void )
         AG_ABEND;
     }
     memset( (void*)pBaseCtx, 0, sizeLeft );
-    pBaseCtx->lineNo = 1;
+    pBaseCtx->lineNo     = 1;
     sizeLeft = dataSize;
 
     /*

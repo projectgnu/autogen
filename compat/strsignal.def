@@ -3,12 +3,12 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 2.2 1999/10/28 02:01:52 bruce Exp $
+ *  $Id: strsignal.def,v 2.3 2000/03/16 02:25:43 bruce Exp $
  */
 
 #shell
 
-RE_sigfind='[A-Z]+[ 	]+[1-9][0-9]*'
+RE_sigfind='[A-Z12]+[ 	]+[1-9][0-9]*'
 RE_sigdef='^#[ 	]*define[ 	][ 	]*SIG'
 RE_inc='^#[ 	]*include[ 	][ 	]*<'
 

@@ -18,6 +18,9 @@ then
   top_srcdir=..
   export top_builddir top_srcdir
 fi
+
+#  disable any $HOME defaults
+#
 HOME=/dev/null
 
 if [ -z "${DEBUG_OPTS}" ]
@@ -131,6 +134,7 @@ set -e
 #
 for t
 do
+  echo Re-building $t
   case "$t" in
   defParse.[ch] )
     #  Set a default for YACC
@@ -171,8 +175,8 @@ do
     eopt="$eopt defs=gfunc templ=snarf srcfile"
     eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
     echo ${GD} $eopt exp*.c func*.c
-    ( SHELL=ksh ${GD} $eopt exp*.c func*.c 2>&1 
-    ) | egrep -v 'no copies of pattern'
+    ( SHELL=ksh ${GD} $eopt exp*.c func*.c 2>&1 ) > stamp-exprini
+    egrep -v 'no copies of pattern' stamp-exprini || :
     date > stamp-exprini
     ;;
 

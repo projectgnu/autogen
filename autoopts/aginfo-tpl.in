@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.9 2000/03/13 00:12:02 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.10 2000/03/16 02:25:43 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -49,8 +49,8 @@ ENDIF=]
 
 This software is released under [=
 CASE copyright.type =][=
- =  gpl =]the GNU Public License[=
- = lgpl =]the GNU Public License with Library Extensions[=
+ =  gpl =]the GNU General Public License[=
+ = lgpl =]the GNU General Public License with Library Extensions[=
  =  bsd =]the Free BSD License[=
  *      =]a proprietary copyright[=
 ESAC =].
