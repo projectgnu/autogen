@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:21:00 $
+# Last Modified:     $Date: 2005/01/19 01:16:46 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: handler.test,v 4.2 2005/01/19 01:16:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -88,8 +88,12 @@ sed '/^XXX-REMOVE-XXX$/d;s/XXX-REMOVE-XXX//' ${testname}.tmp > ${testname}.c
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-sed '1,/Create the static procedure(s) declared above/d' \
-    ${testname}.c > ${testname}.test
+# We are testing to ensure the procedures are created correctly.
+# The template line numbers and time stamps and all that cruft
+# vary too much, so sed them away.
+#
+sed -e '1,/Create the static procedure(s) declared above/d' \
+    -e /^#line/d ${testname}.c > ${testname}.test
 
 # # # # # # # # # # SAMPLE OUTPUT FILE # # # # # # # # #
 
@@ -218,10 +222,9 @@ translate_option_strings( void )
      */
     if (option_usage_text.field_ct == 0)
         return;
-
     /*
-     *  Do the translations.  This code gets compiled into the client programs.
-     *  The first pointer follows the field count field.
+     *  Do the translations.  The first pointer follows the field count field.
+     *  The field count field is the size of a pointer.
      */
     {
         char** ppz = (char**)(void*)&(option_usage_text);

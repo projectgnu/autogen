@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.3 2005/01/09 00:25:06 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.4 2005/01/19 01:16:46 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -55,10 +55,10 @@ tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static tCC*
-findDirName( tOptions* pOpts );
+findDirName( tOptions* pOpts, int* p_free_res );
 
 static tCC*
-findFileName( tOptions* pOpts );
+findFileName( tOptions* pOpts, int* p_free_res );
 
 static void
 printEntry(
@@ -68,7 +68,7 @@ printEntry(
 /* = = = END-STATIC-FORWARD = = = */
 
 static tCC*
-findDirName( tOptions* pOpts )
+findDirName( tOptions* pOpts, int* p_free )
 {
     tCC*  pzDir;
 
@@ -129,13 +129,14 @@ findDirName( tOptions* pOpts )
             return pzEnv;
 
         {
-            size_t sz = strlen( pzEnv ) + strlen( pzEndDir );
+            size_t sz = strlen( pzEnv ) + strlen( pzEndDir ) + 2;
             pzFileName = (char*)AGALOC( sz, "dir name" );
         }
 
         if (pzFileName == NULL)
             return NULL;
 
+        *p_free = 1;
         /*
          *  Glue together the full name into the allocated memory.
          *  FIXME: We lose track of this memory.
@@ -147,12 +148,13 @@ findDirName( tOptions* pOpts )
 
 
 static tCC*
-findFileName( tOptions* pOpts )
+findFileName( tOptions* pOpts, int* p_free_name )
 {
     tCC*   pzDir;
     struct stat stBuf;
+    int    free_dir_name = 0;
 
-    pzDir = findDirName( pOpts );
+    pzDir = findDirName( pOpts, &free_dir_name );
     if (pzDir == NULL)
         return NULL;
 
@@ -199,6 +201,8 @@ findFileName( tOptions* pOpts )
          */
         fprintf( stderr, zWarn, pOpts->pzProgName );
         fprintf( stderr, zNoStat, errno, strerror( errno ), pzDir );
+        if (free_dir_name)
+            AGFREE( (void*)pzDir );
         return NULL;
     } while (0);
 
@@ -216,7 +220,10 @@ findFileName( tOptions* pOpts )
 #else
             sprintf( pzPath, "%s/%s", pzDir, pOpts->pzRcName );
 #endif
+            if (free_dir_name)
+                AGFREE( (void*)pzDir );
             pzDir = pzPath;
+            free_dir_name = 1;
         }
 
         /*
@@ -228,6 +235,7 @@ findFileName( tOptions* pOpts )
                 fprintf( stderr, zWarn, pOpts->pzProgName );
                 fprintf( stderr, zNoStat, errno, strerror( errno ),
                          pzDir );
+                AGFREE( (void*)pzDir );
                 return NULL;
             }
 
@@ -245,6 +253,8 @@ findFileName( tOptions* pOpts )
     if (! S_ISREG( stBuf.st_mode )) {
         fprintf( stderr, zWarn, pOpts->pzProgName );
         fprintf( stderr, zNotFile, pzDir );
+        if (free_dir_name)
+            AGFREE( (void*)pzDir );
         return NULL;
     }
 
@@ -252,6 +262,7 @@ findFileName( tOptions* pOpts )
      *  Get rid of the old file
      */
     unlink( pzDir );
+    *p_free_name = free_dir_name;
     return pzDir;
 }
 
@@ -337,137 +348,144 @@ printEntry(
 void
 optionSaveFile( tOptions* pOpts )
 {
-    tCC*  pzFName;
-
-    pzFName = findFileName( pOpts );
-    if (pzFName == NULL)
-        return;
+    tOptDesc* pOD;
+    int       ct;
+    FILE*     fp;
 
     {
-        tOptDesc* pOD = pOpts->pOptDesc;
-        int       ct  = pOpts->presetOptCt;
-        FILE*     fp  = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
+        int   free_name = 0;
+        tCC*  pzFName = findFileName( pOpts, &free_name );
+        if (pzFName == NULL)
+            return;
 
+        fp = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
         if (fp == NULL) {
             fprintf( stderr, zWarn, pOpts->pzProgName );
             fprintf( stderr, zNoCreat, errno, strerror( errno ), pzFName );
+            if (free_name)
+                AGFREE((void*) pzFName );
             return;
         }
 
-        {
-            const char*  pz = pOpts->pzUsageTitle;
-            fputs( "#  ", fp );
-            do { fputc( *pz, fp ); } while (*(pz++) != '\n');
-        }
+        if (free_name)
+            AGFREE( (void*)pzFName );
+    }
 
-        {
-            time_t  timeVal = time( NULL );
-            char*   pzTime  = ctime( &timeVal );
+    {
+        const char*  pz = pOpts->pzUsageTitle;
+        fputs( "#  ", fp );
+        do { fputc( *pz, fp ); } while (*(pz++) != '\n');
+    }
 
-            fprintf( fp, zPresetFile, pzTime );
+    {
+        time_t  timeVal = time( NULL );
+        char*   pzTime  = ctime( &timeVal );
+
+        fprintf( fp, zPresetFile, pzTime );
 #ifdef HAVE_ALLOCATED_CTIME
-            /*
-             *  The return values for ctime(), localtime(), and gmtime()
-             *  normally point to static data that is overwritten by each call.
-             *  The test to detect allocated ctime, so we leak the memory.
-             */
-            free( pzTime );
+        /*
+         *  The return values for ctime(), localtime(), and gmtime()
+         *  normally point to static data that is overwritten by each call.
+         *  The test to detect allocated ctime, so we leak the memory.
+         */
+        AGFREE( (void*)pzTime );
 #endif
-        }
+    }
+
+    /*
+     *  FOR each of the defined options, ...
+     */
+    ct  = pOpts->presetOptCt;
+    pOD = pOpts->pOptDesc;
+    do  {
+        tOptDesc*  p;
 
         /*
-         *  FOR each of the defined options, ...
+         *  IF    the option has not been defined
+         *     OR it does not take an initialization value
+         *     OR it is equivalenced to another option
+         *  THEN continue (ignore it)
          */
-        do  {
-            tOptDesc*  p;
+        if (UNUSED_OPT( pOD ))
+            continue;
+
+        if ((pOD->fOptState & (OPTST_NO_INIT|OPTST_DOCUMENT|OPTST_OMITTED))
+            != 0)
+            continue;
+
+        if (  (pOD->optEquivIndex != NO_EQUIVALENT)
+              && (pOD->optEquivIndex != pOD->optIndex))
+            continue;
+
+        /*
+         *  Set a temporary pointer to the real option description
+         *  (i.e. account for equivalencing)
+         */
+        p = ((pOD->fOptState & OPTST_EQUIVALENCE) != 0)
+            ? (pOpts->pOptDesc + pOD->optActualIndex) : pOD;
+
+        /*
+         *  IF    no arguments are allowed
+         *  THEN just print the name and continue
+         */
+        if (p->optArgType == ARG_NONE) {
+            fprintf( fp, "%s\n",
+                     (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
+            continue;
+        }
+
+        switch (p->fOptState & ARGTYPE) {
+        case 0:
+        case OPTST_NUMERIC:
+            printEntry( fp, p, p->pzLastArg );
+            break;
+
+        case OPTST_STACKED:
+        {
+            tArgList*  pAL = (tArgList*)p->optCookie;
+            int        uct = pAL->useCt;
+            tCC**      ppz = pAL->apzArgs;
 
             /*
-             *  IF    the option has not been defined
-             *     OR it does not take an initialization value
-             *     OR it is equivalenced to another option
-             *  THEN continue (ignore it)
+             *  Disallow multiple copies of disabled options.
              */
-            if (UNUSED_OPT( pOD ))
-                continue;
+            if (uct > 1)
+                p->fOptState &= ~OPTST_DISABLED;
 
-            if ((pOD->fOptState & (OPTST_NO_INIT|OPTST_DOCUMENT|OPTST_OMITTED))
-                 != 0)
-                continue;
+            while (uct-- > 0)
+                printEntry( fp, p, *(ppz++) );
+            break;
+        }
 
-            if (  (pOD->optEquivIndex != NO_EQUIVALENT)
-               && (pOD->optEquivIndex != pOD->optIndex))
-                continue;
-
+        case OPTST_ENUMERATION:
+        case OPTST_MEMBER_BITS:
+        {
+            tCC* val = p->pzLastArg;
             /*
-             *  Set a temporary pointer to the real option description
-             *  (i.e. account for equivalencing)
+             *  This is a magic incantation that will convert the
+             *  bit flag values back into a string suitable for printing.
              */
-            p = ((pOD->fOptState & OPTST_EQUIVALENCE) != 0)
-                ? (pOpts->pOptDesc + pOD->optActualIndex) : pOD;
-
-            /*
-             *  IF    no arguments are allowed
-             *  THEN just print the name and continue
-             */
-            if (p->optArgType == ARG_NONE) {
-                fprintf( fp, "%s\n",
-                         (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
-                continue;
-            }
-
-            switch (p->fOptState & ARGTYPE) {
-            case 0:
-            case OPTST_NUMERIC:
-                printEntry( fp, p, p->pzLastArg );
-                break;
-
-            case OPTST_STACKED:
-            {
-                tArgList*  pAL = (tArgList*)p->optCookie;
-                int        uct = pAL->useCt;
-                tCC**      ppz = pAL->apzArgs;
-
+            (*(p->pOptProc))( (tOptions*)2UL, p );
+            printEntry( fp, p, p->pzLastArg );
+            if (p->pzLastArg != NULL)
                 /*
-                 *  Disallow multiple copies of disabled options.
+                 *  bit flag and enumeration strings get allocated
                  */
-                if (uct > 1)
-                    p->fOptState &= ~OPTST_DISABLED;
+                AGFREE( (void*)p->pzLastArg );
+            p->pzLastArg = val;
+            break;
+        }
 
-                while (uct-- > 0)
-                    printEntry( fp, p, *(ppz++) );
-                break;
-            }
+        case OPTST_BOOLEAN:
+            printEntry( fp, p, (p->pzLastArg != 0) ? "true" : "false" );
+            break;
 
-            case OPTST_ENUMERATION:
-            case OPTST_MEMBER_BITS:
-            {
-                tCC* val = p->pzLastArg;
-                /*
-                 *  This is a magic incantation that will convert the
-                 *  bit flag values back into a string suitable for printing.
-                 */
-                (*(p->pOptProc))( (tOptions*)2UL, p );
-                printEntry( fp, p, p->pzLastArg );
-                if (p->pzLastArg != NULL)
-                    /*
-                     *  bit flag strings get allocated
-                     */
-                    free( (char*)p->pzLastArg );
-                p->pzLastArg = val;
-                break;
-            }
+        default:
+            break; /* bogus - skip it */
+        }
+    } while ( (pOD++), (--ct > 0));
 
-            case OPTST_BOOLEAN:
-                printEntry( fp, p, (p->pzLastArg != 0) ? "true" : "false" );
-                break;
-
-            default:
-                break; /* bogus - skip it */
-            }
-        } while ( (pOD++), (--ct > 0));
-
-        fclose( fp );
-    }
+    fclose( fp );
 }
 /*
  * Local Variables:

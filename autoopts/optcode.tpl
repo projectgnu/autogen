@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+#$Id: optcode.tpl,v 4.2 2005/01/19 01:16:46 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -420,10 +420,9 @@ translate_option_strings( void )
      */
     if (option_usage_text.field_ct == 0)
         return;
-
     /*
-     *  Do the translations.  This code gets compiled into the client programs.
-     *  The first pointer follows the field count field.
+     *  Do the translations.  The first pointer follows the field count field.
+     *  The field count field is the size of a pointer.
      */
     {
         char** ppz = (char**)(void*)&(option_usage_text);

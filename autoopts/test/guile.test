@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2004-01-01 11:58:18 bkorb"
+# Time-stamp:        "2005-01-16 17:30:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: guile.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: guile.test,v 4.2 2005/01/19 01:16:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -41,7 +41,7 @@ cat >> ${testname}.def <<_EOF_
 include = '#include <stdio.h>';
 include = '#include <guile/gh.h>';
 guile-main;
-before-guile-boot = 'fputs( "guile starts\n", stdout );';
+before-guile-boot = '    fputs( "guile starts\n", stdout );';
 _EOF_
 
 echo ${AG_L} ${testname}.def

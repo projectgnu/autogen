@@ -1,3 +1,8 @@
+2004-01-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/opt*.tpl: Remove all the #line stuff.  Bad idea for AutoOpts.
+	* autoopts/save.c(findDirName): fix allocation size & mem leak.
+
 2004-01-16  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h(tDefCtx): change name of file name to be unique

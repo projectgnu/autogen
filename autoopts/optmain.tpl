@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.2 2005/01/17 01:12:08 bkorb Exp $
+# $Id: optmain.tpl,v 4.3 2005/01/19 01:16:46 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -49,7 +49,7 @@ inner_main( int argc, char** argv )
     }
 [=
   IF (> (len "guile-main") 0)  =]
-    [=guile-main=]
+[= guile-main =]
     exit( EXIT_SUCCESS );[=
   ELSE  =]
     export_options_to_guile( &[=(. pname)=]Options );
@@ -61,8 +61,9 @@ int
 main( int    argc,
       char** argv )
 {[=
-    % before-guile-boot "\n    %s\n"
- =]
+  (if (exist? "before-guile-boot")
+    (string-append
+       "\n"  (get "before-guile-boot") ) ) =]
     gh_enter( argc, argv, inner_main );
     /* NOT REACHED */
     return 0;
@@ -107,8 +108,10 @@ main( int argc, char** argv )
         argc -= ct;
         argv += ct;
     }[=
-    ENDIF    =]
-[= main-text =][=
+    ELSE            =][=
+      option-code   =][=
+    ENDIF           =]
+[= main-text        =][=
 
   ELSE=]
     (void)optionProcess( &[=(. pname)=]Options, argc, argv );[=
@@ -154,7 +157,7 @@ static int
 [= handler-proc =]( FILE* in_fp, const char* pz_file )
 {
     int res = 0;
-[= (prefix "    " (get (string-append (get "handler-proc") "-code"))) =]
+[= (get (string-append (get "handler-proc") "-code")) =]
     return res;
 }[=
 
@@ -175,12 +178,8 @@ main( int argc, char** argv )
         int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
         argc -= ct;
         argv += ct;
-    }[=
-
-  IF (exist? "main-init") =]
-[= main-init =][=
-  ENDIF =]
-
+    }
+[= main-init =]
     /*
      *  Input list from command line
      */
@@ -284,12 +283,8 @@ main( int argc, char** argv )
         int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
         argc -= ct;
         argv += ct;
-    }[=
-
-  IF (exist? "main-init") =]
-[= main-init =][=
-  ENDIF =]
-
+    }
+[= main-init =]
     /*
      *  Input list from command line
      */
@@ -623,7 +618,9 @@ DEFINE range-option-code
 (if (not (=* (get "arg-type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
 
-=]    static const struct {const int rmin, rmax;} rng[ [=(count "arg-range")=] ] = {
+=]
+    static const struct {const int rmin, rmax;} rng[ [=(count "arg-range")
+=] ] = {
 [=(out-push-new)      =][=
   FOR arg-range ",\n" =][=
     CASE arg-range    =][=
@@ -678,7 +675,8 @@ DEFINE range-option-code
 
 
   IF (> (count "arg-range") 1) =]
-    fprintf( option_usage_fp, "%sit must lie in one of the ranges:\n", pzIndent );
+    fprintf( option_usage_fp, "%sit must lie in one of the ranges:\n",
+             pzIndent );
     for ( ix=0;; ) {
         if (rng[ix].rmax == INT_MIN)
              fprintf( option_usage_fp, "%s%d exactly", pzIndent, rng[ix].rmin );
@@ -735,6 +733,7 @@ DEFINE define-option-callbacks  =][=
       invoke callback-proc-header  =][=
 
       IF (exist? "flag-code")      =][=
+
          flag-code                 =][=
 
       ELIF (exist? "extract-code") =][=
