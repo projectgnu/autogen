@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.14 2000/04/28 16:53:03 bkorb Exp $
+ *  $Id: expFormat.c,v 1.15 2000/04/28 16:57:03 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -312,8 +312,8 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  * what:  GNU lib public license
  *
  * exparg: prog_name, name of the program under the LGPL
- * exparg: prefix, String for starting each output line
  * exparg: owner, Grantor of the LGPL
+ * exparg: prefix, String for starting each output line
  *
  * doc:
  *  Emit a string that contains the GNU Library Public License.  It
@@ -359,8 +359,8 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
  * what:  Free BSD public license
  *
  * exparg: prog_name, name of the program under the BSD
- * exparg: prefix, String for starting each output line
  * exparg: owner, Grantor of the BSD License
+ * exparg: prefix, String for starting each output line
  *
  * doc:
  *  Emit a string that contains the Free BSD Public License.  It
