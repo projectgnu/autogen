@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -25,17 +25,23 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
+static tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
-STATIC tFpStack fpRoot = { 0, NULL, NULL, NULL };
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+doStdoutTemplate( tTemplate* pTF );
 
+static void
+openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  Generate all the text within a block.  The caller must
  *  know the exact bounds of the block.  "pEnd" actually
  *  must point to the first entry that is *not* to be emitted.
  */
-EXPORT void
+LOCAL void
 generateBlock( tTemplate*   pT,
                tMacro*      pMac,
                tMacro*      pEnd )
@@ -81,7 +87,7 @@ generateBlock( tTemplate*   pT,
 }
 
 
-STATIC void
+static void
 doStdoutTemplate( tTemplate* pTF )
 {
     tSCC zNoSfx[] = "* NONE *";
@@ -156,7 +162,7 @@ doStdoutTemplate( tTemplate* pTF )
 }
 
 
-EXPORT void
+LOCAL void
 processTemplate( tTemplate* pTF )
 {
     forInfo.fi_depth = 0;
@@ -242,7 +248,7 @@ processTemplate( tTemplate* pTF )
 }
 
 
-EXPORT void
+LOCAL void
 closeOutput( ag_bool purge )
 {
     if ((pCurFp->flags & FPF_NOCHMOD) == 0)
@@ -288,7 +294,7 @@ closeOutput( ag_bool purge )
 }
 
 
-STATIC void
+static void
 openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 {
     tCC*  pzDefFile;

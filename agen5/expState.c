@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expState.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -26,14 +26,23 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC int     entry_length(   char* pzName );
-STATIC int     count_entries(  char* pzName );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static int
+entry_length( char* pzName );
+
+static int
+count_entries( char* pzName );
+
+static SCM
+find_entry_value( SCM op, SCM obj, SCM test );
+/* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION SUPPORT ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-STATIC int
+static int
 entry_length( char* pzName )
 {
     tDefEntry**  papDefs = findEntryList( pzName );
@@ -55,7 +64,7 @@ entry_length( char* pzName )
 }
 
 
-STATIC int
+static int
 count_entries( char* pzName )
 {
     tDefEntry**  papDefs = findEntryList( pzName );
@@ -74,7 +83,7 @@ count_entries( char* pzName )
 }
 
 
-STATIC SCM
+static SCM
 find_entry_value( SCM op, SCM obj, SCM test )
 {
     ag_bool     isIndexed;

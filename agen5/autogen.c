@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: autogen.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -31,18 +31,30 @@ tSCC zClientInput[] = "client-input";
 tSCC* apzStateName[] = { STATE_TABLE };
 #undef _State_
 
-STATIC sigjmp_buf  abendJumpEnv;
+static sigjmp_buf  abendJumpEnv;
 
-/*
- *  Local procedures
- */
-STATIC void signalSetup( void );
-STATIC void abendSignal( int sig );
-STATIC void doneCheck( void );
-STATIC void inner_main( int argc, char** argv );
-STATIC void signalExit( int sig );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+inner_main( int argc, char** argv );
 
-STATIC void
+static void
+signalExit( int sig );
+
+static void
+abendSignal( int sig );
+
+static void
+ignoreSignal( int sig );
+
+static void
+doneCheck( void );
+
+static void
+signalSetup( void );
+/* = = = END-STATIC-FORWARD = = = */
+
+static void
 inner_main( int argc, char** argv )
 {
     initialize( argc, argv );
@@ -92,7 +104,7 @@ main( int    argc,
 }
 
 
-STATIC void
+static void
 signalExit( int sig )
 {
     tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
@@ -154,7 +166,7 @@ signalExit( int sig )
  *  abendSignal catches signals we abend on.  The "siglongjmp" goes back
  *  to the real "main()" procedure and it will call "signalExit()", above.
  */
-STATIC void
+static void
 abendSignal( int sig )
 {
     siglongjmp( abendJumpEnv, sig );
@@ -167,7 +179,7 @@ abendSignal( int sig )
  *  Therefore, always in all programs set it to call a procedure.
  *  The "wait(3)" call will do magical things, but will not override SIGIGN.
  */
-STATIC void
+static void
 ignoreSignal( int sig )
 {
 #ifdef DEBUG_ENABLED
@@ -180,7 +192,7 @@ ignoreSignal( int sig )
 /*
  *  This is called during normal exit processing.
  */
-STATIC void
+static void
 doneCheck( void )
 {
     tSCC zErr[] =
@@ -288,13 +300,12 @@ doneCheck( void )
 }
 
 
+LOCAL void
+ag_abend_at( tCC* pzMsg
 #ifdef DEBUG_ENABLED
-EXPORT void
-ag_abend_at( tCC* pzMsg, tCC* pzFile, int line )
-#else
-EXPORT void
-ag_abend( tCC* pzMsg )
+    , tCC* pzFile, int line
 #endif
+    )
 {
     if (*pzOopsPrefix != NUL) {
         fputs( pzOopsPrefix, stderr );
@@ -333,7 +344,7 @@ ag_abend( tCC* pzMsg )
 }
 
 
-STATIC void
+static void
 signalSetup( void )
 {
     struct sigaction  sa;

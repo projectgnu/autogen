@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: defLoad.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -25,15 +25,21 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC tDefEntry* pFreeEntryList = NULL;
-STATIC void*      pAllocList     = NULL;
+static tDefEntry* pFreeEntryList = NULL;
+static void*      pAllocList     = NULL;
 
 #define ENTRY_SPACE        (4096 - sizeof(void*))
 #define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(tDefEntry))
 #define ENTRY_ALLOC_SIZE   \
     ((ENTRY_ALLOC_CT * sizeof( tDefEntry )) + sizeof(void*))
 
-EXPORT void
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tDefEntry*
+insertDef( tDefEntry* pDef );
+/* = = = END-STATIC-FORWARD = = = */
+
+LOCAL void
 freeEntry( tDefEntry* pDE )
 {
     pDE->pNext = pFreeEntryList;
@@ -41,7 +47,7 @@ freeEntry( tDefEntry* pDE )
 }
 
 
-EXPORT tDefEntry*
+LOCAL tDefEntry*
 getEntry( void )
 {
     tDefEntry*  pRes = pFreeEntryList;
@@ -88,7 +94,7 @@ getEntry( void )
 /*
  *  Append a new entry at the end of a sibling (or twin) list.
  */
-STATIC tDefEntry*
+static tDefEntry*
 insertDef( tDefEntry* pDef )
 {
     tDefEntry* pList = ppParseStack[ stackDepth ];
@@ -198,7 +204,7 @@ insertDef( tDefEntry* pDef )
 }
 
 
-EXPORT tDefEntry*
+LOCAL tDefEntry*
 findPlace( char* name, tCC* pzIndex )
 {
     tDefEntry* pE = getEntry();
@@ -228,7 +234,7 @@ findPlace( char* name, tCC* pzIndex )
  *
  *  Suck in the entire definitions file and parse it.
  */
-EXPORT void
+LOCAL void
 readDefines( void )
 {
     char*    pzData;
@@ -406,7 +412,7 @@ readDefines( void )
 }
 
 
-extern void
+void
 unloadDefs( void )
 {
 }

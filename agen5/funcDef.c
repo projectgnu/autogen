@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: funcDef.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -36,13 +36,25 @@ struct def_list {
 tSCC zNoResolution[] = "Could not resolve macro name: ``%s''";
 tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
 
-STATIC tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
+static tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
 
-STATIC int   orderDefList( const void* p1, const void* p2 );
-STATIC void  prepInvokeArgs( tMacro* pMac );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static int
+orderDefList( const void* p1, const void* p2 );
+
+static tDefList*
+linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
+
+static void
+prepInvokeArgs( tMacro* pMac );
+
+static void
+build_defs( int defCt, tDefList* pList );
+/* = = = END-STATIC-FORWARD = = = */
 
 
-STATIC int
+static int
 orderDefList( const void* p1, const void* p2 )
 {
     tDefEntry* pDL1 = (tDefEntry*)p1;
@@ -60,7 +72,7 @@ orderDefList( const void* p1, const void* p2 )
 }
 
 
-STATIC tDefList*
+static tDefList*
 linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
 {
     tDefList* pN;
@@ -103,7 +115,7 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
  *  for name-value assignments that are only to live for the duration
  *  of the processing of the user defined macro.
  */
-EXPORT void
+LOCAL void
 parseMacroArgs( tTemplate* pT, tMacro* pMac )
 {
     char*        pzScan = pT->pzTemplText + pMac->ozText;
@@ -299,7 +311,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 }
 
 
-STATIC void
+static void
 prepInvokeArgs( tMacro* pMac )
 {
     char*  pzText;
@@ -385,7 +397,7 @@ mFunc_Debug( tTemplate* pT, tMacro* pMac )
  *
  *  Build up a definition context created by passed-in macro arguments
  */
-STATIC void
+static void
 build_defs( int defCt, tDefList* pList )
 {
     tDefEntry* pDefs = &(pList->de);

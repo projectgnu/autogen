@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expGuile.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -25,7 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-teGuileType
+LOCAL teGuileType
 gh_type_e( SCM typ )
 {
     if (gh_boolean_p( typ ))
@@ -64,7 +64,7 @@ gh_type_e( SCM typ )
     return GH_TYPE_UNDEFINED;
 }
 
-EXPORT SCM
+LOCAL SCM
 ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
 {
     SCM port;

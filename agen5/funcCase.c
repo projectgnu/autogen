@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: funcCase.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -40,11 +40,8 @@
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
 
-STATIC void     compile_re( regex_t* pRe, char* pzPat, int flags );
-STATIC void     upString( char* pz );
-
 typedef tSuccess (tSelectProc)( char* pzText, char* pzMatch );
-STATIC tSelectProc
+static tSelectProc
     Select_Compare,
     Select_Compare_End,
     Select_Compare_Start,
@@ -59,9 +56,84 @@ STATIC tSelectProc
     Select_Match_Full,
     Select_Match_Always;
 
+/*
+ *  This is global data used to keep track of the current CASE
+ *  statement being processed.  When CASE statements nest,
+ *  these data are copied onto the stack and restored when
+ *  the nested CASE statement's ESAC function is found.
+ */
+typedef struct case_stack tCaseStack;
+struct case_stack {
+    tMacro*  pCase;
+    tMacro*  pSelect;
+};
+
+static tCaseStack  current_case;
+static tLoadProc mLoad_Select;
+
+static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
+static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+compile_re( regex_t* pRe, char* pzPat, int flags );
+
+static void
+upString( char* pz );
+
+static tSuccess
+Select_Compare( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Compare_End( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Compare_Start( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Compare_Full( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Equivalent( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Equivalent_End( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Equivalent_Start( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Equivalent_Full( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_End( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_Start( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_Full( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_Always( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_Existence( char* pzText, char* pzMatch );
+
+static tSuccess
+Select_Match_NonExistence( char* pzText, char* pzMatch );
+
+static tMacro*
+mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
+/* = = = END-STATIC-FORWARD = = = */
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-STATIC void
+static void
 compile_re( regex_t* pRe, char* pzPat, int flags )
 {
     int  rerr = regcomp( pRe, pzPat, flags );
@@ -74,7 +146,7 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
 }
 
 
-STATIC void
+static void
 upString( char* pz )
 {
     while (*pz != NUL)
@@ -96,7 +168,7 @@ upString( char* pz )
  * doc:  Test to see if a string contains a substring.  "strstr(3)"
  *       will find an address.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Compare( char* pzText, char* pzMatch )
 {
     return (strstr( pzText, pzMatch )) ? SUCCESS : FAILURE;
@@ -125,7 +197,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
  * doc:  Test to see if a string ends with a substring.
  *       strcmp(3) returns zero for comparing the string ends.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Compare_End( char* pzText, char* pzMatch )
 {
     size_t   vlen = strlen( pzMatch );
@@ -164,7 +236,7 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string starts with a substring.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Compare_Start( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
@@ -200,7 +272,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
  *
  * doc:  Test to see if two strings exactly match.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Compare_Full( char* pzText, char* pzMatch )
 {
     return (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
@@ -232,7 +304,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
  *       to character case and certain characters are considered `equivalent'.
  *       Viz., '-', '_' and '^' are equivalent.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Equivalent( char* pzText, char* pzMatch )
 {
     char*    pz;
@@ -278,7 +350,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string ends with an equivalent string.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Equivalent_End( char* pzText, char* pzMatch )
 {
     size_t   vlen = strlen( pzMatch );
@@ -315,7 +387,7 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string starts with an equivalent string.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Equivalent_Start( char* pzText, char* pzMatch )
 {
     size_t   vlen = strlen( pzMatch );
@@ -355,7 +427,7 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
  *       This is an overloaded operation.  If the arguments are not both
  *       strings, then the query is passed through to @code{scm_num_eq_p()}.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Equivalent_Full( char* pzText, char* pzMatch )
 {
     return (streqvcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
@@ -408,7 +480,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
  * doc:  Test to see if a string contains a pattern.
  *       Case is not significant.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Match( char* pzText, char* pzMatch )
 {
     /*
@@ -489,7 +561,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
  * doc:  Test to see if a string ends with a pattern.
  *       Case is not significant.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Match_End( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -581,7 +653,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
  * doc:  Test to see if a string starts with a pattern.
  *       Case is not significant.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Match_Start( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -674,7 +746,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  *       Case is not significant, but any character equivalences
  *       must be expressed in your regular expression.
 =*/
-STATIC tSuccess
+static tSuccess
 Select_Match_Full( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -752,7 +824,7 @@ ag_scm_string_eqv_match_p( SCM text, SCM substr )
 /*
  *  We don't bother making a Guile function for any of these :)
  */
-STATIC tSuccess
+static tSuccess
 Select_Match_Always( char* pzText, char* pzMatch )
 {
     return SUCCESS;
@@ -763,13 +835,13 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  and defaulted to an empty string.  So, the result exists if
  *  the pzText address is anything except "zNil".
  */
-STATIC tSuccess
+static tSuccess
 Select_Match_Existence( char* pzText, char* pzMatch )
 {
     return (pzText != zDefaultNil) ? SUCCESS : FAILURE;
 }
 
-STATIC tSuccess
+static tSuccess
 Select_Match_NonExistence( char* pzText, char* pzMatch )
 {
     return (pzText == zDefaultNil) ? SUCCESS : FAILURE;
@@ -966,24 +1038,6 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
 }
 
 /*
- *  This is global data used to keep track of the current CASE
- *  statement being processed.  When CASE statements nest,
- *  these data are copied onto the stack and restored when
- *  the nested CASE statement's ESAC function is found.
- */
-typedef struct case_stack tCaseStack;
-struct case_stack {
-    tMacro*  pCase;
-    tMacro*  pSelect;
-};
-
-STATIC tCaseStack  current_case;
-STATIC tLoadProc mLoad_Select;
-
-static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
-static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
-
-/*
  *  mLoad_CASE
  *
  *  This function is called to set up (load) the macro
@@ -1095,7 +1149,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    Instead, you must use one of the 19 match operators described in
  *    the @code{CASE} macro description.
 =*/
-STATIC tMacro*
+static tMacro*
 mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     const char*    pzScan = *ppzScan;  /* text after macro */

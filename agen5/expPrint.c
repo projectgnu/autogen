@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expPrint.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -29,19 +29,28 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC sigjmp_buf printJumpEnv;
-STATIC void   printFault( int sig );
-STATIC ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
+static sigjmp_buf printJumpEnv;
+static void   printFault( int sig );
+static ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
 tSCC pzFormatName[] = "format";
 
-STATIC void
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+printFault( int sig );
+
+static ssize_t
+safePrintf( char** ppzBuf, char* pzFmt, void** argV );
+/* = = = END-STATIC-FORWARD = = = */
+
+static void
 printFault( int sig )
 {
     siglongjmp( printJumpEnv, sig );
 }
 
 
-STATIC ssize_t
+static ssize_t
 safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 {
     tSCC zBadArgs[]  = "Bad args to sprintf";
@@ -97,7 +106,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 }
 
 
-EXPORT SCM
+LOCAL SCM
 run_printf( char* pzFmt, int len, SCM alist )
 {
     SCM     res;

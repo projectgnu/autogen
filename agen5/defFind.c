@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: defFind.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -36,14 +36,32 @@ tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
 
 tSC zDefinitionName[ MAXPATHLEN ];
 
-STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
+static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
 #define ILLFORMEDNAME() \
     AG_ABEND( aprf( zNameRef, zDefinitionName, \
               pCurTemplate->pzFileName, pCurMacro->lineNo ));
 
 
-STATIC tDefEntry*
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tDefEntry*
+findEntryByIndex( tDefEntry* pE, char* pzScan );
+
+static void
+addResult( tDefEntry* pDE, tDefEntryList* pDEL );
+
+static size_t
+badName( char* pzD, const char* pzS, size_t srcLen );
+
+static tDefEntry*
+defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed );
+
+static tDefEntry**
+entryListSearch( char* pzName, tDefCtx* pDefCtx );
+/* = = = END-STATIC-FORWARD = = = */
+
+static tDefEntry*
 findEntryByIndex( tDefEntry* pE, char* pzScan )
 {
     int  idx;
@@ -163,7 +181,7 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
 }
 
 
-STATIC size_t
+static size_t
 badName( char* pzD, const char* pzS, size_t srcLen )
 {
     memcpy( (void*)pzD, (void*)pzS, srcLen );
@@ -184,7 +202,7 @@ badName( char* pzD, const char* pzS, size_t srcLen )
  *      (always skipping white space).
  *  We start in CN_START.
  */
-EXPORT int
+LOCAL int
 canonicalizeName( char* pzD, const char* pzS, int srcLen )
 {
     typedef enum {
@@ -368,7 +386,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
  *  the element has been indexed (so the caller will not try
  *  to traverse the list of twins).
  */
-STATIC tDefEntry*
+static tDefEntry*
 defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
 {
     char*        pcBrace;
@@ -534,7 +552,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
 }
 
 
-EXPORT tDefEntry*
+LOCAL tDefEntry*
 findDefEntry( char* pzName, ag_bool* pIsIndexed )
 {
     return defEntrySearch( pzName, &currDefCtx, pIsIndexed );
@@ -550,7 +568,7 @@ findDefEntry( char* pzName, ag_bool* pIsIndexed )
  *  indicator saying if the element has been indexed (so the caller will
  *  not try to traverse the list of twins).
  */
-STATIC tDefEntry**
+static tDefEntry**
 entryListSearch( char* pzName, tDefCtx* pDefCtx )
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
@@ -725,7 +743,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
 }
 
 
-EXPORT tDefEntry**
+LOCAL tDefEntry**
 findEntryList( char* pzName )
 {
     return entryListSearch( pzName, &currDefCtx );

@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: agShell.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -43,20 +43,26 @@
 /*
  *  Dual pipe opening of a child process
  */
-STATIC tpfPair serverPair = { NULL, NULL };
-STATIC pid_t   serverId   = NULLPROCESS;
-STATIC tpChar  pCurDir    = NULL;
-STATIC ag_bool errClose   = AG_FALSE;
+static tpfPair serverPair = { NULL, NULL };
+static pid_t   serverId   = NULLPROCESS;
+static tpChar  pCurDir    = NULL;
+static ag_bool errClose   = AG_FALSE;
 
 tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s\n";
 
 const char* pzLastCmd = NULL;
 
-STATIC void sigHandler( int signo );
-STATIC void serverSetup( void );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+sigHandler( int signo );
+
+static void
+serverSetup( void );
+/* = = = END-STATIC-FORWARD = = = */
 
 
-EXPORT void
+LOCAL void
 closeServer( void )
 {
     if (serverId == NULLPROCESS)
@@ -80,7 +86,7 @@ closeServer( void )
 }
 
 
-STATIC void
+static void
 sigHandler( int signo )
 {
     fprintf( pfTrace, "Closing server:  %s signal (%d) received\n",
@@ -98,7 +104,7 @@ sigHandler( int signo )
 }
 
 
-STATIC void
+static void
 serverSetup( void )
 {
     struct sigaction  saNew;
@@ -200,7 +206,7 @@ serverSetup( void )
  *  for the new process and, optionally, a pointer to a place
  *  to store the child's process id.
  */
-EXPORT int
+LOCAL int
 chainOpen( int       stdinFd,
            tCC**     ppArgs,
            pid_t*    pChild  )
@@ -357,7 +363,7 @@ chainOpen( int       stdinFd,
  *  process should write to "writeFd" and read from "readFd".
  *  The return value is the process id of the created process.
  */
-EXPORT pid_t
+LOCAL pid_t
 openServer( tFdPair* pPair, tCC** ppArgs )
 {
     pid_t     chId;
@@ -384,7 +390,7 @@ openServer( tFdPair* pPair, tCC** ppArgs )
  *  Identical to "openServer()", except that the "fd"'s are "fdopen(3)"-ed
  *  into file pointers instead.
  */
-EXPORT pid_t
+LOCAL pid_t
 openServerFP( tpfPair* pfPair, tCC** ppArgs )
 {
     tFdPair   fdPair;
@@ -408,7 +414,7 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
-EXPORT char*
+LOCAL char*
 loadData( FILE* fp )
 {
     char*   pzText;
@@ -493,7 +499,7 @@ loadData( FILE* fp )
  *  If one of the commands we send to it takes too long or it dies,
  *  we will shoot it and restart one later.
  */
-EXPORT char*
+LOCAL char*
 runShell( const char*  pzCmd )
 {
     tSCC zCmdFail[] = "CLOSING SHELL SERVER - command failure:\n\t%s\n";

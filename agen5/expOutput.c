@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expOutput.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -37,16 +37,18 @@ typedef struct {
     tFpStack*   pOutDesc;
 } tSuspendName;
 
-STATIC int            suspendCt   = 0;
-STATIC int            suspAllocCt = 0;
-STATIC tSuspendName*  pSuspended  = NULL;
-STATIC int            outputDepth = 1;
+static int            suspendCt   = 0;
+static int            suspAllocCt = 0;
+static tSuspendName*  pSuspended  = NULL;
+static int            outputDepth = 1;
 
-STATIC void addWriteAccess( char* pzFileName );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+addWriteAccess( char* pzFileName );
+/* = = = END-STATIC-FORWARD = = = */
 
-
-
-EXPORT void
+LOCAL void
 removeWriteAccess( int fd )
 {
     struct stat    sbuf;
@@ -76,7 +78,7 @@ removeWriteAccess( int fd )
     fchmod( fd, sbuf.st_mode & S_IAMB );
 }
 
-STATIC void
+static void
 addWriteAccess( char* pzFileName )
 {
     struct stat    sbuf;

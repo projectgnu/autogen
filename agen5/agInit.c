@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
- *  Time-stamp:      "2004-10-04 06:48:18 bkorb"
+ *  Time-stamp:      "2005-01-08 14:30:36 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -27,17 +27,23 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-STATIC void addSysEnv( char* pzEnvName );
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+addSysEnv( char* pzEnvName );
+/* = = = END-STATIC-FORWARD = = = */
+
 #ifdef DAEMON_ENABLED
-STATIC ag_bool evalProto( tCC** ppzS, uint16_t* pProto );
-STATIC void spawnPipe( const char* pzFile );
-STATIC void spawnListens( tCC* pzPort, sa_family_t af );
-STATIC void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
+ static ag_bool evalProto( tCC** ppzS, uint16_t* pProto );
+ static void spawnPipe( const char* pzFile );
+ static void spawnListens( tCC* pzPort, sa_family_t af );
+ static void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
 #endif
 
 #include "expr.ini"
 
-EXPORT void
+LOCAL void
 initialize( int arg_ct, char** arg_vec )
 {
     /*
@@ -149,7 +155,7 @@ initialize( int arg_ct, char** arg_vec )
 }
 
 
-STATIC void
+static void
 addSysEnv( char* pzEnvName )
 {
     tSCC zFmt[] = "%s=1";
@@ -183,7 +189,7 @@ addSysEnv( char* pzEnvName )
 
 #ifdef DAEMON_ENABLED
 
-STATIC ag_bool
+  static ag_bool
 evalProto( tCC** ppzS, uint16_t* pProto )
 {
     tCC* pzS = *ppzS;
@@ -203,14 +209,14 @@ evalProto( tCC** ppzS, uint16_t* pProto )
 }
 
 
-EXPORT void
+  LOCAL void
 handleSighup( int sig )
 {
     redoOptions = AG_TRUE;
 }
 
 
-STATIC void
+  static void
 spawnPipe( tCC* pzFile )
 {
 #   define S_IRW_ALL \
@@ -409,7 +415,7 @@ spawnPipe( tCC* pzFile )
 }
 
 
-STATIC void
+  static void
 spawnListens( tCC* pzPort, sa_family_t addr_family )
 {
     tSCC zPortFmt[] = "to port %s with %d type address";
@@ -546,7 +552,7 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
 }
 
 
-STATIC void
+  static void
 becomeDaemon( tCC* pzStdin,
               tCC* pzStdout,
               tCC* pzStderr,

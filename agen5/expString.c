@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expString.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -26,7 +26,34 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC SCM
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static SCM
+makeString( tCC*    pzText,
+            tCC*    pzNewLine,
+            size_t  newLineSize );
+
+static SCM
+shell_stringify( SCM obj, char qt );
+
+static void
+do_substitution(
+    tCC*        pzStr,
+    scm_sizet   strLen,
+    SCM         match,
+    SCM         repl,
+    char**      ppzRes,
+    scm_sizet*  pResLen );
+
+static void
+do_multi_subs(
+    char**      ppzStr,
+    scm_sizet*  pStrLen,
+    SCM         match,
+    SCM         repl );
+/* = = = END-STATIC-FORWARD = = = */
+
+static SCM
 makeString( tCC*    pzText,
             tCC*    pzNewLine,
             size_t  newLineSize )
@@ -194,7 +221,7 @@ makeString( tCC*    pzText,
 }
 
 
-STATIC SCM
+static SCM
 shell_stringify( SCM obj, char qt )
 {
     char*  pzDta;
@@ -299,7 +326,7 @@ shell_stringify( SCM obj, char qt )
  *  experience, except that we don't use regex-es.  It is straight
  *  text substitution.
  */
-STATIC void
+static void
 do_substitution(
     tCC*        pzStr,
     scm_sizet   strLen,
@@ -362,7 +389,7 @@ do_substitution(
  *  be done in the order found in the tree walk of list values.
  *  The "match" and "repl" trees *must* be identical in structure.
  */
-STATIC void
+static void
 do_multi_subs(
     char**      ppzStr,
     scm_sizet*  pStrLen,

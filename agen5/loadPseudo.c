@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -37,6 +37,18 @@
 tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
 
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tCC*
+doSchemeExpr( tCC* pzData, tCC* pzFileName );
+
+static te_pm_event
+findTokenType( tCC**  ppzData, te_pm_state fsm_state );
+
+static tCC*
+copyMarker( tCC* pzData, char* pzMark, int* pCt );
+/* = = = END-STATIC-FORWARD = = = */
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -44,7 +56,7 @@ tSCC zTpName[] = "template";
  *
  *  Process a scheme specification
  */
-STATIC tCC*
+static tCC*
 doSchemeExpr( tCC* pzData, tCC* pzFileName )
 {
     char*   pzEnd = (char*)pzData + strlen( pzData );
@@ -76,7 +88,7 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName )
  *
  *  Process a suffix specification
  */
-EXPORT tCC*
+LOCAL tCC*
 doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 {
     /*
@@ -163,7 +175,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
  *  Skiping leading white space, figure out what sort of token is under
  *  the scan pointer (pzData).
  */
-STATIC te_pm_event
+static te_pm_event
 findTokenType( tCC**  ppzData, te_pm_state fsm_state )
 {
     tCC* pzData = *ppzData;
@@ -285,7 +297,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
  *  Some sort of marker is under the scan pointer.  Copy it for as long
  *  as we find punctuation characters.
  */
-STATIC tCC*
+static tCC*
 copyMarker( tCC* pzData, char* pzMark, int* pCt )
 {
     int ct = 0;
@@ -314,7 +326,7 @@ copyMarker( tCC* pzData, char* pzMark, int* pCt )
  *  Using a finite state machine, scan over the tokens that make up the
  *  "pseudo macro" at the start of every template.
  */
-EXPORT tCC*
+LOCAL tCC*
 loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";

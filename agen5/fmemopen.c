@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-12-08 20:25:11 bkorb"
+ * Time-stamp:      "2005-01-08 13:51:37 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -111,6 +111,27 @@ struct fmem_cookie_s {
                                    Future architectures allow it to vary
                                    by memory region. */
 };
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static int
+fmem_getmode( const char *pMode, mode_bits_t *pRes );
+
+static int
+fmem_extend( fmem_cookie_t *pFMC, size_t new_size );
+
+static ssize_t
+fmem_read( void *cookie, void *pBuf, size_t sz );
+
+static ssize_t
+fmem_write( void *cookie, const void *pBuf, size_t sz );
+
+static seek_pos_t
+fmem_seek (void *cookie, fmem_off_t *p_offset, int dir);
+
+static int
+fmem_close( void *cookie );
+/* = = = END-STATIC-FORWARD = = = */
 
 static int
 fmem_getmode( const char *pMode, mode_bits_t *pRes )

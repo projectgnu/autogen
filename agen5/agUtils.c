@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: agUtils.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,7 +25,11 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC tCC* skipQuote( tCC* pzQte );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static tCC*
+skipQuote( tCC* pzQte );
+/* = = = END-STATIC-FORWARD = = = */
 
 #ifndef HAVE_STRLCPY
 size_t
@@ -56,7 +60,7 @@ strlcpy( char* dest, tCC* src, size_t n )
 #endif
 
 
-EXPORT char*
+LOCAL char*
 aprf( const char* pzFmt, ... )
 {
     char* pz;
@@ -77,7 +81,7 @@ aprf( const char* pzFmt, ... )
 }
 
 
-EXPORT void
+LOCAL void
 doOptions( int arg_ct, char** arg_vec )
 {
     /*
@@ -193,7 +197,7 @@ doOptions( int arg_ct, char** arg_vec )
 }
 
 
-EXPORT tCC*
+LOCAL tCC*
 getDefine( tCC* pzDefName )
 {
     tCC**   ppz;
@@ -222,7 +226,7 @@ getDefine( tCC* pzDefName )
 }
 
 
-EXPORT unsigned int
+LOCAL unsigned int
 doEscapeChar( tCC* pzIn, char* pRes )
 {
     unsigned int  res = 1;
@@ -340,7 +344,7 @@ doEscapeChar( tCC* pzIn, char* pRes )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-EXPORT char*
+LOCAL char*
 spanQuote( char* pzQte )
 {
     char  q = *pzQte;          /*  Save the quote character type */
@@ -391,7 +395,7 @@ spanQuote( char* pzQte )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-STATIC tCC*
+static tCC*
 skipQuote( tCC* pzQte )
 {
     char  q = *pzQte++;        /*  Save the quote character type */
@@ -436,7 +440,7 @@ skipQuote( tCC* pzQte )
 }
 
 
-EXPORT tCC*
+LOCAL tCC*
 skipScheme( tCC* pzSrc,  tCC* pzEnd )
 {
     int  level = 0;
@@ -461,7 +465,7 @@ skipScheme( tCC* pzSrc,  tCC* pzEnd )
 }
 
 
-EXPORT tCC*
+LOCAL tCC*
 skipExpression( tCC* pzSrc, size_t len )
 {
     tCC* pzEnd = pzSrc + len;

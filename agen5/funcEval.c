@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: funcEval.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -25,9 +25,15 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC int exprType( char* pz );
+static int exprType( char* pz );
 
-EXPORT char*
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static int
+exprType( char* pz );
+/* = = = END-STATIC-FORWARD = = = */
+
+LOCAL char*
 resolveSCM( SCM s )
 {
     static char z[48];
@@ -99,7 +105,7 @@ resolveSCM( SCM s )
  *  It may need to be deallocated, so a boolean pointer is used
  *  to tell the caller.
  */
-EXPORT char*
+LOCAL char*
 evalExpression( ag_bool* pMustFree )
 {
     tTemplate*  pT      = pCurTemplate;
@@ -348,7 +354,7 @@ ag_scm_emit( SCM val )
  *  digest the string and return that.  Otherwise, just return
  *  the string.
  */
-EXPORT SCM
+LOCAL SCM
 eval( const char* pzExpr )
 {
     ag_bool allocated = AG_FALSE;
@@ -415,7 +421,7 @@ mFunc_Expr( tTemplate* pT, tMacro* pMac )
 }
 
 
-STATIC int
+static int
 exprType( char* pz )
 {
     switch (*pz) {

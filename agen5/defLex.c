@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: defLex.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -54,17 +54,29 @@ int    aKeywordTkn[] = { KEYWORD_TABLE };
 
 #define SET_LIT_TKN(t) lastToken = DP_EV_LIT_ ## t; *(pCurCtx->pzScan++) = NUL;
 
-STATIC void  loadScheme( void );
-STATIC void  alist_to_autogen_def( void );
-STATIC char* assembleName( char* pzScan, te_dp_event* pRetVal );
-STATIC char* assembleString( char* pzScan );
-STATIC char* assembleHereString( char* pzScan );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
+loadScheme( void );
+
+static void
+alist_to_autogen_def( void );
+
+static char*
+assembleName( char* pzScan, te_dp_event* pRetVal );
+
+static char*
+assembleHereString( char* pzScan );
+
+static char*
+assembleString( char* pzScan );
+/* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   LEXICAL SCANNER
  */
-EXPORT te_dp_event
+LOCAL te_dp_event
 yylex( void )
 {
     lastToken = DP_EV_INVALID;
@@ -284,7 +296,7 @@ lex_done:
 }
 
 
-EXPORT void
+LOCAL void
 yyerror( char* s )
 {
     tSCC zErrTkn[] = "%s:  ``%s''\n";
@@ -319,7 +331,7 @@ yyerror( char* s )
 }
 
 
-STATIC void
+static void
 loadScheme( void )
 {
     char*    pzText    = pCurCtx->pzScan;
@@ -362,7 +374,7 @@ loadScheme( void )
  *  process a single scheme expression, yielding text that gets processed
  *  into AutoGen definitions.
  */
-STATIC void
+static void
 alist_to_autogen_def( void )
 {
     tSCC   zSchemeText[] = "Scheme Computed Definitions";
@@ -438,7 +450,7 @@ alist_to_autogen_def( void )
  *  It may be a number, a name, a keyword or garbage.
  *  Figure out which.
  */
-STATIC char*
+static char*
 assembleName( char* pzScan, te_dp_event* pRetVal )
 {
     /*
@@ -549,7 +561,7 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
-STATIC char*
+static char*
 assembleHereString( char* pzScan )
 {
     ag_bool  trimTabs = AG_FALSE;
@@ -652,7 +664,7 @@ assembleHereString( char* pzScan )
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
-STATIC char*
+static char*
 assembleString( char* pzScan )
 {
     char  q = *(pzScan++);

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: funcIf.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -28,8 +28,27 @@
 tSCC zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
 tSCC zNoIfExpr[] = "expressionless IF";
 
-STATIC ag_bool eval_true( void );
 
+typedef struct if_stack tIfStack;
+struct if_stack {
+    tMacro*  pIf;
+    tMacro*  pElse;
+};
+
+static tIfStack  current_if;
+static tLoadProc mLoad_Elif, mLoad_Else;
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static ag_bool
+eval_true( void );
+
+static tMacro*
+mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
+
+static tMacro*
+mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  eval_true - should a string be interpreted as TRUE?
@@ -42,7 +61,7 @@ STATIC ag_bool eval_true( void );
  *  4.  For its length or its first five characters (whichever is less)
  *      it matches the string "false"
  */
-STATIC ag_bool
+static ag_bool
 eval_true( void )
 {
     ag_bool needFree;
@@ -238,16 +257,6 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
 }
 
 
-typedef struct if_stack tIfStack;
-struct if_stack {
-    tMacro*  pIf;
-    tMacro*  pElse;
-};
-
-STATIC tIfStack  current_if;
-STATIC tLoadProc mLoad_Elif, mLoad_Else;
-
-
 /*=macfunc ELIF
  *
  *  what:   Alternate Conditional Template Block
@@ -259,7 +268,7 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
  *    @code{IF} function.  Its expression argument is evaluated as are
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
-STATIC tMacro*
+static tMacro*
 mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     if ((int)pMac->res == 0)
@@ -285,7 +294,7 @@ mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    It denotes the start of an alternate template block for
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
-STATIC tMacro*
+static tMacro*
 mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     /*

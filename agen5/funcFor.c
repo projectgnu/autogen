@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: funcFor.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -27,18 +27,28 @@
 
 #define ENTRY_END  INT_MAX
 
-STATIC tForState*  pFS;  /* Current "FOR" information (state) */
+static tForState*  pFS;  /* Current "FOR" information (state) */
 
+tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
-STATIC ag_bool nextDefinition( ag_bool invert, tDefEntry** ppList );
-STATIC int
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static ag_bool
+nextDefinition( ag_bool invert, tDefEntry** ppList );
+
+static int
 doForByStep( tTemplate* pT,
              tMacro*    pMac,
              tDefEntry* pFoundDef );
-STATIC int
+
+static int
 doForEach( tTemplate*   pT,
            tMacro*      pMac,
            tDefEntry*   pFoundDef );
+
+static void
+load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac );
+/* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -236,7 +246,7 @@ ag_scm_for_sep( SCM obj )
 }
 
 
-STATIC ag_bool
+static ag_bool
 nextDefinition( ag_bool invert, tDefEntry** ppList )
 {
     ag_bool     haveMatch = AG_FALSE;
@@ -289,7 +299,7 @@ nextDefinition( ag_bool invert, tDefEntry** ppList )
 }
 
 
-STATIC int
+static int
 doForByStep( tTemplate* pT,
              tMacro*    pMac,
              tDefEntry* pFoundDef )
@@ -421,7 +431,7 @@ doForByStep( tTemplate* pT,
     return loopCt;
 }
 
-STATIC int
+static int
 doForEach( tTemplate*   pT,
            tMacro*      pMac,
            tDefEntry*   pFoundDef )
@@ -484,9 +494,7 @@ doForEach( tTemplate*   pT,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
-
-STATIC void
+static void
 load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
 {
     char* pzName = pT->pzTemplText + pMac->ozName;

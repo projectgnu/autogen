@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: agCgi.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -77,9 +77,13 @@ static const char zOops[] =
 "Content-type: text/plain\n\n"
 "AutoGen form processing error:\n";
 
-static char* parseInput( char* pzSrc, int len );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static char*
+parseInput( char* pzSrc, int len );
+/* = = = END-STATIC-FORWARD = = = */
 
-EXPORT void
+LOCAL void
 loadCgi( void )
 {
     /*

@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/01/01 00:20:57 $
+# Last Modified:     $Date: 2005/01/08 22:56:19 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.2 2005/01/08 22:56:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -267,33 +267,9 @@ do
     ;;
 
   proto.h )
-    ( cat <<-   _EOF_
-		/* -*- buffer-read-only: t -*- vi: set ro:
-		 *
-		 * AutoGen Globally exported prototypes `date`
-		 */
-		#ifndef AUTOGEN_PROTOTYPES_H
-		#define AUTOGEN_PROTOTYPES_H
-_EOF_
-    for f in `egrep -l '^ *EXPORT' *.c`
-    do
-      echo
-      echo "/* exports from $f */"
-      echo
-      sed -n '/^EXPORT /,/)$/p' $f | \
-        sed 's/^EXPORT //;s/)$/);/'
-    done
-    echo
-    echo "#endif /* AUTOGEN_PROTOTYPES_H */"
-    ) > proto.h.new
-
-    if test ! -f proto.h
-    then mv -f proto.h.new proto.h
-    elif cmp proto.h proto.h.new
-    then rm -f proto.h.new
-    else mv -f proto.h.new proto.h ; fi
-
-    chmod 444 proto.h
+    files=`allbut *.c - *fsm.c` 2>/dev/null
+    test -z "${files}" && files=`echo *.c`
+    :mkfwd -p ${files}
     ;;
 
   * )

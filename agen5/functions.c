@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: functions.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -27,7 +27,6 @@
 
 tSCC zCantInc[] = "cannot include file";
 tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
-
 
 /*=macfunc INCLUDE
  *

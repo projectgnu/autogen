@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: expExtract.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -25,6 +25,20 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static const char*
+loadExtractData( const char* pzNewFile );
+
+static SCM
+buildEmptyText( const char* pzStart, const char* pzEnd,
+                SCM def );
+
+static SCM
+extractText( const char* pzText, const char* pzStart, const char* pzEnd,
+             SCM def );
+/* = = = END-STATIC-FORWARD = = = */
+
 /*
  *  loadExtractData
  *
@@ -32,7 +46,7 @@
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
  */
-STATIC const char*
+static const char*
 loadExtractData( const char* pzNewFile )
 {
     static const char* pzFile = NULL;
@@ -118,7 +132,7 @@ loadExtractData( const char* pzNewFile )
  *  Could not find the file or could not find the markers.
  *  Either way, emit an empty enclosure.
  */
-STATIC SCM
+static SCM
 buildEmptyText( const char* pzStart, const char* pzEnd,
                 SCM def )
 {
@@ -147,7 +161,7 @@ buildEmptyText( const char* pzStart, const char* pzEnd,
 /*
  *  If we got it, emit it.
  */
-STATIC SCM
+static SCM
 extractText( const char* pzText, const char* pzStart, const char* pzEnd,
              SCM def )
 {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.2 2005/01/08 22:56:20 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -27,10 +27,23 @@
 
 static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
-STATIC size_t countMacros( tCC* pz );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static ag_bool
+canReadFile( tCC* pzFName );
+
+static size_t
+countMacros( tCC* pz );
+
+static void
+loadMacros( tTemplate* pT,
+            tCC*       pzF,
+            tCC*       pzN,
+            tCC*       pzData );
+/* = = = END-STATIC-FORWARD = = = */
 
 
-EXPORT tTemplate*
+LOCAL tTemplate*
 findTemplate( tCC* pzTemplName )
 {
     tTemplate* pT = pNamedTplList;
@@ -42,7 +55,7 @@ findTemplate( tCC* pzTemplName )
     return pT;
 }
 
-STATIC ag_bool
+static ag_bool
 canReadFile( tCC* pzFName )
 {
     struct stat stbf;
@@ -59,7 +72,7 @@ canReadFile( tCC* pzFName )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-EXPORT tSuccess
+LOCAL tSuccess
 findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 {
     char*   pzRoot;
@@ -195,7 +208,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
  *  Figure out how many macros there are in the template
  *  so that we can allocate the right number of pointers.
  */
-STATIC size_t
+static size_t
 countMacros( tCC* pz )
 {
     size_t  ct = 2;
@@ -218,7 +231,7 @@ countMacros( tCC* pz )
  *
  *  Load the macro array and file name.
  */
-STATIC void
+static void
 loadMacros( tTemplate* pT,
             tCC*       pzF,
             tCC*       pzN,
@@ -301,7 +314,7 @@ loadMacros( tTemplate* pT,
  *
  *  Convert a template from data file format to internal format.
  */
-EXPORT tTemplate*
+LOCAL tTemplate*
 templateFixup( tTemplate* pTList, size_t ttlSize )
 {
     tTemplate* pT = pTList;
@@ -333,7 +346,7 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-EXPORT void
+LOCAL void
 mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
     tSCC zOpen[] = "open";
@@ -388,7 +401,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-EXPORT tTemplate*
+LOCAL tTemplate*
 loadTemplate( tCC* pzFileName )
 {
     tSCC*        apzSfx[] = { "tpl", "agl", NULL };
