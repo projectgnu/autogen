@@ -50,8 +50,8 @@ fi
 
 # Construct the info doc
 #
-i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bAutoGen"
-echo AutoGen ${i} opts.def
+i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bautogen"
+echo autogen ${i} opts.def
 AutoGen ${i} opts.def
 
 # Make the option processing files:
