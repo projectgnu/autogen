@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.10 1999/02/25 14:51:51 bkorb Exp $
+ *   $Id: opts.def,v 1.11 1999/02/26 15:57:13 bkorb Exp $
  */
 
 /*
@@ -31,6 +31,11 @@ owner          = "Bruce Korb";
 prog_name      = "columns";
 prog_title     = "Columnize Input Text";
 long_opts;
+
+explain =
+'This program will read a list of text items from standard in
+or a specified input and produce a columnized listing of all
+the non-blank lines.';
 
 version = 1;
 
