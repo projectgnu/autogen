@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2000/09/30 04:05:14 $
+# Last Modified:     $Date: 2000/09/30 19:21:30 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: guile.test,v 1.1 2000/09/30 04:05:14 bkorb Exp $
+# $Id: guile.test,v 1.2 2000/09/30 19:21:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,21 +25,28 @@ fi
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-testname="$testname" \
-argument="${argument}" long_opt="${long_opt}" \
-${SHELL-sh} ${stdopts} option second
-cat >> $testname.def <<_EOF_
+echo "creating ${testname}.def in `pwd`"
+testname="${testname}" \
+argument='[ <guile-arg> ...]' \
+long_opt="true" \
+${SHELL-sh} ${stdopts} option second:
+
+sed -e '/name = "second"/a\
+    max = NOLIMIT; stack_arg;' \
+    -e '/name = "option/a\
+    enabled;' ${testname}.def > ${testname}.tmp
+mv -f ${testname}.tmp ${testname}.def
+
+cat >> ${testname}.def <<_EOF_
 
 include = '#include <stdio.h>';
 include = '#include <guile/gh.h>';
-argument = '[ <guile-arg> ...]';
 guile-main;
 before-guile-boot = 'fputs( "guile starts\n", stderr );';
 _EOF_
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 LIB="${LIB} `guile-config link`"
@@ -48,26 +55,51 @@ compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 guile starts
 test_guile - Test AutoOpts for guile
-USAGE:  guile [ -<flag> ]... [ <guile-arg> ...]
+USAGE:  guile [ -<flag> [<val>] ]... [ <guile-arg> ...]
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
-   -s no  second         The second option descrip
+   -s YES second         The second option descrip
+				- may appear without limit
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
 
-cmp -s $testname.h*lp || \
+cmp -s ${testname}.h*lp || \
   failure help output mismatch
 
 f=`(./${testname} -- -v 2>&1) | grep 'GNU General Public Licence'`
 
 test  -n "$f"  || \
   failure version does not show GPL
+
+cat > ${testname}.runbase <<'_EOF_'
+guile> #t
+guile> #t
+guile> 2
+guile> ("value 1 for second." "value number two")
+guile> #f
+guile> #t
+guile> 
+_EOF_
+
+./${testname} -s 'value 1 for second.' -s 'value number two' \
+  > ${testname}.runout <<'_EOF_'
+have-opt-second
+opt-enabled-second
+opt-ct-second
+opt-args-second
+have-opt-option
+opt-enabled-option
+_EOF_
+
+test $? -ne 0 && failure guile script failed
+diff -b -q ${testname}.run* || \
+  failure unanticipated run output
 
 cleanup
 # end of guile.test

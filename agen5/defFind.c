@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.10 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: defFind.c,v 1.11 2000/09/30 19:21:29 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -319,7 +319,19 @@ cannonicalizeName( char* pzD, const char* pzS, int srcLen )
      *  Copy the name/number.  We already know the first character is valid.
      */
     while (ISNAMECHAR( *pzS )) {
-        *(pzD++) = tolower( *(pzS++) );
+        char ch = *(pzS++);
+        if (isupper( ch ))
+            *(pzD++) = tolower( ch );
+
+        else switch ( ch ) { /* force the separator chars to be '_' */
+        case '-':
+        case '^':
+            *(pzD++) = '_';
+            break;
+
+        default:
+            *(pzD++) = ch;
+        }
 
         if (--srcLen <= 0) {
             pzS = zNil;

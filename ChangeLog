@@ -4,6 +4,9 @@
 	(gperf ...) scheme functions.
 	* autoopts/*.tpl: added 'guile-main' as a global program attribute.
 	the main/inner_main functions are produced.
+	* autoopts/guileopt.c: routine to export option state to Guile
+	* autoopts/Makefile.am: put the above in a separate library
+	* autoopts/test/guile.test: validate the options with Guile commands
 
 2000-09-28  Bruce Korb  <bkorb@gnu.org>
 

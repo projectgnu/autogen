@@ -8,7 +8,7 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.11 2000/09/30 04:05:14 bkorb Exp $
+## $Id: Makefile.am,v 1.12 2000/09/30 19:21:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test guile.test errors.test rc.test shell.test vers.test
@@ -21,7 +21,8 @@ testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = CC="$(CC)" \
 	AGEN="`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@" \
-	LIB="`cd $(top_builddir)/autoopts/.libs/; pwd`/libopts.a" \
+	LIB="`cd $(top_builddir)/autoopts/.libs/; \
+	      echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a `" \
 	INC="-I`cd $(top_builddir)/autoopts; pwd`" \
 	testsubdir=$(testsubdir) srcdir=`cd $(srcdir) ; pwd` \
 	top_srcdir=`cd $(top_srcdir) ; pwd`

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.13 2000/08/29 14:30:20 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.14 2000/09/30 19:21:30 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -294,6 +294,12 @@ void    optionLoadLine( tOptions* pOpts, char*  pzLine );
  *  that the Bourne and Korn shells can interpret.
  */
 void    putBourneShell( tOptions* pOpts );
+
+/*
+ *  export_options_to_guile will emit a series of guile commands so
+ *  that the Scheme code can query the state of any of the defined options.
+ */
+void    export_options_to_guile( tOptions* );
 
 /*
  *  stackOptArg saves the option argument into an option-specific list.

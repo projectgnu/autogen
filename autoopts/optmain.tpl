@@ -13,6 +13,7 @@ DEFINE build-guile-main
 int    original_argc;
 char** original_argv;
 
+
     static void
 inner_main( int argc, char** argv )
 {
@@ -47,7 +48,7 @@ inner_main( int argc, char** argv )
     [=guile-main=]
     exit( EXIT_SUCCESS );[=
   ELSE  =]
-    /* export_options_to_guile( &[=(. pname)=]Options ); */
+    export_options_to_guile( &[=(. pname)=]Options );
     scm_shell( argc, argv );[=
   ENDIF =]
 }

@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##  Autoopts copyright 1992-1999 Bruce Korb
+##  Autoopts copyright 1992-2000 Bruce Korb
 ## 
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Thu Jul 29 11:57:04 1999				      
+## Last Modified:   $Date: 2000/09/30 19:21:30 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.27 2000/09/29 03:21:23 bkorb Exp $
+## $Id: Makefile.am,v 2.28 2000/09/30 19:21:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,25 +21,37 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
-pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl \
-		aginfo.tpl agman1.tpl optlib.tpl optmain.tpl
+pkgdata_DATA	= \
+	aginfo.tpl   agman1.tpl   doc.tpl      libhead.tpl  optcode.tpl \
+	opthead.tpl  options.tpl  optlib.tpl   optmain.tpl
 
-EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 doc.tpl \
-		bootstrap.dir autoopts-config.in config-opts.def \
-		genshell.def genshell.c genshell.h
+GENSRC		= genshell.c genshell.h
+EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) \
+	TODO autoopts.m4 doc.tpl bootstrap.dir autoopts-config.in \
+	config-opts.def genshell.def
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
 
-lib_LTLIBRARIES = libopts.la
+lib_LTLIBRARIES = libopts.la libguileopts.la
+
+##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
+##  It is compiled as a part of the makeshell module.
+##
 libopts_la_SOURCES = \
-		autoopts.c pgusage.c putshell.c save.c \
-		stack.c usage.c version.c streqvcmp.c \
-		autoopts.h options.h streqv.h makeshell.c
+	autoopts.c   autoopts.h   makeshell.c  options.h \
+	pgusage.c    putshell.c   save.c       stack.c      streqv.h \
+	streqvcmp.c  usage.c      version.c
 
 libopts_la_LDFLAGS = -no-undefined \
 		-version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
+
+libguileopts_la_SOURCES = guileopt.c
+libguileopts_la_LDFLAGS = -no-undefined \
+		-version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+libguileopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
+libguileopts_la_LIBDEPEND = ./libopts.so
 
 bin_SCRIPTS	= autoopts-config
 
@@ -47,7 +59,7 @@ include_HEADERS = options.h
 
 makeshell.o : genshell.c
 genshell.c : genshell.def
-	@AGEXE=`cd $(top_builddir)/agen5; pwd`/@AGEXE@ ; cd $(srcdir) ; \
+	@AGEXE=`cd $(top_builddir)/agen5; pwd`/autogen ; cd $(srcdir) ; \
 	  AGEXE="$$AGEXE" $(SHELL) ./bootstrap.dir $@
 
 ../snprintfv/snprintfv.h :
