@@ -1,38 +1,26 @@
-Bruce Korb
-From:	James R. Van Zandt [jrv@vanzandt.mv.com]
-Sent:	Sunday, July 04, 1999 12:48 PM
-To:	Bruce Korb
-Subject:	man.tpl
-
-Bruce -
-
-Here's a modified version of man.tpl for the autogen package.  I
-believe this generates better nroff.  There is one thing I could not
-fix.  I believe you are using this test to determine whether the
-argument is optional: "_IF flag_arg _len 0 = ".  However, this fails
-if the option has a default numerical value.  Thus, for example, the
-man page for columns does not indicate the fact that the argument for
---spread is optional.
-
-I find the template code really hard to edit.  I think a colorizing
-emacs mode would help a lot: template markers in one color, macros in
-a second, and other code in a third.  However, I'm not an elisp
-programmer :-(
-
-	     - Jim Van Zandt
-
-
 {(   -*- nroff -*-
-
 autogen template man=%s.1
-
 )}
-{(#
+{(
+## ---------------------------------------------------------------------
+## agman1.tpl -- Template for command line man pages
+## 
+##  AutoOpts copyright 1992-1999 Bruce Korb
+## 
+## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
+## Maintainer:      Bruce Korb <korbb@datadesign.com>
+## Created:         Mon Jun 28 15:35:12 1999
+## Last Modified:   Fri Jun  4 07:52:27 1999
+##            by:   Bruce Korb <korb@datadesign.com>			      
+## ---------------------------------------------------------------------
+## $Id: agman1-tpl.in,v 2.2 1999/07/07 14:01:22 bkorb Exp $
+## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
 1999-06-28 modified to be template  Bruce Korb <autogen@linuxbox.com>
 1999-07-04 nroff tweaks, Jim Van Zandt <jrv@vanzandt.mv.com>
 
+## Code:
 )}.TH {(prog_name _up)} 1 {(
   _EVAL "date +%Y-%m-%d" _shell)} "" "Programmer's Manual"
 {(
@@ -43,7 +31,14 @@ _EVAL '.\"  ' _DNE
 .\"
 .SH NAME
 {(prog_name _down)} \- {(prog_title)}
-.SH SYNOPSIS
+.SH SYNOPSIS{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  Display the command line prototype,
+      #  based only on the argument processing type.
+      #
+      )}
 .B {(
   _IF prog_file_name _exist )}{(prog_file_name)}{(
   _ELSE)}{(prog_name _down)}{(
@@ -52,9 +47,7 @@ _EVAL '.\"  ' _DNE
   _IF flag.value _exist )}{(
     _IF long_opts _exist )}{(
 
-      # * * * * * * * * * * * * * * * * * * * * * * * * *
-      #
-      #  Mixture of short (flag) options and long options
+      # * * * * *
       #
       )}
 .\" Mixture of short (flag) options and long options
@@ -62,9 +55,7 @@ _EVAL '.\"  ' _DNE
 
     _ELSE )}{(
 
-      # * * * * * * * * * * * * * * * * * * * * * * * * *
-      #
-      #  Short (flag) options only
+      # * * * * *
       #
       )}
 .\" Short (flag) options only
@@ -73,9 +64,7 @@ _EVAL '.\"  ' _DNE
 
   _ELIF long_opts _exist )}{(
 
-      # * * * * * * * * * * * * * * * * * * * * * * * * *
-      #
-      #  Long options only
+      # * * * * *
       #
       )}
 .\" Long options only
@@ -83,9 +72,7 @@ _EVAL '.\"  ' _DNE
 
   _ELIF argument _exist ! )}{(
 
-      # * * * * * * * * * * * * * * * * * * * * * * * * *
-      #
-      #  All arguments are named options.
+      # * * * * *
       #
       )}
 .\" All arguments are named options.
@@ -101,7 +88,15 @@ All arguments are named options.{(
 .br
 .in +8
 {(argument)}{(
-  _ENDIF )}
+  _ENDIF )}{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  Describe the command.  Use 'prog_man_desrip' if it exists,
+      #  otherwise use the 'detail' help option.  If not that,
+      #  then the thing is undocumented.
+      #
+      )}
 .SH "DESCRIPTION"
 This manual page documents, briefly, the \fB{(prog_name _down)}\fP command.
 {(
@@ -114,9 +109,11 @@ _ELSE
 _ENDIF)}
 .SH OPTIONS{(
 
-#  When there are no flag characters and long options are disallowed,
-   the program options are all named options and they are handled
-   without the marker character (hyphen). )}{(
+# * * * * * * * * * * * * * * * * * * * * * * * * *
+#
+   Describe each option
+
+)}{(
 
 _FOR flag
 
@@ -295,4 +292,6 @@ _ENDIF)}
 {(owner)}{(eaddr "# <%s>" _printf)}
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fB{(prog_name)}\fP
-option definitions.
+option definitions.{(
+
+agman.tpl ends here  )}
