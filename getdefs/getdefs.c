@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.20 1999/10/31 00:16:42 bruce Exp $
+ *  $Id: getdefs.c,v 2.21 1999/10/31 00:29:13 bruce Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
@@ -847,12 +847,12 @@ emitSubblock( char* pzDefList, char* pzText, char* pzOut )
         /*
          *  Copy out the attribute name
          */
-        for (;;) {
-            if (! newlineDone) {
-                strcpy( pzOut, zStart + 4 );
-                pzOut += sizeof( zStart ) - 5;
-            }
+        if (! newlineDone) {
+            strcpy( pzOut, zStart + 4 );
+            pzOut += sizeof( zStart ) - 5;
+        }
 
+        for (;;) {
             *pzOut++ = *pzDefList++;
             if (*pzDefList == ' ') {
                 pzDefList++;
