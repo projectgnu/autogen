@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2002-10-26 11:03:56 bkorb"
+ *  Time-stamp:      "2002-11-10 16:57:53 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.7 2002/10/27 04:59:01 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.8 2002/12/07 04:45:03 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -67,12 +67,6 @@
  *  Convert the number to a list usable in a printf call
  */
 #define NUM_TO_VER(n)       ((n) >> 12), ((n) >> 7) & 0x001F, (n) & 0x007F
-
-/*
- *  Some systems have broken printf's!!
- *  So, always link with our own stdio library :-(
- */
-#include "snprintfv/snprintfv.h"
 
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)

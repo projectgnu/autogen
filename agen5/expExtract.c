@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.3 2002/03/29 04:11:19 bkorb Exp $
+ *  $Id: expExtract.c,v 3.4 2002/12/07 04:45:03 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -271,8 +271,8 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
         if (gh_string_p( caveat ) && (SCM_LENGTH( caveat ) > 0))
             pzCaveat = ag_scm2zchars( caveat, "extract caveat" );
 
-        pzStart = asprintf( pzMarker, "START", pzCaveat );
-        pzEnd   = asprintf( pzMarker, "END  ", pzCaveat );
+        pzStart = aprf( pzMarker, "START", pzCaveat );
+        pzEnd   = aprf( pzMarker, "END  ", pzCaveat );
     }
 
     {

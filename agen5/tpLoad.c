@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.10 2002/09/30 01:00:00 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.11 2002/12/07 04:45:03 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -353,7 +353,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      *  Find the template file somewhere
      */
     if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList )))
-        AG_ABEND( asprintf( zCannot, ENOENT, "map data file",
+        AG_ABEND( aprf( zCannot, ENOENT, "map data file",
                             pzFileName, strerror( ENOENT )));
 
     AGDUPSTR( pMapInfo->pzFileName, zRealFile, "map data file" );
@@ -365,11 +365,11 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
         char* pz;
         struct stat stbf;
         if (stat( zRealFile, &stbf ) != 0)
-            AG_ABEND( asprintf( zCannot, errno, zOpen,
+            AG_ABEND( aprf( zCannot, errno, zOpen,
                                 zRealFile, strerror( errno )));
 
         if (! S_ISREG( stbf.st_mode ))
-            AG_ABEND( asprintf( zCannot, errno, zOpen,
+            AG_ABEND( aprf( zCannot, errno, zOpen,
                                 zRealFile, "wrong file type" ));
 
         if (outTime <= stbf.st_mtime)
@@ -382,7 +382,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
     if (pMapInfo->fd == -1)
-        AG_ABEND( asprintf( zCannot, errno, zOpen,
+        AG_ABEND( aprf( zCannot, errno, zOpen,
                             zRealFile, strerror( errno )));
 
     pMapInfo->pData =
@@ -390,7 +390,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
               MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
 
     if (pMapInfo->pData == (void*)(-1))
-        AG_ABEND( asprintf( zCannot, errno, "mmap",
+        AG_ABEND( aprf( zCannot, errno, "mmap",
                             zRealFile, strerror( errno )));
 }
 

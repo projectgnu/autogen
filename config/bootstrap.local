@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2002-07-11 10:29:22 bkorb"
+# Time-stamp:        "2002-12-06 18:02:28 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.8 2002/07/11 20:28:44 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.9 2002/12/07 04:45:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -101,7 +101,6 @@ MISSING=${MISSING-${srcdir}/config/missing}
 case ${BOOTSTRAP} in
 
 pre )
-    cp -fp ${srcdir}/config/bootstrap ${srcdir}/snprintfv/config/.
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 
@@ -126,8 +125,8 @@ pre )
       eval "`egrep '^AG_[A-Z_]*=' VERSION`"
       ( sed "/^AC_INIT(/s@,.*,@,${AG_VERSION},@"'
             /==ADD_CONFIG_FILES==/,$d' ${config_file}
-        echo 'AC_CONFIG_FILES([Makefile \'
-        find [a-px]* -name 'Makefile.am' -o -name '*.in' | \
+        echo 'AC_CONFIG_FILES([Makefile snprintfv/Makefile \'
+        find [a-rt-z]* -name 'Makefile.am' -o -name '*.in' | \
           sed 's,\.\(am\|in\)$,,;/^configure$/d' | sort -u | \
           sed 's,^,  ,;s,$, \\,;$s,\\$,]),'
         sed '1,/==ADD_CONFIG_FILES==/d' ${config_file}

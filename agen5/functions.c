@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.7 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: functions.c,v 3.8 2002/12/07 04:45:03 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -195,7 +195,7 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 mFunc_Bogus( tTemplate* pT, tMacro* pMac )
 {
     tSCC z[] = "%d (%s) is an unknown macro function, or has no handler";
-    char* pz = asprintf( z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
+    char* pz = aprf( z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
                          ? apzFuncNames[ pMac->funcCode ] : "??" );
     AG_ABEND_IN( pT, pMac, pz );
     longjmp( fileAbort, FAILURE );
@@ -375,7 +375,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         pzMac = apzFuncNames[ ix ];
     }
 
-    pzSrc = asprintf( zUnk, pT->pzFileName, pMac->lineNo, pzMac, pzSrc );
+    pzSrc = aprf( zUnk, pT->pzFileName, pMac->lineNo, pzMac, pzSrc );
 
     AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.8 2002/04/06 19:11:44 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -304,7 +304,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        pStk->pzOutName = asprintf( pOutSpec->pzFileFmt,
+        pStk->pzOutName = aprf( pOutSpec->pzFileFmt,
                                     pzDefFile, pOutSpec->zSuffix );
         if (p != NULL)
             *p = '.';
@@ -347,7 +347,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
     if (pStk->pFile == NULL) {
     openError:
-        AG_ABEND( asprintf( zCannot, pzProg, errno, "create",
+        AG_ABEND( aprf( zCannot, pzProg, errno, "create",
                             pStk->pzOutName, strerror( errno )));
     }
 }

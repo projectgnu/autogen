@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.9 2002/09/29 00:16:20 bkorb Exp $
+#$Id: optcode.tpl,v 3.10 2002/12/07 04:45:03 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -46,7 +46,7 @@ IF (exist? "flag.call-proc")
 =]
 [= (shell (string-append
 "columns -I16 --first='extern tOptProc ' -S, <<_EOF_\n"
-(join "\n" (stack "flag.call-proc")) "\n_EOF_" )) =][=
+(join "\n" (stack "flag.call-proc")) "\n_EOF_" )) =];[=
 
 ENDIF
 

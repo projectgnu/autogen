@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.8 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: autogen.h,v 3.9 2002/12/07 04:45:03 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -360,7 +360,7 @@ size_t strlcpy( char* dest, const char* src, size_t n );
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
     if (! gh_string_p( s ))
-        AG_ABEND( asprintf( zNotStr, type ));
+        AG_ABEND( aprf( (char*)zNotStr, type ));
 
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr( SCM_ROCHARS(s), SCM_ROLENGTH(s), 0 );

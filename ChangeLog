@@ -1,6 +1,13 @@
-2002-11-10  Bruce Korb  <bkorb@gnu.org>
+2002-12-10  Bruce Korb  <bkorb@gnu.org>
 
 	==5.4.8 Released
+
+2002-12-05  Bruce Korb  <bkorb@gnu.org>
+
+	* snprintfv/*: reworked everything & incorporated 0.99d
+	* agen5/test/defs(FAILURES): fix directory name
+	* autoopts/optcode.tpl(extern tOptProc): add semicolon to stmt end
+	* doc/auto_gen.tpl(html-escape-encode): quote the strings
 
 2002-11-08  Bruce Korb  <bkorb@gnu.org>
 

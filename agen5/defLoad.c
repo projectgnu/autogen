@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.10 2002/05/29 01:37:41 bkorb Exp $
+ *  $Id: defLoad.c,v 3.11 2002/12/07 04:45:03 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -41,7 +41,7 @@ compareIndex( const void* p1, const void* p2 )
     tDefEntry* pE2 = *((tDefEntry**)p2);
     int  res = pE1->index - pE2->index;
     if (res == 0)
-        AG_ABEND( asprintf( "two %s definitions have index %ld\n",
+        AG_ABEND( aprf( "two %s definitions have index %ld\n",
                             pE1->pzDefName, pE1->index ));
 
     return res;
@@ -328,12 +328,12 @@ readDefines( void )
         char* pz;
         struct stat stbf;
         if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0)
-            AG_ABEND( asprintf( zCannot, errno, "stat",
+            AG_ABEND( aprf( zCannot, errno, "stat",
                                 OPT_ARG( DEFINITIONS ), strerror( errno )));
 
         if (! S_ISREG( stbf.st_mode )) {
             errno = EINVAL;
-            AG_ABEND( asprintf( zCannot, errno, "open non-regular file",
+            AG_ABEND( aprf( zCannot, errno, "open non-regular file",
                                 OPT_ARG( DEFINITIONS ), strerror( errno )));
         }
 
@@ -378,7 +378,7 @@ readDefines( void )
     fp = useStdin ? stdin
                   : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
     if (fp == NULL)
-        AG_ABEND( asprintf( zCannot, errno, "open",
+        AG_ABEND( aprf( zCannot, errno, "open",
                             OPT_ARG( DEFINITIONS ), strerror( errno )));
 
     /*
@@ -398,7 +398,7 @@ readDefines( void )
             if (feof( fp ) || useStdin)
                 break;
 
-            AG_ABEND( asprintf( zCannot, errno, "read",
+            AG_ABEND( aprf( zCannot, errno, "read",
                                 OPT_ARG( DEFINITIONS ), strerror( errno )));
         }
 

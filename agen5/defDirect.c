@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.8 2002/07/07 19:47:25 bkorb Exp $
+ *  $Id: defDirect.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -203,7 +203,7 @@ skipToEndif( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
-                AG_ABEND( asprintf( zNoEndif, pCurCtx->pzFileName,
+                AG_ABEND( aprf( zNoEndif, pCurCtx->pzFileName,
                                     pCurCtx->lineNo ));
 
             pzScan = pz + STRSIZE( zCheckList );
@@ -263,7 +263,7 @@ skipToElseEnd( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
-                AG_ABEND( asprintf( zNoEndif, pCurCtx->pzFileName,
+                AG_ABEND( aprf( zNoEndif, pCurCtx->pzFileName,
                                     pCurCtx->lineNo ));
 
             pzScan = pz + STRSIZE( zCheckList );
@@ -418,7 +418,7 @@ doDir_define( char* pzArg, char* pzScan )
 STATIC char*
 doDir_elif( char* pzArg, char* pzScan )
 {
-    AG_ABEND( asprintf( "`#elif' directive encountered out of context"
+    AG_ABEND( aprf( "`#elif' directive encountered out of context"
                         "\tin %s on line %d\n",
                         pCurCtx->pzFileName, pCurCtx->lineNo ));
 }
@@ -435,7 +435,7 @@ STATIC char*
 doDir_else( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0)
-        AG_ABEND( asprintf( zNoMatch, pCurCtx->pzFileName,
+        AG_ABEND( aprf( zNoMatch, pCurCtx->pzFileName,
                             pCurCtx->lineNo, "else" ));
 
     return skipToEndif( pzScan );
@@ -452,7 +452,7 @@ STATIC char*
 doDir_endif( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0)
-        AG_ABEND( asprintf( zNoMatch, pCurCtx->pzFileName,
+        AG_ABEND( aprf( zNoMatch, pCurCtx->pzFileName,
                             pCurCtx->lineNo, "endif" ));
 
     return pzScan;
@@ -471,7 +471,7 @@ doDir_endshell( char* pzArg, char* pzScan )
      *  In actual practice, the '#endshell's must be consumed inside
      *  the 'doDir_shell()' procedure.
      */
-    AG_ABEND( asprintf( zNoMatch, pCurCtx->pzFileName,
+    AG_ABEND( aprf( zNoMatch, pCurCtx->pzFileName,
                         pCurCtx->lineNo, "endshell" ));
 }
 
@@ -487,7 +487,7 @@ doDir_endshell( char* pzArg, char* pzScan )
 STATIC char*
 doDir_error( char* pzArg, char* pzScan )
 {
-    AG_ABEND( asprintf( "#error directive -- in %s on line %d\n\t%s\n",
+    AG_ABEND( aprf( "#error directive -- in %s on line %d\n\t%s\n",
                         pCurCtx->pzFileName, pCurCtx->lineNo, pzArg ));
 }
 
@@ -639,14 +639,14 @@ doDir_include( char* pzArg, char* pzScan )
         char*  pz = pzScan;
 
         if (fp == NULL)
-            AG_ABEND( asprintf( zCannot, errno, "open file", zFullName,
+            AG_ABEND( aprf( zCannot, errno, "open file", zFullName,
                                 strerror( errno )));
 
         do  {
             size_t rdct = fread( (void*)pz, 1, inclSize, fp );
 
             if (rdct == 0)
-                AG_ABEND( asprintf( zCannot, errno, "read file", zFullName,
+                AG_ABEND( aprf( zCannot, errno, "read file", zFullName,
                                     strerror( errno )));
 
             pz += rdct;
@@ -775,7 +775,7 @@ doDir_shell( char* pzArg, char* pzScan )
 
     pzScan = strstr( pzScan, zEndShell );
     if (pzScan == NULL)
-        AG_ABEND( asprintf( "Missing #endshell after '#shell' "
+        AG_ABEND( aprf( "Missing #endshell after '#shell' "
                             "in %s on line %d\n", pCurCtx->pzFileName,
                             pCurCtx->lineNo ));
 

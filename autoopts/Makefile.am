@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/10/31 05:20:56 $
+## Last Modified:   $Date: 2002/12/07 04:45:03 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.13 2002/10/31 05:20:56 bkorb Exp $
+## $Id: Makefile.am,v 3.14 2002/12/07 04:45:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -49,8 +49,8 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##
 libopts_la_SOURCES = $(HDRS) $(CSRC)
 
-libopts_la_LIBADD  = ../snprintfv/snprintfv/libsnprintfvc.la
-libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+libopts_la_LIBADD  = ../snprintfv/libsnprintfv.la
+libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ -lm
 
 libguileopts_la_SOURCES  = guileopt.c
 libguileopts_la_CFLAGS   = $(GUILE_CPPFLAGS)
@@ -72,8 +72,8 @@ strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
 	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
 
-../snprintfv/snprintfv/libsnprintfvc.la :
-	cd ../snprintfv/snprintfv ; $(MAKE) libsnprintfvc.la
+../snprintfv/libsnprintfv.la :
+	cd ../snprintfv ; $(MAKE) libsnprintfv.la
 
 install-data-local : install-man3
 

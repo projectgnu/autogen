@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.8 2002/06/14 02:11:36 bkorb Exp $
+ *  $Id: defLex.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -279,7 +279,7 @@ scanAgain:
 
 NUL_error:
 
-    AG_ABEND( asprintf( zErrMsg, pzProg, "unterminated quote in definition",
+    AG_ABEND( aprf( zErrMsg, pzProg, "unterminated quote in definition",
                         pCurCtx->pzFileName, pCurCtx->lineNo ));
     return ERROR;
 
@@ -323,14 +323,14 @@ yyerror( char* s )
     case TK_AUTOGEN:     pz = "AUTOGEN\n";     break;
     case TK_DEFINITIONS: pz = "DEFINITIONS\n"; break;
     case TK_END:         pz = "END\n";         break;
-    case TK_VAR_NAME:    pz = asprintf( zVN, (char*)yylval ); break;
-    case TK_OTHER_NAME:  pz = asprintf( zON, (char*)yylval ); break;
-    case TK_STRING:      pz = asprintf( zSt, (char*)yylval ); break;
-    case TK_NUMBER:      pz = asprintf( zNo, (char*)yylval ); break;
-    default:             pz = asprintf( zDf, lastToken );     break;
+    case TK_VAR_NAME:    pz = aprf( zVN, (char*)yylval ); break;
+    case TK_OTHER_NAME:  pz = aprf( zON, (char*)yylval ); break;
+    case TK_STRING:      pz = aprf( zSt, (char*)yylval ); break;
+    case TK_NUMBER:      pz = aprf( zNo, (char*)yylval ); break;
+    default:             pz = aprf( zDf, lastToken );     break;
     }
 
-    AG_ABEND( asprintf( "%s:  in %s on line %d\n"
+    AG_ABEND( aprf( "%s:  in %s on line %d\n"
                         "\ttoken in error:  %s\n"
                         "\t[[...<error-text>]] %s\n\n"
                         "Likely causes:  a mismatched quote, a value that needs "
@@ -406,7 +406,7 @@ alist_to_autogen_def( void )
     {
         char endCh = *pzEnd;
         *pzEnd = NUL;
-        pzText = asprintf( zWrap, pzText );
+        pzText = aprf( zWrap, pzText );
         *pzEnd = endCh;
     }
 
@@ -524,7 +524,7 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
          */
         if (zNameChars[ *pz ] == 0) {
             if (pz == (unsigned char*)pzScan)
-                AG_ABEND( asprintf( "%s Error: Invalid input char '%c' "
+                AG_ABEND( aprf( "%s Error: Invalid input char '%c' "
                                     "in %s on line %d\n", pzProg, *pzScan,
                                     pCurCtx->pzFileName, pCurCtx->lineNo ));
 
@@ -594,7 +594,7 @@ assembleHereString( char* pzScan )
      */
     while (isspace( *pzScan )) {
         if (*pzScan++ == '\n')
-            AG_ABEND( asprintf( zErrMsg, pzProg, "HereString missing the mark",
+            AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
                                 pCurCtx->pzFileName, pCurCtx->lineNo ));
     }
 
@@ -605,14 +605,14 @@ assembleHereString( char* pzScan )
         char* pz = zMark;
         while (ISNAMECHAR( *pzScan )) {
             if (++markLen >= sizeof(zMark))
-                AG_ABEND( asprintf( zErrMsg, pzProg, "HereString mark "
+                AG_ABEND( aprf( zErrMsg, pzProg, "HereString mark "
                                     STR( MAX_HEREMARK_LEN ) " or more chars",
                                     pCurCtx->pzFileName, pCurCtx->lineNo ));
 
             *(pz++) = *(pzScan++);
         }
         if (markLen == 0)
-            AG_ABEND( asprintf( zErrMsg, pzProg, "HereString missing the mark",
+            AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
                                 pCurCtx->pzFileName, pCurCtx->lineNo ));
         *pz = NUL;
     }
@@ -625,7 +625,7 @@ assembleHereString( char* pzScan )
      */
     pzScan = strchr( pzScan, '\n' );
     if (pzScan == NULL)
-        AG_ABEND( asprintf( zErrMsg, pzProg, "Unterminated HereString",
+        AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
                             pCurCtx->pzFileName, pCurCtx->lineNo ));
 
     /*
@@ -651,7 +651,7 @@ assembleHereString( char* pzScan )
                 goto lineDone;
 
             case NUL:
-                AG_ABEND( asprintf( zErrMsg, pzProg, "Unterminated HereString",
+                AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
                                     pCurCtx->pzFileName, pCurCtx->lineNo ));
             }
         } lineDone:;

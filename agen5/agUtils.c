@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.7 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: agUtils.c,v 3.8 2002/12/07 04:45:03 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -76,6 +76,18 @@ strlcpy( char* dest, tCC* src, size_t n )
     return sz + (src - ps);
 }
 #endif
+
+
+EXPORT char*
+aprf( const char* pzFmt, ... )
+{
+    char* pz;
+    va_list ap;
+    va_start( ap, pzFmt );
+    (void)vasprintf( &pz, pzFmt, ap );
+    va_end( ap );
+    return pz;
+}
 
 
 EXPORT void
@@ -260,7 +272,7 @@ addSysEnv( char* pzEnvName )
     if (getenv( pzEnvName ) == NULL) {
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
             fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
-        putenv( asprintf( zFmt, pzEnvName ));
+        putenv( aprf( zFmt, pzEnvName ));
     }
 }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.6 2002/03/02 01:32:59 bkorb Exp $
+ *  $Id: expOutput.c,v 3.7 2002/12/07 04:45:03 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -172,7 +172,7 @@ ag_scm_out_pop( SCM ret_contents )
         if (pos != 0) {
             rewind( pCurFp->pFile );
             if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
-                AG_ABEND( asprintf( "Error %d (%s) rereading output\n",
+                AG_ABEND( aprf( "Error %d (%s) rereading output\n",
                                     errno, strerror( errno )));
         }
     }
@@ -253,7 +253,7 @@ ag_scm_out_resume( SCM suspName )
         }
     }
 
-    AG_ABEND( asprintf( "ERROR: no output file was suspended as ``%s''\n",
+    AG_ABEND( aprf( "ERROR: no output file was suspended as ``%s''\n",
                         pzName ));
     return SCM_UNDEFINED;
 }
@@ -283,7 +283,7 @@ ag_scm_out_push_add( SCM new_file )
         FILE* fp = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
 
         if (fp == NULL)
-            AG_ABEND( asprintf( zCannot, errno, "open for write", pzNewFile,
+            AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
                                 strerror( errno )));
         p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
         p->pFile = fp;
@@ -338,7 +338,7 @@ ag_scm_out_push_new( SCM new_file )
                     pz = "/tmp";
             }
 
-            pzTemp = asprintf( "%s/agtmp.XXXXXX", pz );
+            pzTemp = aprf( "%s/agtmp.XXXXXX", pz );
             if (pzTemp == NULL)
                 AG_ABEND( "cannot allocate temp file template" );
         }
@@ -347,14 +347,14 @@ ag_scm_out_push_new( SCM new_file )
         p->flags |= FPF_UNLINK;
         tmpfd = mkstemp( pzNewFile );
         if (tmpfd < 0)
-            AG_ABEND( asprintf( "failed to create temp file from `%s'",
+            AG_ABEND( aprf( "failed to create temp file from `%s'",
                                 pzTemp ));
 
         p->pFile  = fdopen( tmpfd, "a" FOPEN_BINARY_FLAG "+" );
     }
 
     if (p->pFile == NULL)
-        AG_ABEND( asprintf( zCannot, errno, "open for write", pzNewFile,
+        AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
                             strerror( errno )));
 
     p->pzOutName = pzNewFile;
@@ -405,7 +405,7 @@ ag_scm_out_switch( SCM new_file )
     if (   freopen( pzNewFile, "w" FOPEN_BINARY_FLAG, pCurFp->pFile )
         != pCurFp->pFile)
 
-        AG_ABEND( asprintf( zCannot, errno, "freopen", pzNewFile,
+        AG_ABEND( aprf( zCannot, errno, "freopen", pzNewFile,
                             strerror( errno )));
 
     /*

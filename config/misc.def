@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/10/13 19:22:15 $
+ *  Last Modified:     $Date: 2002/12/07 04:45:03 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.22 2002/10/13 19:22:15 bkorb Exp $
+ *  $Id: misc.def,v 3.23 2002/12/07 04:45:03 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.22 $";
+version = "$Revision: 3.23 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -243,6 +243,18 @@ test = {
 		_EOF_;
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
+};
+
+test = {
+    name   = long_long;
+    type   = compile;
+    check  = "long long ints";
+    action = { act-type = define; };
+    code   = <<- _EOF_
+		long long i;
+		_EOF_;
+    doc =
+    "See if long long works";
 };
 
 do-always = <<- _END_ALWAYS_

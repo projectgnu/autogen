@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.12 2002/09/14 18:40:41 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.13 2002/12/07 04:45:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -388,7 +388,7 @@ ENDFOR gfunc
 Usage:  (html-escape-encode str)
 @*
 Substitute escape sequences for characters that are special to HTML/XML.
-It will replace @code{&}, @code{<} and @code{>} with the strings,
+It will replace "@code{&}", "@code{<}" and "@code{>}" with the strings,
 "@code{&amp;}", "@code{&lt;}", and "@code{&gt;}", respectively.
 
 Arguments:

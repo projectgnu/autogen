@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.11 2002/09/29 00:16:20 bkorb Exp $
+ *   $Id: opts.def,v 3.12 2002/12/07 04:45:03 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -234,7 +234,7 @@ flag = {
 	        USAGE( EXIT_FAILURE );
 	    }
 
-	    pz = asprintf( "(load \"%s\")", zPath );
+	    pz = aprf( "(load \"%s\")", zPath );
 	    procState = PROC_STATE_GUILE_PRELOAD;
 	    gh_eval_str( pz );
 	    free( pz );

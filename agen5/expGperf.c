@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.3 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expGperf.c,v 3.4 2002/12/07 04:45:03 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -132,9 +132,9 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      */
     {
         char* pzCmd;
-        pzCmd = asprintf( zMakeGperf, pzList, pzName, getpid() );
+        pzCmd = aprf( zMakeGperf, pzList, pzName, getpid() );
         if (pzCmd == NULL)
-            AG_ABEND( asprintf( "asprintf( %s, ...", zMakeGperf ));
+            AG_ABEND( aprf( "asprintf( %s, ...", zMakeGperf ));
 
         /*
          *  Run the command and ignore the results.
@@ -178,7 +178,7 @@ ag_scm_gperf( SCM name, SCM str )
      *  scribble space, use that.
      *  (If it does fit, then the test string fits already).
      */
-    pzCmd = asprintf( zRunGperf, pzName, pzStr );
+    pzCmd = aprf( zRunGperf, pzName, pzStr );
     pzStr = runShell( pzCmd );
     if (*pzStr == NUL)
         str = SCM_UNDEFINED;
