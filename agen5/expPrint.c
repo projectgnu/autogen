@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.7 2002/05/21 02:44:34 bkorb Exp $
+ *  $Id: expPrint.c,v 3.8 2002/06/27 01:36:13 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -95,7 +95,7 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
     }
 
     printSize = snprintfv( pzBuf, bufSize, pzFmt, (void*)argV );
-    if ((printSize & 0xF0000000) != 0)
+    if ((printSize & ~0xFFFFFF) != 0)
         AG_ABEND( asprintf( "snprintf returned 0x%08X\n", printSize ));
 
     sigaction( SIGBUS,  &saSave1, NULL );
