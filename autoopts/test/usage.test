@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2003-03-08 15:14:12 bkorb"
+## Time-stamp:      "2003-03-08 16:07:58 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 3.2 2003/03/08 23:15:10 bkorb Exp $
+# $Id: usage.test,v 3.3 2003/03/09 00:17:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -22,42 +22,6 @@ fi
 set -x
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
-
-# This shar contains:
-# length mode       name
-# ------ ---------- ------------------------------------------
-#    586 -rw-r--r-- usage_LGFRA.hlp
-#    564 -rw-r--r-- usage_LGFRp.hlp
-#    582 -rw-r--r-- usage_LGFoA.hlp
-#    560 -rw-r--r-- usage_LGFop.hlp
-#    553 -rw-r--r-- usage_LGsRA.hlp
-#    539 -rw-r--r-- usage_LGsRp.hlp
-#    549 -rw-r--r-- usage_LGsoA.hlp
-#    535 -rw-r--r-- usage_LGsop.hlp
-#    661 -rw-r--r-- usage_LaFRA.hlp
-#    639 -rw-r--r-- usage_LaFRp.hlp
-#    632 -rw-r--r-- usage_LaFoA.hlp
-#    610 -rw-r--r-- usage_LaFop.hlp
-#    633 -rw-r--r-- usage_LasRA.hlp
-#    619 -rw-r--r-- usage_LasRp.hlp
-#    604 -rw-r--r-- usage_LasoA.hlp
-#    590 -rw-r--r-- usage_Lasop.hlp
-#    384 -rw-r--r-- usage_sGFRA.hlp
-#    374 -rw-r--r-- usage_sGFRp.hlp
-#    380 -rw-r--r-- usage_sGFoA.hlp
-#    370 -rw-r--r-- usage_sGFop.hlp
-#    488 -rw-r--r-- usage_sGsRA.hlp
-#    474 -rw-r--r-- usage_sGsRp.hlp
-#    484 -rw-r--r-- usage_sGsoA.hlp
-#    470 -rw-r--r-- usage_sGsop.hlp
-#    531 -rw-r--r-- usage_saFRA.hlp
-#    521 -rw-r--r-- usage_saFRp.hlp
-#    502 -rw-r--r-- usage_saFoA.hlp
-#    492 -rw-r--r-- usage_saFop.hlp
-#    568 -rw-r--r-- usage_sasRA.hlp
-#    554 -rw-r--r-- usage_sasRp.hlp
-#    539 -rw-r--r-- usage_sasoA.hlp
-#    525 -rw-r--r-- usage_sasop.hlp
 
 # ============= usage_LGFRA.hlp ==============
 sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFRA.hlp'
@@ -432,10 +396,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsRA.hlp'
 test_usage_sGsRA - Checkout usage_sGsRA Options
 USAGE:  usage_sGsRA { <option-name>[{=| }<val>] }...
 X
-X  --check-dirs     Checkout directory list
-X  --show-defs      Show the definition tree
-X  --help           Display usage information and exit
-X  --more-help      Extended usage information passed thru pager
+X  check-dirs     Checkout directory list
+X  show-defs      Show the definition tree
+X  help           Display usage information and exit
+X  more-help      Extended usage information passed thru pager
 X
 All arguments are named options.
 X
@@ -450,10 +414,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsRp.hlp'
 test_usage_sGsRp - Checkout usage_sGsRp Options
 USAGE:  usage_sGsRp { <option-name> }...
 X
-X  --check-dirs     Checkout directory list
-X  --show-defs      Show the definition tree
-X  --help           Display usage information and exit
-X  --more-help      Extended usage information passed thru pager
+X  check-dirs     Checkout directory list
+X  show-defs      Show the definition tree
+X  help           Display usage information and exit
+X  more-help      Extended usage information passed thru pager
 X
 All arguments are named options.
 X
@@ -468,10 +432,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsoA.hlp'
 test_usage_sGsoA - Checkout usage_sGsoA Options
 USAGE:  usage_sGsoA [ <option-name>[{=| }<val>] ]...
 X
-X  --check-dirs     Checkout directory list
-X  --show-defs      Show the definition tree
-X  --help           Display usage information and exit
-X  --more-help      Extended usage information passed thru pager
+X  check-dirs     Checkout directory list
+X  show-defs      Show the definition tree
+X  help           Display usage information and exit
+X  more-help      Extended usage information passed thru pager
 X
 All arguments are named options.
 X
@@ -486,10 +450,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsop.hlp'
 test_usage_sGsop - Checkout usage_sGsop Options
 USAGE:  usage_sGsop [ <option-name> ]...
 X
-X  --check-dirs     Checkout directory list
-X  --show-defs      Show the definition tree
-X  --help           Display usage information and exit
-X  --more-help      Extended usage information passed thru pager
+X  check-dirs     Checkout directory list
+X  show-defs      Show the definition tree
+X  help           Display usage information and exit
+X  more-help      Extended usage information passed thru pager
 X
 All arguments are named options.
 X

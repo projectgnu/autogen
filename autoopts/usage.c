@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.11 2003/03/08 21:19:52 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.12 2003/03/09 00:17:03 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -50,7 +50,7 @@
  */
 
 #include "autoopts.h"
-
+#define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
 tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
 tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";
 tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
@@ -130,36 +130,14 @@ optionUsage( pOptions, exitCode )
      *  Determine which header and which option formatting string to use
      */
     if ((pOptions->fOptSet & OPTPROC_GNUUSAGE) != 0) {
-        switch (pOptions->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
-        case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
-            pOptTitle = zNoReq_Short_Title;
-            /*
-             *  We have short options.  Do we have long ones, too?
-             */
-            pOptFmt   = (pOptions->fOptSet & OPTPROC_LONGOPT)
-                ? zGnuOptFmt : zShrtGnuOptFmt;
-            break;
+        pOptTitle = zNoReq_Short_Title;
 
-        case OPTPROC_NO_REQ_OPT:
-            pOptTitle = zNoReq_NoShort_Title;
-            pOptFmt   = zGnuOptFmt + 2; /* skip short opt separator */
-            break;
-
-        case OPTPROC_SHORTOPT:
-            pOptTitle = zReq_Short_Title;
-            /*
-             *  We have short options.  Do we have long ones, too?
-             */
-            pOptFmt   = (pOptions->fOptSet & OPTPROC_LONGOPT)
-                ? zGnuOptFmt : zShrtGnuOptFmt;
-            break;
-
-        default:
-        case 0:
-            pOptTitle = zReq_NoShort_Title;
-            pOptFmt   = zGnuOptFmt + 2; /* skip short opt separator */
+        switch (pOptions->fOptSet & OPTPROC_L_N_S) {
+        case OPTPROC_L_N_S:     pOptFmt   = zGnuOptFmt;     break;
+        case OPTPROC_LONGOPT:   pOptFmt   = zGnuOptFmt + 2; break;
+        case OPTPROC_SHORTOPT:  pOptFmt   = zShrtGnuOptFmt; break;
+        case 0:                 pOptFmt   = zGnuOptFmt + 4; break;
         }
-
         fputc( '\n', option_usage_fp );
 
     } else {
