@@ -9,7 +9,7 @@
 # Last Modified:     Wed Mar 1 2000
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: defref.test,v 1.2 2000/03/05 21:01:13 bruce Exp $
+# $Id: defref.test,v 1.3 2000/03/11 20:01:53 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -85,4 +85,5 @@ _EOF_
 $AGEN $testname.def || failure AutoGen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
+cleanup
 # end of defref.test
