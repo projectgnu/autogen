@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.23 1999/10/30 18:00:29 bruce Exp $
+#$Id: optcode.tpl,v 2.24 2000/02/13 19:47:09 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -162,13 +162,15 @@ static tOptProc doOpt[=(. cap-name)=];[=
 
       IF (exist? "call_proc") =]
 #define [=(get "call_proc")=] [=
-          IF (> (val (get "max")) 1) =]stackOptArg[=
+          IF (not (exist? "max")) =](tpOptProc)NULL[=
+          ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
           ELSE =](tpOptProc)NULL[=
           ENDIF=][=
 
       ELIF (exist? "flag_code") =]
 #define doOpt[=(. cap-name)=] [=
-          IF (> (val (get "max")) 1) =]stackOptArg[=
+          IF (not (exist? "max")) =](tpOptProc)NULL[=
+          ELIF (> (string->number (get "max")) 1) =]stackOptArg[=
           ELSE =](tpOptProc)NULL[=
           ENDIF=][=
 
