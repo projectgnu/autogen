@@ -8,11 +8,11 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:44:06 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/10 01:19:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-TESTS   = argument.test cond.test errors.test guile.test handler.test \
-	keyword.test rc.test shell.test stdopts.test vers.test
+TESTS   = argument.test cond.test equiv.test errors.test guile.test \
+	handler.test keyword.test rc.test shell.test stdopts.test vers.test
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
 
