@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/09 19:46:06 $
+# Last Modified:     $Date: 2001/12/29 11:24:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.0 2001/12/09 19:46:06 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.1 2001/12/29 11:24:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -40,7 +40,8 @@ do
     rm -f $f
     exec 4> $f
     cat >&4 <<- _EOF_
-		/*
+		/* -*- buffer-read-only: t -*- vi: set ro:
+		 *
 		 * Getdefs Globally exported prototypes `date`
 		 */
 		#ifndef GETDEFS_PROTOTYPES_H

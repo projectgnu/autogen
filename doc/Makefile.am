@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:46:05 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/29 11:24:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,11 +18,11 @@
 INFO_DEPS	= autogen.info
 MAKEINFO	= @MAKEINFO@ --no-split
 
-all : $(INFO_DEPS) LSM
+all : $(INFO_DEPS) autogen.lsm
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl \
+EXTRA_DIST	= auto_gen.tpl autogen.info LSM.tpl \
 		snprintfv.texi snprintfv.menu compete.def compete.tpl
 
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
@@ -36,13 +36,13 @@ DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
 
 ADDON_MENU	= \
-		$(top_srcdir)/columns/columns.menu \
-		$(top_srcdir)/getdefs/getdefs.menu \
+		../columns/columns.menu \
+		../getdefs/getdefs.menu \
 		$(srcdir)/snprintfv.menu
 
 ADDON_TEXI	= \
-		$(top_srcdir)/columns/columns.texi \
-		$(top_srcdir)/getdefs/getdefs.texi \
+		../columns/columns.texi \
+		../getdefs/getdefs.texi \
 		$(srcdir)/snprintfv.texi
 
 DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
@@ -60,7 +60,7 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 
 DEFCOPY		= copy=$(OPTIONS_DEF)
 
-GET_OPTS	= srcfile linenum filelist template=auto_gen
+GET_OPTS	= srcfile linenum filelist template=$(DOC_TEMPLATE)
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS) $(BLOCKOPT)
 
@@ -71,10 +71,9 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
-##  The "touch" garbage is because automake is too miserably aggressive
-##  in its dependency checking on files that it "knows" are source files
-##
-autogen.texi : $(DOC_DEPENDS)
+texi : texi-stamp
+
+texi-stamp : $(DOC_DEPENDS)
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" \
@@ -82,6 +81,7 @@ autogen.texi : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
+	@touch $@ ; if [ -f autogen.info ] ; then chmod u+w autogen.info || : ; fi
 
 ##  The following rule is for debugging generation problems:
 ##
@@ -92,12 +92,9 @@ autogen.def : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
-	@-touch $@
+	@touch $@
 
-$(AGSRCDIR)/autogen.texi :
-	@cd $(AGSRCDIR) ; echo making $@ in `pwd` ; make autogen.texi
-
-www/doc/autogen_toc.html : autogen.texi
+www/doc/autogen_toc.html : texi-stamp
 	@mkdir -p www/doc > /dev/null 2>&1 || :
 	texi2html -menu -split_chapter -verbose autogen.texi
 	mv -f autogen*.html www/doc
@@ -106,14 +103,14 @@ www/doc/autogen_toc.html : autogen.texi
 html : web
 web : www/doc/autogen_toc.html
 
-$(top_srcdir)/getdefs/getdefs.texi :
-	@cd $(top_srcdir)/getdefs/ ; $(MAKE) -f ./Makefile gen
+../getdefs/getdefs.texi :
+	@cd ../getdefs/ ; $(MAKE) $$mf gen
  
-$(top_srcdir)/columns/columns.texi :
-	@cd $(top_srcdir)/columns/ ; $(MAKE) -f ./Makefile gen
+../columns/columns.texi :
+	@cd ../columns/ ; $(MAKE) $$mf gen
 
-LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
-	top_builddir=$(top_builddir) \
+autogen.lsm : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
+	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
 	$(AGEXE) -T $(srcdir)/LSM.tpl $(OPTIONS_DEF)
 
 clobber : maintainer-clean

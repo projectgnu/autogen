@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2001/12/24 14:13:32 $
+dnl Last Modified:    $Date: 2001/12/29 11:24:55 $
 dnl            by:    Bruce Korb <bkorb@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.1 2001/12/24 14:13:32 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.2 2001/12/29 11:24:55 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.1 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.2 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -220,10 +220,7 @@ fi
 AC_SUBST(INCLIST)
 
 AM_CONFIG_HEADER(config.h:config-h.in)
-AC_CONFIG_FILES([Makefile agen5/Makefile agen5/test/Makefile \
-autoopts/Makefile autoopts/autoopts-config autoopts/test/Makefile \
-columns/Makefile compat/Makefile config/Makefile config/autogen.spec \
-doc/Makefile getdefs/Makefile getdefs/test/Makefile])
+==ADD_CONFIG_FILES==
 
 AC_CONFIG_COMMANDS([stamp-h],
 [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])

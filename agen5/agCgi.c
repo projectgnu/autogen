@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
+ *  $Id: agCgi.c,v 3.4 2001/12/29 11:24:56 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -83,6 +83,7 @@ typedef enum {
 
 
 static const char zOops[] =
+"HTTP/1.0 500 AutoGen Internal Error\n"
 "Content-type: text/plain\n\n"
 "Form processing error:\n";
 #define zNil     ((char*)(zOops + sizeof( zOops ) - 1))

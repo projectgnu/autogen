@@ -1,11 +1,4 @@
-[= AutoGen5 template lsm=LSM
-
-=][=
-
-;; Submit this (with your software package) via ftp to:
-;; ftp://ibiblio.org/incoming/Linux
-
-(out-push-new "autogen.lsm")
+[= AutoGen5 template lsm=autogen.lsm
 
 =]
 Begin4

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/09 19:46:03 $
+# Last Modified:     $Date: 2001/12/29 11:24:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.0 2001/12/09 19:46:03 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.1 2001/12/29 11:24:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -48,7 +48,7 @@ add_make_links()
 	fi
 
 _EOF_
-    sed -e 1d -e 2d configure.tmp
+    sed -e 1,2d configure.tmp
   ) > configure
 
   rm -f configure.tmp
@@ -115,9 +115,6 @@ pre )
 
     ( cd ${srcdir}/config; set -x ; ${AUTOGEN} misc.def; ) || exit 1
 
-    test -f doc/autogen.texi \
-        || echo '@setfilename fnord' > doc/autogen.texi
-
     byacc=`locate_exe byacc`
     if [ -z "$byacc" ]
     then
@@ -138,12 +135,22 @@ pre )
     then DEBUG_OPTS="-DDEBUG=1"
     else DEBUG_OPTS="-UDEBUG" ; fi
     export DEBUG_OPTS
+
+    if grep '==ADD_CONFIG_FILES==' configure.in > /dev/null
+    then
+      ( sed '/==ADD_CONFIG_FILES==/,$d' configure.in
+        echo 'AC_CONFIG_FILES([Makefile \'
+        find [a-p]* -name 'Makefile.am' -o -name '*.in' | \
+          sed 's,\.\(am\|in\)$,,;/^configure$/d' | sort -u | \
+          columns -I2 --line-sep=' \' --spread=1 | \
+          sed '$s,$,]),'
+        sed '1,/==ADD_CONFIG_FILES==/d' configure.in
+      ) > configure.tmp
+      mv -f configure.tmp configure.in
+    fi
     ;;
 
 post )
-    # remove the fake file so we don't forget to generate it later.
-    test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
-        || rm -f doc/autogen.texi
     add_make_links
     ;;
 
@@ -155,7 +162,8 @@ esac
 
 # Local Variables:
 # mode:shell-script
-# sh-indentation:4
+# sh-indentation:2
+# indent-tabs-mode: nil
 # End:
 
 # config/bootstrap.local ends here

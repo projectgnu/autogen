@@ -1,6 +1,13 @@
-2001-12-24  Bruce Korb  <bkorb@gnu.org>
+2001-12-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/html.test(new): test HTML input
+	* autogen/Makefile.am(columns): build before getdefs
+	* agen5/agCgi.c(zOops): prefix with HTTP internal error code
+	* agen5/funcEval.c(error-source-line): is general purpose function
+	* configure.in(AC_CONFIG_FILES): discover the config files
+	* config/bootstrap.local(AC_CONFIG_FILES): do the discovering
+	* doc/auto_gen.tpl(texi-file-source): find it in either build or src
+	* getdefs/Makefile.am(opts.c): derivable file in distribution.
 
 2001-12-24  Bruce Korb  <bkorb@gnu.org>
 

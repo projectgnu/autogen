@@ -1,4 +1,4 @@
-[= AutoGen5 template -*-texinfo-*-
+[= AutoGen5 template
 
 ##  Documentation template
 ##
@@ -10,13 +10,27 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.0 2001/12/09 19:46:05 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.1 2001/12/29 11:24:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
 
 (setenv "SHELL" "/bin/sh")
-(shell "[ -f autogen.texi ] && mv -f autogen.texi autogen.texi.ori")
+
+(define texi-file-source (shell "
+    if [ -f autogen.texi ]
+    then
+      mv -f autogen.texi autogen.texi.ori
+      echo autogen.texi.ori
+    elif [ -f ${top_srcdir}/doc/autogen.texi ]
+    then
+      echo autogen.texi
+    else
+      echo \"Cannot locate original autogen.texi file\" >&2
+      kill -TERM ${AG_pid}
+      exit 1
+    fi" ))
+
 =]
 \input texinfo
 @ignore
@@ -112,7 +126,7 @@ DEFINE get-text     =][=
       "Extraction from autogen.texi\n"
       "@end ignore" ))
 
-(extract (string-append (out-name) ".ori") text-tag) =][=
+(extract texi-file-source text-tag) =][=
 
 ENDDEF get-text     =][=
 
@@ -480,8 +494,9 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
 [=`cat  ${ADDON_MENU}`=]
 @end menu
 
-[= get-text tag = autofsm =]
-[=`
+[= get-text tag = autofsm =][=
+`
+echo
 
 for f in ${ADDON_TEXI}
 do
@@ -495,4 +510,14 @@ done
 
 ` =]
 [= get-text tag = Future =][=
-`[ -f autogen.texi.ori ] && rm -f autogen.texi.ori` =]
+
+`[ -f autogen.texi.ori ] && rm -f autogen.texi.ori`
+
+=][=#
+
+Local Variables:
+indent-tabs-mode: nil
+mode: texinfo
+End:
+
+=]

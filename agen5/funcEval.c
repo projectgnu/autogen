@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
+ *  $Id: funcEval.c,v 3.3 2001/12/29 11:24:56 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -283,6 +283,7 @@ evalExpression( ag_bool* pMustFree )
 /*=gfunc error_source_line
  *
  * what: display of file & line
+ * general_use:
  * doc:  This function is only invoked just before Guile displays
  *       an error message.  It displays the file name and line number
  *       that triggered the evaluation error.  You should not need to

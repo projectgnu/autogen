@@ -10,40 +10,42 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:46:01 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/29 11:24:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-bin_PROGRAMS = columns
+bin_PROGRAMS    = columns
 
 columns_SOURCES = columns.c opts.c opts.h
 
-GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
-EXTRA_DIST	= $(GEN_SRC) opts.def
-AGEXE		= $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
-columns_LDADD	= $(top_builddir)/autoopts/libopts.la
+BUILT_SOURCES   = columns.menu columns.texi columns.1
+EXTRA_DIST      = opts.def
+AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
+columns_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
 
-INCLUDES 	= @INCLIST@
+INCLUDES        = @INCLIST@
 
 CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1
 MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
 
-gen : $(GEN_SRC)
+gen : $(BUILT_SOURCES)
 
 all : gen
 
-opts.c opts.h: opts.def
-	top_builddir=$(top_builddir) \
-	$(AGEXE) $(top_srcdir)/columns/opts.def
+## opts.h cannot be built until columns is built, so no rules for it.
 
-columns.o : opts.h
+columns.1 columns.menu columns.texi : gen-stamp
 
-columns.menu columns.texi : opts.def columns
+gen-stamp : opts.def columns
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -Taginfo -bcolumns -DLEVEL=section \
 		$(top_srcdir)/columns/opts.def
+	$(AGEXE) -T agman1 -b columns $(srcdir)/opts.def
+	@touch $@
 
-columns.1 : opts.def columns
-	$(AGEXE) -T agman1 -b columns $(srcdir)/opts.def && touch $@
+clean : columns-clean
+
+columns-clean :
+	rm -f *-stamp
 
 # Makefile.am ends here

@@ -8,6 +8,7 @@ case "$1" in
   shift
   set -x
   "$@" && exit 0
+  set +x
   ;;
 esac
 

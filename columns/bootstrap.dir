@@ -1,0 +1,99 @@
+#! /bin/sh
+#
+# ----------------------------------------------------------------------
+# columns/bootstrap.dir --- maintainer's bootstrap script
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Thu Jul 29 09:32:11 1999
+# Last Modified:     $Date: 2001/12/29 11:24:56 $
+#            by:     Bruce Korb <bkorb@gnu.org>
+# ----------------------------------------------------------------------
+# @(#) $Id: bootstrap.dir,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+# ----------------------------------------------------------------------
+
+#  This script rebuilds sources not kept in the CVS repository.
+#  These files are distributed, so it is not necessary to invoke
+#  AutoGen before building AutoGen.  (Like I had to do long ago :)
+
+#  Dump the bootstrap recursive argument.  We're not interested.
+#
+if [ "$1" = recursive ]
+then
+  shift
+fi
+
+#  Check for a "force" option
+#
+if [ "$1" = "-f" ]
+then force=true  ; shift
+else force=false ; fi
+
+#  Name our executable in one place and disable any $HOME defaults
+#  Use the local ${AG}, if available.  Otherwise, look for it.
+#
+AUTOGEN=${AUTOGEN-autogen}
+AG=${builddir}/autogen
+
+if test -f ${AG}
+then
+  if test -x ${AG}
+  then :
+  else AG=""
+  fi
+else AG=""
+fi
+
+if test -z "${AG}"
+then
+  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is [^/]*/;/;" `
+
+  case ${f} in
+  */autogen )
+     AG=${f}
+     ;;
+
+  * )
+    AG=""
+    ;;
+  esac
+fi
+echo "autogen is '${AG}'"
+
+targets="$@"
+[ -z "$targets" ] && targets=opts.h
+
+for f in $targets
+do
+  case $f  in
+
+  opts.h | \
+  opts.c | \
+  stamp-opts )
+    # Make the option processing files:
+    #
+    if [ -z "${AG}" ]
+    then
+      test "X${BOOTSTRAP}" = X \
+        && echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
+    echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
+    ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
+    date > stamp-opts
+    ;;
+
+  * )
+    echo "Don't know how to make $f"
+    exit 1
+    ;;
+  esac
+done
+
+# Local Variables:
+# mode:             shell-script
+# sh-indentation:   2
+# indent-tabs-mode: nil
+# End:
+
+# bootstrap.dir ends here

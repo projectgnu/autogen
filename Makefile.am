@@ -4,15 +4,15 @@
 ##
 ## Maintainer:	     Bruce Korb <bkorb@gnu.org>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    $Date: 2001/12/24 14:13:32 $
+## Last Modified:    $Date: 2001/12/29 11:24:55 $
 ##            by:    Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/24 14:13:32 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2001/12/29 11:24:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 NOSHELL_DIRS = compat config snprintfv autoopts agen5
-SHELL_DIRS   = $(NOSHELL_DIRS) getdefs columns doc
+SHELL_DIRS   = $(NOSHELL_DIRS) columns getdefs doc
 SUBDIRS      = @TOP_DIRLIST@
 
 EXTRA_DIST	= VERSION TODO NOTES configure
