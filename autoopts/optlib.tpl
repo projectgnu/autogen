@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.18 2000/10/17 17:09:19 bkorb Exp $
+# $Id: optlib.tpl,v 1.19 2000/10/21 23:12:44 bkorb Exp $
 
 =]
 [=
@@ -104,8 +104,8 @@ typedef enum {[=
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
           columns -I4 --spread=3 --sep=','"
           (string-upcase! (string->c-name! (join " " (stack "keyword"))))
-          (. UP-name) )=]
-} te_[=(. cap-name)=];[=
+          (string-append UP-prefix UP-name) )=]
+} te_[=(string-append Cap-prefix cap-name)=];[=
   ENDIF
 
 =]
@@ -131,7 +131,8 @@ typedef enum {[=
 
   =*  key        =]
 #define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(te_[=(. cap-name)=]*)(&[=(. UP-prefix)
+                 =] (*(te_[=(string-append Cap-prefix cap-name)
+                          =]*)(&[=(. UP-prefix)
                  =]OPT_ARG([=(. UP-name)=])))[=
 
   =*  bool       =]
