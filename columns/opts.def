@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.14 1999/07/07 19:42:32 bkorb Exp $
+ *   $Id: opts.def,v 1.15 1999/07/08 21:34:15 bkorb Exp $
  */
 
 /*
@@ -241,4 +241,14 @@ per-line embellishments are provided.  See the formatting and
 separation arguments below.
 
 This program is used by AutoGen to help clean up and organize
-its output.';
+its output.
+
+See @file{autogen/src/agfunc.tpl}.
+
+This function was not implemented as an expression function because
+either it would have to be many expression functions, or a provision
+would have to be added to provide options to expression functions.
+Maybe not a bad idea, but it is not being implemented at the moment.
+
+A side benefit is that you can use it outside of AutoGen to columnize
+input, a la the @code{ls} command.';
