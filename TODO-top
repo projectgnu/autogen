@@ -19,18 +19,10 @@
 
 * Pending
 
-** Manual pages should be installed.
 ** new arg for setting time of output files
 ** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
-** Macro: AC_FUNC_ALLOCA
-     This macro does not try to get `alloca' from the System V R3
-     `libPW' or the System V R4 `libucb' because those libraries
-     contain some incompatible functions that cause trouble.  Some
-     versions do not even contain `alloca' or contain a buggy version.
-     If you still want to use their `alloca', use `ar' to extract
-     `alloca.o' from them instead of compiling `alloca.c'.
 ** All errors from autogen/getdefs etc. should start with,
-   `basename(argv[0])'.
+   `options.pzProgName' (aka 'basename(argv[0])').
 
 *  Possibilities for the (distant) future:
 
