@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.9 2005/02/14 14:50:10 bkorb Exp $
- *  Time-stamp:      "2005-02-14 06:49:22 bkorb"
+ *  $Id: load.c,v 4.10 2005/02/14 15:28:29 bkorb Exp $
+ *  Time-stamp:      "2005-02-14 07:25:49 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -53,6 +53,8 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
+static char*
+findArg( char* pzTxt, load_mode_t mode );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath

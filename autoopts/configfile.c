@@ -1,6 +1,6 @@
 
 /*
- *  $Id: configfile.c,v 4.4 2005/02/14 14:09:54 bkorb Exp $
+ *  $Id: configfile.c,v 4.5 2005/02/14 15:28:29 bkorb Exp $
  *
  *  configuration/rc/ini file handling.
  */
@@ -51,14 +51,14 @@
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static char*
-handleConfig(
+handleStructure(
     tOptions*     pOpts,
     tOptState*    pOS,
     char*         pzText,
     int           direction );
 
 static char*
-handleStructure(
+handleConfig(
     tOptions*     pOpts,
     tOptState*    pOS,
     char*         pzText,
