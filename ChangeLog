@@ -1,5 +1,11 @@
 2000-02-29  Bruce Korb  <autogen@linuxbox.com>
 
+	* agen5/funcEval.c: The '?%' macro function failed.
+	* agen5/tests/forfrom.test: added.  Tests the above.
+	* agen5/tests/Makefile.am: added forfrom to test list
+
+2000-02-29  Bruce Korb  <autogen@linuxbox.com>
+
 	* agen5/defFind.c: Added routine to copy a definition reference
 	* agen5/functions.c: use the routine
 	* agen5/funcEval.c: ditto
