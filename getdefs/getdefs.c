@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.28 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: getdefs.c,v 2.29 2001/08/29 03:10:48 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/08/23 03:22:05 $
+ *  Last Modified:     $Date: 2001/08/29 03:10:48 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -321,7 +321,7 @@ updateDatabase( void )
 
     fwrite( pzIndexEOF, (pzEndIndex - pzIndexEOF) + 1, 1, fp );
     fclose( fp );
-    chmod( OPT_ARG( ORDERING ), 0111 );
+    chmod( OPT_ARG( ORDERING ), 0444 );
 }
 
 

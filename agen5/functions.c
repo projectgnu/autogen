@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.20 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: functions.c,v 1.21 2001/08/29 03:10:48 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -32,6 +32,7 @@
 #include "autogen.h"
 
 tSCC zCantInc[] = "cannot include file";
+tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
 
 
 /*=macfunc INCLUDE
@@ -122,17 +123,26 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pInv = findTemplate( pT->pzTemplText + pMac->ozName );
     if (pInv != (tTemplate*)NULL) {
+        if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
+            fprintf( pfTrace, zTrcFmt, "remapped to Define", pMac->funcCode,
+                     pT->pzFileName, pMac->lineNo );
         pMac->funcCode    = FTYP_DEFINE;
         pMac->funcPrivate = (void*)pInv;
         parseMacroArgs( pT, pMac );
         return mFunc_Define( pT, pMac );
     }
 
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+        fprintf( pfTrace, zTrcFmt, "remapped to Expr", pMac->funcCode,
+                 pT->pzFileName, pMac->lineNo );
+        fprintf( pfTrace, "\tbased on %s\n", pT->pzTemplText + pMac->ozName );
+    }
+
     pMac->funcCode = FTYP_EXPR;
-    if (pMac->ozText == 0)
+    if (pMac->ozText == 0) {
         pMac->res = EMIT_VALUE;
 
-    else {
+    } else {
         char* pzExpr = pT->pzTemplText + pMac->ozText;
         switch (*pzExpr) {
         case ';':
@@ -153,6 +163,9 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
         default:
             pMac->res = EMIT_STRING;
         }
+
+        if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
+            fprintf( pfTrace, "\tcode %X -- %s\n", pMac->res, pzExpr );
     }
 
     return mFunc_Expr( pT, pMac );
@@ -176,7 +189,6 @@ mFunc_Bogus( tTemplate* pT, tMacro* pMac )
     longjmp( fileAbort, FAILURE );
     return pMac;
 }
-
 
 
 /*=macfunc TEXT
@@ -350,6 +362,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of functions.c */

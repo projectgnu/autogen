@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.28 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: expState.c,v 1.29 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -321,7 +321,7 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf( pfTrace, "searching for `%s'",
-				 ag_scm2zchars( test, "test value" ));
+                 ag_scm2zchars( test, "test value" ));
 
     return find_entry_value( op, obj, test );
 }
@@ -475,6 +475,7 @@ ag_scm_tpl_file( void )
     SCM
 ag_scm_tpl_file_line( SCM fmt )
 {
+    char    zScribble[ 1024 ];
     tSCC    zFmt[] = "from %s line %d";
     tCC*    pzFmt = zFmt;
     char*   pz;

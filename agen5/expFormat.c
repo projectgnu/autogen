@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.34 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: expFormat.c,v 1.35 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -140,14 +140,15 @@ tSCC zNil[]      = "";
     SCM
 ag_scm_dne( SCM prefix, SCM first )
 {
+    char     zScribble[ 128 ];
     char*    pzRes;
     tCC*     pzFirst = zNil;
     SCM      res;
     tCC*     pzPrefix = ag_scm2zchars( prefix, "prefix" );
     if (strlen( pzPrefix ) > 128 ) {
-		fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-		LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
-	}
+        fprintf( stderr, zPfxMsg, zPfxLen, 128 );
+        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+    }
 
     /*
      *  IF we also have a 'first' prefix string,
@@ -255,7 +256,7 @@ ag_scm_error( SCM res )
         break;
 
     case GH_TYPE_STRING:
-        pzMsg  = SCM_CHARS( res );
+        pzMsg  = ag_scm2zchars( res, "error string" );
         msgLen = SCM_LENGTH( res );
         while (isspace( *pzMsg ) && (--msgLen > 0)) pzMsg++;
 
@@ -278,7 +279,7 @@ ag_scm_error( SCM res )
      *  IF there is a message,
      *  THEN print it.
      */
-    if (*pzMsg != '\0')
+    if (*pzMsg != NUL)
         fprintf( stderr, zFmt, (abort != PROBLEM) ? zErr : zWarn,
                  pCurTemplate->pzFileName, pCurMacro->lineNo,
                  pCurFp->pzOutName, pzMsg );
@@ -624,6 +625,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expFormat.c */

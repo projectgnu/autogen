@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.30 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: funcCase.c,v 1.31 2001/08/29 03:10:48 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -288,7 +288,7 @@ Select_Equivalent( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 {
-	tSCC zSrch[] = "search string";
+    tSCC zSrch[] = "search string";
     char* pzSubstr;
     SCM   res;
 
@@ -665,7 +665,7 @@ ag_scm_string_start_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED );
 
-    if (regexec( &re, SCM_CHARS( text ), 2, m, 0 ) != 0)
+    if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_so != 0)
          res = SCM_BOOL_F;
@@ -687,7 +687,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, SCM_CHARS( text ), 2, m, 0 ) != 0)
+    if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_so != 0)
          res = SCM_BOOL_F;

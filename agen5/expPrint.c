@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.18 2001/08/12 03:07:03 bkorb Exp $
+ *  $Id: expPrint.c,v 1.19 2001/08/29 03:10:48 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -43,7 +43,7 @@ STATIC sigjmp_buf printJumpEnv;
 STATIC void    printFault( int sig );
 STATIC size_t safePrintf( char* pzBuf, size_t bufSize,
                           char* pzFmt, void** argV );
-
+tSCC pzFormatName[] = "format";
 
     STATIC void
 printFault( int sig )
@@ -200,30 +200,12 @@ run_printf( char* pzFmt, int len, SCM alist )
 ag_scm_sprintf( SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
-    char* pzFmt;
-    SCM   res;
-    int   fmt_len;
-
-    if (! gh_string_p( fmt ))
-        return SCM_UNDEFINED;
+    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
 
     if (list_len <= 0)
         return fmt;
 
-    fmt_len = SCM_LENGTH( fmt );
-    if (fmt_len < sizeof( zScribble )) {
-        pzFmt = zScribble;
-        memcpy( (void*)pzFmt, (void*)SCM_CHARS( fmt ), fmt_len );
-        pzFmt[ fmt_len ] = NUL;
-    } else {
-        pzFmt = gh_scm2newstr( fmt, NULL );
-    }
-
-    res = run_printf( pzFmt, list_len, alist );
-
-    if (pzFmt != zScribble)
-        free( (void*)pzFmt );
-    return res;
+    return run_printf( pzFmt, list_len, alist );
 }
 
 
@@ -242,30 +224,10 @@ ag_scm_sprintf( SCM fmt, SCM alist )
     SCM
 ag_scm_printf( SCM fmt, SCM alist )
 {
-    SCM   res;
     int   list_len = scm_ilength( alist );
-    char* pzFmt;
-    int   len;
+    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
 
-    if (! gh_string_p( fmt ))
-        return SCM_UNDEFINED;
-
-    if (list_len <= 0)
-        return fmt;
-
-    len   = SCM_LENGTH( fmt );
-    if (len < sizeof( zScribble ))
-         pzFmt = zScribble;
-    else pzFmt = (char*)AGALOC( len + 1, "printf buffer" );
-
-    memcpy( (void*)pzFmt, (void*)SCM_CHARS( fmt ), len );
-    pzFmt[ len ] = NUL;
-
-    res   = run_printf( pzFmt, list_len, alist );
-    if (pzFmt != zScribble)
-        AGFREE( (void*)pzFmt );
-
-    gh_display( res );
+    gh_display( run_printf( pzFmt, list_len, alist ));
     return SCM_UNDEFINED;
 }
 
@@ -286,18 +248,9 @@ ag_scm_printf( SCM fmt, SCM alist )
     SCM
 ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 {
-    SCM   res;
     int   list_len = scm_ilength( alist );
-    int   len;
-
-    if (! gh_string_p( fmt ))
-        return SCM_UNDEFINED;
-
-    len   = SCM_LENGTH( fmt );
-    memcpy( (void*)zScribble, (void*)SCM_CHARS( fmt ), len );
-    zScribble[ len ] = NUL;
-
-    res   = run_printf( zScribble, list_len, alist );
+    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
+    SCM   res      = run_printf( pzFmt, list_len, alist );
 
     return  scm_display( res, port );
 }

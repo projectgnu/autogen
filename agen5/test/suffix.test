@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2001/05/09 05:27:55 $
+# Last Modified:     $Date: 2001/08/29 03:10:48 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: suffix.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# $Id: suffix.test,v 1.2 2001/08/29 03:10:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -56,6 +56,29 @@ $AGEXE --no-def -T${testname}.tpl -o -b${testname} > ${testname}.stdout || \
 
 cmp ${testname}.stdout* || \
    failure COMPARE cmp ${testname}.stdout*
+
+# # # # # # # # # # STDOUT TEMPLATE # # # # # # # # #
+
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<'_EOF_'
+[= AutoGen5 Template =]
+[=
+text =]
+_EOF_
+
+cat > ${testname}.samp <<- EOF
+	This is some text.
+	This should appear in the output.
+EOF
+
+cat > ${testname}.def <<\EOF
+AutoGen Definitions suffix;
+text = `cat suffix.samp`;
+EOF
+
+$AGEXE ${testname}.def > ${testname}.out
+cmp ${testname}.out ${testname}.samp || \
+  failure "`diff  ${testname}.out ${testname}.samp`"
 
 cleanup
 # end of endmac.test

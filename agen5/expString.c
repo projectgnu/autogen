@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.33 2001/08/12 03:07:03 bkorb Exp $
+ *  $Id: expString.c,v 1.34 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -399,11 +399,9 @@ ag_scm_prefix( SCM prefix, SCM text )
     size_t   pfx_size;
     SCM      res;
 
-    if ((! gh_string_p( prefix )) || (! gh_string_p( text )))
-        return SCM_UNDEFINED;
-
-    pzPfx   = SCM_CHARS( prefix );
-    pzText  = SCM_CHARS( text );
+    pzPfx   = ag_scm2zchars( prefix, "prefix" );
+    pzDta   = \
+    pzText  = ag_scm2zchars( text, "text" );
     pfx_size = strlen( pzPfx );
     out_size = 1;
 
@@ -420,8 +418,8 @@ ag_scm_prefix( SCM prefix, SCM text )
     } exit_count:;
 
     res    = scm_makstr( (scm_sizet)out_size, 0 );
+    pzText = pzDta;
     pzDta  = SCM_CHARS( res );
-    pzText = SCM_CHARS( text );
     strcpy( pzDta, pzPfx );
     pzDta += pfx_size;
 
@@ -471,7 +469,7 @@ ag_scm_shell( SCM cmd )
     if (! gh_string_p( cmd ))
         return SCM_UNDEFINED;
     {
-        char* pz = runShell( SCM_CHARS( cmd ));
+        char* pz = runShell( ag_scm2zchars( cmd, "command" ));
         cmd   = gh_str02scm( pz );
         AGFREE( (void*)pz );
         return cmd;
@@ -495,16 +493,14 @@ ag_scm_shellf( SCM fmt, SCM alist )
 {
     int   len = scm_ilength( alist );
     char* pz;
-
-    if (! gh_string_p( fmt ))
-        return SCM_UNDEFINED;
+    char* pzFmt = ag_scm2zchars( fmt, "format" );
 
     if (len <= 0)
         return fmt;
 
-    fmt = run_printf( SCM_CHARS( fmt ), len, alist );
-    pz = runShell( SCM_CHARS( fmt ));
-    fmt   = gh_str02scm( pz );
+    fmt = run_printf( pzFmt, len, alist );
+    pz  = runShell( ag_scm2zchars( fmt, "shell script" ));
+    fmt = gh_str02scm( pz );
     AGFREE( (void*)pz );
     return fmt;
 }
@@ -539,10 +535,7 @@ ag_scm_raw_shell_str( SCM obj )
     char*      pz;
     SCM        res;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pzDta = SCM_CHARS( obj );
+    pzDta   = ag_scm2zchars( obj, "AG Object" );
     dtaSize = strlen( pzDta ) + 3;
     pz = pzDta-1;
     for (;;) {
@@ -609,10 +602,7 @@ ag_scm_shell_str( SCM obj )
     char*      pz;
     SCM        res;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pzDta = SCM_CHARS( obj );
+    pzDta = ag_scm2zchars( obj, "AG Object" );
     dtaSize = 3;
     pz = pzDta;
     for (;;) {
@@ -688,12 +678,9 @@ ag_scm_stack( SCM obj )
         tDefEntry* pDE;
         SCM        str;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
     res = SCM_EOL;
 
-    ppDE = findEntryList( SCM_CHARS( obj ) );
+    ppDE = findEntryList( ag_scm2zchars( obj, "AG Object" ));
     if (ppDE == NULL)
         return SCM_EOL;
 
@@ -732,12 +719,9 @@ ag_scm_stack( SCM obj )
     SCM
 ag_scm_kr_string( SCM str )
 {
-    tSCC    zNewLine[] = "\\n\\\n";
+    tSCC zNewLine[] = "\\n\\\n";
 
-    if (! gh_string_p( str ))
-        return SCM_UNDEFINED;
-
-    return makeString( SCM_CHARS( str ),
+    return makeString( ag_scm2zchars( str, "string" ),
                        zNewLine, sizeof( zNewLine )-1 );
 }
 
@@ -764,12 +748,9 @@ ag_scm_kr_string( SCM str )
     SCM
 ag_scm_c_string( SCM str )
 {
-    tSCC       zNewLine[] = "\\n\"\n       \"";
+    tSCC zNewLine[] = "\\n\"\n       \"";
 
-    if (! gh_string_p( str ))
-        return SCM_UNDEFINED;
-
-    return makeString( SCM_CHARS( str ),
+    return makeString( ag_scm2zchars( str, "string" ),
                        zNewLine, sizeof( zNewLine )-1 );
 }
 
@@ -794,15 +775,11 @@ ag_scm_c_string( SCM str )
     SCM
 ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 {
-    if (   (! gh_string_p( str ))
-        || (! gh_string_p( from_xform ))
-        || (! gh_string_p( to_xform )))
-        return SCM_UNDEFINED;
     {
         char  map[ 256 ];
         int   i = 255;
-        char* pzFrom = SCM_CHARS( from_xform );
-        char* pzTo   = SCM_CHARS(   to_xform );
+        char* pzFrom = ag_scm2zchars( from_xform, "string" );
+        char* pzTo   = ag_scm2zchars(   to_xform, "string" );
 
         do  {
             map[i] = i;
@@ -841,7 +818,7 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
             }
         } mapDone:;
 
-        pzTo = SCM_CHARS( str );
+        pzTo = ag_scm2zchars( str, "string" );
         while (*pzTo != NUL) {
             *pzTo = map[ (int)*pzTo ];
             pzTo++;
@@ -852,5 +829,6 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expString.c */

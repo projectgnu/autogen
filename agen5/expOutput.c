@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.16 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: expOutput.c,v 1.17 2001/08/29 03:10:48 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -130,20 +130,14 @@ ag_scm_out_delete( void )
     SCM
 ag_scm_out_move( SCM new_file )
 {
-    char* pz;
+    char* pz = ag_scm2zchars( new_file, "filename" );
     int   len;
 
-    if (! gh_string_p( new_file ))
-        return SCM_UNDEFINED;
-
-    len = SCM_LENGTH( new_file );
-    pz  = AGALOC( len + 1, "move-to file name" );
-    memcpy( (void*)pz, (void*)SCM_CHARS( new_file ), len );
-    pz[len] = NUL;
-
     rename( pCurFp->pzOutName, pz );
-
-    pCurFp->pzOutName = pz;  /* memory leak */
+    if ((pCurFp->flags & FPF_STATIC_NM) == 0)
+        AGFREE( (void*)pCurFp->pzOutName );
+    AGDUPSTR( pCurFp->pzOutName, pz, "file name" );
+    pCurFp->flags &= ~FPF_STATIC_NM;
     return SCM_UNDEFINED;
 }
 

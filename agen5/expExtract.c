@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 1.2 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: expExtract.c,v 1.3 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -148,16 +148,12 @@ buildEmptyText( const char* pzStart, const char* pzEnd,
 
     else {
         dlen = SCM_LENGTH( def ) + 1;
-        pzDef = AGALOC( dlen, "default text for extract block" );
-        memcpy( pzDef, SCM_CHARS( def ), dlen-1 );
-        pzDef[ dlen-1 ] = NUL;
+        pzDef = ag_scm2zchars( def, "default extract string" );
     }
 
     res = scm_makstr( mlen + dlen + 1, 0 );
-    if (dlen > 0) {
-        sprintf( SCM_CHARS( res ), "%s\n%s\n%s", pzStart, pzDef, pzEnd );
-        AGFREE( pzDef );
-    }
+    if (dlen > 0)
+         sprintf( SCM_CHARS( res ), "%s\n%s\n%s", pzStart, pzDef, pzEnd );
     else sprintf( SCM_CHARS( res ), "%s\n%s", pzStart, pzEnd );
 
     return res;
@@ -257,3 +253,10 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
         return res;
     }
 }
+
+/*
+ * Local Variables:
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * end of expExtract.c */

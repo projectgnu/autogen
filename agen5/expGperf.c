@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 1.7 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: expGperf.c,v 1.8 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -115,8 +115,7 @@ tSCC zRunGperf[] = "${gperf_%s} %s";
 ag_scm_make_gperf( SCM name, SCM hlist )
 {
     SCM     newline  = gh_str2scm( "\n", 1 );
-    int     nameLen;
-    ag_bool mustFree = AG_FALSE;
+    char*   pzName   = ag_scm2zchars( name, "gperf name" );
     char*   pzList;
 
     if (! gh_string_p( name ))
@@ -126,46 +125,21 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      *  Construct the newline separated list of values
      */
     hlist = ag_scm_join( newline, hlist );
-    if (! gh_string_p( hlist ))
-        return SCM_UNDEFINED;
-
-    /*
-     *  Put the name of the hash program into scribble memory
-     */
-    nameLen = SCM_LENGTH( name );
-    if (nameLen > 128)
-        return SCM_UNDEFINED;
-
-    memcpy( zScribble, SCM_CHARS( name ), nameLen );
-    zScribble[ nameLen ] = NUL;
+    pzList = ag_scm2zchars( hlist, "hash list" );
 
     /*
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        int listLen = SCM_LENGTH( hlist );
-        char*   pzCmd;
-
-        if ((listLen + nameLen + 2) < sizeof( zScribble ))
-            pzList = zScribble + nameLen + 1;
-        else {
-            pzList = (char*)AGALOC( listLen + 1, "gperf string list" );
-            mustFree = AG_TRUE;
-        }
-
-        memcpy( pzList, SCM_CHARS( hlist ), listLen );
-        pzList[ listLen ] = NUL;
-
-        pzCmd = asprintf( zMakeGperf, pzList, zScribble, getpid() );
+        char* pzCmd;
+        pzCmd = asprintf( zMakeGperf, pzList, pzName, getpid() );
         if (pzCmd == (char*)NULL) {
             fprintf( stderr, "Error using %s list:  ``%s''\n\n",
-                     zScribble, pzList );
-            fprintf( stderr, zMakeGperf, pzList, zScribble, getpid() );
+                     pzName, pzList );
+            fprintf( stderr, zMakeGperf, pzList, pzName, getpid() );
 
             LOAD_ABORT( pCurTemplate, pCurMacro, "formatting shell command" );
         }
-        if (mustFree)
-            AGFREE( pzList );
 
         /*
          *  Run the command and ignore the results.
@@ -173,7 +147,6 @@ ag_scm_make_gperf( SCM name, SCM hlist )
          */
         pzList = runShell( pzCmd );
         AGFREE( pzCmd );
-        AGFREE( pzList );
     }
     return SCM_BOOL_T;
 }
@@ -202,59 +175,27 @@ ag_scm_gperf( SCM name, SCM str )
     ag_bool mustFree = AG_FALSE;
     int     nameLen, strLen;
     char*   pzCmd;
-    char*   pzStr;
-
-    if ((! gh_string_p( str )) || (! gh_string_p( name )))
-        return SCM_UNDEFINED;
-
-    /*
-     *  Extract the name and sample string
-     */
-    nameLen = SCM_LENGTH( name );
-    if (nameLen > 128)
-        return SCM_UNDEFINED;
-    memcpy( zScribble, SCM_CHARS( name ), nameLen );
-    zScribble[ nameLen ] = NUL;
-
-    strLen = SCM_LENGTH( str );
-    if ((strLen + nameLen + 2) < sizeof( zScribble ))
-        pzStr = zScribble + nameLen + 1;
-    else
-        pzStr = (char*)AGALOC( strLen + 1, "gperf hash string" );
-    memcpy( pzStr, SCM_CHARS( str ), strLen );
-    pzStr[ strLen ] = NUL;
+    char*   pzStr    = ag_scm2zchars( str,  "key-to-hash" );
+    char*   pzName   = ag_scm2zchars( name, "gperf name" );
 
     /*
      *  Format the gperf command and check the result.  If it fits in
      *  scribble space, use that.
      *  (If it does fit, then the test string fits already).
      */
-    if (  ((strLen + nameLen + 2) * 2 + sizeof( zRunGperf ))
-          < sizeof( zScribble ))  {
-        pzCmd = pzStr + strLen + 1;
-        sprintf( pzCmd, zRunGperf, zScribble, pzStr );
-        mustFree = AG_FALSE;
-
-    } else {
-        pzCmd = asprintf( zRunGperf, zScribble, pzStr );
-        if (mustFree)
-            AGFREE( pzStr );
-        mustFree = AG_TRUE;  /* now it is ``pzCmd'' that is allocated */
-    }
-
+    pzCmd = asprintf( zRunGperf, pzName, pzStr );
     pzStr = runShell( pzCmd );
     if (*pzStr == NUL)
         str = SCM_UNDEFINED;
     else
         str = gh_str02scm( pzStr );
 
-    if (mustFree)
-        AGFREE( pzCmd );
-    AGFREE( pzStr );
+    AGFREE( pzCmd );
     return str;
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expGperf.c */

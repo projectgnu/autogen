@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.21 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: defLex.c,v 1.22 2001/08/29 03:10:48 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -370,7 +370,6 @@ loadScheme( void )
     char*    pzEnd     = (char*)skipScheme( pzText, pzText + strlen( pzText ));
     char     endCh     = *pzEnd;
     int      schemeLen = (pzEnd - pzText);
-    ag_bool  mustFree  = AG_FALSE;
     SCM      res;
 
     /*
@@ -384,10 +383,9 @@ loadScheme( void )
     *pzEnd = endCh;
 
     pCurCtx->pzScan = pzEnd;
-    pzEnd = resolveSCM( res, &mustFree );
+    pzEnd = resolveSCM( res );
     if (strlen( pzEnd ) >= schemeLen) {
-        if (! mustFree)
-            AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
+        AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
 
         yylval = (YYSTYPE)pzEnd;
     }
@@ -397,8 +395,6 @@ loadScheme( void )
          *  We know the result is smaller than the source.  Copy in place.
          */
         strcpy( pzText, pzEnd );
-        if (mustFree)
-            AGFREE( (void*)pzEnd );
         yylval = (YYSTYPE)pzText;
     }
 
@@ -814,6 +810,7 @@ assembleString( char* pzScan )
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of defLex.c */

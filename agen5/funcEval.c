@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.33 2001/08/12 03:07:03 bkorb Exp $
+ *  $Id: funcEval.c,v 1.34 2001/08/29 03:10:48 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -42,7 +42,7 @@ STATIC int exprType( char* pz );
 
 
     EXPORT char*
-resolveSCM( SCM s, ag_bool*  pMustFree )
+resolveSCM( SCM s )
 {
     static char z[32];
     char*  pzRes = z;
@@ -50,18 +50,12 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
 
     switch (gh_type_e( s )) {
     case GH_TYPE_BOOLEAN:         
-        z[0] = SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL; break;
+        z[0] = SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL;
+        break;
 
     case GH_TYPE_STRING:
     case GH_TYPE_SYMBOL:
-        len = SCM_LENGTH(s);
-        if (len >= sizeof( z )) {
-            pzRes = AGALOC( len + 1, "SCM result string" );
-            *pMustFree = AG_TRUE;
-        }
-
-        memcpy( pzRes, SCM_CHARS(s), len );
-        pzRes[ len ] = NUL;
+        pzRes = ag_scm2zchars( s, "SCM Result" );
         break;
 
     case GH_TYPE_CHAR:
@@ -256,7 +250,7 @@ evalExpression( ag_bool* pMustFree )
             *pMustFree = AG_FALSE;
         }
 
-        pzText = resolveSCM( res, pMustFree );
+        pzText = resolveSCM( res );
         break;
     }
 

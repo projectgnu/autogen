@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.12 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.13 2001/08/29 03:10:48 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -103,6 +103,7 @@ processTemplate( tTemplate* pTF )
         {
             tSCC zNone[]  = "* NONE *";
             pzCurSfx      = zNone;
+            currDefCtx    = rootDefCtx;
             pCurFp        = &fpRoot;
             fpRoot.pFile  = stdout;
             fpRoot.pzOutName = "stdout";
@@ -184,6 +185,9 @@ closeOutput( ag_bool purge )
 
     fclose( pCurFp->pFile );
 
+    /*
+     *  Only stdout and /dev/null are marked, "NOUNLINK"
+     */
     if ((pCurFp->flags & FPF_NOUNLINK) == 0) {
         /*
          *  IF we are told to purge the file OR the file is an AutoGen temp
@@ -297,6 +301,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of tpProcess.c */

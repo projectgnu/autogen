@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.19 2001/08/12 03:07:03 bkorb Exp $
+ *  $Id: expGuile.c,v 1.20 2001/08/29 03:10:48 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -122,7 +122,8 @@ ag_scm_max( SCM list )
             break;
 
         case GH_TYPE_STRING:
-            val = strtol( SCM_CHARS( car ), (char**)NULL, 0 );
+            val = strtol( ag_scm2zchars( car, "number-in-string" ),
+                          (char**)NULL, 0 );
             break;
 
         default:
@@ -181,15 +182,9 @@ ag_scm_min( SCM list )
             break;
 
         case GH_TYPE_STRING:
-        {
-            char* pz  = SCM_CHARS( car );
-            int   len = SCM_LENGTH( len );
-            while (isspace( *pz ) && (--len > 0))  pz++;
-            if ((len > 0) && isdigit( *pz ))
-                val = strtol( pz, (char**)NULL, 0 );
-            else val = LONG_MAX;
+            val = strtol( ag_scm2zchars( car, "number-in-string" ),
+                          (char**)NULL, 0 );
             break;
-        }
 
         default:
             continue;
@@ -235,7 +230,8 @@ ag_scm_sum( SCM list )
             break;
 
         case GH_TYPE_STRING:
-            sum += strtol( SCM_CHARS( car ), (char**)NULL, 0 );
+            sum += strtol( ag_scm2zchars( car, "number-in-string" ),
+                           (char**)NULL, 0 );
         }
     } while (--len > 0);
 
@@ -269,6 +265,7 @@ ag_scm_string_to_c_name_x( SCM str )
     while (--len >= 0) {
         char ch = *pz;
         if (! isalnum( ch )) {
+
             if (isspace( ch ))
                 ;
 
@@ -308,7 +305,7 @@ ag_scm_string_upcase_x( SCM str )
     len = SCM_LENGTH( str );
     pz  = SCM_CHARS( str );
     while (--len >= 0) {
-        char ch = *pz;
+         char ch = *pz;                                                         
         if (islower( ch ))
             *pz = toupper( ch );
         pz++;
@@ -335,10 +332,7 @@ ag_scm_string_upcase( SCM str )
     char* pz;
     SCM   res;
 
-    if (! gh_string_p( str ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( str, &len );
+    pz  = gh_scm2newstr( str, &len );
     res = gh_str2scm( pz, len );
     free( (void*)pz );
     ag_scm_string_upcase_x( res );
@@ -477,6 +471,7 @@ ag_scm_string_downcase( SCM str )
 }
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expGuile.c */

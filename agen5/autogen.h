@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.24 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: autogen.h,v 1.25 2001/08/29 03:10:48 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -337,9 +337,6 @@ MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 #ifdef DEBUG
 MKSTRING( GiveUp,    "Giving up in %s line %d\n" );
 #endif
-
-typedef char t_scribble_buf[ 4096 ];
-MODE t_scribble_buf zScribble VALUE( "" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

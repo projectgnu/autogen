@@ -1,3 +1,8 @@
+2001-08-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c(processTemplate): supply the definitions for non-
+	suffixed output, too.
+
 2001-08-23  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h(ag_scm2zchars): faster and secure technique for
