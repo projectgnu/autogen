@@ -1,3 +1,30 @@
+2001-11-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c: 'load_proc:' is obsolete
+	Protect against segfaults when macro arguments are missing.
+	* agen5/funcDef.c: ditto
+	* agen5/funcEval.c: ditto
+	* agen5/funcFor.c: ditto
+	* agen5/funcIf.c: ditto
+	* agen5/functions.c: ditto
+	* agen5/functions.h: INCLUDE macro must now test for missing arg
+	* agen5/opts.def(copyright): move email address
+	* autoopts/agman1.tpl: prefer eaddres from copyright
+	* config/missing: "--run" is now often passed in -- accommodate
+	Update the download address for autogen.
+	* doc/compete.tpl: fix English a bit.
+
+2001-10-31  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(abendSignal): use test & exit inside signal handler,
+	not assert().
+	* agen5/funcFor.c(mLoad_For): make sure the FOR macro has arguments
+	before starting the scan  :-)
+	* agen5/test/for.test: test a FOR macro without any arguments
+	* agen5/fsm.tpl(c output): replace "|no.*" regex with "(no.*){0,1}"
+	* Makefile.am(ChangeLog): old versions no longer distributed.
+	They may be obtained via CVS from CVS servers.
+
 2001-10-28  Bruce Korb  <bkorb@gnu.org>
 
 	* ChangeLog: renamed to ChangeLog.3, tagged release rel-5-2-11

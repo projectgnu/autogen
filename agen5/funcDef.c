@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.39 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: funcDef.c,v 1.40 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -350,7 +350,6 @@ prepInvokeArgs( tMacro* pMac )
 /*=macfunc DEBUG, ifdef DEBUG
  *
  *  handler_proc:
- *  load_proc:
  *  what:  Provide break point spots
  *  desc:
  *      By inserting [+DEBUG n+] into your template, you can set
@@ -469,7 +468,6 @@ build_defs( int defCt, tDefList* pList )
  *  what:    Define a user AutoGen macro
  *  cindex:  define macro
  *  handler_proc:
- *  load_proc:
  *
  *  desc:
  *

@@ -1,11 +1,19 @@
 #! /bin/sh
 
-[ -z "$1" ] && {
-  sh $0 help
-  exit 1
-}
+run=false
+case "$1" in
+--run )
+  # Try to run requested program, and just exit if it succeeds.
+  run=true
+  shift
+  set -x
+  "$@" && exit 0
+  ;;
+esac
 
 exec >&2
+
+exit_code=0
 
 if [ "X$1" = "Xold" ]
 then
@@ -21,17 +29,30 @@ get the up-to-date "'``'$1"'' package from:"
 case "$1" in
 autogen )
   echo "$message"
-  echo "    ${2-http://download.sourceforge.net/AutoGen/}"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/autogen/}"
+  exit_code=1
   ;;
 
 autoconf )
   echo "$message"
   echo "    ${2-ftp://ftp.gnu.org/gnu/autoconf/}"
+  touch configure
   ;;
 
 autoheader )
   echo "$message"
   echo "    ${2-ftp://ftp.gnu.org/gnu/autoconf/}"
+  files=`sed -n 's/^[ ]*A[CM]_CONFIG_HEADER(\([^)]*\)).*/\1/p' ${configure_ac}`
+  test -z "$files" && files="config.h"
+  touch_files=
+  for f in $files; do
+    case "$f" in
+    *:*) touch_files="$touch_files "`echo "$f" |
+				       sed -e 's/^[^:]*://' -e 's/:.*//'`;;
+    *) touch_files="$touch_files $f.in";;
+    esac
+  done
+  touch $touch_files
   ;;
 
 libtoolize )
@@ -42,18 +63,26 @@ libtoolize )
 automake )
   echo "$message"
   echo "    ${2-ftp://ftp.gnu.org/gnu/automake/}"
+  find . -type f -name Makefile.am -print |
+    sed 's/\.am$/.in/' |
+    while read f; do touch "$f"; done
   ;;
 
 aclocal )
   echo "$message"
   echo "    ${2-ftp://ftp.gnu.org/gnu/automake/}"
+  touch aclocal.m4
   ;;
 
-help )
+makeinfo)
+  if ${run} && (makeinfo --version) > /dev/null 2>&1
+  exit_code=1 ; fi
+  ;;
+
+help | "")
   echo '``missing'"''" is used to issue a message and workaround information
   echo for missing development tools.  The tools missing knows about are:
   echo "   " `egrep '^[a-z0-9_-]* *\)' $0 | sed -e 's/ .*//' -e /^help/d `
-  exit 0
   ;;
 
 * )
@@ -62,4 +91,4 @@ help )
 
 esac
 
-exit 1
+exit ${exit_code}

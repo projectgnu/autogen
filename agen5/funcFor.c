@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.25 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: funcFor.c,v 1.26 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -499,7 +499,6 @@ doForEach( tTemplate*   pT,
  *  cindex:  looping, for
  *  cindex:  for loop
  *  handler_proc:
- *  load_proc:
  *
  *  desc:
  *  This macro has a slight variation on the standard syntax:
@@ -658,6 +657,8 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     static tpLoadProc apForLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
 
     papLoadProc = apForLoad;
+    if (srcLen == 0)
+        LOAD_ABORT( pT, pMac, "FOR macro requires iterator name" );
 
     /*
      *  IF this is the first time here,

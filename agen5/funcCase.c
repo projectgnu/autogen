@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.33 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: funcCase.c,v 1.34 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -814,7 +814,6 @@ Select_Match_Always( char* pzText, char* pzMatch )
 /*=macfunc CASE
  *
  *  what:   Select one of several template blocks
- *  load_proc:
  *  handler_proc:
  *
  *  desc:
@@ -1024,10 +1023,8 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  IF there is no associated text expression
      *  THEN woops!  what are we to case on?
      */
-    if (srcLen == 0) {
-        tSCC zEr[] = "expressionless CASE";
-        LOAD_ABORT( pT, pMac, zEr );
-    }
+    if (srcLen == 0)
+        LOAD_ABORT( pT, pMac, "expressionless CASE" );
 
     /*
      *  Load the expression
@@ -1137,6 +1134,8 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     papLoadProc = apCaseLoad;
     pMac->res   = 0;
+    if (srcLen == 0)
+        LOAD_ABORT( pT, pMac, "Empty macro text" );
 
     /*
      *  IF the first character is an asterisk,

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.16 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: funcIf.c,v 1.17 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -29,7 +29,8 @@
 #include "expr.h"
 #include "autogen.h"
 
-tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
+tSCC zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
+tSCC zNoIfExpr[] = "expressionless IF";
 
 STATIC ag_bool eval_true( void );
 
@@ -90,7 +91,6 @@ eval_true( void )
  *  cindex:  conditional emit
  *  cindex:  if test
  *  handler_proc:
- *  load_proc:
  *
  *  desc:
  *  Conditional block.  Its arguments are evaluated (@pxref{EXPR}) and
@@ -182,7 +182,6 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
  *  cindex:  conditional emit
  *  cindex:  while test
  *  handler_proc:
- *  load_proc:
  *
  *  desc:
  *  Conditionally repeated block.  Its arguments are evaluated (@pxref{EXPR})
@@ -268,6 +267,8 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
     tMacro*
 mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
+    if ((int)pMac->res == 0)
+        LOAD_ABORT( pT, pMac, zNoIfExpr );
     /*
      *  Load the expression
      */
@@ -337,6 +338,13 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     static tpLoadProc apIfLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
 
+    /*
+     *  IF there is no associated text expression
+     *  THEN woops!  what are we to case on?
+     */
+    if (srcLen == 0)
+        LOAD_ABORT( pT, pMac, zNoIfExpr );
+
     if (apIfLoad[0] == (tpLoadProc)NULL) {
         memcpy( (void*)apIfLoad, apLoadProc, sizeof( apLoadProc ));
         apIfLoad[ FTYP_ELIF ]  = &mLoad_Elif;
@@ -351,15 +359,6 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  macros.  The 'ENDIF' gets absorbed.
      */
     current_if.pIf = current_if.pElse = pMac;
-
-    /*
-     *  IF there is no associated text expression
-     *  THEN woops!  what are we to case on?
-     */
-    if (srcLen == 0) {
-        tSCC zEr[] = "expressionless IF";
-        LOAD_ABORT( pT, pMac, zEr );
-    }
 
     /*
      *  Load the expression
@@ -404,21 +403,19 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     static tpLoadProc apWhileLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
 
+    /*
+     *  IF there is no associated text expression
+     *  THEN woops!  what are we to case on?
+     */
+    if (srcLen == 0)
+        LOAD_ABORT( pT, pMac, "expressionless WHILE" );
+
     if (apWhileLoad[0] == (tpLoadProc)NULL) {
         memcpy( (void*)apWhileLoad, apLoadProc, sizeof( apLoadProc ));
         apWhileLoad[ FTYP_ENDWHILE ] = &mLoad_Ending;
     }
 
     papLoadProc = apWhileLoad;
-
-    /*
-     *  IF there is no associated text expression
-     *  THEN woops!  what are we to case on?
-     */
-    if (srcLen == 0) {
-        tSCC zEr[] = "expressionless WHILE";
-        LOAD_ABORT( pT, pMac, zEr );
-    }
 
     /*
      *  Load the expression

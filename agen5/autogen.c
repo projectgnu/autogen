@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.19 2001/10/27 17:33:17 bkorb Exp $
+ *  $Id: autogen.c,v 1.20 2001/11/03 21:45:44 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -179,7 +179,12 @@ abendSignal( int sig )
      */
     if (pCurTemplate != (tTemplate*)NULL) {
         int f;
-        assert( pCurMacro != NULL );
+
+        if ( pCurMacro == NULL ) {
+            fputs( "NULL pCurMacro in abendSignal()\n", stderr );
+            _exit( 128 + SIGABRT );
+        }
+
         f = (pCurMacro->funcCode > FUNC_CT)
                 ? FTYP_SELECT : pCurMacro->funcCode;
         fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,

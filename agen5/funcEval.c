@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.34 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: funcEval.c,v 1.35 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -365,7 +365,6 @@ eval( const char* pzExpr )
  *  alias:  "'"
  *
  *  handler_proc:
- *  load_proc:
  *
  *  desc:
  *   This macro does not have a name to cause it to be invoked

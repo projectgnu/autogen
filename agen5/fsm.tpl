@@ -115,7 +115,7 @@ extern te_[=(. pfx)=]_state [=(. pfx)=]_run_fsm( [=
 
 == c =][=
 
-  (if (~ (get "method") "|no.*") (out-delete)) =][=
+  (if (~ (get "method") "(no.*){0,1}") (out-delete)) =][=
 
   preamble     
 

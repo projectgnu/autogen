@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.22 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: functions.c,v 1.23 2001/11/03 21:45:44 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -39,7 +39,6 @@ tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
  *
  *  what:   Read in and emit a template block
  *  handler_proc:
- *  load_proc:     Expr
  *
  *  desc:
  *
@@ -102,11 +101,25 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
 }
 
 
+/*
+ *  mLoad_Include  --  digest an INCLUDE macro
+ *
+ *  Simply verify that there is some argument to this macro.
+ *  Regular "expr" macros are their own argument, so there is always one.
+ */
+    tMacro*
+mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+{
+    if ((int)pMac->res == 0)
+        LOAD_ABORT( pT, pMac, "The INCLUDE macro requires a file name" );
+    return mLoad_Expr( pT, pMac, ppzScan );
+}
+
+
 /*=macfunc UNKNOWN
  *
  *  what:  Either a user macro or a value name.
  *  handler_proc:
- *  load_proc:
  *  unnamed:
  *
  *  desc:
@@ -177,7 +190,6 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
  *  what:  Out-of-context or unknown functions are bogus.
  *  handler_proc:
  *  unnamed:
- *  load_proc:
 =*/
     tMacro*
 mFunc_Bogus( tTemplate* pT, tMacro* pMac )
@@ -211,7 +223,6 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
  *
  *  what:  A block of comment to be ignored
  *  alias:  #
- *  load_proc:
  *
  *    This function can be specified by the user, but there will
  *    never be a situation where it will be invoked at emit time.

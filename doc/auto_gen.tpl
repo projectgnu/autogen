@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.74 2001/10/27 17:33:17 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.75 2001/11/03 21:45:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -81,7 +81,13 @@ notice identical to this one except for the removal of this paragraph.
 @title AutoGen - @value{TITLE}
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{bkorb@@gnu.org}
+@author @email{[=(shellf
+"echo '%s' | sed 's,@,@@,'"
+  (if (exist? "copyright.eaddr")
+      (get "copyright.eaddr")
+      (if (exist? "eaddr")
+          (get "eaddr")
+          "bkorb@gnu.org" ))  )=]}
 
 @page
 @vskip 0pt plus 1filll

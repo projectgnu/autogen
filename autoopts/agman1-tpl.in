@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/10/13 18:48:48 $
+## Last Modified:   $Date: 2001/11/03 21:45:44 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.18 2001/10/13 18:48:48 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.19 2001/11/03 21:45:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 :+]
@@ -312,7 +312,11 @@ ENDIF:+][+:
 IF (or (exist? "copyright.author") (exist? "copyright.owner")) :+]
 .SH AUTHOR
 [+: ?% copyright.author '%s' (get "copyright.owner")
-  :+][+:% eaddr " <%s>" :+][+:
+  :+][+:
+  IF (exist? "copyright.eaddr") :+] <[+: copyright.eaddr :+]>[+:
+  ELIF (exist? "eaddr")         :+] <[+: eaddr :+]>[+:
+  ENDIF    :+][+:
+
   CASE copyright.type :+][+:
    =  gpl  :+]
 .PP
