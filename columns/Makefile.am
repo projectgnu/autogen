@@ -10,7 +10,7 @@
 ## Last Modified:   Wed Oct 21 07:11:19 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1998/10/21 14:28:11 bkorb Exp $
+## $Id: Makefile.am,v 1.5 1999/02/24 18:53:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -30,7 +30,7 @@ gen : $(GEN_SRC)
 
 all : gen
 
-columns.texi : columns.tpl opts.def
+columns.texi : columns.tpl opts.def columns
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -T columns.tpl \
 		$(top_srcdir)/columns/opts.def

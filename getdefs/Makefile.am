@@ -10,7 +10,7 @@
 ## Last Modified:   Wed Oct 21 07:13:30 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.7 1998/10/21 14:28:17 bkorb Exp $
+## $Id: Makefile.am,v 2.8 1999/02/24 18:52:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -30,7 +30,7 @@ gen : $(GEN_SRC)
 
 all : gen
 
-getdefs.texi : getdefs.tpl opts.def
+getdefs.texi : getdefs.tpl opts.def getdefs
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -T getdefs.tpl \
 		$(top_srcdir)/getdefs/opts.def
