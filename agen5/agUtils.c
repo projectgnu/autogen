@@ -1,12 +1,12 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.17 2001/12/01 20:26:19 bkorb Exp $
+ *  $Id: agUtils.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,12 +1,12 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.25 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: autogen.h,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *  Global header file for AutoGen
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

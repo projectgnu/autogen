@@ -1,12 +1,12 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 1.5 2001/12/01 20:26:19 bkorb Exp $
+ *  $Id: expExtract.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -248,8 +248,9 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  *     [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name)) +]
  * @end example
  *
- * This code will move the two output files name, ".fsm.head" and ".fsm.code".
- * At the end of the 'c' output processing, I delete them.
+ * This code will move the two previously produced output files to files
+ * named ".fsm.head" and ".fsm.code".  At the end of the 'c' output
+ * processing, I delete them.
 =*/
     SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.34 2001/11/03 21:45:44 bkorb Exp $
+ *  $Id: funcCase.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */

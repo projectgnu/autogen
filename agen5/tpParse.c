@@ -2,13 +2,13 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.10 2001/12/01 20:26:19 bkorb Exp $
+ *  $Id: tpParse.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

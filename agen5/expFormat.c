@@ -1,12 +1,12 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.37 2001/12/01 20:26:19 bkorb Exp $
+ *  $Id: expFormat.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

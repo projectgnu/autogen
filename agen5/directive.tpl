@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 1.4 2001/10/13 18:48:48 bkorb Exp $
+# $Id: directive.tpl,v 3.0 2001/12/09 19:23:13 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -7,7 +7,7 @@ h =]
 /*
 [=(dne " *  ")=]
  *
- *  copyright 1992-1999 Bruce Korb
+ *  copyright 1992-2001 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  */

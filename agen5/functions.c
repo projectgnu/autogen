@@ -1,12 +1,12 @@
 
 /*
- *  $Id: functions.c,v 1.23 2001/11/03 21:45:44 bkorb Exp $
+ *  $Id: functions.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
  *
  *  This module implements text functions.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.14 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

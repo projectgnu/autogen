@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcDef.c,v 1.41 2001/12/01 20:26:19 bkorb Exp $
+ *  $Id: funcDef.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -203,6 +203,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
          *  Now we have gather up the assigned value.
          */
         while (isspace( *pzScan ))     pzScan++;
+        strtransform( pDL->de.pzDefName, pDL->de.pzDefName );
         pDL->pzExpr = pzScan;
         pDL->de.valType = VALTYP_TEXT;
         pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
