@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: agShell.c,v 4.3 2005/01/22 19:44:15 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -399,8 +399,8 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
     if (chId == NOPROCESS)
         return chId;
 
-    pfPair->pfRead  = fdopen( fdPair.readFd,  "r" FOPEN_TEXT_FLAG );
-    pfPair->pfWrite = fdopen( fdPair.writeFd, "w" FOPEN_TEXT_FLAG );
+    pfPair->pfRead  = fdopen( fdPair.readFd,  "r" FOPEN_BINARY_FLAG );
+    pfPair->pfWrite = fdopen( fdPair.writeFd, "w" FOPEN_BINARY_FLAG );
     return chId;
 }
 #endif /* SHELL_ENABLED */

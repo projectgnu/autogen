@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.3 2005/01/14 20:37:31 bkorb Exp $
+ *  $Id: load.c,v 4.4 2005/01/22 19:44:15 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -71,13 +71,35 @@ loadOptionLine(
  *
  * ret-type: ag_bool
  * ret-desc: AG_TRUE if the name was handled, otherwise AG_FALSE.
+ *           If the name does not start with ``$'', then it is handled
+ *           simply by copying the input name to the output buffer.
  *
  * doc:
- *  This routine does environment variable expansion if the first character
- *  is a ``$''.  If it starts with two dollar characters, then the path
- *  is relative to the location of the executable.  The path returned will
- *  be the "realpath(3C)" of the object (provided this function exists on
- *  the build platform).
+ *
+ *  This routine will copy the @code{pzName} input name into the @code{pzBuf}
+ *  output buffer, carefully not exceeding @code{bufSize} bytes.  If the
+ *  first character of the input name is a @code{'$'} character, then there
+ *  is special handling:
+ *  @*
+ *  @code{$$} is replaced with the directory name of the @code{pzProgPath},
+ *  searching @code{$PATH} if necessary.
+ *  @*
+ *  @code{$NAME} is replaced by the contents of the @code{NAME} environment
+ *  variable.
+ *
+ *  Please note: both @code{$$} and @code{$NAME} must be at the start of the
+ *     @code{pzName} string and must either be the entire string or be followed
+ *     by the @code{'/'} character.
+ *
+ * err:  @code{AG_FALSE} is returned if:
+ *       @*
+ *       @bullet{} @code{$$} is not the full string and
+ *                 the next character is not '/'.
+ *       @*
+ *       @bullet{} @code{$NAME} is not the full string and
+ *                 the next character is not '/'.
+ *       @*
+ *       @bullet{} @code{NAME} is not a known environment variable
 =*/
 ag_bool
 optionMakePath(
@@ -93,7 +115,7 @@ optionMakePath(
      *  IF not an environment variable, just copy the data
      */
     if (*pzName != '$') {
-        strcpy( pzBuf, pzName );
+        strncpy( pzBuf, pzName, bufSize );
         return AG_TRUE;
     }
 
@@ -105,7 +127,6 @@ optionMakePath(
     if (pzName[1] == '$') {
         tCC*    pzPath;
         tCC*    pz;
-
 
         switch (pzName[2]) {
         case '/':
