@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.6 1998/07/14 13:35:09 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 1.7 1998/07/16 18:31:38 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -109,6 +109,7 @@
 #define OPTPROC_INITDONE    0x0100 /* have initializations been done?      */
 #define OPTPROC_NEGATIONS   0x0200 /* any negation options?                */
 #define OPTPROC_ENVIRON     0x0400 /* check environment?                   */
+#define OPTPROC_PLUSMARKS   0x0800 /* Use '+' flag markers?                */
 
 #define STMTS(s)  do { s; } while (0)
 

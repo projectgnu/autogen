@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.4 1998/07/09 17:15:31 bkorb Exp $
+ *  $Id: autoopts.c,v 1.5 1998/07/16 18:31:40 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,7 +70,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.4 1998/07/09 17:15:31 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.5 1998/07/16 18:31:40 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";
@@ -174,26 +174,6 @@ loadValue( tOptions* pOpts, tOptDesc* pOD )
 
 /*
  *  For preset values, we will allways have an argument pointer.
- *  We do a special hack:  when arguments are prohibited, we use
- *  the argument for an indicator to say if it should be regarded
- *  as a disabled option ('+' marked), regular option ('-' marked),
- *  or purged from the set of preset options.  Thus, if you run the
- *  following in your Bourne shell:
- *
- *     MYPROG_FOO_OPT=NO ; export MYPROG_FOO_OPT
- *
- *  then after processing all the presets, the "myprog" program
- *  will have the "Foo-Opt" option removed from the set of
- *  selected options.  NB: Foo-Opt must not be equivalenced to
- *  another option.  On the other hand:
- *
- *     MYPROG_FOO_OPT=FALSE ; export MYPROG_FOO_OPT
- *
- *  This will cause Foo-Opt to be marked as a disabled option,
- *  whether or not '+' options are normally processed.
- *  ALSO:  options that take arguments cannot be deleted or marked
- *  as 'disabled'.  These options should use empty/non-existent
- *  arguments to indicate such things.
  */
     STATIC void
 loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
@@ -701,7 +681,9 @@ doPresets( tOptions*  pOpts )
 
             } else {
                 /*
-                 *  Environment options *CANNOT* be '+'-marked
+                 *  Environment options *CANNOT* be disable prefixed,
+                 *  so we will look for the value to contain
+                 *  the disablement prefix
                  */
                 pOD->fOptState |= OPTST_PRESET;
                 pOD->pzLastArg  = pz;
@@ -760,14 +742,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
              *  Skip over any flag/option markers.
              *  In this mode, they are not required.
              */
-            if (pOpts->fOptSet & OPTPROC_DISABLEOK) {
-                if (*pz == '+')
-                    optFlags |= OPTST_DISABLED;
-
-                while ((*pz == '+') || (*pz == '-')) pz++;
-            }
-
-            else while (*pz == '-') pz++;
+            while (*pz == '-') pz++;
 
             isLongOpt = AG_TRUE;
             pRes = longOptionFind( pOpts, pz, &optFlags );
@@ -783,7 +758,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                 break;
 
             case '+':
-                if (pOpts->fOptSet & OPTPROC_DISABLEOK) {
+                if (pOpts->fOptSet & OPTPROC_PLUSMARKS) {
                     optFlags |= OPTST_DISABLED;
                     break;
                 }
@@ -803,7 +778,6 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
              */
             secondChar = *pOpts->pzCurOpt;
             switch (secondChar) {
-            case '+':
             case '-':
                 if (firstChar == secondChar) {
                     if (*++(pOpts->pzCurOpt) == NUL)
@@ -822,6 +796,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
                 /* FALLTHROUGH */ /* option marker was "-+" or "+-" */
 
             case ':':
+            case '+':
             case NUL:
                 fprintf( stderr, zIllOptChr, pOpts->pzProgPath,
                          zIllegal, secondChar ? secondChar : ' ' );
@@ -873,7 +848,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
      *  Figure out what to do about option  arguments.
      *  An argument may be required, not associated with the option,
      *  or be optional.  We detect the latter by examining for an option
-     *  marker ('+' or '-') on the next possible argument.
+     *  marker on the next possible argument.
      */
     switch (pRes->optArgType) {
     case ARG_MUST:

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: pgusage.c,v 1.2 1998/07/16 18:31:43 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -73,15 +73,15 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
     if (amExiting) {
         char* pzPager = getenv( "PAGER" );
 
-	/*
-	 *  Use the "more(1)" program if "PAGER" has not been defined
-	 */
+        /*
+         *  Use the "more(1)" program if "PAGER" has not been defined
+         */
         if (pzPager == (char*)NULL)
             pzPager = "more";
 
-	/*
-	 *  Page the file and remove it when done.
-	 */
+        /*
+         *  Page the file and remove it when done.
+         */
         sprintf( zPageUsage, "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
                  pzPager, my_pid );
         fclose( stderr );
@@ -89,9 +89,9 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 
         system( zPageUsage );
 
-	/*
-	 *  "return" to the exit logic
-	 */
+        /*
+         *  "return" to the exit logic
+         */
         return;
     }
 

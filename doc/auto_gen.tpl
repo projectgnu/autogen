@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.12 1998/07/15 14:32:47 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.13 1998/07/16 18:31:45 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -856,6 +856,7 @@ for a more complete description.
 * Macro Usage::       User Interface Usage
 * opts.c::            Data Structure and Callout Procs
 * Using Autoopts::    Using Autoopts
+* Quick Start::       Quick Start
 * dependencies::      Autogen Inter-dependency Graph
 @end menu
 
@@ -1114,6 +1115,85 @@ with the following additional arguments:
 myopts.o -L $prefix/lib -lopts
 @end example
 @end itemize
+
+* Quick Start::       Quick Start
+@node Quick Start
+@section Quick Start
+@cindex Quick Start
+
+Since it is generally easier to start with a live example
+that is simpler than the @code{autogen} example itself,
+here is an extremely simple @code{autoopt} example
+to play with and embellish into what you really need:
+
+@smallexample
+Autogen Definitions options;
+prog_name     = check;
+prog_title    = "Checkout Automated Options";
+long_opts;
+environrc;
+
+flag = @{
+    name      = check_dirs;
+    value     = L;
+    flag_arg  = ":";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "Checkout directory list";
+@};
+
+flag = @{
+    name      = show_defs;
+    descrip   = "Show the definition tree";
+    disable   = dont;
+@};
+@end smallexample
+
+@noindent
+Then perform the following steps:
+
+@enumerate
+@item
+@code{autogen -L $prefix/share/autogen check.def}
+@item
+@code{cc -o check -DTEST_CHECK_OPTS -g check.c -L $prefix/lib -lopts}
+@end enumerate
+
+@noindent
+And now, @code{./check --help} yields:
+
+@smallexample
+check - Checkout Automated Options
+USAGE:  check [-<flag> [<val>]]... [--<name>[@{=| @}<val>]]... 
+  Flg Arg Option-Name    Description
+   -L YES check-dirs     Checkout directory list
+				- may appear without limit
+      no  show-defs      Show the definition tree
+				- disabled as --dont-show-defs
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+Options may be disabled with a '+' marker.
+Options may be specified by doubled markers and their name
+or by a single marker and the option character value.
+
+The following option preset mechanisms are supported:
+ - examining environment variables named CHECK_*
+@end smallexample
+
+@noindent
+and @code{./check --check=$HOME --dont-show --check=/usr/local/share} yields:
+@smallexample
+OPTION_CT=3
+export OPTION_CT
+CHECK_CHECK_DIRS_CT=2
+export CHECK_CHECK_DIRS_CT
+CHECK_CHECK_DIRS_1='/home2/bkorb'
+export CHECK_CHECK_DIRS_1
+CHECK_CHECK_DIRS_2='/usr/local/share'
+export CHECK_CHECK_DIRS_2
+CHECK_SHOW_DEFS=dont
+export CHECK_SHOW_DEFS
+@end smallexample
 
 @node dependencies
 @section Autogen Inter-dependency Graph

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.6 1998/07/14 13:35:05 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.7 1998/07/16 18:31:42 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -296,7 +296,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
 
     {
         tSCC zOptsOnly[]  = "All arguments are named options.\n";
-        tSCC zInverted[]  = "Options may be disabled with a '+' marker.\n";
+        tSCC zInverted[]  = "Flag options are disabled with a '+' marker.\n";
         tSCC zNumberOpt[] = "The '-#<number>' option may omit the hash char\n";
 
         tSCC zFlagOkay[]    =
@@ -310,7 +310,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
         u_int  fOptSet = pOptions->fOptSet;
         tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;
 
-        if ((fOptSet & OPTPROC_DISABLEOK) != 0)
+        if ((fOptSet & OPTPROC_PLUSMARKS) != 0)
             fputs( zInverted, fp );
 
         if ((fOptSet & OPTPROC_LONGOPT) != 0)

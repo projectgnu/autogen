@@ -1,4 +1,4 @@
-[=autogen template include $Id: optcode.tpl,v 1.7 1998/07/14 13:35:06 bkorb Exp $ =]
+[=autogen template include $Id: optcode.tpl,v 1.8 1998/07/16 18:31:35 bkorb Exp $ =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
@@ -69,25 +69,20 @@ tSCC    z[=name _cap "#_NAME[] =" + %-28s _printf =] "[=name _up=]";[=
 
   _IF disable _len 0 > =]
 tSCC    zNot[=name _cap "#_Name[] =" + %-25s _printf =] "[=disable _down=]-[=
-    name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
-
-    _IF environrc _exist =]
+    name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";
 tSCC    zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] "[=disable _down=]";[=
-    _ELSE=]
-#define zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] (const char*)NULL[=
-    _ENDIF=][=
     _IF enable _len 0 > =]
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
 
     _ELSE "Enable does not exist" =]
-#define z[=name _cap "#_Name[] =" + %-28s _printf
+#define z[=name _cap "#_Name" + %-28s _printf
           =] (zNot[=name _cap=]_Name + [=_eval disable _len 1 + =])[=
     _ENDIF=][=
 
   _ELSE "Disable does not exist" =]
-#define zNot[=name _cap "#_Pfx" + %-25s _printf =] (const char*)NULL
-#define zNot[=name _cap "#_Name" + %-25s _printf =] (const char*)NULL
+#define zNot[=name _cap "#_Pfx"   + %-25s _printf =] (const char*)NULL
+#define zNot[=name _cap "#_Name"  + %-25s _printf =] (const char*)NULL
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down #- +=][=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
 
@@ -369,7 +364,7 @@ tSCC   zUsageTitle[] = "[=prog_name=] - " [=prog_title _str=]
               argument _len 16 >= &
               =]\\\n"
     "\t\t[=_ENDIF=]" [=argument _str=] "[=
-        _ELIF flag.value _exist ! long_opts _exist ! && =][=
+        _ELIF flag.value _exist ! long_opts _exist ! & =][=
             _ERROR _dfile
                 " definitions allow neither option flags nor long options" + =][=
         _ENDIF=]\n";[=
@@ -415,14 +410,10 @@ _ENDIF=]
 
 tOptions [=prog_name=]Options = {
     OPTIONS_STRUCT_VERSION,
-    (char*)NULL, (char*)NULL, zPROGNAME,
-    zRcName, zCopyright, zCopyrightNotice,
-    zFullVersion,
-    apzHomeList,
-    zUsageTitle,
-    zExplain,
-    zDetail,
-    zDetailFile,
+    (char*)NULL,    (char*)NULL,    zPROGNAME,
+    zRcName,        zCopyright,     zCopyrightNotice,
+    zFullVersion,   apzHomeList,    zUsageTitle,
+    zExplain,       zDetail,        zDetailFile,
     [=_IF usage _exist=][=usage=][=_ELSE=]optionUsage[=_ENDIF=],
     ( OPTPROC_NONE[=                 _IF allow_errors   _exist ! =]
     + OPTPROC_ERRSTOP[=    _ENDIF=][=_IF flag.disable   _exist   =]
@@ -433,7 +424,9 @@ tOptions [=prog_name=]Options = {
     + OPTPROC_NO_REQ_OPT[= _ENDIF=][=_IF flag.disable   _exist   =]
     + OPTPROC_NEGATIONS[=  _ENDIF=][=_IF NUMBER_OPTION  _env     =]
     + OPTPROC_NUM_OPT[=    _ENDIF=][=_IF environrc      _exist   =]
-    + OPTPROC_ENVIRON[=    _ENDIF=] ),
+    + OPTPROC_ENVIRON[=    _ENDIF=][=_IF plus_marks     _exist
+                                         flag.disable   _exist & =]
+    + OPTPROC_PLUSMARKS[=  _ENDIF=] ),
     0, (char*)NULL,
     { INDEX_[=prefix _up #_ +=]OPT_MORE_HELP,
       [=_IF homerc _exist=]INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS[=

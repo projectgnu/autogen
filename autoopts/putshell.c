@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: putshell.c,v 1.2 1998/07/16 18:31:37 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -78,7 +78,8 @@ putBourneShell( tOptions* pOpts )
     int       optCt = pOpts->presetOptCt;
     tOptDesc* pOD   = pOpts->pOptDesc;
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
-    tSCC zOptNumFmt[] = "%s_%s=%d\nexport %1$s_%s\n";
+    tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d\nexport %1$s_%2$s\n";
+    tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
 
     printf( zOptCtFmt, pOpts->curOptIdx-1 );
 
@@ -90,7 +91,7 @@ putBourneShell( tOptions* pOpts )
          *  We assume stacked arguments if the cookie is non-NULL
          */
         if (pOD->optCookie != (void*)NULL) {
-            tSCC zOptCookieCt[] = "%s_%s_CT=%d\nexport %1$s_%s_CT\n";
+            tSCC zOptCookieCt[] = "%1$s_%2$s_CT=%3$d\nexport %1$s_%2$s_CT\n";
 
             tArgList*  pAL = (tArgList*)pOD->optCookie;
             char**     ppz = pAL->apzArgs;
@@ -104,18 +105,27 @@ putBourneShell( tOptions* pOpts )
 
                 printf( zOptNumArg, pOpts->pzPROGNAME, pOD->pz_NAME,
                         pAL->useCt-ct );
-		putQuotedStr( *(ppz++) );
+                putQuotedStr( *(ppz++) );
                 printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME,
                         pAL->useCt-ct );
             }
         }
 
         /*
+         *  If the argument has been disabled,
+         *  Then set its value to the disablement string
+         */
+        else if ((pOD->fOptState & OPTST_DISABLED) != 0)
+            printf( zOptDisabl, pOpts->pzPROGNAME, pOD->pz_NAME,
+                    pOD->pz_DisablePfx );
+
+        /*
          *  If the argument type is numeric, the last arg pointer
          *  is really the VALUE of the string that was pointed to.
          */
         else if ((pOD->fOptState & OPTST_NUMERIC) != 0)
-            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME, pOD->pzLastArg );
+            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
+                    (int)(pOD->pzLastArg) );
 
         /*
          *  IF the option has an empty value,
@@ -124,7 +134,8 @@ putBourneShell( tOptions* pOpts )
         else if (  (pOD->pzLastArg == (char*)NULL)
                 || (pOD->pzLastArg[0] == NUL) )
 
-            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME, pOD->optOccCt );
+            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
+                    pOD->optOccCt );
 
         /*
          *  This option has a text value
@@ -134,7 +145,7 @@ putBourneShell( tOptions* pOpts )
             tSCC zOptEnd[]    = "'\nexport %1$s_%s\n";
 
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
-	    putQuotedStr( pOD->pzLastArg );
+            putQuotedStr( pOD->pzLastArg );
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
         }
     }
