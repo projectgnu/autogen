@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.17 2000/10/17 02:57:00 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.18 2000/10/17 03:56:54 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -239,7 +239,7 @@ struct specOptIndex {
  *  fields.  This way, the "optionProcess()" routine may exit with an
  *  informative message instead of, for example, page faulting.
  */
-#define  OPTIONS_STRUCT_VERSION  28804
+#define  OPTIONS_STRUCT_VERSION  32768
 
 struct options {
     const int         structVersion;

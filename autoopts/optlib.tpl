@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.16 2000/10/17 02:57:00 bkorb Exp $
+# $Id: optlib.tpl,v 1.17 2000/10/17 03:56:54 bkorb Exp $
 
 =]
 [=
@@ -24,7 +24,7 @@ DEFINE set_defines set_desc set_index opt_state =]
   IF (or (exist? "call_proc")
          (exist? "flag_code")
          (exist? "flag_proc")
-         (exist? "stack_arg"))
+         (exist? "stack_arg")
          (~* (get "arg_type") "key|num|bool" ) )   =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                            (. pname)=]Options, \
@@ -97,7 +97,7 @@ Emit the #define's for a single option
 
 DEFINE Option_Defines =][=
 
-  IF (=* (get "arg_type") "enum") =]
+  IF (=* (get "arg_type") "key") =]
 typedef enum {
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
           columns -I4 --spread=3 --sep=','"

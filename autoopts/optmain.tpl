@@ -140,7 +140,7 @@ DEFINE declare-option-callbacks  =][=
     (set! cap-name (string-capitalize! (get "name"))) =][=
 
     CASE arg_type                    =][=
-    =*  enum                         =]
+    =*  key                          =]
 static tOptProc doOpt[=(. cap-name)  =];[=
     =*  bool                         =][=
     =*  num                          =][=
@@ -181,7 +181,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (=* (get "arg_type") "enum") =]
+      ELIF (=* (get "arg_type") "key") =]
 #define doOpt[=(. cap-name)   =] (tpOptProc)NULL[=
       ENDIF             =][=
 
@@ -210,7 +210,7 @@ DEFINE define-option-callbacks  =][=
 
   FOR flag =][=
 
-    IF (or (exist? "flag_code") (=* (get "arg_type") "enum")) =][=
+    IF (or (exist? "flag_code") (=* (get "arg_type") "key")) =][=
        (set! UP-name    (string-upcase! (get "name")))
        (set! cap-name   (string-capitalize UP-name))
        (set! low-name   (string-downcase UP-name))      =]
@@ -222,19 +222,21 @@ DEFINE define-option-callbacks  =][=
 DEF_PROC_2( static, void, doOpt[=(string-capitalize (get "name")) =],
             tOptions*, pOptions, tOptDesc*, pOptDesc )
 {
-[=  ENDIF        =][=
-    IF (exist? "flag_code") =][=
-       flag_code =]
+[=    IF (exist? "flag_code") =][=
+         flag_code =]
 }[=
-    ELSE
-=]    tSCC* az_names[] = {
-[=(shellf "columns -I8 --spread=3 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+      ELSE=]
+    tSCC* az_names[] = {
+[=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
-    pOptDesc->pzLastArg = doEnumerationOption( pOptions, pOptDesc,
-                                               az_names, [=(count "keyword")=] );
+    };
+
+    pOptDesc->pzLastArg = optionEnumerationVal( pOptions, pOptDesc,
+                                                az_names, [=(count "keyword")=] );
 }[=
-    ENDIF        =][=
-  ENDFOR flag =][=
+      ENDIF     =][=
+    ENDIF       =][=
+  ENDFOR flag   =][=
 
   IF (exist? "test_main") =]
 

@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: Text -*-
-#$Id: optcode.tpl,v 2.40 2000/10/17 02:57:00 bkorb Exp $
+#$Id: optcode.tpl,v 2.41 2000/10/17 03:56:54 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -66,7 +66,6 @@ IF (exist? "include") =]
 (define cap-name "")
 
 =][=
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -147,6 +146,7 @@ static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 (define up-name "") =][=
 
 FOR flag "\n" =][=
+
   Option_Descriptor =][=
 
   ;;  IF this is the default option AND we already have one,...
@@ -349,14 +349,8 @@ tOptions [=(. pname)=]Options = {
 /*
  *  Create the static procedure(s) declared above.
  */
-#if defined( __STDC__ ) || defined( __cplusplus )
-    static void
-doUsageOpt( tOptions*  pOpts, tOptDesc* pOD )
-#else
-int doUsageOpt( pOpts, pOD )
-    tOptions*  pOpts;
-    tOptDesc*  pOD;
-#endif
+DEF_PROC_2( static, void, doUsageOpt,
+            tOptions*,  pOpts, tOptDesc*,  pOD )
 {
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=
@@ -377,7 +371,7 @@ IF (exist? "test_main")            =][=
   ENDIF                            =][=
 
 ELIF (exist? "guile-main")         =][=
-
+  `echo invoking build-guile-main >&2` =][=
      invoke build-guile-main       =][=
 
 ENDIF "test/guile main"

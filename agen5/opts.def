@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.25 2000/10/17 03:14:57 bkorb Exp $
+ *   $Id: opts.def,v 1.26 2000/10/17 03:56:54 bkorb Exp $
  */
 
 /*
@@ -261,9 +261,10 @@ flag = {
 
 flag = {
     name        = trace;
-    arg_type    = number;
+    arg_type    = keyword;
     arg_name    = level;
     descrip     = "tracing level of detail";
+    keyword     = nothing, templates, block_macros, expressions, everything;
 
     doc =
     "This option will cause AutoGen to display a trace of its template\n"
@@ -278,16 +279,7 @@ flag = {
     "@item\n"
     "Displays the invocation of every AutoGen macro, even @code{TEXT}macros.\n"
     "@end enumerate";
-
-    flag_code =
-'    if ((unsigned)OPT_VALUE_TRACE > TRACE_EVERYTHING)
-        OPT_VALUE_TRACE = TRACE_EVERYTHING;';
 };
-export = "#define TRACE_NOTHING        0\n"
-         "#define TRACE_TEMPLATES      1\n"
-         "#define TRACE_BLOCK_MACROS   2\n"
-         "#define TRACE_EXPRESSIONS    3\n"
-         "#define TRACE_EVERYTHING     4\n";
 
 flag = {
     name        = trace_out;

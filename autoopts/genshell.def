@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: genshell.def,v 2.5 1999/10/06 15:37:51 bkorb Exp $
+ *   $Id: genshell.def,v 2.6 2000/10/17 03:56:54 bkorb Exp $
  */
 
 /*
@@ -39,7 +39,7 @@ version = 1;
 flag = {
     name      = script;
     value     = o;
-    flag_arg  = ":";
+    arg_type  = string;
     descrip   = "Output Script File";
 };
 
@@ -48,14 +48,14 @@ flag = {
     disable   = no;
     enabled;
     value     = s;
-    flag_arg  = ":";
+    arg_type  = string;
     descrip   = 'Shell name (follows "#!" magic)';
 };
 #ifdef LATER
 flag = {
     name      =  name_prefix;
     disable   =  no;
-    flag_arg  =  ":";
+    arg_type  = string;
     descrip   =  "Prefix for option variable names";
     value     =  p;
 };
