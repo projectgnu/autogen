@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.4 2002/09/29 00:16:20 bkorb Exp $
+ *  $Id: enumeration.c,v 3.5 2003/01/05 21:00:11 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -63,9 +63,10 @@ enumError( pOpts, pOD, paz_names, name_ct )
     int       name_ct;
 {
     if (pOpts != NULL)
-        fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
+        fprintf( option_usage_fp, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
 
-    fprintf( stderr, "The valid %s option keywords are:\n", pOD->pz_Name );
+    fprintf( option_usage_fp, "The valid %s option keywords are:\n",
+             pOD->pz_Name );
 
     if (**paz_names == 0x7F) {
         paz_names++;
@@ -73,7 +74,7 @@ enumError( pOpts, pOD, paz_names, name_ct )
     }
 
     do  {
-        fprintf( stderr, "\t%s\n", *(paz_names++) );
+        fprintf( option_usage_fp, "\t%s\n", *(paz_names++) );
     } while (--name_ct > 0);
 
     if (pOpts != NULL)
@@ -151,6 +152,7 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
                 return (char*)idx;
             if (res != -1) {
                 pz_fmt = "%s error:  the keyword `%s' is ambiguous\n";
+                option_usage_fp = stderr;
                 enumError( pOpts, pOD, paz_names, name_ct );
             }
             res = idx;
@@ -159,6 +161,7 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
 
     if (res < 0) {
         pz_fmt = "%s error:  `%s' does not match any keywords\n";
+        option_usage_fp = stderr;
         enumError( pOpts, pOD, paz_names, name_ct );
     }
 
@@ -174,4 +177,4 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * pgusage.c ends here */
+ * enumeration.c ends here */

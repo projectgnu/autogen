@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.7 2002/10/12 18:12:00 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.8 2003/01/05 21:00:11 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -91,7 +91,7 @@ or doubled %ss.  Flag characters are not interpreted.\n";
 
 static void printInitList PROTO(( tCC** papz, ag_bool*, tCC*, tCC* ));
 
-#define fp stderr
+FILE* option_usage_fp = NULL;
 
 void
 optionUsage( pOptions, exitCode )
@@ -102,7 +102,15 @@ optionUsage( pOptions, exitCode )
     tCC*    pOptTitle;
     ag_bool displayEnum = AG_FALSE;
 
-    fprintf( fp, pOptions->pzUsageTitle, pOptions->pzProgName );
+    /*
+     *  Paged usage will preset option_usage_fp to an output file.
+     *  If it hasn't already been set, then set it to standard output
+     *  on successful exit (help was requested), otherwise error out.
+     */
+    if (option_usage_fp == NULL)
+        option_usage_fp = (exitCode != EXIT_SUCCESS) ? stderr : stdout;
+
+    fprintf( option_usage_fp, pOptions->pzUsageTitle, pOptions->pzProgName );
 
     /*
      *  Determine which header and which option formatting string to use
@@ -136,7 +144,7 @@ optionUsage( pOptions, exitCode )
     if (  (exitCode != EXIT_SUCCESS)
        || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) == 0) )
 
-        fputs( pOptTitle, fp );
+        fputs( pOptTitle, option_usage_fp );
 
     {
         int        ct     = pOptions->optCt;
@@ -161,7 +169,7 @@ optionUsage( pOptions, exitCode )
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
                 if (exitCode == EXIT_SUCCESS) {
-                    fprintf( fp, zBreak, pOD->pzText, pOptTitle );
+                    fprintf( option_usage_fp, zBreak, pOD->pzText, pOptTitle );
                     docCt++;
                 }
 
@@ -179,7 +187,7 @@ optionUsage( pOptions, exitCode )
                && (exitCode == EXIT_SUCCESS)
                && (docCt > 0)
                && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
-                fprintf( fp, zBreak, zAuto, pOptTitle );
+                fprintf( option_usage_fp, zBreak, zAuto, pOptTitle );
 
             /*
              *  Flag prefix:  IF no flags at all, then omit it.
@@ -187,10 +195,10 @@ optionUsage( pOptions, exitCode )
              *  then blank, else print it.
              */
             if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
-                 fputs( "  ",   fp );
+                 fputs( "  ",   option_usage_fp );
             else if (! isgraph( pOD->optValue))
-                 fputs( "     ", fp );
-            else fprintf( fp, "   -%c", pOD->optValue );
+                 fputs( "     ", option_usage_fp );
+            else fprintf( option_usage_fp, "   -%c", pOD->optValue );
 
             /*
              *  convert arg type code into a string
@@ -216,7 +224,7 @@ optionUsage( pOptions, exitCode )
             /*
              *  Print the option description
              */
-            fprintf( fp, pOptFmt, pzArgType, pOD->pz_Name,
+            fprintf( option_usage_fp, pOptFmt, pzArgType, pOD->pz_Name,
                      (pOD->optMinCt != 0) ? zReqArg : zOptArg, pOD->pzText );
 
             /*
@@ -233,7 +241,7 @@ optionUsage( pOptions, exitCode )
             if (  (pOD->pOptMust != NULL)
                || (pOD->pOptCant != NULL) ) {
 
-                fputs( zTabHyp, fp );
+                fputs( zTabHyp, option_usage_fp );
 
                 /*
                  *  DEPENDENCIES:
@@ -241,16 +249,16 @@ optionUsage( pOptions, exitCode )
                 if (pOD->pOptMust != NULL) {
                     const int* pOptNo = pOD->pOptMust;
 
-                    fputs( zReqThese, fp );
+                    fputs( zReqThese, option_usage_fp );
                     for (;;) {
-                        fprintf( fp, zTabout, pOptions->pOptDesc[
+                        fprintf( option_usage_fp, zTabout, pOptions->pOptDesc[
                                  *pOptNo ].pz_Name );
                         if (*++pOptNo == NO_EQUIVALENT)
                             break;
                     }
 
                     if (pOD->pOptCant != NULL)
-                        fputs( zTabHypAnd, fp );
+                        fputs( zTabHypAnd, option_usage_fp );
                 }
 
                 /*
@@ -259,9 +267,9 @@ optionUsage( pOptions, exitCode )
                 if (pOD->pOptCant != NULL) {
                     const int* pOptNo = pOD->pOptCant;
 
-                    fputs( zProhib, fp );
+                    fputs( zProhib, option_usage_fp );
                     for (;;) {
-                        fprintf( fp, zTabout, pOptions->pOptDesc[
+                        fprintf( option_usage_fp, zTabout, pOptions->pOptDesc[
                                  *pOptNo ].pz_Name );
                         if (*++pOptNo == NO_EQUIVALENT)
                             break;
@@ -274,7 +282,7 @@ optionUsage( pOptions, exitCode )
              *  THEN print the disablement info
              */
             if (pOD->pz_DisableName != NULL )
-                fprintf( fp, zDis, pOD->pz_DisableName );
+                fprintf( option_usage_fp, zDis, pOD->pz_DisableName );
 
             /*
              *  IF the numeric option has a special callback,
@@ -291,7 +299,7 @@ optionUsage( pOptions, exitCode )
              *  THEN print that out
              */
             if (pOD->fOptState & OPTST_INITENABLED)
-                fputs( zEnab, fp );
+                fputs( zEnab, option_usage_fp );
 
             /*
              *  IF  the option is in an equivalence class
@@ -300,7 +308,7 @@ optionUsage( pOptions, exitCode )
              */
             if (  (pOD->optEquivIndex != NO_EQUIVALENT)
                && (pOD->optEquivIndex != optNo )  )  {
-                fprintf( fp, zAlt,
+                fprintf( option_usage_fp, zAlt,
                          pOptions->pOptDesc[ pOD->optEquivIndex ].pz_Name );
                 continue;
             }
@@ -315,7 +323,7 @@ optionUsage( pOptions, exitCode )
                   || (pOptions->pzPROGNAME != NULL)
                )  )
 
-                fputs( zNoPreset, fp );
+                fputs( zNoPreset, option_usage_fp );
 
             /*
              *  Print the appearance requirements.
@@ -328,18 +336,18 @@ optionUsage( pOptions, exitCode )
                  */
                 switch (pOD->optMaxCt) {
                 case 0:
-                     fputs( zPreset, fp );
+                     fputs( zPreset, option_usage_fp );
                      break;
 
                 case 1:
                      break;
 
                 case NOLIMIT:
-                     fputs( zNoLim, fp );
+                     fputs( zNoLim, option_usage_fp );
                      break;
 
                 default:
-                     fprintf( fp, zUpTo, pOD->optMaxCt );
+                     fprintf( option_usage_fp, zUpTo, pOD->optMaxCt );
                      break;
                 }
                 break;
@@ -348,16 +356,16 @@ optionUsage( pOptions, exitCode )
                 /*
                  *  More than one is required.  Print the range.
                  */
-                fprintf( fp, zMust, pOD->optMinCt, pOD->optMaxCt );
+                fprintf( option_usage_fp, zMust, pOD->optMinCt, pOD->optMaxCt );
             }
 
             if (  NAMED_OPTS( pOptions )
                && (pOptions->specOptIdx.default_opt == pOD->optIndex))
-                fputs( zDefaultOpt, fp );
+                fputs( zDefaultOpt, option_usage_fp );
         }  while (pOD++, optNo++, (--ct > 0));
     }
 
-    fputc( '\n', fp );
+    fputc( '\n', option_usage_fp );
 
     /*
      *  Describe the mechanics of denoting the options
@@ -367,17 +375,17 @@ optionUsage( pOptions, exitCode )
                           ? zFlagOkay : zNoFlags;
 
         if ((pOptions->fOptSet & OPTPROC_LONGOPT) != 0)
-            fputs( pzFmt, fp );
+            fputs( pzFmt, option_usage_fp );
 
         else if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
-            fputs( zOptsOnly, fp );
+            fputs( zOptsOnly, option_usage_fp );
 
         if ((pOptions->fOptSet & OPTPROC_NUM_OPT) != 0)
-            fputs( zNumberOpt, fp );
+            fputs( zNumberOpt, option_usage_fp );
     }
 
     if (pOptions->pzExplain != NULL)
-        fputs( pOptions->pzExplain, fp );
+        fputs( pOptions->pzExplain, option_usage_fp );
 
     /*
      *  IF the user is asking for help (thus exiting with SUCCESS),
@@ -397,9 +405,9 @@ optionUsage( pOptions, exitCode )
          */
         if ((pOptions->fOptSet & OPTPROC_ENVIRON) != 0) {
             if (initIntro)
-                fputs( zIntro, fp );
+                fputs( zIntro, option_usage_fp );
 
-            fprintf( fp, zExamineFmt, pOptions->pzPROGNAME );
+            fprintf( option_usage_fp, zExamineFmt, pOptions->pzPROGNAME );
         }
 
         /*
@@ -412,8 +420,8 @@ optionUsage( pOptions, exitCode )
             int        optNo  = 0;
             tOptDesc*  pOD    = pOptions->pOptDesc;
 
-            fputc( '\n', fp );
-            fflush( fp );
+            fputc( '\n', option_usage_fp );
+            fflush( option_usage_fp );
             do  {
                 if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
                     (*(pOD->pOptProc))( NULL, pOD );
@@ -424,11 +432,11 @@ optionUsage( pOptions, exitCode )
          *  If there is a detail string, now is the time for that.
          */
         if (pOptions->pzDetail != NULL)
-            fputs( pOptions->pzDetail, fp );
+            fputs( pOptions->pzDetail, option_usage_fp );
     }
 
     if (pOptions->pzBugAddr != NULL)
-        fprintf( fp, "\nplease send bug reports to:  %s\n",
+        fprintf( option_usage_fp, "\nplease send bug reports to:  %s\n",
                  pOptions->pzBugAddr );
 
     exit( exitCode );
@@ -447,7 +455,7 @@ printInitList( papz, pInitIntro, pzRc, pzPN )
     if (papz == NULL)
         return;
 
-    fputs( zIntro, fp );
+    fputs( zIntro, option_usage_fp );
     *pInitIntro = AG_FALSE;
 
     for (;;) {
@@ -463,7 +471,7 @@ printInitList( papz, pInitIntro, pzRc, pzPN )
          *  Print the name of the "homerc" file.  If the "rcfile" name is
          *  not empty, we may or may not print that, too...
          */
-        fprintf( fp, zPathFmt, pzPath );
+        fprintf( option_usage_fp, zPathFmt, pzPath );
         if (*pzRc != NUL) {
             struct stat sb;
 
@@ -473,12 +481,12 @@ printInitList( papz, pInitIntro, pzRc, pzPN )
              */
             if (  (stat( pzPath, &sb ) == 0)
               &&  S_ISDIR( sb.st_mode ) ) {
-                fputc( '/', fp );
-                fputs( pzRc, fp );
+                fputc( '/', option_usage_fp );
+                fputs( pzRc, option_usage_fp );
             }
         }
 
-        fputc( '\n', fp );
+        fputc( '\n', option_usage_fp );
     }
 }
 

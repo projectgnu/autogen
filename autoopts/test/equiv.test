@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/10 01:25:16 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2003/01/05 21:00:11 $
+#            by: bkorb
 #
-# $Id: equiv.test,v 3.2 2001/12/10 01:25:16 bkorb Exp $
+# $Id: equiv.test,v 3.3 2003/01/05 21:00:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -143,6 +143,7 @@ cmp -s ${testname}.h*lp || \
     `diff -c ${testname}.h*lp`"
 
 cat > ${testname}.outbase <<_EOF_
+     18     102     714 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2
@@ -178,6 +179,7 @@ export TEST_EQUIV_OMEGA
 _EOF_
 
 ( set -e
+  PAGER=wc ./${testname} --more | sed 's,/use\..*,/use,'
   ./${testname} --alpha -s 2
   ./${testname} --beta 5 -o opt
   ./${testname} --gamma Yes!

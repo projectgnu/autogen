@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-01-04 18:58:51 bkorb"
+ *  Time-stamp:      "2003-01-05 11:20:13 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.10 2003/01/05 19:14:32 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.11 2003/01/05 21:00:11 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -188,6 +188,11 @@ typedef struct {
                                 p->pzWhence = t " - TAGGED" AO_HERE; )
 #  endif /* MEMDEBUG */
 #endif /* AUTOGEN_BUILD */
+
+/*
+ *  File pointer for usage output
+ */
+extern FILE* option_usage_fp;
 
 /*
  *  optionUsage print the usage text for the program described by the

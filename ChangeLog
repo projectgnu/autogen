@@ -1,3 +1,15 @@
+2003-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c(optionUsage): set option_usage_fp to stdout when
+	the exit code is EXIT_SUCCESS, otherwise use stderr.  Use throughout.
+	* autoopts/enumeration.c: send usage output to "option_usage_fp"
+	* autoopts/makeshell.c: ditto
+	* autoopts/optmain.tpl: ditto (for generated keyword options)
+	* autoopts/pgusage.c: ditto
+	* autoopts/test/defs(compile): do not redirect stderr for help text
+	* autoopts/test/equiv.test: verify that PAGER redirection works
+	* autoopts/test/guile.test: send 'guile starts' string to stdout, too.
+
 2003-01-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*, agen5/*: Rework the memory allocation after valgrind

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.6 2002/12/14 16:02:38 bkorb Exp $
+ *  $Id: makeshell.c,v 3.7 2003/01/05 21:00:11 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -1005,6 +1005,8 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
     fflush( stderr );
     fflush( stdout );
 
+    option_usage_fp = stdout;
+
     /*
      *  First, print our usage
      */
@@ -1049,10 +1051,9 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
             "\n= = = = = = = =\n\n"
             "This incarnation of genshell will produce\n"
              "a shell script to parse the options for %s:\n\n";
-        fprintf( stderr, zMsg, pShellParseOptions->pzProgName );
+        fprintf( option_usage_fp, zMsg, pShellParseOptions->pzProgName );
     }
-    fflush( stderr );
-    fflush( stdout );
+    fflush( option_usage_fp );
 
     /*
      *  Now, print the client usage.

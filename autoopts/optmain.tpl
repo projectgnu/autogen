@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.5 2002/09/10 02:15:01 bkorb Exp $
+# $Id: optmain.tpl,v 3.6 2003/01/05 21:00:11 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -291,8 +291,10 @@ DEFINE range-option-code
           (out-pop #t)) =] };
     int val, ix;
     tCC* pzIndent = "\t\t\t\t  ";
+    extern FILE* option_usage_fp;
 
-    if (pOptDesc == NULL) /* usage is requesting range list */
+    if (pOptDesc == NULL) /* usage is requesting range list
+                             option_usage_fp has already been set */
         goto emit_ranges;
 
     val = atoi( pOptDesc->pzLastArg );
@@ -307,6 +309,7 @@ DEFINE range-option-code
             goto valid_return;
     }
 
+    option_usage_fp = stderr;
     fprintf( stderr, "%s error:  %s option value ``%s''is out of range.\n",
              pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->pzLastArg );
     pzIndent = "\t";
@@ -315,25 +318,26 @@ DEFINE range-option-code
 
 
   IF (> (count "arg_range") 1) =]
-    fprintf( stderr, "%sit must lie in one of the ranges:\n", pzIndent );
+    fprintf( option_usage_fp, "%sit must lie in one of the ranges:\n", pzIndent );
     for ( ix=0;; ) {
         if (rng[ix].rmax == INT_MIN)
-             fprintf( stderr, "%s%d exactly", pzIndent, rng[ix].rmin );
-        else fprintf( stderr, "%s%d to %d", pzIndent,
+             fprintf( option_usage_fp, "%s%d exactly", pzIndent, rng[ix].rmin );
+        else fprintf( option_usage_fp, "%s%d to %d", pzIndent,
                       rng[ix].rmin, rng[ix].rmax );
         if (++ix >= [=(count "arg_range")=])
             break;
-        fputs( ", or\n", stderr );
+        fputs( ", or\n", option_usage_fp );
     }
 
-    fputc( '\n', stderr );[=
+    fputc( '\n', option_usage_fp );[=
 
   ELIF (*==* (get "arg_range") "->")  =]
-    fprintf( stderr, "%sit must lie in the range: %d to %d\n",
+    fprintf( option_usage_fp, "%sit must lie in the range: %d to %d\n",
              pzIndent, rng[0].rmin, rng[0].rmax );[=
 
   ELSE  =]
-    fprintf( stderr, "%sit must be: %d exactly\n", pzIndent, rng[0].rmin );[=
+    fprintf( option_usage_fp, "%sit must be: %d exactly\n",
+             pzIndent, rng[0].rmin );[=
 
   ENDIF =]
     if (pOptDesc == NULL)

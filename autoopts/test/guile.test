@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/05/11 20:23:52 $
+# Last Modified:     $Date: 2003/01/05 21:00:11 $
 #            by: bkorb
 #
-# $Id: guile.test,v 3.1 2002/05/11 20:23:52 bkorb Exp $
+# $Id: guile.test,v 3.2 2003/01/05 21:00:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -42,7 +42,7 @@ cat >> ${testname}.def <<_EOF_
 include = '#include <stdio.h>';
 include = '#include <guile/gh.h>';
 guile-main;
-before-guile-boot = 'fputs( "guile starts\n", stderr );';
+before-guile-boot = 'fputs( "guile starts\n", stdout );';
 _EOF_
 
 echo $AGEN ${testname}.def
