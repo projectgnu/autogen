@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.26 2000/10/27 15:18:19 bkorb Exp $
+ *  $Id: autoopts.c,v 2.27 2000/10/28 01:15:28 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -774,12 +774,13 @@ DEF_PROC_1( STATIC tSuccess doImmediateOpts,
      *  are marked for immediate processing.
      */
     for (;;) {
-        switch (nextOption( pOpts, &optState )) {
+        tSuccess res = nextOption( pOpts, &optState );
+        switch (res) {
         case FAILURE:
             goto optionsDone;
 
         case PROBLEM:
-            return SUCCESS; /* no more args */
+            return 0; /* no more args */
 
         case SUCCESS:
             break;
@@ -822,8 +823,6 @@ DEF_PROC_4( STATIC void loadOptionLine,
             char*,      pzLine,
             tDirection, direction )
 {
-    char*  pzOptionArg;
-
     /*
      *  Strip off the first token on the line.
      *  No quoting, space separation only.
@@ -844,17 +843,16 @@ DEF_PROC_4( STATIC void loadOptionLine,
             while (isspace( *pz )) pz++;
         }
 
-        pzOptionArg = pz;
+        /*
+         *  Make sure we can find the option in our tables and initing it is OK
+         */
+        if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
+            return;
+        if (pOS->pOD->fOptState & OPTST_NO_INIT)
+            return;
+
+        pOS->pzOptArg = pz;
     }
-
-    /*
-     *  Make sure we can find the option in our tables.
-     */
-    if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
-        return;
-
-    if (pOS->pOD->fOptState & OPTST_NO_INIT)
-        return;
 
     switch (pOS->pOD->fOptState & (OPTST_IMM|OPTST_DISABLE_IMM)) {
     case 0:
@@ -923,19 +921,19 @@ DEF_PROC_4( STATIC void loadOptionLine,
      */
     switch (pOS->pOD->optArgType) {
     case ARG_NONE:
-        if (*pzOptionArg != NUL)
+        if (*pOS->pzOptArg != NUL)
             return;
-        pzOptionArg = NULL;
+        pOS->pzOptArg = NULL;
         break;
 
     case ARG_MAY:
-        if (*pzOptionArg == NUL)
-            pzOptionArg = NULL;
+        if (*pOS->pzOptArg == NUL)
+            pOS->pzOptArg = NULL;
 
     case ARG_MUST:
-        if (*pzOptionArg == NUL)
-             pzOptionArg = "";
-        else pzOptionArg = strdup( pzOptionArg );
+        if (*pOS->pzOptArg == NUL)
+             pOS->pzOptArg = "";
+        else pOS->pzOptArg = strdup( pOS->pzOptArg );
         break;
     }
 

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.44 2000/10/27 15:18:19 bkorb Exp $
+#$Id: optcode.tpl,v 2.45 2000/10/28 01:15:28 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -241,7 +241,7 @@ IF (exist? "homerc")
      /* option argument  */ ARG_MUST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_DISABLEOK | OPTST_DISABLED | OPTST_INIT,
+     /* opt state flags  */ OPTST_DISABLEOK,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
