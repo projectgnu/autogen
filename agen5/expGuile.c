@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.3 2002/02/02 19:22:13 bkorb Exp $
+ *  $Id: expGuile.c,v 3.4 2002/02/02 19:22:52 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -385,7 +385,7 @@ ag_scm_string_capitalize_x( SCM str )
 
 /*=gfunc string_capitalize
  *
- * what:   capitalized a new string
+ * what:   capitalize a new string
  * general_use:
  *
  * exparg: str , input string
