@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.7 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: autogen.c,v 3.8 2002/01/25 18:24:18 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -43,7 +43,7 @@ STATIC void signalSetup( void );
 STATIC void abendSignal( int sig );
 STATIC void doneCheck( void );
 STATIC void inner_main( int argc, char** argv );
-
+STATIC void signalExit( int sig );
 
 STATIC void
 inner_main( int argc, char** argv )
@@ -85,7 +85,8 @@ inner_main( int argc, char** argv )
     exit( EXIT_SUCCESS );
 }
 
-    int
+
+int
 main( int    argc,
       char** argv )
 {
@@ -93,7 +94,7 @@ main( int    argc,
     {
         int signo = sigsetjmp( abendJumpEnv, 0 );
         if (signo != 0)
-            exit( signo + 128 );
+            signalExit( signo );
     }
 
     signalSetup();
@@ -104,6 +105,78 @@ main( int    argc,
 }
 
 
+STATIC void
+signalExit( int sig )
+{
+    tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
+    tSCC zAt[]  = "processing template %s\n"
+                  "            on line %d\n"
+                  "       for function %s (%d)\n";
+
+    if (*pzOopsPrefix != NUL) {
+        fputs( pzOopsPrefix, stderr );
+        pzOopsPrefix = "";
+    }
+
+    fprintf( stderr, zErr, sig, strsignal( sig ));
+    fflush( stderr );
+    fflush( stdout );
+    if (pfTrace != stderr )
+        fflush( pfTrace );
+
+    /*
+     *  IF there is a current template, then we should report where we are
+     *  so that the template writer knows where to look for their problem.
+     */
+    if (pCurTemplate != NULL) {
+        int f;
+
+        if ( pCurMacro == NULL ) {
+            fputs( "NULL pCurMacro in abendSignal()\n", stderr );
+            _exit( 128 + SIGABRT );
+        }
+
+        f = (pCurMacro->funcCode > FUNC_CT)
+                ? FTYP_SELECT : pCurMacro->funcCode;
+        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
+                 apzFuncNames[ f ], pCurMacro->funcCode );
+    }
+
+    procState = PROC_STATE_ABORTING;
+    exit( sig + 128 );
+}
+
+
+/*
+ *  abendSignal catches signals we abend on.  The "siglongjmp" goes back
+ *  to the real "main()" procedure and it will call "signalExit()", above.
+ */
+STATIC void
+abendSignal( int sig )
+{
+    siglongjmp( abendJumpEnv, sig );
+}
+
+
+/*
+ *  ignoreSignal is the handler for SIGCHLD.  If we set it to default,
+ *  it will kill us.  If we set it to ignore, it will be inherited.
+ *  Therefore, always in all programs set it to call a procedure.
+ *  The "wait(3)" call will do magical things, but will not override SIGIGN.
+ */
+STATIC void
+ignoreSignal( int sig )
+{
+#ifdef DEBUG
+    fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
+#endif
+    return;
+}
+
+
+/*
+ *  This is called during normal exit processing.
+ */
 STATIC void
 doneCheck( void )
 {
@@ -128,6 +201,11 @@ doneCheck( void )
     switch (procState) {
     case PROC_STATE_EMITTING:
     case PROC_STATE_INCLUDING:
+        if (*pzOopsPrefix != NUL) {
+            fputs( pzOopsPrefix, stderr );
+            pzOopsPrefix = "";
+        }
+
         fprintf( stderr, "AutoGen ABENDED in template %s line %d\n",
                  pCurTemplate->pzFileName, pCurMacro->lineNo );
 
@@ -141,15 +219,16 @@ doneCheck( void )
             closeOutput( AG_TRUE );
 #endif
         } while (pCurFp->pPrev != NULL);
-        break;
+        /* FALLTHROUGH */
+
+    default:
+        _exit( EXIT_FAILURE ); /* exit immediately -- no more processing */
 
     case PROC_STATE_INIT:
     case PROC_STATE_OPTIONS:
     case PROC_STATE_DONE:
-        return;
+        break; /* continue normal exit */
     }
-
-    _exit( EXIT_FAILURE );
 }
 
 
@@ -194,53 +273,6 @@ ag_abend( tCC* pzMsg )
             exit(EXIT_FAILURE);
         }
     }
-}
-
-
-STATIC void
-ignoreSignal( int sig )
-{
-#ifdef DEBUG
-    fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
-#endif
-    return;
-}
-
-
-STATIC void
-abendSignal( int sig )
-{
-    tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
-    tSCC zAt[]  = "processing template %s\n"
-                  "            on line %d\n"
-                  "       for function %s (%d)\n";
-
-    fprintf( stderr, zErr, sig, strsignal( sig ));
-    fflush( stderr );
-    fflush( stdout );
-    if (pfTrace != stderr )
-        fflush( pfTrace );
-
-    /*
-     *  IF there is a current template, then we should report where we are
-     *  so that the template writer knows where to look for their problem.
-     */
-    if (pCurTemplate != NULL) {
-        int f;
-
-        if ( pCurMacro == NULL ) {
-            fputs( "NULL pCurMacro in abendSignal()\n", stderr );
-            _exit( 128 + SIGABRT );
-        }
-
-        f = (pCurMacro->funcCode > FUNC_CT)
-                ? FTYP_SELECT : pCurMacro->funcCode;
-        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
-                 apzFuncNames[ f ], pCurMacro->funcCode );
-    }
-
-    procState = PROC_STATE_ABORTING;
-    siglongjmp( abendJumpEnv, sig );
 }
 
 

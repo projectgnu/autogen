@@ -1,4 +1,11 @@
-2002-01-12  Bruce Korb  <bkorb@gnu.org>
+2002-01-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(signalExit): new routine to do printing outside
+	of signal handler context + emit content-type header as needed
+	(doneCheck): emit content-type header as needed
+	* config/conftest.tpl: renamed from config.tpl
+
+2002-01-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*fsm*.tpl: reworked to eliminate some inconsistencies
 
