@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: vers.test,v 1.1 2000/03/12 01:45:07 bruce Exp $
+# $Id: vers.test,v 1.2 2000/03/19 19:39:39 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -40,7 +40,7 @@ compile "-?"
 echo creating $testname.hlp
 cat > $testname.hlp <<'_EOF_'
 test_vers - Test AutoOpts for vers
-USAGE:  vers [-<flag> [<val>]]... 
+USAGE:  vers [-<flag>] ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s no  second         The second option descrip
@@ -55,7 +55,7 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 1.1 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 1.2 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
 echo $AGEN $testname.def
@@ -69,8 +69,8 @@ compile "-?"
 
 echo recreating $testname.hlp
 cat > $testname.hlp <<_EOF_
-test_vers - Test AutoOpts for vers - Ver. $ver
-USAGE:  vers [-<flag> [<val>]]... 
+test_vers - Test AutoOpts for vers - Ver. ${ver}
+USAGE:  vers [-<flag>] ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s no  second         The second option descrip
@@ -81,7 +81,7 @@ USAGE:  vers [-<flag> [<val>]]...
 _EOF_
 
 cmp -s $testname.h*lp || \
-  failure help output mismatch
+  failure versioned help output mismatch
 
 cleanup
 # end of vers.test
