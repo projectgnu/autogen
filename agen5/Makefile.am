@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.25 2000/09/16 05:42:20 bkorb Exp $
+## $Id: Makefile.am,v 1.26 2000/09/16 07:31:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -34,7 +34,7 @@ GEN_SRC = opts.c opts.h directive.h functions.h expr.ini expr.h \
 pkgdata_DATA	= schemedef.scm
 man_MANS        = autogen.1
 
-EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
+EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl pseudo.x \
 		$(GEN_SRC) bootstrap.dir schemedef.scm fsm.tpl pseudo.def
 
 bin_PROGRAMS	= autogen
