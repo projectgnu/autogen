@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.1 2001/12/10 03:46:15 bkorb Exp $
+ *  $Id: defLex.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -358,6 +358,7 @@ yyerror( char* s )
         fprintf( stderr, "`%1$c' (%1$d)\n", lastToken );
     }
 
+    AG_ABEND_START( "invalid definition token" );
     fprintf( stderr, "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
     AG_ABEND;
 }
@@ -444,9 +445,8 @@ alist_to_autogen_def( void )
      *  The result *must* be a string, or we choke.
      */
     if (! gh_string_p( res )) {
-        tSCC zEr[] = "Error:  Scheme expression does not yield string:\n";
-        fputs( zEr, stderr );
-        AG_ABEND;
+        tSCC zEr[] = "Scheme definition expression does not yield string:\n";
+        AG_ABEND_STR( zEr );
     }
 
     res_len   = SCM_LENGTH( res );

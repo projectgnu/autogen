@@ -4,15 +4,16 @@
 ##
 ## Maintainer:	     Bruce Korb <bkorb@gnu.org>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    $Date: 2001/12/09 19:43:40 $
+## Last Modified:    $Date: 2001/12/24 14:13:32 $
 ##            by:    Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:43:40 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/24 14:13:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-SUBDIRS		= compat config snprintfv autoopts \
-		agen5 getdefs columns doc
+NOSHELL_DIRS = compat config snprintfv autoopts agen5
+SHELL_DIRS   = $(NOSHELL_DIRS) getdefs columns doc
+SUBDIRS      = @TOP_DIRLIST@
 
 EXTRA_DIST	= VERSION TODO NOTES configure
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \

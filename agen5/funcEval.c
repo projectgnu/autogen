@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: funcEval.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -535,5 +535,6 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of funcEval.c */

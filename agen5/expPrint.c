@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: expPrint.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -257,5 +257,6 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expPrint.c */

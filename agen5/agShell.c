@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.1 2001/12/10 03:45:15 bkorb Exp $
+ *  $Id: agShell.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -38,6 +38,24 @@
 #  include <sys/procset.h>
 #endif
 
+tSCC   zTxtBlock[] = "Text Block";
+
+#ifndef ENABLE_SHELL
+ void closeServer( void ) { }
+
+ int chainOpen( int stdinFd, tCC** ppArgs, pid_t* pChild ) { return -1; }
+
+ pid_t openServer( tFdPair* pPair, tCC** ppArgs ) { return NOPROCESS; }
+
+ pid_t openServerFP( tpfPair* pfPair, tCC** ppArgs ) { return NOPROCESS; }
+
+ char* runShell( const char* pzCmd ) {
+     char* pz;
+     AGDUPSTR( pz, pzCmd, "dummy shell command" );
+     return pz;
+ }
+#else
+
 /*
  *  Dual pipe opening of a child process
  */
@@ -46,7 +64,6 @@ STATIC pid_t   serverId   = NULLPROCESS;
 STATIC tpChar  pCurDir    = (char*)NULL;
 STATIC ag_bool errClose   = AG_FALSE;
 
-tSCC   zTxtBlock[] = "Text Block";
 tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s\n";
 
 const char* pzLastCmd = (const char*)NULL;
@@ -296,8 +313,9 @@ chainOpen( int       stdinFd,
         fprintf( stderr, "Server shell %s starts\n", pzShell );
 #endif
     execvp( (char*)pzShell, (char**)ppArgs );
-    fprintf( stderr, "Error %d:  Could not execvp( '%s', ... ):  %s\n",
-             errno, pzShell, strerror( errno ));
+    AG_ABEND_START( "Could not execvp" );
+    fprintf( stderr, "\t( '%s', ... ):  %d - %s\n",
+             pzShell, errno, strerror( errno ));
     AG_ABEND;
 }
 
@@ -352,6 +370,7 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
     pfPair->pfWrite = fdopen( fdPair.writeFd, "w" FOPEN_TEXT_FLAG );
     return chId;
 }
+#endif /* ENABLE_SHELL */
 
 
 /*
@@ -378,17 +397,19 @@ loadData( FILE* fp )
 
     for (;;) {
         size_t  usedCt;
-
+#ifdef OPT_VALUE_TIMEOUT
         /*
          *  Set a timeout so we do not wait forever.
          */
         alarm( OPT_VALUE_TIMEOUT );
-
         if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
             break;
-
         alarm( 0 );
 
+#else
+        if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
+            break;
+#endif
         /*
          *  Check for magic character sequence indicating 'DONE'
          */
@@ -417,10 +438,10 @@ loadData( FILE* fp )
             textSize += 4096;
             p = AGREALOC( (void*)pzText, textSize, NULL );
             if (p == (void*)NULL) {
-                fprintf( stderr, zAllocErr, pzProg,
-                         textSize, "Realloc Text Block" );
-                AGFREE( (void*)pzText );
-                return (char*)NULL;
+                tSCC zRTB[] = "Realloc Text Block";
+                AG_ABEND_START( zAllocErr );
+                fprintf( stderr, zAllocWhat, textSize, zRTB );
+                LOAD_ABORT( pCurTemplate, pCurMacro, zRTB );
             }
 
             pzText   = (char*)p;
@@ -438,7 +459,7 @@ loadData( FILE* fp )
                      "resizing text output" );
 }
 
-
+#ifdef ENABLE_SHELL
 /*
  *  Run a semi-permanent server shell.  The program will be the
  *  one named by the environment variable $SHELL, or default to "sh".
@@ -511,6 +532,8 @@ runShell( const char*  pzCmd )
         return pz;
     }
 }
+
+#endif /* ! ENABLE_SHELL */
 /*
  * Local Variables:
  * c-file-style: "stroustrup"

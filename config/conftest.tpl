@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2001/12/09 19:46:03 $
+#  Last Modified:     $Date: 2001/12/24 14:13:33 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -34,6 +34,12 @@ null
 (define c-code     "")
 (define subst-name "")
 (define fcn-name   "")
+(define ofile-list "")
+(define ofile-name "")
+
+(define arg-name   "")
+(define arg-type   "")
+
 (define group-prefix
    (if (exist? "group")
        (string-append (string-downcase! (get "group")) "_")
@@ -41,17 +47,26 @@ null
 
 FOR test  =][=
   (set! up-name    (string-upcase! (get "name")))
-  (set! test-name  (string-upcase! (string-append
-        group-prefix "CHECK_" up-name)))
   (set! down-name  (string-downcase! (get "name")))
   (set! cache-name (string-append group-prefix "cv_" down-name))
   (set! subst-name (string-upcase! (string-append group-prefix up-name)))
+
   (set! c-code (if (exist? "bracket-imbalance")
         (string-append "changequote(,)"
                        (get "code")
                        "changequote([,])")
         (string-append "[" (get "code") "]") ))
-  (out-switch (string-downcase! (string-append test-name ".m4")))
+
+  (set! test-name  (string-upcase! (string-append
+        group-prefix (get "type") "_" up-name)))
+
+  (if (not (exist? "single-file"))
+      (begin
+        (set! ofile-name (string-downcase! (string-append test-name ".m4")))
+        (out-switch ofile-name)
+        (set! ofile-list (string-append ofile-list ofile-name "\n"))
+  )   )
+
   (dne "dnl " "dnl ") =]
 dnl
 dnl @synopsis [= (. test-name) =][=
@@ -63,13 +78,12 @@ dnl
 [=(prefix "dnl " (get "doc")) =][=
   IF (or (exist? "version") (exist? "author")) =]
 dnl[= (if (exist? "version")
-          (sprintf "\ndnl @version %s"  (get "version")) ) =][=
+          (string-append "\ndnl @version "  (get "version")) ) =][=
       (if (exist? "author")
-          (sprintf "\ndnl @author %s"   (get "author" )) ) =]
+          (string-append "\ndnl @author "   (get "author" )) ) =]
 dnl[=
   ENDIF =]
-AC_DEFUN([[=(. test-name)=]],[[= % require AC_REQUIRE([%s])=]
-  AC_MSG_CHECKING([whether [=check=]])[=
+AC_DEFUN([[=(. test-name)=]],[[= % require AC_REQUIRE([%s])=][=
 
   IF (set! fcn-name (string-append "try-" (get "type")))
      (ag-function? fcn-name) =][=
@@ -79,15 +93,6 @@ AC_DEFUN([[=(. test-name)=]],[[= % require AC_REQUIRE([%s])=]
     (error (string-append "invalid conftest function:  " fcn-name)) =][=
 
   ENDIF  =]
-  if test x$[=(. cache-name)=] = xyes
-  then[=
-  (. true-txt) =][=
-  (if (> (string-length false-txt) 0)
-      (string-append "\n  else" false-txt))      =]
-  fi[=
-  (if (> (string-length both-txt) 0)
-      both-txt)
-=]
 ]) # end of AC_DEFUN of [=(. test-name)=]
 [=
 
@@ -97,7 +102,11 @@ ENDFOR test       =][=
 
 Stash the result of a C/C++ feature test =][=
 
-DEFINE  c-feature
+DEFINE  start-feat-test =]
+  AC_MSG_CHECKING([whether [=check=]])[=
+ENDDEF  start-feat-test =][=
+
+DEFINE  end-feat-test
 
  =][=
 
@@ -135,9 +144,18 @@ DEFINE  c-feature
 
   ENDFOR
 
-=][=
+  =]
+  if test x$[=(. cache-name)=] = xyes
+  then[=
+  (. true-txt) =][=
+  (if (> (string-length false-txt) 0)
+      (string-append "\n  else" false-txt))      =]
+  fi[=
+  (if (> (string-length both-txt) 0)
+      both-txt)
+  =][=
 
-ENDDEF  c-feature =][=
+ENDDEF  end-feat-test =][=
 
 # # # # # # # # # SET-LANGUAGE # # # # # # # # =][=
 
@@ -151,8 +169,8 @@ ENDDEF  set-language  =][=
 
 # # # # # # # # # # RUN # # # # # # # # # =][=
 
-DEFINE  try-run       =][=
-
+DEFINE  try-run   =][=
+  start-feat-test =][=
   set-language    =]
   AC_TRY_RUN([=
      (. c-code)=],[[=(. cache-name)=]=yes],[[=(. cache-name)=]=no],[[=
@@ -167,37 +185,39 @@ DEFINE  try-run       =][=
      if test -f $f && test $f -nt conftest${ac_exeext}
      then rm -f $f ; fi
    done=][=
-   c-feature      =][=
+   end-feat-test  =][=
 
-ENDDEF  try-run       =][=
+ENDDEF  try-run   =][=
 
 # # # # # # # # # # LINK # # # # # # # # # # =][=
 
-DEFINE  try-link      =][=
+DEFINE  try-link  =][=
 
+  start-feat-test =][=
   set-language    =]
   AC_TRY_LINK([=
      (. c-code)=],[[=(. cache-name)=]=yes],[[=(. cache-name)=]=no]
   ) # end of TRY_LINK[=
-  c-feature       =][=
+  end-feat-test   =][=
 
-ENDDEF  try-link      =][=
+ENDDEF  try-link  =][=
 
 # # # # # # # # # # COMPILE # # # # # # # # # # =][=
 
-DEFINE  try-compile   =][=
-
-  set-language    =]
+DEFINE  try-compile =][=
+  start-feat-test   =][=
+  set-language      =]
   AC_TRY_COMPILE([= % includes "[%s]" =],[=
      (. c-code)=],[[=(. cache-name)=]=yes],[[=(. cache-name)
      =]=no]) # end of TRY_COMPILE[=
-  c-feature       =][=
+  end-feat-test     =][=
 
-ENDDEF  try-compile   =][=
+ENDDEF  try-compile =][=
 
 # # # # # # # # # # SHELL TEST # # # # # # # # # # =][=
 
-DEFINE  try-test      =][=
+DEFINE  try-test    =][=
+  start-feat-test         =][=
   (set! subst-name (string-append up-name "_$2"))
   (set! cache-name (string-append cache-name "_$2")) =]
   AC_CACHE_VAL([=(. cache-name)=],
@@ -227,35 +247,107 @@ DEFINE  try-test      =][=
   ENDIF =] ; fi
   AC_MSG_RESULT([$result])
   [=(. subst-name)=]="$[=(. cache-name)=]"
-  AC_SUBST([=(. subst-name)=])[=
+  AC_SUBST([=(. subst-name)=])
+  if test x$[=(. cache-name)=] = xyes
+  then[=
+  (. true-txt) =][=
+  (if (> (string-length false-txt) 0)
+      (string-append "\n  else" false-txt))      =]
+  fi[=
+  (if (> (string-length both-txt) 0)
+      both-txt)
+  =][=
 
 ENDDEF  try-test             =][=
 
-(out-push-new "Makefile.am") =][=
-(dne "#  " "#  ")            =]      
+# # # # # # # # # # ENABLEMENT # # # # # # # # # # =][=
+
+DEFINE  do-enablement        =][=
+
+  (set! arg-name  (string-upcase! (get "enable-type")))
+  (set! arg-type
+        (if (== arg-name "ENABLE")
+            (if (exist? "enable") "disable" "enable")
+            (if (exist? "enable") "without" "with")
+  )     )
+
+=]
+  AC_ARG_[=(. arg-name)=]([[=(. down-name)=]],
+    AC_HELP_STRING([--[=(. arg-type)=]-[=name=]], [=check=]),
+       [[=(. cache-name)=]=$[=(string-downcase! (get "enable-type"))=]_[=
+        (string-tr! (get "name") "-" "_") =]])
+    AC_CACHE_CHECK( [whether [=check=]], [=(. cache-name)=], [=
+   (. cache-name)=]=[=
+      (if (exist? "enable") "yes" "no") =])
+
+  if test X$[=(. cache-name)=] != Xno
+  then :[=
+
+    IF (exist? "define") =]
+    AC_DEFINE([=(. arg-name)=]_[=(string-tr! (get "name") "-a-z" "_A-Z")=], 1,
+            [Define this when[= (if (= arg-name "WITH") " using")
+            =] [=check=][=
+            (if (= arg-name "ENABLE") " is enabled")=].])[=
+    ENDIF  =][=
+
+    IF (exist? "yes-subst")  =]
+    [=(. subst-name)=]=[=(raw-shell-str (get "yes-subst"))=]
+    AC_SUBST([=(. subst-name)=])[=
+    ENDIF =][=
+
+    IF (exist? "yes-action")  =]
+    [=yes-action=][=
+
+    ENDIF =]
+  else :[=
+
+    IF (exist? "no-subst")  =]
+    [=(. subst-name)=]=[=(raw-shell-str (get "no-subst"))=]
+    AC_SUBST([=(. subst-name)=])[=
+    ENDIF =][=
+
+    IF (exist? "no-action")  =]
+    [=no-action=][=
+
+    ENDIF =]
+  fi
+[=
+ENDDEF  do-enablement        =][=
+
+
+DEFINE  try-enable
+
+=][= do-enablement  enable-type = enable =][=
+
+ENDDEF  try-enable           =][=
+
+
+DEFINE  try-with
+
+=][= do-enablement  enable-type = with =][=
+
+ENDDEF  try-with             =][=
+
+;; # # # # # # # # # Makefile.am # # # # # # # # # # #
+
+(out-push-new "Makefile.am")
+(dne "#  " "#  ")            =]
+#
 ## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 3.0 2001/12/09 19:46:03 bkorb Exp $
+## $Id: conftest.tpl,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 GENERATED_M4 = \
-[=
-(out-push-new) =][=
-FOR test "\n"  =][=
-  (string-downcase! (string-append
-        group-prefix "check_" (get "name"))) =].m4[=
-ENDFOR =]
-[=
+[=(shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
+          ofile-list)=]
 
-(shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
-          (out-pop #t) )=]
-
-EXTRA_DIST	= byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) autogen.spec \
-		missing release bootstrap config.tpl misc.def bootstrap.local
+EXTRA_DIST = byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) autogen.spec \
+	missing release bootstrap config.tpl misc.def bootstrap.local
 
 pkgdata_DATA = config.tpl
 
 MAINTAINERCLEANFILES = Makefile.in config.guess config.sub install-sh \
-		ltconfig ltmain.sh missing mkinstalldirs $(GENERATED_M4)
+	ltconfig ltmain.sh missing mkinstalldirs $(GENERATED_M4)
 all:
 	:
 [=

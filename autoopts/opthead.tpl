@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+# $Id: opthead.tpl,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 # Automated Options copyright 1992-2001 Bruce Korb
 
 =]
@@ -27,7 +27,8 @@
 
 #ifndef [=(. defname)=]
 #define [=(. defname)=]
-[= Option_Copyright =]
+[= Option_Copyright =][=
+% config-header "\n#include \"%s\""=]
 #include <options.h>
 
 /*

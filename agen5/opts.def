@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *   $Id: opts.def,v 3.1 2001/12/24 14:13:33 bkorb Exp $
  *
  *  AutoGen copyright 1992-2001 Bruce Korb
  *
@@ -38,8 +38,9 @@ homerc         =  $HOME, ".";
 environrc;
 long_opts;
 
+config-header  = config.h;
+
 include = <<-  _END_INCLUDE
-	#include "config.h"
 	#include "autogen.h"
 	#ifdef HAVE_DLOPEN
 	# ifdef HAVE_DLFCN_H
@@ -369,6 +370,7 @@ flag = {
     arg_range   = "0->3600"; /* one hour limit */
     arg_name    = time-lim;
     descrip     = "Time limit for servers";
+    ifdef       = ENABLE_SHELL;
     doc =
     "AutoGen works with a shell server process.  Most normal commands\n"
     "will complete in less than 10 seconds.  If, however, your commands\n"
@@ -455,7 +457,8 @@ flag = {
     ifdef       = DEBUG;
     doc =
     "This will cause @code{set -x} to be executed in the shell, with\n"
-    "the resultant output printed to /dev/tty.";
+    "the resultant output printed to /dev/tty.  This option will have no\n"
+    "effect if @samp{--disable-shell} was specified at configure time.";
 };
 
 flag = {

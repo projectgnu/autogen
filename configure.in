@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2001/12/09 19:43:40 $
+dnl Last Modified:    $Date: 2001/12/24 14:13:32 $
 dnl            by:    Bruce Korb <bkorb@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.0 2001/12/09 19:43:40 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.1 2001/12/24 14:13:32 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.0 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.1 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -88,22 +88,8 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # Set up and process configure options
 # ----------------------------------------------------------------------
 AG_CHECK_LIB_REGEX
-
-AC_MSG_CHECKING([whether runtime debugging is wanted])
-ag_cv_debug=no
-AC_ARG_ENABLE(debug,
-[  --enable-debug          enable/disable debugging code [no]],[
-ag_cv_debug=$enable_debug
-if test x$enable_debug = xyes; then
-  CPPFLAGS="-DDEBUG $CPPFLAGS"
-  CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g'`"
-  if test x$GCC != xyes; then
-changequote(,)
-    CFLAGS=`echo $CFLAGS|sed 's%-O[0-9]* *%%g'`
-changequote([,])
-  fi
-fi])
-AC_MSG_RESULT([$ag_cv_debug])
+AG_ENABLE_SHELL
+AG_ENABLE_DEBUG
 
 # ----------------------------------------------------------------------
 # Check for standard headers.
@@ -170,14 +156,14 @@ AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal psignal pathfind strlcpy)
 AC_CHECK_FUNCS(snprintf)
 AG_FUNC_FOPEN_BINARY
 AG_FUNC_FOPEN_TEXT
-AG_CHECK_ALLOCATED_CTIME
-## AG_CHECK_POSIX_REGCOMP done within AG_CHECK_LIB_REGEX
-AG_CHECK_POSIX_SYSINFO
-AG_CHECK_STRCSPN
-AG_CHECK_STRFTIME
-AG_CHECK_SYS_SIGLIST
-AG_CHECK_UNAME_SYSCALL
-AG_CHECK_PATHFIND
+AG_RUN_ALLOCATED_CTIME
+## AG_RUN_POSIX_REGCOMP done within AG_CHECK_LIB_REGEX
+AG_RUN_POSIX_SYSINFO
+AG_RUN_STRCSPN
+AG_RUN_STRFTIME
+AG_RUN_SYS_SIGLIST
+AG_RUN_UNAME_SYSCALL
+AG_RUN_PATHFIND
 
 if ! test x$ag_cv_sys_siglist = xyes
 then

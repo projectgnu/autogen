@@ -4,14 +4,14 @@ autogen definitions config.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2001/12/09 19:46:03 $
+ *  Last Modified:     $Date: 2001/12/24 14:13:33 $
  *             by:     Bruce Korb <bkorb@gnu.org>
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.0 2001/12/09 19:46:03 bkorb Exp $
+ *  $Id: misc.def,v 3.1 2001/12/24 14:13:33 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.0 $";
+version = "$Revision: 3.1 $";
 
 test = {
     name   = allocated_ctime;
@@ -184,6 +184,60 @@ test = {
 		_EOF_;
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
+};
+
+test = {
+    name   = shell;
+    type   = enable;
+    check  = 'using shell scripts';
+    define;
+    enable;  /* enabled by default */
+
+    yes-action = <<-  _EOF_
+		    AC_SUBST(OPTS_TESTDIR)
+		    AC_SUBST(TOP_DIRLIST)
+		    AC_SUBST(AGEN5_TESTS)
+		    TOP_DIRLIST='$(SHELL_DIRS)'
+		    OPTS_TESTDIR=test
+		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
+		_EOF_;
+
+    no-action  = <<-  _EOF_
+		    TOP_DIRLIST='$(NOSHELL_DIRS)'
+		    OPTS_TESTDIR=
+		    AGEN5_TESTS='$(NOSHELL_TESTS)'
+		_EOF_;
+
+    doc = <<-  _EOF_
+	AutoGen is now capable of acting as a CGI service.  In that capacity,
+	it is extremely dangerous to allow text to be interpreted by a shell.
+	To ensure that that cannot happen accidentally, it is best to
+	completely disable subshell services by specifying, --disable-shell.
+	In the default, enabled state, the "yes-subst[itution]" will enable
+	the getdefs, columns and doc subdirectory builds.
+	_EOF_;
+};
+
+test = {
+    name   = debug;
+    type   = enable;
+    check  = 'wanting autogen debugging';
+    define;
+    disable;  /* disabled by default */
+    /*
+     *  What to do for non-default
+     */
+    no-action = <<- _EOF_
+		CPPFLAGS="-DDEBUG $CPPFLAGS"
+	    changequote(,)dnl
+	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
+	    changequote([,])dnl
+	_EOF_;
+    doc = <<-  _EOF_
+	This option will enable two debugging options for AutoGen.
+	viz., --show-defs (dump out the definition tree)
+	and --show-shell (print out all shell commands via `set -x')
+	_EOF_;
 };
 
 /* misc.def ends here */

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
+# Last Modified:     $Date: 2001/12/24 14:13:33 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: stack.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: stack.test,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,8 +23,8 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
 [= AutoGen5 template test =]
 [=
 
@@ -41,13 +41,15 @@ cat > $testname.tpl <<_EOF_
   (join  ", " "foo" (stack "foo.bar.baz") "bar" "baz")
 
 =]
+[= (string-substitute (join "\n" (stack "foo.bar.baz"))
+                      '("umb" "le") '("_UMB_" "<=") ) =]
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-cat > $testname.def <<_EOF_
-AutoGen definitions $testname;
+echo creating ${testname}.def
+cat > ${testname}.def <<_EOF_
+AutoGen definitions ${testname};
 
 foo = { bar = { baz  = fumble;  }; };
 foo = { bar = { baz  = mumble;  }; };
@@ -56,19 +58,23 @@ _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
-echo creating $testname.out
+echo creating ${testname}.out
 # this is the output we should expect to see
-cat > $testname.out <<'_EOF_'
+cat > ${testname}.out <<'_EOF_'
 fumble, mumble, grumble
 one,
 two,
 three,
 four
 foo, fumble, mumble, grumble, bar, baz
+f_UMB_<=
+m_UMB_<=
+gr_UMB_<=
 _EOF_
 
-$AGEXE $testname.def || failure $AGEXE failed
-cmp -s $testname.test $testname.out || failure unexpected output
+$AGEXE ${testname}.def || failure $AGEXE failed
+cmp -s ${testname}.test ${testname}.out || \
+	failure "`diff ${testname}.*t`"
 
 cleanup
 # end of get.test

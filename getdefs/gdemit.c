@@ -1,12 +1,12 @@
 /*
- *  $Id: gdemit.c,v 3.0 2001/12/09 19:46:06 bkorb Exp $
+ *  $Id: gdemit.c,v 3.1 2001/12/24 14:13:33 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2001/12/09 19:46:06 $
+ *  Last Modified:     $Date: 2001/12/24 14:13:33 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 #include "getdefs.h"
@@ -172,56 +172,52 @@ emitDefinition( char* pzDef, char* pzOut )
 {
     char   sep_char;
     char   zEntryName[ MAXNAMELEN ];
-	char*  p = zEntryName;
 
     /*
      *  Indent attribute definitions four spaces
      */
-    *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
+    {
+        char*  p = zEntryName;
+        *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
 
-    while (AG_NAME_CHAR(*pzDef))
-        *p++ = *pzOut++ = *pzDef++;
+        while (AG_NAME_CHAR(*pzDef))
+            *p++ = *pzOut++ = *pzDef++;
 
-	if (p >= zEntryName + sizeof( zEntryName )) {
-		fprintf( stderr, "getdefs error:  names constrained to %d bytes\n",
-				 MAXNAMELEN );
-		exit( EXIT_FAILURE );
-	}
+        if (p >= zEntryName + sizeof( zEntryName )) {
+            fprintf( stderr, "getdefs error:  names constrained to %d bytes\n",
+                     MAXNAMELEN );
+            exit( EXIT_FAILURE );
+        }
+        *p = NUL;
+    }
 
-    *p = NUL;
-	/*
-	 *  The next character is guaranteed to be the ':' mark char.
-	 *  Skip it and any following white space.
-	 */
-	while (isspace( *++pzDef ))  ;
-
-	/*
-	 *  Strip the prefixes from all the definition lines
-	 *  (viz., the "^.*\*" text, except that it is a shortest match
-	 *  instead of longest match)
-	 */
-    compressDef( pzDef );
+    /*
+     *  Strip the prefixes from all the definition lines
+     *  (viz., the "^.*\*" text, except that it is a shortest match
+     *  instead of longest match).  Skip the ':' before starting.
+     */
+    compressDef( ++pzDef );
 
     if (HAVE_OPT( SUBBLOCK )) {
         int    ct  = STACKCT_OPT(  SUBBLOCK );
         char** ppz = STACKLST_OPT( SUBBLOCK );
-        char*  p   = zEntryName;
+        char*  pz;
 
         do  {
-            p = *ppz++;
-            if (strcmp( p, zEntryName ) == 0)
-                return emitSubblock( p, pzDef, pzOut );
+            pz = *ppz++;
+            if (strcmp( pz, zEntryName ) == 0)
+                return emitSubblock( pz, pzDef, pzOut );
         } while (--ct > 0);
     }
 
     if (HAVE_OPT( LISTATTR )) {
         int    ct  = STACKCT_OPT(  LISTATTR );
         char** ppz = STACKLST_OPT( LISTATTR );
-        char*  p   = zEntryName;
+        char*  pz   = zEntryName;
 
         do  {
-            p = *ppz++;
-            if (strcmp( p, zEntryName ) == 0)
+            pz = *ppz++;
+            if (strcmp( pz, zEntryName ) == 0)
                 return emitListattr( pzDef, pzOut );
         } while (--ct > 0);
     }
@@ -295,33 +291,33 @@ emitListattr( char* pzText, char* pzOut )
 
     /*
      *  Loop for as long as we have text entries
-	 */
+     */
     for (;;) {
         while (isspace( *pzText )) pzText++;
         if (*pzText == NUL) {
-			/*
+            /*
              *  IF there were no definitions, THEN emit an empty one
              */
             if (FirstAttr)
-				pzOut -= sizeof( zStart ) - 1;
+                pzOut -= sizeof( zStart ) - 1;
 
-			*(pzOut++) = ';';
-			*(pzOut++) = '\n';
-			break;
-		}
+            *(pzOut++) = ';';
+            *(pzOut++) = '\n';
+            break;
+        }
 
-		if (FirstAttr)
-			FirstAttr = 0;
-		else
-			*(pzOut++) = ',';
+        if (FirstAttr)
+            FirstAttr = 0;
+        else
+            *(pzOut++) = ',';
 
-		if (*pzText == sepChar) {
-			*(pzOut++) = '\''; *(pzOut++) = '\'';
-			pzText++;
-			continue;			
-		}
-		pzOut = emitSubblockString( &pzText, sepChar, pzOut );
-	}
+        if (*pzText == sepChar) {
+            *(pzOut++) = '\''; *(pzOut++) = '\'';
+            pzText++;
+            continue;           
+        }
+        pzOut = emitSubblockString( &pzText, sepChar, pzOut );
+    }
 
     return pzOut;
 }
@@ -551,7 +547,6 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
     *ppzText = pzText;
     return pzOut;
 }
-
 
 /* emacs
  * Local Variables:

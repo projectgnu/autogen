@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: expString.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -198,84 +198,220 @@ makeString( tCC*    pzText,
 STATIC SCM
 shell_stringify( SCM obj, char qt )
 {
-    size_t     dtaSize;
-    char*      pzDta;
-    char*      pz;
-    char*      pzNew;
-    SCM        res;
+    char*  pzDta;
+    char*  pzNew;
+    size_t dtaSize = 3;
 
     pzDta = ag_scm2zchars( obj, "AG Object" );
-    dtaSize = 3;
-    pz = pzDta;
-    for (;;) {
-        char c = *(pz++);
 
-        switch (c) {
-        case NUL:
-            goto loopDone1;
+    {
+        char*  pz = pzDta;
 
-        case '"':
-        case '`':
-        case '\\':
-            dtaSize += 2;
-            break;
+        for (;;) {
+            char c = *(pz++);
 
-        default:
-            dtaSize++;            
-        }
-    } loopDone1:;
+            switch (c) {
+            case NUL:
+                goto loopDone1;
 
-    pz  = pzNew = AGALOC( dtaSize, "shell string" );
-    *(pz++) = qt;
-
-    for (;;) {
-        char c = (*(pz++) = *(pzDta++));
-        switch (c) {
-        case NUL:
-            goto loopDone2;
-
-        case '\\':
-            /*
-             *  If someone went to the trouble to escape a backquote or a
-             *  dollar sign, then we should not neutralize it.  Note that we
-             *  handle a following backslash as a normal character.
-             *  ALSO, now that this routine does both `xx` and "xx" strings,
-             *  we have to worry about this stuff differently.  I.e., in ""
-             *  strings, preserve a single \ in front of `, and in ``
-             *  preserve a single \ in front of ".  Icky.
-             *
-             * i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
-             */
-            switch (*pzDta) {
-            case '$':             /* \$  -->  \$    */
+            case '"': case '`': case '\\':
+                dtaSize += 2;
                 break;
-            case '`':             /* \`  -->  \`    */
-            case '"':             /* \"  -->  \"    */
-                if (c != qt)
+
+            default:
+                dtaSize++;            
+            }
+        } loopDone1:;
+    }
+
+    pzNew = AGALOC( dtaSize, "shell string" );
+
+    {
+        char* pz = pzNew;
+        *(pz++) = qt;
+
+        for (;;) {
+            char c = (*(pz++) = *(pzDta++));
+            switch (c) {
+            case NUL:
+                goto loopDone2;
+
+            case '\\':
+                /*
+                 *  If someone went to the trouble to escape a backquote or a
+                 *  dollar sign, then we should not neutralize it.  Note that
+                 *  we handle a following backslash as a normal character.
+                 *
+                 *  i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
+                 */
+                c = *pzDta;
+                switch (*pzDta) {
+                case '$':
                     break;
-            default:              /* otherwise:     */
-                *(pz++) = '\\';   /* \   -->  \\    */
+
+                case '"':
+                case '`':
+                    /*
+                     *  IF the ensuing quote character does *NOT* match the
+                     *  quote character for the string, then we will preserve
+                     *  the single copy of the backslash.  If it does match,
+                     *  then we will double the backslash and a third backslash
+                     *  will be inserted when we emit the quote character.
+                     */
+                    if (c != qt)
+                        break;
+                    /* FALLTHROUGH */
+
+                default:
+                    *(pz++) = '\\';   /* \   -->  \\    */
+                }
+                break;
+
+            case '"': case '`':
+                if (c == qt) {
+                    /*
+                     *  This routine does both `xx` and "xx" strings, we have
+                     *  to worry about this stuff differently.  I.e., in ""
+                     *  strings, add a single \ in front of ", and in ``
+                     *  preserve a add \ in front of `.
+                     */
+                    pz[-1]  = '\\';       /* "   -->   \"   */
+                    *(pz++) = c;
+                }
             }
-            break;
+        } loopDone2:;
 
-        case '"':
-        case '`':
-            if (c == qt) {
-                pz[-1]  = '\\';       /* "   -->   \"   */
-                *(pz++) = c;
-            }
-        }
-    } loopDone2:;
+        pz[-1]  = qt;
+        dtaSize = (pz - pzNew);
+    }
 
-    pz[-1]  = qt;
-    dtaSize = (pz - pzNew);
-    res     = scm_makstr( (scm_sizet)dtaSize, 0 );
-    memcpy( SCM_CHARS( res ), pzNew, dtaSize );
-    AGFREE( pzNew );
-
-    return res;
+    {
+        SCM res = scm_makstr( (scm_sizet)dtaSize, 0 );
+        memcpy( SCM_CHARS( res ), pzNew, dtaSize );
+        AGFREE( pzNew );
+        return res;
+    }
 }
 
+
+/* * * * *
+ *
+ *  Substitution routines.  These routines implement a sed-like
+ *  experience, except that we don't use regex-es.  It is straight
+ *  text substitution.
+ */
+STATIC void
+do_substitution(
+    char*       pzStr,
+    scm_sizet   strLen,
+    SCM         match,
+    SCM         repl,
+    char**      ppzRes,
+    scm_sizet*  pResLen )
+{
+    char* pzMatch = ag_scm2zchars( match, "match text" );
+    char* pzRepl  = ag_scm2zchars( repl,  "repl text" );
+    int   matchL  = SCM_LENGTH( match );
+    int   replL   = SCM_LENGTH( repl );
+    int   endL    = strLen;
+
+    int   repCt   = 0;
+    char* pz      = pzStr;
+    char* pzRes;
+    char* pzScan;
+
+    for (;;) {
+        char* pzNxt = strstr( pz, pzMatch );
+        if (pzNxt == NULL)
+            break;
+        repCt++;
+        pz = pzNxt + matchL;
+    }
+
+    /*
+     *  No substitutions -- no work.  The caller will have to track
+     *  whether or not to deallocate the result.
+     */
+    if (repCt == 0)
+        return;
+
+    endL  = endL + (replL * repCt) - (matchL * repCt);
+    pzScan = pzRes = AGALOC( endL + 1, "substitution" );
+    pz    = pzStr;
+
+    for (;;) {
+        char* pzNxt = strstr( pz, pzMatch );
+        if (pzNxt == NULL)
+            break;
+        if (pz != pzNxt) {
+            memcpy( pzScan, pz, (pzNxt - pz) );
+            pzScan += (pzNxt - pz);
+        }
+        memcpy( pzScan, pzRepl, replL );
+        pzScan += replL;
+        pz = pzNxt + matchL;
+    }
+    strcpy( pzScan, pz );
+    *ppzRes = pzRes;
+    *pResLen = (pzScan - pzRes) + strlen( pz );
+}
+
+
+/*
+ *  Recursive routine.  It calls itself for list values and calls
+ *  "do_substitution" for string values.  Each substitution will
+ *  be done in the order found in the tree walk of list values.
+ *  The "match" and "repl" trees *must* be identical in structure.
+ */
+STATIC void
+do_multi_subs(
+    char**      ppzStr,
+    scm_sizet*  pStrLen,
+    SCM         match,
+    SCM         repl )
+{
+    char* pzStr = *ppzStr;
+    char* pzOri = pzStr;
+    char* pzNxt = pzStr;
+
+    /*
+     *  Loop for as long as our list has more entries
+     */
+    while (! SCM_NULLP( match )) {
+        /*
+         *  "CAR" is the current value, "CDR" is rest of list
+         */
+        SCM  matchCar  = SCM_CAR( match );
+        SCM  replCar   = SCM_CAR( repl );
+
+        match = SCM_CDR( match );
+        repl  = SCM_CDR( repl );
+
+        if (gh_string_p( matchCar )) {
+            do_substitution( pzStr, *pStrLen, matchCar, replCar,
+                             &pzNxt, pStrLen );
+
+            /*
+             *  Be sure to free intermediate results.
+             *  passed-in values are freed by the caller.
+             */
+            if ((pzStr != pzOri) && (pzStr != pzNxt))
+                AGFREE( pzStr );
+            pzStr = pzNxt;
+        }
+
+        else if (gh_list_p( matchCar ))
+            do_multi_subs( &pzStr, pStrLen, matchCar, replCar );
+
+        else
+            /*
+             *  Whatever it is it is not part of what we would expect.  Bail.
+             */
+            break;
+    }
+
+    *ppzStr = pzStr;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION ROUTINES
@@ -689,7 +825,7 @@ ag_scm_raw_shell_str( SCM obj )
  *  of @code{`}.  You have to think about it.  I'm open to suggestions.
  *
  *  Meanwhile, the best way to document is with a detailed output example.
- *  If the backslashes make it through the texinfo processing correctly,
+ *  If the backslashes make it through the text processing correctly,
  *  below you will see what happens with three example strings.  The first
  *  example string contains a list of quoted @code{foo}s, the second is
  *  the same with a single backslash before the quote characters and the
@@ -701,22 +837,24 @@ ag_scm_raw_shell_str( SCM obj )
  *  raw-shell-str: ''\''foo'\'' "foo" `foo` $foo'
  *  shell-str:     "'foo' \"foo\" `foo` $foo"
  *  sub-shell-str: `'foo' "foo" \`foo\` $foo`
- *   
+ *
  *  foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
  *  raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
- *  shell-str:     "\\'bar\\' \\"bar\\" \`bar\` \$bar"
- *  sub-shell-str: `\\'bar\\' \"bar\" \\`bar\\` \$bar`
- *   
+ *  shell-str:     "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
+ *  sub-shell-str: `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
+ *
  *  foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
  *  raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
- *  shell-str:     "\\\\'BAZ\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ"
- *  sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\`BAZ\\\\` \\\$BAZ`
+ *  shell-str:     "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
+ *  sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
  *  @end example
  *
- *  There should be triple and quadruple backslashes in the last two lines of
- *  the example.  If this was not accurately reproduced, take a look at the
- *  agen5/test/shell.test test.  Notice the backslashes in front of the dollar
- *  signs.  It goes from zero to one to three for the "cooked" string examples.
+ *  There should be four, three, five and three backslashes for the four
+ *  examples on the last line, respectively.  The next to last line should
+ *  have four, five, three and three backslashes.  If this was not accurately
+ *  reproduced, take a look at the agen5/test/shell.test test.  Notice the
+ *  backslashes in front of the dollar signs.  It goes from zero to one to
+ *  three for the "cooked" string examples.
 =*/
     SCM
 ag_scm_shell_str( SCM obj )
@@ -909,6 +1047,80 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
     }
     return str;
 }
+
+
+/*=gfunc string_tr
+ *
+ * what:  convert characters with new result
+ * general_use:
+ *
+ *  exparg:  source, string to transform
+ *  exparg:  match,  characters to be converted
+ *  exparg:  translation, conversion list
+ *
+ * doc: This is identical to @code{string-tr!}, except that it does not
+ *      over-write the previous value.
+=*/
+    SCM
+ag_scm_string_tr( SCM Str, SCM From, SCM To )
+{
+    scm_sizet lenz  = SCM_LENGTH( Str );
+    SCM       res   = scm_makstr( lenz, 0 );
+    char*     pzDta = SCM_CHARS( res );
+    memcpy( pzDta, SCM_CHARS( Str ), lenz );
+    return ag_scm_string_tr_x( res, From, To );
+}
+
+
+/*=gfunc string_substitute
+ *
+ * what:  make global replacements in a string
+ * general_use:
+ *
+ *  exparg:  source, string to transform
+ *  exparg:  match,  substring or substring list to be replaced
+ *  exparg:  repl,   replacement strings or substrings
+ *
+ * doc: @code{match} and  @code{repl} may be either a single string or
+ *      a list of strings.  Either way, they must have the same structure
+ *      and number of elements.  For example, to replace all less than
+ *      and all greater than characters, do something like this:
+ *
+ * @example
+ *      (string-substitute str '("<" ">") '("&lt;" "&gt;"))
+ * @end example
+=*/
+    SCM
+ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
+{
+    tCC*       pzStr;
+    scm_sizet  len;
+    SCM        res;
+
+    if (! gh_string_p( Str ))
+        return SCM_UNDEFINED;
+
+    pzStr = SCM_ROCHARS( Str );
+    len   = SCM_LENGTH( Str );
+
+    if (gh_string_p( Match ))
+        do_substitution( (char*)pzStr, len, Match, Repl,
+                         (char**)&pzStr, &len );
+    else
+        do_multi_subs( (char**)&pzStr, &len, Match, Repl );
+
+    res = scm_makstr( len, 0 );
+    memcpy( SCM_CHARS( res ), pzStr, len );
+
+    /*
+     *  IF we have an allocated intermediate result,
+     *  THEN we must free it.  We might have our original string.
+     */
+    if (pzStr != SCM_ROCHARS( Str ))
+        AGFREE( (char*)pzStr );
+    return res;
+}
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"

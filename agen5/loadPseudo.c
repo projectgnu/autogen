@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -300,7 +300,7 @@ EXPORT tCC*
 loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";
-#   define BAD_MARKER( t ) STMTS( \
+#   define BAD_MARKER( t ) STMTS( AG_ABEND_START( "bad template marker" ); \
         fprintf( stderr, zTplErr, pzFileName, templLineNo, t ); AG_ABEND; )
 
     te_pm_state fsm_state  = PM_ST_INIT;
@@ -421,5 +421,6 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of loadPseudo.c */

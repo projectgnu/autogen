@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -247,8 +247,9 @@ loadMacros( tTemplate*     pT,
          *  Make sure all of the input string was scanned.
          */
         if (pzData != (char*)NULL)  {
-            fprintf( stderr, zTplErr, pzF, -1,
-                     "parse ended unexpectedly" );
+            tSCC zNotExpected[] = "parse ended unexpectedly";
+            AG_ABEND_START( zNotExpected );
+            fprintf( stderr, zTplErr, pzF, -1, zNotExpected );
             AG_ABEND;
         }
 
@@ -318,11 +319,6 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
         pT->fd    = 0;
         pT->pNext = (char*)pT + tplSize;
         pT = (tTemplate*)(pT->pNext);
-        if (memcmp( (void*)pT, (void*)pTList, sizeof( tTlibMark )) != 0) {
-            tSCC z[] = "The %s binary template library is inconsistent\n";
-            fprintf( stderr, z, pTList->pzFileName );
-            AG_ABEND;
-        }
     }
 
     pT->pNext = (char*)NULL;
@@ -338,6 +334,12 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
 EXPORT void
 mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
+    tSCC zCannotMmap[] = "cannot mmap";
+#   define zMmap        zCannotMmap + 7
+
+    tSCC zCannotOpen[] = "cannot open";
+#   define zOpen        zCannotOpen + 7
+
     static char  zRealFile[ MAXPATHLEN ];
 
     /*
@@ -345,6 +347,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList ))) {
         tSCC zMapDataFile[] = "map data file";
+        AG_ABEND_START( zMapDataFile );
         fprintf( stderr, zCannot, pzProg, ENOENT,
                  zMapDataFile, pzFileName, strerror( ENOENT ));
         AG_ABEND;
@@ -357,15 +360,16 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
     {
         struct stat stbf;
         if (stat( zRealFile, &stbf ) != 0) {
-            tSCC zStat[] = "stat";
-            fprintf( stderr, zCannot, pzProg, errno,
-                     zStat, zRealFile, strerror( errno ));
+            AG_ABEND_START( zCannotOpen );
+            fprintf( stderr, zCannot, errno, zOpen,
+                     zRealFile, strerror( errno ));
             AG_ABEND;
         }
 
         if (! S_ISREG( stbf.st_mode )) {
-            fprintf( stderr, "ERROR:  `%s' is not a regular file\n",
-                     zRealFile );
+            AG_ABEND_START( zCannotOpen );
+            fprintf( stderr, zCannot, errno, zOpen,
+                     zRealFile, "wrong file type" );
             AG_ABEND;
         }
 
@@ -379,9 +383,9 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
     if (pMapInfo->fd == -1) {
-        tSCC zOpen[] = "open";
-        fprintf( stderr, zCannot, pzProg, errno,
-                 zOpen, zRealFile, strerror( errno ));
+        AG_ABEND_START( zCannotOpen );
+        fprintf( stderr, zCannot, errno, zOpen,
+                 zRealFile, strerror( errno ));
         AG_ABEND;
     }
 
@@ -390,9 +394,9 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
               MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
 
     if (pMapInfo->pData == (void*)(-1)) {
-        tSCC zMmap[] = "mmap";
-        fprintf( stderr, zCannot, pzProg, errno,
-                 zMmap, zRealFile, strerror( errno ));
+        AG_ABEND_START( zCannotMmap );
+        fprintf( stderr, zCannot, errno, zMmap,
+                 zRealFile, strerror( errno ));
         AG_ABEND;
     }
 }
@@ -410,36 +414,6 @@ loadTemplate( tCC* pzFileName )
     static tMapInfo  mapInfo;
 
     mapDataFile( pzFileName, &mapInfo, apzSfx );
-
-    /*
-     *  Check for a binary template.  If it is, it must
-     *  be the current revision, or we choke.
-     */
-    {
-        tTemplate*  p = (tTemplate*)mapInfo.pData;
-
-        if (p->magic.magic.i[0] == magicMark.magic.i[0]) {
-            tSCC zOutOfDate[] = "out-of-date binary template";
-            tSCC zTooNew[]    = "unknown binary template version";
-            tSCC zChange[]    = "Functions changed - rebuild lib";
-            tCC* pz;
-
-            if (p->magic.magic.i[1] == magicMark.magic.i[1]) {
-                p->fd = mapInfo.fd;
-                return templateFixup( p, mapInfo.size-1 );
-            }
-
-            if (p->magic.revision < TEMPLATE_REVISION)
-                pz = zOutOfDate;
-            if (p->magic.revision > TEMPLATE_REVISION)
-                pz = zTooNew;
-            else
-                pz = zChange;
-
-            fprintf( stderr, zTplErr, mapInfo.pzFileName, 0, pz );
-            AG_ABEND;
-        }
-    }
 
     {
         size_t       macroCt;
@@ -505,5 +479,6 @@ unloadTemplate( tTemplate* pT )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of tpLoad.c */

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.1 2001/12/10 03:48:27 bkorb Exp $
+ *  $Id: agUtils.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -121,10 +121,8 @@ doOptions( int arg_ct, char** arg_vec )
      *  THEN a template *must* have been specified.
      */
     if (  (! ENABLED_OPT( DEFINITIONS ))
-       && (! HAVE_OPT( OVERRIDE_TPL )) ) {
-        fputs( "AutoGen error:  no template was specified\n", stderr );
-        AG_ABEND;
-    }
+       && (! HAVE_OPT( OVERRIDE_TPL )) )
+        AG_ABEND_STR( "no template was specified" );
 
     /*
      *  IF we do not have a base-name option, then we compute some value

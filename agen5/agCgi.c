@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.1 2001/12/10 03:48:27 bkorb Exp $
+ *  $Id: agCgi.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -89,6 +89,15 @@ loadCgi()
     int textLen = 0;
     char* pzText  = NULL;
 
+    fclose( stderr );
+    {
+        FILE* fp = fdopen( STDOUT_FILENO, "w" );
+        if (fileno( fp ) < STDERR_FILENO)
+            fp = fdopen( STDOUT_FILENO, "w" );
+        if (fileno( fp ) < STDERR_FILENO)
+            AG_ABEND_STR( "Cannot redirect stderr to stdout" );
+    }
+
     {
         tNameMap* pNM = nameValueMap;
         tNameIdx  ix  = SERVER_SOFTWARE_IDX;
@@ -101,25 +110,20 @@ loadCgi()
     }
 
     textLen = atoi( nameValueMap[ CONTENT_LENGTH_IDX ].pzValue );
-    if (textLen == 0) {
-        fputs( zOops, stderr );
-        fputs( "No data were received\n", stderr );
-        AG_ABEND;
-    }
+    if (textLen == 0)
+        AG_ABEND_STR( "No data were received" );
 
     if (strcasecmp( pzMethod, "POST" ) == 0) {
         pzText  = malloc( (textLen + 32) & ~0x000F );
         if (pzText == NULL) {
-            fputs( zOops, stderr );
-            fprintf( stderr, "could not allocate %d bytes for input\n",
-                    (textLen + 32) & ~0x000F );
+            AG_ABEND_START( zAllocErr );
+            fprintf( stderr, zAllocWhat, (textLen + 32) & ~0x000F, "input" );
             AG_ABEND;
         }
 
         if (fread( pzText, 1, textLen, stdin ) != textLen) {
-            fputs( zOops, stderr );
-            fprintf( stderr, "could not read all %d bytes of input\n",
-                     textLen );
+            AG_ABEND_START( "Could not read" );
+            fprintf( stderr, "\t%d bytes of input\n", textLen );
             AG_ABEND;
         }
         pzText[ textLen ] = '\0';
@@ -131,30 +135,31 @@ loadCgi()
     } else if (strcasecmp( pzMethod, "GET" ) == 0) {
         pzText = parseInput( pzQuery, textLen );
 
-    } else {
-        fputs( zOops, stderr );
-        fprintf( stderr, "could not determine request method:  ``%s''\n",
-                 pzMethod );
-        AG_ABEND;
-    }
+    } else
+        AG_ABEND_STR( "invalid request method" );
+
+    pzOopsPrefix = zOops;
 }
 
 
 static char*
 parseInput( char* pzSrc, int len )
 {
-    int   outlen = len * 2;
+    tSCC zDef[] = "Autogen Definitions cgi;\n";
+    int   outlen = (len * 2) + sizeof( zDef );
     char* pzRes = malloc( outlen );
 
     if (pzRes == NULL)
         pzRes = "cannout allocate output buffer\n";
 
-    else if (cgi_run_fsm( pzSrc, len, pzRes, outlen ) == CGI_ST_DONE)
-        return pzRes;
+    else {
+        strcpy( pzRes, zDef );
+        if (cgi_run_fsm( pzSrc, len, pzRes + sizeof( zDef ) - 1, outlen )
+            == CGI_ST_DONE)
+            return pzRes;
+    }
 
-    fputs( zOops, stderr );
-    fputs( pzRes, stderr );
-    AG_ABEND;
+    AG_ABEND_STR( pzRes );
 }
 
 /*

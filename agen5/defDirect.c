@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.1 2001/12/10 03:42:58 bkorb Exp $
+ *  $Id: defDirect.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -28,8 +28,8 @@
 #include "directive.h"
 
 
-tSCC zNoEndif[]   = "ERROR:  in %s, #endif not found\n";
-tSCC zNoMatch[]   = "ERROR:  in %s, #%s found without an #ifdef/#ifndef\n";
+tSCC zNoEndif[]   = "\tin %s line %d, #endif not found\n";
+tSCC zNoMatch[]   = "\tin %s line %d, #%s no matching start/if directive\n";
 tSCC zCheckList[] = "\n#";
 
 STATIC int  ifdefLevel = 0;
@@ -195,7 +195,9 @@ skipToEndif( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == (char*)NULL) {
-                fprintf( stderr, zNoEndif, pCurCtx->pzFileName );
+                AG_ABEND_START( "endif not found" );
+                fprintf( stderr, zNoEndif,
+                         pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND;
             }
 
@@ -256,7 +258,9 @@ skipToElseEnd( char* pzScan )
         else {
             pz = strstr( pzScan, zCheckList );
             if (pz == (char*)NULL) {
-                fprintf( stderr, zNoEndif, pCurCtx->pzFileName );
+                AG_ABEND_START( "definition directive" );
+                fprintf( stderr, zNoEndif,
+                         pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND;
             }
 
@@ -412,7 +416,9 @@ doDir_define( char* pzArg, char* pzScan )
 STATIC char*
 doDir_elif( char* pzArg, char* pzScan )
 {
-    fputs( "`#elif' directive encountered out of context\n", stderr );
+    AG_ABEND_START( "`#elif' directive encountered out of context" );
+    fprintf( stderr, "\tin %s on line %d\n",
+             pCurCtx->pzFileName, pCurCtx->lineNo );
     AG_ABEND;
 }
 
@@ -428,7 +434,9 @@ STATIC char*
 doDir_else( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
-        fprintf( stderr, zNoMatch, pCurCtx->pzFileName, "else" );
+        AG_ABEND_START( "mismatched #else" );
+        fprintf( stderr, zNoMatch, pCurCtx->pzFileName, pCurCtx->lineNo,
+                 "else" );
         AG_ABEND;
     }
 
@@ -446,7 +454,9 @@ STATIC char*
 doDir_endif( char* pzArg, char* pzScan )
 {
     if (--ifdefLevel < 0) {
-        fprintf( stderr, zNoMatch, pCurCtx->pzFileName, "endif" );
+        AG_ABEND_START( "mismatched #endif" );
+        fprintf( stderr, zNoMatch, pCurCtx->pzFileName, pCurCtx->lineNo,
+                 "endif" );
         AG_ABEND;
     }
 
@@ -466,9 +476,9 @@ doDir_endshell( char* pzArg, char* pzScan )
      *  In actual practice, the '#endshell's must be consumed inside
      *  the 'doDir_shell()' procedure.
      */
-    tSCC zBadEnd[] = "ERROR:  in file %s, '#endshell' directive found "
-                     "without a matching '#shell'\n";
-    fprintf( stderr, zBadEnd, pCurCtx->pzFileName );
+    AG_ABEND_START( "mismatched #endshell" );
+    fprintf( stderr, zNoMatch, pCurCtx->pzFileName, pCurCtx->lineNo,
+             "endshell" );
     AG_ABEND;
 }
 
@@ -484,7 +494,9 @@ doDir_endshell( char* pzArg, char* pzScan )
 STATIC char*
 doDir_error( char* pzArg, char* pzScan )
 {
-    fprintf( stderr, "#error directive -- %s\n", pzArg );
+    AG_ABEND_START( pzArg );
+    fprintf( stderr, "\t#error directive -- in %s on line %d\n",
+             pCurCtx->pzFileName, pCurCtx->lineNo );
     AG_ABEND;
 }
 
@@ -636,9 +648,9 @@ doDir_include( char* pzArg, char* pzScan )
         char*  pz = pzScan;
 
         if (fp == (FILE*)NULL) {
-            fprintf( stderr, "%s ERROR %d (%s):  Cannot open `%s'\n",
-                     pzProg, errno, strerror( errno ),
-                     zFullName );
+            AG_ABEND_START( "Cannot open file" );
+            fprintf( stderr, zCannot, errno, "open", zFullName,
+                     strerror( errno ));
             AG_ABEND;
         }
 
@@ -646,10 +658,10 @@ doDir_include( char* pzArg, char* pzScan )
             size_t rdct = fread( (void*)pz, 1, inclSize, fp );
 
             if (rdct == 0) {
-                fprintf( stderr, "%s ERROR %d (%s):  Cannot read `%s'\n",
-                         pzProg, errno,
-                         strerror( errno ), zFullName );
-                break;
+                AG_ABEND_START( "Cannot read file" );
+                fprintf( stderr, zCannot, errno, "read", zFullName,
+                         strerror( errno ));
+                AG_ABEND;
             }
 
             pz += rdct;
@@ -747,8 +759,9 @@ doDir_shell( char* pzArg, char* pzScan )
 
     pzScan = strstr( pzScan, zEndShell );
     if (pzScan == (char*)NULL) {
-        fprintf( stderr, "%s ERROR:  '#endshell' directive not found "
-                 "after '#shell' directive\n", pzProg );
+        AG_ABEND_START( "Missing #endshell" );
+        fprintf( stderr, "after '#shell' in %s on line %d\n",
+                 pCurCtx->pzFileName, pCurCtx->lineNo );
         AG_ABEND;
     }
 

@@ -1,3 +1,27 @@
+2001-12-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def(config-header): use new attribute
+	* autoopts/opthead.tpl(config-header): include before anything else,
+	if it is defined.
+
+2001-12-19  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/gdemit.c(emitDefinition): reduce aggressive trimming so line
+	leaders can be properly stripped.
+	* agen5/opts.def(timeout): this option is pointless if the server shell
+	has been disabled.  Now active only if ENABLE_SHELL defined.
+	* agen5/agShell.c: disable most everything when ENABLE_SHELL not
+	defined.  loadData is left intact because it is otherwise useful.
+
+2001-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agCgi.c: Add a 'Autogen Definitions cgi;' to start of CGI defs.
+	* agen5/bootstrap.dir(subblock): extract from sources
+	* agen5/expString.c(string-tr): new SCM function: similar to string-tr!
+	(string-substitute): new SCM function to support CGI scripting
+	* agen5/funcCase.c: add subblock argument for getdefs
+	* agen5/test/stack.test: add testing for (string-substitute...)
+
 2001-12-09  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agCgi.c: new - reads in GET and POST CGI values

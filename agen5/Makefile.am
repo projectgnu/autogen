@@ -7,21 +7,21 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/12/10 04:33:14 $
+## Last Modified:   $Date: 2001/12/24 14:13:32 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2001/12/10 04:33:14 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2001/12/24 14:13:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-SUBDIRS		= test
-INCLUDES = @INCLIST@ $(GUILE_INC)
+SUBDIRS     = test
+INCLUDES    = @INCLIST@ $(GUILE_INC)
 
-BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
-GETDEFS         = $(top_builddir)/getdefs/getdefs
-AGEXE		= $(top_builddir)/agen5/@AGEXE@
+BLOCKOPT    = subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
+GETDEFS     = $(top_builddir)/getdefs/getdefs
+AGEXE       = $(top_builddir)/agen5/@AGEXE@
 
-AGARGS  	= autogen=$(AGEXE)
-OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
+AGARGS      = autogen=$(AGEXE)
+OPTDBG      = `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 		  then echo -DDEBUG=1 ; else echo -UDEBUG ; fi`
 
 CONFIG_CLEAN_FILES = autogen.texi autogen.menu autogen.1

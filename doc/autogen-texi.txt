@@ -27,7 +27,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Template File::        AutoGen Template
 * Augmenting AutoGen::   Augmenting AutoGen
 * autogen Invocation::   Invoking AutoGen
-* Installation::         What Gets Installed Where
+* Installation::         Configuring and Installing
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
 * FAQ::                  Hints, helps and FAQs
@@ -1419,8 +1419,67 @@ Extraction from autogen.texi
 
 @page
 @node Installation
-@chapter What Gets Installed Where
-@cindex Installation
+@chapter Configuring and Installing
+
+@menu
+* configuring::    Configuring AutoGen
+* installing::     Installing AutoGen
+@end menu
+
+@node configuring
+@section configuring
+@cindex configuring
+
+AutoGen is configured and built using Libtool, Automake and Autoconf.
+Consequently, you can install it whereever you wish using the various
+@samp{--prefix} options.  To the various configuration options supplied
+by these tools, AutoGen adds two of its own:
+
+@table @samp
+@item --disable-shell
+AutoGen is now capable of acting as a CGI forms server.  As such, it
+will gather its definitions using either @samp{GET} or @samp{POST}
+methods.  All you need to do is have a template named @file{cgi.tpl}
+handy or specify a different one with a command line option.
+
+However, doing this without disabling the server shell brings
+considerable risk.  If you were to pass user input to a script
+that contained, say, the classic "@samp{`rm -rf /`}", you might have
+a problem.  This configuration option will cause shell template
+commands to simply return the command string as the result.
+No mistakes.  Much safer.  Strongly recommended.
+The default is to have server shell scripting enabled.
+
+Disabling the shell will have some build side effects, too.
+
+@itemize @bullet
+@item
+Many of the make check tests will fail, since they assume
+a working server shell.
+@item
+The getdefs and columns programs are not built.
+The options are distributed as definition files and they
+cannot be expanded with a shell-disabled AutoGen.
+@item
+Similarly, the documentation cannot be regenerated because
+the documentation templates depend on subshell functionality.
+@end itemize
+
+@item --enable-debug
+Turning on AutoGen debugging enables very detailed inspection of
+the input definitions and monitoring shell script processing.
+These options are not particularly useful to anyone not directly
+involved in maintaining AutoGen.  If you do choose to enable AutoGen
+debugging, be aware that the usage page was generated without these
+options, so when the build process reaches the documentation rebuild,
+there will be a failure.  @samp{cd} into the @file{agen5} build
+directory, @samp{make} the @samp{autogen.texi} file and all will
+be well thereafter.
+@end table
+
+@node installing
+@section installing
+@cindex Installing
 
 There are several files that get installed.  The number depend
 whether or not both shared and archive libraries are to be
@@ -1429,8 +1488,9 @@ relative to @code{$prefix}.  You can, of course, use
 @code{configure} to place these files where you wish.
 
 @strong{NB}@:  AutoGen does not contain any compiled-in path names.
-All support directories are located via option processing
-and the environment variable @code{HOME}.
+All support directories are located via option processing,
+the environment variable @code{HOME} or finding the directory where
+the executable came from.
 
 The installed files are:
 
@@ -1993,6 +2053,15 @@ Gives additional information whenever the usage routine is invoked..
 This string is inserted into the .h interface file.  Generally used for
 global variables or @code{#include} directives required by
 @code{flag_code} text and shared with other program text.
+Do not specify your configuration header (@file{config.h}) in this
+attribute or the @code{include} attribute, however.  Instead, use
+@code{config-header}, below.
+
+@cindex config-header
+@item config-header
+The contents of this attribute should be just the name of the configuration
+file.  A "#include" naming this file will be inserted at the top of the
+generated header.
 
 @cindex guile-main
 @item guile-main
@@ -2295,7 +2364,7 @@ default:    /* cannot happen */
 This attribute means the option exists for the purpose of separating
 option description text in the usage output.  Libraries may choose
 to make it settable so that the library can determine which command
-options is the first one that pertains to the library.
+line option is the first one that pertains to the library.
 
 If present, this option disables all other attributes except
 @code{settable}, @code{call_proc} and @code{flag_code}.  @code{settable}
@@ -2409,18 +2478,18 @@ string that starts with @code{f}, @code{F}, @code{n} or @code{N}
 
 @item key[@i{word}]
 The argument must match a specified list of strings.
-Assuming you have named the option, @code{opt-name},
-the strings will be converted into an enumeration of type @code{te_Opt_Name}
-with the values @code{OPT_NAME_KEYWORD}.  If you have @strong{not}
-specified a default value, the value @code{OPT_NAME_UNDEFINED} will be
+Assuming you have named the option, @code{optn-name},
+the strings will be converted into an enumeration of type @code{te_Optn_Name}
+with the values @code{OPTN_NAME_KEYWORD}.  If you have @strong{not}
+specified a default value, the value @code{OPTN_NAME_UNDEFINED} will be
 inserted with the value zero.  The option will be initialized to that
 value.  You may now use this in your code as follows:
 
 @example
-te_Opt_Name opt = OPT_VALUE_OPT_NAME;
+te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
 switch (opt) @{
-case OPT_NAME_UNDEFINED:  /* undefined things */ break;
-case OPT_NAME_KEYWORD:    /* `keyword' things */ break;
+case OPTN_NAME_UNDEFINED:  /* undefined things */ break;
+case OPTN_NAME_KEYWORD:    /* `keyword' things */ break;
 default: /* utterly impossible */ ;
 @}
 @end example
@@ -2432,7 +2501,7 @@ AutoOpts produces a special purpose procedure for this option.
 @item keyword
 If the @code{arg-type} is @code{keyword}, then you must specify the
 list of keywords by a series of @code{keyword} entries.  The interface
-file will contain an enumeration of @code{@i{<OPT_NAME>}_@i{<KEYWORD>}} for
+file will contain an enumeration of @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for
 each keyword entry.
 
 @cindex arg-optional
@@ -3356,8 +3425,8 @@ main( int argc, char** argv )
         @}
         argv += arg_ct;
     @}
-    if (HAVE_OPT(OPT_NAME))
-        respond_to_opt_name();
+    if (HAVE_OPT(OPTN_NAME))
+        respond_to_optn_name();
     ...
 @}
 @end example

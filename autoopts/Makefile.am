@@ -7,14 +7,14 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2001/12/09 19:43:58 $
+## Last Modified:   $Date: 2001/12/24 14:13:33 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-SUBDIRS		= test
+SUBDIRS		= @OPTS_TESTDIR@
 
 MAINTAINERCLEANFILES = Makefile.in
 

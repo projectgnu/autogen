@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
+# Last Modified:     $Date: 2001/12/24 14:13:33 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: error.test,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,8 +23,8 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<'_EOF_'
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<'_EOF_'
 <= AutoGen5 template fnord null =>
 THIS TEXT SHOULD BE DELETED!!
 <=
@@ -47,30 +47,32 @@ _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-cat > $testname.def <<'_EOF_'
+echo creating ${testname}.def
+cat > ${testname}.def <<'_EOF_'
 autogen definitions alist;
-#error The error contains a `#error' directive
+#error The definitions file has a `#error' directive
 _EOF_
 
-# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+# # # # # # # # # # EXPECTED OUTPUT FILE 1 # # # # # # #
 
-echo creating $testname.out1
+echo creating ${testname}.out1
 # this is the output we should expect to see
-cat > $testname.out1 <<'_EOF_'
-#error directive -- The error contains a `#error' directive
+cat > ${testname}.out1 <<'_EOF_'
+autogen ERROR:  The definitions file has a `#error' directive
+	#error directive -- in error.def on line 3
 _EOF_
 
-$AGEXE $testname.def 2> $testname.err1 && failure unexpected success
-grep -v 'Giving up in' $testname.err1 >  $testname.err
-cmp -s  $testname.err  $testname.out1 || \
-  failure "actual->expected `diff -c $testname.err  $testname.out1`"
+echo $AGEXE ${testname}.def
+$AGEXE ${testname}.def 2> ${testname}.err1 && failure unexpected success
+grep -v 'Giving up in' ${testname}.err1 >  ${testname}.err
+cmp -s  ${testname}.err  ${testname}.out1 || \
+  failure "actual->expected `diff -c ${testname}.err  ${testname}.out1`"
 
-# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+# # # # # # # # # # EXPECTED OUTPUT FILE 2 # # # # # # #
 
-echo creating $testname.out2
+echo creating ${testname}.out2
 # this is the output we should expect to see
-cat > $testname.out2 <<_EOF_
+cat > ${testname}.out2 <<_EOF_
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
 DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
@@ -80,13 +82,59 @@ DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
 _EOF_
 
 # this is *supposed* to exit with a failure status
-echo autogen --no-def -T$testname.tpl --base=$testname >&2
-$AGEXE --no-def -T$testname.tpl --base=$testname \
-  2> $testname.err2 \
+echo autogen --no-def -T${testname}.tpl --base=${testname} >&2
+$AGEXE --no-def -T${testname}.tpl --base=${testname} \
+  2> ${testname}.err2 \
   && failure Unexpected success for AutoGen
 
-cmp -s $testname.err2 $testname.out2 || \
-  failure "actual->expected `diff -c $testname.err2 $testname.out2`"
+cmp -s ${testname}.err2 ${testname}.out2 || \
+  failure "actual->expected `diff -c ${testname}.err2 ${testname}.out2`"
+
+# # # # # # # # # # EXPECTED OUTPUT FILE 3 # # # # # # #
+
+echo creating ${testname}.out3
+# this is the output we should expect to see
+cat > ${testname}.out3 <<_EOF_
+AutoGen aborting on signal 15 (Terminated)
+processing template error2.tpl
+            on line 2
+       for function EXPR (11)
+_EOF_
+
+sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `kill -TERM ${AG_pid}` =>,' \
+    < ${testname}.tpl > ${testname}2.tpl
+
+# this is *supposed* to exit with a failure status
+echo autogen --no-def -T${testname}2.tpl --base=${testname} >&2
+$AGEXE --no-def -T${testname}2.tpl --base=${testname} \
+  2> ${testname}.err3 \
+  && failure Unexpected success for AutoGen
+
+cmp -s ${testname}.err3 ${testname}.out3 || \
+  failure "actual->expected `diff -c ${testname}.err3 ${testname}.out3`"
+
+# # # # # # # # # # EXPECTED OUTPUT FILE 4 # # # # # # #
+
+sed 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
+
+echo creating ${testname}.out4
+# this is the output we should expect to see
+cat > ${testname}.out4 <<'_EOF_'
+syntax error:  in error2.def on line 2
+    token in error:  VAR_NAME is broken;
+
+autogen ERROR:  invalid definition token
+
+[[...<error-text>]]  broken;
+
+
+_EOF_
+
+echo $AGEXE ${testname}.def
+$AGEXE ${testname}2.def 2> ${testname}.err4 && failure unexpected success
+grep -v 'Giving up in' ${testname}.err4 >  ${testname}.err
+cmp -s  ${testname}.err  ${testname}.out4 || \
+  failure "actual->expected `diff -c ${testname}.err  ${testname}.out4`"
 
 cleanup
 # end of error.test

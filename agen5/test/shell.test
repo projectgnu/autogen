@@ -9,10 +9,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
+# Last Modified:     $Date: 2001/12/24 14:13:33 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: shell.test,v 3.1 2001/12/24 14:13:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -26,7 +26,7 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > $testname.c <<'_EOF_'
+cat > ${testname}.c <<'_EOF_'
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -52,14 +52,14 @@ main( int argc, char** argv )
   return 0;
 }
 _EOF_
-$CC -o $testname $testname.c
+$CC -o ${testname} ${testname}.c
 
 #  The backslashes are stripped by the here-doc processing
 #
-echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
 <= AutoGen5 template test
-   (setenv "SHELL" "./$testname") =>
+   (setenv "SHELL" "./${testname}") =>
 <=\` echo SHELL=\$SHELL \`=>
 Some <=dummy=> text
 <= FOR foo =>
@@ -71,18 +71,18 @@ sub-shell-str: <=(sub-shell-str (get "foo"))=>
 <=\`   : This is a final test \`=>
 _EOF_
 
-echo creating $testname.def
-cat >$testname.def <<'EOF'
+echo creating ${testname}.def
+cat >${testname}.def <<'EOF'
 AutoGen Definitions shell.tpl;
 
 foo = "'foo' \"foo\" `foo` $foo";
 foo = '\\\'bar\\\' \\"bar\\" \`bar\` \$bar';
 foo = '\\\\\'BAZ\\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ';
 EOF
-echo 'dummy = `echo "mumble"`;' >> $testname.def
+echo 'dummy = `echo "mumble"`;' >> ${testname}.def
 
 # this is the output we should expect to see
-cat > $testname.sample <<'_EOF_'
+cat > ${testname}.sample <<'_EOF_'
 SHELL=$SHELL
 Some mumble text
 
@@ -93,20 +93,20 @@ sub-shell-str: `'foo' "foo" \`foo\` $foo`
 
 foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
 raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
-shell-str:     "\\'bar\\' \\"bar\\" \`bar\` \$bar"
-sub-shell-str: `\\'bar\\' \"bar\" \\`bar\\` \$bar`
+shell-str:     "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
+sub-shell-str: `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
 
 foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
 raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
-shell-str:     "\\\\'BAZ\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ"
-sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\`BAZ\\\\` \\\$BAZ`
+shell-str:     "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
+sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
 
 : This is a final test
 _EOF_
 
-$AGEXE $testname.def || failure "$AGEXE $testname.def"
-cmp -s $testname.test $testname.sample || \
-    failure "`diff -c $testname.test $testname.sample`"
+$AGEXE ${testname}.def || failure "$AGEXE ${testname}.def"
+cmp -s ${testname}.test ${testname}.sample || \
+    failure "`diff -c ${testname}.test ${testname}.sample`"
 
 cleanup
 # end of for.test

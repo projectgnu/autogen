@@ -120,7 +120,7 @@ tSCC zBogus[]     = "** OUT-OF-RANGE **";
 tSCC zStInit[]    = "init";
 tSCC zEvInvalid[] = "* Invalid Event *";
 tSCC zFsmErr[]    =
-    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
+    "in state %d (%s), event %d (%s) is invalid\n";
 
 tSCC zStName[] = "name";
 tSCC zStValue[] = "value";
@@ -157,10 +157,7 @@ int
 cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
 {
     /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-    static const char zOops[] =
-        "Content-type: text/plain\n\n"
-        "Form processing error:\n";
-    fputs( zOops, stderr );
+    AG_ABEND_START( "cgi_invalid_transition" );
     fprintf( stderr, zFsmErr, st, CGI_STATE_NAME( st ),
              evt, CGI_EVT_NAME( evt ));
     AG_ABEND;

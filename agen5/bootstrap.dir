@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/10 03:48:27 $
+# Last Modified:     $Date: 2001/12/24 14:13:32 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.1 2001/12/10 03:48:27 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.2 2001/12/24 14:13:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -271,12 +271,14 @@ do
       echo "Reconstructing expr.h and expr.ini requires ksh.  Giving up."
       exit 1
     fi
+
+    #  funcCase.c must be first file in list.
+    #
     AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd` ; export AUTOGEN_TEMPL_DIRS
-    eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
-    eopt="$eopt defs=gfunc templ=snarf srcfile assign=two-phase=yes"
+    eopt="defs=gfunc templ=snarf srcfile assign=two-phase=yes"
     eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
     echo ${GD} $eopt exp*.c func*.c
-    ( SHELL=ksh ${GD} $eopt exp*.c func*.c 2>&1 ) > stamp-exprini
+    ( SHELL=ksh ${GD} $eopt func*.c exp*.c 2>&1 ) > stamp-exprini
     egrep -v 'no copies of pattern' stamp-exprini || :
     date > stamp-exprini
     ;;

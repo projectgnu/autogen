@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: autogen.h,v 3.1 2001/12/24 14:13:32 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -61,7 +61,13 @@ typedef enum {
     procState = PROC_STATE_ABORTING; \
     longjmp( fileAbort, FAILURE ) )
 
-#define LOAD_ABORT( pT, pM, m ) STMTS( \
+#define AG_ABEND_START(s) \
+    fprintf( stderr, zErrorPfx, pzOopsPrefix, (s) )
+
+#define AG_ABEND_STR(s)  STMTS( \
+    AG_ABEND_START( s ); AG_ABEND; )
+
+#define LOAD_ABORT( pT, pM, m ) STMTS( AG_ABEND_START( m ); \
     if (procState >= PROC_STATE_LIB_LOAD) \
         fprintf( stderr, zTplErr, (pT)->pzFileName, (pM)->lineNo, m ); \
     AG_ABEND )
@@ -256,6 +262,7 @@ struct for_state {
 MODE teProcState procState        VALUE( PROC_STATE_INIT );
 MODE char*       pzTemplFileName  VALUE( (char*)NULL );
 MODE tTemplate*  pNamedTplList    VALUE( (tTemplate*)NULL );
+MODE tCC*        pzOopsPrefix     VALUE( "" );
 
 /*
  *  Template Processing Globals
@@ -328,12 +335,14 @@ MODE size_t      defineDataSize   VALUE( 0 );
 #define MKSTRING( name, val ) \
         MODE const char z ## name[ sizeof( val )] VALUE( val )
 
-MKSTRING( AllocErr,  "%s ERROR:  Couldn't allocate a %d byte %s\n" );
-MKSTRING( Cannot,    "%s ERROR %d: cannot %s %s:  %s\n" );
-MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
+MKSTRING( ErrorPfx,  "%sautogen ERROR:  %s\n" );
+MKSTRING( AllocWhat, "\ta %d byte %s\n" );
+MKSTRING( AllocErr,  "Allocation Failure" );
+MKSTRING( Cannot,    "\t%d: cannot %s %s:  %s\n" );
 MKSTRING( TplErr,    "Error in template %s, line %d\n\t%s\n" );
 MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
 MKSTRING( FileLine,  "\tfrom %s line %d\n" );
+MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 #ifdef DEBUG
 MKSTRING( GiveUp,    "Giving up in %s line %d\n" );
 #endif

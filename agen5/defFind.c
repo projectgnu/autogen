@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.1 2001/12/10 03:44:35 bkorb Exp $
+ *  $Id: defFind.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -35,13 +35,21 @@ struct defEntryList {
 };
 typedef struct defEntryList tDefEntryList;
 
-tSCC zInvalRef[]  = "invalid reference";
-tSCC zIllFormed[] = "Ill-formed segmented name:  ``%s''\n";
-tSCC zNoRoom[]    = "No room to canonicalize ``%s''\n";
+tSCC zNameRef[]   = "``%s'' in %s line %d\n";
 
 tSC zDefinitionName[ MAXPATHLEN ];
 
 STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
+
+
+STATIC void
+illFormedName( void )
+{
+    AG_ABEND_START( "Ill-formed segmented name" );
+    fprintf( stderr, zNameRef, zDefinitionName,
+             pCurTemplate->pzFileName, pCurMacro->lineNo );
+    AG_ABEND;
+}
 
 
 STATIC tDefEntry*
@@ -166,11 +174,12 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
 
 
 STATIC size_t
-badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
+badName( char* pzD, const char* pzS, size_t srcLen )
 {
     memcpy( (void*)pzD, (void*)pzS, srcLen );
     pzD[ srcLen ] = NUL;
-    fprintf( stderr, pzFmt, pzD );
+    fprintf( stderr, zNameRef, pzD,
+             pCurTemplate->pzFileName, pCurMacro->lineNo );
     return srcLen + 1;
 }
 
@@ -238,7 +247,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
     switch (state) {
     case CN_START_NAME:
         if (! isalpha( *pzS ))
-            return badName( zIllFormed, pzDst, pzOri, stLen );
+            return badName( pzDst, pzOri, stLen );
         state = CN_NAME_ENDED;  /* we found the start of our first name */
         break;  /* fall through to name/number consumption code */
 
@@ -261,7 +270,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
         }
 
         if (--srcLen <= 0)
-            return badName( zIllFormed, pzDst, pzOri, stLen );
+            return badName( pzDst, pzOri, stLen );
         goto nextSegment;
 
     case CN_INDEX:
@@ -292,7 +301,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
          */
         if (*pzS == '$') {
             if (--srcLen < 0)
-                return badName( zIllFormed, pzDst, pzOri, stLen );
+                return badName( pzDst, pzOri, stLen );
 
             *(pzD++) = *(pzS++);
             goto nextSegment;
@@ -304,7 +313,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
          *  Nothing else is okay.
          */
         if ((*(pzD++) = *(pzS++)) != ']')
-            return badName( zIllFormed, pzDst, pzOri, stLen );
+            return badName( pzDst, pzOri, stLen );
 
         if (--srcLen <= 0) {
             *pzD = NUL;
@@ -468,10 +477,8 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
          *  We must find the closing brace, or there is an error
          */
         pcBrace = strchr( pcBrace, ']' );
-        if (pcBrace == (char*)NULL) {
-            fprintf( stderr, zIllFormed, zDefinitionName );
-            AG_ABEND;
-        }
+        if (pcBrace == (char*)NULL)
+            illFormedName();
 
         /*
          *  IF we are at the end of the definition,
@@ -485,8 +492,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
             break;
 
         default:
-            fprintf( stderr, zIllFormed, zDefinitionName );
-            AG_ABEND;
+            illFormedName();
         }
         /* FALLTHROUGH */
 
@@ -500,8 +506,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
         break;
 
     default:
-        fprintf( stderr, zIllFormed, zDefinitionName );
-        AG_ABEND;
+        illFormedName();
     }
 
     /*
@@ -600,12 +605,8 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
              *  then we cannot "change definition levels"
              */
         not_found:
-            if (defList.nestLevel != 0) {
-                tSCC z[] =
-                    "reached ROOT def resolving last subcomponent:  `%s'\n";
-                fprintf( stderr, z, zDefinitionName );
-                AG_ABEND;
-            }
+            if (defList.nestLevel != 0)
+                illFormedName();
 
             /*
              *  Don't bother returning zero entry list.  Just return NULL.
@@ -668,10 +669,8 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
          *  We must find the closing brace, or there is an error
          */
         pcBrace = strchr( pcBrace, ']' );
-        if (pcBrace == (char*)NULL) {
-            fprintf( stderr, zIllFormed, zDefinitionName );
-            AG_ABEND;
-        }
+        if (pcBrace == (char*)NULL)
+            illFormedName();
 
         /*
          *  IF we are at the end of the definition,
@@ -685,8 +684,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
             break;
 
         default:
-            fprintf( stderr, zIllFormed, zDefinitionName );
-            AG_ABEND;
+            illFormedName();
         }
         /* FALLTHROUGH */
 
@@ -700,8 +698,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
         break;
 
     default:
-        fprintf( stderr, zIllFormed, zDefinitionName );
-        AG_ABEND;
+        illFormedName();
     }
 
     /*
@@ -748,5 +745,6 @@ findEntryList( char* pzName )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of defFind.c */
