@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.24 2000/03/19 22:09:33 bruce Exp $
+## $Id: Makefile.am,v 2.25 2000/03/23 02:57:18 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS	= getdefs
@@ -36,6 +36,8 @@ opts.c opts.h : opts.def
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/getdefs/opts.def
+
+getdefs.o : opts.h
 
 getdefs.menu getdefs.texi : opts.def getdefs
 	top_builddir=$(top_builddir) \

@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.24 2000/03/19 22:11:47 bruce Exp $
+## $Id: Makefile.am,v 1.25 2000/03/23 02:57:18 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -35,6 +35,8 @@ opts.c opts.h: opts.def
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/columns/opts.def
+
+columns.o : opts.h
 
 columns.menu columns.texi : opts.def columns
 	top_builddir=$(top_builddir) \
