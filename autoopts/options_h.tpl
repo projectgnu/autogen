@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.13 2003/03/08 21:19:52 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.14 2003/07/04 15:12:22 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -35,29 +35,30 @@ h=options.h
  *  for "opt_name" are available.
  */
 
-#define OPTST_INIT         0x00000  /* Initial compiled value            */
-#define OPTST_SET          0x00001  /* Set via the "SET_OPT()" macro     */
-#define OPTST_PRESET       0x00002  /* Set via an RC/INI file            */
-#define OPTST_DEFINED      0x00004  /* Set via a command line option     */
-#define OPTST_SET_MASK     0x0000F  /* mask of flags that show set state */
+#define OPTST_INIT         0x000000  /* Initial compiled value            */
+#define OPTST_SET          0x000001  /* Set via the "SET_OPT()" macro     */
+#define OPTST_PRESET       0x000002  /* Set via an RC/INI file            */
+#define OPTST_DEFINED      0x000004  /* Set via a command line option     */
+#define OPTST_SET_MASK     0x000007  /* mask of flags that show set state */
 
-#define OPTST_EQUIVALENCE  0x00010  /* selected by equiv'ed option       */
-#define OPTST_DISABLED     0x00020  /* option is in disabled state       */
+#define OPTST_EQUIVALENCE  0x000010  /* selected by equiv'ed option       */
+#define OPTST_DISABLED     0x000020  /* option is in disabled state       */
 
-#define OPTST_NO_INIT      0x00100  /* option cannot be preset           */
-#define OPTST_NUMBER_OPT   0x00200  /* opt value (flag) is any digit     */
-#define OPTST_STACKED      0x00400  /* opt uses stackOptArg procedure    */
-#define OPTST_INITENABLED  0x00800  /* option defaults to enabled        */
-#define OPTST_ENUMERATION  0x01000  /* opt arg is an enum (keyword list) */
-#define OPTST_BOOLEAN      0x02000  /* opt arg is boolean-valued         */
-#define OPTST_NUMERIC      0x04000  /* opt arg has numeric value         */
-#define OPTST_DOCUMENT     0x08000  /* opt is for documentation only     */
-#define OPTST_IMM          0x10000  /* process option on first pass      */
-#define OPTST_DISABLE_IMM  0x20000  /* process disablement on first pass */
-#define OPTST_OMITTED      0x40000  /* compiled out of program           */
-#define OPTST_MUST_SET     0x80000  /* must be set or pre-set            */
+#define OPTST_NO_INIT      0x000100  /* option cannot be preset           */
+#define OPTST_NUMBER_OPT   0x000200  /* opt value (flag) is any digit     */
+#define OPTST_STACKED      0x000400  /* opt uses stackOptArg procedure    */
+#define OPTST_INITENABLED  0x000800  /* option defaults to enabled        */
+#define OPTST_ENUMERATION  0x001000  /* opt arg is an enum (keyword list) */
+#define OPTST_BOOLEAN      0x002000  /* opt arg is boolean-valued         */
+#define OPTST_NUMERIC      0x004000  /* opt arg has numeric value         */
+#define OPTST_DOCUMENT     0x008000  /* opt is for documentation only     */
+#define OPTST_IMM          0x010000  /* process option on first pass      */
+#define OPTST_DISABLE_IMM  0x020000  /* process disablement on first pass */
+#define OPTST_OMITTED      0x040000  /* compiled out of program           */
+#define OPTST_MUST_SET     0x080000  /* must be set or pre-set            */
+#define OPTST_MEMBER_BITS  0x100000  /* opt arg sets set membership bits  */
 
-#define OPTST_PERSISTENT  0xFFFF00  /* mask of flags that do not change  */
+#define OPTST_PERSISTENT   0xFFFF00  /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.12 2003/05/06 02:14:25 bkorb Exp $
+# $Id: optmain.tpl,v 3.13 2003/07/04 15:12:22 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -166,7 +166,7 @@ DEFINE declare-option-callbacks      =][=
           ELSE                  =]stackOptArg[=
           ENDIF                 =][=
 
-      ELIF (=* (get "arg-type") "key")  =]
+      ELIF (~* (get "arg-type") "key|set")  =]
 static tOptProc doOpt[=(. cap-name)  =];[=
       ENDIF                     =][=
 
@@ -333,11 +333,11 @@ DEFINE define-option-callbacks  =][=
       ENDIF =]
 }[=
 
-  IF (. make-test-main) =]
+      IF (. make-test-main) =]
 
 #endif /* ! defined [= (. main-guard) =] */[=
 
-  ENDIF =][=
+      ENDIF =][=
 
 
     ELIF (=* (get "arg-type") "key") =][=
@@ -356,7 +356,7 @@ DEFINE define-option-callbacks  =][=
     };
 [=
 
-    IF (exist? "arg-optional") =]
+      IF (exist? "arg-optional") =]
     if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)[=
          (string-append UP-name "_"    (if (> (len "arg-optional") 0)
@@ -364,11 +364,27 @@ DEFINE define-option-callbacks  =][=
             (up-c-name "arg-default")
             "UNDEFINED"  ))) =];
     else[=
-    ENDIF =]
+      ENDIF =]
     pOptDesc->pzLastArg =
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=
         (+ (count "keyword") (if (exist? "arg-default") 0 1)) =] );
 }[=
+
+
+    ELIF (=* (get "arg-type") "set") =][=
+
+      invoke callback-proc-header
+=]    tSCC* azNames[] = {
+[=(shellf
+  "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+          (join "\n" (stack "keyword")) )=]
+    };
+    pOptDesc->pzLastArg =
+        optionSetMembers( pOptions, pOptDesc, azNames, [=
+        (count "keyword") =] );
+}[=
+
+
     ENDIF       =][=
   ENDFOR flag   =]
 [=

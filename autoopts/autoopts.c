@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.25 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: autoopts.c,v 3.26 2003/07/04 15:12:22 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -393,7 +393,13 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
      *  Note the kind of flag/option marker
      */
     if (*((pOpts->pzCurOpt)++) != '-')
-        return PROBLEM; /* NORMAL COMPLETION - rest are args */
+        return PROBLEM; /* NORMAL COMPLETION - this + rest are operands */
+
+    /*
+     *  Special hack for a hyphen by itself
+     */
+    if (*(pOpts->pzCurOpt) == NUL)
+        return PROBLEM; /* NORMAL COMPLETION - this + rest are operands */
 
     /*
      *  The current argument is to be processed as an option argument
@@ -406,8 +412,15 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
      */
     if (pOpts->pzCurOpt[0] == '-') {
         if (*++(pOpts->pzCurOpt) == NUL)
-            return PROBLEM; /* NORMAL COMPLETION */
+            /*
+             *  NORMAL COMPLETION - NOT this arg, but rest are operands
+             */
+            return PROBLEM;
 
+        /*
+         *  We do not allow the hyphen to be used as a flag value.
+         *  Therefore, if long options are not to be accepted, we punt.
+         */
         if ((pOpts->fOptSet & OPTPROC_LONGOPT) == 0) {
             fprintf( stderr, zIllOptStr, pOpts->pzProgPath,
                      zIllegal, pOpts->pzCurOpt-2 );

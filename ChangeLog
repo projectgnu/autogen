@@ -1,3 +1,21 @@
+2003-07-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: do not double backslashes in man page text
+	* autoopts/autoopts.m4: fix syntax for config tests
+	* autoopts/enumeration.c(findName): common code for both
+	optionEnumerationVal and optionSetMembers (new procedure)
+	* opt*.tpl: implement set-membership option type
+	* autoopts/restore.c(optionFree): only deallocate optCookie if
+	the OPTST_STACKED bit is set.
+	* autoopts/save.c(optionSaveFile): handle options with member bits
+
+2003-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(findOptDesc): a hyphen by itself must be treated
+	as an operand.
+	* config/bootstrap.local(LANG): unset the thing.  It interferes with
+	proper bootstrapping.
+
 2003-06-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expMake.c(ag_scm_makefile_script): if we are supplying a start

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.14 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: enumeration.c,v 3.15 2003/07/04 15:12:22 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -81,8 +81,54 @@ enumError( pOpts, pOD, paz_names, name_ct )
 }
 
 
+static uintptr_t
+findName(
+    tCC*          pzName,
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC**         paz_names,
+    unsigned int  name_ct )
+{
+    uintptr_t     res = name_ct;
+    size_t        len = strlen( (char*)pzName );
+    uintptr_t     idx;
+    /*
+     *  Look for an exact match, but remember any partial matches.
+     *  Multiple partial matches means we have an ambiguous match.
+     */
+    for (idx = 0; idx < name_ct; idx++) {
+        if (strncmp( (char*)paz_names[idx], (char*)pzName, len ) == 0) {
+            if (paz_names[idx][len] == NUL)
+                return idx;  /* full match */
+
+            if (res != name_ct) {
+                pz_enum_err_fmt = "%s error:  the keyword `%s' is ambiguous\n";
+                option_usage_fp = stderr;
+                enumError( pOpts, pOD, paz_names, name_ct );
+            }
+            res = idx; /* save partial match */
+        }
+    }
+
+    /*
+     *  no partial match -> error
+     */
+    if (res == name_ct) {
+        pz_enum_err_fmt = "%s error:  `%s' does not match any keywords\n";
+        option_usage_fp = stderr;
+        enumError( pOpts, pOD, paz_names, name_ct );
+    }
+
+    /*
+     *  Return the matching index as a char* pointer.
+     *  The result gets stashed in a char* pointer, so it will have to fit.
+     */
+    return res;
+}
+
+
 /*=export_func  optionEnumerationVal
- * what:  put the option state into Guile symbols
+ * what:  Convert between enumeration values and strings
  * private:
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
@@ -139,37 +185,157 @@ optionEnumerationVal(
         break;
     }
 
-    len = strlen( pOD->pzLastArg );
+    return (char*)findName( pOD->pzLastArg, pOpts, pOD, paz_names, name_ct );
+}
 
+
+/*=export_func  optionSetMembers
+ * what:  Convert between bit flag values and strings
+ * private:
+ *
+ * arg:   tOptions*,     pOpts,     the program options descriptor
+ * arg:   tOptDesc*,     pOD,       enumeration option description
+ * arg:   tCC**,         paz_names, list of enumeration names
+ * arg:   unsigned int,  name_ct,   number of names in list
+ *
+ * ret_type:  char*
+ * ret_desc:  the enumeration value cast as a char*
+ *
+ * doc:   This converts the pzLastArg string from the option description
+ *        into the index corresponding to an entry in the name list.
+ *        This will match the generated enumeration value.
+ *        Full matches are always accepted.  Partial matches are accepted
+ *        if there is only one partial match.
+=*/
+char*
+optionSetMembers(
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC**         paz_names,
+    unsigned int  name_ct )
+{
     /*
-     *  Look for an exact match, but remember any partial matches.
-     *  Multiple partial matches means we have an ambiguous match.
+     *  IF the program option descriptor pointer is invalid,
+     *  then it is some sort of special request.
      */
-    for (idx = 0; idx < name_ct; idx++) {
-        if (strncmp( paz_names[idx], pOD->pzLastArg, len ) == 0) {
-            if (paz_names[idx][len] == NUL)
-                return (char*)idx;  /* full match */
-
-            if (res != name_ct) {
-                pz_enum_err_fmt = "%s error:  the keyword `%s' is ambiguous\n";
-                option_usage_fp = stderr;
-                enumError( pOpts, pOD, paz_names, name_ct );
-            }
-            res = idx; /* save partial match */
-        }
-    }
-
-    if (res == name_ct) {
-        pz_enum_err_fmt = "%s error:  `%s' does not match any keywords\n";
-        option_usage_fp = stderr;
+    switch ((uintptr_t)pOpts) {
+    case 0UL:
+        /*
+         *  print the list of enumeration names.
+         */
         enumError( pOpts, pOD, paz_names, name_ct );
+        return (char*)0UL;
+
+    case 1UL:
+    {
+        /*
+         *  print the name string.
+         */
+        uintptr_t bits = (uintptr_t)pOD->optCookie;
+        uintptr_t res  = 0;
+        size_t    len  = 0;
+
+        while (bits != 0) {
+            if (bits & 1) {
+                if (len++ > 0) fputs( " | ", stdout );
+                fputs( paz_names[ res ], stdout );
+            }
+            if (++res >= name_ct) break;
+            bits >>= 1;
+        }
+        return NULL;
     }
 
-    /*
-     *  Return the matching index as a char* pointer.
-     *  The result gets stashed in a char* pointer, so it will have to fit.
-     */
-    return (char*)res;
+    case 2UL:
+    {
+        char*     pz;
+        char*     pzRes;
+        uintptr_t bits = (uintptr_t)pOD->optCookie;
+        uintptr_t res  = 0;
+        size_t    len  = 0;
+
+        /*
+         *  Replace the enumeration value with the name string.
+         *  First, determine the needed length, then allocate and fill in.
+         */
+        while (bits != 0) {
+            if (bits & 1)
+                len += strlen( paz_names[ res ]) + 3;
+            if (++res >= name_ct) break;
+            bits >>= 1;
+        }
+        pzRes = pz = malloc( len );
+        bits = (uintptr_t)pOD->optCookie;
+        res = 0;
+        while (bits != 0) {
+            if (bits & 1) {
+                if (pz != pzRes) {
+                    strcpy( pz, " + " );
+                    pz += 3;
+                }
+                strcpy( pz, paz_names[ res ]);
+                pz += strlen( paz_names[ res ]);
+            }
+            if (++res >= name_ct) break;
+            bits >>= 1;
+        }
+        return pzRes;
+    }
+
+    default:
+        break;
+    }
+
+    {
+        char*     pzArg = pOD->pzLastArg;
+        uintptr_t res = (uintptr_t)pOD->optCookie;
+        if ((pzArg == NULL) || (*pzArg == NUL))
+            return (pOD->optCookie = NULL);
+
+        for (;;) {
+            tSCC zSpn[] = " ,|+\t\r\f\n";
+            char ch;
+            int  iv, len;
+
+            pzArg += strspn( pzArg, zSpn );
+            iv = (*pzArg == '!');
+            if (iv)
+                pzArg += strspn( pzArg+1, zSpn ) + 1;
+
+            len = strcspn( pzArg, zSpn );
+            if (len == 0)
+                break;
+            ch = pzArg[len];
+            pzArg[len] = NUL;
+
+            if ((len == 3) && (strcmp( pzArg, "all" ) == 0)) {
+                res = ~0;
+            }
+            else if ((len == 4) && (strcmp( pzArg, "none" ) == 0)) {
+                res = 0;
+            }
+            else {
+                uintptr_t bit = 1UL
+                    << findName(pzArg, pOpts, pOD, paz_names, name_ct);
+
+                if (iv)
+                     res &= ~bit;
+                else res |= bit;
+            }
+
+            if (ch == NUL)
+                break;
+            pzArg += len;
+            *(pzArg++) = ch;
+        }
+        pOD->optCookie = (void*)res;
+
+        /*
+         *  Return the matching index as a char* pointer.
+         *  The result gets stashed in a char* pointer, so it will have to fit.
+         */
+        return (char*)res;
+    }
 }
 
 /*

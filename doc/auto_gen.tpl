@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.19 2003/05/31 23:15:06 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.20 2003/07/04 15:12:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -18,9 +18,9 @@ texi=autogen.texi
 (setenv "SHELL" "/bin/sh")
 
 (define texi-file-source (shell "
-    tempdir=`mktemp -d -sd ./.ag- 2>/dev/null`
+    tempdir=`mktemp -d ./.ag-XXXXXX 2>/dev/null`
     [ -z \"${tempdir}\" ] && tempdir=.ag-$$.dir
-    [ -d ${tempdir} ] || mkdir ${tempdir}
+    [ -d ${tempdir} ] || mkdir ${tempdir} || kill -TERM ${AG_pid}
     if [ -f autogen.texi ]
     then
       mv -f autogen.texi autogen.texi.ori

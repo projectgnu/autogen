@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.18 2003/05/31 23:15:06 bkorb Exp $
+#$Id: optcode.tpl,v 3.19 2003/07/04 15:12:22 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -46,7 +46,7 @@ extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
     (set-flag-names)                 =][=
 
     CASE arg-type                    =][=
-    =*  key                          =][=
+    ~*  key|set                      =][=
         (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
     =*  bool                         =][=
     =*  num                          =][=
@@ -147,7 +147,7 @@ IF (or (exist? "flag.flag-code")
        (exist? "flag.extract-code")
        (exist? "flag.call-proc")
        (exist? "flag.arg-range")
-       (match-value? =* "flag.arg-type" "key") ) =][=
+       (match-value? ~* "flag.arg-type" "key|set") ) =][=
 
   invoke declare-option-callbacks  =][=
 
@@ -385,7 +385,7 @@ doUsageOpt(
 IF (or (exist? "flag.flag-code")
        (exist? "flag.extract-code")
        (exist? "flag.arg-range")
-       (match-value? =* "flag.arg-type" "key")) =][=
+       (match-value? ~* "flag.arg-type" "key|set")) =][=
 
   invoke  define-option-callbacks  =][=
 

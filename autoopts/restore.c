@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.7 2003/05/26 03:14:59 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.8 2003/07/04 15:12:22 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -150,7 +150,7 @@ optionFree( pOpts )
         tOptDesc* p = pOpts->pOptDesc;
         int ct = pOpts->optCt;
         do  {
-            if (p->optCookie != NULL) {
+            if ((p->fOptState & OPTST_STACKED) && (p->optCookie != NULL)) {
                 AGFREE( p->optCookie );
                 p->fOptState &= OPTST_PERSISTENT;
                 if ((p->fOptState & OPTST_INITENABLED) == 0)

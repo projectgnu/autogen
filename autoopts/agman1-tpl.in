@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-05-05 18:02:12 bkorb"
+## Time-stamp:      "2003-06-12 06:36:27 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.21 2003/05/06 02:14:25 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.22 2003/07/04 15:12:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -139,7 +139,7 @@ This manual page documents, briefly, the \fB[+:
 
 IF (exist? "prog-man-descrip")   :+][+:
   FOR prog-man-descrip "\n.PP\n" :+][+:
-    (string-substitute (get "prog-man-descrip") "\\" "\\\\") :+][+:
+    prog-man-descrip             :+][+:
   ENDFOR                         :+][+:
 ELIF (exist? "detail")           :+][+:
   FOR detail  "\n.PP\n"          :+][+:

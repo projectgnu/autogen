@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.13 2003/05/26 03:14:59 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.14 2003/07/04 15:12:22 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -323,8 +323,8 @@ printEntry( fp, p, pzLA )
  * and do nothing.  If the output file cannot be created or updated, a message
  * will be printed to @code{stderr} and the routine will return.
 =*/
-#define ARGTYPE \
-  (OPTST_NUMERIC | OPTST_STACKED | OPTST_ENUMERATION | OPTST_BOOLEAN )
+#define ARGTYPE (OPTST_NUMERIC \
+  | OPTST_STACKED | OPTST_ENUMERATION | OPTST_MEMBER_BITS | OPTST_BOOLEAN )
 
 void
 optionSaveFile( pOpts )
@@ -435,15 +435,29 @@ optionSaveFile( pOpts )
 
             case OPTST_ENUMERATION:
             {
-                uintptr_t enumVal = (uintptr_t)(p->pzLastArg);
+                char* val = p->pzLastArg;
                 /*
                  *  This is a magic incantation that will convert the
                  *  enumeration value back into a string suitable for printing.
-                 *  We restore the numeric value after printing.
                  */
                 (*(p->pOptProc))( (tOptions*)2UL, p );
                 printEntry( fp, p, p->pzLastArg );
-                p->pzLastArg = (char*)enumVal;
+                p->pzLastArg = val;
+                break;
+            }
+
+            case OPTST_MEMBER_BITS:
+            {
+                char* val = p->pzLastArg;
+                /*
+                 *  This is a magic incantation that will convert the
+                 *  bit flag values back into a string suitable for printing.
+                 */
+                (*(p->pOptProc))( (tOptions*)2UL, p );
+                printEntry( fp, p, p->pzLastArg );
+                if (p->pzLastArg != NULL)
+                    free( p->pzLastArg ); /* bit flag strings get allocated */
+                p->pzLastArg = val;
                 break;
             }
 

@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.3 2002/10/27 04:59:01 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.4 2003/07/04 15:12:22 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:
@@ -104,10 +104,10 @@ main ()
     }
 
     strcpy(tmp_version, optionVersion());
-    if (sscanf(tmp_version, "%d:%d:%d", &autoopts_current,
+    if (sscanf(tmp_version, "%d.%d.%d", &autoopts_current,
 	       &autoopts_revision, &autoopts_age) != 3)
     {
-        printf("%s, bad version string\n", optionVersion);
+        printf("%s, bad version string\n", optionVersion());
         exit(1);
     }
 

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.10 2003/05/18 17:09:27 bkorb Exp $
+# $Id: optlib.tpl,v 3.11 2003/07/04 15:12:22 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -40,7 +40,7 @@ DEFINE set-defines set-desc set-index opt-state =]
          (exist? "flag-proc")
          (exist? "arg-range")
          (exist? "stack_arg")
-         (~* (get "arg-type") "key|num|bool" ) )   =]; \
+         (~* (get "arg-type") "set|key|num|bool" ) )   =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                            (. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
@@ -123,7 +123,9 @@ DEFINE Option_Defines      =][=
     ENDIF ifdef/ifndef     =][=
   ENDIF =][=
 
-  IF (=* (get "arg-type") "key") =]
+  CASE (get "arg-type")    =][=
+
+  =*   key                 =]
 typedef enum {[=
          IF (not (exist? "arg-default")) =] [=
             (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
@@ -133,7 +135,20 @@ typedef enum {[=
           (string-upcase! (string->c-name! (join " " (stack "keyword"))))
           (string-append UP-prefix UP-name) )=]
 } te_[=(string-append Cap-prefix cap-name)=];[=
-  ENDIF
+
+  =*   set                 =][=
+
+    (define full-prefix (string-append UP-prefix UP-name) )  =][=
+
+    FOR    keyword   =][=
+
+      (sprintf "\n#define %-31s 0x%08X"
+         (string-append full-prefix "_" (string-upcase! (get "keyword")))
+         (ash 1 (for-index))  ) =][=
+
+    ENDFOR keyword   =][=
+
+  ESAC  (get "arg-type")
 
 =]
 #define VALUE_[=(sprintf "%-18s" opt-name)=] [=
@@ -151,14 +166,20 @@ typedef enum {[=
 
   CASE arg-type  =][=
 
-  =*  num        =]
+  ~*  num        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(long*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
+                 =] (*(unsigned long*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
 
   =*  key        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] (*(te_[=(string-append Cap-prefix cap-name)
                           =]*)(&[= (. OPT-pfx) =]ARG([=(. UP-name)=])))[=
+
+  =*  set        =]
+#define [=(sprintf
+   "%1$sVALUE_%2$-14s (uintptr_t)(%3$sDESC(%2$s).optCookie)"
+   OPT-pfx UP-name UP-prefix)
+                 =][=
 
   =*  bool       =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
@@ -284,6 +305,14 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
                     (up-c-name "arg-default")) =][=
           ENDIF =])[=
 
+       =* set                   =]
+#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
+         =]((tCC*)[=
+         FOR    arg-default  |  =][=
+           (string-append UP-prefix UP-name "_"
+                   (string-upcase! (get "arg-default")) )  =][=
+         ENDFOR arg-default     =])[=
+
        =* str                   =]
 tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
          =]= [=(kr-string (get "arg-default"))=];[=
@@ -316,6 +345,7 @@ static const int
          =*   num       =]OPTST_NUMERIC | [=
          =*   bool      =]OPTST_BOOLEAN | [=
          =*   key       =]OPTST_ENUMERATION | [=
+         =*   set       =]OPTST_MEMBER_BITS | [=
          ESAC           =][=
          stack-arg      "OPTST_STACKED | "     =][=
          immediate      "OPTST_IMM | "         =][=
@@ -473,7 +503,7 @@ DEFINE Option_Descriptor =][=
            CASE arg-type  =][=
            =*   bool      =]optionBooleanVal[=
            =*   num       =]optionNumericVal[=
-           =*   key       =]doOpt[=(. cap-name)=][=
+           ~*   key|set   =]doOpt[=(. cap-name)=][=
            *              =]NULL[=
            ESAC           =][=
          ENDIF=],

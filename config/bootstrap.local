@@ -7,7 +7,7 @@
 # Time-stamp:        "2002-12-10 21:49:09 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.10 2002/12/14 16:02:38 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.11 2003/07/04 15:12:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -120,6 +120,7 @@ pre )
     fi
     export byacc
 
+    unset LANG || LANG=''
     if grep '==ADD_CONFIG_FILES==' ${config_file} > /dev/null
     then
       exec 4> configure.files
