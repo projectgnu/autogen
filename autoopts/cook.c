@@ -1,7 +1,7 @@
 
 /*
- *  $Id: cook.c,v 4.1 2005/02/14 14:09:54 bkorb Exp $
- *  Time-stamp:      "2005-02-13 14:44:52 bkorb"
+ *  $Id: cook.c,v 4.2 2005/02/14 16:18:25 bkorb Exp $
+ *  Time-stamp:      "2005-02-14 07:58:28 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -60,6 +60,7 @@
  * what:  escape-process a string fragment
  * arg:   + const char* + pzScan  + points to character after the escape +
  * arg:   + char*       + pRes    + Where to put the result byte +
+ * arg:   + char        + nl_ch   + replacement char if scanned char is \n +
  *
  * ret-type: unsigned int
  * ret-desc: The number of bytes consumed processing the escaped character.
@@ -72,39 +73,37 @@
  *  scan pointer (passed in).  The default is to just pass through the
  *  escaped character and advance the scan by one.
  *
+ *  Some applications need to keep an escaped newline, others need to
+ *  suppress it.  This is accomplished by supplying a '\n' replacement
+ *  character that is different from \n, if need be.  For example, use
+ *  0x7F and never emit a 0x7F.
+ *
  * err:  @code{NULL} is returned if the string(s) is/are mal-formed.
 =*/
 unsigned int
-ao_string_cook_escape_char( const char* pzIn, char* pRes )
+ao_string_cook_escape_char( const char* pzIn, char* pRes, char nl )
 {
     unsigned int  res = 1;
 
     switch (*pRes = *pzIn++) {
     case NUL:         /* NUL - end of input string */
-    case '\n':        /* NL  - Omit newline        */
         return 0;
+    case '\r':
+        if (*pzIn != '\n')
+            return 1;
+        res++;
+        /* FALLTHROUGH */
+    case '\n':        /* NL  - emit newline        */
+        *pRes = nl;
+        return res;
 
-    case 't':
-        *pRes = '\t'; /* TAB */
-        break;
-    case 'n':
-        *pRes = '\n'; /* NEWLINE (LineFeed) */
-        break;
-    case 'f':
-        *pRes = '\f'; /* FormFeed (NewPage) */
-        break;
-    case 'r':
-        *pRes = '\r'; /* Carriage Return    */
-        break;
-    case 'v':
-        *pRes = '\v'; /* Vertical Tab       */
-        break;
-    case 'b':
-        *pRes = '\b'; /* backspace          */
-        break;
-    case 'a':
-        *pRes = '\a'; /* Bell               */
-        break;
+    case 'a': *pRes = '\a'; break;
+    case 'b': *pRes = '\b'; break;
+    case 'f': *pRes = '\f'; break;
+    case 'n': *pRes = '\n'; break;
+    case 'r': *pRes = '\r'; break;
+    case 't': *pRes = '\t'; break;
+    case 'v': *pRes = '\v'; break;
 
     case 'x':         /* HEX Escape       */
         if (isxdigit( *pzIn ))  {
@@ -326,7 +325,7 @@ ao_string_cook( char* pzScan, int* pLineCt )
              *  THEN we do the full escape character processing
              */
             else if (q != '\'') {
-                int ct = ao_string_cook_escape_char( pzS, pzD-1 );
+                int ct = ao_string_cook_escape_char( pzS, pzD-1, '\n' );
                 if (ct == 0)
                     return NULL;
 

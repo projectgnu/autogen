@@ -1,6 +1,6 @@
 
 /*
- *  $Id: environment.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: environment.c,v 4.4 2005/02/14 16:18:25 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -86,7 +86,7 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
      *  Tokenize the string.  If there's nothing of interest, we'll bail
      *  here immediately.
      */
-    pTL = string_tokenize( pczOptStr );
+    pTL = ao_string_tokenize( pczOptStr );
     if (pTL == NULL)
         return;
 

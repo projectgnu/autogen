@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: expString.c,v 4.5 2005/02/14 16:18:25 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -159,11 +159,6 @@ makeString( tCC*    pzText,
             pzDta += newLineSize;
             break;
 
-        case '\t':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 't';
-            break;
-
         case '\a':
             *(pzDta++) = '\\';
             *(pzDta++) = 'a';
@@ -182,6 +177,11 @@ makeString( tCC*    pzText,
         case '\r':
             *(pzDta++) = '\\';
             *(pzDta++) = 'r';
+            break;
+
+        case '\t':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 't';
             break;
 
         case '\v':

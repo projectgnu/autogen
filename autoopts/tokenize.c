@@ -47,84 +47,9 @@ copy_cooked( ch_t** ppDest, cc_t** ppSrc )
         case NUL:   pSrc--; /* FALLTHROUGH */
         case '"':   goto done;
         case '\\':
-            switch (*pSrc) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-                /*
-                 *  One, two or three octal digits
-                 */
-                ch = (*(pSrc++)) - '0';
-                if (! isdigit( *pSrc ))
-                    break;
-                if (*pSrc >= '8')
-                    break;
-                ch = (ch << 3) + (*(pSrc++)) - '0';
-                if (! isdigit( *pSrc ))
-                    break;
-                if (*pSrc >= '8')
-                    break;
-                ch = (ch << 3) + (*(pSrc++)) - '0';
+            pSrc += ao_string_cook_escape_char( pSrc, &ch, 0x7F );
+            if (ch == 0x7F)
                 break;
-
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-                /*
-                 *  One or two octal digits
-                 */
-                ch = (*(pSrc++)) - '0';
-                if (! isdigit( *pSrc ))
-                    break;
-                if (*pSrc >= '8')
-                    break;
-                ch = (ch << 3) + (*(pSrc++)) - '0';
-                break;
-
-            case 'x':
-                if (! isxdigit( *++pSrc )) {
-                    ch = 'x';
-                    break;
-                }
-                {
-                    ch_t chars[4];
-                    chars[0] = *(pSrc++);
-                    if (isxdigit( *pSrc )) {
-                        chars[1] = *(pSrc++);
-                        chars[2] = NUL;
-                    } else {
-                        chars[1] = NUL;
-                    }
-                    ch = (ch_t)strtol( (char*)chars, NULL, 16 );
-                }
-                break;
-
-            case '\r':
-                if (*(++pSrc) == '\n')
-                    ++pSrc;
-                continue;
-
-            case '\n':
-                ++pSrc;
-                continue;
-
-            case 'f': ch = '\f'; pSrc++; break;
-            case 'n': ch = '\n'; pSrc++; break;
-            case 'r': ch = '\r'; pSrc++; break;
-            case 't': ch = '\t'; pSrc++; break;
-            case 'v': ch = '\v'; pSrc++; break;
-            case 'b': ch = '\b'; pSrc++; break;
-            case 'a': ch = '\a'; pSrc++; break;
-
-            case NUL:
-                break;
-
-            default:
-                ch = *(pSrc++);
-                break;
-            }
             /* FALLTHROUGH */
 
         default:
@@ -185,7 +110,7 @@ copy_raw( ch_t** ppDest, cc_t** ppSrc )
 }
 
 
-/*=export_func string_tokenize
+/*=export_func ao_string_tokenize
  *
  * what: this is the main option processing routine
  *
@@ -219,7 +144,7 @@ copy_raw( ch_t** ppDest, cc_t** ppSrc )
  * @example
  *    #include <stdlib.h>
  *    int ix;
- *    token_list_t* ptl = string_tokenize( some_string )
+ *    token_list_t* ptl = ao_string_tokenize( some_string )
  *    for (ix = 0; ix < ptl->tkn_ct; ix++)
  *       do_something_with_tkn( ptl->tkn_list[ix] );
  *    free( ptl );
@@ -233,7 +158,7 @@ copy_raw( ch_t** ppDest, cc_t** ppSrc )
  * @end example
 =*/
 token_list_t*
-string_tokenize( const char* str )
+ao_string_tokenize( const char* str )
 {
     int max_token_ct = 1; /* allow for trailing NUL on string */
     token_list_t* res;
@@ -340,7 +265,7 @@ main( int argc, char** argv )
     }
     while (--argc > 0) {
         char* arg = *(++argv);
-        token_list_t* p = string_tokenize( arg );
+        token_list_t* p = ao_string_tokenize( arg );
         if (p == NULL) {
             printf( "Parsing string ``%s'' failed:\n\terrno %d (%s)\n",
                     arg, errno, strerror( errno ));

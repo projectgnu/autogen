@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.4 2005/02/14 14:09:54 bkorb Exp $
+ *  $Id: agUtils.c,v 4.5 2005/02/14 16:18:25 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -247,19 +247,9 @@ spanQuote( char* pzQte )
 
         case '\\':
             if (q != '\'') {
-                unsigned int ct = ao_string_cook_escape_char( pzQte, p-1 );
-                /*
-                 *  IF the advance is zero,
-                 *  THEN we either have end of string (caught above),
-                 *       or we have an escaped new-line,
-                 *       which is to be ignored.
-                 *  ELSE advance the quote scanning pointer by ct
-                 */
-                if (ct == 0) {
-                    p--;     /* move destination back one character */
-                    pzQte++; /* skip over new-line character        */
-                } else
-                    pzQte += ct;
+                int ct = ao_string_cook_escape_char(pzQte, p-1, 0x7F);
+                if (p[-1] == 0x7F)  p--;
+                pzQte += ct;
 
             } else {
                 switch (*pzQte) {
@@ -310,18 +300,8 @@ skipQuote( tCC* pzQte )
 
             } else {
                 char p[10];  /* provide a scratch pad for escape processing */
-                unsigned int ct = ao_string_cook_escape_char( pzQte, p );
-                /*
-                 *  IF the advance is zero,
-                 *  THEN we either have end of string (caught above),
-                 *       or we have an escaped new-line,
-                 *       which is to be ignored.
-                 *  ELSE advance the quote scanning pointer by ct
-                 */
-                if (ct == 0) {
-                    pzQte++; /* skip over new-line character        */
-                } else
-                    pzQte += ct;
+                int ct = ao_string_cook_escape_char( pzQte, p, 0x7F );
+                pzQte += ct;
             } /* if (q == '\'')      */
         }     /* switch (*pzQte++)   */
     }         /* while (*pzQte != q) */
