@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.13 2004/05/22 00:15:45 bkorb Exp $
+# $Id: equiv.test,v 3.14 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -69,8 +69,8 @@ flag = {
   arg-default = mucho;
 };
 _EOF_
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"

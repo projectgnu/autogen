@@ -6,22 +6,20 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 3.5 2004/05/16 19:12:48 bkorb Exp $
+# $Id: shell.test,v 3.6 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -106,7 +104,7 @@ sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
 : This is a final test
 _EOF_
 
-$AGEXE ${testname}.def || failure "$AGEXE ${testname}.def"
+${AGexe} ${testname}.def || failure "${AGexe} ${testname}.def"
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup
      exit 0

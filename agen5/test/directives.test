@@ -2,21 +2,19 @@
 #  -*- Mode: Shell-script -*-
 # directives.test --- test definition directives
 #
-# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Time-stamp:        "2004-10-30 12:53:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by: bkorb
 #
-# $Id: directives.test,v 3.2 2004/05/16 19:12:48 bkorb Exp $
+# $Id: directives.test,v 3.3 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -104,9 +102,9 @@ cat > ${testname}.base <<_EOF_
 Irrelevant bar.
 _EOF_
 
-AGEXE="$AGEXE -DMUMBLE -DFOO=1"
-echo $AGEXE ${testname}.def
-$AGEXE ${testname}.def || failure $AGEXE failed
+AGCMD="${AGexe} -DMUMBLE -DFOO=1"
+echo ${AGCMD} ${testname}.def
+${AGCMD} ${testname}.def || failure ${AGCMD} failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
 

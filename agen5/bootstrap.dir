@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/10/24 04:22:24 $
-#            by: root
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.22 2004/10/24 04:22:24 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.23 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -59,31 +59,40 @@ SHELL=/bin/sh
 #
 rmlist=
 
+set_exe_var() {
+    d=$(cd $dir ; pwd)
+    if [ -x $d/$prog ]
+    then
+      echo export ${var}exe=$d/$prog
+    else
+      eval f=\$${var}exe
+      if test -x "$f"
+      then
+        echo export ${var}exe=$f
+      else
+        f=$(type $prog 2> /dev/null | \
+            sed -e "s;^${prog} is [^/]*/;/;")
+        case ${f} in
+        */${prog} )  echo export ${var}exe=${f} ;;
+        * ) echo unset ${var}exe ;;
+        esac
+      fi
+    fi
+}
+
 #  Name our executable in one place and disable any $HOME defaults
 #  Use the local tools, if available.  Otherwise, look for them.
 #
-eval "`
-while read var prog dir
-do
-d=\`cd $dir ; pwd\`
-if [ -x $d/$prog ]
-then echo ${var}=$d/$prog
-else
-  f=\`type $prog 2> /dev/null | sed -e \"s;${prog} is [^/]*/;/;\" \`
-  case ${f} in
-  */${prog} )  echo ${var}=${f} ;;
-  * ) echo unset ${var} ;;
-  esac
-fi
-done <<EOF
-AG  ${AGEXE-autogen}  ${builddir}
-GD  ${GDEXE-getdefs}  ${builddir}/../getdefs
-COL ${COLEXE-columns} ${builddir}/../columns
+eval $(
+  while read var prog dir
+  do
+    set_exe_var
+  done <<EOF
+AG  ${AGnam-autogen}  ${builddir}
+GD  ${GDnam-getdefs}  ${builddir}/../getdefs
+CL  ${CLnam-columns}  ${builddir}/../columns
 EOF
-`"
-
-COLUMNS_EXE="${COL}"
-export COLUMNS_EXE
+)
 
 # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -122,14 +131,14 @@ do
   defParse-fsm.h )
     # Make the definition parser
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AGexe}" ]
     then
       echo "Cannot locate autogen"
       $force && exit 1
       continue
     fi
 
-    cmd="${AG} defParse.def"
+    cmd="${AGexe} defParse.def"
     echo ${cmd}
     ${cmd}
     date > stamp-parse
@@ -139,30 +148,30 @@ do
   opts.[ch] )
     # Make the option processing files:
     #
-    if test -z "${AG}" -o -z "${COL}"
+    if test -z "${AGexe}" -o -z "${CLexe}"
     then
       echo "Cannot locate either autogen or columns"
       $force && exit 1
       continue
     fi
-    echo ${AG} -L ../autoopts opts.def
-    ${AG} -L ../autoopts opts.def
+    echo ${AGexe} -L ../autoopts opts.def
+    ${AGexe} -L ../autoopts opts.def
     date > stamp-opts
     ;;
 
   stamp-fsm )
     # Make the pseudo-macro processing Finite State Machine
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AGexe}" ]
     then
       echo "Cannot locate autogen"
       $force && exit 1
       continue
     fi
 
-    echo ${AG} pseudo.def
-    ${AG} pseudo.def
-    ${AG} cgi.def
+    echo ${AGexe} pseudo.def
+    ${AGexe} pseudo.def
+    ${AGexe} cgi.def
     rm -f .fsm.*
     date > stamp-fsm
     ;;
@@ -171,7 +180,7 @@ do
   expr.h | \
   expr.def | \
   expr.ini )
-    if test -z "${AG}" -o -z "${COL}" -o -z "${GD}"
+    if test -z "${AGexe}" -o -z "${CLexe}" -o -z "${GDexe}"
     then
       echo "Cannot locate autogen or columns or getdefs"
       $force && exit 1
@@ -190,13 +199,13 @@ do
 		output         expr.def
 		_EOConfig_
 
-    echo ${GD} load=expr.cfg func*.c exp*.c
+    echo ${GDexe} load=expr.cfg func*.c exp*.c
     set +e
-    ( SHELL=sh ${GD} load=expr.cfg func*.c exp*.c 2>&1 ) | \
+    ( SHELL=sh ${GDexe} load=expr.cfg func*.c exp*.c 2>&1 ) | \
       egrep -v 'no copies of pattern' >&2
     set -e
     rm -f expr.cfg
-    ${AG} expr.def
+    ${AGexe} expr.def
     [ "$t" = "expr.def" ] || rm -f expr.def
     date > stamp-exprini
     ;;
@@ -204,7 +213,7 @@ do
   stamp-directive | \
   directive.def | \
   directive.h )
-    if test -z "${AG}" -o -z "${COL}"
+    if test -z "${AGexe}" -o -z "${CLexe}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1
@@ -216,8 +225,8 @@ do
 		output         directive.def
 		linenum
 		_EOConfig_
-    ${GD} load=directive.cfg ${srcdir}/defDirect.c
-    ${AG} -t30 directive.def
+    ${GDexe} load=directive.cfg ${srcdir}/defDirect.c
+    ${AGexe} -t30 directive.def
     rm -f directive.def directive.cfg
     date > stamp-directive
     ;;
@@ -225,34 +234,34 @@ do
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
-    if test -z "${AG}" -o -z "${COL}"
+    if test -z "${AGexe}" -o -z "${CLexe}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1
       continue
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter -bautogen"
-    echo ${AG} ${eopt} opts.def
-    ${AG} ${eopt} opts.def
+    echo ${AGexe} ${eopt} opts.def
+    ${AGexe} ${eopt} opts.def
     ;;
 
   autogen.1 )
     # Construct the man page
     #
-    if test -z "${AG}" -o -z "${COL}"
+    if test -z "${AGexe}" -o -z "${CLexe}"
     then
       echo "Cannot locate autogen or columns"
       $force && exit 1
       continue
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
-    echo ${AG} ${eopt} ./opts.def
-    ${AG} ${eopt} ./opts.def
+    echo ${AGexe} ${eopt} ./opts.def
+    ${AGexe} ${eopt} ./opts.def
     ;;
 
   fmemopen.3 )
-    ${GD} templ=agman3.tpl linenum output=fmemopen.def fmemopen.c
-    ${AG} -L ${top_srcdir}/autoopts fmemopen.def
+    ${GDexe} templ=agman3.tpl linenum output=fmemopen.def fmemopen.c
+    ${AGexe} -L ${top_srcdir}/autoopts fmemopen.def
     rm -f fmemopen.def
     ;;
 

@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 3.6 2004/03/19 18:26:15 bkorb Exp $
+# $Id: argument.test,v 3.7 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,8 +29,8 @@ testname="${testname}" test_main="${test_main}" \
 argument="${argument}" long_opts="${long_opts}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
@@ -66,7 +66,7 @@ sed '/arg_type = number/a\
     arg-range = "-1";\
     arg-range = "3->021";' ${testname}.def > ${testname}2.def
 testname=${testname}2
-$AGEN ${testname}.def || \
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 ( sed '/^TEST MAIN PROCEDURE:/,$d' ${testname}.c
   cat <<EOF

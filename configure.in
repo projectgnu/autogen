@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2004-10-24 12:22:32 bkorb"
+dnl Time-stamp:      "2004-10-30 11:58:35 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.30 2004/10/24 19:27:00 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.31 2004/10/30 20:43:56 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-users@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.30 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.31 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -171,10 +171,11 @@ AC_CHECK_LIB(gen, pathfind)
 # ----------------------------------------------------------------------
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_FUNCS(dlopen)
-if test $ac_cv_func_dlopen = yes
+[if test $ac_cv_func_dlopen = yes
 then DYNAMIC_AG=-export-dynamic
 else DYNAMIC_AG=""
-fi
+fi]
+AC_SUBST(DYNAMIC_AG)
 
 # ----------------------------------------------------------------------
 # Checks for typedefs, structures, and compiler characteristics.
@@ -235,21 +236,28 @@ INVOKE_SNPRINTFV_MACROS
 # Generate the make files.
 # ----------------------------------------------------------------------
 AC_PROG_LN_S
+[
 test -f ./snprintfv/snprintfv/snprintfv.h \
   && rm -f ./snprintfv/snprintfv.h \
   && ${LN_S} `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
 
-[M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
+AGnam=autogen${ac_exeext}
+GDnam=getdefs${ac_exeext}
+CLnam=columns${ac_exeext}
+f=`cd ${top_builddir} > /dev/null ; pwd`
+AGexe=${f}/agen5/${AGnam}
+GDexe=${f}/getdefs/${GDnam}
+CLexe=${f}/columns/${CLnam}
+M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`
+]
 AC_SUBST(M4_SRC)
-[AGFUN_LIST=`cd $srcdir/agen5 ; echo func*.c`]
-AC_SUBST(AGFUN_LIST)
-AGEXE=autogen${ac_exeext}
-AC_SUBST(AGEXE)
-GDEXE=getdefs${ac_exeext}
-AC_SUBST(GDEXE)
-COLEXE=columns${ac_exeext}
-AC_SUBST(COLEXE)
-AC_SUBST(DYNAMIC_AG)
+AC_SUBST(AGnam)
+AC_SUBST(GDnam)
+AC_SUBST(CLnam)
+AC_SUBST(AGexe)
+AC_SUBST(GDexe)
+AC_SUBST(CLexe)
+
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 [

@@ -9,7 +9,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.2 2004/02/01 21:26:46 bkorb Exp $
+## $Id: Makefile.am,v 1.3 2004/10/30 20:43:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = convert.test
@@ -17,11 +17,12 @@ EXTRA_DIST = $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = XML2AG=`cd $(top_builddir)/xml2ag ; pwd`/xml2ag \
-	testsubdir=$(testsubdir) srcdir=$(srcdir) \
-	top_srcdir=$(top_srcdir)
-
 testsubdir = ./testdir
+
+TESTS_ENVIRONMENT = \
+	X2Aexe=`\cd $(top_builddir)/xml2ag ; pwd`/xml2ag$(EXEEXT) \
+	testsubdir=$(testsubdir) \
+	srcdir=$(srcdir) top_srcdir=$(top_srcdir)
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
@@ -34,3 +35,5 @@ perm-stamp :
 	cd $(srcdir) ; chmod +x *.test
 
 # Makefile.am ends here
+
+ XML2AG=

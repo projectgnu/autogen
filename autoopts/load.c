@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 3.5 2004/10/24 19:27:00 bkorb Exp $
+ *  $Id: load.c,v 3.6 2004/10/30 20:43:56 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -166,7 +166,7 @@ optionMakePath(
          *  allocated and we need to deallocate it.
          */
         if (pzPath != pzProgPath)
-             free( pzPath );
+             free( (void*)pzPath );
     }
 
     /*

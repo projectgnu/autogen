@@ -9,7 +9,7 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun May 18, 2003
 #
-# $Id: convert.test,v 1.2 2004/02/01 21:26:46 bkorb Exp $
+# $Id: convert.test,v 1.3 2004/10/30 20:43:57 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -36,7 +36,7 @@ testname=convert
 cd ${testsubdir}
 testsubdir=`pwd`
 
-${XML2AG} -O ${testname}.out <<'_EndOfXML_'
+${X2Aexe} -O ${testname}.out <<'_EndOfXML_'
 <?xml version="1.0"?>
 <ag_example template="sample.tpl">
   <mumble attr="foo">

@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.29 2004/10/11 23:33:35 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.30 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -612,7 +612,7 @@ libs=\"${libs} ${LIBS}\"
 exec 3>&1
 (
   cd ${tempdir}
-  HOME='' ${AGEXE} -L${OPTDIR} default-test.def
+  HOME='' ${AGexe} -L${OPTDIR} default-test.def
   if [ ! -f default-test.c ]
   then
     echo 'NO default-test.c PROGRAM' >&3
@@ -722,7 +722,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -I${OPTDIR}"
   echo "test_main = 'putShellParse';"
 ) | (
   cd ${tempdir}
-  HOME='' ${AGEXE} -t40 -L${OPTDIR} -bgenshellopt -- -
+  HOME='' ${AGexe} -t40 -L${OPTDIR} -bgenshellopt -- -
 
   ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
 ) > ${tempdir}/genshellopt.log 2>&1

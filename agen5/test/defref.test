@@ -6,17 +6,15 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by: bkorb
 #
-# $Id: defref.test,v 3.2 2004/05/16 19:12:48 bkorb Exp $
+# $Id: defref.test,v 3.3 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -82,7 +80,7 @@ The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)
 _EOF_
 
-$AGEXE ${testname}.def || failure AutoGen failed
+${AGexe} ${testname}.def || failure AutoGen failed
 cmp -s ${testname}.test ${testname}.out || \
   failure "`diff ${testname}.test ${testname}.out`"
 

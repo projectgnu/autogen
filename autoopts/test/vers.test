@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/01/14 02:41:16 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: vers.test,v 3.2 2004/01/14 02:41:16 bkorb Exp $
+# $Id: vers.test,v 3.3 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,8 +32,8 @@ ${SHELL-sh} ${stdopts} option second
 echo 'help-value = h;' >> $testname.def
 echo 'version-value = V;' >> $testname.def
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo ${AG_L} $testname.def
+${AG_L} $testname.def || \
   failure AutoGen could not process
 
 compile "-h"
@@ -59,11 +59,11 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 3.2 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 3.3 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo ${AG_L} $testname.def
+${AG_L} $testname.def || \
   failure AutoGen could not process
 
 compile "-h"

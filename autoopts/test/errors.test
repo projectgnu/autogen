@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.9 2004/05/15 03:32:13 bkorb Exp $
+# $Id: errors.test,v 3.10 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -38,8 +38,8 @@ sed '/"second"/a\
 mv -f ${testname}.tmp ${testname}.def
 echo "homerc = ${testname}RC;" >> ${testname}.def
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 set -x
@@ -93,8 +93,8 @@ echo "second bumble" > ${testname}RC/.test_errorsrc
 
 echo "allow_errors;" >> ${testname}.def
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process allow-errors
 
 compile "--help"
@@ -122,8 +122,8 @@ flag = {
 
 _EOF_
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process gnu-usage
 
 compile "--help"
@@ -157,7 +157,7 @@ flag = {
     value = 'X';
 };
 _EOF_
-$AGEN ${testname}.def && \
+${AG_L} ${testname}.def && \
   failure AutoGen processed double ifdefs
 cleanup
 # end of errors.test

@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.12 2004/02/16 22:20:45 bkorb Exp $
+ *  $Id: getdefs.h,v 3.13 2004/10/30 20:43:57 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2004-02-16 11:43:39 bkorb"
+ *  Time-stamp:        "2004-10-30 11:44:48 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -23,19 +23,19 @@
 
 #include REGEX_HEADER
 
-#define EXPORT
-
 #include "opts.h"
 
-#ifdef DEFINE
-#  define MODE
-#  define VALUE(v) = v
-#  define DEF_STRING(n,s) tCC n[] = s
-#else
-#  define MODE extern
-#  define VALUE(v)
-#  define DEF_STRING(n,s) extern tCC n[sizeof(s)]
-#endif
+#define EXPORT
+#undef STATIC
+#  ifdef DEBUG
+#    define STATIC
+#  else
+#    define STATIC static
+#  endif
+
+#define MODE
+#define VALUE(v) = v
+#define DEF_STRING(n,s) tCC n[] = s
 
 #define MAXNAMELEN 256
 

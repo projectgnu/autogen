@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: cond.test,v 3.2 2004/01/14 02:41:16 bkorb Exp $
+# $Id: cond.test,v 3.3 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -36,8 +36,8 @@ flag = {
   doc = mumble;
 };
 EOF
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"

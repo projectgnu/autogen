@@ -4,13 +4,13 @@
 ##
 ##  AutoGen Copyright (C) 1992-2004 Bruce Korb
 ##
-## Time-stamp:        "2003-12-30 19:14:07 bkorb"
+## Time-stamp:        "2004-10-28 18:41:42 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.12 2004/02/01 21:26:45 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.13 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -241,7 +241,7 @@ with bit tests against[=
 "OPT_VALUE_" (get "name")  )) =]).
 The available keywords are:
 @example
-[= (shellf "columns --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[= (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  ) =]
 @end example
 [=

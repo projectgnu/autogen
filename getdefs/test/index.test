@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <bkorb@gnu.org>
 # Maintainer:	     Bruce Korb <bkorb@gnu.org>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2001/12/09 19:46:07 $
+# Last Modified:  $Date: 2004/10/30 20:43:57 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: index.test,v 3.0 2001/12/09 19:46:07 bkorb Exp $
+# $Id: index.test,v 3.1 2004/10/30 20:43:57 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,7 +23,7 @@ fi
 
 
 # Create the files we need in the test environment
-cat > $testname.c <<EOF
+cat > ${testname}.c <<EOF
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 /*=--listattr=foo=*/
 
@@ -54,7 +54,7 @@ ag_scm_in_p( SCM obj, SCM list )
 }
 EOF
 
-cat > $testname.test <<_EOF_
+cat > ${testname}.test <<_EOF_
 /*  -*- buffer-read-only: t -*- vi: set ro:
  *
  *
@@ -112,8 +112,8 @@ gfunc = {
 _EOF_
 
 set -x
-${GETDEFS} output=$testname.out $testname.c || \
-	failure running ${GETDEFS}
+${GDexe} output=$testname.out $testname.c || \
+	failure running ${GDexe}
 cmp -s $testname.test $testname.out || \
 	failure "`diff $testname.test $testname.out`"
 

@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <bkorb@gnu.org>
 # Maintainer:	     Bruce Korb <bkorb@gnu.org>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2001/12/09 19:46:08 $
+# Last Modified:  $Date: 2004/10/30 20:43:57 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: subblock.test,v 3.0 2001/12/09 19:46:08 bkorb Exp $
+# $Id: subblock.test,v 3.1 2004/10/30 20:43:57 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -86,9 +86,9 @@ in the second (list) argument.';
 };
 _EOF_
 
-${GETDEFS} subblock=exparg=arg_name,arg_desc,arg_optional,arg_list \
+${GDexe} subblock=exparg=arg_name,arg_desc,arg_optional,arg_list \
 	   output=$testname.out $testname.c || \
-    failure running ${GETDEFS}
+    failure running ${GDexe}
 cmp -s $testname.test $testname.out || \
 	failure "`diff $testname.test $testname.out`"
 

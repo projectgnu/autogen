@@ -1,14 +1,14 @@
-#! /bin/sh
+#! /bin/ksh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2003-05-22 09:11:48 bkorb"
+# Time-stamp:      "2004-10-30 11:33:27 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.6 2003/05/24 02:49:48 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.7 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -41,27 +41,29 @@ if [ -z "${VERBOSE}" ]
 then VERBOSE=false ; VERBOSE_ARG=""
 else VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ; fi
 export VERBOSE VERBOSE_ARG
+SHELL=${SHELL:-$(which ksh 2>/dev/null)}
+test -z "${SHELL}" && SHELL=/bin/ksh
+export SHELL
 
 set -e
 
 # Figure out the absolute path to the working directory.
 #
-wd=`echo $0|sed 's,/[^/]*$,,'`
+wd=$(echo $0 | sed 's,/[^/]*$,,')
 test -z "${wd}" && wd=.
-wd=`cd ${wd} ; pwd`
+wd=$(cd ${wd} ; pwd)
 
 # Search for a configure.in
 #
 for srcdir in ${wd} ${wd}/.. .. .; do
-    test -f $srcdir/configure.ac && break
-    test -f $srcdir/configure.in && break
+    config_file=configure.ac
+    test ! -f $srcdir/${config_file} || break
+    config_file=configure.in
+    test ! -f $srcdir/${config_file} || break
 done
-
-if test -f $srcdir/configure.ac
-then config_file=configure.ac
-else config_file=configure.in
-fi
+test -f ${config_file}
 export config_file srcdir
+srcdir=$(cd ${srcdir} ; pwd)
 
 #  This missing function is used in many places
 #
@@ -70,22 +72,28 @@ export MISSING
 
 #  Check for AutoGen version 5.
 #
-AUTOGEN=`type autogen 2>/dev/null || :`
-case "${AUTOGEN}" in
-  *" is /"* )
-     AUTOGEN=`echo $AUTOGEN|sed 's,autogen is [^/]*/,/,'`
-     case "`$AUTOGEN --version`" in
-       *"Ver. 5."* )
-           export AUTOGEN ;;
-       * ) echo OUT OF DATE AutoGen: `$AUTOGEN --version` >&2
-           unset AUTOGEN ;;
+AGexe=$(type autogen 2>/dev/null | \
+        sed 's@autogen is [^/]*/@/@')
+case ${AGexe} in
+/* )
+     v=$($AGexe --version)
+     case "$v" in
+       *"Ver. 5."* ) : ;;
+       * ) print -u2 OUT OF DATE AutoGen: $v
+           exit 1 ;;
      esac
      ;;
 
-  * )
-     unset AUTOGEN
+* )
+     print -u2 AutoGen requires autogen to bootstrap
+     exit 1
      ;;
 esac
+GDexe=$(type getdefs 2>/dev/null | \
+        sed 's@getdefs is [^/]*/@/@')
+CLexe=$(type columns 2>/dev/null | \
+        sed 's@columns is [^/]*/@/@')
+export AGexe GDexe CLexe
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
@@ -95,7 +103,7 @@ esac
 BOOTSTRAP=pre
 export BOOTSTRAP
 test -f ${wd}/bootstrap.local && \
-  sh ${VERBOSE_ARG} ${wd}/bootstrap.local $@
+  ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local ${1+"$@"}
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -103,11 +111,11 @@ test -f ${wd}/bootstrap.local && \
 # ----------------------------------------------------------------------
 
 tools="autoconf autoheader aclocal automake libtoolize"
-autoconf_reqver=2.50
-autoheader_reqver=2.50
-aclocal_reqver=1.4-p4
-automake_reqver=1.4-p4
-libtoolize_reqver=1.4
+autoconf_reqver=2.59
+autoheader_reqver=2.59
+aclocal_reqver=1.8
+automake_reqver=1.8
+libtoolize_reqver=1.5
 
 #  A version is out-of-date if it does not compare equal to the correct
 #  version and then one of its component numbers compares less
@@ -152,13 +160,13 @@ DIE=:
 
 for f in $tools
 do
-  v=`$f --version`
+  v=$($f --version)
   if test $? -ne 0
   then
     ${MISSING} ${f}
     DIE="exit 1"
   else
-    v=`echo "$v"|sed 1q |sed 's/.* \([0-9]\)/\1/'`
+    v=$(echo "$v" | sed 1q | sed 's/.* \([0-9]\)/\1/')
     eval reqver=\$${f}_reqver
 
     if out_of_date "${v}" "${reqver}"
@@ -168,7 +176,7 @@ do
     fi
   fi
 
-  eval `echo $f | tr a-z A-Z`=$f
+  eval $(echo $f | tr a-z A-Z)=$f
 done
 
 # If any of the above tests failed, abort at this point.
@@ -185,19 +193,21 @@ doit ()
 
 # Run through all of the required autogeneration tools in
 # each directory which contains a ${config_file} file...
-for i in `find $srcdir -name ${config_file} -print|grep -v CVS/`
+for i in $(find $srcdir -name ${config_file} -print | grep -v CVS/)
 do
   # Find the top directory with respect to the current ${config_file}.
-  top=`echo $i|sed 's,/[^/]*$,,'`
+  top=$(dirname $i)
   case $i in
     /* | [A-Za-z]:\\*) ;;
-    *) top=`(cd $top && pwd)` ;;
+    *) top=$(cd $top && pwd) ;;
   esac
 
-  # A brief check to make sure we are not running in the wrong
-  # directory.
-  initfile=`fgrep AC_CONFIG_SRCDIR $top/${config_file} | sed 's,^.*(,,;s,).*$,,'`
-  if test -z "$initfile" || test ! -f $top/$initfile; then
+  # A brief check to make sure we are not running in the wrong directory.
+  #
+  initfile=$(fgrep AC_CONFIG_SRCDIR $top/${config_file} | \
+           sed 's,^.*(,,;s,).*$,,')
+  if test -z "$initfile" -o ! -f $top/$initfile
+  then
     cat <<- _EOF_
         \$initfile is \`$initfile'
         **Error**: Directory \`$top' does not look like a valid
@@ -244,21 +254,23 @@ done
 # Execute (NOTE: not source!) any bootstrap.dir scripts we find in
 # the source tree.
 
-find . -name bootstrap.dir |
-egrep -v '/CVS/'       | (
-while read f
+bootstraps=$(find . -name bootstrap.dir | egrep -v '/CVS/' | sort)
+for f in ${bootstraps}
 do
-  (cd `dirname $f` ; srcdir=.
-   echo running bootstrap.dir in `pwd`
-   sh ${VERBOSE_ARG} ./bootstrap.dir recursive ) || exit 1
-done ) || exit 1
+  ( cd $(dirname $f)
+    srcdir=.
+    echo running bootstrap.dir in `pwd`
+    ${SHELL} ${VERBOSE_ARG} ./bootstrap.dir recursive
+  ) || exit 1
+done
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
-test ! -f ${wd}/bootstrap.local || . ${wd}/bootstrap.local $@
+test ! -f ${wd}/bootstrap.local || \
+   ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local $@ || exit 1
 
 # Local Variables:
 # mode: shell-script

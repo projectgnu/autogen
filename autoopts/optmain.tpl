@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.29 2004/10/15 01:48:34 bkorb Exp $
+# $Id: optmain.tpl,v 3.30 2004/10/30 20:43:56 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -424,7 +424,7 @@ DEFINE declare-option-callbacks
 
     (shellf (if (< (string-length txt-var) 72)
                 "f='%s' ; echo \"   \" $f"
-                "columns --spread=1 -I4 <<_EOProcs_\n%s\n_EOProcs_" )
+                "${CLexe} --spread=1 -I4 <<_EOProcs_\n%s\n_EOProcs_" )
           txt-var )  ))
 
   (define static-proc-list "doUsageOpt\n")
@@ -646,7 +646,7 @@ DEFINE range-option-code
 
     ESAC arg-range    =][=
   ENDFOR =][=
-  (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
+  (shellf "${CLexe} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
     long val;
     int ix;
@@ -772,7 +772,7 @@ DEFINE define-option-callbacks  =][=
       IF (not (exist? "arg-default")) =] zDef,[=
       ENDIF  =]
 [=(shellf
-  "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) ) =]
     };
 [=
@@ -797,7 +797,7 @@ DEFINE define-option-callbacks  =][=
       invoke callback-proc-header
 =]    tSCC* azNames[] = {
 [=(shellf
-  "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
     optionSetMembers( pOptions, pOptDesc, azNames, [=

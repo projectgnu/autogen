@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/07/11 20:28:44 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.2 2002/07/11 20:28:44 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.3 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -30,35 +30,21 @@ then force=true  ; shift
 else force=false ; fi
 
 #  Name our executable in one place and disable any $HOME defaults
-#  Use the local ${AG}, if available.  Otherwise, look for it.
+#  Use the local ${AGexe}, if available.  Otherwise, look for it.
 #
-AUTOGEN=${AUTOGEN-autogen}
-AG=${builddir}/autogen
-
-if test -f ${AG}
+if test -z "${AGexe}" -o ! -f "${AGexe}" -o ! -x "${AGexe}"
 then
-  if test -x ${AG}
-  then :
-  else AG=""
+  AGexe=`type ${AGnam:-autogen} | sed -e "s@${AGnam:-autogen} is [^/]*/@/@" `
+  if test -x "${AGexe}"
+  then
+    export AGexe
+  else
+    AGexe=""
+    unset AGexe
   fi
-else AG=""
 fi
 
-if test -z "${AG}"
-then
-  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is [^/]*/;/;" `
-
-  case ${f} in
-  */autogen )
-     AG=${f}
-     ;;
-
-  * )
-    AG=""
-    ;;
-  esac
-fi
-echo "autogen is '${AG}'"
+echo "autogen is '${AGexe}'"
 
 targets="$@"
 [ -z "$targets" ] && targets=opts.h
@@ -72,15 +58,15 @@ do
   stamp-opts )
     # Make the option processing files:
     #
-    if [ -z "${AG}" ]
+    if [ -z "${AGexe}" ]
     then
       test "X${BOOTSTRAP}" = X \
         && echo "Cannot locate ${AG}.  Giving up"
       if [ -f opts.h ] && [ -f opts.c ]
       then exit 0 ; else exit 1 ; fi
     fi
-    echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
-    ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
+    echo ${AGexe} -L ../autoopts ${DEBUG_OPTS} opts.def
+    ${AGexe} -L ../autoopts ${DEBUG_OPTS} opts.def
     date > stamp-opts
     ;;
 

@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-13 21:02:51 bkorb"
+## Time-stamp:      "2004-10-30 12:17:14 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.29 2004/10/15 01:48:34 bkorb Exp $
+## $Id: Makefile.am,v 3.30 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -17,7 +17,7 @@
 # They don't work for generated texi files:
 #
 INFO_DEPS       = autogen.info
-MAKEINFO        = @MAKEINFO@ --no-split
+MIexe           = $(MAKEINFO) --no-split
 MAKEINFOFLAGS   = -I$(top_srcdir)/autoopts -I../autoopts
 
 all : $(INFO_DEPS)
@@ -27,19 +27,17 @@ info_TEXINFOS   = autogen.texi
 EXTRA_DIST	= auto_gen.tpl autogen.info snprintfv.texi snprintfv.menu
 
 MAINTAINERCLEANFILES = Makefile.in
-DISTCLEANFILES = texi-stamp autogen.def
+DISTCLEANFILES  = texi-stamp autogen.def
 
 AGSRCDIR	= $(top_srcdir)/agen5
-
 OPTIONS_DEF	= $(AGSRCDIR)/opts.def
-
 DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
-
 GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
 
 AG_ENV          = top_builddir=$(top_builddir) \
-  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`:$$PATH ; \
-  export top_builddir top_srcdir PATH
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`:$$PATH \
+  AGexe=$(AGexe) CLexe=$(CLexe) GDexe=$(GDexe) ; \
+  export top_builddir top_srcdir PATH AGexe CLexe GDexe
 
 ADDON_MENU	= \
 		../columns/columns.menu \
@@ -67,48 +65,45 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 		$(ADDON_TEXI) \
 		$(DOC_INCLUDES)
 
-DEFCOPY		= copy=$(OPTIONS_DEF)
-
-GET_OPTS	= srcfile linenum filelist template=$(DOC_TEMPLATE)
-BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
-GDEXE           = $(top_builddir)/getdefs/@GDEXE@
-AGEXE		= $(top_builddir)/agen5/@AGEXE@
-COLUMNS_EXE     = $(top_builddir)/columns/@COLEXE@
-GETDEFS		= $(GDEXE) $(GET_OPTS) $(BLOCKOPT)
-
+DEFCOPY         = copy=$(OPTIONS_DEF)
+BLOCKOPT        = subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'
 
 texi         : texi-stamp
 autogen.texi : texi
 
-texi-stamp : autogen.def $(AGEXE) $(COLUMNS_EXE)
+texi-stamp : autogen.def $(AGEXE) $(CLexe)
 	$(AG_ENV) ; \
-	AGEXE=`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@ \
-	COLUMNS_EXE=`cd $(top_builddir)/columns ; pwd`/@COLEXE@ \
 	CC="$(CC)" CFLAGS='$(CFLAGS)' \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	LIBS="$(LIBS)" SHELL=/bin/sh MAKE='$(MAKE)' \
-	$(AGEXE) -t180 -L$(srcdir) -L$(top_srcdir) autogen.def
+	$(AGexe) -t180 -L$(srcdir) -L$(top_srcdir) autogen.def
 	@touch $@ ; chmod u+w $(srcdir) . || :
 
-autogen.def : $(DOC_DEPENDS) $(GDEXE)
-	@echo $(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
+autogen.def : $(DOC_DEPENDS) $(GDexe)
+	@( echo output   $@ ; \
+	   echo copy     $(OPTIONS_DEF) ; \
+	   echo srcfile  ; echo linenum ; \
+	   echo template auto_gen.tpl ; \
+	   for f in $(GETDEF_SRC) ; do \
+	     echo input $$f ; done ) > getdefs.ini ; \
+	echo + $(GDexe) load-opt=getdefs.ini
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
+	$(GDexe) load-opt=getdefs.ini || { cat getdefs.ini ; exit 1 ; }
 
 ##  During the product build, the following .texi and .menu files may not
 ##  have been built 'cuz the needed programs are not yet in place.
 ##  Do them now.
 ##
-$(AGEXE) :
-	@cd ../agen5 && $(MAKE) @AGEXE@
+$(AGexe) :
+	@cd ../agen5 && $(MAKE) $(AGnam)
 
-$(GDEXE) :
-	@cd ../getdefs && $(MAKE) @GDEXE@
+$(GDexe) :
+	@cd ../getdefs && $(MAKE) $(AGnam)
 
-$(COLUMNS_EXE) :
-	@cd ../columns && $(MAKE) @COLEXE@
+$(CLexe) :
+	@cd ../columns && $(MAKE) $(CLnam)
 
 ../agen5/autogen.menu : ../agen5/autogen.texi
 ../agen5/autogen.texi :
@@ -138,8 +133,8 @@ $(COLUMNS_EXE) :
 	@cd ../autoopts ; $(MAKE) libopts.texi
 
 autogen.txt : autogen.texi
-	makeinfo --fill-column=70 --no-split --paragraph-indent=0 \
-	         --no-headers --output=$@ autogen.texi
+	$(MIexe) --fill-column=70 --paragraph-indent=0 --no-headers \
+		--output=$@ autogen.texi
 
 clobber : maintainer-clean
 

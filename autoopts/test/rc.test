@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2003-03-09 10:00:55 bkorb"
+# Time-stamp:        "2004-10-30 12:34:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 3.4 2003/03/09 19:53:52 bkorb Exp $
+# $Id: rc.test,v 3.5 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -34,12 +34,13 @@ rcfile = ${testname}.file;
 _EOF_
 
 set -x
-$AGEN ${testname}.def || \
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 # # # # # # # # # # VALIDATE HELP # # # # # # # # #
 
-cat > ${testname}.hlp <<_EOF_
+( cat | sed "s@XXXXX@`pwd`@" > ${testname}.hlp
+) <<_EOF_
 test_rc - Test AutoOpts for rc
 USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
   Flg Arg Option-Name    Description
@@ -57,7 +58,7 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
- - reading file ./rc.rc/rc.file
+ - reading file XXXXX/rc.rc/rc.file
 _EOF_
 
 mkdir ${testname}.rc ${testname}.run

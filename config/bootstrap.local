@@ -4,18 +4,16 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2004-02-16 09:25:16 bkorb"
+# Time-stamp:        "2004-10-30 11:23:29 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.12 2004/02/16 22:20:45 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.13 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
 {
-  if grep 'MAKE LINK TREE' configure > /dev/null 2>&1
-  then return ; fi
-
-  mv configure configure.tmp
+  grep 'MAKE LINK TREE' configure > /dev/null && return 0 || :
+  mv configure configure.tmp || exit 1
 
   (
     sed 2q configure.tmp
@@ -138,12 +136,15 @@ pre )
       mv -f configure.tmp ${config_file}
       rm -f configure.files
     fi
-    test -z "${AUTOGEN}" && exit 0
+    test -z "${AGexe}" && exit 0
 
-    ( columns --version  && \
-      getdefs --version ) > /dev/null || exit 1
+    ( $CLexe --version  && \
+      $GDexe --version ) > /dev/null || exit 1
 
-    ( cd ${srcdir}/config; set -x ; ${AUTOGEN} -L. misc.def; ) || exit 1
+    ( cd ${srcdir}/config
+      set -x
+      ${AGexe} -L. misc.def
+    ) || exit 1
     cp ${srcdir}/snprintfv/snprintfv.m4 ${srcdir}/config/.
     exit 0
     ;;

@@ -45,7 +45,7 @@ tSCC z[=(. Pfx)=]Strings[] =
 
 static const size_t asz[=(. Pfx)=]States[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%sSt%%s_off' <<'_EOF_'
+"${CLexe-columns} --spread=1 -I4 -S, -f'%sSt%%s_off' <<'_EOF_'
 Init
 %s
 _EOF_"
@@ -54,7 +54,7 @@ _EOF_"
 
 static const size_t asz[=(. Pfx)=]Events[] = {
 [=(shellf
-"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%sEv%%s_off' <<'_EOF_'
+"${CLexe-columns} --spread=1 -I4 -S, -f'%sEv%%s_off' <<'_EOF_'
 %s
 Invalid
 _EOF_"

@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2002/09/21 17:27:16 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2004/10/30 20:43:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test
@@ -16,11 +16,11 @@ EXTRA_DIST = defs $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-TESTS_ENVIRONMENT = GETDEFS=`cd $(top_builddir)/getdefs; pwd`/getdefs \
-	testsubdir=$(testsubdir) srcdir=$(srcdir) \
-	top_srcdir=$(top_srcdir)
-
 testsubdir = ./testdir
+
+TESTS_ENVIRONMENT = top_srcdir=$(top_srcdir) \
+	testsubdir=$(testsubdir) srcdir=$(srcdir) \
+	GDexe=$(GDexe) AGexe=$(AGexe) CLexe=$(CLexe)
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES

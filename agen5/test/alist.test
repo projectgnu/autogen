@@ -6,17 +6,15 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: alist.test,v 3.1 2004/05/16 19:12:48 bkorb Exp $
+# $Id: alist.test,v 3.2 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -58,9 +56,9 @@ cat > $testname.out <<_EOF_
   2 name is last
 _EOF_
 
-AGEXE="$AGEXE -L ${srcdir}/.."
-echo $AGEXE $testname.def
-$AGEXE $testname.def || failure $AGEXE failed
+AGEXE="${AGexe} -L ${srcdir}/.."
+echo ${AGexe} $testname.def
+${AGexe} $testname.def || failure ${AGexe} failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

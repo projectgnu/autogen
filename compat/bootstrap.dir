@@ -1,9 +1,9 @@
 #!/bin/sh
 
-if [ -n "${AUTOGEN}" ]
+if [ -n "${AGexe}" ]
 then
   top_srcdir=.. top_builddir=..
   export top_srcdir top_builddir
   echo "Rebuilding strsignal.h"
-  ${AUTOGEN} strsignal.def
+  ${AGexe} strsignal.def
 fi

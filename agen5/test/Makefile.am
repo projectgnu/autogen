@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-02 20:03:02 bkorb"
+## Time-stamp:      "2004-10-30 13:07:53 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.13 2004/10/03 03:17:12 bkorb Exp $
+## $Id: Makefile.am,v 3.14 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -35,9 +35,7 @@ EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 
 TESTS_ENVIRONMENT = \
 	CC="$(CC)" CFLAGS='@CFLAGS@' \
-	GDEXE=`cd $(top_builddir)/getdefs > /dev/null; pwd`/$(GDEXE) \
-	AGEXE=`cd $(top_builddir)/agen5   > /dev/null; pwd`/$(AGEXE) \
-	COLUMNS_EXE="`cd $(top_builddir)/columns > /dev/null; pwd`/$(COLEXE)" \
+	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
 	INC="$(INCLIST) $(CPPFLAGS)" \
 	testsubdir=$(testsubdir) \
 	top_builddir=`cd $(top_builddir) ; pwd` \

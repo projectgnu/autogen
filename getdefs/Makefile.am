@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-10-13 21:03:35 bkorb"
+## Time-stamp:      "2004-10-30 11:50:11 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.17 2004/10/15 01:48:34 bkorb Exp $
+## $Id: Makefile.am,v 3.18 2004/10/30 20:43:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -22,8 +22,7 @@ nodist_getdefs_SOURCES = gd.c opts.h
 SUBDIRS         = test
 BUILT_SOURCES   = opts.c opts.h gd.c
 EXTRA_DIST      = opts.def $(gdsrcs)
-AGEXE           = $(top_builddir)/agen5/@AGEXE@
-AGEXE_LIB       = $(AGEXE) -L$(top_srcdir)/autoopts
+AGEXE_LIB       = $(AGexe) -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
@@ -33,7 +32,6 @@ INCLUDES        = @INCLIST@
 AG_ENV          = top_builddir=$(top_builddir) \
   top_srcdir=$(top_srcdir) PATH=`cd ../columns >/dev/null && pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
-COLUMNS_EXE     = $(top_builddir)/columns/columns$(EXEEXT)
 
 
 all : gen
@@ -44,20 +42,20 @@ gd.c : $(gdsrcs)
 	( echo '#define DEFINE' ; \
 	  for f in $(gdsrcs) ; do echo "#include \"$$f\"" ; done ) > $@
 
-opts.h : opts.def $(COLUMNS_EXE) $(AGEXE)
+opts.h : opts.def $(CLexe) $(AGexe)
 	$(AG_ENV) ; $(AGEXE_LIB) $(srcdir)/opts.def
 
 $(DOCFILES) : doc-stamp
 
-$(AGEXE) :
-	@cd ../agen5 ; $(MAKE) @AGEXE@
+$(AGexe) :
+	@cd ../agen5 ; $(MAKE) $(AGnam)
 
-$(COLUMNS_EXE) :
-	@cd ../columns ; $(MAKE) @COLEXE@
+$(CLexe) :
+	@cd ../columns ; $(MAKE) $(CLnam)
 
-doc-stamp : opts.def $(COLUMNS_EXE) $(TARG)$(EXEEXT) $(AGEXE)
-	$(AG_ENV) ; $(AGEXE_LIB) -Tagman1 -b$(TARG) $(srcdir)/opts.def ; \
-	$(AGEXE_LIB) -Taginfo -b$(TARG) -DLEVEL=section $(srcdir)/opts.def
+doc-stamp : opts.def $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
+	$(AG_ENV) ; $(AGEXE_LIB) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
+	$(AGEXE_LIB) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 	@touch $@
 
 # Makefile.am ends here

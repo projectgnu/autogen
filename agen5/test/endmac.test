@@ -6,17 +6,15 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
+# Last Modified:     $Date: 2004/10/30 20:43:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: endmac.test,v 3.1 2004/05/16 19:12:48 bkorb Exp $
+# $Id: endmac.test,v 3.2 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -29,7 +27,7 @@ cat > ${testname}1.tpl <<EOF
 This is a test
 EOF
 
-$AGEXE -T${testname}1 --no-def 2> /dev/null && \
+${AGexe} -T${testname}1 --no-def 2> /dev/null && \
   failure $testname failure test was successful.  Oops.
 echo $testname failure test failed correctly
 
@@ -40,7 +38,7 @@ ENDMAC 2 <=`echo print this message` =>>
 This is a test
 EOF
 
-$AGEXE -T${testname}2 --no-def || \
+${AGexe} -T${testname}2 --no-def || \
    failure $testname success test was a failure
 echo first successful $testname test succeeded
 
@@ -52,7 +50,7 @@ ENDMAC 3 <+(define foo "print this message")  (. foo) +>>
 This is a test
 EOF
 
-$AGEXE -T${testname}3 --no-def || \
+${AGexe} -T${testname}3 --no-def || \
    failure second $testname success test was a failure
 echo second successful $testname test succeeded
 

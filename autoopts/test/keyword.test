@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.9 2004/05/22 00:15:45 bkorb Exp $
+# $Id: keyword.test,v 3.10 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -56,8 +56,8 @@ cat >> ${testname}.def <<- _EndOfDef_
 	};
 	_EndOfDef_
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-X"
@@ -151,7 +151,7 @@ cat > ${testname}.t1-b <<- _EndTst_
 cmp -s ${testname}.t1-* || \
   failure "`diff ${testname}.t1-*`"
 
-$AGEN -T agman1.tpl ${testname}.def
+${AG_L} -T agman1.tpl ${testname}.def
 cat > ${testname}-base.1 <<_EOMan_
 test_keyword \- Test AutoOpts for keyword
 .SH SYNOPSIS

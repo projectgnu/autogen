@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 3.9 2004/10/15 01:48:34 bkorb Exp $
+# $Id: shell.test,v 3.10 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -34,8 +34,8 @@ test_main="${test_main}"    \
 long_opts=true  \
 ${SHELL} ${stdopts} option: second
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo ${AG_L} $testname.def
+${AG_L} $testname.def || \
   failure AutoGen could not process
 
 compile "-?"
@@ -90,8 +90,8 @@ cmp -s $testname.test $testname.out || \
 sed '/test_main/s/yes/putShellParse/' $testname.def > XX
 mv -f XX $testname.def
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo ${AG_L} $testname.def
+${AG_L} $testname.def || \
   failure AutoGen could not process
 
 compile "-?"

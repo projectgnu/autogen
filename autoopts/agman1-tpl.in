@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-10-04 09:23:51 bkorb"
+## Time-stamp:      "2004-10-28 18:41:56 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.30 2004/10/07 16:07:03 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.31 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -334,7 +334,7 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: (shellf "columns --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  ) :+]
 .fi
 .in -4[+: (if (exist? "arg-default") "\n.sp" ) :+][+:

@@ -110,7 +110,7 @@ forkAutogen( tCC* pzInput )
 
           ==*  key                 =]
             tSCC* kwlist[] = {
-[=(shellf "${COLUMNS_EXE:-columns} -I16 -f'\"%%s\"' -S, --spread=2 <<_EOF_\n%s\n_EOF_"
+[=(shellf "${CLexe:-columns} -I16 -f'\"%%s\"' -S, --spread=2 <<_EOF_\n%s\n_EOF_"
    (join "\n" (stack "keyword"))  )=] };
             pzArg = malloc( [= (+ 4 (string-length (get "name")))
                         =] + strlen( kwlist[ OPT_VALUE_[=(. opt-name)=] ] ) );

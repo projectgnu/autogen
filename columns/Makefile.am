@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-16 10:57:29 bkorb"
+## Time-stamp:      "2004-10-27 19:52:34 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>                    
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2004/02/16 22:20:45 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -18,7 +18,7 @@ nodist_columns_SOURCES = cols.c
 
 BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
-AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
+RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts -bcolumns
 columns_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
 
@@ -41,9 +41,8 @@ cols.c : Makefile
 
 gen-stamp : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
-	$(AGEXE) -Taginfo -bcolumns -DLEVEL=section \
-		$(top_srcdir)/columns/opts.def
-	$(AGEXE) -T agman1 -b columns $(srcdir)/opts.def
+	$(RUNAG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+	$(RUNAG) -Tagman1 $(srcdir)/opts.def
 	@touch $@
 
 # Makefile.am ends here

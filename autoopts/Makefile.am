@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-08-30 17:46:29 bkorb"
+## Time-stamp:      "2004-10-27 20:01:46 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.29 2004/08/31 02:35:14 bkorb Exp $
+## $Id: Makefile.am,v 3.30 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -98,8 +98,7 @@ libopts.c : $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : genshell.def
-	@AGEXE=`cd $(top_builddir)/agen5; pwd`/autogen ; cd $(srcdir) ; \
-	  AGEXE="$$AGEXE" $(SHELL) ./bootstrap.dir $@
+	@cd $(srcdir) ; AGexe=$(AGexe) $(SHELL) ./bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c

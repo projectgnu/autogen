@@ -66,7 +66,7 @@ ENDFOR =]
   usage_text_t option_usage_text = {
     [= (count "utxt") =],
 [= (shell (string-append
-  "columns -W84 -I4 --spread=1 -S, -f'eng_z%s' <<_EOF_\n"
+  "${CLexe:-columns} -W84 -I4 --spread=1 -S, -f'eng_z%s' <<_EOF_\n"
      (join "\n" (stack "utxt.ut-name"))
   "\n_EOF_" )) =]
   };

@@ -1,7 +1,7 @@
 #! /bin/sh
 
-AUTOGEN=${AUTOGEN-autogen}
-noag=`if ${AUTOGEN} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
+AGexe=${AGexe-autogen}
+noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 
 make_funcs_def()
 {
@@ -24,7 +24,7 @@ make_funcs_def()
 	 *  this.  It should be constructed after all binaries are built.
 	 */
 	_END_VERS_INFO_
-    ${AUTOGEN} funcs.def
+    ${AGexe} funcs.def
 }
 
 case "$1" in
@@ -33,16 +33,16 @@ case "$1" in
   #
   $noag && test -f genshell.c && exit 0
   set -e
-  ${AUTOGEN} -L. genshell.def
+  ${AGexe} -L. genshell.def
   ;;
 
 *libopts.texi )
   $noag && test -f libopts.texi && exit 0
-  ${AUTOGEN} -Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def
+  ${AGexe} -Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def
   ;;
 
 *optionProcess.3 )
-  ${AUTOGEN} -Tagman3.tpl funcs.def
+  ${AGexe} -Tagman3.tpl funcs.def
   ;;
 
 * )
@@ -50,9 +50,9 @@ case "$1" in
   #
   if [ ! -f genshell.c ]
   then
-    ${AUTOGEN} -L. genshell.def
+    ${AGexe} -L. genshell.def
   fi
-  ${AUTOGEN} -L. usage-txt.def
+  ${AGexe} -L. usage-txt.def
   if [ ! -f funcs.def ] || [ ! -f options.h ]
   then
     make_funcs_def

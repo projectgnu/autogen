@@ -9,14 +9,12 @@
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.14 2004/02/01 21:09:52 bkorb Exp $
+# $Id: error.test,v 3.15 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    srcdir=`dirname $0`
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
@@ -62,8 +60,8 @@ cat > ${testname}.out1 <<'_EOF_'
 	The definitions file has a `#error' directive
 _EOF_
 
-echo $AGEXE ${testname}.def
-$AGEXE ${testname}.def 2> ${testname}.err1 && failure unexpected success
+echo ${AGexe} ${testname}.def
+${AGexe} ${testname}.def 2> ${testname}.err1 && failure unexpected success
 grep -v 'Giving up in' ${testname}.err1 >  ${testname}.err
 cmp -s  ${testname}.err  ${testname}.out1 || \
   failure "actual->expected `diff -c ${testname}.err  ${testname}.out1`"
@@ -84,7 +82,7 @@ _EOF_
 
 # this is *supposed* to exit with a failure status
 echo autogen --no-def -T${testname}.tpl --base=${testname} >&2
-$AGEXE --no-def -T${testname}.tpl --base=${testname} \
+${AGexe} --no-def -T${testname}.tpl --base=${testname} \
   2> ${testname}.err2 \
   && failure Unexpected success for AutoGen
 
@@ -107,7 +105,7 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `kill -TERM ${AG_pid}` =>,' \
 
 # this is *supposed* to exit with a failure status
 echo autogen --no-def -T${testname}2.tpl --base=${testname} >&2
-$AGEXE --no-def -T${testname}2.tpl --base=${testname} \
+${AGexe} --no-def -T${testname}2.tpl --base=${testname} \
   2> ${testname}.tmp3 \
   && failure Unexpected success for AutoGen
 
@@ -135,8 +133,8 @@ Likely causes:  a mismatched quote, a value that needs quoting,
 		or a missing semi-colon
 _EOF_
 
-echo $AGEXE ${testname}.def
-$AGEXE ${testname}2.def 2> ${testname}.err4 && failure unexpected success
+echo ${AGexe} ${testname}.def
+${AGexe} ${testname}2.def 2> ${testname}.err4 && failure unexpected success
 grep -v 'Giving up in' ${testname}.err4 >  ${testname}.err
 cmp -s  ${testname}.err  ${testname}.out4 || \
   failure "`diff -c ${testname}.out4 ${testname}.err`"
@@ -150,9 +148,9 @@ THIS TEXT SHOULD BE DELETED!!
 <= ENDIF =>
 _EOF_
 
-$AGEXE -T ${testname}.tpl5 -b ${testname} --no-defin \
+${AGexe} -T ${testname}.tpl5 -b ${testname} --no-defin \
   2> ${testname}.out5 > /dev/null
- [ $? -ne 0 ] || failure "$AGEXE was okay with bogus input"
+ [ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
 
 cat > ${testname}.samp5 <<'EOF'
 Error in template error.tpl5, line 3
@@ -178,9 +176,9 @@ if (exist? "nothing")
 End Of File
 _EOF_
 
-$AGEXE -T ${testname}.tpl6 -b ${testname} --no-defin \
+${AGexe} -T ${testname}.tpl6 -b ${testname} --no-defin \
   2> ${testname}.out6 >/dev/null
-[ $? -ne 0 ] || failure "$AGEXE was okay with bogus input"
+[ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
 
 cat > ${testname}.samp6 <<EOF
 ${testname}.tpl6:7:4: In expression (stumble-over-unbound-variable):

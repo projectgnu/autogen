@@ -46,7 +46,7 @@ CASE (suffix) =][=
 #define [=(. PFX)=]_STATE_CT  [=(+ 1 (count "state"))=]
 typedef enum {
 [=
-  (shellf "${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%s_ST_%%s' <<_EOF_
+  (shellf "${CLexe-columns} --spread=1 -I4 -S, -f'%s_ST_%%s' <<_EOF_
 INIT
 %s
 INVALID
@@ -62,7 +62,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "state"))) )=]
 #define [=(. PFX)=]_EVENT_CT [=(count "event")=]
 typedef enum {
 [= compute-transitions =][=
-  (shellf "${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%s_EV_%%s' <<_EOF_
+  (shellf "${CLexe-columns} --spread=1 -I4 -S, -f'%s_EV_%%s' <<_EOF_
 %s
 INVALID
 _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]

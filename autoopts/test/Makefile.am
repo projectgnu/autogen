@@ -2,31 +2,29 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2004-10-02 09:46:25 bkorb"
+## Time-stamp:      "2004-10-27 19:57:19 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2004/10/02 21:40:57 $
+## Last Modified:   $Date: 2004/10/30 20:43:56 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.14 2004/10/02 21:40:57 bkorb Exp $
+## $Id: Makefile.am,v 3.15 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
-testsubdir = ./testdir
+MAINTAINERCLEANFILES	= Makefile.in
 TESTS      = \
     argument.test cond.test    enums.test   equiv.test     errors.test  \
     getopt.test   guile.test   handler.test immediate.test keyword.test \
     main.test     nls.test     rc.test      shell.test     stdopts.test \
     usage.test    vers.test
 
-MAINTAINERCLEANFILES	= Makefile.in
+testsubdir = ./testdir
 
-TESTS_ENVIRONMENT = \
+TESTS_ENVIRONMENT = AGexe=$(AGexe) CLexe=$(CLexe) GDexe=$(GDexe) \
 	CC="$(CC)" CFLAGS='$(CFLAGS)' \
 	LD_LIBRARY_PATH=$(LIBGUILE_PATH):$${LD_LIBRARY_PATH-..} \
 	PATH="`cd $(top_builddir)/columns > /dev/null ; pwd`:$$PATH" \
-	AGEN="`cd $(top_builddir)/agen5   > /dev/null ; pwd`/$(AGEXE)" \
-	COLUMNS_EXE="`cd $(top_builddir)/columns > /dev/null ; pwd`/$(COLEXE)" \
 	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/ > /dev/null ; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
 	INC="-I`cd $(top_builddir)/autoopts > /dev/null ; pwd` \
@@ -34,7 +32,8 @@ TESTS_ENVIRONMENT = \
 	    $(INCLIST) $(CPPFLAGS) $(LIBGUILE_CFLAGS) $(LIBGUILE_LIBS)" \
 	testsubdir=$(testsubdir) \
 	srcdir=`pwd` \
-	top_srcdir=`cd $(top_srcdir) > /dev/null ; pwd`
+	top_srcdir=`\cd $(top_srcdir) > /dev/null ; pwd` \
+	top_builddir=`\cd $(top_builddir) > /dev/null ; pwd`
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES

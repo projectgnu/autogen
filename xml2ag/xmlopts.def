@@ -8,8 +8,12 @@ export = <<-  EOExport
 	#include <sys/types.h>
 	#include <sys/stat.h>
 
-	#define __USE_POSIX /* for glib's pedantic needs */
-	#define __USE_XOPEN_EXTENDED  /* ditto */
+	#ifndef __USE_POSIX
+	#  define __USE_POSIX /* for glib's pedantic needs */
+	#endif
+	#ifndef __USE_XOPEN_EXTENDED
+	#  define __USE_XOPEN_EXTENDED  /* ditto */
+	#endif
 	#include <stdio.h>
 	#include <ctype.h>
 	#include <errno.h>

@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: nls.test,v 3.4 2004/01/15 05:24:40 bkorb Exp $
+# $Id: nls.test,v 3.5 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -30,8 +30,8 @@ ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
 echo 'export = "extern char* gettext( const char* );";' >> ${testname}.def
 
-echo $AGEN ${testname}.def
-$AGEN ${testname}.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 chmod u+w ${testname}.[ch]

@@ -2,22 +2,17 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-13 21:05:43 bkorb"
+## Time-stamp:      "2004-10-28 17:47:17 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.36 2004/10/15 01:48:34 bkorb Exp $
+## $Id: Makefile.am,v 3.37 2004/10/30 20:43:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
 INCLUDES        = @INCLIST@
-
-GETDEFS         = $(top_builddir)/getdefs/@GDEXE@
-AGEXE           = $(top_builddir)/agen5/@AGEXE@
-COLEXE          = $(top_builddir)/columns/@COLEXE@
-
 TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
 GENDOCS         = autogen.texi autogen.menu autogen.1
@@ -25,7 +20,6 @@ CLEANFILES      = $(GENDOCS)
 STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm stamp-parse
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 GEN_SRC         = $(GEN_CSRC) $(GENDOCS)
-
 pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS        = autogen.1
 
@@ -61,9 +55,8 @@ EXPRLIST        = \
 
 AM_YFLAGS = -d
 
-all : @AGEXE@
-
-ag.c : $(csrc) $(hsrc)
+all  : $(AGnam)
+ag.c : Makefile
 	( echo '#define DEFINING' ; echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done ) > $@
 
@@ -79,8 +72,7 @@ SUFFIXES = .i
 GEN_LIST = $(STAMPS) $(GENDOCS)
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \
-	PATH=`cd ../columns >/dev/null && pwd`:$$PATH \
-	AGEXE=$(AGEXE) GDEXE=$(GDEXE) COLEXE=$(COLEXE)
+	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION
@@ -107,20 +99,26 @@ proto.h :
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## autogen.texi GEN-RULE
-autogen.texi : $(STAMPS) @AGEXE@ ../getdefs/getdefs ../columns/columns
+autogen.texi : $(STAMPS)
+	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
+	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
+	test -f $(GDexe) || $(MAKE) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## autogen.1 GEN-RULE
-autogen.1 : opts.def @AGEXE@ ../getdefs/getdefs ../columns/columns
+autogen.1 : opts.def
+	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
+	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
+	test -f $(GDexe) || $(MAKE) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 gen : $(GEN_LIST)
 
-../getdefs/getdefs :
-	cd ../getdefs ; $(MAKE) @GDEXE@
+$(GDexe) :
+	cd ../getdefs ; $(MAKE) $(GDnam)
 
-../columns/columns :
-	cd ../columns ; $(MAKE) @COLEXE@
+$(CLexe) :
+	cd ../columns ; $(MAKE) $(CLnam)
 
 dist : autogen.texi autogen.1
 

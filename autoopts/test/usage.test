@@ -8,7 +8,7 @@
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 3.9 2003/08/24 00:01:30 bkorb Exp $
+# $Id: usage.test,v 3.10 2004/10/30 20:43:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -728,7 +728,7 @@ do
           testname=${tname}_${name}
           emit_defs ${testname}
           test_list="${test_list} ${testname}"
-          $AGEN ${testname}.def || \
+          ${AG_L} ${testname}.def || \
              failure "AutoGen could not process $testname"
           compile ${helpstr}
           cmp -s ${testname}.help ${testname}.hlp || \
