@@ -1,22 +1,12 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.6 2005/02/04 03:57:11 bkorb Exp $
+#$Id: optcode.tpl,v 4.7 2005/02/04 05:10:07 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
 =][=
 
-INCLUDE "optmain.tpl"                =][=
-
-IF (exist? "flag.handle-type")
-
-=]#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-[=
-
-ENDIF =][=
+INCLUDE "optmain.tpl" =][=
 
 IF (exist? "flag.arg-range")
 

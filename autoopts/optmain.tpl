@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.6 2005/02/04 03:57:11 bkorb Exp $
+# $Id: optmain.tpl,v 4.7 2005/02/04 05:10:07 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -159,9 +159,14 @@ DEFINE for-each-main            =][=
 (define handler-arg-type "")
 (tpl-file-line extract-fmt)
 =]
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <unistd.h>
 
 static char*
@@ -184,10 +189,12 @@ trim_input_line( char* pz_s )
 CASE handler-type =][=
 =*  name         =][= (set! handler-arg-type "const char* pz_fname")
                       (define handler-proc "validate_fname")       =][=
-=*  file         =][= (set! handler-arg-type "FILE* entry_fp")
+=*  file         =][=
+   (set! handler-arg-type "const char* pz_fname, FILE* entry_fp")
                       (define handler-proc "validate_fname")       =][=
 *=* text         =][=
-   (set! handler-arg-type "char* pz_file_text, size_t text_size")
+   (set! handler-arg-type
+         "const char* pz_fname, char* pz_file_text, size_t text_size")
                       (define handler-proc "validate_fname")       =][=
 !E               =][= (set! handler-arg-type "const char* pz_entry")
                       (define handler-proc (get "handler-proc"))       =][=
@@ -286,7 +293,7 @@ CASE handler-type =][=
                      pz_fname );
             return 1;
         }
-        res = [= handler-proc =](fp);
+        res = [= handler-proc =](pz_fname, fp);
         fclose(fp);
         return res;
     }[=
@@ -295,7 +302,7 @@ CASE handler-type =][=
     (tpl-file-line extract-fmt)
     =]
     file_text = malloc( text_size + 1 );
-    if (pz_file_text == NULL) {
+    if (file_text == NULL) {
         fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
                 text_size+1, pz_fname);
         exit( EXIT_FAILURE );
@@ -328,7 +335,7 @@ CASE handler-type =][=
                    && (++try_ct < 10)  )
                     continue;
 
-                fprintf( stderr, pz_fs_err, errno, strerror(errno), "read"
+                fprintf( stderr, pz_fs_err, errno, strerror(errno), "read",
                          pz_fname );
                 exit( EXIT_FAILURE );
             }
@@ -343,7 +350,7 @@ CASE handler-type =][=
      *  terminate the thing.
      */
     file_text[ text_size ] = '\0';
-    res = [= handler-proc =](file_text, text_size);
+    res = [= handler-proc =](pz_fname, file_text, text_size);
     free(file_text);
     return res;[=
 ESAC             =]
