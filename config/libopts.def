@@ -29,6 +29,7 @@ test   = {
   libname  = "";
   code     = <<- _END_OF_CODE_
 		#include <stdio.h>
+		#include <stdlib.h>
 		#include <sys/types.h>
 		#include REGEX_HEADER
 		static regex_t re;
@@ -37,7 +38,6 @@ test   = {
 		  if (res == 0) return;
 		  exit( res ); }
 		int main() {
-		  int  res;
 		  regmatch_t m[2];
 		  comp_re( "^.*\$"   );
 		  comp_re( "()|no.*" );
