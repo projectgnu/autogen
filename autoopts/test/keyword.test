@@ -1,0 +1,92 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# argument.test ---  test argument program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: keyword.test,v 1.1 2000/10/17 19:46:16 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating $testname.def in `pwd`"
+testname="$testname" test_main="" \
+argument="${argument}" long_opts="yes" \
+${SHELL-sh} ${stdopts} option:'opt init'
+cat >> $testname.def <<'_EOF_'
+help_value = X;
+flag = {
+    name        = trace;
+    arg_type    = keyword;
+    arg_default = nothing;
+    arg_name    = level;
+    descrip     = "tracing level of detail";
+    keyword     = nothing, templates, block-macros, expressions, explanations;
+};
+_EOF_
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+chmod u+w $testname.c
+cat >> $testname.c <<_EOF_
+#include <stdio.h>
+int main(int argc, char** argv) {
+optionProcess( &test_${testname}Options, argc, argv );
+return 0; }
+_EOF_
+compile "-X"
+
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_keyword - Test AutoOpts for keyword
+USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+  Flg Arg Option-Name    Description
+   -o YES option         The option option descrip
+      KWd trace          tracing level of detail
+   -X no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character/option value.
+
+The valid trace option keywords are:
+	nothing
+	templates
+	block-macros
+	expressions
+	explanations
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+./$testname --trace=exp > /dev/null && \
+  failure $testname accepted ambiguous keyword
+
+./$testname --trace=expr > /dev/null || \
+  failure $testname did not handle its options
+
+cleanup
+# end of argument.test

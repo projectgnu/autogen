@@ -1,5 +1,7 @@
 [= autogen5 template  -*- Mode: Text -*-
-#$Id: optcode.tpl,v 2.42 2000/10/17 17:09:19 bkorb Exp $
+
+#$Id: optcode.tpl,v 2.43 2000/10/17 19:46:15 bkorb Exp $
+
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -121,7 +123,9 @@ tSCC    zNotLoad_Opts_Pfx[]  = "no";
 ENDIF (exist? "homerc") =][=
 
 
-IF (or (exist? "flag.flag_code") (exist? "flag.call_proc")) =][=
+IF (or (exist? "flag.flag_code")
+       (exist? "flag.call_proc")
+       (match-value? =* "flag.arg_type" "key") ) =][=
 
   invoke declare-option-callbacks  =][=
 
@@ -354,7 +358,8 @@ DEF_PROC_2( static, void, doUsageOpt,
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
 }[=
 
-IF (exist? "flag.flag_code")       =][=
+IF (or (exist? "flag.flag_code") 
+       (match-value? =* "flag.arg_type" "key")) =][=
 
   invoke  define-option-callbacks  =][=
 

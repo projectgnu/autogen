@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.10 2000/10/17 17:09:19 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.11 2000/10/17 19:46:15 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -195,11 +195,11 @@ DEF_PROC_2( , void, optionUsage,
             if ((pOD->fOptState & OPTST_NUMERIC) != 0)
                 pzArgType = zNumArg;
 
-	    else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
+            else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
                 pzArgType = zBoolArg;
 
             else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
-                displayEnum = AG_TRUE;
+                displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
                 pzArgType = zKeyArg;
             }
 
@@ -379,9 +379,9 @@ DEF_PROC_2( , void, optionUsage,
         u_int    fOptSet   = pOptions->fOptSet;
         tSCC     zPathFmt[] = " - reading file %s/%s\n";
 
-	/*
-	 *  Display all the places we look for RC files
-	 */
+        /*
+         *  Display all the places we look for RC files
+         */
         if (pOptions->papzHomeList != (const char**)NULL) {
             const char** papzHL = pOptions->papzHomeList;
             for (;;) {
@@ -399,9 +399,9 @@ DEF_PROC_2( , void, optionUsage,
             }
         }
 
-	/*
-	 *  Let the user know about environment variable settings
-	 */
+        /*
+         *  Let the user know about environment variable settings
+         */
         if ((pOptions->fOptSet & OPTPROC_ENVIRON) != 0) {
             if (initIntro)
                 fputs( zIntro, fp );
@@ -409,28 +409,28 @@ DEF_PROC_2( , void, optionUsage,
             fprintf( fp, zExamineFmt, pOptions->pzPROGNAME );
         }
 
-	/*
-	 *  IF we found an enumeration,
-	 *  THEN hunt for it again.  Call the handler proc with a NULL
-	 *       option struct pointer.  That tells it to display the keywords.
-	 */
-	if (displayEnum) {
-	    int        ct     = pOptions->optCt;
-	    int        optNo  = 0;
-	    tOptDesc*  pOD    = pOptions->pOptDesc;
-	    int        docCt  = 0;
+        /*
+         *  IF we found an enumeration,
+         *  THEN hunt for it again.  Call the handler proc with a NULL
+         *       option struct pointer.  That tells it to display the keywords.
+         */
+        if (displayEnum) {
+            int        ct     = pOptions->optCt;
+            int        optNo  = 0;
+            tOptDesc*  pOD    = pOptions->pOptDesc;
+            int        docCt  = 0;
 
             fputc( '\n', fp );
             fflush( fp );
-	    do  {
-		if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
-		    (*(pOD->pOptProc))( NULL, pOD );
-	    }  while (pOD++, optNo++, (--ct > 0));
-	}
+            do  {
+                if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
+                    (*(pOD->pOptProc))( NULL, pOD );
+            }  while (pOD++, optNo++, (--ct > 0));
+        }
 
-	/*
-	 *  If there is a detail string, now is the time for that.
-	 */
+        /*
+         *  If there is a detail string, now is the time for that.
+         */
         if (pOptions->pzDetail != (char*)NULL)
             fputs( pOptions->pzDetail, fp );
 

@@ -1,4 +1,8 @@
-[= AutoGen5 Template -*- Mode: text -*- =]
+[= AutoGen5 Template -*- Mode: text -*-
+
+# $Id: optmain.tpl,v 2.8 2000/10/17 19:46:15 bkorb Exp $
+
+=]
 [=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -122,11 +126,11 @@ ENDDEF  =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE declare-option-callbacks  =][=
+DEFINE declare-option-callbacks      =][=
 
    #  For test builds, no need to call option procs  =][=
 
-  IF (exist? "test_main") =]
+  IF (exist? "test_main")            =]
 #if ! defined( TEST_[=(. pname-up)=]_OPTS )[=
   ENDIF
 
