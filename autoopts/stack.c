@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 1.4 1998/07/02 23:00:23 bkorb Exp $
+ *  $Id: stack.c,v 2.0 1998/08/23 10:39:09 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.0 1998/08/23 10:39:06 bkorb Exp $
  *
  *  String Equivalence Comparison
  *

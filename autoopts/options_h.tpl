@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.9 1998/08/17 14:19:06 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.0 1998/08/23 10:39:17 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.

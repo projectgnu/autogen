@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 1.4 1998/08/17 14:19:10 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.0 1998/08/23 10:39:20 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next

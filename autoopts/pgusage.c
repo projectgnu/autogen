@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 1.3 1998/07/18 05:34:56 bkorb Exp $
+ *  $Id: pgusage.c,v 2.0 1998/08/23 10:39:10 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
