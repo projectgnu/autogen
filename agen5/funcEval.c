@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.2 1999/10/14 22:25:44 bruce Exp $
+ *  $Id: funcEval.c,v 1.3 1999/10/16 20:42:04 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -147,16 +147,6 @@ MAKE_HANDLER_PROC( Eval )
 
  try_again:  /* keep stripping off Scheme comments until done */
     switch ( *pz ) {
-    case ';': /* scheme comment */
-        pz = strchr( pz, '\n' );
-        if (pz == (char*)NULL) {
-            pT->pzTemplText[ pMac->ozText ] = NUL;
-            return pMac + 1;
-        }
-        while (isspace( *pz )) pz++;
-        pMac->ozText = (pz - pT->pzTemplText);
-        goto try_again;
-
     case '(': /* scheme expression */
         res = eval( pz );
 
