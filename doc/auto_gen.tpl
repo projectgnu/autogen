@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul  8 14:20:45 1999                                
+## Last Modified:     Thu Jul  8 15:04:20 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.21 1999/07/08 21:21:10 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.22 1999/07/08 22:08:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -102,7 +102,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
-* Invocation::           Running AutoGen
+* AutoGen Invocation::   Invoking AutoGen
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
@@ -1012,7 +1012,10 @@ at all, I decided to leave it in the list of chapters.
 
 @menu
 [=_EVAL 'for f in ${top_builddir}/*/*.menu
-do case $f in *src/autogen.menu ) ;; * ) cat $f ;; esac ;  done' _shell =]
+do
+  case $f in
+    *src/autogen.menu ) : ;;
+    * ) cat $f ;; esac ;  done' _shell =]
 @end menu
 
 [=_EVAL 'for f in ${top_builddir}/*/*.menu
