@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Wed Aug  4 10:02:34 1999				      
+# Last Modified:     Thu Aug  5 10:20:47 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.15 1999/08/04 17:02:48 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.16 1999/08/05 17:21:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -58,24 +58,27 @@ post )
     (  sed 1q configure
        cat <<-	'_EOF_'
 
-	START_DIR=`pwd`
-	SRCDIR=`echo $0 | sed 's;/[^/]*$;;'`
-	SRCDIR=`cd $SRCDIR && pwd`
-	test "$SRCDIR" = "$START_DIR" || {
-	  ( cd $SRCDIR
-	    find . -type d ) |
-	  egrep -v CVS/ |
+	top_builddir=`pwd`
+	top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
+	top_srcdir=`cd $top_srcdir && pwd`
+	if test "$top_srcdir" = "$top_builddir" ; then : ; else
+	  ( cd $top_srcdir
+	    find . -type d -print ) |
+	  grep -v '/CVS\|/RCS' |
 	  while read f
-          do test -d $f || mkdir $f
-          done
+	  do test -d $f || mkdir $f
+	  done
 
-	  ( cd $SRCDIR
-	    find . -type f -o -type l ) |
-	  egrep -v CVS/ |
-	  while read f ; do rm -f $f ; ln -s $SRCDIR/$f $f ; done
+	  ( cd $top_srcdir
+	    find . -type f -o -type l -print ) |
+	  grep -v '/CVS\|/RCS' |
+	  while read f
+	  do
+	     test -f $f || ln -sf $top_srcdir/$f $f
+	  done
 	  sh ./configure $@
-	  exit 0
-	}
+	  exit $?
+	fi
 
 _EOF_
         sed 1d configure ) > configure.tmp
