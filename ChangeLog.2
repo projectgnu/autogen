@@ -1,3 +1,80 @@
+1999-07-23  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* configure.in (AC_CHECK_HEADERS): prefer stdarg.h over varargs.h:
+	AutoGen requires an ANSI compiler anyway, and using stdarg.h with
+	GNU C allows libsnprintfv to enable some extra compiler
+	optimisations.
+
+1999-07-22  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* snprintfv/*:  Updated to snprintfv-0.98a for a few minor
+	improvements in snprintfv, and a license exception to fix an
+	incompatibility with libopts.
+
+1999-07-13  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* VERSION (AG_PATCHLEVEL): Changed to .5
+
+	* config/bootstrap: Remove non-generic parts, and merge in both
+	directions with the master copy.
+	* config/bootstrap.local: New file.  Factor out the non-generic
+	parts of config/bootstrap, to make maintenance of the master copy
+	of bootstrap saner.
+	* */bootstrap: renamed to bootstrap.dir to work with new bootstrap
+	script.
+
+	* configure.in: Pass --enable-snprintfv-convenience to the
+	snprintfv configuration to make sure we build a convenience
+	library.
+
+	* autoopts/Makefile.am (libopts_la_LIBADD): Link with
+	libsnprintfvc.la, the snprintfv convenience library -- effectively
+	including the snprintfv objects in libopts.
+	* getdefs/Makefile.am (getdefs_LDADD): don't link with
+	libsnprintfv.la anymore; libopts.la now contains it's objects.
+	* columns/Makefile.am (columns_LDADD): ditto.
+	* src/Makefile.am (autogen_LDADD): ditto.
+
+	* snprintfv/*: upgraded to snprintfv-0.97
+	* snprintfv/snprintfv.texi: updated to match the improved 0.97
+	API.
+	* snprintfv/snprintfv.menu: copied from the previous snprintfv
+	directory.
+	* snprintfv/doc/bootstrap: ditto.
+
+	* NOTES: deleted.  It was empty anyway.
+
+	* src/bootstrap: My version of byacc generates y.tab.[ch], not
+	y.out.[ch].  Also DJGPP yacc generates y_tab.[ch].  Handle all
+	three cases.  This is still incomplete, as it hardcodes byacc, but
+	I suppose very few people will use these scripts anyway.  I'll
+	write some code to determine the correct parser generator when
+	we get complaints.
+
+1999-07-12  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* configure.in (AG_CHECK_LIB_REGEX): s/POSIX_REGCOMP/LIB_REGEX/g,
+	AC_CHECK_LIB_REGEX is a superset of the other, and is the only one
+	which provides the configure script cli options.
+	(AC_LIBTOOL_WIN32_DLL): reenable this macro (inside an m4 ifdef
+	guard), or else we can't build properly	with cygwin.
+
+	* src/Makefile.am (../getdefs/getdefs): `$(MAKE) getdefs' is
+	extremely unlikely to match the correct rule since it ignores
+	$(srcdir) etc, so we just use $(MAKE) which will continue to work
+	for future versions of automake.
+	(../columns/columns): ditto.
+
+	* config/Makefile.am (EXTRA_DIST): s/ctime.m4/misc.m4/ as it
+	contains other non-ctime related macros now.
+	s/ctime.def/m4.def/ as it too has non ctime related stuff.
+	* config/bootstrap: s/ctime.def/misc.def/ to find the newly
+	renamed file!
+
+	* configure.in (M4_SRC): Removed this macro in favour of manually
+	listing the macro files.
+	* config/Makefile.am (EXTRA_DIST): s/@M4_SRC@/<list of m4 files>/.
+
 1999-07-07  Bruce Korb  <autogen@linuxbox.com>
 
 	* all files everywhere: generally make everything configure with
@@ -65,7 +142,7 @@
 	* src/autogen.c (main): initialise snprintfv's memory management.
 
 	1999-05-22  Gary V. Vaughan  <gary@oranda.goldfish>
-	
+
 	* src/Makefile.am: include MakeRules.in.
 	delete YFLAGS definition duplicated from MakeRules.in.
 	(autogen.texi): use $(srcdir) in place of $(top_srcdir)/src.
@@ -73,7 +150,7 @@
 	(stamp-agdirect): agdirect is in $(srcdir).
 	(stamp-agexpr): agexpr is in $(srcdir).
 	(stamp-agfunc): agfunc is in $(srcdir).
-	
+
 	* autoopts/Makefile.am (EXTRA_DIST): autoopts.m4 seems to have
 	been accidentally deleted... so put it back in again.
 
@@ -83,7 +160,7 @@
 	* MakeRules.in (AUTOHEADER): automake always changes into
 	$top_srcdir before invoking this, so we mustn't have a relative
 	directory with the -l flag.
-	
+
 1999-05-20  Gary V. Vaughan  <gary@oranda.goldfish>
 
 	* configure.in (AUTOOPTS_CONFIG): autoopts-config will be in the
@@ -116,7 +193,7 @@
 
 	* VERSION:  oops look like I wrote a broken library version update
 	scheme, revert to the libtool mandated standard methodology.
-	
+
 1999-05-10  Gary V. Vaughan  <gary@oranda.demon.co.uk>
 
 	* src/agFunFor.c (varargs.h): don't include it here, there are
@@ -144,7 +221,7 @@
 	* Makefile.am (SUBDIRS): recurse into new snprintfv subdir.
 	* snprintfv: a whole new subpackage!
 	* autoopts/Makefile.am (libopts_la_SOURCES): removed snprintfv.[ch].
-	* autoopts/snprintfv.c: deleted.	
+	* autoopts/snprintfv.c: deleted.
 	* autoopts/snprintfv.h: ditto.
 
 	* src/autogen.h: added missing semicolon line terminator.
@@ -268,7 +345,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 
 1999-03-26  Bruce Korb <autogen@autogen.freeservers.com>
 
-	* src/agTempl.c(parseTemplate): We need to count lines *before* 
+	* src/agTempl.c(parseTemplate): We need to count lines *before*
 	we strip the trailing white space :)
 
 1999-03-23  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
@@ -720,7 +797,7 @@ Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 	libopts.  The release procedure is described in the comments.
 
 	* configure.in: Substitute new libtool vars into configure
-	generated files. 
+	generated files.
 
 	* autoopts/Makefile.am (libopts_la_LDFLAGS): use the new
 	versioning variables with the libtool link command.

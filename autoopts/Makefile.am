@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Wed Jul  7 11:26:41 1999				      
+## Last Modified:   Thu Jul 29 08:22:08 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.17 1999/07/07 19:12:49 bkorb Exp $
+## $Id: Makefile.am,v 2.18 1999/07/29 15:48:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,9 +20,12 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
-EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi bootstrap \
-		autoopts-config.in config-opts.def \
-		genshell.def genshell.c genshell.h agman1.tpl
+pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl \
+		aginfo.tpl agman1.tpl
+
+EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi \
+		bootstrap.dir autoopts-config.in config-opts.def \
+		genshell.def genshell.c genshell.h
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
@@ -32,9 +35,10 @@ libopts_la_SOURCES = \
 		autoopts.c pgusage.c putshell.c save.c \
 		stack.c usage.c version.c streqvcmp.c \
 		autoopts.h options.h streqv.h makeshell.c
-libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
-pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl agman1.tpl
+libopts_la_LDFLAGS = -no-undefined \
+		-version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
 
 bin_SCRIPTS	= autoopts-config
 

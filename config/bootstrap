@@ -3,44 +3,59 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
-# Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
-# Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Wed Jul  7 13:00:30 1999				      
+# Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
+# Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
+# Created:           Thu Apr  9 00:40:23 1998
+# Last Modified:     Thu Jul 29 08:36:54 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.16 1999/07/07 20:00:43 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.17 1999/07/29 15:48:18 bkorb Exp $
 # ----------------------------------------------------------------------
+
+# Commentary:
+#
+# This script is designed to find any directories which contain a
+# configure.in in script, and to run the autotools programs from each
+# of those directories to make sure they are in a state ready to
+# 'configure; make; make install'
+#
+# Often this process involves more than `libtoolize; automake; autoconf',
+# so supplementary actions can be placed in a bootstrap.local script
+# in the same directory as this script, and anywhere in the source tree
+# in bootstrap.dir files.  The bootstrap.local script will be sourced
+# twice; first with BOOTSTRAP=pre before the main part is run, and then
+# again with BOOTSTRAP=post after the main part has finished.  This makes
+# it possible to set up any links or temporary files required for this
+# script to work before it has executed, and then remove them when it
+# has finished.  The bootstrap.dir files are also sourced, in a random
+# order, as they are found in the tree just before the BOOTSTRAP=post
+# phase.  This allows a developer to put any peculiar bootstrap actions
+# required by individual directories where they can be seen (and not
+# forgotten!).
+#
+# In an ideal world, running this bootstrap script (including any extra
+# scripts it executes) should leave a freshly checked out CVS source tree
+# in the same state as a freshly unrolled tarball.  In this way, one
+# no longer has to maintain generated files under source control, they
+# can be generated after checkout using this bootstrap procedure.
 
 # Code:
 
-chmod +x snprintfv/config/genproto
-
-autogen --help > /dev/null 2>&1 || {
-  echo AutoGen not available
-  exit 0
-}
-
-getdefs --help > /dev/null 2>&1 || {
-  echo getdefs not available
-  exit 0
-}
-
-columns --help > /dev/null 2>&1 || {
-  echo columns not available
-  exit 0
-}
-
-(
-  cd config
-  echo Genning config/ctime.m4
-  autogen ctime.def
-) || exit 1
-
+# Rather than give up at the first failure, set this variable to
+# non-zero, so that all the checks are performed before exiting.
+DIE=0
+ 
 # Figure out the absolute path to the working directory.
 wd=`echo $0|sed 's,/[^/]*$,,'`
 test -z "$wd" && wd=.
  
+# Source any local scripts which add to the bootstrap procedure.
+# The bootstrap.local script should test the value of the BOOTSTRAP
+# environment variable to see whether it should run the sections
+# to be called before the main script, or afterwards.
+BOOTSTRAP=pre
+test -f $wd/bootstrap.local && . $wd/bootstrap.local
+
 # Search for a configure.in
 for srcdir in $wd $wd/.. .. .; do
     test -f $srcdir/configure.in && break
@@ -67,12 +82,10 @@ LIBTOOLIZE=:
 sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
   | egrep 'A(C|M)_PROG_LIBTOOL' > /dev/null && LIBTOOLIZE=libtoolize
 
- DIE=0
- 
 missing()
 {
     cat >&2 <<-	_EOF_
-	**ERROR**:  You must have \`$1\' installed to bootstrap autogen.
+	**ERROR**:  You must have \`$1\' installed to bootstrap AutoGen.
 	Download the appropriate package for your distribution,
 	or get the source at:
 	    $2
@@ -129,20 +142,6 @@ fi
 
 # If any of the above tests failed, abort at this point.
 test "$DIE" -ne 0 && exit $DIE
-
-# ----------------------------------------------------------------------
-# Since snprintfv has a mutual dependency on libopts from AutoGen-4.5.3
-# and above, this link is necessary to bootstrap snprintfv's test
-# directory.
-# ----------------------------------------------------------------------
-test -f ./autoopts/autoopts.m4 \
-  && rm -f ./snprintfv/acinclude.m4 \
-  && ln -s `pwd`/autoopts/autoopts.m4 ./snprintfv/acinclude.m4
-
-# ----------------------------------------------------------------------
-# automake wants this stuff now, but we generate it later!
-# ----------------------------------------------------------------------
-test -f doc/autogen.texi || echo '@setfilename fnord' > doc/autogen.texi
 
 # Still here?  Run through all of the required autogeneration tools in
 # each directory which contains a configure.in file...
@@ -201,38 +200,22 @@ do
   )
 done
 
-# remove the fake file so we don't forget to generate it later.
-test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
-    || rm -f doc/autogen.texi
-
-which which > /dev/null 2>&1 || {
-  echo Cannot determine program locations
-  exit 0
-}
-
-find . -name bootstrap |
-egrep -v '(CVS/Base/|config/bootstrap)'   |
+# Execute (NOTE: not source!) any bootstrap.dir scripts we find in
+# the source tree.
+find . -name bootstrap.dir |
+egrep -v 'CVS/Base/'	   |
 while read f
 do
-  (cd `dirname $f`
-   echo running bootstrap in `pwd`
-   sh bootstrap recursive )
+  (cd `echo $f|sed 's,/[^/]*$,,'`
+   echo running bootstrap.dir in `pwd`
+   sh ./bootstrap.dir recursive )
 done
 
-OPTDIR=`pwd`/autoopts
-
-find . -name 'opts.def' |
-egrep -v 'CVS/Base/'    |
-sed 's;\.def$;;'        |
-while read f
-do
-  if [ ! -f ${f}.c ]
-  then
-    ( cd `dirname $f`
-      echo bootstrapping options in `pwd`
-      autogen -L $OPTDIR opts.def
-    )
-  fi
-done
+# Source any local scripts which add to the bootstrap procedure.
+# The bootstrap.local script should test the value of the BOOTSTRAP
+# environment variable to see whether it should run the sections
+# to be called before the main script, or afterwards.
+BOOTSTRAP=post
+test -f $wd/bootstrap.local && . $wd/bootstrap.local
 
 # bootstrap ends here

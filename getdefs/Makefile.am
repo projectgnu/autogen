@@ -7,10 +7,10 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Mon Jul 12 14:12:56 1999				      
+## Last Modified:   Thu Jul 29 08:41:30 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.16 1999/07/12 21:13:22 bkorb Exp $
+## $Id: Makefile.am,v 2.17 1999/07/29 15:48:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -20,8 +20,7 @@ getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
 
-getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la \
-		$(top_builddir)/snprintfv/snprintfv/libsnprintfv.la
+getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 
 getdefs_LDFLAGS = -static
 INCLUDES 	= -I$(top_srcdir) -I$(top_srcdir)/autoopts

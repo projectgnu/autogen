@@ -7,15 +7,15 @@
 ## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
 ## Maintainer:       Bruce Korb <korbb@datadesign.com>
 ## Created:          Mon Jun 30 15:35:12 1997	
-## Last Modified:    Mon Jun 14 10:42:50 1999				      
+## Last Modified:    Thu Jul 29 08:30:10 1999				      
 ##            by:    Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.6 1999/06/14 18:07:56 bkorb Exp $
+## $Id: Makefile.am,v 2.7 1999/07/29 15:48:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-EXTRA_DIST	= bootstrap compat.h gnu-regex.c gnu-regex.h libgen.h \
-		ndir.h pathfind.c sigsend.c strftime.c \
+EXTRA_DIST	= bootstrap.dir compat.h gnu-regex.c gnu-regex.h \
+		libgen.h ndir.h pathfind.c sigsend.c strftime.c \
 		strsignal.c strsignal.def strsignal.h strsignal.tpl
 
 GEN_SRC    = strsignal.h

@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Mon Jul 12 14:13:46 1999				      
+## Last Modified:   Thu Jul 29 08:24:37 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.15 1999/07/12 21:14:09 bkorb Exp $
+## $Id: Makefile.am,v 1.16 1999/07/29 15:48:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -20,8 +20,7 @@ columns_SOURCES = columns.c opts.c opts.h
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
 
-columns_LDADD	= $(top_builddir)/autoopts/libopts.la \
-		$(top_builddir)/snprintfv/snprintfv/libsnprintfv.la
+columns_LDADD	= $(top_builddir)/autoopts/libopts.la
 
 INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
 
@@ -36,7 +35,7 @@ opts.c opts.h: opts.def
 	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/columns/opts.def
 
-columns.menu columns.texi : opts.def columns
+columns.texi : opts.def columns
 	top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -Taginfo -bcolumns \
 		-L $(top_srcdir)/autoopts -DLEVEL=section \
