@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.2 1999/10/30 20:23:23 bruce Exp $
+ *  $Id: expString.c,v 1.3 1999/10/31 00:18:11 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -168,7 +168,10 @@ makeString( tCC*    pzText,
 
 /*=gfunc in_p
  *
- *req:  2
+ * exparg: test-string, string to look for
+ * exparg: string-list, list of strings to check,, ellipsis
+ *
+ * opt:  1
  * doc:  Return SCM_BOOL_T if the first argument is duplicated
  *      in the second (list) argument.
 =*/
@@ -199,6 +202,9 @@ ag_scm_in_p( SCM obj, SCM list )
 
 
 /*=gfunc join
+ *
+ * exparg: separator, string to insert between entries
+ * exparg: list, list of strings to join,, ellipsis
  *
  * opt:  1
  * doc:  With the first argument as the separator string,
@@ -266,6 +272,9 @@ ag_scm_join( SCM sep, SCM list )
 
 /*=gfunc prefix
  *
+ * exparg: prefix, string to insert at start of each line
+ * exparg: text, multi-line block of text
+ *
  * req:  2
  * doc:
  *
@@ -331,6 +340,8 @@ ag_scm_prefix( SCM prefix, SCM text )
 
 /*=gfunc shell
  *
+ * exparg: command, shell command - the result value is stdout
+ *
  * doc:
  *
  *  Generate a string by writing the value to
@@ -362,9 +373,11 @@ ag_scm_shell( SCM cmd )
 
 /*=gfunc raw_shell_str
  *
+ * exparg: string, string to transform
+ *
  * doc:
  *
- *  Convert the text of the string at TOS into a singly quoted string
+ *  Convert the text of the string into a singly quoted string
  *  that a normal shell will process into the original string.
  *  (It will not do macro expansion later, either.)
  *  Contained single quotes become tripled, with the middle quote
@@ -417,6 +430,8 @@ ag_scm_raw_shell_str( SCM obj )
 
 
 /*=gfunc shell_str
+ *
+ * exparg: string, string to transform
  *
  * doc:
  *  Convert the text of the string into a double quoted string
@@ -475,8 +490,8 @@ ag_scm_shell_str( SCM obj )
 
 /*=gfunc stack
  *
- *req: 0
- *var: 1
+ * exparg: ag-name, AutoGen value name
+ *
  * doc:  Create a list of all the strings that are associated
  *      with a name.
 =*/
@@ -501,9 +516,9 @@ ag_scm_stack( SCM obj )
 
 /*=gfunc kr_string
  *
- * exparg: string
- *  doc:
+ * exparg: string, string to reformat
  *
+ *  doc:
  *  Reform a string so that, when printed, a K&R C compiler will be able
  *  to compile the data and construct a string that contains exactly
  *  what the current string contains.  Many non-printing characters are
@@ -525,9 +540,9 @@ evalExpr_kr_string( SCM str )
 
 /*=gfunc c_string
  *
- * exparg: string
- * doc:
+ * exparg: string, string to reformat
  *
+ * doc:
  *  Reform a string so that, when printed, the C compiler will be able
  *  to compile the data and construct a string that contains exactly
  *  what the current string contains.  Many non-printing characters are
@@ -552,9 +567,9 @@ ag_scm_c_string( SCM str )
 
 /*=gfunc string_tr_x
  *
- *  exparg:  source
- *  exparg:  match
- *  exparg:  translation
+ *  exparg:  source, string to transform
+ *  exparg:  match,  characters to be converted
+ *  exparg:  translation, result characters
  *
  *  req:  3
  *
