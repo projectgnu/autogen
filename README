@@ -1,11 +1,10 @@
-This is AutoGen, an automated text file generator.  It was inspired
-out of frustration and hassle with maintaining syncronization between
-option flag lists, global variables and usage information.  The desire
-for more than #define macros came about when it became apparent that
-macros alone were insufficient for reducing the maintenance into a
-single option list.  The impetus to actually start something finally
-came when I had to maintain a large callout procedure table and
-associated lookup tables.
+This is AutoGen, an automated text file generator.  It was inspired out of
+frustration and hassle with maintaining syncronization between option flag
+lists, global variables and usage information.  The desire for more than
+#define macros came about when it became apparent that macros alone were
+insufficient for reducing the maintenance into a single option list.  The
+impetus to actually start something finally came when I had to maintain a
+large callout procedure table and associated lookup tables.
 
 Rev 1 of this utility was a set of #define macro expansions.
 Rev 2 was a shell script that sort-of did a prototype.
@@ -59,14 +58,13 @@ like it.  It is, however, up to you.
 
 ***  Build note: ***
 
-Sometimes, configure believes it has done a good job when it really
-hasn't.  It is possible to configure a system in such a way that
-the Guile headers and libguile are linked against correctly, but the
-loader cannot find libguile.so.xxx.  This is because GCC will silently
-find the library for linking, but not set the library dependencies
-correctly.  The consequence is that the configure script believes that
-standard links will produce working executables.  It won't.  The
-simplest solution is:
+Sometimes, configure believes it has done a good job when it really hasn't.
+It is possible to configure a system in such a way that the Guile headers and
+libguile are linked against correctly, but the loader cannot find
+libguile.so.xxx.  This is because GCC will silently find the library for
+linking, but not set the library dependencies correctly.  The consequence is
+that the configure script believes that standard links will produce working
+executables.  It won't.  The simplest solution is:
 
   .../configure --disable-shared
 

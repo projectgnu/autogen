@@ -9,8 +9,3 @@
 
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
-
-*  Possibilities for the (distant) future:
-
-** write code for "autogetopt" (GNU getopt), or
-  possibly the new glibc argp parser.

@@ -1,20 +1,16 @@
+New in 5.6 - February, 2004
+* AutoFSM was enhanced with the notion of a "noop" transition handling
+* fmemopen() is now used (when possible) for anonymous output (diversions)
+* The Guile function (chdir "...") is now wrapped so AutoGen can adapt
+* the definitions parser now uses a FSM parser instead of YACC
+* AutoOpt-ed programs can now have internationalized usage text
+* Templates have been added for using getopt(3) or getopt_long(3GNU)
+  to parse options (in lieu of libopts).
+
 New in 5.5.5 - May, 2003
-* More improvements in man page appearance
-* minor bug fixes here and there
 * better docs on partitioned ini (rc) files
-* updated snprintfv library
-* improved handling of errors in CGI processing
-* many warning cleanups
 
 New in 5.5.3 - March, 2003
 * AutoOpts' usage procedure has been enhanced to produce either AutoOpts
   standard usage or usage that looks more like current GNU practices.
   The latter provides less information and help.
-* I32LPx behavior has improved.  Don't think I can call it "industrial
-  strength" just yet, tho.
-
-New in 5.5.2 - February, 2003
-* Fixes for FreeBSD weirdisms with sed, dlopen(), and the Guile library
-* stash offsets in uintptr_t types so this thing works when
-  sizeof(void*) != sizeof(off_t)
-* still more configury fixes.  It will never, ever end.
