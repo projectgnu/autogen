@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-01 13:23:21 bkorb"
+## Time-stamp:      "2004-02-05 20:38:07 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.13 2004/02/01 21:26:46 bkorb Exp $
+## $Id: Makefile.am,v 3.14 2004/02/14 22:12:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -30,7 +30,11 @@ DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_getdefs_SOURCES) *-stamp
 INCLUDES        = @INCLIST@
-COLUMNS_EXE     = $(top_builddir)/columns/columns
+AG_ENV          = top_builddir=$(top_builddir) \
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
+  export top_builddir top_srcdir PATH
+COLUMNS_EXE     = $(top_builddir)/columns/columns$(EXEEXT)
+
 
 all : gen
 gen : $(BUILT_SOURCES) $(DOCFILES)
@@ -41,10 +45,7 @@ gd.c : $(gdsrcs)
 	  for f in $(gdsrcs) ; do echo "#include \"$$f\"" ; done ) > $@
 
 opts.h : opts.def $(COLUMNS_EXE) $(AGEXE)
-	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-	COLUMNS_EXE=$(COLUMNS_EXE) ; \
-	export top_builddir top_srcdir COLUMNS_EXE ; \
-	$(AGEXE_LIB) $(srcdir)/opts.def
+	$(AG_ENV) ; $(AGEXE_LIB) $(srcdir)/opts.def
 
 $(DOCFILES) : doc-stamp
 
@@ -54,10 +55,8 @@ $(AGEXE) :
 $(COLUMNS_EXE) :
 	@cd ../columns ; $(MAKE) columns
 
-doc-stamp : opts.def $(TARG)$(EXEEXT) $(AGEXE)
-	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) ; \
-	export top_builddir top_srcdir ; \
-	$(AGEXE_LIB) -Tagman1 -b$(TARG) $(srcdir)/opts.def ; \
+doc-stamp : opts.def $(COLUMNS_EXE) $(TARG)$(EXEEXT) $(AGEXE)
+	$(AG_ENV) ; $(AGEXE_LIB) -Tagman1 -b$(TARG) $(srcdir)/opts.def ; \
 	$(AGEXE_LIB) -Taginfo -b$(TARG) -DLEVEL=section $(srcdir)/opts.def
 	@touch $@
 

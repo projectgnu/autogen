@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-01 13:23:48 bkorb"
+## Time-stamp:      "2004-02-05 20:40:02 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.20 2004/02/01 21:26:46 bkorb Exp $
+## $Id: Makefile.am,v 3.21 2004/02/14 22:12:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -36,6 +36,10 @@ OPTIONS_DEF	= $(AGSRCDIR)/opts.def
 DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 
 GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
+
+AG_ENV          = top_builddir=$(top_builddir) \
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
+  export top_builddir top_srcdir PATH
 
 ADDON_MENU	= \
 		../columns/columns.menu \
@@ -78,8 +82,8 @@ texi         : texi-stamp
 autogen.texi : texi
 
 texi-stamp : autogen.def
-	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	AGEXE=$(AGEXE) CC="$(CC)" COLUMNS_EXE="$(COLUMNS_EXE)" \
+	$(AG_ENV) ; \
+	AGEXE=$(AGEXE) CC="$(CC)" \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	LIBS="$(LIBS)" SHELL=/bin/sh MAKE='$(MAKE)' \

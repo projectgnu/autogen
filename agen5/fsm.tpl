@@ -178,6 +178,5 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 
   `rm -f .fsm.*`        =][=
 
-ESAC (suffix) =][=
-
-trailer =]
+ESAC (suffix) =]
+/* end of [=(out-name)=] */

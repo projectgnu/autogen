@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/02/01 21:26:45 $
+# Last Modified:     $Date: 2004/02/14 22:12:45 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.17 2004/02/01 21:26:45 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.18 2004/02/14 22:12:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -69,7 +69,7 @@ d=\`cd $dir ; pwd\`
 if [ -x $d/$prog ]
 then echo ${var}=$d/$prog
 else
-  f=\`type $prog | sed -e \"s;${prog} is [^/]*/;/;\" \`
+  f=\`type $prog 2> /dev/null | sed -e \"s;${prog} is [^/]*/;/;\" \`
   case ${f} in
   */${prog} )  echo ${var}=${f} ;;
   * ) echo unset ${var} ;;

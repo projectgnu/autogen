@@ -1,89 +1,153 @@
+/*-
+ * Copyright (c) 2004
+ *	Bruce Korb.  All rights reserved.
+ *
+ * This code was inspired from software written by
+ *   Hanno Mueller, kontakt@hanno.de
+ * and completely rewritten by Bruce Korb, bkorb@gnu.org
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#ifdef ENABLE_FMEMOPEN
 
 /*=--subblock=arg=arg_type,arg_name,arg_desc =*/
-/*=*
- * library:  fmem
- * header:   lib-fmem.h
- *
- * lib_description:
- *
- *  This library only functions in the presence of GNU libc.
- *  It is distributed under the GNU Lesser General Public License
- *  as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *
- *  The GNU C Library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with the GNU C Library; if not, write to the Free
- *  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
- *  02111-1307 USA.
-=*/
 /*
  * fmemopen() - "my" version of a string stream
- * Hanno Mueller, kontakt@hanno.de
- * completely rewritten by Bruce Korb - bkorb@gnu.org
+ * inspired by the glibc version, but completely rewritten and
+ * extended by Bruce Korb - bkorb@gnu.org
  *
  * - See the man page.
  */
 
-#ifdef HAVE_FOPENCOOKIE
-
-STATIC int fmem_getmode( const char *mode, fmem_io_mode_t *mptr );
-STATIC int fmem_extend(  fmem_cookie_t *pFMC, size_t new_size );
-
-#ifndef __set_errno
-#  define __set_errno(e)  errno = e
+#if defined(__linux)
+#  define _GNU_SOURCE
 #endif
 
-STATIC int
-fmem_getmode( const char *mode, fmem_io_mode_t *mptr )
+#include <sys/types.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#if defined(__linux)
+#  include <libio.h>
+   typedef _IO_off64_t  fmem_off_t;
+   typedef int          seek_pos_t;
+
+#elif defined(__bsd)
+#  include "local.h"
+   typedef size_t  fmem_off_t;
+   typedef fpos_t  seek_pos_t;
+
+   typedef int     (cookie_close_function_t)(void *);
+   typedef int     (cookie_read_function_t )(void *, char *, int);
+   typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
+   typedef int     (cookie_write_function_t)(void *, const char *, int);
+
+#else
+#  error  OOPS
+#endif
+
+#define PROP_TABLE \
+_Prop_( read,       "Read from buffer"        ) \
+_Prop_( write,      "Write to buffer"         ) \
+_Prop_( append,     "Append to buffer okay"   ) \
+_Prop_( binary,     "byte data - not string"  ) \
+_Prop_( create,     "allocate the string"     ) \
+_Prop_( truncate,   "start writing at start"  ) \
+_Prop_( allocated,  "we allocated the buffer" )
+
+#ifndef NUL
+# define NUL '\0'
+#endif
+
+#define _Prop_(n,s)   BIT_ID_ ## n,
+typedef enum { PROP_TABLE BIT_CT } fmem_flags_e;
+#undef  _Prop_
+
+#define FLAG_BIT(n)  (1 << BIT_ID_ ## n)
+
+typedef unsigned long mode_bits_t;
+typedef unsigned char buf_chars_t;
+
+typedef struct fmem_cookie_s fmem_cookie_t;
+struct fmem_cookie_s
 {
-    if (mode == NULL)
+    mode_bits_t    mode;
+    buf_chars_t   *buffer;
+    size_t         buf_size;    /* Full size of buffer */
+    size_t         next_ix;     /* Current position */
+    size_t         high_water;  /* Highwater mark of valid data */
+    size_t         pg_size;     /* size of a memory page.
+                                   Future architectures allow it to vary
+                                   by memory region. */
+};
+
+static int
+fmem_getpMode( const char *pMode, mode_bits_t *pRes )
+{
+    if (pMode == NULL)
         return 1;
 
-    memset( mptr, 0, sizeof (*mptr));
-
-    switch (*mode) {
-    case 'a':
-        mptr->extensible = mptr->write = mptr->create = mptr->append = 1;
-        break;
-    case 'w':
-        mptr->write = mptr->create = mptr->truncate = 1;
-        break;
-    case 'r':
-        mptr->read = 1;
-        break;
-    default:
-        return 1;
+    switch (*pMode) {
+    case 'a': *pRes = FLAG_BIT(write) | FLAG_BIT(create) | FLAG_BIT(append);
+              break;
+    case 'w': *pRes = FLAG_BIT(write) | FLAG_BIT(create) | FLAG_BIT(truncate);
+              break;
+    case 'r': *pRes = FLAG_BIT(read);
+              break;
+    default:  return EINVAL;
     }
 
+    /*
+     *  If someone wants to supply a "wxxbxbbxbb+" pMode string, I don't care.
+     */
     for (;;) {
-        switch (*++mode) {
-        case NUL:
-            goto mode_done;
-        case '+':
-            mptr->extensible = mptr->read = mptr->write = 1;
-            continue;
-        case 'b':
-            mptr->binary = 1;
-            continue;
-        case 'x':
-            continue;
-        default:
-            return 1;
+        switch (*++pMode) {
+        case '+': *pRes |= FLAG_BIT(append) | FLAG_BIT(read) | FLAG_BIT(write);
+                  if (*pMode != NUL)
+                      return EINVAL;
+                  break;
+        case NUL: break;
+        case 'b': *pRes |= FLAG_BIT(binary); continue;
+        case 'x': continue;
+        default:  return EINVAL;
         }
-    } mode_done:;
+        break;
+    }
 
-    if (!mptr->read && !mptr->write)
-        return 1;
-
-    return 0;
+    /*
+     *  Either the read or write bit must be set. (both okay, too)
+     */
+    return (*pRes & (FLAG_BIT(read) | FLAG_BIT(write)))
+           ? 0 : EINVAL;
 }
 
-STATIC int
+static int
 fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
 {
     size_t ns = (new_size + (pFMC->pg_size - 1)) & (~(pFMC->pg_size - 1));
@@ -94,24 +158,23 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
      *  This bit is set with either "a"ppend mode in the open mode string, or
      *  with a '+' flag setting read and write mode.
      */
-    if (pFMC->mode.extensible == 0)
+    if (pFMC->mode & FLAG_BIT(append) == 0)
         return -1;
 
-    if (pFMC->mode.allocated == 0) {
+    if (pFMC->mode & FLAG_BIT(allocated) == 0) {
         /*
          *  Previously, this was a user supplied buffer.  We now move to one
          *  of our own.  The user is responsible for the earlier memory.
          */
         void* bf = malloc( ns );
         if (bf == NULL) {
-            errno = ENOSPC;
+            errno - ENOSPC;
             return -1;
         }
-        memcpy( bf, pFMC->buffer, pFMC->size );
+        memcpy( bf, pFMC->buffer, pFMC->buf_size );
         pFMC->buffer = bf;
-        pFMC->mode.allocated = 1;
+        pFMC->mode  |= FLAG_BIT(allocated);
     }
-
     else {
         void* bf = realloc( pFMC->buffer, ns );
         if (bf == NULL) {
@@ -124,39 +187,37 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
     /*
      *  Unallocated file space is set to zeros.  Emulate that.
      */
-    memset( pFMC->buffer + pFMC->size, 0, ns - pFMC->size );
-    pFMC->size = ns;
+    memset( pFMC->buffer + pFMC->buf_size, 0, ns - pFMC->buf_size );
+    pFMC->buf_size = ns;
     return 0;
 }
 
-STATIC ssize_t
-fmem_read( void *cookie, void *buf, size_t rd_ct )
+static ssize_t
+fmem_read( void *cookie, void *pBuf, size_t sz )
 {
-    fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
+    fmem_cookie_t *pFMC = cookie;
 
-    if (pFMC->pos + rd_ct > pFMC->size) {
-        if (pFMC->pos >= pFMC->size)
-            return (rd_ct > 0) ? -1 : 0;
-        rd_ct = pFMC->size - pFMC->pos;
+    if (pFMC->next_ix + sz > pFMC->buf_size) {
+        if (pFMC->next_ix >= pFMC->buf_size)
+            return (sz > 0) ? -1 : 0;
+        sz = pFMC->buf_size - pFMC->next_ix;
     }
 
-    memcpy( buf, &(pFMC->buffer[pFMC->pos]), rd_ct );
+    memcpy( pBuf, pFMC->buffer + pFMC->next_ix, sz );
 
-    pFMC->pos += rd_ct;
-    if (pFMC->pos > pFMC->maxpos)
-        pFMC->maxpos = pFMC->pos;
+    pFMC->next_ix += sz;
+    if (pFMC->next_ix > pFMC->high_water)
+        pFMC->high_water = pFMC->next_ix;
 
-    return rd_ct;
+    return sz;
 }
 
-STATIC ssize_t
-fmem_write( void *cookie, const void *b, size_t wr_ct )
-{
-    const char* pBuf = b;
-    fmem_cookie_t *pFMC;
-    int add_nul_char;
 
-    pFMC = (fmem_cookie_t *) cookie;
+static ssize_t
+fmem_write( void *cookie, const void *pBuf, size_t sz )
+{
+    fmem_cookie_t *pFMC = cookie;
+    int add_nul_char;
 
     /*
      *  Only add a NUL character if:
@@ -165,106 +226,86 @@ fmem_write( void *cookie, const void *b, size_t wr_ct )
      *  * there are data to write
      *  * the last character to write is not NUL
      */
-    add_nul_char = (pFMC->mode.binary == 0)
-                   && (  (wr_ct == 0)
-                      || (pBuf[wr_ct - 1] != NUL) );
+    add_nul_char =
+           ((pFMC->mode & FLAG_BIT(binary)) != 0)
+        && (sz > 0)
+        && (((char*)pBuf)[sz - 1] != NUL);
 
-    if (pFMC->mode.append != 0)
-        pFMC->pos = pFMC->maxpos;
+    {
+        size_t next_pos = pFMC->next_ix + sz + add_nul_char;
+        if (next_pos > pFMC->buf_size) {
+            if (fmem_extend( pFMC, next_pos ) != 0) {
+                /*
+                 *  We could not extend the memory.  Try to write some data.
+                 *  Fail if we are either at the end or not writing data.
+                 */
+                if ((pFMC->next_ix >= pFMC->buf_size) || (sz == 0))
+                    return -1; /* no space at all.  errno is set. */
+
+                /*
+                 *  Never add the NUL for a truncated write.  "sz" may be
+                 *  unchanged or limited here.
+                 */
+                add_nul_char = 0;
+                sz = pFMC->buf_size - pFMC->next_ix;
+            }
+        }
+    }
+
+    memcpy( pFMC->buffer + pFMC->next_ix, pBuf, sz);
+
+    pFMC->next_ix += sz;
 
     /*
-     *  IF we are trying to go past the end of the buffer,
-     *  we might shorten the write or we might fail.  Let's see...
+     *  Check for new high water mark and remember it.  Add a NUL if
+     *  we do that and if we have a new high water mark.
      */
-    if (pFMC->pos + wr_ct + add_nul_char > pFMC->size) do {
-        if (pFMC->mode.extensible != 0) {
-            /*
-             *  We are allowed to extend.  We either extend or fail with ENOSPC.
-             *  The error is set in "fmem_extend".
-             */
-            if (fmem_extend( pFMC, pFMC->pos + wr_ct + add_nul_char ) != 0)
-                return -1;
-            break;
-        }
-
-        /*
-         *  IF we are already at the end, then signal an error.
-         */
-        if (pFMC->pos + add_nul_char >= pFMC->size) {
-            errno = ENOSPC;
-            return -1;
-        }
-
-        /*
-         *  Shorten the write.
-         */
-        wr_ct = pFMC->size - pFMC->pos - add_nul_char;
-    } while (0);
-
-    memcpy( &(pFMC->buffer[pFMC->pos]), pBuf, wr_ct );
-
-    pFMC->pos += wr_ct;
-    if (pFMC->pos > pFMC->maxpos) {
-        pFMC->maxpos = pFMC->pos;
+    if (pFMC->next_ix > pFMC->high_water) {
+        pFMC->high_water = pFMC->next_ix;
         if (add_nul_char)
-            pFMC->buffer[pFMC->maxpos] = NUL;
+            pFMC->buffer[ pFMC->high_water ] = NUL;
     }
 
-    return wr_ct;
+    return sz;
 }
 
-STATIC int
-fmem_seek( void *cookie, _IO_off64_t *p_offset, int seek_type )
+
+static seek_pos_t
+fmem_seek (void *cookie, fmem_off_t *p, int dir)
 {
-    _IO_off64_t new_pos;
-    fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
+    fmem_off_t new_pos;
+    fmem_cookie_t *pFMC = cookie;
 
-    switch (seek_type) {
-    case SEEK_SET:
-        new_pos = *p_offset;
-        break;
-
-    case SEEK_CUR:
-        new_pos = pFMC->pos + *p_offset;
-        break;
-
-    case SEEK_END:
-        new_pos = pFMC->size - *p_offset;
-        break;
-
-    case FMEM_IOCTL_BUF_ADDR:
-        *(char**)p_offset = pFMC->buffer;
-        return 0;
-
-    case FMEM_IOCTL_SAVE_BUF:
-        pFMC->mode.allocated = 0;
-        return 0;
-
-    default:
-        errno = EINVAL;
-        return -1;
+    switch (dir) {
+    case SEEK_SET: new_pos = *p;  break;
+    case SEEK_CUR: new_pos = pFMC->next_ix  + *p;  break;
+    case SEEK_END: new_pos = pFMC->buf_size - *p;  break;
+    default:       goto seek_oops;
     }
 
-    if (new_pos < 0) {
-        errno = EINVAL;
-        return -1;
-    }
+    if ((signed)new_pos < 0)
+        goto seek_oops;
 
-    if (new_pos > pFMC->size) {
+    if (new_pos > pFMC->buf_size) {
         if (fmem_extend( pFMC, new_pos ))
-            return -1;
+            return -1; /* errno is set */
     }
 
-    *p_offset = pFMC->pos = new_pos;
-    return 0;
+    pFMC->next_ix = new_pos;
+    return new_pos;
+
+ seek_oops:
+    errno = EINVAL;
+    return -1;
 }
 
-STATIC int
+
+static int
 fmem_close( void *cookie )
 {
-    fmem_cookie_t *pFMC = (fmem_cookie_t *) cookie;
+    fmem_cookie_t *pFMC = cookie;
 
-    if (pFMC->mode.allocated)
+    if (pFMC->mode & FLAG_BIT(allocated))
         free( pFMC->buffer );
     free( pFMC );
 
@@ -376,45 +417,50 @@ fmem_ioctl( FILE* fp, int req, void* ptr )
  *
  *  @noindent
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
- =*/
+=*/
 FILE *
-fmemopen( void *buf, size_t len, const char *mode )
+fmemopen(void *buf, size_t len, const char *mode)
 {
-    fmem_cookie_t *pFMC = (fmem_cookie_t *) malloc( sizeof (fmem_cookie_t));
-    if (pFMC == NULL) {
-        errno = ENOMEM;
-        return NULL;
+    fmem_cookie_t *pFMC;
+
+    {
+        mode_bits_t mode;
+
+        if (fmem_getmode(mode, &mode) != 0) {
+            errno = EINVAL;
+            return NULL;
+        }
+
+        pFMC = malloc(sizeof(fmem_cookie_t));
+        if (pFMC == NULL) {
+            errno = ENOMEM;
+            return NULL;
+        }
+
+        pFMC->mode = mode;
     }
 
-    if (fmem_getmode( mode, &pFMC->mode ) != 0) {
-        errno = EINVAL;
-        free( pFMC );
-        return NULL;
-    }
-
-    pFMC->mode.allocated = ((buf == NULL) || (len == 0));
+    if (buf == NULL)
+        pFMC->mode |= FLAG_BIT(allocated);
     pFMC->pg_size = getpagesize();
 
-    if (pFMC->mode.allocated == 0) {
+    if ((pFMC->mode & FLAG_BIT(allocated)) == 0) {
         char *p = pFMC->buffer = buf;
 
         /*
+         *  User allocated buffer.  User responsible for disposal.
          *  IF writing but not appending, start at beginning
          */
-        if ((pFMC->mode.write != 0) && (pFMC->mode.append == 0)) {
+        pFMC->next_ix = 0;
+        if (  (pFMC->mode & (FLAG_BIT(write) | FLAG_BIT(append)))
+           == FLAG_BIT(write) )  {
             pFMC->buffer[0] = NUL;
-            pFMC->pos = 0;
-
-        } else if ((pFMC->mode.binary != 0) && (pFMC->mode.append != 0)) {
-            pFMC->pos = len;
-
         } else {
-            pFMC->pos = 0;
-            while ((*p != NUL) && (++(pFMC->pos) < len))  p++;
+            while ((*p != NUL) && (++(pFMC->next_ix) < len))  p++;
         }
     }
 
-    else if (pFMC->mode.write == 0) {
+    else if ((pFMC->mode & FLAG_BIT(write)) == 0) {
         /*
          *  No user supplied buffer and we are reading.  Nonsense.
          */
@@ -430,7 +476,7 @@ fmemopen( void *buf, size_t len, const char *mode )
          *  best include "append".
          */
         if (len == 0) {
-            if (pFMC->mode.extensible == 0) {
+            if (pFMC->mode & FLAG_BIT(append) == 0) {
                 errno = EINVAL;
                 free( pFMC );
                 return NULL;
@@ -442,37 +488,38 @@ fmemopen( void *buf, size_t len, const char *mode )
         /*
          *  Unallocated file space is set to zeros.  Emulate that.
          */
-        pFMC->buffer = (char *) calloc( 1, len );
+        pFMC->buffer = calloc(1, len);
         if (pFMC->buffer == NULL) {
             errno = ENOMEM;
             free( pFMC );
             return NULL;
         }
 
-        pFMC->pos = 0;
+        pFMC->next_ix = 0;
     }
 
-    pFMC->size   = len;
-    pFMC->maxpos = (pFMC->mode.binary) ? len : strlen( pFMC->buffer );
+    pFMC->buf_size   = len;
+    pFMC->high_water = (pFMC->mode & FLAG_BIT(binary))
+                   ? len : strlen(pFMC->buffer);
 
+#if defined(HAVE_FOPENCOOKIE)
     {
         cookie_io_functions_t iof;
-        iof.read  = (cookie_read_function_t *)fmem_read;
+        iof.read  = (cookie_read_function_t* )fmem_read;
         iof.write = (cookie_write_function_t*)fmem_write;
-        iof.seek  = (cookie_seek_function_t *)fmem_seek;
+        iof.seek  = (cookie_seek_function_t* )fmem_seek;
         iof.close = (cookie_close_function_t*)fmem_close;
 
-        return fopencookie (pFMC, mode, iof);
+        return fopencookie( pFMC, mode, iof );
     }
+#elif defined(HAVE_FUNOPEN)
+    return funopen( pFMC,
+                    (cookie_read_function_t* )fmem_read,
+                    (cookie_write_function_t*)fmem_write,
+                    (cookie_seek_function_t* )fmem_seek,
+                    (cookie_close_function_t*)fmem_close );
+#else
+#  error We have neither fopencookie(3GNU) nor funopen(3BSD)
+#endif
 }
-
-#endif /* HAVE_FOPENCOOKIE */
-
-/*
- * Local Variables:
- * mode: C
- * c-file-style: "stroustrup"
- * tab-width: 4
- * indent-tabs-mode: nil
- * End:
- * end of agen5/fmemopen.c */
+#endif /* ENABLE_FMEMOPEN */

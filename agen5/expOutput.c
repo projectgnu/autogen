@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.22 2004/02/03 04:57:41 bkorb Exp $
+ *  $Id: expOutput.c,v 3.23 2004/02/14 22:12:45 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -331,7 +331,7 @@ ag_scm_out_push_new( SCM new_file )
         addWriteAccess( pzNewFile );
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     }
-#   ifdef HAVE_FOPENCOOKIE
+#   if defined(ENABLE_FMEMOPEN)
     else if (! HAVE_OPT( NO_FMEMOPEN ))
 #   else
     else

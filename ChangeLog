@@ -1,3 +1,14 @@
+2004-02-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c: more cleanup and adapt for BSD's funopen().
+	* agen5/autogen.h(ENABLE_FMEMOPEN): define if we have either GNU's
+	or BSD's cookie open function
+	* agen5/fsm-macro.tpl(build-switch): accommodate a 'noop' function
+	* agen5/opts.def(no_fmemopen): depend upon ENABLE_FMEMOPEN instead of
+	the GNU function fopencookie(3GNU).
+	* config/misc.def: check for funopen, too.
+	* */Makefile.am: regularize the environment variables passed to $AGEXE
+
 2004-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(serverSetup): do not rely on "getcwd" doing allocation

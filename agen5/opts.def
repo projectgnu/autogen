@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.24 2004/02/03 04:57:41 bkorb Exp $
+ *   $Id: opts.def,v 3.25 2004/02/14 22:12:45 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -392,14 +392,16 @@ flag = {
 flag = {
     name       = no_fmemopen;
     descrip    = "Do not use in-mem streams";
-    ifdef      = HAVE_FOPENCOOKIE;
+    value      = m;
+    ifdef      = ENABLE_FMEMOPEN;
 #ifndef XML2AG
     doc = <<-  _EOF_
-		If the local C library supports "@code{fopencookie(3GNU)}", then AutoGen
-		prefers to use in-memory stream buffer opens instead of anonymous files.
-		This may lead to problems if there is a shortage of virtual memory.
-		If, for a particular application, you run out of memory, then specify
-		this option.  This is unlikely in a modern virtual memory environment.
+		If the local C library supports "@code{fopencookie(3GNU)}", or
+		"@code{funopen(3BSD)}" then AutoGen prefers to use in-memory stream
+		buffer opens instead of anonymous files.  This may lead to problems
+		if there is a shortage of virtual memory.  If, for a particular
+		application, you run out of memory, then specify this option.
+		This is unlikely in a modern virtual memory environment.
 		_EOF_;
 #else
     doc = "Pass-through AutoGen argument";

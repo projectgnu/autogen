@@ -110,9 +110,12 @@ static te_[=(. pfx)=]_state
 }
 [=
   ESAC =][=
-ENDDEF build-callback  =][=
+ENDDEF build-callback
+
+# # # # # # # =][=
 
 DEFINE run-callback
+
 =]
     if (pT != NULL)
         nxtSt = (*pT)( [=
@@ -121,13 +124,17 @@ DEFINE run-callback
 
   ENDFOR     =][=(. pfx)=]_state, nxtSt, trans_evt );[=
 
-ENDDEF run-callback    =][=
+ENDDEF run-callback
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE build-switch    =]
-    case [=cb_prefix=]_[=cb_name=]:
+    case [=cb_prefix=]_[=cb_name=]:[=
+
+  IF (== (get "cb_name") "NOOP") =]  break;[=
+  ELSE =]
 [=
+
 (set! example-code (if (= (get "cb_name") "invalid") (sprintf
       "        exit( %1$s_invalid_transition( %1$s_state, trans_evt ));" pfx)
       (string-append "        nxtSt = HANDLE_" (get "cb_name") "();")  ))
@@ -136,8 +143,12 @@ DEFINE build-switch    =]
      (string-append "        /* %s == " (get "cb_name") " == %s */")
      "" example-code )    =]
         break;
-[=
-ENDDEF                    =][=
+
+[=ENDIF=][=
+
+ENDDEF build-switch
+
+# # # # # # # =][=
 
 DEFINE run-switch         =][=
 
@@ -159,7 +170,7 @@ DEFINE run-switch         =][=
            pfx "_state, trans_evt ));" ))=]
     }[=
 
-ENDDEF run-switch       =][=
+ENDDEF run-switch
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -188,23 +199,7 @@ DEFINE preamble
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=
 
-ENDDEF    =][=
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
-
-DEFINE trailer
-
-=]
-/*
- * Local Variables:
- * mode: C
- * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
- * tab-width: 4
- * End:
- * end of [=(out-name)=] */[=
-
-ENDDEF  trailer  =][=
+ENDDEF  preamble
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
