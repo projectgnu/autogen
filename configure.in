@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2002/04/08 01:46:41 $
+dnl Last Modified:    $Date: 2002/05/11 20:23:52 $
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.6 2002/04/08 01:46:41 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.7 2002/05/11 20:23:52 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.6 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.7 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -168,18 +168,10 @@ AC_SUBST(COMPATOBJ)
 # ----------------------------------------------------------------------
 # Generate the make files.
 # ----------------------------------------------------------------------
+AC_PROG_LN_S
 test -f ./snprintfv/snprintfv/snprintfv.h \
   && rm -f ./snprintfv/snprintfv.h \
-  && ln -s `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
-GUILE_LINK=`guile-config link`
-if test -z "$GUILE_LINK"
-then
-    echo 'Cannot find `guile-config'\' configurator >&2
-    exit 1
-fi
-AC_SUBST(GUILE_LINK)
-GUILE_INC=`guile-config compile | sed 's,-I */usr/include,,'`
-AC_SUBST(GUILE_INC)
+  && ${LN_S} `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
 
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
 AC_SUBST(M4_SRC)

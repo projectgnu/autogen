@@ -7,14 +7,14 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/04/20 00:38:44 $
+## Last Modified:   $Date: 2002/05/11 20:23:52 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.9 2002/04/20 00:38:44 bkorb Exp $
+## $Id: Makefile.am,v 3.10 2002/05/11 20:23:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
-INCLUDES    = @INCLIST@ $(GUILE_INC)
+INCLUDES    = @INCLIST@
 
 GETDEFS     = $(top_builddir)/getdefs/getdefs
 AGEXE       = $(top_builddir)/agen5/@AGEXE@
@@ -48,7 +48,7 @@ autogen_SOURCES = $(GEN_CSRC) \
   funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
   tpParse.c     tpProcess.c
 
-autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
+autogen_LDADD	= $(top_builddir)/autoopts/libopts.la
 
 autogen_LDFLAGS = @DYNAMIC_AG@ @AG_REGEX_LIB@
 

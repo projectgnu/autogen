@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/03/29 04:14:32 $
+ *  Last Modified:     $Date: 2002/05/11 20:23:52 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.10 2002/03/29 04:14:32 bkorb Exp $
+ *  $Id: misc.def,v 3.11 2002/05/11 20:23:52 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.10 $";
+version = "$Revision: 3.11 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -175,6 +175,48 @@ test   = {
 		If this option is not supplied, then the AG_POSIX_REGCOMP
 		will be run to verify that POSIX regular expressions are
 		available.  AutoGen will not work without them.
+		_END_OF_DOC_;
+};
+
+test   = {
+  name     = "guile";
+  type     = "withlib";
+  check    = "a working libguile can be found";
+  code     = <<- _END_OF_CODE_
+		#include <libguile.h>
+		int main () {
+		  SCM fumble, bumble, stumble;
+		  stumble = scm_cons( fumble, bumble );
+		  stumble = scm_display( fumble, bumble );
+		  stumble = scm_ilength( fumble );
+		  stumble = scm_makstr( 1, 2 );
+		  stumble = gh_eval_str( "stumble" );
+		  scm_misc_error( "oops", "bad", bumble );
+		  stumble = scm_num_eq_p( fumble, bumble );
+		  scm_wrong_type_arg( "oops", 1, bumble ); }
+		_END_OF_CODE_;
+  run-mode   =  "link";
+  code-mode  =  "all";
+
+  action   = { no; asis;
+    act-type = script;
+    act-text = <<- _END_OF_SCRIPT_
+		f=`guile-config link`
+		    if test -z "$f"
+		    then
+		      AC_MSG_ERROR([Cannot find Guile])
+		    fi
+		    LDFLAGS="${LDFLAGS} $f"
+		    f=`guile-config compile | \
+		       sed 's,-I */usr/include,,'`
+		    CPPFLAGS="${CPPFLAGS} $f"
+		_END_OF_SCRIPT_; };
+
+  doc = <<- _END_OF_DOC_
+		AutoGen won't work without Guile, so either the methods
+		for finding the header and libraries must be provided,
+		or guile-config must be found in the executable path,
+		or we have to find the stuff in /usr or /usr/local.
 		_END_OF_DOC_;
 };
 

@@ -3857,6 +3857,8 @@ autogen -L $@{prefix@}/share/autogen -DLEVEL=section libexport.def
 Where @file{$@{prefix@}} is the AutoGen installation prefix
 and @file{libexport.def} is some name that suits you.
 
+An example of this can be seen in this document, @xref{libopts procedures}.
+
 @node AutoMan pages
 @section Automated Man Pages
 @cindex AutoMan pages

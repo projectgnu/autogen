@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.4 2002/03/29 02:22:17 bkorb Exp $
+# $Id: opthead.tpl,v 3.5 2002/05/11 20:23:52 bkorb Exp $
 # Automated Options copyright 1992-2002 Bruce Korb
 
 =]
@@ -209,7 +209,15 @@ ELSE "flag.value *DOES NOT* exist" =][=
                                       (. UP-prefix)=]OPT_HELP
 #define VALUE_[=(. UP-prefix)=]OPT_MORE_HELP      INDEX_[=
                                       (. UP-prefix)=]OPT_MORE_HELP[=
-ENDIF=]
+ENDIF=][=
+
+IF (exist? "homerc") =]
+#define SET_[=(. UP-prefix)=]OPT_SAVE_OPTS(a)   STMTS( \
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (char*)(a) )[=
+ENDIF
+=]
 
 /*
  *  Interface defines not associated with particular options

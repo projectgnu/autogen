@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/01/03 17:08:22 $
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:   $Date: 2002/05/11 20:23:52 $
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/01/03 17:08:22 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/05/11 20:23:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -38,7 +38,7 @@ TESTS_ENVIRONMENT = \
 	GDEXE=`cd $(top_builddir)/getdefs; pwd`/@GDEXE@ \
 	AGEXE=`cd $(top_builddir)/agen5  ; pwd`/@AGEXE@ \
 	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
-	INC="@INCLIST@ $(GUILE_INC)" \
+	INC="@INCLIST@ $(CPPFLAGS)" \
 	testsubdir=$(testsubdir) \
 	top_builddir=`cd $(top_builddir) ; pwd` \
 	builddir=`cd $(builddir) ; pwd` \

@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.1 2002/04/14 20:48:23 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.2 2002/05/11 20:23:52 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -52,8 +52,6 @@
 
 #include "autoopts.h"
 
-/*=--subblock=arg=arg_type,arg_name,arg_desc =*/
-
 /*=export_func optionSaveState
  *
  * what:  saves the option state to memory
@@ -101,12 +99,12 @@ optionSaveState( pOpts )
  * what:  restore option state from memory copy
  * arg:   tOptions*, pOpts, program options descriptor
  *
- * doc:  Copy back the option state from the saved memory.
+ * doc:  Copy back the option state from saved memory.
  *       The allocated memory is left intact, so this routine can be
  *       called repeatedly without having to call optionSaveState again.
  *
- * err:  If you have not called optionSaveState before, a diagnostic is
- *       printed to stderr and exit is called.
+ * err:  If you have not called @code{optionSaveState} before, a diagnostic is
+ *       printed to @code{stderr} and exit is called.
 =*/
 void
 optionRestore( pOpts )

@@ -28,7 +28,7 @@ case "$1" in
   then
     getdefs linenum srcfile \
       template=options_h output=funcs.def \
-      restore.c autoopts.c boolean.c enumeration.c \
+      autoopts.c boolean.c enumeration.c restore.c \
       guileopt.c makeshell.c numeric.c pgusage.c putshell.c \
       save.c stack.c streqvcmp.c usage.c version.c
 

@@ -5,13 +5,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-05-05 17:57:34 bkorb"
+## Time-stamp:      "2002-05-07 21:01:49 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo3-tpl.in,v 3.3 2002/05/06 23:42:02 bkorb Exp $
+## $Id: aginfo3-tpl.in,v 3.4 2002/05/11 20:23:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi
@@ -22,7 +22,7 @@ texi
 
 (out-push-new (sprintf "%s.menu" (base-name)))
 (define node-name (sprintf "lib%s procedures" (get "library")))
-(define sec-name  (sprintf "lib%s External Procedures"))
+(define sec-name  (sprintf "lib%s External Procedures" (get "library")))
 
 (define doc-level (getenv "LEVEL"))
 (if (not (string? doc-level))

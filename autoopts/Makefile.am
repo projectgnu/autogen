@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/05/05 03:07:06 $
+## Last Modified:   $Date: 2002/05/11 20:23:52 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2002/05/05 03:07:06 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2002/05/11 20:23:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -19,7 +19,7 @@ SUBDIRS  = @OPTS_TESTDIR@
 DISTCLEANFILES = option*.3 libopts.????
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = @INCLIST@ $(GUILE_INC)
+INCLUDES = @INCLIST@
 GENMAN   = 
 man_MANS = autoopts-config.1 $(GENMAN)
 

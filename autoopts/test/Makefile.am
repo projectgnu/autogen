@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/03/29 02:21:47 $
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:   $Date: 2002/05/11 20:23:52 $
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2002/03/29 02:21:47 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2002/05/11 20:23:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test cond.test equiv.test errors.test guile.test \
@@ -26,9 +26,9 @@ TESTS_ENVIRONMENT = \
 	PATH="`cd $(top_builddir)/columns ; pwd`:$$PATH" \
 	AGEN="`cd $(top_builddir)/agen5 ; pwd`/@AGEXE@" \
 	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
-	LIB="`cd $(top_builddir)/autoopts/.libs/; \
+	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
-	INC="@INCLIST@ $(GUILE_INC)" \
+	INC="@INCLIST@ $(CPPFLAGS)" \
 	testsubdir=$(testsubdir) \
 	srcdir=`pwd` \
 	top_srcdir=`cd $(top_srcdir) ; pwd`

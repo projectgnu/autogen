@@ -149,7 +149,7 @@ ENDDEF start-feat-test =][=
 
 DEFINE  end-feat-test  =][=
 
-  (. pop-language)     =]]) # end of CACHE_VAL
+  (. pop-language)     =]]) # end of AC_CACHE_VAL
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results         =][=
 
@@ -291,13 +291,105 @@ DEFINE  try-with                =][=
        arg-name  = WITH         =][=
 ENDDEF  try-with                =][=
 
-# # # # # # # # # # WITHOUT # # # # # # # # # =][=
+# # # # # # # # # # WITHOUT # # # # # # # =][=
 
 DEFINE  try-without             =][=
   (set! cv-name (string-append group-pfx "cv_with_" down-name)) =][=
   emit-enablement
        arg-name  = WITH         =][=
 ENDDEF  try-without             =][=
+
+# # # # # # # # # # WITHLIB # # # # # # # =][=
+
+DEFINE  try-withlib             =]
+  AC_ARG_WITH([lib[=
+    (set! cv-name (string-append group-pfx "cv_with_" down-name))
+    (. down-name)=]],
+    AC_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
+        =]], [lib[=(. down-name)=] installation prefix]),
+    [[=(. cv-name)=]_root=${with_lib[=(string-tr down-name "-" "_")=]}],
+    AC_CACHE_CHECK([whether with-lib[=(. down-name)=] was specified], [=
+        (. cv-name)=]_root,
+      [=(. cv-name)=]_root=no)
+  ) # end of AC_ARG_WITH
+
+  AC_ARG_WITH([lib[=(. down-name)=]-incdir],
+    AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
+        =]-incdir], [lib[=(. down-name)=] include dir]),
+    [[=(. cv-name)=]_incdir=${with_[=(string-tr test-name "-A-Z" "_a-z")
+                                   =]_incdir}],
+    AC_CACHE_CHECK([whether with-lib[=(. down-name)=]-incdir was specified], [=
+        (. cv-name)=]_incdir,
+      [=(. cv-name)=]_incdir=no)
+  ) # end of AC_ARG_WITH
+
+  AC_ARG_WITH([lib[=(. down-name)=]-libdir],
+    AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
+        =]-libdir], [lib[=(. down-name)=] include dir]),
+    [[=(. cv-name)=]_libdir=${with_[=(string-tr test-name "-A-Z" "_a-z")
+                                   =]_libdir}],
+    AC_CACHE_CHECK([whether with-lib[=(. down-name)=]-libdir was specified], [=
+        (. cv-name)=]_libdir,
+      [=(. cv-name)=]_libdir=no)
+  ) # end of AC_ARG_WITH
+
+  case X${[=(. cv-name)=]_incdir} in
+  Xyes|Xno )
+    case X${[=(. cv-name)=]_root} in
+    Xyes|Xno ) ;;
+    * )        [=(. cv-name)=]_incdir=${[=(. cv-name)=]_root}/include ;;
+    esac
+  esac
+
+  case X${[=(. cv-name)=]_libdir} in
+  Xyes|Xno )
+    case X${[=(. cv-name)=]_root} in
+    Xyes|Xno ) ;;
+    * )        [=(. cv-name)=]_libdir="-L${[=(. cv-name)
+               =]_root}/lib -l[=(. down-name)=]";;
+    esac
+  esac
+  [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"
+  [=(. group-pfx)=]save_LDFLAGS="${LDFLAGS}"[=
+  (define restore-flags (sprintf
+    "\n    CPPFLAGS=\"${%1$ssave_CPPFLAGS}\"
+    LDFLAGS=\"${%1$ssave_LDFLAGS}\"" group-pfx )) =]
+
+  case X${[=(. cv-name)=]_incdir} in
+  Xyes|Xno ) ;;
+  * ) CPPFLAGS="${CPPFLAGS} ${[=(. cv-name)=]_incdir}" ;;
+  esac
+
+  case X${[=(. cv-name)=]_libdir} in
+  Xyes|Xno )
+    LDFLAGS="${LDFLAGS} -l[=(. down-name)=]" ;;
+  * )
+    LDFLAGS="${LDFLAGS} ${[=(. cv-name)=]_libdir}" ;;
+  esac[=
+
+  CASE run-mode                 =][=
+
+  ==   link                     =]
+  AC_MSG_CHECKING([whether lib[=(. down-name)=] can be linked with])[=
+  set-language                  =]
+  AC_LINK_IFELSE([[=(. c-text)=]],
+    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
+  ) # end of AC_LINK_IFELSE [=
+
+  end-feat-test =][=
+
+  ==   run                      =]
+  AC_MSG_CHECKING([whether lib[=(. down-name)=] functions properly])[=
+  set-language                  =]
+  AC_TRY_RUN([=(. c-text)=],
+    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no],[[=
+        (. cv-name)=]=no]
+  ) # end of AC_TRY_RUN [=
+  end-feat-test  =][=
+
+  ESAC                          =][=
+
+ENDDEF  try-withlib             =][=
 
 # # # # # # # # # # ENABLE # # # # # # # # # =][=
 

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.1 2002/03/29 02:22:17 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.2 2002/05/11 20:23:52 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -294,8 +294,29 @@ printEntry( fp, p, pzLA )
 }
 
 
+/*=export_func  optionSaveFile
+ *
+ * what:  saves the option state to a file
+ *
+ * arg:   tOptions*,   pOpts,  program options descriptor
+ *
+ * doc:
+ *
+ * This routine will save the state of option processing to a file.  The name
+ * of that file can be specified with the argument to the @code{--save-opts}
+ * option, or by appending the @code{rcfile} attribute to the last
+ * @code{homerc} attribute.  If no @code{rcfile} attribute was specified, it
+ * will default to @code{.@i{programname}rc}.  If you wish to specify another
+ * file, you should invoke the @code{SET_OPT_SAVE_OPTS( @i{filename} )} macro.
+ *
+ * err:
+ *
+ * If no @code{homerc} file was specified, this routine will silently return
+ * and do nothing.  If the output file cannot be created or updated, a message
+ * will be printed to @code{stderr} and the routine will return.
+=*/
 void
-optionSave( pOpts )
+optionSaveFile( pOpts )
     tOptions* pOpts;
 {
     char*  pzFName;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.8 2002/05/05 18:50:02 bkorb Exp $
+ *  $Id: autoopts.c,v 3.9 2002/05/11 20:23:52 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1463,9 +1463,11 @@ checkConsistency( pOpts )
  *
  *  THESE ROUTINES ARE CALLABLE FROM THE GENERATED OPTION PROCESSING CODE
  */
+/*=--subblock=arg=arg_type,arg_name,arg_desc =*/
 /*=*
- * library: opts
- * header:  your-opts.h
+ * library:  opts
+ * header:   your-opts.h
+ *
  * lib_description:
  *
  *  These are the routines that libopts users may call directly from their
@@ -1702,7 +1704,7 @@ optionProcess( pOpts, argCt, argVect )
         tOptDesc*  pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts;
 
         if (SELECTED_OPT( pOD )) {
-            optionSave( pOpts );
+            optionSaveFile( pOpts );
             exit( EXIT_SUCCESS );
         }
     }
