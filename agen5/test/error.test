@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2002-03-03 16:52:17 bkorb"
+# Time-stamp:        "2002-03-18 18:15:08 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.8 2002/03/04 00:56:19 bkorb Exp $
+# $Id: error.test,v 3.9 2002/03/19 04:11:41 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -96,7 +96,7 @@ cmp -s ${testname}.err2 ${testname}.out2 || \
 echo creating ${testname}.out3
 # this is the output we should expect to see
 cat > ${testname}.out3 <<_EOF_
-AutoGen aborting on signal 15 (Terminated) in state EMITTING
+AutoGen aborting on signal <text-varies> in state EMITTING
 processing template error2.tpl
             on line 2
        for function EXPR (11)
@@ -108,9 +108,11 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `kill -TERM ${AG_pid}` =>,' \
 # this is *supposed* to exit with a failure status
 echo autogen --no-def -T${testname}2.tpl --base=${testname} >&2
 $AGEXE --no-def -T${testname}2.tpl --base=${testname} \
-  2> ${testname}.err3 \
+  2> ${testname}.tmp3 \
   && failure Unexpected success for AutoGen
 
+sed 's,on signal .* in state,on signal <text-varies> in state,' \
+  ${testname}.tmp3 > ${testname}.err3
 cmp -s ${testname}.err3 ${testname}.out3 || \
   failure "actual->expected `diff -c ${testname}.err3 ${testname}.out3`"
 

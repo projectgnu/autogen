@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2002/02/03 01:29:28 $
+#  Last Modified:     $Date: 2002/03/19 04:11:41 $
 #             by: bkorb
 #
 # This template uses the following definitions:
@@ -43,7 +43,7 @@ ENDFOR test             =][=
 (dne "##  " "##  ")     =]
 ##
 ## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 3.4 2002/02/03 01:29:28 bkorb Exp $
+## $Id: conftest.tpl,v 3.5 2002/03/19 04:11:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 GENERATED_M4 = \
@@ -52,7 +52,7 @@ GENERATED_M4 = \
 
 pkgdata_DATA = conftest.tpl confmacs.tpl
 
-EXTRA_DIST = byacc.m4 libregex.m4 openmode.m4 missing bootstrap autogen.spec \
+EXTRA_DIST = byacc.m4 openmode.m4 missing bootstrap autogen.spec \
 	$(pkgdata_DATA) $(GENERATED_M4) misc.def bootstrap.local
 
 MAINTAINERCLEANFILES = Makefile.in config.guess config.sub install-sh \

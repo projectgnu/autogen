@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.7 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: funcEval.c,v 3.8 2002/03/19 04:11:41 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -30,7 +30,7 @@
 #include "autogen.h"
 
 #include <compat/compat.h>
-#include <regex.h>
+#include REGEX_HEADER
 
 tSCC        zNil[] = "";
 

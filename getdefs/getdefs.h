@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.2 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: getdefs.h,v 3.3 2002/03/19 04:11:41 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/03/12 05:12:14 $
+ *  Last Modified:     $Date: 2002/03/19 04:11:41 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -32,7 +32,7 @@
 #  include "snprintfv/snprintfv.h"
 #endif
 
-#include <regex.h>
+#include REGEX_HEADER
 
 #ifdef DEBUG
 #  define STATIC

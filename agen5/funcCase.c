@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.5 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: funcCase.c,v 3.6 2002/03/19 04:11:41 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -29,7 +29,7 @@
 #include "autogen.h"
 #include "expr.h"
 
-#include <regex.h>
+#include REGEX_HEADER
 
 #undef  IS_LOW
 #define IS_LOW(c)  (((c) <= 'z') && ((c) >= 'a'))
@@ -973,7 +973,7 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
 
 #endif /* DEFINE_LOAD_FUNCTIONS */
 
-#include <regex.h>
+#include REGEX_HEADER
 
 /*
  *  This is global data used to keep track of the current CASE

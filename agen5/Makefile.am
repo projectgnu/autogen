@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/01/15 16:55:09 $
-##            by:   Bruce Korb <bkorb@gnu.org>
+## Last Modified:   $Date: 2002/03/19 04:11:41 $
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2002/01/15 16:55:09 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2002/03/19 04:11:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -23,6 +23,7 @@ TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS = cgi.def opts.def pseudo.def
 GENDOCS     = autogen.texi autogen.menu autogen.1
 CLEANFILES  = $(GENDOCS)
+autogen_CFLAGS = -DREGEX_HEADER='@AG_REGEX_HEADER@'
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
@@ -50,7 +51,7 @@ autogen_SOURCES = $(GEN_CSRC) \
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
 
-autogen_LDFLAGS = @DYNAMIC_AG@
+autogen_LDFLAGS = @DYNAMIC_AG@ @AG_REGEX_LIB@
 
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c

@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2002/02/23 01:57:19 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2002/03/19 04:11:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs
@@ -21,10 +21,12 @@ nodist_getdefs_SOURCES = opts.c opts.h
 BUILT_SOURCES   = opts.c opts.h
 EXTRA_DIST      = opts.def
 AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
-getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
+getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la @AG_REGEX_LIB@
 man_MANS        = getdefs.1
 
 getdefs_LDFLAGS = -static
+getdefs_CFLAGS  = -DREGEX_HEADER='@AG_REGEX_HEADER@'
+
 INCLUDES        = @INCLIST@
 
 GENFILES        = getdefs.texi getdefs.menu getdefs.1

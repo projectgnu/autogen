@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.2 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: stack.c,v 3.3 2002/03/19 04:11:41 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -55,7 +55,7 @@
 
 #include "compat/compat.h"
 
-#include <regex.h>
+#include REGEX_HEADER
 #include "autoopts.h"
 
 void

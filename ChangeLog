@@ -1,4 +1,22 @@
-2002-03-11  Bruce Korb  <bkorb@gnu.org> 
+2002-03-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/error.test: HP/UX delivers `kill -TERM' as a SIGCONT.
+	* agen5/compat/strsignal.def: HP/UX defines many signals as "_SIG..."
+	and then defines the normal name to this.
+	* configure.in: use reworked regex tests
+	* config/misc.def: rework regex testing & with options
+	* */Makefile.am: Add CFLAGS = -DREGEX_HEADER='@AG_REGEX_HEADER@'
+	* agen5/funcCase.c: replace '<regex.h>' with 'REGEX_HEADER'
+	* agen5/funcEval.c: ditto
+	* autoopts/stack.c: ditto
+	* getdefs/getdefs.h: ditto
+	* autoopts/autoopts-config.in: add @AG_REGEX_LIB@ to link info
+	* config/bootstrap.local: avoid build directories when cloning
+	* config/conftest.tpl: libregex.m4 is now obsolete
+	* config/libregex.m4: deleted
+	* config/misc: added regex_header, regex_header_path and regex_lib
+
+2002-03-11  Bruce Korb  <bkorb@gnu.org>
 
 	* compat/gnu-regex.c: deleted.  It is broken on some platforms.
 	Therefore, we'll just abort the configure if we don't have a POSIX regex
@@ -11,7 +29,7 @@
 	Autoconf automatically quotes c program text.
 	* config/misc.def(posix_regcomp): bail if we cannot find one.
 
-2002-03-03  Bruce Korb  <bkorb@gnu.org> 
+2002-03-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/functions.c(mLoad_Bogus): handle the case when the text pointer
 	is NULL.

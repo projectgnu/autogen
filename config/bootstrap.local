@@ -1,15 +1,13 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-#
-# ----------------------------------------------------------------------
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/01/25 02:25:03 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Time-stamp:        "2002-03-18 18:34:20 bkorb"
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 3.3 2002/01/25 02:25:03 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 3.4 2002/03/19 04:11:41 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -30,14 +28,14 @@ add_make_links()
 	top_srcdir=`cd $top_srcdir && pwd`
 	if test "$top_srcdir" = "$top_builddir" ; then : ; else
 	  ( cd $top_srcdir
-	    find . -type d -print ) |
+	    find [a-z]* -type d -print ) |
 	  grep -v '/CVS\|/RCS' |
 	  while read f
 	  do test -d $f || mkdir $f
 	  done
 
 	  ( cd $top_srcdir
-	    find . \( -type f -o -type l \) -print ) |
+	    find [a-zA-Z]* \( -type f -o -type l \) -print ) |
 	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
 	  while read f
 	  do

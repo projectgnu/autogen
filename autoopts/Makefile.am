@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2001/12/24 14:13:33 $
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:   $Date: 2002/03/19 04:11:41 $
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2002/03/19 04:11:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -32,6 +32,7 @@ m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
 
 lib_LTLIBRARIES = libopts.la libguileopts.la
+CFLAGS = -DREGEX_HEADER='@AG_REGEX_HEADER@'
 
 ##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
 ##  It is compiled as a part of the makeshell module.

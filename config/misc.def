@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/03/12 05:12:14 $
+ *  Last Modified:     $Date: 2002/03/19 04:11:41 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.6 2002/03/12 05:12:14 bkorb Exp $
+ *  $Id: misc.def,v 3.7 2002/03/19 04:11:41 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.6 $";
+version = "$Revision: 3.7 $";
 
 test = {
     name   = allocated_ctime;
@@ -54,6 +54,54 @@ test = {
     "for AG_CHECK_STRCSPN.";
 };
 
+test   = {
+  name     = "regex_header";
+  type     = "with";
+  check    = "a reg expr header is specified";
+  action   = { yes; act-type=subst;
+               act-text = "<${ag_cv_with_regex_header}>"; };
+  action   = { no;  act-type=subst;
+               act-text = "<regex.h>"; };
+
+  doc = "When using alternative libraries, sometimes you must use\n"
+        "alternative header file names, too.";
+};
+
+test   = {
+  name     = "regex_header_path";
+  type     = "with";
+  check    = "a path to the reg-ex header is specified";
+  action   = { yes; act-type=subst;
+               act-text = "-I${ag_cv_with_regex_header_path}"; };
+  action   = { no;  act-type=subst;  act-text = ""; };
+  action   = { yes; act-quoting = asis;
+    act-type = script;
+    act-text = 'CPPFLAGS="${CPPFLAGS} -I${ag_cv_with_regex_header_path}"';
+  };
+
+  doc     = "If the reg-ex header is not in the normal path, the\n"
+            "installer will have to specify it with this.";
+};
+
+test   = {
+  name     = "regex_lib";
+  type     = "with";
+  check    = "a special reg-ex library is specified";
+  action   = { yes; act-type=subst;  act-text = "${ag_cv_with_regex_lib}"; };
+  action   = { no;  act-type=subst;  act-text = ""; };
+  action   = { yes; act-quoting = asis;
+    act-type = script;
+    act-text = 'LDFLAGS="${LDFLAGS} ${ag_cv_with_regex_lib}"';
+  };
+
+  doc = <<- _END_OF_DOC_
+		This option must specify any ``-lmumble'' option required
+		for linking.  If a ``-L'' option is needed as well, then
+		it should include that as well.  The ``-l'' and ``-L'' must
+		be part of the string value.
+		_END_OF_DOC_;
+};
+
 test = {
     name   = posix_regcomp;
     type   = run;
@@ -74,7 +122,7 @@ test = {
     };
     code   = <<-  _EOF_
 		#include <sys/types.h>
-		#include <regex.h>
+		#include ${AG_REGEX_HEADER}
 		int main() {
 		  int flags = REG_EXTENDED|REG_ICASE|REG_NEWLINE;
 		  regex_t  re;
@@ -111,7 +159,7 @@ test = {
     check  = "strcspn matches prototype and works";
     action = { act-type = define; };
     action = { no; act-type = script;
-               act-text = 'COMPATOBJ="$COMPATOBJ strcspn.lo"'; };
+			act-text = 'COMPATOBJ="$COMPATOBJ strcspn.lo"'; };
 
     code   = <<-  _EOF_
 		#include <string.h>
