@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug 30 12:15:59 1999				      
+# Last Modified:     Mon Aug 30 12:20:25 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.21 1999/08/30 19:16:05 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.22 1999/08/30 19:20:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -97,7 +97,7 @@ post )
     # remove the fake file so we don't forget to generate it later.
     test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
         || rm -f doc/autogen.texi
-    echo Inserting makelink code into configure from `pwd`
+    sh configure $@
     add_make_links
     ;;
 
