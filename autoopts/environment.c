@@ -1,6 +1,6 @@
 
 /*
- *  $Id: environment.c,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+ *  $Id: environment.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2004 Bruce Korb
+ *  Automated Options copyright 1992-2005 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

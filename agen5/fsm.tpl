@@ -9,7 +9,7 @@ c=%s-fsm.c
 (shellf "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
 [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
-#  AutoGen copyright 1992-2004 Bruce Korb
+#  AutoGen copyright 1992-2005 Bruce Korb
 
 =][=
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.4 2005/01/22 19:44:15 bkorb Exp $
+ *  $Id: load.c,v 4.5 2005/01/23 23:33:05 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2004 Bruce Korb
+ *  Automated Options copyright 1992-2005 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

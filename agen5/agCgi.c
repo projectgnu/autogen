@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
+ *  $Id: agCgi.c,v 4.4 2005/01/23 23:33:04 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -9,7 +9,7 @@
  */
 
 /*
- *  AutoGen-cgi copyright 2001-2004 Bruce Korb
+ *  AutoGen-cgi copyright 2001-2005 Bruce Korb
  *
  *  AutoGen-cgi is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -2,11 +2,11 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.2 2005/01/19 01:49:59 bkorb Exp $
+ *   $Id: opts.def,v 4.3 2005/01/23 23:33:06 bkorb Exp $
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -26,7 +26,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2004";
+    date   = "1999-2005";
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = "autogen-users@lists.sf.net";

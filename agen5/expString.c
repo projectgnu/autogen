@@ -1,13 +1,13 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.3 2005/01/09 04:05:39 bkorb Exp $
+ *  $Id: expString.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,6 +1,26 @@
 
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
+/*
+ *  AutoOpts copyright 1992-2005 Bruce Korb
+ *
+ *  AutoOpts is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  AutoOpts is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with AutoOpts.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
 /* Keep this file sorted:
 
    blocksort pat=^utxt in=usage-txt.def out=usage-txt.sort \
@@ -8,7 +28,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.2 2005/01/14 20:37:31 bkorb Exp $
+   $Id: usage-txt.def,v 4.3 2005/01/23 23:33:06 bkorb Exp $
  */
 
 /*

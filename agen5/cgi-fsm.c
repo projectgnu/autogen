@@ -1,13 +1,13 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Wednesday March  3, 2004 at 08:58:11 PM PST
+ *  It has been AutoGen-ed  Wednesday March  3, 2005 at 08:58:11 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001-2004  by  Bruce Korb
+ *  Copyright (c) 2001-2005  by  Bruce Korb
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
  *  

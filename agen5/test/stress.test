@@ -4,14 +4,14 @@
 # stress.test --- stress test
 #
 ## Time-stamp:      "2004-02-01 16:16:46 bkorb"
-## Copyright (c):   1999-2004 by Bruce Korb
+## Copyright (c):   1999-2005 by Bruce Korb
 ##
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #            by: bkorb
 #
-# $Id: stress.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: stress.test,v 4.2 2005/01/23 23:33:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: expPrint.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -10,7 +10,7 @@
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

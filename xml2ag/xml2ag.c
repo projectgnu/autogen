@@ -1,12 +1,10 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.3 2005/01/19 01:49:59 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.4 2005/01/23 23:33:06 bkorb Exp $
  *  This is the main routine for xml2ag.
- */
-
-/*
- *  xml2ag copyright 2002-2004 Bruce Korb
+ *
+ *  xml2ag copyright 2002-2005 Bruce Korb
  *
  *  xml2ag is free software.
  *  You may redistribute it and/or modify it under the terms of the

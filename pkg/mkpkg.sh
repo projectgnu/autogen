@@ -1,12 +1,12 @@
 #! /bin/sh
 ## mkpkg.sh --      create a native package
-## Copyright (c):   2003-2004 by Bruce Korb
-## Time-stamp:      "2003-02-19 20:25:31 bkorb"
+## Copyright (c):   2003-2005 by Bruce Korb
+## Time-stamp:      "2005-01-23 15:31:50 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mkpkg.sh,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+## $Id: mkpkg.sh,v 4.2 2005/01/23 23:33:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

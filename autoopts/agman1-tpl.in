@@ -2,15 +2,15 @@
 
 ## agman1.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2004 Bruce Korb
+##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-01-18 17:48:12 bkorb"
+## Time-stamp:      "2005-01-23 15:30:10 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.2 2005/01/19 01:49:59 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.3 2005/01/23 23:33:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1

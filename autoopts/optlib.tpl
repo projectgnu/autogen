@@ -1,8 +1,8 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: optlib.tpl,v 4.2 2005/01/23 23:33:05 bkorb Exp $
 
-# Automated Options copyright 1992-2004 Bruce Korb
+# Automated Options copyright 1992-2005 Bruce Korb
 
 =][=
 

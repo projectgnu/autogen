@@ -1,15 +1,15 @@
 
 /*
- *  Time-stamp:      "2005-01-21 21:43:00 bkorb"
+ *  Time-stamp:      "2005-01-23 15:31:08 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.5 2005/01/22 16:21:16 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.6 2005/01/23 23:33:05 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  */
 
 /*
- *  Automated Options copyright 1992-2004 Bruce Korb
+ *  Automated Options copyright 1992-2005 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

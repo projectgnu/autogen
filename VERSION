@@ -2,12 +2,12 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Copyright (C) 1999-2004 Bruce Korb
+# Copyright (C) 1999-2005 Bruce Korb
 #
-# Time-stamp:        "2005-01-21 20:41:27 bkorb"
+# Time-stamp:        "2005-01-23 15:32:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2005/01/22 04:48:32 $
+# Last Committed:    $Date: 2005/01/23 23:33:04 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5

@@ -2,10 +2,10 @@
 
 html=autogen.html
 
-# Time-stamp: "2004-10-12 20:12:29 bkorb"
-# Version:    "$Revision: 4.1 $
+# Time-stamp: "2005-01-23 15:31:58 bkorb"
+# Version:    "$Revision: 4.2 $
 
-# AutoGen Options copyright 1992-2004 Bruce Korb
+# AutoGen Options copyright 1992-2005 Bruce Korb
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -13,7 +13,7 @@ html=autogen.html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.2 2005/01/23 23:33:06 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -125,7 +125,7 @@ Please send broken links and other corrections (or suggestions) to
 </p>
 
 <p>
-Copyright (C) 2004 Free Software Foundation, Inc.,
+Copyright (C) 2005 Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111, USA
 <br />
 Verbatim copying and distribution of this entire article is
@@ -135,7 +135,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2005/01/01 00:20:59 $ $Author: bkorb $
+$Date: 2005/01/23 23:33:06 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

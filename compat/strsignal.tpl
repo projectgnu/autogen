@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: strsignal.tpl,v 4.2 2005/01/23 23:33:06 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -9,7 +9,7 @@ h =]
  *
  *  Generated for a [=`uname -r`=] [=`uname`=] platform
  *
- *  Copyright (c) 1992-2004 Bruce Korb
+ *  Copyright (c) 1992-2005 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  */

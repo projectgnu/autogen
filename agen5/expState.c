@@ -1,13 +1,13 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.4 2005/01/22 04:48:32 bkorb Exp $
+ *  $Id: expState.c,v 4.5 2005/01/23 23:33:05 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

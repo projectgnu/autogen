@@ -1,7 +1,7 @@
 /*
  *  This file defines the string_tokenize interface
  *
- *  string_tokenize copyright 2004 Bruce Korb
+ *  string_tokenize copyright 2005 Bruce Korb
  *
  *  string_tokenize is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

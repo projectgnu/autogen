@@ -1,11 +1,11 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.3 2005/01/22 19:44:15 bkorb Exp $
+ *  $Id: agShell.c,v 4.4 2005/01/23 23:33:04 bkorb Exp $
  *  Manage a server shell process
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

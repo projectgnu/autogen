@@ -1,12 +1,12 @@
 
 /*
- *  $Id: defLex.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
+ *  $Id: defLex.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

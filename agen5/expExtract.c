@@ -1,12 +1,12 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.3 2005/01/22 04:48:32 bkorb Exp $
+ *  $Id: expExtract.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

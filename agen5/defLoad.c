@@ -1,12 +1,12 @@
 /*
- *  $Id: defLoad.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
+ *  $Id: defLoad.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
  */
 
 /*
- *  AutoGen copyright 1992-2004 Bruce Korb
+ *  AutoGen copyright 1992-2005 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
