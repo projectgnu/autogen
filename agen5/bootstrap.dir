@@ -196,8 +196,8 @@ do
       echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
-    if ! ksh -c : 2> /dev/null
-    then
+    if ksh -c : 2> /dev/null ; then :
+    else
       echo "Reconstructing expr.h and expr.ini requires ksh.  Giving up."
       exit 1
     fi
