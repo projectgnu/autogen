@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.26 2001/05/09 05:25:59 bkorb Exp $
+# $Id: optlib.tpl,v 1.27 2001/05/22 01:56:53 bkorb Exp $
 
 =]
 [=
@@ -468,9 +468,8 @@ USAGE:  %s [=
     #  IF the USAGE line plus the program name plus the argument
     #  goes past 80 columns, then break the line.  =][=
 
-    `f=\`(cat .usAGe_line ; echo) | sed -n -e 2p -e 2q | wc -c\`` =][=
-
-    IF (< 82 (+ (string->number (shell "echo $f"))
+    IF (< 80 (+ (string-length (shell
+                "sed -n -e 2p -e 2q .usAGe_line"))
                 (len "argument")
                 (len "prog_name") )) =]\
 		[=
