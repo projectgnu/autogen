@@ -1,4 +1,4 @@
-[= AutoGen5 template texi=%s.texi
+[= AutoGen5 template texi
 
 ##  Documentation template
 ## 
@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.6 1999/10/28 03:36:29 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.7 2000/03/05 14:39:02 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -48,18 +48,21 @@ generated usage text and option meanings for [=prog_name=].[=
 ENDIF=]
 
 @menu
-* [=(string-tr!
-          (sprintf "%s %-24s" (get "prog_name") "usage::")
-          "A-Z^_" "a-z--" ) =] [=prog_name=] Usage
+* [=(sprintf "%s %-24s" (. down-prog-name) "usage::")
+  =] [=prog_name=] usage help[=
+     (if (exist? "flag.value") " (-?)") =]
 [=(out-push-new (string-append (out-name) ".tmp"))
   (shell (string-append "f=" (out-name))) =][=
 FOR flag =][=
   IF (> (len "doc") 0)
-=]* [=(string-tr!
-          (sprintf "%s %-24s" (get "prog_name")
-                 (string-append (get "name") "::") )
-          "A-Z^_" "a-z--" )
-     =] [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] Option
+=]* [=(sprintf
+         "%s %-24s"
+         (. down-prog-name)
+         (string-append
+            (string-tr! (get "name") "A-Z^_" "a-z--" )
+            "::" ) )
+     =] [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] option[=
+          % value " (-%s)" =]
 [=ENDIF =][=
 ENDFOR flag=][=
 (out-pop) =][=
@@ -71,34 +74,37 @@ ENDFOR flag=][=
    = chapter    =][=
    = section    =]sub[=
    = subsection =]subsub[=
-   ESAC =]section [=prog_name=] Usage
+   ESAC =]section [=prog_name=] usage help[=
+     (if (exist? "flag.value") " (-?)") =]
 @cindex [=(. down-prog-name)=] usage
 
 This is the automatically generated usage text for [=prog_name=]:
 
 @example
 
-[=
-IF (exist? "prog_file_name") =][=
-  % prog_file_name `PROG=%s` =][=
-ELSE =][=
-  % prog_name `PROG=%s
-    if [ ! -f ${PROG} ]
-    then PROG=\`echo $PROG | tr '[A-Z]' '[a-z]'\` ; fi
-    if [ ! -f ${PROG} ]
-    then PROG=\`echo $PROG | tr x_ x-\` ; fi` =][=
-ENDIF=][=
+[= (shell (sprintf "PROG=%1$s
 
-IF (exist? "long_opts") =][=
-    `HELP=--help` =][=
-ELIF (exist? "flag.value") =][=
-    `HELP='-?'` =][=
-ELSE =][=
-    `HELP=help` =][=
-ENDIF =][=
+    if [ ! -f ${PROG} ]
+    then PROG=`echo $PROG | tr '[A-Z]' '[a-z]'` ; fi
 
-`./${PROG} ${HELP} 2>&1 |
-  sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g' `=]
+    if [ ! -f ${PROG} ]
+    then PROG=`echo $PROG | tr x_ x-` ; fi
+
+    if [ ! -f ${PROG} ]
+    then PROG='echo %1$s is unavailable - no' ; fi
+
+    ./${PROG} %2$s 2>&1 | \
+        sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g' "
+
+    (if (exist? "prog_file_name")
+        (get "prog_file_name")
+        (get "prog_name"))
+
+    (if (exist? "long_opts")       "--help"
+        (if (exist? "flag.value")  "-?"
+                                   "help" ))
+
+    ))  =]
 @end example
 
 [=
@@ -109,7 +115,8 @@ FOR flag=][=
    = chapter    =][=
    = section    =]sub[=
    = subsection =]subsub[=
-   ESAC =]section [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] Option
+   ESAC =]section [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] option[=
+          % value " (-%s)" =]
 @cindex [=(. down-prog-name)=]-[=% name (string-tr! "%s" "A-Z^_" "a-z--")=]
 
 [=doc=]
