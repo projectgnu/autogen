@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.17 2000/08/29 12:48:59 bkorb Exp $
+ *  $Id: autoopts.c,v 2.18 2000/08/29 14:30:20 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -633,7 +633,7 @@ valid_path( char*       pzBuf,  size_t      bufSize,
          *  THEN tack it onto the value we found
          */
         if (pzDir != (char*)NULL) {
-	    pzBuf += strlen( pzBuf );
+            pzBuf += strlen( pzBuf );
 
             if (pzBuf[-1] != DIR_SEP_CHAR)
                 *(pzBuf++) = DIR_SEP_CHAR;
@@ -682,13 +682,13 @@ doPresets( tOptions*  pOpts )
      */
     if (pOpts->papzHomeList != (const char**)NULL) {
         const char** papzHL = pOpts->papzHomeList;
-	const char*  pzPath = *(papzHL++);
+        const char*  pzPath = *(papzHL++);
 
         /*
          *  For every path in the home list, ...
          */
         while ( pzPath = *(papzHL++),
-	       pzPath != (char*)NULL) {
+               pzPath != (char*)NULL) {
             if (! valid_path( zFileName, sizeof( zFileName ),
                               pzPath, pOpts->pzProgPath ))
                 continue;
@@ -1234,11 +1234,13 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
           || (pOpts->structVersion < MIN_OPTION_VERSION     )
        )  )  {
         tSCC zBadVer[] = "Automated Options Processing Error!\n"
-            "\toptionProcess was called by %s with structure version %d.%d\n"
-            "\tThis library was compiled with version %d.%d\n";
+            "\t%s called optionProcess with structure version %d.%d.%d.\n"
+            "\tThis library was compiled with version %d.%d.%d\n"
+            "\tand requires a minimum structure version of %d.%d.%d\n";
         fprintf( stderr, zBadVer, argVect[0],
                  NUM_TO_VER( pOpts->structVersion ),
-                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ));
+                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ),
+                 NUM_TO_VER( MIN_OPTION_VERSION ));
         exit( EXIT_FAILURE );
     }
 

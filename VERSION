@@ -14,30 +14,25 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=0
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".7"
+AG_PATCHLEVEL=".8"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
 #   AG_PATCHLEVEL=""
 #   AG_MINOR_VERSION += 1 (OR AG_MINOR_VERSION = 0 && AG_MAJOR_VERSION += 1)
 #
-# If the autoopts sources have changed
-#   AO_REVISION += 1
-# If new autoopts interfaces have been removed or changed
-#   AO_CURRENT += 1
-#   AO_REVISION = 0
-#   AO_AGE = 0
-# if any autoopts interfaces have been added
-#   AO_CURRENT += 1
-#   AO_REVISION = 0
-#   AO_AGE += 1
-
-# autoopts version
+# AutoOpts versioning:
+#
+# AO_CURRENT  represents the interface version number.
+# AO_REVISION represents the number of times the library has been
+#             modified with an unchanged interface.
+# AO_AGE      represents the number of revisions the current library
+#             is capable of handling.  Currently, 3 thru 7 (i.e. 5)
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=6
+AO_CURRENT=7
 AO_REVISION=0
-AO_AGE=0
+AO_AGE=5
 
 MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 
@@ -47,12 +42,16 @@ VERSION=$AG_VERSION
 PACKAGE=autogen
 
 #  Validate struct marker in autoopts/options.h
+#  The computation here must be kept in sync with
+#  MIN_OPTION_VERSION and NUM_TO_VER in autoopts/autoopts.h
 #
 if [ -n "$srcdir" ] && [ -s $srcdir/autoopts/options.h ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr $AO_CURRENT '*' 4096`
-  lib=`expr '(' $AO_REVISION  '*' 128 ')' + $AO_AGE + $lib`
+  lib=`expr '(' $AO_CURRENT   '*' 4096 ')' \
+          + '(' $AO_REVISION  '*'  128 ')' \
+          + $AO_AGE`
+
   if [ ${hdr}0 -ne ${lib}0 ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib

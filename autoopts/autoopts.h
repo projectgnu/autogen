@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.11 2000/03/12 21:58:07 bruce Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.12 2000/08/29 14:30:20 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -59,12 +59,12 @@
  *  Bump this number *ONLY* if in incompatible change is made to
  *  the interface.
  */
-#define MIN_OPTION_VERSION  ((3  << 12) + 2)
+#define MIN_OPTION_VERSION  ((AO_CURRENT - AO_AGE) * 4096)
 
 /*
  *  Convert the number to a list usable in a printf call
  */
-#define NUM_TO_VER(n)       ((n) >> 12), ((n) & 0x0FFF)
+#define NUM_TO_VER(n)       ((n) >> 12), ((n) >> 7) & 0x001F, (n) & 0x007F
 
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
