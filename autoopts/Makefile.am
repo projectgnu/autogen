@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2004-02-16 12:51:05 bkorb"
+## Time-stamp:      "2004-05-09 11:08:40 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.27 2004/02/16 22:20:45 bkorb Exp $
+## $Id: Makefile.am,v 3.28 2004/05/12 02:36:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -32,7 +32,7 @@ HDRS        = $(GENHDRS) autoopts.h streqv.h
 ## documentation.
 ##
 CSRC        = \
-	autoopts.c  \
+    autoopts.c  \
     boolean.c enumeration.c genshell.c  load.c    makeshell.c \
     numeric.c pgusage.c     putshell.c  restore.c save.c      \
     sort.c    stack.c       streqvcmp.c usage.c   version.c
