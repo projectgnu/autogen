@@ -18,25 +18,7 @@ then
   top_srcdir=..
   export top_builddir top_srcdir
 fi
-
-#  Name our executable in one place and disable any $HOME defaults
-#
-ag=AutoGen
 HOME=/dev/null
-
-#  Use the local ${ag}, if available.  Otherwise, look for it.
-#
-if [ ! -x ./${ag} ]
-then
-  AG=`type ${ag} | sed "s/${ag} is //" `
-  if [ -z "$AG" ]
-  then
-    echo "Cannot locate ${ag}.  Giving up"
-    exit 1
-  fi
-else
-    AG=./${ag}
-fi
 
 if [ -z "${DEBUG_OPTS}" ]
 then
@@ -50,13 +32,29 @@ fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-# For the following to work, we must temporarily install
+# For the following to work, we must temporarily find or install
 # columns and getdefs from wherever they are found:
 #
 rmlist=
 
-if type whence 2>&1 | grep 'not found' > /dev/null
-then whence=which ; else whence=whence ; fi
+#  Name our executable in one place and disable any $HOME defaults
+#  Use the local ${AG}, if available.  Otherwise, look for it.
+#
+AG=./AutoGen
+if [ ! -x ${AG} ]
+then
+  f=`type ${AG} | sed "s/${AG} is //" `
+  case ${f} in
+  */AutoGen )
+     AG=${f}
+     ;;
+
+  * )
+    echo "Cannot locate ${AG}.  Giving up"
+    exit 1
+    ;;
+  esac
+fi
 
 #  The "getdefs" and "columns" programs are specifically
 #  called out in some of the templates (ensuring that
@@ -65,15 +63,35 @@ then whence=which ; else whence=whence ; fi
 GD=../getdefs/getdefs
 if [ ! -x ${GD} ]
 then
-    ln -s `$whence getdefs` ${GD}
-    rmlist="$rmlist ${GD}"
+  f=`type ${GD} | sed "s/${GD} is //" `
+  case ${f} in
+  */getdefs )
+     ln -s ${f} ${GD}
+     rmlist="$rmlist ${GD}"
+     ;;
+
+  * )
+    echo "Cannot locate ${GD}.  Giving up"
+    exit 1
+    ;;
+  esac
 fi
 
 COLS=../columns/columns
 if [ ! -x ${COLS} ]
 then
-    ln -s `$whence columns` ${COLS}
-    rmlist="$rmlist ${COLS}"
+  f=`type ${COLS} | sed "s/${COLS} is //" `
+  case ${f} in
+  */columns )
+     ln -s ${f} ${COLS}
+     rmlist="$rmlist ${COLS}"
+     ;;
+
+  * )
+    echo "Cannot locate ${COLS}.  Giving up"
+    exit 1
+    ;;
+  esac
 fi
 
 # # # # # # # # # # # # # # # # # # # # # # #
@@ -89,8 +107,9 @@ fi
 #
 if [ $# -eq 0 ]
 then
-  set defParse.c opts.c expr.ini functions.h directive.h \
-	autogen.info autogen.1
+  set -- `egrep '^##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
+          sed 's/^## *\(.*\) GEN-RULE/\1/' `
+  echo building $*
 fi
 
 #  Ensure complete success or a noticable failure
@@ -128,6 +147,7 @@ do
     fi
     ;;
 
+  stamp-opts | \
   opts.[ch] )
     # Make the option processing files:
     #
@@ -136,6 +156,7 @@ do
     date > stamp-opts
     ;;
 
+  stamp-exprini | \
   expr.ini )
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="$eopt defs=gfunc templ=snarf srcfile"
@@ -146,6 +167,7 @@ do
     date > stamp-exprini
     ;;
 
+  stamp-functions | \
   functions.h )
     eopt="template=functions defs=macfunc linenum srcfile filelist"
     eopt="$eopt autogen=${AG} base-name=functions"
@@ -154,6 +176,7 @@ do
     date > stamp-functions
     ;;
 
+  stamp-directive | \
   directive.h )
     eopt="template=directive autogen=${AG} base-name=directive"
     echo ${GD} $eopt defDirect.c
