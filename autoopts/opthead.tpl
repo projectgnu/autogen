@@ -1,4 +1,4 @@
-[=autogen template include $Id: opthead.tpl,v 1.5 1998/07/02 23:51:55 bkorb Exp $ =]
+[=autogen template include $Id: opthead.tpl,v 1.6 1998/07/09 17:15:34 bkorb Exp $ =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
 
@@ -84,10 +84,7 @@ _ENDIF=]
  *  Define the option values, and, for numerically valued options,
  *  the (argument) value of the option, and, for equivalenced-to
  *  options, a macro to identify the actual option value used.
- *  The AODFT_* define is for internal use only.
  */[=  _FOR flag=]
-#define AODFT_[=prefix _up #_ +=]OPT_[=name _up "#%-14s" _printf=] [=
-        _IF enabled _exist =]0[=_ELSE=]OPTST_DISABLED[=_ENDIF=]
 #define VALUE_[=prefix _up #_ +=]OPT_[=name _up "#%-14s" _printf=] [=
 
         _IF   value _len 1 = =]'[=value=]'[=
@@ -237,9 +234,10 @@ _ENDIF=]
  *    START - Start option processing from the beginning (index == 1)
  */
 #define    CLEAR_[=prefix _up #_ +=]OPT(n) STMTS( \
-                 [=prefix _up #_ +=]DESC(n).fOptState &= ~OPTST_SET_MASK; \
-                 [=prefix _up #_ +=]DESC(n).fOptState |= OPTST_INIT | AODFT_[=
-                           prefix _up #_ +=]OPT_ ## n; \
+                 [=prefix _up #_ +=]DESC(n).fOptState &= OPTST_PERSISTENT;   \
+                 if ( ([=prefix _up #_ +
+                    =]DESC(n).fOptState & OPTST_INITENABLED) == 0) \
+                     [=prefix _up #_ +=]DESC(n).fOptState |= OPTST_DISABLED; \
                  [=prefix _up #_ +=]DESC(n).optCookie = (void*)NULL )
 #define    STATE_[=prefix _up #_ +=]OPT(n) ([=prefix _up #_ +
                  =]DESC(n).fOptState & OPTST_SET_MASK)

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.3 1998/07/02 23:27:50 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.4 1998/07/09 17:15:37 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -238,9 +238,9 @@ optionUsage( tOptions*  pOptions, int exitCode )
                 }
             }
 
-            if ((pOD->fOptState & OPTST_NEGATABLE) != 0) {
-                tSCC zNegatable[] = "\t\t\t\t- may be negated as 'NO%s'\n";
-                fprintf( fp, zNegatable, pOD->pz_Name );
+            if ((pOD->fOptState & OPTST_DISABLEOK) != 0) {
+                tSCC zCanDisable[] = "\t\t\t\t- may be negated as 'NO%s'\n";
+                fprintf( fp, zCanDisable, pOD->pz_Name );
             }
 
             /*

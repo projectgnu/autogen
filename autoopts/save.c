@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 1.2 1998/06/17 20:21:09 bkorb Exp $
+ *  save.c  $Id: save.c,v 1.3 1998/07/09 17:15:36 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -69,7 +69,7 @@ findDirName( tOptions*  pOpts )
     pzDir = pOpts->pOptDesc[ pOpts->specOptIdx.save_opts ].pzLastArg;
     if ((pzDir != (char*)NULL) && (*pzDir != '\0'))
         return pzDir;
-    
+
     /*
      *  This function only works if there is a directory where
      *  we can stash the RC (INI) file.
@@ -236,15 +236,16 @@ findFileName( tOptions*  pOpts )
     unlink( pzDir );
     return pzDir;
 }
- 
- 
+
+
     STATIC void
 printEntry( FILE* fp, tOptDesc* p, char*  pzLA )
 {
     /*
      *  There is an argument.  Pad the name so values line up
      */
-    fprintf( fp, "%c%-18s  ", (DISABLED_OPT( p )) ? '+' : ' ', p->pz_Name );
+    fprintf( fp, "%-18s  ",
+             (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
 
     /*
      *  IF the option is numeric only,
@@ -333,7 +334,7 @@ optionSave( tOptions* pOpts )
         /*
          *  FOR each of the defined options, ...
          */
-        for (;--ct >= 0; pOD++) {
+        do  {
             tOptDesc*  p;
 
             /*
@@ -364,31 +365,29 @@ optionSave( tOptions* pOpts )
              *  THEN just print the name and continue
              */
             if (p->optArgType == ARG_NONE) {
-                fprintf( fp, "%c%s\n", (DISABLED_OPT( p )) ? '+' : ' ',
-                         p->pz_Name );
+                fprintf( fp, "%s\n", (DISABLED_OPT( p ))
+                                     ? p->pz_DisableName
+                                     : p->pz_Name );
                 continue;
             }
-
-            /*
-             *  IF the supplied argument is empty
-             *  THEN we will not put the option in the RC file
-             */
-            if (  ((p->fOptState & OPTST_NUMERIC) == 0)
-               && (  (p->pzLastArg  == (char*)NULL)
-                  || (p->pzLastArg[0] == '\0')
-               )  )
-                continue;
 
             if ((p->fOptState & OPTST_STACKED) == 0)
                 printEntry( fp, p, p->pzLastArg );
             else {
                 tArgList*  pAL = (tArgList*)p->optCookie;
-                int        ct  = pAL->useCt;
+                int        uct = pAL->useCt;
                 char**     ppz = pAL->apzArgs;
-                while (ct-- > 0)
+
+                /*
+                 *  Disallow multiple copies of disabled options.
+                 */
+                if (uct > 1)
+                    p->fOptState &= ~OPTST_DISABLED;
+
+                while (uct-- > 0)
                     printEntry( fp, p, *(ppz++) );
             }
-        }
+        } while ( (pOD++), (--ct > 0));
 
         fclose( fp );
     }

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.3 1998/07/02 23:00:18 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 1.4 1998/07/09 17:15:35 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -66,10 +66,10 @@
  *  for "opt_name" are available.
  */
 
-#define OPTST_INIT         0x0000
-#define OPTST_SET          0x0001
-#define OPTST_PRESET       0x0002
-#define OPTST_DEFINED      0x0004
+#define OPTST_INIT         0x0000  /* Initial compiled value            */
+#define OPTST_SET          0x0001  /* Set via the "SET_OPT()" macro     */
+#define OPTST_PRESET       0x0002  /* Set via an RC/INI file            */
+#define OPTST_DEFINED      0x0004  /* Set via a command line option     */
 #define OPTST_SET_MASK     0x000F  /* mask of flags that show set state */
 #define OPTST_EQUIVALENCE  0x0010  /* selected by equiv'ed option       */
 #define OPTST_DISABLED     0x0020  /* option with disable marker        */
@@ -77,7 +77,8 @@
 #define OPTST_NUMBER_OPT   0x0200  /* option is number option           */
 #define OPTST_NUMERIC      0x0400  /* option has numeric value          */
 #define OPTST_STACKED      0x0800  /* opt uses stackOptArg procedure    */
-#define OPTST_NEGATABLE    0x1000  /* option may be negated with "NO"   */
+#define OPTST_DISABLEOK    0x1000  /* option may be disabled            */
+#define OPTST_INITENABLED  0x2000  /* option defaults to enabled        */
 #define OPTST_PERSISTENT   0xFF00  /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
@@ -206,6 +207,7 @@ struct optDesc {
     const char*       pz_NAME;
     const char*       pz_Name;
     const char*       pz_DisableName;
+    const char*       pz_DisablePfx;
 };
 
 typedef struct specOptIndex tSpecOptIndex;

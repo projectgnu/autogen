@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.3 1998/07/02 23:00:21 bkorb Exp $
+ *  $Id: autoopts.c,v 1.4 1998/07/09 17:15:31 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,7 +70,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.3 1998/07/02 23:00:21 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.4 1998/07/09 17:15:31 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";
@@ -204,14 +204,7 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
      *       and then set the pointer to the numeric value
      */
     if ((pOD->fOptState & OPTST_NUMERIC) != 0) {
-        char ch = *pOD->pzLastArg;
-        if ((ch == 'n') || (ch == 'N')) {
-             pOD->fOptState &= OPTST_PERSISTENT;
-             pOD->pzLastArg  = (char*)NULL;
-        }
-
-        else
-            pOD->pzLastArg = (char*)strtol( pOD->pzLastArg, (char**)NULL, 0 );
+        pOD->pzLastArg = (char*)strtol( pOD->pzLastArg, (char**)NULL, 0 );
 
     /*
      *  OTHERWISE, the interpretation of the option value depends
@@ -219,62 +212,23 @@ loadPresetValue( tOptions*  pOpts, tOptDesc*  pOD )
      */
     } else switch (pOD->optArgType ) {
     case ARG_MAY:
-        /*
-         *  OPTIONAL ARGUMENT
-         */
-        if (*pOD->pzLastArg == NUL)
-             pOD->pzLastArg = (char*)NULL;
-        else pOD->pzLastArg = strdup( pOD->pzLastArg );
-        break;
+        if (pOD->pzLastArg == NULL)
+            break;
+        /*FALLTHROUGH*/
 
     case ARG_MUST:
-        /*
-         *  REQUIRED ARGUMENT
-         */
         if (*pOD->pzLastArg == NUL)
              pOD->pzLastArg = "";
         else pOD->pzLastArg = strdup( pOD->pzLastArg );
+
         break;
 
     default: /* no argument allowed */
-        /*
-         *  NO ARGUMENT ALLOWED
-         */
-        switch (*pOD->pzLastArg) {
-        case 'n': case 'N':
-            /*
-             *  'N'o, we do not want this option set
-             *  We clear the option and do not process it
-             */
-            pOD->fOptState &= OPTST_PERSISTENT;
-            break;
-
-        case '+':
-        case 'f': case 'F':
-            /*
-             *  Set this option to 'F'alse (opposite of '-' option)
-             */
-            pOD->fOptState |= OPTST_DISABLED;
-            break;
-
-        case '-': case NUL:
-        case 'y': case 'Y': case 't': case 'T':
-            /*
-             *  'Y'es, it is 'T'rue we want this regular option.
-             */
-        default:
-            break;
-        }
         pOD->pzLastArg = (char*)NULL;
         break;
     }
 
-    /*
-     *  IF the preset value does not indicate dropping the value,
-     *  THEN load the value.
-     */
-    if ((pOD->fOptState & OPTST_SET_MASK) != OPTST_INIT)
-        loadValue( pOpts, pOD );
+    loadValue( pOpts, pOD );
 }
 
 
@@ -320,7 +274,7 @@ longOptionFind( tOptions*  pOpts,
             }
 
             if (++matchCt > 1)
-		break;
+                break;
         }
 
         /*
@@ -353,7 +307,7 @@ longOptionFind( tOptions*  pOpts,
             if (++matchCt > 1)
                 break;
         }
-    } while (pOD++, idx++, (idx >= idxLim));
+    } while (pOD++, (++idx < idxLim));
 
     if (pzEq != (char*)NULL)
         *pzEq = '=';
@@ -447,13 +401,6 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
 {
     char*  pzOptionArg;
 
-    if (*pzLine == '+') {
-        optFlag |= OPTST_DISABLED;
-        while (isspace( *++pzLine )) /*NULL*/;
-    }
-    else if (*pzLine == '-')
-        while (isspace( *++pzLine )) /*NULL*/;
-
     /*
      *  Strip off the first token on the line.
      *  No quoting, space separation only.
@@ -486,9 +433,11 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
         tOptDesc*  pOD = longOptionFind( pOpts, pzLine, &optFlag );
         if ((pOD != (tOptDesc*)NULL) && ((pOD->fOptState & OPTST_SET) == 0)) {
             /*
-             *  Clear out non-persistent flags and set our new collection
+             *  Clear out the SET_MASK bits.  "optFlag" contains these
+             *  bits.  However, "fOptState" contains the equivalence/
+             *  disabled bits.
              */
-            pOD->fOptState &= OPTST_PERSISTENT;
+            pOD->fOptState &= OPTST_SET_MASK;
             pOD->fOptState |= optFlag;
             pOD->pzLastArg  = pzOptionArg;
 
@@ -497,10 +446,17 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
     }
 }
 
+
+/*
+ *  optionLoadLine
+ *
+ *  This is a user callable routine for setting options from, for
+ *  example, the contents of a file that they read in.
+ */
     void
 optionLoadLine( tOptions*  pOpts, char*  pzLine )
 {
-    loadOptionLine( pOpts, 0, pzLine );
+    loadOptionLine( pOpts, OPTST_SET, pzLine );
 }
 
 
@@ -580,7 +536,7 @@ doPresets( tOptions*  pOpts )
     /*
      *  when comparing long names, these are equivalent
      */
-    strequate( (const char*)"_-^" );
+    strequate( (const char*)"-_^" );
 
     /*
      *  FIRST, see if we are to look for an rc file where the program
@@ -720,14 +676,33 @@ doPresets( tOptions*  pOpts )
             if ((pOD->fOptState & OPTST_NO_INIT) != 0)
                 continue;
 
+            /*
+             *  IF there is no such environment variable,
+             *  THEN skip this entry, too.
+             */
             strcpy( pzFlagName, pOD->pz_NAME );
             pz = getenv( zEnvName );
+            if (pz == (char*)NULL)
+                continue;
 
-            if (pz != (char*)NULL) {
+            /*
+             *  Strip the mutable state
+             */
+            pOD->fOptState &= OPTST_PERSISTENT;
+
+            /*
+             *  IF the content of the variable is exactly the disablement
+             *  prefix,  THEN forget everything we know about preset values
+             */
+            if (streqvcmp( pz, pOD->pz_DisablePfx ) == 0) {
+                if ((pOD->fOptState & OPTST_INITENABLED) == 0)
+                     pOD->fOptState |= OPTST_DISABLED;
+                pOD->optCookie = (void*)NULL;
+
+            } else {
                 /*
                  *  Environment options *CANNOT* be '+'-marked
                  */
-                pOD->fOptState &= OPTST_PERSISTENT;
                 pOD->fOptState |= OPTST_PRESET;
                 pOD->pzLastArg  = pz;
 

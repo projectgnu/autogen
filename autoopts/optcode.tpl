@@ -1,4 +1,4 @@
-[=autogen template include $Id: optcode.tpl,v 1.5 1998/07/08 17:53:21 bkorb Exp $ =]
+[=autogen template include $Id: optcode.tpl,v 1.6 1998/07/09 17:15:32 bkorb Exp $ =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
@@ -63,6 +63,11 @@ tSCC    z[=name _cap "#_NAME[] =" + %-28s _printf =] "[=name _up=]";[=
 tSCC    zNot[=name _cap "#_Name[] =" + %-25s _printf =] "[=disable _down=]-[=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
 
+    _IF environrc _exist =]
+tSCC    zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] "[=disable _down=]";[=
+    _ELSE=]
+#define zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] (const char*)NULL[=
+    _ENDIF=][=
     _IF enable _len 0 > =]
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
@@ -73,6 +78,7 @@ tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
     _ENDIF=][=
 
   _ELSE "Disable does not exist" =]
+#define zNot[=name _cap "#_Pfx" + %-25s _printf =] (const char*)NULL
 #define zNot[=name _cap "#_Name" + %-25s _printf =] (const char*)NULL
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down #- +=][=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
@@ -225,12 +231,13 @@ static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
          _IF max _exist=][=max=][=_ELSE=]1[=_ENDIF=],
      /* actual cnt, fill */ 0, 0,
      /* opt state flags  */ [=
-         _IF flag_arg _get #=.* ~=]OPTST_NUMERIC | [=  _ENDIF=][=
-         _IF disable   _exist    =]OPTST_NEGATABLE | [=_ENDIF=][=
-         _IF stack_arg _exist    =]OPTST_STACKED | [=  _ENDIF=][=
-         _IF enabled   _exist !  =]OPTST_DISABLED | [= _ENDIF=][=
+         _IF flag_arg _get #=.* ~=]OPTST_NUMERIC | [=     _ENDIF=][=
+         _IF disable   _exist    =]OPTST_DISABLEOK | [=   _ENDIF=][=
+         _IF stack_arg _exist    =]OPTST_STACKED | [=     _ENDIF=][=
+         _IF enabled   _exist !  =]OPTST_DISABLED | [=
+         _ELSE                   =]OPTST_INITENABLED | [= _ENDIF=][=
          _IF no_preset _exist    =]OPTST_NO_INIT[=
-         _ELSE                   =]OPTST_INIT[=        _ENDIF=],
+         _ELSE                   =]OPTST_INIT[=           _ENDIF=],
      /* last opt argumnt */ [=
 
          _IF   flag_arg _len 0  =
@@ -259,7 +266,8 @@ static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
                _ELSE  =]unstackOptArg[=_ENDIF=][=
          _ELSE               =](tpOptProc)NULL[=_ENDIF=],
      /* opt name & text  */ z[=name _cap=]Text,  z[=name _cap=]_NAME,
-                            z[=name _cap=]_Name, zNot[=name _cap=]_Name },
+                            z[=name _cap=]_Name,
+     /* disablement strs */ zNot[=name _cap=]_Name, zNot[=name _cap=]_Pfx },
 [=/flag=][=
 
 _IF version _exist=]
@@ -273,10 +281,11 @@ _IF version _exist=]
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doVersion,
-     /* opt name & text  */ zVersionText,  (const char*)NULL,
-                            zVersion_Name, (const char*)NULL },
+     /* opt name & text  */ zVersionText,      (const char*)NULL,
+                            zVersion_Name,
+     /* disablement strs */ (const char*)NULL, (const char*)NULL },
 [=_ENDIF=]
   {  /* entry idx, value */ INDEX_[=prefix _up #_ +=]OPT_HELP, VALUE_[=
                                     prefix _up #_ +=]OPT_HELP,
@@ -288,10 +297,11 @@ _IF version _exist=]
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doUsageOpt,
-     /* opt name & text  */ zHelpText,  (const char*)NULL,
-                            zHelp_Name, (const char*)NULL },
+     /* opt name & text  */ zHelpText,         (const char*)NULL,
+                            zHelp_Name,
+     /* disablement strs */ (const char*)NULL, (const char*)NULL },
 
   {  /* entry idx, value */ INDEX_[=prefix _up #_ +=]OPT_MORE_HELP, VALUE_[=
                                     prefix _up #_ +=]OPT_MORE_HELP,
@@ -303,10 +313,11 @@ _IF version _exist=]
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doPagedUsage,
-     /* opt name & text  */ zMore_HelpText,  (const char*)NULL,
-                            zMore_Help_Name, (const char*)NULL }[=
+     /* opt name & text  */ zMore_HelpText,    (const char*)NULL,
+                            zMore_Help_Name,
+     /* disablement strs */ (const char*)NULL, (const char*)NULL, }[=
 
 _IF homerc _exist
 =],
@@ -321,10 +332,11 @@ _IF homerc _exist
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ (tOptProc*)NULL,
-     /* opt name & text  */ zSave_OptsText,  (const char*)NULL,
-                            zSave_Opts_Name, (const char*)NULL }[=
+     /* opt name & text  */ zSave_OptsText,    (const char*)NULL,
+                            zSave_Opts_Name,
+     /* disablement strs */ (const char*)NULL, (const char*)NULL, }[=
 _ENDIF=]  };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
