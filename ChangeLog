@@ -1,3 +1,8 @@
+2000-07-26  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c(ag_scm_tpl_line): deleted
+	(ag_scm_tpl_file_line): added
+
 2000-06-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expString.c( makeString ): Place contiguous newline

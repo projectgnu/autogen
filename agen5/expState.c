@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.16 2000/04/10 13:25:06 bkorb Exp $
+ *  $Id: expState.c,v 1.17 2000/07/26 22:53:58 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -681,16 +681,37 @@ ag_scm_tpl_file( void )
 }
 
 
-/*=gfunc tpl_line_num
+/*=gfunc tpl_file_line
  *
- * what:   get the template line number
+ * what:   get the template file and line number
  *
- * doc:  Returns the line number of the current template macro.
+ * doc:  Returns the file and line number of the current template macro
+ *       using the format, "from %s line %d".
 =*/
     SCM
-ag_scm_tpl_line_num( void )
+ag_scm_tpl_file_line( void )
 {
-    return gh_int2scm( pCurMacro->lineNo );
+    tSCC    zFmt[] = "from %s line %d";
+    char*   pz;
+    char    z[ 64 ];
+
+    {
+        size_t  maxlen = strlen( pCurTemplate->pzFileName )
+                       + sizeof( zFmt ) + 3 * sizeof( int );
+        if (maxlen >= sizeof( z ))
+            pz = (char*)AGALOC( maxlen );
+        else pz = z;
+    }
+
+    sprintf( pz, zFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );
+
+    {
+        SCM res = gh_str02scm( pz );
+        if (pz != z)
+            AGFREE( (void*)pz );
+
+        return res;
+    }
 }
 
 #include "expr.ini"
