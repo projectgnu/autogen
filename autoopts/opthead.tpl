@@ -1,17 +1,29 @@
-{@autogen template include $Id: opthead.tpl,v 1.1 1998/04/29 23:14:31 bkorb Exp $ @}
+{@autogen template include $Id: opthead.tpl,v 1.2 1998/06/05 16:49:17 bkorb Exp $ @}
 {@ # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." @}{@
 
-_SETENV HDRNAME _outfile
+_SETENV HDRNAME _outfile @}{@
+
+#  IF    long options are disallowed
+     AND at least one flag character (value) is supplied
+     AND the option count is not equal to the value count
+   THEN ...  @}{@
+
+_IF long_opts  _exist !
+    flag.value _exist
+    flag.value _count flag _count != & & @}{@
+  _ERROR "Error:  long options are not allowed, therefore\n"
+         "        every option must have exactly one value specified" + @}{@
+_ENDIF @}{@
 
 
-@}{@ # "The #define name we use to self-exclude the header" @}{@
+# "The #define name we use to self-exclude the header" @}{@
 
 _SETENV DEFNAME prog_name _get _outfile
-    "#2$echo '%s_%s'|tr '[a-z]./' '[A-Z]__'" _printf _shell@}{@
+    "#2$echo '%s_%s'|tr -- '-./[a-z]' '___[A-Z]'" _printf _shell@}{@
 
- # "Let the real output begin..."
-
+# "Let the real output begin..."
+#
 @}#ifndef {@_eval DEFNAME _env@}
 #define {@_eval DEFNAME _env@}
 {@
@@ -78,6 +90,10 @@ _ENDIF@}
         _IF   value _len 1 = @}'{@value@}'{@
         _ELIF value _get _up NUMBER = @}NUMBER_OPTION{@
               _SETENV NUMBER_OPTION _index @}{@
+        _ELIF value _exist @}{@
+              _ERROR name _get
+                     "Error:  value for opt %s must be single char or 'NUMBER'"
+                     _printf @}{@
         _ELIF _index 0x20 <= @}{@_eval _index@}{@
         _ELSE                @}{@_eval _index 96 +@}{@
         _ENDIF@}{@
