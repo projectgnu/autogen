@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# get.test --- test get functionality
+# in.test --- Verify that the "in?" predicate works
 #
+# Time-stamp:        "2002-10-26 09:41:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           7/12/2001
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+#            by: bkorb
 #
-# $Id: in.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: in.test,v 3.1 2002/10/26 16:41:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -67,4 +67,4 @@ $AGEXE $testname.def || failure $AGEXE failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup
-# end of get.test
+# end of in.test
