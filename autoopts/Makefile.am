@@ -10,10 +10,11 @@
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.23 1999/11/09 05:00:40 bruce Exp $
+## $Id: Makefile.am,v 2.24 2000/03/11 23:18:59 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
+SUBDIRS		= test
 include $(top_srcdir)/MakeRules.in
 MAINTAINERCLEANFILES = Makefile.in
 
