@@ -1,3 +1,19 @@
+2004-03-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-macro.tpl: put strings into one variable and use offsets.
+	Minimizes relocation costs at load time.
+	* agen5/cgi-fsm.c: regen with new templates
+	* agen5/defParse-fsm.c: ditto
+	* autoopts/optcode.tpl: implement coherent method for specifying
+	how to construct a main() procedure.  Add a standardized main() for
+	handling an input list from either the command line or stdin.
+	* autoopts/optmain.tpl: more for the above
+	* autoopts/test/argument.test: accommodate changes to templates
+	* autoopts/test/handler.test: ditto
+	* compat/strsignal.tpl: put strings into single globeal
+	* compat/strsignal.c: use new mechanism
+	* doc/autogen.texi: doc the new main procedure stuff.
+
 2004-02-27  Bruce Korb  <bkorb@gnu.org>
 
 	* config/misc.def: update to eliminate warnings on some platforms
