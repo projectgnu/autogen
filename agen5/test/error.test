@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2003-05-17 10:37:11 bkorb"
+# Time-stamp:        "2003-05-18 13:02:10 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.11 2003/05/18 17:10:51 bkorb Exp $
+# $Id: error.test,v 3.12 2003/05/18 20:02:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -80,13 +80,6 @@ Error in template error.tpl, line 13
 	This is a multi-line
 	error to show how to exit
 	your template
-Failing Guile command:  = = = = =
-
-(error "This is a multi-line
-	error to show how to exit
-	your template")
-
-=================================
 _EOF_
 
 # this is *supposed* to exit with a failure status
