@@ -6,7 +6,7 @@
 ## Created:         Mon Jun 30 15:35:12 1997                
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/06/13 02:00:39 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/06/15 20:20:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,7 +18,7 @@ SUBDIRS      = @TOP_DIRLIST@
 EXTRA_DIST	= VERSION TODO NOTES configure
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 		  configure libtool stamp-h.in
-DISTCLEANFILES = .configure.patch
+DISTCLEANFILES = .configure.patch stamp-h
 
 configure : VERSION
 
