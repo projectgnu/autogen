@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.16 2000/03/12 20:40:30 bruce Exp $
+ *  $Id: funcCase.c,v 1.17 2000/03/12 21:10:21 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -222,7 +222,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 
 /*=gfunc string_contains_eqv_p
  *
- * what:   caseless string contains
+ * what:   caseless substring
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -383,7 +383,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_has_eqv_match_p
  *
- * what:   caseless contained regex match
+ * what:   caseless regex contains
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -467,7 +467,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_end_eqv_match_p
  *
- * what:   caseless regex match end
+ * what:   caseless regex ending
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -565,7 +565,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 =*/
 /*=gfunc string_start_eqv_match_p
  *
- * what:   caseless regex match start
+ * what:   caseless regex start
  * general_use:
  *
  * exparg: text, text to test for pattern
