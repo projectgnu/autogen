@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2000/03/19 19:55:15 $
+# Last Modified:  $Date: 2000/03/19 22:52:00 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.11 2000/03/19 19:55:15 bruce Exp $
+# $Id: expr.test,v 1.12 2000/03/19 22:52:00 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -34,8 +34,8 @@ sed -n '/  expr.ini /,/date > stamp-exprini/p' \
     sed -e 1d -e '$d' >> ./${testname}.sh
 
 sh -x ./${testname}.sh
-sed '1,6d' ./expr.ini > expr.out
-sed '1,6d' ${top_srcdir}/agen5/expr.ini > expr.base
+sed '/DO NOT EDIT/,/and the template/d' ./expr.ini > expr.out
+sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini > expr.base
 
 diff expr.base expr.out || \
   failure expr.ini differs from ${top_srcdir}/agen5/expr.ini
