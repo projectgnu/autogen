@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 2.1 1999/06/03 19:43:28 bkorb Exp $
+ *  $Id: strsignal.c,v 2.2 1999/07/08 17:13:35 bkorb Exp $
  */
 
 #include "compat.h"
@@ -56,6 +56,10 @@
 #    define const
 #  endif
 #endif	/* __STDC__ */
+
+#ifdef HAVE_SYS_SIGLIST
+#  include <signal.h>
+#endif
 
 /*
  *  Import the generated tables
