@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Aug 30 11:11:28 1999				      
+# Last Modified:     Mon Aug 30 12:18:15 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.22 1999/08/30 18:11:59 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.23 1999/08/30 19:18:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -210,6 +210,8 @@ do
    echo running bootstrap.dir in `pwd`
    sh ./bootstrap.dir recursive )
 done
+
+./configure $@
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
