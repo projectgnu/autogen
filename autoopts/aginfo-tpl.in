@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.8 2000/03/13 00:00:45 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.9 2000/03/13 00:12:02 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -47,13 +47,13 @@ This [=(string-downcase! (getenv "LEVEL"))=] documents the @code{AutoOpts}
 generated usage text and option meanings for [=prog_name=].[=
 ENDIF=]
 
-This software is released under [+:
-CASE copyright.type :+][+:
- =  gpl :+]the GNU Public License[+:
- = lgpl :+]the GNU Public License with Library Extensions[+:
- =  bsd :+]the Free BSD License[+:
- *      :+]a proprietary copyright[+:
-ESAC :+].
+This software is released under [=
+CASE copyright.type =][=
+ =  gpl =]the GNU Public License[=
+ = lgpl =]the GNU Public License with Library Extensions[=
+ =  bsd =]the Free BSD License[=
+ *      =]a proprietary copyright[=
+ESAC =].
 
 @menu
 * [=(sprintf "%s %-24s" (. down-prog-name) "usage::")
