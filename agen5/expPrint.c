@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.8 2002/06/27 01:36:13 bkorb Exp $
+ *  $Id: expPrint.c,v 3.9 2002/10/27 04:59:01 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -252,6 +252,52 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
     SCM   res      = run_printf( pzFmt, list_len, alist );
 
     return  scm_display( res, port );
+}
+
+
+/*=gfunc   format_arg_count
+ *
+ * what:   count the args to a format
+ * general_use:
+ *
+ * exparg: format, formatting string
+ *
+ * doc:    "Sometimes, it is useful to simply be able to figure out how many\n"
+ *         "arguments are required by a format string.  For example, if you\n"
+ *         "are extracting a format string for the purpose of generating a\n"
+ *         "macro to invoke a printf-like function, you can run the\n"
+ *         "formatting string through this function to determine how many\n"
+ *         "arguments to provide for in the macro. e.g. for this extraction\n"
+ *         "text:\n"
+ *         "@example\n\n"
+ *         " /*=fumble bumble\n"
+ *         "  * fmt: 'stumble %s: %d\\n'\n"
+ *         " =*" "/\n"
+ *         "@end example\n\n"
+ *         "@noindent\n"
+ *         "You may wish to generate a macro:\n"
+ *         "@example\n\n"
+ *         " #define BUMBLE(a1,a2) printf_like(something,(a1),(a2))\n"
+ *         "@end example\n\n"
+ *         "@noindent\n"
+ *         "You can do this by knowing that the format needs two arguments.\n"
+=*/
+    SCM
+ag_scm_format_arg_count( SCM fmt )
+{
+    char* pzFmt = ag_scm2zchars( fmt, pzFormatName );
+    int   ct    = 0;
+    for (;;) {
+        switch (*(pzFmt++)) {
+        case NUL: goto scanDone;
+        case '%':
+            if (*pzFmt == '%')
+                 pzFmt++;
+            else ct++;
+        }
+    } scanDone:;
+
+    return gh_int2scm( ct );
 }
 /*
  * Local Variables:

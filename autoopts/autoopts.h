@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2002-09-21 10:54:11 bkorb"
+ *  Time-stamp:      "2002-10-26 11:03:56 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.6 2002/09/29 00:16:20 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.7 2002/10/27 04:59:01 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -55,12 +55,11 @@
 #define AUTOGEN_AUTOOPTS_H
 
 #define __EXTENSIONS__
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#  include "compat/compat.h"
-#endif
 
+#include "config.h"
+#include "compat/compat.h"
 #include <sys/param.h>
+
 #include "options.h"
 #include "streqv.h"
 

@@ -1,16 +1,16 @@
-dnl  -*- Mode: M4 -*- 
+dnl  -*- Mode: M4 -*-
 dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
-dnl 
+dnl
 dnl Author:	           Gary V. Vaughan <gvaughan@localhost>
 dnl Maintainer:	       Gary V. Vaughan <gvaughan@localhost>
 dnl Created:	       Sun Nov 15 23:37:14 1998
-dnl Last Modified:     Mon May 17 01:02:44 1999				
+dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.2 2002/09/11 03:30:32 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.3 2002/10/27 04:59:01 bkorb Exp $
 dnl --------------------------------------------------------------------
-dnl 
+dnl
 dnl Code:
 
 # serial 1
@@ -19,7 +19,7 @@ dnl AG_PATH_AUTOOPTS([MIN-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for AUTOOPTS, and define AUTOGEN, AUTOOPTS_CFLAGS, AUTOGEN_LDFLAGS
 dnl      and AUTOOPTS_LIBS.
 dnl
-AC_DEFUN(AG_PATH_AUTOOPTS,
+AC_DEFUN([AG_PATH_AUTOOPTS],
 [dnl Get the cflags and libraries from the autoopts-config script
 AC_ARG_WITH(opts-prefix,
 [  --with-opts-prefix=PFX  Prefix where autoopts is installed (optional)])
@@ -86,7 +86,7 @@ changequote([,])dnl
 #include <stdio.h>
 #include <stdlib.h>
 
-int 
+int
 main ()
 {
     int current, revision, age;
@@ -134,7 +134,7 @@ main ()
         printf("*** to point to the correct copy of autoopts-config, and "
                "remove the file\n");
         printf("*** config.cache before re-running configure\n");
-    } 
+    }
 #if defined (AO_CURRENT) && defined (AO_REVISION) && defined (AO_AGE)
     else if (($autoopts_config_current != AO_CURRENT) ||
              ($autoopts_config_revision != AO_REVISION) ||
@@ -194,7 +194,7 @@ main ()
 
   if test "x$no_autoopts" = x ; then
     AC_MSG_RESULT(yes)
-    ifelse([$2], , :, [$2])     
+    ifelse([$2], , :, [$2])
   else
     AC_MSG_RESULT(no)
     if test "$AUTOOPTS_CONFIG" = "no" ; then

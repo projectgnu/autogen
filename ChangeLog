@@ -1,3 +1,13 @@
+2002-10-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expPrint.c(ag_scm_format_arg_count): new function
+	* agen5/test/format.test: new - test the functionality
+
+2002-10-14  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(libguileopts_la_CFLAGS): set to GUILE flags
+	* autoopts/test/Makefile.am(INCLIST): add $(GUILE_CPPFLAGS)
+
 2002-10-12  Bruce Korb  <bkorb@gnu.org>
 
 	* config/confmacs.tpl(emit-results): add a yes-libflags action that

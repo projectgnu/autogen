@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.4 2002/10/01 04:18:50 bkorb Exp $
+ *  $Id: makeshell.c,v 3.5 2002/10/27 04:59:01 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -49,7 +49,6 @@
  * If you do not wish that, delete this exception notice.
  */
 #include <stdio.h>
-#include <string.h>
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>

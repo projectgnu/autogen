@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.5 2002/07/27 04:13:35 bkorb Exp $
+ *  $Id: putshell.c,v 3.6 2002/10/27 04:59:01 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -51,7 +51,6 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 
 #ifdef __STDC__
 #include "autoopts.h"
