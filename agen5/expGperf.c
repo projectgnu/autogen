@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGperf.c,v 1.2 2000/09/30 02:39:34 bkorb Exp $
+ *  $Id: expGperf.c,v 1.3 2000/09/30 02:42:44 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -217,4 +217,8 @@ ag_scm_gperf( SCM name, SCM str )
     AGFREE( pzStr );
     return str;
 }
-
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expGperf.c */
