@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.4 1999/10/31 19:10:34 bruce Exp $
+ *  $Id: funcCase.c,v 1.5 1999/10/31 22:41:48 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -988,6 +988,11 @@ MAKE_LOAD_PROC( Case )
  *  alias: =
  *  alias: *
  *  situational:
+ *
+ *  desc:
+ *    This macro selects a block of text by matching an expression
+ *    against the sample text expression evaluated in the @code{CASE}
+ *    macro.  @xref{CASE}.
 =*/
 MAKE_LOAD_PROC( Select )
 {
