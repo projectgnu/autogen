@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.4 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: funcEval.c,v 1.5 1999/10/19 02:10:40 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -97,7 +97,6 @@ evalExpression( ag_bool* pMustFree )
                          "attempted to use block macro in eval expression" );
                 return (char*)zNil;
             }
-            code &= EMIT_PRIMARY_TYPE;
 
             /*
              *  IF this is a formatting macro,
@@ -114,6 +113,7 @@ evalExpression( ag_bool* pMustFree )
             } else if (pMac->ozText != 0)
                  pzText = pT->pzTemplText + pMac->ozText;
             else pzText = pDef->pzValue;
+            code &= EMIT_PRIMARY_TYPE;
         }
     }
 
