@@ -38,7 +38,7 @@ do
 	arg="    flag_arg = ':';"
 	;;
     * )
-	arg='\c'
+	unset arg
 	;;
     esac
 
@@ -52,7 +52,7 @@ do
     then
 	echo "    value = '`echo $flag | sed 's/\(.\).*/\1/'`';"
     fi
-    echo "$arg"
+    [ -n "${arg}" ] && echo "${arg}"
     echo "};"
     echo
 done >&5
