@@ -35,10 +35,6 @@
 #include <snprintfv/stream.h>
 #include <snprintfv/mem.h>
 
-#ifdef HAVE_WCHAR_H
-#  include <wchar.h>
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -129,7 +125,7 @@ typedef struct printf_info
 typedef union printf_arg
 {
   unsigned char pa_char;
-  wchar_t pa_wchar;
+  snv_wchar_t pa_wchar;
   short int pa_short_int;
   int pa_int;
   long int pa_long_int;
@@ -142,7 +138,7 @@ typedef union printf_arg
   double pa_double;
   snv_long_double pa_long_double;
   const char *pa_string;
-  const wchar_t *pa_wstring;
+  const snv_wchar_t *pa_wstring;
   snv_constpointer pa_pointer;
 } printf_arg;
 
@@ -154,7 +150,7 @@ typedef union printf_arg
  * Append an error that will be returned by printf_strerror.
  */
 #define PRINTF_ERROR(pi, str)                                         \
-        printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FMT, str);
+        printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FCN, str);
 
 typedef int printf_function PARAMS ((STREAM *stream, struct printf_info *pparser, union printf_arg const * args));
 

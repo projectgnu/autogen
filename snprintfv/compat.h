@@ -115,7 +115,21 @@ extern "C" {
 #define MAX_INT MAXINT
 #define MIN_INT MININT
 
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
+
+#ifndef HAVE_WCHAR_T
+typedef wchar_t snv_wchar_t;
+#else
+typedef int snv_wchar_t;
+#endif
+
+#ifndef HAVE_WINT_T
+typedef wint_t snv_wint_t;
+#else
+typedef int snv_wint_t;
+#endif
 
 #if ENABLE_NLS
 # include <libintl.h>

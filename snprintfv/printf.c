@@ -44,17 +44,22 @@
 #include "stream.h"
 #include "mem.h"
 
-#ifndef HAVE_STRTOUL
-#  include "strtoul.c"
-#endif
+#ifdef SNV_LIBRARY_BUILD
+#  include "dl.h"
+#else
 
-#ifndef HAVE_LDEXPL
-#  include "ldexpl.c"
-#endif
+#  ifndef HAVE_STRTOUL
+#    include "strtoul.c"
+#  endif
 
-#ifndef HAVE_FREXPL
-#  include "frexpl.c"
-#endif
+#  ifndef HAVE_LDEXPL
+#    include "ldexpl.c"
+#  endif
+
+#  ifndef HAVE_FREXPL
+#    include "frexpl.c"
+#  endif
+#endif /* SNV_LIBRARY_BUILD */
 
 #define EOS			'\0'
 #define SNV_CHAR_SPEC		'%'
@@ -295,13 +300,13 @@ parser_reset (pinfo)
  * returned.
  **/
 char *
-printf_error (pinfo, file, line, func/*1, func2, func3*/, error_message)
+printf_error (pinfo, file, line, func1, func2, func3, error_message)
      struct printf_info *pinfo;
      const char *file;
      int line;
-     const char *func/*1;
+     const char *func1;
      const char *func2;
-     const char *func3*/;
+     const char *func3;
      const char *error_message;
 {
   int i;
@@ -320,9 +325,9 @@ printf_error (pinfo, file, line, func/*1, func2, func3*/, error_message)
   for (i /= 10; i >= 1; i /= 10)
     filccat (pinfo->error, '0' + (line / i) % 10);
 
-  filcat (pinfo->error, func/*1);
+  filcat (pinfo->error, func1);
   filcat (pinfo->error, func2);
-  filcat (pinfo->error, func3*/);
+  filcat (pinfo->error, func3);
   filcat (pinfo->error, ": ");
   filcat (pinfo->error, error_message);
   return result;
@@ -668,7 +673,7 @@ stream_printfv (stream, format, ap)
             break;
 
           case PA_WCHAR:
-           args[index].pa_wchar = (wchar_t) *(const long int *)(ap + index);
+           args[index].pa_wchar = (snv_wchar_t) *(const long int *)(ap + index);
             break;
 
           case PA_INT|PA_FLAG_SHORT:
@@ -708,7 +713,7 @@ stream_printfv (stream, format, ap)
             break;
 
           case PA_WSTRING:
-           args[index].pa_wstring = *(const wchar_t **)(ap + index);
+           args[index].pa_wstring = *(const snv_wchar_t **)(ap + index);
             break;
 
           case PA_POINTER:
@@ -854,7 +859,7 @@ stream_vprintf (stream, format, ap)
             break;
 
           case PA_WCHAR:
-	    args[index].pa_wchar = va_arg (ap, wint_t); /* Promoted.  */
+	    args[index].pa_wchar = va_arg (ap, snv_wint_t); /* Promoted.  */
             break;
 
           case PA_INT|PA_FLAG_SHORT:
@@ -890,7 +895,7 @@ stream_vprintf (stream, format, ap)
             break;
 
           case PA_WSTRING:
-	    args[index].pa_wstring = va_arg (ap, const wchar_t *);
+	    args[index].pa_wstring = va_arg (ap, const snv_wchar_t *);
             break;
 
           case PA_POINTER:

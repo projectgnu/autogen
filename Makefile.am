@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2002-08-18 17:50:19 bkorb"
+## Time-stamp:      "2002-12-14 14:56:51 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.13 2002/08/23 04:15:09 bkorb Exp $
+## $Id: Makefile.am,v 3.14 2002/12/15 17:29:12 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -27,9 +27,9 @@ distcleancheck_listfiles = \
 
 configure : VERSION
 
-all : .configure.patch
+all : .conf-stamp
 
-.configure.patch : configure
+.conf-stamp : configure
 	BOOTSTRAP=addlink sh ${top_srcdir}/config/bootstrap.local
 	@touch $@
 

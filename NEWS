@@ -1,3 +1,11 @@
+New in 5.5 - December 15, 2002
+* The FOR macro will now accept a list of values, as in:
+  [= FOR v IN one, "two , part" three =]
+* snprintfv-0.99f was fully incorporated, saving 300K of distribution
+  space and a lot of configure time.
+* The 'dne' function will accept "-d" as the first argument in order
+  to suppress the date from the output.
+
 New in 5.4.8 - December 10, 2002
 * Freed AutoOpts from libguile.  It was never really dependent.
 * new snprintfv library incorporated
