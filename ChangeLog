@@ -4,7 +4,8 @@
 	value lists.
 	* agen5/defReduce.c:  Implementation
 	* agen5/defLex.c:  commas are now a special token
-
+	* autoopts/optlib.tpl:  OSR5 regex cannot grok "^(|:|=)$"  :-(
+	
 1999-11-08  Bruce Korb  <autogen@linuxbox.com>
 
 	* agen5/funcDef.c:  Template structure needed more space.
