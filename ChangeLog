@@ -1,5 +1,18 @@
 2001-09-21  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/stack.c(unstack): make it work when we don't have posix
+	regcomp(3).
+	* autoopts/agman1.tpl: map '$*' to '.br'
+	* config/: change name of 'm4.tpl' to 'config.tpl'
+	* config/config.tpl: document needed definitions + beautify
+
+2001-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(main): when aborting due to signal receipt, the
+	exit code should be 128 + signal number
+
+2001-09-21  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/aginfo.tpl: accept "preserve-case" program attribute
 	* autoopts/optlib.tpl: ditto
 	* autoopts/agman1.tpl: ditto

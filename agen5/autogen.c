@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.17 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: autogen.c,v 1.18 2001/09/29 17:08:56 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -89,8 +89,11 @@ main( int    argc,
       char** argv )
 {
     pfTrace = stderr;
-    if (sigsetjmp( abendJumpEnv, 0 ) != 0)
-        exit( EXIT_FAILURE );
+    {
+        int signo = sigsetjmp( abendJumpEnv, 0 );
+        if (signo != 0)
+            exit( signo + 128 );
+    }
 
     signalSetup();
 

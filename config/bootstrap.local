@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2000/09/22 15:54:19 $
+# Last Modified:     $Date: 2001/09/29 17:08:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.32 2000/09/22 15:54:19 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.33 2001/09/29 17:08:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -113,7 +113,7 @@ pre )
       columns --version  && \
       getdefs --version ) > /dev/null 2>&1 || exit 0
 
-    ( cd ${srcdir}/config; autogen misc.def; )
+    ( cd ${srcdir}/config; ${AUTOGEN} misc.def; )
 
     test -f doc/autogen.texi \
         || echo '@setfilename fnord' > doc/autogen.texi

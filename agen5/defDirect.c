@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: defDirect.c,v 1.15 2001/09/29 17:08:56 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -720,7 +720,7 @@ doDir_line( char* pzArg, char* pzScan )
  *  Invokes @code{$SHELL} or @file{/bin/sh} on a script that should
  *  generate AutoGen definitions.  It does this using the same server
  *  process that handles the back-quoted @code{`} text.
- *  @strong{CAUTION}:  let not your @code{$SHELL} be @code{csh}.
+ *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
 =*/
     STATIC char*
 doDir_shell( char* pzArg, char* pzScan )
@@ -824,5 +824,6 @@ doDir_undef( char* pzArg, char* pzScan )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of defDirect.c */

@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/09/22 04:05:08 $
+## Last Modified:   $Date: 2001/09/29 17:08:56 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.16 2001/09/22 04:05:08 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.17 2001/09/29 17:08:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 :+]
@@ -243,6 +243,7 @@ This option must not appear in combination with any of the following options:
  -e 's;@\\(code|var|samp\\){\\([^}]*\\)\};\\\\fB\\2\\\\fP;g' \
  -e 's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
  -e 's/@\\([{}]\\)/\\1/' \
+ -e 's,^\\$\\*$,.br,' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \
  -e '/^ *@ *example/d' \
  -e 's/^ *@ *end *example/.br/' \

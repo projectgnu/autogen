@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.7 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: stack.c,v 2.8 2001/09/29 17:08:56 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -64,22 +64,14 @@
 
 #include "autoopts.h"
 
-DEF_PROC_2( void unstackOptArg,
-            tOptions*,  pOpts,
-            tOptDesc*,  pOptDesc )
+void unstackOptArg( pOpts, pOptDesc )
+    tOptions*  pOpts;
+    tOptDesc*  pOptDesc;
 {
-    /*
-     *  IF the target system is too feeble to have a POSIX regex,
-     *  THEN we use a simple string compare for entry removal
-     */
-#ifdef HAVE_POSIX_REGCOMP
-    regex_t   re;
-    tArgList* pAL = (tArgList*)pOptDesc->optCookie;
-    int       ct, sIdx, dIdx;
-    char*     pzSrc;
-    char*     pzEq;
+    int       ct, i;
     int       res;
 
+    tArgList* pAL = (tArgList*)pOptDesc->optCookie;
     /*
      *  IF we don't have any stacked options,
      *  THEN indicate that we don't have any of these options
@@ -91,47 +83,85 @@ DEF_PROC_2( void unstackOptArg,
         return;
     }
 
-    if (regcomp( &re, pOptDesc->pzLastArg, REG_NOSUB ) != 0)
-        return;
+#ifdef HAVE_POSIX_REGCOMP
+    {
+        regex_t   re;
+        int       ct, dIdx;
 
+        if (regcomp( &re, pOptDesc->pzLastArg, REG_NOSUB ) != 0)
+            return;
+
+        /*
+         *  search the list for the entry(s) to remove.  Entries that
+         *  are removed are *not* copied into the result.  The source
+         *  index is incremented every time.  The destination only when
+         *  we are keeping a define.
+         */
+        for (i = 0, dIdx = 0, ct = pAL->useCt; --ct >= 0; i++) {
+            char*     pzSrc = pAL->apzArgs[ i ];
+            char*     pzEq  = strchr( pzSrc, '=' );
+
+            if (pzEq != (char*)NULL)
+                *pzEq = NUL;
+
+            res = regexec( &re, pzSrc, (size_t)0, (regmatch_t*)NULL, 0 );
+            switch (res) {
+            case 0:
+                /*
+                 *  Remove this entry by reducing the in-use count
+                 *  and *not* putting the string pointer back into
+                 *  the list.
+                 */
+                pAL->useCt--;
+                break;
+
+            default:
+            case REG_NOMATCH:
+                if (pzEq != (char*)NULL)
+                    *pzEq = '=';
+
+                /*
+                 *  IF we have dropped an entry
+                 *  THEN we have to move the current one.
+                 */
+                if (dIdx != i)
+                    pAL->apzArgs[ dIdx ] = pzSrc;
+                dIdx++;
+            }
+        }
+
+        regfree( &re );
+    }
+#else
     /*
      *  search the list for the entry(s) to remove.  Entries that
      *  are removed are *not* copied into the result.  The source
      *  index is incremented every time.  The destination only when
      *  we are keeping a define.
      */
-    for (sIdx = 0, dIdx = 0, ct = pAL->useCt; --ct >= 0; sIdx++) {
-        pzSrc = pAL->apzArgs[ sIdx ];
-        pzEq  = strchr( pzSrc, '=' );
-
-        if (pzEq != (char*)NULL)
+    for (i = 0, ct = pAL->useCt; i < ct; i++) {
+        char*     pzSrc = pAL->apzArgs[ i ];
+        char*     pzEq  = strchr( pzSrc, '=' );
+        if (pzEq != (char*)NULL) {
             *pzEq = NUL;
+            res = strcmp( pzSrc, pOptDesc->pzLastArg );
+            *pzEq = '=';
+        } else
+            res = strcmp( pzSrc, pOptDesc->pzLastArg );
 
-        res = regexec( &re, pzSrc, (size_t)0, (regmatch_t*)NULL, 0 );
-        switch (res) {
-        case 0:
+        if (res == 0) {
             /*
              *  Remove this entry by reducing the in-use count
              *  and *not* putting the string pointer back into
              *  the list.
              */
-            pAL->useCt--;
+            if (i != --ct)
+                pAL->apzArgs[ i ] = pAL->apzArgs[ --ct ];
+            pAL->useCt = ct;
             break;
-
-        default:
-        case REG_NOMATCH:
-            if (pzEq != (char*)NULL)
-                *pzEq = '=';
-
-            /*
-             *  IF we have dropped an entry
-             *  THEN we have to move the current one.
-             */
-            if (dIdx != sIdx)
-                pAL->apzArgs[ dIdx ] = pzSrc;
-            dIdx++;
         }
     }
+#endif
 
     /*
      *  IF we have unstacked everything,
@@ -144,15 +174,12 @@ DEF_PROC_2( void unstackOptArg,
         free( (void*)pAL );
         pOptDesc->optCookie = (void*)NULL;
     }
-
-    regfree( &re );
-#endif
 }
 
 
-DEF_PROC_2( void stackOptArg,
-            tOptions*,  pOpts,
-            tOptDesc*,  pOptDesc )
+void stackOptArg( pOpts, pOptDesc )
+    tOptions*  pOpts;
+    tOptDesc*  pOptDesc;
 {
     tArgList* pAL;
 
@@ -218,5 +245,6 @@ DEF_PROC_2( void stackOptArg,
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * stack.c ends here */

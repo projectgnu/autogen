@@ -1,13 +1,13 @@
 
-autogen definitions m4;
+autogen definitions config.tpl;
 
 /*
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     Wed Jul  7 10:33:11 1999				      
+ *  Last Modified:     $Date: 2001/09/29 17:08:56 $
  *             by:     Bruce Korb <bkorb@gnu.org>			      
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 1.4 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: misc.def,v 1.5 2001/09/29 17:08:56 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
@@ -123,4 +123,4 @@ test = {
     "Check that the POSIX compliant uname(2) call works properly.";
 };
 
-/* ctime.def ends here */
+/* misc.def ends here */
