@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.15 1999/11/02 04:18:23 bruce Exp $
+ *   $Id: opts.def,v 2.16 1999/11/02 04:39:05 bruce Exp $
  */
 
 /*
@@ -88,9 +88,16 @@ flag = {
     doc =
     "This option is used to create shorthand entries for subblocks.\n"
     "For example, with:\n"
-    "@*\n@code{subblock=arg=argname,type} defined, the text:\n"
+    "@*\n@code{subblock=arg=argname,type,null} defined, the text:\n"
     "@*\n@code{arg: this, char *} will then expand to:\n"
-    "@*\n@code{arg = @{ argname = this; type = \"char *\" @};}.\n";
+    "@*\n@code{arg = @{ argname = this; type = \"char *\"; @};}.\n"
+    "@*\nThe \"this, char *\" string is separated at the commas, with the\n"
+    "white space removed.  You may use characters other than commas by\n"
+    "starting the value string with a punctuation character other than\n"
+    "a single or double quote character.  You may also omit intermediate\n"
+    "values by placing the commas next to each other with no intervening\n"
+    "white space.  For example, \"+mumble++yes+\" will expand to:\n"
+    "@*\n@code{arg = @{ argname = mumble; null = \"yes\"; @};}.\n" ;
 };
 
 flag = {
