@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.5 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: funcDef.c,v 1.6 1999/10/30 18:10:20 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -483,7 +483,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
  *      Macro arguments may be passed, as in the conventional
  *      @example
  *      [# mac_name arg=... #]
- *      @end example.
+ *      @end example
  *      The following it equivalent to the above:
  *      @example
  *      [# INVOKE "mac_name" arg=... #]
