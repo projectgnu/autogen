@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.17 1999/07/07 19:42:33 bkorb Exp $
+ *  $Id: getdefs.c,v 2.18 1999/08/03 23:10:19 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
    Author:            Bruce Korb <korbb@datadesign.com>
    Maintainer:        Bruce Korb <korbb@datadesign.com>
    Created:           Mon Jun 30 15:35:12 1997
-   Last Modified:     Wed Jun 30 09:05:06 1999				    */
+   Last Modified:     Tue Aug  3 16:09:54 1999				    */
 /*            by:     Bruce Korb <korb@datadesign.com>			    */
 
 #include <errno.h>
@@ -402,7 +402,7 @@ validateOptions( void )
        && (OPT_ARG( ORDERING ) != (char*)NULL)) {
         pzIndexText = loadFile( OPT_ARG( ORDERING ));
         if (pzIndexText == (char*)NULL) {
-            pzIndexText = pzEndIndex  = pzIndexEOF = \
+            pzIndexText = pzEndIndex  = pzIndexEOF =
                 (char*)malloc( 0x4000 );
             indexAlloc = 0x4000;
             *pzIndexText = NUL;
