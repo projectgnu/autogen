@@ -15,12 +15,17 @@ _EOF_
 
 if ! ${no_test_main:-false}
 then
-    echo "test_main = yes;" >&5
+  echo "test_main  = yes;" >&5
 fi
 
-if [ ! -z "${argument}" ]
+if [ -n "${argument}" ]
 then
-  echo "argument = '${argument}';" >&5
+  echo "argument   = '${argument}';" >&5
+fi
+
+if [ -n "${long_opts}" ]
+then
+  echo "long_opts;" >&5
 fi
 
 echo >&5
