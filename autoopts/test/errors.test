@@ -1,0 +1,83 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# errors.test ---  test argument program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: errors.test,v 1.1 2000/03/12 01:28:40 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+argument="arg ..."
+long_opts=yes
+. ${stdopts} option second
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "--help"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_errors - Test AutoOpts for errors
+USAGE:  errors [-<flag> [<val>]]... [--<name>[{=| }<val>]]... arg ...
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s no  second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character/option value.
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+./$testname -s -o -s 2> /dev/null && \
+  failure $testname should not accept multiple options
+
+./$testname -o -s > /dev/null || \
+  failure $testname did not handle its options
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "allow_errors;" >> $testname.def
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "--help"
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+#  This time, having a duplicate should be ignored...
+#
+./$testname -s -o -s 2> /dev/null 1>&2 || \
+  failure $testname should not object to multiple options
+
+cleanup
+# end of errors.test
