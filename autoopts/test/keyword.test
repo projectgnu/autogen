@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2003-03-09 09:58:36 bkorb"
+# Time-stamp:        "2003-07-06 09:34:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.4 2003/03/09 19:53:52 bkorb Exp $
+# $Id: keyword.test,v 3.5 2003/07/06 16:34:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -31,14 +31,26 @@ cat >> ${testname}.def <<- _EndOfDef_
 	help_value = X;
 	homerc     = '.';
 	rcfile     = ${testname}.cfg;
+	test-main  = yes;
 
 	flag = {
 	    name        = trace;
-	    arg_type    = keyword;
-	    arg_default = nothing;
-	    arg_name    = level;
+	    arg-type    = keyword;
+	    arg-default = nothing;
+	    arg-name    = level;
 	    descrip     = "tracing level of detail";
-	    keyword     = nothing, templates, block-macros, expressions, explanations;
+	    keyword     = nothing, templates, block-macros, expressions,
+                      explanations;
+	};
+
+	flag = {
+	    name        = sets;
+	    arg-type    = set-members;
+	    arg-default = second, fourth;
+	    arg-name    = membership;
+	    descrip     = "set membership testing";
+	    keyword     = first, second, third, fourth, fifth, sixth, seventh,
+                      eighth, ninth, tenth;
 	};
 	_EndOfDef_
 
@@ -46,13 +58,6 @@ echo $AGEN ${testname}.def
 $AGEN ${testname}.def || \
   failure AutoGen could not process
 
-chmod u+w ${testname}.c
-cat >> ${testname}.c <<_EOF_
-#include <stdio.h>
-int main(int argc, char** argv) {
-optionProcess( &test_${testname}Options, argc, argv );
-return 0; }
-_EOF_
 compile "-X"
 
 
@@ -65,6 +70,8 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
       KWd trace          tracing level of detail
+      Mbr sets           set membership testing
+				- is a set membership option
    -X no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to an rc file
@@ -78,12 +85,23 @@ or by a single hyphen and the flag character.
 The following option preset mechanisms are supported:
  - reading file ./keyword.cfg
 
-The valid trace option keywords are:
+The valid "trace" option keywords are:
 	nothing
 	templates
 	block-macros
 	expressions
 	explanations
+The valid "sets" option keywords are:
+	first
+	second
+	third
+	fourth
+	fifth
+	sixth
+	seventh
+	eighth
+	ninth
+	tenth
 _EOF_
 
 cmp -s ${testname}.h*lp || \
@@ -92,7 +110,7 @@ cmp -s ${testname}.h*lp || \
 ./${testname} --trace=exp > /dev/null 2>&1 && \
   failure ${testname} accepted ambiguous keyword
 
-./${testname} --trace=expr > /dev/null || \
+./${testname} --trace=expr --set=0 > ${testname}.t1-s || \
   failure ${testname} did not handle its options
 
 ./${testname} --trace=expr --save=${testname}.cfg || \
@@ -107,6 +125,28 @@ cat > ${testname}base.cfg <<- _EndIni_
 
 cmp -s ${testname}base.cfg ${testname}res.cfg || \
   failure "`diff ${testname}base.cfg ${testname}res.cfg`"
+
+cat > ${testname}.t1-b <<- _EndTst_
+	OPTION_CT=2
+	export OPTION_CT
+	TEST_KEYWORD_TRACE='expressions'
+	export TEST_KEYWORD_TRACE
+	TEST_KEYWORD_SETS=10
+	export TEST_KEYWORD_SETS
+	typeset -x -i SETS_FIRST=1 # 0x1
+	typeset -x -i SETS_SECOND=2 # 0x2
+	typeset -x -i SETS_THIRD=4 # 0x4
+	typeset -x -i SETS_FOURTH=8 # 0x8
+	typeset -x -i SETS_FIFTH=16 # 0x10
+	typeset -x -i SETS_SIXTH=32 # 0x20
+	typeset -x -i SETS_SEVENTH=64 # 0x40
+	typeset -x -i SETS_EIGHTH=128 # 0x80
+	typeset -x -i SETS_NINTH=256 # 0x100
+	typeset -x -i SETS_TENTH=512 # 0x200
+	_EndTst_
+
+cmp -s ${testname}.t1-* || \
+  failure "`diff ${testname}.t1-*`"
 
 cleanup
 # end of keyword.test

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-11 09:37:03 bkorb"
+# Time-stamp:        "2003-07-05 18:30:48 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.9 2003/03/13 04:08:04 bkorb Exp $
+# $Id: equiv.test,v 3.10 2003/07/06 16:34:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -97,7 +97,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
-The valid omega option keywords are:
+The valid "omega" option keywords are:
 	uno
 	dos
 	tres
@@ -128,7 +128,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
-The valid omega option keywords are:
+The valid "omega" option keywords are:
 	uno
 	dos
 	tres
@@ -140,7 +140,7 @@ cmp -s ${testname}.h*lp || \
     `diff -c ${testname}.h*lp`"
 
 cat > ${testname}.outbase <<_EOF_
-23 109 756 /tmp/use
+23 109 758 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2

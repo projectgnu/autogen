@@ -44,15 +44,6 @@ flag = {
 FLAG_CODE_END ;
 };
 
-flag = {
-    name         = bits;
-    value        = x;
-    arg-type     = set-membership;
-    arg-name     = set-name-list;
-    keyword      = first, second, third, fourth, fifth;
-    descrip      = 'this is a test of bit membership';
-};
-
 #define XML2AG
 #option templ-dir  $top_srcdir/agen5
 #include opts.def

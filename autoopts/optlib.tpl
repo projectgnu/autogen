@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.12 2003/07/04 17:58:14 bkorb Exp $
+# $Id: optlib.tpl,v 3.13 2003/07/06 16:34:59 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -282,25 +282,25 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
     #  Check for special attributes:  a default value
     #  and conflicting or required options
     =][=
-    IF (exist? "arg-default")   =][=
+    IF (define def-arg-name (sprintf "z%-27s "
+                 (string-append cap-name "DefaultArg" )))
+       (define def-arg-array (sprintf "z%-27s "
+                 (string-append cap-name "DefaultArg[]" )))
+       (exist? "arg-default")   =][=
        CASE arg-type            =][=
        =* num                   =]
-#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)[= arg-default =])[=
+#define [=(. def-arg-name)=]((tCC*)[= arg-default =])[=
 
        =* bool                  =][=
           CASE arg-default      =][=
           ~ n.*|f.*|0           =]
-#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)AG_FALSE)[=
+#define [=(. def-arg-name)=]((tCC*)((tCC*)AG_FALSE)[=
           *                     =]
-#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)AG_TRUE)[=
+#define [=(. def-arg-name)=]((tCC*)AG_TRUE)[=
           ESAC                  =][=
 
        =* key                   =]
-#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)[=
+#define [=(. def-arg-name)=]((tCC*)[=
           IF (=* (get "arg-default") (string-append Cap-prefix cap-name))
             =][= arg-default    =][=
           ELSE  =][=(string-append UP-prefix UP-name "_"
@@ -308,16 +308,18 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
           ENDIF =])[=
 
        =* set                   =]
-#define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =](tCC*)([=
-         FOR    arg-default  |  =][=
-           (string-append UP-prefix UP-name "_"
+#define [=(. def-arg-name)=]NULL
+#define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=](tCC*)([=
+         IF (not (exist? "arg-default")) =]0[=
+         ELSE =][=
+           FOR    arg-default | =][=
+             (string-append UP-prefix UP-name "_"
                    (string-upcase! (get "arg-default")) )  =][=
-         ENDFOR arg-default     =])[=
+           ENDFOR arg-default   =][=
+         ENDIF =])[=
 
        =* str                   =]
-tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
-         =]= [=(kr-string (get "arg-default"))=];[=
+tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
 
        *                        =][=
           (error (string-append cap-name
@@ -477,7 +479,9 @@ DEFINE Option_Descriptor =][=
          IF (exist? "arg-default")
               =](char*)z[=(. cap-name)=]DefaultArg[=
          ELSE =]NULL[= ENDIF =],
-     /* arg list/cookie  */ NULL,
+     /* arg list/cookie  */ [=
+            (if (and (=* (get "arg-type") "set") (exist? "arg-default"))
+                (string-append cap-name "CookieBits") "NULL") =],
      /* must/cannot opts */ [=
          (if (exist? "flags-must")
              (string-append "a" cap-name "MustList, ")
