@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.1 1998/08/24 08:42:24 bkorb Exp $
+#$Id: opthead.tpl,v 2.2 1998/08/24 08:43:49 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -516,9 +516,9 @@ end-component
 =][=
   _IF equivalence _get _UP name _get _UP = =]
 #define WHICH_[=prefix _up #_ +=]OPT_[=name _up "#%-14s" _printf
-                =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualIndex)
+                =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualValue)
 #define WHICH_[=prefix _up #_ +=]IDX_[=name _up "#%-14s" _printf
-                =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualValue)[=
+                =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualIndex)[=
   _ENDIF=][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
