@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.11 1999/10/31 22:52:21 bruce Exp $
+ *  $Id: funcDef.c,v 1.12 1999/10/31 23:10:52 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -115,8 +115,8 @@ MAKE_HANDLER_PROC( Debug )
  *      macro marker.  Any remaining text in the macro invocation will be
  *      used to create new name/value pairs that only persist for the
  *      duration of the processing of the macro.  The expressions are
- *      evaluated the same way expressions are evaluated in expression
- *      functions.  @xref{EXPR}.
+ *      evaluated the same way expression clausess are evaluated in
+ *      expression functions.  @xref{EXPR}.
  *
  *      The resulting definitions are handled much
  *      like regular definitions, except:
