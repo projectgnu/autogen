@@ -5,8 +5,11 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  1998/03/10 at 10:08:25
+## Last Modified:  $Date: 1998/05/26 19:00:32 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
+## ---------------------------------------------------------------------
+## $Id: Makefile.am,v 1.2 1998/05/26 19:00:32 bkorb Exp $
+## ---------------------------------------------------------------------
 
 all : autogen.info
 

@@ -7,10 +7,10 @@
 ## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
 ## Maintainer:       Bruce Korb <korbb@datadesign.com>
 ## Created:          Mon Jun 30 15:35:12 1997	
-## Last Modified:    1998/04/01 at 08:58:01
+## Last Modified:    $Date: 1998/05/26 19:00:33 $
 ##            by:    Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+## $Id: Makefile.am,v 1.2 1998/05/26 19:00:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

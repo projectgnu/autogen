@@ -3,10 +3,11 @@
 /* pathfind.c --- find a FILE  MODE along PATH */
 
 /* Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
- * Created:           Tue Jun 24 15:07:31 1997
- * Last Modified:    1998/03/10 at 08:19:08
+ * Created:          Tue Jun 24 15:07:31 1997
+ * Last Modified:    $Date: 1998/05/26 19:00:35 $
  *            by:    Bruce Korb <korbb@datadesign.com>
- * $Id: pathfind.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *
+ * $Id: pathfind.c,v 1.2 1998/05/26 19:00:35 bkorb Exp $
  */
 
 /* Code: */
