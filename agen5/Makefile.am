@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-02-01 13:26:10 bkorb"
+## Time-stamp:      "2004-02-01 15:54:05 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.29 2004/02/01 21:26:45 bkorb Exp $
+## $Id: Makefile.am,v 3.30 2004/02/02 01:42:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -36,9 +36,9 @@ bin_PROGRAMS = autogen
 csrc = \
   autogen.c      agCgi.c       agShell.c     agUtils.c     defParse-fsm.h \
   autogen.h      defDirect.c   defFind.c     defLoad.c     defParse-fsm.c \
-  defLex.c       expExtract.c  expFormat.c   expGperf.c \
+  defLex.c       expExtract.c  expFormat.c   expGperf.c    expString.c    \
   expGuile.c     expMake.c     expOutput.c   expPrint.c    expState.c \
-  expString.c    funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
+  fmemopen.c     funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
   funcIf.c       functions.c   functions.h   loadPseudo.c  tpLoad.c   \
   tpParse.c      tpProcess.c
 

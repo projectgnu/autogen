@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/05/31 23:15:06 $
+ *  Last Modified:     $Date: 2004/02/02 01:42:18 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.30 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: misc.def,v 3.31 2004/02/02 01:42:18 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.30 $";
+version = "$Revision: 3.31 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -259,11 +259,7 @@ test = {
 
 do-always = <<- _END_ALWAYS_
 
-	# Give preference to byacc and yacc over bison.
-	# bison likes alloca.  I hate alloca.  It is not portable.
-	# This is a rehack of AC_PROG_YACC
-	AC_CHECK_PROGS(YACC, byacc yacc 'bison -y', "$missing_dir/missing yacc")
-
+	AC_CHECK_FUNCS(fopencookie)
 	AC_C_INLINE
 	AC_CACHE_CHECK([for static inline], [snv_cv_static_inline], [
 	AC_TRY_COMPILE([static inline foo(bar) int bar; { return bar; }],

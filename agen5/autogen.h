@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.25 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: autogen.h,v 3.26 2004/02/02 01:42:18 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -411,9 +411,45 @@ extern void unloadDefs( void );
  *  GLOBAL PROCEDURES
  */
 #ifndef HAVE_STRLCPY
-size_t strlcpy( char* dest, const char* src, size_t n );
+extern size_t strlcpy( char* dest, const char* src, size_t n );
 #endif
+#ifdef HAVE_FOPENCOOKIE
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  IF we have fopencookie, then we also have our own fmemopen...
+ */
 
+/* The mode of I/O, as given in the MODE argument to fopen, etc.  */
+struct fmem_io_mode_s {
+    unsigned int read:        1;  /* Open for reading.  */
+    unsigned int write:       1;  /* Open for writing.  */
+    unsigned int append:      1;  /* Open for appending.  */
+    unsigned int binary:      1;  /* Opened binary.  */
+    unsigned int create:      1;  /* Create the file.  */
+    unsigned int truncate:    1;  /* Truncate the file on opening.  */
+    unsigned int allocated:   1;  /* we allocated the buffer */
+    unsigned int extensible:  1;  /* The file may be extended */
+};
+typedef struct fmem_io_mode_s fmem_io_mode_t;
+
+struct fmem_cookie_s
+{
+    fmem_io_mode_t mode;
+    unsigned char *buffer;
+    size_t         size;      /* Full size of buffer */
+    _IO_off64_t    pos;       /* Current position */
+    size_t         maxpos;    /* Highwater mark of valid data */
+    size_t         pg_size;   /* size of a memory page */
+};
+typedef struct fmem_cookie_s  fmem_cookie_t;
+
+/*
+ *  Special "seek" requests
+ */
+#define SEEK_BUFFER  0x80000001
+
+extern FILE * fmemopen (void *buf, size_t len, const char *mode);
+#endif
 #include "proto.h"
 
 typedef union {

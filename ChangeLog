@@ -1,9 +1,11 @@
 2004-02-01  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am: remove defParse.y, add defParse.def + its FSM
+	add fmemopen.c to the file list.
 	* agen5/autogen.h: add definition parsing globals,
 	rename "tDefStack" to "tDefCtx" -> ripples throughout
 	"pzValue" in definition entry now a union -> more ripples
+	Incorporate fmemopen definitions.
 	* defLoad.c: mostly rewritten
 	* defReduce.c: deleted
 	* defParse.y: deleted
@@ -16,6 +18,9 @@
 	* autoopts/opthead.tpl(xx-value): disallow empty values if long-opts
 	are not allowed.
 	* autoopts/test/getopt.test: fix up to accommodate non-long-opt progs.
+	* agen5/expOutput.c(ag_scm_out_push_new): use fmemopen for temp files
+	* agen5/fmemopen.c: new file, depends upon glibc.
+	* config/misc.def(bison): bye bye yacc, hello FSM.  check for fopencookie
 
 2004-01-14  Bruce Korb  <bkorb@gnu.org>
 

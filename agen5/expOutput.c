@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: expOutput.c,v 3.21 2004/02/02 01:42:18 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -332,6 +332,7 @@ ag_scm_out_push_new( SCM new_file )
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
 
     } else {
+#     ifndef HAVE_FOPENCOOKIE
         tSCC* pzTemp = NULL;
         int tmpfd;
 
@@ -355,6 +356,12 @@ ag_scm_out_push_new( SCM new_file )
 
         p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
         close( tmpfd );
+
+#     else  /* HAVE_FOPENCOOKIE */
+        p->pFile  = fmemopen( NULL, 0, "w" FOPEN_BINARY_FLAG "+" );
+        pzNewFile = "in-mem buffer";
+        p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
+#     endif /* HAVE_FOPENCOOKIE */
     }
 
     if (p->pFile == NULL)

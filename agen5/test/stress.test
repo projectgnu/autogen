@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stress.test --- stress test
 #
-## Time-stamp:      "2004-02-01 13:56:13 bkorb"
+## Time-stamp:      "2004-02-01 16:16:46 bkorb"
 ## Copyright (c):   1999-2004 by Bruce Korb
 ##
 # Author:            Bruce Korb <bkorb@gnu.org>
@@ -11,7 +11,7 @@
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #            by: bkorb
 #
-# $Id: stress.test,v 3.1 2004/02/01 22:48:42 bkorb Exp $
+# $Id: stress.test,v 3.2 2004/02/02 01:42:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -34,7 +34,7 @@ _EOF_
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
 echo creating ${testname}.samp
-ecount=100000
+ecount=${STRESS_COUNT:-1000}
 # this is the output we should expect to see
 echo "Entry Count = ${ecount}." > ${testname}.samp
 
