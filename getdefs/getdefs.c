@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.26 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: getdefs.c,v 2.27 2001/05/22 01:39:26 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/05/09 05:25:59 $
+ *  Last Modified:     $Date: 2001/05/22 01:39:26 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -873,6 +873,9 @@ emitDefinition( char* pzDef, char* pzOut )
         for (;;) {
             switch (*pzOut++ = *pzDef++) {
             case '\\':
+                *pzOut++  = '\\';
+                break;
+
             case '\'':
                 pzOut[-1] = '\\';
                 *pzOut++  = '\'';
