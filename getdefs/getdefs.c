@@ -677,7 +677,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
      *  Make the source text all lower case and map
      *  '-', '^' and '_' characters to '_'.
      */
-    strtransform( pzDef );
+    strtransform( pzDef, pzDef );
 
     /*
      * IF there is already an entry,
