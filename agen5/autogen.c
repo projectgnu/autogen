@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.4 1999/10/14 22:39:40 bruce Exp $
+ *  $Id: autogen.c,v 1.5 1999/10/16 18:02:37 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -36,31 +36,30 @@ STATIC void signalSetup( void );
     STATIC void
 inner_main( int argc, char** argv )
 {
-    signalSetup();
-    {
-        void ag_init( void );
-        ag_init();
-    }
+    void ag_init( void );
+    tTemplate* pTF;
 
     procState = PROC_STATE_OPTIONS;
     doOptions( argc, argv );
+
+    procState = PROC_STATE_LOAD_DEFS;
     readDefines();
 
     /*
+     *  Activate the AutoGen specific Scheme functions.
      *  Load, process and unload the main template
      */
     procState = PROC_STATE_LOAD_TPL;
-    {
-        tTemplate* pTF = loadTemplate( pzTemplFileName );
+    ag_init();
+    pTF = loadTemplate( pzTemplFileName );
 
-        procState = PROC_STATE_EMITTING;
-        processTemplate( pTF );
+    procState = PROC_STATE_EMITTING;
+    processTemplate( pTF );
 
-        procState = PROC_STATE_CLEANUP;
-        unloadTemplate( pTF );
-    }
-
+    procState = PROC_STATE_CLEANUP;
+    unloadTemplate( pTF );
     unloadDefs();
+
     procState = PROC_STATE_DONE;
     exit( EXIT_SUCCESS );
 }
@@ -72,8 +71,11 @@ main( int    argc,
     if (sigsetjmp( abendJumpEnv, 0 ) != 0)
         exit( EXIT_FAILURE );
 
+    signalSetup();
+
     gh_enter( argc, argv, inner_main );
-    return 0; /* never reached */
+    /* NOT REACHED */
+    return 0;
 }
 
 
@@ -89,8 +91,11 @@ abendSignal( int sig )
         : pCurMacro->funcCode;
 
     fprintf( stderr, zErr, sig, strsignal( sig ));
-    fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
-             apzFuncNames[ f ], pCurMacro->funcCode );
+    if (pCurTemplate != (tTemplate*)NULL)
+        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
+                 apzFuncNames[ f ], pCurMacro->funcCode );
+
+    procState = PROC_STATE_ABORTING;
     siglongjmp( abendJumpEnv, sig );
 }
 
@@ -98,34 +103,6 @@ abendSignal( int sig )
     STATIC void
 doneCheck( void )
 {
-    /*
-     *  This hook is here  primarily to catch the situation
-     *  where the Guile interpreter decides to call exit.
-     */
-    switch (procState) {
-    case PROC_STATE_EMITTING:
-        fprintf( stderr, "AutoGen ABENDED in template %s line %d\n",
-                 pCurTemplate->pzFileName, pCurMacro->lineNo );
-
-        /*
-         *  We got here because someone called exit early.
-         */
-        do  {
-#ifndef DEBUG
-            closeOutput( AG_FALSE );
-#else
-            closeOutput( AG_TRUE );
-#endif
-        } while (pCurFp->pPrev != (tFpStack*)NULL);
-
-    case PROC_STATE_LOAD_TPL:
-    case PROC_STATE_ABORTING:
-        break;
-
-    default:
-        return;
-    }
-
     fflush( stdout );
     fflush( stderr );
 
@@ -139,6 +116,35 @@ doneCheck( void )
         }
         else fclose( pfTrace );
     }
+
+    /*
+     *  This hook is here  primarily to catch the situation
+     *  where the Guile interpreter decides to call exit.
+     */
+    switch (procState) {
+    case PROC_STATE_EMITTING:
+    case PROC_STATE_INCLUDING:
+        fprintf( stderr, "AutoGen ABENDED in template %s line %d\n",
+                 pCurTemplate->pzFileName, pCurMacro->lineNo );
+
+        /*
+         *  We got here because someone called exit early.
+         */
+        do  {
+#ifndef DEBUG
+            closeOutput( AG_FALSE );
+#else
+            closeOutput( AG_TRUE );
+#endif
+        } while (pCurFp->pPrev != (tFpStack*)NULL);
+        break;
+
+    case PROC_STATE_INIT:
+    case PROC_STATE_OPTIONS:
+    case PROC_STATE_DONE:
+        return;
+    }
+
     _exit( EXIT_FAILURE );
 }
 
