@@ -6,7 +6,7 @@
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2003/02/28 21:41:35 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2003/03/03 00:54:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -14,13 +14,17 @@ AGEXE          = `cd $(top_builddir)/agen5   ; pwd`/@AGEXE@
 DISTCLEANFILES = autogen.lsm
 PKG_FILES      = mkpkg.linux mkpkg.sh mkpkg.sun
 LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh
-EXTRA_DIST     = lsm.tpl autogen.spec.in $(LIBOPTS_FILES) $(PKG_FILES)
+EXTRA_DIST     = lsm.tpl spec.tpl $(LIBOPTS_FILES) $(PKG_FILES)
 
 all : $(DISTCLEANFILES)
 
 autogen.lsm : $(top_srcdir)/VERSION lsm.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
 	$(AGEXE) -T $(srcdir)/lsm.tpl $(top_builddir)/agen5/opts.def
+
+autogen.spec : $(top_srcdir)/VERSION spec.tpl
+	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
+	$(AGEXE) -T $(srcdir)/spec.tpl $(top_builddir)/agen5/opts.def
 
 package :
 	top_builddir=$(top_builddir) \

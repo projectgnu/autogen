@@ -2,13 +2,27 @@
 
 eval "`egrep ^AG_ ${top_srcdir}/VERSION`" > /dev/null
 
+## Set directories in case they are relative paths
+##
 builddir=`pwd`
+top_srcdir=`cd ${top_srcdir} > /dev/null ; pwd`
+srcdir=`cd ${srcdir} > /dev/null ; pwd`
+
 cd ${top_builddir}
+top_builddir=`pwd`
+
+mkdir AGPKG
+cd AGPKG
+
 mkdir BUILD SOURCES SPECS RPMS SRPMS
-${MAKE} dist
+echo "topdir:  $PWD" > rpmrc
+
+( cd ..
+  ${MAKE} dist
+  set -x
+  mv autogen-${AG_VERSION}.tar.gz AGPKG/SOURCES/. )
+
 printf "\n\nPACKAGING RPM FOR LINUX\n\n"
-set -x
-mv autogen-${AG_VERSION}.tar.gz SOURCES/.
 
 cd ${builddir}
 AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
@@ -16,8 +30,8 @@ rpmfile=autogen-${AG_VERSION}.spec
 agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
 ${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def
 
-cd ${top_builddir}
-rpm --buildroot . -ba ${builddir}/${rpmfile}
+cd ${top_builddir}/AGPKG
+rpm --buildroot `pwd` --rcfile=rpmrc -ba ${builddir}/${rpmfile}
 
 ## Local Variables:
 ## mode: shell-script

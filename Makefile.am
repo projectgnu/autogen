@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2003-02-19 18:54:02 bkorb"
+## Time-stamp:      "2003-03-02 15:49:24 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.16 2003/03/02 23:39:10 bkorb Exp $
+## $Id: Makefile.am,v 3.17 2003/03/03 00:54:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -35,6 +35,6 @@ all         : .conf-stamp
 
 pkg         : package
 package     :
-	cd pkg && $(MAKE) $@
+	cd pkg && $(MAKE) $@ pkgtype="$(pkgtype)"
 
 ## Makefile.am ends here
