@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2002/01/25 18:24:18 $
+#  Last Modified:     $Date: 2002/02/01 03:48:03 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -334,7 +334,7 @@ ENDDEF  try-with             =][=
 (dne "#  " "#  ")            =]
 #
 ## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 3.2 2002/01/25 18:24:18 bkorb Exp $
+## $Id: conftest.tpl,v 3.3 2002/02/01 03:48:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 GENERATED_M4 = \
@@ -342,7 +342,7 @@ GENERATED_M4 = \
           ofile-list)=]
 
 EXTRA_DIST = byacc.m4 libregex.m4 openmode.m4 $(GENERATED_M4) autogen.spec \
-	missing release bootstrap conftest.tpl misc.def bootstrap.local
+	missing bootstrap conftest.tpl misc.def bootstrap.local
 
 pkgdata_DATA = conftest.tpl
 
