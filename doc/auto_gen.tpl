@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.61 2000/11/01 15:03:36 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.62 2000/11/02 00:56:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -173,8 +173,8 @@ rearranged, augmented and become obsolete without it being necessary to
 go back and clean up older definition files.  Reduce incompatibilities!
 
 @item
-Multiple values for a given name create an array of values.  This array of
-values is used to control the replication of sections of the template.
+Multiple values for a given name create an array of values.  These arrays of
+values are used to control the replication of sections of the template.
 
 @item
 There are named collections of definitions.  They form a nested hierarchy.
@@ -924,7 +924,8 @@ these by defining their own macros.  @xref{DEFINE}.
 @menu
 * pseudo macro::       Format of the Pseudo Macro
 * expression syntax::  Macro Expression Syntax
-* Scheme Functions::   Scheme Functions
+* AutoGen Functions::  AutoGen Scheme Functions
+* Common Functions::   Common Scheme Functions
 * native macros::      AutoGen Native Macros
 * output controls::    Redirecting Output
 @end menu
@@ -1126,49 +1127,53 @@ of the expression.
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+[=
+(define func-name "")
+(define func-str "") =][=
 
+DEFINE set-func-name =][=
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name)) =][=
+
+ENDDEF =]
 @end ignore
 @page
-@node Scheme Functions
-@section Scheme Functions
+@node AutoGen Functions
+@section AutoGen Scheme Functions
 
 AutoGen uses Guile to interpret Scheme expressions within AutoGen
-macros.  All of the normal Guile functions are available, plus
-several more that have been added to be able to query AutoGen state;
-provide information for AutoGen processing; and also augment the
-repertoire of string manipulation functions.
+macros.  All of the normal Guile functions are available, plus several
+extensions (@xref{Common Functions}) have been added to
+augment the repertoire of string manipulation functions and
+manage the state of AutoGen processing.
 
-However, please take note that these functions are not loaded and
-thus not made available until after the command line options have
-been processed and the AutoGen definitions have been loaded.
-They may, of course, be used in Scheme functions that get defined
-at those times, but they cannot be invoked.
+This section describes those functions that are specific to AutoGen.
+Please take note that these AutoGen specific functions are not loaded
+and thus not made available until after the command line options have
+been processed and the AutoGen definitions have been loaded.  They may,
+of course, be used in Scheme functions that get defined at those times,
+but they cannot be invoked.
 
 @menu[=
 (define func-name "")
 (define func-str "") =][=
 FOR gfunc =][=
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
-
-  (set! func-str
-      (if (exist? "string") (get "string") func-name))
- =]
+  IF (not (exist? "general_use")) =][=
+    set-func-name =]
 * SCM [= (sprintf "%-20s" (string-append func-str "::"))
   =][= (string-append "@file{" func-name "} - " (get "what")) =][=
+  ENDIF =][=
 ENDFOR gfunc =]
 @end menu
 
 [=
 FOR gfunc =][=
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
-
-  (set! func-str
-      (if (exist? "string") (get "string") func-name))
- =]
+  IF (not (exist? "general_use")) =][=
+    set-func-name =]
 @node SCM [= (. func-str) =]
 @subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
 @findex [=(. func-name)=][=
@@ -1177,27 +1182,90 @@ FOR gfunc =][=
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
 Usage:  ([=(. func-str)=][=
-  FOR exparg =] [=
-    arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
-    arg_optional " ]" =][=
-  ENDFOR exparg =])
+    FOR exparg =] [=
+      arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
+      arg_optional " ]" =][=
+    ENDFOR exparg =])
 @*
 [= string (string-append func-name ":  ") =][=doc=]
 [=
-  IF (exist? "exparg") =]
+    IF (exist? "exparg") =]
 Arguments:[=
-    FOR exparg =]
+      FOR exparg =]
 @*
 [=arg_name=] - [=
     arg_optional "Optional - " =][=
-      IF (exist? "arg_desc") =][=arg_desc=][=
-      ELSE=]Undocumented[=
-      ENDIF=][=
-    ENDFOR exparg =][=
-  ELSE
+        IF (exist? "arg_desc") =][=arg_desc=][=
+        ELSE=]Undocumented[=
+        ENDIF=][=
+      ENDFOR exparg =][=
+    ELSE
     =]
 This Scheme function takes no arguments.[=
+    ENDIF =][=
+  ENDIF general_use =][=
+ENDFOR gfunc
+=]
+@ignore
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+@end ignore
+@page
+@node Common Functions
+@section Common Scheme Functions
+
+This section describes a number of general purpose functions that make
+the kind of string processing that AutoGen does a little easier.
+Unlike the AutoGen specific functions (@xref{AutoGen Functions}),
+these functions are available for direct use during definition load time.
+
+@menu[=
+(define func-name "")
+(define func-str "") =][=
+FOR gfunc =][=
+  IF (exist? "general_use") =][=
+    set-func-name =]
+* SCM [= (sprintf "%-20s" (string-append func-str "::"))
+  =][= (string-append "@file{" func-name "} - " (get "what")) =][=
   ENDIF =][=
+ENDFOR gfunc =]
+@end menu
+
+[=
+FOR gfunc =][=
+  IF (exist? "general_use") =][=
+    set-func-name =]
+@node SCM [= (. func-str) =]
+@subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
+@findex [=(. func-name)=][=
+% string "\n@findex %s" =]
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
+Usage:  ([=(. func-str)=][=
+    FOR exparg =] [=
+      arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
+      arg_optional " ]" =][=
+    ENDFOR exparg =])
+@*
+[= string (string-append func-name ":  ") =][=doc=]
+[=
+    IF (exist? "exparg") =]
+Arguments:[=
+      FOR exparg =]
+@*
+[=arg_name=] - [=
+    arg_optional "Optional - " =][=
+        IF (exist? "arg_desc") =][=arg_desc=][=
+        ELSE=]Undocumented[=
+        ENDIF=][=
+      ENDFOR exparg =][=
+    ELSE
+    =]
+This Scheme function takes no arguments.[=
+    ENDIF =][=
+  ENDIF general_use =][=
 ENDFOR gfunc
 =]
 @ignore
@@ -1252,7 +1320,7 @@ FOR <name> (...Scheme expression list)
 where @code{<name>} must be a simple name and the Scheme expression list
 is expected to contain one or more of the @code{for-from},
 @code{for-to}, @code{for-by}, and @code{for-sep} functions.
-(@xref{FOR}, and @xref{Scheme Functions})
+(@xref{FOR}, and @xref{AutoGen Functions})
 
 @item
 AutoGen @code{DEFINE} macros must be followed by a simple name.
@@ -1302,7 +1370,7 @@ ENDFOR macfunc=]
 
 AutoGen provides a means for redirecting the template output
 to different files.  It is accomplished by providing a set of
-Scheme functions named @code{out-*} (@xref{Scheme Functions}).
+Scheme functions named @code{out-*} (@xref{AutoGen Functions}).
 
 These functions allow you to logically "push" output files
 onto a stack and return to them later by "pop"ing them back off.
@@ -1313,7 +1381,7 @@ of a template, there is only one output file on the stack.
 That file cannot be popped off.
 
 There are also several functions for determining the output
-status.  @xref{Scheme Functions}.
+status.  @xref{AutoGen Functions}.
 
 @ignore
 
