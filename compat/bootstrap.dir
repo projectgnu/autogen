@@ -1,5 +1,22 @@
 #!/bin/sh
 
+AGEXE=${AGEXE:-autogen}
+AG=${AGEXE}
+if [ ! -x ${AG} ]
+then
+  f=`type ${AGEXE} | sed -e "s;${AGEXE} is ;;" `
+  case ${f} in
+  */${AGEXE} )
+     AG=${f}
+     ;;
+
+  * )
+    test "X$BOOTSTRAP" = X && echo "Cannot locate autogen.  Giving up"
+    exit 1
+    ;;
+  esac
+fi 2>/dev/null
+
 top_srcdir=.. top_builddir=..
 export top_srcdir top_builddir
-autogen strsignal.def
+${AG} strsignal.def
