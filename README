@@ -14,9 +14,9 @@ Rev 3 had a very kludgy macro definition syntax.
 Rev 4 a reworking and simplification of the declarations
 Rev 5 the addition of Guile expression processing
 
-Until a mailing list is organized, direct email to the author:
+Mailing lists can be found on SourceForge:
 
-    Bruce Korb <bkorb@gnu.org>
+    autogen-users@lists.sourceforge.net
 
 
 AutoGen requires:
@@ -33,3 +33,31 @@ Note to SCO/OS5 users:
 	Configure this program with:
 
 		CC=/bin/cc ./configure
+
+Installation note:
+AutoGen does *NOT* contain any compiled-in configuration information.
+Therefore, in order to use the templates that come bundled with it,
+you must tell AutoGen how to find those templates when you build
+applications that use those templates.
+
+1. by doing nothing.  If you do not alter the default data directory,
+   AutoGen will search for templates in the directory ../share/autogen,
+   relative to the executable directory.  That should generally work.
+
+2. You can tell AutoGen where to look with an environment variable:
+
+   export AUTOGEN_TEMPL_DIR=$prefix/share/autogen
+
+3. You can use an RC file:
+
+   autogen -L $prefix/share/autogen --save=$HOME/.autogenrc
+
+4. You can build and install AutoGen, ensuring you have the
+   automake/autoconf/libtool-s needed, and then editing
+   agen5/opts.def thus:
+
+   echo "homerc = $prefix/share/autogen;" >> agen5/opts.def
+
+and then rebuilding AutoGen.  However, if you do this latter
+"fix", you will have an immobile product.  I hate that, others
+like it.  It is, however, up to you.

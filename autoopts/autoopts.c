@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.30 2000/11/04 18:19:19 bkorb Exp $
+ *  $Id: autoopts.c,v 2.31 2001/05/19 22:18:56 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,6 +71,9 @@
 #include <streqv.h>
 #include "autoopts.h"
 #include "compat/compat.h"
+
+
+#define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
 
 tSCC zBadVer[] = "Automated Options Processing Error!\n\
@@ -647,17 +650,18 @@ DEF_PROC_2( STATIC tSuccess nextOption,
  *  filePreset      is used by doLoadOpt() and doPresets()
  *
  *
- *  make_path  --  translate and construct a path
+ *  optionMakePath  --  translate and construct a path
  *
  *  This routine does environment variable expansion if the first character
  *  is a ``$''.  If it starts with two dollar characters, then the path
  *  is relative to the location of the executable.
  */
-DEF_PROC_4( STATIC ag_bool make_path,
-            char*,   pzBuf,
-            size_t,  bufSize,
-            tCC*,    pzName,
-            tCC*,    pzProgPath )
+ag_bool
+optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
+    char*    pzBuf;
+    size_t   bufSize;
+    tCC*     pzName;
+    tCC*     pzProgPath;
 {
     if (bufSize <= strlen( pzName ))
         return AG_FALSE;
@@ -681,11 +685,12 @@ DEF_PROC_4( STATIC ag_bool make_path,
 
         if (strchr( pzProgPath, '/' ) != (char*)NULL)
             pzPath = pzProgPath;
-        else
+        else {
             pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
 
-        if (pzPath == (char*)NULL)
-            return AG_FALSE;
+            if (pzPath == (char*)NULL)
+                return AG_FALSE;
+        }
 
         pz = strrchr( pzPath, '/' );
 
@@ -725,41 +730,32 @@ DEF_PROC_4( STATIC ag_bool make_path,
      *  (We will not accept any more env variables.)
      */
     else {
-        char* pzDir = strchr( pzName+1, '/' );
+        char* pzDir = pzBuf;
 
-        if (pzDir != (char*)NULL)
-            *pzDir = NUL;
-
-        {
-            char* pzEnv = getenv( pzName+1 );
-
-            /*
-             *  Environment value not found -- skip the home list entry
-             */
-            if (pzEnv == (char*)NULL)
-                return AG_FALSE;
-
-            if (strlen( pzEnv ) >= bufSize)
-                return AG_FALSE;
-
-            strcpy( pzBuf, pzEnv );
+        for (;;) {
+            char ch = *++pzName;
+            if (! ISNAMECHAR( ch ))
+                break;
+            *(pzDir++) = ch;
         }
+
+        if (pzDir == pzBuf)
+            return AG_FALSE;
+
+        *pzDir = NUL;
+
+        pzDir = getenv( pzBuf );
 
         /*
-         *  IF we found a directory that followed the env variable,
-         *  THEN tack it onto the value we found
+         *  Environment value not found -- skip the home list entry
          */
-        if (pzDir != (char*)NULL) {
-            if (strlen( pzBuf ) + 1 + strlen( pzDir+1 ) >= bufSize)
-                return AG_FALSE;
+        if (pzDir == (char*)NULL)
+            return AG_FALSE;
 
-            pzBuf += strlen( pzBuf );
+        if (strlen( pzDir ) + 1 + strlen( --pzName ) >= bufSize)
+            return AG_FALSE;
 
-            if (pzBuf[-1] != '/')
-                *(pzBuf++) = '/';
-            strcpy( pzBuf, pzDir+1 );
-            *pzDir = '/';
-        }
+        sprintf( pzBuf, "%s%s", pzDir, pzName );
     }
 
     return AG_TRUE;
@@ -1280,8 +1276,8 @@ DEF_PROC_1( STATIC tSuccess doPresets,
 
             idx += inc;
 
-            if (! make_path( zFileName, sizeof( zFileName ),
-                             pzPath, pOpts->pzProgPath ))
+            if (! optionMakePath( zFileName, sizeof( zFileName ),
+                                  pzPath, pOpts->pzProgPath ))
                 continue;
 
             /*

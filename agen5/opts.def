@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.28 2001/05/09 05:25:59 bkorb Exp $
+ *   $Id: opts.def,v 1.29 2001/05/19 22:18:56 bkorb Exp $
  */
 
 /*
@@ -36,7 +36,7 @@ eaddr          = "bkorb@gnu.org";
 prog_name      = "autogen";
 prog_title     = "The Automated Program Generator";
 argument       = "[ <def-file> ]";
-homerc         = $HOME, ".";
+homerc         =  $HOME, ".";
 environrc;
 long_opts;
 include = "#include \"config.h\"\n"
@@ -90,7 +90,9 @@ flag = {
     settable;
     doc =
     "Add a directory to the list of directories to search when opening\n"
-    "a template, either as the primary template or an included one.";
+    "a template, either as the primary template or an included one.\n"
+    "The last entry has the highest priority in the search list.\n"
+    "That is to say, they are searched in reverse order.";
 };
 
 flag = {

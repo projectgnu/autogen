@@ -71,7 +71,8 @@ _EOF_" (string-upcase! (join "\n" (stack "token"))) )=]
 (shellf
   "tk_list='%s' ; st_list='INIT %s'
    for f in $tk_list ; do for g in $st_list
-   do  eval ${g}_${f}=\\\"{ FSS_INVALID, FSX_INVALID }\\\"
+   do  eval FSM_TRANS_${g}_${f}=\"'{ FSS_INVALID, FSX_INVALID }'\"
+       export FSM_TRANS_${g}_${f}
    done ; done"
         (string-upcase! (join " " (stack "token")))
         (string-upcase! (join " " (stack "state"))))
@@ -79,77 +80,77 @@ _EOF_" (string-upcase! (join "\n" (stack "token"))) )=]
 (define ttkn  "")
 (define tst   "")
 (define ttype "")
-
-(out-push-new ".fsm.trans")
+(define next  "")
 
 ;;  Now, evaluate each transition definition and replace the
 ;;  specified transitions with the defined value.
 ;;
 =][=
 
-FOR transition    "\n"         =][=
+FOR transition                 =][=
 
-  (set! tst  (string-upcase! (get "t_st")))
-  (set! ttkn (string-upcase! (get "ttkn")))  =][=
-
-  IF (== tst "*")              =][=
+  IF (== (get "t_st") "*")     =][=
 
      ;;  This transition applies for all states
      ;;
-     (set! ttype (if (exist? "ttype")
-         (string-upcase! (get "ttype"))
-         (string-append "${f}_" ttkn) ))
+     (set! ttkn  (string-upcase! (get "ttkn")))
+     (set! ttype (if (exist? "ttype") (string-upcase! (get "ttype"))
+                 (string-append "${f}_" ttkn) ))
+     (set! next  (if (exist? "next") (string-upcase! (get "next")) "${f}"))
 
      (shellf
+       "for f in ${st_list} ; do
+       eval FSM_TRANS_${f}_%s=\"'{ FSS_%s, FSX_%s }'\"
+       done"
+       ttkn next ttype )       =][=
 
-     "for f in ${st_list} ; do
-     g=\"%s\"
-     eval ${f}_%s=\\\"{ FSS_%s, FSX_${g} }\\\"
-     echo ${g},
-     done"
-
-     ttype ttkn
-     (if (exist? "next") (string-upcase! (get "next")) "${f}")
-     )                         =][=
-
-   ELIF (== ttkn "*")          =][=
+   ELIF (== (get "ttkn") "*")  =][=
 
      ;;  This transition applies for all transitions in a certain state
      ;;
-     (set! ttype (string-upcase! (if (exist? "ttype") (get "ttype")
-                 (string-append tst "_${f}")  )))
+     (set! tst   (string-upcase! (get "t_st")))
+     (set! ttype (if (exist? "ttype") (string-upcase! (get "ttype"))
+                 (string-append tst "_${f}") ))
+     (set! next  (if (exist? "next") (string-upcase! (get "next")) tst))
 
      (shellf
-      "for f in ${tk_list} ; do
-      g=\"%s\"
-      eval %s_${f}=\\\"{ FSS_%s, FSX_${g} }\\\"
-      echo ${g},
-      done"
-      ttype tst 
-      (string-upcase! (if (exist? "next") (get "next") (get "t_st")))
-      )                        =][=
+       "for f in ${tk_list} ; do
+       eval FSM_TRANS_%s_${f}=\"'{ FSS_%s, FSX_%s }'\"
+       done"
+       tst next ttype )        =][=
 
    ELSE                        =][=
 
-      (set! ttype (string-upcase! (if (exist? "ttype") (get "ttype")
-                  (string-append tst "_" ttkn)  )))
+     FOR t_st                  =][=
 
-      (shell (string-upcase! (sprintf
-       "%s_%s=\"{ FSS_%s, FSX_%s }\""
-       tst  ttkn
-       (if (exist? "next")  (get "next") (get "t_st"))
-       ttype  )))
+       (set! tst (string-upcase! (get "t_st")))
+       (set! next  (if (exist? "next") (string-upcase! (get "next")) tst))
+       =][=
 
-       =][=(. ttype)=],[=
+       FOR ttkn                =][=
 
-   ENDIF                       =][=
+         ;;  This transition applies for all transitions in a certain state
+         ;;
+         (set! ttkn  (string-upcase! (get "ttkn")))
+         (set! ttype (if (exist? "ttype") (string-upcase! (get "ttype"))
+                     (string-append tst "_" ttkn) ))
+    
+         (shellf
+           "for f in ${tk_list} ; do
+           eval FSM_TRANS_%s_%s=\"'{ FSS_%s, FSX_%s }'\"
+           done"
+           tst ttkn next ttype )
+         =][=
 
-ENDFOR   =]
-INVALID,
-[=
-
-(out-pop)
-(shell "sort -u .fsm.trans > .fsm.xlist ; rm -f .fsm.trans")  =]
+       ENDFOR  ttkn            =][=
+     ENDFOR    t_st            =][=
+   ENDIF t_st or ttkn is '*'   =][=
+ENDFOR
+=][=
+`env | \
+ egrep '^FSM_TRANS_' | \
+ sed 's/.*, FSX_//;s/ .*/,/' | \
+ sort -u > .fsm.xlist` =]
 
 #ifdef DEFINE_FSM
 /*[=#
@@ -185,16 +186,19 @@ static t_transition trans_table[ FSM_STATE_COUNT ][ [=(count "token")
 
 DEFINE state-table  =]
   { [=
-  (shellf "state=%s" (string-upcase! (get "state"))) =][=
+  (set! tst (string-upcase! (get "state"))) =][=
 
-  FOR token ",\n    "
-    =][=(shellf "eval echo \\\"\\$${state}_%s\\\""
-                (string-upcase! (get "token"))) =][=
-    (if (first-for?) (sprintf "\t/* %s state */" (get "state")))  =][=
+  FOR token "\n    " =][=
+    (shellf
+      "echo \"$FSM_TRANS_%s_%s%s%s\""
+      tst (string-upcase! (get "token"))
+      (if (not (last-for?)) "," "")
+      (if (first-for?) (sprintf "\t/* %s state */" (get "state")) "")
+    )        =][=
   ENDFOR     =] }[=
 ENDDEF       =][=
 
-state-table state = INIT  =][=
+state-table state = init =][=
 
 FOR state    =],
 [=

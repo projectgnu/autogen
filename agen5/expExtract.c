@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+ *  $Id: expExtract.c,v 1.2 2001/05/19 22:18:56 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -135,18 +135,31 @@ loadExtractData( const char* pzNewFile )
  *  Either way, emit an empty enclosure.
  */
     STATIC SCM
-buildEmptyText( const char* pzStart, const char* pzEnd )
+buildEmptyText( const char* pzStart, const char* pzEnd,
+                SCM def )
 {
-    size_t slen = strlen( pzStart );
-    size_t elen = strlen( pzEnd );
-    SCM res = scm_makstr( slen + elen + 1, 0 );
-    char* pz = SCM_CHARS( res );
-    memcpy( pz, pzStart, slen );
-    pz += slen;
-    *(pz++) = '\n';
-    memcpy( pz, pzEnd, elen );
-    AGFREE( (void*)pzStart );
-    AGFREE( (void*)pzEnd );
+    size_t mlen = strlen( pzStart ) + strlen( pzEnd );
+    SCM res;
+    char* pzDef;
+    size_t dlen;
+
+    if (! gh_string_p( def ))
+        dlen = 0;
+
+    else {
+        dlen = SCM_LENGTH( def ) + 1;
+        pzDef = AGALOC( dlen, "default text for extract block" );
+        memcpy( pzDef, SCM_CHARS( def ), dlen-1 );
+        pzDef[ dlen-1 ] = NUL;
+    }
+
+    res = scm_makstr( mlen + dlen + 1, 0 );
+    if (dlen > 0) {
+        sprintf( SCM_CHARS( res ), "%s\n%s\n%s", pzStart, pzDef, pzEnd );
+        AGFREE( pzDef );
+    }
+    else sprintf( SCM_CHARS( res ), "%s\n%s", pzStart, pzEnd );
+
     return res;
 }
 
@@ -155,25 +168,24 @@ buildEmptyText( const char* pzStart, const char* pzEnd )
  *  If we got it, emit it.
  */
     STATIC SCM
-extractText( const char* pzText, const char* pzStart, const char* pzEnd )
+extractText( const char* pzText, const char* pzStart, const char* pzEnd,
+             SCM def )
 {
     const char* pzS = strstr( pzText, pzStart );
     const char* pzE;
     SCM res;
 
     if (pzS == NULL)
-        return buildEmptyText( pzStart, pzEnd );
+        return buildEmptyText( pzStart, pzEnd, def );
 
     pzE = strstr( pzS, pzEnd );
     if (pzE == NULL)
-        return buildEmptyText( pzStart, pzEnd );
+        return buildEmptyText( pzStart, pzEnd, def );
 
     pzE += strlen( pzEnd );
     res = scm_makstr( pzE - pzS, 0 );
     memcpy( SCM_CHARS( res ), pzS, pzE - pzS );
 
-    AGFREE( (void*)pzStart );
-    AGFREE( (void*)pzEnd );
     return res;
 }
 
@@ -184,22 +196,31 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd )
  * general_use:
  * exparg: file-name,  name of file with text
  * exparg: marker-fmt, format for marker text
- * exparg: caveat,     warn about changing marker, optional
+ * exparg: caveat,     warn about changing marker, opt
+ * exparg: default,    default initial text,       opt
  *
  * doc: This function is used to help construct output files that may contain
  *      text that is carried from one version of the output to the next.
  *
  *      The @code{file} argument is used to name the file that contains the
  *      demarcated text.
- *      The @code{marker-fmt} is a formatting string that is used to
- *      construct the starting and ending demarcation strings.  The sprintf
- *      function is given the @code{marker-fmt} with two arguments.  The
- *      first is either "START" or "END".  The second is either "DO NOT
- *      CHANGE THIS COMMENT" or the optional @code{caveat} argument.  The
- *      resulting strings are presumed to be unique within the subject file.
+ *@*
+ *      The @code{marker-fmt} is a formatting string that is used to construct
+ *      the starting and ending demarcation strings.  The sprintf function is
+ *      given the @code{marker-fmt} with two arguments.  The first is either
+ *      "START" or "END".  The second is either "DO NOT CHANGE THIS COMMENT"
+ *      or the optional @code{caveat} argument.
+ *@*
+ *      @code{caveat} is presumed to be absent if it is the empty string
+ *      (@code{""}).  The resulting strings are presumed to be unique within
+ *      the subject file.
+ *@*
+ *      When a @code{default} argument is supplied and no pre-existing text
+ *      is found, then this text will be inserted between the START and END
+ *      markers.
 =*/
     SCM
-ag_scm_extract( SCM file, SCM marker, SCM caveat )
+ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
 {
     const char* pzStart;
     const char* pzEnd;
@@ -214,7 +235,7 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat )
         const char* pzMarker = gh_scm2newstr( marker, NULL );
         const char* pzCaveat = "DO NOT CHANGE THIS COMMENT";
         int static_caveat = 1;
-        if (gh_string_p( caveat )) {
+        if (gh_string_p( caveat ) && (SCM_LENGTH( caveat ) > 0)) {
             static_caveat = 0;
             pzCaveat = gh_scm2newstr( caveat, NULL );
         }
@@ -224,8 +245,15 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat )
             free( (void*)pzCaveat );
     }
 
-    if (pzText == NULL)
-        return buildEmptyText( pzStart, pzEnd );
+    {
+        SCM res;
 
-    return extractText( pzText, pzStart, pzEnd );
+        if (pzText == NULL)
+             res = buildEmptyText( pzStart, pzEnd, def );
+        else res = extractText( pzText, pzStart, pzEnd, def );
+
+        AGFREE( (void*)pzStart );
+        AGFREE( (void*)pzEnd );
+        return res;
+    }
 }

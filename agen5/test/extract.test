@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/05/09 05:27:55 $
+# Last Modified:     $Date: 2001/05/19 22:18:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: extract.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# $Id: extract.test,v 1.2 2001/05/19 22:18:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -28,6 +28,9 @@ cat > $testname.tpl <<_EOF_
 [= AutoGen5 template out =]
 This is the start of generated text[=\` echo ' working' \` =]
 [=(extract "$testname.save" "/* =-= %s =-= MARKER =-= %s =-= */")=]
+[=(extract "$testname.save" "/* =-= %s =-= SECOND =-= %s =-= */"
+           "DNC Test" "This is an insertion
+test.")=]
 And this is the end.[= \` echo ' done' \` =]
 _EOF_
 
@@ -40,12 +43,16 @@ This is the start of generated text working
 /* =-= START =-= MARKER =-= DO NOT CHANGE THIS COMMENT =-= */
 This is inserted text
 /* =-= END   =-= MARKER =-= DO NOT CHANGE THIS COMMENT =-= */
+/* =-= START =-= SECOND =-= DNC Test =-= */
+This is an insertion
+test.
+/* =-= END   =-= SECOND =-= DNC Test =-= */
 And this is the end. done
 _EOF_
 
 AGEXE="$AGEXE --no-definitions -b $testname -T $testname.tpl"
 $AGEXE || failure $AGEXE failed
-sed '/ START /a\
+sed '/ START =-= MARKER /a\
 This is inserted text' ${testname}.out > $testname.save
 
 $AGEXE || failure $AGEXE failed

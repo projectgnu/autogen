@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.11 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: agUtils.c,v 1.12 2001/05/19 22:18:56 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -72,6 +72,11 @@ strlcpy( char* dest, const char* src, size_t n )
     EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
+    /*
+     *  Set the last resort search directory first (lowest priority)
+     */
+    SET_OPT_TEMPL_DIRS( "$$/../share/autogen" );
+
     /*
      *  Advance the argument counters and pointers past any
      *  command line options

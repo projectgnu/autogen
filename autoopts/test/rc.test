@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.5 2000/11/04 19:43:22 bkorb Exp $
+# $Id: rc.test,v 1.6 2001/05/19 22:18:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -108,9 +108,9 @@ cmp  ${testname}.cmds ${testname}.test || {
 cat >> ../${testname}.rc/${testname}.file  <<_EOF_
 [TEST_MUMBLE]
 second  fourth
-[TEST_`echo ${testname} | tr a-z A-Z`]
+[TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
 second  fifth
-[TEST_`echo ${testname} | tr a-z A-Z`]
+[TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
 second  sixth
 _EOF_
 

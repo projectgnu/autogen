@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.18 2000/10/29 01:43:31 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.19 2001/05/19 22:18:56 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -197,6 +197,19 @@ extern void optionUsage PROTO(( tOptions*, int exitCode ));
  *  the *LAST* defined directory in the papzHomeList.
  */
 void    optionSave PROTO((   tOptions* pOpts ));
+
+/*
+ *  optionMakePath  --  translate and construct a path
+ *
+ *  This routine does environment variable expansion if the first character
+ *  is a ``$''.  If it starts with two dollar characters, then the path
+ *  is relative to the location of the executable.
+ */
+ag_bool optionMakePath PROTO((
+	char*    pzBuf,
+	size_t   bufSize,
+	tCC*     pzName,
+	tCC*     pzProgPath ));
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.25 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expString.c,v 1.26 2001/05/19 22:18:56 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -268,7 +268,7 @@ ag_scm_join( SCM sep, SCM list )
 
     sv_l_len = l_len = scm_ilength( list );
     if (l_len == 0)
-	return gh_str02scm( "" );
+        return gh_str02scm( "" );
 
     pzSep   = SCM_ROCHARS( sep );
     sep_len = SCM_LENGTH( sep );
@@ -552,13 +552,16 @@ ag_scm_raw_shell_str( SCM obj )
  * doc:
  *
  *  Convert the text of the string into a double quoted string that a normal
- *  shell will process into the original string, almost.  It will add the escape
- *  character before two special characters to accomplish this: the backslash
- *  and double quote @code{"}.  It omits the extra backslash, however, if a
- *  backslash is followed by either a backquote or a dollar sign.  This makes it
- *  impossible to render the sequence of a backslash followed by a dollar sign,
- *  but it does make it possible to protect that dollar sign from shell
- *  evaluation.  The lesser of two evils.
+ *  shell will process into the original string, almost.  It will add the
+ *  escape character @code{\\} before two special characters to accomplish
+ *  this: the backslash @code{\\} and double quote @code{"}.
+ *@*
+ *  @bold{WARNING}:
+ *  This function omits the extra backslash in front of a backslash, however,
+ *  if it is followed by either a backquote or a dollar sign.  It must do this
+ *  because otherwise it would be impossible to protect the dollar sign or
+ *  backquote from shell evaluation.  Consequently, it is not possible to
+ *  render the strings "\\$" or "\\`".  The lesser of two evils.
  *
  *  All others characters are copied directly into the output.
 =*/
@@ -603,11 +606,11 @@ ag_scm_shell_str( SCM obj )
 
         case '\\':
             /*
-             *  This deserves a bit of explanation.  Basically, if someone went
-             *  to the trouble to escape a backquote or a dollar sign, then we
-             *  should not neutralize it.  Note that we handle a following
-             *  backslash as a normal character.  i.e.  \\ --> \\\\
-             *  *BUT*   \\$ --> \\\$
+             *  If someone went to the trouble to escape a backquote or a
+             *  dollar sign, then we should not neutralize it.  Note that we
+             *  handle a following backslash as a normal character.
+             *
+             * i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
              */
             switch (*pzDta) {
             case '`':             /* \`  -->  \`    */

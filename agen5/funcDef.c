@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.32 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: funcDef.c,v 1.33 2001/05/19 22:18:56 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -848,7 +848,7 @@ MAKE_HANDLER_PROC( Define )
      */
     if (defCt != 0) {
         stack  = currDefCtx;
-        currDefCtx.pPrev     = &stack;
+        currDefCtx.pPrev = &stack;
         build_defs( defCt, pList );
     }
 

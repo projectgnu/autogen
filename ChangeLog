@@ -1,3 +1,20 @@
+2001-05-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c(doOptions): Preset the first copy of templ-dirs
+	to "$$/../share/autogen" so that ag-distributed templates and
+	definitions can be found at the end of the search list.
+	* agen5/expString.c(shell-string): doc improvements
+	* agen5/tpLoad.c(findFile): replace much logic with the newly exported
+	"optionMakePath" routine + remove logic that hunts in the binary
+	directory.  (We use the preset option as above now.)
+	* autoopts/autoopts.c(make_path): renamed to optionMakePath
+	and exported.
+	* autoopts/autoopts.h(optionMakePath): declare routine extern
+
+2001-05-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c: allow for a default text argument
+
 2001-05-07  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fsm-*.tpl: new files for example FSM output

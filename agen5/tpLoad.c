@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.16 2000/10/11 16:49:01 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.17 2001/05/19 22:18:56 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -60,50 +60,20 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
     char*   pzRoot;
     char*   pzSfx;
     void*   deallocAddr = NULL;
+	tSuccess res = SUCCESS;
 
     /*
      *  Expand leading environment variables.
      *  We will not mess with embedded ones.
      */
     if (*pzFName == '$') {
-        char* pzDef = (char*)(pzFName+1);
-        char* pzEnd = strchr( pzDef, '/' );
-
-        /*
-         *  IF the string contains a directory separator,
-         *  THEN everything up to that is the define name.
-         */
-        if (pzEnd != (char*)NULL)
-            *(pzEnd++) = NUL;
-
-        pzDef = (char*)getDefine( pzDef );
-
-        /*
-         *  IF we cannot find a define name,
-         *  THEN print a warning and continue as normal.
-         */
-        if (pzDef == (char*)NULL) {
-            if (pzEnd != (char*)NULL)
-                pzEnd[-1] = '/';
-
-            fprintf( stderr, "NOTE: cannot expand %s\n", pzFName );
+        if (! optionMakePath( pzFullName, MAXPATHLEN, pzFName,
+                              autogenOptions.pzProgPath ))
             return FAILURE;
-        }
 
-        /*
-         *  Add stuff after the expanded name IFF there is stuff
-         */
-        if (pzEnd != (char*)NULL) {
-            snprintf( pzFullName, MAXPATHLEN, "%s/%s", pzDef, pzEnd );
-            /*
-             *  FIXME:  this is a memory leak
-             */
-            AGDUPSTR( pzFName, pzFullName, "find file name" );
-            deallocAddr = (void*)pzFName;
-            pzEnd[-1] = '/';
-        } else {
-            pzFName = pzDef;
-        }
+        AGDUPSTR( pzFName, pzFullName, "find file name" );
+        deallocAddr = (void*)pzFName;
+
         /*
          *  pzFName now points to the name the file system can use.
          *  It must _not_ point to pzFullName because we will likely
@@ -116,9 +86,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      */
     if (access( pzFName, R_OK ) == 0) {
         strlcpy( pzFullName, pzFName, MAXPATHLEN );
-        if (deallocAddr != NULL)
-            AGFREE( deallocAddr );
-        return SUCCESS;
+        goto findFileReturn;
     }
 
     /*
@@ -144,34 +112,49 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
         do  {
             strcpy( pzEnd, *(papSL++) ); /* must fit */
             if (access( pzFullName, R_OK ) == 0) {
-                if (deallocAddr != NULL)
-                    AGFREE( deallocAddr );
-                return SUCCESS;
+                goto findFileReturn;
             }
         } while (*papSL != NULL);
     }
 
-    if (*pzFName == '/')
-        return FAILURE;
-
     /*
-     *  Search each directory in our directory search list
-     *  for the file.
+     *  IF the file name does not contain a directory separator,
+     *  then we will use the TEMPL_DIR search list to keep hunting.
      */
-    if (HAVE_OPT( TEMPL_DIRS )) {
+    if (pzRoot == (char*)NULL) {
+
+        /*
+         *  Search each directory in our directory search list
+         *  for the file.  We always force one copy of this option.
+         */
         int     ct     = STACKCT_OPT(  TEMPL_DIRS );
         char**  ppzDir = STACKLST_OPT( TEMPL_DIRS ) + ct - 1;
 
         do  {
-            tSCC zDirFmt[] = "%s/%s";
+            tSCC    zDirFmt[] = "%s/%s";
             char*   pzDir  = *(ppzDir--);
 
-            char*   pzEnd  = pzFullName
+            char*   pzEnd;
+
+            /*
+             *  IF one of our template paths starts with '$', then expand it.
+             */
+            if (*pzDir == '$') {
+                if (! optionMakePath( pzFullName, MAXPATHLEN, pzFName,
+                                      autogenOptions.pzProgPath ))
+                    pzDir = ".";
+                else
+                    AGDUPSTR( pzDir, pzFullName, "find directory name" );
+
+                ppzDir[-1] = pzDir;
+            }
+
+            pzEnd  = pzFullName
                 + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
                             zDirFmt, pzDir, pzFName );
 
             if (access( pzFullName, R_OK ) == 0)
-                return SUCCESS;
+                goto findFileReturn;
 
             /*
              *  IF the file does not already have a suffix,
@@ -183,85 +166,21 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 
                 do  {
                     strcpy( pzEnd, *(papSL++) ); /* must fit */
-                    if (access( pzFullName, R_OK ) == 0) {
-                        if (deallocAddr != NULL)
-                            AGFREE( deallocAddr );
-                        return SUCCESS;
-                    }
+                    if (access( pzFullName, R_OK ) == 0)
+                        goto findFileReturn;
+
                 } while (*papSL != NULL);
             }
         } while (--ct > 0);
     }
 
-    /*
-     *  IF there is a directory component to the template name,
-     *  THEN we will not search for templates in the executable's
-     *       directory.
-     */
-    if (pzRoot != (char*)NULL)
-        return FAILURE;
+ findFileReturnFailure:
+	res = FAILURE;
 
-    /*
-     *  Now we try to find this file using our PATH environment variable.
-     */
-    {
-        tSCC   zPath[] = "PATH";
-        char*  pzPath  = getenv( zPath );
-        char*  pzFound;
-
-        /*
-         *  IF we cannot find a PATH variable, bail
-         */
-        if (pzPath == (char*)NULL)
-            return FAILURE;
-
-        pzFound = pathfind( pzPath, pzFName, "rs" );
-
-        /*
-         *  IF we could not find the bare name on the path,
-         *  THEN try all the suffixes we have available, too.
-         */
-        if (  (pzFound == (char*)NULL)
-           && (pzSfx == (char*)NULL)
-           && (papSuffixList != NULL)) {
-            tCC**   papSL = papSuffixList;
-            char*   pzEnd;
-
-            /*
-             *  IF our target name already has a suffix,
-             *  THEN we won't try to supply our own.
-             */
-            if (pzSfx != (char*)NULL) {
-                if (deallocAddr != NULL)
-                    AGFREE( deallocAddr );
-                return FAILURE;
-            }
-
-            pzEnd  = pzFullName
-                + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
-                            "%s.", pzFName );
-
-            for (;;) {
-                strcpy( pzEnd, *papSL ); /* must fit */
-
-                if (access( pzFullName, R_OK ) == 0)
-                    break;
-
-                if (*++papSL == NULL)
-                    return FAILURE;
-
-            } while (*papSL != NULL);
-        }
-
-        if (deallocAddr != NULL)
-            AGFREE( deallocAddr );
-
-        if (pzFound == NULL)
-            return FAILURE;
-
-        strlcpy( pzFullName, pzFound, MAXPATHLEN );
-        return SUCCESS;
-    }
+ findFileReturn:
+	if (deallocAddr != NULL)
+		AGFREE( deallocAddr );
+    return res;
 }
 
 
