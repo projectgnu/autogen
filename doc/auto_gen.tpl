@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.51 2000/03/26 02:37:23 bruce Exp $
+## $Id: auto_gen.tpl,v 2.52 2000/03/26 02:52:56 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -133,24 +133,21 @@ a line in the usage text.
 @end enumerate
 
 @noindent
-You will need more things besides this if you choose to implement long
-option names, rc/ini file processing, environment variables and so on.
+You will need more things besides this if you choose to implement long option
+names, rc/ini file processing, environment variables and so on.  All of this
+can be done mechanically; with the proper templates and this program.
+In fact, it has already been done and AutoGen itself uses it:  @xref{AutoOpts}.
 For a simple example of Automated Option processing, @xref{Quick Start}.
 For a full list of the Automated Option features, @xref{Features}.
 
-All of this can be done mechanically; with the proper templates and this
-program.  In fact, it has already been done and AutoGen itself uses it:
-@xref{AutoOpts}.
-
 @menu
-* Generalities::         General Ideas
+* Generalities::         The Purpose of AutoGen
 * Example Usage::        A Simple Example
 * Testimonial::          A User's Perspective
 @end menu
 
 @node Generalities
-@section General Ideas
-@cindex m4
+@section The Purpose of AutoGen
 
 The idea of this program is to have a text file, a template if
 you will, that contains the general text of the desired output file.
@@ -163,11 +160,11 @@ AutoGen was designed with the following features:
 
 @enumerate
 @item
-The definitions are completely separate from the template.  By
-completely isolating the definitions from the template it greatly
-increases the flexibility of the template implementation.  A secondary
-goal is that a template user only needs to specify those data
-that are necessary to describe his application of a template.
+The definitions are completely separate from the template.  By completely
+isolating the definitions from the template it greatly increases the
+flexibility of the template implementation.  A secondary goal is that a
+template user only needs to specify those data that are necessary to describe
+his application of a template.
 
 @item
 Each datum in the definitions is named.  Thus, the definitions can be
@@ -175,9 +172,8 @@ rearranged, augmented and become obsolete without it being necessary to
 go back and clean up older definition files.  Reduce incompatibilities!
 
 @item
-Multiple values for a given name create an array of values.
-This array of values is used to control the repetition of
-sections of the template.
+Multiple values for a given name create an array of values.  This array of
+values is used to control the repetition of sections of the template.
 
 @item
 There are named collections of definitions.  They form a nested hierarchy.
@@ -330,22 +326,19 @@ output document.
 If you have compiled AutoGen, you can copy out the template and
 definitions, run @file{autogen} and produce exactly the hypothesized
 desired output.
+
+One more point, too.  Lets say you decided it was too much trouble to figure
+out how to use AutoGen, so you created this enumeration and string list with
+thousands of entries.  Now, requirements have changed and it has become
+necessary to map a string containing the enumeration name into the enumeration
+number.  With AutoGen, you just alter the template to emit the table of names.
+It will be guaranteed to be in the correct order, missing none of the entries.
+If you want to do that by hand, well, good luck.
 @page
 @node Testimonial
 @section A User's Perspective
 
 @format
-        Subject: Re: Sysadmin Package
-           Date: Thu, 24 Sep 1998
-           From: "Gary V. Vaughan"
-             To: Alexandre
-             CC: autoconf <autoconf@@gnu.org>
-
-> Bruce Korb writes:
->
-> > I would like to recommend my tool.  It exactly and precisely
-> > addresses these very problems in a manner far simpler than M4.
-
 Alexandre wrote:
 >
 > I'd appreciate opinions from others about advantages/disadvantages of
@@ -383,6 +376,7 @@ these examples might indicate, and has many other varied uses.  I am
 certain Bruce or I could supply you with many and varied examples, and I
 would heartily recommend that you try it for your project and see for
 yourself how it compares to m4.
+@cindex m4
 
 As an aside, I would be interested to see whether someone might be
 persuaded to rationalise autoconf with AutoGen in place of m4...  Ben,
