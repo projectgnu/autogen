@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2004-08-13 16:41:30 bkorb"
+dnl Time-stamp:      "2004-08-15 05:11:05 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.26 2004/08/15 00:52:47 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.27 2004/08/15 12:26:16 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.26 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.27 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -117,30 +117,44 @@ AC_HEADER_DIRENT
 # ----------------------------------------------------------------------
 # AC_CHECK_HEADERS Check for list of headers.
 # ----------------------------------------------------------------------
-AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/param.h \
- libgen.h sys/time.h setjmp.h sys/select.h sys/procset.h dlfcn.h)
+AC_CHECK_HEADERS(dlfcn.h errno.h fcntl.h libgen.h memory.h netinet/in.h \
+    setjmp.h sys/mman.h sys/param.h sys/poll.h sys/procset.h sys/select.h \
+    sys/socket.h sys/stropts.h sys/time.h sys/un.h sys/wait.h unistd.h)
 
-if   test "${ac_cv_header_stdint_h+set}" = set \
-  || test "${ac_cv_header_inttypes_h+set}" = set
-then : ; else
-  AC_MSG_ERROR([You must have stding. or inttypes.h on your system])
-fi
+# --------------------------------------------
+# Verify certain entries from AC_CHECK_HEADERS
+# --------------------------------------------
+for f in sys_types sys_mman sys_param sys_stat sys_wait \
+         string errno stdlib memory setjmp
+do eval as_ac_var=\${ac_cv_header_${f}_h+set}
+   test "${as_ac_var}" = set || \
+     AC_MSG_ERROR([You must have ${f}.h on your system])
+done
 
 # =================
 # AC_CHECK_HEADERS: stdarg.h is present define HAVE_STDARG_H, otherwise
 # if varargs.h is present define HAVE_VARARGS_H.
 # =================
 AC_CHECK_HEADERS(stdarg.h varargs.h, break)
+if test `eval echo '${'$as_ac_Header'}'` != yes; then
+  AC_MSG_ERROR([You must have either stdarg.h or varargs.h on your system])
+fi
 
 # =================
 # Similarly for the string.h and strings.h headers
 # =================
 AC_CHECK_HEADERS(string.h strings.h, break)
+if test `eval echo '${'$as_ac_Header'}'` != yes; then
+  AC_MSG_ERROR([You must have either string.h or strings.h on your system])
+fi
 
 # =================
 # ...and limits headers
 # =================
 AC_CHECK_HEADERS(limits.h sys/limits.h values.h, break)
+if test `eval echo '${'$as_ac_Header'}'` != yes; then
+  AC_MSG_ERROR([You must have limits.h, sys/limits.h or values.h on your system])
+fi
 
 # =================
 # ...and directory read headers
