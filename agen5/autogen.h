@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.7 1999/10/28 03:24:31 bruce Exp $
+ *  $Id: autogen.h,v 1.8 1999/11/07 03:02:58 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -145,6 +145,8 @@ struct template_desc {
     char*       pzFileName;  /* Name of Macro File       */
     char*       pzTplName;   /* Template Name Pointer    */
     char*       pzTemplText; /* offset of the text       */
+    char        zStartMac[8];
+    char        zEndMac[8];
     tMacro      aMacros[1];  /* Array of Macros          */
 /*  char        text[...];    * strings at end of macros */
 };
@@ -277,9 +279,9 @@ MODE tScanCtx*   pBaseCtx         VALUE( (tScanCtx*)NULL );
 MODE tScanCtx*   pCurCtx          VALUE( (tScanCtx*)NULL );
 MODE tScanCtx*   pDoneCtx         VALUE( (tScanCtx*)NULL );
 MODE int         endMacLen        VALUE( 0  );
-MODE char        zEndMac[  16 ]   VALUE( "" );
+MODE char        zEndMac[   8 ]   VALUE( "" );
 MODE int         startMacLen      VALUE( 0  );
-MODE char        zStartMac[ 16 ]  VALUE( "" );
+MODE char        zStartMac[  8 ]  VALUE( "" );
 
 /*
  *  Definition Parsing Globals
