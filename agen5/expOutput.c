@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.8 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: expOutput.c,v 1.9 2000/03/12 20:25:48 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -144,7 +144,7 @@ ag_scm_out_pop( void )
 
 /*=gfunc out_push_add
  *
- * what:   open an old output file
+ * what:   append output to file
  * exparg: file-name, name of the file to append text to
  *
  * doc: 
@@ -181,7 +181,7 @@ ag_scm_out_push_add( SCM new_file )
 
 /*=gfunc out_push_new
  *
- * what:   open a new output file
+ * what:   purge and create output file
  * exparg: file-name, name of the file to create
  *
  * doc:
@@ -219,7 +219,7 @@ ag_scm_out_push_new( SCM new_file )
 
 /*=gfunc out_switch
  *
- * what:   close current and open new file
+ * what:   close and create new output
  * exparg: file-name, name of the file to create
  *
  * doc:
@@ -274,7 +274,7 @@ ag_scm_out_switch( SCM new_file )
 
 /*=gfunc out_depth
  *
- * what: determine the output stack depth
+ * what: output file stack depth
  * doc:  Returns the depth of the output file stack.
  *       @xref{output controls}.
 =*/
@@ -287,7 +287,7 @@ ag_scm_out_depth( void )
 
 /*=gfunc out_name
  *
- * what: get the current output file name
+ * what: current output file name
  * doc:  Returns the name of the current output file.
  *       @xref{output controls}.
 =*/

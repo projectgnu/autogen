@@ -1,7 +1,7 @@
 
 /*
  *  agExpr.c
- *  $Id: expGuile.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: expGuile.c,v 1.10 2000/03/12 20:22:03 bruce Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -81,7 +81,7 @@ gh_type_e( SCM typ )
 
 /*=gfunc max
  *
- * what:   maximum value in the list
+ * what:   maximum value in list
  * general_use:
  *
  * exparg: list , list of values.  Strings are converted to numbers ,, list
@@ -146,7 +146,7 @@ ag_scm_max( SCM list )
 
 /*=gfunc min
  *
- * what:   minimum value in the list
+ * what:   minimum value in list
  * general_use:
  *
  * exparg: list , list of values.  Strings are converted to numbers ,, list
@@ -211,7 +211,7 @@ ag_scm_min( SCM list )
 
 /*=gfunc sum
  *
- * what:   sum of the values in the list
+ * what:   sum of values in list
  * general_use:
  *
  * exparg: list , list of values.  Strings are converted to numbers ,, list
