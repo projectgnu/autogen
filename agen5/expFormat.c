@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.28 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: expFormat.c,v 1.29 2000/09/29 02:59:40 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -475,12 +475,11 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
     SCM
 ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 {
-    char*     pzName;
-    char*     pzPfx;
-    char*     pzOwner;
-    char*     pzRes;
-    SCM       res;
-    int       len;
+    char*   pzPfx;
+    char*   pzOwner;
+    char*   pzRes;
+    SCM     res;
+    int     len;
 
     if (! (   gh_string_p( prog_name )
            && gh_string_p( owner )
@@ -523,7 +522,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
-    pzRes = asprintf( zBsd, pzName, pzPfx, pzOwner );
+    pzRes = asprintf( zBsd, zScribble, pzPfx, pzOwner );
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzProg, -1, "BSD string" );

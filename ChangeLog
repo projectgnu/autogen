@@ -1,3 +1,9 @@
+2000-09-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*.c: cleaned up the memory usage and ensured that AutoGen
+	always exits with a message when allocations fail.
+	Also added the string-*! routines.  They will always be there now.
+
 2000-09-26  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expGuile.c: add replacements for (string-upcase ...),
