@@ -9,7 +9,7 @@
 # Last Modified:     Thu Jun  3 14:32:22 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.10 1999/06/03 21:34:37 bkorb Exp $
+# $Id: bootstrap,v 1.11 1999/06/14 20:49:53 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -201,6 +201,12 @@ which which > /dev/null 2>&1 || {
   echo Cannot determine program locations
   exit 0
 }
+
+(
+  cd config
+  echo Genning config/ctime.m4
+  autogen ctime.def
+) || exit 1
 
 find . -name bootstrap |
 egrep -v '(CVS/Base/|config/bootstrap)'   |
