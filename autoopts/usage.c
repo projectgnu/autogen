@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.15 2000/10/28 18:17:32 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.16 2000/10/31 22:16:56 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -433,71 +433,6 @@ DEF_PROC_2( void optionUsage,
          */
         if (pOptions->pzDetail != (char*)NULL)
             fputs( pOptions->pzDetail, fp );
-
-        /*
-         *  IF      there is a detail file
-         *     AND  we are using the pager
-         *  THEN uncompress the detail file and dump to fp
-         */
-        if (  (pOptions->pzDetailFile != (char*)NULL)
-           && (! UNUSED_OPT( pOptions->pOptDesc
-                           + pOptions->specOptIdx.more_help ))) {
-            char* pzPath = getenv( "PATH" );
-            char* pzHelpPath;
-
-            char  zCmd[ MAXPATHLEN + 64 ];
-            char  zDetFile[ MAXPATHLEN ];
-
-            do {
-                char*  pz = zDetFile
-                    + snprintf( zDetFile, sizeof(zDetFile), "%s.README",
-                                pOptions->pzDetailFile );
-                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
-
-                if (pzHelpPath != (char*)NULL) {
-                    tSCC zCmdFmt[] = "cat %s >&2";
-                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
-                    break;
-                }
-
-                strcpy( pz, ".Z" );
-                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
-
-                if (pzHelpPath != (char*)NULL) {
-                    tSCC zCmdFmt[] = "uncompress -c < %s >&2";
-                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
-                    break;
-                }
-
-                strcpy( pz, ".gz" );
-                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
-
-                if (pzHelpPath != (char*)NULL) {
-                    tSCC zCmdFmt[] = "gunzip -c %s >&2";
-                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
-                    break;
-                }
-
-                strcpy( pz, ".bz2" );
-                pzHelpPath = pathfind( pzPath, zDetFile, "r" );
-
-                if (pzHelpPath != (char*)NULL) {
-                    tSCC zCmdFmt[] = "bunzip2 -c %s >&2";
-                    snprintf( zCmd, sizeof(zCmd), zCmdFmt, pzHelpPath );
-                    break;
-                }
-
-            } while (0);
-
-            /*
-             *  IF we can actually find the detail file,
-             *  THEN really do it.
-             */
-            if (pzHelpPath != (char*)NULL) {
-                fflush( fp );
-                system( zCmd );
-            }
-        }
     }
 
     exit( exitCode );
