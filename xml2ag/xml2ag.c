@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.12 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.13 2003/05/18 17:06:53 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -32,7 +32,7 @@ tSCC zTextFmt[] =
     "text = '%s';\n";
 
 
-static const char* typeName[] = {
+tSCC* typeName[] = {
     "0 - inval",
     "ELEMENT_NODE",
     "ATTRIBUTE_NODE",
@@ -98,13 +98,13 @@ extern void forkAutogen( char* pzInput );
 int
 main( int argc, char** argv )
 {
-	xmlDocPtr pDoc;
+    xmlDocPtr pDoc;
     char*     pzFile = NULL;
 
-	{
-		int ct = optionProcess( &xml2agOptions, argc, argv );
-		argc -= ct;
-		argv += ct;
+    {
+        int ct = optionProcess( &xml2agOptions, argc, argv );
+        argc -= ct;
+        argv += ct;
 
         switch (argc) {
         case 1:
@@ -127,23 +127,23 @@ main( int argc, char** argv )
             fprintf( stderr, "only one argument allowed\n" );
             return EXIT_FAILURE;
         }
-	}
+    }
 
     if (! HAVE_OPT( OUTPUT ))
         forkAutogen( pzFile );
     else
         outFp = stdout;
 
-	if (pzFile != NULL) {
+    if (pzFile != NULL) {
         fprintf( outFp, "/* Parsing file %s */\n", pzFile );
-		pDoc = xmlParseFile( pzFile );
+        pDoc = xmlParseFile( pzFile );
     }
-	else {
-		size_t sz;
-		char*  pz = loadFile( stdin, &sz );
-		pDoc = xmlParseMemory( pz, sz );
+    else {
+        size_t sz;
+        char*  pz = loadFile( stdin, &sz );
+        pDoc = xmlParseMemory( pz, sz );
         fprintf( outFp, "/* Parsed from stdin */\n" );
-	}
+    }
 
     {
         xmlNodePtr pRoot = printHeader( pDoc );
@@ -160,7 +160,7 @@ main( int argc, char** argv )
     }
 
     xmlCleanupParser();
-	return 0;
+    return 0;
 }
 
 
@@ -168,32 +168,32 @@ main( int argc, char** argv )
 STATIC char*
 loadFile( FILE* fp, size_t* pzSize )
 {
-	size_t  asz = CHUNK_SZ;
-	size_t  usz = 0;
-	char*   mem = malloc( asz );
+    size_t  asz = CHUNK_SZ;
+    size_t  usz = 0;
+    char*   mem = malloc( asz );
 
-	for (;;) {
+    for (;;) {
 
-		if ((usz + CHUNK_SZ) > asz) {
-			asz += CHUNK_SZ;
-			mem = realloc( mem, asz );
-		}
+        if ((usz + CHUNK_SZ) > asz) {
+            asz += CHUNK_SZ;
+            mem = realloc( mem, asz );
+        }
 
         if (mem == NULL) {
             fprintf( stderr, "Cannot allocate %d byte bufer\n", asz );
             exit( EXIT_FAILURE );
         }
 
-		{
-			size_t rdct = fread( mem + usz, 1, CHUNK_SZ, fp );
-			usz += rdct;
-			if (rdct < CHUNK_SZ)
-				break;
-		}
-	}
+        {
+            size_t rdct = fread( mem + usz, 1, CHUNK_SZ, fp );
+            usz += rdct;
+            if (rdct < CHUNK_SZ)
+                break;
+        }
+    }
 
-	*pzSize = usz;
-	return mem;
+    *pzSize = usz;
+    return mem;
 }
 
 
