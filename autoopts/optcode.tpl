@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.30 2004/08/14 20:36:57 bkorb Exp $
+#$Id: optcode.tpl,v 3.31 2004/08/15 12:36:20 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -138,7 +138,7 @@ static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 
 FOR flag "\n"       =][=
 
-  Option_Descriptor =][=
+  INVOKE option_descriptor =][=
 
 ENDFOR flag
 

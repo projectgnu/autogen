@@ -14,6 +14,8 @@
 	* autoopts/optmain.tpl: also
 	* doc/autogen.texi: cleanups
 	* agen5/agInit.c: new code for handling daemons.
+	* agen5/directive.tpl(inet_family_map): new struct and array
+	* compat/compat.h: include netinet/in.h and sys/un.h
 
 2004-08-07  Bruce Korb  <bkorb@gnu.org>
 

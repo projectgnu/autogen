@@ -2767,6 +2767,12 @@ Contrariwise, the @code{--load-opts} command line option is
 processed normally.  That means that the options specified in that file
 will be processed after all the @code{homerc} files and, in fact, after
 options that precede it on the command line.
+
+@item also
+If either the @code{immediate} or the @code{immed-disable} attributes
+are set to the string, ``@code{also}'', then the option will actually be
+processed twice:  first at the immediate processing phase and again
+at the ``normal'' time.
 @end table
 
 @node Option Conflict Attributes
