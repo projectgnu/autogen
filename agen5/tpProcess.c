@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.15 2003/04/15 01:05:13 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -305,6 +305,9 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          */
         pStk->pzOutName = aprf( pOutSpec->pzFileFmt, pzDefFile,
                                 pOutSpec->zSuffix );
+        if (pStk->pzOutName == NULL)
+            AG_ABEND( aprf( "Cannot format file name:  ``%s''",
+                            pOutSpec->pzFileFmt ));
         if (p != NULL)
             *p = '.';
     }
