@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.5 2000/09/16 06:39:42 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.6 2000/09/19 01:45:30 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -209,17 +209,25 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
      *  IF the next sequence is "-*-"
      *  THEN we found an edit mode marker
      */
-    else if (strncmp( pzData, "-*-", 3 ) == 0) {
+    else if (strncmp( pzData, "-*-", 3 ) == 0)
         res_tkn = FST_ED_MODE;
-    }
 
+    /*
+     *  IF we are accepting suffixes at this point, then we will
+     *  accept these three characters as the start of a suffix
+     */
+    else if (  (fsm_state == FSS_TEMPL)
+            && (  (*pzData == '.')
+               || (*pzData == '-')
+               || (*pzData == '_')
+            )  )
+        res_tkn = FST_SUFFIX;
     /*
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    else if (ispunct( *pzData ) || (*pzData == '.') || (*pzData == '-')) {
+    else if (ispunct( *pzData ))
         res_tkn = FST_MARKER;
-    }
 
     /*
      *  Otherwise, it is just junk.
