@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.4 1999/10/15 02:57:34 bruce Exp $
+ *  $Id: funcIf.c,v 1.5 1999/10/17 22:15:44 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -36,33 +36,20 @@ tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
     STATIC ag_bool
 eval_true( void )
 {
-    SCM res = eval( pCurTemplate->pzTemplText + pCurMacro->ozText );
-    char* pz;
+    ag_bool needFree;
+    ag_bool res;
+    char* pz = evalExpression( &needFree );
 
-    switch (gh_type_e( res )) {
-    case GH_TYPE_BOOLEAN:
-        return SCM_NFALSEP( res );
+    if (*pz == '\0')
+        res = AG_FALSE;
+    else if (! isdigit( *pz ))
+        res = AG_TRUE;
+    else res = (atoi( pz ) != 0);
 
-    case GH_TYPE_SYMBOL:
-    case GH_TYPE_VECTOR:
-        return AG_TRUE;
+    if (needFree)
+        AGFREE( pz );
 
-    case GH_TYPE_CHAR:
-        return (gh_scm2char( res ) != '\0');
-
-    case GH_TYPE_NUMBER:
-        return (gh_scm2long( res ) != 0);
-
-    case GH_TYPE_STRING:
-        pz = SCM_CHARS( res );
-        if (*pz == '\0')
-            return AG_FALSE;
-        if (! isdigit( *pz ))
-            return AG_TRUE;
-        return (atoi( pz ) != 0);
-    }
-
-    return AG_FALSE;
+    return res;
 }
 
 
@@ -239,22 +226,10 @@ MAKE_LOAD_PROC( Elif )
     const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
-    if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "No expression for `ELIF' function" );
-
-    pMac->res    = 0;
-    pMac->ozText = (pzCopy - pT->pzTemplText);
-    
     /*
-     *  Copy the expression
+     *  Load the expression
      */
-    do  {
-        *(pzCopy++) = *(pzSrc++);
-    } while (--srcLen > 0);
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0'; /* double terminate */
-    
-    pT->pNext = pzCopy;
+    (void)mLoad_Expr( pT, pMac, ppzScan );
 
     current_if.pElse->sibIndex = pMac - pT->aMacros;
     current_if.pElse = pMac;
@@ -341,22 +316,19 @@ MAKE_LOAD_PROC( If )
      */
     current_if.pIf = current_if.pElse = pMac;
 
-    if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "No expression for `IF' function" );
-
-    pMac->res    = 0;
-    pMac->ozText = (pzCopy - pT->pzTemplText);
-    
     /*
-     *  Copy the expression
+     *  IF there is no associated text expression
+     *  THEN woops!  what are we to case on?
      */
-    do  {
-        *(pzCopy++) = *(pzSrc++);
-    } while (--srcLen > 0);
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0'; /* double terminate */
-    
-    pT->pNext = pzCopy;
+    if (srcLen == 0) {
+        tSCC zEr[] = "expressionless IF";
+        LOAD_ABORT( pT, pMac, zEr );
+    }
+
+    /*
+     *  Load the expression
+     */
+    (void)mLoad_Expr( pT, pMac, ppzScan );
 
     /*
      *  Now, do a nested parse of the template.
@@ -407,22 +379,19 @@ MAKE_LOAD_PROC( While )
 
     papLoadProc = apWhileLoad;
 
-    if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "No expression for `IF' function" );
-
-    pMac->res    = 0;
-    pMac->ozText = (pzCopy - pT->pzTemplText);
-    
     /*
-     *  Copy the expression
+     *  IF there is no associated text expression
+     *  THEN woops!  what are we to case on?
      */
-    do  {
-        *(pzCopy++) = *(pzSrc++);
-    } while (--srcLen > 0);
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0'; /* double terminate */
-    
-    pT->pNext = pzCopy;
+    if (srcLen == 0) {
+        tSCC zEr[] = "expressionless WHILE";
+        LOAD_ABORT( pT, pMac, zEr );
+    }
+
+    /*
+     *  Load the expression
+     */
+    (void)mLoad_Expr( pT, pMac, ppzScan );
 
     /*
      *  Now, do a nested parse of the template.

@@ -1,8 +1,8 @@
 
 /*
- *  $Id: funcFor.c,v 1.2 1999/10/14 22:25:45 bruce Exp $
+ *  $Id: funcFor.c,v 1.3 1999/10/17 22:15:44 bruce Exp $
  *
- *  This module implements the _FOR text function.
+ *  This module implements the FOR text function.
  */
 
 /*
@@ -430,7 +430,7 @@ doForEach( tTemplate*   pT,
 =*/
 /*=macfunc ENDFOR
  *
- *  what:   Terminates the _FOR function template block
+ *  what:   Terminates the FOR function template block
  *  situational:
 =*/
 MAKE_HANDLER_PROC( For )

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.5 1999/10/14 23:59:24 bruce Exp $
+ *  $Id: autogen.h,v 1.6 1999/10/17 22:15:44 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -108,15 +108,21 @@ struct template_lib_marker {
 
 /*
  *  Defines for conditional expressions.
- *  The first three are an enumeration, the last two are flags.
+ *  The first four are an enumeration that appear in the
+ *  low four bits and the next-to-lowest four bits.
+ *  "PRIMARY_TYPE" and "SECONDARY_TYPE" are masks for
+ *  extracting this enumeration.  The rest are flags.
  */
-#define EMIT_VALUE      0x0000  /* emit value of variable */
-#define EMIT_EXPRESSION 0x0001  /* Emit result of expr    */
-#define EMIT_SHELL      0x0002  /* emit shell output      */
-#define EMIT_STRING     0x0003  /* emit content of expr   */
-#define EMIT_IF_ABSENT  0x0010
-#define EMIT_ALWAYS     0x0020  /* emit one of two exprs  */
-#define EMIT_FORMATTED  0x0040  /* format, if val present */
+#define EMIT_VALUE          0x0000  /* emit value of variable  */
+#define EMIT_EXPRESSION     0x0001  /* Emit Scheme result      */
+#define EMIT_SHELL          0x0002  /* emit shell output       */
+#define EMIT_STRING         0x0003  /* emit content of expr    */
+#define EMIT_PRIMARY_TYPE   0x0007
+#define EMIT_SECONDARY_TYPE 0x0070
+#define EMIT_IF_ABSENT      0x0100
+#define EMIT_ALWAYS         0x0200  /* emit one of two exprs   */
+#define EMIT_FORMATTED      0x0400  /* format, if val present  */
+#define EMIT_NO_DEFINE      0x0800  /* don't get defined value */
 
 struct macro_desc {
     teFuncType  funcCode;  /* Macro function         */

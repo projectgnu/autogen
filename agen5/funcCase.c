@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.2 1999/10/14 22:25:44 bruce Exp $
+ *  $Id: funcCase.c,v 1.3 1999/10/17 22:15:44 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -741,21 +741,8 @@ MAKE_HANDLER_PROC( Case )
 
     tMacro*   pEnd = pT->aMacros + pMac->endIndex;
     tSCC zLinFmt[] = "\tfrom %s line %d\n";
-
-    SCM sampleText = eval( pT->pzTemplText + pMac->ozText );
-
-    /*
-     *  If the expression did not result in a string, bail now.
-     */
-    if (! gh_string_p( sampleText )) {
-        if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-            fprintf( pfTrace, "CASE in %s line %d skipped:\n"
-                     "\t`%s' did not yield a string\n",
-                     pT->pzFileName, pMac->lineNo,
-                     pT->pzTemplText + pMac->ozText );
-        }
-        return pEnd;
-    }
+    ag_bool needFree;
+    char* pzSampleText = evalExpression( &needFree );
 
     /*
      *  Search through the selection clauses until we either
@@ -764,15 +751,25 @@ MAKE_HANDLER_PROC( Case )
     for (;;) {
         tSuccess mRes;
         pMac = pT->aMacros + pMac->sibIndex;
-        if (pMac >= pEnd)
+        if (pMac >= pEnd) {
+            if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+                fprintf( pfTrace, "CASE string `%s' did not match\n",
+                         pzSampleText );
+
+                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                             pMac->lineNo );
+            }
+
             break;
+        }
 
         /*
          *  The current macro becomes the selected selection macro
          */
         pCurMacro = pMac;
         mRes = (*(match_procs[ pMac->funcCode & 0x0F ])
-               )( SCM_CHARS( sampleText ), pT->pzTemplText + pMac->ozText );
+               )( pzSampleText, pT->pzTemplText + pMac->ozText );
 
         /*
          *  IF match, THEN generate and stop looking for a match.
@@ -780,7 +777,7 @@ MAKE_HANDLER_PROC( Case )
         if (SUCCEEDED( mRes )) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf( pfTrace, "CASE string `%s' %s matched `%s'\n",
-                         SCM_CHARS( sampleText ),
+                         pzSampleText,
                          apzMatchName[ pMac->funcCode & 0x0F ],
                          pT->pzTemplText + pMac->ozText );
 
@@ -794,6 +791,9 @@ MAKE_HANDLER_PROC( Case )
             break;
         }
     }
+
+    if (needFree)
+        AGFREE( pzSampleText );
 
     return pEnd;
 }
@@ -858,15 +858,9 @@ MAKE_LOAD_PROC( Case )
     }
 
     /*
-     *  Copy the expression
+     *  Load the expression
      */
-    pMac->ozText = (pzCopy - pT->pzTemplText);
-    do  {
-        *(pzCopy++) = *(pzSrc++);
-    } while (--srcLen > 0);
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0';
-    pT->pNext = pzCopy;
+    (void)mLoad_Expr( pT, pMac, ppzScan );
 
     /*
      *  IF this is the first time here,
@@ -941,7 +935,7 @@ MAKE_LOAD_PROC( Case )
 
 /*=macfunc SELECT
  *
- *  what:    Selection block for _CASE function
+ *  what:    Selection block for CASE function
  *  alias: ~
  *  alias: =
  *  alias: *

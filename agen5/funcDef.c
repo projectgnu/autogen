@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.4 1999/10/15 02:57:34 bruce Exp $
+ *  $Id: funcDef.c,v 1.5 1999/10/17 22:15:44 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -136,6 +136,7 @@ MAKE_HANDLER_PROC( Debug )
 /*=macfunc ENDDEF
  *
  *  what:   Ends the macro definition started with DEFINE.
+ *  situational:
 =*/
 /*
  *  mFunc_Define

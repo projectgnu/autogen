@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.3 1999/10/14 22:27:23 bruce Exp $
+ *  $Id: functions.c,v 1.4 1999/10/17 22:15:44 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -37,15 +37,13 @@
 
 tSCC zCantInc[] = "cannot include file";
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *   Exported function procedures
- */
+
 /*=macfunc ERROR
  *
  *  what:      Cease processing
  *  cindex:    error handling
- *  handler_proc:  Standard load.
+ *  handler_proc:
+ *  load_proc:     Expr
  *
  *  desc:
  *  The arguments are evaluated and printed to the stderr,
@@ -66,23 +64,12 @@ MAKE_HANDLER_PROC( Error )
 {
     tSCC    zErr[] = "DEFINITIONS ERROR for %s:  %s\n";
     tSCC    zEmptyError[] = "** EMPTY ERROR MESSAGE **";
+    ag_bool needFree;
+    char* pz = evalExpression( &needFree );
 
-    SCM   res = eval( pT->pzTemplText + pMac->ozText );
-
-    if (! gh_string_p( res )) {
-        tSCC zNotStr[] = "\texpression yields non-string:  %s\n";
-
-        if (gh_number_p( res ) && (gh_scm2int( res ) == 0))
-            longjmp( fileAbort, PROBLEM );
-
-        fprintf( stderr, zTplErr, pT->pzFileName,
-                 pMac->lineNo, zCantInc );
-        fprintf( stderr, zNotStr, pT->pzTemplText + pMac->ozText );
-        longjmp( fileAbort, FAILURE );
-    }
-
-    fprintf( stderr, zErr, pT->pzFileName, SCM_CHARS( res ));
+    fprintf( stderr, zErr, pT->pzFileName, pz );
     longjmp( fileAbort, FAILURE );
+    /* NOT REACHED */
     return (tMacro*)NULL;
 }
 
@@ -90,7 +77,8 @@ MAKE_HANDLER_PROC( Error )
 /*=macfunc INCLUDE
  *
  *  what:   Read in and emit a template block
- *  handler_proc:  Standard load.
+ *  handler_proc:
+ *  load_proc:     Expr
  *
  *  desc:
  *
@@ -105,163 +93,27 @@ MAKE_HANDLER_PROC( Error )
 =*/
 MAKE_HANDLER_PROC( Include )
 {
-    SCM res = eval( pT->pzTemplText + pMac->ozText );
+    ag_bool needFree;
+    char* pz = evalExpression( &needFree );
 
-    if (! gh_string_p( res )) {
-        tSCC zNotStr[] = "\texpression yields non-string:  %s\n";
-        fprintf( stderr, zTplErr, pT->pzFileName,
-                 pMac->lineNo, zCantInc );
-        fprintf( stderr, zNotStr, pT->pzTemplText + pMac->ozText );
-        longjmp( fileAbort, (abort) ? FAILURE : PROBLEM );
-    }
+    if (*pz != NUL) {
+        pT = loadTemplate( pz );
 
-    pT = loadTemplate( SCM_CHARS( res ));
-
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zTplFmt[] = "Template %s included\n";
-        tSCC zLinFmt[] = "\tfrom %s line %d\n";
-        fprintf( pfTrace, zTplFmt, pT->pzFileName );
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
-                     pMac->lineNo );
-    }
-
-    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
-    unloadTemplate( pT );
-
-    return pMac + 1;
-}
-
-/*=macfunc COND
- *
- *  what:  Eval Expression Conditionally
- *  alias: -
- *  alias: ?
- *  alias: %
- *
- *  handler_proc:
- *  load_proc:
- *
- *  desc:
- *      The macro text begins with an alphabetic character.  The first
- *      token may be the name of a user defined macro, or
- *      the name of a value, or be unknown to AutoGen.  If it is
- *      a user defined macro, then that macro is invoked and its
- *      output is inserted into the output stream.  If it is a named
- *      value, then the text value associated with the name is inserted
- *      into the output stream.  If the name is not known to AutoGen,
- *      then no output is emitted and processing continues.
- *
- *      For example, @code{[#var_name#]} and @code{[#var_name ...#]} are
- *      equivalent to the following:
- *
- *      @example
- *      [#IF (exist? var_name) #][#
- *          (get var_name) #][#
- *      ENDIF#][#
- *      IF (exist? var_name) #][#
- *      (...) #][#
- *      ENDIF#]
- *      @end example
-=*/
-MAKE_HANDLER_PROC( Cond )
-{
-    ag_bool     isIndexed;
-    tDefEntry*  pDef;
-    int         code = pMac->res;
-    char*       pzText;
-
-    /*
-     *  Get the named definition entry, maybe
-     */
-    pDef = findDefEntry( pT->pzTemplText + pMac->ozName, pCurDef, &isIndexed );
-
-    if (pDef == (tDefEntry*)NULL) {
-        /*
-         *  We do not have a definition.  Check to see if we _must_
-         *  have a definition.
-         */
-        if ((code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) == 0)
-            return pMac + 1;
-        pzText =  pT->pzTemplText + pMac->endIndex;
-    }
-
-    /*
-     *  OTHERWISE, we found an entry.  Make sure we were supposed to.
-     */
-    else {
-        if ((code & EMIT_IF_ABSENT) != 0)
-            return pMac + 1;
-
-        /*
-         *  And make sure what we found is a text value
-         */
-        if (pDef->valType != VALTYP_TEXT) {
-            fprintf( stderr, zTplWarn, pT->pzFileName, pMac->lineNo,
-                     "attempted to use block macro in eval expression" );
-            return pMac + 1;
+        if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+            tSCC zTplFmt[] = "Template %s included\n";
+            tSCC zLinFmt[] = "\tfrom %s line %d\n";
+            fprintf( pfTrace, zTplFmt, pT->pzFileName );
+            if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
+                         pMac->lineNo );
         }
 
-        /*
-         *  IF this is a formatting macro,
-         *  THEN use the value as the argument to the formatting string
-         *  ELIF there is text associated with this macro
-         *  THEN that text is the value of the expression
-         *  OTHERWISE the value associated with the name becomes the
-         *            expression.
-         */
-        if ((code & EMIT_FORMATTED) != 0)
-            pzText = asprintf( pT->pzTemplText + pMac->ozText,
-                               pDef->pzValue );
-        else if (pMac->ozText != 0)
-            pzText = pT->pzTemplText + pMac->ozText;
-        else pzText = pDef->pzValue;
+        generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
+        unloadTemplate( pT );
     }
 
-    /*
-     *  The "code" tells us how to handle the expression
-     */
-    switch (code & 0x000F) {
-    case EMIT_VALUE:
-        fputs( pDef->pzValue, pCurFp->pFile );
-        break;
-
-    case EMIT_EXPRESSION:
-    {
-        SCM res = scm_internal_stack_catch(
-                      SCM_BOOL_T,
-                      (scm_catch_body_t)gh_eval_str,
-                      (void*)pzText,
-                      ag_eval_handler,
-                      (void*)pzText );
-        if (gh_string_p( res ))
-            fputs( SCM_CHARS( res ), pCurFp->pFile );
-
-        else if (gh_char_p( res ))
-            fputc( gh_scm2char( res ), pCurFp->pFile );
-
-        else if (gh_number_p( res ))
-            fprintf( pCurFp->pFile, "%ld", gh_scm2long( res ));
-
-        break;
-    }
-
-    case EMIT_SHELL:
-    {
-        char* pz = runShell( pzText );
-        if (pz != (char*)NULL)
-            fputs( pz, pCurFp->pFile );
+    if (needFree)
         AGFREE( (void*)pz );
-        break;
-    }
-
-    case EMIT_STRING:
-        fputs( pzText, pCurFp->pFile );
-        break;
-    }
-
-    if ((code & EMIT_FORMATTED) != 0)
-        AGFREE( (void*)pzText );
 
     return pMac + 1;
 }
@@ -292,7 +144,7 @@ MAKE_HANDLER_PROC( Unknown )
         return mFunc_Define( pT, pMac, pCurDef );
     }
 
-    pMac->funcCode = FTYP_COND;
+    pMac->funcCode = FTYP_EXPR;
     if (pMac->ozText == 0)
         pMac->res = EMIT_VALUE;
 
@@ -319,7 +171,7 @@ MAKE_HANDLER_PROC( Unknown )
         }
     }
 
-    return mFunc_Cond( pT, pMac, pCurDef );
+    return mFunc_Expr( pT, pMac, pCurDef );
 }
 
 
@@ -345,7 +197,7 @@ MAKE_HANDLER_PROC( Bogus )
 /*=macfunc TEXT
  *
  *  what:  A block of text to be emitted.
- *  handler_proc:  Internally loaded.
+ *  handler_proc:
  *  unnamed:
 =*/
 MAKE_HANDLER_PROC( Text )
@@ -361,7 +213,7 @@ MAKE_HANDLER_PROC( Text )
  *
  *  what:  A block of comment to be ignored
  *  alias:  #
- *  load_proc:  Removed from macro list by loader.
+ *  load_proc:
  *
  *  situational:
  *    This function can be specified by the user, but there will
@@ -396,6 +248,26 @@ MAKE_LOAD_PROC( Unknown )
         pMac->ozText = (pzCopy - pT->pzTemplText);
 
         /*
+         *  Strip off scheme comments
+         */
+        while (*pzSrc == ';') {
+            while (*pzSrc != '\n') {
+                if (--srcLen <= 0) {
+                    pMac->ozText = 0;
+                    return pMac + 1;
+                }
+                pzSrc++;
+            }
+            --srcLen;
+            while (isspace( *++pzSrc )) {
+                if (--srcLen <= 0) {
+                    pMac->ozText = 0;
+                    return pMac + 1;
+                }
+            }
+        }
+
+        /*
          *  Copy the expression
          */
         do  {
@@ -407,94 +279,6 @@ MAKE_LOAD_PROC( Unknown )
         pT->pNext = pzCopy;
     }
 
-    return pMac + 1;
-}
-
-
-/*
- *  mLoad_Cond
- *
- *  Some functions are known to AutoGen, but invalid out of context.
- *  For example, ELIF, ELSE and ENDIF are all known to AutoGen.
- *  However, the load function pointer for those functions points
- *  here, until an "IF" function is encountered.
- */
-MAKE_LOAD_PROC( Cond )
-{
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    long           srcLen = (long)pMac->res;           /* macro len  */
-    const char*    pzSrcEnd = pzSrc + srcLen;
-
-    pMac->res = EMIT_VALUE; /* zero */
-
-    switch (*pzSrc) {
-    case '-':
-        pMac->res = EMIT_IF_ABSENT;
-        pzSrc++;
-        break;
-
-    case '?':
-        pMac->res = EMIT_ALWAYS;
-        pzSrc++;
-        if (*pzSrc != '%')
-            break;
-        /* FALLTHROUGH */
-    case '%':
-        pMac->res |= EMIT_FORMATTED;
-        pzSrc++;
-        break;
-    }
-
-    while (isspace( *pzSrc ))  pzSrc++;
-    if (! isalpha( *pzSrc )) {
-        tSCC zMsg[] = "Conditional expression must start with a name";
-        LOAD_ABORT( pT, pMac, zMsg );
-    }
-    pMac->ozName = (pzCopy - pT->pzTemplText);
-    while (ISNAMECHAR( *pzSrc ))  *(pzCopy++) = *(pzSrc++);
-    *(pzCopy++) = NUL;
-    while (isspace( *pzSrc ))  pzSrc++;
-    srcLen -= (size_t)(pzSrc - (const char*)pMac->ozText);
-    if (srcLen <= 0) {
-        if (pMac->res != EMIT_VALUE) {
-            tSCC zAb[] = "No replacement text for unfound value";
-            tSCC zFm[] = "No formatting string for format expr";
-            fprintf( stderr, zTplErr, pT->pzFileName, pMac->lineNo,
-                     (pMac->res == EMIT_IF_ABSENT) ? zAb : zFm );
-        }
-        pMac->ozText = 0;
-    } else {
-        char* pz = pzCopy;
-
-        pMac->ozText = (pzCopy - pT->pzTemplText);
-        /*
-         *  Copy the expression
-         */
-        do  {
-            *(pzCopy++) = *(pzSrc++);
-        } while (--srcLen > 0);
-        *(pzCopy++) = '\0';
-        *(pzCopy++) = '\0'; /* double terminate */
-        switch (*pz) {
-        case ';':
-        case '(':
-            pMac->res |= EMIT_EXPRESSION;
-            break;
-
-        case '`':
-            pMac->res |= EMIT_SHELL;
-            spanQuote( pz );
-            break;
-
-        case '"':
-        case '\'':
-            spanQuote( pz );
-            pMac->res |= EMIT_STRING;
-        }
-    }
-
-    pT->pNext = pzCopy;
     return pMac + 1;
 }
 
