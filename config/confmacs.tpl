@@ -114,7 +114,7 @@ AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
   (define c-text (get "code"))
   (if (> (string-length c-text) 0)
-      (set! c-text (string-append "[[" (protect-text c-text) "]]"  )))
+      (set! c-text (string-append "[" (protect-text c-text) "]"  )))
 
   mac-name  =]],[[=
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.6 2002/03/04 00:56:19 bkorb Exp $
+ *  $Id: functions.c,v 3.7 2002/03/12 05:12:14 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -349,19 +349,33 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     tMacro*
 mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
+    tSCC zUnk[] =
+        "Unknown macro or invalid context in %s line %d:\n\t%s%s";
+
     tCC* pzSrc = (const char*)pMac->ozText; /* macro text */
+    tCC* pzMac;
+
     char z[ 64 ];
 
-    if (pzSrc == NULL)
-        pzSrc = apzFuncNames[ pMac->funcCode ];
-    else {
-        strncpy( z, pzSrc, 63 );
+    if (pzSrc != NULL) {
+        z[0] = ':';
+        z[1] = z[2] = ' ';
+        strncpy( z+3, pzSrc, 60 );
         z[63] = NUL;
         pzSrc = z;
     }
+    else
+        pzSrc = "";
 
-    pzSrc = asprintf( "Unknown macro or invalid context in %s line %d:\n\t%s",
-                      pT->pzFileName, pMac->lineNo, pzSrc );
+    {
+        int ix = pMac->funcCode;
+        if ((unsigned)ix >= FUNC_CT)
+            ix = 0;
+
+        pzMac = apzFuncNames[ ix ];
+    }
+
+    pzSrc = asprintf( zUnk, pT->pzFileName, pMac->lineNo, pzMac, pzSrc );
 
     AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */

@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/02/23 21:05:26 $
+ *  Last Modified:     $Date: 2002/03/12 05:12:14 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.5 2002/02/23 21:05:26 bkorb Exp $
+ *  $Id: misc.def,v 3.6 2002/03/12 05:12:14 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.5 $";
+version = "$Revision: 3.6 $";
 
 test = {
     name   = allocated_ctime;
@@ -58,7 +58,20 @@ test = {
     name   = posix_regcomp;
     type   = run;
     check  = "POSIX compliant regcomp()/regexec()";
-    action = { act-type = define; };
+    action = { no; act-type = script;
+    act-text = <<-  _END_OF_ACTION
+    cat >&2 <<'_EOF_'
+		I cannot detect POSIX compliant regcomp/regexec routines.
+		These are required for AutoGen to work correctly.  If you have
+		such a library present on your system, you must specify it by
+		setting the LIBS environment variable, e.g., "LIBS='-lregex'".
+		If you do not have such a library on your system, then you should
+		download and install, for example, the one from:
+		    ftp://ftp.gnu.org/gnu/rx/
+		_EOF_
+		exit 1
+		_END_OF_ACTION;
+    };
     code   = <<-  _EOF_
 		#include <sys/types.h>
 		#include <regex.h>

@@ -1,3 +1,16 @@
+2002-03-11  Bruce Korb  <bkorb@gnu.org> 
+
+	* compat/gnu-regex.c: deleted.  It is broken on some platforms.
+	Therefore, we'll just abort the configure if we don't have a POSIX regex
+	* agen5/funcCase.c: remove references to deleted source
+	* agen5/funcEval.c: ditto
+	* autoopts/stack.c: ditto
+	* compat/Makefile.am: ditto
+	* getdefs/getdefs.h: ditto
+	* config/confmacs.tpl(c-text): don't overquote.  Unlike other arguments,
+	Autoconf automatically quotes c program text.
+	* config/misc.def(posix_regcomp): bail if we cannot find one.
+
 2002-03-03  Bruce Korb  <bkorb@gnu.org> 
 
 	* agen5/functions.c(mLoad_Bogus): handle the case when the text pointer
