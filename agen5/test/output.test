@@ -1,0 +1,71 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# include.test --- test include functionality
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/06/24 00:33:20 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: output.test,v 1.1 2001/06/24 00:33:20 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<'EOF'
+<= AutoGen5 template test =>
+<=(out-push-new)
+
+=>This is sample output
+<= `echo Goodbye.`  =><=
+
+(define text (out-pop #t)) =><=
+
+DEFINE wrapper
+
+=>BEGIN
+<=(. text)=>
+END<=
+
+ENDDEF wrapper =><=
+
+wrapper  =>
+Done.
+EOF
+
+# # # # # # # SAMPLE OUTPUT FILE # # # # # #
+
+echo creating $testname.out in `pwd`
+# this is the output we should expect to see
+cat > $testname.out <<'EOF'
+BEGIN
+This is sample output
+Goodbye.
+END
+Done.
+EOF
+
+# # # # # # # RUN AUTOGEN # # # # # #
+
+$AGEXE -b $testname -T $testname.tpl --no-def || \
+  failure autogen failed
+
+# # # # # # # TEST RESULTS # # # # # #
+
+cmp -s $testname.test $testname.out || \
+  failure "`diff $testname.test $testname.out`"
+
+cleanup
+# end of output.test

@@ -1,6 +1,39 @@
+2001-06-23  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl: use (extract ...) to reduce bulk
+	* doc/autogen.texi: now contains some original text
+	* agen5/autogen.h: add some flags to the fpStack struct
+	* agen5/expOutput.c(out-pop): add an optional disposition arg.
+	If present and TRUE, then returns the file text contents.
+	(out-push-new): make the argument optional and use a temp file
+	name if no file name is supplied.
+	* agen5/funcDef.c: fix reference to out-pop.
+	* agen5/tpProcess.c(processTemplate): add flags word to variable def.
+	(outputCLose): check for a temp file flag for unlinking file and
+	deallocating the file output state structure.
+	* doc/auto_gen.tpl: the output file is now writable.
+	* agen5/expState.c(tpl-file-line): allow for an alternate format
+	
+2001-06-23  Albert Chin  <china@thewrittenword.com>
+
+	* autoopts/test/guile.test: avoid ``diff -q'' GNU-ism
+	* autoopts/test/Makefile.am: add more paths for exe's & includes
+	* agen5/opts.def: Tru64 UNIX doesn't define RTLD_GLOBAL ??!!
+	* autoopts/optcode.tpl: move the conditional EXIT_SUCCESS define
+	to *after* where local include directives are inserted.
+	* autoopts/test/defs: Test $VERBOSE, not ! $VERBOSE;
+	pass $CFLAGS through as some platforms might need it
+	* compat/compat.h(libgen): we ought to have the lib before including
+	the header (even if we have the header)
+	* snprintfv/configure.in: fix error message
+	* getdefs/getdefs.h(snprintfv.h): if no native snprintf
+	* columns/columns.c(snprintfv.h): if no native snprintf
+	* columns/Makefile.am(INCLUDES): add snprintfv to search list
+	* configure.in(snprintf): look for this function
+
 2001-06-21  Albert Chin  <china@thewrittenword.com>
 
-	* agen5/defFind.c: Separate the non-static initilization from
+	* agen5/defFind.c: Separate the non-static initialization from
 	the local variable definition.  It's not ANSI.
 
 2001-06-16  Alexandre Duret-Lutz  <duret_g@epita.fr>

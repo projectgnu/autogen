@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.26 2001/06/06 04:19:57 uid24370 Exp $
+ *  $Id: funcCase.c,v 1.27 2001/06/24 00:32:52 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -148,7 +148,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
  * string: "*=="
  *
  * doc:  Test to see if a string ends with a substring.
- *       strcmp(3) returns zero at the end of the string.
+ *       strcmp(3) returns zero for comparing the string ends.
 =*/
     STATIC tSuccess
 Select_Compare_End( char* pzText, char* pzMatch )
@@ -891,10 +891,10 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *
  *  @enumerate
  *  @item
- *  Must the match start at the beginning of the string?
+ *  Must the match start matching from the beginning of the string?
  *  If not, then the match macro code starts with an asterisk (@code{*}).
  *  @item
- *  Must the match finish at the end of the string?
+ *  Must the match finish matching from the end of the string?
  *  If not, then the match macro code ends with an asterisk (@code{*}).
  *  @item
  *  Is the match a pattern match or a string comparison?

@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.15 2001/06/06 04:19:57 uid24370 Exp $
+# $Id: shell.test,v 1.16 2001/06/24 00:32:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -422,7 +422,7 @@ rm -f $testname.sh
 sed '2,9d'  $testname.sh > XXX
 mv -f XXX $testname.sh
 cmp -s $testname.sh* || \
-  failure $testname.sh output did not match $testname.sht
+  failure "`diff $testname.sh $testname.sht`"
 
 # # # # # # # # # # SCRIPT PROCESSING TEST # # # # # # # # #
 
@@ -436,7 +436,7 @@ TEST_SHELL_SECOND=true
 _EOF_
 
 cmp -s $testname.out $testname.test || \
-  failure $testname option processing script failed
+  failure "`diff $testname.out $testname.test`"
 
 cleanup
 # end of shell.test

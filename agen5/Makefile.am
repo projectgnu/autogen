@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/06/17 01:51:14 $
+## Last Modified:   $Date: 2001/06/24 00:32:52 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.31 2001/06/17 01:51:14 bkorb Exp $
+## $Id: Makefile.am,v 1.32 2001/06/24 00:32:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -27,7 +27,7 @@ AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 		  then echo -DDEBUG=1 ; else echo -UDEBUG ; fi`
 
-MAINTAINERCLEANFILES = Makefile.in
+MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
@@ -64,9 +64,6 @@ EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 YFLAGS = -d
 
 all : @AGEXE@
-
-clean :
-	rm -f *.o autogen $(STAMPS) $(GEN_SRC) *~
 
 ##  Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the

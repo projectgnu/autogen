@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=2
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".4"
+AG_PATCHLEVEL=".5"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -60,7 +60,6 @@ if [ -n "$srcdir" ] && [ -s $srcdir/autoopts/options.h ] ; then
   if [ ${hdr}0 -ne ${lib}0 ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
-    return 1
   fi
 fi
 
