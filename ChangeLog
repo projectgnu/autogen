@@ -6,6 +6,8 @@
 	* config/bootstrap.local: exit when autogen is found missing
 	* autoopts/autoopts.c(valid_path): corrected invalid mod of static
 	data (only used on rare platforms)
+	* */bootstrap.dir: suppress "cannot locage" messages during bootstrap
+	(some of the scripts are used during the build)
 
 2000-09-05  Jerome Lovy  <Jerome.Lovy@infonie.de>
 

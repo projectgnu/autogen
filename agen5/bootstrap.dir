@@ -68,6 +68,7 @@ AG=${builddir}/${AGEXE}
 if [ ! -x ${AG} ]
 then
   f=`type ${AGEXE} | sed -e "s;${AGEXE} is ;;" `
+
   case ${f} in
   */${AGEXE} )
      AG=${f}
@@ -77,7 +78,7 @@ then
     AG=""
     ;;
   esac
-fi
+fi 2>/dev/null
 
 #  The "getdefs" and "columns" programs are specifically
 #  called out in some of the templates (ensuring that
@@ -95,11 +96,12 @@ then
 
   * )
     GD=""
-    echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD}).  Giving up"
+    test "X${BOOTSTRAP}" = X \
+      && echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD}).  Giving up"
     exit 1
     ;;
   esac
-fi
+fi 2>/dev/null
 
 COL=../columns/columns
 if [ ! -x ${COL} ]
@@ -111,7 +113,7 @@ then
      rmlist="$rmlist ${COL}"
      ;;
   esac
-fi
+fi 2>/dev/null
 
 # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -159,13 +161,13 @@ do
       case "`type byacc 2>/dev/null`" in
       "byacc is "* )
         YACC="byacc -d" ;;
-      esac
+      esac 2>/dev/null
       if [ "x$YACC" = x ]
       then
         case "`type yacc 2>/dev/null`" in
         "yacc is "* )
           YACC="yacc -d" ;;
-        esac
+        esac 2>/dev/null
       fi
     fi
 
@@ -190,7 +192,8 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+        && echo "Cannot locate ${AG}.  Giving up"
       exit 1
     fi
     echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
@@ -203,7 +206,8 @@ do
   expr.ini )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     if ksh -c : 2> /dev/null ; then :
@@ -224,7 +228,8 @@ do
   expr.def )
     if [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
@@ -236,7 +241,8 @@ do
   functions.h )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
@@ -251,7 +257,8 @@ do
   directive.h )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
@@ -266,7 +273,8 @@ do
     #
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
@@ -279,7 +287,8 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate autogen.  Giving up"
+      test "X${BOOTSTRAP}" = X \
+         && echo "Cannot locate autogen.  Giving up"
       exit 1
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"

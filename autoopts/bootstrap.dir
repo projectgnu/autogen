@@ -14,11 +14,11 @@ then
      ;;
 
   * )
-    echo "Cannot locate autogen.  Giving up"
+    test "X$BOOTSTRAP" = X && echo "Cannot locate autogen.  Giving up"
     exit 1
     ;;
   esac
-fi
+fi 2>/dev/null
 
 case "$1" in
 *genshell.c )

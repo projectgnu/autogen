@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:29:52 1999                                 
 #            by:     Bruce Korb <bkorb@gnu.org>                       
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.30 2000/09/10 22:50:41 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.31 2000/09/10 23:56:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -65,7 +65,7 @@ export MISSING
 #
 BOOTSTRAP=pre
 export BOOTSTRAP
-test -f $wd/bootstrap.local && sh -x $wd/bootstrap.local $@
+test -f $wd/bootstrap.local && sh $wd/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -84,8 +84,6 @@ libtoolize_reqver=1.3
 #
 out_of_date()
 {
-    echo "Checking ${1} vs. ${2}" >&2
-
     if test "X${1}" = "X${2}"
     then return 1 ; fi
 
@@ -132,12 +130,15 @@ do
   else
     v=`echo "$v"|sed 1q |sed 's/.* \([0-9]\)/\1/'`
     eval reqver=\$${f}_reqver
+
     if out_of_date "${v}" "${reqver}"
     then
       ${MISSING} old ${f}
       DIE="exit 1"
     fi
   fi
+
+  eval `echo $f | tr a-z A-Z`=$f
 done
 
 # If any of the above tests failed, abort at this point.
@@ -167,11 +168,11 @@ do
   # directory.
   initfile=`fgrep AC_INIT $top/configure.in | sed 's,^.*(,,;s,).*$,,'`
   if test -z "$initfile" || test ! -f $top/$initfile; then
-    cat <<- EOF
+    cat <<- _EOF_
         \$initfile is \`$initfile'
         **Error**: Directory \`$top' does not look like a valid
         top-level directory.
-        EOF
+_EOF_
     exit 1
   fi
 
@@ -190,17 +191,17 @@ do
     test -d $auxdir || auxdir=.
 
     if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
-      | egrep 'A(C|M)_PROG_LIBTOOL' > /dev/null ; then
+      | egrep 'A[CM]_PROG_LIBTOOL' > /dev/null ; then
     doit $LIBTOOLIZE    --force
     fi
-    
+
     if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
       | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
     doit $ACLOCAL       -I $auxdir
     fi
 
     doit $AUTOHEADER    -l $auxdir
-        
+
     if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
       | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
     doit $AUTOMAKE      --gnu --add-missing
