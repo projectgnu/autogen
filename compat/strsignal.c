@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 2.2 1999/07/08 17:13:35 bkorb Exp $
+ *  $Id: strsignal.c,v 2.3 1999/07/08 17:53:32 bkorb Exp $
  */
 
 #include "compat.h"
@@ -241,6 +241,10 @@ DESCRIPTION
 */
 
 #ifndef HAVE_PSIGNAL
+
+#ifndef __P
+#  define __P(a) a
+#endif
 
 #include "snprintfv.h"
 
