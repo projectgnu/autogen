@@ -1,36 +1,33 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.29 2000/03/12 22:18:01 bruce Exp $
+#$Id: optcode.tpl,v 2.30 2000/03/12 23:30:16 bruce Exp $
 =]
 [=
-IF (exist? "copyright") 
+IF (not (exist? "copyright") )
 =]
-static const char zCopyright[] =
-       [=
-       (c-string (sprintf "%s copyright (c) %s %s, all rights reserved"
-                (. prog-name) (get "copyright") (get "owner") )) =];[=
-ELSE  =]
-#define zCopyright (const char*)NULL[=
-ENDIF =][=
-
-IF (exist? "copyright_note")
-=]
-static const char zCopyrightNotice[] =
-       [=(c-string (get "copyright_note"))=];[=
-
-ELIF (exist? "copyright_gpl")
-=]
-static const char zCopyrightNotice[] =
-       [=
-       (c-string (gpl (. prog-name) "" )) =];[=
-
-ELIF (exist? "copyright_lgpl")
-=]
-static const char zCopyrightNotice[] =
-       [=
-       (c-string (lgpl (. prog-name) (get "owner") "" )) =];[=
-
-ELSE =]
+#define zCopyright       (const char*)NULL
 #define zCopyrightNotice (const char*)NULL[=
+ELSE  =]
+tSCC zCopyright[] =
+       [= (c-string
+       (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
+                (get "copyright.date") (get "copyright.owner") )) =];
+tSCC zCopyrightNotice[] =
+       [=
+  CASE (get "copyright.type") =][=
+
+    =  gpl  =][=(c-string (gpl  (. prog-name) " * " ))=][=
+
+    = lgpl  =][=(c-string (lgpl (. prog-name) (get "copyright.owner")
+                                " * " ))=][=
+
+    =  bsd  =][=(c-string (bsd  (. prog-name) (get "copyright.owner")
+                                " * " ))=][=
+
+    = note  =][=(c-string (get "copyright.text"))=][=
+
+    *       =]"Copyrighted"[=
+
+  ESAC =];[=
 
 ENDIF "copyright notes"
 =]

@@ -57,21 +57,29 @@ DEFINE Option_Copyright =][=
 IF (exist? "copyright") =]
 /*
  * [=(sprintf "%s copyright %s %s - all rights reserved"
-     (. prog-name) (get "copyright") (get "owner") ) =][=
+     (. prog-name) (get "copyright.date") (get "copyright.owner") ) =][=
 
-  IF (exist? "copyright_note") =]
- *
-[=(get "copyright_note")=][=
+  CASE (get "copyright.type") =][=
 
-  ELIF (exist? "copyright_gpl") =]
+    =  gpl  =]
  *
 [=(gpl (. prog-name) " * " ) =][=
 
-  ELIF (exist? "copyright_lgpl") =]
+    = lgpl  =]
  *
-[=(lgpl (. prog-name) (get "owner") " * " ) =][=
+[=(lgpl (. prog-name) (get "copyright.owner") " * " ) =][=
 
-  ENDIF "copyright notes" =]
+    =  bsd  =]
+ *
+[=(bsd  (. prog-name) (get "copyright.owner") " * " ) =][=
+
+    = note  =]
+ *
+[=(prefix " * " (get "copyright.text"))=][=
+
+    *       =] * <<indeterminate copyright type>>[=
+
+  ESAC =]
  */[=
 ENDIF "copyright exists" =][=
 ENDDEF
