@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.3 1999/10/14 22:27:23 bruce Exp $
+ *  $Id: autogen.h,v 1.4 1999/10/14 23:54:47 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -44,9 +44,9 @@ typedef enum {
 } teProcState;
 
 #define AG_ABEND STMTS( \
-    procState = PROC_STATE_ABORTING; \
     if (procState < PROC_STATE_EMITTING) \
         exit(EXIT_FAILURE); \
+    procState = PROC_STATE_ABORTING; \
     longjmp( fileAbort, FAILURE ) )
 
 #define LOAD_ABORT( pT, pM, m ) STMTS( \
