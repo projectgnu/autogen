@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.33 1999/10/30 19:18:53 bruce Exp $
+## $Id: auto_gen.tpl,v 2.34 1999/10/30 20:22:48 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -93,6 +93,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
+* Scheme Functions::     Scheme Functions
 * AutoGen Invocation::   Invoking AutoGen
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
@@ -891,21 +892,33 @@ Extracted from [=srcfile=] on line [=linenum=].
 ENDFOR macfunc=]
 @ignore
 
-Resume source from auto_gen.tpl
-
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 @end ignore
 @page
+@node Scheme Functions
+@chapter Scheme Functions
+
+AutoGen uses Guile to interpret Scheme expressions within AutoGen
+macros.  All of the normal Guile functions are available, plus
+several more that have been added to be able to query AutoGen state;
+provide information for AutoGen processing; and also augment the
+repertore of string manipulation functions.
 
 @table @samp[=
 FOR gfunc =]
-@findex [=% name (string-upcase! "%s") =]
-@item [=% name (string-upcase! "%s") =]
+@findex [=% name (string-downcase! "%s") =]
+@item [=% name
+  (shell (sprintf
+    "echo '%%s' | sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+        (string-tr! "%s" "A-Z_^" "a-z--") )) =][=
+  FOR exparg "," =] [=arg_name=][=
+  ENDFOR exparg =][=
+  ellipsis ", ..." =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
-[=descrip=][=
+[=doc=][=
 
 ENDFOR gfunc
 =]
