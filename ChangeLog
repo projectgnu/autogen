@@ -1,3 +1,8 @@
+2000-05-15  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defLex.c(assembleName): use the ISNAMECHAR() macro to
+	determine which entries are marked as name characters.
+
 2000-04-09  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c:  Fixed bug in assembling arg lists

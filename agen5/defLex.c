@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.13 2000/04/06 17:11:14 bkorb Exp $
+ *  $Id: defLex.c,v 1.14 2000/05/15 20:00:31 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -521,25 +521,8 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
              */
             u_int  idx = ((unsigned)' ') + 1;
             do  {
-                zNameChars[ idx ] = 2;
+                zNameChars[ idx ] = ISNAMECHAR(idx) ? 1 : 2;
             } while (++idx <= (unsigned)'~');
-
-            /*
-             *  Now change alphanumerics and '_' to be VAR_NAME chars.
-             */
-            idx = (unsigned)'a';
-            do  {
-                zNameChars[ idx ] = 1;
-            } while (++idx <= (unsigned)'z');
-            idx = (unsigned)'A';
-            do  {
-                zNameChars[ idx ] = 1;
-            } while (++idx <= (unsigned)'Z');
-            idx = (unsigned)'0';
-            do  {
-                zNameChars[ idx ] = 1;
-            } while (++idx <= (unsigned)'9');
-            zNameChars[ (unsigned)'_' ] = 1;
 
             /*
              *  Now disallow entirely characters we use specially
