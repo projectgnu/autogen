@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <bkorb@gnu.org>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    Sun Jul  1 23:43:01 BST 2001
-##            by:    Gary V. Vaughan <gary@gnu.org>
+## Last Modified:    $Date: 2001/07/13 04:23:55 $
+##            by:    Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.19 2001/07/12 02:20:42 bkorb Exp $
+## $Id: Makefile.am,v 2.20 2001/07/13 04:23:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

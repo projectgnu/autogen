@@ -1,3 +1,68 @@
+2001-07-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/in.test: added to test above.
+	* agen5/expString.c(ag_scm_in_p): accommodate the fact that lists
+	arrive wrapped inside of a list, so do a recursive search for "in?"
+	* agen5/loadPseudo.c(loadPseudoMacro): inverted test fixed
+
+2001-07-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/Makefile.am(TESTS_ENVIRONMENT):  add COLUMNS_EXE
+	and make it uniform with the autoopts/test one.
+	* autoopts/test/Makefile.am(TESTS_ENVIRONMENT): make consistent
+	with the agen5/test one.
+
+2001-07-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/loadPseudo.c(loadPseudoMacro): accommodate a start macro marker
+	immediately following the end marker definition.
+	* agen5/test/endmac.test: test it
+
+2001-07-02  Gary V. Vaughan  <gary@gnu.org>
+
+	* configure.in (GUILE_INC): Missing quote in sed expression.
+	
+2001-07-01  Gary V. Vaughan  <gary@gnu.org>
+
+	* configure.in (AC_CONFIG_HEADERS): Replaced with AM_CONFIG_HEADER.
+	* snprintfv/configure.in (AC_CONFIG_HEADERS): Ditto.
+	* Makefile.am(EXTRA_DIST): No need to have config-h.in provided
+	AM_CONFIG_HEADERS is invoked from configure.in.
+	* snprintfv/Makefile.am(EXTRA_DIST): Ditto.
+
+2001-07-01  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am(EXTRA_DIST): automake forces you to spec config-h.in now
+	* snprintfv/Makefile.am(EXTRA_DIST): ditto
+	* configure.in(GUILE_INC):  Disable `-I /usr/include' when Guile
+	is installed under /usr
+	(INCLIST): actually use this for the makefiles
+	* autoopts/Makefile.am: Use INCLIST
+	* agen5/Makefile.am: Use INCLIST
+	* columns/Makefile.am: Use INCLIST
+	* getdefs/Makefile.am: Use INCLIST
+	* config/Makefile.am(EXTRA_DIST): acconfig.h is no longer required
+	* config/acconfig.h: deleted
+
+2001-07-01  Gary V. Vaughan  <gary@gnu.org>
+
+	* autoopts/Makefile.am:  Make sure we pick up the correct config.h
+	by looking in $(top_srcdir) before $(top_srcdir)/snprintfv.
+	* agen5/Makefile.am:  Ditto.
+
+	Upgraded to use autoconf-2.50, automake-1.4-p4 and libtool-1.4:
+	* configure.in: 2.50 autoupdated and tweaked.
+	* config/acconfig.h: No longer required.
+	* config/bootstrap: Updated minimum required versions of bootstrap
+	tools.
+	(initfile): Look in AC_CONFIG_SRDIR for autoconf-2.50
+	configure.in.
+	(AUTOHEADER): No need for -I flag, acconfig has gone.
+	(AUTOCONF): No need for -I flag, aclocal.m4 is in current
+	directory.
+	* config.guess: Updated from master source at ftp.gnu.org.
+	* snprintfv/configure.in: 2.50 autoupdated and tweaked.
+
 2001-06-24  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options.tpl(columns): add an environment variable saying

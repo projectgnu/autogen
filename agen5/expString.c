@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.27 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: expString.c,v 1.28 2001/07/13 04:23:55 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -210,32 +210,56 @@ makeString( tCC*    pzText,
 ag_scm_in_p( SCM obj, SCM list )
 {
     int   len;
-    SCM   car, res;
+    int   lenz;
+    SCM   car;
     char* pz1;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    len = scm_ilength( list );
-    pz1 = gh_scm2newstr( obj, NULL );
-    res = SCM_BOOL_F;
+    pz1  = SCM_CHARS(  obj );
+    lenz = SCM_LENGTH( obj );
 
-    while (--len >= 0) {
-        car  = SCM_CAR( list );
-        list = SCM_CDR( list );
-        if (gh_string_p( car )) {
-            char* pz2 = gh_scm2newstr( car, NULL );
-            if (strcmp( pz1, pz2 ) == 0) {
-                res = SCM_BOOL_T;
-                free( (void*)pz2 );
-                break;
-            }
-            free( (void*)pz2 );
-        }
+	/*
+	 *  If the second argument is a string somehow, then treat
+	 *  this as a straight out string comparison
+	 */
+    if (gh_string_p( list )) {
+        if (  (SCM_LENGTH( list ) == lenz)
+           && (strncmp( pz1, SCM_CHARS( list ), lenz ) == 0) )
+            return SCM_BOOL_T;
+        return SCM_BOOL_F;
     }
 
-    free( (void*)pz1 );
-    return res;
+    len = scm_ilength( list );
+    if (len == 0)
+        return SCM_BOOL_F;
+
+    /*
+     *  Search all the lists and sub-lists passed in
+     */
+    while (len-- > 0) {
+        car  = SCM_CAR( list );
+        list = SCM_CDR( list );
+
+        /*
+         *  This routine is listed as getting a list as the second
+         *  argument.  That means that if someone builds a list and
+         *  hands it to us, it magically becomes a nested list.
+         *  This unravels that.
+         */
+        if (! gh_string_p( car )) {
+            if (ag_scm_in_p( obj, car ) == SCM_BOOL_T)
+                return SCM_BOOL_T;
+            continue;
+        }
+
+        if (  (SCM_LENGTH( car ) == lenz)
+           && (strncmp( pz1, SCM_CHARS( car ), lenz ) == 0) )
+            return SCM_BOOL_T;
+    }
+
+    return SCM_BOOL_F;
 }
 
 
@@ -497,7 +521,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
  *  escaped with a backslash.  Normal shells will reconstitute the
  *  original string.
  *
- *  @strong{NOTE}: some shells will not correctly handle unusual
+ *  @strong{NOTE}@:  some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
 =*/

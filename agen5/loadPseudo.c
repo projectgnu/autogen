@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.12 2001/06/06 04:19:57 uid24370 Exp $
+ *  $Id: loadPseudo.c,v 1.13 2001/07/13 04:23:55 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -275,7 +275,9 @@ copyMarker( tCC* pzData, char* pzMark, int* pCt )
     EXPORT tCC*
 loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
-    tSCC         zMarkErr[] = "start/end macro mark too long";
+    tSCC zMarkErr[] = "start/end macro mark too long";
+#   define BAD_MARKER( t ) STMTS( \
+        fprintf( stderr, zTplErr, pzFileName, templLineNo, t ); AG_ABEND; )
 
     te_pm_state fsm_state  = PM_ST_INIT;
     ag_bool      line_start = AG_TRUE;  /* set TRUE first time only */
@@ -304,11 +306,9 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
         {
             char* pzEnd = strstr( pzData + 3, "-*-" );
             char* pzNL  = strchr( pzData + 3, '\n' );
-            if ((pzEnd == NULL) || (pzNL < pzEnd)) {
-                tSCC zBadEd[] = "invalid edit mode marker";
-                fprintf( stderr, zTplErr, pzFileName, templLineNo, zBadEd );
-                AG_ABEND;
-            }
+            if ((pzEnd == NULL) || (pzNL < pzEnd))
+                BAD_MARKER( "invalid edit mode marker" );
+
             pzData = pzEnd + 3;
             break;
         }
@@ -319,10 +319,9 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case PM_TR_INIT_MARKER:
             pzData = copyMarker( pzData, zStartMac, &startMacLen );
-            if (pzData == (tCC*)NULL) {
-                fprintf( stderr, zTplErr, pzFileName, templLineNo, zMarkErr );
-                AG_ABEND;
-            }
+            if (pzData == (tCC*)NULL)
+                BAD_MARKER( zMarkErr );
+
             break;
 
         case PM_TR_ST_MARK_AUTOGEN:
@@ -331,10 +330,25 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case PM_TR_TEMPL_MARKER:
             pzData = copyMarker( pzData, zEndMac, &endMacLen );
-            if (pzData == (tCC*)NULL) {
-                fprintf( stderr, zTplErr, pzFileName, templLineNo, zMarkErr );
-                AG_ABEND;
+            if (pzData == (tCC*)NULL)
+                BAD_MARKER( zMarkErr );
+
+            /*
+             *  IF the end macro seems to end with the start macro and
+             *  it is exactly twice as long as the start macro, then
+             *  presume that someone ran the two markers together.
+             */
+            if (  (endMacLen == 2 * startMacLen)
+               && (strcmp( zStartMac, zEndMac + startMacLen ) == 0))  {
+                pzData -= startMacLen;
+                zEndMac[ startMacLen ] = NUL;
+                endMacLen = startMacLen;
             }
+
+            if (strstr( zEndMac, zStartMac ) != NULL)
+                BAD_MARKER( "start marker contained in end marker" );
+            if (strstr( zStartMac, zEndMac ) != NULL)
+                BAD_MARKER( "end marker contained in start marker" );
             break;
 
         case PM_TR_TEMPL_SUFFIX:
@@ -343,21 +357,16 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case PM_TR_END_MARK_ED_MODE:
         case PM_TR_INVALID:
-        {
-            tCC*  pzWhich;
-
             pm_invalid_transition( fsm_state, fsm_tkn );
             switch (fsm_state) {
-            case PM_ST_INIT:     pzWhich = "need start marker";    break;
-            case PM_ST_ST_MARK:  pzWhich = "need autogen5 marker"; break;
-            case PM_ST_AGEN:     pzWhich = "need template marker"; break;
-            case PM_ST_TEMPL:    pzWhich = "need end marker";      break;
-            case PM_ST_END_MARK: pzWhich = "need end of line";     break;
-            default:             pzWhich = "BROKEN FSM";           break;
+            case PM_ST_INIT:     BAD_MARKER( "need start marker" );
+            case PM_ST_ST_MARK:  BAD_MARKER( "need autogen5 marker" );
+            case PM_ST_AGEN:     BAD_MARKER( "need template marker" );
+            case PM_ST_TEMPL:    BAD_MARKER( "need end marker" );
+            case PM_ST_END_MARK: BAD_MARKER( "need end of line" );
+            default:             BAD_MARKER( "BROKEN FSM" );
             }
-            fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
-            AG_ABEND;
-        }
+
         case PM_TR_END_MARK_END_PSEUDO:
             /* we be done now */;
         }
