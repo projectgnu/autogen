@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.17 1999/09/22 15:17:33 bkorb Exp $
+ *   $Id: opts.def,v 1.18 1999/09/22 16:15:32 bkorb Exp $
  */
 
 /*
@@ -224,12 +224,13 @@ include = "#include <stdio.h>\n"
 
 detail =
 
-'This program will read a list of text items from standard in or a
-specified input file and produce a columnized listing of all the
-non-blank lines.  Leading white space on each line is preserved, but
-trailing white space is stripped.  Methods of applying per-entry and
-per-line embellishments are provided.  See the formatting and
-separation arguments below.
+'This program was designed for the purpose of generating compact,
+columnized tables.  It will read a list of text items from standard
+in or a specified input file and produce a columnized listing of
+all the non-blank lines.  Leading white space on each line is
+preserved, but trailing white space is stripped.  Methods of
+applying per-entry and per-line embellishments are provided.
+See the formatting and separation arguments below.
 
 This program is used by AutoGen to help clean up and organize
 its output.';
@@ -245,12 +246,13 @@ Info system documentation.';
 
 prog_info_descrip =
 
-'This program will read a list of text items from standard in or a
-specified input file and produce a columnized listing of all the
-non-blank lines.  Leading white space on each line is preserved, but
-trailing white space is stripped.  Methods of applying per-entry and
-per-line embellishments are provided.  See the formatting and
-separation arguments below.
+'This program was designed for the purpose of generating compact,
+columnized tables.  It will read a list of text items from standard
+in or a specified input file and produce a columnized listing of
+all the non-blank lines.  Leading white space on each line is
+preserved, but trailing white space is stripped.  Methods of
+applying per-entry and per-line embellishments are provided.
+See the formatting and separation arguments below.
 
 This program is used by AutoGen to help clean up and organize
 its output.
