@@ -7,13 +7,13 @@
 # Time-stamp:        "2005-02-09 19:16:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2005/02/13 01:47:59 $
+# Last Committed:    $Date: 2005/02/14 14:22:16 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=6
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".7pre2"
+AG_PATCHLEVEL=".7pre3"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -29,9 +29,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=24
+AO_CURRENT=25
 AO_REVISION=0
-AO_AGE=15
+AO_AGE=16
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0
