@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2005-01-16 14:16:58 bkorb"
+# Time-stamp:        "2005-01-21 17:15:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/17 01:12:08 $
+# Last Modified:     $Date: 2005/01/22 04:48:32 $
 #            by: bkorb
 #
-# $Id: heredef.test,v 4.2 2005/01/17 01:12:08 bkorb Exp $
+# $Id: heredef.test,v 4.3 2005/01/22 04:48:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -36,8 +36,10 @@ cat > ${testname}.tpl <<'_EOF_'
                     (get "string1") (get "string2") ))  )
 =>OKAY:  <= (c-string (get "string3")) =>
 FROM:  string1 extracted <= (def-file-line "string1") =>
-       string2 extracted<=  (def-file-line "string2" "\n#line %2$d \"%s\"") =>
-       string3 extracted <= (def-file-line "string3") =>
+       string2 extracted
+<=  (def-file-line "string2" c-file-line-fmt) =>
+       string3 extracted <=
+(def-file-line "string3" "From %1$s on line %2$d") =>
 _EOF_
 
 # # # # # # # # # # SAMPLE FILE # # # # # # # # #
@@ -46,7 +48,8 @@ OKAY:  "\"`Testing'"
 FROM:  string1 extracted from heredef.def line 3
        string2 extracted
 #line 7 "heredef.def"
-       string3 extracted from heredef.def line 11
+
+       string3 extracted From heredef.def on line 11
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #

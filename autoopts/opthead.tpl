@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+# $Id: opthead.tpl,v 4.2 2005/01/22 04:48:33 bkorb Exp $
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =]
@@ -242,8 +242,9 @@ ENDIF    have/don't have prefix
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+=][=
+(tpl-file-line extract-fmt)
 =]
-
 /* * * * * *
  *
  *  Declare the [=prog-name=] option descriptor.

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.2 2005/01/19 01:16:46 bkorb Exp $
+#$Id: optcode.tpl,v 4.3 2005/01/22 04:48:33 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -51,6 +51,7 @@ tSCC zCopyrightNotice[] =
 
   ESAC =][=
 
+(emit (def-file-line "copyright.text" extract-fmt))
 (kr-string tmp-text) =];[=
 
 ENDIF "copyright notes"
@@ -135,7 +136,7 @@ ENDIF   =]
  */
 static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 
-FOR flag "\n"       =][=
+FOR flag "\n"           =][=
 
   INVOKE option_descriptor =][=
 
@@ -143,7 +144,7 @@ ENDFOR flag
 
 =][=
 
-IF (exist? "version") =]
+IF (exist? "version")   =]
 
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
@@ -158,7 +159,8 @@ IF (exist? "version") =]
      /* option proc      */ [=(if make-test-main "DOVERPROC" "doVersion")=],
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
      /* disablement strs */ NULL, NULL },[=
-ENDIF=]
+
+ENDIF =]
 
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]HELP, [= (. VALUE-pfx) =]HELP,
@@ -189,6 +191,7 @@ ENDIF=]
      /* disablement strs */ NULL, NULL }[=
 
 IF (exist? "homerc")
+
 =],
 
   {  /* entry idx, value */ [=
@@ -218,7 +221,10 @@ IF (exist? "homerc")
      /* option proc      */ doLoadOpt,
      /* desc, NAME, name */ zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name,
      /* disablement strs */ zNotLoad_Opts_Name, zNotLoad_Opts_Pfx }[=
-ENDIF=]
+
+ENDIF
+
+=]
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -298,8 +304,9 @@ tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
 
 ELSE                    =]
 #define zFullVersion    NULL[=
-ENDIF                   =]
-
+ENDIF                   =][=
+(tpl-file-line extract-fmt)
+=]
 #if defined(ENABLE_NLS)
 # define OPTPROC_BASE OPTPROC_TRANSLATE
   static option_translation_proc_t translate_option_strings;
@@ -384,8 +391,9 @@ ELIF (exist? "main")               =][=
 
 ENDIF "test/guile main"
 
+=][=
+(tpl-file-line extract-fmt)
 =]
-
 #if ENABLE_NLS
 #include <string.h>
 #include <stdio.h>

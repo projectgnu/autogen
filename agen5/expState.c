@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.3 2005/01/17 01:12:08 bkorb Exp $
+ *  $Id: expState.c,v 4.4 2005/01/22 04:48:32 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -552,12 +552,19 @@ ag_scm_tpl_file( SCM full )
  *
  * doc:
  *
- *  Returns the file and line number of the current template macro using either
- *  the default format, "from %s line %d", or else the format you supply.
- *  For example, if you want to insert a "C" language file-line directive, you
- *  would supply the format "# %2$d \"%1$s\"".  With the current version of
- *  AutoGen, it is even safe to use the formatting string, "%2$d".  AutoGen
- *  uses an argument vector version of printf: @xref{snprintfv}.  =*/
+ *  Returns the file and line number of the current template macro using
+ *  either the default format, "from %s line %d", or else the format you
+ *  supply.  For example, if you want to insert a "C" language file-line
+ *  directive, you would supply the format "# %2$d \"%1$s\"", but that
+ *  is also already supplied with the scheme variable
+ *  @xref{SCM c-file-line-fmt}.  You may use it thus:
+ *  @example
+ *  (tpl-file-line c-file-line-fmt)
+ *  @end example
+ *
+ *  It is also safe to use the formatting string, "%2$d".  AutoGen uses
+ *  an argument vector version of printf: @xref{snprintfv}.
+=*/
 SCM
 ag_scm_tpl_file_line( SCM fmt )
 {
@@ -580,7 +587,7 @@ ag_scm_tpl_file_line( SCM fmt )
     {
         void* args[2];
         args[0] = (void*)pCurTemplate->pzFileName;
-        args[1] = (void*)pCurMacro->lineNo;
+        args[1] = (void*)(long)pCurMacro->lineNo;
         sprintfv( pz, pzFmt, (snv_constpointer*)args  );
     }
 
@@ -603,12 +610,20 @@ ag_scm_tpl_file_line( SCM fmt )
  *
  * doc:
  *
- *  Returns the file and line number of a AutoGen defined value, using either
- *  the default format, "from %s line %d", or else the format you supply.
- *  For example, if you want to insert a "C" language file-line directive, you
- *  would supply the format "# %2$d \"%1$s\"".  With the current version of
- *  AutoGen, it is even safe to use the formatting string, "%2$d".  AutoGen
- *  uses an argument vector version of printf: @xref{snprintfv}.  =*/
+ *  Returns the file and line number of a AutoGen defined value, using
+ *  either the default format, "from %s line %d", or else the format you
+ *  supply.  For example, if you want to insert a "C" language file-line
+ *  directive, you would supply the format "# %2$d \"%1$s\"", but that
+ *  is also already supplied with the scheme variable
+ *  @xref{SCM c-file-line-fmt}.  You may use it thus:
+ *
+ *  @example
+ *  (def-file-line "ag-def-name" c-file-line-fmt)
+ *  @end example
+ *
+ *  It is also safe to use the formatting string, "%2$d".  AutoGen uses
+ *  an argument vector version of printf: @xref{snprintfv}.
+=*/
 SCM
 ag_scm_def_file_line( SCM obj, SCM fmt )
 {
@@ -642,7 +657,7 @@ ag_scm_def_file_line( SCM obj, SCM fmt )
     {
         void* args[2];
         args[0] = (void*)pE->pzSrcFile;
-        args[1] = (void*)pE->srcLineNum;
+        args[1] = (void*)(long)pE->srcLineNum;
         sprintfv( pzScrib, pzFmt, (snv_constpointer*)args  );
     }
 

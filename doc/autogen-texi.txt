@@ -4464,7 +4464,7 @@ Replace the @samp{@@*} command with ".br"
 This document is produced by invoking the following command:
 
 @example
-AutoGen -L $@{prefix@}/share/autogen -T agman1.tpl options.def
+autogen -L $@{prefix@}/share/autogen -T agman1.tpl options.def
 @end example
 
 @noindent
@@ -4589,17 +4589,20 @@ You cannot automatically take advantage of environment variable options or
 rc (ini) files.
 
 @item
-You cannot use set membership, enumerated, range checked or stacked argument
-type options.  These all depend upon the @code{libopts} library.
+You cannot use set membership, enumerated, range checked or stacked
+argument type options.  In fact, you cannot use anything that depends
+upon the @code{libopts} library.  You are constrained to options that
+take ``@code{string}'' arguments, though you may handle the option
+argument with a callback procedure.
 
 @item
 You must specify every option as ``settable'' because the emitted code
 depends upon the @code{SET_OPT_XXX} macros having been defined.
 
 @item
-``test-main'' must be specified.  The @file{getopt.tpl} template depends
-upon being able to compile the traditional .c file into a program and
-get it to emit the usage text.
+You must specify a main procedure of type ``main''.  The
+@file{getopt.tpl} template depends upon being able to compile the
+traditional .c file into a program and get it to emit the usage text.
 
 @item
 For the same reason, the traditional option parsing table code must be
@@ -4609,13 +4612,25 @@ emitted @b{before} the @file{getopt.tpl} template gets expanded.
 The usage text is, therefore, statically defined.
 
 @item
-The code is fairly new.  I am sure that more can be done and that there are
-some glitches to be ironed out.  Likely all simple stuff, but as I do not
-use it for my own work, it likely isn't exercised quite as much as the rest...
+You must supply some compile and link options via environment variables.
+@table @samp
+@item srcdir
+In case the option definition file lives in a different directory.
+@item CFLAGS
+Any special flags required to compile.  This should minimally include
+the output from running the @code{autoopts-config cflags} script.
+@item LDFLAGS
+Any special flags required to link.  This should minimally include
+the output from running the @code{autoopts-config ldflags} script.
+@item CC
+Set this only if ``@code{cc}'' cannot be found in @code{$PATH}
+(or it is not the one you want).
+@end table
 @end enumerate
 
 @noindent
-To use this, simply invoke autogen twice, in the following order:
+To use this, set the exported environment variables and then invoke
+autogen twice, in the following order:
 
 @example
 autogen myprog-opts.def

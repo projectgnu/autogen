@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.2 2005/01/08 22:56:19 bkorb Exp $
+ *  $Id: expExtract.c,v 4.3 2005/01/22 04:48:32 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -242,7 +242,7 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * "@code{fname}" before AutoGen-eration begins.
  *
  * @table @strong
- * @item NOTE:
+ * @item NB:
  * You can set aside previously generated source files inside the pseudo
  * macro with a Guile/scheme function, extract the text you want to keep
  * with this extract function.  Just remember you should delete it at the

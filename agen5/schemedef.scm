@@ -135,6 +135,7 @@
 ) )
 
 (define autogen-version "AUTOGEN_VERSION")
+(define c-file-line-fmt "#line %2$d \"%1$s\"\n")
 
 (define-macro (defined-as predicate symbol)
   `(and (defined? ',symbol) (,predicate ,symbol)))

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.3 2005/01/19 01:16:46 bkorb Exp $
+# $Id: optmain.tpl,v 4.4 2005/01/22 04:48:33 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -14,6 +14,8 @@
 
 DEFINE build-guile-main
 
+=][=
+(tpl-file-line extract-fmt)
 =]
 int    original_argc;
 char** original_argv;
@@ -46,12 +48,15 @@ inner_main( int argc, char** argv )
          */
         memcpy( new_argv+1, argv + ct, argc * sizeof( char* ));
         argv = new_argv;
-    }
-[=
-  IF (> (len "guile-main") 0)  =]
+    }[=
+
+  IF (> (len "guile-main") 0)  =][=
+
+(def-file-line "copyright.text" extract-fmt) =]
 [= guile-main =]
     exit( EXIT_SUCCESS );[=
   ELSE  =]
+
     export_options_to_guile( &[=(. pname)=]Options );
     scm_shell( argc, argv );[=
   ENDIF =]
@@ -62,8 +67,9 @@ main( int    argc,
       char** argv )
 {[=
   (if (exist? "before-guile-boot")
-    (string-append
-       "\n"  (get "before-guile-boot") ) ) =]
+    (string-append (def-file-line "before-guile-boot" extract-fmt)
+       (get "before-guile-boot") ) )
+=]
     gh_enter( argc, argv, inner_main );
     /* NOT REACHED */
     return 0;
@@ -80,6 +86,8 @@ ENDDEF build-guile-main
 
 DEFINE build-test-main
 
+=][=
+(tpl-file-line extract-fmt)
 =]
 #if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
 
@@ -109,9 +117,12 @@ main( int argc, char** argv )
         argv += ct;
     }[=
     ELSE            =][=
+      (def-file-line "option-code" extract-fmt) =][=
       option-code   =][=
-    ENDIF           =]
-[= main-text        =][=
+    ENDIF           =][=
+
+  (def-file-line "main-text" extract-fmt) =][=
+  main-text         =][=
 
   ELSE=]
     (void)optionProcess( &[=(. pname)=]Options, argc, argv );[=
@@ -144,6 +155,8 @@ DEFINE each-or-stdin-main       =][=
 (if (not (exist? "handler-proc"))
   (error "'each-or-stdin' mains require a handler proc") )
 
+=][=
+(tpl-file-line extract-fmt)
 =]
 #include <stdio.h>
 #include <ctype.h>
@@ -151,13 +164,16 @@ DEFINE each-or-stdin-main       =][=
 #include <unistd.h>
 [=
 
-IF (exist? (string-append (get "handler-proc") "-code")) =]
+IF (set! tmp-text (string-append (get "handler-proc") "-code"))
+   (exist? tmp-text) =]
 
 static int
 [= handler-proc =]( FILE* in_fp, const char* pz_file )
 {
-    int res = 0;
-[= (get (string-append (get "handler-proc") "-code")) =]
+    int res = 0;[=
+   (string-append
+      (def-file-line tmp-text extract-fmt)
+      (get tmp-text) ) =]
     return res;
 }[=
 
@@ -168,6 +184,8 @@ static int
 extern int [= handler-proc =]( FILE*, const char* pz_file );[=
 
   ENDIF
+=][=
+(tpl-file-line extract-fmt)
 =]
 
 int
@@ -178,8 +196,13 @@ main( int argc, char** argv )
         int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
         argc -= ct;
         argv += ct;
-    }
-[= main-init =]
+    }[=
+
+    (def-file-line "main-init" extract-fmt) =][=
+    main-init =][=
+    (tpl-file-line extract-fmt)
+
+=]
     /*
      *  Input list from command line
      */
@@ -233,6 +256,8 @@ DEFINE for-each-main            =][=
   (if (not (exist? "handler-proc"))
       (error "'for-each' mains require a handler proc") )
 
+=][=
+(tpl-file-line extract-fmt)
 =]
 #include <stdio.h>
 #include <ctype.h>
@@ -256,13 +281,16 @@ trim_input_line( char* pz_s )
     }
 }[=
 
-IF (exist? (string-append (get "handler-proc") "-code")) =]
+IF (set! tmp-text (string-append (get "handler-proc") "-code"))
+   (exist? tmp-text) =]
 
 static int
 [= handler-proc =]( const char* pz_entry )
 {
-    int res = 0;
-[= (get (string-append (get "handler-proc") "-code")) =]
+    int res = 0;[=
+   (string-append
+      (def-file-line tmp-text extract-fmt)
+      (get tmp-text) ) =]
     return res;
 }[=
 
@@ -273,6 +301,8 @@ static int
 extern int [= handler-proc =]( const char* );[=
 
   ENDIF
+=][=
+(tpl-file-line extract-fmt)
 =]
 
 int
@@ -283,8 +313,13 @@ main( int argc, char** argv )
         int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
         argc -= ct;
         argv += ct;
-    }
-[= main-init =]
+    }[=
+
+    (def-file-line "main-init" extract-fmt) =][=
+    main-init =][=
+    (tpl-file-line extract-fmt)
+
+=]
     /*
      *  Input list from command line
      */
@@ -474,6 +509,8 @@ DEFINE declare-option-callbacks
 
   IF (. make-test-main)
 
+=][=
+(tpl-file-line extract-fmt)
 =]
 #if defined([=(. main-guard)=])
 /*
@@ -618,9 +655,8 @@ DEFINE range-option-code
 (if (not (=* (get "arg-type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
 
-=]
-    static const struct {const int rmin, rmax;} rng[ [=(count "arg-range")
-=] ] = {
+=]    static const struct {const int rmin, rmax;} rng[ [=
+      (count "arg-range")  =] ] = {
 [=(out-push-new)      =][=
   FOR arg-range ",\n" =][=
     CASE arg-range    =][=

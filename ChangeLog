@@ -1,3 +1,12 @@
+2004-01-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c(ag_scm_tpl_file_line): fix warning for 64 bits
+	(ag_scm_def_file_line): ditto
+	* agen5/schemedef.scm(c-file-line-fmt): new Scheme value
+	* agen5/test/heredef.test: tweak test
+	* agen5/test/opts.test: ditto
+	* autoopts/opt*.tpl: add tpl-file-line functions here and there.
+
 2004-01-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/opt*.tpl: Remove all the #line stuff.  Bad idea for AutoOpts.

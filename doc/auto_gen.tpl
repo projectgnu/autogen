@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.2 2005/01/22 04:48:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -240,6 +240,7 @@ FOR gfunc =][=
 ENDFOR gfunc =]
 * SCM make-header-guard::   @file{make-header-guard} - protect a header file
 * SCM autogen-version::     @file{autogen-version} - ``[= version =]''
+* SCM c-file-line-fmt::     format file info as, ``@code{#line nn "file"}''
 @end menu
 
 [=
@@ -266,13 +267,13 @@ Arguments:[=
 [=arg_name=] - [=
     arg_optional "Optional - " =][=
         IF (exist? "arg_desc") =][=arg_desc=][=
-        ELSE=]Undocumented[=
-        ENDIF=][=
+        ELSE        =]Undocumented[=
+        ENDIF       =][=
       ENDFOR exparg =][=
     ELSE
     =]
 This Scheme function takes no arguments.[=
-    ENDIF =][=
+    ENDIF           =][=
   ENDIF general_use =][=
 ENDFOR gfunc
 =]
@@ -286,10 +287,10 @@ Generated [= (tpl-file-line) =].
 @findex header-file
 @findex header-guard
 
-Emit a @code{#ifndef}/@code{#define} sequence based upon the output
-file name and the provided prefix.  It will also define a scheme
-variables named, @code{header-file} and @code{header-guard}.
-The @code{#define} name is composed as follows:
+Emit a @code{#ifndef}/@code{#define} sequence based upon the output file
+name and the provided prefix.  It will also define a scheme variable
+named, @code{header-file} and @code{header-guard}.  The @code{#define}
+name is composed as follows:
 
 @enumerate
 @item
@@ -336,6 +337,14 @@ This is a symbol defining the current AutoGen version number string.
 It was first defined in AutoGen-5.2.14.
 It is currently ``[= version =]''.
 
+@node SCM c-file-line-fmt
+@subsection format file info as, ``@code{#line nn "file"}''
+@findex c-file-line-fmt
+
+This is a symbol that can easily be used with the functions
+@xref{SCM tpl-file-line}, and @xref{SCM def-file-line}.
+These will emit C program @code{#line} directives pointing to template
+and definitions text, respectively.
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
