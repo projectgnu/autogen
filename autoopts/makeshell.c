@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.4 1998/10/02 17:19:16 bkorb Exp $
+ *  $Id: makeshell.c,v 2.5 1998/10/02 17:21:24 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -112,7 +112,7 @@ static const char zLoopCase[] =
      /*
       *  'arg' may or may not match the current $1
       */
-"    case ${arg} in\n"
+"    case \"${arg}\" in\n"
 "    -- )\n"
 "         doingargs=false\n"
 "         shift\n"
@@ -136,7 +136,7 @@ static const char zLongOpt[] =
 "             OPT_ARG_VAL=`echo \"${optname}\"|sed 's/^[^=]*=//'`\n"
 "             optname=`echo \"${optname}\"|sed 's/=.*$//'` ;; esac\n\n"
 "         decipher_long_opt ${optname}\n\n"
-"         case ${OPT_ARG} in\n"
+"         case \"${OPT_ARG}\" in\n"
 "         NO )\n"
 "             OPT_ARG_VAL=''\n"
 "             ;;\n\n"
@@ -169,7 +169,7 @@ static const char zFlagOpt[] =
 "         flag=`echo \"${arg}\" | sed 's/-\\(.\\).*/\\1/'`\n"
 "         arg=` echo \"${arg}\" | sed 's/-.//'`\n\n"
 "         decipher_flag_opt \"$flag\"\n\n"
-"         case ${OPT_ARG} in\n"
+"         case \"${OPT_ARG}\" in\n"
 "         NO )\n"
 "             if [ -n \"${arg}\" ]\n"
 "             then\n"
@@ -508,7 +508,7 @@ emitLong( tOptions* pOpts )
     int       optionCt = pOpts->optCt;
 
     fputs( "\ndecipher_long_opt()\n{\n"
-           "    case $1 in\n", stdout );
+           "    case \"$1\" in\n", stdout );
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
         tOptDesc* pOD = pOpts->pOptDesc;
