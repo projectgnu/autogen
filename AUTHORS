@@ -1,12 +1,12 @@
 Original authors are also attributed in each source file...
 
 Bruce Korb:
-src/*[ch], getdefs/*.[ch] and autoopts/*.[chtd]*
-tests/opts.test, tests/stress.test and tests/stress.def
-rehacked compat/pathfind.c to be SVR4 compatible.
-reworked compat/strsignal to use a shell script to extract the local
-information and generate a static version.  (It uses autogen,
-so a generated version must be distributed also. :)
+
+src/*, getdefs/*, autoopts/*, columns/*, tests/opts.test,
+tests/stress.test and tests/stress.def rehacked compat/pathfind.c to
+be SVR4 compatible.  reworked compat/strsignal to use a shell script
+to extract the local information and generate a static version.  (It
+uses autogen, so a generated version must be distributed also. :)
 
 Bruce Korb and Gary V. Vaughan:
 In the directory config, regcomp.m4 and bootstrap.
