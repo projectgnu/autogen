@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.25 2000/02/13 19:50:12 bruce Exp $
+#$Id: optcode.tpl,v 2.26 2000/03/12 00:46:52 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -477,7 +477,8 @@ IF (exist? "test_main") =][=
     int
 main( int argc, char** argv )
 {[=
-IF test_main _get putShellParse = TEST_MAIN _env putShellParse = | =]
+
+  IF (= (get "test_main") "putShellParse") =]
     extern tOptions  genshelloptOptions;
     extern void      putShellParse( tOptions* );
     extern tOptions* pShellParseOptions;
@@ -492,7 +493,7 @@ IF test_main _get putShellParse = TEST_MAIN _env putShellParse = | =]
 
 ELSE=]
     (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
-  IF test_main _len 3 > =]
+  IF (> (string-length (get "test_main")) 3) =]
     {
         void [=test_main=]( tOptions* );
         [=test_main=]( &[=prog_name=]Options );
