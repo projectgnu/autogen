@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.23 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: funcCase.c,v 1.24 2000/11/02 00:47:56 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -924,7 +924,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *
  *  These case selection codes have also been implemented as
  *  Scheme expression functions using the same codes
- *  (@xref{Scheme Functions}).
+ *  (@xref{Common Functions}).
 =*/
 /*=macfunc ESAC
  *

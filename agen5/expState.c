@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.24 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: expState.c,v 1.25 2000/11/02 00:47:56 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -454,7 +454,8 @@ ag_scm_exist_p( SCM obj )
  *
  * exparg: ag-name, name of AutoGen function
  *
- * doc:  return SCM_BOOL_T iff a specified name has an AutoGen function.
+ * doc:  return SCM_BOOL_T if a specified name is an AutoGen function,
+ *       otherwise return SCM_BOOL_F.
 =*/
     SCM
 ag_scm_ag_function_p( SCM obj )

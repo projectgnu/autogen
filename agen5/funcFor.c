@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.17 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: funcFor.c,v 1.18 2000/11/02 00:47:56 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -149,11 +149,13 @@ ag_scm_for_by( SCM by )
 /*=gfunc for_sep
  *
  * what:   set loop separation string
- * exparg: separator, the text to insert between each AutoGen FOR iteration
+ * exparg: separator, the text to insert between the output of
+ *         each FOR iteration
  *
  * doc:
- *  This function records the separation string that gets inserted between
- *  each iteration of an AutoGen FOR function.  @xref{FOR}.
+ *  This function records the separation string that is to be inserted
+ *  between each iteration of an AutoGen FOR function.  This is often
+ *  nothing more than a comma.  @xref{FOR}.
 =*/
     SCM
 ag_scm_for_sep( SCM obj )
@@ -414,7 +416,7 @@ doForEach( tTemplate*   pT,
  *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
  *  it is presumed to be a Scheme expression containing the FOR macro
  *  specific functions @code{for-from}, @code{for-by}, @code{for-to},
- *  and/or @code{for-sep}.  @xref{Scheme Functions}.  Otherwise, the
+ *  and/or @code{for-sep}.  @xref{AutoGen Functions}.  Otherwise, the
  *  remaining text is presumed to be a string for inserting between
  *  each iteration of the loop.  This string will be emitted one time
  *  less than the number of iterations of the loop.  That is, it is
