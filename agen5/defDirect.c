@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.6 2002/01/29 03:05:54 bkorb Exp $
+ *  $Id: defDirect.c,v 3.7 2002/07/07 18:34:14 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -701,6 +701,24 @@ doDir_line( char* pzArg, char* pzScan )
     AGFREE( (void*)pCurCtx->pzFileName );
     AGDUPSTR( pCurCtx->pzFileName, pzArg, "line directive file name" );
 
+    return pzScan;
+}
+
+
+/*=directive option
+ *
+ *  arg:  opt-name [ <text> ]
+ *
+ *  text:
+ *  This directive will pass the option name and associated text
+ *  to the AutoOpts optionLoadLine routine.  The option text may
+ *  span multiple lines by continuing them with a backslash.  The
+ *  backslash/newline pair will be replaced with two space characters.
+=*/
+STATIC char*
+doDir_option( char* pzArg, char* pzScan )
+{
+    optionLoadLine( &autogenOptions, pzArg );
     return pzScan;
 }
 

@@ -1,3 +1,9 @@
+2002-07-07  Bruce Korb  <bkorb@gnu.org>
+
+	agen5/defDirect.c(doDir_option): new procedure to allow embedded options
+	in definitions files.
+	agen5/expState.c(ag_scm_set_option): similar for template files
+
 2002-06-27  Bruce Korb  <bkorb@gnu.org>
 
 	* xml2ag/xml2ag.c: add casts to avoid warnings.

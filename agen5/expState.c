@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.5 2002/05/02 03:35:38 bkorb Exp $
+ *  $Id: expState.c,v 3.6 2002/07/07 18:34:14 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -447,6 +447,23 @@ ag_scm_low_lim( SCM obj )
         return gh_int2scm( 0 );
 
     return gh_int2scm( pE->index );
+}
+
+
+/*=gfunc set_option
+ *
+ * what:  Set a command line option
+ *
+ * exparg: opt, AutoGen option name + its argument
+ *
+ * doc:   The text argument must be an option name followed by any needed
+ *        option argument.  Returns SCM_UNDEFINED.
+=*/
+    SCM
+ag_scm_set_option( SCM opt )
+{
+    optionLoadLine( &autogenOptions, ag_scm2zchars( opt, "opt + arg" ));
+    return SCM_UNDEFINED;
 }
 
 

@@ -14,14 +14,6 @@
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
 
-** How about writing a function, (set-cl-option "text")
-   grep for ``/\*=gfunc [a-z]'' in the sources for an example
-   of how to do that.  THEN:
-   
-      [= AutoGen5 Template
-         (set-cl-option "<option-description>")
-      =]
-
 *  Possibilities for the (distant) future:
 
 ** implement [= FOR x IN a, b, c, ... =]
