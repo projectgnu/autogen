@@ -35,12 +35,13 @@ cp -f COPYING        \
 cd ../compat
 cp *.h pathfind.c ../pkg/${tag}/compat/.
 
-cd ../pkg
-files=`cd ${tag} ; ls -1 *.[ch] | \
+cd ../pkg/${tag}
+
+files=`ls -1 *.[ch] | \
 	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\'
 	`
 
-cat > ${tag}/Makefile.am <<-	EOMakefile
+cat > Makefile.am <<-	EOMakefile
 
 	MAINTAINERCLEANFILES = Makefile.in
 	INCLUDES = @INCLIST@
@@ -50,5 +51,7 @@ cat > ${tag}/Makefile.am <<-	EOMakefile
 	libopts_la_SOURCES = \$(SRC)
 	EOMakefile
 
-tar cvf - ${tag} | gzip --best > ${top_builddir}/autoopts/${tag}.tar.gz
+cp ../libopts/* ${tag}/.
+
+tar cvf - ${tag} | gzip --best > ${top_builddir}/${tag}.tar.gz
 rm -rf ${tag}
