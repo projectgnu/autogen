@@ -1,4 +1,55 @@
-1999-05-22  Gary V. Vaughan  <gary@oranda.goldfish>
+1999-06-12  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* README (HP/UX): some helpful comments for the hapless HP/UX
+	user.
+
+	* NOTES (sprintf, vsprintf): No longer relevant with the advent of
+	snprintfv.
+
+	* doc/auto_gen.tpl (Definitions): Fixed @xref which ended with
+	illegal `)'.
+	* autoopts/opthead.tpl (START_OPT): ditto.
+
+	* config/libregex.m4 (--with-included-regex): New configure
+	option to use GNU regex included in AutoGen distribution.
+	(WITH_INCLUDED_REGEX): New config.h define if
+	--with-included-regex was passed to configure.
+	* README (--with-included-regex): added comments.
+	* autoopts/stack.c: Use the HAVE_CONFIG_H wrapper for config.h.
+	Use the WITH_INCLUDED_REGEX define to choose between the included
+	regex or the system header.
+	* src/agFunCase.c: Use the HAVE_CONFIG_H wrapper for config.h.
+	Use the WITH_INCLUDED_REGEX define to choose between the included
+	regex or the system header.
+	* src/agFunEval.c: Use the HAVE_CONFIG_H wrapper for config.h.
+	Use the WITH_INCLUDED_REGEX define to choose between the included
+	regex or the system header.
+	* getdefs/getdefs.h: This _header_ doesn't require the regex.h
+	header.
+	* getdefs/getdefs.c: Use the HAVE_CONFIG_H wrapper for config.h.
+	Use the WITH_INCLUDED_REGEX define to choose between the included
+	regex or the system header.
+	* src/autogen.c: Don't hardwire gnu-regex.c in here...
+	* autoopts/stack.c: ...hardwire it here instead.
+
+	* compat/Makefile.am (EXTRA_DIST): removed COMPAT_SRC hack, and
+	list EXTRA_DIST files manually.
+	* configure.in (COMPAT_SRC): removed.
+
+	* VERSION (AG_PATCHLEVEL): bumped to .5.
+
+	* Makefile.am (SUBDIRS): reordered to build snprintfv first (so
+	that it's objects can be included in libopts.
+
+	* configure.in (ac_configue_args): removed --disable-opts-test
+	option now that snprintfv no longer depends on autoopts.
+	(AUTOOPTS_CONFIG): removed for similar reasons.
+	(AC_LIBTOOL_WIN32_DLL): reinserted for compatibility with
+	libtool-1.3.2 cygwin dll building support.
+
+	* src/autogen.c (main): initialise snprintfv's memory management.
+
+	1999-05-22  Gary V. Vaughan  <gary@oranda.goldfish>
 	
 	* src/Makefile.am: include MakeRules.in.
 	delete YFLAGS definition duplicated from MakeRules.in.

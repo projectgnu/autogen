@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Sat May 22 00:18:33 1999				
-dnl            by:    Gary V. Vaughan <gary@oranda.goldfish>		
+dnl Last Modified:    Mon Jun 14 10:39:25 1999				      
+dnl            by:    Bruce Korb <korb@datadesign.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.11 1999/06/03 19:43:28 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.12 1999/06/14 18:07:55 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.11 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.12 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -40,8 +40,7 @@ AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,[Define this to the autoopts revisio
 # Set up the environment to configure the snprintv subpackage using
 # this version of AutoGen (as opposed to any installed version).
 # ----------------------------------------------------------------------
-ac_configure_args="$ac_configure_args --disable-opts-test"
-dnl until libtool-1.4 is realeased to handle interlibrary dependencies
+dnl until libtool-1.4 is released to handle interlibrary dependencies
 dnl with respect to uninstalled libraries we need to build snprintfv
 dnl static only:
 ac_configure_args="$ac_configure_args --disable-shared"
@@ -51,8 +50,6 @@ if test x$ag_srcdir != x && test -d $ag_srcdir; then
 else
   ag_srcdir=..
 fi
-AUTOOPTS_CONFIG="/bin/sh `pwd`/autoopts/autoopts-config --top_builddir=`pwd` --top_srcdir=$ag_srcdir"
-export AUTOOPTS_CONFIG
 AC_CONFIG_SUBDIRS(snprintfv)
 
 # ----------------------------------------------------------------------
@@ -70,6 +67,7 @@ unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 # ----------------------------------------------------------------------
 AC_PROG_CC
 AC_EXEEXT
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 AG_PROG_BYACC
@@ -162,8 +160,6 @@ test -f ./snprintfv/snprintfv/snprintfv.h \
   && rm -f ./snprintfv/snprintfv.h \
   && ln -s `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
 
-[COMPAT_SRC=`cd $srcdir/compat ; echo [a-z]*[!~]`]
-AC_SUBST(COMPAT_SRC)
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
 AC_SUBST(M4_SRC)
 [AGFUN_LIST=`cd $srcdir/src ; echo agFun*.c`]

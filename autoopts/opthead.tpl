@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.12 1999/06/09 16:59:01 bkorb Exp $
+#$Id: opthead.tpl,v 2.13 1999/06/14 18:07:55 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -859,7 +859,7 @@ _ENDIF=][=#
  *
  *  description:
  *
- *  This is just a shortcut for RESTART_OPT(1) (@xref{RESTART_OPT}).
+ *  This is just a shortcut for RESTART_OPT(1) (@xref{RESTART_OPT}.)
 =*/
 =]
 #define    START_[=prefix _up #_ +=]OPT    RESTART_[=prefix _up #_ +
