@@ -9,12 +9,12 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.8 2000/04/04 13:20:47 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.9 2000/04/04 13:25:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
-if [ "$1" = "-CVS" ]
-then update_cvs=false
-else update_cvs=true ; fi
+if [ "$1" = "+CVS" ]
+then update_cvs=true
+else update_cvs=false; fi
 
 exec 5> temp.config
 
