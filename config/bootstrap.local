@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Fri Jul 30 13:30:45 1999				      
-#            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>		      
+# Last Modified:     Fri Jul 30 08:02:46 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.10 1999/07/30 14:48:46 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.11 1999/07/30 15:02:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -45,7 +45,7 @@ pre )
     fi
     export byacc
 
-    if ( echo $@ | egrep -i debug ) >/dev/null 2>&1
+    if echo $@ | egrep -i debug >/dev/null 2>&1
     then DEBUG_OPTS="-DDEBUG=1" ; export DEBUG_OPTS ; fi
 
     ;;
