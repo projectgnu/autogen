@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.22 1999/11/30 02:27:18 bruce Exp $
+ *  $Id: makeshell.c,v 2.23 2000/03/11 19:23:07 bruce Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -397,7 +397,7 @@ putShellParse( tOptions* pOpts )
         pzShell = OPT_ARG( SHELL );
 
     else if (! ENABLED_OPT( SHELL ))
-	pzShell = (char*)NULL;
+        pzShell = (char*)NULL;
 
     else if ((pzShell = getenv( "SHELL" )),
              pzShell == (char*)NULL)
