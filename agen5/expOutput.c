@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.3 1999/10/31 19:03:51 bruce Exp $
+ *  $Id: expOutput.c,v 1.4 1999/10/31 19:44:55 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -121,8 +121,7 @@ ag_scm_out_move( SCM new_file )
  * doc:  
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
- *  if there has not been a @code{push}.  The file name argument may be
- *  omitted and is ignored.
+ *  if there has not been a @code{push}.
 =*/
     SCM
 ag_scm_out_pop( void )

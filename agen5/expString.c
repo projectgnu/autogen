@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.4 1999/10/31 19:08:16 bruce Exp $
+ *  $Id: expString.c,v 1.5 1999/10/31 19:44:48 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -173,7 +173,7 @@ makeString( tCC*    pzText,
  *
  * opt:  1
  * doc:  Return SCM_BOOL_T if the first argument is duplicated
- *      in the second (list) argument.
+ *      in one of the entries in the second (list) argument.
 =*/
     SCM
 ag_scm_in_p( SCM obj, SCM list )
@@ -437,7 +437,7 @@ ag_scm_raw_shell_str( SCM obj )
  *  Convert the text of the string into a double quoted string
  *  that a normal shell will process into the original string.
  *  (Before doing macro expansion, that is.)
- *  The escaped characters are @code{\\} and @code{"}.
+ *  The escaped characters are the backslash and double quote @code{"}.
  *  All others are copied directly into the output.
 =*/
     SCM
@@ -569,7 +569,7 @@ ag_scm_c_string( SCM str )
  *
  *  exparg:  source, string to transform
  *  exparg:  match,  characters to be converted
- *  exparg:  translation, result characters
+ *  exparg:  translation, conversion list
  *
  *  req:  3
  *
