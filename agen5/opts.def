@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.18 2000/03/19 00:32:23 bruce Exp $
+ *   $Id: opts.def,v 1.19 2000/03/19 00:36:12 bruce Exp $
  */
 
 /*
@@ -52,7 +52,8 @@ version = `
         echo $AG_VERSION
     fi`;
 
-explain = "Create a text file from a template using external definitions.";
+explain =
+"AutoGen creates text files from templates using external definitions.";
 
 detail =
 
