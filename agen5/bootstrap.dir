@@ -184,7 +184,7 @@ do
     date > stamp-directive
     ;;
 
-  autogen.info | autogen.menu )
+  autogen.texi | autogen.menu )
     # Construct the info doc
     #
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
