@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.16 2000/08/13 21:20:24 bkorb Exp $
+ *  $Id: funcFor.c,v 1.17 2000/09/29 02:31:21 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -224,7 +224,6 @@ doForByStep( tTemplate* pT,
              tDefEntry* pFoundDef,
              tDefEntry* pCurDef )
 {
-    int         settings = 0;
     int         loopCt   = 0;
     tDefEntry   textDef;
     tDefEntry*  pPassDef;
@@ -268,7 +267,7 @@ doForByStep( tTemplate* pT,
             fprintf( stderr, zTplErr, pT->pzTplName, pMac->lineNo,
                      "Too many FOR iterations" );
             fprintf( stderr, "\texiting FOR %s from %d to %d "
-                     "by %d:\n\tmore than %d iterations\n",
+                     "by %d:\n\tmore than %ld iterations\n",
                      pT->pzTemplText + pMac->ozText,
                      forInfo.for_from, forInfo.for_to, forInfo.for_by,
                      OPT_VALUE_LOOP_LIMIT );
@@ -599,4 +598,8 @@ MAKE_LOAD_PROC( For )
     papLoadProc = papLP;
     return pEndMac;
 }
-/* end of funcFor.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of funcFor.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.12 2000/09/28 04:16:47 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.13 2000/09/29 02:31:21 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -416,8 +416,6 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
     EXPORT void
 mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
-    void*        pDataMap;
-    int          fd;
     static char  zRealFile[ MAXPATHLEN ];
 
     /*

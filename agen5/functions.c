@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.15 2000/08/13 21:20:24 bkorb Exp $
+ *  $Id: functions.c,v 1.16 2000/09/29 02:31:20 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -31,7 +31,6 @@
 
 #include "autogen.h"
 
-#include <streqv.h>
 #include <guile/gh.h>
 
 

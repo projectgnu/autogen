@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.27 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: expFormat.c,v 1.28 2000/09/29 02:31:21 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -195,7 +195,7 @@ ag_scm_dne( SCM prefix, SCM first )
         strftime( zScribble+128, 128, "%A %B %e, %Y at %r %Z", pTime );
     }
 
-    pzRes = asprintf( zDne, zScribble, pCurFp->pzName, zScribble+128,
+    pzRes = asprintf( zDne, zScribble, pCurFp->pzOutName, zScribble+128,
                       OPT_ARG( DEFINITIONS ), pzTemplFileName, pzFirst );
 
     if (pzRes == (char*)NULL) {
@@ -204,6 +204,11 @@ ag_scm_dne( SCM prefix, SCM first )
     }
 
     res = gh_str02scm( pzRes );
+
+    /*
+     *  Deallocate any temporary buffers.  pzFirst either points to
+     *  the zNil string, or to an allocated buffer.
+     */
     AGFREE( (void*)pzRes );
     if (pzFirst != zNil)
         AGFREE( (void*)pzFirst );
@@ -260,7 +265,7 @@ ag_scm_error( SCM res )
         long val = gh_scm2long( res );
         if (val == 0)
             abort = PROBLEM;
-        snprintf( zNum, sizeof( zNum ), "%d", val );
+        snprintf( zNum, sizeof( zNum ), "%ld", val );
         pzMsg = zNum;
         break;
     }
@@ -300,7 +305,7 @@ ag_scm_error( SCM res )
     if (*pzMsg != '\0')
         fprintf( stderr, zFmt, (abort != PROBLEM) ? zErr : zWarn,
                  pCurTemplate->pzFileName, pCurMacro->lineNo,
-                 pCurFp->pzName, pzMsg );
+                 pCurFp->pzOutName, pzMsg );
     longjmp( fileAbort, abort );
     /* NOTREACHED */
     return SCM_UNDEFINED;
@@ -644,7 +649,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         int     pfx_size = strlen( pzPfx );
         char*   pzScan   = pzRes;
         char*   pzOut;
-        size_t  out_size = pfx_size + 1;
+        size_t  out_size = pfx_size;
 
         /*
          *  Figure out how much space we need (text size plus
@@ -696,4 +701,8 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 
     return res;
 }
-/* end of expFormat.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expFormat.c */

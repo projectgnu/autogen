@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.14 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: expGuile.c,v 1.15 2000/09/29 02:31:20 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -133,7 +133,6 @@ ag_scm_max( SCM list )
         max_val = MAX( max_val, val );
     }
 
-#   undef MAX
     return gh_long2scm( max_val );
 }
 
@@ -200,7 +199,6 @@ ag_scm_min( SCM list )
         min_val = MIN( min_val, val );
     }
 
-#   undef MIN
     return gh_long2scm( min_val );
 }
 
@@ -435,4 +433,8 @@ ag_scm_string_downcase( SCM str )
     ag_scm_string_downcase_x( res );
     return res;
 }
-/* end of expGuile.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expGuile.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.8 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.9 2000/09/29 02:31:20 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -31,7 +31,6 @@
 #include <fcntl.h>
 
 #include "autogen.h"
-#include <streqv.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.22 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: funcCase.c,v 1.23 2000/09/29 02:31:20 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -981,7 +981,6 @@ MAKE_HANDLER_PROC( Case )
     };
 
     tMacro*   pEnd = pT->aMacros + pMac->endIndex;
-    tSCC zLinFmt[] = "\tfrom %s line %d\n";
     ag_bool needFree;
     char* pzSampleText = evalExpression( &needFree );
 
@@ -1060,7 +1059,7 @@ struct case_stack {
 };
 
 STATIC tCaseStack  current_case;
-STATIC tLoadProc mLoad_Select, mLoad_Esac;
+STATIC tLoadProc mLoad_Select;
 
 static tpLoadProc apCaseLoad[ FUNC_CT ]   = { (tpLoadProc)NULL };
 static tpLoadProc apSelectOnly[ FUNC_CT ] = { (tpLoadProc)NULL };
@@ -1073,15 +1072,8 @@ static tpLoadProc apSelectOnly[ FUNC_CT ] = { (tpLoadProc)NULL };
  */
 MAKE_LOAD_PROC( Case )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
-    int            maxTkn;
-    char**         ppzStack;
+    size_t         srcLen     = (size_t)pMac->res;   /* macro len  */
     tCaseStack     save_stack = current_case;
-
     tMacro*        pEsacMac;
 
     /*
@@ -1195,7 +1187,6 @@ MAKE_LOAD_PROC( Select )
     long           srcLen = pMac->res;           /* macro len  */
 
     tSCC zInvSel[] = "Invalid selection clause";
-    char** pp;
     teFuncType typ = FTYP_SELECT_COMPARE_FULL;
 
     /*
@@ -1313,4 +1304,8 @@ MAKE_LOAD_PROC( Select )
 
     return pMac + 1;
 }
-/* end of funcCase.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of funcCase.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.27 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: funcEval.c,v 1.28 2000/09/29 02:31:21 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -79,7 +79,8 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY
-        snprintf( z, sizeof(z), "** Procedure 0x%08X **", SCM_SUBR_ENTRY(s) );
+        snprintf( z, sizeof(z), "** Procedure 0x%08lX **",
+                  SCM_SUBR_ENTRY(s) );
 #else
         pzRes = "** PROCEDURE **";
 #endif
@@ -276,8 +277,6 @@ evalExpression( ag_bool* pMustFree )
     SCM 
 ag_scm_error_source_line( void )
 {
-    SCM port = scm_current_error_port();
-
     fprintf( stderr, "\nin %s line %d:  %s\n", pCurTemplate->pzTplName,
              pCurMacro->lineNo,
              pCurTemplate->pzTemplText + pCurMacro->ozText );
@@ -517,4 +516,8 @@ MAKE_LOAD_PROC( Expr )
     pT->pNext = pzCopy;
     return pMac + 1;
 }
-/* end of funcEval.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of funcEval.c */

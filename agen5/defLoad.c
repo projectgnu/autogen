@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.10 2000/09/28 04:16:47 bkorb Exp $
+ *  $Id: defLoad.c,v 1.11 2000/09/29 02:31:20 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <streqv.h>
-
 #include "autogen.h"
 
 STATIC int compareIndex( const void* p1, const void* p2 );
@@ -42,7 +39,7 @@ compareIndex( const void* p1, const void* p2 )
     int  res = pE1->index - pE2->index;
     if (res == 0) {
         fprintf( stderr, "ERROR: two %s entries have index %ld\n",
-                 pE1->pzName, pE1->index );
+                 pE1->pzDefName, pE1->index );
         AG_ABEND;
     }
     return res;
@@ -139,7 +136,6 @@ fixTwins( tDefEntry** ppNode )
 massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
 {
     static int lvl = 0;
-    char zFmt[ 64 ];
     tDefEntry*  pNode;
     tDefEntry*  pEldestSib = *ppNode;
 
@@ -193,7 +189,7 @@ massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
     skipTwinFix:
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
         if (HAVE_OPT(SHOW_DEFS))
-            printf( zFmt, pNode->index, pNode->pzName );
+            printf( zFmt, pNode->index, pNode->pzDefName );
 #endif
         pNode->pDad = pEldestUncle;
 
@@ -283,8 +279,9 @@ readDefines( void )
      *  Start our definitions tree with a magical root
      */
     memset( (void*)&rootEntry, 0, sizeof( rootEntry ));
-    rootEntry.pzName  = "@@ROOT@@";
+    rootEntry.pzDefName = "@@ROOT@@";
     rootEntry.valType = VALTYP_BLOCK;
+
     if (! ENABLED_OPT( DEFINITIONS )) {
         pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "scan context" );
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));

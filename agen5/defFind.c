@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.9 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: defFind.c,v 1.10 2000/09/29 02:31:20 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <streqv.h>
-
 #include "autogen.h"
 #include "assert.h"
 
@@ -390,7 +387,7 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp( pE->pzName, pzName ) == 0)
+            if (strcmp( pE->pzDefName, pzName ) == 0)
                 goto label_defEntryFound;
 
             pE = pE->pNext;
@@ -562,7 +559,7 @@ findEntryList( char* pzName, tDefEntry* pDefs )
              *  IF the name matches
              *  THEN go add it, plus all its twins
              */
-            if (strcmp( pE->pzName, pzName ) == 0)
+            if (strcmp( pE->pzDefName, pzName ) == 0)
                 goto label_defEntryFound;
 
             pE = pE->pNext;

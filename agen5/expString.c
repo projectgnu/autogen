@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.23 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: expString.c,v 1.24 2000/09/29 02:31:21 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -806,10 +806,14 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 
         pzTo = SCM_CHARS( str );
         while (*pzTo != NUL) {
-            *pzTo = map[ *pzTo ];
+            *pzTo = map[ (int)*pzTo ];
             pzTo++;
         }
     }
     return str;
 }
-/* end of expString.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expString.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.14 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: expPrint.c,v 1.15 2000/09/29 02:31:20 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -56,8 +56,8 @@ printFault( int sig )
     STATIC size_t
 safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
 {
-    tSCC zOvfloFmt[] = "%s ERROR:  formating error with:\n\t`%s'\n";
     tSCC zBadArgs[]  = "Bad args to sprintf";
+    tSCC zBadFmt[]   = "%s ERROR:  %s processing printf format:\n\t%s\n";
 
     size_t printSize;
     int    faultType;
@@ -87,9 +87,7 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
          *  THEN perform that fprintf
          */
         if (sigsetjmp( printJumpEnv, 0 ) == 0)
-            fprintf( stderr, "%s ERROR:  %s processing printf format:\n"
-                     "\t%s\n", pzProg,
-                     strsignal( faultType ), pzFmt );
+            fprintf( stderr, zBadFmt, pzProg, strsignal( faultType ), pzFmt );
 
         /*
          *  The "sprintfv" command below faulted, so we exit
@@ -285,7 +283,6 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 {
     SCM   res;
     int   list_len = scm_ilength( alist );
-    char* pzFmt;
     int   len;
 
     if (! gh_string_p( fmt ))
@@ -299,4 +296,8 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 
     return  scm_display( res, port );
 }
-/* end of expPrint.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expPrint.c */

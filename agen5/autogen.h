@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.16 2000/09/28 04:12:13 bkorb Exp $
+ *  $Id: autogen.h,v 1.17 2000/09/29 02:31:21 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -27,7 +27,9 @@
 #ifndef AUTOGEN_HDR_H
 #define AUTOGEN_HDR_H
 
+#include "compat/compat.h"
 #include "agUtils.h"
+#include "streqv.h"
 
 typedef enum {
     PROC_STATE_INIT,       /* set up `atexit' and load Guile   */
@@ -183,7 +185,7 @@ struct defEntry {
     tDefEntry* pTwin;        /* next member with same name */
     tDefEntry* pPrevTwin;    /* previous memb. of parent   */
     tDefEntry* pEndTwin;     /* head of chain to end ptr   */
-    char*      pzName;       /* name of this member        */
+    char*      pzDefName;    /* name of this member        */
     teValType  valType;      /* text/block/not defined yet */
     long       index;        /* index among twins          */
     char*      pzValue;      /* string or list of children */
@@ -206,7 +208,7 @@ struct outSpec {
 struct fpStack {
     tFpStack*   pPrev;
     FILE*       pFile;
-    char*       pzName;
+    char*       pzOutName;
 };
 
 typedef struct {

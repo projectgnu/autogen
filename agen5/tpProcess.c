@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.8 2000/09/22 20:15:22 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.9 2000/09/29 02:31:21 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -27,7 +27,6 @@
 
 #define HANDLE_FUNCTIONS
 #include "autogen.h"
-#include <streqv.h>
 
 STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
 
@@ -108,7 +107,7 @@ processTemplate( tTemplate* pTF )
             pzCurSfx      = zNone;
             pCurFp        = &fpRoot;
             fpRoot.pFile  = stdout;
-            fpRoot.pzName = "stdout";
+            AGDUPSTR( fpRoot.pzOutName, "stdout", "processTemplate" );
 
             generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt,
                            (tDefEntry*)rootEntry.pzValue );
@@ -129,7 +128,6 @@ processTemplate( tTemplate* pTF )
     }
 
     for (;;) {
-        char       zOut[ MAXPATHLEN ];
         tOutSpec*  pOS    = pOutSpecList;
         int        jumpCd = setjmp( fileAbort );
 
@@ -141,7 +139,6 @@ processTemplate( tTemplate* pTF )
              *  Set the output file name buffer.
              *  It may get switched inside openOutFile.
              */
-            fpRoot.pzName = zOut;
             openOutFile( pOS, &fpRoot );
 
             pzCurSfx = pOS->zSuffix;
@@ -191,7 +188,7 @@ closeOutput( ag_bool purge )
     fclose( pCurFp->pFile );
 
     if (purge)
-        unlink( pCurFp->pzName );
+        unlink( pCurFp->pzOutName );
 
     else {
         struct utimbuf tbuf;
@@ -199,17 +196,16 @@ closeOutput( ag_bool purge )
         tbuf.actime  = time( (time_t*)NULL );
         tbuf.modtime = outTime;
 
-        utime( pCurFp->pzName, &tbuf );
+        utime( pCurFp->pzOutName, &tbuf );
     }
 
     /*
-     *  Do not deallocate stuff for the root file.
-     *  It is not allocated!!
+     *  Do not deallocate the root entry.  It is not allocated!!
      */
+    AGFREE( (void*)pCurFp->pzOutName );
     if (pCurFp->pPrev != (tFpStack*)NULL) {
         tFpStack* p = pCurFp;
         pCurFp = p->pPrev;
-        AGFREE( (void*)p->pzName );
         AGFREE( (void*)p );
     }
 }
@@ -239,8 +235,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        snprintf( pStk->pzName, MAXPATHLEN, pOutSpec->pzFileFmt,
-                  pzDefFile, pOutSpec->zSuffix );
+        pStk->pzOutName = asprintf( pOutSpec->pzFileFmt,
+                                    pzDefFile, pOutSpec->zSuffix );
         if (p != (char*)NULL)
             *p = '.';
     }
@@ -262,7 +258,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
                  *  Make the output a no-op, but perform the operations.
                  */
                 tSCC zDevNull[] = "/dev/null";
-                pStk->pzName = (char*)zDevNull;
+                pStk->pzOutName = (char*)zDevNull;
                 pStk->pFile  = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
                 if (pStk->pFile != (FILE*)NULL)
                     return;
@@ -272,14 +268,18 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         }
     }
 
-    unlink( pStk->pzName );
-    pStk->pFile = fopen( pStk->pzName, "w" FOPEN_BINARY_FLAG );
+    unlink( pStk->pzOutName );
+    pStk->pFile = fopen( pStk->pzOutName, "w" FOPEN_BINARY_FLAG );
 
     if (pStk->pFile == (FILE*)NULL) {
     openError:
         fprintf( stderr, zCannot, pzProg, errno,
-                 "create", pStk->pzName, strerror( errno ));
+                 "create", pStk->pzOutName, strerror( errno ));
         LOAD_ABORT( pCurTemplate, pCurMacro, "file creation error" );
     }
 }
-/* end of tpProcess.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of tpProcess.c */

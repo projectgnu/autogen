@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.11 2000/09/28 04:16:47 bkorb Exp $
+ *  $Id: defDirect.c,v 1.12 2000/09/29 02:31:21 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <streqv.h>
-
 #include "autogen.h"
 #include "directive.h"
 

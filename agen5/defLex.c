@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.17 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: defLex.c,v 1.18 2000/09/29 02:31:20 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <streqv.h>
-
 #include "autogen.h"
 #include "defParse.h"
 #include "expGuile.h"
@@ -459,13 +456,10 @@ alist_to_autogen_def( void )
     AGFREE( (void*)pzText );
 
     /*
-     *  Now, push the resulting string onto the input stack.
+     *  Now, push the resulting string onto the input stack
+     *  and link the new scan data into the context stack
      */
     pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + res_len, "lex scan ctx" );
-
-    /*
-     *  Link the new scan data into the context stack
-     */
     pCtx->pCtx  = pCurCtx;
     pCurCtx     = pCtx;
 
@@ -815,4 +809,8 @@ assembleString( char* pzScan )
         }     /* switch (*(pzD++) = *(pzS++))    */
     }         /* for (;;)                        */
 }
-/* end of defLex.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of defLex.c */

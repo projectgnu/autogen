@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.12 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: expOutput.c,v 1.13 2000/09/29 02:31:20 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -92,7 +92,7 @@ ag_scm_out_delete( void )
     /*
      *  Delete the current output file
      */
-    fprintf( stderr, zSkipMsg, pCurFp->pzName );
+    fprintf( stderr, zSkipMsg, pCurFp->pzOutName );
     outputDepth = 1;
     longjmp( fileAbort, PROBLEM );
     /* NOTREACHED */
@@ -111,13 +111,19 @@ ag_scm_out_delete( void )
 ag_scm_out_move( SCM new_file )
 {
     char* pz;
+    int   len;
 
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pz = gh_scm2newstr( new_file, NULL );
-    rename( pCurFp->pzName, pz );
-    pCurFp->pzName = pz;  /* memory leak */
+    len = SCM_LENGTH( new_file );
+    pz  = AGALOC( len + 1, "move-to file name" );
+    memcpy( (void*)pz, (void*)SCM_CHARS( new_file ), len );
+    pz[len] = NUL;
+
+    rename( pCurFp->pzOutName, pz );
+
+    pCurFp->pzOutName = pz;  /* memory leak */
     return SCM_UNDEFINED;
 }
 
@@ -167,7 +173,7 @@ ag_scm_out_push_add( SCM new_file )
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
     p->pPrev  = pCurFp;
-    p->pzName = pzNewFile;  /* memory leak */
+    p->pzOutName = pzNewFile;  /* memory leak */
     addWriteAccess( pzNewFile );
     outputDepth++;
     p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG );
@@ -199,7 +205,7 @@ ag_scm_out_push_new( SCM new_file )
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
     p->pPrev  = pCurFp;
-    p->pzName = pzNewFile;  /* memory leak */
+    p->pzOutName = pzNewFile;  /* memory leak */
     unlink( pzNewFile );
     outputDepth++;
     p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG );
@@ -233,7 +239,7 @@ ag_scm_out_switch( SCM new_file )
     /*
      *  IF no change, THEN ignore this
      */
-    if (strcmp( pCurFp->pzName, pzNewFile ) == 0) {
+    if (strcmp( pCurFp->pzOutName, pzNewFile ) == 0) {
         free( (void*)pzNewFile );
         return SCM_UNDEFINED;
     }
@@ -258,8 +264,8 @@ ag_scm_out_switch( SCM new_file )
      */
     tbuf.actime  = time( (time_t*)NULL );
     tbuf.modtime = outTime;
-    utime( pCurFp->pzName, &tbuf );
-    pCurFp->pzName = pzNewFile;  /* memory leak */
+    utime( pCurFp->pzOutName, &tbuf );
+    pCurFp->pzOutName = pzNewFile;  /* memory leak */
 
     return SCM_UNDEFINED;
 }
@@ -287,6 +293,10 @@ ag_scm_out_depth( void )
     SCM
 ag_scm_out_name( void )
 {
-    return gh_str02scm( pCurFp->pzName );
+    return gh_str02scm( pCurFp->pzOutName );
 }
-/* end of expOutput.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expOutput.c */

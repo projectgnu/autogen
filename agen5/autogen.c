@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.11 2000/03/16 05:31:46 bruce Exp $
+ *  $Id: autogen.c,v 1.12 2000/09/29 02:31:20 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -163,6 +163,8 @@ doneCheck( void )
     case PROC_STATE_OPTIONS:
     case PROC_STATE_DONE:
         return;
+
+    default: break;
     }
 
     _exit( EXIT_FAILURE );

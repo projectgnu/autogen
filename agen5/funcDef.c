@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.30 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: funcDef.c,v 1.31 2000/09/29 02:31:20 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -26,7 +26,6 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
-#include <streqv.h>
 #include <guile/gh.h>
 
 #include "autogen.h"
@@ -58,7 +57,7 @@ orderDefList( const void* p1, const void* p2 )
 {
     tDefEntry* pDL1 = (tDefEntry*)p1;
     tDefEntry* pDL2 = (tDefEntry*)p2;
-    int cmp = streqvcmp( pDL1->pzName, pDL2->pzName );
+    int cmp = streqvcmp( pDL1->pzDefName, pDL2->pzDefName );
 
     /*
      *  IF the names are the same, then we order them
@@ -66,7 +65,7 @@ orderDefList( const void* p1, const void* p2 )
      *  want the entries reordered within the same name!
      */
     if (cmp == 0)
-        cmp = (int)(pDL1->pzName - pDL2->pzName);
+        cmp = (int)(pDL1->pzDefName - pDL2->pzDefName);
     return cmp;
 }
 
@@ -86,7 +85,7 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
         pN = pNext + 1; /* We return this, valid or not */
         if (--ct <= 0)  /* count each successive twin   */
             break;
-        if (streqvcmp( pNext->de.pzName, pN->de.pzName ) != 0)
+        if (streqvcmp( pNext->de.pzDefName, pN->de.pzDefName ) != 0)
             break;
 
         /*
@@ -325,7 +324,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         /*
          *  Replace the template text with a string containing its address.
          */
-        sprintf( pzText, "[ 0x%08X ]", pNewT );
+        sprintf( pzText, "[ 0x%08lX ]", (unsigned long)pNewT );
     }
 }
 
@@ -397,7 +396,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
      *  Fill in the array of value assignments
      */
     for (;; pDL++ ) {
-        pDL->de.pzName = pzScan;
+        pDL->de.pzDefName = pzScan;
         while (ISNAMECHAR( *pzScan ))  pzScan++;
 
         /*
@@ -530,7 +529,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  IF the next entry has the same name,
              *  THEN it is a "twin".  Link twins on the twin list.
              */
-            if (streqvcmp( pDL->de.pzName, pN->de.pzName ) == 0) {
+            if (streqvcmp( pDL->de.pzDefName, pN->de.pzDefName ) == 0) {
                 pN = linkTwins( pDL, pN, &ct );
                 if (ct <= 0)
                     break;  /* pN is now invalid */
@@ -647,7 +646,7 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
 
     pfp = (tFpStack*)AGALOC( sizeof( tFpStack ), "anonymous template" );
     pfp->pPrev = NULL;
-    pfp->pzName = (char*)zTFil;
+    pfp->pzOutName = (char*)zTFil;
     pCurFp = pfp;
 
     unlink( zTFil );
@@ -1001,7 +1000,7 @@ ag_scm_ag_invoke( SCM macName, SCM list )
             if (! gh_string_p( car ))
                 LOAD_ABORT( pCurTemplate, pCurMacro,
                             "need name for macro arg" );
-            pz = pDE->pzName = strdup( SCM_CHARS( car ));
+            pz = pDE->pzDefName = strdup( SCM_CHARS( car ));
             while (ISNAMECHAR( *pz ))  pz++;
             while (isspace( *pz ))     pz++;
             if (*pz != NUL) {
@@ -1223,4 +1222,8 @@ MAKE_LOAD_PROC( Define )
     memset( (void*)pMac, 0, sizeof(*pMac) );
     return pMac;
 }
-/* end of funcDef.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of funcDef.c */

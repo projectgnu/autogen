@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.23 2000/09/28 06:09:23 bkorb Exp $
+ *  $Id: expState.c,v 1.24 2000/09/29 02:31:21 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -703,4 +703,8 @@ ag_scm_tpl_file_line( void )
 }
 
 #include "expr.ini"
-/* end of expState.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of expState.c */

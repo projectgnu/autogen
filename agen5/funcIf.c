@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.9 2000/08/11 13:27:47 bkorb Exp $
+ *  $Id: funcIf.c,v 1.10 2000/09/29 02:31:21 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -269,11 +269,6 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
 =*/
 MAKE_LOAD_PROC( Elif )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
     /*
      *  Load the expression
      */
@@ -298,11 +293,6 @@ MAKE_LOAD_PROC( Elif )
 =*/
 MAKE_LOAD_PROC( Else )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
     /*
      *  After processing an "ELSE" macro,
      *  we have a special handler function for 'ENDIF' only.
@@ -333,9 +323,6 @@ MAKE_LOAD_PROC( Ending )
 
 MAKE_LOAD_PROC( If )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
     tIfStack       save_stack = current_if;
@@ -405,9 +392,6 @@ MAKE_LOAD_PROC( If )
 
 MAKE_LOAD_PROC( While )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
     tpLoadProc*    papLP = papLoadProc;
