@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: agShell.c,v 1.2 1999/10/14 22:36:55 bruce Exp $
  *  Manage a server shell process
  */
 
@@ -59,7 +59,7 @@ tSCC   zCmdFmt[]   = "\\cd %s\n%s\n\necho\necho %s\n";
 const char* pzLastCmd = (const char*)NULL;
 
 
-    STATIC void
+    void
 closeServer( void )
 {
     sigsend( P_PID, (id_t) serverId, SIGKILL );
