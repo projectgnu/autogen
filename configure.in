@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2002/03/19 04:11:41 $
+dnl Last Modified:    $Date: 2002/03/21 04:20:19 $
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.4 2002/03/19 04:11:41 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.5 2002/03/21 04:20:19 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.4 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.5 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -81,25 +81,7 @@ ifdef([AC_LIBTOOL_WIN32_DLL],
    AC_LIBTOOL_WIN32_DLL)
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
-AG_PROG_BYACC
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
-
-# ----------------------------------------------------------------------
-# Set up and process configure options
-# ----------------------------------------------------------------------
-AG_WITH_REGEX_HEADER
-AG_WITH_REGEX_HEADER_PATH
-AG_WITH_REGEX_LIB
-if [ X"${ag_cv_with_regex_lib}" = Xno ]
-then
-  AG_RUN_POSIX_REGCOMP
-fi
-
-# ----------------------------------------------------------------------
-# Debugging options
-# ----------------------------------------------------------------------
-AG_DISABLE_SHELL
-AG_ENABLE_DEBUG
 
 # ----------------------------------------------------------------------
 # Check for standard headers.
@@ -162,17 +144,14 @@ AC_CHECK_LIB(gen, pathfind)
 # ----------------------------------------------------------------------
 # Checks for standard functions.
 # ----------------------------------------------------------------------
-AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal psignal pathfind strlcpy)
+AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal psignal strlcpy)
 AC_CHECK_FUNCS(snprintf)
-AG_FUNC_FOPEN_BINARY
-AG_FUNC_FOPEN_TEXT
-AG_RUN_ALLOCATED_CTIME
-AG_RUN_POSIX_SYSINFO
-AG_RUN_STRCSPN
-AG_RUN_STRFTIME
-AG_RUN_SYS_SIGLIST
-AG_RUN_UNAME_SYSCALL
-AG_RUN_PATHFIND
+
+# ----------------------------------------------------------------------
+# Do all our own macros
+# ----------------------------------------------------------------------
+AG_PROG_BYACC
+INVOKE_AG_MACROS
 
 if ! test x$ag_cv_sys_siglist = xyes
 then

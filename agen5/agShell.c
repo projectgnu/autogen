@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.9 2002/02/28 00:50:18 bkorb Exp $
+ *  $Id: agShell.c,v 3.10 2002/03/21 04:20:19 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -149,6 +149,21 @@ serverSetup( void )
 
     {
         static char zTrap[] =
+            /*
+             *  IF it is possible to put the base shell into POSIX/Bourne mode,
+             *  THEN do so...
+             */
+            "if test -n \"${ZSH_VERSION+set}\" "
+                "&& (emulate sh) >/dev/null 2>&1\n"
+            "then\n"
+            "  emulate sh\n"
+            "  NULLCMD=:\n"
+            "elif test -n \"${BASH_VERSION+set}\" "
+                  "&& (set -o posix) >/dev/null 2>&1\n"
+            "then\n"
+            "  set -o posix\n"
+            "fi\n"
+
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
             "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=\000000000000\n";

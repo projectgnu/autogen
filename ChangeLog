@@ -1,5 +1,15 @@
 2002-03-18  Bruce Korb  <bkorb@gnu.org>
 
+	* configure.in: remove all the generated macro invocations and invoke
+	them with a collection macro:  INVOKE_AG_MACROS
+	* config/conftest.tpl: generate a macro collection instead of individual
+	macros
+	* agen5/agShell.c(serverSetup): accommodate zsh and bash
+	* compat/strsignal.def: extra protection against non-numeric signal nums
+	* config/confmacs.tpl: fix the argument name for the AC_ARG(name) macro
+
+2002-03-18  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/test/error.test: HP/UX delivers `kill -TERM' as a SIGCONT.
 	* agen5/compat/strsignal.def: HP/UX defines many signals as "_SIG..."
 	and then defines the normal name to this.

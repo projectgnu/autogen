@@ -3,7 +3,7 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 3.1 2002/03/19 04:11:41 bkorb Exp $
+ *  $Id: strsignal.def,v 3.2 2002/03/21 04:20:19 bkorb Exp $
  */
 
 #shell
@@ -104,7 +104,7 @@ else
     #  THEN we know it is a value we are not interested in
     #
     case ${NUM} in
-    *[A-Za-z_] )
+    *[A-Za-z_]* )
        continue ;;
     esac
 
@@ -122,7 +122,7 @@ else
     eval HAVE_${NUM}=1
     f=`echo "$f" | sed -e 's;/\*[ 	]*;;' -e 's;[ 	]*\*/;;'`
     if test -z "$f"
-    then f="Undescribed signal ${NUM}" ; fi
+    then f="Undescribed:  SIG${SIG} (${NUM})" ; fi
 
     cat  <<-    _EOF_
 	signal[ ${NUM} ] = {

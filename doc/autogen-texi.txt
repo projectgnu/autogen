@@ -1631,11 +1631,13 @@ be well thereafter.
 @cindex Signal Names
 
 When AutoGen is first built, it tries to use @code{psignal(3)},
-@code{sys_siglist}, @code{strsigno(3)} and @code{strsignal(3)} from
-the host operating system.  In their absence, the distributed mapping
-is used.  However, once you have installed autogen, the mapping can
-be rebuilt on the host operating system.  To do this, you must perform
-the following steps:
+@code{sys_siglist}, @code{strsigno(3)} and @code{strsignal(3)} from the
+host operating system.  If your system does not supply these, the
+AutoGen distribution will.  However, it will use the distributed mapping
+and this mapping is unlikely to match what your system uses.  This can
+be fixed.  Once you have installed autogen, the mapping can be rebuilt
+on the host operating system.  To do so, you must perform the
+following steps:
 
 @enumerate
 @item

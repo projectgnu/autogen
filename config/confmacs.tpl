@@ -242,7 +242,7 @@ ENDDEF  emit-results   =][=
 DEFINE  emit-enablement
 
   =]
-  AC_ARG_[=arg-name=]([[=(. down-name)=]],
+  AC_ARG_[=arg-name=]([[=(string-tr down-name "_" "-")=]],
     AC_HELP_STRING([--[=type=]-[=(string-tr test-name "_A-Z" "-a-z")
                    =]], [[=check=]]),
     [[=(. cv-name)=]=${[=(string-downcase! (get "arg-name"))
