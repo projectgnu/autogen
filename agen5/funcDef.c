@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.8 1999/10/30 21:49:03 bruce Exp $
+ *  $Id: funcDef.c,v 1.9 1999/10/31 19:56:21 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -92,7 +92,7 @@ MAKE_HANDLER_PROC( Debug )
 
 /*=macfunc DEFINE
  *
- *  what:    Define or invoke a user's AutoGen macro
+ *  what:    Define a user AutoGen macro
  *  cindex:  define macro
  *  handler_proc:
  *  load_proc:
