@@ -4,20 +4,20 @@
 ##
 ##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-20 12:26:55 bkorb"
+## Time-stamp:      "2004-05-29 12:45:29 bkorb"
 ## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.16 2004/02/27 18:45:01 bkorb Exp $
+## $Id: Makefile.am,v 1.17 2004/07/02 18:30:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
 bin_PROGRAMS    = xml2ag
 csrcs           = xmlopts.h xml2ag.c xmlopts.c fork.c
 nodist_xml2ag_SOURCES = x.c
-
+BUILT_SOURCES   = x.c xmlopts.c xmlopts.h
 SUBDIRS         = test
 EXTRA_DIST      = xmlopts.def fork.tpl $(csrcs)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@

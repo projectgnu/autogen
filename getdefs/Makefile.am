@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-20 10:52:06 bkorb"
+## Time-stamp:      "2004-05-29 12:44:36 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2004/02/20 20:18:49 bkorb Exp $
+## $Id: Makefile.am,v 3.16 2004/07/02 18:31:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -20,7 +20,7 @@ getdefs_SOURCES = proto.h
 nodist_getdefs_SOURCES = gd.c opts.h
 
 SUBDIRS         = test
-BUILT_SOURCES   = opts.c opts.h
+BUILT_SOURCES   = opts.c opts.h gd.c
 EXTRA_DIST      = opts.def $(gdsrcs)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@
 AGEXE_LIB       = $(AGEXE) -L$(top_srcdir)/autoopts
