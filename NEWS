@@ -1,3 +1,10 @@
+New in 5.4.4 5.4.3 and 5.4.2
+* The libopts.tar.gz file is now installed
+* Miscelleaneous option state saving bugs were fixed
+* man page templates were cleaned up
+* .texi-isms were removed from usage output
+* a GCC aliasing bug was fixed.
+
 New in 5.4.1
 * Improved the configurability of the libopts tear-off library.
 
@@ -20,51 +27,3 @@ New in 5.0
   An expression may be AutoGen defined values, shell scripts,
   Scheme expressions, or the latter two formatted with an
   AutoGen definition value.  AutoGen now depends on Guile.
-
-New in 4.5.8
-* Finally, finally, finally, really finished the portability issues.
-
-New in 4.5.7
-* Finally, finally, really finished the portability issues.
-
-New in 4.5.6
-* Finally, really finished the portability issues and it now
-  included a complete implementation of the printf family of
-  formatting routines.
-* Templates for client program man pages and invoking chapters
-  for texinfo docs are supplied.  They are also used by the
-  autogen/columns/getdefs programs that come in this package.
-
-New in 4.5
-* Compiles with cygwin tools, provided you link GNU regex.
-* *Much* enhanced portability.  AutoGen really should compile in
-  just about any POSIX environment.
-* Overhauled the configuration to help programs which want to use
-  autoopts from Makefiles.
-
-New in 4.4
-* Massively reworked the template parsing in preparation for
-  beguiling AutoGen.
-* Deleted an ugly shell/awk program and replaced it with
-  an ugly C program for extracting definitions from comments. :)
-
-New in 4.1
-* Two new string generation functions for creating shell-rule
-  quoted strings ("xx...\t") and raw strings ('xxx\nxx')
-* single quoted strings in the template macros are now
-  processed the same way as in the definitions file.
-
-New in 4.0
-* The autoopts package works without the source tree in place.
-* Makefile.in is regenerated with automake-1.2
-* complete rewrite of the macro definitions.
-* changed the code emission and expression processing
-  to handle the new data structures
-* added another expression function (JOIN)
-* changed shell commands to run in a shell server instead
-  of starting a new shell each time.  *MUCH* faster.
-
-New in 3.2
-* Ported to Digital Unix (AXP).
-* ubiquitous bugfixes
-* autoconfiscated with automake 1.2
