@@ -8,12 +8,12 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 2000/03/12 04:17:24 bruce Exp $
+## $Id: Makefile.am,v 1.6 2000/03/15 03:24:07 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test errors.test shell.test vers.test
 
-EXTRA_DIST = defs $(TESTS)
+EXTRA_DIST = defs stdopts.def $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in
 
