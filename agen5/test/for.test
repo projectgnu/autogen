@@ -1,7 +1,7 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# for.test --- test for functionality
+# for.test --- test functionality of `for' function
 #
 # Author:            Bruce Korb <autogen@linuxbox.com>
 # Maintainer:        Bruce Korb <autogen@linuxbox.com>
@@ -9,42 +9,53 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: for.test,v 1.2 1999/10/28 03:36:29 bruce Exp $
+# $Id: for.test,v 1.3 2000/02/28 07:03:35 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test "$srcdir" = "$0" && srcdir=.
     test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
 
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test =>
+<=
+FOR list ",\n" =><=
+  IF (first-for?)
+     =>FIRST:  <=
+  ELIF (last-for?)
+     =>LAST:   <=
+  ELSE
+     =>MIDDLE: <=
+  ENDIF =><=elt[0]=><=
+ENDFOR =>
+_EOF_
+
 
 # Create the files we need in the test environment
-cat > $testname.def <<EOF
-autogen definitions $testname;
-list = { elt = one; };
-list = { elt = two; };
-list = { elt = three; };
-EOF
-
-cat > $testname.tpl <<EOF
-<= autogen template test =>
-<=_FOR list=><=elt=>
-<=/list=>
-EOF
+cat > $testname.def <<_EOF_
+AutoGen definitions $testname;
+list = { elt = one; },
+{ elt = two.one, two.two, two.three; };
+list = { elt = three; }, {elt = four;};
+_EOF_
 
 # this is the output we should expect to see
-cat > $testname.out <<EOF
-one
-two
-three
+cat > $testname.out <<_EOF_
+FIRST:  one,
+MIDDLE: two.one,
+MIDDLE: three,
+LAST:   four
+_EOF_
 
-EOF
-
-$AUTOGEN || exit 1
+$AGEN $testname.def || failure AutoGen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 # end of for.test
