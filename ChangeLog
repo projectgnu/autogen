@@ -1,5 +1,11 @@
 2002-06-10  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/agman1.tpl: pass entire doc through texi->man sed script
+	* autoopts/agman3.tpl: ditto
+	* xml2ag/Makefile.am: specify "columns" binary to use.
+
+2002-06-09  Bruce Korb  <bkorb@gnu.org>
+
 	* xml2ag/*: new command.  Wrapper converts XML to autogen definitions
 	and passes them to a spawned autogen process.  Requires libxml2 to build.
 	* Makefile.am: make the building of xml2ag configurable

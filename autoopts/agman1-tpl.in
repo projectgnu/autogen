@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-05-23 17:34:04 bkorb"
+## Time-stamp:      "2002-06-10 17:08:03 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.6 2002/05/24 01:44:42 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.7 2002/06/11 00:32:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -31,16 +31,39 @@ AutoGen5 template man=%s.1
 .\"
 .SH NAME
 [+: % prog_name (string-downcase! "%s") :+] \- [+:prog_title:+]
-.SH SYNOPSIS[+:
+.SH SYNOPSIS
+.B [+: (string-downcase! (get "prog_name"))
+:+][+:
+    ;; * * * * * * * * * * * * * * * * * * * * * * * * *
+    ;;
+    ;;  Display the command line prototype,
+    ;;  based only on the argument processing type.
+    ;;
+    ;;  And run the entire output through "sed" to convert texi-isms
+    ;;
+    (out-push-new)
 
-      # * * * * * * * * * * * * * * * * * * * * * * * * *
-      #
-      #  Display the command line prototype,
-      #  based only on the argument processing type.
-      #
-      :+]
-.B [+: (out-push-new)
-       (string-downcase! (get "prog_name")) :+][+:
+:+]
+sed \
+ -e 's;@code{\([^}]*\)};\\fB\1\\fP;g' \
+ -e  's;@var{\([^}]*\)};\\fB\1\\fP;g' \
+ -e 's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
+ -e 's;@file{\([^}]*\)};\\fI\1\\fP;g' \
+ -e 's/@\([{}]\)/\1/g' \
+ -e 's,^\$\*$,.br,' \
+ -e '/@ *example/,/@ *end *example/s/^/    /' \
+ -e 's/^ *@ *example/.nf/' \
+ -e 's/^ *@ *end *example/.fi/' \
+ -e '/^ *@ *noindent/d' \
+ -e '/^ *@ *enumerate/d' \
+ -e 's/^ *@ *end *enumerate/.br/' \
+ -e '/^ *@ *table/d' \
+ -e 's/^ *@ *end *table/.br/' \
+ -e 's/^@item/.sp 1/' \
+ -e 's/\*\([a-zA-Z0-9=_ -]*\)\*/\\fB\1\\fP/g' \
+ -e 's/``\([a-zA-Z0-9=_ -]*\)'"''"'/\\fI\1\\fP/g' \
+ -e 's/^@\*/.br/' <<'_End_Of_Man_'
+[+:
 
   IF (exist? "flag.value")  :+][+:
     IF (exist? "long_opts") :+][+:
@@ -391,30 +414,11 @@ Released under an unspecified copyright license.[+:
      ENDIF :+][+:
   ESAC     :+][+:
 ENDIF      :+]
+_End_Of_Man_[+:
+
+(shell (out-pop #t) ) :+]
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fB[+:prog_name:+]\fP
-option definitions.[+:
-
-(shell (string-append "sed \
- -e 's;@code{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e  's;@var{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e 's;@samp{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e 's;@file{\\([^}]*\\)};\\\\fI\\1\\\\fP;g' \
- -e 's/@\\([{}]\\)/\\1/g' \
- -e 's,^\\$\\*$,.br,' \
- -e '/@ *example/,/@ *end *example/s/^/    /' \
- -e 's/^ *@ *example/.nf/' \
- -e 's/^ *@ *end *example/.fi/' \
- -e '/^ *@ *noindent/d' \
- -e '/^ *@ *enumerate/d' \
- -e 's/^ *@ *end *enumerate/.br/' \
- -e '/^ *@ *table/d' \
- -e 's/^ *@ *end *table/.br/' \
- -e 's/^@item/.sp 1/' \
- -e 's/^@\\*/.br/' <<'_End_Of_Man_'\n"
-
- (out-pop #t) "\n_End_Of_Man_"
-
-) ) :+][+: #
+option definitions.[+: #
 
 agman.tpl ends here  :+]

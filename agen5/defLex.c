@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.6 2002/04/06 19:11:44 bkorb Exp $
+ *  $Id: defLex.c,v 3.7 2002/06/11 00:32:42 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -126,23 +126,7 @@ scanAgain:
     case '#':
     {
         extern char* processDirective( char* );
-        char*  pz;
-
-        /*
-         *  NB:  This character and all others that we treat specially
-         *       here must be disallowed as "OTHER_NAME" characters below
-         */
-        pz = processDirective( pCurCtx->pzScan+1 );
-        /*
-         *  Advance past any leading blanks
-         */
-        while (isspace( *pz )) {
-            if (*pz == '\n')
-                pCurCtx->lineNo++;
-            pz++;
-        }
-
-        pCurCtx->pzScan = pz;
+        pCurCtx->pzScan = processDirective( pCurCtx->pzScan+1 );
         goto scanAgain;
     }
 
@@ -272,6 +256,7 @@ scanAgain:
             char* pz = strchr( pCurCtx->pzScan+2, '\n' );
             if (pz != NULL) {
                 pCurCtx->pzScan = pz+1;
+                pCurCtx->lineNo++;
                 goto scanAgain;
             }
             break;
@@ -657,6 +642,7 @@ assembleHereString( char* pzScan )
         for (;;) {
             switch (*(pzDest++) = *(pzScan++)) {
             case '\n':
+                pCurCtx->lineNo++;
                 goto lineDone;
 
             case NUL:
