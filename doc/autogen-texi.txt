@@ -4097,6 +4097,7 @@ in the option descriptor file (@pxref{program attributes}) with the
 @menu
 * loading rcfile::      RC or INI file presets
 * saving rcfile::       Saving the presets in an RC or INI file
+* sample rcfile::       Creating a sample RC or INI file
 * environrc::           environment variable presets
 @end menu
 
@@ -4165,6 +4166,25 @@ All of the known option state will be written to either the specified
 output file or, if it is not specified, then to the last specified
 @code{homerc} file.
 
+@node sample rcfile
+@subsection Creating a sample RC or INI file
+@cindex sample rcfile
+
+AutoOpts is shipped with a template named, @file{rc-sample.tpl}.
+If your option definition file specifies the @code{homerc} attribute,
+then you may invoke @file{autogen} thus:
+
+@example
+autogen -Trc-sample <your-option-def-file>
+@end example
+
+This will, by default, produce a sample file named, @file{sample-<prog-name>rc}.
+It will be named differently if you specify your rc file name with the
+@code{rcfile} attribute.  In that case, the output file will be named,
+@file{sample-<rcfile-name>}.  It will contain all of the program options
+not marked as @code{no-preset}.  It will also include information about
+how they are handled and the text from the @code{doc} attribute.
+
 @node environrc
 @subsection environment variable presets
 @cindex environrc
@@ -4179,7 +4199,7 @@ are the regular names with all special characters converted to
 underscores (@code{_}).)
 
 Option specific environment variables are processed after (and thus
-take precidence over) the contents of the @code{PROGRAM} enviornment
+take precidence over) the contents of the @code{PROGRAM} environment
 variable.  The option argument string for these options takes on the
 string value gotten from the environment.  Consequently, you can only
 have one instance of the @code{OPTNAME}.
