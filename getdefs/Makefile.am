@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.27 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 2.28 2001/07/12 02:20:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS	= getdefs
@@ -24,7 +24,7 @@ getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 man_MANS        = getdefs.1
 
 getdefs_LDFLAGS = -static
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/autoopts -I$(top_srcdir)/snprintfv
+INCLUDES = @INCLIST@
 
 MAINTAINERCLEANFILES = Makefile.in
 

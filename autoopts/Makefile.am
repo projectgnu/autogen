@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2001/06/24 00:47:56 $
+## Last Modified:   $Date: 2001/07/12 02:20:42 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.35 2001/06/24 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 2.36 2001/07/12 02:20:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,8 +18,7 @@ SUBDIRS		= test
 
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = -I. -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
-	-I$(top_builddir)/snprintfv -I$(top_builddir) $(GUILE_INC)
+INCLUDES = @INCLIST@ $(GUILE_INC)
 
 pkgdata_DATA	= \
         aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \

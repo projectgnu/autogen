@@ -2,22 +2,19 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##    AutoGen Copyright (C) 1992-1999 Bruce Korb
+##    AutoGen Copyright (C) 1992-1999,2001 Bruce Korb
 ## 
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/06/24 00:32:52 $
+## Last Modified:   $Date: 2001/07/12 02:20:42 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.32 2001/06/24 00:32:52 bkorb Exp $
+## $Id: Makefile.am,v 1.33 2001/07/12 02:20:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
-INCLUDES = -I. -I$(srcdir) \
-	-I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
-	-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
-	-I$(top_builddir) -I$(top_srcdir) $(GUILE_INC)
+INCLUDES = @INCLIST@ $(GUILE_INC)
 
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS         = $(top_builddir)/getdefs/getdefs

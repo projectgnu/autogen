@@ -1,28 +1,31 @@
 dnl  -*- Mode: M4 -*- 
+
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
-dnl Copyright (C) 1997-1999 Bruce Korb
+dnl Copyright (C) 1997-1999, 2001 Bruce Korb
 dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
-dnl            by:    Bruce Korb <bkorb@gnu.org>			      
+dnl Last Modified:    Sun Jul  2 00:05:24 2001
+dnl            by:    Gary V. Vaughan <gary@gnu.org>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.43 2001/06/24 00:32:52 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.44 2001/07/12 02:20:42 bkorb Exp $
 dnl --------------------------------------------------------------------
 
-AC_INIT(agen5/autogen.c)
+AC_PREREQ(2.50)
+AC_INIT
+AC_CONFIG_SRCDIR(agen5/autogen.c)
 
 . $srcdir/VERSION
 
 AC_CONFIG_AUX_DIR(config)
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.43 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.44 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -187,7 +190,7 @@ then
     exit 1
 fi
 AC_SUBST(GUILE_LINK)
-GUILE_INC=`guile-config compile`
+GUILE_INC=`guile-config compile | sed 's,-I */usr/include,,'`
 AC_SUBST(GUILE_INC)
 
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
@@ -203,13 +206,27 @@ AC_SUBST(COLEXE)
 AC_SUBST(DYNAMIC_AG)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
-AC_SUBST(INCLUDES)
-AM_CONFIG_HEADER(config.h)
-AC_OUTPUT(Makefile agen5/Makefile agen5/test/Makefile \
+[
+if test "$top_srcdir" = "$top_builddir"
+then
+ INCLIST="-I${top_builddir} -I${top_srcdir}/autoopts -I${top_srcdir}/snprintfv"
+else
+ INCLIST="-I${top_builddir} -I${top_srcdir}"
+ INCLIST="${INCLIST} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts"
+ INCLIST="${INCLIST} -I${top_builddir}/snprintfv -I${top_srcdir}/snprintfv"
+fi
+]
+AC_SUBST(INCLIST)
+
+AM_CONFIG_HEADER(config.h:config-h.in)
+AC_CONFIG_FILES([Makefile agen5/Makefile agen5/test/Makefile \
 autoopts/Makefile autoopts/autoopts-config autoopts/test/Makefile \
 columns/Makefile compat/Makefile config/Makefile config/autogen.spec \
-doc/Makefile getdefs/Makefile getdefs/test/Makefile,
- [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+doc/Makefile getdefs/Makefile getdefs/test/Makefile])
+
+AC_CONFIG_COMMANDS([stamp-h],
+[test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+AC_OUTPUT
 
 echo \
 "------------------------------------------------------------------------
