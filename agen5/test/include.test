@@ -1,0 +1,50 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# include.test --- test include functionality
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+#
+# $Id: include.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+
+# Create the files we need in the test environment
+cat > $testname.def <<EOF
+autogen definitions $testname;
+test_name = $testname;
+EOF
+
+cat > $testname.in <<'_EOF_'
+((< autogen template test >))
+testing `((<test_name>))' output.
+_EOF_
+
+cat > $testname.tpl <<_EOF_
+<= autogen template test =>
+<=_INCLUDE $testname.in=>
+_EOF_
+
+# this is the output we should expect to see
+cat > $testname.out <<'_EOF_'
+testing `include' output.
+
+_EOF_
+
+$AUTOGEN || exit 1
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# end of include.test

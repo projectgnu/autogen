@@ -1,0 +1,50 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# reorder.test --- test reorder functionality
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+#
+# $Id: reorder.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# Create the files we need in the test environment
+cat > $testname.def <<EOF
+autogen definitions $testname;
+a[2] = { elt = two; };
+a[1] = { elt = one; };
+a[0] = { elt = zero; };
+b[2] = { elt = two; };
+b[1] = { elt = one; };
+b[0] = { elt = zero; };
+EOF
+
+cat > $testname.tpl <<EOF
+<= autogen template test =>
+<=_FOR a FROM 0 TO 2 SEP ", "=><=elt=><=/a=>
+<=_FOR b FROM 0 TO 2 SEP ", "=><=elt=><=/b=>
+EOF
+
+# this is the output we should expect to see
+cat > $testname.out <<EOF
+zero, one, two
+zero, one, two
+EOF
+
+$AUTOGEN || exit 1
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# end of reorder.test

@@ -1,0 +1,331 @@
+autogen definitions options;
+
+/*
+ *   $Id: opts.def,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ */
+
+/*
+ *  AutoGen copyright 1992-1999 Bruce Korb
+ *
+ *  AutoGen is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with AutoGen.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
+copyright = "1992-1999";
+copyright_gpl;
+
+owner          = "Bruce Korb";
+eaddr          = "AutoGen@linuxbox.com";
+prog_name      = "AutoGen";
+prog_title     = "The Automated Program Generator";
+argument       = "[ <def-file> ]";
+homerc         = $HOME;
+homerc         = ".";
+environrc;
+long_opts;
+include        = '#include "autogen.h"';
+
+version = `
+    if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
+        top_srcdir=..
+    fi
+    if test ! -f $top_srcdir/VERSION ; then
+        echo "#error $top_srcdir/VERSION file missing"
+    else
+        . $top_srcdir/VERSION > /dev/null
+        echo $AG_VERSION
+    fi`;
+
+explain =
+
+'If "<def-file>" is "-" or not specified, standard in is assumed.
+The default "base-name" is the "<def-file>" with suffixes removed.
+However, the template file may specify the output file names.
+"loop-limit" is used in debugging to stop runaway expansions.';
+
+flag = {
+    name      = templ_dirs;
+    value     = L;
+    flag_arg  = ":";
+    descrip   = "Template search directory list";
+    max       = NOLIMIT;
+    arg_name  = dir;
+    stack_arg;
+    settable;
+    doc =
+    "Add a directory to the list of directories to search when opening\n"
+    "a template, either as the primary template or an included one.";
+};
+
+flag = {
+    name      = override_tpl;
+    value     = T;
+    flag_arg  = ":";
+    arg_name  = tpl-file;
+    no_preset;
+    descrip   = "Override template file";
+    doc =
+    "Definition files specify the standard template that is to be expanded.\n"
+    "This option will override that name and expand a different template.";
+
+    flag_code =
+"    extern char* pzTemplFileName;
+    pzTemplFileName = pOptDesc->pzLastArg;";
+};
+
+flag = {
+    name      = lib_template;
+    value     = l;
+    flag_arg  = ":";
+    arg_name  = tpl-file;
+    descrip   = "Library template file";
+    doc =
+    "DEFINE macros are saved from this template file for use in processing\n"
+    "the main macro file.  Template text aside from the DEFINE macros is\n"
+    "is ignored.";
+
+    flag_code =
+'    tTemplate* pT;
+    procState = PROC_STATE_LIB_LOAD;
+    pT = loadTemplate( pOptDesc->pzLastArg );
+    unloadTemplate( pT );
+    procState = PROC_STATE_OPTIONS;';
+};
+
+flag = {
+    name      = base_name;
+    value     = b;
+    flag_arg  = ":";
+    arg_name  = name;
+    no_preset;
+    descrip   = "Base name for output file(s)";
+    doc =
+    "A template may specify the exact name of the output file.\n"
+    "Normally, it does not.  It is, instead, the base name of the\n"
+    "definitions file, with suffixes removed.  If the definitions\n"
+    "are being read from standard in or there is some other reason\n"
+    "for using a different base file name, then use this option.";
+};
+
+flag = {
+    name      = "definitions";
+    flag_arg  = ":";
+    arg_name  = file;
+    no_preset;
+    descrip   = "Definitions input file";
+    disable   = no;
+    enabled;
+    doc =
+    "Use this argument to specify the input definitions file with a\n"
+    "command line option.  If you do not specify this option, then\n"
+    "there must be a command line argument that specifies the file,\n"
+    "even if only to specify stdin with a hyphen (\"-\").\n"
+    "Specify, \"--no-definitions\" when you wish to process\n"
+    "a template without any active AutoGen definitions.\n";
+};
+
+flag = {
+    name      = "load_guile";
+    value     = g;
+    flag_arg  = ":";
+    arg_name  = file;
+    descrip   = "Guile/Scheme code file to load";
+    doc =
+    "Use this argument to preload Scheme scripts into the Guile\n"
+    "interpreter before template processing begins.\n";
+
+    flag_code =
+'    char z[ 4096 ];
+    sprintf( z, "(load \"%s\")", pOptDesc->pzLastArg );
+    procState = PROC_STATE_GUILE_PRELOAD;
+    gh_eval_str( z );
+    procState = PROC_STATE_OPTIONS;';
+};
+
+flag = {
+    name       = skip_suffix;
+    value      = s;
+    flag_arg   = ":";
+    arg_name   = suffix;
+    no_preset;
+    descrip    = "Omit the file with this suffix";
+    max        = NOLIMIT;
+    stack_arg;
+    doc =
+    "Occasionally, it may not be desirable to produce all of the output\n"
+    "files specified in the template.  (For example, only the @file{.h}\n"
+    "header file, but not the @file{.c} program text.)  To do this\n"
+    "specify @code{--skip-suffix=c} on the command line.";
+};
+
+flag = {
+    name        = equate;
+    descrip     = "characters considered equivalent";
+    arg_name    = char-list;
+    flag_arg    = "_-^" /* default equivalence */;
+    doc =
+    "This option will alter the list of characters considered equivalent.\n"
+    "The default are the three characters, \"_-^\".  (The latter is\n"
+    "conventional on a Tandem, and I do a lot of work on the Tandem.)";
+};
+
+flag = {
+    name        = doc_debug;
+    documentation;
+    descrip =
+'The following options are often useful while debugging new templates:';
+};
+
+flag = {
+    name        = loop_limit;
+    flag_arg    = "=256";
+    arg_name    = lim;
+    descrip     = "Limit on increment loops";
+    doc =
+    "This option prevents runaway loops.  For example, if you accidentally\n"
+    "specify, \"_FOR x FROM 1 TO -1 BY 1\", it will take a long time to\n"
+    "finish.  If you do have more than 256 entries in tables, you will\n"
+    "need to specify a new limit with this option.";
+};
+
+flag = {
+    name        = timeout;
+    value       = t;
+    flag_arg    = "=10";
+    arg_name    = time-lim;
+    descrip     = "Time limit for servers";
+    doc =
+    "AutoGen works with a shell server process.  Most normal commands\n"
+    "will complete in less than 10 seconds.  If, however, your commands\n"
+    "need more time than this, use this option.";
+};
+
+#ifdef DEBUG
+/*
+ *  These are for debugging AutoGen itself:
+ */
+flag = {
+    name        = show_defs;
+    no_preset;
+    descrip     = "DEBUG: Show the definition tree";
+    doc =
+    "This option is only available with a DEBUG build of AutoGen.\n"
+    "This will print out the complete definition tree before processing\n"
+    "the template.";
+};
+flag = {
+    name        = show_shell;
+    no_preset;
+    descrip     = "DEBUG: Show shell commands";
+    doc =
+    "This option is only available with a DEBUG build of AutoGen.\n"
+    "This will cause @code{set -x} to be executed in the shell, with\n"
+    "the resultant output printed to /dev/tty.";
+};
+#endif
+
+flag = {
+    name        = doc_control;
+    documentation;
+    descrip =
+'These options can be used to control what gets processed
+in the definitions files and template files.';
+};
+
+flag = {
+    name        = define;
+    value       = D;
+    flag_arg    = ":";
+    arg_name    = name-value;
+    max         = NOLIMIT;
+    descrip     = "name to add to definition list";
+    equivalence = define;
+    stack_arg;
+    settable;
+    doc =
+    "Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing\n"
+    "directives.  This option will cause the name to be added to the\n"
+    "list of defined values.  If you supply a define value as well,\n"
+    "it can be used in the template with the @code{_ENV} expression\n"
+    "function.";
+};
+
+flag = {
+    name        = undefine;
+    value       = U;
+    flag_arg    = ":";
+    arg_name    = name-pat;
+    max         = NOLIMIT;
+    descrip     = "definition list removal pattern";
+    equivalence = define;
+    no_preset;
+    stack_arg;
+    settable;
+    doc =
+    "Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing\n"
+    "directives.  This option will cause the name to be removed from the\n"
+    "list of defined values.";
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Program Documentation
+ */
+
+detail =
+'AutoGen is a tool designed for generating program files
+that contain repetitive text with varied substitutions.
+See the info documentation for details.';
+
+prog_man_descrip =
+'\fBAutoGen\fP is a tool designed for generating program files that contain
+repetitive text with varied substitutions.  Its goal is to simplify the
+maintenance of programs that contain large amounts of repetitious text.
+This is especially valuable if there are several blocks of such text
+that must be kept synchronized.
+.PP
+One common example is the problem of maintaining the code required for
+processing program options.  Processing options requires a minimum of
+four different constructs be kept in proper order in different places in
+your program.  You need at least: The flag character in the flag
+string, code to process the flag when it is encountered, a global
+state variable or two, and a line in the usage text.
+You will need more things besides this if you choose to implement
+long option names, rc/ini file processing, environment variables
+and so on.
+
+All of this can be done mechanically; with the proper templates and this
+program.';
+
+man_doc = '.SH "SEE ALSO"
+This program is documented more fully in the
+.IR AutoGen
+Info system documentation.
+
+.SH "EXAMPLES"
+.ti +4
+autogen -T man.tpl --base-name=autogen opts.def
+.sp
+This command produced this man page from the AutoGen
+option definition file.  It overrides the template
+specified in \fIopts.def\fP (normally \fIoptions.tpl\fP)
+and uses \fIman.tpl\fP.  It also overrides the \fBbase-name\fP of
+the output file, which is normally derived from the input
+definition file name (viz. \fIopts\fP).';
+
+/* prog_info_descrip = ''; */
+
+/* end of opts.def */

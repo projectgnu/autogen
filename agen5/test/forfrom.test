@@ -1,0 +1,49 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# forfrom.test --- test forfrom functionality
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+#
+# $Id: forfrom.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# Create the files we need in the test environment
+cat > $testname.def <<EOF
+autogen definitions $testname;
+list = { elt = one; };
+list = { elt = two; };
+list = { elt = three; };
+list = { elt = fnord; };
+EOF
+
+cat > $testname.tpl <<EOF
+<= autogen template test =>
+<=_FOR list FROM 1 TO (list _HILIM 1 -)=><=elt=>
+<=/list=>
+EOF
+
+# this is the output we should expect to see
+cat > $testname.out <<EOF
+two
+three
+
+EOF
+
+$AUTOGEN || exit 1
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# end of forfrom.test

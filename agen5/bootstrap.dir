@@ -1,0 +1,75 @@
+#! /bin/sh
+
+#  This script rebuilds sources not kept in the CVS repository.
+#  These files are distributed, so it is not necessary to invoke
+#  AutoGen before building AutoGen.  (Like I had to do long ago :)
+
+top_builddir=..
+top_srcdir=..
+export top_builddir top_srcdir
+
+byacc -d agParse.y && {
+    rm -f agParse.c agParse.h
+    if test -f y.out.c; then
+      mv -f y.out.c agParse.c
+      mv -f y.out.h agParse.h
+    elif test -f y.tab.c; then
+      mv -f y.tab.c agParse.c
+      mv -f y.tab.h agParse.h
+    elif test -f y_tab.c; then
+      mv -f y_tab.c agParse.c
+      mv -f y_tab.h agParse.h
+    fi
+}
+
+# For the following to work, we must temporarily install
+# autogen, columns and getdefs from wherever they are found:
+#
+rmlist=
+
+if type whence 2>&1 | grep 'not found' > /dev/null
+then whence=which ; else whence=whence ; fi
+
+if [ ! -x ./autogen ]
+then
+    ln -s `$whence autogen` .
+    rmlist=./autogen
+fi
+
+if [ ! -x ../getdefs/getdefs ]
+then
+    ln -s `$whence getdefs` ../getdefs
+    rmlist="$rmlist ../getdefs/getdefs"
+fi
+
+if [ ! -x ../columns/columns ]
+then
+    ln -s `$whence columns` ../columns
+    rmlist="$rmlist ../columns/columns"
+fi
+
+# Construct the info doc
+#
+i="-L../autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS} -bautogen"
+echo autogen ${i} opts.def
+autogen ${i} opts.def
+
+# Make the option processing files:
+#
+autogen -L ../autoopts ${DEBUG_OPTS} opts.def
+date > stamp-opts
+
+getdefs autogen=autogen base-name=directive template=directive defDirect.c
+date > stamp-directive
+
+getdefs autogen=autogen base-name=functions template=functions \
+		defs=macfunc func*.c
+date > stamp-functions
+
+getdefs assign=group=ag defs=gfunc templ=snarf out=expr.def \
+		srcfile exp*.c func*.c
+SHELL=ksh autogen expr.def
+date > stamp-exprini
+
+if [ ! -z "$rmlist" ]
+then rm -f $rmlist ; fi

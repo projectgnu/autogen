@@ -1,0 +1,102 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# case.test --- test CASE functionality
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:29 PDT 1999
+# Last Modified:     Fri Oct  1 11:00:24 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+#
+# $Id: case.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# # # # # # # TEMPLATE FILE # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<'EOF'
+<= autogen template test =>
+<=
+FOR grp "\n" =><=
+  CASE (get "nam") =><=
+
+  == first  =>first:  <=(printf "%-6s" (get "val"))=> matches: <=
+      CASE (get "val") =><=
+        ~~ ^[a-z]*$ =>~~ ^[a-z]*$  OK<=
+        ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  *** BOGUS ***<=
+        ~~ .*       =>~~ .*        *** BOGUS ***<=
+      ESAC => and <=
+      CASE (get "val") =><=
+        ~ ^[a-z]*$ =>~ ^[a-z]*$  OK<=
+        *          =>~ .*        *** BOGUS ***<=
+      ESAC =><=
+
+  == second =>second: <=(printf "%-6s" (get "val"))=> matches: <=
+      CASE (get "val") =><=
+        ~~ ^[a-z]*$ =>~~ ^[a-z]*$  *** BOGUS ***<=
+        ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  *** BOGUS ***<=
+        ~~ .*       =>~~ .*        OK<=
+      ESAC => and <=
+      CASE (get "val") =><=
+        ~ ^[a-z]*$ =>~ ^[a-z]*$  OK<=
+        *          =>~ .*        *** BOGUS ***<=
+      ESAC =><=
+
+  == third  =>third:  <=(printf "%-6s" (get "val"))=> matches: <=
+      CASE (get "val") =><=
+        ~~ ^[a-z]*$ =>~~ ^[a-z]*$  *** BOGUS ***<=
+        ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  OK<=
+        ~~ .*       =>~~ .*        *** BOGUS ***<=
+      ESAC => and <=
+      CASE (get "val") =><=
+        ~ ^[a-z]*$ =>~ ^[a-z]*$  OK<=
+        *          =>~ .*        *** BOGUS ***<=
+      ESAC =><=
+
+  ESAC =><=
+
+ENDFOR grp=>
+EOF
+
+# # # # # # # SAMPLE OUTPUT FILE # # # # # #
+
+echo creating $testname.out in `pwd`
+# this is the output we should expect to see
+cat > $testname.out <<'EOF'
+first:  string matches: ~~ ^[a-z]*$  OK and ~ ^[a-z]*$  OK
+second: String matches: ~~ .*        OK and ~ ^[a-z]*$  OK
+third:  STRING matches: ~~ ^[A-Z]*$  OK and ~ ^[a-z]*$  OK
+EOF
+
+# # # # # # # DEFINITOINS FILE # # # # # #
+
+cat > $testname.def <<EOF
+autogen definitions $testname;
+
+grp = {
+   nam = first;
+   val = string;
+};
+
+grp = {
+   nam = second;
+   val = String;
+};
+
+grp = {
+   nam = third;
+   val = STRING;
+};
+EOF
+
+# # # # # # # RUN AUTOGEN # # # # # #
+
+$AUTOGEN $testname.def ||  failure autogen failed
+
+# # # # # # # TEST RESULTS # # # # # #
+
+cmp -s $testname.test $testname.out || failure unexpected output
+
+echo $testname done
+# end of case.test

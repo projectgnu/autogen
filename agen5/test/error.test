@@ -1,0 +1,52 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# error.test --- test error functionality
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:30 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
+#
+# $Id: error.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+
+# Create the files we need in the test environment
+cat > $testname.def <<EOF
+autogen definitions $testname;
+x=y;
+EOF
+
+cat > $testname.tpl <<EOF
+<= autogen template fnord null =>
+<=_IF _SFX fnord ==><=_ERROR 0=>this is never seen<=_ENDIF=><=
+_ERROR "this is a multi-line
+	error to show how to exit
+	your template"
+=>
+this is never seen
+EOF
+
+# this is the output we should expect to see
+cat > $testname.out <<EOF
+DEFINITIONS ERROR for $testname.null:  this is a multi-line
+	error to show how to exit
+	your template
+EOF
+
+# this is *supposed* to exit with a failure status
+$AUTOGEN > $testname.test 2>&1 && exit 1
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# end of error.test
