@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.7 1998/10/26 15:33:34 bkorb Exp $
+#$Id: optcode.tpl,v 2.8 1998/10/30 16:49:14 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -567,23 +567,38 @@ _IF TEST_MAIN _env ! ! test_main _exist | =]
 [=_ENDIF=]
     int
 main( int argc, char** argv )
-{
+{[=
+_IF test_main _get putShellParse = TEST_MAIN _env putShellParse = | =]
+    extern tOptions  genshelloptOptions;
+    extern void      putShellParse( tOptions* );
+    extern tOptions* pShellParseOptions;
+
+    /*
+     *  Stash a pointer to the options we are generating.
+     *  `genshellUsage()' will use it.
+     */
+    pShellParseOptions = &[=prog_name=]Options;
+    (void)optionProcess( &genshelloptOptions, argc, argv );
+    putShellParse( &[=prog_name=]Options );[=
+
+_ELSE=]
     (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
-_IF test_main _len 3 >=]
+  _IF test_main _len 3 > =]
     {
         void [=test_main=]( tOptions* );
         [=test_main=]( &[=prog_name=]Options );
     }[=
 
-_ELIF TEST_MAIN _env 3 > =]
+  _ELIF TEST_MAIN _env 3 > =]
     {
         void [=_eval TEST_MAIN _env=]( tOptions* );
         [=_eval TEST_MAIN _env=]( &[=prog_name=]Options );
     }[=
 
-_ELSE=]
+  _ELSE=]
     putBourneShell( &[=prog_name=]Options );[=
 
+  _ENDIF =][=
 _ENDIF=]
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,61 @@
+
+autogen definitions options;
+
+/*
+ *   $Id: genshell.def,v 2.1 1998/10/30 16:49:16 bkorb Exp $
+ */
+
+/*
+ *  Autogen copyright 1992-1998 Bruce Korb
+ *
+ *  Autogen is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  Autogen is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Autogen.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
+copyright = "1998";
+copyright_lgpl;
+
+owner          = "Bruce Korb";
+prog_name      = "genshellopt";
+prog_title     = "Generate Shell Option Processing Script";
+long_opts;
+usage          = genshelloptUsage;
+
+version = 1;
+
+flag = {
+    name      = script;
+    value     = o;
+    flag_arg  = ":";
+    descrip   = "Output Script File";
+};
+
+flag = {
+    name      = shell;
+    value     = s;
+    flag_arg  = ":";
+    descrip   = 'Shell name (follows "#!" magic)';
+};
+
+explain =
+"Note that `shell' is only useful if the output file does not already
+exist.  If it does, then the shell name and optional first argument
+will be extracted from the script file.";
+
+detail =
+"If the script file already exists and contains Automated Option Processing
+text, the second line of the file through the ending tag will be replaced
+by the newly generated text.  The first `#!' line will be regenerated.";

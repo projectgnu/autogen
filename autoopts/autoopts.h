@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.1 1998/09/14 14:33:56 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.2 1998/10/30 16:49:11 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -116,6 +116,22 @@
 
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
+
+/*
+ *  The pager state is used by doPagedUsage() procedure.
+ *  When it runs, it sets itself up to be called again on exit.
+ *  If, however, a routine needs a child process to do some work
+ *  before it is done, then 'pagerState' must be set to
+ *  'PAGER_STATE_CHILD' so that doPagedUsage() will not try
+ *  to run the pager program before its time.
+ */
+typedef enum {
+    PAGER_STATE_INITIAL,
+    PAGER_STATE_READY,
+    PAGER_STATE_CHILD
+} tePagerState;
+
+extern tePagerState pagerState;
 
 #ifdef MEMDEBUG
    extern void* ag_alloc( size_t, const char* );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 2.0 1998/08/23 10:39:10 bkorb Exp $
+ *  $Id: pgusage.c,v 2.1 1998/10/30 16:49:10 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -57,6 +57,7 @@
 #include <memory.h>
 
 #include "autoopts.h"
+tePagerState pagerState = PAGER_STATE_INITIAL;
 
 /*
  *  Run the usage output through a pager.
@@ -66,7 +67,6 @@
 doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {
     static pid_t     my_pid;
-    static ag_bool   amExiting = AG_FALSE;
     char zPageUsage[ 1024 ];
 
     /*
@@ -74,7 +74,38 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
      *     (and thus has called "exit(2)")
      *  THEN invoke the pager to page through the usage file we created.
      */
-    if (amExiting) {
+    switch (pagerState) {
+    case PAGER_STATE_INITIAL:
+    {
+        my_pid  = getpid();
+        sprintf( zPageUsage, "/tmp/use.%lu", my_pid );
+        unlink( zPageUsage );
+
+        /*
+         *  Set stderr to this temporary file
+         */
+        if (freopen( zPageUsage, "w", stderr ) != stderr)
+            _exit( EXIT_FAILURE );
+
+        pagerState = PAGER_STATE_READY;
+
+        /*
+         *  Set up so this routine gets called during the exit logic
+         */
+        atexit( (void(*)(void))doPagedUsage );
+
+        /*
+         *  The usage procedure will now put the usage information into
+         *  the temporary file we created above.
+         */
+        (*pOptions->pUsageProc)( pOptions, EXIT_SUCCESS );
+
+        /*NOTREACHED*/
+        _exit( EXIT_FAILURE );
+    }
+
+    case PAGER_STATE_READY:
+    {
         char* pzPager = getenv( "PAGER" );
 
         /*
@@ -92,37 +123,13 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
         dup2( STDOUT_FILENO, STDERR_FILENO );
 
         system( zPageUsage );
-
-        /*
-         *  "return" to the exit logic
-         */
-        return;
     }
 
-    /*
-     *  First call to this proc ("exit(2)" has not been called yet.)
-     */
-    my_pid  = getpid();
-    sprintf( zPageUsage, "/tmp/use.%lu", my_pid );
-    unlink( zPageUsage );
-
-    /*
-     *  Set stderr to this temporary file
-     */
-    if (freopen( zPageUsage, "w", stderr ) != stderr)
-        _exit( EXIT_FAILURE );
-
-    amExiting = AG_TRUE;
-
-    /*
-     *  Set up so this routine gets called during the exit logic
-     */
-    atexit( (void(*)(void))doPagedUsage );
-
-    /*
-     *  The usage procedure will now put the usage information into
-     *  the temporary file we created above.
-     */
-    (*pOptions->pUsageProc)( pOptions, EXIT_SUCCESS );
-    _exit( EXIT_FAILURE );
+    case PAGER_STATE_CHILD:
+        /*
+         *  This is a child process.  We are not ready to
+         *  run the pager program yet.
+         */
+        break;
+    }
 }

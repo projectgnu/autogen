@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Wed Oct 21 07:13:07 1998
+## Last Modified:   Tue Oct 20 15:09:59 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.8 1998/10/21 14:28:16 bkorb Exp $
+## $Id: Makefile.am,v 2.9 1998/10/30 16:49:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,6 +48,7 @@ AGARGS		= autogen=$(AGEXE) \
 
 autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC)
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	CC="${CC}" \
 	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
 
 $(top_builddir)/getdefs/getdefs.texi :
