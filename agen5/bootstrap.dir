@@ -199,6 +199,11 @@ do
     echo ${AG} ${eopt} ./opts.def
     ${AG} ${eopt} ./opts.def
     ;;
+
+  * )
+    echo "Don't know how to make $t"
+    exit 1
+    ;;
   esac
 done
 
