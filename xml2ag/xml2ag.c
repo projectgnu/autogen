@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.5 2002/06/27 01:55:17 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.6 2002/06/28 02:48:05 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -267,7 +267,7 @@ printHeader( xmlDocPtr pDoc )
         pzTpl = (xmlChar*)OPT_ARG( OVERRIDE_TPL );
     }
     else {
-        pTpl = xmlGetProp( pRootNode, (const uchar*)"template" );
+        pTpl = xmlGetProp( pRootNode, (xmlChar*)"template" );
         if (pTpl == NULL) {
             fprintf( stderr, "No template was specified.\n" );
             exit( EXIT_FAILURE );

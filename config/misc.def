@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/06/08 19:54:52 $
+ *  Last Modified:     $Date: 2002/06/28 02:48:05 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.14 2002/06/08 19:54:52 bkorb Exp $
+ *  $Id: misc.def,v 3.15 2002/06/28 02:48:05 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.14 $";
+version = "$Revision: 3.15 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -166,7 +166,7 @@ test   = {
 		    fi
 		    LDFLAGS="${LDFLAGS} $f"
 		    f=`guile-config compile | \
-		       sed 's,-I */usr/include,,'`
+		        sed 's,-I */usr/include\( |$\),\1,'`
 		    CPPFLAGS="${CPPFLAGS} $f"
 		_END_OF_SCRIPT_; };
 
@@ -179,9 +179,9 @@ test   = {
 };
 
 test   = {
-  name     = "xml";
+  name     = "xml2";
   type     = "withlib";
-  check    = "a working libxml can be found";
+  check    = "a working libxml2 can be found";
   code     = <<- _END_OF_CODE_
 		#include <libxml/parser.h>
 		#include <libxml/tree.h>
@@ -200,7 +200,7 @@ test   = {
 		    then
 		      LDFLAGS="${LDFLAGS} $f"
 		      f=`xml2-config --cflags | \
-		        sed 's,-I */usr/include,,'`
+		        sed 's,-I */usr/include\( |$\),\1,'`
 		      CPPFLAGS="${CPPFLAGS} $f"
 		      AC_SUBST(XML2AG_DIR)
 		      XML2AG_DIR=xml2ag

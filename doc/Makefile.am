@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Thu Aug 12 17:19:38 1999				      
+## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2002/06/13 02:00:40 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2002/06/28 02:48:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -78,10 +78,6 @@ TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
 texi         : texi-stamp
 
-../agen5/autogen.menu : ../agen5/autogen.texi
-../agen5/autogen.texi :
-	cd ../agen5 && $(MAKE) autogen.texi
-
 texi-stamp : $(DOC_DEPENDS)
 	@cd $(srcdir) && chmod u+w .
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
@@ -104,14 +100,32 @@ autogen.def : $(DOC_DEPENDS)
 	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
 	@touch $@
 
+../agen5/autogen.menu : ../agen5/autogen.texi
+../agen5/autogen.texi :
+	cd ../agen5 && $(MAKE) autogen.texi
+
+../getdefs/getdefs.menu : ../getdefs/getdefs.texi
 ../getdefs/getdefs.texi :
-	@cd ../getdefs/ ; $(MAKE) $$mf gen
- 
+	@cd ../getdefs/ ; $(MAKE) doc-stamp
+
+../columns/columns.menu : ../columns/columns.texi
 ../columns/columns.texi :
-	@cd ../columns/ ; $(MAKE) $$mf gen
+	@cd ../columns/ ; $(MAKE) gen-stamp
+
+../xml2ag/xml2ag.menu : ../xml2ag/xml2ag.texi
+../xml2ag/xml2ag.texi :
+	@if [ ! -f ../xml2ag/Makefile ] ; \
+	then [ -d ../xml2ag ] || mkdir ../xml2ag ; \
+	echo "* xml2ag Invocation::             No invoking xml2ag" \
+	     > ../xml2ag/xml2ag.menu ; \
+	exec 3> ../xml2ag/xml2ag.texi ; \
+	echo "@node columns Invocation" >&3 ; \
+	echo "@section No invoking columns" >&3 ; \
+	echo "This program is not available without libxml2." >&3 ; \
+	else cd ../xml2ag ; $(MAKE) doc-stamp ; fi
 
 ../autoopts/libopts.texi :
-	@cd ../autoopts ; $(MAKE) $$mf libopts.texi
+	@cd ../autoopts ; $(MAKE) libopts.texi
 
 autogen.txt : autogen.texi
 	makeinfo --fill-column=70 --no-split --paragraph-indent=0 \

@@ -1,3 +1,20 @@
+2002-06-27  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/xml2ag.c: add casts to avoid warnings.
+	* config/misc.def: fix sed expressions
+	* doc/Makefile.am: Regularize the add-on texi rules +
+	accommodate possibility of xml2ag not being built.
+
+2002-06-26  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/xml2ag.c: add casts to avoid warnings.
+
+2002-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doImmediateOpts): clarify the version mismatch
+	message
+	* noag-boot.sh: regenerate with cgi-fsm.h, too.
+
 2002-06-20  Bruce Korb  <bkorb@gnu.org>
 
 	* columns/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
