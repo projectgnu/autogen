@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.10 2000/03/12 20:21:19 bruce Exp $
+ *  $Id: expFormat.c,v 1.11 2000/03/12 20:55:45 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -105,7 +105,7 @@ tSCC zFmtAlloc[] = "asprintf allocation";
 
 /*=gfunc dne
  *
- * what:  "Do Not Edit" warning
+ * what:  '"Do Not Edit" warning'
  *
  * exparg: prefix, string for starting each output line
  * doc:  Generate a "Do Not Edit" warning string.
