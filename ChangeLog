@@ -1,3 +1,8 @@
+2000-10-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/stdoptions.def:  Provide a set of standard options that
+	clients can take advantage of easily.
+
 2000-10-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/opt*.tpl: implemented xxx-value global attributes to allow
