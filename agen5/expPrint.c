@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.8 2000/03/05 18:42:55 bruce Exp $
+ *  $Id: expPrint.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -38,9 +38,14 @@
 
 #include "autogen.h"
 #include "expGuile.h"
-
+#include "expr.h"
 
 STATIC sigjmp_buf printJumpEnv;
+STATIC void    printFault( int sig );
+STATIC size_t safePrintf( char* pzBuf, size_t bufSize,
+                          char* pzFmt, void** argV );
+STATIC SCM    run_printf( char* pzFmt, int len, SCM alist );
+
 
     STATIC void
 printFault( int sig )

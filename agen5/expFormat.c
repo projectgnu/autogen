@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.8 2000/02/28 00:17:58 bruce Exp $
+ *  $Id: expFormat.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -94,6 +94,7 @@ static const char zDne[] =
 #include "autogen.h"
 #include <guile/gh.h>
 #include "expGuile.h"
+#include "expr.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"

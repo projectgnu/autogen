@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.3 2000/03/05 00:23:30 bruce Exp $
+ *  $Id: tpLoad.c,v 1.4 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -31,11 +31,15 @@
 
 #include "autogen.h"
 
-
 static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
-    tTemplate*
-findTemplate( const char* pzTemplName )
+STATIC tCC* skipSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo );
+STATIC tCC* loadPseudoMacro( tCC* pzData, tCC* pzFileName );
+STATIC size_t countMacros( tCC* pz );
+
+
+    EXPORT tTemplate*
+findTemplate( tCC* pzTemplName )
 {
     tTemplate* pT = pNamedTplList;
     while (pT != (tTemplate*)NULL) {
@@ -51,8 +55,8 @@ findTemplate( const char* pzTemplName )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    tSuccess
-findFile( const char* pzTempl, char* pzFullName )
+    EXPORT tSuccess
+findFile( tCC* pzTempl, char* pzFullName )
 {
     char*   pzRoot;
     char*   pzSfx;
@@ -216,8 +220,8 @@ findFile( const char* pzTempl, char* pzFullName )
  *
  *  Process a suffix specification
  */
-    STATIC const char*
-skipSuffixSpec( const char* pzData, const char* pzFileName, int lineNo )
+    STATIC tCC*
+skipSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 {
     /*
      *  The following is the complete list of POSIX
@@ -307,8 +311,8 @@ skipSuffixSpec( const char* pzData, const char* pzFileName, int lineNo )
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  */
-    STATIC const char*
-loadPseudoMacro( const char* pzData, const char* pzFileName )
+    STATIC tCC*
+loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zNotAg[]  = "not an AutoGen file";
     tSCC    zAG[]  = "AutoGen";
@@ -348,15 +352,15 @@ loadPseudoMacro( const char* pzData, const char* pzFileName )
          *  Skip comments
          */
         if ((pzData[0] == '/') && (pzData[1] == '*')) {
-            const char* pz = strstr( (char*)pzData + 2, "*/" );
-            if (pz == (const char*)NULL) {
+            tCC* pz = strstr( (char*)pzData + 2, "*/" );
+            if (pz == (tCC*)NULL) {
                 tSCC zEr[] = "unended comment";
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, zEr );
                 AG_ABEND;
             }
             for (;;) {
-                pzData = (const char*)strchr( (char*)pzData+1, '\n' );
-                if ((pzData == (const char*)NULL) || (pzData > pz))
+                pzData = (tCC*)strchr( (char*)pzData+1, '\n' );
+                if ((pzData == (tCC*)NULL) || (pzData > pz))
                     break;
                 templLineNo++;
             }
@@ -366,7 +370,7 @@ loadPseudoMacro( const char* pzData, const char* pzFileName )
 
         if (*pzData == '#') {
             char* pz = strchr( pzData, '\n' );
-            if (pz == (const char*)NULL) {
+            if (pz == (tCC*)NULL) {
                 tSCC zEr[] = "unended pseudo macro";
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, zEr );
                 AG_ABEND;
@@ -390,7 +394,7 @@ loadPseudoMacro( const char* pzData, const char* pzFileName )
              *  IF mode end not found OR newline embedded in mode
              *  THEN oops.
              */
-            if ((pz == (const char*)NULL) || (pzData < pz)) {
+            if ((pz == (tCC*)NULL) || (pzData < pz)) {
                 tSCC zEr[] = "unended mode";
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, zEr );
                 AG_ABEND;
@@ -426,7 +430,7 @@ loadPseudoMacro( const char* pzData, const char* pzFileName )
             }
             if (pzData[ sizeof( zAG )-1 ] != '5') {
                 tSCC zOutDate[] = "Out of date AutoGen template";
-                const char* pzWhich = (isspace( pzData[ sizeof( zAG )-1 ] ))
+                tCC* pzWhich = (isspace( pzData[ sizeof( zAG )-1 ] ))
                     ? zOutDate : zNotAg;
                 fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
                 AG_ABEND;
@@ -492,7 +496,7 @@ loadPseudoMacro( const char* pzData, const char* pzFileName )
  *  so that we can allocate the right number of pointers.
  */
     STATIC size_t
-countMacros( const char* pz )
+countMacros( tCC* pz )
 {
     size_t  ct = 2;
     for (;;) {
@@ -514,11 +518,11 @@ countMacros( const char* pz )
  *
  *  Load the macro array and file name.
  */
-    void
+    EXPORT void
 loadMacros( tTemplate*     pT,
-            const char*    pzF,
-            const char*    pzN,
-            const char*    pzData )
+            tCC*    pzF,
+            tCC*    pzN,
+            tCC*    pzData )
 {
     tMacro* pMac   = pT->aMacros;
 
@@ -598,7 +602,7 @@ loadMacros( tTemplate*     pT,
  *
  *  Convert a template from data file format to internal format.
  */
-    tTemplate*
+    EXPORT tTemplate*
 templateFixup( tTemplate* pTList, size_t ttlSize )
 {
     tTemplate* pT = pTList;
@@ -635,8 +639,8 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    tTemplate*
-loadTemplate( const char* pzFileName )
+    EXPORT tTemplate*
+loadTemplate( tCC* pzFileName )
 {
     size_t       dataSize;
     void*        pDataMap;
@@ -731,13 +735,13 @@ loadTemplate( const char* pzFileName )
         size_t       macroCt;
         tTemplate*   pRes;
         size_t       alocSize;
-        const char*  pzData;
+        tCC*  pzData;
 
         /*
          *  Process the leading pseudo-macro.  The template proper
          *  starts immediately after it.
          */
-        pzData = loadPseudoMacro( (const char*)pDataMap, zRealFile );
+        pzData = loadPseudoMacro( (tCC*)pDataMap, zRealFile );
 
         /*
          *  Count the number of macros in the template.  Compute
@@ -747,7 +751,7 @@ loadTemplate( const char* pzFileName )
          */
         macroCt = countMacros( pzData );
         alocSize = sizeof( *pRes ) + (macroCt * sizeof( tMacro ))
-                   + dataSize - (pzData - (const char*)pDataMap)
+                   + dataSize - (pzData - (tCC*)pDataMap)
                    + strlen( zRealFile ) + 0x10;
         alocSize &= ~0x0F;
         pRes = (tTemplate*)AGALOC( alocSize );

@@ -1,7 +1,7 @@
 
 /*
  *  agDirect.c
- *  $Id: defDirect.c,v 1.2 2000/03/05 00:23:30 bruce Exp $
+ *  $Id: defDirect.c,v 1.3 2000/03/05 20:58:13 bruce Exp $
  *  This module processes definition file directives.
  */
 
@@ -37,6 +37,9 @@ tSCC zCheckList[] = "\n#";
 
 STATIC int  ifdefLevel = 0;
 STATIC teDirectives findDirective( char* pzDirName );
+STATIC teDirectives findDirective( char* pzDirName );
+STATIC char* skipToEndif( char* pzScan );
+STATIC char* skipToElseEnd( char* pzScan );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -48,7 +51,7 @@ STATIC teDirectives findDirective( char* pzDirName );
  *  Decide what to do and return a pointer to the character
  *  where scanning is to resume.
  */
-    char*
+    EXPORT char*
 processDirective( char* pzScan )
 {
     const tDirTable* pTbl  = dirTable;

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.10 2000/03/05 18:27:04 bruce Exp $
+ *  $Id: autogen.h,v 1.11 2000/03/05 20:58:13 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -49,6 +49,8 @@ typedef enum {
 #else
 #  define GIVE_UP(f,l)
 #endif
+
+#define EXPORT
 
 #define AG_ABEND STMTS( \
     GIVE_UP( __FILE__, __LINE__ ); \
@@ -335,6 +337,8 @@ struct mem_mgmt {
    extern void* ag_alloc( size_t, const char* );
    extern void* ag_realloc( void*, size_t, const char* );
    extern void  ag_free( void* );
+   extern void  unloadTemplate( tTemplate* pT );
+   extern void  unloadDefs( void );
 
 #  define AGALOC( c )      ag_alloc( c, __FILE__ " at " STR( __LINE__ ))
 #  define AGREALOC( p, c)  ag_realloc( p, c, __FILE__ " at " STR( __LINE__ ))
@@ -353,6 +357,8 @@ struct mem_mgmt {
 #  define AGFREE( p )      free( p )
 #  define AGDUPSTR( p, s ) p = strdup( s )
 #  define TAGMEM( m, t )
+#  define unloadTemplate(pt)
+#  define unloadDefs()
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

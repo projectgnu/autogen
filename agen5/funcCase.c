@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.14 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: funcCase.c,v 1.15 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -27,14 +27,13 @@
 #ifndef DEFINE_LOAD_FUNCTIONS
 
 #include "autogen.h"
+#include "expr.h"
 
 #ifdef WITH_INCLUDED_REGEX
 #  include "compat/gnu-regex.h"
 #else
 #  include <regex.h>
 #endif
-
-#include "proto.h"
 
 #undef  IS_LOW
 #define IS_LOW(c)  (((c) <= 'z') && ((c) >= 'a'))
@@ -51,9 +50,27 @@
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
 
+STATIC void     compile_re( regex_t* pRe, char* pzPat, int flags );
+STATIC void     upString( char* pz );
+
+typedef tSuccess (tSelectProc)( char* pzText, char* pzMatch );
+tSelectProc Select_Compare,
+            Select_Compare_End,
+            Select_Compare_Start,
+            Select_Compare_Full,
+            Select_Equivalent,
+            Select_Equivalent_End,
+            Select_Equivalent_Start,
+            Select_Equivalent_Full,
+            Select_Match,
+            Select_Match_End,
+            Select_Match_Start,
+            Select_Match_Full,
+            Select_Match_Always;
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    static void
+    STATIC void
 compile_re( regex_t* pRe, char* pzPat, int flags )
 {
     int  rerr = regcomp( pRe, pzPat, flags );
@@ -66,7 +83,7 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
 }
 
 
-    static void
+    STATIC void
 upString( char* pz )
 {
     while (*pz != NUL)
@@ -88,7 +105,7 @@ upString( char* pz )
  * doc:  Test to see if a string contains a substring.  "strstr(3)"
  *       will find an address.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Compare( char* pzText, char* pzMatch )
 {
     return (strstr( pzText, pzMatch )) ? SUCCESS : FAILURE;
@@ -117,7 +134,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
  * doc:  Test to see if a string ends with a substring.
  *       strcmp(3) returns zero at the end of the string.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Compare_End( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
@@ -153,7 +170,7 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string starts with a substring.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Compare_Start( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
@@ -186,7 +203,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
  *
  * doc:  Test to see if two strings exactly match.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Compare_Full( char* pzText, char* pzMatch )
 {
     return (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
@@ -218,7 +235,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
  *       to character case.  In other words, it is a case insensitive
  *       comapare.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Equivalent( char* pzText, char* pzMatch )
 {
     char*    pz  = strdup( pzText );
@@ -262,7 +279,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string ends with an equivalent string.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Equivalent_End( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
@@ -298,7 +315,7 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
  *
  * doc:  Test to see if a string starts with an equivalent string.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Equivalent_Start( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
@@ -333,7 +350,7 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
  *       If the arguments are not strings, then
  *       the result of the numeric comparison is returned.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Equivalent_Full( char* pzText, char* pzMatch )
 {
     return (streqvcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
@@ -377,7 +394,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
  * doc:  Test to see if a string contains a pattern.
  *       Case is not significant.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Match( char* pzText, char* pzMatch )
 {
     /*
@@ -461,7 +478,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
  * doc:  Test to see if a string ends with a pattern.
  *       Case is not significant.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Match_End( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -559,7 +576,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
  * doc:  Test to see if a string starts with a pattern.
  *       Case is not significant.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Match_Start( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -653,7 +670,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  * doc:  Test to see if a string fully matches a pattern.
  *       Case is not significant.
 =*/
-    static tSuccess
+    STATIC tSuccess
 Select_Match_Full( char* pzText, char* pzMatch )
 {
     regmatch_t m[2];
@@ -733,7 +750,7 @@ ag_scm_string_eqv_match_p( SCM text, SCM substr )
 /*
  *  We don't bother making a Guile function for this one :)
  */
-    static tSuccess
+    STATIC tSuccess
 Select_Match_Always( char* pzText, char* pzMatch )
 {
     return SUCCESS;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.18 2000/03/05 18:27:05 bruce Exp $
+ *  $Id: funcEval.c,v 1.19 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -28,6 +28,7 @@
 
 #include "autogen.h"
 #include "expGuile.h"
+#include "expr.h"
 
 #include <compat/compat.h>
 #ifdef WITH_INCLUDED_REGEX
@@ -36,30 +37,36 @@
 #  include <regex.h>
 #endif
 
-    char*
+tSCC        zNil[] = "";
+
+STATIC int exprType( char* pz );
+
+
+    EXPORT char*
 resolveSCM( SCM s, ag_bool*  pMustFree )
 {
     static char z[32];
     char*  pzRes = z;
+    int    len;
 
     switch (gh_type_e( s )) {
     case GH_TYPE_BOOLEAN:         
-        strcpy( z, SCM_NFALSEP(res) ? "1" : "0" ); break;
+        strcpy( z, SCM_NFALSEP(s) ? "1" : "0" ); break;
 
     case GH_TYPE_STRING:
     case GH_TYPE_SYMBOL:
-        len = SCM_LENGTH(res);
+        len = SCM_LENGTH(s);
         if (len >= sizeof( z )) {
             pzRes = AGALOC( len + 1 );
             *pMustFree = AG_TRUE;
         }
 
-        memcpy( pzRes, SCM_CHARS(res), len );
+        memcpy( pzRes, SCM_CHARS(s), len );
         pzRes[ len ] = NUL;
         break;
 
     case GH_TYPE_CHAR:
-        z[0] = gh_scm2char(res); z[1] = NUL; break;
+        z[0] = gh_scm2char(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
         pzRes = "** Vector **"; break;
@@ -68,14 +75,14 @@ resolveSCM( SCM s, ag_bool*  pMustFree )
         pzRes = "** Pair **"; break;
 
     case GH_TYPE_NUMBER:
-        sprintf( z, "%ld", gh_scm2long(res) ); break;
+        sprintf( z, "%ld", gh_scm2long(s) ); break;
 
     case GH_TYPE_PROCEDURE:
-ef SCM_SUBR_ENTRY
-        sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(res) ); break;
-e
+#ifdef SCM_SUBR_ENTRY
+        sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(s) ); break;
+#else
         pzRes = "** PROCEDURE **"; break;
-if
+#endif
 
     case GH_TYPE_LIST:
         pzRes = "** LIST **"; break;
@@ -107,7 +114,7 @@ if
  *  It may need to be deallocated, so a boolean pointer is used
  *  to tell the caller.
  */
-    char*
+    EXPORT char*
 evalExpression( ag_bool* pMustFree )
 {
     tTemplate*  pT      = pCurTemplate;
@@ -117,7 +124,6 @@ evalExpression( ag_bool* pMustFree )
     tDefEntry*  pDef;
     int         code = pMac->res;
     char*       pzText;
-    tSCC        zNil[] = "";
 
     *pMustFree = AG_FALSE;
 
@@ -290,7 +296,7 @@ ag_scm_error_source_line( void )
  *  digest the string and return that.  Otherwise, just return
  *  the string.
  */
-    SCM
+    EXPORT SCM
 eval( const char* pzExpr )
 {
     ag_bool allocated = AG_FALSE;
@@ -368,7 +374,7 @@ MAKE_HANDLER_PROC( Expr )
 #endif /* DEFINE_LOAD_FUNCTIONS */
 
 
-    static int
+    STATIC int
 exprType( char* pz )
 {
     switch (*pz) {

@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.8 2000/03/05 18:27:05 bruce Exp $
+ *  $Id: defLex.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -70,7 +70,7 @@ STATIC char* assembleString( char* pzScan );
  *
  *   LEXICAL SCANNER
  */
-    int
+    EXPORT int
 yylex( void )
 {
     lastToken = ERROR;
@@ -297,7 +297,7 @@ lex_done:
 
 
 
-    void
+    EXPORT void
 yyerror( char* s )
 {
     fprintf( stderr, "%s:  in %s on line %d\n    token in error:  ",

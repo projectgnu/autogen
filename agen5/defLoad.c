@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defLoad.c,v 1.3 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: defLoad.c,v 1.4 2000/03/05 20:58:13 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -29,6 +29,10 @@
 #include <streqv.h>
 
 #include "autogen.h"
+
+STATIC int compareIndex( const void* p1, const void* p2 );
+STATIC void fixTwins( tDefEntry** ppNode );
+STATIC void massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle );
 
 
     STATIC int
@@ -273,7 +277,7 @@ massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
  *
  *  Suck in the entire definitions file and parse it.
  */
-    void
+    EXPORT void
 readDefines( void )
 {
     char*    pzData;

@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.16 2000/03/05 02:32:28 bruce Exp $
+## $Id: Makefile.am,v 1.17 2000/03/05 20:58:12 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -63,7 +63,7 @@ clean :
 ##  Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
-## make gen.  ALSO:  keep the "GEN-RULE" comments - used by bootstrap.dir
+## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
 STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
 GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
@@ -85,6 +85,11 @@ stamp-functions: $(FUNCLIST) functions.tpl
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+
+## proto.h GEN-RULE
+proto.h : defParse.y
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
 

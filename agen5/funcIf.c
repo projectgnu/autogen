@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.7 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: funcIf.c,v 1.8 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -31,6 +31,8 @@
 #include "expGuile.h"
 
 tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
+
+STATIC ag_bool eval_true( void );
 
 
     STATIC ag_bool

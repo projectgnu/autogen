@@ -25,9 +25,16 @@ then
   if egrep 'define DEBUG' opts.h > /dev/null 2>&1
   then
     DEBUG_OPTS=-DDEBUG=1
+    AUTOGEN_DEBUG=DEBUG=1
+    export AUTOGEN_DEBUG
   else
     DEBUG_OPTS=-UDEBUG
+    unset AUTOGEN_DEBUG
   fi
+
+else
+  AUTOGEN_DEBUG=`echo " ${DEBUG_OPTS}" | sed 's/ -D/ /g'`
+  export AUTOGEN_DEBUG
 fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -40,10 +47,10 @@ rmlist=
 #  Name our executable in one place and disable any $HOME defaults
 #  Use the local ${AG}, if available.  Otherwise, look for it.
 #
-AG=./AutoGen
+AG=AutoGen
 if [ ! -x ${AG} ]
 then
-  f=`type ${AG} | sed "s/${AG} is //" `
+  f=`type ${AG} | sed -e "s;${AG} is ;;" `
   case ${f} in
   */AutoGen )
      AG=${f}
@@ -63,7 +70,7 @@ fi
 GD=../getdefs/getdefs
 if [ ! -x ${GD} ]
 then
-  f=`type ${GD} | sed "s/${GD} is //" `
+  f=`type getdefs | sed "s/getdefs is //" `
   case ${f} in
   */getdefs )
      ln -s ${f} ${GD}
@@ -80,7 +87,7 @@ fi
 COLS=../columns/columns
 if [ ! -x ${COLS} ]
 then
-  f=`type ${COLS} | sed "s/${COLS} is //" `
+  f=`type columns | sed "s/columns is //" `
   case ${f} in
   */columns )
      ln -s ${f} ${COLS}
@@ -107,8 +114,9 @@ fi
 #
 if [ $# -eq 0 ]
 then
-  set -- `egrep '^##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
-          sed 's/^## *\(.*\) GEN-RULE/\1/' `
+  echo Looking in ${top_srcdir}/agen5/Makefile.am for GEN-RULE
+  set -- `egrep '##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
+          sed 's/.*## *\(.*\) GEN-RULE/\1/' `
   echo building $*
 fi
 
@@ -157,6 +165,7 @@ do
     ;;
 
   stamp-exprini | \
+  expr.h | \
   expr.ini )
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="$eopt defs=gfunc templ=snarf srcfile"
@@ -198,6 +207,29 @@ do
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def
     ${AG} ${eopt} ./opts.def
+    ;;
+
+  proto.h )
+    rm -f proto.h
+    ( cat <<-	_EOF_
+	/*
+	 * AutoGen Globally exported prototypes
+	 */
+	#ifndef AUTOGEN_PROTOTYPES_H
+	#define AUTOGEN_PROTOTYPES_H
+_EOF_
+    for f in `egrep -l '^    EXPORT' *.c`
+    do
+      echo
+      echo "/* exports from $f */"
+      echo
+      sed -n '/^    EXPORT/,/)$/p' $f | \
+        sed -e 's/^    EXPORT *//' -e 's/)$/);/'
+    done
+    echo
+    echo "#endif /* AUTOGEN_PROTOTYPES_H */"
+    ) > proto.h
+    chmod 444 proto.h
     ;;
 
   * )

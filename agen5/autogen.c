@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.7 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: autogen.c,v 1.8 2000/03/05 20:58:12 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -29,11 +29,19 @@
 #include "autogen.h"
 #include <signal.h>
 
-STATIC sigjmp_buf  abendJumpEnv;
-STATIC void signalSetup( void );
-
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)";
+
+STATIC sigjmp_buf  abendJumpEnv;
+
+/*
+ *  Local procedures
+ */
+STATIC void signalSetup( void );
+STATIC void abendSignal( int sig );
+STATIC void doneCheck( void );
+STATIC void inner_main( int argc, char** argv );
+
 
     STATIC void
 inner_main( int argc, char** argv )

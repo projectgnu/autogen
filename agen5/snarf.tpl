@@ -1,19 +1,44 @@
 [= AutoGen5 template  -*- Mode: C -*-
 
-# $Id: snarf.tpl,v 1.5 1999/11/24 23:30:12 bruce Exp $
+# $Id: snarf.tpl,v 1.6 2000/03/05 20:58:13 bruce Exp $
 
 ini =]
-/*
+[= (out-push-new (string-append (base-name) ".h"))
+=]/*
 [=(dne " *  ")=]
  *
- *  copyright 1992-1999 Bruce Korb
+ *  copyright 1992-2000 Bruce Korb
+ *
+[=(gpl "AutoGen" " *  ")=]
+ *
+ *  Guile Implementation Routines[=% group " - for the %s group" =]
+ */
+#ifndef GUILE_PROC_DECLS
+#define GUILE_PROC_DECLS
+[=
+FOR gfunc =]
+extern SCM [=% group "%s_" =]scm_[=name=]( [=
+  IF (exist? "exparg") =][=
+    FOR exparg ", " =]SCM[=
+    ENDFOR =][=
+  ELSE  =]void[=
+  ENDIF =] );[=
+ENDFOR =]
+
+#endif /* GUILE_PROC_DECLS */
+[=(out-pop)
+=]/*
+[=(dne " *  ")=]
+ *
+ *  copyright 1992-2000 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
  *  Guile Initializations - [=% group (string-capitalize! "%s ")
                             =]Global Variables
  */
-typedef SCM (t_scm_callout_proc)();[=
+#include "[= (base-name) =].h"
+typedef SCM (t_scm_callout_proc) ();[=
 
 DEFINE string_content =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
@@ -27,9 +52,6 @@ ENDDEF =][=
     string_content =][=
   ENDFOR gfunc =]
 [=
-  FOR gfunc =]
-extern t_scm_callout_proc [=% group "%s_" =]scm_[=name=];[=
-  ENDFOR gfunc =][=
 
   FOR syntax =][=
     string_content =][=
@@ -66,6 +88,9 @@ ENDDEF =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 =]
+
+void [=% group "%s_" =]init( void );
+
 /*
  *  [=% group "%s " =]Two-Phase Initialization procedure
  *

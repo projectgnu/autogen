@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.12 1999/11/04 05:31:22 bruce Exp $
+ *  $Id: funcFor.c,v 1.13 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -27,9 +27,21 @@
 #ifndef DEFINE_LOAD_FUNCTIONS
 
 #include "autogen.h"
-#include "proto.h"
+#include "expr.h"
 
 #define ENTRY_END  INT_MAX
+
+STATIC ag_bool nextDefinition( ag_bool invert, tDefEntry** ppList );
+STATIC int
+doForByStep( tTemplate* pT,
+             tMacro*    pMac,
+             tDefEntry* pFoundDef,
+             tDefEntry* pCurDef );
+STATIC int
+doForEach( tTemplate*   pT,
+           tMacro*      pMac,
+           tDefEntry*   pFoundDef,
+           tDefEntry*   pCurDef );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

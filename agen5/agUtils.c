@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.2 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: agUtils.c,v 1.3 2000/03/05 20:58:12 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -36,8 +36,10 @@
    static void finalMemCheck( void );
 #endif
 
+STATIC const char* skipQuote( const char* pzQte );
 
-    void
+
+    EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
     /*
@@ -148,7 +150,7 @@ doOptions( int arg_ct, char** arg_vec )
 }
 
 
-    const char*
+    EXPORT const char*
 getDefine( const char* pzDefName )
 {
     char**  ppz;
@@ -177,7 +179,7 @@ getDefine( const char* pzDefName )
 }
 
 
-    unsigned int
+    EXPORT unsigned int
 doEscapeChar( const char* pzIn, char* pRes )
 {
     unsigned int  res = 1;
@@ -295,7 +297,7 @@ doEscapeChar( const char* pzIn, char* pRes )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    char*
+    EXPORT char*
 spanQuote( char* pzQte )
 {
     char  q = *pzQte;          /*  Save the quote character type */
@@ -346,7 +348,7 @@ spanQuote( char* pzQte )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    const char*
+    STATIC const char*
 skipQuote( const char* pzQte )
 {
     char  q = *pzQte++;        /*  Save the quote character type */
@@ -391,7 +393,7 @@ skipQuote( const char* pzQte )
 }
 
 
-    const char*
+    EXPORT const char*
 skipScheme( const char* pzSrc,  const char* pzEnd )
 {
     int  level = 0;
@@ -416,7 +418,7 @@ skipScheme( const char* pzSrc,  const char* pzEnd )
 }
 
 
-    const char*
+    EXPORT const char*
 skipExpression( const char* pzSrc, size_t len )
 {
     const char* pzEnd = pzSrc + len;

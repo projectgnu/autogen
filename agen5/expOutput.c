@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.7 1999/11/04 05:34:50 bruce Exp $
+ *  $Id: expOutput.c,v 1.8 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -29,6 +29,7 @@
 #include <utime.h>
 
 #include "autogen.h"
+#include "expr.h"
 
 #ifndef S_IAMB
 /*
@@ -39,8 +40,10 @@
 
 STATIC int outputDepth = 1;
 
+STATIC void addWriteAccess( char* pzFileName );
 
-    void
+
+    EXPORT void
 removeWriteAccess( int fd )
 {
     struct stat    sbuf;

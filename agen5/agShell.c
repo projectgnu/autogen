@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.3 1999/10/14 22:39:06 bruce Exp $
+ *  $Id: agShell.c,v 1.4 2000/03/05 20:58:12 bruce Exp $
  *  Manage a server shell process
  */
 
@@ -58,8 +58,11 @@ tSCC   zCmdFmt[]   = "\\cd %s\n%s\n\necho\necho %s\n";
 
 const char* pzLastCmd = (const char*)NULL;
 
+STATIC void sigHandler( int signo );
+STATIC void serverSetup( void );
 
-    void
+
+    EXPORT void
 closeServer( void )
 {
     if (serverId == NULLPROCESS)
@@ -164,7 +167,7 @@ serverSetup( void )
  *  for the new process and, optionally, a pointer to a place
  *  to store the child's process id.
  */
-    int
+    EXPORT int
 chainOpen( int       stdinFd,
            tpChar*   ppArgs,
            pid_t*    pChild  )
@@ -288,7 +291,7 @@ chainOpen( int       stdinFd,
  *  process should write to "writeFd" and read from "readFd".
  *  The return value is the process id of the created process.
  */
-    pid_t
+    EXPORT pid_t
 openServer( tFdPair* pPair, tpChar* ppArgs )
 {
     pid_t     chId;
@@ -315,7 +318,7 @@ openServer( tFdPair* pPair, tpChar* ppArgs )
  *  Identical to "openServer()", except that the "fd"'s are "fdopen(3)"-ed
  *  into file pointers instead.
  */
-    pid_t
+    EXPORT pid_t
 openServerFP( tpfPair* pfPair, tpChar* ppArgs )
 {
     tFdPair   fdPair;
@@ -338,7 +341,7 @@ openServerFP( tpfPair* pfPair, tpChar* ppArgs )
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
-    char*
+    EXPORT char*
 loadData( FILE* fp )
 {
     char*   pzText;
@@ -425,7 +428,7 @@ loadData( FILE* fp )
  *  If one of the commands we send to it takes too long or it dies,
  *  we will shoot it and restart one later.
  */
-    char*
+    EXPORT char*
 runShell( const char*  pzCmd )
 {
     tSCC zCmdFail[] = "CLOSING SHELL SERVER - command failure:\n\t%s\n";

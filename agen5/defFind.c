@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defFind.c,v 1.4 2000/03/05 18:27:04 bruce Exp $
+ *  $Id: defFind.c,v 1.5 2000/03/05 20:58:13 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -38,10 +38,13 @@ typedef enum {
     CDF_INDEX_NAME
 } teState;
 
+STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
+
+
 /*
  *  Copy a reference to a definition.
  */
-    int
+    EXPORT int
 copyDefReference( tTemplate* pT, tMacro* pMac,
                   char** ppDest, const char** ppSrc, int maxLen )
 {
@@ -376,7 +379,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
  *  the element has been indexed (so the caller will not try
  *  to traverse the list of twins).
  */
-    tDefEntry*
+    EXPORT tDefEntry*
 findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
 {
     char*      pcBrace;

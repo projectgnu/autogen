@@ -1,7 +1,7 @@
 
 /*
  *  agExpr.c
- *  $Id: expGuile.c,v 1.8 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: expGuile.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -31,6 +31,7 @@
 #include "autogen.h"
 #include <guile/gh.h>
 #include "expGuile.h"
+#include "expr.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.23 1999/11/11 04:38:06 bruce Exp $
+ *  $Id: funcDef.c,v 1.24 2000/03/05 20:58:13 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -25,10 +25,12 @@
  *             Boston,  MA  02111-1307, USA.
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
-#include "autogen.h"
 
 #include <streqv.h>
 #include <guile/gh.h>
+
+#include "autogen.h"
+#include "expr.h"
 
 typedef int (tCmpProc)( const void*, const void* );
 
@@ -41,6 +43,14 @@ struct def_list {
 tSCC  zNoResolution[] = "Could not resolve INVOKE macro name - %s";
 tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
 #endif /* not defined DEFINE_LOAD_FUNCTIONS */
+
+STATIC tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
+
+STATIC int   orderDefList( const void* p1, const void* p2 );
+STATIC char* skipNestedExpression( char* pzScan, size_t len );
+STATIC void  spanTemplate( char* pzQte, tDefList* pDefList );
+STATIC void  prepInvokeArgs( tMacro* pMac );
+STATIC char* anonymousTemplate( void* p, tDefEntry* pCurDef );
 
 
     STATIC int
@@ -191,7 +201,7 @@ skipNestedExpression( char* pzScan, size_t len )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    STATIC char*
+    STATIC void
 spanTemplate( char* pzQte, tDefList* pDefList )
 {
     char* pzStartMark   = pCurTemplate->zStartMac;
@@ -203,8 +213,11 @@ spanTemplate( char* pzQte, tDefList* pDefList )
     char  q;
     int   mac_ct = 1;
 
-    if ((pzStartMacro == (char*)NULL) || (pzExpEnd < pzStartMacro))
-        return spanQuote( pzQte );
+    if (  (pzStartMacro == (char*)NULL)
+       || (pzExpEnd < pzStartMacro)) {
+        (void)spanQuote( pzQte );
+	return;
+    }
 
     q = *pzQte;          /*  Save the quote character type */
     p = pzQte++;         /*  Destination pointer           */
@@ -291,7 +304,6 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         pNewT = templateFixup( pNewT, pNewT->descSize );
         sprintf( pzText, "[ 0x%08X ]", pNewT );
     }
-    return pzQte;
 }
 
 
@@ -303,7 +315,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
  *  for name-value assignments that are only to live for the duration
  *  of the processing of the user defined macro.
  */
-    void
+    EXPORT void
 parseMacroArgs( tTemplate* pT, tMacro* pMac )
 {
     char*        pzScan = pT->pzTemplText + pMac->ozText;
@@ -594,6 +606,7 @@ MAKE_HANDLER_PROC( Debug )
     return pMac+1;
 }
 #endif
+
     STATIC char*
 anonymousTemplate( void* p, tDefEntry* pCurDef )
 {

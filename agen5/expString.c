@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.12 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: expString.c,v 1.13 2000/03/05 20:58:13 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -28,17 +28,23 @@
 
 #include <string.h>
 
-#include "autogen.h"
 #include <guile/gh.h>
+#include "autogen.h"
 #include "expGuile.h"
+#include "expr.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
 #endif
 
+STATIC SCM makeString( tCC*    pzText,
+            tCC*    pzNewLine,
+            size_t  newLineSize );
+
+
     STATIC SCM
 makeString( tCC*    pzText,
-	    tCC*    pzNewLine,
+            tCC*    pzNewLine,
             size_t  newLineSize )
 {
     char*    pzDta;

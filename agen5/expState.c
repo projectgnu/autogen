@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.8 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: expState.c,v 1.9 2000/03/05 20:58:13 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -28,19 +28,24 @@
 
 #include <string.h>
 
-#include "autogen.h"
 #include <guile/gh.h>
+#include "autogen.h"
+#include "expr.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
 #endif
+
+STATIC int     entry_length(   char* pzName, tDefEntry* pCurDef );
+STATIC int     count_entries(  char* pzName, tDefEntry* pCurDef );
+STATIC ag_bool find_any_entry( char* pzName, tDefEntry* pCurDef );
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION SUPPORT ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    static int
+    STATIC int
 entry_length( char* pzName, tDefEntry* pCurDef )
 {
     ag_bool     isIndexed;
@@ -132,7 +137,7 @@ entry_length( char* pzName, tDefEntry* pCurDef )
 }
 
 
-    static int
+    STATIC int
 count_entries( char* pzName, tDefEntry* pCurDef )
 {
     ag_bool     isIndexed;
@@ -227,7 +232,7 @@ count_entries( char* pzName, tDefEntry* pCurDef )
 }
 
 
-    static ag_bool
+    STATIC ag_bool
 find_any_entry( char* pzName, tDefEntry* pCurDef )
 {
     ag_bool     isIndexed;
