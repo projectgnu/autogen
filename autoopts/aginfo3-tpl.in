@@ -5,34 +5,40 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-05-04 19:45:54 bkorb"
+## Time-stamp:      "2002-05-05 17:57:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo3-tpl.in,v 3.2 2002/05/05 03:07:06 bkorb Exp $
+## $Id: aginfo3-tpl.in,v 3.3 2002/05/06 23:42:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi
 
 (setenv "SHELL" "/bin/sh")
 
-+}
-@node lib{+library+} procedures
-@{+
- (define doc-level (getenv "LEVEL"))
- (if (not (string? doc-level))
-     (set! doc-level "section"))
- doc-level +} lib{+library+} External Procedures
++}{+
+
+(out-push-new (sprintf "%s.menu" (base-name)))
+(define node-name (sprintf "lib%s procedures" (get "library")))
+(define sec-name  (sprintf "lib%s External Procedures"))
+
+(define doc-level (getenv "LEVEL"))
+(if (not (string? doc-level))
+    (set! doc-level "section"))
+(sprintf "* %-28s %s\n" (string-append node-name "::") sec-name)  +}{+
+(out-pop)
++}@node {+ (. node-name) +}
+@{+ (. doc-level) +} {+ (. sec-name) +}
 
 {+
 
 IF (not (exist? "lib-description"))
 
-+}These are the publicly exported procedures from the lib{+library+} library.
-Any other functions mentioned in the interface file are for the private use
-of the library.{+
++}These are the publicly exported procedures from the lib@i{library}
+library.  Any other functions mentioned in the @i{header} file are
+for the private use of the library.{+
 
 ELSE  +}{+  lib-description +}{+
 ENDIF +}

@@ -1,5 +1,11 @@
 2002-05-04  Bruce Korb  <bkorb@gnu.org>
 
+	* config/missing(makeinfo): fix syntax
+	* doc/auto_gen.tpl(libopts.texi): hunt for file (schizophrenia)
+	* doc/Makefile.am: config stuff
+
+2002-05-04  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/Makefile.am(libopts.texi): build with correct base name
 	* autoopts/aginfo3.tpl: finish
 	* autoopts/autoopts.c: finish doc-ing the public interfaces
@@ -17,6 +23,7 @@
 	to @include successfully.
 	* doc/autogen.texi: break up the option discussion where we need to
 	"suck up" the user visible functions.
+	(faq): removed from doc, now just part of web site.
 	* getdefs/gdinit.c(validateOptions): allow for "/*=*" definitions.
 	* getdefs/getdefs.c(buildDefinition): do not skip newline for global defs
 	advance from start of entire matched text instead of subexpression.

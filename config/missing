@@ -77,7 +77,7 @@ aclocal )
 
 makeinfo)
   if ${run} && (makeinfo --version) > /dev/null 2>&1
-  exit_code=1 ; fi
+  then exit_code=1 ; fi
   ;;
 
 help | "")

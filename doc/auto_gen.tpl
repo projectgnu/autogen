@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.5 2002/05/05 03:07:07 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.6 2002/05/06 23:42:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -458,7 +458,15 @@ that should go with your program as well.
 [=`${AGEXE} -L ${top_srcdir}/doc ${top_srcdir}/doc/compete.def
    cat compete.texi`=]
 [= get-text tag = "end-autoopts"  =]
-[= `cat ${top_srcdir}/autoopts/libopts.texi` =]
+[= `
+f=../autoopts/libopts.texi
+[ ! -f $f ] && f=${top_srcdir}/autoopts/libopts.texi
+[ -f $f ] || {
+  echo "Cannot locate libopts.texi" >&2
+  kill -n $AG_pid
+  exit 1
+}
+cat $f` =]
 [= get-text tag = "autoopts-data" =]
 
 @example

@@ -30,7 +30,6 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Installation::         Configuring and Installing
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
-* FAQ::                  Hints, helps and FAQs
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::       Function index
@@ -110,8 +109,9 @@ rearranged, augmented and become obsolete without it being necessary to
 go back and clean up older definition files.  Reduce incompatibilities!
 
 @item
-Multiple values for a given name create an array of values.  These arrays of
-values are used to control the replication of sections of the template.
+Every definition name defines an array of values, even when there is
+only one entry.  These arrays of values are used to control the
+replication of sections of the template.
 
 @item
 There are named collections of definitions.  They form a nested hierarchy.
@@ -1856,7 +1856,7 @@ You have greater license with it.
 * option descriptor::   Option Descriptor File
 * Using AutoOpts::      Using AutoOpts
 * shell options::       AutoOpts for Shell Scripts
-* AutoInfo::            Automated @samp{Invoking Info} Doc
+* AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
 @end menu
 
@@ -3757,8 +3757,47 @@ Extraction from autogen.texi
 @end ignore
 
 @node AutoInfo
-@section Automated @samp{Invoking Info} Doc
+@section Automated Info Docs
 @cindex AutoInfo
+
+AutoOpts provides two templates for producing @file{.texi} documentation.
+@file{aginfo.tpl} for the invoking section, and @file{aginfo3.tpl} for
+describing exported library functions and macros.
+
+For both types of documents, the documentation level is selected by
+passing a @samp{-DLEVEL=<level-name>} argument to AutoGen when you build
+the document.  (See the example invocation below.)
+
+Two files will be produced, a @file{.texi} file and a @file{.menu} file.
+You should include the @file{.menu} file in your document where you wish
+to reference the @samp{invoking} chapter, section or subsection.
+
+The @file{.texi} file will contain an introductory paragraph, a menu
+and a subordinate section for the invocation usage and for each
+documented option.  The introductory paragraph is normally the boiler
+plate text, along the lines of:
+
+@example
+This chapter documents the @@file@{AutoOpts@} generated usage text
+and option meanings for the @@file@{your-program@} program.
+@end example
+
+@noindent
+or:
+
+@example
+These are the publicly exported procedures from the lib@i{name} library.
+Any other functions mentioned in the @i{header} file are for the private use
+of the library.
+@end example
+
+@menu
+* command-info::      ``invoking'' info docs
+* library-info::      library info docs
+@end menu
+
+@node command-info
+@subsection ``invoking'' info docs
 
 Using the option definitions for an AutoOpt client program, the
 @file{aginfo.tpl} template will produce texinfo text that documents the
@@ -3768,31 +3807,15 @@ document.  The usage text for the @ref{autogen usage},
 @ref{getdefs usage} and @ref{columns usage} programs, are included in
 this document and are all generated using this template.
 
-Two files will be produced, a @file{.texi} file and a @file{.menu} file.
-You should include the @file{.menu} file in your document where you wish
-to reference the @samp{invoking} chapter, section or subsection.  The
-documentation level is selected by passing a @samp{-DLEVEL=<level-name>}
-argument to AutoGen when you build the document.  (See the example
-invocation below.)
-
-The @file{.texi} file will contain an introductory paragraph, a menu
-and a subordinate section for the invocation usage and for each
-documented option.  The introductory paragraph is normally the boiler
-plate text:
-
-@example
-This chapter documents the @@file@{AutoOpts@} generated usage text
-and option meanings for the @@file@{your-program@} program.
-@end example
+If your program's option definitions include a
+@samp{prog-info-descrip} section, then that text will replace the
+boilerplate introductory paragraph.
 
 @noindent
-However, if your program's option definitions include a
-@samp{prog-info-descrip} section, then that is what will be used instead.
-
 These files are produced by invoking the following command:
 
 @example
-AutoGen -L $@{prefix@}/share/autogen -T aginfo.tpl \
+autogen -L $@{prefix@}/share/autogen -T aginfo.tpl \
         -DLEVEL=section your-opts.def
 @end example
 
@@ -3801,9 +3824,55 @@ Where @file{$@{prefix@}} is the AutoGen installation prefix
 and @file{your-opts.def} is the name of your product's option
 definition file.
 
+@node library-info
+@subsection library info docs
+
+The @file{texinfo} doc for libraries is derived from mostly the same
+information as is used for producing man pages @xref{man3}.  The main
+difference is that there is only one output file and the individual
+functions are referenced from a @code{.texi} menu.  There is also
+a small difference in the global attributes used:
+
+@multitable @columnfractions .02 .23 .65
+@item @tab lib_description
+@tab A description of the library.  This text appears before the menu.
+If not provided, the standard boilerplate version will be inserted.
+@item
+@item @tab see_also
+@tab The @code{SEE ALSO} functionality is not supported for the
+@file{texinfo} documentation, so any @code{see_also} attribute will be ignored.
+@end multitable
+
+@noindent
+These files are produced by invoking the following commands:
+
+@example
+getdefs linenum srcfile template=aginfo3.tpl output=libexport.def \
+       <source-file-list>
+
+autogen -L $@{prefix@}/share/autogen -DLEVEL=section libexport.def
+@end example
+
+@noindent
+Where @file{$@{prefix@}} is the AutoGen installation prefix
+and @file{libexport.def} is some name that suits you.
+
 @node AutoMan pages
 @section Automated Man Pages
 @cindex AutoMan pages
+
+AutoOpts provides two templates for producing man pages.
+The command (@file{man1}) pages are derived from the options definition
+file, and the library (@file{man3}) pages are derived from
+stylized comments (@pxref{getdefs Invocation}).
+
+@menu
+* man1::      command line man pages
+* man3::      library man pages
+@end menu
+
+@node man1
+@subsection command line man pages
 
 Using the option definitions for an AutoOpt client program,
 the @samp{agman1.tpl} template will produce an nroff document
@@ -3843,15 +3912,107 @@ Where @file{$@{prefix@}} is the AutoGen installation prefix and
 I do not use this very much, so any feedback or improvements would be
 greatly appreciated.
 
+@node man3
+@subsection library man pages
+
+Two global definitions are required, and then
+one library man page is produced for each @code{export_func} definition
+that is found.  It is generally convenient to place these definitions
+as @file{getdefs} comments (@pxref{getdefs Invocation}) near the procedure
+definition, but they may also be a separate AutoGen definitions file
+(@pxref{Definitions File}).  Each function will be cross referenced
+with their sister functions in a @file{SEE ALSO} section.  A global
+@code{see_also} definition will be appended to this cross referencing text.
+
+@noindent
+The two global definitions required are:
+
+@multitable @columnfractions .02 .15 .77
+@item @tab library
+@tab This is the name of your library, without the @file{lib} prefix.
+The AutoOpts library is named @file{libopts.so...}, so the @code{library}
+attribute would have the value @code{opts}.
+@item
+@item @tab header
+@tab Generally, using a library with a compiled program entails
+@code{#include}-ing a header file.  Name that header with this attribute.
+In the case of AutoOpts, it is generated and will vary based on the
+name of the option definition file.  Consequently, @file{your-opts.h} is
+specified.
+@end multitable
+
+@noindent
+The @code{export_func} definition should contain the following attributes:
+
+@multitable @columnfractions .02 .15 .77
+@item @tab name
+@tab The name of the procedure the library user may call.
+@item @tab what
+@tab A brief sentence describing what the procedure does.
+@item @tab doc
+@tab A detailed description of what the procedure does.
+It may ramble on for as long as necessary to properly describe it.
+@item @tab err
+@tab A short description of how errors are handled.
+@item @tab ret_type
+@tab The data type returned by the procedure.
+Omit this for @code{void} procedures.
+@item @tab ret_desc
+@tab Describe what the returned value is, if needed.
+@item @tab private
+@tab If specified, the function will @strong{not} be documented.
+This is used, for example, to produce external declarations for functions
+that are not available for public use, but are used in the generated text.
+@item
+@item @tab arg
+@tab This is a compound attribute that contains:
+@end multitable
+@multitable @columnfractions .02 .15 .15 .62
+@item @tab @tab arg_type
+@tab The data type of the argument.
+@item @tab @tab arg_name
+@tab A short name for it.
+@item @tab @tab arg_desc
+@tab A brief description.
+@end multitable
+
+@noindent
+As a @file{getdefs} comment, this would appear something like this:
+
+@example
+/*=--subblock=arg=arg_type,arg_name,arg_desc =*/
+/*=*
+ * library: opts
+ * header:  your-opts.h
+=*/
+/*=export_func optionProcess
+ *
+ * what: this is the main option processing routine
+ * arg:  + tOptions* + pOpts + program options descriptor +
+ * arg:  + int       + argc  + program arg count  +
+ * arg:  + char**    + argv  + program arg vector +
+ * ret_type:  int
+ * ret_desc:  the count of the arguments processed
+ *
+ * doc:  This is what it does.
+ * err:  When it can't, it does this.
+=*/
+@end example
+
+@noindent
+Note the @code{subblock} and @code{library} comments.
+@code{subblock} is an embedded @file{getdefs}
+option (@pxref{getdefs subblock}) that tells it how to parse the
+@code{arg} attribute.  The @code{library} and @code{header} entries
+are global definitions that apply to all the documented functions.
+
 @page
 @node Add-Ons
 @chapter Add-on packages for AutoGen
 
 This chapter includes several programs that either work closely
 with AutoGen (extracting definitions or providing special formatting
-functions), or else it is @code{mkmerge}.  I want to promote the
-latter as an alternative to the builddir/srcdir schizophrenia.
-I hate it. :(
+functions).
 
 AutoOpts ought to appear in this list also, but since it is
 the primary reason why many people would even look into AutoGen
@@ -3933,48 +4094,6 @@ Extraction from autogen.texi
 @end ignore
 
 @page
-@node FAQ
-@chapter Hints, helps and FAQs
-@cindex FAQ
-
-This is a collection of issues that have come up and some approaches
-to them.  As I collect more, I'll add some organization, too.
-
-@table @samp
-@item version string
-@cindex version string
-Q:  ``One [consistency issue] is the version string. It is set in configure.in
-for autoconf and in the defs file for autogen, where they really are the
-same value.''
-
-A:  There are several possible approaches.  Well, lots of approaches, but
-I'll enumerate a few here:
-
-@enumerate
-@item
-AutoGen definitions can derive their string value from the output of a
-shell script.  Therefore, you can @code{grep} and @code{sed} the
-@file{configure.ac} file.
-
-@item
-@file{configure} (@file{configure.ac}) is just a shell script, too.
-It can run a script whose purpose is to @code{echo} out the version, so
-@strong{both} @file{configure} and AutoGen can easily use the same script.
-
-@item
-You can make an @file{configure.ac.tpl} template and generate
-@file{configure.ac} from AutoGen.  This would mean, however,
-you could not run configure before this.
-
-@item
-You can make a @file{version.def.in} file and create @file{version.def}
-when you run configure.  Likewise, this would mean you would have
-to configure the product before generating any files that needed
-the version from @file{version.def}.
-@end enumerate
-@end table
-
-@page
 @node Future
 @chapter Some ideas for the future.
 @cindex futures
@@ -4004,6 +4123,11 @@ to instead use this tool.
 @page
 @contents
 @bye
+@ignore
+END   == FUTURE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
 @c  LocalWords:  AutoGen texinfo Korb tpl bruce Exp texi autogen setfilename AG
 @c  LocalWords:  settitle setchapternewpage dne dircategory direntry ifinfo gpl
 @c  LocalWords:  AutoOpts snprintfv titlepage vskip pt filll sp dir xref cindex
@@ -4015,8 +4139,3 @@ to instead use this tool.
 @c  LocalWords:  ing getdefs libopts src ksh forcomma csh env Sourced autoopts
 @c  LocalWords:  mkmerge builddir ADDON AutoGetopts getopt glibc argp perl awk
 @c  LocalWords:  printindex cp fn
-
-@ignore
-END   == FUTURE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore

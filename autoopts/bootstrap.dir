@@ -26,7 +26,7 @@ case "$1" in
   fi
   if [ ! -f funcs.def ]
   then
-    getdefs assign='library=opts; header=your-opts.h' linenum srcfile \
+    getdefs linenum srcfile \
       template=options_h output=funcs.def \
       restore.c autoopts.c boolean.c enumeration.c \
       guileopt.c makeshell.c numeric.c pgusage.c putshell.c \

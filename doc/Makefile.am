@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.4 2002/05/05 03:07:06 bkorb Exp $
+## $Id: Makefile.am,v 3.5 2002/05/06 23:42:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -50,7 +50,8 @@ ADDON_TEXI	= \
 DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
 		$(AGSRCDIR)/autogen.menu \
-		$(AGSRCDIR)/autogen.texi
+		../autoopts/libopts.texi \
+		$(AGSRCDIR)/autogen.texi compete.def compete.tpl
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
@@ -58,8 +59,7 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 		$(OPTIONS_DEF) \
 		$(ADDON_MENU) \
 		$(ADDON_TEXI) \
-		../autoopts/libopts.texi \
-		$(DOC_INCLUDES) compete.def compete.tpl
+		$(DOC_INCLUDES)
 
 DEFCOPY		= copy=$(OPTIONS_DEF)
 
@@ -74,7 +74,6 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
-autogen.texi : texi-stamp
 texi         : texi-stamp
 
 texi-stamp : $(DOC_DEPENDS)
@@ -98,15 +97,6 @@ autogen.def : $(DOC_DEPENDS)
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
 	@touch $@
-
-www/doc/autogen_toc.html : texi-stamp
-	@mkdir -p www/doc > /dev/null 2>&1 || :
-	texi2html -menu -split_chapter -verbose autogen.texi
-	mv -f autogen*.html www/doc
-	@-sleep 1 ; touch $@
-
-html : web
-web : www/doc/autogen_toc.html
 
 ../getdefs/getdefs.texi :
 	@cd ../getdefs/ ; $(MAKE) $$mf gen
