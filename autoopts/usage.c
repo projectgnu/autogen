@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.16 2003/03/13 04:08:04 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.17 2003/03/14 01:47:02 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -85,6 +85,7 @@ typedef struct {
     tCC*    pzOpt;
     tCC*    pzNo;
     tCC*    pzBrk;
+    tCC*    pzNoF;
     tCC*    pzSpc;
     tCC*    pzOptFmt;
 } arg_types_t;
@@ -454,9 +455,9 @@ printBareUsage(
      *  opts are to be printed too.
      */
     if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
-        fputs( "  ",   option_usage_fp );
-    else if (! isgraph( pOD->optValue))
         fputs( pAT->pzSpc, option_usage_fp );
+    else if (! isgraph( pOD->optValue))
+        fputs( pAT->pzNoF, option_usage_fp );
     else {
         fprintf( option_usage_fp, "   -%c", pOD->optValue );
         if (  (pOptions->fOptSet & (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
@@ -537,7 +538,7 @@ tSC  zGnuBoolArg[]      = "=T/F";
 tSC  zGnuOptArg[]       = "[=arg]";
 #define zGnuNoArg       zGnuReqArg
 tSCC zGnuBreak[]        = "\n%s\n\n";
-tSCC zGnuSpace[]        = "      ";
+tSCC zGnuSpace[]        = "      ";  /* 6 spaces */
 
 static arg_types_t gnuTypes = {
     zGnuStrArg,
@@ -548,7 +549,8 @@ static arg_types_t gnuTypes = {
     zGnuOptArg,
     zGnuNoArg,
     zGnuBreak,
-    zGnuSpace
+    zGnuSpace,     /* 6 spaces */
+    zGnuSpace + 3  /* 3 spaces */
 };
 
 tSCC zStdStrArg[]       = "Str";
@@ -569,7 +571,8 @@ static arg_types_t stdTypes = {
     zStdOptArg,
     zStdNoArg,
     zStdBreak,
-    zGnuSpace + 1
+    zGnuSpace + 1,  /* 5 spaces */
+    zGnuSpace + 4   /* 2 spaces */
 };
 
 static void

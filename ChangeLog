@@ -1,3 +1,10 @@
+2003-03-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def(version): some egreps require '^'-s to be quoted
+	* autoopts/usage.c: initial space in absence of short option needs
+	to vary by non-gnu-style vs. standard
+	* autoopts/test/usage.test: accommodate
+
 2003-03-12  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/Makefile.am: some shells like to echo after a cd.
