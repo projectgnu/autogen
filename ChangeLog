@@ -1,5 +1,12 @@
 2000-03-18  Bruce Korb  <autogen@linuxbox.com>
 
+	* autoopts/doc.tpl:  Highlighted and documented the AutoMan and
+	AutoInfo capabilities :-)
+	* autoopts/agman1.tpl:  minor cleanup
+	* autoopts/aginfo.tpl:  ditto
+
+2000-03-18  Bruce Korb  <autogen@linuxbox.com>
+
 	* autoopts/optlib.tpl:  add USAGE_LINE.  Omits square brackets
 	around option syntax if there are required arguments.
 	* autoopts/optcode.tpl:  Make the usage invocation syntax a 
