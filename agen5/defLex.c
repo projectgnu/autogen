@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.3 1999/11/30 02:24:45 bruce Exp $
+ *  $Id: defLex.c,v 1.4 1999/11/30 02:37:15 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -373,9 +373,9 @@ loadScheme( void )
 
     case GH_TYPE_LIST:
     case GH_TYPE_PAIR:
-        /* FIXME retTok = TK_DEFINITIONS; */
-        /* alist_to_autogen_def( res ) */
-        /* break; */
+        retTok = TK_DEFINITIONS;
+        alist_to_autogen_def( res );
+        break;
 
     case GH_TYPE_VECTOR:
     case GH_TYPE_PROCEDURE:
@@ -398,20 +398,35 @@ loadScheme( void )
     STATIC void
 alist_to_autogen_def( SCM alist )
 {
-    tSCC   zSchemeText[] = "Computed Definitions";
+    tSCC   zSchemeText[] = "Scheme Computed Definitions";
     char*  pzStart;
     SCM    res;
     tScanCtx*  pCtx;
 
-    /* DO THE RE-EVALUATION */
+    static SCM proc = SCM_UNDEFINED;
+
+    if (proc == SCM_UNDEFINED) {
+        tSCC z[] = "(module-ref (cdr (the-module)) "
+            " 'alist->autogen-def)";
+        tSCC zFailed[] = "Guile lookup failed for `alist->autogen-def'\n";
+
+        proc = gh_eval_str( (char*)z );
+
+        if (proc == SCM_UNDEFINED) {
+            fputs( zFailed, stderr );
+            exit( EXIT_FAILURE );
+        }
+    }
+
+    res = scm_apply(proc, alist, SCM_EOL);
 
     /*
      *  The result *must* be a string, or we choke.
      */
     if (! gh_string_p( res )) {
         tSCC zEr[] = "Error:  Scheme expression does not yield string:\n"
-            "\tin %s on line %d\n\t%s\n";
-        fprintf( stderr, zEr, pCurCtx->pzFileName, pCurCtx->lineNo, pzStart );
+            "\tin %s on line %d\n";
+        fprintf( stderr, zEr, pCurCtx->pzFileName, pCurCtx->lineNo );
         exit( EXIT_FAILURE );
     }
 
