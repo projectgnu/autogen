@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.18 1999/10/28 01:23:35 bruce Exp $
+#$Id: optcode.tpl,v 2.19 1999/10/28 01:25:24 bruce Exp $
 =]
 [=
 
@@ -303,9 +303,10 @@ ELSE                  =]"[=(. prog-name)=] - " [=
        (c-string (get "prog_title")) =][=
 ENDIF =]
     "\nUSAGE:  %s [=
-        IF (exist? "flag.value")  =][-<flag> [<val>]]... [=
-        ELIF (exist? "long_opts")  !=][<option-name>[ =<value>]] ...[=
-        ENDIF=][=
+        IF   (exist? "flag.value")      =][-<flag> [<val>]]... [=
+        ELIF (not (exist? "long_opts")) =][<option-name>[ =<value>]] ...[=
+        ENDIF =][=
+
         IF (exist? "long_opts")   =][--<name>[{=| }<val>]]... [=
         ENDIF=][=
         IF (exist? "argument")  =][=
