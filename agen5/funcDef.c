@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.18 1999/11/04 04:37:00 bruce Exp $
+ *  $Id: funcDef.c,v 1.19 1999/11/04 04:57:05 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -115,8 +115,8 @@ MAKE_HANDLER_PROC( Debug )
  *      macro marker.  Any remaining text in the macro invocation will be
  *      used to create new name/value pairs that only persist for the
  *      duration of the processing of the macro.  The expressions are
- *      evaluated the same way expression clausess are evaluated in
- *      expression functions.  @xref{EXPR}.
+ *      evaluated the same way simple expressions are evaluated.
+ *      @xref{expression syntax}.
  *
  *      The resulting definitions are handled much
  *      like regular definitions, except:
@@ -581,7 +581,7 @@ MAKE_HANDLER_PROC( Invoke )
 }
 
 /*=gfunc ag_invoke
- *
+ * what:   Invoke an AutoGen macro
  * exparg: macro, name of macro to invoke
  * exparg: args,  macro arguments, optional, ellipsis
  *
