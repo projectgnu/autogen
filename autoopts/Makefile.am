@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/04/20 18:37:56 $
+## Last Modified:   $Date: 2002/05/05 03:07:06 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2002/04/20 18:37:56 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2002/05/05 03:07:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -83,6 +83,6 @@ $(GENMAN) : funcs.def
 	../agen5/autogen -Tagman3.tpl funcs.def ; else true ; fi
 
 libopts.texi : ../agen5/autogen funcs.def
-	../agen5/autogen -Taginfo3.tpl funcs.def
+	../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -b libopts funcs.def
 
 # Makefile.am ends here

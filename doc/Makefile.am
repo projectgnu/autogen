@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/03/02 01:46:45 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/05/05 03:07:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -17,6 +17,7 @@
 #
 INFO_DEPS	= autogen.info
 MAKEINFO	= @MAKEINFO@ --no-split
+MAKEINFOFLAGS = -I$(top_srcdir)/autoopts -I../autoopts
 
 all : $(INFO_DEPS) autogen.lsm
 
@@ -25,8 +26,8 @@ info_TEXINFOS   = autogen.texi
 EXTRA_DIST	= auto_gen.tpl autogen.info LSM.tpl \
 		snprintfv.texi snprintfv.menu compete.def compete.tpl
 
-MAINTAINERCLEANFILES = Makefile.in autogen.texi
-DISTCLEANFILES = autogen.lsm
+MAINTAINERCLEANFILES = Makefile.in
+DISTCLEANFILES = autogen.lsm texi-stamp compete.texi
 
 AGSRCDIR	= $(top_srcdir)/agen5
 
@@ -57,6 +58,7 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 		$(OPTIONS_DEF) \
 		$(ADDON_MENU) \
 		$(ADDON_TEXI) \
+		../autoopts/libopts.texi \
 		$(DOC_INCLUDES) compete.def compete.tpl
 
 DEFCOPY		= copy=$(OPTIONS_DEF)
@@ -72,9 +74,11 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
-texi : texi-stamp
+autogen.texi : texi-stamp
+texi         : texi-stamp
 
 texi-stamp : $(DOC_DEPENDS)
+	@cd $(srcdir) && chmod u+w .
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" \
@@ -109,6 +113,9 @@ web : www/doc/autogen_toc.html
  
 ../columns/columns.texi :
 	@cd ../columns/ ; $(MAKE) $$mf gen
+
+../autoopts/libopts.texi :
+	@cd ../autoopts ; $(MAKE) $$mf libopts.texi
 
 autogen.txt : autogen.texi
 	makeinfo --fill-column=70 --no-split --paragraph-indent=0 \

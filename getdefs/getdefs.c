@@ -1,13 +1,13 @@
 /*
- *  $Id: getdefs.c,v 3.3 2002/02/05 21:34:57 bkorb Exp $
+ *  $Id: getdefs.c,v 3.4 2002/05/05 03:07:07 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/02/05 21:34:57 $
- *            by:      Bruce Korb <bkorb@gnu.org>
+ *  Last Modified:     $Date: 2002/05/05 03:07:07 $
+ *            by: bkorb
  */
 
 #define DEFINE
@@ -301,8 +301,6 @@ buildDefinition(
         pzOut += sprintf( pzOut, zLineId, line, pzFile );
 
         pzDef = strchr( pzDef, '\n' );
-        if (pzDef != (char*)NULL)
-            pzDef++;
         preamble = PROBLEM;
 
     } else {
@@ -822,7 +820,7 @@ processFile( char* pzFile )
             continue;
         }
 
-        pzDef = pzScan + matches[1].rm_so;
+        pzDef = pzScan + matches[0].rm_so + sizeof( "/*=" ) - 1;
         pzNext = strstr( pzDef, "=*/" );
         if (pzNext == (char*)NULL) {
             fprintf( stderr, zNoEnd, pzFile, lineNo );

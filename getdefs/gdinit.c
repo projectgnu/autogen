@@ -1,13 +1,13 @@
 /*
- *  $Id: gdinit.c,v 3.0 2001/12/09 19:46:06 bkorb Exp $
+ *  $Id: gdinit.c,v 3.1 2002/05/05 03:07:07 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2001/12/09 19:46:06 $
- *            by:      Bruce Korb <bkorb@gnu.org>
+ *  Last Modified:     $Date: 2002/05/05 03:07:07 $
+ *            by: bkorb
  */
 #include "getdefs.h"
 
@@ -246,7 +246,8 @@ validateOptions( void )
      *  the '/' '*' '=' character sequence.  We ignore case.
      */
     if ((! HAVE_OPT( DEFS_TO_GET )) || (*OPT_ARG( DEFS_TO_GET ) == NUL)) {
-        pzDefPat = "/\\*=([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z]";
+        pzDefPat = "/\\*=(\\*|"
+                   "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
 
     } else {
         char*  pz  = OPT_ARG( DEFS_TO_GET );

@@ -1,3 +1,26 @@
+2002-05-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(libopts.texi): build with correct base name
+	* autoopts/aginfo3.tpl: finish
+	* autoopts/autoopts.c: finish doc-ing the public interfaces
+	* autoopts/bootstrap.dir(libopts.texi): correct build command
+	* autoopts/options_h.tpl(export_func): Make it clear which are private
+	and which are public.
+	* autoopts/stack.c(stackOptArg): a disabled option should just clear
+	the option argument stack.  It doesn't have an argument to process
+	in the "unstack" routine anyway.
+	* doc/Makefile.am(MAINTAINERCLEANFILES): autogen.texi is no longer
+	cleanable.  It contains persistent information.
+	(DISTCLEANFILES): remove generated junk, add a rule for jumping into
+	the autoopts dir to build libopts.texi specifically.
+	* doc/auto_gen.tpl(libopts.texi): suck it up since it is so hard
+	to @include successfully.
+	* doc/autogen.texi: break up the option discussion where we need to
+	"suck up" the user visible functions.
+	* getdefs/gdinit.c(validateOptions): allow for "/*=*" definitions.
+	* getdefs/getdefs.c(buildDefinition): do not skip newline for global defs
+	advance from start of entire matched text instead of subexpression.
+
 2002-05-01  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(zSchemeInit): add macro for determining existence and

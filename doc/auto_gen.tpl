@@ -8,9 +8,9 @@
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Mar 4, 2001
-##            by:     Bruce Korb <bkorb@gnu.org>                        
+##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.4 2002/04/14 20:48:23 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.5 2002/05/05 03:07:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -457,7 +457,9 @@ that should go with your program as well.
 [= get-text tag = autoopts =]
 [=`${AGEXE} -L ${top_srcdir}/doc ${top_srcdir}/doc/compete.def
    cat compete.texi`=]
-[= get-text tag = "end-autoopts" =]
+[= get-text tag = "end-autoopts"  =]
+[= `cat ${top_srcdir}/autoopts/libopts.texi` =]
+[= get-text tag = "autoopts-data" =]
 
 @example
 [= `
@@ -514,13 +516,12 @@ done
 ` =]
 [= get-text tag = Future =][=
 
-`[ -f autogen.texi.ori ] && rm -f autogen.texi.ori`
+(shell "[ -f autogen.texi.ori ] && rm -f autogen.texi.ori")
+(set-writable #t)
 
-=][=#
-
-Local Variables:
-indent-tabs-mode: nil
-mode: texinfo
-End:
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; mode: texinfo
+;; End:
 
 =]

@@ -1,15 +1,13 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# configure --- maintainer's bootstrap configure script
-#
+# Time-stamp:        "2002-05-04 17:20:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Jul 30 10:57:13 1999
-# Last Modified:     Mon Aug  9 10:15:42 1999				      
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Created:           Fri Jul 30 10:57:13 1999			      
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 3.1 2002/01/24 04:53:04 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 3.2 2002/05/05 03:07:06 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -18,21 +16,18 @@ else update_cvs=true ; fi
 
 exec 5> temp.config
 
-GENLIST="agen5/autogen.1
-	 agen5/directive.h
+GENLIST="agen5/directive.h
 	 agen5/defParse.c
 	 agen5/defParse.h
 	 agen5/expr.h
 	 agen5/expr.ini
-	 agen5/functions.h
-	 agen5/opts.c
-	 agen5/opts.h
+	 agen5/opts.[ch]
 	 agen5/pseudo-fsm.h
 	 agen5/autogen.menu
 	 agen5/autogen.texi
-	 autoopts/genshell.c
-	 autoopts/genshell.h
+	 autoopts/genshell.[ch]
 	 compat/strsignal.h
+	 columns/opts.[ch]
 	 config/ag_*.m4"
 
 for f in ${GENLIST}

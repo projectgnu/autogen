@@ -2892,13 +2892,13 @@ the options were found (@code{STACKCT_OPT(NAME)}) and to obtain a
 pointer to a list of pointers to the argument values
 (@code{STACKLST_OPT(NAME)}).
 
-If two options are equivalenced (@pxref{equivalence}) and specify this
-attribute, then the ``equivalenced-to'' option will add entries to the
-stack, and the ``equivalencing'' option, if specified, will @i{remove}
-entries that match the regular expression argument.  The pattern,
-"@code{.*}" will efficiently remove all the entries in the stack.
-It would not be useful to have more than two options in this equivalence
-class.
+If two options are equivalenced (@pxref{Special Option Handling}) and
+specify this attribute, then the ``equivalenced-to'' option will add
+entries to the stack, and the ``equivalencing'' option, if specified,
+will @i{remove} entries that match the regular expression argument.  The
+pattern, "@code{.*}" will efficiently remove all the entries in the
+stack.  It would not be useful to have more than two options in this
+equivalence class.
 
 If the stacked option has a disablement prefix, then the entire
 stack of arguments will be cleared even more efficiently than the
@@ -3112,7 +3112,7 @@ included with the AutoGen sources.
 * WHICH_OPT_name::          WHICH_OPT_name - Which Equivalenced Option
 * teOptIndex::              teOptIndex - Option Index and Enumeration
 * OPTIONS_STRUCT_VERSION::  OPTIONS_STRUCT_VERSION - active version
-* libopts procedures::      libopts Procedures
+* libopts procedures::      libopts External Procedures
 @end menu
 
 @node Option Processing Data
@@ -3601,57 +3601,15 @@ date magic marker, explain the difficulty and exit.  You will then need
 to rebuild and recompile your option definitions.  This has rarely been
 necessary.
 
-@node libopts procedures
-@subsection libopts procedures
+@ignore
+END   == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
-These are the publicly exported procedures from the libopts library.
-
-@table @samp
-@item optionProcess
-This is the main entry point for processing options.  It is intended
-that this procedure be called once at the beginning of the execution of
-a program.  Depending on options selected earlier, it is sometimes
-necessary to stop and restart option processing, or to select completely
-different sets of options.  This can be done easily, but you generally
-do not want to do this.
-
-@item optionVersion
-Returns the full version string compiled into the library.
-
-@item optionLoadLine
-When passed a pointer to the option struct and a string, it will
-find the option named by the first token on the string and set
-the option argument to the remainder of the string.  The caller must
-NUL terminate the string.  Any embedded new lines will be included
-in the option argument.
-
-@item putBourneShell
-This routine will write to stdout the state of the options as encoded
-in the option structure.  It will also write out the number of arguments
-consumed by option processing.  The output result can be eval-ed by
-a shell in the following manner:
-
-@example
-eval "`handle-prog-opts $@{1+\"$@@\"@}`"
-[ -z "$OPTION_CT" ] && exit 1
-shift $OPTION_CT
-@end example
-
-@noindent
-This routine is normally specified by specifying
-@code{test-main = yes;} in the option definitions file.
-
-@item putShellParse
-This routine will write to stdout a series of shell commands that
-will parse the command line options.  This routine will be called
-when you specify @code{test-main = putShellParse;} and the result
-is compiled with @code{-DTEST_xxx_OPTS} defined.  This is the
-only way it should ever be invoked.
-
-@item all the rest
-The remaining routines are for the exclusive use of the generated
-option processing code.  You should not be using them directly.
-@end table
+@ignore
+START == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
 @node option descriptor
 @section Option Descriptor File
@@ -3789,7 +3747,7 @@ may specify the shell program to use on the first shell script line.
 That program's usage text would look something like this:
 
 @ignore
-END   == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 

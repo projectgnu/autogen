@@ -11,7 +11,7 @@ case "$1" in
   ;;
 
 *libopts.texi )
-  ${AUTOGEN} -Taginfo3.tpl funcs.def
+  ${AUTOGEN} -Taginfo3.tpl -DLEVEL=subsection -b libopts funcs.def
   ;;
 
 *optionProcess.3 )

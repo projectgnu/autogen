@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.4 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: stack.c,v 3.5 2002/05/05 03:07:06 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -166,7 +166,12 @@ stackOptArg( pOpts, pOptDesc )
      *  THEN we unstack the argument
      */
     if (DISABLED_OPT( pOptDesc )) {
-        unstackOptArg( pOpts, pOptDesc );
+        if (pOptDesc->optCookie != NULL) {
+            AGFREE( pOptDesc->optCookie );
+            pOptDesc->optCookie = NULL;
+        }
+        pOptDesc->fOptState &= OPTST_PERSISTENT;
+        pOptDesc->fOptState |= OPTST_DISABLED;
         return;
     }
 
