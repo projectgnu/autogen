@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul  8 15:04:20 1999                                
+## Last Modified:     Thu Jul 29 12:18:32 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.22 1999/07/08 22:08:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.23 1999/07/29 19:18:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -744,6 +744,9 @@ The processing directives and comments are not
 part of the grammar.  They are handled by the scanner/lexer.
 The following was extracted directly from the agParse.y source file:
 
+@ignore
+Extracted from $top_srcdir/src/agParse.y
+@end ignore
 @example
 [=_eval
   "sed -n -e'/^definitions/,$p' $top_srcdir/src/agParse.y |
@@ -894,6 +897,7 @@ _FOR macfunc =][=
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Copy of generated file ${top_builddir}/src/autogen.texi
 @end ignore
 @page
 
@@ -987,6 +991,7 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+autoopts.texi input
 @end ignore
 @page
 @node AutoOpts
@@ -995,6 +1000,8 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 [=_INCLUDE autoopts/autoopts.texi=]
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Absorbed documents from the add-ons
+
 @end ignore
 @page
 @node Add-Ons
@@ -1022,6 +1029,9 @@ do
 do 
    if [ "$f" = ${top_builddir}/src/autogen.menu ] ; then : ; else
    echo \'@page\'
+   echo \'@ignore\'
+   echo \'Copy of $f and associated .texi\'
+   echo \'@end ignore\'
    sed s/\'${top_builddir}\'/"${top_builddir}"/ `echo $f|
        sed \'s/\.menu$/\.texi/\'`
    fi
@@ -1029,6 +1039,7 @@ done' _shell =]
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Resume text from auto_gen.tpl
 @end ignore
 @page
 @node Future
