@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <korbb@datadesign.com>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    Thu Jul 29 08:08:38 1999				      
+## Last Modified:    Mon Aug  9 10:10:35 1999				      
 ##            by:    Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.9 1999/07/29 15:48:18 bkorb Exp $
+## $Id: Makefile.am,v 2.10 1999/08/09 17:10:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,5 +21,11 @@ MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config.h.in \
 		  configure libtool stamp-h.in
 
 configure : VERSION
+
+all : .configure.patch
+
+.configure.patch : configure
+	BOOTSTRAP=addlink sh ${top_srcdir}/config/bootstrap.local
+	@touch $@
 
 ## Makefile.am ends here
