@@ -1,3 +1,8 @@
+2000-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* VERSION: bump the versions
+	* autoopts/autoopts.c: change assignment to compare. :)
+
 2000-11-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.[ch]: implement RC file sections, de-implement
