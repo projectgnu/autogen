@@ -1,6 +1,8 @@
 [= AutoGen5 Template  -*- Mode: Text -*-=]
 [=
 
+#  AutoGen copyright 1992-2002 Bruce Korb =][=
+
 DEFINE emit-cookie-args   =][=
   FOR cookie              =]
     [=cookie=],[=

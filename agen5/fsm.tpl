@@ -8,8 +8,9 @@ c=%s-fsm.c
 (shellf "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
 [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
-=]
-[=
+#  AutoGen copyright 1992-2002 Bruce Korb
+
+=][=
 
 CASE (suffix) =][=
 

@@ -2,6 +2,8 @@
 [=
 (define fmt "")
 
+;;;  AutoGen copyright 1992-2002 Bruce Korb
+
 ;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE state-table  =]

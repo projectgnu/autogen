@@ -1,7 +1,5 @@
 
-;;; Ok, it handles embedded alists now :). I could be changed to handle
-;;; identifiers other than strings or symbols (though obviously alists are
-;;; right out ;), but I think you have to draw the line somewhere :)
+;;;  AutoGen copyright 1992-2002 Bruce Korb
 
 (use-modules (ice-9 common-list))
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.4 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: autogen.c,v 3.5 2002/01/13 08:14:27 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -168,9 +168,11 @@ ag_abend( tCC* pzMsg )
     fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
 #endif
 
-    if (procState >= PROC_STATE_LIB_LOAD)
+    if (procState >= PROC_STATE_LIB_LOAD) {
+        int line = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
         fprintf( stderr, "Error in template %s, line %d\n\t",
-                 pCurTemplate->pzFileName, pCurMacro->lineNo );
+                 pCurTemplate->pzFileName, line );
+    }
     fputs( pzMsg, stderr );
     fputc( '\n', stderr );
 
