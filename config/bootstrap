@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
-# Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
+# Author:            Gary V. Vaughan <gary@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     $Date: 2002/07/11 20:28:44 $
+# Last Modified:     $Date: 2002/08/17 21:08:13 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.2 2002/07/11 20:28:44 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.3 2002/08/17 21:08:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
