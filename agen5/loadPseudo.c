@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.20 2004/02/16 22:20:45 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.21 2004/05/16 19:19:09 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -215,8 +215,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      */
     if (isalnum( *pzData )) {
         if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
-
-            if (isspace( pzData[ sizeof(zAgName)-1 ])) {
+            if (isspace( pzData[ sizeof(zAgName)-1 ] )) {
                 *ppzData = pzData + sizeof(zAgName);
                 return PM_EV_AUTOGEN;
             }
@@ -225,9 +224,8 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
         }
 
         if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0) {
-
-            if (isspace( pzData[ sizeof(zTpName)-1 ])) {
-                *ppzData = pzData + sizeof(zTpName);
+            if (isspace( pzData[ sizeof(zTpName)-1 ] )) {
+                *ppzData = pzData + sizeof(zTpName)-1;
                 return PM_EV_TEMPLATE;
             }
 
