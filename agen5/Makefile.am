@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1999/11/02 05:22:18 bruce Exp $
+## $Id: Makefile.am,v 1.5 1999/11/03 05:26:20 bruce Exp $
 ## ---------------------------------------------------------------------
 
 INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
@@ -47,8 +47,6 @@ AutoGen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
 
 AutoGen_LDADD	= $(top_builddir)/autoopts/libopts.la \
 		/usr/local/lib/libguile.a -ldl -lm -lc
-
-CFLAGS  = $(OPTDBG) -g
 
 FARGS = base-name=functions template=functions filelist agarg=$(OPTDBG)
 
