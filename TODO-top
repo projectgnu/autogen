@@ -1,9 +1,5 @@
 #  -*- Mode: Outline -*-
 
-* In Progress
-
-*** ANSI format specifiers for snprintv: ceEfgG with conversion quals h and l
-
 * Pending
 
 ** noag-boot.sh needs to really work when autogen is not available.
@@ -17,5 +13,6 @@
 *  Possibilities for the (distant) future:
 
 ** implement [= FOR x IN a, b, c, ... =]
+
 ** write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.
