@@ -2800,8 +2800,8 @@ or @code{all} was specified:
 
 @example
 uintptr_t opt = OPT_VALUE_OPTN_NAME;
-if (opt & OPTN_NAME_FIRST) /* OPTN_NAME_FIRST bit was set */ ;
-@}
+if (opt & OPTN_NAME_FIRST)
+    /* OPTN_NAME_FIRST bit was set */ ;
 @end example
 
 AutoOpts produces a special purpose procedure for this option.

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.11 2003/07/06 16:34:59 bkorb Exp $
+ *  $Id: putshell.c,v 3.12 2003/07/08 02:30:45 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -121,6 +121,39 @@ putBourneShell( tOptions* pOpts )
         }
 
         /*
+         *  If the argument type is a set membership bitmask, then we always
+         *  emit the thing.  We do this because it will always have some sort
+         *  of bitmask value and we need to emit the bit values.
+         */
+        if ((pOD->fOptState & OPTST_MEMBER_BITS) != 0) {
+            char* pz;
+            uintptr_t val = 1;
+            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
+                    (uintptr_t)(pOD->optCookie) );
+            pOD->optCookie = (void*)(uintptr_t)~0UL;
+            (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
+            pz = (char*)pOD->pzLastArg;
+            while (*pz != NUL) {
+                printf( "typeset -x -i %s_", pOD->pz_NAME );
+                pz += strspn( pz, " +\t\n\f" );
+                for (;;) {
+                    char ch = *(pz++);
+                    switch (ch) {
+                    case ' ':
+                    case '+': goto name_done;
+                    case NUL: pz--; goto name_done;
+                    default:
+                        fputc( toupper( ch ), stdout );
+                    }
+                } name_done:;
+                printf( "=%1$d # 0x%1$X\n", val );
+                val <<= 1;
+            }
+            free( pOD->pzLastArg );
+            continue;
+        }
+
+        /*
          *  IF the option was either specified or it wakes up enabled,
          *  then we will emit information.  Otherwise, skip it.
          *  The idea is that if someone defines an option to initialize
@@ -180,38 +213,6 @@ putBourneShell( tOptions* pOpts )
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
             (*(pOD->pOptProc))( (tOptions*)1UL, pOD );
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
-        }
-
-        /*
-         *  If the argument type is an enumeration, then it is much
-         *  like a text value, except we call the callback function
-         *  to emit the value corresponding to the "pzLastArg" number.
-         */
-        else if ((pOD->fOptState & OPTST_MEMBER_BITS) != 0) {
-            char* pz;
-            uintptr_t val = 1;
-            printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    (uintptr_t)(pOD->optCookie) );
-            pOD->optCookie = (void*)(uintptr_t)~0UL;
-            (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
-            pz = (char*)pOD->pzLastArg;
-            while (*pz != NUL) {
-                printf( "typeset -x -i %s_", pOD->pz_NAME );
-                pz += strspn( pz, " +\t\n\f" );
-                for (;;) {
-                    char ch = *(pz++);
-                    switch (ch) {
-                    case ' ':
-                    case '+': goto name_done;
-                    case NUL: pz--; goto name_done;
-                    default:
-                        fputc( toupper( ch ), stdout );
-                    }
-                } name_done:;
-                printf( "=%1$d # 0x%1$X\n", val );
-                val <<= 1;
-            }
-            free( pOD->pzLastArg );
         }
 
         /*

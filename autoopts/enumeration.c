@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.17 2003/07/06 16:34:59 bkorb Exp $
+ *  $Id: enumeration.c,v 3.18 2003/07/08 02:30:45 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -308,10 +308,13 @@ optionSetMembers(
             pzArg[len] = NUL;
 
             if ((len == 3) && (strcmp( pzArg, "all" ) == 0)) {
-                res = ~0;
+                if (iv)
+                     res = 0;
+                else res = ~0;
             }
             else if ((len == 4) && (strcmp( pzArg, "none" ) == 0)) {
-                res = 0;
+                if (! iv)
+                    res = 0;
             }
             else {
                 char* pz;
@@ -330,6 +333,10 @@ optionSetMembers(
             pzArg += len;
             *(pzArg++) = ch;
         }
+        if (name_ct < (8 * sizeof( uintptr_t ))) {
+            res &= (1UL << name_ct) - 1UL;
+        }
+
         pOD->optCookie = (void*)res;
     }
 }

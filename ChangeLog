@@ -1,3 +1,18 @@
+2003-07-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/enumeration.c: cleanup
+	* autoopts/options_h.tpl: cleanup
+	* autoopts/optlib.tpl: cleanup
+	* autoopts/optmain.tpl: cleanup
+	* autoopts/putshell.c: Handle set membership
+	* autoopts/streqv.h: Remove ``PROTO(( ... ))'' stuff
+	* autoopts/test/equiv.test: Adjust the test result values
+	* autoopts/test/stdopts.test: also
+	* autoopts/test/keyword.test: Test the set membership
+	* autoopts/test/handler.test: also
+	* autoopts/usage.c(printExtendedUsage): handle set membership
+	* doc/autogen.texi: doc the stuff
+
 2003-07-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl: do not double backslashes in man page text

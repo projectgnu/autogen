@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-06-12 06:36:27 bkorb"
+## Time-stamp:      "2003-07-07 19:12:39 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.22 2003/07/04 15:12:22 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.23 2003/07/08 02:30:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -298,14 +298,31 @@ This option must appear in combination with the following options:
       IF (exist? "flags-cant") :+]
 This option must not appear in combination with any of the following options:
 [+: FOR flags-cant ", " :+][+:flags-cant:+][+:ENDFOR:+].[+:
-      ENDIF:+][+:
+      ENDIF     :+][+:
+      IF (~* (get "arg-type") "key|set") :+]
+This option takes a keyword as its argument[+:
+         IF (=* (get "arg-type") "set")  :+] list.  Each entry turns on or off
+membership bits.  These bits can be tested with bit tests against[+:
+         ELSE   :+].  The argument sets an enumeration value that can
+be tested by comparing[+:
+         ENDIF  :+] the option value macro.  The available keywords are:
+.in +4
+.nf
+.na
+[+: (shellf "columns --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+            (join "\n" (stack "keyword"))  ) :+]
+.fi
+.in -4[+: (if (exist? "arg-default") "\n.sp" ) :+][+:
+      ENDIF     :+][+:
       IF (exist? "arg-default") :+]
 The default [+:(. opt-arg):+] for this option is:
 .ti +4
-[+: arg-default :+][+:
-      ENDIF:+]
+[+: (join ", " (stack "arg-default")) :+][+:
+      ENDIF     :+]
 .sp
-[+: (string-substitute (get "doc") "\\" "\\\\") :+][+:
+[+: (if (exist? "doc")
+        (string-substitute (get "doc") "\\" "\\\\")
+        "This option has not beed fully documented." ) :+][+:
 
   ENDIF (not (exist? "documentation")) :+][+:
 

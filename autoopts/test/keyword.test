@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2003-07-06 09:34:24 bkorb"
+# Time-stamp:        "2003-07-07 19:28:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.5 2003/07/06 16:34:59 bkorb Exp $
+# $Id: keyword.test,v 3.6 2003/07/08 02:30:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -47,7 +47,7 @@ cat >> ${testname}.def <<- _EndOfDef_
 	    name        = sets;
 	    arg-type    = set-members;
 	    arg-default = second, fourth;
-	    arg-name    = membership;
+	    arg-name    = member-list;
 	    descrip     = "set membership testing";
 	    keyword     = first, second, third, fourth, fifth, sixth, seventh,
                       eighth, ninth, tenth;
@@ -147,6 +147,94 @@ cat > ${testname}.t1-b <<- _EndTst_
 
 cmp -s ${testname}.t1-* || \
   failure "`diff ${testname}.t1-*`"
+
+$AGEN -T agman1.tpl ${testname}.def
+cat > ${testname}-base.1 <<_EOMan_
+test_keyword \- Test AutoOpts for keyword
+.SH SYNOPSIS
+.B test_keyword
+.\" Mixture of short (flag) options and long options
+.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP " [[=| ]\fIvalue\fP]]..."
+.PP
+All arguments must be options.
+.SH "DESCRIPTION"
+This manual page documents, briefly, the \fBtest_keyword\fP command.
+Its description is not documented.
+.SH OPTIONS
+.TP
+.BR -o " \fIstring\fP, " --option "=" \fIstring\fP
+The option option descrip.
+The default \fIstring\fP for this option is:
+.ti +4
+opt init
+.sp
+This option has not beed fully documented.
+.TP
+.BR --trace "=\fIlevel\fP"
+tracing level of detail.
+This option takes a keyword as its argument.  The argument sets an enumeration value that can
+be tested by comparing the option value macro.  The available keywords are:
+.in +4
+.nf
+.na
+nothing      templates    block-macros
+expressions  explanations
+.fi
+.in -4
+.sp
+The default \fIlevel\fP for this option is:
+.ti +4
+nothing
+.sp
+This option has not beed fully documented.
+.TP
+.BR --sets "=\fImember-list\fP"
+set membership testing.
+This option takes a keyword as its argument list.  Each entry turns on or off
+membership bits.  These bits can be tested with bit tests against the option value macro.  The available keywords are:
+.in +4
+.nf
+.na
+first   second  third   fourth  fifth   sixth
+seventh eighth  ninth   tenth
+.fi
+.in -4
+.sp
+The default \fImember-list\fP for this option is:
+.ti +4
+second, fourth
+.sp
+This option has not beed fully documented.
+.TP
+.BR \-X , " \--help"
+Display usage information and exit.
+.TP
+.BR \-! , " \--more-help"
+Extended usage information passed thru pager.
+.TP
+.BR \-> " [\fIrcfile\fP]," " \--save-opts" "[=\fIrcfile\fP]"
+Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
+rc file listed in the \fBOPTION PRESETS\fP section, below.
+.TP
+.BR \-< " \fIrcfile\fP," " \--load-opts" "=\fIrcfile\fP," " --no-load-opts"
+Load options from \fIrcfile\fP.
+The \fIno-load-opts\fP form will disable the loading
+of earlier RC/INI files.  \fI--no-load-opts\fP is handled early,
+out of order.
+.SH OPTION PRESETS
+Any option that is not marked as \fInot presettable\fP may be preset
+by loading values from RC (.ini) file(s).
+The \fIhomerc\fP file is "\fI.\fP", unless that is a directory.
+In that case, the file "\fIkeyword.cfg\fP"
+is searched for within that directory.
+.PP
+This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
+option definitions.
+_EOMan_
+
+sed '1,/^\.SH NAME/d' ${testname}.1 > ${testname}-res.1
+cmp -s ${testname}-base.1 ${testname}-res.1 || \
+  failure "`diff ${testname}-base.1 ${testname}-res.1`"
 
 cleanup
 # end of keyword.test
