@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul  8 14:35:10 1999				      
+## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.3 1999/07/08 21:35:37 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.4 1999/07/08 22:06:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 
@@ -58,8 +58,9 @@ _eval _outfile "f=%s ; sort $f.tmp ; rm -f $f.tmp" _printf _shell
 @cindex [=prog_name _down=] usage
 
 This is the automatically generated usage text for [=prog_name=]:
-@*
+
 @example
+
 [=_IF prog_file_name _exist
   =][=prog_file_name "PROG=%s" _shell =][=
   _ELSE
