@@ -1,3 +1,13 @@
+2003-05-03  Bruce Korb  <bkorb@gnu.org>
+
+	* */*.c: remove proc type indentation from obsolete coding style.
+	* agen5/autogen.c: include compat/strsignal.c, if we need it.
+	* compat/strsignal.c(signo_max): unused - remove
+	(strsigno): ditto
+	(strtosigno): ditto
+	(psignal): ditto
+	* configure.in(psignal): don't configure it, either.
+
 2003-05-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c(ag_scm_get): add an optional second argument - an

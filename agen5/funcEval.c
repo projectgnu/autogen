@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.15 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: funcEval.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -279,7 +279,7 @@ evalExpression( ag_bool* pMustFree )
  *       that triggered the evaluation error.  You should not need to
  *       invoke this routine directly.  Guile will do it automatically.
 =*/
-    SCM 
+SCM 
 ag_scm_error_source_line( void )
 {
     tSCC zErr[] = "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
@@ -353,7 +353,7 @@ eval( const char* pzExpr )
  *   macro is inferred.  The result of the expression evaluation
  *   (@pxref{expression syntax}) is written to the current output.
 =*/
-    tMacro*
+tMacro*
 mFunc_Expr( tTemplate* pT, tMacro* pMac )
 {
     ag_bool needFree;
@@ -394,7 +394,7 @@ exprType( char* pz )
 /*
  *  mLoad_Expression
  */
-    tMacro*
+tMacro*
 mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*    pzCopy; /* next text dest   */

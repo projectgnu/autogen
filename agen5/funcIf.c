@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.8 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: funcIf.c,v 3.9 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -321,7 +321,7 @@ mLoad_Ending( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 
 
-    tMacro*
+tMacro*
 mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
@@ -387,7 +387,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 
 
-    tMacro*
+tMacro*
 mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
@@ -452,7 +452,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *         nor @code{--not-writable} have been specified.  This state
  *         is reset when the current suffix's output is complete.
 =*/
-    SCM
+SCM
 ag_scm_set_writable( SCM set )
 {
     tSCC zWarn[] =

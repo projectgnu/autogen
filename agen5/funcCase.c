@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: funcCase.c,v 3.15 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -102,7 +102,7 @@ Select_Compare( char* pzText, char* pzMatch )
     return (strstr( pzText, pzMatch )) ? SUCCESS : FAILURE;
 }
 
-    SCM
+SCM
 ag_scm_string_contains_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -141,7 +141,7 @@ Select_Compare_End( char* pzText, char* pzMatch )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_ends_with_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -177,7 +177,7 @@ Select_Compare_Start( char* pzText, char* pzMatch )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_starts_with_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -206,7 +206,7 @@ Select_Compare_Full( char* pzText, char* pzMatch )
     return (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
 }
 
-    SCM
+SCM
 ag_scm_string_equals_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -246,7 +246,7 @@ Select_Equivalent( char* pzText, char* pzMatch )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 {
     tSCC zSrch[] = "search string";
@@ -292,7 +292,7 @@ Select_Equivalent_End( char* pzText, char* pzMatch )
            : FAILURE;
 }
 
-    SCM
+SCM
 ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -325,7 +325,7 @@ Select_Equivalent_Start( char* pzText, char* pzMatch )
            : FAILURE;
 }
 
-    SCM
+SCM
 ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -361,7 +361,7 @@ Select_Equivalent_Full( char* pzText, char* pzMatch )
     return (streqvcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
 }
 
-    SCM
+SCM
 ag_scm_string_eqv_p( SCM text, SCM substr )
 {
     char* pzText;
@@ -426,7 +426,7 @@ Select_Match( char* pzText, char* pzMatch )
     return SUCCESS;
 }
 
-    SCM
+SCM
 ag_scm_string_has_match_p( SCM text, SCM substr )
 {
     SCM      res;
@@ -443,7 +443,7 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -509,7 +509,7 @@ Select_Match_End( char* pzText, char* pzMatch )
     return SUCCESS;
 }
 
-    SCM
+SCM
 ag_scm_string_end_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -531,7 +531,7 @@ ag_scm_string_end_match_p( SCM text, SCM substr )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -601,7 +601,7 @@ Select_Match_Start( char* pzText, char* pzMatch )
     return SUCCESS;
 }
 
-    SCM
+SCM
 ag_scm_string_start_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -623,7 +623,7 @@ ag_scm_string_start_match_p( SCM text, SCM substr )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -701,7 +701,7 @@ Select_Match_Full( char* pzText, char* pzMatch )
     return SUCCESS;
 }
 
-    SCM
+SCM
 ag_scm_string_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -724,7 +724,7 @@ ag_scm_string_match_p( SCM text, SCM substr )
     return res;
 }
 
-    SCM
+SCM
 ag_scm_string_eqv_match_p( SCM text, SCM substr )
 {
     char* pzText   = ag_scm2zchars( text, "text to match" );
@@ -821,7 +821,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *    This macro ends the @code{CASE} function template block.
  *    For a complete description, @xref{CASE}.
 =*/
-    tMacro*
+tMacro*
 mFunc_Case( tTemplate* pT, tMacro* pMac )
 {
     typedef tSuccess (t_match_proc)( char*, char* );
@@ -954,7 +954,7 @@ static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
  *  This function is called to set up (load) the macro
  *  when the template is first read in (before processing).
  */
-    tMacro*
+tMacro*
 mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen     = (size_t)pMac->res;   /* macro len  */

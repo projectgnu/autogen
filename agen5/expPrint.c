@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expPrint.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -180,7 +180,7 @@ run_printf( char* pzFmt, int len, SCM alist )
  *
  * doc:  Format a string using arguments from the alist.
 =*/
-    SCM
+SCM
 ag_scm_sprintf( SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
@@ -206,7 +206,7 @@ ag_scm_sprintf( SCM fmt, SCM alist )
  *       output.  Use this to print information messages to a template user.
  *       Use ``(sprintf ...)'' to add text to your document.
 =*/
-    SCM
+SCM
 ag_scm_printf( SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
@@ -230,7 +230,7 @@ ag_scm_printf( SCM fmt, SCM alist )
  *       Write to a specified port.  The result will NOT appear in your
  *       output.  Use this to print information messages to a template user.
 =*/
-    SCM
+SCM
 ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
@@ -323,7 +323,7 @@ ag_scm_hide_email( SCM display, SCM eaddr )
  *         "@noindent\n"
  *         "You can do this by knowing that the format needs two arguments.\n"
 =*/
-    SCM
+SCM
 ag_scm_format_arg_count( SCM fmt )
 {
     char* pzFmt = ag_scm2zchars( fmt, pzFormatName );

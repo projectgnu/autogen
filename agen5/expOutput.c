@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expOutput.c,v 3.15 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -98,7 +98,7 @@ addWriteAccess( char* pzFileName )
  *  output files.  Use the @code{(error "0")} scheme function instead.
  *  @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_delete( void )
 {
     tSCC zSkipMsg[] = "NOTE:  skipping file '%s'\n";
@@ -124,7 +124,7 @@ ag_scm_out_delete( void )
  *         file from being deleted.  It @i{may}, however, be used on the
  *         root output file.
 =*/
-    SCM
+SCM
 ag_scm_out_move( SCM new_file )
 {
     size_t sz = SCM_LENGTH( new_file );
@@ -154,7 +154,7 @@ ag_scm_out_move( SCM new_file )
  *  the argument should be @code{#t} and the contents of the file
  *  are returned by the function.
 =*/
-    SCM
+SCM
 ag_scm_out_pop( SCM ret_contents )
 {
     SCM res = SCM_UNDEFINED;
@@ -191,7 +191,7 @@ ag_scm_out_pop( SCM ret_contents )
  *  change the tag every time you suspend output to a file, because the
  *  tag names are forgotten as soon as the file has been "resumed".
 =*/
-    SCM
+SCM
 ag_scm_out_suspend( SCM suspName )
 {
     SCM res = SCM_UNDEFINED;
@@ -230,7 +230,7 @@ ag_scm_out_suspend( SCM suspName )
  *  current again.  That output must have been suspended with the same tag
  *  name given to this routine as its argument.
 =*/
-    SCM
+SCM
 ag_scm_out_resume( SCM suspName )
 {
     int  ix  = 0;
@@ -264,7 +264,7 @@ ag_scm_out_resume( SCM suspName )
  *  Identical to @code{push-new}, except the contents are @strong{not}
  *  purged, but appended to.  @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_push_add( SCM new_file )
 {
     tFpStack* p;
@@ -314,7 +314,7 @@ ag_scm_out_push_add( SCM new_file )
  *  it is closed.
  *  @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_push_new( SCM new_file )
 {
     tFpStack* p;
@@ -381,7 +381,7 @@ ag_scm_out_push_new( SCM new_file )
  *  you may not pop the base level output file, but you may
  *  @code{switch} it.  @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_switch( SCM new_file )
 {
     struct utimbuf tbuf;
@@ -435,7 +435,7 @@ ag_scm_out_switch( SCM new_file )
  * doc:  Returns the depth of the output file stack.
  *       @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_depth( void )
 {
     return gh_int2scm( outputDepth );
@@ -450,7 +450,7 @@ ag_scm_out_depth( void )
  *       a real output file name is found.
  *       @xref{output controls}.
 =*/
-    SCM
+SCM
 ag_scm_out_name( void )
 {
     tFpStack* p = pCurFp;

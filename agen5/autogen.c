@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.25 2003/05/03 15:29:38 bkorb Exp $
+ *  $Id: autogen.c,v 3.26 2003/05/03 23:59:05 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -414,7 +414,11 @@ signalSetup( void )
 }
 
 #ifndef HAVE_STRFTIME
-#  include "compat/strftime.c"
+#  include <compat/strftime.c>
+#endif
+
+#ifndef HAVE_STRSIGNAL
+#  include <compat/strsignal.c>
 #endif
 
 /*

@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.11 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: expGperf.c,v 3.12 2003/05/03 23:59:05 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -106,7 +106,7 @@ tSCC zRunGperf[] = "${gperf_%s} %s";
  *       This program will be obliterated within a few seconds after
  *       AutoGen exits.
 =*/
-    SCM
+SCM
 ag_scm_make_gperf( SCM name, SCM hlist )
 {
     SCM     newline  = gh_str2scm( "\n", 1 );
@@ -157,7 +157,7 @@ ag_scm_make_gperf( SCM name, SCM hlist )
  *
  *       See the documentation for @command{gperf(1GNU)} for more details.
 =*/
-    SCM
+SCM
 ag_scm_gperf( SCM name, SCM str )
 {
     char*   pzCmd;

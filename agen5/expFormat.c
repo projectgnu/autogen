@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expFormat.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -243,7 +243,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
  *  the argument begins with the number 0 (zero), or the string is the
  *  empty string, then processing continues with the next suffix.
 =*/
-    SCM
+SCM
 ag_scm_error( SCM res )
 {
     tSCC      zFmt[]    = "DEFINITIONS %s in %s line %d for %s:\n\t%s\n";
@@ -337,7 +337,7 @@ ag_scm_error( SCM res )
  *  about.
  *
 =*/
-    SCM
+SCM
 ag_scm_gpl( SCM prog_name, SCM prefix )
 {
     char*   pzPfx  = ag_scm2zchars( prefix, "GPL line prefix" );
@@ -383,7 +383,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  *  start each output line.  @code{owner} contains the copyright owner.
  *  @code{prog_name} contains the name of the program the copyright is about.
 =*/
-    SCM
+SCM
 ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
 {
     char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
@@ -435,7 +435,7 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
  *  @code{prog_name} contains the name of the program the copyright is about.
  *
 =*/
-    SCM
+SCM
 ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 {
     char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
@@ -492,7 +492,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
  *  the two string formatting arguments.  Each output line is automatically
  *  prefixed with the string @code{prefix}.
 =*/
-    SCM
+SCM
 ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 {
     char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.10 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: expGuile.c,v 3.11 2003/05/03 23:59:05 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -74,7 +74,7 @@ gh_type_e( SCM typ )
  *
  * doc:  Return the maximum value in the list
 =*/
-    SCM
+SCM
 ag_scm_max( SCM list )
 {
     int   len;
@@ -134,7 +134,7 @@ ag_scm_max( SCM list )
  *
  * doc:  Return the minimum value in the list
 =*/
-    SCM
+SCM
 ag_scm_min( SCM list )
 {
     int   len;
@@ -194,7 +194,7 @@ ag_scm_min( SCM list )
  *
  * doc:  Compute the sum of the list of expressions.
 =*/
-    SCM
+SCM
 ag_scm_sum( SCM list )
 {
     int  len = scm_ilength( list );
@@ -239,7 +239,7 @@ ag_scm_sum( SCM list )
  *       into underscores.  Whitespace characters are ignored.  Any other
  *       character type (i.e. non-graphic and non-white) will cause a failure.
 =*/
-    SCM
+SCM
 ag_scm_string_to_c_name_x( SCM str )
 {
     tSCC  zFun[] = "ag_scm_string_to_c_name_x";
@@ -281,7 +281,7 @@ ag_scm_string_to_c_name_x( SCM str )
  *
  * doc:  Change to upper case all the characters in an SCM string.
 =*/
-    SCM
+SCM
 ag_scm_string_upcase_x( SCM str )
 {
     int   len;
@@ -313,7 +313,7 @@ ag_scm_string_upcase_x( SCM str )
  * doc:  Create a new SCM string containing the same text as the original,
  *       only all the lower case letters are changed to upper case.
 =*/
-    SCM
+SCM
 ag_scm_string_upcase( SCM str )
 {
     size_t  len;
@@ -337,7 +337,7 @@ ag_scm_string_upcase( SCM str )
  *
  * doc:  capitalize all the words in an SCM string.
 =*/
-    SCM
+SCM
 ag_scm_string_capitalize_x( SCM str )
 {
     int     len;
@@ -382,7 +382,7 @@ ag_scm_string_capitalize_x( SCM str )
  *       only all the first letter of each word is upper cased and all
  *       other letters are made lower case.
 =*/
-    SCM
+SCM
 ag_scm_string_capitalize( SCM str )
 {
     size_t  len;
@@ -409,7 +409,7 @@ ag_scm_string_capitalize( SCM str )
  *
  * doc:  Change to lower case all the characters in an SCM string.
 =*/
-    SCM
+SCM
 ag_scm_string_downcase_x( SCM str )
 {
     int   len;
@@ -441,7 +441,7 @@ ag_scm_string_downcase_x( SCM str )
  * doc:  Create a new SCM string containing the same text as the original,
  *       only all the upper case letters are changed to lower case.
 =*/
-    SCM
+SCM
 ag_scm_string_downcase( SCM str )
 {
     size_t  len;

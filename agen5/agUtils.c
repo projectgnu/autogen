@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.15 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: agUtils.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -29,7 +29,7 @@ STATIC void addSysEnv( char* pzEnvName );
 STATIC tCC* skipQuote( tCC* pzQte );
 
 #ifndef HAVE_STRLCPY
-    size_t
+size_t
 strlcpy( char* dest, tCC* src, size_t n )
 {
     char* pz = dest;

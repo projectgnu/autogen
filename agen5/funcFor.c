@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.12 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: funcFor.c,v 3.13 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -53,7 +53,7 @@ doForEach( tTemplate*   pT,
  *          Outside of any FOR loop, it returns SCM_UNDEFINED.
  *          @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_first_for_p( SCM which )
 {
     if (forInfo.fi_depth <= 0)
@@ -92,7 +92,7 @@ ag_scm_first_for_p( SCM which )
  *          Outside of any FOR loop, it returns SCM_UNDEFINED.
  *          @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_last_for_p( SCM which )
 {
     if (forInfo.fi_depth <= 0)
@@ -131,7 +131,7 @@ ag_scm_last_for_p( SCM which )
  *          Outside of any FOR loop, it returns SCM_UNDEFINED.
  *          @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_for_index( SCM which )
 {
     if (forInfo.fi_depth <= 0)
@@ -170,7 +170,7 @@ ag_scm_for_index( SCM which )
  *       Outside of the FOR macro itself, this function will emit an error.
  *       @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_for_from( SCM from )
 {
     if ((! pFS->for_loading) || (! gh_number_p( from )))
@@ -190,7 +190,7 @@ ag_scm_for_from( SCM from )
  *       Outside of the FOR macro itself, this function will emit an error.
  *       @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_for_to( SCM to )
 {
     if ((! pFS->for_loading) || (! gh_number_p( to )))
@@ -210,7 +210,7 @@ ag_scm_for_to( SCM to )
  *       Outside of the FOR macro itself, this function will emit an error.
  *       @xref{FOR}.
 =*/
-    SCM
+SCM
 ag_scm_for_by( SCM by )
 {
     if ((! pFS->for_loading) || (! gh_number_p( by )))
@@ -231,7 +231,7 @@ ag_scm_for_by( SCM by )
  *       nothing more than a comma.
  *       Outside of the FOR macro itself, this function will emit an error.
 =*/
-    SCM
+SCM
 ag_scm_for_sep( SCM obj )
 {
     if (! pFS->for_loading)
@@ -677,7 +677,7 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
  *    This macro ends the @code{FOR} function template block.
  *    For a complete description @xref{FOR}.
 =*/
-    tMacro*
+tMacro*
 mFunc_For( tTemplate* pT, tMacro* pMac )
 {
     tMacro*     pMRet = pT->aMacros + pMac->endIndex;
@@ -751,7 +751,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
 }
 
 
-    tMacro*
+tMacro*
 mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*   pzCopy = pT->pNext; /* next text dest   */

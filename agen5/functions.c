@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.15 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: functions.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -45,7 +45,7 @@ tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
  *  @samp{IF} and @samp{WHILE}; extending through their respective
  *  terminating macro functions.
 =*/
-    tMacro*
+tMacro*
 mFunc_Include( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pNewTpl;
@@ -101,7 +101,7 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
  *  Simply verify that there is some argument to this macro.
  *  Regular "expr" macros are their own argument, so there is always one.
  */
-    tMacro*
+tMacro*
 mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     if ((int)pMac->res == 0)
@@ -125,7 +125,7 @@ mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *
  *  You may not specify @code{UNKNOWN} explicitly.
 =*/
-    tMacro*
+tMacro*
 mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pInv = findTemplate( pT->pzTemplText + pMac->ozName );
@@ -185,7 +185,7 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
  *  handler_proc:
  *  unnamed:
 =*/
-    tMacro*
+tMacro*
 mFunc_Bogus( tTemplate* pT, tMacro* pMac )
 {
     tSCC z[] = "%d (%s) is an unknown macro function, or has no handler";
@@ -203,7 +203,7 @@ mFunc_Bogus( tTemplate* pT, tMacro* pMac )
  *  handler_proc:
  *  unnamed:
 =*/
-    tMacro*
+tMacro*
 mFunc_Text( tTemplate* pT, tMacro* pMac )
 {
     fputs( pT->pzTemplText + pMac->ozText, pCurFp->pFile );
@@ -224,7 +224,7 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
  *    If the native macro name code is @code{#}, then the
  *    entire macro function is treated as a comment and ignored.
 =*/
-    tMacro*
+tMacro*
 mLoad_Comment( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     memset( (void*)pMac, 0, sizeof( *pMac ));
@@ -238,7 +238,7 @@ mLoad_Comment( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *  Move any text into the text offset field.
  *  This is used as the default load mechanism.
  */
-    tMacro*
+tMacro*
 mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*          pzCopy = pT->pNext;
@@ -338,7 +338,7 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *  However, the load function pointer for those functions points
  *  here, until an "IF" function is encountered.
  */
-    tMacro*
+tMacro*
 mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     tSCC zUnk[] =

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: funcDef.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -347,7 +347,7 @@ prepInvokeArgs( tMacro* pMac )
  *      a breakpoint on the #n case element below and step through
  *      the processing of interesting parts of your template.
 =*/
-    tMacro*
+tMacro*
 mFunc_Debug( tTemplate* pT, tMacro* pMac )
 {
     static int dummy = 0;
@@ -516,7 +516,7 @@ build_defs( int defCt, tDefList* pList )
  *
  *  This routine runs the invocation.
  */
-    tMacro*
+tMacro*
 mFunc_Define( tTemplate* pT, tMacro* pMac )
 {
     tDefList*   pList  = (tDefList*)pMac->res;
@@ -592,7 +592,7 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
  *  the first time the macro is processed and evaluated again every
  *  time the macro is evaluated.
 =*/
-    tMacro*
+tMacro*
 mFunc_Invoke( tTemplate* pT, tMacro* pMac )
 {
     char* pzText;
@@ -650,14 +650,14 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
  *  what:   Loads the debug function so you can set breakpoints
  *          at load time, too :-)
 =*/
-    tMacro*
+tMacro*
 mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     return mLoad_Unknown( pT, pMac, ppzScan );
 }
 
 
-    tMacro*
+tMacro*
 mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     tSCC         zNameNeeded[] = "DEFINE requires a name";

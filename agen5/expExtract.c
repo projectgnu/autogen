@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.8 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expExtract.c,v 3.9 2003/05/03 23:59:05 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -247,7 +247,7 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * named ".fsm.head" and ".fsm.code".  At the end of the 'c' output
  * processing, I delete them.
 =*/
-    SCM
+SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
 {
     const char* pzStart;
@@ -296,7 +296,7 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
  * files.  This function will search the same list for @file{file-name}, both
  * with and without the @file{.suffix}, if provided.
 =*/
-    SCM
+SCM
 ag_scm_find_file( SCM file, SCM suffix )
 {
     tSCC  zFun[] = "ag_scm_find_file";
