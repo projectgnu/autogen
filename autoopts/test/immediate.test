@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2005-02-14 17:04:17 bkorb"
+# Time-stamp:        "2005-03-06 09:13:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: immediate.test,v 4.2 2005/02/15 01:34:13 bkorb Exp $
+# $Id: immediate.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -16,10 +16,8 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
-set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -87,4 +85,12 @@ test "$f" = "invocation_ct = 2" || \
   failure "DIS-abled option not processed twice"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of immediate.test

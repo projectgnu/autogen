@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2005-02-19 18:05:14 bkorb"
+# Time-stamp:        "2005-03-06 09:13:06 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.4 2005/02/20 02:15:48 bkorb Exp $
+# $Id: getopt.test,v 4.5 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -16,10 +16,8 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
-set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -594,4 +592,12 @@ cmp -s ${testname}2-base.c ${testname}2-getopt.c || { set +x ; \
   failure "`diff ${testname}2-base.c ${testname}2-getopt.c`" ; }
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of getopt.test

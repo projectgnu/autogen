@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-02-21 11:52:19 bkorb"
+# Time-stamp:        "2005-03-06 09:21:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.6 2005/02/21 23:01:08 bkorb Exp $
+# $Id: rc.test,v 4.7 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -16,7 +16,6 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
 
@@ -36,7 +35,6 @@ homerc = "\$\$/${testname}.rc";
 rcfile = ${testname}.file;
 _EOF_
 
-set -x
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 

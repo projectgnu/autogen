@@ -1,0 +1,206 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# nested.test ---  test nested option values
+#
+# Time-stamp:        "2005-03-06 12:08:37 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2005/03/06 20:16:08 $
+#            by: bkorb
+#
+# $Id: nested.test,v 4.1 2005/03/06 20:16:08 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+exec 5> ${testname}.def
+cat >&5 <<- _EOF_
+
+	AutoGen definitions options;
+
+	config-header = 'config.h';
+	prog-name  = "test_${testname}";
+	prog-title = "Test AutoOpts for ${testname}";
+
+	flag = {
+	    name = struct;
+	    value = s;
+	    max = NOLIMIT;
+	    descrip = 'structured argument val';
+	    arg-type = nested;
+	};
+	main = {
+	    main-type = main;
+	_EOF_
+
+echo '    main-text = <''<- _EOCode_' >&5
+cat >&5 <<- _EOF_
+	    {
+	        int ix = 0;
+	        const tOptionValue* pOV =
+	            optionFindValue(&DESC(STRUCT), NULL, NULL);
+	        do {
+	            printf("\nstruct opt #%d:\n", ++ix);
+	            res |= print_entry( pOV );
+	            pOV = optionFindNextValue(&DESC(STRUCT), pOV, NULL, NULL);
+	        } while (pOV != NULL);
+	    }
+	_EOF_
+
+echo "_EOCode_; };" >&5
+
+echo 'include = <''<- _EOSubr_' >&5
+cat >&5 <<- _EOF_
+	#include <stdio.h>
+
+	int print_nested( const tOptionValue* pGV );
+
+	int print_entry( const tOptionValue* pGV ) {
+	  if (pGV == NULL) {
+	    fprintf( stderr, "ENTRY NOT FOUND\n" );
+	    return 1;
+	  }
+	  printf( "%-8s -- ", pGV->pzName );
+	  switch (pGV->valType) {
+	    case OPARG_TYPE_NONE:
+	      fputs( "no value\n", stdout ); break;
+
+	    case OPARG_TYPE_STRING:
+	      printf( "string:   %s\n",      pGV->v.strVal ); break;
+
+	    case OPARG_TYPE_ENUMERATION:
+	      printf( "enum:     %d\n",      pGV->v.enumVal ); break;
+
+	    case OPARG_TYPE_BOOLEAN:
+	      printf( "bool:     %s\n",
+	              pGV->v.boolVal ? "TRUE" : "false" ); break;
+
+	    case OPARG_TYPE_MEMBERSHIP:
+	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
+
+	    case OPARG_TYPE_NUMERIC:
+	      printf( "number:   %d\n",      pGV->v.longVal ); break;
+
+	    case OPARG_TYPE_HIERARCHY:
+	      printf( "nested:   0x%08lX\n", pGV->v.nestVal );
+	      return print_nested( pGV );
+	      break;
+
+	    default:
+	      printf( "bad type: %d\n",      pGV->valType );
+	      return 1;
+	  }
+	  return 0;
+	}
+
+	int print_nested( const tOptionValue* pGV ) {
+	  int res = 0;
+	  const tOptionValue* pOV = optionGetValue( pGV, NULL );
+	  while (pOV != NULL) {
+	    res |= print_entry( pOV );
+	    pOV = optionNextValue( pGV, pOV );
+	  }
+	  return res;
+	}
+	_EOF_
+echo "_EOSubr_;" >&5
+
+exec 5>&-
+
+# # # # # # # # # # CREATE PROGRAM # # # # # # # # #
+
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+basehelp=${testname}-base.help
+echo creating ${basehelp}
+cat > ${basehelp} <<_EOF_
+test_${testname} - Test AutoOpts for ${testname}
+USAGE:  ${testname} [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -s Cpx struct         structured argument val
+				- may appear multiple times
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${basehelp} ${testname}.help || \
+  failure "`diff ${basehelp} ${testname}.help`"
+
+# # # # # # # # # # SINGLE ARG TEST # # # # # # # # #
+
+cat > ${testname}-res1.base <<_EOF_
+
+struct opt #1:
+struct   -- nested:   0xXXXXXXXX
+able     -- no value
+bar      -- number:   1234
+foo      -- no value
+stumble  -- no value
+_EOF_
+
+./${testname} -s 'stumble, foo, <bar type=number>1234</bar> able' | \
+sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' > ${testname}-res1.out || \
+  failure "FAILED: \
+./${testname} -s 'stumble, foo, <bar type=number>1234</bar> baz'"
+
+cmp -s ${testname}-res1.* || \
+  failure "`diff ${testname}-res1.*`"
+
+# # # # # # # # # # DOUBLE ARG TEST # # # # # # # # #
+
+(./${testname} -s 'stumble, foo, <bar type=number>1234</bar>, able' \
+  -s 'foo, <bar type=number>4321</bar> <gr type=nested>one, two, three</gr>' | \
+sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
+  failure "FAILED:  ./${testname} ${arg1} ${arg2}"
+
+cat > ${testname}-res2.base <<- _EOF_
+
+struct opt #1:
+struct   -- nested:   0xXXXXXXXX
+able     -- no value
+bar      -- number:   1234
+foo      -- no value
+stumble  -- no value
+
+struct opt #2:
+struct   -- nested:   0xXXXXXXXX
+bar      -- number:   4321
+foo      -- no value
+gr       -- nested:   0xXXXXXXXX
+one      -- no value
+three    -- no value
+two      -- no value
+_EOF_
+
+cmp -s ${testname}-res2.* || \
+  failure "`diff ${testname}-res2.*`"
+
+# # # # # # # # # # TEST OPERATION # # # # # # # # # #
+
+cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 8
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of nested.test

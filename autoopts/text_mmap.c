@@ -1,7 +1,7 @@
 /*
- * $Id: text_mmap.c,v 4.3 2005/02/21 23:01:08 bkorb Exp $
+ * $Id: text_mmap.c,v 4.4 2005/03/06 20:16:08 bkorb Exp $
  *
- * Time-stamp:      "2005-02-20 17:18:28 bkorb"
+ * Time-stamp:      "2005-02-24 11:56:43 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
@@ -159,7 +159,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
 #ifdef MAP_ANONYMOUS
             void* pNuls = mmap(
                 (void*)(((char*)pMI->txt_data) + pMI->txt_size), pgsz,
-                PROT_READ, MAP_SHARED|MAP_ANONYMOUS|MAP_FIXED, 0, 0 );
+                PROT_READ, MAP_ANONYMOUS|MAP_FIXED, 0, 0 );
 
             if (pNuls == MAP_FAILED) {
                 pMI->txt_errno = errno;

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2005-02-14 17:04:46 bkorb"
+## Time-stamp:      "2005-03-06 09:12:51 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 4.2 2005/02/15 01:34:13 bkorb Exp $
+# $Id: usage.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -16,10 +16,8 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
-set -x
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
@@ -763,4 +761,12 @@ do
 done
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of usage.test

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.13 2005/02/21 23:01:08 bkorb Exp $
- *  Time-stamp:      "2005-02-20 16:36:09 bkorb"
+ *  $Id: load.c,v 4.14 2005/03/06 20:16:08 bkorb Exp $
+ *  Time-stamp:      "2005-02-23 14:22:26 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -54,7 +54,7 @@
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static char*
-findArg( char* pzTxt, tOptionLoadMode mode );
+assembleArgValue( char* pzTxt, tOptionLoadMode mode );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
@@ -235,8 +235,47 @@ optionMakePath(
 }
 
 
+LOCAL void
+mungeString( char* pzTxt, tOptionLoadMode mode )
+{
+    char* pzE;
+
+    if (mode == OPTION_LOAD_KEEP)
+        return;
+
+    if (isspace( *pzTxt )) {
+        char* pzS = pzTxt;
+        char* pzD = pzTxt;
+        while (isspace( *++pzS ))  ;
+        while ((*(pzD++) = *(pzS++)) != NUL)   ;
+        pzE = pzD-1;
+    } else
+        pzE = pzTxt + strlen( pzTxt );
+
+    while ((pzE > pzTxt) && isspace( pzE[-1] ))  pzE--;
+    *pzE = NUL;
+
+    if (mode == OPTION_LOAD_UNCOOKED)
+        return;
+
+    switch (*pzTxt) {
+    default: return;
+    case '"':
+    case '\'': break;
+    }
+
+    switch (pzE[-1]) {
+    default: return;
+    case '"':
+    case '\'': break;
+    }
+
+    (void)ao_string_cook( pzTxt, NULL );
+}
+
+
 static char*
-findArg( char* pzTxt, tOptionLoadMode mode )
+assembleArgValue( char* pzTxt, tOptionLoadMode mode )
 {
     tSCC zBrk[] = " \t:=";
     char* pzEnd = strpbrk( pzTxt, zBrk );
@@ -266,33 +305,10 @@ findArg( char* pzTxt, tOptionLoadMode mode )
     space_break = isspace(*pzEnd);
     *(pzEnd++) = NUL;
     while (isspace(*pzEnd))  pzEnd++;
-    if (space_break) {
-        if ((*pzEnd == ':') || (*pzEnd == '='))
-            while (isspace(*++pzEnd))   ;
-    }
+    if (space_break && ((*pzEnd == ':') || (*pzEnd == '=')))
+        pzEnd++;
 
-    /*
-     *  Trim off trailing white space
-     */
-    {
-        char* pz = pzEnd + strlen(pzEnd);
-        while (isspace(pz[-1]) && (pz > pzEnd))  pz--;
-        *pz = NUL;
-
-        if ((mode == OPTION_LOAD_UNCOOKED) || (pzEnd == pz))
-            return pzEnd;
-
-        if ((pz[-1] != '"') && (pz[-1] != '\''))
-            return pzEnd;
-    }
-    if ((*pzEnd != '"') && (*pzEnd != '\''))
-        return pzEnd;
-
-    /*
-     *  If we got to here, the text starts and ends with a quote character and
-     *  we are cooking our quoted strings.
-     */
-    (void)ao_string_cook( pzEnd, NULL );
+    mungeString( pzEnd, mode );
     return pzEnd;
 }
 
@@ -314,7 +330,7 @@ loadOptionLine(
     while (isspace( *pzLine ))  pzLine++;
 
     {
-        char* pzArg = findArg( pzLine, load_mode );
+        char* pzArg = assembleArgValue( pzLine, load_mode );
 
         if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
             return;
@@ -417,15 +433,18 @@ loadOptionLine(
  *
  * doc:
  *
- * This is a client program callable routine for setting options from, for
- * example, the contents of a file that they read in.  Only one option may
- * appear in the text.  It will be treated as a normal (non-preset) option.
+ *  This is a client program callable routine for setting options from, for
+ *  example, the contents of a file that they read in.  Only one option may
+ *  appear in the text.  It will be treated as a normal (non-preset) option.
  *
- * When passed a pointer to the option struct and a string, it will
- * find the option named by the first token on the string and set
- * the option argument to the remainder of the string.  The caller must
- * NUL terminate the string.  Any embedded new lines will be included
- * in the option argument.
+ *  When passed a pointer to the option struct and a string, it will find
+ *  the option named by the first token on the string and set the option
+ *  argument to the remainder of the string.  The caller must NUL terminate
+ *  the string.  Any embedded new lines will be included in the option
+ *  argument.  If the input looks like one or more quoted strings, then the
+ *  input will be "cooked".  The "cooking" is identical to the string
+ *  formation used in AutoGen definition files (@pxref{basic expression}),
+ *  except that you may not use backquotes.
  *
  * err:   Invalid options are silently ignored.  Invalid option arguments
  *        will cause a warning to print, but the function should return.
@@ -438,7 +457,7 @@ optionLoadLine(
     tOptState st = OPTSTATE_INITIALIZER(SET);
     char* pz;
     AGDUPSTR( pz, pzLine, "user option line" );
-    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS, OPTION_LOAD_UNCOOKED );
+    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS, OPTION_LOAD_COOKED );
     AGFREE( pz );
 }
 /*

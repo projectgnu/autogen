@@ -2,7 +2,7 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2005-02-20 14:02:52 bkorb"
+ * Time-stamp:      "2005-03-06 10:03:26 bkorb"
  *
  *  AutoOpts copyright 1992-2005 Bruce Korb
  *
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.9 2005/02/20 23:00:55 bkorb Exp $
+   $Id: usage-txt.def,v 4.10 2005/03/06 20:16:08 bkorb Exp $
  */
 
 /*
@@ -484,7 +484,7 @@ utxt = { ut-name = StdKeyLArg;
 };
 
 utxt = { ut-name = StdNestArg;
-         ut-text = "=Cpx";
+         ut-text = "Cpx";
 };
 
 utxt = { ut-name = StdNoArg;

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-02-14 17:14:30 bkorb"
+## Time-stamp:      "2005-02-28 14:21:19 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.6 2005/02/15 01:34:13 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.7 2005/03/06 20:16:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -115,6 +115,14 @@ cat >> libopts.m4 <<-	\EOMacro
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 cp ${top_srcdir}/pkg/libopts/COPYING* .
 
+cat > MakeDefs.inc <<- EODefs
+	if NEED_LIBOPTS
+	LIBOPTS_DIR = libopts
+	else
+	LIBOPTS_DIR =
+	endif
+	EODefs
+
 vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 exec 3> Makefile.am
 cat >&3 <<-	EOMakefile
@@ -123,23 +131,12 @@ cat >&3 <<-	EOMakefile
 	lib_LTLIBRARIES       = libopts.la
 	libopts_la_SOURCES    = libopts.c
 	libopts_la_LDFLAGS    = -version-info ${AM_LDFLAGS} ${vers}
-	EXTRA_DIST            = `echo COPYING*` compat \\
+	EXTRA_DIST            = \\
 	EOMakefile
 
-cols="${top_builddir}/columns/columns -I4 --spread=1"
-
-ls -1 *.[ch] | \
-   ${cols} --line-sep="  \\" >&3
-
+ls -1 | egrep -v "^(libopts\.c|Makefile\.am)\$" \
+  | ${CLexe} -I4 --spread=1 --line-sep="  \\" >&3
 exec 3>&-
-
-cat > MakeDefs.inc <<- EODefs
-	if NEED_LIBOPTS
-	LIBOPTS_DIR = libopts
-	else
-	LIBOPTS_DIR =
-	endif
-	EODefs
 
 if gzip --version > /dev/null 2>&1
 then

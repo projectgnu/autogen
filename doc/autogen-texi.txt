@@ -2407,7 +2407,7 @@ on the second line.
 You must supply a value for the @code{main-text} attribute.
 You may also supply a value for @code{option-code}.  If you do, then
 the @code{optionProcess} invocation will not be emitted into the code.
-AutoOpts will wrap the text inside of:
+AutoOpts will wrap the @code{main-text} inside of:
 
 @example
 int
@@ -4211,7 +4211,7 @@ quote processing.  This is the default and need not be specified.
 Strings are formed and concatenated if, after stripping leading and trailing
 white space, the text begins and ends with either single (') or double (")
 quote characters.  That processing is identical to the string formation used
-in AutoGen definition files (@pxref{Definitions}), except that you may not
+in AutoGen definition files (@pxref{basic expression}), except that you may not
 use backquotes.
 @end table
 

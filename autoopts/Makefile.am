@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-19 17:54:27 bkorb"
+## Time-stamp:      "2005-02-28 14:02:24 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.15 2005/02/20 02:15:48 bkorb Exp $
+## $Id: Makefile.am,v 4.16 2005/03/06 20:16:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,10 +22,12 @@ PATHFIND_MAN=
 endif
 
 GENMAN      = $(PATHFIND_MAN) \
-    optionFileLoad.3  optionFree.3      optionLoadLine.3  optionProcess.3 \
-    optionRestore.3   optionSaveFile.3  optionSaveState.3 optionVersion.3 \
-    strequate.3       streqvcmp.3       streqvmap.3       string_tokenize.3 \
-    strneqvcmp.3      strtransform.3
+    ao_string_tokenize.3 configFileLoad.3 optionFileLoad.3 optionFindValue.3 \
+    optionFree.3         optionGetValue.3 optionLoadLine.3 optionNextValue.3 \
+    optionProcess.3      optionRestore.3  optionSaveFile.3 optionSaveState.3 \
+    optionUnloadNested.3 optionVersion.3  strequate.3      streqvcmp.3       \
+    streqvmap.3          strneqvcmp.3     strtransform.3
+
 MAN_STAMP   = man3-stamp
 
 GENTEXI     = libopts.texi libopts.menu
@@ -148,6 +150,7 @@ libsrc : $(libsrc)
 $(libsrc) :
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
 	export top_srcdir top_builddir ; \
+	AGexe="$(AGexe)" CLexe="$(CLexe)" \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
 	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
 

@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.13 2005/02/23 00:09:53 bkorb Exp $
- *  Time-stamp:      "2005-02-22 08:10:17 bkorb"
+ *  $Id: configfile.c,v 4.14 2005/03/06 20:16:08 bkorb Exp $
+ *  Time-stamp:      "2005-03-06 12:13:55 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -115,38 +115,6 @@ skipUnknown( char* pzText );
  * what:  parse a configuration file
  * arg:   + const char*     + pzFile + the file to load +
  *
- * ret_type:  tOptionValue*
- * ret_desc:  An allocated, compound value structure
- *
- * doc:
- *  This routine will load a named configuration file and parse the
- *  text as a hierarchically valued option.  The option descriptor
- *  created from an option definition file is not used via this interface.
-=*/
-tOptionValue*
-configFileLoad( const char* pzFile )
-{
-    tmap_info_t   cfgfile;
-    char* pzText =
-        text_mmap( pzFile, PROT_READ, MAP_PRIVATE, &cfgfile );
-    tOptionValue* pRes = NULL;
-
-    if (pzText == MAP_FAILED)
-        return NULL;
-
-    pRes = optionLoadNested( pzText, OPTION_LOAD_COOKED );
- all_done:
-    text_munmap( &cfgfile );
-    return pRes;
-}
-
-
-/*=export_func  optionGetValue
- *
- * what:  get a specific value from a hierarcical set
- * arg:   + const tOptionValue* + pOptValue + a hierarchcal value +
- * arg:   + const char*   + valueName + name of value to get +
- *
  * ret_type:  const tOptionValue*
  * ret_desc:  An allocated, compound value structure
  *
@@ -154,30 +122,309 @@ configFileLoad( const char* pzFile )
  *  This routine will load a named configuration file and parse the
  *  text as a hierarchically valued option.  The option descriptor
  *  created from an option definition file is not used via this interface.
+ *  The returned value is "named" with the input file name and is of
+ *  type "@code{OPARG_TYPE_HIERARCHY}".  It may be used in calls to
+ *  @code{optionGetValue()}, @code{optionNextValue()} and
+ *  @code{optionUnloadNested()}.
+ *
+ * err:
+ *  If the file cannot be loaded or processed, @code{NULL} is returned and
+ *  @var{errno} is set.  It may be set by a call to either @code{open(2)}
+ *  @code{mmap(2)} or other file system calls, or it may be:
+ *  @itemize @bullet
+ *  @item
+ *  @code{ENOENT} - the file was empty.
+ *  @item
+ *  @code{EINVAL} - the file contents are invalid -- not properly formed.
+ *  @item
+ *  @code{ENOMEM} - not enough memory to allocate the needed structures.
+ *  @end itemize
 =*/
 const tOptionValue*
-optionGetValue( const tOptionValue* pOV, const char* pzValName )
+configFileLoad( const char* pzFile )
+{
+    tmap_info_t   cfgfile;
+    tOptionValue* pRes = NULL;
+    char* pzText =
+        text_mmap( pzFile, PROT_READ, MAP_PRIVATE, &cfgfile );
+
+    if (pzText == MAP_FAILED)
+        return NULL; /* errno is set */
+
+    pRes = optionLoadNested(pzText, pzFile, strlen(pzFile), OPTION_LOAD_COOKED);
+ all_done:
+    if (pRes == NULL) {
+        int err = errno;
+        text_munmap( &cfgfile );
+        errno = err;
+    } else
+        text_munmap( &cfgfile );
+    return pRes;
+}
+
+
+/*=export_func  optionFindValue
+ *
+ * what:  find a hierarcicaly valued option instance
+ * arg:   + const tOptDesc* + pOptDesc + an option with a nested arg type +
+ * arg:   + const char*     + name     + name of value to find +
+ * arg:   + const char*     + value    + the matching value    +
+ *
+ * ret_type:  const tOptionValue*
+ * ret_desc:  a compound value structure
+ *
+ * doc:
+ *  This routine will find an entry in a nested value option or configurable.
+ *  It will search through the list and return a matching entry.
+ *
+ * err:
+ *  The returned result is NULL and errno is set:
+ *  @itemize @bullet
+ *  @item
+ *  @code{EINVAL} - the @code{pOptValue} does not point to a valid
+ *  hierarchical option value.
+ *  @item
+ *  @code{ENOENT} - no entry matched the given name.
+ *  @end itemize
+=*/
+const tOptionValue*
+optionFindValue( const tOptDesc* pOptDesc,
+                 const char* pzName, const char* pzVal )
+{
+    const tOptionValue* pRes = NULL;
+
+    if (  (pOptDesc == NULL)
+       || (OPTST_GET_ARGTYPE(pOptDesc->fOptState) != OPARG_TYPE_HIERARCHY))  {
+        errno = EINVAL;
+    }
+
+    else if (pOptDesc->optCookie == NULL) {
+        errno = ENOENT;
+    }
+
+    else do {
+        tArgList* pAL = pOptDesc->optCookie;
+        int ct = pAL->useCt;
+        const tOptionValue** ppOV =
+            (const tOptionValue**)(void*)&(pAL->apzArgs);
+
+        if (ct == 0) {
+            errno = ENOENT;
+            break;
+        }
+
+        if (pzName == NULL) {
+            pRes = *ppOV;
+            break;
+        }
+
+        while (--ct >= 0) {
+            const tOptionValue* pOV = *(ppOV++);
+            const tOptionValue* pRV = optionGetValue( pOV, pzName );
+
+            if (pRV == NULL)
+                continue;
+
+            if (pzVal == NULL) {
+                pRes = pOV;
+                break;
+            }
+        }
+        if (pRes == NULL)
+            errno = ENOENT;
+    } while (0);
+
+    return pRes;
+}
+
+
+/*=export_func  optionFindNextValue
+ *
+ * what:  find a hierarcicaly valued option instance
+ * arg:   + const tOptDesc* + pOptDesc + an option with a nested arg type +
+ * arg:   + const tOptionValue* + pPrevVal + the last entry +
+ * arg:   + const char*     + name     + name of value to find +
+ * arg:   + const char*     + value    + the matching value    +
+ *
+ * ret_type:  const tOptionValue*
+ * ret_desc:  a compound value structure
+ *
+ * doc:
+ *  This routine will find the next entry in a nested value option or
+ *  configurable.  It will search through the list and return the next entry
+ *  that matches the criteria.
+ *
+ * err:
+ *  The returned result is NULL and errno is set:
+ *  @itemize @bullet
+ *  @item
+ *  @code{EINVAL} - the @code{pOptValue} does not point to a valid
+ *  hierarchical option value.
+ *  @item
+ *  @code{ENOENT} - no entry matched the given name.
+ *  @end itemize
+=*/
+const tOptionValue*
+optionFindNextValue( const tOptDesc* pOptDesc, const tOptionValue* pPrevVal,
+                 const char* pzName, const char* pzVal )
+{
+    int foundOldVal = 0;
+    tOptionValue* pRes = NULL;
+
+    if (  (pOptDesc == NULL)
+       || (OPTST_GET_ARGTYPE(pOptDesc->fOptState) != OPARG_TYPE_HIERARCHY))  {
+        errno = EINVAL;
+    }
+
+    else if (pOptDesc->optCookie == NULL) {
+        errno = ENOENT;
+    }
+
+    else do {
+        tArgList* pAL = pOptDesc->optCookie;
+        int ct = pAL->useCt;
+        tOptionValue** ppOV = (tOptionValue**)(void*)&(pAL->apzArgs);
+
+        if (ct == 0) {
+            errno = ENOENT;
+            break;
+        }
+
+        while (--ct >= 0) {
+            tOptionValue* pOV = *(ppOV++);
+            if (foundOldVal) {
+                pRes = pOV;
+                break;
+            }
+            if (pOV == pPrevVal)
+                foundOldVal = 1;
+        }
+        if (pRes == NULL)
+            errno = ENOENT;
+    } while (0);
+
+    return pRes;
+}
+
+
+/*=export_func  optionGetValue
+ *
+ * what:  get a specific value from a hierarcical list
+ * arg:   + const tOptionValue* + pOptValue + a hierarchcal value +
+ * arg:   + const char*   + valueName + name of value to get +
+ *
+ * ret_type:  const tOptionValue*
+ * ret_desc:  a compound value structure
+ *
+ * doc:
+ *  This routine will find an entry in a nested value option or configurable.
+ *  If "valueName" is NULL, then the first entry is returned.  Otherwise,
+ *  the first entry with a name that exactly matches the argument will be
+ *  returned.
+ *
+ * err:
+ *  The returned result is NULL and errno is set:
+ *  @itemize @bullet
+ *  @item
+ *  @code{EINVAL} - the @code{pOptValue} does not point to a valid
+ *  hierarchical option value.
+ *  @item
+ *  @code{ENOENT} - no entry matched the given name.
+ *  @end itemize
+=*/
+const tOptionValue*
+optionGetValue( const tOptionValue* pOld, const char* pzValName )
 {
     tArgList*     pAL;
     tOptionValue* pRes = NULL;
 
-    if (pOV->valType != OPARG_TYPE_HIERARCHY) {
+    if ((pOld == NULL) || (pOld->valType != OPARG_TYPE_HIERARCHY)) {
         errno = EINVAL;
         return NULL;
     }
-    pAL = pOV->v.nestVal;
+    pAL = pOld->v.nestVal;
+
+    if (pAL->useCt > 0) {
+        int ct = pAL->useCt;
+        tOptionValue** papOV = (tOptionValue**)(pAL->apzArgs);
+
+        if (pzValName == NULL) {
+            pRes = *papOV;
+        }
+
+        else do {
+            tOptionValue* pOV = *(papOV++);
+            if (strcmp( pOV->pzName, pzValName ) == 0) {
+                pRes = pOV;
+                break;
+            }
+        } while (--ct > 0);
+    }
+    if (pRes == NULL)
+        errno = ENOENT;
+    return pRes;
+}
+
+
+/*=export_func  optionNextValue
+ *
+ * what:  get the next value from a hierarchical list
+ * arg:   + const tOptionValue* + pOptValue + a hierarchcal list value +
+ * arg:   + const tOptionValue* + pOldValue + a value from this list   +
+ *
+ * ret_type:  const tOptionValue*
+ * ret_desc:  a compound value structure
+ *
+ * doc:
+ *  This routine will return the next entry after the entry passed in.  At the
+ *  end of the list, NULL will be returned.  If the entry is not found on the
+ *  list, NULL will be returned and "@var{errno}" will be set to EINVAL.
+ *  The "@var{pOldValue}" must have been gotten from a prior call to this routine
+ *  or to "@code{opitonGetValue()}".
+ *
+ * err:
+ *  The returned result is NULL and errno is set:
+ *  @itemize @bullet
+ *  @item
+ *  @code{EINVAL} - the @code{pOptValue} does not point to a valid
+ *  hierarchical option value or @code{pOldValue} does not point to a
+ *  member of that option value.
+ *  @item
+ *  @code{ENOENT} - the supplied @code{pOldValue} pointed to the last entry.
+ *  @end itemize
+=*/
+const tOptionValue*
+optionNextValue( const tOptionValue* pOVList, const tOptionValue* pOldOV )
+{
+    tArgList*     pAL;
+    tOptionValue* pRes = NULL;
+    int           err  = EINVAL;
+
+    if ((pOVList == NULL) || (pOVList->valType != OPARG_TYPE_HIERARCHY)) {
+        errno = EINVAL;
+        return NULL;
+    }
+    pAL = pOVList->v.nestVal;
     {
         int   ct   = pAL->useCt;
-        tNameValue** papNV = (tNameValue**)(pAL->apzArgs);
+        tOptionValue** papNV = (tOptionValue**)(pAL->apzArgs);
 
         while (ct-- > 0) {
-            tNameValue* pNV = *(papNV++);
-            if (strcmp( pNV->pzName, pzValName ) == 0) {
-                pRes = &(pNV->val);
+            tOptionValue* pNV = *(papNV++);
+            if (pNV == pOldOV) {
+                if (ct == 0) {
+                    err = ENOENT;
+
+                } else {
+                    err  = 0;
+                    pRes = *papNV;
+                }
                 break;
             }
         }
     }
+    if (err != 0)
+        errno = err;
     return pRes;
 }
 
@@ -450,7 +697,7 @@ handleStructure(
     int           direction )
 {
     tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
-    tOptionValue    valu;
+    tOptionValue     valu;
 
     char* pzName = ++pzText;
     char* pcNulPoint;
@@ -458,11 +705,11 @@ handleStructure(
 
     while (ISNAMECHAR( *pzText ))  pzText++;
     pcNulPoint = pzText;
+    valu.valType = OPARG_TYPE_STRING;
 
     switch (*pzText) {
     case ' ':
     case '\t':
-        valu.valType = OPARG_TYPE_STRING;
         pzText = parseAttributes( pOpts, pzText, &mode, &valu );
         if (*pzText == '>')
             break;
@@ -512,7 +759,7 @@ handleStructure(
             return pzText;
 
         *pzText = NUL;
-        
+
         pzText += len-1;
     }
 
@@ -646,7 +893,9 @@ internalFileLoad( tOptions* pOpts )
  * See the AutoOpts documentation for a thorough discussion of the
  * config file format.
  *
- * err:  Returns the value, "-1" if the option (config file) descriptor
+ * Configuration files not found or not decipherable are simply ignored.
+ *
+ * err:  Returns the value, "-1" if the program options descriptor
  *       is out of date or indecipherable.  Otherwise, the value "0" will
  *       always be returned.
 =*/

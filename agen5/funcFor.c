@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: funcFor.c,v 4.4 2005/03/06 20:16:08 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -646,6 +646,9 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
  *  @code{FOR} macro.  Likewise, the @code{first-for}, @code{last-for}
  *  and @code{for-index} functions are disabled outside of the range
  *  of a @code{FOR} block.
+ *
+ *  @strong{Also:} the @code{<value-name>} must be a single level name,
+ *  not a compound name (@pxref{naming values}).
  *
  *  @example
  *  [+FOR var (for-from 0) (for-to <number>) (for-sep ",") +]

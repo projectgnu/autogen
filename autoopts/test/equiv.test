@@ -1,16 +1,14 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# argument.test ---  test argument program attribute
-#                    make sure that when it is not specified
-#                    then option processing consumes all args.
+# equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2005-02-03 19:07:19 bkorb"
+# Time-stamp:        "2005-03-06 09:15:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 4.2 2005/02/04 03:57:11 bkorb Exp $
+# $Id: equiv.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -18,10 +16,8 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
-set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -259,4 +255,12 @@ cmp -s ${testname}-base.out2 ${testname}.out2 || \
   failure "${testname}-2 ERROR: conflicting options accepted"
 
 cleanup
-# end of argument.test
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of equiv.test

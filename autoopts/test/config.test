@@ -1,0 +1,179 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# rc.test ---  test loading and saving of rc files
+#
+# Time-stamp:        "2005-03-06 09:20:06 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+#
+# $Id: config.test,v 4.1 2005/03/06 20:16:08 bkorb Exp $
+# ----------------------------------------------------------------------
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+fi
+. $srcdir/defs
+
+# # # # # # # # # # PROGRAM FILE # # # # # # # # #
+
+cat > ${testname}.c <<-  _EOTest_
+	#include <stdio.h>
+	#include "config.h"
+	#include <autoopts/options.h>
+
+	int print_entry( const tOptionValue* pGV ) {
+	  if (pGV == NULL) {
+	    fprintf( stderr, "ENTRY NOT FOUND\n" );
+	    return 1;
+	  }
+	  printf( "%-8s -- ", pGV->pzName );
+	  switch (pGV->valType) {
+	    case OPARG_TYPE_NONE:
+	      fputs( "no value\n", stdout ); break;
+
+	    case OPARG_TYPE_STRING:
+	      printf( "string:   %s\n",      pGV->v.strVal ); break;
+
+	    case OPARG_TYPE_ENUMERATION:
+	      printf( "enum:     %d\n",      pGV->v.enumVal ); break;
+
+	    case OPARG_TYPE_BOOLEAN:
+	      printf( "bool:     %s\n",
+	              pGV->v.boolVal ? "TRUE" : "false" ); break;
+
+	    case OPARG_TYPE_MEMBERSHIP:
+	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
+
+	    case OPARG_TYPE_NUMERIC:
+	      printf( "number:   %d\n",      pGV->v.longVal ); break;
+
+	    case OPARG_TYPE_HIERARCHY:
+	      printf( "nested:   0x%08lX\n", pGV->v.nestVal ); break;
+
+	    default:
+	      printf( "bad type: %d\n",      pGV->valType );
+	      return 1;
+	  }
+	  return 0;
+	}
+
+	int main( int argc, char** argv ) {
+	  int res = 0;
+	  const tOptionValue* pOV;
+	  if ((argc < 3) || (argv[1][0] == '-')) {
+	    fputs( "help\n", stdout );
+	    return 0;
+	  }
+	  pOV = configFileLoad( *++argv );
+	  if (pOV == NULL) {
+	    fprintf( stderr, "Could not load:  %s\n", *argv );
+	    return 1;
+	  }
+	  argc -= 2;
+	  while (argc-- > 0) {
+	    const tOptionValue* pGV = optionGetValue( pOV, *++argv );
+	    res |= print_entry( pGV );
+	  }
+
+	  {
+	    const tOptionValue* pGV = optionGetValue( pOV, "nasty" );
+	    pGV = optionGetValue( pGV, "bar" );
+	    if (pGV->valType != OPARG_TYPE_BOOLEAN) {
+	      res = 1;
+	    } else if (pGV->v.boolVal) {
+	      fputs( "YES!!\n", stdout );
+	    } else {
+	      fputs( "oops!!\n", stdout );
+	      res = 1;
+	    }
+	  }
+
+	  {
+	    const tOptionValue* pGV = optionGetValue( pOV, NULL );
+	    while (pGV != NULL) {
+	      res |= print_entry( pGV );
+	      pGV = optionNextValue( pOV, pGV );
+	    }
+	  }
+
+	  print_entry( pOV );
+	  optionUnloadNested( pOV );
+	  return res;
+	}
+	_EOTest_
+
+compile --help
+
+# # # # # # # # # # RUN TESTS # # # # # # # # #
+
+echo Constructing test ${testname} files
+cat > ${testname}.cfg <<-  \_EOConfig_
+	mumble  = grumble
+	grumble : rumble
+
+	stumble   "The\tquick\
+	brown fox\tjumped\n\
+	over everything."
+
+	<nasty type=nested>
+	   foo : foolish
+	   <bar type=bool> YES!! </bar>
+	</nasty>
+	alpha, beta ', gamma'
+	<beta cooked>    "Carol\tTine\n"
+	</beta>
+	<zzyzx type=number> 42 </zzyzx>
+	_EOConfig_
+
+cat > ${testname}.res <<-  \_EOResult_
+	mumble   -- string:   grumble
+	grumble  -- string:   rumble
+	stumble  -- string:   The	quickbrown fox	jumped
+	over everything.
+	alpha    -- no value
+	beta     -- string:   , gamma
+	zzyzx    -- number:   42
+	YES!!
+	alpha    -- no value
+	beta     -- string:   , gamma
+	beta     -- string:   Carol	Tine
+
+	grumble  -- string:   rumble
+	mumble   -- string:   grumble
+	nasty    -- nested:   0xXXXXXXXX
+	stumble  -- string:   The	quickbrown fox	jumped
+	over everything.
+	zzyzx    -- number:   42
+	./config.cfg -- nested:   0xXXXXXXXX
+	_EOResult_
+
+./${testname} ./${testname}.cfg mumble grumble stumble alpha beta zzyzx \
+  > ${testname}.tmp-out || {
+  failure "Cannot run ${testname}"
+}
+
+sed '/ -- nested:/s/0x.*/0xXXXXXXXX/' \
+    ${testname}.tmp-out > ${testname}.out
+cmp ${testname}.out ${testname}.res || {
+  failure "`diff -c ${testname}.out ${testname}.res`"
+}
+
+./${testname} ${testname}.cfg gamma >/dev/null && \
+  failure "found non-existent value"
+
+# # # # # # # # # # CLEANUP # # # # # # # # #
+
+cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of config.test

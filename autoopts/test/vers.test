@@ -5,13 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2005-03-06 09:18:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:21:00 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2005/03/06 20:16:08 $
+#            by: bkorb
 #
-# $Id: vers.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: vers.test,v 4.2 2005/03/06 20:16:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -19,7 +20,6 @@ if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
 
@@ -59,7 +59,7 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 4.1 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 4.2 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
 echo ${AG_L} $testname.def
@@ -88,4 +88,12 @@ cmp -s $testname.h*lp || \
   failure versioned help output mismatch
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of vers.test

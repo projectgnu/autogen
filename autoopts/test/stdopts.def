@@ -1,7 +1,7 @@
 #! /bin/sh
 #
-## Time-stamp:      "2005-02-14 16:37:03 bkorb"
-## ident            $Id: stdopts.def,v 4.2 2005/02/15 01:34:13 bkorb Exp $
+## Time-stamp:      "2005-03-06 09:16:30 bkorb"
+## ident            $Id: stdopts.def,v 4.3 2005/03/06 20:16:08 bkorb Exp $
 
 #  This is the standard set of options for testing option processing
 #  It is expected to be dot
@@ -80,3 +80,12 @@ do
 done >&5
 
 exec 5>&-
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of stdopts.def

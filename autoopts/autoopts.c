@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.11 2005/02/21 23:01:08 bkorb Exp $
- *  Time-stamp:      "2005-02-20 16:36:01 bkorb"
+ *  $Id: autoopts.c,v 4.12 2005/03/06 20:16:08 bkorb Exp $
+ *  Time-stamp:      "2005-02-23 14:26:53 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -150,7 +150,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
              */
             p->optActualValue = pOD->optValue;
             p->optActualIndex = pOD->optIndex;
-            pOptState->flags |= OPTST_EQUIVALENCE;          
+            pOptState->flags |= OPTST_EQUIVALENCE;
         }
 
         /*
@@ -942,10 +942,13 @@ checkConsistency( tOptions* pOpts )
  * do not want to do this.
  *
  * The number of arguments processed always includes the program name.
- * If one of the arguments is "--", then it is counted and the
- * processing stops.  If an error was encountered and errors are
- * to be tolerated, then the returned value is the index of the
- * argument causing the error.
+ * If one of the arguments is "--", then it is counted and the processing
+ * stops.  If an error was encountered and errors are to be tolerated, then
+ * the returned value is the index of the argument causing the error.
+ * A hyphen by itself ("-") will also cause processing to stop and will
+ * @emph{not} be counted among the processed arguments.  A hyphen by itself
+ * is treated as an operand.  Encountering an operand stops option
+ * processing.
  *
  * err:  Errors will cause diagnostics to be printed.  @code{exit(3)} may
  *       or may not be called.  It depends upon whether or not the options
