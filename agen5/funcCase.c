@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.17 2000/03/12 21:10:21 bruce Exp $
+ *  $Id: funcCase.c,v 1.18 2000/03/29 04:51:06 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -49,6 +49,9 @@
 #define PTRUP(p) STMTS(if(IS_LOW(*(p)))*(p)=_toupper(*(p));(p)++)
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
+tSCC zTrue[]   = "TRUE ";
+tSCC zFalse[]  = "FALSE";
+tSCC zTrFmt[]  = "\t%s that `%s' %s `%s'\n";
 
 STATIC void     compile_re( regex_t* pRe, char* pzPat, int flags );
 STATIC void     upString( char* pz );
@@ -114,10 +117,22 @@ Select_Compare( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_contains_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+    SCM   res;
+
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
-    return (strstr( SCM_CHARS( text ), SCM_CHARS( substr )))
-        ? SCM_BOOL_T : SCM_BOOL_F;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
+
+    res = (strstr( pzText, pzSubstr) == (char*)NULL) ? SCM_BOOL_F : SCM_BOOL_T;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
+                 pzText, "*==*", pzSubstr );
+    return res;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -137,13 +152,20 @@ ag_scm_string_contains_p( SCM text, SCM substr )
     STATIC tSuccess
 Select_Compare_End( char* pzText, char* pzMatch )
 {
-    size_t  vlen = strlen( pzMatch );
-    size_t  tlen = strlen( pzText );
+    size_t   vlen = strlen( pzMatch );
+    size_t   tlen = strlen( pzText );
+    tSuccess res;
+
     if (tlen < vlen)
-        return FAILURE;
-    if (strcmp( pzText + (tlen - vlen), pzMatch ) == 0)
-        return SUCCESS;
-    return FAILURE;
+        res = FAILURE;
+    else if (strcmp( pzText + (tlen - vlen), pzMatch ) == 0)
+         res = SUCCESS;
+    else res = FAILURE;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "*==", pzMatch );
+    return res;
 }
 
     SCM
@@ -151,6 +173,7 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
 {
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
     return (SUCCESSFUL( Select_Compare_End( SCM_CHARS( text ),
                                             SCM_CHARS( substr ))))
         ? SCM_BOOL_T : SCM_BOOL_F;
@@ -174,9 +197,16 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
 Select_Compare_Start( char* pzText, char* pzMatch )
 {
     size_t  vlen = strlen( pzMatch );
+    tSuccess res;
+
     if (strncmp( pzText, pzMatch, vlen ) == 0)
-        return SUCCESS;
-    return FAILURE;
+         res = SUCCESS;
+    else res = FAILURE;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "==*", pzMatch );
+    return res;
 }
 
     SCM
@@ -184,6 +214,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
 {
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
     return (SUCCESSFUL( Select_Compare_Start( SCM_CHARS( text ),
                                               SCM_CHARS( substr ))))
         ? SCM_BOOL_T : SCM_BOOL_F;
@@ -206,16 +237,32 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
     STATIC tSuccess
 Select_Compare_Full( char* pzText, char* pzMatch )
 {
-    return (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
+    tSuccess res = (strcmp( pzText, pzMatch ) == 0) ? SUCCESS : FAILURE;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "==", pzMatch );
+    return res;
 }
 
     SCM
 ag_scm_string_equals_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+    SCM   res;
+
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
-    return (strcmp( SCM_CHARS( text ), SCM_CHARS( substr )) == 0)
-        ? SCM_BOOL_T : SCM_BOOL_F;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
+    res = (strcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
+                 pzText, "==", pzSubstr );
+    return res;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -245,6 +292,10 @@ Select_Equivalent( char* pzText, char* pzMatch )
     if (strstr( pz, pzMatch ) == (char*)NULL)
         res = FAILURE;
     AGFREE( (void*)pz );
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "*=*", pzMatch );
     return res;
 }
 
@@ -257,6 +308,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
     pzSubstr = strdup( SCM_CHARS( substr ));
+
     upString( pzSubstr );
     if (SUCCESSFUL( Select_Equivalent( SCM_CHARS( text ), pzSubstr )))
          res = SCM_BOOL_T;
@@ -282,13 +334,19 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
     STATIC tSuccess
 Select_Equivalent_End( char* pzText, char* pzMatch )
 {
-    size_t  vlen = strlen( pzMatch );
-    size_t  tlen = strlen( pzText );
+    size_t   vlen = strlen( pzMatch );
+    size_t   tlen = strlen( pzText );
+    tSuccess res;
     if (tlen < vlen)
-        return FAILURE;
+        res = FAILURE;
     if (streqvcmp( pzText + (tlen - vlen), pzMatch ) == 0)
-        return SUCCESS;
-    return FAILURE;
+         res = SUCCESS;
+    else res = FAILURE;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "*=", pzMatch );
+    return res;
 }
 
     SCM
@@ -296,6 +354,7 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 {
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
     return (SUCCESSFUL( Select_Equivalent_End( SCM_CHARS( text ),
                                                SCM_CHARS( substr ))))
         ? SCM_BOOL_T : SCM_BOOL_F;
@@ -318,10 +377,17 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
     STATIC tSuccess
 Select_Equivalent_Start( char* pzText, char* pzMatch )
 {
-    size_t  vlen = strlen( pzMatch );
+    size_t   vlen = strlen( pzMatch );
+    tSuccess res;
+
     if (strneqvcmp( pzText, pzMatch, vlen ) == 0)
-        return SUCCESS;
-    return FAILURE;
+         res = SUCCESS;
+    else res = FAILURE;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, SUCCESSFUL(res) ? zTrue : zFalse,
+                 pzText, "*==*", pzMatch );
+    return res;
 }
 
     SCM
@@ -329,6 +395,7 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 {
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
     return (SUCCESSFUL( Select_Equivalent_Start( SCM_CHARS( text ),
                                                  SCM_CHARS( substr ))))
         ? SCM_BOOL_T : SCM_BOOL_F;
@@ -359,11 +426,22 @@ Select_Equivalent_Full( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_eqv_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+    SCM   res;
+
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return scm_num_eq_p( text, substr );
 
-    return (streqvcmp( SCM_CHARS( text ), SCM_CHARS( substr )) == 0)
-        ? SCM_BOOL_T : SCM_BOOL_F;
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
+
+    res = (streqvcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
+
+    if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
+        fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
+                 pzText, "*==*", pzSubstr );
+    return res;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -434,11 +512,17 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM      res;
     regex_t  re;
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
 
@@ -501,13 +585,18 @@ Select_Match_End( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_end_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
-    char*      pzText;
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
     pzText = SCM_CHARS( text );
@@ -526,13 +615,18 @@ ag_scm_string_end_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
-    char*      pzText;
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
     pzText = SCM_CHARS( text );
@@ -599,12 +693,18 @@ Select_Match_Start( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_start_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
 
@@ -622,12 +722,18 @@ ag_scm_string_start_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
 
@@ -696,13 +802,18 @@ Select_Match_Full( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
-    char*      pzText;
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
+
+    pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
     pzText = SCM_CHARS( text );
@@ -722,16 +833,20 @@ ag_scm_string_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_eqv_match_p( SCM text, SCM substr )
 {
+    char* pzText;
+    char* pzSubstr;
+
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
-    char*      pzText;
 
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
 
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
     pzText = SCM_CHARS( text );
+    pzSubstr = SCM_CHARS( substr );
+
+    compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
     if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
