@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.9 1998/07/14 21:27:51 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.10 1998/07/14 22:04:22 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -889,12 +889,13 @@ and initialization file options.  See @samp{features}
 for a more complete description.
 
 @menu
-* Features::       Autoopts Features
-* opts.def::       Option Definitions
-* opts.h::         User Interface
-* Macro Usage::    User Interface Usage
-* opts.c::         Data Structure and Callout Procs
-* dependencies::   Autogen Inter-dependency Graph
+* Features::          Autoopts Features
+* opts.def::          Option Definitions
+* opts.h::            User Interface
+* Macro Usage::       User Interface Usage
+* opts.c::            Data Structure and Callout Procs
+* Using Autoopts::    Using Autoopts
+* dependencies::      Autogen Inter-dependency Graph
 @end menu
 
 @node Features
@@ -1097,6 +1098,51 @@ callout procedures that are specified or required.  You should never
 have need for looking at this, execpt to examine the code generated
 for implementing the @code{flag_code} construct.
 
+@node Using Autoopts
+@section Using Autoopts
+@cindex using autoopts
+
+To use autoopts in your application:
+
+@itemize @bullet
+@item
+Create a file @samp{myopts.def},
+according to the documentation above.
+@item
+In all your source files where you need to refer to option state,
+@code{#include "myopts.h"} (generated for you).
+@item
+In your main routine, code something along the lines of:
+
+@example
+main( int argc, char** argv )
+@{
+    @{
+        int arg_ct = optionProcess( &myprogOptions, argc, argv );
+        argc -= arg_ct;
+        if ((argc < ARGC_MIN) || (argc > ARGC_MAX)) @{
+            fprintf( stderr, "%s ERROR:  remaining args (%d) "
+                     "out of range\n", myprogOptions.pzProgName,
+                     argc );
+
+            USAGE( EXIT_FAILURE );
+        @}
+        argv += arg_ct;
+    @}
+    if (HAVE_OPT(OPT_NAME))
+        respond_to_opt_name();
+    ...
+@}
+@end example
+
+@item
+Compile @samp{myopts.c} and link your program
+with the following additional arguments:
+
+@example
+myopts.o -L $prefix/lib -lopts
+@end example
+
 @node dependencies
 @section Autogen Inter-dependency Graph
 @cindex autoopts dependencies
@@ -1144,7 +1190,6 @@ support option processing and the brief form of usage text.
 Here are some things that might happen in the distant future.
 
 @itemize @bullet
-
 @item
 Rewrite in Guile.
 
