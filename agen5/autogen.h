@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.26 2004/02/02 01:42:18 bkorb Exp $
+ *  $Id: autogen.h,v 3.27 2004/02/02 01:48:43 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -446,7 +446,7 @@ typedef struct fmem_cookie_s  fmem_cookie_t;
 /*
  *  Special "seek" requests
  */
-#define SEEK_BUFFER  0x80000001
+#define FMEM_IOCTL_BUFFER  0x80000001
 
 extern FILE * fmemopen (void *buf, size_t len, const char *mode);
 #endif
