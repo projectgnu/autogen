@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Aug 30 12:29:52 1999				      
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     Mon Aug 30 12:29:52 1999                                 
+#            by:     Bruce Korb <bkorb@gnu.org>                       
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.29 2000/04/04 13:22:50 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.30 2000/09/10 22:50:41 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -41,58 +41,108 @@
 
 # Code:
 
-# Rather than give up at the first failure, set this variable to
-# non-zero, so that all the checks are performed before exiting.
-DIE=0
- 
 # Figure out the absolute path to the working directory.
+#
 wd=`echo $0|sed 's,/[^/]*$,,'`
 test -z "$wd" && wd=.
+wd=`cd $wd ; pwd`
 
 # Search for a configure.in
+#
 for srcdir in $wd $wd/.. .. .; do
     test -f $srcdir/configure.in && break
 done
  
+#  This missing function is used in many places
+#
+MISSING="`cd ${srcdir}/config ; pwd`/missing"
+export MISSING
+
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
+#
 BOOTSTRAP=pre
-test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
+export BOOTSTRAP
+test -f $wd/bootstrap.local && sh -x $wd/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
 # available on the host machine.
 # ----------------------------------------------------------------------
+
+tools="autoconf autoheader aclocal automake libtoolize"
+autoconf_reqver=2.13
+autoheader_reqver=2.13
+aclocal_reqver=1.4
+automake_reqver=1.4
+libtoolize_reqver=1.3
+
+#  A version is out-of-date if it does not compare equal to the correct
+#  version and then one of its component numbers compares less
 #
-# Assume autoconf will be present until we can prove otherwise.
-AUTOCONF=autoconf
-AUTOHEADER=autoheader
-
-# See whether the configure template requires automake.
-ACLOCAL=aclocal
-AUTOMAKE=:
-
-sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
-  | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null && AUTOMAKE=automake
-
-# See whether the configure template requires libtool.
-LIBTOOLIZE=:
-sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
-  | egrep 'A(C|M)_PROG_LIBTOOL' > /dev/null && LIBTOOLIZE=libtoolize
-
-missing()
+out_of_date()
 {
-    cat >&2 <<-	_EOF_
-	**ERROR**:  You must have \`$1\' installed to bootstrap AutoGen.
-	Download the appropriate package for your distribution,
-	or get the source at:
-	    $2
-	(or any later version found there)
-	_EOF_
-	DIE=1
+    echo "Checking ${1} vs. ${2}" >&2
+
+    if test "X${1}" = "X${2}"
+    then return 1 ; fi
+
+    tv=`IFS=" .";set -- ${1};echo $@`
+    bv=`IFS=" .";set -- ${2};echo $@`
+
+    #  FOREVER...(as long as we have version number components)
+    #
+    while :
+    do
+        #  Extract the next component.  If they are not equal,
+        #  then it is time to return 0 or 1.
+        #
+        x=`set -- $tv;echo $1`
+        y=`set -- $bv;echo $1`
+        if test "X$x" = "X$y" ; then :
+        else
+            set -- `(echo $x return 0; echo $y return 1) | sort -n | sed 1q`
+            shift
+            eval $@
+        fi
+
+        #  Shift off the first component of each.  If the base version is done
+        #  then the test version is more recent, otherwise the other way
+        #
+        tv=`set -- $tv;shift;echo $@`
+        bv=`set -- $bv;shift;echo $@`
+        [ -z "$bv" ] && return 1
+        [ -z "$tv" ] && return 0
+    done
 }
+
+# Rather than give up at the first failure, set this variable to
+# "exit 1", so that all the checks are performed before exiting.
+DIE=:
+
+for f in $tools
+do
+  v=`$f --version`
+  if test $? -ne 0
+  then
+    ${MISSING} ${f}
+    DIE="exit 1"
+  else
+    v=`echo "$v"|sed 1q |sed 's/.* \([0-9]\)/\1/'`
+    eval reqver=\$${f}_reqver
+    if out_of_date "${v}" "${reqver}"
+    then
+      ${MISSING} old ${f}
+      DIE="exit 1"
+    fi
+  fi
+done
+
+# If any of the above tests failed, abort at this point.
+#
+${DIE}
 
 doit ()
 {
@@ -102,48 +152,7 @@ doit ()
   fi
 }
 
-# We must be using autoconf (or we wouldn't need this script!).
-$AUTOCONF --version >/dev/null 2>&1
-if test $? -ne 0; then
-  missing $AUTOCONF ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz
-
-  # No point testing autoheader
-  #
-  AUTOHEADER=:
-fi
-
-# If autoconf failed we don't bother testing for autoheader.
-$AUTOHEADER --version >/dev/null 2>&1
-if test $? -ne 0; then
-  missing $AUTOHEADER ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz
-fi
-
-# Check for the presence of libtool.
-$LIBTOOLIZE --version >/dev/null 2>&1
-if test $? -ne 0; then
-  missing $LIBTOOLIZE ftp://ftp.gnu.org/gnu/libtool/libtool-1.3.tar.gz
-fi
-
-# Check for the presence of automake.
-$AUTOMAKE --version >/dev/null 2>&1
-if test $? -ne 0; then
-  missing $AUTOMAKE ftp://ftp.gnu.org/gnu/automake/automake-1.4.tar.gz
-
-  # No point testing aclocal
-  #
-  ACLOCAL=:
-fi
-
-# If automake failed we don't bother testing for aclocal.
-$ACLOCAL --version >/dev/null 2>&1
-if test $? -ne 0; then
-  missing $ACLOCAL ftp://ftp.gnu.org/gnu/automake/automake-1.4.tar.gz
-fi
-
-# If any of the above tests failed, abort at this point.
-test "$DIE" -ne 0 && exit $DIE
-
-# Still here?  Run through all of the required autogeneration tools in
+# Run through all of the required autogeneration tools in
 # each directory which contains a configure.in file...
 for i in `find $srcdir -name configure.in -print|grep -v CVS/`
 do
@@ -159,10 +168,10 @@ do
   initfile=`fgrep AC_INIT $top/configure.in | sed 's,^.*(,,;s,).*$,,'`
   if test -z "$initfile" || test ! -f $top/$initfile; then
     cat <<- EOF
-	\$initfile is \`$initfile'
-	**Error**: Directory \`$top' does not look like a valid
-	top-level directory.
-	EOF
+        \$initfile is \`$initfile'
+        **Error**: Directory \`$top' does not look like a valid
+        top-level directory.
+        EOF
     exit 1
   fi
 
@@ -204,7 +213,7 @@ done
 # Execute (NOTE: not source!) any bootstrap.dir scripts we find in
 # the source tree.
 find . -name bootstrap.dir |
-egrep -v 'CVS/Base/'	   |
+egrep -v 'CVS/Base/'       |
 while read f
 do
   (cd `echo $f|sed 's,/[^/]*$,,'`

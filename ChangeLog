@@ -2,6 +2,10 @@
 
 	* autoopts/autoopts.h(pathfind): duplicates declaration from
 	compat/compat.h - removed.
+	* config/bootstrap(missing): move it so it can be used in:
+	* config/bootstrap.local: exit when autogen is found missing
+	* autoopts/autoopts.c(valid_path): corrected invalid mod of static
+	data (only used on rare platforms)
 
 2000-09-05  Jerome Lovy  <Jerome.Lovy@infonie.de>
 

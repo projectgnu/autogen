@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.18 2000/08/29 14:30:20 bkorb Exp $
+ *  $Id: autoopts.c,v 2.19 2000/09/10 22:50:41 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -552,8 +552,8 @@ doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 
 
     STATIC ag_bool
-valid_path( char*       pzBuf,  size_t      bufSize,
-            const char* pzName, const char* pzProgPath )
+valid_path( char*  pzBuf,  size_t  bufSize,
+            tCC*   pzName, tCC*    pzProgPath )
 {
     /*
      *  IF not an environment variable, just copy the data
@@ -566,9 +566,14 @@ valid_path( char*       pzBuf,  size_t      bufSize,
         return AG_TRUE;
     }
 
+    /*
+     *  IF the name starts with "$$", then it must start be "$$" or
+     *  it must start with "$$/".  In either event, replace the "$$"
+     *  with the path to the executable and append a "/" character.
+     */
     if (pzName[1] == '$') {
-        char*  pzPath;
-        char* pz;
+        tCC*  pzPath;
+        tCC*  pz;
 
         if (strchr( pzProgPath, DIR_SEP_CHAR ) != (char*)NULL)
             pzPath = pzProgPath;
@@ -588,7 +593,9 @@ valid_path( char*       pzBuf,  size_t      bufSize,
         if (pz == (char*)NULL)
             return AG_FALSE;
 
-        *pz = NUL;
+        /*
+         *  Skip past the "$$" and, maybe, the "/".  Anything else is invalid.
+         */
         pzName += 2;
         switch (*pzName) {
         case DIR_SEP_CHAR:
@@ -600,10 +607,11 @@ valid_path( char*       pzBuf,  size_t      bufSize,
         }
 
         /*
-         *  Concatenate the rc file name to the end of the executable path and
-         *  see if we can find that file and process it.
+         *  Concatenate the file name to the end of the executable path.
+         *  The result may be either a file or a directory.
          */
-        snprintf( pzBuf, bufSize, "%s/%s", pzPath, pzName );
+        memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
+        strcpy( pzBuf (pz - pzPath)+1, pzName );
     }
 
     /*
