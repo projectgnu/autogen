@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.30 2004/08/31 02:35:14 bkorb Exp $
+ *   $Id: opts.def,v 3.31 2004/10/03 02:56:23 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -584,6 +584,7 @@ flag = {
 #endif
 };
 
+#ifdef DAEMON_ENABLED
 flag = {
     name        = daemon;
     value       = d;
@@ -627,6 +628,7 @@ flag = {
     doc = "Pass-through AutoGen argument";
 #endif
 };
+#endif
 
 #ifndef XML2AG
 flag = {

@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# line.test --- test (tpl-file-line) functionality
+# loop.test --- test FOR loop
 #
-# Time-stamp:        "2004-10-01 19:22:59 bkorb"
+# Time-stamp:        "2004-10-01 20:30:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/10/02 02:49:07 $
+# Last Modified:     $Date: 2004/10/03 02:56:23 $
 #            by: bkorb
 #
-# $Id: loop.test,v 3.1 2004/10/02 02:49:07 bkorb Exp $
+# $Id: loop.test,v 3.2 2004/10/03 02:56:23 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -30,7 +30,7 @@ cat > ${testname}.tpl <<-  _EOTPL_
 	[= (define ix 0) (define ct 63) =][=
 	WHILE (< ix ct) =]
 	[= (set! ix (+ ix 1)) (sprintf "test %2d of %2d:  " ix ct)
-	=][= (tpl-file-line "%2\$d") =][=
+	=][= (tpl-file-loop "%2\$d") =][=
 	ENDWHILE=]
 	End ${testname} Test
 	_EOTPL_
@@ -40,9 +40,9 @@ set -x
 echo creating ${testname}.out
 # this is the output we should expect to see
 cat > ${testname}.out <<- '_EOF_'
-	line Test
+	loop Test
 
-	End line Test
+	End loop Test
 	_EOF_
 
 $AGEXE --base=${testname} --no-def --override=${testname}.tpl || \
@@ -52,4 +52,4 @@ egrep -v ' of 63:  6$' ${testname}.txt > ${testname}.test
 cmp -s ${testname}.test ${testname}.out || failure unexpected output
 
 cleanup
-# end of line.test
+# end of loop.test

@@ -1,3 +1,23 @@
+2004-10-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/directive.tpl: put daemon stuff under ifdef DAEMON_ENABLED
+	* agen5/autogen.c: ditto
+	* agen5/autogen.h: ditto
+	* agen5/opts.def: ditto
+	* agen5/test/Makefile.am: Add disabled daemon test
+	* agen5/test/for.test: exercize tpl-file-line function
+	* autoopts/autoopts.c: disable presetting of equivalenced options
+	disable selecting more than one member of an equivalence class
+	* autoopts/optcode.tpl: mark descriptors that have immediate opts
+	* autoopts/options_h.tpl: add a flag to indicate presetting state
+	* autoopts/optlib.tpl: add OPTNAME_MEMBERSHIP_MASK for set memberships
+	Also, redirect equivalenced option values to the base option
+	* autoopts/streqv.h: Prefix the globals with "option_"
+	* autoopts/test/Makefile.am: add the enums test
+	* autoopts/test/enums.test: more rigorous testing of sets and enums
+	* config/libopts.def: fix warnings in config tests
+	* doc/autogen.texi: improve docs on environment option presets
+	
 2004-08-30  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(doEnvPresets): break out into separate file

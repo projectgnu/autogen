@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.17 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: defDirect.c,v 3.18 2004/10/03 02:56:23 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -716,8 +716,8 @@ doDir_line( char* pzArg, char* pzScan )
  *  text:
  *
  *  This directive will pass the option name and associated text to the
- *  AutoOpts optionLoadLine routine (@pxref{optionLoadLine}).  The option text
- *  may span multiple lines by continuing them with a backslash.
+ *  AutoOpts optionLoadLine routine (@pxref{libopts-optionLoadLine}).  The
+ *  option text may span multiple lines by continuing them with a backslash.
  *  The backslash/newline pair will be replaced with two space characters.
  *  This directive may be used to set a search path for locating template files
  *  For example, this:
