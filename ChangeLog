@@ -1,3 +1,9 @@
+2003-03-02  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am(package): propagate $(pkgtype)
+	* pkg/...: more work, RPM's still wont work in alternate directory.
+	Followed the docs, tho....
+
 2003-02-28  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am: added rule for making packages in the pkg directory
