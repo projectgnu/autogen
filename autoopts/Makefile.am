@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 1998/06/01 18:50:54 $
+## Last Modified:   $Date: 1998/07/08 18:18:31 $
 ##            by:   Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 1998/06/01 18:50:54 bkorb Exp $
+## $Id: Makefile.am,v 1.4 1998/07/08 18:18:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,7 +23,7 @@ libopts_la_SOURCES = autoopts.c pgusage.c putshell.c save.c \
 
 datadir		= $(prefix)/share/$(PACKAGE)
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl
-EXTRA_DIST      = $(pkgdata_DATA)
+EXTRA_DIST      = $(pkgdata_DATA) TODO
 INCLUDES        = -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
 include_HEADERS = options.h
 MAINTAINERCLEANFILES = Makefile.in
