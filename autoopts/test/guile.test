@@ -1,0 +1,73 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# guile.test ---  test guile-main program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2000/09/30 04:05:14 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: guile.test,v 1.1 2000/09/30 04:05:14 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating $testname.def in `pwd`"
+testname="$testname" \
+argument="${argument}" long_opt="${long_opt}" \
+${SHELL-sh} ${stdopts} option second
+cat >> $testname.def <<_EOF_
+
+include = '#include <stdio.h>';
+include = '#include <guile/gh.h>';
+argument = '[ <guile-arg> ...]';
+guile-main;
+before-guile-boot = 'fputs( "guile starts\n", stderr );';
+_EOF_
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+LIB="${LIB} `guile-config link`"
+compile "-?"
+
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+guile starts
+test_guile - Test AutoOpts for guile
+USAGE:  guile [ -<flag> ]... [ <guile-arg> ...]
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s no  second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+f=`(./${testname} -- -v 2>&1) | grep 'GNU General Public Licence'`
+
+test  -n "$f"  || \
+  failure version does not show GPL
+
+cleanup
+# end of guile.test
