@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.18 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: functions.c,v 3.19 2004/10/11 23:33:34 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -215,6 +215,7 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
 /*=macfunc COMMENT
  *
  *  what:  A block of comment to be ignored
+ *  alias: #
  *
  *  desc:
  *    This function can be specified by the user, but there will

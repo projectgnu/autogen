@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.32 2004/10/07 16:07:03 bkorb Exp $
+ *   $Id: opts.def,v 3.33 2004/10/11 23:33:35 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -416,10 +416,11 @@ flag = {
     descrip     = "characters considered equivalent";
 #ifndef XML2AG
     arg-default = "_-^" /* default equivalence */;
-    doc =
-    "This option will alter the list of characters considered equivalent.\n"
-    "The default are the three characters, \"_-^\".  (The latter is\n"
-    "conventional on a Tandem, and I do a lot of work on the Tandem.)";
+    doc = <<-  _EODoc_
+	This option will alter the list of characters considered equivalent.
+	The default are the three characters, "_-^".  (The last is conventional
+	on a Tandem/HP-NonStop, and I used to do a lot of work on Tandems.)
+	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -432,8 +433,10 @@ flag = {
 #ifndef XML2AG
     settable;
     no-preset;
-    doc = "This option will leave output files writable."
-          "Normally, output files are read-only.";
+    doc = <<-  _EODoc_
+	This option will leave output files writable.
+	Normally, output files are read-only.
+	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -457,12 +460,12 @@ flag = {
     arg-name    = lim;
     descrip     = "Limit on increment loops";
 #ifndef XML2AG
-    doc =
-    "This option prevents runaway loops.  For example, if you accidentally\n"
-    "specify, \"FOR x (for-from 1) (for-to -1) (for-by 1)\",\n"
-    "it will take a long time to finish.\n"
-    "If you do have more than 256 entries in tables, you will\n"
-    "need to specify a new limit with this option.";
+    doc = <<-  _EODoc_
+	This option prevents runaway loops.  For example, if you accidentally
+	specify, "FOR x (for-from 1) (for-to -1) (for-by 1)", it will take
+	a long time to finish.  If you do have more than 256 entries in tables,
+	you will need to specify a new limit with this option.
+	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif

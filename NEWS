@@ -1,6 +1,9 @@
 New in 5.6.4 - October, 2004
 AutoGen:
 * -Wall warning cleanups
+* exist and not-exist selection macros -- the CASE macro can now
+  select a clause based on value existence.  Previously, you could detect
+  an empty string and you then had to use the ``(exist? "name")'' function.
 
 AutoOpts:
 * The listing of enumerated option arguments is a bit more concise.
@@ -10,6 +13,11 @@ AutoOpts:
   "${PROGNAME}" environment variable will be processed tokenizing it
   and processing it as a list of command line options.  It may not
   contain any command line operands.
+
+getdefs:
+* With "listed" attributes, if you quote an entry, then the scanning code
+  has to push the scan forward to the next entry so we don't wind up with
+  a spurious empty entry!!
 
 New in 5.6.3 - July, 2004
 AutoGen:

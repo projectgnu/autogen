@@ -376,7 +376,7 @@ Sincerely,
 @end ignore
 @page
 @node Definitions File
-@chapter AutoGen Definitions File
+@chapter Definitions File
 @cindex definitions file
 @cindex .def file
 
@@ -1021,7 +1021,7 @@ Of course.  :-)
 @end ignore
 @page
 @node Template File
-@chapter AutoGen Template
+@chapter Template File
 @cindex template file
 @cindex .tpl file
 

@@ -1,3 +1,15 @@
+2004-10-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h(zDefaultNil): new global to distinguish defaulted/
+	unknown values from an empty string actual value.
+	* agen5/funcCase.c(Select_Match_Existence): use new global
+	(Select_Match_NonExistence): ditto
+	* agen5/funcEval.c(evalExpression): ditto
+	* agen5/functions.h(zFn_Select): new selection aliases: !E and +E
+	* agen5/test/case.test: test new aliases
+	* getdefs/gdemit.c(emitListattr): after a quoted entry in a "listed"
+	attribute, scan forward to next entry - no bogus empty entries!
+
 2004-10-09  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defParse-fsm.c(dp_do_invalid): return invalid

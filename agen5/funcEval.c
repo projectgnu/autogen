@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.23 2004/10/07 16:07:03 bkorb Exp $
+ *  $Id: funcEval.c,v 3.24 2004/10/11 23:33:34 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -146,7 +146,7 @@ evalExpression( ag_bool* pMustFree )
                 /*
                  *  Emit only if found
                  */
-                return (char*)zNil;
+                return (char*)zDefaultNil;
 
             case (EMIT_IF_ABSENT | EMIT_ALWAYS):
                 /*
@@ -164,13 +164,13 @@ evalExpression( ag_bool* pMustFree )
             tSCC zBlock[] = "attempted to use block macro in eval expression";
 
             if ((code & EMIT_IF_ABSENT) != 0)
-                return (char*)zNil;
+                return (char*)zDefaultNil;
 
             if (  (pDef->valType != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
                 fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                          zBlock );
-                return (char*)zNil;
+                return (char*)zDefaultNil;
             }
 
             /*
@@ -191,7 +191,7 @@ evalExpression( ag_bool* pMustFree )
                 if (pDef->valType != VALTYP_TEXT) {
                     fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                              zBlock );
-                    return (char*)zNil;
+                    return (char*)zDefaultNil;
                 }
 
                 *pMustFree = AG_TRUE;
@@ -208,7 +208,7 @@ evalExpression( ag_bool* pMustFree )
                 if (pDef->valType != VALTYP_TEXT) {
                     fprintf( pfTrace, zTplWarn, pT->pzFileName, pMac->lineNo,
                              zBlock );
-                    return (char*)zNil;
+                    return (char*)zDefaultNil;
                 }
 
                 pzText = pDef->val.pzText;
@@ -391,6 +391,7 @@ eval( const char* pzExpr )
 /*=macfunc EXPR
  *
  *  what:  Evaluate and emit an Expression
+ *  alias: + - + ? + % + ; + ( + . + '`' + '"' + "'" +
  *
  *  desc:
  *   This macro does not have a name to cause it to be invoked

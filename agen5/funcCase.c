@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.18 2004/10/11 00:00:52 bkorb Exp $
+ *  $Id: funcCase.c,v 3.19 2004/10/11 23:33:34 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -750,7 +750,7 @@ ag_scm_string_eqv_match_p( SCM text, SCM substr )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
- *  We don't bother making a Guile function for this one :)
+ *  We don't bother making a Guile function for any of these :)
  */
 STATIC tSuccess
 Select_Match_Always( char* pzText, char* pzMatch )
@@ -759,21 +759,20 @@ Select_Match_Always( char* pzText, char* pzMatch )
 }
 
 /*
- *  We don't bother making a Guile function for this one :)
+ *  If the "pzText" addresses "zNil", then we couldn't find a value
+ *  and defaulted to an empty string.  So, the result exists if
+ *  the pzText address is anything except "zNil".
  */
 STATIC tSuccess
 Select_Match_Existence( char* pzText, char* pzMatch )
 {
-    return (pzText != zNil) ? SUCCESS : FAILURE;
+    return (pzText != zDefaultNil) ? SUCCESS : FAILURE;
 }
 
-/*
- *  We don't bother making a Guile function for this one :)
- */
 STATIC tSuccess
 Select_Match_NonExistence( char* pzText, char* pzMatch )
 {
-    return (pzText == zNil) ? SUCCESS : FAILURE;
+    return (pzText == zDefaultNil) ? SUCCESS : FAILURE;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -787,14 +786,14 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
  *
  *  The arguments are evaluated and converted to a string, if necessary.  A
  *  simple name will be interpreted as an AutoGen value name and its value will
- *  be used by the @{SELECT} expressions (see the example below and the
+ *  be used by the @code{SELECT} macros (see the example below and the
  *  expression evaluation function, @pxref{EXPR}).  The scope of the macro is
- *  up to the matching ESAC function.  Within the scope of a CASE, this string
- *  is matched against case selection macros.  There are sixteen match macros
- *  that are derived from four different ways the test may be performed, plus
- *  an "always true", "true if the AutoGen value was found", and "true if no
- *  AutoGen value was found" matches.  The codes for the sixteen match
- *  macros are formed as follows:
+ *  up to the matching @code{ESAC} macro.  Within the scope of a @code{CASE},
+ *  this string is matched against case selection macros.  There are sixteen
+ *  match macros that are derived from four different ways matches may be
+ *  performed, plus an "always true", "true if the AutoGen value was found",
+ *  and "true if no AutoGen value was found" matches.  The codes for the
+ *  nineteen match macros are formed as follows:
  *
  *  @enumerate
  *  @item
@@ -813,6 +812,12 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
  *  @item
  *  Do you need a default match when none of the others match?
  *  Use a single asterisk (@code{*}).
+ *  @item
+ *  Do you need to distinguish between an empty string value and a value
+ *  that was not found?  Use the non-existence test (@code{!E}) before
+ *  testing a full match against an empty string (@code{== ''}).
+ *  There is also an existence test (@code{+E}), more for symmetry than
+ *  for practical use.
  *  @end enumerate
  *
  *  @noindent
@@ -823,9 +828,9 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
  *  [+ ~~*  "[Tt]est" +]reg exp must match at start, not at end
  *  [+ ==   "TeSt"    +]a full-string, case sensitive compare
  *  [+ =    "TEST"    +]a full-string, case insensitive compare
- *  [+ !@             +]not exists - matches if no AutoGen value found
+ *  [+ !E             +]not exists - matches if no AutoGen value found
  *  [+ ==   ""        +]expression yielded a zero-length string
- *  [+ @              +]exists - matches if any value result
+ *  [+ +E             +]exists - matches if there is any value result
  *  [+ *              +]always match - no testing
  *  [+ ESAC +]
  *  @end example
@@ -835,8 +840,8 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
  *  a number, it is converted to a decimal string.
  *
  *  These case selection codes have also been implemented as
- *  Scheme expression functions using the same codes
- *  (@pxref{Common Functions}).
+ *  Scheme expression functions using the same codes.  They are documented
+ *  in this texi doc as ``string-*?'' predicates (@pxref{Common Functions}).
 =*/
 /*=macfunc ESAC
  *
@@ -1080,6 +1085,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*=macfunc SELECT
  *
  *  what:    Selection block for CASE function
+ *  alias:   | ~ | = | * | ! | + |
  *  desc:
  *    This macro selects a block of text by matching an expression
  *    against the sample text expression evaluated in the @code{CASE}
@@ -1151,24 +1157,25 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         break;
 
     case '!':
-        if ((*pzSrc != '@') || (! isspace( pzSrc[1])) )
-            AG_ABEND_IN( pT, pMac, zInvSel );
+    case '+':
+        switch (*pzSrc) {
+        case 'e':
+        case 'E':
+            break;
+        default:
+            goto bad_sel;
+        }
+        if ((pzSrc[1] != NUL) && (! isspace( pzSrc[1] )))
+            goto bad_sel;
 
-        typ = FTYP_SELECT_MATCH_NONEXISTENCE;
-        srcLen = 0;
-        pMac->ozText = 0;
-        goto selection_done;
-
-    case '@':
-        if (! isspace( *pzSrc ))
-            AG_ABEND_IN( pT, pMac, zInvSel );
-
-        typ = FTYP_SELECT_MATCH_EXISTENCE;
+        typ = (pzSrc[-1] == '!')
+            ? FTYP_SELECT_MATCH_NONEXISTENCE : FTYP_SELECT_MATCH_EXISTENCE;
         srcLen = 0;
         pMac->ozText = 0;
         goto selection_done;
 
     default:
+    bad_sel:
         AG_ABEND_IN( pT, pMac, zInvSel );
     }
 

@@ -1,12 +1,12 @@
 /*
- *  $Id: gdemit.c,v 3.6 2004/02/01 21:26:46 bkorb Exp $
+ *  $Id: gdemit.c,v 3.7 2004/10/11 23:33:35 bkorb Exp $
  *
  *    getdefs copyright 1999-2004 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2004/02/01 21:26:46 $
+ *  Last Modified:     $Date: 2004/10/11 23:33:35 $
  *            by: bkorb
  */
 
@@ -284,36 +284,43 @@ emitListattr( char* pzText, char* pzOut )
      */
     if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
         sepChar = *(pzText++);
+    while (isspace( *pzText )) pzText++;
 
     /*
      *  Loop for as long as we have text entries
      */
-    for (;;) {
-        while (isspace( *pzText )) pzText++;
-        if (*pzText == NUL) {
-            /*
-             *  IF there were no definitions, THEN emit an empty one
-             */
-            if (FirstAttr)
-                pzOut -= sizeof( zStart ) - 1;
-
-            *(pzOut++) = ';';
-            *(pzOut++) = '\n';
-            break;
-        }
+    while (*pzText != NUL) {
 
         if (FirstAttr)
             FirstAttr = 0;
         else
             *(pzOut++) = ',';
 
+        /*
+         *  If the first thing we find is the separator char,
+         *  then emit the empty string.
+         */
         if (*pzText == sepChar) {
             *(pzOut++) = '\''; *(pzOut++) = '\'';
             pzText++;
-            continue;           
+            continue;
         }
+
+        /*
+         *  Emit whatever we have.  The call will consume any trailing
+         *  separator character.
+         */
         pzOut = emitSubblockString( &pzText, sepChar, pzOut );
     }
+
+    /*
+     *  IF there were no definitions, THEN emit an empty one
+     */
+    if (FirstAttr)
+        pzOut -= sizeof( zStart ) - 1;
+
+    *(pzOut++) = ';';
+    *(pzOut++) = '\n';
 
     return pzOut;
 }
@@ -491,8 +498,19 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
      *  THEN call the quoted text emitting routine
      */
     if ((*pzText == '"') || (*pzText == '\'')) {
+        pzOut = emitQuote( &pzText, pzOut );
+
+        /*
+         *  Make sure we strip off trailing white space and any
+         *  separation character.
+         */
+        while (isspace( *pzText )) pzText++;
+        if (*pzText == sepChar) {
+            pzText++;
+            while (isspace( *pzText )) pzText++;
+        }
         *ppzText = pzText;
-        return emitQuote( ppzText, pzOut );
+        return pzOut;
     }
 
     /*
@@ -540,6 +558,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
     }
 
     *pzOut++ = '\'';
+    while (isspace( *pzText )) pzText++;
     *ppzText = pzText;
     return pzOut;
 }

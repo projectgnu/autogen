@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # case.test --- test CASE functionality
 #
-# Time-stamp:        "2004-10-10 16:50:36 bkorb"
+# Time-stamp:        "2004-10-11 11:41:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2004/10/11 00:00:52 $
+# Last Modified:     $Date: 2004/10/11 23:33:35 $
 #            by: bkorb
 #
-# $Id: case.test,v 3.2 2004/10/11 00:00:52 bkorb Exp $
+# $Id: case.test,v 3.3 2004/10/11 23:33:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -45,7 +45,7 @@ FOR grp "\n" =><=
       CASE (get "val") =><=
         ~~ ^[a-z]*$ =>~~ ^[a-z]*$  *** BOGUS ***<=
         ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  *** BOGUS ***<=
-        ~~ .*       =>~~ .*        OK<=
+        ~* .        =>~* .         OK<=
       ESAC => and <=
       CASE (get "val") =><=
         ~ ^[a-z]*$ =>~ ^[a-z]*$  OK<=
@@ -66,16 +66,18 @@ FOR grp "\n" =><=
   ESAC =><=
 
 ENDFOR grp=>
-empty: <= CASE empty-val =><=
-   @  =>valid<=
-   !@ =>BOGUS<=
-   *  =>REAL-BOGUS<=
-   ESAC =>
-bogus: <= CASE bogus-val =><=
-   !@ =>valid<=
-   @  =>BOGUS<=
-   *  =>REAL-BOGUS<=
-   ESAC =>
+empty:  <= CASE empty-val =><=
+   ~* .  =>WRONG<=
+   !E    =>BOGUS<=
+   +E    =>valid<=
+   *     =>REAL-BOGUS<=
+   ESAC  =>
+bogus:  <= CASE bogus-val =><=
+   ~* .  =>WRONG<=
+   +E    =>BOGUS<=
+   !E    =>valid<=
+   *     =>REAL-BOGUS<=
+   ESAC  =>
 EOF
 
 # # # # # # # SAMPLE OUTPUT FILE # # # # # #
@@ -84,10 +86,10 @@ echo creating $testname.out in `pwd`
 # this is the output we should expect to see
 cat > $testname.out <<'EOF'
 first:  string matches: ~~ ^[a-z]*$  OK and ~ ^[a-z]*$  OK
-second: String matches: ~~ .*        OK and ~ ^[a-z]*$  OK
+second: String matches: ~* .         OK and ~ ^[a-z]*$  OK
 third:  STRING matches: ~~ ^[A-Z]*$  OK and ~ ^[a-z]*$  OK
-empty: valid
-bogus: valid
+empty:  valid
+bogus:  valid
 EOF
 
 # # # # # # # DEFINITIONS FILE # # # # # #
@@ -109,7 +111,7 @@ grp = {
    nam = third;
    val = STRING;
 };
-empty-val = '';
+empty-val;
 EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #

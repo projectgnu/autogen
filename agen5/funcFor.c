@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.17 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: funcFor.c,v 3.18 2004/10/11 23:33:34 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -596,14 +596,10 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
  *  This macro has a slight variation on the standard syntax:
  *  @example
  *  FOR <value-name> [ <separator-string> ]
- *  @end example
- *  or
- *  @example
- *  FOR <value-name> (...Scheme expression list
- *  @end example
- *  or
- *  @example
- *  FOR <value-name> IN "quoted string" unquoted-string ...
+ *
+ *  FOR <value-name> (...Scheme expression list)
+ *
+ *  FOR <value-name> IN "string" [ ... ]
  *  @end example
  *
  *  Other than for the last form, the first macro argument must be the name of

@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.28 2004/08/12 03:26:23 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.29 2004/10/11 23:33:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -440,43 +440,56 @@ Here are the exceptions to that general rule:
 a list of name/string value pairs.  The string values are
 @i{simple expressions}, as described above.
 
-That is, the @code{INVOKE} syntax is either:
+That is, the @code{INVOKE} syntax is one of these two:
 @example
 <user-macro-name> [ <name> [ = <expression> ] ... ]
-@end example
-@noindent
-or
-@example
+
 INVOKE <name-expression> [ <name> [ = <expression> ] ... ]
 @end example
 
 @item
-AutoGen FOR macros must be in one of two forms:
+AutoGen FOR macros must be in one of three forms:
 
 @example
 FOR <name> [ <separator-string> ]
-@end example
-@noindent
-or
-@example
+
 FOR <name> (...Scheme expression list)
+
+FOR <name> IN <string-entry> [ ... ]
 @end example
 @noindent
-where @code{<name>} must be a simple name and the Scheme expression list
+where:
+@table @samp
+@item <name>
+must be a simple name.
+@item <separator-string>
+is inserted between copies of the enclosed block.  Do not try to use ``IN''
+as your separator string.  It won't work.
+@item <string-entry>
+is an entry in a list of strings.  ``@code{<name>}'' is assigned
+each value from the ``@code{IN}'' list before expanding the @code{FOR} block.
+@item (...Scheme expression list)
 is expected to contain one or more of the @code{for-from},
 @code{for-to}, @code{for-by}, and @code{for-sep} functions.
 (@xref{FOR}, and @ref{AutoGen Functions})
+@end table
+
+The first two forms iterate over the @code{FOR} block if @code{<name>}
+is found in the AutoGen values.  The last form will create the AutoGen
+value named @code{<name>}.
 
 @item
 AutoGen @code{DEFINE} macros must be followed by a simple name.
-Anything after that is ignored.  @xref{DEFINE}.
+Anything after that is ignored.  Consequently, that ``comment space''
+may be used to document any named values the macro expects to have
+set up as arguments.  @xref{DEFINE}.
 
 @item
 The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
 macros take no arguments and ignore everything after the macro name
 (e.g. see @ref{COMMENT})
-@end enumerate
-[=
+@end enumerate[=
+
 
 #  FOR each defined function,
       this code will insert the extracted documentation =][=

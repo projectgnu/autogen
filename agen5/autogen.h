@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.35 2004/10/07 16:07:03 bkorb Exp $
+ *  $Id: autogen.h,v 3.36 2004/10/11 23:33:34 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -406,16 +406,28 @@ MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
 #define MKSTRING( name, val ) \
         MODE const char z ## name[ sizeof( val )] VALUE( val )
 
-MKSTRING( AllocWhat, "Could not allocate a %d byte %s\n" );
-MKSTRING( AllocErr,  "Allocation Failure" );
-MKSTRING( Cannot,    "fserr %d: cannot %s %s:  %s\n" );
-MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
-MKSTRING( FileLine,  "\tfrom %s line %d\n" );
-MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
-MKSTRING( NotStr,    "ERROR: %s is not a string\n" );
-MKSTRING( DevNull,   "/dev/null" );
-MKSTRING( ShellEnv,  "SHELL" );
-MKSTRING( Nil,       "" );
+MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n" );
+MKSTRING( AllocErr,   "Allocation Failure" );
+MKSTRING( Cannot,     "fserr %d: cannot %s %s:  %s\n" );
+MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n" );
+MKSTRING( FileLine,   "\tfrom %s line %d\n" );
+MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
+MKSTRING( NotStr,     "ERROR: %s is not a string\n" );
+MKSTRING( DevNull,    "/dev/null" );
+MKSTRING( ShellEnv,   "SHELL" );
+
+/*
+ *  It may seem odd that there are two 'nil' strings.  It is used by
+ *  evalExpression() to distinguish between an actual value of a zero-
+ *  length string, and a defaulted value because there was no value
+ *  available.  (In fact, that routine will always select 'zDefaultNil'
+ *  except when "runShell()" returns NULL.  A NULL result means an empty
+ *  string that is valid (zNil) as opposed to an empty string due to
+ *  an unknown value (zDefaultNil).  This distinction is utilized in
+ *  the Select_Match_Existence() and Select_Match_NonExistence() functions.
+ */
+MKSTRING( Nil,        "" );
+MKSTRING( DefaultNil, "" );
 
 extern void unloadTemplate( tTemplate* pT );
 extern void unloadDefs( void );
