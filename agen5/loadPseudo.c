@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.3 2000/09/16 06:25:29 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.4 2000/09/16 06:27:50 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -176,10 +176,10 @@ findTokenType( tCC**  ppzData, te_fsm_state fsm_state, ag_bool line_start )
     }
 
     /*
-     *  IF the token starts with an alphabetic,
+     *  IF the token starts with an alphanumeric,
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
-    if (isalpha( *pzData )) {
+    if (isalnum( *pzData )) {
         if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
             res_tkn = isspace( pzData[ sizeof(zAgName)-1 ])
                 ? FST_AUTOGEN : FST_SUFFIX;
