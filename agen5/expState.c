@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.17 2004/02/05 04:45:30 bkorb Exp $
+ *  $Id: expState.c,v 3.18 2004/02/05 04:48:58 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -198,7 +198,8 @@ ag_scm_base_name( void )
  *
  * doc:  Sets the current directory for AutoGen.  Shell commands will run
  *       from this directory as well.  This is a wrapper around the Guile
- *       native function.
+ *       native function.  It returns its directory name argument and
+ *       fails the program on failure.
 =*/
 SCM
 ag_scm_chdir( SCM dir )
@@ -516,6 +517,9 @@ ag_scm_suffix( void )
  * exparg: full_path, include full path to file, optonal
  *
  * doc:  Returns the name of the current template file.
+ *       If @code{#t} is passed in as an argument, then the template
+ *       file is hunted for in the template search path.  Otherwise,
+ *       just the unadorned name.
 =*/
 SCM
 ag_scm_tpl_file( SCM full )
