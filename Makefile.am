@@ -6,7 +6,7 @@
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.12 2002/08/19 00:50:37 bkorb Exp $
+## $Id: Makefile.am,v 3.13 2002/08/23 04:15:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -24,7 +24,6 @@ MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 
 distcleancheck_listfiles = \
      find -type f -exec 'test -f $(srcdir)/{} || echo {} ;'
-
 
 configure : VERSION
 
