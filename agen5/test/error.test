@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2002/01/31 02:29:13 $
+# Last Modified:     $Date: 2002/01/31 03:51:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 3.5 2002/01/31 02:29:13 bkorb Exp $
+# $Id: error.test,v 3.6 2002/01/31 03:51:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -96,7 +96,7 @@ cmp -s ${testname}.err2 ${testname}.out2 || \
 echo creating ${testname}.out3
 # this is the output we should expect to see
 cat > ${testname}.out3 <<_EOF_
-AutoGen aborting on signal 15 (Terminated) in state INCLUDING
+AutoGen aborting on signal 15 (Terminated) in state EMITTING
 processing template error2.tpl
             on line 2
        for function EXPR (11)
