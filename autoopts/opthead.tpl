@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.19 2000/10/07 22:52:08 bkorb Exp $
+# $Id: opthead.tpl,v 2.20 2000/10/10 12:33:40 bkorb Exp $
 =]
 [=
 
@@ -63,9 +63,7 @@ ENDIF =]
 IF (exist? "version") =]
 #define [=(. UP-prog)=]_VERSION       [=(c-string (get "version"))=]
 #define [=(. UP-prog)=]_FULL_VERSION  "[=
-  (. prog-name) =] - [=(if (exist? "prog_title")
-                           (sprintf "%s - " (get "prog_title")))
-  =]Ver. [=version=]"[=
+  (. prog-name) =] - [= % prog_title "%s - " =]Ver. [=version=]"[=
 ENDIF (exist? version) =]
 
 /*
