@@ -46,18 +46,31 @@
 #include "printf.h"
 
 #ifdef HAVE_LONG_DOUBLE
-extern long double frexpl (long double x, int *exp);
-extern long double ldexpl (long double x, int exp);
+#ifndef HAVE_FREXPL
+static long double frexpl (long double x, int *exp);
+#endif
+#ifndef HAVE_LDEXPL
+static long double ldexpl (long double x, int exp);
+#endif
 #else
 #define frexpl frexp
 #define ldexpl ldexp
 #endif
 
+static printf_function
+    printf_char,          printf_count,   printf_flag,
+    printf_float,         printf_integer,
+    printf_numeric_param, printf_pointer, printf_string;
+
+static printf_arginfo_function
+    printf_flag_info,
+    printf_modifier_info, printf_numeric_param_info;
+
+printf_arginfo_function printf_generic_info;
+
 
 static uintmax_t
-fetch_uintmax(
-    struct printf_info *pinfo,
-	union printf_arg const *arg )
+fetch_uintmax (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
     return (uintmax_t) arg->pa_u_long_long_int;
@@ -75,9 +88,7 @@ fetch_uintmax(
 }
 
 static intmax_t
-fetch_intmax(
-     struct printf_info *pinfo,
-     union printf_arg const *arg )
+fetch_intmax (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
     return (intmax_t) arg->pa_long_long_int;
@@ -95,9 +106,7 @@ fetch_intmax(
 }
 
 static snv_long_double
-fetch_double(
-     struct printf_info *pinfo,
-     union printf_arg const *arg )
+fetch_double (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
     return arg->pa_long_double;
@@ -107,9 +116,8 @@ fetch_double(
 
 
 #ifndef HAVE_COPYSIGNL
-snv_long_double
-copysignl(
-	snv_long_double x, snv_long_double y )
+static snv_long_double
+copysignl (snv_long_double x, snv_long_double y)
 {
 #ifdef HAVE_COPYSIGN
   return x * (snv_long_double) copysign (1.0, x * y);
@@ -123,9 +131,7 @@ copysignl(
 #endif
 
 static snv_long_double
-ipow(
-     snv_long_double base,
-     int n )
+ipow (snv_long_double base, int n)
 {
   int k = 1;
   snv_long_double result = 1.0;
@@ -149,10 +155,7 @@ ipow(
 }
 
 static int
-print_float(
-     struct printf_info *pinfo,
-     char *buf,
-     snv_long_double n )
+print_float (struct printf_info *pinfo, char *buf, snv_long_double n)
 {
   /* Print value of n in a buffer in the given base.
      Based upon the algorithm outlined in:
@@ -219,7 +222,7 @@ print_float(
     }
 
   /* Zero and infinity also can have a sign in front of them. */
-  if (copysign (1.0, n) < 0.0)
+  if (copysignl (1.0, n) < 0.0)
     {
       n = -1.0 * n;
       *p++ = '-';
@@ -476,19 +479,14 @@ print_float(
 
 
 static int
-printf_flag(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_flag (STREAM *stream, struct printf_info *const pinfo,
+			 union printf_arg const *args)
 {
   return 0;
 }
 
 static int
-printf_flag_info(
-     struct printf_info *const pinfo,
-     size_t n,
-     int *argtypes )
+printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -549,10 +547,8 @@ printf_flag_info(
 }
 
 static int
-printf_numeric_param(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_numeric_param (STREAM *stream, struct printf_info *const pinfo,
+					  union printf_arg const *args)
 {
   /* Called twice if both the width and precision are
      asterisks, in which case we extract the width on
@@ -567,12 +563,10 @@ printf_numeric_param(
 }
  
 static int
-printf_numeric_param_info(
-     struct printf_info *const pinfo,
-     size_t n,
-     int *argtypes )
+printf_numeric_param_info (struct printf_info *const pinfo, size_t n,
+						   int *argtypes)
 {
-  char *pEnd = NULL;
+  const char *pEnd = NULL;
   int found = 0, allowed_states, new_state;
 
   unsigned long value;		/* we use strtoul, and cast back to int. */
@@ -586,12 +580,24 @@ printf_numeric_param_info(
       found |= 1;
     }
 
-  /* Parse the number (or optionally a ``*''). */
-  value = strtoul (pinfo->format, &pEnd, 10);
-  if (pEnd != NULL && pEnd > pinfo->format)
+  /* Parse the ``*''. */
+  if (*pinfo->format == '*')
+    {
+      if (n)
+        argtypes[0] = PA_INT;
+
+      pinfo->format++;
+      found |= 2;
+    }
+
+  /* Parse the number. */
+  for (pEnd = pinfo->format, value = 0; *pEnd >= '0' && *pEnd <= '9'; pEnd++)
+    value = value * 10 + (*pEnd - '0');
+
+  if (pEnd > pinfo->format)
     {
       pinfo->format = pEnd;
-      found |= 2;
+      found |= 4;
     }
 
   if (value > INT_MAX)
@@ -600,15 +606,7 @@ printf_numeric_param_info(
       return -1;
     }
 
-  if (*pinfo->format == '*')
-    {
-      if (n)
-        argtypes[0] = PA_INT;
-
-      pinfo->format++;
-      found |= 4;
-    }
-
+  /* Finally look for a $. */
   if (*pinfo->format == '$')
     {
       pinfo->format++;
@@ -618,27 +616,35 @@ printf_numeric_param_info(
   switch (found)
     {
     /* We must have read a width specification. */
-    case 4:
+    case 2:
       value = INT_MIN;
 
-    case 2:
+    case 4:
       allowed_states = SNV_STATE_BEGIN | SNV_STATE_WIDTH;
       new_state = ~(SNV_STATE_BEGIN | SNV_STATE_FLAG | SNV_STATE_WIDTH);
       pinfo->width = value;
       break;
 
+    case 14:
+      PRINTF_ERROR (pinfo, "position specifications for widths not supported");
+      return -1;
+
     /* We must have read a precision specification. */
-    case 5:
+    case 3:
       value = INT_MIN;
 
-    case 3:
+    case 5:
       allowed_states = SNV_STATE_PRECISION | SNV_STATE_BEGIN;
       new_state = SNV_STATE_MODIFIER | SNV_STATE_SPECIFIER;
       pinfo->prec = value;
       break;
 
+    case 15:
+      PRINTF_ERROR (pinfo, "precision specifications for precisions not supported");
+      return -1;
+
     /* We must have read a position specification. */
-    case 10:
+    case 12:
       allowed_states = SNV_STATE_BEGIN;
       new_state = ~SNV_STATE_BEGIN;
       pinfo->dollar = value;
@@ -660,14 +666,11 @@ printf_numeric_param_info(
   pinfo->format--;
 
   /* Return the number of arguments used. */
-  return found & 4 ? 1 : 0;
+  return (found & 2) != 0;
 }
 
 static int
-printf_modifier_info(
-     struct printf_info *const pinfo,
-     size_t n,
-     int *argtypes )
+printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -754,10 +757,7 @@ printf_modifier_info(
  * Always 1.
  */
 int
-printf_generic_info( pinfo, n, argtypes )
-	struct printf_info *const pinfo;
-    size_t n;
-    int *argtypes;
+printf_generic_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   int type = pinfo->type;
 
@@ -785,10 +785,8 @@ printf_generic_info( pinfo, n, argtypes )
 
 
 static int
-printf_char(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_char (STREAM *stream, struct printf_info *const pinfo,
+			 union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
   char ch = '\0';
@@ -833,13 +831,11 @@ printf_char(
 }
 
 static int
-printf_float(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_float (STREAM *stream, struct printf_info *const pinfo,
+			  union printf_arg const *args)
 {
   snv_long_double value = 0.0;
-  int len, count_or_errorcode = SNV_OK, type = PA_DOUBLE;
+  int len, count_or_errorcode = SNV_OK;
 #ifdef HAVE_LONG_DOUBLE
   char buffer[LDBL_MAX_10_EXP + 20], *p = buffer;
 #else
@@ -906,13 +902,9 @@ printf_float(
 }
 
 static int
-printf_count(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_count (STREAM *stream, struct printf_info *const pinfo,
+			  union printf_arg const *args)
 {
-  int type = pinfo->type;
-
   if (pinfo->is_char)
     *(char *) (args->pa_pointer) = pinfo->count;
 
@@ -932,10 +924,8 @@ printf_count(
 }
 
 static int
-printf_integer(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_integer (STREAM *stream, struct printf_info *const pinfo,
+				union printf_arg const *args)
 {
   static const char digits_lower[] = "0123456789abcdefghijklmnopqrstuvwxyz";
   static const char digits_upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1076,10 +1066,8 @@ printf_integer(
 }
 
 static int
-printf_pointer(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_pointer (STREAM *stream, struct printf_info *const pinfo,
+				union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
 
@@ -1132,10 +1120,8 @@ printf_pointer(
 }
 
 static int
-printf_string(
-     STREAM *stream,
-     struct printf_info *const pinfo,
-     union printf_arg const *args )
+printf_string (STREAM *stream, struct printf_info *const pinfo,
+			   union printf_arg const *args)
 {
   int len = 0, count_or_errorcode = SNV_OK;
   const char *p = NULL;
@@ -1194,89 +1180,94 @@ printf_string(
   /* Return the number of characters emitted. */
   return count_or_errorcode;
 }
+
 
-/**
- * printf_generic:
- * @stream: the stream (possibly a struct printfv_stream appropriately
- * cast) on which to write output.
- * @pinfo: the current state information for the format string parser.
- * @args: the pointer to the first argument to be read by the handler
- *
- * An example implementation of a %printf_function, used to provide easy
- * access to justification, width and precision options.
- *
- * Return value:
- * The number of characters output.
- **/
-int
-printf_generic( stream, pinfo, args )
-	STREAM *stream;
-    struct printf_info *const pinfo;
-    union printf_arg const *args;
+/* replacements for frexpl and ldexpl follow */
+
+#if defined HAVE_LONG_DOUBLE && !defined HAVE_FREXPL
+
+/* Binary search.  Quite inefficient but portable. */
+static long double
+frexpl(long double x, int *exp)
 {
-  int len = 0, count_or_errorcode = SNV_OK;
-  char *p = NULL;
+  long double exponents[20], *next;
+  int exponent, bit;
 
-  /* Used to interface to the custom function. */
-  STREAM *out;
-  Filament *fil;
-  printf_function *user_func = (printf_function *) pinfo->extra;
-
-  return_val_if_fail (pinfo != NULL, SNV_ERROR);
-
-  /* Read these now to advance the argument pointer appropriately */
-  if (pinfo->prec == -1)
-    pinfo->prec = 0;
-
-  /* Check for valid pre-state. */
-  if (pinfo->prec <= -1)
+  /* Check for zero, nan and infinity. */
+  if (x != x || x + x == x )
     {
-      PRINTF_ERROR (pinfo, "invalid flags");
-      return -1;
+      *exp = 0;
+      return x;
     }
 
-  /* Print to a stream using a user-supplied function. */
-  fil = filnew (NULL, 0);
-  out = stream_new (fil, SNV_UNLIMITED, NULL, filputc);
-  user_func (out, pinfo, args);
-  stream_delete (out);
-  len = fillen (fil);
-  p = fildelete (fil);
+  if (x < 0)
+    return -frexpl(-x, exp);
 
-  /* Left pad to the width if the supplied argument is less than
-     the width specifier.  */
-  if (p != NULL && pinfo->prec && pinfo->prec < len)
-    len = pinfo->prec;
-
-  if ((len < pinfo->width) && !pinfo->left)
+  exponent = 0;
+  if (x > 1.0)
     {
-      int padwidth = pinfo->width - len;
-      while ((count_or_errorcode >= 0) && (count_or_errorcode < padwidth))
-	SNV_EMIT (pinfo->pad, stream, count_or_errorcode);
+      for (next = exponents, exponents[0] = 2.0L, bit = 1;
+	   *next <= x + x;
+	   bit <<= 1, next[1] = next[0] * next[0], next++);
+
+      for (; next >= exponents; bit >>= 1, next--)
+	if (x + x >= *next)
+	  {
+	    x /= *next;
+	    exponent |= bit;
+	  }
+
     }
 
-  /* Fill the buffer with as many characters from the format argument
-   * as possible without overflowing or exceeding the precision.
-   */
-  if ((count_or_errorcode >= 0) && (p != NULL))
+  else if (x < 0.5)
     {
-      int mark = count_or_errorcode;
-      while ((count_or_errorcode >= 0) && *p != '\0'
-	     && ((pinfo->prec == 0) || (count_or_errorcode - mark < len)))
-	SNV_EMIT (*p++, stream, count_or_errorcode);
+      for (next = exponents, exponents[0] = 0.5L, bit = 1;
+	   *next > x;
+	   bit <<= 1, next[1] = next[0] * next[0], next++);
+
+      for (; next >= exponents; bit >>= 1, next--)
+	if (x < *next)
+	  {
+	    x /= *next;
+	    exponent |= bit;
+	  }
+
+      exponent = -exponent;
     }
 
-  /* Right pad to the width if we still didn't reach the specified
-   * width and the left justify flag was set.
-   */
-  if ((count_or_errorcode < pinfo->width) && pinfo->left)
-    while ((count_or_errorcode >= 0)
-	   && (count_or_errorcode < pinfo->width))
-      SNV_EMIT (pinfo->pad, stream, count_or_errorcode);
-
-  /* Return the number of characters emitted. */
-  return count_or_errorcode;
+  *exp = exponent;
+  return x;
 }
+#endif
+
+#if defined HAVE_LONG_DOUBLE && !defined HAVE_LDEXPL
+
+static long double
+ldexpl(long double x, int exp)
+{
+  long double factor;
+  int bit;
+
+  /* Check for zero, nan and infinity. */
+  if (x != x || x + x == x )
+    return x;
+
+  if (exp < 0)
+    {
+      exp = -exp;
+      factor = 0.5L;
+    }
+  else
+    factor = 2.0L;
+
+  for (bit = 1; bit <= exp; bit <<= 1, factor *= factor)
+    if (exp & bit)
+      x *= factor;
+
+  return x;
+}
+#endif
+
 
 
 /* This is where the parsing of FORMAT strings is handled:
@@ -1292,24 +1283,24 @@ printf_generic( stream, pinfo, args )
 
 spec_entry snv_default_spec_table[] = {
   /* ch  type         function */
-  {' ', TRUE, 0, printf_flag, printf_flag_info},
-  {'#', TRUE, 0, printf_flag, printf_flag_info},
-  {'+', TRUE, 0, printf_flag, printf_flag_info},
-  {'-', TRUE, 0, printf_flag, printf_flag_info},
-  {'\'', TRUE, 0, printf_flag, printf_flag_info},
-  {'*', TRUE, PA_INT, printf_numeric_param, printf_numeric_param_info},
-  {'.', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'0', TRUE, 0, printf_flag, printf_flag_info},
-  {'1', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'2', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'3', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'4', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'5', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'6', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'7', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'8', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'9', TRUE, 0, printf_numeric_param, printf_numeric_param_info},
-  {'c', FALSE, PA_CHAR, printf_char, NULL},
+  {' ', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'#', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'+', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'-', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'\'', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'*', TRUE, PA_INT, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'.', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'0', TRUE, 0, printf_flag, printf_flag_info, NULL},
+  {'1', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'2', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'3', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'4', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'5', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'6', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'7', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'8', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'9', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
+  {'c', FALSE, PA_CHAR, printf_char, NULL, NULL},
   {'d', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
   {'e', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
   {'E', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
@@ -1317,26 +1308,26 @@ spec_entry snv_default_spec_table[] = {
   {'F', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
   {'g', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
   {'G', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'h', TRUE, 0, printf_flag, printf_modifier_info},
+  {'h', TRUE, 0, printf_flag, printf_modifier_info, NULL},
   {'i', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'j', TRUE, 0, printf_flag, printf_modifier_info},
-  {'l', TRUE, 0, printf_flag, printf_modifier_info},
-  {'L', TRUE, 0, printf_flag, printf_modifier_info},
-  {'n', FALSE, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info},
+  {'j', TRUE, 0, printf_flag, printf_modifier_info, NULL},
+  {'l', TRUE, 0, printf_flag, printf_modifier_info, NULL},
+  {'L', TRUE, 0, printf_flag, printf_modifier_info, NULL},
+  {'n', FALSE, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info, NULL},
   {'o', FALSE, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 8},
   {'p', FALSE, PA_POINTER, printf_pointer, NULL, (snv_pointer) 16},
-  {'q', TRUE, 0, printf_flag, printf_modifier_info},
-  {'s', FALSE, PA_STRING, printf_string, NULL},
-  {'t', TRUE, 0, printf_flag, printf_modifier_info},
+  {'q', TRUE, 0, printf_flag, printf_modifier_info, NULL},
+  {'s', FALSE, PA_STRING, printf_string, NULL, NULL},
+  {'t', TRUE, 0, printf_flag, printf_modifier_info, NULL},
   {'u', FALSE, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 10},
   {'x', FALSE, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 16},
   {'X', FALSE, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 16},
-  {'z', TRUE, 0, printf_flag, printf_modifier_info},
-  {'\0', FALSE, PA_LAST}
+  {'z', TRUE, 0, printf_flag, printf_modifier_info, NULL},
+  {'\0', FALSE, PA_LAST, NULL, NULL, NULL}
 };
 
 /* format.c ends here */

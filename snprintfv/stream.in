@@ -30,17 +30,6 @@
 #ifndef STREAM_H
 #define STREAM_H 1
 
-#ifndef PARAMS
-#  if __STDC__
-#    ifndef NOPROTOS
-#      define PARAMS(args)	args
-#    endif
-#  endif
-#  ifndef PARAMS
-#    define PARAMS(args)	()
-#  endif
-#endif
-
 #define STREAM_READABLE		(1 << 0)
 #define STREAM_WRITABLE		(1 << 1)
 
@@ -79,7 +68,7 @@ typedef struct stream STREAM;
  * stream, cast to an int if it was written successfully, or
  * else %EOF, if the write failed.
  **/
-typedef int (*StreamPut) PARAMS ((int ch, STREAM * stream));
+typedef int (*StreamPut) (int ch, STREAM * stream);
 
 /**
  * StreamGet:
@@ -92,7 +81,7 @@ typedef int (*StreamPut) PARAMS ((int ch, STREAM * stream));
  * stream, cast to an int if it was read successfully, or
  * else %EOF, if the read failed.
  **/
-typedef int (*StreamGet) PARAMS ((STREAM * stream));
+typedef int (*StreamGet) (STREAM * stream);
 
 
 @protos stream.c

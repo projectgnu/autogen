@@ -76,26 +76,6 @@
 #include "mem.h"
 #include "filament.h"
 
-#ifndef FILAMENT_BUFSIZ
-#  define FILAMENT_BUFSIZ	512
-#endif
-
-struct filament
-{
-  char *value;			/* pointer to the start of the string */
-  size_t length;		/* length of the string */
-  size_t size;			/* total memory allocated */
-  char buffer[FILAMENT_BUFSIZ];	/* usually string == &buffer[0] */
-};
-
-
-/* Save the overhead of a function call in the great majority of cases. */
-#define FIL_MAYBE_EXTEND(fil, len, copy)  \
-  do { \
-    if ((len)>=(fil)->size) { fil_maybe_extend((fil), (len), (copy)); } \
-  } while (0)
-
-static inline void fil_maybe_extend PARAMS ((Filament * fil, size_t len, boolean copy));
 
 
 /**
@@ -112,9 +92,7 @@ static inline void fil_maybe_extend PARAMS ((Filament * fil, size_t len, boolean
  * A newly created Filament object is returned.
  **/
 Filament *
-filnew (init, len)
-     const char *const init;
-     size_t len;
+filnew (const char *const init, size_t len)
 {
   Filament *new;
 
@@ -141,10 +119,7 @@ filnew (init, len)
  * The initialised Filament object is returned.
  **/
 Filament *
-filinit (fil, init, len)
-     Filament *fil;
-     const char *const init;
-     size_t len;
+filinit (Filament *fil, const char *const init, size_t len)
 {
   if (init == NULL || len < 1)
     {
@@ -176,7 +151,7 @@ filinit (fil, init, len)
 	  /* If we get to here then we never try to shrink the already
 	     allocated dynamic buffer (if any), we just leave it in
 	     place all ready to expand into later... */
-	  FIL_MAYBE_EXTEND (fil, len, FALSE);
+	  fil_maybe_extend (fil, len, FALSE);
 	}
 
       snv_assert (len < fil->size);
@@ -201,8 +176,7 @@ filinit (fil, init, len)
  * this string including any embedded nulls.
  **/
 char *
-fildelete (fil)
-     Filament *fil;
+fildelete (Filament *fil)
 {
   char *value;
 
@@ -221,174 +195,32 @@ fildelete (fil)
 }
 
 /**
- * filval:
- * @fil: The Filament object being queried.
- *
- * Return value:
- * A pointer to the internal null terminated string held by the Filament
- * object is returned.  Since the @fil may contain embedded nulls, it
- * is not entirely safe to use the strfoo() API to examine the contents
- * of the return value.
- **/
-char *
-filval (fil)
-     Filament *fil;
-{
-  /* Because we have been careful to ensure there is always at least
-     one spare byte of allocated memory, it is safe to set it here. */
-  fil->value[fil->length] = '\0';
-  return fil->value;
-}
-
-/**
- * fillen:
- * @fil: The Filament object being queried.
- * 
- * Return value:
- * The length of @fil, including any embedded nulls, but excluding the
- * terminating null, is returned.
- **/
-size_t
-fillen (fil)
-     Filament *fil;
-{
-  return fil->length;
-}
-
-/**
- * filelt:
- * @fil: The Filament being queried.
- * @n: A zero based index into @fil.
- * 
- * This function looks for the @n'th element of @fil.
- * 
- * Return value:
- * If @n is an index inside the Filament @fil, then the character stored
- * at that index cast to an int is returned, otherwise @n is outside
- * this range and -1 is returned.
- **/
-int
-filelt (fil, n)
-     Filament *fil;
-     size_t n;
-{
-  return ((n >= 0) && (n < fil->length)) ? (int) fil->value[n] : -1;
-}
-
-/**
- * filcat:
- * @fil: The destination Filament of the concatenation.
- * @str: The address of the source bytes for concatenation.
- * 
- * The bytes starting at address @str upto and including the first null
- * byte encountered are destructively concatenated to @fil.  If
- * necessary @fil is dynamically reallocated to make room for this
- * operation.
- * 
- * Return value: 
- * A pointer to the null terminated string (along with any embedded nulls)
- * which is the result of this concatenation is returned.
- **/
-char *
-filcat (fil, str)
-     Filament *fil;
-     const char *str;
-{
-  return filncat (fil, str, strlen (str));
-}
-
-/**
- * filncat:
- * @fil: The destination Filament of the concatenation.
- * @str: The address of the source bytes for concatenation.
- * @n: The number of bytes to be copied from @str.
- * 
- * @n bytes starting with the byte at address @str are destructively
- * concatenated to @fil.  If necessary, @fil is dynamically reallocated
- * to make room for this operation.
- * 
- * Return value:
- * A pointer to the null terminated string (along with any embedded nulls)
- * which is the result of this concatenation is returned.
- **/
-char *
-filncat (fil, str, n)
-     Filament *fil;
-     const char *str;
-     size_t n;
-{
-  FIL_MAYBE_EXTEND (fil, n + fil->length, TRUE);
-
-  memcpy (fil->value + fil->length, str, n);
-  fil->length += n;
-
-  return fil->value;
-}
-
-/**
- * filccat:
- * @fil: The destination Filament of the concatenation.
- * @c: The character to append to @fil.
- * 
- * @c is destructively concatenated to @fil.  If necessary, @fil is
- * dynamically reallocated to make room for this operation.  When used
- * repeatedly this function is considerably less efficient than %filncat(),
- * since it must maintain the %'\0' suffix for C string compatibility
- * after every appended character, and then overwrite that %'\0' on the
- * next call.
- * 
- * Return value:
- * A pointer to the null terminated string (along with any embedded nulls)
- * which is the result of this concatenation is returned.
- **/
-char *
-filccat (fil, c)
-     Filament *fil;
-     int c;
-{
-  FIL_MAYBE_EXTEND (fil, 1 + fil->length, TRUE);
-
-  fil->value[fil->length++] = (char) c;
-
-  return fil->value;
-}
-
-/* 
- * fil_maybe_extend
+ * _fil_extend:
  * @fil: The Filament object which may need more string space.
  * @len: The length of the data to be stored in @fil.
  * @copy: whether to copy data from the static buffer on reallocation.
  *
- * This function will examine the difference between the amount of
- * space in @fil, and @len, the length required for the prospective
- * contents, and if necessary will assign a bigger block of memory
- * to @fil.
+ * This function will will assign a bigger block of memory to @fil
+ * considering the space left in @fil and @len, the length required
+ * for the prospective contents.
  */
-static void
-fil_maybe_extend (fil, len, copy)
-     Filament *fil;
-     size_t len;
-     boolean copy;
+void
+_fil_extend (Filament *fil, size_t len, boolean copy)
 {
-  /* Only extend the buffer if there really isn't enough room for
-     a string of length @len at all. */
+  /* Usually we will simply double the amount of space previously
+     allocated, but if the extra data is larger than the current
+     size it *still* won't fit, so in that case we allocate enough
+     room plus some we leave the current free space to expand into. */
+  fil->size += MAX (len, fil->size);
 
-  /* if (len >= fil->size) -- this is in the FIL_MAYBE_EXTEND macro now */
-  {
-    /* Usually we will simply double the amount of space previously
-       allocated, but if the extra data is larger than the current
-       size it *still* won't fit, so in that case we allocate enough
-       room plus some conservative extra space to expand into. */
-    fil->size += MAX (len, fil->size);
-    if (fil->value == fil->buffer)
-      {
-	fil->value = snv_new (char, fil->size);
-	if (copy)
-	  memcpy (fil->value, fil->buffer, fil->length);
-      }
-    else
-      fil->value = snv_renew (char, fil->value, fil->size);
-  }
+  if (fil->value == fil->buffer)
+    {
+      fil->value = snv_new (char, fil->size);
+      if (copy)
+	memcpy (fil->value, fil->buffer, fil->length);
+    }
+  else
+    fil->value = snv_renew (char, fil->value, fil->size);
 }
 
 /* Filament.c ends here */

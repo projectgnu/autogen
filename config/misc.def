@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/02/04 00:29:12 $
+ *  Last Modified:     $Date: 2003/03/31 02:37:49 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.24 2003/02/04 00:29:12 bkorb Exp $
+ *  $Id: misc.def,v 3.25 2003/03/31 02:37:49 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.24 $";
+version = "$Revision: 3.25 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -238,6 +238,15 @@ do-always = <<- _END_ALWAYS_
 	# This is a rehack of AC_PROG_YACC
 	AC_CHECK_PROGS(YACC, byacc yacc 'bison -y', "$missing_dir/missing yacc")
 
+	AC_C_INLINE
+	AC_CACHE_CHECK([for static inline], [snv_cv_static_inline], [
+	AC_TRY_COMPILE([static inline foo(bar) int bar; { return bar; }],
+	  [return foo(0);],
+	  [snv_cv_static_inline='static inline'],
+	  [snv_cv_static_inline='static'])
+	])
+	AC_DEFINE_UNQUOTED(SNV_INLINE, ${snv_cv_static_inline},
+	         [define to static or static inline])
 	_END_ALWAYS_;
 
 /* misc.def ends here */

@@ -149,12 +149,12 @@ typedef union printf_arg
  *
  * Append an error that will be returned by printf_strerror.
  */
-#define PRINTF_ERROR(pi, str)                                         \
+#define PRINTF_ERROR(pi, str) \
         printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FCN, str);
-
-typedef int printf_function PARAMS ((STREAM *stream, struct printf_info *pparser, union printf_arg const * args));
-
-typedef int printf_arginfo_function PARAMS ((struct printf_info *pparser, size_t n, int *argtypes));
+typedef int printf_function (STREAM *stream, struct printf_info *pparser,
+							 union printf_arg const * args);
+typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
+									 int *argtypes);
 
 /**
  * spec_entry:
@@ -199,7 +199,7 @@ spec_entry;
  * Returns %NULL if @func was not successfully registered, a
  * %spec_entry with the information on the function if it was.
  **/
-typedef spec_entry *register_callback_function PARAMS ((unsigned spec, printf_function *func, printf_arginfo_function *arginfo));
+typedef spec_entry *register_callback_function (unsigned spec, printf_function *func, printf_arginfo_function *arginfo);
 
 /* Codes to determine basic types.
 
@@ -263,18 +263,25 @@ enum
    formatting API, then define COMPILING_SNPRINTFV_C and use the snv_
    prefix for the entry points below. */
 #ifndef COMPILING_PRINTF_C
-#undef printf
-#undef vprintf
-#undef dprintf
-#undef vdprintf
-#undef fprintf
-#undef vfprintf
-#undef sprintf
-#undef vsprintf
-#undef snprintf
-#undef vsnprintf
-#undef asprintf
-#undef vasprintf
+#undef  printf
+#undef  vprintf
+#undef  dprintf
+#undef  vdprintf
+#undef  fprintf
+#undef  vfprintf
+#undef  sprintf
+#undef  vsprintf
+#undef  snprintf
+#undef  vsnprintf
+#undef  asprintf
+#undef  vasprintf
+#undef  asprintfv
+#undef  dprintfv
+#undef  fprintfv
+#undef  sprintfv
+#undef  printfv
+#undef  snprintfv
+
 #define printf          snv_printf
 #define vprintf         snv_vprintf
 #define dprintf         snv_dprintf
@@ -287,6 +294,12 @@ enum
 #define vsnprintf       snv_vsnprintf
 #define asprintf        snv_asprintf
 #define vasprintf       snv_vasprintf
+#define asprintfv       snv_asprintfv
+#define dprintfv        snv_dprintfv
+#define fprintfv        snv_fprintfv
+#define sprintfv        snv_sprintfv
+#define printfv         snv_printfv
+#define snprintfv       snv_snprintfv
 #endif				/* !COMPILING_SNPRINTFV_C */
 #ifdef __cplusplus
 }

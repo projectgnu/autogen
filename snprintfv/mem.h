@@ -38,13 +38,13 @@
 
 #ifdef _WIN32
 #  ifdef DLL_EXPORT
-#    define SNV_SCOPE	__declspec(dllexport)
+#    define SNV_SCOPE	extern __declspec(dllexport)
+#  else
+#    ifdef LIBSNPRINTFV_DLL_IMPORT
+#      define SNV_SCOPE	extern __declspec(dllimport)
+#    endif
 #  endif
-#  ifdef LIBSNPRINTFV_DLL_IMPORT
-#    define SNV_SCOPE	extern __declspec(dllimport)
-#  endif
-#endif
-#ifndef SNV_SCOPE
+#else
 #  define SNV_SCOPE	extern
 #endif
 
@@ -57,10 +57,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#define END_EXTERN_C }
-#else
-#define END_EXTERN_C
-#endif
+#endif /* __cplusplus */
 
 /* These function pointers are exposed through the API incase a user
    of this library needs to map our memory management routines to
@@ -77,9 +74,11 @@ SNV_SCOPE free_proc_t*    snv_free;
 /* And these are reimplemented tout court because they are
    not fully portable.  */
 extern realloc_proc_t snv_xrealloc;
-extern char* snv_strdup PARAMS((const char *str));
+extern char* snv_strdup (const char *str);
 
-END_EXTERN_C
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* SNPRINTFV_MEM_H */
 

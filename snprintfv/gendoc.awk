@@ -35,14 +35,12 @@
 #    mode=<header.h>	output exported function prototypes with
 #			<header.h> in their keyword list (or all
 #			exported functions if none cite header.h).
-#    proto=PARAMS	parameter wrapper macro name [default]
-#                       e.g. int foo PARAMS((char bar));
 #    global=GLOBAL_DATA	private global data scope macro name used in
 #			.c file to be replaced by...
 #    scope=SCOPE	public global data scope macro name to be used
 #			int generated .h file.
 #    format=PRINTF	gnu printf attribute macro name [default]
-#                       This macro needs to handle K&R, ANSI and GNU C.
+#                       This macro needs to handle ANSI and GNU C.
 #                       e.g. int baz PRINTF((char *format, ...), 1, 2);
 #
 # See the accompanying README for details of how to format function headers
@@ -78,7 +76,6 @@ BEGIN {
     delete paramdesc[fname,paramname];# description of PARAMNAME in FNAME
 
     if (!length(mode))   mode   = "texinfo";
-    if (!length(proto))  proto  = "PARAMS";
     if (!length(format)) format = "PRINTF";
     if (!length(global)) global = "GLOBAL_DATA";
     if (!length(scope))  scope  = "SCOPE";
@@ -281,98 +278,6 @@ funcdecl>0 {
 	    
 	    decl[fname] = $0;
 	}
-	# Function prototype
-	else if ($0 ~ /^[ \t]*extern[ \t]*.*[\)0-9]\);[ \t]*$/) {
-	    sub(/^[ \t]*extern[ \t]*/, "");	# strip leading extern keyword
-	    sub(/[ \t]+[A-Z_]*P[A-Z]*\(\(/, " ("); # and __P/PARAMS macro
-	    sub(/[ \t]*\)\)[ \t]*;[ \t]*$/, ");"); # and trailing garbage
-
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("%s: DEBUG(%s): ANSI prototype found:\n" \
-		       "\t>%s<\n",
-		       program_name, fname, $0) | "cat >&2";
-	    }
-
-	    type[fname] = $0;
-	    sub(/^[ \t]*inline[ \t]*/, "", type[fname]);
-	    type[fname] = substr(type[fname], 1,
-				 match(type[fname], /[ \t]*\(/) -1);
-	    sub(/[ \t][a-zA-Z0-9_]+$/, "", type[fname]);
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("\ttype: >%s<\n", type[fname]) | "cat >&2";
-	    }
-	    
-	    decl[fname] = $0;
-
-	    sub(/^.*\(+/, "");	   # strip leading garbage
-	    sub(/(\)[0-9, \t]*)?\);+[ \t]*$/, ""); # strip trailing garbage
-
-	    # populate the functions param array
-	    argc = split($0, params, /,[ \t]*/);
-	    for (i = 1; i <= argc; i++) {
-		if (debug == 1 || index(debug, fname) != 0) {
-		    printf("\tparam%d: >%s<\n", i, params[i]) | "cat >&2";
-		}
-		param[fname,i -1] = params[i];
-		delete params[i];
-	    }
-	    param[fname, argc] = "NULL";
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("\tparam%d: >%s<\n",
-		       argc +1, param[fname, argc]) | "cat >&2";
-	    }
-	}
-	# Macro function
-	else if ($0 ~ /^\#[ \t]*define[ \t]+[_A-Za-z0-9]+\(/) {
-	    keywords[fname] = keywords[fname] " macro";
-
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("%s: DEBUG(%s): macro function definition found:\n" \
-		       "\t>%s<\n",
-		       program_name, fname, $0) | "cat >&2";
-	    }
-	    sub(/^[^(]*\(+/, "");	# strip leading garbage
-	    sub(/\).*$/, "");		# strip trailing garbage
-
-	    # populate the macro's param array
-	    argc = split($0, params, /,[ \t]*/);
-	    decl[fname] = fname "(";
-	    for (i = 1; i <= argc; i++) {
-		if (debug == 1 || index(debug, fname) != 0) {
-		    printf("\tparam%d: >%s<\n", i, params[i]) | "cat >&2";
-		}
-		param[fname,i -1] = params[i];
-		decl[fname] = decl[fname] param[fname, i -1];
-		if (i < argc) {
-		    decl[fname] = decl[fname] ", ";
-		}
-		delete params[i];
-	    }
-	    decl[fname] = decl[fname] ")";
-
-	    param[fname, argc] = "NULL";
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("\tparam%d: >%s<\n",
-		       argc +1, param[fname, argc]) | "cat >&2";
-	    }
-
-	}
-	# Macro alias
-	else if ($0 ~ /^\#[ \t]*define[ \t]+[_A-Za-z0-9]+[ \t]+/) {
-	    keywords[fname] = keywords[fname] " alias";
-
-	    if (debug == 1 || index(debug, fname) != 0) {
-		printf("%s: DEBUG(%s): macro alias definition found:\n" \
-		       "\t>%s<\n",
-		       program_name, fname, $0) | "cat >&2";
-	    }
-	    decl[fname] = fname;
-	}
-	# ignore other preprocessor directives
-	else if ($0 ~ /^[ \t]*\#/)
-	{
-	    next;
-	}
 	# Function pointer typedef
 	else if ($0 ~ /^[ \t]*typedef[ \t]+.*\);[ \t]*$/) {
 	    keywords[fname] = keywords[fname] " functionpointer typedef";
@@ -442,7 +347,99 @@ funcdecl>0 {
 	    }
 	    decl[fname] = fname;
 	}
-	# assume a return type line from a function definition
+	# Macro function
+	else if ($0 ~ /^\#[ \t]*define[ \t]+[_A-Za-z0-9]+\(/) {
+	    keywords[fname] = keywords[fname] " macro";
+
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("%s: DEBUG(%s): macro function definition found:\n" \
+		       "\t>%s<\n",
+		       program_name, fname, $0) | "cat >&2";
+	    }
+	    sub(/^[^(]*\(+/, "");	# strip leading garbage
+	    sub(/\).*$/, "");		# strip trailing garbage
+
+	    # populate the macro's param array
+	    argc = split($0, params, /,[ \t]*/);
+	    decl[fname] = fname "(";
+	    for (i = 1; i <= argc; i++) {
+		if (debug == 1 || index(debug, fname) != 0) {
+		    printf("\tparam%d: >%s<\n", i, params[i]) | "cat >&2";
+		}
+		param[fname,i -1] = params[i];
+		decl[fname] = decl[fname] param[fname, i -1];
+		if (i < argc) {
+		    decl[fname] = decl[fname] ", ";
+		}
+		delete params[i];
+	    }
+	    decl[fname] = decl[fname] ")";
+
+	    param[fname, argc] = "NULL";
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("\tparam%d: >%s<\n",
+		       argc +1, param[fname, argc]) | "cat >&2";
+	    }
+
+	}
+	# Macro alias
+	else if ($0 ~ /^\#[ \t]*define[ \t]+[_A-Za-z0-9]+[ \t]+/) {
+	    keywords[fname] = keywords[fname] " alias";
+
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("%s: DEBUG(%s): macro alias definition found:\n" \
+		       "\t>%s<\n",
+		       program_name, fname, $0) | "cat >&2";
+	    }
+	    decl[fname] = fname;
+	}
+	# Function prototype
+	else if ($0 ~ /^[ \t]*(extern)?[ \t]*.*\);?[ \t]*$/) {
+	    sub(/^[ \t]*extern[ \t]*/, "");	# strip leading extern keyword
+	    sub(/[ \t]+[A-Z_]*P[A-Z]*\(\(/, " ("); # and __P/PARAMS macro
+	    sub(/[ \t]*\)\)[ \t]*;?[ \t]*$/, ")"); # and trailing garbage
+
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("%s: DEBUG(%s): ANSI prototype found:\n" \
+		       "\t>%s<\n",
+		       program_name, fname, $0) | "cat >&2";
+	    }
+
+	    type[fname] = $0;
+	    sub(/^[ \t]*inline[ \t]*/, "", type[fname]);
+	    type[fname] = substr(type[fname], 1,
+				 match(type[fname], /[ \t]*\(/) -1);
+	    sub(/[ \t][a-zA-Z0-9_]+$/, "", type[fname]);
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("\ttype: >%s<\n", type[fname]) | "cat >&2";
+	    }
+	    
+	    decl[fname] = $0;
+
+	    sub(/^.*\(+/, "");	   # strip leading garbage
+	    sub(/(\)[0-9, \t]*)?\);*[ \t]*$/, ""); # strip trailing garbage
+
+	    # populate the functions param array
+	    argc = split($0, params, /,[ \t]*/);
+	    for (i = 1; i <= argc; i++) {
+		if (debug == 1 || index(debug, fname) != 0) {
+		    printf("\tparam%d: >%s<\n", i, params[i]) | "cat >&2";
+		}
+		param[fname,i -1] = params[i];
+		delete params[i];
+	    }
+	    param[fname, argc] = "NULL";
+	    if (debug == 1 || index(debug, fname) != 0) {
+		printf("\tparam%d: >%s<\n",
+		       argc +1, param[fname, argc]) | "cat >&2";
+	    }
+	}
+	# ignore other preprocessor directives
+	else if ($0 ~ /^[ \t]*\#/)
+	{
+	    next;
+	}
+	# assume return type line from a function definition
 	else
 	{
 	    if (debug == 1 || index(debug, fname) != 0) {
@@ -478,10 +475,18 @@ funcdecl>0 {
 	next;
     }
     if (funcdecl == 2) {	# second line contains function name @ $1
-	if ($0 ~ /\.\.\.[ \t]*[\)]+/) {
-	    # We have just seen the "..." which marks the end of a stdarg
-	    # prototype declaration, and need to reset for the next header
+	if ($0 ~ /\(.*[A-Za-z_]+[* \t]+[_A-Za-z]+/ || $0 ~ /\([ \t]*void/) {
+	    # We have just seen two consecutive keywords or "void", both of
+	    # which mark an ANSI declaration, and need to reset for the next
+	    # header
 	    funcdecl = 0;
+
+	    # Is this a printf attributable prototype?  Look for
+	    # ``format,'' in the penultimate argument:
+	    use_format=0;
+	    if ($0 ~ /[^a-zA-Z_]format,[ \t]*\.\.\.)$/) {
+	        use_format=1;
+	    }
 
 	    sub(/^.*\(+/, "");	  # strip leading garbage
 	    sub(/\)+[ \t]*$/, ""); # strip trailing garbage
@@ -490,13 +495,6 @@ funcdecl>0 {
 	    if (index(debug, fname) != 0) {
 		printf("%s: DEBUG(%s): checking param %d, \"%s\".\n",
 		       program_name, fname, argc, params[argc -1]) | "cat >&2";
-	    }
-
-	    # Is this a printf attributable prototype?  Look for
-	    # ``format,'' in the penultimate argument:
-	    use_format=0;
-	    if (match(params[argc -1], /[^a-zA-Z_]format$/)) {
-	        use_format=1;
 	    }
 
 	    if (use_format == 1  && (debug == 1 || index(debug, fname) != 0)) {
@@ -515,7 +513,7 @@ funcdecl>0 {
 	    if (use_format) {
 	        decl[fname] = decl[fname] " " format "((";
 	    } else {
-	        decl[fname] = decl[fname] " " proto "((";
+	        decl[fname] = decl[fname] " (";
 	    }
 	    for (i = 1; i <= argc; i++) {
 		if (debug == 1 || index(debug, fname) != 0) {
@@ -529,10 +527,13 @@ funcdecl>0 {
 		delete params[i];
 	    }
 	    param[fname, argc] = "NULL";
+	    if (argc == 0)
+		decl[fname] = decl[fname] "void";
+
 	    if (use_format) {
 	        decl[fname] = decl[fname] "), " (argc -1) ", " argc ");\n";
 	    } else {
-	        decl[fname] = decl[fname] "));\n";
+	        decl[fname] = decl[fname] ");\n";
 	    }
 
 	    if (debug == 1 || index(debug, fname) != 0) {
@@ -559,14 +560,17 @@ funcdecl>0 {
 	    # We have just seen the "{" which marks the start of the
 	    # function body, and need to reset for the next header
 	    funcdecl = 0;
-	    decl[fname] = decl[fname] " " proto "((";
+	    decl[fname] = decl[fname] " (";
 	    for (i = 0; i < argc; i++) {
 		decl[fname] = decl[fname] param[fname,i];
 		if (param[fname,i +1] != "NULL") {
 		    decl[fname] = decl[fname] ", ";
 		}
 	    }
-	    decl[fname] = decl[fname] "));";
+	    if (argc == 0)
+		decl[fname] = decl[fname] "void";
+
+	    decl[fname] = decl[fname] ");";
 
 	    if (debug == 1 || index(debug, fname) != 0) {
 		printf("%s: DEBUG(%s): full declaration generated:\n" \

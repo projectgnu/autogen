@@ -51,14 +51,6 @@
 #  ifndef HAVE_STRTOUL
 #    include "strtoul.c"
 #  endif
-
-#  ifndef HAVE_LDEXPL
-#    include "ldexpl.c"
-#  endif
-
-#  ifndef HAVE_FREXPL
-#    include "frexpl.c"
-#  endif
 #endif /* SNV_LIBRARY_BUILD */
 
 #define EOS			'\0'
@@ -66,11 +58,11 @@
 #define SNV_ESC_SPEC		'\\'
 
 /* Functions to manage mapping of spec chars to handlers. */
-static unsigned spec_hash PARAMS ((unsigned spec));
-static void spec_init PARAMS ((void));
-static spec_entry *spec_lookup PARAMS ((unsigned spec));
-static void spec_insert PARAMS ((spec_entry * pentry));
-static int do_printfv PARAMS ((STREAM *stream, const char *format, union printf_arg const args[]));
+SNV_INLINE unsigned spec_hash (unsigned spec);
+SNV_INLINE void spec_init (void);
+SNV_INLINE spec_entry *spec_lookup (unsigned spec);
+static void spec_insert (spec_entry * pentry);
+static int do_printfv (STREAM *stream, const char *format, union printf_arg const args[]);
 
 /* FIXME:  We are assuming an ASCII character set where all the
            printable characters are between SPACE and DEL. */
@@ -84,15 +76,15 @@ static spec_entry *spec_table[ASCII_DEL - ASCII_SPACE];
 /* TODO:  This is not thread-safe as well. */
 static char *printf_last_error;
 
-static inline unsigned
-spec_hash (spec)
-     unsigned spec;
+SNV_INLINE unsigned
+spec_hash (unsigned spec)
 {
   return (spec & ASCII_DEL) - ASCII_SPACE;
 }
 
 /* Register all of the functions in INIT_SPEC_TABLE. */
-static void spec_init PARAMS ((void))
+static void
+spec_init (void)
 {
   static boolean is_init = FALSE;
 
@@ -116,9 +108,8 @@ static void spec_init PARAMS ((void))
 }
 
 /* Insert PENTRY, a new handler, into SPEC_TABLE. */
-static inline void
-spec_insert (pentry)
-     spec_entry *pentry;
+SNV_INLINE void
+spec_insert (spec_entry *pentry)
 {
   unsigned hash = spec_hash (pentry->spec);
   spec_init ();
@@ -126,9 +117,8 @@ spec_insert (pentry)
 }
 
 /* Lookup and return the SPEC_TABLE entry for SPEC. */
-static inline spec_entry *
-spec_lookup (spec)
-     unsigned spec;
+SNV_INLINE spec_entry *
+spec_lookup (unsigned spec)
 {
   unsigned hash = spec_hash (spec);
   spec_init ();
@@ -150,10 +140,7 @@ spec_lookup (spec)
  * %spec_entry with the information on the function if it was.
  **/
 spec_entry *
-register_printf_function (spec, fmt, arg)
-     unsigned spec;
-     printf_function *fmt;
-     printf_arginfo_function *arg;
+register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_function *arg)
 {
   spec_entry *new, *old;
   old = spec_lookup (spec);
@@ -173,10 +160,7 @@ register_printf_function (spec, fmt, arg)
 }
 
 static int
-call_argtype_function (pinfo, argtypes, spec)
-     struct printf_info *const pinfo;
-     int **argtypes;
-     spec_entry *spec;
+call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_entry *spec)
 {
   int n;
   int argindex = (pinfo->dollar && !spec->modifier_char)
@@ -261,24 +245,21 @@ call_argtype_function (pinfo, argtypes, spec)
  * of the caller to free the string.
  */
 char *
-printf_strerror ()
+printf_strerror (void)
 {
   return snv_strdup(printf_last_error);
 }
 
 /* (re)initialise the memory used by PPARSER. */
-static inline void *
-parser_init (pinfo, format)
-     struct printf_info *pinfo;
-     const char *format;
+static inline void
+parser_init (struct printf_info *pinfo, const char *format)
 {
   memset (pinfo, 0, sizeof (struct printf_info));
   pinfo->format = format;
 }
 
 static inline struct printf_info *
-parser_reset (pinfo)
-     struct printf_info *pinfo;
+parser_reset (struct printf_info *pinfo)
 {
   pinfo->is_long_double = pinfo->is_char = pinfo->is_short =
     pinfo->is_long = pinfo->alt = pinfo->space = pinfo->left =
@@ -313,14 +294,7 @@ parser_reset (pinfo)
  * returned.
  **/
 char *
-printf_error (pinfo, file, line, func1, func2, func3, error_message)
-     struct printf_info *pinfo;
-     const char *file;
-     int line;
-     const char *func1;
-     const char *func2;
-     const char *func3;
-     const char *error_message;
+printf_error (struct printf_info *pinfo, const char *file, int line, const char *func1, const char *func2, const char *func3, const char *error_message)
 {
   int i;
   char *result;
@@ -369,10 +343,7 @@ printf_error (pinfo, file, line, func1, func2, func3, error_message)
  * is returned instead.
  **/
 size_t
-parse_printf_format (format, n, argtypes)
-     const char *format;
-     int n;
-     int *argtypes;
+parse_printf_format (const char *format, int n, int *argtypes)
 {
   struct printf_info info;
 
@@ -475,10 +446,7 @@ parse_printf_format (format, n, argtypes)
 }
 
 int
-do_printfv (stream, format, args)
-     STREAM *stream;
-     const char *format;
-     union printf_arg const args[];
+do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 {
   struct printf_info info;
 
@@ -598,10 +566,7 @@ do_printfv (stream, format, args)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-stream_printfv (stream, format, ap)
-     STREAM *stream;
-     const char *format;
-     snv_constpointer const *ap;
+stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
 {
   union printf_arg *args;
   struct printf_info info;
@@ -622,7 +587,6 @@ stream_printfv (stream, format, ap)
            {
              /* We found the start of a format specifier! */
              spec_entry *spec;
-             int status;
 
              parser_reset (&info);
              do
@@ -775,10 +739,7 @@ stream_printfv (stream, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-stream_vprintf (stream, format, ap)
-     STREAM *stream;
-     const char *format;
-     va_list ap;
+stream_vprintf (STREAM *stream, const char *format, va_list ap)
 {
   union printf_arg *args = NULL;
   struct printf_info info;
@@ -799,7 +760,6 @@ stream_vprintf (stream, format, ap)
 	    {
 	      /* We found the start of a format specifier! */
 	      spec_entry *spec;
-	      int status;
 
 	      parser_reset (&info);
 	      do
@@ -954,21 +914,14 @@ stream_vprintf (stream, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 stream_printf (STREAM * stream, const char *format, ...)
-#else
-stream_printf (stream, format, va_alist)
-     STREAM *stream;
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = stream_vprintf (stream, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -977,7 +930,7 @@ stream_printf (stream, format, va_alist)
 /*  Finally... the main API implementation: */
 
 /**
- * fdputc: printf.h
+ * snv_fdputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
  * 
@@ -989,9 +942,7 @@ stream_printf (stream, format, va_alist)
  * an error (errno will be set to indicate the type of error).
  **/
 int
-fdputc (ch, stream)
-     int ch;
-     STREAM *stream;
+snv_fdputc (int ch, STREAM *stream)
 {
   static char buf[1] = { 0 };
   buf[0] = (char) ch;
@@ -1012,21 +963,14 @@ fdputc (ch, stream)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_dprintf (int fd, const char *format, ...)
-#else
-snv_dprintf (fd, format, va_alist)
-     int fd;
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = snv_vdprintf (fd, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -1045,14 +989,11 @@ snv_dprintf (fd, format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vdprintf (fd, format, ap)
-     int fd;
-     const char *format;
-     va_list ap;
+snv_vdprintf (int fd, const char *format, va_list ap)
 {
   int result;
   STREAM *out = stream_new (SNV_INT_TO_POINTER (fd),
-	       		    SNV_UNLIMITED, NULL, fdputc);
+	       		    SNV_UNLIMITED, NULL, snv_fdputc);
 
   result = stream_vprintf (out, format, ap);
   stream_delete (out);
@@ -1060,7 +1001,7 @@ snv_vdprintf (fd, format, ap)
 }
 
 /**
- * dprintfv: printf.h
+ * snv_dprintfv: printf.h
  * @fd: an open file descriptor.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
@@ -1073,14 +1014,11 @@ snv_vdprintf (fd, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-dprintfv (fd, format, args)
-     int fd;
-     const char *format;
-     snv_constpointer const args[];
+snv_dprintfv (int fd, const char *format, snv_constpointer const args[])
 {
   int result;
   STREAM *out = stream_new (SNV_INT_TO_POINTER (fd),
-	       		    SNV_UNLIMITED, NULL, fdputc);
+	       		    SNV_UNLIMITED, NULL, snv_fdputc);
 
   result = stream_printfv (out, format, args);
   stream_delete (out);
@@ -1089,7 +1027,7 @@ dprintfv (fd, format, args)
 
 
 /**
- * fileputc: printf.h
+ * snv_fileputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
  * 
@@ -1100,9 +1038,7 @@ dprintfv (fd, format, args)
  * The value of @ch that has been put in @stream.
  **/
 int
-fileputc (ch, stream)
-     int ch;
-     STREAM *stream;
+snv_fileputc (int ch, STREAM *stream)
 {
   FILE *fp = (FILE *) stream_details (stream);
   return putc (ch, fp);
@@ -1121,20 +1057,14 @@ fileputc (ch, stream)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_printf (const char *format, ...)
-#else
-snv_printf (format, va_alist)
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = snv_vprintf (format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -1152,12 +1082,10 @@ snv_printf (format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vprintf (format, ap)
-     const char *format;
-     va_list ap;
+snv_vprintf (const char *format, va_list ap)
 {
   int result;
-  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, fileputc);
+  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc);
 
   result = stream_vprintf (out, format, ap);
   stream_delete (out);
@@ -1165,7 +1093,7 @@ snv_vprintf (format, ap)
 }
 
 /**
- * printfv: printf.h
+ * snv_printfv: printf.h
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
  * 
@@ -1177,12 +1105,10 @@ snv_vprintf (format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-printfv (format, args)
-     const char *format;
-     snv_constpointer const args[];
+snv_printfv (const char *format, snv_constpointer const args[])
 {
   int result;
-  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, fileputc);
+  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc);
 
   result = stream_printfv (out, format, args);
   stream_delete (out);
@@ -1203,21 +1129,14 @@ printfv (format, args)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_fprintf (FILE * file, const char *format, ...)
-#else
-snv_fprintf (file, format, va_alist)
-     FILE *file;
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = snv_vfprintf (file, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -1236,13 +1155,10 @@ snv_fprintf (file, format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vfprintf (file, format, ap)
-     FILE *file;
-     const char *format;
-     va_list ap;
+snv_vfprintf (FILE *file, const char *format, va_list ap)
 {
   int result;
-  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, fileputc);
+  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc);
 
   result = stream_vprintf (out, format, ap);
   stream_delete (out);
@@ -1250,7 +1166,7 @@ snv_vfprintf (file, format, ap)
 }
 
 /**
- * fprintfv: printf.h
+ * snv_fprintfv: printf.h
  * @file: a stdio.h FILE* stream.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
@@ -1263,13 +1179,10 @@ snv_vfprintf (file, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-fprintfv (file, format, args)
-     FILE *file;
-     const char *format;
-     snv_constpointer const args[];
+snv_fprintfv (FILE *file, const char *format, snv_constpointer const args[])
 {
   int result;
-  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, fileputc);
+  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc);
 
   result = stream_printfv (out, format, args);
   stream_delete (out);
@@ -1278,7 +1191,7 @@ fprintfv (file, format, args)
 
 
 /**
- * bufputc: printf.h
+ * snv_bufputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
  * 
@@ -1289,7 +1202,7 @@ fprintfv (file, format, args)
  * The value of @ch that has been put in @stream.
  **/
 int
-bufputc (ch, stream)
+snv_bufputc (ch, stream)
      int ch;
      STREAM *stream;
 {
@@ -1313,21 +1226,14 @@ bufputc (ch, stream)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_sprintf (char buffer[], const char *format, ...)
-#else
-snv_sprintf (buffer, format, va_alist)
-     char buffer[];
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = snv_vsprintf (buffer, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -1346,13 +1252,10 @@ snv_sprintf (buffer, format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vsprintf (buffer, format, ap)
-     char buffer[];
-     const char *format;
-     va_list ap;
+snv_vsprintf (char buffer[], const char *format, va_list ap)
 {
   int count_or_errorcode;
-  STREAM *out = stream_new (&buffer, SNV_UNLIMITED, NULL, bufputc);
+  STREAM *out = stream_new (&buffer, SNV_UNLIMITED, NULL, snv_bufputc);
   count_or_errorcode = stream_vprintf (out, format, ap);
 
   /* Terminate with an EOS without incrementing the counter. */
@@ -1363,7 +1266,7 @@ snv_vsprintf (buffer, format, ap)
 }
 
 /**
- * sprintfv: printf.h
+ * snv_sprintfv: printf.h
  * @buffer: a preallocated char* buffer.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
@@ -1376,13 +1279,10 @@ snv_vsprintf (buffer, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-sprintfv (buffer, format, args)
-     char buffer[];
-     const char *format;
-     snv_constpointer const args[];
+snv_sprintfv (char buffer[], const char *format, snv_constpointer const args[])
 {
   int count_or_errorcode;
-  STREAM *out = stream_new (&buffer, SNV_UNLIMITED, NULL, bufputc);
+  STREAM *out = stream_new (&buffer, SNV_UNLIMITED, NULL, snv_bufputc);
   count_or_errorcode = stream_printfv (out, format, args);
 
   /* Terminate with an EOS without incrementing the counter. */
@@ -1408,22 +1308,14 @@ sprintfv (buffer, format, args)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_snprintf (char buffer[], unsigned long limit, const char *format, ...)
-#else
-snv_snprintf (buffer, limit, format, va_alist)
-     char buffer[];
-     unsigned long limit;
-     const char *format;
-     va_dcl
-#endif
 {
   int count_or_errorcode;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count_or_errorcode = snv_vsnprintf (buffer, limit, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count_or_errorcode;
 }
@@ -1444,14 +1336,10 @@ snv_snprintf (buffer, limit, format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vsnprintf (buffer, limit, format, ap)
-     char buffer[];
-     unsigned long limit;
-     const char *format;
-     va_list ap;
+snv_vsnprintf (char buffer[], unsigned long limit, const char *format, va_list ap)
 {
   int count_or_errorcode;
-  STREAM *out = stream_new (&buffer, limit - 1, NULL, bufputc);
+  STREAM *out = stream_new (&buffer, limit - 1, NULL, snv_bufputc);
   count_or_errorcode = stream_vprintf (out, format, ap);
   *buffer = EOS;
 
@@ -1460,7 +1348,7 @@ snv_vsnprintf (buffer, limit, format, ap)
 }
 
 /**
- * snprintfv: printf.h
+ * snv_snprintfv: printf.h
  * @buffer: a preallocated char* buffer.
  * @limit: the maximum number of characters to write into @buffer.
  * @format: a % delimited format string.
@@ -1475,14 +1363,10 @@ snv_vsnprintf (buffer, limit, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snprintfv (buffer, limit, format, args)
-     char buffer[];
-     unsigned long limit;
-     const char *format;
-     snv_constpointer const args[];
+snv_snprintfv (char buffer[], unsigned long limit, const char *format, snv_constpointer const args[])
 {
   int count_or_errorcode;
-  STREAM *out = stream_new (&buffer, limit - 1, NULL, bufputc);
+  STREAM *out = stream_new (&buffer, limit - 1, NULL, snv_bufputc);
   count_or_errorcode = stream_printfv (out, format, args);
   *buffer = EOS;
 
@@ -1492,7 +1376,7 @@ snprintfv (buffer, limit, format, args)
 
 
 /**
- * filputc: printf.h
+ * snv_filputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
  * 
@@ -1503,11 +1387,12 @@ snprintfv (buffer, limit, format, args)
  * The value of @ch that has been put in @stream.
  **/
 int
-filputc (ch, stream)
+snv_filputc (ch, stream)
      int ch;
      STREAM *stream;
 {
-  return filccat ((Filament *) stream_details (stream), ch), ch;
+  filccat ((Filament *) stream_details (stream), ch);
+  return ch;
 }
 
 /**
@@ -1531,21 +1416,14 @@ filputc (ch, stream)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-#ifdef SNV_USING_STDARG_H
 snv_asprintf (char **result, const char *format, ...)
-#else
-snv_asprintf (result, format, va_alist)
-     char **result;
-     const char *format;
-     va_dcl
-#endif
 {
   int count;
   va_list ap;
 
-  VA_START (ap, format);
+  va_start (ap, format);
   count = snv_vasprintf (result, format, ap);
-  VA_END (ap);
+  va_end (ap);
 
   return count;
 }
@@ -1568,15 +1446,12 @@ snv_asprintf (result, format, va_alist)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_vasprintf (result, format, ap)
-     char **result;
-     const char *format;
-     va_list ap;
+snv_vasprintf (char **result, const char *format, va_list ap)
 {
   int count_or_errorcode;
   char *base;
   Filament *fil = filnew (NULL, 0);
-  STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, filputc);
+  STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   count_or_errorcode = stream_vprintf (out, format, ap);
 
   base = fildelete (fil);
@@ -1587,7 +1462,7 @@ snv_vasprintf (result, format, ap)
 }
 
 /**
- * asprintfv: printf.h
+ * snv_asprintfv: printf.h
  * @result: the address of a char * variable.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
@@ -1604,15 +1479,12 @@ snv_vasprintf (result, format, ap)
  * an error, when %SNV_ERROR is returned.
  **/
 int
-asprintfv (result, format, args)
-     char **result;
-     const char *format;
-     snv_constpointer const args[];
+snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
 {
   int count_or_errorcode;
   char *base;
   Filament *fil = filnew (NULL, 0);
-  STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, filputc);
+  STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   count_or_errorcode = stream_printfv (out, format, args);
 
   base = fildelete (fil);

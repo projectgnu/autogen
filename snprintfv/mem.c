@@ -47,9 +47,8 @@ realloc_proc_t* snv_realloc = (realloc_proc_t*)realloc;
 free_proc_t*    snv_free    = (free_proc_t*)free;
 
 /* Unportable memory management functions are reimplemented tout court.  */
-snv_pointer snv_xrealloc (old, count)
-     snv_pointer old;
-     size_t count;
+snv_pointer
+snv_xrealloc (snv_pointer old, size_t count)
 {
   if (count < 1)
     {
@@ -62,8 +61,8 @@ snv_pointer snv_xrealloc (old, count)
     return snv_realloc (old, count);
 }
 
-char *snv_strdup (str)
-     const char *str;
+char *
+snv_strdup (const char *str)
 {
   size_t len = strlen (str);
   char *result = snv_malloc (len + 1);

@@ -42,7 +42,6 @@ libsnprintfv_la_SOURCES =   \
 # These files are the raw sources used to generate similarly named
 # header files after extracting the prototypes from the sources
 #
-EXTRA_DIST      =  frexpl.c ldexpl.c strtoul.c \
-	filament.in printf.in stream.in
+EXTRA_DIST = filament.in printf.in stream.in
 
 # Makefile.am ends here

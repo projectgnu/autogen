@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-  */
 
 /* stream.c ---  customizable stream routines
- * Copyright (C) 1998, 1999, 2000, 2002 Gary V. Vaughan
+ * Copyright (C) 1998, 1999, 2000, 2002, 2003 Gary V. Vaughan
  * Originally by Gary V. Vaughan, 1998
  * This file is part of Snprintfv
  *
@@ -44,6 +44,17 @@ struct stream
   StreamPut put_func;
 };
 
+static int
+stream_not_readable (STREAM *stream)
+{
+  return -1;
+}
+
+static int
+stream_not_writable (int ch, STREAM *stream)
+{
+  return -1;
+}
 
 /**
  * stream_new: constructor
@@ -52,24 +63,23 @@ struct stream
  * @get_func: function to get a character from @dets stream.
  * @put_func: function to put a character in @dets stream.
  * 
- * Allocate and initialize a new %STREAM data type.
+ * Allocate and initialize a new %STREAM data type.  The @get_func
+ * and @put_func can be NULL if you intend to create a non-readable
+ * or non-writable stream, respectively.
  * 
  * Return value:
  * The address of the newly allocated and initialised stream is returned.
  **/
 STREAM *
-stream_new (dets, limit, get_func, put_func)
-     snv_pointer dets;
-     unsigned long limit;
-     StreamGet get_func;
-     StreamPut put_func;
+stream_new (snv_pointer dets, unsigned long limit, StreamGet get_func, StreamPut put_func)
 {
   STREAM *new = snv_new (STREAM, 1);
 
   new->stream = dets;
   new->limit = limit;
-  new->get_func = get_func;
-  new->put_func = put_func;
+
+  new->get_func = get_func ? get_func : stream_not_readable;
+  new->put_func = put_func ? put_func : stream_not_writable;
 
   return new;
 }
@@ -86,8 +96,7 @@ stream_new (dets, limit, get_func, put_func)
  * returned for handling by the calling function.
  **/
 snv_pointer
-stream_delete (stream)
-     STREAM *stream;
+stream_delete (STREAM *stream)
 {
   snv_pointer dets = stream->stream;
   snv_delete (stream);
@@ -107,8 +116,7 @@ stream_delete (stream)
  * when it was originally created.
  **/
 snv_pointer
-stream_details (stream)
-     STREAM *stream;
+stream_details (STREAM *stream)
 {
   return stream ? stream->stream : NULL;
 }
@@ -125,13 +133,11 @@ stream_details (stream)
  * If @stream is full, return 1.  Otherwise, if any other error occurs,
  * that error code is returned unchanged.  This is of course dependant
  * on what the handler function uses to indicate an error.  If the stream
- * is not full and the stream's writing function suceeds, 1 (the number of
+ * is not full and the stream's writing function succeeds, 1 (the number of
  * characters emitted!) is returned.
  **/
 int
-stream_put (ch, stream)
-     int ch;
-     STREAM *stream;
+stream_put (int ch, STREAM *stream)
 {
   int ch_or_errorcode;
 
@@ -142,9 +148,49 @@ stream_put (ch, stream)
     return 1;
 
   stream->limit -= 1;
-  ch_or_errorcode = stream->put_func ? (*stream->put_func) (ch, stream) : -1;
+  ch_or_errorcode = (*stream->put_func) (ch, stream);
 
   return (ch_or_errorcode < 0) ? ch_or_errorcode : 1;
+}
+
+/**
+ * stream_puts:
+ * @s: A string to be placed in @stream.
+ * @stream: The stream to be written to.
+ *
+ * This function will @ch in @stream if that stream's output limit will
+ * not be exceeded.
+ *
+ * Return value:
+ * If any other error occurs, that error code is returned unchanged.
+ * This is of course dependant on what the handler function uses to
+ * indicate an error.  If the stream becomes full, the remaining
+ * characters are not printed.  If the stream's writing function
+ * always succeeds, the number of characters emitted or skipped is
+ * returned.
+ **/
+int
+stream_puts (char *s, STREAM *stream)
+{
+  int ch_or_errorcode;
+  int num;
+
+  if (!stream)
+    return -1;
+
+  for (num = 0; *s; num++, s++)
+    {
+      if (stream->limit < 1)
+        return num + strlen (s);
+
+      stream->limit -= 1;
+      ch_or_errorcode = (*stream->put_func) (*s, stream);
+
+      if (ch_or_errorcode < 0)
+	return ch_or_errorcode;
+    }
+
+  return num;
 }
 
 /**
@@ -159,10 +205,9 @@ stream_put (ch, stream)
  * an int) is returned.
  **/
 int
-stream_get (stream)
-     STREAM *stream;
+stream_get (STREAM *stream)
 {
-  return stream->get_func ? (*stream->get_func) (stream) : -1;
+  return (*stream->get_func) (stream);
 }
 
 /* stream.c ends here */

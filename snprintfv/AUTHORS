@@ -3,8 +3,6 @@ Authors of libsnprintfv.  See individual files for their licenses.
 Gary V. Vaughan <gary@gnu.org>:
   Designed, implemented and maintains libsnprintfv.
 
-Paolo Bonzini <bonzini@gnu.org>:
-  Maintained libsnprintfv in Summer 2002 and souped it up a bit.
-
-University of California, Berkeley and its contributers:
-  snprintfv/strtoul.c
+Paolo Bonzini <bonzini@gnu.org> and
+Bruce Korb <bkorb@gnu.org>:
+  Maintained libsnprintfv from Summer 2002 up to the 1.0 release.
