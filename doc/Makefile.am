@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-05-09 19:08:22 bkorb"
+## Time-stamp:      "2004-05-09 19:22:46 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.25 2004/05/10 02:11:02 bkorb Exp $
+## $Id: Makefile.am,v 3.26 2004/05/10 02:52:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -71,12 +71,12 @@ DEFCOPY		= copy=$(OPTIONS_DEF)
 
 GET_OPTS	= srcfile linenum filelist template=$(DOC_TEMPLATE)
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
-GDEXE           = `cd $(top_builddir)/getdefs ; pwd`/@GDEXE@
-AGEXE		= `cd $(top_builddir)/agen5   ; pwd`/@AGEXE@
-COLUMNS_EXE     = `cd $(top_builddir)/columns ; pwd`/@COLEXE@
+GDEXE           = $(top_builddir)/getdefs/@GDEXE@
+AGEXE		= $(top_builddir)/agen5/@AGEXE@
+COLUMNS_EXE     = $(top_builddir)/columns/@COLEXE@
 GETDEFS		= $(GDEXE) $(GET_OPTS) $(BLOCKOPT)
 
-TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
+TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'
 
 texi         : texi-stamp
 autogen.texi : texi

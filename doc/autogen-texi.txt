@@ -1836,7 +1836,7 @@ commercial programs.
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
 * option descriptor::   Option Descriptor File
-* Generated main::      Generating main() procedures
+* Generated main::      Generating main procedures
 * Using AutoOpts::      Using AutoOpts
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
@@ -2204,7 +2204,7 @@ the flexibility is there.
 @menu
 * program attributes::        Program Description Attributes
 * information attributes::    Program Information Attributes
-* generated main::            Generated main Procedures
+* deprecated main::           Generated main Procedures (deprecated)
 * option attributes::         Option Attributes
 * documentation attributes::  Man and Info doc Attributes
 * automatic options::         Automatically Supported Options
@@ -2334,13 +2334,13 @@ Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
 @end table
 
-@node generated main
-@subsection Generated main Procedures
-@cindex generated main
+@node deprecated main
+@subsection Generated main Procedures (deprecated)
 
-@strong{The following is deprecated.  Users are encouraged to use
-the @i{main} description for specifying the type and content of a generated
-main procedure.}
+@strong{The following is deprecated.  Users are encouraged to use the
+@i{main} description (@pxref{Generated main}) for specifying the type
+and content of a generated main procedure.}
+[[note to self: move some of this text to the new section.]]
 
 AutoOpts can generate the main procedure in certain circumstances.
 It will do this to help with integrating with the guile library environment,
@@ -2349,13 +2349,6 @@ variables for use in processing shell script options and for
 testing the command line interface.
 
 @table @samp
-@cindex before-guile-boot
-@item before-guile-boot
-If @code{guile-main} has been specified and if this is specified
-as well, then this code will be inserted into the actual @code{main()}
-procedure before @code{gh_enter()} is called.
-
-@cindex guile-main
 @item guile-main
 Creates a guile-style main and inner-main procedures.
 The inner main procedure will call @code{optionProcess()} and will
@@ -2364,11 +2357,23 @@ does not specify any code, then calls to the AutoOpts library procedure
 @code{export_options_to_guile()} and then @code{scm_shell()} will
 be inserted into @code{inner_main()}.
 
+@strong{Instead of this, use @ref{Generated main} procedures, specifying
+a @code{main-type} of @code{guile} (@pxref{main guile}).}
+
+@item before-guile-boot
+If @code{guile-main} has been specified and if this is specified
+as well, then this code will be inserted into the actual @code{main()}
+procedure before @code{gh_enter()} is called.
+
+@strong{Instead of this, use @ref{Generated main} procedures, specifying
+a @code{main-type} of @code{guile} (@pxref{main guile}) and add the
+@code{before-guile-boot} attribute.}
+
 @cindex main-text
 @item main-text
 If you need to specify the content of the main procedure generated
 for the "option testing" program, you can do that with this attribute.
-The result will be a procedure that looks like this:
+The result will be a procedure that looks similar to this:
 
 @example
 int main( int argc, char** argv ) @{
@@ -2377,10 +2382,18 @@ int main( int argc, char** argv ) @{
 @}
 @end example
 
+@strong{Instead of this, use @ref{Generated main} procedures, specifying
+a @code{main-type} of @code{main} (@pxref{main main}) and add the
+@code{code} attribute.}
+
 @cindex test-main
 @item test-main
 Creates a test main procedure for testing option processing.  The
 resulting program may also be used for several purposes.
+
+@strong{Instead of this, use @ref{Generated main} procedures, specifying
+a @code{main-type} of @code{main} (@pxref{main main}) and add the
+@code{test-main} attribute.}
 
 @enumerate
 @item
@@ -3760,21 +3773,21 @@ the code generated for implementing the @code{flag_code} construct.
 @section Generating main procedures
 @cindex main procedure
 
-When AutoOpts generates the code to parse the command line options,
-it has the ability to produce any of several types of main() procedures.
-This is done by specifying a global structured value for @code{main}.
-The values that it contains are dependent on the value set for the
-one value it must have:  @code{main-type}.
+When AutoOpts generates the code to parse the command line options, it has
+the ability to produce any of several types of @code{main()} procedures.
+This is done by specifying a global structured value for @code{main}.  The
+values that it contains are dependent on the value set for the one value it
+must have: @code{main-type}.
 
 The recognized values for @code{main-type} are:
 @menu
-* main guile::              guile main and inner_main procedures
-* main shell-process::      main() that parses shell script options
-* main shell-parser::       main() that produces shell parser
-* main main::               main() with code supplied
-* main include::            main() code gets included by AutoGen
-* main invoke::             main() generated from supplied macro
-* main for-each::           main() performs function on each arg
+* main guile::              guile: main and inner_main procedures
+* main shell-process::      shell-process: emit Bourne shell results
+* main shell-parser::       shell-parser: emit Bourne shell script
+* main main::               main: user supplied main procedure
+* main include::            include: code emitted from included template
+* main invoke::             invoke: code emitted from AutoGen macro
+* main for-each::           for-each: perform function on each argument
 @end menu
 
 Here is an example of an @code{include} variation:
@@ -3787,7 +3800,7 @@ main = @{
 @end example
 
 @node main guile
-@subsection guile main and inner_main procedures
+@subsection guile: main and inner_main procedures
 
 When the @code{main-type} is specified to be @code{guile},
 a @code{main()} procedure is generated that calls @code{gh_enter()}, providing
@@ -3804,7 +3817,7 @@ function from the Guile library.  This latter will render the program
 nearly identical to the stock @code{guile(1)} program.
 
 @node main shell-process
-@subsection main() that parses shell script options
+@subsection shell-process: emit Bourne shell results
 
 This will produce a @code{main()} procedure that parses the command line
 options and emits to @code{stdout} Bourne shell commands that puts the
@@ -3847,7 +3860,7 @@ For example, the following would be appended to the above:
 off any options.
 
 @node main shell-parser
-@subsection main() that produces shell parser
+@subsection shell-parser: emit Bourne shell script
 
 This will produce a @code{main()} procedure that emits a shell script
 that will parse the command line options.  That script can be emitted
@@ -3864,7 +3877,7 @@ The program is also pretty insistent upon starting its parsing script
 on the second line.
 
 @node main main
-@subsection main() with code supplied
+@subsection main: user supplied main procedure
 
 You must supply a value to the @code{code} attribute.
 AutoOpts will wrap the text inside of:
@@ -3888,21 +3901,33 @@ code = <<- _EndOfMainProc_
 @end example
 
 @node main include
-@subsection main() code gets included by AutoGen
+@subsection include: code emitted from included template
 
 You must write a template to produce your main procedure.
-You specify the name of the template with the @code{tpl} attribute.
+You specify the name of the template with the @code{tpl} attribute
+and it will be incorporated at the point where AutoOpts is ready
+to emit the @code{main()} procedure.
+
+This can be very useful if, in your working environment, you have
+many programs with highly similar @code{main()} procedures.  All you need
+to do is parameterize the variations and specify which variant is needed
+within the @code{main} AutoOpts specification.  Since you are coding
+the template for this, the attributes needed for this variation would
+be dictated by your template.
 
 @node main invoke
-@subsection main() generated from supplied macro
+@subsection invoke: code emitted from AutoGen macro
 
-You must write a template to produce your main procedure.
-You specify the name of the macro function to create the procedure
-with the @code{func} attribute.  Typically, this will be defined by
-incorporating a ``lib-template'' in the AutoGen invocation.
+You must write a template to produce your main procedure.  That template
+must contain a definition for the function specified with the @code{func}
+attribute to this @code{main()} procedure specification.  Typically, this
+template will be incorporated by using the @code{--lib-template} option
+(@pxref{autogen lib-template}) in the AutoGen invocation.  Otherwise, this
+variation operates in much the same way as ``@code{include}''
+(@pxref{main include}) method.
 
 @node main for-each
-@subsection main() performs function on each arg
+@subsection for-each: perform function on each argument
 
 This produces a main procedure that invokes a procedure once for each
 operand on the command line (non-option arguments), @strong{OR} once
@@ -3922,7 +3947,7 @@ the procedure must be:
 int @i{my_handler}( const char *pz_operand );
 @end example
 
-If you provide the code, then your @code{main} procedure specification
+If you provide the code, then your @code{main()} procedure specification
 will look something like this:
 
 @example
