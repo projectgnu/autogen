@@ -8,11 +8,11 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 1999/10/31 18:34:28 bruce Exp $
+## $Id: Makefile.am,v 1.4 1999/10/31 23:37:32 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = subblock.test
-EXTRA_DIST = defs stress.def bootstrap.dir $(TESTS)
+EXTRA_DIST = defs bootstrap.dir $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in
 
