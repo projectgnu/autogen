@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.18 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expGuile.c,v 1.19 2001/08/12 03:07:03 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -99,7 +99,7 @@ ag_scm_max( SCM list )
         return SCM_UNDEFINED;
 
     while (--len >= 0) {
-        long val;
+        unsigned long val;
 
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
@@ -118,7 +118,7 @@ ag_scm_max( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2long( car );
+            val = gh_scm2ulong( car );
             break;
 
         case GH_TYPE_STRING:
@@ -158,7 +158,7 @@ ag_scm_min( SCM list )
         return SCM_UNDEFINED;
 
     while (--len >= 0) {
-        long val;
+        unsigned long val;
 
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
@@ -177,7 +177,7 @@ ag_scm_min( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2long( car );
+            val = gh_scm2ulong( car );
             break;
 
         case GH_TYPE_STRING:
@@ -214,7 +214,7 @@ ag_scm_min( SCM list )
 ag_scm_sum( SCM list )
 {
     int  len = scm_ilength( list );
-    long sum = 0;
+    unsigned long sum = 0;
 
     if (len <= 0)
         return gh_int2scm( 0 );
@@ -231,7 +231,7 @@ ag_scm_sum( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            sum += gh_scm2long( car );
+            sum += gh_scm2ulong( car );
             break;
 
         case GH_TYPE_STRING:

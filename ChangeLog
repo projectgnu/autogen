@@ -1,3 +1,15 @@
+2001-08-11  Bruce Korb  <bkorb@gnu.org>
+
+	* snprintfv/ChangeLog: fixed up some mis-allocation issues
+	* agen5/agUtils.h(ISPATHCHAR): new macro
+	* agen5/expFormat.c(ag_scm_error): Get numbers as unsigned longs.
+	Print them as ints, until we have proper support for long in printf.
+	* agen5/expGuile.c: ditto
+	* agen5/expPrint.c: ditto
+	* agen5/funcDef.c: ditto
+	* agen5/funcEval.c: ditto
+	* agen5/expString.c: sprintf from snprintfv is working again
+
 2001-08-04  Bruce Korb  <bkorb@gnu.org>
 
 	* snprintfv/snprintfv/format.c: broken ptr dereference and

@@ -4068,6 +4068,7 @@ You have greater license with it.
 
 @menu
 * Features::          AutoOpts Features
+* Comparison::        Competitive Feature Analysis
 * Quick Start::       Quick Start
 * opts.def::          Option Definitions File
 * AutoOpts API::      Programmatic Interface
@@ -4109,6 +4110,22 @@ and @xref{program attributes}.
 @item
 Store the option state into an initialization/rc file.
 @xref{saving rc files}.
+
+@item
+Options may stand by themselves or have required or optional arguments.
+
+@item
+Option arguments may be arbitrary strings or constrained to numbers
+or a list of keywords.
+
+@item
+Options may default to an enabled or a disabled state.  If they default
+to enabled, then you must provide a disablement prefix to allow users
+to disable the option.
+
+@item
+If you provide a disablement prefix, then you may provide an enablement
+prifix, too.  e.g., @code{--allow-mumble} and @code{--prevent-mumble}.
 
 @item
 Verify that required options are present the
@@ -4273,6 +4290,90 @@ name followed, optionally, by a string value.  Leading and trailing
 white space is trimmed from the value, but otherwise new lines are
 not discarded.  The caller is expected to have NUL terminated the
 string at the correct point.
+
+@node Comparison
+@section Competitive Feature Analysis
+
+Here is a feature comparison of AutoOpts and five other command line
+parser generators.  They all read a file that describes the program
+options and produces code to parse command line options.  Each has their
+own format for describing options.
+
+All versions support both short options (flags) and GNU-type long
+options.  clig, however, is unique in that you must choose one or the
+other.  Either way, clig options are introduced with a single hyphen.
+The other packages identify long options with doubled hyphens.
+
+@enumerate
+@item
+AutoOpts is a component of AutoGen.  AutoGen has many capabilities, but
+here we concentrate on the portion called AutoOpts.  AutoOpts is the
+most general of these programs, and has the most extensive
+documentation.  It is the only one that supports shell scripts as well
+as C programs.  It also supports command option processing from a configuration
+file or the environment.
+
+@item
+clig generates a skeleton man page and can also update a previously
+generated man page.
+
+@item
+genparse.
+
+@item
+gaa supports option input from a configuration file as well as the
+command line.  NOTE HOWEVER: gaa is not maintained.
+
+@item
+gengetopt is the only one that generates a skeleton main.c
+instead of a separate parsing function.  Since you must edit this
+file to create your program, rerunning gengetopt will wipe out
+any such changes.
+
+@item
+wyg uses flex and bison to generate a configuration file parser,
+but uses getopt_long to parse the command line options.
+
+@end enumerate
+
+@format
+package                 1       2       3       4       5       6
+C language app         yes     yes     yes     yes     yes     yes
+shell script app       yes     no      no      no      no      no
+package result         parser  parser  parser  parser  main.c  parser
+
+config file input      yes     no      no      yes     no      yes
+environment input      yes     no      no      no      no      no
+config file output     yes     no      no      no      no      no
+command line           yes     yes     yes     yes     yes     yes
+
+parameter types        [1]     4       5       5       11      4
+callback functions     yes     no      yes     yes     yes     no
+multiple parameters    yes     yes     no      no      no      no
+optional parameters    yes     yes     no      no      no      no
+default values         yes     yes     yes     yes     no      yes
+range checks           no      yes     yes     no      no      no
+enumeration options    yes     no      no      no      no      no
+option data            struct  struct  struct  struct  vars    struct
+
+usage()                yes     yes     yes     yes     yes     yes
+man page               yes     yes     no      no      no      no
+texinfo usage          yes     no      no      no      no      no
+makefile               no      no      no      no      no      no
+
+developer dependencies none    tcl     none    none    none    bison,flex
+user dependencies      [2]     none    none    none    none    none
+@end format
+
+ [1] See the lengthy list of features @xref{Features}.
+
+ [2] There is a user-visible dependency iff the developer does a
+dynamic link to the libopts.so library.  Developers are free to either
+link statically or ship libopts.so with their product.  A Debian
+package would need only a dependency on the package supplying libopts
+(libopts9, at present).
+
+ -- James R. Van Zandt
 
 @node Quick Start
 @section Quick Start

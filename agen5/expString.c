@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.32 2001/08/05 17:48:27 bkorb Exp $
+ *  $Id: expString.c,v 1.33 2001/08/12 03:07:03 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -177,7 +177,6 @@ makeString( tCC*    pzText,
              *  sprintf is safe here, because we already computed
              *  the amount of space we will be using.
              */
-#undef sprintf
             sprintf( pzDta, zFmt, ch );
             pzDta += 4;
         }

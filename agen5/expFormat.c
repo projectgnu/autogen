@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.32 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expFormat.c,v 1.33 2001/08/12 03:07:03 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -217,7 +217,7 @@ ag_scm_dne( SCM prefix, SCM first )
  *  @end example
  *
  *  The first three arguments to this format are provided by the
- *  routine and are: The name of the template file, the line within
+ *  routine and are@:  The name of the template file, the line within
  *  the template where the error was found, and the current output
  *  file name.
  *
@@ -247,10 +247,10 @@ ag_scm_error( SCM res )
 
     case GH_TYPE_NUMBER:
     {
-        long val = gh_scm2long( res );
+        unsigned long val = gh_scm2ulong( res );
         if (val == 0)
             abort = PROBLEM;
-        snprintf( zNum, sizeof( zNum ), "%ld", val );
+        snprintf( zNum, sizeof( zNum ), "%d", val );
         pzMsg = zNum;
         break;
     }
@@ -306,10 +306,10 @@ ag_scm_error( SCM res )
  * exparg: prefix, String for starting each output line
  *
  * doc:
- *  Emit a string that contains the GNU Public License.  It
- *  takes two arguments: @code{prefix} contains the string to start
- *  each output line, and
- *  @code{prog_name} contains the name of the program the copyright is
+ *
+ *  Emit a string that contains the GNU Public License.  It takes two
+ *  arguments@:  @code{prefix} contains the string to start each output line,
+ *  and @code{prog_name} contains the name of the program the copyright is
  *  about.
  *
 =*/
@@ -373,11 +373,11 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  * exparg: prefix, String for starting each output line
  *
  * doc:
- *  Emit a string that contains the GNU Library Public License.  It
- *  takes three arguments: @code{prefix} contains the string to start
- *  each output line.  @code{owner} contains the copyright owner.
- *  @code{prog_name} contains the name of the program the copyright is
- *  about.
+ *
+ *  Emit a string that contains the GNU Library Public License.  It takes
+ *  three arguments@:  @code{prefix} contains the string to start each output
+ *  line.  @code{owner} contains the copyright owner.  @code{prog_name}
+ *  contains the name of the program the copyright is about.
  *
 =*/
     SCM
@@ -453,11 +453,11 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
  * exparg: prefix, String for starting each output line
  *
  * doc:
- *  Emit a string that contains the Free BSD Public License.  It
- *  takes three arguments: @code{prefix} contains the string to start
- *  each output line.  @code{owner} contains the copyright owner.
- *  @code{prog_name} contains the name of the program the copyright is
- *  about.
+ *
+ *  Emit a string that contains the Free BSD Public License.  It takes three
+ *  arguments@:  @code{prefix} contains the string to start each output line.
+ *  @code{owner} contains the copyright owner.  @code{prog_name} contains the
+ *  name of the program the copyright is about.
  *
 =*/
     SCM
