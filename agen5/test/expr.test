@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 1999/11/03 06:10:25 $
+# Last Modified:  $Date: 1999/11/03 06:29:03 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.1 1999/11/03 06:10:25 bruce Exp $
+# $Id: expr.test,v 1.2 1999/11/03 06:29:03 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -20,18 +20,24 @@ if test -z "$srcdir"; then
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
+workdir=`pwd`
+(cd .. ; cp $srcdir/snarf.tpl $workdir)
 
 BLOCKOPT="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
 GETOPTS="assign=group=ag defs=gfunc templ=snarf srcfile base-name=expr"
 FILES=""
 for f in ${EXPRLIST}
 do
-  EXPRLIST="${EXPRLIST} ${top_srcdir}/agen5/$f"
+  FILES="${FILES} ${top_srcdir}/agen5/$f"
 done
 
 echo ${GETDEFS} ${BLOCKOPT} ${GETOPTS} autogen=${AGEXE} ${FILES}
-${GETDEFS} ${BLOCKOPT} ${GETOPTS} autogen=${AGEXE} ${FILES}
+${GETDEFS} ${BLOCKOPT} ${GETOPTS} autogen=${AGEN} ${FILES}
 
-diff expr.ini ${top_srcdir}/agen5/
+sed '1,6d' ./expr.ini > expr.out
+sed '1,6d' ${top_srcdir}/agen5/expr.ini > expr.base
+
+diff expr.base expr.out || \
+  failure `pwd`/expr.ini differs from ${top_srcdir}/agen5/expr.ini
 
 # subblock.test ends here
