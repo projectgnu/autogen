@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defFind.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: defFind.c,v 1.2 2000/03/01 04:35:12 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -29,6 +29,172 @@
 #include <streqv.h>
 
 #include "autogen.h"
+
+tSCC zInvalRef[] = "invalid reference";
+tSCC zPartRef[]  = "incomplete reference";
+
+typedef enum {
+    CDF_INITIAL = 0,
+    CDF_TOPLEVEL_NAME,
+    CDF_INDEX_NAME
+} teState;
+
+/*
+ *  Copy a reference to a definition.
+ */
+    int
+copyDefReference( tTemplate* pT, tMacro* pMac,
+                  char** ppDest, const char** ppSrc, int maxLen )
+{
+    char*   pDest  = *ppDest;
+    tCC*    pSrc   = *ppSrc;
+    tCC*    pStart = pSrc;
+    teState state  = CDF_INITIAL;
+    char    ch, nextCh;
+
+    /*
+     *  After skipping any white space, we are allowed to stumble upon a top
+     *  level name, an index or a period separating a nested value name.
+     */
+    do  {
+        if (maxLen-- <= 0)
+            goto leaveCopyDefReference;
+        ch = *(pSrc++);
+    } while (isspace( ch ));
+
+    if (ISNAMECHAR( ch ))
+        state = CDF_TOPLEVEL_NAME;
+
+    else switch (ch) {
+    case '[':
+    case '.':
+        *(pDest++) = ch;
+        do  {
+            if (maxLen-- <= 0)
+                LOAD_ABORT( pT, pMac, zPartRef );
+
+            nextCh = *(pSrc++);
+        } while (isspace( nextCh ));
+
+        if (! ISNAMECHAR( nextCh ))
+            LOAD_ABORT( pT, pMac, zInvalRef );
+
+        state = (ch == '.') ? CDF_TOPLEVEL_NAME : CDF_INDEX_NAME;
+        ch = nextCh;
+        break;
+
+    default:
+        LOAD_ABORT( pT, pMac, zInvalRef );
+    }
+
+    for (;;) {
+        /*
+         *  FOR each name character, copy it.
+         */
+        do  {
+            *(pDest++) = ch;
+            if (maxLen-- <= 0) {
+                if (state == CDF_INDEX_NAME)
+                    LOAD_ABORT( pT, pMac, zPartRef );
+                goto leaveCopyDefReference;
+            }
+            ch = *(pSrc++);
+        } while (ISNAMECHAR( ch ));
+
+        /*
+         *  skip any trailing space
+         */
+        while (isspace( ch )) {
+            if (maxLen-- <= 0)
+                goto leaveCopyDefReference;
+            ch = *(pSrc++);
+        }
+
+        /*
+         *  Only three special chars are used in definition references
+         *  '[', ']' and '.'.  Stop on anything else.
+         */
+        switch (ch) {
+        case '[':
+        case '.':
+            if (state == CDF_INDEX_NAME)
+                LOAD_ABORT( pT, pMac, zInvalRef );
+
+            /*
+             *  The next state depends on the current char
+             */
+            *(pDest++) = ch;
+            state = (ch == '.') ? CDF_TOPLEVEL_NAME : CDF_INDEX_NAME;
+
+            /*
+             *  Skip trailing space
+             */
+            do  {
+                if (maxLen-- <= 0)
+                    LOAD_ABORT( pT, pMac, zInvalRef );
+                ch = *(pSrc++);
+            } while (isspace( ch ));
+
+            /*
+             *  We *must* have a name at this point.
+             */
+            if (! ISNAMECHAR( ch ))
+                LOAD_ABORT( pT, pMac, zInvalRef );
+            break;
+
+        case ']':
+            if (state == CDF_TOPLEVEL_NAME)
+                LOAD_ABORT( pT, pMac, zInvalRef );
+            *(pDest++) = ch;
+
+            /*
+             *  Skip trailing space
+             */
+            do  {
+                if (maxLen-- <= 0)
+                    goto leaveCopyDefReference;
+                ch = *(pSrc++);
+            } while (isspace( ch ));
+
+            switch (ch) {
+            case '.':
+                *(pDest++) = ch;
+                break;
+
+            case '[':
+            case ']':
+                LOAD_ABORT( pT, pMac, zInvalRef );
+
+            default:
+                goto leaveCopyDefReference;
+            }
+
+            /*
+             *  We found a '.' char.  Skip trailing space
+             */
+            do  {
+                if (maxLen-- <= 0)
+                    LOAD_ABORT( pT, pMac, zInvalRef );
+                ch = *(pSrc++);
+            } while (isspace( ch ));
+
+            if (! ISNAMECHAR( ch ))
+                LOAD_ABORT( pT, pMac, zInvalRef );
+            state = CDF_TOPLEVEL_NAME;
+            break;
+
+        default:
+            pSrc--;
+            goto leaveCopyDefReference;
+        }
+    }
+
+ leaveCopyDefReference:
+    *ppSrc     = pSrc;
+    *(pDest++) = NUL;
+    *ppDest    = pDest;
+    return (int)(pSrc - pStart);
+}
 
 
     STATIC tDefEntry*

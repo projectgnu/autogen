@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.10 2000/02/28 06:54:23 bruce Exp $
+ *  $Id: functions.c,v 1.11 2000/03/01 04:35:12 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -202,76 +202,6 @@ MAKE_LOAD_PROC( Comment )
 
 
 /*
- *  Append a subscript to a value name
- */
-    static size_t
-insertSubscript( tMacro* pMac, tTemplate* pT )
-{
-    char*          pzDest = pT->pzTemplText + pMac->ozName;
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
-    char  ch;
-
-    pzDest += strlen( pzDest );  /* destination goes back to end of name */
-
-    /*
-     *  Copy the opening bracket
-     */
-    --srcLen;
-    *(pzDest++) = *(pzSrc++);
-
-    for (;;) {
-        ch = *(pzSrc++);
-
-        if (--srcLen < 0)
-            LOAD_ABORT( pT, pMac, "Unterminated subscript" );
-
-        /*
-         *  Insert alphanumerics.  They will be interpreted
-         *  by the "findEntry" stuff
-         */
-        if (isalnum( ch ) || (ch == '_'))
-            *(pzDest++) = ch;
-
-        /*
-         *  Ignore spaces.  Yes, this glues name tokens together.
-         */
-        else if (isspace( ch ))
-            ;
-
-        /*
-         *  The close brace ends the subscripting
-         */
-        else if (ch == ']') {
-            *(pzDest++) = ch;
-            break;
-        }
-
-        else /*
-              *  Anything else is in error
-              */
-            LOAD_ABORT( pT, pMac, "invalid subscript" );
-    }
-
-    *(pzDest++) = NUL;
-
-    /*
-     *  Skip over trailing spaces.  If there is anything
-     *  left, then is is the expression that needs copying.
-     */
-    while (isspace( *pzSrc ))  ++pzSrc, --srcLen;
-
-    /*
-     *  The expression text starts after the extended name...
-     */
-    pMac->ozText = (off_t)pzSrc;
-    pT->pNext    = pzDest;
-    return srcLen;
-}
-
-
-/*
  *  mLoad_Unknown  --  the default (unknown) load function
  *
  *  Move any text into the text offset field.
@@ -279,7 +209,7 @@ insertSubscript( tMacro* pMac, tTemplate* pT )
  */
 MAKE_LOAD_PROC( Unknown )
 {
-    char*          pzCopy;
+    char*          pzCopy = pT->pNext;
     const char*    pzSrc;
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -307,10 +237,12 @@ MAKE_LOAD_PROC( Unknown )
         break;
 
     case '[':
-        srcLen = insertSubscript( pMac, pT );
+        pzCopy = pT->pzTemplText + pMac->ozName;
+        pzCopy += strlen( pzCopy );
+        srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );
+        pT->pNext = pzCopy+1;
         if (srcLen <= 0)
             goto return_emtpy_expression;
-        pzSrc = (const char*)pMac->ozText;
         break;
     }
 

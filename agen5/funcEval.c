@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.13 1999/11/16 05:27:01 bruce Exp $
+ *  $Id: funcEval.c,v 1.14 2000/03/01 04:35:12 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -357,16 +357,15 @@ MAKE_LOAD_PROC( Expr )
 
     pzCopy = pT->pNext;
 
-    while (isspace( *pzSrc ))  pzSrc++;
+    while (isspace( *pzSrc ) && (srcLen-- > 0))  pzSrc++;
     if (! isalpha( *pzSrc )) {
         tSCC zMsg[] = "Conditional expression must start with a name";
         LOAD_ABORT( pT, pMac, zMsg );
     }
     pMac->ozName = (pzCopy - pT->pzTemplText);
-    while (ISNAMECHAR( *pzSrc ))  *(pzCopy++) = *(pzSrc++);
-    *(pzCopy++) = NUL;
-    while (isspace( *pzSrc ))  pzSrc++;
-    srcLen -= (size_t)(pzSrc - (const char*)pMac->ozText);
+
+    srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );
+
     if (srcLen <= 0) {
         if (pMac->res != EMIT_VALUE) {
             tSCC zAb[] = "No replacement text for unfound value";
