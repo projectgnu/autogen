@@ -1,5 +1,37 @@
-1998-07-02  Gary V. Vaughan  <garyv@oranda.demon.co.uk>
+1998-07-02  Bruce Korb <korbb@datadesign.com>
+	* AUTHORS
+	regex.* are no longer distributed with autogen.
+	I futzed with bootstrap, too :)
 
+	* autoopts/options.h
+	Added version marker to the option structure.
+
+	* autoopts/optcode.tpl
+	Added the text string for testing for disabled options.
+	Inserted the structure version known at the time of
+	compilation.
+
+	* autoopts/autoopts.c
+	Verifies that the structure version in the option descriptor
+	matches the one known by optionProcess().
+	Also now compares a long name with a disabled name,
+	when there is a disabled name.
+
+	* autoopts/options.tpl
+	Reformatted and expanded the descriptions of the definitions
+	used inside the template.  This section is now suitable for
+	insertion into a .texi document.
+
+	* doc/auto_gen.tpl
+	expanded substantially the autoopts chapter.
+	The option definition descriptions are extracted from
+	$(top_srcdir)/autoopts/options.tpl
+
+	* doc/Makefile.am
+	added $(top_srcdir)/autoopts/options.tpl to the list of
+	dependencies for autogen.texi.
+
+1998-07-02  Gary V. Vaughan  <garyv@oranda.demon.co.uk>
 	* VERSION: removed a spurious hyphen, and bumped patchlevel
 	to 4.3.3
 
@@ -67,7 +99,7 @@
 1998-06-17  Bruce Korb <korbb@datadesign.com>
 	* Most files listed below:
 	Began the implementation of enable/disable by changing references
-	to "invert" to "disable"
+	from "invert" to "disable"
 
 	* autoopts/autoopts.c
 	Replaced "'\0'" with "NUL".
