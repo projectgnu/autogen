@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:06 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2003/02/04 02:59:26 $
+#            by: bkorb
 #
-# $Id: handler.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
+# $Id: handler.test,v 3.1 2003/02/04 02:59:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -26,11 +26,11 @@ set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-cat > $testname.def <<_EOF_
+echo "creating ${testname}.def in `pwd`"
+cat > ${testname}.def <<_EOF_
 AutoGen Definitions options;
-prog-name = $testname;
-prog-title = "Testing $testname";
+prog-name = ${testname};
+prog-title = "Testing ${testname}";
 
 flag = {
     name = first;
@@ -65,24 +65,26 @@ flag = {
 };
 _EOF_
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 sed '/START =/a\
-    SampleCode();' $testname.c > $testname.tmp
-mv -f $testname.tmp $testname.c
+SampleCode();\
+XXX-REMOVE-XXX' ${testname}.c > ${testname}.tmp
+chmod 644 ${testname}.c
+sed '/^XXX-REMOVE-XXX$/d;s/XXX-REMOVE-XXX//' ${testname}.tmp > ${testname}.c
 
-$AGEN $testname.def || \
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 sed '1,/Create the static procedure(s) declared above/d' \
-    $testname.c > $testname.test
+    ${testname}.c > ${testname}.test
 
 # # # # # # # # # # SAMPLE OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.sample
-cat > $testname.sample <<'_EOF_'
+echo creating ${testname}.sample
+cat > ${testname}.sample <<'_EOF_'
  */
 static void
 #ifdef __cplusplus
@@ -114,7 +116,7 @@ doOptFirst( pOptions, pOptDesc )
 #endif
 {
 /*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
-    SampleCode();
+SampleCode();
 /*  END   =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 }
 
@@ -162,8 +164,8 @@ doOptThird( pOptions, pOptDesc )
 
 _EOF_
 
-cmp -s $testname.test $testname.sample || \
-  failure "`diff -c $testname.test $testname.sample`"
+cmp -s ${testname}.test ${testname}.sample || \
+  failure "`diff -c ${testname}.test ${testname}.sample`"
 
 cleanup
 # end of handler.test
