@@ -1,6 +1,7 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.30 2000/03/12 23:30:16 bruce Exp $
+#$Id: optcode.tpl,v 2.31 2000/03/12 23:48:22 bruce Exp $
 =]
+#include "[=(. hdrname)=]"
 [=
 IF (not (exist? "copyright") )
 =]
@@ -15,13 +16,13 @@ tSCC zCopyrightNotice[] =
        [=
   CASE (get "copyright.type") =][=
 
-    =  gpl  =][=(c-string (gpl  (. prog-name) " * " ))=][=
+    =  gpl  =][=(c-string (gpl  (. prog-name) "" ))=][=
 
     = lgpl  =][=(c-string (lgpl (. prog-name) (get "copyright.owner")
-                                " * " ))=][=
+                                "" ))=][=
 
     =  bsd  =][=(c-string (bsd  (. prog-name) (get "copyright.owner")
-                                " * " ))=][=
+                                "" ))=][=
 
     = note  =][=(c-string (get "copyright.text"))=][=
 
@@ -29,9 +30,7 @@ tSCC zCopyrightNotice[] =
 
   ESAC =];[=
 
-ENDIF "copyright notes"
-=]
-#include "[=(. hdrname)=]"
+ENDIF "copyright notes"=]
 [=
 FOR flag =][=
   IF (exist? "call_proc") =]
