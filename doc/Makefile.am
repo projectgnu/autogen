@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.40 2000/04/04 13:23:05 bkorb Exp $
+## $Id: Makefile.am,v 2.41 2000/09/16 07:22:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -96,6 +96,7 @@ autogen.texi : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
+	@-touch $@
 
 ##  The following rule is for debugging generation problems:
 ##
@@ -106,6 +107,7 @@ autogen.def : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
+	@-touch $@
 
 $(AGSRCDIR)/autogen.texi :
 	@cd $(AGSRCDIR) ; echo making $@ in `pwd` ; make autogen.texi
