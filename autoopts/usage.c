@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.0 1998/08/23 10:39:22 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.1 1998/09/14 14:33:55 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -126,14 +126,22 @@ optionUsage( tOptions*  pOptions, int exitCode )
             tSCC  zNumArg[] = "Num";
             tSCC  zOptArg[] = "opt";
             tSCC  zNoArg[]  = "no ";
+            tSCC  zBreak[]  = "\n%s\n\n%s";
+            tSCC  zAuto[]   =
+                "Auto-supported Options:";
+
             tCC*  pzArgType;
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
                 if (exitCode == EXIT_SUCCESS)
-                    fprintf( fp, "\n%s\n\n%s", pOD->pzText, pOptTitle );
+                    fprintf( fp, zBreak, pOD->pzText, pOptTitle );
 
                 continue;
             }
+
+            if (  (pOptions->presetOptCt == pOD->optIndex)
+               && (exitCode == EXIT_SUCCESS) )
+                fprintf( fp, zBreak, zAuto, pOptTitle );
 
             /*
              *  Flag prefix:  IF no flags at all, then omit it.
@@ -304,6 +312,11 @@ optionUsage( tOptions*  pOptions, int exitCode )
                 fprintf( fp, zMust, pOD->optMinCt, pOD->optMaxCt );
             }
             }
+
+            if (  NAMED_OPTS( pOptions )
+               && (pOptions->specOptIdx.default_opt == pOD->optIndex))
+                fputs( "\t\t\t\t- is the default option for unnamed options\n",
+                       fp );
         }  while (pOD++, optNo++, (--ct > 0));
     }
 

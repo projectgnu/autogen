@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.0 1998/09/10 20:29:20 bkorb Exp $
+ *   $Id: opts.def,v 2.1 1998/09/14 14:34:03 bkorb Exp $
  */
 
 /*
@@ -64,6 +64,10 @@ flag = {
     descrip   = "subblock definition names";
 };
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Definition Insertion Options:
+ */
 flag = {
     name        = doc_insert;
     descrip     = "Definition insertion options";
@@ -78,7 +82,6 @@ flag = {
     descrip   = "Global assignments";
 };
 
-#ifdef LATER
 flag = {
     name      = common_assign;
     flag_arg  = ":";
@@ -86,7 +89,6 @@ flag = {
     stack_arg;
     descrip   = "Assignments common to all blocks";
 };
-#endif
 
 flag = {
     name        = copy;
@@ -94,6 +96,22 @@ flag = {
     descrip     = "File to copy to output defs";
 };
 
+flag = {
+    name        = file;
+    flag_arg;     /* optional */
+    descrip     = "Insert source file name into each def";
+};
+
+flag = {
+    name        = membership;
+    flag_arg    = ':';
+    descrip     = "Name of subcollection of entry types";
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Definition Output Disposition Options:
+ */
 flag = {
     name        = doc_output;
     descrip     = "Definition output disposition options:";
@@ -137,12 +155,10 @@ flag = {
     flags_cant  = output;
 };
 
-flag = {
-    name        = doc_automated;
-    documentation;
-    descrip =
-'The following are automatically supported by AutoOpts:';
-};
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Clarifications
+ */
 
 explain =
 "This program extracts autogen definitions from a list of source files.";
@@ -151,11 +167,11 @@ detail =
 "Definitions are delimited by the patterns:\n
     `/\\*=[a-zA-Z][a-zA-Z0-9_]*[ \\t][ \\t]*[a-zA-Z][a-zA-Z0-9_]*\\n'
     `=\\*/'.\n
-The first name is the block name and the second is the block entry
+The first name is the entry type and the second is the entry
 name.  This creates a definition of the following form:
 
     #line nnn \"source-file-name\"
-    block_name = {
+    entry_type = {
         name = entry_name;
         ...
     };\n

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.0 1998/08/23 10:39:17 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.1 1998/09/14 14:33:51 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -225,7 +225,7 @@ struct specOptIndex {
     tUC               more_help;
     tUC               save_opts;
     tUC               number_option;
-    tUC               filler;
+    tUC               default_opt;
 };
 
 /*

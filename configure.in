@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Sat Aug 22 22:11:14 1998
-dnl            by:    Caldera Openlinux User <bkorb@ellen>
+dnl Last Modified:    Fri Sep 11 07:10:58 1998
+dnl            by:    Bruce Korb <bkorb@ellen>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.0 1998/08/23 10:50:34 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.1 1998/09/14 14:33:46 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -20,7 +20,7 @@ AC_CANONICAL_SYSTEM
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.0 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.1 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -162,7 +162,8 @@ AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile MakeRules doc/Makefile compat/Makefile \
-autoopts/Makefile src/Makefile tests/Makefile config/Makefile,
+autoopts/Makefile src/Makefile tests/Makefile config/Makefile \
+getdefs/Makefile,
  [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
 
 dnl configure.in ends here

@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:  $Date: 1998/07/02 23:00:24 $
-#            by:  Bruce Korb <korbb@datadesign.com>
+# Last Modified:     Fri Sep 11 07:24:22 1998
+#            by:     Bruce Korb <bkorb@ellen>
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.2 1998/07/02 23:00:24 bkorb Exp $
+# $Id: bootstrap,v 1.3 1998/09/14 14:33:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -27,7 +27,7 @@ done
 # Make sure all of the maintainer tools required for bootstrap are
 # available on the host machine.
 # ----------------------------------------------------------------------
-
+#
 # Assume autoconf will be present until we can prove otherwise.
 AUTOCONF=autoconf
 AUTOHEADER=autoheader
@@ -100,7 +100,7 @@ test "$DIE" -ne 0 && exit $DIE
 
 # Still here?  Run through all of the required autogeneration tools in
 # each directory which contains a configure.in file...
-for i in `find $srcdir -name configure.in -print`
+for i in `find $srcdir -name configure.in -print|grep -v CVS/`
 do
     # Find the top directory with respect to the current configure.in.
     top=`echo $i|sed 's,/[^/]*$,,'`
@@ -108,7 +108,6 @@ do
         /* | [A-Za-z]:\\*) ;;
         *) top=`(cd $top && pwd)` ;;
     esac
-    echo bootstrapping in $top
 
     # A brief check to make sure we are not running in the wrong
     # directory.
@@ -124,6 +123,7 @@ do
     # Execute this in a sub-shell so we don't lose our start location.
     (
         cd $top
+        echo bootstrapping in `pwd`
 
         # Use auxdir if set in configure.in.
         auxdir=${auxdir-`fgrep CONFIG_AUX_DIR configure.in | \
@@ -131,12 +131,19 @@ do
         test -n "$auxdir" || auxdir=$srcdir
         test -d $auxdir || auxdir=.
 
+        echo $LIBTOOLIZE    --force
         $LIBTOOLIZE    --force
-        $ACLOCAL    -I $auxdir
+        echo $ACLOCAL       -I $auxdir
+        $ACLOCAL       -I $auxdir
+        echo $AUTOHEADER    -l $auxdir
         $AUTOHEADER    -l $auxdir
+        echo $AUTOMAKE      --add-missing
         $AUTOMAKE      --add-missing
+        echo $AUTOMAKE      --gnu
         $AUTOMAKE      --gnu
+        echo $AUTOHEADER    -l $auxdir
         $AUTOHEADER    -l $auxdir
+        echo $AUTOCONF
         $AUTOCONF
     )
 done

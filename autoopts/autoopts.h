@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.0 1998/08/23 10:39:11 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.1 1998/09/14 14:33:56 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -113,6 +113,9 @@
 #  define _STR(s) #s
 #  define STR(s)  _STR(s)
 #endif
+
+#define NAMED_OPTS(po) \
+        (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
 
 #ifdef MEMDEBUG
    extern void* ag_alloc( size_t, const char* );

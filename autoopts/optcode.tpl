@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.2 1998/08/21 21:26:34 bkorb Exp $
+#$Id: optcode.tpl,v 2.3 1998/09/14 14:33:52 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -306,6 +306,10 @@ _FOR flag "\n" =][=
                             z[=name _cap=]_Name,
      /* disablement strs */ zNot[=name _cap=]_Name, zNot[=name _cap=]_Pfx },[=
 
+    _IF default _exist flag_arg _len 0 > & =][=
+      _SETENV DEFAULT_OPTION _index =][=
+
+    _ENDIF =][=
   _ENDIF documentation =][=
 
 /flag
@@ -473,9 +477,12 @@ tOptions [=prog_name=]Options = {
       [=_IF homerc _exist=]INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS[=
         _ELSE            =] 0 /* no option state saving */[=_ENDIF=],
       [=_IF NUMBER_OPTION _env
-             =][=_eval NUMBER_OPTION _env=] /* index of '-#' option */[=
-        _ELSE=]NO_EQUIVALENT /* no '-#' option */[=_ENDIF=], 0 },
-    [=prefix _up #_ +=]OPTION_CT, [=_eval flag _len=],
+             =][=_eval NUMBER_OPTION _env =] /* index of '-#' option */[=
+        _ELSE=]NO_EQUIVALENT /* no '-#' option */[=_ENDIF=],
+      [=_IF DEFAULT_OPTION _env
+             =][=_eval DEFAULT_OPTION _env=] /* index of default opt */[=
+        _ELSE=]NO_EQUIVALENT /* no '-#' option */[=_ENDIF=] },
+    [=prefix _up #_ +=]OPTION_CT, [=_eval flag _count=],
     optDesc
 };
 
@@ -522,7 +529,7 @@ _IF TEST_MAIN _env ! ! test_main _exist | =]
 [=_ELSE=]
 #if defined( TEST_[=prog_name _up #_ +=]OPTS )
 [=_ENDIF=]
-    void
+    int
 main( int argc, char** argv )
 {
     (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
@@ -542,7 +549,7 @@ _ELSE=]
     putBourneShell( &[=prog_name=]Options );[=
 
 _ENDIF=]
-    exit( EXIT_SUCCESS );
+    return EXIT_SUCCESS;
 }
 #endif  /* defined TEST_[=prog_name _up #_ +=]OPTS */[=
 _ENDIF "test_main"=]

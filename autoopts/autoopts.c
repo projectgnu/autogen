@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.0 1998/08/23 10:39:16 bkorb Exp $
+ *  $Id: autoopts.c,v 2.1 1998/09/14 14:33:50 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.0 1998/08/23 10:39:16 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.1 1998/09/14 14:33:50 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -306,6 +306,25 @@ longOptionFind( tOptions*  pOpts,
         if (disable)
             *pFlags |= OPTST_DISABLED;
         pOD = pOpts->pOptDesc + matchIdx;
+        if (pzEq != (char*)NULL)
+             pOD->pzLastArg = pzEq+1;
+        else pOD->pzLastArg = (char*)NULL;
+
+        return pOD;
+    }
+
+    /*
+     *  IF there is no equal sign
+     *     *AND* we are using named arguments
+     *     *AND* there is a default named option,
+     *  THEN return that option.
+     */
+    if (  (pzEq == (char*)NULL)
+       && NAMED_OPTS(pOpts)
+       && (pOpts->specOptIdx.default_opt != NO_EQUIVALENT)) {
+        pOD = pOpts->pOptDesc + pOpts->specOptIdx.default_opt;
+
+        pOD->pzLastArg = pzOptName;
 
         return pOD;
     }
@@ -340,8 +359,10 @@ shortOptionFind( tOptions*  pOpts,
          *  THEN we stop here
          */
         if (  ((pRes->fOptState & OPTST_DOCUMENT) == 0)
-           && (optValue == pRes->optValue)  )
+           && (optValue == pRes->optValue)  )  {
+            pRes->pzLastArg = (char*)NULL;
             return pRes;
+        }
 
         /*
          *  Advance to next option description
@@ -362,6 +383,7 @@ shortOptionFind( tOptions*  pOpts,
                && (pOpts->specOptIdx.number_option != NO_EQUIVALENT) ) {
                 pRes = pOpts->pOptDesc + pOpts->specOptIdx.number_option;
                 (pOpts->pzCurOpt)--;
+                pRes->pzLastArg = (char*)NULL;
                 return pRes;
             }
 
@@ -737,9 +759,9 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
         pOpts->pzCurOpt = argVect[ pOpts->curOptIdx ];
 
         /*
-         *  IF all arguments must be options, ...
+         *  IF all arguments must be named options, ...
          */
-        if ((pOpts->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0) {
+        if (NAMED_OPTS(pOpts)) {
             char* pz = pOpts->pzCurOpt;
             pOpts->curOptIdx++;
 
@@ -862,115 +884,134 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
     pRes->fOptState &= OPTST_PERSISTENT;
     pRes->fOptState |= optFlags;
 
-    switch (argType) {
-    case ARG_MUST:
-        /*
-         *  An option argument is required.
-         */
-        if (isLongOpt) {
-            char* pz = strchr( pOpts->pzCurOpt, '=' );
+    /*
+     *  In the event of a "default" argument,
+     *  then we do not need to look for an argument.
+     */
+    if (pRes->pzLastArg != (char*)NULL)
+      pOpts->pzCurOpt  = (char*)NULL;
+    else
+      switch (argType) {
+      case ARG_MUST:
+          /*
+           *  An option argument is required.
+           */
+          if (isLongOpt) {
+              char* pz = strchr( pOpts->pzCurOpt, '=' );
 
-            /*
-             *  IF the argument is attached to the long name,
-             *  THEN set the pointer
-             *  ELSE get the next argumet because we consumed the
-             *       entire argument with the option name
-             */
-            if (pz != (char*)NULL) {
-                pRes->pzLastArg = pz+1;
-            } else {
-                pRes->pzLastArg = argVect[ pOpts->curOptIdx++ ];
-            }
-        } else {
-            if (*++pOpts->pzCurOpt == NUL)
-                pOpts->pzCurOpt = argVect[ pOpts->curOptIdx++ ];
-            pRes->pzLastArg = pOpts->pzCurOpt;
-        }
+              /*
+               *  IF the argument is attached to the long name,
+               *  THEN set the pointer
+               *  ELSE get the next argumet because we consumed the
+               *       entire argument with the option name
+               */
+              if (pz != (char*)NULL) {
+                  pRes->pzLastArg = pz+1;
+              } else {
+                  pRes->pzLastArg = argVect[ pOpts->curOptIdx++ ];
+              }
+          } else {
+              if (*++pOpts->pzCurOpt == NUL)
+                  pOpts->pzCurOpt = argVect[ pOpts->curOptIdx++ ];
+              pRes->pzLastArg = pOpts->pzCurOpt;
+          }
 
-        if (pOpts->curOptIdx > argCt) {
-            fprintf( stderr, zMisArg, pOpts->pzProgPath, pRes->pz_Name );
-            pRes = NO_OPT_DESC;
-        }
+          if (pOpts->curOptIdx > argCt) {
+              fprintf( stderr, zMisArg, pOpts->pzProgPath, pRes->pz_Name );
+              pOpts->curOptIdx = argCt;
+              pOpts->pzCurOpt  = (char*)NULL;
 
-        pOpts->pzCurOpt = (char*)NULL;  /* next time advance to next arg */
-        break;
+              return NO_OPT_DESC;
+          }
 
-    case ARG_MAY:
-        /*
-         *  An option argument is optional.
-         */
-        if (isLongOpt) {
-            char* pz = strchr( pOpts->pzCurOpt, '=' );
+          pOpts->pzCurOpt = (char*)NULL;  /* next time advance to next arg */
+          break;
 
-            /*
-             *  IF the argument is attached to the long name,
-             *  THEN set the pointer
-             *  ELSE get the next argumet because we consumed the
-             *       entire argument with the option name
-             */
-            if (pz != (char*)NULL) {
-                pRes->pzLastArg = pz+1;
-            } else {
-                char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
+      case ARG_MAY:
+          /*
+           *  An option argument is optional.
+           */
+          if (isLongOpt) {
+              char* pz = strchr( pOpts->pzCurOpt, '=' );
 
-                /*
-                 *  BECAUSE it is optional, we must make sure
-                 *  we did not find another flag and that there
-                 *  is such an argument.
-                 */
-                if ( pzLA != (char*)NULL) {
-                    if ((*pzLA == '-') || (*pzLA == '+'))
-                         pRes->pzLastArg = (char*)NULL;
-                    else pOpts->curOptIdx++; /* argument found */
-                }
-            }
+              /*
+               *  IF the argument is attached to the long name,
+               *  THEN set the pointer
+               */
+              if (pz != (char*)NULL) {
+                  pRes->pzLastArg = pz+1;
+              }
 
-        } else {
-            if (*++pOpts->pzCurOpt != NUL)
-                pRes->pzLastArg = pOpts->pzCurOpt;
-            else {
-                char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
+              /*
+               *  ELSE if we are *not* using named arguments,
+               *  THEN the next argument is our argument, unless
+               *       it starts with one of the flag characters.
+               */
+              else if (! NAMED_OPTS(pOpts)) {
+                  char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
 
-                /*
-                 *  BECAUSE it is optional, we must make sure
-                 *  we did not find another flag and that there
-                 *  is such an argument.
-                 */
-                if ( pzLA != (char*)NULL) {
-                    if ((*pzLA == '-') || (*pzLA == '+'))
-                         pRes->pzLastArg = (char*)NULL;
-                    else pOpts->curOptIdx++; /* argument found */
-                }
-            }
-        }
+                  /*
+                   *  BECAUSE it is optional, we must make sure
+                   *  we did not find another flag and that there
+                   *  is such an argument.
+                   */
+                  if ( pzLA != (char*)NULL) {
+                      if ((*pzLA == '-') || (*pzLA == '+'))
+                           pRes->pzLastArg = (char*)NULL;
+                      else pOpts->curOptIdx++; /* argument found */
+                  }
+              }
 
-        /*
-         *  After an option with an optional argument, we will
-         *  *always* start with the next option because if there
-         *  were any characters following the option name/flag,
-         *  they would be interpreted as the argument.
-         */
-        pOpts->pzCurOpt = (char*)NULL;
-        break;
+          } else {
+              if (*++pOpts->pzCurOpt != NUL)
+                  pRes->pzLastArg = pOpts->pzCurOpt;
+              else {
+                  char* pzLA = pRes->pzLastArg = argVect[ pOpts->curOptIdx ];
 
-    default: /* CANNOT */
-        /*
-         *  No option argument.  Make sure next time around we find
-         *  the correct flag (next argument for long options,
-         *  maybe the next character for short flags).
-         */
-        if (! isLongOpt) {
-            (pOpts->pzCurOpt)++;
-        } else {
-            if (strchr( pOpts->pzCurOpt, '=' ) != (char*)NULL) {
-                fprintf( stderr, zNoDisableArg, pOpts->pzProgPath,
-                         pRes->pz_Name );
-                goto errorBail;
-            }
-            pOpts->pzCurOpt = (char*)NULL;
-        }
-    }
+                  /*
+                   *  BECAUSE it is optional, we must make sure
+                   *  we did not find another flag and that there
+                   *  is such an argument.
+                   */
+                  if ( pzLA != (char*)NULL) {
+                      if ((*pzLA == '-') || (*pzLA == '+'))
+                           pRes->pzLastArg = (char*)NULL;
+                      else pOpts->curOptIdx++; /* argument found */
+                  }
+              }
+          }
 
+          /*
+           *  After an option with an optional argument, we will
+           *  *always* start with the next option because if there
+           *  were any characters following the option name/flag,
+           *  they would be interpreted as the argument.
+           */
+          pOpts->pzCurOpt = (char*)NULL;
+          break;
+
+      default: /* CANNOT */
+          /*
+           *  No option argument.  Make sure next time around we find
+           *  the correct flag (next argument for long options,
+           *  maybe the next character for short flags).
+           */
+          if (! isLongOpt) {
+              (pOpts->pzCurOpt)++;
+          } else {
+              if (strchr( pOpts->pzCurOpt, '=' ) != (char*)NULL) {
+                  fprintf( stderr, zNoDisableArg, pOpts->pzProgPath,
+                           pRes->pz_Name );
+                  goto errorBail;
+              }
+              pOpts->pzCurOpt = (char*)NULL;
+          }
+      }
+
+    /*
+     *  IF this option requires a numeric value,
+     *  THEN convert it to a number now.
+     */
     if ((pRes->fOptState & OPTST_NUMERIC) != 0) {
         if (pRes->pzLastArg == (char*)NULL) {
             pOpts->curOptIdx = argCt;
@@ -1070,9 +1111,19 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
         int        oCt = pOpts->presetOptCt;
 
         /*
+         *  IF there was a processing error,
+         *  THEN it is time to call usage exit.
+         */
+        if (errCt != 0)
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+
+        /*
          *  FOR each of "oCt" options, ...
          */
         for (;;) {
+            tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
+            tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
+
             const int*  pMust = pOD->pOptMust;
             const int*  pCant = pOD->pOptCant;
 
@@ -1117,12 +1168,10 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
             if (  (  (pOD->optEquivIndex == NO_EQUIVALENT)
                   || (pOD->optEquivIndex == pOD->optIndex) )
                && (pOD->optOccCt <  pOD->optMinCt)  )  {
-                tSCC zNotEnough[] = "ERROR:  The %s option must appear %d times\n";
-                tSCC zNeedOne[]   = "ERROR:  The %s option is required\n";
 
                 errCt++;
                 if (pOD->optMinCt > 1)
-                     fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
+                    fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
                 else fprintf( stderr, zNeedOne, pOD->pz_Name );
             }
 

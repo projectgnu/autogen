@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.0 1998/08/23 10:39:06 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.1 1998/09/14 14:33:53 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -72,14 +72,14 @@ static unsigned char charmap[] = {
     '0',  '1',  '2',  '3',   '4',  '5',  '6',  '7',
     '8',  '9',  ':',  ';',   '<',  '=',  '>',  '?',
 
-    '@',  'A',  'B',  'C',   'D',  'E',  'F',  'G',
-    'H',  'I',  'J',  'K',   'L',  'M',  'N',  'O',
-    'P',  'Q',  'R',  'S',   'T',  'U',  'V',  'W',
-    'X',  'Y',  'Z',  '[',   '\\', ']',  '^',  '_',
-    '`',  'A',  'B',  'C',   'D',  'E',  'F',  'G',
-    'H',  'I',  'J',  'K',   'L',  'M',  'N',  'O',
-    'P',  'Q',  'R',  'S',   'T',  'U',  'V',  'W',
-    'X',  'Y',  'Z',  '{',   '|',  '}',  '~',  0x7F,
+    '@',  'a',  'b',  'c',   'd',  'e',  'f',  'g',
+    'h',  'i',  'j',  'k',   'l',  'm',  'n',  'o',
+    'p',  'q',  'r',  's',   't',  'u',  'v',  'w',
+    'x',  'y',  'z',  '[',   '\\', ']',  '^',  '_',
+    '`',  'a',  'b',  'c',   'd',  'e',  'f',  'g',
+    'h',  'i',  'j',  'k',   'l',  'm',  'n',  'o',
+    'p',  'q',  'r',  's',   't',  'u',  'v',  'w',
+    'x',  'y',  'z',  '{',   '|',  '}',  '~',  0x7f,
 
     0x80, 0x81, 0x82, 0x83,  0x84, 0x85, 0x86, 0x87,
     0x88, 0x89, 0x8A, 0x8B,  0x8C, 0x8D, 0x8E, 0x8F,
@@ -169,7 +169,7 @@ streqvmap( char chFrom,
 strequate( const char* s )
 {
     if ((s != (char*)NULL) && (*s != '\0')) {
-        unsigned char equiv = (unsigned)*(s++);
+        unsigned char equiv = (unsigned)*s;
         while (*s != '\0')
             charmap[ (unsigned)*(s++) ] = equiv;
     }

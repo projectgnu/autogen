@@ -30,6 +30,11 @@ static const char zDne[] =
 static const char zAgDef[] =
 "autogen definitions %s;\n";
 
+char* pzIndexText = (char*)NULL;
+char* pzEndIndex  = (char*)NULL;
+char* pzIndexEOF  = (char*)NULL;
+size_t indexAlloc = 0;
+
 #define MARK_CHAR ':'
 
 char zRER[ 256 ];
@@ -80,13 +85,6 @@ main( int    argc,
 
         fprintf( outFp, zAgDef, zTemplName );
 
-        if (HAVE_OPT( COPY )) {
-            char* pz = loadFile( OPT_ARG( COPY ));
-            fputs( pz, outFp );
-            fputc( '\n', outFp );
-            free( (void*)pz );
-        }
-
         if (HAVE_OPT( ASSIGN )) {
             int    ct  = STACKCT_OPT(  ASSIGN );
             char** ppz = STACKLST_OPT( ASSIGN );
@@ -94,6 +92,20 @@ main( int    argc,
                 fprintf( outFp, "%s;\n", *ppz++ );
             } while (--ct > 0);
             fputc( '\n', outFp );
+        }
+
+        if (HAVE_OPT( COPY )) {
+            char* pz = loadFile( OPT_ARG( COPY ));
+            if (pz == (char*)NULL) {
+                fprintf( stderr, "Error %d (%s) read opening %s\n",
+                         errno, strerror( errno ), OPT_ARG( COPY ));
+                exit( EXIT_FAILURE );
+            }
+
+            fprintf( outFp, "#line 1 \"%s\"\n", OPT_ARG( COPY ));
+            fputs( pz, outFp );
+            fputc( '\n', outFp );
+            free( (void*)pz );
         }
 
         {
@@ -123,6 +135,12 @@ main( int    argc,
             utime( OPT_ARG( OUTPUT ), &tbuf );
             chmod( OPT_ARG( OUTPUT ), S_IRUSR|S_IRGRP|S_IROTH);
         }
+    }
+
+    if ((pzIndexText != (char*)NULL) && (pzEndIndex != pzIndexEOF)) {
+        FILE* fp = fopen( OPT_ARG( ORDERING ), "a" );
+        fputs( pzIndexEOF, fp );
+        fclose( fp );
     }
 
     return EXIT_SUCCESS;
@@ -262,6 +280,21 @@ validateOptions( void )
                      errno, strerror( errno ), ppz[-1] );
             USAGE( EXIT_FAILURE );
         }
+    }
+
+    if (   HAVE_OPT( ORDERING )
+       && (OPT_ARG( ORDERING ) != (char*)NULL)) {
+        pzIndexText = loadFile( OPT_ARG( ORDERING ));
+        if (pzIndexText == (char*)NULL) {
+            pzIndexText = pzEndIndex  = pzIndexEOF = \
+                (char*)malloc( 0x4000 );
+            indexAlloc = 0x4000;
+            *pzIndexText = NUL;
+        } else {
+            pzEndIndex  = pzIndexEOF = pzIndexText + strlen( pzIndexText );
+            indexAlloc = (pzEndIndex - pzIndexText) + 1;
+        }
+        strequate( "_-^" );
     }
 }
 
@@ -632,6 +665,109 @@ emitDefinition( char* pzDef, char* pzOut )
 }
 
 
+
+    char*
+assignIndex( char*  pzOut,  char*  pzDef )
+{
+    char*  pzMatch;
+    size_t len = strlen( pzDef );
+    long   idx;
+
+    /*
+     *  Make the source text all lower case and map
+     *  '-', '^' and '_' characters to '_'.
+     */
+    strtransform( pzDef );
+
+    /*
+     * IF there is already an entry,
+     * THEN put the index into the output.
+     */
+    pzMatch = strstr( pzIndexText, pzDef );
+    if (pzMatch != (char*)NULL) {
+        pzMatch += len;
+        while (isspace( *pzMatch )) pzMatch++;
+        while ((*pzOut++ = *pzMatch++) != ']') ;
+        return pzOut;
+    }
+
+    /*
+     *  We have a new entry.  Make sure we have room for it
+     *  in our in-memory string
+     */
+    if (((pzEndIndex - pzIndexText) + len + 64 ) > indexAlloc) {
+        char* pz;
+        indexAlloc +=  0x1FFF;
+        indexAlloc &= ~0x0FFF;
+        pz = (char*)realloc( (void*)pzIndexText, indexAlloc );
+        if (pz == (char*)NULL) {
+            fputs( "Realloc of index text failed\n", stderr );
+            exit( EXIT_FAILURE );
+        }
+
+        /*
+         *  IF the allocation moved,
+         *  THEN adjust all our pointers.
+         */
+        if (pz != pzIndexText) {
+            pzIndexEOF  = pz + (pzIndexEOF - pzIndexText);
+            pzEndIndex  = pz + (pzEndIndex - pzIndexText);
+            pzIndexText = pz;
+        }
+    }
+
+    /*
+     *  IF there are no data in our text database,
+     *  THEN default to a zero index.
+     */
+    if (pzEndIndex == pzIndexText)
+        idx = 0;
+    else do {
+        char* pz = strrchr( pzDef, ' ' );
+        *pz = NUL;
+        len = strlen( pzDef );
+
+        /*
+         *  Find the last entry for the current category of entries
+         */
+        pzMatch = strstr( pzIndexText, pzDef );
+        if (pzMatch == (char*)NULL) {
+            /*
+             *  No entries for this category.  Use zero for an index.
+             */
+            idx = 0;
+            *pz = ' ';
+            break;
+        }
+
+        for (;;) {
+            char* pzn = strstr( pzMatch + len, pzDef );
+            if (pzn == (char*)NULL)
+                break;
+            pzMatch = pzn;
+        }
+
+        /*
+         *  Skip forward to the '[' character and convert the
+         *  number that follows to a long.
+         */
+        *pz = ' ';
+        pzMatch = strchr( pzMatch + len, '[' );
+        idx = strtol( pzMatch+1, (char**)NULL, 0 )+1;
+    } while (0);
+
+    /*
+     *  Add the new entry to our text database and
+     *  place a copy of the value into our output.
+     */
+    pzEndIndex += sprintf( pzEndIndex, "%-40s  [%d]\n", pzDef, idx );
+    pzOut += sprintf( pzOut, "[%d]", idx );
+
+    return pzOut;
+}
+
+
+
     void
 buildDefinition(
     char*    pzDef,
@@ -650,12 +786,17 @@ buildDefinition(
         "error no data for definition in file %s line %d\n";
 
     char* pzNextDef = (char*)NULL;
+    char  zDefText[ 256 ];
+    char* pzDefText = zDefText;
 
     /*
      *  Copy out the name of the entry type
      */
-    while (isalnum( *pzDef ))
-        *pzOut++ = *pzDef++;
+    *pzDefText++ = '`';
+    while (isalnum( *pzDef )) {
+        *pzDefText++ = \
+        *pzOut++     = *pzDef++;
+    }
 
     while (isspace( *pzDef )) pzDef++;
 
@@ -670,6 +811,15 @@ buildDefinition(
             pzDef++;
         }
         *pzDef = NUL;
+
+        if (pzIndexText != (char*)NULL) {
+            char* pz;
+            if (HAVE_OPT( MEMBERSHIP ))
+                 sprintf( pzDefText, "  %s  %s'", OPT_ARG( MEMBERSHIP ),
+                          pzName );
+            else sprintf( pzDefText, "  %s'", pzName );
+            pzOut = assignIndex( pzOut, zDefText );
+        }
 
         /*
          *  We insert the name with a consistent name string
@@ -732,7 +882,27 @@ buildDefinition(
         }
     } eachAttrDone:;
 
-    *pzOut++ = '}'; *pzOut++ = ';'; *pzOut++ = '\n'; *pzOut++ = NUL;
+    if (HAVE_OPT( COMMON_ASSIGN )) {
+        int    ct  = STACKCT_OPT(  ASSIGN );
+        char** ppz = STACKLST_OPT( ASSIGN );
+        do  {
+            pzOut += sprintf( pzOut, "    %s;\n", *ppz++ );
+        } while (--ct > 0);
+        *pzOut++ = '\n';
+    }
+
+    if (HAVE_OPT( FILE )) {
+        char* pz = OPT_ARG( FILE );
+        if (pz == (char*)NULL)
+            pz = "file";
+        pzOut += sprintf( pzOut, "    %s = '%s';\n", pz, pzFile );
+    }
+
+    if (HAVE_OPT( MEMBERSHIP ))
+        pzOut += sprintf( pzOut, "    member = '%s';\n",
+                          OPT_ARG( MEMBERSHIP ));
+
+    *pzOut++ = '}'; *pzOut++ = ';'; *pzOut++ = '\n'; *pzOut = NUL;
 }
 
 
@@ -747,8 +917,14 @@ processFile( char* pzFile )
     char* pzDta;   /* data value        */
     int   lineNo = 1;
     char* pzOut;
-
     regmatch_t  matches[MAX_SUBMATCH+1];
+
+    if (pzText == (char*)NULL) {
+        fprintf( stderr, "Error %d (%s) read opening %s\n",
+                 errno, strerror( errno ), pzFile );
+        exit( EXIT_FAILURE );
+    }
+
     pzNext = pzText;
 
     while ( pzScan = pzNext,
@@ -1020,9 +1196,7 @@ loadFile( char* pzFname )
     char*  pzText;
 
     if (fp == (FILE*)NULL) {
-        fprintf( stderr, "Error %d (%s) read opening %s\n",
-                 errno, strerror( errno ), pzFname );
-        exit( EXIT_FAILURE );
+        return (char*)NULL;
     }
     res = fstat( fileno( fp ), &stb );
     if (res != 0) {
