@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.14 2000/09/29 03:19:13 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.15 2000/10/11 16:48:19 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -115,7 +115,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  Check for an immediately accessible file
      */
     if (access( pzFName, R_OK ) == 0) {
-        strcpy( pzFullName, pzFName );
+        strlcpy( pzFullName, pzFName, MAXPATHLEN );
         if (deallocAddr != NULL)
             AGFREE( deallocAddr );
         return SUCCESS;
@@ -142,7 +142,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
             snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN, "%s.", pzFName );
 
         do  {
-            strcpy( pzEnd, *(papSL++) );
+            strcpy( pzEnd, *(papSL++) ); /* must fit */
             if (access( pzFullName, R_OK ) == 0) {
                 if (deallocAddr != NULL)
                     AGFREE( deallocAddr );
@@ -182,7 +182,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
                 *(pzEnd++) = '.';
 
                 do  {
-                    strcpy( pzEnd, *(papSL++) );
+                    strcpy( pzEnd, *(papSL++) ); /* must fit */
                     if (access( pzFullName, R_OK ) == 0) {
                         if (deallocAddr != NULL)
                             AGFREE( deallocAddr );
@@ -242,7 +242,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
                             "%s.", pzFName );
 
             for (;;) {
-                strcpy( pzEnd, *papSL );
+                strcpy( pzEnd, *papSL ); /* must fit */
 
                 if (access( pzFullName, R_OK ) == 0)
                     break;
@@ -259,7 +259,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
         if (pzFound == NULL)
             return FAILURE;
 
-        strcpy( pzFullName, pzFound );
+        strlcpy( pzFullName, pzFound, MAXPATHLEN );
         return SUCCESS;
     }
 }
@@ -555,8 +555,8 @@ loadTemplate( tCC* pzFileName )
         pRes->descSize  = alocSize;
         pRes->macroCt   = macroCt;
         pRes->fd        = -1;
-        strcpy( pRes->zStartMac, zStartMac );
-        strcpy( pRes->zEndMac, zEndMac );
+        strcpy( pRes->zStartMac, zStartMac ); /* must fit */
+        strcpy( pRes->zEndMac, zEndMac );     /* must fit */
         loadMacros( pRes, mapInfo.pzFileName, (char*)NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize,
                                      "resize main template" );
