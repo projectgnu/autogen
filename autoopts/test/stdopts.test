@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
+# Time-stamp:        "2003-03-09 10:02:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/03/08 21:19:52 $
-#            by: bkorb
 #
-# $Id: stdopts.test,v 3.2 2003/03/08 21:19:52 bkorb Exp $
+# $Id: stdopts.test,v 3.3 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -76,9 +75,9 @@ The valid verbose option keywords are:
 _EOF_
 
 cmp -s $testname.h*lp || \
-  failure "`diff $testname.h*lp`"
+  failure "`diff ${testname}.hlp ${testname}.help`"
 
-./$testname --verbose=exp > /dev/null && \
+./$testname --verbose=exp > /dev/null 2>&1 && \
   failure $testname accepted ambiguous keyword
 
 ./$testname --verbose=inf > $testname.out || \

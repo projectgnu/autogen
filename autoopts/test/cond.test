@@ -5,13 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2003-03-09 09:50:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:06 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: cond.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
+# $Id: cond.test,v 3.1 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -53,7 +52,7 @@ cat > $testname.hlp <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s Num second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -69,7 +68,7 @@ cat > $testname.hlp <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s Num second         The second option descrip
    -c no  cond           cond test
    -? no  help           Display usage information and exit

@@ -1,3 +1,9 @@
+2003-03-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c(optionUsage): Separate more completely the GNU vs.
+	std option description format strings.
+	* autoopts/test/*.test: formatting tweaks
+
 2003-03-08  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(OPTPROC_GNUUSAGE): set the flag when needed.
@@ -11,7 +17,7 @@
 	* autoopts/test/shell.test: likewise
 	* autoopts/test/stdopts.test: likewise
 	* autoopts/usage.c(optionUsage): likewise + incorporate changes for
-	GNU-style usage message
+	GNU-style usage message + ensure the paged usage text gets flushed
 
 2003-03-07  Bruce Korb  <bkorb@gnu.org>
 

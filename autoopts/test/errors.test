@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-08 12:05:25 bkorb"
+# Time-stamp:        "2003-03-09 09:53:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.4 2003/03/08 21:19:52 bkorb Exp $
+# $Id: errors.test,v 3.5 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -53,11 +53,11 @@ test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
-   -s YES second         The second option descrip
+   -s Str second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to an rc file
-   -< YES load-opts      Load options from an rc file
+   -< Str load-opts      Load options from an rc file
 				- disabled as --no-load-opts
 				- may appear multiple times
 

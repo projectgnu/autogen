@@ -5,13 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2003-03-09 09:55:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/01/05 21:00:11 $
-#            by: bkorb
 #
-# $Id: guile.test,v 3.2 2003/01/05 21:00:11 bkorb Exp $
+# $Id: guile.test,v 3.3 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -63,7 +62,7 @@ USAGE:  guile [ -<flag> [<val>] ]... [ <guile-arg> ...]
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
 				- enabled by default
-   -s YES second         The second option descrip
+   -s Str second         The second option descrip
 				- may appear multiple times
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -71,7 +70,7 @@ USAGE:  guile [ -<flag> [<val>] ]... [ <guile-arg> ...]
 _EOF_
 
 cmp -s ${testname}.h*lp || \
-  failure help output mismatch
+  failure "`diff ${testname}.hlp ${testname}.help`"
 
 f=`(./${testname} -- -v 2>&1) | grep 'GNU General Public Licence'`
 

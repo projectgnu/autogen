@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-08 12:08:01 bkorb"
+# Time-stamp:        "2003-03-09 10:01:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 3.5 2003/03/08 21:19:52 bkorb Exp $
+# $Id: shell.test,v 3.6 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -48,7 +48,7 @@ test_shell - Test AutoOpts for shell
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s no  second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -58,7 +58,7 @@ or by a single hyphen and the flag character.
 _EOF_
 
 cmp -s $testname.h*lp || \
-  failure help output mismatch
+  failure "`diff ${testname}.hlp ${testname}.help`"
 
 ./$testname -X 2> /dev/null && \
   failure $testname should not accept bogus options
@@ -103,8 +103,8 @@ cat > $testname.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES script         Output Script File
-   -s YES shell          Shell name (follows "#!" magic)
+   -o Str script         Output Script File
+   -s Str shell          Shell name (follows "#!" magic)
 				- disabled as --no-shell
 				- enabled by default
    -v opt version        Output version information and exit
@@ -133,7 +133,7 @@ test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s no  second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -154,7 +154,7 @@ TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s no  second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -166,7 +166,7 @@ TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s no  second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager

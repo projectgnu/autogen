@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2003-03-08 12:04:35 bkorb"
+# Time-stamp:        "2003-03-09 09:58:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.3 2003/03/08 21:19:52 bkorb Exp $
+# $Id: keyword.test,v 3.4 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -63,12 +63,12 @@ cat > ${testname}.hlp <<'_EOF_'
 test_keyword - Test AutoOpts for keyword
 USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
       KWd trace          tracing level of detail
    -X no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to an rc file
-   -< YES load-opts      Load options from an rc file
+   -< Str load-opts      Load options from an rc file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -89,7 +89,7 @@ _EOF_
 cmp -s ${testname}.h*lp || \
   failure "`diff ${testname}.h*lp`"
 
-./${testname} --trace=exp > /dev/null && \
+./${testname} --trace=exp > /dev/null 2>&1 && \
   failure ${testname} accepted ambiguous keyword
 
 ./${testname} --trace=expr > /dev/null || \

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-08 10:24:00 bkorb"
+# Time-stamp:        "2003-03-09 09:49:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 3.2 2003/03/08 21:19:52 bkorb Exp $
+# $Id: argument.test,v 3.3 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -24,13 +24,13 @@ fi
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-testname="$testname" test_main="${test_main}" \
+echo "creating ${testname}.def in `pwd`"
+testname="${testname}" test_main="${test_main}" \
 argument="${argument}" long_opt="${long_opt}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
@@ -38,29 +38,29 @@ compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 test_argument - Test AutoOpts for argument
 USAGE:  argument [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s Num second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure help output mismatch
+cmp -s ${testname}.h*lp || \
+  failure "`diff ${testname}.hlp ${testname}.help`"
 
-./$testname mumble 2> /dev/null && \
-  failure $testname should not accept non-options
+./${testname} mumble 2> /dev/null && \
+  failure ${testname} should not accept non-options
 
-./$testname -s mumble 2> /dev/null && \
-  failure $testname should not accept bad options
+./${testname} -s mumble 2> /dev/null && \
+  failure ${testname} should not accept bad options
 
-./$testname -o string -s 99 > /dev/null || \
-  failure $testname did not handle its options
+./${testname} -o string -s 99 > /dev/null || \
+  failure ${testname} did not handle its options
 
 cleanup
 # end of argument.test

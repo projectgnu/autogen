@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-08 16:41:07 bkorb"
+# Time-stamp:        "2003-03-09 09:52:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.7 2003/03/09 00:47:59 bkorb Exp $
+# $Id: equiv.test,v 3.8 2003/03/09 19:53:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -82,7 +82,7 @@ cat > ${testname}.hlp <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
 USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s Num second         The second option descrip
       opt alpha          alpha opt
       Num beta           beta opt
@@ -105,8 +105,7 @@ The valid omega option keywords are:
 _EOF_
 
 cmp -s ${testname}.h*lp || \
-  failure "
-    `diff -c ${testname}.h*lp`"
+  failure "`diff ${testname}.hlp ${testname}.help`"
 
 INC="${INC} -DCOND=1"
 compile "-?"
@@ -114,7 +113,7 @@ cat > ${testname}.hlp <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
 USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
-   -o YES option         The option option descrip
+   -o Str option         The option option descrip
    -s Num second         The second option descrip
       opt alpha          alpha opt
       Num beta           beta opt
