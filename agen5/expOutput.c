@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.10 2000/09/18 00:41:49 bkorb Exp $
+ *  $Id: expOutput.c,v 1.11 2000/09/27 20:38:54 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -110,11 +110,14 @@ ag_scm_out_delete( void )
     SCM
 ag_scm_out_move( SCM new_file )
 {
+    char* pz;
+
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    rename( pCurFp->pzName, SCM_CHARS( new_file ));
-    pCurFp->pzName = strdup( SCM_CHARS( new_file ));
+    pz = gh_scm2newstr( new_file, NULL );
+    rename( pCurFp->pzName, pz );
+    pCurFp->pzName = pz;  /* memory leak */
     return SCM_UNDEFINED;
 }
 
@@ -160,11 +163,11 @@ ag_scm_out_push_add( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pzNewFile = SCM_CHARS( new_file );
+    pzNewFile = gh_scm2newstr( new_file, NULL );
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ));
     p->pPrev  = pCurFp;
-    p->pzName = strdup( pzNewFile );
+    p->pzName = pzNewFile;  /* memory leak */
     addWriteAccess( pzNewFile );
     outputDepth++;
     p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG );
@@ -192,11 +195,11 @@ ag_scm_out_push_new( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pzNewFile = SCM_CHARS( new_file );
+    pzNewFile = gh_scm2newstr( new_file, NULL );
 
     p = (tFpStack*)AGALOC( sizeof( tFpStack ));
     p->pPrev  = pCurFp;
-    p->pzName = strdup( pzNewFile );
+    p->pzName = pzNewFile;  /* memory leak */
     unlink( pzNewFile );
     outputDepth++;
     p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG );
@@ -225,13 +228,15 @@ ag_scm_out_switch( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pzNewFile = SCM_CHARS( new_file );
+    pzNewFile = gh_scm2newstr( new_file, NULL );
 
     /*
      *  IF no change, THEN ignore this
      */
-    if (strcmp( pCurFp->pzName, pzNewFile ) == 0)
+    if (strcmp( pCurFp->pzName, pzNewFile ) == 0) {
+        free( (void*)pzNewFile );
         return SCM_UNDEFINED;
+    }
 
     removeWriteAccess( fileno( pCurFp->pFile ));
 
@@ -254,7 +259,7 @@ ag_scm_out_switch( SCM new_file )
     tbuf.actime  = time( (time_t*)NULL );
     tbuf.modtime = outTime;
     utime( pCurFp->pzName, &tbuf );
-    pCurFp->pzName = strdup( pzNewFile );
+    pCurFp->pzName = pzNewFile;  /* memory leak */
 
     return SCM_UNDEFINED;
 }

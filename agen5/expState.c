@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.19 2000/08/13 21:20:24 bkorb Exp $
+ *  $Id: expState.c,v 1.20 2000/09/27 20:38:54 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -237,7 +237,7 @@ count_entries( char* pzName, tDefEntry* pCurDef )
     STATIC SCM
 find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 {
-    char*       pzName = SCM_CHARS( obj );
+    char*       pzName = gh_scm2newstr( obj, NULL );
     ag_bool     isIndexed;
     tDefEntry*  pE;
     tDefEntry*  pMembers;
@@ -254,6 +254,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
         *(pzField++) = NUL;
 
     pE = findDefEntry( pzName, pCurDef, &isIndexed );
+    free( (void*)pzName );
 
     /*
      *  No such entry?  return FALSE
@@ -372,13 +373,16 @@ ag_scm_base_name( void )
     SCM
 ag_scm_count( SCM obj )
 {
+    int    ent_len;
+    char*  pzEntName;
+
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    {
-        int len = count_entries( SCM_CHARS( obj ), pDefContext );
-        return gh_int2scm( len );
-    }
+    pzEntName = gh_scm2newstr( obj, NULL );
+    ent_len = count_entries( pzEntName, pDefContext );
+    free( (void*)pzEntName );
+    return gh_int2scm( ent_len );
 }
 
 
@@ -422,14 +426,20 @@ ag_scm_def_file( void )
 ag_scm_exist_p( SCM obj )
 {
     ag_bool x;
+    SCM     res;
+    char*   pz;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    if (findDefEntry( SCM_CHARS( obj ), pDefContext, &x ) == NULL)
-        return SCM_BOOL_F;
+    pz = gh_scm2newstr( obj, NULL );
+    if (findDefEntry( pz, pDefContext, &x ) == NULL)
+         res = SCM_BOOL_F;
+    else res = SCM_BOOL_T;
 
-    return SCM_BOOL_T;
+    free( (void*)pz );
+
+    return res;
 }
 
 
@@ -444,12 +454,20 @@ ag_scm_exist_p( SCM obj )
     SCM
 ag_scm_ag_function_p( SCM obj )
 {
+    SCM     res;
+    char*   pz;
+
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    return (findTemplate( SCM_CHARS( obj )) != (tTemplate*)NULL)
-           ? SCM_BOOL_T
-           : SCM_BOOL_F;
+    pz = gh_scm2newstr( obj, NULL );
+    if (findTemplate( pz ) == NULL)
+         res = SCM_BOOL_F;
+    else res = SCM_BOOL_T;
+
+    free( (void*)pz );
+
+    return res;
 }
 
 
@@ -480,8 +498,11 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
        || (! gh_string_p(    test )) )
         return SCM_UNDEFINED;
 
-    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf( pfTrace, "searching for `%s'", SCM_CHARS( test ));
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
+        char* pzTest = gh_scm2newstr( test, NULL );
+        fprintf( pfTrace, "searching for `%s'", pzTest );
+        free( (void*)pzTest );
+    }
 
     return find_entry_value( op, obj, test, pDefContext );
 }
@@ -500,11 +521,14 @@ ag_scm_get( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     x;
+    char*       pz;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x );
+    pz = gh_scm2newstr( obj, NULL );
+    pE = findDefEntry( pz, pDefContext, &x );
+    free( (void*)pz );
 
     if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
         return gh_str02scm( "" );
@@ -526,11 +550,14 @@ ag_scm_high_lim( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     isIndexed;
+    char*       pz;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed );
+    pz = gh_scm2newstr( obj, NULL );
+    pE = findDefEntry( pz, pDefContext, &isIndexed );
+    free( (void*)pz );
 
     /*
      *  IF we did not find the entry we are looking for
@@ -563,13 +590,16 @@ ag_scm_high_lim( SCM obj )
     SCM
 ag_scm_len( SCM obj )
 {
+    char*       pz;
+    int         len;
+
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    {
-        int len = entry_length( SCM_CHARS( obj ), pDefContext );
-        return gh_int2scm( len );
-    }
+    pz = gh_scm2newstr( obj, NULL );
+    len = entry_length( pz, pDefContext );
+    free( (void*)pz );
+    return gh_int2scm( len );
 }
 
 
@@ -586,11 +616,14 @@ ag_scm_low_lim( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     x;
+    char*       pz;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x );
+    pz = gh_scm2newstr( obj, NULL );
+    pE = findDefEntry( pz, pDefContext, &x );
+    free( (void*)pz );
 
     /*
      *  IF we did not find the entry we are looking for

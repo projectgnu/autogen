@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.25 2000/09/16 17:04:28 bkorb Exp $
+ *  $Id: expFormat.c,v 1.26 2000/09/27 20:38:54 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -161,15 +161,16 @@ ag_scm_dne( SCM prefix, SCM first )
     if (! gh_string_p( prefix ))
         return SCM_UNDEFINED;
 
-    pzPfx = SCM_CHARS( prefix );
+    pzPfx = gh_scm2newstr( prefix, NULL );
 
     /*
      *  IF we also have a 'first' prefix string,
      *  THEN we set it to something other than ``zNil'' and deallocate later.
      */
     if (gh_string_p( first )) {
-        pzFirst = SCM_CHARS( first );
-        pzFirst = asprintf( zDne1, pzFirst, pzPfx );
+        char* pz = gh_scm2newstr( first );
+        pzFirst = asprintf( zDne1, pz, pzPfx );
+        free( (void*)pz ); /* use free() directly */
     }
 
     {
@@ -185,6 +186,8 @@ ag_scm_dne( SCM prefix, SCM first )
         fprintf( stderr, zAllocErr, pzProg, -1, "Do-Not-Edit string" );
         LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
     }
+
+    free( (void*)pzPfx ); /* use free() directly */
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -256,7 +259,7 @@ ag_scm_error( SCM res )
         break;
 
     case GH_TYPE_STRING:
-        pzMsg = SCM_CHARS( res );
+        pzMsg = gh_scm2newstr( res, NULL ); /* once-only memory leak */
         while (isspace( *pzMsg )) pzMsg++;
         /*
          *  IF the message starts with the number zero,
@@ -314,8 +317,8 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
            && gh_string_p( prefix )))
         return SCM_UNDEFINED;
 
-    pzName  = SCM_CHARS( prog_name );
-    pzPfx   = SCM_CHARS( prefix );
+    pzName  = gh_scm2newstr( prog_name, NULL );
+    pzPfx   = gh_scm2newstr( prefix, NULL );
 
     pzRes = asprintf( zGpl, pzName, pzPfx );
 
@@ -326,6 +329,8 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
+    free( (void*)pzName );
+    free( (void*)pzPfx );
     return res;
 }
 
@@ -360,9 +365,9 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
            && gh_string_p( prefix )))
         return SCM_UNDEFINED;
 
-    pzName  = SCM_CHARS( prog_name );
-    pzPfx   = SCM_CHARS( prefix );
-    pzOwner = SCM_CHARS( owner );
+    pzName  = gh_scm2newstr( prog_name, NULL );
+    pzPfx   = gh_scm2newstr( prefix, NULL );
+    pzOwner = gh_scm2newstr( owner, NULL );
 
     pzRes = asprintf( zLgpl, pzName, pzPfx, pzOwner );
 
@@ -373,6 +378,9 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
+    free( (void*)pzName );
+    free( (void*)pzPfx );
+    free( (void*)pzOwner );
     return res;
 }
 
@@ -407,9 +415,9 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
            && gh_string_p( prefix )))
         return SCM_UNDEFINED;
 
-    pzName  = SCM_CHARS( prog_name );
-    pzPfx   = SCM_CHARS( prefix );
-    pzOwner = SCM_CHARS( owner );
+    pzName  = gh_scm2newstr( prog_name, NULL );
+    pzPfx   = gh_scm2newstr( prefix, NULL );
+    pzOwner = gh_scm2newstr( owner, NULL );
 
     pzRes = asprintf( zBsd, pzName, pzPfx, pzOwner );
 
@@ -420,6 +428,9 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
+    free( (void*)pzName );
+    free( (void*)pzPfx );
+    free( (void*)pzOwner );
     return res;
 }
 
@@ -456,21 +467,21 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         return SCM_UNDEFINED;
 
     {
-        char* pzLicense = SCM_CHARS( license );
+        char* pzLicense = gh_scm2newstr( license, NULL );
 
         /*
          *  Set the current file name.
          *  If it changes, then unmap the old data
          */
         if (mi.pzFileName == NULL)
-            AGDUPSTR( mi.pzFileName, pzLicense );
+            mi.pzFileName = pzLicense;
 
         else if (strcmp( mi.pzFileName, pzLicense ) != 0) {
             munmap( mi.pData, mi.size );
             close( mi.fd );
             mi.pData = NULL;
-            AGFREE( (void*)mi.pzFileName );
-            AGDUPSTR( mi.pzFileName, pzLicense );
+            free( (void*)mi.pzFileName;
+            mi.pzFileName = pzLicense;
         }
     }
 
@@ -492,8 +503,8 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  Reformat the string with the given arguments
      */
     {
-        char*  pzName   = SCM_CHARS( prog_name );
-        char*  pzOwner  = SCM_CHARS( owner );
+        char*  pzName   = gh_scm2newstr( prog_name, NULL );
+        char*  pzOwner  = gh_scm2newstr( owner, NULL );
 
         pzRes = asprintf( (char*)mi.pData, pzName, pzOwner );
 
@@ -501,13 +512,15 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
             fprintf( stderr, zAllocErr, pzProg, -1, "license string" );
             LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
         }
+        free( (void*)pzName );
+        free( (void*)pzOwner );
     }
 
     {
-        char*   pzPfx    = SCM_CHARS( prefix );
+        int     pfx_size;
+        char*   pzPfx    = gh_scm2newstr( prefix, &pfx_size );
         char*   pzScan   = pzRes;
         char*   pzOut;
-        size_t  pfx_size = strlen( pzPfx );
         size_t  out_size = pfx_size + 1;
 
         /*
@@ -538,6 +551,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         for (;;) {
             switch (*(pzOut++) = *(pzScan++)) {
             case NUL:
+                free( (void*)pzPfx );
                 goto exit_copy;
 
             case '\n':

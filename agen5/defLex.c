@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.14 2000/05/15 20:00:31 bkorb Exp $
+ *  $Id: defLex.c,v 1.15 2000/09/27 20:38:54 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -458,12 +458,16 @@ alist_to_autogen_def( void )
     /*
      *  Now, push the resulting string onto the input stack.
      */
-    pzText = SCM_CHARS( res );
-    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + strlen( pzText ));
-    if (pCtx == (tScanCtx*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 sizeof( tScanCtx ), "scheme expression" );
-        AG_ABEND;
+    {
+        int  len;
+        pzText = gh_scm2newstr( res, &len );
+
+        pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + len );
+        if (pCtx == (tScanCtx*)NULL) {
+            fprintf( stderr, zAllocErr, pzProg,
+                     sizeof( tScanCtx ) + 4 + len, "scheme expression" );
+            AG_ABEND;
+        }
     }
 
     /*
@@ -480,6 +484,8 @@ alist_to_autogen_def( void )
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
     strcpy( pCtx->pzScan, pzText );
+    free( (void*)pzText );  /* use free() directly here */
+
     /*
      *  At this point, the next token will be obtained
      *  from the newly allocated context structure.

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.12 2000/09/27 01:05:08 bkorb Exp $
+ *  $Id: expGuile.c,v 1.13 2000/09/27 20:38:54 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -125,10 +125,11 @@ ag_scm_max( SCM list )
 
         case GH_TYPE_STRING:
         {
-            char* pz = SCM_CHARS( car );
-            if (! isdigit( *pz ))
-                continue;
-            val = strtol( pz, (char**)NULL, 0 );
+            char* pz = gh_scm2newstr( car, NULL );
+            if (isdigit( *pz ))
+                 val = strtol( pz, (char**)NULL, 0 );
+            else val = 0;
+            free( (void*)pz );
             break;
         }
 
@@ -190,10 +191,11 @@ ag_scm_min( SCM list )
 
         case GH_TYPE_STRING:
         {
-            char* pz = SCM_CHARS( car );
-            if (! isdigit( *pz ))
-                continue;
-            val = strtol( pz, (char**)NULL, 0 );
+            char* pz = gh_scm2newstr( car, NULL );
+            if (isdigit( *pz ))
+                 val = strtol( pz, (char**)NULL, 0 );
+            else val = LONG_MAX;
+            free( (void*)pz );
             break;
         }
 
@@ -242,7 +244,11 @@ ag_scm_sum( SCM list )
             break;
 
         case GH_TYPE_STRING:
-            sum += strtol( SCM_CHARS( car ), (char**)NULL, 0 );
+        {
+            char* pz = gh_scm2newstr( car, NULL );
+            sum += strtol( pz, (char**)NULL, 0 );
+            free( (void*)pz );
+        }
         }
     } while (--len > 0);
 
@@ -263,10 +269,18 @@ ag_scm_sum( SCM list )
     SCM
 ag_scm_string_upcase( SCM str )
 {
+    int   len;
+    char* pz;
+    SCM   res;
+
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    return scm_string_upcase_x( gh_str02scm( SCM_CHARS( str )));
+    pz = gh_scm2newstr( str, &len );
+    res = gh_str2scm( pz, len );
+    free( (void*)pz );
+    scm_string_upcase_x( res );
+    return res;
 }
 
 
@@ -284,10 +298,18 @@ ag_scm_string_upcase( SCM str )
     SCM
 ag_scm_string_capitalize( SCM str )
 {
+    int   len;
+    char* pz;
+    SCM   res;
+
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    return scm_string_capitalize_x( gh_str02scm( SCM_CHARS( str )));
+    pz = gh_scm2newstr( str, &len );
+    res = gh_str2scm( pz, len );
+    free( (void*)pz );
+    scm_string_capitalize_x( res );
+    return res;
 }
 
 
@@ -304,9 +326,17 @@ ag_scm_string_capitalize( SCM str )
     SCM
 ag_scm_string_downcase( SCM str )
 {
+    int   len;
+    char* pz;
+    SCM   res;
+
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    return scm_string_downcase_x( gh_str02scm( SCM_CHARS( str )));
+    pz = gh_scm2newstr( str, &len );
+    res = gh_str2scm( pz, len );
+    free( (void*)pz );
+    scm_string_downcase_x( res );
+    return res;
 }
 /* end of expGuile.c */

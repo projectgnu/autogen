@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.20 2000/08/13 21:20:24 bkorb Exp $
+ *  $Id: expString.c,v 1.21 2000/09/27 20:38:54 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -212,25 +212,32 @@ makeString( tCC*    pzText,
 ag_scm_in_p( SCM obj, SCM list )
 {
     int   len;
-    SCM   car;
-    char* pz;
+    SCM   car, res;
+    char* pz1;
 
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
     len = scm_ilength( list );
-    pz  = SCM_CHARS( obj );
+    pz1 = gh_scm2newstr( obj, NULL );
+    res = SCM_BOOL_F;
 
     while (--len >= 0) {
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
         if (gh_string_p( car )) {
-            if (strcmp( pz, SCM_CHARS( car )) == 0)
-                return SCM_BOOL_T;
+            char* pz2 = gh_scm2newstr( car, NULL );
+            if (strcmp( pz1, pz2 ) == 0) {
+                res = SCM_BOOL_T;
+                free( (void*)pz2 );
+                break;
+            }
+            free( (void*)pz2 );
         }
     }
 
-    return SCM_BOOL_F;
+    free( (void*)pz1 );
+    return res;
 }
 
 
@@ -262,8 +269,8 @@ ag_scm_join( SCM sep, SCM list )
         return SCM_UNDEFINED;
 
     sv_l_len = l_len = scm_ilength( list );
-    pzSep   = SCM_CHARS( sep );
-    sep_len = strlen( pzSep );
+    pzSep   = SCM_ROCHARS( sep );
+    sep_len = SCM_LENGTH( sep );
     str_len = 1;
 
     /*
@@ -286,7 +293,7 @@ ag_scm_join( SCM sep, SCM list )
                 continue;
         }
 
-        str_len += strlen( SCM_CHARS( car )) + sep_len;
+        str_len += SCM_LENGTH( car ) + sep_len;
     }
 
     l_len = sv_l_len;
@@ -297,6 +304,8 @@ ag_scm_join( SCM sep, SCM list )
      *  Now, copy each one into the output
      */
     for (;;) {
+        int cpy_len;
+
         car   = SCM_CAR( alist );
         alist = SCM_CDR( alist );
 
@@ -310,18 +319,20 @@ ag_scm_join( SCM sep, SCM list )
                 continue;
         }
 
-        strcpy( pzRes, SCM_CHARS( car ));
-        pzRes += strlen( pzRes );
+        cpy_len = SCM_LENGTH( car );
+        memcpy( (void*)pzRes, SCM_ROCHARS( scm ), cpy_len );
+        pzRes += cpy_len;
 
         /*
          *  IF we reach zero, then do not insert a separation and bail out
          */
         if (--l_len <= 0)
             break;
-        strcpy( pzRes, pzSep );
+        memcpy( (void*)pzRes, (void*)pzSep, sep_len );
         pzRes += sep_len;
     }
 
+    *pzRes = NUL;
     return res;
 }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.10 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: expPrint.c,v 1.11 2000/09/27 20:38:54 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -144,7 +144,7 @@ run_printf( char* pzFmt, int len, SCM alist )
 
         case GH_TYPE_SYMBOL:
         case GH_TYPE_STRING:
-            *(argp++) = (void*)SCM_CHARS( car );
+            *(argp++) = (void*)gh_scm2newstr( car, NULL );
             break;
 
         case GH_TYPE_PROCEDURE:
@@ -178,15 +178,20 @@ run_printf( char* pzFmt, int len, SCM alist )
     SCM
 ag_scm_sprintf( SCM fmt, SCM alist )
 {
-    int len = scm_ilength( alist );
+    int   list_len = scm_ilength( alist );
+    char* pzFmt;
+    SCM   res;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
 
-    if (len <= 0)
+    if (list_len <= 0)
         return fmt;
 
-    return run_printf( SCM_CHARS( fmt ), len, alist );
+    pzFmt = gh_scm2newstr( fmt, NULL );
+    res   = run_printf( pzFmt, list_len, alist );
+    free( (void*)pzFmt );
+    return res;
 }
 
 
@@ -204,16 +209,19 @@ ag_scm_sprintf( SCM fmt, SCM alist )
     SCM
 ag_scm_printf( SCM fmt, SCM alist )
 {
-    SCM res;
-    int len = scm_ilength( alist );
+    SCM   res;
+    int   list_len = scm_ilength( alist );
+    char* pzFmt;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
 
-    if (len <= 0)
+    if (list_len <= 0)
         return fmt;
 
-    res = run_printf( SCM_CHARS( fmt ), len, alist );
+    pzFmt = gh_scm2newstr( fmt, NULL );
+    res   = run_printf( pzFmt, list_len, alist );
+    free( (void*)pzFmt );
 
     gh_display( res );
     return SCM_UNDEFINED;
@@ -235,8 +243,9 @@ ag_scm_printf( SCM fmt, SCM alist )
     SCM
 ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 {
-    SCM res;
-    int len = scm_ilength( alist );
+    SCM   res;
+    int   list_len = scm_ilength( alist );
+    char* pzFmt;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
@@ -244,7 +253,9 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
     if (len <= 0)
         return fmt;
 
-    res = run_printf( SCM_CHARS( fmt ), len, alist );
+    pzFmt = gh_scm2newstr( fmt, NULL );
+    res   = run_printf( pzFmt, list_len, alist );
+    free( (void*)pzFmt );
 
     return  scm_display( res, port );
 }
