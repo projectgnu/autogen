@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: expFormat.c,v 1.2 1999/10/31 00:27:01 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -104,7 +104,8 @@ tSCC zFmtAlloc[] = "asprintf allocation";
 
 /*=gfunc dne
  *
- *doc:  Generate a "Do Not Edit" warning string.
+ * exparg: prefix, string for starting each output line
+ * doc:  Generate a "Do Not Edit" warning string.
  *      The argument is a per-line string prefix.
 =*/
     SCM
@@ -141,7 +142,8 @@ ag_scm_dne( SCM prefix )
 
 /*=gfunc error
  *
- *doc:
+ * exparg: @message@message to display before exiting@@
+ * doc:
  *
  *  The argument is a string that printed out as part of an error
  *  message.  The message is formed from the formatting string:
@@ -216,11 +218,12 @@ ag_scm_error( SCM res )
 
 /*=gfunc gpl
  *
- *arg: prog_name
- *arg: prefix
- *req: 2
+ * exparg: prog_name, name of the program under the GPL
+ * exparg: prefix, String for starting each output line
  *
- *doc:
+ * req: 2
+ *
+ * doc:
  *
  *  Emit a string that contains the GNU Public License.  It
  *  takes two arguments: @code{prefix} contains the string to start
@@ -259,12 +262,12 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
 
 /*=gfunc lgpl
  *
- *arg: prog_name
- *arg: owner
- *arg: prefix
- *req: 3
+ * exparg: prog_name, name of the program under the LGPL
+ * exparg: owner, Grantor of the LGPL
+ * exparg: prefix, String for starting each output line
+ * req: 3
  *
- *doc:
+ * doc:
  *
  *  Emit a string that contains the GNU Library Public License.  It
  *  takes three arguments: @code{prefix} contains the string to start
