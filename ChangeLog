@@ -1,3 +1,18 @@
+2004-02-12  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/text_mmap.c: new - maps text files, always ensuring that
+	at least one NUL byte is after the last text byte.
+	* autoopts/Makefile.am: Add to sources
+	* autoopts/autoopts.h(tmap_info_t): and add to data structures
+	* autoopts/configfile.c(internalFileLoad): new function for new job
+	* autoopts/load.c(filePreset): move to "configfile.c"
+	(doLoadOpt): ditto
+	* autoopts/optlib.tpl(min): if there is no "min", but there is a
+	"must-set", then set optMinCt to 1 anyway.
+	* autoopts/test/main.test(main.DEF): accommodate file systems with
+	case-insensitive naming -- use "def2" instead of ".DEF".
+	* fiddle with configury some more.
+
 2004-02-05  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl(main): doc the new forms of "main" procedures

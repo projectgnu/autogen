@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-10 18:41:01 bkorb"
+## Time-stamp:      "2005-02-12 17:51:42 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2005/02/13 01:47:59 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2005/02/13 01:58:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,7 +25,7 @@ GENMAN      = $(PATHFIND_MAN) \
     configFileLoad.3  optionFree.3      optionLoadLine.3  optionProcess.3 \
     optionRestore.3   optionSaveFile.3  optionSaveState.3 optionVersion.3 \
     strequate.3       streqvcmp.3       streqvmap.3       string_tokenize.3 \
-    strneqvcmp.3      strtransform.3    text_mmap.3       text_munmap.3
+    strneqvcmp.3      strtransform.3
 MAN_STAMP   = man3-stamp
 
 GENTEXI     = libopts.texi libopts.menu
