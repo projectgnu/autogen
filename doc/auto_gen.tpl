@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.8 1998/07/14 21:05:13 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.9 1998/07/14 21:27:51 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -81,6 +81,10 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 
 @end ifinfo
 
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
+
 @node Introduction
 @chapter Introduction
 @cindex Introduction
@@ -115,10 +119,14 @@ with the proper templates and this program.
 In fact, I have already done so and @code{autogen} already
 uses the AutoOpt facility.
 
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
+
 @node Generalities
 @chapter General ideas
-
 @cindex m4
+
 The goal is to try to simplify the process of maintaining
 repetitive program text.  If there is a single block of text
 that needs repetitive substitutions, @code{#define}
@@ -163,6 +171,10 @@ and it contains text macro and group macro definitions.
 
 Conventionally, it uses the file name suffix @code{def}.
 @end table
+
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
 
 @node Example Usage
 @chapter A Simple Example
@@ -239,6 +251,10 @@ list = @{ list_element = omega;
 @noindent
 Furthermore, if we ever need a name/enumeration mapping again,
 we can always write a new set of definitions for the old template.
+
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
 
 @node Definitions File
 @chapter Macro Definitions File
@@ -555,6 +571,10 @@ Extracted fromt the agParse.y source file:
   _shell=]
 @end example
 
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
+
 @node Template File
 @chapter Output Template
 @cindex template file
@@ -735,6 +755,10 @@ _FOR agfunc_func =][=
   _ENDIF "unnamed does not exist" =][=
 /agfunc_func=]
 
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
+
 @node Invocation
 @chapter Running the program
 @cindex invocation
@@ -746,6 +770,10 @@ as shown in this AutoOpt generated usage text:
 [=_eval "#../src/autogen --help 2>&1 |
         sed -e 's/{/@{/' -e 's/}/@}/' -e 's/\t/        /g'"  _shell=]
 @end example
+
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
 
 @node Installation
 @chapter What Gets Installed Where
@@ -796,6 +824,57 @@ make install
 
 However, you may wish to insert @code{make}
 and @code{make check} before the second command.
+
+If you do do a @code{make check} and there are any failures,
+you will find the results in @code{tests/FAILURES}.  Needless to say,
+I would be interested in seeing the contents of those files and
+any associated messages.  If you choose to go on and analyze
+one of these failures, you will have to invoke the test script
+by hand.  Automake does not provide an easy way to do this
+and there are some things you have to do to make it work.
+
+Here is the code from the make file that runs each test:
+@example
+TESTS_ENVIRONMENT = testsubdir=$(testsubdir) \
+        top_srcdir=$(top_srcdir) CC=$(CC)
+
+srcdir=$(srcdir); export srcdir; \
+for tst in $(TESTS); do \
+  if test -f $$tst; then dir=.; \
+  else dir="$(srcdir)"; fi; \
+  if $(TESTS_ENVIRONMENT) $$dir/$$tst; then \
+    all=`expr $$all + 1`; \
+    echo "PASS: $$tst"; \
+  elif test $$? -ne 77; then \
+    all=`expr $$all + 1`; \
+    failed=`expr $$failed + 1`; \
+    echo "FAIL: $$tst"; \
+  fi; \
+done
+@end example
+
+Notes:
+@itemize @bullet
+@item
+@samp{testsubdir} is a configured value that defaults to @samp{testdir}.
+@item
+@samp{srcdir} is a configured value that defaults to @samp{.}.
+@item
+@samp{top_srcdir} needs to be set correctly.
+@item
+@samp{CC} needs to refer to an ANSI-compliant compiler.
+@end itemize
+
+So, you must invoke the @samp{test-name.test} file thus,
+replacing @code{.} and @code{..} as needed:
+
+@example
+testsubdir=testdir top_srcdir=.. srcdir=. ./test-name.test
+@end example
+
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
 
 @node Autoopts
 @chapter Automated Option Processing
@@ -1053,6 +1132,10 @@ that will generate the option processing loop, but call
 @code{getopts(3)} to parse the options.  It will @strong{only}
 support option processing and the brief form of usage text.
 @end ifinfo
+
+@ignore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+@end ignore
 
 @node Future
 @chapter Some ideas for the future.
