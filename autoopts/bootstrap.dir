@@ -33,10 +33,11 @@ case "$1" in
       save.c stack.c streqvcmp.c usage.c version.c
     chmod u+w funcs.def
     eval "`egrep '^AO_' ../VERSION`"
-    echo vers-info = "'${AO_CURRENT}:${AO_REVISION}:${AO_AGE}';" >> funcs.def
-    echo vers-numb = "'`expr '(' $AO_CURRENT   '*' 4096 ')' \
-                      + '(' $AO_REVISION  '*'  128 ')' \
-                      + $AO_AGE`';" >> funcs.def
+    cat >> funcs.def <<-	_END_VERS_INFO_
+		vers-info = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
+		vers-curr = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
+		vers-min  = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
+		_END_VERS_INFO_
     ${AUTOGEN} funcs.def
     ${AUTOGEN} -Tagman3.tpl funcs.def
     f=`echo option*.3`

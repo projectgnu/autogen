@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.12 2002/07/09 02:32:25 bkorb Exp $
+ *  $Id: autoopts.c,v 3.13 2002/07/11 00:48:07 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -773,9 +773,9 @@ doImmediateOpts( pOpts )
      *     either too large (?!) or too small,
      *  THEN emit error message and fail-exit
      */
-    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION )
-       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-          || (pOpts->structVersion < MIN_OPTION_VERSION     )
+    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION  )
+       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
+          || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
 
         tSCC zErr[] =

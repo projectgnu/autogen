@@ -3,6 +3,10 @@
 	* autoopts/optmain.tpl(main): allow clients to specify the contents
 	of the main procedure.
 	* doc/autogen.texi(main-text): doc it
+	* autoopts/options_h.tpl(OPTIONS_MINIMUM_VERSION): derive from VERSION
+	* autoopts/autoopts.c(optionProcess): use the new value
+	* autoopts/autoopts.h(MIN_OPTION_VERSION): remove #define
+	* autoopts/bootstrap.dir(funcs.def): create a definition for this.
 
 2002-07-08  Bruce Korb  <bkorb@gnu.org>
 

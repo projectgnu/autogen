@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 3.3 2002/06/15 16:27:27 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.4 2002/07/11 00:48:07 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -53,13 +53,6 @@
 #define AUTOGEN_AUTOOPTS_H
 
 #include "options.h"
-
-/*
- *  Define the minimum acceptable acceptable version for AutoOpts.
- *  Bump this number *ONLY* if in incompatible change is made to
- *  the interface.
- */
-#define MIN_OPTION_VERSION  ((AO_CURRENT - AO_AGE) * 4096)
 
 /*
  *  Convert the number to a list usable in a printf call

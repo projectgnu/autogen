@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.8 2002/07/09 02:32:25 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.9 2002/07/11 00:48:07 bkorb Exp $
 
 =][=
 
@@ -201,14 +201,11 @@ struct specOptIndex {
     tUC               number_option;
     tUC               default_opt;
 };
-
-/*
- *  Be sure to change this value every time a change is made that
- *  changes the interface structure or the meanings of any of its
- *  fields.  This way, the "optionProcess()" routine may exit with an
- *  informative message instead of, for example, seg faulting.
- */
-#define  OPTIONS_STRUCT_VERSION  [=  vers-numb =]
+[=# /*
+     *  These "vers" values are manipulated by the contents of ../VERSION
+     */ =]
+#define  OPTIONS_STRUCT_VERSION  [=  vers-curr =]
+#define  OPTIONS_MINIMUM_VERSION [=  vers-min  =]
 #define  OPTIONS_VERSION_STRING  "[= vers-info =]"
 
 struct options {
