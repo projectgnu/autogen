@@ -8,7 +8,7 @@
  * Last Modified:     Fri Jul 30 12:34:46 1999
  *            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>
  *
- * $Id: compat.h,v 2.5 1999/07/30 14:48:46 bkorb Exp $
+ * $Id: compat.h,v 2.6 2000/03/05 18:41:59 bruce Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -25,6 +25,17 @@
 #  define STATIC
 #else
 #  define STATIC static
+#endif
+
+#ifndef PARAMS
+#  if __STDC__
+#    ifndef NOPROTOS
+#      define PARAMS(args)      args
+#    endif
+#  endif
+#  ifndef PARAMS
+#    define PARAMS(args)        ()
+#  endif
 #endif
 
 #include <config.h>
@@ -163,7 +174,7 @@
 #endif
 
 #ifndef HAVE_PATHFIND
-  EXTERN char *pathfind (/* const char *, const char *, const char * */);
+  EXTERN char *pathfind PARAMS((const char *, const char *, const char *));
 #endif
 
 # if defined (HAVE_DIRENT_H)
