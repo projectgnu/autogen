@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.4 2005/01/23 23:33:06 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 4.5 2005/02/04 03:57:11 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -249,7 +249,7 @@ printProgramDetails( tOptions* pOptions )
     ag_bool  initIntro = AG_TRUE;
 
     /*
-     *  Display all the places we look for RC files
+     *  Display all the places we look for config files
      */
     printInitList( pOptions->papzHomeList, &initIntro,
                    pOptions->pzRcName, pOptions->pzProgPath );

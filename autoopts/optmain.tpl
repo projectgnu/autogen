@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.5 2005/01/23 23:33:06 bkorb Exp $
+# $Id: optmain.tpl,v 4.6 2005/02/04 03:57:11 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -31,7 +31,7 @@ inner_main( int argc, char** argv )
         char** new_argv = (char**)malloc( (argc - ct + 2)*sizeof(char*) );
 
         if (new_argv == NULL) {
-            fputs( "[=(. pname)=] cannot allocate new argv\n", stderr );
+            fputs( _("[=(. pname)=] cannot allocate new argv\n"), stderr );
             exit( EXIT_FAILURE );
         }
 
@@ -143,107 +143,6 @@ ENDDEF  build-test-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-   BUILD EACH-OR-STDIN MAIN
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
-
-DEFINE each-or-stdin-main       =][=
-
-(if (not (==* (get "argument") "[" ))
-  (error "command line arguments must be optional for a 'each-or-stdin' main"))
-
-(if (not (exist? "handler-proc"))
-  (error "'each-or-stdin' mains require a handler proc") )
-
-=][=
-(tpl-file-line extract-fmt)
-=]
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <unistd.h>
-[=
-
-IF (set! tmp-text (string-append (get "handler-proc") "-code"))
-   (exist? tmp-text) =]
-
-static int
-[= handler-proc =]( FILE* in_fp, const char* pz_file )
-{
-    int res = 0;[=
-   (string-append
-      (def-file-line tmp-text extract-fmt)
-      (get tmp-text) ) =]
-    return res;
-}[=
-
-  ELSE
-
-=]
-
-extern int [= handler-proc =]( FILE*, const char* pz_file );[=
-
-  ENDIF
-=][=
-(tpl-file-line extract-fmt)
-=]
-
-int
-main( int argc, char** argv )
-{
-    int res = 0;
-    {
-        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
-        argc -= ct;
-        argv += ct;
-    }[=
-
-    (def-file-line "main-init" extract-fmt) =][=
-    main-init =][=
-    (tpl-file-line extract-fmt)
-
-=]
-    /*
-     *  Input list from command line
-     */
-    if (argc > 0) {
-        do  {
-            const char* pzF = *(argv++);
-            FILE* fp = fopen( pzF, "r" );
-            if (fp == NULL) {
-                fprintf( stderr, "[= prog-name
-             =] fs ERROR:  %d (%s) opening %s\n",
-                         errno, strerror( errno ), pzF );
-                return EXIT_FAILURE;
-            }
-            res |= [= handler-proc =]( fp, pzF );
-            fclose( fp );
-        } while (--argc > 0);
-    }
-
-    /*
-     *  Input file must not be a tty.
-     */
-    else if (isatty( STDIN_FILENO )) {
-        fputs( "[= prog-name =] ERROR: input list is a tty\n", stderr );
-        [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
-        /* NOTREACHED */
-    }
-
-    /*
-     *  Input list from a pipe or file or some such
-     */
-    else {
-        res = [= handler-proc =]( stdin, "stdin" );
-    }
-
-    return res;
-}[=
-
-ENDDEF each-or-stdin-main
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
    BUILD FOR-EACH MAIN
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
@@ -257,6 +156,7 @@ DEFINE for-each-main            =][=
       (error "'for-each' mains require a handler proc") )
 
 =][=
+(define handler-arg-type "")
 (tpl-file-line extract-fmt)
 =]
 #include <stdio.h>
@@ -274,18 +174,31 @@ trim_input_line( char* pz_s )
 
     switch (*pz_s) {
     case '\0':
-    case '#':
+    case '[= ?% comment-char "%s" "#" =]':
         return NULL;
     default:
         return pz_s;
     }
 }[=
 
+CASE handler-type =][=
+=*  name         =][= (set! handler-arg-type "const char* pz_fname")
+                      (define handler-proc "validate_fname")       =][=
+=*  file         =][= (set! handler-arg-type "FILE* entry_fp")
+                      (define handler-proc "validate_fname")       =][=
+*=* text         =][=
+   (set! handler-arg-type "char* pz_file_text, size_t text_size")
+                      (define handler-proc "validate_fname")       =][=
+!E               =][= (set! handler-arg-type "const char* pz_entry")
+                      (define handler-proc (get "handler-proc"))       =][=
+*                =][= (error) =][=
+ESAC             =][=
+
 IF (set! tmp-text (string-append (get "handler-proc") "-code"))
    (exist? tmp-text) =]
 
 static int
-[= handler-proc =]( const char* pz_entry )
+[= handler-proc =]( [=(. handler-arg-type)=] )
 {
     int res = 0;[=
    (string-append
@@ -294,13 +207,150 @@ static int
     return res;
 }[=
 
-  ELSE
+ELSE
 
 =]
 
-extern int [= handler-proc =]( const char* );[=
+extern int [= handler-proc =]( [=(. handler-arg-type)=] );[=
+
+ENDIF
+
+=][=
+(tpl-file-line extract-fmt)
+=][=
+
+IF (exist? "handler-type")  =]
+
+static int
+validate_fname( const char* pz_fname )
+{
+    const char* pz_fs_err =
+        _("fs error %d (%s) %s-ing %s\n");[=
+
+  IF (*=* (get "handler-type") "text") =]
+    char*  file_text;
+    size_t text_size;
+    int    res;[=
+  ENDIF =]
+
+    {
+        struct stat sb;
+        if (stat( pz_fname, &sb ) < 0) {
+            fprintf( stderr, pz_fs_err, errno, strerror(errno), "stat",
+                     pz_fname );
+            return 1;
+        }[=
+
+  IF (*=* (get "handler-type") "text") =]
+
+        if (! S_ISREG(sb.st_mode)) {
+            fprintf( stderr, pz_fs_err, EINVAL, strerror(EINVAL),
+                     "not regular file:", pz_fname );
+            return 1;
+        }[=
+
+    IF (=* (get "handler-type") "some-text") =]
+
+        if (sb.st_size == 0) {
+            fprintf( stderr, pz_fs_err, EINVAL, strerror(EINVAL),
+                     "empty file:", pz_fname );
+            return 1;
+        }[=
+
+    ENDIF  =]
+
+        text_size = sb.st_size;[=
 
   ENDIF
+
+=]
+    }[=
+
+CASE handler-type =][=
+=*  name         =][=
+    (tpl-file-line extract-fmt)
+    =]
+
+    return [= handler-proc =](pz_fname);[=
+
+=*  file         =][=
+    (tpl-file-line extract-fmt)
+    =]
+    {
+        int res;
+        FILE* fp = fopen(pz_fname, "[=
+        (shellf "echo '%s' | sed 's/.*-//'"
+                (get "handler-type")) =]");
+        if (fp == NULL) {
+            fprintf( stderr, pz_fs_err, errno, strerror(errno), "fopen",
+                     pz_fname );
+            return 1;
+        }
+        res = [= handler-proc =](fp);
+        fclose(fp);
+        return res;
+    }[=
+
+*=*  text        =][=
+    (tpl-file-line extract-fmt)
+    =]
+    file_text = malloc( text_size + 1 );
+    if (pz_file_text == NULL) {
+        fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
+                text_size+1, pz_fname);
+        exit( EXIT_FAILURE );
+    }
+
+    {
+        char*   pz = file_text;
+        size_t  sz = text_size;
+        int     fd = open(pz_fname, O_RDONLY);
+        int     try_ct = 0;
+
+        if (fd < 0) {
+            fprintf( stderr, pz_fs_err, errno, strerror(errno), "open",
+                     pz_fname );
+            return 1;
+        }
+
+        while (sz > 0) {
+            ssize_t rd_ct = read( fd, pz, sz );
+            /*
+             *  a read count of zero is theoretically okay, but we've already
+             *  checked the file size, so we shoud be reading more.
+             *  For us, a count of zero is an error.
+             */
+            if (rd_ct <= 0) {
+                /*
+                 * Try retriable errors up to 10 times.  Then bomb out.
+                 */
+                if (  ((errno == EAGAIN) || (errno == EINTR))
+                   && (++try_ct < 10)  )
+                    continue;
+
+                fprintf( stderr, pz_fs_err, errno, strerror(errno), "read"
+                         pz_fname );
+                exit( EXIT_FAILURE );
+            }
+            pz += rd_ct;
+            sz -= rd_ct;
+        }
+        close(fd);
+    }
+
+    /*
+     *  Just in case it is a text file, we have an extra byte to NUL
+     *  terminate the thing.
+     */
+    file_text[ text_size ] = '\0';
+    res = [= handler-proc =](file_text, text_size);
+    free(file_text);
+    return res;[=
+ESAC             =]
+}[=
+
+ENDIF handler-type exists
+
 =][=
 (tpl-file-line extract-fmt)
 =]
@@ -325,7 +375,7 @@ main( int argc, char** argv )
      */
     if (argc > 0) {
         do  {
-            res |= [= handler-proc =]( *(argv++) );
+            res |= [= (. handler-proc) =]( *(argv++) );
         } while (--argc > 0);
     }
 
@@ -333,7 +383,7 @@ main( int argc, char** argv )
      *  Input list from tty input
      */
     else if (isatty( STDIN_FILENO )) {
-        fputs( "[=(. prog-name)=] ERROR: input list is a tty\n", stderr );
+        fputs( _("[=(. prog-name)=] ERROR: input list is a tty\n"), stderr );
         [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
         /* NOTREACHED */
     }
@@ -346,8 +396,8 @@ main( int argc, char** argv )
         int pg_size = getpagesize();
         char* buf   = malloc( pg_size );
         if (buf == NULL) {
-            fputs( "[=(. prog-name)
-                   =] ERROR: no memory for input list\n", stderr );
+            fputs( _("[=(. prog-name)
+                   =] ERROR: no memory for input list\n"), stderr );
             return EXIT_FAILURE;
         }
 
@@ -358,16 +408,22 @@ main( int argc, char** argv )
 
             pz = trim_input_line( pz );
             if (pz != NULL) {
-                 res |= [= handler-proc =]( pz );
+                 res |= [= (. handler-proc) =]( pz );
                  in_ct++;
             }
         }
 
         if (in_ct == 0)
-            fputs( "[=(. prog-name)
-                   =] Warning:  no input lines were read\n", stderr );
+            fputs( _("[=(. prog-name)
+                   =] Warning:  no input lines were read\n"), stderr );
         free( buf );
-    }
+    }[=
+
+    (def-file-line "main-fini" extract-fmt) =][=
+    main-fini =][=
+    (tpl-file-line extract-fmt)
+
+=]
 
     return res;
 }[=
@@ -403,10 +459,7 @@ DEFINE build-main               =][= FOR main[] =][=
 
   == for-each                   =][=
      INVOKE for-each-main       =][=
- 
-  == each-or-stdin              =][=
-     INVOKE each-or-stdin-main  =][=
- 
+
   *                             =][=
      (error (sprintf "unknown/invalid main-type: '%s'" (get "main-type"))) =][=
 
@@ -429,7 +482,6 @@ DEFINE declare-option-callbacks
  *  Declare option callback procedures
  */[=
   (define undef-proc-names "")
-
   (define extern-proc-list (string-append
 
     "doPagedUsage\n"
@@ -703,7 +755,7 @@ DEFINE range-option-code
     }
 
     option_usage_fp = stderr;
-    fprintf( stderr, "%s error:  %s option value ``%s''is out of range.\n",
+    fprintf( stderr, _("%s error:  %s option value ``%s''is out of range.\n"),
              pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->pzLastArg );
     pzIndent = "\t";
 
@@ -711,26 +763,27 @@ DEFINE range-option-code
 
 
   IF (> (count "arg-range") 1) =]
-    fprintf( option_usage_fp, "%sit must lie in one of the ranges:\n",
+    fprintf( option_usage_fp, _("%sit must lie in one of the ranges:\n"),
              pzIndent );
     for ( ix=0;; ) {
         if (rng[ix].rmax == INT_MIN)
-             fprintf( option_usage_fp, "%s%d exactly", pzIndent, rng[ix].rmin );
-        else fprintf( option_usage_fp, "%s%d to %d", pzIndent,
+             fprintf(option_usage_fp, _("%s%d exactly"), pzIndent,
+                     rng[ix].rmin);
+        else fprintf(option_usage_fp, _("%s%d to %d"), pzIndent,
                       rng[ix].rmin, rng[ix].rmax );
         if (++ix >= [=(count "arg-range")=])
             break;
-        fputs( ", or\n", option_usage_fp );
+        fputs( _(", or\n"), option_usage_fp );
     }
 
     fputc( '\n', option_usage_fp );[=
 
   ELIF (*==* (get "arg-range") "->")  =]
-    fprintf( option_usage_fp, "%sit must lie in the range: %d to %d\n",
+    fprintf( option_usage_fp, _("%sit must lie in the range: %d to %d\n"),
              pzIndent, rng[0].rmin, rng[0].rmax );[=
 
   ELSE  =]
-    fprintf( option_usage_fp, "%sit must be: %d exactly\n",
+    fprintf( option_usage_fp, _("%sit must be: %d exactly\n"),
              pzIndent, rng[0].rmin );[=
 
   ENDIF =]

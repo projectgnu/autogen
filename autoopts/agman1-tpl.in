@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-01-23 15:30:10 bkorb"
+## Time-stamp:      "2005-02-03 19:10:50 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.4 2005/02/04 03:57:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -389,7 +389,7 @@ IF (exist? "homerc") :+]
      ENDIF :+]save-opts "[=\fIrcfile\fP]"[+:
   ENDIF    :+]
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
-rc file listed in the \fBOPTION PRESETS\fP section, below.
+configuration file listed in the \fBOPTION PRESETS\fP section, below.
 .TP
 .BR [+:
 
@@ -446,7 +446,7 @@ by loading values from [+:
 .aj[+:
     IF (exist? "homerc") :+]
 The environmental presets take precedence (are processed later than)
-the RC files.[+:
+the configuration files.[+:
     ENDIF   :+][+:
   ELSE      :+].[+:
   ENDIF     :+][+:

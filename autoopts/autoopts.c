@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.5 2005/01/23 23:52:49 bkorb Exp $
+ *  $Id: autoopts.c,v 4.6 2005/02/04 03:57:11 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -666,11 +666,11 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
  *  DO PRESETS
  *
  *  The next several routines do the immediate action pass on the command
- *  line options, then the environment variables then the RC files in
+ *  line options, then the environment variables, then the config files in
  *  reverse order.  Once done with that, the order is reversed and all
- *  the RC files and environment variables are processed again, this time
- *  only processing the non-immediate action options.  doPresets() will
- *  then return for optionProcess() to do the final pass on the command
+ *  the config files and environment variables are processed again, this
+ *  time only processing the non-immediate action options.  doPresets()
+ *  will then return for optionProcess() to do the final pass on the command
  *  line arguments.
  */
 
@@ -749,7 +749,7 @@ doRegularOpts( tOptions* pOpts )
 
 
 /*
- *  doPresets - check for preset values from an rc file or the envrionment
+ *  doPresets - check for preset values from a config file or the envrionment
  */
 static tSuccess
 doPresets( tOptions* pOpts )
@@ -762,7 +762,7 @@ doPresets( tOptions* pOpts )
      */
     pOpts->fOptSet |= OPTPROC_PRESETTING;
     /*
-     *  IF there are no RC files,
+     *  IF there are no config files,
      *  THEN do any environment presets and leave.
      */
     if (  (pOpts->papzHomeList == NULL)

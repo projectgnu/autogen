@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2004-12-17 11:25:29 bkorb"
+# Time-stamp:        "2005-02-03 19:10:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: keyword.test,v 4.2 2005/02/04 03:57:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -76,8 +76,8 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- is a set membership option
    -X no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to an rc file
-   -< Str load-opts      Load options from an rc file
+   -> opt save-opts      Save the option state to a config file
+   -< Str load-opts      Load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -227,7 +227,7 @@ Extended usage information passed thru pager.
 .TP
 .BR \-> " [\fIrcfile\fP]," " \--save-opts" "[=\fIrcfile\fP]"
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
-rc file listed in the \fBOPTION PRESETS\fP section, below.
+configuration file listed in the \fBOPTION PRESETS\fP section, below.
 .TP
 .BR \-< " \fIrcfile\fP," " \--load-opts" "=\fIrcfile\fP," " --no-load-opts"
 Load options from \fIrcfile\fP.

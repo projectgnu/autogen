@@ -1,12 +1,22 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.5 2005/01/23 23:33:05 bkorb Exp $
+#$Id: optcode.tpl,v 4.6 2005/02/04 03:57:11 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
 =][=
 
 INCLUDE "optmain.tpl"                =][=
+
+IF (exist? "flag.handle-type")
+
+=]#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+[=
+
+ENDIF =][=
 
 IF (exist? "flag.arg-range")
 
@@ -21,6 +31,7 @@ IF (or (= "putBourneShell" (get "main.shell-process"))
 #define [= (set! make-test-main #t) main-guard =] 1[=
 ENDIF
 =]
+#define OPTION_CODE_COMPILE 1
 #include "[= (. header-file) =]"
 
 #ifdef  __cplusplus
@@ -109,10 +120,10 @@ IF (exist? "homerc")
 /*
  *  Save/Load_Opts option description:
  */
-tSCC zSave_OptsText[]     = "Save the option state to an rc file";
+tSCC zSave_OptsText[]     = "Save the option state to a config file";
 tSCC zSave_Opts_Name[]    = "save-opts";
 
-tSCC zLoad_OptsText[]     = "Load options from an rc file";
+tSCC zLoad_OptsText[]     = "Load options from a config file";
 tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
 
 tSCC zNotLoad_Opts_Name[] = "no-load-opts";

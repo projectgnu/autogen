@@ -2313,7 +2313,6 @@ The recognized values for @code{main-type} are:
 * main include::            include: code emitted from included template
 * main invoke::             invoke: code emitted from AutoGen macro
 * main for-each::           for-each: perform function on each argument
-* main each-or-stdin::      each-or-stdin: each argument or on stdin
 @end menu
 
 Here is an example of an @code{include} variation:
@@ -2466,27 +2465,86 @@ This produces a main procedure that invokes a procedure once for each
 operand on the command line (non-option arguments), @strong{OR} once
 for each non-blank, non-comment @code{stdin} input line.  Leading and
 trailing white space is trimmed from the input line and comment lines
-are lines that begin with a hash ('#') character.  (If anyone ever asks,
-I could make it specifiable, as the code to do this is emitted into
-the output and is not part of libopts.)
+are lines that begin with a hash ('#') character or a character specified
+with the @code{comment-char} attribute.
 
 @strong{NB}:
 The @code{argument} program attribute (@pxref{program attributes})
-must either begin with the @code{[} character, or be omitted and
-default to "@code{[ <file> [...]]}".
+must begin with the @code{[} character, to indicate that there are
+command operands, but that they are optional.
 
-The name of the procedure must be specified with the
-@code{handler-proc} attribute.  That procedure is presumed to be
-external, but if you provide the code for it, then the procedure is
-emitted as a static procedure in the generated code.  The profile of
-the procedure must be:
+There are a number of attributes to @code{main} that may be used:
+
+@table @code
+@item  handler-proc
+This attribute is required.  It is used to name the procedure to call.
+That procedure is presumed to be external, but if you provide the code
+for it, then the procedure is emitted as a static procedure in the
+generated code.  This procedure should return 0 on success, a cumulative
+error code on warning and exit without returning on an unrecoverable error.
+As the cumulative warning codes are @i{or}-ed together, the codes should be
+some sort of bit mask in order to be ultimately decipherable (if you
+need to do that).
+
+@item handler-type
+If you do not supply this attribute, your handler procedure must be
+the default type.  The profile of the procedure must be:
 
 @example
-int @i{my_handler}( const char *pz_operand );
+int @i{my_handler}( const char *pz_entry );
 @end example
 
-If you provide the code, then your @code{main()} procedure specification
-will look something like this:
+@noindent
+However, if you do supply this attribute, you may select any of three
+alternate flavors:
+
+@table @samp
+@item name-of-file
+This is essentially the same as the default handler type, except that before
+your procedure is invoked, the generated code has verified that the string
+names an existing file.  The profile is unchanged.
+
+@item file-X
+Before calling your procedure, the file is f-opened according to the ``X'',
+where ``X'' may be any of the legal modes for @code{fopen(3C)}.  In this case,
+the profile for your procedure must be:
+
+@example
+int @i{my_handler}( FILE* entry_fp );
+@end example
+
+@item  text-of-file
+@itemx some-text-of-file
+Before calling your procedure, the contents of the file are read into memory.
+(Excessively large files may cause problems.)  The ``@samp{some-text-of-file}''
+disallows empty files.  Both require regular files.  In this case, the profile
+for your procedure must be:
+
+@example
+int @i{my_handler}( char* file_text, size_t text_size );
+@end example
+
+@noindent
+Note that though the @code{file_text} is not @code{const}, any changes made to
+it are not written back to the original file.  It is merely a memory image of
+the file contents.  Also, the memory allocated to hold the text is
+@code{text_size + 1} bytes long and the final byte is always @code{NUL}.
+The file contents need not be text, as the data are read with the @code{read(2)}
+system call.
+@end table
+
+@item main-init
+This is code that gets inserted after the options have been processed, but
+before the handler procs get invoked.
+
+@item main-fini
+This is code that gets inserted after all the entries have been processed,
+just before returning from @code{main()}.
+
+@item @i{my_handler}-code
+With this attribute, you provide the code for your handler procedure
+in the option definition file.  In this case, your @code{main()}
+procedure specification might look something like this:
 
 @example
 main = @{
@@ -2499,7 +2557,8 @@ main = @{
 @end example
 
 @noindent
-and the emitted procedure will look like this:
+and instead of an emitted external reference, a procedure will be emitted
+that looks like this:
 
 @example
 static int
@@ -2510,6 +2569,7 @@ static int
     return res;
 @}
 @end example
+@end table
 
 Exit code reporting is cumulative.  If the called procedure needs
 to cause a fail-exit, it is expected to call @code{exit(3)} directly.
@@ -2530,38 +2590,6 @@ of the emitted code:
 You may also specify some main procedure start up code with the
 @code{main-init} attribute.  Any code specified by that attribute will
 be inserted immediately after the option processing call.
-
-@node main each-or-stdin
-@subsubsection each-or-stdin: each argument or on stdin
-
-This is very similar to the for-each main procedure (@pxref{main for-each}).
-The difference is that the callout procedure is passed a read-only
-@code{FILE*} pointer and a pointer to the file name:
-
-@example
-extern int @i{my_handler}( FILE* in_fp, const char* pz_file_name );
-@end example
-@noindent
-If there are no command line operands, then this function is invoked
-much like:
-
-@example
-res = @i{my_handler}( stdin, "stdin" );
-exit( res );
-@end example
-
-If there are command line operands, then each operand is processed as follows:
-@example
-const char* pzF = *(argv++);
-FILE* fp = fopen( pzF, "r" );
-if (fp == NULL) @{
-    fprintf( stderr, "prog-name fs ERROR:  %d (%s) opening %s\n",
-             errno, strerror( errno ), pzF );
-    return EXIT_FAILURE;
-@}
-res |= @i{my_handler}( fp, pzF );
-fclose( fp );
-@end example
 
 @node information attributes
 @subsection Program Information Attributes
@@ -2890,22 +2918,22 @@ appear in generated man pages or in the generated invoking texinfo doc.
 @subsubsection Immediate Action Attributes
 @cindex immediate action
 
-Certain options may need to be processed early.  For example, in order
-to suppress the processing of RC files, it is necessary to process the
-command line option @code{--no-load-opts} @strong{before} the RC files
-are processed.  To accommodate this, certain options may have their
-enabled or disabled forms marked for immediate processing.  The
-consequence of this is that they are processed ahead of all other
-options in the reverse of normal order.
+Certain options may need to be processed early.  For example, in order to
+suppress the processing of configuration files, it is necessary to process the
+command line option @code{--no-load-opts} @strong{before} the config files are
+processed.  To accommodate this, certain options may have their enabled or
+disabled forms marked for immediate processing.  The consequence of this is
+that they are processed ahead of all other options in the reverse of normal
+order.
 
-Normally, the first options processed are the options specified in the
-first @code{homerc} file, followed by then next @code{homerc} file
-through to the end of RC file processing.  Next, environment variables
-are processed and finally, the command line options.  The later
-options override settings processed earlier.  That actually gives them
-higher priority.  Command line immediate action options actually have
-the lowest priority of all.  They would be used only if they are to have
-an effect on the processing of subsequent options.
+Normally, the first options processed are the options specified in the first
+@code{homerc} file, followed by then next @code{homerc} file through to the
+end of config file processing.  Next, environment variables are processed and
+finally, the command line options.  The later options override settings
+processed earlier.  That actually gives them higher priority.  Command line
+immediate action options actually have the lowest priority of all.  They would
+be used only if they are to have an effect on the processing of subsequent
+options.
 
 @table @samp
 @cindex immediate
@@ -2921,7 +2949,7 @@ of the remaining options :-).
 Use this option attribute to specify that the disabled form of the
 option is to be processed immediately.  The @code{load-opts} option is
 so specified.  The @code{--no-load-opts} command line option will
-suppress the processing of RC files and environment variables.
+suppress the processing of config files and environment variables.
 Contrariwise, the @code{--load-opts} command line option is
 processed normally.  That means that the options specified in that file
 will be processed after all the @code{homerc} files and, in fact, after
@@ -3317,7 +3345,7 @@ used within another configuration file, causing them to nest.
 It is ultimately intended that specifying the option,
 @code{no-load-opts} will suppress the processing of configuration files and
 environment variables.  To do this, AutoOpts must first implement
-pre-scanning of the options, environment and rc files.
+pre-scanning of the options, environment and config files.
 @end table
 
 @node standard options
@@ -4163,8 +4191,9 @@ after that is a square close bracket (@code{]}), then the section is
 processed and the file closed.  Otherwise, the section is ignored and a
 matching section is searched for.
 
-For example, if the @code{fumble-stumble} options had a sectioned RC file,
-then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
+For example, if the @code{fumble-stumble} options had a sectioned
+configuration file, then a line containing exactly @code{[FUMBLE_STUMBLE]}
+would be searched for.
 
 @node saving rcfile
 @subsection Saving the presets into a configuration file
@@ -4187,12 +4216,13 @@ then you may invoke @file{autogen} thus:
 autogen -Trc-sample <your-option-def-file>
 @end example
 
-This will, by default, produce a sample file named, @file{sample-<prog-name>rc}.
-It will be named differently if you specify your rc file name with the
-@code{rcfile} attribute.  In that case, the output file will be named,
-@file{sample-<rcfile-name>}.  It will contain all of the program options
-not marked as @code{no-preset}.  It will also include information about
-how they are handled and the text from the @code{doc} attribute.
+This will, by default, produce a sample file named,
+@file{sample-<prog-name>rc}.  It will be named differently if you specify your
+configuration (rc) file name with the @code{rcfile} attribute.  In that case,
+the output file will be named, @file{sample-<rcfile-name>}.  It will contain
+all of the program options not marked as @code{no-preset}.  It will also
+include information about how they are handled and the text from the
+@code{doc} attribute.
 
 @node environrc
 @subsection environment variable presets

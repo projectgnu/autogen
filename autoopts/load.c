@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.5 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: load.c,v 4.6 2005/02/04 03:57:11 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -377,7 +377,7 @@ loadOptionLine(
 /*
  *  filePreset
  *
- *  Load a file containing presetting information (an RC file).
+ *  Load a file containing presetting information (a configuration file).
  */
 LOCAL void
 filePreset(

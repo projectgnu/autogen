@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.6 2005/01/24 20:27:42 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.7 2005/02/04 03:57:11 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -208,7 +208,7 @@ findFileName( tOptions* pOpts, int* p_free_name )
 
     /*
      *  IF what we found was a directory,
-     *  THEN tack on the RC file name
+     *  THEN tack on the config file name
      */
     if (S_ISDIR( stBuf.st_mode )) {
         size_t sz = strlen( pzDir ) + strlen( pOpts->pzRcName ) + 2;
