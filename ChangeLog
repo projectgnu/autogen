@@ -1,4 +1,4 @@
-2004-02-02  Bruce Korb  <bkorb@gnu.org>
+2004-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(serverSetup): do not rely on "getcwd" doing allocation
 	* agen5/expState.c(ag_scm_chdir): new wrapper for scm_chdir
