@@ -170,7 +170,7 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
      *  with a '+' flag setting read and write mode.
      */
     if (pFMC->mode & FLAG_BIT(append) == 0)
-        return -1;
+        goto no_space;
 
     if (pFMC->mode & FLAG_BIT(allocated) == 0) {
         /*
@@ -178,20 +178,18 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
          *  of our own.  The user is responsible for the earlier memory.
          */
         void* bf = malloc( ns );
-        if (bf == NULL) {
-            errno = ENOSPC;
-            return -1;
-        }
+        if (bf == NULL)
+            goto no_space;
+
         memcpy( bf, pFMC->buffer, pFMC->buf_size );
         pFMC->buffer = bf;
         pFMC->mode  |= FLAG_BIT(allocated);
     }
     else {
         void* bf = realloc( pFMC->buffer, ns );
-        if (bf == NULL) {
-            errno = ENOSPC;
-            return -1;
-        }
+        if (bf == NULL)
+            goto no_space;
+
         pFMC->buffer = bf;
     }
 
@@ -201,6 +199,10 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
     memset( pFMC->buffer + pFMC->buf_size, 0, ns - pFMC->buf_size );
     pFMC->buf_size = ns;
     return 0;
+
+ no_space:
+    errno = ENOSPC;
+    return -1;
 }
 
 static ssize_t
