@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.10 1999/11/06 03:25:41 bruce Exp $
+ *   $Id: opts.def,v 1.11 1999/11/16 05:22:21 bruce Exp $
  */
 
 /*
@@ -141,11 +141,11 @@ flag = {
 };
 
 flag = {
-    name      = "load_guile";
-    value     = g;
+    name      = "load_scheme";
+    value     = S;
     flag_arg  = ":";
     arg_name  = file;
-    descrip   = "Guile/Scheme code file to load";
+    descrip   = "Scheme code file to load";
     doc =
     "Use this argument to preload Scheme scripts into the Guile\n"
     "interpreter before template processing begins.\n"
@@ -155,10 +155,10 @@ flag = {
     "option processing is complete.\n";
 
     flag_code =
-'    char z[ 4096 ];
-    sprintf( z, "(load \"%s\")", pOptDesc->pzLastArg );
+'    char* pz = asprintf( "(load \"%s\")", pOptDesc->pzLastArg );
     procState = PROC_STATE_GUILE_PRELOAD;
     gh_eval_str( z );
+    free( pz );
     procState = PROC_STATE_OPTIONS;';
 };
 
