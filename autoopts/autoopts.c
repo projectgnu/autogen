@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.3 1998/09/22 23:34:44 bkorb Exp $
+ *  $Id: autoopts.c,v 2.4 1998/10/08 14:06:54 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.3 1998/09/22 23:34:44 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.4 1998/10/08 14:06:54 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -722,7 +722,8 @@ doPresets( tOptions*  pOpts )
              *  IF the content of the variable is exactly the disablement
              *  prefix,  THEN forget everything we know about preset values
              */
-            if (streqvcmp( pz, pOD->pz_DisablePfx ) == 0) {
+            if (  (pOD->pz_DisablePfx != (char*)NULL)
+               && (streqvcmp( pz, pOD->pz_DisablePfx ) == 0)) {
                 if ((pOD->fOptState & OPTST_INITENABLED) == 0)
                      pOD->fOptState |= OPTST_DISABLED;
                 pOD->optCookie = (void*)NULL;
