@@ -8,10 +8,10 @@
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 1999/11/06 20:08:18 bruce Exp $
+## $Id: Makefile.am,v 1.6 1999/11/07 05:02:27 bruce Exp $
 ## ---------------------------------------------------------------------
 
-TESTS      = case.test define.test endmac.test expr.test opts.test
+TESTS      = case.test define.test endmac.test expr.test nestmac.test opts.test
 EXTRA_DIST = defs $(TESTS)
 
 MAINTAINERCLEANFILES	= Makefile.in
