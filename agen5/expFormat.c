@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.7 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: expFormat.c,v 1.8 2000/02/28 00:17:58 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -169,7 +169,9 @@ ag_scm_dne( SCM prefix )
     SCM
 ag_scm_error( SCM res )
 {
-    tSCC      zErr[] = "DEFINITIONS ERROR in %s line %d for %s:  %s\n";
+    tSCC      zFmt[]    = "DEFINITIONS %s in %s line %d for %s:\n\t%s\n";
+    tSCC      zErr[]    = "ERROR";
+    tSCC      zWarn[]   = "Warning";
     tSCC      zBadMsg[] = "??? indecipherable error message ???";
     tCC*      pzMsg;
     tSuccess  abort = FAILURE;
@@ -203,17 +205,29 @@ ag_scm_error( SCM res )
     case GH_TYPE_STRING:
         pzMsg = SCM_CHARS( res );
         while (isspace( *pzMsg )) pzMsg++;
-        if (isdigit( *pzMsg ) && (strtol( pzMsg, (char**)NULL, 0 ) == 0))
+        /*
+         *  IF the message starts with the number zero,
+         *    OR the message is the empty string,
+         *  THEN this is just a warning that is ignored
+         */
+        if (  (  isdigit( *pzMsg )
+              && (strtol( pzMsg, (char**)NULL, 0 ) == 0))
+           || (*pzMsg == '\0')  )
             abort = PROBLEM;
-        else abort = (*pzMsg != '\0');
         break;
 
     default:
         pzMsg = zBadMsg;
     }
 
-    fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo,
-             pCurFp->pzName, pzMsg );
+    /*
+     *  IF there is a message,
+     *  THEN print it.
+     */
+    if (*pzMsg != '\0')
+        fprintf( stderr, zFmt, (abort != PROBLEM) ? zErr : zWarn,
+                 pCurTemplate->pzFileName, pCurMacro->lineNo,
+                 pCurFp->pzName, pzMsg );
     longjmp( fileAbort, abort );
     /* NOTREACHED */
     return SCM_UNDEFINED;
