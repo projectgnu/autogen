@@ -15,16 +15,5 @@ specifier handlers.
 The latest version of libsnprintfv is available from the author's
 homepage: http://www.oranda.demon.co.uk.
 
-libsnprintfv is written in a very portable K&R compatible style, and
-should build anywhere that provides a reasonable C compiler and runtime.
-See the file INSTALL for instructions on how to build and install
-libsnprintfv.
-
-See the file NEWS for a description of user visible changes to
-libsnprintfv between releases.
-
-See the file TODO for a list of outstanding work.
-
 If you have any suggestions or bug reports, please send email to the
 author at <gary@gnu.org>.
-
