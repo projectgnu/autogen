@@ -1,5 +1,9 @@
 2001-12-24  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/test/html.test(new): test HTML input
+
+2001-12-24  Bruce Korb  <bkorb@gnu.org>
+
 	* Makefile.am(SUBDIRS): list configured based on --disable-shell
 	* configure.in(DEBUG): use a configure test function
 	* agen5/agCgi.c(stderr): reopen as stdout.

@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: agCgi.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -30,6 +30,12 @@
 #include "autogen.h"
 
 #include "cgi-fsm.h"
+
+#ifdef HAVE_FCNTL_H
+#  include <fcntl.h>
+#else
+#  error NEED  <fcntl.h>
+#endif
 
 typedef struct {
     const char*  pzName;
@@ -84,19 +90,14 @@ static const char zOops[] =
 static char* parseInput( char* pzSrc, int len );
 
 EXPORT void
-loadCgi()
+loadCgi( void )
 {
     int textLen = 0;
     char* pzText  = NULL;
 
     fclose( stderr );
-    {
-        FILE* fp = fdopen( STDOUT_FILENO, "w" );
-        if (fileno( fp ) < STDERR_FILENO)
-            fp = fdopen( STDOUT_FILENO, "w" );
-        if (fileno( fp ) < STDERR_FILENO)
-            AG_ABEND_STR( "Cannot redirect stderr to stdout" );
-    }
+    fcntl( STDOUT_FILENO, F_DUPFD, STDERR_FILENO );
+    (void)fdopen( STDERR_FILENO, "w" );
 
     {
         tNameMap* pNM = nameValueMap;
@@ -138,7 +139,15 @@ loadCgi()
     } else
         AG_ABEND_STR( "invalid request method" );
 
+    pzText = AGREALOC( pzText, strlen( pzText )+1, "CGI input" );
     pzOopsPrefix = zOops;
+
+    pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "CGI context" );
+    memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
+    pBaseCtx->lineNo     = 1;
+    pBaseCtx->pzFileName = "@@ CGI Definitions @@";
+    pBaseCtx->pzScan     = \
+    pBaseCtx->pzData     = pzText;
 }
 
 
@@ -147,7 +156,7 @@ parseInput( char* pzSrc, int len )
 {
     tSCC zDef[] = "Autogen Definitions cgi;\n";
     int   outlen = (len * 2) + sizeof( zDef );
-    char* pzRes = malloc( outlen );
+    char* pzRes = AGALOC( outlen, "CGI Definitions" );
 
     if (pzRes == NULL)
         pzRes = "cannout allocate output buffer\n";

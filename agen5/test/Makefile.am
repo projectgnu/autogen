@@ -5,17 +5,17 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2001/12/24 14:13:33 $
+## Last Modified:   $Date: 2001/12/26 20:07:57 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2001/12/26 20:07:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test
 
 NOSHELL_TESTS = alist.test case.test defref.test dynref.test endmac.test \
-	for.test forfrom.test get.test gperf.test heredef.test in.test \
+	for.test forfrom.test get.test gperf.test heredef.test html.test in.test \
 	license.test match.test reorder.test stack.test string.test
 
 TESTS = @AGEN5_TESTS@

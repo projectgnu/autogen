@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.2 2001/12/10 03:39:59 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -27,8 +27,11 @@
 
 #define HANDLE_FUNCTIONS
 #include "autogen.h"
+#include "expr.h"
 
 STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
+
+STATIC tFpStack fpRoot = { 0, (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
 
 
 /*
@@ -84,11 +87,77 @@ generateBlock( tTemplate*   pT,
 }
 
 
+STATIC void
+doStdoutTemplate( tTemplate* pTF )
+{
+    tSCC zNone[]  = "* NONE *";
+    tSCC zCont[]  = "content-type:";
+    int  jmpcode  = setjmp( fileAbort );
+    SCM  res;
+    tCC* pzRes;
+
+    switch (jmpcode) {
+    case SUCCESS:
+        break;
+
+    case PROBLEM:
+        if (*pzOopsPrefix != NUL)
+            fprintf( stdout, "%soutput was abandoned\n", pzOopsPrefix );
+        fclose( stdout );
+        return;
+
+    default:
+        fprintf( stderr, "%sBogus return from setjmp:  %d\n",
+                 pzOopsPrefix, jmpcode );
+
+    case FAILURE:
+        exit( EXIT_FAILURE );
+    }
+
+    pzCurSfx      = zNone;
+    currDefCtx    = rootDefCtx;
+    pCurFp        = &fpRoot;
+    fpRoot.pFile  = stdout;
+    fpRoot.pzOutName = "stdout";
+    fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+        fprintf( pfTrace, "Starting stdout template\n" );
+        fflush( pfTrace );
+    }
+
+    /*
+     *  IF there is a CGI prefix for error messages,
+     *  THEN divert all output to a temporary file so that
+     *  the output will be clean for any error messages we have to emit.
+     */
+    if (*pzOopsPrefix == NUL)
+        generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
+
+    else {
+        (void)ag_scm_out_push_new( SCM_UNDEFINED );
+
+        generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
+
+        /*
+         *  Read back in the spooled output.  Make sure it starts with
+         *  a content-type: prefix.  If not, we supply our own HTML prefix.
+         */
+        res = ag_scm_out_pop( SCM_BOOL_T );
+        pzRes = SCM_CHARS( res );
+
+        if (strneqvcmp( pzRes, zCont, sizeof( zCont ) - 1) != 0)
+            fputs( "Content-Type: text/html\n\n", stdout );
+
+        fwrite( pzRes, SCM_LENGTH( res ), 1, stdout );
+    }
+
+    fclose( stdout );
+}
+
+
 EXPORT void
 processTemplate( tTemplate* pTF )
 {
-    tFpStack fpRoot = { 0, (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
-
     forInfo.fi_depth = 0;
 
     /*
@@ -97,35 +166,7 @@ processTemplate( tTemplate* pTF )
      *  With output going to stdout, we don't try to remove output on errors.
      */
     if (pOutSpecList == (tOutSpec*)NULL) {
-        int jmpcode = setjmp( fileAbort );
-        switch (jmpcode) {
-        case SUCCESS:
-        {
-            tSCC zNone[]  = "* NONE *";
-            pzCurSfx      = zNone;
-            currDefCtx    = rootDefCtx;
-            pCurFp        = &fpRoot;
-            fpRoot.pFile  = stdout;
-            fpRoot.pzOutName = "stdout";
-            fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
-            if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-                fprintf( pfTrace, "Starting stdout template\n" );
-                fflush( pfTrace );
-            }
-            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
-            break;
-        }
-
-        case PROBLEM:
-            break;
-
-        default:
-            fprintf( stderr, "Bogus return from setjmp:  %d\n", jmpcode );
-        case FAILURE:
-            exit( EXIT_FAILURE );
-        }
-
-        fclose( stdout );
+        doStdoutTemplate( pTF );
         return;
     }
 

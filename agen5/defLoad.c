@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: defLoad.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -263,6 +263,24 @@ massageDefTree( tDefEntry** ppNode )
 }
 
 
+STATIC void
+parseDefinitions( void )
+{
+#if defined( VALUE_OPT_SHOW_DEFS )
+    if (HAVE_OPT( SHOW_DEFS )) {
+        printf( "%d bytes of definition\n\n", strlen( pBaseCtx->pzData ));
+        fputs( pBaseCtx->pzData, stdout );
+    }
+#endif
+    pCurCtx = pBaseCtx;
+    {
+        extern int yyparse( void );
+        (void)yyparse();
+    }
+    massageDefTree( &(rootDefCtx.pDefs) );
+}
+
+
 /*
  *  readDefines
  *
@@ -297,6 +315,7 @@ readDefines( void )
 
         if ((pzLen != NULL) && (pzMeth != NULL)) {
             loadCgi();
+            parseDefinitions();
             return;
         }
 
@@ -448,18 +467,7 @@ readDefines( void )
      */
     if (fp != stdin)
         fclose( fp );
-#if defined( VALUE_OPT_SHOW_DEFS )
-    if (HAVE_OPT( SHOW_DEFS )) {
-        printf( "%d bytes of definition\n\n", strlen( pBaseCtx->pzData ));
-        fputs( pBaseCtx->pzData, stdout );
-    }
-#endif
-    pCurCtx = pBaseCtx;
-    {
-        extern int yyparse( void );
-        (void)yyparse();
-    }
-    massageDefTree( &(rootDefCtx.pDefs) );
+    parseDefinitions();
 }
 /*
  * Local Variables:
