@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.18 2000/10/17 03:56:54 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.19 2000/10/17 17:09:19 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -105,18 +105,17 @@
 #define OPTPROC_NONE        0x0000
 #define OPTPROC_LONGOPT     0x0001 /* Process long style options      */
 #define OPTPROC_SHORTOPT    0x0002 /* Process short style "flags"     */
-#define OPTPROC_EXERC       0x0004 /* Preload options from exe's dir  */
-#define OPTPROC_ERRSTOP     0x0008 /* Stop on argument errors         */
-#define OPTPROC_DISABLEOK   0x0010 /* Disabling options are allowed   */
-#define OPTPROC_DISABLEDOPT 0x0020 /* Current option is disabled      */
-#define OPTPROC_NO_REQ_OPT  0x0040 /* no options are required         */
-#define OPTPROC_NUM_OPT     0x0080 /* there is a number option        */
-#define OPTPROC_INITDONE    0x0100 /* have initializations been done? */
-#define OPTPROC_NEGATIONS   0x0200 /* any negation options?           */
-#define OPTPROC_ENVIRON     0x0400 /* check environment?              */
-#define OPTPROC_PLUSMARKS   0x0800 /* Use '+' flag markers?           */
-#define OPTPROC_NO_ARGS     0x1000 /* Disallow remaining arguments    */
-#define OPTPROC_ARGS_REQ    0x2000 /* Require arguments after options */
+#define OPTPROC_ERRSTOP     0x0004 /* Stop on argument errors         */
+#define OPTPROC_DISABLEOK   0x0008 /* Disabling options are allowed   */
+#define OPTPROC_DISABLEDOPT 0x0010 /* Current option is disabled      */
+#define OPTPROC_NO_REQ_OPT  0x0020 /* no options are required         */
+#define OPTPROC_NUM_OPT     0x0040 /* there is a number option        */
+#define OPTPROC_INITDONE    0x0080 /* have initializations been done? */
+#define OPTPROC_NEGATIONS   0x0100 /* any negation options?           */
+#define OPTPROC_ENVIRON     0x0200 /* check environment?              */
+#define OPTPROC_PLUSMARKS   0x0400 /* Use '+' flag markers?           */
+#define OPTPROC_NO_ARGS     0x0800 /* Disallow remaining arguments    */
+#define OPTPROC_ARGS_REQ    0x1000 /* Require arguments after options */
 
 #define STMTS(s)  do { s; } while (0)
 

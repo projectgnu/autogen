@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: Text -*-
-#$Id: optcode.tpl,v 2.41 2000/10/17 03:56:54 bkorb Exp $
+#$Id: optcode.tpl,v 2.42 2000/10/17 17:09:19 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -256,14 +256,13 @@ tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
 tSCC   zUsageTitle[] =
 [= USAGE_LINE =];[=
 
-IF (or (exist? "homerc") (exist? "exerc")) =]
+IF (exist? "homerc") =]
 tSCC   zRcName[]     = "[=
   IF (> (string-length (get "rcfile")) 0)
         =][=rcfile=][=
   ELSE  =].[=(. pname-down)=]rc[=
   ENDIF =]";
 tSCC*  apzHomeList[] = {[=
-  % exerc "\n       \"$$/%s\"," =][=
   FOR homerc=]
        [= (kr-string (get "homerc")) =],[=
   ENDFOR homerc=]

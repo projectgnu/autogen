@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.2 2000/10/17 04:25:31 bkorb Exp $
+ *  $Id: enumeration.c,v 2.3 2000/10/17 17:09:19 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -66,12 +66,16 @@ DEF_PROC_4( static, void, enumError,
             tCC**, paz_names,
             int, name_ct )
 {
-    fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg, pOD->pz_Name );
-    fputs( "The valid keywords are:\n", stderr );
+    if (pOpts != NULL)
+        fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
+
+    fprintf( stderr, "The valid %s option keywords are:\n", pOD->pz_Name );
     do  {
         fprintf( stderr, "\t%s\n", *(paz_names++) );
     } while (--name_ct > 0);
-    (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+
+    if (pOpts != NULL)
+        (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
 }
 
 /*
@@ -84,16 +88,32 @@ DEF_PROC_4( , char*, optionEnumerationVal,
             tCC**, paz_names,
             int, name_ct )
 {
-    size_t  len = strlen( pOD->pzLastArg );
+    size_t  len;
     int     idx;
     int     res = -1;
 
+    /*
+     *  IF there is no option struct pointer, then we are being
+     *  called (indirectly) by the usage routine.  It wants the
+     *  keyword list to be printed.
+     */
+    if (pOpts == NULL) {
+        enumError( pOpts, pOD, paz_names, name_ct );
+        return;
+    }
+
+    len = strlen( pOD->pzLastArg );
+
+    /*
+     *  Look for an exact match, but remember any partial matches.
+     *  Multiple partial matches means we have an ambiguous match.
+     */
     for (idx = 0; idx < name_ct; idx++) {
         if (strncmp( paz_names[idx], pOD->pzLastArg, len ) == 0) {
             if (paz_names[idx][len] == NUL)
                 return (char*)idx;
             if (res != -1) {
-                pz_fmt = "%s error:  `%s' is ambiguous for %s option\n";
+                pz_fmt = "%s error:  the keyword `%s' is ambiguous\n";
                 enumError( pOpts, pOD, paz_names, name_ct );
             }
             res = idx;
@@ -101,10 +121,14 @@ DEF_PROC_4( , char*, optionEnumerationVal,
     }
 
     if (res < 0) {
-        pz_fmt = "%s error:  `%s' does not match any %s keywords\n";
+        pz_fmt = "%s error:  `%s' does not match any keywords\n";
         enumError( pOpts, pOD, paz_names, name_ct );
     }
 
+    /*
+     *  Return the matching index as a char* pointer.
+     *  The result gets stashed in a char* pointer, so it will have to fit.
+     */
     return (char*)res;
 }
 /*

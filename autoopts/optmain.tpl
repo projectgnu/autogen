@@ -223,18 +223,22 @@ DEF_PROC_2( static, void, doOpt[=(string-capitalize (get "name")) =],
             tOptions*, pOptions, tOptDesc*, pOptDesc )
 {
 [=    IF (exist? "flag_code") =][=
-         flag_code =]
-}[=
-      ELSE=]
-    tSCC* az_names[] = {
+         flag_code =][=
+      ELSE         =][=
+         IF (not (exist? "arg_default")) =]    tSCC zDef[2] = { 0x7F, 0 };
+[=       ENDIF
+=]    tSCC* az_names[] = {[=
+         IF (not (exist? "arg_default")) =] zDef,[=
+         ENDIF  =]
 [=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
 
-    pOptDesc->pzLastArg = optionEnumerationVal( pOptions, pOptDesc,
-                                                az_names, [=(count "keyword")=] );
+    pOptDesc->pzLastArg = optionEnumerationVal( pOptions, pOptDesc, az_names,
+                                                [=
+      (+ (count "keyword") (if (exist? "arg_default") 0 1)) =] );[=
+      ENDIF     =]
 }[=
-      ENDIF     =][=
     ENDIF       =][=
   ENDFOR flag   =][=
 

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.9 2000/10/17 02:57:00 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.10 2000/10/17 17:09:19 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -76,6 +76,7 @@ tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
 tSCC zTabout[]     = "\t\t\t\t%s\n";
 tSCC zTabHyp[]     = "\t\t\t\t- ";
 tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
+tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";
 tSCC zReqThese[]   = "requires these options:\n";
 tSCC zProhib[]     = "prohibits these options:\n";
 
@@ -103,9 +104,10 @@ DEF_PROC_2( , void, optionUsage,
             tOptions*,  pOptions,
             int,        exitCode )
 {
-    tCC*  pOptFmt;
-    tCC*  pOptTitle;
-    FILE* fp = stderr;
+    tCC*    pOptFmt;
+    tCC*    pOptTitle;
+    FILE*   fp = stderr;
+    ag_bool displayEnum = AG_FALSE;
 
     fprintf( fp, pOptions->pzUsageTitle, pOptions->pzProgName );
 
@@ -143,14 +145,14 @@ DEF_PROC_2( , void, optionUsage,
         int        docCt  = 0;
 
         do  {
-            tSCC  zReqArg[] = "YES";
-            tSCC  zNumArg[] = "Num";
-            tSCC  zKeyArg[] = "Key";
-            tSCC  zBolArg[] = "Bol";
-            tSCC  zOptArg[] = "opt";
-            tSCC  zNoArg[]  = "no ";
-            tSCC  zBreak[]  = "\n%s\n\n%s";
-            tSCC  zAuto[]   = "Auto-supported Options:";
+            tSCC  zReqArg[]  = "YES";
+            tSCC  zNumArg[]  = "Num";
+            tSCC  zKeyArg[]  = "KWd";
+            tSCC  zBoolArg[] = "T/F";
+            tSCC  zOptArg[]  = "opt";
+            tSCC  zNoArg[]   = "no ";
+            tSCC  zBreak[]   = "\n%s\n\n%s";
+            tSCC  zAuto[]    = "Auto-supported Options:";
 
             tCC*  pzArgType;
 
@@ -194,10 +196,12 @@ DEF_PROC_2( , void, optionUsage,
                 pzArgType = zNumArg;
 
 	    else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
-                pzArgType = zBolArg;
+                pzArgType = zBoolArg;
 
-	    else if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
+            else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
+                displayEnum = AG_TRUE;
                 pzArgType = zKeyArg;
+            }
 
             else switch (pOD->optArgType) {
             case ':': pzArgType = zReqArg; break;
@@ -294,8 +298,7 @@ DEF_PROC_2( , void, optionUsage,
              *  THEN advise that this option may not be preset.
              */
             if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
-               && (  ((pOptions->fOptSet & OPTPROC_EXERC) != 0)
-                  || (pOptions->papzHomeList != (const char**)NULL)
+               && (  (pOptions->papzHomeList != (const char**)NULL)
                   || (pOptions->pzPROGNAME != (const char*)NULL)
                )  )
 
@@ -337,13 +340,15 @@ DEF_PROC_2( , void, optionUsage,
 
             if (  NAMED_OPTS( pOptions )
                && (pOptions->specOptIdx.default_opt == pOD->optIndex))
-                fputs( "\t\t\t\t- default option for unnamed options\n",
-                       fp );
+                fputs( zDefaultOpt, fp );
         }  while (pOD++, optNo++, (--ct > 0));
     }
 
     fputc( '\n', fp );
 
+    /*
+     *  Describe the mechanics of denoting the options
+     */
     {
         u_int  fOptSet = pOptions->fOptSet;
         tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;
@@ -365,19 +370,18 @@ DEF_PROC_2( , void, optionUsage,
     if (pOptions->pzExplain != (char*)NULL)
         fputs( pOptions->pzExplain, fp );
 
-
+    /*
+     *  IF the user is asking for help (thus exiting with SUCCESS),
+     *  THEN see what additional information we can provide.
+     */
     if (exitCode == EXIT_SUCCESS) {
         ag_bool  initIntro = AG_TRUE;
         u_int    fOptSet   = pOptions->fOptSet;
         tSCC     zPathFmt[] = " - reading file %s/%s\n";
 
-        if ((fOptSet & OPTPROC_EXERC) != 0) {
-            fputs( zIntro, fp );
-            fprintf( fp, zHomePath, pOptions->pzProgName,
-                     pOptions->pzRcName );
-            initIntro = AG_FALSE;
-        }
-
+	/*
+	 *  Display all the places we look for RC files
+	 */
         if (pOptions->papzHomeList != (const char**)NULL) {
             const char** papzHL = pOptions->papzHomeList;
             for (;;) {
@@ -395,6 +399,9 @@ DEF_PROC_2( , void, optionUsage,
             }
         }
 
+	/*
+	 *  Let the user know about environment variable settings
+	 */
         if ((pOptions->fOptSet & OPTPROC_ENVIRON) != 0) {
             if (initIntro)
                 fputs( zIntro, fp );
@@ -402,6 +409,28 @@ DEF_PROC_2( , void, optionUsage,
             fprintf( fp, zExamineFmt, pOptions->pzPROGNAME );
         }
 
+	/*
+	 *  IF we found an enumeration,
+	 *  THEN hunt for it again.  Call the handler proc with a NULL
+	 *       option struct pointer.  That tells it to display the keywords.
+	 */
+	if (displayEnum) {
+	    int        ct     = pOptions->optCt;
+	    int        optNo  = 0;
+	    tOptDesc*  pOD    = pOptions->pOptDesc;
+	    int        docCt  = 0;
+
+            fputc( '\n', fp );
+            fflush( fp );
+	    do  {
+		if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
+		    (*(pOD->pOptProc))( NULL, pOD );
+	    }  while (pOD++, optNo++, (--ct > 0));
+	}
+
+	/*
+	 *  If there is a detail string, now is the time for that.
+	 */
         if (pOptions->pzDetail != (char*)NULL)
             fputs( pOptions->pzDetail, fp );
 

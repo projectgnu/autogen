@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.17 2000/10/17 03:56:54 bkorb Exp $
+# $Id: optlib.tpl,v 1.18 2000/10/17 17:09:19 bkorb Exp $
 
 =]
 [=
@@ -98,10 +98,12 @@ Emit the #define's for a single option
 DEFINE Option_Defines =][=
 
   IF (=* (get "arg_type") "key") =]
-typedef enum {
+typedef enum {[=
+         IF (not (exist? "arg_default")) =] [=(. UP-name)=]_UNDEFINED = 0,[=
+         ENDIF  =]
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
           columns -I4 --spread=3 --sep=','"
-          (string-upcase! (join " " (stack "keyword")))
+          (string-upcase! (string->c-name! (join " " (stack "keyword"))))
           (. UP-name) )=]
 } te_[=(. cap-name)=];[=
   ENDIF
@@ -175,6 +177,7 @@ Define the arrays of values associated with an option (strings, etc.) =][=
 DEFINE Option_Strings =][=
 
 (set! cap-name (string-capitalize! (get "name")))
+(set! UP-name  (string-upcase cap-name))
 =]
 /*
  *  [=(. cap-name)=] option description[=

@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.23 2000/10/17 02:57:00 bkorb Exp $
+# $Id: opthead.tpl,v 2.24 2000/10/17 17:09:19 bkorb Exp $
 =]
 [=
 
@@ -10,8 +10,8 @@
 
 ;; The #define name we use to self-exclude the header"
 
-(define defname (string-tr! (string-append prog-name "_" hdrname)
-                     "-./=a-z" "____A-Z" ))
+(define defname (string->c-name! (string-upcase!
+                (string-append prog-name "_" hdrname))))
 
 ;; Let the real output begin...
 

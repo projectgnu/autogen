@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.26 2000/10/17 03:56:54 bkorb Exp $
+ *   $Id: opts.def,v 1.27 2000/10/17 17:09:19 bkorb Exp $
  */
 
 /*
@@ -262,9 +262,10 @@ flag = {
 flag = {
     name        = trace;
     arg_type    = keyword;
+    arg_default = nothing;
     arg_name    = level;
     descrip     = "tracing level of detail";
-    keyword     = nothing, templates, block_macros, expressions, everything;
+    keyword     = nothing, templates, block-macros, expressions, everything;
 
     doc =
     "This option will cause AutoGen to display a trace of its template\n"
@@ -294,17 +295,18 @@ flag = {
     "For example, @code{--traceout='| less'} will run the trace output\n"
     "through the @code{less} program.";
 
-    flag_code =
-'    if (*pOptDesc->pzLastArg == \'|\')
+    flag_code = << FLAG_CODE_END
+    if (*pOptDesc->pzLastArg == '|')
         pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
     else
         pfTrace = fopen( pOptDesc->pzLastArg, "w" );
 
     if (pfTrace == (FILE*)NULL) {
-        fprintf( stderr, "Error %d (%s) opening `%s\' for output",
+        fprintf( stderr, "Error %d (%s) opening `%s' for output",
                  errno, strerror( errno ), pOptDesc->pzLastArg );
         exit( EXIT_FAILURE );
-    }';
+    }
+FLAG_CODE_END ;
 };
 
 #ifdef DEBUG

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.16 2000/10/17 15:34:36 bkorb Exp $
+ *  $Id: expGuile.c,v 1.17 2000/10/17 17:09:19 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -252,8 +252,9 @@ ag_scm_sum( SCM list )
  *
  * exparg: str , input/output string
  *
- * doc:  Change all the characters that are invalid in a C name token
- *       into underscores.
+ * doc:  Change all the graphic characters that are invalid in a C name token
+ *       into underscores.  Whitespace characters are ignored.  Any other
+ *       character type (i.e. non-graphic and non-white) will cause a failure.
 =*/
     SCM
 ag_scm_string_to_c_name_x( SCM str )
@@ -270,14 +271,16 @@ ag_scm_string_to_c_name_x( SCM str )
     while (--len >= 0) {
         char ch = *pz;
         if (! isalnum( ch )) {
-            if ((! isprint( ch )) && (ch != '\t')) {
+            if (isspace( ch ))
+                ;
+
+            else if (isprint( ch ))
+                *pz = '_';
+
+            else
                 scm_misc_error( zFun,
                                 "cannot map unprintable chars to C name chars",
                                 str );
-                /* NOTREACHED */
-            }
-
-            *pz = '_';
         }
         pz++;
     }

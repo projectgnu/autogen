@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.24 2000/10/17 02:57:00 bkorb Exp $
+ *  $Id: autoopts.c,v 2.25 2000/10/17 17:09:19 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -675,20 +675,6 @@ DEF_PROC_1( STATIC, void, doPresets,
      *  when comparing long names, these are equivalent
      */
     strequate( (const char*)"-_^" );
-
-    /*
-     *  FIRST, see if we are to look for an rc file where the program
-     *  was found.  These values will have the lowest priority.
-     */
-    if ((fOptSet & OPTPROC_EXERC) != 0){
-        char   zRcName[ 64 ];
-
-        snprintf( zRcName, sizeof(zRcName), "$$/%s", pOpts->pzRcName );
-
-        if (valid_path( zFileName, sizeof(zFileName),
-                        zRcName, pOpts->pzProgPath))
-            filePreset( pOpts, zFileName );
-    }
 
     /*
      *  Next, search the list of "home" directories.
