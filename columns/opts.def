@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.15 1999/07/08 21:34:15 bkorb Exp $
+ *   $Id: opts.def,v 1.16 1999/09/22 15:13:29 bkorb Exp $
  */
 
 /*
@@ -95,6 +95,17 @@ flag = {
     "If a number, then this many spaces will be inserted at the start of\n"
     "every line.  Otherwise, it is a line prefix that will be inserted\n"
     "at the start of every line.";
+};
+
+flag = {
+    name      = first_indent;
+    flag_arg  = ":";
+    arg_name  = l-pfx;
+    descrip   = "First line prefix";
+    doc =
+    "If a number, then this many spaces will be inserted at the start of\n"
+    "the first line.  Otherwise, it is a line prefix that will be inserted\n"
+    "at the start of that line.";
 };
 
 flag = {
