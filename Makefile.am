@@ -6,7 +6,7 @@
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.14 2002/12/15 17:29:12 bkorb Exp $
+## $Id: Makefile.am,v 3.15 2002/12/16 03:31:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,7 +18,7 @@ config_dist    = config/missing config/misc.def config/libopts.def
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
 pkg_dist       = pkg/autogen.spec.in config/bootstrap.local
 EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(pkgdata_DATA)
-DISTCLEANFILES = .configure.patch stamp-h
+DISTCLEANFILES = .conf-stamp stamp-h
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
           configure libtool stamp-h.in config/ag_macros.m4
 

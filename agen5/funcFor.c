@@ -1,8 +1,8 @@
 
 /*
- *  $Id: funcFor.c,v 3.5 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: funcFor.c,v 3.6 2002/12/16 03:31:31 bkorb Exp $
  *
- *  This module implements the FOR text function.
+ *  This module implements the FOR text macro.
  */
 
 /*
@@ -616,31 +616,36 @@ load_ForIn( char* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
  *  FOR <value-name> IN "quoted string" unquoted-string ...
  *  @end example
  *
- *  Other than for the last form, the first argument must be the name of an
- *  AutoGen value.  If there is no value associated with the name, the
- *  @code{FOR} loop block is skipped entirely.  The scope of the @code{FOR}
- *  function extends to the corresponding @code{ENDFOR} macro.  The last form
- *  will create an array of string values that only exists within the context
- *  of this @code{FOR} loop, and a @code{separator-string} must be coded into
- *  the loop using the @code{(last-for?)} predicate (@pxref{SCM last-for?}).
+ *  Other than for the last form, the first macro argument must be the name of
+ *  an AutoGen value.  If there is no value associated with the name, the
+ *  @code{FOR} template block is skipped entirely.  The scope of the @code{FOR}
+ *  macro extends to the corresponding @code{ENDFOR} macro.  The last form will
+ *  create an array of string values named @code{<value-name>} that only exists
+ *  within the context of this @code{FOR} loop.  With this form, in order to
+ *  use a @code{separator-string}, you must code it into the end of the
+ *  template block using the @code{(last-for?)} predicate function
+ *  (@pxref{SCM last-for?}).
  *
- *  If there are any further arguments, if the first character is either
- *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
- *  it is presumed to be a Scheme expression containing the FOR macro
- *  specific functions @code{for-from}, @code{for-by}, @code{for-to},
- *  and/or @code{for-sep}.  @xref{AutoGen Functions}.  Otherwise, the
- *  remaining text is presumed to be a string for inserting between
- *  each iteration of the loop.  This string will be emitted one time
- *  less than the number of iterations of the loop.  That is, it is
- *  emitted after each loop, excepting for the last iteration.
+ *  If there are any arguments after the @code{value-name}, the initial
+ *  characters are used to determine the form.  If the first character is
+ *  either a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
+ *  it is presumed to be a Scheme expression containing the FOR macro specific
+ *  functions @code{for-from}, @code{for-by}, @code{for-to}, and/or
+ *  @code{for-sep}.  @xref{AutoGen Functions}.  If it consists of an '@code{i}'
+ *  an '@code{n}' and separated by white space from more text, then the
+ *  @code{FOR x IN} form is processed.  Otherwise, the remaining text is
+ *  presumed to be a string for inserting between each iteration of the loop.
+ *  This string will be emitted one time less than the number of iterations of
+ *  the loop.  That is, it is emitted after each loop, excepting for the last
+ *  iteration.
  *
- *  If the from/by/to functions are invoked, they will specify which
- *  copies of the named value are to be processed.  If there is no
- *  copy of the named value associated with a particular index,
- *  the @code{FOR} template block will be instantiated anyway.
- *  The template must use methods for detecting missing definitions and
- *  emitting default text.  In this fashion, you can insert entries
- *  from a sparse or non-zero based array into a dense, zero based array.
+ *  If the from/by/to functions are invoked, they will specify which copies of
+ *  the named value are to be processed.  If there is no copy of the named
+ *  value associated with a particular index, the @code{FOR} template block
+ *  will be instantiated anyway.  The template must use methods for detecting
+ *  missing definitions and emitting default text.  In this fashion, you can
+ *  insert entries from a sparse or non-zero based array into a dense, zero
+ *  based array.
  *
  *  @strong{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
  *  @code{for-sep} functions are disabled outside of the context of the
