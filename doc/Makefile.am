@@ -5,37 +5,35 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/06/01 20:57:46 $
+## Last Modified:  $Date: 1998/06/02 15:26:20 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 1998/06/01 20:57:46 bkorb Exp $
+## $Id: Makefile.am,v 1.5 1998/06/02 15:26:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-all : autogen.info
+# This variable is needed to subvert automake's info rules.
+# They don't work for generated texi files:
+#
+INFO_DEPS     = autogen.info
+
+all : $(INFO_DEPS)
 
 @MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
 
-EXTRA_DIST	= autogen.def auto_gen.tpl autogen.texisav
+EXTRA_DIST      = autogen.def auto_gen.tpl autogen.texisav
 MAINTAINERCLEANFILES = Makefile.in
 
-ODEF		= $(top_builddir)/src/opts.def
-info_TEXINFOS	= autogen.texi
-BUILT_SOURCES	= autogen.texi
+info_TEXINFOS   = autogen.texi
+BUILT_SOURCES   = autogen.texi
 
-gendir	= $(top_builddir)/src
-docdir	= $(top_srcdir)/doc
-optdir	= $(top_srcdir)/autoopts
+ODEF            = $(top_builddir)/src/opts.def
+DIRECT          = $(top_builddir)/src/agdirect.def
+EXPR            = $(top_builddir)/src/agexpr.def
+FUNC            = $(top_builddir)/src/agfunc.def
+AGINCLUDE       = $(ODEF) $(DIRECT) $(EXPR) $(FUNC)
 
-AGEN	= $(gendir)/autogen
-ODEF	= $(gendir)/opts.def
-DIRECT  = $(top_builddir)/src/agdirect.def
-EXPR    = $(top_builddir)/src/agexpr.def
-FUNC    = $(top_builddir)/src/agfunc.def
-
-autogen.texi: auto_gen.tpl autogen.def $(ODEF) $(DIRECT) $(EXPR) $(FUNC)
-	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-		$(AGEN) autogen.def
+autogen.texi : auto_gen.tpl autogen.def $(AGINCLUDE)
 
 autogen.info : autogen.texi
 
