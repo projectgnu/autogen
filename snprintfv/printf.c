@@ -445,7 +445,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
   return info.argc;
 }
 
-int
+static int
 do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 {
   struct printf_info info;
