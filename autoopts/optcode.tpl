@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.28 2000/03/12 22:04:14 bruce Exp $
+#$Id: optcode.tpl,v 2.29 2000/03/12 22:18:01 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -332,8 +332,7 @@ ENDIF =]
           #  IF the argument description is not likely to fit on a line ...
           =][=
           IF (and (exist? "flag.value") 
-             (and (exist? "long_opts")
-                  (>= (string-length (get "argument")) 16)  ))
+                  (exist? "long_opts" ) )
               =]\\\n"
     "\t\t[=ENDIF=]" [=(c-string (get "argument"))=] "[=
         ENDIF=]\n";[=
