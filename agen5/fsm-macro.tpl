@@ -203,6 +203,7 @@ DEFINE trailer
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * tab-width: 4
  * End:
  * end of [=(out-name)=] */[=

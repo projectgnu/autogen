@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.4 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: autogen.h,v 3.5 2002/01/29 03:05:54 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -313,7 +313,7 @@ MODE size_t      defineDataSize   VALUE( 0 );
 
 MKSTRING( AllocWhat, "Could not allocate a %d byte %s\n" );
 MKSTRING( AllocErr,  "Allocation Failure" );
-MKSTRING( Cannot,    "\t%d: cannot %s %s:  %s\n" );
+MKSTRING( Cannot,    "fserr %d: cannot %s %s:  %s\n" );
 MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
 MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
@@ -395,10 +395,8 @@ size_t strlcpy( char* dest, const char* src, size_t n );
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
-    if (! gh_string_p( s )) {
-        char* pz = asprintf( zNotStr, type );
-        AG_ABEND( pz );
-    }
+    if (! gh_string_p( s ))
+        AG_ABEND( asprintf( zNotStr, type ));
 
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr( SCM_ROCHARS(s), SCM_ROLENGTH(s), 0 );

@@ -329,6 +329,7 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * tab-width: 4
  * End:
  * end of cgi-fsm.c */

@@ -1,3 +1,7 @@
+2002-01-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*.[ch]: error message cleanups.
+
 2002-01-25  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(signalExit): new routine to do printing outside

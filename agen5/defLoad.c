@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.7 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: defLoad.c,v 3.8 2002/01/29 03:05:55 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -40,11 +40,10 @@ compareIndex( const void* p1, const void* p2 )
     tDefEntry* pE1 = *((tDefEntry**)p1);
     tDefEntry* pE2 = *((tDefEntry**)p2);
     int  res = pE1->index - pE2->index;
-    if (res == 0) {
-        char* pz = asprintf( "two %s definitions have index %ld\n",
-                 pE1->pzDefName, pE1->index );
-        AG_ABEND( pz );
-    }
+    if (res == 0)
+        AG_ABEND( asprintf( "two %s definitions have index %ld\n",
+                            pE1->pzDefName, pE1->index ));
+
     return res;
 }
 
@@ -329,16 +328,14 @@ readDefines( void )
     else {
         char* pz;
         struct stat stbf;
-        if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0) {
-            pz = asprintf( zCannot, errno, "stat",
-                           OPT_ARG( DEFINITIONS ), strerror( errno ));
-            AG_ABEND( pz );
-        }
+        if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0)
+            AG_ABEND( asprintf( zCannot, errno, "stat",
+                                OPT_ARG( DEFINITIONS ), strerror( errno )));
+
         if (! S_ISREG( stbf.st_mode )) {
             errno = EINVAL;
-            pz = asprintf( zCannot, errno, "open non-regular file",
-                           OPT_ARG( DEFINITIONS ), strerror( errno ));
-            AG_ABEND( pz );
+            AG_ABEND( asprintf( zCannot, errno, "open non-regular file",
+                                OPT_ARG( DEFINITIONS ), strerror( errno )));
         }
 
         /*
@@ -381,11 +378,9 @@ readDefines( void )
      */
     fp = useStdin ? stdin
                   : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
-    if (fp == NULL) {
-        pzData = asprintf( zCannot, errno, "open",
-                           OPT_ARG( DEFINITIONS ), strerror( errno ));
-        AG_ABEND( pzData );
-    }
+    if (fp == NULL)
+        AG_ABEND( asprintf( zCannot, errno, "open",
+                            OPT_ARG( DEFINITIONS ), strerror( errno )));
 
     /*
      *  Read until done...
@@ -404,9 +399,8 @@ readDefines( void )
             if (feof( fp ) || useStdin)
                 break;
 
-            pzData = asprintf( zCannot, errno, "read",
-                               OPT_ARG( DEFINITIONS ), strerror( errno ));
-            AG_ABEND( pzData );
+            AG_ABEND( asprintf( zCannot, errno, "read",
+                                OPT_ARG( DEFINITIONS ), strerror( errno )));
         }
 
         /*

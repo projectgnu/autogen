@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.4 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expOutput.c,v 3.5 2002/01/29 03:05:55 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -277,17 +277,23 @@ ag_scm_out_push_add( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
-    p->pPrev     = pCurFp;
-    p->flags     = FPF_FREE;
-
     pzNewFile    = gh_scm2newstr( new_file, NULL );
     addWriteAccess( pzNewFile );
-    p->pFile     = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+    {
+        FILE* fp = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
 
+        if (fp == NULL)
+            AG_ABEND( asprintf( zCannot, errno, "open for write", pzNewFile,
+                                strerror( errno )));
+        p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
+        p->pFile = fp;
+    }
+
+    p->pPrev     = pCurFp;
+    p->flags     = FPF_FREE;
     p->pzOutName = pzNewFile;
     outputDepth++;
-    pCurFp    = p;
+    pCurFp       = p;
     return SCM_UNDEFINED;
 }
 
@@ -319,7 +325,7 @@ ag_scm_out_push_new( SCM new_file )
         pzNewFile = gh_scm2newstr( new_file, NULL );
         unlink( pzNewFile );
         addWriteAccess( pzNewFile );
-        p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+        p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     } else {
         tSCC* pzTemp = NULL;
         int tmpfd;
@@ -346,6 +352,10 @@ ag_scm_out_push_new( SCM new_file )
 
         p->pFile  = fdopen( tmpfd, "a" FOPEN_BINARY_FLAG "+" );
     }
+
+    if (p->pFile == NULL)
+        AG_ABEND( asprintf( zCannot, errno, "open for write", pzNewFile,
+                            strerror( errno )));
 
     p->pzOutName = pzNewFile;
     outputDepth++;

@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.7 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: agCgi.c,v 3.8 2002/01/29 03:05:54 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -116,17 +116,14 @@ loadCgi( void )
             AG_ABEND( "No CGI data were received" );
 
         pzText  = malloc( (textLen + 32) & ~0x000F );
-        if (pzText == NULL) {
-            char* pz = asprintf( "%s: %d bytes for CGI input",
-                                 zAllocErr, textLen );
-            AG_ABEND( pz );
-        }
+        if (pzText == NULL)
+            AG_ABEND( asprintf( "%s: %d bytes for CGI input",
+                                zAllocErr, textLen ));
 
-        if (fread( pzText, 1, textLen, stdin ) != textLen) {
-            char* pz = asprintf( zCannot, errno, "read", "CGI text",
-                                 strerror( errno ));
-            AG_ABEND( pz );
-        }
+        if (fread( pzText, 1, textLen, stdin ) != textLen)
+            AG_ABEND( asprintf( zCannot, errno, "read", "CGI text",
+                                strerror( errno )));
+
         pzText[ textLen ] = '\0';
 
         pzQuery = pzText;

@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: agShell.c,v 3.6 2002/01/29 03:05:54 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -313,11 +313,8 @@ chainOpen( int       stdinFd,
         fprintf( pfTrace, "Server shell %s starts\n", pzShell );
 #endif
     execvp( (char*)pzShell, (char**)ppArgs );
-    {
-        char* pz = asprintf( "Could not execvp( '%s', ... ):  %d - %s\n",
-                             pzShell, errno, strerror( errno ));
-        AG_ABEND( pz );
-    }
+    AG_ABEND( asprintf( "Could not execvp( '%s', ... ):  %d - %s\n",
+                        pzShell, errno, strerror( errno )));
 }
 
 
@@ -440,8 +437,7 @@ loadData( FILE* fp )
             p = AGREALOC( (void*)pzText, textSize, NULL );
             if (p == NULL) {
                 tSCC zRTB[] = "Realloc Text Block";
-                pzScan = asprintf( zAllocWhat, textSize, zRTB );
-                AG_ABEND( pzScan );
+                AG_ABEND( asprintf( zAllocWhat, textSize, zRTB ));
             }
 
             pzText   = (char*)p;
