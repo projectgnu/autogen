@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-08-15 16:17:49 bkorb"
+ *  Time-stamp:      "2004-08-15 18:29:17 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.26 2004/08/16 01:09:21 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.27 2004/08/16 01:30:17 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -201,8 +201,13 @@ typedef struct {
  *      TWICE         don't care
  *      DISABLE_TWICE don't care
  *      1 -and-  x 1 x x
- *
- *  B) handling at "regular" time, any of the following 4:
+ */
+#define DO_IMMEDIATELY(_flg) \
+    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM)) == OPTST_IMM) \
+    || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
+        == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
+
+/*  B) handling at "regular" time because it was not immediate
  *
  *  1.  OPTST_DISABLED is not set:
  *      IMM           must *NOT* be set
@@ -211,19 +216,27 @@ typedef struct {
  *      DISABLE_TWICE don't care
  *      0 -and-  0 x x x
  *
- *  2.  OPTST_DISABLED is not set:
+ *  2.  OPTST_DISABLED is set:
+ *      IMM           don't care
+ *      DISABLE_IMM   don't care
+ *      TWICE         must be set
+ *      DISABLE_TWICE don't care
+ *      1 -and-  x x 1 x
+ */
+#define DO_NORMALLY(_flg) ( \
+       (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
+    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
+                  OPTST_DISABLED)  )
+
+/*  C)  handling at "regular" time because it is to be handled twice.
+ *      The immediate bit was already tested and found to be set:
+ *
+ *  3.  OPTST_DISABLED is not set:
  *      IMM           is set (but don't care)
  *      DISABLE_IMM   don't care
  *      TWICE         must be set
  *      DISABLE_TWICE don't care
  *      0 -and-  ? x 1 x
- *
- *  3.  OPTST_DISABLED is set:
- *      IMM           don't care
- *      DISABLE_IMM   must *NOT* be set
- *      TWICE         don't care
- *      DISABLE_TWICE don't care
- *      1 -and-  x 0 x x
  *
  *  4.  OPTST_DISABLED is set:
  *      IMM           don't care
@@ -232,16 +245,6 @@ typedef struct {
  *      DISABLE_TWICE must be set
  *      1 -and-  x ? x 1
  */
-#define DO_IMMEDIATELY(_flg) \
-    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM)) == OPTST_IMM) \
-    || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
-        == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
-
-#define DO_NORMALY(_flg) ( \
-       (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
-    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
-                  OPTST_DISABLED)  )
-
 #define DO_SECOND_TIME(_flg) ( \
        (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
                   OPTST_TWICE)                                  \
