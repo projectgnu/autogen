@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.37 2000/03/06 02:03:26 bruce Exp $
+## $Id: Makefile.am,v 2.38 2000/03/12 22:30:33 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -95,6 +95,16 @@ autogen.texi : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
+
+##  The following rule is for debugging generation problems:
+##
+autogen.def : $(DOC_DEPENDS)
+	@echo $(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
+	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	ADDON_MENU="$(ADDON_MENU)" \
+	ADDON_TEXI="$(ADDON_TEXI)" \
+	DOC_DEPENDS="$(DOC_DEPENDS)" \
+	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
 
 $(AGSRCDIR)/autogen.texi :
 	@cd $(AGSRCDIR) ; echo making $@ in `pwd` ; make autogen.texi
