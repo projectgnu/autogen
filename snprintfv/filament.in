@@ -1,0 +1,62 @@
+/*  -*- Mode: C -*-  */
+
+/* filament.h --- a bit like a string but different =)O|
+ * Copyright (C) 1998, 1999, 2000, 2002 Gary V. Vaughan
+ * Originally by Gary V. Vaughan, 1998
+ * This file is part of Snprintfv
+ *
+ * Snprintfv is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Snprintfv program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * As a special exception to the GNU General Public License, if you
+ * distribute this file as part of a program that also links with and
+ * uses the libopts library from AutoGen, you may include it under
+ * the same distribution terms used by the libopts library.
+ */
+
+/* Code: */
+
+#ifndef FILAMENT_H
+#define FILAMENT_H 1
+
+#include <snprintfv/compat.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+/* This brace is so that emacs can still indent properly: */ }
+#endif
+#endif				/* __cplusplus */
+
+/**
+ * Filament:
+ * Opaque data type used to hold 8-bit clean dynamic strings which know
+ * their own length and resize themselves to avoid buffer overruns.
+ **/
+typedef struct filament Filament;
+
+@protos filament.c
+
+#ifdef __cplusplus
+#if 0
+/* This brace is so that emacs can still indent properly: */
+{
+#endif
+}
+#endif /* __cplusplus */
+
+#endif /* FILAMENT_H */
+
+/* filament.h ends here */

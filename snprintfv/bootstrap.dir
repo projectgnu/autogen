@@ -1,0 +1,62 @@
+#! /bin/sh
+#  -*- Mode: Sh -*- 
+# ----------------------------------------------------------------------
+# bootstrap.dir --- script to create generated files in this directory
+#
+# Author:	      Gary V. Vaughan <gvv@techie.com>
+# Maintainer:	      Gary V. Vaughan <gvv@techie.com>
+# Created:	      Wed Jul 14 10:49:15 1999
+# Last Modified:      Thu Aug  5 14:14:36 1999				      
+#            by: bkorb
+# ----------------------------------------------------------------------
+# @(#) $Id: bootstrap.dir,v 1.1 2002/12/07 03:00:59 bkorb Exp $
+# ----------------------------------------------------------------------
+# Copyright (C) 1999 Gary V. Vaughan
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+# As a special exception to the GNU General Public License, if you
+# distribute this file as part of a program that also links with and
+# uses the libopts library from AutoGen, you may include it under
+# the same distribution terms used by the libopts library.
+
+# Code:
+
+top_srcdir=..
+srcdir=.
+cwd=`pwd`
+
+AWK=${AWK-awk}
+GENPROTO=./genproto
+GENPROTO_FLAGS=./gendoc.awk
+GENPROTO_ENVIRONMENT='FORMAT=SNV_GNUC_PRINTF'
+
+# Generate the header files
+for file in [abd-z]*.in
+do
+  header=`echo $file | sed 's,\.in$,.h,'`
+  stamp=`echo $file|sed 's,\.in$,.stamp,'`
+  temp=${header}T
+  eval $GENPROTO_ENVIRONMENT $GENPROTO $GENPROTO_FLAGS $srcdir/$file > $temp
+  if test x"$header" != x && cmp -s $header $temp; then
+    echo $header is unchanged; rm -f $temp;
+  else
+    echo creating $header; mv -f $temp $header;
+  fi
+  date > $stamp
+done
+
+# bootstrap.dir ends here
