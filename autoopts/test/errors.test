@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-11-22 20:17:22 bkorb"
+# Time-stamp:        "2003-11-22 21:20:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.6 2003/11/23 04:28:37 bkorb Exp $
+# $Id: errors.test,v 3.7 2003/11/23 05:21:21 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -107,7 +107,19 @@ cmp -s ${testname}.h*lp || \
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "reorder-opts;" >> ${testname}.def
+sed '/second option/a\
+    max = "10";' ${testname}.def > XX
+mv -f XX ${testname}.def
+cat >> ${testname}.def << '_EOF_'
+reorder-opts;
+flag = {
+    name = "another";
+    max  = '5';
+    descrip = "Another option descrip";
+    value = 'X';
+};
+
+_EOF_
 
 echo $AGEN ${testname}.def
 $AGEN ${testname}.def || \
@@ -119,20 +131,22 @@ compile "--help"
 
 echo creating ${testname}-sh.samp
 cat > ${testname}-sh.samp <<'_EOF_'
-OPTION_CT=2
+OPTION_CT=4
 export OPTION_CT
 TEST_ERRORS_OPTION=1 # 0x1
 export TEST_ERRORS_OPTION
 TEST_ERRORS_SECOND='foo'
 export TEST_ERRORS_SECOND
-set -- 'mum'\''ble' 'stumble'
+TEST_ERRORS_ANOTHER=1 # 0x1
+export TEST_ERRORS_ANOTHER
+set -- 'mum'\''ble' '-X' 'stumble'
 OPTION_CT=0
 _EOF_
 
-./${testname} "mum'ble" -os foo stumble > ${testname}-sh.out
+./${testname} "mum'ble" -os foo -X -- -X stumble > ${testname}-sh.out
 
 cmp -s ${testname}-sh.out ${testname}-sh.samp || \
-  failure "`diff ${testname}-sh.out ${testname}-sh.samp`"
+  failure "`diff ${testname}-sh.samp ${testname}-sh.out`"
 
 cleanup
 # end of errors.test

@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.2 2003/11/23 04:28:37 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.3 2003/11/23 05:21:21 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -105,16 +105,22 @@ optionSort( tOptions* pOpts )
 
         switch (pzArg[1]) {
         case NUL:
+            /*
+             *  A regular option.  Put it on the operand list.
+             */
             ppzOpds[ opdsIdx++ ] = pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
             continue;
 
         case '-':
             /*
-             *  Two consecutive hypens _always_ force the remainder of the
-             *  arguments to be operands.
+             *  Two consecutive hypens.  Put them on the options list and then
+             *  _always_ force the remainder of the arguments to be operands.
              */
-            if (pzArg[2] == NUL)
+            if (pzArg[2] == NUL) {
+                ppzOpts[ optsIdx++ ] =
+                    pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
                 goto restOperands;
+            }
             res = longOptionFind( pOpts, pzArg+2, &os );
             break;
 
