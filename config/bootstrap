@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Aug 30 12:18:15 1999				      
+# Last Modified:     Mon Aug 30 12:21:20 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.23 1999/08/30 19:18:42 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.24 1999/08/30 19:25:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -59,7 +59,7 @@ done
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=pre
-test -f $wd/bootstrap.local && . $wd/bootstrap.local
+test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -211,13 +211,11 @@ do
    sh ./bootstrap.dir recursive )
 done
 
-./configure $@
-
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
-test -f $wd/bootstrap.local && . $wd/bootstrap.local
+test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
 
 # bootstrap ends here
