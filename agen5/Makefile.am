@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-11-21 13:02:28 bkorb"
+## Time-stamp:      "2004-11-22 15:23:40 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.38 2004/11/21 21:31:25 bkorb Exp $
+## $Id: Makefile.am,v 3.39 2004/11/22 23:45:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -18,7 +18,7 @@ DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
 CLEANFILES      = autogen.texi autogen.menu autogen.1
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm \
-                  stamp-man stamp-texi stamp-parse
+                  stamp-man stamp-parse
 pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 nodist_man_MANS = autogen.1
 
@@ -96,22 +96,16 @@ proto.h :
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-texi GEN-RULE
-stamp-texi : $(STAMPS)
-	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
-	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
-	test -f $(GDexe) || $(MAKE) $(GDexe)
+stamp-texi : $(STAMPS) $(AGnam) $(CLexe) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-man GEN-RULE
-stamp-man : opts.def
-	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
-	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
-	test -f $(GDexe) || $(MAKE) $(GDexe)
+stamp-man : opts.def $(AGnam) $(CLexe) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 autogen.1 : stamp-man
 autogen.texi : stamp-texi
-gen : $(STAMPS)
+gen : stamp-texi
 
 $(GDexe) :
 	cd ../getdefs ; $(MAKE) $(GDnam)
