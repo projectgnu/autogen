@@ -1,4 +1,4 @@
-[=autogen template lsm=LSM =]
+[= AutoGen5 template lsm=LSM =]
 Begin3
 Title:          AutoGen - [=prog_title=]
 
