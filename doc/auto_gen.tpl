@@ -1,16 +1,16 @@
 [= AutoGen5 template -*-texinfo-*-
 
 ##  Documentation template
-## 
+##
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
-## 
+##
 ## Author:            Bruce Korb <autogen@linuxbox.com>
 ## Maintainer:        Bruce Korb <autogen@linuxbox.com>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.45 1999/11/16 05:55:33 bruce Exp $
+## $Id: auto_gen.tpl,v 2.46 1999/11/16 06:05:16 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -319,7 +319,7 @@ others are simply Scheme expressions, the result of which will be
 inserted into the output text.  Other expressions are names of AutoGen
 values.  These values will be inserted into the output text.  For example,
 @code{[+list_info+]} will result in the value associated with
-the name @code{list_info} being inserted between the double quotes and 
+the name @code{list_info} being inserted between the double quotes and
 @code{(string-upcase! (get "list_element"))} will first "get" the value
 associated with the name @code{list_element}, then change the case of
 all the letters to upper case.  The result will be inserted into the
@@ -340,12 +340,12 @@ desired output.
              CC: autoconf <autoconf@@gnu.org>
 
 > Bruce Korb writes:
-> 
+>
 > > I would like to recommend my tool.  It exactly and precisely
 > > addresses these very problems in a manner far simpler than M4.
 
 Alexandre wrote:
-> 
+>
 > I'd appreciate opinions from others about advantages/disadvantages of
 > each of these macro packages.
 @end format
@@ -356,7 +356,7 @@ be that it separates the operational data from the implementation.
 Indulge me for a few paragraphs, and all will be revealed:
 In the manual, Bruce cites the example of maintaining command line flags
 inside the source code; traditionally spreading usage information, flag
-names, letters and processing across several functions (if not files). 
+names, letters and processing across several functions (if not files).
 Investing the time in writing a sort of boiler plate (a template in
 AutoGen terminology) pays by moving all of the option details (usage,
 flags names etc.) into a well structured table (a definition file if you
@@ -647,7 +647,7 @@ in the discussion of string formation rules.  They are:
 
 @enumerate
 @item
-The back quoted text that gets processed by the shell into a single
+Back quoted text that gets processed by the shell into a single
 text value.
 @item
 Text surrounded by parentheses that is handed off to Guile for
@@ -657,15 +657,17 @@ for a single text value.
 
 @noindent
 The third method will be discussed in the next section (@xref{Directives}):
+
 @enumerate 3
 @item
 The @code{#shell} and @code{#endshell} directives delimit a block of
-shell script that yields an entire document that gets parsed as AutoGen
+shell script that yields a "document" that gets parsed as AutoGen
 definitions.  Consequently, more than one definition may result.
 @end enumerate
 
 @noindent
-Finally, Guile may be used to yield compound definitions values:
+Finally, Guile may be used to yield compound definitions' values:
+
 @enumerate 4
 @item
 When a Scheme expression is enclosed in the tokens @code{@{(} and
@@ -674,27 +676,31 @@ names and values that will be used to create AutoGen definitions.
 @end enumerate
 
 @noindent
-This last method is expected to be used as follows:
+This last method is to be used as follows:
 
 @example
-mumble = {( (name (value-expression))  (name2 (another-expr)) )};
+mumble = @{( (name  (value-expression))
+             (name2 (another-expr))  )@};
 @end example
 
 @noindent
 Under the covers, the string:
+
 @example
-( (name (value-expression))  (name2 (another-expr)) )
+( (name  (value-expression))
+  (name2 (another-expr)) )
 @end example
 
 @noindent
 gets handed off to a Guile function named @code{AutoGen-define-list}
-in an expression that would look like:
+in an expression that looks like:
 
 @example
 (AutoGen-define-list
     ( (name (value-expression))  (name2 (another-expr)) ) )
 @end example
 
+@noindent
 Until documented here, the user must supply this function  :-).
 
 @node Directives
@@ -1400,7 +1406,7 @@ echo '
 '
 
 for f in ${ADDON_TEXI}
-do 
+do
    echo '@page'
    echo '@ignore'
    echo 'Copy of $f'
