@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.6 1999/10/30 18:20:21 bruce Exp $
+ *   $Id: opts.def,v 1.7 1999/10/31 23:23:20 bruce Exp $
  */
 
 /*
@@ -148,7 +148,11 @@ flag = {
     descrip   = "Guile/Scheme code file to load";
     doc =
     "Use this argument to preload Scheme scripts into the Guile\n"
-    "interpreter before template processing begins.\n";
+    "interpreter before template processing begins.\n"
+    "Please note that the AutoGen specific functions are not loaded\n"
+    "until after argument processing.  So, though they may be specified\n"
+    "in lambda functions you define, they may not be invoked until after\n"
+    "option processing is complete.\n";
 
     flag_code =
 '    char z[ 4096 ];
