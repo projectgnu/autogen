@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.8 2003/07/04 15:12:22 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -50,6 +50,9 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* === STATIC PROCS === */
+/* === END STATIC PROCS === */
+
 /*=export_func optionSaveState
  *
  * what:  saves the option state to memory
@@ -65,8 +68,7 @@
  *        Otherwise, it will always succeed.
 =*/
 void
-optionSaveState( pOpts )
-    tOptions* pOpts;
+optionSaveState( tOptions* pOpts )
 {
     if (pOpts->pSavedState == NULL) {
         size_t sz = sizeof( *pOpts ) + (pOpts->optCt * sizeof( tOptDesc ));
@@ -105,8 +107,7 @@ optionSaveState( pOpts )
  *       printed to @code{stderr} and exit is called.
 =*/
 void
-optionRestore( pOpts )
-    tOptions* pOpts;
+optionRestore( tOptions* pOpts )
 {
     tOptions* p = (tOptions*)pOpts->pSavedState;
 
@@ -139,8 +140,7 @@ optionRestore( pOpts )
  *        this routine is always successful.      
 =*/
 void
-optionFree( pOpts )
-    tOptions* pOpts;
+optionFree( tOptions* pOpts )
 {
     if (pOpts->pSavedState != NULL) {
         AGFREE( pOpts->pSavedState );

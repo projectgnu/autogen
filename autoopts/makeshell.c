@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.13 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: makeshell.c,v 3.14 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -342,12 +342,32 @@ static char*  pzShell   = (char*)NULL;
 static char*  pzLeader  = (char*)NULL;
 static char*  pzTrailer = (char*)NULL;
 
-static void  emitFlag(  tOptions* pOpts );
-static void  emitLong(  tOptions* pOpts );
-static void  emitUsage( tOptions* pOpts );
-static void  emitSetup( tOptions* pOpts );
-static void  openOutput( const char* );
+/* === STATIC PROCS === */
+STATIC void
+textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD );
 
+STATIC void
+emitUsage( tOptions* pOpts );
+
+STATIC void
+emitSetup( tOptions* pOpts );
+
+STATIC void
+printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc );
+
+STATIC void
+printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc );
+
+STATIC void
+emitFlag( tOptions* pOpts );
+
+STATIC void
+emitLong( tOptions* pOpts );
+
+STATIC void
+openOutput( const char* pzFile );
+
+/* === END STATIC PROCS === */
 
 /*=export_func  putShellParse
  * private:
@@ -449,7 +469,7 @@ putShellParse( tOptions* pOpts )
 }
 
 
-LOCAL void
+STATIC void
 textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 {
     int  nlHoldCt = 0;
@@ -542,7 +562,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 }
 
 
-LOCAL void
+STATIC void
 emitUsage( tOptions* pOpts )
 {
     char     zTimeBuf[ 128 ];
@@ -610,7 +630,7 @@ emitUsage( tOptions* pOpts )
 }
 
 
-LOCAL void
+STATIC void
 emitSetup( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -666,7 +686,7 @@ emitSetup( tOptions* pOpts )
 }
 
 
-LOCAL void
+STATIC void
 printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doVersion)
@@ -717,7 +737,7 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-LOCAL void
+STATIC void
 printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     if (pOptDesc->pOptProc == doLoadOpt) {
@@ -736,7 +756,7 @@ printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 }
 
 
-LOCAL void
+STATIC void
 emitFlag( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -758,7 +778,7 @@ emitFlag( tOptions* pOpts )
 }
 
 
-LOCAL void
+STATIC void
 emitLong( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -898,7 +918,7 @@ emitLong( tOptions* pOpts )
 }
 
 
-LOCAL void
+STATIC void
 openOutput( const char* pzFile )
 {
     FILE* fp;
@@ -977,15 +997,29 @@ openOutput( const char* pzFile )
 }
 
 
-LOCAL void
-genshelloptUsage( tOptions*  pOptions, int exitCode )
+/*=export_func genshelloptUsage
+ * private:
+ * what: The usage function for the genshellopt generated program
+ *
+ * arg:  + tOptions* + pOpts    + program options descriptor +
+ * arg:  + int       + exitCode + usage text type to produce +
+ *
+ * doc:
+ *  This function is used to create the usage strings for the option
+ *  processing shell script code.  Two child processes are spawned
+ *  each emitting the usage text in either the short (error exit)
+ *  style or the long style.  The generated program will capture this
+ *  and create shell script variables containing the two types of text.
+=*/
+void
+genshelloptUsage( tOptions*  pOpts, int exitCode )
 {
     /*
      *  IF not EXIT_SUCCESS,
      *  THEN emit the short form of usage.
      */
     if (exitCode != EXIT_SUCCESS)
-        optionUsage( pOptions, exitCode );
+        optionUsage( pOpts, exitCode );
     fflush( stderr );
     fflush( stdout );
 
@@ -996,13 +1030,13 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
      */
     switch (fork()) {
     case -1:
-        optionUsage( pOptions, EXIT_FAILURE );
+        optionUsage( pOpts, EXIT_FAILURE );
         /*NOTREACHED*/
         _exit( EXIT_FAILURE );
 
     case 0:
         pagerState = PAGER_STATE_CHILD;
-        optionUsage( pOptions, EXIT_SUCCESS );
+        optionUsage( pOpts, EXIT_SUCCESS );
         /*NOTREACHED*/
         _exit( EXIT_FAILURE );
 

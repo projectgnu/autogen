@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.8 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: pgusage.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -52,6 +52,9 @@
  */
 
 tePagerState pagerState = PAGER_STATE_INITIAL;
+
+/* === STATIC PROCS === */
+/* === END STATIC PROCS === */
 
 /*=export_func  doPagedUsage
  * private:

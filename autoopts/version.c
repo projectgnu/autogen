@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.8 2003/11/23 02:07:44 bkorb Exp $
+/*  $Id: version.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -56,7 +56,32 @@ tSCC zBadArg[] =
 
 tSCC zBugRpt[] = "\nplease send bug reports to:  %s\n";
 
-LOCAL void
+/* === STATIC PROCS === */
+STATIC void
+printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
+
+/* === END STATIC PROCS === */
+
+/*=export_func  optionVersion
+ *
+ * what:     return the compiled AutoOpts version number
+ * ret_type: const char*
+ * ret_desc: the version string in constant memory
+ * doc:
+ *  Returns the full version string compiled into the library.
+ *  The returned string cannot be modified.
+=*/
+const char*
+optionVersion( void )
+{
+    static const char zVersion[] =
+        STR( AO_CURRENT.AO_REVISION );
+
+    return zVersion;
+}
+
+
+STATIC void
 printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
 {
     char swCh;
@@ -131,7 +156,7 @@ doVersion( pOpts, pOD )
     printVersion( pOpts, pOD, stdout );
 }
 
-/*=export_func  doVersion
+/*=export_func  doVersionStderr
  * private:
  *
  * what:  Print the program version to stderr

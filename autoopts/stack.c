@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.12 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: stack.c,v 3.13 2003/11/23 19:15:28 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -50,6 +50,9 @@
  */
 
 #include REGEX_HEADER
+
+/* === STATIC PROCS === */
+/* === END STATIC PROCS === */
 
 /*=export_func  unstackOptArg
  * private:

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 3.6 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: boolean.c,v 3.7 2003/11/23 19:15:28 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -50,6 +50,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
+
+/* === STATIC PROCS === */
+/* === END STATIC PROCS === */
 
 /*=export_func  optionBooleanVal
  * private:

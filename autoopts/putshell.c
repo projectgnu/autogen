@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.15 2003/11/23 04:28:37 bkorb Exp $
+ *  $Id: putshell.c,v 3.16 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -50,10 +50,16 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* === STATIC PROCS === */
+STATIC void
+putQuotedStr( char* pzStr );
+
+/* === END STATIC PROCS === */
+
 /*
  *  Make sure embedded single quotes come out okay
  */
-LOCAL void
+STATIC void
 putQuotedStr( char* pzStr )
 {
     if (pzStr != (char*)NULL) for (;;) {

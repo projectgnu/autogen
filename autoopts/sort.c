@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.3 2003/11/23 05:21:21 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.4 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -48,6 +48,136 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* === STATIC PROCS === */
+/* === END STATIC PROCS === */
+
+/*
+ *  "mustHandleArg" and "mayHandleArg" are really similar.  The biggest
+ *  difference is that "may" will consume the next argument only if it
+ *  does not start with a hyphen and "must" will consume it, hyphen or not.
+ */
+STATIC tSuccess
+mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
+               char** ppzOpts, int* pOptsIdx )
+{
+    /*
+     *  An option argument is required.  Long options can either have
+     *  a separate command line argument, or an argument attached by
+     *  the '=' character.  Figure out which.
+     */
+    switch (pOS->optType) {
+    case TOPT_SHORT:
+        /*
+         *  See if an arg string follows the flag character.  If not,
+         *  the next arg must be the option argument.
+         */
+        if (*pzArg != NUL)
+            return SUCCESS;
+        break;
+
+    case TOPT_LONG:
+        /*
+         *  See if an arg string has already been assigned (glued on
+         *  with an `=' character).  If not, the next is the opt arg.
+         */
+        if (pOS->pzOptArg != (char*)NULL)
+            return SUCCESS;
+        break;
+    }
+    if (pOpts->curOptIdx >= pOpts->origArgCt)
+        return FAILURE;
+
+    ppzOpts[ (*pOptsIdx)++ ] = pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
+    return SUCCESS;
+}
+
+STATIC tSuccess
+mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
+              char** ppzOpts, int* pOptsIdx )
+{
+    /*
+     *  An option argument is optional.
+     */
+    switch (pOS->optType) {
+    case TOPT_SHORT:
+        /*
+         *  IF nothing is glued on after the current flag character,
+         *  THEN see if there is another argument.  If so and if it
+         *  does *NOT* start with a hyphen, then it is the option arg.
+         */
+        if (*pzArg != NUL)
+            return SUCCESS;
+        break;
+
+    case TOPT_LONG:
+        /*
+         *  Look for an argument if we don't already have one (glued on
+         *  with a `=' character)
+         */
+        if (pOS->pzOptArg != (char*)NULL)
+            return SUCCESS;
+        break;
+    }
+    if (pOpts->curOptIdx >= pOpts->origArgCt)
+        return PROBLEM;
+
+    pzArg = pOpts->origArgVect[ pOpts->curOptIdx ];
+    if (*pzArg != '-')
+        ppzOpts[ (*pOptsIdx)++ ] = pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
+    return SUCCESS;
+}
+
+/*
+ *  Process a string of short options glued together.  If the last one
+ *  does or may take an argument, the do the argument processing and leave.
+ */
+STATIC tSuccess
+checkShortOpts( tOptions* pOpts, char* pzArg, tOptState* pOS,
+                char** ppzOpts, int* pOptsIdx )
+{
+    while (*pzArg != NUL) {
+        if (FAILED( shortOptionFind( pOpts, *pzArg, pOS )))
+            return FAILURE;
+
+        switch (pOS->pOD->optArgType) {
+        case ARG_MUST:
+            /*
+             *  IF we need another argument, be sure it is there and
+             *  take it.
+             */
+            if (pzArg[1] == NUL) {
+                if (pOpts->curOptIdx >= pOpts->origArgCt)
+                    return FAILURE;
+                ppzOpts[ (*pOptsIdx)++ ] =
+                    pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
+            }
+            return SUCCESS;
+
+        case ARG_MAY:
+            /*
+             *  Take an argument if it is not attached and it does not
+             *  start with a hyphen.
+             */
+            if (pzArg[1] != NUL)
+                return SUCCESS;
+
+            pzArg = pOpts->origArgVect[ pOpts->curOptIdx ];
+            if (*pzArg != '-')
+                ppzOpts[ (*pOptsIdx)++ ] =
+                    pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
+            return SUCCESS;
+
+        default:
+            pzArg++;
+        }
+    }
+    return SUCCESS;
+}
+
+/*
+ *  If the program wants sorted options (separated operands and options),
+ *  then this routine will to the trick.
+ */
 LOCAL void
 optionSort( tOptions* pOpts )
 {
@@ -78,6 +208,9 @@ optionSort( tOptions* pOpts )
         free( ppzOpts );
         goto exit_no_mem;
     }
+
+    pOpts->curOptIdx   = 1;
+    pOpts->pzCurOpt    = (char*)NULL;
 
     /*
      *  Now, process all the options from our current position onward.
@@ -151,138 +284,33 @@ optionSort( tOptions* pOpts )
 
         switch (os.pOD->optArgType) {
         case ARG_MUST:
-            /*
-             *  An option argument is required.  Long options can either have
-             *  a separate command line argument, or an argument attached by
-             *  the '=' character.  Figure out which.
-             */
-            switch (os.optType) {
-            case TOPT_SHORT:
-                /*
-                 *  See if an arg string follows the flag character.  If not,
-                 *  the next arg must be the option argument.
-                 */
-                if (pzArg[2] == NUL) {
-                    if (pOpts->curOptIdx >= pOpts->origArgCt) {
-                        errno = EIO;
-                        goto freeTemps;
-                    }
-                    ppzOpts[ optsIdx++ ] =
-                        pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                }
-                break;
-
-            case TOPT_LONG:
-                /*
-                 *  See if an arg string has already been assigned (glued on
-                 *  with an `=' character).  If not, the next is the opt arg.
-                 */
-                if (os.pzOptArg == (char*)NULL) {
-                    if (pOpts->curOptIdx >= pOpts->origArgCt) {
-                        errno = EIO;
-                        goto freeTemps;
-                    }
-                    ppzOpts[ optsIdx++ ] =
-                        pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                }
-                break;
+            switch (mustHandleArg( pOpts, pzArg+2, &os, ppzOpts, &optsIdx )) {
+            case PROBLEM:
+            case FAILURE: errno = EIO; goto freeTemps;
             }
-            break;
+            goto nextArg;
 
         case ARG_MAY:
-            /*
-             *  An option argument is optional.
-             */
-            switch (os.optType) {
-            case TOPT_SHORT:
-                /*
-                 *  IF nothing is glued on after the current flag character,
-                 *  THEN see if there is another argument.  If so and if it
-                 *  does *NOT* start with a hyphen, then it is the option arg.
-                 */
-                if (pzArg[2] == NUL) {
-                    if (pOpts->curOptIdx >= pOpts->origArgCt) {
-                        errno = 0;
-                        goto joinLists;
-                    }
-
-                    pzArg = pOpts->origArgVect[ pOpts->curOptIdx ];
-                    if (*pzArg != '-')
-                        ppzOpts[ optsIdx++ ] =
-                            pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                }
-                break;
-
-            case TOPT_LONG:
-                /*
-                 *  Look for an argument if we don't already have one (glued on
-                 *  with a `=' character)
-                 */
-                if (os.pzOptArg == (char*)NULL) {
-                    if (pOpts->curOptIdx >= pOpts->origArgCt) {
-                        errno = 0;
-                        goto joinLists;
-                    }
-
-                    pzArg = pOpts->origArgVect[ pOpts->curOptIdx ];
-                    if (*pzArg != '-')
-                        ppzOpts[ optsIdx++ ] =
-                            pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                }
-                break;
+            switch (mayHandleArg( pOpts, pzArg+2, &os, ppzOpts, &optsIdx )) {
+            case FAILURE: errno = EIO; goto freeTemps;
+            case PROBLEM: errno = 0;   goto joinLists;
             }
-            continue;
+            goto nextArg;
 
         default: /* CANNOT */
             /*
-             *  No option argument.  If we do not have a short option here,
-             *  then keep scanning for short options until we get to the end
-             *  of the string.
+             *  No option argument.  If we have a short option here,
+             *  then scan for short options until we get to the end
+             *  of the argument string.
              */
-            if (os.optType != TOPT_SHORT)
-                continue;
-
-            pzArg += 2;
-            while (*pzArg != NUL) {
-                if (FAILED( shortOptionFind( pOpts, *pzArg, &os ))) {
-                    errno = EIO;
-                    goto freeTemps;
-                }
-                switch (os.pOD->optArgType) {
-                case ARG_MUST:
-                    /*
-                     *  IF we need another argument, be sure it is there and
-                     *  take it.
-                     */
-                    if (pzArg[1] == NUL) {
-                        if (pOpts->curOptIdx >= pOpts->origArgCt) {
-                            errno = EIO;
-                            goto freeTemps;
-                        }
-                        ppzOpts[ optsIdx++ ] =
-                            pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                    }
-                    goto shortOptsDone;
-
-                case ARG_MAY:
-                    /*
-                     *  Take an argument if it is not attached and it does not
-                     *  start with a hyphen.
-                     */
-                    if (pzArg[1] != NUL)
-                        goto shortOptsDone;
-                    pzArg = pOpts->origArgVect[ pOpts->curOptIdx ];
-                    if (*pzArg != '-')
-                        ppzOpts[ optsIdx++ ] =
-                            pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
-                    goto shortOptsDone;
-
-                default:
-                    pzArg++;
-                }
-            } shortOptsDone:;
-        }
-    }
+            if (  (os.optType == TOPT_SHORT)
+               && FAILED( checkShortOpts( pOpts, pzArg+2, &os,
+                                          ppzOpts, &optsIdx )) )  {
+                errno = EIO;
+                goto freeTemps;
+            }
+        } nextArg:;
+    } /* for (;;) */
 
  restOperands:
     while (pOpts->curOptIdx < pOpts->origArgCt)

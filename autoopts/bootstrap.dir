@@ -30,11 +30,9 @@ case "$1" in
   fi
   if [ ! -f funcs.def ] || [ ! -f options.h ]
   then
-    getdefs linenum srcfile \
-      template=options_h output=funcs.def \
-      autoopts.c boolean.c enumeration.c restore.c \
-      guileopt.c makeshell.c numeric.c pgusage.c putshell.c \
-      save.c stack.c streqvcmp.c usage.c version.c
+    files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
+      sed '/^CSRC/d;s/[=\\]//'`
+    getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
     eval "`egrep '^AO_' ../VERSION`"
     cat >> funcs.def <<-	_END_VERS_INFO_
@@ -56,10 +54,11 @@ case "$1" in
     sed -n '/^LOCAL /,/^{$/p' $g | \
       sed 's/^LOCAL /static /;s/^{//;s/)$/);/'
   done >&4
-  echo '/* === END LOCALS === */' >&4
-  sed '1,/=== END LOCALS ===/d' autoopts.h >&4
+  tag="=== END LOCALS ==="
+  echo "/* ${tag} */" >&4
+  sed "1,/${tag}/d" autoopts.h >&4
   exec 4>&-
-  if cmp $f autoopts.h
+  if cmp -s $f autoopts.h
   then rm -f $f
   else mv -f $f autoopts.h
   fi

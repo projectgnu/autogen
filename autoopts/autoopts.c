@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.28 2003/11/23 04:28:37 bkorb Exp $
+ *  $Id: autoopts.c,v 3.29 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -69,14 +69,41 @@ tSCC zAtMost[]      = "%4$d %1$s%s options allowed\n";
 tSCC zEquiv[]       = "-equivalence";
 tSCC zErrOnly[]     = "ERROR:  only ";
 
+#   define SKIP_RC_FILES(po) \
+    DISABLED_OPT(&((po)->pOptDesc[ (po)->specOptIdx.save_opts+1]))
+
+/* === STATIC PROCS === */
+STATIC tSuccess
+findOptDesc( tOptions* pOpts, tOptState* pOptState );
+
+STATIC tSuccess
+nextOption( tOptions* pOpts, tOptState* pOptState );
+
+STATIC tSuccess
+doImmediateOpts( tOptions* pOpts );
+
+STATIC void
+doEnvPresets( tOptions* pOpts, teEnvPresetType type );
+
+STATIC tSuccess
+doRcFiles( tOptions* pOpts );
+
+STATIC tSuccess
+doPresets( tOptions* pOpts );
+
+STATIC int
+checkConsistency( tOptions* pOpts );
+
+/* === END STATIC PROCS === */
+
 /*
- *  loadValue
+ *  handleOption
  *
- *  This routine handles equivalencing and invoking the handler procedure,
- *  if any.
+ *  This routine handles equivalencing, sets the option state flags and
+ *  invokes the handler procedure, if any.
  */
 LOCAL tSuccess
-loadValue( tOptions* pOpts, tOptState* pOptState )
+handleOption( tOptions* pOpts, tOptState* pOptState )
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -351,7 +378,7 @@ shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
  *
  *  Find the option descriptor for the current option
  */
-LOCAL tSuccess
+STATIC tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState )
 {
     /*
@@ -444,7 +471,7 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
  *  all the state in the state argument so that the option can be skipped
  *  without consequence (side effect).
  */
-LOCAL tSuccess
+STATIC tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState )
 {
     tSuccess res;
@@ -620,194 +647,14 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
  *  only processing the non-immediate action options.  doPresets() will
  *  then return for optionProcess() to do the final pass on the command
  *  line arguments.
- *
- *  doPresets()     is only called by optionProcess().
- *  loadOptionLine  is used by optionLoadLine() and doPresets()
- *  filePreset      is used by doLoadOpt() and doPresets()
  */
-
-/*=export_func  optionMakePath
- * private:
- *
- * what:  translate and construct a path
- * arg:   + char* + pzBuf      + The result buffer +
- * arg:   + int   + bufSize    + The size of this buffer +
- * arg:   + tCC*  + pzName     + The input name +
- * arg:   + tCC*  + pzProgPath + The full path of the current program +
- *
- * ret-type: ag_bool
- * ret-desc: AG_TRUE if the name was handled, otherwise AG_FALSE.
- *
- * doc:
- *  This routine does environment variable expansion if the first character
- *  is a ``$''.  If it starts with two dollar characters, then the path
- *  is relative to the location of the executable.
-=*/
-ag_bool
-optionMakePath(
-    char*    pzBuf,
-    int      bufSize,
-    tCC*     pzName,
-    tCC*     pzProgPath )
-{
-    if (bufSize <= strlen( pzName ))
-        return AG_FALSE;
-
-    /*
-     *  IF not an environment variable, just copy the data
-     */
-    if (*pzName != '$') {
-        strcpy( pzBuf, pzName );
-        return AG_TRUE;
-    }
-
-    /*
-     *  IF the name starts with "$$", then it must be "$$" or
-     *  it must start with "$$/".  In either event, replace the "$$"
-     *  with the path to the executable and append a "/" character.
-     */
-    if (pzName[1] == '$') {
-        tCC*  pzPath;
-        tCC*  pz;
-
-        switch (pzName[2]) {
-        case '/':
-        case NUL:
-            break;
-        default:
-            return AG_FALSE;
-        }
-
-        /*
-         *  See if the path is included in the program name.
-         *  If it is, we're done.  Otherwise, we have to hunt
-         *  for the program using "pathfind".
-         */
-        if (strchr( pzProgPath, '/' ) != (char*)NULL)
-            pzPath = pzProgPath;
-        else {
-            pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
-
-            if (pzPath == (char*)NULL)
-                return AG_FALSE;
-        }
-
-        pz = strrchr( pzPath, '/' );
-
-        /*
-         *  IF we cannot find a directory name separator,
-         *  THEN we do not have a path name to our executable file.
-         */
-        if (pz == (char*)NULL)
-            return AG_FALSE;
-
-        /*
-         *  Skip past the "$$" and, maybe, the "/".  Anything else is invalid.
-         */
-        pzName += 2;
-        switch (*pzName) {
-        case '/':
-            pzName++;
-        case NUL:
-            break;
-        default:
-            return AG_FALSE;
-        }
-
-        /*
-         *  Concatenate the file name to the end of the executable path.
-         *  The result may be either a file or a directory.
-         */
-        if ((pz - pzPath)+1 + strlen(pzName) >= bufSize)
-            return AG_FALSE;
-
-        memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
-        strcpy( pzBuf + (pz - pzPath) + 1, pzName );
-    }
-
-    /*
-     *  See if the env variable is followed by specified directories
-     *  (We will not accept any more env variables.)
-     */
-    else {
-        char* pzDir = pzBuf;
-
-        for (;;) {
-            char ch = *++pzName;
-            if (! ISNAMECHAR( ch ))
-                break;
-            *(pzDir++) = ch;
-        }
-
-        if (pzDir == pzBuf)
-            return AG_FALSE;
-
-        *pzDir = NUL;
-
-        pzDir = getenv( pzBuf );
-
-        /*
-         *  Environment value not found -- skip the home list entry
-         */
-        if (pzDir == (char*)NULL)
-            return AG_FALSE;
-
-        if (strlen( pzDir ) + 1 + strlen( pzName ) >= bufSize)
-            return AG_FALSE;
-
-        sprintf( pzBuf, "%s%s", pzDir, pzName );
-    }
-
-    return AG_TRUE;
-}
-
 
 /*
  *  doImmediateOpts - scan the command line for immediate action options
  */
-LOCAL tSuccess
+STATIC tSuccess
 doImmediateOpts( tOptions* pOpts )
 {
-    /*
-     *  IF the struct version is not the current, and also
-     *     either too large (?!) or too small,
-     *  THEN emit error message and fail-exit
-     */
-    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION  )
-       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
-          || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
-       )  )  {
-
-        tSCC zErr[] =
-            "Automated Options Processing Error!\n"
-            "\t%s called optionProcess with structure version %d:%d:%d.\n";
-        tSCC zBig[] =
-            "\tThis exceeds the compiled library version:  "
-            OPTIONS_VERSION_STRING "\n";
-        tSCC zSml[] =
-            "\tThis is less than the minimum library version:  "
-            OPTIONS_MIN_VER_STRING "\n";
-
-        fprintf( stderr, zErr, pOpts->origArgVect[0],
-                 NUM_TO_VER( pOpts->structVersion ));
-        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-            fputs( zBig, stderr );
-        else
-            fputs( zSml, stderr );
-
-        exit( EXIT_FAILURE );
-    }
-
-    {
-        const char* pz = strrchr( *pOpts->origArgVect, '/' );
-
-        if (pz == (char*)NULL)
-             pOpts->pzProgName = *pOpts->origArgVect;
-        else pOpts->pzProgName = pz+1;
-
-        pOpts->pzProgPath = *pOpts->origArgVect;
-    }
-
     pOpts->curOptIdx = 1;     /* start by skipping program name */
     pOpts->pzCurOpt  = NULL;
 
@@ -821,22 +668,12 @@ doImmediateOpts( tOptions* pOpts )
      *  are marked for immediate processing.
      */
     for (;;) {
-        tOptState optState = { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL };
+        tOptState optState = OPTSTATE_INITIALIZER;
 
-        tSuccess res = nextOption( pOpts, &optState );
-        switch (res) {
-        case FAILURE:
-            goto optionsDone;
-
-        case PROBLEM:
-            /*
-             *  FIXME:  Here is where we have to worry about how to reorder
-             *          arguments.  Not today.
-             */
-            return SUCCESS; /* no more args */
-
-        case SUCCESS:
-            break;
+        switch (nextOption( pOpts, &optState )) {
+        case FAILURE: goto optionsDone;
+        case PROBLEM: return SUCCESS; /* no more args */
+        case SUCCESS: break;
         }
 
         /*
@@ -860,7 +697,7 @@ doImmediateOpts( tOptions* pOpts )
             break;
         }
 
-        if (! SUCCESSFUL( loadValue( pOpts, &optState )))
+        if (! SUCCESSFUL( handleOption( pOpts, &optState )))
             break;
     } optionsDone:;
 
@@ -870,253 +707,11 @@ doImmediateOpts( tOptions* pOpts )
 }
 
 
-LOCAL void
-loadOptionLine(
-    tOptions*  pOpts,
-    tOptState* pOS,
-    char*      pzLine,
-    tDirection direction )
-{
-    /*
-     *  Strip off the first token on the line.
-     *  No quoting, space separation only.
-     */
-    {
-        char* pz = pzLine;
-        while (  (! isspace( *pz ))
-              && (*pz != NUL)
-              && (*pz != '=' )  ) pz++;
-
-        /*
-         *  IF we exited because we found either a space char or an '=',
-         *  THEN terminate the name (clobbering either a space or '=')
-         *       and scan over any more white space that follows.
-         */
-        if (*pz != NUL) {
-            *pz++ = NUL;
-            while (isspace( *pz )) pz++;
-        }
-
-        /*
-         *  Make sure we can find the option in our tables and initing it is OK
-         */
-        if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
-            return;
-        if (pOS->flags & OPTST_NO_INIT)
-            return;
-
-        pOS->pzOptArg = pz;
-    }
-
-    switch (pOS->flags & (OPTST_IMM|OPTST_DISABLE_IMM)) {
-    case 0:
-        /*
-         *  The selected option has no immediate action.
-         *  THEREFORE, if the direction is PRESETTING
-         *  THEN we skip this option.
-         */
-        if (PRESETTING(direction))
-            return;
-        break;
-
-    case OPTST_IMM:
-        if (PRESETTING(direction)) {
-            /*
-             *  We are in the presetting direction with an option we handle
-             *  immediately for enablement, but normally for disablement.
-             *  Therefore, skip if disabled.
-             */
-            if ((pOS->flags & OPTST_DISABLED) == 0)
-                return;
-        } else {
-            /*
-             *  We are in the processing direction with an option we handle
-             *  immediately for enablement, but normally for disablement.
-             *  Therefore, skip if NOT disabled.
-             */
-            if ((pOS->flags & OPTST_DISABLED) != 0)
-                return;
-        }
-        break;
-
-    case OPTST_DISABLE_IMM:
-        if (PRESETTING(direction)) {
-            /*
-             *  We are in the presetting direction with an option we handle
-             *  immediately for disablement, but normally for disablement.
-             *  Therefore, skip if NOT disabled.
-             */
-            if ((pOS->flags & OPTST_DISABLED) != 0)
-                return;
-        } else {
-            /*
-             *  We are in the processing direction with an option we handle
-             *  immediately for disablement, but normally for disablement.
-             *  Therefore, skip if disabled.
-             */
-            if ((pOS->flags & OPTST_DISABLED) == 0)
-                return;
-        }
-        break;
-
-    case OPTST_IMM|OPTST_DISABLE_IMM:
-        /*
-         *  The selected option is always for immediate action.
-         *  THEREFORE, if the direction is PROCESSING
-         *  THEN we skip this option.
-         */
-        if (PROCESSING(direction))
-            return;
-        break;
-    }
-
-    /*
-     *  Fix up the args.
-     */
-    switch (pOS->pOD->optArgType) {
-    case ARG_NONE:
-        if (*pOS->pzOptArg != NUL)
-            return;
-        pOS->pzOptArg = NULL;
-        break;
-
-    case ARG_MAY:
-        if (*pOS->pzOptArg == NUL)
-             pOS->pzOptArg = NULL;
-        else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, "option argument" );
-        break;
-
-    case ARG_MUST:
-        if (*pOS->pzOptArg == NUL)
-             pOS->pzOptArg = "";
-        else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, "option argument" );
-        break;
-    }
-
-    loadValue( pOpts, pOS );
-}
-
-
-/*
- *  filePreset
- *
- *  Load a file containing presetting information (an RC file).
- */
-LOCAL void
-filePreset(
-    tOptions*     pOpts,
-    const char*   pzFileName,
-    int           direction )
-{
-    typedef enum { SEC_NONE, SEC_LOOKING, SEC_PROCESS } teSec;
-    teSec   sec     = SEC_NONE;
-    FILE*   fp      = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
-    u_int   saveOpt = pOpts->fOptSet;
-    char    zLine[ 0x1000 ];
-
-    if (fp == (FILE*)NULL)
-        return;
-
-    /*
-     *  DO NOT STOP ON ERRORS.  During preset, they are ignored.
-     */
-    pOpts->fOptSet &= ~OPTPROC_ERRSTOP;
-
-    /*
-     *  FOR each line in the file...
-     */
-    while (fgets( zLine, sizeof( zLine ), fp ) != (char*)NULL) {
-        char*  pzLine = zLine;
-
-        for (;;) {
-            pzLine += strlen( pzLine );
-
-            /*
-             *  IF the line is full, we stop...
-             */
-            if (pzLine >= zLine + (sizeof( zLine )-2))
-                break;
-            /*
-             *  Trim of trailing white space.
-             */
-            while ((pzLine > zLine) && isspace(pzLine[-1])) pzLine--;
-            *pzLine = NUL;
-            /*
-             *  IF the line is not continued, then exit the loop
-             */
-            if (pzLine[-1] != '\\')
-                break;
-            /*
-             *  insert a newline and get the continuation
-             */
-            pzLine[-1] = '\n';
-            fgets( pzLine, sizeof( zLine ) - (int)(pzLine - zLine), fp );
-        }
-
-        pzLine = zLine;
-        while (isspace( *pzLine )) pzLine++;
-
-        switch (*pzLine) {
-        case NUL:
-        case '#':
-            /*
-             *  Ignore blank and comment lines
-             */
-            continue;
-
-        case '[':
-            /*
-             *  Enter a section IFF sections are requested and the section
-             *  name matches.  If the file is not sectioned,
-             *  then all will be handled.
-             */
-            if (pOpts->pzPROGNAME == (char*)NULL)
-                goto fileDone;
-
-            switch (sec) {
-            case SEC_NONE:
-                sec = SEC_LOOKING;
-                /* FALLTHROUGH */
-
-            case SEC_LOOKING:
-            {
-                int secNameLen = strlen( pOpts->pzPROGNAME );
-                if (  (strncmp( pzLine+1, pOpts->pzPROGNAME, secNameLen ) != 0)
-                   || (pzLine[secNameLen+1] != ']')  )
-                    continue;
-                sec = SEC_PROCESS;
-                break;
-            }
-
-            case SEC_PROCESS:
-                goto fileDone;
-            }
-            break;
-
-        default:
-            /*
-             *  Load the line only if we are not in looking-for-section state
-             */
-            if (sec == SEC_LOOKING)
-                continue;
-        }
-
-        {
-            tOptState st = { NULL, OPTST_PRESET, TOPT_UNDEFINED, 0, NULL };
-            loadOptionLine( pOpts, &st, pzLine, direction );
-        }
-    } fileDone:;
-
-    pOpts->fOptSet = saveOpt;
-    fclose( fp );
-}
-
-
 /*
  *  doEnvPresets - check for preset values from the envrionment
  *  This routine should process in all, immediate or normal modes....
  */
-LOCAL void
+STATIC void
 doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 {
     int        ct;
@@ -1228,7 +823,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
                 break;
             }
 
-        loadValue( pOpts, &st );
+        handleOption( pOpts, &st );
     }
 }
 
@@ -1236,106 +831,146 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-LOCAL tSuccess
+STATIC tSuccess
+doRcFiles( tOptions* pOpts )
+{
+    int   idx;
+    int   inc = DIRECTION_PRESET;
+    tCC*  pzPath;
+    char  zFileName[ 4096 ];
+
+    /*
+     *  Find the last RC entry (highest priority entry)
+     */
+    for (idx = 0; pOpts->papzHomeList[ idx+1 ] != NULL; ++idx)  ;
+
+    /*
+     *  For every path in the home list, ...  *TWICE* We start at the last
+     *  (highest priority) entry, work our way down to the lowest priority,
+     *  handling the immediate options.
+     *  Then we go back up, doing the normal options.
+     */
+    for (;;) {
+        struct stat StatBuf;
+
+        /*
+         *  IF we've reached the bottom end, change direction
+         */
+        if (idx < 0) {
+            inc = DIRECTION_PROCESS;
+            idx = 0;
+        }
+
+        pzPath = pOpts->papzHomeList[ idx ];
+
+        /*
+         *  IF we've reached the top end, bail out
+         */
+        if (pzPath == (char*)NULL)
+            break;
+
+        idx += inc;
+
+        if (! optionMakePath( zFileName, sizeof( zFileName ),
+                              pzPath, pOpts->pzProgPath ))
+            continue;
+
+        /*
+         *  IF the file name we constructed is a directory,
+         *  THEN append the Resource Configuration file name
+         *  ELSE we must have the complete file name
+         */
+        if (stat( zFileName, &StatBuf ) != 0)
+            continue; /* bogus name - skip the home list entry */
+
+        if (S_ISDIR( StatBuf.st_mode )) {
+            size_t len = strlen( zFileName );
+            char* pz;
+
+            if (len + 1 + strlen( pOpts->pzRcName ) >= sizeof( zFileName ))
+                continue;
+
+            pz = zFileName + len;
+            if (pz[-1] != '/')
+                *(pz++) = '/';
+            strcpy( pz, pOpts->pzRcName );
+        }
+
+        filePreset( pOpts, zFileName, inc );
+
+        /*
+         *  IF we are now to skip RC files AND we are presetting,
+         *  THEN change direction.  We must go the other way.
+         */
+        if (SKIP_RC_FILES(pOpts) && PRESETTING(inc)) {
+            idx -= inc;  /* go back and reprocess current file */
+            inc =  DIRECTION_PROCESS;
+        }
+    } /* For every path in the home list, ... */
+}
+
+
+/*
+ *  doPresets - check for preset values from an rc file or the envrionment
+ */
+STATIC tSuccess
 doPresets( tOptions* pOpts )
 {
-#   define SKIP_RC_FILES \
-    DISABLED_OPT(&(pOpts->pOptDesc[ pOpts->specOptIdx.save_opts+1]))
+    /*
+     *  IF the struct version is not the current, and also
+     *     either too large (?!) or too small,
+     *  THEN emit error message and fail-exit
+     */
+    if (  ( pOpts->structVersion  != OPTIONS_STRUCT_VERSION  )
+       && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
+          || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
+       )  )  {
+
+        tSCC zErr[] =
+            "Automated Options Processing Error!\n"
+            "\t%s called optionProcess with structure version %d:%d:%d.\n";
+        tSCC zBig[] =
+            "\tThis exceeds the compiled library version:  "
+            OPTIONS_VERSION_STRING "\n";
+        tSCC zSml[] =
+            "\tThis is less than the minimum library version:  "
+            OPTIONS_MIN_VER_STRING "\n";
+
+        fprintf( stderr, zErr, pOpts->origArgVect[0],
+                 NUM_TO_VER( pOpts->structVersion ));
+        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
+            fputs( zBig, stderr );
+        else
+            fputs( zSml, stderr );
+
+        exit( EXIT_FAILURE );
+    }
 
     {
-        tSuccess  res = doImmediateOpts( pOpts );
-        if (! SUCCESSFUL( res ))
-            return res;
+        const char* pz = strrchr( *pOpts->origArgVect, '/' );
+
+        if (pz == (char*)NULL)
+             pOpts->pzProgName = *pOpts->origArgVect;
+        else pOpts->pzProgName = pz+1;
+
+        pOpts->pzProgPath = *pOpts->origArgVect;
     }
+
+    if (! SUCCESSFUL( doImmediateOpts( pOpts )))
+        return FAILURE;
 
     /*
      *  IF there are no RC files,
      *  THEN do any environment presets and leave.
      */
     if (  (pOpts->papzHomeList == (const char**)NULL)
-       || SKIP_RC_FILES )  {
+       || SKIP_RC_FILES(pOpts) )  {
         doEnvPresets( pOpts, ENV_ALL );
         return SUCCESS;
     }
 
     doEnvPresets( pOpts, ENV_IMM );
-
-    {
-        int   idx;
-        int   inc = DIRECTION_PRESET;
-        tCC*  pzPath;
-        char  zFileName[ 4096 ];
-
-        /*
-         *  Find the last RC entry (highest priority entry)
-         */
-        for (idx = 0; pOpts->papzHomeList[ idx+1 ] != NULL; ++idx)  ;
-
-        /*
-         *  For every path in the home list, ...  *TWICE* We start at the last
-         *  (highest priority) entry, work our way down to the lowest priority,
-         *  handling the immediate options.
-         *  Then we go back up, doing the normal options.
-         */
-        for (;;) {
-            struct stat StatBuf;
-
-            /*
-             *  IF we've reached the bottom end, change direction
-             */
-            if (idx < 0) {
-                inc = DIRECTION_PROCESS;
-                idx = 0;
-            }
-
-            pzPath = pOpts->papzHomeList[ idx ];
-
-            /*
-             *  IF we've reached the top end, bail out
-             */
-            if (pzPath == (char*)NULL)
-                break;
-
-            idx += inc;
-
-            if (! optionMakePath( zFileName, sizeof( zFileName ),
-                                  pzPath, pOpts->pzProgPath ))
-                continue;
-
-            /*
-             *  IF the file name we constructed is a directory,
-             *  THEN append the Resource Configuration file name
-             *  ELSE we must have the complete file name
-             */
-            if (stat( zFileName, &StatBuf ) != 0)
-                continue; /* bogus name - skip the home list entry */
-
-            if (S_ISDIR( StatBuf.st_mode )) {
-                size_t len = strlen( zFileName );
-                char* pz;
-
-                if (len + 1 + strlen( pOpts->pzRcName ) >= sizeof( zFileName ))
-                    continue;
-
-                pz = zFileName + len;
-                if (pz[-1] != '/')
-                    *(pz++) = '/';
-                strcpy( pz, pOpts->pzRcName );
-            }
-
-            filePreset( pOpts, zFileName, inc );
-
-            /*
-             *  IF we are now to skip RC files AND we are presetting,
-             *  THEN change direction.  We must go the other way.
-             */
-            if ((SKIP_RC_FILES) && PRESETTING(inc)) {
-                idx -= inc;  /* go back and reprocess current file */
-                inc =  DIRECTION_PROCESS;
-            }
-        } /* For every path in the home list, ... */
-    }
-
+    doRcFiles(    pOpts );
     doEnvPresets( pOpts, ENV_NON_IMM );
     return SUCCESS;
 }
@@ -1347,7 +982,7 @@ doPresets( tOptions* pOpts )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-LOCAL int
+STATIC int
 checkConsistency( tOptions* pOpts )
 {
     int       errCt = 0;
@@ -1483,114 +1118,7 @@ checkConsistency( tOptions* pOpts )
  *  called from any other user code.  The @file{options.h} is fairly clear
  *  about this, too.
 =*/
-/*=export_func  optionLoadLine
- *
- * what:  process a string for an option name and value
- *
- * arg:   tOptions*,   pOpts,  program options descriptor
- * arg:   const char*, pzLine, NUL-terminated text
- *
- * doc:
- *
- * This is a user callable routine for setting options from, for
- * example, the contents of a file that they read in.
- * Only one option may appear in the text.  It will be treated
- * as a normal (non-preset) option.
- *
- * When passed a pointer to the option struct and a string, it will
- * find the option named by the first token on the string and set
- * the option argument to the remainder of the string.  The caller must
- * NUL terminate the string.  Any embedded new lines will be included
- * in the option argument.
- *
- * err:   Invalid options are silently ignored.  Invalid option arguments
- *        will cause a warning to print, but the function should return.
-=*/
-void
-optionLoadLine(
-    tOptions*  pOpts,
-    tCC*       pzLine )
-{
-    tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
-    char* pz;
-    AGDUPSTR( pz, pzLine, "user option line" );
-    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
-    AGFREE( pz );
-}
 
-
-/*=export_func  doLoadOpt
- * private:
- *
- * what:  Load an option rc/ini file
- * arg:   + tOptions* + pOpts    + program options descriptor +
- * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
- *
- * doc:
- *  Processes the options found in the file named with pOptDesc->pzLastArg.
-=*/
-void
-doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
-{
-    /*
-     *  IF the option is not being disabled,
-     *  THEN load the file.  There must be a file.
-     *  (If it is being disabled, then the disablement processing
-     *  already took place.  It must be done to suppress preloading
-     *  of ini/rc files.)
-     */
-    if (! DISABLED_OPT( pOptDesc )) {
-        struct stat sb;
-        if (stat( pOptDesc->pzLastArg, &sb ) != 0) {
-            tSCC zMsg[] =
-                "File error %d (%s) opening %s for loading options\n";
-
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
-
-            fprintf( stderr, zMsg, errno, strerror( errno ),
-                     pOptDesc->pzLastArg );
-            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            /* NOT REACHED */
-        }
-
-        if (! S_ISREG( sb.st_mode )) {
-            tSCC zMsg[] =
-                "error:  cannot load options from non-regular file %s\n";
-
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
-
-            fprintf( stderr, zMsg, pOptDesc->pzLastArg );
-            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            /* NOT REACHED */
-        }
-
-        filePreset( pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS );
-    }
-}
-
-
-/*=export_func  optionVersion
- *
- * what:     return the compiled AutoOpts version number
- * ret_type: const char*
- * ret_desc: the version string in constant memory
- * doc:
- *  Returns the full version string compiled into the library.
- *  The returned string cannot be modified.
-=*/
-const char*
-optionVersion( void )
-{
-    static const char zVersion[] =
-        STR( AO_CURRENT.AO_REVISION );
-
-    return zVersion;
-}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*=export_func optionProcess
  *
  * what: this is the main option processing routine
@@ -1598,6 +1126,7 @@ optionVersion( void )
  * arg:  + tOptions* + pOpts + program options descriptor +
  * arg:  + int       + argc  + program arg count  +
  * arg:  + char**    + argv  + program arg vector +
+ *
  * ret_type:  int
  * ret_desc:  the count of the arguments processed
  *
@@ -1636,14 +1165,14 @@ optionProcess(
         pOpts->origArgVect = argVect;
         pOpts->fOptSet    |= OPTPROC_INITDONE;
 
-        if (FAILED( doPresets( pOpts )))
+        if (! SUCCESSFUL( doPresets( pOpts )))
             return 0;
 
         if ((pOpts->fOptSet & OPTPROC_REORDER) != 0)
             optionSort( pOpts );
 
-        pOpts->curOptIdx = 1;
-        pOpts->pzCurOpt = (char*)NULL;
+        pOpts->curOptIdx   = 1;
+        pOpts->pzCurOpt    = (char*)NULL;
     }
 
     /*
@@ -1661,7 +1190,7 @@ optionProcess(
      *  non-standard programs that require it.)
      */
     for (;;) {
-        tOptState optState = { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL };
+        tOptState optState = OPTSTATE_INITIALIZER;
 
         switch (nextOption( pOpts, &optState )) {
         case FAILURE:
@@ -1697,7 +1226,7 @@ optionProcess(
             continue;
         }
 
-        if (! SUCCESSFUL( loadValue( pOpts, &optState ))) {
+        if (! SUCCESSFUL( handleOption( pOpts, &optState ))) {
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
                 (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
             break;

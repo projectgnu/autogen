@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.19 2003/11/23 02:07:44 bkorb Exp $
+ *  $Id: enumeration.c,v 3.20 2003/11/23 19:15:28 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -51,9 +51,27 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/* === STATIC PROCS === */
+STATIC void
+enumError(
+    tOptions* pOpts,
+    tOptDesc* pOD,
+    tCC**     paz_names,
+    int       name_ct );
+
+STATIC uintptr_t
+findName(
+    tCC*          pzName,
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC**         paz_names,
+    unsigned int  name_ct );
+
+/* === END STATIC PROCS === */
+
 tSCC*  pz_enum_err_fmt;
 
-LOCAL void
+STATIC void
 enumError(
     tOptions* pOpts,
     tOptDesc* pOD,
@@ -81,7 +99,7 @@ enumError(
 }
 
 
-LOCAL uintptr_t
+STATIC uintptr_t
 findName(
     tCC*          pzName,
     tOptions*     pOpts,

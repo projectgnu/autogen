@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.24 2003/11/23 06:24:43 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.25 2003/11/23 19:15:28 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -79,6 +79,37 @@ The following option preset mechanisms are supported:\n";
 FILE* option_usage_fp = NULL;
 static char    zOptFmtLine[ 16 ];
 static ag_bool displayEnum;
+
+/* === STATIC PROCS === */
+STATIC void
+printProgramDetails( tOptions* pOptions );
+
+STATIC void
+printExtendedUsage(
+    tOptions*     pOptions,
+    tOptDesc*     pOD,
+    arg_types_t*  pAT );
+
+STATIC void
+printBareUsage(
+    tOptions*     pOptions,
+    tOptDesc*     pOD,
+    arg_types_t*  pAT );
+
+STATIC void
+setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+
+STATIC void
+setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+
+STATIC void
+printInitList(
+    tCC**    papz,
+    ag_bool* pInitIntro,
+    tCC*     pzRc,
+    tCC*     pzPN );
+
+/* === END STATIC PROCS === */
 
 /*=export_func  optionUsage
  * private:
@@ -248,7 +279,7 @@ or by a single hyphen and the flag character.\n";
  *
  *   PROGRAM DETAILS
  */
-LOCAL void
+STATIC void
 printProgramDetails( tOptions* pOptions )
 {
     ag_bool  initIntro = AG_TRUE;
@@ -298,7 +329,7 @@ printProgramDetails( tOptions* pOptions )
  *
  *   PER OPTION TYPE USAGE INFORMATION
  */
-LOCAL void
+STATIC void
 printExtendedUsage(
     tOptions*     pOptions,
     tOptDesc*     pOD,
@@ -428,7 +459,7 @@ printExtendedUsage(
 }
 
 
-LOCAL void
+STATIC void
 printBareUsage(
     tOptions*     pOptions,
     tOptDesc*     pOD,
@@ -568,7 +599,7 @@ static arg_types_t stdTypes = {
     /* pzSpc  */ zSixSpaces + 4   /* 2 spaces */
 };
 
-LOCAL void
+STATIC void
 setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
 {
     int  flen = 0;
@@ -601,7 +632,7 @@ setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
     sprintf( zOptFmtLine, zFmtFmt, flen );
 }
 
-LOCAL void
+STATIC void
 setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
 {
     int  flen = 22;
@@ -630,7 +661,7 @@ setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
  *   testing to see if a name is a directory or a file.  It's
  *   squishy, but important to tell users how to find these files.
  */
-LOCAL void
+STATIC void
 printInitList(
     tCC**    papz,
     ag_bool* pInitIntro,

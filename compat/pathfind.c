@@ -5,24 +5,16 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 2001/12/09 19:46:02 $
+ * Last Modified:    $Date: 2003/11/23 19:16:36 $
  *            by:    Bruce Korb <bkorb@gnu.org>
  *
- * $Id: pathfind.c,v 3.0 2001/12/09 19:46:02 bkorb Exp $
+ * $Id: pathfind.c,v 3.1 2003/11/23 19:16:36 bkorb Exp $
  */
 
 /* Code: */
 
 #include "compat.h"
 #ifndef HAVE_PATHFIND
-
-#ifndef STATIC
-#  ifdef DEBUG
-#    define STATIC
-#  else
-#    define STATIC static
-#  endif
-#endif
 
 STATIC char* make_absolute( const char *string, const char *dot_path );
 STATIC char* canonicalize_pathname( char *path );

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-11-22 17:22:21 bkorb"
+ *  Time-stamp:      "2003-11-23 08:41:41 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.18 2003/11/23 02:07:44 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.19 2003/11/23 19:16:36 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -135,6 +135,8 @@ typedef struct {
     int        argType;
     char*      pzOptArg;
 } tOptState;
+#define OPTSTATE_INITIALIZER \
+    { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL }
 
 #define TEXTTO_TABLE \
         _TT_( LONGUSAGE ) \
