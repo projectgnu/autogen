@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.0 1998/08/21 20:31:00 bkorb Exp $
+#$Id: optcode.tpl,v 2.1 1998/08/21 21:24:05 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -390,7 +390,8 @@ tSCC   zPROGNAME[]   = "[=prog_name _up=]";[=
           but only if we have not been provided with a value."
 
 =]
-tSCC   zUsageTitle[] = "[=prog_name=] - " [=prog_title _str=]
+tSCC   zUsageTitle[] = "[=prog_name=] - " [=prog_title _str=][=
+           version " - Version %s" _printf=]
     "\nUSAGE:  %s [=
         _IF flag.value _exist =][-<flag> [<val>]]... [=
         _ELIF long_opts _exist !=][<option-name>[{=| }<value>]] ...[=
