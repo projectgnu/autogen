@@ -1,6 +1,9 @@
 [= AutoGen5 Template spec =]
 
-%define __spec_install_post  /usr/lib/rpm/brp-strip ; /usr/lib/rpm/brp-strip-static-archive ; /usr/lib/rpm/brp-strip-comment-note
+%define __spec_install_post  /usr/lib/rpm/brp-strip ;[=
+`test -x /usr/lib/rpm/brp-strip-static-archive && \
+   echo ' /usr/lib/rpm/brp-strip-static-archive ;'`
+=] /usr/lib/rpm/brp-strip-comment-note
 
 Summary: AutoGen - [=prog-title=]
 Name: [= prog-name =]
@@ -12,7 +15,6 @@ Group: Development/Tools
 Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
 BuildRoot: [=`cd ${top_builddir}/AGPKG > /dev/null && pwd`
            =]/BUILD/ROOT
-BuildRequires: gzip texinfo libtool > 1.3 guile
 
 %description
 AutoGen is a tool designed for generating program files that contain

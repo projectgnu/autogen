@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2003/05/31 23:15:06 bkorb Exp $
+## $Id: Makefile.am,v 3.16 2003/08/24 00:01:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -70,8 +70,6 @@ GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS) $(BLOCKOPT)
 
 AGEXE		= `cd $(top_builddir)/agen5   ; pwd`/@AGEXE@
 COLUMNS_EXE = `cd $(top_builddir)/columns ; pwd`/columns@EXEEXT@
-AGARGS		= base-name=autogen autogen=$(AGEXE) \
-		agarg="-L$(srcdir) -L$(top_srcdir) -t180"
 
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
@@ -83,7 +81,8 @@ texi-stamp : autogen.def
 	AGEXE=$(AGEXE) CC="$(CC)" COLUMNS_EXE="$(COLUMNS_EXE)" \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
-	LIBS="$(LIBS)" $(AGEXE) -t180 -L$(srcdir) -L$(top_srcdir) autogen.def
+	LIBS="$(LIBS)" SHELL=/bin/sh \
+	$(AGEXE) -t180 -L$(srcdir) -L$(top_srcdir) autogen.def
 	@touch $@ ; chmod u+w $(srcdir) . || :
 
 autogen.def : $(DOC_DEPENDS)

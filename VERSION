@@ -1,10 +1,10 @@
-#! /bin/echo AutoGen_Version_5.0,_but_this_should_be_sourced
+#! /bin/echo AutoGen_Version_5.5,_but_this_should_be_sourced
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
 # Copyright (C) 1999-2003 Bruce Korb
 #
-# Time-stamp:        "2003-08-07 19:49:08 bkorb"
+# Time-stamp:        "2003-08-23 08:54:17 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 # ----------------------------------------------------------------------
@@ -12,7 +12,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".6pre3"
+AG_PATCHLEVEL=".6"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

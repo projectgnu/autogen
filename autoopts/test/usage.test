@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2003-08-09 20:52:56 bkorb"
+## Time-stamp:      "2003-08-23 15:21:38 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 3.8 2003/08/21 02:06:09 bkorb Exp $
+# $Id: usage.test,v 3.9 2003/08/24 00:01:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -676,9 +676,9 @@ emit_defs()
 	    descrip   = "Show the definition tree";
 	_EOF_
 
-  if ${flag_opts} && ! ${long_opts}
+  if ${flag_opts}
   then
-    echo "    value     = s;" >&4
+    ${long_opts} || echo "    value     = s;" >&4
   fi
 
   if ${arg_opts}

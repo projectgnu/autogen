@@ -1,3 +1,17 @@
+2003-08-23  Bruce Korb  <bkorb@gnu.org>
+
+	==5.5.6 released.
+
+	* pkg/spec.tpl(brp-strip-static-archive): invoke this in post processing
+	only if it actually exists.
+	(BuildRequires): presumes RPM-installed tools, will not check for
+	``make install'' versions.
+	* doc/Makefile.am(AGARGS): obsolete
+	(SHELL): set it to /bin/sh before genning the docs
+	* autoopts/test/usage.test(! ${long_opts}): rework as a proper command
+	* agen5/test/defs(VERBOSE): ``!'' is not a proper shell command
+	* snprintfv/compat.h(#endif): remove ^M
+
 2003-08-20  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(arg-range): Include stdio.h and limits.h
