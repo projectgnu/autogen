@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.11 2003/04/11 21:38:43 bkorb Exp $
+ *  $Id: expOutput.c,v 3.12 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -25,11 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <time.h>
-#include <utime.h>
-
 #include "autogen.h"
-#include "expr.h"
 
 #ifndef S_IAMB
 /*

@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.5 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expExtract.c,v 3.6 2003/04/13 21:42:13 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -25,9 +25,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <string.h>
-
-#include "expr.h"
 #include "autogen.h"
 
 /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.13 2003/03/11 03:35:42 bkorb Exp $
+ *  $Id: expPrint.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -30,13 +30,11 @@
  */
 
 #include <signal.h>
-#include <compat/compat.h>
 
 #ifndef HAVE_STRSIGNAL
 #  include <compat/strsignal.c>
 #endif
 
-#include "expr.h"
 #include "autogen.h"
 
 STATIC sigjmp_buf printJumpEnv;

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.13 2003/04/11 21:38:43 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -27,7 +27,6 @@
 
 #define HANDLE_FUNCTIONS
 #include "autogen.h"
-#include "expr.h"
 
 STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
 
@@ -312,8 +311,20 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
     pCurFp = pStk;
 
-    if (strcmp( pOutSpec->zSuffix, "null" ) == 0)
-        goto openNull;
+    if (strcmp( pOutSpec->zSuffix, "null" ) == 0) {
+      null_open:
+        /*
+         *  Make the output a no-op, but perform the operations.
+         */
+        AGFREE( (void*)pStk->pzOutName );
+        pStk->pzOutName = (char*)zDevNull;
+        pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
+        pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
+        if (pStk->pFile != NULL)
+            return;
+
+        goto openError;
+    }
 
     /*
      *  IF we are to skip the current suffix,
@@ -325,21 +336,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         char**  ppz = STACKLST_OPT( SKIP_SUFFIX );
 
         while (--ct >= 0) {
-            if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0) {
-
-            openNull:
-                /*
-                 *  Make the output a no-op, but perform the operations.
-                 */
-                AGFREE( (void*)pStk->pzOutName );
-                pStk->pzOutName = (char*)zDevNull;
-                pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
-                pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
-                if (pStk->pFile != NULL)
-                    return;
-
-                goto openError;
-            }
+            if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0)
+                goto null_open;
         }
     }
 

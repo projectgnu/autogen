@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.8 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expMake.c,v 3.9 2003/04/13 21:42:13 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -26,7 +26,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include "expr.h"
 #include "autogen.h"
 
 /*=gfunc makefile_script

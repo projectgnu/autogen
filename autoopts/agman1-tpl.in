@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-02-03 17:22:22 bkorb"
+## Time-stamp:      "2003-04-12 15:58:44 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.19 2003/02/16 00:04:39 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.20 2003/04/13 21:42:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -50,6 +50,7 @@ sed \
  -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
  -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
  -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
+ -e      's;@i{\([^}]*\)};\\fI\1\\fP;g' \
  -e   's;@file{\([^}]*\)};\\fI\1\\fP;g' \
  -e   's;@emph{\([^}]*\)};\\fI\1\\fP;g' \
  -e 's;@strong{\([^}]*\)};\\fB\1\\fP;g' \

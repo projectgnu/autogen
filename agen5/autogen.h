@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.12 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: autogen.h,v 3.13 2003/04/13 21:42:13 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -27,9 +27,10 @@
 #ifndef AUTOGEN_HDR_H
 #define AUTOGEN_HDR_H
 
-#include "compat/compat.h"
-#include "autoopts/autoopts.h"
 #include "agUtils.h"
+#include "compat/compat.h"
+#include "expr.h"
+#include "autoopts/autoopts.h"
 #include "streqv.h"
 
 #define STATE_TABLE           /* set up `atexit' and load Guile   */  \

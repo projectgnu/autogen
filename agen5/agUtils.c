@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.11 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: agUtils.c,v 3.12 2003/04/13 21:42:13 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,8 +25,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <time.h>
-#include <utime.h>
 #include <ctype.h>
 #include <assert.h>
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.19 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: autogen.c,v 3.20 2003/04/13 21:42:13 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,8 +25,10 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
+#include <sys/types.h>
 #define DEFINING
 #include "autogen.h"
+#include <sys/wait.h>
 #include <signal.h>
 #include <assert.h>
 

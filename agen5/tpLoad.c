@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.14 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.15 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -25,9 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <sys/types.h>
 #include <sys/param.h>
-#include <sys/mman.h> 
 #include <fcntl.h>
 
 #include "autogen.h"

@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.8 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: defFind.c,v 3.9 2003/04/13 21:42:13 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -24,8 +24,9 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
+
 #include "autogen.h"
-#include "assert.h"
+#include <assert.h>
 
 struct defEntryList {
     size_t         allocCt;

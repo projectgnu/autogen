@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.9 2003/03/02 23:39:10 bkorb Exp $
+ *  $Id: funcFor.c,v 3.10 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -27,7 +27,6 @@
 #ifndef DEFINE_LOAD_FUNCTIONS
 
 #include "autogen.h"
-#include "expr.h"
 
 #define ENTRY_END  INT_MAX
 

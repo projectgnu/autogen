@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.15 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: agShell.c,v 3.16 2003/04/13 21:42:13 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -25,13 +25,7 @@
  */
 
 #include "autogen.h"
-
-#ifdef HAVE_FCNTL_H
-#  include <fcntl.h>
-#else
-#  error NEED  <fcntl.h>
-#endif
-
+#include <fcntl.h>
 #include <signal.h>
 
 #if HAVE_SYS_PROCSET_H

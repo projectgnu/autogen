@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.12 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: functions.c,v 3.13 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -25,9 +25,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
-
-#include <time.h>
-#include <utime.h>
 
 #include "autogen.h"
 

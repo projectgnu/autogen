@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.10 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.11 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -25,9 +25,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <sys/types.h>
 #include <sys/param.h>
-#include <sys/mman.h>
 #include <fcntl.h>
 
 #include "autogen.h"

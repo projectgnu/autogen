@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.11 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: funcCase.c,v 3.12 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -27,7 +27,6 @@
 #ifndef DEFINE_LOAD_FUNCTIONS
 
 #include "autogen.h"
-#include "expr.h"
 
 #include REGEX_HEADER
 

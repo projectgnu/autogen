@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.12 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: funcEval.c,v 3.13 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -26,10 +26,8 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
-#include "expr.h"
 #include "autogen.h"
 
-#include <compat/compat.h>
 #include REGEX_HEADER
 
 tSCC        zNil[] = "";

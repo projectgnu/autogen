@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.13 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expFormat.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -103,9 +103,6 @@ static const char zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-#include <string.h>
-
-#include "expr.h"
 #include "autogen.h"
 
 #ifndef HAVE_STRFTIME

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.5 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: funcIf.c,v 3.6 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -26,7 +26,6 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
-#include "expr.h"
 #include "autogen.h"
 
 tSCC zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.13 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: funcDef.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -26,9 +26,6 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
-#include <guile/gh.h>
-
-#include "expr.h"
 #include "autogen.h"
 
 tSCC zNil[] = "";

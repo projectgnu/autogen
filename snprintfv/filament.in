@@ -109,7 +109,7 @@ fillen (Filament *fil)
  * this range and -1 is returned.
  **/
 SNV_INLINE int
-filelt (Filament *fil, size_t n)
+filelt (Filament *fil, ssize_t n)
 {
   if ((n >= 0) && (n < fil->length))
     return (int) fil->value[n];

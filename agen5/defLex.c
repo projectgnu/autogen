@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.13 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: defLex.c,v 3.14 2003/04/13 21:42:13 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -24,7 +24,7 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-#include "expr.h"
+
 #include "autogen.h"
 #include "defParse.h"
 
