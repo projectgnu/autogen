@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.17 2001/09/21 03:09:48 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.18 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -72,6 +72,7 @@ tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
 tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
 tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
 tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
+tSCC zRange[]      = "\t\t\t\t- must lie within the range:\n";
 tSCC zTabout[]     = "\t\t\t\t%s\n";
 tSCC zTabHyp[]     = "\t\t\t\t- ";
 tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
@@ -281,6 +282,17 @@ DEF_PROC_2( void optionUsage,
              */
             if (pOD->pz_DisableName != (char*)NULL )
                 fprintf( fp, zDis, pOD->pz_DisableName );
+
+            /*
+             *  IF the numeric option has a special callback,
+             *  THEN call it, requesting the range or other special info
+             */
+            if (  (pOD->fOptState & OPTST_NUMERIC)
+                  && (pOD->pOptProc != NULL)
+                  && (pOD->pOptProc != optionNumericVal) ) {
+                fputs( zRange, stderr );
+                (*(pOD->pOptProc))( pOptions, NULL );
+            }
 
             /*
              *  IF the option defaults to being enabled,

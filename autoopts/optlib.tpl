@@ -1,15 +1,21 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.33 2001/09/29 20:42:44 bkorb Exp $
+# $Id: optlib.tpl,v 1.34 2001/10/01 23:51:33 bkorb Exp $
 
 =][=
 
-IF (getenv "DOCUMENT_USAGE") =][=
-  (define skip-ifdef #t)     =][=
-ELSE                         =][=
-  (define skip-ifdef #f)     =][=
-ENDIF                        =][=
+IF (getenv "DOCUMENT_USAGE")     =][=
+  (define skip-ifdef #t)         =][=
 
+ELIF (or (exist? "flag.ifdef")
+         (exist? "flag.ifndef")) =][=
+  (define skip-ifdef #f)         =][=
+
+ELSE                             =][=
+  (define skip-ifdef #t)         =][=
+ENDIF
+
+=][=
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Emit the "#define SET_OPT_NAME ..." and "#define DISABLE_OPT_NAME ..."
@@ -30,6 +36,7 @@ DEFINE set_defines set_desc set_index opt_state =]
          (exist? "flag_code")
          (exist? "extract_code")
          (exist? "flag_proc")
+         (exist? "arg_range")
          (exist? "stack_arg")
          (~* (get "arg_type") "key|num|bool" ) )   =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
@@ -46,6 +53,7 @@ DEFINE set_defines set_desc set_index opt_state =]
            (exist? "flag_code")
            (exist? "extract_code")
            (exist? "flag_proc")
+           (exist? "arg_range")
            (exist? "stack_arg") ) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                   (. pname)=]Options, \
@@ -111,7 +119,8 @@ DEFINE Option_Defines      =][=
     ELIF (exist? "ifndef") =]
 #ifndef [=(get "ifndef")   =][=
     ENDIF ifdef/ifndef     =][=
-  ENDIF =]
+  ENDIF =][=
+
   IF (=* (get "arg_type") "key") =]
 typedef enum {[=
          IF (not (exist? "arg_default")) =] [=
@@ -128,7 +137,6 @@ typedef enum {[=
 #define VALUE_[=(sprintf "%-18s" opt-name)=] [=
      IF (exist? "value") =][=
         CASE (get "value") =][=
-        =   number  =]NUMBER_OPTION[=
         ==  '       =]'\''[=
         ~   .       =]'[=value=]'[=
         *           =][=ERROR (sprintf
@@ -403,7 +411,8 @@ DEFINE Option_Descriptor =][=
      /* option proc      */ [=
          IF   (exist? "call_proc")        =][=call_proc=][=
          ELIF (or (exist? "extract_code")
-                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
+                  (exist? "flag_code")
+                  (exist? "arg_range"))   =]doOpt[=(. cap-name)=][=
          ELSE                             =](tpOptProc)NULL[=
          ENDIF =],
      /* desc, NAME, name */ z[=(. cap-name)=]Text, (const char*)NULL,
@@ -453,7 +462,8 @@ DEFINE Option_Descriptor =][=
      /* option proc      */ [=
          IF   (exist? "call_proc")        =][=call_proc=][=
          ELIF (or (exist? "extract_code")
-                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
+                  (exist? "flag_code")
+                  (exist? "arg_range"))   =]doOpt[=(. cap-name)=][=
 
          ELIF (exist? "flag_proc") =]doOpt[= (string-capitalize!
                                              (get "flag_proc")) =][=

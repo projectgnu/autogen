@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.30 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: expState.c,v 1.31 2001/10/01 23:51:33 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -333,7 +333,10 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
  *
  * exparg: ag-name, name of AutoGen value
  *
- * doc:  get the first string value associated with the name.
+ * doc:
+ *  Get the first string value associated with the name.
+ *  It will always return either the associated string value, or
+ *  the empty string.
 =*/
     SCM
 ag_scm_get( SCM obj )
@@ -356,7 +359,19 @@ ag_scm_get( SCM obj )
  *
  * exparg: ag-name, name of AutoGen value
  *
- * doc:  Returns the highest index associated with an array of definitions.
+ * doc:
+ *
+ *  Returns the highest index associated with an array of definitions.
+ *  This is generally, but not necessarily, one less than the
+ *  @code{count} value.  (The indexes may be specified, rendering a
+ *  non-zero based or sparse array of values.)
+ *
+ *  This is very useful for specifying the size of a zero-based array
+ *  of values where not all values are present.  For example:
+ *
+ *  @example
+ *  tMyStruct myVals[ [+ (+ 1 (high-lim "my-val-list")) +] ];
+ *  @end example
 =*/
     SCM
 ag_scm_high_lim( SCM obj )

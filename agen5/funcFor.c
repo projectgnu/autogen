@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.24 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: funcFor.c,v 1.25 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -513,8 +513,8 @@ doForEach( tTemplate*   pT,
  *
  *  The first argument must be the name of an AutoGen value.  If there is
  *  no value associated with the name, the FOR loop block is skipped
- *  entirely.  The scope of the @code{FOR} function extends to the ENDFOR
- *  macro that contains this name.
+ *  entirely.  The scope of the @code{FOR} function extends to the
+ *  corresponding ENDFOR macro.
  *
  *  If there are any further arguments, if the first character is either
  *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
@@ -564,7 +564,6 @@ doForEach( tTemplate*   pT,
 /*=macfunc ENDFOR
  *
  *  what:   Terminates the @code{FOR} function template block
- *  situational:
  *
  *  desc:
  *    This macro ends the @code{FOR} function template block.

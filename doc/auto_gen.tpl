@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.71 2001/09/29 20:42:44 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.72 2001/10/01 23:51:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -297,15 +297,75 @@ This Scheme function takes no arguments.[=
   ENDIF general_use =][=
 ENDFOR gfunc
 =]
-[= get-text tag = macros =]
-@menu[=
+[= get-text tag = MACROS =]
+@menu
+* AGMacro syntax::   AutoGen Macro Syntax[=
 FOR macfunc =][=
-  IF (exist? "desc") =]
-* [=% name (sprintf "%%-18s" "%s::")
-  =] [=(string-upcase! (get "name"))=] - [=what=][=
+  IF (exist? "desc") =][=
+    (sprintf "\n* %-18s %s - %s"
+       (string-append  (get "name") "::" )
+       (string-upcase! (get "name"))
+       (get "what") ) =][=
   ENDIF =][=
 ENDFOR macfunc=]
 @end menu
+@node AGMacro syntax
+@subsection AutoGen Macro Syntax
+@cindex macro syntax
+
+The general syntax is:
+
+@example
+[ @{ <native-macro-name> | <user-defined-name> @} ] [ <arg> ... ]
+@end example
+
+@noindent
+The syntax for @code{<arg>} depends on the particular macro,
+but is generally a full expression (@pxref{expression syntax}).
+Here are the exceptions to that general rule:
+
+@enumerate
+@item
+@code{INVOKE} macros, implicit or explicit, must be followed by
+a list of name/string value pairs.  The string values are
+@i{simple expressions}, as described above.
+
+That is, the @code{INVOKE} syntax is either:
+@example
+<user-macro-name> [ <name> [ = <expression> ] ... ]
+@end example
+@noindent
+or
+@example
+INVOKE <name-expression> [ <name> [ = <expression> ] ... ]
+@end example
+
+@item
+AutoGen FOR macros must be in one of two forms:
+
+@example
+FOR <name> [ <separator-string> ]
+@end example
+@noindent
+or
+@example
+FOR <name> (...Scheme expression list)
+@end example
+@noindent
+where @code{<name>} must be a simple name and the Scheme expression list
+is expected to contain one or more of the @code{for-from},
+@code{for-to}, @code{for-by}, and @code{for-sep} functions.
+(@xref{FOR}, and @ref{AutoGen Functions})
+
+@item
+AutoGen @code{DEFINE} macros must be followed by a simple name.
+Anything after that is ignored.  @xref{DEFINE}.
+
+@item
+The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
+macros take no arguments and ignore everything after the macro name
+(e.g. see @ref{COMMENT})
+@end enumerate
 [=
 
 #  FOR each defined function,

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.33 2001/09/29 20:42:44 bkorb Exp $
+ *   $Id: opts.def,v 1.34 2001/10/01 23:51:33 bkorb Exp $
  *
  *  AutoGen copyright 1992-2000 Bruce Korb
  *
@@ -366,12 +366,15 @@ flag = {
     value       = t;
     arg_type    = number;
     arg_default = 10;
+    arg_range   = "0->3600"; /* one hour limit */
     arg_name    = time-lim;
     descrip     = "Time limit for servers";
     doc =
     "AutoGen works with a shell server process.  Most normal commands\n"
     "will complete in less than 10 seconds.  If, however, your commands\n"
-    "need more time than this, use this option.";
+    "need more time than this, use this option.\n\n"
+    "The valid range is 0 to 3600 seconds (1 hour).\n"
+    "Zero will disable the server time limit.";
 };
 
 flag = {

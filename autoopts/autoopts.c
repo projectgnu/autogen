@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.34 2001/09/29 17:08:56 bkorb Exp $
+ *  $Id: autoopts.c,v 2.35 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -388,9 +388,9 @@ shortOptionFind( pOpts, optValue, pOptState )
  *
  *  Find the option descriptor for the current option
  */
-DEF_PROC_2( STATIC tSuccess findOptDesc,
-            tOptions*,  pOpts,
-            tOptState*, pOptState )
+STATIC tSuccess findOptDesc( pOpts, pOptState )
+    tOptions*  pOpts;
+    tOptState* pOptState;
 {
     /*
      *  IF we are continuing a short option list (e.g. -xyz...)
@@ -1217,8 +1217,8 @@ doEnvPresets( pOpts, type )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-DEF_PROC_1( STATIC tSuccess doPresets,
-            tOptions*,  pOpts )
+STATIC tSuccess doPresets( pOpts )
+    tOptions*  pOpts;
 {
 #   define SKIP_RC_FILES \
     DISABLED_OPT(&(pOpts->pOptDesc[ pOpts->specOptIdx.save_opts+1]))
@@ -1328,8 +1328,8 @@ DEF_PROC_1( STATIC tSuccess doPresets,
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-DEF_PROC_1( STATIC int checkConsistency,
-            tOptions*,  pOpts )
+STATIC int checkConsistency( pOpts )
+    tOptions*  pOpts;
 {
     int       errCt = 0;
 
@@ -1480,7 +1480,8 @@ DEF_PROC_2( void doLoadOpt,
  *
  *  Return the compiled version number.
  */
-DEF_PROC_0( const char* optionVersion )
+const char*
+optionVersion()
 {
     static const char zVersion[] =
         STR( AO_ANNOUNCE_LEVEL );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.15 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: funcIf.c,v 1.16 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -123,7 +123,6 @@ eval_true( void )
 /*=macfunc ENDIF
  *
  *  what:   Terminate the @code{IF} Template Block
- *  situational:
  *
  *  desc:
  *    This macro ends the @code{IF} function template block.
@@ -207,7 +206,6 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
 /*=macfunc ENDWHILE
  *
  *  what:   Terminate the @code{WHILE} Template Block
- *  situational:
  *
  *  desc:
  *    This macro ends the @code{WHILE} function template block.
@@ -259,7 +257,6 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
 /*=macfunc ELIF
  *
  *  what:   Alternate Conditional Template Block
- *  situational:
  *
  *  desc:
  *    This macro must only appear after an @code{IF} function, and
@@ -285,7 +282,6 @@ mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*=macfunc ELSE
  *
  *  what:   Alternate Template Block
- *  situational:
  *
  *  desc:
  *    This macro must only appear after an @code{IF} function,

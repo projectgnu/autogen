@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.38 2001/08/25 00:18:17 bkorb Exp $
+ *  $Id: funcDef.c,v 1.39 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -516,7 +516,6 @@ build_defs( int defCt, tDefList* pList )
 /*=macfunc ENDDEF
  *
  *  what:   Ends a macro definition.
- *  situational:
  *
  *  desc:
  *    This macro ends the @code{DEFINE} function template block.

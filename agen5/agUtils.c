@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.14 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: agUtils.c,v 1.15 2001/10/01 23:51:33 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -202,7 +202,10 @@ doOptions( int arg_ct, char** arg_vec )
     {
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
-            SI_PLATFORM, SI_MACHINE };
+#ifdef      SI_PLATFORM
+            SI_PLATFORM,
+#endif
+            SI_MACHINE };
         int ix;
         long sz;
         char z[ 128 ];

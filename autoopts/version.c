@@ -1,13 +1,13 @@
 
 /*
- *  $Id: version.c,v 2.6 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: version.c,v 2.7 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 /*
- *  Automated Options copyright 1992-2000 Bruce Korb
+ *  Automated Options copyright 1992-2001 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -55,7 +55,7 @@
 #include "autoopts.h"
 
 tSCC zAO[] =
-    "Automated Options version %s, copyright (c) 1999-2000 Bruce Korb\n";
+    "Automated Options version %s, copyright (c) 1999-2001 Bruce Korb\n";
 
 tSCC zBadArg[] =
 "ERROR: version option argument '%c' invalid.  Use:\n\

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.14 2001/09/21 03:09:48 bkorb Exp $
+# $Id: optmain.tpl,v 2.15 2001/10/01 23:51:33 bkorb Exp $
 
 =]
 [=
@@ -148,11 +148,15 @@ DEFINE declare-option-callbacks      =][=
 static tOptProc doOpt[=(. cap-name)  =];[=
     =*  bool                         =][=
     =*  num                          =][=
+      IF (exist? "arg_range")        =]
+static tOptProc doOpt[=(. cap-name)  =];[=
+      ENDIF                          =][=
     *                                =][=
       IF (exist? "call_proc")        =]
 extern tOptProc [=(get "call_proc")  =];[=
 
-      ELIF (or (exist? "flag_code") (exist? "extract_code")) =]
+      ELIF (or (exist? "extract_code")
+               (exist? "flag_code")) =]
 static tOptProc doOpt[=(. cap-name)  =];[=
 
       ENDIF                          =][=
@@ -178,7 +182,9 @@ static tOptProc doOpt[=(. cap-name)  =];[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (or (exist? "flag_code") (exist? "extract_code"))  =]
+      ELIF (or (exist? "flag_code")
+               (exist? "extract_code")
+               (exist? "arg_range")) =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
                         =](tpOptProc)NULL[=
@@ -221,6 +227,82 @@ ENDDEF                          =][=
 
 # # # # # # # # # # # # # # # # =][=
 
+DEFINE range-option-code
+
+=][=
+
+(if (not (=* (get "arg_type") "num"))
+    (error (string-append "range option " low-name " is not numeric")) )
+
+=]    static struct {int rmin, rmax;} optRange[ [=(count "arg_range")=] ] = {
+[=(out-push-new)      =][=
+  FOR arg_range ",\n" =][=
+    CASE arg_range    =][=
+      *==    "->"     =][=
+             (shellf "f=`echo '%s'|sed 's,->$,,'`
+                     echo \"{ $f, INT_MAX }\"" (get "arg_range")) =][=
+
+      ==*    "->"     =][=
+             (shellf "f=`echo '%s'|sed 's,^->,,'`
+                     echo \"{ INT_MIN, $f }\"" (get "arg_range")) =][=
+
+      *==*   "->"     =][=
+             (shellf "f=`echo '%s'|sed 's/->/, /'`
+                     echo \"{ $f }\"" (get "arg_range")) =][=
+
+      *               =]{ [=arg_range=], INT_MAX-1 }[=
+    ESAC arg_range    =][=
+  ENDFOR =][=
+  (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
+          (out-pop #t)) =] };
+    int val, ix;
+    tCC* pzIndent = "\t\t\t\t  ";
+
+    if (pOptDesc == NULL) /* usage is requesting range list */
+        goto emit_ranges;
+
+    val = atoi( pOptDesc->pzLastArg );
+    for (ix = 0; ix < [=(count "arg_range")=]; ix++) {
+        if (val == optRange[ix].rmin)
+            goto valid_return;
+        if (optRange[ix].rmax == INT_MAX-1)
+            continue;
+        if (val < optRange[ix].rmin)
+            continue;
+        if (val <= optRange[ix].rmax)
+            goto valid_return;
+    }
+
+    fprintf( stderr, "%s error:  %s option value ``%s''is out of range.\n"
+             "\tit must lie in the range:",
+             pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->pzLastArg );
+    pzIndent = "\t";
+
+  emit_ranges:
+    for ( ix=0;; ) {
+        if (optRange[ix].rmax == 0)
+             fprintf( stderr, "%s%d", pzIndent, optRange[ix].rmin );
+        else fprintf( stderr, "%s%d to %d", pzIndent,
+                      optRange[ix].rmin, optRange[ix].rmax );
+        if (++ix >= [=(count "arg_range")=])
+            break;
+        fputs( ", or\n", stderr );
+    }
+
+    fputc( '\n', stderr );
+    if (pOptDesc == NULL)
+        return;
+
+    [=(. UP-prefix)=]USAGE( EXIT_FAILURE );
+    /* NOTREACHED */
+
+  valid_return:
+    pOptDesc->pzLastArg = (char*)val;[=
+
+ENDDEF                          =][=
+
+# # # # # # # # # # # # # # # # =][=
+
 DEFINE define-option-callbacks  =][=
 
   FOR  flag  =][=
@@ -229,7 +311,9 @@ DEFINE define-option-callbacks  =][=
     (set! cap-name   (string-capitalize UP-name))
     (set! low-name   (string-downcase UP-name))      =][=
 
-    IF (or (exist? "flag_code") (exist? "extract_code")) =][=
+    IF (or (exist? "flag_code")
+           (exist? "extract_code")
+           (exist? "arg_range") ) =][=
 
       IF (exist? "test_main") =]
 
@@ -238,9 +322,19 @@ DEFINE define-option-callbacks  =][=
       ENDIF =][=
 
       invoke callback-proc-header  =][=
-      (if (exist? "flag_code") (get "flag_code")
-          (extract (string-append (base-name) ".c.save") (string-append
-          "/*  %s =-= " cap-name " Opt Code =-= %s */"))  ) =]
+
+      IF (exist? "flag_code")      =][=
+         flag_code                 =][=
+
+      ELIF (exist? "extract_code") =][=
+         (extract (string-append (base-name) ".c.save") (string-append
+                  "/*  %s =-= " cap-name " Opt Code =-= %s */"))
+         =][=
+
+      ELIF (exist? "arg_range")    =][=
+         range-option-code         =][=
+
+      ENDIF =]
 }[=
 
   IF (exist? "test_main") =]

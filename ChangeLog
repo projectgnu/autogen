@@ -1,3 +1,20 @@
+2001-10-01  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: much doc cleanups
+	* autoopts/opt*.tpl(arg_range): crate a handler procedure when this
+	attribute is specified.
+	* agen5/opts.def(--timeout): take advantage of this
+	* autoopts/numeric.c: accommodate the usage procedure callback
+	* autoopts/usage.c: call numeric argument callback procedures to get
+	any range information they may want to add for extended usage.
+	* autoopts/makeshell.c: fix pointer reference
+
+2001-10-01  Albert Chin  <china@thewrittenword.com>
+
+	* agen5/agUtils.c(doOptions): not all systems with POSIX sysinfo
+	support SI_PLATFORM.
+	* agen5/bootstrap.dir(COLUMNS_EXE): needs to be exported
+
 2001-09-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/stack.c(unstack): make it work when we don't have posix

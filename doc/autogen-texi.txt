@@ -1212,62 +1212,41 @@ Extraction from autogen.texi
 @cindex native macros
 
 This section describes the various AutoGen natively defined macros.
-The general syntax is:
+Unlike the Scheme functions, some of these macros are "block macros"
+with a scope that extends through a terminating macro.  Block macros
+must not overlap.  That is to say, a block macro started within the
+scope of an encompassing block macro must have its matching end macro
+appear before the encompassing block macro is either ended or subdivided.
 
-@example
-[ @{ <native-macro-name> | <user-defined-name> @} ] [ <arg> ... ]
-@end example
+The block macros are these:
 
-@noindent
-The syntax for @code{<arg>} depends on the particular macro,
-but is generally a full expression (@pxref{expression syntax}).
-Here are the exceptions to that general rule:
+@table @code
+@item CASE
+This macro has scope through the @code{ESAC} macro.
+The scope is subdivided by @code{SELECT} macros.
+You must have at least one @code{SELECT} macro.
 
-@enumerate
-@item
-@code{INVOKE} macros, implicit or explicit, must be followed by
-a list of name/string value pairs.  The string values are
-@i{simple expressions}, as described above.
+@item DEFINE
+This macro has scope through the @code{ENDDEF} macro.
+The defined user macro can never be a block macro.
 
-That is, the @code{INVOKE} syntax is either:
-@example
-<user-macro-name> [ <name> [ = <expression> ] ... ]
-@end example
-@noindent
-or
-@example
-INVOKE <name-expression> [ <name> [ = <expression> ] ... ]
-@end example
+@item FOR
+This macro has scope through the @code{ENDFOR} macro.
 
-@item
-AutoGen FOR macros must be in one of two forms:
+@item IF
+This macro has scope through the @code{ENDIF} macro.
+The scope may be subdivided by @code{ELIF} and @code{ELSE}
+macros.  Obviously, there may be only one @code{ELSE} macro
+and it must be the last of these subdivisions.
 
-@example
-FOR <name> [ <separator-string> ]
-@end example
-@noindent
-or
-@example
-FOR <name> (...Scheme expression list)
-@end example
-@noindent
-where @code{<name>} must be a simple name and the Scheme expression list
-is expected to contain one or more of the @code{for-from},
-@code{for-to}, @code{for-by}, and @code{for-sep} functions.
-(@xref{FOR}, and @ref{AutoGen Functions})
+@item INCLUDE
+This macro has the scope of the included file.
+It is a block macro in the sense that the included
+file must not contain any incomplete block macros.
 
-@item
-AutoGen @code{DEFINE} macros must be followed by a simple name.
-Anything after that is ignored.  @xref{DEFINE}.
-
-@item
-The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
-macros take no arguments and ignore everything after the macro name
-(e.g. see @ref{COMMENT})
-@end enumerate
-
-@noindent
-These are the AutoGen native macros:
+@item WHILE
+This macro has scope through the @code{ENDWHILE} macro.
+@end table
 @ignore
 END   == MACROS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
@@ -1719,7 +1698,7 @@ homerc = "$$/../share/autogen";
 The initialization files are processed in the order they are specified
 by the @code{homerc} attribute, so that each new file will normally
 override the settings of the previous files.  A few options may be
-marked for @code{immediate action} (@pxref{immediate action}).  Any such
+marked for @code{immediate action} (@pxref{Immediate Action}).  Any such
 options are acted upon in @strong{reverse} order.  The disabled
 @code{load-opts} (@code{--no-load-opts}) option, for example, is an
 immediate action option.  Its presence in the last @code{homerc} file
@@ -1899,8 +1878,8 @@ flexibility is there.
 * program attributes::        Program Description Attributes
 * option attributes::         Option Attributes
 * documentation attributes::  Man and Info doc Attributes
-* immediate action::          Immediate Action Attributes
-* standard options::          Automatically Supported Options
+* automatic options::         Automatically Supported Options
+* standard options::          Library of Standard Options
 @end menu
 
 @node program attributes
@@ -2175,7 +2154,9 @@ describes what data are available for writing option processing code.
 @menu
 * Required Attributes::         Required Attributes
 * Optional Attributes::         Singly Optional Attributes
+* Immediate Action::            Immediate Action Attributes
 * Multiply Optional::           Multiply Optional Attributes
+* Option Arguments::            Option Argument Processing
 * Option Processing::           Special Option Processing
 * Option Processing Data::      Data for Option Processing
 @end menu
@@ -2229,60 +2210,6 @@ pointers.
 @cindex value
 @item value
 The flag character to specify for traditional option flags.  e.g. @code{-L}.
-
-@cindex arg_type
-@item arg_type
-This specifies the type of argument the option will take.
-If not present, the option cannot take an argument.
-If present, it must be one of the following four.
-The bracketed part of the name is optional.
-
-@table @samp
-@item str[@i{ing}]
-The argument may be any arbitrary string.
-
-@item num[@i{ber}]
-The argument must be a correctly formed number, without any trailing
-U's or L's.
-
-@item bool[@i{ean}]
-The argument will be interpreted and always yield either AG_TRUE or
-AG_FALSE.  False values are@:  the empty string, the number zero, or a
-string that starts with @code{f}, @code{F}, @code{n} or @code{N}
-(representing False or No).  Anything else will be interpreted as True.
-
-@item key[@i{word}]
-The argument must match a specified list of strings.
-Assuming you have named the option, @code{opt-name},
-the strings will be converted into an enumeration of type @code{te_Opt_Name}
-with the values @code{OPT_NAME_KEYWORD}.  If you have @strong{not}
-specified a default value, the value @code{OPT_NAME_UNDEFINED} will be
-inserted with the value zero.  The option will be initialized to that
-value.  You may now use this in your code as follows:
-
-@smallexample
-te_Opt_Name opt = OPT_VALUE_OPT_NAME;
-switch (opt) @{
-case OPT_NAME_UNDEFINED:  /* undefined things */ break;
-case OPT_NAME_KEYWORD:    /* `keyword' things */ break;
-default: /* utterly impossible */ ;
-@}
-@end smallexample
-@end table
-
-@cindex arg_optional
-@item arg_optional
-This attribute indicates that the user does not have to supply an
-argument for the option.  This is only valid if the @var{arg_type} is
-@code{string} or @code{keyword}.  If it is @code{keyword}, then
-this attribute may also specify the default keyword to assume when
-the argument is not supplied.  Without such a specification, the
-default keyword will be the zero-valued keyword.
-
-@cindex arg_default
-@item arg_default
-This specifies the default value to be used when the option is
-not specified or preset.
 
 @cindex min
 @item min
@@ -2383,6 +2310,44 @@ name and do not contain an equal sign (@code{=}) will be interpreted as
 option arguments to the default option.
 @end table
 
+@node Immediate Action
+@subsubsection Immediate Action Attributes
+@cindex immediate action
+
+Certain options may need to be processed early.  For example, in order
+to suppress the processing of RC files, it is necessary to process the
+command line option @code{--no-load-opts} @strong{before} the RC files
+are processed.  To accommodate this, certain options may have their
+enabled or disabled forms marked for immediate processing.  The
+consequence of this is that they are processed ahead of all other
+options in the reverse of normal order.
+
+Normally, the first options processed are the options specified in the
+first @code{homerc} file, followed by then next @code{homerc} file
+through to the end of RC file processing.  Next, environment variables
+are processed and finally, the command line options.  The later
+options override settings processed earlier.  That actually gives them
+higher priority.  Command line immediate action options actually have
+the lowest priority of all.  They would be used only if they are to have
+an effect on the processing of subsequent options.
+
+@table @samp
+@cindex immediate
+@item immediate
+Use this option attribute to specify that the enabled form of the option
+is to be processed immediately.  The @code{help} and @code{more-help}
+options are so specified.  They will also call @code{exit()} upon
+completion, so they @strong{do} have an effect on the processing
+of the remaining options :-).
+
+@cindex immed_disable
+@item immed_disable
+Use this option attribute to specify that the disabled form of the option
+is to be processed immediately.  The @code{load-opts} option is so
+specified so that the @code{--no-load-opts} command line option will
+suppress the processing of RC files and environment variables.
+@end table
+
 @node Multiply Optional
 @subsubsection Multiply Optional Attributes
 @cindex Multiply Optional
@@ -2408,14 +2373,119 @@ one entry for every option that @strong{cannot} be present
 when this option is present
 @end table
 
+@node Option Arguments
+@subsubsection Option Argument Processing
+@cindex Option Arguments
+
+Several attributes relate to the handling of arguments to options.
+Each may appear only once, except for the @code{arg_range} attribute.
+It may appear as often as may be needed.
+
+@table @samp
+@cindex arg_type
+@item arg_type
+This specifies the type of argument the option will take.
+If not present, the option cannot take an argument.
+If present, it must be one of the following four.
+The bracketed part of the name is optional.
+
+@table @samp
+@item str[@i{ing}]
+The argument may be any arbitrary string.
+
+@item num[@i{ber}]
+The argument must be a correctly formed number, without any trailing
+U's or L's.  If you specify your own callback validation routine,
+read the @code{arg_rangs} section below for some considerations.
+AutoOpts contains a library procedure to convert the string to a number.
+If you specify range checking with @code{arg_range}, then AutoOpts
+produces a special purpose procedure for this option.
+
+@item bool[@i{ean}]
+The argument will be interpreted and always yield either AG_TRUE or
+AG_FALSE.  False values are@:  the empty string, the number zero, or a
+string that starts with @code{f}, @code{F}, @code{n} or @code{N}
+(representing False or No).  Anything else will be interpreted as True.
+
+@item key[@i{word}]
+The argument must match a specified list of strings.
+Assuming you have named the option, @code{opt-name},
+the strings will be converted into an enumeration of type @code{te_Opt_Name}
+with the values @code{OPT_NAME_KEYWORD}.  If you have @strong{not}
+specified a default value, the value @code{OPT_NAME_UNDEFINED} will be
+inserted with the value zero.  The option will be initialized to that
+value.  You may now use this in your code as follows:
+
+@smallexample
+te_Opt_Name opt = OPT_VALUE_OPT_NAME;
+switch (opt) @{
+case OPT_NAME_UNDEFINED:  /* undefined things */ break;
+case OPT_NAME_KEYWORD:    /* `keyword' things */ break;
+default: /* utterly impossible */ ;
+@}
+@end smallexample
+
+AutoOpts produces a special purpose procedure for this option.
+@end table
+
+@cindex arg_optional
+@item arg_optional
+This attribute indicates that the user does not have to supply an
+argument for the option.  This is only valid if the @var{arg_type} is
+@code{string} or @code{keyword}.  If it is @code{keyword}, then
+this attribute may also specify the default keyword to assume when
+the argument is not supplied.  Without such a specification, the
+default keyword will be the zero-valued keyword.
+
+@cindex arg_default
+@item arg_default
+This specifies the default value to be used when the option is
+not specified or preset.
+
+@cindex arg_range
+@item arg_range
+If the @code{arg_type} is @code{number}, then @code{arg_range}s may be
+specified, too.  If you specify one or more of these option attributes,
+then AutoOpts will create a callback procedure for handling it.  The
+argument value supplied for the option must match one of the range
+entries.  Each arg_range should consist of either an integer by itself
+or an integer range.  The integer range is specified by one or two
+integers separated by the two character sequence, @code{->}.
+
+The generated procedure imposes some constraints:
+@itemize @bullet
+@item
+A number by itself will match that one value.
+@item
+The high end of the range may not be @code{INT_MAX-1}.
+That value is used to indicate a single-valued match.
+@item
+An omitted lower value implies a lower bound of INT_MIN.
+@item
+An omitted upper value implies a upper bound of INT_MAX.
+@item
+The argument value is required.  It may not be optional.
+@end itemize
+
+The usage procedure displays these ranges by calling the callback
+with the @code{pOptDesc} pointer set to @code{NULL}.  Therefore,
+all callback procedures designed to handle options with numeric
+arguments @strong{must} be prepared to handle a call with that
+pointer set @code{NULL}.
+@end table
+
 @node Option Processing
 @subsubsection Special Option Processing
 @cindex Option Processing
 
+AutoOpts will automatically generate a callback procedure for options
+with enumerated keyword arguments and numeric arguments with range
+checking.  If you have specified such an option, you may not specify any
+of the attributes listed here.
+
+Otherwise, you may pick zero or one of the following attributes.
 The first two attributes interact with the @code{documentation} and
 @code{settable} attributes.  See their documentation above.
-
-Pick zero or one of the next four:
 
 @table @samp
 @cindex flag_code
@@ -2439,8 +2509,8 @@ structures may be accessed.  @xref{Option Processing Data}.
 This is effectively identical to @code{flag_code}, except that the
 source is kept in the output file instead of the definitions file.
 A long comment is used to demarcate the code.  You must not modify
-that marker.  @i{Before} regenerating the option code file, you must
-rename the old file from MUMBLE.c to MUMBLE.c.save.  The template
+that marker.  @i{Before} regenerating the option code file,
+the old file is renamed from MUMBLE.c to MUMBLE.c.save.  The template
 will be looking there for the text to copy into the new output file.
 
 @cindex call_proc
@@ -2613,47 +2683,9 @@ Finally, if you need to add man page sections like @code{SEE ALSO} or
 text will be inserted verbatim in the man page after the @code{OPTIONS}
 section and before the @code{AUTHOR} section.
 
-@node immediate action
-@subsection Immediate Action Attributes
-@cindex immediate action
-
-Certain options may need to be processed early.  For example, in order
-to suppress the processing of RC files, it is necessary to process the
-command line option @code{--no-load-opts} @strong{before} the RC files
-are processed.  To accommodate this, certain options may have their
-enabled or disabled forms marked for immediate processing.  The
-consequence of this is that they are processed ahead of all other
-options in the reverse of normal order.
-
-Normally, the first options processed are the options specified in the
-first @code{homerc} file, followed by then next @code{homerc} file
-through to the end of RC file processing.  Next, environment variables
-are processed and finally, the command line options.  The later
-options override settings processed earlier.  That actually gives them
-higher priority.  Command line immediate action options actually have
-the lowest priority of all.  They would be used only if they are to have
-an effect on the processing of subsequent options.
-
-@table @samp
-@cindex immediate
-@item immediate
-Use this option attribute to specify that the enabled form of the option
-is to be processed immediately.  The @code{help} and @code{more-help}
-options are so specified.  They will also call @code{exit()} upon
-completion, so they @strong{do} have an effect on the processing
-of the remaining options :-).
-
-@cindex immed_disable
-@item immed_disable
-Use this option attribute to specify that the disabled form of the option
-is to be processed immediately.  The @code{load-opts} option is so
-specified so that the @code{--no-load-opts} command line option will
-suppress the processing of RC files and environment variables.
-@end table
-
-@node standard options
+@node automatic options
 @subsection Automatically Supported Options
-@cindex standard options
+@cindex automatic options
 
 AutoOpts provides automated support for five options.  @code{help} and
 @code{more-help} are always provided.  @code{version} is provided if
@@ -2713,6 +2745,43 @@ It is ultimately intended that specifying the option,
 environment variables.  To do this, AutoOpts must first implement
 pre-scanning of the options, environment and rc files.
 @end table
+
+@node standard options
+@subsection Library of Standard Options
+@cindex standard options
+
+AutoOpts has developed a set of standardized options.
+You may incorporate these options in your program simply by adding
+a @code{#define} for the options you want, and the line,
+
+@smallexample
+#include stdoptions.def
+@end smallexample
+
+@noindent
+in your option definitions.  The supported options are specified thus:
+
+@smallexample
+#define DEBUG
+#define VERBOSE
+#define WARN
+#define BRIEF
+#define QUIET
+#define SILENT
+#define DRY_RUN
+#define OUTPUT
+#define INPUT
+#define DIRECTORY
+#define INTERACTIVE
+@end smallexample
+
+By default, only the long form of the option will be available.
+To specify the short (flag) form, suffix these names with @code{_FLAG}.
+e.g.,
+
+@smallexample
+#define DEBUG_FLAG
+@end smallexample
 
 @node AutoOpts API
 @section Programmatic Interface

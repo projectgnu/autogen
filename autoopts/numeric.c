@@ -1,6 +1,6 @@
 
 /*
- *  $Id: numeric.c,v 2.3 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: numeric.c,v 2.4 2001/10/01 23:51:33 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -62,14 +62,19 @@
  *  The value is true, unless it starts with 'n' or 'f' or "#f" or
  *  it is an empty string or it is a number that evaluates to zero
  */
-DEF_PROC_2( void optionNumericVal,
-            tOptions*, pOpts,
-            tOptDesc*, pOD )
+void optionNumericVal( pOpts, pOD )
+    tOptions* pOpts;
+    tOptDesc* pOD;
 {
     char* pz;
     long  val;
 
-    if (pOD->pzLastArg == NULL)
+    /*
+     *  Numeric options may have a range associated with it.
+     *  If it does, the usage procedure requests that it be
+     *  emitted by passing a NULL pOD pointer.
+     */
+    if ((pOD == NULL) || (pOD->pzLastArg == NULL))
         return;
 
     val = strtol( pOD->pzLastArg, &pz, 0 );
@@ -84,5 +89,6 @@ DEF_PROC_2( void optionNumericVal,
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * pgusage.c ends here */

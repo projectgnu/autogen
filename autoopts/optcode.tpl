@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.51 2001/09/21 03:09:48 bkorb Exp $
+#$Id: optcode.tpl,v 2.52 2001/10/01 23:51:33 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -128,6 +128,7 @@ ENDIF (exist? "homerc") =][=
 IF (or (exist? "flag.flag_code")
        (exist? "flag.extract_code")
        (exist? "flag.call_proc")
+       (exist? "flag.arg_range")
        (match-value? =* "flag.arg_type" "key") ) =][=
 
   invoke declare-option-callbacks  =][=
@@ -358,6 +359,7 @@ doUsageOpt( pOpts, pOD )
 
 IF (or (exist? "flag.flag_code")
        (exist? "flag.extract_code")
+       (exist? "flag.arg_range")
        (match-value? =* "flag.arg_type" "key")) =][=
 
   invoke  define-option-callbacks  =][=

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.32 2001/09/21 03:09:48 bkorb Exp $
+ *  $Id: funcCase.c,v 1.33 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -857,10 +857,9 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  [+ ESAC +]
  *  @end example
  *
- *  @code{<full-expression>} may be any expression described in the
- *  @code{EXPR} expression function, including the use of apply-codes
- *  and value-names.  If the expression yields a number, it is
- *  converted to a decimal string.
+ *  @code{<full-expression>} (@pxref{expression syntax}) may be any expression,
+ *  including the use of apply-codes and value-names.  If the expression yields
+ *  a number, it is converted to a decimal string.
  *
  *  These case selection codes have also been implemented as
  *  Scheme expression functions using the same codes
@@ -869,7 +868,6 @@ Select_Match_Always( char* pzText, char* pzMatch )
 /*=macfunc ESAC
  *
  *  what:   Terminate the @code{CASE} Template Block
- *  situational:
  *
  *  desc:
  *    This macro ends the @code{CASE} function template block.
@@ -1113,12 +1111,15 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *  alias: ~
  *  alias: =
  *  alias: *
- *  situational:
  *
  *  desc:
  *    This macro selects a block of text by matching an expression
  *    against the sample text expression evaluated in the @code{CASE}
  *    macro.  @xref{CASE}.
+ *
+ *    You do not specify a @code{SELECT} macro with the word ``select''.
+ *    Instead, you must use one of the 17 match operators described in
+ *    the @code{CASE} macro description.
 =*/
     tMacro*
 mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )

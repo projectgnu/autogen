@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.21 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: functions.c,v 1.22 2001/10/01 23:51:33 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -213,7 +213,6 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
  *  alias:  #
  *  load_proc:
  *
- *  situational:
  *    This function can be specified by the user, but there will
  *    never be a situation where it will be invoked at emit time.
  *    The macro is actually removed from the internal representation.
