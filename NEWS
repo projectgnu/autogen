@@ -1,3 +1,8 @@
+New in 4.4
+* Massively reworked the template parsing in preparation for
+  beguiling autogen.
+* Deleted an ugly shell/awk program and replaced it with
+  an ugly C program for extracting definitions from comments. :)
 New in 4.1
 * Two new string generation functions for creating shell-rule
   quoted strings ("xx...\t") and raw strings ('xxx\nxx')
