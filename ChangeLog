@@ -1,3 +1,9 @@
+2000-09-16  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c(dne): added second optional argument to indicate
+	inserting a DO NOT EDIT editing hint for emacs and vi.
+	* agen5/*.tpl: use it
+
 2000-09-15  Bruce Korb  <bkorb@gnu.org>
 
 	* :mkconfig: add agen5/pseudo.x to shar-ed files

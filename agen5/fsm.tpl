@@ -3,8 +3,7 @@
 x
 
 =]
-/*
-[= (dne " *  ") =]
+[= (dne " *  " "/*  ") =]
  *
  *  Automated Finite State Machine
  *

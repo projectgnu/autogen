@@ -1,11 +1,12 @@
 [= AutoGen5 template  -*- Mode: C -*-
 
-# $Id: snarf.tpl,v 1.6 2000/03/05 20:58:13 bruce Exp $
+# $Id: snarf.tpl,v 1.7 2000/09/16 15:45:37 bkorb Exp $
 
 ini =]
 [= (out-push-new (string-append (base-name) ".h"))
-=]/*
-[=(dne " *  ")=]
+=][=
+
+(dne " *  " "/*  ")=]
  *
  *  copyright 1992-2000 Bruce Korb
  *
@@ -26,9 +27,11 @@ extern SCM [=% group "%s_" =]scm_[=name=]( [=
 ENDFOR =]
 
 #endif /* GUILE_PROC_DECLS */
-[=(out-pop)
-=]/*
-[=(dne " *  ")=]
+[=
+(out-pop)
+=][=
+
+(dne " *  " "/*  ")=]
  *
  *  copyright 1992-2000 Bruce Korb
  *
