@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.6 2002/09/21 17:27:16 bkorb Exp $
+ *  $Id: getdefs.h,v 3.7 2003/02/03 00:58:19 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/09/21 17:27:16 $
+ *  Last Modified:     $Date: 2003/02/03 00:58:19 $
  *            by: bkorb
  */
 
@@ -71,7 +71,7 @@ MODE tCC*     pzAutogen   VALUE( "autogen" );
 DEF_STRING( zGlobal,     "\n/* GLOBALDEFS */\n" );
 DEF_STRING( zLineId,     "\n#line %d \"%s\"\n" );
 DEF_STRING( zMallocErr,  "Error:  could not allocate %d bytes for %s\n" );
-DEF_STRING( zAttribRe,   "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_]*):");
+DEF_STRING( zAttribRe,   "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_-]*):");
 DEF_STRING( zNameTag,    " = {\n    name    = '" );
 DEF_STRING( zMemberLine, "    member  = " );
 DEF_STRING( zNoData,     "error no data for definition in file %s line %d\n" );
