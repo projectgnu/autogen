@@ -1857,6 +1857,11 @@ Initialization from RC or INI files, and
 saving the option state back into one.
 
 @item
+INI files may be partitioned.
+One INI file may be used by several programs by partitioning it
+with lines containing, ``@code{[PROGRAM_NAME]}'', @xref{loading rc files}.
+
+@item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
 Such options may default to either an enabled or a disabled state.  You
 may also provide an enablement prifix, too, e.g., @code{--allow-mumble}
@@ -1950,11 +1955,10 @@ the last line not continued with a backslash.  Leading and trailing
 white space is stripped.
 
 Initialization files are selected both by the @code{homerc} entries and,
-optionally, via an automatically supplied command line option.  The
-first component of the @code{homerc} entry may be an environment
-variable such as @code{$HOME}, or it may also be @code{$$} (@strong{two}
-dollar sign characters) to specify the directory of the executable.
-For example:
+optionally, via a command line option.  The first component of the
+@code{homerc} entry may be an environment variable such as @code{$HOME}, or
+it may also be @code{$$} (@strong{two} dollar sign characters) to specify
+the directory of the executable.  For example:
 
 @example
 homerc = "$$/../share/autogen";
@@ -1964,19 +1968,35 @@ homerc = "$$/../share/autogen";
 will cause the AutoOpts library to look in the normal autogen datadir
 for an initialization file.
 
-The initialization files are processed in the order they are specified
-by the @code{homerc} attribute, so that each new file will normally
-override the settings of the previous files.  A few options may be
-marked for @code{immediate action} (@pxref{Immediate Action}).  Any such
+The initialization files are processed in the order they are specified by
+the @code{homerc} attribute, so that each new file will normally override
+the settings of the previous files.  This may be overridden by marking some
+options for @code{immediate action} (@pxref{Immediate Action}).  Any such
 options are acted upon in @strong{reverse} order.  The disabled
 @code{load-opts} (@code{--no-load-opts}) option, for example, is an
-immediate action option.  Its presence in the last @code{homerc} file
-will prevent the processing of any prior @code{homerc} files.
+immediate action option.  Its presence in the last @code{homerc} file will
+prevent the processing of any prior @code{homerc} files because its effect
+is immediate.
 
-Further initialization file processing can be @strong{suppressed} by
-specifying @code{--no-load-opts} on the command line, or
-@code{PROGRAM_LOAD_OPTS=no} in the environment, or @code{no-load-opts}
-in any of the specified @code{homerc} files.
+Initialization file processing can be completely suppressed by specifying
+@code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
+the environment.
+
+Initialization files may be sectioned.
+@cindex sectioned ini file
+If, for example, you have a collection of programs that work closely
+together and, likely, have a common set of options, these programs may use a
+single, sectioned, initialization file.  It may be partitioned by lines that
+commence with the square open bracket (@code{[}).  All text before the first
+such a line is always processed.  Once such a line is found, the
+@strong{upper-cased} c-variable-syntax program name will be compared against
+the text following that bracket.  If there is a match and the next character
+after that is a square close bracket (@code{]}), then the section is
+processed and the file closed.  Otherwise, the section is ignored and a
+matching section is searched for.
+
+For exampe, if the @code{fumble-stumble} options had a sectioned RC file,
+then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
 
 @node saving rc files
 @unnumberedsubsec saving rc files
@@ -1994,7 +2014,7 @@ output file or, if it is not specified, then to the last specified
 The @code{optionLoadLine} takes two arguments:
 @enumerate
 @item
-The pointer to the option descriptor.
+The pointer to the program's option descriptor (@code{tOptions*}).
 @item
 A pointer to a NUL-terminated string that contains a long option name
 followed, optionally, by a string value.
@@ -2439,25 +2459,6 @@ documentation option that cannot be specified on the command line, but
 is marked as @code{settable}.  The library client program will invoke the
 @code{SET_OPTION} macro which will invoke a handler function that will
 finally set these global variables.
-
-@cindex rcsection
-@item rcsection
-If you have a collection of option descriptions that are intended
-to use the same RC/ini files, then you will likely want to partition
-that file.  That will be possible by specifying this attribute
-with AutoOpts version 9.2 and later.
-
-Every RC file will be considered partitioned by lines that commence with
-the square open bracket (@code{[}).  All text before such a line is
-always processed.  Once such a line is found, the @strong{upper-cased}
-c-variable-syntax program name will be compared against the text
-following that bracket.  If there is a match and the next character
-after that is a square close bracket (@code{]}), then the section is
-processed and the file closed.  Otherwise, the section is ignored and a
-matching section is searched for.
-
-For exampe, if the @code{fumble-stumble} options had a sectioned RC file,
-then a line containing @code{[FUMBLE_STUMBLE]} would be searched for.
 
 @cindex usage
 @item usage
@@ -3100,6 +3101,16 @@ enumeration: @code{silent}, @code{quiet}, @code{brief},
 @code{informative} and @code{verbose}; with the default being
 @code{brief}.
 
+@ignore
+END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
+@ignore
+START == AUTOOPTS-API == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
 @node AutoOpts API
 @section Programmatic Interface
 @cindex AutoOpts API
@@ -3643,7 +3654,7 @@ to rebuild and recompile your option definitions.  This has rarely been
 necessary.
 
 @ignore
-END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AUTOOPTS-API == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
