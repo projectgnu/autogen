@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.30 1999/11/11 04:06:15 bruce Exp $
+dnl Code: $Id: configure.in,v 2.31 2000/03/11 23:21:22 bruce Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.30 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.31 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -176,7 +176,8 @@ AC_SUBST(INCLUDES)
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile doc/Makefile compat/Makefile \
 autoopts/Makefile autoopts/autoopts-config agen5/Makefile agen5/test/Makefile \
-config/Makefile getdefs/Makefile getdefs/test/Makefile columns/Makefile,
+config/Makefile getdefs/Makefile getdefs/test/Makefile columns/Makefile \
+autoopts/test/Makefile,
  [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
 
 echo \
