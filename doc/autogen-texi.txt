@@ -83,6 +83,8 @@ program.  In fact, it has already been done and AutoGen itself uses it@:
 * Testimonial::          A User's Perspective
 @end menu
 
+@c === SECTION MARKER
+
 @node Generalities
 @section The Purpose of AutoGen
 
@@ -144,6 +146,8 @@ Sometimes, it is just simply easier and clearer to compute some text or
 a value in one context when its application needs to be later.  So,
 functions are available for saving text or values for later use.
 @end enumerate
+
+@c === SECTION MARKER
 
 @node Example Usage
 @section A Simple Example
@@ -280,6 +284,8 @@ number.  With AutoGen, you just alter the template to emit the table of names.
 It will be guaranteed to be in the correct order, missing none of the entries.
 If you want to do that by hand, well, good luck.
 
+@c === SECTION MARKER
+
 @node csh/zsh caveat
 @section csh/zsh caveat
 
@@ -310,6 +316,8 @@ At the end of each scriptlet, the command @code{echo mumble} is
 appended.  The program you use as a shell must emit the single
 argument @code{mumble} on a line by itself.
 @end enumerate
+
+@c === SECTION MARKER
 
 @node Testimonial
 @section A User's Perspective
@@ -414,6 +422,8 @@ C macro substitution is @strong{not} performed.
 * Alternate Definition::  Alternate Definition Forms
 @end menu
 
+@c === SECTION MARKER
+
 @node Identification
 @section The Identification Definition
 @cindex identification
@@ -459,6 +469,8 @@ templ-dirs command line option.
 
 If AutoGen fails to find the template file in one of these places,
 it prints an error message and exits.
+
+@c === SECTION MARKER
 
 @node Definitions
 @section Named Definitions
@@ -675,6 +687,8 @@ characters in the first column should be disambiguated with
 an escape @code{\} or join them with previous lines:
 @code{"fumble\n#ifdef LATER...}.
 
+@c === SECTION MARKER
+
 @node Index Assignments
 @section Assigning an Index to a Definition
 @cindex Definition Index
@@ -737,6 +751,8 @@ say, always contains a "grumble" value:
 [+ IF (exist? "grumble") +]
 @end example
 
+@c === SECTION MARKER
+
 @node Dynamic Text
 @section Dynamic Text
 @cindex Dynamic Definition Text
@@ -777,6 +793,8 @@ named @code{alist->autogen-def} in an expression that looks like this:
     ( (name (value-expression))  (name2 (another-expr)) ) )
 @end example
 
+@c === SECTION MARKER
+
 @node Directives
 @section Controlling What Gets Processed
 @cindex directives
@@ -812,6 +830,8 @@ Extraction from autogen.texi
 @ignore
 Resume input from autogen.texi
 @end ignore
+
+@c === SECTION MARKER
 
 @node Predefines
 @section Pre-defined Names
@@ -873,6 +893,8 @@ segregate real C code from autogen definitions by testing for
 #endif
 @end example
 
+@c === SECTION MARKER
+
 @node Comments
 @section Commenting Your Definitions
 @cindex comments
@@ -886,6 +908,8 @@ The definitions file may contain C and C++ style comments.
  */
 // this comment is a single line comment
 @end example
+
+@c === SECTION MARKER
 
 @node Example
 @section What it all looks like.
@@ -931,6 +955,8 @@ Extraction from autogen.texi
 START == TEMPLATE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
+
+@c === SECTION MARKER
 
 @node Alternate Definition
 @section Alternate Definition Forms
@@ -1032,6 +1058,8 @@ these by defining their own macros.  @xref{DEFINE}.
 * native macros::      AutoGen Native Macros
 * output controls::    Redirecting Output
 @end menu
+
+@c === SECTION MARKER
 
 @node pseudo macro
 @section Format of the Pseudo Macro
@@ -1136,6 +1164,8 @@ The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
 character after the newline that follows the end macro marker.
 
+@c === SECTION MARKER
+
 @node naming values
 @section Naming a value
 @cindex naming values
@@ -1165,6 +1195,8 @@ the value search is started in the current context only.  No higher
 levels are searched.
 
 If someone rewrites this, I'll incorporate it.  :-)
+
+@c === SECTION MARKER
 
 @node expression syntax
 @section Macro Expression Syntax
@@ -1313,6 +1345,8 @@ START == MACROS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
+@c === SECTION MARKER
+
 @node native macros
 @section AutoGen Native Macros
 @cindex native macros
@@ -1362,6 +1396,8 @@ Extraction from autogen.texi
 START == AUGMENTING == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
+
+@c === SECTION MARKER
 
 @node output controls
 @section Redirecting Output
@@ -1432,6 +1468,8 @@ that can be invoked as a Guile macro.  Here is how you do these.
 * AutoGen macros::       AutoGen Macros
 @end menu
 
+@c === SECTION MARKER
+
 @node shell commands
 @section Shell Output Commands
 
@@ -1448,6 +1486,8 @@ processing, the recommended method for stopping AutoGen is:
 echo "some error text" >&2
 kill -2 $@{AG_pid@}
 @end example
+
+@c === SECTION MARKER
 
 @node guile macros
 @section Guile Macros
@@ -1466,6 +1506,8 @@ processing, the recommended method for stopping AutoGen is:
 @example
 (error "some error text")
 @end example
+
+@c === SECTION MARKER
 
 @node guile callouts
 @section Guile Callout Functions
@@ -1531,6 +1573,8 @@ See the Guile documentation for more details.
 More information is also available in a large comment at the
 beginning of the @file{agen5/snarf.tpl} template file.
 
+@c === SECTION MARKER
+
 @node AutoGen macros
 @section AutoGen Macros
 
@@ -1565,6 +1609,8 @@ Extraction from autogen.texi
 * signal names::   Signal Names
 * installing::     Installing AutoGen
 @end menu
+
+@c === SECTION MARKER
 
 @node configuring
 @section Configuring AutoGen
@@ -1630,6 +1676,8 @@ The @code{lib-specs} from @file{--with-regex-lib=lib-specs} will be added
 to @code{LDFLAGS} without any adornment.
 @end table
 
+@c === SECTION MARKER
+
 @page
 @node AutoGen CGI
 @section AutoGen as a CGI server
@@ -1688,6 +1736,8 @@ shell processing disabled (@code{--disable-shell}).  That will make it
 impossible for any referenced template to hand data to a subshell for
 interpretation.
 
+@c === SECTION MARKER
+
 @node signal names
 @section Signal Names
 @cindex Signal Names
@@ -1724,6 +1774,8 @@ fail on your platform, please send me copies of the header files
 containing the signal names and numbers, along with the full path names
 of these files.  I will endeavor to fix it.  There is a shell script
 inside of @file{strsignal.def} that tries to hunt down the information.
+
+@c === SECTION MARKER
 
 @node installing
 @section Installing AutoGen
@@ -1838,12 +1890,15 @@ commercial programs.
 * option descriptor::   Option Descriptor File
 * Generated main::      Generating main procedures
 * Using AutoOpts::      Using AutoOpts
+* Presetting Options::  Presetting Options
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
 * getopt_long::         Using getopt(3C)
 * i18n::                Internationalizing AutoOpts
 @end menu
+
+@c === SECTION MARKER
 
 @node Features
 @section AutoOpts Features
@@ -1864,16 +1919,16 @@ GNU-style long options processing.  Long options
 are recognized without case sensitivity, and they may be abbreviated.
 
 @item
-Environment variable initializations.
+Environment variable initializations, @xref{environrc}.
 
 @item
 Initialization from RC or INI files, and
-saving the option state back into one.
+saving the option state back into one, @xref{loading rcfile}.
 
 @item
-INI files may be partitioned.
-One INI file may be used by several programs by partitioning it
-with lines containing, ``@code{[PROGRAM_NAME]}'', @xref{loading rc files}.
+INI files may be partitioned.  One INI file may be used by several
+programs by partitioning it with lines containing,
+``@code{[PROGRAM_NAME]}'', @xref{loading rcfile}.
 
 @item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
@@ -1956,93 +2011,7 @@ a localization function such as @code{gettext(3GNU)}, then the option
 processing code will be localizable (@pxref{i18n}).
 @end enumerate
 
-@noindent
-Explanatory details:
-@menu
-* loading rc files::  loading rc files
-* saving rc files::   saving rc files
-* optionLoadLine::    process a text string for options
-@end menu
-
-@node loading rc files
-@unnumberedsubsec loading rc files
-@cindex loading rc files
-Initialization files are enabled by specifying the program attribute
-@code{homerc} (@pxref{program attributes}).  The initialization values
-are identified by the long option name followed by white space and any
-associated value.  The value, if any, will continue through the end of
-the last line not continued with a backslash.  Leading and trailing
-white space is stripped.
-
-Initialization files are selected both by the @code{homerc} entries and,
-optionally, via a command line option.  The first component of the
-@code{homerc} entry may be an environment variable such as @code{$HOME}, or
-it may also be @code{$$} (@strong{two} dollar sign characters) to specify
-the directory of the executable.  For example:
-
-@example
-homerc = "$$/../share/autogen";
-@end example
-
-@noindent
-will cause the AutoOpts library to look in the normal autogen datadir
-for an initialization file.
-
-The initialization files are processed in the order they are specified by
-the @code{homerc} attribute, so that each new file will normally override
-the settings of the previous files.  This may be overridden by marking some
-options for @code{immediate action} (@pxref{Immediate Action}).  Any such
-options are acted upon in @strong{reverse} order.  The disabled
-@code{load-opts} (@code{--no-load-opts}) option, for example, is an
-immediate action option.  Its presence in the last @code{homerc} file will
-prevent the processing of any prior @code{homerc} files because its effect
-is immediate.
-
-Initialization file processing can be completely suppressed by specifying
-@code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
-the environment.
-
-Initialization files may be sectioned.
-@cindex sectioned ini file
-If, for example, you have a collection of programs that work closely
-together and, likely, have a common set of options, these programs may use a
-single, sectioned, initialization file.  It may be partitioned by lines that
-commence with the square open bracket (@code{[}).  All text before the first
-such a line is always processed.  Once such a line is found, the
-@strong{upper-cased} c-variable-syntax program name will be compared against
-the text following that bracket.  If there is a match and the next character
-after that is a square close bracket (@code{]}), then the section is
-processed and the file closed.  Otherwise, the section is ignored and a
-matching section is searched for.
-
-For example, if the @code{fumble-stumble} options had a sectioned RC file,
-then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
-
-@node saving rc files
-@unnumberedsubsec saving rc files
-@cindex saving rc files
-When initialization files are enabled for an application, the user is
-also provided with an automatically supplied @code{--save-opts} option.
-All of the known option state will be written to either the specified
-output file or, if it is not specified, then to the last specified
-@code{homerc} file.
-
-@node optionLoadLine
-@unnumberedsubsec process a text string for options
-@cindex optionLoadLine
-
-The @code{optionLoadLine} takes two arguments:
-@enumerate
-@item
-The pointer to the program's option descriptor (@code{tOptions*}).
-@item
-A pointer to a NUL-terminated string that contains a long option name
-followed, optionally, by a string value.
-@end enumerate
-
-Leading and trailing white space is trimmed from the value, but
-otherwise new lines are not discarded.  The caller is expected to have
-NUL terminated the string at the correct point.
+@c === SECTION MARKER
 
 @page
 @node Quick Start
@@ -2168,6 +2137,8 @@ The rest of this chapter will describe the myriad of option attributes
 supported by AutoOpts.  However, keep in mind that, in general, you won't
 need much more than what was described in this "quick start" section.
 
+@c === SECTION MARKER
+
 @node Option Definitions
 @section Option Definitions
 @cindex Option Definitions
@@ -2252,17 +2223,9 @@ processing must @strong{not} consume all of the command line arguments.
 @cindex environrc
 @item environrc
 Indicates looking in the environment for values of variables named,
-@code{PROGRAM_OPTNAME}, where @code{PROGRAM} is the upper cased
-@code{C-name} of the program and @code{OPTNAME} is the upper cased
-@code{C-name} of the option.  The @code{C-name}s are the regular
-names with all special characters converted to underscores (@code{_}).
-
-If a particular option may be disabled, then its disabled state
-is indicated by setting the value to the disablement prefix.
-So, for example, if the disablement prefix were @code{dont}, then
-you can disable the @code{optname} option by setting the
-@code{PROGRAM_OPTNAME}' environment variable to `@i{dont}'.
-@xref{Common Attributes}.
+@code{PROGRAM_OPTNAME} or @code{PROGRAM}, where @code{PROGRAM} is the
+upper cased @code{C-name} of the program and @code{OPTNAME} is the
+upper cased @code{C-name} of a specific option.
 
 @cindex export
 @item export
@@ -2287,7 +2250,7 @@ or @file{/usr/local/share/progname}) or an environment variable (like
 where the executable was found (@file{$$[/...]}) to use to try to find
 the rcfile.  Use as many as you like.  The presence of this attribute
 activates the @code{--save-opts} and @code{--load-opts} options.
-@xref{loading rc files}.
+@xref{loading rcfile}.
 
 @cindex include
 @item include
@@ -2684,6 +2647,15 @@ For an option equivalence class, there is a single occurrence counter
 for all the members of the class.  All members of the equivalence class
 must contain the same equivalenced-to option, including the
 equivalenced-to option itself.  Thus, it must be a member.
+Such options may not be preset (be set from @file{rc} files or
+environment variables) and always conflict with each other
+(two members of the same equivalence class may not appear together).
+
+Also, please take careful note:  since the options are
+mapped to the equivalenced-to option descriptor, any option
+argument values are mapped to that descriptor also.  Be sure
+you know which ``equivalent option'' was selected before getting
+the option argument value!
 
 As an example, @code{cpio(1)} has three options @code{-o}, @code{-i},
 and @code{-p} that define the operational mode of the program
@@ -3225,6 +3197,8 @@ START == AUTOOPTS-API == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
+@c === SECTION MARKER
+
 @node AutoOpts API
 @section Programmatic Interface
 @cindex AutoOpts API
@@ -3318,8 +3292,7 @@ Initial compiled value.  As a bit test, it will always yield FALSE.
 The option was set via the @code{SET_OPT()} macro.
 
 @item PRESET
-The option was set via an RC/INI file, or a call to the
-@code{optionLoadLine()} routine.
+The option was set via an RC/INI file.
 
 @item DEFINED
 The option was set via a command line option.
@@ -3777,6 +3750,8 @@ START == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore'
 Extraction from autogen.texi
 @end ignore
 
+@c === SECTION MARKER
+
 @node option descriptor
 @section Option Descriptor File
 @cindex option descriptor
@@ -3788,6 +3763,8 @@ information provided in the option definitions, plus a number of static
 strings and any callout procedures that are specified or required.  You
 should never have need for looking at this, except, perhaps, to examine
 the code generated for implementing the @code{flag_code} construct.
+
+@c === SECTION MARKER
 
 @node Generated main
 @section Generating main procedures
@@ -4016,6 +3993,8 @@ of the emitted code:
     @} else @{ ...
 @end example
 
+@c === SECTION MARKER
+
 @node Using AutoOpts
 @section Using AutoOpts
 @cindex using AutoOpts
@@ -4159,6 +4138,130 @@ also a web page that describes what you need to do:
 @url{http://autogen.sourceforge.net/blocksort.html}
 @end example
 
+@c === SECTION MARKER
+
+@node Presetting Options
+@section Presetting Options
+@cindex shell options
+
+AutoOpts supports the notion of ``presetting'' the value or state of an option.
+The values may be obtained either from environment variables or from
+initialization files (@file{rc} or @file{ini} files).  In order to take
+advantage of this, the AutoOpts client program must specify these features
+in the option descriptor file (@pxref{program attributes}) with the
+@code{rcfile} or @code{environrc} attributes.
+
+@menu
+* loading rcfile::      RC or INI file presets
+* saving rcfile::       Saving the presets in an RC or INI file
+* environrc::           environment variable presets
+@end menu
+
+@node loading rcfile
+@subsection RC or INI file presets
+@cindex rcfile
+
+Initialization files are enabled by specifying the program attribute
+@code{homerc} (@pxref{program attributes}).  The initialization values
+are identified by the long option name followed by white space and any
+associated value.  The value, if any, will continue through the end of
+the last line not continued with a backslash.  Leading and trailing
+white space is stripped.  The newlines are retained, though the preceding
+backslashes are removed.
+
+Initialization files are selected both by the @code{homerc} entries and,
+optionally, via a command line option.  The first component of the
+@code{homerc} entry may be an environment variable such as @code{$HOME}, or
+it may also be @code{$$} (@strong{two} dollar sign characters) to specify
+the directory of the executable.  For example:
+
+@example
+homerc = "$$/../share/autogen";
+@end example
+
+@noindent
+will cause the AutoOpts library to look in the normal autogen datadir
+for an initialization file.
+
+The initialization files are processed in the order they are specified by
+the @code{homerc} attribute, so that each new file will normally override
+the settings of the previous files.  This may be overridden by marking some
+options for @code{immediate action} (@pxref{Immediate Action}).  Any such
+options are acted upon in @strong{reverse} order.  The disabled
+@code{load-opts} (@code{--no-load-opts}) option, for example, is an
+immediate action option.  Its presence in the last @code{homerc} file will
+prevent the processing of any prior @code{homerc} files because its effect
+is immediate.
+
+Initialization file processing can be completely suppressed by specifying
+@code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
+the environment (if @code{environrc} has been specified).
+
+Initialization files may be sectioned.
+@cindex sectioned ini file
+If, for example, you have a collection of programs that work closely
+together and, likely, have a common set of options, these programs may use a
+single, sectioned, initialization file.  It may be partitioned by lines that
+commence with the square open bracket (@code{[}).  All text before the first
+such a line is always processed.  Once such a line is found, the
+@strong{upper-cased} c-variable-syntax program name will be compared against
+the text following that bracket.  If there is a match and the next character
+after that is a square close bracket (@code{]}), then the section is
+processed and the file closed.  Otherwise, the section is ignored and a
+matching section is searched for.
+
+For example, if the @code{fumble-stumble} options had a sectioned RC file,
+then a line containing exactly @code{[FUMBLE_STUMBLE]} would be searched for.
+
+@node saving rcfile
+@subsection Saving the presets in an RC or INI file
+
+When initialization files are enabled for an application, the user is
+also provided with an automatically supplied @code{--save-opts} option.
+All of the known option state will be written to either the specified
+output file or, if it is not specified, then to the last specified
+@code{homerc} file.
+
+@node environrc
+@subsection environment variable presets
+@cindex environrc
+
+If the AutoOpts client program specifies @code{environrc} in its
+option descriptor file, then environment variables will be used for
+presetting option state.  Variables will be looked for that are named,
+@code{PROGRAM_OPTNAME} and @code{PROGRAM}.  @code{PROGRAM} is the
+upper cased @code{C-name} of the program, and @code{OPTNAME} is the
+upper cased @code{C-name} of a specific option.  (The @code{C-name}s
+are the regular names with all special characters converted to
+underscores (@code{_}).)
+
+Option specific environment variables are processed after (and thus
+take precidence over) the contents of the @code{PROGRAM} enviornment
+variable.  The option argument string for these options takes on the
+string value gotten from the environment.  Consequently, you can only
+have one instance of the @code{OPTNAME}.
+
+If a particular option may be disabled, then its disabled state is
+indicated by setting the @code{PROGRAM_OPTNAME} value to the
+disablement prefix.  So, for example, if the disablement prefix were
+@code{dont}, then you can disable the @code{optname} option by setting
+the @code{PROGRAM_OPTNAME}' environment variable to `@i{dont}'.
+@xref{Common Attributes}.
+
+The @code{PROGRAM} environment string is tokenized and parsed much
+like a command line.  Doubly quoted strings have backslash escapes
+processed the same way they are processed in C program constant
+strings.  Singly quoted strings are ``pretty raw'' in that backslashes are
+honored before other backslashes, apostrophes, newlines and cr/newline
+pairs.  The options must be introduced with hyphens in the same way as
+the command line.
+
+Some options are not presettable.  Members of equivalence classes of
+options are not presettable, as are options specified with the
+@code{no-preset} attribute.
+
+@c === SECTION MARKER
+
 @node shell options
 @section AutoOpts for Shell Scripts
 @cindex shell options
@@ -4234,6 +4337,8 @@ Extraction from autogen.texi
 START == AUTOINFO == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
+
+@c === SECTION MARKER
 
 @node AutoInfo
 @section Automated Info Docs
@@ -4337,6 +4442,8 @@ Where @file{$@{prefix@}} is the AutoGen installation prefix
 and @file{libexport.def} is some name that suits you.
 
 An example of this can be seen in this document, @xref{libopts procedures}.
+
+@c === SECTION MARKER
 
 @node AutoMan pages
 @section Automated Man Pages
@@ -4487,6 +4594,8 @@ option (@pxref{getdefs subblock}) that tells it how to parse the
 @code{arg} attribute.  The @code{library} and @code{header} entries
 are global definitions that apply to all the documented functions.
 
+@c === SECTION MARKER
+
 @node getopt_long
 @section Using getopt(3C)
 @cindex getopt_long
@@ -4544,6 +4653,8 @@ autogen -T getopt.tpl myprog-opts.def
 and you will have three new files: @file{myprog-opts.h}, @file{myprog-opts.c},
 and @file{getopt-progname.c}, where ``progname'' is the name specified with
 the global @code{prog-name} attribute in the option definition file.
+
+@c === SECTION MARKER
 
 @node i18n
 @section Internationalizing AutoOpts
@@ -4603,6 +4714,8 @@ START == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
+@c === SECTION MARKER
+
 @node AutoFSM
 @section Automated Finite State Machine
 @cindex AutoFSM
@@ -4631,6 +4744,8 @@ Download this and you will have a large, complex example of how to use
 RPC calls.  There is a brief example
 @uref{http://www.gnu.org/software/autogen/xdr/index.html,on the web}, but
 you should @uref{http://download.sourceforge.net/autogen/,download AutoXDR}.
+
+@c === SECTION MARKER
 
 @node AutoEvents
 @section Automated Event Management
