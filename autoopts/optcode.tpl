@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.24 2000/02/13 19:47:09 bruce Exp $
+#$Id: optcode.tpl,v 2.25 2000/02/13 19:50:12 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -38,7 +38,7 @@ ENDIF "copyright notes"
 [=
 FOR flag =][=
   IF (exist? "call_proc") =]
-extern tOptProc   [=(get "call_proc=")=];[=
+extern tOptProc   [= call_proc =];[=
   ENDIF =][=
 ENDFOR flag=]
 extern tUsageProc [=
