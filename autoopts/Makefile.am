@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.22 1999/10/31 23:36:13 bruce Exp $
+## $Id: Makefile.am,v 2.23 1999/11/09 05:00:40 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,7 +21,7 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
 
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl \
-		aginfo.tpl agman1.tpl
+		aginfo.tpl agman1.tpl optlib.tpl
 
 EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 doc.tpl \
 		bootstrap.dir autoopts-config.in config-opts.def \
