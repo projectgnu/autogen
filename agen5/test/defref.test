@@ -1,0 +1,82 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# defref.test --- definition reference testing
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Wed Mar 1 2000
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: defref.test,v 1.1 2000/03/02 05:46:53 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test =>
+The last of each list:<=
+FOR list =>
+  list[<=(for-index)=>] -> <=val[$]=><=
+ENDFOR =>
+
+The first of each list:<=
+FOR list =>
+  list[<=(for-index)=>] -> <=val[]=><=
+ENDFOR =>
+
+The full list:<=
+FOR list =>
+  list[<=(for-index)=>] -> <=
+  FOR val ", " => val[<=(for-index)=>]=<=val=><=
+  ENDFOR =><=
+ENDFOR =>
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+# Create the files we need in the test environment
+cat > $testname.def <<_EOF_
+AutoGen definitions $testname;
+list =    { val = L0.first, L0.second, L0.last; },
+          { val[0] = L1.first;  val[2] = L1.second-and-last; };
+list[3] = { val = L3.third.all; },
+          { val[1] = L4.first; val[3] = L4.last; };
+_EOF_
+
+# # # # # # # # # # ANTICIPATED RESULT # # # # # # # # #
+
+cat > $testname.out <<_EOF_
+The last of each list:
+  list[0] -> L0.last
+  list[1] -> L1.second-and-last
+  list[3] -> L3.third.all
+  list[4] -> L4.last
+
+The first of each list:
+  list[0] -> L0.first
+  list[1] -> L1.first
+  list[3] -> L3.third.all
+  list[4] -> L4.first
+
+The full list:
+  list[0] ->  val[0]=L0.first,  val[1]=L0.second,  val[2]=L0.last
+  list[1] ->  val[0]=L1.first,  val[2]=L1.second-and-last
+  list[3] ->  val[0]=L3.third.all
+  list[4] ->  val[1]=L4.first,  val[3]=L4.last
+_EOF_
+
+$AGEN $testname.def || failure AutoGen failed
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# end of defref.test
