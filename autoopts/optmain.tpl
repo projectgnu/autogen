@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.25 2004/05/15 03:32:13 bkorb Exp $
+# $Id: optmain.tpl,v 3.26 2004/08/14 20:36:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -280,43 +280,171 @@ ENDDEF build-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE declare-option-callbacks =][=
+DEFINE declare-option-callbacks
 
-   #  For test builds, no need to call option procs  =][=
+   This is the test for whether or not to emit callback handling code:
 
-  IF (. make-test-main)         =]
+=]
+/*
+ *  Declare option callback procedures
+ */[=
+  (define undef-proc-names "")
+
+  (define extern-proc-list (string-append
+
+    "doPagedUsage\n"
+
+    (if (exist? "version") "doVersion\n" "")
+  ) )
+
+  (define extern-test-list (string-append
+
+    "doPagedUsage\n"
+
+    (if (exist? "version") "doVersionStderr\n" "")
+  ) )
+
+  (define emit-decl-list (lambda(txt-var)
+
+    (set! txt-var (shellf "(egrep -v '^NULL$' | sort -u | \
+      sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
+          txt-var ))
+
+    (shellf (if (< (string-length txt-var) 72)
+                "f='%s' ; echo \"   \" $f"
+                "columns --spread=1 -I4 <<_EOProcs_\n%s\n_EOProcs_" )
+          txt-var )  ))
+
+  (define static-proc-list "doUsageOpt\n")
+  (define static-test-list static-proc-list)   =][=
+
+  FOR    flag   =][=
+
+    (set! flg-name (get "name"))
+    (if (hash-ref have-cb-procs flg-name)
+        (begin
+          (if make-test-main (begin
+              (set! tmp-val (hash-ref test-proc-name flg-name))
+              (if (hash-ref is-ext-cb-proc flg-name)
+                  (set! extern-test-list (string-append extern-test-list
+                        tmp-val "\n" ))
+
+                  (set! static-test-list (string-append static-test-list
+                        tmp-val "\n" ))
+              )
+          )   )
+
+          (set! tmp-val (hash-ref cb-proc-name flg-name))
+
+          (if (hash-ref is-ext-cb-proc flg-name)
+              (set! extern-proc-list (string-append extern-proc-list
+                    (hash-ref cb-proc-name flg-name) "\n" ))
+
+              (set! static-proc-list (string-append static-proc-list
+                    (hash-ref cb-proc-name flg-name) "\n" ))
+          )
+
+          (if (exist? "ifdef") (begin
+              (emit (sprintf "\n#ifndef %s\n#define %s doUsageOpt\n#endif"
+                         (get "ifdef") tmp-val ))
+              (set! undef-proc-names (string-append undef-proc-names
+                 (sprintf
+                     "\n#ifndef %1$s\n#undef  %2$s\n#define %2$s NULL\n#endif"
+                     (get "ifdef") tmp-val )  ))
+          )   )
+
+          (if (exist? "ifndef") (begin
+              (emit (sprintf "\n#ifdef %s\n#define %s doUsageOpt\n#endif"
+                             (get "ifdef") tmp-val ))
+              (set! undef-proc-names (string-append undef-proc-names
+                 (sprintf
+                     "\n#ifdef %1$s\n#undef  %2$s\n#define %2$s NULL\n#endif"
+                     (get "ifndef") tmp-val )  ))
+          )   )
+    )   ) ""    =][=
+
+  ENDFOR flag   =][=
+
+  IF (. make-test-main)
+
+=]
 #if defined([=(. main-guard)=])
 /*
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
- */[=
-    FOR flag                    =][=
-    (set! cap-name (string->c-name! (string-capitalize! (get "name"))) ) =][=
-
-      IF (exist? "call-proc")   =]
-#define [=(get "call-proc")     =] [=
-          IF (~ (get "max") "1{0,1}")
-                                =]NULL[=
-          ELSE                  =]stackOptArg[=
-          ENDIF                 =][=
-
-      ELIF (or (exist? "flag-code")
-               (exist? "extract-code")
-               (exist? "arg-range")) =]
-#define doOpt[=(. cap-name)   =] [=
-          IF (~ (get "max") "1{0,1}")
-                                =]NULL[=
-          ELSE                  =]stackOptArg[=
-          ENDIF                 =][=
-
-      ELIF (~* (get "arg-type") "key|set")  =]
-static tOptProc doOpt[=(. cap-name)  =];[=
-      ENDIF                     =][=
-
-    ENDFOR flag                 =]
-#endif /* defined([=(. main-guard)=]) */[=
-  ENDIF (. make-test-main)      =]
+ */
+extern tOptProc
 [=
+
+(emit-decl-list extern-test-list)  =][=
+
+    IF (> (string-length static-test-list) 0)
+
+=]
+static tOptProc
+[=(emit-decl-list static-test-list)=][=
+
+    ENDIF have static test procs
+
+=][=
+
+(out-push-new)
+
+=][=
+
+    FOR     flag          =][=
+      IF (not (= (hash-ref cb-proc-name   flg-name)
+                 (hash-ref test-proc-name flg-name))) =]
+#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref test-proc-name flg-name)=][=
+      ENDIF               =][=
+    ENDFOR  flag          =][=
+
+    IF (set! static-test-list (out-pop #t))
+       (> (string-length static-test-list) 0) =]
+
+/*
+ *  #define map the "normal" callout procs to the test ones...
+ */
+[= (. static-test-list) =][=
+
+    ENDIF  have some #define mappings
+
+=]
+
+#else /* NOT defined [=(. main-guard)=] */
+/*
+ *  When not under test, there are different procs to use
+ */[=
+
+  ENDIF make-test-main
+
+=]
+extern tOptProc
+[=(emit-decl-list extern-proc-list)=][=
+
+  IF (> (string-length static-proc-list) 0)
+
+=]
+static tOptProc
+[=(emit-decl-list static-proc-list)=][=
+
+  ENDIF have static test procs
+
+=][=
+
+  IF (. make-test-main)   =][=
+
+    FOR     flag          =][=
+      IF (not (= (hash-ref cb-proc-name   flg-name)
+                 (hash-ref test-proc-name flg-name))) =]
+#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
+      ENDIF               =][=
+    ENDFOR  flag          =]
+#endif /* defined([=(. main-guard)=]) */[=
+
+  ENDIF (. make-test-main)      =][=
+
+(. undef-proc-names)  =][=
 
 ENDDEF declare-option-callbacks
 
@@ -330,8 +458,24 @@ DEFINE callback-proc-header     =]
 
 /* * * * * * *
  *
- *   For the [=name=] option.
+ *   For the [=name=] option[=
+
+  IF (exist? "ifdef")
+
+=], when [= ifdef =] is #define-d.
  */
+#ifdef [= ifdef                 =][=
+  ELIF (exist? "ifndef")
+
+=], when [= ifdef =] is *not* #define-d.
+ */
+#ifndef [= ifndef               =][=
+  ELSE                          =].
+ */[=
+
+  ENDIF ifdef / ifndef
+
+=]
 static void
 doOpt[=(. cap-name) =](
     tOptions*   pOptions,
@@ -474,6 +618,12 @@ DEFINE define-option-callbacks  =][=
 
       ENDIF =]
 }[=
+
+  IF (exist? "ifdef")           =]
+#endif /* defined [= ifdef      =] */[=
+  ELIF (exist? "ifndef")        =]
+#endif /* ! defined [= ifndef   =] */[=
+  ENDIF ifdef / ifndef          =][=
 
       IF (. make-test-main) =]
 

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.29 2004/05/15 03:32:13 bkorb Exp $
+#$Id: optcode.tpl,v 3.30 2004/08/14 20:36:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -50,34 +50,12 @@ tSCC zCopyrightNotice[] =
     *       =][=(set! tmp-text "Copyrighted")=][=
 
   ESAC =][=
-(set! tmp-text (kr-string tmp-text))
-tmp-text =];[=
+
+(kr-string tmp-text) =];[=
 
 ENDIF "copyright notes"
 
 =]
-extern tOptProc doVersionStderr, doVersion, doPagedUsage[=
-  (set! tmp-name "doUsageOpt\n")
-  (if (exist? "homerc") ", doLoadOpt")  =][=
-
-  FOR flag                              =][=
-    (set-flag-names)
-    (if (exist? "call-proc")
-        (string-append ", " (get "call-proc"))
-        (begin
-           (set! tmp-text (hash-ref cb-proc-name flg-name))
-           (if (==* tmp-text "doOpt")
-               (set! tmp-name (string-append tmp-name tmp-text "\n")) )
-    )   )                            =][=
-  ENDFOR    flag
-
-=][=
-
-(shell (string-append
-  "( sort -u | "
-  "  ${COLUMNS_EXE} -I16 --first=';\nstatic tOptProc ' -S, --spread=1\n"
-  ") <<_EOF_\n"
-         tmp-name "_EOF_" )) =];
 extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
@@ -87,9 +65,7 @@ IF (exist? "include") =]
  *  global included definitions
  */[=
 
-  FOR include "\n" =]
-[= (get "include") =][=
-  ENDFOR include   =]
+  (join "\n" (stack "include"))  =]
 [=ENDIF "include exists" =]
 #ifndef NULL
 #  define NULL 0
@@ -111,23 +87,18 @@ ENDFOR flag
 =]
 
 /*
- *  Help option description:
+ *  Help/More_Help[= version "/Version"=] option descriptions:
  */
-tSCC zHelpText[]  = "Display usage information and exit";
-tSCC zHelp_Name[] = "help";
+tSCC zHelpText[]       = "Display usage information and exit";
+tSCC zHelp_Name[]      = "help";
 
-/*
- *  More_Help option description:
- */
 tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
 tSCC zMore_Help_Name[] = "more-help";[=
 
 IF (exist? "version")
+
 =]
 
-/*
- *  Version option description:
- */
 tSCC zVersionText[]    = "Output version information and exit";
 tSCC zVersion_Name[]   = "version";[=
 ENDIF (exist? "version")  =][=
@@ -136,31 +107,20 @@ IF (exist? "homerc")
 =]
 
 /*
- *  Save_Opts option description:
+ *  Save/Load_Opts option description:
  */
-tSCC zSave_OptsText[]  = "Save the option state to an rc file";
-tSCC zSave_Opts_Name[] = "save-opts";
+tSCC zSave_OptsText[]     = "Save the option state to an rc file";
+tSCC zSave_Opts_Name[]    = "save-opts";
 
-/*
- *  Load_Opts option description:
- */
-tSCC    zLoad_OptsText[]     = "Load options from an rc file";
-tSCC    zLoad_Opts_NAME[]    = "LOAD_OPTS";
-tSCC    zNotLoad_Opts_Name[] = "no-load-opts";
-tSCC    zNotLoad_Opts_Pfx[]  = "no";
-#define zLoad_Opts_Name        (zNotLoad_Opts_Name + 3)[=
+tSCC zLoad_OptsText[]     = "Load options from an rc file";
+tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
+
+tSCC zNotLoad_Opts_Name[] = "no-load-opts";
+tSCC zNotLoad_Opts_Pfx[]  = "no";
+#define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
 ENDIF (exist? "homerc") =][=
 
-
-IF (or (exist? "flag.flag-code")
-       (exist? "flag.extract-code")
-       (exist? "flag.call-proc")
-       (exist? "flag.arg-range")
-       (match-value? ~* "flag.arg-type" "key|set") ) =][=
-
   invoke declare-option-callbacks  =][=
-
-ENDIF   =][=
 
 IF (and (exist? "version") make-test-main) =]
 #ifdef [=(. main-guard)     =]

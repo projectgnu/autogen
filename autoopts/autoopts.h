@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-02-16 11:22:13 bkorb"
+ *  Time-stamp:      "2004-08-14 07:33:27 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.24 2004/02/16 22:20:45 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.25 2004/08/14 20:36:57 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -176,6 +176,75 @@ typedef struct {
 #ifdef AUTOGEN_BUILD
 #  include <snprintfv/printf.h>
 #endif /* AUTOGEN_BUILD */
+
+/*
+ *  DO option handling?
+ *
+ *  Options are examined at two times:  at immediate handling time and at
+ *  normal handling time.  If an option is disabled, the timing may be
+ *  different from the handling of the undisabled option.  The OPTST_DIABLED
+ *  bit indicates the state of the currently discovered option.
+ *  So, here's how it works:
+ *
+ *  A) handling at "immediate" time, either 1 or 2:
+ *
+ *  1.  OPTST_DISABLED is not set:
+ *      IMM           must be set
+ *      DISABLE_IMM   don't care
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *      0 -and-  1 x x x
+ *
+ *  2.  OPTST_DISABLED is set:
+ *      IMM           don't care
+ *      DISABLE_IMM   must be set
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *      1 -and-  x 1 x x
+ *
+ *  B) handling at "regular" time, any of the following 4:
+ *
+ *  1.  OPTST_DISABLED is not set:
+ *      IMM           must *NOT* be set
+ *      DISABLE_IMM   don't care
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *      0 -and-  0 x x x
+ *
+ *  2.  OPTST_DISABLED is not set:
+ *      IMM           is set (but don't care)
+ *      DISABLE_IMM   don't care
+ *      TWICE         must be set
+ *      DISABLE_TWICE don't care
+ *      0 -and-  ? x 1 x
+ *
+ *  3.  OPTST_DISABLED is set:
+ *      IMM           don't care
+ *      DISABLE_IMM   must *NOT* be set
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *      1 -and-  x 0 x x
+ *
+ *  4.  OPTST_DISABLED is set:
+ *      IMM           don't care
+ *      DISABLE_IMM   is set (but don't care)
+ *      TWICE         don't care
+ *      DISABLE_TWICE must be set
+ *      1 -and-  x ? x 1
+ */
+#define DO_IMMEDIATELY(_flg) \
+    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM)) == OPTST_IMM) \
+    || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
+        == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
+
+#define DO_NORMAL_TIME(_flg) \
+    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
+    || (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
+                  (OPTST_DISABLED|OPTST_TWICE))                 \
+    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
+                  OPTST_DISABLED)                               \
+    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_TWICE))  ==     \
+                  (OPTST_DISABLED|OPTST_DISABLE_TWICE)  ))
 
 /*
  *  Define and initialize all the user visible strings.

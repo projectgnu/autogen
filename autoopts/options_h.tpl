@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.20 2004/08/12 03:24:00 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.21 2004/08/14 20:36:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -62,54 +62,6 @@ h=options.h
 #define OPTST_DISABLE_TWICE  0x0400000  /* process disabled option twice     */
 
 #define OPTST_PERSISTENT     0xFFFFF00  /* mask of flags that do not change  */
-
-/*
- *  Options are examined at two times:  at immediate handling time and at
- *  normal handling time.  If an option is disabled, the timing may be
- *  different from the handling of the undisabled option.  So, here's how
- *  it works:
- *
- *  A) handling at "immediate" time, either 1 or 2:
- *
- *  1.  The "option is disabled" bit is *NOT* set (OPTST_DISABLED)
- *      IMM           must be set
- *      DISABLE_IMM   don't care
- *      TWICE         don't care
- *      DISABLE_TWICE don't care
- *
- *  2.  The "option is disabled" bit *IS* set (OPTST_DISABLED)
- *      IMM           don't care
- *      DISABLE_IMM   must be set
- *      TWICE         don't care
- *      DISABLE_TWICE don't care
- *
- *  B) handling at "regular" time, either 1 or 2:
- *
- *  1.  The "option is disabled" bit is *NOT* set (OPTST_DISABLED)
- *      IMM           must *NOT* be set -- *OR*
- *      TWICE         must be set
- *      DISABLE_IMM   don't care
- *      DISABLE_TWICE don't care
- *
- *  2.  The "option is disabled" bit *IS* set (OPTST_DISABLED)
- *      IMM           don't care
- *      TWICE         don't care
- *      DISABLE_IMM   must *NOT* be set -- *OR*
- *      DISABLE_TWICE must be set
- */
-#define DO_IMMEDIATELY(_flg) \
-    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM)) == OPTST_IMM) \
-    || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
-        == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
-
-#define DO_NORMAL_TIME(_flg) \
-    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
-    || (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
-                  (OPTST_DISABLED|OPTST_TWICE))                 \
-    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
-                  OPTST_DISABLED)                               \
-    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_TWICE))  ==     \
-                  (OPTST_DISABLED|OPTST_DISABLE_TWICE)  ))
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)

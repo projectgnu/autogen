@@ -1,85 +1,154 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.21 2004/05/15 03:32:13 bkorb Exp $
+# $Id: optlib.tpl,v 3.22 2004/08/14 20:36:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =][=
 
-(define tmp-val  #f)
-(define tmp-name "")
-(define tmp-text "")
+(define have-proc   #f)
+(define proc-name   "")
+(define test-name   "")
+(define tmp-text    "")
+(define is-extern   #t)
+(define is-priv     #t)
 (define make-callback-procs #f)
 
-;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  =][=
 
-;;; Save the various flag name morphs into a hash table =][=
+DEFINE save-name-morphs
 
-DEFINE save-name-morphs     =][=
+   Save the various flag name morphs into hash tables
+
+   Every option descriptor has a pointer to a handler procedure.  That
+   pointer may be NULL.  We generate a procedure for keyword,
+   set-membership and range checked options.  "stackOptArg" is called
+   if "stack-arg" is specified.  The specified procedure is called if
+   "call-proc" is specified.  Finally, we insert the specified code for
+   options with "flag-code" or "extract-code" attributes.
+
+   This all changes, however, if "make-test-main" is set.  It is set if
+   either "test-main" is specified as a program/global attribute, or if
+   the TEST_MAIN environment variable is defined.  This should be set
+   if either the program is intended to digest options for an incorporating
+   shell script, or else if the user wants a quick program to show off the
+   usage text and command line parsing.  For that environment, all callbacks
+   are disabled except "stackOptArg" for stacked arguments and the
+   keyword set membership options.
+
+ =][=
+
   IF
 
-     (set-flag-names)
-     (if do-ifdefs
-         (begin
-            (if (or (exist? "ifdef") (exist? "ifndef"))
-                (set! tmp-val #t)
-                (set! tmp-val #f)  )
-            (hash-create-handle! ifdef-ed flg-name tmp-val)
-     )   )
+    (define need-stacking (lambda()
+        (if (not (exist? "max"))
+            #f
+            (if (> (string->number (get "max")) 1)
+                #t
+                #f
+    )   )   ))
 
-     (exist? "call-proc")
+    (set-flag-names)
+    (hash-create-handle! ifdef-ed flg-name
+              (and do-ifdefs (or (exist? "ifdef") (exist? "ifndef")))  )
+    (set! proc-name (string-append "doOpt" cap-name))
+    (set! is-priv   #t)
+
+    (exist? "call-proc")
 
     =][=
-    (set! tmp-val #t)
-    (set! tmp-name (get "call-proc"))
+
+    (set! have-proc #t)
+    (set! is-extern #t)
+    (set! is-priv   #f)
+    (set! proc-name (get "call-proc"))
+    (set! test-name (if need-stacking "stackOptArg" "NULL"))
 
   =][=
   ELIF (or (exist? "extract-code")
            (exist? "flag-code")
            (exist? "arg-range"))
     =][=
-    (set! tmp-val #t)
-    (set! tmp-name (string-append "doOpt" cap-name))
+
+    (set! have-proc #t)
+    (set! is-extern #f)
+    (set! test-name (if (exist? "arg-range") proc-name
+                        (if need-stacking "stackOptArg" "NULL")  ))
 
   =][=
-  ELIF (exist? "flag-proc") =][=
-    (set! tmp-val #t)
-    (set! tmp-name (string-append "doOpt"
-                   (string-capitalize! (get "flag-proc"))  ))
+  ELIF (exist? "flag-proc")     =][=
+
+    (set! have-proc #t)
+    (set! is-priv   #f)
+    (set! proc-name (string-append "doOpt" (cap-c-name "flag-proc")))
+    (set! test-name (if need-stacking "stackOptArg" "NULL"))
+    (set! is-extern #f)
 
   =][=
-  ELIF (exist? "stack-arg") =][=
-    (set! tmp-val #t)
+  ELIF (exist? "stack-arg")     =][=
+
+    (set! have-proc #t)
+    (set! is-priv   #f)
     (if (or (not (exist? "equivalence"))
             (== (up-c-name "equivalence") UP-name) )
-      (set! tmp-name "stackOptArg")
-      (set! tmp-name "unstackOptArg")  )
+        (set! proc-name "stackOptArg")
+        (set! proc-name "unstackOptArg")  )
+    (set! test-name (if need-stacking proc-name "NULL"))
+    (set! is-extern #t)
 
   =][=
+
   ELSE =][=
-    CASE arg-type           =][=
-    =*   bool               =][=
-         (set! tmp-name "optionBooleanVal")
-         (set! tmp-val #t)  =][=
-    =*   num                =][=
-         (set! tmp-name "optionNumericVal")
-         (set! tmp-val #t)  =][=
-    ~*   key|set            =][=
-         (set! tmp-name (string-append "doOpt" cap-name))
-         (set! tmp-val #t)  =][=
-    *                       =][=
-         (set! tmp-val #f)  =][=
-    ESAC                    =][=
+    CASE arg-type               =][=
+    =*   bool                   =][=
+         (set! proc-name "optionBooleanVal")
+         (set! test-name proc-name)
+         (set! is-extern #t)
+         (set! is-priv   #f)
+         (set! have-proc #t)    =][=
+
+    =*   num                    =][=
+         (set! proc-name "optionNumericVal")
+         (set! test-name proc-name)
+         (set! is-extern #t)
+         (set! is-priv   #f)
+         (set! have-proc #t)    =][=
+
+    ~*   key|set                =][=
+         (set! test-name proc-name)
+         (set! is-extern #f)
+         (set! have-proc #t)    =][=
+
+    *                           =][=
+         (set! have-proc #f)    =][=
+    ESAC                        =][=
 
   ENDIF =][=
 
-  (if tmp-val
+  ;;  If these are different, then a #define name is inserted into the
+  ;;  option descriptor table.  Never a need to mess with it if we are
+  ;;  not building a "test main" procedure.
+  ;;
+  (if (not make-test-main)
+      (set! test-name proc-name))
+
+  (if have-proc
       (begin
-        (hash-create-handle! have-cb-procs flg-name #t)
-        (hash-create-handle! cb-proc-name  flg-name tmp-name)
+        (if (and (not is-priv) (or (exist? "ifdef") (exist? "ifndef")))
+            (error (sprintf
+               "option %s is conditional, but invokes a non-private procedure"
+                       flg-name )))
+        (hash-create-handle! have-cb-procs   flg-name #t)
+        (hash-create-handle! cb-proc-name    flg-name proc-name)
+        (hash-create-handle! test-proc-name  flg-name test-name)
+        (hash-create-handle! is-ext-cb-proc  flg-name is-extern)
         (set! make-callback-procs #t)
       )
-      (hash-create-handle! cb-proc-name  flg-name "NULL")
+      (begin
+        (hash-create-handle! have-cb-procs   flg-name #f)
+        (hash-create-handle! cb-proc-name    flg-name "NULL")
+        (hash-create-handle! test-proc-name  flg-name "NULL")
+      )
   )
 
   (if (exist? "default")
@@ -528,9 +597,20 @@ DEFINE Option_Descriptor =][=
          (if (exist? "flags-cant")
              (string-append "a" cap-name "CantList")
              "NULL" ) =],
-     /* option proc      */ [=(hash-ref cb-proc-name flg-name)=],
-     /* desc, NAME, name */ z[=(. cap-name)=]Text,  z[=(. cap-name)=]_NAME,
-                            z[=(. cap-name)=]_Name,
+     /* option proc      */ [=
+
+     ;;  If there is a difference between what gets invoked under test and
+     ;;  what gets invoked "normally", then there must be a #define name
+     ;;  for the procedure.  There will only be such a difference if
+     ;;  make-test-main is #t
+     ;;
+     (if (= (hash-ref cb-proc-name flg-name)
+            (hash-ref test-proc-name flg-name))
+
+         (hash-ref test-proc-name flg-name)
+         (string-append UP-name "_OPT_PROC")  )  =],
+     /* desc, NAME, name */ [=
+     (sprintf "z%1$sText, z%1$s_NAME, z%1$s_Name," cap-name) =]
      /* disablement strs */ [=(hash-ref disable-name   flg-name)=], [=
                               (hash-ref disable-prefix flg-name)=] },[=
   ENDIF =][=
