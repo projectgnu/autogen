@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.65 2001/06/06 04:19:57 uid24370 Exp $
+## $Id: auto_gen.tpl,v 2.66 2001/06/22 03:16:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1456,7 +1456,7 @@ that can be invoked as a Guile macro.  Here is how you do these.
 @section Shell Output Commands
 
 Shell commands are run inside of a server process.  This means that,
-unlike @command{make}, context is kept from one command to the next.
+unlike @file{make}, context is kept from one command to the next.
 Consequently, you can define a shell function in one place inside of
 your template and invoke it in another.  You may also store values
 in shell variables for later reference.  If you load functions from
@@ -1484,7 +1484,7 @@ these routines, or by building them into AutoGen.
 
 To build them into AutoGen, you must place your routines in the source
 directory and name the files @file{exp*.c}.  You also must have a stylized
-comment that @command{getdefs} can find that conforms to the following:
+comment that @file{getdefs} can find that conforms to the following:
 
 @example
 /*=gfunc <function-name>
@@ -1518,7 +1518,7 @@ a function that queries or modifies the state of AutoGen.
 
 @item <invocation-name-string>
 Normally, the @code{function-name} string will be transformed into
-a reasonable invocation string.  However, that is not always true.
+a reasonable invocation name.  However, that is not always true.
 If the result does not suit your needs, then supply an alternate string.
 
 @item exparg:
@@ -1546,22 +1546,29 @@ The user-defined macros may be defined in your templates or loaded
 with the @code{--lib-template} option
 (See @ref{DEFINE} and  @ref{autogen lib-template}).
 
-As for AutoGen native macors, do not add any.  It is easy to do, but I
-won't like it.  Fundamentally, AutoGen takes a description of the output
-file, makes substitutions for various expressions, selects blocks of
-text based on various conditions and iterates over blocks of text based
-on either conditions or arrays of defined values.  This has been stable
-for years.
+As for AutoGen native macros, do not add any. It is easy to do,
+but I won't like it.  The basic functions needed to accomplish
+looping over and selecting blocks of text have proven to be
+sufficient over a period of several years.  New text transformations
+can be easily added via any of the AutoGen extension methods, viz.
+a Guile function, a C routine invoked as a Guile function, a user
+defined macro, shell script, etc.
 
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-Invocation section from [= ` echo ${top_srcdir}/agen5/autogen.texi ` =]
+Invocation section from [= `
+
+cat <<_EOF_
+${top_srcdir}/agen5/autogen.texi
+
 @end ignore
 @page
 
-[= ` cat ${top_srcdir}/agen5/autogen.texi ` =]
+_EOF_
+
+cat ${top_srcdir}/agen5/autogen.texi ` =]
 @ignore
 
 Resume text from auto_gen.tpl
