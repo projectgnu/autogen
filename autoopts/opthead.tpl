@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.16 1999/10/22 00:28:24 bruce Exp $
+# $Id: opthead.tpl,v 2.17 1999/10/26 02:37:54 bruce Exp $
 =]
 [=
 
@@ -25,27 +25,7 @@
 
 #ifndef [=(. defname)=]
 #define [=(. defname)=]
-[=
-IF (exist? "copyright") =]
-/*
- * [=(sprintf "%s copyright %s %s - all rights reserved"
-     (. prog-name) (get "copyright") (get "owner") ) =][=
-
-  IF (exist? "copyright_note") =]
- *
-[=(get "copyright_note")=][=
-
-  ELIF (exist? "copyright_gpl") =]
- *
-[=(gpl (. prog-name) " * " ) =][=
-
-  ELIF (exist? "copyright_lgpl") =]
- *
-[=(lgpl (. prog-name) (get "owner") " * " ) =][=
-
-  ENDIF "copyright notes" =]
- */[=
-ENDIF "copyright exists" =]
+[= Option_Copyright =]
 #include <options.h>
 
 /*
