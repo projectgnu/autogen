@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.17 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: funcCase.c,v 3.18 2004/10/11 00:00:52 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -758,6 +758,24 @@ Select_Match_Always( char* pzText, char* pzMatch )
     return SUCCESS;
 }
 
+/*
+ *  We don't bother making a Guile function for this one :)
+ */
+STATIC tSuccess
+Select_Match_Existence( char* pzText, char* pzMatch )
+{
+    return (pzText != zNil) ? SUCCESS : FAILURE;
+}
+
+/*
+ *  We don't bother making a Guile function for this one :)
+ */
+STATIC tSuccess
+Select_Match_NonExistence( char* pzText, char* pzMatch )
+{
+    return (pzText == zNil) ? SUCCESS : FAILURE;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*=macfunc CASE
@@ -767,12 +785,16 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *
  *  desc:
  *
- *  The arguments are evaluated and converted to a string, if necessary.
- *  (@pxref{EXPR})  The scope of the macro is up to the matching ESAC
- *  function.  Within the scope of a CASE, this string is matched against
- *  case selection macros.  There are sixteen match macros that are derived
- *  from four different ways the test may be performed, plus an "always
- *  true" match.  The code for each selection expression is formed as follows:
+ *  The arguments are evaluated and converted to a string, if necessary.  A
+ *  simple name will be interpreted as an AutoGen value name and its value will
+ *  be used by the @{SELECT} expressions (see the example below and the
+ *  expression evaluation function, @pxref{EXPR}).  The scope of the macro is
+ *  up to the matching ESAC function.  Within the scope of a CASE, this string
+ *  is matched against case selection macros.  There are sixteen match macros
+ *  that are derived from four different ways the test may be performed, plus
+ *  an "always true", "true if the AutoGen value was found", and "true if no
+ *  AutoGen value was found" matches.  The codes for the sixteen match
+ *  macros are formed as follows:
  *
  *  @enumerate
  *  @item
@@ -801,6 +823,9 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  [+ ~~*  "[Tt]est" +]reg exp must match at start, not at end
  *  [+ ==   "TeSt"    +]a full-string, case sensitive compare
  *  [+ =    "TEST"    +]a full-string, case insensitive compare
+ *  [+ !@             +]not exists - matches if no AutoGen value found
+ *  [+ ==   ""        +]expression yielded a zero-length string
+ *  [+ @              +]exists - matches if any value result
  *  [+ *              +]always match - no testing
  *  [+ ESAC +]
  *  @end example
@@ -826,8 +851,9 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
 {
     typedef tSuccess (t_match_proc)( char*, char* );
     /*
-     *  There are only 13 procedures because the case insenstive matching
-     *  get mapped into the previous four.  The last is "match always".
+     *  There are only 15 procedures because the case insenstive matching
+     *  get mapped into the previous four.  The last three are "match always",
+     *  "match if a value was found" "match if no value found".
      */
     static t_match_proc* match_procs[] = {
         &Select_Compare_Full,
@@ -845,7 +871,9 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
         &Select_Match_Start,
         &Select_Match,
 
-        &Select_Match_Always
+        &Select_Match_Always,
+        &Select_Match_Existence,
+        &Select_Match_NonExistence
     };
 
     tSCC* apzMatchName[] = {
@@ -864,7 +892,9 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
         "MATCH_START",
         "MATCH_WITHIN",
 
-        "MATCH_ALWAYS"
+        "MATCH_ALWAYS",
+        "MATCH_EXISTENCE",
+        "MATCH_NONEXISTENCE"
     };
 
     tMacro*   pEnd = pT->aMacros + pMac->endIndex;
@@ -1056,7 +1086,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    macro.  @xref{CASE}.
  *
  *    You do not specify a @code{SELECT} macro with the word ``select''.
- *    Instead, you must use one of the 17 match operators described in
+ *    Instead, you must use one of the 19 match operators described in
  *    the @code{CASE} macro description.
 =*/
 STATIC tMacro*
@@ -1119,6 +1149,24 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
             typ |= FTYP_SELECT_EQUIVALENT_FULL;
         }
         break;
+
+    case '!':
+        if ((*pzSrc != '@') || (! isspace( pzSrc[1])) )
+            AG_ABEND_IN( pT, pMac, zInvSel );
+
+        typ = FTYP_SELECT_MATCH_NONEXISTENCE;
+        srcLen = 0;
+        pMac->ozText = 0;
+        goto selection_done;
+
+    case '@':
+        if (! isspace( *pzSrc ))
+            AG_ABEND_IN( pT, pMac, zInvSel );
+
+        typ = FTYP_SELECT_MATCH_EXISTENCE;
+        srcLen = 0;
+        pMac->ozText = 0;
+        goto selection_done;
 
     default:
         AG_ABEND_IN( pT, pMac, zInvSel );

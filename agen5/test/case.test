@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # case.test --- test CASE functionality
 #
-# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Time-stamp:        "2004-10-10 16:50:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2004/05/16 19:12:48 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2004/10/11 00:00:52 $
+#            by: bkorb
 #
-# $Id: case.test,v 3.1 2004/05/16 19:12:48 bkorb Exp $
+# $Id: case.test,v 3.2 2004/10/11 00:00:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -66,6 +66,16 @@ FOR grp "\n" =><=
   ESAC =><=
 
 ENDFOR grp=>
+empty: <= CASE empty-val =><=
+   @  =>valid<=
+   !@ =>BOGUS<=
+   *  =>REAL-BOGUS<=
+   ESAC =>
+bogus: <= CASE bogus-val =><=
+   !@ =>valid<=
+   @  =>BOGUS<=
+   *  =>REAL-BOGUS<=
+   ESAC =>
 EOF
 
 # # # # # # # SAMPLE OUTPUT FILE # # # # # #
@@ -76,6 +86,8 @@ cat > $testname.out <<'EOF'
 first:  string matches: ~~ ^[a-z]*$  OK and ~ ^[a-z]*$  OK
 second: String matches: ~~ .*        OK and ~ ^[a-z]*$  OK
 third:  STRING matches: ~~ ^[A-Z]*$  OK and ~ ^[a-z]*$  OK
+empty: valid
+bogus: valid
 EOF
 
 # # # # # # # DEFINITIONS FILE # # # # # #
@@ -97,6 +109,7 @@ grp = {
    nam = third;
    val = STRING;
 };
+empty-val = '';
 EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #

@@ -1,3 +1,16 @@
+New in 5.6.4 - October, 2004
+AutoGen:
+* -Wall warning cleanups
+
+AutoOpts:
+* The listing of enumerated option arguments is a bit more concise.
+* Options may be handled twice: once during the immediate phase and
+  again during the "normal" processing phase.
+* If environment variable "rc" processing is enabled, then the
+  "${PROGNAME}" environment variable will be processed tokenizing it
+  and processing it as a list of command line options.  It may not
+  contain any command line operands.
+
 New in 5.6.3 - July, 2004
 AutoGen:
 * fixed tpl-file-line so that "%2$d" works for the format.
