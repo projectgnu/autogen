@@ -1,0 +1,55 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# extract.test --- test extract functionality
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/05/09 05:27:55 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: extract.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+[= AutoGen5 template out =]
+This is the start of generated text[=\` echo ' working' \` =]
+[=(extract "$testname.save" "/* =-= %s =-= MARKER =-= %s =-= */")=]
+And this is the end.[= \` echo ' done' \` =]
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating ${testname}.sample
+# this is the output we should expect to see
+cat > ${testname}.sample <<'_EOF_'
+This is the start of generated text working
+/* =-= START =-= MARKER =-= DO NOT CHANGE THIS COMMENT =-= */
+This is inserted text
+/* =-= END   =-= MARKER =-= DO NOT CHANGE THIS COMMENT =-= */
+And this is the end. done
+_EOF_
+
+AGEXE="$AGEXE --no-definitions -b $testname -T $testname.tpl"
+$AGEXE || failure $AGEXE failed
+sed '/ START /a\
+This is inserted text' ${testname}.out > $testname.save
+
+$AGEXE || failure $AGEXE failed
+cmp -s ${testname}.out ${testname}.sample || failure unexpected output
+
+cleanup
+# end of extract.test

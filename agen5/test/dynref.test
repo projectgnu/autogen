@@ -1,0 +1,69 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# dynref.test --- test dynamic scoping of definition values
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/05/09 05:27:55 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: dynref.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<'_EOF_'
+[= AutoGen5 Template test =]
+[=
+
+DEFINE nest         =][=
+
+  FOR nesting        =][=
+    IF (first-for?)
+=]The un-nested value is:  [=value=].[=
+    ENDIF           =][=
+  ENDFOR            =][=
+
+ENDDEF              =][=
+
+nest value = "hidden value"
+
+=]
+_EOF_
+
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+cat > $testname.def <<_EOF_
+autogen definitions $testname;
+
+nesting = { name = one;   };
+nesting = { name = two;   };
+nesting = { name = three; };
+nesting = { name = four;  };
+_EOF_
+
+# this is the output we should expect to see
+cat > $testname.out <<_EOF_
+The un-nested value is:  hidden value.
+_EOF_
+
+echo $AGEXE $testname.def
+$AGEXE $testname.def || failure $AGEXE failed
+cmp -s $testname.test $testname.out || failure unexpected output
+
+cleanup
+# end of dynref.test

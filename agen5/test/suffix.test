@@ -1,0 +1,61 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# suffix.test --- test the select suffix option
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:29 PDT 1999
+# Last Modified:     $Date: 2001/05/09 05:27:55 $
+#            by:     Bruce Korb <bkorb@gnu.org>
+#
+# $Id: suffix.test,v 1.1 2001/05/09 05:27:55 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<'_EOF_'
+[= AutoGen5 Template test =]
+[=
+
+CASE (suffix) =][=
+
+== test       =]BOGUS[=
+== "* NONE *" =]No Suffix[=
+== Example    =]Example[=
+*             =]Bogon ``[=(suffix)=]''[=
+
+ESAC =]
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo "Example"   > ${testname}.Example.test
+echo "No Suffix" > ${testname}.stdout.test
+
+# # # # # # # # # # RUN TESTS # # # # # # #
+
+$AGEXE --no-def -T${testname}.tpl -oExample -b${testname} || \
+   failure $AGEXE --no-def -T${testname}.tpl -oExample -b${testname}
+
+cmp ${testname}.Example* || \
+   failure COMPARE cmp ${testname}.Example*
+
+$AGEXE --no-def -T${testname}.tpl -o -b${testname} > ${testname}.stdout || \
+   failure $AGEXE --no-def -T${testname}.tpl -o -b${testname}
+
+cmp ${testname}.stdout* || \
+   failure COMPARE cmp ${testname}.stdout*
+
+cleanup
+# end of endmac.test
