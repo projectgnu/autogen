@@ -1,19 +1,30 @@
+New in 4.5.5
+* Finally, really, finished the portability issues and it now
+  included a complete implementation of the printf family of
+  formatting routines.
+* Templates for client program man pages and invoking chapters
+  for texinfo docs are supplied.  They are also used by the
+  autogen/columns/getdefs programs that come in this package.
+
 New in 4.5
 * Compiles with cygwin tools, provided you link GNU regex.
-* *Much* enhanced portability.  AutoGen really should compile in just
-  about any POSIX environment.
+* *Much* enhanced portability.  AutoGen really should compile in
+  just about any POSIX environment.
 * Overhauled the configuration to help programs which want to use
   autoopts from Makefiles.
+
 New in 4.4
 * Massively reworked the template parsing in preparation for
   beguiling AutoGen.
 * Deleted an ugly shell/awk program and replaced it with
   an ugly C program for extracting definitions from comments. :)
+
 New in 4.1
 * Two new string generation functions for creating shell-rule
   quoted strings ("xx...\t") and raw strings ('xxx\nxx')
 * single quoted strings in the template macros are now
   processed the same way as in the definitions file.
+
 New in 4.0
 * The autoopts package works without the source tree in place.
 * Makefile.in is regenerated with automake-1.2
@@ -23,6 +34,7 @@ New in 4.0
 * added another expression function (JOIN)
 * changed shell commands to run in a shell server instead
   of starting a new shell each time.  *MUCH* faster.
+
 New in 3.2
 * Ported to Digital Unix (AXP).
 * ubiquitous bugfixes
