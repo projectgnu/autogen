@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.6 2002/05/05 03:07:06 bkorb Exp $
+ *  $Id: autoopts.c,v 3.7 2002/05/05 17:54:16 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1584,7 +1584,7 @@ optionVersion()
  * ret_type:  int
  * ret_desc:  the count of the arguments processed
  *
- * doc:  
+ * doc:
  *
  * This is the main entry point for processing options.  It is intended
  * that this procedure be called once at the beginning of the execution of
