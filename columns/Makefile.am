@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.19 1999/10/28 03:36:29 bruce Exp $
+## $Id: Makefile.am,v 1.20 1999/10/29 02:35:29 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -32,17 +32,17 @@ all : gen
 
 opts.c opts.h: opts.def
 	top_builddir=$(top_builddir) \
-	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
+	$(top_builddir)/src/AutoGen -L $(top_srcdir)/autoopts \
 		$(top_srcdir)/columns/opts.def
 
 columns.menu columns.texi : opts.def columns
 	top_builddir=$(top_builddir) \
-	$(top_builddir)/src/autogen -Taginfo -bcolumns \
+	$(top_builddir)/src/AutoGen -Taginfo -bcolumns \
 		-L $(top_srcdir)/autoopts -DLEVEL=section \
 		$(top_srcdir)/columns/opts.def
 
 columns.1 : opts.def columns
-	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
+	${top_builddir}/src/AutoGen -T agman1 -L $(top_srcdir)/autoopts \
 		-b columns $(srcdir)/opts.def
 
 # Makefile.am ends here
