@@ -1,4 +1,4 @@
-[=autogen template include $Id: opthead.tpl,v 1.8 1998/07/15 14:32:45 bkorb Exp $ =]
+[=autogen template include $Id: opthead.tpl,v 1.9 1998/07/16 21:22:51 bkorb Exp $ =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
 
@@ -424,11 +424,47 @@ and/or has an assigned handler procedure.";
 
 end-component
 =][=
-  _IF setable _exist=][=
-    _IF equivalence _exist equivalence _get _UP name _get _UP != &
+  _IF setable _exist =][=
+    _IF  equivalence _exist !
+         equivalence _get _UP name _get _UP == |
+
+
+ =]
+#define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
+      _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
+        [=prefix _up #_ +=]DESC([=name _up
+                       =]).optActualIndex = INDEX_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
+        [=prefix _up #_ +=]DESC([=name _up
+                       =]).optActualValue = VALUE_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
+        [=prefix _up #_ +=]DESC([=name _up=]).fOptState &= OPTST_PERSISTENT; \
+        [=prefix _up #_ +=]DESC([=name _up=]).fOptState |= OPTST_SET[=
+      _IF flag_arg _exist=]; \
+        [=prefix _up #_ +=]DESC([=name _up=]).pzLastArg  = [=
+        _IF flag_arg _get #=.* ~=](char*)atoi[=_ENDIF=](a)[=
+      _ENDIF flag_arg-exists =][=
+      _IF call_proc _exist
+          flag_code _exist |
+          flag_proc _exist |
+          stack_arg _exist |=]; \
+        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
+                  prog_name=]Options, \
+                [=prog_name=]Options.pOptDesc + INDEX_[=
+                         prefix _up #_ +=]OPT_[=name _up=] )[=
+      _ENDIF "callout procedure exists" =] )[=
+
+
+    _ELSE
 =]
 #define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
       _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+                       =]).optActualIndex = INDEX_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+                       =]).optActualValue = VALUE_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
         [=prefix _up #_ +=]DESC([=equivalence _up
                        =]).fOptState &= OPTST_PERSISTENT; \
         [=prefix _up #_ +=]DESC([=equivalence _up
@@ -447,25 +483,6 @@ end-component
                          prefix _up #_ +=]OPT_[=equivalence _up=] )[=
       _ENDIF "callout procedure exists" =] )[=
 
-
-    _ELSE "NOT equivalenced" =]
-#define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
-      _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
-        [=prefix _up #_ +=]DESC([=name _up=]).fOptState &= OPTST_PERSISTENT; \
-        [=prefix _up #_ +=]DESC([=name _up=]).fOptState |= OPTST_SET[=
-      _IF flag_arg _exist=]; \
-        [=prefix _up #_ +=]DESC([=name _up=]).pzLastArg  = [=
-        _IF flag_arg _get #=.* ~=](char*)atoi[=_ENDIF=](a)[=
-      _ENDIF flag_arg-exists =][=
-      _IF call_proc _exist
-          flag_code _exist |
-          flag_proc _exist |
-          stack_arg _exist |=]; \
-        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
-                  prog_name=]Options, \
-                [=prog_name=]Options.pOptDesc + INDEX_[=
-                         prefix _up #_ +=]OPT_[=name _up=] )[=
-      _ENDIF "callout procedure exists" =] )[=
     _ENDIF=][=
   _ENDIF=][=#
 
