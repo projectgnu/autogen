@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.19 1999/10/06 21:24:10 bkorb Exp $
+ *  $Id: makeshell.c,v 2.20 1999/11/04 02:22:47 bruce Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -85,7 +85,7 @@ static const char zMultiDef[] = "\n"
 "export %1$s_%2$s_CT\n";
 
 static const char zSingleDef[] = "\n"
-"unset %1$s_%2$s\n"
+"unset %1$s_%2$s || :\n"
 "%1$s_%2$s='%3$s'\n"
 "export %1$s_%2$s\n";
 

@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.39 1999/11/02 04:08:08 bruce Exp $
+## $Id: auto_gen.tpl,v 2.40 1999/11/04 02:22:47 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -310,7 +310,7 @@ templates.  However, sometimes there are common sections and this is
 just an example.
 
 The @code{[+FOR list "," +]} and @code{[+ ENDFOR list +]} clauses delimit
-blocks of text that will be repeated for every definition of @code{list}.
+a block of text that will be repeated for every definition of @code{list}.
 Inside of that block, the definition name-value pairs that
 are members of each @code{list} are available for substitutions.
 
@@ -319,11 +319,12 @@ special expression functions that are dependent on AutoGen named values;
 others are simply Scheme expressions, the result of which will be
 inserted into the output text.  Other expressions are names of AutoGen
 values.  These values will be inserted into the output text.  For example,
-@example
-"[+list_info+]"
-@end example
-will result in the value associated with the name @code{list_info} being
-inserted between the double quotes.
+@code{[+list_info+]} will result in the value associated with
+the name @code{list_info} being inserted between the double quotes and 
+@code{(string-upcase! (get "list_element"))} will first "get" the value
+associated with the name @code{list_element}, then change the case of
+all the letters to upper case.  The result will be inserted into the
+output document.
 
 If you have compiled AutoGen, you can copy out the template and
 definitions, run @file{autogen} and produce exactly the hypothesized
@@ -435,6 +436,7 @@ C macro substitution is @strong{not} performed.
 * Comments::        Commenting Your Definitions
 * Example::         What it all looks like.
 * Full Syntax::     YACC Language Grammar
+* Definitionless::  AutoGen without Definitions
 @end menu
 
 @node Identification
@@ -760,6 +762,17 @@ Extracted from $top_srcdir/agen5/defParse.y
    sed -e 's/{/@{/g' -e 's/}/@}/g' ` =]
 @end example
 
+@node Definitionless
+@section AutoGen without Definitions
+@cindex Definitionless
+
+It is entirely possible to write a template that does not depend upon
+external definitions.  Such a template would likely have an unvarying
+output, but be convenient nonetheless because of an external library
+of either AutoGen or Scheme functions, or both.  This can be accommodated
+by providing the @code{--override-tpl} and @code{--no-definitions}
+options on the command line.  @xref{Invoking AutoGen}.
+
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
@@ -769,9 +782,9 @@ Extracted from $top_srcdir/agen5/defParse.y
 @cindex template file
 @cindex .tpl file
 
-The template is composed of two parts.  The first part consists of a
-pseudo macro invocation and commentary.  It is followed by the template
-proper.
+The AutoGen template file defines the content of the output text.
+It is composed of two parts.  The first part consists of a pseudo
+macro invocation and commentary.  It is followed by the template proper.
 
 @cindex pseudo macro
 @cindex macro, pseudo
@@ -921,10 +934,9 @@ You cannot explicitly specify @code{UNKNOWN}.
 
 @item
 Explicit @code{INVOKE} macros must be followed by an expression that
-yields a known user defined AutoGen macro.  Implicit @code{INVOKE}
-macros start with the name of the macro.  There is no expression
-evaluation to determine the name.  Both formats are followed by
-a list of name/string value pairs.  The string values are
+yields a known user defined AutoGen macro.  Implicit macro invocations
+do not evaluate an expression to determine the name.  Both formats are
+followed by a list of name/string value pairs.  The string values are
 expressions, as described above.
 
 That is, the @code{INVOKE} syntax is either:
