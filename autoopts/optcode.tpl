@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.5 2002/06/14 02:11:36 bkorb Exp $
+#$Id: optcode.tpl,v 3.6 2002/07/27 04:13:35 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -270,7 +270,7 @@ ENDIF=]
  */
 tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
 tSCC   zUsageTitle[] =
-[= USAGE_LINE =];[=
+[= USAGE_LINE           =];[=
 
 IF (exist? "homerc") =]
 tSCC   zRcName[]     = "[=
@@ -278,41 +278,55 @@ tSCC   zRcName[]     = "[=
       (string-append "." pname-down "rc")
       (get "rcfile") ) =]";
 tSCC*  apzHomeList[] = {[=
-  FOR homerc=]
+  FOR homerc            =]
        [= (kr-string (get "homerc")) =],[=
   ENDFOR homerc=]
        NULL };[=
-ELSE=]
+
+ELSE                    =]
 #define zRcName     NULL
 #define apzHomeList NULL[=
-ENDIF=][=
+ENDIF                   =][=
 
-IF (exist? "explain") =]
-tSCC   zExplain[]    = [=
+IF (exist? "copyright.bugs")   =]
+
+tSCC   zBugsAddr[]    = "[= copyright.bugs =]";[=
+
+ELSE                    =]
+
+#define zBugsAddr NULL[=
+ENDIF                   =][=
+
+IF (exist? "explain")   =]
+tSCC   zExplain[]     = [=
    (kr-string (string-append "\n" (get "explain") "\n") ) =];[=
-ELSE=]
+ELSE                    =]
 #define zExplain NULL[=
-ENDIF=]
-[=
-IF (exist? "detail") =]
+ENDIF                   =][=
+
+IF (exist? "detail")    =]
+
 tSCC    zDetail[]     = [=
-       (kr-string (string-append "\n" (get "detail") "\n")) =];
-[=
-ELSE
-=]
+       (kr-string (string-append "\n" (get "detail") "\n")) =];[=
+
+ELSE                    =]
+
 #define zDetail NULL[=
-ENDIF=][=
+ENDIF                   =][=
 
 IF (not (exist? "usage")) =]
+
 extern  tUsageProc optionUsage;[=
 ENDIF=][=
 
-IF (exist? "version") =]
+IF (exist? "version")   =]
+
 tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
 
-ELSE=]
+ELSE                    =]
+
 #define zFullVersion NULL[=
-ENDIF=]
+ENDIF                   =]
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
@@ -351,7 +365,9 @@ tOptions [=(. pname)=]Options = {
          ELSE =]NO_EQUIVALENT /* no default option */[=
          ENDIF =] },
     [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */,
-    optDesc
+    optDesc,
+    0, (char**)NULL,  /* original argc + argv    */
+    zBugsAddr         /* address to send bugs to */
 };
 
 /*

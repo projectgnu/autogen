@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.6 2002/05/06 23:42:02 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.7 2002/07/27 04:13:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -182,7 +182,7 @@ Extracted from $top_srcdir/agen5/defParse.y
  then top_srcdir=.. ; fi
  [ ! -f ${top_srcdir}/agen5/defParse.y ] && kill -2 ${AG_pid}
  sed -n -e '/^definitions/,$p' ${top_srcdir}/agen5/defParse.y |
- sed -e 's/{/@{/g' -e 's/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
+ sed -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
 @end example
 
 [= get-text tag = TEMPLATE =]
@@ -493,7 +493,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
 ) > /dev/null 2>&1
 
 ( .tmp/genshellopt --help 2>&1 ) |
-  sed -e 's;\t;        ;g' -e 's;{;@{;g' -e 's;};@};g'
+  sed -e 's,\t,        ,g;s,@,@@,g;s,{,@{,g;s,},@},g'
   rm -rf .tmp
 
 ` =]

@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     $Date: 2002/06/13 02:00:40 $
+## Last Modified:     $Date: 2002/07/27 04:13:35 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.3 2002/06/13 02:00:40 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.4 2002/07/27 04:13:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -118,7 +118,7 @@ This is the automatically generated usage text for [=prog_name=]:
 
     ${PROG} %2$s 2>&1 | \
         sed -e 's/USAGE:  lt-/USAGE:  /' \
-            -e 's/{/@{/g' -e 's/}/@}/g' \
+            -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' \
             -e 's/\t/        /g' "
 
     (get "prog_name")

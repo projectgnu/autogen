@@ -1,3 +1,19 @@
+2002-07-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: Remove redundant doc
+	* autoopts/putshell.c: enabled but unused options have their default
+	values printed to the shell script output
+	* autoopts/options_h.tpl(pzBugAddr): string pointer for a
+	"mail-bug-reports-to" copyright attribute
+	* autoopts/optcode.tpl(copyright.bugs): create string when attr present
+	* autoopts/usage.c(pzBugAddr): print it when present
+	* autoopts/version.c(pzBugAddr): print it for long version
+	* autoopts/aginfo.tpl(USAGE): double the '@' chars for texi
+	* doc/auto_gen.tpl: ditto
+	* agen5/opts.def(copyright): add new field
+	* columns/opts.def(copyright): add new field
+	* getdefs/opts.def(copyright): add new field
+
 2002-07-10  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optmain.tpl(main): allow clients to specify the contents

@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.2 2002/06/14 02:11:36 bkorb Exp $
+/*  $Id: version.c,v 3.3 2002/07/27 04:13:35 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -59,6 +59,8 @@ tSCC zBadArg[] =
 \t'c' - version and copyright\n\
 \t'n' - version and copyright notice\n";
 
+tSCC zBugRpt[] = "\nplease send bug reports to:  %s\n";
+
 static void
 printVersion( pOpts, pOD, fp )
     tOptions*  pOpts;
@@ -67,11 +69,11 @@ printVersion( pOpts, pOD, fp )
 {
     char swCh;
 
-    if (pOD->pzLastArg == (char*)NULL)
+    if (pOD->pzLastArg == NULL)
          swCh = 'v';
     else swCh = pOD->pzLastArg[0];
 
-    if (pOpts->pzFullVersion != (char*)NULL)
+    if (pOpts->pzFullVersion != NULL)
          fputs( pOpts->pzFullVersion, fp );
     else fputs( pOpts->pzProgName,    fp );
     fputc( '\n', fp );
@@ -84,27 +86,31 @@ printVersion( pOpts, pOD, fp )
 
     case 'c':
     case 'C':
-        if (pOpts->pzCopyright != (char*)NULL) {
+        if (pOpts->pzCopyright != NULL) {
             fputs( pOpts->pzCopyright, fp );
             fputc( '\n', fp );
         }
         fprintf( fp, zAOV, optionVersion() );
+        if (pOpts->pzBugAddr != NULL)
+            fprintf( fp, zBugRpt, pOpts->pzBugAddr );
         break;
 
     case 'n':
     case 'N':
-        if (pOpts->pzCopyright != (char*)NULL) {
+        if (pOpts->pzCopyright != NULL) {
             fputs( pOpts->pzCopyright, fp );
             fputc( '\n', fp );
             fputc( '\n', fp );
         }
 
-        if (pOpts->pzCopyNotice != (char*)NULL) {
+        if (pOpts->pzCopyNotice != NULL) {
             fputs( pOpts->pzCopyNotice, fp );
             fputc( '\n', fp );
         }
 
         fprintf( fp, zAOV, optionVersion() );
+        if (pOpts->pzBugAddr != NULL)
+            fprintf( fp, zBugRpt, pOpts->pzBugAddr );
         break;
 
     default:

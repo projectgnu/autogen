@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.2 2002/06/13 02:00:40 bkorb Exp $
+ *   $Id: opts.def,v 3.3 2002/07/27 04:13:35 bkorb Exp $
  */
 
 /*
@@ -30,6 +30,7 @@ copyright = {
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = "bkorb@gnu.org";
+    bugs   = "autogen-bugs@sf.net";
 };
 
 prog_name     = "getdefs";

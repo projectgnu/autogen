@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.4 2002/04/14 20:48:23 bkorb Exp $
+ *  $Id: putshell.c,v 3.5 2002/07/27 04:13:35 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -126,7 +126,13 @@ putBourneShell( tOptions* pOpts )
             pOD = p;
         }
 
-        if (UNUSED_OPT( pOD ))
+        /*
+         *  IF the option was either specified or it wakes up enabled,
+         *  then we will emit information.  Otherwise, skip it.
+         *  The idea is that if someone defines an option to initialize
+         *  enabled, we should tell our shell script that it is enabled.
+         */
+        if (UNUSED_OPT( pOD ) && DISABLED_OPT( pOD ))
             continue;
 
         /*
@@ -159,7 +165,8 @@ putBourneShell( tOptions* pOpts )
          */
         else if ((pOD->fOptState & OPTST_DISABLED) != 0)
             printf( zOptDisabl, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    pOD->pz_DisablePfx );
+                    (pOD->pz_DisablePfx != NULL)
+                    ? pOD->pz_DisablePfx : "false" );
 
         /*
          *  If the argument type is numeric, the last arg pointer

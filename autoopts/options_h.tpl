@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.10 2002/07/11 02:06:09 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.11 2002/07/27 04:13:35 bkorb Exp $
 
 =][=
 
@@ -233,7 +233,7 @@ struct options {
     tOptDesc*         pOptDesc;
     int               origArgCt;
     char**            origArgVect;
-    void*             futureUse2;
+    const char*       pzBugAddr;
 };
 
 #if defined( __STDC__ ) || defined( __cplusplus )

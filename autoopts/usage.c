@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.3 2002/05/24 01:44:42 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.4 2002/07/27 04:13:35 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -232,15 +232,15 @@ optionUsage( pOptions, exitCode )
              *  IF there are option conflicts or dependencies,
              *  THEN print them here.
              */
-            if (  (pOD->pOptMust != (int*)NULL)
-               || (pOD->pOptCant != (int*)NULL) ) {
+            if (  (pOD->pOptMust != NULL)
+               || (pOD->pOptCant != NULL) ) {
 
                 fputs( zTabHyp, fp );
 
                 /*
                  *  DEPENDENCIES:
                  */
-                if (pOD->pOptMust != (int*)NULL) {
+                if (pOD->pOptMust != NULL) {
                     const int* pOptNo = pOD->pOptMust;
 
                     fputs( zReqThese, fp );
@@ -251,14 +251,14 @@ optionUsage( pOptions, exitCode )
                             break;
                     }
 
-                    if (pOD->pOptCant != (int*)NULL)
+                    if (pOD->pOptCant != NULL)
                         fputs( zTabHypAnd, fp );
                 }
 
                 /*
                  *  CONFLICTS:
                  */
-                if (pOD->pOptCant != (int*)NULL) {
+                if (pOD->pOptCant != NULL) {
                     const int* pOptNo = pOD->pOptCant;
 
                     fputs( zProhib, fp );
@@ -275,7 +275,7 @@ optionUsage( pOptions, exitCode )
              *  IF there is a disablement string
              *  THEN print the disablement info
              */
-            if (pOD->pz_DisableName != (char*)NULL )
+            if (pOD->pz_DisableName != NULL )
                 fprintf( fp, zDis, pOD->pz_DisableName );
 
             /*
@@ -313,8 +313,8 @@ optionUsage( pOptions, exitCode )
              *  THEN advise that this option may not be preset.
              */
             if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
-               && (  (pOptions->papzHomeList != (const char**)NULL)
-                  || (pOptions->pzPROGNAME != (const char*)NULL)
+               && (  (pOptions->papzHomeList != NULL)
+                  || (pOptions->pzPROGNAME != NULL)
                )  )
 
                 fputs( zNoPreset, fp );
@@ -378,8 +378,12 @@ optionUsage( pOptions, exitCode )
             fputs( zNumberOpt, fp );
     }
 
-    if (pOptions->pzExplain != (char*)NULL)
+    if (pOptions->pzExplain != NULL)
         fputs( pOptions->pzExplain, fp );
+
+    if (pOptions->pzBugAddr != NULL)
+        fprintf( fp, "\nplease send bug reports to:  %s\n",
+                 pOptions->pzBugAddr );
 
     /*
      *  IF the user is asking for help (thus exiting with SUCCESS),
@@ -425,7 +429,7 @@ optionUsage( pOptions, exitCode )
         /*
          *  If there is a detail string, now is the time for that.
          */
-        if (pOptions->pzDetail != (char*)NULL)
+        if (pOptions->pzDetail != NULL)
             fputs( pOptions->pzDetail, fp );
     }
 
@@ -451,7 +455,7 @@ printInitList( papz, pInitIntro, pzRc, pzPN )
     for (;;) {
         const char* pzPath = *(papz++);
 
-        if (pzPath == (char*)NULL)
+        if (pzPath == NULL)
             break;
 
         if (optionMakePath( zPath, sizeof( zPath ), pzPath, pzPN ))

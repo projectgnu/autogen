@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.1 2002/03/23 05:06:56 bkorb Exp $
+ *   $Id: opts.def,v 3.2 2002/07/27 04:13:35 bkorb Exp $
  */
 
 /*
@@ -28,6 +28,8 @@ copyright = {
     date   = "1999-2000";
     type   = gpl;
     owner  = "Bruce Korb";
+    eaddr  = "bkorb@gnu.org";
+    bugs   = "autogen-bugs@sf.net";
 };
 
 eaddr          = "bkorb@gnu.org";
