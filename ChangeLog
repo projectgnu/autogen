@@ -17,6 +17,14 @@
 	* autoopts/usage.c: we always HAVE_PATHFIND now.
 	Alphabatized formatting strings.
 	* autoopts/version.c: update copyright and move to top of file
+	* autoopts/aginfo.tpl: allow multiple descriptions
+	* autoopts/agman1.tpl: ditto
+	* autoopts/autoopts.c: consistent flag usage
+	* autoopts/putshell.c(putBourneShell): add code to properly handle
+	equivalenced options.
+	* autoopts/stack.c(stackOptArg): add code to properly handle
+	equivalenced options.  (option arguments are handled according to
+	their defining option, not the equivalenced-to option.)
 
 2001-12-01  Bruce Korb  <bkorb@gnu.org>
 
