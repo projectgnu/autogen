@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.1 2001/12/10 01:13:09 bkorb Exp $
+ *  $Id: putshell.c,v 3.2 2001/12/10 01:21:35 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -85,7 +85,7 @@ putBourneShell( tOptions* pOpts )
     tSCC zOptValFmt[] = "%s_%s='";
     tSCC zOptEnd[]    = "'\nexport %s_%s\n";
     tSCC zFullOptFmt[]= "%1$s_%2$s='%3$s'\nexport %1$s_%2$s\n";
-    tSCC zEquiv[]     = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s\n";
+    tSCC zEquiv[]     = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s_MODE\n";
 
     printf( zOptCtFmt, pOpts->curOptIdx-1 );
 
