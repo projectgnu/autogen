@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/12/09 19:23:13 $
+## Last Modified:   $Date: 2001/12/10 03:48:27 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+## $Id: Makefile.am,v 3.1 2001/12/10 03:48:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -29,7 +29,8 @@ DISTCLEANFILES = Makefile.in
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
-GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h
+GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h \
+	cgi-fsm.c cgi-fsm.h
 GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
 pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
@@ -46,7 +47,8 @@ autogen_SOURCES = $(GEN_CSRC) \
         defReduce.c   expExtract.c  expFormat.c   expGperf.c    expGuile.c  \
         expOutput.c   expPrint.c    expState.c    expString.c   funcCase.c  \
         funcDef.c     funcEval.c    funcFor.c     funcIf.c      functions.c \
-        functions.h   loadPseudo.c  tpLoad.c      tpParse.c     tpProcess.c
+        functions.h   loadPseudo.c  tpLoad.c      tpParse.c     tpProcess.c \
+        agCgi.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: autogen.c,v 3.1 2001/12/10 03:48:27 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -44,7 +44,7 @@ STATIC void doneCheck( void );
 STATIC void inner_main( int argc, char** argv );
 
 
-    STATIC void
+STATIC void
 inner_main( int argc, char** argv )
 {
     void ag_init( void );
@@ -103,7 +103,7 @@ main( int    argc,
 }
 
 
-    STATIC void
+STATIC void
 doneCheck( void )
 {
     fflush( stdout );
@@ -152,14 +152,14 @@ doneCheck( void )
 }
 
 
-    STATIC void
+STATIC void
 ignoreSignal( int sig )
 {
     return;
 }
 
 
-    STATIC void
+STATIC void
 abendSignal( int sig )
 {
     tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
@@ -196,7 +196,7 @@ abendSignal( int sig )
 }
 
 
-    STATIC void
+STATIC void
 signalSetup( void )
 {
     struct sigaction  sa;

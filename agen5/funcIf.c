@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: funcIf.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -46,7 +46,7 @@ STATIC ag_bool eval_true( void );
  *  4.  For its length or its first five characters (whichever is less)
  *      it matches the string "false"
  */
-    STATIC ag_bool
+STATIC ag_bool
 eval_true( void )
 {
     ag_bool needFree;

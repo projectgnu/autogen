@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: funcDef.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -51,7 +51,7 @@ STATIC int   orderDefList( const void* p1, const void* p2 );
 STATIC void  prepInvokeArgs( tMacro* pMac );
 
 
-    STATIC int
+STATIC int
 orderDefList( const void* p1, const void* p2 )
 {
     tDefEntry* pDL1 = (tDefEntry*)p1;
@@ -69,7 +69,7 @@ orderDefList( const void* p1, const void* p2 )
 }
 
 
-    STATIC tDefList*
+STATIC tDefList*
 linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
 {
     tDefList* pN;
@@ -112,7 +112,7 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
  *  for name-value assignments that are only to live for the duration
  *  of the processing of the user defined macro.
  */
-    EXPORT void
+EXPORT void
 parseMacroArgs( tTemplate* pT, tMacro* pMac )
 {
     char*        pzScan = pT->pzTemplText + pMac->ozText;
@@ -308,7 +308,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 }
 
 
-    STATIC void
+STATIC void
 prepInvokeArgs( tMacro* pMac )
 {
     char*  pzText;

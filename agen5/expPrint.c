@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expPrint.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -45,14 +45,14 @@ STATIC size_t safePrintf( char* pzBuf, size_t bufSize,
                           char* pzFmt, void** argV );
 tSCC pzFormatName[] = "format";
 
-    STATIC void
+STATIC void
 printFault( int sig )
 {
     siglongjmp( printJumpEnv, sig );
 }
 
 
-    STATIC size_t
+STATIC size_t
 safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
 {
     tSCC zBadArgs[]  = "Bad args to sprintf";
@@ -106,7 +106,7 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
 }
 
 
-    EXPORT SCM
+EXPORT SCM
 run_printf( char* pzFmt, int len, SCM alist )
 {
     SCM     res;

@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expExtract.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -37,7 +37,7 @@
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
  */
-    STATIC const char*
+STATIC const char*
 loadExtractData( const char* pzNewFile )
 {
     static const char* pzFile = NULL;
@@ -123,7 +123,7 @@ loadExtractData( const char* pzNewFile )
  *  Could not find the file or could not find the markers.
  *  Either way, emit an empty enclosure.
  */
-    STATIC SCM
+STATIC SCM
 buildEmptyText( const char* pzStart, const char* pzEnd,
                 SCM def )
 {
@@ -152,7 +152,7 @@ buildEmptyText( const char* pzStart, const char* pzEnd,
 /*
  *  If we got it, emit it.
  */
-    STATIC SCM
+STATIC SCM
 extractText( const char* pzText, const char* pzStart, const char* pzEnd,
              SCM def )
 {

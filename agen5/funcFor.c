@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: funcFor.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -245,7 +245,7 @@ ag_scm_for_sep( SCM obj )
 }
 
 
-    STATIC ag_bool
+STATIC ag_bool
 nextDefinition( ag_bool invert, tDefEntry** ppList )
 {
     ag_bool     haveMatch = AG_FALSE;
@@ -298,7 +298,7 @@ nextDefinition( ag_bool invert, tDefEntry** ppList )
 }
 
 
-    STATIC int
+STATIC int
 doForByStep( tTemplate* pT,
              tMacro*    pMac,
              tDefEntry* pFoundDef )
@@ -430,7 +430,7 @@ doForByStep( tTemplate* pT,
     return loopCt;
 }
 
-    STATIC int
+STATIC int
 doForEach( tTemplate*   pT,
            tMacro*      pMac,
            tDefEntry*   pFoundDef )

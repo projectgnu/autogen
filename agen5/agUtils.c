@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: agUtils.c,v 3.1 2001/12/10 03:48:27 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -78,7 +78,7 @@ strlcpy( char* dest, tCC* src, size_t n )
 #endif
 
 
-    EXPORT void
+EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
     /*
@@ -244,7 +244,7 @@ doOptions( int arg_ct, char** arg_vec )
 }
 
 
-    STATIC void
+STATIC void
 addSysEnv( char* pzEnvName )
 {
     tSCC zFmt[] = "%s=1";
@@ -267,7 +267,7 @@ addSysEnv( char* pzEnvName )
 }
 
 
-    EXPORT tCC*
+EXPORT tCC*
 getDefine( tCC* pzDefName )
 {
     char**  ppz;
@@ -296,7 +296,7 @@ getDefine( tCC* pzDefName )
 }
 
 
-    EXPORT unsigned int
+EXPORT unsigned int
 doEscapeChar( tCC* pzIn, char* pRes )
 {
     unsigned int  res = 1;
@@ -414,7 +414,7 @@ doEscapeChar( tCC* pzIn, char* pRes )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    EXPORT char*
+EXPORT char*
 spanQuote( char* pzQte )
 {
     char  q = *pzQte;          /*  Save the quote character type */
@@ -465,7 +465,7 @@ spanQuote( char* pzQte )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    STATIC tCC*
+STATIC tCC*
 skipQuote( tCC* pzQte )
 {
     char  q = *pzQte++;        /*  Save the quote character type */
@@ -510,7 +510,7 @@ skipQuote( tCC* pzQte )
 }
 
 
-    EXPORT tCC*
+EXPORT tCC*
 skipScheme( tCC* pzSrc,  tCC* pzEnd )
 {
     int  level = 0;
@@ -535,7 +535,7 @@ skipScheme( tCC* pzSrc,  tCC* pzEnd )
 }
 
 
-    EXPORT tCC*
+EXPORT tCC*
 skipExpression( tCC* pzSrc, size_t len )
 {
     tCC* pzEnd = pzSrc + len;
@@ -704,7 +704,7 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
 }
 
 
-    STATIC void
+STATIC void
 checkMem( tMemMgmt* pMM )
 {
     char* p  = pMM->pEnd;
@@ -740,7 +740,7 @@ ag_free( void* p )
 }
 
 
-    STATIC void
+STATIC void
 finalMemCheck( void )
 {
     tMemMgmt*  pMM = memHead.pNext;

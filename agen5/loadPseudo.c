@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -52,7 +52,7 @@ tSCC zTpName[] = "template";
  *
  *  Process a scheme specification
  */
-    STATIC tCC*
+STATIC tCC*
 doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
 {
     char* pzEnd = (char*)pzData + strlen( pzData );
@@ -73,7 +73,7 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
  *
  *  Process a suffix specification
  */
-    EXPORT tCC*
+EXPORT tCC*
 doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 {
     /*
@@ -160,7 +160,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
  *  Skiping leading white space, figure out what sort of token is under
  *  the scan pointer (pzData).
  */
-    STATIC te_pm_event
+STATIC te_pm_event
 findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
 {
     tCC* pzData = *ppzData;
@@ -267,7 +267,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
  *  Some sort of marker is under the scan pointer.  Copy it for as long
  *  as we find punctuation characters.
  */
-    STATIC tCC*
+STATIC tCC*
 copyMarker( tCC* pzData, char* pzMark, int* pCt )
 {
     int ct = 0;
@@ -296,7 +296,7 @@ copyMarker( tCC* pzData, char* pzMark, int* pCt )
  *  Using a finite state machine, scan over the tokens that make up the
  *  "pseudo macro" at the start of every template.
  */
-    EXPORT tCC*
+EXPORT tCC*
 loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";

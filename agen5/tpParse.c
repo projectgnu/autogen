@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: tpParse.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -39,7 +39,7 @@ STATIC tCC* findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark );
  *  Return the enumerated function type corresponding
  *  to a name pointed to by the input argument.
  */
-    STATIC teFuncType
+STATIC teFuncType
 whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 {
     const char*   pzFuncName = *ppzScan;
@@ -126,7 +126,7 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 }
 
 
-    STATIC tCC*
+STATIC tCC*
 findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
 {
     tCC* pzMark = *ppzMark + startMacLen;
@@ -162,7 +162,7 @@ findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
 }
 
 
-    EXPORT tMacro*
+EXPORT tMacro*
 parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
 {
     tCC* pzScan = *ppzText;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: funcEval.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -41,7 +41,7 @@ tSCC        zNil[] = "";
 STATIC int exprType( char* pz );
 
 
-    EXPORT char*
+EXPORT char*
 resolveSCM( SCM s )
 {
     static char z[32];
@@ -109,7 +109,7 @@ resolveSCM( SCM s )
  *  It may need to be deallocated, so a boolean pointer is used
  *  to tell the caller.
  */
-    EXPORT char*
+EXPORT char*
 evalExpression( ag_bool* pMustFree )
 {
     tTemplate*  pT      = pCurTemplate;
@@ -310,7 +310,7 @@ ag_scm_error_source_line( void )
  *  digest the string and return that.  Otherwise, just return
  *  the string.
  */
-    EXPORT SCM
+EXPORT SCM
 eval( const char* pzExpr )
 {
     ag_bool allocated = AG_FALSE;
@@ -389,7 +389,7 @@ mFunc_Expr( tTemplate* pT, tMacro* pMac )
 #endif /* DEFINE_LOAD_FUNCTIONS */
 
 
-    STATIC int
+STATIC int
 exprType( char* pz )
 {
     switch (*pz) {

@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: defLoad.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -34,7 +34,7 @@ STATIC void massageDefTree( tDefEntry** ppNode );
 static char zFmt[ 64 ];
 #endif
 
-    STATIC int
+STATIC int
 compareIndex( const void* p1, const void* p2 )
 {
     tDefEntry* pE1 = *((tDefEntry**)p1);
@@ -57,7 +57,7 @@ compareIndex( const void* p1, const void* p2 )
  *  Once they are all sorted, then we link them together
  *  in that order.
  */
-    STATIC void
+STATIC void
 fixTwins( tDefEntry** ppNode )
 {
     long curMax = -1;
@@ -135,7 +135,7 @@ fixTwins( tDefEntry** ppNode )
  *  but different indexes).  This routine does that.
  *  It is recursive, handling one level at a time.
  */
-    STATIC void
+STATIC void
 massageDefTree( tDefEntry** ppNode )
 {
     static int lvl = 0;
@@ -267,7 +267,7 @@ massageDefTree( tDefEntry** ppNode )
  *
  *  Suck in the entire definitions file and parse it.
  */
-    EXPORT void
+EXPORT void
 readDefines( void )
 {
     char*    pzData;
@@ -291,8 +291,16 @@ readDefines( void )
      *  the stdin input exceeds our initial allocation of 16K.
      */
     if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
+        char* pzLen  = getenv( "CONTENT_LENGTH" );
+        char* pzMeth = getenv( "REQUEST_METHOD" );
+
+        if ((pzLen != NULL) && (pzMeth != NULL)) {
+            loadCgi();
+            return;
+        }
+
         OPT_ARG( DEFINITIONS )  = "stdin";
-        outTime  = time( (time_t*)NULL );
+        outTime  = time( NULL );
         dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
     }

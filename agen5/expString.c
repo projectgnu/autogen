@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expString.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -36,7 +36,7 @@
 #endif
 
 
-    STATIC SCM
+STATIC SCM
 makeString( tCC*    pzText,
             tCC*    pzNewLine,
             size_t  newLineSize )
@@ -195,7 +195,7 @@ makeString( tCC*    pzText,
 }
 
 
-    STATIC SCM
+STATIC SCM
 shell_stringify( SCM obj, char qt )
 {
     size_t     dtaSize;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expOutput.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -52,7 +52,7 @@ STATIC void addWriteAccess( char* pzFileName );
 
 
 
-    EXPORT void
+EXPORT void
 removeWriteAccess( int fd )
 {
     struct stat    sbuf;
@@ -82,7 +82,7 @@ removeWriteAccess( int fd )
     fchmod( fd, sbuf.st_mode & S_IAMB );
 }
 
-    STATIC void
+STATIC void
 addWriteAccess( char* pzFileName )
 {
     struct stat    sbuf;

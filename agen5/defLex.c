@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: defLex.c,v 3.1 2001/12/10 03:46:15 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -72,7 +72,7 @@ STATIC char* assembleHereString( char* pzScan );
  *
  *   LEXICAL SCANNER
  */
-    EXPORT int
+EXPORT int
 yylex( void )
 {
     lastToken = ERROR;
@@ -316,7 +316,7 @@ lex_done:
 
 
 
-    EXPORT void
+EXPORT void
 yyerror( char* s )
 {
     fprintf( stderr, "%s:  in %s on line %d\n    token in error:  ",
@@ -363,7 +363,7 @@ yyerror( char* s )
 }
 
 
-    STATIC void
+STATIC void
 loadScheme( void )
 {
     char*    pzText    = pCurCtx->pzScan;
@@ -405,7 +405,7 @@ loadScheme( void )
  *  process a single scheme expression, yielding text that gets processed
  *  into AutoGen definitions.
  */
-    STATIC void
+STATIC void
 alist_to_autogen_def( void )
 {
     tSCC   zSchemeText[] = "Scheme Computed Definitions";
@@ -486,7 +486,7 @@ alist_to_autogen_def( void )
  *  It may be a number, a name, a keyword or garbage.
  *  Figure out which.
  */
-    STATIC char*
+STATIC char*
 assembleName( char* pzScan, YYSTYPE* pRetVal )
 {
     /*
@@ -599,7 +599,7 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
-    STATIC char*
+STATIC char*
 assembleHereString( char* pzScan )
 {
     ag_bool  trimTabs = AG_FALSE;
@@ -710,7 +710,7 @@ assembleHereString( char* pzScan )
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
-    STATIC char*
+STATIC char*
 assembleString( char* pzScan )
 {
     char  q = *(pzScan++);

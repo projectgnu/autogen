@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -37,7 +37,7 @@ static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 STATIC size_t countMacros( tCC* pz );
 
 
-    EXPORT tTemplate*
+EXPORT tTemplate*
 findTemplate( tCC* pzTemplName )
 {
     tTemplate* pT = pNamedTplList;
@@ -54,7 +54,7 @@ findTemplate( tCC* pzTemplName )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    EXPORT tSuccess
+EXPORT tSuccess
 findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 {
     char*   pzRoot;
@@ -191,7 +191,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
  *  Figure out how many macros there are in the template
  *  so that we can allocate the right number of pointers.
  */
-    STATIC size_t
+STATIC size_t
 countMacros( tCC* pz )
 {
     size_t  ct = 2;
@@ -214,7 +214,7 @@ countMacros( tCC* pz )
  *
  *  Load the macro array and file name.
  */
-    EXPORT void
+EXPORT void
 loadMacros( tTemplate*     pT,
             tCC*    pzF,
             tCC*    pzN,
@@ -298,7 +298,7 @@ loadMacros( tTemplate*     pT,
  *
  *  Convert a template from data file format to internal format.
  */
-    EXPORT tTemplate*
+EXPORT tTemplate*
 templateFixup( tTemplate* pTList, size_t ttlSize )
 {
     tTemplate* pT = pTList;
@@ -335,7 +335,7 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    EXPORT void
+EXPORT void
 mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
     static char  zRealFile[ MAXPATHLEN ];
@@ -403,7 +403,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    EXPORT tTemplate*
+EXPORT tTemplate*
 loadTemplate( tCC* pzFileName )
 {
     tSCC*        apzSfx[] = { "tpl", "agl", NULL };

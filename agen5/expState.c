@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expState.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -42,7 +42,7 @@ STATIC int     count_entries(  char* pzName );
  *  EXPRESSION EVALUATION SUPPORT ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    STATIC int
+STATIC int
 entry_length( char* pzName )
 {
     tDefEntry**  papDefs = findEntryList( pzName );
@@ -64,7 +64,7 @@ entry_length( char* pzName )
 }
 
 
-    STATIC int
+STATIC int
 count_entries( char* pzName )
 {
     tDefEntry**  papDefs = findEntryList( pzName );
@@ -83,7 +83,7 @@ count_entries( char* pzName )
 }
 
 
-    STATIC SCM
+STATIC SCM
 find_entry_value( SCM op, SCM obj, SCM test )
 {
     ag_bool     isIndexed;

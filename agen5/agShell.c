@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: agShell.c,v 3.1 2001/12/10 03:45:15 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -55,7 +55,7 @@ STATIC void sigHandler( int signo );
 STATIC void serverSetup( void );
 
 
-    EXPORT void
+EXPORT void
 closeServer( void )
 {
     if (serverId == NULLPROCESS)
@@ -79,7 +79,7 @@ closeServer( void )
 }
 
 
-    STATIC void
+STATIC void
 sigHandler( int signo )
 {
     extern char* strsignal PROTO(( int ));
@@ -98,7 +98,7 @@ sigHandler( int signo )
 }
 
 
-    STATIC void
+STATIC void
 serverSetup( void )
 {
     struct sigaction  saNew;
@@ -178,7 +178,7 @@ serverSetup( void )
  *  for the new process and, optionally, a pointer to a place
  *  to store the child's process id.
  */
-    EXPORT int
+EXPORT int
 chainOpen( int       stdinFd,
            tCC**     ppArgs,
            pid_t*    pChild  )
@@ -312,7 +312,7 @@ chainOpen( int       stdinFd,
  *  process should write to "writeFd" and read from "readFd".
  *  The return value is the process id of the created process.
  */
-    EXPORT pid_t
+EXPORT pid_t
 openServer( tFdPair* pPair, tCC** ppArgs )
 {
     pid_t     chId;
@@ -339,7 +339,7 @@ openServer( tFdPair* pPair, tCC** ppArgs )
  *  Identical to "openServer()", except that the "fd"'s are "fdopen(3)"-ed
  *  into file pointers instead.
  */
-    EXPORT pid_t
+EXPORT pid_t
 openServerFP( tpfPair* pfPair, tCC** ppArgs )
 {
     tFdPair   fdPair;
@@ -362,7 +362,7 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
-    EXPORT char*
+EXPORT char*
 loadData( FILE* fp )
 {
     char*   pzText;
@@ -445,7 +445,7 @@ loadData( FILE* fp )
  *  If one of the commands we send to it takes too long or it dies,
  *  we will shoot it and restart one later.
  */
-    EXPORT char*
+EXPORT char*
 runShell( const char*  pzCmd )
 {
     tSCC zCmdFail[] = "CLOSING SHELL SERVER - command failure:\n\t%s\n";

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/09 19:23:13 $
+# Last Modified:     $Date: 2001/12/10 03:48:27 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.1 2001/12/10 03:48:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -251,7 +251,9 @@ do
       exit 1
     fi
     echo ${AG} pseudo.def
-    ${AG} pseudo.def && rm -f .fsm.*
+    ${AG} pseudo.def
+    ${AG} cgi.def
+    rm -f .fsm.*
     date > stamp-fsm
     ;;
 
@@ -342,13 +344,13 @@ do
 	#ifndef AUTOGEN_PROTOTYPES_H
 	#define AUTOGEN_PROTOTYPES_H
 _EOF_
-    for f in `egrep -l '^    EXPORT' *.c`
+    for f in `egrep -l '^ *EXPORT' *.c`
     do
       echo
       echo "/* exports from $f */"
       echo
-      sed -n '/^    EXPORT/,/)$/p' $f | \
-        sed -e 's/^    EXPORT *//' -e 's/)$/);/'
+      sed -n '/^ *EXPORT/,/)$/p' $f | \
+        sed -e 's/^ *EXPORT *//' -e 's/)$/);/'
     done
     echo
     echo "#endif /* AUTOGEN_PROTOTYPES_H */"
