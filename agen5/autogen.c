@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.26 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: autogen.c,v 3.27 2003/05/06 03:27:16 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -48,24 +48,24 @@ tSCC zSchemeInit[] =
 "    (string-substitute str\n"
 "          '(\"&\"      \"<\"     \">\")\n"
 "          '(\"&amp;\"  \"&lt;\"  \"&gt;\") )))";
+
 #ifdef LATER
-
-    >> (define (eval-client-input str)
-    >>   (stack-catch #t
-    >>     (lambda ()
-    >>       (call-with-input-string str
-    >>         (lambda (p)
-    >>           (set-port-filename! p (tpl-file))
-    >>           (set-port-line! p (string->number (tpl-file-line "%2$d")))
-    >>           (list (primitive-eval (read p))))))
-    >>     (lambda (key . args)
-    >>       ;; [1]
-    >>       (apply display-error (fluid-ref the-last-stack)
-    >>                            (current-error-port)
-    >>                            args)
-    >>       (set! stack-saved? #f)
-    >>       #f)))
-
+tSCC zCatchEval[] = "\\n"
+    "(define (eval-client-input str)\n"
+    "  (stack-catch #t\n"
+    "    (lambda ()\n"
+    "      (call-with-input-string str\n"
+    "        (lambda (p)\n"
+    "          (set-port-filename! p (tpl-file))\n"
+    "          (set-port-line! p (string->number (tpl-file-line \"%2$d\")))\n"
+    "          (list (primitive-eval (read p))))))\n"
+    "    (lambda (key . args)\n"
+    "      (apply display-error (fluid-ref the-last-stack)\n"
+    "                           (current-error-port)\n"
+    "                           args)\n"
+    "      (set! stack-saved? #f)\n"
+    "      #f\n"
+    ") ) )";
 #endif
 STATIC sigjmp_buf  abendJumpEnv;
 

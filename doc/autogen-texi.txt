@@ -3123,7 +3123,7 @@ included with the AutoGen sources.
 * COUNT_OPT::               COUNT_OPT( <NAME> ) - Definition Count
 * DESC::                    DESC( <NAME> ) - Option Descriptor
 * DISABLE_OPT_name::        DISABLE_OPT_name - Disable an option
-* ENABLED::                 ENABLED( <NAME> ) - Is Option Enabled?
+* ENABLED_OPT::             ENABLED_OPT( <NAME> ) - Is Option Enabled?
 * ERRSKIP_OPTERR::          ERRSKIP_OPTERR - Ignore Option Errors
 * ERRSTOP_OPTERR::          ERRSTOP_OPTERR - Stop on Errors
 * HAVE_OPT::                HAVE_OPT( <NAME> ) - Have this option?
@@ -3311,9 +3311,9 @@ this macro does not allow an option argument.
 DISABLE_OPT_NAME;
 @end example
 
-@node ENABLED
-@subsection ENABLED( <NAME> ) - Is Option Enabled?
-@findex ENABLED
+@node ENABLED_OPT
+@subsection ENABLED_OPT( <NAME> ) - Is Option Enabled?
+@findex ENABLED_OPT
 
 Yields true if the option defaults to disabled and
 @code{ISUNUSED_OPT()} would yield true.  It also yields true if
