@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Wed Aug  4 09:55:37 1999				      
+# Last Modified:     Wed Aug  4 09:59:04 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.13 1999/08/04 16:55:47 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.14 1999/08/04 16:59:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -78,6 +78,7 @@ _EOF_
         sed 1d configure ) > configure.tmp
 
     mv -f configure.tmp configure
+    chmod +x configure
     ;;
 
 esac
