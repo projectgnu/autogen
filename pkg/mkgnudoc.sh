@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Time-stamp: "2002-10-12 14:29:29 bkorb"
-# Version:    "$Revision: 3.5 $
+# Version:    "$Revision: 3.6 $
 
 eval "`egrep '^AG_' ../VERSION`"
 [ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
@@ -61,9 +61,9 @@ cat > TAG <<EOF
    ><img src="http://software/autogen/pix/abrowser.png"
    width="118" height="32" alt="Viewable With Any Browser"
    border="0"></a>
-&nbsp;&nbsp;<a href="http://software/autogen/"
-><img src="/graphics/gnu-head-sm.jpg"
-     width="88" height="31" border="0" alt="GNU Head"></a></p>
+&nbsp;&nbsp;<a href="/software/autogen/"
+><img src="/software/autogen/pix/autogen_header.png"
+     width="188" height="50" border="0" alt="AutoGen Home"></a></p>
 EOF
 body-end -i TAG */*.html
 autogen --no-def -T ${pkgsrcdir}/gnudoc.tpl
