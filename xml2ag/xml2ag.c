@@ -1,4 +1,30 @@
 
+/*
+ *  xml2ag.c
+ *  $Id: xml2ag.c,v 1.4 2002/06/26 23:28:08 bkorb Exp $
+ *  This is the main routine for xml2ag.
+ */
+
+/*
+ *  xml2ag copyright 1992-2002 Bruce Korb
+ *
+ *  xml2ag is free software.
+ *  You may redistribute it and/or modify it under the terms of the
+ *  GNU General Public License, as published by the Free Software
+ *  Foundation; either version 2, or (at your option) any later version.
+ *
+ *  xml2ag is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with AutoGen.  See the file "COPYING".  If not,
+ *  write to:  The Free Software Foundation, Inc.,
+ *             59 Temple Place - Suite 330,
+ *             Boston,  MA  02111-1307, USA.
+ */
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
@@ -219,7 +245,7 @@ printHeader( xmlDocPtr pDoc )
 
     xmlNodePtr pRootNode = xmlDocGetRootElement( pDoc );
     xmlChar*   pTpl = NULL;
-    char*      pzTpl;
+    xmlChar*   pzTpl;
 
     if (pRootNode == NULL) {
         fprintf( stderr, "Root node not found\n" );
@@ -229,10 +255,10 @@ printHeader( xmlDocPtr pDoc )
     if (HAVE_OPT( OVERRIDE_TPL )) {
         if (strchr( OPT_ARG( OVERRIDE_TPL ), '.' ) != NULL)
             pzSfx = "";
-        pzTpl = OPT_ARG( OVERRIDE_TPL );
+        pzTpl = (xmlChar*)OPT_ARG( OVERRIDE_TPL );
     }
     else {
-        pTpl = xmlGetProp( pRootNode, "template" );
+        pTpl = xmlGetProp( pRootNode, (const uchar*)"template" );
         if (pTpl == NULL) {
             fprintf( stderr, "No template was specified.\n" );
             exit( EXIT_FAILURE );
@@ -248,16 +274,16 @@ printHeader( xmlDocPtr pDoc )
         free( pTpl );
 
     if (pDoc->name != NULL)
-        fprintf( outFp, "XML-name = '%s';\n", trim( pDoc->name, NULL ));
+        fprintf( outFp, "XML-name = '%s';\n", TRIM( pDoc->name, NULL ));
 
     if (pDoc->version != NULL)
-        fprintf( outFp, "XML-version = '%s';\n", trim( pDoc->version, NULL ));
+        fprintf( outFp, "XML-version = '%s';\n", TRIM( pDoc->version, NULL ));
 
     if (pDoc->encoding != NULL)
-        fprintf( outFp, "XML-encoding = '%s';\n", trim( pDoc->encoding, NULL ));
+        fprintf( outFp, "XML-encoding = '%s';\n", TRIM( pDoc->encoding, NULL ));
 
     if (pDoc->URL != NULL)
-        fprintf( outFp, "XML-URL = '%s';\n", trim( pDoc->URL, NULL ));
+        fprintf( outFp, "XML-URL = '%s';\n", TRIM( pDoc->URL, NULL ));
 
     if (pDoc->standalone)
         fputs( "XML-standalone = true;\n", outFp );
@@ -275,13 +301,13 @@ printAttrs( xmlAttrPtr pAttr )
         fputs( pAttr->name, outFp );
         fputs( " = ", outFp );
         if (pAttr->children->children == NULL)
-            fprintf( outFp, "'%s';\n", trim( pzCont, NULL ));
+            fprintf( outFp, "'%s';\n", TRIM( pzCont, NULL ));
         else {
             fputs( "{\n", outFp );
             level++;
             if (pzCont != NULL) {
                 emitIndentation();
-                fprintf( outFp, zTextFmt, trim( pzCont, NULL ));
+                fprintf( outFp, zTextFmt, TRIM( pzCont, NULL ));
             }
             printChildren( pAttr->children->children );
             level--;
@@ -304,7 +330,7 @@ printNode( xmlNodePtr pNode )
         char*  pzTxt;
         emitIndentation();
         fputs( pNode->name, outFp );
-        pzTxt = trim( pNode->content, &sz );
+        pzTxt = TRIM( pNode->content, &sz );
 
         if (  (pNode->properties == NULL)
            && (pNode->children == NULL)) {
@@ -334,7 +360,7 @@ printNode( xmlNodePtr pNode )
     case XML_TEXT_NODE:
     {
         size_t sz;
-        char* pzTxt = trim( pNode->content, &sz );
+        char* pzTxt = TRIM( pNode->content, &sz );
         if (sz == 0)
             break;
         emitIndentation();
@@ -345,7 +371,7 @@ printNode( xmlNodePtr pNode )
     case XML_COMMENT_NODE:
     {
         size_t sz;
-        char* pzTxt = trim( pNode->content, &sz );
+        char* pzTxt = TRIM( pNode->content, &sz );
         if (sz == 0)
             break;
 
