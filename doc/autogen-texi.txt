@@ -27,6 +27,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Template File::        AutoGen Template
 * Augmenting AutoGen::   Augmenting AutoGen
 * autogen Invocation::   Invoking AutoGen
+* AutoGen CGI::          AutoGen as a CGI server
 * Installation::         Configuring and Installing
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
@@ -1482,6 +1483,64 @@ Extraction from autogen.texi
 @end ignore
 
 @page
+@node AutoGen CGI
+@chapter AutoGen as a CGI server
+
+AutoGen is now capable of acting as a CGI forms server.
+It behaves as a CGI server if the definitions input is from stdin
+and the environment variable @code{REQUEST_METHOD} is defined
+and set to either "GET" or "POST".  If set to anything else,
+AutoGen will exit with a failure message.  When set to one of those
+values, the CGI data will be converted to AutoGen definitions
+(@pxref{Definitions File}) and the template named "@code{cgi.tpl}"
+will be processed.
+
+This works by including the name of the real template to process
+in the form data and having the "@code{cgi.tpl}" template include
+that template for processing.  I do this for processing the form
+@url{http://autogen.sourceforge.net/conftest.html}.  The "@code{cgi.tpl}"
+looks approximately like this:
+
+@example
+<? AutoGen5 Template ?>
+<?
+IF (not (exist? "template"))                       ?><?
+  form-error                                       ?><?
+
+ELIF (=* (get "template") "/")                     ?><?
+  form-error                                       ?><?
+
+ELIF (define tpl-file (string-append "cgi-tpl/"
+                      (get "template")))
+     (access? tpl-file R_OK)                       ?><?
+  INCLUDE (. tpl-file)                             ?><?
+
+ELIF (set! tpl-file (string-append tpl-file ".tpl"))
+     (access? tpl-file R_OK)                       ?><?
+  INCLUDE (. tpl-file)                             ?><?
+
+ELSE                                               ?><?
+  form-error                                       ?><?
+ENDIF                                              ?>
+@end example
+
+@noindent
+This forces the template to be found in the "@code{cgi-tpl/}"
+directory.  Note also that there is no suffix specified in the
+pseudo macro (@pxref{pseudo macro}).  That tells AutoGen to emit
+the output to stdout.
+
+The output is actually spooled until it is complete so that,
+in the case of an error, the output can be discarded and a proper
+error message can be written in its stead.
+
+@strong{Please also note} that it is advisable, @emph{especially} for network
+accessible machines, to configure AutoGen (@pxref{configuring}) with
+shell processing disabled (@code{--disable-shell}).  That will make it
+impossible for any referenced template to hand data to a subshell for
+interpretation.
+
+@page
 @node Installation
 @chapter Configuring and Installing
 
@@ -1501,10 +1560,11 @@ by these tools, AutoGen adds two of its own:
 
 @table @samp
 @item --disable-shell
-AutoGen is now capable of acting as a CGI forms server.  As such, it
-will gather its definitions using either @samp{GET} or @samp{POST}
-methods.  All you need to do is have a template named @file{cgi.tpl}
-handy or specify a different one with a command line option.
+AutoGen is now capable of acting as a CGI forms server, @xref{AutoGen CGI}.
+As such, it will gather its definitions using either @samp{GET} or
+@samp{POST} methods.  All you need to do is have a template named
+@file{cgi.tpl} handy or specify a different one with a command line
+option.
 
 However, doing this without disabling the server shell brings
 considerable risk.  If you were to pass user input to a script
