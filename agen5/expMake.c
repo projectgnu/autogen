@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.12 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: expMake.c,v 3.13 2003/06/14 17:54:23 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -213,10 +213,13 @@ ag_scm_makefile_script( SCM text )
 
                 /*
                  *  We have now started our next output line and there are
-                 *  still data.  Indent with a tab, if called for.
+                 *  still data.  Indent with a tab, if called for.  If we do
+                 *  insert a tab, then skip leading tabs on the line.
                  */
-                if (tabch)
+                if (tabch) {
                     *(pzOut++) = tabch;
+                    while (*pzScn == tabch)  pzScn++;
+                }
                 break;
 
             case NUL:

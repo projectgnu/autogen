@@ -1,3 +1,13 @@
+2003-06-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c(ag_scm_makefile_script): if we are supplying a start
+	of line tab character, it looks ugly to also use tab characters from
+	the source string, so strip them.
+
+2003-06-01  Bruce Korb  <bkorb@gnu.org>
+
+	==5.5.5 released.
+
 2003-05-30  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/schemedef.scm(before-error-hook): not part of Guile 1.4
