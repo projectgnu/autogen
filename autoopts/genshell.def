@@ -2,7 +2,8 @@
 autogen definitions options;
 
 /*
- *   $Id: genshell.def,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+ *   $Id: genshell.def,v 4.3 2005/02/14 16:25:37 bkorb Exp $
+ * Time-stamp:      "2005-02-14 08:23:40 bkorb"
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *

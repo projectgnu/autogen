@@ -1,6 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.5 2005/02/04 03:57:11 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 4.6 2005/02/14 16:25:37 bkorb Exp $
+ * Time-stamp:      "2005-02-14 08:20:02 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.

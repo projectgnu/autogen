@@ -2,9 +2,11 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.5 2005/02/14 16:25:37 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
+
+# Time-stamp:      "2005-02-14 05:59:50 bkorb"
 
 =][=
 

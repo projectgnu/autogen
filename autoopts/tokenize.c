@@ -1,5 +1,6 @@
 /*
  *  This file defines the string_tokenize interface
+ * Time-stamp:      "2005-02-14 08:20:31 bkorb"
  *
  *  string_tokenize copyright 2005 Bruce Korb
  *

@@ -1,6 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: numeric.c,v 4.4 2005/02/14 16:25:37 bkorb Exp $
+ * Time-stamp:      "2005-02-14 08:22:56 bkorb"
  *
  *   Automated Options Paged Usage module.
  *

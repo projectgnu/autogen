@@ -2,6 +2,8 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
+ * Time-stamp:      "2005-02-14 08:20:24 bkorb"
+ *
  *  AutoOpts copyright 1992-2005 Bruce Korb
  *
  *  AutoOpts is free software.
@@ -28,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.5 2005/02/13 16:17:18 bkorb Exp $
+   $Id: usage-txt.def,v 4.6 2005/02/14 16:25:37 bkorb Exp $
  */
 
 /*

@@ -1,6 +1,7 @@
 
 /*
- *  $Id: environment.c,v 4.4 2005/02/14 16:18:25 bkorb Exp $
+ *  $Id: environment.c,v 4.5 2005/02/14 16:25:37 bkorb Exp $
+ * Time-stamp:      "2005-02-14 08:23:43 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional

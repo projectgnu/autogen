@@ -1,3 +1,8 @@
+/*
+ * $Id: text_mmap.c,v 4.2 2005/02/14 16:25:37 bkorb Exp $
+ *
+ * Time-stamp:      "2005-02-14 08:20:53 bkorb"
+ */
 
 #define FILE_WRITABLE(_prt,_flg) \
 	((_prt & PROT_WRITE) && (_flg & (MAP_SHARED|MAP_PRIVATE) == MAP_SHARED))

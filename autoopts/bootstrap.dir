@@ -1,5 +1,7 @@
 #! /bin/sh
-
+# Time-stamp:      "2005-02-14 08:24:09 bkorb"
+# $Id: bootstrap.dir,v 4.4 2005/02/14 16:25:37 bkorb Exp $
+#
 AGexe=${AGexe-autogen}
 noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 

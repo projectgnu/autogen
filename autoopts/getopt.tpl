@@ -2,6 +2,8 @@
 
    c=%s-temp.c
 
+# Time-stamp:      "2005-02-14 08:23:31 bkorb"
+
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
   Time-stamp:        "2005-02-07 10:18:18 bkorb"
@@ -24,7 +26,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.2 2005/02/07 18:19:01 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.3 2005/02/14 16:25:37 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>

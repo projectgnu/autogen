@@ -5,10 +5,10 @@ dnl
 dnl Author:	           Gary V. Vaughan <gvaughan@localhost>
 dnl Maintainer:	       Gary V. Vaughan <gvaughan@localhost>
 dnl Created:	       Sun Nov 15 23:37:14 1998
-dnl Last Modified:     Mon May 17 01:02:44 1999
+cnl Time-stamp:        "2005-02-14 08:24:48 bkorb"
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.3 2005/01/22 16:21:16 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.4 2005/02/14 16:25:37 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:

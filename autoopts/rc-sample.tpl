@@ -1,4 +1,8 @@
-[= AutoGen5 Template rc =]
+[= AutoGen5 Template rc
+
+# Time-stamp:      "2005-02-14 08:21:57 bkorb"
+
+=]
 # [= prog-name =] sample configuration file
 #[=
 
