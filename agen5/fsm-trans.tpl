@@ -67,7 +67,8 @@ extern int
 =]static [=
   ENDIF
 
-=]const t_transition [=(. pfx)=]_trans_table[ [=(. PFX)
+=]const t_transition
+[=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
   state-table
     state = init =][=
@@ -120,7 +121,8 @@ struct transition {[=
  *  the new state and the transition enumeration code (in that order).
  *  It is indexed by first the current state and then the event code.
  */
-static const t_transition [=(. pfx)=]_trans_table[ [=(. PFX)
+static const t_transition
+[=(. pfx)=]_trans_table[ [=(. PFX)
 =]_STATE_CT ][ [=(. PFX)=]_EVENT_CT ] = {[=
 
   state-table

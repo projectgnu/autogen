@@ -2,6 +2,8 @@
 
 	* autoopts/autoopts-config.in(static-libs): new option
 	* autoopts/autoopts-config.1(static-libs): doc it
+	* agen5/defParse.y(makeEmptyDefs): Allow for def file with no defs.
+	* agen5/defReduce.c(makeEmptyDefs): write the routine.
 
 2002-05-11  Bruce Korb  <bkorb@gnu.org>
 
