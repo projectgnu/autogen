@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.6 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -41,7 +41,7 @@ EXPORT tTemplate*
 findTemplate( tCC* pzTemplName )
 {
     tTemplate* pT = pNamedTplList;
-    while (pT != (tTemplate*)NULL) {
+    while (pT != NULL) {
         if (streqvcmp( pzTemplName, pT->pzTplName ) == 0)
             break;
         pT = (tTemplate*)(pT->pNext);
@@ -108,7 +108,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  Check for immediate access once again.
      */
     pzRoot = strrchr( pzFName, '/' );
-    pzSfx  = (pzRoot != (char*)NULL)
+    pzSfx  = (pzRoot != NULL)
              ? strchr( ++pzRoot, '.' )
              : strchr( pzFName, '.' );
 
@@ -116,7 +116,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  IF the file does not already have a suffix,
      *  THEN try the suffixes that are okay for this file.
      */
-    if ((pzSfx == (char*)NULL) && (papSuffixList != NULL)) {
+    if ((pzSfx == NULL) && (papSuffixList != NULL)) {
         tCC** papSL = papSuffixList;
 
         char* pzEnd = pzFullName +
@@ -134,7 +134,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  IF the file name does not contain a directory separator,
      *  then we will use the TEMPL_DIR search list to keep hunting.
      */
-    if (pzRoot == (char*)NULL) {
+    if (pzRoot == NULL) {
 
         /*
          *  Search each directory in our directory search list
@@ -173,7 +173,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
              *  IF the file does not already have a suffix,
              *  THEN try the ones that are okay for this file.
              */
-            if ((pzSfx == (char*)NULL) && (papSuffixList != NULL)) {
+            if ((pzSfx == NULL) && (papSuffixList != NULL)) {
                 tCC** papSL = papSuffixList;
                 *(pzEnd++) = '.';
 
@@ -210,7 +210,7 @@ countMacros( tCC* pz )
     size_t  ct = 2;
     for (;;) {
         pz = strstr( pz, zStartMac );
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             break;
         ct += 2;
         if (strncmp( pz - endMacLen, zEndMac, endMacLen ) == 0)
@@ -243,7 +243,7 @@ loadMacros( tTemplate* pT,
         len = strlen( pzF ) + 1;
         memcpy( (void*)pzText, (void*)pzF, len );
         pzText += len;
-        if (pzN != (char*)NULL) {
+        if (pzN != NULL) {
             len = strlen( pzN ) + 1;
             memcpy( (void*)pzText, (void*)pzN, len );
             pzText += len;
@@ -261,7 +261,7 @@ loadMacros( tTemplate* pT,
         /*
          *  Make sure all of the input string was scanned.
          */
-        if (pzData != (char*)NULL)
+        if (pzData != NULL)
             AG_ABEND( "Template parse ended unexpectedly" );
 
         pT->macroCt = pMacEnd - pMac;
@@ -332,7 +332,7 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
         pT = (tTemplate*)(pT->pNext);
     }
 
-    pT->pNext = (char*)NULL;
+    pT->pNext = NULL;
     return pTList;
 }
 
@@ -394,7 +394,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
     }
 
     pMapInfo->pData =
-        mmap( (void*)NULL, pMapInfo->size, PROT_READ | PROT_WRITE,
+        mmap( NULL, pMapInfo->size, PROT_READ | PROT_WRITE,
               MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
 
     if (pMapInfo->pData == (void*)(-1)) {
@@ -459,7 +459,7 @@ loadTemplate( tCC* pzFileName )
         pRes->fd        = -1;
         strcpy( pRes->zStartMac, zStartMac ); /* must fit */
         strcpy( pRes->zEndMac, zEndMac );     /* must fit */
-        loadMacros( pRes, mapInfo.pzFileName, (char*)NULL, pzData );
+        loadMacros( pRes, mapInfo.pzFileName, NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize,
                                      "resize template" );
 

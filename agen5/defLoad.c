@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.6 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: defLoad.c,v 3.7 2002/01/19 07:35:23 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -68,7 +68,7 @@ fixTwins( tDefEntry** ppNode )
     tDefEntry* pNxt = pTw->pNext;
     void*  ap[ 16 ];
 
-    pTw->pNext = (tDefEntry*)NULL;
+    pTw->pNext = NULL;
 
     /*
      *  Do the initial twin scan, assigning index numbers as needed
@@ -82,7 +82,7 @@ fixTwins( tDefEntry** ppNode )
 
         twinCt++;
         pTw = pTw->pTwin;
-    } while (pTw != (tDefEntry*)NULL);
+    } while (pTw != NULL);
 
     /*
      *  Try to avoid allocating a pointer array,
@@ -99,7 +99,7 @@ fixTwins( tDefEntry** ppNode )
      *  Reinsert the "next" pointer into the new first entry
      */
     for (pTw = *ppNode, idx = 0;
-         pTw != (tDefEntry*)NULL;
+         pTw != NULL;
          idx++, pTw = pTw->pTwin) {
         p[idx] = (void*)pTw;
     }
@@ -115,7 +115,7 @@ fixTwins( tDefEntry** ppNode )
         *ppNode = (tDefEntry*)p[idx];
         ppNode = &((tDefEntry*)(p[idx]))->pTwin;
     }
-    *ppNode = (tDefEntry*)NULL;
+    *ppNode = NULL;
 
     /*
      *  If we allocated the pointer array, dump it now
@@ -147,7 +147,7 @@ massageDefTree( tDefEntry** ppNode )
 #endif
 
     do  {
-        tDefEntry** ppNextSib  = (tDefEntry**)NULL;
+        tDefEntry** ppNextSib  = NULL;
 
         pNode = *ppNode;
 
@@ -155,7 +155,7 @@ massageDefTree( tDefEntry** ppNode )
          *  IF this node has a twin (definition with same name)
          *  THEN ...
          */
-        if (pNode->pTwin != (tDefEntry*)NULL) {
+        if (pNode->pTwin != NULL) {
             fixTwins( ppNode );
             pNode = *ppNode;  /* new first entry */
 
@@ -171,7 +171,7 @@ massageDefTree( tDefEntry** ppNode )
                     pNextTwin->pPrevTwin = pPrevTwin;
                     pPrevTwin = pNextTwin;
                     pNextTwin = pNextTwin->pTwin;
-                } while (pNextTwin != (tDefEntry*)NULL);
+                } while (pNextTwin != NULL);
 
                 /*
                  *  The eldest twin has a baby twin pointer
@@ -238,13 +238,13 @@ massageDefTree( tDefEntry** ppNode )
          *  IF we have to deal with a twin,
          *  THEN remember who the next sibling is and handle the twin
          */
-        if (pNode->pTwin != (tDefEntry*)NULL) {
+        if (pNode->pTwin != NULL) {
             /*
              *  IF we do not already have a next sibling pointer,
              *  THEN save it now.  We will clear this pointer when
              *       we run out of twins.
              */
-            if (ppNextSib == (tDefEntry**)NULL)
+            if (ppNextSib == NULL)
                 ppNextSib = ppNode;
 
             pNode = pNode->pTwin;
@@ -255,10 +255,10 @@ massageDefTree( tDefEntry** ppNode )
          *  IF we stashed a next sibling pointer in order to handle
          *  twins, THEN resume the scan from that point
          */
-        if (ppNextSib != (tDefEntry**)NULL)
+        if (ppNextSib != NULL)
             ppNode = ppNextSib;
 
-    } while (*ppNode != (tDefEntry*)NULL);
+    } while (*ppNode != NULL);
 }
 
 
@@ -351,7 +351,7 @@ readDefines( void )
 
         if (ENABLED_OPT( SOURCE_TIME ))
              outTime = stbf.st_mtime + 1;
-        else outTime = time( (time_t*)NULL );
+        else outTime = time( NULL );
 
         useStdin = AG_FALSE;
     }
@@ -374,14 +374,14 @@ readDefines( void )
     pzData =
         pBaseCtx->pzScan =
         pBaseCtx->pzData = (char*)(pBaseCtx+1);
-    pBaseCtx->pCtx = (tScanCtx*)NULL;
+    pBaseCtx->pCtx = NULL;
 
     /*
      *  Set the input file pointer, as needed
      */
     fp = useStdin ? stdin
                   : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
-    if (fp == (FILE*)NULL) {
+    if (fp == NULL) {
         pzData = asprintf( zCannot, errno, "open",
                            OPT_ARG( DEFINITIONS ), strerror( errno ));
         AG_ABEND( pzData );

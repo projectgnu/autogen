@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: expFormat.c,v 3.4 2002/01/19 07:35:23 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -162,7 +162,7 @@ ag_scm_dne( SCM prefix, SCM first )
     }
 
     {
-        time_t    curTime = time( (time_t*)NULL );
+        time_t    curTime = time( NULL );
         struct tm*  pTime = localtime( &curTime );
         strftime( zScribble, 128, "%A %B %e, %Y at %r %Z", pTime );
     }
@@ -171,7 +171,7 @@ ag_scm_dne( SCM prefix, SCM first )
                       pzPrefix, pCurFp->pzOutName, zScribble,
                       OPT_ARG( DEFINITIONS ), pzTemplFileName, pzFirst );
 
-    if (pzRes == (char*)NULL)
+    if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzProg, -1, "Do-Not-Edit string" ));
 
     res = gh_str02scm( pzRes );
@@ -261,7 +261,7 @@ ag_scm_error( SCM res )
          */
         if (msgLen <= 0)
             abort = PROBLEM;
-        else if (isdigit( *pzMsg ) && (strtol( pzMsg, (char**)NULL, 0 ) == 0))
+        else if (isdigit( *pzMsg ) && (strtol( pzMsg, NULL, 0 ) == 0))
             abort = PROBLEM;
         break;
 
@@ -330,7 +330,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      */
     pzRes = asprintf( zGpl, pzPrg, pzPfx );
 
-    if (pzRes == (char*)NULL)
+    if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "GPL string" ));
 
     res = gh_str02scm( pzRes );
@@ -383,7 +383,7 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
      */
     pzRes = asprintf( zLgpl, pzPrg, pzPfx, pzOwner );
 
-    if (pzRes == (char*)NULL)
+    if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "LGPL string" ));
 
     res = gh_str02scm( pzRes );
@@ -444,7 +444,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
      */
     pzRes = asprintf( zBsd, pzPrg, pzPfx, pzOwner );
 
-    if (pzRes == (char*)NULL)
+    if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "BSD string" ));
 
     res = gh_str02scm( pzRes );
@@ -499,7 +499,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         else if (strcmp( mi.pzFileName, pzLicense ) != 0) {
             munmap( mi.pData, mi.size );
             close( mi.fd );
-            mi.pData = (char*)NULL;
+            mi.pData = NULL;
             free( (void*)mi.pzFileName );
             mi.pzFileName = pzLicense;
         }
@@ -508,7 +508,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
     /*
      *  Make sure the data are loaded and trim any white space
      */
-    if (mi.pData == (char*)NULL) {
+    if (mi.pData == NULL) {
         char* pz;
         tSCC*  apzSfx[] = { "lic", NULL };
 
@@ -537,7 +537,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  Reformat the string with the given arguments
      */
     pzRes = asprintf( (char*)mi.pData, pzPrg, pzOwner );
-    if (pzRes == (char*)NULL)
+    if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzPrg, -1, "license string" ));
 
     {

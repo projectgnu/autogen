@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.0 2001/12/09 19:43:59 bkorb Exp $
+# $Id: optmain.tpl,v 3.1 2002/01/19 07:35:24 bkorb Exp $
 
 # Automated Options copyright 1992-2001 Bruce Korb
 
@@ -192,7 +192,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
       IF (exist? "call_proc") =]
 #define [=(get "call_proc")   =] [=
           IF (~ (get "max") "1{0,1}")
-                        =](tpOptProc)NULL[=
+                        =]NULL[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
@@ -201,7 +201,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
                (exist? "arg_range")) =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
-                        =](tpOptProc)NULL[=
+                        =]NULL[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 

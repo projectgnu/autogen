@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.3 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: autogen.h,v 3.4 2002/01/19 07:35:23 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -134,7 +134,7 @@ struct template_desc {
     size_t      descSize;    /* Structure Size           */
     char*       pNext;       /* Next Pointer             */
     int         macroCt;     /* Count of Macros          */
-    char*       pzFileName;  /* Name of Macro File       */
+    tCC*        pzFileName;  /* Name of Macro File       */
     char*       pzTplName;   /* Template Name Pointer    */
     char*       pzTemplText; /* offset of the text       */
     char        zStartMac[MAX_SUFFIX_LEN];
@@ -236,24 +236,24 @@ struct for_state {
  */
 #define pzProg   autogenOptions.pzProgName
 MODE teProcState procState        VALUE( PROC_STATE_INIT );
-MODE char*       pzTemplFileName  VALUE( (char*)NULL );
-MODE tTemplate*  pNamedTplList    VALUE( (tTemplate*)NULL );
+MODE char*       pzTemplFileName  VALUE( NULL );
+MODE tTemplate*  pNamedTplList    VALUE( NULL );
 MODE tCC*        pzOopsPrefix     VALUE( "" );
 
 /*
  *  Template Processing Globals
  */
-MODE tCC*        pzCurSfx         VALUE( (char*)NULL );
+MODE tCC*        pzCurSfx         VALUE( NULL );
 MODE time_t      outTime          VALUE( 0 );
-MODE tFpStack*   pCurFp           VALUE( (tFpStack*)NULL );
-MODE tOutSpec*   pOutSpecList     VALUE( (tOutSpec*)NULL );
+MODE tFpStack*   pCurFp           VALUE( NULL );
+MODE tOutSpec*   pOutSpecList     VALUE( NULL );
 MODE jmp_buf     fileAbort        VALUE( { 0 } );
-MODE char*       pzCurStart       VALUE( (char*)NULL );
+MODE char*       pzCurStart       VALUE( NULL );
 MODE off_t       curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
-MODE FILE*       pfTrace          VALUE( (FILE*)NULL );
+MODE FILE*       pfTrace          VALUE( NULL );
 
-MODE tCC*        serverArgs[2]    VALUE( { (char*)NULL } );
+MODE tCC*        serverArgs[2]    VALUE( { NULL } );
 
 /*
  *  AutoGen definiton and template context
@@ -272,7 +272,7 @@ MODE tCC*        serverArgs[2]    VALUE( { (char*)NULL } );
  */
 MODE tDefStack   currDefCtx       VALUE( { NULL } );
 MODE tDefStack   rootDefCtx       VALUE( { NULL } );
-MODE tTemplate*  pCurTemplate     VALUE( (tTemplate*)NULL );
+MODE tTemplate*  pCurTemplate     VALUE( NULL );
 
 /*
  *  Current Macro
@@ -284,15 +284,15 @@ MODE tTemplate*  pCurTemplate     VALUE( (tTemplate*)NULL );
  *      alternation macros
  *  3.  mFunc_Case may transfer to one of its selection clauses.
  */
-MODE tMacro*     pCurMacro        VALUE( (tMacro*)NULL );
+MODE tMacro*     pCurMacro        VALUE( NULL );
 
 /*
  *  Template Parsing Globals
  */
 MODE int         templLineNo      VALUE( 1 );
-MODE tScanCtx*   pBaseCtx         VALUE( (tScanCtx*)NULL );
-MODE tScanCtx*   pCurCtx          VALUE( (tScanCtx*)NULL );
-MODE tScanCtx*   pDoneCtx         VALUE( (tScanCtx*)NULL );
+MODE tScanCtx*   pBaseCtx         VALUE( NULL );
+MODE tScanCtx*   pCurCtx          VALUE( NULL );
+MODE tScanCtx*   pDoneCtx         VALUE( NULL );
 MODE int         endMacLen        VALUE( 0  );
 MODE char        zEndMac[   8 ]   VALUE( "" );
 MODE int         startMacLen      VALUE( 0  );
@@ -301,7 +301,7 @@ MODE char        zStartMac[  8 ]  VALUE( "" );
 /*
  *  Definition Parsing Globals
  */
-MODE char*       pzDefineData     VALUE( (char*)NULL );
+MODE char*       pzDefineData     VALUE( NULL );
 MODE size_t      defineDataSize   VALUE( 0 );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

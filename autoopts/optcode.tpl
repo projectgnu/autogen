@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+#$Id: optcode.tpl,v 3.1 2002/01/19 07:35:24 bkorb Exp $
 
 # Automated Options copyright 1992-2001 Bruce Korb
 
@@ -13,8 +13,8 @@ INCLUDE "optmain.tpl"
 =][=
 IF (not (exist? "copyright") )
 =]
-#define zCopyright       (const char*)NULL
-#define zCopyrightNotice (const char*)NULL[=
+#define zCopyright       NULL
+#define zCopyrightNotice NULL[=
 ELSE  =]
 tSCC zCopyright[] =
        [= (kr-string
@@ -184,13 +184,12 @@ IF (exist? "version") =]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
      /* option proc      */ doVersion,
-     /* desc, NAME, name */ zVersionText,      (const char*)NULL,
-                            zVersion_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL },[=
+     /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
+     /* disablement strs */ NULL, NULL },[=
 ENDIF=]
 
   {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_HELP, VALUE_[=
@@ -200,13 +199,12 @@ ENDIF=]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
      /* option proc      */ doUsageOpt,
-     /* desc, NAME, name */ zHelpText,         (const char*)NULL,
-                            zHelp_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL },
+     /* desc, NAME, name */ zHelpText, NULL, zHelp_Name,
+     /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_MORE_HELP, VALUE_[=
                                      (. UP-prefix) =]OPT_MORE_HELP,
@@ -215,13 +213,12 @@ ENDIF=]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ doPagedUsage,
-     /* desc, NAME, name */ zMore_HelpText,    (const char*)NULL,
-                            zMore_Help_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL }[=
+     /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
+     /* disablement strs */ NULL, NULL }[=
 
 IF (exist? "homerc")
 =],
@@ -233,13 +230,12 @@ IF (exist? "homerc")
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max act ct  */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
-     /* option proc      */ (tOptProc*)NULL,
-     /* desc, NAME, name */ zSave_OptsText,    (const char*)NULL,
-                            zSave_Opts_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL },
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ zSave_OptsText, NULL, zSave_Opts_Name,
+     /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_LOAD_OPTS, VALUE_[=
                                      (. UP-prefix) =]OPT_LOAD_OPTS,
@@ -248,12 +244,11 @@ IF (exist? "homerc")
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_DISABLE_IMM,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
      /* option proc      */ doLoadOpt,
-     /* desc, NAME, name */ zLoad_OptsText,  zLoad_Opts_NAME,
-                            zLoad_Opts_Name,
+     /* desc, NAME, name */ zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name,
      /* disablement strs */ zNotLoad_Opts_Name, zNotLoad_Opts_Pfx }[=
 ENDIF=]
 };
@@ -276,17 +271,17 @@ tSCC*  apzHomeList[] = {[=
   FOR homerc=]
        [= (kr-string (get "homerc")) =],[=
   ENDFOR homerc=]
-       (char*)NULL };[=
+       NULL };[=
 ELSE=]
-#define zRcName     (tCC*)NULL
-#define apzHomeList (tCC**)NULL[=
+#define zRcName     NULL
+#define apzHomeList NULL[=
 ENDIF=][=
 
 IF (exist? "explain") =]
 tSCC   zExplain[]    = [=
    (kr-string (string-append "\n" (get "explain") "\n") ) =];[=
 ELSE=]
-#define zExplain (const char*)NULL[=
+#define zExplain NULL[=
 ENDIF=]
 [=
 IF (exist? "detail") =]
@@ -295,7 +290,7 @@ tSCC    zDetail[]     = [=
 [=
 ELSE
 =]
-#define zDetail (const char*)NULL[=
+#define zDetail NULL[=
 ENDIF=][=
 
 IF (not (exist? "usage")) =]
@@ -306,15 +301,15 @@ IF (exist? "version") =]
 tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
 
 ELSE=]
-#define zFullVersion (const char*)NULL[=
+#define zFullVersion NULL[=
 ENDIF=]
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
-    (char*)NULL,    (char*)NULL,    zPROGNAME,
-    zRcName,        zCopyright,     zCopyrightNotice,
-    zFullVersion,   apzHomeList,    zUsageTitle,
-    zExplain,       zDetail,        (void*)NULL,
+    NULL,         NULL,        zPROGNAME,
+    zRcName,      zCopyright,  zCopyrightNotice,
+    zFullVersion, apzHomeList, zUsageTitle,
+    zExplain,     zDetail,     NULL,
     [=IF (exist? "usage")=][=usage=][=
       ELSE               =]optionUsage[=ENDIF=],
     ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
@@ -330,7 +325,7 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-opts")      =]
     + OPTPROC_REORDER[=    ENDIF=] ),
-    0, (char*)NULL,
+    0, NULL,
     { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
       [=IF (exist? "homerc")
              =]INDEX_[= (. UP-prefix) =]OPT_SAVE_OPTS[=

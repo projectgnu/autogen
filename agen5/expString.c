@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expString.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -768,7 +768,7 @@ ag_scm_raw_shell_str( SCM obj )
     pz = pzDta-1;
     for (;;) {
         pz = strchr( pz+1, '\'' );
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             break;
         dtaSize += STRSIZE( zQ );
     }

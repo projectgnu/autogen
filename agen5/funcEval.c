@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: funcEval.c,v 3.6 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -132,7 +132,7 @@ evalExpression( ag_bool* pMustFree )
          */
         pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
 
-        if (pDef == (tDefEntry*)NULL) {
+        if (pDef == NULL) {
             switch (code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) {
             case EMIT_IF_ABSENT:
                 /*
@@ -261,7 +261,7 @@ evalExpression( ag_bool* pMustFree )
         if (*pMustFree)
             AGFREE( (void*)pzText );
 
-        if (pz != (char*)NULL) {
+        if (pz != NULL) {
             *pMustFree = AG_TRUE;
             pzText = pz;
         }

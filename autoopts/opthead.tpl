@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+# $Id: opthead.tpl,v 3.2 2002/01/19 07:35:24 bkorb Exp $
 # Automated Options copyright 1992-2001 Bruce Korb
 
 =]
@@ -107,7 +107,7 @@ ENDIF (exist? version) =]
                 if ( ([=(. UP-prefix)
                     =]DESC(n).fOptState & OPTST_INITENABLED) == 0) \
                     [=(. UP-prefix)=]DESC(n).fOptState |= OPTST_DISABLED; \
-                [=(. UP-prefix)=]DESC(n).optCookie = (void*)NULL )
+                [=(. UP-prefix)=]DESC(n).optCookie = NULL )
 
 /*
  *  Interface defines for specific options.
@@ -236,7 +236,7 @@ ENDIF=]
                          =]Options.fOptSet |= OPTPROC_ERRSTOP )
 #define  RESTART_[=(. UP-prefix)=]OPT(n) STMTS( \
                 [=(. pname)=]Options.curOptIdx = (n); \
-                [=(. pname)=]Options.pzCurOpt  = (char*)NULL )
+                [=(. pname)=]Options.pzCurOpt  = NULL )
 #define    START_[=(. UP-prefix)=]OPT    RESTART_[=(. UP-prefix)
                 =]OPT(1)
 #define     [=(. UP-prefix)=]USAGE(c)    (*[=(. pname)

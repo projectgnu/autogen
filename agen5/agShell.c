@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: agShell.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -59,14 +59,14 @@ tSCC   zTxtBlock[] = "Text Block";
 /*
  *  Dual pipe opening of a child process
  */
-STATIC tpfPair serverPair = { (FILE*)NULL, (FILE*)NULL };
+STATIC tpfPair serverPair = { NULL, NULL };
 STATIC pid_t   serverId   = NULLPROCESS;
-STATIC tpChar  pCurDir    = (char*)NULL;
+STATIC tpChar  pCurDir    = NULL;
 STATIC ag_bool errClose   = AG_FALSE;
 
 tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s\n";
 
-const char* pzLastCmd = (const char*)NULL;
+const char* pzLastCmd = NULL;
 
 STATIC void sigHandler( int signo );
 STATIC void serverSetup( void );
@@ -92,7 +92,7 @@ closeServer( void )
         (void)fclose( serverPair.pfWrite );
     }
 
-    serverPair.pfRead = serverPair.pfWrite = (FILE*)NULL;
+    serverPair.pfRead = serverPair.pfWrite = NULL;
 }
 
 
@@ -106,11 +106,11 @@ sigHandler( int signo )
 
     (void)fputs( "\nLast command issued:\n", pfTrace );
     {
-        const char* pz = (pzLastCmd == (const char*)NULL)
+        const char* pz = (pzLastCmd == NULL)
             ? "?? unknown ??\n" : pzLastCmd;
         fprintf( pfTrace, zCmdFmt, pCurDir, pz, zShDone );
     }
-    pzLastCmd = (const char*)NULL;
+    pzLastCmd = NULL;
     closeServer();
 }
 
@@ -126,7 +126,7 @@ serverSetup( void )
         static int doneOnce = 0;
         if (doneOnce++ == 0) {
             (void)atexit( &closeServer );
-            pCurDir = getcwd( (char*)NULL, MAXPATHLEN+1 );
+            pCurDir = getcwd( NULL, MAXPATHLEN+1 );
 #if defined( DEBUG )
             if (HAVE_OPT( SHOW_SHELL ))
                 fputs( "\nServer First Start\n", pfTrace );
@@ -182,7 +182,7 @@ serverSetup( void )
 #endif
         AGFREE( (void*)pz );
     }
-    pzLastCmd = (const char*)NULL;
+    pzLastCmd = NULL;
 }
 
 
@@ -207,7 +207,7 @@ chainOpen( int       stdinFd,
     /*
      *  If we did not get an arg list, use the default
      */
-    if (ppArgs == (tCC**)NULL)
+    if (ppArgs == NULL)
         ppArgs = serverArgs;
 
     /*
@@ -216,10 +216,10 @@ chainOpen( int       stdinFd,
      *  that, then sh.  Set argv[0] to whatever we decided on.
      */
     if (pzShell = *ppArgs,
-       (pzShell == (char*)NULL) || (*pzShell == NUL)){
+       (pzShell == NULL) || (*pzShell == NUL)){
 
         pzShell = getenv( "SHELL" );
-        if (pzShell == (char*)NULL)
+        if (pzShell == NULL)
             pzShell = "sh";
 
         *ppArgs = pzShell;
@@ -230,7 +230,7 @@ chainOpen( int       stdinFd,
      *  and the parent will read from it.
      */
     if (pipe( (int*)&stdoutPair ) < 0) {
-        if (pChild != (pid_t*)NULL)
+        if (pChild != NULL)
             *pChild = NOPROCESS;
         return -1;
     }
@@ -240,12 +240,12 @@ chainOpen( int       stdinFd,
         tSCC   zPath[] = "PATH";
         tCC*   pzPath  = getenv( zPath );
 
-        if (pzPath == (char*)NULL)
+        if (pzPath == NULL)
             pzPath = pzShell;
 
         else {
             pzPath = pathfind( pzPath, pzShell, "rxs" );
-            if (pzPath == (char*)NULL)
+            if (pzPath == NULL)
                 pzPath = pzShell;
         }
 
@@ -264,12 +264,12 @@ chainOpen( int       stdinFd,
         close( stdinFd );
         close( stdoutPair.readFd );
         close( stdoutPair.writeFd );
-        if (pChild != (pid_t*)NULL)
+        if (pChild != NULL)
             *pChild = NOPROCESS;
         return -1;
 
     default:           /* parent - return opposite FD's */
-        if (pChild != (pid_t*)NULL)
+        if (pChild != NULL)
             *pChild = chId;
 
         close( stdinFd );
@@ -306,7 +306,7 @@ chainOpen( int       stdinFd,
      *  Make the output file unbuffered only.
      *  We do not want to wait for shell output buffering.
      */
-    setvbuf( stdout, (char*)NULL, _IONBF, 0 );
+    setvbuf( stdout, NULL, _IONBF, 0 );
 
 #if defined( DEBUG )
     if (HAVE_OPT( SHOW_SHELL ))
@@ -403,12 +403,12 @@ loadData( FILE* fp )
          *  Set a timeout so we do not wait forever.
          */
         alarm( OPT_VALUE_TIMEOUT );
-        if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
+        if (fgets( zLine, sizeof( zLine ), fp ) == NULL)
             break;
         alarm( 0 );
 
 #else
-        if (fgets( zLine, sizeof( zLine ), fp ) == (char*)NULL)
+        if (fgets( zLine, sizeof( zLine ), fp ) == NULL)
             break;
 #endif
         /*
@@ -438,7 +438,7 @@ loadData( FILE* fp )
             void*  p;
             textSize += 4096;
             p = AGREALOC( (void*)pzText, textSize, NULL );
-            if (p == (void*)NULL) {
+            if (p == NULL) {
                 tSCC zRTB[] = "Realloc Text Block";
                 pzScan = asprintf( zAllocWhat, textSize, zRTB );
                 AG_ABEND( pzScan );
@@ -509,7 +509,7 @@ runShell( const char*  pzCmd )
 
     if (errClose) {
         fprintf( pfTrace, zCmdFail, pzCmd );
-        return (char*)NULL;
+        return NULL;
     }
 
     /*
@@ -518,7 +518,7 @@ runShell( const char*  pzCmd )
      */
     {
         char* pz = loadData( serverPair.pfRead );
-        if (pz == (char*)NULL) {
+        if (pz == NULL) {
             fprintf( pfTrace, zCmdFail, pzCmd );
             closeServer();
             pz = (char*)AGALOC( 1, zTxtBlock );
@@ -528,7 +528,7 @@ runShell( const char*  pzCmd )
         } else if (errClose)
             fprintf( pfTrace, zCmdFail, pzCmd );
 
-        pzLastCmd = (char*)NULL;
+        pzLastCmd = NULL;
         return pz;
     }
 }

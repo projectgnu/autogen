@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+# $Id: optlib.tpl,v 3.1 2002/01/19 07:35:24 bkorb Exp $
 
 # Automated Options copyright 1992-2001 Bruce Korb
 
@@ -50,7 +50,7 @@ DEFINE set_defines set_desc set_index opt_state =]
 #define DISABLE_[=(. opt-name)=]   STMTS( \
         [=set_desc=].fOptState &= OPTST_PERSISTENT; \
         [=set_desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
-        [=set_desc=].pzLastArg  = (char*)NULL[=
+        [=set_desc=].pzLastArg  = NULL[=
     IF (or (exist? "call_proc")
            (exist? "flag_code")
            (exist? "extract_code")
@@ -248,9 +248,9 @@ tSCC    z[=(sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
     ELSE  No disablement of this option:
     =]
 #define zNot[= (sprintf "%-24s" (string-append cap-name "_Pfx"))
-             =] (const char*)NULL
+             =] NULL
 #define zNot[= (sprintf "%-24s" (string-append cap-name "_Name"))
-             =] (const char*)NULL
+             =] NULL
 tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
              =]= "[= (string-tr! (string-append
         (if (exist? "enable") (string-append (get "enable") "-") "")
@@ -408,18 +408,17 @@ DEFINE Option_Descriptor =][=
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 0, 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
-     /* last opt argumnt */ (char*)NULL,
-     /* arg list/cookie  */ (void*)NULL,
-     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
+     /* last opt argumnt */ NULL,
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
      /* option proc      */ [=
          IF   (exist? "call_proc")        =][=call_proc=][=
          ELIF (or (exist? "extract_code")
                   (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
-         ELSE                             =](tpOptProc)NULL[=
+         ELSE                             =]NULL[=
          ENDIF =],
-     /* desc, NAME, name */ z[=(. cap-name)=]Text, (const char*)NULL,
-                            (const char*)NULL,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL },[=
+     /* desc, NAME, name */ z[=(. cap-name)=]Text, NULL, NULL,
+     /* disablement strs */ NULL, NULL },[=
 
   ELSE
 
@@ -450,16 +449,17 @@ DEFINE Option_Descriptor =][=
      /* min, max, act ct */ [=(if (exist? "min") (get "min") "0")=], [=
          (if (exist? "max") (get "max") "1")=], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
-     /* last opt argumnt */ (char*)[=
-         IF (exist? "arg_default") =]z[=(. cap-name)=]DefaultArg[=
+     /* last opt argumnt */ [=
+         IF (exist? "arg_default")
+              =](char*)z[=(. cap-name)=]DefaultArg[=
          ELSE =]NULL[= ENDIF =],
-     /* arg list/cookie  */ (void*)NULL,
+     /* arg list/cookie  */ NULL,
      /* must/cannot opts */ [=
          IF (exist? "flags_must")=]a[=(. cap-name)=]MustList[=
-         ELSE                    =](const int*)NULL[=
+         ELSE                    =]NULL[=
          ENDIF=], [=
          IF (exist? "flags_cant")=]a[=(. cap-name)=]CantList[=
-         ELSE                    =](const int*)NULL[=
+         ELSE                    =]NULL[=
          ENDIF=],
      /* option proc      */ [=
          IF   (exist? "call_proc")        =][=call_proc=][=
@@ -483,7 +483,7 @@ DEFINE Option_Descriptor =][=
            =*   bool      =]optionBooleanVal[=
            =*   num       =]optionNumericVal[=
            =*   key       =]doOpt[=(. cap-name)=][=
-           *              =](tpOptProc)NULL[=
+           *              =]NULL[=
            ESAC           =][=
          ENDIF=],
      /* desc, NAME, name */ z[=(. cap-name)=]Text,  z[=(. cap-name)=]_NAME,

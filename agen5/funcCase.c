@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: funcCase.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -122,7 +122,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
     char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM   res;
 
-    res = (strstr( pzText, pzSubstr) == (char*)NULL) ? SCM_BOOL_F : SCM_BOOL_T;
+    res = (strstr( pzText, pzSubstr) == NULL) ? SCM_BOOL_F : SCM_BOOL_T;
 
     if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
         fprintf( pfTrace, zTrFmt, (res == SCM_BOOL_T) ? zTrue : zFalse,
@@ -275,7 +275,7 @@ Select_Equivalent( char* pzText, char* pzMatch )
     tSuccess res = SUCCESS;
 
     upString( pz );
-    if (strstr( pz, pzMatch ) == (char*)NULL)
+    if (strstr( pz, pzMatch ) == NULL)
         res = FAILURE;
     AGFREE( (void*)pz );
 
@@ -469,14 +469,14 @@ Select_Match( char* pzText, char* pzMatch )
     /*
      *  On the first call for this macro, compile the expression
      */
-    if (pCurMacro->funcPrivate == (void*)NULL) {
+    if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
     if (regexec( (regex_t*)pCurMacro->funcPrivate, pzText, 0,
-                 (regmatch_t*)NULL, 0 ) != 0)
+                 NULL, 0 ) != 0)
         return FAILURE;
     return SUCCESS;
 }
@@ -490,7 +490,7 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
     compile_re( &re, ag_scm2zchars( substr, "match expr" ), REG_EXTENDED );
 
     if (regexec( &re, ag_scm2zchars( text, "text to match" ), 0,
-                 (regmatch_t*)NULL, 0 ) == 0)
+                 NULL, 0 ) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -508,7 +508,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, pzText, 0, (regmatch_t*)NULL, 0 ) == 0)
+    if (regexec( &re, pzText, 0, NULL, 0 ) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -551,7 +551,7 @@ Select_Match_End( char* pzText, char* pzMatch )
     /*
      *  On the first call for this macro, compile the expression
      */
-    if (pCurMacro->funcPrivate == (void*)NULL) {
+    if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match end re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
@@ -643,7 +643,7 @@ Select_Match_Start( char* pzText, char* pzMatch )
     /*
      *  On the first call for this macro, compile the expression
      */
-    if (pCurMacro->funcPrivate == (void*)NULL) {
+    if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match start re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = (void*)pRe;
@@ -737,7 +737,7 @@ Select_Match_Full( char* pzText, char* pzMatch )
     /*
      *  On the first call for this macro, compile the expression
      */
-    if (pCurMacro->funcPrivate == (void*)NULL) {
+    if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match full re" );
         compile_re( pRe, pzMatch, pCurMacro->res );
         pCurMacro->funcPrivate = pRe;
@@ -998,8 +998,8 @@ struct case_stack {
 STATIC tCaseStack  current_case;
 STATIC tLoadProc mLoad_Select;
 
-static tpLoadProc apCaseLoad[ FUNC_CT ]   = { (tpLoadProc)NULL };
-static tpLoadProc apSelectOnly[ FUNC_CT ] = { (tpLoadProc)NULL };
+static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
+static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
 
 /*
  *  mLoad_CASE
@@ -1035,11 +1035,9 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  IF this is the first time here,
      *  THEN set up the "CASE" mode callout table.
      *  It is the standard table, except entries are inserted
-     *  for functions that are enabled only while processing
-     *  a CASE macro
+     *  for SELECT and ESAC.
      */
-    if (apCaseLoad[0] == (tpLoadProc)NULL) {
-        extern tLoadProc mLoad_Bogus;
+    if (apCaseLoad[0] == NULL) {
         int i;
 
         /*
@@ -1072,7 +1070,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  Continue parsing the template from this nested level
      */
     pEsacMac = parseTemplate( pMac+1, ppzScan );
-    if (*ppzScan == (char*)NULL)
+    if (*ppzScan == NULL)
         AG_ABEND_IN( pT, pMac, "ESAC not found" );
 
     /*
@@ -1118,7 +1116,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    Instead, you must use one of the 17 match operators described in
  *    the @code{CASE} macro description.
 =*/
-    tMacro*
+STATIC tMacro*
 mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     const char*    pzScan = *ppzScan;  /* text after macro */

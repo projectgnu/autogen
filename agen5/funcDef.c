@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.5 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: funcDef.c,v 3.6 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -96,10 +96,10 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
     }
 
     pDL->de.pEndTwin  = &(pNext->de);
-    pNext->de.pTwin   = (tDefEntry*)NULL; /* NULL terminated list */
-    pDL->de.pPrevTwin = (tDefEntry*)NULL; /* NULL terminated list */
+    pNext->de.pTwin   = NULL; /* NULL terminated list */
+    pDL->de.pPrevTwin = NULL; /* NULL terminated list */
     *pCt = ct;
-    pDL->de.pNext = (tDefEntry*)NULL;     /* in case ct == 0      */
+    pDL->de.pNext = NULL;     /* in case ct == 0      */
     return pN; /* If ct is zero, then this is invalid */
 }
 
@@ -249,7 +249,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  Default:  the raw sequence of characters is the value
              */
             pDL->de.pzValue = pDL->pzExpr;
-            pDL->pzExpr     = (char*)NULL;
+            pDL->pzExpr     = NULL;
         }
 
         /*
@@ -285,7 +285,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
          */
         for (;;) {
             if (--ct == 0) {
-                pDL->de.pNext = (tDefEntry*)NULL;
+                pDL->de.pNext = NULL;
                 break;
             }
 
@@ -406,7 +406,7 @@ build_defs( int defCt, tDefList* pList )
      *      and set the text value to it.
      */
     do  {
-        if (pList->pzExpr == (char*)NULL)
+        if (pList->pzExpr == NULL)
             continue;
 
     retryExpression:
@@ -414,7 +414,7 @@ build_defs( int defCt, tDefList* pList )
         case ';':
         {
             char* pz = strchr( pList->pzExpr, '\n' );
-            if (pz != (char*)NULL) {
+            if (pz != NULL) {
                 while (isspace( *++pz ))  ;
                 pList->pzExpr = pz;
                 goto retryExpression;
@@ -422,7 +422,7 @@ build_defs( int defCt, tDefList* pList )
             /* FALLTHROUGH */
         }
         case NUL:
-            pList->pzExpr = (char*)NULL;
+            pList->pzExpr = NULL;
             pList->de.pzValue = (char*)zNil;
             break;
 
@@ -567,9 +567,9 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
     if ((defCt = pMac->sibIndex) > 0) {
         pList = (tDefList*)pMac->res;
         while (defCt-- > 0) {
-            if (pList->pzExpr != (char*)NULL) {
+            if (pList->pzExpr != NULL) {
                 AGFREE( (void*)pList->de.pzValue );
-                pList->de.pzValue = (char*)NULL;
+                pList->de.pzValue = NULL;
             }
             pList++;
         }
@@ -628,7 +628,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
             pMac->funcPrivate = (void*)findTemplate(
                 pT->pzTemplText + pMac->ozName );
 
-            if (pMac->funcPrivate == (void*)NULL) {
+            if (pMac->funcPrivate == NULL) {
                 pzText = asprintf( zNoResolution,
                                    pT->pzTemplText + pMac->ozName );
                 AG_ABEND_IN( pT, pMac, pzText );
@@ -645,7 +645,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
     macName = eval( pT->pzTemplText + pMac->ozName );
 
     pInv = findTemplate( ag_scm2zchars( macName, "macro name" ));
-    if (pInv == (tTemplate*)NULL) {
+    if (pInv == NULL) {
         pzText = asprintf( zNoResolution,
                            ag_scm2zchars( macName, "macro name" ));
         AG_ABEND_IN( pT, pMac, pzText );
@@ -681,7 +681,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  Save the global macro loading mode
      */
     tpLoadProc* papLP = papLoadProc;
-    static tpLoadProc apDefineLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
+    static tpLoadProc apDefineLoad[ FUNC_CT ] = { NULL };
 
     if (pMac->ozText == 0)
         AG_ABEND_IN( pT, pMac, zNameNeeded );
@@ -693,7 +693,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  for functions that are enabled only while processing
      *  a DEFINE block (i.e. "ENDDEF")
      */
-    if (apDefineLoad[0] == (tpLoadProc)NULL) {
+    if (apDefineLoad[0] == NULL) {
         memcpy( (void*)apDefineLoad, apLoadProc, sizeof( apLoadProc ));
         apDefineLoad[ FTYP_ENDDEF ] = &mLoad_Ending;
     }
@@ -720,8 +720,8 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         pNewT->descSize = alocSize;
         pNewT->macroCt  = macCt;
         pNewT->pzFileName = (char*)(pNewT->aMacros + macCt);
-        memcpy( pNewT->pzFileName, pT->pzFileName, fnameSize );
-        pzCopy = pNewT->pzTplName = pNewT->pzFileName + fnameSize;
+        memcpy( (void*)pNewT->pzFileName, pT->pzFileName, fnameSize );
+        pzCopy = pNewT->pzTplName = (void*)(pNewT->pzFileName + fnameSize);
         if (! isalpha( *pzSrc ))
             AG_ABEND_IN( pT, pMac, zNameNeeded );
 
@@ -741,7 +741,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         /*
          *  Make sure all of the input string was *NOT* scanned.
          */
-        if (*ppzScan == (char*)NULL)
+        if (*ppzScan == NULL)
             AG_ABEND_IN( pT, pMac, "parse ended unexpectedly" );
 
         pNewT->macroCt = pMacEnd - &(pNewT->aMacros[0]);

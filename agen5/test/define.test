@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
+# Last Modified:     $Date: 2002/01/19 07:35:24 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: define.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: define.test,v 3.1 2002/01/19 07:35:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -59,7 +59,7 @@ cat > $testname.tpl <<'_EOF_'
 [= AutoGen5 Template test =]
 [=
 
-DEFINE nest          =][=
+DEFINE nest     =][=
   IF (exist? "name") =]
 level [=level=] iteration [=(for-index)=] Nested Name:  [=name=][=
   ENDIF         =][=
@@ -68,7 +68,7 @@ level [=level=] iteration [=(for-index)=] Nested Name:  [=name=][=
     nest        =][=
   ENDFOR        =][=
 
-ENDDEF          =][=
+ENDDEF nest     =][=
 
 FOR value
 
@@ -83,6 +83,7 @@ FOR value
 [=ENDIF         =][=
 ENDFOR          =]
 [=invoke nest   =]
+Done.
 _EOF_
 
 
@@ -116,7 +117,7 @@ nesting[1] = {
 _EOF_
 
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > $testname.samp <<_EOF_
 0 Argument list:
 	arg[ 0 ] = one
 	arg[ 1 ] = the second arg = the second
@@ -133,11 +134,15 @@ level 1 iteration 1 Nested Name:  primary
 level 2 iteration 1 Nested Name:  secondary
 level 2 iteration 2 Nested Name:  primary
 level 3 iteration 1 Nested Name:  tertiary
+Done.
 _EOF_
 
 echo $AGEXE --lib=$testname.tlib $testname.def
-$AGEXE --lib=$testname.tlib $testname.def || failure $AGEXE failed
-cmp -s $testname.test $testname.out || failure unexpected output
+$AGEXE --lib=$testname.tlib $testname.def || \
+  failure "$AGEXE failed"
+set -x
+cmp -s $testname.test $testname.test || \
+  failure "`diff $testname.samp $testname.test`"
 
 cleanup
 # end of define.test

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.1 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expGuile.c,v 3.2 2002/01/19 07:35:23 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -123,7 +123,7 @@ ag_scm_max( SCM list )
 
         case GH_TYPE_STRING:
             val = strtol( ag_scm2zchars( car, "number-in-string" ),
-                          (char**)NULL, 0 );
+                          NULL, 0 );
             break;
 
         default:
@@ -183,7 +183,7 @@ ag_scm_min( SCM list )
 
         case GH_TYPE_STRING:
             val = strtol( ag_scm2zchars( car, "number-in-string" ),
-                          (char**)NULL, 0 );
+                          NULL, 0 );
             break;
 
         default:
@@ -231,7 +231,7 @@ ag_scm_sum( SCM list )
 
         case GH_TYPE_STRING:
             sum += strtol( ag_scm2zchars( car, "number-in-string" ),
-                           (char**)NULL, 0 );
+                           NULL, 0 );
         }
     } while (--len > 0);
 

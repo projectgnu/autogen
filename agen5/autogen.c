@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.6 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: autogen.c,v 3.7 2002/01/19 07:35:23 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -140,7 +140,7 @@ doneCheck( void )
 #else
             closeOutput( AG_TRUE );
 #endif
-        } while (pCurFp->pPrev != (tFpStack*)NULL);
+        } while (pCurFp->pPrev != NULL);
         break;
 
     case PROC_STATE_INIT:
@@ -154,10 +154,10 @@ doneCheck( void )
 
 
 #ifdef DEBUG
-EXTERN void
+EXPORT void
 ag_abend_at( tCC* pzMsg, tCC* pzFile, int line )
 #else
-EXTERN void
+EXPORT void
 ag_abend( tCC* pzMsg )
 #endif
 {
@@ -225,7 +225,7 @@ abendSignal( int sig )
      *  IF there is a current template, then we should report where we are
      *  so that the template writer knows where to look for their problem.
      */
-    if (pCurTemplate != (tTemplate*)NULL) {
+    if (pCurTemplate != NULL) {
         int f;
 
         if ( pCurMacro == NULL ) {
@@ -290,11 +290,11 @@ signalSetup( void )
         default:
             sa.sa_handler = abendSignal;
         }
-        sigaction( sigNo,  &sa, (struct sigaction*)NULL );
+        sigaction( sigNo,  &sa, NULL );
     } while (++sigNo < NSIG);
 
     sa.sa_handler = ignoreSignal;
-    sigaction( SIGCHLD,  &sa, (struct sigaction*)NULL );
+    sigaction( SIGCHLD,  &sa, NULL );
 }
 /*
  * Local Variables:

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: funcIf.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -128,7 +128,7 @@ eval_true( void )
  *    This macro ends the @code{IF} function template block.
  *    For a complete description @xref{IF}.
 =*/
-    tMacro*
+tMacro*
 mFunc_If( tTemplate* pT, tMacro* pMac )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
@@ -210,7 +210,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
  *    This macro ends the @code{WHILE} function template block.
  *    For a complete description @xref{WHILE}.
 =*/
-    tMacro*
+tMacro*
 mFunc_While( tTemplate* pT, tMacro* pMac )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
@@ -264,7 +264,7 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
  *    @code{IF} function.  Its expression argument is evaluated as are
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
-    tMacro*
+STATIC tMacro*
 mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     if ((int)pMac->res == 0)
@@ -290,16 +290,16 @@ mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    It denotes the start of an alternate template block for
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
-    tMacro*
+STATIC tMacro*
 mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     /*
      *  After processing an "ELSE" macro,
      *  we have a special handler function for 'ENDIF' only.
      */
-    static tpLoadProc apElseLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
+    static tpLoadProc apElseLoad[ FUNC_CT ] = { NULL };
 
-    if (apElseLoad[0] == (tpLoadProc)NULL) {
+    if (apElseLoad[0] == NULL) {
         memcpy( (void*)apElseLoad, apLoadProc, sizeof( apLoadProc ));
         apElseLoad[ FTYP_ENDIF ] = &mLoad_Ending;
     }
@@ -314,11 +314,15 @@ mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 
 
-    tMacro*
+/*
+ *  mLoad_Ending is the common block termination function.
+ *  By returning NULL, it tells the macro parsing loop to return.
+ */
+tMacro*
 mLoad_Ending( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     memset( (void*)pMac, 0, sizeof( *pMac ));
-    return (tMacro*)NULL;
+    return NULL;
 }
 
 
@@ -336,7 +340,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  we have handler functions for 'ELIF', 'ELSE' and 'ENDIF'
      *  Otherwise, we do not.  Switch the callout function table.
      */
-    static tpLoadProc apIfLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
+    static tpLoadProc apIfLoad[ FUNC_CT ] = { NULL };
 
     /*
      *  IF there is no associated text expression
@@ -345,7 +349,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     if (srcLen == 0)
         AG_ABEND_IN( pT, pMac, zNoIfExpr );
 
-    if (apIfLoad[0] == (tpLoadProc)NULL) {
+    if (apIfLoad[0] == NULL) {
         memcpy( (void*)apIfLoad, apLoadProc, sizeof( apLoadProc ));
         apIfLoad[ FTYP_ELIF ]  = &mLoad_Elif;
         apIfLoad[ FTYP_ELSE ]  = &mLoad_Else;
@@ -373,7 +377,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  to the remaining text.
      */
     pEndifMac = parseTemplate( pMac+1, ppzScan );
-    if (*ppzScan == (char*)NULL)
+    if (*ppzScan == NULL)
         AG_ABEND_IN( pT, pMac, "ENDIF not found" );
 
     current_if.pIf->endIndex   = \
@@ -401,7 +405,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  we have handler functions for 'ELIF', 'ELSE' and 'ENDIF'
      *  Otherwise, we do not.  Switch the callout function table.
      */
-    static tpLoadProc apWhileLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
+    static tpLoadProc apWhileLoad[ FUNC_CT ] = { NULL };
 
     /*
      *  IF there is no associated text expression
@@ -410,7 +414,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     if (srcLen == 0)
         AG_ABEND_IN( pT, pMac, "expressionless WHILE" );
 
-    if (apWhileLoad[0] == (tpLoadProc)NULL) {
+    if (apWhileLoad[0] == NULL) {
         memcpy( (void*)apWhileLoad, apLoadProc, sizeof( apLoadProc ));
         apWhileLoad[ FTYP_ENDWHILE ] = &mLoad_Ending;
     }
@@ -429,7 +433,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  text.
      */
     pEndMac = parseTemplate( pMac+1, ppzScan );
-    if (*ppzScan == (char*)NULL)
+    if (*ppzScan == NULL)
         AG_ABEND_IN( pT, pMac, "ENDWHILE not found" );
 
     pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;

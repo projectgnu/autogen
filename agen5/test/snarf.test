@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
+# Last Modified:     $Date: 2002/01/19 07:35:24 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 #
-# $Id: snarf.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: snarf.test,v 3.1 2002/01/19 07:35:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -184,7 +184,7 @@ extern SCM test_scm_sym_bumble_it;
 _EOF_
 
 cmp ${testname}.h.* || \
-    failure cmp ${testname}.h.*
+    failure "`diff ${testname}.h.*`"
 
 cleanup
 # end of endmac.test

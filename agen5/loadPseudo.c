@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -116,7 +116,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      */
     *ppOSList  = pOS;
     ppOSList   = &pOS->pNext;
-    pOS->pNext = (tOutSpec*)NULL;
+    pOS->pNext = NULL;
 
     /*
      *  Copy the data into the suffix field from our input buffer.
@@ -129,7 +129,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 
     pz = strchr( pOS->zSuffix, '=' );
 
-    if (pz != (char*)NULL) {
+    if (pz != NULL) {
         tSCC zFileFmt3[] = "%s";
         *pz++ = NUL;
         if (*pz == NUL)
@@ -233,7 +233,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
      */
     if ((*pzData == '#') && line_start) {
         pzData = strchr( pzData+1, '\n' );
-        if (pzData == (char*)NULL)
+        if (pzData == NULL)
             return PM_EV_INVALID;
 
         goto skipWhiteSpace;
@@ -278,7 +278,7 @@ copyMarker( tCC* pzData, char* pzMark, int* pCt )
             break;
         *(pzMark++) = ch;
         if (++ct >= sizeof( zStartMac ))
-            return (tCC*)NULL;
+            return NULL;
 
         pzData++;
     }
@@ -345,7 +345,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case PM_TR_INIT_MARKER:
             pzData = copyMarker( pzData, zStartMac, &startMacLen );
-            if (pzData == (tCC*)NULL)
+            if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 
             break;
@@ -356,7 +356,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
         case PM_TR_TEMPL_MARKER:
             pzData = copyMarker( pzData, zEndMac, &endMacLen );
-            if (pzData == (tCC*)NULL)
+            if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 
             /*

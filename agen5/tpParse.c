@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: tpParse.c,v 3.5 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -147,7 +147,7 @@ findMacroEnd( tCC** ppzMark )
     *ppzMark     = pzMark;
 
     pzEndMark = strstr( pzMark, zEndMac );
-	if (pzEndMark == (char*)NULL)
+	if (pzEndMark == NULL)
 		AG_ABEND( "macro has no end" );
 
 	pzNextMark = strstr( pzMark, zStartMac );
@@ -196,9 +196,12 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *  IF there is any text, then make a text macro entry
          */
         if (pzMark != pzScan) {
-            char* pzCopy = pT->pNext;
-            const char* pzEnd = (pzMark != (char*)NULL)
-                                ? pzMark : pzScan + strlen( pzScan );
+            char* pzCopy;
+            const char* pzEnd;
+
+            pzCopy = pT->pNext;
+            pzEnd = (pzMark != NULL)
+                ? pzMark : pzScan + strlen( pzScan );
 
             pM->ozText    = pzCopy - pT->pzTemplText;
             pM->funcCode  = FTYP_TEXT;
@@ -227,7 +230,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *  IF no more macro marks are found,
          *  THEN we are done...
          */
-        if (pzMark == (char*)NULL)
+        if (pzMark == NULL)
             break;
 
         /*
@@ -246,7 +249,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
 
             for (;;pz++) {
                 pz = strchr( pz, '\n' );
-                if ((pz == (char*)NULL) || (pz > pzMacEnd))
+                if ((pz == NULL) || (pz > pzMacEnd))
                     break;
                 templLineNo++;
             }
@@ -295,7 +298,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             }
 #endif
 
-            if (pNM == (tMacro*)NULL) {
+            if (pNM == NULL) {
                 *ppzText = pzScan;
                 DEBUG_DEC(level);
                 return pM;
@@ -310,7 +313,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
      *  We reached the end of the input string.
      *  Return a NULL scanning pointer and a pointer to the end.
      */
-    *ppzText = (const char*)NULL;
+    *ppzText = NULL;
     return pM;
 }
 /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: functions.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -135,7 +135,7 @@ mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pInv = findTemplate( pT->pzTemplText + pMac->ozName );
-    if (pInv != (tTemplate*)NULL) {
+    if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
             fprintf( pfTrace, zTrcFmt, "remapped to Define", pMac->funcCode,
                      pT->pzFileName, pMac->lineNo );
@@ -360,7 +360,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
     AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */
-    return (tMacro*)NULL;
+    return NULL;
 }
 /*
  * Local Variables:

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: funcFor.c,v 3.3 2002/01/19 07:35:24 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -251,7 +251,7 @@ nextDefinition( ag_bool invert, tDefEntry** ppList )
     ag_bool     haveMatch = AG_FALSE;
     tDefEntry*  pList     = *ppList;
 
-    while (pList != (tDefEntry*)NULL) {
+    while (pList != NULL) {
         /*
          *  Loop until we find or pass the current index value
          *
@@ -309,7 +309,7 @@ doForByStep( tTemplate* pT,
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
     tDefStack   stack     = currDefCtx;
 
-    if (pFS->for_pzSep == (char*)NULL)
+    if (pFS->for_pzSep == NULL)
         pFS->for_pzSep = "";
 
     /*
@@ -318,7 +318,7 @@ doForByStep( tTemplate* pT,
      *       entries of the twin set.
      */
     {
-        tDefEntry* pLast = (pFoundDef->pEndTwin != (tDefEntry*)NULL)
+        tDefEntry* pLast = (pFoundDef->pEndTwin != NULL)
                            ? pFoundDef->pEndTwin : pFoundDef;
 
         if (pFS->for_from == 0x7BAD0BAD)
@@ -372,12 +372,12 @@ doForByStep( tTemplate* pT,
             nextIdx = pFS->for_index + pFS->for_by;
 
         } else if (invert) {
-            nextIdx = (pFoundDef->pPrevTwin == (tDefEntry*)NULL)
+            nextIdx = (pFoundDef->pPrevTwin == NULL)
                 ? pFS->for_to - 1  /* last iteration !! */
                 : pFoundDef->pPrevTwin->index;
 
         } else {
-            nextIdx = (pFoundDef->pTwin == (tDefEntry*)NULL)
+            nextIdx = (pFoundDef->pTwin == NULL)
                 ? pFS->for_to + 1  /* last iteration !! */
                 : pFoundDef->pTwin->index;
         }
@@ -394,7 +394,7 @@ doForByStep( tTemplate* pT,
          */
         else if (pFoundDef->valType == VALTYP_TEXT) {
             textDef = *pFoundDef;
-            textDef.pNext = textDef.pTwin = (tDefEntry*)NULL;
+            textDef.pNext = textDef.pTwin = NULL;
 
             currDefCtx.pDefs = &textDef;
             currDefCtx.pPrev = &stack;
@@ -452,7 +452,7 @@ doForEach( tTemplate*   pT,
          */
         if (pFoundDef->valType == VALTYP_TEXT) {
             textDef = *pFoundDef;
-            textDef.pNext = textDef.pTwin = (tDefEntry*)NULL;
+            textDef.pNext = textDef.pTwin = NULL;
 
             currDefCtx.pDefs = &textDef;
         } else {
@@ -468,7 +468,7 @@ doForEach( tTemplate*   pT,
          *  Advance to the next twin
          */
         pFoundDef = pFoundDef->pTwin;
-        if (pFoundDef == (tDefEntry*)NULL)
+        if (pFoundDef == NULL)
             pFS->for_lastFor = AG_TRUE;
 
         generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex );
@@ -476,7 +476,7 @@ doForEach( tTemplate*   pT,
         loopCt++;
         pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
 
-        if (pFoundDef == (tDefEntry*)NULL)
+        if (pFoundDef == NULL)
             break;
         pFS->for_firstFor = AG_FALSE;
 
@@ -577,7 +577,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
     int         loopCt;
 
     pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
-    if (pDef == (tDefEntry*)NULL) {
+    if (pDef == NULL) {
         if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
             fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
                      pT->pzTemplText + pMac->ozName );
@@ -654,7 +654,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     tpLoadProc* papLP = papLoadProc;
 
-    static tpLoadProc apForLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
+    static tpLoadProc apForLoad[ FUNC_CT ] = { NULL };
 
     papLoadProc = apForLoad;
     if (srcLen == 0)
@@ -667,7 +667,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  for functions that are enabled only while processing
      *  a FOR macro
      */
-    if (apForLoad[0] == (tpLoadProc)NULL) {
+    if (apForLoad[0] == NULL) {
         memcpy( (void*)apForLoad, apLoadProc, sizeof( apLoadProc ));
         apForLoad[ FTYP_ENDFOR ] = &mLoad_Ending;
     }
@@ -710,7 +710,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pT->pNext = pzCopy;
 
     pEndMac = parseTemplate( pMac + 1, ppzScan );
-    if (*ppzScan == (char*)NULL)
+    if (*ppzScan == NULL)
         AG_ABEND_IN( pT, pMac, "ENDFOR not found" );
 
     pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;

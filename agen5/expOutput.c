@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.3 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: expOutput.c,v 3.4 2002/01/19 07:35:23 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -163,7 +163,7 @@ ag_scm_out_pop( SCM ret_contents )
 {
     SCM res = SCM_UNDEFINED;
 
-    if (pCurFp->pPrev == (tFpStack*)NULL)
+    if (pCurFp->pPrev == NULL)
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed\n" );
 
 
@@ -201,7 +201,7 @@ ag_scm_out_suspend( SCM suspName )
     SCM res = SCM_UNDEFINED;
     tCC* pzSuspName = ag_scm2zchars( suspName, "suspend name" );
 
-    if (pCurFp->pPrev == (tFpStack*)NULL)
+    if (pCurFp->pPrev == NULL)
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed" );
 
     if (++suspendCt > suspAllocCt) {
@@ -401,7 +401,7 @@ ag_scm_out_switch( SCM new_file )
     /*
      *  Set the mod time on the old file.
      */
-    tbuf.actime  = time( (time_t*)NULL );
+    tbuf.actime  = time( NULL );
     tbuf.modtime = outTime;
     utime( pCurFp->pzOutName, &tbuf );
     pCurFp->pzOutName = pzNewFile;  /* memory leak */

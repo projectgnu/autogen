@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+ *   $Id: opts.def,v 3.2 2002/01/19 07:35:24 bkorb Exp $
  *
  *  AutoGen copyright 1992-2001 Bruce Korb
  *
@@ -249,7 +249,7 @@ flag = {
 	    void* hdl = dlopen( pOptDesc->pzLastArg, RTLD_NOW|RTLD_GLOBAL );
 	    init_proc_t* proc;
 
-	    if (hdl == (void*)NULL) {
+	    if (hdl == NULL) {
 	        const char* pzErr = dlerror();
 	        fprintf( stderr, "dlopen(%s) error %d\n%s\n",
 	                 pOptDesc->pzLastArg, errno, pzErr );
@@ -430,7 +430,7 @@ flag = {
     else
         pfTrace = fopen( pOptDesc->pzLastArg, "w" );
 
-    if (pfTrace == (FILE*)NULL) {
+    if (pfTrace == NULL) {
         fprintf( stderr, "Error %d (%s) opening `%s' for output",
                  errno, strerror( errno ), pOptDesc->pzLastArg );
         exit( EXIT_FAILURE );

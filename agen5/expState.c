@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expState.c,v 3.3 2002/01/19 07:35:23 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -100,7 +100,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
         fprintf( pfTrace, " in \"%s\" -- ", pzName );
 
     pzField = strchr( pzName, '.' );
-    if (pzField != (char*)NULL)
+    if (pzField != NULL)
         *(pzField++) = NUL;
 
     pE = findDefEntry( pzName, &isIndexed );
@@ -108,7 +108,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
     /*
      *  No such entry?  return FALSE
      */
-    if (pE == (tDefEntry*)NULL) {
+    if (pE == NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
         goto return_res;
@@ -117,7 +117,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
     /*
      *  No subfield?  Check the values
      */
-    if (pzField == (char*)NULL) {
+    if (pzField == NULL) {
         if (pE->valType != VALTYP_TEXT) {
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                 fputs( zFailed, pfTrace );
@@ -130,7 +130,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
             while (result == SCM_BOOL_F) {
 
                 pE = pE->pTwin;
-                if (pE == (tDefEntry*)NULL)
+                if (pE == NULL)
                     break;
 
                 field = gh_str02scm( pE->pzValue );
@@ -167,7 +167,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
             while (result == SCM_BOOL_F) {
 
                 pE = pE->pTwin;
-                if (pE == (tDefEntry*)NULL)
+                if (pE == NULL)
                     break;
 
                 currDefCtx.pDefs = (tDefEntry*)(void*)(pE->pzValue);
@@ -346,7 +346,7 @@ ag_scm_get( SCM obj )
 
     pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &x );
 
-    if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
+    if ((pE == NULL) || (pE->valType != VALTYP_TEXT))
         return gh_str02scm( "" );
 
     return gh_str02scm( pE->pzValue );
@@ -386,13 +386,13 @@ ag_scm_high_lim( SCM obj )
      *  THEN return zero
      *  ELSE search the twin list for the high entry
      */
-    if (pE == (tDefEntry*)NULL)
+    if (pE == NULL)
         return gh_int2scm( 0 );
 
     if (isIndexed)
         return gh_int2scm( pE->index );
 
-    if (pE->pEndTwin != (tDefEntry*)NULL)
+    if (pE->pEndTwin != NULL)
         pE = pE->pEndTwin;
 
     return gh_int2scm( pE->index );
@@ -443,7 +443,7 @@ ag_scm_low_lim( SCM obj )
      *  THEN return zero
      *  ELSE we have the low index.
      */
-    if (pE == (tDefEntry*)NULL)
+    if (pE == NULL)
         return gh_int2scm( 0 );
 
     return gh_int2scm( pE->index );

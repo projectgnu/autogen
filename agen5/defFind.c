@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
+ *  $Id: defFind.c,v 3.4 2002/01/19 07:35:23 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -45,7 +45,7 @@ STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 STATIC void
 illFormedName( void )
 {
-    char* pz = asprintf( stderr, zNameRef, zDefinitionName,
+    char* pz = asprintf( zNameRef, zDefinitionName,
                          pCurTemplate->pzFileName, pCurMacro->lineNo );
     AG_ABEND( pz );
 }
@@ -68,9 +68,9 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
     if (*pzScan == '$') {
         while (isspace( *++pzScan )) ;
         if (*pzScan != ']')
-            return (tDefEntry*)NULL;
+            return NULL;
 
-        if (pE->pEndTwin != (tDefEntry*)NULL)
+        if (pE->pEndTwin != NULL)
             return pE->pEndTwin;
 
         return pE;
@@ -88,7 +88,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
          */
         while (isspace( *pz )) pz++;
         if (*pz != ']')
-            return (tDefEntry*)NULL;
+            return NULL;
     }
 
     else {
@@ -99,7 +99,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         const char* pzVal;
 
         if (! isalpha( *pzScan ))
-            return (tDefEntry*)NULL;
+            return NULL;
 
         while (ISNAMECHAR( *pzScan )) pzScan++;
 
@@ -119,13 +119,13 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
          */
         while (isspace( *pzScan )) pzScan++;
         if (*pzScan != ']')
-            return (tDefEntry*)NULL;
+            return NULL;
 
         /*
          *  make sure we found a defined value
          */
-        if ((pzVal == (char*)NULL) || (*pzVal == NUL))
-            return (tDefEntry*)NULL;
+        if ((pzVal == NULL) || (*pzVal == NUL))
+            return NULL;
 
         idx = strtol( pzVal, &pzDef, 0 );
 
@@ -133,7 +133,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
          *  Make sure we got a legal number
          */
         if (*pzDef != NUL)
-            return (tDefEntry*)NULL;
+            return NULL;
     }
 
     /*
@@ -141,11 +141,11 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
      */
     do  {
         if (pE->index > idx)
-            return (tDefEntry*)NULL;
+            return NULL;
         if (pE->index == idx)
             break;
         pE = pE->pTwin;
-    } while (pE != (tDefEntry*)NULL);
+    } while (pE != NULL);
 
     return pE;
 }
@@ -400,7 +400,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
         canonicalizeName( zDefinitionName, pzName, strlen( pzName ));
         pzName = zDefinitionName;
 
-        if (pIsIndexed != (ag_bool*)NULL)
+        if (pIsIndexed != NULL)
              *pIsIndexed = AG_FALSE;
         else pIsIndexed  = &dummy;
 
@@ -422,8 +422,8 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
          *  THEN it is time to bail out.
          */
         pE = pDefStack->pDefs;
-        if (pE == (tDefEntry*)NULL)
-            return (tDefEntry*)NULL;
+        if (pE == NULL)
+            return NULL;
 
         do  {
             /*
@@ -434,21 +434,21 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
                 goto found_def_entry;
 
             pE = pE->pNext;
-        } while (pE != (tDefEntry*)NULL);
+        } while (pE != NULL);
 
         /*
          *  IF we are nested, then we cannot change the definition level.
          *  So, we did not find anything.
          */
         if ((nestingDepth != 0) || noNesting)
-            return (tDefEntry*)NULL;
+            return NULL;
 
         /*
          *  Let's go try the definitions at the next higher level.
          */
         pDefStack = pDefStack->pPrev;
         if (pDefStack == NULL)
-            return (tDefEntry*)NULL;
+            return NULL;
     } found_def_entry:;
 
     /*
@@ -469,14 +469,14 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
         while (isspace( *++pcBrace )) ;
 
         pE = findEntryByIndex( pE, pcBrace );
-        if (pE == (tDefEntry*)NULL)
+        if (pE == NULL)
             return pE;
 
         /*
          *  We must find the closing brace, or there is an error
          */
         pcBrace = strchr( pcBrace, ']' );
-        if (pcBrace == (char*)NULL)
+        if (pcBrace == NULL)
             illFormedName();
 
         /*
@@ -512,7 +512,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
      *  We cannot find a member of a non-block type macro definition.
      */
     if (pE->valType != VALTYP_BLOCK)
-        return (tDefEntry*)NULL;
+        return NULL;
 
     /*
      *  Loop through all the twins of the entry we found until
@@ -529,7 +529,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
             tDefEntry* res;
 
             res = defEntrySearch( pzName, &stack, pIsIndexed );
-            if ((res != (tDefEntry*)NULL) || (breakCh == '[')) {
+            if ((res != NULL) || (breakCh == '[')) {
                 nestingDepth--;
                 return res;
             }
@@ -541,7 +541,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
     }
 
     nestingDepth--;
-    return (tDefEntry*)NULL;
+    return NULL;
 }
 
 
@@ -598,7 +598,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
          *  THEN it is time to bail out.
          */
         pE = pDefStack->pDefs;
-        if (pE == (tDefEntry*)NULL) {
+        if (pE == NULL) {
             /*
              *  Make sure we are not nested.  Once we start to nest,
              *  then we cannot "change definition levels"
@@ -610,7 +610,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
             /*
              *  Don't bother returning zero entry list.  Just return NULL.
              */
-            return (tDefEntry**)NULL;
+            return NULL;
         }
 
         do  {
@@ -622,7 +622,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
                 goto found_def_entry;
 
             pE = pE->pNext;
-        } while (pE != (tDefEntry*)NULL);
+        } while (pE != NULL);
 
         /*
          *  IF we are nested, then we cannot change the definition level.
@@ -661,14 +661,14 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
         while (isspace( *++pcBrace )) ;
 
         pE = findEntryByIndex( pE, pcBrace );
-        if (pE == (tDefEntry*)NULL)
+        if (pE == NULL)
             goto returnResult;
 
         /*
          *  We must find the closing brace, or there is an error
          */
         pcBrace = strchr( pcBrace, ']' );
-        if (pcBrace == (char*)NULL)
+        if (pcBrace == NULL)
             illFormedName();
 
         /*
@@ -704,7 +704,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
      *  We cannot find a member of a non-block type macro definition.
      */
     if (pE->valType != VALTYP_BLOCK)
-        return (tDefEntry**)NULL;
+        return NULL;
 
     /*
      *  Loop through all the twins of the entry.  We ignore twins if we just

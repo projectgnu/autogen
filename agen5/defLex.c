@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: defLex.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -107,7 +107,7 @@ scanAgain:
          *  IF we are not inside an include context,
          *  THEN go finish.
          */
-        if (pCurCtx->pCtx == (tScanCtx*)NULL)
+        if (pCurCtx->pCtx == NULL)
             goto lex_done;
 
         /*
@@ -173,7 +173,7 @@ scanAgain:
     case '"':
     {
         char* pz = assembleString( pCurCtx->pzScan );
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             goto NUL_error;
 
         lastToken = TK_STRING;
@@ -188,7 +188,7 @@ scanAgain:
             goto BrokenToken;
 
         pz = assembleHereString( pCurCtx->pzScan + 2 );
-        if (pz == (char*)NULL) {
+        if (pz == NULL) {
             lastToken = ERROR;
             return ERROR;
         }
@@ -211,7 +211,7 @@ scanAgain:
             char* pz = strchr( pCurCtx->pzScan, ';' );
 
             for (;;) {
-                if (pz == (char*)NULL) {
+                if (pz == NULL) {
                     pz = pCurCtx->pzScan + strlen( pCurCtx->pzScan );
                     break;
                 }
@@ -232,14 +232,14 @@ scanAgain:
     {
         char*   pz = assembleString( pCurCtx->pzScan );
 
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             goto NUL_error;
 
         pCurCtx->pzScan = pz;
 
         lastToken = TK_STRING;
         pz = runShell( (const char*)yylval );
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             goto scanAgain;
         TAGMEM( pz, "shell definition string" );
         yylval = (YYSTYPE)pz;
@@ -254,11 +254,11 @@ scanAgain:
         case '*':
         {
             char* pz = strstr( pCurCtx->pzScan+2, "*/" );
-            if (pz != (char*)NULL) {
+            if (pz != NULL) {
                 char* p = pCurCtx->pzScan+1;
                 for (;;) {
                     p = strchr( p+1, '\n' );
-                    if ((p == (char*)NULL) || (p > pz))
+                    if ((p == NULL) || (p > pz))
                         break;
                     pCurCtx->lineNo++;
                 }
@@ -270,7 +270,7 @@ scanAgain:
         case '/':
         {
             char* pz = strchr( pCurCtx->pzScan+2, '\n' );
-            if (pz != (char*)NULL) {
+            if (pz != NULL) {
                 pCurCtx->pzScan = pz+1;
                 goto scanAgain;
             }
@@ -632,7 +632,7 @@ assembleHereString( char* pzScan )
      *  Skip forward to the EOL after the marker.
      */
     pzScan = strchr( pzScan, '\n' );
-    if (pzScan == (char*)NULL)
+    if (pzScan == NULL)
         AG_ABEND( asprintf( zErrMsg, pzProg, "Unterminated HereString",
                             pCurCtx->pzFileName, pCurCtx->lineNo ));
 
@@ -738,7 +738,7 @@ assembleString( char* pzScan )
 
         switch (*(pzD++) = *(pzS++)) {
         case NUL:
-            return (char*)NULL;
+            return NULL;
 
         case '\n':
             pCurCtx->lineNo++;
@@ -763,7 +763,7 @@ assembleString( char* pzScan )
             else if (q != '\'') {
                 int ct = doEscapeChar( pzS, pzD-1 );
                 if (ct == 0)
-                    return (char*)NULL;
+                    return NULL;
 
                 pzS += ct;
             }     /* if (q != '\'')                  */

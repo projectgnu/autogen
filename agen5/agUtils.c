@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: agUtils.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -141,7 +141,7 @@ doOptions( int arg_ct, char** arg_vec )
          *  Point to the character after the last '/', or to the full
          *  definition file name, if there is no '/'.
          */
-        if (pz++ == (char*)NULL)
+        if (pz++ == NULL)
             pz = OPT_ARG( DEFINITIONS );
 
         /*
@@ -177,7 +177,7 @@ doOptions( int arg_ct, char** arg_vec )
              *  IF there is no associated value,  THEN set it to '1'.
              *  There are weird problems with empty defines.
              */
-            if (strchr( pz, '=' ) == (char*)NULL) {
+            if (strchr( pz, '=' ) == NULL) {
                 size_t siz = strlen( pz )+3;
                 char*  p   = AGALOC( siz, "env define" );
                 strcpy( p, pz );
@@ -279,15 +279,15 @@ getDefine( tCC* pzDefName )
             char* pzEq = strchr( pz, '=' );
             int   res;
 
-            if (pzEq != (char*)NULL)
+            if (pzEq != NULL)
                 *pzEq = NUL;
 
             res = strcmp( pzDefName, pz );
-            if (pzEq != (char*)NULL)
+            if (pzEq != NULL)
                 *pzEq = '=';
 
             if (res == 0)
-                return (pzEq != (char*)NULL) ? pzEq+1 : "";
+                return (pzEq != NULL) ? pzEq+1 : "";
         }
     }
     return getenv( pzDefName );
@@ -546,7 +546,7 @@ skipExpression( tCC* pzSrc, size_t len )
     switch (*pzSrc) {
     case ';':
         pzSrc = strchr( pzSrc, '\n' );
-        if (pzSrc == (tCC*)NULL)
+        if (pzSrc == NULL)
             return pzEnd;
         goto guess_again;
 
@@ -575,7 +575,7 @@ skipExpression( tCC* pzSrc, size_t len )
 ag_alloc( size_t sz, tCC* pzWhat )
 {
     void* p = malloc( sz );
-    if ((p == (void*)NULL) && (pzWhat != NULL))
+    if ((p == NULL) && (pzWhat != NULL))
         AG_ABEND( asprintf( zAllocErr, pzProg, sz, pzWhat ));
     return p;
 }
@@ -585,9 +585,9 @@ ag_alloc( size_t sz, tCC* pzWhat )
 ag_realloc( void* p, size_t sz, tCC* pzWhat )
 {
     void* np = p ? realloc( p, sz ) : malloc( sz );
-    if (np == (void*)NULL) {
+    if (np == NULL) {
         if (pzWhat != NULL)
-            AG_ABEND( sprintf( zAllocErr, pzProg, sz, pzWhat ));
+            AG_ABEND( asprintf( zAllocErr, pzProg, sz, pzWhat ));
 
         if (p != NULL)
             free( p );
@@ -615,14 +615,14 @@ ag_strdup( tCC* pz, tCC* pzWhat )
 
     pzRes = ag_alloc( len, pzWhat );
 
-    if (pzRes != (char*)NULL)
+    if (pzRes != NULL)
         strcpy( pzRes, pz );
 
     return pzRes;
 }
 
 #else
-STATIC tMemMgmt memHead = { &memHead, &memHead, (char*)NULL, "ROOT" };
+STATIC tMemMgmt memHead = { &memHead, &memHead, NULL, "ROOT" };
 #define CHECK_CT 128
 #define SPARE    128
 
@@ -633,9 +633,9 @@ ag_alloc( size_t sz, tCC* pzWhat, tCC* pz )
     size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
     tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
 
-    if (p == (tMemMgmt*)NULL) {
+    if (p == NULL) {
         if (pzWhat == NULL)
-            return (void*)NULL;
+            return NULL;
 
         pzWhat = asprintf( zAllocErr, pzProg, sz, pzWhat );
         AG_ABEND( pzWhat );
@@ -668,7 +668,7 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
     np = (tMemMgmt*)(p ? realloc( (void*)np, asz & ~0x3F )
                        : malloc( asz & ~0x3F ));
 
-    if (np == (tMemMgmt*)NULL) {
+    if (np == NULL) {
         if (pzWhat == NULL) {
             if (p != NULL)
                 free( (void*)p );
@@ -678,7 +678,7 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
              */
             sv.pPrev->pNext = sv.pNext;
             sv.pNext->pPrev = sv.pPrev;
-            return (void*)NULL;
+            return NULL;
         }
 
         AG_ABEND( asprintf( zAllocErr, pzProg, sz, pzWhat ));
@@ -712,7 +712,7 @@ checkMem( tMemMgmt* pMM )
             fclose( stderr );
             fclose( pfTrace );
             fclose( stdout );
-            p = (char*)NULL;
+            p = NULL;
             *p = '~'; /* PAGE FAULT */
             _exit( EXIT_FAILURE );
         }
@@ -768,7 +768,7 @@ ag_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
 
     pzRes = ag_alloc( len, pzWhat, pzDupFrom );
 
-    if (pzRes != (char*)NULL)
+    if (pzRes != NULL)
         strcpy( pzRes, pz );
 
     return pzRes;

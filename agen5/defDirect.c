@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.4 2002/01/15 16:55:09 bkorb Exp $
+ *  $Id: defDirect.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -63,7 +63,7 @@ processDirective( char* pzScan )
     for (;;) {
         pzEnd = strchr( pzScan, '\n' );
 
-        if (pzEnd == (char*)NULL) {
+        if (pzEnd == NULL) {
             /*
              *  The end of the directive is the end of the string
              */
@@ -202,7 +202,7 @@ skipToEndif( char* pzScan )
             pz = ++pzScan;
         else {
             pz = strstr( pzScan, zCheckList );
-            if (pz == (char*)NULL) {
+            if (pz == NULL) {
                 pz = asprintf( zNoEndif, pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND( pz );
             }
@@ -219,7 +219,7 @@ skipToEndif( char* pzScan )
              *  We found the endif we are interested in
              */
             char* pz = strchr( pzScan, '\n' );
-            if (pz != (char*)NULL)
+            if (pz != NULL)
                 return pz+1;
             return pzScan + strlen( pzScan );
         }
@@ -263,7 +263,7 @@ skipToElseEnd( char* pzScan )
             pz = ++pzScan;
         else {
             pz = strstr( pzScan, zCheckList );
-            if (pz == (char*)NULL) {
+            if (pz == NULL) {
                 pz = asprintf( zNoEndif, pCurCtx->pzFileName, pCurCtx->lineNo );
                 AG_ABEND( pz );
             }
@@ -290,7 +290,7 @@ skipToElseEnd( char* pzScan )
              *  Start processing the text.
              */
             char* pz = strchr( pzScan, '\n' );
-            if (pz != (char*)NULL)
+            if (pz != NULL)
                 return pz+1;
             return pzScan + strlen( pzScan );
         }
@@ -534,7 +534,7 @@ doDir_if( char* pzArg, char* pzScan )
 STATIC char*
 doDir_ifdef( char* pzArg, char* pzScan )
 {
-    if (getDefine( pzArg ) == (char*)NULL)
+    if (getDefine( pzArg ) == NULL)
         return skipToElseEnd( pzScan );
     ifdefLevel++;
     return pzScan;
@@ -553,7 +553,7 @@ doDir_ifdef( char* pzArg, char* pzScan )
 STATIC char*
 doDir_ifndef( char* pzArg, char* pzScan )
 {
-    if (getDefine( pzArg ) != (char*)NULL)
+    if (getDefine( pzArg ) != NULL)
         return skipToElseEnd( pzScan );
     ifdefLevel++;
     return pzScan;
@@ -647,7 +647,7 @@ doDir_include( char* pzArg, char* pzScan )
         FILE*  fp = fopen( zFullName, "r" FOPEN_TEXT_FLAG );
         char*  pz = pzScan;
 
-        if (fp == (FILE*)NULL) {
+        if (fp == NULL) {
             char* pz = asprintf( zCannot, errno, "open file", zFullName,
                                  strerror( errno ));
             AG_ABEND( pz );
@@ -707,7 +707,7 @@ doDir_line( char* pzArg, char* pzScan )
         return pzScan;
     {
         char* pz = strchr( pzArg, '"' );
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             return pzScan;
         *pz = NUL;
     }
@@ -745,7 +745,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  The output time will always be the current time.
      *  The dynamic content is always current :)
      */
-    outTime = time( (time_t*)NULL );
+    outTime = time( NULL );
 
     /*
      *  IF there are no data after the '#shell' directive,
@@ -756,7 +756,7 @@ doDir_shell( char* pzArg, char* pzScan )
         return pzScan;
 
     pzScan = strstr( pzScan, zEndShell );
-    if (pzScan == (char*)NULL) {
+    if (pzScan == NULL) {
         pzScan = asprintf( "Missing #endshell after '#shell' "
                            "in %s on line %d\n", pCurCtx->pzFileName,
                            pCurCtx->lineNo );
@@ -771,7 +771,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  THEN the scan will resume on a zero-length string.
      */
     pzScan = strchr( pzScan + STRSIZE( zEndShell ), '\n' );
-    if (pzScan == (char*)NULL)
+    if (pzScan == NULL)
         pzScan = "";
 
     /*
@@ -784,7 +784,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  "file text" that is used for more definitions.
      */
     pzText = runShell( pzText );
-    if (  (pzText == (char*)NULL)
+    if (  (pzText == NULL)
        || (*pzText == NUL))
         return pzScan;
 

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.6 2002/01/15 16:55:10 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.7 2002/01/19 07:35:24 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -31,7 +31,7 @@
 
 STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
 
-STATIC tFpStack fpRoot = { 0, (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
+STATIC tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
 
 /*
@@ -56,7 +56,7 @@ generateBlock( tTemplate*   pT,
      */
     pCurTemplate = pT;
 
-    while ((pMac != (tMacro*)NULL) && (pMac < pEnd)) {
+    while ((pMac != NULL) && (pMac < pEnd)) {
         fc = pMac->funcCode;
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
@@ -163,7 +163,7 @@ processTemplate( tTemplate* pTF )
      *  THEN we will generate to standard out with the suffix set to zNone.
      *  With output going to stdout, we don't try to remove output on errors.
      */
-    if (pOutSpecList == (tOutSpec*)NULL) {
+    if (pOutSpecList == NULL) {
         doStdoutTemplate( pTF );
         return;
     }
@@ -192,7 +192,7 @@ processTemplate( tTemplate* pTF )
 
             do  {
                 closeOutput( AG_FALSE );  /* keep output */
-            } while (pCurFp->pPrev != (tFpStack*)NULL);
+            } while (pCurFp->pPrev != NULL);
         }
 
         else {
@@ -207,7 +207,7 @@ processTemplate( tTemplate* pTF )
              */
             do  {
                 closeOutput( AG_TRUE );  /* discard output */
-            } while (pCurFp->pPrev != (tFpStack*)NULL);
+            } while (pCurFp->pPrev != NULL);
 
             /*
              *  On failure (or unknown jump type), we quit the program, too.
@@ -225,7 +225,7 @@ processTemplate( tTemplate* pTF )
         pOutSpecList = pOS->pNext;
         AGFREE( (void*)pOS );
 
-        if (pOutSpecList == (tOutSpec*)NULL)
+        if (pOutSpecList == NULL)
             break;
     }
 }
@@ -252,7 +252,7 @@ closeOutput( ag_bool purge )
         else {
             struct utimbuf tbuf;
 
-            tbuf.actime  = time( (time_t*)NULL );
+            tbuf.actime  = time( NULL );
             tbuf.modtime = outTime;
 
             utime( pCurFp->pzOutName, &tbuf );
@@ -293,11 +293,11 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      */
     {
         char*  p = strrchr( pzDefFile, '/' );
-        if (p == (char*)NULL)
+        if (p == NULL)
             p = pzDefFile;
 
         p = strchr( p, '.' );
-        if (p != (char*)NULL)
+        if (p != NULL)
             *p = NUL;
         /*
          *  Now formulate the output file name in the buffer
@@ -305,7 +305,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          */
         pStk->pzOutName = asprintf( pOutSpec->pzFileFmt,
                                     pzDefFile, pOutSpec->zSuffix );
-        if (p != (char*)NULL)
+        if (p != NULL)
             *p = '.';
     }
 
@@ -334,7 +334,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
                 pStk->pzOutName = (char*)zDevNull;
                 pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK;
                 pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
-                if (pStk->pFile != (FILE*)NULL)
+                if (pStk->pFile != NULL)
                     return;
 
                 goto openError;
@@ -345,7 +345,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
     unlink( pStk->pzOutName );
     pStk->pFile = fopen( pStk->pzOutName, "w" FOPEN_BINARY_FLAG );
 
-    if (pStk->pFile == (FILE*)NULL) {
+    if (pStk->pFile == NULL) {
     openError:
         AG_ABEND( asprintf( zCannot, pzProg, errno, "create",
                             pStk->pzOutName, strerror( errno )));
