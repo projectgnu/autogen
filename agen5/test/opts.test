@@ -1,0 +1,58 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# opts.test --- Verify the handling of options
+#
+# Author:	     Bruce Korb <autogen@linuxbox.com>
+# Maintainer:	     Bruce Korb <autogen@linuxbox.com>
+# Created:	     Sat Mar 28 14:21:31 1998
+# Last Modified:     $Date: 1999/11/06 04:09:55 $
+#            by:     Bruce Korb <autogen@linuxbox.com>
+#
+# $Id: opts.test,v 1.1 1999/11/06 04:09:55 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+workdir=`pwd`
+agopts=`cd .. ; cd $srcdir/.. ; cp opts.[chd]* $workdir > /dev/null 2>&1
+        cp ../VERSION $workdir/.. ; cd ../autoopts ; pwd`
+
+if grep 'define DEBUG' opts.h > /dev/null 2>&1
+then
+  agopts="-L $agopts -DDEBUG=1"
+else
+  agopts="-L $agopts"
+fi
+
+sed '1,7d' opts.c > opts.c.base
+sed '1,7d' opts.h > opts.h.base
+rm -f opts.[ch]
+
+echo $AGEN $agopts opts.def
+$AGEN $agopts opts.def || \
+  failure $AGEN $agopts opts.def
+
+rm -f ../VERSION
+
+sed '1,7d' opts.c > opts.c.res || \
+  failure cannot find opts.c
+
+echo diff opts.c.base opts.c.res
+diff opts.c.base opts.c.res || \
+  failure differ opts.c.base opts.c.res
+
+sed '1,7d' opts.h > opts.h.res || \
+  failure cannot find opts.h
+
+echo diff opts.h.base opts.h.res
+diff opts.h.base opts.h.res || \
+  failure differ opts.h.base opts.h.res
+
+# opts.test ends here
