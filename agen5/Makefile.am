@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.13 1999/11/30 02:24:45 bruce Exp $
+## $Id: Makefile.am,v 1.14 2000/03/05 00:31:30 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -30,6 +30,8 @@ MAINTAINERCLEANFILES = Makefile.in
 
 GEN_SRC = opts.c opts.h directive.h functions.h expr.ini \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi
+
+pkgdata_DATA	= schemedef.scm
 
 EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
 		$(GEN_SRC) bootstrap.dir schemedef.scm
