@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.10 1999/11/03 05:19:16 bruce Exp $
+ *  $Id: funcFor.c,v 1.11 1999/11/04 04:36:50 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -405,7 +405,8 @@ doForEach( tTemplate*   pT,
  *  If the from/by/to functions are invoked, they will specify which
  *  copies of the named value are to be processed.  If there is no
  *  copy of the named value associated with a particular index,
- *  the template has methods for detecting missing definitions and
+ *  the @code{FOR} template block will be instantiated anyway.
+ *  The template must use methods for detecting missing definitions and
  *  emitting default text.  In this fashion, you can insert entries
  *  from a sparse or non-zero based array into a dense, zero based array.
  *
@@ -422,9 +423,8 @@ doForEach( tTemplate*   pT,
  *  @end example
  *
  *  @noindent
- *  this will repeat the @code{\n... text with @code{var}ious
- *  substitutions ...} several times, depending on @code{LIMIT},
- *  a value which is gotten from the environment.  Each repetition,
+ *  this will repeat the @code{... text with @code{var}ious
+ *  substitutions ...} <number>+1 times.  Each repetition,
  *  except for the last, will have a comma @code{,} after it.
  *
  *  @example
