@@ -8,7 +8,7 @@ tSCC zConflict[] =
     "the file name operand conflicts with the definitions option.\n";
 
 tSCC zTextFmt[] =
-    "_Text = '%s';\n";
+    "text = '%s';\n";
 
 
 static const char* typeName[] = {
@@ -301,38 +301,24 @@ printNode( xmlNodePtr pNode )
     case XML_ELEMENT_NODE:
     {
         size_t sz;
-        char* pzTxt;
+        char*  pzTxt;
         emitIndentation();
         fputs( pNode->name, outFp );
+        pzTxt = trim( pNode->content, &sz );
 
-        /*
-         *  Try to avoid another level.  We can do this IFF there are no
-         *  properties and either there are no children or there is no content
-         *  *AND* the only child is a text node.
-         */
-        if (pNode->properties == NULL) {
-            if (pNode->children == NULL) {
-                pzTxt = trim( pNode->content, &sz );
-                if (sz == 0)
-                     fputs( ";\n", outFp );
-                else fprintf( outFp, " = '%s';\n", pzTxt );
-                break;
-            }
+        if (  (pNode->properties == NULL)
+           && (pNode->children == NULL)) {
 
-            if (  (pNode->content  == NULL)
-               && (pNode->children == pNode->last)
-               && (pNode->children->type == XML_TEXT_NODE)) {
-
-                pzTxt = trim( pNode->children->content, &sz );
-                if (sz == 0)
-                     fputs( ";\n", outFp );
-                else fprintf( outFp, " = '%s';\n", pzTxt );
-                break;
-            }
+            if (sz == 0)
+                 fputs( ";\n", outFp );
+            else fprintf( outFp, " = '%s';\n", pzTxt );
+            break;
         }
 
         fputs( " = {\n", outFp );
         level++;
+        emitIndentation();
+        fprintf( outFp, "content = '%s';\n", pzTxt );
         printAttrs( pNode->properties );
         printChildren( pNode->children );
         level--;
