@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.28 2004/08/15 00:52:47 bkorb Exp $
+ *   $Id: opts.def,v 3.29 2004/08/15 12:23:13 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -594,11 +594,33 @@ flag = {
     no-preset;
     flag-code   = '    SET_OPT_DEFINITIONS("-");';
     doc = <<-  _EODoc_
-	If you wish to be able to run AutoGen as a daemon process, specify this
-	option.  The resulting daemon will be able to receive requests on either
-	a socket or over a named pipe (fattach-ed to a file).  A number is
-	presumed to be a port number; anything else should be a file name.
-	The "fattach(2)" call must function properly.
+
+	If you wish to be able to run AutoGen as a daemon process, specify
+	this option.  The resulting daemon will be able to receive requests on
+	either a socket or over a named pipe.  The syntax of the connect-type
+	argument determines the kind of connection:
+
+        @table @samp
+        @item is a number
+        The address family will default to AF_INET and the number must
+	represent the port number AutoGen will listen on.
+
+	@item contains a colon
+	The string up to the colon will be looked up.  If it matches an
+        address family, the string after the colon is presumed to be an
+        address of the appropriate kind. "unix:" addresses should be a
+        path name with existing directory names, but a non-existent base
+        file name.  "inet:" and "inet6" should be followed by a port number.
+
+        @item some other string
+	The string represents a named pipe.  If your system supports
+	@code{fattach} and @code{connld}, then that will be the name of the
+        bi-directional pipe that any number of processes can open and
+        communicate over.  If your system does @strong{not} support such things,
+        then the input pipe will be suffixed with "-in" and the output pipe
+        suffixed with "-out" and only one client may connect at a time.
+	@end table
+
 	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
