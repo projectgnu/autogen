@@ -1,6 +1,6 @@
 
 /*
- *  $Id: nested.c,v 4.5 2005/03/06 20:16:08 bkorb Exp $
+ *  $Id: nested.c,v 4.6 2005/03/13 19:34:26 bkorb Exp $
  *  Time-stamp:      "2005-03-06 12:11:57 bkorb"
  *
  *   Automated Options Nested Values module.
@@ -77,6 +77,12 @@ scanNameEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode );
 
 static const char*
 scanXmlEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode );
+
+static void
+unloadNestedArglist( tArgList* pAL );
+
+static void
+sortNestedList( tArgList* pAL );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*  removeBackslashes

@@ -87,6 +87,8 @@
                 ";\n"
 ) ) ) ) ) )         )
 
+(define shell-cleanup "")
+
 ;;; /*=sfunc   make_header_guard
 ;;;  *
 ;;;  * what:   create ifndef/define guard

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.12 2005/03/06 20:16:08 bkorb Exp $
- *  Time-stamp:      "2005-02-23 14:26:53 bkorb"
+ *  $Id: autoopts.c,v 4.13 2005/03/13 19:34:26 bkorb Exp $
+ *  Time-stamp:      "2005-03-13 08:39:23 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -854,11 +854,11 @@ checkConsistency( tOptions* pOpts )
                 break;
 
             /*
-             *  IF presetting is okay and it has been preset,
-             *  THEN min occurrence count doesn't count
+             *  IF MUST_SET means SET and PRESET are okay,
+             *  so min occurrence count doesn't count
              */
-#           define PRESET_OK  (OPTST_PRESET | OPTST_MUST_SET)
-            if ((pOD->fOptState & PRESET_OK) == PRESET_OK)
+            if (  (pOD->fOptState & OPTST_MUST_SET)
+               && (pOD->fOptState & (OPTST_PRESET | OPTST_SET)) )
                 break;
 
             errCt++;

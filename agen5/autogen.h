@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: autogen.h,v 4.5 2005/03/13 19:34:26 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -449,7 +449,7 @@ extern size_t strlcpy( char* dest, const char* src, size_t n );
  */
 #define FMEM_IOCTL_SAVE_BUF  0x80000002
 
-extern FILE * fmemopen (void *buf, size_t len, const char *mode);
+extern FILE * ag_fmemopen (void *buf, ssize_t len, const char *mode);
 #endif
 #include "proto.h"
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: expOutput.c,v 4.4 2005/03/13 19:34:26 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -377,7 +377,7 @@ ag_scm_out_push_new( SCM new_file )
          *  Otherwise, anonymous output without --no-fmemopen being selected
          *  will get us here.
          */
-        p->pFile  = fmemopen( NULL, 0, "wb+" );
+        p->pFile  = ag_fmemopen( NULL, 0, "wb+" );
         pzNewFile = "in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
     }

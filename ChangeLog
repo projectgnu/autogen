@@ -1,3 +1,10 @@
+2004-03-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(checkConsistency): "must-set" means that a "set"
+	option is okay, too.
+	* autoopts/configfile.c: more work on it.
+	* autoopts/test/errors.test: test the consistency fix
+
 2004-02-20  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*: Remove "optArgType" from option descriptor and use

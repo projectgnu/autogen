@@ -72,7 +72,7 @@ the best solution is to examine the output of ``guile-config link'',
 duplicate the ``-L/path/to/lib'' argument, but changing the "-L" to
 "-R" or "-Wl,-rpath," or "-rpath" or whatever it happens to be that
 works for your platform, and hand that off to configure as the argument
-to ``--with-libguile-libdir''.  "libtool" won't fix it and it's too hard
+to ``--with-libguile-link''.  "libtool" won't fix it and it's too hard
 for me.  Sorry.  Anyway, for example, assume:
 
   guile-config link
@@ -84,6 +84,6 @@ produces:
 now run configure as follows:
 
   .../configure \
-    --with-libguile-libdir='-L/opt/sfw/lib -lguile -lm -R/opt/sfw/lib'
+    --with-libguile-link='-L/opt/sfw/lib -lguile -lm -R/opt/sfw/lib'
 
 Isn't that special?

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.10 2005/02/20 23:00:55 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.11 2005/03/13 19:34:26 bkorb Exp $
  * Time-stamp:      "2005-02-20 13:49:46 bkorb"
  *
  *  This module's routines will take the currently set options and
@@ -56,10 +56,10 @@ tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static tCC*
-findDirName( tOptions* pOpts, int* p_free_res );
+findDirName( tOptions* pOpts, int* p_free );
 
 static tCC*
-findFileName( tOptions* pOpts, int* p_free_res );
+findFileName( tOptions* pOpts, int* p_free_name );
 
 static void
 printEntry(

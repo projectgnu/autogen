@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.6 2005/01/24 20:27:42 bkorb Exp $
+ *  $Id: autogen.c,v 4.7 2005/03/13 19:34:26 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -201,6 +201,11 @@ doneCheck( void )
     tSCC zErr[] =
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
         "\t%s on line %d\n";
+
+#ifdef SHELL_ENABLED
+    scm_c_eval_string( "(if (> (string-length shell-cleanup) 0)"
+                       "    (shell shell-cleanup) )" );
+#endif
 
     fflush( stdout );
     fflush( stderr );

@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.14 2005/03/06 20:16:08 bkorb Exp $
- *  Time-stamp:      "2005-03-06 12:13:55 bkorb"
+ *  $Id: configfile.c,v 4.15 2005/03/13 19:34:26 bkorb Exp $
+ *  Time-stamp:      "2005-03-13 08:08:01 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -447,6 +447,11 @@ filePreset(
 
     if (pzFileText == MAP_FAILED)
         return;
+
+    if (direction == DIRECTION_CALLED) {
+        st.flags  = OPTST_DEFINED;
+        direction = DIRECTION_PROCESS;
+    }
 
     /*
      *  IF this is called via "optionProcess", then we are presetting.
@@ -952,7 +957,7 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
             /* NOT REACHED */
         }
 
-        filePreset(pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS);
+        filePreset(pOpts, pOptDesc->pzLastArg, DIRECTION_CALLED);
     }
 }
 
@@ -968,6 +973,10 @@ parseAttributes(
     tOptionLoadMode*    pMode,
     tOptionValue*       pType )
 {
+    size_t lenLoadType = strlen( zLoadType );
+    size_t lenKeyWords = strlen( zKeyWords );
+    size_t lenSetMem   = strlen( zSetMembers );
+
     do  {
         switch (*pzText) {
         case '/': pType->valType = OPARG_TYPE_NONE;
@@ -987,28 +996,19 @@ parseAttributes(
 
         while (isspace( *++pzText ))   ;
 
-        {
-            size_t len = strlen( zLoadType );
-            if (strncmp( pzText, zLoadType, len ) == 0) {
-                pzText = parseValueType( pzText+len, pType );
-                continue;
-            }
+        if (strncmp( pzText, zLoadType, lenLoadType ) == 0) {
+            pzText = parseValueType( pzText+lenLoadType, pType );
+            continue;
         }
 
-        {
-            size_t len = strlen( zKeyWords );
-            if (strncmp( pzText, zKeyWords, len ) == 0) {
-                pzText = parseKeyWordType( pOpts, pzText+len, pType );
-                continue;
-            }
+        if (strncmp( pzText, zKeyWords, lenKeyWords ) == 0) {
+            pzText = parseKeyWordType( pOpts, pzText+lenKeyWords, pType );
+            continue;
         }
 
-        {
-            size_t len = strlen( zSetMembers );
-            if (strncmp( pzText, zSetMembers, len ) == 0) {
-                pzText = parseSetMemType( pOpts, pzText+len, pType );
-                continue;
-            }
+        if (strncmp( pzText, zSetMembers, lenSetMem ) == 0) {
+            pzText = parseSetMemType( pOpts, pzText+lenSetMem, pType );
+            continue;
         }
 
         pzText = parseLoadMode( pzText, pMode );

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:13:07 bkorb"
+# Time-stamp:        "2005-03-13 07:41:06 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
+# $Id: errors.test,v 4.4 2005/03/13 19:34:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -81,11 +81,18 @@ cmp -s ${testname}.h*lp || \
   failure ${testname} stumbled somehow
 
 ./${testname} -o > /dev/null 2>&1 && \
+  failure ${testname} "'option'" must have argument
+
+./${testname} -o mumble > /dev/null 2>&1 && \
   failure ${testname} must have second argument
 
 echo "second bumble" > ${testname}RC/.test_errorsrc
 ./${testname} -o mumble > /dev/null || \
   failure ${testname} did not see errorsRC/.test_errorsrc
+
+mv ${testname}RC/.test_errorsrc ${testname}RC/test_errors.rc
+./${testname} --load=${testname}RC/test_errors.rc -o mumble > /dev/null || \
+  failure ${testname} did not see errorsRC/test_errors.rc
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 

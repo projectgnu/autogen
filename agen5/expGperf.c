@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.3 2005/02/20 02:15:48 bkorb Exp $
+ *  $Id: expGperf.c,v 4.4 2005/03/13 19:34:26 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -23,24 +23,29 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
+#ifndef SHELL_ENABLED
+SCM
+ag_scm_make_gperf( SCM name, SCM hlist )
+{
+    return SCM_UNDEFINED;
+}
+
+SCM
+ag_scm_gperf( SCM name, SCM str )
+{
+    return SCM_UNDEFINED;
+}
+#else
 
 tSCC zMakeGperf[] =
-"gperf_%2$s=.ZZPURGE.$$/%2$s\n"
-"[ -d .ZZPURGE.$$ ] || mkdir .ZZPURGE.$$\n"
+"gperf_%2$s=.gperf.$$/%2$s\n"
+"[ -d .gperf.$$ ] || mkdir .gperf.$$\n"
 
-/*
- *  The following little scriplet will ensure that the junk we leave
- *  around will be removed not more than three seconds after we finish.
- *  The third argument to this format string is the process id of AutoGen.
- */
-"( ( while ps -p %3$d ; do sleep 3 ; done\n"
-"    rm -rf .ZZPURGE.$$ ) > /dev/null 2>&1 & )\n"
-
-"cd .ZZPURGE.$$ || {\n"
-"  echo 'cannot mkdir and enter .ZZPURGE.$$' >&2\n"
+"cd .gperf.$$ || {\n"
+"  echo 'cannot mkdir and enter .gperf.$$' >&2\n"
 "  exit 1\n}\n"
 
-"( "
+"dir=`pwd` \n( "
 
 /*
  *  From here to the matching closing paren, we are constructing the
@@ -84,7 +89,9 @@ tSCC zMakeGperf[] =
 /*
  *  actually build the program using "make"
  */
-"make %2$s || exit 1";
+"res=`make %2$s 2>&1`\n"
+"test $? -eq 0 || die \"${res}\"\n"
+"echo rm -rf ${dir}";
 
 
 tSCC zRunGperf[] = "${gperf_%s} %s";
@@ -126,6 +133,8 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
+        static const char zCleanup[] =
+            "(set! shell-cleanup (string-append shell-cleanup \"%s\n\"))\n";
         char* pzCmd;
         pzCmd = aprf( zMakeGperf, pzList, pzName, getpid() );
 
@@ -133,7 +142,13 @@ ag_scm_make_gperf( SCM name, SCM hlist )
          *  Run the command and ignore the results.
          *  In theory, the program should be ready.
          */
-        AGFREE( runShell( pzCmd ));
+        pzList = runShell( pzCmd );
+        AGFREE( pzCmd );
+
+        pzCmd = aprf( zCleanup, pzList );
+        AGFREE( pzList );
+
+        (void)scm_c_eval_string( pzCmd );
         AGFREE( pzCmd );
     }
     return SCM_BOOL_T;
@@ -180,6 +195,7 @@ ag_scm_gperf( SCM name, SCM str )
     AGFREE( pzStr );
     return str;
 }
+#endif
 /*
  * Local Variables:
  * mode: C
