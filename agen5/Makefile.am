@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.9 1999/11/06 22:14:47 bruce Exp $
+## $Id: Makefile.am,v 1.10 1999/11/07 01:12:35 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -101,7 +101,7 @@ gen : defParse.h autogen.texi autogen.1
 ../columns/columns :
 	cd ../columns ; $(MAKE)
 
-all : autogen.texi autogen.1
+dist : autogen.texi autogen.1
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
