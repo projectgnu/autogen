@@ -10,7 +10,7 @@
 ## Last Modified:   Wed Nov 25 13:16:21 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.9 1998/11/25 21:19:28 bkorb Exp $
+## $Id: Makefile.am,v 2.10 1998/11/25 21:22:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,7 +26,7 @@ libopts_la_LDFLAGS = -version-info @LT_CURRENT@:@LT_REVISION@:@LT_AGE@
 
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl
 EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.texi autoopts-config.in \
-		genshell.def genshell.c genshell.h
+		genshell.def genshell.c genshell.h config-opts.def
 INCLUDES	= -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
 bin_SCRIPTS	= autoopts-config
 include_HEADERS = options.h
