@@ -235,32 +235,34 @@ typedef int compatboolean;
 #  endif
 #endif
 
+#ifdef _WIN32
+#  ifdef DLL_EXPORT
+#    define SNV_SCOPE	extern __declspec(dllexport)
+#  else
+#    ifdef LIBSNPRINTFV_DLL_IMPORT
+#      define SNV_SCOPE	extern __declspec(dllimport)
+#    endif
+#  endif
+#endif
+#ifndef SNV_SCOPE
+#  define SNV_SCOPE	extern
+#endif
+
 #undef SNV_GNUC_PRINTF
 #undef SNV_GNUC_NORETURN
 #if	__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
-#  ifdef SNV_USING_STDARG_H
-#    define SNV_GNUC_PRINTF( args, format_idx, arg_idx )		\
+#  define SNV_GNUC_PRINTF( args, format_idx, arg_idx )		\
   	args __attribute__((format (printf, format_idx, arg_idx)))
-#  else
-#    define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) ()
-#  endif
 #  define SNV_GNUC_NORETURN						\
 	__attribute__((noreturn))
+#  define SNV_ASSERT_FCN  	 " (", __PRETTY_FUNCTION__, ")"
 #else /* !__GNUC__ */
-#  ifdef SNV_USING_STDARG_H
-#    define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) args
-#  else
-#    define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) ()
-#  endif
+#  define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) args
 #  define SNV_GNUC_NORETURN
+#  define SNV_ASSERT_FCN		"", "", ""
 #endif /* !__GNUC__ */
 
 #define SNV_ASSERT_FMT  "file %s: line %d%s%s%s: assertion \"%s\" failed.\n"
-#ifdef __GNUC__
-#define SNV_ASSERT_FCN          " (", __PRETTY_FUNCTION__, ")"
-#else
-#define SNV_ASSERT_FCN          "", "", ""
-#endif
 
 #ifndef STR
 #  define STR(s) _STR(s)

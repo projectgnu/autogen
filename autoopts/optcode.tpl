@@ -1,21 +1,36 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.19 2003/07/04 15:12:22 bkorb Exp $
+#$Id: optcode.tpl,v 3.20 2003/08/21 02:06:09 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
+=][=
+
+INCLUDE "optmain.tpl"                =][=
+
+IF (exist? "flag.arg-range")
+
+=]#include <stdio.h>
+#include <limits.h>[=
+
+ENDIF
+
 =]
-#include "[=(. header-file)=]"
+#include "[= (. header-file) =]"
 
 #ifdef  __cplusplus
 extern "C" {
-#endif
-[=
+#endif[=
 
-INCLUDE "optmain.tpl"
+IF (exist? "flag.arg-range")
 
-=][=
+=]
+extern FILE* option_usage_fp;[=
+
+ENDIF                                =][=
+
 IF (not (exist? "copyright") )
+
 =]
 #define zCopyright       NULL
 #define zCopyrightNotice NULL[=
@@ -36,7 +51,9 @@ tSCC zCopyrightNotice[] =
 
   ESAC =];[=
 
-ENDIF "copyright notes"=]
+ENDIF "copyright notes"
+
+=]
 extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
   (exist? "homerc") ", doLoadOpt")   =][=
 

@@ -32,7 +32,7 @@ noinst_HEADERS          = mem.h filament.h stream.h printf.h compat.h
 dist_noinst_DATA        = filament.stamp stream.stamp printf.stamp
 noinst_LTLIBRARIES      = libsnprintfv.la
 libsnprintfv_la_LDFLAGS = -no-undefined
-CSRC = filament.c format.c printf.c mem.c stream.c
+CSRC = filament.c format.c printf.c mem.c stream.c custom.c
 
 nodist_libsnprintfv_la_SOURCES = snv.c
 

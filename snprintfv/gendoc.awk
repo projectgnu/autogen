@@ -484,7 +484,7 @@ funcdecl>0 {
 	    # Is this a printf attributable prototype?  Look for
 	    # ``format,'' in the penultimate argument:
 	    use_format=0;
-	    if ($0 ~ /[^a-zA-Z_]format,[ \t]*\.\.\.)$/) {
+	    if ($0 ~ /[^a-zA-Z_]format,[ \t]*\.\.\.\)$/) {
 	        use_format=1;
 	    }
 
@@ -797,7 +797,7 @@ END {
 	        # %word becoming @code{}
     	        source = lines[i];
 	        dest = "";
-	        while (match(source, /%[-+*/%<>!=()A-Za-z0-9_\\'"]+/)) {
+	        while (match(source, /%[-+*\/%<>!=()A-Za-z0-9_\\\'\"]+/)) {
 		    postchar="$"; # dummy for end of string
 		    if (RSTART + RLENGTH < length (source)) {
 		        postchar = substr(source, RSTART + RLENGTH, 1);
@@ -858,7 +858,7 @@ END {
 	        # %word becoming @code{}
     	        source = lines[i];
 	        dest = "";
-	        while (match(source, /%[-+*/%<>!=()A-Za-z0-9_\\"']+/)) {
+	        while (match(source, /%[-+*\/%<>!=()A-Za-z0-9_\\\"\']+/)) {
 		    postchar="$"; # dummy for end of string
 		    if (RSTART + RLENGTH < length (source)) {
 		        postchar = substr(source, RSTART + RLENGTH, 1);

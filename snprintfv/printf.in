@@ -99,6 +99,8 @@ typedef struct printf_info
   unsigned showsign:1;
   unsigned group:1;
   unsigned wide:1;
+
+  const union printf_arg *args;
 } printf_info;
 
 /**
@@ -136,7 +138,7 @@ typedef union printf_arg
   uintmax_t pa_u_long_long_int;
   float pa_float;
   double pa_double;
-  snv_long_double pa_long_double;
+  long double pa_long_double;
   const char *pa_string;
   const snv_wchar_t *pa_wstring;
   snv_constpointer pa_pointer;
@@ -159,7 +161,6 @@ typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
 /**
  * spec_entry:
  * @spec: the specifier character that was matched
- * @modifier_char: usually %FALSE, these specifiers aren't influenced by $ and cannot be overridden
  * @type: when @arg is NULL, the type of the only argument to the specifier
  * @fmt: the handler function to actually print the arguments to the specifier
  * @arg: the handler function to tell %printf about the types of the arguments to the specifier
@@ -170,7 +171,7 @@ typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
 typedef struct spec_entry
 {
   int spec;
-  int modifier_char;
+  int unused;  /* for binary compatibility */
   int type;
   printf_function *fmt;
   printf_arginfo_function *arg;
@@ -258,6 +259,7 @@ enum
 
 @protos format.c
 @protos printf.c
+@protos custom.c
 
 /* If you don't want to use snprintfv functions for *all* of your string
    formatting API, then define COMPILING_SNPRINTFV_C and use the snv_

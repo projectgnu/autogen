@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-09 09:49:41 bkorb"
+# Time-stamp:        "2003-08-20 18:46:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 3.3 2003/03/09 19:53:52 bkorb Exp $
+# $Id: argument.test,v 3.4 2003/08/21 02:06:09 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -35,11 +35,11 @@ $AGEN ${testname}.def || \
 
 compile "-?"
 
-
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+basehlp=${testname}.hlp
+echo creating ${basehlp}
+cat > ${basehlp} <<'_EOF_'
 test_argument - Test AutoOpts for argument
 USAGE:  argument [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -51,7 +51,7 @@ USAGE:  argument [ -<flag> [<val>] ]...
 _EOF_
 
 cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+  failure "`diff ${basehlp} ${testname}.help`"
 
 ./${testname} mumble 2> /dev/null && \
   failure ${testname} should not accept non-options
@@ -60,6 +60,47 @@ cmp -s ${testname}.h*lp || \
   failure ${testname} should not accept bad options
 
 ./${testname} -o string -s 99 > /dev/null || \
+  failure ${testname} did not handle its options
+
+sed '/arg_type = number/a\
+    arg-range = "-1";\
+    arg-range = "3->021";' ${testname}.def > ${testname}2.def
+testname=${testname}2
+$AGEN ${testname}.def || \
+  failure AutoGen could not process
+( sed '/^#if defined( TEST_TEST_ARGUMENT_OPTS )/,$d' ${testname}.c
+  cat <<EOF
+int main( int argc, char** argv ) {
+  optionProcess( &test_argumentOptions, argc, argv );
+  return 0; }
+EOF
+) > XX
+mv ${testname}.c ${testname}.c.save
+mv -f XX ${testname}.c
+
+compile "-?"
+
+cat > ${testname}.hlp <<'_EOF_'
+test_argument - Test AutoOpts for argument
+USAGE:  argument2 [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o Str option         The option option descrip
+   -s Num second         The second option descrip
+				  it must lie in one of the ranges:
+				  -1 exactly, or
+				  3 to 17
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${testname}.hlp ${testname}.help || \
+  failure "`diff ${testname}.hlp ${testname}.help`"
+
+./${testname} -o string -s 99 > /dev/null && \
+  failure ${testname} did not handle oversized option
+
+./${testname} -o string -s 10 > /dev/null || \
   failure ${testname} did not handle its options
 
 cleanup

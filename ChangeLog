@@ -1,3 +1,40 @@
+2003-08-20  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(arg-range): Include stdio.h and limits.h
+	for the generated code that handles argument ranges.
+	* autoopts/optmain.tpl(option_usage_fp): must be globally declared
+	* autoopts/test/argument.test: Add code to test arg-range
+
+2003-08-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/usage.test: test display with mix of with and without
+	flag options
+	* autoopts/usage.c(printBareUsage): add an extra space when there are
+	both flags and long options, but this does not have the flag value.
+
+2003-08-08  Deneys S. Maartens  <dsm@tlabs.ac.za>
+
+	* autoopts/autoopts.m4:
+        min_opts_version is not defined anywhere.
+        The test programme also seems a bit borken. :)
+
+	* pkg/mkpkg.linux:
+        The rpm programme has been split into smaller utility
+        programmes.  On RedHat rpm itself doesn't recognise the build
+        flags any more.
+
+	* pkg/spec.tpl:
+        When the prefix isn't /usr/local, the manpages get gzip'ed, and
+        the build fails because the (unzipped) manpage files don't
+        exist.  The %define at the top of the spec file fixes this.
+        It's probably not a very elegant solution, but inserting
+        `/usr/lib/rpm/bpr-compress' just before the file list gets
+        generated in the %install section is probably even worse.
+
+2003-08-07  Bruce Korb  <bkorb@gnu.org>
+
+	* snprintfv/*: update to pre-release of version 1.1
+
 2003-07-06  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/enumeration.c: cleanup

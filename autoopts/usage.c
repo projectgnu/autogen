@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.21 2003/07/04 17:58:14 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.22 2003/08/21 02:06:09 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -460,9 +460,12 @@ printBareUsage(
      */
     if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
         fputs( pAT->pzSpc, option_usage_fp );
-    else if (! isgraph( pOD->optValue))
+    else if (! isgraph( pOD->optValue)) {
+        if (  (pOptions->fOptSet & (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
+           == (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
+            fputc( ' ', option_usage_fp );
         fputs( pAT->pzNoF, option_usage_fp );
-    else {
+    } else {
         fprintf( option_usage_fp, "   -%c", pOD->optValue );
         if (  (pOptions->fOptSet & (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
            == (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))

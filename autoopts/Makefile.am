@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-20 17:23:05 bkorb"
+## Time-stamp:      "2003-07-12 10:57:13 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.19 2003/04/21 03:35:35 bkorb Exp $
+## $Id: Makefile.am,v 3.20 2003/08/21 02:06:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,7 +25,7 @@ man_MANS = autoopts-config.1 $(GENMAN)
 libsrc   = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 nodist_pkgdata_DATA	= $(libsrc)
-pkgdata_DATA	= stdoptions.def \
+pkgdata_DATA	= stdoptions.def autoopts.m4 \
     aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
     options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 

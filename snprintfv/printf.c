@@ -69,6 +69,8 @@ static int do_printfv (STREAM *stream, const char *format, union printf_arg cons
 #define ASCII_DEL	(int)'\177'
 #define ASCII_SPACE	(int)' '
 
+#define IS_MODIFIER(spec)  (!((spec)->fmt))
+
 /* TODO:  This is not thread-safe.  Change the API to pass the spec_table
           in as the first parameter to the functions which use it? */
 static spec_entry *spec_table[ASCII_DEL - ASCII_SPACE];
@@ -144,12 +146,14 @@ register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_fu
 {
   spec_entry *new, *old;
   old = spec_lookup (spec);
-  if (old && old->modifier_char)
+  if (old && IS_MODIFIER (old))
+    return NULL;
+
+  if (!fmt || !spec)
     return NULL;
 
   new = snv_new (spec_entry, 1);
   new->spec = spec;
-  new->modifier_char = FALSE;
   new->fmt = fmt;
   new->arg = arg;
   new->user = NULL;
@@ -163,10 +167,11 @@ static int
 call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_entry *spec)
 {
   int n;
-  int argindex = (pinfo->dollar && !spec->modifier_char)
+  int argindex = (pinfo->dollar && !IS_MODIFIER (spec))
          ? pinfo->dollar - 1
          : pinfo->argindex;
 
+  int save_argindex = pinfo->argindex;
   int save_state = pinfo->state;
   char const *save_format = pinfo->format;
 
@@ -217,6 +222,7 @@ call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_ent
 	  pinfo->argc = argindex + n;
 
 	  /* Call again... */
+	  pinfo->argindex = save_argindex;
 	  pinfo->format = save_format;
 	  pinfo->state = save_state;
           pinfo->spec = *pinfo->format;
@@ -226,7 +232,7 @@ call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_ent
 	}
     }
 
-  if (!pinfo->dollar || spec->modifier_char)
+  if (!pinfo->dollar || !IS_MODIFIER (spec))
     pinfo->argindex += n;
 
   return n;
@@ -252,10 +258,11 @@ printf_strerror (void)
 
 /* (re)initialise the memory used by PPARSER. */
 static inline void
-parser_init (struct printf_info *pinfo, const char *format)
+parser_init (struct printf_info *pinfo, const char *format, const union printf_arg *args)
 {
   memset (pinfo, 0, sizeof (struct printf_info));
   pinfo->format = format;
+  pinfo->args = args;
 }
 
 static inline struct printf_info *
@@ -349,7 +356,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
 
   return_val_if_fail (format != NULL, -1);
 
-  parser_init (&info, format);
+  parser_init (&info, format, NULL);
 
   while (*info.format != EOS)
     {
@@ -381,14 +388,14 @@ parse_printf_format (const char *format, int n, int *argtypes)
 		      goto error;
 		    }
 
-		  if (!spec->modifier_char &&
+		  if (!IS_MODIFIER (spec) &&
 		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
 		    {
 		      PRINTF_ERROR (&info, "invalid combination of flags");
 		      goto error;
 		    }
 
-	          argindex = info.dollar && !spec->modifier_char
+	          argindex = info.dollar && !IS_MODIFIER (spec)
 			       ? info.dollar - 1 : info.argindex;
 
 		  /* ...and call the relevant handler.  */
@@ -410,12 +417,12 @@ parse_printf_format (const char *format, int n, int *argtypes)
 		    goto error;
 
 		  info.argc = MAX (info.argc, argindex + status);
-		  if (!info.dollar || spec->modifier_char)
+		  if (!info.dollar || !IS_MODIFIER (spec))
 		    info.argindex += status;
 
 		  info.format++;
 		}
-	      while (spec->modifier_char);
+	      while (IS_MODIFIER (spec));
 	      continue;
 	    }
 
@@ -455,7 +462,7 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
      Here we scan through the format string and move bytes into the
      stream and call handlers based on the parser state. */
 
-  parser_init (&info, format);
+  parser_init (&info, format, args);
 
   /* Keep going until the format string runs out! */
   while (*info.format != EOS)
@@ -487,7 +494,7 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 		      goto error;
 		    }
 
-		  if (!spec->modifier_char &&
+		  if (!IS_MODIFIER (spec) &&
 		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
 		    {
 		      PRINTF_ERROR (&info, "invalid combination of flags");
@@ -504,22 +511,22 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 		  if (status < 0)
 		    goto error;
 
-		  argindex = info.dollar && !spec->modifier_char
+		  argindex = info.dollar && !IS_MODIFIER (spec)
 		    ? info.dollar - 1 : info.argindex;
 
 		  info.format++;
 		  info.argc = MAX (info.argc, argindex + status);
-		  if (!info.dollar || spec->modifier_char)
+		  if (!info.dollar && !IS_MODIFIER (spec))
 		    info.argindex += status;
-
-		  status = (*spec->fmt) (stream, &info, args + argindex);
-
-		  if (status < 0)
-		    goto error;
-
-		  info.count += status;
 		}
-	      while (info.count >= 0 && spec->modifier_char);
+	      while (info.count >= 0 && IS_MODIFIER (spec));
+
+	      status = (*spec->fmt) (stream, &info, args + argindex);
+
+	      if (status < 0)
+	        goto error;
+
+	      info.count += status;
 	      continue;
 	    }
 
@@ -575,7 +582,7 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
 
   return_val_if_fail (format != NULL, SNV_ERROR);
 
-  parser_init (&info, format);
+  parser_init (&info, format, NULL);
   while (*info.format != EOS)
     {
       int ch = (int) *info.format++;
@@ -603,7 +610,7 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
                      goto error;
                    }
 
-                 if (!spec->modifier_char &&
+                 if (!IS_MODIFIER (spec) &&
                      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
                    {
                      PRINTF_ERROR (&info, "invalid combination of flags");
@@ -616,7 +623,7 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
 
                  info.format++;
                }
-             while (info.count >= 0 && spec->modifier_char);
+             while (info.count >= 0 && IS_MODIFIER (spec));
              continue;
            }
          /* An escaped CHAR_SPEC: ignore it (by falling through). */
@@ -748,7 +755,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 
   return_val_if_fail (format != NULL, SNV_ERROR);
 
-  parser_init (&info, format);
+  parser_init (&info, format, NULL);
   while (*info.format != EOS)
     {
       int ch = (int) *info.format++;
@@ -776,7 +783,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 		      goto error;
 		    }
 
-		  if (!spec->modifier_char &&
+		  if (!IS_MODIFIER (spec) &&
 		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
 		    {
 		      PRINTF_ERROR (&info, "invalid combination of flags");
@@ -789,7 +796,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 
 		  info.format++;
 		}
-	      while (info.count >= 0 && spec->modifier_char);
+	      while (info.count >= 0 && IS_MODIFIER (spec));
 	      continue;
 	    }
 	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
@@ -856,7 +863,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
             break;
 
           case PA_DOUBLE|PA_FLAG_LONG_DOUBLE:
-	    args[index].pa_long_double = va_arg (ap, snv_long_double);
+	    args[index].pa_long_double = va_arg (ap, long double);
             break;
 
           case PA_DOUBLE:
@@ -1391,8 +1398,7 @@ snv_filputc (ch, stream)
      int ch;
      STREAM *stream;
 {
-  filccat ((Filament *) stream_details (stream), ch);
-  return ch;
+  return filccat ((Filament *) stream_details (stream), ch), ch;
 }
 
 /**

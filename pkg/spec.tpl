@@ -1,4 +1,7 @@
 [= AutoGen5 Template spec =]
+
+%define __spec_install_post  /usr/lib/rpm/brp-strip ; /usr/lib/rpm/brp-strip-static-archive ; /usr/lib/rpm/brp-strip-comment-note
+
 Summary: AutoGen - [=prog-title=]
 Name: [= prog-name =]
 Version: [= version =]

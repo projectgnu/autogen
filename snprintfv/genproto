@@ -36,16 +36,18 @@
 # USAGE: genproto [debug] <filter> source.h-in > source.h
 #
 # This program scans a C source file for special comments preceding
-# function declarations, and generates
-# function declarations suitable for use in a header file.
+# function definitions, and generates commented function
+# declarations suitable for use in a header file.
 #
 # See the accompanying README for details of how to format function headers
 # for extraction by this script.
 
 # Code:
 
+debug=
+#debug="-v debug=1"
 if test "X$1" = Xdebug; then
-  set -x
+  debug="-v debug=1"
   shift
 else
   # cleanup temporary files on exit, hangup, interrupt, quit or terminate
@@ -60,29 +62,30 @@ fi
 file=$2
 dir=`echo $file | sed 's,/[^/]*$,,'`
 mode=`echo $file | sed 's,^.*/,,g;s,\.in$,.h,'`
-proto=${PROTO-PARAMS}
 format=${FORMAT-GNUC_PRINTF}
 global=${GLOBAL-GLOBAL_DATA}
 scope=${SCOPE-SCOPE}
 
-filter="${AWK-awk} -v mode=$mode -v proto=$proto -v format=$format -v global=$global -v scope=$scope -f $1"
+filter="${AWK-awk} $debug -v mode=$mode -v format=$format -v global=$global -v scope=$scope -f $1"
 
 # Read in the source file expanding @protos foo.c lines using the
 # gendoc.awk script
 #
-${AWK-awk} '		     
-BEGIN {
-    while (getline > 0) {
+${AWK-awk} '
+NR == 1 {
+    printf "#line 1 \"%s\"\n", FILENAME
+    do {
         if (tolower($1) != "@protos") {
-	    print;
-	    continue;
-	}
-	source = "'"$dir"'/" $2;
-	while ((getline < source) > 0) {
-	    print | "'"$filter"'";
-	}
-	close("'"$filter"'");
-    }
+            print;
+            continue;
+        }
+        source = "'"$dir"'/" $2;
+        while ((getline < source) > 0) {
+            print | "'"$filter"'";
+        }
+        close("'"$filter"'");
+        printf "#line %d \"%s\"\n", NR + 1, FILENAME
+    } while (getline > 0)
 }' $file
 
 exit 0

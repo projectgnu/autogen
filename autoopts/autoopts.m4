@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.4 2003/07/04 15:12:22 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.5 2003/08/21 02:06:09 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:
@@ -48,12 +48,15 @@ AC_ARG_ENABLE(opts-test,
   else
     AC_PATH_PROG(AUTOOPTS_CONFIG, autoopts-config, no)
   fi
-  min_opts_version=ifelse([$1], ,4:2:0,$1)
+  min_opts_version="9:0:0"
   AC_MSG_CHECKING(for autoopts version >= $min_opts_version)
   no_autoopts=""
   if test "$AUTOOPTS_CONFIG" = "no" ; then
     no_autoopts=yes
   else
+    min_cur=9
+    min_rev=0
+    min_age=0
     AUTOGEN=`$AUTOOPTS_CONFIG $autoopts_config_args --autogen`
     AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --cflags`
     AUTOGEN_LDFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
@@ -86,102 +89,69 @@ changequote([,])dnl
 #include <stdio.h>
 #include <stdlib.h>
 
+static const char zBadVer[] = "\n\\
+*** 'autoopts-config --version' returned $autoopts_config_current:$autoopts_config_revision:$autoopts_config_age,\n\\
+***                but autoopts returned (%d:%d:0)\n\\
+*** If autoopts-config was correct, then it is best to remove the old version\n\\
+*** of autoopts. You may also be able to fix the error by modifying your\n\\
+*** LD_LIBRARY_PATH enviroment variable, or by editing /etc/ld.so.conf.\n\\
+*** Make sure you have run ldconfig if that is required on your system.\n\\
+*** Otherwise, set the environment variable AUTOOPTS_CONFIG to point to\n\\
+*** the correct copy of autoopts-config, and remove the file config.cache\n\\
+*** before re-running configure.\n";
+
+static const char zOldVer[] = "\n\\
+*** An old version of autoopts (%d:%d:%d) was found.\n\\
+*** You need a version of autoopts newer than $min_cur:$min_rev:$min_age.  \
+The latest version of\n\\
+*** autoopts is always available from http://autogen.sourceforge.net.\n\\
+*** If you have already installed a sufficiently new version, this error\n\\
+*** probably means that the wrong copy of the autoopts-config shell script is\n\\
+*** being found. The easiest way to fix this is to remove the old version\n\\
+*** of autoopts, but you can also set the AUTOOPTS_CONFIG environment to point\n\\
+*** to the correct copy of autoopts-config. (In this case, you will have to\n\\
+*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n\\
+*** so that the correct libraries are found at run-time).\n";
+
+
 int
 main ()
 {
-    int current, revision, age;
-    int autoopts_current, autoopts_revision, autoopts_age;
+    int current, revision;
     char tmp_version[16];
 
     system ("touch conf.optstest");
 
-    /* HP/UX 9 (%@#!) writes to sscanf strings */
-    strcpy(tmp_version, "$min_opts_version");
-    if (sscanf(tmp_version, "%d:%d:%d", &current, &revision, &age) != 3)
-    {
-        printf("%s, bad version string\n", "$min_opts_version");
-        exit(1);
-    }
-
     strcpy(tmp_version, optionVersion());
-    if (sscanf(tmp_version, "%d.%d.%d", &autoopts_current,
-	       &autoopts_revision, &autoopts_age) != 3)
-    {
-        printf("%s, bad version string\n", optionVersion());
+    if (sscanf(tmp_version, "%d.%d", &current, &revision) != 2) {
+        printf("bad version string: -->>%s<<-- is not -->>%d.%d<<--\n",
+               optionVersion(), current, revision);
         exit(1);
     }
 
-    if ((current != $autoopts_config_current) ||
-        (revision != $autoopts_config_revision) ||
-        (age != $autoopts_config_age))
-    {
-        printf("\n*** 'autoopts-config --version' returned %d:%d:%d,"
-               " but autoopts returned (%d:%d:%d)\n",
-	       $autoopts_config_current,
-               $autoopts_config_revision, $autoopts_config_age,
-               current, revision, age);
-        printf("*** If autoopts-config was correct, then it is best to"
-	       "remove the\n");
-        printf("*** old version of autoopts. You may also "
-               "be able to fix the error\n");
-        printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, "
-               "or by editing\n");
-        printf("*** /etc/ld.so.conf. Make sure you have run ldconfig if that "
-               "is\n");
-        printf("*** required on your system.\n");
-        printf("*** If autoopts-config was wrong, set the environment "
-               "variable AUTOOPTS_CONFIG\n");
-        printf("*** to point to the correct copy of autoopts-config, and "
-               "remove the file\n");
-        printf("*** config.cache before re-running configure\n");
+    if (  (current  != $autoopts_config_current)
+       || (revision != $autoopts_config_revision)) {
+        printf( zBadVer, current, revision);
+        return 1;
     }
 #if defined (AO_CURRENT) && defined (AO_REVISION) && defined (AO_AGE)
-    else if (($autoopts_config_current != AO_CURRENT) ||
-             ($autoopts_config_revision != AO_REVISION) ||
-	     ($autoopts_config_age != AO_AGE))
-    {
+    if (  ($autoopts_config_current  != AO_CURRENT)
+       || ($autoopts_config_revision != AO_REVISION)
+       || ($autoopts_config_age      != AO_AGE))  {
         printf("*** autoopts header files (version %d:%d:%d) do not match\n",
-	       AO_CURRENT, AO_REVISION, AO__AGE);
-        printf("*** library (version %d:%d:%d)\n", autoopts_current,
-               autoopts_revision, autoopts_age);
+               AO_CURRENT, AO_REVISION, AO_AGE);
+        printf("*** library (version %d:%d:0)\n", current, revision);
+        return 1;
     }
 #endif
-    else
-    {
-        if ((autoopts_current - autoopts_age > current - age) ||
-            ((autoopts_current - autoopts_age == current - age) &&
-             (autoopts_age > age)) ||
-            ((autoopts_current - autoopts_age == current - age) &&
-             (autoopts_age == age) &&
-             (autoopts_revision >= revision)))
-        {
-            return 0;
-        }
-        else
-        {
-            printf("\n*** An old version of autoopts (%d:%d:%d) was found.\n",
-                   autoopts_current, autoopts_revision, autoopts_age);
-            printf("*** You need a version of autoopts newer than %d:%d:%d.  "
-                   "The latest version of\n", current, revision, age);
-	    printf("*** autoopts is always available from "
-		   "ftp://autogen.linuxave.org.\n");
-            printf("***\n");
-            printf("*** If you have already installed a sufficiently new "
-                   "version, this error\n");
-            printf("*** probably means that the wrong copy of the "
-                   "autoopts-config shell script is\n");
-            printf("*** being found. The easiest way to fix this is to "
-                   "remove the old version\n");
-            printf("*** of autoopts, but you can also set the "
-                   "AUTOOPTS_CONFIG environment to point to the\n");
-            printf("*** correct copy of autoopts-config. (In this case, "
-                   "you will have to\n");
-            printf("*** modify your LD_LIBRARY_PATH enviroment variable, or "
-                   "edit /etc/ld.so.conf\n");
-            printf("*** so that the correct libraries are found at "
-                   "run-time).\n");
-        }
-    }
+
+    if (  ($autoopts_config_current - $autoopts_config_age > $min_cur)
+       || (  ($autoopts_config_current - $autoopts_config_age == $min_cur)
+          && ($autoopts_config_revision >= $min_rev) ))
+        return 0;
+
+    printf(zOldVer, $autoopts_config_current, $autoopts_config_revision,
+           $autoopts_config_age);
     return 1;
 }
 ],, no_autoopts=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])

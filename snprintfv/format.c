@@ -35,8 +35,6 @@
 #  include <dmalloc.h>
 #endif
 
-#include <float.h>
-#include <math.h>
 #include <stddef.h>
 
 #ifdef HAVE_WCHAR_H
@@ -45,28 +43,19 @@
 
 #include "printf.h"
 
-#ifdef HAVE_LONG_DOUBLE
-#ifndef HAVE_FREXPL
-static long double frexpl (long double x, int *exp);
-#endif
-#ifndef HAVE_LDEXPL
-static long double ldexpl (long double x, int exp);
-#endif
-#else
-#define frexpl frexp
-#define ldexpl ldexp
-#endif
+#ifndef NO_FLOAT_PRINTING
+# include <float.h>
+# include <math.h>
 
-static printf_function
-    printf_char,          printf_count,   printf_flag,
-    printf_float,         printf_integer,
-    printf_numeric_param, printf_pointer, printf_string;
-
-static printf_arginfo_function
-    printf_flag_info,
-    printf_modifier_info, printf_numeric_param_info;
-
-printf_arginfo_function printf_generic_info;
+# ifdef HAVE_LONG_DOUBLE
+#  ifndef HAVE_MODFL
+      static long double snv_modfl (long double x, long double *exp);
+#     define modfl snv_modfl
+#  endif
+# else
+#  define modfl(x,exp) modf((double)(x), (double*)(exp))
+# endif
+#endif
 
 
 static uintmax_t
@@ -91,36 +80,39 @@ static intmax_t
 fetch_intmax (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
-    return (intmax_t) arg->pa_long_long_int;
+    return (intmax_t) (signed long long) arg->pa_long_long_int;
 
   if (pinfo->is_long)
-    return (intmax_t) arg->pa_long_int;
+    return (intmax_t) (signed long) arg->pa_long_int;
 
   if (pinfo->is_short)
-    return (intmax_t) arg->pa_short_int;
+    return (intmax_t) (signed short) arg->pa_short_int;
 
   if (pinfo->is_char)
-    return (intmax_t) arg->pa_char;
+    return (intmax_t) (signed char) arg->pa_char;
 
-  return (intmax_t) arg->pa_int;
+  return (intmax_t) (signed int) arg->pa_int;
 }
-
-static snv_long_double
+ 
+#ifndef NO_FLOAT_PRINTING
+static long double
 fetch_double (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
     return arg->pa_long_double;
   else
-    return (snv_long_double) (arg->pa_double);
+    return (long double) (arg->pa_double);
 }
+#endif
 
 
+#ifndef NO_FLOAT_PRINTING
 #ifndef HAVE_COPYSIGNL
-static snv_long_double
-copysignl (snv_long_double x, snv_long_double y)
+static long double
+copysignl (long double x, long double y)
 {
 #ifdef HAVE_COPYSIGN
-  return x * (snv_long_double) copysign (1.0, x * y);
+  return x * (long double) copysign (1.0, x * y);
 #else
   /* If we do not have copysign, assume zero is unsigned (too risky to
      assume we have infinities, which would allow to test with
@@ -128,362 +120,301 @@ copysignl (snv_long_double x, snv_long_double y)
   return (x < 0.0 ^ y < 0.0) ? x * -1.0 : x;
 #endif
 }
-#endif
+#endif /* HAVE_COPYSIGNL */
 
-static snv_long_double
-ipow (snv_long_double base, int n)
+/* These two routines are cleaned up version of the code in libio 2.95.3
+   (actually I got it from the Attic, not from the released tarball).
+   The changes were mainly to share code between %f and %g (libio did
+   share some code between %e and %g), and to share code between the
+   %e and %f when invoked by %g.  Support from infinities and NaNs comes
+   from the old snprintfv code.  */
+
+static char *
+print_float_round (long double fract, int *exp, char *start, char *end,
+		   char ch, int *signp)
 {
-  int k = 1;
-  snv_long_double result = 1.0;
-  if (n < 0)
-    {
-      base = 1.0 / base;
-      n = -n;
-    }
+  long double tmp;
+  if (fract)
+    (void) modfl (fract * 10, &tmp);
+  else
+    tmp = ch - '0';
 
-  while (n)
-    {
-      if (n & k)
-	{
-	  result *= base;
-	  n ^= k;
-	}
-      base *= base;
-      k <<= 1;
-    }
-  return result;
+  if (tmp > 4)
+    for (;; --end)
+      {
+	if (*end == '.')
+	  --end;
+	if (end == start)
+	  {
+	    if (exp) /* e/E; increment exponent */
+	      ++end, ++*exp;
+
+	    *end = '1';
+	    break;
+	  }
+	if (++*end <= '9')
+	  break;
+	*end = '0';
+      }
+
+  /* ``"%.3f", (double)-0.0004'' gives you a negative 0. */
+  else if (*signp == '-')
+    for (;; --end)
+      {
+	if (*end == '.')
+	  --end;
+	if (*end != '0')
+	  break;
+	if (end == start)
+	  *signp = 0;
+      }
+  return (start);
 }
 
 static int
-print_float (struct printf_info *pinfo, char *buf, snv_long_double n)
+print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, long double n)
 {
-  /* Print value of n in a buffer in the given base.
-     Based upon the algorithm outlined in:
-     Robert G. Burger and R. Kent Dybvig
-     Printing Floating Point Numbers Quickly and Accurately
-     ACM SIGPLAN 1996 Conference on Programming Language Design and Implementation
-     June 1996.
+  int prec, fmtch;
+  char *p, *t;
+  long double fract;
+  int expcnt, gformat = 0;
+  long double integer, tmp;
+  char expbuf[10];
 
-     This version performs all calculations with long doubles. */
-
-#ifdef HAVE_LONG_DOUBLE
-#define OUT_BITS (LDBL_MANT_DIG - 3)
-#define BASE 10.0L
-#define LOG_BASE 3.3219280948873623478703194294893901758648L
-#else
-#define OUT_BITS (DBL_MANT_DIG - 3)
-#define BASE 10.0
-#define LOG_BASE 3.3219280948873623478703194294893901758648
-#endif
-
-  int exp, base_exp, d, zeros_dropped = 0, dec_point_count, prec;
-  boolean g_format, fixed_format, drop_zeros, tc1, tc2;
-  snv_long_double m, m_plus, m_minus, significand, round, scale;
-  char exp_char, *p = buf;
-
-  /* Parse the specifier and adapt our printing format to it */
-  exp_char = pinfo->spec < 'a' ? 'E' : 'e';
   prec = pinfo->prec;
-  switch (pinfo->spec)
-    {
-    case 'e':
-    case 'E':
-      drop_zeros = FALSE;
-      fixed_format = FALSE;
-      g_format = FALSE;
-      break;
-
-    case 'f':
-    case 'F':
-      drop_zeros = FALSE;
-      fixed_format = TRUE;
-      g_format = FALSE;
-      break;
-
-    case 'g':
-    case 'G':
-      prec = pinfo->prec = MAX (1, prec);
-      drop_zeros = !pinfo->alt;
-      g_format = TRUE;
-      break;
-
-    default:
-      abort ();
-    }
+  fmtch = pinfo->spec;
+  t = startp;
 
   /* Do the special cases: nans, infinities, zero, and negative numbers. */
   if (n != n)
     {
       /* Not-a-numbers are printed as a simple string. */
-      *p++ = pinfo->spec < 'a' ? 'N' : 'n';
-      *p++ = pinfo->spec < 'a' ? 'A' : 'a';
-      *p++ = pinfo->spec < 'a' ? 'N' : 'n';
-      return p - buf;
+      *t++ = fmtch < 'a' ? 'N' : 'n';
+      *t++ = fmtch < 'a' ? 'A' : 'a';
+      *t++ = fmtch < 'a' ? 'N' : 'n';
+      return t - startp;
     }
 
   /* Zero and infinity also can have a sign in front of them. */
   if (copysignl (1.0, n) < 0.0)
     {
       n = -1.0 * n;
-      *p++ = '-';
+      *signp = '-';
     }
-  else if (pinfo->showsign)
-    *p++ = '+';
-  else if (pinfo->space)
-    *p++ = ' ';
-
-  if (n == 0.0)
-    {
-      /* Zero is printed as either '0' or '0.00000...' */
-      *p++ = '0';
-
-      /* For 'g' and 'G', we printed a significant digit. */
-      if (pinfo->spec == 'g' || pinfo->spec == 'G')
-	prec--;
-
-      if (!drop_zeros && (prec > 0 || pinfo->alt))
-	{
-	  *p++ = '.';
-	  memset (p, '0', prec);
-	  p += prec;
-	}
-
-      if (pinfo->spec == 'e' || pinfo->spec == 'E')
-	{
-	  *p++ = pinfo->spec;
-	  *p++ = '+';
-	  *p++ = '0';
-	  *p++ = '0';
-	}
-
-      return p - buf;
-    }
+  else
+    *signp = 0;
 
   if ((n - n) != (n - n))
     {
       /* Infinities are printed as a simple string. */
-      *p++ = pinfo->spec < 'a' ? 'I' : 'i';
-      *p++ = pinfo->spec < 'a' ? 'N' : 'n';
-      *p++ = pinfo->spec < 'a' ? 'F' : 'f';
-      return p - buf;
+      *t++ = fmtch < 'a' ? 'I' : 'i';
+      *t++ = fmtch < 'a' ? 'N' : 'n';
+      *t++ = fmtch < 'a' ? 'F' : 'f';
+      return t - startp;
     }
 
-  /* Do the black magic required to initialize the loop. */
-  significand = frexpl (n, &exp);
-  base_exp = ceil (exp / LOG_BASE);
+  expcnt = 0;
+  fract = modfl (n, &integer);
 
-  /* The algorithm repeatedly strips off the leading digit
-     of the number, prints it, and multiplies by 10 to get
-     the next one.  However to avoid overflows when we have
-     big numbers or denormals (whose reciprocal is +Inf) we
-     have sometimes to work on scaled versions of n.  This
-     scaling factor goes into m.
+  /* get an extra slot for rounding. */
+  *t++ = '0';
 
-     m_plus and m_minus track the indetermination in the bits
-     of n that we print (not n/m in this case) so that we have
-     a precise measure of when we have printed a number that
-     is equivalent to n.  */
-
-  m = 1.0;
-  if (exp >= 0)
+  /* get integer portion of number; put into the end of the buffer; the
+     .01 is added for modfl (356.0 / 10, &integer) returning .59999999...  */
+  for (p = endp - 1; p >= startp && integer; ++expcnt)
     {
-      m_plus = ldexpl (1.0, exp - OUT_BITS);
-      m_minus = (significand != 1.0) ? m_plus : m_plus / 2.0;
+      tmp = modfl (integer / 10, &integer);
+      *p-- = '0' + ((int) ((tmp + .01L) * 10));
+    }
+
+  switch (fmtch)
+    {
+    case 'g':
+    case 'G':
+      gformat = 1;
+
+      /* a precision of 0 is treated as a precision of 1. */
+      if (!prec)
+	pinfo->prec = ++prec;
+
+      /* ``The style used depends on the value converted; style e
+         will be used only if the exponent resulting from the
+         conversion is less than -4 or greater than the precision.''
+                -- ANSI X3J11 */
+      if (expcnt > prec || (!expcnt && fract && fract < .0001L))
+	{
+	  /* g/G format counts "significant digits, not digits of
+	     precision; for the e/E format, this just causes an
+	     off-by-one problem, i.e. g/G considers the digit
+	     before the decimal point significant and e/E doesn't
+	     count it as precision.  */
+	  --prec;
+	  fmtch -= 2;		/* G->E, g->e */
+	  goto eformat;
+	}
+      else
+	{
+          /* Decrement precision */
+          if (n != 0.0L)
+	    prec -= (endp - p) - 1;
+	  else
+	    prec--;
+
+	  goto fformat;
+	}
+
+    case 'f':
+    case 'F':
+    fformat:
+      /* reverse integer into beginning of buffer */
+      if (expcnt)
+	for (; ++p < endp; *t++ = *p);
+      else
+	*t++ = '0';
+
+      /* If precision required or alternate flag set, add in a
+         decimal point.  */
+      if (pinfo->prec || pinfo->alt)
+	*t++ = '.';
+
+      /* if requires more precision and some fraction left */
+      if (fract)
+	{
+	  if (prec)
+	    {
+	      /* For %g, if no integer part, don't count initial
+	         zeros as significant digits. */
+	      do
+		{
+		  fract = modfl (fract * 10, &tmp);
+		  *t++ = '0' + ((int) tmp);
+		}
+	      while (!tmp && !expcnt && gformat);
+
+	      while (--prec && fract)
+		{
+		  fract = modfl (fract * 10, &tmp);
+		  *t++ = '0' + ((int) tmp);
+		}
+	    }
+
+	  if (fract)
+	    startp =
+	      print_float_round (fract, (int *) NULL, startp, t - 1, (char) 0, signp);
+	}
+
+      break;
+
+    case 'e':
+    case 'E':
+    eformat:
+      if (expcnt)
+	{
+	  *t++ = *++p;
+	  if (pinfo->prec || pinfo->alt)
+	    *t++ = '.';
+
+	  /* if requires more precision and some integer left */
+	  for (; prec && ++p < endp; --prec)
+	    *t++ = *p;
+
+	  /* if done precision and more of the integer component,
+	     round using it; adjust fract so we don't re-round
+	     later.  */
+	  if (!prec && ++p < endp)
+	    {
+	      fract = 0;
+	      startp = print_float_round ((long double) 0, &expcnt, startp, t - 1, *p, signp);
+	    }
+
+	  /* adjust expcnt for digit in front of decimal */
+	  --expcnt;
+	}
+
+      /* until first fractional digit, decrement exponent */
+      else if (fract)
+	{
+	  /* adjust expcnt for digit in front of decimal */
+	  for (expcnt = -1;; --expcnt)
+	    {
+	      fract = modfl (fract * 10, &tmp);
+	      if (tmp)
+		break;
+	    }
+	  *t++ = '0' + ((int) tmp);
+	  if (pinfo->prec || pinfo->alt)
+	    *t++ = '.';
+	}
+
+      else
+	{
+	  *t++ = '0';
+	  if (pinfo->prec || pinfo->alt)
+	    *t++ = '.';
+	}
+
+      /* if requires more precision and some fraction left */
+      if (fract)
+	{
+	  if (prec)
+	    do
+	      {
+		fract = modfl (fract * 10, &tmp);
+		*t++ = '0' + ((int) tmp);
+	      }
+	    while (--prec && fract);
+
+	  if (fract)
+	    startp = print_float_round (fract, &expcnt, startp, t - 1, (char) 0, signp);
+	}
+      break;
+
+    default:
+      abort ();
+    }
+
+  /* %e/%f/%#g add 0's for precision, others trim 0's */
+  if (gformat && !pinfo->alt)
+    {
+      while (t > startp && *--t == '0');
+      if (*t != '.')
+        ++t;
     }
   else
+    for (; prec--; *t++ = '0');
+
+  if (fmtch == 'e' || fmtch == 'E')
     {
-      n = ldexpl (n, OUT_BITS);
-      m = ldexpl (m, OUT_BITS);
-#ifdef HAVE_LONG_DOUBLE
-      m_minus = ldexpl (1.0, MAX (exp, LDBL_MIN_EXP - 3));
-      m_plus = (exp == LDBL_MIN_EXP - 2 || significand != 1.0)
-	? m_minus : m_minus * 2.0;
-#else
-      m_minus = ldexpl (1.0, MAX (exp, DBL_MIN_EXP - 3));
-      m_plus = (exp == DBL_MIN_EXP - 2 || significand != 1.0)
-	? m_minus : m_minus * 2.0;
-#endif
-    }
-
-  if (base_exp >= 0)
-    {
-#ifdef HAVE_LONG_DOUBLE
-      if (exp == LDBL_MAX_EXP)
-#else
-      if (exp == DBL_MAX_EXP)
-#endif
-	{
-	  /* Scale down to prevent overflow to Infinity during conversion */
-	  n /= BASE;
-	  m /= BASE;
-	  m_plus /= BASE;
-	  m_minus /= BASE;
-	  base_exp--;
-	}
-    }
-  else
-    {
-#ifdef HAVE_LONG_DOUBLE
-      if (exp < LDBL_MIN_EXP - 2)
-#else
-      if (exp < DBL_MIN_EXP - 2)
-#endif
-	{
-	  /* Scale up to prevent denorm reciprocals overflowing to Infinity */
-	  d = ceil (53 / LOG_BASE);
-	  scale = ipow (BASE, d);
-	  n *= scale;
-	  m *= scale;
-	  m_plus *= scale;
-	  m_minus *= scale;
-	}
-    }
-
-  /* Modify m so that 1 <= n/m < 10 and round the last printed digits.  If
-     the precision is high enough, the RHS is too small to actually change
-     n, so we still need to check for rounding in the loop below.  */
-  m *= ipow (BASE, base_exp);
-  base_exp++;
-
-  for (;;)
-    {
-      /* Decide which format to adopt for %g and %G */
-      if (g_format)
-        fixed_format = base_exp > -4 && base_exp <= pinfo->prec;
-    
-      dec_point_count = fixed_format ? base_exp : 1;
-
-      /* For %g/%G, the precision specifies the number of printed
-         significant digits, not the number of decimal digits.  */
-      if (g_format)
-        prec = pinfo->prec - dec_point_count;
-
-      round = m * 5 * ipow (BASE, -dec_point_count - prec);
-
-      if (n + round >= BASE * m)
-        m *= BASE, base_exp++;
-
-      else if (n + round + m_plus < m)
-        m /= BASE, base_exp--;
-
+      *t++ = fmtch;
+      if (expcnt < 0)
+        {
+          expcnt = -expcnt;
+          *t++ = '-';
+        }
       else
-	break;
-    }
+        *t++ = '+';
 
-  /* Not in scientific notation.  Print 0.00000's if needed */
-  if (fixed_format)
-    {
-      if (dec_point_count <= 0)
-	*p++ = '0';
-
-      if (dec_point_count < 0)
-	{
-	  *p++ = '.';
-	  memset (p, '0', -dec_point_count);
-	  p += MIN (prec, -dec_point_count);
-	}
-    }
-
-  n += round;
-
-  do
-    {
-      /* Extract the most significant digit and test the
-	 two termination conditions corresponding to underflow. */
-      d = floor (n / m);
-      n -= d * m;
-
-      tc1 = n < m_minus;
-      tc2 = n + m_plus >= m;
-      if (tc2 && (!tc1 || n * 2.0 >= m))
-	/* Check whether printing the correct value requires us
-	   to round towards +infinity. */
-	d++;
-
-      if (drop_zeros && d == 0 && dec_point_count <= 0)
-	/* Keep a count of trailing zeros after the decimal point. */
-	zeros_dropped++;
-      else
-	{
-	  /* Write zeros that we thought were trailing. */
-	  if (dec_point_count == -zeros_dropped)
-	    *p++ = '.';
-
-	  while (zeros_dropped--)
-	    *p++ = '0';
-
-	  zeros_dropped = 0;
-	  *p++ = d + '0';
-	}
-
-      n *= BASE;
-      m_plus *= BASE;
-      m_minus *= BASE;
-    }
-  /* Exit when we underflow n, or when we wrote all the
-     decimal places we were asked for. */
-  while (--dec_point_count > -prec && !tc1 && !tc2);
-
-  /* Write trailing zeros *before* the decimal point. */
-  if (dec_point_count > 0)
-    {
-      memset (p, '0', dec_point_count);
-      p += dec_point_count;
-      dec_point_count = 0;
-    }
-
-  /* Don't put the decimal point if there are no trailing
-     zeros, unless %# was given. */
-  if (dec_point_count == 0 && (prec > 0 || pinfo->alt))
-    *p++ = '.';
-
-  /* If asked for, write trailing zeros *after* the decimal point. */
-  if (!drop_zeros && prec + dec_point_count > 0)
-    {
-      memset (p, '0', prec + dec_point_count);
-      p += prec + dec_point_count;
-    }
-
-  /* Print the exponent now. */
-  if (!fixed_format)
-    {
-      char x[10], *q = x;
-      *p++ = exp_char;
-      base_exp--;
-      if (base_exp < 0)
-	{
-	  *p++ = '-';
-	  base_exp = -base_exp;
-	}
-      else
-	*p++ = '+';
-
-      if (base_exp < 10)
-	/* At least two digits in the exponent please. */
-	*p++ = '0';
-
+      p = expbuf;
       do
-	{
-	  *q++ = base_exp % 10 + '0';
-	  base_exp /= 10;
-	}
-      while (base_exp != 0);
-
-      /* Copy to the main buffer in reverse order */
-      while (q > x)
-	*p++ = *--q;
+        *p++ = '0' + (expcnt % 10);
+      while ((expcnt /= 10) > 9);
+      *p++ = '0' + expcnt;
+      while (p > expbuf)
+	*t++ = *--p;
     }
 
-  return p - buf;
-}
-
+  if (!*signp)
+    {
+      if (pinfo->showsign)
+        *signp = '+';
+      else if (pinfo->space)
+        *signp = ' ';
+    }
 
-static int
-printf_flag (STREAM *stream, struct printf_info *const pinfo,
-			 union printf_arg const *args)
-{
-  return 0;
+  return (t - startp);
 }
+#endif
+
 
 static int
 printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
@@ -546,30 +477,21 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
   return 0;
 }
 
-static int
-printf_numeric_param (STREAM *stream, struct printf_info *const pinfo,
-					  union printf_arg const *args)
-{
-  /* Called twice if both the width and precision are
-     asterisks, in which case we extract the width on
-     the first call and the precision on the second.  */
-  if (pinfo->width == INT_MIN)
-    pinfo->width = args->pa_int;
- 
-  else if (pinfo->prec == INT_MIN)
-    pinfo->prec = args->pa_int;
+/* This function has considerably more freedom than the others in
+   playing with pinfo; in particular, it modifies argindex and can
+   return completely bogus values whose only purpose is to extend
+   the argtypes vector so that it has enough items for the positional
+   parameter of the width (in the *n$ case).  It also expects that
+   argtypes = (base of argtypes vector) + pinfo->argindex.
 
-  return 0;
-}
- 
+   This is messy, suggestion for simplifying it are gladly accepted.  */
 static int
-printf_numeric_param_info (struct printf_info *const pinfo, size_t n,
-						   int *argtypes)
+printf_numeric_param_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   const char *pEnd = NULL;
   int found = 0, allowed_states, new_state;
-
-  unsigned long value;		/* we use strtoul, and cast back to int. */
+  int position = 0, skipped_args = 0;
+  long value;
 
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -580,12 +502,9 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n,
       found |= 1;
     }
 
-  /* Parse the ``*''. */
+  /* First we might have a ``*''. */
   if (*pinfo->format == '*')
     {
-      if (n)
-        argtypes[0] = PA_INT;
-
       pinfo->format++;
       found |= 2;
     }
@@ -606,48 +525,79 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n,
       return -1;
     }
 
-  /* Finally look for a $. */
+  /* And finally a dollar sign. */
   if (*pinfo->format == '$')
     {
+      if (value == 0)
+	{
+          PRINTF_ERROR (pinfo, "invalid position specifier");
+          return -1;
+	}
+
+      position = value;
       pinfo->format++;
       found |= 8;
+    }
+
+  switch (found & 14)
+    {
+    /* We found a * specification */
+    case 2:
+      if (pinfo->args)
+	value = pinfo->args[pinfo->argindex].pa_int;
+      if (n)
+	argtypes[0] = PA_INT;
+      pinfo->argindex++;
+      skipped_args = 1;
+      found ^= 6;
+      break;
+
+    /* We found a *n$ specification */
+    case 14:
+      if (n + pinfo->argindex > position - 1)
+	argtypes[position - 1 - pinfo->argindex] = PA_INT;
+
+      /* Else there is not enough space, reallocate and retry please...
+         ... but we must say how much to skip.  */
+      if (position >= pinfo->argindex)
+        skipped_args = position - pinfo->argindex;
+
+      if (pinfo->args)
+	value = pinfo->args[position - 1].pa_int;
+      found ^= 10;
+      break;
     }
 
   switch (found)
     {
     /* We must have read a width specification. */
-    case 2:
-      value = INT_MIN;
-
     case 4:
       allowed_states = SNV_STATE_BEGIN | SNV_STATE_WIDTH;
       new_state = ~(SNV_STATE_BEGIN | SNV_STATE_FLAG | SNV_STATE_WIDTH);
+
+      /* How awful... */
+      if (value < 0)
+	{
+	  pinfo->pad = ' ';
+	  pinfo->left = TRUE;
+	  value = -value;
+	}
+
       pinfo->width = value;
       break;
 
-    case 14:
-      PRINTF_ERROR (pinfo, "position specifications for widths not supported");
-      return -1;
-
     /* We must have read a precision specification. */
-    case 3:
-      value = INT_MIN;
-
     case 5:
       allowed_states = SNV_STATE_PRECISION | SNV_STATE_BEGIN;
       new_state = SNV_STATE_MODIFIER | SNV_STATE_SPECIFIER;
       pinfo->prec = value;
       break;
 
-    case 15:
-      PRINTF_ERROR (pinfo, "precision specifications for precisions not supported");
-      return -1;
-
     /* We must have read a position specification. */
     case 12:
       allowed_states = SNV_STATE_BEGIN;
       new_state = ~SNV_STATE_BEGIN;
-      pinfo->dollar = value;
+      pinfo->dollar = position;
       break;
 
     /* We must have read something bogus. */
@@ -664,9 +614,7 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n,
 
   pinfo->state = new_state;
   pinfo->format--;
-
-  /* Return the number of arguments used. */
-  return (found & 2) != 0;
+  return skipped_args;
 }
 
 static int
@@ -740,53 +688,9 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
   return 0;
 }
 
-/**
- * printf_generic_info:
- * @pinfo: the current state information for the format
- * string parser.
- * @n: the number of available slots in the @argtypes array
- * @argtypes: the pointer to the first slot to be filled by the
- * function
- *
- * An example implementation of a %printf_arginfo_function, which
- * takes the basic type from the type given in the %spec_entry
- * and adds flags depending on what was parsed (e.g. %PA_FLAG_SHORT
- * is %pparser->is_short and so on).
- *
- * Return value:
- * Always 1.
- */
-int
-printf_generic_info (struct printf_info *const pinfo, size_t n, int *argtypes)
-{
-  int type = pinfo->type;
-
-  if (!n)
-    return 1;
-
-  if ((type & PA_TYPE_MASK) == PA_POINTER)
-    type |= PA_FLAG_UNSIGNED;
-
-  if (pinfo->is_char)
-    type = PA_CHAR;
-
-  if (pinfo->is_short)
-    type |= PA_FLAG_SHORT;
-
-  if (pinfo->is_long)
-    type |= PA_FLAG_LONG;
-
-  if (pinfo->is_long_double)
-    type |= PA_FLAG_LONG_LONG;
-
-  argtypes[0] = type;
-  return 1;
-}
-
 
 static int
-printf_char (STREAM *stream, struct printf_info *const pinfo,
-			 union printf_arg const *args)
+printf_char (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
   char ch = '\0';
@@ -830,16 +734,17 @@ printf_char (STREAM *stream, struct printf_info *const pinfo,
   return count_or_errorcode;
 }
 
+#ifndef NO_FLOAT_PRINTING
+
 static int
-printf_float (STREAM *stream, struct printf_info *const pinfo,
-			  union printf_arg const *args)
+printf_float (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
-  snv_long_double value = 0.0;
-  int len, count_or_errorcode = SNV_OK;
+  long double value = 0.0;
+  int sign, len, count_or_errorcode = SNV_OK;
 #ifdef HAVE_LONG_DOUBLE
-  char buffer[LDBL_MAX_10_EXP + 20], *p = buffer;
+  char buffer[LDBL_MAX_10_EXP * 2 + 20], *p = buffer;
 #else
-  char buffer[DBL_MAX_10_EXP + 20], *p = buffer;
+  char buffer[DBL_MAX_10_EXP * 2 + 20], *p = buffer;
 #endif
 
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
@@ -860,9 +765,14 @@ printf_float (STREAM *stream, struct printf_info *const pinfo,
   value = fetch_double (pinfo, args);
 
   /* Convert the number into a string. */
-  len = print_float (pinfo, buffer, value);
+  len = print_float (pinfo, buffer, buffer + sizeof (buffer), &sign, value);
+  if (*buffer == '0')
+    p++, len--;
 
+  /* Compute the size of the padding.  */
   pinfo->width -= len;
+  if (sign)
+    pinfo->width--;
 
   /* Left pad to the remaining width if the supplied argument is less
      than the width specifier, and the padding character is ' '.  */
@@ -871,14 +781,8 @@ printf_float (STREAM *stream, struct printf_info *const pinfo,
       SNV_EMIT (pinfo->pad, stream, count_or_errorcode);
 
   /* Display any sign character. */
-  if (count_or_errorcode >= 0)
-    {
-      if (*p == '+' || *p == '-' || *p == ' ')
-	{
-	  SNV_EMIT (*p++, stream, count_or_errorcode);
-	  len--;
-	}
-    }
+  if (count_or_errorcode >= 0 && sign)
+    SNV_EMIT (sign, stream, count_or_errorcode);
 
   /* Left pad to the remaining width if the supplied argument is less
      than the width specifier, and the padding character is not ' '.  */
@@ -900,10 +804,10 @@ printf_float (STREAM *stream, struct printf_info *const pinfo,
   /* Return the number of characters emitted. */
   return count_or_errorcode;
 }
+#endif
 
 static int
-printf_count (STREAM *stream, struct printf_info *const pinfo,
-			  union printf_arg const *args)
+printf_count (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   if (pinfo->is_char)
     *(char *) (args->pa_pointer) = pinfo->count;
@@ -924,8 +828,7 @@ printf_count (STREAM *stream, struct printf_info *const pinfo,
 }
 
 static int
-printf_integer (STREAM *stream, struct printf_info *const pinfo,
-				union printf_arg const *args)
+printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   static const char digits_lower[] = "0123456789abcdefghijklmnopqrstuvwxyz";
   static const char digits_upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1066,8 +969,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo,
 }
 
 static int
-printf_pointer (STREAM *stream, struct printf_info *const pinfo,
-				union printf_arg const *args)
+printf_pointer (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
 
@@ -1120,8 +1022,7 @@ printf_pointer (STREAM *stream, struct printf_info *const pinfo,
 }
 
 static int
-printf_string (STREAM *stream, struct printf_info *const pinfo,
-			   union printf_arg const *args)
+printf_string (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int len = 0, count_or_errorcode = SNV_OK;
   const char *p = NULL;
@@ -1180,92 +1081,42 @@ printf_string (STREAM *stream, struct printf_info *const pinfo,
   /* Return the number of characters emitted. */
   return count_or_errorcode;
 }
+
 
 
-/* replacements for frexpl and ldexpl follow */
+/* replacement for modfl follow.  */
 
-#if defined HAVE_LONG_DOUBLE && !defined HAVE_FREXPL
+#ifndef NO_FLOAT_PRINTING
 
-/* Binary search.  Quite inefficient but portable. */
-static long double
-frexpl(long double x, int *exp)
+static long double snv_modfl (long double x, long double *exp)
 {
-  long double exponents[20], *next;
-  int exponent, bit;
+  /* To compute the integer part of a positive integer (in this case
+     abs(X)), sum a big enough integer to the absolute value, so that
+     the precision of the floating point number is exactly 1.  Then
+     we round towards zero.
 
-  /* Check for zero, nan and infinity. */
-  if (x != x || x + x == x )
+     The code in the two branches is the same but it considers -x
+     if x is negative.  */
+
+  long double z;
+  if (x < 0.0L)
     {
-      *exp = 0;
-      return x;
-    }
+      z = 1.0L / LDBL_EPSILON - x - 1.0 / LDBL_EPSILON;
+      if (z + x > 0.0L)
+        z = z - 1.0L;
 
-  if (x < 0)
-    return -frexpl(-x, exp);
-
-  exponent = 0;
-  if (x > 1.0)
-    {
-      for (next = exponents, exponents[0] = 2.0L, bit = 1;
-	   *next <= x + x;
-	   bit <<= 1, next[1] = next[0] * next[0], next++);
-
-      for (; next >= exponents; bit >>= 1, next--)
-	if (x + x >= *next)
-	  {
-	    x /= *next;
-	    exponent |= bit;
-	  }
-
-    }
-
-  else if (x < 0.5)
-    {
-      for (next = exponents, exponents[0] = 0.5L, bit = 1;
-	   *next > x;
-	   bit <<= 1, next[1] = next[0] * next[0], next++);
-
-      for (; next >= exponents; bit >>= 1, next--)
-	if (x < *next)
-	  {
-	    x /= *next;
-	    exponent |= bit;
-	  }
-
-      exponent = -exponent;
-    }
-
-  *exp = exponent;
-  return x;
-}
-#endif
-
-#if defined HAVE_LONG_DOUBLE && !defined HAVE_LDEXPL
-
-static long double
-ldexpl(long double x, int exp)
-{
-  long double factor;
-  int bit;
-
-  /* Check for zero, nan and infinity. */
-  if (x != x || x + x == x )
-    return x;
-
-  if (exp < 0)
-    {
-      exp = -exp;
-      factor = 0.5L;
+      return (*exp = -z) + x;
     }
   else
-    factor = 2.0L;
+    {
+      z = 1.0L / LDBL_EPSILON + x - 1.0 / LDBL_EPSILON;
+      if (z > x)
+        z = z - 1.0L;
 
-  for (bit = 1; bit <= exp; bit <<= 1, factor *= factor)
-    if (exp & bit)
-      x *= factor;
-
-  return x;
+      return x - (*exp = z);
+    }
 }
+
 #endif
 
 
@@ -1283,51 +1134,54 @@ ldexpl(long double x, int exp)
 
 spec_entry snv_default_spec_table[] = {
   /* ch  type         function */
-  {' ', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'#', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'+', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'-', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'\'', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'*', TRUE, PA_INT, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'.', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'0', TRUE, 0, printf_flag, printf_flag_info, NULL},
-  {'1', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'2', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'3', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'4', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'5', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'6', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'7', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'8', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'9', TRUE, 0, printf_numeric_param, printf_numeric_param_info, NULL},
-  {'c', FALSE, PA_CHAR, printf_char, NULL, NULL},
-  {'d', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'e', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'E', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'f', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'F', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'g', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'G', FALSE, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
-  {'h', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'i', FALSE, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'j', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'l', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'L', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'n', FALSE, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info, NULL},
-  {'o', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+  {' ', 0, 0, NULL, printf_flag_info, NULL},
+  {'#', 0, 0, NULL, printf_flag_info, NULL},
+  {'+', 0, 0, NULL, printf_flag_info, NULL},
+  {'-', 0, 0, NULL, printf_flag_info, NULL},
+  {'\'', 0, 0, NULL, printf_flag_info, NULL},
+  {'*', 0, PA_INT, NULL, printf_numeric_param_info, NULL},
+  {'$', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'.', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'0', 0, 0, NULL, printf_flag_info, NULL},
+  {'1', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'2', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'3', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'4', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'5', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'6', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'7', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'8', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'9', 0, 0, NULL, printf_numeric_param_info, NULL},
+  {'c', 0, PA_CHAR, printf_char, NULL, NULL},
+  {'d', 0, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
+#ifndef NO_FLOAT_PRINTING
+  {'e', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'E', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'f', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'F', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'g', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+  {'G', 0, PA_DOUBLE, printf_float, printf_generic_info, (snv_pointer) 6},
+#endif
+  {'h', 0, 0, NULL, printf_modifier_info, NULL},
+  {'i', 0, PA_INT, printf_integer, printf_generic_info, (snv_pointer) 10},
+  {'j', 0, 0, NULL, printf_modifier_info, NULL},
+  {'l', 0, 0, NULL, printf_modifier_info, NULL},
+  {'L', 0, 0, NULL, printf_modifier_info, NULL},
+  {'n', 0, PA_INT | PA_FLAG_PTR, printf_count, printf_generic_info, NULL},
+  {'o', 0, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 8},
-  {'p', FALSE, PA_POINTER, printf_pointer, NULL, (snv_pointer) 16},
-  {'q', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'s', FALSE, PA_STRING, printf_string, NULL, NULL},
-  {'t', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'u', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+  {'p', 0, PA_POINTER, printf_pointer, NULL, (snv_pointer) 16},
+  {'q', 0, 0, NULL, printf_modifier_info, NULL},
+  {'s', 0, PA_STRING, printf_string, NULL, NULL},
+  {'t', 0, 0, NULL, printf_modifier_info, NULL},
+  {'u', 0, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 10},
-  {'x', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+  {'x', 0, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 16},
-  {'X', FALSE, PA_INT | PA_FLAG_UNSIGNED,
+  {'X', 0, PA_INT | PA_FLAG_UNSIGNED,
    printf_integer, printf_generic_info, (snv_pointer) 16},
-  {'z', TRUE, 0, printf_flag, printf_modifier_info, NULL},
-  {'\0', FALSE, PA_LAST, NULL, NULL, NULL}
+  {'z', 0, 0, NULL, printf_modifier_info, NULL},
+  {'\0', 0, PA_LAST, NULL, NULL, NULL}
 };
 
 /* format.c ends here */
