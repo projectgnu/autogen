@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.3 2003/04/21 03:35:34 bkorb Exp $
+# $Id: directive.tpl,v 3.4 2003/05/17 02:45:19 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -27,16 +27,16 @@ struct dir_table {
  *  Declare the procedures that will handle the directives
  */
 static tDirProc doDir_IGNORE;[=
-FOR directive =][=
+FOR directive    =][=
   IF (not (exist? "dummy")) =]
 static tDirProc doDir_[=name=];[=
-  ENDIF=][=
+  ENDIF          =][=
 ENDFOR directive =]
 
 /*
  *  Define the constant string names for each directive
  */[=
-FOR directive =]
+FOR directive    =]
 static const char z[=% name (string-capitalize! (sprintf "%%-12s" "%s[]"))
        =] = "[=% name (string-downcase! "%s") =]";[=
 ENDFOR directive
@@ -55,12 +55,23 @@ ENDFOR directive=]
 static tDirTable dirTable[ DIRECTIVE_CT ] = {[=
 FOR directive , =]
     { sizeof( z[=% name (string-capitalize! (sprintf "%%-14s" "%s )-1,"))
-       =]z[=% name (string-capitalize! (sprintf "%%-10s" "%s,"))
-       =]doDir_[=
+        =]z[=% name (string-capitalize! (sprintf "%%-10s" "%s,"))
+        =]doDir_[=
   IF (exist? "dummy") =]IGNORE,   [=
-  ELSE =][=% name (string-downcase! (sprintf "%%-10s" "%s,")) =][=
-  ENDIF=]0 }[=
+  ELSE  =][=% name (string-downcase! (sprintf "%%-10s" "%s,")) =][=
+  ENDIF =]0 }[=
 ENDFOR directive=] };
+
+/*
+ *  This text has been extracted from [=`echo ${srcdir}/schemedef.scm`=]
+ */
+tSCC zSchemeInit[] =
+[= (kr-string (shell
+
+"sed \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//
+/^\\(;\\|$\\)/d\" ${srcdir}/schemedef.scm" ))
+
+=];
 #endif /* DEFINING */
 #endif /* [=(. header-guard)=] */[= #
 
