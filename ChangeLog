@@ -1,3 +1,9 @@
+2000-08-30  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/doc.tpl(genshellopts): make the compilation more robust
+	* config/bootstrap.local(whence): use a shell function based on
+	'type' when both "whence" and "which" are not available.
+
 2000-08-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(valid_path):  new procedure.  If a path is
