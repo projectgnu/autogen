@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.9 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: agShell.c,v 1.10 2001/05/09 05:25:59 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -24,7 +24,7 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-#include <compat/compat.h>
+#include "autogen.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -37,8 +37,6 @@
 #if HAVE_SYS_PROCSET_H
 #  include <sys/procset.h>
 #endif
-
-#include "autogen.h"
 
 /*
  *  Dual pipe opening of a child process

@@ -7,16 +7,17 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2000/09/30 02:36:25 $
+## Last Modified:   $Date: 2001/05/09 05:25:59 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.28 2000/09/30 02:36:25 bkorb Exp $
+## $Id: Makefile.am,v 1.29 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
-INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
-		-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
-		-I$(top_builddir) -I$(top_srcdir) -I. -I$(srcdir)
+INCLUDES = -I. -I$(srcdir) $(GUILE_INC) \
+	-I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
+	-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
+	-I$(top_builddir) -I$(top_srcdir)
 
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS         = $(top_builddir)/getdefs/getdefs
@@ -28,33 +29,38 @@ OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-GEN_SRC = opts.c opts.h directive.h functions.h expr.ini expr.h \
-	defParse.c defParse.h autogen.1 autogen.menu autogen.texi proto.h
+#  GEN_CSRC omits defParse.c and defParse.h because automake understands
+#
+GEN_CSRC = opts.c opts.h directive.h functions.h expr.ini expr.h proto.h
+GEN_SRC = $(GEN_CSRC) defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
-pkgdata_DATA	= schemedef.scm fsm.tpl
+pkgdata_DATA	= schemedef.scm fsm.tpl fsm-example.tpl fsm-state.tpl
 man_MANS        = autogen.1
 
-EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl pseudo.x \
-		$(GEN_SRC) bootstrap.dir schemedef.scm fsm.tpl pseudo.def
+EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
+	pseudo.def pseudo-fsm.c pseudo-fsm.h \
+	$(GEN_SRC) bootstrap.dir $(pkgdata_DATA)
 
 bin_PROGRAMS	= autogen
-autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   expGperf.c \
-		autogen.h   defDirect.c defFind.c   defLex.c    defLoad.c \
-		defParse.y  defReduce.c directive.h expFormat.c expGuile.c \
-		expGuile.h  expOutput.c expPrint.c  expState.c  expString.c \
-		expr.ini    funcCase.c  funcDef.c   funcEval.c  funcFor.c \
-		funcIf.c    functions.c functions.h opts.c      opts.h \
-		proto.h     tpLoad.c    tpParse.c   tpProcess.c loadPseudo.c
 
-autogen_LDADD	= $(top_builddir)/autoopts/libopts.la \
-		@GUILE_LINK@
+autogen_SOURCES = $(GEN_CSRC) \
+        agShell.c   agUtils.c    agUtils.h   autogen.c  autogen.h \
+        defDirect.c defFind.c    defLex.c    defLoad.c  defParse.y \
+        defReduce.c expExtract.c expFormat.c expGperf.c expGuile.c \
+        expOutput.c expPrint.c   expState.c  expString.c \
+        funcCase.c  funcDef.c    funcEval.c  funcFor.c  funcIf.c \
+        functions.c loadPseudo.c tpLoad.c    tpParse.c  tpProcess.c
+
+autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
+
+autogen_LDFLAGS = @DYNAMIC_AG@
 
 FARGS = base-name=functions template=functions filelist agarg=$(OPTDBG)
 
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
 EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
-		expString.c expGperf.c  $(FUNCLIST)
+		expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 YFLAGS = -d
 

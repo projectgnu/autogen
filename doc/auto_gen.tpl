@@ -2,15 +2,15 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-1999 Bruce Korb
+##  AutoGen Copyright (C) 1992-2001 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Mon Aug 30 10:50:10 1999                                
+## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.63 2000/11/04 19:55:50 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.64 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -92,6 +92,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
+* Augmenting AutoGen::   Augmenting AutoGen
 * autogen Invocation::   Invoking AutoGen
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
@@ -144,6 +145,7 @@ For a full list of the Automated Option features, @xref{Features}.
 @menu
 * Generalities::         The Purpose of AutoGen
 * Example Usage::        A Simple Example
+* csh caveat::           csh caveat
 * Testimonial::          A User's Perspective
 @end menu
 
@@ -189,9 +191,9 @@ start of each template.  Template designers know best what fits into their
 syntax and can avoid marker conflicts.
 
 We did this because it is burdensome and difficult to avoid conflicts
-using the pure C preprocessor substitution rules.  It also makes it
-easier to specify expressions that transform the value.  Of course, our
-expressions are less cryptic than the shell methods.
+using either M4 tokenizaion or C preprocessor substitution rules.  It
+also makes it easier to specify expressions that transform the value.
+Of course, our expressions are less cryptic than the shell methods.
 
 @item
 These same markers are used, in conjunction with enclosed keywords, to
@@ -335,6 +337,18 @@ necessary to map a string containing the enumeration name into the enumeration
 number.  With AutoGen, you just alter the template to emit the table of names.
 It will be guaranteed to be in the correct order, missing none of the entries.
 If you want to do that by hand, well, good luck.
+
+@node csh caveat
+@section csh caveat
+
+AutoGen tries to use your normal shell so that you can supply
+shell code in a manner you are accustomed to using.  If, however,
+you use csh, you cannot do this.  Csh is sufficiently difficult
+to program that it is unsupported.  Therefore, when invoking
+AutoGen from a csh environment, you must be certain to set the
+SHELL environment variable to a Bourne-derived shell.
+e.g.  sh, ksh or bash.
+
 @page
 @node Testimonial
 @section A User's Perspective
@@ -458,7 +472,7 @@ sensitivity.  Most lookups in this program are case insensitive.
 @noindent
 Also, if the input contains more identification definitions,
 they will be ignored.  This is done so that you may include
-(@xref{Directives}) other definition files without an identification
+(@pxref{Directives}) other definition files without an identification
 conflict.
 
 @cindex template, file name
@@ -489,11 +503,11 @@ it prints an error message and exits.
 
 Any name may have multiple values associated with it in the definition
 file.  If there is more than one instance, the @strong{only} way to
-expand all of the copies of it is by using the FOR (@xref{FOR}.) text
+expand all of the copies of it is by using the FOR (@pxref{FOR}) text
 function on it, as described in the next chapter.
 
 There are two kinds of definitions, @samp{simple} and @samp{compound}.
-They are defined thus (@xref{Full Syntax}):
+They are defined thus (@pxref{Full Syntax}):
 
 @example
 compound_name '=' '@{' definition-list '@}' ';'
@@ -718,10 +732,10 @@ an escape @code{\} or join them with previous lines:
 @cindex Dynamic Definition Text
 
 There are several methods for including dynamic content inside a definitions
-file.  Three of them are mentioned above (@xref{shell-generated}, and
-@xref{scheme-generated}) in the discussion of string formation rules.
+file.  Three of them are mentioned above (@ref{shell-generated} and
+@pxref{scheme-generated}) in the discussion of string formation rules.
 Another method uses the @code{#shell} processing directive.
-It will be discussed in the next section (@xref{Directives}).
+It will be discussed in the next section (@pxref{Directives}).
 Guile/Scheme may also be used to yield to create definitions.
 
 When the Scheme expression is preceeded by a backslash and single
@@ -810,7 +824,6 @@ The definitions file may contain C-style comments.
  *  This is a comment.
  *  It continues for several lines and suppresses all processing
  *  until the closing characters '*' and '/' appear together.
-#include is ignored.
  */
 @end example
 
@@ -923,6 +936,7 @@ these by defining their own macros.  @xref{DEFINE}.
 
 @menu
 * pseudo macro::       Format of the Pseudo Macro
+* naming values::      Naming a value
 * expression syntax::  Macro Expression Syntax
 * AutoGen Functions::  AutoGen Scheme Functions
 * Common Functions::   Common Scheme Functions
@@ -1005,6 +1019,36 @@ The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
 character after the new-line that follows the end macro marker.
 
+@node naming values
+@section Naming a value
+@cindex naming values
+
+When an AutoGen value is specified in a template, it is specified by name.
+The name may be a simple name, or a compound name of several components.
+Since each named value in AutoGen is implicitly an array of one or more
+values, each component may have an index associated with it.
+
+@noindent
+It looks like this:
+
+@example
+comp-name-1 . comp-name-2 [ 2 ]
+@end example
+
+Note that if there are multiple components to a name, each component
+name is separated by a dot (@code{.}).  Indexes follow a component name,
+enclosed in square brackets (@code{[} and @code{]}).  The index may be
+either an integer or an integer-valued define name.  The first component
+of the name is searched for in the current definition level.  If not
+found, higher levels will be searched until either a value is found,
+or there are no more definition levels.  Subsequent components of the
+name must be found within the context of the newly-current definition
+level.  Also, if the named value is prefixed by a dot (@code{.}), then
+the value search is started in the current context only.  No higher
+levels are searched.
+
+If someone rewrites this, I'll incorporate it.  :-)
+
 @node expression syntax
 @section Macro Expression Syntax
 @cindex expression syntax
@@ -1020,7 +1064,9 @@ Where
 @item <apply-code>
 is any of @code{-}, @code{?}, @code{%} or @code{?%} (see below).
 @item <value-name>
-is a (possibly unknown) AutoGen value name (@xref{EXPR}.)
+is a (possibly unknown) AutoGen value name (@xref{naming values},
+and @pxref{EXPR}).  In this context, the name may not contain any
+white space.
 @item <simple-expr-1>
 is either a Scheme expression starting with @code{;} or @code{(};
 a shell expression surrounded with @code{`}; or a string, quoted or
@@ -1147,7 +1193,7 @@ ENDDEF =]
 
 AutoGen uses Guile to interpret Scheme expressions within AutoGen
 macros.  All of the normal Guile functions are available, plus several
-extensions (@xref{Common Functions}) have been added to
+extensions (@pxref{Common Functions}) have been added to
 augment the repertoire of string manipulation functions and
 manage the state of AutoGen processing.
 
@@ -1217,7 +1263,7 @@ ENDFOR gfunc
 
 This section describes a number of general purpose functions that make
 the kind of string processing that AutoGen does a little easier.
-Unlike the AutoGen specific functions (@xref{AutoGen Functions}),
+Unlike the AutoGen specific functions (@pxref{AutoGen Functions}),
 these functions are available for direct use during definition load time.
 
 @menu[=
@@ -1286,7 +1332,7 @@ The general syntax is:
 
 @noindent
 The syntax for @code{<arg>} depends on the particular macro,
-but is generally a full expression (@xref{expression syntax}).
+but is generally a full expression (@pxref{expression syntax}).
 Here are the exceptions to that general rule:
 
 @enumerate
@@ -1320,7 +1366,7 @@ FOR <name> (...Scheme expression list)
 where @code{<name>} must be a simple name and the Scheme expression list
 is expected to contain one or more of the @code{for-from},
 @code{for-to}, @code{for-by}, and @code{for-sep} functions.
-(@xref{FOR}, and @xref{AutoGen Functions})
+(@xref{FOR}, and @ref{AutoGen Functions})
 
 @item
 AutoGen @code{DEFINE} macros must be followed by a simple name.
@@ -1329,7 +1375,7 @@ Anything after that is ignored.  @xref{DEFINE}.
 @item
 The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
 macros take no arguments and ignore everything after the macro name
-(e.g. @xref{COMMENT})
+(e.g. see @ref{COMMENT})
 @end enumerate
 
 @noindent
@@ -1370,12 +1416,12 @@ ENDFOR macfunc=]
 
 AutoGen provides a means for redirecting the template output
 to different files.  It is accomplished by providing a set of
-Scheme functions named @code{out-*} (@xref{AutoGen Functions}).
+Scheme functions named @code{out-*} (@pxref{AutoGen Functions}).
 
 These functions allow you to logically "push" output files
 onto a stack and return to them later by "pop"ing them back off.
 At the end of processing the template for a particular suffix
-(see @xref{pseudo macro}), all the files in the output stack are
+(@pxref{pseudo macro}), all the files in the output stack are
 closed and popped off.  Consequently, at the start of the processing
 of a template, there is only one output file on the stack.
 That file cannot be popped off.
@@ -1385,7 +1431,128 @@ status.  @xref{AutoGen Functions}.
 
 @ignore
 
-Resume text from auto_gen.tpl
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+@end ignore
+
+@page
+@node Augmenting AutoGen
+@chapter Augmenting AutoGen
+@cindex Augmenting AutoGen
+
+AutoGen was designed to be simple to enhance.  You can do it by
+providing shell commands, Guile/Scheme macros or callout functions
+that can be invoked as a Guile macro.  Here is how you do these.
+
+@menu
+* shell commands::       Shell Output Commands
+* guile macros::         Guile Macros
+* guile callouts::       Guile Callout Functions
+* AutoGen macros::       AutoGen Macros
+@end menu
+
+@node shell commands
+@section Shell Output Commands
+
+Shell commands are run inside of a server process.  This means that,
+unlike @command{make}, context is kept from one command to the next.
+Consequently, you can define a shell function in one place inside of
+your template and invoke it in another.  You may also store values
+in shell variables for later reference.  If you load functions from
+a file containing shell functions, they will remain until AutoGen exits.
+
+@node guile macros
+@section Guile Macros
+
+Guile also maintains context from one command to the next.  This means
+you may define functions and variables in one place and reference them
+elsewhere.  You also may load Guile macro definitions from a Scheme
+file by using the @code{--load-scheme} command line option
+(@pxref{autogen load-scheme}).  Beware,
+however, that the AutoGen specific scheme functions have not been loaded
+at this time, so though you may define functions that reference them,
+do not invoke the AutoGen functions at this time.
+
+@node guile callouts
+@section Guile Callout Functions
+
+Callout functions must be registered with Guile to work.  This can
+be accomplished either by putting your routines into a shared library
+that contains a @code{void scm_init( void )} routine that registers
+these routines, or by building them into AutoGen.
+
+To build them into AutoGen, you must place your routines in the source
+directory and name the files @file{exp*.c}.  You also must have a stylized
+comment that @command{getdefs} can find that conforms to the following:
+
+@example
+/*=gfunc <function-name>
+ *
+ *  what:    <short one-liner>
+ *  general_use:
+ *  string:  <invocation-name-string>
+ *  exparg:  <name>, <description> [, ['optional'] [, 'list']]
+ *  doc:     A long description telling people how to use
+ *           this function.
+=*/
+SCM
+ag_scm_<function-name>( SCM arg_name[, ...] )
+@{ <code> @}
+@end example
+
+@table @samp
+@item gfunc
+You must have this exactly thus.
+
+@item <function-name>
+This must follow C syntax for variable names
+
+@item <short one-liner>
+This should be about a half a line long.
+It is used as a subsection title in this document.
+
+@item general_use:
+You must supply this unless you are an AutoGen maintainer and are writing
+a function that queries or modifies the state of AutoGen.
+
+@item <invocation-name-string>
+Normally, the @code{function-name} string will be transformed into
+a reasonable invocation string.  However, that is not always true.
+If the result does not suit your needs, then supply an alternate string.
+
+@item exparg:
+You must supply one for each argument to your function.
+All optional arguments must be last.
+The last of the optional arguments may be a list, if you choose.
+
+@item doc:
+Please say something meaningful.
+
+@item [, ...]
+Do not actually specify an ANSI ellipsis here.  You must provide
+for all the arguments you specified with @code{exparg}.
+@end table
+
+See the Guile documentation for more details.
+More information is also available in a large comment at the
+beginning of the @file{agen5/snarf.tpl} template file.
+
+@node AutoGen macros
+@section AutoGen Macros
+
+There are two kinds:  those you define yourself and AutoGen native.
+The user-defined macros may be defined in your templates or loaded
+with the @code{--lib-template} option
+(See @ref{DEFINE} and  @ref{autogen lib-template}).
+
+As for AutoGen native macors, do not add any.  It is easy to do, but I
+won't like it.  Fundamentally, AutoGen takes a description of the output
+file, makes substitutions for various expressions, selects blocks of
+text based on various conditions and iterates over blocks of text based
+on either conditions or arrays of defined values.  This has been stable
+for years.
+
+@ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1430,10 +1597,10 @@ Automated Option Processing (see next chapter).
 
 @item
 Seven template files and a scheme script in @file{share/autogen}, needed
-for Automated Option Processing (@xref{AutoOpts}.), parsing definitions
-written with scheme syntax (@xref{Dynamic Text}.), and the templates for
+for Automated Option Processing (@pxref{AutoOpts}), parsing definitions
+written with scheme syntax (@pxref{Dynamic Text}), and the templates for
 producing documentation for your program
-(@xref{documentation attributes}.).
+(@pxref{documentation attributes}).
 
 @item
 Info-style help files as @file{info/autogen.info*}.

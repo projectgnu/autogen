@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.13 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: expOutput.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -47,6 +47,17 @@ STATIC void addWriteAccess( char* pzFileName );
 removeWriteAccess( int fd )
 {
     struct stat    sbuf;
+
+    /*
+     *  If the output is supposed to be writable, then also see if
+     *  it is a temporary condition (set vs. a command line option).
+     */
+    if (ENABLED_OPT( WRITABLE )) {
+        if (! HAVE_OPT( WRITABLE ))
+            CLEAR_OPT( WRITABLE );
+        return;
+    }
+
     /*
      *  Set our usage mask to all all the access
      *  bits that do not provide for write access

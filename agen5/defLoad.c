@@ -1,8 +1,8 @@
 /*
- *  $Id: defLoad.c,v 1.12 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: defLoad.c,v 1.13 2001/05/09 05:25:59 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
- *  their parent definition (except the fixed "rootEntry" entry).
+ *  their parent definition.
  */
 
 /*
@@ -28,8 +28,11 @@
 
 STATIC int compareIndex( const void* p1, const void* p2 );
 STATIC void fixTwins( tDefEntry** ppNode );
-STATIC void massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle );
+STATIC void massageDefTree( tDefEntry** ppNode );
 
+#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
+static char zFmt[ 64 ];
+#endif
 
     STATIC int
 compareIndex( const void* p1, const void* p2 )
@@ -133,11 +136,10 @@ fixTwins( tDefEntry** ppNode )
  *  It is recursive, handling one level at a time.
  */
     STATIC void
-massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
+massageDefTree( tDefEntry** ppNode )
 {
     static int lvl = 0;
     tDefEntry*  pNode;
-    tDefEntry*  pEldestSib = *ppNode;
 
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
     if (HAVE_OPT( SHOW_DEFS ))
@@ -191,7 +193,6 @@ massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
         if (HAVE_OPT(SHOW_DEFS))
             printf( zFmt, pNode->index, pNode->pzDefName );
 #endif
-        pNode->pDad = pEldestUncle;
 
         if (pNode->valType == VALTYP_BLOCK) {
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
@@ -203,7 +204,7 @@ massageDefTree( tDefEntry** ppNode, tDefEntry* pEldestUncle )
              *  block definition.
              */
             lvl++;
-            massageDefTree( (tDefEntry**)&(pNode->pzValue), pEldestSib );
+            massageDefTree( (tDefEntry**)&(pNode->pzValue) );
             lvl--;
         }
 
@@ -275,13 +276,6 @@ readDefines( void )
     ag_bool  useStdin;
     FILE*    fp;
 
-    /*
-     *  Start our definitions tree with a magical root
-     */
-    memset( (void*)&rootEntry, 0, sizeof( rootEntry ));
-    rootEntry.pzDefName = "@@ROOT@@";
-    rootEntry.valType = VALTYP_BLOCK;
-
     if (! ENABLED_OPT( DEFINITIONS )) {
         pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "scan context" );
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
@@ -296,7 +290,7 @@ readDefines( void )
      *  do not try to open it and we try to allocate more memory if
      *  the stdin input exceeds our initial allocation of 16K.
      */
-    else if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
+    if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
         OPT_ARG( DEFINITIONS )  = "stdin";
         outTime  = time( (time_t*)NULL );
         dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
@@ -424,8 +418,8 @@ readDefines( void )
              *  has been corrected as well.
              */
             if (p != pBaseCtx) {
-                p->pzScan =
-                    p->pzData = (char*)(p+1);
+                p->pzScan = \
+                p->pzData = (char*)(p+1);
                 pzData = p->pzData + (pzData - pBaseCtx->pzData);
                 pBaseCtx = p;
             }
@@ -446,10 +440,7 @@ readDefines( void )
         extern int yyparse( void );
         (void)yyparse();
     }
-    {
-        tDefEntry* pRoot = &rootEntry;
-        massageDefTree( &pRoot, (tDefEntry*)NULL );
-    }
+    massageDefTree( &(rootDefCtx.pDefs) );
 }
 /*
  * Local Variables:

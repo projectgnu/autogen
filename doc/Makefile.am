@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.41 2000/09/16 07:22:24 bkorb Exp $
+## $Id: Makefile.am,v 2.42 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -31,26 +31,9 @@ AGSRCDIR	= $(top_srcdir)/agen5
 
 OPTIONS_DEF	= $(AGSRCDIR)/opts.def
 
-FUNCSRC		= \
-		$(AGSRCDIR)/funcCase.c \
-		$(AGSRCDIR)/funcDef.c \
-		$(AGSRCDIR)/funcEval.c \
-		$(AGSRCDIR)/funcFor.c \
-		$(AGSRCDIR)/funcIf.c \
-		$(AGSRCDIR)/functions.c
-
-EXPRSRC		= \
-		$(AGSRCDIR)/expFormat.c \
-		$(AGSRCDIR)/expGuile.c \
-		$(AGSRCDIR)/expOutput.c \
-		$(AGSRCDIR)/expPrint.c \
-		$(AGSRCDIR)/expState.c \
-		$(AGSRCDIR)/expString.c \
-		$(FUNCSRC)
-
 DIRECTIVESRC	= $(AGSRCDIR)/defDirect.c
 
-GETDEF_SRC	= $(EXPRSRC) $(DIRECTIVESRC)
+GETDEF_SRC	= $(AGSRCDIR)/func*.c $(AGSRCDIR)/exp*.c $(DIRECTIVESRC)
 
 ADDON_MENU	= \
 		$(top_srcdir)/columns/columns.menu \
@@ -72,7 +55,6 @@ DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
 DOC_DEPENDS	= $(DOC_TEMPLATE) \
 		$(OPTIONS_DEF) \
-		$(GETDEF_SRC) \
 		$(ADDON_MENU) \
 		$(ADDON_TEXI) \
 		$(DOC_INCLUDES)
@@ -88,15 +70,18 @@ AGEXE		= `cd $(top_builddir)/agen5 ; pwd`/@AGEXE@
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
 
+##  The "touch" garbage is because automake is too miserably aggressive
+##  in its dependency checking on files that it "knows" are source files
+##
 autogen.texi : $(DOC_DEPENDS)
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ...
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" \
 	ADDON_MENU="$(ADDON_MENU)" \
 	ADDON_TEXI="$(ADDON_TEXI)" \
-	DOC_DEPENDS="$(DOC_DEPENDS)" \
+	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
-	@-touch $@
+	@-sleep 1 ; touch $@
 
 ##  The following rule is for debugging generation problems:
 ##
@@ -116,7 +101,7 @@ www/doc/autogen_toc.html : autogen.texi
 	@mkdir -p www/doc > /dev/null 2>&1 || :
 	texi2html -menu -split_chapter -verbose autogen.texi
 	mv -f autogen*.html www/doc
-	@touch $@
+	@-sleep 1 ; touch $@
 
 html : web
 web : www/doc/autogen_toc.html

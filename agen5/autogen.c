@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.13 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: autogen.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -28,6 +28,7 @@
 #define DEFINING
 #include "autogen.h"
 #include <signal.h>
+#include <assert.h>
 
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)";
@@ -106,14 +107,21 @@ abendSignal( int sig )
     tSCC zAt[]  = "processing template %s\n"
                   "            on line %d\n"
                   "       for function %s (%d)\n";
-    int f = (pCurMacro->funcCode > FUNC_CT)
-        ? FTYP_SELECT
-        : pCurMacro->funcCode;
 
     fprintf( stderr, zErr, sig, strsignal( sig ));
-    if (pCurTemplate != (tTemplate*)NULL)
+
+    /*
+     *  IF there is a current template, then we should report where we are
+     *  so that the template writer knows where to look for their problem.
+     */
+    if (pCurTemplate != (tTemplate*)NULL) {
+        int f;
+        assert( pCurMacro != NULL );
+        f = (pCurMacro->funcCode > FUNC_CT)
+                ? FTYP_SELECT : pCurMacro->funcCode;
         fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
                  apzFuncNames[ f ], pCurMacro->funcCode );
+    }
 
     procState = PROC_STATE_ABORTING;
     siglongjmp( abendJumpEnv, sig );
@@ -196,7 +204,7 @@ signalSetup( void )
         sigaction( ++sigNo,  &sa, (struct sigaction*)NULL );
     } while (sigNo < NSIG);
 
-    sa.sa_handler = SIG_IGN;
+    sa.sa_handler = SIG_DFL;
     sigaction( SIGCHLD,  &sa, (struct sigaction*)NULL );
 }
 /*

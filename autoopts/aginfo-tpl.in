@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.18 2000/09/11 14:58:51 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.19 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -90,8 +90,7 @@ ENDFOR flag=][=
 
 This is the automatically generated usage text for [=prog_name=]:
 
-@example
-
+@format
 [= (shellf "PROG=./%1$s
 
     if [ ! -f ${PROG} ]
@@ -117,7 +116,7 @@ This is the automatically generated usage text for [=prog_name=]:
                                    "help" ))
 
     )  =]
-@end example[=
+@end format[=
 
 #  FOR all options, except the `documentation' options, ...  =][=
 

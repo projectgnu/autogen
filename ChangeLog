@@ -1,3 +1,168 @@
+2001-05-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-*.tpl: new files for example FSM output
+	* agen5/fsm.tpl: use these & largely rewrite
+	* agen5/opts.def: add --writable option
+	* agen5/loadPseudo.c: adjust for new names for FSM output
+	* agen5/expExtract.c: set --writable option when extract used
+	* agen5/expFormat.c(dne): change "DO NOT EDIT" to "EDIT WITH CAUTION"
+	in the presence of the --writable option
+	* agen5/tpProcess.c: turn off write permission only if we do not
+	have the --writable option.
+
+2001-05-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcFor(for-index): accept a for loop name
+	(for-first?): ditto
+	(for-last?): ditto
+	* agen5/fsm.tpl: simplify the code
+
+2001-05-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(expExtract.c): new for (extract..) function
+	* agen5/*.c: regularized usage of "expr.h"
+	* agen5/expGperf.c: documentation and comment cleanup
+	* agen5/expPrint.c(safePrintf): interpret as an error any "size"
+	of more than 0x10000000 bytes (16 MBytes).
+	* agen5/fsm.tpl: take advantage of the new (extract...) function
+	* agen5/opts.def: doc tweaks
+	* agen5/snarf.tpl: add teGuileType, eliminating expGuile.h
+	* agen5/test/Makefile.am(extract.test): new test
+	* agen5/test/snarf.test: fix for snarf.tpl changes
+	* doc/Makefile.am: remove uninteresting dependency so the file
+	list can be made dynamic
+	* doc/auto_gen.tpl(Augmenting AutoGen): new chapter
+
+2001-05-04  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* snprintfv/snprintfv/format.c(string_specifier_handler):
+	Mask the character being output to ensure it is not interpreted
+	as a negative number.
+	* agen5/expPrint.c(safePrintf): validate the returned size.
+	Choke if it is an error code.
+
+2001-04-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h: Added a definition stack structure type,
+	built an allocated for-info structure, avoiding messing with
+	stack structure switching
+	* agen5/defLoad.c: Use global dynamic definition stack instead of
+	static definition stack.
+	* agen5/defFind.c: ditto
+	* agen5/expGuile.c: ditto
+	* agen5/defParse.y: ditto
+	* agen5/expState.c: ditto
+	* agen5/funcFor.c: ditto
+	* agen5/tpProcess.c: ditto
+	* agen5/funcDef.c: ditto
+	(ag-invoke): broken, unused function that I cannot see use for: gone
+	* agen5/test/dynref.test: test the new changes
+
+2001-04-15  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/getdefs.c(buildPreamble): restore newline char at end of
+	first line.  It is needed by the pattern matching.
+	* getdefs/opts.def: remove documentation of bug.
+
+2001-04-15  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/bootstrap.dir(functions.h): set the DEBUG option when
+	appropriate
+	* agen5/defLoad.c(zFmt): create the scratch buffer for DEBUG
+	* agen5/funcDef.c(mFunc_Debug): print out DEBUG macro args on
+	trace
+	* agen5/funcFor.c(doForEach): set the proper superior def context
+
+2001-03-26  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl(naming values): new section
+	* agen5/*: remove current def pointer from arg lists,
+	use a global instead.  Eventually, we use stacked contexts.
+
+2001-03-22  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl(naming values): new section describing the
+	syntax for naming AutoGen values in templates.  Needs work.
+	* agen5/funcFor.c(mFunc_For): allow for local-only loop vars.
+	* agen5/test/define.test: test "recursive" defines.  Tricky.
+
+2001-03-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defFind.c(canonicalizeName): allow for leading '.'
+	(findEntryList): Disallow "nesting" when name starts with '.'
+	(findDefEntry): ditto
+	
+2001-03-21  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* agen5/autogen.c(abendSignal): Do not dereference pCurMacro if
+	pCurTemplate is NULL.
+
+2001-03-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c(entry_length): remove redundant code.
+	(count_entries): ditto (duplicates findEntryList())
+
+2001-03-17  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/loadPseudo.c(skipSuffixSpec): rename to doSuffixSpec and make
+	global.  Processing is bypassed if: not in option processing, and
+	either not processing main template *OR* there were --select-suffix
+	options specified.
+	* agen5/opts.def(select-suffix): new option for overriding the
+	template suffix specifications.
+
+2001-03-13  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in(GUILE_INC): new substitution
+	* autoopts/test/Makefile.am(TESTS_ENV): add $(LIBS)
+	* autoopts/test/guile.test: remove inconsistent last line from output
+	* agen5/test/gperf.test: test for gperf program before running test
+	* autoopts/Makefile.am: add GUILE_INC to INCLUDES list
+	* agen5/Makefile.am: ditto
+
+2001-03-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcEval.c(evalExpression): Correct the handling of apply-
+	when-not-found expressions
+	* autoopts/Makefile.am(libopts_la_LDFLAGS): remove broken -no-undefined
+	* agen5/agUtils.c(strlcpy): fix warning
+	* agen5/snarf.tpl(init-proc): default to ``scm_init''.
+	* agen5/test/get.test: add test for getting non-existent value
+	* autoopts/doc.tpl: remove genshellopt historical text, since the
+	SIGCHLD bug is now worked around
+	* agen5/opts.def: make the doc texi-friendly
+	Invoke ``scm_init'' when dl-opening a function library
+
+2001-03-07  Bruce Korb  <bkorb@gnu.org>
+	
+	* configure.in: check for dynamic library support
+	* agen5/Makefile.am: add -export-dynamic to link args, if supported
+	* agen5/opts.def(load-functions): add new option, disabled if not
+	supported
+	* agen5/snarf.tpl: document how to use it + better support for
+	symbols and syntax thingies
+	* agen5/bootstrap.dir: add newly required global assignment
+	* agen5/test/Makefile.am: run new test
+	* agen5/test/snarf.test: add new test
+	* agen5/autogen.c(main): set the SIGCHLD response to SIG_DFL.
+	This will create zombies, but not very many, we hope.
+	Avoids bug in GCC 2.95 series and in SCO's compiler.
+
+2001-02-24  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* agen5/expState.c: Use @pxref and @ref in lieu of @xref, as approp.
+	* agen5/funcCase.c: ditto
+	* agen5/funcEval.c: ditto
+	* agen5/funcIf.c: ditto
+	* autoopts/doc.tpl: ditto
+	* doc/auto_gen.tpl: ditto
+	* doc/snprintfv.texi: ditto
+	* getdefs/getdefs.c: ditto + remove caps from case insensitve RE.
+
+2001-02-24  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.tpl: use the no-editing hints with the DNE macro
+
 2000-11-29  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c( strlcpy ): correct signature
@@ -63,7 +228,7 @@
 
 2000-10-12  Bruce Korb  <bkorb@gnu.org>
 
-	* agen5/defFind.c: The cannonicalization of value names downcased
+	* agen5/defFind.c: The canonicalization of value names downcased
 	#define names.  That doesn't work.
 
 2000-10-07  Bruce Korb  <bkorb@gnu.org>
@@ -178,9 +343,9 @@
 	* agen5/expString.c(ag_scm_join): the lists can arrive as nested lists.
 	(ag_scm_stack): did the implementation.
 	* agen5/defFind.c(copyDefReference): obsoleted
-	(cannonicalizeName): replacement procedure - more flexible
+	(canonicalizeName): replacement procedure - more flexible
 	* agen5/agUtils.h: ISNAMECHAR now includes the hyphen
-	* agen5/funcEval.c: use ``cannonicalizeName'' instead of ``copy...''
+	* agen5/funcEval.c: use ``canonicalizeName'' instead of ``copy...''
 	* agen5/functions.c: ditto
 	* agen5/test/Makefile.am: add test for Scheme function ``stack''
 

@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.13 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: defDirect.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -667,9 +667,12 @@ doDir_include( char* pzArg, char* pzScan )
 /*=directive line
  *
  *  text:
- *  Alters the current line number and/or file name.
- *  You may wish to use this directive if you extract definition
- *  source from other files.
+ *
+ *  Alters the current line number and/or file name.  You may wish to
+ *  use this directive if you extract definition source from other files.
+ *  @command{getdefs} uses this mechanism so AutoGen will report the correct
+ *  file and approximate line number of any errors found in extracted
+ *  definitions.
 =*/
     STATIC char*
 doDir_line( char* pzArg, char* pzScan )
@@ -714,9 +717,10 @@ doDir_line( char* pzArg, char* pzScan )
 /*=directive shell
  *
  *  text:
- *  Invokes $SHELL or /bin/sh on a script that should generate
- *  AutoGen definitions.  It does this using the same server
+ *  Invokes @code{$SHELL} or @file{/bin/sh} on a script that should
+ *  generate AutoGen definitions.  It does this using the same server
  *  process that handles the back-quoted @code{`} text.
+ *  @strong{CAUTION}:  let not your @code{$SHELL} be @code{csh}.
 =*/
     STATIC char*
 doDir_shell( char* pzArg, char* pzScan )

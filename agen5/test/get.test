@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2000/09/30 15:09:43 $
+# Last Modified:     $Date: 2001/05/09 05:25:59 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: get.test,v 1.2 2000/09/30 15:09:43 bkorb Exp $
+# $Id: get.test,v 1.3 2001/05/09 05:25:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -36,7 +36,10 @@ ELIF (not (= "mumble" (get "foo.bar.baz"))) =][=
          (get "foo.bar.baz")))   =][=
 ELSE
       =]A OK[=
-ENDIF =]
+ENDIF =][=
+
+- bogus "\nA OK2" =][=
+- foo   "\nBOGUS" =]
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -56,6 +59,7 @@ echo creating $testname.out
 # this is the output we should expect to see
 cat > $testname.out <<'_EOF_'
 A OK
+A OK2
 _EOF_
 
 $AGEXE $testname.def || failure $AGEXE failed

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.17 2000/10/17 17:09:19 bkorb Exp $
+ *  $Id: expGuile.c,v 1.18 2001/05/09 05:25:59 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -27,10 +27,8 @@
 
 #include <string.h>
 
-#include "autogen.h"
-#include <guile/gh.h>
-#include "expGuile.h"
 #include "expr.h"
+#include "autogen.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
@@ -124,7 +122,7 @@ ag_scm_max( SCM list )
             break;
 
         case GH_TYPE_STRING:
-	    val = strtol( SCM_CHARS( car ), (char**)NULL, 0 );
+            val = strtol( SCM_CHARS( car ), (char**)NULL, 0 );
             break;
 
         default:
@@ -185,10 +183,10 @@ ag_scm_min( SCM list )
         case GH_TYPE_STRING:
         {
             char* pz  = SCM_CHARS( car );
-	    int   len = SCM_LENGTH( len );
-	    while (isspace( *pz ) && (--len > 0))  pz++;
+            int   len = SCM_LENGTH( len );
+            while (isspace( *pz ) && (--len > 0))  pz++;
             if ((len > 0) && isdigit( *pz ))
-                 val = strtol( pz, (char**)NULL, 0 );
+                val = strtol( pz, (char**)NULL, 0 );
             else val = LONG_MAX;
             break;
         }

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.31 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: funcDef.c,v 1.32 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -28,8 +28,8 @@
 
 #include <guile/gh.h>
 
-#include "autogen.h"
 #include "expr.h"
+#include "autogen.h"
 
 typedef int (tCmpProc)( const void*, const void* );
 
@@ -39,7 +39,7 @@ struct def_list {
     char*      pzExpr;
 };
 
-tSCC  zNoResolution[] = "Could not resolve INVOKE macro name - %s";
+tSCC  zNoResolution[] = "Could not resolve macro name: ``%s''";
 tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
 #endif /* not defined DEFINE_LOAD_FUNCTIONS */
 
@@ -49,7 +49,7 @@ STATIC int   orderDefList( const void* p1, const void* p2 );
 STATIC char* skipNestedExpression( char* pzScan, size_t len );
 STATIC void  spanTemplate( char* pzQte, tDefList* pDefList );
 STATIC void  prepInvokeArgs( tMacro* pMac );
-STATIC char* anonymousTemplate( void* p, tDefEntry* pCurDef );
+STATIC char* anonymousTemplate( void* p );
 
 
     STATIC int
@@ -553,7 +553,7 @@ prepInvokeArgs( tMacro* pMac )
     pMac->ozName = pMac->ozText;
     pzText = pT->pzTemplText + pMac->ozText;
     pzText = (char*)skipExpression( pzText, strlen( pzText ));
-    
+
     /*
      *  IF there is no more text,
      *  THEN there are no arguments
@@ -562,7 +562,7 @@ prepInvokeArgs( tMacro* pMac )
         pMac->ozText = 0;
         pMac->res = 0;
     }
-    
+
     /*
      *  OTHERWISE, skip to the start of the text and process
      *  the arguments to the macro
@@ -596,42 +596,35 @@ MAKE_HANDLER_PROC( Debug )
 {
     static int dummy = 0;
 
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf( pfTrace, "  --  DEBUG %s -- FOR index %d\n",
+                 pT->pzTemplText + pMac->ozText, (forInfo.fi_depth <= 0) ? -1
+                 : forInfo.fi_data[ forInfo.fi_depth - 1].for_index );
     /*
-     *  The case element values were chosen to thwart any
+     *  The case element values were chosen to thwart most
      *  optimizer that might be too bright for its own good.
+     *  (`dummy' is write-only and could be ignored)
      */
     switch (atoi( pT->pzTemplText + pMac->ozText )) {
-    case 0:
-        dummy = 'A'; break;
-    case 1:
-        dummy = 'u'; break;
-    case 2:
-        dummy = 't'; break;
-    case 4:
-        dummy = 'o'; break;
-    case 8:
-        dummy = 'G'; break;
-    case 16:
-        dummy = 'e'; break;
-    case 32:
-        dummy = 'n'; break;
-    case 64:
-        dummy = 'X'; break;
-    case 128:
-        dummy = 'Y'; break;
-    case 256:
-        dummy = 'Z'; break;
-    case 512:
-        dummy = '.'; break;
-    default:
-        dummy++;
+    case 0:    dummy = 'A'; break;
+    case 1:    dummy = 'u'; break;
+    case 2:    dummy = 't'; break;
+    case 4:    dummy = 'o'; break;
+    case 8:    dummy = 'G'; break;
+    case 16:   dummy = 'e'; break;
+    case 32:   dummy = 'n'; break;
+    case 64:   dummy = 'X'; break;
+    case 128:  dummy = 'Y'; break;
+    case 256:  dummy = 'Z'; break;
+    case 512:  dummy = '.'; break;
+    default:   dummy++;
     }
     return pMac+1;
 }
 #endif
 
     STATIC char*
-anonymousTemplate( void* p, tDefEntry* pCurDef )
+anonymousTemplate( void* p )
 {
     tSCC zTFil[] = "/tmp/.AutoGenTemp";
 
@@ -665,7 +658,7 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
                      pCurM->lineNo );
     }
 
-    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
+    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt );
 
     /*
      *  Pop any output files pushed since the anonymous template started.
@@ -687,6 +680,90 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
     pCurTemplate = pSavT;
     pCurMacro    = pCurM;
     return res;
+}
+
+
+/*
+ *  build_defs
+ *
+ *  Build up a definition context created by passed-in macro arguments
+ */
+STATIC void
+build_defs( int defCt, tDefList* pList )
+{
+    tDefEntry* pDefs = &(pList->de);
+	currDefCtx.pDefs = pDefs;
+
+    /*
+     *  FOR each definition, evaluate the associated expression
+     *      and set the text value to it.
+     */
+    do  {
+        if (pList->pzExpr == (char*)NULL)
+            continue;
+
+    retryExpression:
+        switch (*(pList->pzExpr)) {
+        case ';':
+        {
+            char* pz = strchr( pList->pzExpr, '\n' );
+            if (pz != (char*)NULL) {
+                while (isspace( *++pz ))  ;
+                pList->pzExpr = pz;
+                goto retryExpression;
+            }
+            /* FALLTHROUGH */
+        }
+        case NUL:
+            pList->pzExpr = (char*)NULL;
+            pList->de.pzValue = "";
+            break;
+
+        case '[':
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                fprintf( pfTrace, "anonymus template arg %d\n",
+                         pCurMacro->sibIndex - defCt );
+
+            pList->de.pzValue =
+                anonymousTemplate(
+                    (void*)strtoul( pList->pzExpr + 2, (char**)NULL, 0 ));
+            break;
+
+        case '(':
+        {
+            SCM res;
+
+            /*
+             *  It is a scheme expression.  Accept only string
+             *  and number results.
+             */
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
+                fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
+                         pCurMacro->sibIndex - defCt, pList->pzExpr );
+            }
+            res = gh_eval_str( pList->pzExpr );
+
+            if (gh_string_p( res )) {
+                pList->de.pzValue = strdup( SCM_CHARS( res ));
+            }
+            else if (gh_number_p( res )) {
+                pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
+                snprintf( pList->de.pzValue, 16, "%ld", gh_scm2long( res ));
+            }
+            else
+                pList->de.pzValue = strdup( "" );
+            break;
+        }
+
+        case '`':
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
+                fprintf( pfTrace, "shell eval for arg %d:\n\t`%s'\n",
+                         pCurMacro->sibIndex - defCt, pList->pzExpr+1 );
+            }
+            pList->de.pzValue = runShell( pList->pzExpr+1 );
+            break;
+        }
+    } while (pList++, --defCt > 0);
 }
 
 
@@ -754,7 +831,8 @@ MAKE_HANDLER_PROC( Define )
     int         defCt  = pMac->sibIndex;
     SCM         res;
     tDefEntry*  pDefs;
-    tTemplate*  pOldTpl = pCurTemplate;
+    tDefStack*  pStack;
+    tDefStack   stack;
 
     pT = (tTemplate*)pMac->funcPrivate;
 
@@ -768,84 +846,22 @@ MAKE_HANDLER_PROC( Define )
     /*
      *  IF we have no special definitions, then do not nest definitions
      */
-    if (defCt == 0)
-        pDefs = pCurDef;
-    else {
-        pDefs = &(pList->de);
-        pList->de.pDad = pCurDef;
-
-        /*
-         *  FOR each definition, evaluate the associated expression
-         *      and set the text value to it.
-         */
-        do  {
-            if (pList->pzExpr == (char*)NULL)
-                continue;
-
-        retryExpression:
-            switch (*(pList->pzExpr)) {
-            case ';':
-            {
-                char* pz = strchr( pList->pzExpr, '\n' );
-                if (pz != (char*)NULL) {
-                    while (isspace( *++pz ))  ;
-                    pList->pzExpr = pz;
-                    goto retryExpression;
-                }
-                /* FALLTHROUGH */
-            }
-            case NUL:
-                pList->pzExpr = (char*)NULL;
-                pList->de.pzValue = "";
-                break;
-
-            case '[':
-                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                    fprintf( pfTrace, "anonymus template arg %d\n",
-                             pMac->sibIndex - defCt );
-
-                pList->de.pzValue =
-                    anonymousTemplate(
-                        (void*)strtoul( pList->pzExpr + 2, (char**)NULL, 0 ),
-                        pCurDef );
-                break;
-
-            case '(':
-                /*
-                 *  It is a scheme expression.  Accept only string
-                 *  and number results.
-                 */
-                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                    fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
-                             pMac->sibIndex - defCt, pList->pzExpr );
-                }
-                res = gh_eval_str( pList->pzExpr );
-
-                if (gh_string_p( res )) {
-                    pList->de.pzValue = strdup( SCM_CHARS( res ));
-                }
-                else if (gh_number_p( res )) {
-                    pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
-                    snprintf( pList->de.pzValue, 16, "%ld", gh_scm2long( res ));
-                }
-                else
-                    pList->de.pzValue = strdup( "" );
-                break;
-
-            case '`':
-                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                    fprintf( pfTrace, "shell eval for arg %d:\n\t`%s'\n",
-                             pMac->sibIndex - defCt, pList->pzExpr+1 );
-                }
-                pList->de.pzValue = runShell( pList->pzExpr+1 );
-                break;
-            }
-        } while (pList++, --defCt > 0);
+    if (defCt != 0) {
+        stack  = currDefCtx;
+        currDefCtx.pPrev     = &stack;
+        build_defs( defCt, pList );
     }
 
-    pCurTemplate = pT;
-    generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pDefs );
-    pCurTemplate = pOldTpl;
+    {
+        tTemplate*  pOldTpl = pCurTemplate;
+        pCurTemplate = pT;
+
+        generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt );
+        pCurTemplate = pOldTpl;
+    }
+
+    if (defCt != 0)
+        currDefCtx = stack;
 
     if ((defCt = pMac->sibIndex) > 0) {
         pList = (tDefList*)pMac->res;
@@ -857,12 +873,6 @@ MAKE_HANDLER_PROC( Define )
             pList++;
         }
     }
-
-    /*
-     *  The DEFINE function changes the global definition context.
-     *  Restore it to the one passed in.
-     */
-    pDefContext  = pCurDef;
 
     return pMac+1;
 }
@@ -922,7 +932,7 @@ MAKE_HANDLER_PROC( Invoke )
                 LOAD_ABORT( pT, pMac, pzText );
             }
 
-            return mFunc_Define( pT, pMac, pCurDef );
+            return mFunc_Define( pT, pMac );
         }
     }
 
@@ -944,140 +954,10 @@ MAKE_HANDLER_PROC( Invoke )
 
     pMac->funcPrivate = (void*)pInv;
 
-    return mFunc_Define( pT, pMac, pCurDef );
-}
-
-/*=gfunc ag_invoke
- *
- * what:   invoke AutoGen macro
- * exparg: macro, name of macro to invoke
- * exparg: args,  macro arguments, optional, ellipsis
- *
- * doc:  Invoke an AutoGen macro and put the results into a string.
- *       As of this writing, however, the macro arguments are not
- *       well implemented.  Each entry of the list must be a string
- *       that starts with a name, followed by an equal sign followed
- *       by the text value.  This is not very Schemey.  Don't rely on this.
-=*/
-    SCM
-ag_scm_ag_invoke( SCM macName, SCM list )
-{
-    SCM         res = SCM_UNDEFINED, car;
-    tTemplate*  pT;
-    tMacro*     pMac;
-    char*       pz;
-
-    int  len   = scm_ilength( list );
-    int  defCt = 0;
-
-    tDefEntry*  pDefList;
-    tDefEntry*  pDE;
-
-    if (! gh_string_p( macName ))
-        LOAD_ABORT( pT, pMac, zNoResolution );
-
-    pT = findTemplate( SCM_CHARS( macName ));
-    if (pT == (tTemplate*)NULL)
-        LOAD_ABORT( pCurTemplate, pCurMacro, zNoResolution );
-
-    if (len <= 0) {
-        pDE = pDefContext;
-        pDefList = (tDefEntry*)NULL;
-    }
-
-    else {
-        pDefList = \
-        pDE = (tDefEntry*)AGALOC( sizeof( *pDE ) * len,
-                                  "named args to AG macro" );
-        memset( (void*)pDE, 0, sizeof( *pDE ) * len );
-        for (;;) {
-            if (len-- <= 0)
-                break;
-
-            defCt++;
-            car  = SCM_CAR( list );
-            list = SCM_CDR( list );
-            if (! gh_string_p( car ))
-                LOAD_ABORT( pCurTemplate, pCurMacro,
-                            "need name for macro arg" );
-            pz = pDE->pzDefName = strdup( SCM_CHARS( car ));
-            while (ISNAMECHAR( *pz ))  pz++;
-            while (isspace( *pz ))     pz++;
-            if (*pz != NUL) {
-                pDE++;
-                continue;
-            }
-
-            if (*pz != '=')
-                LOAD_ABORT( pCurTemplate, pCurMacro,
-                            "garbage in macro arg name" );
-
-            *(pz++) = NUL;
-            if (*pz != NUL) {
-                while (isspace( *pz ))  pz++;
-                pDE->pzValue = pz;
-                continue;
-            }
-
-            if (len-- <= 0)
-                LOAD_ABORT( pCurTemplate, pCurMacro,
-                            "missing value for macro arg" );
-
-            car  = SCM_CAR( list );
-            list = SCM_CDR( list );
-            if (! gh_string_p( car ))
-                LOAD_ABORT( pCurTemplate, pCurMacro,
-                            "need name for macro arg" );
-            pDE->pzValue = strdup( SCM_CHARS( car ));
-        }
-
-        if (defCt > 1) {
-            /*
-             *  There was more than one value assignment.
-             *  Sort them just so we know the siblings are together.
-             *  Do not use qsort().  The first entries must be first.
-             */
-            qsort( (void*)pMac->res, defCt, sizeof( tDefList ), orderDefList );
-#ifdef LATER
-            /*
-             *  The structures need to be made to be pDefLists, not defentries
-             */
-            /*
-             *  Now, link them all together.  Singly linked list.
-             */
-            for (;;) {
-                if (--defCt == 0) {
-                    pDE->pNext = (tDefEntry*)NULL;
-                    break;
-                }
-    
-                pN = pDE + 1;
-    
-                /*
-                 *  IF the next entry has the same name,
-                 *  THEN it is a "twin".  Link twins on the twin list.
-                 */
-                if (streqvcmp( pDL->pzName, pN->pzName ) == 0)
-                    pN = linkTwins( pDL, pN, &ct );
-    
-                pDE->pNext = pN;
-                pDE = pN;
-            }
-#endif
-        }
-    }
-
-    /*
-     *  FIXME:  insert code that will
-     *  1.  Process any invocation arguments
-     *  2.  Divert to a _UNIQUE_ file name
-     *  3.  read back the diversion and set the result SCM to it
-     *  4.  delete the diversion file
-     *  5.  deallocate anything allocated
-     */
-    return res;
+    return mFunc_Define( pT, pMac );
 }
 #endif /* DEFINE_LOAD_FUNCTIONS not defined */
+
 
 /* Load Debug
  *

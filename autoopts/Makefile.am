@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2000/10/17 02:57:00 $
+## Last Modified:   $Date: 2001/05/09 05:25:59 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.33 2000/10/17 02:57:00 bkorb Exp $
+## $Id: Makefile.am,v 2.34 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,15 +18,15 @@ SUBDIRS		= test
 
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
-		-I$(top_builddir)/snprintfv -I$(top_builddir) -I.
+INCLUDES = -I. -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
+	-I$(top_builddir)/snprintfv -I$(top_builddir) $(GUILE_INC)
 
 pkgdata_DATA	= \
         aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \
         optlib.tpl    optmain.tpl   stdoptions.def
 
 GENSRC		= genshell.c genshell.h
-EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) \
+EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING \
 	TODO autoopts.m4 doc.tpl bootstrap.dir autoopts-config.in \
 	config-opts.def genshell.def
 
@@ -44,9 +44,8 @@ libopts_la_SOURCES = \
 	putshell.c   save.c       stack.c     streqv.h       \
 	streqvcmp.c  usage.c      version.c
 
-libopts_la_LDFLAGS = -no-undefined \
-		-version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
+libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
 libguileopts_la_SOURCES = guileopt.c
 libguileopts_la_LDFLAGS = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@

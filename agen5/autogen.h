@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.19 2000/12/11 23:27:54 bkorb Exp $
+ *  $Id: autogen.h,v 1.20 2001/05/09 05:25:59 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -73,6 +73,7 @@ typedef struct defEntry      tDefEntry;
 typedef struct macro_desc    tMacro;
 typedef struct template_desc tTemplate;
 typedef struct for_info      tForInfo;
+typedef struct for_state     tForState;
 typedef struct template_lib_marker tTlibMark;
 
 #define MAX_SUFFIX_LEN  8  /* maximum length of a file name suffix */
@@ -93,11 +94,11 @@ mLoad_ ## n ( tTemplate*  pT,  tMacro*  pMac, const char**  ppzScan )
  *  Procedure for handling a template function
  *  during the text emission phase.
  */
-typedef tMacro* (tHdlrProc)( tTemplate*, tMacro*, tDefEntry* pCurDef );
+typedef tMacro* (tHdlrProc)( tTemplate*, tMacro* );
 typedef tHdlrProc* tpHdlrProc;
 #define MAKE_HANDLER_PROC( n ) \
     tMacro* \
-mFunc_ ## n ( tTemplate*  pT,  tMacro*  pMac, tDefEntry* pCurDef )
+mFunc_ ## n ( tTemplate* pT,  tMacro* pMac )
 
 /*
  *  This must be included after the function prototypes
@@ -179,11 +180,16 @@ typedef enum {
 
 #define NO_INDEX ((short)0x80DEAD)
 
+typedef struct def_stack tDefStack;
+struct def_stack {
+	tDefEntry* pDefs;        /* ptr to current def set     */
+    tDefStack* pPrev;        /* ptr to previous def set    */
+};
+
 struct defEntry {
-    tDefEntry* pDad;         /* pointer to parent          */
-    tDefEntry* pNext;        /* next member of same parent */
+    tDefEntry* pNext;        /* next member of same level  */
     tDefEntry* pTwin;        /* next member with same name */
-    tDefEntry* pPrevTwin;    /* previous memb. of parent   */
+    tDefEntry* pPrevTwin;    /* previous memb. of level    */
     tDefEntry* pEndTwin;     /* head of chain to end ptr   */
     char*      pzDefName;    /* name of this member        */
     teValType  valType;      /* text/block/not defined yet */
@@ -223,13 +229,19 @@ typedef struct {
  *  FOR loop processing state
  */
 struct for_info {
+    int          fi_depth;
+    int          fi_alloc;
+    tForState*   fi_data;
+};
+
+struct for_state {
     ag_bool      for_loading;
     int          for_from;
     int          for_to;
     int          for_by;
     int          for_index;
-    int          for_depth;
     char*        for_pzSep;
+    char*        for_pzName;
     ag_bool      for_lastFor;
     ag_bool      for_firstFor;
 };
@@ -257,12 +269,11 @@ MODE char*       pzCurStart       VALUE( (char*)NULL );
 MODE off_t       curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( (FILE*)NULL );
-MODE tDefEntry   rootEntry;
 
 /*
  *  AutoGen definiton and template context
  *
- *  pDefContext is the current, active list of name/value pairs.
+ *  currDefCtx is the current, active list of name/value pairs.
  *  Points to its parent list for full search resolution.
  *
  *  pCurTemplate the template (and DEFINE macro) from which
@@ -274,7 +285,8 @@ MODE tDefEntry   rootEntry;
  *  and mFunc_For.  They are the only routines that dynamically
  *  push name/value pairs on the definition stack.
  */
-MODE tDefEntry*  pDefContext      VALUE( (tDefEntry*)NULL );
+MODE tDefStack   currDefCtx       VALUE( { NULL } );
+MODE tDefStack   rootDefCtx       VALUE( { NULL } );
 MODE tTemplate*  pCurTemplate     VALUE( (tTemplate*)NULL );
 
 /*

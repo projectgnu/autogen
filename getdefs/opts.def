@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.25 2000/10/17 04:09:40 bkorb Exp $
+ *   $Id: opts.def,v 2.26 2001/05/09 05:25:59 bkorb Exp $
  */
 
 /*
@@ -327,38 +327,72 @@ Info system documentation.';
 
 /* * * * * INFO DOC DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
-prog_info_descrip =
-"This program extracts AutoGen definitions from a list of source files.
-Definitions are delimited by `/*=<entry-type> <entry-name>\\n\' and `=*/\\n\'.
+prog_info_descrip = <<_EOF_
+This program extracts AutoGen definitions from a list of source files.
+Definitions are delimited by `/*=<entry-type> <entry-name>\n' and `=*/\n'.
 From that, this program creates a definition of the following form:
 
 @format
-    #line nnn \"source-file-name\"
+    #line nnn "source-file-name"
     entry_type = @{
         name = entry_name;
         ...
     @};
 @end format
 
-The ellipsis `...' is filled in by text found between the two delimiters, with
-everything up through the first sequence of asterisks deleted on every line.
-Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
+The ellipsis `...' is filled in by text found between the two delimiters,
+using the following rules:
+
+@enumerate
+@item
+Each entry is located by the pattern "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_]*):".
+Fundamentally, it finds a line that, after the first asterisk on the line,
+contains whitespace then a name and is immediately followed by a colon.
+The name becomes the name of the attribute and what follows, up to the
+next attribute, is its value.
+@item
+If the first character of the value is either a single or double quote,
+then you are responsible for quoting the text as it gets inserted into
+the output definitions.
+@item
+All the leading text on a line is stripped from the value.
+The leading text is everything before the first asterisk,
+the asterisk and all the whitespace characters that immediately
+follow it.  If you want whitespace at the beginnings of the lines
+of text, you must do something like this:
+
+@example
+ * mumble:
+ * "  this is some\n"
+ * "  indented text."
+@end example
+
+@item
+If the `<entry-name>' is followed by a comma, the word `ifdef'
 (or 'ifndef') and a name `if_name', then the above entry will appear as:
 
-@format
-    #ifdef if_name
-    #line nnn \"source-file-name\"
-    entry_type = @{
-        name = entry_name;
-        ...
-    @};
-    #endif
-@end format
+@example
+#ifdef if_name
+#line nnn "source-file-name"
+entry_type = @{
+    name = entry_name;
+    ...
+@};
+#endif
+@end example
 
-@noindent
-Also, with the use of the @code{subblock} option, you can specify a nested
-value, @xref{getdefs subblock}.
+@item
+If you use of the @code{subblock} option, you can specify a nested
+value, @xref{getdefs subblock}.  That is, this text:
 
-Also, if @code{<entry-type>} is an asterisk (@code{*}), then the entry_type
-enclosure and the name entry will be omitted and the ellipsis will
-become top-level definitions.";
+@example
+ * arg:  int, this, what-it-is
+@end example
+
+with the `--subblock=arg=type,name,doc' option would yield:
+
+@example
+arg = @{ type = int; name = this; doc = what-it-is; @};
+@end example
+@end enumerate
+_EOF_;

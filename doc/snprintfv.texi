@@ -68,7 +68,7 @@ Many thanks!!
 
    For further details, the reader is referred to the snprintfv
 documentation.  These functions are also available in the template
-processing as: `sprintf' (@xref{SCM sprintf}), `printf'
-(@xref{SCM printf}), `fprintf' (@xref{SCM fprintf}), and `shellf'
-(@xref{SCM shellf}).
+processing as: `sprintf' (@pxref{SCM sprintf}), `printf'
+(@pxref{SCM printf}), `fprintf' (@pxref{SCM fprintf}), and `shellf'
+(@pxref{SCM shellf}).
 

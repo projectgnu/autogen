@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.24 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: expString.c,v 1.25 2001/05/09 05:25:59 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -28,10 +28,8 @@
 
 #include <string.h>
 
-#include <guile/gh.h>
-#include "autogen.h"
-#include "expGuile.h"
 #include "expr.h"
+#include "autogen.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
@@ -656,7 +654,7 @@ ag_scm_stack( SCM obj )
 
     res = SCM_EOL;
 
-    ppDE = findEntryList( SCM_CHARS( obj ), pDefContext );
+    ppDE = findEntryList( SCM_CHARS( obj ) );
     if (ppDE == NULL)
         return SCM_EOL;
 

@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.25 2000/09/14 03:42:36 bkorb Exp $
+ *  $Id: getdefs.c,v 2.26 2001/05/09 05:25:59 bkorb Exp $
  *
- *    getdefs copyright 1999 Bruce Korb
+ *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2000/09/14 03:42:36 $
+ *  Last Modified:     $Date: 2001/05/09 05:25:59 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -123,7 +123,7 @@ validateOptions( void )
      *  the '/' '*' '=' character sequence
      */
     if ((! HAVE_OPT( DEFS_TO_GET )) || (*OPT_ARG( DEFS_TO_GET ) == NUL)) {
-        pzDefPat = "/\\*=([a-zA-Z][a-zA-Z0-9_]*|\\*)[ \t]+[a-zA-Z]";
+        pzDefPat = "/\\*=([a-z][a-z0-9_]*|\\*)[ \t]+[a-z]";
 
     } else {
         char*  pz  = OPT_ARG( DEFS_TO_GET );
@@ -154,14 +154,14 @@ validateOptions( void )
         int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );
         if (rerr != 0) {
             regerror( rerr, &define_re, zRER, sizeof( zRER ));
-            fprintf( stderr, zReErr, rerr, pzDefPat );
+            fprintf( stderr, zReErr, rerr, zRER, pzDefPat );
             exit( EXIT_FAILURE );
         }
 
         rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
         if (rerr != 0) {
             regerror( rerr, &attrib_re, zRER, sizeof( zRER ));
-            fprintf( stderr, zReErr, rerr, zAttribRe );
+            fprintf( stderr, zReErr, rerr, zRER, zAttribRe );
             exit( EXIT_FAILURE );
         }
     }
@@ -1052,7 +1052,7 @@ buildPreamble(
         return FAILURE;
     }
 
-    *pzDef++ = NUL;
+    *pzDef = NUL;
 
     /*
      *  Now start the output.  First, the "#line" directive,
@@ -1099,6 +1099,7 @@ buildPreamble(
 
     *ppzOut = pzOut;
     *ppzDef = pzDef;
+    *pzDef  = '\n';  /* restore the newline.  Used in pattern match */
 
     /*
      *  Returning "PROBLEM" means the caller must emit the "#endif\n"
@@ -1134,7 +1135,7 @@ buildDefinition(
             pzDef++;
         preamble = PROBLEM;
 
-    } else {    
+    } else {
         preamble = buildPreamble( &pzDef, &pzOut, pzFile, line );
         if (FAILED( preamble )) {
             *pzOut = NUL;
@@ -1635,7 +1636,7 @@ loadFile( char* pzFname )
         pzRead += rdct;
         rdsz   -= rdct;
     } while (rdsz > 0);
-            
+
     *pzRead = NUL;
     fclose( fp );
     return pzText;

@@ -1,6 +1,6 @@
-[= AutoGen5 Template  -*-  Mode:  C  -*-
+[= AutoGen5 Template  -*-  Mode:  text  -*-
 
-x
+h=%s-fsm.h
 
 =]
 [= (dne " *  " "/*  ") =]
@@ -26,119 +26,147 @@ x
  *  this template will also produce example code for your FSM.
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
- *
+ */[=
+
+  (define hdrname (out-name))
+  (define guard   (string-append
+          (string-upcase! (string->c-name! (out-name))) "_GUARD" ))
+
+=]
+#ifndef [=(. guard)=]
+#define [=(. guard)=]
+/*
  *  Here are the available states.
  */
 typedef enum {
 [=
-(out-push-new ".fsm.state")
+(shellf "columns --spread=1 -I4 -S, -f'FSS_%%s' <<_EOF_
+INIT
+%s
+INVALID
+DONE
+_EOF_" (string-upcase! (join "\n" (stack "state"))) )=]
+} te_fsm_state;
 
-  =]FSS_INIT = 0
-[=
-
-FOR  state
-
-  =]FSS_[= (string-upcase! (get "state")) =]
-[=
-ENDFOR
-
-  =]FSS_INVALID
-FSS_DONE[=
-
-(out-pop) =][=
-
-`columns --spread=3 -I4 -S, < .fsm.state`  =]
-} te_fsm_state;[=
-
-
-FOR token
-
-  =][=
-
-  (shellf
-     "tkn=\"%s\" ; eval INIT_${tkn}=\\\"{ FSS_INVALID, FSX_INVALID }\\\""
-     (string-upcase! (get "token")))  =][=
-
-  FOR state =][=
-
-    (shellf "eval %s_${tkn}=\\\"{ FSS_INVALID, FSX_INVALID }\\\""
-            (string-upcase! (get "state")))   =][=
-
-  ENDFOR
-
-  =][=
-
-ENDFOR
-
-=]
+/*
+ *  Count of non-terminal states.  FSS_INVALID and FSS_DONE are terminal,
+ *  FSS_INIT is not  :-).
+ */
+#define FSM_STATE_COUNT  [=(+ 1 (count "state"))=]
 
 /*
  *  The transition tokens.
  */
 typedef enum {
 [=
-(out-push-new ".fsm.tkn")
-
-  =][=
-
-FOR  token  "\n"
-
-  =]FST_[= (string-upcase! (get "token")) =][=
-
-ENDFOR    =]
-FST_INVALID[=
-
-(out-pop) =][=
-
-`columns --spread=3 -I4 -S, < .fsm.tkn`  =]
+(shellf "columns --spread=1 -I4 -S, -f'FST_%%s' <<_EOF_
+%s
+INVALID
+_EOF_" (string-upcase! (join "\n" (stack "token"))) )=]
 } te_fsm_token;
-
-/*
- *  This enumerates all the valid state + token-name transitions.
- *  It is actually possible to have multiple specifications for a single
- *  pair, but we unique sort the list and eliminate dups that way.
- *  The last one specified will be the only one effective.
- */
-typedef enum {[=
-(shellf "state_list=\"INIT %s\""
-       (string-upcase! (join " " (stack "state"))))
-(define next-state "")
-(out-push-new ".fsm.trans") =][=
-
-FOR transition              =][=
-
-  CASE t_st                 =][=
-  == "*"                    =]
 [=
-    (set! next-state (if (exist? "next") (get "next") "${f}"))
 
-    (shellf "for f in ${state_list} ; do
-     eval ${f}_%1$s=\\\"{ FSS_%2$s, FSX_${f}_%1$s }\\\"
-     echo \"    FSX_${f}_%1$s,\"
-     done" (string-upcase! (get "ttkn")) next-state)
-  =][=
+;;  Initialize every possible transition as invalid
+;;
+(shellf
+  "tk_list='%s' ; st_list='INIT %s'
+   for f in $tk_list ; do for g in $st_list
+   do  eval ${g}_${f}=\\\"{ FSS_INVALID, FSX_INVALID }\\\"
+   done ; done"
+        (string-upcase! (join " " (stack "token")))
+        (string-upcase! (join " " (stack "state"))))
 
+(define ttkn  "")
+(define tst   "")
+(define ttype "")
 
-  ~  [a-z][a-z0-9_]*    =][=
+(out-push-new ".fsm.trans")
 
-  (shellf "%1$s_%2$s=\"{ FSS_%3$s, FSX_%1$s_%2$s }\""
-          (string-upcase! (get "t_st"))
-          (string-upcase! (get "ttkn"))
-          (string-upcase! (get "next")) )
-  =]
-    FSX_[=(string-upcase! (get "t_st"))
-      =]_[=(string-upcase! (get "ttkn")) =],[=
+;;  Now, evaluate each transition definition and replace the
+;;  specified transitions with the defined value.
+;;
+=][=
 
-  *      =][= (error % t_st "Invalid state name: '%s'") =][=
+FOR transition    "\n"         =][=
 
-  ESAC   =][=
+  (set! tst  (string-upcase! (get "t_st")))
+  (set! ttkn (string-upcase! (get "ttkn")))  =][=
 
-ENDFOR   =][=
+  IF (== tst "*")              =][=
+
+     ;;  This transition applies for all states
+     ;;
+     (set! ttype (if (exist? "ttype")
+         (string-upcase! (get "ttype"))
+         (string-append "${f}_" ttkn) ))
+
+     (shellf
+
+     "for f in ${st_list} ; do
+     g=\"%s\"
+     eval ${f}_%s=\\\"{ FSS_%s, FSX_${g} }\\\"
+     echo ${g},
+     done"
+
+     ttype ttkn
+     (if (exist? "next") (string-upcase! (get "next")) "${f}")
+     )                         =][=
+
+   ELIF (== ttkn "*")          =][=
+
+     ;;  This transition applies for all transitions in a certain state
+     ;;
+     (set! ttype (string-upcase! (if (exist? "ttype") (get "ttype")
+                 (string-append tst "_${f}")  )))
+
+     (shellf
+      "for f in ${tk_list} ; do
+      g=\"%s\"
+      eval %s_${f}=\\\"{ FSS_%s, FSX_${g} }\\\"
+      echo ${g},
+      done"
+      ttype tst 
+      (string-upcase! (if (exist? "next") (get "next") (get "t_st")))
+      )                        =][=
+
+   ELSE                        =][=
+
+      (set! ttype (string-upcase! (if (exist? "ttype") (get "ttype")
+                  (string-append tst "_" ttkn)  )))
+
+      (shell (string-upcase! (sprintf
+       "%s_%s=\"{ FSS_%s, FSX_%s }\""
+       tst  ttkn
+       (if (exist? "next")  (get "next") (get "t_st"))
+       ttype  )))
+
+       =][=(. ttype)=],[=
+
+   ENDIF                       =][=
+
+ENDFOR   =]
+INVALID,
+[=
 
 (out-pop)
-(shell "sort -u .fsm.trans > .fsm.xlist ; cat .fsm.xlist")
+(shell "sort -u .fsm.trans > .fsm.xlist ; rm -f .fsm.trans")  =]
+
+#ifdef DEFINE_FSM
+/*[=#
+
+   It is actually possible to have multiple specifications for a
+   single state/token pair, but we unique sort the list and eliminate
+   dups that way.  The unique-ified list is used to produce the switch
+   statement later.
+
+   The last state/token assignment will supply the value for the
+   transition table.
+
 =]
-    FSX_INVALID
+ *  This enumerates all the valid state + token-name transitions.
+ */
+typedef enum {
+[=`sed 's/^/    FSX_/;$s/,$//' .fsm.xlist`=]
 }  te_transition;
 
 typedef struct transition t_transition;
@@ -151,42 +179,62 @@ struct transition {
  *  This table maps the state enumeration + the token enumeration to
  *  the transition enumeration code and the new state.
  *  It is indexed by first the current state and then the token code.
- *  There are no transition entries defined for the INVALID or DONE
- *  states, obviously  :-).
  */
-static t_transition trans_table[ [=
-   (+ 1 (count "state")) =] ][ [=(count "token")=] ] = {
-[=
-(out-push-new ".fsm.ttbl1") =][=
+static t_transition trans_table[ FSM_STATE_COUNT ][ [=(count "token")
+                            =] ] = {[=
 
-FOR token "\n" =][=
-  (shellf "echo $INIT_%s" (string-upcase! (get "token")))  =][=
-ENDFOR
-
-=]
-[=
-
-(out-pop)
-(shell "columns --spread=3 --first-indent=\"  {\" -I4 -S, < .fsm.ttbl1") =] },
-[=
-FOR state ",\n" =]
-[=
-  (out-push-new ".fsm.ttbl2")
+DEFINE state-table  =]
+  { [=
   (shellf "state=%s" (string-upcase! (get "state"))) =][=
 
-  FOR token =][=
-    (shellf "eval echo \\$${state}_%s" (string-upcase! (get "token"))) =]
-[=ENDFOR=][=
+  FOR token ",\n    "
+    =][=(shellf "eval echo \\\"\\$${state}_%s\\\""
+                (string-upcase! (get "token"))) =][=
+    (if (first-for?) (sprintf "\t/* %s state */" (get "state")))  =][=
+  ENDFOR     =] }[=
+ENDDEF       =][=
 
-  (out-pop)
-  (shell "columns --spread=3 --first-indent=\"  {\" -I4 -S, < .fsm.ttbl2") =] }[=
-ENDFOR =]
+state-table state = INIT  =][=
+
+FOR state    =],
+[=
+state-table  =][=
+ENDFOR       =]
 };
+#endif /* DEFINE_FSM */
+#endif /* [=(. guard)=] */
+[=
+IF (exist? "example")  =][=
+
+  (shellf
+    "targ_file=%s-fsm.c
+     [ -f ${targ_file} ] && mv -f ${targ_file} .fsm.oldtext"
+    (base-name))
+
+  (out-switch (string-append (base-name) "-fsm.c"))
+  (set-writable) =][=
+ELSE             =][=
+  (out-switch (string-append (base-name) "-fsm.c")) =][=
+ENDIF            =][=
+
+(dne " *  " "/*  ")  =]
+ *
+[=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
+ */
+#ifndef EXAMPLE_TEXT
+
+#include <stdio.h>
+#include <stdlib.h>
+#define  DEFINE_FSM
+#include "[=(. hdrname)=]"
 
 #ifndef tSCC
 #  define tSCC static const char
 #endif
 
+/*
+ *  Print out an invalid transition message and return EXIT_FAILURE
+ */
     int
 fsm_invalid_transition( te_fsm_state old_state, te_fsm_token tkn )
 {
@@ -204,22 +252,12 @@ ENDFOR
 
 =]
     tSCC* apzStates[] = {
-[= (out-push-new ".fsm.name")
-=]zStInit,
-[=
-
-FOR state ",\n"
-
-=]zSt[=(string-capitalize! (get "state"))=][=
-
-ENDFOR
-
-=][=
-
-(out-pop)
-(shell "columns --spread=3 -I8 < .fsm.name")
-
-=] };
+[=(shellf
+"columns --spread=1 -I8 -S, -f'zSt%%s' <<'_EOF_'
+Init
+%s
+_EOF_"
+(string-capitalize! (join "\n" (stack "state")))  )=] };
 [=
 
 FOR token =]
@@ -229,19 +267,11 @@ ENDFOR
 
 =]
     tSCC* apzTokens[] = {
-[= (out-push-new ".fsm.name") =][=
-
-FOR token ",\n"
-
-=]zTk[=(string-capitalize! (get "token"))=][=
-
-ENDFOR =],
-zInvalid[=
-
-(out-pop)
-(shell "columns --spread=3 -I8 < .fsm.name")
-
-=] };
+[=(shellf
+"columns --spread=1 -I8 -S, -f'zTk%%s' <<'_EOF_'
+%s
+_EOF_"
+(string-capitalize! (join "\n" (stack "token")))  )=] };
 
     const char* pzState;
     const char* pzToken;
@@ -258,59 +288,33 @@ zInvalid[=
     return EXIT_FAILURE;
 }[=
 
-IF (getenv "EXAMPLE") =]
+IF (exist? "example") =]
 
-#ifdef EXAMPLE
-/*
- *  You will need to fill in the capitalized pseudo-calls with
- *  code that makes sense for your app.
- */
-{
-    te_fsm_state fsm_state = FSS_INIT;
-    FSM_INITIALIZATIONS();
+#else /* *is* [=example=]-type EXAMPLE_TEXT */[=
 
-    while (fsm_state != FSS_DONE) {
-        te_fsm_token  fsm_tkn = GET_FSM_TOKEN();
-        te_fsm_state  nxt_state;
-        te_transition trans;
+  CASE example  =][=
 
-        /*
-         *  IF you are certain fsm_tkn cannot be invalid, you may skip test.
-         */
-        if (fsm_tkn >= FST_INVALID) {
-            nxt_state = FSS_INVALID;
-            trans     = FSX_INVALID;
-        } else {
-            nxt_state = trans_table[ fsm_state ][ fsm_tkn ].next_state;
-            trans     = trans_table[ fsm_state ][ fsm_tkn ].trans_type;
-        }
+  =*  glob      =][=
+	  (define example-type "global") =][=
+      include "fsm-example.tpl"      =][=
 
-        /*
-         *  There are only so many "FSX_<state-name>_<token-name>"
-         *  transitions that are legal.  See which one we got.
-         *  It is legal to alter "nxt_state" while processing these.
-         */
-        switch (trans) {
-[=`
+  =*  fun       =][=
+	  (define example-type "func")   =][=
+      include "fsm-example.tpl"      =][=
 
-for f in \`cat .fsm.xlist\`
-do
-  echo "${f}" | sed -e 's,FSX_,        case FSX_,'   -e 's/,/:/'
-  echo "${f}" | sed -e 's,FSX_,            HANDLE_,'  -e 's/,/();/'
-  echo "            break;"
-  echo
-done `=]
+  =*  state     =][=
+	  (define example-type "state")  =][=
+      include "fsm-state.tpl"        =][=
 
-        case FSX_INVALID:
-            fsm_invalid_transition( fsm_state, fsm_tkn );
-            exit( EXIT_FAILURE );
-        }
+  *             =][=
+      (shellf "rm -f .fsm.* >&2")
+	  (error "Example must specify 'glob'al, 'state' or 'fun'ction")  =][=
+  ESAC          =][=
 
-        fsm_state = nxt_state;
-    }
-}
-#endif /* EXAMPLE */[=
+ENDIF
 
-ENDIF  =][=
+=][=
 
-`rm -f .fsm.* >&2`=]
+`rm -f .fsm.* >&2`
+=]
+#endif /* EXAMPLE_TEXT */

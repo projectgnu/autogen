@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcIf.c,v 1.11 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: funcIf.c,v 1.12 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -26,9 +26,8 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
+#include "expr.h"
 #include "autogen.h"
-#include "proto.h"
-#include "expGuile.h"
 
 tSCC zNoIfEnd[]   = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
 
@@ -94,7 +93,7 @@ eval_true( void )
  *  load_proc:
  *
  *  desc:
- *  Conditional block.  Its arguments are evaluated (@xref{EXPR}) and
+ *  Conditional block.  Its arguments are evaluated (@pxref{EXPR}) and
  *  if the result is non-zero or a string with one or more bytes,
  *  then the condition is true and the text from that point
  *  until a matched @code{ELIF}, @code{ELSE} or @code{ENDIF} is emitted.
@@ -158,7 +157,7 @@ MAKE_HANDLER_PROC( If )
                              pIf->lineNo );
             }
 
-            generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex, pCurDef );
+            generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex );
             break;
         }
         pMac = pT->aMacros + pMac->sibIndex;
@@ -186,7 +185,7 @@ MAKE_HANDLER_PROC( If )
  *  load_proc:
  *
  *  desc:
- *  Conditionally repeated block.  Its arguments are evaluated (@xref{EXPR})
+ *  Conditionally repeated block.  Its arguments are evaluated (@pxref{EXPR})
  *  and as long as the result is non-zero or a string with one or more bytes,
  *  then the condition is true and the text from that point
  *  until a matched @code{ENDWHILE} is emitted.
@@ -230,7 +229,7 @@ MAKE_HANDLER_PROC( While )
         if (! eval_true())
             break;
         ct++;
-        generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex, pCurDef );
+        generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex );
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
@@ -443,6 +442,23 @@ MAKE_LOAD_PROC( While )
      */
     papLoadProc = papLP;
     return pEndMac;
+}
+
+
+/*=gfunc set_writable
+ *
+ * what:   Make the output file be writable
+ *
+ * doc:    This function will set the current output file to be writable.
+ *         This is only effective if the command line option
+ *         @code{--not-writable} has not been specified.  This state
+ *         is reset when the current suffix's output is complete.
+=*/
+    SCM
+ag_scm_set_writable( void )
+{
+    SET_OPT_WRITABLE;
+    return SCM_UNDEFINED;
 }
 /*
  * Local Variables:

@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2000/10/17 04:12:49 $
+# Last Modified:     $Date: 2001/05/09 05:25:59 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: guile.test,v 1.4 2000/10/17 04:12:49 bkorb Exp $
+# $Id: guile.test,v 1.5 2001/05/09 05:25:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -85,11 +85,10 @@ guile> 2
 guile> ("value 1 for second." "value number two")
 guile> #f
 guile> #t
-guile> 
 _EOF_
 
 ./${testname} -s 'value 1 for second.' -s 'value number two' \
-  > ${testname}.runout <<'_EOF_'
+  > ${testname}.tmprun <<'_EOF_'
 have-opt-second
 opt-enabled-second
 opt-ct-second
@@ -99,6 +98,11 @@ opt-enabled-option
 _EOF_
 
 test $? -ne 0 && failure guile script failed
+
+#  Delete the last line.  It may not have a new line and that
+#  causes a compare failure (despite the `-b') on some systems
+#
+sed '$d'  ${testname}.tmprun >  ${testname}.runout
 diff -b -q ${testname}.run* || \
   failure unanticipated run output
 

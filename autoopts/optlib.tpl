@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.25 2000/11/10 16:31:37 bkorb Exp $
+# $Id: optlib.tpl,v 1.26 2001/05/09 05:25:59 bkorb Exp $
 
 =]
 [=
@@ -23,6 +23,7 @@ DEFINE set_defines set_desc set_index opt_state =]
   ENDIF  =][=
   IF (or (exist? "call_proc")
          (exist? "flag_code")
+         (exist? "extract_code")
          (exist? "flag_proc")
          (exist? "stack_arg")
          (~* (get "arg_type") "key|num|bool" ) )   =]; \
@@ -37,9 +38,10 @@ DEFINE set_defines set_desc set_index opt_state =]
         [=set_desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
         [=set_desc=].pzLastArg  = (char*)NULL[=
     IF (or (exist? "call_proc")
-       (or (exist? "flag_code")
-       (or (exist? "flag_proc")
-           (exist? "stack_arg") ))) =]; \
+           (exist? "flag_code")
+           (exist? "extract_code")
+           (exist? "flag_proc")
+           (exist? "stack_arg") ) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                   (. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set_index=] )[=
@@ -314,9 +316,10 @@ DEFINE Option_Descriptor =][=
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ [=
-         IF   (exist? "call_proc") =][=(get "call_proc")=][=
-         ELIF (exist? "flag_code") =]doOpt[=(. cap-name)=][=
-         ELSE                      =](tpOptProc)NULL[=
+         IF   (exist? "call_proc")        =][=call_proc=][=
+         ELIF (or (exist? "extract_code")
+                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
+         ELSE                             =](tpOptProc)NULL[=
          ENDIF =],
      /* desc, NAME, name */ z[=(. cap-name)=]Text, (const char*)NULL,
                             (const char*)NULL,
@@ -352,17 +355,17 @@ DEFINE Option_Descriptor =][=
          (if (exist? "max") (get "max") "1")=], 0,
      /* opt state flags  */ [=
          CASE arg_type  =][=
-         =*   num                      =]OPTST_NUMERIC | [=
-         =*   bool                     =]OPTST_BOOLEAN | [=
-         =*   key                      =]OPTST_ENUMERATION | [=
+         =*   num       =]OPTST_NUMERIC | [=
+         =*   bool      =]OPTST_BOOLEAN | [=
+         =*   key       =]OPTST_ENUMERATION | [=
          ESAC           =][=
-         IF (exist? "stack_arg")       =]OPTST_STACKED | [=     ENDIF=][=
-         IF (exist? "immediate")       =]OPTST_IMM | [=         ENDIF=][=
-         IF (exist? "immed_disable")   =]OPTST_DISABLE_IMM | [= ENDIF=][=
-         IF (not (exist? "enabled"))   =]OPTST_DISABLED | [=
-         ELSE                          =]OPTST_INITENABLED | [= ENDIF=][=
-         IF (exist? "no_preset")       =]OPTST_NO_INIT[=
-         ELSE                          =]OPTST_INIT[=           ENDIF=],
+         stack_arg      "OPTST_STACKED | "     =][=
+         immediate      "OPTST_IMM | "         =][=
+         immed_disable  "OPTST_DISABLE_IMM | " =][=
+         ? enabled      "OPTST_INITENABLED"
+                        "OPTST_DISABLED"    =] | [=
+         ? no_preset    "OPTST_NO_INIT"
+                        "OPTST_INIT"           =],
      /* last opt argumnt */ (char*)[=
          IF (exist? "arg_default") =]z[=(. cap-name)=]DefaultArg[=
          ELSE =]NULL[= ENDIF =],
@@ -375,9 +378,9 @@ DEFINE Option_Descriptor =][=
          ELSE                    =](const int*)NULL[=
          ENDIF=],
      /* option proc      */ [=
-         IF   (exist? "call_proc") =][=call_proc=][=
-
-         ELIF (exist? "flag_code") =]doOpt[=(. cap-name)=][=
+         IF   (exist? "call_proc")        =][=call_proc=][=
+         ELIF (or (exist? "extract_code")
+                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
 
          ELIF (exist? "flag_proc") =]doOpt[= (string-capitalize!
                                              (get "flag_proc")) =][=
@@ -386,17 +389,17 @@ DEFINE Option_Descriptor =][=
            IF (or (not (exist? "equivalence"))
                   (= (get "equivalence") (get "name")) )
 
-                                   =]stackOptArg[=
-           ELSE                    =]unstackOptArg[=
-           ENDIF  =][=
+                          =]stackOptArg[=
+           ELSE           =]unstackOptArg[=
+           ENDIF          =][=
 
-         ELSE                      =][=
-           CASE arg_type           =][=
-           =*   bool               =]optionBooleanVal[=
-           =*   num                =]optionNumericVal[=
-           =*   key                =]doOpt[=(. cap-name)=][=
-           *                       =](tpOptProc)NULL[=
-           ESAC                    =][=
+         ELSE             =][=
+           CASE arg_type  =][=
+           =*   bool      =]optionBooleanVal[=
+           =*   num       =]optionNumericVal[=
+           =*   key       =]doOpt[=(. cap-name)=][=
+           *              =](tpOptProc)NULL[=
+           ESAC           =][=
          ENDIF=],
      /* desc, NAME, name */ z[=(. cap-name)=]Text,  z[=(. cap-name)=]_NAME,
                             z[=(. cap-name)=]_Name,

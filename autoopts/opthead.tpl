@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.24 2000/10/17 17:09:19 bkorb Exp $
+# $Id: opthead.tpl,v 2.25 2001/05/09 05:25:59 bkorb Exp $
 =]
 [=
 
@@ -123,7 +123,7 @@ FOR flag =][=
   (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
  IF (exist? "documentation") =][=
-   IF (or (exist? "call_proc") (exist? "flag_code"))
+   IF (or (exist? "call_proc") (exist? "flag_code") (exist? "extract_code"))
 =]
 #define SET_[=(. UP-prefix)=]OPT_[=(. UP-name)=]   STMTS( \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \

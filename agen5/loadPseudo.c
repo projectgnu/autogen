@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.10 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.11 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -27,7 +27,7 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
-#include <sys/mman.h> 
+#include <sys/mman.h>
 #include <fcntl.h>
 
 #include "autogen.h"
@@ -39,7 +39,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  */
-#include "pseudo.x"
+#include "pseudo-fsm.c"
 
 tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
@@ -51,21 +51,19 @@ tSCC zTpName[] = "template";
  *
  *  Process a suffix specification
  */
-    STATIC tCC*
-skipSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
+    EXPORT tCC*
+doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 {
     /*
-     *  The following is the complete list of POSIX
-     *  required-to-be-legal file name characters.
-     *  These are the only characters we allow to
-     *  appear in a suffix.  We do, however, add
-     *  '=' and '%' because we also allow a format
-     *  specification to follow the suffix, separated
-     *  by an '=' character.
+     *  The following is the complete list of POSIX required-to-be-legal
+     *  file name characters.  These are the only characters we allow to
+     *  appear in a suffix.  We do, however, add '=' and '%' because we
+     *  also allow a format specification to follow the suffix,
+     *  separated by an '=' character.
      */
-    tSCC       zFilChars[] = "abcdefghijklmnopqrstuvwxyz"
-                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                             "0123456789" "-_./" "=%";
+    tSCC zSuffixSpecChars[] = "abcdefghijklmnopqrstuvwxyz"
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "-_./" "=%";
+
     tOutSpec*  pOS;
     char*      pz;
     static tOutSpec**  ppOSList = &pOutSpecList;
@@ -73,12 +71,16 @@ skipSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
     /*
      *  Skip over the suffix construct
      */
-    size_t spn = strspn( pzData, zFilChars );
+    size_t spn = strspn( pzData, zSuffixSpecChars );
 
     /*
-     *  The suffix construct is saved only for the main template!
+     *  If pzFileName is NULL, then we are called by --select-suffix.
+     *  Otherwise, the suffix construct is saved only for the main template,
+     *  and only when the --select-suffix option was not specified.
      */
-    if (procState != PROC_STATE_LOAD_TPL)
+    if (  (pzFileName != NULL)
+       && (  (procState != PROC_STATE_LOAD_TPL)
+          || HAVE_OPT( SELECT_SUFFIX )))
         return pzData + spn;
 
     /*
@@ -280,7 +282,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
     templLineNo  = 1;
 
     while (fsm_state != FSS_DONE) {
-        te_fsm_token  fsm_tkn = findTokenType( &pzData, fsm_state, line_start );
+        te_fsm_token fsm_tkn = findTokenType( &pzData, fsm_state, line_start );
         te_fsm_state  nxt_state;
         te_transition trans;
 
@@ -335,16 +337,16 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             break;
 
         case FSX_TEMPL_SUFFIX:
-            pzData = skipSuffixSpec( pzData, pzFileName, templLineNo );
+            pzData = doSuffixSpec( pzData, pzFileName, templLineNo );
             break;
 
         case FSX_END_MARK_ED_MODE:
         case FSX_INVALID:
-	{
-	    tCC*  pzWhich;
+        {
+            tCC*  pzWhich;
 
             fsm_invalid_transition( fsm_state, fsm_tkn );
-	    switch (fsm_state) {
+            switch (fsm_state) {
             case FSS_INIT:     pzWhich = "need start marker";    break;
             case FSS_ST_MARK:  pzWhich = "need autogen5 marker"; break;
             case FSS_AGEN:     pzWhich = "need template marker"; break;
@@ -354,7 +356,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             }
             fprintf( stderr, zTplErr, pzFileName, templLineNo, pzWhich );
             AG_ABEND;
-	}
+        }
         case FSX_END_MARK_END_PSEUDO:
             /* we be done now */;
         }

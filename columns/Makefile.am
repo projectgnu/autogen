@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.26 2000/04/04 13:22:19 bkorb Exp $
+## $Id: Makefile.am,v 1.27 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -19,7 +19,7 @@ columns_SOURCES = columns.c opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
-AGEXE		= $(top_builddir)/agen5/@AGEXE@
+AGEXE		= $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
 
@@ -33,19 +33,16 @@ all : gen
 
 opts.c opts.h: opts.def
 	top_builddir=$(top_builddir) \
-	$(AGEXE) -L $(top_srcdir)/autoopts \
-		$(top_srcdir)/columns/opts.def
+	$(AGEXE) $(top_srcdir)/columns/opts.def
 
 columns.o : opts.h
 
 columns.menu columns.texi : opts.def columns
 	top_builddir=$(top_builddir) \
-	$(AGEXE) -Taginfo -bcolumns \
-		-L $(top_srcdir)/autoopts -DLEVEL=section \
+	$(AGEXE) -Taginfo -bcolumns -DLEVEL=section \
 		$(top_srcdir)/columns/opts.def
 
 columns.1 : opts.def columns
-	$(AGEXE) -T agman1 -L $(top_srcdir)/autoopts \
-		-b columns $(srcdir)/opts.def
+	$(AGEXE) -T agman1 -b columns $(srcdir)/opts.def && touch $@
 
 # Makefile.am ends here

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcCase.c,v 1.24 2000/11/02 00:47:56 bkorb Exp $
+ *  $Id: funcCase.c,v 1.25 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -883,7 +883,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  desc:
  *
  *  The arguments are evaluated and converted to a string, if necessary.
- *  (@xref{EXPR}.)  The scope of the macro is up to the matching ESAC
+ *  (@pxref{EXPR})  The scope of the macro is up to the matching ESAC
  *  function.  Within the scope of a CASE, this string is matched against
  *  case selection macros.  There are sixteen match macros that are derived
  *  from four different ways the test may be performed.
@@ -924,7 +924,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *
  *  These case selection codes have also been implemented as
  *  Scheme expression functions using the same codes
- *  (@xref{Common Functions}).
+ *  (@pxref{Common Functions}).
 =*/
 /*=macfunc ESAC
  *
@@ -1026,8 +1026,7 @@ MAKE_HANDLER_PROC( Case )
                              pMac->lineNo );
             }
 
-            generateBlock( pT, pMac + 1, pT->aMacros + pMac->sibIndex,
-                           pCurDef );
+            generateBlock( pT, pMac + 1, pT->aMacros + pMac->sibIndex );
             break;
         }
     }

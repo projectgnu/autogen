@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.9 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.10 2001/05/09 05:25:59 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -39,8 +39,7 @@ STATIC void openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
     EXPORT void
 generateBlock( tTemplate*   pT,
                tMacro*      pMac,
-               tMacro*      pEnd,
-               tDefEntry*   pCurDef )
+               tMacro*      pEnd )
 {
     tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
     int  fc;
@@ -53,7 +52,6 @@ generateBlock( tTemplate*   pT,
      *  handling code.  It is all for user friendly diagnostics.
      */
     pCurTemplate = pT;
-    pDefContext  = pCurDef;
 
     while ((pMac != (tMacro*)NULL) && (pMac < pEnd)) {
         fc = pMac->funcCode;
@@ -81,7 +79,7 @@ generateBlock( tTemplate*   pT,
         }
 
         pCurMacro = pMac;
-        pMac = (*(apHdlrProc[ fc ]))( pT, pMac, pCurDef );
+        pMac = (*(apHdlrProc[ fc ]))( pT, pMac );
     }
 }
 
@@ -91,7 +89,7 @@ processTemplate( tTemplate* pTF )
 {
     tFpStack fpRoot = { (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
 
-    forInfo.for_depth = 0;
+    forInfo.fi_depth = 0;
 
     /*
      *  IF the template file does not specify any output suffixes,
@@ -108,9 +106,7 @@ processTemplate( tTemplate* pTF )
             pCurFp        = &fpRoot;
             fpRoot.pFile  = stdout;
             AGDUPSTR( fpRoot.pzOutName, "stdout", "processTemplate" );
-
-            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt,
-                           (tDefEntry*)rootEntry.pzValue );
+            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
             break;
         }
 
@@ -142,9 +138,8 @@ processTemplate( tTemplate* pTF )
             openOutFile( pOS, &fpRoot );
 
             pzCurSfx = pOS->zSuffix;
-
-            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt,
-                           (tDefEntry*)rootEntry.pzValue );
+            currDefCtx = rootDefCtx;
+            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
 
             do  {
                 closeOutput( AG_FALSE );  /* keep output */
@@ -185,6 +180,7 @@ processTemplate( tTemplate* pTF )
 closeOutput( ag_bool purge )
 {
     removeWriteAccess( fileno( pCurFp->pFile ));
+
     fclose( pCurFp->pFile );
 
     if (purge)

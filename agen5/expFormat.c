@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 1.31 2000/11/02 00:47:56 bkorb Exp $
+ *  $Id: expFormat.c,v 1.32 2001/05/09 05:25:59 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -43,44 +43,21 @@ static const char zGpl[] =
 "%2$s           Boston,  MA  02111-1307, USA.";
 
 static const char zLgpl[] =
-"%2$s%1$s is free software.\n%2$s\n"
-"%2$sYou may redistribute it and/or modify it under the terms of the\n"
-"%2$sGNU General Public License, as published by the Free Software\n"
-"%2$sFoundation; either version 2, or (at your option) any later version.\n"
+"%2$s%1$s is free software; you can redistribute it and/or\n"
+"%2$smodify it under the terms of the GNU Lesser General Public\n"
+"%2$sLicense as published by the Free Software Foundation; either\n"
+"%2$sversion 2.1 of the License, or (at your option) any later version.\n"
 "%2$s\n"
 "%2$s%1$s is distributed in the hope that it will be useful,\n"
 "%2$sbut WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"%2$sSee the GNU General Public License for more details.\n"
+"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+"%2$sLesser General Public License for more details.\n"
 "%2$s\n"
-"%2$sYou should have received a copy of the GNU General Public License\n"
-"%2$salong with %1$s.  See the file \"COPYING\".  If not,\n"
-"%2$swrite to:  The Free Software Foundation, Inc.,\n"
+"%2$sYou should have received a copy of the GNU Lesser General Public\n"
+"%2$sLicense along with %1$s; if not, write to:\n"
+"%2$s           The Free Software Foundation, Inc.,\n"
 "%2$s           59 Temple Place - Suite 330,\n"
-"%2$s           Boston,  MA  02111-1307, USA.\n"
-"%2$s\n"
-"%2$sAs a special exception, %3$s gives permission for additional\n"
-"%2$suses of the text contained in the release of %1$s.\n"
-"%2$s\n"
-"%2$sThe exception is that, if you link the %1$s library with other\n"
-"%2$sfiles to produce an executable, this does not by itself cause the\n"
-"%2$sresulting executable to be covered by the GNU General Public License.\n"
-"%2$sYour use of that executable is in no way restricted on account of\n"
-"%2$slinking the %1$s library code into it.\n"
-"%2$s\n"
-"%2$sThis exception does not however invalidate any other reasons why\n"
-"%2$sthe executable file might be covered by the GNU General Public License.\n"
-"%2$s\n"
-"%2$sThis exception applies only to the code released by %3$s under\n"
-"%2$sthe name %1$s.  If you copy code from other sources under the\n"
-"%2$sGeneral Public License into a copy of %1$s, as the General Public\n"
-"%2$sLicense permits, the exception does not apply to the code that you add\n"
-"%2$sin this way.  To avoid misleading anyone as to the status of such\n"
-"%2$smodified files, you must delete this exception notice from them.\n"
-"%2$s\n"
-"%2$sIf you write modifications of your own for %1$s, it is your choice\n"
-"%2$swhether to permit this exception to apply to your modifications.\n"
-"%2$sIf you do not wish that, delete this exception notice.";
+"%2$s           Boston,  MA  02111-1307, USA.";
 
 static const char zBsd[] =
 "%2$s%1$s is free software copyrighted by %3$s.\n%2$s\n"
@@ -119,12 +96,17 @@ static const char zDne[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
+static const char zDne2[] = "%6$s"
+"%1$sEDIT THIS FILE WITH CAUTION  (%2$s)\n"
+"%1$s\n"
+"%1$sIt has been AutoGen-ed  %3$s\n"
+"%1$sFrom the definitions    %4$s\n"
+"%1$sand the template file   %5$s";
+
 #include <string.h>
 
-#include "autogen.h"
-#include <guile/gh.h>
-#include "expGuile.h"
 #include "expr.h"
+#include "autogen.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
@@ -145,10 +127,11 @@ tSCC zNil[]      = "";
  * exparg: prefix, string for starting each output line
  * exparg: first_prefix, for the first output line, opt
  *
- * doc:  Generate a "Do Not Edit" warning string.
- *       The argument is a per-line string prefix.
- *       The optional second argument is a first-line prefix and
- *       activates the read-only editor hints:
+ * doc:  Generate a "DO NOT EDIT" or "EDIT WITH CARE" warning string.
+ *       Which depends on whether or not the @code{--writable} command line
+ *       option was set.  The argument is a per-line string prefix.
+ *       The optional second argument is a first-line prefix and,
+ *       in read-only mode, activates the editor hints:
  *       @*
  *       @example
  *       -*- buffer-read-only: t -*- vi: set ro:
@@ -186,7 +169,8 @@ ag_scm_dne( SCM prefix, SCM first )
         }
         memcpy( (void*)(zScribble + 128), (void*)SCM_CHARS( first ), len );
         zScribble[ len + 128 ] = NUL;
-        pzFirst = asprintf( zDne1, zScribble+128, zScribble );
+        pzFirst = asprintf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
+                            zScribble+128, zScribble );
     }
 
     {
@@ -195,7 +179,8 @@ ag_scm_dne( SCM prefix, SCM first )
         strftime( zScribble+128, 128, "%A %B %e, %Y at %r %Z", pTime );
     }
 
-    pzRes = asprintf( zDne, zScribble, pCurFp->pzOutName, zScribble+128,
+    pzRes = asprintf( ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
+                      zScribble, pCurFp->pzOutName, zScribble+128,
                       OPT_ARG( DEFINITIONS ), pzTemplFileName, pzFirst );
 
     if (pzRes == (char*)NULL) {
@@ -384,7 +369,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  * general_use:
  *
  * exparg: prog_name, name of the program under the LGPL
- * exparg: owner, Grantor of the LGPL
+ * exparg: owner, Grantor of the LGPL (obsolete)
  * exparg: prefix, String for starting each output line
  *
  * doc:

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcEval.c,v 1.29 2000/10/11 16:24:42 bkorb Exp $
+ *  $Id: funcEval.c,v 1.30 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -26,9 +26,8 @@
  */
 #ifndef DEFINE_LOAD_FUNCTIONS
 
-#include "autogen.h"
-#include "expGuile.h"
 #include "expr.h"
+#include "autogen.h"
 
 #include <compat/compat.h>
 #ifdef WITH_INCLUDED_REGEX
@@ -121,7 +120,6 @@ evalExpression( ag_bool* pMustFree )
 {
     tTemplate*  pT      = pCurTemplate;
     tMacro*     pMac    = pCurMacro;
-    tDefEntry*  pCurDef = pDefContext;
     ag_bool     isIndexed;
     tDefEntry*  pDef;
     int         code = pMac->res;
@@ -138,18 +136,40 @@ evalExpression( ag_bool* pMustFree )
         /*
          *  Get the named definition entry, maybe
          */
-        pDef = findDefEntry( pT->pzTemplText + pMac->ozName,
-                             pCurDef, &isIndexed );
+        pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
 
         if (pDef == (tDefEntry*)NULL) {
-            /*
-             *  We do not have a definition.  Check to see if we _must_
-             *  have a definition.
-             */
-            if ((code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) == 0)
+            switch (code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) {
+            case EMIT_IF_ABSENT:
+                /*
+                 *  There is only one expression.  It applies because
+                 *  we did not find a definition.
+                 */
+                pzText = pT->pzTemplText + pMac->ozText;
+                code &= EMIT_PRIMARY_TYPE;
+                break;
+
+            case EMIT_ALWAYS:
+                /*
+                 *  There are two expressions.  Take the second one.
+                 */
+                pzText =  pT->pzTemplText + pMac->endIndex;
+                code   = ((code & EMIT_SECONDARY_TYPE)
+                          >> EMIT_SECONDARY_SHIFT);
+                break;
+
+            case 0:
+                /*
+                 *  Emit only if found
+                 */
                 return (char*)zNil;
-            pzText =  pT->pzTemplText + pMac->endIndex;
-            code   = ((code & EMIT_SECONDARY_TYPE) >> EMIT_SECONDARY_SHIFT);
+
+            case (EMIT_IF_ABSENT | EMIT_ALWAYS):
+                /*
+                 *  Emit inconsistently :-}
+                 */
+                LOAD_ABORT( pT, pMac, "PROGRAM ERROR:  ambiguous expr code" );
+            }
         }
 
         /*
@@ -358,7 +378,7 @@ eval( const char* pzExpr )
  *   explicitly, though if a macro starts with one of the apply codes
  *   or one of the simple expression markers, then an expression
  *   macro is inferred.  The result of the expression evaluation
- *   (@xref{expression syntax}) is written to the current output.
+ *   (@pxref{expression syntax}) is written to the current output.
 =*/
 MAKE_HANDLER_PROC( Expr )
 {
@@ -454,7 +474,7 @@ MAKE_LOAD_PROC( Expr )
     pzCopy = pT->pNext;
     pMac->ozName = (pzCopy - pT->pzTemplText);
     {
-        size_t remLen = cannonicalizeName( pzCopy, pzSrc, srcLen );
+        size_t remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
         if (remLen > srcLen)
             LOAD_ABORT( pT, pMac, "Invalid definition name" );
         pzSrc  += srcLen - remLen;

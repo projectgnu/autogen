@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2000/09/27 17:22:53 $
+# Last Modified:     $Date: 2001/05/09 05:25:59 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 1.31 2000/09/27 17:22:53 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 1.32 2001/05/09 05:25:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -61,8 +61,15 @@ then
   fi
 
 else
-  AUTOGEN_DEBUG=`echo " ${DEBUG_OPTS}" | sed 's/ -D/ /g'`
-  export AUTOGEN_DEBUG
+  case "${DEBUG_OPTS}" in
+  *DDEBUG* )
+    AUTOGEN_DEBUG=DEBUG=1
+    export AUTOGEN_DEBUG
+    ;;
+  * )
+    unset AUTOGEN_DEBUG
+    ;;
+  esac
 fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -263,7 +270,7 @@ do
     fi
     AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd` ; export AUTOGEN_TEMPL_DIRS
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
-    eopt="$eopt defs=gfunc templ=snarf srcfile"
+    eopt="$eopt defs=gfunc templ=snarf srcfile assign=two-phase=yes"
     eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
     echo ${GD} $eopt exp*.c func*.c
     ( SHELL=ksh ${GD} $eopt exp*.c func*.c 2>&1 ) > stamp-exprini
@@ -294,6 +301,8 @@ do
     AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
     eopt="template=functions defs=macfunc linenum srcfile filelist"
     eopt="$eopt autogen=${AG} base-name=functions"
+    if [ -n "${AUTOGEN_DEBUG}" ]
+    then eopt="$eopt agarg='-D${AUTOGEN_DEBUG}'" ; fi
     echo ${GD} $eopt func*.c
     ${GD} $eopt func*.c
     date > stamp-functions
@@ -325,7 +334,7 @@ do
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
     echo ${AG} ${eopt} -bautogen opts.def
-    ${AG} ${eopt} -bautogen opts.def
+    ${AG} ${eopt} -bautogen opts.def && touch autogen.menu autogen.texi
     ;;
 
   autogen.1 )
@@ -339,7 +348,7 @@ do
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def
-    ${AG} ${eopt} ./opts.def
+    ${AG} ${eopt} ./opts.def && touch autogen.1
     ;;
 
   proto.h )

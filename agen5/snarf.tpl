@@ -1,14 +1,80 @@
-[= AutoGen5 template  -*- Mode: C -*-
+[= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 1.8 2000/10/17 15:34:36 bkorb Exp $
+# $Id: snarf.tpl,v 1.9 2001/05/09 05:25:59 bkorb Exp $
 
 ini =]
-[= (out-push-new (string-append (base-name) ".h"))
-=][=
+[=#
 
+This template will emit the code necessary for registering callout routines
+for Guile/Scheme.  The name of the output file will be ``basename.ini''
+where ``basename'' may be of your choosing.
+
+The following definitions are used:
+
+group      A module prefix that preceeds the "scm_" prefix to all symbols
+init       the name of the created initialization routine.  This defaults
+           to "scm_init" or "group_init", if "group" is specified.
+           You must specify this for shared libraries.
+init_code  code to put at the start of the init routine
+fini_code  code to put at the end of the init routine
+
+gfunc      this is a compound definition containing the following definitions
+  name     the name of the function.  The Scheme string name will normally be
+           derived from this name, but it may be over-ridden with the "string"
+           attribute.  The transforming sed expression is:
+
+                sed -e's/_p$/?/;s/_x$/!/;s/_/-/g;s/-to-/->/'
+
+  string   the Scheme name for the function, if not derivable from the name.
+  static   If defined, then the function will not be exported.
+
+  exparg   "EXPression ARGument"  for each argument your routine handles,
+           you must specify one of these.  This is a compound definition
+           with the following "attributes" that may be defined:
+
+    arg_name      The name of the argument.  required
+    arg_desc      A very brief description of the argument.  required
+    arg_optional  Specify this if the argument is only optional
+    arg_list      Specify this for the last argument if the last argument
+                  may be an SCM list (i.e. an SCM-flavor of var args).
+
+syntax     This defines a Guile syntax element.  Read the Guile doc for
+           descriptions of the following attributes:
+  name       the name of the C variable to hold the value
+  type
+  cfn
+  string     the Scheme name for the syntax element, if not derivable.
+
+symbol     This defines a Guile symbol.
+  name       the name of the C variable to hold the value
+  init_val   initial scm value for object
+  const_val  initial integer value for object (signed long)
+  string     the Scheme name for the symbol, if not derivable.
+
+If you are using a definitions file, these are defined in the normal
+way.  If you are extracting them from `getdefs(1AG)' comments, then:
+
+1.  `group' and `init' should be defined on the command line thus:
+        getdefs assign=group=XX  assign=init=init_proc_name
+
+2.  `init_code' and `fini_code' should be defined in a traditional
+    definitions file and be incorporated from a command line option:
+        getdefs copy=file-name.def
+
+3.  `gfunc', `syntax', and `symbol' are getdefs' entry types.
+    The `name' attributes come from the getdefs entry name.
+    The remaining attributes are specified in the comment, per
+    the getdefs documentation.
+
+=][=
+(define scm-prefix
+        (if (exist? "group")
+            (string-append (get "group") "_scm_")
+            "scm_" ))
+(out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2000 Bruce Korb
+ *  copyright 1992-2001 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -16,14 +82,38 @@ ini =]
  */
 #ifndef GUILE_PROC_DECLS
 #define GUILE_PROC_DECLS
+#include <guile/gh.h>
+
+typedef enum {
+    GH_TYPE_UNDEFINED = 0,
+    GH_TYPE_BOOLEAN,
+    GH_TYPE_SYMBOL,
+    GH_TYPE_CHAR,
+    GH_TYPE_VECTOR,
+    GH_TYPE_PAIR,
+    GH_TYPE_NUMBER,
+    GH_TYPE_STRING,
+    GH_TYPE_PROCEDURE,
+    GH_TYPE_LIST,
+    GH_TYPE_INEXACT,
+    GH_TYPE_EXACT
+} teGuileType;
+
+teGuileType gh_type_e( SCM );
 [=
 FOR gfunc =]
-extern SCM [=% group "%s_" =]scm_[=name=]( [=
+extern SCM [=(. scm-prefix)=][=name=]( [=
   IF (exist? "exparg") =][=
     FOR exparg ", " =]SCM[=
     ENDFOR =][=
   ELSE  =]void[=
   ENDIF =] );[=
+ENDFOR =][=
+
+FOR symbol =][=
+  IF (exist? "global") =]
+extern SCM [=(. scm-prefix)=]sym_[=name=];[=
+  ENDIF =][=
 ENDFOR =]
 
 #endif /* GUILE_PROC_DECLS */
@@ -33,15 +123,14 @@ ENDFOR =]
 
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2000 Bruce Korb
+ *  copyright 1992-2001 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
  *  Guile Initializations - [=% group (string-capitalize! "%s ")
                             =]Global Variables
  */
-#include "[= (base-name) =].h"
-typedef SCM (t_scm_callout_proc) ();[=
+#include "[= (base-name) =].h"[=
 
 DEFINE string_content =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
@@ -60,9 +149,10 @@ ENDDEF =][=
     string_content =][=
   ENDFOR syntax =][=
 
-  FOR symbol =]
+  FOR symbol =][=
+    string_content =]
 [=  IF (exist? "global") =]      [=ELSE=]static[=ENDIF
-    =] SCM sym_[=% name %-18s =] = SCM_BOOL_F;[=
+    =] SCM [=(. scm-prefix)=]sym_[=% name %-18s =] = SCM_BOOL_F;[=
   ENDFOR symbol =]
 [=
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -71,10 +161,15 @@ ENDDEF =][=
 DEFINE CALL_NEWPROC =]
     gh_new_procedure( (char*)s_[=name=],
                       [=
-      % group "%s_"     =]scm_[= % name (sprintf "%%-28s" "%s,") =] [=
+         (. scm-prefix)=][= % name (sprintf "%%-28s" "%s,") =] [=
 
       IF (not (exist? "exparg"))
        =]0, 0, 0[=
+
+      #  Count of all the arguments:       (count "exparg")
+         Of these, some may be optional:   (count "exparg.arg_optional")
+         Of the optional, one may be an arg_list.
+         The sum of the three numbers must be:  (count "exparg")  =][=
 
       ELIF (not (exist? "exparg.arg_list")) =][=
        (- (count "exparg") (count "exparg.arg_optional")) =], [=
@@ -90,28 +185,16 @@ DEFINE CALL_NEWPROC =]
 ENDDEF =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=]
+=][=
 
-void [=% group "%s_" =]init( void );
+DEFINE emit-init-code =][=
 
-/*
- *  [=% group "%s " =]Two-Phase Initialization procedure
- *
- *  This routine assumes that certain routines are not to be exported
- *  until the second time it is called.
- */
-void
-[=% group "%s_" =]init( void )
-{
-  static int first_time = 0;
-  if (first_time++ == 0) {
-[=
   IF (exist? "init_code") =]
     [=init_code=][=
   ENDIF =][=
 
   FOR gfunc =][=
-    IF (exist? "general_use") =][=
+    IF (or (not (exist? "two-phase")) (exist? "general_use")) =][=
       CALL_NEWPROC =][=
     ENDIF =][=
   ENDFOR gfunc =][=
@@ -120,31 +203,70 @@ void
     scm_make_synt( s_[=% name (sprintf "%%-16s" "%s,")=] [=type=], [=cfn=] );[=
   ENDFOR syntax =][=
 
-  FOR symbol =][=
-    IF (not (exist? "vcell")) =]
-    sym_[=name=] = scm_permanent_object (SCM_CAR (scm_intern0 ([=
-                 scheme_name=])));[=
-    ELSE =]
-    sym_[=name=] = scm_permanent_object (scm_intern0 ([=scheme_name=]));
-    SCM_SETCDR (sym_[=name=], [=
-      IF    (exist? "init_val") =][=init_val=][=
-      ELIF (exist? "const_val") =]scm_long2num([=const_val=])[=
-      ELSE                      =]SCM_BOOL_F[=
-      ENDIF=]);[=
+  FOR symbol =]
+    [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object [=
+    IF (not (and (exist? "init_val") (exist? "const_val")))
+         =](SCM_CAR (scm_intern0 (s_[=name=])));[=
+
+    ELSE =](scm_intern0 (s_[=name=]));
+    SCM_SETCDR ([=(. scm-prefix)=]sym_[=name=], [=
+      ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
     ENDIF =][=
-  ENDFOR symbol =]
+  ENDFOR symbol =][=
+
+ENDDEF  =][=
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+=]
+[= (define init-proc
+      (if (exist? "init")
+          (get "init")
+          (if (exist? "group")
+              (string-append (get "group") "_init")
+              "scm_init"))) =]
+void [=(. init-proc)=]( void );
+[= IF (exist? "two_phase") =]
+/*
+ * [=group=] Two-Phase Initialization procedure.
+ *
+ *  This routine assumes that certain routines are not to be exported
+ *  until the second time it is called.
+ */
+void
+[=(. init-proc)=]( void )
+{
+  static int first_time = 0;
+  if (first_time++ == 0) {[=
+    invoke emit-init-code=]
   } else {[=
 
-  FOR gfunc =][=
-    IF (not (exist? "general_use")) =][=
-      CALL_NEWPROC =][=
-    ENDIF =][=
-  ENDFOR gfunc =][=
+    FOR gfunc =][=
+      IF (not (exist? "general_use")) =][=
+        CALL_NEWPROC =][=
+      ENDIF =][=
+    ENDFOR gfunc =][=
+
+    IF (exist? "fini_code") =]
+    [=fini_code=][=
+    ENDIF =]
+  }
+}[=
+
+ELSE (not exist two-phase) =]
+/*
+ * [=group=] Initialization procedure
+ */
+void
+[=(. init-proc)=]( void )
+{[=
+
+  invoke emit-init-code =][=
 
   IF (exist? "fini_code") =]
     [=fini_code=][=
   ENDIF =]
-  }
-}[= #
+}[=
+
+ENDIF =][= #
 
 end of snarf.tpl =]

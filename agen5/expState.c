@@ -1,13 +1,13 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.25 2000/11/02 00:47:56 bkorb Exp $
+ *  $Id: expState.c,v 1.26 2001/05/09 05:25:59 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2001 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -28,222 +28,71 @@
 
 #include <string.h>
 
-#include <guile/gh.h>
-#include "autogen.h"
 #include "expr.h"
+#include "autogen.h"
 
 #ifndef HAVE_STRFTIME
 #  include "compat/strftime.c"
 #endif
 
-STATIC int     entry_length(   char* pzName, tDefEntry* pCurDef );
-STATIC int     count_entries(  char* pzName, tDefEntry* pCurDef );
+STATIC int     entry_length(   char* pzName );
+STATIC int     count_entries(  char* pzName );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION SUPPORT ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     STATIC int
-entry_length( char* pzName, tDefEntry* pCurDef )
+entry_length( char* pzName )
 {
-    ag_bool     isIndexed;
-    tDefEntry*  pE;
+    tDefEntry**  papDefs = findEntryList( pzName );
+    int          res     = 0;
 
-    char* pzField = strchr( pzName, '.' );
-
-    if (pzField != (char*)NULL)
-        *(pzField++) = NUL;
-
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
-
-    if (pzField != (char*)NULL)
-        pzField[-1] = '.';
-
-    /*
-     *  No such entry?  return zero
-     */
-    if (pE == (tDefEntry*)NULL)
+    if (papDefs == NULL)
         return 0;
 
-    /*
-     *  IF the macro declaration is text type,
-     *  THEN ...
-     */
-    if (pE->valType == VALTYP_TEXT) {
-        int resVal = 0;
-
-        /*
-         *  IF there are subfields specified
-         *  THEN the result is zero (there are none for text macros)
-         */
-        if (pzField != (char*)NULL)
-            return 0;
-
-        /*
-         *  IF we found a specific index
-         *  THEN the result is the string length
-         *
-         *  Of course, if one set of "twins" was indexed and another not,
-         *  then you won't get what you want, but you *will* get what
-         *  you deserve  :-)
-         */
-        if (isIndexed)
-            return strlen( pE->pzValue );
-
-        /*
-         *  ELSE find the string lengths of each member
-         */
-        do  {
-            resVal += strlen( pE->pzValue );
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-        return resVal;
+    for (;;) {
+        tDefEntry*   pDE = *(papDefs++);
+        if (pDE == NULL)
+            break;
+        if (pDE->valType == VALTYP_TEXT)
+            res += strlen( pDE->pzValue );
+        else
+            res++;
     }
-
-    /*
-     *  The macro is a block type macro.
-     *  IF there are no subfields specified,
-     *  THEN the result is the twin count
-     */
-    if (pzField == (char*)NULL) {
-        int resVal = 0;
-        if (isIndexed)
-            resVal = 1;
-
-        else do  {
-            resVal++;
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-
-        return resVal;
-    }
-
-    if (isIndexed)
-        return entry_length( pzField, (tDefEntry*)(void*)(pE->pzValue) );
-
-    {
-        int resVal = 0;
-
-        /*
-         *  FOR each entry of the type we found, ...
-         */
-        do  {
-            resVal += entry_length( pzField,
-                                      (tDefEntry*)(void*)(pE->pzValue) );
-
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-
-        return resVal;
-    }
+    return res;
 }
 
 
     STATIC int
-count_entries( char* pzName, tDefEntry* pCurDef )
+count_entries( char* pzName )
 {
-    ag_bool     isIndexed;
-    tDefEntry*  pE;
+    tDefEntry**  papDefs = findEntryList( pzName );
+    int          res     = 0;
 
-    char* pzField = strchr( pzName, '.' );
-
-    if (pzField != (char*)NULL)
-        *(pzField++) = NUL;
-
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
-
-    if (pzField != (char*)NULL)
-        pzField[-1] = '.';
-
-    /*
-     *  No such entry?  return zero
-     */
-    if (pE == (tDefEntry*)NULL)
+    if (papDefs == NULL)
         return 0;
 
-    /*
-     *  IF the macro declaration is text type,
-     *  THEN ...
-     */
-    if (pE->valType == VALTYP_TEXT) {
-        int resVal = 0;
-
-        /*
-         *  IF there are subfields specified
-         *  THEN the result is zero (there are none for text macros)
-         */
-        if (pzField != (char*)NULL)
-            return 0;
-
-        /*
-         *  IF we found a specific index
-         *  THEN it is just this one.
-         */
-        if (isIndexed)
-            return 1;
-
-        /*
-         *  ELSE find the string lengths of each member
-         */
-        do  {
-            resVal++;
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-        return resVal;
+    for (;;) {
+        tDefEntry*   pDE = *(papDefs++);
+        if (pDE == NULL)
+            break;
+        res++;
     }
-
-    /*
-     *  The macro is a block type macro.
-     *  IF there are no subfields specified,
-     *  THEN the result is the twin count
-     */
-    if (pzField == (char*)NULL) {
-        int resVal = 0;
-        if (isIndexed)
-            resVal = 1;
-
-        else do  {
-            resVal++;
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-
-        return resVal;
-    }
-
-    /*
-     *  IF this is indexed, then we only count entries for this entry.
-     */
-    if (isIndexed)
-        return count_entries( pzField, (tDefEntry*)(void*)(pE->pzValue) );
-
-    {
-        int resVal = 0;
-
-        /*
-         *  FOR each entry of the type we found, ...
-         */
-        do  {
-            resVal += count_entries( pzField,
-                                     (tDefEntry*)(void*)(pE->pzValue) );
-
-            pE = pE->pTwin;
-        } while (pE != (tDefEntry*)NULL);
-
-        return resVal;
-    }
+    return res;
 }
 
 
     STATIC SCM
-find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
+find_entry_value( SCM op, SCM obj, SCM test )
 {
     ag_bool     isIndexed;
     tDefEntry*  pE;
-    tDefEntry*  pMembers;
     SCM         field;
     tSCC        zFailed[] = "failed\n";
     tSCC        zSucc[]   = "SUCCESS\n";
     char*       pzField;
+    SCM         result    = SCM_BOOL_F;
 
     char* pzName = gh_scm2newstr( obj, NULL );
 
@@ -254,7 +103,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed );
+    pE = findDefEntry( pzName, &isIndexed );
 
     /*
      *  No such entry?  return FALSE
@@ -262,7 +111,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pE == (tDefEntry*)NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        goto return_FALSE;
+        goto return_res;
     }
 
     /*
@@ -272,35 +121,25 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
         if (pE->valType != VALTYP_TEXT) {
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                 fputs( zFailed, pfTrace );
-            goto return_FALSE;
+            goto return_res; /* Cannot match string -- not a text value */
         }
 
-        field = gh_str02scm( pE->pzValue );
-        if (isIndexed) {
-            field = gh_call2( op, field, test );
-            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                fputs( (field == SCM_BOOL_T) ? zSucc : zFailed, pfTrace );
-            free( (void*)pzName );;
-            return field;
-        }
+        field  = gh_str02scm( pE->pzValue );
+        result = gh_call2( op, field, test );
+        if (! isIndexed)
+            while (result == SCM_BOOL_F) {
 
-        for (;;) {
-            if (gh_call2( op, field, test ) == SCM_BOOL_T) {
-                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                    fputs( zSucc, pfTrace );
-                goto return_TRUE;
+                pE = pE->pTwin;
+                if (pE == (tDefEntry*)NULL)
+                    break;
+
+                field = gh_str02scm( pE->pzValue );
+                result = gh_call2( op, field, test );
             }
 
-            pE = pE->pTwin;
-            if (pE == (tDefEntry*)NULL)
-                break;
-
-            field = gh_str02scm( pE->pzValue );
-        }
-
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-            fputs( zFailed, pfTrace );
-        goto return_FALSE;
+            fputs( (result == SCM_BOOL_T) ? zSucc : zFailed, pfTrace );
+        goto return_res;
     }
 
     /*
@@ -309,7 +148,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pE->valType == VALTYP_TEXT) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        goto return_FALSE;
+        goto return_res;
     }
 
     /*
@@ -317,32 +156,30 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
      */
     pzField[-1] = '.';
     field       = gh_str02scm( pzField );
-    pMembers    = (tDefEntry*)(void*)(pE->pzValue);
+    {
+        tDefStack    stack   = currDefCtx;
+        currDefCtx.pPrev     = &stack;
 
-    if (isIndexed) {
-        if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
-            goto return_TRUE;
-        goto return_FALSE;
+        currDefCtx.pDefs = (tDefEntry*)(void*)(pE->pzValue);
+        result = find_entry_value( op, field, test );
+
+        if (! isIndexed)
+            while (result == SCM_BOOL_F) {
+
+                pE = pE->pTwin;
+                if (pE == (tDefEntry*)NULL)
+                    break;
+
+                currDefCtx.pDefs = (tDefEntry*)(void*)(pE->pzValue);
+                result = find_entry_value( op, field, test );
+            }
+
+        currDefCtx = stack;
     }
 
-    for (;;) {
-        if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
-            goto return_TRUE;
-
-        pE = pE->pTwin;
-        if (pE == (tDefEntry*)NULL)
-            break;
-
-        pMembers = (tDefEntry*)(void*)(pE->pzValue);
-    }
-
- return_FALSE:
+ return_res:
     free( (void*)pzName );
-    return SCM_BOOL_F;
-
- return_TRUE:
-    free( (void*)pzName );
-    return SCM_BOOL_T;
+    return result;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -385,7 +222,7 @@ ag_scm_count( SCM obj )
         return SCM_UNDEFINED;
 
     pzEntName = gh_scm2newstr( obj, NULL );
-    ent_len = count_entries( pzEntName, pDefContext );
+    ent_len = count_entries( pzEntName );
     free( (void*)pzEntName );
     return gh_int2scm( ent_len );
 }
@@ -438,7 +275,7 @@ ag_scm_exist_p( SCM obj )
         return SCM_UNDEFINED;
 
     pz = gh_scm2newstr( obj, NULL );
-    if (findDefEntry( pz, pDefContext, &x ) == NULL)
+    if (findDefEntry( pz, &x ) == NULL)
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
 
@@ -494,7 +331,7 @@ ag_scm_ag_function_p( SCM obj )
  *       functions provided by AutoGen.
  *       @*
  *       The value name must follow the same rules as the
- *       @code{ag-name} argument for @code{exist?} (@xref{SCM exist?}).
+ *       @code{ag-name} argument for @code{exist?} (@pxref{SCM exist?}).
 =*/
     SCM
 ag_scm_match_value_p( SCM op, SCM obj, SCM test )
@@ -510,7 +347,7 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
         free( (void*)pzTest );
     }
 
-    return find_entry_value( op, obj, test, pDefContext );
+    return find_entry_value( op, obj, test );
 }
 
 
@@ -533,7 +370,7 @@ ag_scm_get( SCM obj )
         return SCM_UNDEFINED;
 
     pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, pDefContext, &x );
+    pE = findDefEntry( pz, &x );
     free( (void*)pz );
 
     if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
@@ -562,7 +399,7 @@ ag_scm_high_lim( SCM obj )
         return SCM_UNDEFINED;
 
     pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, pDefContext, &isIndexed );
+    pE = findDefEntry( pz, &isIndexed );
     free( (void*)pz );
 
     /*
@@ -603,7 +440,7 @@ ag_scm_len( SCM obj )
         return SCM_UNDEFINED;
 
     pz = gh_scm2newstr( obj, NULL );
-    len = entry_length( pz, pDefContext );
+    len = entry_length( pz );
     free( (void*)pz );
     return gh_int2scm( len );
 }
@@ -628,7 +465,7 @@ ag_scm_low_lim( SCM obj )
         return SCM_UNDEFINED;
 
     pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, pDefContext, &x );
+    pE = findDefEntry( pz, &x );
     free( (void*)pz );
 
     /*

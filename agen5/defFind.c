@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.13 2000/10/13 02:18:46 bkorb Exp $
+ *  $Id: defFind.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -37,7 +37,7 @@ typedef struct defEntryList tDefEntryList;
 
 tSCC zInvalRef[]  = "invalid reference";
 tSCC zIllFormed[] = "Ill-formed segmented name:  ``%s''\n";
-tSCC zNoRoom[]    = "No room to cannonicalize ``%s''\n";
+tSCC zNoRoom[]    = "No room to canonicalize ``%s''\n";
 
 tSC zDefinitionName[ MAXPATHLEN ];
 
@@ -176,7 +176,7 @@ badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
 
 
 /*
- *  cannonicalizeName:  remove white space and roughly verify the syntax.
+ *  canonicalizeName:  remove white space and roughly verify the syntax.
  *  This procedure will consume everything from the source string that
  *  forms a valid AutoGen compound definition name.
  *  We leave legally when:
@@ -186,7 +186,7 @@ badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
  *  We start in CN_START.
  */
     EXPORT int
-cannonicalizeName( char* pzD, const char* pzS, int srcLen )
+canonicalizeName( char* pzD, const char* pzS, int srcLen )
 {
     tSCC zNil[] = "";
 
@@ -203,6 +203,23 @@ cannonicalizeName( char* pzD, const char* pzS, int srcLen )
     const char* pzOri = pzS;
     char*       pzDst = pzD;
     size_t      stLen = srcLen;
+
+    /*
+     *  Before anything, skip a leading '.' as a special hack to force
+     *  a current context lookup.
+     */
+    while (isspace( *pzS )) {
+        if (--srcLen <= 0) {
+            pzS = zNil;
+            break;
+        }
+        pzS++;
+    }
+
+    if (*pzS == '.') {
+        *(pzD++) = '.';
+        pzS++;
+    }
 
  nextSegment:
     /*
@@ -354,29 +371,35 @@ cannonicalizeName( char* pzD, const char* pzS, int srcLen )
  *  the element has been indexed (so the caller will not try
  *  to traverse the list of twins).
  */
-    EXPORT tDefEntry*
-findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
+    STATIC tDefEntry*
+defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
 {
     char*        pcBrace;
     char         breakCh;
     tDefEntry*   pE;
     ag_bool      dummy;
+    ag_bool      noNesting    = AG_FALSE;
 
     static int   nestingDepth = 0;
 
     /*
-     *  IF we are at the start of a search, then cannonicalize the name
+     *  IF we are at the start of a search, then canonicalize the name
      *  we are hunting for, copying it to a modifiable buffer, and
      *  initialize the "indexed" boolean to false (we have not found
      *  an index yet).
      */
     if (nestingDepth == 0) {
-        cannonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        canonicalizeName( zDefinitionName, pzName, strlen( pzName ));
         pzName = zDefinitionName;
 
         if (pIsIndexed != (ag_bool*)NULL)
              *pIsIndexed = AG_FALSE;
         else pIsIndexed  = &dummy;
+
+        if (*pzName == '.') {
+            noNesting = AG_TRUE;
+            pzName++;
+        }
     }
 
     pcBrace  = pzName + strcspn( pzName, "[." );
@@ -390,10 +413,9 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        if (pDefs == (tDefEntry*)NULL)
+        pE = pDefStack->pDefs;
+        if (pE == (tDefEntry*)NULL)
             return (tDefEntry*)NULL;
-
-        pE = pDefs;
 
         do  {
             /*
@@ -401,7 +423,7 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
              *  THEN break out of the double loop
              */
             if (strcmp( pE->pzDefName, pzName ) == 0)
-                goto label_defEntryFound;
+                goto found_def_entry;
 
             pE = pE->pNext;
         } while (pE != (tDefEntry*)NULL);
@@ -410,14 +432,16 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
          *  IF we are nested, then we cannot change the definition level.
          *  So, we did not find anything.
          */
-        if (nestingDepth != 0)
+        if ((nestingDepth != 0) || noNesting)
             return (tDefEntry*)NULL;
 
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefs = pDefs->pDad ;
-    } label_defEntryFound:;
+        pDefStack = pDefStack->pPrev;
+        if (pDefStack == NULL)
+            return (tDefEntry*)NULL;
+    } found_def_entry:;
 
     /*
      *  At this point, we have found the entry that matches the supplied
@@ -492,50 +516,69 @@ findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
      *  used a subscript.
      */
     nestingDepth++;
-    do  {
-        tDefEntry* res = findDefEntry( pzName, (tDefEntry*)pE->pzValue,
-                                       pIsIndexed );
-        if ((res != (tDefEntry*)NULL) || (breakCh == '[')) {
-            nestingDepth--;
-            return res;
+    {
+        tDefStack stack = { (tDefEntry*)pE->pzValue, &currDefCtx };
+        for (;;) {
+            tDefEntry* res;
+
+            res = defEntrySearch( pzName, &stack, pIsIndexed );
+            if ((res != (tDefEntry*)NULL) || (breakCh == '[')) {
+                nestingDepth--;
+                return res;
+            }
+            pE = pE->pTwin;
+            if (pE == NULL)
+                break;
+            stack.pDefs = (tDefEntry*)pE->pzValue;
         }
-        pE = pE->pTwin;
-    } while (pE != (tDefEntry*)NULL);
+    }
 
     nestingDepth--;
     return (tDefEntry*)NULL;
 }
 
 
+    EXPORT tDefEntry*
+findDefEntry( char* pzName, ag_bool* pIsIndexed )
+{
+    return defEntrySearch( pzName, &currDefCtx, pIsIndexed );
+}
+
+
 /*
  *  findEntryList
  *
- *  Find the definition entry for the name passed in.
- *  It is okay to find block entries IFF they are found on the
- *  current level.  Once you start traversing up the tree,
- *  the macro must be a text macro.  Return an indicator saying if
- *  the element has been indexed (so the caller will not try
- *  to traverse the list of twins).
+ *  Find the definition entry for the name passed in.  It is okay to find
+ *  block entries IFF they are found on the current level.  Once you start
+ *  traversing up the tree, the macro must be a text macro.  Return an
+ *  indicator saying if the element has been indexed (so the caller will
+ *  not try to traverse the list of twins).
  */
-    EXPORT tDefEntry**
-findEntryList( char* pzName, tDefEntry* pDefs )
+    STATIC tDefEntry**
+entryListSearch( char* pzName, tDefStack* pDefStack )
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
 
     char*      pcBrace;
     char       breakCh;
     tDefEntry* pE;
+    ag_bool    noNesting = AG_FALSE;
 
     /*
-     *  IF we are at the start of a search, then cannonicalize the name
+     *  IF we are at the start of a search, then canonicalize the name
      *  we are hunting for, copying it to a modifiable buffer, and
      *  initialize the "indexed" boolean to false (we have not found
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
-        cannonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        canonicalizeName( zDefinitionName, pzName, strlen( pzName ));
         pzName = zDefinitionName;
         defList.usedCt = 0;
+
+        if (*pzName == '.') {
+            noNesting = AG_TRUE;
+            pzName++;
+        }
     }
 
     pcBrace  = pzName + strcspn( pzName, "[." );
@@ -547,11 +590,13 @@ findEntryList( char* pzName, tDefEntry* pDefs )
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        if (pDefs == (tDefEntry*)NULL) {
+        pE = pDefStack->pDefs;
+        if (pE == (tDefEntry*)NULL) {
             /*
              *  Make sure we are not nested.  Once we start to nest,
              *  then we cannot "change definition levels"
              */
+        not_found:
             if (defList.nestLevel != 0) {
                 tSCC z[] =
                     "reached ROOT def resolving last subcomponent:  `%s'\n";
@@ -565,15 +610,13 @@ findEntryList( char* pzName, tDefEntry* pDefs )
             return (tDefEntry**)NULL;
         }
 
-        pE = pDefs;
-
         do  {
             /*
              *  IF the name matches
              *  THEN go add it, plus all its twins
              */
             if (strcmp( pE->pzDefName, pzName ) == 0)
-                goto label_defEntryFound;
+                goto found_def_entry;
 
             pE = pE->pNext;
         } while (pE != (tDefEntry*)NULL);
@@ -582,14 +625,16 @@ findEntryList( char* pzName, tDefEntry* pDefs )
          *  IF we are nested, then we cannot change the definition level.
          *  Just go and return what we have found so far.
          */
-        if (defList.nestLevel != 0)
+        if ((defList.nestLevel != 0) || noNesting)
             goto returnResult;
 
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefs = pDefs->pDad ;
-    } label_defEntryFound:;
+        pDefStack = pDefStack->pPrev;
+        if (pDefStack == NULL)
+            goto not_found;
+    } found_def_entry:;
 
     /*
      *  At this point, we have found the entry that matches the supplied
@@ -667,12 +712,18 @@ findEntryList( char* pzName, tDefEntry* pDefs )
      *  used a subscript.
      */
     defList.nestLevel++;
-    do  {
-        (void)findEntryList( pzName, (tDefEntry*)pE->pzValue );
-        if (breakCh == '[')
-            break;
-        pE = pE->pTwin;
-    } while (pE != (tDefEntry*)NULL);
+    {
+        tDefStack stack = { (tDefEntry*)pE->pzValue, &currDefCtx };
+        for (;;) {
+            (void)entryListSearch( pzName, &stack );
+            if (breakCh == '[')
+                break;
+            pE = pE->pTwin;
+            if (pE == NULL)
+                break;
+            stack.pDefs = (tDefEntry*)pE->pzValue;
+        }
+    }
     defList.nestLevel--;
 
  returnResult:
@@ -680,6 +731,13 @@ findEntryList( char* pzName, tDefEntry* pDefs )
         addResult( NULL, &defList );
 
     return defList.papDefEntry;
+}
+
+
+    EXPORT tDefEntry**
+findEntryList( char* pzName )
+{
+    return entryListSearch( pzName, &currDefCtx );
 }
 /*
  * Local Variables:

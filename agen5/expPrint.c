@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.15 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: expPrint.c,v 1.16 2001/05/09 05:25:59 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -36,9 +36,8 @@
 #  include <compat/strsignal.c>
 #endif
 
-#include "autogen.h"
-#include "expGuile.h"
 #include "expr.h"
+#include "autogen.h"
 
 STATIC sigjmp_buf printJumpEnv;
 STATIC void    printFault( int sig );
@@ -96,6 +95,10 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
     }
 
     printSize = snprintfv( pzBuf, bufSize, pzFmt, (void*)argV );
+    if ((printSize & 0xF0000000) != 0) {
+        fprintf( stderr, "snprintf returned 0x%08X\n", printSize );
+        LOAD_ABORT( pCurTemplate, pCurMacro, zBadArgs );
+    }
 
     sigaction( SIGBUS,  &saSave1, (struct sigaction*)NULL );
     sigaction( SIGSEGV, &saSave2, (struct sigaction*)NULL );

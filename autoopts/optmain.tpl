@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.11 2000/10/29 01:43:32 bkorb Exp $
+# $Id: optmain.tpl,v 2.12 2001/05/09 05:25:59 bkorb Exp $
 
 =]
 [=
@@ -152,7 +152,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
       IF (exist? "call_proc")        =]
 extern tOptProc [=(get "call_proc")  =];[=
 
-      ELIF (exist? "flag_code")      =]
+      ELIF (or (exist? "flag_code") (exist? "extract_code")) =]
 static tOptProc doOpt[=(. cap-name)  =];[=
 
       ENDIF                          =][=
@@ -178,7 +178,7 @@ static tOptProc doOpt[=(. cap-name)  =];[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (exist? "flag_code")  =]
+      ELIF (or (exist? "flag_code") (exist? "extract_code"))  =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
                         =](tpOptProc)NULL[=
@@ -227,7 +227,7 @@ DEFINE define-option-callbacks  =][=
     (set! cap-name   (string-capitalize UP-name))
     (set! low-name   (string-downcase UP-name))      =][=
 
-    IF (exist? "flag_code") =][=
+    IF (or (exist? "flag_code") (exist? "extract_code")) =][=
 
       IF (exist? "test_main") =]
 
@@ -236,7 +236,9 @@ DEFINE define-option-callbacks  =][=
       ENDIF =][=
 
       invoke callback-proc-header  =][=
-      flag_code =]
+      (if (exist? "flag_code") (get "flag_code")
+          (extract (string-append (base-name) ".c.save") (string-append
+          "/*  %s =-= " cap-name " Opt Code =-= %s */"))  ) =]
 }[=
 
   IF (exist? "test_main") =]

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2000/09/30 15:09:43 $
+# Last Modified:     $Date: 2001/05/09 05:25:59 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: for.test,v 1.6 2000/09/30 15:09:43 bkorb Exp $
+# $Id: for.test,v 1.7 2001/05/09 05:25:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -36,6 +36,25 @@ FOR list ",\n" =><=
      =>MIDDLE: <=
   ENDIF =><=elt[0]=><=
 ENDFOR =>
+<=
+FOR list-2        =><=
+  FOR list ", "
+    =><=bumble    =><=
+  ENDFOR          =><=
+ENDFOR            =>
+<=
+FOR list  ",\n"   =><=
+  FOR list-2
+    =><=(for-index "list")=>:  <=
+      IF (first-for? "list")
+         =>FIRST<=
+      ELIF (last-for? "list")
+         =>LAST<=
+      ELSE
+         =>MIDDLE<=
+      ENDIF       =><=
+  ENDFOR          =><=
+ENDFOR            =>
 _EOF_
 
 
@@ -45,18 +64,26 @@ AutoGen definitions $testname;
 list = { elt = one; },
 { elt = two.one, two.two, two.three; };
 list = { elt = three; }, {elt = four;};
+
+list-2 = { bumble = mumble; };
 _EOF_
 
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > $testname.sample <<_EOF_
 FIRST:  one,
 MIDDLE: two.one,
 MIDDLE: three,
 LAST:   four
+mumble, mumble, mumble, mumble
+0:  FIRST,
+1:  MIDDLE,
+2:  MIDDLE,
+3:  LAST
 _EOF_
 
 $AGEXE $testname.def || failure AutoGen failed
-cmp -s $testname.test $testname.out || failure unexpected output
+cmp -s $testname.test $testname.sample || \
+    failure "`diff -c $testname.test $testname.sample`"
 
 cleanup
 # end of for.test

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.20 2000/10/13 02:18:46 bkorb Exp $
+ *  $Id: defLex.c,v 1.21 2001/05/09 05:25:59 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -24,9 +24,9 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
+#include "expr.h"
 #include "autogen.h"
 #include "defParse.h"
-#include "expGuile.h"
 
 tSCC zSchemedefFile[]   = "schemedef.scm";
 ag_bool schemedefLoaded = AG_FALSE;

@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <bkorb@gnu.org>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.40 2000/11/29 16:44:14 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.41 2001/05/09 05:25:59 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.40 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.41 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -135,6 +135,17 @@ AC_CHECK_HEADERS(sys/procset.h)
 AC_CHECK_LIB(gen, pathfind)
 
 # ----------------------------------------------------------------------
+# Check for Dynamic library stuff
+# ----------------------------------------------------------------------
+AC_CHECK_HEADERS(dlfcn.h)
+AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_FUNCS(dlopen)
+if test $ac_cv_func_dlopen = yes
+then DYNAMIC_AG=-export-dynamic
+else DYNAMIC_AG=""
+fi
+
+# ----------------------------------------------------------------------
 # Checks for typedefs, structures, and compiler characteristics.
 # ----------------------------------------------------------------------
 AC_TYPE_MODE_T
@@ -175,6 +186,8 @@ then
     exit 1
 fi
 AC_SUBST(GUILE_LINK)
+GUILE_INC=`guile-config compile`
+AC_SUBST(GUILE_INC)
 
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
 AC_SUBST(M4_SRC)
@@ -186,6 +199,7 @@ GDEXE=getdefs${ac_exeext}
 AC_SUBST(GDEXE)
 COLEXE=columns${ac_exeext}
 AC_SUBST(COLEXE)
+AC_SUBST(DYNAMIC_AG)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)

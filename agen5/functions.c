@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.17 2000/10/11 17:01:23 bkorb Exp $
+ *  $Id: functions.c,v 1.18 2001/05/09 05:25:59 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -30,9 +30,6 @@
 #include <utime.h>
 
 #include "autogen.h"
-
-#include <guile/gh.h>
-
 
 tSCC zCantInc[] = "cannot include file";
 
@@ -91,8 +88,7 @@ MAKE_HANDLER_PROC( Include )
         }
 
         generateBlock( pNewTpl, pNewTpl->aMacros,
-                       pNewTpl->aMacros + pNewTpl->macroCt,
-                       pCurDef );
+                       pNewTpl->aMacros + pNewTpl->macroCt );
         unloadTemplate( pNewTpl );
         pCurTemplate = pT;
     }
@@ -128,7 +124,7 @@ MAKE_HANDLER_PROC( Unknown )
         pMac->funcCode    = FTYP_DEFINE;
         pMac->funcPrivate = (void*)pInv;
         parseMacroArgs( pT, pMac );
-        return mFunc_Define( pT, pMac, pCurDef );
+        return mFunc_Define( pT, pMac );
     }
 
     pMac->funcCode = FTYP_EXPR;
@@ -158,7 +154,7 @@ MAKE_HANDLER_PROC( Unknown )
         }
     }
 
-    return mFunc_Expr( pT, pMac, pCurDef );
+    return mFunc_Expr( pT, pMac );
 }
 
 
@@ -275,9 +271,9 @@ MAKE_LOAD_PROC( Unknown )
         srcLen += remLen;
 
         /*
-         *  Now copy over the full cannonical name.  Check for errors.
+         *  Now copy over the full canonical name.  Check for errors.
          */
-        remLen = cannonicalizeName( pzCopy, pzSrc, srcLen );
+        remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
         if (remLen > srcLen)
             LOAD_ABORT( pT, pMac, "Invalid definition name" );
 

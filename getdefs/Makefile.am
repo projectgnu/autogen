@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.26 2000/04/04 13:23:31 bkorb Exp $
+## $Id: Makefile.am,v 2.27 2001/05/09 05:25:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS	= getdefs
@@ -19,7 +19,7 @@ getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
 EXTRA_DIST	= $(GEN_SRC) opts.def
-AGEXE		= $(top_builddir)/agen5/@AGEXE@
+AGEXE		= $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 man_MANS        = getdefs.1
 
@@ -34,19 +34,16 @@ all : gen
 
 opts.c opts.h : opts.def
 	top_builddir=$(top_builddir) \
-	$(AGEXE) -L $(top_srcdir)/autoopts \
-		$(top_srcdir)/getdefs/opts.def
+	$(AGEXE) $(top_srcdir)/getdefs/opts.def
 
 getdefs.o : opts.h
 
 getdefs.menu getdefs.texi : opts.def getdefs
 	top_builddir=$(top_builddir) \
-	$(AGEXE) -Taginfo -bgetdefs \
-		-L $(top_srcdir)/autoopts -DLEVEL=section \
+	$(AGEXE) -Taginfo -bgetdefs -DLEVEL=section \
 		$(top_srcdir)/getdefs/opts.def
 
 getdefs.1 : opts.def getdefs
-	$(AGEXE) -T agman1 -L $(top_srcdir)/autoopts \
-		-b getdefs $(srcdir)/opts.def
+	$(AGEXE) -T agman1 -b getdefs $(srcdir)/opts.def && touch $@
 
 # Makefile.am ends here
