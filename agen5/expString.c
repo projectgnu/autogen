@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.22 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: expString.c,v 1.23 2000/09/28 06:09:23 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -269,14 +269,17 @@ ag_scm_join( SCM sep, SCM list )
         return SCM_UNDEFINED;
 
     sv_l_len = l_len = scm_ilength( list );
+    if (l_len == 0)
+	return gh_str02scm( "" );
+
     pzSep   = SCM_ROCHARS( sep );
     sep_len = SCM_LENGTH( sep );
-    str_len = 1;
+    str_len = 0;
 
     /*
      *  Count up the lengths of all the strings to be joined.
      */
-    while (--l_len >= 0) {
+    for (;;) {
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
 
@@ -290,10 +293,15 @@ ag_scm_join( SCM sep, SCM list )
             if (car != SCM_UNDEFINED)
                 car = ag_scm_join( sep, car );
             if (! gh_string_p( car ))
-                continue;
+                return SCM_UNDEFINED;
         }
 
-        str_len += SCM_LENGTH( car ) + sep_len;
+        str_len += SCM_LENGTH( car );
+
+        if (--l_len <= 0)
+            break;
+
+        str_len += sep_len;
     }
 
     l_len = sv_l_len;
@@ -312,12 +320,8 @@ ag_scm_join( SCM sep, SCM list )
         /*
          *  This unravels nested lists.
          */
-        if (! gh_string_p( car )) {
-            if (car != SCM_UNDEFINED)
-                car = ag_scm_join( sep, car );
-            if (! gh_string_p( car ))
-                continue;
-        }
+        if (! gh_string_p( car ))
+            car = ag_scm_join( sep, car );
 
         cpy_len = SCM_LENGTH( car );
         memcpy( (void*)pzRes, SCM_ROCHARS( car ), cpy_len );
@@ -332,7 +336,6 @@ ag_scm_join( SCM sep, SCM list )
         pzRes += sep_len;
     }
 
-    *pzRes = NUL;
     return res;
 }
 

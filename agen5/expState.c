@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.22 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: expState.c,v 1.23 2000/09/28 06:09:23 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -237,35 +237,32 @@ count_entries( char* pzName, tDefEntry* pCurDef )
     STATIC SCM
 find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 {
-    char*       pzName = gh_scm2newstr( obj, NULL );
     ag_bool     isIndexed;
     tDefEntry*  pE;
     tDefEntry*  pMembers;
     SCM         field;
     tSCC        zFailed[] = "failed\n";
     tSCC        zSucc[]   = "SUCCESS\n";
+    char*       pzField;
 
-    char* pzField = strchr( pzName, '.' );
+    char* pzName = gh_scm2newstr( obj, NULL );
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf( pfTrace, " in \"%s\" -- ", pzName );
 
+    pzField = strchr( pzName, '.' );
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
     pE = findDefEntry( pzName, pCurDef, &isIndexed );
-    free( (void*)pzName );
 
     /*
      *  No such entry?  return FALSE
      */
     if (pE == (tDefEntry*)NULL) {
-        if (pzField != (char*)NULL)
-            pzField[-1] = '.';
-
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        return SCM_BOOL_F;
+        goto return_FALSE;
     }
 
     /*
@@ -275,7 +272,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
         if (pE->valType != VALTYP_TEXT) {
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                 fputs( zFailed, pfTrace );
-            return SCM_BOOL_F;
+            goto return_FALSE;
         }
 
         field = gh_str02scm( pE->pzValue );
@@ -283,6 +280,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
             field = gh_call2( op, field, test );
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                 fputs( (field == SCM_BOOL_T) ? zSucc : zFailed, pfTrace );
+            free( (void*)pzName );;
             return field;
         }
 
@@ -290,7 +288,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
             if (gh_call2( op, field, test ) == SCM_BOOL_T) {
                 if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                     fputs( zSucc, pfTrace );
-                return SCM_BOOL_T;
+                goto return_TRUE;
             }
 
             pE = pE->pTwin;
@@ -302,7 +300,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        return SCM_BOOL_F;
+        goto return_FALSE;
     }
 
     /*
@@ -311,7 +309,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pE->valType == VALTYP_TEXT) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        return SCM_BOOL_F;
+        goto return_FALSE;
     }
 
     /*
@@ -323,13 +321,13 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 
     if (isIndexed) {
         if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
-            return SCM_BOOL_T;
-        return SCM_BOOL_F;
+            goto return_TRUE;
+        goto return_FALSE;
     }
 
     for (;;) {
         if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
-            return SCM_BOOL_T;
+            goto return_TRUE;
 
         pE = pE->pTwin;
         if (pE == (tDefEntry*)NULL)
@@ -337,7 +335,14 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 
         pMembers = (tDefEntry*)(void*)(pE->pzValue);
     }
+
+ return_FALSE:
+    free( (void*)pzName );
     return SCM_BOOL_F;
+
+ return_TRUE:
+    free( (void*)pzName );
+    return SCM_BOOL_T;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

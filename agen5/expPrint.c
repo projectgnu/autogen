@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.13 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: expPrint.c,v 1.14 2000/09/28 06:09:23 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -201,6 +201,7 @@ ag_scm_sprintf( SCM fmt, SCM alist )
     int   list_len = scm_ilength( alist );
     char* pzFmt;
     SCM   res;
+    int   fmt_len;
 
     if (! gh_string_p( fmt ))
         return SCM_UNDEFINED;
@@ -208,9 +209,19 @@ ag_scm_sprintf( SCM fmt, SCM alist )
     if (list_len <= 0)
         return fmt;
 
-    pzFmt = gh_scm2newstr( fmt, NULL );
-    res   = run_printf( pzFmt, list_len, alist );
-    free( (void*)pzFmt );
+    fmt_len = SCM_LENGTH( fmt );
+    if (fmt_len < sizeof( zScribble )) {
+        pzFmt = zScribble;
+        memcpy( (void*)pzFmt, (void*)SCM_CHARS( fmt ), fmt_len );
+        pzFmt[ fmt_len ] = NUL;
+    } else {
+        pzFmt = gh_scm2newstr( fmt, NULL );
+    }
+
+    res = run_printf( pzFmt, list_len, alist );
+
+    if (pzFmt != zScribble)
+        free( (void*)pzFmt );
     return res;
 }
 

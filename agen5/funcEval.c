@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.26 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: funcEval.c,v 1.27 2000/09/28 06:09:23 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -311,7 +311,7 @@ eval( const char* pzExpr )
         break;
 
     case '`':
-        AGDUPSTR( pzTemp, pzExpr );
+        AGDUPSTR( pzTemp, pzExpr, "shell script" );
         (void)spanQuote( pzTemp );
         pzExpr = runShell( pzTemp );
         AGFREE( (void*)pzTemp );
@@ -321,7 +321,7 @@ eval( const char* pzExpr )
 
     case '"':
     case '\'':
-        AGDUPSTR( pzTemp, pzExpr );
+        AGDUPSTR( pzTemp, pzExpr, "quoted string" );
         (void)spanQuote( pzTemp );
         allocated = AG_TRUE;
         pzExpr = pzTemp;

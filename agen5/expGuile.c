@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.13 2000/09/27 20:38:54 bkorb Exp $
+ *  $Id: expGuile.c,v 1.14 2000/09/28 06:09:23 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -124,14 +124,8 @@ ag_scm_max( SCM list )
             break;
 
         case GH_TYPE_STRING:
-        {
-            char* pz = gh_scm2newstr( car, NULL );
-            if (isdigit( *pz ))
-                 val = strtol( pz, (char**)NULL, 0 );
-            else val = 0;
-            free( (void*)pz );
+	    val = strtol( SCM_CHARS( car ), (char**)NULL, 0 );
             break;
-        }
 
         default:
             continue;
@@ -191,11 +185,12 @@ ag_scm_min( SCM list )
 
         case GH_TYPE_STRING:
         {
-            char* pz = gh_scm2newstr( car, NULL );
-            if (isdigit( *pz ))
+            char* pz  = SCM_CHARS( car );
+	    int   len = SCM_LENGTH( len );
+	    while (isspace( *pz ) && (--len > 0))  pz++;
+            if ((len > 0) && isdigit( *pz ))
                  val = strtol( pz, (char**)NULL, 0 );
             else val = LONG_MAX;
-            free( (void*)pz );
             break;
         }
 
@@ -244,15 +239,42 @@ ag_scm_sum( SCM list )
             break;
 
         case GH_TYPE_STRING:
-        {
-            char* pz = gh_scm2newstr( car, NULL );
-            sum += strtol( pz, (char**)NULL, 0 );
-            free( (void*)pz );
-        }
+            sum += strtol( SCM_CHARS( car ), (char**)NULL, 0 );
         }
     } while (--len > 0);
 
     return gh_long2scm( sum );
+}
+
+
+/*=gfunc string_upcase_x
+ *
+ * what:   make a string be upper case
+ * general_use:
+ *
+ * exparg: str , input/output string
+ *
+ * doc:  Change to upper case all the characters in an SCM string.
+=*/
+    SCM
+ag_scm_string_upcase_x( SCM str )
+{
+    int   len;
+    char* pz;
+
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    len = SCM_LENGTH( str );
+    pz  = SCM_CHARS( str );
+    while (--len >= 0) {
+        char ch = *pz;
+        if (islower( ch ))
+            *pz = toupper( ch );
+        pz++;
+    }
+
+    return str;
 }
 
 
@@ -279,8 +301,51 @@ ag_scm_string_upcase( SCM str )
     pz = gh_scm2newstr( str, &len );
     res = gh_str2scm( pz, len );
     free( (void*)pz );
-    scm_string_upcase_x( res );
+    ag_scm_string_upcase_x( res );
     return res;
+}
+
+
+/*=gfunc string_capitalize_x
+ *
+ * what:   capitalize a string
+ * general_use:
+ *
+ * exparg: str , input/output string
+ *
+ * doc:  capitalize all the words in an SCM string.
+=*/
+    SCM
+ag_scm_string_capitalize_x( SCM str )
+{
+    int     len;
+    char*   pz;
+    ag_bool word_start = AG_TRUE;
+
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    len = SCM_LENGTH( str );
+    pz  = SCM_CHARS( str );
+
+    while (--len >= 0) {
+        char ch = *pz;
+
+        if (! isalnum( ch )) {
+            word_start = AG_TRUE;
+
+        } else if (word_start) {
+            word_start = AG_FALSE;
+            if (islower( ch ))
+                *pz = toupper( ch );
+
+        } else if (isupper( ch ))
+            *pz = tolower( ch );
+
+        pz++;
+    }
+
+    return str;
 }
 
 
@@ -308,8 +373,39 @@ ag_scm_string_capitalize( SCM str )
     pz = gh_scm2newstr( str, &len );
     res = gh_str2scm( pz, len );
     free( (void*)pz );
-    scm_string_capitalize_x( res );
+    ag_scm_string_capitalize_x( res );
     return res;
+}
+
+
+/*=gfunc string_downcase_x
+ *
+ * what:   make a string be lower case
+ * general_use:
+ *
+ * exparg: str , input/output string
+ *
+ * doc:  Change to lower case all the characters in an SCM string.
+=*/
+    SCM
+ag_scm_string_downcase_x( SCM str )
+{
+    int   len;
+    char* pz;
+
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    len = SCM_LENGTH( str );
+    pz  = SCM_CHARS( str );
+    while (--len >= 0) {
+        char ch = *pz;
+        if (isupper( ch ))
+            *pz = tolower( ch );
+        pz++;
+    }
+
+    return str;
 }
 
 
@@ -336,7 +432,7 @@ ag_scm_string_downcase( SCM str )
     pz = gh_scm2newstr( str, &len );
     res = gh_str2scm( pz, len );
     free( (void*)pz );
-    scm_string_downcase_x( res );
+    ag_scm_string_downcase_x( res );
     return res;
 }
 /* end of expGuile.c */

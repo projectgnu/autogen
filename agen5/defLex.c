@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.16 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: defLex.c,v 1.17 2000/09/28 06:09:23 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -472,7 +472,7 @@ alist_to_autogen_def( void )
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR( pCtx->pzFileName, zSchemeText );
+    AGDUPSTR( pCtx->pzFileName, zSchemeText, zSchemeText );
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
