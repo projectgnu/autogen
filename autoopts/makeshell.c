@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.2 1998/10/02 16:08:48 bkorb Exp $
+ *  $Id: makeshell.c,v 2.3 1998/10/02 17:13:42 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -80,19 +80,27 @@ static const char zOptTrail[] =
 static const char zCmdFmt[] =
     "        %s\n";
 
+static const char zCountTest[] =
+    "        if [ $%1$s_%2$s_CT -ge %3$d ] ; then\n"
+    "            echo Error:  too many %2$s options >&2\n"
+    "            USAGE 1 ; fi\n";
+
 static const char zMultiArg[] =
-    "        ARG_ELEMENT=\"[${%1$s_%2$s_CT}]\"\n"
+    "        OPT_ELEMENT=\"[${%1$s_%2$s_CT}]\"\n"
     "        %1$s_%2$s_CT=`expr ${%1$s_%2$s_CT} + 1`\n"
-    "        ARGUMENT='%2$s'\n";
+    "        OPT_NAME='%2$s'\n";
 
 static const char zSingleArg[] =
-    "        ARG_ELEMENT=''\n"
+    "        if [ -n \"${%1$s_%2$s}\" ] ; then\n"
+    "            echo Error:  duplicate %2$s option >&2\n"
+    "            USAGE 1 ; fi\n"
+    "        OPT_ELEMENT=''\n"
     "        %1$s_%2$s=1\n"
-    "        ARGUMENT='%2$s'\n";
+    "        OPT_NAME='%2$s'\n";
 
-static const char zMayArg[]  = "        ARGARG=OK\n";
-static const char zMustArg[] = "        ARGARG=YES\n";
-static const char zCantArg[] = "        ARGARG=NO\n";
+static const char zMayArg[]  = "        OPT_ARG=OK\n";
+static const char zMustArg[] = "        OPT_ARG=YES\n";
+static const char zCantArg[] = "        OPT_ARG=NO\n";
 static const char zEndCaseElement[] = "        ;;\n\n";
 
 
@@ -100,7 +108,7 @@ static const char zLoopCase[] =
 "doingargs=true\n"
 "arg=\"$1\"\n\n"
 "while $doingargs && [ $# -gt 0 ]\ndo\n"
-"    haveargarg=0\n\n"
+"    OPT_ARG_VAL=''\n\n"
      /*
       *  'arg' may or may not match the current $1
       */
@@ -121,52 +129,49 @@ static const char zLongOptCase[] =
 "         ;;\n\n";
 
 static const char zLongOpt[] =
+"         optname=`echo \"${arg}\"|sed 's/^--//'`\n"
 "         shift\n"
-"         argname=`echo \"$arg\"|sed 's/^--//'`\n"
 "         arg=\"$1\"\n\n"
-"         case \"$argname\" in *=* )\n"
-"             argarg=`echo \"$argname\"|sed 's/^[^=]*=//'`\n"
-"             argname=`echo \"$argname\"|sed 's/=.*$//'`\n"
-"             haveargarg=1 ;;\n"
-"         esac\n\n"
-"         decipher_long_opt $argname\n\n"
-"         case $ARGARG in\n"
+"         case \"${optname}\" in *=* )\n"
+"             OPT_ARG_VAL=`echo \"${optname}\"|sed 's/^[^=]*=//'`\n"
+"             optname=`echo \"${optname}\"|sed 's/=.*$//'` ;; esac\n\n"
+"         decipher_long_opt ${optname}\n\n"
+"         case ${OPT_ARG} in\n"
 "         NO )\n"
-"             haveargarg=0\n"
+"             OPT_ARG_VAL=''\n"
 "             ;;\n\n"
 "         YES )\n"
-"             if [ $haveargarg -eq 0 ]\n"
+"             if [ -z \"${OPT_ARG_VAL}\" ]\n"
 "             then\n"
 "                 if [ $# -eq 0 ]\n"
 "                 then\n"
-"                     echo No argument provided for ${ARGUMENT} option >&2\n"
+"                     echo No argument provided for ${OPT_NAME} option >&2\n"
 "                     USAGE 1\n"
 "                 fi\n\n"
-"                 argarg=\"$arg\"\n"
+"                 OPT_ARG_VAL=\"${arg}\"\n"
 "                 shift\n"
 "                 arg=\"$1\"\n"
-"                 haveargarg=1\n"
 "             fi\n"
 "             ;;\n\n"
 "         OK )\n"
-"             if [ $haveargarg -eq 0 ] && [ $# -gt 0 ]\n"
+"             if [ -z \"${OPT_ARG_VAL}\" ] && [ $# -gt 0 ]\n"
 "             then\n"
-"                 case \"$1\" in -* ) ;; * )\n"
-"                     argarg=\"$1\"\n"
+"                 case \"${arg}\" in -* ) ;; * )\n"
+"                     OPT_ARG_VAL=\"${arg}\"\n"
 "                     shift\n"
-"                     haveargarg=1 ;; esac\n"
+"                     arg=\"$1\" ;; esac\n"
 "             fi\n"
 "             ;;\n"
 "         esac\n";
 
 static const char zFlagOpt[] =
 "    -* )\n"
-"         flag=`sed 's/-\\(.\\).*/\\1/'`\n"
-"         arg=`sed 's/-.//'`\n\n"
-"         decipher_flag_opt $flag\n\n"
-"         case $ARGARG in\n"
+"         flag=`echo \"${arg}\" | sed 's/-\\(.\\).*/\\1/'`\n"
+"         arg=` echo \"${arg}\" | sed 's/-.//'`\n\n"
+"         decipher_flag_opt \"$flag\"\n\n"
+"         case ${OPT_ARG} in\n"
 "         NO )\n"
-"             if [ ! -z \"$arg\" ]\n"
+"             if [ -n \"${arg}\" ]\n"
 "             then\n"
 "                 arg=-\"${arg}\"\n"
 "             else\n"
@@ -175,39 +180,35 @@ static const char zFlagOpt[] =
 "             fi\n"
 "             ;;\n\n"
 "         YES )\n"
-"             haveargarg=1\n"
-"             if [ ! -z \"$arg\" ]\n"
+"             if [ -n \"${arg}\" ]\n"
 "             then\n"
-"                 argarg=\"$arg\"\n\n"
+"                 OPT_ARG_VAL=\"${arg}\"\n\n"
 "             else\n"
 "                 if [ $# -eq 0 ]\n"
 "                 then\n"
-"                     echo No argument provided for ${ARGUMENT} option >&2\n"
+"                     echo No argument provided for ${OPT_NAME} option >&2\n"
 "                     USAGE 1\n"
 "                 fi\n"
 "                 shift\n"
-"                 argarg=\"$1\"\n"
+"                 OPT_ARG_VAL=\"$1\"\n"
 "             fi\n\n"
 "             shift\n"
 "             arg=\"$1\"\n"
 "             ;;\n\n"
 "         OK )\n"
-"             if [ ! -z \"$arg\" ]\n"
+"             if [ -n \"${arg}\" ]\n"
 "             then\n"
-"                 argarg=\"$arg\"\n"
-"                 haveargarg=1\n"
+"                 OPT_ARG_VAL=\"${arg}\"\n"
 "                 shift\n"
 "                 arg=\"$1\"\n\n"
 "             else\n"
 "                 shift\n"
 "                 if [ $# -gt 0 ]\n"
 "                 then\n"
-"                     arg=\"$1\"\n"
 "                     case \"$1\" in -* ) ;; * )\n"
-"                         argarg=\"$1\"\n"
-"                         haveargarg=1\n"
-"                         shift\n"
-"                         arg=\"$1\" ;; esac\n"
+"                         OPT_ARG_VAL=\"$1\"\n"
+"                         shift ;; esac\n"
+"                     arg=\"$1\"\n"
 "                 fi\n"
 "             fi\n"
 "             ;;\n"
@@ -221,9 +222,9 @@ static const char zCaseEnd[] =
 "    esac\n\n";
 
 static const char zLoopEnd[] =
-"    if [ $haveargarg -gt 0 ]\n"
+"    if [ -n \"${OPT_ARG_VAL}\" ]\n"
 "    then\n"
-"        eval \\$%s_${ARGUMENT}${ARG_ELEMENT}=\"'${argarg}'\"\n"
+"        eval \\$%s_${OPT_NAME}${OPT_ELEMENT}=\"'${OPT_ARG_VAL}'\"\n"
 "    fi\n"
 "done\n";
 
@@ -472,10 +473,15 @@ emitFlag( tOptions* pOpts )
                     printf( zCmdFmt, "LONGUSAGE" );
 
             } else {
-                const char* pzFmt = (pOptDesc->optMaxCt > 1)
-                                    ? zMultiArg : zSingleArg;
+                if (pOptDesc->optMaxCt == 1)
+                    printf( zSingleArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+                else {
+                    if ((unsigned)pOptDesc->optMaxCt < NOLIMIT)
+                        printf( zCountTest, pOpts->pzPROGNAME,
+                                pOptDesc->pz_NAME, pOptDesc->optMaxCt );
 
-                printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+                    printf( zMultiArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+                }
 
                 switch (pOptDesc->optArgType) {
                 case ARG_MAY:
@@ -588,10 +594,15 @@ emitLong( tOptions* pOpts )
                 printf( zCmdFmt, "LONGUSAGE" );
 
         } else {
-            const char* pzFmt = (pOptDesc->optMaxCt > 1)
-                                ? zMultiArg : zSingleArg;
+            if (pOptDesc->optMaxCt == 1)
+                printf( zSingleArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+            else {
+                if ((unsigned)pOptDesc->optMaxCt < NOLIMIT)
+                    printf( zCountTest, pOpts->pzPROGNAME,
+                            pOptDesc->pz_NAME, pOptDesc->optMaxCt );
 
-            printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+                printf( zMultiArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+            }
 
             switch (pOptDesc->optArgType) {
             case ARG_MAY:
