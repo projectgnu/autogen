@@ -1,12 +1,12 @@
 /*
- *  $Id: getdefs.c,v 3.2 2002/01/10 15:25:05 bkorb Exp $
+ *  $Id: getdefs.c,v 3.3 2002/02/05 21:34:57 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/01/10 15:25:05 $
+ *  Last Modified:     $Date: 2002/02/05 21:34:57 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -69,6 +69,10 @@ startAutogen( void );
 STATIC void
 updateDatabase( void );
 /* END-FORWARD */
+
+#ifndef HAVE_STRSIGNAL
+#  include "compat/strsignal.c"
+#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

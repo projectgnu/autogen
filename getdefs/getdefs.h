@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.0 2001/12/09 19:46:06 bkorb Exp $
+ *  $Id: getdefs.h,v 3.1 2002/02/05 21:34:57 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/12/09 19:46:06 $
+ *  Last Modified:     $Date: 2002/02/05 21:34:57 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -30,10 +30,6 @@
 
 #ifndef HAVE_SNPRINTF
 #  include "snprintfv/snprintfv.h"
-#endif
-
-#ifndef HAVE_STRSIGNAL
-#  include "compat/strsignal.c"
 #endif
 
 #ifdef WITH_INCLUDED_REGEX
