@@ -1,12 +1,12 @@
-[= autogen template -*- Mode: C -*-
-# $Id: directive.tpl,v 1.1 1999/10/14 00:33:53 bruce Exp $
+[= AutoGen5 template -*- Mode: C -*-
+# $Id: directive.tpl,v 1.2 1999/10/27 00:22:12 bruce Exp $
 h =]
 /*
-[=_eval "# *  " _DNE=]
+[=(dne " *  ")=]
  *
  *  copyright 1992-1999 Bruce Korb
  *
-[=_eval AutoGen "# *  " _gpl=]
+[=(gpl "AutoGen" " *  ")=]
  */
 #ifndef AUTOGEN_DIRECTIVE_H
 #define AUTOGEN_DIRECTIVE_H
@@ -25,41 +25,41 @@ struct dir_table {
  *  Declare the procedures that will handle the directives
  */
 static tDirProc doDir_IGNORE;[=
-_FOR directive =][=
-  _IF dummy _exist ! =]
+FOR directive =][=
+  IF (not (exist? "dummy")) =]
 static tDirProc doDir_[=name=];[=
-  _ENDIF=][=
-/directive =]
+  ENDIF=][=
+ENDFOR directive =]
 
 /*
  *  Define the constant string names for each directive
  */[=
-_FOR directive =]
-static const char z[=name _cap "#[]" + "#%-12s" _printf
-       =] = [=name _down _str=];[=
-/directive
+FOR directive =]
+static const char z[=% name (sprintf "%%-12s" "%s[]")
+       =] = "[=% name (string-downcase! "%s") =]";[=
+ENDFOR directive
 =]
 
 /*
  *  Enumerate the directives
  */
 typedef enum {[=
-_FOR directive , =]
-    DIR_[=name _up=][=
-/directive=]
+FOR directive , =]
+    DIR_[=% name (string-upcase! "%s") =][=
+ENDFOR directive=]
 } teDirectives;
 
-#define DIRECTIVE_CT  [=_eval directive _hilim 1 +=]
+#define DIRECTIVE_CT  [= (+ ( high-lim "directive") 1) =]
 static tDirTable dirTable[ DIRECTIVE_CT ] = {[=
-_FOR directive , =]
-    { sizeof( z[=name _cap "# )-1," + "#%-14s" _printf
-       =]z[=name _cap #, + "#%-10s" _printf
+FOR directive , =]
+    { sizeof( z[=% name (string-capitalize! (sprintf "%%-14s" "%s )-1,"))
+       =]z[=% name (string-capitalize! (sprintf "%%-10s" "%s,"))
        =]doDir_[=
-  _IF dummy _exist =]IGNORE,   [=
-  _ELSE =][= name #, + "#%-10s" _printf =][=
-  _ENDIF=]0 }[=
-/directive=] };
+  IF (exist? "dummy") =]IGNORE,   [=
+  ELSE =][=% name (string-capitalize! (sprintf "%%-10s" "%s,")) =][=
+  ENDIF=]0 }[=
+ENDFOR directive=] };
 
-#endif /* AUTOGEN_DIRECTIVE_H */[=
+#endif /* AUTOGEN_DIRECTIVE_H */[= #
 
 end of directive.tpl  =]
