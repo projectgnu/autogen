@@ -1,14 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.3 2002/03/19 04:11:41 bkorb Exp $
+ *  $Id: getdefs.h,v 3.4 2002/03/23 05:06:56 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2002/03/19 04:11:41 $
- *            by:      Bruce Korb <bkorb@gnu.org>
+ *  Last Modified:     $Date: 2002/03/23 05:06:56 $
+ *            by: bkorb
  */
 
 #ifndef GETDEFS_HEADER
@@ -51,22 +51,6 @@
 #  define MODE extern
 #  define VALUE(v)
 #  define DEF_STRING(n,s) extern tCC n[sizeof(s)]
-#endif
-
-#ifndef FOPEN_BINARY_FLAG
-#  ifdef USE_FOPEN_BINARY
-#    define FOPEN_BINARY_FLAG   "b"
-#  else
-#    define FOPEN_BINARY_FLAG
-#  endif
-#endif
-
-#ifndef FOPEN_TEXT_FLAG
-#  ifdef USE_FOPEN_TEXT
-#    define FOPEN_TEXT_FLAG   "t"
-#  else
-#    define FOPEN_TEXT_FLAG
-#  endif
 #endif
 
 #define MAXNAMELEN 256

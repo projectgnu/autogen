@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.0 2001/12/09 19:46:01 bkorb Exp $
+ *   $Id: opts.def,v 3.1 2002/03/23 05:06:56 bkorb Exp $
  */
 
 /*
@@ -217,12 +217,7 @@ include = "#include <stdio.h>\n"
           "#include <errno.h>\n"
           "#ifdef HAVE_CONFIG_H\n"
           '#  include "config.h"'  "\n"
-          "#endif\n"
-          "#ifdef USE_FOPEN_BINARY\n"
-          '#  define FOPEN_BINARY_FLAG "b"'  "\n"
-          "#else\n"
-          "#  define FOPEN_BINARY_FLAG\n"
-          "#endif";
+          "#endif\n";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

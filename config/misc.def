@@ -4,14 +4,15 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/03/21 04:20:19 $
+ *  Last Modified:     $Date: 2002/03/23 05:06:56 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.8 2002/03/21 04:20:19 bkorb Exp $
+ *  $Id: misc.def,v 3.9 2002/03/23 05:06:56 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.8 $";
+version = "$Revision: 3.9 $";
+output-file = ag_macros.m4;
 
 test = {
     name   = shell;
@@ -87,7 +88,7 @@ test   = {
   action   = { yes; act-type=subst;
                act-text = "-I${ag_cv_with_regex_header_path}"; };
   action   = { no;  act-type=subst;  act-text = ""; };
-  action   = { yes; act-quoting = asis;
+  action   = { yes; asis;
     act-type = script;
     act-text = 'CPPFLAGS="${CPPFLAGS} -I${ag_cv_with_regex_header_path}"';
   };
@@ -139,12 +140,12 @@ test   = {
   action   = { yes; act-type=subst;  act-text = "${ag_cv_with_regex_lib}"; };
   action   = { no;  act-type=subst;  act-text = ""; };
 
-  action   = { yes; act-quoting = asis;
+  action   = { yes; asis;
     act-type = script;
     act-text = 'LDFLAGS="${LDFLAGS} ${ag_cv_with_regex_lib}"';
   };
 
-  action   = { no; act-quoting = asis;
+  action   = { no; asis;
     act-type = script;
     act-text = 'AG_RUN_POSIX_REGCOMP';
   };
@@ -255,6 +256,7 @@ test = {
     action = { act-type = define; };
     code  = <<-  _EOF_
 		#include <time.h>
+		#include <string.h>
 		char t_buf[ 64 ];
 		int main() {
 		  static const char z[] = "Thursday Aug 28 240";
@@ -307,5 +309,62 @@ test = {
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
 };
+
+test = {
+    name   = fopen_binary;
+    type   = run;
+    check  = 'fopen accepts "b" mode';
+    action = { act-type = script; asis;
+      act-text = "AC_DEFINE([FOPEN_BINARY_FLAG],\"b\",\n\t"
+                 "[fopen(3) accepts a 'b' in the mode flag])"; };
+    action = { act-type = script; asis; no;
+      act-text = "AC_DEFINE([FOPEN_BINARY_FLAG],\"\",\n\t"
+                 "[fopen(3) accepts a 'b' in the mode flag])"; };
+    code   = <<- _EOF_
+		#include <stdio.h>
+		int main (int argc, char** argv) {
+		FILE* fp = fopen("conftest.$ac_ext", "rb");
+		return (fp == NULL) ? 1 : fclose(fp); }
+		_EOF_;
+    doc = <<- _END_OF_DOC_
+		Test whether fopen accepts a "b" in the mode string for binary file
+		opening.  This makes no difference on most unices, but some OSes
+		convert every newline written to a file to two bytes (CR LF), and
+		every CR LF read from a file is silently converted to a newline.
+		_END_OF_DOC_;
+};
+
+test = {
+    name   = fopen_text;
+    type   = run;
+    check  = 'fopen accepts "t" mode';
+    action = { act-type = script; asis;
+      act-text = "AC_DEFINE([FOPEN_TEXT_FLAG],\"t\",\n\t"
+                 "[fopen(3) accepts a 't' in the mode flag])"; };
+    action = { act-type = script; asis; no;
+      act-text = "AC_DEFINE([FOPEN_TEXT_FLAG],\"\",\n\t"
+                 "[fopen(3) accepts a 't' in the mode flag])"; };
+    code   = <<- _EOF_
+		#include <stdio.h>
+		int main (int argc, char** argv) {
+		FILE* fp = fopen("conftest.$ac_ext", "rt");
+		return (fp == NULL) ? 1 : fclose(fp); }
+		_EOF_;
+    doc = <<- _END_OF_DOC_
+		Test whether fopen accepts a "t" in the mode string for text file
+		opening.  This makes no difference on most unices, but some OSes
+		convert every newline written to a file to two bytes (CR LF), and
+		every CR LF read from a file is silently converted to a newline.
+		_END_OF_DOC_;
+};
+
+do-always = <<- _END_ALWAYS_
+
+	# Give preference to byacc and yacc over bison.
+	# bison likes alloca.  I hate alloca.  It is not portable.
+	# This is a rehack of AC_PROG_YACC
+	AC_CHECK_PROGS(YACC, byacc yacc 'bison -y', "$missing_dir/missing yacc")
+
+	_END_ALWAYS_;
 
 /* misc.def ends here */

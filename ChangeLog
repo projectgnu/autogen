@@ -1,3 +1,15 @@
+2002-03-22  Bruce Korb  <bkorb@gnu.org>
+
+	* config/confmacs.tpl: make it possible to dump all the macros into
+	a single output file.  More convenient.
+	* config/conftest.tpl: ditto.
+	* config/misc.def(fopen_binary): new
+	(fopen_text): new
+	* config/openmode.m4: obsolete
+	* getdefs/getdefs.h(FOPEN_BINARY_FLAG): use config.h
+	* compat/compat.h: ditto
+	* columns/opts.def: ditto
+
 2002-03-18  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: remove all the generated macro invocations and invoke

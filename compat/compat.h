@@ -6,9 +6,9 @@
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  * Last Modified:     Fri Jul 30 12:34:46 1999
- *            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>
+ *            by: bkorb
  *
- * $Id: compat.h,v 3.0 2001/12/09 19:46:02 bkorb Exp $
+ * $Id: compat.h,v 3.1 2002/03/23 05:06:56 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -92,22 +92,6 @@
 
 #ifndef NUL
 #  define NUL '\0'
-#endif
-
-#ifndef FOPEN_BINARY_FLAG
-#  ifdef USE_FOPEN_BINARY
-#    define FOPEN_BINARY_FLAG	"b"
-#  else
-#    define FOPEN_BINARY_FLAG
-#  endif
-#endif
-
-#ifndef FOPEN_TEXT_FLAG
-#  ifdef USE_TEXT_BINARY
-#    define FOPEN_TEXT_FLAG	"t"
-#  else
-#    define FOPEN_TEXT_FLAG
-#  endif
 #endif
 
 #ifdef HAVE_LIMITS_H

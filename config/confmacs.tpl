@@ -50,56 +50,60 @@ DEFINE  emit-macro      =][=
       (define good-define-name  "WITH_%s")     =][=
   ESAC  =][=
 
+  IF (. separate-macros) =][=
+
 (dne "dnl " "dnl ") =]
 dnl
 dnl @synopsis  [=(. mac-name)=]
 dnl
 dnl @success-result[=
-  IF (<= (count "action") (count "action.no")) =]:  there is no output[=
-  ELSE         =]
+    IF (<= (count "action") (count "action.no"))
+      =]:  there is no output[=
+    ELSE         =]
 dnl[=
-    FOR action =][=
-      IF (not (exist? "no"))  =][=
-        CASE  act-type  =][=
-        ==  define      =]
+      FOR action =][=
+        IF (not (exist? "no"))  =][=
+          CASE  act-type  =][=
+          ==  define      =]
 dnl   * [=(sprintf good-define-name up-name)
-        =] is #defined as [=?% act-text "%s" "1"=][=
-        ==  subst       =]
+          =] is #defined as [=?% act-text "%s" "1"=][=
+          ==  subst       =]
 dnl   * @[=(.  sub-name)=]@ is replaced by [=act-text=][=
-        ==  script      =]
+          ==  script      =]
 dnl   * a short script is run[=
-        ESAC   =][=
-      ENDIF    =][=
-    ENDFOR     =][=
-  ENDIF        =]
+          ESAC   =][=
+        ENDIF    =][=
+      ENDFOR     =][=
+    ENDIF (<= (count "action") (count "action.no")) =]
 dnl
 dnl @failure-result[=
-  IF (= (count "action.no") 0) =]:  there is no output[=
-  ELSE         =]
+    IF (= (count "action.no") 0)
+      =]:  there is no output[=
+    ELSE         =]
 dnl[=
-    FOR action =][=
-      IF (exist? "no")  =][=
-        CASE  act-type  =][=
-        ==  define      =]
+      FOR action =][=
+        IF (exist? "no")  =][=
+          CASE  act-type  =][=
+          ==  define      =]
 dnl   * [=(sprintf bad-define-name up-name)
-       =] is #defined as [=?% act-text "%s" "1"=][=
-        ==  subst       =]
+           =] is #defined as [=?% act-text "%s" "1"=][=
+          ==  subst       =]
 dnl   * @[=(. sub-name)=]@ is replaced by [=act-text=][=
-        ==  script      =]
+          ==  script      =]
 dnl   * a short script is run[=
-        ESAC   =][=
-      ENDIF    =][=
-    ENDFOR     =][=
-  ENDIF        =][=
+          ESAC   =][=
+        ENDIF    =][=
+      ENDFOR     =][=
+    ENDIF (= (count "action.no") 0) =][=
 
-  IF   (define doc-text (get "doc"))
+    IF   (define doc-text (get "doc"))
      (> (string-length doc-text) 0) =]
 dnl
 dnl @description
 [=(prefix "dnl   " doc-text) =][=
-  ENDIF =][=
+    ENDIF =][=
 
-IF  (exist? "author") =]
+    IF  (exist? "author") =]
 dnl
 dnl @version "[=
 
@@ -108,8 +112,12 @@ dnl @version "[=
 dnl
 dnl @author [=author=][=
 
-ENDIF     =]
-dnl
+    ENDIF (exist? "author") =]
+dnl[=
+
+  ENDIF separate-macros
+
+=]
 AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
   (define c-text (get "code"))
@@ -180,11 +188,11 @@ DEFINE  emit-results   =][=
 
     == yes-script        =][=
       (set! good-text (string-append good-text "\n    "
-            (protect-text tmp-text)))
+            (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
       =][=
 
     ==  no-define        =][=
-      (set! good-text (string-append good-text
+      (set! bad-text (string-append bad-text
             "\n    AC_DEFINE([" (sprintf bad-define-name up-name) "],["
 			(if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if '" (protect-text (get "check"))
@@ -199,7 +207,7 @@ DEFINE  emit-results   =][=
 
     ==  no-script        =][=
       (set! bad-text (string-append bad-text "\n    "
-            (protect-text tmp-text)))
+            (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
       =][=
 
     ESAC                 =][=

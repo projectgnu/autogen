@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2002/03/21 04:20:19 $
+#  Last Modified:     $Date: 2002/03/23 05:06:56 $
 #             by: bkorb
 #
 # This template uses the following definitions:
@@ -25,35 +25,57 @@ null
 
 INCLUDE "confmacs.tpl"  =][=
 
-(out-switch (string-append (string-downcase! (get "group")) "_macros.m4"))
-(define ofile      "")
-(define ofile-list "")
+(if (exist? "output-file")
+    (begin
+      (define ofile (get "output-file"))
+      (define separate-macros #f)
+      (shellf "echo sending output to %s >&2" ofile)
+    )
+
+    (begin
+      (define ofile
+         (string-append (string-downcase! (get "group")) "_macros.m4") )
+      (define separate-macros #t)
+)   )
+(out-switch ofile)
+(define ofile-list ofile)
+(define do-all-name (string-append
+        "INVOKE_" (string-upcase! (get "group")) "_MACROS" ))
 (dne "dnl " "dnl ")     =]
 dnl
-dnl @synopsis  INVOKE_[=(string-upcase! (get "group"))=]_MACROS
+dnl @synopsis  [=(. do-all-name)=]
 dnl
 dnl  This macro will invoke the AutoConf macros specified in [=(def-file)=]
 dnl  that have not been disabled with "omit-invocation".
-dnl
-AC_DEFUN([INVOKE_[=(string-upcase! (get "group"))=]_MACROS],[[=
+dnl[=
 
-FOR test                =][=
-    preamble            =][=
-    (set! ofile (string-append (string-downcase mac-name) ".m4" ))
-    (out-push-new ofile)
-    (set! ofile-list (string-append ofile-list
-          "\n" ofile))  =][=
-    emit-macro          =][=
-    (out-pop)           =][=
+(if (not separate-macros) (out-push-new)) =]
+AC_DEFUN([[=(. do-all-name)=]],[[=
+
+FOR test        =][=
+  preamble      =][=
+  (if separate-macros
+     (begin
+        (set! ofile (string-append (string-downcase mac-name) ".m4" ))
+        (out-push-new ofile)
+        (set! ofile-list (string-append ofile-list "\n" ofile))
+     )
+     (out-suspend "main-macro")
+  )             =][=
+
+  emit-macro    =]
+[=(if separate-macros (out-pop) (out-resume "main-macro"))    =][=
 
   IF (not (exist? "omit-invocation")) =]
-# Check to see if [=check=].
-[=(. mac-name)  =]
-[=
-  ENDIF         =][=
-ENDFOR test
-
-=]]) # end AC_DEFUN of [=(string-upcase! (get "group"))=]_MACROS
+  # Check to see if [=check=].
+  [=(. mac-name)=]
+[=ENDIF         =][=
+ENDFOR test     =][=
+(if (not separate-macros)
+    (out-pop #t)) =][=
+(prefix "  " (join "\n" (stack "do-always")))
+=]
+]) # end AC_DEFUN of [=(. do-all-name)=]
 [=
 
 ;; # # # # # # # # # Makefile.am # # # # # # # # # # #
@@ -62,16 +84,20 @@ ENDFOR test
 (dne "##  " "##  ")     =]
 ##
 ## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 3.6 2002/03/21 04:20:19 bkorb Exp $
+## $Id: conftest.tpl,v 3.7 2002/03/23 05:06:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-GENERATED_M4 = \
+GENERATED_M4 = [=
+  IF (not separate-macros)
+        =][=(. ofile-list)=][=
+  ELSE  =]\
 [=(shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
-          ofile-list)=]
+          ofile-list)=][=
+  ENDIF =]
 
 pkgdata_DATA = conftest.tpl confmacs.tpl
 
-EXTRA_DIST = byacc.m4 openmode.m4 missing bootstrap autogen.spec \
+EXTRA_DIST = missing bootstrap autogen.spec \
 	$(pkgdata_DATA) $(GENERATED_M4) misc.def bootstrap.local
 
 MAINTAINERCLEANFILES = Makefile.in config.guess config.sub install-sh \
