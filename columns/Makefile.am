@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Thu Jul  8 14:45:13 1999				      
+## Last Modified:   Mon Jul 12 14:13:46 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.14 1999/07/12 18:50:16 bkorb Exp $
+## $Id: Makefile.am,v 1.15 1999/07/12 21:14:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -44,6 +44,6 @@ columns.menu columns.texi : opts.def columns
 
 columns.1 : opts.def columns
 	${top_builddir}/src/autogen -T agman1 -L $(top_srcdir)/autoopts \
-		-b columns opts.def
+		-b columns $(srcdir)/opts.def
 
 # Makefile.am ends here
