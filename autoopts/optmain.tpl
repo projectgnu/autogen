@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.17 2003/08/21 02:06:09 bkorb Exp $
+# $Id: optmain.tpl,v 3.18 2003/08/22 03:19:27 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -236,6 +236,7 @@ DEFINE range-option-code
           (out-pop #t)) =] };
     int val, ix;
     tCC* pzIndent = "\t\t\t\t  ";
+    extern FILE* option_usage_fp;
 
     if (pOptDesc == NULL) /* usage is requesting range list
                              option_usage_fp has already been set */

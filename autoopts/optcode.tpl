@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.20 2003/08/21 02:06:09 bkorb Exp $
+#$Id: optcode.tpl,v 3.21 2003/08/22 03:19:27 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -21,13 +21,6 @@ ENDIF
 #ifdef  __cplusplus
 extern "C" {
 #endif[=
-
-IF (exist? "flag.arg-range")
-
-=]
-extern FILE* option_usage_fp;[=
-
-ENDIF                                =][=
 
 IF (not (exist? "copyright") )
 
