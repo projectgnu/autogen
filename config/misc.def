@@ -1,0 +1,96 @@
+
+autogen definitions m4;
+
+/*
+ *  Maintainer:        Bruce Korb <korb@datadesign.com>
+ *  Created:           Tue Nov 24 01:07:30 1998
+ *  Last Modified:     Wed Jul  7 10:33:11 1999				      
+ *             by:     Bruce Korb <korb@datadesign.com>			      
+ *  -------------------------------------------------------------------
+ *  $Id: misc.def,v 1.1 1999/07/29 20:34:05 bkorb Exp $
+ *  -------------------------------------------------------------------
+ */
+group = ag;
+
+test = {
+    name  = allocated_ctime;
+    type  = run;
+    check = "ctime() allocates memory for its result";
+    code = "
+#include <time.h>
+int main (int argc, char *argv[])
+{
+   time_t  timeVal = time( (time_t*)NULL );
+   char*   pzTime  = ctime( &timeVal );
+   free( (void*)pzTime );
+   return 0;
+}";
+
+    doc =
+    "Check whether we need to free the memory returned by ctime.";
+};
+
+test = {
+    name = strftime;
+    type = run;
+    check = "strftime() works";
+    code =
+'#include <time.h>
+char t_buf[ 64 ];
+int main()
+{
+  static const char z[] = "Thursday Aug 28 240";
+  struct tm tm;
+  tm.tm_sec   = 36;  /* seconds after the minute [0, 61]  */
+  tm.tm_min   = 44;  /* minutes after the hour [0, 59] */
+  tm.tm_hour  = 12;  /* hour since midnight [0, 23] */
+  tm.tm_mday  = 28;  /* day of the month [1, 31] */
+  tm.tm_mon   =  7;  /* months since January [0, 11] */
+  tm.tm_year  = 86;  /* years since 1900 */
+  tm.tm_wday  =  4;  /* days since Sunday [0, 6] */
+  tm.tm_yday  = 239; /* days since January 1 [0, 365] */
+  tm.tm_isdst =  1;  /* flag for daylight savings time */
+  strftime( t_buf, sizeof( t_buf ), "%A %b %d %j", &tm );
+  return strcmp( t_buf, z );
+}';
+
+    doc =
+    "Check for existence and functioning of strftime routine.";
+};
+
+test = {
+    name  = posix_regcomp;
+    type  = run;
+    check = "POSIX compliant regcomp()/regexec()";
+    code  =
+'#include <sys/types.h>
+#include <regex.h>
+int main()
+{
+  regex_t  re;
+  return regcomp( &re, "^.*$", REG_EXTENDED|REG_ICASE|REG_NEWLINE );
+}';
+
+    doc =
+    "Check that the POSIX compliant regular expression compiler\n"
+    "is available in the POSIX specified manner, and it works.";
+};
+
+test = {
+    name  = sys_siglist;
+    type  = run;
+    check = "there is a global text array sys_siglist";
+    code  =
+'#include <signal.h>
+int main()
+{
+  const char* pz = sys_siglist[1];
+  return (pz != 0) ? 0 : 1;
+}';
+
+    doc =
+    "Check that the POSIX compliant regular expression compiler\n"
+    "is available in the POSIX specified manner, and it works.";
+};
+
+/* ctime.def ends here */
