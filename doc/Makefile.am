@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Tue Aug  3 16:18:52 1999				      
+## Last Modified:   Wed Aug  4 07:52:50 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.20 1999/08/03 23:19:07 bkorb Exp $
+## $Id: Makefile.am,v 2.21 1999/08/04 14:53:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -50,9 +50,8 @@ TPLINC		= $(top_srcdir)/src/agParse.y \
 
 GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
 AGEXE		= $(top_builddir)/src/autogen
-AGARGS		= autogen=$(AGEXE) \
-		agarg=--templ-dirs=$(top_srcdir) agarg=-t60 \
-		base-name=autogen
+AGARGS		= base-name=autogen autogen=$(AGEXE) \
+		agarg=-L$(srcdir) agarg=-L$(top_srcdir) agarg=-t60
 
 autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC) $(SNVDOC)
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
