@@ -1,3 +1,7 @@
+2003-04-21  Bruce Korb  <bkorb@gnu.org>
+
+	* */*.[ch]: remove unnecessary includes
+
 2003-04-20  Bruce Korb  <bkorb@gnu.org>
 
 	* */*.[ch]: warning patrol

@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.5 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: columns.c,v 3.6 2003/04/22 01:40:20 bkorb Exp $
  */
 
 /*
@@ -23,15 +23,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include "config.h"
-
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "opts.h"
 
 struct print_list {
     char**     papz;
@@ -64,7 +55,7 @@ void writeColumns( void );
 int  handleIndent( char* pzIndentArg );
 
 
-    int
+int
 main( int    argc,
       char** argv )
 {
@@ -213,7 +204,7 @@ handleIndent( char* pzIndentArg )
 }
 
 
-    void
+void
 readLines( void )
 {
     int   sepLen;
@@ -364,7 +355,7 @@ readLines( void )
 }
 
 
-    void
+void
 writeColumns( void )
 {
     char zFmt[ 12 ];
@@ -507,7 +498,7 @@ writeColumns( void )
 }
 
 
-    void
+void
 writeRows( void )
 {
     char zFmt[ 12 ];
@@ -592,7 +583,7 @@ writeRows( void )
 /*
  *  Line comparison procedure
  */
-    int
+int
 compProc( const void* p1, const void* p2 )
 {
     char* pz1 = *(char**)p1;

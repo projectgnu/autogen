@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-20 17:58:22 bkorb"
+## Time-stamp:      "2003-04-21 18:07:32 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.22 2003/04/21 03:35:34 bkorb Exp $
+## $Id: Makefile.am,v 3.23 2003/04/22 01:40:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -37,7 +37,7 @@ MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
 
 bin_PROGRAMS = autogen
 
-CSRC = \
+csrc = \
   autogen.c     agCgi.c       agShell.c     agUtils.c     agUtils.h  \
   autogen.h     defDirect.c   defFind.c     defLex.c      defLoad.c  \
   defParse.y    defReduce.c   expExtract.c  expFormat.c   expGperf.c \
@@ -46,7 +46,7 @@ CSRC = \
   funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
   tpParse.c     tpProcess.c
 
-EXTRA_DIST = $(CSRC) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
+EXTRA_DIST = $(csrc) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
 
 nodist_autogen_SOURCES = ag.c
 autogen_SOURCES = defParse.y $(GEN_CSRC)
@@ -62,9 +62,11 @@ AM_YFLAGS = -d
 
 all : @AGEXE@
 
-ag.c : $(CSRC)
-	(for f in $(CSRC) ; do case "$$f" in *.c ) \
-	  echo "#include \"$$f\"" ; esac ; done) > $@
+ag.c : $(csrc)
+	( echo '#define DEFINING' ; echo '#include "autogen.h"' ; \
+	for f in $(csrc) ; do case "$$f" in \
+	  *.c ) echo "#include \"$$f\"" ;; \
+	  esac ; done ) > $@
 
 ##  This is a LIE:  only defLex.o depends upon defParse.h.  However, automake
 ##  is unable to cope with that and they don't provide another way to do it.

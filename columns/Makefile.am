@@ -10,15 +10,15 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.4 2003/02/16 00:04:40 bkorb Exp $
+## $Id: Makefile.am,v 3.5 2003/04/22 01:40:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
-
-columns_SOURCES = columns.c opts.c opts.h
+csrc            = opts.h columns.c opts.c
+nodist_columns_SOURCES = cols.c
 
 BUILT_SOURCES   = columns.menu columns.texi columns.1
-EXTRA_DIST      = opts.def
+EXTRA_DIST      = opts.def $(csrc)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
 columns_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
@@ -35,6 +35,9 @@ all : gen
 ## opts.h cannot be built until columns is built, so no rules for it.
 
 columns.1 columns.menu columns.texi : gen-stamp
+
+cols.c : $(csrc)
+	for f in $(csrc) ; do echo "#include \"$$f\"" ; done > $@
 
 gen-stamp : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \

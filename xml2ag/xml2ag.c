@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.10 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.11 2003/04/22 01:40:20 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -24,12 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-
-#include "xmlopts.h"
-#include <string.h>
 
 tSCC zConflict[] =
     "the file name operand conflicts with the definitions option.\n";

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.22 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: autogen.c,v 3.23 2003/04/22 01:40:20 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-#define DEFINING
-#include "autogen.h"
 
 tSCC zSchemeInit[] =
 "(add-hook! before-error-hook error-source-line)\n"

@@ -1,15 +1,14 @@
 /*
- *  $Id: gdinit.c,v 3.4 2003/04/19 02:40:34 bkorb Exp $
+ *  $Id: gdinit.c,v 3.5 2003/04/22 01:40:20 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2003/04/19 02:40:34 $
+ *  Last Modified:     $Date: 2003/04/22 01:40:20 $
  *            by: bkorb
  */
-#include "getdefs.h"
 
 tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 

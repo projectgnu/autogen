@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.6 2003/04/21 03:35:35 bkorb Exp $
+ *   $Id: opts.def,v 3.7 2003/04/22 01:40:20 bkorb Exp $
  */
 
 /*
@@ -35,6 +35,14 @@ eaddr          = "bkorb@gnu.org";
 prog_name      = "columns";
 prog_title     = "Columnize Input Text";
 long_opts;
+
+export = <<- EOExport
+	#include "config.h"
+	#include <ctype.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	EOExport;
 
 version = "1.1";
 

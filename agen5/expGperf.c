@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 3.10 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expGperf.c,v 3.11 2003/04/22 01:40:20 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -48,7 +48,7 @@ tSCC zMakeGperf[] =
  */
 "cat <<'_EOF_'\n"
 "%%{\n"
-"#include <stdio.h>\n"
+"#" "include <stdio.h>\n"
 "typedef struct index t_index;\n"
 "%%}\n"
 "struct index { char* name; int idx; };\n"

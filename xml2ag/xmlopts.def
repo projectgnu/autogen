@@ -4,15 +4,19 @@ autogen definitions options;
 
 #option templ-dir  $top_srcdir/autoopts
 
-export = "
-\#include <stdio.h>
-\#include <unistd.h>
-\#include <errno.h>
-\#include <limits.h>
-\#include <stdlib.h>
-\#include <string.h>
+export = <<-  EOExport
+	#include <stdio.h>
+	#include <unistd.h>
+	#include <errno.h>
+	#include <limits.h>
+	#include <stdlib.h>
+	#include <string.h>
 
-extern FILE* outFp;";
+	#include <libxml/parser.h>
+	#include <libxml/tree.h>
+
+	extern FILE* outFp;
+	EOExport;
 
 flag = {
     name        = output;

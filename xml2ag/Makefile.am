@@ -4,21 +4,21 @@
 ##
 ##    AutoGen copyright 2002-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-02-03 11:54:40 bkorb"
+## Time-stamp:      "2003-04-21 18:03:22 bkorb"
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.10 2003/02/16 00:04:40 bkorb Exp $
+## $Id: Makefile.am,v 1.11 2003/04/22 01:40:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
 bin_PROGRAMS    = xml2ag
-nodist_xml2ag_SOURCES = xmlopts.c xmlopts.h fork.c
-xml2ag_SOURCES  = xml2ag.c
+csrcs           = xmlopts.h xml2ag.c xmlopts.c fork.c
+nodist_xml2ag_SOURCES = x.c
 
 ## SUBDIRS      = test
-EXTRA_DIST      = xmlopts.def fork.tpl
+EXTRA_DIST      = xmlopts.def fork.tpl $(csrcs)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
 man_MANS        = $(TARG).1
@@ -29,6 +29,9 @@ INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 
 all : gen
 gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
+
+x.c : $(csrcs)
+	for f in $(csrcs) ; do echo "#include \"$$f\"" ; done > $@
 
 xmlopts.c $(xml2ag_OBJECTS) : xmlopts.h
 

@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.9 2003/04/19 02:40:34 bkorb Exp $
+ *  $Id: getdefs.h,v 3.10 2003/04/22 01:40:20 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2003-04-18 19:25:20 bkorb"
+ *  Time-stamp:        "2003-04-21 17:55:45 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
