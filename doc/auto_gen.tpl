@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.14 1998/07/16 21:30:21 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.15 1998/07/16 21:48:46 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -944,8 +944,8 @@ usage and other attributes related to each option.
         $top_srcdir/autoopts/options.tpl |
 sed -e's/`/@code{/g' \
     -es/\\\'/}/g     \
-    -e's/^\\([a-zA-Z]\\)/@item \\1/'  \
-    -e 's/^[ \t]*//' " _shell =]
+    -e's/^\\([a-z][a-z_]*\\)/@cindex \\1\\\n@item \\1/' |
+sed -e's/^[ \t]*//' " _shell =]
 @end ignore
 
 @node standard options
