@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.46 1999/11/16 06:05:16 bruce Exp $
+## $Id: auto_gen.tpl,v 2.47 2000/03/11 21:36:17 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -666,42 +666,39 @@ definitions.  Consequently, more than one definition may result.
 @end enumerate
 
 @noindent
-Finally, Guile may be used to yield compound definitions' values:
+Finally, Guile/Scheme may be used to yield to create definitions:
 
 @enumerate 4
 @item
-When a Scheme expression is enclosed in the tokens @code{@{(} and
-@code{)@}}, then the expression is expected to be an alist of
+When the Scheme expression is preceeded by a backslash and single
+quote, then the expression is expected to be an alist of
 names and values that will be used to create AutoGen definitions.
-@end enumerate
 
 @noindent
-This last method is to be used as follows:
+This method can be be used as follows:
 
 @example
-mumble = @{( (name  (value-expression))
-             (name2 (another-expr))  )@};
+\'( (name  (value-expression))
+    (name2 (another-expr))  )
 @end example
 
 @noindent
-Under the covers, the string:
+This is entirely equivalent to:
 
 @example
-( (name  (value-expression))
-  (name2 (another-expr)) )
+name  = (value-expression);
+name2 = (another-expr);
 @end example
 
 @noindent
-gets handed off to a Guile function named @code{AutoGen-define-list}
-in an expression that looks like:
+Under the covers, the expression gets handed off to a Guile function
+named @code{alist->autogen-def} in an expression that looks like:
 
 @example
-(AutoGen-define-list
+(alist->autogen-def
     ( (name (value-expression))  (name2 (another-expr)) ) )
 @end example
-
-@noindent
-Until documented here, the user must supply this function  :-).
+@end enumerate
 
 @node Directives
 @section Controlling What Gets Processed
