@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.1 2002/06/15 18:24:59 bkorb Exp $
+ *  $Id: columns.c,v 3.2 2002/12/16 03:44:16 bkorb Exp $
  */
 
 /*
@@ -599,3 +599,10 @@ compProc( const void* p1, const void* p2 )
     char* pz2 = *(char**)p2;
     return strcmp( pz1, pz2 );
 }
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * tab-width: 4
+ * End:
+ * end of columns.c */
