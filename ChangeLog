@@ -1,9 +1,9 @@
-2000-10-30  Bruce Korb  <bkorb@gnu.org>
+2000-10-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*: much cleaning up
 	* autoopts/test/*.test:  rework for slightly altered help output
 
-2000-10-28  Bruce Korb  <bkorb@gnu.org>
+2000-10-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options.h: Join the mode, type and procedure names in the
 	DEF_PROC_* macros.
