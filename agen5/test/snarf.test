@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2005-01-08 19:56:28 bkorb"
+# Time-stamp:        "2005-03-07 13:07:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2005/01/23 23:33:05 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 # Copyright:         1999-2005 by Bruce Korb
-# $Id: snarf.test,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+# $Id: snarf.test,v 4.4 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -188,4 +188,12 @@ cmp ${testname}.h.* || \
     failure "`diff ${testname}.h.*`"
 
 cleanup
-# end of endmac.test
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of snarf.test

@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # in.test --- Verify that the "in?" predicate works
 #
-# Time-stamp:        "2002-12-10 21:38:31 bkorb"
+# Time-stamp:        "2005-03-07 13:05:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           7/12/2001
 #            by: bkorb
 #
-# $Id: in.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: in.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -76,4 +76,12 @@ cmp -s ${testname}.ok ${testname}.out || \
   failure "`diff ${testname}.ok ${testname}.test`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of in.test

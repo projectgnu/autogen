@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # loop.test --- test FOR loop
 #
-# Time-stamp:        "2004-10-02 20:15:51 bkorb"
+# Time-stamp:        "2005-03-07 13:05:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 #
-# $Id: loop.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: loop.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -115,4 +115,12 @@ egrep -v ' of 63:  6$' ${testname}.txt > ${testname}.test
 cmp -s ${testname}.test ${testname}.out || failure unexpected output
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of loop.test

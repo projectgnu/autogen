@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # format.test --- Count format string arguments.
 #
-# Time-stamp:        "2002-12-14 09:57:04 bkorb"
+# Time-stamp:        "2005-03-07 13:05:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           7/12/2001
 #            by: bkorb
 #
-# $Id: format.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: format.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -77,4 +77,12 @@ cmp -s ${testname}.base ${testname}.test || \
    failure "`diff ${testname}.base ${testname}.test`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of format.test

@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # define.test --- test evalstack functionality
 #
-# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Time-stamp:        "2005-03-07 13:05:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
+#            by: bkorb
 #
-# $Id: define.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: define.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -143,4 +143,12 @@ cmp -s $testname.test $testname.test || \
   failure "`diff $testname.samp $testname.test`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of define.test

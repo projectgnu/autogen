@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # include.test --- test include functionality
 #
-# Time-stamp:        "2004-10-30 12:54:06 bkorb"
+# Time-stamp:        "2005-03-07 13:05:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #            by: bkorb
 #
-# $Id: include.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: include.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -51,4 +51,12 @@ ${AGCMD} || failure ${AGCMD} failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of include.test

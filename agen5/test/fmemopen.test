@@ -1,0 +1,110 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# fmemopen.test --- fmemopen code
+#
+# Time-stamp:        "2005-03-07 14:57:37 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
+#            by: bkorb
+#
+# $Id: fmemopen.test,v 4.1 2005/03/13 19:30:08 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`dirname $0`
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+if egrep 'define ENABLE_FMEMOPEN' ${top_builddir}/config.h >/dev/null
+then : ; else cleanup ; exit 0 ; fi
+
+exec 5> ${testname}-main.c
+
+for f in TEST_FMEMOPEN __USE_GNU _GNU_SOURCE
+do printf '#define  %s\n' $f ; done >&5
+
+for f in '"config.h"' '<stdio.h>' '<errno.h>'
+do printf '#include %s\n' "${f}" ; done >&5
+
+echo >&5
+
+sed -n '/#ifdef ENABLE_FMEMOPEN/,/#endif/p' \
+    ${top_srcdir}/agen5/autogen.h >&5
+
+cat >&5  <<_EOF_
+
+#ifndef NUL
+# define NUL '\0'
+#endif
+
+#include "fmemopen.c"
+#define PROG_ERR "fmemopen error:  "
+
+int
+main( int argc, char** argv )
+{
+    static const char zJump[] =
+        "The quick brown fox jumped over the lazy dogs.\n";
+
+    FILE*   fp = fmemopen( NULL, 0, "w+" );
+    char*   bf;
+    size_t  ln;
+
+    if (fp == NULL) {
+        fprintf( stderr, PROG_ERR "fs err %d (%s) on fmemopen(NULL, 0, 'w+')\n",
+                 errno, strerror( errno ));
+        return 1;
+    }
+
+    printf( "The fmemopen fileno is %d\n", fileno(fp));
+    fputs( zJump, fp );
+    fflush( fp );
+    if (saved_cookie->high_water != sizeof(zJump)-1) {
+        fprintf( stderr, PROG_ERR "bad buf end:  %ld != %ld (actual)\n",
+                 saved_cookie->high_water, sizeof(zJump)-1 );
+        return 2;
+    }
+
+    bf = NULL;
+    fmem_ioctl( fp, FMEM_IOCTL_SAVE_BUF, &bf );
+    if ((void*)bf != (void*)saved_cookie->buffer) {
+        fprintf( stderr, PROG_ERR "bad buf addr:  0x%lX != 0x%lX (actual)\n",
+                 bf, saved_cookie->buffer );
+        return 3;
+    }
+
+    ln = fseek( fp, 0, SEEK_END );
+    if (ln != saved_cookie->high_water) {
+        fprintf( stderr, PROG_ERR "bad buf seek:  0x%lX != 0x%lX (actual)\n",
+                 ln, saved_cookie->high_water );
+        return 4;
+    }
+    free( bf );
+    return 0;
+}
+_EOF_
+
+CFLAGS=$(echo ${CFLAGS} -I${top_builddir} -I${top_builddir}/agen5)
+${CC} -g ${CFLAGS} -o ${testname} ${testname}-main.c || \
+  failure "Cannot compile fmemopen.c"
+./fmemopen 2> ${testname}.errors
+err=$?
+test -s ${testname}.errors && \
+  failure "ERROR $err -- `cat ${testname}.errors`"
+
+cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of fmemopen.test

@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # extract.test --- test extract functionality
 #
-# Time-stamp:        "2004-10-30 12:50:00 bkorb"
+# Time-stamp:        "2005-03-07 13:05:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 #
-# $Id: extract.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: extract.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -62,4 +62,12 @@ cmp -s ${testname}.out ${testname}.dir/${testname}.sample || \
   failure "`diff -c ${testname}.out ${testname}.dir/${testname}.sample`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of extract.test

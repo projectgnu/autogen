@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2005-01-21 17:15:46 bkorb"
+# Time-stamp:        "2005-03-07 13:05:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/22 04:48:32 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 #
-# $Id: heredef.test,v 4.3 2005/01/22 04:48:32 bkorb Exp $
+# $Id: heredef.test,v 4.4 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -76,5 +76,13 @@ if cmp ${testname}.test ${testname}.sample
 then cleanup
 else failure "`diff ${testname}.sample ${testname}.test`"
 fi
+
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
 
 # end of heredef.test

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2004-10-28 17:50:25 bkorb"
+# Time-stamp:      "2005-03-07 13:08:01 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Sat Mar 28 14:21:31 1998
 #
-# $Id: expr.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: expr.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -45,4 +45,12 @@ cmp expr.base expr.res || \
   failure "`diff -c expr.base expr.res`"
 
 cleanup
-# expr.test ends here
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of expr.test

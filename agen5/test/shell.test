@@ -1,18 +1,18 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# for.test --- test functionality of switching shells
+# shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2005-01-18 17:23:14 bkorb"
+# Time-stamp:        "2005-03-07 13:07:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/19 01:49:59 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.2 2005/01/19 01:49:59 bkorb Exp $
+# $Id: shell.test,v 4.3 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
@@ -127,4 +127,11 @@ fi
 
 failure "`set +x;diff -c ${testname}.sample ${testname}.test`"
 
-# end of for.test
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of shell.test

@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # suffix.test --- test the select suffix option
 #
-# Time-stamp:        "2004-11-01 14:54:23 bkorb"
+# Time-stamp:        "2005-03-07 13:06:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
+# Last Modified:     $Date: 2005/03/13 19:30:08 $
 #            by: bkorb
 #
-# $Id: suffix.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: suffix.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -79,4 +79,12 @@ cmp ${testname}.out ${testname}.samp || \
   failure "`diff  ${testname}.out ${testname}.samp`"
 
 cleanup
-# end of endmac.test
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of suffix.test

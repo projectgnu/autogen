@@ -3,14 +3,14 @@
 # ----------------------------------------------------------------------
 # stack.test --- test stack and join functionality
 #
-## Time-stamp:      "2004-02-01 13:35:28 bkorb"
+## Time-stamp:      "2005-03-07 13:05:17 bkorb"
 ## Copyright (c):   1999-2005 by Bruce Korb
 ##
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 #
-# $Id: stack.test,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+# $Id: stack.test,v 4.3 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -76,4 +76,12 @@ cmp -s ${testname}.test ${testname}.out || \
 	failure "`diff ${testname}.*t`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of stack.test

@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# for.test --- test functionality of `for' function
+# gperf.test --- test functionality of `for' function
 #
-# Time-stamp:        "2004-02-01 13:51:49 bkorb"
+# Time-stamp:        "2005-03-13 11:28:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2005/03/13 19:31:24 $
+#            by: bkorb
 #
-# $Id: gperf.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: gperf.test,v 4.2 2005/03/13 19:31:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if gperf --version > /dev/null 2>&1
@@ -28,8 +28,8 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
 <= AutoGen5 template test =>
 <=
 
@@ -42,30 +42,40 @@ FOR foo "\n" =><=
 <=bar=>	yields: <=(gperf "tst" (get "bar"))=><=
   ENDFOR   =><=
 
-ENDFOR =>
+ENDFOR =><=
+\`tar cf - .${testname}.* > ${testname}-prog.tar || \
+  die 'cannot save gperf files'\`=>
 _EOF_
 
 
 # Create the files we need in the test environment
-cat > $testname.def <<_EOF_
-AutoGen Definitions $testname;
+cat > ${testname}.def <<_EOF_
+AutoGen Definitions ${testname};
 foo = { bar = first; bar = second; };
 foo = { bar = third; bar = fourth; };
 _EOF_
 
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > ${testname}.base <<_EOF_
 
-first	yields:
-second	yields:
+first	yields: 0x01
+second	yields: 0x02
 
-third	yields:
-fourth	yields:
+third	yields: 0x03
+fourth	yields: 0x04
 _EOF_
 
-${AGexe} $testname.def || failure AutoGen failed
-sed 's/yields:.*$/yields:/' $testname.test > $testname.tout
-cmp -s $testname.tout $testname.out || failure unexpected output
+${AGexe} ${testname}.def || failure AutoGen failed
+cmp -s ${testname}.base ${testname}.test || \
+  failure "`diff ${testname}.base ${testname}.test`"
 
 cleanup
-# end of for.test
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of gperf.test

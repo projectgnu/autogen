@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2004-11-01 14:49:46 bkorb"
+# Time-stamp:        "2005-03-07 13:05:43 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: error.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -204,4 +204,12 @@ cmp -s  ${testname}.samp6  ${testname}.out6 || \
   failure "`diff -c ${testname}.samp6 ${testname}.out6`"
 
 cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
 # end of error.test
