@@ -1,0 +1,66 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# for.test --- test functionality of `for' function
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: gperf.test,v 1.1 2000/09/30 02:36:25 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test =>
+<=
+
+(if (not (make-gperf "tst" (stack "foo.bar")))
+    (error "cannot make gperf")) =><=
+
+FOR foo "\n" =><=
+
+  FOR bar  =>
+<=bar=>	yields: <=(gperf "tst" (get "bar"))=><=
+  ENDFOR   =><=
+
+ENDFOR =>
+_EOF_
+
+
+# Create the files we need in the test environment
+cat > $testname.def <<_EOF_
+AutoGen Definitions $testname;
+foo = { bar = first; bar = second; };
+foo = { bar = third; bar = fourth; };
+_EOF_
+
+# this is the output we should expect to see
+cat > $testname.out <<_EOF_
+
+first	yields:
+second	yields:
+
+third	yields:
+fourth	yields:
+_EOF_
+
+$AGEXE $testname.def || failure AutoGen failed
+sed 's/yields:.*$/yields:/' $testname.test > $testname.tout
+cmp -s $testname.tout $testname.out || failure unexpected output
+
+cleanup
+# end of for.test

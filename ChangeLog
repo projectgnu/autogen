@@ -1,3 +1,8 @@
+2000-09-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expGperf.c: new.  Implements (make-gperf ...) and
+	(gperf ...) scheme functions.
+
 2000-09-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*.c: cleaned up the memory usage and ensured that AutoGen

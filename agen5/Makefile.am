@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2000/09/16 16:04:26 $
+## Last Modified:   $Date: 2000/09/30 02:36:25 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.27 2000/09/16 16:04:26 bkorb Exp $
+## $Id: Makefile.am,v 1.28 2000/09/30 02:36:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -38,7 +38,7 @@ EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl pseudo.x \
 		$(GEN_SRC) bootstrap.dir schemedef.scm fsm.tpl pseudo.def
 
 bin_PROGRAMS	= autogen
-autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
+autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   expGperf.c \
 		autogen.h   defDirect.c defFind.c   defLex.c    defLoad.c \
 		defParse.y  defReduce.c directive.h expFormat.c expGuile.c \
 		expGuile.h  expOutput.c expPrint.c  expState.c  expString.c \
@@ -54,7 +54,7 @@ FARGS = base-name=functions template=functions filelist agarg=$(OPTDBG)
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
 EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
-		expString.c $(FUNCLIST)
+		expString.c expGperf.c  $(FUNCLIST)
 
 YFLAGS = -d
 
