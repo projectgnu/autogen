@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Thursday February  5, 2004 at 08:40:48 PM PST
+ *  It has been AutoGen-ed  Monday February 16, 2004 at 02:26:49 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -69,10 +69,9 @@ typedef enum {
     CGI_TR_NAME_EQUAL,
     CGI_TR_SEPARATE,
     CGI_TR_STASH,
-    CGI_TR_VALUE_ESCAPE,
-    CGI_TR_VALUE_SPACE
+    CGI_TR_VALUE_ESCAPE
 } te_cgi_trans;
-#define CGI_TRANSITION_CT  6
+#define CGI_TRANSITION_CT  5
 
 /*
  *  the state transition handling map
@@ -91,11 +90,11 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
   /* STATE 0:  CGI_ST_INIT */
   { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  name_char */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  equal */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  space */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  escape */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  = */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  + */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  % */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  separator */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  & */
     { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
   },
 
@@ -103,11 +102,11 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
   /* STATE 1:  CGI_ST_NAME */
   { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
     { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  name_char */
-    { CGI_ST_VALUE, CGI_TR_NAME_EQUAL },            /* EVT:  equal */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  space */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  escape */
+    { CGI_ST_VALUE, CGI_TR_NAME_EQUAL },            /* EVT:  = */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  + */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  % */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  separator */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  & */
     { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
   },
 
@@ -115,11 +114,11 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
   /* STATE 2:  CGI_ST_VALUE */
   { { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  alpha */
     { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  name_char */
-    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  equal */
-    { CGI_ST_VALUE, CGI_TR_VALUE_SPACE },           /* EVT:  space */
-    { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },          /* EVT:  escape */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  = */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  + */
+    { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },          /* EVT:  % */
     { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  other */
-    { CGI_ST_INIT, CGI_TR_SEPARATE },               /* EVT:  separator */
+    { CGI_ST_INIT, CGI_TR_SEPARATE },               /* EVT:  & */
     { CGI_ST_DONE, CGI_TR_SEPARATE }                /* EVT:  end */
   }
 };
@@ -143,11 +142,11 @@ tSCC* apzCgiStates[] = {
 tSCC zCgiEvInvalid[] = "* Invalid Event *";
 tSCC zCgiEvAlpha[] = "alpha";
 tSCC zCgiEvName_Char[] = "name_char";
-tSCC zCgiEvEqual[] = "equal";
-tSCC zCgiEvSpace[] = "space";
-tSCC zCgiEvEscape[] = "escape";
+tSCC zCgiEvEqual[] = "=";
+tSCC zCgiEvSpace[] = "+";
+tSCC zCgiEvEscape[] = "%";
 tSCC zCgiEvOther[] = "other";
-tSCC zCgiEvSeparator[] = "separator";
+tSCC zCgiEvSeparator[] = "&";
 tSCC zCgiEvEnd[] = "end";
 tSCC* apzCgiEvents[] = {
     zCgiEvAlpha,     zCgiEvName_Char, zCgiEvEqual,     zCgiEvSpace,
@@ -250,6 +249,7 @@ cgi_run_fsm(
             /* END   == INVALID == DO NOT CHANGE THIS COMMENT */
             break;
 
+
         case CGI_TR_NAME_EQUAL:
             /* START == NAME_EQUAL == DO NOT CHANGE THIS COMMENT */
             strcpy( pzOut, "='" );
@@ -257,6 +257,7 @@ cgi_run_fsm(
             pzOut += 2;
             /* END   == NAME_EQUAL == DO NOT CHANGE THIS COMMENT */
             break;
+
 
         case CGI_TR_SEPARATE:
             /* START == SEPARATE == DO NOT CHANGE THIS COMMENT */
@@ -266,12 +267,14 @@ cgi_run_fsm(
             /* END   == SEPARATE == DO NOT CHANGE THIS COMMENT */
             break;
 
+
         case CGI_TR_STASH:
             /* START == STASH == DO NOT CHANGE THIS COMMENT */
             *(pzOut++) = curCh;
             outlen--;
             /* END   == STASH == DO NOT CHANGE THIS COMMENT */
             break;
+
 
         case CGI_TR_VALUE_ESCAPE:
             /* START == VALUE_ESCAPE == DO NOT CHANGE THIS COMMENT */
@@ -301,12 +304,6 @@ cgi_run_fsm(
             /* END   == VALUE_ESCAPE == DO NOT CHANGE THIS COMMENT */
             break;
 
-        case CGI_TR_VALUE_SPACE:
-            /* START == VALUE_SPACE == DO NOT CHANGE THIS COMMENT */
-            *(pzOut++) = ' ';
-            outlen--;
-            /* END   == VALUE_SPACE == DO NOT CHANGE THIS COMMENT */
-            break;
 
         default:
             /* START == BROKEN MACHINE == DO NOT CHANGE THIS COMMENT */
@@ -322,11 +319,4 @@ cgi_run_fsm(
     }
     return cgi_state;
 }
-/*
- * Local Variables:
- * mode: C
- * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
- * tab-width: 4
- * End:
- * end of cgi-fsm.c */
+/* end of cgi-fsm.c */
