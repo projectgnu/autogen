@@ -1,5 +1,5 @@
 #! /bin/echo AutoGen_Version_4.5,_but_this_should_be_sourced
-# -*- Mode: Ksh -*-
+# -*- Mode: sh -*-
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
@@ -25,20 +25,16 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #   AO_REVISION += 1
 # if any autoopts API interfaces have been added, removed or changed
 #   AO_REVISION =0
-#   AO_CURRENT += 1
-# additionally, if API interfaces have been added
-#   AO_AGE += 1
-# or if any API interfaces have been removed
-#   AO_AGE = 0
+#   AO_VERSION += 1
 
 # autoopts version
 #
 AO_LIBRARY=libopts.la
-AO_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
+AO_VERSION=3
+AO_REVISION=2
+AO_PATCHLEVEL=""
 
-AO_CURRENT=5
-AO_REVISION=0
-AO_AGE=2
+AO_RELEASE=$AO_VERSION.$AO_REVISION
 
 MAINTAINER='Bruce Korb <autogen@linuxbox.com>'
 
@@ -52,7 +48,7 @@ PACKAGE=autogen
 if [ -n "$srcdir" ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $AO_CURRENT`
+  lib=`expr '(' $AO_VERSION '*' 4096 ')' + $AO_REVISION`
   if [ $hdr -ne $lib ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
@@ -62,7 +58,7 @@ fi
 
 # Display version numbers banner for my sanity!
 #
-soname=$AO_LIBRARY.`expr $AO_CURRENT - $AO_AGE`.$AO_AGE.$AO_REVISION
+soname=$AO_LIBRARY.$AO_VERSION.$AO_REVISION$AO_PATCHLEVEL
 spaces="                                        "
 while :
 do

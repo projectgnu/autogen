@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.24 1999/10/28 03:36:28 bruce Exp $
+dnl Code: $Id: configure.in,v 2.25 1999/10/28 03:50:25 bruce Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.24 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.25 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -30,9 +30,8 @@ ifdef([AC_REVISION],AC_REVISION($Revision: 2.24 $),)dnl
 AC_SUBST(AG_VERSION)
 AC_SUBST(AG_MAJOR_VERSION)
 AC_SUBST(AG_MINOR_VERSION)
-AC_SUBST(AO_CURRENT)
+AC_SUBST(AO_VERSION)
 AC_SUBST(AO_REVISION)
-AC_SUBST(AO_AGE)
 AC_DEFINE_UNQUOTED(AO_CURRENT,$AO_CURRENT,[Define this to the autoopts current number])
 AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,[Define this to the autoopts age number])
 AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,[Define this to the autoopts revision number])
