@@ -2,6 +2,7 @@
 
 	* agen5/autogen.c(zSchemeInit): add macro for determining existence and
 	type of a Scheme definition.
+	* agen5/expState.c(tpl_file_line): change the example format.
 
 2002-04-19  Bruce Korb  <bkorb@gnu.org>
 

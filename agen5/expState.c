@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.4 2002/01/22 02:49:53 bkorb Exp $
+ *  $Id: expState.c,v 3.5 2002/05/02 03:35:38 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -485,8 +485,8 @@ ag_scm_tpl_file( void )
  *
  * doc:  Returns the file and line number of the current template macro
  *       using either the default format, "from %s line %d", or else
- *       the format you supply.  For example, if you want only the line
- *       number, you would supply the format "%2$d".
+ *       the format you supply.  For example, if you want to insert a "C"
+ *       language file-line directive, you would supply the format "# %2$d %1$s".
 =*/
     SCM
 ag_scm_tpl_file_line( SCM fmt )
