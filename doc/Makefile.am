@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.29 1999/10/30 19:19:07 bruce Exp $
+## $Id: Makefile.am,v 2.30 1999/10/30 19:23:23 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -64,7 +64,7 @@ DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
 		$(AGSRCDIR)/autogen.menu \
 		$(AGSRCDIR)/autogen.texi \
-		$(top_srcdir)/autoopts/autoopts.texi
+		$(top_srcdir)/autoopts/doc.tpl
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
