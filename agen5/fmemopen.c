@@ -1,24 +1,26 @@
-/* Fmemopen re-implementation.
-   Copyright (C) 2000 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-   Contributed by  Hanno Mueller, kontakt@hanno.de, 2000.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
 
 /*=--subblock=arg=arg_type,arg_name,arg_desc =*/
+/*=*
+ * library:  fmem
+ * header:   lib-fmem.h
+ *
+ * lib_description:
+ *
+ *  This library only functions in the presence of GNU libc.
+ *  It is distributed under the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  The GNU C Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with the GNU C Library; if not, write to the Free
+ *  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307 USA.
+=*/
 /*
  * fmemopen() - "my" version of a string stream
  * Hanno Mueller, kontakt@hanno.de
@@ -270,11 +272,11 @@ fmem_close (void *cookie)
  *
  *  doc:
  *
- *  This routine surrepticiously slips in a special request.
+ *  This routine surreptitiously slips in a special request.
  *  Currently, the only special request supported is,
  *  @code{FMEM_IOCTL_BUFFER}.  The third argument is never optional
  *  and must be a pointer to where the buffer address is to be stored.
- *  @code{sizeof long} must be @code{sizeof char*}.
+ *  "@code{sizeof long}" must be the same as "@code{sizeof char*}".
 =*/
 int
 fmemioctl( FILE* fp, int req, void* ptr )
@@ -306,46 +308,47 @@ fmemioctl( FILE* fp, int req, void* ptr )
  *  is marked as "extensible".  Any allocated memory is @code{free()}-ed
  *  when @code{fclose(3C)} is called.
  *
- *  The mode string is interpreted as follows:
+ *  The mode string is interpreted as follows.  If the first character of
+ *  the mode is:
  *
- *  @enumerate
- *  @item
- *
- *  If the first letter is an 'a', the string is opened in "append" mode.
+ *  @table @code
+ *  @item a
+ *  Then the string is opened in "append" mode.
  *  Append mode is always extensible.  In binary mode, "appending" will
  *  begin from the end of the initial buffer.  Otherwise, appending will
  *  start at the first non-NUL character in the initial buffer.
  *
- *  @item
- *
- *  If the first letter is a 'w', the string is opened in "write" mode.
+ *  @item w
+ *  Then the string is opened in "write" mode.
  *  Writing (and any reading) start at the beginning of the buffer.  If the
  *  buffer was supplied by the caller and it is allowed to be extended, then
  *  the initial buffer may or may not be in use at any point in time, and
  *  the user is responsible for handling the disposition of the initial
  *  memory.
  *
- *  @item
- *  If the first letter is a 'r', the string is opened in "read" mode.
+ *  @item r
+ *  Then the string is opened in "read" mode.
+ *  @end table
  *
- *  @item
- *  Any other first letter will result in @code{errno} being set to
- *  @code{EINVAL}.
+ *  @noindent
+ *  If it is not one of these three, the open fails and @code{errno} is
+ *  set to @code{EINVAL}.  These initial characters may be followed by:
  *
- *  @item
- *  If one of the following characters is '+', then the buffer is marked
+ *  @table @code
+ *  @item +
+ *  The buffer is marked
  *  as extensible and both reading and writing is enabled.
  *
- *  @item
- *  If one of the following characters is 'b', then the I/O is marked as
+ *  @item b
+ *  The I/O is marked as
  *  "binary" and a trailing NUL will not be inserted into the buffer.
  *
- *  @item
- *  The letter 'x' is ignored.
+ *  @item x
+ *  This is ignored.
+ *  @end table
  *
- *  @item
+ *  @noindent
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
- *  @end enumerate
  =*/
 FILE *
 fmemopen (void *buf, size_t len, const char *mode)
