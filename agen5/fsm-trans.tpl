@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Text -*-
 
-#  AutoGen copyright 1992-2003 Bruce Korb
+#  AutoGen copyright 1992-2004 Bruce Korb
 
 =][=
 

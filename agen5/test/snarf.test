@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2003/05/24 02:49:48 $
+# Last Modified:     $Date: 2004/02/01 21:26:45 $
 #            by: bkorb
-# Copyright:         1999-2003 by Bruce Korb
-# $Id: snarf.test,v 3.5 2003/05/24 02:49:48 bkorb Exp $
+# Copyright:         1999-2004 by Bruce Korb
+# $Id: snarf.test,v 3.6 2004/02/01 21:26:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -83,7 +83,7 @@ cat > ${testname}.ini.OK <<'_EOF_'
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2003 Bruce Korb
+ *  copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  
@@ -140,7 +140,7 @@ cat > ${testname}.h.OK <<_EOF_
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2003 Bruce Korb
+ *  copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  

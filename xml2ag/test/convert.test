@@ -3,12 +3,13 @@
 # ----------------------------------------------------------------------
 # convert.test --- test XML -> AutoGen conversion
 #
+## Copyright (c):   2003-2004 by Bruce Korb
 ## Time-stamp:      "2003-05-18 12:04:07 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun May 18, 2003
 #
-# $Id: convert.test,v 1.1 2003/05/26 03:14:59 bkorb Exp $
+# $Id: convert.test,v 1.2 2004/02/01 21:26:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

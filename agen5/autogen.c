@@ -1,12 +1,12 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.31 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: autogen.c,v 3.32 2004/02/01 21:26:45 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
 /*
- *  AutoGen copyright 1992-2003 Bruce Korb
+ *  AutoGen copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -2,14 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-##  Autoopts copyright 1992-2003 Bruce Korb
+## Time-stamp:      "2004-02-01 13:25:29 bkorb"
+## Copyright (c):   1992-2004 by Bruce Korb
 ##
-## Time-stamp:      "2004-01-01 12:04:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.25 2004/01/14 02:41:16 bkorb Exp $
+## $Id: Makefile.am,v 3.26 2004/02/01 21:26:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

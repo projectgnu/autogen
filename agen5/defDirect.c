@@ -1,12 +1,12 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.16 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: defDirect.c,v 3.17 2004/02/01 21:26:45 bkorb Exp $
  *  This module processes definition file directives.
  */
 
 /*
- *  AutoGen copyright 1992-2003 Bruce Korb
+ *  AutoGen copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

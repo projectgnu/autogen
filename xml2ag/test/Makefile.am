@@ -2,13 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
+## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 2003/05/26 03:14:59 bkorb Exp $
+## $Id: Makefile.am,v 1.2 2004/02/01 21:26:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = convert.test

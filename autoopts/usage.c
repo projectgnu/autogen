@@ -1,13 +1,13 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.26 2004/01/14 02:41:16 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.27 2004/02/01 21:26:46 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
 /*
- *  Automated Options copyright 1992-2003 Bruce Korb
+ *  Automated Options copyright 1992-2004 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

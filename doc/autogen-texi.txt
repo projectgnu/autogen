@@ -2431,7 +2431,7 @@ and is different from the copyright owner.
 An example of this might be:
 @example
 copyright = @{
-    date  = "1992-2003";
+    date  = "1992-2004";
     owner = "Bruce Korb";
     eaddr = 'bkorb@@gnu.org';
     type  = GPL;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.22 2004/01/14 02:41:16 bkorb Exp $
+ *  $Id: enumeration.c,v 3.23 2004/02/01 21:26:45 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2003 Bruce Korb
+ *  Automated Options copyright 1992-2004 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

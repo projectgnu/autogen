@@ -1,8 +1,8 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.19 2003/12/27 15:06:40 bkorb Exp $
+# $Id: optmain.tpl,v 3.20 2004/02/01 21:26:45 bkorb Exp $
 
-# Automated Options copyright 1992-2003 Bruce Korb
+# Automated Options copyright 1992-2004 Bruce Korb
 
 =]
 [=

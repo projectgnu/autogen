@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.18 2004/01/14 02:41:16 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.19 2004/02/01 21:26:45 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2003 Bruce Korb
+ *  Automated Options copyright 1992-2004 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

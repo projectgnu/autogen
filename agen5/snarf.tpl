@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 3.4 2003/05/24 02:49:48 bkorb Exp $
+# $Id: snarf.tpl,v 3.5 2004/02/01 21:26:45 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -76,7 +76,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2003 Bruce Korb
+ *  copyright 1992-2004 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -124,7 +124,7 @@ ENDFOR =]
 
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2003 Bruce Korb
+ *  copyright 1992-2004 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *

@@ -2,14 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-##    AutoGen copyright 2002-2003 Bruce Korb
+##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2003-04-21 18:03:22 bkorb"
-## Author:	        Bruce Korb <bkorb@gnu.org>
-## Created:	        Jun 10 2002
+## Time-stamp:      "2004-02-01 13:22:18 bkorb"
+## Copyright (c):   2003-2004 by Bruce Korb
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.12 2003/05/18 19:58:23 bkorb Exp $
+## $Id: Makefile.am,v 1.13 2004/02/01 21:26:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 

@@ -2,12 +2,12 @@
 
 /*  pseudo.def
  *
- *  AutoGen copyright 1992-2003 Bruce Korb
+ *  AutoGen copyright 1992-2004 Bruce Korb
  *
  *  This defines the finite state transition table for parsing the
  *  pseudo-macro at the head of every template
  *
- *  $Id: pseudo.def,v 3.2 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: pseudo.def,v 3.3 2004/02/01 21:26:45 bkorb Exp $
  */
 AutoGen Definitions fsm;
 

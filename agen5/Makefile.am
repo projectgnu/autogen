@@ -2,14 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-##    AutoGen copyright (C) 1992-2003 Bruce Korb
+## Time-stamp:      "2004-02-01 13:26:10 bkorb"
+## Copyright (c):   1992-2004 by Bruce Korb
 ##
-## Time-stamp:      "2004-02-01 12:57:44 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.28 2004/02/01 21:09:52 bkorb Exp $
+## $Id: Makefile.am,v 3.29 2004/02/01 21:26:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test

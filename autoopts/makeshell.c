@@ -1,13 +1,13 @@
 
 /*
- *  $Id: makeshell.c,v 3.17 2004/01/14 02:41:16 bkorb Exp $
+ *  $Id: makeshell.c,v 3.18 2004/02/01 21:26:45 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
  */
 
 /*
- *  Automated Options copyright 1992-2003 Bruce Korb
+ *  Automated Options copyright 1992-2004 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

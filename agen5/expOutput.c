@@ -1,12 +1,12 @@
 
 /*
- *  $Id: expOutput.c,v 3.19 2003/12/27 15:06:39 bkorb Exp $
+ *  $Id: expOutput.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
 
 /*
- *  AutoGen copyright 1992-2003 Bruce Korb
+ *  AutoGen copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

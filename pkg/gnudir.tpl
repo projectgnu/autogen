@@ -1,5 +1,5 @@
 %%comments:
-Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+Copyright (C) 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -53,7 +53,7 @@ the arguments on both sides of the RPC request.
 
 %%maintainer: Bruce Korb <bkorb@gnu.org>
 
-%%updated: 2003-02-15
+%%updated: 2004-02-01
 
 %%keywords: RPC, rpcgen, NFSv4, finite state machine, FSM, Guile, M4
 

@@ -1,7 +1,7 @@
 /*
- *  $Id: getdefs.c,v 3.12 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: getdefs.c,v 3.13 2004/02/01 21:26:46 bkorb Exp $
  *
- *    getdefs copyright 1999-2003 Bruce Korb
+ *    getdefs copyright 1999-2004 Bruce Korb
  *
  *  Time-stamp:        "2003-12-20 10:32:56 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>

@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 3.3 2004/02/01 21:09:52 bkorb Exp $
+# $Id: getopt.test,v 3.4 2004/02/01 21:26:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -39,7 +39,7 @@ help-value = 'h';
 gnu-usage;
 
 copyright = {
-    date  = "2003";
+    date  = "2003-2004";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";
@@ -178,7 +178,7 @@ doVersion(
 {
   char* pz_by = _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2004 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -419,7 +419,7 @@ doVersion(
 {
   char* pz_by = _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2004 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcEval.c,v 3.19 2004/02/01 21:09:52 bkorb Exp $
+ *  $Id: funcEval.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
 
 /*
- *  AutoGen copyright 1992-2003 Bruce Korb
+ *  AutoGen copyright 1992-2004 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

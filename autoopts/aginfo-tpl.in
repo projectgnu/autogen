@@ -2,7 +2,7 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-2003 Bruce Korb
+##  AutoGen Copyright (C) 1992-2004 Bruce Korb
 ##
 ## Time-stamp:        "2003-12-30 19:14:07 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:           Tue Sep 15 13:13:48 1998
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.11 2004/01/14 02:41:16 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.12 2004/02/01 21:26:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
