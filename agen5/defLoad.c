@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.9 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: defLoad.c,v 3.10 2002/05/29 01:37:41 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -127,12 +127,11 @@ fixTwins( tDefEntry** ppNode )
 /*
  *  massageDefTree
  *
- *  The agReduce.c functions do not do everything.
- *  It stuffs all the definitins into the definition tree,
- *  but it is easier to come back at the end and link
- *  together the "twins" (definitions with the same name,
- *  but different indexes).  This routine does that.
- *  It is recursive, handling one level at a time.
+ *  The defReduce.c functions do not do everything.  It stuffs all the
+ *  definitins into the definition tree, but it is easier to come back at the
+ *  end and link together the "twins" (definitions with the same name, but
+ *  different indexes).  This routine does that.  It is recursive, handling one
+ *  level at a time.
  */
 STATIC void
 massageDefTree( tDefEntry** ppNode )
