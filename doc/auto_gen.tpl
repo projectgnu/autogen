@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.44 1999/11/07 03:02:23 bruce Exp $
+## $Id: auto_gen.tpl,v 2.45 1999/11/16 05:55:33 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -431,6 +431,7 @@ C macro substitution is @strong{not} performed.
 @menu
 * Identification::  The First Definition
 * Definitions::     Simple and Compound Definitions
+* Dynamic Text::    Dynamic Text
 * Directives::      Controlling What Gets Processed
 * Comments::        Commenting Your Definitions
 * Example::         What it all looks like.
@@ -635,6 +636,66 @@ havoc with the definition processing directives.  The hash
 characters in the first column should be disambiguated with
 an escape @code{\} or join them with previous lines:
 @code{"foo\n#ifdef LATER...}.
+
+@node Dynamic Text
+@section Dynamic Text
+@cindex Dynamic Definition Text
+
+There are several methods for including dynamic content inside a
+definitions file.  Two of them are mentioned above (@xref{Definitions})
+in the discussion of string formation rules.  They are:
+
+@enumerate
+@item
+The back quoted text that gets processed by the shell into a single
+text value.
+@item
+Text surrounded by parentheses that is handed off to Guile for
+interpretation.  The result must be a single string that is used
+for a single text value.
+@end enumerate
+
+@noindent
+The third method will be discussed in the next section (@xref{Directives}):
+@enumerate 3
+@item
+The @code{#shell} and @code{#endshell} directives delimit a block of
+shell script that yields an entire document that gets parsed as AutoGen
+definitions.  Consequently, more than one definition may result.
+@end enumerate
+
+@noindent
+Finally, Guile may be used to yield compound definitions values:
+@enumerate 4
+@item
+When a Scheme expression is enclosed in the tokens @code{@{(} and
+@code{)@}}, then the expression is expected to be an alist of
+names and values that will be used to create AutoGen definitions.
+@end enumerate
+
+@noindent
+This last method is expected to be used as follows:
+
+@example
+mumble = {( (name (value-expression))  (name2 (another-expr)) )};
+@end example
+
+@noindent
+Under the covers, the string:
+@example
+( (name (value-expression))  (name2 (another-expr)) )
+@end example
+
+@noindent
+gets handed off to a Guile function named @code{AutoGen-define-list}
+in an expression that would look like:
+
+@example
+(AutoGen-define-list
+    ( (name (value-expression))  (name2 (another-expr)) ) )
+@end example
+
+Until documented here, the user must supply this function  :-).
 
 @node Directives
 @section Controlling What Gets Processed
