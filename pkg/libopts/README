@@ -1,0 +1,26 @@
+THIS TARBALL IS NOT A FULL DISTRIBUTION.
+
+The contents of this tarball is designed to be incorporated into
+software packages that utilize the AutoOpts option automation
+package and are intended to be installed on systems that may not
+have libopts installed.
+
+Usage Instructions for autoconf/automake/libtoolized projects:
+
+1. Install the unrolled tarball into your package source tree
+2. Add ''${tag}'' to the list of subdirectories to build
+3. Add ''${tag}/Makefile'' to the list of configured files
+4. Move libopts.m4 to your autoconf macro directory
+5. Add ''INVOKE_LIBOPTS_MACROS'' to your configure.ac file.
+
+If your package does not utilize the auto* tools, then you
+will need to hand craft the rules for building the library.
+
+LICENSING:
+
+This material is copyright 1993-2002 by Bruce Korb.
+You are licensed to use this under the terms of either
+the GNU Lesser General Public License (see: COPYING.lgpl), or,
+at your option, the modified Berkeley Software Distribution
+License (see:  COPYING.mbsd).  Both of these files should be
+included with this tarball.

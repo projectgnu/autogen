@@ -1,3 +1,10 @@
+2002-08-10  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/*: new directory structure for managing the building of packages
+	* pkg/libopts/*: added files needed by the tear-off libopts source
+	* config/misc.def: removed macros needed by the libopts tear-off
+	* config/libopts.def: new
+
 2002-07-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl(eaddr): use "eaddr" instead of inventing new attr.
@@ -54,4 +61,4 @@
 	* agen5/expState.c(ag_scm_set_option): similar for template files
 	* agen5/test/directives.test: test it for finding a template.
 
-5.3.10 released.  Older changes retired to ChangeLog.3
+5.4 released.  Older changes retired to ChangeLog.3

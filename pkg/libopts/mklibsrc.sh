@@ -6,6 +6,7 @@ top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
 
 tag=libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
+
 cd ${top_builddir}/pkg
 [ ! -d ${tag} ] || rm -rf ${tag}
 mkdir ${tag}
@@ -38,8 +39,15 @@ cp *.h pathfind.c ../pkg/${tag}/compat/.
 cd ../pkg/${tag}
 
 files=`ls -1 *.[ch] | \
-	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\'
-	`
+	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\' `
+
+( echo "autogen definitions conftest.tpl;"
+  echo "output-file = libopts.m4;"
+  echo "group       = libopts;"
+  cat ${top_srcdir}/config/libopts.def
+) | ${top_builddir}/agen5/autogen -L ${top_srcdir}/config -- -
+
+[ -f Makefile.am ] && rm -f Makefile.am
 
 cat > Makefile.am <<-	EOMakefile
 
@@ -51,7 +59,9 @@ cat > Makefile.am <<-	EOMakefile
 	libopts_la_SOURCES = \$(SRC)
 	EOMakefile
 
-cp ../libopts/* ${tag}/.
+sed s,'\${tag}',"${tag}",g ../libopts/README > README
+cp ../libopts/COPYING* .
 
+cd ..
 tar cvf - ${tag} | gzip --best > ${top_builddir}/${tag}.tar.gz
 rm -rf ${tag}

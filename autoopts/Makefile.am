@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/08/10 02:08:35 $
+## Last Modified:   $Date: 2002/08/10 19:10:30 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.10 2002/08/10 02:08:35 bkorb Exp $
+## $Id: Makefile.am,v 3.11 2002/08/10 19:10:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -88,6 +88,6 @@ libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz:
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
 	export top_srcdir top_builddir ; \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
-	$(SHELL) $(top_srcdir)/pkg/mklibopts-src.sh
+	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
 
 # Makefile.am ends here

@@ -49,7 +49,7 @@ AutoGen is a tool designed for generating program files that contain
 repetitive text with varied substitutions.  Its goal is to simplify the
 maintenance of programs that contain large amounts of repetitious text.
 This is especially valuable if there are several blocks of such text
-that must be kept synchronized.
+that must be kept synchronized in parallel tables.
 
 One common example is the problem of maintaining the code required for
 processing program options.  Processing options requires a minimum of
