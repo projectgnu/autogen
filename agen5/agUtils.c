@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: agUtils.c,v 3.20 2003/05/31 23:15:06 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -89,6 +89,15 @@ doOptions( int arg_ct, char** arg_vec )
     pzLastScheme = zSchemeInit;
     ag_scm_c_eval_string_from_file_line( zSchemeInit, "directive.h",
                                          SCHEME_INIT_LINE );
+#ifndef scm_t_port
+    {
+        tSCC zInitRest[] =
+            "(add-hook! before-error-hook error-source-line)\n"
+            "(use-modules (ice-9 stack-catch))";
+        pzLastScheme = zInitRest;
+        ag_scm_c_eval_string_from_file_line( zInitRest, __FILE__, __LINE__-3 );
+    }
+#endif
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
         tSCC zBT[] = "(debug-enable 'backtrace)";
         pzLastScheme = zBT;

@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.16 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: defLoad.c,v 3.17 2003/05/31 23:15:06 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -455,6 +455,12 @@ readDefines( void )
     if (fp != stdin)
         fclose( fp );
     parseDefinitions();
+}
+
+
+extern void
+unloadDefs( void )
+{
 }
 /*
  * Local Variables:

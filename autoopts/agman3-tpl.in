@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-05-25 15:06:13 bkorb"
+## Time-stamp:      "2003-05-27 08:39:19 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman3-tpl.in,v 3.5 2003/05/26 03:14:59 bkorb Exp $
+## $Id: agman3-tpl.in,v 3.6 2003/05/31 23:15:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 null
@@ -111,7 +111,18 @@ sed \
   IF (exist? "err") +}
 .sp 1
 .SH ERRORS
-{+err+}{+
+{+ err +}{+
+
+  ENDIF +}{+
+
+  IF (exist? "example") +}
+.sp 1
+.SH EXAMPLES
+.nf
+.in +5
+{+ example +}
+.in -5
+.fi{+
 
   ENDIF +}
 _End_Of_Man_{+
@@ -125,7 +136,7 @@ The \fIinfo\fP documentation for the \fI-l{+library+}\fP library.
 (if (> (string-length see-also) 0)
     (set! tmp-txt (string-append see-also ", " tmp-txt))  )
 
-(shellf "set -x ;echo '%s' | \
+(shellf "echo '%s' | \
 sed 's@%s(3) @@;s/3) $/3)/;s/(3) /(3), /g;s/, *,/,/g;s/^, *//'"
     tmp-txt (get "name")) +}
 {+

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.17 2003/05/18 17:09:27 bkorb Exp $
+#$Id: optcode.tpl,v 3.18 2003/05/31 23:15:06 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -80,8 +80,8 @@ IF (exist? "include") =]
  */[=
 
   FOR include "\n" =]
-[=(get "include") =][=
-  ENDFOR include =]
+[= (get "include") =][=
+  ENDFOR include   =]
 [=ENDIF "include exists" =]
 #ifndef NULL
 #  define NULL 0
@@ -93,14 +93,7 @@ IF (exist? "include") =]
 #  define  EXIT_FAILURE 1
 #endif[=
 
-(define number-arg (make-regexp "=.*"))
-
-=][=
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-=][=
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 FOR flag "\n"      =][=
   (set-flag-names) =][=

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-05-25 19:21:39 bkorb"
+ *  Time-stamp:      "2003-05-26 08:04:30 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.16 2003/05/26 03:14:59 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.17 2003/05/31 23:15:06 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -133,29 +133,12 @@ typedef struct {
 #  define AGALOC( c, w )        malloc( c )
 #  define AGREALOC( p, c, w )   realloc( p, c )
 #  define AGFREE( p )           free( p )
+#  define AGDUPSTR( p, s, w )   p = strdup( s )
 #  define TAGMEM( m, t )
 
-#ifndef AUTOGEN_BUILD
-#  define AGDUPSTR( p, s, w )   p = strdup( s )
-
-#else /* AUTOGEN_BUILD is defined, use snprintfv and a private strdup: */
+#ifdef AUTOGEN_BUILD
 #  include <snprintfv/printf.h>
-
-#  define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w )
-
-/*
- *  There are some systems out there where autogen is broken if "strdup"
- *  is allowed to duplicate strings smaller than 32 bytes.  This ensures
- *  that we work.  We also round up everything up to 32 bytes.
- */
-static inline char*
-aopts_strdup( tCC* pz, tCC* pzWhat )
-{
-    size_t  len = strlen( pz )+1;
-    char*   pzRes = AGALOC( (len + 0x20) & ~0x1F, pzWhat );
-    memcpy( pzRes, pz, len );
-    return pzRes;
-}
+#else  /* NOT AUTOGEN_BUILD */
 #endif /* AUTOGEN_BUILD */
 
 /*

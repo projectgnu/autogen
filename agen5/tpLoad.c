@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.20 2003/05/31 23:15:06 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -451,6 +451,10 @@ loadTemplate( tCC* pzFileName )
     }
 }
 
+extern void
+unloadTemplate( tTemplate* pT )
+{
+}
 /*
  * Local Variables:
  * mode: C

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: expPrint.c,v 3.19 2003/05/31 23:15:06 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -108,7 +108,7 @@ run_printf( char* pzFmt, int len, SCM alist )
         arglist = argp = args;
     else
         arglist =
-        argp    = (void**)malloc( (len+1) * sizeof(void));
+        argp    = (void**)malloc( (len+1) * sizeof(void*));
 
     while (len-- > 0) {
         SCM  car = SCM_CAR( alist );

@@ -1,3 +1,27 @@
+2003-05-30  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/schemedef.scm(before-error-hook): not part of Guile 1.4
+	(ice-9 stack-catch): also not part of 1.4
+	* agen5/agUtils.c(doOptions): above code moved here for 1.6
+	* agen5/autogen.h(unloadTemplate): always exist now
+	(unloadDefs): ditto
+	* agen5/defLex.c(assembleString): Allow comments within concatenated
+	string values.
+	* agen5/defLoad.c(unloadDefs): new dummy procedure
+	* agen5/expPrint.c(run_printf): sizeof pointer, not void
+	* agen5/loadPseudo.c(doSchemeExpr): accommodate HP/UX initializing
+	* agen5/tpLoad.c(unloadTemplate): new dummy procedure
+	* autoopts/agman3.tpl(example): accommodate example section
+	* autoopts/autoopts.h(aopts_strdup): obsolete
+	* autoopts/enumeration.c(optionEnumerationVal): the result number is
+	now unsigned.  Do not look for negative value.
+	* autoopts/optcode.tpl(number-arg): obsolete
+	* autoopts/opthead.tpl(FULL_VERSION): use sprintf for whole string
+	* autoopts/options.tpl: add test to ensure prog-title is defined.
+	* config/misc.def: define scm_t_port for Guile 1.4, too.
+	* doc/Makefile.am(texi-stamp): allow long timeout for linking on HP
+	* doc/auto_gen.tpl(default-test): rework how it gets built
+
 2003-05-23  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c(doOptions): move the ag_init call to here from main

@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/05/26 03:14:59 $
+ *  Last Modified:     $Date: 2003/05/31 23:15:06 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.29 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: misc.def,v 3.30 2003/05/31 23:15:06 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.29 $";
+version = "$Revision: 3.30 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -55,7 +55,7 @@ test   = {
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
 		#include <guile/gh.h>
-		#include <libguile/list.h>
+		#include <libguile.h>
 		int main () {
 		  SCM fumble, bumble, stumble;
 		  stumble = scm_cons( fumble, bumble );
@@ -94,7 +94,7 @@ test   = {
   check     = "scm_primitive_eval_x links";
   cflags    = "${ag_cv_with_libguile_cflags}";
   libs      = "${ag_cv_with_libguile_libs}";
-  code      = "#include <guile/gh.h>\n"
+  code      = "#include <guile/gh.h>\n#include <libguile.h>\n"
               "SCM res = scm_primitive_eval_x( SCM_UNDEFINED );";
 
   action    = { no; asis;
@@ -102,11 +102,13 @@ test   = {
     act-text  = <<- _END_OF_SCRIPT_
 		AC_DEFINE([scm_primitive_eval_x], [scm_eval_x],
 		        [Define this if no scm_primitive_eval_x])
+		AC_DEFINE([scm_t_port], [scm_port], [Define this if no scm_t_port])
 		_END_OF_SCRIPT_; };
 
   doc = <<- _END_OF_DOC_
 		Guile 1.4 does not have scm_primitive_eval_x,
-		but scm_eval_x will work as well.
+		but scm_eval_x will work as well.  If this is necessary, then the port
+		type structure will be named "scm_port" instead of "scm_t_port", too.
 		_END_OF_DOC_;
 };
 

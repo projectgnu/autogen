@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.18 2003/05/26 03:14:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.19 2003/05/31 23:15:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -18,7 +18,8 @@ texi=autogen.texi
 (setenv "SHELL" "/bin/sh")
 
 (define texi-file-source (shell "
-    tempdir=`mktemp -d -sd ./.ag- 2>/dev/null || echo .ag-$$.dir`
+    tempdir=`mktemp -d -sd ./.ag- 2>/dev/null`
+    [ -z \"${tempdir}\" ] && tempdir=.ag-$$.dir
     [ -d ${tempdir} ] || mkdir ${tempdir}
     if [ -f autogen.texi ]
     then
@@ -574,30 +575,31 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (shell (string-append "
-OPTDIR=`cd ${top_srcdir}/autoopts >/dev/null; pwd`
+OPTDIR=`cd ${top_builddir}/autoopts >/dev/null; pwd`
 libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
 if [ -f ${libs}/libopts.a ]
 then libs=\"${libs}/libopts.a\"
 else libs=\"-L ${libs} -lopts\"
 fi
+libs=\"${libs} ${LIBS}\"
 opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -g -I${OPTDIR}\"
-
+(
 cd ${tempdir}
-HOME='' ${AGEXE} -L${OPTDIR} default-test.def 1>&2
+HOME='' ${AGEXE} -L${OPTDIR} default-test.def
 if [ ! -f default-test.c ]
 then
-  echo 'NO default-test.c PROGRAM' >&2
+  echo 'NO default-test.c PROGRAM'
   kill -TERM $AG_pid
   exit 1
 fi
 
-${CC} ${opts} default-test.c ${libs} -lm 1>&2
+${CC} ${opts} default-test.c ${libs}
 if [ ! -x ./default-test ]
 then
-  echo 'NO default-test EXECUTABLE' >&2
+  echo 'NO default-test EXECUTABLE'
   kill -TERM $AG_pid
   exit 1
-fi
+fi ) >&2
 HOME='$HOME/.default_testrc' ./default-test --help | \
    sed 's,@,@@,g;s,{,@{,g;s,},@},g;s,\t,        ,g' " ))
 =]
@@ -631,7 +633,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
   cd ${tempdir}
   HOME='' ${AGEXE} -t40 -L${OPTDIR} -bgenshellopt -- -
 
-  ${CC} ${opts} genshellopt.c ${libs} -lm
+  ${CC} ${opts} genshellopt.c ${libs}
 ) > /dev/null 2>&1
 
 if [ ! -x ${tempdir}/genshellopt ]

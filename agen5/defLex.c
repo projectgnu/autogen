@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.20 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: defLex.c,v 3.21 2003/05/31 23:15:06 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -675,7 +675,7 @@ assembleString( char* pzScan )
     char  q = *(pzScan++);
 
     /*
-     *  It is a quoted string.  Process the escape characters
+     *  It is a quoted string.  Process the escape sequence characters
      *  (in the set "abfnrtv") and make sure we find a closing quote.
      */
     char* pzD = pzScan;
@@ -685,15 +685,15 @@ assembleString( char* pzScan )
 
     for (;;) {
         /*
-         *  IF the next character is the quote character,
-         *  THEN we may end the string.  We end it unless
-         *  the next non-blank character *after* the string
-         *  happens to also be a quote.  If it is, then
-         *  we will change our quote character to the new
-         *  quote character and continue condensing text.
+         *  IF the next character is the quote character, THEN we may end the
+         *  string.  We end it unless the next non-blank character *after* the
+         *  string happens to also be a quote.  If it is, then we will change
+         *  our quote character to the new quote character and continue
+         *  condensing text.
          */
         while (*pzS == q) {
             *pzD = NUL;
+        scan_for_quote:
             while (isspace(*(++pzS)))
                 if (*pzS == '\n')
                     pCurCtx->lineNo++;
@@ -706,6 +706,35 @@ assembleString( char* pzScan )
             case '"':
             case '\'':
                 break;
+
+            case '/':
+                /*
+                 *  Allow for a comment embedded in the concatenated string.
+                 */
+                switch (pzS[1]) {
+                default:  return pzS;
+                case '/':
+                    /*
+                     *  Skip to end of line
+                     */
+                    for (;;) {
+                        char ch = *++pzS;
+                        switch (ch) {
+                        case '\n': goto scan_for_quote;
+                        case '\0': return pzS;
+                        default:   break;
+                        }
+                    }
+                case '*':
+                    /*
+                     *  Skip to terminating star slash
+                     */
+                    pzS = strstr( pzS+2, "*/" );
+                    if (pzS == NULL)
+                        return (char*)zNil;
+                    pzS++;
+                    goto scan_for_quote;
+                }
 
             case '#':
                 /*

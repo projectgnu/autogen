@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.20 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: autogen.h,v 3.21 2003/05/31 23:15:06 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -333,19 +333,8 @@ MKSTRING( DevNull,   "/dev/null" );
 MKSTRING( ShellEnv,  "SHELL" );
 MKSTRING( Nil,       "" );
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  MEMORY DEBUGGING
- */
-#ifdef MEMDEBUG
-
-   extern void  unloadTemplate( tTemplate* pT );
-   extern void  unloadDefs( void );
-
-#else
-#  define unloadTemplate(pt)
-#  define unloadDefs()
-#endif
+extern void unloadTemplate( tTemplate* pT );
+extern void unloadDefs( void );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.13 2003/05/03 16:21:35 bkorb Exp $
+ *  $Id: enumeration.c,v 3.14 2003/05/31 23:15:06 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -51,7 +51,7 @@
  * If you do not wish that, delete this exception notice.
  */
 
-tSCC*  pz_fmt;
+tSCC*  pz_enum_err_fmt;
 
 static void
 enumError( pOpts, pOD, paz_names, name_ct )
@@ -61,7 +61,8 @@ enumError( pOpts, pOD, paz_names, name_ct )
     int       name_ct;
 {
     if (pOpts != NULL)
-        fprintf( option_usage_fp, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
+        fprintf( option_usage_fp, pz_enum_err_fmt,
+                 pOpts->pzProgName, pOD->pzLastArg );
 
     fprintf( option_usage_fp, "The valid %s option keywords are:\n",
              pOD->pz_Name );
@@ -84,10 +85,10 @@ enumError( pOpts, pOD, paz_names, name_ct )
  * what:  put the option state into Guile symbols
  * private:
  *
- * arg:   tOptions*, pOpts,     the program options descriptor
- * arg:   tOptDesc*, pOD,       enumeration option description
- * arg:   tCC**,     paz_names, list of enumeration names
- * arg:   int,       name_ct,   number of names in list
+ * arg:   tOptions*,     pOpts,     the program options descriptor
+ * arg:   tOptDesc*,     pOD,       enumeration option description
+ * arg:   tCC**,         paz_names, list of enumeration names
+ * arg:   unsigned int,  name_ct,   number of names in list
  *
  * ret_type:  char*
  * ret_desc:  the enumeration value cast as a char*
@@ -99,21 +100,21 @@ enumError( pOpts, pOD, paz_names, name_ct )
  *        if there is only one partial match.
 =*/
 char*
-optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
-    tOptions* pOpts;
-    tOptDesc* pOD;
-    tCC**     paz_names;
-    int       name_ct;
+optionEnumerationVal(
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC**         paz_names,
+    unsigned int  name_ct )
 {
-    size_t      len;
-    int         idx;
-    uintptr_t   res = (uintptr_t)~0;
+    size_t        len;
+    uintptr_t     idx;
+    uintptr_t     res = name_ct;
 
     /*
      *  IF the program option descriptor pointer is invalid,
      *  then it is some sort of special request.
      */
-    switch ((u_long)pOpts) {
+    switch ((uintptr_t)pOpts) {
     case 0UL:
         /*
          *  print the list of enumeration names.
@@ -147,18 +148,19 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
     for (idx = 0; idx < name_ct; idx++) {
         if (strncmp( paz_names[idx], pOD->pzLastArg, len ) == 0) {
             if (paz_names[idx][len] == NUL)
-                return (char*)idx;
-            if (res != -1) {
-                pz_fmt = "%s error:  the keyword `%s' is ambiguous\n";
+                return (char*)idx;  /* full match */
+
+            if (res != name_ct) {
+                pz_enum_err_fmt = "%s error:  the keyword `%s' is ambiguous\n";
                 option_usage_fp = stderr;
                 enumError( pOpts, pOD, paz_names, name_ct );
             }
-            res = idx;
+            res = idx; /* save partial match */
         }
     }
 
-    if (res < 0) {
-        pz_fmt = "%s error:  `%s' does not match any keywords\n";
+    if (res == name_ct) {
+        pz_enum_err_fmt = "%s error:  `%s' does not match any keywords\n";
         option_usage_fp = stderr;
         enumError( pOpts, pOD, paz_names, name_ct );
     }

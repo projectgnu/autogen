@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.11 2003/05/18 17:09:27 bkorb Exp $
+# $Id: opthead.tpl,v 3.12 2003/05/31 23:15:06 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
@@ -47,8 +47,8 @@ ENDIF =]
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
 IF (exist? "version") =]
 #define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
-#define [=(. pname-up)=]_FULL_VERSION  "[=
-  prog-name =] - [= % prog-title "%s - " =]Ver. [=version=]"[=
+#define [=(. pname-up)=]_FULL_VERSION  [=(c-string (sprintf
+"%s - %s - Ver. %s" prog-name (get "prog-title") (get "version"))) =][=
 ENDIF (exist? version) =]
 
 /*

@@ -87,8 +87,6 @@
                 ";\n"
 ) ) ) ) ) )         )
 
-(add-hook! before-error-hook error-source-line)
-
 ;;; /*=sfunc   make_header_guard
 ;;;  *
 ;;;  * what:   create ifndef/define guard
@@ -159,7 +157,6 @@
           '("&"      "<"     ">")
           '("&amp;"  "&lt;"  "&gt;") ) ))
 
-(use-modules (ice-9 stack-catch))
 (use-modules (ice-9 debug))
 
 (read-enable 'positions)
