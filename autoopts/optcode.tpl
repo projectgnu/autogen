@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.23 2004/01/14 02:41:16 bkorb Exp $
+#$Id: optcode.tpl,v 3.24 2004/01/15 05:04:25 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -415,7 +415,7 @@ IF (or (exist? "flag.flag-code")
 
 ENDIF                              =][=
 
-IF (. make-test-main)                =][=
+IF (. make-test-main)              =][=
 
   IF (exist? "guile-main")         =][=
      (error "both ``test-main'' and ``guile-main'' have been defined") =][=
@@ -437,12 +437,15 @@ ENDIF "test/guile main"
 #include <usage-txt.h>
 
 static char*
-AO_strdup( const char* pz )
+AO_gettext( const char* pz )
 {
     char* pzRes;
     if (pz == NULL)
         return NULL;
-    pzRes = strdup( pz );
+    pzRes = _(pz);
+    if (pzRes == pz)
+        return pzRes;
+    pzRes = strdup( pzRes );
     if (pzRes == NULL) {
         fputs( _("No memory for duping translated strings\n"), stderr );
         exit( EXIT_FAILURE );
@@ -466,26 +469,37 @@ translate_option_strings( void )
     {
         char** ppz = (char**)(void*)&(option_usage_text);
 
-        ix  = option_usage_text.field_ct;
+        ix = option_usage_text.field_ct;
+        if (ix == 0)
+            return;
+
         do {
             ppz++;
-            *ppz = AO_strdup(_(*ppz));
+            *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
     }
+    /*
+     *  Guard against re-translation.  It won't work.  The strings will have
+     *  been changed by the first pass through this code.  One shot only.
+     */
+    option_usage_text.field_ct = 0;
 
-    for (ix = [=(. pname)=]Options.optCt; --ix >= 0; pOD++)  {
-        pOD->pzText  = AO_strdup(_(pOD->pzText));
-        pOD->pz_NAME = AO_strdup(_(pOD->pz_NAME));
-        pOD->pz_Name = AO_strdup(_(pOD->pz_Name));
+    for (ix = [=(. pname)=]Options.optCt; --ix >= 0; pOD++)  {[=
 
-        pOD->pz_DisableName = AO_strdup(_(pOD->pz_DisableName));
-        pOD->pz_DisablePfx  = AO_strdup(_(pOD->pz_DisablePfx));
+  FOR field IN pzText pz_NAME pz_Name pz_DisableName pz_DisablePfx  =][=
+
+    (sprintf "\n        pOD->%1$-16s = AO_gettext(pOD->%1$s);"
+             (get "field"))  =][=
+
+  ENDFOR =]
     }[=
 
   FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle
-               pzExplain pzDetail  =]
-    [=(. pname)=]Options.[=(sprintf "%-13s" (get "field"))=] = AO_strdup(_([=
-      (. pname)=]Options.[=field=]));[=
+               pzExplain pzDetail  =][=
+
+    (sprintf "\n    %1$sOptions.%2$-13s = AO_gettext(%1$sOptions.%2$s);"
+             pname (get "field"))  =][=
+
   ENDFOR =]
 }
 

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2003-07-10 18:22:57 bkorb"
+# Time-stamp:        "2004-01-14 20:40:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.7 2003/07/11 01:25:30 bkorb Exp $
+# $Id: keyword.test,v 3.8 2004/01/15 05:04:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -166,7 +166,7 @@ Its description is not documented.
 The option option descrip.
 The default \fIstring\fP for this option is:
 .ti +4
-opt init
+ opt init
 .sp
 This option has not beed fully documented.
 .TP
@@ -184,7 +184,7 @@ expressions  explanations
 .sp
 The default \fIlevel\fP for this option is:
 .ti +4
-nothing
+ nothing
 .sp
 This option has not beed fully documented.
 .TP
@@ -202,7 +202,7 @@ seventh eighth  ninth   tenth
 .sp
 The default \fImember-list\fP for this option is:
 .ti +4
-second, fourth
+ second
 .sp
 This option has not beed fully documented.
 .TP

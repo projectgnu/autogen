@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/01/14 02:41:16 $
+# Last Modified:     $Date: 2004/01/15 05:04:25 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.4 2004/01/14 02:41:16 bkorb Exp $
+# $Id: handler.test,v 3.5 2004/01/15 05:04:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -190,12 +190,15 @@ doOptSixth(
 #include <usage-txt.h>
 
 static char*
-AO_strdup( const char* pz )
+AO_gettext( const char* pz )
 {
     char* pzRes;
     if (pz == NULL)
         return NULL;
-    pzRes = strdup( pz );
+    pzRes = _(pz);
+    if (pzRes == pz)
+        return pzRes;
+    pzRes = strdup( pzRes );
     if (pzRes == NULL) {
         fputs( _("No memory for duping translated strings\n"), stderr );
         exit( EXIT_FAILURE );
@@ -219,27 +222,34 @@ translate_option_strings( void )
     {
         char** ppz = (char**)(void*)&(option_usage_text);
 
-        ix  = option_usage_text.field_ct;
+        ix = option_usage_text.field_ct;
+        if (ix == 0)
+            return;
+
         do {
             ppz++;
-            *ppz = AO_strdup(_(*ppz));
+            *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
     }
+    /*
+     *  Guard against re-translation.  It won't work.  The strings will have
+     *  been changed by the first pass through this code.  One shot only.
+     */
+    option_usage_text.field_ct = 0;
 
     for (ix = handlerOptions.optCt; --ix >= 0; pOD++)  {
-        pOD->pzText  = AO_strdup(_(pOD->pzText));
-        pOD->pz_NAME = AO_strdup(_(pOD->pz_NAME));
-        pOD->pz_Name = AO_strdup(_(pOD->pz_Name));
-
-        pOD->pz_DisableName = AO_strdup(_(pOD->pz_DisableName));
-        pOD->pz_DisablePfx  = AO_strdup(_(pOD->pz_DisablePfx));
+        pOD->pzText           = AO_gettext(pOD->pzText);
+        pOD->pz_NAME          = AO_gettext(pOD->pz_NAME);
+        pOD->pz_Name          = AO_gettext(pOD->pz_Name);
+        pOD->pz_DisableName   = AO_gettext(pOD->pz_DisableName);
+        pOD->pz_DisablePfx    = AO_gettext(pOD->pz_DisablePfx);
     }
-    handlerOptions.pzCopyright   = AO_strdup(_(handlerOptions.pzCopyright));
-    handlerOptions.pzCopyNotice  = AO_strdup(_(handlerOptions.pzCopyNotice));
-    handlerOptions.pzFullVersion = AO_strdup(_(handlerOptions.pzFullVersion));
-    handlerOptions.pzUsageTitle  = AO_strdup(_(handlerOptions.pzUsageTitle));
-    handlerOptions.pzExplain     = AO_strdup(_(handlerOptions.pzExplain));
-    handlerOptions.pzDetail      = AO_strdup(_(handlerOptions.pzDetail));
+    handlerOptions.pzCopyright   = AO_gettext(handlerOptions.pzCopyright);
+    handlerOptions.pzCopyNotice  = AO_gettext(handlerOptions.pzCopyNotice);
+    handlerOptions.pzFullVersion = AO_gettext(handlerOptions.pzFullVersion);
+    handlerOptions.pzUsageTitle  = AO_gettext(handlerOptions.pzUsageTitle);
+    handlerOptions.pzExplain     = AO_gettext(handlerOptions.pzExplain);
+    handlerOptions.pzDetail      = AO_gettext(handlerOptions.pzDetail);
 }
 
 #endif /* ENABLE_NLS */

@@ -1,3 +1,13 @@
+2004-01-14  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(AO_gettext): rename from strdup - add gettext
+	invocation to the code, removing it from translate_option_strings
+	* autoopts/test/handler.test: adjust test results
+	* autoopts/test/keyword.test: fix test results.  The man page must
+	insert a space to avoid dotted file name disappearance!
+	* autoopts/test/nls.test: ensure the right libraries are used for
+	headers and linking
+
 2004-01-13  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(tOptProc): call procs are extern, not static.
