@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.24 2000/08/13 21:20:24 bkorb Exp $
+## $Id: Makefile.am,v 1.25 2000/09/16 05:42:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -35,7 +35,7 @@ pkgdata_DATA	= schemedef.scm
 man_MANS        = autogen.1
 
 EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl \
-		$(GEN_SRC) bootstrap.dir schemedef.scm
+		$(GEN_SRC) bootstrap.dir schemedef.scm fsm.tpl pseudo.def
 
 bin_PROGRAMS	= autogen
 autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
@@ -44,7 +44,7 @@ autogen_SOURCES =agShell.c  agUtils.c   agUtils.h   autogen.c   \
 		expGuile.h  expOutput.c expPrint.c  expState.c  expString.c \
 		expr.ini    funcCase.c  funcDef.c   funcEval.c  funcFor.c \
 		funcIf.c    functions.c functions.h opts.c      opts.h \
-		proto.h     tpLoad.c    tpParse.c   tpProcess.c
+		proto.h     tpLoad.c    tpParse.c   tpProcess.c loadPseudo.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la \
 		@GUILE_LINK@
@@ -68,7 +68,7 @@ clean :
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-STAMPS   = stamp-directive stamp-exprini stamp-functions stamp-opts
+STAMPS   = stamp-directive stamp-exprini stamp-functions stamp-opts stamp-fsm
 GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) DEBUG_OPTS=$(OPTDBG) \
@@ -90,6 +90,10 @@ stamp-functions: $(FUNCLIST) functions.tpl
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
+	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+
+## stamp-fsm GEN-RULE
+stamp-fsm : pseudo.def fsm.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE

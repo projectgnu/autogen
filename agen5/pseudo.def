@@ -1,0 +1,44 @@
+/* -*- Mode: C -*- */
+
+/*  pseudo.def
+ *
+ *  This defines the finite state transition table for parsing the
+ *  pseudo-macro at the head of every template
+ *
+ *  $Id: pseudo.def,v 1.1 2000/09/16 05:42:20 bkorb Exp $
+ */
+AutoGen Definitions fsm;
+
+token = ed_mode;     /* the -*- mode marker */
+token = marker;      /* a start or end macro mark */
+token = end_pseudo;  /* newline found in end_mark state */
+
+token = "autogen";   /* "autogen" */
+token = template;    /* "template" */
+token = suffix;      /* a string other than the above */
+
+state = st_mark;     /* start marker processed */
+state = agen;        /* "autogen5" processed   */
+state = templ;       /* "template" processed   */
+state = end_mark;    /* end marker processed   */
+
+/*
+ *  No-op transition.  Applies to all states and does not change state.
+ */
+transition = { t_st = '*';         ttkn = ed_mode;  };
+/*
+ *  Disable the ed_mode transition in the end_mark state tho
+ */
+transition = { t_st = end_mark;    ttkn = ed_mode;    next = invalid;    };
+
+/*
+ *  Meaningful transitions
+ */
+transition = { t_st = init;      ttkn = marker;     next = st_mark; };
+transition = { t_st = st_mark;   ttkn = "autogen";  next = agen;       };
+transition = { t_st = agen;      ttkn = template;   next = templ;      };
+transition = { t_st = templ;     ttkn = suffix;     next = templ;      };
+transition = { t_st = templ;     ttkn = marker;     next = end_mark;   };
+transition = { t_st = end_mark;  ttkn = end_pseudo; next = done;       };
+
+/* pseudo.def ends here */

@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.16 2000/09/11 00:56:00 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.17 2000/09/16 05:42:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -27,6 +27,7 @@ GENLIST="agen5/autogen.1
 	 agen5/functions.h
 	 agen5/opts.c
 	 agen5/opts.h
+	 agen5/pseudo.x
 	 agen5/autogen.menu
 	 agen5/autogen.texi
 	 autoopts/genshell.c

@@ -4,5 +4,6 @@ if [ -n "${AUTOGEN}" ]
 then
   top_srcdir=.. top_builddir=..
   export top_srcdir top_builddir
-  ${AG} strsignal.def
+  echo "Rebuilding strsignal.h"
+  ${AUTOGEN} strsignal.def
 fi

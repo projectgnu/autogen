@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug 30 12:29:52 1999                                 
 #            by:     Bruce Korb <bkorb@gnu.org>                       
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.32 2000/09/15 03:17:46 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.33 2000/09/16 05:44:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -63,7 +63,7 @@ export MISSING
 AUTOGEN=`type autogen 2>/dev/null`
 case "${AUTOGEN}" in
   *" is /"* )
-     AUTOGEN=`echo $AUTOGEN|sed 's,autogen is /,/,'`
+     AUTOGEN=`echo $AUTOGEN|sed 's,autogen is [^/]*/,/,'`
      case "`$AUTOGEN --version`" in
        *"Ver. 5."* )
            export AUTOGEN ;;

@@ -1,3 +1,17 @@
+2000-09-15  Bruce Korb  <bkorb@gnu.org>
+
+	* :mkconfig: add agen5/pseudo.x to shar-ed files
+	* configure: regenerated
+	* agen5/tpLoad.c(loadPseudoMacro,skipSuffixSpec) removed to:
+	* agen5/loadPseudo.c: new file
+	* agen5/Makefile.am: add new files
+	* agen5/fsm.tpl: Finite State Machine generator
+	* agen5/pseudo.def: FSM definitions for pseudo macro
+	* agen5/bootstrap.dir: cleanup
+	* compat/bootstrap.dir: cleanup
+	* config/bootstrap: cleanup
+
+
 2000-09-14  Bruce Korb  <bkorb@gnu.org>
 
 	* */bootstrap*: use one authoritative decision about whether or

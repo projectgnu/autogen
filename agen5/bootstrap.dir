@@ -65,12 +65,22 @@ rmlist=
 #
 AUTOGEN=${AUTOGEN-autogen}
 AG=${builddir}/autogen
-if [ ! -x ${AG} ]
+
+if test -f ${AG}
 then
-  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is /;/;" `
+  if test -x ${AG}
+  then :
+  else AG=""
+  fi
+else AG=""
+fi
+
+if test -z "${AG}"
+then
+  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is [^/]*/;/;" `
 
   case ${f} in
-  */${AUTOGEN} )
+  */autogen )
      AG=${f}
      ;;
 
@@ -78,7 +88,8 @@ then
     AG=""
     ;;
   esac
-fi 2>/dev/null
+fi
+echo "autogen is '${AG}'"
 
 #  The "getdefs" and "columns" programs are specifically
 #  called out in some of the templates (ensuring that
@@ -87,7 +98,7 @@ fi 2>/dev/null
 GD=../getdefs/getdefs
 if [ ! -x ${GD} ]
 then
-  f=`type getdefs | sed "s/getdefs is //" `
+  f=`type getdefs | sed "s,getdefs is [^/]*/,/," `
   case ${f} in
   */getdefs )
      ln -s ${f} ${GD}
@@ -106,7 +117,7 @@ fi 2>/dev/null
 COL=../columns/columns
 if [ ! -x ${COL} ]
 then
-  f=`type columns | sed "s/columns is //" `
+  f=`type columns | sed "s,columns is [^/]*/,/," `
   case ${f} in
   */columns )
      ln -s ${f} ${COL}
@@ -136,8 +147,6 @@ then
     done
     set -- $t
   fi
-
-  echo building $*
 fi
 
 #  Ensure complete success or a noticable failure
@@ -199,6 +208,20 @@ do
     echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
     ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
     date > stamp-opts
+    ;;
+
+  stamp-fsm )
+    # Make the pseudo-macro processing Finite State Machine
+    #
+    if [ -z "${AG}" ]
+    then
+      test "X${BOOTSTRAP}" = X \
+        && echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
+    echo ${AG} pseudo.def
+    ${AG} pseudo.def
+    date > stamp-fsm
     ;;
 
   stamp-exprini | \
