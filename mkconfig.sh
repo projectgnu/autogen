@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.15 2000/09/11 00:46:41 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 2.16 2000/09/11 00:56:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if [ "$1" = "-CVS" ]
@@ -31,7 +31,8 @@ GENLIST="agen5/autogen.1
 	 agen5/autogen.texi
 	 autoopts/genshell.c
 	 autoopts/genshell.h
-	 compat/strsignal.h"
+	 compat/strsignal.h
+	 config/misc.m4"
 
 for f in ${GENLIST}
 do
