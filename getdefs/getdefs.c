@@ -1,4 +1,5 @@
 
+#define DEFINE
 #include "getdefs.h"
 
 static const char zStartDef[] =
@@ -9,6 +10,11 @@ static const char zSeekErr[] =
 
 static const char zMallocErr[] =
 "Error:  could not allocate %d bytes for %s\n";
+
+static const char zAttribRe[] =
+    "\n[^*]*\\*[ \t]*([a-z][a-z0-9_]*):";
+
+char zRER[ 256 ];
 
 char*   pzDefPat = (char*)NULL;
 regex_t define_re;
@@ -29,6 +35,10 @@ size_t  blkAllocCt = 0;
 FILE* startAutogen( void );
 char* loadFile( char* pzFname );
 void  processFile( char* pzFile, FILE* defFp );
+void  sortEntries( void );
+void  validateOptions( void );
+
+
 
     int
 main( int    argc,
@@ -44,56 +54,7 @@ main( int    argc,
         argv += optCt;
     }
 
-    if (! HAVE_OPT( DEFS_TO_GET )) {
-        pzDefPat = "/\\*=([a-z][a-z]*) ";
-
-    } else {
-        char*  pz  = OPT_ARG( DEFS_TO_GET );
-        size_t len = strlen( pz ) + 16;
-        if (len < 16)
-            len = 16;
-        pzDefPat = (char*)malloc( len );
-        if (pzDefPat == (char*)NULL) {
-            fprintf( stderr, zMallocErr, len, "definition pattern" );
-            exit( EXIT_FAILURE );
-        }
-        sprintf( pzDefPat, "/\\*=(%s) ", pz );
-    }
-
-    {
-        static const char zReErr[] =
-            "Regex error %d (%s):  Cannot compile reg expr:\n\t%s\n";
-        static const char zAttribRe[] = "^[^*]*\*[a-z]";
-
-        int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );
-        if (rerr != 0) {
-            regerror( rerr, &define_re, zCurDir, sizeof( zCurDir ));
-            fprintf( stderr, zReErr, rerr, pzDefPat );
-            exit( EXIT_FAILURE );
-        }
-
-        int rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
-        if (rerr != 0) {
-            regerror( rerr, &attrib_re, zCurDir, sizeof( zCurDir ));
-            fprintf( stderr, zReErr, rerr, zAttribRe );
-            exit( EXIT_FAILURE );
-        }
-    }
-
-    if (HAVE_OPT( BLOCK )) {
-        int     ct  = STACKCT_OPT(  BLOCK );
-        char**  ppz = STACKLST_OPT( BLOCK );
-
-        do  {
-            char* pz = strchr( *ppz++, '=' );
-            if (pz == (char*)NULL) {
-                fprintf( stderr, "ERROR:  block attr must have name list:\n"
-                         "\t%s\n", ppz[-1] );
-                USAGE( EXIT_FAILURE );
-            }
-            *pz = NUL;
-        } while (--ct > 0);
-    }
+    validateOptions();
 
     {
         FILE* outFp;
@@ -122,9 +83,9 @@ main( int    argc,
         while (--argc >= 0)
             processFile( *argv++, outFp );
 
-	if (ENABLED_OPT( ORDERING )) {
-	    sortEntries();
-	}
+        if (ENABLED_OPT( ORDERING )) {
+            sortEntries();
+        }
 
         fclose( outFp );
     }
@@ -132,6 +93,66 @@ main( int    argc,
     return EXIT_SUCCESS;
 }
 
+
+    void
+validateOptions( void )
+{
+    if (! HAVE_OPT( DEFS_TO_GET )) {
+        pzDefPat = "/\\*=([a-z][a-z]*) ";
+
+    } else {
+        char*  pz  = OPT_ARG( DEFS_TO_GET );
+        size_t len = strlen( pz ) + 16;
+        if (len < 16)
+            len = 16;
+        pzDefPat = (char*)malloc( len );
+        if (pzDefPat == (char*)NULL) {
+            fprintf( stderr, zMallocErr, len, "definition pattern" );
+            exit( EXIT_FAILURE );
+        }
+        sprintf( pzDefPat, "/\\*=(%s) ", pz );
+    }
+
+    {
+        static const char zReErr[] =
+            "Regex error %d (%s):  Cannot compile reg expr:\n\t%s\n";
+
+        int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );
+        if (rerr != 0) {
+            regerror( rerr, &define_re, zRER, sizeof( zRER ));
+            fprintf( stderr, zReErr, rerr, pzDefPat );
+            exit( EXIT_FAILURE );
+        }
+
+        rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
+        if (rerr != 0) {
+            regerror( rerr, &attrib_re, zRER, sizeof( zRER ));
+            fprintf( stderr, zReErr, rerr, zAttribRe );
+            exit( EXIT_FAILURE );
+        }
+    }
+
+    if (HAVE_OPT( BLOCK )) {
+        int     ct  = STACKCT_OPT(  BLOCK );
+        char**  ppz = STACKLST_OPT( BLOCK );
+
+        do  {
+            char* pz = strchr( *ppz++, '=' );
+            if (pz == (char*)NULL) {
+                fprintf( stderr, "ERROR:  block attr must have name list:\n"
+                         "\t%s\n", ppz[-1] );
+                USAGE( EXIT_FAILURE );
+            }
+            *pz = NUL;
+        } while (--ct > 0);
+    }
+}
+
+
+    void
+sortEntries( void )
+{
+}
 
 
     int
@@ -289,8 +310,56 @@ typedef enum {
 } teDefState;
 
 
+
     void
-emitDefinition( char* pzDef, char* pzFile, int line, FILE* defFp )
+compressDef( char* pz )
+{
+    char* pzDest = pz;
+    char* pzSrc  = pz+1;
+    int   nl     =  0;
+    while (isspace( *pzSrc )) {
+        if (*pzSrc == '\n')
+            nl++;
+        pzSrc++;
+    }
+
+    if (nl) {
+        while (*++pzSrc != '*') {
+            if (*pzSrc == NUL) {
+                *pz = NUL;
+                return;
+            }
+        }
+        while (isspace( *++pzSrc ))  ;
+    }
+
+    for (;;) {
+        for (;;) {
+            switch (*pzDest++ = *pzSrc++) {
+            case '\n':
+                goto lineDone;
+            case NUL:
+                goto compressDone;
+            default:
+            }
+        } lineDone:;
+
+        while (*++pzSrc != '*') {
+            if (*pzSrc == NUL) {
+                goto compressDone;
+            }
+        }
+        while (isspace( *++pzSrc ))  ;
+    } compressDone:;
+
+    while ((pzDest > pz) && isspace( pzDest[-1] )) pzDest--;
+    *pzDest = NUL;
+}
+
+
+
+    void
+buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
 {
     static const char zFieldMark[] =
         "error field name does not end with ':' in file %s line %d\n";
@@ -301,182 +370,97 @@ emitDefinition( char* pzDef, char* pzFile, int line, FILE* defFp )
     static const char zNoData[] =
         "error no data for definition in file %s line %d\n";
 
-    char* pzName;
     teDefState state = DST_START;
-    int   nlCt;
+    char* pzNextDef;
 
     while (isalnum( *pzDef ))
-        fputc( *pzDef++, defFp );
+        *pzOut++ = *pzDef++;
+
     while (isspace( *pzDef )) pzDef++;
-    pzName = pzDef;
-    while (! isspace( *pzDef )) {
-        if (*pzDef == NUL)
-            return;
-        pzDef++;
+
+    {
+        char* pzName = pzDef;
+        while (! isspace( *pzDef )) {
+            if (*pzDef == NUL)
+                return;
+            pzDef++;
+        }
+        *pzDef = NUL;
+
+        pzOut += sprintf( pzOut, " = {\n    name = '%s';\n", pzName );
     }
-    *pzDef++ = NUL;
+    *pzDef = '\n';
+    for (;; pzDef = pzNextDef) {
+        int        ct;
+        regmatch_t match[2];
 
-    fprintf( defFp, " = {\n    name = '%s';\n", pzName );
-
-    for (;;) {
-        pzDef = strchr( pzDef, '\n' );
-        if (pzDef == (char*)NULL)
+        ct = regexec( &attrib_re, pzDef, COUNT( match ), match, 0 );
+        if (ct != 0) {
+            if (ct != 1) {
+                regerror( ct, &attrib_re, zRER, sizeof( zRER ));
+                fprintf( stderr, "Error %d (%s) finding `%s' in\n%s\n\n",
+                         ct, zRER, zAttribRe, pzDef );
+            }
             break;
-
-        pzDef = strpbrk( pzDef+1, "*\n" );
-        if (pzDef == (char*)NULL)
-            break;
-
-        if (*++pzDef == '\n')
+        }
+        pzDef[ match[0].rm_so ] = NUL;
+        pzNextDef = pzDef + match[1].rm_so;
+        if (state == DST_START) {
+            state = DST_NAME_LINE;
             continue;
-
-        if (*pzDef == '*')
-            continue;
-
-        if (isalpha( *pzDef )) {
-            switch (state) {
-
-            case DST_NAME_LINE:
-                fputs( "\n#", defFp );
-                fprintf( defFp,  zConfused, pzFile, line );
-                fprintf( stderr, zConfused, pzFile, line );
-                return;
-
-            case DST_TEXT:
-                fputc( '\'', defFp );
-
-            case DST_STRING:
-            case DST_NAME:
-                fputs( ";\n", defFp );
-
-            case DST_START:
-            {
-                char  zAttr[ 65 ];
-                char* pz = zAttr;
-
-                state = DST_NAME_LINE;
-                nlCt  = 0;
-
-                while (isalnum( *pzDef ))
-                    *pz++ = *pzDef++;
-                *pz = NUL;
-
-                if (putBlockAttr( &pzDef, zAttr, defFp )) {
-                    state = DST_START;
-                    continue;
-                }
-
-                if (*pzDef++ != ':') {
-                    fputs( "\n#", defFp );
-                    fprintf( defFp,  zFieldMark, pzFile, line );
-                    fprintf( stderr, zFieldMark, pzFile, line );
-                    return;
-                }
-            }
-            }
         }
+        *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
+        while (*pzDef != ':') *pzOut++ = *pzDef++;
+        compressDef( pzDef );
 
-        if (*pzDef == '.')
-             pzDef++;
-        else pzDef += strspn( pzDef, " \t" );
-
-        if (*pzDef == '\n') {
-            switch (state) {
-            case DST_NAME_LINE:
-                state = DST_NAME;
-                continue;
-
-            case DST_TEXT:
-                nlCt++;
-
-            case DST_NAME:
-            case DST_START:
-            case DST_STRING:
-                continue;
-            }
-        }
-
-        switch (state) {
-        case DST_START:
-            fputs( "\n#", defFp );
-            fprintf( defFp,  zStrCtx, pzFile, line );
-            fprintf( stderr, zStrCtx, pzFile, line );
-            return;
-
-        case DST_NAME_LINE:
-            if ((*pzDef == '"') || (*pzDef == '\'')) {
-                fputs( " = ", defFp );
-                state = DST_STRING;
-                goto doString;
-            }
-            state = DST_TEXT;
-            fputs( " = '", defFp );
-            goto doText;
-
-        case DST_NAME:
-            if ((*pzDef == '"') || (*pzDef == '\'')) {
-                fputs( " =\n", defFp );
-                state = DST_STRING;
-                goto doString;
-            }
-            state = DST_TEXT;
-            fputs( " =\n'", defFp );
-
-        case DST_TEXT:
-        doText:
-            while (nlCt > 0) {
-                fputc( '\n', defFp );
-                nlCt--;
-            }
-            for (;;) {
-                switch (*pzDef) {
-                case '\n':
-                    nlCt = 1;
-                    goto getNextLine;
-
-                case '\'':
-                    fputc( '\\', defFp );
-
-                default:
-                    fputc( *pzDef++, defFp );
-                }
-            }
+        switch (*pzDef) {
+        case NUL:
+            pzOut += sprintf( pzOut, ";\n" );
             break;
 
-        case DST_STRING:
-            if ((*pzDef != '"') && (*pzDef != '\'')) {
-                fputs( "\n#", defFp );
-                fprintf( defFp,  zStrCtx, pzFile, line );
-                fprintf( stderr, zStrCtx, pzFile, line );
-                return;
+        case '"':
+        case '\'':
+            pzOut += sprintf( pzOut, " = %s;\n", pzDef );
+            break;
+
+        case '\n':
+            *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = '\n';
+            pzDef++;
+
+            switch (*pzDef) {
+            case '"':
+            case '\'':
+                pzOut += sprintf( pzOut, " = %s;\n", pzDef );
+                break;
+
+            default:
+                pzOut += sprintf( pzOut, " = '%s';\n", pzDef );
+                break;
             }
-            fputs( "\n        ", defFp );
 
-        doString:
-        while (*pzDef != '\n')
-            fputc( *pzDef++, defFp );
+        default:
+            pzOut += sprintf( pzOut, " = '%s';\n", pzDef );
+            break;
         }
-
-    getNextLine:;
     }
 
     switch (state) {
         case DST_START:
-            fputs( "\n#", defFp );
-            fprintf( defFp,  zNoData, pzFile, line );
+            *pzOut++ = '\n'; *pzOut++ = '#';
+            pzOut += sprintf( pzOut,  zNoData, pzFile, line );
             fprintf( stderr, zNoData, pzFile, line );
             return;
 
         case DST_TEXT:
-            fputc( '\'', defFp );
+            *pzOut++ = '\'';
 
         case DST_STRING:
         case DST_NAME_LINE:
         case DST_NAME:
-            fputs( ";\n", defFp );
+            *pzOut++ = ';'; *pzOut++ = '\n';
     }
 
-    fputs( "};\n", defFp );
+    *pzOut++ = '}'; *pzOut++ = ';'; *pzOut++ = '\n'; *pzOut++ = NUL;
 }
 
 
@@ -490,6 +474,7 @@ processFile( char* pzFile, FILE* defFp )
     char* pzNext;  /* start next search */
     char* pzDta;   /* data value        */
     int   lineNo = 1;
+    char* pzOut;
 
     regmatch_t  matches[MAX_SUBMATCH+1];
     pzNext = pzText;
@@ -500,7 +485,7 @@ processFile( char* pzFile, FILE* defFp )
         static const char zNoEnd[] =
             "Error:  definition in %s at line %d has no end\n";
         static const char zNoSubexp[] =
-            "Warning: subexpr not found at offset %d in %s:\n\t%s\n";
+            "Warning: subexpr not found on line %d in %s:\n\t%s\n";
 
         /*
          *  Make sure there is a subexpression match!!
@@ -524,44 +509,50 @@ processFile( char* pzFile, FILE* defFp )
         }
 
         pzDef = pzScan + matches[1].rm_so;
-
+        pzNext = strstr( pzDef, "=*/" );
+        if (pzNext == (char*)NULL) {
+            fprintf( stderr, zNoEnd, pzFile, lineNo );
+            exit( EXIT_FAILURE );
+        }
+        *pzNext = NUL;
+        pzNext += 3;
         /*
          *  Count the number of lines skipped to the start of the def.
          */
-        while (pzNext < pzDef) {
-            lineNo++;
-            pzNext = strchr( pzNext, '\n' );
-            if (pzNext == (char*)NULL)
+        while (pzScan < pzDef) {
+            pzScan = strchr( pzScan, '\n' );
+            if (pzScan == (char*)NULL)
                 break;
-            pzNext++;
+            lineNo++;
+            pzScan++;
         }
 
-        fprintf( defFp, "\n#line %d \"%s\"\n", lineNo, pzFile );
-        pzDta  = pzNext;
-        pzNext = strstr( pzNext, "=*/\n" );
-
-        if (pzNext == (char*)NULL) {
-            fprintf( stderr, zNoEnd, pzFile, lineNo );
-            break;
+        {
+            tSCC zLineId[] = "\n#line %d \"%s\"\n";
+            pzOut = pzDta =
+                (char*)malloc( 2 * strlen( pzDef ) + sizeof( zLineId ) + 1024);
+            pzOut += sprintf( pzDta, zLineId, lineNo, pzFile );
         }
 
         /*
          *  Count the number of lines in the definition itself.
          *  It will find and stop on the "=* /\n" line.
          */
-        while (pzDta < pzNext) {
+        pzScan = pzDef;
+        for (;;) {
+            pzScan = strchr( pzScan, '\n' );
+            if (pzScan++ == (char*)NULL)
+                break;
             lineNo++;
-            pzDta = strchr( pzDta, '\n' )+1;
         }
-
-        *pzNext = NUL;
-        pzNext  = pzDta;
 
         /*
          *  OK.  We are done figuring out where the boundaries of the
          *  definition are and where we will resume our processing.
          */
-        emitDefinition( pzDef, pzFile, lineNo, defFp );
+        buildDefinition( pzDef, pzFile, lineNo, pzOut );
+        fputs( pzDta, defFp );
+        free( (void*)pzDta );
     }
 
     if (lineNo == 1) {
