@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.26 2000/03/12 00:46:52 bruce Exp $
+#$Id: optcode.tpl,v 2.27 2000/03/12 00:53:25 bruce Exp $
 =]
 [=
 IF (exist? "copyright") 
@@ -491,19 +491,19 @@ main( int argc, char** argv )
     (void)optionProcess( &genshelloptOptions, argc, argv );
     putShellParse( &[=prog_name=]Options );[=
 
-ELSE=]
+  ELSE=]
     (void)optionProcess( &[=prog_name=]Options, argc, argv );[=
-  IF (> (string-length (get "test_main")) 3) =]
+    IF (> (string-length (get "test_main")) 3) =]
+
     {
         void [=test_main=]( tOptions* );
         [=test_main=]( &[=prog_name=]Options );
-    }[=
-
-  ELSE=]
+    }
+[=  ELSE=]
     putBourneShell( &[=prog_name=]Options );[=
 
-  ENDIF =][=
-ENDIF=]
+    ENDIF =][=
+  ENDIF=]
     return EXIT_SUCCESS;
 }
 #endif  /* defined TEST_[= (. pname-up) =]_OPTS */[=
