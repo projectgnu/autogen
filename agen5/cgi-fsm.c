@@ -1,13 +1,13 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday November 25, 2001 at 03:34:10 PM PST
+ *  It has been AutoGen-ed  Thursday March 28, 2002 at 06:40:17 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001  by  Bruce Korb
+ *  Copyright (c) 2001-2002  by  Bruce Korb
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
  *  
@@ -85,15 +85,14 @@
  *  Some transition types may be common to several transitions.
  */
 typedef enum {
-    CGI_TR_INIT_ALPHA,
     CGI_TR_INVALID,
     CGI_TR_NAME_EQUAL,
-    CGI_TR_SEPERATE,
+    CGI_TR_SEPARATE,
     CGI_TR_STASH,
     CGI_TR_VALUE_ESCAPE,
     CGI_TR_VALUE_SPACE
 } te_cgi_trans;
-#define CGI_TRANSITION_CT  7
+#define CGI_TRANSITION_CT  6
 
 /*
  *  the state transition handling map
@@ -107,7 +106,7 @@ struct transition {
     te_cgi_trans  transition;
 };
 static const t_transition cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
-  { { CGI_ST_NAME, CGI_TR_INIT_ALPHA },             /* init state */
+  { { CGI_ST_NAME, CGI_TR_STASH },                  /* init state */
     { CGI_ST_INVALID, CGI_TR_INVALID },
     { CGI_ST_INVALID, CGI_TR_INVALID },
     { CGI_ST_INVALID, CGI_TR_INVALID },
@@ -131,8 +130,8 @@ static const t_transition cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
     { CGI_ST_VALUE, CGI_TR_VALUE_SPACE },
     { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },
     { CGI_ST_VALUE, CGI_TR_STASH },
-    { CGI_ST_INIT, CGI_TR_SEPERATE },
-    { CGI_ST_DONE, CGI_TR_SEPERATE } }
+    { CGI_ST_INIT, CGI_TR_SEPARATE },
+    { CGI_ST_DONE, CGI_TR_SEPARATE } }
 };
 
 
@@ -143,7 +142,7 @@ tSCC zBogus[]     = "** OUT-OF-RANGE **";
 tSCC zStInit[]    = "init";
 tSCC zEvInvalid[] = "* Invalid Event *";
 tSCC zFsmErr[]    =
-    "in state %d (%s), event %d (%s) is invalid\n";
+    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n";
 
 tSCC zStName[] = "name";
 tSCC zStValue[] = "value";
@@ -156,11 +155,11 @@ tSCC zEvEqual[] = "equal";
 tSCC zEvSpace[] = "space";
 tSCC zEvEscape[] = "escape";
 tSCC zEvOther[] = "other";
-tSCC zEvSeperator[] = "seperator";
+tSCC zEvSeparator[] = "separator";
 tSCC zEvEnd[] = "end";
 tSCC* apzEvents[] = {
     zEvAlpha,     zEvName_Char, zEvEqual,     zEvSpace,     zEvEscape,
-    zEvOther,     zEvSeperator, zEvEnd,       zEvInvalid };
+    zEvOther,     zEvSeparator, zEvEnd,       zEvInvalid };
 
 #define CGI_EVT_NAME(t) ( (((unsigned)(t)) >= CGI_EV_INVALID) \
     ? zBogus : apzEvents[ t ])
@@ -189,9 +188,15 @@ cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
     return EXIT_FAILURE;
 }
 
-
+/*
+ *  Run the FSM.  Will return CGI_ST_DONE or CGI_ST_INVALID
+ */
 te_cgi_state
-cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
+cgi_run_fsm(
+    const char* pzSrc,
+    int inlen,
+    char* pzOut,
+    int outlen )
 {
     te_cgi_state cgi_state = CGI_ST_INIT;
     te_cgi_event trans_evt;
@@ -236,7 +241,7 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
             trans = pTT->transition;
         }
 
-#ifdef DEBUG_ENABLED
+#ifdef DEBUG
         printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
             CGI_STATE_NAME( cgi_state ), cgi_state,
             CGI_EVT_NAME( trans_evt ), trans_evt,
@@ -244,13 +249,6 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
 #endif
 
         switch (trans) {
-        case CGI_TR_INIT_ALPHA:
-            /* START == INIT_ALPHA == DO NOT CHANGE THIS COMMENT */
-            *(pzOut++) = curCh;
-            outlen--;
-            /* END   == INIT_ALPHA == DO NOT CHANGE THIS COMMENT */
-            break;
-
         case CGI_TR_INVALID:
             /* START == INVALID == DO NOT CHANGE THIS COMMENT */
             exit( cgi_invalid_transition( cgi_state, trans_evt ));
@@ -265,12 +263,12 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
             /* END   == NAME_EQUAL == DO NOT CHANGE THIS COMMENT */
             break;
 
-        case CGI_TR_SEPERATE:
-            /* START == SEPERATE == DO NOT CHANGE THIS COMMENT */
+        case CGI_TR_SEPARATE:
+            /* START == SEPARATE == DO NOT CHANGE THIS COMMENT */
             strcpy( pzOut, "';\n" );
             outlen -= 2;
             pzOut += 3;
-            /* END   == SEPERATE == DO NOT CHANGE THIS COMMENT */
+            /* END   == SEPARATE == DO NOT CHANGE THIS COMMENT */
             break;
 
         case CGI_TR_STASH:
@@ -316,7 +314,7 @@ cgi_run_fsm( const char* pzSrc, int inlen, char* pzOut, int outlen )
             exit( cgi_invalid_transition( cgi_state, trans_evt ));
             /* END   == BROKEN MACHINE == DO NOT CHANGE THIS COMMENT */
         }
-#ifdef DEBUG_ENABLED
+#ifdef DEBUG
         if (nxtSt != firstNext)
             printf( "transition code changed destination state to %s(%d)\n",
                 CGI_STATE_NAME( nxtSt ), nxtSt );
