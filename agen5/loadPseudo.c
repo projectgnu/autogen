@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.13 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.14 2003/05/18 17:12:30 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -45,16 +45,22 @@ tSCC zTpName[] = "template";
  *  Process a scheme specification
  */
 STATIC tCC*
-doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
+doSchemeExpr( tCC* pzData, tCC* pzFileName )
 {
-    char* pzEnd = (char*)pzData + strlen( pzData );
-    char  ch;
+    char*   pzEnd = (char*)pzData + strlen( pzData );
+    char    ch;
+    tMacro* pCM = pCurMacro;
+    tMacro  mac = { (teFuncType)~0, templLineNo, 0, 0 };
 
-    pzEnd = (char*)skipScheme( pzData, pzEnd );
-    ch = *pzEnd;
-    *pzEnd = NUL;
-    gh_eval_str( (char*)pzData );
-    *pzEnd = ch;
+    pzEnd     = (char*)skipScheme( pzData, pzEnd );
+    ch        = *pzEnd;
+    *pzEnd    = NUL;
+    pCurMacro = &mac;
+
+    ag_eval( (char*)pzData );
+
+    pCurMacro = pCM;
+    *pzEnd    = ch;
     while (pzData < pzEnd)
         if (*(pzData++) == '\n')
             templLineNo++;
@@ -376,7 +382,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             break;
 
         case PM_TR_TEMPL_SCHEME:
-            pzData = doSchemeExpr( pzData, pzFileName, templLineNo );
+            pzData = doSchemeExpr( pzData, pzFileName );
             break;
 
         case PM_TR_END_MARK_ED_MODE:

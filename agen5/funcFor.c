@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.13 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: funcFor.c,v 3.14 2003/05/18 17:12:30 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -63,11 +63,10 @@ ag_scm_first_for_p( SCM which )
         return (pFS->for_firstFor) ? SCM_BOOL_T : SCM_BOOL_F;
 
     {
-        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = gh_scm2newstr( which, &ct );
+        char*      pz  = ag_scm2zchars( which, "which for" );
         SCM        res = SCM_UNDEFINED;
-        ct = forInfo.fi_depth;
+        int        ct  = forInfo.fi_depth;
 
         do  {
             if (strcmp( p->for_pzName, pz ) == 0) {
@@ -77,7 +76,6 @@ ag_scm_first_for_p( SCM which )
             p--;
         } while (--ct > 0);
 
-        free( (void*)pz );
         return res;
     }
 }
@@ -102,11 +100,10 @@ ag_scm_last_for_p( SCM which )
         return (pFS->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
 
     {
-        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = gh_scm2newstr( which, &ct );
+        char*      pz  = ag_scm2zchars( which, "which for" );
         SCM        res = SCM_UNDEFINED;
-        ct = forInfo.fi_depth;
+        int        ct  = forInfo.fi_depth;
 
         do  {
             if (strcmp( p->for_pzName, pz ) == 0) {
@@ -116,7 +113,6 @@ ag_scm_last_for_p( SCM which )
             p--;
         } while (--ct > 0);
 
-        free( (void*)pz );
         return res;
     }
 }
@@ -136,15 +132,15 @@ ag_scm_for_index( SCM which )
 {
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
+
     if (! gh_string_p( which ))
         return gh_int2scm( pFS->for_index );
 
     {
-        size_t     ct;
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = gh_scm2newstr( which, &ct );
+        char*      pz  = ag_scm2zchars( which, "which for" );
         SCM        res = SCM_UNDEFINED;
-        ct = forInfo.fi_depth;
+        int        ct  = forInfo.fi_depth;
 
         do  {
             if (strcmp( p->for_pzName, pz ) == 0) {
@@ -154,7 +150,6 @@ ag_scm_for_index( SCM which )
             p--;
         } while (--ct > 0);
 
-        free( (void*)pz );
         return res;
     }
 }

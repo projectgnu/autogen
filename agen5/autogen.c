@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.27 2003/05/06 03:27:16 bkorb Exp $
+ *  $Id: autogen.c,v 3.28 2003/05/18 17:12:29 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,48 +25,12 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-tSCC zSchemeInit[] =
-"(add-hook! before-error-hook error-source-line)\n"
+tSCC zClientInput[] = "client-input";
 
-"(define header-file \"\")  (define header-guard \"\")\n"
+#define _State_(n)  #n,
+tSCC* apzStateName[] = { STATE_TABLE };
+#undef _State_
 
-"(define (make-header-guard hdr-pfx)\n"
-"   (begin\n"
-"      (set! header-file  (out-name))\n"
-"      (set! header-guard (string-upcase! (string->c-name! (string-append\n"
-"             (if (string? hdr-pfx) hdr-pfx \"HEADER\")\n"
-"             \"_\" header-file \"_GUARD\" ))))\n"
-"      (sprintf \"#ifndef %1$s\\n#define %1$s\" header-guard)\n"
-")  )\n"
-
-"(define autogen-version \"" AUTOGEN_VERSION "\")\n"
-
-"(define-macro (defined-as predicate symbol)\n"
-"  `(and (defined? ',symbol) (,predicate ,symbol)))"
-
-"(define html-escape-encode (lambda (str)\n"
-"    (string-substitute str\n"
-"          '(\"&\"      \"<\"     \">\")\n"
-"          '(\"&amp;\"  \"&lt;\"  \"&gt;\") )))";
-
-#ifdef LATER
-tSCC zCatchEval[] = "\\n"
-    "(define (eval-client-input str)\n"
-    "  (stack-catch #t\n"
-    "    (lambda ()\n"
-    "      (call-with-input-string str\n"
-    "        (lambda (p)\n"
-    "          (set-port-filename! p (tpl-file))\n"
-    "          (set-port-line! p (string->number (tpl-file-line \"%2$d\")))\n"
-    "          (list (primitive-eval (read p))))))\n"
-    "    (lambda (key . args)\n"
-    "      (apply display-error (fluid-ref the-last-stack)\n"
-    "                           (current-error-port)\n"
-    "                           args)\n"
-    "      (set! stack-saved? #f)\n"
-    "      #f\n"
-    ") ) )";
-#endif
 STATIC sigjmp_buf  abendJumpEnv;
 
 /*
@@ -82,13 +46,12 @@ STATIC void
 inner_main( int argc, char** argv )
 {
     void ag_init( void );
-    tTemplate* pTF;
 
     /*
-     *  Initialize all but the processing Scheme functions
+     *  Initialize all but the processing Scheme functions then call doOptions
+     *  to do all the initializations before processing starts.
      */
     ag_init();
-    procState = PROC_STATE_OPTIONS;
     doOptions( argc, argv );
 
     procState = PROC_STATE_LOAD_DEFS;
@@ -96,24 +59,21 @@ inner_main( int argc, char** argv )
 
     /*
      *  Activate the AutoGen specific Scheme functions.
-     *  Load, process and unload the main template
+     *  Then load, process and unload the main template
      */
     procState = PROC_STATE_LOAD_TPL;
-
-    /*
-     *  Initialize the processing Scheme functions
-     */
     ag_init();
-    gh_eval_str( (char*)zSchemeInit );
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        gh_eval_str( "(debug-enable 'backtrace)" );
-    pTF = loadTemplate( pzTemplFileName );
 
-    procState = PROC_STATE_EMITTING;
-    processTemplate( pTF );
+    {
+        tTemplate* pTF = loadTemplate( pzTemplFileName );
 
-    procState = PROC_STATE_CLEANUP;
-    unloadTemplate( pTF );
+        procState = PROC_STATE_EMITTING;
+        processTemplate( pTF );
+
+        procState = PROC_STATE_CLEANUP;
+        unloadTemplate( pTF );
+    }
+
     unloadDefs();
 
     procState = PROC_STATE_DONE;
@@ -143,26 +103,26 @@ main( int    argc,
 STATIC void
 signalExit( int sig )
 {
+    tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
+
     if (*pzOopsPrefix != NUL) {
         fputs( pzOopsPrefix, stderr );
-        pzOopsPrefix = "";
+        pzOopsPrefix = zNil;
     }
 
-    {
-        tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
-#       define _State_(n)  #n,
-        tSCC* apzStateName[] = { STATE_TABLE };
-#       undef _State_
-
-        fprintf( stderr, zErr, sig, strsignal( sig ),
-                 ((unsigned)procState <= PROC_STATE_DONE)
-                 ? apzStateName[ procState ] : "** BOGUS **" );
-    }
+    fprintf( stderr, zErr, sig, strsignal( sig ),
+             ((unsigned)procState <= PROC_STATE_DONE)
+             ? apzStateName[ procState ] : "** BOGUS **" );
 
     fflush( stderr );
     fflush( stdout );
     if (pfTrace != stderr )
         fflush( pfTrace );
+
+    if (procState == PROC_STATE_ABORTING)
+        _exit( sig + 128 );
+
+    procState = PROC_STATE_ABORTING;
 
     /*
      *  IF there is a current template, then we should report where we are
@@ -172,20 +132,28 @@ signalExit( int sig )
         tSCC zAt[]  = "processing template %s\n"
                       "            on line %d\n"
                       "       for function %s (%d)\n";
-        int f;
+        int line, fnCd;
+        tCC* pzFn;
+        tCC* pzFl;
 
         if ( pCurMacro == NULL ) {
-            fputs( "NULL pCurMacro in abendSignal()\n", stderr );
-            _exit( 128 + SIGABRT );
-        }
+            pzFn = "pseudo-macro";
+            line = 0;
+            fnCd = -1;
 
-        f = (pCurMacro->funcCode > FUNC_CT)
-                ? FTYP_SELECT : pCurMacro->funcCode;
-        fprintf( stderr, zAt, pCurTemplate->pzFileName, pCurMacro->lineNo,
-                 apzFuncNames[ f ], pCurMacro->funcCode );
+        } else {
+            int f = (pCurMacro->funcCode > FUNC_CT)
+                    ? FTYP_SELECT : pCurMacro->funcCode;
+            pzFn = apzFuncNames[ f ];
+            line = pCurMacro->lineNo;
+            fnCd = pCurMacro->funcCode;
+        }
+        pzFl = pCurTemplate->pzFileName;
+        if (pzFl == NULL)
+            pzFl = "NULL file name";
+        fprintf( stderr, zAt, pzFl, line, pzFn, fnCd );
     }
 
-    procState = PROC_STATE_ABORTING;
     exit( sig + 128 );
 }
 
@@ -250,10 +218,11 @@ doneCheck( void )
          */
         if (*pzOopsPrefix != NUL) {
             /*
-             *  Emit the CGI page header for an error message.
+             *  Emit the CGI page header for an error message.  We will rewind
+             *  stderr and write the contents to stdout momentarily.
              */
             fputs( pzOopsPrefix, stdout );
-            pzOopsPrefix = "";
+            pzOopsPrefix = zNil;
         }
 
         fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
@@ -268,15 +237,32 @@ doneCheck( void )
             closeOutput( AG_TRUE );
 #endif
         } while (pCurFp->pPrev != NULL);
-        /* FALLTHROUGH */
+        break; /* continue failure exit */
 
     default:
-    case PROC_STATE_INIT:
-    case PROC_STATE_OPTIONS:
+        fprintf( stderr, "ABEND-ing in %s state\n", apzStateName[procState] );
+        /* FALLTHROUGH */
+
+    case PROC_STATE_ABORTING:
+        if (*pzOopsPrefix != NUL) {
+            /*
+             *  Emit the CGI page header for an error message.  We will rewind
+             *  stderr and write the contents to stdout momentarily.
+             */
+            fputs( pzOopsPrefix, stdout );
+            pzOopsPrefix = zNil;
+        }
         break; /* continue failure exit */
 
     case PROC_STATE_DONE:
         break; /* continue normal exit */
+    }
+
+    if (pzLastScheme != NULL) {
+        tSCC zGuileFail[] =
+            "Failing Guile command:  = = = = =\n\n%s\n\n"
+            "=================================\n";
+        fprintf( stderr, zGuileFail, pzLastScheme );
     }
 
     /*
@@ -304,6 +290,7 @@ doneCheck( void )
     fclose( stderr );
     unlink( pzTmpStderr );
     AGFREE( pzTmpStderr );
+    pzTmpStderr = NULL;
 }
 
 
@@ -317,7 +304,7 @@ ag_abend( tCC* pzMsg )
 {
     if (*pzOopsPrefix != NUL) {
         fputs( pzOopsPrefix, stderr );
-        pzOopsPrefix = "";
+        pzOopsPrefix = zNil;
     }
 
 #ifdef DEBUG_ENABLED

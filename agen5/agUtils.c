@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: agUtils.c,v 3.17 2003/05/18 17:12:29 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -81,6 +81,19 @@ aprf( const char* pzFmt, ... )
 EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
+    /*
+     *  Some scheme initializations
+     */
+    pzLastScheme = zSchemeInit;
+    gh_eval_str( (char*)zSchemeInit );
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        tSCC zBT[] = "(debug-enable 'backtrace)";
+        pzLastScheme = zBT;
+        gh_eval_str( zBT );
+    }
+    pzLastScheme = NULL;
+
+    procState = PROC_STATE_OPTIONS;
     /*
      *  Set the last resort search directory first (lowest priority)
      */

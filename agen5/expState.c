@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.11 2003/05/02 01:01:59 bkorb Exp $
+ *  $Id: expState.c,v 3.12 2003/05/18 17:12:30 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -79,13 +79,11 @@ find_entry_value( SCM op, SCM obj, SCM test )
 {
     ag_bool     isIndexed;
     tDefEntry*  pE;
-    SCM         field;
     tSCC        zFailed[] = "failed\n";
     tSCC        zSucc[]   = "SUCCESS\n";
     char*       pzField;
-    SCM         result    = SCM_BOOL_F;
 
-    char* pzName = gh_scm2newstr( obj, NULL );
+    char* pzName = ag_scm2zchars( obj, "find name" );
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf( pfTrace, " in \"%s\" -- ", pzName );
@@ -102,17 +100,19 @@ find_entry_value( SCM op, SCM obj, SCM test )
     if (pE == NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        goto return_res;
+        return SCM_BOOL_F;
     }
 
     /*
      *  No subfield?  Check the values
      */
     if (pzField == NULL) {
+        SCM result;
+        SCM field;
         if (pE->valType != VALTYP_TEXT) {
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
                 fputs( zFailed, pfTrace );
-            goto return_res; /* Cannot match string -- not a text value */
+            return SCM_BOOL_F; /* Cannot match string -- not a text value */
         }
 
         field  = gh_str02scm( pE->pzValue );
@@ -130,7 +130,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
 
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( (result == SCM_BOOL_T) ? zSucc : zFailed, pfTrace );
-        goto return_res;
+        return result;
     }
 
     /*
@@ -139,15 +139,16 @@ find_entry_value( SCM op, SCM obj, SCM test )
     if (pE->valType == VALTYP_TEXT) {
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
             fputs( zFailed, pfTrace );
-        goto return_res;
+        return SCM_BOOL_F;
     }
 
     /*
      *  Search the members for what we want.
      */
     pzField[-1] = '.';
-    field       = gh_str02scm( pzField );
     {
+        SCM field = gh_str02scm( pzField );
+        SCM result;
         tDefStack    stack   = currDefCtx;
         currDefCtx.pPrev     = &stack;
 
@@ -166,11 +167,8 @@ find_entry_value( SCM op, SCM obj, SCM test )
             }
 
         currDefCtx = stack;
+        return result;
     }
-
- return_res:
-    free( (void*)pzName );
-    return result;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

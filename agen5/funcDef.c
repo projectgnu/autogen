@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: funcDef.c,v 3.18 2003/05/18 17:12:30 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -428,7 +428,7 @@ build_defs( int defCt, tDefList* pList )
                 fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
                          pCurMacro->sibIndex - defCt, pList->pzExpr );
             }
-            res = gh_eval_str( pList->pzExpr );
+            res = ag_eval( pList->pzExpr );
 
             if (gh_string_p( res )) {
                 AGDUPSTR( pList->de.pzValue, ag_scm2zchars( res, "eval res" ),

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.15 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: expOutput.c,v 3.16 2003/05/18 17:12:30 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -194,8 +194,6 @@ ag_scm_out_pop( SCM ret_contents )
 SCM
 ag_scm_out_suspend( SCM suspName )
 {
-    SCM res = SCM_UNDEFINED;
-
     if (pCurFp->pPrev == NULL)
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed" );
 
@@ -217,7 +215,7 @@ ag_scm_out_suspend( SCM suspName )
     pCurFp = pCurFp->pPrev;
     outputDepth--;
 
-    return res;
+    return SCM_UNDEFINED;
 }
 
 
@@ -240,7 +238,7 @@ ag_scm_out_resume( SCM suspName )
         if (strcmp( pSuspended[ ix ].pzSuspendName, pzName ) == 0) {
             pSuspended[ ix ].pOutDesc->pPrev = pCurFp;
             pCurFp = pSuspended[ ix ].pOutDesc;
-            free( (void*)pSuspended[ ix ].pzSuspendName ); /* Guile allocation */
+            free( (void*)pSuspended[ ix ].pzSuspendName ); /* Guile alloc */
             if (ix < --suspendCt)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;

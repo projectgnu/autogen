@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: funcEval.c,v 3.17 2003/05/18 17:12:30 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -233,7 +233,7 @@ evalExpression( ag_bool* pMustFree )
 
     case EMIT_EXPRESSION:
     {
-        SCM res = gh_eval_str( pzText );
+        SCM res = ag_eval( pzText );
 
         if (*pMustFree) {
             AGFREE( (void*)pzText );
@@ -312,7 +312,7 @@ eval( const char* pzExpr )
     switch (*pzExpr) {
     case '(':
     case ';':
-        res = gh_eval_str( (char*)pzExpr );
+        res = ag_eval( (char*)pzExpr );
         break;
 
     case '`':

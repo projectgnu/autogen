@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.11 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: expGuile.c,v 3.12 2003/05/18 17:12:29 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -316,13 +316,11 @@ ag_scm_string_upcase_x( SCM str )
 SCM
 ag_scm_string_upcase( SCM str )
 {
-    size_t  len;
-    char*   pz;
-    SCM     res;
+    SCM res;
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
 
-    pz  = gh_scm2newstr( str, &len );
-    res = gh_str2scm( pz, len );
-    free( (void*)pz );
+    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
     ag_scm_string_upcase_x( res );
     return res;
 }
@@ -385,16 +383,11 @@ ag_scm_string_capitalize_x( SCM str )
 SCM
 ag_scm_string_capitalize( SCM str )
 {
-    size_t  len;
-    char*   pz;
-    SCM     res;
-
+    SCM res;
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    pz = gh_scm2newstr( str, &len );
-    res = gh_str2scm( pz, len );
-    free( (void*)pz );
+    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
     ag_scm_string_capitalize_x( res );
     return res;
 }
@@ -444,16 +437,11 @@ ag_scm_string_downcase_x( SCM str )
 SCM
 ag_scm_string_downcase( SCM str )
 {
-    size_t  len;
-    char*   pz;
-    SCM     res;
-
+    SCM res;
     if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    pz = gh_scm2newstr( str, &len );
-    res = gh_str2scm( pz, len );
-    free( (void*)pz );
+    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
     ag_scm_string_downcase_x( res );
     return res;
 }

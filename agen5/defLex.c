@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.17 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: defLex.c,v 3.18 2003/05/18 17:12:29 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -24,9 +24,6 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
-
-tSCC zSchemedefFile[]   = "schemedef.scm";
-ag_bool schemedefLoaded = AG_FALSE;
 
 extern YYSTYPE yylval;
 static YYSTYPE lastToken;
@@ -354,7 +351,7 @@ loadScheme( void )
      */
     *pzEnd = NUL;
     procState = PROC_STATE_GUILE_PRELOAD;
-    res = gh_eval_str( pzText );
+    res = ag_eval( pzText );
     procState = PROC_STATE_LOAD_DEFS;
     *pzEnd = endCh;
 
@@ -394,11 +391,6 @@ alist_to_autogen_def( void )
     int    res_len;
     tScanCtx*  pCtx;
 
-    if (! schemedefLoaded) {
-        SET_OPT_LOAD_SCHEME( (char*)zSchemedefFile );
-        schemedefLoaded = AG_TRUE;
-    }
-
     /*
      *  Wrap the scheme expression with the `alist->autogen-def' function
      */
@@ -414,7 +406,7 @@ alist_to_autogen_def( void )
      *  the NUL-ed character.
      */
     procState = PROC_STATE_GUILE_PRELOAD;
-    res       = gh_eval_str( pzText );
+    res       = ag_eval( pzText );
 
     /*
      *  The result *must* be a string, or we choke.
