@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.35 2000/09/27 20:44:00 bkorb Exp $
+#$Id: optcode.tpl,v 2.36 2000/09/30 03:17:37 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -215,7 +215,7 @@ ENDIF=]
                             zMore_Help_Name,
      /* disablement strs */ (const char*)NULL, (const char*)NULL }[=
 
-IF homerc _exist
+IF (exist? "homerc")
 =],
 
   {  /* entry idx, value */ INDEX_[= (. UP-prefix) =]OPT_SAVE_OPTS, VALUE_[=
