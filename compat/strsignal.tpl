@@ -1,6 +1,6 @@
 (-: AutoGen5 template 
 
-# $Id: strsignal.tpl,v 2.5 1999/10/28 02:26:08 bruce Exp $
+# $Id: strsignal.tpl,v 2.6 1999/10/28 02:27:10 bruce Exp $
 
 h :-)
 /*
@@ -39,14 +39,15 @@ static char zBad_(-: (sprintf "%-13s" (sprintf "%d[]" (for-index)))
   (out-pop) :-)(-:
 
 ENDFOR signal:-)
+
+static char* signal_names[] = {
+(-:`columns -I4 -S, -i .sig.names ; rm -f .sig.names` :-) };
+
 #ifndef HAVE_SYS_SIGLIST
 (-:`cat .sig.liststr ; rm -f .sig.liststr`:-)
 
 static char* sys_siglist[] = {
 (-:`columns -I4 -S, -i .sig.list ; rm -f .sig.list` :-) };
+
 #endif /* HAVE_SYS_SIGLIST */
-
-static char* signal_names[] = {
-(-:`columns -I4 -S, -i .sig.names ; rm -f .sig.names` :-) };
-
 #endif /* MAX_SIGNAL_NUMBER */
