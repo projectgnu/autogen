@@ -8,15 +8,16 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.19 2000/08/13 21:20:24 bkorb Exp $
+## $Id: Makefile.am,v 1.20 2000/09/30 15:08:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
-	alist.test       case.test        define.test      defref.test   \
-	directives.test  endmac.test      error.test       expr.test     \
-	for.test         forfrom.test     get.test         heredef.test  \
-	include.test     license.test     match.test       nestmac.test  \
-	opts.test        reorder.test     stack.test
+	alist.test       case.test        define.test      defref.test \
+	directives.test  endmac.test      error.test       expr.test \
+	for.test         forfrom.test     get.test         gperf.test \
+	heredef.test     include.test     license.test     match.test \
+	nestmac.test     opts.test        reorder.test     stack.test \
+	string.test
 
 EXTRA_DIST = defs $(TESTS)
 
