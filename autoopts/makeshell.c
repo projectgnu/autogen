@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.11 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: makeshell.c,v 3.12 2003/07/11 01:03:13 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -612,9 +612,6 @@ emitUsage( tOptions* pOpts )
     }
 }
 
-
-#define ARGTYPE \
-  (OPTST_NUMERIC | OPTST_STACKED | OPTST_ENUMERATION | OPTST_BOOLEAN )
 
 STATIC void
 emitSetup( tOptions* pOpts )

@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.20 2003/07/04 15:12:22 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.21 2003/07/11 01:03:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -600,7 +600,7 @@ then
   kill -TERM $AG_pid
   exit 1
 fi ) >&2
-HOME='$HOME/.default_testrc' ./default-test --help | \
+HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
    sed 's,@,@@,g;s,{,@{,g;s,},@},g;s,\t,        ,g' " ))
 =]
 @end example

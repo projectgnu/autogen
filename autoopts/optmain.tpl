@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.14 2003/07/04 17:58:14 bkorb Exp $
+# $Id: optmain.tpl,v 3.15 2003/07/11 01:03:13 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -352,7 +352,7 @@ DEFINE define-option-callbacks  =][=
       ENDIF  =]
 [=(shellf
   "${COLUMNS_EXE} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
-          (join "\n" (stack "keyword")) )=]
+          (string->c-name! (join "\n" (stack "keyword")) ))=]
     };
 [=
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.12 2003/07/08 02:30:45 bkorb Exp $
+ *  $Id: putshell.c,v 3.13 2003/07/11 01:03:13 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -81,7 +81,7 @@ putBourneShell( tOptions* pOpts )
 {
     int         optIx = 0;
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
-    tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d\nexport %1$s_%2$s\n";
+    tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d # 0x%3$X\nexport %1$s_%2$s\n";
     tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
     tSCC zOptValFmt[] = "%s_%s='";
     tSCC zOptEnd[]    = "'\nexport %s_%s\n";
@@ -138,13 +138,12 @@ putBourneShell( tOptions* pOpts )
                 pz += strspn( pz, " +\t\n\f" );
                 for (;;) {
                     char ch = *(pz++);
-                    switch (ch) {
-                    case ' ':
-                    case '+': goto name_done;
-                    case NUL: pz--; goto name_done;
-                    default:
-                        fputc( toupper( ch ), stdout );
-                    }
+                         if (islower( ch ))  fputc( toupper( ch ), stdout );
+                    else if (isalnum( ch ))  fputc( ch, stdout );
+                    else if (isspace( ch )
+                          || (ch == '+'))    goto name_done;
+                    else if (ch == NUL)      { pz--; goto name_done; }
+                    else fputc( '_', stdout );
                 } name_done:;
                 printf( "=%1$d # 0x%1$X\n", val );
                 val <<= 1;

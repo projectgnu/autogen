@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.13 2003/07/06 16:34:59 bkorb Exp $
+# $Id: optlib.tpl,v 3.14 2003/07/11 01:03:13 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -145,7 +145,8 @@ typedef enum {[=
     FOR    keyword   =][=
 
       (sprintf setmember-fmt
-         (string-append full-prefix "_" (string-upcase! (get "keyword")))
+         (string->c-name! (string-append
+             full-prefix "_" (string-upcase! (get "keyword")) ))
          (ash 1 (for-index))  ) =][=
 
     ENDFOR keyword   =][=
@@ -309,12 +310,12 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
 
        =* set                   =]
 #define [=(. def-arg-name)=]NULL
-#define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=](tCC*)([=
+#define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=](void*)([=
          IF (not (exist? "arg-default")) =]0[=
          ELSE =][=
            FOR    arg-default | =][=
-             (string-append UP-prefix UP-name "_"
-                   (string-upcase! (get "arg-default")) )  =][=
+             (string->c-name! (string-append UP-prefix UP-name "_"
+                   (string-upcase! (get "arg-default")) ))  =][=
            ENDFOR arg-default   =][=
          ENDIF =])[=
 
