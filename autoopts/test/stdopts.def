@@ -1,0 +1,44 @@
+#! /bin/echo this_file_should_be_sourced,_not_executed
+#  -*- Mode: Shell-script -*-
+
+#  This is the standard set of options for testing option processing
+#  It is expected to be dot
+
+exec 5> $testname.def
+cat >&5 <<_EOF_
+
+AutoGen definitions options;
+
+prog_name  = "test_${testname}";
+prog_title = "Test AutoOpts for ${testname}";
+_EOF_
+
+if ! ${no_test_main:-false}
+then
+    echo "test_main = yes;" >&5
+fi
+
+echo >&5
+
+for flag
+do
+    if ${use_flags}
+    then
+        cat <<-_EOF_
+	flag = {
+	    name = "$flag";
+	    descrip = "The $flag option descrip";
+	    value = '`echo $flag | sed 's/\(.\).*/\1/'`';
+	};
+	_EOF_
+    else
+        cat <<-_EOF_
+	flag = {
+	    name = "$flag";
+	    descrip = "The $flag option descrip";
+	};
+	_EOF_
+    fi
+done >&5
+
+exec 5>&-

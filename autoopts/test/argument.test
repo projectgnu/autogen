@@ -1,0 +1,59 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# argument.test --- test argument program attribute
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: argument.test,v 1.1 2000/03/12 00:46:17 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+. ${stdopts} option second
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_argument - Test AutoOpts for argument
+USAGE:  argument [-<flag> [<val>]]... 
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s no  second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+./$testname mumble 2> /dev/null && \
+  failure $testname should not accept non-options
+
+./$testname -o -s > /dev/null
+
+cleanup
+# end of argument.test
