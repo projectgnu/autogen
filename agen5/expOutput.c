@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: expOutput.c,v 1.2 1999/10/30 20:31:20 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -75,7 +75,7 @@ addWriteAccess( char* pzFileName )
 /*=gfunc out_delete
  *
  * req: 0
- *doc:  
+ * doc:  
  *  Remove the current output file.  Cease processing the template for
  *  the current suffix.  It is an error if there are @code{push}-ed
  *  output files.  Use the @code{[#_ERROR 0#]} function instead.
@@ -98,7 +98,9 @@ ag_scm_out_delete( void )
 
 /*=gfunc out_move
  *
- *doc:  
+ * exparg: new-name
+ *
+ * doc:  
  *  Rename current output file.
 =*/
     SCM
@@ -116,7 +118,7 @@ ag_scm_out_move( SCM new_file )
 /*=gfunc out_pop
  *
  * req: 0
- *doc:  
+ * doc:  
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
  *  if there has not been a @code{push}.  The file name argument may be
@@ -139,7 +141,9 @@ ag_scm_out_pop( void )
 
 /*=gfunc out_push_add
  *
- *doc: 
+ * exparg: file-name
+ *
+ * doc: 
  *  Identical to @code{push-new}, except the contents are @strong{not}
  *  purged, but appended to. 
 =*/
@@ -173,7 +177,9 @@ ag_scm_out_push_add( SCM new_file )
 
 /*=gfunc out_push_new
  *
- *doc:  
+ * exparg: file-name
+ *
+ * doc:
  *  Leave the current output file open, but purge and create
  *  a new file that will remain open until a @code{pop} @code{delete}
  *  or @code{switch} closes it.
@@ -208,7 +214,9 @@ ag_scm_out_push_new( SCM new_file )
 
 /*=gfunc out_switch
  *
- *doc:
+ * exparg: file-name
+ *
+ * doc:
  *  Switch output files - close current file and make the current
  *  file pointer refer to the new file
 =*/
@@ -260,7 +268,7 @@ ag_scm_out_switch( SCM new_file )
  *
  * req:  0
  *
- *doc:  Returns the name of the current output file.
+ * doc:  Returns the depth of the output file stack.
 =*/
     SCM
 ag_scm_out_depth( void )
@@ -273,7 +281,7 @@ ag_scm_out_depth( void )
  *
  * req:  0
  *
- *doc:  Returns the name of the current output file.
+ * doc:  Returns the name of the current output file.
 =*/
     SCM
 ag_scm_out_name( void )
