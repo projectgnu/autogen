@@ -1,3 +1,10 @@
+New in 5.0
+* Everything you knew about templates is mostly wrong.
+  Template expressions were made simpler and much more powerful.
+  An expression may be AutoGen defined values, shell scripts,
+  Scheme expressions, or the latter two formatted with an
+  AutoGen definition value.  AutoGen now depends on Guile.
+
 New in 4.5.8
 * Finally, finally, finally, really finished the portability issues.
 
