@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.19 2004/02/01 21:26:45 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.20 2004/05/22 00:17:32 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -438,18 +438,6 @@ optionSaveFile( tOptions* pOpts )
             }
 
             case OPTST_ENUMERATION:
-            {
-                tCC* val = p->pzLastArg;
-                /*
-                 *  This is a magic incantation that will convert the
-                 *  enumeration value back into a string suitable for printing.
-                 */
-                (*(p->pOptProc))( (tOptions*)2UL, p );
-                printEntry( fp, p, p->pzLastArg );
-                p->pzLastArg = val;
-                break;
-            }
-
             case OPTST_MEMBER_BITS:
             {
                 tCC* val = p->pzLastArg;
