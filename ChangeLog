@@ -1,3 +1,8 @@
+2000-07-31  Bruce Korb  <bkorb@gnu.org>
+
+	* autogen/options.tpl:  Clarified messages about when 'value' option
+	attributes are required
+
 2000-07-28  Bruce Korb  <bkorb@gnu.org>
 
 	* config/autogen.spec.in: new file - precursor for autogen.spec
