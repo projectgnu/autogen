@@ -6,6 +6,8 @@
 
 * Pending
 
+** noag-boot.sh needs to really work when autogen is not available.
+
 ** All errors from getdefs and columns should start with,
    `options.pzProgName' (aka 'basename(argv[0])').
 
