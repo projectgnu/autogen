@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-02-12 08:12:44 bkorb"
+# Time-stamp:        "2005-02-14 08:50:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.4 2005/02/13 01:48:00 bkorb Exp $
+# $Id: rc.test,v 4.5 2005/02/14 16:52:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -138,6 +138,32 @@ _EOF_
 
 cmp  ${testname}.cmds ${testname}.test || {
   df="`diff -c ${testname}.test ${testname}.cmds`"
+  cd ..
+  failure "${df}"
+}
+
+mv ../${testname}.rc/${testname}.file ../${testname}.rc/${testname}.save
+( sed '/^[TEST_MUMBLE]/,$d' ../${testname}.rc/${testname}.save
+  cat <<- _EOF_
+	<?program test-mumble>
+	second    fourth
+	<!--  This is a comment
+	      and it should have no effect -->
+	<?program test-${testname}>
+	<second cooked>
+	   fifth
+	</second>
+	# this is another comment
+	#
+	<?program test-stumble>
+	second  : sixth
+	_EOF_
+) > ../${testname}.rc/${testname}.file
+
+../${testname} -t yyy MUMBLE > ${testname}.cmds
+
+cmp  ${testname}.cmds ${testname}.test || {
+  df="USING <?program>:  `diff -c ${testname}.test ${testname}.cmds`"
   cd ..
   failure "${df}"
 }

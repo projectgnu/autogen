@@ -1,7 +1,7 @@
 
 /*
- *  $Id: configfile.c,v 4.6 2005/02/14 16:25:37 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:23:50 bkorb"
+ *  $Id: configfile.c,v 4.7 2005/02/14 16:52:31 bkorb Exp $
+ * Time-stamp:      "2005-02-14 08:50:30 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -344,8 +344,6 @@ handleConfig(
          */
         *(pzEnd++) = NUL;
     }
-
-    fprintf( stderr, "Loading option:  ``%s''\n", pzName );
 
     /*
      *  "pzName" points to what looks like text for one option/configurable.
