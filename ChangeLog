@@ -2,6 +2,10 @@
 
 	* autoopts/*: much cleaning up
 	* autoopts/test/*.test:  rework for slightly altered help output
+	* autoopts/autoopts.h: add private procedure
+	* autoopts/doc.tpl: document, document, document
+	* autoopts/options.h: remove private procedure
+	* autoopts/optlib.tpl: use new features correctly
 
 2000-10-27  Bruce Korb  <bkorb@gnu.org>
 

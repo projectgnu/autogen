@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.21 2000/10/28 18:17:32 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.22 2000/10/28 23:12:52 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -342,12 +342,6 @@ const char	*optionVersion PROTO(( void ));
  *  following the flag list, per "getopt(3)".
  */
 int     optionProcess PROTO(( tOptions* pOpts, int argCt, char** argVect ));
-
-/*
- *  optionSave saves the option state into an RC or INI file in
- *  the *LAST* defined directory in the papzHomeList.
- */
-void    optionSave PROTO((   tOptions* pOpts ));
 
 /*
  *  optionLoadLine will load an option in the text buffer as

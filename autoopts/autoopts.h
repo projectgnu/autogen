@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.16 2000/10/28 18:17:32 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.17 2000/10/28 23:12:51 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -191,6 +191,12 @@ typedef struct {
 #endif
 
 extern void optionUsage PROTO(( tOptions*, int exitCode ));
+
+/*
+ *  optionSave saves the option state into an RC or INI file in
+ *  the *LAST* defined directory in the papzHomeList.
+ */
+void    optionSave PROTO((   tOptions* pOpts ));
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*
