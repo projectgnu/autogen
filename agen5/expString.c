@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.8 1999/11/03 05:16:41 bruce Exp $
+ *  $Id: expString.c,v 1.9 1999/11/04 05:19:26 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -269,6 +269,7 @@ ag_scm_join( SCM sep, SCM list )
 
 
 /*=gfunc prefix
+ * what:  prefix lines with a string
  *
  * exparg: prefix, string to insert at start of each line
  * exparg: text, multi-line block of text
@@ -276,7 +277,7 @@ ag_scm_join( SCM sep, SCM list )
  * doc:
  *  Prefix every line in the second string with the first string.
  *
- *  For example, the first string is "# " and the second contains:
+ *  For example, if the first string is "# " and the second contains:
  *  @example
  *  two
  *  lines
@@ -344,6 +345,7 @@ ag_scm_prefix( SCM prefix, SCM text )
 
 
 /*=gfunc shell
+ * what:  invoke a shell script for its output
  *
  * exparg: command, shell command - the result value is stdout
  *
@@ -375,7 +377,38 @@ ag_scm_shell( SCM cmd )
 }
 
 
+/*=gfunc shellf
+ * what:  format a string, run shell on result
+ *
+ * exparg: format, formatting string
+ * exparg: format-arg, list of arguments to formatting string, opt, list
+ *
+ * doc:  Format a string using arguments from the alist,
+ *       then send the result to the shell for interpretation.
+=*/
+    SCM
+ag_scm_shellf( SCM fmt, SCM alist )
+{
+    int len = scm_ilength( alist );
+
+    if (! gh_string_p( fmt ))
+        return SCM_UNDEFINED;
+
+    if (len <= 0)
+        return fmt;
+
+    fmt = run_printf( SCM_CHARS( fmt ), len, alist );
+    {
+        char* pz = runShell( SCM_CHARS( fmt ));
+        cmd   = gh_str02scm( pz );
+        AGFREE( (void*)pz );
+        return cmd;
+    }
+}
+
+
 /*=gfunc raw_shell_str
+ * what:  emit single quote string for shell
  *
  * exparg: string, string to transform
  *
@@ -433,6 +466,7 @@ ag_scm_raw_shell_str( SCM obj )
 
 
 /*=gfunc shell_str
+ * what:  emit double quote string for shell
  *
  * exparg: string, string to transform
  *
@@ -492,6 +526,7 @@ ag_scm_shell_str( SCM obj )
 
 
 /*=gfunc stack
+ * what:  stack named AutoGen values
  *
  * exparg: ag-name, AutoGen value name
  *
@@ -518,6 +553,7 @@ ag_scm_stack( SCM obj )
 
 
 /*=gfunc kr_string
+ * what:  emit a string for K&R C
  *
  * exparg: string, string to reformat
  *
@@ -542,6 +578,7 @@ ag_scm_kr_string( SCM str )
 
 
 /*=gfunc c_string
+ * what:  emit a string for ANSI C
  *
  * exparg: string, string to reformat
  *
@@ -571,6 +608,7 @@ ag_scm_c_string( SCM str )
 
 
 /*=gfunc string_tr_x
+ * what:  convert letters in a string
  *
  *  exparg:  source, string to transform
  *  exparg:  match,  characters to be converted
