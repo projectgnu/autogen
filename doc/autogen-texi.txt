@@ -120,9 +120,9 @@ These associated data are used collectively in sets of substitutions.
 
 @item
 The template has special markers to indicate where substitutions are
-required, much like the @code{$@{VAR@}} construct in a shell @code{here
-doc}.  These markers are not fixed strings.  They are specified at the
-start of each template.  Template designers know best what fits into their
+required, much like the @code{$@{VAR@}} construct in a shell @code{here doc}.
+These markers are not fixed strings.  They are specified at the start of
+each template.  Template designers know best what fits into their
 syntax and can avoid marker conflicts.
 
 We did this because it is burdensome and difficult to avoid conflicts
