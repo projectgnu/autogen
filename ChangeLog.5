@@ -1,3 +1,222 @@
+2004-01-04  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.5.7 Released
+
+2004-01-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*.c: pulled all the strings that show up in human readable
+	text and put them into:
+	* autoopts/usage-txt.def: new repository for all human readable
+	AutoOpts strings
+	* autoopts/usage-txt.tpl: Permute the above into the five tables needed
+	to use the strings and translate them into another language.  The
+	translation only happens if the _USER_PROGRAM_ is compiled with NLS.
+	* autoopts/usage-txt.h: the generated result
+
+2003-12-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/getopt.tpl: new file.  Implements using getopt_long() as
+	the command line parser for AutoOpts-described options.
+	* autoopts/Makefile.am(pkgdata_DATA): add getopt.tpl
+	* autoopts/sort.c(optionSort): Disable if the environment variable
+	"POSIXLY_CORRECT" is set.
+	* doc/autogen.texi: update the docs for this stuff.
+
+2003-12-27  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c(ag_scm_out_name): constness warning
+	* compat/compat.h(__USE_GNU): define before including string.h
+	* getdefs/gdinit.c(validateOptions): zNoList is not used
+	* xml2ag/fork.tpl(forkAutogen): cast OPT_VALUE to int (warning)
+	* xml2ag/xml2ag.c(trim): printf format arg warning
+
+2003-12-20  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: Clean up constness of various variables
+
+2003-12-14  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/mkpkg.linux: put %_tmppath in the .rpmmacros also
+	* pkg/spec.tpl: use it.
+
+2003-12-07  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: tag the entries to make them easier to find in configure
+	* agen5/Makefile.am(autogen.1): it depends on getdefs & columns, too.
+	* agen5/agUtils.h(fcntl.h): don't include if we don't have it
+	* agen5/bootstrap.dir(autogen.1): don't touch it after creation
+	* agen5/expPrint.c(run_printf): cast the SCM through uintptr_t
+	* autoopts/enumeration.c(optionEnumerationVal): use uintptr_t to
+	cast a char* to a scalar.
+	* autoopts/guileopt.c(export_options_to_guile): ditto
+	* autoopts/putshell.c(putBourneShell): ditto
+	* compat/compat.h(stdint.h): we now require this for building.
+	* agen5/expString.c(ag_scm_raw_shell_str): expand doc for new stuff
+	* autoopts/optmain.tpl(range-option-code): set value type to "long",
+	as it is more likely to match a pointer size.  The generated output
+	may or may not have access to stdint.h types.
+	* getdefs/Makefile.am(opts.h): getdefs and columns must be built first.
+
+2003-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c(ag_scm_raw_shell_str): minimize the switching
+	between quoted text and escaped single quotes for raw-shell-str.
+	* agen5/test/defs(testsubdir): correct spelling
+	* agen5/test/shell.test(raw-shell-str): correct for new results
+	* agen5/test/string.test(checkStr): make messages more explicit
+	* autoopts/makeshell.c(emitSetup): accommodate environment variable
+	"presets" for one-copy-only options.
+	* autoopts/test/shell.test: accommodate the new results
+
+2003-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c(emitMatchExpr): consolodate some code here &
+	fix a bug where a possibly null pointer was not tested for such.
+	* doc/Makefile.am(texi-stamp): $(MAKE) must be passed through, too.
+	* doc/auto_gen.tpl: show an example of a shell script option parsing
+	program that reorders command arguments.
+	* doc/autogen.texi: ditto.
+
+2003-11-22  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(CSRC): add sort.c file
+	* autoopts/autoopts.c: move interface types to autoopts.h and change
+	references to "STATIC" to "LOCAL"
+	(optionMakePath): exported for use by AutoGen, but nobody else
+	* autoopts/autoopts.h: incorporate interface types defined in some
+	of the modules.  Incorporate generated procedure prototypes.
+	* autoopts/bootstrap.dir(LOCAL PROCEDURES): extract their names and
+	insert them into autoopts.h
+
+	* autoopts/boolean.c(optionBooleanVal): export this function for ao use
+	* autoopts/numeric.c(optionNumericVal): ditto
+	* autoopts/pgusage.c(doPagedUsage): ditto
+	* autoopts/stack.c(unstackOptArg, stackOptArg): ditto
+	* autoopts/makeshell.c(putShellParse): ditto, plus convert STATIC usage
+	to LOCAL usage.
+
+	* autoopts/enumeration.c(enumError): LOCAL-ize for static use
+	(findName): ditto
+	* autoopts/putshell.c(putQuotedStr): ditto
+	* autoopts/save.c(findDirName, findFileName, printEntry): ditto
+
+	* autoopts/options_h.tpl(private): separate private use funcs better
+	* autoopts/options.tpl(do-ifdefs): clean up usage
+	* autoopts/optlib.tpl(ifdef-ed): clean up usage
+	* autoopts/sort.c(optionSort): new file/routine to separate options
+	from operands.  Not directly callable by users.
+
+	* autoopts/usage.c(arg_types_t): move to autoopts.h
+	(optionUsage): export this function for ao use
+	LOCAL-ize several functions.
+
+	* autoopts/version.c(printVersion): LOCAL-ize
+	(doVersion): export this function for ao use
+	* doc/autogen.texi: many cleanups.
+
+	* autoopts/autoopts.c(optionProcess): call optionSort if REORDER set
+	* autoopts/putshell.c(putBourneShell): If the args were sorted, then
+	reset the argument list.
+	* autoopts/sort.c(optionSort): correct the sense of the test.
+	* autoopts/test/errors.test(reorder-opts): test functionality.
+
+2003-11-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(serverSetup): do not depend upon the shell understand-
+	ing "elif", disallow any variation of *csh shells and ensure that there
+	are plenty of characters for writing the AutoGen pid into the init
+	script for the shell.
+
+2003-08-23  Bruce Korb  <bkorb@gnu.org>
+
+	==5.5.6 released.
+
+	* pkg/spec.tpl(brp-strip-static-archive): invoke this in post processing
+	only if it actually exists.
+	(BuildRequires): presumes RPM-installed tools, will not check for
+	``make install'' versions.
+	* doc/Makefile.am(AGARGS): obsolete
+	(SHELL): set it to /bin/sh before genning the docs
+	* autoopts/test/usage.test(! ${long_opts}): rework as a proper command
+	* agen5/test/defs(VERBOSE): ``!'' is not a proper shell command
+	* snprintfv/compat.h(#endif): remove ^M
+
+2003-08-20  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(arg-range): Include stdio.h and limits.h
+	for the generated code that handles argument ranges.
+	* autoopts/optmain.tpl(option_usage_fp): must be globally declared
+	* autoopts/test/argument.test: Add code to test arg-range
+
+2003-08-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/usage.test: test display with mix of with and without
+	flag options
+	* autoopts/usage.c(printBareUsage): add an extra space when there are
+	both flags and long options, but this does not have the flag value.
+
+2003-08-08  Deneys S. Maartens  <dsm@tlabs.ac.za>
+
+	* autoopts/autoopts.m4:
+        min_opts_version is not defined anywhere.
+        The test programme also seems a bit borken. :)
+
+	* pkg/mkpkg.linux:
+        The rpm programme has been split into smaller utility
+        programmes.  On RedHat rpm itself doesn't recognise the build
+        flags any more.
+
+	* pkg/spec.tpl:
+        When the prefix isn't /usr/local, the manpages get gzip'ed, and
+        the build fails because the (unzipped) manpage files don't
+        exist.  The %define at the top of the spec file fixes this.
+        It's probably not a very elegant solution, but inserting
+        `/usr/lib/rpm/bpr-compress' just before the file list gets
+        generated in the %install section is probably even worse.
+
+2003-08-07  Bruce Korb  <bkorb@gnu.org>
+
+	* snprintfv/*: update to pre-release of version 1.1
+
+2003-07-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/enumeration.c: cleanup
+	* autoopts/options_h.tpl: cleanup
+	* autoopts/optlib.tpl: cleanup
+	* autoopts/optmain.tpl: cleanup
+	* autoopts/putshell.c: Handle set membership
+	* autoopts/streqv.h: Remove ``PROTO(( ... ))'' stuff
+	* autoopts/test/equiv.test: Adjust the test result values
+	* autoopts/test/stdopts.test: also
+	* autoopts/test/keyword.test: Test the set membership
+	* autoopts/test/handler.test: also
+	* autoopts/usage.c(printExtendedUsage): handle set membership
+	* doc/autogen.texi: doc the stuff
+
+2003-07-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: do not double backslashes in man page text
+	* autoopts/autoopts.m4: fix syntax for config tests
+	* autoopts/enumeration.c(findName): common code for both
+	optionEnumerationVal and optionSetMembers (new procedure)
+	* opt*.tpl: implement set-membership option type
+	* autoopts/restore.c(optionFree): only deallocate optCookie if
+	the OPTST_STACKED bit is set.
+	* autoopts/save.c(optionSaveFile): handle options with member bits
+
+2003-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(findOptDesc): a hyphen by itself must be treated
+	as an operand.
+	* config/bootstrap.local(LANG): unset the thing.  It interferes with
+	proper bootstrapping.
+
+2003-06-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c(ag_scm_makefile_script): if we are supplying a start
+	of line tab character, it looks ugly to also use tab characters from
+	the source string, so strip them.
+
 2003-06-01  Bruce Korb  <bkorb@gnu.org>
 
 	==5.5.5 released.

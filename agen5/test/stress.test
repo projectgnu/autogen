@@ -1,0 +1,57 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# stress.test --- stress test
+#
+## Time-stamp:      "2004-02-01 13:56:13 bkorb"
+## Copyright (c):   1999-2004 by Bruce Korb
+##
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+#            by: bkorb
+#
+# $Id: stress.test,v 3.1 2004/02/01 22:48:42 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
+[= AutoGen5 template test =]
+Entry Count = [= (count "entry") =].
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+set -x
+echo creating ${testname}.samp
+ecount=100000
+# this is the output we should expect to see
+echo "Entry Count = ${ecount}." > ${testname}.samp
+
+(
+  set +x
+  echo "AutoGen Definitions ${testname};"
+  idx=1
+  while test $idx -le ${ecount}
+  do
+    echo "entry = { value = 'val-${idx}'; depth = '${idx}'; const = xx; };"
+    idx=`expr $idx + 1`
+  done
+) | $AGEXE -b ${testname} -
+test $? -eq 0 || failure $AGEXE failed
+
+cmp -s ${testname}.test ${testname}.samp || \
+	failure "`diff ${testname}.test ${testname}.samp`"
+
+cleanup
+# end of get.test

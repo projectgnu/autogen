@@ -1,15 +1,16 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# get.test --- test get functionality
+# stack.test --- test stack and join functionality
 #
+## Time-stamp:      "2004-02-01 13:35:28 bkorb"
+## Copyright (c):   1999-2004 by Bruce Korb
+##
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/24 14:13:33 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+#            by: bkorb
 #
-# $Id: stack.test,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+# $Id: stack.test,v 3.2 2004/02/01 22:48:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -77,4 +78,4 @@ cmp -s ${testname}.test ${testname}.out || \
 	failure "`diff ${testname}.*t`"
 
 cleanup
-# end of get.test
+# end of stack.test
