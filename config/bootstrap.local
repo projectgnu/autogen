@@ -6,11 +6,54 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug  9 09:25:13 1999				      
+# Last Modified:     Mon Aug  9 10:04:30 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.18 1999/08/09 16:25:40 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.19 1999/08/09 17:06:55 bkorb Exp $
 # ----------------------------------------------------------------------
+
+add_make_links()
+{
+  if grep -l 'MAKE LINK TREE' configure > /dev/null 2>&1
+  then return ; fi
+
+  (
+    sed 2q configure
+    cat <<-	'_EOF_'
+
+	#MAKE LINK TREE
+	#
+	top_builddir=`pwd`
+	top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
+	top_srcdir=`cd $top_srcdir && pwd`
+	if test "$top_srcdir" = "$top_builddir" ; then : ; else
+	  ( cd $top_srcdir
+	    find . -type d -print ) |
+	  grep -v '/CVS\|/RCS' |
+	  while read f
+	  do test -d $f || mkdir $f
+	  done
+
+	  ( cd $top_srcdir
+	    find . \( -type f -o -type l \) -print ) |
+	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
+	  while read f
+	  do
+	     test -f $f || ln -sf $top_srcdir/$f $f
+	  done
+	  sh ./configure $@
+	  exit $?
+	fi
+
+_EOF_
+    sed -e 1d -e 2d configure
+  ) > configure.tmp
+
+  rm -f configure
+  mv -f configure.tmp configure
+  chmod +x configure
+}
+
 
 case ${BOOTSTRAP} in
 
@@ -48,43 +91,17 @@ pre )
 
     if echo $@ | egrep -i debug >/dev/null 2>&1
     then DEBUG_OPTS="-DDEBUG=1" ; export DEBUG_OPTS ; fi
-
     ;;
 
 post )
     # remove the fake file so we don't forget to generate it later.
     test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
         || rm -f doc/autogen.texi
-    (  sed 1q configure
-       cat <<-	'_EOF_'
+    add_make_links
+    ;;
 
-	top_builddir=`pwd`
-	top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
-	top_srcdir=`cd $top_srcdir && pwd`
-	if test "$top_srcdir" = "$top_builddir" ; then : ; else
-	  ( cd $top_srcdir
-	    find . -type d -print ) |
-	  grep -v '/CVS\|/RCS' |
-	  while read f
-	  do test -d $f || mkdir $f
-	  done
-
-	  ( cd $top_srcdir
-	    find . \( -type f -o -type l \) -print ) |
-	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
-	  while read f
-	  do
-	     test -f $f || ln -sf $top_srcdir/$f $f
-	  done
-	  sh ./configure $@
-	  exit $?
-	fi
-
-_EOF_
-        sed 1d configure ) > configure.tmp
-
-    mv -f configure.tmp configure
-    chmod +x configure
+mklink )
+    add_make_links
     ;;
 
 esac
