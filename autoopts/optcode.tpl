@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.12 2003/03/08 21:19:52 bkorb Exp $
+#$Id: optcode.tpl,v 3.13 2003/03/13 04:08:04 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -134,10 +134,10 @@ ENDIF (exist? "homerc") =][=
 
 
 IF (or (exist? "flag.flag_code")
-       (exist? "flag.extract_code")
-       (exist? "flag.call_proc")
-       (exist? "flag.arg_range")
-       (match-value? =* "flag.arg_type" "key") ) =][=
+       (exist? "flag.extract-code")
+       (exist? "flag.call-proc")
+       (exist? "flag.arg-range")
+       (match-value? =* "flag.arg-type" "key") ) =][=
 
   invoke declare-option-callbacks  =][=
 

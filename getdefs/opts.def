@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.6 2003/02/05 02:40:26 bkorb Exp $
+ *   $Id: opts.def,v 3.7 2003/03/13 04:08:04 bkorb Exp $
  */
 
 /*
@@ -290,6 +290,7 @@ flag = {
     name        = template;
     arg_type    = string;
     arg_name    = file;
+    settable;
     descrip     = "Template Name";
     doc =
     "Specifies the template name to be used for generating the final output.";

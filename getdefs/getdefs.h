@@ -1,14 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.7 2003/02/03 00:58:19 bkorb Exp $
+ *  $Id: getdefs.h,v 3.8 2003/03/13 04:08:04 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
+ *  Time-stamp:        "2003-03-12 19:42:53 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2003/02/03 00:58:19 $
- *            by: bkorb
  */
 
 #ifndef GETDEFS_HEADER
@@ -95,12 +94,6 @@ DEF_STRING( zDne,
 MODE char*   pzDefPat   VALUE( (char*)NULL );
 MODE regex_t define_re;
 MODE regex_t attrib_re;
-
-/*
- *  The NUL-terminated string containing the name of the template
- *  the output definitions are to refer to.
- */
-MODE char   zTemplName[ 65 ] VALUE( {0} );
 
 /*
  *  The output file pointer.  It may be "stdout".

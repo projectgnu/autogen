@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-09 09:52:19 bkorb"
+# Time-stamp:        "2003-03-11 09:37:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.8 2003/03/09 19:53:52 bkorb Exp $
+# $Id: equiv.test,v 3.9 2003/03/13 04:08:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -89,7 +89,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       T/F gamma          gamma opt
 				- an alternate for alpha
-      KWd omega          omega opt
+      opt omega          omega opt
 				- an alternate for alpha
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -120,7 +120,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       T/F gamma          gamma opt
 				- an alternate for alpha
-      KWd omega          omega opt
+      opt omega          omega opt
 				- an alternate for alpha
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager

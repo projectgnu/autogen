@@ -1,3 +1,25 @@
+2003-03-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/Makefile.am: some shells like to echo after a cd.
+	* agen5/test/opts.test: same issue
+	* autoopts/test/Makefile.am: and again + set LD_LIBRARY_PATH for Guile
+	* config/confmacs.tpl: Pass through the 'withlib' library directory so
+	the executables can have LD_LIBRARY_PATH set.
+	* getdefs/getdefs.c: Don't set a hard limit on the template name.
+	* getdefs/getdefs.h: Remove the template name with the hard coded len.
+	* getdefs/opts.def: the --template option is now settable
+
+2003-03-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c(printBareUsage): give arg handling type precedence
+	in the argument description over the argument format type.  Display
+	optional option arguments as "arg" instead of "opt".
+	* autoopts/test/equiv.test: accommodate
+	* autoopts/test/usage.test: accommodate
+	* autoopts/options.tpl: "usage" and "gnu-usage" conflict
+	* doc/autogen.texi: doc this new stuff
+	(information attributes): split the description attributes
+
 2003-03-10  Bruce Korb  <bkorb@gnu.org>
 
 	* VERSION: clean out cruft

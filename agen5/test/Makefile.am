@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/12/14 02:25:33 $
+## Last Modified:   $Date: 2003/03/13 04:08:04 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2002/12/14 02:25:33 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2003/03/13 04:08:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -24,7 +24,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 TESTS      = @AGEN5_TESTS@
 testsubdir = ./testdir
-CPPFLAGS   = @CPPFLAGS@
 EXTRA_DIST = defs $(TESTS)
 FUNCLIST   = funcCase.c  funcDef.c  funcEval.c   funcFor.c   funcIf.c \
 		     functions.c
@@ -33,10 +32,10 @@ EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 
 TESTS_ENVIRONMENT = \
 	CC="$(CC)" CFLAGS='@CFLAGS@' \
-	GDEXE=`cd $(top_builddir)/getdefs; pwd`/@GDEXE@ \
-	AGEXE=`cd $(top_builddir)/agen5  ; pwd`/@AGEXE@ \
-	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
-	INC="@INCLIST@ $(CPPFLAGS)" \
+	GDEXE=`cd $(top_builddir)/getdefs > /dev/null; pwd`/$(GDEXE) \
+	AGEXE=`cd $(top_builddir)/agen5   > /dev/null; pwd`/$(AGEXE) \
+	COLUMNS_EXE="`cd $(top_builddir)/columns > /dev/null; pwd`/$(COLEXE)" \
+	INC="$(INCLIST) $(CPPFLAGS)" \
 	testsubdir=$(testsubdir) \
 	top_builddir=`cd $(top_builddir) ; pwd` \
 	builddir=`cd $(builddir) ; pwd` \

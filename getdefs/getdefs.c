@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.7 2003/02/16 00:04:40 bkorb Exp $
+ *  $Id: getdefs.c,v 3.8 2003/03/13 04:08:04 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
- *  Time-stamp:        "2003-02-03 18:08:01 bkorb"
+ *  Time-stamp:        "2003-03-12 19:57:20 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -611,7 +611,7 @@ doPreamble( FILE* outFp )
     /*
      *  Emit the "autogen definitions xxx;" line
      */
-    fprintf( outFp, zAgDef, zTemplName );
+    fprintf( outFp, zAgDef, OPT_ARG( TEMPLATE ));
 
     if (HAVE_OPT( FILELIST )) {
         tSCC   zFmt[] = "%-12s = '%s';\n";
@@ -941,9 +941,7 @@ startAutogen( void )
 {
     char*  pz;
     FILE*  agFp;
-
-    char zSrch[ MAXPATHLEN ];
-    char zBase[ 68 ];
+    char*  pzBase = NULL;
 
     /*
      *  Compute the base name.
@@ -953,31 +951,37 @@ startAutogen( void )
      *     a normal name, then use that.
      *  If neither of these work, then use the current directory name.
      */
-    if (HAVE_OPT( BASE_NAME ))
-        snprintf( zBase, sizeof(zBase), "-b%s", OPT_ARG( BASE_NAME ));
-
+    if (HAVE_OPT( BASE_NAME )) {
+        pzBase = malloc( strlen( OPT_ARG( BASE_NAME )) + 3 );
+        strcpy( pzBase, "-b" );
+        strcpy( pzBase+2, OPT_ARG( BASE_NAME ));
+    }
     else {
         /*
          *  IF we have a definition name pattern,
          *  THEN copy the leading part that consists of name-like characters.
          */
-        strcpy( zBase, "-b" );
         if (HAVE_OPT( DEFS_TO_GET )) {
             char* pzS = OPT_ARG( DEFS_TO_GET );
-            pz = zBase + 2;
+            pzBase = malloc( strlen( pzS ) + 3 );
+            strcpy( pzBase, "-b" );
+
+            pz = pzBase + 2;
             while (isalnum( *pzS ) || (*pzS == '_'))
                 *pz++ = *pzS++;
-            *pz = NUL;
-            if (pz >= zBase + sizeof(zBase)) {
-                fputs( "base name length exceeds 64\n", stderr );
-                exit( EXIT_FAILURE );
+            if (pz = pzBase + 2) {
+                free( pzBase );
+                pzBase = NULL;
             }
+            else
+                *pz = NUL;
         }
 
         /*
          *  IF no pattern or it does not look like a name, ...
          */
-        if (zBase[2] == NUL) {
+        if (pzBase == NULL) {
+            char zSrch[ MAXPATHLEN ];
             if (getcwd( zSrch, sizeof( zSrch )) == (char*)NULL) {
                 fprintf( stderr, "Error %d (%s) on getcwd\n", errno,
                          strerror( errno ));
@@ -988,7 +992,9 @@ startAutogen( void )
             if (pz == (char*)NULL)
                  pz = zSrch;
             else pz++;
-            snprintf( zBase+2, sizeof(zBase)-2, "%s", pz );
+            pzBase = malloc( strlen( pz ) + 3 );
+            strcpy( pzBase, "-b" );
+            strcpy( pzBase+2, pz );
         }
     }
 
@@ -997,11 +1003,8 @@ startAutogen( void )
      *  If not, then whatever we decided our base name was will also
      *  be our template name.
      */
-    if (HAVE_OPT( TEMPLATE )) {
-        strcpy( zTemplName, OPT_ARG( TEMPLATE ));
-    } else {
-        strcpy( zTemplName, zBase+2 );
-    }
+    if (! HAVE_OPT( TEMPLATE ))
+        SET_OPT_TEMPLATE( strdup( pzBase+2 ));
 
     /*
      *  Now, what kind of output have we?
@@ -1092,6 +1095,7 @@ startAutogen( void )
                          errno, strerror( errno ));
                 exit( EXIT_FAILURE );
             }
+            free( pzBase );
             return agFp;
         }
     }
@@ -1124,7 +1128,7 @@ startAutogen( void )
             } while (--ct > 0);
         }
 
-        *pparg++ = zBase;
+        *pparg++ = pzBase;
         *pparg++ = "--";
         *pparg++ = "-";
         *pparg++ = (char*)NULL;

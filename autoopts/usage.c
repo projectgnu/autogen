@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.15 2003/03/11 03:34:47 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.16 2003/03/13 04:08:04 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -417,24 +417,14 @@ printExtendedUsage(
     switch (pOD->optMinCt) {
     case 1:
     case 0:
-        /*
-         *  IF the max is more than one, print an "UP TO" message
-         */
         switch (pOD->optMaxCt) {
-        case 0:
-            fputs( zPreset, option_usage_fp );
-            break;
-
-        case 1:
-            break;
-
-        case NOLIMIT:
-            fputs( zNoLim, option_usage_fp );
-            break;
-
-        default:
-            fprintf( option_usage_fp, zUpTo, pOD->optMaxCt );
-            break;
+        case 0:       fputs( zPreset, option_usage_fp ); break;
+        case NOLIMIT: fputs( zNoLim, option_usage_fp );  break;
+        case 1:       break;
+            /*
+             * IF the max is more than one but limited, print "UP TO" message
+             */
+        default:      fprintf( option_usage_fp, zUpTo, pOD->optMaxCt );  break;
         }
         break;
 
@@ -471,38 +461,50 @@ printBareUsage(
         fprintf( option_usage_fp, "   -%c", pOD->optValue );
         if (  (pOptions->fOptSet & (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
            == (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
-            fputc( ',', option_usage_fp );
+            fputs( ", ", option_usage_fp );
     }
 
     {
         char  z[ 80 ];
         tCC*  pzArgType;
+
         /*
-         *  convert arg type code into a string
+         *  Determine the argument type string first on its usage, then,
+         *  when the option argument is required, base the type string on the
+         *  argument type.
          */
-        if ((pOD->fOptState & OPTST_NUMERIC) != 0)
-            pzArgType = pAT->pzNum;
-
-        else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
-            pzArgType = pAT->pzBool;
-
-        else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
-            displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
-            pzArgType = pAT->pzKey;
-        }
-
-        else switch (pOD->optArgType) {
-        case ':': pzArgType = pAT->pzStr; break;
-        case '?': pzArgType = pAT->pzOpt; break;
-        default:
-        case ' ': pzArgType = pAT->pzNo;  break;
+        switch (pOD->optArgType) {
+        default:       goto bogus_desc;
+        case ARG_MAY:  pzArgType = pAT->pzOpt; break;
+        case ARG_NONE: pzArgType = pAT->pzNo;  break;
+        case ARG_MUST:
+            switch ( pOD->fOptState
+                   & (OPTST_NUMERIC|OPTST_BOOLEAN|OPTST_ENUMERATION)) {
+            case OPTST_ENUMERATION: pzArgType = pAT->pzKey;  break;
+            case OPTST_BOOLEAN:     pzArgType = pAT->pzBool; break;
+            case OPTST_NUMERIC:     pzArgType = pAT->pzNum;  break;
+            case 0:                 pzArgType = pAT->pzStr;  break;
+            default:                goto bogus_desc;         break;
+            }
         }
 
         snprintf( z, sizeof(z), pAT->pzOptFmt, pzArgType, pOD->pz_Name,
                   (pOD->optMinCt != 0) ? pAT->pzReq : pAT->pzOpt );
 
         fprintf( option_usage_fp, zOptFmtLine, z, pOD->pzText );
+
+        if (pOD->fOptState & OPTST_ENUMERATION)
+            displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
     }
+    return;
+
+ bogus_desc:
+    {
+        tSCC zErr[] =
+            "AutoOpts ERROR:  invalid option descriptor for %s\n";
+        fprintf( stderr, zErr, pOD->pz_Name );
+    }
+    exit( EXIT_FAILURE );
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -517,7 +519,7 @@ printBareUsage(
  *  These formats are used immediately after the option flag (if used) has
  *  been printed.
  */
-tSCC zGnuOptFmt[]       = " --%2$s%1$s";
+tSCC zGnuOptFmt[]       = "--%2$s%1$s";
 tSCC zShrtGnuOptFmt[]   = "%s";
 tSCC zNrmOptFmt[]       = " %3s %s";
 tSCC zReqOptFmt[]       = " %3s %-14s %s";
@@ -532,7 +534,7 @@ tSCC zGnuReqArg[]       = " ";
 tSC  zGnuNumArg[]       = "=num";
 tSC  zGnuKeyArg[]       = "=KWd";
 tSC  zGnuBoolArg[]      = "=T/F";
-tSC  zGnuOptArg[]       = "[=opt]";
+tSC  zGnuOptArg[]       = "[=arg]";
 #define zGnuNoArg       zGnuReqArg
 tSCC zGnuBreak[]        = "\n%s\n\n";
 tSCC zGnuSpace[]        = "      ";
@@ -612,11 +614,11 @@ setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
     switch (pOpts->fOptSet & OPTPROC_L_N_S) {
     case OPTPROC_L_N_S:    gnuTypes.pzOptFmt = zGnuOptFmt;     break;
     case OPTPROC_LONGOPT:  gnuTypes.pzOptFmt = zGnuOptFmt;     break;
-    case 0:                gnuTypes.pzOptFmt = zGnuOptFmt + 3; break;
+    case 0:                gnuTypes.pzOptFmt = zGnuOptFmt + 2; break;
     case OPTPROC_SHORTOPT:
         gnuTypes.pzOptFmt = zShrtGnuOptFmt;
         zGnuStrArg[0] = zGnuNumArg[0] = zGnuKeyArg[0] = zGnuBoolArg[0] = ' ';
-        gnuTypes.pzOpt = " [opt]";
+        gnuTypes.pzOpt = " [arg]";
         flen = 8;
         break;
     }

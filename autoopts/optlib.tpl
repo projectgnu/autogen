@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.5 2003/02/16 00:04:40 bkorb Exp $
+# $Id: optlib.tpl,v 3.6 2003/03/13 04:08:04 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -24,42 +24,42 @@ Emit the "#define SET_OPT_NAME ..." and "#define DISABLE_OPT_NAME ..."
 
 =][=
 
-DEFINE set_defines set_desc set_index opt_state =]
+DEFINE set-defines set-desc set-index opt-state =]
 #define SET_[=(. opt-name)=][=
-  IF (exist? "arg_type")=](a)[=ENDIF=]   STMTS( \
-        [=set_desc=].optActualIndex = [=(for-index)=]; \
-        [=set_desc=].optActualValue = VALUE_[=(. opt-name)=]; \
-        [=set_desc=].fOptState &= OPTST_PERSISTENT; \
-        [=set_desc=].fOptState |= [=opt_state=][=
-  IF (exist? "arg_type")=]; \
-        [=set_desc=].pzLastArg  = (char*)(a)[=
+  IF (exist? "arg-type")=](a)[=ENDIF=]   STMTS( \
+        [=set-desc=].optActualIndex = [=(for-index)=]; \
+        [=set-desc=].optActualValue = VALUE_[=(. opt-name)=]; \
+        [=set-desc=].fOptState &= OPTST_PERSISTENT; \
+        [=set-desc=].fOptState |= [=opt-state=][=
+  IF (exist? "arg-type")=]; \
+        [=set-desc=].pzLastArg  = (char*)(a)[=
   ENDIF  =][=
-  IF (or (exist? "call_proc")
-         (exist? "flag_code")
-         (exist? "extract_code")
-         (exist? "flag_proc")
-         (exist? "arg_range")
+  IF (or (exist? "call-proc")
+         (exist? "flag-code")
+         (exist? "extract-code")
+         (exist? "flag-proc")
+         (exist? "arg-range")
          (exist? "stack_arg")
-         (~* (get "arg_type") "key|num|bool" ) )   =]; \
+         (~* (get "arg-type") "key|num|bool" ) )   =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                            (. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set_index=] )[=
+                [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
   ENDIF "callout procedure exists" =] )[=
 
   IF (exist? "disable") =]
 #define DISABLE_[=(. opt-name)=]   STMTS( \
-        [=set_desc=].fOptState &= OPTST_PERSISTENT; \
-        [=set_desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
-        [=set_desc=].pzLastArg  = NULL[=
-    IF (or (exist? "call_proc")
-           (exist? "flag_code")
-           (exist? "extract_code")
-           (exist? "flag_proc")
-           (exist? "arg_range")
+        [=set-desc=].fOptState &= OPTST_PERSISTENT; \
+        [=set-desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
+        [=set-desc=].pzLastArg  = NULL[=
+    IF (or (exist? "call-proc")
+           (exist? "flag-code")
+           (exist? "extract-code")
+           (exist? "flag-proc")
+           (exist? "arg-range")
            (exist? "stack_arg") ) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=
                   (. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set_index=] )[=
+                [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
     ENDIF "callout procedure exists" =] )[=
 
   ENDIF disable exists =][=
@@ -123,9 +123,9 @@ DEFINE Option_Defines      =][=
     ENDIF ifdef/ifndef     =][=
   ENDIF =][=
 
-  IF (=* (get "arg_type") "key") =]
+  IF (=* (get "arg-type") "key") =]
 typedef enum {[=
-         IF (not (exist? "arg_default")) =] [=
+         IF (not (exist? "arg-default")) =] [=
             (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
          ENDIF  =]
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
@@ -149,7 +149,7 @@ typedef enum {[=
      ELSE                 =][= (+ (for-index) 96) =][=
      ENDIF =][=
 
-  CASE arg_type  =][=
+  CASE arg-type  =][=
 
   =*  num        =]
 #define [=(. UP-prefix)=]OPT_VALUE_[=(sprintf "%-14s" UP-name)
@@ -177,18 +177,18 @@ typedef enum {[=
     IF  (or (not (exist? "equivalence"))
             (= (get "equivalence") UP-name)) =][=
 
-      set_defines
-           set_desc  = (string-append UP-prefix "DESC(" UP-name ")" )
-           set_index = (for-index)
-           opt_state = OPTST_SET =][=
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
+           set-index = (for-index)
+           opt-state = OPTST_SET =][=
 
     ELSE "not equivalenced"   =][=
-      set_defines
-           set_desc  = (string-append UP-prefix "DESC("
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC("
                            (string-upcase! (get "equivalence")) ")" )
-           set_index = (string-append "INDEX_" UP-prefix "OPT_"
+           set-index = (string-append "INDEX_" UP-prefix "OPT_"
                            (string-upcase! (get "equivalence")) )
-           opt_state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
+           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
     ENDIF is/not equivalenced =][=
 
@@ -261,14 +261,14 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
     #  Check for special attributes:  a default value
     #  and conflicting or required options
     =][=
-    IF (exist? "arg_default")   =][=
-       CASE arg_type            =][=
+    IF (exist? "arg-default")   =][=
+       CASE arg-type            =][=
        =* num                   =]
 #define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)[= arg_default =])[=
+         =]((tCC*)[= arg-default =])[=
 
        =* bool                  =][=
-          CASE arg_default      =][=
+          CASE arg-default      =][=
           ~ n.*|f.*|0           =]
 #define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
          =]((tCC*)AG_FALSE)[=
@@ -280,19 +280,19 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* key                   =]
 #define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
          =]((tCC*)[=
-          IF (=* (get "arg_default") (string-append Cap-prefix cap-name))
-            =][= arg_default    =][=
+          IF (=* (get "arg-default") (string-append Cap-prefix cap-name))
+            =][= arg-default    =][=
           ELSE  =][=(string-append UP-prefix UP-name)=]_[=
-                    (string-upcase! (get "arg_default"))=][=
+                    (string-upcase! (get "arg-default"))=][=
           ENDIF =])[=
 
        =* str                   =]
 tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
-         =]= [=(kr-string (get "arg_default"))=];[=
+         =]= [=(kr-string (get "arg-default"))=];[=
 
        *                        =][=
           (error (string-append cap-name
-                 " has arg_default, but no valid arg_type"))  =][=
+                 " has arg-default, but no valid arg-type"))  =][=
        ESAC                     =][=
     ENDIF                       =][=
 
@@ -314,7 +314,7 @@ static const int
       ENDFOR flags_cant =] NO_EQUIVALENT };[=
     ENDIF =]
 #define [=(. UP-name)=]_FLAGS       ([=
-         CASE arg_type  =][=
+         CASE arg-type  =][=
          =*   num       =]OPTST_NUMERIC | [=
          =*   bool      =]OPTST_BOOLEAN | [=
          =*   key       =]OPTST_ENUMERATION | [=
@@ -368,7 +368,7 @@ tSCC    z[=(. cap-name)=]Text[] =
 #define VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
-      IF (exist? "arg_default") =]
+      IF (exist? "arg-default") =]
 #define z[=(. cap-name)=]DefaultArg NULL[=
       ENDIF =][=
 
@@ -408,9 +408,9 @@ DEFINE Option_Descriptor =][=
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ [=
-         IF   (exist? "call_proc")        =][=call_proc=][=
-         ELIF (or (exist? "extract_code")
-                  (exist? "flag_code"))   =]doOpt[=(. cap-name)=][=
+         IF   (exist? "call-proc")        =][=call-proc=][=
+         ELIF (or (exist? "extract-code")
+                  (exist? "flag-code"))   =]doOpt[=(. cap-name)=][=
          ELSE                             =]NULL[=
          ENDIF =],
      /* desc, NAME, name */ z[=(. cap-name)=]Text, NULL, NULL,
@@ -430,8 +430,8 @@ DEFINE Option_Descriptor =][=
               =][=(for-index)=], VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=],[=
           ENDIF=]
      /* option argument  */ ARG_[=
-         IF (not (exist? "arg_type"))  =]NONE[=
-         ELIF (exist? "arg_optional")  =]MAY[=
+         IF (not (exist? "arg-type"))  =]NONE[=
+         ELIF (exist? "arg-optional")  =]MAY[=
          ELSE                          =]MUST[=
          ENDIF =],
      /* equivalenced to  */ [=
@@ -446,7 +446,7 @@ DEFINE Option_Descriptor =][=
          (if (exist? "max") (get "max") "1")=], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
      /* last opt argumnt */ [=
-         IF (exist? "arg_default")
+         IF (exist? "arg-default")
               =](char*)z[=(. cap-name)=]DefaultArg[=
          ELSE =]NULL[= ENDIF =],
      /* arg list/cookie  */ NULL,
@@ -458,13 +458,13 @@ DEFINE Option_Descriptor =][=
          ELSE                    =]NULL[=
          ENDIF=],
      /* option proc      */ [=
-         IF   (exist? "call_proc")        =][=call_proc=][=
-         ELIF (or (exist? "extract_code")
-                  (exist? "flag_code")
-                  (exist? "arg_range"))   =]doOpt[=(. cap-name)=][=
+         IF   (exist? "call-proc")        =][=call-proc=][=
+         ELIF (or (exist? "extract-code")
+                  (exist? "flag-code")
+                  (exist? "arg-range"))   =]doOpt[=(. cap-name)=][=
 
-         ELIF (exist? "flag_proc") =]doOpt[= (string-capitalize!
-                                             (get "flag_proc")) =][=
+         ELIF (exist? "flag-proc") =]doOpt[= (string-capitalize!
+                                             (get "flag-proc")) =][=
 
          ELIF (exist? "stack_arg") =][=
            IF (or (not (exist? "equivalence"))
@@ -475,7 +475,7 @@ DEFINE Option_Descriptor =][=
            ENDIF          =][=
 
          ELSE             =][=
-           CASE arg_type  =][=
+           CASE arg-type  =][=
            =*   bool      =]optionBooleanVal[=
            =*   num       =]optionNumericVal[=
            =*   key       =]doOpt[=(. cap-name)=][=
@@ -512,7 +512,7 @@ DEFINE USAGE_LINE   =][=
 
   ;;  Compute the option arguments
   ;;
-  (if (exist? "flag.arg_type")
+  (if (exist? "flag.arg-type")
       (begin
         (define flag-arg " [<val>]")
         (define  opt-arg "[{=| }<val>]") )

@@ -269,7 +269,7 @@ all the letters to upper case.  The result will be inserted into the
 output document.
 
 If you have compiled AutoGen, you can copy out the template and definitions
-as described above and run ``@code{autogen list.def}''.  This will produce
+as described above and run @code{autogen list.def}.  This will produce
 exactly the hypothesized desired output.
 
 One more point, too.  Lets say you decided it was too much trouble to figure
@@ -1918,6 +1918,17 @@ client programs will accept.  They specify option definitions
 that get @code{#include}-d into the client option definitions
 and they specify an "anchor" option that has a callback and must be invoked.
 That will give the library access to the option state for their options.
+
+@item
+The generated usage text can be emitted in either AutoOpts standard
+format (maximizing the information about each option), or GNU-ish
+normal form.  The default form is selected by either specifying or not
+specifying the @code{gnu-usage} attribute (@pxref{information attributes}).
+This can be overridden by the user himself with the
+@code{AUTOOPTS_USAGE} environment variable.  If it exists and is set
+to the string @code{gnu}, it will force GNU-ish style format; if it is
+set to the string @code{autoopts}, it will force AutoOpts standard
+format; otherwise, it will have no effect.
 @end enumerate
 
 @noindent
@@ -2150,6 +2161,8 @@ the flexibility is there.
 
 @menu
 * program attributes::        Program Description Attributes
+* information attributes::    Program Information Attributes
+* generated main::            Generated main Procedures
 * option attributes::         Option Attributes
 * documentation attributes::  Man and Info doc Attributes
 * automatic options::         Automatically Supported Options
@@ -2160,10 +2173,11 @@ the flexibility is there.
 @subsection Program Description Attributes
 @cindex program attributes
 
-The following global option definitions are used to define attributes of
-the entire program.  The first two are required of every program.  The
-rest have been alphabetized.  Except as noted, there may be only one
-copy of each of these definitions:
+The following global definitions are used to define attributes of the entire
+program.  These generally alter the configuration or global behavior of the
+AutoOpts option parser.  The first two are required of every program.  The
+rest have been alphabetized.  Except as noted, there may be only one copy of
+each of these definitions:
 
 @table @samp
 @cindex prog-name
@@ -2174,21 +2188,6 @@ are derived using @code{string->c_name!} (@pxref{SCM string->c-name!}).
 @cindex prog-title
 @item prog-title
 This attribute is required and may be any descriptive text.
-
-@cindex prog-desc
-@item prog-desc @strong{and}
-@cindex opts-ptr
-@itemx opts-ptr
-These define global pointer variables that point to the program
-descriptor and the first option descriptor for a library option.  This
-is intended for use by certain libraries that need command line and/or
-initialization file option processing.  These definitions have no effect
-on the option template output, but are used for creating a library
-interface file.  Normally, the first "option" for a library will be a
-documentation option that cannot be specified on the command line, but
-is marked as @code{settable}.  The library client program will invoke the
-@code{SET_OPTION} macro which will invoke a handler function that will
-finally set these global variables.
 
 @cindex allow-errors
 @item allow-errors
@@ -2207,12 +2206,171 @@ absence of command line argument following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
 
+@cindex environrc
+@item environrc
+Indicates looking in the environment for values of variables named,
+@code{PROGRAM_OPTNAME}, where @code{PROGRAM} is the upper cased
+@code{C-name} of the program and @code{OPTNAME} is the upper cased
+@code{C-name} of the option.  The @code{C-name}s are the regular
+names with all special characters converted to underscores (@code{_}).
+
+If a particular option may be disabled, then its disabled state
+is indicated by setting the value to the disablement prefix.
+So, for example, if the disablement prefix were @code{dont}, then
+you can disable the @code{optname} option by setting the
+@code{PROGRAM_OPTNAME}' environment variable to `@i{dont}'.
+@xref{Common Attributes}.
+
+@cindex export
+@item export
+This string is inserted into the .h interface file.  Generally used for
+global variables or @code{#include} directives required by
+@code{flag_code} text and shared with other program text.
+Do not specify your configuration header (@file{config.h}) in this
+attribute or the @code{include} attribute, however.  Instead, use
+@code{config-header}, below.
+
+@cindex config-header
+@item config-header
+The contents of this attribute should be just the name of the configuration
+file.  A "#include" naming this file will be inserted at the top of the
+generated header.
+
+@cindex homerc
+@item homerc
+Specifies either a directory or a file using a specific path (like @code{.}
+or @file{/usr/local/share/progname}) or an environment variable (like
+@file{$HOME/rc/} or @file{$PREFIX/share/progname}) or the directory
+where the executable was found (@file{$$[/...]}) to use to try to find
+the rcfile.  Use as many as you like.  The presence of this attribute
+activates the @code{--save-opts} and @code{--load-opts} options.
+@xref{loading rc files}.
+
+@cindex include
+@item include
+This string is inserted into the .c file.  Generally used for global
+variables required only by @code{flag_code} program text.
+
+@cindex long-opts
+@cindex named option mode
+@item long-opts
+Presence indicates GNU-standard long option processing.  If any options
+do not have an option value (flag character) specified, and least one
+does specify such a value, then you must specify @code{long-opts}.  If
+none of your options specify an option value (flag character) and you do
+not specify @code{long-opts}, then command line arguments are processed
+in "named option mode".  This means that:
+
+@itemize @bullet
+@item
+Every command line argument must be a long option.
+@item
+The flag markers @code{-} and @code{--} are completely optional.
+@item
+The @code{argument} program attribute is disallowed.
+@item
+One of the options may be specified as the default
+(as long as it has a required option argument).
+@end itemize
+
+@cindex prefix
+@item prefix
+This value is inserted into @strong{all} global names.  This will
+disambiguate them if more than one set of options are to be compiled
+into a single program.
+
+@cindex rcfile
+@item rcfile
+Specifies the initialization file name.  This is only useful if you
+have provided at least one @code{homerc} attribute.
+@noindent
+default: .<prog-name>rc
+
+@cindex version
+@item version
+Specifies the program version and activates the VERSION option,
+@xref{automatic options}.
+@end table
+
+@node generated main
+@subsection Generated main Procedures
+@cindex generated main
+
+AutoOpts can generate the main procedure in certain circumstances.
+It will do this to help with integrating with the guile library environment,
+and for creating a program to convert command line options into environment
+variables for use in processing shell script options and for
+testing the command line interface.
+
+@table @samp
 @cindex before-guile-boot
 @item before-guile-boot
 If @code{guile-main} has been specified and if this is specified
 as well, then this code will be inserted into the actual @code{main()}
 procedure before @code{gh_enter()} is called.
 
+@cindex guile-main
+@item guile-main
+Creates a guile-style main and inner-main procedures.
+The inner main procedure will call @code{optionProcess()} and will
+invoke any code specified by this attribute.  If this attribute
+does not specify any code, then calls to the AutoOpts library procedure
+@code{export_options_to_guile()} and then @code{scm_shell()} will
+be inserted into @code{inner_main()}.
+
+@cindex main-text
+@item main-text
+If you need to specify the content of the main procedure generated
+for the "option testing" program, you can do that with this attribute.
+The result will be a procedure that looks like this:
+
+@example
+int main( int argc, char** argv ) @{
+[+  main-text  +]
+    return EXIT_SUCCESS;
+@}
+@end example
+
+@cindex test-main
+@item test-main
+Creates a test main procedure for testing option processing.  The
+resulting program may also be used for several purposes.
+
+@enumerate
+@item
+If the text of @code{test-main} is short (3 or fewer characters), the
+generated main() will call putBourneShell.  That routine will emit
+Bourne shell commands that can be eval-ed by a Bourne-derived shell to
+incorporate the digested options into the shell's environment,
+@xref{shell options}.  You would use it thus:
+@example
+eval "`./programopts $@@`"
+test -z "$@{OPTION_CT@}" ] && exit 1
+test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
+@end example
+
+@item
+If the text of @code{test-main} contains @code{putShellParse}, the
+program will generate portable Bourne shell commands that will parse the
+command line options.  The expectation is that this result will be
+copied into a shell script and used there, @xref{shell options}.
+
+@item
+Any other text must be the name of a routine that you will write yourself.
+That routine will be called after processing the command line options
+and it will be passed the option processing descriptor pointer as its
+sole argument.
+@end enumerate
+@end table
+
+@node information attributes
+@subsection Program Information Attributes
+@cindex information attributes
+
+These attributes are used to define how and what information is displayed
+to the user of the program.
+
+@table @samp
 @cindex copyright
 @item copyright
 The @code{copyright} is a structured value containing three to five
@@ -2255,114 +2413,9 @@ copyright = @{
 This string is added to the usage output when the HELP option is
 selected.
 
-@cindex environrc
-@item environrc
-Indicates looking in the environment for values of variables named
-@*
-PROGRAM_OPTNAME.
-@*
-where @code{PROGRAM} is the upper cased C-name of the program and
-@code{OPTNAME} is the upper cased C-name of the option.  The
-@code{C-name}s are the regular names with all special characters
-converted to underscores (@code{_}).
-
-If a particular option may be disabled, then its disabled state
-is indicated by setting the value to the disablement prefix.
-So, for example, if the disablement prefix were @code{dont}, then
-you can disable the @code{optname} option by setting the
-@code{PROGRAM_OPTNAME} environment variable to `@i{dont}'.
-@xref{Common Attributes}.
-
 @cindex explain
 @item explain
 Gives additional information whenever the usage routine is invoked..
-
-@cindex export
-@item export
-This string is inserted into the .h interface file.  Generally used for
-global variables or @code{#include} directives required by
-@code{flag_code} text and shared with other program text.
-Do not specify your configuration header (@file{config.h}) in this
-attribute or the @code{include} attribute, however.  Instead, use
-@code{config-header}, below.
-
-@cindex config-header
-@item config-header
-The contents of this attribute should be just the name of the configuration
-file.  A "#include" naming this file will be inserted at the top of the
-generated header.
-
-@cindex guile-main
-@item guile-main
-Creates a guile-style main and inner-main procedures.
-The inner main procedure will call @code{optionProcess()} and will
-invoke any code specified by this attribute.  If this attribute
-does not specify any code, then calls to the AutoOpts library procedure
-@code{export_options_to_guile()} and then @code{scm_shell()} will
-be inserted into @code{inner_main()}.
-
-@cindex homerc
-@item homerc
-Specifies either a directory or a file using a specific path (like @code{.}
-or @file{/usr/local/share/progname}) or an environment variable (like
-@file{$HOME/rc/} or @file{$PREFIX/share/progname}) or the directory
-where the executable was found (@file{$$[/...]}) to use to try to find
-the rcfile.  Use as many as you like.  The presence of this attribute
-activates the @code{--save-opts} and @code{--load-opts} options.
-@xref{loading rc files}.
-
-@cindex include
-@item include
-This string is inserted into the .c file.  Generally used for global
-variables required only by @code{flag_code} program text.
-
-@cindex long-opts
-@cindex named option mode
-@item long-opts
-Presence indicates GNU-standard long option processing.  If any options
-do not have an option value (flag character) specified, and least one
-does specify such a value, then you must specify @code{long-opts}.  If
-none of your options specify an option value (flag character) and you do
-not specify @code{long-opts}, then command line arguments are processed
-in "named option mode".  This means that:
-
-@itemize @bullet
-@item
-Every command line argument must be a long option.
-@item
-The flag markers @code{-} and @code{--} are completely optional.
-@item
-The @code{argument} program attribute is disallowed.
-@item
-One of the options may be specified as the default
-(as long as it has a required option argument).
-@end itemize
-
-@cindex main-text
-@item main-text
-If you need to specify the content of the main procedure generated
-for the "option testing" program, you can do that with this attribute.
-The result will be a procedure that looks like this:
-
-@example
-int main( int argc, char** argv ) @{
-[+  main-text  +]
-    return EXIT_SUCCESS;
-@}
-@end example
-
-@cindex prefix
-@item prefix
-This value is inserted into @strong{all} global names.  This will
-disambiguate them if more than one set of options are to be compiled
-into a single program.
-
-@cindex rcfile
-@item rcfile
-Specifies the initialization file name.  This is only useful if you
-have provided at least one @code{homerc} attribute.
-@noindent
-default: .<prog-name>rc
 
 @cindex preserve-case
 @item preserve-case
@@ -2371,6 +2424,21 @@ Normally, the option names are all documented in lower case.
 However, if you specify this attribute, then they will display
 in the case used in their specification.  Command line options
 will still be matched without case sensitivity.
+
+@cindex prog-desc
+@item prog-desc @strong{and}
+@cindex opts-ptr
+@itemx opts-ptr
+These define global pointer variables that point to the program
+descriptor and the first option descriptor for a library option.  This
+is intended for use by certain libraries that need command line and/or
+initialization file option processing.  These definitions have no effect
+on the option template output, but are used for creating a library
+interface file.  Normally, the first "option" for a library will be a
+documentation option that cannot be specified on the command line, but
+is marked as @code{settable}.  The library client program will invoke the
+@code{SET_OPTION} macro which will invoke a handler function that will
+finally set these global variables.
 
 @cindex rcsection
 @item rcsection
@@ -2391,37 +2459,6 @@ matching section is searched for.
 For exampe, if the @code{fumble-stumble} options had a sectioned RC file,
 then a line containing @code{[FUMBLE_STUMBLE]} would be searched for.
 
-@cindex test-main
-@item test-main
-Creates a test main procedure for testing option processing.  The
-resulting program may also be used for several purposes.
-
-@enumerate
-@item
-If the text of @code{test-main} is short (3 or fewer characters), the
-generated main() will call putBourneShell.  That routine will emit
-Bourne shell commands that can be eval-ed by a Bourne-derived shell to
-incorporate the digested options into the shell's environment,
-@xref{shell options}.  You would use it thus:
-@example
-eval "`./programopts $@@`"
-test -z "$@{OPTION_CT@}" ] && exit 1
-test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
-@end example
-
-@item
-If the text of @code{test-main} contains @code{putShellParse}, the
-program will generate portable Bourne shell commands that will parse the
-command line options.  The expectation is that this result will be
-copied into a shell script and used there, @xref{shell options}.
-
-@item
-Any other text must be the name of a routine that you will write yourself.
-That routine will be called after processing the command line options
-and it will be passed the option processing descriptor pointer as its
-sole argument.
-@end enumerate
-
 @cindex usage
 @item usage
 Optionally names the usage procedure, if the library routine
@@ -2430,9 +2467,14 @@ Optionally names the usage procedure, if the library routine
 you will use a procedure by that name for displaying usage.
 Of course, you will need to provide that procedure.
 
-@cindex version
-@item version
-Specifies the program version and activates the VERSION option.
+@cindex gnu-usage
+@item gnu-usage
+Normally, the default format produced by the @code{optionUsage} procedure
+is @i{AutoOpts Standard}.  By specifying this attribute, the default format
+will be @i{GNU-ish style}.  Either default may be overridden by the user with
+the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
+or @code{autoopts}, it will alter the style appropriately.  This attribute
+will conflict with the @code{usage} attribute.
 @end table
 
 @node option attributes
@@ -2441,13 +2483,12 @@ Specifies the program version and activates the VERSION option.
 
 For each option you wish to specify, you must have a block macro named
 @code{flag} defined.  There are two required attributes: @code{name} and
-@code{descrip}.  If any options do not have a @code{value} (traditional
-flag character) attribute, then the @code{long-opts} global text macro
-must also be defined.  As a special exception, if no options have a
-@code{value} @strong{and} @code{long-opts} is not defined @strong{and}
-@code{argument} is not defined, then all arguments to the program are
-named.  In this case, the @code{-} and @code{--} command line option
-markers are optional.
+@code{descrip}.  If any options do not have a @code{value} (traditional flag
+character) attribute, then the @code{long-opts} global text macro must also
+be defined.  As a special exception, if no options have a @code{value}
+@strong{and} @code{long-opts} is not defined @strong{and} @code{argument} is
+not defined, then all arguments to the program are named.  In this case, the
+@code{-} and @code{--} command line option markers are optional.
 
 @menu
 * Required Attributes::         Required Attributes
@@ -2945,19 +2986,18 @@ section and before the @code{AUTHOR} section.
 
 AutoOpts provides automated support for five options.  @code{help} and
 @code{more-help} are always provided.  @code{version} is provided if
-@code{version} is defined in the option definitions.  @code{save-opts}
-and @code{load-opts} are provided if at least one @code{homerc} is
-defined.
+@code{version} is defined in the option definitions @xref{program attributes}.
+@code{save-opts} and @code{load-opts} are provided if at least
+one @code{homerc} is defined @xref{program attributes}.
 
-Below are the option names and flag values.  The flags are activated if
-and only if at least one user-defined option also uses a flag value.
-These flags may be deleted or changed to characters of your choosing by
-specifying @code{xxx-value = "y";}, where @code{xxx}
-is one of the five names below and @code{y} is either empty or the
-character of your choice.  For example, to change the help flag from
-@code{?} to @code{h}, specify @code{help-value = "h";}; and to require
-that @code{save-opts} be specified only with its long option name,
-specify @code{save-opts-value = "";}.
+Below are the option names and flag values.  The flags are activated if and
+only if at least one user-defined option also uses a flag value.  These
+flags may be deleted or changed to characters of your choosing by specifying
+@code{xxx-value = "y";}, where @code{xxx} is one of the five names below and
+@code{y} is either empty or the character of your choice.  For example, to
+change the help flag from @code{?} to @code{h}, specify @code{help-value = "h";};
+and to require that @code{save-opts} be specified only with its long
+option name, specify @code{save-opts-value = "";}.
 
 @table @samp
 @item help -?
@@ -2974,42 +3014,37 @@ a pager program.  (@code{more} by default, or the program identified
 by the @code{PAGER} environment variable.)
 
 @item version -v
-This will print the program name, title and version.
-If it is followed by the letter @code{c} and
-a value for @code{copyright} and @code{owner} have been provided,
-then the copyright will be printed, too.
-If it is followed by the letter @code{n}, then the full
-copyright notice (if available) will be printed.
+This will print the program name, title and version.  If it is followed by
+the letter @code{c} and a value for @code{copyright} and @code{owner} have
+been provided, then the copyright will be printed, too.  If it is followed
+by the letter @code{n}, then the full copyright notice (if available) will
+be printed.
 
 @item save-opts ->
-This option will cause the option state to be printed in
-RC/INI file format when option processing is done but not
-yet verified for consistency.  The program will terminate
-successfully without running when this has completed.
-Note that for most shells you will have to quote or escape the
-flag character to restrict special meanings to the shell.
+This option will cause the option state to be printed in RC/INI file format
+when option processing is done but not yet verified for consistency.  The
+program will terminate successfully without running when this has completed.
+Note that for most shells you will have to quote or escape the flag
+character to restrict special meanings to the shell.
 
-The output file will be the RC/INI file name (default or provided
-by @code{rcfile}) in the last directory named in a @code{homerc}
-definition.
+The output file will be the RC/INI file name (default or provided by
+@code{rcfile}) in the last directory named in a @code{homerc} definition.
 
 This option may be set from within your program by invoking the
 "@code{SET_OPT_SAVE_OPTS(@i{filename})}" macro (@pxref{SET_OPT_name}).
-Invoking this macro will set the file name for saving the option
-processing state, but the state will @strong{not} actually be saved.
-You must call @code{optionSaveFile} to do that
-(@pxref{libopts-optionSaveFile}).  @strong{CAVEAT:} if, after invoking
-this macro, you call @code{optionProcess}, the option processing state
-will be saved to this file and @code{optionProcess} will not return.
-You may wish to invoke @code{CLEAR_OPT( SAVE_OPTS )}
-(@pxref{CLEAR_OPT}) beforehand.
+Invoking this macro will set the file name for saving the option processing
+state, but the state will @strong{not} actually be saved.  You must call
+@code{optionSaveFile} to do that (@pxref{libopts-optionSaveFile}).
+@strong{CAVEAT:} if, after invoking this macro, you call
+@code{optionProcess}, the option processing state will be saved to this file
+and @code{optionProcess} will not return.  You may wish to invoke
+@code{CLEAR_OPT( SAVE_OPTS )} (@pxref{CLEAR_OPT}) beforehand.
 
 @item load-opts -<
-This option will load options from the named file.  They
-will be treated exactly as if they were loaded from the
-normally found RC/INI files, but will not be loaded until
-the option is actually processed.  This can also be used
-within an RC/INI file causing them to nest.
+This option will load options from the named file.  They will be treated
+exactly as if they were loaded from the normally found RC/INI files, but
+will not be loaded until the option is actually processed.  This can also be
+used within an RC/INI file causing them to nest.
 
 It is ultimately intended that specifying the option,
 @code{no-load-opts} will suppress the processing of rc/ini files and
@@ -3832,7 +3867,7 @@ if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
 shift $@{OPTION_CT@}
 @end example
 
-If you had used ``@code{test-main = putShellParse}'' instead, then you can,
+If you had used @code{test-main = putShellParse} instead, then you can,
 at this point, merely run the program and it will write the parsing
 script to standard out.  You may also provide this program with command
 line options to specify the shell script file to create or edit, and you

@@ -176,17 +176,23 @@ DEFINE  emit-results   =][=
 
   IF (and (= (get "type") "withlib") (exist? "config")) =]
     AC_SUBST([LIB[=(. up-name)=]_CFLAGS])
-    AC_SUBST([LIB[=(. up-name)=]_LIBS])[=
+    AC_SUBST([LIB[=(. up-name)=]_LIBS])
+    AC_SUBST([LIB[=(. up-name)=]_PATH])[=
 
     (define good-subst 1)
     (define bad-subst  1)
-    (set! good-text (string-append good-text (sprintf "
+    (set! good-text (string-append good-text (sprintf "[
       LIB%1$s_CFLAGS=\"${%2$s_cflags}\"
-      LIB%1$s_LIBS=\"${%2$s_libs}\""
+      LIB%1$s_LIBS=\"${%2$s_libs}\"
+      case \"${LIB%1$s_LIBS}\" in *-L* )
+        LIB%1$s_PATH=`echo ${LIB%1$s_LIBS} | sed 's/.*-L[ \t]*//;s/[ \t].*//'`
+      ;; * ) LIB%1$s_PATH='' ;; esac]"
        up-name cv-name )))
 
-    (set! bad-text (string-append bad-text (sprintf
-    "\n      LIB%1$s_CFLAGS=''\n      LIB%1$s_LIBS=''"  up-name )))  =][=
+    (set! bad-text (string-append bad-text (sprintf "
+      LIB%1$s_CFLAGS=''
+      LIB%1$s_LIBS=''
+      LIB%1$s_PATH=''"  up-name )))  =][=
 
   ENDIF  type is withlib =][=
 
@@ -344,6 +350,14 @@ DEFINE  try-withlib             =][=
       [=(. cv-name)=]_root=no)
   ) # end of AC_ARG_WITH [=(. lib-name)=]
 
+  if test "${with_libguile+set}" = set && \
+     test "${withval}" = no
+  then ## disabled by request
+    [=(. cv-name)=]_root=no
+    [=(. cv-name)=]_cflags=no
+    [=(. cv-name)=]_libs=no
+  else
+
   AC_ARG_WITH([[=(. lib-name)=]-cflags],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
         =]-cflags], [[=(. lib-name)=] compile flags]),
@@ -417,6 +431,8 @@ DEFINE  try-withlib             =][=
   =][= # # # # set cflags/libs # # # #
 
 =]
+  fi ## disabled by request
+
   case "X${[=(. cv-name)=]_cflags}" in
   Xyes|Xno|X )
     [=(. cv-name)=]_cflags="" ;;

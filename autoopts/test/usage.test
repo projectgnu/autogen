@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2003-03-10 19:08:08 bkorb"
+## Time-stamp:      "2003-03-12 18:31:19 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 3.5 2003/03/11 03:34:47 bkorb Exp $
+# $Id: usage.test,v 3.6 2003/03/13 04:08:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,10 +29,10 @@ test_usage_LGFRA - Checkout usage_LGFRA Options
 USAGE:  usage_LGFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
 X
-X   -L, --check-dirs=str      Checkout directory list
-X   -s, --show-defs=num       Show the definition tree
-X   -?, --help                Display usage information and exit
-X   -!, --more-help           Extended usage information passed thru pager
+X   -L, --check-dirs=str       Checkout directory list
+X   -s, --show-defs[=arg]      Show the definition tree
+X   -?, --help                 Display usage information and exit
+X   -!, --more-help            Extended usage information passed thru pager
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
@@ -48,10 +48,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFRp.hlp'
 test_usage_LGFRp - Checkout usage_LGFRp Options
 USAGE:  usage_LGFRp { -<flag> | --<name> }... cmd-arg ...
 X
-X   -L, --check-dirs          Checkout directory list
-X   -s, --show-defs           Show the definition tree
-X   -?, --help                Display usage information and exit
-X   -!, --more-help           Extended usage information passed thru pager
+X   -L, --check-dirs           Checkout directory list
+X   -s, --show-defs            Show the definition tree
+X   -?, --help                 Display usage information and exit
+X   -!, --more-help            Extended usage information passed thru pager
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
@@ -68,10 +68,10 @@ test_usage_LGFoA - Checkout usage_LGFoA Options
 USAGE:  usage_LGFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
 X
-X   -L, --check-dirs=str      Checkout directory list
-X   -s, --show-defs=num       Show the definition tree
-X   -?, --help                Display usage information and exit
-X   -!, --more-help           Extended usage information passed thru pager
+X   -L, --check-dirs=str       Checkout directory list
+X   -s, --show-defs[=arg]      Show the definition tree
+X   -?, --help                 Display usage information and exit
+X   -!, --more-help            Extended usage information passed thru pager
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
@@ -87,10 +87,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFop.hlp'
 test_usage_LGFop - Checkout usage_LGFop Options
 USAGE:  usage_LGFop [ -<flag> | --<name> ]... cmd-arg ...
 X
-X   -L, --check-dirs          Checkout directory list
-X   -s, --show-defs           Show the definition tree
-X   -?, --help                Display usage information and exit
-X   -!, --more-help           Extended usage information passed thru pager
+X   -L, --check-dirs           Checkout directory list
+X   -s, --show-defs            Show the definition tree
+X   -?, --help                 Display usage information and exit
+X   -!, --more-help            Extended usage information passed thru pager
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
@@ -106,10 +106,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsRA.hlp'
 test_usage_LGsRA - Checkout usage_LGsRA Options
 USAGE:  usage_LGsRA { --<name>[{=| }<val>] }... cmd-arg ...
 X
-X   --check-dirs=str      Checkout directory list
-X   --show-defs=num       Show the definition tree
-X   --help                Display usage information and exit
-X   --more-help           Extended usage information passed thru pager
+X  --check-dirs=str       Checkout directory list
+X  --show-defs[=arg]      Show the definition tree
+X  --help                 Display usage information and exit
+X  --more-help            Extended usage information passed thru pager
 X
 Options are specified by single or double hyphens and their name.
 X
@@ -124,10 +124,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsRp.hlp'
 test_usage_LGsRp - Checkout usage_LGsRp Options
 USAGE:  usage_LGsRp { --<name> }... cmd-arg ...
 X
-X   --check-dirs          Checkout directory list
-X   --show-defs           Show the definition tree
-X   --help                Display usage information and exit
-X   --more-help           Extended usage information passed thru pager
+X  --check-dirs           Checkout directory list
+X  --show-defs            Show the definition tree
+X  --help                 Display usage information and exit
+X  --more-help            Extended usage information passed thru pager
 X
 Options are specified by single or double hyphens and their name.
 X
@@ -142,10 +142,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsoA.hlp'
 test_usage_LGsoA - Checkout usage_LGsoA Options
 USAGE:  usage_LGsoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X
-X   --check-dirs=str      Checkout directory list
-X   --show-defs=num       Show the definition tree
-X   --help                Display usage information and exit
-X   --more-help           Extended usage information passed thru pager
+X  --check-dirs=str       Checkout directory list
+X  --show-defs[=arg]      Show the definition tree
+X  --help                 Display usage information and exit
+X  --more-help            Extended usage information passed thru pager
 X
 Options are specified by single or double hyphens and their name.
 X
@@ -160,10 +160,10 @@ sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsop.hlp'
 test_usage_LGsop - Checkout usage_LGsop Options
 USAGE:  usage_LGsop [ --<name> ]... cmd-arg ...
 X
-X   --check-dirs          Checkout directory list
-X   --show-defs           Show the definition tree
-X   --help                Display usage information and exit
-X   --more-help           Extended usage information passed thru pager
+X  --check-dirs           Checkout directory list
+X  --show-defs            Show the definition tree
+X  --help                 Display usage information and exit
+X  --more-help            Extended usage information passed thru pager
 X
 Options are specified by single or double hyphens and their name.
 X
@@ -180,7 +180,7 @@ USAGE:  usage_LaFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L Str check-dirs     YES  Checkout directory list
-X   -s Num show-defs      opt  Show the definition tree
+X   -s opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
 X
@@ -219,7 +219,7 @@ USAGE:  usage_LaFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L Str check-dirs     Checkout directory list
-X   -s Num show-defs      Show the definition tree
+X   -s opt show-defs      Show the definition tree
 X   -? no  help           Display usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
 X
@@ -257,7 +257,7 @@ test_usage_LasRA - Checkout usage_LasRA Options
 USAGE:  usage_LasRA { --<name>[{=| }<val>] }... cmd-arg ...
 X   Arg Option-Name   Req?  Description
 X   Str check-dirs     YES  Checkout directory list
-X   Num show-defs      opt  Show the definition tree
+X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
 X
@@ -293,7 +293,7 @@ test_usage_LasoA - Checkout usage_LasoA Options
 USAGE:  usage_LasoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X   Arg Option-Name    Description
 X   Str check-dirs     Checkout directory list
-X   Num show-defs      Show the definition tree
+X   opt show-defs      Show the definition tree
 X   no  help           Display usage information and exit
 X   no  more-help      Extended usage information passed thru pager
 X
@@ -329,7 +329,7 @@ test_usage_sGFRA - Checkout usage_sGFRA Options
 USAGE:  usage_sGFRA { -<flag> [<val>] }... cmd-arg ...
 X
 X   -L str     Checkout directory list
-X   -s num     Show the definition tree
+X   -s [arg]   Show the definition tree
 X   -?         Display usage information and exit
 X   -!         Extended usage information passed thru pager
 X
@@ -363,7 +363,7 @@ test_usage_sGFoA - Checkout usage_sGFoA Options
 USAGE:  usage_sGFoA [ -<flag> [<val>] ]... cmd-arg ...
 X
 X   -L str     Checkout directory list
-X   -s num     Show the definition tree
+X   -s [arg]   Show the definition tree
 X   -?         Display usage information and exit
 X   -!         Extended usage information passed thru pager
 X
@@ -397,7 +397,7 @@ test_usage_sGsRA - Checkout usage_sGsRA Options
 USAGE:  usage_sGsRA { <option-name>[{=| }<val>] }...
 X
 X  check-dirs=str         Checkout directory list
-X  show-defs=num          Show the definition tree
+X  show-defs[=arg]        Show the definition tree
 X  help                   Display usage information and exit
 X  more-help              Extended usage information passed thru pager
 X
@@ -433,7 +433,7 @@ test_usage_sGsoA - Checkout usage_sGsoA Options
 USAGE:  usage_sGsoA [ <option-name>[{=| }<val>] ]...
 X
 X  check-dirs=str         Checkout directory list
-X  show-defs=num          Show the definition tree
+X  show-defs[=arg]        Show the definition tree
 X  help                   Display usage information and exit
 X  more-help              Extended usage information passed thru pager
 X
@@ -469,7 +469,7 @@ test_usage_saFRA - Checkout usage_saFRA Options
 USAGE:  usage_saFRA { -<flag> [<val>] }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L Str check-dirs     YES  Checkout directory list
-X   -s Num show-defs      opt  Show the definition tree
+X   -s opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
 X
@@ -503,7 +503,7 @@ test_usage_saFoA - Checkout usage_saFoA Options
 USAGE:  usage_saFoA [ -<flag> [<val>] ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L Str check-dirs     Checkout directory list
-X   -s Num show-defs      Show the definition tree
+X   -s opt show-defs      Show the definition tree
 X   -? no  help           Display usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
 X
@@ -537,7 +537,7 @@ test_usage_sasRA - Checkout usage_sasRA Options
 USAGE:  usage_sasRA { <option-name>[{=| }<val>] }...
 X   Arg Option-Name   Req?  Description
 X   Str check-dirs     YES  Checkout directory list
-X   Num show-defs      opt  Show the definition tree
+X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
 X
@@ -573,7 +573,7 @@ test_usage_sasoA - Checkout usage_sasoA Options
 USAGE:  usage_sasoA [ <option-name>[{=| }<val>] ]...
 X   Arg Option-Name    Description
 X   Str check-dirs     Checkout directory list
-X   Num show-defs      Show the definition tree
+X   opt show-defs      Show the definition tree
 X   no  help           Display usage information and exit
 X   no  more-help      Extended usage information passed thru pager
 X
@@ -606,7 +606,7 @@ SHAR_EOF
 # # # # # # # # # # DEFINITIONS FILES # # # # # # # # #
 nl='
 '
-function emit_defs()
+emit_defs()
 {
   exec 4> $1.def
   cat >&4 <<-  _EOF_

@@ -4,7 +4,7 @@
 #
 # Copyright (C) 1999-2003 Bruce Korb
 #
-# Time-stamp:        "2003-03-10 19:26:17 bkorb"
+# Time-stamp:        "2003-03-12 19:41:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 # ----------------------------------------------------------------------
@@ -12,7 +12,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".3pre4"
+AG_PATCHLEVEL=".3pre5"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -49,7 +49,7 @@ h='*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 
 printf "$h$h*\n\n" || :
 printf "                 A      U      T      O      G      E      N\n\n" || :
-printf "%-38s %39s\n" "$PACKAGE-$VERSION" "$soname" || :
+printf "%-38s %38s\n" "$PACKAGE-$VERSION" "$soname" || :
 printf "$h$h*\n" || :
 
 # VERSION ends here

@@ -3,23 +3,22 @@
 # ----------------------------------------------------------------------
 # opts.test --- Verify the handling of options
 #
-# Author:	     Bruce Korb <bkorb@gnu.org>
-# Maintainer:	     Bruce Korb <bkorb@gnu.org>
-# Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Time-stamp:       "2003-03-12 19:38:46 bkorb"
+# Author:	        Bruce Korb <bkorb@gnu.org>
+# Maintainer:	    Bruce Korb <bkorb@gnu.org>
+# Created:	        Sat Mar 28 14:21:31 1998
 #
-# $Id: opts.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: opts.test,v 3.1 2003/03/13 04:08:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
-if test -z "$srcdir"; then
+if test -z "${srcdir}"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    test -z "${srcdir}" && srcdir=.
+    test "${srcdir}" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
-. $srcdir/defs
+. ${srcdir}/defs
 
 #  Fetch the options files
 #
@@ -31,33 +30,29 @@ unstamp()
 
 workdir=`pwd`
 rm -f ../VERSION ./opts.* || :
-agopts=`
-  cd ..
-  cd $srcdir/..
 
-  unstamp opts.c $workdir/opts.c.base
-  unstamp opts.h $workdir/opts.h.base
+cd ${top_srcdir}/agen5
+unstamp opts.c ${workdir}/opts.c.base
+unstamp opts.h ${workdir}/opts.h.base
+cp opts.def ${workdir}/.
+cp -f ${top_srcdir}/VERSION ${workdir}/..
 
-  cp opts.def $workdir/
-  cp -f ../VERSION $workdir/..
-  cd ../autoopts
-  pwd` || exit 1
-
+cd ${workdir}
 set -x
 ls -l * ../VERSION > $testname.log
 
 echo Checking for "'define DEBUG'" options
-if grep 'define DEBUG' $srcdir/../opts.h
+if grep 'define DEBUG' ${srcdir}/../opts.h
 then
-  AGEXE="$AGEXE -L $agopts -DDEBUG=1"
+  AGEXE="$AGEXE -L ${top_srcdir}/autoopts -DDEBUG=1"
 else
-  AGEXE="$AGEXE -L $agopts"
+  AGEXE="$AGEXE -L ${top_srcdir}/autoopts"
 fi
 
 echo $AGEXE opts.def
 $AGEXE opts.def || {
   rm -f ../VERSION
-  failure $AGEXE $agopts opts.def
+  failure $AGEXE opts.def
 }
 
 rm -f ../VERSION
