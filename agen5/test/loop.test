@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # loop.test --- test FOR loop
 #
-# Time-stamp:        "2004-10-01 20:30:49 bkorb"
+# Time-stamp:        "2004-10-02 20:15:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/10/03 02:56:23 $
+# Last Modified:     $Date: 2004/10/03 03:17:12 $
 #            by: bkorb
 #
-# $Id: loop.test,v 3.2 2004/10/03 02:56:23 bkorb Exp $
+# $Id: loop.test,v 3.3 2004/10/03 03:17:12 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -28,21 +28,86 @@ cat > ${testname}.tpl <<-  _EOTPL_
 	[= AutoGen5 Template txt =]
 	${testname} Test
 	[= (define ix 0) (define ct 63) =][=
-	WHILE (< ix ct) =]
-	[= (set! ix (+ ix 1)) (sprintf "test %2d of %2d:  " ix ct)
-	=][= (tpl-file-loop "%2\$d") =][=
-	ENDWHILE=]
-	End ${testname} Test
+
+	WHILE (< ix ct) =][=
+	  (set! ix (+ ix 1)) =][=
+          (sprintf "test %2d of %2d:  %s\n"
+                    ix ct (tpl-file-line "%2\$d")) =][=
+	ENDWHILE
+
+	=]End ${testname} Test
 	_EOTPL_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
 echo creating ${testname}.out
 # this is the output we should expect to see
-cat > ${testname}.out <<- '_EOF_'
-	loop Test
-
-	End loop Test
+cat > ${testname}.out <<- _EOF_
+	${testname} Test
+	test  1 of 63:  7
+	test  2 of 63:  7
+	test  3 of 63:  7
+	test  4 of 63:  7
+	test  5 of 63:  7
+	test  6 of 63:  7
+	test  7 of 63:  7
+	test  8 of 63:  7
+	test  9 of 63:  7
+	test 10 of 63:  7
+	test 11 of 63:  7
+	test 12 of 63:  7
+	test 13 of 63:  7
+	test 14 of 63:  7
+	test 15 of 63:  7
+	test 16 of 63:  7
+	test 17 of 63:  7
+	test 18 of 63:  7
+	test 19 of 63:  7
+	test 20 of 63:  7
+	test 21 of 63:  7
+	test 22 of 63:  7
+	test 23 of 63:  7
+	test 24 of 63:  7
+	test 25 of 63:  7
+	test 26 of 63:  7
+	test 27 of 63:  7
+	test 28 of 63:  7
+	test 29 of 63:  7
+	test 30 of 63:  7
+	test 31 of 63:  7
+	test 32 of 63:  7
+	test 33 of 63:  7
+	test 34 of 63:  7
+	test 35 of 63:  7
+	test 36 of 63:  7
+	test 37 of 63:  7
+	test 38 of 63:  7
+	test 39 of 63:  7
+	test 40 of 63:  7
+	test 41 of 63:  7
+	test 42 of 63:  7
+	test 43 of 63:  7
+	test 44 of 63:  7
+	test 45 of 63:  7
+	test 46 of 63:  7
+	test 47 of 63:  7
+	test 48 of 63:  7
+	test 49 of 63:  7
+	test 50 of 63:  7
+	test 51 of 63:  7
+	test 52 of 63:  7
+	test 53 of 63:  7
+	test 54 of 63:  7
+	test 55 of 63:  7
+	test 56 of 63:  7
+	test 57 of 63:  7
+	test 58 of 63:  7
+	test 59 of 63:  7
+	test 60 of 63:  7
+	test 61 of 63:  7
+	test 62 of 63:  7
+	test 63 of 63:  7
+	End ${testname} Test
 	_EOF_
 
 $AGEXE --base=${testname} --no-def --override=${testname}.tpl || \
