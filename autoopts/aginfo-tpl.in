@@ -4,13 +4,13 @@
 ## 
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
 ## 
-## Author:            Bruce Korb <korbb@datadesign.com>
-## Maintainer:        Bruce Korb <korbb@datadesign.com>
+## Author:            Bruce Korb <autogen@linuxbox.com>
+## Maintainer:        Bruce Korb <autogen@linuxbox.com>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
-##            by:     Bruce Korb <korb@datadesign.com>			      
+##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.5 1999/10/22 00:28:20 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.6 1999/10/28 03:36:29 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]

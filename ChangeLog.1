@@ -1,4 +1,4 @@
-1998-08-17  Bruce Korb <korbb@datadesign.com>
+1998-08-17  Bruce Korb <autogen@linuxbox.com>
 	* Makefile.am
 	configure needs to depend on the VERSION
 
@@ -41,7 +41,7 @@
 	Added some verbose output.
 	Corrected comparison output based on printf bug.
 
-1998-07-30  Bruce Korb <korbb@datadesign.com>
+1998-07-30  Bruce Korb <autogen@linuxbox.com>
 
 	* autoopts/Makefile.am
 	Distribute the TODO file, too.
@@ -136,7 +136,7 @@
 	whereas it otherwise indicates advancing the scan pointer
 	by that amount.
 
-1998-07-02  Bruce Korb <korbb@datadesign.com>
+1998-07-02  Bruce Korb <autogen@linuxbox.com>
 	* AUTHORS
 	regex.* are no longer distributed with autogen.
 	I futzed with bootstrap, too :)
@@ -240,7 +240,7 @@
 	any of the autoregeneration with the newly built autogen binary
 	from working.
 
-1998-06-17  Bruce Korb <korbb@datadesign.com>
+1998-06-17  Bruce Korb <autogen@linuxbox.com>
 	* Most files listed below:
 	Began the implementation of enable/disable by changing references
 	from "invert" to "disable"
@@ -332,7 +332,7 @@
 	against the generated opts files to prevent failure every time the
 	version number is bumped.
 
-1998-06-05  Bruce Korb <korbb@datadesign.com>
+1998-06-05  Bruce Korb <autogen@linuxbox.com>
 	* autoopts/opthead.tpl
 	Sanity check flag values when long options are disallowed
 
@@ -370,7 +370,7 @@
 	* src/agPrint.c (safePrintf): cse for repeated sigaction block
 	in each preprocessor branch.
 
-1998-05-28  Bruce Korb <korbb@datadesign.com>
+1998-05-28  Bruce Korb <autogen@linuxbox.com>
 	* src/agEval.c:  New rules for typing expression tokens:
 	
 	  IF the first char is alpha or a space, it is a string
@@ -388,7 +388,7 @@
 	* src/opts.def:
 	Upgrade minor version due to new expression token typing
 
-1998-05-26  Bruce Korb <korbb@datadesign.com>
+1998-05-26  Bruce Korb <autogen@linuxbox.com>
 	* NOTES
 	Added sprintf discussion
 
@@ -414,7 +414,7 @@
 	* tests/reorder.test: New test to hilight the (now fixed)
 	block macro reordering bug.
 
-1998-04-11  Bruce Korb <korbb@datadesign.com>
+1998-04-11  Bruce Korb <autogen@linuxbox.com>
 
 	* src/agFunCase.c:  Substantially rewritten to properly
 	handle nesting with other block functions as well as itself.
@@ -491,7 +491,7 @@
 	* tests/opts.test: Fixed some references to allow this test to
 	run for "make distcheck" and VPATH builds.
 
-1998-04-07  Bruce Korb <korbb@datadesign.com>
+1998-04-07  Bruce Korb <autogen@linuxbox.com>
 
 	* src/*.c autoopts/*.c compat/*.c
 	Macro-ized all memory allocation/deallocations
@@ -584,7 +584,7 @@
 	switches, and display status.
 	(LTLIBOBJS): Generate and substitute for LTLIBOBJS.
 
-1998-03-02	Bruce Korb <korbb@datadesign.com>
+1998-03-02	Bruce Korb <autogen@linuxbox.com>
 	* compat/Makefile.am (strsignal.h):
 	In the build rule for strsignal.h, made the running of autogen
 	conditional upon the existence of the executable.
@@ -617,7 +617,7 @@
 	switches, and display status.
 	(LTLIBOBJS): Generate and substitute for LTLIBOBJS.
 
-1998-02-27	Bruce Korb <korbb@datadesign.com>
+1998-02-27	Bruce Korb <autogen@linuxbox.com>
 	* src/autogen.h
 	* src/agexpr.h
 	* src/agExpr.c
@@ -631,7 +631,7 @@
 	* src/agEmit.c
 	Initialize the forLoopDepth at the beginning of the template scan
 
-1998-02-26	Bruce Korb <korbb@datadesign.com>
+1998-02-26	Bruce Korb <autogen@linuxbox.com>
 	* autoopts/Makefile.am
 	* autoopts/autoopts.h
 	* autoopts/optcode.tpl
@@ -691,7 +691,7 @@
 	* tests/yyy.sh
 	Cleanup
 
-1998-02-19	Bruce Korb <korbb@datadesign.com>
+1998-02-19	Bruce Korb <autogen@linuxbox.com>
 
 	* compat/maxpath.h
 	Respelled 'HAVE_SYS_PARAM' as 'HAVE_SYS_PARAM_H'
@@ -703,7 +703,7 @@
 	* reworked and applied many of the changes called out below
 	by Gary.
 
-1998-02-12	Bruce Korb <korbb@datadesign.com>
+1998-02-12	Bruce Korb <autogen@linuxbox.com>
 	* Bumped the revision to 4.1
 	* Added src/agParse.y to the distribution sources
 	* changed src/tokenize.c so the '...' quoting rules match
@@ -727,7 +727,7 @@
 	(-a) and to include the dependency information so that the
 	user can install without gcc (-i).
 
-1998-01-29	Bruce Korb <korbb@datadesign.com>
+1998-01-29	Bruce Korb <autogen@linuxbox.com>
 	* Added a new expression function "SHSTR" to produce a string
 	that the shell will pass on to a program.
 
@@ -754,7 +754,7 @@
 	* src/opts.c, src/opts.h:
 	Regenerated with the above change.
 
-1997-10-29	Bruce Korb <korbb@datadesign.com>
+1997-10-29	Bruce Korb <autogen@linuxbox.com>
 	* Invented global defines for the executable file and invocation
 
 	* Created a weirdo target that works for finding updates since
@@ -770,7 +770,7 @@
 	However, in other cases it is necessary and I cannot tell when to
 	allow and when not inside of "findDefEntry".  Removed restriction.
 
-1997-10-16	Bruce Korb <korbb@datadesign.com>
+1997-10-16	Bruce Korb <autogen@linuxbox.com>
 	* Removed "success.h" from the entire source.  Its contents were
 	not used in the autoopts directory and was was used in the src
 	directory was added to "autogen.h".
@@ -795,7 +795,7 @@
 	* doc/autogen.tpl:
 	Added @dircategory and @direcntry so that install-info works
 
-1997-10-15  Bruce Korb <korbb@datadesign.com>
+1997-10-15  Bruce Korb <autogen@linuxbox.com>
 	* Incorporated the changes noted below by Gary (as needed)
 	Differences:  "success.h" was moved to autoopts/ dir and
 	is installed (required by "autoopts.h").  This caused changes
@@ -1310,7 +1310,7 @@ Tue Jul  1 13:02:54 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 	Use POSIX entrypoints to regex if available.
 
 	* src/tmTempl.c (startTemplate):
-	2 patches from Bruce <korbb@datadesign.com> and another from me to
+	2 patches from Bruce <autogen@linuxbox.com> and another from me to
 	prevent NULL pointer dereferences when a template file is not
 	found along the search path.
 

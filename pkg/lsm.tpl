@@ -27,10 +27,10 @@ Description:    AutoGen is a tool for automatically generating
 Keywords:       macro, m4, cpp, code generation, preprocessor,
                 options, getopts
 
-Author:         korb@datadesign.com (Bruce Korb)
+Author:         autogen@linuxbox.com (Bruce Korb)
                 gvaughan@oranda.demon.co.uk (Gary V. Vaughan)
 
-Maintained-by:  korbb@datadesign.com (Bruce Korb)
+Maintained-by:  autogen@linuxbox.com (Bruce Korb)
 
 Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
                 [=

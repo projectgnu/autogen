@@ -4,13 +4,13 @@
 ## 
 ##    AutoGen copyright 1992-1999 Bruce Korb
 ## 
-## Author:	   Bruce Korb <korbb@datadesign.com>
-## Maintainer:	   Bruce Korb <korbb@datadesign.com>
+## Author:	   Bruce Korb <autogen@linuxbox.com>
+## Maintainer:	   Bruce Korb <autogen@linuxbox.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
-##            by:   Bruce Korb <korb@datadesign.com>			      
+##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.19 1999/09/08 22:08:44 bkorb Exp $
+## $Id: Makefile.am,v 2.20 1999/10/28 03:36:29 bruce Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs

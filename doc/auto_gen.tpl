@@ -4,13 +4,13 @@
 ## 
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
 ## 
-## Author:            Bruce Korb <korbb@datadesign.com>
-## Maintainer:        Bruce Korb <korbb@datadesign.com>
+## Author:            Bruce Korb <autogen@linuxbox.com>
+## Maintainer:        Bruce Korb <autogen@linuxbox.com>
 ## Created:           Tue Sep 15 13:13:48 1998
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
-##            by:     Bruce Korb <korb@datadesign.com>                        
+##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.30 1999/10/26 02:44:23 bruce Exp $
+## $Id: auto_gen.tpl,v 2.31 1999/10/28 03:36:29 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]

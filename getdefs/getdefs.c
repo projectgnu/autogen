@@ -1,14 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.18 1999/08/03 23:10:19 bkorb Exp $
+ *  $Id: getdefs.c,v 2.19 1999/10/28 03:36:29 bruce Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
-   Author:            Bruce Korb <korbb@datadesign.com>
-   Maintainer:        Bruce Korb <korbb@datadesign.com>
+   Author:            Bruce Korb <autogen@linuxbox.com>
+   Maintainer:        Bruce Korb <autogen@linuxbox.com>
    Created:           Mon Jun 30 15:35:12 1997
    Last Modified:     Tue Aug  3 16:09:54 1999				    */
-/*            by:     Bruce Korb <korb@datadesign.com>			    */
+/*            by:     Bruce Korb <autogen@linuxbox.com>			    */
 
 #include <errno.h>
 #include <sys/types.h>

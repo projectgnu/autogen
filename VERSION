@@ -6,9 +6,9 @@
 # Copyright (C) 1999 Bruce Korb
 #
 # Last Modified:     Tue Sep 28 07:01:05 1999				      
-# Author:            Bruce Korb <korb@datadesign.com>
-# Maintainer:        Bruce Korb <korb@datadesign.com>
-# by:                Bruce Korb <korb@datadesign.com>			      
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# by:                Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5

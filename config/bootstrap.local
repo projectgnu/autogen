@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # config/bootstrap.local --- maintainer's bootstrap script
 #
-# Author:            Bruce Korb <korb@datadesign.com>
-# Maintainer:        Bruce Korb <korb@datadesign.com>
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
 # Created:           Thu Jul 29 09:32:11 1999
 # Last Modified:     Mon Aug 30 12:28:33 1999				      
-#            by:     Bruce Korb <korb@datadesign.com>			      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.25 1999/10/26 03:04:47 bruce Exp $
+# @(#) $Id: bootstrap.local,v 1.26 1999/10/28 03:36:29 bruce Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()

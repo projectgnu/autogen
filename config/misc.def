@@ -2,12 +2,12 @@
 autogen definitions m4;
 
 /*
- *  Maintainer:        Bruce Korb <korb@datadesign.com>
+ *  Maintainer:        Bruce Korb <autogen@linuxbox.com>
  *  Created:           Tue Nov 24 01:07:30 1998
  *  Last Modified:     Wed Jul  7 10:33:11 1999				      
- *             by:     Bruce Korb <korb@datadesign.com>			      
+ *             by:     Bruce Korb <autogen@linuxbox.com>			      
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 1.1 1999/07/29 20:34:05 bkorb Exp $
+ *  $Id: misc.def,v 1.2 1999/10/28 03:36:29 bruce Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;

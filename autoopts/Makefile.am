@@ -4,13 +4,13 @@
 ## 
 ##  Autoopts copyright 1992-1999 Bruce Korb
 ## 
-## Author:          Bruce Korb <korbb@datadesign.com>
-## Maintainer:      Bruce Korb <korbb@datadesign.com>
+## Author:          Bruce Korb <autogen@linuxbox.com>
+## Maintainer:      Bruce Korb <autogen@linuxbox.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
-##            by:   Bruce Korb <korb@datadesign.com>			      
+##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.19 1999/07/29 18:58:00 bkorb Exp $
+## $Id: Makefile.am,v 2.20 1999/10/28 03:36:29 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

@@ -7,9 +7,9 @@
 # Maintainer:        Bruce Korb <autogen@linuxbox.com>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <korb@datadesign.com>			      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: error.test,v 1.1 1999/10/14 00:33:53 bruce Exp $
+# $Id: error.test,v 1.2 1999/10/28 03:36:28 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

@@ -2,12 +2,12 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Maintainer:	     Bruce Korb <korbb@datadesign.com>
+## Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 ## Created:	     Mon Jun 30 15:35:12 1997				
 ## Last Modified:    Tue Sep 28 07:17:04 1999				      
-##            by:    Bruce Korb <korb@datadesign.com>			      
+##            by:    Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.11 1999/09/28 14:17:17 bkorb Exp $
+## $Id: Makefile.am,v 2.12 1999/10/28 03:36:28 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
