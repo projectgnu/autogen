@@ -10,17 +10,20 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.27 2004/05/19 03:41:04 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.28 2004/08/12 03:26:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
 
 (setenv "SHELL" "/bin/sh")
 
-(define texi-file-source (shell "
+(define temp-dir (shell "
     tempdir=`mktemp -d ./.ag-XXXXXX 2>/dev/null`
     [ -z \"${tempdir}\" ] && tempdir=.ag-$$.dir
     [ -d ${tempdir} ] || mkdir ${tempdir} || kill -TERM ${AG_pid}
+    echo ${tempdir}" ))
+
+(define texi-file-source (shell "
     if [ -f autogen.texi ]
     then
       mv -f autogen.texi autogen.texi.ori
@@ -537,7 +540,9 @@ Here is an example program that uses the following set of definitions:
 @example
 [=
 
- (out-push-new (shellf "echo ${tempdir}/default-test.def"))
+ (out-push-new (shellf "
+    tempdir=%s
+    echo ${tempdir}/default-test.def" temp-dir ))
 
 =]AutoGen Definitions options;
 
