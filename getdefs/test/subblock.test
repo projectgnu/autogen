@@ -1,0 +1,63 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# forcomma.test --- test the "," operand of _FOR
+#
+# Author:	     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
+# Maintainer:	     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
+# Created:	     Sat Mar 28 14:21:31 1998
+# Last Modified:  $Date: 1999/10/31 16:21:54 $
+#            by:     Bruce Korb <autogen@linuxbox.com>
+#
+# $Id: subblock.test,v 1.1 1999/10/31 16:21:54 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+
+# Create the files we need in the test environment
+cat > $testname.c <<EOF
+/*=gfunc in_p
+ *
+ * exparg: test-string, string to look for
+ * exparg: string-list, list of strings to check,, ellipsis
+ *
+ * opt:  1
+ * doc:  Return SCM_BOOL_T if the first argument is duplicated
+ *      in the second (list) argument.
+=*/
+    SCM
+ag_scm_in_p( SCM obj, SCM list )
+{
+}
+EOF
+
+cat > $testname.test <<EOF
+gfunc = {
+    exparg = {
+        arg_name = 'test-string';
+        arg_desc = 'string to look for';
+    };
+    exparg = {
+        arg_name = 'string-list';
+        arg_desc = 'list of strings to check';
+        arg_list = 'ellipsis';
+    };
+    opt = '1';
+    doc = 'Return SCM_BOOL_T if the first argument is duplicated
+in the second (list) argument.';
+};
+EOF
+
+${GETDEFS} subblock=exparg=arg_name,arg_desc,arg_optional,arg_list \
+	   output=$testname.out $testname.c || exit 1
+cmp -s $testname.test $testname.out || failure unexpected output
+
+# subblock.test ends here
