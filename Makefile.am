@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <korbb@datadesign.com>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    Mon Aug  9 10:10:35 1999				      
+## Last Modified:    Tue Sep 28 07:17:04 1999				      
 ##            by:    Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.10 1999/08/09 17:10:52 bkorb Exp $
+## $Id: Makefile.am,v 2.11 1999/09/28 14:17:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -16,7 +16,7 @@ include $(top_srcdir)/MakeRules.in
 SUBDIRS		= compat config snprintfv autoopts \
 		src getdefs columns tests doc
 
-EXTRA_DIST	= MakeRules.in VERSION TODO configure ChangeLog.1
+EXTRA_DIST	= MakeRules.in VERSION TODO NOTES configure ChangeLog.1
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config.h.in \
 		  configure libtool stamp-h.in
 
