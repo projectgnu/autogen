@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.7 1999/11/02 04:16:04 bruce Exp $
+ *  $Id: expString.c,v 1.8 1999/11/03 05:16:41 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -171,7 +171,6 @@ makeString( tCC*    pzText,
  * exparg: test-string, string to look for
  * exparg: string-list, list of strings to check,, list
  *
- * opt:  1
  * doc:  Return SCM_BOOL_T if the first argument is duplicated
  *      in one of the entries in the second (list) argument.
 =*/
@@ -206,7 +205,6 @@ ag_scm_in_p( SCM obj, SCM list )
  * exparg: separator, string to insert between entries
  * exparg: list, list of strings to join,, list
  *
- * opt:  1
  * doc:  With the first argument as the separator string,
  *      joins together the second argument a-list of strings
  *      into one long string.
@@ -275,9 +273,7 @@ ag_scm_join( SCM sep, SCM list )
  * exparg: prefix, string to insert at start of each line
  * exparg: text, multi-line block of text
  *
- * req:  2
  * doc:
- *
  *  Prefix every line in the second string with the first string.
  *
  *  For example, the first string is "# " and the second contains:
@@ -352,7 +348,6 @@ ag_scm_prefix( SCM prefix, SCM text )
  * exparg: command, shell command - the result value is stdout
  *
  * doc:
- *
  *  Generate a string by writing the value to
  *  a server shell and reading the output back in.  The template
  *  programmer is responsible for ensuring that it completes
@@ -385,7 +380,6 @@ ag_scm_shell( SCM cmd )
  * exparg: string, string to transform
  *
  * doc:
- *
  *  Convert the text of the string into a singly quoted string
  *  that a normal shell will process into the original string.
  *  (It will not do macro expansion later, either.)
@@ -552,7 +546,6 @@ ag_scm_kr_string( SCM str )
  * exparg: string, string to reformat
  *
  * doc:
- *
  *  Reform a string so that, when printed, the C compiler will be able to
  *  compile the data and construct a string that contains exactly what the
  *  current string contains.  Many non-printing characters are replaced with
@@ -583,9 +576,7 @@ ag_scm_c_string( SCM str )
  *  exparg:  match,  characters to be converted
  *  exparg:  translation, conversion list
  *
- *  req:  3
- *
- * doc:  This is the same as the @code{tr(1)} program, except the
+ * doc: This is the same as the @code{tr(1)} program, except the
  *      string to transform is the first argument.  The second and
  *      third arguments are used to construct mapping arrays for the
  *      transformation of the first argument.

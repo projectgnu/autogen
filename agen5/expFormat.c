@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.3 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: expFormat.c,v 1.4 1999/11/03 05:18:23 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -221,10 +221,7 @@ ag_scm_error( SCM res )
  * exparg: prog-name, name of the program under the GPL
  * exparg: prefix, String for starting each output line
  *
- * req: 2
- *
  * doc:
- *
  *  Emit a string that contains the GNU Public License.  It
  *  takes two arguments: @code{prefix} contains the string to start
  *  each output line, and
@@ -265,10 +262,8 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  * exparg: prog_name, name of the program under the LGPL
  * exparg: owner, Grantor of the LGPL
  * exparg: prefix, String for starting each output line
- * req: 3
  *
  * doc:
- *
  *  Emit a string that contains the GNU Library Public License.  It
  *  takes three arguments: @code{prefix} contains the string to start
  *  each output line.  @code{owner} contains the copyright owner.

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.4 1999/10/31 19:07:07 bruce Exp $
+ *  $Id: expState.c,v 1.5 1999/11/03 05:17:38 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -304,8 +304,6 @@ ag_scm_count( SCM obj )
 
 /*=gfunc def_file
  *
- * req:  0
- *
  * doc:  Get the name of the definitions file.
  *       Returns the name of the source file containing the AutoGen
  *       definitions.
@@ -462,10 +460,7 @@ ag_scm_low_lim( SCM obj )
 
 /*=gfunc suffix
  *
- * req: 0
- *
  * doc:
- *
  *  Returns the current active suffix.  See @code{generate} in the
  *  @code{Declarations Input} section above.
 =*/
@@ -477,8 +472,6 @@ ag_scm_suffix( void )
 
 
 /*=gfunc tpl_file
- *
- * req:  0
  *
  * doc:  Returns the name of the current template file.
 =*/

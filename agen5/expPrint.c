@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.3 1999/10/31 19:45:02 bruce Exp $
+ *  $Id: expPrint.c,v 1.4 1999/11/03 05:19:57 bruce Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -164,8 +164,7 @@ run_printf( char* pzFmt, int len, SCM alist )
  *
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
- * opt:  0
- * var:  1
+ *
  * doc:  Format a string using arguments from the alist.
 =*/
     SCM
@@ -187,8 +186,7 @@ ag_scm_sprintf( SCM fmt, SCM alist )
  *
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
- * opt:  0
- * var:  1
+ *
  * doc:  Format a string using arguments from the alist.
  *       Write to the default output port.
 =*/
@@ -216,9 +214,7 @@ ag_scm_printf( SCM fmt, SCM alist )
  * exparg: port, output port
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
- * req:  1
- * opt:  0
- * var:  1
+ *
  * doc:  Format a string using arguments from the alist.
  *       Write to a specified port.
 =*/

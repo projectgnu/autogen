@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.5 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: expOutput.c,v 1.6 1999/11/03 05:21:17 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -74,7 +74,6 @@ addWriteAccess( char* pzFileName )
 
 /*=gfunc out_delete
  *
- * req: 0
  * doc:  
  *  Remove the current output file.  Cease processing the template for
  *  the current suffix.  It is an error if there are @code{push}-ed
@@ -117,7 +116,6 @@ ag_scm_out_move( SCM new_file )
 
 /*=gfunc out_pop
  *
- * req: 0
  * doc:  
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
@@ -267,8 +265,6 @@ ag_scm_out_switch( SCM new_file )
 
 /*=gfunc out_depth
  *
- * req:  0
- *
  * doc:  Returns the depth of the output file stack.
  *       @xref{output controls}.
 =*/
@@ -280,8 +276,6 @@ ag_scm_out_depth( void )
 
 
 /*=gfunc out_name
- *
- * req:  0
  *
  * doc:  Returns the name of the current output file.
  *       @xref{output controls}.

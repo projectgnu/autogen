@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.9 1999/11/02 05:46:41 bruce Exp $
+ *  $Id: funcCase.c,v 1.10 1999/11/03 05:22:32 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -60,7 +60,6 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*==*"
  *
  * doc:  Test to see if a string contains a substring.  "strstr(3)"
@@ -88,7 +87,6 @@ ag_scm_string_contains_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*=="
  *
  * doc:  Test to see if a string ends with a substring.
@@ -123,7 +121,6 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "==*"
  *
  * doc:  Test to see if a string starts with a substring.
@@ -154,7 +151,6 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "=="
  *
  * doc:  Test to see if two strings exactly match.
@@ -181,7 +177,6 @@ ag_scm_string_equals_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*=*"
  *
  * doc:  Test to see if a string contains an equivalent string.
@@ -226,7 +221,6 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*="
  *
  * doc:  Test to see if a string ends with an equivalent string.
@@ -260,7 +254,6 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "=*"
  *
  * doc:  Test to see if a string starts with an equivalent string.
@@ -291,7 +284,6 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "="
  *
  * doc:  Test to see if two strings are equivalent.
@@ -321,7 +313,6 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*~~*"
  *
  * doc:  Test to see if a string contains a pattern.
@@ -332,7 +323,6 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*~*"
  *
  * doc:  Test to see if a string contains a pattern.
@@ -401,7 +391,6 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*~~"
  *
  * doc:  Test to see if a string ends with a pattern.
@@ -412,7 +401,6 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "*~"
  *
  * doc:  Test to see if a string ends with a pattern.
@@ -495,7 +483,6 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "~~*"
  *
  * doc:  Test to see if a string starts with a pattern.
@@ -506,7 +493,6 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "~*"
  *
  * doc:  Test to see if a string starts with a pattern.
@@ -585,7 +571,6 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "~~"
  *
  * doc:  Test to see if a string fully matches a pattern.
@@ -596,7 +581,6 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
- * req: 2
  * string: "~"
  *
  * doc:  Test to see if a string fully matches a pattern.

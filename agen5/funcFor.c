@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.9 1999/11/02 05:27:53 bruce Exp $
+ *  $Id: funcFor.c,v 1.10 1999/11/03 05:19:16 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -37,7 +37,6 @@
 
 /*=gfunc first_for_p
  *
- * req:  0
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
  *       on the first pass through the data.  @xref{FOR}.
 =*/
@@ -51,7 +50,6 @@ ag_scm_first_for_p( void )
 
 /*=gfunc last_for_p
  *
- * req:  0
  * doc:  Returns SCM_BOOL_T if the current, innermost FOR loop is
  *       on the last pass through the data.  @xref{FOR}.
 =*/
@@ -65,7 +63,6 @@ ag_scm_last_for_p( void )
 
 /*=gfunc for_index
  *
- * req:   0
  * doc:   Returns the current index for innermost FOR loop.
  *        Outside of any FOR loop, it returns SCM_UNDEFINED.
  *        @xref{FOR}.
