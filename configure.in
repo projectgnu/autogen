@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Mon Jun 14 10:39:25 1999				      
+dnl Last Modified:    Mon Jun 14 13:55:36 1999				      
 dnl            by:    Bruce Korb <korb@datadesign.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.12 1999/06/14 18:07:55 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.13 1999/06/14 20:57:54 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.12 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.13 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -76,7 +76,7 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # ----------------------------------------------------------------------
 # Set up and process configure options
 # ----------------------------------------------------------------------
-AG_CHECK_LIB_REGEX
+AG_CHECK_POSIX_REGCOMP
 
 AC_MSG_CHECKING([whether runtime debugging is wanted])
 ag_cv_debug=no
@@ -149,9 +149,9 @@ AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend psignal pathfind)
 AG_FUNC_FOPEN_BINARY
 AG_FUNC_FOPEN_TEXT
-AG_FUNC_CTIME_HEAP
-AG_FUNC_STRFTIME
-AG_VAR_SYS_SIGLIST
+AG_CHECK_ALLOCATED_CTIME
+AG_CHECK_STRFTIME
+AG_CHECK_SYS_SIGLIST
 
 # ----------------------------------------------------------------------
 # Generate the make files.
