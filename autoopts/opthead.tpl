@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.11 1999/03/30 23:09:04 bkorb Exp $
+#$Id: opthead.tpl,v 2.12 1999/06/09 16:59:01 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -571,9 +571,14 @@ _FOR flag =][=
                 =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualValue)
 #define WHICH_[=prefix _up #_ +=]IDX_[=name _up "#%-14s" _printf
                 =] ([=prefix _up #_ +=]DESC([=name _up=]).optActualIndex)[=
-  _ENDIF=][=#
+  _ENDIF=][=
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * =][=
+
+  _IF setable _exist =][=
+
+  #  These two are skipped if the option is not setable.
+
 
 /*=usermac SET_OPT_name
  *
@@ -593,11 +598,32 @@ _FOR flag =][=
  *  SET_OPT_NAME( "string-value" );
  *  @end example
 =*/
+/*=usermac DISABLE_OPT_name
+ *
+ *  title:  Disable an option
+ *
+ *  description:
+ *
+ *  This macro is emitted if it is both setable
+ *  and it can be disabled.  If it cannot be disabled, it may
+ *  always be CLEAR-ed (see above).
+ *
+ *  The form of the macro will actually depend on whether the
+ *  option is equivalenced to another, and/or has an assigned
+ *  handler procedure.  Unlike the @code{SET_OPT} macro,
+ *  this macro does not allow an option argument.
+ *
+ *  @example
+ *  DISABLE_OPT_NAME;
+ *  @end example
+=*/
 =][=
-  _IF setable _exist =][=
     _IF  equivalence _exist !
-         equivalence _get _UP name _get _UP == |
+         equivalence _get _UP name _get _UP == |  =][=
 
+    #
+    IF the option is not equivalenced to another,
+    THEN we set the actual option...
 
  =]
 #define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
@@ -623,7 +649,38 @@ _FOR flag =][=
       _ENDIF "callout procedure exists" =] )[=
 
 
-    _ELSE "not equivalenced"
+      #  See if we need to emit the disable macro =][=
+
+      _IF disable _exist =]
+#define DISABLE_[=prefix _up #_ +=]OPT_[=name _up=]   STMTS( \
+        [=prefix _up #_ +=]DESC([=name _up
+                       =]).optActualIndex = [=_eval _index=]; \
+        [=prefix _up #_ +=]DESC([=name _up
+                       =]).optActualValue = VALUE_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
+        [=prefix _up #_ +=]DESC([=name _up=]).fOptState &= OPTST_PERSISTENT; \
+        [=prefix _up #_ +=]DESC([=name _up
+            =]).fOptState |= OPTST_SET | OPTST_DISABLED; \
+        [=prefix _up #_ +=]DESC([=name _up=]).pzLastArg  = (char*)NULL[=
+        _IF call_proc _exist
+            flag_code _exist |
+            flag_proc _exist |
+            stack_arg _exist |=]; \
+        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
+                  prog_name=]Options, \
+                [=prog_name=]Options.pOptDesc + [=_eval _index=] )[=
+        _ENDIF "callout procedure exists" =] )[=
+
+      _ENDIF disableable-exists =][=
+
+
+    # * * * * *
+    #
+    #  THIS OPTION IS EQUIVALENCED TO ANOTHER
+    #
+    =][=
+
+    _ELSE "it is equivalenced"
 =]
 #define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
       _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
@@ -650,50 +707,39 @@ _FOR flag =][=
                          prefix _up #_ +=]OPT_[=equivalence _up=] )[=
       _ENDIF "callout procedure exists" =] )[=
 
+
+      #  See if we need to emit the disable macro =][=
+
+      _IF disable _exist =]
+#define DISABLE_[=prefix _up #_ +=]OPT_[=name _up=]   STMTS( \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+                       =]).optActualIndex = [=_eval _index=]; \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+                       =]).optActualValue = VALUE_[=prefix _up #_ +
+                       =]OPT_[=name _up=]; \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+                       =]).fOptState &= OPTST_PERSISTENT; \
+        [=prefix _up #_ +=]DESC([=equivalence _up
+            =]).fOptState |= OPTST_SET | OPTST_DISABLED | OPTST_EQUIVALENCE; \
+        [=prefix _up #_ +=]DESC([=equivalence _up=]).pzLastArg  = (char*)NULL[=
+        _IF call_proc _exist
+            flag_code _exist |
+            flag_proc _exist |
+            stack_arg _exist |=]; \
+        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
+                           prog_name=]Options, \
+                [=prog_name=]Options.pOptDesc + INDEX_[=
+                         prefix _up #_ +=]OPT_[=equivalence _up=] )[=
+        _ENDIF "callout procedure exists" =] )[=
+
+      _ENDIF disableable-exists =][=
+
     _ENDIF is/not equivalenced =][=
 
-  _ENDIF setable =][=#
+  _ENDIF setable =][=
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac DISABLE_OPT_name
- *
- *  title:  Disable an option
- *
- *  description:
- *
- *  This macro is emitted if it is both setable
- *  and it can be disabled.  If it cannot be disabled, it may
- *  always be CLEAR-ed (see above).
- *
- *  The form of the macro will actually depend on whether the
- *  option is equivalenced to another, and/or has an assigned
- *  handler procedure.  Unlike the @code{SET_OPT} macro,
- *  this macro does not allow an option argument.
- *
- *  @example
- *  DISABLE_OPT_NAME;
- *  @end example
-=*/
-=][=
-  _IF setable _exist disable _exist & =]
-#define DISABLE_[=prefix _up #_ +=]OPT_[=name _up=]   STMTS( \
-        [=prefix _up #_ +=]DESC([=name _up=]).fOptState &= OPTST_PERSISTENT; \
-        [=prefix _up #_ +=]DESC([=name _up
-            =]).fOptState |= OPTST_SET | OPTST_DISABLED; \
-        [=prefix _up #_ +=]DESC([=name _up=]).pzLastArg  = (char*)NULL[=
-    _IF call_proc _exist
-        flag_code _exist |
-        flag_proc _exist |
-        stack_arg _exist |=]; \
-        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
-                  prog_name=]Options, \
-                [=prog_name=]Options.pOptDesc + [=_eval _index=] )[=
-     _ENDIF "callout procedure exists" =] )[=
-
-  _ENDIF setable/disableable-exists =][=#
-
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 End of option-specific defines
 
