@@ -2,6 +2,8 @@
 
 	* agen5/expFormat.c(ag_scm_dne): add another optional argument.
 	If the first arg is "-d", then do not insert a date and shift args 1.
+	* agen5/test/format.test: test this feature
+	* snprintfv/*: upgrade to 0.99f, with patches to make it work
 	* agen5/opts.def(define): Make note of when and how the -D arguments
 	get exported into the environment variables.
 	* autoopts/agman1.tpl(flags_must): fix opton spelling

@@ -33,19 +33,19 @@ dist_noinst_DATA        = filament.stamp stream.stamp printf.stamp
 noinst_LTLIBRARIES      = libsnprintfv.la
 libsnprintfv_la_LDFLAGS = -no-undefined
 libsnprintfv_la_SOURCES =   \
-            filament.c      \
-            format.c        \
-            printf.c        \
-            mem.c           \
-            stream.c
+	filament.c  \
+	format.c    \
+	printf.c    \
+	mem.c       \
+	stream.c
 
 # These files are the raw sources used to generate similarly named
 # header files after extracting the prototypes from the sources
 #
-EXTRA_DIST              =   \
-            filament.in     \
-            printf.in       \
-            stream.in
+EXTRA_DIST      = \
+	filament.in   \
+	printf.in     \
+	stream.in
 
 # Makefile.am ends here
 

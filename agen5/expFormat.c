@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.8 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: expFormat.c,v 3.9 2002/12/14 18:17:53 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -154,9 +154,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     char*    pzRes;
     tCC*     pzFirst = zNil;
     SCM      res;
-    tCC*     pzPrefix = ag_scm2zchars( prefix, "prefix" );
-    if (strlen( pzPrefix ) > 128 )
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    tCC*     pzPrefix;
 
     /*
      *  Check for the ``-d'' option
@@ -169,6 +167,10 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
             first  = opt;
         }
     }
+
+    if (SCM_LENGTH( prefix ) > 128 )
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    pzPrefix = ag_scm2zchars( prefix, "prefix" );
 
     /*
      *  IF we also have a 'first' prefix string,

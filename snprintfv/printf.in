@@ -35,8 +35,8 @@
 #include <snprintfv/stream.h>
 #include <snprintfv/mem.h>
 
-#ifdef WITH_DMALLOC
-#  include <dmalloc.h>
+#ifdef HAVE_WCHAR_H
+#  include <wchar.h>
 #endif
 
 #ifdef __cplusplus
@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-/* The type of each element in the spec_table exported by the fsm. */
+/* The type of each element in the table of printf specifiers. */
 struct spec_entry;
 
 typedef enum
@@ -154,7 +154,7 @@ typedef union printf_arg
  * Append an error that will be returned by printf_strerror.
  */
 #define PRINTF_ERROR(pi, str)                                         \
-        printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FCN, str);
+        printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FMT, str);
 
 typedef int printf_function PARAMS ((STREAM *stream, struct printf_info *pparser, union printf_arg const * args));
 
@@ -181,6 +181,29 @@ typedef struct spec_entry
   snv_pointer user;
 }
 spec_entry;
+
+/**
+ * register_callback_function: printf.h
+ * @spec: the character which will trigger the functions, cast to an unsigned int.
+ * @fmt: the handler function to actually print the arguments to the specifier
+ * @arg: the handler function to tell %printf about the types of the arguments to the specifier
+ * 
+ * Register the pair made of @fmt and @arg, so that it is called
+ * when @spec is encountered in a format string.  If you create
+ * a shared library with an entry point named
+ * %snv_register_printf_funcs, and put the library in the
+ * search path given by the environment library %LTDL_LIBRARY_PATH,
+ * that entry point will be called when %libsnprintfv is initialized,
+ * passing a pointer to this kind of function (actually, a pointer
+ * to %register_printf_function) to it.  This functionality is only
+ * present when the library is installed, not when it is built as
+ * a convenience library.
+ * 
+ * Return value:
+ * Returns %NULL if @func was not successfully registered, a
+ * %spec_entry with the information on the function if it was.
+ **/
+typedef spec_entry *register_callback_function PARAMS ((unsigned spec, printf_function *func, printf_arginfo_function *arginfo));
 
 /* Codes to determine basic types.
 

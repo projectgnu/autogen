@@ -31,19 +31,21 @@
 #  include <config.h>
 #endif
 
+#ifdef WITH_DMALLOC
+#  include <dmalloc.h>
+#endif
+
 #include <float.h>
 #include <math.h>
 #include <stddef.h>
 
-#include "printf.h"
-#undef printf
-
-#if 0
-/* libltdl requires this */
-#define snv_default_spec_table	format_LTX_snv_default_spec_table
+#ifdef HAVE_WCHAR_H
+#  include <wchar.h>
 #endif
 
-#ifdef HAVE_LDEXPL
+#include "printf.h"
+
+#ifdef HAVE_LONG_DOUBLE
 extern long double frexpl (long double x, int *exp);
 extern long double ldexpl (long double x, int exp);
 #else

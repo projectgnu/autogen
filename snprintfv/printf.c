@@ -35,11 +35,26 @@
 
 #define COMPILING_PRINTF_C
 #include "printf.h"
-#undef COMPILING_PRINTF_C
+
+#ifdef WITH_DMALLOC
+#include <dmalloc.h>
+#endif
 
 #include "filament.h"
 #include "stream.h"
 #include "mem.h"
+
+#ifndef HAVE_STRTOUL
+#  include "strtoul.c"
+#endif
+
+#ifndef HAVE_LDEXPL
+#  include "ldexpl.c"
+#endif
+
+#ifndef HAVE_FREXPL
+#  include "frexpl.c"
+#endif
 
 #define EOS			'\0'
 #define SNV_CHAR_SPEC		'%'
@@ -54,11 +69,11 @@ static int do_printfv PARAMS ((STREAM *stream, const char *format, union printf_
 
 /* FIXME:  We are assuming an ASCII character set where all the
            printable characters are between SPACE and DEL. */
-#define ASCII_DEL	(int)''
+#define ASCII_DEL	(int)'\177'
 #define ASCII_SPACE	(int)' '
 
 /* TODO:  This is not thread-safe.  Change the API to pass the spec_table
-          in as the first parameter to the functions which use it. */
+          in as the first parameter to the functions which use it? */
 static spec_entry *spec_table[ASCII_DEL - ASCII_SPACE];
 
 /* TODO:  This is not thread-safe as well. */
@@ -88,7 +103,9 @@ static void spec_init PARAMS ((void))
 	  spec_table[hash] = snv_default_spec_table + index;
 	  index++;
 	}
-
+#ifdef SNV_LIBRARY_BUILD
+      snv_load_all_modules ();
+#endif
       is_init = TRUE;
     }
 }
@@ -278,13 +295,13 @@ parser_reset (pinfo)
  * returned.
  **/
 char *
-printf_error (pinfo, file, line, func1, func2, func3, error_message)
+printf_error (pinfo, file, line, func/*1, func2, func3*/, error_message)
      struct printf_info *pinfo;
      const char *file;
      int line;
-     const char *func1;
+     const char *func/*1;
      const char *func2;
-     const char *func3;
+     const char *func3*/;
      const char *error_message;
 {
   int i;
@@ -303,9 +320,9 @@ printf_error (pinfo, file, line, func1, func2, func3, error_message)
   for (i /= 10; i >= 1; i /= 10)
     filccat (pinfo->error, '0' + (line / i) % 10);
 
-  filcat (pinfo->error, func1);
+  filcat (pinfo->error, func/*1);
   filcat (pinfo->error, func2);
-  filcat (pinfo->error, func3);
+  filcat (pinfo->error, func3*/);
   filcat (pinfo->error, ": ");
   filcat (pinfo->error, error_message);
   return result;
@@ -837,7 +854,7 @@ stream_vprintf (stream, format, ap)
             break;
 
           case PA_WCHAR:
-	    args[index].pa_wchar = va_arg (ap, wint_t);
+	    args[index].pa_wchar = va_arg (ap, wint_t); /* Promoted.  */
             break;
 
           case PA_INT|PA_FLAG_SHORT:
@@ -1069,7 +1086,8 @@ fileputc (ch, stream)
      int ch;
      STREAM *stream;
 {
-  return fputc (ch, (FILE *) stream_details (stream));
+  FILE *fp = (FILE *) stream_details (stream);
+  return putc (ch, fp);
 }
 
 /**

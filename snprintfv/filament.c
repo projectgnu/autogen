@@ -69,6 +69,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WITH_DMALLOC
+#  include <dmalloc.h>
+#endif
+
 #include "mem.h"
 #include "filament.h"
 
@@ -84,12 +88,12 @@ struct filament
   char buffer[FILAMENT_BUFSIZ];	/* usually string == &buffer[0] */
 };
 
-#define FILLEN(fil)    ((fil)->length)
-#define FILVAL(fil)    ((fil)->value)
 
 /* Save the overhead of a function call in the great majority of cases. */
 #define FIL_MAYBE_EXTEND(fil, len, copy)  \
-	if ((len)>=(fil)->size) { fil_maybe_extend((fil), (len), (copy)); }
+  do { \
+    if ((len)>=(fil)->size) { fil_maybe_extend((fil), (len), (copy)); } \
+  } while (0)
 
 static inline void fil_maybe_extend PARAMS ((Filament * fil, size_t len, boolean copy));
 
@@ -147,9 +151,7 @@ filinit (fil, init, len)
       /* Recycle any dynamic memory assigned to the previous
          contents of @fil, and point back into the static buffer. */
       if (fil->value != fil->buffer)
-	{
-	  snv_delete (fil->value);
-	}
+	snv_delete (fil->value);
 
       fil->value = fil->buffer;
       fil->length = 0;
@@ -157,9 +159,7 @@ filinit (fil, init, len)
     }
   else
     {
-      int bytes = len;
-
-      if (len < FILAMENT_BUFSIZ * 3 / 2)
+      if (len < FILAMENT_BUFSIZ)
 	{
 	  /* We have initialisation data which will easily fit into
 	     the static buffer: recycle any memory already assigned
@@ -168,16 +168,15 @@ filinit (fil, init, len)
 	    {
 	      snv_delete (fil->value);
 	      fil->value = fil->buffer;
+	      fil->size = FILAMENT_BUFSIZ;
 	    }
-	  bytes = 0;		/* Don't allocate any memory please! */
 	}
-
-      if (bytes)
+      else
 	{
 	  /* If we get to here then we never try to shrink the already
 	     allocated dynamic buffer (if any), we just leave it in
 	     place all ready to expand into later... */
-	  FIL_MAYBE_EXTEND (fil, bytes, FALSE);
+	  FIL_MAYBE_EXTEND (fil, len, FALSE);
 	}
 
       snv_assert (len < fil->size);
@@ -209,9 +208,9 @@ fildelete (fil)
 
   if (fil->value == fil->buffer)
     {
-      value = memcpy (snv_new (char, 1 + FILLEN (fil)),
-		      fil->buffer, 1 + FILLEN (fil));
-      value[FILLEN (fil)] = '\0';
+      value = memcpy (snv_new (char, 1 + fil->length),
+		      fil->buffer, 1 + fil->length);
+      value[fil->length] = '\0';
     }
   else
     value = filval (fil);
@@ -380,7 +379,7 @@ fil_maybe_extend (fil, len, copy)
        allocated, but if the extra data is larger than the current
        size it *still* won't fit, so in that case we allocate enough
        room plus some conservative extra space to expand into. */
-    fil->size = MAX (FILAMENT_BUFSIZ + len, 2 * fil->size);
+    fil->size += MAX (len, fil->size);
     if (fil->value == fil->buffer)
       {
 	fil->value = snv_new (char, fil->size);

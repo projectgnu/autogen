@@ -295,6 +295,20 @@ typedef int compatboolean;
 
 typedef SNV_LONG_DOUBLE snv_long_double;
 
+#ifndef HAVE_STRTOUL
+extern unsigned long strtoul PARAMS(( const char *nptrm,
+									  char **endptr,
+									  register int base ));
+#endif
+
+#ifndef HAVE_LDEXPL
+extern long double ldexpl PARAMS((long double x, int exp));
+#endif
+
+#ifndef HAVE_FREXPL
+extern long double frexpl PARAMS((long double x, int *exp));
+#endif
+
 SNV_END_EXTERN_C
 #endif /* SNPRINTFV_COMPAT_H
           compat.h ends here  */
