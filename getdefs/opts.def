@@ -2,24 +2,24 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 1.1 1998/08/21 21:17:07 bkorb Exp $
+ *   $Id: opts.def,v 1.2 1998/08/24 11:30:41 bkorb Exp $
  */
 
 /*
- *  Getdefs copyright 1992-1998 Bruce Korb
+ *  Autogen copyright 1992-1998 Bruce Korb
  *
- *  Getdefs is free software.
+ *  Autogen is free software.
  *  You may redistribute it and/or modify it under the terms of the
  *  GNU General Public License, as published by the Free Software
  *  Foundation; either version 2, or (at your option) any later version.
  *
- *  Getdefs is distributed in the hope that it will be useful,
+ *  Autogen is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Getdefs.  See the file "COPYING".  If not,
+ *  along with Autogen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
@@ -31,42 +31,50 @@ copyright_gpl;
 owner          = "Bruce Korb";
 prog_name      = "getdefs";
 prog_title     = "Autogen Definition Extraction Tool";
-argument       = "<def-file> [ ... ]";
-long_opts;
-
-version = "0.1";
 
 flag = {
-    name      = defs_to_get;
+    name      = "defs_to_get";
     flag_arg  = ":";
     descrip   = 'Regexp to look for after the "/*="';
 };
 
 flag = {
-    name      = "autogen";
-    flag_arg;
-    disable   = "no";
-    enabled;
-    descrip   = "Invoke autogen with defs";
+    name      = ordering;
+    flag_arg; /* optional */
+    disable   = no;
+    descrip   = "Alphabatize or use named file";
 };
 
 flag = {
-    name      = template;
+    name      = input;
     flag_arg  = ":";
-    descrip   = "Template Name";
+    max       = NOLIMIT;
+    min       = "1";
+    stack_arg;
+    default;
+    descrip   = "Input file to search for defs";
 };
 
 flag = {
-    name      = templ_dirs;
-    flag_arg  = ":";
-    descrip   = "Template search directory list";
-    setable;
+    name        = insert_opts;
+    documentation;
+    descrip     = "Definition insertion options";
 };
 
 flag = {
-    name      = base_name;
+    name      = block;
     flag_arg  = ":";
-    descrip   = "Base name for output file(s)";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "Common defs for each output block";
+};
+
+flag = {
+    name      = assign;
+    flag_arg  = ":";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "Global output definitions";
 };
 
 flag = {
@@ -76,24 +84,52 @@ flag = {
 };
 
 flag = {
-    name      = assign;
-    flag_arg  = ":";
-    max       = NOLIMIT;
-    stack_arg;
-    descrip   = "Global assignment for output defs";
+    name        = output_opts;
+    documentation;
+    descrip     = "Definition output disposition options\n"
+                  '("no-autogen" implies output to stdout):';
 };
 
 flag = {
-    name      = block;
-    flag_arg  = ":";
-    max       = NOLIMIT;
-    stack_arg;
-    descrip   = "Block macro for output";
+    name        = output;
+    equivalence = "autogen";
+    descrip     = "Output file to open";
 };
 
 flag = {
-    name      = ordering;
-    flag_arg;
-    disable   = no;
-    descrip   = "Alphabatize or use named file";
+    name        = "autogen";
+    equivalence = "autogen";
+    flag_arg;     /* optional */
+    disable     = "no";
+    enabled;
+    descrip     = "Invoke autogen with defs";
+};
+
+flag = {
+    name        = template;
+    flag_arg    = ":";
+    descrip     = "Template Name";
+    flags_cant  = output;
+};
+
+flag = {
+    name        = templ_dirs;
+    flag_arg    = ":";
+    descrip     = "Template search directory list";
+    setable;
+    flags_cant  = output;
+};
+
+flag = {
+    name        = base_name;
+    flag_arg    = ":";
+    descrip     = "Base name for output file(s)";
+    flags_cant  = output;
+};
+
+flag = {
+    name        = automated;
+    documentation;
+    descrip =
+'The following are automatically supported by AutoOpts:';
 };

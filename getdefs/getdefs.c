@@ -14,6 +14,9 @@ static const char zMallocErr[] =
 static const char zAttribRe[] =
     "\n[^*]*\\*[ \t]*([a-z][a-z0-9_]*):";
 
+static const char zNameTag[] =
+    " = {\n    name = '";
+
 char zRER[ 256 ];
 
 char*   pzDefPat = (char*)NULL;
@@ -26,34 +29,27 @@ char   zBaseName[ 65 ];
 FILE*  evtFp = (FILE*)NULL;
 size_t evtSz = 0;
 
+typedef int (compar_func)(const void *, const void *);
+compar_func compar_text;
+
 typedef char* tPz;
 tPz*    papzBlocks = (tPz*)NULL;
 size_t  blkUseCt   = 0;
 size_t  blkAllocCt = 0;
 
-
 FILE* startAutogen( void );
 char* loadFile( char* pzFname );
-void  processFile( char* pzFile, FILE* defFp );
+void  processFile( char* pzFile );
 void  sortEntries( void );
 void  validateOptions( void );
-
+void  printEntries( FILE* defFp );
 
 
     int
 main( int    argc,
       char** argv )
 {
-    {
-        int optCt = optionProcess( &getdefsOptions, argc, argv );
-        argc -= optCt;
-        if (argc <= 0) {
-            fputs( "Error: no input files specified\n", stderr );
-            USAGE( EXIT_FAILURE );
-        }
-        argv += optCt;
-    }
-
+    optionProcess( &getdefsOptions, argc, argv );
     validateOptions();
 
     {
@@ -75,18 +71,23 @@ main( int    argc,
             int    ct  = STACKCT_OPT(  ASSIGN );
             char** ppz = STACKLST_OPT( ASSIGN );
             do  {
-                fputs( *ppz++, outFp );
-                fputc( '\n',   outFp );
+                fprintf( outFp, "%s;\n", *ppz++ );
             } while (--ct > 0);
         }
 
-        while (--argc >= 0)
-            processFile( *argv++, outFp );
-
-        if (ENABLED_OPT( ORDERING )) {
-            sortEntries();
+        {
+            int    ct  = STACKCT_OPT(  INPUT );
+            char** ppz = STACKLST_OPT( INPUT );
+            do  {
+                processFile( *ppz++ );
+            } while (--ct > 0);
         }
 
+        if (ENABLED_OPT( ORDERING ))
+            qsort( (void*)papzBlocks, blkUseCt, sizeof( char* ),
+                   &compar_text );
+
+        printEntries( outFp );
         fclose( outFp );
     }
 
@@ -149,9 +150,46 @@ validateOptions( void )
 }
 
 
-    void
-sortEntries( void )
+
+    int
+compar_text( const void* p1, const void* p2 )
 {
+    char* pz1 = strstr( *(char**)p1, zNameTag );
+    char* pe1;
+    char* pz2 = strstr( *(char**)p2, zNameTag );
+    char* pe2;
+    int   res;
+
+    static const char zBogus[] = "Bogus definition:\n%s\n";
+
+    if (pz1 == (char*)NULL) {
+        fprintf( stderr, zBogus, *(char**)p1 );
+        exit( EXIT_FAILURE );
+    }
+
+    if (pz2 == (char*)NULL) {
+        fprintf( stderr, zBogus, *(char**)p2 );
+        exit( EXIT_FAILURE );
+    }
+
+    pe1 = strchr( pz1 + sizeof( zNameTag ), '\'' );
+
+    if (pe1 == (char*)NULL) {
+        fprintf( stderr, zBogus, *(char**)p1 );
+        exit( EXIT_FAILURE );
+    }
+
+    pe2 = strchr( pz2 + sizeof( zNameTag ), '\'' );
+
+    if (pe2 == (char*)NULL) {
+        fprintf( stderr, zBogus, *(char**)p2 );
+        exit( EXIT_FAILURE );
+    }
+
+    *pe1 = *pe2 = NUL;
+    res = strcmp( pz1, pz2 );
+    *pe1 = *pe2 = '\'';
+    return res;
 }
 
 
@@ -314,36 +352,59 @@ typedef enum {
     void
 compressDef( char* pz )
 {
+    char* pzStrt = pz;
     char* pzDest = pz;
     char* pzSrc  = pz+1;
-    int   nl     =  0;
-    while (isspace( *pzSrc )) {
-        if (*pzSrc == '\n')
-            nl++;
-        pzSrc++;
-    }
 
-    if (nl) {
+    for (;;) {
+        int   nl =  0;
+
+        /*
+         *  Skip over leading space
+         */
+        while (isspace( *pzSrc )) {
+            if (*pzSrc == '\n')
+                nl++;
+            pzSrc++;
+        }
+
+        /*
+         *  IF no new-lines were found, then we found text start
+         */
+        if (nl == 0)
+            break;
+
+        /*
+         *  Skip forward to the next asterisk.
+         *  Then, skip over leading space.
+         */
         while (*++pzSrc != '*') {
             if (*pzSrc == NUL) {
-                *pz = NUL;
+                *pzStrt = NUL;
                 return;
             }
         }
-        while (isspace( *++pzSrc ))  ;
     }
 
     for (;;) {
         for (;;) {
+	    /*
+	     *  Move the source to destination until we find
+	     *  either a new-line or a NUL.
+	     */
             switch (*pzDest++ = *pzSrc++) {
             case '\n':
                 goto lineDone;
             case NUL:
+                pzDest--;
                 goto compressDone;
             default:
             }
         } lineDone:;
 
+	/*
+	 *  We found a new-line.  Skip forward to an asterisk.
+	 */
         while (*++pzSrc != '*') {
             if (*pzSrc == NUL) {
                 goto compressDone;
@@ -352,7 +413,7 @@ compressDef( char* pz )
         while (isspace( *++pzSrc ))  ;
     } compressDone:;
 
-    while ((pzDest > pz) && isspace( pzDest[-1] )) pzDest--;
+    while ((pzDest > pzStrt) && isspace( pzDest[-1] )) pzDest--;
     *pzDest = NUL;
 }
 
@@ -387,8 +448,17 @@ buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
         }
         *pzDef = NUL;
 
-        pzOut += sprintf( pzOut, " = {\n    name = '%s';\n", pzName );
+        pzOut += sprintf( pzOut, "%s%s';\n", zNameTag, pzName );
     }
+
+    if (HAVE_OPT( BLOCK )) {
+        int    ct  = STACKCT_OPT(  BLOCK );
+        char** ppz = STACKLST_OPT( BLOCK );
+        do  {
+            pzOut += sprintf( "    %s;\n", *ppz++ );
+        } while (--ct > 0);
+    }
+
     *pzDef = '\n';
     for (;; pzDef = pzNextDef) {
         int        ct;
@@ -415,7 +485,7 @@ buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
 
         switch (*pzDef) {
         case NUL:
-            pzOut += sprintf( pzOut, ";\n" );
+            *pzOut++ = ';'; *pzOut++ = '\n';
             break;
 
         case '"':
@@ -466,7 +536,7 @@ buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
 
 
     void
-processFile( char* pzFile, FILE* defFp )
+processFile( char* pzFile )
 {
     char* pzText = loadFile( pzFile ); /* full text */
     char* pzScan;  /* Scanning Pointer  */
@@ -530,7 +600,7 @@ processFile( char* pzFile, FILE* defFp )
         {
             tSCC zLineId[] = "\n#line %d \"%s\"\n";
             pzOut = pzDta =
-                (char*)malloc( 2 * strlen( pzDef ) + sizeof( zLineId ) + 1024);
+                (char*)malloc( 2 * strlen( pzDef ) + sizeof( zLineId ) + 4096);
             pzOut += sprintf( pzDta, zLineId, lineNo, pzFile );
         }
 
@@ -551,8 +621,19 @@ processFile( char* pzFile, FILE* defFp )
          *  definition are and where we will resume our processing.
          */
         buildDefinition( pzDef, pzFile, lineNo, pzOut );
-        fputs( pzDta, defFp );
-        free( (void*)pzDta );
+        pzDta = (char*)realloc( (void*)pzDta, strlen( pzDta ) + 1 );
+
+        if (++blkUseCt > blkAllocCt) {
+            blkAllocCt += 32;
+            papzBlocks = (char**)realloc( (void*)papzBlocks,
+                                          blkAllocCt * sizeof( char* ));
+            if (papzBlocks == (char**)NULL) {
+                fprintf( stderr, "Realloc error for %d pointers\n",
+                         blkAllocCt );
+                exit( EXIT_FAILURE );
+            }
+        }
+        papzBlocks[ blkUseCt-1 ] = pzDta;
     }
 
     if (lineNo == 1) {
@@ -564,6 +645,25 @@ processFile( char* pzFile, FILE* defFp )
 }
 
 
+    void
+printEntries( FILE* fp )
+{
+    int     ct  = blkUseCt;
+    char**  ppz = papzBlocks;
+
+    for (;;) {
+        char* pz = *(ppz++);
+        if (--ct < 0)
+            break;
+        fputs( pz, fp );
+        free( (void*)pz );
+        if (ct > 0)
+            fputs( "\n\n", fp );
+    }
+    free( (void*)papzBlocks );
+}
+
+
     FILE*
 startAutogen( void )
 {
@@ -572,10 +672,32 @@ startAutogen( void )
 
     char* args[ 8 ];
     char** pparg = args+1;
+    char*  pzAutogen = "autogen";
 
     char zTempl[ MAXPATHLEN ];
     char zSrch[  MAXPATHLEN ];
     char zBase[  MAXPATHLEN ];
+
+    if (HAVE_OPT( AUTOGEN ))
+        switch (WHICH_IDX_AUTOGEN) {
+        case INDEX_OPT_OUTPUT:
+            if (strcmp( OPT_ARG( OUTPUT ), "-"))
+                return stdout;
+            return fopen( OPT_ARG( OUTPUT ), "r" );
+
+        case INDEX_OPT_AUTOGEN:
+            if (! ENABLED_OPT( AUTOGEN ))
+                return stdout;
+    
+            if (  ( OPT_ARG( AUTOGEN ) != (char*)NULL)
+               && (*OPT_ARG( AUTOGEN ) != NUL ))
+                pzAutogen = OPT_ARG( AUTOGEN );
+
+            break;
+
+        default:
+            break;
+        }
 
     if (HAVE_OPT( BASE_NAME ))
         sprintf( zBase, "-b%s", OPT_ARG( BASE_NAME ));
@@ -609,9 +731,7 @@ startAutogen( void )
         return stdout;
     }
 
-    if (HAVE_OPT( AUTOGEN ) && (OPT_ARG( AUTOGEN ) != (char*)NULL))
-         args[0] = OPT_ARG( AUTOGEN );
-    else args[0] = "autogen";
+    args[0] = pzAutogen;
 
     if (HAVE_OPT( TEMPL_DIRS )) {
         sprintf( zSrch, "-L%s", OPT_ARG( TEMPL_DIRS ));
