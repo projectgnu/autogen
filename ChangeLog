@@ -1,3 +1,9 @@
+2003-04-10  Bruce Korb  <bkorb@gnu.org>
+
+	* expOutput.c(ag_scm_out_push_new): mkstemp uses the O_CREAT flag.
+	This is incompatibile with the fdopen option "a+" on OSR5.
+	* tpProcess.c(openOutFile): incorrect arg list for printf.
+
 2003-04-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/bootstrap.dir: fix comment

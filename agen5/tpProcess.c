@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.12 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.13 2003/04/11 21:38:43 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -348,8 +348,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
     if (pStk->pFile == NULL) {
     openError:
-        AG_ABEND( aprf( zCannot, pzProg, errno, "create",
-                        pStk->pzOutName, strerror( errno )));
+        AG_ABEND( aprf( zCannot, errno, "create", pStk->pzOutName,
+                        strerror( errno )));
     }
 }
 /*

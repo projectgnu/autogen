@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.10 2003/02/16 00:04:39 bkorb Exp $
+ *  $Id: expOutput.c,v 3.11 2003/04/11 21:38:43 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -362,7 +362,7 @@ ag_scm_out_push_new( SCM new_file )
         if (tmpfd < 0)
             AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
-        p->pFile  = fdopen( tmpfd, "a" FOPEN_BINARY_FLAG "+" );
+        p->pFile  = fdopen( tmpfd, "w" FOPEN_BINARY_FLAG "+" );
     }
 
     if (p->pFile == NULL)
