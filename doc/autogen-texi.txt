@@ -376,8 +376,8 @@ This chapter describes the syntax and semantics of the AutoGen
 definition file.  In order to instantiate a template, you normally must
 provide a definitions file that identifies itself and contains some
 value definitions.  Consequently, we keep it very simple.  For
-"advanced" users, there are preprocessing directives and comments that
-may be used as well.
+"advanced" users, there are preprocessing directives, sparse
+arrays, named indexes and comments that may be used as well.
 
 The definitions file is used to associate values with names.  Every
 value is implicitly an array of values, even if there is only one value.

@@ -2,8 +2,8 @@
 
 html=autogen.html
 
-# Time-stamp: "2002-02-02 13:10:02 bkorb"
-# Version:    "$Revision: 3.2 $
+# Time-stamp: "2003-04-22 17:29:36 bkorb"
+# Version:    "$Revision: 3.3 $
 
 # AutoGen Options copyright 1992-2003 Bruce Korb
 
@@ -87,6 +87,10 @@ This manual is available in the following formats:
   <p>
   <li>formatted as <a href="dvi/autogen.dvi.gz">a TeX dvi file ([=
       (compute-size "dvi/autogen.dvi.gz")
+      =] gzipped bytes)</a>.
+  <p>
+  <li>formatted as <a href="pdf/autogen.pdf.gz">a PDF file ([=
+      (compute-size "pdf/autogen.pdf.gz")
       =] gzipped bytes)</a>.
   <p>
   <li>formatted as <a href="ps/autogen.ps.gz">a PostScript file ([=

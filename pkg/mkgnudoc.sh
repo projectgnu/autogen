@@ -1,7 +1,9 @@
 #! /bin/sh
 
-# Time-stamp: "2002-12-27 09:48:31 bkorb"
-# Version:    "$Revision: 3.7 $
+# Time-stamp: "2003-04-22 17:28:18 bkorb"
+# Version:    "$Revision: 3.8 $
+
+MAKE=${MAKE:-make}
 
 eval "`egrep '^AG_' ../VERSION`"
 [ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
@@ -11,7 +13,7 @@ mkdir autogen-${AG_VERSION} || {
 }
 
 cd autogen-${AG_VERSION}
-mkdir html_mono html_chapter html_node info text dvi ps texi || {
+mkdir html_mono html_chapter html_node info text dvi pdf ps texi || {
   echo cannot make subdirectories: >&2
   echo html_mono html_chapter html_node info text dvi ps texi >&2
   exit 1
@@ -21,7 +23,7 @@ echo
 echo "Making documentation hierarchy for autogen-${AG_VERSION}"
 echo
 cd ..
-[ -f autogen.info ] || make
+[ -f autogen.info ] || ${MAKE}
 
 texi2html -menu -split=none    -verbose autogen.texi
 mv -f autogen.html autogen-${AG_VERSION}/html_mono
@@ -39,10 +41,12 @@ for f in autogen*.info*
 do gzip -c $f > autogen-${AG_VERSION}/info/$f.gz
 done
 
-[ -f autogen.ps  ] || make autogen.ps
-[ -f autogen.txt ] || make autogen.txt
+[ -f autogen.ps  ] || ${MAKE} autogen.ps
+[ -f autogen.txt ] || ${MAKE} autogen.txt
+[ -f autogen.pdf ] || ${MAKE} autogen.pdf
 
 gzip -c autogen.dvi  > autogen-${AG_VERSION}/dvi/autogen.dvi.gz
+gzip -c autogen.pdf  > autogen-${AG_VERSION}/pdf/autogen.pdf.gz
 gzip -c autogen.ps   > autogen-${AG_VERSION}/ps/autogen.ps.gz
 gzip -c autogen.texi > autogen-${AG_VERSION}/texi/autogen.texi.gz
 gzip -c autogen.txt  > autogen-${AG_VERSION}/text/autogen.txt.gz
