@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.8 2002/07/27 17:46:33 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.9 2002/07/27 19:10:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -53,22 +53,14 @@ directories:
 [=
 (define e-addr "bkorb@gnu.org")
 
-(shellf "
-COPYRIGHT='%s'
-TITLE='%s'
-PACKAGE='%s'
-cat <<_EOF_
+(shell (string-append "cat <<_EOF_
 @set EDITION   ${AG_REVISION}
 @set VERSION   ${AG_REVISION}
 @set UPDATED   `date '+%B %Y'`
-@set COPYRIGHT $COPYRIGHT
-@set TITLE     $TITLE
-@set PACKAGE   $PACKAGE
-_EOF_"
-
-  (get "copyright.date")
-  (get "prog_title")
-  (get "package"))
+@set COPYRIGHT "    (get "copyright.date")
+"\n@set TITLE     " (get "prog_title")
+"\n@set PACKAGE   " (get "package")
+"\n_EOF_" ))
 
 =]
 

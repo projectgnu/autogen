@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.6 2002/06/15 01:12:13 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.7 2002/07/27 19:10:46 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -63,6 +63,9 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
     *pzEnd = NUL;
     gh_eval_str( pzData );
     *pzEnd = ch;
+    while (pzData < pzEnd)
+        if (*(pzData++) == '\n')
+            templLineNo++;
     return (tCC*)pzEnd;
 }
 

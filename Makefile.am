@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2002-07-11 12:36:16 bkorb"
+## Time-stamp:      "2002-07-27 11:42:45 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2002/07/11 20:28:44 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2002/07/27 19:10:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,7 +21,7 @@ MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 		  configure libtool stamp-h.in
 
 distcleancheck_listfiles = \
-     find -type f -exec sh -c 'test -f $(scrdir)/{} || echo {}'
+     find -type f -exec 'test -f $(scrdir)/{} || echo {}'
 
 configure : VERSION
 

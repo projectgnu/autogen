@@ -1,3 +1,109 @@
+
+2002-06-27  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/xml2ag.c: add casts to avoid warnings.
+	* config/misc.def: fix sed expressions
+	* doc/Makefile.am: Regularize the add-on texi rules +
+	accommodate possibility of xml2ag not being built.
+
+2002-06-26  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/xml2ag.c: add casts to avoid warnings.
+
+2002-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doImmediateOpts): clarify the version mismatch
+	message
+	* noag-boot.sh: regenerate with cgi-fsm.h, too.
+
+2002-06-20  Bruce Korb  <bkorb@gnu.org>
+
+	* columns/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+	* getdefs/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+	* xml2ag/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+
+2002-06-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-macro.tpl(suffix): put it all in Scheme
+	* agen5/loadPseudo.c(loadPseudoMacro): avoid segfaults on empty files
+	* agen5/defReduce.c: fix cast for warning elimination
+	* columns/columns.c(snprintfv.h): remove unnecessary #include
+	* compat/strsignal.c: ditto
+	* getdefs/getdefs.h: ditto
+
+2002-06-13  Bruce Korb  <bkorb@gnu.org>
+
+	* defLex.c(yylex): prevent compilers from caching a changable value
+	* autoopts/autoopts-config.in: don't try to provide a REGEX_LIB subs.
+	* autoopts/optcode.tpl(doVersion): when compiling for a generated main,
+	divert version output to stderr.
+	* autoopts/save.c: remove redundant test + restrict scope of variable.
+	* autoopts/version.c(doVersionStderr): new proc for generated mains.
+	* doc/autogen.texi(XML): improve doc on how it is used.
+	
+2002-06-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(getdefs): use the configured name
+	* agen5/defReduce.c(makeEmptyDefs): anti-warning cast
+	* autoopts/aginfo.tpl(explain): add explanitory info to top
+	* autoopts/agman1.tpl(FOR flag): get correct enablement and disablement
+	names and use them.
+	* autoopts/opthead.tpl(HAVE_OPT): readability change
+	* doc/Makefile.am(xml2ag): add documentation
+	* doc/autogen.texi: tweak XML discussion
+	* getdefs/Makefile.am: make it very similar to the xml2ag one
+	* xml2ag/Makefile.am: make it very similar to the getdefs one
+	* xml2ag/xmlopts.def(prog-info-descrip): doc the info variant some more.
+	
+2002-06-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: pass entire doc through texi->man sed script
+	* autoopts/agman3.tpl: ditto
+	* xml2ag/Makefile.am: specify "columns" binary to use.
+	* xml2ag/fork.tpl: use COLUMNS_EXE, when available.
+
+2002-06-09  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/*: new command.  Wrapper converts XML to autogen definitions
+	and passes them to a spawned autogen process.  Requires libxml2 to build.
+	* Makefile.am: make the building of xml2ag configurable
+	* agen5/opts.def: Use this file for pass through opts for xml2ag
+	* config/misc.def: Add the configured value $(XML2AG_DIR) to TOP_DIRLIST
+	(xml): add a new "withlib" test, with a `xml2-config` test fallback.
+	It will not override --no-libxml, however.
+	* getdefs/Makefile.am(DISTCLEANFILES): add $(nodist_getdefs_SOURCES)
+
+2002-05-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/Makefile.in(CPPFLAGS): specifically set the value
+	* agen5/test/Makefile.in(CPPFLAGS): ditto
+
+2002-05-28  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in(static-libs): new option
+	* autoopts/autoopts-config.1(static-libs): doc it
+	* agen5/defParse.y(makeEmptyDefs): Allow for def file with no defs.
+	* agen5/defReduce.c(makeEmptyDefs): write the routine.
+
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl: filter entire doc for texinfo-isms
+	* autoopts/agman3.tpl: ditto
+
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expPrint.c(ag_scm_printf): clarify usage.
+	* autoopts/test/errors.test(RC): create directory early for usage display
+	* autoopts/usage.c(printInitList): program name now needed to expand
+	'$$' references.  $$ and $X expansions on rc file names is now done.
+	Also, corrected S_ISDIR test for file name display.
+	* autoopts/test/rc.test(rc.file): directory name is now expanded
+	* config/confmacs.tpl(withlib): add special define names
+
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
+	* 5.3.7 released.  Older changes retired to ChangeLog.3
+
 2002-05-11  Bruce Korb  <bkorb@gnu.org>
 
 	* config/misc.def(guile): add --with-xxx for guile library

@@ -1,3 +1,11 @@
+New in 5.4
+* should have bumped to 5.4 with the release of xml2ag.
+  AutoOpts documentation and usage text now uses the copyright.eaddr value
+  as the "send bug reports to" address.
+  AutoGen command line options may now be embedded in template and definitions
+  files.  The template files support the scheme function (set-option "..."),
+  and definition files support the directive, "#option ...".
+
 New in 5.3.8
 * xml2ag was added.  This is a wrapper program that will convert
   XML documentation into AutoGen definitions and pass them through
