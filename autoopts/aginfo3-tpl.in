@@ -5,13 +5,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2002-05-07 21:01:49 bkorb"
+## Time-stamp:      "2004-05-09 11:03:21 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo3-tpl.in,v 3.6 2004/02/01 21:26:45 bkorb Exp $
+## $Id: aginfo3-tpl.in,v 3.7 2004/05/12 02:37:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi
@@ -21,8 +21,11 @@ texi
 +}{+
 
 (out-push-new (sprintf "%s.menu" (base-name)))
-(define node-name (sprintf "lib%s procedures" (get "library")))
-(define sec-name  (sprintf "lib%s External Procedures" (get "library")))
+(define lib-name (get "library"))
+(if (< (string-length lib-name) 1)
+    (set! lib-name (base-name)) )
+(define node-name (sprintf "lib%s procedures" lib-name))
+(define sec-name  (sprintf "lib%s External Procedures" lib-name))
 
 (define doc-level (getenv "LEVEL"))
 (if (not (string? doc-level))
@@ -36,7 +39,7 @@ texi
 
 IF (not (exist? "lib-description"))
 
-+}These are the publicly exported procedures from the lib@i{library}
++}These are the publicly exported procedures from the lib@i{{+(. lib-name)+}}
 library.  Any other functions mentioned in the @i{header} file are
 for the private use of the library.{+
 
@@ -48,7 +51,7 @@ ENDIF +}
 FOR export_func               +}{+
   IF (not (exist? "private")) +}
 * lib{+(sprintf "%-24s" (string-append
-       (get "library") "-" (get "name") "::"))
+       lib-name "-" (get "name") "::"))
     +} {+name      +}{+
 
   ENDIF private    +}{+
