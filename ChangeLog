@@ -1,3 +1,8 @@
+2000-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.h(pathfind): duplicates declaration from
+	compat/compat.h - removed.
+
 2000-09-05  Jerome Lovy  <Jerome.Lovy@infonie.de>
 
 	* autoopts/test/Makefile.am:  Pass through the

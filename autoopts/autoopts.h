@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.12 2000/08/29 14:30:20 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.13 2000/09/10 19:21:45 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -128,19 +128,6 @@
 #else
 #  define DIR_SEP_CHAR   '\\'
 #  define OPT_CHAR       '/'
-#endif
-
-#ifndef HAVE_PATHFIND
-/*
- * pathfind looks for a a file with name FILENAME and MODE access
- * along colon delimited PATH, and returns the full pathname as a
- * string, or NULL if not found.
- */
-#  ifdef __STDC__
-     extern char* pathfind(const char *, const char *, const char *);
-#  else
-     extern char* pathfind();
-#  endif
 #endif
 
 #ifndef STR
