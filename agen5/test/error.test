@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2003-05-18 13:02:10 bkorb"
+# Time-stamp:        "2003-05-18 19:07:17 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.12 2003/05/18 20:02:40 bkorb Exp $
+# $Id: error.test,v 3.13 2003/05/22 04:23:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -198,9 +198,8 @@ if (exist? "nothing")
 =================================
 EOF
 
-## cmp -s  ${testname}.samp6  ${testname}.out6 || \
-##   failure "`diff -c ${testname}.samp6 ${testname}.out6`"
-diff -c ${testname}.samp6 ${testname}.out6
+cmp -s  ${testname}.samp6  ${testname}.out6 || \
+  failure "`diff -c ${testname}.samp6 ${testname}.out6`"
 
 cleanup
 # end of error.test

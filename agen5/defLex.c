@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.18 2003/05/18 17:12:29 bkorb Exp $
+ *  $Id: defLex.c,v 3.19 2003/05/22 04:23:01 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -351,7 +351,8 @@ loadScheme( void )
      */
     *pzEnd = NUL;
     procState = PROC_STATE_GUILE_PRELOAD;
-    res = ag_eval( pzText );
+    res = ag_scm_c_eval_string_from_file_line(
+        pzText, pCurCtx->pzFileName, pCurCtx->lineNo );
     procState = PROC_STATE_LOAD_DEFS;
     *pzEnd = endCh;
 
@@ -406,7 +407,8 @@ alist_to_autogen_def( void )
      *  the NUL-ed character.
      */
     procState = PROC_STATE_GUILE_PRELOAD;
-    res       = ag_eval( pzText );
+    res = ag_scm_c_eval_string_from_file_line(
+        pzText, pCurCtx->pzFileName, pCurCtx->lineNo );
 
     /*
      *  The result *must* be a string, or we choke.

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.14 2003/05/18 17:12:30 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.15 2003/05/22 04:23:01 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -57,7 +57,8 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName )
     *pzEnd    = NUL;
     pCurMacro = &mac;
 
-    ag_eval( (char*)pzData );
+    ag_scm_c_eval_string_from_file_line(
+          (char*)pzData, pzFileName, templLineNo );
 
     pCurMacro = pCM;
     *pzEnd    = ch;

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2003-05-16 19:11:53 bkorb"
+# Time-stamp:      "2003-05-18 19:06:25 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: html.test,v 3.6 2003/05/18 17:10:51 bkorb Exp $
+# $Id: html.test,v 3.7 2003/05/22 04:23:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -92,8 +92,8 @@ cat > ${testname}-2.samp <<'_EOF_'
 Content-type: text/plain
 
 AutoGen form processing error:
-<unnamed port>:1:22: In expression (define foo bogus):
-<unnamed port>:1:22: Unbound variable: bogus
+cgi.tpl:9:22: In expression (define foo bogus):
+cgi.tpl:9:22: Unbound variable: bogus
 Scheme evaluation error.  AutoGen ABEND-ing in template
 	cgi.tpl on line 9
 Failing Guile command:  = = = = =

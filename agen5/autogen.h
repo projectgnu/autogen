@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.18 2003/05/18 19:58:23 bkorb Exp $
+ *  $Id: autogen.h,v 3.19 2003/05/22 04:23:01 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -381,16 +381,9 @@ static inline SCM ag_eval( tCC* pzStr )
     tCC* pzSaveScheme = pzLastScheme; /* Watch for nested calls */
     pzLastScheme = pzStr;
 
-#ifdef LATER
-    {
-        static SCM proc = SCM_UNDEFINED;
-        if (proc == SCM_UNDEFINED)
-            proc = scm_permanent_object( scm_c_lookup( "eval-client-input" ));
-        res = scm_call_1(SCM_VARIABLE_REF(proc), gh_str02scm( pzStr ));
-    }
-#else
-    res = gh_eval_str( pzStr );
-#endif
+    res = ag_scm_c_eval_string_from_file_line(
+        pzStr, pCurTemplate->pzFileName, pCurMacro->lineNo );
+
     pzLastScheme = pzSaveScheme;
     return res;
 }

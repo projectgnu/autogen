@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.12 2003/05/18 17:12:29 bkorb Exp $
+ *  $Id: expGuile.c,v 3.13 2003/05/22 04:23:01 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -62,6 +62,45 @@ gh_type_e( SCM typ )
         return GH_TYPE_EXACT;
 
     return GH_TYPE_UNDEFINED;
+}
+
+EXPORT SCM
+ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
+{
+    SCM port;
+
+    {
+        tSCC zEx[] = "eval-string-from-file-line";
+        SCM  expr  = scm_makfrom0str( pzExpr );
+        port = scm_mkstrport( SCM_INUM0, expr, SCM_OPN | SCM_RDNG, zEx );
+    }
+
+    {
+        static SCM file = SCM_UNDEFINED;
+        scm_t_port* pt;
+
+        if (  (file == SCM_UNDEFINED)
+           || (strcmp( SCM_CHARS( file ), pzFile ) != 0) )
+            file = scm_makfrom0str( pzFile );
+
+        pt = SCM_PTAB_ENTRY(port);
+        pt->line_number = line - 1;
+        pt->file_name   = file;
+    }
+
+    {
+        SCM ans = SCM_UNSPECIFIED;
+
+        /* Read expressions from that port; ignore the values.  */
+        for (;;) {
+            SCM form = scm_read( port );
+            if (SCM_EOF_OBJECT_P( form ))
+                break;
+            ans = scm_primitive_eval_x( form );
+        }
+
+        return ans;
+    }
 }
 
 
