@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Feb 25 13:44:24 1999
+## Last Modified:     Fri Feb 26 10:17:15 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.10 1999/02/25 21:49:09 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.11 1999/02/26 18:26:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -115,7 +115,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 
 AutoGen is a tool designed for generating program files that contain
 repetitive text with varied substitutions.  Its goal is to simplify the
-maintainence of programs that contain large amounts of repetitious text.
+maintenance of programs that contain large amounts of repetitious text.
 This is especially valuable if there are several blocks of such text
 that must be kept synchronized.
 
@@ -126,13 +126,13 @@ your program.  You need at least:
 
 @enumerate
 @item
-the flag character in the flag string
+The flag character in the flag string,
 @item
-code to process the flag when it is encountered
+code to process the flag when it is encountered,
 @item
-a global variable (typically something like:  @samp{int sflg = 0;})
+a global state variable or two, and
 @item
-a line in the usage text
+a line in the usage text.
 @end enumerate
 
 @noindent
@@ -140,10 +140,9 @@ You will need more things besides this if you choose to implement
 long option names, rc/ini file processing, environment variables
 and so on.
 
-All of these things can be kept in sync mechanically,
-with the proper templates and this program.
-In fact, I have already done so and AutoGen already
-uses such a facility.  @xref{AutoOpts}.
+All of this can be done mechanically; with the proper templates and this
+program.  In fact, it has already been done and AutoGen itself uses it:
+@xref{AutoOpts}.
 
 @menu
 * Generalities::         General Ideas
