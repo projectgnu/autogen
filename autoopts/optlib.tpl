@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.23 2000/10/29 01:43:32 bkorb Exp $
+# $Id: optlib.tpl,v 1.24 2000/11/01 15:26:23 bkorb Exp $
 
 =]
 [=
@@ -420,7 +420,7 @@ whether or not there are flag options.  If any options take
 arguments, then append "[<val>]" to the flag description and
 "[{=| }<val>]" to the option-name/name descriptions.  We won't
 worry about being correct if every option has a required argument.
-Finally, if there are no minimum occurrance counts (i.e. all
+Finally, if there are no minimum occurrence counts (i.e. all
 options are optional), then we put square brackets around the
 syntax. =][=
 
@@ -442,7 +442,7 @@ USAGE:  %s [=
 
   IF (not (exist? "flag.min")) =][[= ELSE =]{[= ENDIF =] [=
 
-  #  At least one option has a minimum occurrance count.
+  #  At least one option has a minimum occurrence count.
      Therefore, we omit the square brackets around the option
      syntax.
   =][=
