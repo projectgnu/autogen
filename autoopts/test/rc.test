@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: rc.test,v 1.4 2000/10/28 18:17:32 bkorb Exp $
+# $Id: rc.test,v 1.5 2000/11/04 19:43:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -97,6 +97,35 @@ TEST_RC_THIRD='xxx'
 export TEST_RC_THIRD
 _EOF_
 
+
+cmp  ${testname}.cmds ${testname}.test || {
+  cd ..
+  failure ${testname}.cmds AND ${testname}.test do not compare equal
+}
+
+# # # # # # # # # # SECOND TEST OUTPUT FILE # # # # # # # # #
+
+cat >> ../${testname}.rc/${testname}.file  <<_EOF_
+[TEST_MUMBLE]
+second  fourth
+[TEST_`echo ${testname} | tr a-z A-Z`]
+second  fifth
+[TEST_`echo ${testname} | tr a-z A-Z`]
+second  sixth
+_EOF_
+
+../${testname} -t yyy MUMBLE > ${testname}.cmds
+
+#  This is what the output should be:
+#
+cat > ${testname}.test <<'_EOF_'
+OPTION_CT=2
+export OPTION_CT
+TEST_RC_SECOND='fifth'
+export TEST_RC_SECOND
+TEST_RC_THIRD='yyy'
+export TEST_RC_THIRD
+_EOF_
 
 cmp  ${testname}.cmds ${testname}.test || {
   cd ..
