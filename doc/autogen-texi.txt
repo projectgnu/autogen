@@ -400,15 +400,15 @@ ignored, along with all following text through the matching
 C macro substitution is @strong{not} performed.
 
 @menu
-* Identification::  The Identification Definition
-* Definitions::     Named Definitions
-* Dynamic Text::    Dynamic Text
-* Directives::      Controlling What Gets Processed
-* Predefines::      Pre-defined Names
-* Comments::        Commenting Your Definitions
-* Example::         What it all looks like.
-* Full Syntax::     YACC Language Grammar
-* Definition-less::  AutoGen without Definitions
+* Identification::        The Identification Definition
+* Definitions::           Named Definitions
+* Dynamic Text::          Dynamic Text
+* Directives::            Controlling What Gets Processed
+* Predefines::            Pre-defined Names
+* Comments::              Commenting Your Definitions
+* Example::               What it all looks like.
+* Full Syntax::           YACC Language Grammar
+* Alternate Definition::  Alternate Definition Forms
 @end menu
 
 @node Identification
@@ -878,9 +878,9 @@ START == TEMPLATE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
-@node Definition-less
-@section AutoGen without Definitions
-@cindex Definition-less
+@node Alternate Definition
+@section Alternate Definition Forms
+@cindex Alternate Definition
 
 It is entirely possible to write a template that does not depend upon
 external definitions.  Such a template would likely have an unvarying
@@ -1997,7 +1997,7 @@ values.  If @code{copyright} is used, then the first three are required.
 @item
 @file{type} - specifies the type of distribution license.
 AutoOpts/AutoGen will automatically support the text of the GNU Public
-License (@file{GPL}), the GNU Public License with Library extensions
+License (@file{GPL}), the GNU General Public License with Library extensions
 (@file{LGPL}), the Free BSD license (@file{BSD}), and a
 write-it-yourself copyright notice (@file{NOTE}).  Only these values are
 recognized.

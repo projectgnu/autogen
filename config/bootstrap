@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     $Date: 2001/12/09 19:46:03 $
+# Last Modified:     $Date: 2002/01/12 05:10:01 $
 #            by:     Gary V. Vaughan <gary@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.0 2001/12/09 19:46:03 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.1 2002/01/12 05:10:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -49,10 +49,16 @@ wd=`cd $wd ; pwd`
 # Search for a configure.in
 #
 for srcdir in $wd $wd/.. .. .; do
+    test -f $srcdir/configure.ac && break
     test -f $srcdir/configure.in && break
 done
-export srcdir
- 
+
+if test -f $srcdir/configure.ac
+then config_file=configure.ac
+else config_file=configure.in
+fi
+export config_file srcdir
+
 #  This missing function is used in many places
 #
 MISSING="`cd ${srcdir}/config ; pwd`/missing"
@@ -173,10 +179,10 @@ doit ()
 }
 
 # Run through all of the required autogeneration tools in
-# each directory which contains a configure.in file...
-for i in `find $srcdir -name configure.in -print|grep -v CVS/`
+# each directory which contains a ${config_file} file...
+for i in `find $srcdir -name ${config_file} -print|grep -v CVS/`
 do
-  # Find the top directory with respect to the current configure.in.
+  # Find the top directory with respect to the current ${config_file}.
   top=`echo $i|sed 's,/[^/]*$,,'`
   case $i in
     /* | [A-Za-z]:\\*) ;;
@@ -185,7 +191,7 @@ do
 
   # A brief check to make sure we are not running in the wrong
   # directory.
-  initfile=`fgrep AC_CONFIG_SRCDIR $top/configure.in | sed 's,^.*(,,;s,).*$,,'`
+  initfile=`fgrep AC_CONFIG_SRCDIR $top/${config_file} | sed 's,^.*(,,;s,).*$,,'`
   if test -z "$initfile" || test ! -f $top/$initfile; then
     cat <<- _EOF_
         \$initfile is \`$initfile'
@@ -203,25 +209,25 @@ _EOF_
     # remove any stale config.cache
     doit rm -f config.cache
 
-    # Use auxdir if set in configure.in.
-    auxdir=${auxdir-`fgrep CONFIG_AUX_DIR configure.in | \
+    # Use auxdir if set in ${config_file}.
+    auxdir=${auxdir-`fgrep CONFIG_AUX_DIR ${config_file} | \
         sed 's,^.*(,,;s,).*$,,'`}
     test -n "$auxdir" || auxdir=$srcdir
     test -d $auxdir || auxdir=.
 
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
+    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
       | egrep 'A[CM]_PROG_LIBTOOL' > /dev/null ; then
     doit $LIBTOOLIZE    --force
     fi
 
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
+    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
       | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
     doit $ACLOCAL       -I $auxdir
     fi
 
     doit $AUTOHEADER
 
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
+    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
       | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
     doit $AUTOMAKE      --gnu --add-missing
     fi
@@ -232,14 +238,15 @@ done
 
 # Execute (NOTE: not source!) any bootstrap.dir scripts we find in
 # the source tree.
+
 find . -name bootstrap.dir |
-egrep -v 'CVS/Base/'       |
+egrep -v '/CVS/'       | (
 while read f
 do
-  (cd `echo $f|sed 's,/[^/]*$,,'`
+  (cd `dirname $f` ; srcdir=.
    echo running bootstrap.dir in `pwd`
-   sh ./bootstrap.dir recursive )
-done
+   sh ./bootstrap.dir recursive ) || exit 1
+done ) || exit 1
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
@@ -249,8 +256,9 @@ BOOTSTRAP=post
 test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
 
 # Local Variables:
-# mode:shell-script
-# sh-indentation:4
+# mode: shell-script
+# sh-indentation: 2
+# indent-tabs-mode: nil
 # End:
 
 # bootstrap ends here

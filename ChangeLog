@@ -1,3 +1,23 @@
+2002-01-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/bootstrap.dir: write a function to compute AG, GD and COL
+	(set +e): some testing winds up causing a failing false in error
+	* agen5/expFormat.c(ag_scm_error): send error messages to pfTrace
+	(Public License): change to _General_ Public License
+	* agen5/expPrint.c(run_printf): accommodate empty argument lists
+	* agen5/expString.c(shellf): add debugging code
+	* agen5/functions.c(mLoad_Bogus): allocate the error string so it
+	can be handled in the standard way (instead of just fprintf-ing it).
+	* agen5/test/error.test(DEFINITIONS ERROR): new format for message
+	* agen5/test/html.test(cgi.tpl): for CGI scripts, this template will
+	now always be the default, so supply it.  (It avoids requiring
+	command line overrides.)
+	* config/bootstrap(configure.in): parameterize it 'cuz the standard
+	is now named, "configure.ac".
+	* config/bootstrap.local(ADD_CONFIG_FILES): dynamically compute the
+	list.  It's too hard to remember to grub around inside configure.ac.
+	* agen5/autogen.c(autogen-version): add to Guile environment
+
 2002-01-10  Bruce Korb  <bkorb@gnu.org>
 
 	* getdefs/getdefs.c(main): remove warning that is overly common

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.2 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: tpParse.c,v 3.3 2002/01/12 05:10:01 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -89,7 +89,7 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
              *  Make sure we matched to the end of the token.
              */
             if (ISNAMECHAR( pzFuncName[pNT->cmpLen] ))
-                return FTYP_BOGUS;
+                break;
 
             /*
              *  Advance the scanner past the macro name.
@@ -167,7 +167,7 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
 {
     tCC* pzScan = *ppzText;
 
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
+#if defined( DEBUG )
     tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
     tSCC zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
@@ -203,7 +203,7 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
             pM->ozText    = pzCopy - pT->pzTemplText;
             pM->funcCode  = FTYP_TEXT;
             pM->lineNo    = templLineNo;
-#if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
+#if defined( DEBUG )
             if (HAVE_OPT( SHOW_DEFS )) {
                 int ct = level;
                 fprintf( pfTrace, "%3d ", pM - pT->aMacros );
@@ -269,7 +269,7 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
          *       will be non-NULL.
          */
         {
-#if ! defined( DEBUG ) || ! defined( VALUE_OPT_SHOW_DEFS )
+#if ! defined( DEBUG )
             tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pT, pM, &pzScan );
 #else
             teFuncType ft = pM->funcCode;

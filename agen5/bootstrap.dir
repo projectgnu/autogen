@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/24 14:13:32 $
+# Last Modified:     $Date: 2002/01/12 05:10:01 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.3 2002/01/12 05:10:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -80,69 +80,28 @@ fi
 rmlist=
 
 #  Name our executable in one place and disable any $HOME defaults
-#  Use the local ${AG}, if available.  Otherwise, look for it.
+#  Use the local tools, if available.  Otherwise, look for them.
 #
-AUTOGEN=${AUTOGEN-autogen}
-AG=${builddir}/autogen
-
-if test -f ${AG}
-then
-  if test -x ${AG}
-  then :
-  else AG=""
-  fi
-else AG=""
-fi
-
-if test -z "${AG}"
-then
-  f=`type ${AUTOGEN} | sed -e "s;${AUTOGEN} is [^/]*/;/;" `
-
+eval "`
+while read var prog dir
+do
+d=\`cd $dir ; pwd\`
+if [ -x $d/$prog ]
+then echo ${var}=$d/$prog
+else
+  f=\`type $prog | sed -e \"s;${prog} is [^/]*/;/;\" \`
   case ${f} in
-  */autogen )
-     AG=${f}
-     ;;
-
-  * )
-    AG=""
-    ;;
+  */${prog} )  echo ${var}=${f} ;;
+  * ) echo unset ${var} ;;
   esac
 fi
-echo "autogen is '${AG}'"
+done <<EOF
+AG  ${AGEXE-autogen}  ${builddir}
+GD  ${GDEXE-getdefs}  ${builddir}/../getdefs
+COL ${COLEXE-columns} ${builddir}/../columns
+EOF
+`"
 
-#  The "getdefs" and "columns" programs are specifically
-#  called out in some of the templates (ensuring that
-#  they are the ones shipped with the current package)
-#
-GD=../getdefs/getdefs
-if [ ! -x ${GD} ]
-then
-  f=`type getdefs | sed "s,getdefs is [^/]*/,/," `
-  case ${f} in
-  */getdefs )
-     ln -s ${f} ${GD}
-     rmlist="$rmlist ${GD}"
-     ;;
-
-  * )
-    GD=""
-    test "X${BOOTSTRAP}" = X \
-      && echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD})."
-    ;;
-  esac
-fi 2>/dev/null
-
-COL=../columns/columns
-if [ ! -x ${COL} ]
-then
-  f=`type columns | sed "s,columns is [^/]*/,/," `
-  case ${f} in
-  */columns )
-     ln -s ${f} ${COL}
-     rmlist="$rmlist ${COL}"
-     ;;
-  esac
-fi 2>/dev/null
 COLUMNS_EXE="${COL}"
 export COLUMNS_EXE
 
@@ -159,11 +118,7 @@ then
   else
     t=""
     for f
-    do if [ ! -f $f ]
-       then
-         echo "Bootstrapping $f"
-         t="$t $f"
-       fi
+    do [ ! -f $f ] && t="$t $f"
     done
     set -- $t
   fi
@@ -185,6 +140,7 @@ do
   defParse.[ch] )
     #  Set a default for YACC
     #
+	set +e
     if [ "x${YACC}" = x ]
     then
       f="`type byacc 2>/dev/null`"
@@ -224,6 +180,7 @@ do
       mv -f y_tab.c defParse.c
       mv -f y_tab.h defParse.h
     fi
+	set -e
     ;;
 
   stamp-opts | \
@@ -232,8 +189,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-        && echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate ${AG}.  Giving up"
       exit 1
     fi
     echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
@@ -246,8 +202,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-        && echo "Cannot locate ${AG}.  Giving up"
+      echo "Cannot locate ${AG}.  Giving up"
       exit 1
     fi
     echo ${AG} pseudo.def
@@ -259,11 +214,11 @@ do
 
   stamp-exprini | \
   expr.h | \
+  expr.def | \
   expr.ini )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen or getdefs.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     if ksh -c : 2> /dev/null ; then :
@@ -273,40 +228,36 @@ do
     fi
 
     #  funcCase.c must be first file in list.
+    #  It has the exparg attribute names.
     #
-    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd` ; export AUTOGEN_TEMPL_DIRS
     eopt="defs=gfunc templ=snarf srcfile assign=two-phase=yes"
-    eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
-    echo ${GD} $eopt exp*.c func*.c
-    ( SHELL=ksh ${GD} $eopt func*.c exp*.c 2>&1 ) > stamp-exprini
-    egrep -v 'no copies of pattern' stamp-exprini || :
+    eopt="assign=group=ag $eopt out=expr.def"
+    rm -f expr.def
+    echo ${GD} $eopt func*.c exp*.c
+    set +e
+    ( SHELL=ksh ${GD} $eopt func*.c exp*.c 2>&1 ) | \
+	  egrep -v 'no copies of pattern' >&2
+    set -e
+	${AG} expr.def
+    if [ "$t" = "expr.def" ]
+	then : ; else rm -f expr.def ; fi
     date > stamp-exprini
     ;;
 
-  expr.def )
-    if [ -z "${GD}" ]
-    then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen or getdefs.  Giving up"
-      exit 1
-    fi
-    eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
-    eopt="assign=group=ag $eopt defs=gfunc templ=snarf srcfile"
-    SHELL=ksh ${GD} $eopt out=expr.def exp*.c func*.c
-    ;;
-
   stamp-directive | \
+  directive.def | \
   directive.h )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen or getdefs.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
-    AUTOGEN_TEMPL_DIRS=`cd $srcdir ; pwd`
-    eopt="template=directive autogen=${AG} base-name=directive"
-    echo ${GD} $eopt ${top_srcdir}/agen5/defDirect.c
-    ${GD} $eopt defDirect.c
+    eopt="template=directive out=directive.def"
+    echo "${GD} $eopt ${srcdir}/defDirect.c | ${AG} -b directive"
+    ${GD} $eopt ${srcdir}/defDirect.c
+    ${AG} directive.def
+    if [ "$t" = "directive.def" ]
+	then : ; else rm -f directive.def ; fi
     date > stamp-directive
     ;;
 
@@ -315,8 +266,7 @@ do
     #
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen or getdefs.  Giving up"
+      echo "Cannot locate autogen or getdefs.  Giving up"
       exit 1
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
@@ -329,8 +279,7 @@ do
     #
     if [ -z "${AG}" ]
     then
-      test "X${BOOTSTRAP}" = X \
-         && echo "Cannot locate autogen.  Giving up"
+      echo "Cannot locate autogen.  Giving up"
       exit 1
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
@@ -340,7 +289,8 @@ do
 
   proto.h )
     ( cat <<-	_EOF_
-	/*
+	/* -*- buffer-read-only: t -*- vi: set ro:
+	 *
 	 * AutoGen Globally exported prototypes `date`
 	 */
 	#ifndef AUTOGEN_PROTOTYPES_H
@@ -383,6 +333,7 @@ then rm -f $rmlist ; fi
 # Local Variables:
 # mode:shell-script
 # sh-indentation:4
+# indent-tabs-mode: nil
 # End:
 
 # bootstrap.dir ends here

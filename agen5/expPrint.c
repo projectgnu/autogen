@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: expPrint.c,v 3.3 2002/01/12 05:10:01 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -122,7 +122,7 @@ run_printf( char* pzFmt, int len, SCM alist )
      *  Allocate everything we need at once.  Round up to next 4096 bytes.
      *  Most likely, we allocate and free a page every time.
      */
-    bfSize += 2 * len * sizeof( void* ) + 0x0FFF;
+    bfSize += 2 * len * sizeof( void* ) + 0x100F;
     bfSize &= ~0x0FFF;
 
     arglist  = argp  = (void**)AGALOC( bfSize, "sprintf buffer" );
@@ -130,7 +130,7 @@ run_printf( char* pzFmt, int len, SCM alist )
     pzBuf    = (char*)(freelist + len);
     bfSize  -= 2 * len * sizeof( void* );
 
-    do  {
+    while (len-- > 0) {
         SCM  car = SCM_CAR( alist );
         alist = SCM_CDR( alist );
         switch (gh_type_e( car )) {
@@ -169,7 +169,7 @@ run_printf( char* pzFmt, int len, SCM alist )
             *(argp++) = (void*)"...";
             break;
         }
-    } while (--len > 0);
+    }
 
     /*
      *  Do the formatting and allocate a new SCM to hold the result.

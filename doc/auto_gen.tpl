@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.2 2002/01/12 05:10:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -115,6 +115,14 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 @end titlepage
 [=
 
+DEFINE id-file =]
+@ignore
+Generated [= (tpl-file-line) =].
+Extracted from [=srcfile=] line [=linenum=].
+@end ignore[=
+
+ENDDEF  =][=
+
 
 (define text-tag "")=][=
 
@@ -149,11 +157,9 @@ FOR directive "\n" =][=
 @item #[=% name (string-downcase! "%s") =][= % arg " %s" =]
 @cindex #[=% name (string-downcase! "%s") =]
 @cindex [=% name (string-downcase! "%s") =] directive
-@ignore
-Generated [= (tpl-file-line) =].
-@end ignore
-[=text=][=
-  ENDIF=][=
+[= id-file =]
+[=text     =][=
+  ENDIF    =][=
 ENDFOR directive=]
 @end table
 
@@ -236,9 +242,7 @@ FOR gfunc =][=
 @subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
-@ignore
-Generated [= (tpl-file-line) =].
-@end ignore
+[= id-file     =]
 Usage:  ([=(. func-str)=][=
     FOR exparg =] [=
       arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
@@ -298,9 +302,7 @@ FOR gfunc =][=
 @subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
-@ignore
-Generated [= (tpl-file-line) =].
-@end ignore
+[= id-file     =]
 Usage:  ([=(. func-str)=][=
     FOR exparg =] [=
       arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
@@ -405,9 +407,7 @@ FOR macfunc =][=
 
 @node [=name=]
 @subsection [=% name (string-upcase! "%s") =] - [=what=]
-@ignore
-Generated [= (tpl-file-line) =].
-@end ignore
+[= id-file =]
 @findex [=% name (string-upcase! "%s") =][=
   (if (exist? "cindex")
       (string-append "\n@cindex "

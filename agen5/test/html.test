@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/01/03 17:08:22 $
+# Last Modified:     $Date: 2002/01/12 05:10:01 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: html.test,v 3.2 2002/01/03 17:08:22 bkorb Exp $
+# $Id: html.test,v 3.3 2002/01/12 05:10:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,7 +21,33 @@ if test -z "$srcdir"; then
 fi
 . $srcdir/defs
 
-# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+# # # # # # # # # # TEMPLATE FILES # # # # # # # # #
+
+echo creating cgi.tpl
+cat > cgi.tpl <<'_EOF_'
+<? AutoGen5 Template ?>
+<? DEFINE form-error
+?>HTTP/1.0 500 AutoGen Forms Error
+Content-Type: text/plain
+
+The submitted form does not contain a valid template<?
+  IF (exist? "template") ?> (<?template?>) <?ENDIF?>.<?
+ENDDEF                                             ?><?
+
+IF (not (exist? "template"))                       ?><?
+  form-error                                       ?><?
+
+ELIF (access? (get "template") R_OK)               ?><?
+  INCLUDE (get "template")                         ?><?
+
+ELIF (access? (string-append
+              (get "template") ".tpl") R_OK)       ?><?
+  INCLUDE (string-append (get "template") ".tpl")  ?><?
+
+ELSE                                               ?><?
+  form-error                                       ?><?
+ENDIF                                              ?>
+_EOF_
 
 echo creating ${testname}.tpl
 cat > ${testname}.tpl <<'_EOF_'
@@ -42,16 +68,14 @@ Content-Type: text/html
 _EOF_
 
 # # # # # # # RUN AUTOGEN # # # # # #
-
+set -x
 REQUEST_METHOD=GET
-QUERY_STRING='mumble=fumble+bumble&foo=bar'
-CONTENT_LENGTH=${#QUERY_STRING}
+QUERY_STRING="mumble=fumble+bumble&foo=bar&template=${testname}"
+CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
-export CONTENT_LENGTH
-export REQUEST_METHOD
-export QUERY_STRING
+export CONTENT_LENGTH REQUEST_METHOD QUERY_STRING
 
-$AGEXE -b ${testname} -T ${testname}.tpl > ${testname}.test || \
+$AGEXE > ${testname}.test || \
   failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #

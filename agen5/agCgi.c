@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.4 2001/12/29 11:24:56 bkorb Exp $
+ *  $Id: agCgi.c,v 3.5 2002/01/12 05:10:01 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -96,8 +96,7 @@ loadCgi( void )
     int textLen = 0;
     char* pzText  = NULL;
 
-    fclose( stderr );
-    fcntl( STDOUT_FILENO, F_DUPFD, STDERR_FILENO );
+    dup2( STDOUT_FILENO, STDERR_FILENO );
     (void)fdopen( STDERR_FILENO, "w" );
 
     {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.1 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: functions.c,v 3.2 2002/01/12 05:10:01 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -349,24 +349,24 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     tMacro*
 mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
-    long           srcLen = (long)pMac->res;           /* macro len  */
-    char z[ 128 ];
-    snprintf( z, sizeof(z), "%s function (%d) out of context",
-              apzFuncNames[ pMac->funcCode ], pMac->funcCode );
-    fprintf( stderr, zTplErr, pT->pzFileName,
-             pMac->lineNo, z );
+    tCC* pzSrc = (const char*)pMac->ozText; /* macro text */
+    char z1[ 128 ];
+    char z2[ 64 ];
 
-    if (srcLen > 0) {
-        if (srcLen > 64)
-            srcLen = 64;
-        do  {
-            fputc( *(pzSrc++), stderr );
-        } while (--srcLen > 0);
-        fputc( '\n', stderr );
+    strncpy( z2, pzSrc, 63 );
+    z2[63] = NUL;
+
+    snprintf( z1, sizeof(z1), "%s function (%d) out of context",
+              apzFuncNames[ pMac->funcCode ], pMac->funcCode );
+
+    {
+        char* pz = asprintf( zTplErr, pT->pzFileName, pMac->lineNo, z1 );
+        pzSrc = AGALOC( strlen( pz ) + 65, "context error message" );
+        sprintf( pzSrc, "%s%s", pz, z2 );
+        AGFREE( pz );
     }
 
-    LOAD_ABORT( pT, pMac, "bad context" );
+    LOAD_ABORT( pT, pMac, pzSrc );
     /* NOTREACHED */
     return (tMacro*)NULL;
 }

@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.1 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: expMake.c,v 3.2 2002/01/12 05:10:01 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -47,22 +47,25 @@
  *  line that does not end with a backslash.
  *
  *  @item
- *  Doubling the dollar sign character, unless it immediately preceeds an
- *  opening parenthesis or the single character make macros '*', '<', '@', '?'
- *  or '%'.  Other single character make macros without enclosing parentheses
- *  will fail.  For shell usage of the "$@", "$?" and "$*" macros, you must
- *  enclose them with curly braces, i.e., "$@{?@}".
+ *  Doubling the dollar sign character, unless it immediately precedes an
+ *  opening parenthesis or the single character make macros '*', '<', '@@',
+ *  '?' or '%'.  Other single character make macros without enclosing
+ *  parentheses will fail.  For shell usage of the "$@@", "$?" and "$*"
+ *  macros, you must enclose them with curly braces, i.e., "$@{?@}".
  *
  *  @item
- *  Prefixes every line with a tab, unless the first line starts with a tab.
+ *  Prefixes every line with a tab, unless the first line
+ *  already starts with a tab.
  *
  *  @item
  *  The newline character on the last line, if present, is suppressed.
  *  @end enumerate
  *
- *  You would be expected to use this function approximately as follows:
+ *  @noindent
+ *  This function is intended to be used approximately as follows:
  *
  *  @example
+ *  $(TARGET) : $(DEPENDENCIES)
  *  <+ (out-push-new) +>
  *  ....arbitrary shell script text....
  *  <+ (makefile-script (out-pop #t)) +>
