@@ -1,9 +1,37 @@
+1998-10-08  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* doc/Makefile.am (EXTRA_DIST): added the new depend diagrams.
+
+	* src/agfunc.def (eval): Changed the table name to evalexpr, to
+	work with the new getdef generated agexpr.def.
+
+	* doc/auto_gen.tpl (dependencies): Added some texinfo code to
+	include the epsf diagram in the printed manual.
+	([=/agfunc_func=]):  Changed to macfunc, to work with the new
+	getdef generated agfunc.def.
+	([=/agexpr_func=]): Changed to evalexpr.
+
+	* doc/depend.fig: New file.  xfig source for the diagram below.
+
+	* doc/depend.eps: New file.  Encapsulated postscript dependency
+	diagram for the printed manual.
+
 1998-10-08  Bruce Korb <korbb@datadesign.com>
 	* autoopts/makeshell.c
 	Developed a special "TEST_MAIN" procedure putShellParse
 	which emits a portable shell script that will parse the
 	arguments from the definition file.  There is some
 	functionality that it cannot do, however :(
+
+1998-10-02  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/vsnprintf.m4: New file.  Autoconf macros to determine
+	if the system provides {v,}snprintf, and if so whether they
+	correctly return number of bytes written, and whether they parse
+	%n$ positional parameters correctly.
+
+	* config/acconfig.h: Added HAVE_SNPRINTF and HAVE_VSNPRINTF
+	macros.
 
 1998-09-28  Bruce Korb <korbb@datadesign.com>
 	* columns/*
@@ -22,6 +50,7 @@
 	* src/agShell
 	Added some code to make clearer what may have failed,
 	should the shell command go away or abend.
+	
 1998-09-23  Bruce Korb <korbb@datadesign.com>
 	* autoopts/Makefile.am
 	* autoopts/opthead.tpl
@@ -65,9 +94,83 @@
 	* tests/opts.test
 	Fixed distribution problems (schitzophrenic directories)
 
+1998-09-17  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* getdefs/Makefile.am (getdefs_LDFLAGS): new macro to ensure that
+	getdefs is statically linked against libopts.la, and can be safely
+	run from the build directory without libopts being installed.
+
+1998-09-16  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* Makefile.am (SUBDIRS): reordered so that the getdefs utility
+	gets built in time for when it is needed for the src directory.
+
+	* doc/LSM.tpl (Primary-site): use wc instead of fileinfo to
+	calculate the size in a portable way.
+
+	This is a tricky one because we need to calculate the size of the
+	tarball to finish making this file... but we need to have the file
+	to roll the tarball... hmmm.  Just gotta roll the tarball twice,
+	removing the bogus LSM before the second run.  I guess this needs
+	to be automated by the release script.
+
+	* configure.in (AC_FUNC_ALLOCA): a start to the alloca action
+	in the TODO list.
+
+	* AUTHORS: Attributed snprintf.c
+
+	* compat/snprintf.c: new file.
+
+	* TODO: Removed the write a general definition extraction tool (a
+	la src/makedefs.sh) entry... getdefs/* is the start of this.
+	Added an snprintf.c action.  Added an excerpt from the autoconf
+	docs to the alloca.c action.
+
+	* src/autogen.c, src/agReduce.c, src/autogen.h (PTRUP, PTRDN):
+	Removed [slightly] bogus preprocessor magic for __to{up|low}er
+	performance hack.  Now we trust the system headers to do the right
+	thing when we use the exported to{up|low}er entry points.  Also
+	moved all the macros to a shared header file so we don't keep two
+	implementations in the source.
+
+	If you find a braindamaged system, the following is functionally
+	equivalent to the old way of calling __toupper:
+
+	CPPFLAGS='-Dtoupper=__toupper -Dtolower=__tolower' ./configure --foo
+
+	* configure.in (AC_CHECK_HEADERS): Added stdlib.h, cygwin32 seems
+	to fail the AC_HEADER_STDC checks, but needs to define
+	HAVE_STDLIB_H to tell the code that it does [at least] have a
+	stdlib.h header.
+
+1998-09-15  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* src/agFunc.c (mLoad_Context): Wrap the function body in #ifdef
+	DEBUG, as apzFuncNames is a valid symbol only when DEBUG is
+	defined by the preprocessor!
+
+	* src/autogen.c: #include signal.h to get a definition for struct
+	sigaction [as used in main()].
+
 1998-09-14  Bruce Korb <korbb@datadesign.com>
 	* */*
 	Corrected most of the problems engendered by below :-}
+
+1998-08-24  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* tests/opts.test (RUN): disabled the broken test w/
+	TEST_AUTOGEN_OPTS, so that the release script will work.
+
+	It always fails for me with opts.hlp2 (the link line in the test
+	complains of no main function):
+	
+	./opts.test: ./autogen: No such file or directory
+
+	
+	* doc/auto_gen.tpl (Installation): updated the documentation of
+	this node to reflect the way I have been running tests.
+
+	* VERSION: Bumped patchlevel to .6
 
 1998-08-21  Bruce Korb <korbb@datadesign.com>
 	* src/*
@@ -75,3 +178,43 @@
 	the text emission.  A massive data structure now points to all
 	the pieces.  This data structure should be fairly easy to
 	beguile.  It was why I did it :).
+	* autoopts/usage.c
+	A couple of innocuous changes to try to avoid the shared library
+	problem with formatting output to stderr.
+
+	* autoopts/options.tpl
+	Expanded commentary on the valid use of arguments in "flag_code".
+
+	* autoopts/Makefile.am
+	Distribute the TODO file, too.
+
+	* autoopts/autoopts.c
+	Since all disable-able (negatable) options now have a special
+	prefix assigned, "yes", "no", "true", "false" "-" and "+"
+	values no longer need have special meanings.  A bunch of code
+	was removed.  The RC/INI files no longer need the +/- prefix
+	to the option name, either.
+
+	* autoopts/options.h
+	Changed "NEGATABLE" to "DISABLEOK".
+	Added "INITENABLED".  Removed the "AODFT_*" defines.
+	Fixed the CLEAR_OPT() macro accordingly.
+	Added pzDisablePfx, used as a special value for environment
+	variable presetting.  Not used anywhere else.
+
+1998-07-20  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* configure.in (AC_CHECK_SIZEOF): add cross-compilation defaults
+	to eliminate autoconf warnings.
+
+	* VERSION: Added new vars to track libtool library versioning for
+	libopts.  The release procedure is described in the comments.
+
+	* configure.in: Substitute new libtool vars into configure
+	generated files. 
+
+	* autoopts/Makefile.am (libopts_la_LDFLAGS): use the new
+	versioning variables with the libtool link command.
+
+	* TODO: removed libtool versioning item implemented above.
+	Removed xmalloc item (ag_malloc is used now).

@@ -7,20 +7,21 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Fri Sep 11 07:10:58 1998
-dnl            by:    Bruce Korb <bkorb@ellen>
+dnl Last Modified:    Tue Oct 13 07:49:30 1998
+dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.2 1998/09/28 19:32:55 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.3 1998/10/13 15:30:40 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
+. $srcdir/VERSION
+
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 
-. $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.2 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.3 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -96,7 +97,7 @@ fi
 AC_HEADER_STDC
 AC_HEADER_DIRENT
 AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h)
-AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h setjmp.h)
+AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h setjmp.h stdlib.h)
 
 # If varargs.h is present define HAVE_VARARGS_H, otherwise if stdarg.h
 # is present define HAVE_STDARG_H.
@@ -144,7 +145,10 @@ AC_CHECK_SIZEOF(int, 4)
 # Checks for standard functions.
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend pathfind)
+AC_FUNC_ALLOCA
 AG_FUNC_CTIME_HEAP
+AG_FUNC_VSNPRINTF_DOLLAR
+AG_FUNC_SNPRINTF_DOLLAR
 
 # ----------------------------------------------------------------------
 # Generate the make files.

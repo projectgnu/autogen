@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Author:         Bruce Korb <korbb@datadesign.com>
-## Maintainer:     Bruce Korb <korbb@datadesign.com>
-## Created:        Fri Aug 15 12:04 1997
-## Last Modified:   Mon Sep 28 12:07:41 1998
+## Author:          Bruce Korb <korbb@datadesign.com>
+## Maintainer:      Bruce Korb <korbb@datadesign.com>
+## Created:         Fri Aug 15 12:04 1997
+## Last Modified:   Tue Oct 13 07:55:54 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.6 1998/09/28 19:33:05 bkorb Exp $
+## $Id: Makefile.am,v 2.7 1998/10/13 15:30:46 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,7 +21,7 @@ all : $(INFO_DEPS) LSM
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl LSM LSM.tpl
+EXTRA_DIST	= auto_gen.tpl LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 ODEF            = $(top_srcdir)/src/opts.def

@@ -27,14 +27,15 @@ Description:    Autogen is a tool for automatically generating
 Keywords:       macro, m4, cpp, code generation, preprocessor,
                 options, getopts
 
-Author:         korbb@datadesign.com (Bruce Korb)
+Author:         korb@datadesign.com (Bruce Korb)
                 garyv@oranda.demon.co.uk (Gary V. Vaughan)
 
 Maintained-by:  korbb@datadesign.com (Bruce Korb)
 
 Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
-                [=_EVAL "echo `expr $(fileinfo -N0 -s ../auto*.gz) / 1024` kB"
-                        _shell =] [=_EVAL "cd .. ; echo auto*.gz" _shell=]
+                [=_EVAL "cd .. ; set -- auto*.gz
+                  echo `expr $(wc -c < $1) / 1024` kB $1"
+                  _shell=]
 
 Alternate-site:
 

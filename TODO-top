@@ -17,10 +17,18 @@
 * Write an argv style parsing agPrint.c
 * Try to sort out the server chaining stuff once and for all... I
   suspect the pipeline will need to be built up in reverse like bash...
-* Use the libtool versioning stuff for libopts
-* release doesn't perform a proper in situ build sanity check because it
-  works from the current source tree, rather than a tree built from the
-  distribution tarball... this should be fixed.
+* Need to add compat/snprintf.c and replace use of sprintf w/ snprintf
+  throughout!  This really needs to support %n$ notation too =/O|
+* Need to add compat/alloca.c, or else use byacc instead of bison for
+  distribution (bison parsers rely on a working alloca -- yeuck!!)
+  Let's use byacc!!
+  - Macro: AC_FUNC_ALLOCA
+     This macro does not try to get `alloca' from the System V R3
+     `libPW' or the System V R4 `libucb' because those libraries
+     contain some incompatible functions that cause trouble.  Some
+     versions do not even contain `alloca' or contain a buggy version.
+     If you still want to use their `alloca', use `ar' to extract
+     `alloca.o' from them instead of compiling `alloca.c'.
 
 #  Possibilities for the (distant) future:
 

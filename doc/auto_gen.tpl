@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Tue Sep 29 07:50:20 1998
+## Last Modified:     Tue Oct 13 07:59:40 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.4 1998/09/29 15:34:47 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.5 1998/10/13 15:30:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -793,13 +793,36 @@ make install
 However, you may wish to insert @code{make}
 and @code{make check} before the second command.
 
-If you do do a @code{make check} and there are any failures,
+If you do perform a @code{make check} and there are any failures,
 you will find the results in @code{tests/FAILURES}.  Needless to say,
 I would be interested in seeing the contents of those files and
 any associated messages.  If you choose to go on and analyze
 one of these failures, you will have to invoke the test script
-by hand.  Automake does not provide an easy way to do this
-and there may be some variables you have to set to make it work.
+by hand.  Automake generates rules to do this, using the make variable
+@t{TESTS}.
+
+So, you must invoke the @samp{test-name.test} file thus, from either the
+@t{tests} directory itself, or the toplevel directory:
+
+@example
+make TESTS=test-name.test check
+@end example
+
+All of the Autogen tests are written to honour the contents of
+the @t{VERBOSE} environment variable.  Normally, any commentary generated
+during a test run is discarded unless the @t{VERBOSE} environment variable is
+set.  So, to see what is happening during the test, you might invoke the
+following with @i{bash} or @i{ksh}:
+
+@example
+VERBOSE=1 make TESTS="for.test forcomma.test" check
+@end example
+
+Or equivalently with @i{csh}:
+
+@example
+env VERBOSE=1 make TESTS="for.test forcomma.test" check
+@end example
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
