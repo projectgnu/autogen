@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/06/28 02:48:05 $
+ *  Last Modified:     $Date: 2002/06/29 22:32:30 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.15 2002/06/28 02:48:05 bkorb Exp $
+ *  $Id: misc.def,v 3.16 2002/06/29 22:32:30 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.15 $";
+version = "$Revision: 3.16 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -199,8 +199,7 @@ test   = {
 		    if test X${with_libxml} != Xno && test -n "$f"
 		    then
 		      LDFLAGS="${LDFLAGS} $f"
-		      f=`xml2-config --cflags | \
-		        sed 's,-I */usr/include\( |$\),\1,'`
+		      f=`xml2-config --cflags`
 		      CPPFLAGS="${CPPFLAGS} $f"
 		      AC_SUBST(XML2AG_DIR)
 		      XML2AG_DIR=xml2ag
