@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.16 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: autoopts.c,v 3.17 2002/09/30 04:15:26 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -985,6 +985,7 @@ loadOptionLine( pOpts, pOS, pzLine, direction )
     case ARG_MAY:
         if (*pOS->pzOptArg == NUL)
             pOS->pzOptArg = NULL;
+        break;
 
     case ARG_MUST:
         if (*pOS->pzOptArg == NUL)

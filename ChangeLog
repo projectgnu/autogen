@@ -4,6 +4,8 @@
 	argument options.
 	* agen5/bootstrap.dir(getdefs): use a config file instead of pug-ugly
 	command line options.
+	* agen5/test/snarf.test(cfg): use a config file.
+	* autoopts/cmd.sh(cfg): use a config file.
 
 2002-09-28  Bruce Korb  <bkorb@gnu.org>
 
