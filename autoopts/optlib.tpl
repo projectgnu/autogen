@@ -341,4 +341,93 @@ DEFINE Option_Descriptor =][=
                             =]_Name, zNot[=(. cap-name)=]_Pfx },[=
   ENDIF =][=
 
-ENDDEF Option_Descriptor =]
+ENDDEF Option_Descriptor =][= =][=
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+Compute the usage line.  It is complex because we are trying to
+encode as much information as we can and still be comprehensible.
+
+The rules are:  If any options have a "value" attribute, then
+there are flags allowed, so include "-<flag>" on the usage line.
+If the program has the "long_opts" attribute set, then we must
+have "<option-name>" or "--<name>" on the line, depending on
+whether or not there are flag options.  If any options take 
+arguments, then append "[<val>]" to the flag description and
+"[{=| }<val>]" to the option-name/name descriptions.  We won't
+worry about being correct if every option has a required argument.
+Finally, if there are no minimum occurrance counts (i.e. all
+options are optional), then we put square brackets around the
+syntax. =][=
+
+DEFINE USAGE_LINE   =][=
+  (out-push-new ".usAGe_line") =]USAGE:  %s [=
+
+  IF (exist? "flag.min") =][=
+
+    #  At least one option has a minimum occurrance count.
+       Therefore, we omit the square brackets around the option
+       syntax.
+    =][=
+    IF (exist? "flag.flag_arg") =][=
+      IF   (exist? "flag.value")      =]-<flag> [<val>]... [=
+      ELIF (not (exist? "long_opts")) =]<option-name>[{=| }<val>] ...[=
+      ENDIF =][=
+
+      IF (exist? "long_opts")   =]--<name>[{=| }<val>]...[=
+      ENDIF=][=
+
+    ELSE  no flag_args exist =][=
+      IF   (exist? "flag.value")      =]-<flag> ... [=
+      ELIF (not (exist? "long_opts")) =]<option-name> ...[=
+      ENDIF =][=
+
+      IF (exist? "long_opts")   =]--<name>...[=
+      ENDIF=][=
+    ENDIF =][=
+
+  ELSE =][=
+
+    #  No options have a minimum occurrance count.
+       Therefore, we place square brackets around the option
+       syntax.
+    =][=
+    IF (exist? "flag.flag_arg") =][=
+      IF   (exist? "flag.value")      =][-<flag> [<val>]]... [=
+      ELIF (not (exist? "long_opts")) =][<option-name>[{=| }<val>]] ...[=
+      ENDIF =][=
+
+      IF (exist? "long_opts")   =][--<name>[{=| }<val>]]...[=
+      ENDIF=][=
+
+    ELSE  no flag_args exist =][=
+      IF   (exist? "flag.value")      =][-<flag>] ... [=
+      ELIF (not (exist? "long_opts")) =][<option-name>] ...[=
+      ENDIF =][=
+
+      IF (exist? "long_opts")   =][--<name>] ...[=
+      ENDIF=][=
+    ENDIF=][=
+  ENDIF =][=
+
+  #  Emit the line as it exists so far.  Remember how many characters
+     it uses so we can decide if we need to emit a line break
+     before we emit any argument description.
+  =][=
+  (out-pop)
+  (shell "cat .usAGe_line
+          line_len=`wc -c < .usAGe_line`
+          rm -f .usAGe_line") =][=
+
+  IF (exist? "argument") =] [=
+
+    IF (< 80 (+ (string->number (shell "echo $line_len"))
+                (len "argument"))) =]\\\n"
+      "\t\t[=
+    ENDIF
+    =]" [=(c-string (get "argument"))=] "[=
+
+  ENDIF=][=
+ENDDEF
+=]
