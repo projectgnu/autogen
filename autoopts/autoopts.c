@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.9 2005/02/14 14:09:54 bkorb Exp $
- *  Time-stamp:      "2005-02-13 14:23:59 bkorb"
+ *  $Id: autoopts.c,v 4.10 2005/02/20 23:00:55 bkorb Exp $
+ *  Time-stamp:      "2005-02-20 13:17:16 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -501,6 +501,7 @@ static tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState )
 {
     tSuccess res;
+    enum { ARG_NONE, ARG_MAY, ARG_MUST } arg_type = ARG_NONE;
 
     res = findOptDesc( pOpts, pOptState );
     if (! SUCCESSFUL( res ))
@@ -514,10 +515,15 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
      *  Disabled mode option selection also disables option arguments.
      */
     if ((pOptState->flags & OPTST_DISABLED) != 0)
-         pOptState->argType = ARG_NONE;
-    else pOptState->argType = pOptState->pOD->optArgType;
+        arg_type = ARG_NONE;
+    else if (OPTST_GET_ARGTYPE(pOptState->flags) == OPARG_TYPE_NONE)
+        arg_type = ARG_NONE;
+    else if (pOptState->flags & OPTST_ARG_OPTIONAL)
+        arg_type = ARG_MAY;
+    else
+        arg_type = ARG_MUST;
 
-    switch (pOptState->argType) {
+    switch (arg_type) {
     case ARG_MUST:
         /*
          *  An option argument is required.  Long options can either have

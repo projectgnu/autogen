@@ -1,3 +1,8 @@
+2004-02-20  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*: Remove "optArgType" from option descriptor and use
+	OPTST_GET_ARGTYPE() macro to determine this instead.
+
 2004-02-13  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/cook.c: NEW - move all string cooking here

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: configfile.c,v 4.9 2005/02/20 02:15:48 bkorb Exp $
- * Time-stamp:      "2005-02-19 15:20:36 bkorb"
+ *  $Id: configfile.c,v 4.10 2005/02/20 23:00:55 bkorb Exp $
+ * Time-stamp:      "2005-02-20 14:05:19 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -154,32 +154,132 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
 
 
 static char*
+skipUnknown( char* pzText )
+{
+    for (;; pzText++) {
+        if (isspace( *pzText ))  return pzText;
+        switch (*pzText) {
+        case NUL: return NULL;
+        case '/':
+        case '>': return pzText;
+        }
+    }
+}
+
+
+/*
+ *  parseValueType
+ *
+ *  "pzText" points to the character after "type="
+ */
+static char*
 parseValueType(
     tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType )
 {
-    return strchr( pzText, '>' );
+    {
+        size_t len = strlen(zLtypeString);
+        if (strncmp( pzText, zLtypeString, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_STRING;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeKeyword);
+        if (strncmp( pzText, zLtypeKeyword, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_ENUMERATION;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeBool);
+        if (strncmp( pzText, zLtypeBool, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_BOOLEAN;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeSetMembership);
+        if (strncmp( pzText, zLtypeSetMembership, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_MEMBERSHIP;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeNumber);
+        if (strncmp( pzText, zLtypeNumber, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_NUMERIC;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeNest);
+        if (strncmp( pzText, zLtypeNest, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_HIERARCHY;
+                return pzText + len + 1;
+            }
+        }
+        goto unknown;
+    }
+
+  unknown:
+    pType->valType = OPARG_TYPE_NONE;
+    return skipUnknown( pzText );
 }
 
 
+/*
+ *  parseKeyWordType
+ *
+ *  "pzText" points to the character after "words=".
+ *  What should follow is a name of a keyword (enumeration) list.
+ */
 static char*
 parseKeyWordType(
     tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType )
 {
-    return strchr( pzText, '>' );
+    return skipUnknown( pzText );
 }
 
 
+/*
+ *  parseSetMemType
+ *
+ *  "pzText" points to the character after "members="
+ *  What should follow is a name of a "set membership".
+ *  A collection of bit flags.
+ */
 static char*
 parseSetMemType(
     tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType )
 {
-    return strchr( pzText, '>' );
+    return skipUnknown( pzText );
 }
 
 
@@ -188,33 +288,47 @@ parseLoadMode(
     char*               pzText,
     tOptionLoadMode*    pMode )
 {
-    size_t cooked_len   = strlen(zLoadCooked);
-    size_t uncooked_len = strlen(zLoadUncooked);
-    size_t keep_len     = strlen(zLoadKeep);
-
-    if (strncmp( pzText, zLoadCooked, cooked_len ) == 0) {
-        if ((pzText[cooked_len] == '>') || isspace(pzText[cooked_len])) {
-            *pMode = OPTION_LOAD_COOKED;
-            return pzText + cooked_len + 1;
+    {
+        size_t len = strlen(zLoadCooked);
+        if (strncmp( pzText, zLoadCooked, len ) == 0) {
+            if (  (pzText[len] == '>')
+               || (pzText[len] == '/')
+               || isspace(pzText[len])) {
+                *pMode = OPTION_LOAD_COOKED;
+                return pzText + len;
+            }
         }
-
-    } else if (strncmp( pzText, zLoadUncooked, uncooked_len ) == 0) {
-        if ((pzText[uncooked_len] == '>') || isspace(pzText[uncooked_len])) {
-            *pMode = OPTION_LOAD_UNCOOKED;
-            return pzText + uncooked_len + 1;
-        }
-
-    } else if (strncmp( pzText, zLoadKeep, keep_len ) == 0) {
-        if ((pzText[keep_len] == '>') || isspace(pzText[keep_len])) {
-            *pMode = OPTION_LOAD_KEEP;
-            return pzText + keep_len + 1;
-        }
+        goto unknown;
     }
 
-    pzText = strchr( pzText, '>' );
-    if (pzText != NULL)
-        pzText++;
-    return pzText;
+    {
+        size_t len = strlen(zLoadUncooked);
+        if (strncmp( pzText, zLoadUncooked, len ) == 0) {
+            if (  (pzText[len] == '>')
+               || (pzText[len] == '/')
+               || isspace(pzText[len])) {
+                *pMode = OPTION_LOAD_UNCOOKED;
+                return pzText + len;
+            }
+        }
+        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLoadKeep);
+        if (strncmp( pzText, zLoadKeep, len ) == 0) {
+            if (  (pzText[len] == '>')
+               || (pzText[len] == '/')
+               || isspace(pzText[len])) {
+                *pMode = OPTION_LOAD_KEEP;
+                return pzText + len;
+            }
+        }
+        goto unknown;
+    }
+
+  unknown:
+    return skipUnknown( pzText );
 }
 
 
@@ -227,7 +341,8 @@ parseAttributes(
 {
     do  {
         switch (*pzText) {
-        case '>': return pzText+1;
+        case '/':
+        case '>': return pzText;
 
         default:
         case NUL: return NULL;
@@ -286,13 +401,12 @@ handleStructure(
     char*         pzText,
     int           direction )
 {
-    size_t cooked_len   = strlen(zLoadCooked);
-    size_t uncooked_len = strlen(zLoadUncooked);
-    size_t keep_len     = strlen(zLoadKeep);
-
     tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
-    char* pzName         = ++pzText;
+    tOptionValue    valu;
+
+    char* pzName = ++pzText;
     char* pcNulPoint;
+    char* pzValStart;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
     pcNulPoint = pzText;
@@ -300,37 +414,12 @@ handleStructure(
     switch (*pzText) {
     case ' ':
     case '\t':
-    {
-        char* pzD;
-        pzD = ++pzText;
-
-        while (isspace( *pzText ))    pzText++;
-
-        if (strncmp( pzText, zLoadKeep, keep_len ) == 0) {
-            pzText += keep_len;
-            memmove( pzD, pzText, strlen(pzText)+1 );
-            pzText = pzD;
-            mode = OPTION_LOAD_KEEP;
-
-        } else if (strncmp( pzText, zLoadCooked, cooked_len ) == 0) {
-            pzText += cooked_len;
-            memset( pzD, ' ', cooked_len );
-            mode = OPTION_LOAD_COOKED;
-
-        } else if (strncmp( pzText, zLoadUncooked, uncooked_len ) == 0) {
-            pzText += uncooked_len;
-            memset( pzD, ' ', uncooked_len );
-
-        } else while (*pzD != '>') {
-            /*
-             *  Unrecognized attribute.  Skip the attributes.
-             */
-            *(pzD++) = ' ';
-            if (*pzD == NUL)
-                break;
-        }
-        break;
-    }
+        valu.valType = OPARG_TYPE_STRING;
+        pzText = parseAttributes( pOpts, pzText, &mode, &valu );
+        if (*pzText == '>')
+            break;
+        if (*pzText != '/')
+            return NULL;
 
     case '/':
         if (pzText[1] != '>')
@@ -349,6 +438,7 @@ handleStructure(
             pzText++;
         return pzText;
     }
+    pzValStart = ++pzText;
 
     /*
      *  If we are here, we have a value.  Separate the name from the
@@ -381,7 +471,7 @@ handleStructure(
     /*
      *  Rejoin the name and value for parsing by "loadOptionLine()".
      */
-    *pcNulPoint = ' ';
+    *(pcNulPoint++) = ' ';
 
     /*
      *  "pzName" points to what looks like text for one option/configurable.

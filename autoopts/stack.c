@@ -1,8 +1,8 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 4.4 2005/02/20 02:15:48 bkorb Exp $
- *  Time-stamp:      "2005-02-14 08:21:23 bkorb"
+ *  $Id: stack.c,v 4.5 2005/02/20 23:00:55 bkorb Exp $
+ *  Time-stamp:      "2005-02-20 14:11:50 bkorb"
  *
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
@@ -163,7 +163,7 @@ optionStackArg( pOpts, pOptDesc )
     tArgList* pAL;
     tCC* pzLast = pOptDesc->pzLastArg;
 
-    if (pOptDesc->optArgType == ARG_NONE)
+    if (OPTST_GET_ARGTYPE(pOptDesc->fOptState) == OPARG_TYPE_NONE)
         return;
 
     if (pOptDesc->optActualIndex != pOptDesc->optIndex)

@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.8 2005/02/20 02:29:46 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.9 2005/02/20 23:00:55 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -56,7 +56,7 @@ h=options.h
 
 typedef enum {
     OPARG_TYPE_NONE          = 0,
-    OPARG_TYPE_STRING        = 1,       /* vanilla string */
+    OPARG_TYPE_STRING        = 1,       /* default type/ vanilla string      */
     OPARG_TYPE_ENUMERATION   = 2,       /* opt arg is an enum (keyword list) */
     OPARG_TYPE_BOOLEAN       = 3,       /* opt arg is boolean-valued         */
     OPARG_TYPE_MEMBERSHIP    = 4,       /* opt arg sets set membership bits  */
@@ -94,13 +94,14 @@ typedef struct optionValue {
 #define OPTST_STACKED        0x0000400  /* opt uses optionStackArg procedure */
 #define OPTST_INITENABLED    0x0000800  /* option defaults to enabled        */
 #define OPTST_ARG_TYPE_MASK  0x000F000  /* bits used to specify opt arg type */
-#define OPTST_IMM            0x0010000  /* process option on first pass      */
-#define OPTST_DISABLE_IMM    0x0020000  /* process disablement on first pass */
-#define OPTST_OMITTED        0x0040000  /* compiled out of program           */
-#define OPTST_MUST_SET       0x0080000  /* must be set or pre-set            */
-#define OPTST_DOCUMENT       0x0100000  /* opt is for documentation only     */
-#define OPTST_TWICE          0x0200000  /* process option twice - imm + reg  */
-#define OPTST_DISABLE_TWICE  0x0400000  /* process disabled option twice     */
+#define OPTST_ARG_OPTIONAL   0x0010000  /* the option argument not required  */
+#define OPTST_IMM            0x0020000  /* process option on first pass      */
+#define OPTST_DISABLE_IMM    0x0040000  /* process disablement on first pass */
+#define OPTST_OMITTED        0x0080000  /* compiled out of program           */
+#define OPTST_MUST_SET       0x0100000  /* must be set or pre-set            */
+#define OPTST_DOCUMENT       0x0200000  /* opt is for documentation only     */
+#define OPTST_TWICE          0x0400000  /* process option twice - imm + reg  */
+#define OPTST_DISABLE_TWICE  0x0800000  /* process disabled option twice     */
 
 #define OPTST_PERSISTENT     0xFFFFF00  /* mask of flags that do not change  */
 
@@ -216,13 +217,13 @@ struct optDesc {
     uint16_t          optActualIndex;   /* PUBLIC */
     uint16_t          optActualValue;   /* PUBLIC */
 
-    uint16_t          optArgType;
     uint16_t          optEquivIndex;    /* PUBLIC */
     uint16_t          optMinCt;
     uint16_t          optMaxCt;
+    uint16_t          optOccCt;         /* PUBLIC */
 
-    uint32_t          optOccCt;         /* PUBLIC */
     uint32_t          fOptState;        /* PUBLIC */
+    uint32_t          reserved;
     tCC*              pzLastArg;        /* PUBLIC */
     void*             optCookie;        /* PUBLIC */
 

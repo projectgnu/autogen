@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.7 2005/02/15 01:34:13 bkorb Exp $
- * Time-stamp:      "2005-02-14 16:50:39 bkorb"
+ *  usage.c  $Id: usage.c,v 4.8 2005/02/20 23:00:55 bkorb Exp $
+ * Time-stamp:      "2005-02-20 13:47:52 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -461,20 +461,20 @@ printBareUsage(
          *  when the option argument is required, base the type string on the
          *  argument type.
          */
-        switch (pOD->optArgType) {
-        default:       goto bogus_desc;
-        case ARG_MAY:  pzArgType = pAT->pzOpt; break;
-        case ARG_NONE: pzArgType = pAT->pzNo;  break;
-        case ARG_MUST:
-            switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
-            case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
-            case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
-            case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
-            case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
-            case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
-            case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
-            default:                     goto bogus_desc;         break;
-            }
+        if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NONE) {
+            pzArgType = pAT->pzNo;
+
+        } else if (pOD->fOptState & OPTST_ARG_OPTIONAL) {
+            pzArgType = pAT->pzOpt;
+
+        } else switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
+        case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
+        case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
+        case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
+        case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
+        case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
+        default:                     goto bogus_desc;         break;
         }
 
         snprintf( z, sizeof(z), pAT->pzOptFmt, pzArgType, pOD->pz_Name,

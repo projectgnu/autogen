@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.7 2005/02/20 02:29:46 bkorb Exp $
+# $Id: optlib.tpl,v 4.8 2005/02/20 23:00:55 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-19 18:20:51 bkorb"
+# Time-stamp:      "2005-02-20 13:53:22 bkorb"
 
 =][=
 
@@ -504,40 +504,42 @@ static const int
          must-set       " | OPTST_MUST_SET"    =][=
          no-preset      " | OPTST_NO_INIT"     =][=
 
-         CASE arg-type  =][=
-         =*  num        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
-
-         =*  bool       =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=
-
-         =*  key        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_ENUMERATION)[=
-
-         =*  set        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_MEMBERSHIP)[=
-
-         ~*  hier|nest  =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_HIERARCHY)[=
-
-         =*  str        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
-
-         == ""          =][= # nothing   =][=
-         *              =][=
-         (error (string-append "unknown arg type '"
-                (get "arg-type") "' for " flg-name)) =][=
-         ESAC arg-type  =][=
-
          CASE immediate =][=
          =    also      =] | OPTST_IMM | OPTST_TWICE[=
-         *              =][= immediate " | OPTST_IMM" =][=
+         +E             =] | OPTST_IMM[=
          ESAC immediate =][=
 
          CASE immed-disable  =][=
          =    also           =] | OPTST_DISABLE_IMM | OPTST_DISABLE_TWICE[=
-         *                   =][= immediate       " | OPTST_DISABLE_IMM" =][=
-         ESAC immed-disable  =])[=
+         +E                  =] | OPTST_DISABLE_IMM[=
+         ESAC immed-disable  =][=
+
+         IF (exist? "arg-type")                =][=
+            CASE arg-type  =][=
+            =*  num        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
+
+            =*  bool       =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=
+
+            =*  key        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_ENUMERATION)[=
+
+            =*  set        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_MEMBERSHIP)[=
+
+            ~*  hier|nest  =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_HIERARCHY)[=
+
+            =*  str        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
+
+            *              =][=
+            (error (string-append "unknown arg type '"
+                   (get "arg-type") "' for " flg-name)) =][=
+            ESAC arg-type  =][=
+            (if (exist? "arg-optional") " | OPTST_ARG_OPTIONAL") =][=
+         ENDIF arg-type exists  =])[=
 ENDDEF   emit-nondoc-option
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -607,10 +609,9 @@ DEFINE Option_Descriptor =][=
 =]
   {  /* entry idx, value */ 0, 0,
      /* equiv idx, value */ 0, 0,
-     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 0, 0,
-     /* opt state flags  */ [=(. UP-name)=]_FLAGS,
+     /* opt state flags  */ [=(. UP-name)=]_FLAGS, 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -630,15 +631,12 @@ DEFINE Option_Descriptor =][=
                               (string-append OPT-pfx UP-name)=],
      /* equiv idx, value */ [=
           IF (== (up-c-name "equivalence") UP-name)
-              =]NO_EQUIVALENT, 0,[=
+              =]NO_EQUIVALENT, 0[=
           ELIF (or (exist? "equivalence") (exist? "unstack-arg"))
-              =]NOLIMIT, NOLIMIT,[=
+              =]NOLIMIT, NOLIMIT[=
           ELSE
-              =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=],[=
-          ENDIF=]
-     /* option argument  */ '[=
-         (if (not (exist? "arg-type"))   " "
-             (if (exist? "arg-optional") "?" ":") ) =]',
+              =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=][=
+          ENDIF=],
      /* equivalenced to  */ [=
          (if (exist? "unstack-arg")
              (index-name "unstack-arg")
@@ -652,7 +650,7 @@ DEFINE Option_Descriptor =][=
              (if (exist? "must-set") "1" "0" )) =], [=
          (if (=* (get "arg-type") "set") "NOLIMIT"
              (if (exist? "max") (get "max") "1") ) =], 0,
-     /* opt state flags  */ [=(. UP-name)=]_FLAGS,
+     /* opt state flags  */ [=(. UP-name)=]_FLAGS, 0,
      /* last opt argumnt */ [=
          IF (exist? "arg-default")
               =]z[=(. cap-name)=]DefaultArg[=

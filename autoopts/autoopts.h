@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-19 18:17:42 bkorb"
+ *  Time-stamp:      "2005-02-20 13:21:47 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.12 2005/02/20 02:29:46 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.13 2005/02/20 23:00:55 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -71,10 +71,6 @@
 #endif
 #undef  EXPORT
 #define EXPORT
-
-#define ARG_NONE  ' '
-#define ARG_MUST  ':'
-#define ARG_MAY   '?'
 
 /*
  *  Convert the number to a list usable in a printf call
@@ -147,10 +143,9 @@ typedef struct {
     tCC*       pzOptArg;
     tUL        flags;
     teOptType  optType;
-    int        argType;
 } tOptState;
 #define OPTSTATE_INITIALIZER(st) \
-    { NULL, NULL, OPTST_ ## st, TOPT_UNDEFINED, 0 }
+    { NULL, NULL, OPTST_ ## st, TOPT_UNDEFINED }
 
 #define TEXTTO_TABLE \
         _TT_( LONGUSAGE ) \

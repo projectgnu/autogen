@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.11 2005/02/20 02:15:48 bkorb Exp $
- *  Time-stamp:      "2005-02-19 15:27:03 bkorb"
+ *  $Id: load.c,v 4.12 2005/02/20 23:00:55 bkorb Exp $
+ *  Time-stamp:      "2005-02-20 13:30:43 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -388,24 +388,20 @@ loadOptionLine(
     /*
      *  Fix up the args.
      */
-    switch (pOS->pOD->optArgType) {
-    case ARG_NONE:
+    if (OPTST_GET_ARGTYPE(pOS->pOD->fOptState) == OPARG_TYPE_NONE) {
         if (*pOS->pzOptArg != NUL)
             return;
         pOS->pzOptArg = NULL;
-        break;
 
-    case ARG_MAY:
+    } else if (pOS->pOD->fOptState & OPTST_ARG_OPTIONAL) {
         if (*pOS->pzOptArg == NUL)
              pOS->pzOptArg = NULL;
         else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, "option argument" );
-        break;
 
-    case ARG_MUST:
+    } else {
         if (*pOS->pzOptArg == NUL)
-             pOS->pzOptArg = "";
+             pOS->pzOptArg = zNil;
         else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, "option argument" );
-        break;
     }
 
     handleOption( pOpts, pOS );

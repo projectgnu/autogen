@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.9 2005/02/15 01:34:13 bkorb Exp $
- * Time-stamp:      "2005-02-14 14:59:26 bkorb"
+ *  save.c  $Id: save.c,v 4.10 2005/02/20 23:00:55 bkorb Exp $
+ * Time-stamp:      "2005-02-20 13:49:46 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -427,7 +427,7 @@ optionSaveFile( tOptions* pOpts )
          *  IF    no arguments are allowed
          *  THEN just print the name and continue
          */
-        if (p->optArgType == ARG_NONE) {
+        if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NONE) {
             fprintf( fp, "%s\n",
                      (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
             continue;

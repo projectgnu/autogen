@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.6 2005/02/20 02:15:48 bkorb Exp $
- * Time-stamp:      "2005-02-14 14:25:43 bkorb"
+ *  $Id: makeshell.c,v 4.7 2005/02/20 23:00:55 bkorb Exp $
+ * Time-stamp:      "2005-02-20 14:06:03 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -747,18 +747,17 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
             printf( zMultiArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
         }
 
-        switch (pOptDesc->optArgType) {
-        case ARG_MAY:
-            printf( zMayArg,  pOpts->pzPROGNAME, pOptDesc->pz_NAME );
-            break;
-
-        case ARG_MUST:
-            fputs( zMustArg, stdout );
-            break;
-
-        default:
+        /*
+         *  Fix up the args.
+         */
+        if (OPTST_GET_ARGTYPE(pOptDesc->fOptState) == OPARG_TYPE_NONE) {
             printf( zCantArg, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
-            break;
+
+        } else if (pOptDesc->fOptState & OPTST_ARG_OPTIONAL) {
+            printf( zMayArg,  pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+
+        } else {
+            fputs( zMustArg, stdout );
         }
     }
     fputs( zOptionEndSelect, stdout );

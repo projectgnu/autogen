@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.12 2005/02/20 02:29:46 bkorb Exp $
+#$Id: optcode.tpl,v 4.13 2005/02/20 23:00:55 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-19 18:18:55 bkorb"
+# Time-stamp:      "2005-02-20 13:01:50 bkorb"
 
 =][=
 
@@ -151,10 +151,10 @@ IF (exist? "version")   =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+                          | OPTST_ARG_OPTIONAL, 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -168,10 +168,9 @@ ENDIF =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM,
+     /* opt state flags  */ OPTST_IMM, 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -182,10 +181,9 @@ ENDIF =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM,
+     /* opt state flags  */ OPTST_IMM, 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -200,10 +198,10 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+                          | OPTST_ARG_OPTIONAL, 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -214,11 +212,10 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ':',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_DISABLE_IMM | \
-			OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
+			OPTST_SET_ARGTYPE(OPARG_TYPE_STRING), 0,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
