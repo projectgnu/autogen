@@ -5,7 +5,7 @@
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:     Wed Oct 21 07:16:06 1998
+# Last Modified:     Wed Oct 21 07:30:03 1998
 # Author:         Bruce Korb <korbb@datadesign.com>
 # Maintainer:     Bruce Korb <korbb@datadesign.com>
 #          by:       Bruce Korb <korb@datadesign.com>
@@ -50,7 +50,7 @@ PACKAGE=autogen
 
 # Display version numbers banner for my sanity!
 #
-spaces="                "
+spaces="                                "
 while :
 do
   string="$PACKAGE-$VERSION$spaces$LT_LIBRARY.$LT_CURRENT.$LT_AGE.$LT_REVISION"
@@ -69,13 +69,15 @@ _EOF_
 
 #  Validate struct marker in autoopts/options.h
 #
-hdr=`egrep OPTIONS_STRUCT_VERSION ${top_srcdir}/autoopts/options.h |
-     sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
-if [ $hdr -ne $lib ] ; then
-  echo autoopts/options.h out of sync with version.
-  echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
-  exit 1
+if [ -n "${1}" ] ; then
+  hdr=`egrep OPTIONS_STRUCT_VERSION ${1}/autoopts/options.h |
+       sed 's/.*OPTIONS_STRUCT_VERSION *//'`
+  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
+  if [ $hdr -ne $lib ] ; then
+    echo autoopts/options.h out of sync with version.
+    echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
+    exit 1
+  fi
 fi
 
 cat << _EOF_
