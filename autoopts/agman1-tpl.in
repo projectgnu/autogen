@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-07-27 10:50:34 bkorb"
+## Time-stamp:      "2002-08-18 19:45:16 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.14 2002/07/27 17:50:39 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.15 2002/08/19 02:51:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -64,8 +64,10 @@ sed \
  -e 's/``\([a-zA-Z0-9:~=_ -]*\)'"''"'/\\fI\1\\fP/g' \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 [+:
+  IF (define named-mode (not (or (exist? "flag.value")
+                                 (exist? "long_opts") )))
+     (exist? "flag.value")  :+][+:
 
-  IF (exist? "flag.value")  :+][+:
     IF (exist? "long_opts") :+][+:
 
       # * * * * *
@@ -283,6 +285,9 @@ or in initialization (rc) files.[+:ENDIF:+][+:
       IF (exist? "arg-default") :+]
 The default [+:(. opt-arg):+] for this opton is \fI[+: arg-default :+]\fP.[+:
       ENDIF:+][+:
+      IF (and (exist? "default") named-mode) :+]
+This option is the default option.[+:
+      ENDIF:+][+:
       IF (exist? "equivalence") :+]
 This option is a member of the [+:equivalence:+] class of options.[+:ENDIF:+][+:
       IF (exist? "flags_must") :+]
@@ -290,7 +295,8 @@ This opton must appear in combination with the following options:
 [+: FOR flags_must ", " :+][+:flags_must:+][+:ENDFOR:+].[+:ENDIF:+][+:
       IF (exist? "flags_cant") :+]
 This option must not appear in combination with any of the following options:
-[+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:ENDIF:+]
+[+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:
+      ENDIF:+]
 .sp
 [+: doc :+][+:
 
