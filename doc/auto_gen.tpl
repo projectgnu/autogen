@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.35 1999/10/30 20:33:22 bruce Exp $
+## $Id: auto_gen.tpl,v 2.36 1999/10/31 00:31:44 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -912,15 +912,18 @@ FOR gfunc =]
   (shell (sprintf
     "echo '%%s' | sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
         (string-tr! "%s" "A-Z_^" "a-z--") )) =][=
-  FOR exparg "," =] [=arg_name=][=
-  ENDFOR exparg =][=
-  IF (exist? "ellipsis") =][=
-    exparg "," =] ...[=
-  ENDIF =]
+  FOR exparg "," =] [=arg_name=][= arg_ellipsis " ..." =][=
+  ENDFOR exparg =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
 [=doc=][=
+  (if (exist? "exparg") "\n") =][=
+  FOR exparg =]
+@*
+[=arg_name=] - [=
+    IF (exist? "arg_desc") =][=arg_desc=][=ELSE=]Undocumented[=ENDIF=][=
+  ENDFOR exparg =][=
 
 ENDFOR gfunc
 =]
