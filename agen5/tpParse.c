@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: tpParse.c,v 3.2 2002/01/03 17:08:22 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -179,11 +179,11 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
         int ct = level;
         tMacro* pPm = pM-1;
 
-        printf( "%3d ", pPm - pT->aMacros );
-        do { fputs( "  ", stdout ); } while (--ct > 0);
+        fprintf( pfTrace, "%3d ", pPm - pT->aMacros );
+        do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
-        printf( zTUndef, apzFuncNames[ pPm->funcCode ], pPm->funcCode,
-                pPm->lineNo );
+        fprintf( pfTrace, zTUndef, apzFuncNames[ pPm->funcCode ],
+                 pPm->funcCode, pPm->lineNo );
     }
 #else
     #define DEBUG_DEC(l)
@@ -206,10 +206,10 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
             if (HAVE_OPT( SHOW_DEFS )) {
                 int ct = level;
-                printf( "%3d ", pM - pT->aMacros );
-                do { fputs( "  ", stdout ); } while (--ct > 0);
+                fprintf( pfTrace, "%3d ", pM - pT->aMacros );
+                do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
-                printf( zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
+                fprintf( pfTrace, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
                         pM->lineNo, pM->endIndex,
                         pzEnd - pzScan );
             }
@@ -279,18 +279,18 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
             if (HAVE_OPT( SHOW_DEFS )) {
                 int ct = level;
                 if (pM->funcCode == FTYP_BOGUS)
-                     fputs( "    ", stdout );
-                else printf( "%3d ", pM - pT->aMacros );
+                     fputs( "    ", pfTrace );
+                else fprintf( pfTrace, "%3d ", pM - pT->aMacros );
 
-                do { fputs( "  ", stdout ); } while (--ct > 0);
+                do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
                 if (pM->funcCode == FTYP_BOGUS)
-                     printf( zTUndef, apzFuncNames[ ft ], ft, ln );
+                     fprintf( pfTrace, zTUndef, apzFuncNames[ ft ], ft, ln );
                 else
-                    printf( zTDef, apzFuncNames[ ft ], pM->funcCode, ln,
-                            pM->endIndex,
-                            strlen( (pM->ozText == 0) ? ""
-                                    : (pT->pzTemplText + pM->ozText) ));
+                    fprintf( pfTrace, zTDef, apzFuncNames[ ft ], pM->funcCode,
+                             ln, pM->endIndex,
+                             strlen( (pM->ozText == 0) ? ""
+                                     : (pT->pzTemplText + pM->ozText) ));
             }
 #endif
 

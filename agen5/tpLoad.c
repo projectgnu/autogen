@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.3 2002/01/03 17:08:22 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -289,7 +289,7 @@ loadMacros( tTemplate*     pT,
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";
-        printf( zSum, pT->macroCt, pzF, pT->descSize );
+        fprintf( pfTrace, zSum, pT->macroCt, pzF, pT->descSize );
     }
 #endif
 }

@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
+ *  $Id: defLoad.c,v 3.4 2002/01/03 17:08:22 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -192,13 +192,13 @@ massageDefTree( tDefEntry** ppNode )
     skipTwinFix:
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
         if (HAVE_OPT(SHOW_DEFS))
-            printf( zFmt, pNode->index, pNode->pzDefName );
+            fprintf( pfTrace, zFmt, pNode->index, pNode->pzDefName );
 #endif
 
         if (pNode->valType == VALTYP_BLOCK) {
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_DEFS )
             if (HAVE_OPT(SHOW_DEFS))
-                fputs( "{...}\n", stdout );
+                fputs( "{...}\n", pfTrace );
 #endif
             /*
              *  Do this same function on all the children of this
@@ -221,14 +221,14 @@ massageDefTree( tDefEntry** ppNode )
             for (;;) {
                 char ch = *(pz++);
                 if (ch == NUL) {
-                    fputc( '\n', stdout );
+                    fputc( '\n', pfTrace );
                     break;
                 }
-                fputc( ch, stdout );
+                fputc( ch, pfTrace );
                 if (ch == '\n')
                     break;
                 if (--ct == 0) {
-                    fputc( '\n', stdout );
+                    fputc( '\n', pfTrace );
                     break;
                 }
             }
@@ -268,8 +268,9 @@ parseDefinitions( void )
 {
 #if defined( VALUE_OPT_SHOW_DEFS )
     if (HAVE_OPT( SHOW_DEFS )) {
-        printf( "%d bytes of definition\n\n", strlen( pBaseCtx->pzData ));
-        fputs( pBaseCtx->pzData, stdout );
+        fprintf( pfTrace, "%d bytes of definition\n\n",
+                 strlen( pBaseCtx->pzData ));
+        fputs( pBaseCtx->pzData, pfTrace );
     }
 #endif
     pCurCtx = pBaseCtx;

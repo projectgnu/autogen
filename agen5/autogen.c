@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.1 2001/12/10 03:48:27 bkorb Exp $
+ *  $Id: autogen.c,v 3.2 2002/01/03 17:08:22 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -155,6 +155,9 @@ doneCheck( void )
 STATIC void
 ignoreSignal( int sig )
 {
+#ifdef DEBUG
+    fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
+#endif
     return;
 }
 

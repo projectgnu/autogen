@@ -46,6 +46,9 @@
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
 #include "autogen.h"
+#ifndef DEBUG_FSM
+#  undef DEBUG
+#endif
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 

@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/12/24 14:13:32 $
+## Last Modified:   $Date: 2002/01/03 17:08:22 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2001/12/24 14:13:32 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/01/03 17:08:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -42,13 +42,13 @@ EXTRA_DIST	 = directive.tpl opts.def snarf.tpl cgi.def \
 bin_PROGRAMS = autogen
 
 autogen_SOURCES = $(GEN_CSRC) \
-        agShell.c     agUtils.c     agUtils.h     autogen.c     autogen.h   \
-        defDirect.c   defFind.c     defLex.c      defLoad.c     defParse.y  \
-        defReduce.c   expExtract.c  expFormat.c   expGperf.c    expGuile.c  \
-        expOutput.c   expPrint.c    expState.c    expString.c   funcCase.c  \
-        funcDef.c     funcEval.c    funcFor.c     funcIf.c      functions.c \
-        functions.h   loadPseudo.c  tpLoad.c      tpParse.c     tpProcess.c \
-        agCgi.c
+  agCgi.c       agShell.c     agUtils.c     agUtils.h     autogen.c  \
+  autogen.h     defDirect.c   defFind.c     defLex.c      defLoad.c  \
+  defParse.y    defReduce.c   expExtract.c  expFormat.c   expGperf.c \
+  expGuile.c    expMake.c     expOutput.c   expPrint.c    expState.c \
+  expString.c   funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
+  funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
+  tpParse.c     tpProcess.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la @GUILE_LINK@
 

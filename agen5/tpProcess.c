@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.3 2001/12/26 20:07:57 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.4 2002/01/03 17:08:22 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -120,10 +120,8 @@ doStdoutTemplate( tTemplate* pTF )
     fpRoot.pFile  = stdout;
     fpRoot.pzOutName = "stdout";
     fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
-    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        fprintf( pfTrace, "Starting stdout template\n" );
-        fflush( pfTrace );
-    }
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
+        fputs( "Starting stdout template\n", pfTrace );
 
     /*
      *  IF there is a CGI prefix for error messages,
