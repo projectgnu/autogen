@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.15 2000/08/09 14:56:25 bkorb Exp $
+ *  $Id: funcFor.c,v 1.16 2000/08/13 21:20:24 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -474,7 +474,7 @@ MAKE_HANDLER_PROC( For )
     int         loopCt;
 
     pDef = findDefEntry( pT->pzTemplText + pMac->ozName, pCurDef,
-                         &isIndexed, AG_TRUE );
+                         &isIndexed );
     if (pDef == (tDefEntry*)NULL) {
         if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
             fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",

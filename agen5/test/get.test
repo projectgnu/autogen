@@ -1,0 +1,65 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# get.test --- test get functionality
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: get.test,v 1.1 2000/08/13 21:20:24 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+[= AutoGen5 template test =]
+[=
+
+IF (not (exist? "foo.bar.baz"))  =][=
+  (error "foo.bar.baz does, too, exist!")   =][=
+
+ELIF (not (= "mumble" (get "foo.bar.baz"))) =][=
+  (error (sprintf "We got the wrong baz.  We got:  %s"
+         (get "foo.bar.baz")))   =][=
+ELSE
+      =]A OK[=
+ENDIF =]
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+cat > $testname.def <<_EOF_
+AutoGen definitions $testname;
+
+foo = { bar = { nada = nothing; }; };
+foo = { bar = { baz  = mumble;  }; };  /* this is the one */
+foo = { bar = { baz  = grumble; }; };
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+set -x
+echo creating $testname.out
+# this is the output we should expect to see
+cat > $testname.out <<'_EOF_'
+A OK
+_EOF_
+
+$AGEXE $testname.def || failure $AGEXE failed
+cmp -s $testname.test $testname.out || failure unexpected output
+
+cleanup
+# end of get.test

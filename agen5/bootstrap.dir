@@ -154,9 +154,19 @@ do
   defParse.[ch] )
     #  Set a default for YACC
     #
-    if [ -z "${YACC}" ]
+    if [ "x${YACC}" = x ]
     then
-      YACC="byacc -d"
+      case "`type byacc 2>/dev/null`" in
+      "byacc is "* )
+        YACC="byacc -d" ;;
+      esac
+      if [ "x$YACC" = x ]
+      then
+        case "`type yacc 2>/dev/null`" in
+        "yacc is "* )
+          YACC="yacc -d" ;;
+        esac
+      fi
     fi
 
     echo ${YACC} defParse.y
@@ -297,7 +307,9 @@ _EOF_
     echo "#endif /* AUTOGEN_PROTOTYPES_H */"
     ) > proto.h.new
 
-    if cmp proto.h proto.h.new
+    if test ! -f proto.h
+    then mv -f proto.h.new proto.h
+    elif cmp proto.h proto.h.new
     then rm -f proto.h.new
     else mv -f proto.h.new proto.h ; fi
 

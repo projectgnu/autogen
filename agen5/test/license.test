@@ -1,0 +1,57 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# license.test --- test license functionality
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: license.test,v 1.1 2000/08/13 21:20:24 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+[= AutoGen5 template test =]
+/*
+[= (license "$testname" "$testname" "Auto-Gen" " *  " ) =]
+ */
+_EOF_
+
+# # # # # # # # # # LICENSE FILE # # # # # # # # #
+
+echo creating $testname.lic
+cat > $testname.lic <<'_EOF_'
+This is a bogus license granted by %2$s for %1$s.
+Use it in good health
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+set -x
+echo creating $testname.out
+# this is the output we should expect to see
+cat > $testname.out <<_EOF_
+/*
+ *  This is a bogus license granted by Auto-Gen for $testname.
+ *  Use it in good health
+ */
+_EOF_
+
+$AGEXE -b $testname --no-def -T $testname.tpl || failure $AGEXE failed
+cmp -s $testname.test $testname.out || failure unexpected output
+
+cleanup
+# end of license.test

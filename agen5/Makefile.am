@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.23 2000/04/04 13:21:41 bkorb Exp $
+## $Id: Makefile.am,v 1.24 2000/08/13 21:20:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -73,6 +73,8 @@ GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) DEBUG_OPTS=$(OPTDBG) \
 	AGEXE=@AGEXE@ GDEXE=@GDEXE@ COLEXE=@COLEXE@
+
+defLex.o : defParse.h
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION

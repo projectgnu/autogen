@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.7 2000/08/09 14:56:25 bkorb Exp $
+ *  $Id: defFind.c,v 1.8 2000/08/13 21:20:24 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -28,245 +28,23 @@
 #include <streqv.h>
 
 #include "autogen.h"
+#include "assert.h"
 
-tSCC zInvalRef[] = "invalid reference";
+struct defEntryList {
+    size_t         allocCt;
+    size_t         usedCt;
+    tDefEntry**    papDefEntry;
+    int            nestLevel;
+};
+typedef struct defEntryList tDefEntryList;
 
-typedef enum {
-    CDF_INITIAL = 0,
-    CDF_TOPLEVEL_NAME,
-    CDF_INDEX_NAME
-} teState;
+tSCC zInvalRef[]  = "invalid reference";
+tSCC zIllFormed[] = "Ill-formed segmented name:  ``%s''\n";
+tSCC zNoRoom[]    = "No room to cannonicalize ``%s''\n";
+
+tSC zDefinitionName[ MAXPATHLEN ];
 
 STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
-
-
-/*
- *  Copy a reference to a definition.
- */
-    EXPORT int
-copyDefReference( tTemplate* pT, tMacro* pMac,
-                  char** ppDest, const char** ppSrc, int maxLen )
-{
-    char*   pDest  = *ppDest;
-    tCC*    pSrc   = *ppSrc;
-    tCC*    pStart = pSrc;
-    teState state  = CDF_INITIAL;
-    char    ch, nextCh;
-
-    /*
-     *  After skipping any white space, we are allowed to stumble upon a top
-     *  level name, an index or a period separating a nested value name.
-     */
-    do  {
-        if (maxLen-- <= 0)
-            goto leaveCopyDefReference;
-        ch = *(pSrc++);
-    } while (isspace( ch ));
-
-    if (ISNAMECHAR( ch ))
-        state = CDF_TOPLEVEL_NAME;
-
-    else switch (ch) {
-    case '[':
-    case '.':
-        *(pDest++) = ch;
-        do  {
-            if (maxLen-- <= 0)
-                LOAD_ABORT( pT, pMac, zInvalRef );
-
-            nextCh = *(pSrc++);
-        } while (isspace( nextCh ));
-
-        if (! ISNAMECHAR( nextCh )) {
-            /*
-             *  Not having a name character here is valid IFF
-             *  we are using the "[$]" subscript syntax
-             */
-            if (ch != '[')
-                LOAD_ABORT( pT, pMac, zInvalRef );
-
-            switch (nextCh) {
-            case '$':
-                *(pDest++) = nextCh;
-
-                /*
-                 *  Skip trailing space
-                 */
-                do  {
-                    if (maxLen-- <= 0)
-                        LOAD_ABORT( pT, pMac, zInvalRef );
-                    ch = *(pSrc++);
-                } while (isspace( ch ));
-                if (ch != ']')
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-                goto closeBracket;
-                /* FALLTHROUGH */
-
-            case ']':
-                ch = nextCh;
-                goto closeBracket;
-
-            default:
-                LOAD_ABORT( pT, pMac, zInvalRef );
-            }
-        }
-
-        state = (ch == '.') ? CDF_TOPLEVEL_NAME : CDF_INDEX_NAME;
-        ch = nextCh;
-        break;
-
-    default:
-        LOAD_ABORT( pT, pMac, zInvalRef );
-    }
-
-    for (;;) {
-        /*
-         *  FOR each name character, copy it.
-         */
-        if ((ch == '$') && (state == CDF_INDEX_NAME)) {
-            *(pDest++) = ch;
-            if (maxLen-- <= 0)
-                LOAD_ABORT( pT, pMac, zInvalRef );
-            ch = *(pSrc++);
-            if ((! isspace( ch )) && (ch != ']'))
-                LOAD_ABORT( pT, pMac, zInvalRef );
-        }
-        else do  {
-            *(pDest++) = ch;
-            if (maxLen-- <= 0) {
-                if (state == CDF_INDEX_NAME)
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-                goto leaveCopyDefReference;
-            }
-            ch = *(pSrc++);
-        } while (ISNAMECHAR( ch ));
-
-        /*
-         *  skip any trailing space
-         */
-        while (isspace( ch )) {
-            if (maxLen-- <= 0)
-                goto leaveCopyDefReference;
-            ch = *(pSrc++);
-        }
-
-        /*
-         *  Only three special chars are used in definition references
-         *  '[', ']' and '.'.  Stop on anything else.
-         */
-        switch (ch) {
-        case '[':
-        case '.':
-            if (state == CDF_INDEX_NAME)
-                LOAD_ABORT( pT, pMac, zInvalRef );
-
-            /*
-             *  The next state depends on the current char
-             */
-            *(pDest++) = ch;
-            state = (ch == '.') ? CDF_TOPLEVEL_NAME : CDF_INDEX_NAME;
-
-            /*
-             *  Skip trailing space
-             */
-            do  {
-                if (maxLen-- <= 0)
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-                ch = *(pSrc++);
-            } while (isspace( ch ));
-
-            /*
-             *  We *must* have a name at this point.
-             */
-            if (! ISNAMECHAR( ch )) {
-                /*
-                 *  Not having a name character here is valid IFF
-                 *  we are using the "[$]" subscript syntax
-                 */
-                if (state != CDF_INDEX_NAME)
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-
-                switch (ch) {
-                case '$':
-                    *(pDest++) = ch;
-
-                    /*
-                     *  Skip trailing space
-                     */
-                    do  {
-                        if (maxLen-- <= 0)
-                            LOAD_ABORT( pT, pMac, zInvalRef );
-                        ch = *(pSrc++);
-                    } while (isspace( ch ));
-                    if (ch != ']')
-                        LOAD_ABORT( pT, pMac, zInvalRef );
-                    /* FALLTHROUGH */
-
-                case ']':
-                    goto closeBracket;
-
-                default:
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-                }
-            }
-            break;
-
-        case ']':
-            if (state == CDF_TOPLEVEL_NAME)
-                LOAD_ABORT( pT, pMac, zInvalRef );
-
-        closeBracket:
-            *(pDest++) = ch;
-
-            /*
-             *  Skip trailing space
-             */
-            do  {
-                if (maxLen-- <= 0)
-                    goto leaveCopyDefReference;
-                ch = *(pSrc++);
-            } while (isspace( ch ));
-
-            switch (ch) {
-            case '.':
-                *(pDest++) = ch;
-                break;
-
-            case '[':
-            case ']':
-                LOAD_ABORT( pT, pMac, zInvalRef );
-
-            default:
-                pSrc--;
-                goto leaveCopyDefReference;
-            }
-
-            /*
-             *  We found a '.' char.  Skip trailing space
-             */
-            do  {
-                if (maxLen-- <= 0)
-                    LOAD_ABORT( pT, pMac, zInvalRef );
-                ch = *(pSrc++);
-            } while (isspace( ch ));
-
-            if (! ISNAMECHAR( ch ))
-                LOAD_ABORT( pT, pMac, zInvalRef );
-            state = CDF_TOPLEVEL_NAME;
-            break;
-
-        default:
-            pSrc--;
-            goto leaveCopyDefReference;
-        }
-    }
-
- leaveCopyDefReference:
-    *ppSrc     = pSrc;
-    *(pDest++) = NUL;
-    *ppDest    = pDest;
-    return (int)(pSrc - pStart);
-}
 
 
     STATIC tDefEntry*
@@ -368,6 +146,197 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
     return pE;
 }
 
+
+/*
+ *  find entry support routines:
+ *
+ *  addResult:  place a new definition entry on the end of the
+ *              list of found definitions (reallocating list size as needed).
+ */
+static void
+addResult( tDefEntry* pDE, tDefEntryList* pDEL )
+{
+    if (++(pDEL->usedCt) > pDEL->allocCt) {
+        if ((pDEL->allocCt += pDEL->allocCt) == 0) {
+            pDEL->allocCt     = 16;
+            pDEL->papDefEntry = (tDefEntry**)AGALOC( 16 * sizeof( void* ));
+        } else {
+            pDEL->papDefEntry =
+                (tDefEntry**)AGREALOC( (void*)pDEL->papDefEntry,
+                                       pDEL->allocCt * sizeof( void* ));
+        }
+    }
+
+    pDEL->papDefEntry[ pDEL->usedCt-1 ] = pDE;
+}
+
+
+    STATIC size_t
+badName( const char* pzFmt, char* pzD, const char* pzS, size_t srcLen )
+{
+    memcpy( (void*)pzD, (void*)pzS, srcLen );
+    pzD[ srcLen ] = NUL;
+    fprintf( stderr, pzFmt, pzD );
+    return srcLen + 1;
+}
+
+
+/*
+ *  cannonicalizeName:  remove white space and roughly verify the syntax.
+ *  This procedure will consume everything from the source string that
+ *  forms a valid AutoGen compound definition name.
+ *  We leave legally when:
+ *  1.  the state is "CN_NAME_ENDED", AND
+ *  2.  We stumble into a character that is not either '[' or '.'
+ *      (always skipping white space).
+ *  We start in CN_START.
+ */
+    EXPORT int
+cannonicalizeName( char* pzD, const char* pzS, int srcLen )
+{
+    tSCC zNil[] = "";
+
+    typedef enum {
+        CN_START_NAME = 0,   /* must find a name */
+        CN_NAME_ENDED,       /* must find '[' or '.' or we end */
+        CN_INDEX,            /* must find name, number, '$' or ']' */
+        CN_INDEX_CLOSE,      /* must find ']' */
+        CN_INDEX_ENDED       /* must find '.' or we end */
+    } teConState;
+
+    teConState state = CN_START_NAME;
+
+    const char* pzOri = pzS;
+    char*       pzDst = pzD;
+    size_t      stLen = srcLen;
+
+ nextSegment:
+    /*
+     *  The next segment may always start with an alpha character,
+     *  but an index may also start with a number.  The full number
+     *  validation will happen in findEntryByIndex().
+     */
+    while (isspace( *pzS )) {
+        if (--srcLen <= 0) {
+            pzS = zNil;
+            break;
+        }
+        pzS++;
+    }
+
+    switch (state) {
+    case CN_START_NAME:
+        if (! isalpha( *pzS ))
+            return badName( zIllFormed, pzDst, pzOri, stLen );
+        state = CN_NAME_ENDED;  /* we found the start of our first name */
+        break;  /* fall through to name/number consumption code */
+
+    case CN_NAME_ENDED:
+        switch (*pzS++) {
+        case '[':
+            *(pzD++) = '[';
+            state = CN_INDEX;
+            break;
+
+        case '.':
+            *(pzD++) = '.';
+            state = CN_START_NAME;
+            break;
+
+        default:
+            /* legal exit -- we have a name already */
+            *pzD = NUL;
+            return srcLen;
+        }
+
+        if (--srcLen <= 0)
+            return badName( zIllFormed, pzDst, pzOri, stLen );
+        goto nextSegment;
+
+    case CN_INDEX:
+        /*
+         *  An index.  Valid syntaxes are:
+         *
+         *    '[' <#define-d name> ']'
+         *    '[' <number> ']'
+         *    '['  '$'  ']'
+         *    '['       ']'
+         *
+         *  We will check for and handle the last case right here.
+         *  The next cycle must find the index closer (']').
+         */
+        state = CN_INDEX_CLOSE;
+
+        /*
+         *  Numbers and #define-d names are handled at the end of the switch.
+         *  '$' and ']' are handled immediately below.
+         */
+        if (isalnum( *pzS ))
+            break;
+
+        /*
+         *  A solitary '$' is the highest index, whatever that happens to be
+         *  We process that right here because down below we only accept
+         *  name-type characters and this is not VMS.
+         */
+        if (*pzS == '$') {
+            if (--srcLen < 0)
+                return badName( zIllFormed, pzDst, pzOri, stLen );
+
+            *(pzD++) = *(pzS++);
+            goto nextSegment;
+        }
+        /* FALLTHROUGH */
+
+    case CN_INDEX_CLOSE:
+        /*
+         *  Nothing else is okay.
+         */
+        if ((*(pzD++) = *(pzS++)) != ']')
+            return badName( zIllFormed, pzDst, pzOri, stLen );
+
+        if (--srcLen <= 0) {
+            *pzD = NUL;
+            return srcLen;
+        }
+        state = CN_INDEX_ENDED;
+        goto nextSegment;
+
+    case CN_INDEX_ENDED:
+        if ((*pzS != '.') || (--srcLen < 0)) {
+            *pzD = NUL;
+            return srcLen;
+        }
+        *(pzD++) = *(pzS++);
+
+        state = CN_START_NAME;
+        goto nextSegment;
+    }
+
+    /*
+     *  The next state must be either looking for what comes after the
+     *  end of a name, or for the close bracket after an index.
+     *  Whatever, the next token must be a name or a number.
+     */
+    assert((state == CN_NAME_ENDED) || (state == CN_INDEX_CLOSE));
+    assert( isalnum( *pzS ));
+
+    /*
+     *  Copy the name/number.  We already know the first character is valid.
+     */
+    while (ISNAMECHAR( *pzS )) {
+        *(pzD++) = tolower( *(pzS++) );
+
+        if (--srcLen <= 0) {
+            pzS = zNil;
+            break;
+        }
+    }
+
+    goto nextSegment;
+}
+
+
 /*
  *  findDefEntry
  *
@@ -379,32 +348,44 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
  *  to traverse the list of twins).
  */
     EXPORT tDefEntry*
-findDefEntry( char* pzName, tDefEntry* pDefs,
-              ag_bool* pIsIndexed, ag_bool may_change_level )
+findDefEntry( char* pzName, tDefEntry* pDefs, ag_bool* pIsIndexed )
 {
-    char*      pcBrace;
-    char       breakCh;
-    tDefEntry* pE;
-    char       zDefName[ MAXPATHLEN ];
+    char*        pcBrace;
+    char         breakCh;
+    tDefEntry*   pE;
+    ag_bool      dummy;
 
-    if (pIsIndexed != (ag_bool*)NULL)
-      *pIsIndexed = AG_FALSE;
+    static int   nestingDepth = 0;
 
- findDefEntryRecurse:
+    /*
+     *  IF we are at the start of a search, then cannonicalize the name
+     *  we are hunting for, copying it to a modifiable buffer, and
+     *  initialize the "indexed" boolean to false (we have not found
+     *  an index yet).
+     */
+    if (nestingDepth == 0) {
+        cannonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        pzName = zDefinitionName;
+
+        if (pIsIndexed != (ag_bool*)NULL)
+             *pIsIndexed = AG_FALSE;
+        else pIsIndexed  = &dummy;
+    }
+
     pcBrace  = pzName + strcspn( pzName, "[." );
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
-    if (pIsIndexed != (ag_bool*)NULL)
-      *pIsIndexed |= (breakCh == '[');
-
-    strtransform( zDefName, pzName );
+    *pIsIndexed |= (breakCh == '[');
 
     for (;;) {
-        if (pDefs == (tDefEntry*)NULL) {
-            *pcBrace = breakCh;
+        /*
+         *  IF we are at the end of the definitions (reached ROOT),
+         *  THEN it is time to bail out.
+         */
+        if (pDefs == (tDefEntry*)NULL)
             return (tDefEntry*)NULL;
-        }
+
         pE = pDefs;
 
         do  {
@@ -412,21 +393,30 @@ findDefEntry( char* pzName, tDefEntry* pDefs,
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp( pE->pzName, zDefName ) == 0)
-                goto def_entry_found;
+            if (strcmp( pE->pzName, pzName ) == 0)
+                goto label_defEntryFound;
 
             pE = pE->pNext;
         } while (pE != (tDefEntry*)NULL);
 
         /*
-         *  Advance and check for finish (not found in root defs)
+         *  IF we are nested, then we cannot change the definition level.
+         *  So, we did not find anything.
          */
-        if (! may_change_level)
+        if (nestingDepth != 0)
             return (tDefEntry*)NULL;
 
+        /*
+         *  Let's go try the definitions at the next higher level.
+         */
         pDefs = pDefs->pDad ;
-    } def_entry_found:;
+    } label_defEntryFound:;
 
+    /*
+     *  At this point, we have found the entry that matches the supplied
+     *  name, up to the '[' or '.' or NUL character.  It *must* be one of
+     *  those three characters.
+     */
     *pcBrace = breakCh;
 
     switch (breakCh) {
@@ -447,16 +437,26 @@ findDefEntry( char* pzName, tDefEntry* pDefs,
          *  We must find the closing brace, or there is an error
          */
         pcBrace = strchr( pcBrace, ']' );
-        if (pcBrace == (char*)NULL)
-            return (tDefEntry*)NULL;
+        if (pcBrace == (char*)NULL) {
+            fprintf( stderr, zIllFormed, zDefinitionName );
+            AG_ABEND;
+        }
 
         /*
          *  IF we are at the end of the definition,
          *  THEN return what we found
          */
-        if (*++pcBrace != '.')
+        switch (*++pcBrace) {
+        case NUL:
             return pE;
 
+        case '.':
+            break;
+
+        default:
+            fprintf( stderr, zIllFormed, zDefinitionName );
+            AG_ABEND;
+        }
         /* FALLTHROUGH */
 
     case '.':
@@ -467,6 +467,10 @@ findDefEntry( char* pzName, tDefEntry* pDefs,
          */
         pzName = pcBrace + 1;
         break;
+
+    default:
+        fprintf( stderr, zIllFormed, zDefinitionName );
+        AG_ABEND;
     }
 
     /*
@@ -480,14 +484,194 @@ findDefEntry( char* pzName, tDefEntry* pDefs,
      *  we find the entry we want.  We ignore twins if we just
      *  used a subscript.
      */
+    nestingDepth++;
     do  {
         tDefEntry* res = findDefEntry( pzName, (tDefEntry*)pE->pzValue,
-                                       pIsIndexed, AG_FALSE );
-        if ((res != (tDefEntry*)NULL) || (breakCh == '['))
+                                       pIsIndexed );
+        if ((res != (tDefEntry*)NULL) || (breakCh == '[')) {
+            nestingDepth--;
             return res;
+        }
         pE = pE->pTwin;
     } while (pE != (tDefEntry*)NULL);
 
+    nestingDepth--;
     return (tDefEntry*)NULL;
+}
+
+
+/*
+ *  findEntryList
+ *
+ *  Find the definition entry for the name passed in.
+ *  It is okay to find block entries IFF they are found on the
+ *  current level.  Once you start traversing up the tree,
+ *  the macro must be a text macro.  Return an indicator saying if
+ *  the element has been indexed (so the caller will not try
+ *  to traverse the list of twins).
+ */
+    EXPORT tDefEntry**
+findEntryList( char* pzName, tDefEntry* pDefs )
+{
+    static tDefEntryList defList = { 0, 0, NULL, 0 };
+
+    char*      pcBrace;
+    char       breakCh;
+    tDefEntry* pE;
+
+    /*
+     *  IF we are at the start of a search, then cannonicalize the name
+     *  we are hunting for, copying it to a modifiable buffer, and
+     *  initialize the "indexed" boolean to false (we have not found
+     *  an index yet).
+     */
+    if (defList.nestLevel == 0) {
+        cannonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        pzName = zDefinitionName;
+        defList.usedCt = 0;
+    }
+
+    pcBrace  = pzName + strcspn( pzName, "[." );
+    breakCh  = *pcBrace;
+    *pcBrace = NUL;
+
+    for (;;) {
+        /*
+         *  IF we are at the end of the definitions (reached ROOT),
+         *  THEN it is time to bail out.
+         */
+        if (pDefs == (tDefEntry*)NULL) {
+            /*
+             *  Make sure we are not nested.  Once we start to nest,
+             *  then we cannot "change definition levels"
+             */
+            if (defList.nestLevel != 0) {
+                tSCC z[] =
+                    "reached ROOT def resolving last subcomponent:  `%s'\n";
+                fprintf( stderr, z, zDefinitionName );
+                AG_ABEND;
+            }
+
+            /*
+             *  Don't bother returning zero entry list.  Just return NULL.
+             */
+            return (tDefEntry**)NULL;
+        }
+
+        pE = pDefs;
+
+        do  {
+            /*
+             *  IF the name matches
+             *  THEN go add it, plus all its twins
+             */
+            if (strcmp( pE->pzName, pzName ) == 0)
+                goto label_defEntryFound;
+
+            pE = pE->pNext;
+        } while (pE != (tDefEntry*)NULL);
+
+        /*
+         *  IF we are nested, then we cannot change the definition level.
+         *  Just go and return what we have found so far.
+         */
+        if (defList.nestLevel != 0)
+            goto returnResult;
+
+        /*
+         *  Let's go try the definitions at the next higher level.
+         */
+        pDefs = pDefs->pDad ;
+    } label_defEntryFound:;
+
+    /*
+     *  At this point, we have found the entry that matches the supplied
+     *  name, up to the '[' or '.' or NUL character.  It *must* be one of
+     *  those three characters.
+     */
+    *pcBrace = breakCh;
+
+    switch (breakCh) {
+    case NUL:
+        do  {
+            addResult( pE, &defList );
+            pE = pE->pTwin;
+        } while (pE != NULL);
+        goto returnResult;
+
+    case '[':
+        /*
+         *  We have to find a specific entry in a list.
+         */
+        while (isspace( *++pcBrace )) ;
+
+        pE = findEntryByIndex( pE, pcBrace );
+        if (pE == (tDefEntry*)NULL)
+            goto returnResult;
+
+        /*
+         *  We must find the closing brace, or there is an error
+         */
+        pcBrace = strchr( pcBrace, ']' );
+        if (pcBrace == (char*)NULL) {
+            fprintf( stderr, zIllFormed, zDefinitionName );
+            AG_ABEND;
+        }
+
+        /*
+         *  IF we are at the end of the definition,
+         *  THEN return what we found
+         */
+        switch (*++pcBrace) {
+        case NUL:
+            goto returnResult;
+
+        case '.':
+            break;
+
+        default:
+            fprintf( stderr, zIllFormed, zDefinitionName );
+            AG_ABEND;
+        }
+        /* FALLTHROUGH */
+
+    case '.':
+        /*
+         *  It is a segmented value name.  Set the name pointer
+         *  to the next segment and search starting from the newly
+         *  available set of definitions.
+         */
+        pzName = pcBrace + 1;
+        break;
+
+    default:
+        fprintf( stderr, zIllFormed, zDefinitionName );
+        AG_ABEND;
+    }
+
+    /*
+     *  We cannot find a member of a non-block type macro definition.
+     */
+    if (pE->valType != VALTYP_BLOCK)
+        return (tDefEntry**)NULL;
+
+    /*
+     *  Loop through all the twins of the entry.  We ignore twins if we just
+     *  used a subscript.
+     */
+    defList.nestLevel++;
+    do  {
+        (void)findEntryList( pzName, (tDefEntry*)pE->pzValue );
+        if (breakCh == '[')
+            break;
+        pE = pE->pTwin;
+    } while (pE != (tDefEntry*)NULL);
+    defList.nestLevel--;
+
+ returnResult:
+    if (defList.nestLevel == 0)
+        addResult( NULL, &defList );
+
+    return defList.papDefEntry;
 }
 /* end of defFind.c */

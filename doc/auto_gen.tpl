@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.58 2000/08/11 13:27:47 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.59 2000/08/13 21:21:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -61,7 +61,7 @@ notice identical to this one except for the removal of this paragraph
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{bkorb@@gnu.org}
+@author @email{autogen@@linuxave.org}
 
 @page
 @vskip 0pt plus 1filll

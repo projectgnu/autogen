@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.18 2000/08/09 14:56:25 bkorb Exp $
+ *  $Id: expState.c,v 1.19 2000/08/13 21:20:24 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -54,7 +54,7 @@ entry_length( char* pzName, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed );
 
     if (pzField != (char*)NULL)
         pzField[-1] = '.';
@@ -150,7 +150,7 @@ count_entries( char* pzName, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed );
 
     if (pzField != (char*)NULL)
         pzField[-1] = '.';
@@ -253,7 +253,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
 
-    pE = findDefEntry( pzName, pCurDef, &isIndexed, AG_TRUE );
+    pE = findDefEntry( pzName, pCurDef, &isIndexed );
 
     /*
      *  No such entry?  return FALSE
@@ -426,7 +426,7 @@ ag_scm_exist_p( SCM obj )
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    if (findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE ) == NULL)
+    if (findDefEntry( SCM_CHARS( obj ), pDefContext, &x ) == NULL)
         return SCM_BOOL_F;
 
     return SCM_BOOL_T;
@@ -504,7 +504,7 @@ ag_scm_get( SCM obj )
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x );
 
     if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
         return gh_str02scm( "" );
@@ -530,7 +530,7 @@ ag_scm_high_lim( SCM obj )
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed, AG_TRUE );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &isIndexed );
 
     /*
      *  IF we did not find the entry we are looking for
@@ -590,7 +590,7 @@ ag_scm_low_lim( SCM obj )
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
 
-    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x, AG_TRUE );
+    pE = findDefEntry( SCM_CHARS( obj ), pDefContext, &x );
 
     /*
      *  IF we did not find the entry we are looking for

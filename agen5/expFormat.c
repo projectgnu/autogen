@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.19 2000/08/11 13:45:47 bkorb Exp $
+ *  $Id: expFormat.c,v 1.20 2000/08/13 21:20:24 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -403,8 +403,8 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
  * what:  an arbitrary license
  *
  * exparg: lic_name, file name of the license
- * exparg: prog_name, name of the program under the BSD
- * exparg: owner, Grantor of the BSD License
+ * exparg: prog_name, name of the licensed program or library
+ * exparg: owner, Grantor of the License
  * exparg: prefix, String for starting each output line
  *
  * doc:
@@ -448,11 +448,23 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         }
     }
 
+    /*
+     *  Make sure the data are loaded and trim any white space
+     */
     if (mi.pData == (char*)NULL) {
+	char* pz;
         tSCC*  apzSfx[] = { "lic", NULL };
+
         mapDataFile( mi.pzFileName, &mi, apzSfx );
+
+	pz = (char*)mi.pData + mi.size - 1;
+	while (isspace( pz[-1] )) pz--;
+	*pz = NUL;
     }
 
+    /*
+     *  Reformat the string with the given arguments
+     */
     {
         char*  pzName   = SCM_CHARS( prog_name );
         char*  pzOwner  = SCM_CHARS( owner );
@@ -470,7 +482,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         char*   pzScan   = pzRes;
         char*   pzOut;
         size_t  pfx_size = strlen( pzPfx );
-        size_t  out_size = 1;
+        size_t  out_size = pfx_size + 1;
 
         /*
          *  Figure out how much space we need (text size plus

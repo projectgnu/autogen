@@ -13,16 +13,19 @@ prog_name  = "test_${testname}";
 prog_title = "Test AutoOpts for ${testname}";
 _EOF_
 
+echo test_main $test_main
 if [ -n "${test_main}" ]
 then
   echo "test_main  = '${test_main}';" >&5
 fi
 
+echo argument $argument
 if [ -n "${argument}" ]
 then
   echo "argument   = '${argument}';" >&5
 fi
 
+echo long_opts $long_opts
 if [ -n "${long_opts}" ]
 then
   echo "long_opts;" >&5
@@ -31,6 +34,12 @@ fi
 for flag
 do
     case "$flag" in
+    *:* )
+        arg=`echo $flag | sed 's/.*://'`
+	flag=`echo $flag | sed 's/:.*//'`
+	arg="    flag_arg = ':$arg';"
+	;;
+
     *: )
 	flag=`echo $flag | sed 's/://'`
 	arg="    flag_arg = ':';"

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.19 2000/08/11 13:27:47 bkorb Exp $
+ *  $Id: expString.c,v 1.20 2000/08/13 21:20:24 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -37,10 +37,6 @@
 #  include "compat/strftime.c"
 #endif
 
-STATIC SCM makeString( tCC*    pzText,
-            tCC*    pzNewLine,
-            size_t  newLineSize );
-
 
     STATIC SCM
 makeString( tCC*    pzText,
@@ -73,7 +69,7 @@ makeString( tCC*    pzText,
          *  When not a normal character, then count the characters
          *  required to represent whatever it is.
          */
-	else switch (ch) {
+        else switch (ch) {
         case NUL:
             goto loopBreak;
 
@@ -246,8 +242,9 @@ ag_scm_in_p( SCM obj, SCM list )
  * exparg: list, list of strings to join,, list
  *
  * doc:  With the first argument as the separator string,
- *      joins together the second argument a-list of strings
- *      into one long string.
+ *       joins together an a-list of strings into one long string.
+ *       The list may contain nested lists, partly because you
+ *       cannot always control that.
 =*/
     SCM
 ag_scm_join( SCM sep, SCM list )
@@ -275,10 +272,21 @@ ag_scm_join( SCM sep, SCM list )
     while (--l_len >= 0) {
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
-        if (! gh_string_p( car ))
-            return SCM_UNDEFINED;
 
-        str_len += strlen( SCM_CHARS( car ));
+        /*
+         *  This routine is listed as getting a list as the second
+         *  argument.  That means that if someone builds a list and
+         *  hands it to us, it magically becomes a nested list.
+         *  This unravels that.
+         */
+        if (! gh_string_p( car )) {
+            if (car != SCM_UNDEFINED)
+                car = ag_scm_join( sep, car );
+            if (! gh_string_p( car ))
+                continue;
+        }
+
+        str_len += strlen( SCM_CHARS( car )) + sep_len;
     }
 
     l_len = sv_l_len;
@@ -289,8 +297,18 @@ ag_scm_join( SCM sep, SCM list )
      *  Now, copy each one into the output
      */
     for (;;) {
-        car  = SCM_CAR( alist );
+        car   = SCM_CAR( alist );
         alist = SCM_CDR( alist );
+
+        /*
+         *  This unravels nested lists.
+         */
+        if (! gh_string_p( car )) {
+            if (car != SCM_UNDEFINED)
+                car = ag_scm_join( sep, car );
+            if (! gh_string_p( car ))
+                continue;
+        }
 
         strcpy( pzRes, SCM_CHARS( car ));
         pzRes += strlen( pzRes );
@@ -608,24 +626,40 @@ ag_scm_shell_str( SCM obj )
  * exparg: ag-name, AutoGen value name
  *
  * doc:  Create a list of all the strings that are associated
- *       with a name.  This has been de-implemented for Guile.
- *       It will be fixed later.
+ *       with a name.  They must all be text values or we choke.
 =*/
     SCM
 ag_scm_stack( SCM obj )
 {
-    SCM   res = SCM_EOL;
+    SCM   res;
     SCM * pos = &res;
+    tDefEntry** ppDE;
+        tDefEntry* pDE;
+        SCM        str;
+
     if (! gh_string_p( obj ))
         return SCM_UNDEFINED;
-#ifdef LATER
-    while (elt != SCM_UNDEFINED)
-    {
-        *pos = scm_cons (elt, SCM_EOL);
-        pos = SCM_CDRLOC (*pos);
-        elt = va_arg (foo, SCM);
+
+    res = SCM_EOL;
+
+    ppDE = findEntryList( SCM_CHARS( obj ), pDefContext );
+    if (ppDE == NULL)
+        return SCM_EOL;
+
+    for (;;) {
+        pDE = *(ppDE++);
+
+        if (pDE == NULL)
+            break;
+
+        if (pDE->valType != VALTYP_TEXT)
+            return SCM_UNDEFINED;
+
+        str  = gh_str02scm( pDE->pzValue );
+        *pos = scm_cons( str, SCM_EOL );
+        pos  = SCM_CDRLOC( *pos );
     }
-#endif
+
     return res;
 }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.14 2000/04/10 13:25:06 bkorb Exp $
+ *  $Id: functions.c,v 1.15 2000/08/13 21:20:24 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -256,13 +256,40 @@ MAKE_LOAD_PROC( Unknown )
 
     case '[':
     case '.':
+    {
+        size_t remLen;
+
+        /*
+         *  We are going to recopy the definition name,
+         *  this time as a canonical name (i.e. with '[', ']' and '.'
+         *  characters and all blanks squeezed out)
+         */
         pzCopy = pT->pzTemplText + pMac->ozName;
-        pzCopy += strlen( pzCopy );
-        srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );
-        pT->pNext = pzCopy+1;
+
+        /*
+         *  Move back the source pointer.  We may have skipped blanks,
+         *  so skip over however many first, then back up over the name.
+         */
+        while (isspace( pzSrc[-1] )) pzSrc--, srcLen++;
+        remLen  = strlen( pzCopy );
+        pzSrc  -= remLen;
+        srcLen += remLen;
+
+        /*
+         *  Now copy over the full cannonical name.  Check for errors.
+         */
+        remLen = cannonicalizeName( pzCopy, pzSrc, srcLen );
+        if (remLen > srcLen)
+            LOAD_ABORT( pT, pMac, "Invalid definition name" );
+
+        pzSrc  += srcLen - remLen;
+        srcLen  = remLen;
+
+        pT->pNext = pzCopy + strlen( pzCopy ) + 1;
         if (srcLen <= 0)
             goto return_emtpy_expression;
         break;
+    }
     }
 
     /*

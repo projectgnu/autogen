@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: C -*-
 
-# $Id: optlib.tpl,v 1.12 2000/08/11 13:27:47 bkorb Exp $
+# $Id: optlib.tpl,v 1.13 2000/08/13 21:20:25 bkorb Exp $
 
 =]
 [=
@@ -166,30 +166,30 @@ tSCC    z[=(. cap-name)=]Text[] =
   IF (not (exist? "documentation")) =][=
   #
   #  This is *NOT* a documentation option: =]
-tSCC    z[= (sprintf "%-25s" (string-append (. cap-name)
+tSCC    z[= (sprintf "%-25s" (string-append cap-name
                     "_NAME[]" )) =] = "[=(string-upcase! (get "name"))=]";[=
 
     #  IF this option can be disabled,
     #  THEN we must create the string for the disabled version
     #  =][=
     IF (> (len "disable") 0) =]
-tSCC    zNot[= (sprintf "%-23s" (string-append (. cap-name) "_Name[]"))
+tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Name[]"))
              =]= "[=(string-downcase! (get "disable"))=]-[=
           (shell (sprintf "echo '%s'|tr '_\^' '\\-\\-'"
                         (string-downcase! (get "name")) )) =]";
-tSCC    zNot[= (sprintf "%-23s" (string-append (. cap-name) "_Pfx[]"))
+tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
              =]= "[=(string-downcase! (get "disable"))=]";[=
 
 
       #  See if we can use a substring for the option name:
       #  =][=
       IF (> (len "enable") 0) =]
-tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name) "_Name[]")) =]= "[=
+tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
          (shell (sprintf "echo '%s-%s'|tr '_\^' '\\-\\-'"
                         (string-downcase! (get "enable"))
                         (string-downcase! (get "name")) )) =]";[=
       ELSE =]
-#define z[=(sprintf "%-28s" (string-append (. cap-name)
+#define z[=(sprintf "%-28s" (string-append cap-name
         "_Name")) =](zNot[= (. cap-name) =]_Name + [=
         (+ (string-length (get "disable")) 1 ) =])[=
       ENDIF =][=
@@ -197,12 +197,12 @@ tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name) "_Name[]")) =]= "[=
 
     ELSE  No disablement of this option:
     =]
-#define zNot[= (sprintf "%-24s" (string-append (. cap-name)
-                                "_Pfx")) =] (const char*)NULL
-#define zNot[= (sprintf "%-24s" (string-append (. cap-name)
-                                "_Name")) =] (const char*)NULL
-tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name)
-                                "_Name[]")) =]= "[=enable 
+#define zNot[= (sprintf "%-24s" (string-append cap-name "_Pfx"))
+             =] (const char*)NULL
+#define zNot[= (sprintf "%-24s" (string-append cap-name "_Name"))
+             =] (const char*)NULL
+tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
+             =]= "[=enable 
          (string-append (string-downcase! (get "enable")) "-") =][=
          (string-tr! (string-downcase! (get "name")) "_^" "--" ) =]";[=
 
@@ -214,17 +214,17 @@ tSCC    z[=    (sprintf "%-26s" (string-append (. cap-name)
     CASE (get "flag_arg") =][=
     ~~  ^[:= ]{0,1}$ =][= # No initial value   =][=
     ~~* =[0-9]       =][= # Numeric init value =]
-#define z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg" ))
+#define z[=(sprintf "%-28s" (string-append cap-name "DefaultArg" ))
          =]((tCC*)[=(shell (sprintf "echo %s | sed 's@^=@@'"
                          (get "flag_arg") ))=])[=
 
     ==*  :         =][= # String init value =]
-tSCC    z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg[]" ))
+tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
          =]= [=(c-string (shell (sprintf "echo '%s' | sed 's@^:@@'"
                          (get "flag_arg") ))) =];[=
 
     *              =][= # String init value =]
-tSCC    z[=(sprintf "%-28s" (string-append (. cap-name) "DefaultArg[]" ))
+tSCC    z[=(sprintf "%-28s" (string-append cap-name "DefaultArg[]" ))
          =]= [=(c-string (get "flag_arg"))=];[=
     ESAC =][=
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.23 2000/08/09 14:56:25 bkorb Exp $
+ *  $Id: funcEval.c,v 1.24 2000/08/13 21:20:24 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -138,7 +138,7 @@ evalExpression( ag_bool* pMustFree )
          *  Get the named definition entry, maybe
          */
         pDef = findDefEntry( pT->pzTemplText + pMac->ozName,
-                             pCurDef, &isIndexed, AG_TRUE );
+                             pCurDef, &isIndexed );
 
         if (pDef == (tDefEntry*)NULL) {
             /*
@@ -453,15 +453,15 @@ MAKE_LOAD_PROC( Expr )
     }
 
     pzCopy = pT->pNext;
-
-    while (isspace( *pzSrc ))  pzSrc++, srcLen--;
-    if (! isalpha( *pzSrc )) {
-        tSCC zMsg[] = "Conditional expression must start with a name";
-        LOAD_ABORT( pT, pMac, zMsg );
-    }
     pMac->ozName = (pzCopy - pT->pzTemplText);
-
-    srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );
+    {
+        size_t remLen = cannonicalizeName( pzCopy, pzSrc, srcLen );
+        if (remLen > srcLen)
+            LOAD_ABORT( pT, pMac, "Invalid definition name" );
+        pzSrc  += srcLen - remLen;
+        srcLen  = remLen;
+        pzCopy += strlen( pzCopy )+1;
+    }
 
     if (pzSrc >= pzSrcEnd) {
         if (pMac->res != EMIT_VALUE) {
@@ -482,7 +482,7 @@ MAKE_LOAD_PROC( Expr )
          *  Copy the expression
          */
         do { *(pzCopy++) = *(pzSrc++); } while (--ct > 0);
-        *(pzCopy++) = '\0'; *(pzCopy++) = '\0'; /* double terminate */
+        *(pzCopy++) = NUL; *(pzCopy++) = NUL; /* double terminate */
 
         /*
          *  IF this expression has an "if-present" and "if-not-present"
