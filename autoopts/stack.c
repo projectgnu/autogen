@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.14 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: stack.c,v 3.15 2004/01/14 02:41:16 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -73,7 +73,7 @@ unstackOptArg( pOpts, pOptDesc )
      *  IF we don't have any stacked options,
      *  THEN indicate that we don't have any of these options
      */
-    if (pAL == (tArgList*)NULL) {
+    if (pAL == NULL) {
         pOptDesc->fOptState &= OPTST_PERSISTENT;
         if ( (pOptDesc->fOptState & OPTST_INITENABLED) == 0)
             pOptDesc->fOptState |= OPTST_DISABLED;
@@ -100,7 +100,7 @@ unstackOptArg( pOpts, pOptDesc )
             if (pzEq != NULL)
                 *pzEq = NUL;
 
-            res = regexec( &re, pzSrc, (size_t)0, (regmatch_t*)NULL, 0 );
+            res = regexec( &re, pzSrc, (size_t)0, NULL, 0 );
             switch (res) {
             case 0:
                 /*
@@ -138,7 +138,7 @@ unstackOptArg( pOpts, pOptDesc )
         if ( (pOptDesc->fOptState & OPTST_INITENABLED) == 0)
             pOptDesc->fOptState |= OPTST_DISABLED;
         free( (void*)pAL );
-        pOptDesc->optCookie = (void*)NULL;
+        pOptDesc->optCookie = NULL;
     }
 }
 
@@ -196,9 +196,9 @@ stackOptArg( pOpts, pOptDesc )
      *  IF we have never allocated one of these,
      *  THEN allocate one now
      */
-    if (pAL == (tArgList*)NULL) {
+    if (pAL == NULL) {
         pAL = (tArgList*)AGALOC( sizeof( *pAL ), "new option arg stack" );
-        if (pAL == (tArgList*)NULL)
+        if (pAL == NULL)
             return;
         pAL->useCt   = 0;
         pAL->allocCt = MIN_ARG_ALLOC_CT;
@@ -218,7 +218,7 @@ stackOptArg( pOpts, pOptDesc )
          */
         sz += sizeof(char*) * (pAL->allocCt - MIN_ARG_ALLOC_CT);
         pAL = (tArgList*)AGREALOC( (void*)pAL, sz, "expanded opt arg stack" );
-        if (pAL == (tArgList*)NULL)
+        if (pAL == NULL)
             return;
     }
 

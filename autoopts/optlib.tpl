@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.16 2003/12/27 15:06:40 bkorb Exp $
+# $Id: optlib.tpl,v 3.17 2004/01/14 02:41:16 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -371,7 +371,7 @@ DEFINE   Option_Strings
     ENDIF ifdef/ifndef      =][=
   ENDIF =]
 tSCC    z[=(. cap-name)=]Text[] =
-        [=(kr-string (get "descrip"))=];[=
+        [=(set! tmp-text (kr-string (get "descrip")))  tmp-text=];[=
 
   IF (exist? "documentation")     =]
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
@@ -570,10 +570,14 @@ DEFINE USAGE_LINE   =][=
           (get "argument")  ))
   )
 
+  (set! tmp-text
   (kr-string (string-append prog-name " - " (get "prog-title")
            (if (exist? "version") (string-append " - Ver. " (get "version"))
                "" )
-           "\n" usage-line "\n" ))    =][=
+           "\n" usage-line "\n" )) )
+
+  tmp-text =][=
 
 ENDDEF
+
 =]

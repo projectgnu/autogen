@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.7 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: guileopt.c,v 3.8 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -134,7 +134,7 @@ export_options_to_guile( pOpts )
         /*
          *  IF there is a stack of option args, emit them as a list.
          */
-        if (pOD->optCookie != (void*)NULL) {
+        if (pOD->optCookie != NULL) {
             tArgList* pAL = (tArgList*)pOD->optCookie;
             int       act = pAL->useCt;
             tCC**     ppa = pAL->apzArgs;

@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/07/04 17:58:14 $
+# Last Modified:     $Date: 2004/01/14 02:41:16 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.3 2003/07/04 17:58:14 bkorb Exp $
+# $Id: handler.test,v 3.4 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -183,13 +183,74 @@ doOptSixth(
     optionSetMembers( pOptions, pOptDesc, azNames, 4 );
 }
 
+
+#if ENABLE_NLS
+#include <string.h>
+#include <stdio.h>
+#include <usage-txt.h>
+
+static char*
+AO_strdup( const char* pz )
+{
+    char* pzRes;
+    if (pz == NULL)
+        return NULL;
+    pzRes = strdup( pz );
+    if (pzRes == NULL) {
+        fputs( _("No memory for duping translated strings\n"), stderr );
+        exit( EXIT_FAILURE );
+    }
+    return pzRes;
+}
+
+static void
+translate_option_strings( void )
+{
+    /*
+     *  This invokes the translation code (e.g. gettext(3)).
+     */
+    int ix;
+    tOptDesc* pOD = handlerOptions.pOptDesc;
+
+    /*
+     *  Do the translations.  This code gets compiled into the client programs.
+     *  The first pointer follows the field count field.
+     */
+    {
+        char** ppz = (char**)(void*)&(option_usage_text);
+
+        ix  = option_usage_text.field_ct;
+        do {
+            ppz++;
+            *ppz = AO_strdup(_(*ppz));
+        } while (--ix > 0);
+    }
+
+    for (ix = handlerOptions.optCt; --ix >= 0; pOD++)  {
+        pOD->pzText  = AO_strdup(_(pOD->pzText));
+        pOD->pz_NAME = AO_strdup(_(pOD->pz_NAME));
+        pOD->pz_Name = AO_strdup(_(pOD->pz_Name));
+
+        pOD->pz_DisableName = AO_strdup(_(pOD->pz_DisableName));
+        pOD->pz_DisablePfx  = AO_strdup(_(pOD->pz_DisablePfx));
+    }
+    handlerOptions.pzCopyright   = AO_strdup(_(handlerOptions.pzCopyright));
+    handlerOptions.pzCopyNotice  = AO_strdup(_(handlerOptions.pzCopyNotice));
+    handlerOptions.pzFullVersion = AO_strdup(_(handlerOptions.pzFullVersion));
+    handlerOptions.pzUsageTitle  = AO_strdup(_(handlerOptions.pzUsageTitle));
+    handlerOptions.pzExplain     = AO_strdup(_(handlerOptions.pzExplain));
+    handlerOptions.pzDetail      = AO_strdup(_(handlerOptions.pzDetail));
+}
+
+#endif /* ENABLE_NLS */
+
 #ifdef  __cplusplus
 }
 #endif
 _EOF_
 
-cmp -s ${testname}.test ${testname}.sample || \
-  failure "`diff -c ${testname}.test ${testname}.sample`"
+cmp -s ${testname}.test ${testname}.sample || { set +x ; \
+  failure "`diff -c ${testname}.test ${testname}.sample`" ; }
 
 cleanup
 # end of handler.test

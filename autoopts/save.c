@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.17 2003/12/27 15:06:40 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.18 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -73,10 +73,10 @@ findDirName( tOptions* pOpts )
     tCC*  pzDir;
 
     if (pOpts->specOptIdx.save_opts == 0)
-        return (char*)NULL;
+        return NULL;
 
     pzDir = pOpts->pOptDesc[ pOpts->specOptIdx.save_opts ].pzLastArg;
-    if ((pzDir != (char*)NULL) && (*pzDir != NUL))
+    if ((pzDir != NULL) && (*pzDir != NUL))
         return pzDir;
 
     /*
@@ -119,9 +119,9 @@ findDirName( tOptions* pOpts )
             pzEnv = getenv( pzDir );
         }
 
-        if (pzEnv == (char*)NULL) {
+        if (pzEnv == NULL) {
             fprintf( stderr, zWarn, pOpts->pzProgName );
-            fprintf( stderr, "'%s' not defined\n", pzDir );
+            fprintf( stderr, zNotDef, pzDir );
             return NULL;
         }
 
@@ -150,7 +150,6 @@ STATIC tCC*
 findFileName( tOptions* pOpts )
 {
     tCC*   pzDir;
-    tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
     struct stat stBuf;
 
     pzDir = findDirName( pOpts );
@@ -245,7 +244,7 @@ findFileName( tOptions* pOpts )
      */
     if (! S_ISREG( stBuf.st_mode )) {
         fprintf( stderr, zWarn, pOpts->pzProgName );
-        fprintf( stderr, "'%s' is not a regular file.\n", pzDir );
+        fprintf( stderr, zNotFile, pzDir );
         return NULL;
     }
 
@@ -349,10 +348,9 @@ optionSaveFile( tOptions* pOpts )
         int       ct  = pOpts->presetOptCt;
         FILE*     fp  = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
 
-        if (fp == (FILE*)NULL) {
+        if (fp == NULL) {
             fprintf( stderr, zWarn, pOpts->pzProgName );
-            fprintf( stderr, "error %d (%s) creating %s\n", errno,
-                     strerror( errno ), pzFName );
+            fprintf( stderr, zNoCreat, errno, strerror( errno ), pzFName );
             return;
         }
 
@@ -363,11 +361,10 @@ optionSaveFile( tOptions* pOpts )
         }
 
         {
-            time_t  timeVal = time( (time_t*)NULL );
+            time_t  timeVal = time( NULL );
             char*   pzTime  = ctime( &timeVal );
 
-            fprintf( fp, "#  preset/initialization file\n#  %s#\n",
-                     pzTime );
+            fprintf( fp, zPresetFile, pzTime );
 #ifdef HAVE_ALLOCATED_CTIME
             /*
              *  The return values for ctime(), localtime(), and gmtime()
@@ -412,9 +409,8 @@ optionSaveFile( tOptions* pOpts )
              *  THEN just print the name and continue
              */
             if (p->optArgType == ARG_NONE) {
-                fprintf( fp, "%s\n", (DISABLED_OPT( p ))
-                                     ? p->pz_DisableName
-                                     : p->pz_Name );
+                fprintf( fp, "%s\n",
+                         (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
                 continue;
             }
 

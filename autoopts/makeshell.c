@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.16 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: makeshell.c,v 3.17 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -51,7 +51,7 @@
 
 #include "genshell.c"
 
-tOptions*  pShellParseOptions = (tOptions*)NULL;
+tOptions*  pShellParseOptions = NULL;
 
 /* * * * * * * * * * * * * * * * * * * * *
  *
@@ -360,9 +360,9 @@ tSCC zFlagOptArg[] =
 "            ;;\n"
 "        esac\n";
 
-tSCC* pzShell   = (char*)NULL;
-static char*  pzLeader  = (char*)NULL;
-static char*  pzTrailer = (char*)NULL;
+tSCC* pzShell = NULL;
+static char*  pzLeader  = NULL;
+static char*  pzTrailer = NULL;
 
 /* === STATIC PROCS === */
 STATIC void
@@ -418,7 +418,7 @@ putShellParse( tOptions* pOpts )
         pzShell = NULL;
 
     else if ((pzShell = getenv( "SHELL" )),
-             pzShell == (char*)NULL)
+             pzShell == NULL)
 
         pzShell = "/bin/sh";
 
@@ -486,7 +486,7 @@ putShellParse( tOptions* pOpts )
     }
 
     printf( zLoopEnd, pOpts->pzPROGNAME, zTrailerMarker );
-    if ((pzTrailer != (char*)NULL) && (*pzTrailer != '\0'))
+    if ((pzTrailer != NULL) && (*pzTrailer != '\0'))
         fputs( pzTrailer, stdout );
     else if (ENABLED_OPT( SHELL ))
         printf( "\nenv | egrep %s_\n", pOpts->pzPROGNAME );
@@ -515,14 +515,13 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
     fflush( stdout );
 
     if (pipe( pipeFd ) != 0) {
-        fprintf( stderr, "Error %d (%s) from the pipe(2) syscall\n",
-                 errno, strerror( errno ));
+        fprintf( stderr, zBadPipe, errno, strerror( errno ));
         exit( EXIT_FAILURE );
     }
 
     switch (fork()) {
     case -1:
-        printf( "Cannot obtain %s usage\n", pOpts->pzProgName );
+        fprintf( stderr, zForkFail, errno, strerror(errno), pOpts->pzProgName);
         exit( EXIT_FAILURE );
         break;
 
@@ -601,7 +600,7 @@ emitUsage( tOptions* pOpts )
      *  by the definitions (rather than the current
      *  executable name).  Down case the upper cased name.
      */
-    if (pzLeader != (char*)NULL)
+    if (pzLeader != NULL)
         fputs( pzLeader, stdout );
 
     {
@@ -609,7 +608,7 @@ emitUsage( tOptions* pOpts )
         tCC*    pzOutName;
 
         {
-            time_t    curTime = time( (time_t*)NULL );
+            time_t    curTime = time( NULL );
             struct tm*  pTime = localtime( &curTime );
             strftime( zTimeBuf, AO_NAME_SIZE, "%A %B %e, %Y at %r %Z", pTime );
         }
@@ -639,8 +638,8 @@ emitUsage( tOptions* pOpts )
     printf( zEndPreamble, pOpts->pzPROGNAME );
 
     pOpts->pzProgPath = pOpts->pzProgName = zTimeBuf;
-    textToVariable( pOpts, TT_LONGUSAGE,  (tOptDesc*)NULL );
-    textToVariable( pOpts, TT_USAGE, (tOptDesc*)NULL );
+    textToVariable( pOpts, TT_LONGUSAGE, NULL );
+    textToVariable( pOpts, TT_USAGE,     NULL );
 
     {
         tOptDesc* pOptDesc = pOpts->pOptDesc;
@@ -675,7 +674,7 @@ emitSetup( tOptions* pOpts )
          *  Options that are either usage documentation or are compiled out
          *  are not to be processed.
          */
-        if (SKIP_OPT(pOptDesc) || (pOptDesc->pz_NAME == (char*)NULL))
+        if (SKIP_OPT(pOptDesc) || (pOptDesc->pz_NAME == NULL))
             continue;
 
         if (pOptDesc->optMaxCt > 1)
@@ -699,7 +698,7 @@ emitSetup( tOptions* pOpts )
             pzDefault = zVal;
         }
 
-        else if (pOptDesc->pzLastArg == (char*)NULL) {
+        else if (pOptDesc->pzLastArg == NULL) {
             if (pzFmt == zSingleDef)
                 pzFmt = zSingleNoDef;
             pzDefault = NULL;
@@ -725,9 +724,9 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
         printf( zCmdFmt, "echo 'Warning:  Cannot load options files' >&2" );
         printf( zCmdFmt, "OPT_ARG_NEEDED=YES" );
 
-    } else if (pOptDesc->pz_NAME == (char*)NULL) {
+    } else if (pOptDesc->pz_NAME == NULL) {
 
-        if (pOptDesc->pOptProc == (tOptProc*)NULL) {
+        if (pOptDesc->pOptProc == NULL) {
             printf( zCmdFmt, "echo 'Warning:  Cannot save options files' "
                     ">&2" );
             printf( zCmdFmt, "OPT_ARG_NEEDED=OK" );
@@ -844,7 +843,7 @@ emitMatchExpr( tCC* pzMatchName, tOptDesc* pCurOpt, tOptions* pOpts )
         /*
          *  Check the disablement name, too.
          */
-        if (pOD->pz_DisableName != (char*)NULL) {
+        if (pOD->pz_DisableName != NULL) {
             matchCt = 0;
             while (  toupper( pOD->pz_DisableName[matchCt] )
                   == toupper( pzMatchName[matchCt] ))
@@ -911,7 +910,7 @@ emitLong( tOptions* pOpts )
         /*
          *  Now, do the same thing for the disablement version of the option.
          */
-        if (pOD->pz_DisableName != (char*)NULL) {
+        if (pOD->pz_DisableName != NULL) {
             emitMatchExpr( pOD->pz_DisableName, pOD, pOpts );
             printOptionInaction( pOpts, pOD );
         }
@@ -925,7 +924,7 @@ STATIC void
 openOutput( const char* pzFile )
 {
     FILE* fp;
-    char* pzData = (char*)NULL;
+    char* pzData = NULL;
     struct stat stbf;
 
     do  {
@@ -944,8 +943,7 @@ openOutput( const char* pzFile )
          *  The file must be a regular file
          */
         if (! S_ISREG( stbf.st_mode )) {
-            fprintf( stderr, "Error `%s' is not a regular file\n",
-                     pzFile );
+            fprintf( stderr, zNotFile, pzFile );
             exit( EXIT_FAILURE );
         }
 
@@ -1067,13 +1065,7 @@ genshelloptUsage( tOptions*  pOpts, int exitCode )
     /*
      *  Separate the makeshell usage from the client usage
      */
-    {
-        tSCC zMsg[] =
-            "\n= = = = = = = =\n\n"
-            "This incarnation of genshell will produce\n"
-             "a shell script to parse the options for %s:\n\n";
-        fprintf( option_usage_fp, zMsg, pShellParseOptions->pzProgName );
-    }
+    fprintf( option_usage_fp, zGenshell, pShellParseOptions->pzProgName );
     fflush( option_usage_fp );
 
     /*

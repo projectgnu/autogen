@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: pgusage.c,v 3.10 2004/01/14 02:41:16 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -121,7 +121,7 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
         /*
          *  Use the "more(1)" program if "PAGER" has not been defined
          */
-        if (pzPager == (char*)NULL)
+        if (pzPager == NULL)
             pzPager = "more";
 
         /*

@@ -1,16 +1,14 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# argument.test ---  test argument program attribute
-#                    make sure that when it is not specified
-#                    then option processing consumes all args.
+# cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2003-03-09 09:50:41 bkorb"
+# Time-stamp:        "2004-01-01 10:03:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: cond.test,v 3.1 2003/03/09 19:53:52 bkorb Exp $
+# $Id: cond.test,v 3.2 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -25,11 +23,11 @@ set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-testname="$testname" test_main="${test_main}" \
-argument="${argument}" long_opt="${long_opt}" \
+echo "creating ${testname}.def in `pwd`"
+testname="${testname}" test_main="${test_main}" \
+argument="${argument}" long_opts="${long_opts}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
-cat >> $testname.def <<EOF
+cat >> ${testname}.def <<EOF
 flag = {
   name = cond;
   value = c;
@@ -38,8 +36,8 @@ flag = {
   doc = mumble;
 };
 EOF
-echo $AGEN $testname.def
-$AGEN $testname.def || \
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
@@ -47,8 +45,8 @@ compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -59,12 +57,12 @@ USAGE:  cond [ -<flag> [<val>] ]...
 
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure "`diff $testname.h*lp`"
+cmp -s ${testname}.h*lp || \
+  failure "`diff ${testname}.h*lp`"
 
 INC="${INC} -DCOND=1"
 compile "-?"
-cat > $testname.hlp <<'_EOF_'
+cat > ${testname}.hlp <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -76,8 +74,8 @@ USAGE:  cond [ -<flag> [<val>] ]...
 
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure "`diff $testname.h*lp`"
+cmp -s ${testname}.h*lp || \
+  failure "`diff ${testname}.h*lp`"
 
 cleanup
-# end of argument.test
+# end of cond.test

@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 3.4 2003/08/21 02:06:09 bkorb Exp $
+# $Id: argument.test,v 3.5 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -26,7 +26,7 @@ fi
 
 echo "creating ${testname}.def in `pwd`"
 testname="${testname}" test_main="${test_main}" \
-argument="${argument}" long_opt="${long_opt}" \
+argument="${argument}" long_opts="${long_opts}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
 echo $AGEN ${testname}.def

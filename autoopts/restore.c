@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.10 2003/11/24 17:20:47 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.11 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -81,10 +81,9 @@ optionSaveState( tOptions* pOpts )
             if (pzName == NULL) {
                 pzName = pOpts->pzPROGNAME;
                 if (pzName == NULL)
-                    pzName = "";
+                    pzName = zNil;
             }
-            fprintf( stderr, "%s(optionSaveState): error: cannot allocate "
-                     "%d bytes\n", pzName, sz );
+            fprintf( stderr, zCantSave, pzName, sz );
             exit( EXIT_FAILURE );
         }
     }
@@ -122,10 +121,9 @@ optionRestore( tOptions* pOpts )
         if (pzName == NULL) {
             pzName = pOpts->pzPROGNAME;
             if (pzName == NULL)
-                pzName = "";
+                pzName = zNil;
         }
-        fprintf( stderr, "%s(optionRestore): error: no saved option state\n",
-                 pzName );
+        fprintf( stderr, zNoState, pzName );
         exit( EXIT_FAILURE );
     }
     memcpy( pOpts, p, sizeof( *p ));

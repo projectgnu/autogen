@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.9 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.10 2004/01/14 02:41:16 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -168,7 +168,7 @@ void
 strequate( s )
     const char* s;
 {
-    if ((s != (char*)NULL) && (*s != NUL)) {
+    if ((s != NULL) && (*s != NUL)) {
         unsigned char equiv = (unsigned)*s;
         while (*s != NUL)
             charmap[ (unsigned)*(s++) ] = equiv;

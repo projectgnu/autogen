@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.6 2003/12/30 05:09:59 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.7 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -80,7 +80,7 @@ mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
          *  See if an arg string has already been assigned (glued on
          *  with an `=' character).  If not, the next is the opt arg.
          */
-        if (pOS->pzOptArg != (char*)NULL)
+        if (pOS->pzOptArg != NULL)
             return SUCCESS;
         break;
 
@@ -117,7 +117,7 @@ mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
          *  Look for an argument if we don't already have one (glued on
          *  with a `=' character)
          */
-        if (pOS->pzOptArg != (char*)NULL)
+        if (pOS->pzOptArg != NULL)
             return SUCCESS;
         break;
 
@@ -223,8 +223,8 @@ optionSort( tOptions* pOpts )
         goto exit_no_mem;
     }
 
-    pOpts->curOptIdx   = 1;
-    pOpts->pzCurOpt    = (char*)NULL;
+    pOpts->curOptIdx = 1;
+    pOpts->pzCurOpt  = NULL;
 
     /*
      *  Now, process all the options from our current position onward.

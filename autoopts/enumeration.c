@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.21 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: enumeration.c,v 3.22 2004/01/14 02:41:16 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -82,8 +82,7 @@ enumError(
         fprintf( option_usage_fp, pz_enum_err_fmt,
                  pOpts->pzProgName, pOD->pzLastArg );
 
-    fprintf( option_usage_fp, "The valid \"%s\" option keywords are:\n",
-             pOD->pz_Name );
+    fprintf( option_usage_fp, zValidKeys, pOD->pz_Name );
 
     if (**paz_names == 0x7F) {
         paz_names++;
@@ -120,7 +119,7 @@ findName(
                 return idx;  /* full match */
 
             if (res != name_ct) {
-                pz_enum_err_fmt = "%s error:  the keyword `%s' is ambiguous\n";
+                pz_enum_err_fmt = zAmbigKey;
                 option_usage_fp = stderr;
                 enumError( pOpts, pOD, paz_names, name_ct );
             }
@@ -132,7 +131,7 @@ findName(
      *  no partial match -> error
      */
     if (res == name_ct) {
-        pz_enum_err_fmt = "%s error:  `%s' does not match any keywords\n";
+        pz_enum_err_fmt = zNoKey;
         option_usage_fp = stderr;
         enumError( pOpts, pOD, paz_names, name_ct );
     }
@@ -318,12 +317,12 @@ optionSetMembers(
             if (len == 0)
                 break;
 
-            if ((len == 3) && (strncmp( pzArg, "all", 3 ) == 0)) {
+            if ((len == 3) && (strncmp( pzArg, zAll, 3 ) == 0)) {
                 if (iv)
                      res = 0;
                 else res = ~0;
             }
-            else if ((len == 4) && (strncmp( pzArg, "none", 4 ) == 0)) {
+            else if ((len == 4) && (strncmp( pzArg, zNone, 4 ) == 0)) {
                 if (! iv)
                     res = 0;
             }

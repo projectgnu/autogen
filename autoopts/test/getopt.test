@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2003-12-31 16:04:23 bkorb"
+# Time-stamp:        "2004-01-13 18:34:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 3.1 2004/01/01 22:21:55 bkorb Exp $
+# $Id: getopt.test,v 3.2 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -93,7 +93,8 @@ _EOF_
 echo $AGEN ${testname}.def
 $AGEN ${testname}.def || \
   failure AutoGen could not process
-srcdir=`pwd` $AGEN -T getopt.tpl ${testname}.def
+srcdir=`pwd` CFLAGS="${CFLAGS} ${INC}" LDFLAGS="${LDFLAGS} ${LIB}" \
+$AGEN -T getopt.tpl ${testname}.def
 sed '1,/and the template file/d
     /\$Id:/d
     /Last template edit:/d' getopt-test_${testname}.c \

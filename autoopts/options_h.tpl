@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.17 2003/12/27 15:06:40 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.18 2004/01/14 02:41:16 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -90,6 +90,7 @@ h=options.h
 #define OPTPROC_ARGS_REQ    0x0400 /* Require arguments after options */
 #define OPTPROC_REORDER     0x0800 /* reorder arguments after options */
 #define OPTPROC_GNUUSAGE    0x1000 /* emit usage in GNU style         */
+#define OPTPROC_TRANSLATE   0x2000 /* Translate strings in tOptions   */
 
 #define STMTS(s)  do { s; } while (0)
 
@@ -213,6 +214,11 @@ struct specOptIndex {
 #define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
 #define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 
+/*
+ *  The procedure generated for translating option text
+ */
+typedef void (option_translation_proc_t)(void);
+
 struct options {
     const int         structVersion;
     const char*       pzProgPath;
@@ -238,6 +244,7 @@ struct options {
     int               origArgCt;
     char**            origArgVect;
     const char*       pzBugAddr;
+    option_translation_proc_t* pTransProc;
 };
 
 #if defined( __STDC__ ) || defined( __cplusplus )

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-12-21 09:55:40 bkorb"
+ *  Time-stamp:      "2004-01-01 09:10:28 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.21 2003/12/27 15:06:40 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.22 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -139,7 +139,7 @@ typedef struct {
     tUL        flags;
     teOptType  optType;
     int        argType;
-    char*      pzOptArg;
+    tCC*       pzOptArg;
 } tOptState;
 #define OPTSTATE_INITIALIZER \
     { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL }
@@ -178,8 +178,15 @@ typedef struct {
 
 #ifdef AUTOGEN_BUILD
 #  include <snprintfv/printf.h>
-#else  /* NOT AUTOGEN_BUILD */
 #endif /* AUTOGEN_BUILD */
+
+/*
+ *  Define and initialize all the user visible strings.
+ *  We do not do translations.  If translations are to be done, then
+ *  the client will provide a callback for that purpose.
+ */
+#undef DO_TRANSLATIONS
+#include "usage-txt.h"
 
 /*
  *  File pointer for usage output

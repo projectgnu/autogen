@@ -28,6 +28,7 @@ case "$1" in
   then
     ${AUTOGEN} -L. genshell.def
   fi
+  ${AUTOGEN} -L. usage-txt.def
   if [ ! -f funcs.def ] || [ ! -f options.h ]
   then
     files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \

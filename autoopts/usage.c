@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.25 2003/11/23 19:15:28 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.26 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -50,31 +50,14 @@
  */
 
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
-tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
-tSCC zDefaultOpt[] = "\t\t\t\t- default option for unnamed options\n";
-tSCC zDis[]        = "\t\t\t\t- disabled as --%s\n";
-tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
-tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
-tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
-tSCC zMust[]       = "\t\t\t\t- must appear between %d and %d times\n";
-tSCC zNoLim[]      = "\t\t\t\t- may appear multiple times\n";
-tSCC zMembers[]    = "\t\t\t\t- is a set membership option\n";
-tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
-tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
-tSCC zProhib[]     = "prohibits these options:\n";
-tSCC zReqThese[]   = "requires these options:\n";
-tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
-tSCC zTabHyp[]     = "\t\t\t\t- ";
-tSCC zTabout[]     = "\t\t\t\t%s\n";
-tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
 
-tSCC zNoReq_Short_Title[]   = "  Flg Arg Option-Name    Description\n";
-tSCC zNoReq_NoShort_Title[] = "   Arg Option-Name    Description\n";
-tSCC zReq_Short_Title[]     = "  Flg Arg Option-Name   Req?  Description\n";
-tSCC zReq_NoShort_Title[]   = "   Arg Option-Name   Req?  Description\n";
+#ifndef tSC
+#  define tSC static char
+#endif
 
-tSCC zPresetIntro[]         = "\n\
-The following option preset mechanisms are supported:\n";
+#include "usage-txt.h"
+
+static arg_types_t argTypes;
 
 FILE* option_usage_fp = NULL;
 static char    zOptFmtLine[ 16 ];
@@ -97,10 +80,10 @@ printBareUsage(
     arg_types_t*  pAT );
 
 STATIC void
-setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+setStdOptFmts( tOptions* pOpts, tCC** ppT );
 
 STATIC void
-setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
+setGnuOptFmts( tOptions* pOpts, tCC** ppT );
 
 STATIC void
 printInitList(
@@ -130,7 +113,6 @@ optionUsage(
     int       exitCode )
 {
     tCC*    pOptTitle;
-    arg_types_t* pAT;
 
     displayEnum = AG_FALSE;
 
@@ -161,11 +143,11 @@ optionUsage(
      *  Determine which header and which option formatting strings to use
      */
     if ((pOptions->fOptSet & OPTPROC_GNUUSAGE) != 0) {
-        setGnuOptFmts( pOptions, &pOptTitle, &pAT );
+        setGnuOptFmts( pOptions, &pOptTitle );
         fputc( '\n', option_usage_fp );
     }
     else {
-        setStdOptFmts( pOptions, &pOptTitle, &pAT );
+        setStdOptFmts( pOptions, &pOptTitle );
 
         /*
          *  When we exit with EXIT_SUCCESS and the first option is a doc option,
@@ -184,14 +166,13 @@ optionUsage(
         int        docCt  = 0;
 
         do  {
-            tSCC  zAuto[]     = "Auto-supported Options:";
-
             if ((pOD->fOptState & OPTST_OMITTED) != 0)
                 continue;
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
                 if (exitCode == EXIT_SUCCESS) {
-                    fprintf(option_usage_fp, pAT->pzBrk, pOD->pzText, pOptTitle);
+                    fprintf(option_usage_fp, argTypes.pzBrk, pOD->pzText,
+                            pOptTitle);
                     docCt++;
                 }
 
@@ -209,16 +190,16 @@ optionUsage(
                && (exitCode == EXIT_SUCCESS)
                && (docCt > 0)
                && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
-                fprintf( option_usage_fp, pAT->pzBrk, zAuto, pOptTitle );
+                fprintf( option_usage_fp, argTypes.pzBrk, zAuto, pOptTitle );
 
-            printBareUsage( pOptions, pOD, pAT );
+            printBareUsage( pOptions, pOD, &argTypes );
 
             /*
              *  IF we were invoked because of the --help option,
              *  THEN print all the extra info
              */
             if (exitCode == EXIT_SUCCESS)
-                printExtendedUsage( pOptions, pOD, pAT );
+                printExtendedUsage( pOptions, pOD, &argTypes );
 
         }  while (pOD++, optNo++, (--ct > 0));
     }
@@ -229,15 +210,6 @@ optionUsage(
      *  Describe the mechanics of denoting the options
      */
     switch (pOptions->fOptSet & OPTPROC_L_N_S) {
-
-        tSCC zOptsOnly[]   = "All arguments are named options.\n";
-        tSCC zFlagOkay[]   =
-"Options are specified by doubled hyphens and their name\n\
-or by a single hyphen and the flag character.\n";
-
-        tSCC zNoFlags[]    =
-"Options are specified by single or double hyphens and their name.\n";
-
     case OPTPROC_L_N_S:     fputs( zFlagOkay, option_usage_fp ); break;
     case OPTPROC_SHORTOPT:  break;
     case OPTPROC_LONGOPT:   fputs( zNoFlags,  option_usage_fp ); break;
@@ -245,15 +217,10 @@ or by a single hyphen and the flag character.\n";
     }
 
     if ((pOptions->fOptSet & OPTPROC_NUM_OPT) != 0) {
-        tSCC zNumberOpt[]  =
-            "The '-#<number>' option may omit the hash char\n";
         fputs( zNumberOpt, option_usage_fp );
     }
 
     if ((pOptions->fOptSet & OPTPROC_REORDER) != 0) {
-        tSCC zReorder[]  =
-            "Operands and options may be intermixed.  "
-            "They will be reordered.\n";
         fputs( zReorder, option_usage_fp );
     }
 
@@ -268,8 +235,7 @@ or by a single hyphen and the flag character.\n";
         printProgramDetails( pOptions );
 
     if (pOptions->pzBugAddr != NULL)
-        fprintf( option_usage_fp, "\nplease send bug reports to:  %s\n",
-                 pOptions->pzBugAddr );
+        fprintf( option_usage_fp, zPlsSendBugs, pOptions->pzBugAddr );
     fflush( option_usage_fp );
 
     exit( exitCode );
@@ -522,11 +488,7 @@ printBareUsage(
     return;
 
  bogus_desc:
-    {
-        tSCC zErr[] =
-            "AutoOpts ERROR:  invalid option descriptor for %s\n";
-        fprintf( stderr, zErr, pOD->pz_Name );
-    }
+    fprintf( stderr, zInvalOptDesc, pOD->pz_Name );
     exit( EXIT_FAILURE );
 }
 
@@ -542,115 +504,81 @@ printBareUsage(
  *  These formats are used immediately after the option flag (if used) has
  *  been printed.
  */
-tSCC zGnuOptFmt[]       = "--%2$s%1$s";
-tSCC zShrtGnuOptFmt[]   = "%s";
-tSCC zNrmOptFmt[]       = " %3s %s";
-tSCC zReqOptFmt[]       = " %3s %-14s %s";
-tSCC zFmtFmt[]          = "%%-%ds %%s\n";
-
-#ifndef tSC
-#  define tSC static char
-#endif
-
-tSC  zGnuStrArg[]       = "=str";
-tSC  zGnuNumArg[]       = "=num";
-tSC  zGnuKeyArg[]       = "=KWd";
-tSC  zGnuKeyLArg[]      = "=Mbr";
-tSC  zGnuBoolArg[]      = "=T/F";
-tSCC zGnuOptArg[]       = "[=arg]";
-tSCC zGnuBreak[]        = "\n%s\n\n";
-tSCC zSixSpaces[]       = "      ";  /* 6 spaces */
-
-static arg_types_t gnuTypes = {
-    /* pzStr  */ zGnuStrArg,
-    /* pzReq  */ zSixSpaces + 5,  /* 1 space  */
-    /* pzNum  */ zGnuNumArg,
-    /* pzKey  */ zGnuKeyArg,
-    /* pzKeyL */ zGnuKeyLArg,
-    /* pzBool */ zGnuBoolArg,
-    /* pzOpt  */ zGnuOptArg,
-    /* pzNo   */ zSixSpaces + 5,  /* 1 space  */
-    /* pzBrk  */ zGnuBreak,
-    /* pzNoF  */ zSixSpaces,      /* 6 spaces */
-    /* pzSpc  */ zSixSpaces + 3   /* 3 spaces */
-};
-
-tSCC zStdStrArg[]       = "Str";
-tSCC zStdReqArg[]       = "YES";
-tSCC zStdNumArg[]       = "Num";
-tSCC zStdKeyArg[]       = "KWd";
-tSCC zStdKeyLArg[]      = "Mbr";
-tSCC zStdBoolArg[]      = "T/F";
-tSCC zStdOptArg[]       = "opt";
-tSCC zStdNoArg[]        = "no ";
-tSCC zStdBreak[]        = "\n%s\n\n%s";
-
-static arg_types_t stdTypes = {
-    /* pzStr  */ zStdStrArg,
-    /* pzReq  */ zStdReqArg,
-    /* pzNum  */ zStdNumArg,
-    /* pzKey  */ zStdKeyArg,
-    /* pzKeyL */ zStdKeyLArg,
-    /* pzBool */ zStdBoolArg,
-    /* pzOpt  */ zStdOptArg,
-    /* pzNo   */ zStdNoArg,
-    /* pzBrk  */ zStdBreak,
-    /* pzNoF  */ zSixSpaces + 1,  /* 5 spaces */
-    /* pzSpc  */ zSixSpaces + 4   /* 2 spaces */
-};
-
 STATIC void
-setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
+setStdOptFmts( tOptions* pOpts, tCC** ppT )
 {
     int  flen = 0;
+
+    argTypes.pzStr  = zStdStrArg;
+    argTypes.pzReq  = zStdReqArg;
+    argTypes.pzNum  = zStdNumArg;
+    argTypes.pzKey  = zStdKeyArg;
+    argTypes.pzKeyL = zStdKeyLArg;
+    argTypes.pzBool = zStdBoolArg;
+    argTypes.pzOpt  = zStdOptArg;
+    argTypes.pzNo   = zStdNoArg;
+    argTypes.pzBrk  = zStdBreak;
+    argTypes.pzNoF  = zFiveSpaces;
+    argTypes.pzSpc  = zTwoSpaces;
+
     switch (pOpts->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
     case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
-        *ppT = zNoReq_Short_Title;
-        stdTypes.pzOptFmt = zNrmOptFmt;
+        *ppT = zNoRq_ShrtTtl;
+        argTypes.pzOptFmt = zNrmOptFmt;
         flen = 19;
         break;
 
     case OPTPROC_NO_REQ_OPT:
-        *ppT = zNoReq_NoShort_Title;
-        stdTypes.pzOptFmt = zNrmOptFmt;
+        *ppT = zNoRq_NoShrtTtl;
+        argTypes.pzOptFmt = zNrmOptFmt;
         flen = 19;
         break;
 
     case OPTPROC_SHORTOPT:
-        *ppT = zReq_Short_Title;
-        stdTypes.pzOptFmt = zReqOptFmt;
+        *ppT = zReq_ShrtTtl;
+        argTypes.pzOptFmt = zReqOptFmt;
         flen = 24;
         break;
 
     case 0:
-        *ppT = zReq_NoShort_Title;
-        stdTypes.pzOptFmt = zReqOptFmt;
+        *ppT = zReq_NoShrtTtl;
+        argTypes.pzOptFmt = zReqOptFmt;
         flen = 24;
     }
 
-    *ppAT = &stdTypes;
     sprintf( zOptFmtLine, zFmtFmt, flen );
 }
 
 STATIC void
-setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT )
+setGnuOptFmts( tOptions* pOpts, tCC** ppT )
 {
     int  flen = 22;
-    *ppT = zNoReq_Short_Title;
+    *ppT = zNoRq_ShrtTtl;
+
+    argTypes.pzStr  = zGnuStrArg;
+    argTypes.pzReq  = zOneSpace;
+    argTypes.pzNum  = zGnuNumArg;
+    argTypes.pzKey  = zGnuKeyArg;
+    argTypes.pzKeyL = zGnuKeyLArg;
+    argTypes.pzBool = zGnuBoolArg;
+    argTypes.pzOpt  = zGnuOptArg;
+    argTypes.pzNo   = zOneSpace;
+    argTypes.pzBrk  = zGnuBreak;
+    argTypes.pzNoF  = zSixSpaces;
+    argTypes.pzSpc  = zThreeSpaces;
 
     switch (pOpts->fOptSet & OPTPROC_L_N_S) {
-    case OPTPROC_L_N_S:    gnuTypes.pzOptFmt = zGnuOptFmt;     break;
-    case OPTPROC_LONGOPT:  gnuTypes.pzOptFmt = zGnuOptFmt;     break;
-    case 0:                gnuTypes.pzOptFmt = zGnuOptFmt + 2; break;
+    case OPTPROC_L_N_S:    argTypes.pzOptFmt = zGnuOptFmt;     break;
+    case OPTPROC_LONGOPT:  argTypes.pzOptFmt = zGnuOptFmt;     break;
+    case 0:                argTypes.pzOptFmt = zGnuOptFmt + 2; break;
     case OPTPROC_SHORTOPT:
-        gnuTypes.pzOptFmt = zShrtGnuOptFmt;
+        argTypes.pzOptFmt = zShrtGnuOptFmt;
         zGnuStrArg[0] = zGnuNumArg[0] = zGnuKeyArg[0] = zGnuBoolArg[0] = ' ';
-        gnuTypes.pzOpt = " [arg]";
+        argTypes.pzOpt = " [arg]";
         flen = 8;
         break;
     }
 
-    *ppAT = &gnuTypes;
     sprintf( zOptFmtLine, zFmtFmt, flen );
 }
 
@@ -668,7 +596,6 @@ printInitList(
     tCC*     pzRc,
     tCC*     pzPN )
 {
-    tSCC zPathFmt[] = " - reading file %s";
     char zPath[ MAXPATHLEN+1 ];
 
     if (papz == NULL)

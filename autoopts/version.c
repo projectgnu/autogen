@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
+/*  $Id: version.c,v 3.10 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -47,14 +47,6 @@ static const char zAOV[] =
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-tSCC zBadArg[] =
-"ERROR: version option argument '%c' invalid.  Use:\n\
-\t'v' - version only\n\
-\t'c' - version and copyright\n\
-\t'n' - version and copyright notice\n";
-
-tSCC zBugRpt[] = "\nplease send bug reports to:  %s\n";
 
 /* === STATIC PROCS === */
 STATIC void
@@ -109,7 +101,7 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
         }
         fprintf( fp, zAOV, optionVersion() );
         if (pOpts->pzBugAddr != NULL)
-            fprintf( fp, zBugRpt, pOpts->pzBugAddr );
+            fprintf( fp, zPlsSendBugs, pOpts->pzBugAddr );
         break;
 
     case 'n':
@@ -127,11 +119,11 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
 
         fprintf( fp, zAOV, optionVersion() );
         if (pOpts->pzBugAddr != NULL)
-            fprintf( fp, zBugRpt, pOpts->pzBugAddr );
+            fprintf( fp, zPlsSendBugs, pOpts->pzBugAddr );
         break;
 
     default:
-        fprintf( stderr, zBadArg, swCh );
+        fprintf( stderr, zBadVerArg, swCh );
         exit( EXIT_FAILURE );
     }
 

@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-11-22 22:03:02 bkorb"
+## Time-stamp:      "2004-01-08 10:37:04 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.25 2003/11/23 06:24:43 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.26 2004/01/14 02:41:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -324,7 +324,7 @@ be tested by comparing[+:
       IF (exist? "arg-default") :+]
 The default [+:(. opt-arg):+] for this option is:
 .ti +4
-[+: (join ", " (stack "arg-default")) :+][+:
+ [+: arg-default :+][+:
       ENDIF     :+]
 .sp
 [+: (if (exist? "doc")

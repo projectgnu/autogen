@@ -8,16 +8,16 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.17 2003/12/03 02:45:08 bkorb Exp $
+## $Id: Makefile.am,v 3.18 2004/01/14 02:41:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 # This variable is needed to subvert automake's info rules.
 # They don't work for generated texi files:
 #
-INFO_DEPS	= autogen.info
-MAKEINFO	= @MAKEINFO@ --no-split
-MAKEINFOFLAGS = -I$(top_srcdir)/autoopts -I../autoopts
+INFO_DEPS       = autogen.info
+MAKEINFO        = @MAKEINFO@ --no-split
+MAKEINFOFLAGS   = -I$(top_srcdir)/autoopts -I../autoopts
 
 all : $(INFO_DEPS)
 

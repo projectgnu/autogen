@@ -1,3 +1,25 @@
+2004-01-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(tOptProc): call procs are extern, not static.
+	* autoopts/test/getopt.test(AGEN): pass in the proper flags for
+	compiling against the AutoOpts library under test.
+	* autoopts/test/nls.test(.def): export the fake gettext function
+
+2004-01-04  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.5.7 Released
+
+2004-01-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*.c: pulled all the strings that show up in human readable
+	text and put them into:
+	* autoopts/usage-txt.def: new repository for all human readable
+	AutoOpts strings
+	* autoopts/usage-txt.tpl: Permute the above into the five tables needed
+	to use the strings and translate them into another language.  The
+	translation only happens if the _USER_PROGRAM_ is compiled with NLS.
+	* autoopts/usage-txt.h: the generated result
+
 2003-12-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/getopt.tpl: new file.  Implements using getopt_long() as

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.17 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: putshell.c,v 3.18 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -122,14 +122,14 @@ putQuotedStr( tCC* pzStr )
 void
 putBourneShell( tOptions* pOpts )
 {
-    int         optIx = 0;
+    int  optIx = 0;
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
     tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d # 0x%3$X\nexport %1$s_%2$s\n";
     tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
     tSCC zOptValFmt[] = "%s_%s=";
     tSCC zOptEnd[]    = "\nexport %s_%s\n";
     tSCC zFullOptFmt[]= "%1$s_%2$s='%3$s'\nexport %1$s_%2$s\n";
-    tSCC zEquiv[]     = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s_MODE\n";
+    tSCC zEquivMode[] = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s_MODE\n";
 
     printf( zOptCtFmt, pOpts->curOptIdx-1 );
 
@@ -159,7 +159,7 @@ putBourneShell( tOptions* pOpts )
             p->pzLastArg = pOD->pzLastArg;
             p->fOptState &= OPTST_PERSISTENT;
             p->fOptState |= pOD->fOptState & ~OPTST_PERSISTENT;
-            printf( zEquiv, pOpts->pzPROGNAME, pOD->pz_NAME, p->pz_NAME );
+            printf( zEquivMode, pOpts->pzPROGNAME, pOD->pz_NAME, p->pz_NAME );
             pOD = p;
         }
 
@@ -208,7 +208,7 @@ putBourneShell( tOptions* pOpts )
          *  Handle stacked arguments
          */
         if (  (pOD->fOptState & OPTST_STACKED)
-           && (pOD->optCookie != (void*)NULL) )  {
+           && (pOD->optCookie != NULL) )  {
             tSCC zOptCookieCt[] = "%1$s_%2$s_CT=%3$d\nexport %1$s_%2$s_CT\n";
 
             tArgList*    pAL = (tArgList*)pOD->optCookie;

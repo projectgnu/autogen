@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.16 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: expString.c,v 3.17 2004/01/14 02:41:16 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -31,9 +31,10 @@ makeString( tCC*    pzText,
             tCC*    pzNewLine,
             size_t  newLineSize )
 {
+    char     z[ 256 ];
     char*    pzDta;
+    char*    pzFre;
     tCC*     pzScn   = pzText;
-    SCM      res;
 
     /*
      *  Start by counting the start and end quotes, plus the NUL.
@@ -82,8 +83,10 @@ makeString( tCC*    pzText,
      *  We now know how big the string is going to be.
      *  Allocate what we need.
      */
-    res   = scm_makstr( (scm_sizet)dtaSize, 0 );
-    pzDta = SCM_CHARS( res );
+    if (dtaSize >= sizeof(z))
+         pzFre = pzDta = AGALOC( dtaSize, "quoting string" );
+    else pzFre = pzDta = z;
+
     pzScn = pzText;
 
     *(pzDta++) = '"';
@@ -181,7 +184,13 @@ makeString( tCC*    pzText,
      */
     *(pzDta++) = '"';
     *pzDta = NUL;
-    return res;
+
+    {
+        SCM res = scm_makfrom0str( pzFre );
+        if (pzFre != z)
+            AGFREE( pzFre );
+        return res;
+    }
 }
 
 

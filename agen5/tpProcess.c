@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.22 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.23 2004/01/14 02:41:16 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -84,7 +84,7 @@ generateBlock( tTemplate*   pT,
 STATIC void
 doStdoutTemplate( tTemplate* pTF )
 {
-    tSCC zNone[]  = "* NONE *";
+    tSCC zNoSfx[] = "* NONE *";
     tSCC zBadR[]  = "%sBogus return from setjmp:  %d\n";
     int  jmpcode  = setjmp( fileAbort );
     SCM  res;
@@ -116,7 +116,7 @@ doStdoutTemplate( tTemplate* pTF )
         exit( EXIT_FAILURE );
     }
 
-    pzCurSfx      = zNone;
+    pzCurSfx      = zNoSfx;
     currDefCtx    = rootDefCtx;
     pCurFp        = &fpRoot;
     fpRoot.pFile  = stdout;
@@ -163,7 +163,7 @@ processTemplate( tTemplate* pTF )
 
     /*
      *  IF the template file does not specify any output suffixes,
-     *  THEN we will generate to standard out with the suffix set to zNone.
+     *  THEN we will generate to standard out with the suffix set to zNoSfx.
      *  With output going to stdout, we don't try to remove output on errors.
      */
     if (pOutSpecList == NULL) {

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: numeric.c,v 3.7 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: numeric.c,v 3.8 2004/01/14 02:41:16 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -80,8 +80,7 @@ optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
 
     val = strtol( pOD->pzLastArg, &pz, 0 );
     if (*pz != NUL) {
-        fprintf( stderr, "%s error:  `%s' is not a recognizable number\n",
-                 pOpts->pzProgName, pOD->pzLastArg );
+        fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->pzLastArg );
         (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
     }
 

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2004-01-01 14:04:42 bkorb"
+# Time-stamp:        "2004-01-13 18:32:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: nls.test,v 3.1 2004/01/01 22:21:55 bkorb Exp $
+# $Id: nls.test,v 3.2 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -28,13 +28,14 @@ testname="${testname}" test_main="YES" \
 argument="${argument}" long_opts="YES" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
+echo 'export "extern char* gettext( const char* );";' >> ${testname}.def
+
 echo $AGEN ${testname}.def
 $AGEN ${testname}.def || \
   failure AutoGen could not process
 
 chmod u+w ${testname}.[ch]
 CFLAGS="${CFLAGS} -DENABLE_NLS=1"
-echo "extern char* gettext( const char* );" >> ${testname}.h
 cat >> ${testname}.c <<'_EOF_'
 
 char*

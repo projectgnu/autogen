@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-12-21 09:46:48 bkorb"
+## Time-stamp:      "2004-01-01 12:04:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.24 2003/12/30 05:09:59 bkorb Exp $
+## $Id: Makefile.am,v 3.25 2004/01/14 02:41:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -29,7 +29,7 @@ pkgdata_DATA	= stdoptions.def autoopts.m4 \
     getopt.tpl aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
     options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 
-HDRS        = autoopts.h options.h  streqv.h
+HDRS        = autoopts.h options.h  streqv.h usage-txt.h
 CSRC        = \
 	autoopts.c boolean.c enumeration.c load.c      makeshell.c \
 	numeric.c  pgusage.c putshell.c    restore.c   save.c \
@@ -37,7 +37,8 @@ CSRC        = \
 ALLSRC		= genshell.c genshell.h $(CSRC)
 
 EXTRA_DIST	= $(pkgdata_DATA) $(ALLSRC) COPYING $(man_MANS) options_h.tpl \
-	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def
+	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def \
+	usage-txt.def usage-txt.tpl
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
@@ -58,7 +59,7 @@ libguileopts_la_LDFLAGS  = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
 bin_SCRIPTS	= autoopts-config
 
-include_HEADERS = options.h
+include_HEADERS = options.h usage-txt.h
 
 libopts.c : autoopts.h $(CSRC)
 	( echo '#define AUTOOPTS_INTERNAL' ; \

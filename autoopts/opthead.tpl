@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.14 2003/12/27 15:06:40 bkorb Exp $
+# $Id: opthead.tpl,v 3.15 2004/01/14 02:41:16 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
@@ -230,6 +230,19 @@ IF (exist? "export")=]
 [= (get "export") =][=
   ENDFOR export=][=
 ENDIF=]
+
+#ifndef _
+#  if ENABLE_NLS
+#    include <stdio.h>
+     static inline char* aoGetsText( const char* pz ) {
+         if (pz == NULL) return NULL;
+         return (char*)gettext( pz );
+     }
+#    define _(s)  aoGetsText(s)
+#  else  /* ENABLE_NLS */
+#    define _(s)  s
+#  endif /* ENABLE_NLS */
+#endif
 
 #ifdef  __cplusplus
 }

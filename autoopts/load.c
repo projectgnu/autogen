@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 3.1 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: load.c,v 3.2 2004/01/14 02:41:16 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -117,12 +117,12 @@ optionMakePath(
          *  If it is, we're done.  Otherwise, we have to hunt
          *  for the program using "pathfind".
          */
-        if (strchr( pzProgPath, '/' ) != (char*)NULL)
+        if (strchr( pzProgPath, '/' ) != NULL)
             pzPath = pzProgPath;
         else {
             pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
 
-            if (pzPath == (char*)NULL)
+            if (pzPath == NULL)
                 return AG_FALSE;
         }
 
@@ -132,7 +132,7 @@ optionMakePath(
          *  IF we cannot find a directory name separator,
          *  THEN we do not have a path name to our executable file.
          */
-        if (pz == (char*)NULL)
+        if (pz == NULL)
             return AG_FALSE;
 
         /*
@@ -183,7 +183,7 @@ optionMakePath(
         /*
          *  Environment value not found -- skip the home list entry
          */
-        if (pzDir == (char*)NULL)
+        if (pzDir == NULL)
             return AG_FALSE;
 
         if (strlen( pzDir ) + 1 + strlen( pzName ) >= bufSize)
@@ -340,7 +340,7 @@ filePreset(
     u_int   saveOpt = pOpts->fOptSet;
     char    zLine[ 0x1000 ];
 
-    if (fp == (FILE*)NULL)
+    if (fp == NULL)
         return;
 
     /*
@@ -351,7 +351,7 @@ filePreset(
     /*
      *  FOR each line in the file...
      */
-    while (fgets( zLine, sizeof( zLine ), fp ) != (char*)NULL) {
+    while (fgets( zLine, sizeof( zLine ), fp ) != NULL) {
         char*  pzLine = zLine;
 
         for (;;) {
@@ -396,7 +396,7 @@ filePreset(
              *  name matches.  If the file is not sectioned,
              *  then all will be handled.
              */
-            if (pOpts->pzPROGNAME == (char*)NULL)
+            if (pOpts->pzPROGNAME == NULL)
                 goto fileDone;
 
             switch (sec) {
@@ -510,13 +510,10 @@ doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
         }
 
         if (! S_ISREG( sb.st_mode )) {
-            tSCC zMsg[] =
-                "error:  cannot load options from non-regular file %s\n";
-
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
                 return;
 
-            fprintf( stderr, zMsg, pOptDesc->pzLastArg );
+            fprintf( stderr, zNotFile, pOptDesc->pzLastArg );
             (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
             /* NOT REACHED */
         }

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-09 09:55:10 bkorb"
+# Time-stamp:        "2004-01-01 11:58:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: guile.test,v 3.3 2003/03/09 19:53:52 bkorb Exp $
+# $Id: guile.test,v 3.4 2004/01/14 02:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -27,7 +27,7 @@ fi
 echo "creating ${testname}.def in `pwd`"
 testname="${testname}" \
 argument='[ <guile-arg> ...]' \
-long_opt="true" \
+long_opts="true" \
 ${SHELL-sh} ${stdopts} option second:
 
 sed -e '/name = "second"/a\
@@ -58,7 +58,8 @@ echo creating ${testname}.hlp
 cat > ${testname}.hlp <<'_EOF_'
 guile starts
 test_guile - Test AutoOpts for guile
-USAGE:  guile [ -<flag> [<val>] ]... [ <guile-arg> ...]
+USAGE:  guile [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+		[ <guile-arg> ...]
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
 				- enabled by default
@@ -67,6 +68,8 @@ USAGE:  guile [ -<flag> [<val>] ]... [ <guile-arg> ...]
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 _EOF_
 
 cmp -s ${testname}.h*lp || \

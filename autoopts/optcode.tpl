@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.22 2003/11/23 06:24:43 bkorb Exp $
+#$Id: optcode.tpl,v 3.23 2004/01/14 02:41:16 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -22,27 +22,32 @@ ENDIF
 extern "C" {
 #endif[=
 
-IF (not (exist? "copyright") )
+IF (define tmp-text "")
+   (not (exist? "copyright") )
 
 =]
 #define zCopyright       NULL
 #define zCopyrightNotice NULL[=
 ELSE  =]
 tSCC zCopyright[] =
-       [= (kr-string
+       [= (set! tmp-text (kr-string
        (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
-                (get "copyright.date") (get "copyright.owner") )) =];
+                (get "copyright.date") (get "copyright.owner") )))
+       tmp-text =];
 tSCC zCopyrightNotice[] =
        [=
+
   CASE (get "copyright.type") =][=
 
-    =  gpl  =][=(kr-string (gpl  prog-name "" ))=][=
-    = lgpl  =][=(kr-string (lgpl prog-name (get "copyright.owner") "" ))=][=
-    =  bsd  =][=(kr-string (bsd  prog-name (get "copyright.owner") "" ))=][=
-    = note  =][=(kr-string (get  "copyright.text"))=][=
-    *       =]"Copyrighted"[=
+    =  gpl  =][=(set! tmp-text (gpl  prog-name "" ))=][=
+    = lgpl  =][=(set! tmp-text (lgpl prog-name (get "copyright.owner") ""))=][=
+    =  bsd  =][=(set! tmp-text (bsd  prog-name (get "copyright.owner") ""))=][=
+    = note  =][=(set! tmp-text (get  "copyright.text"))=][=
+    *       =][=(set! tmp-text "Copyrighted")=][=
 
-  ESAC =];[=
+  ESAC =][=
+(set! tmp-text (kr-string tmp-text))
+tmp-text =];[=
 
 ENDIF "copyright notes"
 
@@ -64,8 +69,7 @@ extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
         (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
       ENDIF                          =][=
     *                                =][=
-      IF (exist? "call-proc")        =][=
-        (set! proc-list (string-append proc-list (get "call-proc") "\n")) =][=
+      IF (exist? "call-proc")        =], [=call-proc=][=
 
       ELIF (or (exist? "extract-code")
                (exist? "flag-code")) =][=
@@ -123,6 +127,7 @@ tSCC zHelp_Name[] = "help";
  */
 tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
 tSCC zMore_Help_Name[] = "more-help";[=
+
 IF (exist? "version")
 =]
 
@@ -304,9 +309,9 @@ ELSE                    =]
 ENDIF                   =][=
 
 (define patch-text (lambda (t-name)
-  (kr-string (string-append "\n" (shellf
+  (set! tmp-text (kr-string (string-append "\n" (shellf
   "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n%s\n_EODetail_"
-  (get t-name)  ) "\n" )) ))
+  (get t-name)  ) "\n" ))) ))
 
 (define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
 
@@ -321,13 +326,13 @@ ENDIF                   =][=
                         =][=
 
 IF (exist? "explain")   =]
-tSCC   zExplain[]     = [= (patch-text "explain") =];[=
+tSCC   zExplain[]     = [= (patch-text "explain") tmp-text =];[=
 ELSE                    =]
 #define zExplain NULL[=
 ENDIF                   =][=
 
 IF (exist? "detail")    =]
-tSCC    zDetail[]     = [= (patch-text "detail") =];[=
+tSCC    zDetail[]     = [= (patch-text "detail") tmp-text =];[=
 
 ELSE                    =]
 #define zDetail         NULL[=
@@ -340,13 +345,21 @@ ELSE                    =]
 #define zFullVersion    NULL[=
 ENDIF                   =]
 
+#if defined(ENABLE_NLS)
+# define OPTPROC_BASE OPTPROC_TRANSLATE
+  static option_translation_proc_t translate_option_strings;
+#else
+# define OPTPROC_BASE OPTPROC_NONE
+# define translate_option_strings NULL
+#endif /* ENABLE_NLS */
+
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
-    NULL,           NULL,           zPROGNAME,
-    zRcName,        zCopyright,     zCopyrightNotice,
-    zFullVersion,   apzHomeList,    zUsageTitle,
-    zExplain,       zDetail,        NULL,           [= (. usage-proc) =],
-    ( OPTPROC_NONE[=                IF (not (exist? "allow-errors"))     =]
+    NULL,         NULL,         zPROGNAME,
+    zRcName,      zCopyright,   zCopyrightNotice,
+    zFullVersion, apzHomeList,  zUsageTitle,
+    zExplain,     zDetail,      NULL,           [= (. usage-proc) =],
+    ( OPTPROC_BASE[=                IF (not (exist? "allow-errors"))     =]
     + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
     + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long-opts")         =]
     + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
@@ -377,8 +390,9 @@ tOptions [=(. pname)=]Options = {
          ENDIF =] },
     [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */,
     optDesc,
-    0, (char**)NULL,  /* original argc + argv    */
-    zBugsAddr         /* address to send bugs to */
+    0, NULL,          /* original argc + argv    */
+    zBugsAddr,        /* address to send bugs to */
+    translate_option_strings
 };
 
 /*
@@ -416,6 +430,67 @@ ELIF (exist? "guile-main")         =][=
 ENDIF "test/guile main"
 
 =]
+
+#if ENABLE_NLS
+#include <string.h>
+#include <stdio.h>
+#include <usage-txt.h>
+
+static char*
+AO_strdup( const char* pz )
+{
+    char* pzRes;
+    if (pz == NULL)
+        return NULL;
+    pzRes = strdup( pz );
+    if (pzRes == NULL) {
+        fputs( _("No memory for duping translated strings\n"), stderr );
+        exit( EXIT_FAILURE );
+    }
+    return pzRes;
+}
+
+static void
+translate_option_strings( void )
+{
+    /*
+     *  This invokes the translation code (e.g. gettext(3)).
+     */
+    int ix;
+    tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
+
+    /*
+     *  Do the translations.  This code gets compiled into the client programs.
+     *  The first pointer follows the field count field.
+     */
+    {
+        char** ppz = (char**)(void*)&(option_usage_text);
+
+        ix  = option_usage_text.field_ct;
+        do {
+            ppz++;
+            *ppz = AO_strdup(_(*ppz));
+        } while (--ix > 0);
+    }
+
+    for (ix = [=(. pname)=]Options.optCt; --ix >= 0; pOD++)  {
+        pOD->pzText  = AO_strdup(_(pOD->pzText));
+        pOD->pz_NAME = AO_strdup(_(pOD->pz_NAME));
+        pOD->pz_Name = AO_strdup(_(pOD->pz_Name));
+
+        pOD->pz_DisableName = AO_strdup(_(pOD->pz_DisableName));
+        pOD->pz_DisablePfx  = AO_strdup(_(pOD->pz_DisablePfx));
+    }[=
+
+  FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle
+               pzExplain pzDetail  =]
+    [=(. pname)=]Options.[=(sprintf "%-13s" (get "field"))=] = AO_strdup(_([=
+      (. pname)=]Options.[=field=]));[=
+  ENDFOR =]
+}
+
+#endif /* ENABLE_NLS */
+
 #ifdef  __cplusplus
 }
 #endif
