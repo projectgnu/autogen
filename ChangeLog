@@ -4,12 +4,16 @@
 	* configure.in(LN_S): use this macro instead of 'ln -s' directly
 	* */Makefile.am(INCLUDES): GUILE_INC is obsolete
 	* */Makefile.am(LDADD): GUILE_LINK is obsolete
+	* */Makefile.am(LDADD): AG_REGEX_LIB is obsolete
 	* autoopts/aginfo3.tpl(sec-name): fix formatting
 	* autoopts/autoopts.c(optionProcess): change optionSave to optionSaveFile
 	* autoopts/opthead.tpl(SAVE_OPTS): this option is now settable.
 	* autoopts/save.c(optionSaveFile): renamed from optionSave.  exported now
 	* config/confmacs.tpl(withlib): add code to generate withlib testing.
-	* config/misc.def(guile): new withlib test
+	* config/misc.def(guile): new withlib test, use for guile and regex.
+	(posix_regcomp): obsolete
+	(regex_lib): obsolete
+	(regex_header_path): obsolete
 	* agen5/fsm*.tpl(reent): implement reentrant FSM
 	
 2002-05-04  Bruce Korb  <bkorb@gnu.org>

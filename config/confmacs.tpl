@@ -50,7 +50,9 @@ DEFINE  emit-macro      =][=
       (define good-define-name  "WITH_%s")     =][=
   ESAC  =][=
 
-  IF (. separate-macros) =][=
+  IF  (define good-text  "")
+      (define bad-text   "")
+      (. separate-macros)    =][=
 
 (dne "dnl " "dnl ") =]
 dnl
@@ -161,8 +163,6 @@ DEFINE  emit-results   =][=
 
   (define good-subst 0 )
   (define bad-subst  0 )
-  (define good-text  "")
-  (define bad-text   "")
   (define tmp-text   "") =][=
 
   FOR     action         =][=
@@ -351,7 +351,7 @@ DEFINE  try-withlib             =]
   esac
   [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"
   [=(. group-pfx)=]save_LDFLAGS="${LDFLAGS}"[=
-  (define restore-flags (sprintf
+  (set! bad-text (sprintf
     "\n    CPPFLAGS=\"${%1$ssave_CPPFLAGS}\"
     LDFLAGS=\"${%1$ssave_LDFLAGS}\"" group-pfx )) =]
 
@@ -361,8 +361,14 @@ DEFINE  try-withlib             =]
   esac
 
   case X${[=(. cv-name)=]_libdir} in
-  Xyes|Xno )
-    LDFLAGS="${LDFLAGS} -l[=(. down-name)=]" ;;
+  Xyes|Xno )[=
+    IF (exist? "libname")      =][=
+      IF (> (string-length (get "libname")) 0) =]
+    LDFLAGS="${LDFLAGS} -l[=libname=]"[=
+      ENDIF length of libname =][=
+    ELSE  not exist libname   =]
+    LDFLAGS="${LDFLAGS} -l[=(. down-name)=]"[=
+    ENDIF  =] ;;
   * )
     LDFLAGS="${LDFLAGS} ${[=(. cv-name)=]_libdir}" ;;
   esac[=

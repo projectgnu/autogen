@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/05/11 20:51:24 $
+ *  Last Modified:     $Date: 2002/05/12 00:31:13 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.12 2002/05/11 20:51:24 bkorb Exp $
+ *  $Id: misc.def,v 3.13 2002/05/12 00:31:13 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.12 $";
+version = "$Revision: 3.13 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -86,41 +86,11 @@ test   = {
 };
 
 test   = {
-  name     = "regex_header_path";
-  type     = "with";
-  check    = "the directory path to the reg-ex header";
-  action   = { yes; act-type=subst;
-               act-text = "-I${ag_cv_with_regex_header_path}"; };
-  action   = { no;  act-type=subst;  act-text = ""; };
-  action   = { yes; asis;
-    act-type = script;
-    act-text = 'CPPFLAGS="${CPPFLAGS} -I${ag_cv_with_regex_header_path}"';
-  };
-
-  doc     = "If the reg-ex header is not in the normal path, the\n"
-            "installer will have to specify it with this.";
-};
-
-test = {
-    name   = posix_regcomp;
-    type   = run;
-    omit-invocation; /* see --with-regex-lib below */
-    check  = "regcomp()/regexec() is POSIX compliant";
-    action = { no; act-type = script;
-    act-text = <<-  _END_OF_ACTION
-    cat >&2 <<'_EOF_'
-		I cannot detect POSIX compliant regcomp/regexec routines.
-		These are required for AutoGen to work correctly.  If you have
-		such a library present on your system, you must specify it by
-		setting the LIBS environment variable, e.g., "LIBS='-lregex'".
-		If you do not have such a library on your system, then you should
-		download and install, for example, the one from:
-		    ftp://ftp.gnu.org/gnu/rx/
-		_EOF_
-		exit 1
-		_END_OF_ACTION;
-    };
-    code   = <<-  _EOF_
+  name     = regex;
+  type     = withlib;
+  check    = "a working libregex can be found";
+  libname  = "";
+  code     = <<- _END_OF_CODE_
 		#include <stdio.h>
 		#include <sys/types.h>
 		#include REGEX_HEADER
@@ -141,41 +111,28 @@ test = {
 		    return 1;
 		  }
 		  return 0; }
-		_EOF_;
-
-    doc =
-    "Check that the POSIX compliant regular expression compiler\n"
-    "is available in the POSIX specified manner, and it works.\n"
-    "If it fails, there is a backup.  Specify: --with-regex-lib=-lwhatever";
-};
-
-test   = {
-  name     = "regex_lib";
-  type     = "with";
-  check    = "a special reg-ex library is specified";
-  action   = { yes; act-type=subst;  act-text = "${ag_cv_with_regex_lib}"; };
-  action   = { no;  act-type=subst;  act-text = ""; };
-
-  action   = { yes; asis;
-    act-type = script;
-    act-text = 'LDFLAGS="${LDFLAGS} ${ag_cv_with_regex_lib}"';
-  };
+		_END_OF_CODE_;
+  run-mode   =  "run";
+  code-mode  =  "all";
 
   action   = { no; asis;
     act-type = script;
-    act-text = 'AG_RUN_POSIX_REGCOMP';
+    act-text = <<-  _END_OF_ACTION
+    	cat >&2 <<'_EOF_'
+			I cannot detect POSIX compliant regcomp/regexec routines.
+			These are required for AutoGen to work correctly.  If you have
+			such a library present on your system, you must specify it by
+			setting the LIBS environment variable, e.g., "LIBS='-lregex'".
+			If you do not have such a library on your system, then you should
+			download and install, for example, the one from:
+			    ftp://ftp.gnu.org/gnu/rx/
+			_EOF_
+		AC_MSG_ERROR([Cannot find working POSIX regex library])
+		_END_OF_ACTION ;
   };
 
-  doc = <<- _END_OF_DOC_
-		This option must specify any ``-lmumble'' option required
-		for linking.  If a ``-L'' option is needed as well, then
-		it should include that as well.  The ``-l'' and ``-L'' must
-		be part of the string value.
-
-		If this option is not supplied, then the AG_POSIX_REGCOMP
-		will be run to verify that POSIX regular expressions are
-		available.  AutoGen will not work without them.
-		_END_OF_DOC_;
+  doc =
+	"AutoGen won't work without a POSIX compliant regular expression library.";
 };
 
 test   = {

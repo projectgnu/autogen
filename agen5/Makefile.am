@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/05/11 20:23:52 $
+## Last Modified:   $Date: 2002/05/12 00:31:13 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.10 2002/05/11 20:23:52 bkorb Exp $
+## $Id: Makefile.am,v 3.11 2002/05/12 00:31:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -50,7 +50,7 @@ autogen_SOURCES = $(GEN_CSRC) \
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la
 
-autogen_LDFLAGS = @DYNAMIC_AG@ @AG_REGEX_LIB@
+autogen_LDFLAGS = @DYNAMIC_AG@
 
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
