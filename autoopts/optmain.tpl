@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.21 2004/03/19 18:26:15 bkorb Exp $
+# $Id: optmain.tpl,v 3.22 2004/03/19 19:01:29 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -139,6 +139,7 @@ DEFINE for-each-main    =][=
 #include <ctype.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static char*
 trim_input_line( char* pz_s )
@@ -146,7 +147,7 @@ trim_input_line( char* pz_s )
     char* pz_e = pz_s + strlen( pz_s );
     while ((pz_e > pz_s) && isspace( pz_e[-1] ))  pz_e--;
     *pz_e = '\0';
-    while (isspace( *pz ))  pz++;
+    while (isspace( *pz_s ))  pz_s++;
 
     switch (*pz_s) {
     case '\0':
@@ -195,7 +196,7 @@ main( int argc, char** argv )
     /*
      *  Input list from tty input
      */
-    else if (! isatty( STDIN_FILENO )) {
+    else if (isatty( STDIN_FILENO )) {
         fputs( "[=(. prog-name)=] ERROR: input list must not be a tty\n",
                stderr );
         [= (. UP-prefix) =]USAGE( EXIT_FAILURE );

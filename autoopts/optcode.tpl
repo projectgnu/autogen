@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.26 2004/03/19 18:26:15 bkorb Exp $
+#$Id: optcode.tpl,v 3.27 2004/03/19 19:01:29 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -314,9 +314,13 @@ ELSE                    =]
 ENDIF                   =][=
 
 (define patch-text (lambda (t-name)
-  (set! tmp-text (kr-string (string-append "\n" (shellf
-  "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n%s\n_EODetail_"
-  (get t-name)  ) "\n" ))) ))
+  (set! tmp-text (kr-string (string-append "\n"
+
+  (shell (string-append
+    "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n"
+    (get t-name)
+    "\n_EODetail_" ))
+  "\n" ))) ))
 
 (define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
 
@@ -330,8 +334,22 @@ ENDIF                   =][=
 
                         =][=
 
-IF (exist? "explain")   =]
-tSCC   zExplain[]     = [= (patch-text "explain") tmp-text =];[=
+IF (or (exist? "explain") (== (get "main.main-type") "for-each"))  =]
+tSCC   zExplain[]     = [=
+
+ (if (exist? "explain")
+     (patch-text "explain")
+     (set! tmp-text "")  )
+
+ (if (== (get "main.main-type") "for-each")
+   (set! tmp-text (string-append tmp-text
+
+   "\n\"If no arguments are provided, input arguments are read from stdin,\\n\"
+\"one per line, blank and '#'-prefixed lines are comments.\\n\"
+\"'stdin' may not be a terminal (tty).\\n\"" ))  )
+
+ tmp-text =];[=
+
 ELSE                    =]
 #define zExplain NULL[=
 ENDIF                   =][=
