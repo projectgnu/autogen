@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.3 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: stack.c,v 2.4 2000/03/11 18:31:30 bruce Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -70,42 +70,62 @@ unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
 {
     /*
      *  IF the target system is too feeble to have a POSIX regex,
-     *  THEN it is also too feeble to unstack option arguments
+     *  THEN we use a simple string compare for entry removal
      */
 #ifdef HAVE_POSIX_REGCOMP
-    regex_t   pzExpBuf;
+    regex_t   re;
     tArgList* pAL = (tArgList*)pOptDesc->optCookie;
     int       ct, sIdx, dIdx;
+    char*     pzSrc;
+    char*     pzEq;
+    int       res;
 
     if (pAL == (tArgList*)NULL)
         return;
 
-    if (regcomp( &pzExpBuf, pOptDesc->pzLastArg, REG_NOSUB ) != 0)
+    if (regcomp( &re, pOptDesc->pzLastArg, REG_NOSUB ) != 0)
         return;
 
     /*
-     *  search the list for the entry(s) to remove
+     *  search the list for the entry(s) to remove.  Entries that
+     *  are removed are *not* copied into the result.  The source
+     *  index is incremented every time.  The destination only when
+     *  we are keeping a define.
      */
     for (sIdx = 0, dIdx = 0, ct = pAL->useCt; --ct >= 0; sIdx++) {
-        char* pzSrc = pAL->apzArgs[ sIdx ];
-        int matches;
+        pzSrc = pAL->apzArgs[ sIdx ];
+        pzEq  = strchr( pzSrc, '=' );
 
-        matches = regexec( &pzExpBuf, pzSrc, (size_t)0,
-                           (regmatch_t*)NULL, 0 );
-        /*
-         *  IF this entry does match
-         *  THEN drop the entry
-         *  ELSE shift the entry (if necessary)
-         */
-        if (matches)
+        if (pzEq != (char*)NULL)
+            *pzEq = NUL;
+
+        res = regexec( &re, pzSrc, (size_t)0, (regmatch_t*)NULL, 0 );
+        switch (res) {
+        case 0:
+            /*
+             *  Remove this entry by reducing the in-use count
+             *  and *not* putting the string pointer back into
+             *  the list.
+             */
             pAL->useCt--;
-        else {
+            break;
+
+        default:
+        case REG_NOMATCH:
+            if (pzEq != (char*)NULL)
+                *pzEq = '=';
+
+            /*
+             *  IF we have dropped an entry
+             *  THEN we have to move the current one.
+             */
             if (dIdx != sIdx)
-                pAL->apzArgs[ dIdx++ ] = pzSrc;
+                pAL->apzArgs[ dIdx ] = pzSrc;
+            dIdx++;
         }
     }
 
-    regfree( &pzExpBuf );
+    regfree( &re );
 #endif
 }
 
