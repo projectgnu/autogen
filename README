@@ -16,7 +16,7 @@ Rev 5 (?) the addition of Guile expression processing
 
 Until a mailing list is organized, direct email to the author:
 
-    Bruce Korb <ddsinc09@ix.netcom.com>
+    Bruce Korb <autogen@linuxbox.com>
 
 
 AutoGen requires a POSIX regular expression library, and an ANSI C
@@ -31,16 +31,3 @@ Note to SCO/OS5 users:
 	Configure this program with:
 
 		CC=/bin/cc ./configure
-
-Note to HP/UX users:
-	The native regex library is pretty sucky (on 10.20 at least) so
-	you should link with a better regex lib, such as the included
-	one:
-
-		./configure --with-included-regex
-
-	If you use the native c compiler, you must put it in ANSI C mode
-	with:
-
-		CFLAGS=-Ae ./configure
-

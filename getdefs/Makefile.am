@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.18 1999/07/29 20:41:42 bkorb Exp $
+## $Id: Makefile.am,v 2.19 1999/09/08 22:08:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -23,7 +23,7 @@ EXTRA_DIST	= $(GEN_SRC) opts.def#  bootstrap.dir
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 
 getdefs_LDFLAGS = -static
-INCLUDES 	= -I$(top_srcdir) -I$(top_srcdir)/autoopts
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/autoopts -I$(top_srcdir)/snprintfv
 
 MAINTAINERCLEANFILES = Makefile.in
 

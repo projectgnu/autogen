@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.9 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: autoopts.c,v 2.10 1999/09/08 22:08:44 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,8 +70,6 @@
 
 #include <streqv.h>
 #include "autoopts.h"
-
-#ident "$Id: autoopts.c,v 2.9 1999/07/07 19:41:00 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";

@@ -1,3 +1,22 @@
+1999-09-02  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* README (Note to HP/UX users):  Removed.  AutoGen now passes
+	the test suite with the native regex implementation, and configure
+	will now turn on ANSI compatibility by itself.
+	
+	* MakeRules.in (TPLDIRS): add -L $(top_srcdir)/compat so that
+	autogen can rebuild strsignal.h.
+	* src/Makefile.am (TPLDIRS): ditto.
+	
+	* getdefs/Makefile.am (INCLUDES): add -I$(top_srcdir)/snprintfv so
+	that the compiler can find snprintfv.h.
+	
+	* autoopts/autoopts.c (#ident): Use a "static const char" array,
+	or else HP/UX cc barfs.
+
+	* configure.in (AM_PROG_CC_STDC): Required to put native compilers
+	into ANSI compatible mode.
+	
 1999-08-05  Bruce Korb <autogen@linuxbox.com>
 
 	* config/bootstrap.local: Fixed the hack for inserting
