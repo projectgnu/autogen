@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.16 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expPrint.c,v 1.17 2001/06/24 00:47:56 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -236,7 +236,8 @@ ag_scm_sprintf( SCM fmt, SCM alist )
  * exparg: format-arg, list of arguments to formatting string, opt, list
  *
  * doc:  Format a string using arguments from the alist.
- *       Write to the default output port.
+ *       Write to the default output port.  The result will NOT appear in your
+ *       output.  Use this to print information messages to a template user.
 =*/
     SCM
 ag_scm_printf( SCM fmt, SCM alist )
@@ -274,12 +275,13 @@ ag_scm_printf( SCM fmt, SCM alist )
  * what:  format to a file
  * general_use:
  *
- * exparg: port, output port
+ * exparg: port, Guile-scheme output port
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
  *
  * doc:  Format a string using arguments from the alist.
- *       Write to a specified port.
+ *       Write to a specified port.  The result will NOT appear in your
+ *       output.  Use this to print information messages to a template user.
 =*/
     SCM
 ag_scm_fprintf( SCM port, SCM fmt, SCM alist )

@@ -8,7 +8,7 @@
  * Last Modified:     Fri Jul 30 12:34:46 1999
  *            by:     Gary V. Vaughan <gary@oranda.demon.co.uk>
  *
- * $Id: compat.h,v 2.6 2000/03/05 18:41:59 bruce Exp $
+ * $Id: compat.h,v 2.7 2001/06/24 00:47:56 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -205,7 +205,7 @@
 #    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
 # endif /* !_POSIX_SOURCE */
 
-#ifdef HAVE_LIBGEN_H
+#if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
 #  include <libgen.h>
 #endif
 

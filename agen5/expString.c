@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.26 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: expString.c,v 1.27 2001/06/24 00:47:56 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -496,6 +496,10 @@ ag_scm_shellf( SCM fmt, SCM alist )
  *  Contained single quotes become tripled, with the middle quote
  *  escaped with a backslash.  Normal shells will reconstitute the
  *  original string.
+ *
+ *  @strong{NOTE}: some shells will not correctly handle unusual
+ *  non-printing characters.  This routine works for most reasonably
+ *  conventional ASCII strings.
 =*/
     SCM
 ag_scm_raw_shell_str( SCM obj )
@@ -564,6 +568,10 @@ ag_scm_raw_shell_str( SCM obj )
  *  render the strings "\\$" or "\\`".  The lesser of two evils.
  *
  *  All others characters are copied directly into the output.
+ *
+ *  @strong{NOTE}: some shells will not correctly handle unusual
+ *  non-printing characters.  This routine works for most reasonably
+ *  conventional ASCII strings.
 =*/
     SCM
 ag_scm_shell_str( SCM obj )

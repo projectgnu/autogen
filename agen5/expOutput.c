@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expOutput.c,v 1.15 2001/06/24 00:47:56 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -141,24 +141,44 @@ ag_scm_out_move( SCM new_file )
 
 /*=gfunc out_pop
  *
- * what:  close current output file
+ * what:   close current output file
+ * exparg: disp, return contents of the file, optional
  * doc:  
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
  *  if there has not been a @code{push}.  @xref{output controls}.
+ *
+ *  If there is no argument, no further action is taken.  Otherwise,
+ *  the argument should be @code{#t} and the contents of the file
+ *  are returned by the function.
 =*/
     SCM
-ag_scm_out_pop( void )
+ag_scm_out_pop( SCM ret_contents )
 {
+    SCM res = SCM_UNDEFINED;
+
     if (pCurFp->pPrev == (tFpStack*)NULL) {
         fputs( "ERROR:  Cannot pop output with no output pushed\n",
                stderr );
         LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
     }
 
+
+    if (gh_boolean_p( ret_contents ) && SCM_NFALSEP( ret_contents )) {
+        long pos;
+        pos = ftell( pCurFp->pFile );
+        res = scm_makstr( pos, 0 );
+        rewind( pCurFp->pFile );
+        if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1) {
+            fprintf( stderr, "Error %d (%s) rereading output\n", errno,
+                     strerror( errno ));
+            res = SCM_UNDEFINED;
+        }
+    }
+
     outputDepth--;
     closeOutput( AG_FALSE );
-    return SCM_UNDEFINED;
+    return res;
 }
 
 
@@ -180,14 +200,16 @@ ag_scm_out_push_add( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pzNewFile = gh_scm2newstr( new_file, NULL );
-
     p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
-    p->pPrev  = pCurFp;
-    p->pzOutName = pzNewFile;  /* memory leak */
+    p->pPrev     = pCurFp;
+    p->flags     = FPF_FREE;
+
+    pzNewFile    = gh_scm2newstr( new_file, NULL );
     addWriteAccess( pzNewFile );
+    p->pFile     = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+
+    p->pzOutName = pzNewFile;
     outputDepth++;
-    p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG );
     pCurFp    = p;
     return SCM_UNDEFINED;
 }
@@ -196,7 +218,7 @@ ag_scm_out_push_add( SCM new_file )
 /*=gfunc out_push_new
  *
  * what:   purge and create output file
- * exparg: file-name, name of the file to create
+ * exparg: file-name, name of the file to create, optional
  *
  * doc:
  *  Leave the current output file open, but purge and create
@@ -209,17 +231,23 @@ ag_scm_out_push_new( SCM new_file )
     tFpStack* p;
     char*  pzNewFile;
 
-    if (! gh_string_p( new_file ))
-        return SCM_UNDEFINED;
-
-    pzNewFile = gh_scm2newstr( new_file, NULL );
-
     p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
-    p->pPrev  = pCurFp;
-    p->pzOutName = pzNewFile;  /* memory leak */
-    unlink( pzNewFile );
+    p->pPrev = pCurFp;
+    p->flags = FPF_FREE;
+
+    if (gh_string_p( new_file )) {
+        pzNewFile = gh_scm2newstr( new_file, NULL );
+        unlink( pzNewFile );
+        addWriteAccess( pzNewFile );
+        p->pFile  = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+    } else {
+        AGDUPSTR( pzNewFile, ".agtmp.XXXXXX", "temp file name" );
+        p->flags |= FPF_UNLINK;
+        p->pFile  = fdopen( mkstemp( pzNewFile ), "a" FOPEN_BINARY_FLAG "+" );
+    }
+
+    p->pzOutName = pzNewFile;
     outputDepth++;
-    p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG );
     pCurFp    = p;
     return SCM_UNDEFINED;
 }

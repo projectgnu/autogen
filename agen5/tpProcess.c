@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.10 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: tpProcess.c,v 1.11 2001/06/24 00:47:56 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -87,7 +87,7 @@ generateBlock( tTemplate*   pT,
     EXPORT void
 processTemplate( tTemplate* pTF )
 {
-    tFpStack fpRoot = { (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
+    tFpStack fpRoot = { 0, (tFpStack*)NULL, (FILE*)NULL, (char*)NULL };
 
     forInfo.fi_depth = 0;
 
@@ -183,7 +183,11 @@ closeOutput( ag_bool purge )
 
     fclose( pCurFp->pFile );
 
-    if (purge)
+    /*
+     *  IF we are told to purge the file OR the file is an AutoGen temp
+     *  file, then get rid of the output.
+     */
+    if (purge || ((pCurFp->flags & FPF_UNLINK) != 0))
         unlink( pCurFp->pzOutName );
 
     else {
@@ -199,7 +203,7 @@ closeOutput( ag_bool purge )
      *  Do not deallocate the root entry.  It is not allocated!!
      */
     AGFREE( (void*)pCurFp->pzOutName );
-    if (pCurFp->pPrev != (tFpStack*)NULL) {
+    if ((pCurFp->flags & FPF_FREE) != 0) {
         tFpStack* p = pCurFp;
         pCurFp = p->pPrev;
         AGFREE( (void*)p );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.33 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: funcDef.c,v 1.34 2001/06/24 00:47:56 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -666,7 +666,7 @@ anonymousTemplate( void* p )
      *  choke when the output stack becomes empty.
      */
     while (pCurFp != pfp)
-        ag_scm_out_pop();
+        ag_scm_out_pop( SCM_UNDEFINED );
 
     fpos = ftell( pfp->pFile );
     res = (char*)AGALOC( fpos + 1, "anonymous template output"  );
@@ -692,7 +692,7 @@ STATIC void
 build_defs( int defCt, tDefList* pList )
 {
     tDefEntry* pDefs = &(pList->de);
-	currDefCtx.pDefs = pDefs;
+    currDefCtx.pDefs = pDefs;
 
     /*
      *  FOR each definition, evaluate the associated expression
@@ -775,41 +775,46 @@ build_defs( int defCt, tDefList* pList )
  *  load_proc:
  *
  *  desc:
- *      This function will define a new macro.  You must provide a
- *      name for the macro.  You do not specify any arguments,
- *      though the invocation may specify a set of name/value pairs
- *      that are to be active during the processing of the macro.
  *
- *      @example
- *      [+ define foo +]
- *      ... macro body with macro functions ...
- *      [+ enddef +]
- *      ... [+ foo bar='raw text' baz=<<text expression>> +]
- *      @end example
+ *  This function will define a new macro.  You must provide a name for the
+ *  macro.  You do not specify any arguments, though the invocation may
+ *  specify a set of name/value pairs that are to be active during the
+ *  processing of the macro.
  *
- *      Once the macro has been defined, this new macro can be invoked by
- *      specifying the macro name as the first token after the start
- *      macro marker.  Any remaining text in the macro invocation will be
- *      used to create new name/value pairs that only persist for the
- *      duration of the processing of the macro.  The expressions are
- *      evaluated the same way simple expressions are evaluated.
- *      @xref{expression syntax}.
+ *  @example
+ *  [+ define foo +]
+ *  ... macro body with macro functions ...
+ *  [+ enddef +]
+ *  ... [+ foo bar='raw text' baz=<<text expression>> +]
+ *  @end example
  *
- *      The resulting definitions are handled much
- *      like regular definitions, except:
+ *  Once the macro has been defined, this new macro can be invoked by
+ *  specifying the macro name as the first token after the start macro
+ *  marker.  Alternatively, you may make the invocation explicitly invoke a
+ *  defined macro by specifying @code{INVOKE} in the macro invocation.  If
+ *  you do that, the macro name can be computed with an expression that gets
+ *  evaluated every time the INVOKE macro is encountered.  @xref{INVOKE}.
  *
- *      @enumerate
- *      @item
- *      The values may not be compound.  That is, they may not contain
- *      nested name/value pairs.
- *      @item
- *      The bindings go away when the macro is complete.
- *      @item
- *      The name/value pairs are separated by whitespace instead of
- *      semi-colons.
- *      @item
- *      Sequences of strings are not concatenated.
- *      @end enumerate
+ *  Any remaining text in the macro invocation will be used to create new
+ *  name/value pairs that only persist for the duration of the processing of
+ *  the macro.  The expressions are evaluated the same way simple
+ *  expressions are evaluated.  @xref{expression syntax}.
+ *
+ *  The resulting definitions are handled much like regular
+ *  definitions, except:
+ *
+ *  @enumerate
+ *  @item
+ *  The values may not be compound.  That is, they may not contain
+ *  nested name/value pairs.
+ *  @item
+ *  The bindings go away when the macro is complete.
+ *  @item
+ *  The name/value pairs are separated by whitespace instead of
+ *  semi-colons.
+ *  @item
+ *  Sequences of strings are not concatenated.
+ *  @end enumerate
 =*/
 /*=macfunc ENDDEF
  *

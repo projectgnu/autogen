@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.49 2001/05/09 05:25:59 bkorb Exp $
+#$Id: optcode.tpl,v 2.50 2001/06/24 00:47:56 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -46,14 +46,6 @@ ENDFOR flag=]
 extern tUsageProc [=
   (if (exist? "usage") (get "usage") "optionUsage") =];
 
-#ifndef NULL
-#  define NULL 0x0
-#endif
-
-#ifndef EXIT_SUCCESS
-#  define  EXIT_SUCCESS 0
-#  define  EXIT_FAILURE 1
-#endif
 [=
 IF (exist? "include") =]
 /*
@@ -63,7 +55,17 @@ IF (exist? "include") =]
   FOR include "\n" =]
 [=(get "include") =][=
   ENDFOR include =]
-[=ENDIF "include exists" =][=
+[=ENDIF "include exists" =]
+#ifndef NULL
+#  define NULL 0x0
+#endif
+#ifndef EXIT_SUCCESS
+#  define  EXIT_SUCCESS 0
+#endif
+#ifndef EXIT_FAILURE
+#  define  EXIT_FAILURE 1
+#endif[=
+
 (define number-arg (make-regexp "=.*"))
 (define cap-name "")
 

@@ -1,20 +1,21 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 2.5 2000/09/18 02:04:05 bkorb Exp $
+ *  $Id: getdefs.h,v 2.6 2001/06/24 00:47:56 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2000/09/18 02:04:05 $
+ *  Last Modified:     $Date: 2001/06/24 00:47:56 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
 #ifndef GETDEFS_HEADER
 #define GETDEFS_HEADER
 
-#include <sys/types.h>
+#include "config.h"
+
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -27,7 +28,9 @@
 #include <unistd.h>
 #include <utime.h>
 
-#include "config.h"
+#ifndef HAVE_SNPRINTF
+#  include "snprintfv/snprintfv.h"
+#endif
 
 #ifndef HAVE_STRSIGNAL
 #  include "compat/strsignal.c"

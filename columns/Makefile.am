@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.27 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 1.28 2001/06/24 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -23,7 +23,8 @@ AGEXE		= $(top_builddir)/agen5/@AGEXE@ -L $(top_srcdir)/autoopts
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la
 man_MANS        = columns.1
 
-INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
+INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts \
+	-I$(top_srcdir)/snprintfv
 
 MAINTAINERCLEANFILES = Makefile.in columns.texi
 

@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2001/05/09 05:25:59 $
+## Last Modified:   $Date: 2001/06/24 00:47:56 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.34 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 2.35 2001/06/24 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -27,7 +27,7 @@ pkgdata_DATA	= \
 
 GENSRC		= genshell.c genshell.h
 EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING \
-	TODO autoopts.m4 doc.tpl bootstrap.dir autoopts-config.in \
+	TODO autoopts.m4 bootstrap.dir autoopts-config.in \
 	config-opts.def genshell.def
 
 m4datadir	= $(datadir)/aclocal

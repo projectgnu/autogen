@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.26 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expState.c,v 1.27 2001/06/24 00:47:56 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -512,24 +512,35 @@ ag_scm_tpl_file( void )
  *
  * what:   get the template file and line number
  *
+ * exparg: msg-fmt, formatting for line message, optional
+ *
  * doc:  Returns the file and line number of the current template macro
- *       using the format, "from %s line %d".
+ *       using either the default format, "from %s line %d", or else
+ *       the format you supply.  For example, if you want only the line
+ *       number, you would supply the format "%2$d".
 =*/
     SCM
-ag_scm_tpl_file_line( void )
+ag_scm_tpl_file_line( SCM fmt )
 {
     tSCC    zFmt[] = "from %s line %d";
+    tCC*    pzFmt = zFmt;
     char*   pz;
+
+    if (gh_string_p( fmt ))
+        pzFmt = gh_scm2newstr( fmt, NULL );
 
     {
         size_t  maxlen = strlen( pCurTemplate->pzFileName )
-                       + sizeof( zFmt ) + 3 * sizeof( int );
+                       + strlen( pzFmt ) + 4 * sizeof( int );
         if (maxlen >= sizeof( zScribble ))
             pz = (char*)AGALOC( maxlen, "file-line buffer" );
         else pz = zScribble;
     }
 
-    sprintf( pz, zFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );
+    sprintf( pz, pzFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );
+
+    if (pzFmt != zFmt)
+        free( (void*)pzFmt );
 
     {
         SCM res = gh_str02scm( pz );

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2000/09/30 15:09:43 $
+# Last Modified:     $Date: 2001/06/24 00:47:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: case.test,v 1.6 2000/09/30 15:09:43 bkorb Exp $
+# $Id: case.test,v 1.7 2001/06/24 00:47:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -78,7 +78,7 @@ second: String matches: ~~ .*        OK and ~ ^[a-z]*$  OK
 third:  STRING matches: ~~ ^[A-Z]*$  OK and ~ ^[a-z]*$  OK
 EOF
 
-# # # # # # # DEFINITOINS FILE # # # # # #
+# # # # # # # DEFINITIONS FILE # # # # # #
 
 cat > $testname.def <<EOF
 autogen definitions $testname;
@@ -108,5 +108,4 @@ $AGEXE $testname.def ||  failure autogen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup
-echo $testname done
 # end of case.test

@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2001/05/09 05:25:59 $
+## Last Modified:   $Date: 2001/06/24 00:47:56 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.22 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 1.23 2001/06/24 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
@@ -17,16 +17,16 @@ TESTS      = \
 	expr.test       extract.test for.test     forfrom.test \
 	get.test        gperf.test   heredef.test include.test \
 	license.test    match.test   nestmac.test opts.test \
-	reorder.test    snarf.test   stack.test   string.test \
-	suffix.test
+	output.test     reorder.test snarf.test   stack.test \
+	string.test     suffix.test
 
 EXTRA_DIST = defs $(TESTS)
 
-MAINTAINERCLEANFILES	= Makefile.in
+MAINTAINERCLEANFILES = Makefile.in
 
-FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
+FUNCLIST = funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
-EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
+EXPRLIST = expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 		expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 testsubdir = ./testdir

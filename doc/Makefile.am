@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.42 2001/05/09 05:25:59 bkorb Exp $
+## $Id: Makefile.am,v 2.43 2001/06/24 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,8 +48,7 @@ ADDON_TEXI	= \
 DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
 		$(AGSRCDIR)/autogen.menu \
-		$(AGSRCDIR)/autogen.texi \
-		$(top_srcdir)/autoopts/doc.tpl
+		$(AGSRCDIR)/autogen.texi
 
 DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
 
@@ -74,6 +73,7 @@ AGARGS		= base-name=autogen autogen=$(AGEXE) \
 ##  in its dependency checking on files that it "knows" are source files
 ##
 autogen.texi : $(DOC_DEPENDS)
+	@-[ -f $(top_srcdir)/doc/$@ ] && cp -f $(top_srcdir)/doc/$@ $@.ori
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ...
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" \
@@ -81,7 +81,7 @@ autogen.texi : $(DOC_DEPENDS)
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
 	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
-	@-sleep 1 ; touch $@
+	@-sleep 1 ; touch $@ ; [ -s $@ ] && [ -f $@.ori ] && rm -f $@.ori
 
 ##  The following rule is for debugging generation problems:
 ##

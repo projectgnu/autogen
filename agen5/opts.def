@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.29 2001/05/19 22:18:56 bkorb Exp $
+ *   $Id: opts.def,v 1.30 2001/06/24 00:47:56 bkorb Exp $
  */
 
 /*
@@ -39,16 +39,23 @@ argument       = "[ <def-file> ]";
 homerc         =  $HOME, ".";
 environrc;
 long_opts;
-include = "#include \"config.h\"\n"
-          "#include \"autogen.h\"\n"
-          "#ifdef HAVE_DLOPEN\n"
-          "#ifdef HAVE_DLFCN_H\n"
-          "#include <dlfcn.h>\n"
-          "#else\n"
-          "extern void* dlopen(const char*,int);\n"
-          "#endif\n"
-          "#endif\n"
-          "typedef void (init_proc_t)( void );";
+
+include = <<-  _END_INCLUDE
+	#include "config.h"
+	#include "autogen.h"
+	#ifdef HAVE_DLOPEN
+	# ifdef HAVE_DLFCN_H
+	#  include <dlfcn.h>
+	# else
+	   extern void* dlopen(const char*,int);
+	# endif
+
+	# ifndef  RTLD_GLOBAL
+	#  define RTLD_GLOBAL 0
+	# endif
+	#endif
+	typedef void (init_proc_t)( void );
+	_END_INCLUDE;
 
 version = `
     if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
@@ -75,7 +82,7 @@ The output file names are based on the template, but generally use the
 base name of the definition file.  If standard in is read for the
 definitions, then `stdin' will be used for that base name.  The
 suffixes to the base name are gotten from the template.  However, the
-template file may specify the entire output file.
+template file may specify the entire output file name.
 
 `loop-limit' is used in debugging to stop runaway expansions.";
 
@@ -374,19 +381,28 @@ flag = {
     descrip     = "tracing level of detail";
     keyword     = nothing, templates, block-macros, expressions, everything;
 
-    doc =
-    "This option will cause AutoGen to display a trace of its template\n"
-    "processing.  There are five levels:\n"
-    "@enumerate 0\n"
-    "@item\nDoes no tracing at all (default)\n"
-    "@item\n"
-    "Traces the invocation of @code{DEFINE}d macros and @code{INCLUDE}s\n"
-    "@item\nTraces all block macros.  The above, plus @code{IF}, @code{FOR},\n"
-    "@code{CASE} and @code{WHILE}.\n"
-    "@item\nDisplays the results of expression evaluations\n"
-    "@item\n"
-    "Displays the invocation of every AutoGen macro, even @code{TEXT}macros.\n"
-    "@end enumerate";
+	doc = <<-  _EOF_
+	This option will cause AutoGen to display a trace of its template
+	processing.  There are five levels:
+
+	@table @samp
+	@item nothing
+	Does no tracing at all (default)
+
+	@item templates
+	Traces the invocation of @code{DEFINE}d macros and @code{INCLUDE}s
+
+	@item block-macros
+	Traces all block macros.  The above, plus @code{IF}, @code{FOR},
+	@code{CASE} and @code{WHILE}.
+
+	@item expressions
+	Displays the results of expression evaluations
+
+	@item everything
+	Displays the invocation of every AutoGen macro, even @code{TEXT}macros.
+	@end table
+	_EOF_;
 };
 
 flag = {

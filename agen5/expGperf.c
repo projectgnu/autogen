@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 1.6 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: expGperf.c,v 1.7 2001/06/24 00:47:56 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -192,6 +192,7 @@ ag_scm_make_gperf( SCM name, SCM hlist )
  *       function @xref{SCM make-gperf}.  The @code{name} you supply here must
  *       match the name used to create the program and the string to hash must
  *       be one of the strings supplied in the @code{make-gperf} string list.
+ *       The result will be a perfect hash index.
  *
  *       See the documentation for @command{gperf(1GNU)} for more details.
 =*/

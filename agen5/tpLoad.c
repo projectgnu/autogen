@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.18 2001/05/28 00:23:28 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.19 2001/06/24 00:47:56 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -60,7 +60,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
     char*   pzRoot;
     char*   pzSfx;
     void*   deallocAddr = NULL;
-	tSuccess res = SUCCESS;
+    tSuccess res = SUCCESS;
 
     /*
      *  Expand leading environment variables.
@@ -175,11 +175,11 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
     }
 
  findFileReturnFailure:
-	res = FAILURE;
+    res = FAILURE;
 
  findFileReturn:
-	if (deallocAddr != NULL)
-		AGFREE( deallocAddr );
+    if (deallocAddr != NULL)
+        AGFREE( deallocAddr );
     return res;
 }
 

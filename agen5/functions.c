@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.18 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: functions.c,v 1.19 2001/06/24 00:47:56 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -108,14 +108,13 @@ MAKE_HANDLER_PROC( Include )
  *  unnamed:
  *
  *  desc:
- *  The macro text has started with a name not known to AutoGen.
- *  If, at template instantiation time, it turns out to be the
- *  name of a template block, then the macro invokes that template.
- *  If it is not, then it is a conditional expression that is
- *  evaluated only if the name is defined at the time the macro
- *  is invoked.
  *
- *  You may not specify @code{UNKNOWN} specifically.
+ *  The macro text has started with a name not known to AutoGen.  If, at run
+ *  time, it turns out to be the name of a defined macro, then that macro is
+ *  invoked.  If it is not, then it is a conditional expression that is
+ *  evaluated only if the name is defined at the time the macro is invoked.
+ *
+ *  You may not specify @code{UNKNOWN} explicitly.
 =*/
 MAKE_HANDLER_PROC( Unknown )
 {
@@ -204,7 +203,7 @@ MAKE_HANDLER_PROC( Text )
  *    The macro is actually removed from the internal representation.
  *
  *  desc:
- *    If the specified function code is @code{#}, then the
+ *    If the native macro name code is @code{#}, then the
  *    entire macro function is treated as a comment and ignored.
 =*/
 MAKE_LOAD_PROC( Comment )

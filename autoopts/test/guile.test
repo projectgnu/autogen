@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/05/09 05:25:59 $
+# Last Modified:     $Date: 2001/06/24 00:47:56 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: guile.test,v 1.5 2001/05/09 05:25:59 bkorb Exp $
+# $Id: guile.test,v 1.6 2001/06/24 00:47:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -103,7 +103,7 @@ test $? -ne 0 && failure guile script failed
 #  causes a compare failure (despite the `-b') on some systems
 #
 sed '$d'  ${testname}.tmprun >  ${testname}.runout
-diff -b -q ${testname}.run* || \
+diff -b ${testname}.run* > /dev/null || \
   failure unanticipated run output
 
 cleanup

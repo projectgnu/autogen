@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 1.12 2000/04/04 13:22:19 bkorb Exp $
+ *  $Id: columns.c,v 1.13 2001/06/24 00:47:56 bkorb Exp $
  */
 
 /*
@@ -24,11 +24,17 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "opts.h"
+
+#ifndef HAVE_SNPRINTF
+# include "snprintfv/snprintfv.h"
+#endif
 
 struct print_list {
     char**     papz;
