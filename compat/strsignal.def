@@ -3,7 +3,7 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 2.1 1999/08/03 22:51:37 bkorb Exp $
+ *  $Id: strsignal.def,v 2.2 1999/10/28 02:01:52 bruce Exp $
  */
 
 #shell
@@ -91,5 +91,3 @@ else
   done
 fi
 #endshell
-
-date = `date`;
