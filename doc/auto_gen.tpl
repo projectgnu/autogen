@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Fri Jul 30 07:20:54 1999                                
+## Last Modified:     Fri Jul 30 08:51:54 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.25 1999/07/30 14:21:35 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.26 1999/07/30 15:54:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1025,15 +1025,17 @@ do
     * ) cat $f ;; esac ;  done' _shell =]
 @end menu
 
-[=_EVAL 'for f in ${top_builddir}/*/*.menu
+[=_EVAL 'TOPSRC=`cd ${top_srcdir} ; pwd`
+TOPBUILD=`cd ${top_builddir} ; pwd`
+for f in ${top_srcdir}/*/*.menu
 do 
-   if [ "$f" = ${top_builddir}/src/autogen.menu ] ; then : ; else
+   if [ "$f" = ${top_srcdir}/src/autogen.menu ] ; then : ; else
    echo \'@page\'
    echo \'@ignore\'
    echo \'Copy of $f and associated .texi\'
    echo \'@end ignore\'
-   sed -e s/\'${top_builddir}\'/"${top_builddir}"/ \
-       -e s/\'${top_srcdir}\'/"${top_srcdir}"/ `echo $f|
+   sed -e s@\'${top_builddir}\'@"${TOPBUILD}"@ \
+       -e s@\'${top_srcdir}\'@"${TOPSRC}"@ `echo $f|
        sed \'s/\.menu$/\.texi/\'`
    fi
 done' _shell =]
