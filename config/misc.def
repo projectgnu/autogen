@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/10/07 03:09:35 $
+ *  Last Modified:     $Date: 2002/10/13 19:22:15 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.21 2002/10/07 03:09:35 bkorb Exp $
+ *  $Id: misc.def,v 3.22 2002/10/13 19:22:15 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.21 $";
+version = "$Revision: 3.22 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -108,29 +108,8 @@ test   = {
 		_END_OF_SCRIPT_; };
 
   action   = { asis;
-    act-type = script;
-      act-text = <<-  _END_OF_SCRIPT_
-		CPPFLAGS="${ag_save_CPPFLAGS}"
-		    LDFLAGS="${ag_save_LDFLAGS}"
-
-		    AC_SUBST(GUILE_CPPFLAGS)
-		    if test "${ag_cv_with_guile_incdir+set}" = set ; then
-		      GUILE_CPPFLAGS=-I${ag_cv_with_guile_incdir}
-		    elif test "${ag_cv_with_guile_root+set}" = set ; then
-		      GUILE_CPPFLAGS=-I${ag_cv_with_guile_root}/include
-		    fi
-
-		    AC_SUBST(GUILE_LDFLAGS)
-		    if test "${ag_cv_with_guile_libdir+set}" = set ; then
-		      GUILE_LDFLAGS="${ag_cv_with_guile_libdir}"
-		    elif test "${ag_cv_with_guile_root+set}" = set ; then
-		      GUILE_LDFLAGS="-L${ag_cv_with_guile_root}/lib -lguile"
-		    fi
-
-		    AC_SUBST(GUILE_DIR)
-		    GUILE_DIR=guile
-		_END_OF_SCRIPT_;
-  };
+    act-type = libflags;
+    act-text = GUILE; };
 
   doc = <<- _END_OF_DOC_
 		AutoGen won't work without Guile, so either the methods
@@ -166,34 +145,20 @@ test   = {
 		      echo "libxml2 found via xml2-config" >&2
 		      ag_cv_with_xml2_libdir="${XML2AG_LDFLAGS}"
 		      ag_cv_with_xml2_incdir="${XML2AG_CPPFLAGS}"
+		    else XML2AG_DIR=""
 		    fi
 		_END_OF_SCRIPT_;
   };
 
   action   = { asis;
     act-type = script;
-      act-text = <<-  _END_OF_SCRIPT_
-		CPPFLAGS="${ag_save_CPPFLAGS}"
-		    LDFLAGS="${ag_save_LDFLAGS}"
-
-		    AC_SUBST(XML2AG_CPPFLAGS)
-		    if test "${ag_cv_with_xml2_incdir+set}" = set ; then
-		      XML2AG_CPPFLAGS=-I${ag_cv_with_xml2_incdir}
-		    elif test "${ag_cv_with_xml2_root+set}" = set ; then
-		      XML2AG_CPPFLAGS=-I${ag_cv_with_xml2_root}/include
-		    fi
-
-		    AC_SUBST(XML2AG_LDFLAGS)
-		    if test "${ag_cv_with_xml2_libdir+set}" = set ; then
-		      XML2AG_LDFLAGS="${ag_cv_with_xml2_libdir}"
-		    elif test "${ag_cv_with_xml2_root+set}" = set ; then
-		      XML2AG_LDFLAGS="-L${ag_cv_with_xml2_root}/lib -lxml2"
-		    fi
-
-		    AC_SUBST(XML2AG_DIR)
-		    XML2AG_DIR=xml2ag
-		_END_OF_SCRIPT_;
+    act-text = 'XML2AG_DIR=xml2ag
+    AC_SUBST([XML2AG_DIR])';
   };
+
+  action   = { asis;
+    act-type = libflags;
+    act-text = XML2AG; };
 
   doc = <<- _END_OF_DOC_
 		xml2ag won't work without libxml2, so either the methods

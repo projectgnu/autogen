@@ -1,3 +1,11 @@
+2002-10-12  Bruce Korb  <bkorb@gnu.org>
+
+	* config/confmacs.tpl(emit-results): add a yes-libflags action that
+	figures out how to set the xx_CPPFLAGS and xx_LDFLAGS macros correctly.
+	(througout): marked the ``# end of'' whatevers with a name
+	* config/misc.def(libguile): use the libflags action
+	(libxml2): ditto
+
 2002-10-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am(YFLAGS): change to AM_YFLAGS for automake 1.7.
