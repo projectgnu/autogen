@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.13 2000/10/28 18:17:32 bkorb Exp $
+# $Id: shell.test,v 1.14 2000/12/11 23:02:14 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -193,7 +193,7 @@ do
         ;;
 
     --* )
-        OPT_CODE=`echo "X${OPT_ARG}"|sed 's/^X--//'`
+        OPT_CODE=`echo "X${OPT_ARG}"|sed 's/^X-*//'`
         shift
         OPT_ARG="$1"
 
