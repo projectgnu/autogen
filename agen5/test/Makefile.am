@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/05/11 20:23:52 $
+## Last Modified:   $Date: 2002/05/30 01:31:08 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.4 2002/05/11 20:23:52 bkorb Exp $
+## $Id: Makefile.am,v 3.5 2002/05/30 01:31:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -20,18 +20,16 @@ NOSHELL_TESTS = \
   html.test     in.test       license.test  make.test     match.test   \
   reorder.test  stack.test    string.test
 
-TESTS = @AGEN5_TESTS@
-
-EXTRA_DIST = defs $(TESTS)
-
 MAINTAINERCLEANFILES = Makefile.in
 
-FUNCLIST = funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
-		functions.c
-EXPRLIST = expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
-		expString.c expGperf.c expExtract.c $(FUNCLIST)
-
+TESTS      = @AGEN5_TESTS@
 testsubdir = ./testdir
+CPPFLAGS   = @CPPFLAGS@
+EXTRA_DIST = defs $(TESTS)
+FUNCLIST   = funcCase.c  funcDef.c  funcEval.c   funcFor.c   funcIf.c \
+		     functions.c
+EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
+		     expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 TESTS_ENVIRONMENT = \
 	CC="$(CC)" CFLAGS='@CFLAGS@' \

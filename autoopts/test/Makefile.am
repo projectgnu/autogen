@@ -5,20 +5,19 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/05/11 20:23:52 $
+## Last Modified:   $Date: 2002/05/30 01:31:08 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/05/11 20:23:52 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2002/05/30 01:31:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-TESTS   = argument.test cond.test equiv.test errors.test guile.test \
+EXTRA_DIST = defs stdopts.def $(TESTS)
+testsubdir = ./testdir
+CPPFLAGS   = @CPPFLAGS@
+TESTS      = argument.test cond.test equiv.test errors.test guile.test \
 	handler.test keyword.test rc.test shell.test stdopts.test vers.test
 
-EXTRA_DIST = defs stdopts.def $(TESTS)
-
 MAINTAINERCLEANFILES	= Makefile.in
-
-testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = \
 	CC="$(CC)" \

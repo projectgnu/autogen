@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2002/05/30 01:31:08 $
+#            by: bkorb
 #
-# $Id: output.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: output.test,v 3.1 2002/05/30 01:31:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -80,6 +80,28 @@ $AGEXE -b $testname -T $testname.tpl --no-def || \
 
 cmp -s $testname.samp $testname.test || \
   failure "`diff $testname.samp $testname.test`"
+
+# # # # # # # EMPTY DEFINITIONS FILE # # # # # #
+
+cat > $testname.def <<EOF
+AutoGen Definitions $testname.tpl;
+EOF
+
+# # # # # # # RUN AUTOGEN # # # # # #
+
+mv -f $testname.test $testname.tst1 || \
+  failure moving output-1 failed
+
+$AGEXE $testname.def || \
+  failure autogen failed
+
+mv -f $testname.test $testname.tst2 || \
+  failure moving output-2 failed
+
+# # # # # # # TEST RESULTS # # # # # #
+
+cmp -s $testname.tst1 $testname.tst2 || \
+  failure "`diff $testname.tst1 $testname.tst2`"
 
 cleanup
 # end of output.test
