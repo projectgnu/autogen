@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-06-12 17:14:11 bkorb"
+## Time-stamp:      "2002-07-08 18:42:28 bkorb"
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 2002/06/20 22:05:07 bkorb Exp $
+## $Id: Makefile.am,v 1.7 2002/07/09 02:32:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -20,12 +20,12 @@ xml2ag_SOURCES  = xml2ag.c
 ## SUBDIRS      = test
 EXTRA_DIST      = xmlopts.def fork.tpl
 AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L$(top_srcdir)/agen5
-xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la
+xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la @XML2AG_LDFLAGS@
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) *-stamp
-INCLUDES        = @INCLIST@
+INCLUDES        = @INCLIST@ @XML2AG_CPPFLAGS@
 
 all : gen
 gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)

@@ -1,3 +1,16 @@
+2002-07-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(doImmediateOpts): put the version into the
+	source in string format so "strings(1)" can find it.
+	* autoopts/bootstrap.dir: compute the value for that purpose
+	* autoopts/options_h.tpl: insert the computed value
+	* config/confmacs.tpl: restore CPPFLAGS and LDFLAGS on failure
+	* config/misc.def: only specify libxml includes and lib for the
+	xml2ag directory.  Do this with XML2AG_* substitution variables.
+	* xml2ag/Makefile.am: use the substitution variables
+	* snprintfv/Makefile.am: restore the old version.  New is broken.
+	* snprintfv/snprintfv/Makefile.am: bootstrap.dir is not distributed
+
 2002-07-07  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defDirect.c(doDir_option): new procedure to allow embedded

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.11 2002/06/23 16:47:15 bkorb Exp $
+ *  $Id: autoopts.c,v 3.12 2002/07/09 02:32:25 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -781,15 +781,14 @@ doImmediateOpts( pOpts )
         tSCC zErr[] =
             "Automated Options Processing Error!\n";
         tSCC zVer[] =
-            "\t%s called optionProcess with structure version %d.%d.%d.\n";
+            "\t%s called optionProcess with structure version %s.\n";
         tSCC zBig[] =
-            "\tThis exceeds the library compiled version:  %d.%d.%d\n";
+            "\tThis exceeds the library compiled version:  %d:%d:%d\n";
         tSCC zSml[] =
-            "\tThis is less than the minimum livrary version: %d.%d.%d\n";
+            "\tThis is less than the minimum livrary version: %d:%d:%d\n";
 
         fputs( zErr, stderr );
-        fprintf( stderr, zVer, pOpts->origArgVect[0],
-                 NUM_TO_VER( pOpts->structVersion ));
+        fprintf( stderr, zVer, pOpts->origArgVect[0], OPTIONS_VERSION_STRING );
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
             fprintf( stderr, zBig, NUM_TO_VER( OPTIONS_STRUCT_VERSION ));
         else

@@ -307,7 +307,7 @@ ENDDEF  try-without             =][=
 DEFINE  try-withlib             =]
   AC_ARG_WITH([lib[=
     (set! cv-name (string-append group-pfx "cv_with_" down-name))
-    (. down-name)=]],
+    down-name =]],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
         =]], [lib[=(. down-name)=] installation prefix]),
     [[=(. cv-name)=]_root=${with_lib[=(string-tr down-name "-" "_")=]}],
@@ -328,7 +328,7 @@ DEFINE  try-withlib             =]
 
   AC_ARG_WITH([lib[=(. down-name)=]-libdir],
     AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
-        =]-libdir], [lib[=(. down-name)=] include dir]),
+        =]-libdir], [lib[=(. down-name)=] library dir]),
     [[=(. cv-name)=]_libdir=${with_[=(string-tr test-name "-A-Z" "_a-z")
                                    =]_libdir}],
     AC_CACHE_CHECK([whether with-lib[=(. down-name)=]-libdir was specified], [=
@@ -339,15 +339,15 @@ DEFINE  try-withlib             =]
   case X${[=(. cv-name)=]_incdir} in
   Xyes|Xno )
     case X${[=(. cv-name)=]_root} in
-    Xyes|Xno ) ;;
-    * )        [=(. cv-name)=]_incdir=${[=(. cv-name)=]_root}/include ;;
+    Xyes|Xno ) [=(. cv-name)=]_incdir=no ;;
+    * )        [=(. cv-name)=]_incdir=-I${[=(. cv-name)=]_root}/include ;;
     esac
   esac
 
   case X${[=(. cv-name)=]_libdir} in
   Xyes|Xno )
     case X${[=(. cv-name)=]_root} in
-    Xyes|Xno ) ;;
+    Xyes|Xno ) [=(. cv-name)=]_libdir=no ;;
     * )        [=(. cv-name)=]_libdir="-L${[=(. cv-name)
                =]_root}/lib -l[=(. down-name)=]";;
     esac
@@ -382,7 +382,9 @@ DEFINE  try-withlib             =]
   AC_MSG_CHECKING([whether lib[=(. down-name)=] can be linked with])[=
   set-language                  =]
   AC_LINK_IFELSE([[=(. c-text)=]],
-    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
+    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no
+    CPPFLAGS="${[=(. group-pfx)=]save_CPPFLAGS}"
+    LDFLAGS="${[=(. group-pfx)=]save_LDFLAGS}"]
   ) # end of AC_LINK_IFELSE [=
 
   end-feat-test =][=

@@ -31,7 +31,12 @@ case "$1" in
       autoopts.c boolean.c enumeration.c restore.c \
       guileopt.c makeshell.c numeric.c pgusage.c putshell.c \
       save.c stack.c streqvcmp.c usage.c version.c
-
+    chmod u+w funcs.def
+    eval "`egrep '^AO_' ../VERSION`"
+    echo vers-info = "'${AO_CURRENT}:${AO_REVISION}:${AO_AGE}';" >> funcs.def
+    echo vers-numb = "'`expr '(' $AO_CURRENT   '*' 4096 ')' \
+                      + '(' $AO_REVISION  '*'  128 ')' \
+                      + $AO_AGE`';" >> funcs.def
     ${AUTOGEN} funcs.def
     ${AUTOGEN} -Tagman3.tpl funcs.def
     f=`echo option*.3`
@@ -41,4 +46,3 @@ case "$1" in
   fi
   ;;
 esac
-

@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/06/29 22:32:30 $
+ *  Last Modified:     $Date: 2002/07/09 02:32:25 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.16 2002/06/29 22:32:30 bkorb Exp $
+ *  $Id: misc.def,v 3.17 2002/07/09 02:32:25 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.16 $";
+version = "$Revision: 3.17 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -198,14 +198,40 @@ test   = {
 		f=`xml2-config --libs`
 		    if test X${with_libxml} != Xno && test -n "$f"
 		    then
-		      LDFLAGS="${LDFLAGS} $f"
-		      f=`xml2-config --cflags`
-		      CPPFLAGS="${CPPFLAGS} $f"
-		      AC_SUBST(XML2AG_DIR)
+		      XML2AG_LDFLAGS="$f"
+		      XML2AG_CPPFLAGS="`xml2-config --cflags`"
 		      XML2AG_DIR=xml2ag
 		      echo "libxml2 found via xml2-config" >&2
+		      ag_cv_with_xml2_libdir="${XML2AG_LDFLAGS}"
+		      ag_cv_with_xml2_incdir="${XML2AG_CPPFLAGS}"
 		    fi
-		_END_OF_SCRIPT_; };
+		_END_OF_SCRIPT_;
+  };
+
+  action   = { asis;
+    act-type = script;
+      act-text = <<-  _END_OF_SCRIPT_
+		CPPFLAGS="${ag_save_CPPFLAGS}"
+		    LDFLAGS="${ag_save_LDFLAGS}"
+
+		    AC_SUBST(XML2AG_CPPFLAGS)
+		    if test "${ag_cv_with_xml2_incdir+set}" = set ; then
+		      XML2AG_CPPFLAGS=-I${ag_cv_with_xml2_incdir}
+		    elif test "${ag_cv_with_xml2_root+set}" = set ; then
+		      XML2AG_CPPFLAGS=-I${ag_cv_with_xml2_root}/include
+		    fi
+
+		    AC_SUBST(XML2AG_LDFLAGS)
+		    if test "${ag_cv_with_xml2_libdir+set}" = set ; then
+		      XML2AG_LDFLAGS="${ag_cv_with_xml2_libdir}"
+		    elif test "${ag_cv_with_xml2_root+set}" = set ; then
+		      XML2AG_LDFLAGS="-L${ag_cv_with_xml2_root}/lib -lxml2"
+		    fi
+
+		    AC_SUBST(XML2AG_DIR)
+		    XML2AG_DIR=xml2ag
+		_END_OF_SCRIPT_;
+  };
 
   doc = <<- _END_OF_DOC_
 		xml2ag won't work without libxml2, so either the methods
