@@ -10,9 +10,10 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 1999/11/03 05:26:20 bruce Exp $
+## $Id: Makefile.am,v 1.6 1999/11/03 05:58:35 bruce Exp $
 ## ---------------------------------------------------------------------
 
+SUBDIRS		= test
 INCLUDES	= -I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
 		-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
 		-I$(top_builddir) -I$(top_srcdir) -I. -I$(srcdir)
