@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/06/13 02:00:40 $
+## Last Modified:   $Date: 2002/07/11 20:28:44 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.12 2002/06/13 02:00:40 bkorb Exp $
+## $Id: Makefile.am,v 3.13 2002/07/11 20:28:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -23,6 +23,7 @@ TEMPLATES   = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS = cgi.def opts.def pseudo.def
 GENDOCS     = autogen.texi autogen.menu autogen.1
 CLEANFILES  = $(GENDOCS)
+STAMPS      = stamp-directive stamp-exprini stamp-opts stamp-fsm
 
 #  GEN_CSRC omits defParse.c and defParse.h because automake understands
 #
@@ -49,7 +50,6 @@ autogen_SOURCES = $(GEN_CSRC) \
   tpParse.c     tpProcess.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la
-
 autogen_LDFLAGS = @DYNAMIC_AG@
 
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
@@ -66,7 +66,6 @@ all : @AGEXE@
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-STAMPS   = stamp-directive stamp-exprini stamp-opts stamp-fsm
 GEN_LIST = $(STAMPS) $(GENDOCS) defParse.c defParse.h
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \

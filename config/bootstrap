@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     $Date: 2002/01/12 05:10:01 $
-#            by:     Gary V. Vaughan <gary@gnu.org>
+# Last Modified:     $Date: 2002/07/11 20:28:44 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.1 2002/01/12 05:10:01 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.2 2002/07/11 20:28:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -38,6 +38,11 @@
 # can be generated after checkout using this bootstrap procedure.
 
 # Code:
+if [ -z "${VERBOSE}" ]
+then VERBOSE=false ; VERBOSE_ARG=""
+else VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ; fi
+export VERBOSE VERBOSE_ARG
+
 set -e
 
 # Figure out the absolute path to the working directory.
@@ -66,7 +71,7 @@ export MISSING
 
 #  Check for AutoGen version 5.
 #
-AUTOGEN=`type autogen 2>/dev/null`
+AUTOGEN=`type autogen 2>/dev/null || :`
 case "${AUTOGEN}" in
   *" is /"* )
      AUTOGEN=`echo $AUTOGEN|sed 's,autogen is [^/]*/,/,'`
@@ -90,7 +95,8 @@ esac
 #
 BOOTSTRAP=pre
 export BOOTSTRAP
-test -f $wd/bootstrap.local && sh $wd/bootstrap.local $@
+test -f $wd/bootstrap.local && \
+  sh ${VERBOSE_ARG} $wd/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -245,7 +251,7 @@ while read f
 do
   (cd `dirname $f` ; srcdir=.
    echo running bootstrap.dir in `pwd`
-   sh ./bootstrap.dir recursive ) || exit 1
+   sh ${VERBOSE_ARG} ./bootstrap.dir recursive ) || exit 1
 done ) || exit 1
 
 # Source any local scripts which add to the bootstrap procedure.

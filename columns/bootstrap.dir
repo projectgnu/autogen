@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/29 11:24:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Last Modified:     $Date: 2002/07/11 20:28:44 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.2 2002/07/11 20:28:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -76,7 +76,8 @@ do
     then
       test "X${BOOTSTRAP}" = X \
         && echo "Cannot locate ${AG}.  Giving up"
-      exit 1
+      if [ -f opts.h ] && [ -f opts.c ]
+      then exit 0 ; else exit 1 ; fi
     fi
     echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
     ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def

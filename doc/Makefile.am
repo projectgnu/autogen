@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2002/06/28 02:48:05 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2002/07/11 20:28:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -69,20 +69,21 @@ GET_OPTS	= srcfile linenum filelist template=$(DOC_TEMPLATE)
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS) $(BLOCKOPT)
 
-AGEXE		= `cd $(top_builddir)/agen5 ; pwd`/@AGEXE@
-
+AGEXE		= `cd $(top_builddir)/agen5   ; pwd`/@AGEXE@
+COLUMNS_EXE = `cd $(top_builddir)/columns ; pwd`/columns@EXEEXT@
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
 
 TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 
 texi         : texi-stamp
+autogen.texi : texi
 
 texi-stamp : $(DOC_DEPENDS)
 	@cd $(srcdir) && chmod u+w .
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	AGEXE=$(AGEXE) CC="$(CC)" \
+	AGEXE=$(AGEXE) CC="$(CC)" COLUMNS_EXE="$(COLUMNS_EXE)" \
 	ADDON_MENU="$(ADDON_MENU)" \
 	ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \

@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/05/11 20:23:52 $
+## Last Modified:   $Date: 2002/07/11 20:28:44 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2002/05/11 20:23:52 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2002/07/11 20:28:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,7 +20,8 @@ DISTCLEANFILES = option*.3 libopts.????
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = @INCLIST@
-GENMAN   = 
+GENMAN   = optionFree.3 optionLoadLine.3 optionProcess.3 optionRestore.3 \
+optionSaveFile.3 optionSaveState.3 optionVersion.3
 man_MANS = autoopts-config.1 $(GENMAN)
 
 pkgdata_DATA	= \

@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/01/15 16:55:09 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Last Modified:     $Date: 2002/07/11 20:28:44 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.6 2002/01/15 16:55:09 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.7 2002/07/11 20:28:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -167,9 +167,10 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
-      exit 1
-    fi
+      echo "Cannot locate ${AG}"
+      $force && exit 1
+      continue
+   fi
     echo ${AG} -L ../autoopts opts.def
     ${AG} -L ../autoopts opts.def
     date > stamp-opts
@@ -180,9 +181,11 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate ${AG}.  Giving up"
-      exit 1
+      echo "Cannot locate ${AG}"
+      $force && exit 1
+      continue
     fi
+
     echo ${AG} pseudo.def
     ${AG} pseudo.def
     ${AG} cgi.def
@@ -196,13 +199,16 @@ do
   expr.ini )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
-      exit 1
+      echo "Cannot locate autogen or getdefs"
+      $force && exit 1
+      continue
     fi
+
     if ksh -c : 2> /dev/null ; then :
     else
-      echo "Reconstructing expr.h and expr.ini requires ksh.  Giving up."
-      exit 1
+      echo "Reconstructing expr.h and expr.ini requires ksh."
+      $force && exit 1
+      continue
     fi
 
     #  funcCase.c must be first file in list.
@@ -227,8 +233,9 @@ do
   directive.h )
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
-      exit 1
+      echo "Cannot locate autogen or getdefs"
+      $force && exit 1
+      continue
     fi
     eopt="template=directive out=directive.def"
     echo "${GD} $eopt ${srcdir}/defDirect.c | ${AG} -b directive"
@@ -244,8 +251,9 @@ do
     #
     if [ -z "${AG}" ] || [ -z "${GD}" ]
     then
-      echo "Cannot locate autogen or getdefs.  Giving up"
-      exit 1
+      echo "Cannot locate autogen or getdefs"
+      $force && exit 1
+      continue
     fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter"
     echo ${AG} ${eopt} -bautogen opts.def
@@ -257,8 +265,9 @@ do
     #
     if [ -z "${AG}" ]
     then
-      echo "Cannot locate autogen.  Giving up"
-      exit 1
+      echo "Cannot locate autogen"
+      $force && exit 1
+      continue
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def

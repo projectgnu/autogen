@@ -1,30 +1,34 @@
 #! /bin/sh
 
 AUTOGEN=${AUTOGEN-autogen}
+noag=`if ${AUTOGEN} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 
 case "$1" in
 *genshell.c )
   #  We were probably invoked by make
   #
+  $noag && test -f genshell.c && exit 0
   set -e
   ${AUTOGEN} -L. genshell.def
   ;;
 
 *libopts.texi )
+  $noag && test -f libopts.texi && exit 0
   ${AUTOGEN} -Taginfo3.tpl -DLEVEL=subsection -b libopts funcs.def
   ;;
 
 *optionProcess.3 )
+  ${AUTOGEN} -Tagman3.tpl funcs.def
   ;;
 
 * )
-  #  This is likely a bootstrap.  Don't build if it exists
+  #  This is likely a bootstrap.  Don't build genshell.c if it exists
   #
   if [ ! -f genshell.c ]
   then
     ${AUTOGEN} -L. genshell.def
   fi
-  if [ ! -f funcs.def ]
+  if [ ! -f funcs.def ] || [ ! -f options.h ]
   then
     getdefs linenum srcfile \
       template=options_h output=funcs.def \
@@ -40,11 +44,6 @@ case "$1" in
 		vers-min-str = "`expr $AO_CURRENT - $AO_AGE`:0:0";
 		_END_VERS_INFO_
     ${AUTOGEN} funcs.def
-    ${AUTOGEN} -Tagman3.tpl funcs.def
-    f=`echo option*.3`
-    sed "s/^GENMAN .*/GENMAN = $f/" Makefile.am > XX$$
-    mv -f XX$$ Makefile.am
-    rm -f $f
   fi
   ;;
 esac
