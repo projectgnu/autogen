@@ -1,7 +1,6 @@
 #  -*- Mode: Outline -*-
 
 * new arg for setting time of output files
-* implement support for '#line' directive in definitions
 * Use compat.h vararg/stdarg macros.
 * need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 * persuade FSF to patch autoconf so that the AC_CHECK_TYPE(id_t) code doesn't
@@ -15,8 +14,6 @@
   constructing arrays of string pointers and knowing whether they
   point to contiguous source text or to allocated memory.
 * ANSI format specifiers: cdeEfgGiosuxX with conversion quals h and l
-* edit sources to use xmalloc and friends throughout for better recovery
-  from failed allocation
 * Write an argv style parsing agPrint.c
 * Try to sort out the server chaining stuff once and for all... I
   suspect the pipeline will need to be built up in reverse like bash...

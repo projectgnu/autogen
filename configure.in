@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 1998/06/22 03:10:13 $
-dnl            by:    Bruce Korb <korbb@datadesign.com>
+dnl Last Modified:    Sat Aug 22 22:11:14 1998
+dnl            by:    Caldera Openlinux User <bkorb@ellen>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 1.4 1998/06/22 03:10:13 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.0 1998/08/23 10:50:34 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -20,7 +20,17 @@ AC_CANONICAL_SYSTEM
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 1.4 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.0 $),)dnl
+
+# ----------------------------------------------------------------------
+# Substitute VERSION vars here, so that they can be used by the Makefile
+# ----------------------------------------------------------------------
+AC_SUBST(AG_VERSION)
+AC_SUBST(AG_MAJOR_VERSION)
+AC_SUBST(AG_MINOR_VERSION)
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
 
 # ----------------------------------------------------------------------
 # If `configure' is invoked (in)directly via `make', ensure that it
@@ -127,8 +137,8 @@ AC_CHECK_TYPE(u_int, unsigned int)
 AC_CHECK_TYPE(u_long, unsigned long int)
 AC_C_CONST
 AC_C_INLINE
-AC_CHECK_SIZEOF(char*)
-AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(char*, 4)
+AC_CHECK_SIZEOF(int, 4)
 
 # ----------------------------------------------------------------------
 # Checks for standard functions.
@@ -137,15 +147,8 @@ AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend pathfind)
 AG_FUNC_CTIME_HEAP
 
 # ----------------------------------------------------------------------
-# Substitute these here, so that they can be used by the Makefile
-# ----------------------------------------------------------------------
-AC_SUBST(TM_VERSION)
-AC_SUBST(TM_MAJOR_VERSION)
-AC_SUBST(TM_MINOR_VERSION)
-
-# -----------------------------------------------------------------------
 # Generate the make files.
-# -----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 [COMPAT_SRC=`cd $srcdir/compat ; echo [a-z]*[!~]`]
 AC_SUBST(COMPAT_SRC)
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]
