@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/05/11 20:23:52 $
+ *  Last Modified:     $Date: 2002/05/11 20:51:24 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.11 2002/05/11 20:23:52 bkorb Exp $
+ *  $Id: misc.def,v 3.12 2002/05/11 20:51:24 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.11 $";
+version = "$Revision: 3.12 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -193,7 +193,8 @@ test   = {
 		  stumble = gh_eval_str( "stumble" );
 		  scm_misc_error( "oops", "bad", bumble );
 		  stumble = scm_num_eq_p( fumble, bumble );
-		  scm_wrong_type_arg( "oops", 1, bumble ); }
+		  scm_wrong_type_arg( "oops", 1, bumble );
+		  return 0; }
 		_END_OF_CODE_;
   run-mode   =  "link";
   code-mode  =  "all";
