@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.3 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: expMake.c,v 3.4 2002/03/27 04:49:45 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -83,10 +83,10 @@
  *
  *  @item
  *  The newline character on the last line, if present, is suppressed.
- *  @end enumerate
  *
  *  @item
  *  Blank lines are stripped.
+ *  @end enumerate
  *
  *  @noindent
  *  This function is intended to be used approximately as follows:
