@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.25 1999/10/28 03:36:29 bruce Exp $
+## $Id: Makefile.am,v 2.26 1999/10/30 16:35:06 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,41 +25,72 @@ info_TEXINFOS   = autogen.texi
 EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl depend.fig depend.eps
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
-ODEF            = $(top_srcdir)/src/opts.def
-SNVDOC          = $(top_srcdir)/snprintfv/doc/snprintfv.texi
-DEFSRC		= \
-		$(top_srcdir)/src/agFunCase.c \
-		$(top_srcdir)/src/agFunEval.c \
-		$(top_srcdir)/src/agFunFor.c \
-		$(top_srcdir)/src/agFunIf.c \
-		$(top_srcdir)/src/agFunOut.c \
-		$(top_srcdir)/src/agFunc.c \
-		$(top_srcdir)/src/agDirect.c \
-		$(top_srcdir)/src/agExpr.c \
-		$(top_srcdir)/autoopts/opthead.tpl
+OPTIONS_DEF	= $(top_srcdir)/agen5/opts.def
 
-DEFCOPY		= copy=$(ODEF)
+FUNCSRC		= \
+		$(top_srcdir)/agen5/funcCase.c \
+		$(top_srcdir)/agen5/funcDef.c \
+		$(top_srcdir)/agen5/funcEval.c \
+		$(top_srcdir)/agen5/funcFor.c \
+		$(top_srcdir)/agen5/funcIf.c \
+		$(top_srcdir)/agen5/functions.c
 
-TEMPLATE	= $(srcdir)/auto_gen.tpl
-TPLINC		= $(top_srcdir)/src/agParse.y \
-		$(top_builddir)/src/opts.h \
-		$(top_srcdir)/src/autogen.texi \
-		$(top_srcdir)/autoopts/autoopts.texi \
-		$(top_builddir)/columns/columns.texi \
-		$(top_builddir)/getdefs/getdefs.texi
+EXPRSRC		= \
+		$(top_srcdir)/agen5/expFormat.c \
+		$(top_srcdir)/agen5/expGuile.c \
+		$(top_srcdir)/agen5/expOutput.c \
+		$(top_srcdir)/agen5/expPrint.c \
+		$(top_srcdir)/agen5/expState.c \
+		$(top_srcdir)/agen5/expString.c \
+		$(FUNCSRC)
 
-GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
+DIRECTIVESRC	= $(top_srcdir)/agen5/defDirect.c
+
+GETDEF_SRC	= $(FUNCSRC) $(EXPRSRC) $(DIRECTIVESRC)
+
+ADDON_MENU	= \
+		$(top_srcdir)/columns/columns.menu \
+		$(top_srcdir)/getdefs/getdefs.menu \
+		$(top_srcdir)/snprintfv/snprintfv.menu
+
+ADDON_TEXI	= \
+		$(top_srcdir)/columns/columns.texi \
+		$(top_srcdir)/getdefs/getdefs.texi \
+		$(top_srcdir)/snprintfv/snprintfv.texi
+
+DOC_INCLUDES	= $(top_srcdir)/src/agParse.y \
+		$(top_srcdir)/src/opts.h \
+		$(top_srcdir)/agen5/autogen.menu \
+		$(top_srcdir)/agen5/autogen.texi \
+		$(top_srcdir)/autoopts/autoopts.texi
+
+DOC_TEMPLATE	= $(srcdir)/auto_gen.tpl
+
+DOC_DEPENDS	= $(DOC_TEMPLATE) \
+		$(OPTIONS_DEF) \
+		$(GETDEF_SRC) \
+		$(ADDON_MENU) \
+		$(ADDON_TEXI) \
+		$(DOC_INCLUDES)
+
+DEFCOPY		= copy=$(OPTIONS_DEF)
+
+GET_OPTS	= srcfile linenum filelist template=auto_gen
+GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS)
+
 AGEXE		= AutoGen
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
-		agarg=-L$(srcdir) agarg=-L$(top_srcdir) agarg=-t60
+		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
 
-autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC) $(SNVDOC)
-	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	CC="${CC}" \
-	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
+autogen.texi : $(DOC_DEPENDS)
+	top_srcdir=$(top_srcdir) CC="$(CC)" \
+	ADDON_MENU="$(ADDON_MENU)" \
+	ADDON_TEXI="$(ADDON_TEXI)" \
+	DOC_DEPENDS="$(DOC_DEPENDS)" \
+	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
 
 www/doc/autogen_toc.html : autogen.texi
-	@mkdir -f www/doc > /dev/null 2>&1 || :
+	@mkdir -p www/doc > /dev/null 2>&1 || :
 	texi2html -menu -split_chapter -verbose autogen.texi
 	mv -f *.html www/doc
 	@touch $@
@@ -67,28 +98,16 @@ www/doc/autogen_toc.html : autogen.texi
 html : web
 web : www/doc/autogen_toc.html
 
-$(top_builddir)/getdefs/getdefs.texi :
-	@cd $(top_builddir)/getdefs/ ; $(MAKE) gen
+$(top_srcdir)/getdefs/getdefs.texi :
+	@cd $(top_srcdir)/getdefs/ ; $(MAKE) -f ./Makefile gen
  
-$(top_builddir)/columns/columns.texi :
-	@cd $(top_builddir)/columns/ ; $(MAKE) gen
+$(top_srcdir)/columns/columns.texi :
+	@cd $(top_srcdir)/columns/ ; $(MAKE) -f ./Makefile gen
 
 LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
-	@if $(AGEXE) --version >&- 2>&- ; then \
-	  echo $(AGEXE) -L $(srcdir) -T LSM.tpl $(ODEF) ; \
-	  top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	    $(AGEXE) -L $(srcdir) -T LSM.tpl $(ODEF) ; \
-	else \
-	  if test -s $(srcdir)/$@; then \
-	   echo "WARNING: $(AGEXE) not available, current $(srcdir)/$@ used"; \
-	  else \
-	   echo "ERROR: $(srcdir)/$@ has been corrupted"; \
-	  fi; \
-	fi
+	top_srcdir=$(top_srcdir) \
+	$(AGEXE) -T LSM.tpl $(OPTIONS_DEF)
 
 autogen.info : doc
-
-doc :
-	ln -s $(top_srcdir)/snprintfv/doc ./doc
 
 # Makefile.am ends here
