@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
- * Last Modified:     Wed Apr 14 09:26:27 1999
+ * Last Modified:     Thu May  6 18:21:59 1999
  *            by:     Bruce Korb <korb@datadesign.com>
  *
- * $Id: compat.h,v 2.3 1999/04/14 17:44:03 bkorb Exp $
+ * $Id: compat.h,v 2.4 1999/06/03 19:43:28 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -151,6 +151,7 @@
 
 /* ##### Pointer sized word ##### */
 
+/* FIXME:  the MAX stuff in here is broken! */
 #if SIZEOF_CHARP > SIZEOF_INT
    typedef long t_word;
    #define WORD_MAX  LONG_MAX
@@ -164,8 +165,6 @@
 #ifndef HAVE_PATHFIND
   EXTERN char *pathfind (/* const char *, const char *, const char * */);
 #endif
-
-# define __EXTENSIONS__
 
 # if defined (HAVE_DIRENT_H)
 #   include <dirent.h>

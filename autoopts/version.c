@@ -1,6 +1,6 @@
 
 /*
- *  $Id: version.c,v 2.1 1999/02/24 18:51:26 bkorb Exp $
+ *  $Id: version.c,v 2.2 1999/06/03 19:43:28 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -57,7 +57,7 @@
     void
 doVersion( tOptions*  pOpts, tOptDesc* pOD )
 {
-    tSCC zAO[] = "Automated Options version %d.%d, copyright (c) 1999 "
+    tSCC zAO[] = "Automated Options version %s, copyright (c) 1999 "
                  "Bruce Korb\n";
     char swCh;
 
@@ -82,8 +82,7 @@ doVersion( tOptions*  pOpts, tOptDesc* pOD )
             fputs( pOpts->pzCopyright, stdout );
             fputc( '\n', stdout );
         }
-        printf( zAO, OPTIONS_STRUCT_VERSION >> 12,
-                OPTIONS_STRUCT_VERSION & 0x0FFF );
+        printf( zAO, optionVersion() );
         break;
 
     case 'n':
@@ -99,8 +98,7 @@ doVersion( tOptions*  pOpts, tOptDesc* pOD )
             fputc( '\n', stdout );
         }
 
-        printf( zAO, OPTIONS_STRUCT_VERSION >> 12,
-                OPTIONS_STRUCT_VERSION & 0x0FFF );
+        printf( zAO, optionVersion() );
         break;
 
     default:

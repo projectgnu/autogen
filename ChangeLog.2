@@ -1,8 +1,125 @@
+1999-05-22  Gary V. Vaughan  <gary@oranda.goldfish>
+	
+	* src/Makefile.am: include MakeRules.in.
+	delete YFLAGS definition duplicated from MakeRules.in.
+	(autogen.texi): use $(srcdir) in place of $(top_srcdir)/src.
+	(stamp-opts): opts.def is in $(srcdir).
+	(stamp-agdirect): agdirect is in $(srcdir).
+	(stamp-agexpr): agexpr is in $(srcdir).
+	(stamp-agfunc): agfunc is in $(srcdir).
+	
+	* autoopts/Makefile.am (EXTRA_DIST): autoopts.m4 seems to have
+	been accidentally deleted... so put it back in again.
+
+	* config/bootstrap: Don't create the snprintfv.h link in here.
+	* configure.in: Create it in here instead.
+
+	* MakeRules.in (AUTOHEADER): automake always changes into
+	$top_srcdir before invoking this, so we mustn't have a relative
+	directory with the -l flag.
+	
+1999-05-20  Gary V. Vaughan  <gary@oranda.goldfish>
+
+	* configure.in (AUTOOPTS_CONFIG): autoopts-config will be in the
+	build tree, not the source tree.
+
+1999-05-19  Gary V. Vaughan  <gary@oranda.goldfish>
+
+	* autoopts/autoopts-config.in:  Accept a new undocumented
+	--top_builddir argument so that VPATH builds can work.
+	Output the libtool library name for the uninstalled libopts
+	if --top_builddir is passed.
+	* configure.in (AUTOOPTS_CONFIG): Pass --top_builddir so
+	that the snprintfv tests will link with the uninstalled
+	libopts library.
+
+1999-05-16  Gary V. Vaughan  <gary@oranda.goldfish>
+
+	* autoopts.c (optionVersion): New function to verify version
+	compiled into libopts.h
+	* configure.in: define the library version components in
+	config.h to verify version number in installed headers.
+	* autoopts/options.h (OPTIONS_STRUCT_VERSION): recalculated.
+	* VERSION: library version bumped due to additional entry point.
+
+	* configure.in: Change the library version number definitions to
+	start with AO_.
+	* VERSION (soname): ditto.
+	* autoopts/Makefile.am: ditto.
+	* autoopts/autoopts-config.in: ditto.
+
+	* VERSION:  oops look like I wrote a broken library version update
+	scheme, revert to the libtool mandated standard methodology.
+	
+1999-05-10  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* src/agFunFor.c (varargs.h): don't include it here, there are
+	no variadic functions in this file!!
+	* src/agFunIf.c (varargs.h): ditto.
+	* src/agFunOut.c (varargs.h): ditto.
+	* src/agFunc.c (varargs.h): ditto.
+	* src/autogen.h (varargs.h): ditto.
+
+1999-05-06  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* configure.in (AC_FUNC_ALLOCA): Removed: now that we have a byacc
+	macro, this is no longer required.
+
+	* config/bootstrap: Merged latest changes back in to local copy.
+	Moved autogen specific file hackery out of the loop so that the
+	script will still recurse properly. (Bruce -- we don't want to
+	remove the config.status file or else `config.status --recheck'
+	won't work, and you will have lost all the flags you passed on
+	the original run).
+
+	* src/Makefile.am (INCLUDES): Look in current directory too!
+
+	* configure.in (AC_CONFIG_SUBDIRS): configure snprintfv subdir.
+	* Makefile.am (SUBDIRS): recurse into new snprintfv subdir.
+	* snprintfv: a whole new subpackage!
+	* autoopts/Makefile.am (libopts_la_SOURCES): removed snprintfv.[ch].
+	* autoopts/snprintfv.c: deleted.	
+	* autoopts/snprintfv.h: ditto.
+
+	* src/autogen.h: added missing semicolon line terminator.
+
+	* config/byacc.m4: Add a serial number to the macro file.
+
+	* compat/strsignal.c: moved snprintfv.h include inside the
+	preprocessor guards that need it.
+
+Wed May  5 14:11:23 1999  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* getdefs/Makefile.am (INCLUDES): Add top_srcdir to locate
+	compat/strsignal.c in VPATH builds.
+
+	* README: Fixed typo.
+
+	* tests/stress.test: Try to copy stress.def if hard link fails.
+
+	* compat/compat.h:  __EXTENSIONS__ is unnecessary
+
 1999-04-26  Bruce Korb  <ddsinc09@ix.netcom.com>
 
 	* src/agExpr.c( SHSTR ): hack around EGCS optimizing bug.
 
+1999-04-15  Gary V. Vaughan  <gvaughan@oranda.goldfish>
+
+	* autoopts/Makefile.am (libopts_la_SOURCES): replace one occurence
+	of  snprintfv.c with snprintfv.h.
+
+1999-04-14  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* src/agExpr.c (evalExpr_PRINTF): Fix a memory leak in argV
+	elements which point to numbers.
+
 1999-04-13  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/autoopts.m4: moved into the autoopts subdir, otherwise
+	it is in aclocal's search path and clashed with any installed
+	version.
+	* autoopts/Makefile.am: Install autoopts from here...
+	* config/Makefile.am: ...and not here =)O|
 
 	* compat/Makefile.am (MAINTAINERCLEANFILES): Don't remove
 	$(GEN_SRC) as these files are needed to bootstrap AutoGen on some
@@ -40,6 +157,7 @@
 	* autoopts/autoopts.h: include snprintfv.h to get typedefs and
 	replacement /.*printf.*/ functions.
 	* src/autogen.h: ditto.
+	* compat/strsignal.c: ditto.
 
 	* src/agExpr.c (evalExpr_PRINTF): Wrap arguments correctly to
 	make a suitable argv array for sprintfv.
@@ -73,7 +191,7 @@
 	* configure.in: Don't look in libPW for alloca(), as it contains
 	plenty of other garbage which upsets some systems.
 
-	1999-03-31  Bruce Korb <autogen@autogen.freeservers.com>
+1999-03-31  Bruce Korb <autogen@autogen.freeservers.com>
 
 	* ./VERSION: updated version, removed non-portable "grep -q"
 

@@ -16,7 +16,7 @@ Rev 5 (?) the addition of Guile expression processing
 
 Until a mailing list is organized, direct email to the author:
 
-    Bruce Korb <korbb@datadesign.com>
+    Bruce Korb <ddsinc09@ix.netcom.com>
 
 
 Autogen requires a POSIX regular expression library, and an ANSI C
@@ -30,4 +30,4 @@ Note to SCO/OS5 users:
 	in the presence of gcc and consequently needs to use /bin/cc.
 	Configure this program with:
 
-		CC=/bin/cc ./configre
+		CC=/bin/cc ./configure

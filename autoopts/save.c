@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.2 1998/11/25 21:19:41 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.3 1999/06/03 19:43:28 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -51,6 +51,7 @@
  */
 
 #include <compat/compat.h>
+#include <snprintfv/compat.h>
 
 #include <time.h>
 

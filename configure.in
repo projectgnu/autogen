@@ -2,26 +2,26 @@ dnl  -*- Mode: M4 -*-
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
-dnl Copyright (C) 1997-1998 Bruce Korb
+dnl Copyright (C) 1997-1999 Bruce Korb
 dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Tue Apr 13 08:45:44 1999
-dnl            by:    Bruce Korb <korb@datadesign.com>
+dnl Last Modified:    Sat May 22 00:18:33 1999				
+dnl            by:    Gary V. Vaughan <gary@oranda.goldfish>		
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.10 1999/04/14 17:44:03 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.11 1999/06/03 19:43:28 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
 . $srcdir/VERSION
 
 AC_CONFIG_AUX_DIR(config)
-AC_CANONICAL_SYSTEM
 
+AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.10 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.11 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -29,9 +29,31 @@ ifdef([AC_REVISION],AC_REVISION($Revision: 2.10 $),)dnl
 AC_SUBST(AG_VERSION)
 AC_SUBST(AG_MAJOR_VERSION)
 AC_SUBST(AG_MINOR_VERSION)
-AC_SUBST(LT_CURRENT)
-AC_SUBST(LT_REVISION)
-AC_SUBST(LT_AGE)
+AC_SUBST(AO_CURRENT)
+AC_SUBST(AO_REVISION)
+AC_SUBST(AO_AGE)
+AC_DEFINE_UNQUOTED(AO_CURRENT,$AO_CURRENT,[Define this to the autoopts current number])
+AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,[Define this to the autoopts age number])
+AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,[Define this to the autoopts revision number])
+
+# ----------------------------------------------------------------------
+# Set up the environment to configure the snprintv subpackage using
+# this version of AutoGen (as opposed to any installed version).
+# ----------------------------------------------------------------------
+ac_configure_args="$ac_configure_args --disable-opts-test"
+dnl until libtool-1.4 is realeased to handle interlibrary dependencies
+dnl with respect to uninstalled libraries we need to build snprintfv
+dnl static only:
+ac_configure_args="$ac_configure_args --disable-shared"
+ag_srcdir=`\cd $srcdir && pwd`
+if test x$ag_srcdir != x && test -d $ag_srcdir; then
+  :
+else
+  ag_srcdir=..
+fi
+AUTOOPTS_CONFIG="/bin/sh `pwd`/autoopts/autoopts-config --top_builddir=`pwd` --top_srcdir=$ag_srcdir"
+export AUTOOPTS_CONFIG
+AC_CONFIG_SUBDIRS(snprintfv)
 
 # ----------------------------------------------------------------------
 # If `configure' is invoked (in)directly via `make', ensure that it
@@ -50,7 +72,7 @@ AC_PROG_CC
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
-AC_PROG_YACC
+AG_PROG_BYACC
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 
 # ----------------------------------------------------------------------
@@ -127,7 +149,6 @@ AC_CHECK_SIZEOF(int, 4)
 # Checks for standard functions.
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend psignal pathfind)
-AC_FUNC_ALLOCA
 AG_FUNC_FOPEN_BINARY
 AG_FUNC_FOPEN_TEXT
 AG_FUNC_CTIME_HEAP
@@ -137,6 +158,10 @@ AG_VAR_SYS_SIGLIST
 # ----------------------------------------------------------------------
 # Generate the make files.
 # ----------------------------------------------------------------------
+test -f ./snprintfv/snprintfv/snprintfv.h \
+  && rm -f ./snprintfv/snprintfv.h \
+  && ln -s `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
+
 [COMPAT_SRC=`cd $srcdir/compat ; echo [a-z]*[!~]`]
 AC_SUBST(COMPAT_SRC)
 [M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`]

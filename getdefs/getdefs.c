@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.12 1999/03/17 16:55:21 bkorb Exp $
+ *  $Id: getdefs.c,v 2.14 1999/06/03 19:43:28 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -101,6 +101,7 @@ char*  pzAutogen = "autogen";
  */
 char*   pzDefPat = (char*)NULL;
 regex_t define_re;
+regex_t attrib_re;
 
 /*
  *  The NUL-terminated string containing the name of the template
@@ -217,7 +218,7 @@ main( int    argc,
             }
         } else if (WIFSIGNALED( status )) {
             status = WTERMSIG( status );
-            fprintf( stderr, "ERROR:  %s exited due to %s signal (%s)\n",
+            fprintf( stderr, "ERROR:  %s exited due to %d signal (%s)\n",
                      pzAutogen, status, strsignal( status ));
             return EXIT_FAILURE;
         } else {
@@ -1195,7 +1196,7 @@ buildDefinition(
             pzNextDef = pzDef = pzDef + match[1].rm_so;
             break;
 
-        case 1:
+        case REG_NOMATCH:
             /*
              *  No more attributes.
              */
@@ -1219,7 +1220,7 @@ buildDefinition(
             *pzOut++ = '\n';
             *pzOut++ = '#';
             sprintf( pzOut, zErr, re_res, zRER, zAttribRe, pzDef );
-            fputs( pzOut, stderr );
+            fprintf( stderr, "getdefs:  %s", zErr );
             return;
         }
         }

@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <regex.h>
+#include <streqv.h>
 
 #include "opts.h"
 
@@ -43,7 +44,5 @@ typedef int tSuccess;
 #define HADGLITCH( p )     ((p) >  SUCCESS)
 
 MODE char*    pzDefText VALUE( (char*)NULL );
-
-MODE regex_t  attrib_re;
 
 #endif /* GETDEFS_HEADER */

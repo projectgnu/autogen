@@ -17,31 +17,30 @@ AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 AG_PATCHLEVEL=".3"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
-# Library versioning for libopts
-#
-AG_INTERFACE_AGE=2
-AG_BINARY_AGE=3
-
 # Making releases:
 #   AG_PATCHLEVEL=""
 #   AG_MINOR_VERSION += 1 (OR AG_MINOR_VERSION = 0 && AG_MAJOR_VERSION += 1)
-#   AG_INTERFACE_AGE += 1
-#   AG_BINARY_AGE += 1
-# if any functions have been added, set AG_INTERFACE_AGE to 0.
-# if backwards compatibility has been broken,
-# set AG_BINARY_AGE and AG_INTERFACE_AGE to 0.
 #
+# If the autoopts sources have changed
+#   AO_REVISION += 1
+# if any autoopts API interfaces have been added, removed or changed
+#   AO_REVISION =0
+#   AO_CURRENT += 1
+# additionally, if API interfaces have been added
+#   AO_AGE += 1
+# or if any API interfaces have been removed
+#   AO_AGE = 0
 
-# libtool versioning
+# autoopts version
 #
-LT_LIBRARY=libopts.la
-LT_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
+AO_LIBRARY=libopts.la
+AO_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 
-LT_CURRENT=`expr $AG_MINOR_VERSION - $AG_INTERFACE_AGE`
-LT_AGE=`expr $AG_BINARY_AGE - $AG_INTERFACE_AGE`
-LT_REVISION=$AG_INTERFACE_AGE
+AO_CURRENT=4
+AO_REVISION=0
+AO_AGE=2
 
-MAINTAINER='Bruce Korb <korb@datadesign.com>'
+MAINTAINER='Bruce Korb <autogen@autogen.freeservers.com>'
 
 # For automake
 #
@@ -53,7 +52,7 @@ PACKAGE=autogen
 if [ -n "$srcdir" ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
+  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $AO_CURRENT`
   if [ $hdr -ne $lib ] ; then
     echo autoopts/options.h out of sync with version.
     echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
@@ -63,7 +62,7 @@ fi
 
 # Display version numbers banner for my sanity!
 #
-soname=$LT_LIBRARY.`expr $LT_CURRENT - $LT_AGE`.$LT_AGE.$LT_REVISION
+soname=$AO_LIBRARY.`expr $AO_CURRENT - $AO_AGE`.$AO_AGE.$AO_REVISION
 spaces="                                        "
 while :
 do
@@ -79,9 +78,6 @@ cat << _EOF_
 
 
                  A      U      T      O      G      E      N
-_EOF_
-
-cat << _EOF_
 
 $string
 ------------------------------------------------------------------------------

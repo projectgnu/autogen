@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.3 1998/10/21 14:28:09 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.4 1999/06/03 19:43:28 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -228,12 +228,12 @@ struct specOptIndex {
 };
 
 /*
- *  Be sure to change this value every time a change is made
- *  that changes the interface.  This way, the "optionProcess()"
- *  routine may exit with an informative message instead of,
- *  for example, page faulting.
+ *  Be sure to change this value every time a change is made that
+ *  changes the interface structure or the meanings of any of its
+ *  fields.  This way, the "optionProcess()" routine may exit with an
+ *  informative message instead of, for example, page faulting.
  */
-#define OPTIONS_STRUCT_VERSION 16387
+#define  OPTIONS_STRUCT_VERSION  16388
 
 struct options {
     const int         structVersion;
@@ -262,6 +262,12 @@ struct options {
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+/*
+ * Return the full version string compiled into the library.
+ */
+const char	*optionVersion( void );
+
 /*
  *  optionProcess scans the argument flags completely.
  *  The return value is the argument index of the first argument

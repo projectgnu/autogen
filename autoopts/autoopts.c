@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.5 1998/11/25 21:19:30 bkorb Exp $
+ *  $Id: autoopts.c,v 2.6 1999/06/03 19:43:28 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.5 1998/11/25 21:19:30 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.6 1999/06/03 19:43:28 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -1045,6 +1045,20 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
     }
 
     return pRes;  /* SUCCESSFUL RETURN */
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Return the compiled version number.
+ */
+    const char*
+optionVersion( void )
+{
+    static const char zVersion[] = STR( AO_CURRENT ) ":"
+                                   STR( AO_REVISION ) ":"
+                                   STR( AO_AGE );
+    return zVersion;
 }
 
 
