@@ -1,5 +1,11 @@
+New in 4.5.8
+* Finally, finally, finally, really finished the portability issues.
+
+New in 4.5.7
+* Finally, finally, really finished the portability issues.
+
 New in 4.5.6
-* Finally, really, finished the portability issues and it now
+* Finally, really finished the portability issues and it now
   included a complete implementation of the printf family of
   formatting routines.
 * Templates for client program man pages and invoking chapters

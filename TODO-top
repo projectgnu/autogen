@@ -14,7 +14,8 @@
 
 *** Need to replace use of sprintf w/ snprintf throughout!
 *** ANSI format specifiers: ceEfgG with conversion quals h and l
-*** rewrite in guile (instead of C)
+*** rewrite expressions to use Guile (instead of the reverse
+    polish stuff originally hacked together :)
 
 * Pending
 
