@@ -1,6 +1,12 @@
 
 autogen definitions fsm;
 
+/*
+ *  This FSM is used to process input CGI data into AutoGen definitions
+ *  output.  There are three basic states:  initial, name processing
+ *  and processing a value.
+ */
+
 method = case;
 type   = loop;
 cookie = "const char* pzSrc";
