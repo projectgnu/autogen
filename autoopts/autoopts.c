@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.15 2000/08/28 19:15:49 bkorb Exp $
+ *  $Id: autoopts.c,v 2.16 2000/08/28 20:42:12 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -555,13 +555,13 @@ doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 valid_path( char*       pzBuf,  size_t      bufSize,
             const char* pzName, const char* pzProgPath )
 {
-    char* pzDir;
-    char* pzEnv;
-
     /*
      *  IF not an environment variable, just copy the data
      */
     if (*pzName != '$') {
+        if (bufSize <= strlen( pzName ))
+            return AG_FALSE;
+
         strcpy( pzBuf, pzName );
         return AG_TRUE;
     }
@@ -570,7 +570,6 @@ valid_path( char*       pzBuf,  size_t      bufSize,
         char*  pzPath = pathfind( getenv( (const char*)"PATH" ),
                                   pzProgPath, (const char*)"x" );
         char* pz;
-        struct stat stbf;
 
         if (pzPath == (char*)NULL)
             return AG_FALSE;
@@ -599,42 +598,46 @@ valid_path( char*       pzBuf,  size_t      bufSize,
          *  Concatenate the rc file name to the end of the executable path and
          *  see if we can find that file and process it.
          */
-        sprintf( pzBuf, "%s/%s", pzPath, pzName );
-        if (stat( pzBuf, &stbf ) != 0)
-            return AG_FALSE;
-        return AG_TRUE;
+        snprintf( pzBuf, bufSize, "%s/%s", pzPath, pzName );
     }
 
     /*
      *  See if the env variable is followed by specified directories
      *  (We will not accept any more env variables.)
      */
-    pzDir = strchr( pzPath+1, DIR_SEP_CHAR );
+    else {
+        char* pzDir = strchr( pzName+1, DIR_SEP_CHAR );
 
-    if (pzDir != (char*)NULL)
-        *pzDir = NUL;
+        if (pzDir != (char*)NULL)
+            *pzDir = NUL;
 
-    pzEnv = getenv( pzPath+1 );
+        {
+            char* pzEnv = getenv( pzName+1 );
 
-    /*
-     *  Environment value not found -- skip the home list entry
-     */
-    if (pzEnv == (char*)NULL)
-        return AG_FALSE;
+            /*
+             *  Environment value not found -- skip the home list entry
+             */
+            if (pzEnv == (char*)NULL)
+                return AG_FALSE;
 
-    strcpy( zFileName, pzEnv );
+            strcpy( pzBuf, pzEnv );
+        }
 
-    /*
-     *  IF we found a directory that followed the env variable,
-     *  THEN tack it onto the value we found
-     */
-    if (pzDir != (char*)NULL) {
-        pzEnv = zFileName + strlen( zFileName );
-        if (pzEnv[-1] != DIR_SEP_CHAR)
-            *(pzEnv++) = DIR_SEP_CHAR;
-        strcpy( pzEnv, pzDir+1 );
-        *pzDir = DIR_SEP_CHAR;
+        /*
+         *  IF we found a directory that followed the env variable,
+         *  THEN tack it onto the value we found
+         */
+        if (pzDir != (char*)NULL) {
+	    pzBuf += strlen( pzBuf );
+
+            if (pzBuf[-1] != DIR_SEP_CHAR)
+                *(pzBuf++) = DIR_SEP_CHAR;
+            strcpy( pzBuf, pzDir+1 );
+            *pzDir = DIR_SEP_CHAR;
+        }
     }
+
+    return AG_TRUE;
 }
 
 
