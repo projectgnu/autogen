@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 2003/11/23 19:16:36 $
- *            by:    Bruce Korb <bkorb@gnu.org>
+ * Last Modified:    $Date: 2004/10/24 19:27:00 $
+ *            by: bkorb
  *
- * $Id: pathfind.c,v 3.1 2003/11/23 19:16:36 bkorb Exp $
+ * $Id: pathfind.c,v 3.2 2004/10/24 19:27:00 bkorb Exp $
  */
 
 /* Code: */
@@ -39,7 +39,7 @@ STATIC char* extract_colon_unit( char* dir, const char *string, int *p_index );
  *          k         sticky bit    (NOT IMPLEMENTED)
  *          s         size nonzero    (NOT IMPLEMENTED)
  */
-     char*
+char*
 pathfind( const char*  path,
           const char*  fileName,
           const char*  mode )

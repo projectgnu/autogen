@@ -2,6 +2,10 @@
 New in 5.6.4 - October, 2004
 * fixed autoopts/test/enums.test - real newline characters are not
   allowed in portable string constants -- it was a typo.
+* fixed some bootstrapping for Solaris -- /bin/sh thinks '^' is a '|'.
+* The '$$' expansion in locating the program will now use "realpath(3C)".
+  This way, if a program is installed in /opt/whatever/bin/program
+  and you run it via a symlink, '$$' will resolve to /opt/whatever/bin.
 
 New in 5.6.3 - October, 2004
 General:

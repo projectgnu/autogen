@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 3.4 2004/10/02 21:40:56 bkorb Exp $
+ *  $Id: load.c,v 3.5 2004/10/24 19:27:00 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -75,14 +75,16 @@ loadOptionLine(
  * doc:
  *  This routine does environment variable expansion if the first character
  *  is a ``$''.  If it starts with two dollar characters, then the path
- *  is relative to the location of the executable.
+ *  is relative to the location of the executable.  The path returned will
+ *  be the "realpath(3C)" of the object (provided this function exists on
+ *  the build platform).
 =*/
 ag_bool
 optionMakePath(
-    char*    pzBuf,
-    int      bufSize,
-    tCC*     pzName,
-    tCC*     pzProgPath )
+    char*   pzBuf,
+    int     bufSize,
+    tCC*    pzName,
+    tCC*    pzProgPath )
 {
     if (bufSize <= strlen( pzName ))
         return AG_FALSE;
@@ -101,8 +103,9 @@ optionMakePath(
      *  with the path to the executable and append a "/" character.
      */
     if (pzName[1] == '$') {
-        tCC*  pzPath;
-        tCC*  pz;
+        tCC*    pzPath;
+        tCC*    pz;
+
 
         switch (pzName[2]) {
         case '/':
@@ -157,6 +160,13 @@ optionMakePath(
 
         memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
         strcpy( pzBuf + (pz - pzPath) + 1, pzName );
+
+        /*
+         *  If the "pzPath" path was gotten from "pathfind()", then it was
+         *  allocated and we need to deallocate it.
+         */
+        if (pzPath != pzProgPath)
+             free( pzPath );
     }
 
     /*
@@ -191,6 +201,17 @@ optionMakePath(
 
         sprintf( pzBuf, "%s%s", pzDir, pzName );
     }
+
+#ifdef HAVE_REALPATH
+    {
+        char z[ PATH_MAX+1 ];
+
+        if (realpath( pzBuf, z ) == NULL)
+            return AG_FALSE;
+
+        strcpy( pzBuf, z );
+    }
+#endif
 
     return AG_TRUE;
 }

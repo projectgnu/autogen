@@ -1,10 +1,11 @@
-2004-10-23  Bruce Korb  <bkorb@gnu.org>
+2004-10-24  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.4 Released
 
-2004-10-23  Bruce Korb  <bkorb@gnu.org>
+2004-10-24  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/enums.test: fix a typo
+	* autoopts/load.c(optionMakePath): Use realpath(3C) to locate files.
 
 2004-10-18  Bruce Korb  <bkorb@gnu.org>
 
