@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.15 2000/03/05 00:27:44 bruce Exp $
+ *   $Id: opts.def,v 1.16 2000/03/11 21:37:09 bruce Exp $
  */
 
 /*
@@ -145,6 +145,7 @@ flag = {
     flag_arg  = ":";
     arg_name  = file;
     descrip   = "Scheme code file to load";
+    settable;
     doc =
     "Use this argument to preload Scheme scripts into the Guile\n"
     "interpreter before template processing begins.\n"
@@ -153,7 +154,8 @@ flag = {
     "in lambda functions you define, they may not be invoked until after\n"
     "option processing is complete.\n";
 
-    flag_code = '    char zPath[ MAXPATHLEN ];
+    flag_code = '    int saveState = procState;
+    char zPath[ MAXPATHLEN ];
     char* pz;
     if (! SUCCESSFUL( findFile( pOptDesc->pzLastArg, zPath ))) {
         fprintf( stderr, "Cannot locate scheme file `%s\'\n",
@@ -165,7 +167,7 @@ flag = {
     procState = PROC_STATE_GUILE_PRELOAD;
     gh_eval_str( pz );
     free( pz );
-    procState = PROC_STATE_OPTIONS;';
+    procState = saveState;';
 };
 
 flag = {
