@@ -1,56 +1,36 @@
+
 New in 5.6.4 - October, 2004
+* fixed autoopts/test/enums.test - real newline characters are not
+  allowed in portable string constants -- it was a typo.
+
+New in 5.6.3 - October, 2004
 General:
 * various cleanups for -Wall and Cygwin builds
-
-AutoGen:
-* -Wall warning cleanups
-* exist and not-exist selection macros -- the CASE macro can now
-  select a clause based on value existence.  Previously, you could detect
-  an empty string and you then had to use the ``(exist? "name")'' function.
 
 AutoOpts:
 * The listing of enumerated option arguments is a bit more concise.
 * Options may be handled twice: once during the immediate phase and
   again during the "normal" processing phase.
 * If environment variable "rc" processing is enabled, then the
-  "${PROGNAME}" environment variable will be processed tokenizing it
+  "${PROGNAME}" environment variable will be processed - tokenizing it
   and processing it as a list of command line options.  It may not
   contain any command line operands.
-* New case SELECT macros:  !E (CASE value does not exist) and, more for
-  symmetry than usefulness, +E (CASE value does exist).  Now, they can
-  distinguish between a non-existent value and the empty string value.
 * a new main procedure type:  each-or-stdin  This will fopen() each
   command line operand and pass the FILE* pointer to the callout procedure.
   If there are no operands, then stdin is passed.
+* main() procedures can be specified more consistently
 
-getdefs:
-* With "listed" attributes, if you quote an entry, then the scanning code
-  has to push the scan forward to the next entry so we don't wind up with
-  a spurious empty entry!!
-
-New in 5.6.3 - July, 2004
 AutoGen:
+* -Wall warning cleanups
+* exist and not-exist selection macros -- the CASE macro can now
+  select a clause based on value existence.  Previously, you could detect
+  an empty string and you then had to use the ``(exist? "name")'' function.
 * fixed tpl-file-line so that "%2$d" works for the format.
 * Added (emit) function that directly emits its args into output
 * keyword lists are columnized in usage text
 * distributed subdirectories no longer depend on also being built.
 
-AutoOpts:
-* main() procedures can be specified more consistently
-
-New in 5.6 - February, 2004
-* AutoFSM was enhanced with the notion of a "noop" transition handling
-* fmemopen() is now used (when possible) for anonymous output (diversions)
-* The Guile function (chdir "...") is now wrapped so AutoGen can adapt
-* the definitions parser now uses a FSM parser instead of YACC
-* AutoOpt-ed programs can now have internationalized usage text
-* Templates have been added for using getopt(3) or getopt_long(3GNU)
-  to parse options (in lieu of libopts).
-
-New in 5.5.5 - May, 2003
-* better docs on partitioned ini (rc) files
-
-New in 5.5.3 - March, 2003
-* AutoOpts' usage procedure has been enhanced to produce either AutoOpts
-  standard usage or usage that looks more like current GNU practices.
-  The latter provides less information and help.
+getdefs (an AutoGen support utility):
+* With "listed" attributes, if you quote an entry, then the scanning code
+  has to push the scan forward to the next entry so we don't wind up with
+  a spurious empty entry!!

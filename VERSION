@@ -7,13 +7,13 @@
 # Time-stamp:        "2004-10-13 21:23:28 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2004/10/18 19:37:48 $
+# Last Committed:    $Date: 2004/10/24 03:59:01 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=6
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".3"
+AG_PATCHLEVEL=".4"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

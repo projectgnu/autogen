@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2004-10-02 11:49:17 bkorb"
+# Time-stamp:        "2004-10-23 20:24:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: enums.test,v 3.1 2004/10/02 21:40:57 bkorb Exp $
+# $Id: enums.test,v 3.2 2004/10/24 03:59:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -90,33 +90,37 @@ flag = {
    arg-name = id;
    max      = NOLIMIT;
 
-   flag-code =
-	"    /*\n"
-	"     *  'set' and 'unset' must be acted upon immediately 'cuz we may\n"
-	"     *  get more of them.\n"
-	"     */\n"
-	"    switch (WHICH_IDX_PRINT) {\n"
-	"    case NO_EQUIVALENT:\n"
-	"        /* FALLTHROUGH */\n"
-	"    case INDEX_OPT_PRINT:\n"
-	"        /* FALLTHROUGH */\n"
-	"    case INDEX_OPT_DUMP_LOG:\n"
-	"        /* FALLTHROUGH */\n"
-	"    case INDEX_OPT_ALL_DUMP:\n"
-	"        if (COUNT_OPT( MSG_NUM ) > 1) {\n"
-	"            fputs( \"Except for 'set' and 'unset' functions, only \"\n"
-	"                   \"one 'msg-num' is is allowed\\n\", stderr );\n"
-	"            USAGE( EXIT_FAILURE );\n"
-	"        }\n"
-	"        break;\n"
-	"    case INDEX_OPT_SET:\n"
-	"        set_options( 1, pOptDesc->pzLastArg );\n"
-	"        break;\n"
-	"    case INDEX_OPT_UNSET:\n"
-	"        set_options( 0, pOptDesc->pzLastArg );\n"
-	"        break;\n"
-	"    }\n";
+   flag-code = <<- _EndOfFlagCode_
+	    /*
+	     *  'set' and 'unset' must be acted upon immediately -- we may
+	     *  get more of them.
+	     */
+	    switch (WHICH_IDX_PRINT) {
+	    case NO_EQUIVALENT:
+	        /* FALLTHROUGH */
+	    case INDEX_OPT_PRINT:
+	        /* FALLTHROUGH */
+	    case INDEX_OPT_DUMP_LOG:
+	        /* FALLTHROUGH */
+	    case INDEX_OPT_ALL_DUMP:
+	        if (COUNT_OPT( MSG_NUM ) > 1) {
+	            fputs( "Except for 'set' and 'unset' functions, only "
+	                   "one 'msg-num' is allowed\n", stderr );
+	            USAGE( EXIT_FAILURE );
+	        }
+	        break;
+	    case INDEX_OPT_SET:
+	        set_options( 1, pOptDesc->pzLastArg );
+	        break;
+	    case INDEX_OPT_UNSET:
+	        set_options( 0, pOptDesc->pzLastArg );
+	        break;
+	    };
+	_EndOfFlagCode_;
 };
+/*
+cat <<_EOF_
+ * for emacs */
 
 export = "#include <sys/types.h>\n"
 	 "#include <sys/stat.h>\n"
