@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.28 1999/10/31 16:25:44 bruce Exp $
+dnl Code: $Id: configure.in,v 2.29 1999/11/03 05:57:30 bruce Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.28 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.29 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -163,14 +163,12 @@ test -f ./snprintfv/snprintfv/snprintfv.h \
 AC_SUBST(M4_SRC)
 [AGFUN_LIST=`cd $srcdir/agen5 ; echo func*.c`]
 AC_SUBST(AGFUN_LIST)
-[TEST_LIST=`cd $srcdir/tests ; echo [a-z]*.test`]
-AC_SUBST(TEST_LIST)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile doc/Makefile compat/Makefile \
-autoopts/Makefile autoopts/autoopts-config agen5/Makefile tests/Makefile \
+autoopts/Makefile autoopts/autoopts-config agen5/Makefile agen5/test/Makefile \
 config/Makefile getdefs/Makefile getdefs/test/Makefile columns/Makefile,
  [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
 
