@@ -1,4 +1,13 @@
-2003-12-20  Bruce Korb  <bkorb@gnu.org>
+2003-12-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/getopt.tpl: new file.  Implements using getopt_long() as
+	the command line parser for AutoOpts-described options.
+	* autoopts/Makefile.am(pkgdata_DATA): add getopt.tpl
+	* autoopts/sort.c(optionSort): Disable if the environment variable
+	"POSIXLY_CORRECT" is set.
+	* doc/autogen.texi: update the docs for this stuff.
+
+2003-12-27  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expOutput.c(ag_scm_out_name): constness warning
 	* compat/compat.h(__USE_GNU): define before including string.h

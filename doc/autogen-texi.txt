@@ -1829,6 +1829,7 @@ commercial programs.
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
+* getopt_long::         Using getopt_long(3GNU)
 @end menu
 
 @node Features
@@ -2485,12 +2486,13 @@ will conflict with the @code{usage} attribute.
 
 @cindex reorder-args
 @item reorder-args
-Some applications traditionally require that the command operands be intermixed
-with the command options.  In order to handle that, the arguments must be
-reordered.  If you are writing such an application, specify this global option.
-All of the options (and any associated option arguments) will be brought to
-the beginning of the argument list.  New applications should not use this
-feature, if at all possible.
+Some applications traditionally require that the command operands be
+intermixed with the command options.  In order to handle that, the arguments
+must be reordered.  If you are writing such an application, specify this
+global option.  All of the options (and any associated option arguments)
+will be brought to the beginning of the argument list.  New applications
+should not use this feature, if at all possible.  This feature is
+@i{disabled} if @code{POSIXLY_CORRECT} is defined in the environment.
 @end table
 
 @node option attributes
@@ -4202,6 +4204,55 @@ Note the @code{subblock} and @code{library} comments.
 option (@pxref{getdefs subblock}) that tells it how to parse the
 @code{arg} attribute.  The @code{library} and @code{header} entries
 are global definitions that apply to all the documented functions.
+
+@node getopt_long
+@section Using getopt_long(3GNU)
+@cindex getopt_long
+
+There is now a template named, ``@code{getopt.tpl}'' that is distributed
+with autoopts.  With it, you will have another source file generated for
+you that will utilize the GNU @code{getopt_long(3GNU)} function for parsing
+the command line arguments.  It will save you from being dependent upon
+the @code{libopts} library, but it also carries with it some limitations
+on the use of AutoOpts features:
+
+@enumerate
+@item
+You cannot automatically take advantage of environment variable options or
+rc (ini) files.
+@item
+You cannot use set membership, enumerated or range checked options.
+These all depend upon the @code{libopts} library.
+@item
+You must specify every option as ``settable'' because the emitted code
+depends upon the @code{SET_OPT_XXX} macros having been defined.
+@item
+``test-main'' must be specified.  The @file{getopt.tpl} template depends
+upon being able to compile the traditional .c file into a program and
+get it to emit the usage text.
+@item
+For the same reason, the traditional option parsing table code must be
+emitted @b{before} the @file{getopt.tpl} template gets expanded.
+@item
+The usage text is, therefore, statically defined.
+@item
+The code is green.  I am sure that more can be done and that there are
+some glitches to be ironed out.  Likely all simple stuff, but as I do not
+use it for my own work, it likely isn't exercised as much as the rest...
+@end enumerate
+
+@noindent
+To use this, simply invoke autogen twice, as in:
+
+@example
+autogen myprog-opts.def
+autogen -T getopt.tpl myprog-opts.def
+@end example
+
+@noindent
+and you will have three new files: @file{myprog-opts.h}, @file{myprog-opts.c},
+and @file{getopt-progname.c}, where ``progname'' is the name specified with
+the @code{prog-name}.
 
 @page
 @node Add-Ons

@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.5 2003/12/27 15:06:40 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.6 2003/12/30 05:09:59 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -193,6 +193,14 @@ optionSort( tOptions* pOpts )
     int    opdsIdx = 0;
 
     tOptState os = { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL };
+
+    /*
+     *  Disable for POSIX conformance
+     */
+    if (getenv( "POSIXLY_CORRECT" ) != NULL) {
+        errno = 0;
+        return;
+    }
 
     errno = ENOENT;
 

@@ -9,7 +9,7 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.23 2003/12/27 15:06:40 bkorb Exp $
+## $Id: Makefile.am,v 3.24 2003/12/30 05:09:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,7 +26,7 @@ libsrc   = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 nodist_pkgdata_DATA	= $(libsrc)
 pkgdata_DATA	= stdoptions.def autoopts.m4 \
-    aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
+    getopt.tpl aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
     options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 
 HDRS        = autoopts.h options.h  streqv.h
