@@ -7,17 +7,17 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2001/06/06 04:19:57 $
+## Last Modified:   $Date: 2001/06/17 01:51:14 $
 ##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.30 2001/06/06 04:19:57 uid24370 Exp $
+## $Id: Makefile.am,v 1.31 2001/06/17 01:51:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
-INCLUDES = -I. -I$(srcdir) $(GUILE_INC) \
+INCLUDES = -I. -I$(srcdir) \
 	-I$(top_builddir)/autoopts -I$(top_srcdir)/autoopts \
 	-I$(top_builddir)/snprintfv -I$(top_srcdir)/snprintfv \
-	-I$(top_builddir) -I$(top_srcdir)
+	-I$(top_builddir) -I$(top_srcdir) $(GUILE_INC)
 
 BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS         = $(top_builddir)/getdefs/getdefs

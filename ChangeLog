@@ -1,3 +1,10 @@
+2001-06-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+        * agen5/Makefile.am (INCLUDES): Move guile's includes after
+        autogen's local includes so that local files are found
+        before those that may have been installed in the same 
+        directory as guile.
+
 2001-06-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fsm.tpl: reworked
