@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.4 2000/03/11 01:49:29 bruce Exp $
+ *  $Id: defDirect.c,v 1.5 2000/03/11 11:17:10 bruce Exp $
  *  This module processes definition file directives.
  */
 
@@ -402,6 +402,20 @@ doDir_define( char* pzArg, char* pzScan )
 
     SET_OPT_DEFINE( pzName );
     return pzScan;
+}
+
+
+/*=directive elif
+ *
+ *  text:
+ *  This must follow an @code{#if}.
+ *  It should never be called.
+=*/
+    STATIC char*
+doDir_elif( char* pzArg, char* pzScan )
+{
+    fputs( "`#elif' directive encountered out of context\n", stderr );
+    AG_ABEND;
 }
 
 
