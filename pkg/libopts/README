@@ -14,16 +14,17 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 
       rm -rf libopts libopts-*
       gunzip -c `autoopts-config libsrc` | tar -xvf -
-      cp -fp libopts-*.*.*/libopts.m4 config/.
+      mv -f libopts-*.*.* libopts
+      cp -fp libopts/libopts.m4 config/.
 
 2. Add the following to your ``configure.ac'' file:
 
       AUTOOPTS_CHECK
-      AC_CONFIG_FILE( [libopts/Makefile] )
+      AC_OUTPUT( [libopts/Makefile] <...> )
 
 3. Add the following to your top level ``Makefile.am'' file:
 
-      include libopts/Makefile.inc
+      include $(srcdir)/libopts/MakeDefs.inc
       SUBDIRS = <...> $(LIBOPTS_DIR) <...>
 
    where ``<...>'' can be whatever other directories you may
@@ -45,6 +46,7 @@ Usage Instructions for autoconf/automake/libtoolized projects:
    If you are creating man pages and texi documentation from
    the program options, you will need these rules somewhere, too:
 
+     man_MANS = prog.1
      prog.1 : prog-opts.def
          autogen -Tagman1.tpl -bprog prog-opts.def
 
