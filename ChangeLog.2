@@ -1,4 +1,94 @@
+1998-12-01  Bruce Korb  <korb@datadesign.com>
+
+	* src/agGetDef.c (findDefEntry): split the routine
+	and enabled qualified definition names.
+
+	* columns/opts.def: Disambiguated two flags
+
+	* getdefs/opts.def: Removed the group membership option.
+	This is now done as a qualification to the type name
+
+	* getdefs/getdefs.c: Removed references to the above.
+	Instead, if the type name (the text following the "/*=")
+	is qualified as in "type.group", then "member = group;"
+	is added to the output definition.
+	Also improved line number reporting.
+
+1998-11-24  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/fopenbinary.m4: New file.
+	Define macros AG_FUNC_FOPEN_BINARY, and AG_FUNC_OPEN_BINARY
+	(the latter is not used {yet}).
+	* configure.in: use the AG_FUNC_FOPEN_BINARY macro.
+	* config/acconfig.h: add USE_FOPEN_BINARY define.
+	* compat/compat.h (FOPEN_BINARY_FLAG): define this to "b" or
+	"" depending on USE_FOPEN_BINARY value.
+	* autoopts/autoopts.h:  ditto.
+	* getdefs/getdefs.c: ditto.
+	* src/agTempl.c (loadTemplText, openOutFile): fopen with
+	FOPEN_BINARY_FLAG.
+	* src/agShell.c (openServerFP): ditto.
+	* src/agGetDef.c (readDefines): ditto.
+	* src/agFunOut.c (mFunc_Output): ditto.
+	* src/agDirect.c (doDir_include): ditto.
+	* getdefs/getdefs.c (main, startAutogen, loadFile): ditto.
+	* columns/opts.def (flag): ditto.
+	* autoopts/save.c (optionSave): ditto.
+	* autoopts/pgusage.c (doPagedUsage): ditto.
+	* autoopts/makeshell.c (textToVariable, loadTrailer): ditto.
+	* autoopts/autoopts.c (filePreset): ditto.
+	
+	* autoopts/Makefile.am (EXTRA_DIST): Added autoopts-config.in.
+	
+1998-11-22 Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* tests/optgen.test, tests/opthelp.test: reenabled these tests.
+	In order for them to work as expected, we must be careful to
+	rebuild the src/opts.[ch] files before making the autogen
+	executable!!
+
+1998-11-17  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* configure.in (AG_CHECK_LIB_REGEX): Use the new macro in place of
+	inlined code.
+	* config/libregex.m4: Move the configure checks for libregex
+	options out of configure.in into this new file.
+
+	* autoopts/autoopts.texi: Typo, descrbes->describe.
+
+1998-11-16  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* VERSION: $1 references arguments to the script which
+	sources (as opposed to executes) VERSION (configure in this case).
+	Changed to $srcdir.
+	* configure.in:  Removed attempt to pass positional parameters to
+	a sourced script.
+	
+	* config/bootstrap: changed >&- redirections to >/dev/null for
+	compatibility with ash (/bin/sh on debian and cygwin).
+	
+	* autoopts/Makefile.am: install autoopts-config.
+	* autoopts/autoopts-config.in: new file.  A shell script
+	which configure substitutes so that when installed it can
+	be used to reveal compile and link details to another
+	program which wants to use autoopts.
+	* config/Makefile.am: install auptoopts.m4.
+	* config/autoopts.m4: new file.  Can be included into
+	another project's aclocal.m4 file to extract the necessary
+	configury from a matching installed autoopts-config.
+	Removed redefinition of datadir (which automake sets anyway).
+
+1998-11-15  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* autoopts/opt*.tpl: Make sure all instances of `prog_name'
+	seen by the C compiler have had invalid identifier characters
+	replaced by `_'.
+	* autoopts/autoopts.texi (program attributes): Change docs to
+	reflect that illegal C identifiers for `prog_name' will be
+	massaged.
+
 1998-10-30  Bruce Korb <korbb@datadesign.com>
+
 	* MakeRules.in
 	`test x$i(srcdir)' *had* to be a mistype of `test x$(srcdir)'!!
 	* autoopts/pgusage.c

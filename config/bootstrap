@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Fri Sep 11 07:24:22 1998
-#            by:     Bruce Korb <bkorb@ellen>
+# Last Modified:     Tue Nov 24 08:57:45 1998
+#            by:     Bruce Korb <korb@datadesign.com>
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.3 1998/09/14 14:33:59 bkorb Exp $
+# $Id: bootstrap,v 1.4 1998/12/08 18:34:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -58,7 +58,7 @@ missing()
 }
 
 # We must be using autoconf (or we wouldn't need this script!).
-$AUTOCONF --version >&- 2>&-
+$AUTOCONF --version >/dev/null 2>&1
 if test $? -ne 0; then
 	missing $AUTOCONF ftp://ftp.gnu.org/pub/gnu/autoconf-2.12.tar.gz
 
@@ -68,19 +68,19 @@ if test $? -ne 0; then
 fi
 
 # If autoconf failed we don't bother testing for autoheader.
-$AUTOHEADER --version >&- 2>&-
+$AUTOHEADER --version >/dev/null 2>&1
 if test $? -ne 0; then
 	missing $AUTOHEADER ftp://ftp.gnu.org/pub/gnu/autoconf-2.12.tar.gz
 fi
 
 # Check for the presence of libtool.
-$LIBTOOLIZE --version >&- 2>&-
+$LIBTOOLIZE --version >/dev/null 2>&1
 if test $? -ne 0; then
 	missing $LIBTOOLIZE ftp://ftp.gnu.org/pub/gnu/libtool-1.2.tar.gz
 fi
 
 # Check for the presence of automake.
-$AUTOMAKE --version >&- 2>&-
+$AUTOMAKE --version >/dev/null 2>&1
 if test $? -ne 0; then
 	missing $AUTOMAKE ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz
 
@@ -90,7 +90,7 @@ if test $? -ne 0; then
 fi
 
 # If automake failed we don't bother testing for aclocal.
-$ACLOCAL --version >&- 2>&-
+$ACLOCAL --version >/dev/null 2>&1
 if test $? -ne 0; then
 	missing $ACLOCAL ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz
 fi
@@ -141,10 +141,10 @@ do
         $AUTOMAKE      --add-missing
         echo $AUTOMAKE      --gnu
         $AUTOMAKE      --gnu
-        echo $AUTOHEADER    -l $auxdir
-        $AUTOHEADER    -l $auxdir
         echo $AUTOCONF
         $AUTOCONF
+        echo $AUTOHEADER    -l $auxdir
+        $AUTOHEADER    -l $auxdir
     )
 done
 

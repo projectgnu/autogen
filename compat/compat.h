@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
- * Last Modified:    $Date: 1998/09/22 22:17:18 $
- *            by:    Bruce Korb <korbb@datadesign.com>
+ * Last Modified:     Tue Nov 24 08:15:35 1998
+ *            by:     Bruce Korb <korb@datadesign.com>
  *
- * $Id: compat.h,v 2.0 1998/09/22 22:17:18 bkorb Exp $
+ * $Id: compat.h,v 2.1 1998/12/08 18:34:33 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -82,6 +82,14 @@
 
 #include <stdio.h>
 #include <ctype.h>
+
+#ifndef FOPEN_BINARY_FLAG
+#  ifdef USE_FOPEN_BINARY
+#    define FOPEN_BINARY_FLAG	"b"
+#  else
+#    define FOPEN_BINARY_FLAG
+#  endif
+#endif
 
 #ifdef HAVE_LIMITS_H
 #  include <limits.h>

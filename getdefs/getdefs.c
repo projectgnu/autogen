@@ -1,13 +1,13 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.9 1998/11/16 23:02:02 bkorb Exp $
+ *  $Id: getdefs.c,v 2.10 1998/12/08 18:34:46 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
  * Author:            Bruce Korb <korbb@datadesign.com>
  * Maintainer:        Bruce Korb <korbb@datadesign.com>
  * Created:           Mon Jun 30 15:35:12 1997
- * Last Modified:     Wed Sep 23 12:12:19 1998
+ * Last Modified:     Wed Nov 25 13:18:08 1998
  *            by:     Bruce Korb <korb@datadesign.com>
  *
  */
@@ -28,6 +28,14 @@
 #  include <compat/strsignal.c>
 #endif
 
+#ifndef FOPEN_BINARY_FLAG
+#  ifdef USE_FOPEN_BINARY
+#    define FOPEN_BINARY_FLAG   "b"
+#  else
+#    define FOPEN_BINARY_FLAG
+#  endif
+#endif
+
 #define MAXNAMELEN 256
 #ifndef MAXPATHLEN
 #  define MAXPATHLEN 4096
@@ -42,8 +50,11 @@ static const char zMallocErr[] =
 static const char zAttribRe[] =
     "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_]*):";
 
-static const char zNameTag[] =
-    " = {\n    name = '";
+static const char zNameTag[] = " = {\n"
+    "    name    = '";
+
+static const char zMemberLine[] =
+    "    member  = ";
 
 static const char zNoData[] =
     "error no data for definition in file %s line %d\n";
@@ -182,7 +193,7 @@ main( int    argc,
      *  THEN append the new entries to the file.
      */
     if ((pzIndexText != (char*)NULL) && (pzEndIndex != pzIndexEOF)) {
-        FILE* fp = fopen( OPT_ARG( ORDERING ), "a" );
+        FILE* fp = fopen( OPT_ARG( ORDERING ), "a" FOPEN_BINARY_FLAG );
         fputs( pzIndexEOF, fp );
         fclose( fp );
     }
@@ -219,14 +230,13 @@ validateOptions( void )
      *  Our default pattern is to accept all names following
      *  the '/' '*' '=' character sequence
      */
-    if (! HAVE_OPT( DEFS_TO_GET )) {
-        pzDefPat = "/\\*=([a-z][a-z]*) ";
+    if ((! HAVE_OPT( DEFS_TO_GET )) || (*OPT_ARG( DEFS_TO_GET ) == NUL)) {
+        pzDefPat = "/\\*=([a-z][a-z0-9.]*)[ \t][ \t]*[a-z]";
 
     } else {
         char*  pz  = OPT_ARG( DEFS_TO_GET );
         size_t len = strlen( pz ) + 16;
-        if (len < 16)
-            len = 16;
+
         pzDefPat = (char*)malloc( len );
         if (pzDefPat == (char*)NULL) {
             fprintf( stderr, zMallocErr, len, "definition pattern" );
@@ -237,7 +247,7 @@ validateOptions( void )
          *  IF a pattern has been supplied, enclose it with
          *  the '/' '*' '=' part of the pattern.
          */
-        sprintf( pzDefPat, "/\\*=(%s) ", pz );
+        sprintf( pzDefPat, "/\\*=(%s)", pz );
     }
 
     /*
@@ -1039,6 +1049,8 @@ buildPreamble(
     char* pzDefText = zDefText;
     char  zNameText[ MAXNAMELEN ];
     char* pzNameText = zNameText;
+    char* pzMembership;
+
     char* pzIfText   = (char*)NULL;
     tSCC zLineId[]   = "\n#line %d \"%s\"\n";
 
@@ -1046,7 +1058,7 @@ buildPreamble(
      *  Copy out the name of the entry type
      */
     *pzDefText++ = '`';
-    while (isalnum( *pzDef ) || (*pzDef == '_'))
+    while (isalnum( *pzDef ) || (*pzDef == '_') || (*pzDef == '.'))
         *pzDefText++ = *pzDef++;
     *pzDefText = NUL;
 
@@ -1093,8 +1105,14 @@ buildPreamble(
     pzOut += sprintf( pzOut, zLineId, line, pzFile );
     if (pzIfText != (char*)NULL)
         pzOut += sprintf( pzOut, "#%s\n", pzIfText );
-    strcpy( pzOut, zDefText+1 );
-    pzOut += strlen( pzOut );
+    {
+        char*  pz = zDefText+1;
+        while (isalnum( *pz ) || (*pz == '_'))
+            *pzOut++ = *pz++;
+        if (*pz == '.')
+             pzMembership = pz+1;
+        else pzMembership = (char*)NULL;
+    }
 
     /*
      *  IF we are indexing the entries,
@@ -1102,10 +1120,7 @@ buildPreamble(
      *       and insert the index into the output.
      */
     if (pzIndexText != (char*)NULL) {
-        if (HAVE_OPT( MEMBERSHIP ))
-             sprintf( pzDefText, "  %s  %s'", OPT_ARG( MEMBERSHIP ),
-                      zNameText );
-        else sprintf( pzDefText, "  %s'", zNameText );
+        sprintf( pzDefText, "  %s'", zNameText );
         pzOut = assignIndex( pzOut, zDefText );
     }
 
@@ -1114,6 +1129,15 @@ buildPreamble(
      *  that we use to locate the sort key later.
      */
     pzOut += sprintf( pzOut, "%s%s';\n", zNameTag, zNameText );
+    if (pzMembership != (char*)NULL) {
+        strcpy( pzOut, zMemberLine );
+        pzOut += sizeof( zMemberLine )-1;
+        while (isalnum( *pzMembership ) || (*pzMembership == '_'))
+            *pzOut++ = *pzMembership++;
+        *pzOut++ = ';';
+        *pzOut++ = '\n';
+    }
+
     *ppzOut = pzOut;
     *ppzDef = pzDef;
 
@@ -1141,10 +1165,6 @@ buildDefinition(
          *pzOut = NUL;
          return;
     }
-
-    if (HAVE_OPT( MEMBERSHIP ))
-        pzOut += sprintf( pzOut, "    member = '%s';\n",
-                          OPT_ARG( MEMBERSHIP ));
 
     /*
      *  FOR each attribute for this entry, ...
@@ -1258,7 +1278,9 @@ processFile( char* pzFile )
         static const char zNoEnd[] =
             "Error:  definition in %s at line %d has no end\n";
         static const char zNoSubexp[] =
-            "Warning: subexpr not found on line %d in %s:\n\t%s\n";
+            "Warning: entry type not found on line %d in %s:\n\t%s\n";
+
+        int  linesInDef = 0;
 
         /*
          *  Make sure there is a subexpression match!!
@@ -1312,7 +1334,7 @@ processFile( char* pzFile )
             pzScan = strchr( pzScan, '\n' );
             if (pzScan++ == (char*)NULL)
                 break;
-            lineNo++;
+            linesInDef++;
         }
 
         /*
@@ -1320,7 +1342,8 @@ processFile( char* pzFile )
          *  definition are and where we will resume our processing.
          */
         buildDefinition( pzDef, pzFile, lineNo, pzOut );
-        pzDta = (char*)realloc( (void*)pzDta, strlen( pzDta ) + 1 );
+        pzDta   = (char*)realloc( (void*)pzDta, strlen( pzDta ) + 1 );
+        lineNo += linesInDef;
 
         if (++blkUseCt > blkAllocCt) {
             blkAllocCt += 32;
@@ -1451,7 +1474,7 @@ startAutogen( void )
                 return stdout;
 
             unlink( OPT_ARG( OUTPUT ));
-            fp = fopen( OPT_ARG( OUTPUT ), "w" );
+            fp = fopen( OPT_ARG( OUTPUT ), "w" FOPEN_BINARY_FLAG );
             fprintf( fp, zDne, OPT_ARG( OUTPUT ));
 
             do  {
@@ -1509,7 +1532,7 @@ startAutogen( void )
              *  and get a FILE* pointer for the write file descriptor
              */
             close( pfd[0] );
-            agFp = fdopen( pfd[1], "w" );
+            agFp = fdopen( pfd[1], "w" FOPEN_BINARY_FLAG );
             if (agFp == (FILE*)NULL) {
                 fprintf( stderr, "Error %d (%s) fdopening pipe[1]\n",
                          errno, strerror( errno ));
@@ -1579,33 +1602,67 @@ startAutogen( void )
     char*
 loadFile( char* pzFname )
 {
-    FILE* fp = fopen( pzFname, "r" );
-    int   res;
-    struct stat stb;
+    FILE*  fp = fopen( pzFname, "r" FOPEN_BINARY_FLAG );
+    int    res;
     char*  pzText;
+    char*  pzRead;
+    size_t rdsz;
 
-    if (fp == (FILE*)NULL) {
+    if (fp == (FILE*)NULL)
         return (char*)NULL;
+    /*
+     *  Find out how much data we need to read.
+     *  And make sure we are reading a regular file.
+     */
+    {
+        struct stat stb;
+        res = fstat( fileno( fp ), &stb );
+        if (res != 0) {
+            fprintf( stderr, "error %d (%s) stat-ing %s\n",
+                     errno, strerror( errno ), pzFname );
+            exit( EXIT_FAILURE );
+        }
+        if (! S_ISREG( stb.st_mode )) {
+            fprintf( stderr, "error file %s is not a regular file\n",
+                     pzFname );
+            exit( EXIT_FAILURE );
+        }
+        rdsz = stb.st_size;
+        if (rdsz < 16) {
+            fprintf( stderr, "Error file %s only contains %d bytes.\n"
+                     "\tit cannot contain autogen definitions\n",
+                     pzFname, rdsz );
+            exit( EXIT_FAILURE );
+        }
     }
-    res = fstat( fileno( fp ), &stb );
-    if (res != 0) {
-        fprintf( stderr, "error %d (%s) stat-ing %s\n",
-                 errno, strerror( errno ), pzFname );
-        exit( EXIT_FAILURE );
-    }
-    pzText = (char*)malloc( stb.st_size + 1 );
+
+    /*
+     *  Allocate the space we need for the ENTIRE file.
+     */
+    pzRead = pzText = (char*)malloc( rdsz + 1 );
     if (pzText == (char*)NULL) {
         fprintf( stderr, "Error: could not allocate %d bytes\n",
-                 stb.st_size + 1 );
+                 rdsz + 1 );
         exit( EXIT_FAILURE );
     }
-    if (fread( (void*)pzText, 1, stb.st_size, fp )
-        != stb.st_size) {
-        fprintf( stderr, "Could not read all %d bytes from %s\n",
-                 stb.st_size, pzFname );
-        exit( EXIT_FAILURE );
-    }
-    pzText[ stb.st_size ] = NUL;
+
+    /*
+     *  Read as much as we can get until we have read the file.
+     */
+    do  {
+        size_t rdct = fread( (void*)pzRead, 1, rdsz, fp );
+
+        if (rdct == 0) {
+            fprintf( stderr, "Error %d (%s) reading file %s\n",
+                     errno, strerror( errno ), pzFname );
+            exit( EXIT_FAILURE );
+        }
+
+        pzRead += rdct;
+        rdsz   -= rdct;
+    } while (rdsz > 0);
+            
+    *pzRead = NUL;
     fclose( fp );
     return pzText;
 }

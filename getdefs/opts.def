@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.7 1998/11/16 23:02:04 bkorb Exp $
+ *   $Id: opts.def,v 2.8 1998/12/08 18:34:48 bkorb Exp $
  */
 
 /*
@@ -165,17 +165,6 @@ flag = {
     "@example\nlinenum = '%s';\n@end example\n"
     "If an argument is supplied, that string will be used for the entry\n"
     "name instead of @var{linenum}.";
-};
-
-flag = {
-    name        = membership;
-    flag_arg    = ':';
-    descrip     = "Name of subcollection of entry types";
-    doc =
-    "This option is most useful if you are ordering chronologically\n"
-    "with a getdefs-maintiained database and you wish to order the\n"
-    "entries by groups.  This is not completely thought out yet, so\n"
-    "do not use this option.";
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

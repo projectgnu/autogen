@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.8 1998/11/27 22:28:09 bkorb Exp $
+ *   $Id: opts.def,v 1.9 1998/12/08 18:34:31 bkorb Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ flag = {
 
 flag = {
     name      = separation;
-    value     = s;
+    value     = S;
     flag_arg  = ':';
     descrip   = "Separation string - follows all but last";
     doc =

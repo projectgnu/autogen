@@ -5,22 +5,22 @@
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:     Wed Oct 21 07:30:03 1998
-# Author:         Bruce Korb <korbb@datadesign.com>
-# Maintainer:     Bruce Korb <korbb@datadesign.com>
-#          by:       Bruce Korb <korb@datadesign.com>
+# Last Modified:     Tue Nov 24 07:48:33 1998
+# Author:            Bruce Korb <korb@datadesign.com>
+# Maintainer:        Bruce Korb <korb@datadesign.com>
+# by:                Bruce Korb <korb@datadesign.com>
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=4
-AG_MINOR_VERSION=4
+AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=.4
+AG_PATCHLEVEL=""
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Library versioning for libopts
 #
-AG_INTERFACE_AGE=1
-AG_BINARY_AGE=1
+AG_INTERFACE_AGE=2
+AG_BINARY_AGE=3
 
 # Making releases:
 #   AG_PATCHLEVEL=""
@@ -36,17 +36,30 @@ AG_BINARY_AGE=1
 #
 LT_LIBRARY=libopts.la
 LT_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
+
 LT_CURRENT=`expr $AG_MINOR_VERSION - $AG_INTERFACE_AGE`
-
-LT_REVISION=$AG_INTERFACE_AGE
 LT_AGE=`expr $AG_BINARY_AGE - $AG_INTERFACE_AGE`
+LT_REVISION=$AG_INTERFACE_AGE
 
-MAINTAINER='Bruce Korb <korbb@datadesign.com>'
+MAINTAINER='Bruce Korb <korb@datadesign.com>'
 
 # For automake
 #
 VERSION=$AG_VERSION
 PACKAGE=autogen
+
+#  Validate struct marker in autoopts/options.h
+#
+if [ -n "$srcdir" ] ; then
+  hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
+       sed 's/.*OPTIONS_STRUCT_VERSION *//'`
+  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
+  if [ $hdr -ne $lib ] ; then
+    echo autoopts/options.h out of sync with version.
+    echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
+    exit 1
+  fi
+fi
 
 # Display version numbers banner for my sanity!
 #
@@ -66,19 +79,6 @@ cat << _EOF_
 
                  A      U      T      O      G      E      N
 _EOF_
-
-#  Validate struct marker in autoopts/options.h
-#
-if [ -n "${1}" ] ; then
-  hdr=`egrep OPTIONS_STRUCT_VERSION ${1}/autoopts/options.h |
-       sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
-  if [ $hdr -ne $lib ] ; then
-    echo autoopts/options.h out of sync with version.
-    echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
-    exit 1
-  fi
-fi
 
 cat << _EOF_
 

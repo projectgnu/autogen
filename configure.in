@@ -7,21 +7,21 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Wed Oct 21 07:16:25 1998
+dnl Last Modified:    Tue Nov 24 09:30:32 1998
 dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.4 1998/10/21 14:28:07 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.5 1998/12/08 18:34:28 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
-. $srcdir/VERSION $srcdir
+. $srcdir/VERSION
 
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.4 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.5 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -47,8 +47,8 @@ unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
 AC_PROG_CC
-AM_CYGWIN32
-AM_PROG_INSTALL
+ifdef([AC_EXEEXT],[AC_EXEEXT],[AM_CYGWIN32])
+ifdef([AC_PROG_INSTALL],[AC_PROG_INSTALL],[AM_PROG_INSTALL])
 AM_PROG_LIBTOOL
 AC_PROG_YACC
 AG_PROG_MAKE_INCLUDE
@@ -57,18 +57,12 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # ----------------------------------------------------------------------
 # Set up and process configure options
 # ----------------------------------------------------------------------
-ag_cv_regex_lib=
-AC_ARG_WITH(regex-lib,
-[  --with-regex-lib        name of a POSIX regex library [default=none]],[
-ag_cv_regex_lib=$with_regex_lib])
-if test x$ag_cv_regex_lib != x; then
-  LIBS="-l$ag_cv_regex_lib $LIBS"
-fi
+AG_CHECK_LIB_REGEX
 
 AC_MSG_CHECKING([whether runtime debugging is wanted])
 ag_cv_debug=no
 AC_ARG_ENABLE(debug,
-[  --enable-debug          enable/disable debugging code [default=no]],[
+[  --enable-debug          enable/disable debugging code [no]],[
 ag_cv_debug=$enable_debug
 if test x$enable_debug = xyes; then
   CPPFLAGS="-DDEBUG $CPPFLAGS"
@@ -83,21 +77,13 @@ AC_MSG_RESULT([$ag_cv_debug])
 
 AM_WITH_DMALLOC
 
-CPPFLAGS="$ac_debug $CPPFLAGS"
-if test x$enable_debug = xyes; then
-  CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g'`"
-  if test x$GCC != xyes; then
-    CFLAGS=`echo $CFLAGS|sed 's%-O[0-9]* *%%g'`
-  fi
-fi
-
 # ----------------------------------------------------------------------
 # Check for standard headers.
 # ----------------------------------------------------------------------
 AC_HEADER_STDC
 AC_HEADER_DIRENT
 AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h)
-AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h setjmp.h stdlib.h)
+AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
 
 # If varargs.h is present define HAVE_VARARGS_H, otherwise if stdarg.h
 # is present define HAVE_STDARG_H.
@@ -136,6 +122,7 @@ AC_TYPE_SIGNAL
 AC_CHECK_TYPE(u_short, unsigned short int)
 AC_CHECK_TYPE(u_int, unsigned int)
 AC_CHECK_TYPE(u_long, unsigned long int)
+# AC_CHECK_TYPE(wchar_t, unsigned in)
 AC_C_CONST
 AC_C_INLINE
 AC_CHECK_SIZEOF(char*, 4)
@@ -146,7 +133,9 @@ AC_CHECK_SIZEOF(int, 4)
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend pathfind)
 AC_FUNC_ALLOCA
+AG_FUNC_FOPEN_BINARY
 AG_FUNC_CTIME_HEAP
+AG_FUNC_STRFTIME
 AG_FUNC_VSNPRINTF_DOLLAR
 AG_FUNC_SNPRINTF_DOLLAR
 
@@ -166,8 +155,21 @@ AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile MakeRules doc/Makefile compat/Makefile \
-autoopts/Makefile src/Makefile tests/Makefile config/Makefile \
-getdefs/Makefile columns/Makefile,
+autoopts/Makefile autoopts/autoopts-config src/Makefile tests/Makefile \
+config/Makefile getdefs/Makefile columns/Makefile,
  [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+
+echo \
+"------------------------------------------------------------------------
+Configuration:
+
+  Source code location:       ${srcdir}
+  Compiler:	              ${CC}
+  Compiler flags:             ${CFLAGS}
+  Host System Type:           ${host}
+  Install path:		      ${prefix}
+
+  See config.h for further configuration information.
+------------------------------------------------------------------------"
 
 dnl configure.in ends here

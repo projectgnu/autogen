@@ -1,3 +1,10 @@
+New in 4.5
+* Ported to win32 with cygwinb19.dll -- b20 has bugs which prevent
+  the shell server from working.
+* *Much* enhanced portability.  Autogen really should compile in just
+  about any POSIX environment.
+* Overhauled the configuration to help programs which want to use
+  autoopts from Makefiles.
 New in 4.4
 * Massively reworked the template parsing in preparation for
   beguiling autogen.
