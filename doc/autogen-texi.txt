@@ -1212,6 +1212,54 @@ START == MACROS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
+@node SCM make-header-guard
+@subsection @file{make-header-guard} - make self-inclusion guard
+@findex make-header-guard
+@findex header-file
+@findex header-guard
+
+Usage:  (make-header-guard prefix)
+@*
+This function will insert the @code{#ifndef} and @code{#define} C preprocessing
+directives that will cause a header file to exclude itself once it has been
+sourced in a compilation.  The @code{#define} name is composed as follows:
+
+@enumerate
+@item
+The first element is the string argument and a separating underscore.
+@item
+That is followed by the name of the header file with illegal characters
+mapped to underscores.
+@item
+The end of the name is always, "@code{_GUARD}".
+@item
+Finally, the entire string is mapped to upper case.
+@end enumerate
+
+The name of the header file (the current output file) is stored in the SCM
+symbol @code{header-file}.  The final @code{#define} name is stored in
+@code{header-guard}.  Consequently, the concluding @code{#endif} for the
+file should read something like:
+
+@example
+#endif /* [+ (. header-guard) +] */
+@end example
+
+Obviously, if you are going to produce more than one header file from
+a particular template, you will need to be careful how this SCM value
+gets handled.
+
+Arguments:
+@*
+prefix - prefix for @code{#define} name.
+
+@node SCM autogen-version
+@subsection @file{autogen-version} - autogen version number
+@findex autogen-version
+
+This is a symbol defining the current AutoGen version number string.
+It was first defined in AutoGen-5.2.14.
+
 @node native macros
 @section AutoGen Native Macros
 @cindex native macros

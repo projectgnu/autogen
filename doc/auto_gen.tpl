@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.2 2002/01/12 05:10:01 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.3 2002/01/31 03:56:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -292,6 +292,8 @@ FOR gfunc =][=
   =][= (string-append "@file{" func-name "} - " (get "what")) =][=
   ENDIF =][=
 ENDFOR gfunc =]
+* SCM make-header-guard:: @file{make-header-guard} - make self-inclusion guard
+* SCM autogen-version::   @file{autogen-version} - autogen version number
 @end menu
 
 [=
@@ -328,6 +330,7 @@ This Scheme function takes no arguments.[=
   ENDIF general_use =][=
 ENDFOR gfunc
 =]
+
 [= get-text tag = MACROS =]
 @menu
 * AGMacro syntax::   AutoGen Macro Syntax[=
