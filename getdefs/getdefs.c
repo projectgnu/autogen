@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.11 1999/01/26 15:41:40 bkorb Exp $
+ *  $Id: getdefs.c,v 2.13 1999/03/01 21:21:15 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -32,6 +32,14 @@
 #    define FOPEN_BINARY_FLAG   "b"
 #  else
 #    define FOPEN_BINARY_FLAG
+#  endif
+#endif
+
+#ifndef FOPEN_TEXT_FLAG
+#  ifdef USE_FOPEN_TEXT
+#    define FOPEN_TEXT_FLAG   "t"
+#  else
+#    define FOPEN_TEXT_FLAG
 #  endif
 #endif
 
@@ -1187,7 +1195,7 @@ buildDefinition(
             pzNextDef = pzDef = pzDef + match[1].rm_so;
             break;
 
-        case 1:
+        case REG_NOMATCH:
             /*
              *  No more attributes.
              */
