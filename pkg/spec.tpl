@@ -1,15 +1,8 @@
 [= AutoGen5 Template spec =]
-%define prefix  %{?_prefix}%{!?_prefix:[=`echo $prefix`=]}
-%define infodir %{?_infodir}%{!?_infodir:/usr/info}
-%define __spec_install_post  /usr/lib/rpm/brp-strip ;[=
-`test -x /usr/lib/rpm/brp-strip-static-archive && \
-   echo ' /usr/lib/rpm/brp-strip-static-archive ;'`
-=] /usr/lib/rpm/brp-strip-comment-note
-
 Summary: AutoGen - [=prog-title=]
-Name: [= prog-name =]
+Name:    [= prog-name =]
 Version: [= version =]
-Vendor: [= copyright.owner =] http://autogen.sf.net
+Vendor:  [= copyright.owner =] http://autogen.sf.net
 Release: [=`echo $AG_MAJOR_VERSION`=]
 Copyright: GPL
 Group: Development/Tools
@@ -35,7 +28,7 @@ The Copyright itself is privately held by Bruce Korb.
 chmod -R +rw *
 
 %build
-./configure --prefix=%{prefix} --infodir=%{_infodir}
+%configure
 make CFLAGS="$RPM_OPT_FLAGS"
 
 if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd; then
@@ -50,9 +43,7 @@ fi
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
 mkdir -p $RPM_BUILD_ROOT
 make install DESTDIR=${RPM_BUILD_ROOT}
-
-( cd $RPM_BUILD_ROOT && find . ! -type d 
-) | sed "s,^\./,/,g" > [= prog-name =]-filelist
+rm -f $RPM_BUILD_ROOT/%{_infodir}/dir
 
 %post
 /sbin/ldconfig
@@ -80,6 +71,7 @@ then
      hostname 2>/dev/null\`>"
   echo "- Regenerated"
 fi`=]
+* Wed Oct 27 2004 Ed Swierk <eswierk@users.sf.net> fixed up for Fedora
 * Tue Dec 16 2003 Richard Zidlicky <rz@linux-m68k.org> 5.5.7pre5-5
 - fix %%doc
 - add post/pre scriptlets
