@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2002/07/07 19:47:25 $
+#            by: bkorb
 #
-# $Id: directives.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: directives.test,v 3.1 2002/07/07 19:47:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,17 +23,24 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<'_EOF_'
+mkdir ${testname}.dir
+mkdir ${testname}.dir/subdir
+LDIR=`pwd`/${testname}.dir
+export LDIR
+
+echo creating ${testname}.dir/subdir/${testname}.tpl
+cat > ${testname}.dir/subdir/${testname}.tpl <<'_EOF_'
 [= AutoGen5 Template test =]
 Irrelevant [=foo=].
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-cat > $testname.inc <<_EOF_
-autogen definitions $testname;
+echo creating ${testname}.inc
+cat > ${testname}.inc <<_EOF_
+autogen definitions ${testname};
+
+#option templ-dir \$LDIR/subdir
 
 /*
 #define COMMENT
@@ -48,11 +55,11 @@ autogen definitions $testname;
 #endif
 _EOF_
 
-echo creating $testname.def
-cat > $testname.def <<_EOF_
-autogen definitions $testname;
+echo creating ${testname}.def
+cat > ${testname}.def <<_EOF_
+autogen definitions ${testname};
 
-#include $testname.inc
+#include ${testname}.inc
 
 #ifdef FUMBLE
 #  error  we fumbled mumble
@@ -91,16 +98,17 @@ _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 
-echo creating $testname.out
+echo creating ${testname}.base
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > ${testname}.base <<_EOF_
 Irrelevant bar.
 _EOF_
 
 AGEXE="$AGEXE -DMUMBLE -DFOO=1"
-echo $AGEXE $testname.def
-$AGEXE $testname.def || failure $AGEXE failed
-cmp -s $testname.test $testname.out || failure unexpected output
+echo $AGEXE ${testname}.def
+$AGEXE ${testname}.def || failure $AGEXE failed
+cmp -s ${testname}.base ${testname}.test || \
+  failure "`diff ${testname}.base ${testname}.test`"
 
 cleanup
 # end of directives.test

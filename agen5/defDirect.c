@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 3.7 2002/07/07 18:34:14 bkorb Exp $
+ *  $Id: defDirect.c,v 3.8 2002/07/07 19:47:25 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -710,10 +710,23 @@ doDir_line( char* pzArg, char* pzScan )
  *  arg:  opt-name [ <text> ]
  *
  *  text:
- *  This directive will pass the option name and associated text
- *  to the AutoOpts optionLoadLine routine.  The option text may
- *  span multiple lines by continuing them with a backslash.  The
- *  backslash/newline pair will be replaced with two space characters.
+ *
+ *  This directive will pass the option name and associated text to the
+ *  AutoOpts optionLoadLine routine (@pxref{optionLoadLine}).  The option text
+ *  may span multiple lines by continuing them with a backslash.
+ *  The backslash/newline pair will be replaced with two space characters.
+ *  This directive may be used to set a search path for locating template files
+ *  For example, this:
+ *
+ *  @example
+ *    #option templ-dirs $ENVVAR/dirname
+ *  @end example
+ *  @noindent
+ *  will direct autogen to use the @code{ENVVAR} environment variable to find
+ *  a directory named @code{dirname} that (may) contain templates.  Since these
+ *  directories are searched in most recently supplied first order, search
+ *  directories supplied in this way will be searched before any supplied on
+ *  the command line.
 =*/
 STATIC char*
 doDir_option( char* pzArg, char* pzScan )
