@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <bkorb@gnu.org>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.37 2000/08/11 15:05:47 gvv Exp $
+dnl Code: $Id: configure.in,v 2.38 2000/09/26 20:16:14 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.37 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.38 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -166,7 +166,7 @@ test -f ./snprintfv/snprintfv/snprintfv.h \
   && rm -f ./snprintfv/snprintfv.h \
   && ln -s `pwd`/snprintfv/snprintfv/snprintfv.h ./snprintfv/
 GUILE_LINK=`guile-config link`
-if [ -z "$GUILE_LINK" ]
+if test -z "$GUILE_LINK"
 then
     echo 'Cannot find `guile-config'\' configurator >&2
     exit 1

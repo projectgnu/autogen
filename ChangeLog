@@ -1,3 +1,7 @@
+2000-09-26  Carlos Henrique Bauer  <bauer@atlas.unisinos.br>
+
+	* configure.in: replace ``[...]'' test expression with ``test ...''
+
 2000-09-22  Bruce Korb  <bkorb@gnu.org>
 
 	* */bootstrap*: Clean up syntax for lame shells
