@@ -1,3 +1,13 @@
+2002-03-28  Bruce Korb  <bkorb@gnu.org>
+
+	* all over:  update copyright dates
+	* expExtract.c(find-file): is not general use
+	* config/misc.def(regex_header): fix it some more.  This time, we
+	define REGEX_HEADER directly in the config.h output file.
+	(posix_regex): improve the testing and accommodate pedantic regcomp's.
+	* doc/autogen.texi: doc the 'AutoGen as a CGI server' as part of the
+	'Configuring and Installing' chapter.
+
 2002-03-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*: sed 's/DEBUG/DEBUG_ENABLED/g' -- well, almost.

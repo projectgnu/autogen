@@ -27,7 +27,6 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Template File::        AutoGen Template
 * Augmenting AutoGen::   Augmenting AutoGen
 * autogen Invocation::   Invoking AutoGen
-* AutoGen CGI::          AutoGen as a CGI server
 * Installation::         Configuring and Installing
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
@@ -1507,8 +1506,83 @@ Extraction from autogen.texi
 @end ignore
 
 @page
+@node Installation
+@chapter Configuring and Installing
+
+@menu
+* configuring::    Configuring AutoGen
+* AutoGen CGI::    AutoGen as a CGI server
+* signal names::   Signal Names
+* installing::     Installing AutoGen
+@end menu
+
+@node configuring
+@section Configuring AutoGen
+@cindex configuring
+
+AutoGen is configured and built using Libtool, Automake and Autoconf.
+Consequently, you can install it whereever you wish using the various
+@samp{--prefix} options.  To the various configuration options supplied
+by these tools, AutoGen adds a few of its own:
+
+@table @samp
+@item --disable-shell
+AutoGen is now capable of acting as a CGI forms server, @xref{AutoGen CGI}.
+As such, it will gather its definitions using either @samp{GET} or
+@samp{POST} methods.  All you need to do is have a template named
+@file{cgi.tpl} handy or specify a different one with a command line
+option.
+
+However, doing this without disabling the server shell brings
+considerable risk.  If you were to pass user input to a script
+that contained, say, the classic "@samp{`rm -rf /`}", you might have
+a problem.  This configuration option will cause shell template
+commands to simply return the command string as the result.
+No mistakes.  Much safer.  Strongly recommended.
+The default is to have server shell scripting enabled.
+
+Disabling the shell will have some build side effects, too.
+
+@itemize @bullet
+@item
+Many of the make check tests will fail, since they assume
+a working server shell.
+@item
+The getdefs and columns programs are not built.
+The options are distributed as definition files and they
+cannot be expanded with a shell-disabled AutoGen.
+@item
+Similarly, the documentation cannot be regenerated because
+the documentation templates depend on subshell functionality.
+@end itemize
+
+@item --enable-debug
+Turning on AutoGen debugging enables very detailed inspection of
+the input definitions and monitoring shell script processing.
+These options are not particularly useful to anyone not directly
+involved in maintaining AutoGen.  If you do choose to enable AutoGen
+debugging, be aware that the usage page was generated without these
+options, so when the build process reaches the documentation rebuild,
+there will be a failure.  @samp{cd} into the @file{agen5} build
+directory, @samp{make} the @samp{autogen.texi} file and all will
+be well thereafter.
+
+@item --with-regex-header
+@itemx --with-header-path
+@itemx --with-regex-lib
+These three work together to specify how to compile with and link to
+a particular POSIX regular expression library.  The value for
+@file{--with-regex-header=value} must be the name of the relevant header
+file.  The AutoGen sources will attempt to include that source with
+a @code{#include <value>} C preprocessing statement.  The @code{path} from the
+@file{--with-header-path=path} will be added to @code{CPPFLAGS} as @file{-Ipath}.
+The @code{lib-specs} from @file{--with-regex-lib=lib-specs} will be added
+to @code{LDFLAGS} without any adornment.
+@end table
+
+@page
 @node AutoGen CGI
-@chapter AutoGen as a CGI server
+@section AutoGen as a CGI server
 
 AutoGen is now capable of acting as a CGI forms server.
 It behaves as a CGI server if the definitions input is from stdin
@@ -1563,68 +1637,6 @@ accessible machines, to configure AutoGen (@pxref{configuring}) with
 shell processing disabled (@code{--disable-shell}).  That will make it
 impossible for any referenced template to hand data to a subshell for
 interpretation.
-
-@page
-@node Installation
-@chapter Configuring and Installing
-
-@menu
-* configuring::    Configuring AutoGen
-* signal names::   Signal Names
-* installing::     Installing AutoGen
-@end menu
-
-@node configuring
-@section Configuring AutoGen
-@cindex configuring
-
-AutoGen is configured and built using Libtool, Automake and Autoconf.
-Consequently, you can install it whereever you wish using the various
-@samp{--prefix} options.  To the various configuration options supplied
-by these tools, AutoGen adds two of its own:
-
-@table @samp
-@item --disable-shell
-AutoGen is now capable of acting as a CGI forms server, @xref{AutoGen CGI}.
-As such, it will gather its definitions using either @samp{GET} or
-@samp{POST} methods.  All you need to do is have a template named
-@file{cgi.tpl} handy or specify a different one with a command line
-option.
-
-However, doing this without disabling the server shell brings
-considerable risk.  If you were to pass user input to a script
-that contained, say, the classic "@samp{`rm -rf /`}", you might have
-a problem.  This configuration option will cause shell template
-commands to simply return the command string as the result.
-No mistakes.  Much safer.  Strongly recommended.
-The default is to have server shell scripting enabled.
-
-Disabling the shell will have some build side effects, too.
-
-@itemize @bullet
-@item
-Many of the make check tests will fail, since they assume
-a working server shell.
-@item
-The getdefs and columns programs are not built.
-The options are distributed as definition files and they
-cannot be expanded with a shell-disabled AutoGen.
-@item
-Similarly, the documentation cannot be regenerated because
-the documentation templates depend on subshell functionality.
-@end itemize
-
-@item --enable-debug
-Turning on AutoGen debugging enables very detailed inspection of
-the input definitions and monitoring shell script processing.
-These options are not particularly useful to anyone not directly
-involved in maintaining AutoGen.  If you do choose to enable AutoGen
-debugging, be aware that the usage page was generated without these
-options, so when the build process reaches the documentation rebuild,
-there will be a failure.  @samp{cd} into the @file{agen5} build
-directory, @samp{make} the @samp{autogen.texi} file and all will
-be well thereafter.
-@end table
 
 @node signal names
 @section Signal Names

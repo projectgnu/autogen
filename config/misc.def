@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/03/23 05:06:56 $
+ *  Last Modified:     $Date: 2002/03/29 04:14:32 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.9 2002/03/23 05:06:56 bkorb Exp $
+ *  $Id: misc.def,v 3.10 2002/03/29 04:14:32 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.9 $";
+version = "$Revision: 3.10 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -72,10 +72,14 @@ test   = {
   name     = "regex_header";
   type     = "with";
   check    = "a reg expr header is specified";
-  action   = { yes; act-type=subst;
-               act-text = "<${ag_cv_with_regex_header}>"; };
-  action   = { no;  act-type=subst;
-               act-text = "<regex.h>"; };
+
+  action   = { yes; act-type = script; asis;
+        act-text = 'AC_DEFINE_UNQUOTED([REGEX_HEADER],'
+                   '[<${ag_cv_with_regex_header}>])'; };
+
+  action   = { no; act-type = script; asis;
+        act-text = 'AC_DEFINE([REGEX_HEADER],[<regex.h>],'
+                              '[name of regex header file])'; };
 
   doc = "When using alternative libraries, sometimes you must use\n"
         "alternative header file names, too.";
@@ -84,7 +88,7 @@ test   = {
 test   = {
   name     = "regex_header_path";
   type     = "with";
-  check    = "a path to the reg-ex header is specified";
+  check    = "the directory path to the reg-ex header";
   action   = { yes; act-type=subst;
                act-text = "-I${ag_cv_with_regex_header_path}"; };
   action   = { no;  act-type=subst;  act-text = ""; };
@@ -117,20 +121,32 @@ test = {
 		_END_OF_ACTION;
     };
     code   = <<-  _EOF_
+		#include <stdio.h>
 		#include <sys/types.h>
-		#include ${AG_REGEX_HEADER}
+		#include REGEX_HEADER
+		static regex_t re;
+		void comp_re( const char* pzPat ) {
+		  int res = regcomp( &re, pzPat, REG_EXTENDED|REG_ICASE|REG_NEWLINE );
+		  if (res == 0) return;
+		  exit( res ); }
 		int main() {
-		  int flags = REG_EXTENDED|REG_ICASE|REG_NEWLINE;
-		  regex_t  re;
-		  if (regcomp( &re, "^.*$", flags ) != 0)
+		  int  res;
+		  regmatch_t m[2];
+		  comp_re( "^.*\$"   );
+		  comp_re( "()|no.*" );
+		  comp_re( "."       );
+		  if (regexec( &re, "X", 2, m, 0 ) != 0)  return 1;
+		  if ((m[0].rm_so != 0) || (m[0].rm_eo != 1)) {
+		    fputs( "error: regex -->.<-- did not match\n", stderr );
 		    return 1;
-		  return regcomp( &re, "|no.*", flags ); }
+		  }
+		  return 0; }
 		_EOF_;
 
     doc =
     "Check that the POSIX compliant regular expression compiler\n"
     "is available in the POSIX specified manner, and it works.\n"
-    "If it fails, there is a backup.  Specify:  --with-regex-lib=-lwhatever";
+    "If it fails, there is a backup.  Specify: --with-regex-lib=-lwhatever";
 };
 
 test   = {
