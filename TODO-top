@@ -1,9 +1,5 @@
 #  -*- Mode: Outline -*-
 
-* Known Bugs
-
-** getdefs leaves a NUL at the end of the database file
-
 ** memfrob(3GNU) as a function
 
 * In Progress
@@ -12,14 +8,14 @@
 
 * Pending
 
-** All errors from autogen/getdefs etc. should start with,
+** All errors from getdefs and columns should start with,
    `options.pzProgName' (aka 'basename(argv[0])').
+
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
 
 ** devise a clean way for multiple flavors of definition input:
    XML
-   CGI-POST
    different documentation extractors, akin to "getdefs"
 
 ** How about writing a function, (set-cl-option "text")
