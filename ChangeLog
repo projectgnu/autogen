@@ -2,6 +2,8 @@
 
 	* agen5/expGperf.c: new.  Implements (make-gperf ...) and
 	(gperf ...) scheme functions.
+	* autoopts/*.tpl: added 'guile-main' as a global program attribute.
+	the main/inner_main functions are produced.
 
 2000-09-28  Bruce Korb  <bkorb@gnu.org>
 
