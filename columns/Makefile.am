@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Thu Jul 29 12:02:20 1999				      
+## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.17 1999/07/29 19:02:50 bkorb Exp $
+## $Id: Makefile.am,v 1.18 1999/07/29 20:40:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -18,7 +18,7 @@ bin_PROGRAMS = columns
 columns_SOURCES = columns.c opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h columns.menu columns.texi columns.1
-EXTRA_DIST	= $(GEN_SRC) opts.def
+EXTRA_DIST	= $(GEN_SRC) opts.def bootstrap.dir
 
 columns_LDADD	= $(top_builddir)/autoopts/libopts.la
 
