@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.27 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: makeshell.c,v 2.28 2000/11/09 16:06:20 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -265,7 +265,7 @@ static const char zCantArg[] =
  *  Formats for emitting the text for handling long option types
  */
 static const char zLongOptInit[] =
-"        OPT_CODE=`echo \"X${OPT_ARG}\"|sed 's/^X--//'`\n"
+"        OPT_CODE=`echo \"X${OPT_ARG}\"|sed 's/^X-*//'`\n"
 "        shift\n"
 "        OPT_ARG=\"$1\"\n\n"
 "        case \"${OPT_CODE}\" in *=* )\n"
