@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.18 2000/03/05 21:19:19 bruce Exp $
+## $Id: Makefile.am,v 1.19 2000/03/05 22:54:06 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -28,7 +28,7 @@ OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-GEN_SRC = opts.c opts.h directive.h functions.h expr.ini \
+GEN_SRC = opts.c opts.h directive.h functions.h expr.ini expr.h \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi
 
 pkgdata_DATA	= schemedef.scm
@@ -73,42 +73,42 @@ GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## stamp-functions GEN-RULE
 stamp-functions: $(FUNCLIST) functions.tpl
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE
 proto.h : defParse.y
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## autogen.texi GEN-RULE
 autogen.texi : $(STAMPS) ../getdefs/getdefs ../columns/columns AutoGen
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
  
 ## autogen.1 GEN-RULE
 autogen.1 : opts.def
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
+	DEBUG_OPTS=$(OPTDBG) sh $(srcdir)/bootstrap.dir $@
 
 ## defParse.c GEN-RULE
 defParse.c defParse.h : defParse.y
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	YACC="$(YACC) $(YFLAGS)" sh ./bootstrap.dir $@
+	YACC="$(YACC) $(YFLAGS)" sh $(srcdir)/bootstrap.dir $@
 
 gen : $(GEN_LIST)
 
