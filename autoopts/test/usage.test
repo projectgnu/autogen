@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2003-03-08 12:24:17 bkorb"
+## Time-stamp:      "2003-03-08 15:14:12 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 3.1 2003/03/08 21:19:52 bkorb Exp $
+# $Id: usage.test,v 3.2 2003/03/08 23:15:10 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -736,7 +736,6 @@ tname=${testname}
 for long_opts in true false
 do
   ${long_opts} && lname=L || lname=s
-  ${long_opts} && hstr=--help || hstr='-?'
 
   for gnu_usage in true false
   do
@@ -746,9 +745,14 @@ do
     do
       ${flag_opts} && fname="${uname}F" || fname="${uname}s"
 
-      if ! ${flag_opts} && ! ${long_opts}
-      then helpstr=help
-      else helpstr=${hstr} ; fi
+      if ${long_opts}
+      then helpstr=--help
+
+      elif ${flag_opts}
+      then helpstr='-?'
+
+      else helpstr=help
+      fi
 
       for req_opts in true false
       do
@@ -766,6 +770,27 @@ do
           cmp -s ${testname}.help ${testname}.hlp || \
              failure "FAILED ${testname}
 `diff ${testname}.help ${testname}.hlp`"
+
+          if ${gnu_usage}
+          then
+            f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1a\\2/"`
+            sed "s/${f}/${testname}/g;\
+                 s/is in AutoOpts traditional/should be in GNU/" ${f}.hlp > \
+              ${testname}.alt.hlp
+            AUTOOPTS_USAGE=autoopts ./${testname} ${helpstr} > \
+              ${testname}.alt.help
+          else
+            f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1G\\2/"`
+            sed "s/${f}/${testname}/g;\
+                 s/should be in GNU/is in AutoOpts traditional/" ${f}.hlp > \
+              ${testname}.alt.hlp
+            AUTOOPTS_USAGE=gnu ./${testname} ${helpstr} > \
+              ${testname}.alt.help
+          fi
+          cmp -s ${testname}.alt.help ${testname}.alt.hlp || \
+             failure "FAILED ${testname}
+`diff ${testname}.alt.help ${testname}.alt.hlp`"
+
         done
       done
     done
