@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.18 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.19 2003/05/18 19:58:23 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -90,6 +90,8 @@ doStdoutTemplate( tTemplate* pTF )
     SCM  res;
     tCC* pzRes;
 
+    pzLastScheme = NULL; /* We cannot be in Scheme processing */
+
     switch (jmpcode) {
     case SUCCESS:
         break;
@@ -172,6 +174,14 @@ processTemplate( tTemplate* pTF )
     for (;;) {
         tOutSpec*  pOS    = pOutSpecList;
         int        jumpCd = setjmp( fileAbort );
+
+        /*
+         * We cannot be in Scheme processing.  We've either just started
+         * or we've made a long jump from our own code.  If we've made a
+         * long jump, we've printed a message that is sufficient and we
+         * don't need to print any scheme expressions.
+         */
+        pzLastScheme = NULL;
 
         /*
          *  HOW was that we got here?

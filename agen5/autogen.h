@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.17 2003/05/18 17:14:45 bkorb Exp $
+ *  $Id: autogen.h,v 3.18 2003/05/18 19:58:23 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -378,6 +378,7 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 static inline SCM ag_eval( tCC* pzStr )
 {
     SCM res;
+    tCC* pzSaveScheme = pzLastScheme; /* Watch for nested calls */
     pzLastScheme = pzStr;
 
 #ifdef LATER
@@ -390,7 +391,7 @@ static inline SCM ag_eval( tCC* pzStr )
 #else
     res = gh_eval_str( pzStr );
 #endif
-    pzLastScheme = NULL;
+    pzLastScheme = pzSaveScheme;
     return res;
 }
 

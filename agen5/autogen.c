@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.28 2003/05/18 17:12:29 bkorb Exp $
+ *  $Id: autogen.c,v 3.29 2003/05/18 19:58:23 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -254,6 +254,8 @@ doneCheck( void )
         }
         break; /* continue failure exit */
 
+    case PROC_STATE_OPTIONS:
+        /* Exiting in option processing state is verbose enough */
     case PROC_STATE_DONE:
         break; /* continue normal exit */
     }

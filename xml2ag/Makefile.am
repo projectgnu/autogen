@@ -9,7 +9,7 @@
 ## Created:	        Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.11 2003/04/22 01:40:20 bkorb Exp $
+## $Id: Makefile.am,v 1.12 2003/05/18 19:58:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -17,7 +17,7 @@ bin_PROGRAMS    = xml2ag
 csrcs           = xmlopts.h xml2ag.c xmlopts.c fork.c
 nodist_xml2ag_SOURCES = x.c
 
-## SUBDIRS      = test
+SUBDIRS         = test
 EXTRA_DIST      = xmlopts.def fork.tpl $(csrcs)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
