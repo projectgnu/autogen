@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.13 1999/11/04 05:28:11 bruce Exp $
+ *  $Id: funcCase.c,v 1.14 1999/11/24 23:30:12 bruce Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -36,6 +36,19 @@
 
 #include "proto.h"
 
+#undef  IS_LOW
+#define IS_LOW(c)  (((c) <= 'z') && ((c) >= 'a'))
+
+#ifndef _toupper
+#  ifdef __toupper
+#    define _toupper(c)     __toupper(c)
+#  else
+#    define _toupper(c)     toupper(c)
+#  endif
+#endif
+
+#define PTRUP(p) STMTS(if(IS_LOW(*(p)))*(p)=_toupper(*(p));(p)++)
+
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -53,11 +66,20 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
 }
 
 
+    static void
+upString( char* pz )
+{
+    while (*pz != NUL)
+        PTRUP(pz);
+}
+
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*=gfunc string_contains_p
  *
  * what:   test for substring match
+ * general_use:
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
@@ -86,6 +108,7 @@ ag_scm_string_contains_p( SCM text, SCM substr )
 /*=gfunc string_ends_with_p
  *
  * what:   test string ending
+ * general_use:
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
  *
@@ -121,6 +144,7 @@ ag_scm_string_ends_with_p( SCM text, SCM substr )
 /*=gfunc string_starts_with_p
  *
  * what:   test string starting
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -153,6 +177,7 @@ ag_scm_string_starts_with_p( SCM text, SCM substr )
 /*=gfunc string_equals_p
  *
  * what:   test string matching
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -181,6 +206,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
 /*=gfunc string_contains_eqv_p
  *
  * what:   case insensitive test string contains
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -198,7 +224,7 @@ Select_Equivalent( char* pzText, char* pzMatch )
     char*    pz  = strdup( pzText );
     tSuccess res = SUCCESS;
 
-    upcase( pz, CC_ALL_UP );
+    upString( pz );
     if (strstr( pz, pzMatch ) == (char*)NULL)
         res = FAILURE;
     AGFREE( (void*)pz );
@@ -214,7 +240,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return SCM_UNDEFINED;
     pzSubstr = strdup( SCM_CHARS( substr ));
-    upcase( pzSubstr, CC_ALL_UP );
+    upString( pzSubstr );
     if (SUCCESSFUL( Select_Equivalent( SCM_CHARS( text ), pzSubstr )))
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
@@ -227,6 +253,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 /*=gfunc string_ends_eqv_p
  *
  * what:   case insenstive test string ending
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -262,6 +289,7 @@ ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 /*=gfunc string_starts_eqv_p
  *
  * what:   case insenstive test string start
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -294,6 +322,7 @@ ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 /*=gfunc string_eqv_p
  *
  * what:   case insenstive test string match
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -325,6 +354,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 /*=gfunc string_has_match_p
  *
  * what:   regex match within string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -337,6 +367,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
 /*=gfunc string_has_eqv_match_p
  *
  * what:   case insensitive regex match within string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -407,6 +438,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_end_match_p
  *
  * what:   regex match end of string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -419,6 +451,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_end_eqv_match_p
  *
  * what:   case insensitive regex match end of string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -503,6 +536,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_start_match_p
  *
  * what:   regex match start of string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -515,6 +549,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_start_eqv_match_p
  *
  * what:   case insensitive regex match start of string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -595,6 +630,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_match_p
  *
  * what:   regex match string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for
@@ -607,6 +643,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 /*=gfunc string_eqv_match_p
  *
  * what:   case insensitive regex match string
+ * general_use:
  *
  * exparg: text, text to test for pattern
  * exparg: match, pattern/substring to search for

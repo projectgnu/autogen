@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.6 1999/11/11 04:36:17 bruce Exp $
+ *  $Id: autogen.c,v 1.7 1999/11/24 23:30:12 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -32,6 +32,8 @@
 STATIC sigjmp_buf  abendJumpEnv;
 STATIC void signalSetup( void );
 
+tSCC zSchemeInit[] =
+"(add-hook! before-error-hook error-source-line)";
 
     STATIC void
 inner_main( int argc, char** argv )
@@ -39,6 +41,10 @@ inner_main( int argc, char** argv )
     void ag_init( void );
     tTemplate* pTF;
 
+    /*
+     *  Initialize all but the processing Scheme functions
+     */
+    ag_init();
     procState = PROC_STATE_OPTIONS;
     doOptions( argc, argv );
 
@@ -50,8 +56,12 @@ inner_main( int argc, char** argv )
      *  Load, process and unload the main template
      */
     procState = PROC_STATE_LOAD_TPL;
+
+    /*
+     *  Initialize the processing Scheme functions
+     */
     ag_init();
-    gh_eval_str( "(add-hook! before-error-hook error-source-line)" );
+    gh_eval_str( (char*)zSchemeInit );
     pTF = loadTemplate( pzTemplFileName );
 
     procState = PROC_STATE_EMITTING;

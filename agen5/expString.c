@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.11 1999/11/05 02:38:40 bruce Exp $
+ *  $Id: expString.c,v 1.12 1999/11/24 23:30:12 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -169,6 +169,7 @@ makeString( tCC*    pzText,
 /*=gfunc in_p
  *
  * what:   test for string in list
+ * general_use:
  * exparg: test-string, string to look for
  * exparg: string-list, list of strings to check,, list
  *
@@ -204,6 +205,7 @@ ag_scm_in_p( SCM obj, SCM list )
 /*=gfunc join
  *
  * what:   join a list of strings with separator
+ * general_use:
  * exparg: separator, string to insert between entries
  * exparg: list, list of strings to join,, list
  *
@@ -273,6 +275,7 @@ ag_scm_join( SCM sep, SCM list )
 /*=gfunc prefix
  *
  * what:  prefix lines with a string
+ * general_use:
  *
  * exparg: prefix, string to insert at start of each line
  * exparg: text, multi-line block of text
@@ -350,6 +353,7 @@ ag_scm_prefix( SCM prefix, SCM text )
 /*=gfunc shell
  *
  * what:  invoke a shell script for its output
+ * general_use:
  *
  * exparg: command, shell command - the result value is stdout
  *
@@ -384,6 +388,7 @@ ag_scm_shell( SCM cmd )
 /*=gfunc shellf
  *
  * what:  format a string, run shell on result
+ * general_use:
  *
  * exparg: format, formatting string
  * exparg: format-arg, list of arguments to formatting string, opt, list
@@ -414,6 +419,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
 /*=gfunc raw_shell_str
  *
  * what:  emit single quote string for shell
+ * general_use:
  *
  * exparg: string, string to transform
  *
@@ -473,6 +479,7 @@ ag_scm_raw_shell_str( SCM obj )
 /*=gfunc shell_str
  *
  * what:  emit double quote string for shell
+ * general_use:
  *
  * exparg: string, string to transform
  *
@@ -562,6 +569,7 @@ ag_scm_stack( SCM obj )
 /*=gfunc kr_string
  *
  * what:  emit a string for K&R C
+ * general_use:
  *
  * exparg: string, string to reformat
  *
@@ -588,6 +596,7 @@ ag_scm_kr_string( SCM str )
 /*=gfunc c_string
  *
  * what:  emit a string for ANSI C
+ * general_use:
  *
  * exparg: string, string to reformat
  *
@@ -619,6 +628,7 @@ ag_scm_c_string( SCM str )
 /*=gfunc string_tr_x
  *
  * what:  convert letters in a string
+ * general_use:
  *
  *  exparg:  source, string to transform
  *  exparg:  match,  characters to be converted

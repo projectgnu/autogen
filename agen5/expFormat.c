@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.6 1999/11/04 05:25:05 bruce Exp $
+ *  $Id: expFormat.c,v 1.7 1999/11/24 23:30:12 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -108,7 +108,7 @@ tSCC zFmtAlloc[] = "asprintf allocation";
  *
  * exparg: prefix, string for starting each output line
  * doc:  Generate a "Do Not Edit" warning string.
- *      The argument is a per-line string prefix.
+ *       The argument is a per-line string prefix.
 =*/
     SCM
 ag_scm_dne( SCM prefix )
@@ -129,7 +129,7 @@ ag_scm_dne( SCM prefix )
     }
 
     pzRes = asprintf( zDne, pzPfx, pCurFp->pzName,
-                      zTimeBuf, pzDefineFileName, pzTemplFileName );
+                      zTimeBuf, OPT_ARG( DEFINITIONS ), pzTemplFileName );
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzProg, -1, "Do-Not-Edit string" );

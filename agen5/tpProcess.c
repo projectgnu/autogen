@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 1.3 1999/10/15 02:57:34 bruce Exp $
+ *  $Id: tpProcess.c,v 1.4 1999/11/24 23:30:12 bruce Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -228,9 +228,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      *  If an argument is not provided, we use the base name of
      *  the definitions file.
      */
-    if ( ISSEL_OPT( BASE_NAME ))
-         pzDefFile = OPT_ARG( BASE_NAME );
-    else pzDefFile = pzDefineFileName;
+    pzDefFile = OPT_ARG( BASE_NAME );
 
     {
         char*  p = strrchr( pzDefFile, '/' );

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.8 1999/11/07 03:02:58 bruce Exp $
+ *  $Id: autogen.h,v 1.9 1999/11/24 23:30:12 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -198,11 +198,8 @@ struct fpStack {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Expression Evaluation Stuff
+ *  FOR loop processing state
  */
-typedef enum { CC_UPPER = 1, CC_lower = 2, CC_Cap, CC_NONE,
-               CC_ALL_UP,    CC_all_low,   CC_All_Cap } teCaseType;
-
 struct for_info {
     ag_bool      for_loading;
     int          for_from;
@@ -223,7 +220,6 @@ struct for_info {
  */
 #define pzProg   AutoGenOptions.pzProgName
 MODE teProcState procState        VALUE( PROC_STATE_INIT );
-MODE char*       pzDefineFileName VALUE( (char*)NULL );
 MODE char*       pzTemplFileName  VALUE( (char*)NULL );
 MODE tTemplate*  pNamedTplList    VALUE( (tTemplate*)NULL );
 

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: agUtils.c,v 1.2 1999/11/24 23:30:12 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -45,35 +45,76 @@ doOptions( int arg_ct, char** arg_vec )
      *  command line options
      */
     {
+        tSCC zOnlyOneSrc[] = "%s ERROR:  Too many definition files\n";
         int  optCt = optionProcess( &AutoGenOptions, arg_ct, arg_vec );
 
         /*
          *  Make sure we have a source file, even if it is "-" (stdin)
          */
-        ;
         switch (arg_ct - optCt) {
         case 1:
-            pzDefineFileName = *(arg_vec + optCt);
-            break;
-
-        case 0:
-            pzDefineFileName = "-";
-            break;
+            if (! HAVE_OPT( DEFINITIONS )) {
+                OPT_ARG( DEFINITIONS ) = *(arg_vec + optCt);
+                break;
+            }
+            /* FALLTHROUGH */
 
         default:
-        {
-            tSCC zOnlyOneSrc[] = "%s ERROR:  Too many definition files\n";
             fprintf( stderr, zOnlyOneSrc, pzProg );
             USAGE( EXIT_FAILURE );
-        }
+
+        case 0:
+            if (! HAVE_OPT( DEFINITIONS ))
+                OPT_ARG( DEFINITIONS ) = "-";
+            break;
         }
     }
 
+    /*
+     *  IF the definitions file has been disabled,
+     *  THEN a template *must* have been specified.
+     */
     if (  (! ENABLED_OPT( DEFINITIONS ))
        && (! HAVE_OPT( OVERRIDE_TPL )) ) {
         fputs( "AutoGen error:  no template was specified\n", stderr );
         AG_ABEND;
     }
+
+    /*
+     *  IF we do not have a base-name option, then we compute some value
+     */
+    if (! HAVE_OPT( BASE_NAME )) do {
+        char* pz;
+        char* pzD;
+
+        if (! ENABLED_OPT( DEFINITIONS )) {
+            OPT_ARG( BASE_NAME ) = "baseless";
+            break;
+        }
+
+        pz = strrchr( OPT_ARG( DEFINITIONS ), '/' );
+        /*
+         *  Point to the character after the last '/', or to the full
+         *  definition file name, if there is no '/'.
+         */
+        if (pz++ == (char*)NULL)
+            pz = OPT_ARG( DEFINITIONS );
+
+        /*
+         *  IF input is from stdin, then use "stdin"
+         */
+        if ((pz[0] == '-') && (pz[1] == NUL)) {
+            OPT_ARG( BASE_NAME ) = "stdin";
+            break;
+        }
+
+        /*
+         *  Otherwise, use the basename of the definitions file
+         */
+        pzD = OPT_ARG( BASE_NAME ) = AGALOC( strlen( pz )+1 );
+        while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
+        *pzD = NUL;
+    } while (AG_FALSE);
 
     strequate( OPT_ARG( EQUATE ));
 
@@ -87,8 +128,8 @@ doOptions( int arg_ct, char** arg_vec )
         do  {
             char* pz = *(ppz++);
             /*
-             *  IF there is no associated value,
-             *  THEN append a NUL value to it.
+             *  IF there is no associated value,  THEN set it to '1'.
+             *  There are weird problems with empty defines.
              */
             if (strchr( pz, '=' ) == (char*)NULL) {
                 size_t siz = strlen( pz )+3;
@@ -103,61 +144,6 @@ doOptions( int arg_ct, char** arg_vec )
              */
             putenv( pz );
         } while (--ct > 0);
-    }
-}
-
-
-    void
-upcase( char* pz, teCaseType  caseMode )
-{
-    switch (caseMode) {
-    case CC_Cap:
-        while (isspace( *pz )) pz++;
-        if (*pz != NUL)
-            PTRUP(pz);
-        /*FALLTHROUGH*/
-
-    case CC_lower:
-        while (isspace( *pz )) pz++;
-        while (ISNAMECHAR( *pz ))
-            PTRDN(pz);
-        break;
-
-    default:
-    case CC_UPPER:
-        while (isspace( *pz )) pz++;
-        while (ISNAMECHAR( *pz ))
-            PTRUP(pz);
-        break;
-
-    case CC_ALL_UP:
-        while (*pz != NUL)
-            PTRUP(pz);
-        break;
-
-    case CC_all_low:
-        while (*pz != NUL)
-            PTRDN(pz);
-        break;
-
-    case CC_All_Cap:
-    {
-        ag_bool  doCap = AG_TRUE;
-
-        while (*pz != NUL) {
-            if (isalnum( *pz )) {
-                if (doCap) {
-                    PTRUP(pz);
-                    doCap = AG_FALSE;
-                } else
-                    PTRDN(pz);
-            } else {
-                pz++;
-                doCap = AG_TRUE;
-            }
-        }
-        break;
-    }
     }
 }
 

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.7 1999/11/04 05:26:23 bruce Exp $
+ *  $Id: expState.c,v 1.8 1999/11/24 23:30:12 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -278,6 +278,19 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/*=gfunc base_name
+ *
+ * what:   the base name of the output file(s)
+ *
+ * doc:  Returns a string containing the base name of the output file(s).
+=*/
+    SCM
+ag_scm_base_name( void )
+{
+    return gh_str02scm( OPT_ARG( BASE_NAME ));
+}
+
 
 /*=gfunc count
  *

@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defLoad.c,v 1.2 1999/10/16 17:47:42 bruce Exp $
+ *  $Id: defLoad.c,v 1.3 1999/11/24 23:30:12 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -301,8 +301,8 @@ readDefines( void )
      *  do not try to open it and we try to allocate more memory if
      *  the stdin input exceeds our initial allocation of 16K.
      */
-    if (strcmp( pzDefineFileName, "-" ) == 0) {
-        pzDefineFileName  = "stdin";
+    else if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
+        OPT_ARG( DEFINITIONS )  = "stdin";
         outTime  = time( (time_t*)NULL );
         sizeLeft = dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
@@ -314,15 +314,15 @@ readDefines( void )
      */
     else {
         struct stat stbf;
-        if (stat( pzDefineFileName, &stbf ) != 0) {
+        if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0) {
             fprintf( stderr, "%s ERROR %d (%s) stat-ing %s\n",
                      pzProg, errno, strerror( errno ),
-                     pzDefineFileName );
+                     OPT_ARG( DEFINITIONS ) );
             AG_ABEND;
         }
         if (! S_ISREG( stbf.st_mode )) {
             fprintf( stderr, "%s ERROR:  %s is not a regular file\n",
-                     pzProg, pzDefineFileName );
+                     pzProg, OPT_ARG( DEFINITIONS ) );
             AG_ABEND;
         }
 
@@ -360,11 +360,11 @@ readDefines( void )
     /*
      *  Set the input file pointer, as needed
      */
-    fp = useStdin ? stdin : fopen( pzDefineFileName, "r" FOPEN_TEXT_FLAG );
+    fp = useStdin ? stdin : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
     if (fp == (FILE*)NULL) {
         fprintf( stderr, "%s ERROR %d (%s):  cannot open %s\n",
                  pzProg, errno, strerror( errno ),
-                 pzDefineFileName );
+                 OPT_ARG( DEFINITIONS ) );
         AG_ABEND;
     }
 
@@ -387,7 +387,7 @@ readDefines( void )
 
             fprintf( stderr, "%s ERROR %d (%s):  cannot read %d bytes "
                      "from %s\n", pzProg, errno,
-                     strerror( errno ), dataSize, pzDefineFileName );
+                     strerror( errno ), dataSize, OPT_ARG( DEFINITIONS ) );
             AG_ABEND;
         }
 
@@ -438,7 +438,7 @@ readDefines( void )
     }
 
     *pzData = NUL;
-    AGDUPSTR( pBaseCtx->pzFileName, pzDefineFileName );
+    AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ) );
 
     /*
      *  Close the input file, parse the data
