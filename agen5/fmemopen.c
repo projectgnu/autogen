@@ -34,6 +34,18 @@
 #ifdef ENABLE_FMEMOPEN
 
 /*=--subblock=arg=arg_type,arg_name,arg_desc =*/
+/*=*
+ * library:  fmem
+ * header:   libfmem.h
+ *
+ * lib_description:
+ *
+ *  This library only functions in the presence of GNU or BSD's libc.
+ *  It is distributed under the Berkeley Software Distribution License.
+ *  This library can only function if there is a libc-supplied mechanism
+ *  for fread/fwrite/fseek/fclose to call into this code.  GNU uses
+ *  fopencookie and BSD supplies funopen.
+=*/
 /*
  * fmemopen() - "my" version of a string stream
  * inspired by the glibc version, but completely rewritten and
@@ -95,8 +107,7 @@ typedef unsigned long mode_bits_t;
 typedef unsigned char buf_chars_t;
 
 typedef struct fmem_cookie_s fmem_cookie_t;
-struct fmem_cookie_s
-{
+struct fmem_cookie_s {
     mode_bits_t    mode;
     buf_chars_t   *buffer;
     size_t         buf_size;    /* Full size of buffer */
@@ -168,7 +179,7 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
          */
         void* bf = malloc( ns );
         if (bf == NULL) {
-            errno - ENOSPC;
+            errno = ENOSPC;
             return -1;
         }
         memcpy( bf, pFMC->buffer, pFMC->buf_size );
@@ -335,6 +346,7 @@ fmem_close( void *cookie )
  *
  *  This routine surreptitiously slips in a special request.
  *  The commands supported are:
+ *
  *  @table @code
  *  @item FMEM_IOCTL_BUF_ADDR
  *    Retrieve the address of the buffer.  Future output to the stream
@@ -375,13 +387,13 @@ fmem_ioctl( FILE* fp, int req, void* ptr )
  *  ret-type:  FILE*
  *  ret-desc:  a stdio FILE* pointer
  *
- *  err:  NULL is returned and errno is set
+ *  err:  NULL is returned and errno is set to @code{EINVAL} or @code{ENOSPC}.
  *
  *  doc:
  *
  *  If @code{buf} is @code{NULL}, then a buffer is allocated.
  *  It is allocated to size @code{len}, unless that is zero.
- *  If @code{len} is zero, then @code{pagesize()} is used and the buffer
+ *  If @code{len} is zero, then @code{getpagesize()} is used and the buffer
  *  is marked as "extensible".  Any allocated memory is @code{free()}-ed
  *  when @code{fclose(3C)} is called.
  *
@@ -393,7 +405,8 @@ fmem_ioctl( FILE* fp, int req, void* ptr )
  *  Then the string is opened in "append" mode.
  *  Append mode is always extensible.  In binary mode, "appending" will
  *  begin from the end of the initial buffer.  Otherwise, appending will
- *  start at the first non-NUL character in the initial buffer.
+ *  start at the first NUL character in the initial buffer (or the end of
+ *  the buffer if there is no NUL character).
  *
  *  @item w
  *  Then the string is opened in "write" mode.
