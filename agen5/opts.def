@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *   $Id: opts.def,v 1.2 1999/10/14 01:16:03 bruce Exp $
  */
 
 /*
@@ -90,6 +90,7 @@ flag = {
     name      = lib_template;
     value     = l;
     flag_arg  = ":";
+    max       = NOLIMIT;
     arg_name  = tpl-file;
     descrip   = "Library template file";
     doc =
