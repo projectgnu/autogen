@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.2 1998/08/24 11:30:41 bkorb Exp $
+ *   $Id: opts.def,v 1.3 1998/08/26 10:31:46 bkorb Exp $
  */
 
 /*
@@ -56,6 +56,14 @@ flag = {
 };
 
 flag = {
+    name      = subgroup;
+    flag_arg  = ":";
+    max       = NOLIMIT;
+    stack_arg;
+    descrip   = "subgroup definition names";
+};
+
+flag = {
     name        = insert_opts;
     documentation;
     descrip     = "Definition insertion options";
@@ -78,21 +86,22 @@ flag = {
 };
 
 flag = {
-    name      = include;
-    flag_arg  = ":";
-    descrip   = "File to copy to output defs";
+    name        = include;
+    flag_arg    = ":";
+    descrip     = "File to copy to output defs";
 };
 
 flag = {
     name        = output_opts;
-    documentation;
     descrip     = "Definition output disposition options\n"
                   '("no-autogen" implies output to stdout):';
+    documentation;
 };
 
 flag = {
     name        = output;
     equivalence = "autogen";
+    flag_arg    = ":";
     descrip     = "Output file to open";
 };
 
@@ -109,7 +118,6 @@ flag = {
     name        = template;
     flag_arg    = ":";
     descrip     = "Template Name";
-    flags_cant  = output;
 };
 
 flag = {

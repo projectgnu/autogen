@@ -12,19 +12,26 @@ static const char zMallocErr[] =
 "Error:  could not allocate %d bytes for %s\n";
 
 static const char zAttribRe[] =
-    "\n[^*]*\\*[ \t]*([a-z][a-z0-9_]*):";
+    "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_]*):";
 
 static const char zNameTag[] =
     " = {\n    name = '";
 
+#define MARK_CHAR ':'
+
 char zRER[ 256 ];
+
+#ifndef STR
+#  define __STR(s)  #s
+#  define STR(s)    __STR(s)
+#endif
 
 char*   pzDefPat = (char*)NULL;
 regex_t define_re;
 
 char*  pzEvtNum = (char*)NULL;
 char   zCurDir[ 65 ];
-char   zBaseName[ 65 ];
+char   zTemplName[ 65 ];
 
 FILE*  evtFp = (FILE*)NULL;
 size_t evtSz = 0;
@@ -58,7 +65,7 @@ main( int    argc,
 
         outFp = startAutogen();
 
-        fprintf( outFp, zAgDef, zBaseName );
+        fprintf( outFp, zAgDef, zTemplName );
 
         if (HAVE_OPT( INCLUDE )) {
             char* pz = loadFile( OPT_ARG( INCLUDE ));
@@ -134,17 +141,77 @@ validateOptions( void )
     }
 
     if (HAVE_OPT( BLOCK )) {
+        tSCC    zNoList[] = "ERROR:  block attr must have name list:\n"
+                            "\t%s\n";
         int     ct  = STACKCT_OPT(  BLOCK );
         char**  ppz = STACKLST_OPT( BLOCK );
+        char*   pz;
+        char*   p;
 
+        /*
+         *  FOR each BLOCK argument,
+         *  DO  condense each name list to be a list of names
+         *      separated by a single space and NUL terminated.
+         */
         do  {
-            char* pz = strchr( *ppz++, '=' );
+            /*
+             *  Make sure we find the '=' separator
+             */
+            pz = strchr( *ppz++, '=' );
             if (pz == (char*)NULL) {
-                fprintf( stderr, "ERROR:  block attr must have name list:\n"
-                         "\t%s\n", ppz[-1] );
+                fprintf( stderr, zNoList, ppz[-1] );
                 USAGE( EXIT_FAILURE );
             }
-            *pz = NUL;
+
+            /*
+             *  NUL the equal char
+             */
+            *pz++ = NUL;
+            p = pz;
+
+            /*
+             *  Make sure at least one attribute name is defined
+             */
+            while (isspace( *pz )) pz++;
+            if (*pz == NUL) {
+                fprintf( stderr, zNoList, ppz[-1] );
+                USAGE( EXIT_FAILURE );
+            }
+
+            for (;;) {
+                /*
+                 *  Attribute names must start with an alpha
+                 */
+                if (! isalpha( *pz )) {
+                    fprintf( stderr, "ERROR:  attribute names must start "
+                             "with an alphabetic character:\n\t%s\n",
+                             ppz[-1] );
+                    USAGE( EXIT_FAILURE );
+                }
+
+                /*
+                 *  Copy the name.  (maybe.  "p" and "pz" may be equal)
+                 */
+                while (isalnum( *pz ) || (*pz == '_'))
+                    *p++ = *pz++;
+
+                /*
+                 *  Skip over one comma (optional) and any white space
+                 */
+                while (isspace( *pz )) pz++;
+                if (*pz == ',')
+                    pz++;
+
+                while (isspace( *pz )) pz++;
+                if (*pz == NUL)
+                    break;
+                /*
+                 *  The final string contains only one space
+                 */
+                *p++ = ' ';
+            }
+
+            *p = NUL;
         } while (--ct > 0);
     }
 }
@@ -193,159 +260,6 @@ compar_text( const void* p1, const void* p2 )
 }
 
 
-    int
-eventNumber( char* pzName )
-{
-    char* pz;
-    char* pzGrp;
-    char  zName[ 80 ];
-    int   num = 0;
-
-    strcpy( zName, "#define " );
-    pz = zName + sizeof( "#define " )-1;
-    pzGrp = zCurDir;
-    while (*pzGrp != NUL)
-        *pz++ = toupper( *pzGrp++ );
-    *pz++ = '_';
-    while (*pzName != NUL)
-        *pz++ = toupper( *pzName++ );
-    strcpy( pz, "_EVTNO " );
-    pzGrp = strstr( pzEvtNum, zName );
-    if (pzGrp != (char*)NULL) {
-        pzGrp += strlen( zName );
-        while (isspace( *pzGrp )) pzGrp++;
-        return atoi( pzGrp );
-    }
-    pzGrp = pzEvtNum + strlen( pzEvtNum );
-    while ((pzGrp > pzEvtNum) && isspace( pzGrp[-1] )) pzGrp--;
-    while ((pzGrp > pzEvtNum) && isdigit( pzGrp[-1] )) pzGrp--;
-    if (isdigit( *pzGrp ))
-        num = atoi( pzGrp )+1;
-    pzGrp += strlen( pzGrp );
-    sprintf( pzGrp, "%-40s %5d\n", zName, num );
-    return num;
-}
-
-
-    int
-putBlockAttr(  char** ppzAttr, char* pzAttrName, FILE* outFp )
-{
-    char* pzAttrDefs;
-
-    fprintf( outFp, "    %s", pzAttrName );
-
-    if (! HAVE_OPT( BLOCK ))
-        return 0;
-
-    {
-        int     ct  = STACKCT_OPT(  BLOCK );
-        char**  ppz = STACKLST_OPT( BLOCK );
-
-        for (;;) {
-            if (streqvcmp( *ppz++, pzAttrName ) == 0)
-                break;
-            if (--ct <= 0)
-                return 0;
-        }
-        pzAttrDefs = ppz[-1];
-        pzAttrDefs += strlen( pzAttrDefs ) + 1;
-    }
-
-    fputs( " = {\n", outFp );
-    {
-        char* pzAttr = *ppzAttr + 1;
-        char* pzDta  = (char*)malloc( strlen( pzAttr ));
-        char* pzScn  = pzDta;
-        pzAttr += strspn( pzAttr, " \t" );
-        if (*pzAttr != '\n') {
-            do  {
-                *pzScn++ = *pzAttr++;
-            } while ((*pzAttr != NUL) && (*pzAttr != '\n'));
-            *pzScn++ = '\n';
-        }
-        for (;;) {
-            char* pz = strpbrk( pzAttr+1, "*\n" );
-            if (pz == (char*)NULL)
-                break;
-            pzAttr = pz;
-            if (*pz == '\n') {
-                *pzScn++ = '\n';
-                pzAttr = pz;
-                continue;
-            }
-            if (isalpha( pz[1] )) {
-                pzAttr = pz-1;
-                *pzAttr = '\n';
-                break;
-            }
-            pz++;
-            if (*pz == '.')
-                 pz++;
-            else pz += strspn( pz, " \t" );
-            for (;;) {
-                switch (*pzScn++ = *pz++) {
-                case '\n':
-                    pzAttr = pz;
-                    goto endInnerCopy;
-
-                case '\0':
-                    pzAttr = pz-1;
-                    goto endCopy;
-
-                default:
-                    ;
-                }
-            } endInnerCopy: ;
-        }
-
-    endCopy:
-        *ppzAttr = pzAttr;
-        while (isspace( pzScn[-1] )) pzScn--;
-        *pzScn   = NUL;
-        pzScn    = pzDta;
-        while (isspace( *pzScn )) pzScn++;
-
-        while (*pzScn != NUL) {
-            fputs( "        ", outFp );
-            while (isalnum( *pzAttrDefs ) || (*pzAttrDefs == '_'))
-                fputc( *pzAttrDefs++, outFp );
-            fputs( " = '", outFp );
-            while (isspace( *pzAttrDefs )) pzAttrDefs++;
-            if (*pzAttrDefs == ',') {
-                pzAttrDefs++;
-                while (isspace( *pzAttrDefs )) pzAttrDefs++;
-            }
-            for (;;) {
-                switch (*pzScn) {
-                case '\'':
-                    fputc( '\\', outFp );
-                default:
-                    fputc( *pzScn++, outFp );
-                    break;
-                case ',':
-                    pzScn++;
-                case NUL:
-                    fputs( "';\n", outFp );
-                    while (isspace( *pzScn )) pzScn++;
-                    goto dataDone;
-                }
-            } dataDone:;
-        }
-
-        free( (void*)pzDta );
-    }
-    fputs( "    };\n", outFp );
-    return 1;
-}
-
-
-typedef enum {
-    DST_START,
-    DST_NAME_LINE,
-    DST_NAME,
-    DST_TEXT,
-    DST_STRING
-} teDefState;
 
 
 
@@ -355,46 +269,52 @@ compressDef( char* pz )
     char* pzStrt = pz;
     char* pzDest = pz;
     char* pzSrc  = pz+1;
+    int   nlCt;
 
     for (;;) {
-        int   nl =  0;
+        nlCt =  0;
 
         /*
          *  Skip over leading space
          */
         while (isspace( *pzSrc )) {
             if (*pzSrc == '\n')
-                nl++;
+                nlCt++;
             pzSrc++;
         }
 
         /*
          *  IF no new-lines were found, then we found text start
          */
-        if (nl == 0)
+        if (nlCt == 0)
             break;
 
         /*
-         *  Skip forward to the next asterisk.
+         *  Skip over the first asterisk we find
          *  Then, skip over leading space.
          */
-        while (*++pzSrc != '*') {
-            if (*pzSrc == NUL) {
-                *pzStrt = NUL;
-                return;
-            }
+        pzSrc = strchr( pzSrc, '*' );
+        if (pzSrc == (char*)NULL) {
+            *pzStrt = NUL;
+            return;
         }
+
+        /*
+         *  Skip over sequential asterisks
+         */
+        while (*pzSrc == '*') pzSrc++;
     }
 
     for (;;) {
         for (;;) {
-	    /*
-	     *  Move the source to destination until we find
-	     *  either a new-line or a NUL.
-	     */
+            /*
+             *  Move the source to destination until we find
+             *  either a new-line or a NUL.
+             */
             switch (*pzDest++ = *pzSrc++) {
             case '\n':
-                goto lineDone;
+                if (*pzSrc != NUL)
+                    goto lineDone;
             case NUL:
                 pzDest--;
                 goto compressDone;
@@ -402,15 +322,27 @@ compressDef( char* pz )
             }
         } lineDone:;
 
-	/*
-	 *  We found a new-line.  Skip forward to an asterisk.
-	 */
-        while (*++pzSrc != '*') {
-            if (*pzSrc == NUL) {
+        /*
+         *  We found a new-line.  Skip forward to an asterisk.
+         */
+    foundNewline:
+        while (*pzSrc != '*') {
+            if (*pzSrc == NUL)
                 goto compressDone;
-            }
+            if (*pzSrc == '\n')
+                nlCt++;
+            pzSrc++;
         }
-        while (isspace( *++pzSrc ))  ;
+        if (nlCt > 0) {
+            *pzDest++ = '\n';
+            nlCt =  0;
+        }
+        while (*pzSrc == '*')     pzSrc++;
+        while (isspace( *pzSrc )) {
+            if (*pzSrc == '\n')
+                goto foundNewline;
+            pzSrc++;
+        }
     } compressDone:;
 
     while ((pzDest > pzStrt) && isspace( pzDest[-1] )) pzDest--;
@@ -418,12 +350,245 @@ compressDef( char* pz )
 }
 
 
+    char*
+emitQuote( char** ppzText, char* pzOut )
+{
+    char*  pzText = *ppzText;
+    char   svch   = (*pzOut++ = *pzText++);
+
+    for (;;) {
+        switch (*pzOut++ = *pzText++) {
+
+        case '\\':
+            if ((*pzOut++ = *pzText++) != NUL)
+                break;
+
+        case NUL:
+            pzText--;
+            pzOut[-1] = svch;
+            svch = NUL;
+            /* FALLTHROUGH */
+
+        case '"':
+        case '\'':
+            if (pzOut[-1] == svch)
+                goto quoteDone;
+
+            break;
+        }
+    }
+
+quoteDone:
+    *ppzText = pzText;
+    *pzOut++ = ';';
+    return pzOut;
+}
+
+
+
+    char*
+emitString( char** ppzText, char* pzOut )
+{
+    char*  pzText  = *ppzText;
+    char*  pcComma;
+    char*  pcEnd;
+
+    while (isspace( *pzText )) pzText++;
+
+    if ((*pzText == '"') || (*pzText == '\'')) {
+        *ppzText = pzText;
+        return emitQuote( ppzText, pzOut );
+    }
+
+    pcComma = strchr( pzText, ',' );
+    if (pcComma == (char*)NULL) {
+        pcEnd = pzText + strlen( pzText );
+        pcComma = pcEnd-1;
+    } else {
+        pcEnd = pcComma;
+    }
+
+    while ((pcEnd > pzText) && isspace( pcEnd[-1] )) pcEnd--;
+    *pzOut++ = '\'';
+    {
+        char ch = *pcEnd;
+        *pcEnd = NUL;
+        for (;;) {
+            char ch = *pzText++;
+            switch (ch) {
+            case '\'':
+                *pzOut++ = '\\';
+            default:
+                *pzOut++ = ch;
+                break;
+            case NUL:
+                goto copyDone;
+            }
+        } copyDone: ;
+
+        pzText = pcComma+1;
+        *pcEnd = ch;
+    }
+
+    *pzOut++ = '\''; *pzOut++ = ';';
+    *ppzText = pzText;
+    return pzOut;
+}
+
+
+
+    char*
+emitSubgroup( char* pzDefList, char* pzText, char* pzOut )
+{
+    tSCC  zStart[] = " = {\n        ";
+    tSCC  zEnd[]   = "\n    };\n";
+    int   newlineDone = 1;
+
+    /*
+     *  Advance past subgroup name to the entry name list
+     */
+    pzDefList += strlen( pzDefList ) + 1;
+    strcpy( pzOut, zStart );
+    pzOut += sizeof( zStart ) - 1;
+
+    /*
+     *  Loop for as long as we have text entries and subgroup
+     *  attribute names, ...
+     */
+    do  {
+        while (isspace( *pzText )) pzText++;
+        if (*pzText == NUL)
+            break;
+
+        /*
+         *  IF the text is just a comma, then we skip the entry
+         */
+        if (*pzText == ',') {
+            pzText++;
+            while ((! isspace( *pzDefList )) && (*pzDefList != NUL))
+                pzDefList++;
+
+        } else {
+            if (! newlineDone) {
+                strcpy( pzOut, zStart + 4 );
+                pzOut += sizeof( zStart ) - 5;
+            }
+
+            /*
+             *  Copy out the attribute name
+             */
+            for (;;) {
+                *pzOut++ = *pzDefList++;
+                if (*pzDefList == ' ') {
+                    pzDefList++;
+                    break;
+                }
+                if (*pzDefList == NUL)
+                    break;
+            }
+
+            /*
+             *  Copy out the assignment operator and emit the string
+             */
+            *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
+            pzOut = emitString( &pzText, pzOut );
+            newlineDone = 0;
+        }
+    } while (isalpha( *pzDefList ));
+    strcpy( pzOut, zEnd );
+    return pzOut + sizeof( zEnd ) - 1;
+}
+
+
+    char*
+emitDefinition( char* pzDef, char* pzOut )
+{
+    char   char_after_equal;
+    char   zEntryName[ 256 ];
+
+    /*
+     *  Indent attribute definitions four spaces
+     */
+    *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
+
+    if (! HAVE_OPT( BLOCK )) {
+        while (*pzDef != MARK_CHAR)  *pzOut++ = *pzDef++;
+        compressDef( pzDef );
+
+    } else {
+        int    ct  = STACKCT_OPT(  BLOCK );
+        char** ppz = STACKLST_OPT( BLOCK );
+        char*  p   = zEntryName;
+
+        while (*pzDef != MARK_CHAR)
+            *p++ = *pzOut++ = *pzDef++;
+
+        *p = NUL;
+        compressDef( pzDef );
+
+        do  {
+            p = *ppz++;
+            if (strcmp( p, zEntryName ) == 0) {
+                pzOut = emitSubgroup( p, pzDef, pzOut );
+                return pzOut;
+            }
+        } while (--ct > 0);
+    }
+
+    if (*pzDef == '\n') {
+        char_after_equal = '\n';
+        while (isspace( *pzDef )) pzDef++;
+    } else {
+        char_after_equal = ' ';
+    }
+
+    switch (*pzDef) {
+    case NUL:
+        *pzOut++ = ';'; *pzOut++ = '\n';
+        break;
+
+    case '"':
+    case '\'':
+    case '{':
+        /*
+         *  Quoted entries or subgroups do their own stringification
+         */
+        pzOut += sprintf( pzOut, " =%c%s;\n", char_after_equal, pzDef );
+        break;
+
+    default:
+        *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = char_after_equal;
+        *pzOut++ = '\'';
+
+        for (;;) {
+            switch (*pzOut++ = *pzDef++) {
+            case '\\':
+            case '\'':
+                pzOut[-1] = '\\';
+                *pzOut++  = '\'';
+                break;
+
+            case NUL:
+                goto unquotedDone;
+            }
+        } unquotedDone:;
+        pzOut[-1] = '\''; *pzOut++ = ';'; *pzOut++ = '\n';
+        break;
+    }
+    return pzOut;
+}
+
 
     void
-buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
+buildDefinition(
+    char*    pzDef,
+    char*    pzFile,
+    int      line,
+    char*    pzOut )
 {
     static const char zFieldMark[] =
-        "error field name does not end with ':' in file %s line %d\n";
+        "error field name does not end with " STR( MARK_CHAR )
+        " in file %s line %d\n";
     static const char zStrCtx[] =
         "error String value found out of context in file %s line %d\n";
     static const char zConfused[] =
@@ -431,14 +596,19 @@ buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
     static const char zNoData[] =
         "error no data for definition in file %s line %d\n";
 
-    teDefState state = DST_START;
-    char* pzNextDef;
+    char* pzNextDef = (char*)NULL;
 
+    /*
+     *  Copy out the name of the entry type
+     */
     while (isalnum( *pzDef ))
         *pzOut++ = *pzDef++;
 
     while (isspace( *pzDef )) pzDef++;
 
+    /*
+     *  Now find the name of this particular copy of the entry type
+     */
     {
         char* pzName = pzDef;
         while (! isspace( *pzDef )) {
@@ -448,87 +618,66 @@ buildDefinition( char* pzDef, char* pzFile, int line, char* pzOut )
         }
         *pzDef = NUL;
 
+        /*
+         *  We insert the name with a consistent name string
+         *  that we use to locate the sort key later.
+         */
         pzOut += sprintf( pzOut, "%s%s';\n", zNameTag, pzName );
     }
 
-    if (HAVE_OPT( BLOCK )) {
-        int    ct  = STACKCT_OPT(  BLOCK );
-        char** ppz = STACKLST_OPT( BLOCK );
-        do  {
-            pzOut += sprintf( "    %s;\n", *ppz++ );
-        } while (--ct > 0);
-    }
-
     *pzDef = '\n';
-    for (;; pzDef = pzNextDef) {
-        int        ct;
+
+    /*
+     *  FOR each attribute for this entry, ...
+     */
+    for (;;) {
+        int        re_res;
         regmatch_t match[2];
 
-        ct = regexec( &attrib_re, pzDef, COUNT( match ), match, 0 );
-        if (ct != 0) {
-            if (ct != 1) {
-                regerror( ct, &attrib_re, zRER, sizeof( zRER ));
-                fprintf( stderr, "Error %d (%s) finding `%s' in\n%s\n\n",
-                         ct, zRER, zAttribRe, pzDef );
+        /*
+         *  Find the next attribute regular expression
+         */
+        re_res = regexec( &attrib_re, pzDef, COUNT( match ), match, 0 );
+        switch (re_res) {
+        case 0:
+            /*
+             *  NUL-terminate the current attribute.
+             *  Set the "next" pointer to the start of the next attribute name.
+             */
+            pzDef[ match[0].rm_so ] = NUL;
+            if (pzNextDef != (char*)NULL)
+                pzOut = emitDefinition( pzNextDef, pzOut );
+            pzNextDef = pzDef = pzDef + match[1].rm_so;
+            break;
+
+        case 1:
+            /*
+             *  No more attributes.
+             */
+            if (pzNextDef == (char*)NULL) {
+                *pzOut++ = '\n'; *pzOut++ = '#';
+                sprintf( pzOut,  zNoData, pzFile, line );
+                fputs( pzOut, stderr );
+                pzOut += strlen( pzOut );
+                return;
             }
+
+            pzOut = emitDefinition( pzNextDef, pzOut );
+            goto eachAttrDone;
             break;
-        }
-        pzDef[ match[0].rm_so ] = NUL;
-        pzNextDef = pzDef + match[1].rm_so;
-        if (state == DST_START) {
-            state = DST_NAME_LINE;
-            continue;
-        }
-        *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
-        while (*pzDef != ':') *pzOut++ = *pzDef++;
-        compressDef( pzDef );
-
-        switch (*pzDef) {
-        case NUL:
-            *pzOut++ = ';'; *pzOut++ = '\n';
-            break;
-
-        case '"':
-        case '\'':
-            pzOut += sprintf( pzOut, " = %s;\n", pzDef );
-            break;
-
-        case '\n':
-            *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = '\n';
-            pzDef++;
-
-            switch (*pzDef) {
-            case '"':
-            case '\'':
-                pzOut += sprintf( pzOut, " = %s;\n", pzDef );
-                break;
-
-            default:
-                pzOut += sprintf( pzOut, " = '%s';\n", pzDef );
-                break;
-            }
 
         default:
-            pzOut += sprintf( pzOut, " = '%s';\n", pzDef );
-            break;
-        }
-    }
-
-    switch (state) {
-        case DST_START:
-            *pzOut++ = '\n'; *pzOut++ = '#';
-            pzOut += sprintf( pzOut,  zNoData, pzFile, line );
-            fprintf( stderr, zNoData, pzFile, line );
+        {
+            tSCC zErr[] = "error %d (%s) finding `%s' in\n%s\n\n";
+            regerror( re_res, &attrib_re, zRER, sizeof( zRER ));
+            *pzOut++ = '\n';
+            *pzOut++ = '#';
+            sprintf( pzOut, zErr, re_res, zRER, zAttribRe, pzDef );
+            fputs( pzOut, stderr );
             return;
-
-        case DST_TEXT:
-            *pzOut++ = '\'';
-
-        case DST_STRING:
-        case DST_NAME_LINE:
-        case DST_NAME:
-            *pzOut++ = ';'; *pzOut++ = '\n';
-    }
+        }
+        }
+    } eachAttrDone:;
 
     *pzOut++ = '}'; *pzOut++ = ';'; *pzOut++ = '\n'; *pzOut++ = NUL;
 }
@@ -589,12 +738,13 @@ processFile( char* pzFile )
         /*
          *  Count the number of lines skipped to the start of the def.
          */
-        while (pzScan < pzDef) {
+        for (;;) {
             pzScan = strchr( pzScan, '\n' );
-            if (pzScan == (char*)NULL)
+            if (pzScan++ == (char*)NULL)
+                break;
+            if (pzScan >= pzDef)
                 break;
             lineNo++;
-            pzScan++;
         }
 
         {
@@ -636,10 +786,9 @@ processFile( char* pzFile )
         papzBlocks[ blkUseCt-1 ] = pzDta;
     }
 
-    if (lineNo == 1) {
+    if (lineNo == 1)
         fprintf( stderr, "Warning:  no copies of pattern `%s' were found in "
                  "%s\n", pzDefPat, pzFile );
-    }
 
     free( (void*)pzText );
 }
@@ -651,6 +800,9 @@ printEntries( FILE* fp )
     int     ct  = blkUseCt;
     char**  ppz = papzBlocks;
 
+    if (ct == 0)
+        exit( EXIT_FAILURE );
+
     for (;;) {
         char* pz = *(ppz++);
         if (--ct < 0)
@@ -658,7 +810,7 @@ printEntries( FILE* fp )
         fputs( pz, fp );
         free( (void*)pz );
         if (ct > 0)
-            fputs( "\n\n", fp );
+            fputc( '\n', fp );
     }
     free( (void*)papzBlocks );
 }
@@ -678,12 +830,46 @@ startAutogen( void )
     char zSrch[  MAXPATHLEN ];
     char zBase[  MAXPATHLEN ];
 
+    if (HAVE_OPT( BASE_NAME )) {
+        sprintf( zBase, "-b%s", OPT_ARG( BASE_NAME ));
+    }
+
+    else if (HAVE_OPT( DEFS_TO_GET )) {
+        char* pzS = OPT_ARG( DEFS_TO_GET );
+        strcpy( zBase, "-b" );
+        pz = zBase + 2;
+        while (isalnum( *pzS ) || (*pzS == '_'))
+            *pz++ = *pzS++;
+        *pz = NUL;
+
+        if (zBase[2] == NUL) {
+            if (getcwd( zSrch, sizeof( zSrch )) == (char*)NULL) {
+                fprintf( stderr, "Error %d (%s) on getcwd\n", errno,
+                         strerror( errno ));
+                exit( EXIT_FAILURE );
+            }
+
+            pz = strrchr( zSrch, '/' );
+            if (pz == (char*)NULL)
+                 pz = zSrch;
+            else pz++;
+            strcpy( zBase+2, pz );
+        }
+    }
+
+    if (HAVE_OPT( TEMPLATE )) {
+        sprintf( zTempl, "-T%s", OPT_ARG( TEMPLATE ));
+	strcpy( zTemplName, OPT_ARG( TEMPLATE ));
+    } else {
+	strcpy( zTemplName, zBase+2 );
+    }
+
     if (HAVE_OPT( AUTOGEN ))
         switch (WHICH_IDX_AUTOGEN) {
         case INDEX_OPT_OUTPUT:
-            if (strcmp( OPT_ARG( OUTPUT ), "-"))
+            if (strcmp( OPT_ARG( OUTPUT ), "-") == 0)
                 return stdout;
-            return fopen( OPT_ARG( OUTPUT ), "r" );
+            return fopen( OPT_ARG( OUTPUT ), "w" );
 
         case INDEX_OPT_AUTOGEN:
             if (! ENABLED_OPT( AUTOGEN ))
@@ -694,42 +880,7 @@ startAutogen( void )
                 pzAutogen = OPT_ARG( AUTOGEN );
 
             break;
-
-        default:
-            break;
         }
-
-    if (HAVE_OPT( BASE_NAME ))
-        sprintf( zBase, "-b%s", OPT_ARG( BASE_NAME ));
-
-    else if (HAVE_OPT( DEFS_TO_GET )) {
-        char* pzS = OPT_ARG( DEFS_TO_GET );
-        strcpy( zBase, "-b" );
-        pz = zBase + 2;
-        while (isalnum( *pzS ) || (*pzS == '_'))
-            *pz++ = *pzS++;
-        *pz = NUL;
-    }
-
-    if (zBase[2] == NUL) {
-        char zPath[  MAXPATHLEN ];
-        if (getcwd( zPath, sizeof( zPath )) == (char*)NULL) {
-            fprintf( stderr, "Error %d (%s) on getcwd\n", errno,
-                     strerror( errno ));
-            exit( EXIT_FAILURE );
-        }
-
-        pz = strrchr( zPath, '/' );
-        if (pz == (char*)NULL)
-             pz = zPath;
-        else pz++;
-        strcpy( zBase+2, pz );
-    }
-
-    if (! ENABLED_OPT( AUTOGEN )) {
-        strcpy( zBaseName, zBase+2 );
-        return stdout;
-    }
 
     args[0] = pzAutogen;
 
@@ -739,12 +890,9 @@ startAutogen( void )
     }
 
     *pparg++ = zBase;
-    strcpy( zBaseName, zBase+2 );
 
-    if (HAVE_OPT( TEMPLATE )) {
-        sprintf( zTempl, "-T%s", OPT_ARG( TEMPLATE ));
+    if (HAVE_OPT( TEMPLATE ))
         *pparg++ = zTempl;
-    }
 
     *pparg++ = "--";
     *pparg++ = "-";
