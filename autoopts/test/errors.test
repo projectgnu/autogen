@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-11-22 22:05:23 bkorb"
+# Time-stamp:        "2004-05-14 11:15:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.8 2003/11/23 06:24:43 bkorb Exp $
+# $Id: errors.test,v 3.9 2004/05/15 03:32:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -149,5 +149,15 @@ _EOF_
 cmp -s ${testname}-sh.out ${testname}-sh.samp || \
   failure "`diff ${testname}-sh.samp ${testname}-sh.out`"
 
+cat >> ${testname}.def << '_EOF_'
+flag = {
+    name = "still-another";
+    ifdef = true ; ifndef = false;
+    descrip = "Another option descrip";
+    value = 'X';
+};
+_EOF_
+$AGEN ${testname}.def && \
+  failure AutoGen processed double ifdefs
 cleanup
 # end of errors.test

@@ -1,3 +1,13 @@
+2004-05-14  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options.tpl(define): define a set of hash tables to use
+	* autoopts/optlib.tpl(save-name-morphs): new macro - use hash tables
+	* autoopts/optcode.tpl: ditto
+	* autoopts/opthead.tpl: ditto
+	* autoopts/optmain.tpl: ditto
+	* autoopts/test/errors.test(still-another): new - test for multiple ifdf
+	* autoopts/test/handler.test: adjust for tweaks
+
 2004-05-09  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/aginfo3.tpl(lib-name): handle the library name consistently

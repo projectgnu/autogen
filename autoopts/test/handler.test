@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/03/19 19:29:20 $
+# Last Modified:     $Date: 2004/05/15 03:32:13 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.6 2004/03/19 19:29:20 bkorb Exp $
+# $Id: handler.test,v 3.7 2004/05/15 03:32:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -106,7 +106,7 @@ doUsageOpt(
 
 /* * * * * * *
  *
- *   For the "First Option".
+ *   For the first option.
  */
 static void
 doOptFirst(
@@ -120,7 +120,7 @@ SampleCode();
 
 /* * * * * * *
  *
- *   For the "Second Option".
+ *   For the second option.
  */
 static void
 doOptSecond(
@@ -138,7 +138,7 @@ doOptSecond(
 
 /* * * * * * *
  *
- *   For the "Third Option".
+ *   For the third option.
  */
 static void
 doOptThird(
@@ -150,7 +150,7 @@ doOptThird(
 
 /* * * * * * *
  *
- *   For the "Fourth Option".
+ *   For the fourth option.
  */
 static void
 doOptFourth(
@@ -170,7 +170,7 @@ doOptFourth(
 
 /* * * * * * *
  *
- *   For the "Sixth Option".
+ *   For the sixth option.
  */
 static void
 doOptSixth(

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.18 2004/05/13 04:27:30 bkorb Exp $
+# $Id: opthead.tpl,v 3.19 2004/05/15 03:32:13 bkorb Exp $
 # Automated Options copyright 1992-2004 Bruce Korb
 
 =]
@@ -57,7 +57,29 @@ ENDIF (exist? version) =]
  *  enumeration above).  e.g. HAVE_[=(. UP-prefix)=]OPT( [=
     (up-c-name "flag[].name") =] )
  */[=
-(sprintf "
+
+IF (> 1 (string-length UP-prefix))
+
+=]
+#define         DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n]
+#define     HAVE_OPT(n) (! UNUSED_OPT(& DESC(n)))
+#define      OPT_ARG(n) (DESC(n).pzLastArg)
+#define    STATE_OPT(n) (DESC(n).fOptState & OPTST_SET_MASK)
+#define    COUNT_OPT(n) (DESC(n).optOccCt)
+#define    ISSEL_OPT(n) (SELECTED_OPT(&DESC(n)))
+#define ISUNUSED_OPT(n) (UNUSED_OPT(& DESC(n)))
+#define  ENABLED_OPT(n) (! DISABLED_OPT(& DESC(n)))
+#define  STACKCT_OPT(n) (((tArgList*)(DESC(n).optCookie))->useCt)
+#define STACKLST_OPT(n) (((tArgList*)(DESC(n).optCookie))->apzArgs)
+#define    CLEAR_OPT(n) STMTS( \
+                DESC(n).fOptState &= OPTST_PERSISTENT;   \
+                if ( (DESC(n).fOptState & OPTST_INITENABLED) == 0) \
+                    DESC(n).fOptState |= OPTST_DISABLED; \
+                DESC(n).optCookie = NULL )[=
+
+ELSE we have a prefix:
+
+=][=  (sprintf "
 #define         %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_ ## n]
 #define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
 #define      %1$sOPT_ARG(n) (%1$sDESC(n).pzLastArg)
@@ -74,21 +96,23 @@ ENDIF (exist? version) =]
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
 
-  UP-prefix pname
+  UP-prefix pname )   =][=
 
-) =]
+ENDIF prefix/not      =]
 
 /*
  *  Interface defines for specific options.
  */[=
 
 FOR flag              =][=
-  (set-flag-names)    =][=
   save-name-morphs    =][=
-  (set! opt-name   (string-append OPT-pfx UP-name))
-  (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
- IF (exist? "documentation") =][=
+  IF (set! opt-name   (string-append OPT-pfx UP-name))
+     (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" ))
+
+     (exist? "documentation")
+
+   =][=
    IF (hash-ref have-cb-procs flg-name)
 =]
 #define SET_[= (string-append OPT-pfx UP-name) =]   STMTS( \
@@ -99,7 +123,7 @@ FOR flag              =][=
  ELSE                 =][=
    Option_Defines     =][=
  ENDIF                =][=
-ENDFOR  flag          =][=#
+ENDFOR  flag
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -114,75 +138,58 @@ are used identically to the user-generated VALUE defines.
 
 :=]
 [=
-IF (exist? "flag.value") =][=
-  IF (exist? "version")  =]
-#define [= (. VALUE-pfx) =]VERSION        [=
-    IF (not (exist? "version-value")) =]'v'[=
-    ELSE      =][=
-      CASE (get "version-value")  =][=
-      == ""   =][= (if (not (exist? "long-opts"))
-                       (error "'version-value' may not be empty")) INDEX-pfx
-              =]VERSION[=
-      == "'"  =]'\''[=
-      ~~ .    =]'[=version-value=]'[=
-      *       =][=(error "value (flag) codes must be single characters") =][=
-      ESAC    =][=
-    ENDIF     =][=
-  ENDIF       =][=
 
-  IF (exist? "homerc")=]
-#define [= (. VALUE-pfx) =]SAVE_OPTS      [=
-    IF (not (exist? "save-opts-value")) =]'>'[=
-    ELSE      =][=
-      CASE (get "save-opts-value")  =][=
-      == ""   =][= (if (not (exist? "long-opts"))
-                       (error "'save-opts-value' may not be empty")) INDEX-pfx
-              =]SAVE_OPTS[=
-      == "'"  =]'\''[=
-      ~~ .    =]'[=save-opts-value=]'[=
-      *       =][=(error "value (flag) codes must be single characters") =][=
-      ESAC    =][=
-    ENDIF     =]
-#define [= (. VALUE-pfx) =]LOAD_OPTS      [=
-    IF (not (exist? "load-opts-value")) =]'<'[=
-    ELSE      =][=
-      CASE (get "load-opts-value")  =][=
-      == ""   =][= (if (not (exist? "long-opts"))
-                       (error "'load-opts-value' may not be empty")) INDEX-pfx
-              =]LOAD_OPTS[=
-      == "'"  =]'\''[=
-      ~~ .    =]'[=load-opts-value=]'[=
-      *       =][=(error "value (flag) codes must be single characters") =][=
-      ESAC    =][=
-    ENDIF     =][=
-  ENDIF
-=]
-#define [= (. VALUE-pfx) =]HELP           [=
-    IF (not (exist? "help-value")) =]'?'[=
-    ELSE      =][=
-      CASE (get "help-value")  =][=
-      == ""   =][= (if (not (exist? "long-opts"))
-                       (error "'help-value' may not be empty")) INDEX-pfx
-              =]HELP[=
-      == "'"  =]'\''[=
-      ~~ .    =]'[=help-value=]'[=
-      *       =][=(error "value (flag) codes must be single characters") =][=
-      ESAC    =][=
-    ENDIF     =]
-#define [= (. VALUE-pfx) =]MORE_HELP      [=
-    IF (not (exist? "more-help-value")) =]'!'[=
-    ELSE      =][=
-      CASE (get "more-help-value")  =][=
-      == ""   =][= (if (not (exist? "long-opts"))
-                       (error "'more-help-value' may not be empty")) INDEX-pfx
-              =]MORE_HELP[=
-      == "'"  =]'\''[=
-      ~~ .    =]'[=more-help-value=]'[=
-      *       =][=(error "value (flag) codes must be single characters") =][=
-      ESAC    =][=
-    ENDIF     =][=
+DEFINE set-std-value =]
+#define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
+  CASE (set! tmp-val (get "val-name"))
+       (get tmp-val)        =][=
+   == ""   =][=
 
-ELSE "flag.value *DOES NOT* exist" =][=
+     (if (exist? tmp-val)
+         (if (not (exist? "long-opts"))
+             (error (sprintf "'%s' may not be empty" tmp-val))
+             (string-append INDEX-pfx (get "val-UPNAME"))  )
+         (sprintf "'%s'" (get "std-value"))
+     )     =][=
+
+   == "'"  =]'\''[=
+   ~~ .    =]'[=(get tmp-val)=]'[=
+   *       =][=(error "value (flag) codes must be single characters") =][=
+   ESAC    =][=
+ENDDEF set-std-value        =][=
+
+IF (exist? "flag.value")    =][=
+
+  IF (exist? "version")     =][=
+    set-std-value
+       val-name    = "version-value"
+       val-UPNAME  = "VERSION"
+       std-value   = "v"    =][=
+  ENDIF  have "version"     =][=
+
+  IF (exist? "homerc")      =][=
+    set-std-value
+       val-name    = "save-opts-value"
+       val-UPNAME  = "SAVE_OPTS"
+       std-value   = ">"    =][=
+
+    set-std-value
+       val-name    = "load-opts-value"
+       val-UPNAME  = "LOAD_OPTS"
+       std-value   = "<"    =][=
+  ENDIF  have "homerc"      =][=
+
+  set-std-value
+       val-name    = "help-value"
+       val-UPNAME  = "HELP"
+       std-value   = "?"    =][=
+
+  set-std-value
+       val-name    = "more-help-value"
+       val-UPNAME  = "MORE_HELP"
+       std-value   = "!"    =][=
+
+ELSE  NO "flag.value"       =][=
 
   IF (exist? "version") =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
@@ -206,19 +213,35 @@ ENDIF
 /*
  *  Interface defines not associated with particular options
  */
-#define  ERRSKIP_[=(. UP-prefix)=]OPTERR STMTS( [=(. pname)
-                         =]Options.fOptSet &= ~OPTPROC_ERRSTOP )
-#define  ERRSTOP_[=(. UP-prefix)=]OPTERR STMTS( [=(. pname)
-                         =]Options.fOptSet |= OPTPROC_ERRSTOP )
-#define  RESTART_[=(. UP-prefix)=]OPT(n) STMTS( \
-                [=(. pname)=]Options.curOptIdx = (n); \
-                [=(. pname)=]Options.pzCurOpt  = NULL )
-#define    START_[=(. UP-prefix)=]OPT    RESTART_[=(. UP-prefix)
-                =]OPT(1)
-#define     [=(. UP-prefix)=]USAGE(c)    (*[=(. pname)
-                 =]Options.pUsageProc)( &[=(. pname)=]Options, c )[=#
+#define ERRSKIP_[=
+
+IF (> 1 (string-length UP-prefix))
+
+=][= (sprintf  "OPTERR  STMTS( %1$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
+#define ERRSTOP_OPTERR  STMTS( %1$sOptions.fOptSet |= OPTPROC_ERRSTOP )
+#define RESTART_OPT(n)  STMTS( \\
+                %1$sOptions.curOptIdx = (n); \\
+                %1$sOptions.pzCurOpt  = NULL )
+#define START_OPT       RESTART_OPT(1)
+#define USAGE(c)        (*%1$sOptions.pUsageProc)( &%1$sOptions, c )"
+   pname ) =][=
+
+ELSE  we have a prefix
+
+=][= (sprintf  "%1$sOPTERR  STMTS( %2$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
+#define ERRSTOP_%1$sOPTERR  STMTS( %2$sOptions.fOptSet |= OPTPROC_ERRSTOP )
+#define RESTART_%1$sOPT(n)  STMTS( \\
+                %2$sOptions.curOptIdx = (n); \\
+                %2$sOptions.pzCurOpt  = NULL )
+#define START_%1$sOPT       RESTART_%1$sOPT(1)
+#define %1$sUSAGE(c)        (*%2$sOptions.pUsageProc)( &%2$sOptions, c )"
+
+  UP-prefix  pname ) =][=
+
+ENDIF    have/don't have prefix
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 =]
 
 /* * * * * *
@@ -236,10 +259,10 @@ IF (exist? "export")=]
 /* * * * * *
  *
  *  Globals exported from the [=prog_title=] option definitions
- */[=
-  FOR export "\n"=]
-[= (get "export") =][=
-  ENDFOR export=][=
+ */
+[= FOR export "\n\n" =][=
+      export         =][=
+   ENDFOR export     =][=
 ENDIF=]
 
 #ifndef _

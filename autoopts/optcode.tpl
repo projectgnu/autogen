@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.28 2004/03/19 19:29:20 bkorb Exp $
+#$Id: optcode.tpl,v 3.29 2004/05/15 03:32:13 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -27,8 +27,7 @@ ENDIF
 extern "C" {
 #endif[=
 
-IF (define tmp-text "")
-   (not (exist? "copyright") )
+IF (not (exist? "copyright") )
 
 =]
 #define zCopyright       NULL
@@ -57,38 +56,28 @@ tmp-text =];[=
 ENDIF "copyright notes"
 
 =]
-extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
-  (exist? "homerc") ", doLoadOpt")   =][=
+extern tOptProc doVersionStderr, doVersion, doPagedUsage[=
+  (set! tmp-name "doUsageOpt\n")
+  (if (exist? "homerc") ", doLoadOpt")  =][=
 
-  (define proc-list "doUsageOpt\n")  =][=
-
-  FOR flag                           =][=
-    (set-flag-names)                 =][=
-
-    CASE arg-type                    =][=
-    ~*  key|set                      =][=
-        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
-    =*  bool                         =][=
-    =*  num                          =][=
-      IF (exist? "arg-range")        =][=
-        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
-      ENDIF                          =][=
-    *                                =][=
-      IF (exist? "call-proc")        =], [=call-proc=][=
-
-      ELIF (or (exist? "extract-code")
-               (exist? "flag-code")) =][=
-        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
-
-      ENDIF                          =][=
-    ESAC                             =][=
+  FOR flag                              =][=
+    (set-flag-names)
+    (if (exist? "call-proc")
+        (string-append ", " (get "call-proc"))
+        (begin
+           (set! tmp-text (hash-ref cb-proc-name flg-name))
+           (if (==* tmp-text "doOpt")
+               (set! tmp-name (string-append tmp-name tmp-text "\n")) )
+    )   )                            =][=
   ENDFOR    flag
 
 =][=
 
 (shell (string-append
-"${COLUMNS_EXE} -I16 --first=';\nstatic tOptProc ' -S, --spread=1 <<_EOF_\n"
-         proc-list "_EOF_" )) =];
+  "( sort -u | "
+  "  ${COLUMNS_EXE} -I16 --first=';\nstatic tOptProc ' -S, --spread=1\n"
+  ") <<_EOF_\n"
+         tmp-name "_EOF_" )) =];
 extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
@@ -115,7 +104,7 @@ IF (exist? "include") =]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 FOR flag "\n"      =][=
-  (set-flag-names) =][=
+
   Option_Strings   =][=
 
 ENDFOR flag
@@ -173,16 +162,12 @@ IF (or (exist? "flag.flag-code")
 
 ENDIF   =][=
 
-IF (exist? "version")       =][=
-  IF (. make-test-main)     =]
+IF (and (exist? "version") make-test-main) =]
 #ifdef [=(. main-guard)     =]
 # define DOVERPROC doVersionStderr
 #else
 # define DOVERPROC doVersion
 #endif /* [=(. main-guard)=] */[=
-  ELSE  =]
-#define DOVERPROC doVersion[=
-  ENDIF =][=
 ENDIF   =]
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -192,20 +177,8 @@ ENDIF   =]
 static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 
 FOR flag "\n"       =][=
-  (set-flag-names)  =][=
+
   Option_Descriptor =][=
-
-  ;;  IF this is the default option AND we already have one,...
-  ;;  THEN remember this index
-  ;;
-  (if (and (exist? "default") (>= default-opt-index 0))
-      (error (sprintf "\n\tDefault argument %d duplicates %d\n"
-                      (for-index) default-opt-index) ))
-
-  ;;  IF this is the default option then remember this index
-  ;;
-  (if (and (exist? "default"))
-      (set! default-opt-index (for-index)) ) =][=
 
 ENDFOR flag
 
@@ -223,7 +196,7 @@ IF (exist? "version") =]
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ DOVERPROC,
+     /* option proc      */ [=(if make-test-main "DOVERPROC" "doVersion")=],
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
      /* disablement strs */ NULL, NULL },[=
 ENDIF=]

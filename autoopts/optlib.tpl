@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.20 2004/05/13 04:27:30 bkorb Exp $
+# $Id: optlib.tpl,v 3.21 2004/05/15 03:32:13 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -8,14 +8,28 @@
 
 (define tmp-val  #f)
 (define tmp-name "")
+(define tmp-text "")
+(define make-callback-procs #f)
 
 ;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 ;;; Save the various flag name morphs into a hash table =][=
 
 DEFINE save-name-morphs     =][=
+  IF
 
-  IF (exist? "call-proc")   =][=
+     (set-flag-names)
+     (if do-ifdefs
+         (begin
+            (if (or (exist? "ifdef") (exist? "ifndef"))
+                (set! tmp-val #t)
+                (set! tmp-val #f)  )
+            (hash-create-handle! ifdef-ed flg-name tmp-val)
+     )   )
+
+     (exist? "call-proc")
+
+    =][=
     (set! tmp-val #t)
     (set! tmp-name (get "call-proc"))
 
@@ -54,15 +68,22 @@ DEFINE save-name-morphs     =][=
          (set! tmp-name (string-append "doOpt" cap-name))
          (set! tmp-val #t)  =][=
     *                       =][=
-         (set! tmp-name "NULL")
          (set! tmp-val #f)  =][=
     ESAC                    =][=
 
   ENDIF =][=
 
-  (hash-create-handle! have-cb-procs flg-name tmp-val)
-  (hash-create-handle! cb-proc-name  flg-name tmp-name)
-  ""
+  (if tmp-val
+      (begin
+        (hash-create-handle! have-cb-procs flg-name #t)
+        (hash-create-handle! cb-proc-name  flg-name tmp-name)
+        (set! make-callback-procs #t)
+      )
+      (hash-create-handle! cb-proc-name  flg-name "NULL")
+  )
+
+  (if (exist? "default")
+      (set! default-opt-index (for-index)) )
 
 =][=
 
@@ -144,18 +165,14 @@ ENDDEF Option_Copyright
 
 Emit the #define's for a single option  =][=
 
-DEFINE Option_Defines      =][=
-  IF (. ifdef-ed)          =][=
-    IF   (exist? "ifdef")  =]
-#ifdef [=(get "ifdef")     =][=
-    ELIF (exist? "ifndef") =]
-#ifndef [=(get "ifndef")   =][=
-    ENDIF ifdef/ifndef     =][=
+DEFINE Option_Defines             =][=
+  IF (hash-ref ifdef-ed flg-name) =]
+#if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
   ENDIF =][=
 
-  CASE (get "arg-type")    =][=
+  CASE (get "arg-type")           =][=
 
-  =*   key                 =]
+  =*   key                        =]
 typedef enum {[=
          IF (not (exist? "arg-default")) =] [=
             (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
@@ -244,13 +261,9 @@ typedef enum {[=
 
     ENDIF is/not equivalenced =][=
 
-  ENDIF settable            =][=
-  IF (. ifdef-ed)       =][=
-    IF (exist? "ifdef")     =]
-#endif /* [=    ifdef       =][=
-    ELIF (exist? "ifndef")  =]
-#endif /* ! [=  ifndef      =][=
-    ENDIF =] */[=
+  ENDIF settable                  =][=
+  IF (hash-ref ifdef-ed flg-name) =]
+#endif /* [= ifdef =][= ifndef =] */[=
   ENDIF =][=
 
 ENDDEF Option_Defines
@@ -398,19 +411,14 @@ DEFINE   Option_Strings
 
 =]
 /*
- *  [=(. cap-name)=] option description[=
+ *  [=(set-flag-names) cap-name=] option description[=
   IF (or (exist? "flags_must") (exist? "flags_cant")) =] with
  *  "Must also have options" and "Incompatible options"[=
   ENDIF =]:
  */[=
-
-  IF (. ifdef-ed)           =][=
-    IF (exist? "ifdef")     =]
-#ifdef [=  ifdef            =][=
-    ELSE                    =]
-#ifndef [= ifndef           =][=
-    ENDIF ifdef/ifndef      =][=
-  ENDIF =]
+  IF (hash-ref ifdef-ed flg-name) =]
+#if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
+  ENDIF  ifdef-ed                 =]
 tSCC    z[=(. cap-name)=]Text[] =
         [=(set! tmp-text (kr-string (get "descrip")))  tmp-text=];[=
 
@@ -420,9 +428,9 @@ tSCC    z[=(. cap-name)=]Text[] =
      emit-nondoc-option           =][=
   ENDIF  (exist? "documentation") =][=
 
-  IF (. ifdef-ed)   =]
+  IF (hash-ref ifdef-ed flg-name) =]
 
-#else   /* disable [=(. cap-name)=] */
+#else   /* disable [= (. cap-name)=] */
 #define VALUE_[=(string-append OPT-pfx UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
@@ -445,7 +453,7 @@ tSCC    z[=(. cap-name)=]Text[] =
 #define zNot[=(. cap-name)=]_Pfx    NULL[=
     ENDIF =]
 #endif  /* [= ifdef =][= ifndef =] */[=
-  ENDIF (. ifdef-ed)   =][=
+  ENDIF  ifdef-ed   =][=
 
 ENDDEF Option_Strings
 
@@ -454,8 +462,12 @@ ENDDEF Option_Strings
 Define the values for an option descriptor   =][=
 
 DEFINE Option_Descriptor =][=
+  IF
+     (set-flag-names)
 
-  IF (exist? "documentation") =]
+     (exist? "documentation")
+
+=]
   {  /* entry idx, value */ 0, 0,
      /* equiv idx, value */ 0, 0,
      /* option argument  */ ARG_NONE,
