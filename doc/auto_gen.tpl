@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Wed Sep 23 10:44:02 1998
+## Last Modified:     Mon Sep 28 11:44:58 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.2 1998/09/24 17:43:58 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.3 1998/09/28 19:33:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -91,7 +91,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Invocation::           Running Autogen
 * Installation::         What Gets Installed Where
 * Autoopts::             Automated Option Processing
-* GetDefs::              Extract Definitions from Source
+* Add-Ons::              Add-on packages for Autogen
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::	 Function index
@@ -457,10 +457,11 @@ str = "foo"
 will result in a syntax error.  However,
 
 @example
-str = "foo
+str = '"foo\n"
 #ifdef LATER
-      bar
-#endif\n";
+"     bar\n"
+#endif
+';
 @end example
 
 @noindent
@@ -741,7 +742,7 @@ as shown in this AutoOpts generated usage text:
 
 @example
 [=_eval "#${top_builddir}/src/autogen --help 2>&1 |
-        sed -e 's/{/@{/' -e 's/}/@}/' -e 's/\t/        /g'"  _shell=]
+        sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g'"  _shell=]
 @end example
 
 @ignore
@@ -818,10 +819,28 @@ and there may be some variables you have to set to make it work.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
-@node GetDefs
-@chapter Extract Definitions from Source
-@cindex getdefs
-[=_INCLUDE getdefs/getdefs.texi=]
+@node Add-Ons
+@chapter Add-on packages for Autogen
+
+This chapter includes several programs that either work closely
+with autogen (extracting definitions or providing special formatting
+functions), or else it is @code{mkmerge}.  I want to promote the
+latter as an alternative to the builddir/srcdir schitzophrenia.
+I hate it. :(
+
+AutoOpts ought to appear in this list also, but since it is
+the primary reason why many people would even look into Autogen
+at all, I decided to leave it in the list of chapters.
+
+@menu
+[=_EVAL 'for f in ${top_builddir}/*/*.menu
+do cat $f ; done' _shell =]
+@end menu
+
+[=_EVAL 'for f in ${top_builddir}/*/*.menu
+do echo '@page'
+   cat `echo $f|sed \'s/\.menu$/\.texi/\'`
+done' _shell =]
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

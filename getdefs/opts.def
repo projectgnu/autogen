@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.3 1998/09/24 14:35:51 bkorb Exp $
+ *   $Id: opts.def,v 2.4 1998/09/28 19:33:07 bkorb Exp $
  */
 
 /*
@@ -36,6 +36,10 @@ flag = {
     name      = "defs_to_get";
     flag_arg  = ":";
     descrip   = 'Regexp to look for after the "/*="';
+    doc =
+    "If you want definitions only from a particular category, or even\n"
+    "with names matching particular patterns, then specify this regular\n"
+    "expression for the text that must follow the @code{/*=}.";
 };
 
 flag = {
@@ -44,16 +48,28 @@ flag = {
     disable   = no;
     enabled;
     descrip   = "Alphabatize or use named file";
+    doc =
+    "By default, ordering is alphabetical by the entry name.\n"
+    "Use, @code{no-ordering} if order is unimportant.\n"
+    "Use @code{ordering} with no argument to order without case sensitivity.\n"
+    "Use @code{ordering=file-name} if chronological order is important.\n"
+    "getdefs will maintain the text content of @code{file-name}.\n"
+    "@code{file-name} need not exist.\n";
 };
 
 flag = {
     name      = input;
     flag_arg  = ":";
     max       = NOLIMIT;
-    min       = "1";
+    min       = 1;
     stack_arg;
     default;
     descrip   = "Input file to search for defs";
+    doc =
+    "All files that are to be searched for definitions must be named\n"
+    "on the command line.  If an option name is not mentioned in the\n"
+    "command line argument, it is presumed to be this option.  There must\n"
+    "be at least one.";
 };
 
 flag = {
@@ -62,12 +78,23 @@ flag = {
     max       = NOLIMIT;
     stack_arg;
     descrip   = "subblock definition names";
+    doc =
+    "This option is used to create shorthand entries for subblocks.\n"
+    "For example, with @code{subbl=arg=argname,type}, the text:\n"
+    "@code{arg: this, char *} will then expand to:\n"
+    "@code{arg = @{ argname = this; type = \"char *\" @};}.\n";
 };
 
 flag = {
     name        = filelist;
     flag_arg;     /* optional */
     descrip     = "Insert source file names into defs";
+    doc =
+    "Inserts the name of each input file into the output definitions.\n"
+    "If no argument is supplied, the format will be:\n"
+    "@example\ninfile = '%s';\n@end example\n"
+    "If an argument is supplied, that string will be used for the entry\n"
+    "name instead of @var{infile}.";
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -86,6 +113,9 @@ flag = {
     max       = NOLIMIT;
     stack_arg;
     descrip   = "Global assignments";
+    doc =
+    "The argument to each copy of this option will be inserted into\n"
+    "the output definitions, with only a semicolon attached.";
 };
 
 flag = {
@@ -94,6 +124,9 @@ flag = {
     max       = NOLIMIT;
     stack_arg;
     descrip   = "Assignments common to all blocks";
+    doc =
+    "The argument to each copy of this option will be inserted into\n"
+    "each output definition, with only a semicolon attached.";
 };
 
 flag = {
@@ -102,18 +135,33 @@ flag = {
     max         = NOLIMIT;
     stack_arg;
     descrip     = "File(s) to copy into definitions";
+    doc =
+    "The content of each file named by these options will be inserted into\n"
+    "the output definitions.";
 };
 
 flag = {
     name        = file;
     flag_arg;     /* optional */
     descrip     = "Insert source file name into each def";
+    doc =
+    "Inserts the name of the input file where a definition was found\n"
+    "into the output definition.\n"
+    "If no argument is supplied, the format will be:\n"
+    "@example\nfile = '%s';\n@end example\n"
+    "If an argument is supplied, that string will be used for the entry\n"
+    "name instead of @var{infile}.";
 };
 
 flag = {
     name        = membership;
     flag_arg    = ':';
     descrip     = "Name of subcollection of entry types";
+    doc =
+    "This option is most useful if you are ordering chronologically\n"
+    "with a getdefs-maintiained database and you wish to order the\n"
+    "entries by groups.  This is not completely thought out yet, so\n"
+    "do not use this option.";
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -131,6 +179,9 @@ flag = {
     equivalence = "autogen";
     flag_arg    = ":";
     descrip     = "Output file to open";
+    doc =
+    "If you are not sending the output to an Augogen process,\n"
+    "you may name an output file instead.";
 };
 
 flag = {
@@ -140,12 +191,19 @@ flag = {
     disable     = "no";
     enabled;
     descrip     = "Invoke autogen with defs";
+    doc =
+    "This is the default output mode.  Specifying @code{no-autogen} is\n"
+    "equivalent to @code{output=-}.  If you supply an argument to this\n"
+    "option, that program will be started as if it were Autogen and\n"
+    "its standard in will be set to the output definitions of this program.";
 };
 
 flag = {
     name        = template;
     flag_arg    = ":";
     descrip     = "Template Name";
+    doc =
+    "Specifies the template name to be used for generating the final output.";
 };
 
 flag = {
@@ -155,6 +213,9 @@ flag = {
     stack_arg;
     descrip     = "Autogen Argument";
     flags_cant  = output;
+    doc =
+    "This is a passthrough argument.  It allows you to have Autogen invoked\n"
+    "with any arbitrary argument.";
 };
 
 flag = {
@@ -162,6 +223,11 @@ flag = {
     flag_arg    = ":";
     descrip     = "Base name for output file(s)";
     flags_cant  = output;
+    doc =
+    "When output is going to Autogen, a base name must either be supplied\n"
+    "or derived.  If this option is not supplied, then it is taken from\n"
+    "the @code{template} option.  If that is not provided either, then\n"
+    "it is set to the base name of the current directory.";
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -174,7 +240,7 @@ explain =
 
 detail =
 "Definitions are delimited by the patterns:\n
-    `/\\*=[a-zA-Z][a-zA-Z0-9_]*[ \\t][ \\t]*[a-zA-Z][a-zA-Z0-9_]*\\n'
+    `/\\*=[a-zA-Z][a-zA-Z0-9_]*[ \\t][ \\t]*[a-zA-Z][a-zA-Z0-9_]*'
     `=\\*/'.\n
 The first name is the entry type and the second is the entry
 name.  This creates a definition of the following form:
@@ -186,30 +252,4 @@ name.  This creates a definition of the following form:
     };\n
 The elipsis '...' is filled in by text found after the `/*=' line
 and before the `=*/' line, with leading `^[^*]*\\*\\**[ \\t]*' removed
-from each line (or all text if an asterisk is not found).
-
-`ordering' is, by default, alphabetical by the entry name.
-    Use, `no-ordering' if order is unimportant.
-    Use `ordering' with no argument to order without case sensitivity.
-    Use `ordering=file-name' if chronological order is important.
-    getdefs will maintain the text content of `file-name'.
-    `file-name' need not exist.
-
-`subblock' is used to create shorthand entries for subblocks.
-    For example, with `subbl=arg=argname,type', the text:
-    `arg: this, char *' will then expand to:
-    `arg = { argname = this; type = \"char *\" };'.
-
-`autogen' is the default output, which is to say by default
-    the output is written to a pipe that an autogen process is
-    reading for definitions.  You may optionally specify a particular
-    autogen program.  You may alternately specify `output=file'
-    to cause the definitions to be written to a file.
-
-`template' specifies a particular template for the definitions to use.
-    If not specified, it defaults to the base-name argument.
-    If that is not specified, then it tries to find a name string
-    from the `defs-to-get' argument.  Failing that, it will use
-    the name of the current directory.
-
-`templ-dirs' and `base-name' are passed on to the autogen process.";
+from each line (or all text if an asterisk is not found).";

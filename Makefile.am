@@ -7,13 +7,13 @@
 ## Last Modified:    Tue Sep 15 11:35:46 1998
 ##            by:    Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.2 1998/09/16 20:44:59 bkorb Exp $
+## $Id: Makefile.am,v 2.3 1998/09/28 19:32:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 @MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
 
-SUBDIRS = compat config autoopts src tests doc getdefs
+SUBDIRS = compat config autoopts src getdefs columns tests doc
 
 EXTRA_DIST	= NOTES VERSION TODO configure ChangeLog.1
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config.h.in \

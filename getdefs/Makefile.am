@@ -7,19 +7,17 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Mon Sep 14 06:59:06 1998
-##            by:   Bruce Korb <korbb@datadesign.com>
+## Last Modified:   Mon Sep 28 12:05:08 1998
+##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.2 1998/09/22 20:53:44 bkorb Exp $
+## $Id: Makefile.am,v 2.3 1998/09/28 19:33:06 bkorb Exp $
 ## ---------------------------------------------------------------------
-
-@MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
 
 bin_PROGRAMS = getdefs
 
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h opts.def
 
-GEN_SRC 	= opts.c opts.h
+GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu
 EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.texi
 
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
@@ -27,5 +25,25 @@ getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
 
 MAINTAINERCLEANFILES = Makefile.in
+
+gen : $(GEN_SRC)
+
+getdefs.texi : getdefs.tpl opts.def
+	top_builddir=$(top_builddir) \
+	$(top_builddir)/src/autogen -T getdefs.tpl \
+		$(top_srcdir)/getdefs/opts.def
+
+getdefs.menu : opts.def
+	@( echo "[=autogen template menu=getdefs.menu =]" ; \
+	   echo "* [=prog_name #:: + #%-32s _printf=] [=prog_title=]" \
+	 ) > .getdefs.tpl
+	top_builddir=$(top_builddir) \
+	$(top_builddir)/src/autogen -T .getdefs.tpl \
+		$(top_srcdir)/getdefs/opts.def && rm -f .getdefs.tpl
+
+opts.c opts.h: opts.def
+	top_builddir=$(top_builddir) \
+	$(top_builddir)/src/autogen -L $(top_srcdir)/autoopts \
+		$(top_srcdir)/getdefs/opts.def
 
 # Makefile.am ends here

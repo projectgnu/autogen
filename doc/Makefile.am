@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:   Wed Sep 23 14:30:10 1998
+## Last Modified:   Mon Sep 28 12:07:41 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.5 1998/09/23 21:51:52 bkorb Exp $
+## $Id: Makefile.am,v 2.6 1998/09/28 19:33:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -37,7 +37,8 @@ TEMPLATE	= $(srcdir)/auto_gen.tpl
 TPLINC		= $(top_srcdir)/src/agParse.y \
 		$(top_builddir)/src/opts.h \
 		$(top_srcdir)/autoopts/autoopts.texi \
-		$(top_srcdir)/getdefs/getdefs.texi
+		$(top_builddir)/columns/columns.texi \
+		$(top_builddir)/getdefs/getdefs.texi
 
 GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
 AGEXE		= $(top_builddir)/src/autogen
@@ -49,12 +50,19 @@ autogen.def:	$(DEFSRC) $(ODEF)
 	$(GETDEFS) output=$@ template=auto_gen $(DEFCOPY) $(DEFSRC)
 	@-touch $@
 
+##  This really should be the build rule:
+##	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
+##
 autogen.texi : auto_gen.tpl autogen.def $(TPLINC)
+	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	$(top_builddir)/src/autogen -L$(top_srcdir) -L$(top_srcdir)/doc \
 		-bautogen ./autogen.def
 
-##  This really should be the build rule:
-##	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
+$(top_builddir)/getdefs/getdefs.texi :
+	@cd $(top_builddir)/getdefs/ ; $(MAKE) gen
+ 
+$(top_builddir)/columns/columns.texi :
+	@cd $(top_builddir)/columns/ ; $(MAKE) gen
 
 LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	@if $(AGEXE) --version >&- 2>&- ; then \

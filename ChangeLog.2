@@ -1,3 +1,20 @@
+1998-09-28  Bruce Korb <korbb@datadesign.com>
+	* columns/*
+	New program to columnize a list of text.
+	* autoopts/opthead.tpl
+	The OPT_VALUE_* macro must be cast to an int, not t_word.
+	* doc/auto_gen.tpl
+	recoded to look for files named */*.menu and include those
+	entries in an add-on chapter.
+	* getdefs/getdefs.texi
+	Renamed it to getdefs.tpl and now generate both getdefs.texi
+	and getdefs.menu.  The latter file contains solely a section
+	menu entry.
+	* getdefs/opts.def
+	Added documentation strings for each option.
+	* src/agShell
+	Added some code to make clearer what may have failed,
+	should the shell command go away or abend.
 1998-09-23  Bruce Korb <korbb@datadesign.com>
 	* autoopts/Makefile.am
 	* autoopts/opthead.tpl

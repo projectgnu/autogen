@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.6 1998/09/24 17:43:57 bkorb Exp $
+#$Id: opthead.tpl,v 2.7 1998/09/28 19:33:01 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -523,7 +523,7 @@ _FOR flag =][=
   _IF flag_arg _get #=.* ~
 =]
 #define [=prefix _up #_ +=]OPT_VALUE_[=name _up "#%-14s" _printf
-                =] ((t_word)([=prefix _up #_ +=]OPT_ARG([=name _up=])))[=
+                =] ((int)([=prefix _up #_ +=]OPT_ARG([=name _up=])))[=
   _ENDIF=][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
