@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: expString.c,v 1.2 1999/10/30 20:23:23 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -36,6 +36,132 @@
 #  include "compat/strftime.c"
 #endif
 
+    STATIC SCM
+makeString( tCC*    pzText,
+	    tCC*    pzNewLine,
+            size_t  newLineSize )
+{
+    tCC*     pzDta   = pzText;
+    char*    pzScn;
+    SCM      res;
+    size_t   dtaSize = sizeof( "\"\"" );
+
+    for (;;) {
+        char ch = *(pzDta++);
+        if ((ch >= ' ') && (ch <= '~')) {
+            dtaSize++;
+            if ((ch == '"') || (ch == '\\'))
+                dtaSize++;
+
+        } else switch (ch) {
+        case NUL:
+            goto loopBreak;
+
+        case '\n':
+            dtaSize += newLineSize;
+            break;
+
+        case '\t':
+        case '\a':
+        case '\b':
+        case '\f':
+        case '\r':
+        case '\v':
+            dtaSize += 2;
+            break;
+
+        default:
+            dtaSize += 4;
+        }
+    } loopBreak:;
+
+
+    res   = scm_makstr( (scm_sizet)dtaSize, 0 );
+    pzDta = SCM_CHARS( res );
+    pzScn = pzText;
+
+    *(pzDta++) = '"';
+
+    for (;;) {
+        unsigned char ch = (unsigned char)*pzScn;
+        if ((ch >= ' ') && (ch <= '~')) {
+            if ((ch == '"') || (ch == '\\'))
+                /*
+                 *  We must escape these characters in the output string
+                 */
+                *(pzDta++) = '\\';
+            *(pzDta++) = ch;
+
+        } else switch (ch) {
+        case NUL:
+            goto copyDone;
+
+        case '\n':
+            /*
+             *  Replace the new-line with its escaped representation.
+             *  Also, break and restart the output string, indented
+             *  7 spaces (so that after the '"' char is printed,
+             *  any contained tabbing will look correct).
+             *  Do *not* start a new line if there are no more data.
+             */
+            if (pzScn[1] == NUL) {
+                *(pzDta++) = '\\';
+                *(pzDta++) = 'n';
+                goto copyDone;
+            }
+
+            strcpy( pzDta, pzNewLine );
+            pzDta += newLineSize;
+            break;
+
+        case '\t':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 't';
+            break;
+
+        case '\a':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 'a';
+            break;
+
+        case '\b':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 'b';
+            break;
+
+        case '\f':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 'f';
+            break;
+
+        case '\r':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 'r';
+            break;
+
+        case '\v':
+            *(pzDta++) = '\\';
+            *(pzDta++) = 'v';
+            break;
+
+        default:
+            pzDta += sprintf( pzDta, "\\%03o", ch );
+        }
+
+        pzScn++;
+    } copyDone:
+
+    /*
+     *  End of string.  Terminate the quoted output.
+     *  If necessary, deallocate the text string.
+     *  Return the scan resumption point.
+     */
+    *(pzDta++) = '"';
+    *pzDta = NUL;
+    return res;
+}
+
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -43,7 +169,7 @@
 /*=gfunc in_p
  *
  *req:  2
- *doc:  Return SCM_BOOL_T if the first argument is duplicated
+ * doc:  Return SCM_BOOL_T if the first argument is duplicated
  *      in the second (list) argument.
 =*/
     SCM
@@ -75,7 +201,7 @@ ag_scm_in_p( SCM obj, SCM list )
 /*=gfunc join
  *
  * opt:  1
- *doc:  With the first argument as the separator string,
+ * doc:  With the first argument as the separator string,
  *      joins together the second argument a-list of strings
  *      into one long string.
 =*/
@@ -141,7 +267,7 @@ ag_scm_join( SCM sep, SCM list )
 /*=gfunc prefix
  *
  * req:  2
- *doc:
+ * doc:
  *
  *  Prefix every line in the second string with the first string.
  *  E.g. if the first string is "# " and the second contains
@@ -205,7 +331,7 @@ ag_scm_prefix( SCM prefix, SCM text )
 
 /*=gfunc shell
  *
- *doc:
+ * doc:
  *
  *  Generate a string by writing the value to
  *  a server shell and reading the output back in.  The template
@@ -236,7 +362,7 @@ ag_scm_shell( SCM cmd )
 
 /*=gfunc raw_shell_str
  *
- *doc:
+ * doc:
  *
  *  Convert the text of the string at TOS into a singly quoted string
  *  that a normal shell will process into the original string.
@@ -292,7 +418,7 @@ ag_scm_raw_shell_str( SCM obj )
 
 /*=gfunc shell_str
  *
- *doc:
+ * doc:
  *  Convert the text of the string into a double quoted string
  *  that a normal shell will process into the original string.
  *  (Before doing macro expansion, that is.)
@@ -351,7 +477,7 @@ ag_scm_shell_str( SCM obj )
  *
  *req: 0
  *var: 1
- *doc:  Create a list of all the strings that are associated
+ * doc:  Create a list of all the strings that are associated
  *      with a name.
 =*/
     SCM
@@ -373,9 +499,34 @@ ag_scm_stack( SCM obj )
 }
 
 
+/*=gfunc kr_string
+ *
+ * exparg: string
+ *  doc:
+ *
+ *  Reform a string so that, when printed, a K&R C compiler will be able
+ *  to compile the data and construct a string that contains exactly
+ *  what the current string contains.  Many non-printing characters are
+ *  replaced with escape sequences.  New-lines are replaced with a
+ *  backslash-n-backslash and newline sequence,
+=*/
+    SCM
+evalExpr_kr_string( SCM str )
+{
+    tSCC    zNewLine[] = "\\n\\\n";
+
+    if (! gh_string_p( str ))
+        return SCM_UNDEFINED;
+
+    return makeString( SCM_CHARS( str ),
+                       zNewLine, sizeof( zNewLine )-1 );
+}
+
+
 /*=gfunc c_string
  *
- *doc:
+ * exparg: string
+ * doc:
  *
  *  Reform a string so that, when printed, the C compiler will be able
  *  to compile the data and construct a string that contains exactly
@@ -384,140 +535,30 @@ ag_scm_stack( SCM obj )
  *  backslash-n sequence @code{\\n}, followed by a closing quote, a
  *  newline seven spaces and another re-opening quote.  The compiler
  *  will implicitly concatenate them.  The reader will see line breaks.
- *  A K&R compiler will choke.
+ *  A K&R compiler will choke.  Use @code{kr-string} for that.
 =*/
     SCM
-ag_scm_c_string( SCM obj )
+ag_scm_c_string( SCM str )
 {
     tSCC       zNewline[] = "\\n\"\n       \"";
-    char*      pzDta;
-    char*      pzScn;
-    char*      pzRet;
-    size_t     dtaSize    = sizeof( "\"\"" ); /* 3 */
-    SCM        res;
 
-    if (! gh_string_p( obj ))
+    if (! gh_string_p( str ))
         return SCM_UNDEFINED;
 
-    pzScn = pzDta = SCM_CHARS( obj );
-    for (;;) {
-        char ch = *(pzDta++);
-        if ((ch >= ' ') && (ch <= '~')) {
-            dtaSize++;
-            if ((ch == '"') || (ch == '\\'))
-                dtaSize++;
-
-        } else switch (ch) {
-        case NUL:
-            goto loopBreak;
-
-        case '\n':
-            dtaSize += STRSIZE( zNewline );
-            break;
-
-        case '\t':
-        case '\a':
-        case '\b':
-        case '\f':
-        case '\r':
-        case '\v':
-            dtaSize += 2;
-            break;
-
-        default:
-            dtaSize += 4;
-        }
-    } loopBreak:;
-
-    res   = scm_makstr( (scm_sizet)dtaSize, 0 );
-    pzDta = SCM_CHARS( res );
-    *(pzDta++) = '"';
-
-    for (;;) {
-        unsigned char ch = (unsigned char)*pzScn;
-        if ((ch >= ' ') && (ch <= '~')) {
-            if ((ch == '"') || (ch == '\\'))
-                /*
-                 *  We must escape these characters in the output string
-                 */
-                *(pzDta++) = '\\';
-            *(pzDta++) = ch;
-
-        } else switch (ch) {
-        case NUL:
-            goto copyDone;
-
-        case '\n':
-            /*
-             *  Replace the new-line with its escaped representation.
-             *  Also, break and restart the output string, indented
-             *  7 spaces (so that after the '"' char is printed,
-             *  any contained tabbing will look correct).
-             *  Do *not* start a new line if there are no more data.
-             */
-            if (pzScn[1] == NUL) {
-                *(pzDta++) = '\\';
-                *(pzDta++) = 'n';
-                goto copyDone;
-            }
-
-            strcpy( pzDta, zNewline );
-            pzDta += STRSIZE( zNewline );
-            break;
-
-        case '\t':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 't';
-            break;
-
-        case '\a':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'a';
-            break;
-
-        case '\b':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'b';
-            break;
-
-        case '\f':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'f';
-            break;
-
-        case '\r':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'r';
-            break;
-
-        case '\v':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'v';
-            break;
-
-        default:
-            pzDta += sprintf( pzDta, "\\%03o", ch );
-        }
-
-        pzScn++;
-    } copyDone:
-
-    /*
-     *  End of string.  Terminate the quoted output.
-     *  If necessary, deallocate the text string.
-     *  Return the scan resumption point.
-     */
-    *(pzDta++) = '"';
-    *pzDta = NUL;
-    return res;
+    return makeString( SCM_CHARS( str ),
+                       zNewLine, sizeof( zNewLine )-1 );
 }
 
 
 /*=gfunc string_tr_x
  *
+ *  exparg:  source
+ *  exparg:  match
+ *  exparg:  translation
+ *
  *  req:  3
  *
- *doc:  This is the same as the @code{tr(1)} program, except the
+ * doc:  This is the same as the @code{tr(1)} program, except the
  *      string to transform is the first argument.  The second and
  *      third arguments are used to construct mapping arrays for the
  *      transformation of the first argument.
