@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Thu Jul 29 09:21:03 1999				      
+# Last Modified:     Thu Jul 29 09:50:14 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.18 1999/07/29 16:35:52 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.19 1999/07/29 16:57:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -54,6 +54,26 @@ for srcdir in $wd $wd/.. .. .; do
     test -f $srcdir/configure.in && break
 done
 
+missing()
+{
+    cat >&2 <<-	_EOF_
+	**ERROR**:  You must have \`$1\' installed to bootstrap AutoGen.
+	Download the appropriate package for your distribution,
+	or get the source at:
+	    $2
+	(or any later version found there)
+	_EOF_
+	DIE=1
+}
+
+doit ()
+{
+  if test "x$1" != x: ; then 
+    echo "$@"
+    eval "$@"
+  fi
+}
+
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
@@ -81,26 +101,6 @@ sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
 LIBTOOLIZE=:
 sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in \
   | egrep 'A(C|M)_PROG_LIBTOOL' > /dev/null && LIBTOOLIZE=libtoolize
-
-missing()
-{
-    cat >&2 <<-	_EOF_
-	**ERROR**:  You must have \`$1\' installed to bootstrap AutoGen.
-	Download the appropriate package for your distribution,
-	or get the source at:
-	    $2
-	(or any later version found there)
-	_EOF_
-	DIE=1
-}
-
-doit ()
-{
-  if test "x$1" != x: ; then 
-    echo "$@"
-    eval "$@"
-  fi
-}
 
 # We must be using autoconf (or we wouldn't need this script!).
 $AUTOCONF --version >/dev/null 2>&1
