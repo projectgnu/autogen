@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.29 2000/11/03 03:11:30 bkorb Exp $
+ *  $Id: autoopts.c,v 2.30 2000/11/04 18:19:19 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1275,7 +1275,7 @@ DEF_PROC_1( STATIC tSuccess doPresets,
             /*
              *  IF we've reached the top end, bail out
              */
-            if (pzPath = (char*)NULL)
+            if (pzPath == (char*)NULL)
                 break;
 
             idx += inc;
