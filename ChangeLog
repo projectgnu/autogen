@@ -1,5 +1,14 @@
 2000-08-12  Bruce Korb  <bkorb@gnu.org>
 
+	autoopts/autoopts.c(valid_path):  new procedure.  If a path is
+	prefixed with "$$", replace that text with the path to the
+	executable.
+	autoopts/optcode.tpl: Change "exerc" to emit an homerc entry "$$"
+	instead of the now obsolete flag.
+	autoopts/doc.tpl: document the new behavior
+
+2000-08-12  Bruce Korb  <bkorb@gnu.org>
+
 	agen5/expString.c(ag_scm_join): the lists can arrive as nested lists.
 	(ag_scm_stack): did the implementation.
 	agen5/defFind.c(copyDefReference): obsoleted

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.14 2000/03/19 01:29:15 bruce Exp $
+ *  $Id: autoopts.c,v 2.15 2000/08/28 19:15:49 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -551,6 +551,93 @@ doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 }
 
 
+    STATIC ag_bool
+valid_path( char*       pzBuf,  size_t      bufSize,
+            const char* pzName, const char* pzProgPath )
+{
+    char* pzDir;
+    char* pzEnv;
+
+    /*
+     *  IF not an environment variable, just copy the data
+     */
+    if (*pzName != '$') {
+        strcpy( pzBuf, pzName );
+        return AG_TRUE;
+    }
+
+    if (pzName[1] == '$') {
+        char*  pzPath = pathfind( getenv( (const char*)"PATH" ),
+                                  pzProgPath, (const char*)"x" );
+        char* pz;
+        struct stat stbf;
+
+        if (pzPath == (char*)NULL)
+            return AG_FALSE;
+
+        pz = strrchr( pzPath, DIR_SEP_CHAR );
+
+        /*
+         *  IF we cannot find a directory name separator,
+         *  THEN we do not have a path name to our executable file.
+         */
+        if (pz == (char*)NULL)
+            return AG_FALSE;
+
+        *pz = NUL;
+        pzName += 2;
+        switch (*pzName) {
+        case DIR_SEP_CHAR:
+            pzName++;
+        case NUL:
+            break;
+        default:
+            return AG_FALSE;
+        }
+
+        /*
+         *  Concatenate the rc file name to the end of the executable path and
+         *  see if we can find that file and process it.
+         */
+        sprintf( pzBuf, "%s/%s", pzPath, pzName );
+        if (stat( pzBuf, &stbf ) != 0)
+            return AG_FALSE;
+        return AG_TRUE;
+    }
+
+    /*
+     *  See if the env variable is followed by specified directories
+     *  (We will not accept any more env variables.)
+     */
+    pzDir = strchr( pzPath+1, DIR_SEP_CHAR );
+
+    if (pzDir != (char*)NULL)
+        *pzDir = NUL;
+
+    pzEnv = getenv( pzPath+1 );
+
+    /*
+     *  Environment value not found -- skip the home list entry
+     */
+    if (pzEnv == (char*)NULL)
+        return AG_FALSE;
+
+    strcpy( zFileName, pzEnv );
+
+    /*
+     *  IF we found a directory that followed the env variable,
+     *  THEN tack it onto the value we found
+     */
+    if (pzDir != (char*)NULL) {
+        pzEnv = zFileName + strlen( zFileName );
+        if (pzEnv[-1] != DIR_SEP_CHAR)
+            *(pzEnv++) = DIR_SEP_CHAR;
+        strcpy( pzEnv, pzDir+1 );
+        *pzDir = DIR_SEP_CHAR;
+    }
+}
+
+
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
@@ -558,6 +645,7 @@ doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 doPresets( tOptions*  pOpts )
 {
     u_int fOptSet = pOpts->fOptSet;
+    char        zFileName[ 4096 ];
 
     /*
      *  when comparing long names, these are equivalent
@@ -568,37 +656,15 @@ doPresets( tOptions*  pOpts )
      *  FIRST, see if we are to look for an rc file where the program
      *  was found.  These values will have the lowest priority.
      */
-    if ((fOptSet & OPTPROC_EXERC) != 0) do {
-        char   zFileName[ 1024 ];
-        char*  pzPath = pathfind( getenv( (const char*)"PATH" ),
-                                  pOpts->pzProgPath, (const char*)"x" );
-        char* pz;
+    if ((fOptSet & OPTPROC_EXERC) != 0){
+        char   zRcName[ 64 ];
 
-        if (pzPath == (char*)NULL)
-            break;
+        snprintf( zRcName, sizeof(zRcName), "$$/%s", pOpts->pzRcName );
 
-        pz = strrchr( pzPath, DIR_SEP_CHAR );
-        /*
-         *  IF we cannot find a directory name separator,
-         *  THEN we do not have a path name to our executable file.
-         */
-        if (pz == (char*)NULL)
-            break;
-
-        *pz = NUL;
-
-        /*
-         *  Concatenate the rc file name to the end of the executable path and
-         *  see if we can find that file and process it.
-         */
-        strcpy( zFileName, pzPath );
-        pz = zFileName + strlen( zFileName );
-        if (pz[-1] != DIR_SEP_CHAR)
-            *(pz++) = DIR_SEP_CHAR;
-        strcpy( pz, pOpts->pzRcName );
-
-        filePreset( pOpts, zFileName );
-    } while (AG_FALSE);
+        if (valid_path( zFileName, sizeof(zFileName),
+                        zRcName, pOpts->pzProgPath))
+            filePreset( pOpts, zFileName );
+    }
 
     /*
      *  Next, search the list of "home" directories.
@@ -610,7 +676,6 @@ doPresets( tOptions*  pOpts )
         const char** papzHL = pOpts->papzHomeList;
         for (;;) {
             const char* pzPath = *(papzHL++);
-            char        zFileName[ 1024 ];
 
             /*
              *  Break when done
@@ -618,44 +683,9 @@ doPresets( tOptions*  pOpts )
             if (pzPath == (char*)NULL)
                 break;
 
-            /*
-             *  IF not an environment variable, just copy the data
-             */
-            if (*pzPath != '$') {
-                strcpy( zFileName, pzPath );
-            } else {
-                /*
-                 *  See if the env variable is followed by specified directories
-                 *  (We will not accept any more env variables.)
-                 */
-                char* pzDir = strchr( pzPath+1, DIR_SEP_CHAR );
-                char* pzEnv;
-
-                if (pzDir != (char*)NULL)
-                    *pzDir = NUL;
-
-                pzEnv = getenv( pzPath+1 );
-
-                /*
-                 *  Environment value not found -- skip the home list entry
-                 */
-                if (pzEnv == (char*)NULL)
-                    continue;
-
-                strcpy( zFileName, pzEnv );
-
-                /*
-                 *  IF we found a directory that followed the env variable,
-                 *  THEN tack it onto the value we found
-                 */
-                if (pzDir != (char*)NULL) {
-                    pzEnv = zFileName + strlen( zFileName );
-                    if (pzEnv[-1] != DIR_SEP_CHAR)
-                        *(pzEnv++) = DIR_SEP_CHAR;
-                    strcpy( pzEnv, pzDir+1 );
-                    *pzDir = DIR_SEP_CHAR;
-                }
-            }
+            if (! valid_path( zFileName, sizeof( zFileName ),
+                              pzPath, pOpts->pzProgPath ))
+                continue;
 
             /*
              *  IF the file name we constructed is a directory,

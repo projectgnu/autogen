@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.33 2000/03/19 00:17:23 bruce Exp $
+#$Id: optcode.tpl,v 2.34 2000/08/28 19:15:49 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -313,13 +313,14 @@ ELSE                  =]"[=(. prog-name)=] - " [=
 ENDIF =]
     "\n[= USAGE_LINE =]\n";[=
 
-IF homerc  _exist=]
+IF (or (exist? "homerc") (exist? "exerc")) =]
 tSCC   zRcName[]     = "[=
   IF (> (string-length (get "rcfile")) 0)
         =][=rcfile=][=
   ELSE  =].[=(. pname-down)=]rc[=
   ENDIF =]";
 tSCC*  apzHomeList[] = {[=
+  % exerc "\n       \"$$/%s\"," =][=
   FOR homerc=]
        [= (c-string (get "homerc")) =],[=
   ENDFOR homerc=]
@@ -372,8 +373,7 @@ tOptions [=(. pname)=]Options = {
       ELSE               =]optionUsage[=ENDIF=],
     ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
     + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.disable")      =]
-    + OPTPROC_DISABLEOK[=  ENDIF=][=IF      (exist? "exerc")             =]
-    + OPTPROC_EXERC[=      ENDIF=][=IF      (exist? "flag.value")        =]
+    + OPTPROC_DISABLEOK[=  ENDIF=][=IF      (exist? "flag.value")        =]
     + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long_opts")         =]
     + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
     + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]
@@ -386,7 +386,7 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_ARGS_REQ[=   ENDIF=] ),
     0, (char*)NULL,
     { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
-      [=IF (exist? "homerc") 
+      [=IF (exist? "homerc")
              =]INDEX_[= (. UP-prefix) =]OPT_SAVE_OPTS[=
         ELSE =] 0 /* no option state saving */[=
         ENDIF=],
