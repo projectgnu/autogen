@@ -1,7 +1,7 @@
 
 /*
  *  agDirect.c
- *  $Id: defDirect.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: defDirect.c,v 1.2 2000/03/05 00:23:30 bruce Exp $
  *  This module processes definition file directives.
  */
 
@@ -557,7 +557,7 @@ doDir_include( char* pzArg, char* pzScan )
         return pzScan;
     pCurCtx->pzScan  = pzScan;
 
-    if (! SUCCESSFUL( findTemplateFile( pzArg, zFullName ))) {
+    if (! SUCCESSFUL( findFile( pzArg, zFullName ))) {
         tSCC zFmt[] = "WARNING:  cannot find `%s' definitions file\n";
         fprintf( stderr, zFmt, pzArg );
         return pzScan;

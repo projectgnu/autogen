@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.2 1999/11/07 04:13:25 bruce Exp $
+ *  $Id: tpLoad.c,v 1.3 2000/03/05 00:23:30 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -52,7 +52,7 @@ findTemplate( const char* pzTemplName )
  *  list trying to find the base template file name.
  */
     tSuccess
-findTemplateFile( const char* pzTempl, char* pzFullName )
+findFile( const char* pzTempl, char* pzFullName )
 {
     char*   pzRoot;
     char*   pzSfx;
@@ -647,7 +647,7 @@ loadTemplate( const char* pzFileName )
     /*
      *  Find the template file somewhere
      */
-    if (! SUCCESSFUL( findTemplateFile( pzFileName, zRealFile ))) {
+    if (! SUCCESSFUL( findFile( pzFileName, zRealFile ))) {
         tSCC zFindTemplFile[] = "find template file";
         fprintf( stderr, zCannot, pzProg, ENOENT,
                  zFindTemplFile, pzFileName, strerror( ENOENT ));
