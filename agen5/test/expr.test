@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 1999/11/30 02:26:30 $
+# Last Modified:  $Date: 2000/03/05 22:24:06 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.8 1999/11/30 02:26:30 bruce Exp $
+# $Id: expr.test,v 1.9 2000/03/05 22:24:06 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -27,7 +27,7 @@ cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
 cat > ./${testname}.sh <<- _EOF_
 GD="${top_builddir}/getdefs/getdefs"
 AG="${top_builddir}/agen5/AutoGen"
-set -e
+
 _EOF_
 sed -n '/  expr.ini /,/stamp-exprini/p' ${top_srcdir}/agen5/bootstrap.dir |
   sed -e 1d -e '$d' >> ./${testname}.sh
