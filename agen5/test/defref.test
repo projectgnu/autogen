@@ -9,7 +9,7 @@
 # Last Modified:     Wed Mar 1 2000
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: defref.test,v 1.1 2000/03/02 05:46:53 bruce Exp $
+# $Id: defref.test,v 1.2 2000/03/05 21:01:13 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -41,6 +41,9 @@ FOR list =>
   FOR val ", " => val[<=(for-index)=>]=<=val=><=
   ENDFOR =><=
 ENDFOR =>
+
+The first value is:  <= ?% list[].val[]   "val = %s (first)" "Undefined??"=>
+The last value is:   <= ?% list[$].val[$] "val = %s (last)" "Undefined??"=>
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -74,6 +77,9 @@ The full list:
   list[1] ->  val[0]=L1.first,  val[2]=L1.second-and-last
   list[3] ->  val[0]=L3.third.all
   list[4] ->  val[1]=L4.first,  val[3]=L4.last
+
+The first value is:  val = L0.first (first)
+The last value is:   val = L4.last (last)
 _EOF_
 
 $AGEN $testname.def || failure AutoGen failed
