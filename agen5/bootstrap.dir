@@ -43,7 +43,7 @@ fi
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # For the following to work, we must temporarily find or install
-# columns and getdefs from wherever they are found:
+# AutoGen, columns and getdefs from wherever they are found:
 #
 rmlist=
 
@@ -60,8 +60,7 @@ then
      ;;
 
   * )
-    echo "Cannot locate ${AG}.  Giving up"
-    exit 1
+    AG=""
     ;;
   esac
 fi
@@ -113,13 +112,16 @@ then
   shift
 fi
 
-#  IF we have no remaining argument, then do everything
+#  IF we have no remaining argument, then do everything unbuilt
 #
 if [ $# -eq 0 ]
 then
   echo Looking in ${top_srcdir}/agen5/Makefile.am for GEN-RULE
   set -- `egrep '##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
           sed 's/.*## *\(.*\) GEN-RULE/\1/' `
+  t=""
+  for f ; do if [ ! -s $f ] ; then t="$t $f" ; fi ; done
+  set -- $t
   echo building $*
 fi
 
@@ -163,6 +165,11 @@ do
   opts.[ch] )
     # Make the option processing files:
     #
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     echo ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
     ${AG} -L ../autoopts ${DEBUG_OPTS} opts.def
     date > stamp-opts
@@ -171,6 +178,11 @@ do
   stamp-exprini | \
   expr.h | \
   expr.ini )
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     eopt="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
     eopt="$eopt defs=gfunc templ=snarf srcfile"
     eopt="assign=group=ag $eopt autogen=${AG} base-name=expr"
@@ -188,6 +200,11 @@ do
 
   stamp-functions | \
   functions.h )
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     eopt="template=functions defs=macfunc linenum srcfile filelist"
     eopt="$eopt autogen=${AG} base-name=functions"
     echo ${GD} $eopt func*.c
@@ -197,6 +214,11 @@ do
 
   stamp-directive | \
   directive.h )
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     eopt="template=directive autogen=${AG} base-name=directive"
     echo ${GD} $eopt ${top_srcdir}/agen5/defDirect.c
     ${GD} $eopt defDirect.c
@@ -206,6 +228,11 @@ do
   autogen.texi | autogen.menu )
     # Construct the info doc
     #
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter ${DEBUG_OPTS}"
     echo ${AG} ${eopt} -bautogen opts.def
     ${AG} ${eopt} -bautogen opts.def
@@ -214,6 +241,11 @@ do
   autogen.1 )
     # Construct the man page
     #
+    if [ -z "${AG}" ]
+    then
+      echo "Cannot locate ${AG}.  Giving up"
+      exit 1
+    fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def
     ${AG} ${eopt} ./opts.def
