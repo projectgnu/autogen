@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.29 1999/10/22 00:26:35 bruce Exp $
+## $Id: auto_gen.tpl,v 2.30 1999/10/26 02:44:23 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -285,48 +285,55 @@ It looks something like this.
 (For a full description, @xref{Template File}.)
 
 @example
-[#autogen template h c #]
-[#_IF _SFX h = #]
-typedef enum @{[#
-   _FOR list , #]
-        IDX_[#list_element _up#][#
-   /list #] @}  list_enum;
+[+ AutoGen5 template h c +]
+[+ CASE (suffix) +][+
+   ==  h  +]
+typedef enum @{[+
+   FOR list "," +]
+        IDX_[+ (string-upcase! (get "list_element")) +][+
+   ENDFOR list +] @}  list_enum;
 
-extern const char* az_name_list[ [#_eval list _count #] ];
-[#
+extern const char* az_name_list[ [+ (count "list") +] ];
+[+
 
-_ELIF _SFX c = #]
+   ==  c  +]
 #include "list.h"
-const char* az_name_list[] = @{[#
-_FOR list ,#]
-        "[#list_info#]"[#
-/list #] @};[#
+const char* az_name_list[] = @{[+
+  FOR list "," +]
+        "[+list_info+]"[+
+  ENDFOR list +] @};[+
 
-_ENDIF header/program #]
+ESAC +]
 @end example
 
-The @code{[#autogen template h c #]} text tells AutoGen that this is a
-template file; that it is to be processed twice; that the start macro
-marker is @code{[#}; and the end marker is @code{#]}.  The template will
-be processed first with a suffix value of @code{h} and then with
-@code{c}.
+The @code{[# AutoGen5 template h c #]} text tells AutoGen that this is
+an AutoGen version 5 template file; that it is to be processed twice;
+that the start macro marker is @code{[#}; and the end marker is
+@code{#]}.  The template will be processed first with a suffix value of
+@code{h} and then with @code{c}.  Normally, the suffix values are
+appended to the @file{base-name} to create the output file name.
 
-The @code{[#_IF _SFX h = #]} and @code{[#_ELIF _SFX c = #]} clauses
+The @code{[# == h #]} and @code{[# == c #]} @code{CASE} selection clauses
 select different text for the two different passes.  In this example,
 the output is nearly disjoint and could have been put in two separate
 templates.  However, sometimes there are common sections and this is
 just an example.
 
-The @code{[#_FOR list ,#]} and @code{[# /list #]} clauses delimit
+The @code{[#FOR list "," #]} and @code{[# ENDFOR list #]} clauses delimit
 blocks of text that will be repeated for every definition of @code{list}.
 Inside of that block, the definition name-value pairs that
 are members of each @code{list} are available for substitutions.
 
 The remainder of the macros are expressions.  Some of these contain
-special expression functions to obtain certain values or modify the
-values before they are inserted into the output.  For example,
-@code{_count} yields the number of definitions of a particular name,
-and @code{_up} will change a string to all upper case.
+special expression functions that are dependent on AutoGen named values;
+others are simply Scheme expressions, the result of which will be
+inserted into the output text.  Other expressions are names of AutoGen
+values.  These values will be inserted into the output text.  For example,
+@example
+"[#list_info#]"
+@end example
+will result in the value associated with the name @code{list_info} being
+inserted between the double quotes.
 
 If you have compiled AutoGen, you can copy out the template and
 definitions, run @file{autogen} and produce exactly the hypothesized
@@ -487,7 +494,7 @@ it prints an error message and exits.
 
 Any name may have multiple values associated with it in the definition
 file.  If there is more than one instance, the @strong{only} way to
-expand all of the copies of it is by using the _FOR (@xref{FOR}.) text
+expand all of the copies of it is by using the FOR (@xref{FOR}.) text
 function on it, as described in the next chapter.
 
 There are two kinds of definitions, @samp{simple} and @samp{compound}.
@@ -540,7 +547,7 @@ list = @{ list_element = omega;  last;
 @end example
 
 @cindex simple definitions, format
-The string values for definitions may be specified in one of four
+The string values for definitions may be specified in one of five
 formation rules:
 
 @table @samp
@@ -594,6 +601,11 @@ definition text.  E.g. @code{;}, @code{"}, @code{'}, @code{`}, @code{=},
 white space character.  Basically, if the string looks like it is a
 normal file name or variable name, and it is not one of two keywords
 (@samp{autogen} or @samp{definitions}) then it is OK to not quote it.
+
+@item a Scheme expression starting with an open parenthesis @code{(}
+The scheme expression will be evaluated by Guile and the
+value will be the result.  The AutoGen expression functions
+are @strong{dis}abled at this stage, so do not use them.
 @end table
 
 If single or double quote characters are used, then you
@@ -739,10 +751,10 @@ part of the grammar.  They are handled by the scanner/lexer.
 The following was extracted directly from the agParse.y source file:
 
 @ignore
-Extracted from $top_srcdir/src/agParse.y
+Extracted from $top_srcdir/agen5/defParse.y
 @end ignore
 @example
-[=`sed -n -e '/^definitions/,$p' $top_srcdir/src/agParse.y |
+[=`sed -n -e '/^definitions/,$p' $top_srcdir/agen5/defParse.y |
   sed -e 's/{/@{/g' -e 's/}/@}/g' `=]
 @end example
 
@@ -872,11 +884,15 @@ FOR macfunc =][=
 [=desc=][=
   ENDIF desc exists =][=
 ENDFOR macfunc=]
-
 @ignore
 
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+@end ignore
+@page
+
 @table @samp[=
-FOR evalexpr =]
+FOR gfunc =]
 @findex [=% name (string-upcase! "%s") =]
 @item [=% name (string-upcase! "%s") =]
 [=descrip=]
@@ -885,8 +901,10 @@ ENDFOR evalexpr
 =]
 @end table[=
 
+@ignore
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copy of generated file ${top_builddir}/src/autogen.texi
+
 @end ignore
 @page
 
