@@ -1,27 +1,27 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2002-07-27 11:42:45 bkorb"
+## Time-stamp:      "2002-07-28 20:20:31 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.9 2002/07/27 19:10:46 bkorb Exp $
+## $Id: Makefile.am,v 3.10 2002/07/29 03:24:34 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 NOSHELL_DIRS   = compat snprintfv autoopts agen5
 SHELL_DIRS     = $(NOSHELL_DIRS) columns getdefs
-XML2AG_DIR     = @XML2AG_DIR@ doc
+XML2AG_DIR     = @XML2AG_DIR@ doc pkg
 SUBDIRS        = @TOP_DIRLIST@
-CFG_DIST       = config/autogen.spec.in config/bootstrap.local
+CFG_DIST       = pkg/autogen.spec.in config/bootstrap.local
 EXTRA_DIST	   = VERSION TODO NOTES configure $(CFG_DIST)
 DISTCLEANFILES = .configure.patch stamp-h
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 		  configure libtool stamp-h.in
 
 distcleancheck_listfiles = \
-     find -type f -exec 'test -f $(scrdir)/{} || echo {}'
+     find -type f -exec 'test -f $(srcdir)/{} || echo {} ;'
 
 configure : VERSION
 
