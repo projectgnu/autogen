@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.7 1999/11/24 23:30:12 bruce Exp $
+ *  $Id: expPrint.c,v 1.8 2000/03/05 18:42:55 bruce Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -75,8 +75,9 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
      */
     if (faultType = sigsetjmp( printJumpEnv, 0 ),
         faultType != 0) {
-        extern char* strsignal();
-
+#ifndef HAVE_STRSIGNAL
+        extern char* strsignal PARAMS((int signo));
+#endif
         /*
          *  IF the fprintf command in the then clause has not failed yet,
          *  THEN perform that fprintf
