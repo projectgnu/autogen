@@ -1,0 +1,63 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# heredef.test --- definition reference testing
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Wed Mar 1 2000
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: heredef.test,v 1.1 2000/04/06 17:11:14 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test =>
+<=
+
+(if (not (= (get "string1") (get "string2")))
+    (error (sprintf "`%s' <> `%s'"
+                    (get "string1") (get "string2") ))  )
+
+=><=
+
+(if (not (= (get "string2") (get "string3")))
+    (error (sprintf "`%s' <> `%s'"
+                    (get "string1") (get "string2") ))  )
+=>OKAY:  <= (c-string (get "string3")) =>
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+# Create the files we need in the test environment
+echo "AutoGen definitions $testname;" > $testname.def
+cat >> $testname.def <<'_EOF_'
+
+string1 = <<- AG_EOF
+	"`Testing'
+	AG_EOF;
+
+string2 = <<- AG_EOF
+"`Testing'
+AG_EOF;
+
+string3 = "\"`Testing'";
+
+_EOF_
+
+$AGEXE $testname.def || failure $testname AutoGen failed
+
+cleanup
+# end of heredef.test

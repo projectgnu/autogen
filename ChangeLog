@@ -1,3 +1,13 @@
+2000-04-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defLex.c:  Implemented a "here string" construct
+	* agen5/test/heredef.test:  Tested the construct
+	* agen5/test/Makefile.am:  enabled the test
+
+2000-04-05  Gary V. Vaughan  <gary@oranda.demon.co.uk>
+
+	* snprintfv/...: Various fixes
+
 2000-03-28  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am's & bootstrap.dir's throughout:  Use the configured

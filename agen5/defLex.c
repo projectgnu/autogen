@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.12 2000/04/04 16:44:12 bkorb Exp $
+ *  $Id: defLex.c,v 1.13 2000/04/06 17:11:14 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -37,6 +37,8 @@ ag_bool schemedefLoaded = AG_FALSE;
 extern YYSTYPE yylval;
 static YYSTYPE lastToken;
 
+tSCC zErrMsg[] = "%s Error:  %s in %s on line %d\n";
+
 /*
  *  This keyword table must match those found in agParse.y.
  *  You will find them in a %token statement that follows
@@ -67,6 +69,7 @@ STATIC void  loadScheme( void );
 STATIC void  alist_to_autogen_def( void );
 STATIC char* assembleName( char* pzScan, YYSTYPE* pRetVal );
 STATIC char* assembleString( char* pzScan );
+STATIC char* assembleHereString( char* pzScan );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -181,6 +184,23 @@ scanAgain:
         break;
     }
 
+    case '<':
+    {
+        char* pz;
+        if (pCurCtx->pzScan[1] != '<')
+            goto BrokenToken;
+
+        pz = assembleHereString( pCurCtx->pzScan + 2 );
+        if (pz == (char*)NULL) {
+            lastToken = ERROR;
+            return ERROR;
+        }
+
+        lastToken = TK_STRING;
+        pCurCtx->pzScan = pz;
+        break;
+    }
+
     case '(':
         loadScheme();
         break;
@@ -263,6 +283,7 @@ scanAgain:
         /* FALLTHROUGH */ /* to Invalid input char */
 
     default:
+    BrokenToken:
         pCurCtx->pzScan = assembleName( pCurCtx->pzScan, &lastToken );
         break;
     }   /* switch (*pCurCtx->pzScan) */
@@ -271,8 +292,7 @@ scanAgain:
 
 NUL_error:
 
-    fprintf( stderr, "%s ERROR:  unterminated quote in definition "
-             "in %s on line %d\n", pzProg,
+    fprintf( stderr, zErrMsg, pzProg, "unterminated quote in definition",
              pCurCtx->pzFileName, pCurCtx->lineNo );
     lastToken = ERROR;
     return ERROR;
@@ -526,13 +546,15 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
              */
             zNameChars[ (unsigned)'"' ] = 0;
             zNameChars[ (unsigned)'#' ] = 0;
-            zNameChars[ (unsigned)'\''] = 0;
             zNameChars[ (unsigned)'(' ] = 0;
             zNameChars[ (unsigned)')' ] = 0;
             zNameChars[ (unsigned)',' ] = 0;
             zNameChars[ (unsigned)';' ] = 0;
+            zNameChars[ (unsigned)'<' ] = 0;
             zNameChars[ (unsigned)'=' ] = 0;
+            zNameChars[ (unsigned)'>' ] = 0;
             zNameChars[ (unsigned)'[' ] = 0;
+            zNameChars[ (unsigned)'\''] = 0;
             zNameChars[ (unsigned)']' ] = 0;
             zNameChars[ (unsigned)'`' ] = 0;
             zNameChars[ (unsigned)'{' ] = 0;
@@ -551,8 +573,9 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
          */
         if (zNameChars[ *pz ] == 0) {
             if (pz == (unsigned char*)pzScan) {
-                fprintf( stderr, "Invalid input char '%c' in %s on line %d\n",
-                         *pzScan, pCurCtx->pzFileName, pCurCtx->lineNo );
+                fprintf( stderr, "%s Error: Invalid input char '%c' "
+                         "in %s on line %d\n", pzProg, *pzScan,
+                         pCurCtx->pzFileName, pCurCtx->lineNo );
                 *pRetVal = FINISH;
                 return pzScan;
             }
@@ -593,6 +616,117 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
     }
 
     return pzScan;
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  A quoted string has been found.
+ *  Find the end of it and compress any escape sequences.
+ */
+    STATIC char*
+assembleHereString( char* pzScan )
+{
+    ag_bool  trimTabs = AG_FALSE;
+    char     zMark[ 64 ];
+    int      markLen = 0;
+    char*    pzDest;
+
+    /*
+     *  See if we are to strip leading tab chars
+     */
+    if (*pzScan == '-') {
+        trimTabs = AG_TRUE;
+        pzScan++;
+    }
+
+    /*
+     *  Skip white space up to the marker or EOL
+     */
+    while (isspace( *pzScan )) {
+        if (*pzScan++ == '\n') {
+            fprintf( stderr, zErrMsg, pzProg, "HereString missing the mark",
+                     pCurCtx->pzFileName, pCurCtx->lineNo );
+            return (char*)NULL;
+        }
+    }
+
+    /*
+     *  Copy the marker, noting its length
+     */
+    {
+        char* pz = zMark;
+        while (ISNAMECHAR( *pzScan )) {
+            if (++markLen >= sizeof(zMark)) {
+                fprintf( stderr, zErrMsg, pzProg,
+                         "HereString mark over 63 chars",
+                         pCurCtx->pzFileName, pCurCtx->lineNo );
+                return (char*)NULL;
+            }
+
+            *(pz++) = *(pzScan++);
+        }
+        if (markLen == 0) {
+            fprintf( stderr, zErrMsg, pzProg, "HereString missing the mark",
+                     pCurCtx->pzFileName, pCurCtx->lineNo );
+            return (char*)NULL;
+        }
+        *pz = NUL;
+    }
+
+    pzDest = pzScan;
+    yylval = (YYSTYPE)pzDest;
+
+    /*
+     *  Skip forward to the EOL after the marker.
+     */
+    pzScan = strchr( pzScan, '\n' );
+    if (pzScan == (char*)NULL) {
+        fprintf( stderr, zErrMsg, pzProg, "Unterminated HereString",
+                 pCurCtx->pzFileName, pCurCtx->lineNo );
+        return (char*)NULL;
+    }
+
+    /*
+     *  And skip the first new line + conditionally skip tabs
+     */
+    pzScan++;
+
+    if (trimTabs)
+        while (*pzScan == '\t')  ++pzScan;
+
+    /*
+     *  FOR as long as the text does not match the mark
+     *       OR it matches but is a substring
+     *  DO copy characters
+     */
+    while (  (strncmp( pzScan, zMark, markLen ) != 0)
+          || ISNAMECHAR( pzScan[ markLen ]) )  {
+
+        for (;;) {
+            switch (*(pzDest++) = *(pzScan++)) {
+            case '\n':
+                goto lineDone;
+
+            case NUL:
+                fprintf( stderr, zErrMsg, pzProg, "Unterminated HereString",
+                         pCurCtx->pzFileName, pCurCtx->lineNo );
+                return (char*)NULL;
+            }
+        } lineDone:;
+
+        if (trimTabs)
+            while (*pzScan == '\t')  ++pzScan;
+    } /* while strncmp ... */
+
+    /*
+     *  pzDest may still equal yylval, if no data were copied
+     */
+    if (pzDest > (char*)yylval)
+         pzDest[-1] = NUL;
+    else pzDest[0]  = NUL;
+
+    return pzScan + markLen;
 }
 
 
