@@ -7,11 +7,13 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Wed Aug  4 09:46:52 1999				      
+dnl Last Modified:    Wed Aug  4 09:50:03 1999				      
 dnl            by:    Bruce Korb <korb@datadesign.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.19 1999/08/04 16:47:05 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.20 1999/08/04 16:50:13 bkorb Exp $
 dnl --------------------------------------------------------------------
+
+AC_INIT(src/autogen.c)
 
 START_DIR=`pwd`
 SRCDIR=`echo $0 | sed 's;/[^/]*$;;'`
@@ -29,7 +31,6 @@ test "$SRCDIR" = "$START_DIR" || {
   exit 0
 }
 
-AC_INIT(src/autogen.c)
 . $srcdir/VERSION
 
 AC_CONFIG_AUX_DIR(config)
@@ -37,7 +38,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.19 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.20 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
