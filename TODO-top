@@ -15,3 +15,14 @@
   constructing arrays of string pointers and knowing whether they
   point to contiguous source text or to allocated memory.
 * ANSI format specifiers: cdeEfgGiosuxX with conversion quals h and l
+* edit sources to use xmalloc and friends throughout for better recovery
+  from failed allocation
+* Write an argv style parsing agPrint.c
+
+Possibilities for the future:
+
+* think about changing the tokenizer to do more sophisticated token typing.
+* rewrite in guile (instead of C)
+* parse the autogen macros with a guile tranlator
+* write code for "autogetopt" (GNU getopt), or
+  possibly the new glibc argp parser.

@@ -60,16 +60,3 @@ SETENV calls:
 
       27 bytes from agFunc.c at 542
       18 bytes from agFunc.c at 542
-
-
-
-
-	* configure.in (AC_SUBST): Calculate the glob match for
-	agFun*.c in the src directory here (see below) and substitute
-	with AGFUN_SOURCES.
-	
-	* src/Makefile.am (agfunc.def): Removed agFun*.c dependency,
-	as it is not valid (and breaks ground up maint-rebuild). 
-	Substitute for AGFUN_SOURCES instead.  I left the rule itself
-	using a glob expression so that maintainer additions will
-	be picked up in the rule even though the dependency won't notice.

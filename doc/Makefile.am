@@ -5,17 +5,23 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/05/26 19:00:32 $
+## Last Modified:  $Date: 1998/06/01 18:50:58 $
 ##            by:  Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.2 1998/05/26 19:00:32 bkorb Exp $
+## $Id: Makefile.am,v 1.3 1998/06/01 18:50:58 bkorb Exp $
 ## ---------------------------------------------------------------------
+## Code:
 
 all : autogen.info
 
+@MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
+
+EXTRA_DIST	= autogen.def auto_gen.tpl autogen.texisav
+MAINTAINERCLEANFILES = Makefile.in
+
+ODEF		= $(top_builddir)/src/opts.def
 info_TEXINFOS	= autogen.texi
-# EXTRA_DIST       = autogen_toc.html autogen.html
-EXTRA_DIST	= autogen.def auto_gen.tpl
+BUILT_SOURCES	= autogen.texi
 
 gendir	= $(top_builddir)/src
 docdir	= $(top_srcdir)/doc

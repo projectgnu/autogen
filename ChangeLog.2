@@ -1,3 +1,23 @@
+1998-05-31  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* mkupdate.sh: Convert to bourne shell (not sure about the
+	basetime calculation tho'...)
+
+	* TODO: added a couple of new items.
+
+	* AUTHORS: updated to attribute new files.
+
+	* src/Makefile.am (CLEANFILES): added *.unordered to the
+	cleanfiles list.
+
+	* src/makedef.sh: modified to fallback on the unordered file if
+	all else fails, rather than cause make to stop... print a warning
+	when this happens.
+	Tidied header generation.
+
+	* src/agPrint.c (safePrintf): cse for repeated sigaction block
+	in each preprocessor branch.
+
 1998-05-28  Bruce Korb <korbb@datadesign.com>
 	* src/agEval.c:  New rules for typing expression tokens:
 	
@@ -36,6 +56,12 @@
 
 	* src/agPrint.c
 	indentation fixes
+	
+1998-05-08  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* tests/reorder.test: New test to hilight the (now fixed)
+	block macro reordering bug.
+
 1998-04-11  Bruce Korb <korbb@datadesign.com>
 
 	* src/agFunCase.c:  Substantially rewritten to properly

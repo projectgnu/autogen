@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 1998/05/26 19:04:04 $
+## Last Modified:   $Date: 1998/06/01 18:50:54 $
 ##            by:   Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.2 1998/05/26 19:04:04 bkorb Exp $
+## $Id: Makefile.am,v 1.3 1998/06/01 18:50:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,5 +26,6 @@ pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl
 EXTRA_DIST      = $(pkgdata_DATA)
 INCLUDES        = -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
 include_HEADERS = options.h
+MAINTAINERCLEANFILES = Makefile.in
 
 # Makefile.am ends here
