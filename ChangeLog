@@ -1,3 +1,16 @@
+2004-02-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/cook.c: NEW - move all string cooking here
+	* agen5/agUtils.c(doEscapeChar): removed
+	* agen5/defLex.c(assembleString): removed
+	* autoopts/tokenize.c(copy_cooked): use cook book cook code.
+	* autoopts/autoopts.c(doPresets): internalFileLoad has no failure mode
+	* autoopts/configfile.c(internalFileLoad): so remove its return value
+	* autoopts/load.c(findArg): routine to separate and process the option
+	argument, "process" method depending on mode:  KEEP, UNCOOKED and COOKED.
+	(loadOptionLine): use the new function.
+	* autoopts/test/rc.test: test this new stuff
+
 2004-02-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/text_mmap.c: new - maps text files, always ensuring that
@@ -14,6 +27,8 @@
 	* fiddle with configury some more.
 
 2004-02-05  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.6.6 Released
 
 	* autoopts/agman1.tpl(main): doc the new forms of "main" procedures
 	* autoopts/test/Makefile.am(verbose): testing special target
