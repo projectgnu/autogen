@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.7 2004/02/16 22:20:45 bkorb Exp $
+# $Id: directive.tpl,v 3.8 2004/08/15 11:31:25 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -73,7 +73,34 @@ tSCC zSchemeInit[] =
 "sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
-=];
+ =]; /* for emacs: " */
+
+#ifdef DAEMON_ENABLED
+typedef struct inet_family_map_s {
+    const char*     pz_name;
+    unsigned short  nm_len;
+    unsigned short  family;
+} inet_family_map_t;
+
+inet_family_map_t inet_family_map[] = {
+[=`
+
+find /usr/include -follow -name socket.h | \
+xargs egrep '^#define[ \t]+AF_[A-Z0-9]+[ \t]+[0-9]' | \
+sed 's,^.*#define[ \t]*AF_,,;s,[ \t].*,,' | \
+ while read f
+ do
+   case $f in
+   MAX ) echo '    { NULL, 0, 0 } };'
+         break ;;
+   esac
+
+   g=\`echo $f | tr '[A-Z]' '[a-z]'\`:
+   echo "    { \\\"${g}\\\", ${#g}, AF_${f} },"
+ done
+
+`=]
+#endif /* DAEMON_ENABLED */
 #endif /* DEFINING */
 #endif /* [=(. header-guard)=] */[= #
 
