@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2002-08-23 20:09:20 bkorb"
+## Time-stamp:      "2002-09-10 19:39:08 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.12 2002/08/24 03:17:33 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.13 2002/09/11 02:57:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,7 +23,11 @@ cd ${top_builddir}/pkg
 mkdir ${tag}
 mkdir ${tag}/compat
 
-cd ../autoopts
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  WORKING IN SOURCE DIRECTORY
+#
+cd ${top_srcdir}/autoopts
 cp -f autoopts.c     \
       autoopts.h     \
       boolean.c      \
@@ -38,17 +42,18 @@ cp -f autoopts.c     \
       streqvcmp.c    \
       usage.c        \
       version.c      \
-  ../pkg/${tag}/.
+  ${top_builddir}/pkg/${tag}/.
 
-cp -f COPYING ../pkg/${tag}/COPYING.lgpl
+cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
 
 cd ../compat
-cp *.h pathfind.c ../pkg/${tag}/compat/.
+cp *.h pathfind.c ${top_builddir}/pkg/${tag}/compat/.
+#
+#  END WORK IN SOURCE DIRECTORY
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-cd ../pkg/${tag}
-
-files=`ls -1 *.[ch] | \
-	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\' `
+cd ${top_builddir}/pkg/${tag}
 
 ag="${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable"
 ( echo "autogen definitions conftest.tpl;"
@@ -105,18 +110,7 @@ cat >> libopts.m4 <<-	EOMacro
 
 [ -f Makefile.am ] && rm -f Makefile.am
 
-cat > Makefile.am <<-	EOMakefile
-
-	MAINTAINERCLEANFILES = Makefile.in
-	INCLUDES = @INCLIST@
-	SRC      = \\
-	$files
-	lib_LTLIBRARIES = libopts.la
-	libopts_la_SOURCES = \$(SRC)
-	EOMakefile
-
 cat > MakeDefs.inc <<-	EOMakeDefs
-
 	## LIBOPTS Makefile Fragment
 	if NEED_LIBOPTS
 	  LIBOPTS_DIR  = libopts
@@ -127,8 +121,23 @@ cat > MakeDefs.inc <<-	EOMakeDefs
 	LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
 	EOMakeDefs
 
-sed s,'\${tag}',"${tag}",g ../libopts/README > README
-cp ../libopts/COPYING* .
+sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
+cp ${top_srcdir}/pkg/libopts/COPYING* .
+
+exec 3> Makefile.am
+cat >&3 <<-	EOMakefile
+	## LIBOPTS Makefile
+	EXTRA_DIST            = `echo COPYING*` MakeDefs.inc
+	MAINTAINERCLEANFILES  = Makefile.in
+	INCLUDES              = @INCLIST@
+	lib_LTLIBRARIES       = libopts.la
+	libopts_la_SOURCES    = \\
+	EOMakefile
+
+ls -1 *.[ch] | \
+  ${top_builddir}/columns/columns -I4 --spread=1 --line='  \' >&3
+
+exec 3>&-
 
 cd ..
 tar cvf - ${tag} | gzip --best > ${top_builddir}/autoopts/${tag}.tar.gz

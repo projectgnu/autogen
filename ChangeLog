@@ -1,3 +1,9 @@
+2002-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in: variables are very order dependent.
+	* pkg/libopts/mklibsrc.sh(Makefile.am): make sure various files are
+	redistributed by the host project
+
 2002-09-09  Bruce Korb  <bkorb@gnu.org>
 
 	* options.tpl(set-flag-names): new scheme function for setting up the
