@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2003-07-07 19:28:34 bkorb"
+# Time-stamp:        "2003-07-10 18:22:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.6 2003/07/08 02:30:45 bkorb Exp $
+# $Id: keyword.test,v 3.7 2003/07/11 01:25:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -131,7 +131,7 @@ cat > ${testname}.t1-b <<- _EndTst_
 	export OPTION_CT
 	TEST_KEYWORD_TRACE='expressions'
 	export TEST_KEYWORD_TRACE
-	TEST_KEYWORD_SETS=10
+	TEST_KEYWORD_SETS=10 # 0xA
 	export TEST_KEYWORD_SETS
 	typeset -x -i SETS_FIRST=1 # 0x1
 	typeset -x -i SETS_SECOND=2 # 0x2

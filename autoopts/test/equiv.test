@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-07-05 18:30:48 bkorb"
+# Time-stamp:        "2003-07-10 18:18:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.10 2003/07/06 16:34:59 bkorb Exp $
+# $Id: equiv.test,v 3.11 2003/07/11 01:25:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -143,9 +143,9 @@ cat > ${testname}.outbase <<_EOF_
 23 109 758 /tmp/use
 OPTION_CT=3
 export OPTION_CT
-TEST_EQUIV_SECOND=2
+TEST_EQUIV_SECOND=2 # 0x2
 export TEST_EQUIV_SECOND
-TEST_EQUIV_ALPHA=1
+TEST_EQUIV_ALPHA=1 # 0x1
 export TEST_EQUIV_ALPHA
 OPTION_CT=4
 export OPTION_CT
@@ -153,7 +153,7 @@ TEST_EQUIV_OPTION='opt'
 export TEST_EQUIV_OPTION
 TEST_EQUIV_ALPHA_MODE='BETA'
 export TEST_EQUIV_ALPHA_MODE
-TEST_EQUIV_BETA=5
+TEST_EQUIV_BETA=5 # 0x5
 export TEST_EQUIV_BETA
 OPTION_CT=2
 export OPTION_CT
