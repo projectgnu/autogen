@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.4 2002/03/27 04:49:45 bkorb Exp $
+ *  $Id: expMake.c,v 3.5 2002/03/27 05:13:35 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -68,7 +68,7 @@
  *  '?' or '%'.  Other single character make macros that do not have enclosing
  *  parentheses will fail.  For shell usage of the "$@@", "$?" and "$*"
  *  macros, you must enclose them with curly braces, e.g., "$@{?@}".
- *  The ksh construct @code{(<command>)} will not work.  Though some
+ *  The ksh construct @code{$(<command>)} will not work.  Though some
  *  @command{make}s accept @code{$@{var@}} constructs, this function will
  *  assume it is for shell interpretation and double the dollar character.
  *  You must use @code{$(var)} for all @command{make} substitutions.
