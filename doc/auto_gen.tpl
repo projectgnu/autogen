@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.36 1999/10/31 00:31:44 bruce Exp $
+## $Id: auto_gen.tpl,v 2.37 1999/10/31 18:55:58 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -906,25 +906,39 @@ provide information for AutoGen processing; and also augment the
 repertore of string manipulation functions.
 
 @table @samp[=
-FOR gfunc =]
-@findex [=% name (string-downcase! "%s") =]
-@item [=% name
-  (shell (sprintf
-    "echo '%%s' | sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-        (string-tr! "%s" "A-Z_^" "a-z--") )) =][=
-  FOR exparg "," =] [=arg_name=][= arg_ellipsis " ..." =][=
+(define func-name "")
+(define func-str "") =][=
+FOR gfunc =][=
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name))
+ =]
+@findex [=(. func-name)=][=
+% string "\n@findex %s" =]
+@item [=(. func-str)=][=
+  FOR exparg "," =] [=
+    arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
+    arg_optional " ]" =][=
   ENDFOR exparg =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
 [=doc=][=
-  (if (exist? "exparg") "\n") =][=
-  FOR exparg =]
+  IF (exist? "exparg") =][=
+
+    FOR exparg =]
 @*
 [=arg_name=] - [=
-    IF (exist? "arg_desc") =][=arg_desc=][=ELSE=]Undocumented[=ENDIF=][=
-  ENDFOR exparg =][=
-
+    arg_optional "Optional - " =][=
+      IF (exist? "arg_desc") =][=arg_desc=][=
+      ELSE=]Undocumented[=
+      ENDIF=][=
+    ENDFOR exparg =][=
+  ELSE =]  This Scheme function takes no arguments.[=
+  ENDIF =][=
 ENDFOR gfunc
 =]
 @end table
