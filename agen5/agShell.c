@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.14 2001/09/23 01:30:01 bkorb Exp $
+ *  $Id: agShell.c,v 1.15 2001/10/27 17:33:17 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -63,8 +63,18 @@ closeServer( void )
 
     (void)kill( serverId, SIGKILL );
     serverId = NULLPROCESS;
-    (void)fclose( serverPair.pfRead );
-    (void)fclose( serverPair.pfWrite );
+
+    /*
+     *  This guard should not be necessary.  However, sometimes someone
+     *  holds an allocation pthread lock when a seg fault occurrs.  fclose
+     *  needs that lock, so we hang waiting for it.  Oops.  So, when we
+     *  are aborting, we just let the OS close these file descriptors.
+     */
+    if (procState != PROC_STATE_ABORTING) {
+        (void)fclose( serverPair.pfRead );
+        (void)fclose( serverPair.pfWrite );
+    }
+
     serverPair.pfRead = serverPair.pfWrite = (FILE*)NULL;
 }
 
@@ -122,10 +132,11 @@ serverSetup( void )
         tSCC zTrap[] =
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done\n" "unalias cd 2>/dev/null >&2\n";
+            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=%d\n";
         char* pz;
         pzLastCmd = zTrap;
-        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
+        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir,
+                 pzLastCmd, zShDone, getpid() );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
 #if defined( DEBUG ) && defined( VALUE_OPT_SHOW_SHELL )
@@ -137,8 +148,8 @@ serverSetup( void )
     if (HAVE_OPT( SHOW_SHELL )) {
         tSCC zSetup[] = "set -x\n"
                         "exec 2> /dev/tty\n"
-                        "trap >&2\n"
-                        "echo server setup done >&2\n";
+                        "trap\n"
+                        "echo server setup done\n";
         char* pz;
 
         fputs( "Server traps set\n", stderr );
@@ -146,8 +157,7 @@ serverSetup( void )
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
-        if (HAVE_OPT( SHOW_SHELL ))
-            fprintf( stderr, "Trap state:\n%s\n", pz );
+        fprintf( stderr, "Trap state:\n%s\n", pz );
 #endif
         AGFREE( (void*)pz );
     }
@@ -490,5 +500,6 @@ runShell( const char*  pzCmd )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of agShell.c */

@@ -763,10 +763,11 @@ Resume input from autogen.texi
 When AutoGen starts, it tries to determine several names from the
 operating environment and put them into environment variables for use in
 both @code{#ifdef} tests in the definitions files and in shell scripts
-with environment variable tests.  For these names, it will first try to
-use the POSIX version of the @code{sysinfo(2)} system call.  Failing
-that, it will try for the POSIX @code{uname(2)} call.  If neither is
-available, then this feature is not supported.
+with environment variable tests.  @code{__autogen__} is always defined.
+For other names, AutoGen will first try to use the POSIX version of the
+@code{sysinfo(2)} system call.  Failing that, it will try for the POSIX
+@code{uname(2)} call.  If neither is available, then only
+"@code{__autogen__}" will be inserted into the environment.
 
 If @code{sysinfo(2)} is available, the strings associated with
 
@@ -802,9 +803,11 @@ For Linux and other operating systems that only support the
 @code{nodename} (e.g., "__bach__")
 @end itemize
 
-By testing these pre-defines in my definitions, I can select
+By testing these pre-defines in my definitions, you can select
 pieces of the definitions without resorting to writing shell
-scripts that parse the output of @code{uname(1)}.
+scripts that parse the output of @code{uname(1)}.  You can also
+segregate real C code from autogen definitions by testing for
+"@code{__autogen__}".
 
 @example
 #ifdef __bach__
@@ -818,14 +821,14 @@ scripts that parse the output of @code{uname(1)}.
 @section Commenting Your Definitions
 @cindex comments
 
-The definitions file may contain C-style comments.
+The definitions file may contain C and C++ style comments.
 
 @example
 /*
- *  This is a comment.
- *  It continues for several lines and suppresses all processing
- *  until the closing characters '*' and '/' appear together.
+ *  This is a comment.  It continues for several lines and closes
+ *  when the characters '*' and '/' appear together.
  */
+// this comment is a single line comment
 @end example
 
 @node Example
@@ -849,28 +852,17 @@ global = "value for a global text definition.";
 
 a_block = @{
     a_field;
-    /*
-     *  You might want to document sub-block definitions, too
-     */
     a_subblock = @{
         sub_name  = first;
         sub_field = "sub value.";
     @};
 
 #ifdef FEATURE
-    /*
-     *  This definition is applicable only if FEATURE
-     *  has been defined during the processing of the definitions.
-     */
     a_subblock = @{
         sub_name  = second;
     @};
 #endif
 
-@};
-
-a_block = @{
-    a_field = here;
 @};
 @end example
 
@@ -957,10 +949,10 @@ file, then the first macro invocation will look something like this:
 
 @example
 [+ AutoGen5 template -*- Mode: emacs-mode-of-choice -*-
-
 h=chk-%s.h
-
-c +]
+c
+# make sure we don't use csh:
+(setup "SHELL" "/bin/sh")  +]
 @end example
 
 @noindent
@@ -1294,6 +1286,13 @@ your template and invoke it in another.  You may also store values
 in shell variables for later reference.  If you load functions from
 a file containing shell functions, they will remain until AutoGen exits.
 
+If your shell script should determine that AutoGen should stop
+processing, the recommended method for stopping AutoGen is:
+@example
+echo "some error text" >&2
+kill -2 $@{AG_pid@}
+@end example
+
 @node guile macros
 @section Guile Macros
 
@@ -1305,6 +1304,12 @@ file by using the @code{--load-scheme} command line option
 however, that the AutoGen specific scheme functions have not been loaded
 at this time, so though you may define functions that reference them,
 do not invoke the AutoGen functions at this time.
+
+If your Scheme script should determine that AutoGen should stop
+processing, the recommended method for stopping AutoGen is:
+@example
+(error "some error text")
+@end example
 
 @node guile callouts
 @section Guile Callout Functions
@@ -1524,28 +1529,18 @@ section.
 
 @enumerate
 @item
-POSIX-compliant short (flag) option processing, if your options specify
-at least one option @code{value} (@pxref{Common Attributes}).
+POSIX-compliant short (flag) option processing.
 
 @item
-GNU-style long options processing, if you specify @code{long-opts}
-(@pxref{program attributes}) as a global program attribute.  Long options
-are recognized without case sensitivity, and they may be abbreviated to
-the minimum length that is unique within the set of program options.
+GNU-style long options processing.  Long options
+are recognized without case sensitivity, and they may be abbreviated.
 
 @item
-Process environment variable initializations, if the @code{environrc}
-program attribute is specified and the variable(s) exist.
-@xref{program attributes}.
+Environment variable initializations.
 
 @item
-Process initialization/rc files, if the @code{homerc} program attribute(s)
-are specified and the file(s) exist).  @xref{loading rc files},
-and @xref{program attributes}.
-
-@item
-Store the option state into an initialization/rc file.
-@xref{saving rc files}.
+Initialization from RC or INI files, and
+saving the option state back into one.
 
 @item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
@@ -1554,32 +1549,26 @@ may also provide an enablement prifix, too, e.g., @code{--allow-mumble}
 and @code{--prevent-mumble}.
 
 @item
-Verify that required options are present the required minimum number of
-times on the command line, and do not appear more than the maximum
-number of times.  @xref{Common Attributes}.
+Verify that required options are present between the minimum and
+maximum number of times on the command line.
 
 @item
 Verify that conflicting options do not appear together, and that options
 that require the presence of other options are, in fact, used in the
-presence of other options.  @xref{Option Conflict Attributes}.
+presence of other options.
 
 @item
-Provides a callable routine (@pxref{optionLoadLine}) to parse a line of
-text as if it were a line from one of the RC/INI files.  (Consequently,
-you may stash options in a text file you process and pass the relevant
-text for option processing.)
+Provides a callable routine to parse
+a text string as if it were from one of the RC/INI files.
 
 @item
 @code{--help} and @code{--version} are automatically supported.
 @code{--more-help} will page the generated help.
-@code{--version} is activated by specifying a @code{version}
-program attribute.
 
 @item
 By adding a @samp{doc} and @samp{arg-name} attributes to each option,
 AutoGen will also be able to produce a man page and the @samp{invoking}
-section of a texinfo document.  These documentation templates will also
-weave in the @samp{explain} and @samp{detail} program attributes as well.
+section of a texinfo document.
 
 @item
 Insert the option processing state into Scheme-defined variables.
@@ -1673,11 +1662,19 @@ output file or, if it is not specified, then to the last specified
 @node optionLoadLine
 @unnumberedsubsec process a text string for options
 @cindex optionLoadLine
-This routine expects a NUL-terminated string to contain a long option
-name followed, optionally, by a string value.  Leading and trailing
-white space is trimmed from the value, but otherwise new lines are
-not discarded.  The caller is expected to have NUL terminated the
-string at the correct point.
+
+The @code{optionLoadLine} takes two arguments:
+@enumerate
+@item
+The pointer to the option descriptor.
+@item
+A pointer to a NUL-terminated string that contains a long option name
+followed, optionally, by a string value.
+@end enumerate
+
+Leading and trailing white space is trimmed from the value, but
+otherwise new lines are not discarded.  The caller is expected to have
+NUL terminated the string at the correct point.
 
 @ignore
 END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
@@ -1795,7 +1792,7 @@ main( int argc, char** argv )
 The options are tested and used as in the following fragment:
 
 @example
-  if (HAVE_OPT( SHOW_DEFS )) @{
+  if (HAVE_OPT( SHOW_DEFS ) && HAVE_OPT( CHECK_DIRS )) @{
     int    dirct = STACKCT_OPT( CHECK_DIRS );
     char** dirs  = STACKLST_OPT( CHECK_DIRS );
     while (dirct-- > 0) @{
@@ -1832,6 +1829,8 @@ option attributes, @xref{Common Attributes}.
 @code{arg-type} from the option argument specification section,
 @xref{Option Arguments}.
 @item
+Read the overall how to, @xref{Using AutoOpts}.
+@item
 Highly recommended, but not required, are the several "man" and
 "info" documentation attributes, @xref{documentation attributes}.
 @end enumerate
@@ -1860,8 +1859,8 @@ copy of each of these definitions:
 @table @samp
 @cindex prog-name
 @item prog-name
-This attribute is required.  Variable names derived from this name will
-be transformed via @code{string->c_name!} (@pxref{SCM string->c-name!}).
+This attribute is required.  Variable names derived from this name
+are derived using @code{string->c_name!} (@pxref{SCM string->c-name!}).
 
 @cindex prog-title
 @item prog-title
@@ -2205,6 +2204,9 @@ ifdef = WITH_MUMBLING;
 
 @noindent
 Note that case and spelling must match whatever you are using.
+Do not confuse these attributes with the AutoGen directives of the
+same names, @xref{Directives}.  These cause C pre-processing directives
+to be inserted into the generated C text.
 @end table
 
 @node Special Option Handling
@@ -2363,7 +2365,7 @@ The bracketed part of the name is optional.
 The argument may be any arbitrary string.
 
 @item num[@i{ber}]
-The argument must be a correctly formed number, without any trailing
+The argument must be a correctly formed integer, without any trailing
 U's or L's.  If you specify your own callback validation routine,
 read the @code{arg-range} section below for some considerations.
 AutoOpts contains a library procedure to convert the string to a number.
@@ -2399,8 +2401,10 @@ AutoOpts produces a special purpose procedure for this option.
 
 @cindex keyword
 @item keyword
-If the @code{arg-type} is @code{keyword}, then you have to specify the
-list of keywords by a series of @code{keyword} entries.
+If the @code{arg-type} is @code{keyword}, then you must specify the
+list of keywords by a series of @code{keyword} entries.  The interface
+file will contain an enumeration of @code{@i{<OPT_NAME>}_@i{<KEYWORD>}} for
+each keyword entry.
 
 @cindex arg-optional
 @item arg-optional
@@ -2676,6 +2680,7 @@ e.g.,
 
 @code{--silent}, @code{--quiet}, @code{--brief} and @code{--verbose} are
 related in that they all indicate some level of diagnostic output.
+These options are all designed to conflict with each other.
 Instead of four different options, however, several levels can be
 incorporated by @code{#define}-ing @code{VERBOSE_ENUM}.  In conjunction
 with @code{VERBOSE}, it incorporates the notion of @i{5} levels in an
@@ -3397,7 +3402,7 @@ if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
 shift $@{OPTION_CT@}
 @end example
 
-If you had used @code{-DTEST_MAIN=putShellParse} instead, then you can,
+If you had used ``@code{test-main = putShellParse}'' instead, then you can,
 at this point, merely run the program and it will write the parsing
 script to standard out.  You may also provide this program with command
 line options to specify the shell script file to create or edit, and you

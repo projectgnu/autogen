@@ -12,9 +12,9 @@
 
 ** expOutput.c needs to export "outputShutdown(bool keep)
 
-** getdefs ought to allow for assigned indexes
-
 ** getdefs leaves a NUL at the end of the database file
+
+** memfrob(3GNU) as a function
 
 * In Progress
 
@@ -23,14 +23,11 @@
 * Pending
 
 ** augment AutoGen defs with XML.
-** emit conditional compile directives around emitted options
 ** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 ** All errors from autogen/getdefs etc. should start with,
    `options.pzProgName' (aka 'basename(argv[0])').
 ** Change the invocations of getdefs to send output to stdout in
    preference to invoking autogen internally.  The current method is ugly.
-** In AutoOpts, add another(!) attribute that says an option is active
-   IFF a flag is set.  E.g.  ``ifdef = DEBUG;''
 
 *  Possibilities for the (distant) future:
 

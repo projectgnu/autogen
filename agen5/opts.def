@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.34 2001/10/01 23:51:33 bkorb Exp $
+ *   $Id: opts.def,v 1.35 2001/10/27 17:33:17 bkorb Exp $
  *
  *  AutoGen copyright 1992-2000 Bruce Korb
  *
@@ -404,7 +404,7 @@ flag = {
 	Displays the results of expression evaluations
 
 	@item everything
-	Displays the invocation of every AutoGen macro, even @code{TEXT}macros.
+	Displays the invocation of every AutoGen macro, even @code{TEXT} macros.
 	@end table
 	_EOF_;
 };

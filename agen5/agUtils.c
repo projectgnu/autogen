@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.15 2001/10/01 23:51:33 bkorb Exp $
+ *  $Id: agUtils.c,v 1.16 2001/10/27 17:33:17 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -34,17 +34,13 @@
 
 #if defined( HAVE_POSIX_SYSINFO )
 #  include <sys/systeminfo.h>
-   STATIC void addSysEnv( char* pzEnvName );
-#  define NEED_ADDSYSENV
 
 #elif defined( HAVE_UNAME_SYSCALL )
 #  include <sys/utsname.h>
-   STATIC void addSysEnv( char* pzEnvName );
-#  define NEED_ADDSYSENV
 
-#else
-#  undef  NEED_ADDSYSENV
 #endif
+
+STATIC void addSysEnv( char* pzEnvName );
 
 #ifdef MEMDEBUG
 #  include "snprintfv/mem.h"
@@ -198,8 +194,9 @@ doOptions( int arg_ct, char** arg_vec )
         } while (--ct > 0);
     }
 
-#if defined( HAVE_POSIX_SYSINFO )
     {
+        char z[ 128 ] = "__autogen__";
+#if defined( HAVE_POSIX_SYSINFO )
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
 #ifdef      SI_PLATFORM
@@ -208,11 +205,9 @@ doOptions( int arg_ct, char** arg_vec )
             SI_MACHINE };
         int ix;
         long sz;
-        char z[ 128 ];
         char* pz = z+2;
 
-        z[0] = z[1] = '_';
-
+        addSysEnv( z );
         for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
             sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
             if (sz > 0) {
@@ -222,20 +217,17 @@ doOptions( int arg_ct, char** arg_vec )
                 addSysEnv( z );
             }
         }
-    }
 
 #elif defined( HAVE_UNAME_SYSCALL )
-    {
-        char z[ 128 ];
         struct utsname unm;
 
+        addSysEnv( z );
         if (uname( &unm ) != 0) {
             fprintf( stderr, "Error %d (%s) making uname(2) call\n",
                      errno, strerror( errno ));
             exit( EXIT_FAILURE );
         }
 
-        z[0] = z[1] = '_';
         sprintf( z+2, "%s__", unm.sysname );
         addSysEnv( z );
 
@@ -244,12 +236,14 @@ doOptions( int arg_ct, char** arg_vec )
 
         sprintf( z+2, "%s__", unm.nodename );
         addSysEnv( z );
-    }
+#else
+
+        addSysEnv( z );
 #endif
+    }
 }
 
 
-#ifdef NEED_ADDSYSENV
     STATIC void
 addSysEnv( char* pzEnvName )
 {
@@ -271,7 +265,6 @@ addSysEnv( char* pzEnvName )
         putenv( asprintf( zFmt, pzEnvName ));
     }
 }
-#endif /* NEED_ADDSYSENV */
 
 
     EXPORT tCC*

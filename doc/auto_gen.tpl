@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.73 2001/10/13 18:48:48 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.74 2001/10/27 17:33:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -130,7 +130,7 @@ FOR directive "\n" =][=
 @cindex #[=% name (string-downcase! "%s") =]
 @cindex [=% name (string-downcase! "%s") =] directive
 @ignore
-Extracted from [=srcfile=] on line [=linenum=].
+Generated [= (tpl-file-line) =].
 @end ignore
 [=text=][=
   ENDIF=][=
@@ -152,9 +152,11 @@ Extracted from $top_srcdir/agen5/defParse.y
 @example
 [= # extract the syntax from defParse.y, then escape the characters
      that texi sees as operators and remove comments:  =][=
-
- ` sed -n -e '/^definitions/,$p' $top_srcdir/agen5/defParse.y |
-   sed -e 's/{/@{/g' -e 's/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
+`if test -z "$top_srcdir" || test ! -d "$top_srcdir"
+ then top_srcdir=.. ; fi
+ [ ! -f ${top_srcdir}/agen5/defParse.y ] && kill -2 ${AG_pid}
+ sed -n -e '/^definitions/,$p' ${top_srcdir}/agen5/defParse.y |
+ sed -e 's/{/@{/g' -e 's/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
 @end example
 
 [= get-text tag = TEMPLATE =]
@@ -197,6 +199,7 @@ but they cannot be invoked.
 (define func-name "")
 (define func-str "") =][=
 FOR gfunc =][=
+  (if (not (exist? "name")) (error "NO NAME")) =][=
   IF (not (exist? "general_use")) =][=
     set-func-name =]
 * SCM [= (sprintf "%-20s" (string-append func-str "::"))
@@ -214,7 +217,7 @@ FOR gfunc =][=
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
 @ignore
-Extracted from [=srcfile=] on line [=linenum=].
+Generated [= (tpl-file-line) =].
 @end ignore
 Usage:  ([=(. func-str)=][=
     FOR exparg =] [=
@@ -276,7 +279,7 @@ FOR gfunc =][=
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
 @ignore
-Extracted from [=srcfile=] on line [=linenum=].
+Generated [= (tpl-file-line) =].
 @end ignore
 Usage:  ([=(. func-str)=][=
     FOR exparg =] [=
@@ -383,12 +386,12 @@ FOR macfunc =][=
 @node [=name=]
 @subsection [=% name (string-upcase! "%s") =] - [=what=]
 @ignore
-Extracted from [=srcfile=] on line [=linenum=].
+Generated [= (tpl-file-line) =].
 @end ignore
 @findex [=% name (string-upcase! "%s") =][=
-    FOR cindex =]
-@cindex [=cindex=][=
-    ENDFOR cindex=]
+  (if (exist? "cindex")
+      (string-append "\n@cindex "
+         (join "\n@cindex " (stack "cindex")) ))  =]
 
 [=desc=][=
   ENDIF desc exists =][=

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.18 2001/09/29 17:08:56 bkorb Exp $
+ *  $Id: autogen.c,v 1.19 2001/10/27 17:33:17 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -168,6 +168,10 @@ abendSignal( int sig )
                   "       for function %s (%d)\n";
 
     fprintf( stderr, zErr, sig, strsignal( sig ));
+    fflush( stderr );
+    fflush( stdout );
+    if (pfTrace != stderr )
+        fflush( pfTrace );
 
     /*
      *  IF there is a current template, then we should report where we are

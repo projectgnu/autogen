@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 1.3 2001/08/29 03:10:48 bkorb Exp $
+ *  $Id: expExtract.c,v 1.4 2001/10/27 17:33:17 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -60,28 +60,22 @@ loadExtractData( const char* pzNewFile )
         return NULL;
 
     if (  (pzFile != NULL)
-       && (strcmp( pzFile, pzNewFile ) == 0)) {
-        free( (void*)pzNewFile );
+       && (strcmp( pzFile, pzNewFile ) == 0))
         return pzText;
-    }
 
     if (  (stat( pzNewFile, &sbuf ) != 0)
        || (! S_ISREG(sbuf.st_mode))
-       || (sbuf.st_size < 10) ) {
-        free( (void*)pzNewFile );
+       || (sbuf.st_size < 10) )
         return NULL;
-    }
 
     if (pzFile != NULL) {
-        free( (void*)pzFile );
+        AGFREE( (void*)pzFile );
         AGFREE( (void*)pzText );
         pzFile = pzText = NULL;
     }
 
-    pzFile = pzNewFile;
+    AGDUPSTR( pzFile, pzNewFile, "extract file name" );
     pzIn = (char*)AGALOC( sbuf.st_size + 1, "Extraction File Text" );
-    if (pzIn == NULL)
-        goto bad_return;
 
     if (! HAVE_OPT( WRITABLE ))
         SET_OPT_WRITABLE;
@@ -116,17 +110,12 @@ loadExtractData( const char* pzNewFile )
 
  bad_return:
 
-    if (pzFile != NULL) {
-        free( (void*)pzFile );
-        pzFile = NULL;
-    }
+    AGFREE( (void*)pzFile );
+    pzFile = NULL;
+    AGFREE( (void*)pzText );
+    pzText = NULL;
 
-    if (pzText != NULL) {
-        AGFREE( (void*)pzText );
-        pzText = NULL;
-    }
-
-    return NULL;
+    return pzText;
 }
 
 
@@ -195,25 +184,51 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * exparg: caveat,     warn about changing marker, opt
  * exparg: default,    default initial text,       opt
  *
- * doc: This function is used to help construct output files that may contain
- *      text that is carried from one version of the output to the next.
+ * doc:
  *
- *      The @code{file} argument is used to name the file that contains the
- *      demarcated text.
- *@*
+ * This function is used to help construct output files that may contain
+ * text that is carried from one version of the output to the next.
+ *
+ * @itemize @bullet
+ * @item
+ *      The @code{file-name} argument is used to name the file that
+ *      contains the demarcated text.
+ * @item
  *      The @code{marker-fmt} is a formatting string that is used to construct
  *      the starting and ending demarcation strings.  The sprintf function is
  *      given the @code{marker-fmt} with two arguments.  The first is either
  *      "START" or "END".  The second is either "DO NOT CHANGE THIS COMMENT"
  *      or the optional @code{caveat} argument.
- *@*
+ * @item
  *      @code{caveat} is presumed to be absent if it is the empty string
- *      (@code{""}).  The resulting strings are presumed to be unique within
- *      the subject file.
- *@*
+ *      (@code{""}).  If absent, ``DO NOT CHANGE THIS COMMENT'' is used
+ *      as the second string argument to the @code{marker-fmt}.
+ * @item
  *      When a @code{default} argument is supplied and no pre-existing text
  *      is found, then this text will be inserted between the START and END
  *      markers.
+ * @end itemize
+ * @noindent
+ * The resulting strings are presumed to be unique within
+ * the subject file.  As a simplified example:
+ *
+ * @example
+ * [+ (extract "fname" "// %s - SOMETHING - %s" ""
+ *             "example default") +]
+ * @end example
+ * @noindent
+ * will result in the following text being inserted into the output:
+ *
+ * @example
+ * // START - SOMETHING - DO NOT CHANGE THIS COMMENT
+ * example default
+ * // END   - SOMETHING - DO NOT CHANGE THIS COMMENT
+ * @end example
+ * @noindent
+ * The ``@code{example default}'' string can then be carried forward to
+ * the next generation of the output, @strong{@i{provided}} the output
+ * is not named "@code{fname}" @i{and} the old output is renamed to
+ * "@code{fname}" before AutoGen-eration begins.
 =*/
     SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
@@ -225,20 +240,17 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
     if (! gh_string_p( file ) || ! gh_string_p( marker ))
         return SCM_UNDEFINED;
 
-    pzText = loadExtractData( gh_scm2newstr( file, NULL ));
+    pzText = loadExtractData( ag_scm2zchars( file, "extract file" ));
 
     {
-        const char* pzMarker = gh_scm2newstr( marker, NULL );
+        const char* pzMarker = ag_scm2zchars( marker, "extract marker" );
         const char* pzCaveat = "DO NOT CHANGE THIS COMMENT";
-        int static_caveat = 1;
-        if (gh_string_p( caveat ) && (SCM_LENGTH( caveat ) > 0)) {
-            static_caveat = 0;
-            pzCaveat = gh_scm2newstr( caveat, NULL );
-        }
+
+        if (gh_string_p( caveat ) && (SCM_LENGTH( caveat ) > 0))
+            pzCaveat = ag_scm2zchars( caveat, "extract caveat" );
+
         pzStart = asprintf( pzMarker, "START", pzCaveat );
         pzEnd   = asprintf( pzMarker, "END  ", pzCaveat );
-        if (! static_caveat)
-            free( (void*)pzCaveat );
     }
 
     {
