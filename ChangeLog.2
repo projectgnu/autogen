@@ -1,3 +1,21 @@
+1998-05-28  Bruce Korb <korbb@datadesign.com>
+	* src/agEval.c:  New rules for typing expression tokens:
+	
+	  IF the first char is alpha or a space, it is a string
+	  IF it is a digit, it is a number
+	  IF it is a '#', the following chars are a string
+	  IF it is a '_', it introduces a function name
+	  IF it is '+' or '-' and then a digit, then it is a number
+	  IF it is a single punctuation character or one followed by
+	        another, then it is an operator of some sort.
+	  ELSE is is a string
+
+	* src/agFunCase.c agFunFor.c agFunIf.c agFunOut.c agFunc.c agPrint.c:
+	Remove old bogus file names
+
+	* src/opts.def:
+	Upgrade minor version due to new expression token typing
+
 1998-05-26  Bruce Korb <korbb@datadesign.com>
 	* NOTES
 	Added sprintf discussion
