@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.18 2000/11/29 16:44:28 bkorb Exp $
+ *  $Id: autogen.h,v 1.19 2000/12/11 23:27:54 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -388,6 +388,7 @@ struct mem_mgmt {
  *  GLOBAL PROCEDURES
  */
 #ifndef HAVE_STRLCPY
+size_t strlcpy( char* dest, const char* src, size_t n );
 #endif
 
 #include "proto.h"
