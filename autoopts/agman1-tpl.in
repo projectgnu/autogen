@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-06-12 16:45:07 bkorb"
+## Time-stamp:      "2002-06-14 08:21:39 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.9 2002/06/13 02:00:40 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.10 2002/06/14 23:35:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -60,8 +60,8 @@ sed \
  -e '/^ *@ *table/d' \
  -e 's/^ *@ *end *table/.br/' \
  -e 's/^@item/.sp 1/' \
- -e 's/\*\([a-zA-Z0-9=_ -]*\)\*/\\fB\1\\fP/g' \
- -e 's/``\([a-zA-Z0-9=_ -]*\)'"''"'/\\fI\1\\fP/g' \
+ -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
+ -e 's/``\([a-zA-Z0-9:~=_ -]*\)'"''"'/\\fI\1\\fP/g' \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 [+:
 
@@ -312,12 +312,12 @@ ENDFOR flag
 
 :+]
 .TP
-.BR [+:IF (exist? "flag.value") :+]\-? , " --[+:
+.BR [+:IF (exist? "flag.value") :+]\-[+: ?% help-value "%s" "?" :+] , " --[+:
       ELIF (exist? "long_opt") :+]--[+:
       ENDIF:+]help
 Display usage information and exit.
 .TP
-.BR [+:IF (exist? "flag.value") :+]-! , " --[+:
+.BR [+:IF (exist? "flag.value") :+]-[+: ?% more-help-value "%s" "!" :+] , " --[+:
       ELIF (exist? "long_opt") :+]--[+:
       ENDIF:+]more-help
 Extended usage information passed thru pager.[+:
@@ -325,19 +325,19 @@ Extended usage information passed thru pager.[+:
 
 IF (exist? "homerc") :+]
 .TP
-.BR [+: IF (exist? "flag.value") :+]-> " \fIrcfile\fP, --" [+:
+.BR [+: IF (exist? "flag.value") :+]-[+: ?% save-opts-value "%s" ">" :+] " \fIrcfile\fP, --" [+:
       ELIF (exist? "long_opt") :+]--[+:
       ENDIF:+]save-opts "[=\fIrcfile\fP]
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 rc file listed in the \fBOPTION PRESETS\fP section, below.
 .TP
-.BR [+: IF (exist? "flag.value") :+]-< " \fIrcfile\fP, --" [+:
+.BR [+: IF (exist? "flag.value") :+]-[+: ?% load-opts-value "%s" "<" :+] " \fIrcfile\fP, --" [+:
       ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]load-opts "=\fIrcfile\fP"
+      ENDIF:+]load-opts "=\fIrcfile\fP", " \fB--no-load-opts\fP"
 Load options from \fIrcfile\fP.
-.TP
-.BR  --no-load-opts
-Disable loading options from an rc file.[+:
+The \fIno-load-opts\fP form will disable the loading
+of earlier RC/INI files.  \fI--no-load-opts\fP is handled early,
+out of order.[+:
 ENDIF (exist? "homerc") :+][+:
 
 
@@ -352,10 +352,6 @@ ENDIF
 
 
 :+][+:
-IF (exist? "explain") :+]
-.PP
-[+:explain  :+][+:
-ENDIF       :+][+:
 IF (or (exist? "homerc") (exist? "environrc")) :+]
 .SH OPTION PRESETS
 Any option that is not marked as ``not presettable'' may be preset
