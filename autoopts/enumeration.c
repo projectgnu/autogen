@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.3 2000/10/17 17:09:19 bkorb Exp $
+ *  $Id: enumeration.c,v 2.4 2000/10/19 23:00:19 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -70,6 +70,12 @@ DEF_PROC_4( static, void, enumError,
         fprintf( stderr, pz_fmt, pOpts->pzProgName, pOD->pzLastArg );
 
     fprintf( stderr, "The valid %s option keywords are:\n", pOD->pz_Name );
+
+    if (**paz_names == 0x7F) {
+        paz_names++;
+        name_ct--;
+    }
+
     do  {
         fprintf( stderr, "\t%s\n", *(paz_names++) );
     } while (--name_ct > 0);
@@ -94,12 +100,20 @@ DEF_PROC_4( , char*, optionEnumerationVal,
 
     /*
      *  IF there is no option struct pointer, then we are being
-     *  called (indirectly) by the usage routine.  It wants the
-     *  keyword list to be printed.
+     *  called (indirectly) by the usage or putshell routine.
+     *  They want the keyword or keyword list to be printed.
      */
-    if (pOpts == NULL) {
+    switch ((u_long)pOpts) {
+    case 0UL:
         enumError( pOpts, pOD, paz_names, name_ct );
         return;
+
+    case 1UL:
+        fputs( paz_names[ (int)(pOD->pzLastArg) ], stdout );
+        return;
+
+    default:
+        break;
     }
 
     len = strlen( pOD->pzLastArg );

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.8 2000/10/17 19:46:15 bkorb Exp $
+# $Id: optmain.tpl,v 2.9 2000/10/19 23:00:19 bkorb Exp $
 
 =]
 [=
@@ -185,8 +185,8 @@ static tOptProc doOpt[=(. cap-name)  =];[=
           ELSE          =]stackOptArg[=
           ENDIF         =][=
 
-      ELIF (=* (get "arg_type") "key") =]
-#define doOpt[=(. cap-name)   =] (tpOptProc)NULL[=
+      ELIF (=* (get "arg_type") "key")  =]
+static tOptProc doOpt[=(. cap-name)  =];[=
       ENDIF             =][=
 
     ENDFOR flag         =]
@@ -204,53 +204,67 @@ ENDDEF
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE define-option-callbacks  =][=
-
-  IF (exist? "test_main") =]
-
-#if ! defined( TEST_[= (. pname-up) =]_OPTS )[=
-
-  ENDIF =][=
-
-  FOR flag =][=
-
-    IF (or (exist? "flag_code") (=* (get "arg_type") "key")) =][=
-       (set! UP-name    (string-upcase! (get "name")))
-       (set! cap-name   (string-capitalize UP-name))
-       (set! low-name   (string-downcase UP-name))      =]
+DEFINE callback-proc-header     =]
 
 /* * * * * * *
  *
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
-DEF_PROC_2( static, void, doOpt[=(string-capitalize (get "name")) =],
+DEF_PROC_2( static, void, doOpt[=(. cap-name) =],
             tOptions*, pOptions, tOptDesc*, pOptDesc )
 {
-[=    IF (exist? "flag_code") =][=
-         flag_code =][=
-      ELSE         =][=
-         IF (not (exist? "arg_default")) =]    tSCC zDef[2] = { 0x7F, 0 };
-[=       ENDIF
-=]    tSCC* az_names[] = {[=
-         IF (not (exist? "arg_default")) =] zDef,[=
-         ENDIF  =]
-[=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
-          (join "\n" (stack "keyword")) )=]
-    };
+[=
 
-    pOptDesc->pzLastArg = optionEnumerationVal( pOptions, pOptDesc, az_names,
-                                                [=
-      (+ (count "keyword") (if (exist? "arg_default") 0 1)) =] );[=
-      ENDIF     =]
+ENDDEF                          =][=
+
+# # # # # # # # # # # # # # # # =][=
+
+DEFINE define-option-callbacks  =][=
+
+  FOR  flag  =][=
+
+    (set! UP-name    (string-upcase! (get "name")))
+    (set! cap-name   (string-capitalize UP-name))
+    (set! low-name   (string-downcase UP-name))      =][=
+
+    IF (exist? "flag_code") =][=
+
+      IF (exist? "test_main") =]
+
+#if ! defined( TEST_[= (. pname-up) =]_OPTS )[=
+
+      ENDIF =][=
+
+      invoke callback-proc-header  =][=
+      flag_code =]
 }[=
-    ENDIF       =][=
-  ENDFOR flag   =][=
 
   IF (exist? "test_main") =]
 
 #endif /* ! defined TEST_[= (. pname-up) =]_OPTS */[=
 
-  ENDIF =]
+  ENDIF =][=
+
+
+    ELIF (=* (get "arg_type") "key") =][=
+
+      invoke callback-proc-header  =][=
+      IF (not (exist? "arg_default"))
+=]    tSCC zDef[2] = { 0x7F, 0 };
+[=    ENDIF
+=]    tSCC* az_names[] = {[=
+      IF (not (exist? "arg_default")) =] zDef,[=
+      ENDIF  =]
+[=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+          (join "\n" (stack "keyword")) )=]
+    };
+
+    pOptDesc->pzLastArg =
+        optionEnumerationVal( pOptions, pOptDesc, az_names, [=
+        (+ (count "keyword") (if (exist? "arg_default") 0 1)) =] );
+}[=
+    ENDIF       =][=
+  ENDFOR flag   =]
 [=
 
 ENDDEF
