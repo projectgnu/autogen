@@ -1,0 +1,83 @@
+[= autogen template texi=%s.texi =]
+@node [=prog_name=] Invocation
+@[=_EVAL LEVEL _env=] Invoking [=prog_name=]
+@cindex [=prog_name _down=] invocation
+@ignore
+[=_OUTPUT push-new _outfile "echo %s | sed 's/texi$/menu/'"
+          _printf _shell
+=]* [=prog_name " Invocation::" + #%-32s _printf
+=] Invoking [=prog_name=]
+[=_OUTPUT pop=]
+[= _EVAL "#" _DNE =]
+
+@end ignore
+
+[=_IF prog_info_descrip _exist
+    =][=prog_info_descrip=][=
+  _ELSE
+    =][=detail=][=
+  _ENDIF=]
+
+@menu
+* [=prog_name " usage::" + #%-32s _printf _down
+=] [=prog_name=] Usage
+[=_OUTPUT push-new _outfile #.tmp + =][=
+_FOR flag =][=
+  _IF doc _len 0 >
+=]* [=prog_name name _get #:: + "#2$%s %-24s" _printf A-Z^_ a-z-- _tr
+=] [=name #A-Z^_ #a-z-- _tr=] Option
+[=_ENDIF =][=
+/flag=][=
+_OUTPUT pop =][=
+_eval _outfile "f=%s ; sort $f.tmp ; rm -f $f.tmp" _printf _shell
+=]
+@end menu
+
+@node [=prog_name _down=] usage
+@[=_CASE LEVEL _env _down=][=
+   _ chapter    =][=
+   _ section    =]sub[=
+   _ subsection =]subsub[=
+  _ESAC =]section [=prog_name=] Usage
+@cindex [=prog_name _down=] usage
+
+This is the automatically generated usage text for [=prog_name=]:
+@*
+@example
+[=_IF prog_file_name _exist
+  =][=prog_file_name "PROG=%s" _shell =][=
+  _ELSE
+  =][=
+prog_name "PROG=%s
+if [ ! -f ${PROG} ] ; then PROG=`echo $PROG | tr '[A-Z]' '[a-z]'` ; fi
+if [ ! -f ${PROG} ] ; then PROG=`echo $PROG | tr x_ x-` ; fi"
+
+  _printf _shell =][=
+  _ENDIF=][=
+
+  _IF long_opts _exist =][=
+    _EVAL "HELP=--help" _shell =][=
+  _ELIF flag.value _exist =][=
+    _EVAL "HELP='-?'" _shell =][=
+  _ELSE =][=
+    _EVAL "HELP=help" _shell =][=
+  _ENDIF =][=
+
+_EVAL "#./${PROG} ${HELP} 2>&1 |
+  sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g'"  _shell=]
+@end example
+
+[=
+_FOR flag=][=
+  _IF doc _len 0 > =]
+@node [=prog_name _down=] [=name A-Z^_ a-z-- _tr=]
+@[=_CASE LEVEL _env _down=][=
+   _ chapter    =][=
+   _ section    =]sub[=
+   _ subsection =]subsub[=
+  _ESAC =]section [=name #A-Z^_ #a-z-- _tr=] Option
+@cindex [=prog_name _down=]-[=name A-Z^_ a-z-- _tr=]
+
+[=doc=]
+[=_ENDIF=][=
+/flag=]
