@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.5 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: funcIf.c,v 1.6 1999/10/31 22:49:12 bruce Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -62,12 +62,12 @@ eval_true( void )
  *  load_proc:
  *
  *  desc:
- *  Conditional block.  Its arguments are evaluated (see _EVAL) and
+ *  Conditional block.  Its arguments are evaluated (@xref{EXPR}) and
  *  if the result is non-zero or a string with one or more bytes,
  *  then the condition is true and the text from that point
- *  until a matched "ELIF", "ELSE" or "ENDIF" is emitted.
- *  "ELIF" introduces a conditional alternative if the "_IF"
- *  clause evaluated FALSE and "ELSE" introduces an unconditional
+ *  until a matched @code{ELIF}, @code{ELSE} or @code{ENDIF} is emitted.
+ *  @code{ELIF} introduces a conditional alternative if the @code{IF}
+ *  clause evaluated FALSE and @code{ELSE} introduces an unconditional
  *  alternative.
  *
  *  @example
@@ -148,10 +148,10 @@ MAKE_HANDLER_PROC( If )
  *  load_proc:
  *
  *  desc:
- *  Conditionally repeated block.  Its arguments are evaluated (see _EVAL)
+ *  Conditionally repeated block.  Its arguments are evaluated (@xref{EXPR})
  *  and as long as the result is non-zero or a string with one or more bytes,
  *  then the condition is true and the text from that point
- *  until a matched "ENDWHILE" is emitted.
+ *  until a matched @code{ENDWHILE} is emitted.
  *
  *  @example
  *  [#WHILE [[condition]]#]
@@ -162,12 +162,12 @@ MAKE_HANDLER_PROC( If )
 =*/
 /*=macfunc ENDWHILE
  *
- *  what:   Terminate the @code{IF} Template Block
+ *  what:   Terminate the @code{WHILE} Template Block
  *  situational:
  *
  *  desc:
- *    This macro ends the @code{IF} function template block.
- *    For a complete description @xref{IF}.
+ *    This macro ends the @code{WHILE} function template block.
+ *    For a complete description @xref{WHILE}.
 =*/
 MAKE_HANDLER_PROC( While )
 {
@@ -214,10 +214,11 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
  *  situational:
  *
  *  desc:
- *    This macro must only appear after an @code{IF} function,
- *    and before any associated @code{ELSE} or @code{ENDIF} functions.
- *    It denotes the start of an alternate template block for
- *    the @code{IF} function.  For a complete description @xref{IF}.
+ *    This macro must only appear after an @code{IF} function, and
+ *    before any associated @code{ELSE} or @code{ENDIF} functions.
+ *    It denotes the start of an alternate template block for the
+ *    @code{IF} function.  Its expression argument is evaluated as are
+ *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
 MAKE_LOAD_PROC( Elif )
 {
