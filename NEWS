@@ -1,3 +1,12 @@
+New in 5.6.3 - July, 2004
+AutoGen:
+* fixed tpl-file-line so that "%2$d" works for the format.
+* Added (emit) function that directly emits its args into output
+* keyword lists are columnized in usage text
+
+AutoOpts:
+* main() procedures can be specified more consistently
+
 New in 5.6 - February, 2004
 * AutoFSM was enhanced with the notion of a "noop" transition handling
 * fmemopen() is now used (when possible) for anonymous output (diversions)

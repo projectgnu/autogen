@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.21 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: expPrint.c,v 3.22 2004/07/22 02:48:10 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -31,7 +31,7 @@
 
 STATIC sigjmp_buf printJumpEnv;
 STATIC void   printFault( int sig );
-STATIC ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
+STATIC ssize_t safePrintf( char** pzBuf, char* pzFmt, ag_printf_arg_u_t* argV );
 tSCC pzFormatName[] = "format";
 
 STATIC void
@@ -42,7 +42,7 @@ printFault( int sig )
 
 
 STATIC ssize_t
-safePrintf( char** ppzBuf, char* pzFmt, void** argV )
+safePrintf( char** ppzBuf, char* pzFmt, ag_printf_arg_u_t* argV )
 {
     tSCC zBadArgs[]  = "Bad args to sprintf";
     tSCC zBadFmt[]   = "%s ERROR:  %s processing printf format:\n\t%s\n";
@@ -75,7 +75,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
              *  THEN perform that fprintf
              */
             if (sigsetjmp( printJumpEnv, 0 ) == 0)
-                fprintf(pfTrace, zBadFmt, pzProg, strsignal( faultType ), pzFmt);
+                fprintf(pfTrace, zBadFmt, pzProg, strsignal(faultType), pzFmt);
 
             /*
              *  The "sprintfv" command below faulted, so we exit
@@ -85,7 +85,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
     }
 
     {
-        size_t printSize = asprintfv( ppzBuf, pzFmt, (void*)argV );
+        size_t printSize = asprintfv( ppzBuf, pzFmt, (void**)(void*)argV );
         if ((printSize & ~0xFFFFFF) != 0)
             AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 
@@ -100,9 +100,9 @@ EXPORT SCM
 run_printf( char* pzFmt, int len, SCM alist )
 {
     SCM     res;
-    void*   args[8];
-    void**  arglist;
-    void**  argp;
+    ag_printf_arg_u_t   args[8];
+    ag_printf_arg_u_t*  arglist;
+    ag_printf_arg_u_t*  argp;
 
     if (len < 8)
         arglist = argp = args;
@@ -116,37 +116,37 @@ run_printf( char* pzFmt, int len, SCM alist )
         switch (gh_type_e( car )) {
         default:
         case GH_TYPE_UNDEFINED:
-            *(argp++) = (void*)"???";
+            (argp++)->pa_string = "???";
             break;
 
         case GH_TYPE_BOOLEAN:
-            *(argp++) = (void*)((car == SCM_BOOL_F) ? "#f" : "#t");
+            (argp++)->pa_string = (void*)((car == SCM_BOOL_F) ? "#f" : "#t");
             break;
 
         case GH_TYPE_CHAR:
-            *(argp++) = (void*)(uintptr_t)gh_scm2char( car );
+            (argp++)->pa_char   = gh_scm2char( car );
             break;
 
         case GH_TYPE_PAIR:
-            *(argp++) = (void*)"..";
+            (argp++)->pa_string = "..";
             break;
 
         case GH_TYPE_NUMBER:
-            *(argp++) = (void*)gh_scm2ulong( car );
+            (argp++)->pa_u_long_int = gh_scm2ulong( car );
             break;
 
         case GH_TYPE_SYMBOL:
         case GH_TYPE_STRING:
-            *(argp++) = (void*)ag_scm2zchars( car, "printf str" );
+            (argp++)->pa_string = ag_scm2zchars( car, "printf str" );
             break;
 
         case GH_TYPE_PROCEDURE:
-            *(argp++) = (void*)"(*)()";
+            (argp++)->pa_string = "(*)()";
             break;
 
         case GH_TYPE_VECTOR:
         case GH_TYPE_LIST:
-            *(argp++) = (void*)"...";
+            (argp++)->pa_string = "...";
             break;
         }
     }

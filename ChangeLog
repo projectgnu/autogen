@@ -1,3 +1,16 @@
+2004-07-21  Bruce Korb  <bkorb@gnu.org>
+
+	* mkconfig.sh(shar): clean up usage
+	* agen5/autogen.h(ag_printf_arg_u_t): new - for printfv's argv
+	* agen5/expPrint.c(safePrintf): use the type for passing args
+	(run_printf): ditto + use its fields instead of casting about
+	* agen5/expState.c(ag_scm_tpl_file_line): use sprintfv, not sprintf
+	* agen5/funcEval.c(ag_scm_emit): new function that emits all its args
+	* agen5/test/line.test: new test
+	* agen5/test/Makefile.am(line.test): run the new test
+	* autoopts/usage-txt.def(utxt): correct usage text
+	* autoopts/test/stdopts.test: adjust expected output
+
 2004-05-21  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl(membership bits): expand usage
@@ -18,7 +31,7 @@
 
 	* doc/auto_gen.tpl(libs): add ${LIBS} to the end of it for -lgen, etc.
 
-	= 5.6.2 Released/abortive
+	= 5.6.2 Released
 
 2004-05-15  Bruce Korb  <bkorb@gnu.org>
 

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.19 2004/02/27 18:45:01 bkorb Exp $
+ *  $Id: expState.c,v 3.20 2004/07/22 02:48:10 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -565,7 +565,12 @@ ag_scm_tpl_file_line( SCM fmt )
         else pz = zScribble;
     }
 
-    sprintf( pz, pzFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );
+    {
+        ag_printf_arg_u_t args[2];
+        args[0].pa_string = pCurTemplate->pzFileName;
+        args[1].pa_u_int  = pCurMacro->lineNo;
+        sprintfv( pz, pzFmt, (void**)args  );
+    }
 
     {
         SCM res = gh_str02scm( pz );

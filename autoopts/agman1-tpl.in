@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-05-21 16:12:15 bkorb"
+## Time-stamp:      "2004-07-02 13:54:41 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.28 2004/05/22 00:15:45 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.29 2004/07/22 02:48:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1

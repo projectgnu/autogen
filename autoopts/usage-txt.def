@@ -8,7 +8,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 3.2 2004/05/22 00:15:45 bkorb Exp $
+   $Id: usage-txt.def,v 3.3 2004/07/22 02:48:10 bkorb Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ utxt = { ut-type = cch_t;
 
 utxt = { ut-type = cch_t;
          ut-name = Auto;
-         ut-text = "Auto-supported Options:";
+         ut-text = "version and help options:";
 };
 
 utxt = { ut-type = cch_t;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.20 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: funcEval.c,v 3.21 2004/07/22 02:48:10 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -30,7 +30,7 @@ STATIC int exprType( char* pz );
 EXPORT char*
 resolveSCM( SCM s )
 {
-    static char z[32];
+    static char z[48];
     char*  pzRes = z;
 
     switch (gh_type_e( s )) {
@@ -287,6 +287,54 @@ ag_scm_error_source_line( void )
              pCurTemplate->pzTemplText + pCurMacro->ozText );
     fflush( stderr );
 
+    return SCM_UNDEFINED;
+}
+
+
+/*=gfunc emit
+ *
+ * what: emit the text for each argument
+ * general_use:
+ *
+ * exparg: alist, list of arguments to stringify and emit, , list
+ *
+ * doc:  Walk the tree of arguments, displaying the values of displayable
+ *       SCM types.
+=*/
+SCM 
+ag_scm_emit( SCM val )
+{
+    SCM car;
+
+    for (;;) {
+        if (val == SCM_UNDEFINED)
+            break;
+
+        if (SCM_NULLP( val ))
+            break;
+
+        if (gh_string_p( val )) {
+            fputs( (char*)ag_scm2zchars( val, "emit val" ), pCurFp->pFile );
+            fflush( pCurFp->pFile );
+            break;
+        }
+
+        switch (gh_type_e( val )) {
+        case GH_TYPE_LIST:
+            ag_scm_emit( SCM_CAR( val ));
+            val = SCM_CDR( val );
+            continue;
+
+        default:
+            fputs( resolveSCM( val ), pCurFp->pFile );
+            fflush( pCurFp->pFile );
+            break;
+        }
+
+        break;
+    }
+
+ done:
     return SCM_UNDEFINED;
 }
 

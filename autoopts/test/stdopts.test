@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2004-05-21 14:40:54 bkorb"
+# Time-stamp:        "2004-07-09 12:02:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 3.5 2004/05/22 00:15:45 bkorb Exp $
+# $Id: stdopts.test,v 3.6 2004/07/22 02:48:10 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -57,7 +57,7 @@ by AutoOpts:
   Flg Arg Option-Name    Description
    -V KWd verbose        run program with progress info
 
-Auto-supported Options:
+version and help options:
 
   Flg Arg Option-Name    Description
    -? no  help           Display usage information and exit

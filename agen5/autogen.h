@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.31 2004/02/15 02:42:36 bkorb Exp $
+ *  $Id: autogen.h,v 3.32 2004/07/22 02:48:10 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -40,6 +40,16 @@
 #include "opts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
+#ifdef SOME_OTHER_TIME
+typedef union printf_arg ag_printf_arg_u_t;
+#else
+typedef union {
+    unsigned char pa_char;
+    unsigned int  pa_u_int;
+    unsigned long pa_u_long_int;
+    const char*   pa_string;
+} ag_printf_arg_u_t;
+#endif
 
 #ifndef STR
 #  define _STR(s) #s
