@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.16 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: autogen.h,v 3.17 2003/05/18 17:14:45 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -165,7 +165,7 @@ typedef enum {
 
 typedef struct def_stack tDefStack;
 struct def_stack {
-	tDefEntry* pDefs;        /* ptr to current def set     */
+    tDefEntry* pDefs;        /* ptr to current def set     */
     tDefStack* pPrev;        /* ptr to previous def set    */
 };
 
@@ -201,7 +201,7 @@ struct outSpec {
 #define FPF_NOCHMOD    0x0010  /* do not chmod(2) file    */
 
 struct fpStack {
-	int         flags;
+    int         flags;
     tFpStack*   pPrev;
     FILE*       pFile;
     char*       pzOutName;
@@ -283,6 +283,7 @@ MODE tCC*        pzShellProgram   VALUE( NULL );
 MODE tDefStack   currDefCtx       VALUE( { NULL } );
 MODE tDefStack   rootDefCtx       VALUE( { NULL } );
 MODE tTemplate*  pCurTemplate     VALUE( NULL );
+MODE tCC*        pzLastScheme     VALUE( NULL );
 
 /*
  *  Current Macro
@@ -372,6 +373,25 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr( SCM_ROCHARS(s), SCM_ROLENGTH(s), 0 );
     return SCM_CHARS(s);
+}
+
+static inline SCM ag_eval( tCC* pzStr )
+{
+    SCM res;
+    pzLastScheme = pzStr;
+
+#ifdef LATER
+    {
+        static SCM proc = SCM_UNDEFINED;
+        if (proc == SCM_UNDEFINED)
+            proc = scm_permanent_object( scm_c_lookup( "eval-client-input" ));
+        res = scm_call_1(SCM_VARIABLE_REF(proc), gh_str02scm( pzStr ));
+    }
+#else
+    res = gh_eval_str( pzStr );
+#endif
+    pzLastScheme = NULL;
+    return res;
 }
 
 #endif /* AUTOGEN_HDR */
