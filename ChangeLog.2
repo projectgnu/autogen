@@ -1,3 +1,18 @@
+1999-07-07  Bruce Korb  <autogen@linuxbox.com>
+
+	* all files everywhere: generally make everything configure with
+	the snprintfv stuff.
+
+	* snprintfv/snprintfv/snprintfv.c: va_arg requires the programmer
+	to know that 'char' and 'short' auto-promote to 'int'.
+
+	* src/agExpr.c: the 'map' expression function is now obsolete.
+	* src/agExpr.c: 'tr' has been added in its stead
+
+	* snprintfv/snprintfv.menu: Added so the AutoBorg doc will see
+	the snprintfv documentation
+	* snprintfv/snprintfv.texi: Added the snprintfv documentation
+
 1999-06-12  Gary V. Vaughan  <gary@oranda.demon.co.uk>
 
 	* README (HP/UX): some helpful comments for the hapless HP/UX
