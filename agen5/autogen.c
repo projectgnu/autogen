@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.29 2003/05/18 19:58:23 bkorb Exp $
+ *  $Id: autogen.c,v 3.30 2003/05/24 02:49:48 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -45,13 +45,6 @@ STATIC void signalExit( int sig );
 STATIC void
 inner_main( int argc, char** argv )
 {
-    void ag_init( void );
-
-    /*
-     *  Initialize all but the processing Scheme functions then call doOptions
-     *  to do all the initializations before processing starts.
-     */
-    ag_init();
     doOptions( argc, argv );
 
     procState = PROC_STATE_LOAD_DEFS;
@@ -62,7 +55,6 @@ inner_main( int argc, char** argv )
      *  Then load, process and unload the main template
      */
     procState = PROC_STATE_LOAD_TPL;
-    ag_init();
 
     {
         tTemplate* pTF = loadTemplate( pzTemplFileName );

@@ -131,8 +131,6 @@ dnl[=
 AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
   (define c-text (get "code"))
-  (if (> (string-length c-text) 0)
-      (set! c-text (string-append "[" (protect-text c-text) "]"  )))
 
   mac-name  =]],[[=
 
@@ -145,7 +143,8 @@ ERROR:  invalid conftest function:   ``[= (. fcn-name) =]''[=
 
   ENDIF  =]
 [=(prefix "  " (join "\n" (stack "always")))
-=]]) # end of AC_DEFUN of [=(. mac-name)=]
+=]
+]) # end of AC_DEFUN of [=(. mac-name)=]
 [=
 
 ENDDEF  emit-macro   =][=
@@ -160,7 +159,8 @@ ENDDEF start-feat-test =][=
 
 DEFINE  end-feat-test  =][=
 
-  (. pop-language)     =]]) # end of AC_CACHE_VAL for [=(. cv-name)=]
+  (. pop-language)     =]
+  ]) # end of AC_CACHE_VAL for [=(. cv-name)=]
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results         =][=
 
@@ -315,6 +315,26 @@ DEFINE  set-language
 
   ESAC  =][=
 
+  IF (exist? "cflags")
+
+=]
+    [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"
+    CPPFLAGS="[= cflags =] ${CPPFLAGS}"[=
+    (set! pop-language (string-append pop-language
+          "\n    CPPFLAGS=\"${" group-pfx "save_CPPFLAGS}\"" )) =][=
+
+  ENDIF   cflags exists         =][=
+
+  IF (exist? "libs")
+
+=]
+    [=(. group-pfx)=]save_LIBS="${LIBS}"
+    LIBS="[= libs =] ${LIBS}"[=
+    (set! pop-language (string-append pop-language
+          "\n    LIBS=\"${" group-pfx "save_LIBS}\"" )) =][=
+
+  ENDIF   libs exists           =][=
+
 ENDDEF  set-language            =][=
 
 # # # # # # # # # # WITH # # # # # # # # # =][=
@@ -466,14 +486,14 @@ DEFINE  try-withlib             =][=
   ==   link                     =]
   AC_MSG_CHECKING([whether [=(. lib-name)=] can be linked with])[=
   set-language                  =]
-  AC_LINK_IFELSE([[=(. c-text)=]],
+  AC_LINK_IFELSE([[[=(protect-text c-text)=]]],
     [[=(. cv-name)=]=yes],
     [[=(. cv-name)=]=no]) # end of AC_LINK_IFELSE [=
 
   ==   run                      =]
   AC_MSG_CHECKING([whether [=(. lib-name)=] functions properly])[=
   set-language                  =]
-  AC_TRY_RUN([=(. c-text)=],
+  AC_TRY_RUN([[=(protect-text c-text)=]],
     [[=(. cv-name)=]=yes], [[=(. cv-name)=]=no],
     [[=(. cv-name)=]=no]) # end of AC_TRY_RUN [=
 
@@ -523,7 +543,7 @@ DEFINE  try-run                 =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_RUN([=(. c-text)=],
+  AC_TRY_RUN([[=(protect-text c-text)=]],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no],[[=
         (. cv-name)=]=no]
   ) # end of TRY_RUN[=
@@ -537,7 +557,10 @@ DEFINE  try-link                =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_LINK([=(. c-text)=],
+  AC_TRY_LINK([[= (protect-text (shellf
+    "egrep '^#' <<_EOF_\n%s\n_EOF_" c-text )) =]],
+    [[= (protect-text (shellf
+    "egrep -v '^#' <<_EOF_\n%s\n_EOF_" c-text )) =]],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
   ) # end of TRY_LINK[=
   end-feat-test                 =][=
@@ -550,7 +573,7 @@ DEFINE  try-compile             =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_COMPILE([= % includes "[%s]" =],[=(. c-text)=],
+  AC_TRY_COMPILE([= % includes "[%s]" =],[[=(protect-text c-text)=]],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
   ) # end of TRY_COMPILE[=
   end-feat-test                 =][=

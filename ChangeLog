@@ -1,3 +1,19 @@
+2003-05-23  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c(doOptions): move the ag_init call to here from main
+	* agen5/autogen.c(inner_main): move ag_init and zSchemeInit eval to
+	the initialization (option processing) function: doOptions.
+	* agen5/directive.tpl(zSchemeInit): create #define for file + line
+	* agen5/expOutput.c: make sure all output files are re-readable
+	(ag_scm_out_line): new - return the current output line number.
+	* agen5/snarf.tpl: simplify a bunch of stuff.
+	* agen5/test/snarf.test: adjust to tweaked syntax
+	* agen5/tpProcess.c(openOutFile): make output file re-readable
+	* config/bootstrap: bail on problem.
+	* config/confmacs.tpl: allow compile/link/run tests to specify cppflags
+	and libs.
+	* config/misc.def(eval-string): new - check for scm_primitive_eval_x()
+
 2003-05-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expGuile.c(ag_scm_string_upcase): avoid using gh_scm2newstr

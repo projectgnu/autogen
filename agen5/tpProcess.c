@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.19 2003/05/18 19:58:23 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.20 2003/05/24 02:49:48 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -334,7 +334,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         AGFREE( (void*)pStk->pzOutName );
         pStk->pzOutName = (char*)zDevNull;
         pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
-        pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
+        pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG "+" );
         if (pStk->pFile != NULL)
             return;
 
@@ -357,7 +357,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
     }
 
     unlink( pStk->pzOutName );
-    pStk->pFile = fopen( pStk->pzOutName, "w" FOPEN_BINARY_FLAG );
+    pStk->pFile = fopen( pStk->pzOutName, "w+" FOPEN_BINARY_FLAG );
 
     if (pStk->pFile == NULL) {
     openError:

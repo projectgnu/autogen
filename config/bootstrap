@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2002-09-21 11:45:59 bkorb"
+# Time-stamp:      "2003-05-22 09:11:48 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.5 2002/09/29 00:16:20 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.6 2003/05/24 02:49:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -179,7 +179,7 @@ doit ()
 {
   if test "x$1" != x: ; then 
     echo "RUN:  $@"
-    eval "$@"
+    eval "$@" || exit 1
   fi
 }
 

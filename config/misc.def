@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/05/18 17:16:35 $
+ *  Last Modified:     $Date: 2003/05/24 02:49:48 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.27 2003/05/18 17:16:35 bkorb Exp $
+ *  $Id: misc.def,v 3.28 2003/05/24 02:49:48 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.27 $";
+version = "$Revision: 3.28 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -90,7 +90,6 @@ test   = {
 		  return 0; }
 		_END_OF_CODE_;
   run-mode   =  "link";
-  code-mode  =  "all";
 
   config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
   action = { yes; act-type = script;
@@ -111,6 +110,28 @@ test   = {
 };
 
 test   = {
+  name      = "eval_string";
+  type      = "link";
+  check     = "scm_primitive_eval_x links";
+  cflags    = "${ag_cv_with_libguile_cflags}";
+  libs      = "${ag_cv_with_libguile_libs}";
+  code      = "#include <guile/gh.h>\n"
+              "SCM res = scm_primitive_eval_x( SCM_UNDEFINED );";
+
+  action    = { no; asis;
+    act-type  = script;
+    act-text  = <<- _END_OF_SCRIPT_
+		AC_DEFINE([scm_primitive_eval_x], [scm_eval_x],
+		        [Define this if no scm_primitive_eval_x])
+		_END_OF_SCRIPT_; };
+
+  doc = <<- _END_OF_DOC_
+		Guile 1.4 does not have scm_primitive_eval_x,
+		but scm_eval_x will work as well.
+		_END_OF_DOC_;
+};
+
+test   = {
   name     = "xml2";
   type     = "withlib";
   check    = "a working libxml2 can be found";
@@ -127,7 +148,6 @@ test   = {
                         '    LIBS="${ag_save_LIBS}"';
            };
   run-mode   =  "link";
-  code-mode  =  "all";
 
   action   = { asis;
     act-type = script;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.16 2003/05/18 17:12:30 bkorb Exp $
+ *  $Id: expOutput.c,v 3.17 2003/05/24 02:49:48 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -353,7 +353,8 @@ ag_scm_out_push_new( SCM new_file )
         if (tmpfd < 0)
             AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
-        p->pFile  = fdopen( tmpfd, "w" FOPEN_BINARY_FLAG "+" );
+        p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
+        close( tmpfd );
     }
 
     if (p->pFile == NULL)
@@ -409,7 +410,7 @@ ag_scm_out_switch( SCM new_file )
      *  and try to ensure nothing is in the way.
      */
     unlink( pzNewFile );
-    if (   freopen( pzNewFile, "w" FOPEN_BINARY_FLAG, pCurFp->pFile )
+    if (   freopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+", pCurFp->pFile )
         != pCurFp->pFile)
 
         AG_ABEND( aprf( zCannot, errno, "freopen", pzNewFile,
@@ -454,6 +455,40 @@ ag_scm_out_name( void )
     tFpStack* p = pCurFp;
     while (p->flags & FPF_UNLINK)  p = p->pPrev;
     return gh_str02scm( p->pzOutName );
+}
+
+
+/*=gfunc out_line
+ *
+ * what: output file line number
+ * doc:  Returns the current line number of the output file.
+ *       It rewinds and reads the file to count newlines.
+=*/
+SCM
+ag_scm_out_line( void )
+{
+    int lineNum = 1;
+
+    do {
+        long svpos = ftell( pCurFp->pFile );
+        long pos   = svpos;
+
+        if (pos == 0)
+            break;
+
+        rewind( pCurFp->pFile );
+        do {
+            int ich = fgetc( pCurFp->pFile );
+            unsigned char ch = ich;
+            if (ich < 0)
+                break;
+            if (ch == (unsigned char)'\n')
+                lineNum++;
+        } while (--pos > 0);
+        fseek( pCurFp->pFile, svpos, SEEK_SET );
+    } while(0);
+
+    return gh_int2scm( lineNum );
 }
 
 /*

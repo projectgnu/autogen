@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 3.3 2003/02/16 00:04:39 bkorb Exp $
+# $Id: snarf.tpl,v 3.4 2003/05/24 02:49:48 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -133,25 +133,18 @@ ENDFOR =]
  */
 #include "[= (. header-file) =]"[=
 
-DEFINE string_content =]
+DEFINE string-content   =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
-    IF (exist? "string") =][=(c-string (get "string"))=][=
-    ELSE =]"[= % name `echo '%s' |
-       sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'` =]"[=
-    ENDIF =];[=
-ENDDEF =][=
+    (c-string (if (exist? "string") (get "string") (shellf
+"echo '%s' | sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
+      (get "name")  )))  =];[=
+ENDDEF  string-content   =][=
 
-  FOR gfunc =][=
-    string_content =][=
-  ENDFOR gfunc =]
-[=
+  FOR gfunc  =][= INVOKE string-content =][= ENDFOR =][=
+  FOR syntax =][= INVOKE string-content =][= ENDFOR =][=
+  FOR symbol =][= INVOKE string-content =][= ENDFOR =][=
 
-  FOR syntax =][=
-    string_content =][=
-  ENDFOR syntax =][=
-
-  FOR symbol =][=
-    string_content =]
+  FOR symbol =]
 [=  IF (exist? "global") =]      [=ELSE=]static[=ENDIF
     =] SCM [=(. scm-prefix)=]sym_[=% name %-18s =] = SCM_BOOL_F;[=
   ENDFOR symbol =]
@@ -159,10 +152,8 @@ ENDDEF =][=
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 =][=
 
-DEFINE CALL_NEWPROC =]
-    gh_new_procedure( (char*)s_[=name=],
-                      [=
-         (. scm-prefix)=][= % name (sprintf "%%-28s" "%s,") =] [=
+DEFINE mk-new-proc =]
+    NEW_PROC( [= % name (sprintf "%%-24s" "%s,") =][=
 
       IF (not (exist? "exparg"))
        =]0, 0, 0[=
@@ -186,23 +177,34 @@ DEFINE CALL_NEWPROC =]
 ENDDEF =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=][=
+=]
+[= (define init-proc
+      (if (exist? "init")
+          (get "init")
+          (if (exist? "group")
+              (string-append (get "group") "_init")
+              "scm_init"))) =]
+void [=(. init-proc)=]( void );
+#define NEW_PROC( _An, _Ar, _Ao, _Ax ) \
+  gh_new_procedure( (char*)s_ ## _An, ag_scm_ ## _An, _Ar, _Ao, _Ax )
 
-DEFINE emit-init-code =][=
+/*
+ * [=group=] Initialization procedure.
+ */
+void
+[=(. init-proc)=]( void )
+{[=
 
-  IF (exist? "init_code") =]
-    [=init_code=][=
-  ENDIF =][=
+  (if (exist? "init-code")
+      (prefix "    " (get "init-code")) "") =][=
 
-  FOR gfunc =][=
-    IF (or (not (exist? "two-phase")) (exist? "general_use")) =][=
-      CALL_NEWPROC =][=
-    ENDIF =][=
-  ENDFOR gfunc =][=
+  FOR  gfunc            =][=
+      mk-new-proc       =][=
+  ENDFOR gfunc          =][=
 
-  FOR syntax =]
+  FOR  syntax           =]
     scm_make_synt( s_[=% name (sprintf "%%-16s" "%s,")=] [=type=], [=cfn=] );[=
-  ENDFOR syntax =][=
+  ENDFOR syntax         =][=
 
   FOR symbol =]
     [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object [=
@@ -214,60 +216,9 @@ DEFINE emit-init-code =][=
       ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
     ENDIF =][=
   ENDFOR symbol =][=
-
-ENDDEF  =][=
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=]
-[= (define init-proc
-      (if (exist? "init")
-          (get "init")
-          (if (exist? "group")
-              (string-append (get "group") "_init")
-              "scm_init"))) =]
-void [=(. init-proc)=]( void );
-[= IF (exist? "two_phase") =]
-/*
- * [=group=] Two-Phase Initialization procedure.
- *
- *  This routine assumes that certain routines are not to be exported
- *  until the second time it is called.
- */
-void
-[=(. init-proc)=]( void )
-{
-  static int first_time = 0;
-  if (first_time++ == 0) {[=
-    invoke emit-init-code=]
-  } else {[=
-
-    FOR gfunc =][=
-      IF (not (exist? "general_use")) =][=
-        CALL_NEWPROC =][=
-      ENDIF =][=
-    ENDFOR gfunc =][=
-
-    IF (exist? "fini_code") =]
-    [=fini_code=][=
-    ENDIF =]
-  }
-}[=
-
-ELSE (not exist two-phase) =]
-/*
- * [=group=] Initialization procedure
- */
-void
-[=(. init-proc)=]( void )
-{[=
-
-  invoke emit-init-code =][=
-
-  IF (exist? "fini_code") =]
-    [=fini_code=][=
-  ENDIF =]
-}[=
-
-ENDIF =][= #
+    
+  (if (exist? "fini-code")
+      (prefix "    " (get "fini-code")) "") =]
+}[= #
 
 end of snarf.tpl =]

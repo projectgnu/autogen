@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.4 2003/05/17 02:45:19 bkorb Exp $
+# $Id: directive.tpl,v 3.5 2003/05/24 02:49:48 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -65,6 +65,8 @@ ENDFOR directive=] };
 /*
  *  This text has been extracted from [=`echo ${srcdir}/schemedef.scm`=]
  */
+#define SCHEME_INIT_FILE [= (c-string (out-name)) =]
+#define SCHEME_INIT_LINE [= # (+ (out-line) 2) =] 131
 tSCC zSchemeInit[] =
 [= (kr-string (shell
 

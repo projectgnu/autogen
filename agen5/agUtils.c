@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.17 2003/05/18 17:12:29 bkorb Exp $
+ *  $Id: agUtils.c,v 3.18 2003/05/24 02:49:48 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -81,15 +81,18 @@ aprf( const char* pzFmt, ... )
 EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
+    void ag_init( void );
     /*
-     *  Some scheme initializations
+     *  Initialize all the Scheme functions.
      */
+    ag_init();
     pzLastScheme = zSchemeInit;
-    gh_eval_str( (char*)zSchemeInit );
+    ag_scm_c_eval_string_from_file_line( zSchemeInit, "directive.h",
+                                         SCHEME_INIT_LINE );
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
         tSCC zBT[] = "(debug-enable 'backtrace)";
         pzLastScheme = zBT;
-        gh_eval_str( zBT );
+        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
     }
     pzLastScheme = NULL;
 
