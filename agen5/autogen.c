@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.10 2002/01/31 02:29:13 bkorb Exp $
+ *  $Id: autogen.c,v 3.11 2002/01/31 02:49:31 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -36,11 +36,9 @@ tSCC zSchemeInit[] =
 "(define (make-header-guard hdr-pfx)\n"
 "   (begin\n"
 "      (set! header-file  (out-name))\n"
-"      (set! header-guard (string-upcase! (string-append\n"
+"      (set! header-guard (string-upcase! (string->c-name! (string-append\n"
 "             (if (string? hdr-pfx) hdr-pfx \"HEADER\")\n"
-"             \"_\"\n"
-"             (string->c-name! (out-name))\n"
-"             \"_GUARD\"  )))\n"
+"             \"_\" header-file \"_GUARD\" ))))\n"
 "      (sprintf \"#ifndef %1$s\\n#define %1$s\" header-guard)\n"
 ")  )\n"
 "(define autogen-version \"" AUTOGEN_VERSION "\")";
