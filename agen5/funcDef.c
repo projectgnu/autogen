@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.13 1999/10/31 23:18:06 bruce Exp $
+ *  $Id: funcDef.c,v 1.14 1999/11/02 02:31:49 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -47,7 +47,7 @@ tSCC  zNoResolution[] = "Could not resolve INVOKE macro name - %s";
  *  load_proc:
  *  what:  Provide break point spots
  *  desc:
- *      By inserting [#DEBUG n#] into your template, you can set
+ *      By inserting [+DEBUG n+] into your template, you can set
  *      a breakpoint on the #n case element below and step through
  *      the processing of interesting parts of your template.
 =*/
@@ -104,10 +104,10 @@ MAKE_HANDLER_PROC( Debug )
  *      that are to be active during the processing of the macro.
  *
  *      @example
- *      [# define foo #]
+ *      [+ define foo +]
  *      ... macro body with macro functions ...
- *      [# enddef #]
- *      ... [# foo bar='raw text' baz=<<text expression>> #]
+ *      [+ enddef +]
+ *      ... [+ foo bar='raw text' baz=<<text expression>> +]
  *      @end example
  *
  *      Once the macro has been defined, this new macro can be invoked by
@@ -481,17 +481,17 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 /*=macfunc INVOKE
  *
  *  handler_proc:
- *  what:  Invoke an AutoGen function with a computed name
+ *  what:  Invoke an AutoGen defined macro
  *  desc:
  *      Each iteration may select a different macro.
  *      A macro name _must_ be found, or it chokes and dies.
  *      Macro arguments may be passed, as in the conventional
  *      @example
- *      [# mac_name arg=... #]
+ *      [+ mac_name arg=... +]
  *      @end example
  *      The following is equivalent to the above:
  *      @example
- *      [# INVOKE "mac_name" arg=... #]
+ *      [+ INVOKE "mac_name" arg=... +]
  *      @end example
 =*/
 MAKE_HANDLER_PROC( Invoke )
