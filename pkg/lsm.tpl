@@ -1,10 +1,10 @@
 [=autogen template lsm=LSM =]
 Begin3
-Title:          AutoGen - Automated Text Generation
+Title:          AutoGen - [=prog_title=]
 
 Version:        [=version=]
 
-Entered-date:   [=_eval "date +%d%b%y" _shell _UP=]
+Entered-date:   [=`date +%d%b%y`=]
 
 Description:    AutoGen is a tool for automatically generating
                 arbitrary text files that contain repetitive text
@@ -28,23 +28,22 @@ Keywords:       macro, m4, cpp, code generation, preprocessor,
                 options, getopts
 
 Author:         autogen@linuxbox.com (Bruce Korb)
-                gvaughan@oranda.demon.co.uk (Gary V. Vaughan)
+                gary@oranda.demon.co.uk (Gary V. Vaughan)
 
 Maintained-by:  autogen@linuxbox.com (Bruce Korb)
 
 Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
-                [=
-_EVAL '
+                [= `
 cd $top_builddir
 set -- autogen*.gz
 if [ $# -gt 1 ]
-then shift `expr $# - 1` ; fi
+then shift \`expr $# - 1\` ; fi
 if [ ! -f $1 ]
 then ct=564
-else ct="`expr \\( \`wc -c < $1\` + 1023 \\) / 1024`"
+else ct="\`expr \\\\( \\\`wc -c < $1\\\` + 1023 \\\\) / 1024\`"
 fi
 echo $ct KB $1
-' _shell =]
+` =]
 
 Alternate-site:
 
