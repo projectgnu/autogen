@@ -2,22 +2,22 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-05 07:34:34 bkorb"
+## Time-stamp:      "2005-02-21 15:09:19 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/02/05 15:55:22 $
+## Last Modified:   $Date: 2005/02/22 02:42:55 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2005/02/05 15:55:22 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2005/02/22 02:42:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
 MAINTAINERCLEANFILES	= Makefile.in
 TESTS      = \
-    argument.test cond.test    enums.test   equiv.test     errors.test  \
-    getopt.test   guile.test   handler.test immediate.test keyword.test \
-    main.test     nls.test     rc.test      shell.test     stdopts.test \
-    usage.test    vers.test
+    argument.test cond.test   config.test enums.test   equiv.test \
+    errors.test   getopt.test guile.test  handler.test immediate.test \
+    keyword.test  main.test   nls.test    rc.test      shell.test \
+    stdopts.test  usage.test  vers.test
 
 testsubdir = ./testdir
 

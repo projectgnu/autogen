@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.11 2005/02/21 23:01:08 bkorb Exp $
- *  Time-stamp:      "2005-02-21 13:00:26 bkorb"
+ *  $Id: configfile.c,v 4.12 2005/02/22 02:42:55 bkorb Exp $
+ *  Time-stamp:      "2005-02-21 18:32:50 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -109,7 +109,6 @@ parseSetMemType(
 
 static char*
 parseValueType(
-    tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType );
 
@@ -152,7 +151,7 @@ configFileLoad( const char* pzFile )
 /*=export_func  optionGetValue
  *
  * what:  get a specific value from a hierarcical set
- * arg:   + tOptionValue* + pOptValue + a hierarchcal value +
+ * arg:   + const tOptionValue* + pOptValue + a hierarchcal value +
  * arg:   + const char*   + valueName + name of value to get +
  *
  * ret_type:  const tOptionValue*
@@ -164,7 +163,7 @@ configFileLoad( const char* pzFile )
  *  created from an option definition file is not used via this interface.
 =*/
 const tOptionValue*
-optionGetValue( tOptionValue* pOV, const char* pzValName )
+optionGetValue( const tOptionValue* pOV, const char* pzValName )
 {
     tArgList*     pAL;
     tOptionValue* pRes = NULL;
@@ -720,7 +719,7 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
  *
  *  Parse the various attributes of an XML-styled config file entry
  */
-static char*
+LOCAL char*
 parseAttributes(
     tOptions*           pOpts,
     char*               pzText,
@@ -729,7 +728,7 @@ parseAttributes(
 {
     do  {
         switch (*pzText) {
-        case '/':
+        case '/': pType->valType = OPARG_TYPE_NONE;
         case '>': return pzText;
 
         default:
@@ -749,7 +748,7 @@ parseAttributes(
         {
             size_t len = strlen( zLoadType );
             if (strncmp( pzText, zLoadType, len ) == 0) {
-                pzText = parseValueType( pOpts, pzText+len, pType );
+                pzText = parseValueType( pzText+len, pType );
                 continue;
             }
         }
@@ -812,8 +811,8 @@ parseLoadMode(
                 *pMode = OPTION_LOAD_COOKED;
                 return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
     }
 
     {
@@ -825,8 +824,8 @@ parseLoadMode(
                 *pMode = OPTION_LOAD_UNCOOKED;
                 return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
     }
 
     {
@@ -838,8 +837,8 @@ parseLoadMode(
                 *pMode = OPTION_LOAD_KEEP;
                 return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
     }
 
   unknown:
@@ -869,7 +868,6 @@ parseSetMemType(
  */
 static char*
 parseValueType(
-    tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType )
 {
@@ -878,43 +876,10 @@ parseValueType(
         if (strncmp( pzText, zLtypeString, len ) == 0) {
             if ((pzText[len] == '>') || isspace(pzText[len])) {
                 pType->valType = OPARG_TYPE_STRING;
-                return pzText + len + 1;
+                return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
-    }
-
-    {
-        size_t len = strlen(zLtypeKeyword);
-        if (strncmp( pzText, zLtypeKeyword, len ) == 0) {
-            if ((pzText[len] == '>') || isspace(pzText[len])) {
-                pType->valType = OPARG_TYPE_ENUMERATION;
-                return pzText + len + 1;
-            }
-        }
-        goto unknown;
-    }
-
-    {
-        size_t len = strlen(zLtypeBool);
-        if (strncmp( pzText, zLtypeBool, len ) == 0) {
-            if ((pzText[len] == '>') || isspace(pzText[len])) {
-                pType->valType = OPARG_TYPE_BOOLEAN;
-                return pzText + len + 1;
-            }
-        }
-        goto unknown;
-    }
-
-    {
-        size_t len = strlen(zLtypeSetMembership);
-        if (strncmp( pzText, zLtypeSetMembership, len ) == 0) {
-            if ((pzText[len] == '>') || isspace(pzText[len])) {
-                pType->valType = OPARG_TYPE_MEMBERSHIP;
-                return pzText + len + 1;
-            }
-        }
-        goto unknown;
     }
 
     {
@@ -922,10 +887,43 @@ parseValueType(
         if (strncmp( pzText, zLtypeNumber, len ) == 0) {
             if ((pzText[len] == '>') || isspace(pzText[len])) {
                 pType->valType = OPARG_TYPE_NUMERIC;
-                return pzText + len + 1;
+                return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
+    }
+
+    {
+        size_t len = strlen(zLtypeBool);
+        if (strncmp( pzText, zLtypeBool, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_BOOLEAN;
+                return pzText + len;
+            }
+            goto unknown;
+        }
+    }
+
+    {
+        size_t len = strlen(zLtypeKeyword);
+        if (strncmp( pzText, zLtypeKeyword, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_ENUMERATION;
+                return pzText + len;
+            }
+            goto unknown;
+        }
+    }
+
+    {
+        size_t len = strlen(zLtypeSetMembership);
+        if (strncmp( pzText, zLtypeSetMembership, len ) == 0) {
+            if ((pzText[len] == '>') || isspace(pzText[len])) {
+                pType->valType = OPARG_TYPE_MEMBERSHIP;
+                return pzText + len;
+            }
+            goto unknown;
+        }
     }
 
     {
@@ -933,10 +931,10 @@ parseValueType(
         if (strncmp( pzText, zLtypeNest, len ) == 0) {
             if ((pzText[len] == '>') || isspace(pzText[len])) {
                 pType->valType = OPARG_TYPE_HIERARCHY;
-                return pzText + len + 1;
+                return pzText + len;
             }
+            goto unknown;
         }
-        goto unknown;
     }
 
   unknown:
