@@ -331,11 +331,6 @@ DEFINE Option_Descriptor =][=
                             z[=(. cap-name)=]_Name,
      /* disablement strs */ zNot[=(. cap-name)
                             =]_Name, zNot[=(. cap-name)=]_Pfx },[=
-
-    IF (and (exist? "default") (= (len "flag_arg") 0)) =][=
-      (set! default-opt-index (for-index)) =][=
-
-    ENDIF =][=
   ENDIF =][=
 
 ENDDEF Option_Descriptor =]
