@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.10 2000/03/12 20:40:41 bruce Exp $
+ *  $Id: expState.c,v 1.11 2000/03/29 03:06:32 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -248,8 +248,11 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
     /*
      *  No such entry?  return zero
      */
-    if (pE == (tDefEntry*)NULL)
+    if (pE == (tDefEntry*)NULL) {
+        if (pzField != (char*)NULL)
+            pzField[-1] = '.';
         return AG_FALSE;
+    }
 
     /*
      *  No subfield?  return one
@@ -264,7 +267,6 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
         return AG_FALSE;
 
     pzField[-1] = '.';
-    pzName = pzField;
 
     if (isIndexed) {
         tDefEntry*  pMemberList = (tDefEntry*)(void*)(pE->pzValue);
@@ -278,6 +280,89 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
         pE = pE->pTwin;
     } while (pE != (tDefEntry*)NULL);
     return AG_FALSE;
+}
+
+
+    STATIC SCM
+find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
+{
+    char*       pzName = SCM_CHARS( obj );
+    ag_bool     isIndexed;
+    tDefEntry*  pE;
+    tDefEntry*  pMembers;
+    SCM         field;
+
+    char* pzField = strchr( pzName, '.' );
+
+    if (pzField != (char*)NULL)
+        *(pzField++) = NUL;
+
+    pE = findDefEntry( pzName, pCurDef, &isIndexed );
+
+    /*
+     *  No such entry?  return FALSE
+     */
+    if (pE == (tDefEntry*)NULL) {
+        if (pzField != (char*)NULL)
+            pzField[-1] = '.';
+
+        return SCM_BOOL_F;
+    }
+
+    /*
+     *  No subfield?  Check the values
+     */
+    if (pzField == (char*)NULL) {
+        if (pE->valType != VALTYP_TEXT)
+            return SCM_BOOL_F;
+
+        field = gh_str2scm( pE->pzValue, strlen( pE->pzValue ));
+        if (isIndexed)
+            return gh_call2( op, field, test );
+
+        for (;;) {
+            if (gh_call2( op, field, test ) == SCM_BOOL_T)
+                return SCM_BOOL_T;
+
+            pE = pE->pTwin;
+            if (pE == (tDefEntry*)NULL)
+                break;
+
+            field = gh_str2scm( pE->pzValue, strlen( pE->pzValue ));
+        }
+        return SCM_BOOL_F;
+    }
+
+    /*
+     *  a subfield for a text macro?  return FALSE
+     */
+    if (pE->valType == VALTYP_TEXT)
+        return SCM_BOOL_F;
+
+    /*
+     *  Search the members for what we want.
+     */
+    pzField[-1] = '.';
+    field       = gh_str2scm( pzField, strlen( pzField ));
+    pMembers    = (tDefEntry*)(void*)(pE->pzValue);
+
+    if (isIndexed) {
+        if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
+            return SCM_BOOL_T;
+        return SCM_BOOL_F;
+    }
+
+    for (;;) {
+        if (find_entry_value( op, field, test, pMembers ) == SCM_BOOL_T)
+            return SCM_BOOL_T;
+
+        pE = pE->pTwin;
+        if (pE == (tDefEntry*)NULL)
+            break;
+
+        pMembers = (tDefEntry*)(void*)(pE->pzValue);
+    }
+    return SCM_BOOL_F;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -368,6 +453,37 @@ ag_scm_exist_p( SCM obj )
     return (find_any_entry( SCM_CHARS( obj ), pDefContext ))
            ? SCM_BOOL_T
            : SCM_BOOL_F;
+}
+
+
+/*=gfunc match_value_p
+ *
+ * what:   test for value name
+ *
+ * exparg: op,       boolean result operator
+ * exparg: ag-name,  name of AutoGen value
+ * exparg: test-str, string to test against
+ *
+ * doc:  This function answers the question, "Is there a value named
+ *       @code{ag-name} that matches the pattern @code{test-str} using the
+ *       match function @code{op}?"  Return SCM_BOOL_T iff at least one
+ *       occurrance of the specified name has an AutoGen value matching the
+ *       test string.  The operator can be any function that takes two string
+ *       arguments and yields a boolean.  It is expected that you will use one
+ *       of the string matching functions provided by AutoGen.
+ *       @*
+ *       The value name must follow the same rules as the
+ *       @code{ag-name} argument for @code{exist?} (@xref{SCM exist?}).
+=*/
+    SCM
+ag_scm_match_value_p( SCM op, SCM obj, SCM test )
+{
+    if (  (! gh_procedure_p( op   ))
+       || (! gh_string_p(    obj  ))
+       || (! gh_string_p(    test )) )
+        return SCM_UNDEFINED;
+
+    return find_entry_value( op, obj, test, pDefContext );
 }
 
 
