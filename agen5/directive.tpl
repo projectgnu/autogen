@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 1.2 1999/10/27 00:22:12 bruce Exp $
+# $Id: directive.tpl,v 1.3 1999/10/28 02:50:52 bruce Exp $
 h =]
 /*
 [=(dne " *  ")=]
@@ -35,7 +35,7 @@ ENDFOR directive =]
  *  Define the constant string names for each directive
  */[=
 FOR directive =]
-static const char z[=% name (sprintf "%%-12s" "%s[]")
+static const char z[=% name (string-capitalize! (sprintf "%%-12s" "%s[]"))
        =] = "[=% name (string-downcase! "%s") =]";[=
 ENDFOR directive
 =]
@@ -56,7 +56,7 @@ FOR directive , =]
        =]z[=% name (string-capitalize! (sprintf "%%-10s" "%s,"))
        =]doDir_[=
   IF (exist? "dummy") =]IGNORE,   [=
-  ELSE =][=% name (string-capitalize! (sprintf "%%-10s" "%s,")) =][=
+  ELSE =][=% name (string-downcase! (sprintf "%%-10s" "%s,")) =][=
   ENDIF=]0 }[=
 ENDFOR directive=] };
 
