@@ -3,6 +3,7 @@
 	* autoopts/agman1.tpl: pass entire doc through texi->man sed script
 	* autoopts/agman3.tpl: ditto
 	* xml2ag/Makefile.am: specify "columns" binary to use.
+	* xml2ag/fork.tpl: use COLUMNS_EXE, when available.
 
 2002-06-09  Bruce Korb  <bkorb@gnu.org>
 

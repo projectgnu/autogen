@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-06-10 17:08:03 bkorb"
+## Time-stamp:      "2002-06-10 18:23:30 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.7 2002/06/11 00:32:42 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.8 2002/06/11 01:27:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -143,21 +143,21 @@ ELSE
 ENDIF :+]
 .SH OPTIONS[+:
 
-# * * * * * * * * * * * * * * * * * * * * * * * * *
-#
-   Describe each option
-
-:+][+:
+;; * * * * * * * * * * * * * * * * * * * * * * * * *
+;;
+;; Describe each option
+;;
 (define opt-arg  "")
-(define opt-name "")            :+][+:
-
-IF (exist? "preserve-case")     :+][+:
-  (define optname-from "_^")
-  (define optname-to   "--")    :+][+:
-ELSE                            :+][+:
-  (define optname-from "A-Z_^")
-  (define optname-to   "a-z--") :+][+:
-ENDIF                           :+][+:
+(define opt-name "")
+(if (exist? "preserve-case")
+    (begin
+      (define optname-from "_^")
+      (define optname-to   "--") )
+    (begin
+      (define optname-from "A-Z_^")
+      (define optname-to   "a-z--") )
+)
+:+][+:
 
 FOR flag
 

@@ -7,7 +7,7 @@
 ## Created:	    Jun 10 2002
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 2002/06/11 00:32:42 bkorb Exp $
+## $Id: Makefile.am,v 1.4 2002/06/11 01:27:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = xml2ag
@@ -31,6 +31,7 @@ xmlopts.h : xmlopts.def
 	$(AGEXE) -L$(top_srcdir)/autoopts xmlopts.def
 
 fork.c : fork.tpl xmlopts.def
+	top_builddir=$(top_builddir) COLUMNS_EXE=`cd ../columns;pwd`/columns \
 	$(AGEXE) -T fork.tpl xmlopts.def
 
 $(GENFILES) : gen-stamp
