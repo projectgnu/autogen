@@ -7,7 +7,7 @@
 # Time-stamp:        "2004-12-31 15:56:17 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2004/12/31 23:56:27 $
+# Last Committed:    $Date: 2005/01/01 00:16:53 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
