@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+ *  $Id: makeshell.c,v 3.1 2002/02/23 21:05:26 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -81,14 +81,6 @@ static const char zPreamble[] =
 
 static const char zEndPreamble[] =
 "#  From the %s option definitions\n#\n";
-
-static const char zMultiDef[] = "\n"
-"%1$s_%2$s_CT=0\n"
-"export %1$s_%2$s_CT\n";
-
-static const char zSingleDef[] = "\n"
-"%1$s_%2$s='%3$s'\n"
-"export %1$s_%2$s\n";
 
 /* * * * * * * * * * * * * * * * * * * * *
  *
@@ -375,13 +367,14 @@ extern tOptProc doVersion;
 extern tOptProc doPagedUsage;
 extern tOptProc doLoadOpt;
 STATIC char*  pzShell   = (char*)NULL;
+STATIC char*  pzLeader  = (char*)NULL;
 STATIC char*  pzTrailer = (char*)NULL;
 
 STATIC void  emitFlag(  tOptions* pOpts );
 STATIC void  emitLong(  tOptions* pOpts );
 STATIC void  emitUsage( tOptions* pOpts );
 STATIC void  emitSetup( tOptions* pOpts );
-STATIC char* loadTrailer( const char* );
+STATIC void  openOutput( const char* );
 
 
 void
@@ -407,7 +400,7 @@ putShellParse( tOptions* pOpts )
      *  Check for a specified output file
      */
     if (HAVE_OPT( SCRIPT ))
-        pzTrailer = loadTrailer( OPT_ARG( SCRIPT ));
+        openOutput( OPT_ARG( SCRIPT ));
 
     emitUsage( pOpts );
     emitSetup( pOpts );
@@ -579,6 +572,9 @@ emitUsage( tOptions* pOpts )
      *  by the definitions (rather than the current
      *  executable name).  Down case the upper cased name.
      */
+    if (pzLeader != (char*)NULL)
+        fputs( pzLeader, stdout );
+
     {
         char*    pzOutName;
         char*    pz;
@@ -593,7 +589,7 @@ emitUsage( tOptions* pOpts )
              pzOutName = OPT_ARG( SCRIPT );
         else pzOutName = "stdout";
 
-        if (pzShell != (char*)NULL)
+        if ((pzLeader == NULL) && (pzShell != (char*)NULL))
             printf( "#! %s\n", pzShell );
 
         printf( zPreamble, zStartMarker, pzOutName, zTimeBuf );
@@ -639,10 +635,22 @@ emitSetup( tOptions* pOpts )
     tOptDesc* pOptDesc = pOpts->pOptDesc;
     int       optionCt = pOpts->presetOptCt;
     const char* pzFmt;
-    const char* pzValue;
+    const char* pzDefault;
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
-        char zVal[20];
+        tSCC zMultiDef[] = "\n"
+            "%1$s_%2$s_CT=0\n"
+            "export %1$s_%2$s_CT\n";
+
+        tSCC zSingleDef[] = "\n"
+            "%1$s_%2$s=\"${%1$s_%2$s-'%3$s'}\"\n"
+            "export %1$s_%2$s\n";
+
+        tSCC zSingleNoDef[] = "\n"
+            "%1$s_%2$s=\"${%1$s_%2$s}\"\n"
+            "export %1$s_%2$s\n";
+
+        char zVal[16];
 
         if (SKIP_OPT(pOptDesc) || (pOptDesc->pz_NAME == (char*)NULL))
             continue;
@@ -653,13 +661,15 @@ emitSetup( tOptions* pOpts )
 
         if (pOptDesc->fOptState & OPTST_NUMERIC) {
             snprintf( zVal, sizeof( zVal ), "%ld", (tUL)pOptDesc->pzLastArg );
-            pzValue = zVal;
-        } else if (pOptDesc->pzLastArg == (char*)NULL)
-            pzValue = "";
+            pzDefault = zVal;
+        } else if (pOptDesc->pzLastArg == (char*)NULL) {
+            pzFmt     = zSingleNoDef;
+            pzDefault = NULL;
+        }
         else
-            pzValue = pOptDesc->pzLastArg;
+            pzDefault = pOptDesc->pzLastArg;
 
-        printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME, pzValue );
+        printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME, pzDefault );
     }
 }
 
@@ -896,89 +906,8 @@ emitLong( tOptions* pOpts )
 }
 
 
-char*
-setShell( char** ppzData, char* pzEndMarker )
-{
-    char* pz;
-    char* pzRes;
-    char* pzData = *ppzData;
-
-    /*
-     *  IF the file begins with the magic marker (it ought to),
-     *  THEN we will set the `pzShell' pointer to the first
-     *       non-whitespace character on this line.
-     *       (If it is all white, we will leave `pzShell' alone.)
-     */
-    if (strncmp( pzData, "#!", 2 ) != 0)
-        return pzShell;
-
-    pz = pzData + 2 + strspn( pzData+2, " \t\v\f" );
-    if (*pz == '\n')
-        return pzShell;
-
-    pzRes = pz;
-    /*
-     *  We now have the start of the string that we return
-     *  as the result.  Now, we must determine where to end
-     *  the string.
-     */
-    pz = strstr( pz, zStartMarker );
-
-    /*
-     *  IF we can find our start marker (we ought to),
-     *  THEN we will keep everything up to that.
-     *       This allows users to keep initial comments.
-     *       This should be the normal return point.
-     */
-    if ((pz != (char*)NULL) && (pz < pzEndMarker)) {
-        *pz = NUL;
-        return pzRes;
-    }
-
-    /*
-     *  Go back to the result point and scan over entries on this line.
-     */
-    pz = pzRes;
-    while (! isspace( *++pz ))  ;
-
-    /*
-     *  IF there is something else on the line,
-     *  THEN append it to the 'SHELL' value.
-     *       It is used as the first argument to the script.
-     */
-    if ((*pz == ' ') || (*pz == '\t')) {
-        pz += strspn( pz, " \t\v\f" );
-
-        /*
-         *  IF all we have is white space to the newline,
-         *  THEN go back and take only the shell name.
-         */
-        if (*pz == '\n')
-            pz = pzShell;
-
-        while (! isspace( *++pz ))  ;
-    }
-
-    /*
-     *  IF we did not find our marker,
-     *  THEN the 'rest' output starts on the next line.
-     */
-    if (pzEndMarker == (char*)NULL) {
-        (*ppzData) = strchr( pz, '\n' );
-        if ((*ppzData) != (char*)NULL)
-            (*ppzData)++;
-    }
-
-    /*
-     *  NUL terminate the shell name and argument.
-     */
-    *pz = '\0';
-    return pzRes;
-}
-
-
-STATIC char*
-loadTrailer( const char* pzFile )
+STATIC void
+openOutput( const char* pzFile )
 {
     FILE* fp;
     char* pzData = (char*)NULL;
@@ -1027,24 +956,32 @@ loadTrailer( const char* pzFile )
         }
 
         /*
-         *  NUL-terminate the data and look for our end marker.
+         *  NUL-terminate the leader and look for the trailer
          */
         *pzScan = '\0';
         fclose( fp );
-        pzScan  = strstr( pzData, zTrailerMarker );
-        pzShell = setShell( &pzData, pzScan );
+        pzScan  = strstr( pzData, zStartMarker );
+        if (pzScan == NULL) {
+            pzTrailer = pzData;
+            break;
+        }
+
+        *(pzScan++) = NUL;
+        pzScan  = strstr( pzScan, zTrailerMarker );
+        if (pzScan == NULL) {
+            pzTrailer = pzData;
+            break;
+        }
 
         /*
          *  Check to see if the data contains
          *  our marker.  If it does, then we will skip over it
          */
-        if (pzScan != (char*)NULL)
-            pzData = pzScan + sizeof( zTrailerMarker ) - 1;
-
+        pzTrailer = pzScan + sizeof( zTrailerMarker ) - 1;
+        pzLeader  = pzData;
     } while (AG_FALSE);
 
     freopen( pzFile, "w" FOPEN_BINARY_FLAG, stdout );
-    return pzData;
 }
 
 

@@ -9,9 +9,9 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+#            by: bkorb
 #
-# $Id: shell.test,v 3.0 2001/12/09 19:44:06 bkorb Exp $
+# $Id: shell.test,v 3.1 2002/02/23 21:05:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -174,10 +174,10 @@ Options may be specified by doubled hyphens and their name
 or by a single hyphen and the flag character (option value).'
 
 
-TEST_SHELL_OPTION=''
+TEST_SHELL_OPTION="${TEST_SHELL_OPTION}"
 export TEST_SHELL_OPTION
 
-TEST_SHELL_SECOND=''
+TEST_SHELL_SECOND="${TEST_SHELL_SECOND}"
 export TEST_SHELL_SECOND
 
 OPT_PROCESS=true

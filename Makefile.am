@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <bkorb@gnu.org>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    $Date: 2001/12/29 11:24:55 $
+## Last Modified:    $Date: 2002/02/23 21:05:26 $
 ##            by:    Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2001/12/29 11:24:55 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2002/02/23 21:05:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,6 +18,7 @@ SUBDIRS      = @TOP_DIRLIST@
 EXTRA_DIST	= VERSION TODO NOTES configure
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
 		  configure libtool stamp-h.in
+DISTCLEANFILES = .configure.patch
 
 configure : VERSION
 

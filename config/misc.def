@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/02/03 01:29:28 $
+ *  Last Modified:     $Date: 2002/02/23 21:05:26 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.4 2002/02/03 01:29:28 bkorb Exp $
+ *  $Id: misc.def,v 3.5 2002/02/23 21:05:26 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.4 $";
+version = "$Revision: 3.5 $";
 
 test = {
     name   = allocated_ctime;
@@ -155,7 +155,6 @@ test = {
     type   = run;
     check  = "there is a global text array sys_siglist";
     action = { act-type = define; };
-    action = { act-type = subst; };
 
     code   = <<-  _EOF_
 		#include <signal.h>

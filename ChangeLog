@@ -1,3 +1,18 @@
+2002-02-23  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am: remove a stamp file for DISTCLEAN
+	* agen5/agShell.c(sigHandler): declare strsignal() iff HAVE_STRSIGNAL
+	is not defined (i.e., we supply our own implementation)
+	* autoopts/makeshell.c(emitUsage): emit the preamble from the previous
+	version of the file (if it exists).
+	(emitSetup): Allow users to supply over-riding defaults
+	(setShell): obsolete
+	(loadTrailer): renamed
+	(openOutput): new name.  Modified to save a pointer to the leader text.
+	* autoopts/test/shell.test: modified to cope with default over-rides
+	* snprintfv/configure.in(LIBOBJS): ugly hackaround so that autoconf
+	won't know we are using the value.
+
 2002-02-04  Bruce Korb  <bkorb@gnu.org>
 
 	* getdefs/getdefs.c: #include strsignal.c when needed
