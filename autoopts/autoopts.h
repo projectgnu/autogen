@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2002-12-09 17:44:44 bkorb"
+ *  Time-stamp:      "2003-01-04 18:58:51 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.9 2002/12/14 16:02:38 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.10 2003/01/05 19:14:32 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -174,19 +174,18 @@ typedef struct {
          const char* pzWhence;
      };
 
-     extern void* aopts_alloc( size_t, const char*, const char* );
-     extern void* aopts_realloc( void*, size_t, const char*, const char* );
-     extern char* aopts_strdup( const char* pz, const char*, const char* );
+     extern void* aopts_alloc( size_t, const char* );
+     extern void* aopts_realloc( void*, size_t, const char* );
+     extern char* aopts_strdup( const char* pz, const char* );
      extern void  aopts_free( void* );
 
-#    define AO_HERE  __FILE__ " at " STR( __LINE__ )
-#    define AGALOC( c, w )      aopts_alloc( c, w, AO_HERE )
-#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w, AO_HERE )
-#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w, "strdup in " AO_HERE )
+#    define AO_HERE  " in " __FILE__ " at " STR( __LINE__ )
+#    define AGALOC( c, w )      aopts_alloc( c, w AO_HERE )
+#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w AO_HERE )
+#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w " - strdup" AO_HERE )
 #    define AGFREE( p )         aopts_free( p )
 #    define TAGMEM( m, t )      STMTS( tMemMgmt* p  = ((tMemMgmt*)m)-1; \
-                                tSCC z[] = t " in " AO_HERE; \
-                                p->pzWhence = z; )
+                                p->pzWhence = t " - TAGGED" AO_HERE; )
 #  endif /* MEMDEBUG */
 #endif /* AUTOGEN_BUILD */
 

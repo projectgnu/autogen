@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.13 2002/12/07 04:45:03 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.14 2003/01/05 19:14:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -550,7 +550,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
   cd .tmp
   HOME='' ${AGEXE} -t40 -L${OPTDIR} -bgenshellopt -- -
 
-  ${CC} ${opts} genshellopt.c ${libs}
+  ${CC} ${opts} genshellopt.c ${libs} -lm
 ) > /dev/null 2>&1
 
 ( .tmp/genshellopt --help 2>&1 ) |

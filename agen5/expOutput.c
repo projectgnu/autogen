@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.7 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: expOutput.c,v 3.8 2003/01/05 19:14:32 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -133,8 +133,10 @@ ag_scm_out_delete( void )
     SCM
 ag_scm_out_move( SCM new_file )
 {
-    char* pz = ag_scm2zchars( new_file, "filename" );
-    int   len;
+    size_t sz = SCM_LENGTH( new_file );
+    char*  pz = (char*)AGALOC( sz + 1, "new file name string" );
+    memcpy( pz, SCM_CHARS( new_file ), sz );
+    pz[ sz ] = NUL;
 
     rename( pCurFp->pzOutName, pz );
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
@@ -173,7 +175,7 @@ ag_scm_out_pop( SCM ret_contents )
             rewind( pCurFp->pFile );
             if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
                 AG_ABEND( aprf( "Error %d (%s) rereading output\n",
-                                    errno, strerror( errno )));
+                                errno, strerror( errno )));
         }
     }
 
@@ -245,7 +247,7 @@ ag_scm_out_resume( SCM suspName )
         if (strcmp( pSuspended[ ix ].pzSuspendName, pzName ) == 0) {
             pSuspended[ ix ].pOutDesc->pPrev = pCurFp;
             pCurFp = pSuspended[ ix ].pOutDesc;
-            free( (void*)pSuspended[ ix ].pzSuspendName );
+            free( (void*)pSuspended[ ix ].pzSuspendName ); /* Guile allocation */
             if (ix < --suspendCt)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;
@@ -254,7 +256,7 @@ ag_scm_out_resume( SCM suspName )
     }
 
     AG_ABEND( aprf( "ERROR: no output file was suspended as ``%s''\n",
-                        pzName ));
+                    pzName ));
     return SCM_UNDEFINED;
 }
 
@@ -277,14 +279,21 @@ ag_scm_out_push_add( SCM new_file )
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
 
-    pzNewFile    = gh_scm2newstr( new_file, NULL );
+    {
+        size_t sz = SCM_LENGTH( new_file );
+        pzNewFile = (char*)AGALOC( sz + 1, "append file name string" );
+        memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
+        pzNewFile[ sz ] = NUL;
+    }
+
     addWriteAccess( pzNewFile );
+
     {
         FILE* fp = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
 
         if (fp == NULL)
             AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
-                                strerror( errno )));
+                            strerror( errno )));
         p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
         p->pFile = fp;
     }
@@ -322,10 +331,14 @@ ag_scm_out_push_new( SCM new_file )
     p->flags = FPF_FREE;
 
     if (gh_string_p( new_file )) {
-        pzNewFile = gh_scm2newstr( new_file, NULL );
+        size_t sz = SCM_LENGTH( new_file );
+        pzNewFile = (char*)AGALOC( sz + 1, "new file name string" );
+        memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
+        pzNewFile[ sz ] = NUL;
         unlink( pzNewFile );
         addWriteAccess( pzNewFile );
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+
     } else {
         tSCC* pzTemp = NULL;
         int tmpfd;
@@ -341,21 +354,21 @@ ag_scm_out_push_new( SCM new_file )
             pzTemp = aprf( "%s/agtmp.XXXXXX", pz );
             if (pzTemp == NULL)
                 AG_ABEND( "cannot allocate temp file template" );
+            TAGMEM( pzTemp, "Saved temp file template" );
         }
 
         AGDUPSTR( pzNewFile, pzTemp, "temp file name" );
         p->flags |= FPF_UNLINK;
         tmpfd = mkstemp( pzNewFile );
         if (tmpfd < 0)
-            AG_ABEND( aprf( "failed to create temp file from `%s'",
-                                pzTemp ));
+            AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
         p->pFile  = fdopen( tmpfd, "a" FOPEN_BINARY_FLAG "+" );
     }
 
     if (p->pFile == NULL)
         AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
-                            strerror( errno )));
+                        strerror( errno )));
 
     p->pzOutName = pzNewFile;
     outputDepth++;
@@ -384,14 +397,18 @@ ag_scm_out_switch( SCM new_file )
 
     if (! gh_string_p( new_file ))
         return SCM_UNDEFINED;
-
-    pzNewFile = gh_scm2newstr( new_file, NULL );
+    {
+        size_t sz = SCM_LENGTH( new_file );
+        pzNewFile = (char*)AGALOC( sz + 1, "new file name string" );
+        memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
+        pzNewFile[ sz ] = NUL;
+    }
 
     /*
      *  IF no change, THEN ignore this
      */
     if (strcmp( pCurFp->pzOutName, pzNewFile ) == 0) {
-        free( (void*)pzNewFile );
+        AGFREE( (void*)pzNewFile );
         return SCM_UNDEFINED;
     }
 
@@ -406,7 +423,7 @@ ag_scm_out_switch( SCM new_file )
         != pCurFp->pFile)
 
         AG_ABEND( aprf( zCannot, errno, "freopen", pzNewFile,
-                            strerror( errno )));
+                        strerror( errno )));
 
     /*
      *  Set the mod time on the old file.

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.10 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.11 2003/01/05 19:14:32 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -304,8 +304,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        pStk->pzOutName = aprf( pOutSpec->pzFileFmt,
-                                    pzDefFile, pOutSpec->zSuffix );
+        pStk->pzOutName = aprf( pOutSpec->pzFileFmt, pzDefFile,
+                                pOutSpec->zSuffix );
         if (p != NULL)
             *p = '.';
     }
@@ -331,6 +331,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
                 /*
                  *  Make the output a no-op, but perform the operations.
                  */
+                AGFREE( (void*)pStk->pzOutName );
                 pStk->pzOutName = (char*)zDevNull;
                 pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
                 pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
@@ -348,7 +349,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
     if (pStk->pFile == NULL) {
     openError:
         AG_ABEND( aprf( zCannot, pzProg, errno, "create",
-                            pStk->pzOutName, strerror( errno )));
+                        pStk->pzOutName, strerror( errno )));
     }
 }
 /*

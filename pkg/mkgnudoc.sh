@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2002-10-12 14:29:29 bkorb"
-# Version:    "$Revision: 3.6 $
+# Time-stamp: "2002-12-27 09:48:31 bkorb"
+# Version:    "$Revision: 3.7 $
 
 eval "`egrep '^AG_' ../VERSION`"
 [ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
@@ -25,20 +25,14 @@ cd ..
 
 texi2html -menu -split=none    -verbose autogen.texi
 mv -f autogen.html autogen-${AG_VERSION}/html_mono
-(cd autogen-${AG_VERSION}/html_mono
- gzip -c autogen.html > autogen.html.gz )
 echo mono done
 
 texi2html -menu -split=chapter -verbose autogen.texi
 mv -f autogen*.html autogen-${AG_VERSION}/html_chapter
-(cd autogen-${AG_VERSION}/html_chapter
- tar cf - autogen*.html | gzip > autogen_chapter_html.tar.gz )
 echo chapter done
 
 texi2html -menu -split=section -verbose autogen.texi
 mv -f autogen*.html autogen-${AG_VERSION}/html_node
-(cd autogen-${AG_VERSION}/html_node
- tar cf - autogen*.html | gzip > autogen_node_html.tar.gz )
 echo node done
 
 for f in autogen*.info*
@@ -66,6 +60,14 @@ cat > TAG <<EOF
      width="188" height="50" border="0" alt="AutoGen Home"></a></p>
 EOF
 body-end -i TAG */*.html
+
+(cd html_mono
+ gzip -c autogen.html > autogen.html.gz )
+(cd html_chapter
+ tar cf - autogen*.html | gzip > autogen_chapter_html.tar.gz )
+(cd html_node
+ tar cf - autogen*.html | gzip > autogen_node_html.tar.gz )
+
 autogen --no-def -T ${pkgsrcdir}/gnudoc.tpl
 rm -f TAG
 cd ..

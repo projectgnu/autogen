@@ -17,6 +17,12 @@ Usage Instructions for autoconf/automake/libtoolized projects:
       mv -f libopts-*.*.* libopts
       cp -fp libopts/libopts.m4 config/.
 
+   I tend to put my configure auxiliary files in "config".
+   Whatever directory you choose, if it is not ".", then
+   be sure to tell autoconf about it with:
+
+      AC_CONFIG_AUX_DIR( [config] )
+
 2. Add the following to your ``configure.ac'' file:
 
       LIBOPTS_CHECK

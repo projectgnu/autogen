@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.9 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: funcCase.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -259,7 +259,7 @@ ag_scm_string_contains_eqv_p( SCM text, SCM substr )
     char* pzSubstr;
     SCM   res;
 
-    AGDUPSTR( pzSubstr, ag_scm2zchars( substr, zSrch ), zSrch );
+    AGDUPSTR( pzSubstr, ag_scm2zchars( substr, zSrch ), "substring" );
 
     upString( pzSubstr );
     if (SUCCESSFUL( Select_Equivalent( ag_scm2zchars( text, "sample text" ),

@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.6 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: stack.c,v 3.7 2003/01/05 19:14:32 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -179,7 +179,7 @@ stackOptArg( pOpts, pOptDesc )
      *  THEN allocate one now
      */
     if (pAL == (tArgList*)NULL) {
-        pAL = (tArgList*)AGALOC( sizeof( *pAL ), "open file stack entry" );
+        pAL = (tArgList*)AGALOC( sizeof( *pAL ), "new option arg stack" );
         if (pAL == (tArgList*)NULL)
             return;
         pAL->useCt   = 0;
@@ -199,7 +199,7 @@ stackOptArg( pOpts, pOptDesc )
          *  pointers.  We subtract it off to find our augment size.
          */
         sz += sizeof(char*) * (pAL->allocCt - MIN_ARG_ALLOC_CT);
-        pAL = (tArgList*)AGREALOC( (void*)pAL, sz, "open file stack entry" );
+        pAL = (tArgList*)AGREALOC( (void*)pAL, sz, "expanded opt arg stack" );
         if (pAL == (tArgList*)NULL)
             return;
     }

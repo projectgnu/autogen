@@ -1,3 +1,12 @@
+2003-01-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*, agen5/*: Rework the memory allocation after valgrind
+	analysis & get "MEMDEBUG" working again.
+
+2002-12-27  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl: genshellopts now needs lib math
+
 2002-12-14  Bruce Korb  <bkorb@gnu.org>
 
 	* */opts.def: change bugs@sf.net to bugs@lists.sf.net throughout

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.7 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: tpParse.c,v 3.8 2003/01/05 19:14:32 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -147,17 +147,17 @@ findMacroEnd( tCC** ppzMark )
     *ppzMark     = pzMark;
 
     pzEndMark = strstr( pzMark, zEndMac );
-	if (pzEndMark == NULL)
-		AG_ABEND( "macro has no end" );
+    if (pzEndMark == NULL)
+        AG_ABEND( "macro has no end" );
 
-	pzNextMark = strstr( pzMark, zStartMac );
-	if (pzNextMark == NULL)
-		return pzEndMark;
+    pzNextMark = strstr( pzMark, zStartMac );
+    if (pzNextMark == NULL)
+        return pzEndMark;
 
-	if (pzEndMark > pzNextMark)
-		AG_ABEND( "macros cannot nest" );
+    if (pzEndMark > pzNextMark)
+        AG_ABEND( "macros cannot nest" );
 
-	return pzEndMark;
+    return pzEndMark;
 }
 
 

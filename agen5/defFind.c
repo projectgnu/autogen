@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 3.5 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: defFind.c,v 3.6 2003/01/05 19:14:32 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -46,7 +46,7 @@ STATIC void
 illFormedName( void )
 {
     char* pz = aprf( zNameRef, zDefinitionName,
-                         pCurTemplate->pzFileName, pCurMacro->lineNo );
+                     pCurTemplate->pzFileName, pCurMacro->lineNo );
     AG_ABEND( pz );
 }
 
@@ -163,8 +163,7 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
     if (++(pDEL->usedCt) > pDEL->allocCt) {
         pDEL->allocCt += pDEL->allocCt + 8; /* 8, 24, 56, ... */
         pDEL->papDefEntry = (tDefEntry**)
-            AGREALOC( (void*)pDEL->papDefEntry,
-                      pDEL->allocCt * sizeof( void* ),
+            AGREALOC( (void*)pDEL->papDefEntry, pDEL->allocCt * sizeof( void* ),
                       "added find result" );
     }
 

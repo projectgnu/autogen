@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.12 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: agShell.c,v 3.13 2003/01/05 19:14:32 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -37,8 +37,6 @@
 #if HAVE_SYS_PROCSET_H
 #  include <sys/procset.h>
 #endif
-
-tSCC   zTxtBlock[] = "Text Block";
 
 #ifndef SHELL_ENABLED
  void closeServer( void ) { }
@@ -331,7 +329,7 @@ chainOpen( int       stdinFd,
 #endif
     execvp( (char*)pzShell, (char**)ppArgs );
     AG_ABEND( aprf( "Could not execvp( '%s', ... ):  %d - %s\n",
-                        pzShell, errno, strerror( errno )));
+                    pzShell, errno, strerror( errno )));
 }
 
 
@@ -406,7 +404,7 @@ loadData( FILE* fp )
 
     textSize = 4096;
     pzScan   = \
-    pzText   = AGALOC( textSize, zTxtBlock );
+    pzText   = AGALOC( textSize, "Text Block" );
 
     *pzText  = NUL;
 
@@ -453,7 +451,7 @@ loadData( FILE* fp )
             size_t off = (size_t)(pzScan - pzText);
             void*  p;
             textSize += 4096;
-            p = AGREALOC( (void*)pzText, textSize, NULL );
+            p = AGREALOC( (void*)pzText, textSize, "expanding text" );
             if (p == NULL) {
                 tSCC zRTB[] = "Realloc Text Block";
                 AG_ABEND( aprf( zAllocWhat, textSize, zRTB ));
@@ -501,7 +499,7 @@ runShell( const char*  pzCmd )
      *  THEN return the nil string.
      */
     if (serverId <= 0) {
-        char* pz = (char*)AGALOC( 1, zTxtBlock );
+        char* pz = (char*)AGALOC( 1, "Text Block" );
 
         *pz = NUL;
         return pz;
@@ -536,7 +534,7 @@ runShell( const char*  pzCmd )
         if (pz == NULL) {
             fprintf( pfTrace, zCmdFail, pzCmd );
             closeServer();
-            pz = (char*)AGALOC( 1, zTxtBlock );
+            pz = (char*)AGALOC( 1, "Text Block" );
 
             *pz = NUL;
 

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.8 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: agUtils.c,v 3.9 2003/01/05 19:14:32 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -86,6 +86,13 @@ aprf( const char* pzFmt, ... )
     va_start( ap, pzFmt );
     (void)vasprintf( &pz, pzFmt, ap );
     va_end( ap );
+#ifdef MEMDEBUG
+    {
+        char* pzDup;
+        AGDUPSTR( pzDup, pz, "aprf" );
+        pz = pzDup;
+    }
+#endif
     return pz;
 }
 
@@ -168,7 +175,7 @@ doOptions( int arg_ct, char** arg_vec )
          *  Otherwise, use the basename of the definitions file
          */
         OPT_ARG( BASE_NAME ) = \
-        pzD = AGALOC( strlen( pz )+1, "def file name" );
+        pzD = AGALOC( strlen( pz )+1, "derived base name" );
 
         while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
         *pzD = NUL;
@@ -270,9 +277,13 @@ addSysEnv( char* pzEnvName )
             break;
     }
     if (getenv( pzEnvName ) == NULL) {
+        char* pz;
+
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
             fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
-        putenv( aprf( zFmt, pzEnvName ));
+        pz = aprf( zFmt, pzEnvName );
+        TAGMEM( pz, "Added environment var" );
+        putenv( pz );
     }
 }
 

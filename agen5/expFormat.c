@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.9 2002/12/14 18:17:53 bkorb Exp $
+ *  $Id: expFormat.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -182,7 +182,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
             AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
 
         pzFirst = aprf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
-                            ag_scm2zchars( first, "first-prefix" ), pzPrefix );
+                        ag_scm2zchars( first, "first-prefix" ), pzPrefix );
     }
 
     if (noDate) {
@@ -208,12 +208,12 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
         }
 
         pzRes = aprf( ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
-                          pzPrefix, pCurFp->pzOutName, zScribble,
-                          pz, pzTemplFileName, pzFirst );
+                      pzPrefix, pCurFp->pzOutName, zScribble,
+                      pz, pzTemplFileName, pzFirst );
     }
 
     if (pzRes == NULL)
-        AG_ABEND( aprf( zAllocErr, pzProg, -1, "Do-Not-Edit string" ));
+        AG_ABEND( "Allocating Do-Not-Edit string" );
 
     res = gh_str02scm( pzRes );
 
@@ -316,11 +316,12 @@ ag_scm_error( SCM res )
      */
     if (*pzMsg != NUL) {
         char* pz = aprf( zFmt, (abort != PROBLEM) ? zErr : zWarn,
-                             pCurTemplate->pzFileName, pCurMacro->lineNo,
-                             pCurFp->pzOutName, pzMsg );
+                         pCurTemplate->pzFileName, pCurMacro->lineNo,
+                         pCurFp->pzOutName, pzMsg );
         if (abort != PROBLEM)
             AG_ABEND( pz );
         fputs( pz, pfTrace );
+        AGFREE( (void*)pz );
     }
 
     longjmp( fileAbort, abort );
@@ -372,7 +373,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
     pzRes = aprf( zGpl, pzPrg, pzPfx );
 
     if (pzRes == NULL)
-        AG_ABEND( aprf( zAllocErr, pzPrg, -1, "GPL string" ));
+        AG_ABEND( "Cannot allocate GPL string" );
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -425,7 +426,7 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
     pzRes = aprf( zLgpl, pzPrg, pzPfx, pzOwner );
 
     if (pzRes == NULL)
-        AG_ABEND( aprf( zAllocErr, pzPrg, -1, "LGPL string" ));
+        AG_ABEND( "Cannot allocate LGPL string" );
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -486,7 +487,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
     pzRes = aprf( zBsd, pzPrg, pzPfx, pzOwner );
 
     if (pzRes == NULL)
-        AG_ABEND( aprf( zAllocErr, pzPrg, -1, "BSD string" ));
+        AG_ABEND( "Cannot allocate BSD license string" );
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
@@ -528,7 +529,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         return SCM_UNDEFINED;
 
     {
-        char* pzLicense = gh_scm2newstr( license, NULL );
+        char* pzLicense = ag_scm2zchars( license, "license file name" );
 
         /*
          *  Set the current file name.
@@ -541,19 +542,22 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
             munmap( mi.pData, mi.size );
             close( mi.fd );
             mi.pData = NULL;
-            free( (void*)mi.pzFileName );
+            AGFREE( (void*)mi.pzFileName );
             mi.pzFileName = pzLicense;
         }
     }
 
     /*
-     *  Make sure the data are loaded and trim any white space
+     *  Make sure the data are loaded and trim any white space.
+     *  If the data pointer is NULL, then we have put a Guile-allocated
+     *  string pointer into mi.pzFileName.  "mapDataFile" will insert
+     *  an AGSTRDUP-ed string there.
      */
     if (mi.pData == NULL) {
-        char* pz;
+        char* pz = mi.pzFileName;
         tSCC*  apzSfx[] = { "lic", NULL };
 
-        mapDataFile( mi.pzFileName, &mi, apzSfx );
+        mapDataFile( pz, &mi, apzSfx );
 
         pz = (char*)mi.pData + mi.size - 1;
         while (isspace( pz[-1] )) pz--;
@@ -579,7 +583,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      */
     pzRes = aprf( (char*)mi.pData, pzPrg, pzOwner );
     if (pzRes == NULL)
-        AG_ABEND( aprf( zAllocErr, pzPrg, -1, "license string" ));
+        AG_ABEND( "Cannot allocate generic license string" );
 
     {
         int     pfx_size = strlen( pzPfx );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: defLex.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -280,7 +280,7 @@ scanAgain:
 NUL_error:
 
     AG_ABEND( aprf( zErrMsg, pzProg, "unterminated quote in definition",
-                        pCurCtx->pzFileName, pCurCtx->lineNo ));
+                    pCurCtx->pzFileName, pCurCtx->lineNo ));
     return ERROR;
 
 lex_done:
@@ -327,16 +327,19 @@ yyerror( char* s )
     case TK_OTHER_NAME:  pz = aprf( zON, (char*)yylval ); break;
     case TK_STRING:      pz = aprf( zSt, (char*)yylval ); break;
     case TK_NUMBER:      pz = aprf( zNo, (char*)yylval ); break;
-    default:             pz = aprf( zDf, lastToken );     break;
+    default:             pz = aprf( zDf, lastToken );
+                         if (pz == NULL) pz = "lastToken"; break;
     }
 
+    if (pz == NULL)
+        pz = (char*)yylval;
     AG_ABEND( aprf( "%s:  in %s on line %d\n"
-                        "\ttoken in error:  %s\n"
-                        "\t[[...<error-text>]] %s\n\n"
-                        "Likely causes:  a mismatched quote, a value that needs "
-                        "quoting,\n\t\tor a missing semi-colon\n",
-                        s, pCurCtx->pzFileName, pCurCtx->lineNo, pz,
-                        pCurCtx->pzScan ));
+                    "\ttoken in error:  %s\n"
+                    "\t[[...<error-text>]] %s\n\n"
+                    "Likely causes:  a mismatched quote, a value that needs "
+                    "quoting,\n\t\tor a missing semi-colon\n",
+                    s, pCurCtx->pzFileName, pCurCtx->lineNo, pz,
+                    pCurCtx->pzScan ));
 }
 
 
@@ -441,7 +444,7 @@ alist_to_autogen_def( void )
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR( pCtx->pzFileName, zSchemeText, zSchemeText );
+    AGDUPSTR( pCtx->pzFileName, zSchemeText, "scheme text" );
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
@@ -525,8 +528,8 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
         if (zNameChars[ *pz ] == 0) {
             if (pz == (unsigned char*)pzScan)
                 AG_ABEND( aprf( "%s Error: Invalid input char '%c' "
-                                    "in %s on line %d\n", pzProg, *pzScan,
-                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                "in %s on line %d\n", pzProg, *pzScan,
+                                pCurCtx->pzFileName, pCurCtx->lineNo ));
 
             *pRetVal = TK_VAR_NAME;
         } else {
@@ -595,7 +598,7 @@ assembleHereString( char* pzScan )
     while (isspace( *pzScan )) {
         if (*pzScan++ == '\n')
             AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
-                                pCurCtx->pzFileName, pCurCtx->lineNo ));
+                            pCurCtx->pzFileName, pCurCtx->lineNo ));
     }
 
     /*
@@ -606,14 +609,14 @@ assembleHereString( char* pzScan )
         while (ISNAMECHAR( *pzScan )) {
             if (++markLen >= sizeof(zMark))
                 AG_ABEND( aprf( zErrMsg, pzProg, "HereString mark "
-                                    STR( MAX_HEREMARK_LEN ) " or more chars",
-                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                STR( MAX_HEREMARK_LEN ) " or more chars",
+                                pCurCtx->pzFileName, pCurCtx->lineNo ));
 
             *(pz++) = *(pzScan++);
         }
         if (markLen == 0)
             AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
-                                pCurCtx->pzFileName, pCurCtx->lineNo ));
+                            pCurCtx->pzFileName, pCurCtx->lineNo ));
         *pz = NUL;
     }
 
@@ -626,7 +629,7 @@ assembleHereString( char* pzScan )
     pzScan = strchr( pzScan, '\n' );
     if (pzScan == NULL)
         AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                            pCurCtx->pzFileName, pCurCtx->lineNo ));
+                        pCurCtx->pzFileName, pCurCtx->lineNo ));
 
     /*
      *  And skip the first new line + conditionally skip tabs
@@ -652,7 +655,7 @@ assembleHereString( char* pzScan )
 
             case NUL:
                 AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                                    pCurCtx->pzFileName, pCurCtx->lineNo ));
+                                pCurCtx->pzFileName, pCurCtx->lineNo ));
             }
         } lineDone:;
 

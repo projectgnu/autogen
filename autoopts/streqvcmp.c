@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.3 2002/12/14 16:02:38 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.4 2003/01/05 19:14:32 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -198,10 +198,10 @@ strtransform( d, s )
 }
 
 #ifdef AUTOGEN_BUILD
-tSCC zAllocErr[] = "AutoOpts allocation failed for %d bytes of %s\n";
+tSCC  zAllocErr[] = "AutoOpts allocation failed for %d bytes of %s\n";
 #ifndef MEMDEBUG
 
-    void*
+void*
 aopts_alloc( size_t sz, tCC* pzWhat )
 {
     void* p = malloc( sz );
@@ -213,7 +213,7 @@ aopts_alloc( size_t sz, tCC* pzWhat )
 }
 
 
-    void*
+void*
 aopts_realloc( void* p, size_t sz, tCC* pzWhat )
 {
     void* np = p ? realloc( p, sz ) : malloc( sz );
@@ -231,7 +231,7 @@ aopts_realloc( void* p, size_t sz, tCC* pzWhat )
 }
 
 
-    char*
+char*
 aopts_strdup( tCC* pz, tCC* pzWhat )
 {
     char*   pzRes;
@@ -255,14 +255,22 @@ aopts_strdup( tCC* pz, tCC* pzWhat )
     return pzRes;
 }
 
-#else
+#else /* MEMDEBUG is defined: */
+
 STATIC tMemMgmt memHead = { &memHead, &memHead, NULL, "ROOT" };
 #define CHECK_CT 128
 #define SPARE    128
 
+#ifdef AUTOGEN_BUILD
+/*
+ *  Weak definition (strong one in agen)
+ */
+FILE* pfTrace;
+#endif
 
-    void*
-aopts_alloc( size_t sz, tCC* pzWhat, tCC* pz )
+
+void*
+aopts_alloc( size_t sz, tCC* pzWhat )
 {
     size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
     tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
@@ -285,18 +293,24 @@ aopts_alloc( size_t sz, tCC* pzWhat, tCC* pz )
 
     p->pEnd = ((char*)(p+1)) + sz;
     memset( (void*)p->pEnd, '~', CHECK_CT );
-    p->pzWhence = pz;
+    p->pzWhence = pzWhat;
 
     return (void*)(p+1);
 }
 
 
-    void*
-aopts_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
+void*
+aopts_realloc( void* p, size_t sz, tCC* pzWhat )
 {
     size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
-    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
-    tMemMgmt    sv  = *np;
+    tMemMgmt*   np;
+    tMemMgmt    sv;
+
+    if (p == NULL)
+        return aopts_alloc( sz, pzWhat );
+
+    np  = ((tMemMgmt*)p)-1;
+    sv  = *np;
 
     checkMem( np );
     np = (tMemMgmt*)(p ? realloc( (void*)np, asz & ~0x3F )
@@ -327,13 +341,13 @@ aopts_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
 
     np->pEnd = ((char*)(np+1)) + sz;
     memset( (void*)np->pEnd, '~', CHECK_CT );
-    np->pzWhence = pz;
+    np->pzWhence = pzWhat;
 
     return (void*)(np+1);
 }
 
 
-STATIC void
+void
 checkMem( tMemMgmt* pMM )
 {
     char* p  = pMM->pEnd;
@@ -341,11 +355,13 @@ checkMem( tMemMgmt* pMM )
 
     do  {
         if (*(p++) != '~') {
+#ifdef AUTOGEN_BUILD
             fprintf( pfTrace, "Stray pointer %d bytes after %d-byte %s end\n",
                      CHECK_CT - ct, pMM->pEnd - (char*)(pMM+1),
                      pMM->pzWhence );
-            fclose( stderr );
             fclose( pfTrace );
+#endif
+            fclose( stderr );
             fclose( stdout );
             p = NULL;
             *p = '~'; /* SEG FAULT */
@@ -355,7 +371,7 @@ checkMem( tMemMgmt* pMM )
 }
 
 
-    void
+void
 aopts_free( void* p )
 {
     tMemMgmt*   np  = ((tMemMgmt*)p)-1;
@@ -370,9 +386,10 @@ aopts_free( void* p )
 }
 
 
-STATIC void
+void
 finalMemCheck( void )
 {
+#ifdef AUTOGEN_BUILD
     tMemMgmt*  pMM = memHead.pNext;
 
     fputs( "\nResidual allocation list:\n", pfTrace );
@@ -382,11 +399,12 @@ finalMemCheck( void )
                  pMM->pEnd - (char*)(pMM+1), pMM->pzWhence );
         pMM = pMM->pNext;
     }
+#endif
 }
 
 
-    char*
-aopts_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
+char*
+aopts_strdup( tCC* pz, tCC* pzWhat )
 {
     char*   pzRes;
     size_t  len = strlen( pz )+1;
@@ -401,7 +419,7 @@ aopts_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
          len = 0x20;
     else len = (len + 0x20) & ~0x1F;
 
-    pzRes = aopts_alloc( len, pzWhat, pzDupFrom );
+    pzRes = aopts_alloc( len, pzWhat );
 
     if (pzRes != NULL)
         strcpy( pzRes, pz );

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.12 2002/12/14 02:25:33 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.13 2003/01/05 19:14:32 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -353,10 +353,10 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      *  Find the template file somewhere
      */
     if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList )))
-        AG_ABEND( aprf( zCannot, ENOENT, "map data file",
-                            pzFileName, strerror( ENOENT )));
+        AG_ABEND( aprf( zCannot, ENOENT, "map data file", pzFileName,
+                        strerror( ENOENT )));
 
-    AGDUPSTR( pMapInfo->pzFileName, zRealFile, "map data file" );
+    AGDUPSTR( pMapInfo->pzFileName, zRealFile, "mmapped file name" );
 
     /*
      *  The template file must really be a file.
@@ -365,12 +365,12 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
         char* pz;
         struct stat stbf;
         if (stat( zRealFile, &stbf ) != 0)
-            AG_ABEND( aprf( zCannot, errno, zOpen,
-                                zRealFile, strerror( errno )));
+            AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile,
+                            strerror( errno )));
 
         if (! S_ISREG( stbf.st_mode ))
-            AG_ABEND( aprf( zCannot, errno, zOpen,
-                                zRealFile, "wrong file type" ));
+            AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile,
+                            "wrong file type" ));
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;
@@ -382,16 +382,14 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
     if (pMapInfo->fd == -1)
-        AG_ABEND( aprf( zCannot, errno, zOpen,
-                            zRealFile, strerror( errno )));
+        AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile, strerror( errno )));
 
     pMapInfo->pData =
         mmap( NULL, pMapInfo->size, PROT_READ | PROT_WRITE,
               MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
 
     if (pMapInfo->pData == (void*)(-1))
-        AG_ABEND( aprf( zCannot, errno, "mmap",
-                            zRealFile, strerror( errno )));
+        AG_ABEND( aprf( zCannot, errno, "mmap", zRealFile, strerror( errno )));
 }
 
 
