@@ -45,7 +45,7 @@ PACKAGE=autogen
 
 #  Validate struct marker in autoopts/options.h
 #
-if [ -n "$srcdir" ] ; then
+if [ -f $srcdir/autoopts/options.h ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
   lib=`expr '(' $AO_VERSION '*' 4096 ')' + $AO_REVISION`
