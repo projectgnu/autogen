@@ -9,19 +9,28 @@
 # Last Modified:     Fri Oct  1 11:00:24 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: case.test,v 1.2 1999/10/28 03:36:28 bruce Exp $
+# $Id: case.test,v 1.3 1999/11/06 04:24:16 bruce Exp $
 # ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
 
 # # # # # # # TEMPLATE FILE # # # # # #
 
 echo creating $testname.tpl
 cat > $testname.tpl <<'EOF'
-<= autogen template test =>
+<= AutoGen5 template test =>
 <=
 FOR grp "\n" =><=
   CASE (get "nam") =><=
 
-  == first  =>first:  <=(printf "%-6s" (get "val"))=> matches: <=
+  == first  =>first:  <=(sprintf "%-6s" (get "val"))=> matches: <=
       CASE (get "val") =><=
         ~~ ^[a-z]*$ =>~~ ^[a-z]*$  OK<=
         ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  *** BOGUS ***<=
@@ -32,7 +41,7 @@ FOR grp "\n" =><=
         *          =>~ .*        *** BOGUS ***<=
       ESAC =><=
 
-  == second =>second: <=(printf "%-6s" (get "val"))=> matches: <=
+  == second =>second: <=(sprintf "%-6s" (get "val"))=> matches: <=
       CASE (get "val") =><=
         ~~ ^[a-z]*$ =>~~ ^[a-z]*$  *** BOGUS ***<=
         ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  *** BOGUS ***<=
@@ -43,7 +52,7 @@ FOR grp "\n" =><=
         *          =>~ .*        *** BOGUS ***<=
       ESAC =><=
 
-  == third  =>third:  <=(printf "%-6s" (get "val"))=> matches: <=
+  == third  =>third:  <=(sprintf "%-6s" (get "val"))=> matches: <=
       CASE (get "val") =><=
         ~~ ^[a-z]*$ =>~~ ^[a-z]*$  *** BOGUS ***<=
         ~~ ^[A-Z]*$ =>~~ ^[A-Z]*$  OK<=
@@ -92,7 +101,7 @@ EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #
 
-$AUTOGEN $testname.def ||  failure autogen failed
+$AGEN $testname.def ||  failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
 
