@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.13 2000/03/12 22:13:42 bruce Exp $
+ *  $Id: autoopts.c,v 2.14 2000/03/19 01:29:15 bruce Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1053,9 +1053,9 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
     const char*
 optionVersion( void )
 {
-    static const char zVersion[] = STR( AO_CURRENT ) ":"
-                                   STR( AO_REVISION ) ":"
-                                   STR( AO_AGE );
+    static const char zVersion[] =
+        STR( AO_ANNOUNCE_LEVEL );
+
     return zVersion;
 }
 
