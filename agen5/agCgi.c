@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.5 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: agCgi.c,v 3.6 2002/01/13 08:04:32 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -9,7 +9,7 @@
  */
 
 /*
- *  AutoGen-cgi copyright 2001 Bruce Korb
+ *  AutoGen-cgi copyright 2001-2002 Bruce Korb
  *
  *  AutoGen-cgi is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -81,11 +81,10 @@ typedef enum {
 #define pzMethod nameValueMap[ REQUEST_METHOD_IDX ].pzValue
 #define pzQuery  nameValueMap[ QUERY_STRING_IDX   ].pzValue
 
-
 static const char zOops[] =
-"HTTP/1.0 500 AutoGen Internal Error\n"
 "Content-type: text/plain\n\n"
-"Form processing error:\n";
+"AutoGen form processing error:\n";
+
 #define zNil     ((char*)(zOops + sizeof( zOops ) - 1))
 
 static char* parseInput( char* pzSrc, int len );
@@ -112,20 +111,20 @@ loadCgi( void )
 
     textLen = atoi( nameValueMap[ CONTENT_LENGTH_IDX ].pzValue );
     if (textLen == 0)
-        AG_ABEND_STR( "No data were received" );
+        AG_ABEND( "No CGI data were received" );
 
     if (strcasecmp( pzMethod, "POST" ) == 0) {
         pzText  = malloc( (textLen + 32) & ~0x000F );
         if (pzText == NULL) {
-            AG_ABEND_START( zAllocErr );
-            fprintf( stderr, zAllocWhat, (textLen + 32) & ~0x000F, "input" );
-            AG_ABEND;
+            char* pz = asprintf( "%s: %d bytes for CGI input",
+                                 zAllocErr, textLen );
+            AG_ABEND( pz );
         }
 
         if (fread( pzText, 1, textLen, stdin ) != textLen) {
-            AG_ABEND_START( "Could not read" );
-            fprintf( stderr, "\t%d bytes of input\n", textLen );
-            AG_ABEND;
+            char* pz = asprintf( zCannot, errno, "read", "CGI text",
+                                 strerror( errno ));
+            AG_ABEND( pz );
         }
         pzText[ textLen ] = '\0';
 
@@ -137,7 +136,7 @@ loadCgi( void )
         pzText = parseInput( pzQuery, textLen );
 
     } else
-        AG_ABEND_STR( "invalid request method" );
+        AG_ABEND( "invalid request method" );
 
     pzText = AGREALOC( pzText, strlen( pzText )+1, "CGI input" );
     pzOopsPrefix = zOops;
@@ -168,7 +167,7 @@ parseInput( char* pzSrc, int len )
             return pzRes;
     }
 
-    AG_ABEND_STR( pzRes );
+    AG_ABEND( pzRes );
 }
 
 /*

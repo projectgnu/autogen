@@ -1,11 +1,11 @@
 /*
- *  $Id: expGperf.c,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+ *  $Id: expGperf.c,v 3.1 2002/01/13 08:04:33 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -138,7 +138,7 @@ ag_scm_make_gperf( SCM name, SCM hlist )
                      pzName, pzList );
             fprintf( stderr, zMakeGperf, pzList, pzName, getpid() );
 
-            LOAD_ABORT( pCurTemplate, pCurMacro, "formatting shell command" );
+            AG_ABEND( "formatting shell command" );
         }
 
         /*

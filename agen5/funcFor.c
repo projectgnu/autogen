@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcFor.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: funcFor.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -358,9 +358,9 @@ doForByStep( tTemplate* pT,
         ag_bool gotNewDef = nextDefinition( invert, &pFoundDef );
 
         if (loopLimit-- < 0) {
-            fprintf( stderr, zTplErr, pT->pzTplName, pMac->lineNo,
-                     "Too many FOR iterations" );
-            fprintf( stderr, "\texiting FOR %s from %d to %d "
+            fprintf( pfTrace, "too many FOR iterations in %s line %d\n",
+                     pT->pzTplName, pMac->lineNo );
+            fprintf( pfTrace, "\texiting FOR %s from %d to %d "
                      "by %d:\n\tmore than %ld iterations\n",
                      pT->pzTemplText + pMac->ozText,
                      pFS->for_from, pFS->for_to, pFS->for_by,
@@ -658,7 +658,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
     papLoadProc = apForLoad;
     if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "FOR macro requires iterator name" );
+        AG_ABEND_IN( pT, pMac, "FOR macro requires iterator name" );
 
     /*
      *  IF this is the first time here,
@@ -688,7 +688,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     *(pzCopy++) = '\0';
 
     if (pT->pzTemplText[ pMac->ozName ] == '\0')
-        LOAD_ABORT( pT, pMac, "invalid FOR loop variable" );
+        AG_ABEND_IN( pT, pMac, "invalid FOR loop variable" );
 
     /*
      *  Copy the rest of the macro text into the "text" string
@@ -709,9 +709,9 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     }
     pT->pNext = pzCopy;
 
-    pEndMac = parseTemplate( pT, pMac + 1, ppzScan );
+    pEndMac = parseTemplate( pMac + 1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "ENDFOR not found" );
+        AG_ABEND_IN( pT, pMac, "ENDFOR not found" );
 
     pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;
 

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2002/01/12 05:10:01 $
+# Last Modified:     $Date: 2002/01/13 08:04:32 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.3 2002/01/12 05:10:01 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.4 2002/01/13 08:04:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -301,8 +301,8 @@ _EOF_
       echo
       echo "/* exports from $f */"
       echo
-      sed -n '/^ *EXPORT/,/)$/p' $f | \
-        sed -e 's/^ *EXPORT *//' -e 's/)$/);/'
+      sed -n '/^EXPORT /,/)$/p' $f | \
+        sed 's/^EXPORT //;s/)$/);/'
     done
     echo
     echo "#endif /* AUTOGEN_PROTOTYPES_H */"

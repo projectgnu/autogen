@@ -1,12 +1,12 @@
 
 /*
- *  $Id: tpLoad.c,v 3.3 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -214,11 +214,11 @@ countMacros( tCC* pz )
  *
  *  Load the macro array and file name.
  */
-EXPORT void
-loadMacros( tTemplate*     pT,
-            tCC*    pzF,
-            tCC*    pzN,
-            tCC*    pzData )
+STATIC void
+loadMacros( tTemplate* pT,
+            tCC*       pzF,
+            tCC*       pzN,
+            tCC*       pzData )
 {
     tMacro* pMac   = pT->aMacros;
 
@@ -240,18 +240,16 @@ loadMacros( tTemplate*     pT,
         pT->pNext = pzText + 1;
     }
 
+    pCurTemplate = pT;
+
     {
-        tMacro* pMacEnd = parseTemplate( pT, pMac, &pzData );
+        tMacro* pMacEnd = parseTemplate( pMac, &pzData );
 
         /*
          *  Make sure all of the input string was scanned.
          */
-        if (pzData != (char*)NULL)  {
-            tSCC zNotExpected[] = "parse ended unexpectedly";
-            AG_ABEND_START( zNotExpected );
-            fprintf( stderr, zTplErr, pzF, -1, zNotExpected );
-            AG_ABEND;
-        }
+        if (pzData != (char*)NULL)
+            AG_ABEND( "Template parse ended unexpectedly" );
 
         pT->macroCt = pMacEnd - pMac;
 
@@ -334,11 +332,7 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
 EXPORT void
 mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
-    tSCC zCannotMmap[] = "cannot mmap";
-#   define zMmap        zCannotMmap + 7
-
-    tSCC zCannotOpen[] = "cannot open";
-#   define zOpen        zCannotOpen + 7
+    tSCC zOpen[] = "open";
 
     static char  zRealFile[ MAXPATHLEN ];
 
@@ -347,10 +341,9 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList ))) {
         tSCC zMapDataFile[] = "map data file";
-        AG_ABEND_START( zMapDataFile );
-        fprintf( stderr, zCannot, pzProg, ENOENT,
-                 zMapDataFile, pzFileName, strerror( ENOENT ));
-        AG_ABEND;
+        char* pz = asprintf( zCannot, pzProg, ENOENT,
+                             zMapDataFile, pzFileName, strerror( ENOENT ));
+        AG_ABEND( pz );
     }
     AGDUPSTR( pMapInfo->pzFileName, zRealFile, "map data file" );
 
@@ -358,19 +351,18 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      *  The template file must really be a file.
      */
     {
+        char* pz;
         struct stat stbf;
         if (stat( zRealFile, &stbf ) != 0) {
-            AG_ABEND_START( zCannotOpen );
-            fprintf( stderr, zCannot, errno, zOpen,
-                     zRealFile, strerror( errno ));
-            AG_ABEND;
+            pz = asprintf( zCannot, errno, zOpen,
+                           zRealFile, strerror( errno ));
+            AG_ABEND( pz );
         }
 
         if (! S_ISREG( stbf.st_mode )) {
-            AG_ABEND_START( zCannotOpen );
-            fprintf( stderr, zCannot, errno, zOpen,
-                     zRealFile, "wrong file type" );
-            AG_ABEND;
+            pz = asprintf( zCannot, errno, zOpen,
+                           zRealFile, "wrong file type" );
+            AG_ABEND( pz );
         }
 
         if (outTime <= stbf.st_mtime)
@@ -383,10 +375,9 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
      */
     pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
     if (pMapInfo->fd == -1) {
-        AG_ABEND_START( zCannotOpen );
-        fprintf( stderr, zCannot, errno, zOpen,
-                 zRealFile, strerror( errno ));
-        AG_ABEND;
+        char* pz = asprintf( zCannot, errno, zOpen,
+                             zRealFile, strerror( errno ));
+        AG_ABEND( pz );
     }
 
     pMapInfo->pData =
@@ -394,10 +385,9 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
               MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
 
     if (pMapInfo->pData == (void*)(-1)) {
-        AG_ABEND_START( zCannotMmap );
-        fprintf( stderr, zCannot, errno, zMmap,
-                 zRealFile, strerror( errno ));
-        AG_ABEND;
+        char* pz = asprintf( zCannot, errno, "mmap",
+                             zRealFile, strerror( errno ));
+        AG_ABEND( pz );
     }
 }
 
@@ -417,7 +407,10 @@ loadTemplate( tCC* pzFileName )
 
     {
         size_t       macroCt;
+        tTemplate    tmpTpl;
         tTemplate*   pRes;
+        tTemplate*   pSaveTpl = pCurTemplate;
+        tMacro*      pSaveMac = pCurMacro;
         size_t       alocSize;
         tCC*         pzData;
 
@@ -425,6 +418,9 @@ loadTemplate( tCC* pzFileName )
          *  Process the leading pseudo-macro.  The template proper
          *  starts immediately after it.
          */
+        pCurMacro    = NULL;
+        pCurTemplate = &tmpTpl;
+        tmpTpl.pzFileName = mapInfo.pzFileName;
         pzData = loadPseudoMacro( (tCC*)mapInfo.pData, mapInfo.pzFileName );
 
         /*
@@ -452,11 +448,14 @@ loadTemplate( tCC* pzFileName )
         strcpy( pRes->zEndMac, zEndMac );     /* must fit */
         loadMacros( pRes, mapInfo.pzFileName, (char*)NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize,
-                                     "resize main template" );
+                                     "resize template" );
 
         munmap( mapInfo.pData, mapInfo.size );
         close( mapInfo.fd );
-        return templateFixup( pRes, pRes->descSize );
+        pRes = templateFixup( pRes, pRes->descSize );
+        pCurTemplate = pSaveTpl;
+        pCurMacro    = pSaveMac;
+        return pRes;
     }
 }
 

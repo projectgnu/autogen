@@ -1,12 +1,12 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: agUtils.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -122,7 +122,7 @@ doOptions( int arg_ct, char** arg_vec )
      */
     if (  (! ENABLED_OPT( DEFINITIONS ))
        && (! HAVE_OPT( OVERRIDE_TPL )) )
-        AG_ABEND_STR( "no template was specified" );
+        AG_ABEND( "no template was specified" );
 
     /*
      *  IF we do not have a base-name option, then we compute some value
@@ -576,8 +576,8 @@ ag_alloc( size_t sz, tCC* pzWhat )
 {
     void* p = malloc( sz );
     if ((p == (void*)NULL) && (pzWhat != NULL)) {
-        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+        pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+        AG_ABEND( pzWhat );
     }
     return p;
 }
@@ -589,8 +589,8 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat )
     void* np = p ? realloc( p, sz ) : malloc( sz );
     if (np == (void*)NULL) {
         if (pzWhat != NULL) {
-            fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-            LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+            pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+            AG_ABEND( pzWhat );
         }
         if (p != NULL)
             free( p );
@@ -640,8 +640,8 @@ ag_alloc( size_t sz, tCC* pzWhat, tCC* pz )
         if (pzWhat == NULL)
             return (void*)NULL;
 
-        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+        pzWhat = asprintf( zAllocErr, pzProg, sz, pzWhat );
+        AG_ABEND( pzWhat );
     }
 
     /*
@@ -684,8 +684,8 @@ ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
             return (void*)NULL;
         }
 
-        fprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
-        LOAD_ABORT( pCurTemplate, pCurMacro, pzWhat );
+        pzWhat = asprintf( stderr, zAllocErr, pzProg, sz, pzWhat );
+        AG_ABEND( pzWhat );
     }
 
     /*

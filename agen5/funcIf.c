@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcIf.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: funcIf.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -268,7 +268,7 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
 mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     if ((int)pMac->res == 0)
-        LOAD_ABORT( pT, pMac, zNoIfExpr );
+        AG_ABEND_IN( pT, pMac, zNoIfExpr );
     /*
      *  Load the expression
      */
@@ -343,7 +343,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, zNoIfExpr );
+        AG_ABEND_IN( pT, pMac, zNoIfExpr );
 
     if (apIfLoad[0] == (tpLoadProc)NULL) {
         memcpy( (void*)apIfLoad, apLoadProc, sizeof( apLoadProc ));
@@ -372,9 +372,9 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  to return with the text scanning pointer pointing
      *  to the remaining text.
      */
-    pEndifMac = parseTemplate( pT, pMac+1, ppzScan );
+    pEndifMac = parseTemplate( pMac+1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "ENDIF not found" );
+        AG_ABEND_IN( pT, pMac, "ENDIF not found" );
 
     current_if.pIf->endIndex   = \
     current_if.pElse->sibIndex = pEndifMac - pT->aMacros;
@@ -408,7 +408,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "expressionless WHILE" );
+        AG_ABEND_IN( pT, pMac, "expressionless WHILE" );
 
     if (apWhileLoad[0] == (tpLoadProc)NULL) {
         memcpy( (void*)apWhileLoad, apLoadProc, sizeof( apLoadProc ));
@@ -428,9 +428,9 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  to return with the text scanning pointer pointing to the remaining
      *  text.
      */
-    pEndMac = parseTemplate( pT, pMac+1, ppzScan );
+    pEndMac = parseTemplate( pMac+1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "ENDWHILE not found" );
+        AG_ABEND_IN( pT, pMac, "ENDWHILE not found" );
 
     pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;
 

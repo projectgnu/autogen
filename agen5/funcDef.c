@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcDef.c,v 3.3 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: funcDef.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -136,7 +136,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         if (! isalpha( *pzScan )) {
             fprintf( stderr, "On macro argument # %d:\n%s\n",
                      ct, pzScan );
-            LOAD_ABORT( pT, pMac, "no macro arg name" );
+            AG_ABEND_IN( pT, pMac, "no macro arg name" );
         }
 
         while (ISNAMECHAR( *pzScan ))  pzScan++;
@@ -178,7 +178,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             pDL->de.pzValue = (char*)zNil; goto fill_in_array_done;
 
         default:
-            LOAD_ABORT( pT, pMac, "name not followed by '='" );
+            AG_ABEND_IN( pT, pMac, "name not followed by '='" );
 
         case ' ': case '\t': case '\n': case '\f':
             *(pzScan++) = NUL;
@@ -260,7 +260,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             break;
 
         if (! isspace( *pzScan ))
-            LOAD_ABORT( pT, pMac, "no space separating entries" );
+            AG_ABEND_IN( pT, pMac, "no space separating entries" );
 
         /*
          *  Terminate the string value and skip over any additional space
@@ -315,7 +315,7 @@ prepInvokeArgs( tMacro* pMac )
     tTemplate* pT = pCurTemplate;
 
     if (pMac->ozText == 0)
-        LOAD_ABORT( pT, pMac, "The INVOKE macro requires a name" );
+        AG_ABEND_IN( pT, pMac, "The INVOKE macro requires a name" );
     pMac->ozName = pMac->ozText;
     pzText = pT->pzTemplText + pMac->ozText;
     pzText = (char*)skipExpression( pzText, strlen( pzText ));
@@ -335,7 +335,7 @@ prepInvokeArgs( tMacro* pMac )
      */
     else {
         if (! isspace( *pzText ))
-            LOAD_ABORT( pT, pMac,
+            AG_ABEND_IN( pT, pMac,
                         "The INVOKE macro name not space separated" );
         *pzText = NUL;
         while (isspace( *++pzText ))  ;
@@ -631,7 +631,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
             if (pMac->funcPrivate == (void*)NULL) {
                 pzText = asprintf( zNoResolution,
                                    pT->pzTemplText + pMac->ozName );
-                LOAD_ABORT( pT, pMac, pzText );
+                AG_ABEND_IN( pT, pMac, pzText );
             }
 
             return mFunc_Define( pT, pMac );
@@ -648,7 +648,7 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
     if (pInv == (tTemplate*)NULL) {
         pzText = asprintf( zNoResolution,
                            ag_scm2zchars( macName, "macro name" ));
-        LOAD_ABORT( pT, pMac, pzText );
+        AG_ABEND_IN( pT, pMac, pzText );
     }
 
     pMac->funcPrivate = (void*)pInv;
@@ -684,7 +684,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     static tpLoadProc apDefineLoad[ FUNC_CT ] = { (tpLoadProc)NULL };
 
     if (pMac->ozText == 0)
-        LOAD_ABORT( pT, pMac, zNameNeeded );
+        AG_ABEND_IN( pT, pMac, zNameNeeded );
 
     /*
      *  IF this is the first time here,
@@ -723,7 +723,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         memcpy( pNewT->pzFileName, pT->pzFileName, fnameSize );
         pzCopy = pNewT->pzTplName = pNewT->pzFileName + fnameSize;
         if (! isalpha( *pzSrc ))
-            LOAD_ABORT( pT, pMac, zNameNeeded );
+            AG_ABEND_IN( pT, pMac, zNameNeeded );
 
         while (ISNAMECHAR(*pzSrc))  *(pzCopy++) = *(pzSrc++);
     }
@@ -733,15 +733,16 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pNewT->pNext = pzCopy+1;
     strcpy( pNewT->zStartMac, pT->zStartMac );
     strcpy( pNewT->zEndMac, pT->zEndMac );
+    pCurTemplate = pNewT;
 
     {
-        tMacro* pMacEnd = parseTemplate( pNewT, pNewT->aMacros, ppzScan );
+        tMacro* pMacEnd = parseTemplate( pNewT->aMacros, ppzScan );
 
         /*
          *  Make sure all of the input string was *NOT* scanned.
          */
         if (*ppzScan == (char*)NULL)
-            LOAD_ABORT( pT, pMac, "parse ended unexpectedly" );
+            AG_ABEND_IN( pT, pMac, "parse ended unexpectedly" );
 
         pNewT->macroCt = pMacEnd - &(pNewT->aMacros[0]);
 
@@ -797,6 +798,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pNamedTplList = pNewT;
     papLoadProc = papLP;
     memset( (void*)pMac, 0, sizeof(*pMac) );
+    pCurTemplate = pT;
     return pMac;
 }
 /*

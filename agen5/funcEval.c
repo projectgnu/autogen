@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcEval.c,v 3.3 2001/12/29 11:24:56 bkorb Exp $
+ *  $Id: funcEval.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -162,7 +162,7 @@ evalExpression( ag_bool* pMustFree )
                 /*
                  *  Emit inconsistently :-}
                  */
-                LOAD_ABORT( pT, pMac, "PROGRAM ERROR:  ambiguous expr code" );
+                AG_ABEND_IN( pT, pMac, "PROGRAM ERROR:  ambiguous expr code" );
             }
         }
 
@@ -473,20 +473,16 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     {
         size_t remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
         if (remLen > srcLen)
-            LOAD_ABORT( pT, pMac, "Invalid definition name" );
+            AG_ABEND_IN( pT, pMac, "Invalid definition name" );
         pzSrc  += srcLen - remLen;
         srcLen  = remLen;
         pzCopy += strlen( pzCopy )+1;
     }
 
     if (pzSrc >= pzSrcEnd) {
-        if (pMac->res != EMIT_VALUE) {
-            tSCC zAb[] = "No replacement text for unfound value";
-            tSCC zFm[] = "No formatting string for format expr";
-            fprintf( stderr, zTplErr, pT->pzFileName, pMac->lineNo,
-                     (pMac->res == EMIT_IF_ABSENT) ? zAb : zFm );
-            LOAD_ABORT( pT, pMac, "definition expression" );
-        }
+        if (pMac->res != EMIT_VALUE)
+            AG_ABEND_IN( pT, pMac, "No text for unfound value" );
+
         pMac->ozText = 0;
 
     } else {
@@ -511,10 +507,10 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
              *  The next expression must be within bounds and space separated
              */
             if (pzNextExpr >= pz + srcLen)
-                LOAD_ABORT( pT, pMac, "`?' needs two expressions" );
+                AG_ABEND_IN( pT, pMac, "`?' needs two expressions" );
 
             if (! isspace( *pzNextExpr ))
-                LOAD_ABORT( pT, pMac, "No space between expressions" );
+                AG_ABEND_IN( pT, pMac, "No space between expressions" );
 
             /*
              *  NUL terminate the first expression, skip intervening

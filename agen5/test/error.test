@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-# Last Modified:     $Date: 2002/01/12 05:10:01 $
+# Last Modified:     $Date: 2002/01/13 08:04:33 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: error.test,v 3.2 2002/01/12 05:10:01 bkorb Exp $
+# $Id: error.test,v 3.3 2002/01/13 08:04:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -58,8 +58,9 @@ _EOF_
 echo creating ${testname}.out1
 # this is the output we should expect to see
 cat > ${testname}.out1 <<'_EOF_'
-autogen ERROR:  The definitions file has a `#error' directive
-	#error directive -- in error.def on line 3
+#error directive -- in error.def on line 3
+	The definitions file has a `#error' directive
+
 _EOF_
 
 echo $AGEXE ${testname}.def
@@ -75,7 +76,8 @@ echo creating ${testname}.out2
 cat > ${testname}.out2 <<_EOF_
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
-autogen ERROR:  DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
+Error in template error.tpl, line 13
+	DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
 	This is a multi-line
 	error to show how to exit
 	your template
@@ -124,9 +126,9 @@ cat > ${testname}.out4 <<'_EOF_'
 syntax error:  in error2.def on line 2
     token in error:  VAR_NAME is broken;
 
-autogen ERROR:  invalid definition token
-
+invalid definition token
 [[...<error-text>]]  broken;
+
 
 
 _EOF_
@@ -135,7 +137,7 @@ echo $AGEXE ${testname}.def
 $AGEXE ${testname}2.def 2> ${testname}.err4 && failure unexpected success
 grep -v 'Giving up in' ${testname}.err4 >  ${testname}.err
 cmp -s  ${testname}.err  ${testname}.out4 || \
-  failure "actual->expected `diff -c ${testname}.err  ${testname}.out4`"
+  failure "`diff -c ${testname}.out4 ${testname}.err`"
 
 cleanup
 # end of error.test

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: expOutput.c,v 3.1 2001/12/10 03:48:28 bkorb Exp $
+ *  $Id: expOutput.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -166,7 +166,7 @@ ag_scm_out_pop( SCM ret_contents )
     if (pCurFp->pPrev == (tFpStack*)NULL) {
         fputs( "ERROR:  Cannot pop output with no output pushed\n",
                stderr );
-        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
+        AG_ABEND( "expr failed" );
     }
 
 
@@ -209,7 +209,7 @@ ag_scm_out_suspend( SCM suspName )
     if (pCurFp->pPrev == (tFpStack*)NULL) {
         fputs( "ERROR:  Cannot pop output with no output pushed\n",
                stderr );
-        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
+        AG_ABEND( "expr failed" );
     }
 
     if (++suspendCt > suspAllocCt) {
@@ -263,7 +263,7 @@ ag_scm_out_resume( SCM suspName )
 
     fprintf( stderr, "ERROR: no output file was suspended as ``%s''\n",
              pzName );
-    LOAD_ABORT( pCurTemplate, pCurMacro, "resume failed" );
+    AG_ABEND( "resume failed" );
     return SCM_UNDEFINED;
 }
 
@@ -385,7 +385,7 @@ ag_scm_out_switch( SCM new_file )
         tSCC zOpen[] = "%s ERROR %d (%s): cannot open %s\n";
         fprintf( stderr, zOpen, pzProg,
                  errno, strerror( errno ), pzNewFile );
-        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
+        AG_ABEND( "expr failed" );
     }
 
     /*

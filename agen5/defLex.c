@@ -1,12 +1,12 @@
 
 /*
- *  $Id: defLex.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: defLex.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -358,9 +358,11 @@ yyerror( char* s )
         fprintf( stderr, "`%1$c' (%1$d)\n", lastToken );
     }
 
-    AG_ABEND_START( "invalid definition token" );
-    fprintf( stderr, "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
-    AG_ABEND;
+    {
+        char* pz = asprintf( "invalid definition token"
+                             "\n[[...<error-text>]] %s\n\n", pCurCtx->pzScan );
+        AG_ABEND( pz );
+    }
 }
 
 
@@ -446,7 +448,7 @@ alist_to_autogen_def( void )
      */
     if (! gh_string_p( res )) {
         tSCC zEr[] = "Scheme definition expression does not yield string:\n";
-        AG_ABEND_STR( zEr );
+        AG_ABEND( zEr );
     }
 
     res_len   = SCM_LENGTH( res );
@@ -458,7 +460,7 @@ alist_to_autogen_def( void )
      *  Now, push the resulting string onto the input stack
      *  and link the new scan data into the context stack
      */
-    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + res_len, "lex scan ctx" );
+    pCtx = (tScanCtx*)AGALOC( sizeof(tScanCtx) + 4 + res_len, "lex scan ctx" );
     pCtx->pCtx  = pCurCtx;
     pCurCtx     = pCtx;
 

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: functions.c,v 3.2 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: functions.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements text functions.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -111,7 +111,7 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
 mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     if ((int)pMac->res == 0)
-        LOAD_ABORT( pT, pMac, "The INCLUDE macro requires a file name" );
+        AG_ABEND_IN( pT, pMac, "The INCLUDE macro requires a file name" );
     return mLoad_Expr( pT, pMac, ppzScan );
 }
 
@@ -197,7 +197,7 @@ mFunc_Bogus( tTemplate* pT, tMacro* pMac )
     tSCC z[] = "%d (%s) is an unknown macro function, or has no handler";
     char* pz = asprintf( z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
                          ? apzFuncNames[ pMac->funcCode ] : "??" );
-    LOAD_ABORT( pT, pMac, pz );
+    AG_ABEND_IN( pT, pMac, pz );
     longjmp( fileAbort, FAILURE );
     return pMac;
 }
@@ -302,7 +302,7 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          */
         remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
         if (remLen > srcLen)
-            LOAD_ABORT( pT, pMac, "Invalid definition name" );
+            AG_ABEND_IN( pT, pMac, "Invalid definition name" );
 
         pzSrc  += srcLen - remLen;
         srcLen  = remLen;
@@ -350,23 +350,15 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     tCC* pzSrc = (const char*)pMac->ozText; /* macro text */
-    char z1[ 128 ];
-    char z2[ 64 ];
+    char z[ 64 ];
 
-    strncpy( z2, pzSrc, 63 );
-    z2[63] = NUL;
+    strncpy( z, pzSrc, 63 );
+    z[63] = NUL;
 
-    snprintf( z1, sizeof(z1), "%s function (%d) out of context",
-              apzFuncNames[ pMac->funcCode ], pMac->funcCode );
+    pzSrc = asprintf( "Unknown macro or invalid context in %s line %d:\n\t%s",
+                      pT->pzFileName, pMac->lineNo, z );
 
-    {
-        char* pz = asprintf( zTplErr, pT->pzFileName, pMac->lineNo, z1 );
-        pzSrc = AGALOC( strlen( pz ) + 65, "context error message" );
-        sprintf( pzSrc, "%s%s", pz, z2 );
-        AGFREE( pz );
-    }
-
-    LOAD_ABORT( pT, pMac, pzSrc );
+    AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */
     return (tMacro*)NULL;
 }

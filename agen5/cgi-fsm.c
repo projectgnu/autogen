@@ -160,10 +160,10 @@ int
 cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
 {
     /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-    AG_ABEND_START( "cgi_invalid_transition" );
-    fprintf( stderr, zFsmErr, st, CGI_STATE_NAME( st ),
-             evt, CGI_EVT_NAME( evt ));
-    AG_ABEND;
+    char* pz = asprintf( zFsmErr, st, CGI_STATE_NAME( st ),
+						 evt, CGI_EVT_NAME( evt ));
+	pz = asprintf( "CGI parsing error:  %s", pz );
+    AG_ABEND( pz );
     /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
 
     return EXIT_FAILURE;

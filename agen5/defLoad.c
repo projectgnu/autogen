@@ -1,12 +1,12 @@
 /*
- *  $Id: defLoad.c,v 3.4 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: defLoad.c,v 3.5 2002/01/13 08:04:33 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -41,10 +41,9 @@ compareIndex( const void* p1, const void* p2 )
     tDefEntry* pE2 = *((tDefEntry**)p2);
     int  res = pE1->index - pE2->index;
     if (res == 0) {
-        AG_ABEND_START( "duplicate definitions" );
-        fprintf( stderr, "\ttwo %s entries have index %ld\n",
+        char* pz = asprintf( "two %s definitions have index %ld\n",
                  pE1->pzDefName, pE1->index );
-        AG_ABEND;
+        AG_ABEND( pz );
     }
     return res;
 }
@@ -314,13 +313,13 @@ readDefines( void )
         char* pzLen  = getenv( "CONTENT_LENGTH" );
         char* pzMeth = getenv( "REQUEST_METHOD" );
 
+        OPT_ARG( DEFINITIONS )  = "stdin";
         if ((pzLen != NULL) && (pzMeth != NULL)) {
             loadCgi();
             parseDefinitions();
             return;
         }
 
-        OPT_ARG( DEFINITIONS )  = "stdin";
         outTime  = time( NULL );
         dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
@@ -331,18 +330,18 @@ readDefines( void )
      *  find out how big it was and when it was last modified.
      */
     else {
+        char* pz;
         struct stat stbf;
         if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0) {
-            AG_ABEND_START( "cannot open" );
-            fprintf( stderr, zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                     strerror( errno ));
-            AG_ABEND;
+            pz = asprintf( zCannot, errno, "stat",
+                           OPT_ARG( DEFINITIONS ), strerror( errno ));
+            AG_ABEND( pz );
         }
         if (! S_ISREG( stbf.st_mode )) {
-            AG_ABEND_START( "cannot open" );
-            fprintf( stderr, zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                     strerror( errno ));
-            AG_ABEND;
+            errno = EINVAL;
+            pz = asprintf( zCannot, errno, "open non-regular file",
+                           OPT_ARG( DEFINITIONS ), strerror( errno ));
+            AG_ABEND( pz );
         }
 
         /*
@@ -386,10 +385,9 @@ readDefines( void )
     fp = useStdin ? stdin
                   : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
     if (fp == (FILE*)NULL) {
-        AG_ABEND_START( "cannot open" );
-        fprintf( stderr, zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                 strerror( errno ));
-        AG_ABEND;
+        pzData = asprintf( zCannot, errno, "open",
+                           OPT_ARG( DEFINITIONS ), strerror( errno ));
+        AG_ABEND( pzData );
     }
 
     /*
@@ -409,10 +407,9 @@ readDefines( void )
             if (feof( fp ) || useStdin)
                 break;
 
-            AG_ABEND_START( "cannot read" );
-            fprintf( stderr, zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                     strerror( errno ));
-            AG_ABEND;
+            pzData = asprintf( zCannot, errno, "read",
+                               OPT_ARG( DEFINITIONS ), strerror( errno ));
+            AG_ABEND( pzData );
         }
 
         /*
@@ -457,7 +454,7 @@ readDefines( void )
     }
 
     if (pzData == pBaseCtx->pzData)
-        AG_ABEND_STR( "No definition data were read" );
+        AG_ABEND( "No definition data were read" );
 
     *pzData = NUL;
     AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ), "def file name" );

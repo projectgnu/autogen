@@ -1,12 +1,12 @@
 /*
- *  $Id: defFind.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: defFind.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -35,7 +35,7 @@ struct defEntryList {
 };
 typedef struct defEntryList tDefEntryList;
 
-tSCC zNameRef[]   = "``%s'' in %s line %d\n";
+tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
 
 tSC zDefinitionName[ MAXPATHLEN ];
 
@@ -45,10 +45,9 @@ STATIC tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 STATIC void
 illFormedName( void )
 {
-    AG_ABEND_START( "Ill-formed segmented name" );
-    fprintf( stderr, zNameRef, zDefinitionName,
-             pCurTemplate->pzFileName, pCurMacro->lineNo );
-    AG_ABEND;
+    char* pz = asprintf( stderr, zNameRef, zDefinitionName,
+                         pCurTemplate->pzFileName, pCurMacro->lineNo );
+    AG_ABEND( pz );
 }
 
 
@@ -178,7 +177,7 @@ badName( char* pzD, const char* pzS, size_t srcLen )
 {
     memcpy( (void*)pzD, (void*)pzS, srcLen );
     pzD[ srcLen ] = NUL;
-    fprintf( stderr, zNameRef, pzD,
+    fprintf( pfTrace, zNameRef, pzD,
              pCurTemplate->pzFileName, pCurMacro->lineNo );
     return srcLen + 1;
 }

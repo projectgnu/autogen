@@ -1,12 +1,12 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.3 2002/01/09 15:51:45 bkorb Exp $
+ *  $Id: autogen.c,v 3.4 2002/01/13 08:04:32 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -150,6 +150,44 @@ doneCheck( void )
     }
 
     _exit( EXIT_FAILURE );
+}
+
+
+#ifdef DEBUG
+EXTERN void
+ag_abend_at( tCC* pzMsg, tCC* pzFile, int line )
+#else
+EXTERN void
+ag_abend( tCC* pzMsg )
+#endif
+{
+    if (*pzOopsPrefix != NUL)
+        fputs( pzOopsPrefix, stderr );
+
+#ifdef DEBUG
+    fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
+#endif
+
+    if (procState >= PROC_STATE_LIB_LOAD)
+        fprintf( stderr, "Error in template %s, line %d\n\t",
+                 pCurTemplate->pzFileName, pCurMacro->lineNo );
+    fputs( pzMsg, stderr );
+    fputc( '\n', stderr );
+
+    {
+        teProcState oldState = procState;
+        procState = PROC_STATE_ABORTING;
+
+        switch (oldState) {
+        case PROC_STATE_EMITTING:
+        case PROC_STATE_INCLUDING:
+        case PROC_STATE_CLEANUP:
+            longjmp( fileAbort, FAILURE );
+            /* NOTREACHED */
+        default:
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 

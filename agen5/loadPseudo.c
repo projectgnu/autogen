@@ -1,12 +1,12 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -300,8 +300,10 @@ EXPORT tCC*
 loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";
-#   define BAD_MARKER( t ) STMTS( AG_ABEND_START( "bad template marker" ); \
-        fprintf( stderr, zTplErr, pzFileName, templLineNo, t ); AG_ABEND; )
+    tSCC zBadMark[] = "bad template marker in %s on line %d:\n\t%s";
+#   define BAD_MARKER( t ) STMTS( \
+            char* pz = asprintf( zBadMark, pzFileName, templLineNo, t ); \
+            AG_ABEND( pz ); )
 
     te_pm_state fsm_state  = PM_ST_INIT;
     ag_bool      line_start = AG_TRUE;  /* set TRUE first time only */

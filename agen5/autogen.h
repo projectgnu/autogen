@@ -1,12 +1,12 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.1 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: autogen.h,v 3.2 2002/01/13 08:04:32 bkorb Exp $
  *  Global header file for AutoGen
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -45,32 +45,7 @@ typedef enum {
     PROC_STATE_DONE        /* `exit' has been called           */
 } teProcState;
 
-#ifdef DEBUG
-#  define GIVE_UP(f,l) \
-    fprintf( stderr, zGiveUp, f, l )
-#else
-#  define GIVE_UP(f,l)
-#endif
-
 #define EXPORT
-
-#define AG_ABEND STMTS( \
-    GIVE_UP( __FILE__, __LINE__ ); \
-    if (procState < PROC_STATE_EMITTING) \
-        exit(EXIT_FAILURE); \
-    procState = PROC_STATE_ABORTING; \
-    longjmp( fileAbort, FAILURE ) )
-
-#define AG_ABEND_START(s) \
-    fprintf( stderr, zErrorPfx, pzOopsPrefix, (s) )
-
-#define AG_ABEND_STR(s)  STMTS( \
-    AG_ABEND_START( s ); AG_ABEND; )
-
-#define LOAD_ABORT( pT, pM, m ) STMTS( AG_ABEND_START( m ); \
-    if (procState >= PROC_STATE_LIB_LOAD) \
-        fprintf( stderr, zTplErr, (pT)->pzFileName, (pM)->lineNo, m ); \
-    AG_ABEND )
 
 typedef struct fpStack       tFpStack;
 typedef struct outSpec       tOutSpec;
@@ -335,17 +310,13 @@ MODE size_t      defineDataSize   VALUE( 0 );
 #define MKSTRING( name, val ) \
         MODE const char z ## name[ sizeof( val )] VALUE( val )
 
-MKSTRING( ErrorPfx,  "%sautogen ERROR:  %s\n" );
-MKSTRING( AllocWhat, "\ta %d byte %s\n" );
+MKSTRING( AllocWhat, "Could not allocate a %d byte %s\n" );
 MKSTRING( AllocErr,  "Allocation Failure" );
 MKSTRING( Cannot,    "\t%d: cannot %s %s:  %s\n" );
-MKSTRING( TplErr,    "Error in template %s, line %d\n\t%s\n" );
 MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
 MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
-#ifdef DEBUG
-MKSTRING( GiveUp,    "Giving up in %s line %d\n" );
-#endif
+MKSTRING( NotStr,    "ERROR: %s is not a string\n" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -411,12 +382,19 @@ struct mem_mgmt {
 size_t strlcpy( char* dest, const char* src, size_t n );
 #endif
 
+#ifdef DEBUG
+# define AG_ABEND(s)  ag_abend_at(s,__FILE__,__LINE__)
+#else
+# define AG_ABEND(s)  ag_abend(s)
+#endif
+#define AG_ABEND_IN(t,m,s) \
+                      STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
+
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
     if (! gh_string_p( s )) {
-        tSCC zNotStr[] = "ERROR: %s is not a string\n";
-        fprintf( stderr, zNotStr, type );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zNotStr+14 );
+        char* pz = asprintf( zNotStr, type );
+        AG_ABEND( pz );
     }
 
     if (SCM_SUBSTRP(s))

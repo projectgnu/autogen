@@ -2,13 +2,13 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.3 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: tpParse.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -30,9 +30,8 @@
 #define LOAD_FUNCTIONS
 #include "autogen.h"
 
-STATIC teFuncType whichFunc( tTemplate* pT, tMacro* pMac,
-                             const char** ppzScan );
-STATIC tCC* findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark );
+STATIC teFuncType whichFunc( tCC** ppzScan );
+STATIC tCC* findMacroEnd( tCC** ppzMark );
 
 
 /*
@@ -40,7 +39,7 @@ STATIC tCC* findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark );
  *  to a name pointed to by the input argument.
  */
 STATIC teFuncType
-whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
+whichFunc( tCC** ppzScan )
 {
     const char*   pzFuncName = *ppzScan;
     int           hi, lo, av;
@@ -106,14 +105,14 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
     /*
      *  Save the name for later lookup
      */
-    pMac->ozName = (pT->pNext - pT->pzTemplText);
+    pCurMacro->ozName = (pCurTemplate->pNext - pCurTemplate->pzTemplText);
     {
-        char* pzCopy = pT->pNext;
+        char* pzCopy = pCurTemplate->pNext;
         while (ISNAMECHAR( *pzFuncName ))
             *(pzCopy++) = *(pzFuncName++);
         *(pzCopy++) = '\0';
         *ppzScan = pzFuncName;
-        pT->pNext = pzCopy;
+        pCurTemplate->pNext = pzCopy;
     }
 
     /*
@@ -127,7 +126,7 @@ whichFunc( tTemplate* pT, tMacro* pMac, const char** ppzScan )
 
 
 STATIC tCC*
-findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
+findMacroEnd( tCC** ppzMark )
 {
     tCC* pzMark = *ppzMark + startMacLen;
     tCC* pzNextMark;
@@ -143,29 +142,30 @@ findMacroEnd( tTemplate* pT, tMacro* pM, tCC** ppzMark )
             templLineNo++;
     }
 
-    pM->funcCode = whichFunc( pT, pM, &pzMark );
-    pM->lineNo   = templLineNo;
+    pCurMacro->funcCode = whichFunc( &pzMark );
+    pCurMacro->lineNo   = templLineNo;
     *ppzMark     = pzMark;
 
     pzEndMark = strstr( pzMark, zEndMac );
 	if (pzEndMark == (char*)NULL)
-		LOAD_ABORT( pT, pM, "macro has no end" );
+		AG_ABEND( "macro has no end" );
 
 	pzNextMark = strstr( pzMark, zStartMac );
 	if (pzNextMark == NULL)
 		return pzEndMark;
 
 	if (pzEndMark > pzNextMark)
-		LOAD_ABORT( pT, pM, "macros cannot nest" );
+		AG_ABEND( "macros cannot nest" );
 
 	return pzEndMark;
 }
 
 
 EXPORT tMacro*
-parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
+parseTemplate( tMacro* pM, tCC** ppzText )
 {
     tCC* pzScan = *ppzText;
+    tTemplate* pT = pCurTemplate;
 
 #if defined( DEBUG )
     tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
@@ -233,7 +233,8 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
         /*
          *  Find the macro code and the end of the macro invocation
          */
-        pzScan = findMacroEnd( pT, pM, &pzMark );
+        pCurMacro = pM;
+        pzScan = findMacroEnd( &pzMark );
 
         /*
          *  Count the lines in the macro text and advance the

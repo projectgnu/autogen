@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcCase.c,v 3.2 2001/12/24 14:13:33 bkorb Exp $
+ *  $Id: funcCase.c,v 3.3 2002/01/13 08:04:33 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -82,7 +82,7 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
         char zEr[ 128 ];
         regerror( rerr, pRe, zEr, sizeof( zEr ));
         fprintf( stderr, zBadRe, rerr, zEr, pzPat );
-        LOAD_ABORT( pCurTemplate, pCurMacro, "Bad regular expression" );
+        AG_ABEND( "Bad regular expression" );
     }
 }
 
@@ -1024,7 +1024,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "expressionless CASE" );
+        AG_ABEND_IN( pT, pMac, "expressionless CASE" );
 
     /*
      *  Load the expression
@@ -1071,9 +1071,9 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     /*
      *  Continue parsing the template from this nested level
      */
-    pEsacMac = parseTemplate( pT, pMac+1, ppzScan );
+    pEsacMac = parseTemplate( pMac+1, ppzScan );
     if (*ppzScan == (char*)NULL)
-        LOAD_ABORT( pT, pMac, "ESAC not found" );
+        AG_ABEND_IN( pT, pMac, "ESAC not found" );
 
     /*
      *  Tell the last select macro where its end is.
@@ -1135,7 +1135,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     papLoadProc = apCaseLoad;
     pMac->res   = 0;
     if (srcLen == 0)
-        LOAD_ABORT( pT, pMac, "Empty macro text" );
+        AG_ABEND_IN( pT, pMac, "Empty macro text" );
 
     /*
      *  IF the first character is an asterisk,
@@ -1180,7 +1180,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         break;
 
     default:
-        LOAD_ABORT( pT, pMac, zInvSel );
+        AG_ABEND_IN( pT, pMac, zInvSel );
     }
 
     /*
@@ -1194,12 +1194,12 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     }
 
     if (! isspace( *pzSrc ))
-        LOAD_ABORT( pT, pMac, zInvSel );
+        AG_ABEND_IN( pT, pMac, zInvSel );
 
     while (isspace(*pzSrc)) pzSrc++;
     srcLen -= pzSrc - (const char*)pMac->ozText;
     if (srcLen <= 0)
-        LOAD_ABORT( pT, pMac, zInvSel );
+        AG_ABEND_IN( pT, pMac, zInvSel );
 
     /*
      *  See if we are doing case insensitive regular expressions

@@ -1,12 +1,12 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.1 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: expFormat.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -147,7 +147,7 @@ ag_scm_dne( SCM prefix, SCM first )
     tCC*     pzPrefix = ag_scm2zchars( prefix, "prefix" );
     if (strlen( pzPrefix ) > 128 ) {
         fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+        AG_ABEND( zPfxLen );
     }
 
     /*
@@ -158,7 +158,7 @@ ag_scm_dne( SCM prefix, SCM first )
         int len = SCM_LENGTH( first );
         if (len >= 128) {
             fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-            LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+            AG_ABEND( zPfxLen );
         }
 
         pzFirst = asprintf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
@@ -177,7 +177,7 @@ ag_scm_dne( SCM prefix, SCM first )
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzProg, -1, "Do-Not-Edit string" );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        AG_ABEND( zFmtAlloc );
     }
 
     res = gh_str02scm( pzRes );
@@ -284,7 +284,7 @@ ag_scm_error( SCM res )
                              pCurTemplate->pzFileName, pCurMacro->lineNo,
                              pCurFp->pzOutName, pzMsg );
         if (abort != PROBLEM)
-            AG_ABEND_STR( pz );
+            AG_ABEND( pz );
         fputs( pz, pfTrace );
     }
 
@@ -327,12 +327,12 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      */
     if (SCM_LENGTH( prog_name ) >= 256) {
         fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zProgLen );
+        AG_ABEND( zProgLen );
     }
 
     if (SCM_LENGTH( prefix ) >= 128) {
         fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+        AG_ABEND( zPfxLen );
     }
 
     /*
@@ -342,7 +342,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzPrg, -1, "GPL string" );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        AG_ABEND( zFmtAlloc );
     }
 
     res = gh_str02scm( pzRes );
@@ -383,17 +383,17 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
      */
     if (SCM_LENGTH( prog_name ) >= 256) {
         fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zProgLen );
+        AG_ABEND( zProgLen );
     }
 
     if (SCM_LENGTH( prefix ) >= 128) {
         fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+        AG_ABEND( zPfxLen );
     }
 
     if (SCM_LENGTH( owner ) >= 256) {
         fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zOwnLen );
+        AG_ABEND( zOwnLen );
     }
 
     /*
@@ -403,7 +403,7 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzPrg, -1, "LGPL string" );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        AG_ABEND( zFmtAlloc );
     }
 
     res = gh_str02scm( pzRes );
@@ -452,17 +452,17 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
      */
     if (SCM_LENGTH( prog_name ) >= 256) {
         fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zProgLen );
+        AG_ABEND( zProgLen );
     }
 
     if (SCM_LENGTH( prefix ) >= 128) {
         fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+        AG_ABEND( zPfxLen );
     }
 
     if (SCM_LENGTH( owner ) >= 256) {
         fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zOwnLen );
+        AG_ABEND( zOwnLen );
     }
 
     /*
@@ -472,7 +472,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzPrg, -1, "BSD string" );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        AG_ABEND( zFmtAlloc );
     }
 
     res = gh_str02scm( pzRes );
@@ -554,15 +554,15 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      */
     if (SCM_LENGTH( prog_name ) >= 256) {
         fprintf( stderr, zPfxMsg, zProgLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zProgLen );
+        AG_ABEND( zProgLen );
     }
     if (SCM_LENGTH( prefix ) >= 128) {
         fprintf( stderr, zPfxMsg, zPfxLen, 128 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zPfxLen );
+        AG_ABEND( zPfxLen );
     }
     if (SCM_LENGTH( owner ) >= 256) {
         fprintf( stderr, zPfxMsg, zOwnLen, 256 );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zOwnLen );
+        AG_ABEND( zOwnLen );
     }
 
     /*
@@ -571,7 +571,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
     pzRes = asprintf( (char*)mi.pData, pzPrg, pzOwner );
     if (pzRes == (char*)NULL) {
         fprintf( stderr, zAllocErr, pzPrg, -1, "license string" );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        AG_ABEND( zFmtAlloc );
     }
 
     {

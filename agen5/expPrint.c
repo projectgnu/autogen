@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.3 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: expPrint.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -10,7 +10,7 @@
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -91,13 +91,13 @@ safePrintf( char* pzBuf, size_t bufSize, char* pzFmt, void** argV )
         /*
          *  The "sprintfv" command below faulted, so we exit
          */
-        LOAD_ABORT( pCurTemplate, pCurMacro, zBadArgs );
+        AG_ABEND( zBadArgs );
     }
 
     printSize = snprintfv( pzBuf, bufSize, pzFmt, (void*)argV );
     if ((printSize & 0xF0000000) != 0) {
         fprintf( stderr, "snprintf returned 0x%08X\n", printSize );
-        LOAD_ABORT( pCurTemplate, pCurMacro, zBadArgs );
+        AG_ABEND( zBadArgs );
     }
 
     sigaction( SIGBUS,  &saSave1, (struct sigaction*)NULL );

@@ -1,13 +1,13 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.3 2002/01/12 05:10:01 bkorb Exp $
+ *  $Id: expString.c,v 3.4 2002/01/13 08:04:33 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -647,7 +647,7 @@ ag_scm_prefix( SCM prefix, SCM text )
         switch (ch) {
         case NUL:
             if (out_size != 0)
-                LOAD_ABORT( pCurTemplate, pCurMacro, "(prefix ...) failed" );
+                AG_ABEND( "(prefix ...) failed" );
 
             return res;
 
@@ -721,7 +721,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
 
 #ifdef DEBUG
     if (len < 0)
-        AG_ABEND_STR( "invalid alist to shellf" );
+        AG_ABEND( "invalid alist to shellf" );
 #endif
 
     pz  = ag_scm2zchars( fmt, "format" );

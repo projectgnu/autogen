@@ -1,11 +1,11 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.2 2001/12/24 14:13:32 bkorb Exp $
+ *  $Id: agShell.c,v 3.3 2002/01/13 08:04:32 bkorb Exp $
  *  Manage a server shell process
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -313,10 +313,11 @@ chainOpen( int       stdinFd,
         fprintf( stderr, "Server shell %s starts\n", pzShell );
 #endif
     execvp( (char*)pzShell, (char**)ppArgs );
-    AG_ABEND_START( "Could not execvp" );
-    fprintf( stderr, "\t( '%s', ... ):  %d - %s\n",
-             pzShell, errno, strerror( errno ));
-    AG_ABEND;
+    {
+        char* pz = asprintf( "Could not execvp( '%s', ... ):  %d - %s\n",
+                             pzShell, errno, strerror( errno ));
+        AG_ABEND( pz );
+    }
 }
 
 
@@ -439,9 +440,8 @@ loadData( FILE* fp )
             p = AGREALOC( (void*)pzText, textSize, NULL );
             if (p == (void*)NULL) {
                 tSCC zRTB[] = "Realloc Text Block";
-                AG_ABEND_START( zAllocErr );
-                fprintf( stderr, zAllocWhat, textSize, zRTB );
-                LOAD_ABORT( pCurTemplate, pCurMacro, zRTB );
+                pzScan = asprintf( zAllocWhat, textSize, zRTB );
+                AG_ABEND( pzScan );
             }
 
             pzText   = (char*)p;

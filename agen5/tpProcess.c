@@ -1,12 +1,12 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.4 2002/01/03 17:08:22 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.5 2002/01/13 08:04:33 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
 /*
- *  AutoGen copyright 1992-2001 Bruce Korb
+ *  AutoGen copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -346,7 +346,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
     openError:
         fprintf( stderr, zCannot, pzProg, errno,
                  "create", pStk->pzOutName, strerror( errno ));
-        LOAD_ABORT( pCurTemplate, pCurMacro, "file creation error" );
+        AG_ABEND( "file creation error" );
     }
 }
 /*
