@@ -9,12 +9,12 @@
 # Last Modified:     Mon Jun 21 11:14:25 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.14 1999/07/07 16:01:15 bkorb Exp $
+# $Id: bootstrap,v 1.15 1999/07/07 16:04:20 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
 
-chmod +x config/genproto
+chmod +x snprintfv/config/genproto
 
 # Figure out the absolute path to the working directory.
 wd=`echo $0|sed 's,/[^/]*$,,'`
