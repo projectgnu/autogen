@@ -1,6 +1,6 @@
 (-: AutoGen5 template 
 
-# $Id: strsignal.tpl,v 2.4 1999/10/28 02:24:53 bruce Exp $
+# $Id: strsignal.tpl,v 2.5 1999/10/28 02:26:08 bruce Exp $
 
 h :-)
 /*
@@ -15,10 +15,11 @@ h :-)
 (-:
 FOR signal (for-from 0) (for-by 1) :-)(-:
   IF (exist? "signame") :-)
-static char zSig_(-: % signame (sprintf "%%-13s" "%s[]"):-) =
-"SIG(-:signame:-)";(-:
+static char zSig_(-: % signame (sprintf "%%-13s" "%s[]")
+                 :-) = "SIG(-:signame:-)";(-:
   (out-push-add ".sig.liststr") :-)
-static char zInf_(-: % signame (sprintf "%%-13s" "%s[]"):-) = "(-:sigtext:-)";(-:
+static char zInf_(-: % signame (sprintf "%%-13s" "%s[]")
+                 :-) = "(-:sigtext:-)";(-:
   (out-pop) :-)(-:
   ELSE  :-)
 static char zBad_(-: (sprintf "%-13s" (sprintf "%d[]" (for-index)))
@@ -38,8 +39,8 @@ static char zBad_(-: (sprintf "%-13s" (sprintf "%d[]" (for-index)))
   (out-pop) :-)(-:
 
 ENDFOR signal:-)
-(-:`cat .sig.liststr ; rm -f .sig.liststr`:-)
 #ifndef HAVE_SYS_SIGLIST
+(-:`cat .sig.liststr ; rm -f .sig.liststr`:-)
 
 static char* sys_siglist[] = {
 (-:`columns -I4 -S, -i .sig.list ; rm -f .sig.list` :-) };
