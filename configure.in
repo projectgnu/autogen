@@ -8,10 +8,10 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2002/03/21 04:20:19 $
+dnl Last Modified:    $Date: 2002/04/08 01:46:41 $
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.5 2002/03/21 04:20:19 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.6 2002/04/08 01:46:41 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.5 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.6 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -150,7 +150,6 @@ AC_CHECK_FUNCS(snprintf)
 # ----------------------------------------------------------------------
 # Do all our own macros
 # ----------------------------------------------------------------------
-AG_PROG_BYACC
 INVOKE_AG_MACROS
 
 if ! test x$ag_cv_sys_siglist = xyes
