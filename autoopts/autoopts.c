@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.2 1998/09/21 21:37:13 bkorb Exp $
+ *  $Id: autoopts.c,v 2.3 1998/09/22 23:34:44 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.2 1998/09/21 21:37:13 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.3 1998/09/22 23:34:44 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -105,7 +105,7 @@ loadValue( tOptions* pOpts, tOptDesc* pOD )
      *  Save a copy of the option procedure pointer.
      *  If this is an equivalence class option, we still want this proc.
      */
-    tOptProc*  pOP    = pOD->pOptProc;
+    tOptProc* pOP = pOD->pOptProc;
 
     /*
      *  IF this is an equivalence class option,
@@ -432,12 +432,13 @@ loadOptionLine( tOptions*  pOpts, u_long optFlag, char* pzLine )
 
     /*
      *  IF    we can find the option
-     *    AND the option has not been set from the command line
-     * ...
+     *    AND the option set limit has not been reached,
+     *  THEN ...
      */
     {
         tOptDesc*  pOD = longOptionFind( pOpts, pzLine, &optFlag );
-        if ((pOD != (tOptDesc*)NULL) && ((pOD->fOptState & OPTST_SET) == 0)) {
+        if (  (pOD != (tOptDesc*)NULL)
+           && (pOD->optOccCt < pOD->optMaxCt) ) {
             /*
              *  Clear out the SET_MASK bits.  "optFlag" contains these
              *  bits.  However, "fOptState" contains the equivalence/
