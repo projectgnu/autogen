@@ -3,49 +3,17 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2004-08-14 16:04:21 bkorb"
+ *  Time-stamp:      "2004-08-15 05:08:41 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.9 2004/08/15 00:52:47 bkorb Exp $
+ * $Id: compat.h,v 3.10 2004/08/15 12:23:50 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
 
 #include <config.h>
-
-#ifndef HAVE_SYS_TYPES_H
-#  error NEED <sys/types.h>
-#endif
-
-#ifndef HAVE_SYS_STAT_H
-#  error NEED <sys/stat.h>
-#endif
-
-#ifndef HAVE_STRING_H
-#  error NEED <string.h>
-#endif
-
-#ifndef HAVE_ERRNO_H
-#  error NEED <errno.h>
-#endif
-
-#ifndef HAVE_STDLIB_H
-#  error NEED <stdlib.h>
-#endif
-
-#ifndef HAVE_MEMORY_H
-#  error NEED <memory.h>
-#endif
-
-#if (! defined(HAVE_LIMITS_H)) && (! defined(HAVE_SYS_LIMITS_H))
-#  error NEED <limits.h> *OR* <sys/limits.h>
-#endif
-
-#ifndef HAVE_SETJMP_H
-#  error NEED <setjmp.h>
-#endif
 
 #ifndef HAVE_STRSIGNAL
    char * strsignal( int signo );
@@ -73,11 +41,34 @@
 #  include <sys/utsname.h>
 #endif
 
-#include <sys/stropts.h>
-#include <sys/poll.h>
+#ifdef DAEMON_ENABLED
+#  if HAVE_SYS_STROPTS_H
+#  include <sys/stropts.h>
+#  endif
 
-#if HAVE_SYS_SELECT_H
-#include <sys/select.h>
+#  if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#  endif
+
+#  if ! defined(HAVE_SYS_POLL_H) && ! defined(HAVE_SYS_SELECT_H)
+#    error This system cannot support daemon processing
+#  endif
+
+#  if HAVE_SYS_POLL_H
+#  include <sys/poll.h>
+#  endif
+
+#  if HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+#  endif
+
+#  if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#  endif
+
+#  if HAVE_SYS_UN_H
+#  include <sys/un.h>
+#  endif
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
