@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.19 2000/10/21 23:12:44 bkorb Exp $
+# $Id: optlib.tpl,v 1.20 2000/10/21 23:27:35 bkorb Exp $
 
 =]
 [=
@@ -99,7 +99,8 @@ DEFINE Option_Defines =][=
 
   IF (=* (get "arg_type") "key") =]
 typedef enum {[=
-         IF (not (exist? "arg_default")) =] [=(. UP-name)=]_UNDEFINED = 0,[=
+         IF (not (exist? "arg_default")) =] [=
+            (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
          ENDIF  =]
 [=(shellf "for f in %s ; do echo %s_${f} ; done | \
           columns -I4 --spread=3 --sep=','"
@@ -256,9 +257,10 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* key                   =]
 #define z[=(sprintf "%-28s" (string-append cap-name "DefaultArg" ))
          =]((tCC*)[=
-          IF (=* (get "arg_default") cap-name)
+          IF (=* (get "arg_default") (string-append Cap-prefix cap-name))
             =][= arg_default    =][=
-          ELSE  =][=(. UP-name)=]_[=(string-upcase! (get "arg_default"))=][=
+          ELSE  =][=(string-append UP-prefix UP-name)=]_[=
+                    (string-upcase! (get "arg_default"))=][=
           ENDIF =])[=
 
        =* str                   =]
