@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/04/14 20:48:23 $
+## Last Modified:   $Date: 2002/04/20 18:37:56 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/04/14 20:48:23 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/04/20 18:37:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -69,7 +69,7 @@ pathfind.lo : $(top_srcdir)/compat/pathfind.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/pathfind.c
 
 ../snprintfv/snprintfv.h :
-	if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
+	if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
 	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
 
 ../snprintfv/snprintfv/libsnprintfvc.la :
