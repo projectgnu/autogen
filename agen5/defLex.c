@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 1.11 2000/03/21 03:05:22 bruce Exp $
+ *  $Id: defLex.c,v 1.12 2000/04/04 16:44:12 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -522,19 +522,21 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
             zNameChars[ (unsigned)'_' ] = 1;
 
             /*
-             *  Now disallow entirely characters we use as tokens
+             *  Now disallow entirely characters we use specially
              */
+            zNameChars[ (unsigned)'"' ] = 0;
             zNameChars[ (unsigned)'#' ] = 0;
+            zNameChars[ (unsigned)'\''] = 0;
+            zNameChars[ (unsigned)'(' ] = 0;
+            zNameChars[ (unsigned)')' ] = 0;
+            zNameChars[ (unsigned)',' ] = 0;
+            zNameChars[ (unsigned)';' ] = 0;
             zNameChars[ (unsigned)'=' ] = 0;
-            zNameChars[ (unsigned)'{' ] = 0;
-            zNameChars[ (unsigned)'}' ] = 0;
             zNameChars[ (unsigned)'[' ] = 0;
             zNameChars[ (unsigned)']' ] = 0;
-            zNameChars[ (unsigned)';' ] = 0;
-            zNameChars[ (unsigned)',' ] = 0;
-            zNameChars[ (unsigned)'"' ] = 0;
             zNameChars[ (unsigned)'`' ] = 0;
-            zNameChars[ (unsigned)'\'' ] = 0;
+            zNameChars[ (unsigned)'{' ] = 0;
+            zNameChars[ (unsigned)'}' ] = 0;
         }
 
         /*

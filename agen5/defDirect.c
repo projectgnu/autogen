@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.6 2000/03/16 02:25:42 bruce Exp $
+ *  $Id: defDirect.c,v 1.7 2000/04/04 16:44:12 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -408,8 +408,9 @@ doDir_define( char* pzArg, char* pzScan )
 /*=directive elif
  *
  *  text:
- *  This must follow an @code{#if}.
- *  It should never be called.
+ *  This must follow an @code{#if}
+ *  otherwise it will generate an error.
+ *  It will be ignored.
 =*/
     STATIC char*
 doDir_elif( char* pzArg, char* pzScan )
@@ -422,8 +423,9 @@ doDir_elif( char* pzArg, char* pzScan )
 /*=directive else
  *
  *  text:
- *  This must follow an @code{#ifdef} or @code{#ifndef}.
- *  It will change the processing state to the reverse of what it was.
+ *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
+ *  If it follows the @code{#if}, then it will be ignored.  Othewise,
+ *  it will change the processing state to the reverse of what it was.
 =*/
     STATIC char*
 doDir_else( char* pzArg, char* pzScan )
@@ -440,8 +442,8 @@ doDir_else( char* pzArg, char* pzScan )
 /*=directive endif
  *
  *  text:
- *  This must follow an @code{#ifdef} or @code{#ifndef}.
- *  This will resume normal processing of text.
+ *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
+ *  In all cases, this will resume normal processing of text.
 =*/
     STATIC char*
 doDir_endif( char* pzArg, char* pzScan )

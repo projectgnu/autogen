@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.20 2000/04/04 13:21:41 bkorb Exp $
+ *   $Id: opts.def,v 1.21 2000/04/04 16:44:12 bkorb Exp $
  */
 
 /*
@@ -57,15 +57,16 @@ explain =
 
 detail =
 
-"The definitions file (`<def-file>') can be specified with the `definitions'
-option or as the command argument, but not both.  Omitting it or specifying `-'
-will result in reading definitions from standard input.
+"The definitions file (`<def-file>') can be specified with the
+`definitions' option or as the command argument, but not both.
+Omitting it or specifying `-' will result in reading definitions from
+standard input.
 
-The output file names are based on the template, but generally use the base
-name of the definition file.  If standard in is read for the definitions, then
-`stdin' will be used for that base name.  The suffixes to the base name are
-gotten from the template.  However, the template file may specify the entire
-output file.
+The output file names are based on the template, but generally use the
+base name of the definition file.  If standard in is read for the
+definitions, then `stdin' will be used for that base name.  The
+suffixes to the base name are gotten from the template.  However, the
+template file may specify the entire output file.
 
 `loop-limit' is used in debugging to stop runaway expansions.";
 
@@ -389,8 +390,8 @@ flag = {
     settable;
     doc =
     "Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing\n"
-    "directives.  This option will cause the name to be removed from the\n"
-    "list of defined values.";
+    "directives.  This option will cause the matching names to be\n"
+    "removed from the list of defined values.";
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -438,9 +439,5 @@ specified in \fIopts.def\fP (normally \fIoptions.tpl\fP)
 and uses \fIman.tpl\fP.  It also overrides the \fBbase-name\fP of
 the output file, which is normally derived from the input
 definition file name (viz. \fIopts\fP).';
-
-prog_info_descrip =
-'This chapter documents the @code{AutoOpts} generated usage text and
-option meanings for the @code{AutoGen} program.';
 
 /* end of opts.def */

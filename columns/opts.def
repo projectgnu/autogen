@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.21 2000/04/04 13:22:19 bkorb Exp $
+ *   $Id: opts.def,v 1.22 2000/04/04 16:44:12 bkorb Exp $
  */
 
 /*
@@ -259,7 +259,7 @@ See the formatting and separation arguments below.
 This program is used by AutoGen to help clean up and organize
 its output.
 
-See @file{autogen/src/agfunc.tpl}.
+See @file{autogen/agen5/functions.tpl}.
 
 This function was not implemented as an expression function because
 either it would have to be many expression functions, or a provision

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.19 2000/04/04 13:23:32 bkorb Exp $
+ *   $Id: opts.def,v 2.20 2000/04/04 16:44:12 bkorb Exp $
  */
 
 /*
@@ -267,16 +267,17 @@ flag = {
 
 detail =
 "This program extracts AutoGen definitions from a list of source files.
-Definitions are delimited by `/*=<entry-type> <entry-name>\\n' and `=*/\\n'.
-From that, this program creates a definition of the following form:\n
+Definitions are delimited by `/*=<entry-type> <entry-name>\\n' and
+`=*/\\n'.  From that, this program creates a definition of the
+following form:\n
     #line nnn \"source-file-name\"
     entry_type = {
         name = entry_name;
         ...
     };\n
-The ellipsis '...' is filled in by text found between the two delimiters,
-with everything up through the first sequence of asterisks deleted
-on every line.";
+The ellipsis '...' is filled in by text found between the two
+delimiters, with everything up through the first sequence of
+asterisks deleted on every line.";
 
 
 /* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */

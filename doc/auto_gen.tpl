@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.53 2000/04/04 13:23:05 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.54 2000/04/04 16:44:12 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -585,11 +585,12 @@ A definition utilizing a backquote may not be joined with any other text.
 
 @item without surrounding quotes
 The string must not contain any of the characters special to the
-definition text.  E.g. @code{;}, @code{"}, @code{'}, @code{`}, @code{=},
-@code{@{}, @code{@}}, @code{[}, @code{]}, @code{#} or any
-white space character.  Basically, if the string looks like it is a
-normal file name or variable name, and it is not one of two keywords
-(@samp{autogen} or @samp{definitions}) then it is OK to not quote it.
+definition text (e.g. @code{"}, @code{#}, @code{'}, @code{(}, @code{)},
+@code{,}, @code{;}, @code{=}, @code{[}, @code{]}, @code{`}, @code{@{},
+@code{@}} or any white space character).  Basically, if the string looks
+like it is a normal file name or variable name, and it is not one of two
+keywords (@samp{autogen} or @samp{definitions}) then it is OK to not
+quote it, otherwise you should.
 
 @item a Scheme expression starting with an open parenthesis @code{(}
 The scheme expression will be evaluated by Guile and the
@@ -1160,7 +1161,7 @@ The general syntax is:
 @end example
 
 @noindent
-The syntax for @code{<argument>} depends on the particular macro,
+The syntax for @code{<arg>} depends on the particular macro,
 but is generally a full expression (@xref{expression syntax}).
 Here are the exceptions to that general rule:
 
@@ -1297,21 +1298,26 @@ The installed files are:
 The executables in @file{bin} (autogen, getdefs and columns).
 
 @item
-The link library(ies) as @file{lib/libopts.*}.
+The AutoOpts link libraries as @file{lib/libopts.*}.
 
 @item
 An include file in @file{include/options.h}, needed for
 Automated Option Processing (see next chapter).
 
 @item
-Six template files in @file{share/autogen}, needed for
-Automated Option Processing (@xref{AutoOpts}.) and for documenting
-your program.  (@xref{documentation attributes}.)
+Seven template files and a scheme script in @file{share/autogen}, needed
+for Automated Option Processing (@xref{AutoOpts}.), parsing definitions
+written with scheme syntax (@xref{Dynamic Text}.), and the templates for
+producing documentation for your program
+(@xref{documentation attributes}.).
 
 @item
 Info-style help files as @file{info/autogen.info*}.
 These files document AutoGen, the option processing
 library AutoOpts, and several add-on components.
+
+@item
+The three man pages for the three executables are installed in man/man1.
 @end enumerate
 
 This program, library and supporting files can be installed
