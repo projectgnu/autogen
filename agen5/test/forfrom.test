@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: forfrom.test,v 1.3 2000/03/04 23:54:23 bruce Exp $
+# $Id: forfrom.test,v 1.4 2000/03/05 00:03:39 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -50,7 +50,7 @@ list[7] = { elt = seven; };
 list[9] = { elt = nine; };
 EOF
 
-# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # # # #
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 
 echo creating $testname.out
 # this is the output we should expect to see
@@ -60,7 +60,8 @@ list[4] = EMPTY,
 list[7] = this is "seven"
 _EOF_
 
-$AGEN $testname.def || failure could not run AutoGen
+$AGEN $testname.def || failure $AGEN failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
+cleanup
 # end of forfrom.test
