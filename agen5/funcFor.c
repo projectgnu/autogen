@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.7 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: funcFor.c,v 1.8 1999/11/02 05:27:22 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -412,7 +412,7 @@ doForEach( tTemplate*   pT,
  *  emitting default text.  In this fashion, you can insert entries
  *  from a sparse or non-zero based array into a dense, zero based array.
  *
- *  @string{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
+ *  @bold{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
  *  @code{for-sep} functions are disabled outside of the context of the
  *  @code{FOR} macro.  Likewise, the @code{first-for}, @code{last-for}
  *  and @code{for-index} functions are disabled outside of the range
