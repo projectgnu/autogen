@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.9 2000/02/27 23:51:44 bruce Exp $
+ *  $Id: functions.c,v 1.10 2000/02/28 06:54:23 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -202,6 +202,76 @@ MAKE_LOAD_PROC( Comment )
 
 
 /*
+ *  Append a subscript to a value name
+ */
+    static size_t
+insertSubscript( tMacro* pMac, tTemplate* pT )
+{
+    char*          pzDest = pT->pzTemplText + pMac->ozName;
+    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
+    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
+
+    char  ch;
+
+    pzDest += strlen( pzDest );  /* destination goes back to end of name */
+
+    /*
+     *  Copy the opening bracket
+     */
+    --srcLen;
+    *(pzDest++) = *(pzSrc++);
+
+    for (;;) {
+        ch = *(pzSrc++);
+
+        if (--srcLen < 0)
+            LOAD_ABORT( pT, pMac, "Unterminated subscript" );
+
+        /*
+         *  Insert alphanumerics.  They will be interpreted
+         *  by the "findEntry" stuff
+         */
+        if (isalnum( ch ) || (ch == '_'))
+            *(pzDest++) = ch;
+
+        /*
+         *  Ignore spaces.  Yes, this glues name tokens together.
+         */
+        else if (isspace( ch ))
+            ;
+
+        /*
+         *  The close brace ends the subscripting
+         */
+        else if (ch == ']') {
+            *(pzDest++) = ch;
+            break;
+        }
+
+        else /*
+              *  Anything else is in error
+              */
+            LOAD_ABORT( pT, pMac, "invalid subscript" );
+    }
+
+    *(pzDest++) = NUL;
+
+    /*
+     *  Skip over trailing spaces.  If there is anything
+     *  left, then is is the expression that needs copying.
+     */
+    while (isspace( *pzSrc ))  ++pzSrc, --srcLen;
+
+    /*
+     *  The expression text starts after the extended name...
+     */
+    pMac->ozText = (off_t)pzSrc;
+    pT->pNext    = pzDest;
+    return srcLen;
+}
+
+
+/*
  *  mLoad_Unknown  --  the default (unknown) load function
  *
  *  Move any text into the text offset field.
@@ -209,46 +279,61 @@ MAKE_LOAD_PROC( Comment )
  */
 MAKE_LOAD_PROC( Unknown )
 {
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
+    char*          pzCopy;
+    const char*    pzSrc;
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
-    if (srcLen > 0) {
-        pMac->res    = 0;
-        pMac->ozText = (pzCopy - pT->pzTemplText);
+    if (srcLen <= 0)
+        goto return_emtpy_expression;
 
+    pzSrc = (const char*)pMac->ozText; /* macro text */
+
+    switch (*pzSrc) {
+    case ';':
         /*
          *  Strip off scheme comments
          */
-        while (*pzSrc == ';') {
-            while (*pzSrc != '\n') {
-                if (--srcLen <= 0) {
-                    pMac->ozText = 0;
-                    return pMac + 1;
-                }
-                pzSrc++;
-            }
-            --srcLen;
-            while (isspace( *++pzSrc )) {
-                if (--srcLen <= 0) {
-                    pMac->ozText = 0;
-                    return pMac + 1;
-                }
-            }
-        }
-
-        /*
-         *  Copy the expression
-         */
         do  {
-            *(pzCopy++) = *(pzSrc++);
-        } while (--srcLen > 0);
-        *(pzCopy++) = '\0';
-        *(pzCopy++) = '\0'; /* double terminate */
+            while (--srcLen, (*++pzSrc != '\n')) {
+                if (srcLen <= 0)
+                    goto return_emtpy_expression;
+            }
 
-        pT->pNext = pzCopy;
+            while (--srcLen, isspace( *++pzSrc )) {
+                if (srcLen <= 0)
+                    goto return_emtpy_expression;
+            }
+        } while (*pzSrc == ';');
+        break;
+
+    case '[':
+        srcLen = insertSubscript( pMac, pT );
+        if (srcLen <= 0)
+            goto return_emtpy_expression;
+        pzSrc = (const char*)pMac->ozText;
+        break;
     }
 
+    /*
+     *  Copy the expression
+     */
+    pzCopy = pT->pNext; /* next text dest   */
+    pMac->ozText = (pzCopy - pT->pzTemplText);
+    pMac->res    = 0;
+
+    do  {
+        *(pzCopy++) = *(pzSrc++);
+    } while (--srcLen > 0);
+    *(pzCopy++) = '\0';
+    *(pzCopy++) = '\0'; /* double terminate */
+
+    pT->pNext = pzCopy;
+
+    return pMac + 1;
+
+ return_emtpy_expression:
+    pMac->ozText = 0;
+    pMac->res    = 0;
     return pMac + 1;
 }
 
