@@ -28,7 +28,49 @@ Usage Instructions for autoconf/automake/libtoolized projects:
    If it is not empty, it will automatically get distributed, so
    ''@LIBOPTS_DIST@'' will be left empty.
 
-See how simple?  :-)
+See how simple?  :-)  There's even another gotcha.  :-(
+
+From http://mail.gnu.org/pipermail/automake/2002-August/011704.html
+
+> It turns out I want to distribute the source for a library that may or
+> may not get built.  Consequently, though I configure the Makefile when
+> building the distribution, I likely won't actually build the thing.
+> That has the following consequences for "make distcheck" (again):
+> 
+> 1.  The library, a .deps subdirectory and some dependency files
+>     get dropped into the distribution.  This happens because
+>     that directory must be specified in the EXTRA_DIST variable
+>     when it is not in the SUBDIRS variable.
+> 
+> 2.  During distcheck, the tarball is unrolled and all the files
+>     and directories are made read-only.
+> 
+> 3.  Next, distcheck configures the thing, re-creating many of
+>     these .deps files
+> 
+> 4.  When distcheck starts to construct the new tarball, it copies
+>     the source directory, preserving permissions, then it copies
+>     built files over the source directory files.  Except it can't.
+>     It dies.
+
+Here's the required patch to automake's distdir.am file
+found in ${prefix}/share/automake-*/am/distdir.am:
+
+--- distdir.am  Sun Jul 21 21:31:06 2002
++++ distdir.am.new      Mon Aug 19 20:14:41 2002
+@@ -98,10 +98,11 @@
+ ## source files _and_ generated files.  It is also important when the
+ ## directory exists only in $(srcdir), because some vendor Make (such
+ ## as Tru64) will magically create an empty directory in `.'
++## DO NOT FORGET that there may be duplicates in the source and build :-(
+            if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
+              cp -pR $(srcdir)/$$file $(distdir)$$dir || exit 1; \
+            fi; \
+-           cp -pR $$d/$$file $(distdir)$$dir || exit 1; \
++           cp -pR $$d/$$file $(distdir)$$dir || :; \
+          else \
+ ## Test for file existence because sometimes a file gets included in
+ ## DISTFILES twice.  For example this happens when a single source
 
 If your package does not utilize the auto* tools, then you
 will need to hand craft the rules for building the library.
