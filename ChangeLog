@@ -1,3 +1,10 @@
+2002-10-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(autogen_LDFLAGS): add guile flags
+	(autogen_CFLAGS): new -- add guile flags
+	* config/misc.def(guile): save flags in GUILE_CPPFLAGS and LDFLAGS
+	* doc/Makefile.am(xml2ag.menu): correctly detect when xml2ag is absent
+
 2002-09-30  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(AGDUPSTR): make sure to call this where needed!

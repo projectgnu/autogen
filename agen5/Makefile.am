@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-09-28 13:22:20 bkorb"
+## Time-stamp:      "2002-10-06 19:59:20 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2002/09/29 00:16:20 bkorb Exp $
+## $Id: Makefile.am,v 3.16 2002/10/07 03:09:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -49,8 +49,8 @@ autogen_SOURCES = $(GEN_CSRC) \
   tpParse.c     tpProcess.c
 
 autogen_LDADD	= $(top_builddir)/autoopts/libopts.la
-autogen_LDFLAGS = @DYNAMIC_AG@
-
+autogen_LDFLAGS = $(DYNAMIC_AG) $(GUILE_LDFLAGS)
+autogen_CFLAGS  = $(GUILE_CPPFLAGS)
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
 EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \

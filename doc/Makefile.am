@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.12 2002/08/19 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 3.13 2002/10/07 03:09:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -110,12 +110,12 @@ autogen.def : $(DOC_DEPENDS)
 
 ../xml2ag/xml2ag.menu : ../xml2ag/xml2ag.texi
 ../xml2ag/xml2ag.texi :
-	@if [ ! -f ../xml2ag/Makefile ] ; \
+	@if [ -z "$(XML2AG_DIR)" ] ; \
 	then [ -d ../xml2ag ] || mkdir ../xml2ag ; \
 	echo "* xml2ag Invocation::             No invoking xml2ag" \
 	     > ../xml2ag/xml2ag.menu ; \
-	( echo "@node xml2ag Invocation" >&3 ; \
-	  echo "@section No invoking xml2ag" >&3 ; \
+	( echo "@node xml2ag Invocation" ; \
+	  echo "@section No invoking xml2ag" ; \
 	  echo "This program is not available without libxml2." \
 	) > ../xml2ag/xml2ag.texi ; \
 	else cd ../xml2ag ; $(MAKE) doc-stamp ; fi
