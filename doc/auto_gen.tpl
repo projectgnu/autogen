@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.41 1999/11/04 05:38:08 bruce Exp $
+## $Id: auto_gen.tpl,v 2.42 1999/11/05 02:36:29 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -90,7 +90,6 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
-* Scheme Functions::     Scheme Functions
 * AutoGen Invocation::   Invoking AutoGen
 * Installation::         What Gets Installed Where
 * AutoOpts::             Automated Option Processing
@@ -808,6 +807,7 @@ these by defining their own macros.  @xref{DEFINE}.
 @menu
 * pseudo macro::       Format of the Pseudo Macro
 * expression syntax::  Macro Expression Syntax
+* Scheme Functions::   Scheme Functions
 * native macros::      AutoGen Native Macros
 * output controls::    Redirecting Output
 @end menu
@@ -1005,6 +1005,86 @@ of the expression.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 @end ignore
+@page
+@node Scheme Functions
+@section Scheme Functions
+
+AutoGen uses Guile to interpret Scheme expressions within AutoGen
+macros.  All of the normal Guile functions are available, plus
+several more that have been added to be able to query AutoGen state;
+provide information for AutoGen processing; and also augment the
+repertore of string manipulation functions.
+
+However, please take note that these functions are not loaded and
+thus not made available until after the command line options have
+been processed and the AutoGen definitions have been loaded.
+They may, of course, be used in Scheme functions that get defined
+at those times, but they cannot be invoked.
+
+@menu[=
+(define func-name "")
+(define func-str "") =][=
+FOR gfunc =][=
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+ =]
+* SCM-[= (sprintf "%-26s" (string-append func-name "::"))
+  =][=
+  IF (exist? "what") =][=what=][=
+  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
+  ENDIF =][=
+ENDFOR gfunc =]
+@end menu
+
+[=
+FOR gfunc =][=
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name))
+ =]
+@node SCM-[= (. func-name) =]
+@subsection [=
+  IF (exist? "what") =][=what=][=
+  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
+  ENDIF =]
+@findex [=(. func-name)=][=
+% string "\n@findex %s" =]
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
+Usage:  ([=(. func-str)=][=
+  FOR exparg =] [=
+    arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
+    arg_optional " ]" =][=
+  ENDFOR exparg =])
+@*
+[= string (string-append func-name ":  ") =][=doc=]
+[=
+  IF (exist? "exparg") =]
+Arguments:[=
+    FOR exparg =]
+@*
+[=arg_name=] - [=
+    arg_optional "Optional - " =][=
+      IF (exist? "arg_desc") =][=arg_desc=][=
+      ELSE=]Undocumented[=
+      ENDIF=][=
+    ENDFOR exparg =][=
+  ELSE
+    =]
+This Scheme function takes no arguments.[=
+  ENDIF =][=
+ENDFOR gfunc
+=]
+@ignore
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+@end ignore
 @node native macros
 @section AutoGen Native Macros
 @cindex native macros
@@ -1118,86 +1198,6 @@ status.  @xref{Scheme Functions}.
 @ignore
 
 Resume text from auto_gen.tpl
-
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-@end ignore
-@page
-@node Scheme Functions
-@chapter Scheme Functions
-
-AutoGen uses Guile to interpret Scheme expressions within AutoGen
-macros.  All of the normal Guile functions are available, plus
-several more that have been added to be able to query AutoGen state;
-provide information for AutoGen processing; and also augment the
-repertore of string manipulation functions.
-
-However, please take note that these functions are not loaded and
-thus not made available until after the command line options have
-been processed and the AutoGen definitions have been loaded.
-They may, of course, be used in Scheme functions that get defined
-at those times, but they cannot be invoked.
-
-@menu[=
-(define func-name "")
-(define func-str "") =][=
-FOR gfunc =][=
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
- =]
-* SCM-[= (sprintf "%-26s" (string-append func-name "::"))
-  =][=
-  IF (exist? "what") =][=what=][=
-  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
-  ENDIF =][=
-ENDFOR gfunc =]
-@end menu
-
-[=
-FOR gfunc =][=
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
-
-  (set! func-str
-      (if (exist? "string") (get "string") func-name))
- =]
-@node SCM-[= (. func-name) =]
-@section [=
-  IF (exist? "what") =][=what=][=
-  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
-  ENDIF =]
-@findex [=(. func-name)=][=
-% string "\n@findex %s" =]
-@ignore
-Extracted from [=srcfile=] on line [=linenum=].
-@end ignore
-Usage:  ([=(. func-str)=][=
-  FOR exparg =] [=
-    arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
-    arg_optional " ]" =][=
-  ENDFOR exparg =])
-@*
-[= string (string-append func-name ":  ") =][=doc=]
-[=
-  IF (exist? "exparg") =]
-Arguments:[=
-    FOR exparg =]
-@*
-[=arg_name=] - [=
-    arg_optional "Optional - " =][=
-      IF (exist? "arg_desc") =][=arg_desc=][=
-      ELSE=]Undocumented[=
-      ENDIF=][=
-    ENDFOR exparg =][=
-  ELSE
-    =]
-This Scheme function takes no arguments.[=
-  ENDIF =][=
-ENDFOR gfunc
-=]
-@ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1352,9 +1352,6 @@ Resume text from auto_gen.tpl
 Here are some things that might happen in the distant future.
 
 @itemize @bullet
-@item
-Rewrite in Guile.
-
 @item
 Write code for "AutoGetopts" (GNU getopt), or
 possibly the new glibc argp parser.
