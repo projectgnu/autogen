@@ -1,15 +1,15 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.12 1999/02/25 17:31:37 bkorb Exp $
+#$Id: optcode.tpl,v 2.13 1999/02/26 17:36:35 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
        [=
     _IF prog_file_name _exist=][=
-        prog_file_name _cap copyright _get owner _get
+        prog_file_name copyright _get owner _get
         "#3$%s copyright (c) %s %s, all rights reserved" _printf _str=][=
     _ELSE =][=
-        prog_name _cap copyright _get owner _get
+        prog_name copyright _get owner _get
        "#3$%s copyright (c) %s %s, all rights reserved" _printf _str=][=
     _ENDIF=];[=
   _ELSE =]
@@ -26,9 +26,9 @@ _ELIF copyright_gpl _exist
 static const char zCopyrightNotice[] =
        [=
   _IF prog_file_name _exist =][=
-      prog_name _cap "#" _gpl _str=][=
+      prog_file_name "#" _gpl _str=][=
   _ELSE =][=
-      prog_name _cap "#" _gpl _str=][=
+      prog_name "#" _gpl _str=][=
   _ENDIF=];[=
 
 _ELIF copyright_lgpl _exist
@@ -36,9 +36,9 @@ _ELIF copyright_lgpl _exist
 static const char zCopyrightNotice[] =
        [=
   _IF prog_file_name _exist =][=
-      prog_file_name _cap owner _get "#" _lgpl _str=][=
+      prog_file_name owner _get "#" _lgpl _str=][=
   _ELSE=][=
-      prog_name _cap owner _get "#" _lgpl _str=][=
+      prog_name owner _get "#" _lgpl _str=][=
   _ENDIF=];[=
 _ELSE =]
 #define zCopyrightNotice (const char*)NULL[=
@@ -233,14 +233,14 @@ static tOptProc doOpt[=name _cap=];[=
 
       _ENDIF=][=
     /FLAG=]
-#endif /* defined( TEST_[=prog_name _up #_ +=]OPTS ) */[=_ENDIF=]
+#endif /* defined( TEST_[=prog_name _up=]_OPTS ) */[=_ENDIF=]
 [=
 
 
 _ENDIF "flag.flag_code _exist flag.call_proc _exist |" =]
 /*
  *  These are always callable, whether
- *  TEST_[=prog_name _up #_ +=]OPTS is defined or not
+ *  TEST_[=prog_name _up=]_OPTS is defined or not
  */
 static tOptProc doUsageOpt;[=
 _IF version _exist=]

@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Tue Oct 20 15:09:59 1998
+## Last Modified:   Fri Feb 26 08:55:14 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.9 1998/10/30 16:49:16 bkorb Exp $
+## $Id: Makefile.am,v 2.10 1999/02/26 17:36:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -36,6 +36,7 @@ DEFCOPY		= copy=$(ODEF)
 TEMPLATE	= $(srcdir)/auto_gen.tpl
 TPLINC		= $(top_srcdir)/src/agParse.y \
 		$(top_builddir)/src/opts.h \
+		$(top_srcdir)/src/autogen.texi \
 		$(top_srcdir)/autoopts/autoopts.texi \
 		$(top_builddir)/columns/columns.texi \
 		$(top_builddir)/getdefs/getdefs.texi
@@ -43,7 +44,7 @@ TPLINC		= $(top_srcdir)/src/agParse.y \
 GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
 AGEXE		= $(top_builddir)/src/autogen
 AGARGS		= autogen=$(AGEXE) \
-		agarg=--templ-dirs=$(top_srcdir) \
+		agarg=--templ-dirs=$(top_srcdir) agarg=-t60 \
 		base-name=autogen
 
 autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC)

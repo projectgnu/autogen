@@ -1,12 +1,12 @@
 [=autogen template lsm=LSM =]
 Begin3
-Title:          Autogen - Automated Text Generation
+Title:          AutoGen - Automated Text Generation
 
 Version:        [=version=]
 
 Entered-date:   [=_eval "date +%d%b%y" _shell _UP=]
 
-Description:    Autogen is a tool for automatically generating
+Description:    AutoGen is a tool for automatically generating
                 arbitrary text files that contain repetitive text
                 with varying substitutions.  This is particularly
                 useful if you have several types of repetitive

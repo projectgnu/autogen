@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.9 1999/02/24 18:52:37 bkorb Exp $
+ *   $Id: opts.def,v 2.10 1999/02/26 17:36:35 bkorb Exp $
  */
 
 /*
@@ -193,11 +193,11 @@ flag = {
     flag_arg;     /* optional */
     disable     = "no";
     enabled;
-    descrip     = "Invoke autogen with defs";
+    descrip     = "Invoke AutoGen with defs";
     doc =
     "This is the default output mode.  Specifying @code{no-autogen} is\n"
     "equivalent to @code{output=-}.  If you supply an argument to this\n"
-    "option, that program will be started as if it were Autogen and\n"
+    "option, that program will be started as if it were AutoGen and\n"
     "its standard in will be set to the output definitions of this program.";
 };
 
@@ -214,10 +214,10 @@ flag = {
     flag_arg    = ":";
     max         = NOLIMIT;
     stack_arg;
-    descrip     = "Autogen Argument";
+    descrip     = "AutoGen Argument";
     flags_cant  = output;
     doc =
-    "This is a passthrough argument.  It allows you to have Autogen invoked\n"
+    "This is a passthrough argument.  It allows you to have AutoGen invoked\n"
     "with any arbitrary argument.";
 };
 
@@ -227,7 +227,7 @@ flag = {
     descrip     = "Base name for output file(s)";
     flags_cant  = output;
     doc =
-    "When output is going to Autogen, a base name must either be supplied\n"
+    "When output is going to AutoGen, a base name must either be supplied\n"
     "or derived.  If this option is not supplied, then it is taken from\n"
     "the @code{template} option.  If that is not provided either, then\n"
     "it is set to the base name of the current directory.";
@@ -244,15 +244,14 @@ explain =
 detail =
 "Definitions are delimited by the patterns:\n
     `/\\*=[a-zA-Z][a-zA-Z0-9_]*[ \\t][ \\t]*[a-zA-Z][a-zA-Z0-9_]*'
-    `=\\*/'.\n
+    `=\\*/'\n
 The first name is the entry type and the second is the entry
-name.  This creates a definition of the following form:
-
+name.  This creates a definition of the following form:\n
     #line nnn \"source-file-name\"
     entry_type = {
         name = entry_name;
         ...
     };\n
 The elipsis '...' is filled in by text found after the `/*=' line
-and before the `=*/' line, with leading `^[^*]*\\*\\**[ \\t]*' removed
-from each line (or all text if an asterisk is not found).";
+and before the `=*/' line, with everything up through the first
+sequence of asterisks deleted on every line.";
