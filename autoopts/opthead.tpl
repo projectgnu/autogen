@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.9 1999/02/25 17:31:38 bkorb Exp $
+#$Id: opthead.tpl,v 2.10 1999/02/26 23:09:01 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -185,7 +185,7 @@ _ENDIF version-exists =]
 
 /*=usermac DESC
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Option Descriptor
  *
@@ -205,7 +205,7 @@ _ENDIF version-exists =]
 
 /*=usermac HAVE_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Have this option?
  *
@@ -215,7 +215,7 @@ _ENDIF version-exists =]
  *  in any fashion at all.  It is used thus:
  *
  *  @example
- *  if (HAVE_OPT( OPT_NAME )) @{\n"
+ *  if (HAVE_OPT( NAME )) @{\n"
  *  "    <do-things-associated-with-opt-name>;
  *  @}
  *  @end example"
@@ -228,7 +228,7 @@ _ENDIF version-exists =]
 
 /*=usermac OPT_ARG
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Option Argument String
  *
@@ -237,11 +237,11 @@ _ENDIF version-exists =]
  *  "The option argument value as a pointer to string.
  *  Note that argument values that have been specified as numbers
  *  are stored as numbers.  For such options, use instead the
- *  @code{OPT_VALUE_optname} define.  It is used thus:
+ *  @code{OPT_VALUE_name} define.  It is used thus:
  *
  *  @example
- *  if (HAVE_OPT( OPT_NAME )) @{\n"
- *  "    char* p = OPT_ARG( OPT_NAME );\n"
+ *  if (HAVE_OPT( NAME )) @{\n"
+ *  "    char* p = OPT_ARG( NAME );\n"
  *  "    <do-things-with-opt-name-argument-string>;
  *  @}
  *  @end example"
@@ -254,7 +254,7 @@ _ENDIF version-exists =]
 
 /*=usermac STATE_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Option State
  *
@@ -268,12 +268,12 @@ _ENDIF version-exists =]
  *  or @code{OPTST_DEFINED}.  It is used thus:
  *
  *  @example
- *  switch (STATE_OPT( OPT_NAME )) @{\n"
+ *  switch (STATE_OPT( NAME )) @{\n"
  *  "    case OPTST_INIT:\n"
  *  "        not-preset, set or on the command line.  (unless CLEAR-ed)\n\n"
  *
  *  "    case OPTST_SET:\n"
- *  "        option set via the SET_OPT_OPT_NAME() macro.\n\n"
+ *  "        option set via the SET_OPT_NAME() macro.\n\n"
  *
  *  "    case OPTST_PRESET:\n"
  *  "        option set via an RC/INI file or environment variable\n\n"
@@ -294,7 +294,7 @@ _ENDIF version-exists =]
 
 /*=usermac COUNT_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Definition Count
  *
@@ -305,7 +305,7 @@ _ENDIF version-exists =]
  *  of preset options.
  *
  *  @example
- *  if (COUNT_OPT( OPT_NAME ) != desired-count) @{\n"
+ *  if (COUNT_OPT( NAME ) != desired-count) @{\n"
  *  "    make-an-undesireable-message.
  *  @}
  *  @end example"
@@ -318,7 +318,7 @@ _ENDIF version-exists =]
 
 /*=usermac ISSEL_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Is Option Selected?
  *
@@ -335,7 +335,7 @@ _ENDIF version-exists =]
 
 /*=usermac ISUNUSED_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Never Specified?
  *
@@ -353,7 +353,7 @@ _ENDIF version-exists =]
 
 /*=usermac ENABLED
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Is Option Enabled?
  *
@@ -362,7 +362,7 @@ _ENDIF version-exists =]
  *  Yields true if the option defaults to disabled and
  *  @code{ISUNUSED_OPT()} would yield true.  It also yields true if
  *  the option has been specified with a disablement prefix,
- *  disablement value or the @code{DISABLE_OPT_OPT_NAME} macro was invoked.
+ *  disablement value or the @code{DISABLE_OPT_NAME} macro was invoked.
 =*/
 =]
 #define  ENABLED_[=prefix _up #_ +=]OPT(n) (! DISABLED_OPT(& [=prefix _up #_ +
@@ -372,7 +372,7 @@ _ENDIF version-exists =]
 
 /*=usermac STACKCT_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Stacked Arg Count
  *
@@ -384,13 +384,13 @@ _ENDIF version-exists =]
  *
  *  Do not use this on options that have not been stacked or has not been
  *  specified (the @code{stack_arg} attribute must have been specified,
- *  and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
+ *  and @code{HAVE_OPT(<NAME>)} must yield TRUE).
  *  Otherwise, you will likely page fault.
  *
  *  @example
- *  if (HAVE_OPT( OPT_NAME )) @{\n"
- *  "    int     ct = STACKCT_OPT(  OPT_NAME );\n"
- *  "    char**  pp = STACKLST_OPT( OPT_NAME );\n\n"
+ *  if (HAVE_OPT( NAME )) @{\n"
+ *  "    int     ct = STACKCT_OPT(  NAME );\n"
+ *  "    char**  pp = STACKLST_OPT( NAME );\n\n"
  *
  *  "    do  @{\n"
  *  "        char* p = *pp++;\n"
@@ -407,7 +407,7 @@ _ENDIF version-exists =]
 
 /*=usermac STACKLST_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Argument Stack
  *
@@ -424,9 +424,9 @@ _ENDIF version-exists =]
  *  Otherwise, you will likely page fault.
  *
  *  @example
- *  if (HAVE_OPT( OPT_NAME )) @{\n"
- *  "    int     ct = STACKCT_OPT(  OPT_NAME );\n"
- *  "    char**  pp = STACKLST_OPT( OPT_NAME );\n\n"
+ *  if (HAVE_OPT( NAME )) @{\n"
+ *  "    int     ct = STACKCT_OPT(  NAME );\n"
+ *  "    char**  pp = STACKLST_OPT( NAME );\n\n"
  *
  *  "    do  @{\n"
  *  "        char* p = *pp++;\n"
@@ -443,7 +443,7 @@ _ENDIF version-exists =]
 
 /*=usermac CLEAR_OPT
  *
- *  macro_arg:  <OPT_NAME>
+ *  macro_arg:  <NAME>
  *
  *  title:  Clear Option Markings
  *
@@ -484,7 +484,7 @@ _FOR flag =][=
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac VALUE_OPT_optname
+/*=usermac VALUE_OPT_name
  *
  *  title:  Option Flag Value
  *
@@ -499,7 +499,7 @@ _FOR flag =][=
  *
  *  @example
  *  switch (WHICH_OPT_OTHER_OPT) @{
- *  case VALUE_OPT_OPT_NAME:\n"
+ *  case VALUE_OPT_NAME:\n"
  *  "    this-option-was-really-opt-name;
  *  case VALUE_OPT_OTHER_OPT:\n"
  *  "    this-option-was-really-other-opt;
@@ -523,7 +523,7 @@ _FOR flag =][=
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac OPT_VALUE_optname
+/*=usermac OPT_VALUE_name
  *
  *  title:  Option Argument Value
  *
@@ -534,7 +534,7 @@ _FOR flag =][=
  *  containing the numeric value of the option argument.
  *
  *  @example
- *  int opt_val = OPT_VALUE_OPT_NAME;
+ *  int opt_val = OPT_VALUE_NAME;
  *  @end example
 =*/
 =][=
@@ -546,7 +546,7 @@ _FOR flag =][=
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac WHICH_OPT_optname
+/*=usermac WHICH_OPT_name
  *
  *  title:  Which Equivalenced Option
  *
@@ -558,7 +558,7 @@ _FOR flag =][=
  *
  *  @example
  *  switch (WHICH_OPT_OTHER_OPT) @{
- *  case VALUE_OPT_OPT_NAME:\n"
+ *  case VALUE_OPT_NAME:\n"
  *  "    this-option-was-really-opt-name;
  *  case VALUE_OPT_OTHER_OPT:\n"
  *  "    this-option-was-really-other-opt;
@@ -575,7 +575,7 @@ _FOR flag =][=
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac SET_OPT_optname
+/*=usermac SET_OPT_name
  *
  *  title:  Force an option to be set
  *
@@ -590,7 +590,7 @@ _FOR flag =][=
  *  an argument, then this macro will too.
  *
  *  @example
- *  SET_OPT_OPT_NAME( "string-value" );
+ *  SET_OPT_NAME( "string-value" );
  *  @end example
 =*/
 =][=
@@ -656,7 +656,7 @@ _FOR flag =][=
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*=usermac DISABLE_OPT_optname
+/*=usermac DISABLE_OPT_name
  *
  *  title:  Disable an option
  *
@@ -672,7 +672,7 @@ _FOR flag =][=
  *  this macro does not allow an option argument.
  *
  *  @example
- *  DISABLE_OPT_OPT_NAME;
+ *  DISABLE_OPT_NAME;
  *  @end example
 =*/
 =][=
