@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/05/12 00:31:13 $
+ *  Last Modified:     $Date: 2002/06/08 19:54:52 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.13 2002/05/12 00:31:13 bkorb Exp $
+ *  $Id: misc.def,v 3.14 2002/06/08 19:54:52 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.13 $";
+version = "$Revision: 3.14 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -25,14 +25,14 @@ test = {
 		AC_SUBST(OPTS_TESTDIR)
 		    AC_SUBST(TOP_DIRLIST)
 		    AC_SUBST(AGEN5_TESTS)
-		    TOP_DIRLIST='$(SHELL_DIRS)'
+		    TOP_DIRLIST='$(SHELL_DIRS) $(XML2AG_DIR)'
 		    OPTS_TESTDIR=test
 		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
 		_EOF_; };
 
     action = { no; act-type = script;
       act-text = <<-  _EOF_
-		TOP_DIRLIST='$(NOSHELL_DIRS)'
+		TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
 		    OPTS_TESTDIR=
 		    AGEN5_TESTS='$(NOSHELL_TESTS)'
 		_EOF_; };
@@ -175,6 +175,43 @@ test   = {
 		for finding the header and libraries must be provided,
 		or guile-config must be found in the executable path,
 		or we have to find the stuff in /usr or /usr/local.
+		_END_OF_DOC_;
+};
+
+test   = {
+  name     = "xml";
+  type     = "withlib";
+  check    = "a working libxml can be found";
+  code     = <<- _END_OF_CODE_
+		#include <libxml/parser.h>
+		#include <libxml/tree.h>
+
+		int main () {
+		xmlDocPtr p = xmlParseFile( "mumble.xml" ); }
+		_END_OF_CODE_;
+  run-mode   =  "link";
+  code-mode  =  "all";
+
+  action   = { no; asis;
+    act-type = script;
+    act-text = <<- _END_OF_SCRIPT_
+		f=`xml2-config --libs`
+		    if test X${with_libxml} != Xno && test -n "$f"
+		    then
+		      LDFLAGS="${LDFLAGS} $f"
+		      f=`xml2-config --cflags | \
+		        sed 's,-I */usr/include,,'`
+		      CPPFLAGS="${CPPFLAGS} $f"
+		      AC_SUBST(XML2AG_DIR)
+		      XML2AG_DIR=xml2ag
+		      echo "libxml2 found via xml2-config" >&2
+		    fi
+		_END_OF_SCRIPT_; };
+
+  doc = <<- _END_OF_DOC_
+		xml2ag won't work without libxml2, so either the methods
+		for finding the header and libraries must be provided,
+		or xml2-config must be found in the executable path.
 		_END_OF_DOC_;
 };
 

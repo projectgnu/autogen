@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.6 2002/06/08 17:25:56 bkorb Exp $
+ *   $Id: opts.def,v 3.7 2002/06/08 19:54:52 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -38,7 +38,7 @@ homerc         =  $HOME, ".";
 environrc;
 
 #else
-prog_name      = xml2ag;
+prog-name      = xml2ag;
 prog-title     = "XML to AutoGen Definiton Converter";
 #endif
 

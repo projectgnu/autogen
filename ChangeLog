@@ -1,3 +1,14 @@
+2002-06-10  Bruce Korb  <bkorb@gnu.org>
+
+	* xml2ag/*: new command.  Wrapper converts XML to autogen definitions
+	and passes them to a spawned autogen process.  Requires libxml2 to build.
+	* Makefile.am: make the building of xml2ag configurable
+	* agen5/opts.def: Use this file for pass through opts for xml2ag
+	* config/misc.def: Add the configured value $(XML2AG_DIR) to TOP_DIRLIST
+	(xml): add a new "withlib" test, with a `xml2-config` test fallback.
+	It will not override --no-libxml, however.
+	* getdefs/Makefile.am(DISTCLEANFILES): add $(nodist_getdefs_SOURCES)
+
 2002-05-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/Makefile.in(CPPFLAGS): specifically set the value

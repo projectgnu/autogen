@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/05/12 00:31:13 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/06/08 19:54:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs
@@ -30,7 +30,7 @@ INCLUDES        = @INCLIST@
 
 GENFILES        = getdefs.texi getdefs.menu getdefs.1
 MAINTAINERCLEANFILES = Makefile.in
-DISTCLEANFILES  = $(GENFILES)
+DISTCLEANFILES  = $(GENFILES) $(nodist_getdefs_SOURCES)
 
 gen : $(BUILT_SOURCES) $(GENFILES)
 
