@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Tue Oct 13 07:55:54 1998
+## Last Modified:   Wed Oct 21 07:13:07 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.7 1998/10/13 15:30:46 bkorb Exp $
+## $Id: Makefile.am,v 2.8 1998/10/21 14:28:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -46,17 +46,9 @@ AGARGS		= autogen=$(AGEXE) \
 		agarg=--templ-dirs=$(top_srcdir) \
 		base-name=autogen
 
-autogen.def:	$(DEFSRC) $(ODEF)
-	$(GETDEFS) output=$@ template=auto_gen $(DEFCOPY) $(DEFSRC)
-	@-touch $@
-
-##  This really should be the build rule:
-##	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
-##
-autogen.texi : auto_gen.tpl autogen.def $(TPLINC)
+autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC)
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	$(top_builddir)/src/autogen -L$(top_srcdir) -L$(top_srcdir)/doc \
-		-bautogen ./autogen.def
+	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
 
 $(top_builddir)/getdefs/getdefs.texi :
 	@cd $(top_builddir)/getdefs/ ; $(MAKE) gen

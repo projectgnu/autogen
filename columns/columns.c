@@ -5,17 +5,28 @@
 
 #include "opts.h"
 
+struct print_list {
+    char**     papz;
+    int        index;
+};
+
+typedef struct print_list tPrintList, *tpPrintList;
+
 typedef int (tCompProc)(const void*, const void*);
 tCompProc compProc;
 
-int maxline = 0;
+int maxEntryWidth = 0;
+int fillColumnCt  = 0;
+
 char zLine[ 133 ];
 char zFmtLine[ 133 ];
 
 char**  papzLines = (char**)NULL;
 size_t  allocCt   = 0;
 size_t  usedCt    = 0;
-
+size_t  lineWidth = 79;
+size_t  columnCt  = 0;
+size_t  columnSz  = 0;
 
 void readLines( void );
 void writeRows( void );
@@ -30,6 +41,15 @@ main( int    argc,
         fputs( "Error:  this program takes no arguments\n", stderr );
         USAGE( EXIT_FAILURE );
     }
+
+    if (HAVE_OPT( LINE_WIDTH ))
+        lineWidth = OPT_VALUE_LINE_WIDTH;
+
+    if (HAVE_OPT( COL_WIDTH ))
+        columnSz = OPT_VALUE_COL_WIDTH;
+
+    if (HAVE_OPT( COLUMNS ))
+        columnCt = OPT_VALUE_COLUMNS;
 
     readLines();
 
@@ -113,11 +133,11 @@ readLines( void )
         if (sepLen > 0)
             strcat( pzL, OPT_ARG( SEPARATION ));
 
-        if (len > maxline)
-            maxline = len;
+        if (len > maxEntryWidth)
+            maxEntryWidth = len;
     }
 
-    if (maxline++ == 0) {
+    if (maxEntryWidth++ == 0) {
         fputs( "Warning:  no input text was read\n", stderr );
         exit( EXIT_SUCCESS );
     }
@@ -126,64 +146,64 @@ readLines( void )
      *  Set the line width to the amount of space we have to play with.
      *  OPT_VALUE_INDENT defaults to zero.
      */
-    OPT_VALUE_LINE_WIDTH -= OPT_VALUE_INDENT;
+    lineWidth -= OPT_VALUE_INDENT;
+    if (lineWidth < maxEntryWidth)
+        lineWidth = maxEntryWidth;
 
     /*
-     *  Raise the line width if it is supposed to be longer than
-     *  the longest line we found in our input
+     *  If we do not have a column size set,
+     *  then figure out what it must be.
      */
-    if (OPT_VALUE_COL_WIDTH > maxline)
-        maxline = OPT_VALUE_COL_WIDTH;
-
-    /*
-     *  On the other hand, if the number of columns was specified,
-     *  then maximize the separation of the columns.
-     */
-    else if (OPT_VALUE_COLUMNS > 0) {
+    if (columnSz == 0) {
         /*
-         *  IF there is to be only one column,
-         *  THEN its nominal "width" is the full line width.
-         *       (Why is this person bothering with this program?)
+         *  IF the column count is set, then that dictates it.
          */
-        if (OPT_VALUE_COLUMNS == 1)
-            maxline = OPT_VALUE_LINE_WIDTH;
-
-        /*
-         *  ELSE we will put any extra space between the columns
-         *       Compute the per-column space for all but the
-         *       last column (we will not insert following white space)
-         */
-        else {
-            int  spreadwidth = OPT_VALUE_LINE_WIDTH - maxline;
-            int  fsz = spreadwidth / (OPT_VALUE_COLUMNS-1);
+        if (columnCt > 1) {
+            int  spreadwidth = lineWidth - maxEntryWidth;
+            int  sz = spreadwidth / (columnCt-1);
 
             /*
-             *  IF there is room for added space,
-             *  THEN add it.
+             *  Either there is room for added space,
+             *  or we must (possibly) reduce the number of columns
              */
-            if (fsz > maxline)
-                maxline = fsz;
+            if (sz >= maxEntryWidth)
+                columnSz = sz;
+            else
+                columnCt = (spreadwidth / maxEntryWidth) + 1;
         }
+
+        /*
+         *  ELSE neither the column size or count have been set:
+         */
+        else {
+            columnCt = ((lineWidth - maxEntryWidth) / maxEntryWidth) + 1;
+            columnSz = ((lineWidth - maxEntryWidth) / columnCt);
+        }
+    }
+
+    /*
+     *  Otherwise, the column size has been set.  Ensure it is sane.
+     */
+    else {
+        if (maxEntryWidth > columnSz)
+            columnSz = maxEntryWidth;
+
+        if (  (columnCt == 0)
+           || ( ((columnSz * (columnCt-1)) + maxEntryWidth) > lineWidth ))
+            columnCt = ((lineWidth - maxEntryWidth) / columnSz) + 1;
     }
 
     /*
      *  Make sure the output line length is big enough
      */
-    if (OPT_VALUE_LINE_WIDTH < maxline) {
+    if (lineWidth < maxEntryWidth) {
         fprintf( stderr, "Warning:  line width of %3d is smaller than\n"
                          "          longest line  %3d\n",
-                 OPT_VALUE_LINE_WIDTH, maxline );
-        OPT_VALUE_LINE_WIDTH = maxline;
+                 lineWidth, maxEntryWidth );
+        lineWidth = maxEntryWidth;
     }
 }
 
-
-struct print_list {
-    char**     papz;
-    int        index;
-};
-
-typedef struct print_list tPrintList, *tpPrintList;
 
     void
 writeColumns( void )
@@ -192,26 +212,8 @@ writeColumns( void )
     int  colCt, rowCt, col, row;
     tpPrintList pPL;
 
-    /*
-     *  Compute the columizing formatting string.
-     *  If the column width has been specified,
-     *  then 'maxline' is set to the right size already.
-     *  Otherwise, we will try to insert any left over space
-     *  between columns.
-     */
-    {
-        int  rem;
-        int  fsz;
-
-        colCt = OPT_VALUE_LINE_WIDTH / maxline;
-        rem   = OPT_VALUE_LINE_WIDTH - (colCt * maxline);
-
-        if ((rem == 0) || (colCt < 2) || (OPT_VALUE_COL_WIDTH > 0))
-            fsz = maxline;
-        else
-            fsz = maxline + (rem / (colCt-1));
-        sprintf( zFmt, "%%-%ds", fsz );
-    }
+    colCt = columnCt;
+    sprintf( zFmt, "%%-%ds", columnSz );
 
     if (colCt == 1) {
         writeRows();
@@ -253,13 +255,13 @@ writeColumns( void )
          *  The last column is blank, so we reduce our column count,
          *  even if the user specified a count!!
          */
-	colCt--;
-	rem   = OPT_VALUE_LINE_WIDTH - (colCt * maxline);
+        colCt--;
+        rem   = lineWidth - (colCt * maxEntryWidth);
 
-        if ((rem == 0) || (colCt < 2) || (OPT_VALUE_COL_WIDTH > 0))
-            fsz = maxline;
+        if ((rem == 0) || (colCt < 2) || (columnSz > 0))
+            fsz = maxEntryWidth;
         else
-            fsz = maxline + (rem / (colCt-1));
+            fsz = maxEntryWidth + (rem / (colCt-1));
         sprintf( zFmt, "%%-%ds", fsz );
     }
 
@@ -315,7 +317,7 @@ writeColumns( void )
             fputs( pzE, stdout );
             fputc( '\n', stdout );
             break;
-	}
+        }
 
         fputs( pzE, stdout );
         fputc( '\n', stdout );
@@ -330,26 +332,8 @@ writeRows( void )
     char zFmt[ 12 ];
     int  colCt;
 
-    /*
-     *  Compute the columizing formatting string.
-     *  If the column width has been specified,
-     *  then 'maxline' is set to the right size already.
-     *  Otherwise, we will try to insert any left over space
-     *  between columns.
-     */
-    {
-        int  rem;
-        int  fsz;
-
-        colCt = OPT_VALUE_LINE_WIDTH / maxline;
-        rem   = OPT_VALUE_LINE_WIDTH - (colCt * maxline);
-
-        if ((rem == 0) || (colCt < 2) || (OPT_VALUE_COL_WIDTH > 0))
-            fsz = maxline;
-        else
-            fsz = maxline + (rem / (colCt-1));
-        sprintf( zFmt, "%%-%ds", fsz );
-    }
+    colCt = columnCt;
+    sprintf( zFmt, "%%-%ds", columnSz );
 
     /*
      *  IF we have a separator,

@@ -1,11 +1,11 @@
-#! /bin/echo Version_4.3,_but_it_should_be_sourced
+#! /bin/echo Autogen_Version_4.4,_but_it_should_be_sourced
 # -*- Mode: Ksh -*-
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:     Tue Oct 13 07:37:12 1998
+# Last Modified:     Wed Oct 21 07:16:06 1998
 # Author:         Bruce Korb <korbb@datadesign.com>
 # Maintainer:     Bruce Korb <korbb@datadesign.com>
 #          by:       Bruce Korb <korb@datadesign.com>
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=4
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=.3
+AG_PATCHLEVEL=.4
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Library versioning for libopts
@@ -37,6 +37,7 @@ AG_BINARY_AGE=1
 LT_LIBRARY=libopts.la
 LT_RELEASE=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 LT_CURRENT=`expr $AG_MINOR_VERSION - $AG_INTERFACE_AGE`
+
 LT_REVISION=$AG_INTERFACE_AGE
 LT_AGE=`expr $AG_BINARY_AGE - $AG_INTERFACE_AGE`
 
@@ -49,14 +50,14 @@ PACKAGE=autogen
 
 # Display version numbers banner for my sanity!
 #
-spaces=""
+spaces="                "
 while :
 do
   string="$PACKAGE-$VERSION$spaces$LT_LIBRARY.$LT_CURRENT.$LT_AGE.$LT_REVISION"
   if echo "$string" | grep -q '^.\{78,\}$'; then
     break
   fi
-  spaces=" "$spaces
+  spaces=" $spaces"
 done
 
 cat << _EOF_
@@ -64,6 +65,20 @@ cat << _EOF_
 
 
                  A      U      T      O      G      E      N
+_EOF_
+
+#  Validate struct marker in autoopts/options.h
+#
+hdr=`egrep OPTIONS_STRUCT_VERSION ${top_srcdir}/autoopts/options.h |
+     sed 's/.*OPTIONS_STRUCT_VERSION *//'`
+lib=`expr '(' $AG_MAJOR_VERSION '*' 4096 ')' + $LT_CURRENT`
+if [ $hdr -ne $lib ] ; then
+  echo autoopts/options.h out of sync with version.
+  echo OPTIONS_STRUCT_VERSION is $hdr, should be $lib
+  exit 1
+fi
+
+cat << _EOF_
 
 $string
 ------------------------------------------------------------------------------

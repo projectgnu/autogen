@@ -7,21 +7,21 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Tue Oct 13 07:49:30 1998
+dnl Last Modified:    Wed Oct 21 07:16:25 1998
 dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.3 1998/10/13 15:30:40 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.4 1998/10/21 14:28:07 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
-. $srcdir/VERSION
+. $srcdir/VERSION $srcdir
 
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.3 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.4 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile

@@ -1,3 +1,32 @@
+1998-10-21  Bruce Korb <korbb@datadesign.com>
+	* Installed all the Gary stuff below
+	* columns/* I now actually have it working completely.
+	* src/agGetDef.c if reading definitions from stdin,
+	the file must be left open so server shells work correctly
+	
+1998-10-15  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* MakeRules.in (.def.c, .def.h):  When a built source is
+	defaulted to the bootstrapping version in a VPATH build,
+	copy to the build directory.
+
+	* src/VERSION: reset the library version numbers to reflect the
+	binary incompatibility since 4.4.3.
+
+	* src/Makefile.am: remove the bogus rule for opts.c anda opts.h
+	regeneration.  The dependencies still stand, but now the working
+	rule in MakeRules is used.
+
+	* tests/optcli.test, tests/optgen.test, tests/opthelp.test:
+	New files which split the three tests previously in opts.test
+	(below) into their own files.
+
+	* tests/opts.test: Removed.
+
+1998-10-13  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+	* doc/LSM.tpl: use a small awk script in place of a ksh-ism, an
+	expr and wc!
+
 1998-10-08  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* doc/Makefile.am (EXTRA_DIST): added the new depend diagrams.

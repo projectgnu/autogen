@@ -7,10 +7,10 @@
 ## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
 ## Maintainer:       Bruce Korb <korbb@datadesign.com>
 ## Created:          Mon Jun 30 15:35:12 1997	
-## Last Modified:    Mon Sep 14 06:59:22 1998
-##            by:    Bruce Korb <korbb@datadesign.com>
+## Last Modified:    Wed Oct 21 07:12:04 1998
+##            by:    Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.0 1998/09/22 22:17:27 bkorb Exp $
+## $Id: Makefile.am,v 2.1 1998/10/21 14:28:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,6 +21,7 @@ MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
 AGEXE      = $(top_builddir)/src/autogen
 
 all:
+	:
 
 strsignal.h : strsignal.def strsignal.tpl
 	@if $(AGEXE) --version >&- 2>&- ; then \

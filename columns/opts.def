@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.4 1998/09/30 14:25:19 bkorb Exp $
+ *   $Id: opts.def,v 1.5 1998/10/21 14:28:13 bkorb Exp $
  */
 
 /*
@@ -37,7 +37,7 @@ version = 1;
 flag = {
     name      = line_width;
     value     = W;
-    flag_arg  = "=80";
+    flag_arg  = "=79";
     descrip   = "Maximum Line Width";
     doc       =
     "This option specifies the full width of the output line,\n"
@@ -53,7 +53,6 @@ flag = {
     value     = c;
     flag_arg  = "=0";
     descrip   = "Desired number of columns";
-    flags_cant = col_width;
     doc =
     "Use this option to specify exactly how many columns to produce.\n"
     "If that many columns will not fit within @var{line_width}, then\n"
@@ -65,7 +64,6 @@ flag = {
     value     = w;
     flag_arg  = "=0";
     descrip   = "Set width of each column";
-    flags_cant = columns;
     doc =
     "Use this option to specify exactly how many characters are to be\n"
     "allocated for each column.  If it is narrower than the widest entry,\n"

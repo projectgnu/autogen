@@ -7,10 +7,10 @@
 ## Author:	   Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	   Bruce Korb <korbb@datadesign.com>
 ## Created:	   Mon Jun 30 15:35:12 1997
-## Last Modified:   Tue Oct 13 08:07:09 1998
+## Last Modified:   Wed Oct 21 07:13:30 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.6 1998/10/13 15:30:49 bkorb Exp $
+## $Id: Makefile.am,v 2.7 1998/10/21 14:28:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -27,6 +27,8 @@ INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
 MAINTAINERCLEANFILES = Makefile.in
 
 gen : $(GEN_SRC)
+
+all : gen
 
 getdefs.texi : getdefs.tpl opts.def
 	top_builddir=$(top_builddir) \

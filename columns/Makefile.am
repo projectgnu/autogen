@@ -7,10 +7,10 @@
 ## Author:	    Bruce Korb <korbb@datadesign.com>
 ## Maintainer:	    Bruce Korb <korbb@datadesign.com>
 ## Created:	    Mon Jun 30 15:35:12 1997
-## Last Modified:   Mon Sep 28 12:05:41 1998
+## Last Modified:   Wed Oct 21 07:11:19 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 1998/09/28 20:02:30 bkorb Exp $
+## $Id: Makefile.am,v 1.4 1998/10/21 14:28:11 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = columns
@@ -27,6 +27,8 @@ INCLUDES 	= -I$(top_srcdir)/autoopts -I$(top_builddir)/autoopts
 MAINTAINERCLEANFILES = Makefile.in columns.texi
 
 gen : $(GEN_SRC)
+
+all : gen
 
 columns.texi : columns.tpl opts.def
 	top_builddir=$(top_builddir) \
