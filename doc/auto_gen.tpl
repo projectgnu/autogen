@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Wed Mar 10 11:07:00 1999
+## Last Modified:     Tue Mar 16 14:10:25 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.14 1999/03/10 19:07:27 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.15 1999/03/17 16:55:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -27,14 +27,14 @@ texi=autogen.texi =]
 Plus bits and pieces gathered from all over the source/build
 directories:
 [=_FOR infile=]
-	[=infile=][=
+        [=infile=][=
 /infile =]
 [=
 _EVAL '
-  echo "	${top_srcdir}/autoopts/autoopts.texi"
+  echo "        ${top_srcdir}/autoopts/autoopts.texi"
   for f in ${top_builddir}/*/*.menu
-  do echo "	$f"
-     echo "	`echo $f|sed \'s/\.menu$/\.texi/\'`"
+  do echo "     $f"
+     echo "     `echo $f|sed \'s/\.menu$/\.texi/\'`"
   done' _shell =]
 
 @end ignore
@@ -100,7 +100,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Add-Ons::              Add-on packages for AutoGen
 * Future::               Some ideas for the future.
 * Concept Index::        General index
-* Function Index::	 Function index
+* Function Index::       Function index
 @end menu
 
 @end ifinfo
@@ -154,56 +154,63 @@ program.  In fact, it has already been done and AutoGen itself uses it:
 @section General Ideas
 @cindex m4
 
-The initial idea of this program was to have a text file, a template if
-you will, that contained the text of the desired output file, with a few
-additional features.
+The idea of this program is to have a text file, a template if
+you will, that contains the general text of the desired output file.
+That file includes substitution expressions and sections of text that are
+replicated under the control of separate definition files.
+
 @cindex design goals
 
+AutoGen was designed with the following features:
+
 @enumerate
 @item
-The text would need special markers to indicate where substitutions were
-required, a la the @code{$@{VAR@}} construct in a shell @code{here doc}.
+The definitions are completely separate from the template.  By
+completely isolating the definitions from the template it greatly
+increases the flexibility of the template implementation.  A secondary
+goal is that a template user only needs to specify those data
+that are necessary to describe his application of a template.
+
+@item
+Each datum in the definitions is named.  Thus, the definitions can be
+rearranged, augmented and become obsolete without it being necessary to
+go back and clean up older definition files.  Reduce incompatibilities!
+
+@item
+Multiple values for a given name create an array of values.
+This array of values is used to control the repetition of
+sections of the template.
+
+@item
+There are named collections of definitions.  They form a nested hierarchy.
+Associated values are collected and associated with a group name.
+These associated data are used collectively in sets of substitutions.
+
+@item
+The template has special markers to indicate where substitutions are
+required, much like the @code{$@{VAR@}} construct in a shell @code{here
+doc}.  These markers are not fixed strings.  They are specified at the
+start of each template.  Template designers know best what fits into their
+syntax and can avoid marker conflicts.
+
 We did this because it is burdonsome and difficult to avoid conflicts
 using the pure C preprocessor substitution rules.  It also makes it
-easier to specify modifications to the value.  Of course, our
-modifications are specified rather less cryptically than the shell methods.
+easier to specify expressions that transform the value.  Of course, our
+expressions are less cryptic than the shell methods.
 
 @item
-It would also need a way to indicate sections of text that were to be
-skipped and for sections of text that were to be repeated.  This is a
-major improvement over using C preprocessing macros.  With the C
-preprocessor, you have no way of selecting output text because it is an
-@i{un}varying, mechanical substitution process.
+These same markers are used, in conjunction with enclosed keywords, to
+indicate sections of text that are to be skipped and for sections of
+text that were to be repeated.  This is a major improvement over using C
+preprocessing macros.  With the C preprocessor, you have no way of
+selecting output text because it is an @i{un}varying, mechanical
+substitution process.
 
 @item
-There also needed to be methods for carefully controlling the output.
+Finally, we supply methods for carefully controlling the output.
 Sometimes, it is just simply easier and clearer to compute some text or
 a value in one context when its application needs to be later.  So,
-methods were devised for saving text or values for later use.
-@end enumerate
-
-This template needs to be driven by a separate file of named values; a
-definitions file.  My goal here is to require a template user to specify
-@strong{only} those data that are necessary to describe his application of
-the template.  By completely isolating the definitions from the template
-it becomes possible to greatly increase the flexibility of the
-implementation (template).  So, the important attributes of the
-definitions are:
-
-@enumerate
-@item
-The definitions should be completely separate from the template.
-
-@item
-Each datum should be named.  That way, they can be rearranged,
-augmented and become obsolete without it being necessary to go
-back and clean up older definition files.  Reduce incompatibilities!
-
-@item
-There should be named collections, a hierarchy, of definitions.
-Associated values need to be collected and associated with a group name.
-That way, the associated data can be used collectively for sets of
-substitutions.
+functions are available for saving text or values for later use.
 @end enumerate
 
 @node Example Usage
@@ -237,7 +244,7 @@ strings:
 const char* az_name_list[] = @{
         "some alpha stuff",
         "more beta stuff",
-        "dumb omega stuff" @};
+        "final omega stuff" @};
 @end example
 
 @noindent
@@ -251,7 +258,7 @@ list = @{ list_element = alpha;
 list = @{ list_info    = "more beta stuff";
          list_element = beta; @};
 list = @{ list_element = omega;
-         list_info    = "dumb omega stuff"; @};
+         list_info    = "final omega stuff"; @};
 @end example
 
 The @code{autogen definitions list;} entry defines the file as an
@@ -312,6 +319,9 @@ values before they are inserted into the output.  For example,
 @code{_count} yields the number of definitions of a particular name,
 and @code{_up} will change a string to all upper case.
 
+If you have compiled AutoGen, you can copy out the template and
+definitions, run @file{autogen} and produce exactly the hypothesized
+desired output.
 @node Testimonial
 @section A User's Perspective
 
@@ -356,8 +366,8 @@ with such a template... AutoOpts.
 One final consequence of the good separation in the design of AutoGen is
 that it is retargettable to a greater extent.  The
 egcs/gcc/fixinc/inclhack.def can equally be used (with different
-templates) to create a shellscript (inclhack.sh) or a c program
-(inclhack.c).
+templates) to create a shell script (inclhack.sh) or a c program
+(fixincl.c).
 
 This is just the tip of the iceberg.  AutoGen is far more powerful than
 these examples might indicate, and has many other varied uses.  I am
@@ -384,16 +394,25 @@ Sincerely,
 @cindex .def file
 
 This chapter describes the syntax and semantics of the AutoGen
-definition file.  Knowledge of this syntax is required of anyone that
-uses AutoGen to instantiate a template.  Consequently, we keep it
-simple.
+definition file.  Knowledge of identification, simple and compound
+definition syntax is required to instantiate a template.  Consequently,
+we keep it very simple.  For "advanced" users, there are preprocessing
+directives and comments that may be used as well.
 
 The definitions file is used to associate values with names.  When
 multiple values are associated with a single name, an implicit array of
 values is formed.  Values may be either simple strings or compound
 collections of value-name pairs.  An array may not contain both simple
-and compound members.  For a simple example, @xref{Example Usage} or
-@xref{Example}.
+and compound members.  Fundamentally, it is as simple as:
+
+@example
+prog_name = "autogen";
+flag = @{
+    name      = templ_dirs;
+    value     = L;
+    descrip   = "Template search directory list";
+@};
+@end example
 
 For purposes of commenting and controlling the processing of the
 definitions, C-style comments and most C preprocessing directives are
@@ -418,41 +437,38 @@ C macro substitution is @strong{not} performed.
 The first definition in this file is used to identify it as a
 AutoGen file.  It consists of the two keywords,
 @samp{autogen} and @samp{definitions} followed by the default
-template name and a terminating semi-colon @code{;}.
+template name and a terminating semi-colon (@code{;}).  That is:
+
+@example
+        AutoGen Definitions @var{template-name};
+@end example
+
+@noindent
+Note that, other than the name @var{template-name}, the words
+@samp{AutoGen} and @samp{Definitions} are searched for without case
+sensitivity.  Most lookups in this program are case insensitive.
 
 @cindex template, file name
 @cindex .tpl, file name
 @cindex tpl, file name
 
 @noindent
-The template file is determined from the template name in the following way:
+AutoGen uses the name of the template to find the corresponding template
+file.  It searches for the file in the following way, stopping when
+it finds the file:
 
 @enumerate
 @item
-The template name is appended, if needed, with the string, ".tpl".
+It tries to open @file{./@var{template-name}}.  If it fails,
 @item
-@cindex Templ-Dirs
-The file is looked for in the current directory.
+it tries @file{./@var{template-name}.tpl}.
 @item
-The file is looked for in the directories named
-in the @code{Templ-Dirs} options on the command line,
-in the order specified.
-@item
-If the file is not found in any of these locations,
-a message is printed and AutoGen exits.
+It searches for either of these files in the directories listed in the
+templ-dirs command line option.
 @end enumerate
 
-For a @code{foobar} template, your identification definition will look
-like this:
-
-@example
-AutoGen Definitions foobar;
-@end example
-
-@noindent
-Note that, other than the name @code{foobar}, the words @samp{AutoGen}
-and @samp{definitions} are searched for without case sensitivity.
-Most lookups in this program are case insensitive.
+If AutoGen fails to find the template file in one of these places,
+it prints an error message and exits.
 
 @node Definitions
 @section Simple and Compound Definitions
@@ -498,6 +514,21 @@ value.
 contain nested compound definitions.  Any such definitions may
 @strong{only} be expanded within a @code{FOR} block iterating over the
 containing compound definition.  @xref{FOR}.
+
+Here is, again, the example definitions from the previous chapter,
+with three additional name value pairs.  Two with an empty value
+assigned (@var{first} and @var{last}), and a "global" @var{group_name}.
+
+@example
+autogen definitions list;
+group_name = example;
+list = @{ list_element = alpha;  first;
+         list_info    = "some alpha stuff"; @};
+list = @{ list_info    = "more beta stuff";
+         list_element = beta; @};
+list = @{ list_element = omega;  last;
+         list_info    = "final omega stuff"; @};
+@end example
 
 @cindex simple definitions, format
 The string values for definitions may be specified in one of four
@@ -734,7 +765,7 @@ of suffixes to be generated by the template.
 * template id::      Format of the Pseudo Macro
 @end menu
 
-AutoGen-ing a file consists of copying text from the template proper to
+AutoGen-ing a file consists of copying text from the template to
 the output file until a start macro marker is found.  The text from the
 start marker to the end marker constitutes the macro text.  If it starts
 with a hash mark (@code{#}), then the macro is a comment.  If it starts
@@ -755,6 +786,33 @@ _FOR macfunc =][=
 @node template id
 @section Format of the Pseudo Macro
 @cindex template id
+
+The template file must begin with a pseudo-macro.  The pseudo-macro
+is used to identify the file as an AutoGen template file,
+define the starting and ending macro markers and specify the
+list of output files the template is to create.
+
+Assuming we want to use @code{[+} and @code{+]} as the start and
+end macro markers, and we wish to produce a @file{.c} and a @file{.h}
+file, then the first macro invocation will look something like this:
+
+@example
+[+ autogen template -*- Mode: emacs-mode-of-choice -*-
+
+h=chk-%s.h
+
+c +]
+@end example
+
+@noindent
+Note:  It is generally a good idea to use some sort of opening
+bracket in the starting macro and closing bracket in the ending
+macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
+in the starting macro).  It helps both visually and with editors
+capable of finding a balancing parenthesis.
+
+@noindent
+Detailed description:
 
 The starting macro marker must be the first non-white space characters
 encountered in the file.  The marker consists of all the contiguous
@@ -789,28 +847,6 @@ AutoGen.
 The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
 character after the new-line that follows the end macro marker.
-
-So, assuming we want to use @code{[#} and @code{#]} as the start and
-end macro markers, and we wish to produce a @file{.c} and a @file{.h}
-file, then the first macro invocation will look something like this:
-
-@example
-[#autogen template -*- Mode: emacs-mode-of-choice -*-
-
-h=chk-%s.h
-
-# it is important that the end macro mark appear after
-# useful text.  Otherwise, the '#]' by itself would be
-# seen as a comment and ignored.
-
-c #]
-@end example
-
-Note:  It is generally a good idea to use some sort of opening
-bracket in the starting macro and closing bracket in the ending
-macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
-in the starting macro).  It helps both visually and with editors
-capable of finding a balancing parenthesis.
 
 [=
 

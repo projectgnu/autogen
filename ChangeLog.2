@@ -14,15 +14,36 @@
 
 1999-03-15  Gary V. Vaughan  <gvaughan@pranda.demon.co.uk>
 
-       * configure.in: Use fixed autoconf-2.13 id_t type relplacement.
-       Removed conditional macros which break under automake-1.4:
-       unfortunately AutoGen now *requires* automake-1.4 and autoconf-2.13.
-       * src/proto.h (strdup):  Bogus prototype removed.  A harmless warning
-       about mismatched types will be seen on machines which don't
-       prototype strdup in strings.h, but trying to second guess how strdup
-       is prototyped in the system headers was bound to fail on some targets.
-       * compat/sigsend.c (id_t): configury will typedef this for us if
-       it is missing from the system headers.
+	* configure.in: Use fixed autoconf-2.13 id_t type relplacement.
+	Removed conditional macros which break under automake-1.4:
+	unfortunately AutoGen now *requires* automake-1.4 and autoconf-2.13.
+	* src/proto.h (strdup):  Bogus prototype removed.  A harmless warning
+	about mismatched types will be seen on machines which don't
+	prototype strdup in strings.h, but trying to second guess how strdup
+	is prototyped in the system headers was bound to fail on some targets.
+	* compat/sigsend.c (id_t): configury will typedef this for us if
+	it is missing from the system headers.
+
+1999-01-26  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/fopenbinary: removed.
+	* config/openmode.m4: new file with macros from fopenbinary
+	and equivalent functions for text mode opening.
+	* configure.in: use the AG_FUNC_FOPEN_TEXT macro.
+	* config/acconfig.h: add USE_FOPEN_TEXT define.
+	* compat/compat.h (FOPEN_TEXT): define this to "t" or
+	"" depending on USE_FOPEN_TEXT value.
+	* autoopts/autoopts.h:  ditto.
+	* getdefs/getdefs.c: ditto.
+
+	* config/bootstrap: tidied up somewhat.
+
+	* configure.in: removed duplicate AC_PROG_INSTALL.
+
+	* VERSION: calculate libtool soname correctly.
+
+	* tests/evalstr.test: a bug in bash 2.02(1) prevents
+	\177 from being quoted properly =(O|
 
 1998-12-01  Bruce Korb  <korb@datadesign.com>
 

@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.13 1999/03/01 21:21:15 bkorb Exp $
+ *  $Id: getdefs.c,v 2.12 1999/03/17 16:55:21 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
@@ -1195,7 +1195,7 @@ buildDefinition(
             pzNextDef = pzDef = pzDef + match[1].rm_so;
             break;
 
-        case REG_NOMATCH:
+        case 1:
             /*
              *  No more attributes.
              */

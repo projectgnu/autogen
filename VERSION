@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".1"
+AG_PATCHLEVEL=".2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Library versioning for libopts
@@ -63,10 +63,11 @@ fi
 
 # Display version numbers banner for my sanity!
 #
+soname=$LT_LIBRARY.`expr $LT_CURRENT - $LT_AGE`.$LT_AGE.$LT_REVISION
 spaces="                                "
 while :
 do
-  string="$PACKAGE-$VERSION$spaces$LT_LIBRARY.$LT_CURRENT.$LT_AGE.$LT_REVISION"
+  string="$PACKAGE-$VERSION$spaces$soname"
   if echo "$string" | grep -q '^.\{78,\}$'; then
     break
   fi

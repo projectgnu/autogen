@@ -8,7 +8,7 @@
  * Last Modified:     Tue Nov 24 08:15:35 1998
  *            by:     Bruce Korb <korb@datadesign.com>
  *
- * $Id: compat.h,v 2.1 1998/12/08 18:34:33 bkorb Exp $
+ * $Id: compat.h,v 2.2 1999/03/17 16:55:18 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -88,6 +88,14 @@
 #    define FOPEN_BINARY_FLAG	"b"
 #  else
 #    define FOPEN_BINARY_FLAG
+#  endif
+#endif
+
+#ifndef FOPEN_TEXT_FLAG
+#  ifdef USE_TEXT_BINARY
+#    define FOPEN_TEXT_FLAG	"t"
+#  else
+#    define FOPEN_TEXT_FLAG
 #  endif
 #endif
 

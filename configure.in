@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Tue Mar 16 07:39:41 1999
-dnl            by:    Bruce Korb <korb@datadesign.com>
+dnl Last Modified:    Tue Mar 16 11:32:04 1999				      
+dnl            by:    Gary V. Vaughan <garyv@oranda.demon.co.uk>	      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.8 1999/03/16 15:54:57 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.9 1999/03/17 16:55:18 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.8 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.9 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -122,7 +122,7 @@ AC_CHECK_TYPE(u_short, unsigned short int)
 AC_CHECK_TYPE(u_int, unsigned int)
 AC_CHECK_TYPE(u_long, unsigned long int)
 AC_CHECK_TYPE(id_t, int)
-# AC_CHECK_TYPE(wchar_t, unsigned in)
+# AC_CHECK_TYPE(wchar_t, unsigned int)
 AC_C_CONST
 AC_C_INLINE
 AC_CHECK_SIZEOF(char*, 4)
@@ -134,6 +134,7 @@ AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal sigsend pathfind)
 AC_FUNC_ALLOCA
 AG_FUNC_FOPEN_BINARY
+AG_FUNC_FOPEN_TEXT
 AG_FUNC_CTIME_HEAP
 AG_FUNC_STRFTIME
 AG_FUNC_VSNPRINTF_DOLLAR

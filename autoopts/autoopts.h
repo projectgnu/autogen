@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.3 1998/11/25 21:19:32 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.4 1999/03/17 16:55:18 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -85,6 +85,14 @@
 #    define FOPEN_BINARY_FLAG	"b"
 #  else
 #    define FOPEN_BINARY_FLAG
+#  endif
+#endif
+
+#ifndef FOPEN_TEXT_FLAG
+#  ifdef USE_TEXT_BINARY
+#    define FOPEN_TEXT_FLAG	"t"
+#  else
+#    define FOPEN_TEXT_FLAG
 #  endif
 #endif
 

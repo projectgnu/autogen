@@ -9,7 +9,7 @@
 # Last Modified:     Tue Nov 24 08:57:45 1998
 #            by:     Bruce Korb <korb@datadesign.com>
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.4 1998/12/08 18:34:43 bkorb Exp $
+# $Id: bootstrap,v 1.5 1999/03/17 16:55:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -55,6 +55,12 @@ missing()
 	(or any later version found there)
 	_EOF_
 	DIE=1
+}
+
+doit ()
+{
+    echo "$@"
+    eval "$@"
 }
 
 # We must be using autoconf (or we wouldn't need this script!).
@@ -131,20 +137,11 @@ do
         test -n "$auxdir" || auxdir=$srcdir
         test -d $auxdir || auxdir=.
 
-        echo $LIBTOOLIZE    --force
-        $LIBTOOLIZE    --force
-        echo $ACLOCAL       -I $auxdir
-        $ACLOCAL       -I $auxdir
-        echo $AUTOHEADER    -l $auxdir
-        $AUTOHEADER    -l $auxdir
-        echo $AUTOMAKE      --add-missing
-        $AUTOMAKE      --add-missing
-        echo $AUTOMAKE      --gnu
-        $AUTOMAKE      --gnu
-        echo $AUTOCONF
-        $AUTOCONF
-        echo $AUTOHEADER    -l $auxdir
-        $AUTOHEADER    -l $auxdir
+        doit $LIBTOOLIZE    --force
+        doit $ACLOCAL       -I $auxdir
+        doit $AUTOMAKE      --gnu --add-missing
+        doit $AUTOCONF
+        doit $AUTOHEADER    -l $auxdir
     )
 done
 

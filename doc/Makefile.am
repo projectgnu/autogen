@@ -8,7 +8,7 @@
 ## Last Modified:   Fri Feb 26 08:55:14 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.10 1999/02/26 17:36:35 bkorb Exp $
+## $Id: Makefile.am,v 2.11 1999/03/17 16:55:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -51,6 +51,14 @@ autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC)
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	CC="${CC}" \
 	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
+
+www/doc/autogen_toc.html : autogen.texi
+	@mkdir -f www/doc > /dev/null 2>&1
+	cd www/doc ; texi2html -split_chapter -verbose \
+		$(top_builddir)/doc/autogen.texi
+	@touch $@
+
+web : www/doc/autogen_toc.html
 
 $(top_builddir)/getdefs/getdefs.texi :
 	@cd $(top_builddir)/getdefs/ ; $(MAKE) gen
