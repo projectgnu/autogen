@@ -19,7 +19,7 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 
 2. Add the following to your ``configure.ac'' file:
 
-      AUTOOPTS_CHECK
+      LIBOPTS_CHECK
 
    This macro will automatically invoke
 

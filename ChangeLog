@@ -1,5 +1,9 @@
 2002-12-14  Bruce Korb  <bkorb@gnu.org>
 
+	* */opts.def: change bugs@sf.net to bugs@lists.sf.net throughout
+
+2002-12-14  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/expFormat.c(ag_scm_dne): add another optional argument.
 	If the first arg is "-d", then do not insert a date and shift args 1.
 	* agen5/test/format.test: test this feature

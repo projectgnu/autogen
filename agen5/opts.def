@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.13 2002/12/14 02:25:33 bkorb Exp $
+ *   $Id: opts.def,v 3.14 2002/12/19 01:35:37 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -27,7 +27,7 @@ autogen definitions options;
 copyright = {
     date  = "1992-2002";
     owner = "Bruce Korb";
-    eaddr = "autogen-bugs@sf.net";
+    eaddr = "autogen-bugs@lists.sf.net";
     type  = gpl;
 };
 
