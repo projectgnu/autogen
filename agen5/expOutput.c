@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.6 1999/11/03 05:21:17 bruce Exp $
+ *  $Id: expOutput.c,v 1.7 1999/11/04 05:34:50 bruce Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -74,6 +74,7 @@ addWriteAccess( char* pzFileName )
 
 /*=gfunc out_delete
  *
+ * what: delete current output file
  * doc:  
  *  Remove the current output file.  Cease processing the template for
  *  the current suffix.  It is an error if there are @code{push}-ed
@@ -98,6 +99,7 @@ ag_scm_out_delete( void )
 
 /*=gfunc out_move
  *
+ * what:   change name of output file
  * exparg: new-name, new name for the current output file
  *
  * doc:    Rename current output file.  @xref{output controls}.
@@ -116,6 +118,7 @@ ag_scm_out_move( SCM new_file )
 
 /*=gfunc out_pop
  *
+ * what:  close current output file
  * doc:  
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
@@ -138,6 +141,7 @@ ag_scm_out_pop( void )
 
 /*=gfunc out_push_add
  *
+ * what:   open an old output file
  * exparg: file-name, name of the file to append text to
  *
  * doc: 
@@ -174,6 +178,7 @@ ag_scm_out_push_add( SCM new_file )
 
 /*=gfunc out_push_new
  *
+ * what:   open a new output file
  * exparg: file-name, name of the file to create
  *
  * doc:
@@ -211,6 +216,7 @@ ag_scm_out_push_new( SCM new_file )
 
 /*=gfunc out_switch
  *
+ * what:   close current and open new file
  * exparg: file-name, name of the file to create
  *
  * doc:
@@ -265,6 +271,7 @@ ag_scm_out_switch( SCM new_file )
 
 /*=gfunc out_depth
  *
+ * what: determine the output stack depth
  * doc:  Returns the depth of the output file stack.
  *       @xref{output controls}.
 =*/
@@ -277,6 +284,7 @@ ag_scm_out_depth( void )
 
 /*=gfunc out_name
  *
+ * what: get the current output file name
  * doc:  Returns the name of the current output file.
  *       @xref{output controls}.
 =*/
