@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.16 2003/08/24 00:01:30 bkorb Exp $
+## $Id: Makefile.am,v 3.17 2003/12/03 02:45:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -81,7 +81,7 @@ texi-stamp : autogen.def
 	AGEXE=$(AGEXE) CC="$(CC)" COLUMNS_EXE="$(COLUMNS_EXE)" \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
-	LIBS="$(LIBS)" SHELL=/bin/sh \
+	LIBS="$(LIBS)" SHELL=/bin/sh MAKE='$(MAKE)' \
 	$(AGEXE) -t180 -L$(srcdir) -L$(top_srcdir) autogen.def
 	@touch $@ ; chmod u+w $(srcdir) . || :
 

@@ -1,3 +1,12 @@
+2003-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c(emitMatchExpr): consolodate some code here &
+	fix a bug where a possibly null pointer was not tested for such.
+	* doc/Makefile.am(texi-stamp): $(MAKE) must be passed through, too.
+	* doc/auto_gen.tpl: show an example of a shell script option parsing
+	program that reorders command arguments.
+	* doc/autogen.texi: ditto.
+
 2003-11-22  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am(CSRC): add sort.c file

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.14 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: makeshell.c,v 3.15 2003/12/03 02:45:08 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -362,6 +362,9 @@ STATIC void
 emitFlag( tOptions* pOpts );
 
 STATIC void
+emitMatchExpr( tCC* pzMatchName, tOptDesc* pCurOpt, tOptions* pOpts );
+
+STATIC void
 emitLong( tOptions* pOpts );
 
 STATIC void
@@ -406,6 +409,9 @@ putShellParse( tOptions* pOpts )
     emitUsage( pOpts );
     emitSetup( pOpts );
 
+    /*
+     *  There are four modes of option processing.
+     */
     switch (pOpts->fOptSet & (OPTPROC_LONGOPT|OPTPROC_SHORTOPT)) {
     case OPTPROC_LONGOPT:
         fputs( zLoopCase,        stdout );
@@ -653,6 +659,10 @@ emitSetup( tOptions* pOpts )
 
         char zVal[16];
 
+        /*
+         *  Options that are either usage documentation or are compiled out
+         *  are not to be processed.
+         */
         if (SKIP_OPT(pOptDesc) || (pOptDesc->pz_NAME == (char*)NULL))
             continue;
 
@@ -661,7 +671,7 @@ emitSetup( tOptions* pOpts )
         else pzFmt = zSingleDef;
 
         /*
-         *  IF this is an enumeration option, then convert the value
+         *  IF this is an enumeration/bitmask option, then convert the value
          *  to a string before printing the default value.
          */
         if (pOptDesc->fOptState & OPTST_ENUMERATION) {
@@ -669,7 +679,10 @@ emitSetup( tOptions* pOpts )
             pzDefault = pOptDesc->pzLastArg;
         }
 
-        else if (pOptDesc->fOptState & OPTST_NUMERIC) {
+        /*
+         *  Numeric and membership bit options are just printed as a number.
+         */
+        else if (pOptDesc->fOptState & (OPTST_NUMERIC | OPTST_MEMBER_BITS)) {
             snprintf( zVal, sizeof( zVal ), "%ld", (tUL)pOptDesc->pzLastArg );
             pzDefault = zVal;
         }
@@ -778,142 +791,119 @@ emitFlag( tOptions* pOpts )
 }
 
 
+/*
+ *  Emit the match text for a long option
+ */
+STATIC void
+emitMatchExpr( tCC* pzMatchName, tOptDesc* pCurOpt, tOptions* pOpts )
+{
+    tOptDesc* pOD = pOpts->pOptDesc;
+    int       oCt = pOpts->optCt;
+    int       min = 1;
+    char      zName[ 256 ];
+    char*     pz  = zName;
+
+    for (;;) {
+        int matchCt = 0;
+
+        /*
+         *  Omit the current option, Documentation opts and compiled out opts.
+         */
+        if ((pOD == pCurOpt) || SKIP_OPT(pOD)){
+            if (--oCt <= 0)
+                break;
+            pOD++;
+            continue;
+        }
+
+        /*
+         *  Check each character of the name case insensitively.
+         *  They must not be the same.  They cannot be, because it would
+         *  not compile correctly if they were.
+         */
+        while (  toupper( pOD->pz_Name[matchCt] )
+              == toupper( pzMatchName[matchCt] ))
+            matchCt++;
+
+        if (matchCt > min)
+            min = matchCt;
+
+        /*
+         *  Check the disablement name, too.
+         */
+        if (pOD->pz_DisableName != (char*)NULL) {
+            matchCt = 0;
+            while (  toupper( pOD->pz_DisableName[matchCt] )
+                  == toupper( pzMatchName[matchCt] ))
+                matchCt++;
+            if (matchCt > min)
+                min = matchCt;
+        }
+        if (--oCt <= 0)
+            break;
+        pOD++;
+    }
+
+    /*
+     *  IF the 'min' is all or one short of the name length,
+     *  THEN the entire string must be matched.
+     */
+    if (  (pzMatchName[min  ] == NUL)
+       || (pzMatchName[min+1] == NUL) )
+        printf( zOptionFullName, pzMatchName );
+
+    else {
+        int matchCt = 0;
+        for (; matchCt <= min; matchCt++)
+            *pz++ = pzMatchName[matchCt];
+
+        for (;;) {
+            *pz = NUL;
+            printf( zOptionPartName, zName );
+            *pz++ = pzMatchName[matchCt++];
+            if (pzMatchName[matchCt] == NUL) {
+                *pz = NUL;
+                printf( zOptionFullName, zName );
+                break;
+            }
+        }
+    }
+}
+
+
+/*
+ *  Emit GNU-standard long option handling code
+ */
 STATIC void
 emitLong( tOptions* pOpts )
 {
-    tOptDesc* pOptDesc = pOpts->pOptDesc;
-    int       optionCt = pOpts->optCt;
+    tOptDesc* pOD = pOpts->pOptDesc;
+    int       ct  = pOpts->optCt;
 
     fputs( zOptionCase, stdout );
 
-    for (;optionCt > 0; pOptDesc++, --optionCt) {
-        tOptDesc* pOD = pOpts->pOptDesc;
-        int       oCt = pOpts->optCt;
-        int       min = 1;
-        int       matchCt = 0;
-        char      zName[ 256 ];
-        char*     pz = zName;
-
-        if (SKIP_OPT(pOptDesc))
+    /*
+     *  do each option, ...
+     */
+    do  {
+        /*
+         *  Documentation & compiled-out options
+         */
+        if (SKIP_OPT(pOD))
             continue;
 
-        for (;;) {
-            matchCt = 0;
-
-            if ((pOD == pOptDesc) || SKIP_OPT(pOD)){
-                if (--oCt <= 0)
-                    break;
-                pOD++;
-                continue;
-            }
-
-            while (  toupper( pOD->pz_Name[matchCt] )
-                  == toupper( pOptDesc->pz_Name[matchCt] ))
-                matchCt++;
-            if (matchCt > min)
-                min = matchCt;
-
-            if (pOD->pz_DisableName != (char*)NULL) {
-                matchCt = 0;
-                while (  toupper( pOD->pz_DisableName[matchCt] )
-                      == toupper( pOptDesc->pz_Name[matchCt] ))
-                    matchCt++;
-                if (matchCt > min)
-                    min = matchCt;
-            }
-            if (--oCt <= 0)
-                break;
-            pOD++;
-        }
+        emitMatchExpr( pOD->pz_Name, pOD, pOpts );
+        printOptionAction( pOpts, pOD );
 
         /*
-         *  IF the 'min' is all or one short of the name length,
-         *  THEN the entire string must be matched.
+         *  Now, do the same thing for the disablement version of the option.
          */
-        if (  (pOptDesc->pz_Name[min  ] == NUL)
-           || (pOptDesc->pz_Name[min+1] == NUL) )
-            printf( zOptionFullName, pOptDesc->pz_Name );
-
-        else {
-            for (matchCt = 0; matchCt <= min; matchCt++)
-                *pz++ = pOptDesc->pz_Name[matchCt];
-
-            for (;;) {
-                *pz = NUL;
-                printf( zOptionPartName, zName );
-                *pz++ = pOptDesc->pz_Name[matchCt++];
-                if (pOptDesc->pz_Name[matchCt] == NUL) {
-                    *pz = NUL;
-                    printf( zOptionFullName, zName );
-                    break;
-                }
-            }
+        if (pOD->pz_DisableName != (char*)NULL) {
+            emitMatchExpr( pOD->pz_DisableName, pOD, pOpts );
+            printOptionInaction( pOpts, pOD );
         }
+    } while (pOD++, --ct > 0);
 
-        printOptionAction( pOpts, pOptDesc );
-        if (pOptDesc->pz_DisableName == (char*)NULL)
-            continue;
-
-        pOD = pOpts->pOptDesc;
-        oCt = pOpts->optCt;
-        min = 1;
-        pz = zName;
-
-        for (;;) {
-            matchCt = 0;
-
-            if ((pOD == pOptDesc) || SKIP_OPT(pOptDesc)){
-                if (--oCt <= 0)
-                    break;
-                pOD++;
-                continue;
-            }
-
-            while (  toupper( pOD->pz_Name[matchCt] )
-                  == toupper( pOptDesc->pz_DisableName[matchCt] ))
-                matchCt++;
-            if (matchCt > min)
-                min = matchCt;
-
-            if (pOD->pz_DisableName != (char*)NULL) {
-                matchCt = 0;
-                while (  toupper( pOD->pz_DisableName[matchCt] )
-                      == toupper( pOptDesc->pz_DisableName[matchCt] ))
-                    matchCt++;
-                if (matchCt > min)
-                    min = matchCt;
-            }
-            if (--oCt <= 0)
-                break;
-            pOD++;
-        }
-
-        /*
-         *  IF the 'min' is all or one short of the name length,
-         *  THEN the entire string must be matched.
-         */
-        if (  (pOptDesc->pz_DisableName[min  ] == NUL)
-           || (pOptDesc->pz_DisableName[min+1] == NUL) )
-            printf( zOptionFullName, pOptDesc->pz_DisableName );
-
-        else {
-            for (matchCt = 0; matchCt <= min; matchCt++)
-                *pz++ = pOptDesc->pz_DisableName[matchCt];
-
-            for (;;) {
-                *pz = NUL;
-                printf( zOptionPartName, zName );
-                *pz++ = pOptDesc->pz_DisableName[matchCt++];
-                if (pOptDesc->pz_DisableName[matchCt] == NUL) {
-                    *pz = NUL;
-                    printf( zOptionFullName, zName );
-                    break;
-                }
-            }
-        }
-
-        printOptionInaction( pOpts, pOptDesc );
-    }
     printf( zOptionUnknown, "option", pOpts->pzPROGNAME );
 }
 

@@ -47,7 +47,7 @@ case "$1" in
   f=ao$$.h
   exec 4> $f
   sed '/=== LOCAL PROCEDURES ===/q' autoopts.h >&4
-  for g in *.c
+  for g in `egrep -l '^LOCAL ' *.c`
   do
     echo
     echo "/* $g */"

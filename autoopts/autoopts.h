@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-11-23 08:41:41 bkorb"
+ *  Time-stamp:      "2003-11-23 11:28:38 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.19 2003/11/23 19:16:36 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.20 2003/12/03 02:45:08 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -187,7 +187,7 @@ extern tOptProc doVersion, doPagedUsage, doLoadOpt;
 
 /* autoopts.c */
 static tSuccess
-loadValue( tOptions* pOpts, tOptState* pOptState );
+handleOption( tOptions* pOpts, tOptState* pOptState );
 
 static tSuccess
 longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState );
@@ -195,157 +195,18 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState );
 static tSuccess
 shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState );
 
-static tSuccess
-findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
-static tSuccess
-nextOption( tOptions* pOpts, tOptState* pOptState );
-
-static tSuccess
-doImmediateOpts( tOptions* pOpts );
-
-static void
-loadOptionLine(
-    tOptions*  pOpts,
-    tOptState* pOS,
-    char*      pzLine,
-    tDirection direction );
-
+/* load.c */
 static void
 filePreset(
     tOptions*     pOpts,
     const char*   pzFileName,
     int           direction );
 
-static void
-doEnvPresets( tOptions* pOpts, teEnvPresetType type );
-
-static tSuccess
-doPresets( tOptions* pOpts );
-
-static int
-checkConsistency( tOptions* pOpts );
-
-
-/* boolean.c */
-
-/* enumeration.c */
-static void
-enumError(
-    tOptions* pOpts,
-    tOptDesc* pOD,
-    tCC**     paz_names,
-    int       name_ct );
-
-static uintptr_t
-findName(
-    tCC*          pzName,
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC**         paz_names,
-    unsigned int  name_ct );
-
-
-/* genshell.c */
-
-/* guileopt.c */
-
-/* makeshell.c */
-static void
-textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD );
-
-static void
-emitUsage( tOptions* pOpts );
-
-static void
-emitSetup( tOptions* pOpts );
-
-static void
-printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc );
-
-static void
-printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc );
-
-static void
-emitFlag( tOptions* pOpts );
-
-static void
-emitLong( tOptions* pOpts );
-
-static void
-openOutput( const char* pzFile );
-
-static void
-genshelloptUsage( tOptions*  pOptions, int exitCode );
-
-
-/* numeric.c */
-
-/* pgusage.c */
-
-/* putshell.c */
-static void
-putQuotedStr( char* pzStr );
-
-
-/* restore.c */
-
-/* save.c */
-static char*
-findDirName( tOptions* pOpts );
-
-static char*
-findFileName( tOptions* pOpts );
-
-static void
-printEntry(
-    FILE*      fp,
-    tOptDesc*  p,
-    char*      pzLA );
-
 
 /* sort.c */
 static void
 optionSort( tOptions* pOpts );
-
-
-/* stack.c */
-
-/* streqvcmp.c */
-
-/* usage.c */
-static void
-printProgramDetails( tOptions* pOptions );
-
-static void
-printExtendedUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT );
-
-static void
-printBareUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT );
-
-static void
-setStdOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
-
-static void
-setGnuOptFmts( tOptions* pOpts, tCC** ppT, arg_types_t** ppAT );
-
-static void
-printInitList(
-    tCC**    papz,
-    ag_bool* pInitIntro,
-    tCC*     pzRc,
-    tCC*     pzPN );
-
-
-/* version.c */
-static void
-printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
 
 /* === END LOCALS === */
 

@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.21 2003/07/11 01:03:13 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.22 2003/12/03 02:45:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -601,7 +601,7 @@ then
   exit 1
 fi ) >&2
 HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
-   sed 's,@,@@,g;s,{,@{,g;s,},@},g;s,\t,        ,g' " ))
+   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g' " ))
 =]
 @end example
 [=
@@ -618,9 +618,65 @@ f=../autoopts/libopts.texi
 }
 cat $f`
 
-=][=
+=]
+[=
 
-get-text tag = "autoopts-data" =]
+get-text tag = "autoopts-data"
+
+=]
+[=
+
+ (out-push-new)
+
+=]fn() {
+    cd ${top_builddir}/autoopts/test || return
+    VERBOSE=true
+    export VERBOSE
+    ${MAKE} check TESTS=errors.test > /dev/null 2>&1
+    if test ! -x testdir/errors
+    then
+      return
+    fi
+    cat <<-EOF
+
+	Here is the usage output example from AutoOpts error handling
+	tests.  The option definition has argument reordering enabled:
+
+	@example
+EOF
+
+    ./testdir/errors -? | sed 's,	,        ,g;s,\([@{}]\),@\1,g'
+    cmd='errors operand1 -s first operand2 -X -- -s operand3'
+    cat <<-EOF
+	@end example
+
+	Using the invocation,
+	@example
+	  test-${cmd}
+	@end example
+	you get the following output for your shell script to evaluate:
+
+	@example
+	`testdir/${cmd}`
+	@end example
+EOF
+}
+fn
+[=
+
+(shell (out-pop #t))
+
+=]
+@node script-parser
+@subsection Parsing with a Portable Script
+
+If you had used @code{test-main = putShellParse} instead, then you can,
+at this point, merely run the program and it will write the parsing
+script to standard out.  You may also provide this program with command
+line options to specify the shell script file to create or edit, and you
+may specify the shell program to use on the first shell script line.
+That program's usage text would look something like the following
+and the script parser itself would be very verbose:
 
 @example
 [= `
@@ -644,7 +700,12 @@ then
 fi
 
 ${tempdir}/genshellopt --help | \
-  sed -e 's,\t,        ,g;s,@,@@,g;s,{,@{,g;s,},@},g'
+  sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
+set -x
+echo
+echo
+${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || kill -HUP $AG_pid
+sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g' ${tempdir}/genshellopt.sh
 
 ` =]
 @end example

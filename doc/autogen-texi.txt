@@ -2225,7 +2225,7 @@ Specifies the syntax of the arguments that @strong{follow} the options.
 It may not be empty, but if it is not supplied, then option processing
 must consume all the arguments.  If it is supplied and starts with an
 open bracket (@code{[}), then there is no requirement on the presence or
-absence of command line argument following the options.  Lastly, if it
+absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
 
@@ -3879,16 +3879,16 @@ also a web page that describes what you need to do:
 @section AutoOpts for Shell Scripts
 @cindex shell options
 
-AutoOpts may be used with shell scripts by automatically creating a
+AutoOpts may be used with shell scripts either by automatically creating a
 complete program that will process command line options and pass back
 the results to the invoking shell by issuing shell variable assignment
-commands.  It may also be used to generate portable shell code that can
+commands, or it may be used to generate portable shell code that can
 be inserted into your script.
 
 The functionality of these features, of course, is somewhat constrained
 compared with the normal program facilities.  Specifically, you cannot
 invoke callout procedures with either of these methods.  Additionally,
-if you generate a shell script:
+if you generate a shell script to do the parsing:
 
 @enumerate
 @item
@@ -3908,40 +3908,39 @@ the definitions file with the additional global attribute:
 test-main [ = proc-to-call ] ;
 @end example
 
-If you do not supply a @code{proc-to-call}, it will default
-to @code{putBourneShell}.  That will produce a program that
-will process the options and generate shell text for the
-invoking shell to interpret.  If you supply the name,
-@code{putShellParse}, then you will have a program that
-will generate a shell script that can parse the options.
-If you supply a different procedure name, you will have to
-provide that routine and it may do whatever you like.
+If you do not supply a @code{proc-to-call}, it will default to
+@code{putBourneShell}.  That will produce a program that will process the
+options and generate shell text for the invoking shell to interpret
+(@pxref{binary-parser}).  If you supply the name, @code{putShellParse}, then
+you will have a program that will generate a shell script that can parse the
+options (@pxref{script-parser}).  If you supply a different procedure name,
+you will have to provide that routine and it may do whatever you like.
 
-In summary, you will need to issue approximately the
-following two commands to have a working program:
+@menu
+* binary-parser::        Parsing with an Executable
+* script-parser::        Parsing with a Portable Script
+@end menu
+
+@node binary-parser
+@subsection Parsing with an Executable
+
+The following commands are approximately all that is needed
+to build a shell script command line option parser from
+an option definition file:
 
 @example
-autogen -L <opt-template-dir> program.def
-cc -o progopts -L <opt-lib-dir> -I <opt-include-dir> \
-        -DTEST_program_OPTS program.c -lopts
+autogen -L <opt-template-dir> test-errors.def
+cc -o test-errors -L <opt-lib-dir> -I <opt-include-dir> \
+        -DTEST_PROGRAM_OPTS test-errors.c -lopts
 @end example
 
-The resulting
-program can be used within your shell script as follows:
+The resulting program can then be used within your shell script as follows:
 
 @example
-eval `./progopts $@@`
+eval `./test-errors "$@@"`
 if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
-shift $@{OPTION_CT@}
+test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
-
-If you had used @code{test-main = putShellParse} instead, then you can,
-at this point, merely run the program and it will write the parsing
-script to standard out.  You may also provide this program with command
-line options to specify the shell script file to create or edit, and you
-may specify the shell program to use on the first shell script line.
-That program's usage text would look something like this:
-
 @ignore
 END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
