@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.23 1999/08/13 00:19:45 bkorb Exp $
+## $Id: Makefile.am,v 2.24 1999/10/26 02:39:30 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -49,7 +49,7 @@ TPLINC		= $(top_srcdir)/src/agParse.y \
 		$(top_builddir)/getdefs/getdefs.texi
 
 GETDEFS		= $(top_builddir)/getdefs/getdefs filelist
-AGEXE		= $(top_builddir)/src/autogen
+AGEXE		= AutoGen
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg=-L$(srcdir) agarg=-L$(top_srcdir) agarg=-t60
 
