@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Mon Aug 30 12:20:25 1999				      
+# Last Modified:     Mon Aug 30 12:24:10 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.22 1999/08/30 19:20:33 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.23 1999/08/30 19:25:17 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -24,7 +24,7 @@ add_make_links()
 	#MAKE LINK TREE
 	#
 	top_builddir=`pwd`
-	top_srcdir=`echo $0 | sed 's@/[^/]*$@@'`
+	top_srcdir=`echo $0 | sed 's,/[^/]*$,,'`
 	top_srcdir=`cd $top_srcdir && pwd`
 	if test "$top_srcdir" = "$top_builddir" ; then : ; else
 	  ( cd $top_srcdir
@@ -97,7 +97,6 @@ post )
     # remove the fake file so we don't forget to generate it later.
     test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
         || rm -f doc/autogen.texi
-    sh configure $@
     add_make_links
     ;;
 
