@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.11 2000/03/05 20:58:13 bruce Exp $
+ *  $Id: autogen.h,v 1.12 2000/03/15 02:45:19 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -245,7 +245,7 @@ MODE jmp_buf     fileAbort        VALUE( { 0 } );
 MODE char*       pzCurStart       VALUE( (char*)NULL );
 MODE off_t       curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
-MODE FILE*       pfTrace          VALUE( stderr );
+MODE FILE*       pfTrace          VALUE( (FILE*)NULL );
 MODE tDefEntry   rootEntry;
 
 /*
