@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.1 2000/09/16 05:42:20 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.2 2000/09/16 06:19:50 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -31,6 +31,7 @@
 #include <fcntl.h>
 
 #include "autogen.h"
+#include <streqv.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -284,7 +285,6 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
          */
         switch (trans) {
         case FSX_AGEN_ED_MODE:
-        case FSX_END_MARK_ED_MODE:
         case FSX_INIT_ED_MODE:
         case FSX_ST_MARK_ED_MODE:
         case FSX_TEMPL_ED_MODE:
@@ -328,6 +328,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             pzData = skipSuffixSpec( pzData, pzFileName, templLineNo );
             break;
 
+        case FSX_END_MARK_ED_MODE:
         case FSX_INVALID:
             fsm_invalid_transition( fsm_state, fsm_tkn );
             fprintf( stderr, zTplErr, pzFileName, templLineNo, "FSM error" );
