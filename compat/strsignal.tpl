@@ -1,6 +1,6 @@
 < AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 3.0 2001/12/09 19:46:02 bkorb Exp $
+# $Id: strsignal.tpl,v 3.1 2002/05/31 00:26:15 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -14,17 +14,20 @@ h >
  */
 #ifndef MAX_SIGNAL_NUMBER
 #define MAX_SIGNAL_NUMBER < (high-lim "signal") >
+#ifndef tSCC
+#  define tSCC static const char
+#endif
 <
 FOR signal (for-from 0) (for-by 1) ><
   IF (exist? "signame") >
-static char zSig_< % signame (sprintf "%%-13s" "%s[]")
+tSCC zSig_< % signame (sprintf "%%-13s" "%s[]")
                  > = "SIG<signame>";<
   (out-push-add ".sig.liststr") >
-static char zInf_< % signame (sprintf "%%-13s" "%s[]")
+tSCC zInf_< % signame (sprintf "%%-13s" "%s[]")
                  > = < (c-string (get "sigtext")) >;<
   (out-pop) ><
   ELSE  >
-static char zBad_< (sprintf "%-13s" (sprintf "%d[]" (for-index)))
+tSCC zBad_< (sprintf "%-13s" (sprintf "%d[]" (for-index)))
                   > = "Signal <(for-index)> invalid";<
   ENDIF ><
   ;; evaluations
@@ -42,13 +45,13 @@ static char zBad_< (sprintf "%-13s" (sprintf "%d[]" (for-index)))
 
 ENDFOR signal>
 
-static char* signal_names[] = {
+tSCC* signal_names[] = {
 <`columns -I4 -S, -i .sig.names` > };
 
 #ifndef HAVE_SYS_SIGLIST
 <`cat .sig.liststr`>
 
-static char* sys_siglist[] = {
+tSCC* sys_siglist[] = {
 <`columns -I4 -S, -i .sig.list ; rm -f .sig.*` > };
 
 #endif /* HAVE_SYS_SIGLIST */
