@@ -1,3 +1,8 @@
+2000-03-05  Bruce Korb  <autogen@linuxbox.com>
+
+	* agen5/*:  reworked prototyping
+	* agen5/proto.h:  is now generated
+
 2000-03-04  Bruce Korb  <autogen@linuxbox.com>
 
 	* agen5/funcEval.c: The '?%' macro function failed.
