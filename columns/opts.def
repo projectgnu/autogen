@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.3 1998/09/28 20:05:59 bkorb Exp $
+ *   $Id: opts.def,v 1.4 1998/09/30 14:25:19 bkorb Exp $
  */
 
 /*
@@ -113,6 +113,15 @@ flag = {
     doc =
     "Use this option if, for example, you wish a comma to appear after\n"
     "each entry except the last.";
+};
+
+flag = {
+    name      = by_columns;
+    descrip   = "Print entries in column order";
+    doc =
+"Normally, the entries are printed out in order by rows and then columns.
+This option will cause the entries to be printed in rows.  The final
+column may be shorter than the others.";
 };
 
 flag = {

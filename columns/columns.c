@@ -18,7 +18,8 @@ size_t  usedCt    = 0;
 
 
 void readLines( void );
-void writeLines( void );
+void writeRows( void );
+void writeColumns( void );
 
 
     int
@@ -35,7 +36,9 @@ main( int    argc,
     if (HAVE_OPT( SORT ))
         qsort( (void*)papzLines, usedCt, sizeof( char* ), &compProc );
 
-    writeLines();
+    if (HAVE_OPT( BY_COLUMNS ))
+         writeColumns();
+    else writeRows();
 
     return 0;
 }
@@ -175,8 +178,146 @@ readLines( void )
 }
 
 
+struct print_list {
+    char**     papz;
+    int        index;
+};
+
+typedef struct print_list tPrintList, *tpPrintList;
+
     void
-writeLines( void )
+writeColumns( void )
+{
+    char zFmt[ 12 ];
+    int  colCt, rowCt, col, row;
+    tpPrintList pPL;
+
+    /*
+     *  Compute the columizing formatting string.
+     *  If the column width has been specified,
+     *  then 'maxline' is set to the right size already.
+     *  Otherwise, we will try to insert any left over space
+     *  between columns.
+     */
+    {
+        int  rem;
+        int  fsz;
+
+        colCt = OPT_VALUE_LINE_WIDTH / maxline;
+        rem   = OPT_VALUE_LINE_WIDTH - (colCt * maxline);
+
+        if ((rem == 0) || (colCt < 2) || (OPT_VALUE_COL_WIDTH > 0))
+            fsz = maxline;
+        else
+            fsz = maxline + (rem / (colCt-1));
+        sprintf( zFmt, "%%-%ds", fsz );
+    }
+
+    if (colCt == 1) {
+        writeRows();
+        return;
+    }
+
+    pPL   = (tpPrintList)malloc( colCt * sizeof( tPrintList ));
+
+    /*
+     *  This "loop" is normally executed half way through and exited.
+     *  IF, however, we would  produce an empty final column,
+     *  we will reduce our column count and line width and then
+     *  try the top-of-column pointer computation again.
+     */
+    for (;;) {
+        int  rem;
+        int  fsz;
+
+        rowCt = (usedCt/colCt) + ((usedCt % colCt) ? 1 : 0);
+
+        /*
+         *  FOR each column, compute the address of the pointer to
+         *  the string at the top of the column, and the index of
+         *  that entry.
+         */
+        for (col = 0; col < colCt ; col++) {
+            pPL[col].papz  = papzLines + (col * rowCt);
+            pPL[col].index = col * rowCt;
+        }
+
+        /*
+         *  IF the final column is not empty,
+         *  THEN break out and start printing.
+         */
+        if (pPL[colCt-1].index < usedCt)
+            break;
+
+        /*
+         *  The last column is blank, so we reduce our column count,
+         *  even if the user specified a count!!
+         */
+	colCt--;
+	rem   = OPT_VALUE_LINE_WIDTH - (colCt * maxline);
+
+        if ((rem == 0) || (colCt < 2) || (OPT_VALUE_COL_WIDTH > 0))
+            fsz = maxline;
+        else
+            fsz = maxline + (rem / (colCt-1));
+        sprintf( zFmt, "%%-%ds", fsz );
+    }
+
+    /*
+     *  IF we have a separator,
+     *  THEN remove it from the last entry.
+     */
+    if (HAVE_OPT( SEPARATION )) {
+        char* pz = papzLines[ usedCt-1 ];
+        pz += strlen( pz ) - strlen( OPT_ARG( SEPARATION ));
+        *pz = '\0';
+    }
+
+    for (row = 0; row < rowCt; row++) {
+        char*  pzL;
+        char*  pzE;
+
+        if (OPT_VALUE_INDENT > 0) {
+            int ct = OPT_VALUE_INDENT;
+            do { fputc( ' ', stdout ); } while (--ct > 0);
+        }
+
+        /*
+         *  Increment the index of the current entry in the last column.
+         *  IF it goes beyond the end of the entries in use,
+         *  THEN reduce our column count.
+         */
+        if ((pPL[colCt-1].index)++ >= usedCt)
+            colCt--;
+
+        /*
+         *  Get the address of the string in the last column.
+         */
+        pzE = *(pPL[colCt-1].papz++);
+
+        col = 0;
+        /*
+         *  FOR every column except the last,
+         *     print the entry with the width format
+         */
+        while (++col < colCt) {
+            pzL = *(pPL[col-1].papz++);
+            fprintf( stdout, zFmt, pzL );
+            free( (void*)pzL );
+        }
+
+        /*
+         *  Print the last entry on the line, without the width format
+         */
+        fputs( pzE, stdout );
+        fputc( '\n', stdout );
+        free( (void*)pzE );
+    }
+}
+
+
+    void
+writeRows( void )
 {
     char zFmt[ 12 ];
     int  colCt;
@@ -222,9 +363,14 @@ writeLines( void )
         size_t  left  = usedCt;
         int     lnNo  = 0;
 
-        do  {
+        for (;;) {
             char* pzL = *ppzLL++;
-            left--;
+            if (--left <= 0) {
+                fputs( pzL, stdout );
+                fputc( '\n', stdout );
+                free( (void*)pzL );
+                break;
+            }
 
             if (++lnNo < colCt)
                 fprintf( stdout, zFmt, pzL );
@@ -233,7 +379,7 @@ writeLines( void )
                 lnNo = 0;
                 fputs( pzL, stdout );
                 fputc( '\n', stdout );
-                if ((OPT_VALUE_INDENT > 0) && (left > 0)) {
+                if (OPT_VALUE_INDENT > 0) {
                     int ct = OPT_VALUE_INDENT;
                     do { fputc( ' ', stdout ); } while (--ct > 0);
                 }
