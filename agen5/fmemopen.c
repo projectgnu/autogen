@@ -533,7 +533,7 @@ fmemopen(void *buf, size_t len, const char *pMode)
     {
         cookie_read_function_t* pRd =
             (pFMC->mode & FLAG_BIT(read))  ? fmem_read  : NULL;
-        cookie_read_function_t* pWr =
+        cookie_write_function_t* pWr =
             (pFMC->mode & FLAG_BIT(write)) ? fmem_write : NULL;
 #if defined(HAVE_FOPENCOOKIE)
         cookie_io_functions_t iof;
@@ -548,7 +548,7 @@ fmemopen(void *buf, size_t len, const char *pMode)
                         (cookie_seek_function_t* )fmem_seek,
                         (cookie_close_function_t*)fmem_close );
 #else
-#  error We have neither fopencookie(3GNU) nor funopen(3BSD)
+#       error We have neither fopencookie(3GNU) nor funopen(3BSD)
 #endif
     }
 }
