@@ -4072,9 +4072,10 @@ are global definitions that apply to all the documented functions.
 
 This chapter includes several programs that either work closely
 with AutoGen (extracting definitions or providing special formatting
-functions).
+functions), or leverage off of AutoGen technology.  There is also
+a formatting library that helps make AutoGen possible.
 
-AutoOpts ought to appear in this list also, but since it is
+AutoOpts ought to appear in this list as well, but since it is
 the primary reason why many people would even look into AutoGen
 at all, I decided to leave it in the list of chapters.
 
