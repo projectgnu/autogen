@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.9 2002/05/11 20:23:52 bkorb Exp $
+ *  $Id: autoopts.c,v 3.10 2002/05/24 01:44:42 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1720,9 +1720,11 @@ optionProcess( pOpts, argCt, argVect )
 
     return pOpts->curOptIdx;
 }
+
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
+ * tab-width: 4
  * End:
  * autoopts.c ends here */

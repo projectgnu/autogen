@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/03/29 02:21:47 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2002/05/24 01:44:42 $
+#            by: bkorb
 #
-# $Id: errors.test,v 3.2 2002/03/29 02:21:47 bkorb Exp $
+# $Id: errors.test,v 3.3 2002/05/24 01:44:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -43,6 +43,7 @@ $AGEN ${testname}.def || \
   failure AutoGen could not process
 
 set -x
+mkdir ${testname}RC
 compile "--help"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
@@ -83,8 +84,6 @@ cmp -s ${testname}.h*lp || \
 ./${testname} -o > /dev/null 2>&1 && \
   failure ${testname} must have second argument
 
-mkdir ${testname}RC
-
 echo "second bumble" > ${testname}RC/.test_errorsrc
 ./${testname} -o mumble > /dev/null || \
   failure ${testname} did not see errorsRC/.test_errorsrc
@@ -100,7 +99,7 @@ $AGEN ${testname}.def || \
 compile "--help"
 
 cmp -s ${testname}.h*lp || \
-  failure help output mismatch
+  failure "`diff ${testname}.h*lp`"
 
 #  This time, having a duplicate should be ignored...
 #

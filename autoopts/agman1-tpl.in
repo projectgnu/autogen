@@ -1,19 +1,19 @@
 [+:   -*- nroff -*-
-AutoGen5 template man=%s.1
 
-## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
+## Time-stamp:      "2002-05-23 17:34:04 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Time-stamp:      "2002-02-01 16:02:34 bkorb"
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.5 2002/04/04 06:44:26 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.6 2002/05/24 01:44:42 bkorb Exp $
 ## ---------------------------------------------------------------------
+
+AutoGen5 template man=%s.1
 
 (setenv "SHELL" "/bin/sh")
 
@@ -39,7 +39,8 @@ AutoGen5 template man=%s.1
       #  based only on the argument processing type.
       #
       :+]
-.B [+: (string-downcase! (get "prog_name")) :+][+:
+.B [+: (out-push-new)
+       (string-downcase! (get "prog_name")) :+][+:
 
   IF (exist? "flag.value")  :+][+:
     IF (exist? "long_opts") :+][+:
@@ -257,22 +258,7 @@ This option must not appear in combination with any of the following options:
         Thus, for nroff to see one backslash, use four (4)
         and for nroff to output a backslash, use EIGHT (8)!!!!
 
-   ):+][+: % doc `sed \
- -e 's;@code{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e  's;@var{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e 's;@samp{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
- -e 's;@file{\\([^}]*\\)};\\\\fI\\1\\\\fP;g' \
- -e 's/@\\([{}]\\)/\\1/g' \
- -e 's,^\\$\\*$,.br,' \
- -e '/@ *example/,/@ *end *example/s/^/    /' \
- -e '/^ *@ *example/d' \
- -e 's/^ *@ *end *example/.br/' \
- -e '/^ *@ *enumerate/d' \
- -e 's/^ *@ *end *enumerate/.br/' \
- -e '/^ *@ *table/d' \
- -e 's/^ *@ *end *table/.br/' \
- -e 's/^@item/.sp 1/' \
- -e 's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_` :+][+:
+   ):+][+: doc :+][+:
 
   ENDIF documentation _exist ! :+][+:
 
@@ -297,7 +283,8 @@ IF (exist? "homerc") :+]
 .BR [+: IF (exist? "flag.value") :+]-> " \fIrcfile\fP, --" [+:
       ELIF (exist? "long_opt") :+]--[+:
       ENDIF:+]save-opts "[=\fIrcfile\fP]
-Save the option state to \fIrcfile\fP.
+Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
+rc file listed in the \fBOPTION PRESETS\fP section, below.
 .TP
 .BR [+: IF (exist? "flag.value") :+]-< " \fIrcfile\fP, --" [+:
       ELIF (exist? "long_opt") :+]--[+:
@@ -322,8 +309,51 @@ ENDIF
 :+][+:
 IF (exist? "explain") :+]
 .PP
-[+:explain:+][+:
-ENDIF:+][+:
+[+:explain  :+][+:
+ENDIF       :+][+:
+IF (or (exist? "homerc") (exist? "environrc")) :+]
+.SH OPTION PRESETS
+Any option that is not marked as ``not presettable'' may be preset
+by loading values from [+:
+  IF (exist? "homerc")
+    :+]RC (.ini) file(s)[+:
+    IF (exist? "environrc")
+            :+] and values from
+[+:
+    ENDIF   :+][+:
+  ENDIF     :+][+:
+  IF (exist? "environrc") :+]environment variables named:
+.nf
+  \fB[+:(string-tr! (get "prog-name") "a-z^-" "A-Z__") :+]_<option-name>\fP
+.fi
+.aj[+:
+    IF (exist? "homerc") :+]
+The environmental presets take precedence (are processed later than)
+the RC files.[+:
+    ENDIF   :+][+:
+  ELSE      :+].[+:
+  ENDIF     :+][+:
+
+  CASE (count "homerc") :+][+:
+  == "0"    :+][+:
+  == "1"    :+]
+The \fIhomerc\fP file is ``\fB[+:homerc:+]\fP'', unless that is a directory.
+In that case, the file \fI[+: ?% rcfile "%s"
+(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP
+is searched for within that directory.[+:
+
+  *         :+]
+The \fIhomerc\fP files are [+:
+    FOR homerc ", "  :+][+:
+      IF (last-for?) :+]and [+:
+      ENDIF :+]``\fI[+: homerc :+]\fP''[+: ENDFOR :+].
+If any of these are directories, then the file \fI[+: ?% rcfile "%s"
+(string-append "." (string-tr (get "prog-name") "A-Z^-" "a-z__") "rc") :+]\fP
+is searched for within those directories.[+:
+  ESAC      :+][+:
+
+
+ENDIF       :+][+:
 IF (exist? "man_doc") :+]
 [+:man_doc:+][+:
 ENDIF:+][+:
@@ -363,6 +393,28 @@ Released under an unspecified copyright license.[+:
 ENDIF      :+]
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fB[+:prog_name:+]\fP
-option definitions.[+: #
+option definitions.[+:
+
+(shell (string-append "sed \
+ -e 's;@code{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
+ -e  's;@var{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
+ -e 's;@samp{\\([^}]*\\)};\\\\fB\\1\\\\fP;g' \
+ -e 's;@file{\\([^}]*\\)};\\\\fI\\1\\\\fP;g' \
+ -e 's/@\\([{}]\\)/\\1/g' \
+ -e 's,^\\$\\*$,.br,' \
+ -e '/@ *example/,/@ *end *example/s/^/    /' \
+ -e 's/^ *@ *example/.nf/' \
+ -e 's/^ *@ *end *example/.fi/' \
+ -e '/^ *@ *noindent/d' \
+ -e '/^ *@ *enumerate/d' \
+ -e 's/^ *@ *end *enumerate/.br/' \
+ -e '/^ *@ *table/d' \
+ -e 's/^ *@ *end *table/.br/' \
+ -e 's/^@item/.sp 1/' \
+ -e 's/^@\\*/.br/' <<'_End_Of_Man_'\n"
+
+ (out-pop #t) "\n_End_Of_Man_"
+
+) ) :+][+: #
 
 agman.tpl ends here  :+]

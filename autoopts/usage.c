@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.2 2002/04/04 06:44:26 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.3 2002/05/24 01:44:42 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -91,7 +91,7 @@ tSCC zNoFlags[]    =
 "Options are specified by their name and either single\n\
 or doubled %ss.  Flag characters are not interpreted.\n";
 
-static void printInitList PROTO(( tCC** papz, ag_bool*, tCC* ));
+static void printInitList PROTO(( tCC** papz, ag_bool*, tCC*, tCC* ));
 
 #define fp stderr
 
@@ -391,7 +391,8 @@ optionUsage( pOptions, exitCode )
         /*
          *  Display all the places we look for RC files
          */
-        printInitList( pOptions->papzHomeList, &initIntro, pOptions->pzRcName );
+        printInitList( pOptions->papzHomeList, &initIntro,
+                       pOptions->pzRcName, pOptions->pzProgName );
 
         /*
          *  Let the user know about environment variable settings
@@ -432,12 +433,14 @@ optionUsage( pOptions, exitCode )
 }
 
 static void
-printInitList( papz, pInitIntro, pzRc )
-    tCC** papz;
+printInitList( papz, pInitIntro, pzRc, pzPN )
+    tCC**    papz;
     ag_bool* pInitIntro;
-    tCC*  pzRc;
+    tCC*     pzRc;
+    tCC*     pzPN;
 {
     tSCC zPathFmt[] = " - reading file %s";
+    char zPath[ MAXPATHLEN+1 ];
 
     if (papz == NULL)
         return;
@@ -451,6 +454,9 @@ printInitList( papz, pInitIntro, pzRc )
         if (pzPath == (char*)NULL)
             break;
 
+        if (optionMakePath( zPath, sizeof( zPath ), pzPath, pzPN ))
+            pzPath = zPath;
+
         /*
          *  Print the name of the "homerc" file.  If the "rcfile" name is
          *  not empty, we may or may not print that, too...
@@ -460,11 +466,11 @@ printInitList( papz, pInitIntro, pzRc )
             struct stat sb;
 
             /*
-             *  IF the "homerc" file either does not exist or is a directory,
-             *  then assume it is a directory and append the "rcfile" name.
+             *  IF the "homerc" file is a directory,
+             *  then append the "rcfile" name.
              */
-            if (  (stat( pzPath, &sb ) != 0)
-              ||  S_ISDIR( sb.st_mode )  ) {
+            if (  (stat( pzPath, &sb ) == 0)
+              &&  S_ISDIR( sb.st_mode ) ) {
                 fputc( '/', fp );
                 fputs( pzRc, fp );
             }
@@ -478,5 +484,6 @@ printInitList( papz, pInitIntro, pzRc )
  * Local Variables:
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
+ * tab-width: 4
  * End:
  * usage.c ends here */

@@ -3411,7 +3411,7 @@ SET_OPT_SAVE_OPTS( "filename" );
 @end example
 
 @noindent
-@xref{automatic options} for a discussion of the implications of using
+@xref{automatic options}, for a discussion of the implications of using
 this particular example.
 
 @node STACKCT_OPT

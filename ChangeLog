@@ -1,5 +1,20 @@
 2002-05-11  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/agman1.tpl: filter entire doc for texinfo-isms
+	* autoopts/agman3.tpl: ditto
+
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expPrint.c(ag_scm_printf): clarify usage.
+	* autoopts/test/errors.test(RC): create directory early for usage display
+	* autoopts/usage.c(printInitList): program name now needed to expand
+	'$$' references.  $$ and $X expansions on rc file names is now done.
+	Also, corrected S_ISDIR test for file name display.
+	* autoopts/test/rc.test(rc.file): directory name is now expanded
+	* config/confmacs.tpl(withlib): add special define names
+
+2002-05-11  Bruce Korb  <bkorb@gnu.org>
+
 	* config/misc.def(guile): add --with-xxx for guile library
 	* configure.in(LN_S): use this macro instead of 'ln -s' directly
 	* */Makefile.am(INCLUDES): GUILE_INC is obsolete
