@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.9 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.10 2002/09/30 01:00:00 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -443,7 +443,7 @@ loadTemplate( tCC* pzFileName )
         /*
          *  Initialize the values:
          */
-        memcpy( (void*)pRes, (void*)&magicMark, sizeof( magicMark ));
+        pRes->magic     = magicMark;
         pRes->descSize  = alocSize;
         pRes->macroCt   = macroCt;
         pRes->fd        = -1;

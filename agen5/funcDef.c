@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.8 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: funcDef.c,v 3.9 2002/09/30 00:59:51 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -715,8 +715,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          */
         pNewT = (tTemplate*)AGALOC( alocSize, "AG macro definition" );
         memset( (void*)pNewT, 0, alocSize );
-        memcpy( (void*)&(pNewT->magic), (void*)&(pT->magic),
-                sizeof( pNewT->magic ));
+        pNewT->magic    = pT->magic;
         pNewT->fd       = 0;
         pNewT->descSize = alocSize;
         pNewT->macroCt  = macCt;
