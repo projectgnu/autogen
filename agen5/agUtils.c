@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.8 2000/10/11 16:19:19 bkorb Exp $
+ *  $Id: agUtils.c,v 1.9 2000/10/13 02:18:46 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -37,6 +37,19 @@
 #endif
 
 STATIC const char* skipQuote( const char* pzQte );
+
+
+    EXPORT char*
+strlcpy( char* dest, const char* src, size_t n )
+{
+    char* pz = dest;
+    while ((*(pz++) = *(src++)) != NUL)
+        if (--n <= 0) {
+            pz[-1] = NUL;
+            break;
+        }
+    return dest;
+}
 
 
     EXPORT void

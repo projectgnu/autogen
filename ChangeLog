@@ -1,3 +1,8 @@
+2000-10-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defFind.c: The cannonicalization of value names downcased
+	#define names.  That doesn't work.
+
 2000-10-07  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*.tpl:  Made the templates emit K&R C
