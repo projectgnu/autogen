@@ -1,0 +1,71 @@
+#!/bin/ksh
+# -*- Mode: shell-script -*-
+#
+# $Id: announce.txt,v 3.1 2004/10/23 18:19:13 bkorb Exp $
+
+tfile=$(mktemp ./agaXXXXXX.txt) 2>/dev/null
+test -z "${tfile}" && tfile=aga$$.txt
+
+eval $(egrep '^A[GO]_[A-Z0-9_]*=' VERSION)
+AO_VERSION=AutoOpts\ Version\ ${AO_CURRENT}.${AO_REVISION}
+
+exec 3> ${tfile}
+
+recip=$(logname)" info-gnu@gnu.org"
+to="GNU Announcements <info-gnu@gnu.org>"
+
+cat >&3 <<_EOF_
+From: $(logname)
+To: ${to}	
+Subject: AutoGen Version ${AG_VERSION}/${AO_VERSION}
+Reply-To: autogen-users@lists.sf.net
+
+AutoGen/AutoOpts is a binary project that serves two separate purposes
+and are inextricably intertwined:
+
+AutoGen is a tool designed to simplify the creation and maintenance of
+programs that contain large amounts of repetitious text. It is especially
+valuable in programs that have several blocks of text that must be kept
+synchronized.
+
+AutoOpts is both an example of that and a project in its own right.
+It is a very powerful command line option parser consisting of a
+set of AutoGen templates and a run time library that nearly eliminates
+the hassle of managing, parsing and documenting program options.
+
+New in ${AG_VERSION} - `date '+%B, %Y'`
+_EOF_
+
+sed "1,/^New in ${AG_VERSION} -/d ; /^New in /,\$d" NEWS >&3
+
+cat >&3 <<_EOF_
+
+AutoGen home:    http://www.gnu.org/software/autogen/
+primary ftp:     ftp://ftp.gnu.org/gnu/autogen
+bug reports:     autogen-users at the SourceForge net domain
+bug archive:     http://sourceforge.net/mailarchive/forum.php?forum_id=7034
+maintainer:      Bruce Korb - bkorb at the usual GNU domain
+_EOF_
+
+exec 3>&-
+echo rmail ${recip} < ${tfile}
+
+recip=$(logname)" autogen-announce@lists.sf.net"
+to="AutoGen Announcements <autogen-announce@lists.sf.net>"
+
+cfile=${tfile%.txt}.tmp
+exec 3> ${cfile}
+sed '/^AutoGen home:/,$d'";s/^To: .*/To: ${to}/" ${tfile} >&3
+
+cat >&3 <<_EOF_
+AutoGen home:    http://autogen.sourceforge.net/
+primary ftp:     http://sourceforge.net/project/showfiles.php?group_id=3593
+bug reports:     autogen-users at the SourceForge net domain
+bug archive:     http://sourceforge.net/mailarchive/forum.php?forum_id=7034
+maintainer:      Bruce Korb - bkorb at users in SourceForge net domain
+_EOF_
+
+exec 3>&-
+rmail ${recip} < ${cfile}
+
+rm -f ${tfile} ${cfile}
