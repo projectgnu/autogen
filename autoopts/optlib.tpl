@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.11 2003/07/04 15:12:22 bkorb Exp $
+# $Id: optlib.tpl,v 3.12 2003/07/04 17:58:14 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -137,12 +137,14 @@ typedef enum {[=
 } te_[=(string-append Cap-prefix cap-name)=];[=
 
   =*   set                 =][=
-
+    (define setmember-fmt (string-append "\n#define %-24s 0x%0"
+       (shellf "expr '(' %d + 3 ')' / 4" (count "keyword")) "XUL"
+       (if (> (count "keyword") 32) "L" "")  ))
     (define full-prefix (string-append UP-prefix UP-name) )  =][=
 
     FOR    keyword   =][=
 
-      (sprintf "\n#define %-31s 0x%08X"
+      (sprintf setmember-fmt
          (string-append full-prefix "_" (string-upcase! (get "keyword")))
          (ash 1 (for-index))  ) =][=
 
@@ -307,7 +309,7 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
 
        =* set                   =]
 #define z[=(sprintf "%-27s " (string-append cap-name "DefaultArg" ))
-         =]((tCC*)[=
+         =](tCC*)([=
          FOR    arg-default  |  =][=
            (string-append UP-prefix UP-name "_"
                    (string-upcase! (get "arg-default")) )  =][=
@@ -468,7 +470,8 @@ DEFINE Option_Descriptor =][=
              "NO_EQUIVALENT"
          ) =],
      /* min, max, act ct */ [=(if (exist? "min") (get "min") "0")=], [=
-         (if (exist? "max") (get "max") "1")=], 0,
+         (if (=* (get "arg-type") "set") "NOLIMIT"
+             (if (exist? "max") (get "max") "1") ) =], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
      /* last opt argumnt */ [=
          IF (exist? "arg-default")

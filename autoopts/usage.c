@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.20 2003/04/21 03:35:35 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.21 2003/07/04 17:58:14 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -58,6 +58,7 @@ tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
 tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
 tSCC zMust[]       = "\t\t\t\t- must appear between %d and %d times\n";
 tSCC zNoLim[]      = "\t\t\t\t- may appear multiple times\n";
+tSCC zMembers[]    = "\t\t\t\t- is a set membership option\n";
 tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
 tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
 tSCC zProhib[]     = "prohibits these options:\n";
@@ -80,6 +81,7 @@ typedef struct {
     tCC*    pzReq;
     tCC*    pzNum;
     tCC*    pzKey;
+    tCC*    pzKeyL;
     tCC*    pzBool;
     tCC*    pzOpt;
     tCC*    pzNo;
@@ -298,7 +300,7 @@ printProgramDetails( tOptions* pOptions )
         fputc( '\n', option_usage_fp );
         fflush( option_usage_fp );
         do  {
-            if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
+            if (pOD->fOptState & (OPTST_ENUMERATION|OPTST_MEMBER_BITS))
                 (*(pOD->pOptProc))( NULL, pOD );
         }  while (pOD++, optNo++, (--ct > 0));
     }
@@ -414,7 +416,10 @@ printExtendedUsage(
     /*
      *  Print the appearance requirements.
      */
-    switch (pOD->optMinCt) {
+    if (pOD->fOptState & OPTST_MEMBER_BITS)
+        fputs( zMembers, option_usage_fp );
+
+    else switch (pOD->optMinCt) {
     case 1:
     case 0:
         switch (pOD->optMaxCt) {
@@ -467,6 +472,8 @@ printBareUsage(
     {
         char  z[ 80 ];
         tCC*  pzArgType;
+#       define OPTFMT ( OPTST_NUMERIC | OPTST_BOOLEAN | OPTST_ENUMERATION \
+                      | OPTST_MEMBER_BITS )
 
         /*
          *  Determine the argument type string first on its usage, then,
@@ -478,9 +485,9 @@ printBareUsage(
         case ARG_MAY:  pzArgType = pAT->pzOpt; break;
         case ARG_NONE: pzArgType = pAT->pzNo;  break;
         case ARG_MUST:
-            switch ( pOD->fOptState
-                   & (OPTST_NUMERIC|OPTST_BOOLEAN|OPTST_ENUMERATION)) {
+            switch ( pOD->fOptState & OPTFMT) {
             case OPTST_ENUMERATION: pzArgType = pAT->pzKey;  break;
+            case OPTST_MEMBER_BITS: pzArgType = pAT->pzKeyL; break;
             case OPTST_BOOLEAN:     pzArgType = pAT->pzBool; break;
             case OPTST_NUMERIC:     pzArgType = pAT->pzNum;  break;
             case 0:                 pzArgType = pAT->pzStr;  break;
@@ -493,7 +500,7 @@ printBareUsage(
 
         fprintf( option_usage_fp, zOptFmtLine, z, pOD->pzText );
 
-        if (pOD->fOptState & OPTST_ENUMERATION)
+        if (pOD->fOptState & (OPTST_ENUMERATION|OPTST_MEMBER_BITS))
             displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
     }
     return;
@@ -532,6 +539,7 @@ tSCC zFmtFmt[]          = "%%-%ds %%s\n";
 tSC  zGnuStrArg[]       = "=str";
 tSC  zGnuNumArg[]       = "=num";
 tSC  zGnuKeyArg[]       = "=KWd";
+tSC  zGnuKeyLArg[]      = "=Mbr";
 tSC  zGnuBoolArg[]      = "=T/F";
 tSCC zGnuOptArg[]       = "[=arg]";
 tSCC zGnuBreak[]        = "\n%s\n\n";
@@ -542,6 +550,7 @@ static arg_types_t gnuTypes = {
     /* pzReq  */ zSixSpaces + 5,  /* 1 space  */
     /* pzNum  */ zGnuNumArg,
     /* pzKey  */ zGnuKeyArg,
+    /* pzKeyL */ zGnuKeyLArg,
     /* pzBool */ zGnuBoolArg,
     /* pzOpt  */ zGnuOptArg,
     /* pzNo   */ zSixSpaces + 5,  /* 1 space  */
@@ -554,6 +563,7 @@ tSCC zStdStrArg[]       = "Str";
 tSCC zStdReqArg[]       = "YES";
 tSCC zStdNumArg[]       = "Num";
 tSCC zStdKeyArg[]       = "KWd";
+tSCC zStdKeyLArg[]      = "Mbr";
 tSCC zStdBoolArg[]      = "T/F";
 tSCC zStdOptArg[]       = "opt";
 tSCC zStdNoArg[]        = "no ";
@@ -564,6 +574,7 @@ static arg_types_t stdTypes = {
     /* pzReq  */ zStdReqArg,
     /* pzNum  */ zStdNumArg,
     /* pzKey  */ zStdKeyArg,
+    /* pzKeyL */ zStdKeyLArg,
     /* pzBool */ zStdBoolArg,
     /* pzOpt  */ zStdOptArg,
     /* pzNo   */ zStdNoArg,

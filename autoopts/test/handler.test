@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/05/02 01:01:59 $
+# Last Modified:     $Date: 2003/07/04 17:58:14 $
 #            by: bkorb
 #
-# $Id: handler.test,v 3.2 2003/05/02 01:01:59 bkorb Exp $
+# $Id: handler.test,v 3.3 2003/07/04 17:58:14 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -64,6 +64,14 @@ flag = {
     name = fifth;
     descrip = "fifth description";
     flag_proc = first;
+};
+
+flag = {
+    name = sixth;
+    descrip = "sixth description";
+    arg_type = set-member;
+    keyword = alpha, beta, gamma, omega;
+    arg-default = gamma, beta;
 };
 _EOF_
 
@@ -158,6 +166,21 @@ doOptFourth(
     else
     pOptDesc->pzLastArg =
         optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
+}
+
+/* * * * * * *
+ *
+ *   For the "Sixth Option".
+ */
+static void
+doOptSixth(
+    tOptions*   pOptions,
+    tOptDesc*   pOptDesc )
+{
+    tSCC* azNames[] = {
+        "alpha",  "beta",   "gamma",  "omega"
+    };
+    optionSetMembers( pOptions, pOptDesc, azNames, 4 );
 }
 
 #ifdef  __cplusplus

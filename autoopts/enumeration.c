@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.15 2003/07/04 15:12:22 bkorb Exp $
+ *  $Id: enumeration.c,v 3.16 2003/07/04 17:58:14 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -64,7 +64,7 @@ enumError( pOpts, pOD, paz_names, name_ct )
         fprintf( option_usage_fp, pz_enum_err_fmt,
                  pOpts->pzProgName, pOD->pzLastArg );
 
-    fprintf( option_usage_fp, "The valid %s option keywords are:\n",
+    fprintf( option_usage_fp, "The valid \"%s\" option keywords are:\n",
              pOD->pz_Name );
 
     if (**paz_names == 0x7F) {
@@ -198,16 +198,13 @@ optionEnumerationVal(
  * arg:   tCC**,         paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
- * ret_type:  char*
- * ret_desc:  the enumeration value cast as a char*
- *
  * doc:   This converts the pzLastArg string from the option description
  *        into the index corresponding to an entry in the name list.
  *        This will match the generated enumeration value.
  *        Full matches are always accepted.  Partial matches are accepted
  *        if there is only one partial match.
 =*/
-char*
+void
 optionSetMembers(
     tOptions*     pOpts,
     tOptDesc*     pOD,
@@ -224,7 +221,7 @@ optionSetMembers(
          *  print the list of enumeration names.
          */
         enumError( pOpts, pOD, paz_names, name_ct );
-        return (char*)0UL;
+        return;
 
     case 1UL:
     {
@@ -243,7 +240,7 @@ optionSetMembers(
             if (++res >= name_ct) break;
             bits >>= 1;
         }
-        return NULL;
+        return;
     }
 
     case 2UL:
@@ -264,7 +261,7 @@ optionSetMembers(
             if (++res >= name_ct) break;
             bits >>= 1;
         }
-        pzRes = pz = malloc( len );
+        pOD->pzLastArg = pz = malloc( len );
         bits = (uintptr_t)pOD->optCookie;
         res = 0;
         while (bits != 0) {
@@ -279,7 +276,7 @@ optionSetMembers(
             if (++res >= name_ct) break;
             bits >>= 1;
         }
-        return pzRes;
+        return;
     }
 
     default:
@@ -288,10 +285,13 @@ optionSetMembers(
 
     {
         char*     pzArg = pOD->pzLastArg;
-        uintptr_t res = (uintptr_t)pOD->optCookie;
-        if ((pzArg == NULL) || (*pzArg == NUL))
-            return (pOD->optCookie = NULL);
+        uintptr_t res;
+        if ((pzArg == NULL) || (*pzArg == NUL)) {
+            pOD->optCookie = NULL;
+            return;
+        }
 
+        res = (uintptr_t)pOD->optCookie;
         for (;;) {
             tSCC zSpn[] = " ,|+\t\r\f\n";
             char ch;
@@ -315,8 +315,11 @@ optionSetMembers(
                 res = 0;
             }
             else {
-                uintptr_t bit = 1UL
-                    << findName(pzArg, pOpts, pOD, paz_names, name_ct);
+                char* pz;
+                uintptr_t bit = strtoul( pzArg, &pz, 0 );
+
+                if (*pz != NUL)
+                   bit = 1UL << findName(pzArg, pOpts, pOD, paz_names, name_ct);
 
                 if (iv)
                      res &= ~bit;
@@ -329,12 +332,6 @@ optionSetMembers(
             *(pzArg++) = ch;
         }
         pOD->optCookie = (void*)res;
-
-        /*
-         *  Return the matching index as a char* pointer.
-         *  The result gets stashed in a char* pointer, so it will have to fit.
-         */
-        return (char*)res;
     }
 }
 

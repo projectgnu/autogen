@@ -2781,14 +2781,44 @@ default: /* utterly impossible */ ;
 @end example
 
 AutoOpts produces a special purpose procedure for this option.
+
+@item set[@i{-membership}]
+The argument must be a list of names each of which must match the
+strings "@code{all}", "@code{none}" or one of the keywords specified
+for this option.  @code{all} will turn on all membership bits and
+@code{none} will turn them all off.  Specifying one of the keywords
+will turn on the corresponding set membership bit.  Literal numbers
+may also be used and may, thereby, set or clear more than one bit.
+Preceeding a keyword or literal number with a bang (@code{!}  -
+exclamation point) will turn the bit(s) off.  The number of keywords
+allowed is constrained by the number of bits in a pointer, as the bit
+set is kept in a @code{void*}.
+
+If, for example, you specified @code{first} in your list of keywords,
+then you can use the following code to test to see if either @code{first}
+or @code{all} was specified:
+
+@example
+uintptr_t opt = OPT_VALUE_OPTN_NAME;
+if (opt & OPTN_NAME_FIRST) /* OPTN_NAME_FIRST bit was set */ ;
+@}
+@end example
+
+AutoOpts produces a special purpose procedure for this option.
+
 @end table
 
 @cindex keyword
 @item keyword
-If the @code{arg-type} is @code{keyword}, then you must specify the
-list of keywords by a series of @code{keyword} entries.  The interface
-file will contain an enumeration of @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for
-each keyword entry.
+If the @code{arg-type} is @code{keyword} or @code{set-membership},
+then you must specify the list of keywords by a series of
+@code{keyword} entries.  The interface file will contain values for
+@code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each keyword entry.
+@code{keyword} option types will have an enumeration and 
+@code{set-membership} option types will have a set of unsigned long bits
+@code{#define}-d.  If there are more than 32 bits defined, the @code{#define}
+will set unsigned long long values and you best be running on a
+64 bit platform.
 
 @cindex arg-optional
 @item arg-optional
