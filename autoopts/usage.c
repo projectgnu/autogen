@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.11 2000/10/17 19:46:15 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.12 2000/10/20 00:03:29 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -136,7 +136,15 @@ DEF_PROC_2( , void, optionUsage,
         pOptFmt   = zReqOptFmt;
     }
 
-    fputs( pOptTitle, fp );
+    /*
+     *  IF we are NOT going to start the option list with a documentation opt,
+     *  THEN emit the title here.
+     *  Doc options are emitted only if the exitCode is SUCCESS.
+     */
+    if (  (exitCode != EXIT_SUCCESS)
+       || ((pOptions->pOptDesc & OPTST_DOCUMENT) != 0) )
+
+        fputs( pOptTitle, fp );
 
     {
         int        ct     = pOptions->optCt;
