@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.9 1999/07/07 19:41:00 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.10 2000/03/12 21:45:21 bruce Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -53,6 +53,8 @@
 #define AUTOGEN_AUTOOPTS_H
 
 #include "options.h"
+
+#define MIN_OPTION_VERSION  ((3 * 4096) + 2)
 
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
