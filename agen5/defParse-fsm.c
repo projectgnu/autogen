@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Saturday January 17, 2004 at 09:56:10 AM PST
+ *  It has been AutoGen-ed  Saturday January 17, 2004 at 10:52:57 AM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -73,15 +73,15 @@ typedef te_dp_state (dp_callback_t)(
     te_dp_event trans_evt );
 
 static dp_callback_t
+    dp_do_empty_val,
+    dp_do_end_block,
     dp_do_have_name_lit_eq,
-    dp_do_have_name_lit_semi,
-    dp_do_have_value_lit_comma,
     dp_do_indexed_name,
     dp_do_invalid,
     dp_do_need_name_end,
-    dp_do_need_name_lit_c_brace,
     dp_do_need_name_var_name,
-    dp_do_need_value_lit_o_brace,
+    dp_do_next_val,
+    dp_do_start_block,
     dp_do_str_value,
     dp_do_tpl_name;
 
@@ -101,160 +101,182 @@ struct transition {
  */
 static const t_dp_transition
 dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
-  { { DP_ST_NEED_DEF, NULL },                       /* init state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_def state */
-    { DP_ST_NEED_TPL, NULL },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_tpl state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_SEMI, &dp_do_tpl_name },
-    { DP_ST_NEED_SEMI, &dp_do_tpl_name },
-    { DP_ST_NEED_SEMI, &dp_do_tpl_name },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_semi state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_NAME, NULL },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_name state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_DONE, &dp_do_need_name_end },
-    { DP_ST_HAVE_NAME, &dp_do_need_name_var_name },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_HAVE_VALUE, &dp_do_need_name_lit_c_brace },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* have_name state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_NAME, &dp_do_have_name_lit_semi },
-    { DP_ST_NEED_VALUE, &dp_do_have_name_lit_eq },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_IDX, NULL },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_value state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_HAVE_VALUE, &dp_do_str_value },
-    { DP_ST_HAVE_VALUE, &dp_do_str_value },
-    { DP_ST_HAVE_VALUE, &dp_do_str_value },
-    { DP_ST_HAVE_VALUE, &dp_do_str_value },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_NAME, &dp_do_need_value_lit_o_brace },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_idx state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_CBKT, &dp_do_indexed_name },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_CBKT, &dp_do_indexed_name },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* need_cbkt state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INDX_NAME, NULL } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* indx_name state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_NAME, NULL },
-    { DP_ST_NEED_VALUE, NULL },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } },
-  { { DP_ST_INVALID, &dp_do_invalid },              /* have_value state */
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_NAME, NULL },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_NEED_VALUE, &dp_do_have_value_lit_comma },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid },
-    { DP_ST_INVALID, &dp_do_invalid } }
+
+  /* STATE:  init */
+  { { DP_ST_NEED_DEF, NULL },                       /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_def */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_NEED_TPL, NULL },                       /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_tpl */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  var_name */
+    { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  other_name */
+    { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_semi */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_NEED_NAME, NULL },                      /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_name */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_DONE, &dp_do_need_name_end },           /* EVT:  End-Of-File */
+    { DP_ST_HAVE_NAME, &dp_do_need_name_var_name }, /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_HAVE_VALUE, &dp_do_end_block },         /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  have_name */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_NEED_NAME, &dp_do_empty_val },          /* EVT:  ; */
+    { DP_ST_NEED_VALUE, &dp_do_have_name_lit_eq },  /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_NEED_IDX, NULL },                       /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_value */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  var_name */
+    { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  other_name */
+    { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  string */
+    { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_NEED_NAME, &dp_do_start_block },        /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_idx */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_NEED_CBKT, &dp_do_indexed_name },       /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_NEED_CBKT, &dp_do_indexed_name },       /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  need_cbkt */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INDX_NAME, NULL }                       /* EVT:  ] */ },
+
+  /* STATE:  indx_name */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_NEED_NAME, &dp_do_empty_val },          /* EVT:  ; */
+    { DP_ST_NEED_VALUE, NULL },                     /* EVT:  = */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ },
+
+  /* STATE:  have_value */
+  { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
+    { DP_ST_NEED_NAME, NULL },                      /* EVT:  ; */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
+    { DP_ST_NEED_VALUE, &dp_do_next_val },          /* EVT:  , */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  { */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  } */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  [ */
+    { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */ }
 };
 
 
@@ -330,12 +352,52 @@ dp_invalid_transition( te_dp_state st, te_dp_event evt )
 }
 
 static te_dp_state
+dp_do_empty_val(
+    te_dp_state initial,
+    te_dp_state maybe_next,
+    te_dp_event trans_evt )
+{
+/*  START == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
+    /*
+     *  Our state is either "have-name" or "indx-name" and we found a ';',
+     *  end of statement.  It is a string value with an empty string.
+     */
+    tDefEntry* pDE = findPlace( pz_new_name, NULL );
+    if (pCurrentEntry != NULL)
+        addSibMacro( pDE, pCurrentEntry );
+    pCurrentEntry = pDE;
+    makeMacro( pCurrentEntry, "", VALTYP_TEXT );
+    return maybe_next;
+/*  END   == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
+}
+
+static te_dp_state
+dp_do_end_block(
+    te_dp_state initial,
+    te_dp_state maybe_next,
+    te_dp_event trans_evt )
+{
+/*  START == END BLOCK == DO NOT CHANGE THIS COMMENT  */
+    if (--stackDepth < 0)
+        yyerror( "Too many close braces" );
+
+    makeMacroList( ppDefStack[ stackDepth ], pCurrentEntry, VALTYP_BLOCK );
+    pCurrentEntry = ppDefStack[ stackDepth ];
+    return maybe_next;
+/*  END   == END BLOCK == DO NOT CHANGE THIS COMMENT  */
+}
+
+static te_dp_state
 dp_do_have_name_lit_eq(
     te_dp_state initial,
     te_dp_state maybe_next,
     te_dp_event trans_evt )
 {
 /*  START == HAVE NAME LIT EQ == DO NOT CHANGE THIS COMMENT  */
+    /*
+     *  Create a new entry but defer "makeMacro" call until we have the
+     *  assigned value.
+     */
     tDefEntry* pDE = findPlace( pz_new_name, NULL );
     if (pCurrentEntry != NULL)
         addSibMacro( pDE, pCurrentEntry );
@@ -345,39 +407,16 @@ dp_do_have_name_lit_eq(
 }
 
 static te_dp_state
-dp_do_have_name_lit_semi(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == HAVE NAME LIT SEMI == DO NOT CHANGE THIS COMMENT  */
-    tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    if (pCurrentEntry != NULL)
-        addSibMacro( pDE, pCurrentEntry );
-    pCurrentEntry = pDE;
-    makeMacro( pCurrentEntry, "", VALTYP_TEXT );
-    return maybe_next;
-/*  END   == HAVE NAME LIT SEMI == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
-dp_do_have_value_lit_comma(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == HAVE VALUE LIT COMMA == DO NOT CHANGE THIS COMMENT  */
-    return maybe_next;
-/*  END   == HAVE VALUE LIT COMMA == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
 dp_do_indexed_name(
     te_dp_state initial,
     te_dp_state maybe_next,
     te_dp_event trans_evt )
 {
 /*  START == INDEXED NAME == DO NOT CHANGE THIS COMMENT  */
+    /*
+     *  Create a new entry with a specified indes, but defer "makeMacro" call
+     *  until we have the assigned value.
+     */
     tDefEntry* pDE = findPlace( pz_new_name, pz_token );
     if (pCurrentEntry != NULL)
         addSibMacro( pDE, pCurrentEntry );
@@ -412,22 +451,6 @@ dp_do_need_name_end(
 }
 
 static te_dp_state
-dp_do_need_name_lit_c_brace(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
-{
-/*  START == NEED NAME LIT C BRACE == DO NOT CHANGE THIS COMMENT  */
-    if (--stackDepth < 0)
-        yyerror( "Too many close braces" );
-
-    makeMacroList( ppDefStack[ stackDepth ], pCurrentEntry, VALTYP_BLOCK );
-    pCurrentEntry = ppDefStack[ stackDepth ];
-    return maybe_next;
-/*  END   == NEED NAME LIT C BRACE == DO NOT CHANGE THIS COMMENT  */
-}
-
-static te_dp_state
 dp_do_need_name_var_name(
     te_dp_state initial,
     te_dp_state maybe_next,
@@ -440,12 +463,30 @@ dp_do_need_name_var_name(
 }
 
 static te_dp_state
-dp_do_need_value_lit_o_brace(
+dp_do_next_val(
     te_dp_state initial,
     te_dp_state maybe_next,
     te_dp_event trans_evt )
 {
-/*  START == NEED VALUE LIT O BRACE == DO NOT CHANGE THIS COMMENT  */
+/*  START == NEXT VAL == DO NOT CHANGE THIS COMMENT  */
+    /*
+     *  Create a new entry but defer "makeMacro" call until we have the
+     *  assigned value.
+     */
+    tDefEntry* pDE = findPlace( pCurrentEntry->pzDefName, NULL );
+    addSibMacro( pDE, pCurrentEntry );
+    pCurrentEntry = pDE;
+    return maybe_next;
+/*  END   == NEXT VAL == DO NOT CHANGE THIS COMMENT  */
+}
+
+static te_dp_state
+dp_do_start_block(
+    te_dp_state initial,
+    te_dp_state maybe_next,
+    te_dp_event trans_evt )
+{
+/*  START == START BLOCK == DO NOT CHANGE THIS COMMENT  */
     if (pCurrentEntry->valType == VALTYP_TEXT)
         yyerror( "assigning a block value to text name" );
 
@@ -465,7 +506,7 @@ dp_do_need_value_lit_o_brace(
     makeMacro( pCurrentEntry, NULL, VALTYP_BLOCK );
     ppDefStack[ stackDepth-1 ] = pCurrentEntry;
     return maybe_next;
-/*  END   == NEED VALUE LIT O BRACE == DO NOT CHANGE THIS COMMENT  */
+/*  END   == START BLOCK == DO NOT CHANGE THIS COMMENT  */
 }
 
 static te_dp_state
@@ -527,7 +568,8 @@ dp_run_fsm( void )
             DP_EVT_NAME( trans_evt ), trans_evt,
             DP_STATE_NAME( nxtSt ), nxtSt );
 #endif
-        nxtSt = (*pT)( dp_state, nxtSt, trans_evt );
+        if (pT != NULL)
+            nxtSt = (*pT)( dp_state, nxtSt, trans_evt );
 #ifdef DEBUG
         if (nxtSt != firstNext)
             printf( "transition code changed destination state to %s(%d)\n",

@@ -114,7 +114,8 @@ ENDDEF build-callback  =][=
 
 DEFINE run-callback
 =]
-    nxtSt = (*pT)( [=
+    if (pT != NULL)
+        nxtSt = (*pT)( [=
   FOR cookie =][=
       (shellf "echo '%s'|sed 's,.*[ \t],,'" (get "cookie")) =], [=
 

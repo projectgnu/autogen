@@ -4,20 +4,23 @@
 
 =][=
 
+(define event-string "")  =][=
+
 DEFINE state-table  =]
+
+  /* STATE:  [= state =] */
   { [=
   (shellf "state=%s" (string-upcase! (get "state"))) =][=
 
   FOR event "\n    "  =][=
-    IF (first-for?)   =][=
-       (set! fmt (shellf "eval echo \\\"\\$FSM_TRANS_${state}_%s,\\\""
-                 (string-upcase! (get "event"))  ))
-       (sprintf "%-47s /* %s state */" fmt (get "state")) =][=
-    ELSE     =][=
-       (shellf "eval echo \\\"\\$FSM_TRANS_${state}_%s%s\\\""
-                 (string-upcase! (get "event"))
-                 (if (not (last-for?)) "," "")) =][=
-    ENDIF    =][=
+    (set! fmt (shellf "eval echo \\\"\\$FSM_TRANS_${state}_%s%s\\\""
+              (string-upcase! (get "event"))
+              (if (last-for?) "" ",")  ))
+    (set! event-string (if (exist? (get "event"))
+                           (get (get "event"))
+                           (get "event")  ))
+    (sprintf "%-47s /* EVT:  %s */" fmt event-string ) =][=
+
   ENDFOR     =] }[=
 ENDDEF       =][=
 

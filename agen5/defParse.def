@@ -65,16 +65,18 @@ transition =
  *  or end a block or end the input.
  */
 transition =
-{ tst = need_name;    tev = var_name;    next = have_name; },
-{ tst = need_name;    tev = lit_c_brace; next = have_value; },
-{ tst = need_name;    tev = end;         next = done; };
+{ tst = need_name;    tev   = var_name;     next = have_name; },
+{ tst = need_name;    tev   = lit_c_brace;  next = have_value;
+                      ttype = end_block; },
+{ tst = need_name;    tev   = end;          next = done; };
 
 /*
  *  We have a name now.  Next is a semicolon for an empty string value,
  *  or an '=' to start a value list or a '[' for an indexed value.
  */
 transition =
-{ tst = have_name;    tev   = lit_semi;        next = need_name; },
+{ tst = have_name;    tev   = lit_semi;        next = need_name;     
+                      ttype = empty_val; },
 { tst = have_name;    tev   = lit_eq;          next = need_value; },
 { tst = have_name;    tev   = lit_open_bkt;    next = need_idx; ttype = noop; },
 { tst = need_idx;     tev   = number, var_name;
@@ -85,13 +87,17 @@ transition =
  *  once you have one index, you cannot have another.
  *  Otherwise, "indx_name" is identical to "have_name".
  */
-{ tst = indx_name;    tev = lit_semi;      next = need_name;  ttype = noop; },
-{ tst = indx_name;    tev = lit_eq;        next = need_value; ttype = noop; };
+{ tst = indx_name;    tev   = lit_semi;        next = need_name;
+                      ttype = empty_val; },
+{ tst = indx_name;    tev   = lit_eq;          next = need_value;
+                      ttype = noop; };
 
 transition =
 { tst  = need_value;  tev   = string, other_name, var_name, number;
-                      next  = have_value;     ttype = str_value; },
-{ tst  = need_value;  tev   = lit_o_brace;    next  = need_name;  },
-{ tst  = have_value;  tev   = lit_semi;       next  = need_name;
+                      next  = have_value;      ttype = str_value; },
+{ tst  = need_value;  tev   = lit_o_brace;     next  = need_name;
+                      ttype = start_block; },
+{ tst  = have_value;  tev   = lit_semi;        next  = need_name;
                       ttype = noop; },
-{ tst  = have_value;  tev   = lit_comma;      next  = need_value; };
+{ tst  = have_value;  tev   = lit_comma;       next  = need_value;
+                      ttype = next_val; };
