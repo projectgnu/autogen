@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 1.10 1999/07/28 15:32:40 bkorb Exp $
+ *  $Id: columns.c,v 1.11 1999/09/22 15:15:49 bkorb Exp $
  */
 
 /*
@@ -46,18 +46,19 @@ int fillColumnCt  = 0;
 char zLine[ 133 ];
 char zFmtLine[ 133 ];
 
-char**  papzLines = (char**)NULL;
-char*   pzLinePfx = (char*)NULL;
-size_t  allocCt   = 0;
-size_t  usedCt    = 0;
-size_t  lineWidth = 79;
-size_t  columnCt  = 0;
-size_t  columnSz  = 0;
+char**  papzLines  = (char**)NULL;
+char*   pzLinePfx  = (char*)NULL;
+char*   pzFirstPfx = (char*)NULL;
+size_t  allocCt    = 0;
+size_t  usedCt     = 0;
+size_t  lineWidth  = 79;
+size_t  columnCt   = 0;
+size_t  columnSz   = 0;
 
 void readLines( void );
 void writeRows( void );
 void writeColumns( void );
-int  handleIndent( void );
+int  handleIndent( char* pzIndentArg );
 
 
     int
@@ -72,8 +73,43 @@ main( int    argc,
     if (HAVE_OPT( WIDTH ))
         lineWidth = OPT_VALUE_WIDTH;
 
-    if (HAVE_OPT( INDENT ))
-        lineWidth -= handleIndent();
+    if (HAVE_OPT( INDENT )) {
+        size_t indentSize = handleIndent( OPT_ARG( INDENT ));
+        lineWidth -= indentSize;
+
+        if (! HAVE_OPT( FIRST_INDENT ))
+            pzFirstPfx = pzLinePfx;
+        else {
+
+            /*
+             *  The first line has a special indentation/prefix.
+             *  Compute it, but do not let it be larger than
+             *  the indentation value.
+             */
+            char*  pzSave = pzLinePfx;
+            size_t firstSize = handleIndent( OPT_ARG( FIRST_INDENT ));
+            pzFirstPfx = pzLinePfx;
+            pzLinePfx = pzSave;
+
+            /*
+             *  Now force the first line prefix to have the same size
+             *  as the indentSize
+             */
+            if (firstSize > indentSize) {
+                fprintf( stderr, "Warning: prefix `%s' has been truncated to ",
+                         pzFirstPfx );
+                pzFirstPfx[ indentSize ] = '\0';
+                fprintf( stderr, "`%s'\n", pzFirstPfx );
+
+            } else if (firstSize < indentSize) {
+                char* tmp = (char*)malloc( indentSize + 1 );
+                char  z[10];
+                sprintf( z, "%%-%ds", indentSize );
+                sprintf( tmp, z, pzFirstPfx );
+                pzFirstPfx = tmp;
+            }
+        }
+    }
 
     if (HAVE_OPT( LINE_SEPARATION ))
         lineWidth -= strlen( OPT_ARG( LINE_SEPARATION ));
@@ -101,10 +137,10 @@ main( int    argc,
 
 
     int
-handleIndent( void )
+handleIndent( char* pzIndentArg )
 {
     char* pz;
-    long  colCt = strtol( OPT_ARG( INDENT ), &pz, 0 );
+    long  colCt = strtol( pzIndentArg, &pz, 0 );
 
     /*
      *  IF the indent argument is a number
@@ -137,7 +173,7 @@ handleIndent( void )
          *  It will not be the empty string because that is handled
          *  as an indent count of zero and is ignored.
          */
-        pz = pzLinePfx = OPT_ARG( INDENT );
+        pz = pzLinePfx = pzIndentArg;
         colCt =  0;
         for (;;) {
             /*
@@ -487,8 +523,10 @@ writeRows( void )
         *pz = '\0';
     }
 
-    if (pzLinePfx != (char*)NULL)
-        fputs( pzLinePfx, stdout );
+    if (pzFirstPfx != (char*)NULL) {
+        fputs( pzFirstPfx, stdout );
+        pzFirstPfx = pzLinePfx;
+    }
 
     {
         char**  ppzLL = papzLines;
@@ -536,8 +574,10 @@ writeRows( void )
                 /*
                  *  Start the next line with any required indentation
                  */
-                if (pzLinePfx != (char*)NULL)
-                    fputs( pzLinePfx, stdout );
+                if (pzFirstPfx != (char*)NULL) {
+                    fputs( pzFirstPfx, stdout );
+                    pzFirstPfx = pzLinePfx;
+                }
             }
 
             free( (void*)pzL );
