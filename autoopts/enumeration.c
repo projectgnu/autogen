@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.11 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: enumeration.c,v 3.12 2003/05/03 16:11:38 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -107,7 +107,7 @@ optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
 {
     size_t      len;
     int         idx;
-    uintptr_t   res = -1;
+    uintptr_t   res = ~0;
 
     /*
      *  IF the program option descriptor pointer is invalid,
