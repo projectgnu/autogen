@@ -119,7 +119,7 @@ struct fmem_cookie_s {
 };
 
 static int
-fmem_getpMode( const char *pMode, mode_bits_t *pRes )
+fmem_getmode( const char *pMode, mode_bits_t *pRes )
 {
     if (pMode == NULL)
         return 1;
@@ -441,14 +441,14 @@ fmem_ioctl( FILE* fp, int req, void* ptr )
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
 =*/
 FILE *
-fmemopen(void *buf, size_t len, const char *mode)
+fmemopen(void *buf, size_t len, const char *pMode)
 {
     fmem_cookie_t *pFMC;
 
     {
         mode_bits_t mode;
 
-        if (fmem_getmode(mode, &mode) != 0) {
+        if (fmem_getmode(pMode, &mode) != 0) {
             errno = EINVAL;
             return NULL;
         }
