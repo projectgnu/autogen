@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.50 2000/03/19 23:11:37 bruce Exp $
+## $Id: auto_gen.tpl,v 2.51 2000/03/26 02:37:23 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -83,6 +83,7 @@ files that contain repetitive text with varied substitutions.
 This document is very long because it is intended as a reference
 document.  For a quick start example, @xref{Example Usage}.
 For a simple example of Automated Option processing, @xref{Quick Start}.
+For a full list of the Automated Option features, @xref{Features}.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
@@ -135,6 +136,7 @@ a line in the usage text.
 You will need more things besides this if you choose to implement long
 option names, rc/ini file processing, environment variables and so on.
 For a simple example of Automated Option processing, @xref{Quick Start}.
+For a full list of the Automated Option features, @xref{Features}.
 
 All of this can be done mechanically; with the proper templates and this
 program.  In fact, it has already been done and AutoGen itself uses it:
