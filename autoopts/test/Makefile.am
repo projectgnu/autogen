@@ -8,7 +8,7 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 2000/03/15 03:24:07 bruce Exp $
+## $Id: Makefile.am,v 1.7 2000/03/16 02:29:59 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test errors.test shell.test vers.test
@@ -31,6 +31,6 @@ distclean-local:
 $(TESTS) : perm-stamp
 
 perm-stamp :
-	cd $(srcdir) ; chmod +x *.test
+	cd $(srcdir) ; chmod +x *.test || :
 
 # Makefile.am ends here
