@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.9 1998/11/25 21:19:37 bkorb Exp $
+#$Id: optcode.tpl,v 2.10 1999/02/24 16:23:13 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -7,10 +7,10 @@ static const char zCopyright[] =
        [=
     _IF prog_file_name _exist=][=
         prog_file_name _cap copyright _get owner _get
-        "#3$%s copyright %s %s, all rights reserved" _printf _str=][=
+        "#3$%s copyright (c) %s %s, all rights reserved" _printf _str=][=
     _ELSE =][=
         prog_name _cap copyright _get owner _get
-       "#3$%s copyright %s %s, all rights reserved" _printf _str=][=
+       "#3$%s copyright (c) %s %s, all rights reserved" _printf _str=][=
     _ENDIF=];[=
   _ELSE =]
 #define zCopyright (const char*)NULL[=
