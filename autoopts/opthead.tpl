@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.21 2000/10/16 00:07:24 bkorb Exp $
+# $Id: opthead.tpl,v 2.22 2000/10/16 00:26:50 bkorb Exp $
 =]
 [=
 
@@ -151,7 +151,7 @@ IF (exist? "flag.value") =][=
     ELSE      =][=
       CASE (get "version_value")  =][=
       == ""   =]INDEX_[=(. UP-prefix)=]OPT_VERSION[=
-      == "'"  =]"'"[=
+      == "'"  =]'\''[=
       ~~ .    =]'[=version_value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
@@ -164,7 +164,7 @@ IF (exist? "flag.value") =][=
     ELSE      =][=
       CASE (get "save_opts_value")  =][=
       == ""   =]INDEX_[=(. UP-prefix)=]OPT_SAVE_OPTS[=
-      == "'"  =]"'"[=
+      == "'"  =]'\''[=
       ~~ .    =]'[=save_opts_value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
@@ -174,7 +174,7 @@ IF (exist? "flag.value") =][=
     ELSE      =][=
       CASE (get "load_opts_value")  =][=
       == ""   =]INDEX_[=(. UP-prefix)=]OPT_LOAD_OPTS[=
-      == "'"  =]"'"[=
+      == "'"  =]'\''[=
       ~~ .    =]'[=load_opts_value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
@@ -186,7 +186,7 @@ IF (exist? "flag.value") =][=
     ELSE      =][=
       CASE (get "help_value")  =][=
       == ""   =]INDEX_[=(. UP-prefix)=]OPT_HELP[=
-      == "'"  =]"'"[=
+      == "'"  =]'\''[=
       ~~ .    =]'[=help_value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
@@ -196,7 +196,7 @@ IF (exist? "flag.value") =][=
     ELSE      =][=
       CASE (get "more_help_value")  =][=
       == ""   =]INDEX_[=(. UP-prefix)=]OPT_MORE_HELP[=
-      == "'"  =]"'"[=
+      == "'"  =]'\''[=
       ~~ .    =]'[=more_help_value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
       ESAC    =][=
