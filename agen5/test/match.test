@@ -1,0 +1,59 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# match.test --- test the "match-value?" scheme
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:29 PDT 1999
+# Last Modified:     Fri Oct  1 11:17:56 1999
+#            by:     Bruce Korb <bkorb@gnu.org>
+#
+# $Id: match.test,v 1.1 2000/03/29 03:06:07 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<'_EOF_'
+[= AutoGen5 Template test =]
+ ==*  "sec"  [= IF (match-value? ==* "foo.valu" "sec" )
+             =]YES[=ELSE=]FAIL[=ENDIF=]
+ ==*  "SEC"  [= IF (match-value? ==* "foo.valu" "SEC" )
+             =]FAIL[=ELSE=]YES[=ENDIF=]
+ *=*  "rST"  [= IF (match-value? *=* "foo.valu" "rST" )
+             =]YES[=ELSE=]FAIL[=ENDIF=]
+ *==* "rST"  [= IF (match-value? *==* "foo.valu" "rST" )
+             =]FAIL[=ELSE=]YES[=ENDIF=]
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating ${testname}.def
+cat > ${testname}.def <<_EOF_
+autogen definitions ${testname}.tpl;
+
+foo = {  valu = first.0; valu = primary.0; };
+foo = {  valu = first.1; valu = secondary.1; };
+foo = {  valu = first.2; };
+foo = {  valu = first.3; valu = tertiery.3; };
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+$AGEN ${testname}.def || \
+   failure could not generate output
+egrep FAIL ${testname}.test && \
+   failure some ${testname} tests failed
+
+cleanup
+# end of endmac.test
