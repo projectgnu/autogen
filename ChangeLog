@@ -1,3 +1,18 @@
+2002-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agCgi.c: reopen stderr as stdout so we can direct messages
+	to the client, instead of an invisible log file
+	* agen5/*.c: refer to GNU General Public License *with* "General".
+	* agen5/*.c: change all references from stderr to pfTrace (an alias).
+	* agen5/tpParse.c(whichFunc): return UNKNOWN when a name is unknown.
+	* agen5/test/html.test: route all queries through "cgi.tpl" and
+	depend on a definiton for "template" to source in the correct template.
+	* config/bootstrap: parameterize the name of the input configuration
+	file.  "configure.ac" is preferred to "configure.in" now.
+	* config/bootstrap.local: ditto
+	* doc/auto_gen.tpl: cleanup
+	* doc/autogen.texi: ditto
+
 2002-01-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expMake.c: new add makefile-script function
@@ -58,97 +73,3 @@
 	and the correct environment variables are set.
 	* agen5/bootstrap.dir: regenerate cgi-fsm
 	* agen5/Makefile.am: distribute the new sources
-
-2001-12-08  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/funcDef.c(parseMacroArgs): run argument names through
-	strtransform();
-	* autoopts/Makefile.am(config-opts.def):obsolete
-	(@COMPATOBJ@): new config substitution
-	(strcspn.lo): configurable object
-	(pathfind.lo): configurable object
-	* autoopts/*: removed DEF_PROC_* cruft + updated copyright
-	* autoopts/optcode.tpl(reorder-opts): new global option attribute
-	* autoopts/options.h(OPTST_MUST_SET): new option attribute
-	(OPTPROC_REORDER): new option processing attribute
-	* autoopts/optlib.tpl(must-set): new option attribute
-	(option proc): arg_range is invalid for doc option
-	* autoopts/stack.c: we always HAVE_POSIX_REGCOMP now
-	* autoopts/stdoptions.def: add copyright
-	* autoopts/usage.c: we always HAVE_PATHFIND now.
-	Alphabatized formatting strings.
-	* autoopts/version.c: update copyright and move to top of file
-	* autoopts/aginfo.tpl: allow multiple descriptions
-	* autoopts/agman1.tpl: ditto
-	* autoopts/autoopts.c: consistent flag usage
-	* autoopts/putshell.c(putBourneShell): add code to properly handle
-	equivalenced options.
-	* autoopts/stack.c(stackOptArg): add code to properly handle
-	equivalenced options.  (option arguments are handled according to
-	their defining option, not the equivalenced-to option.)
-
-2001-12-01  Bruce Korb  <bkorb@gnu.org>
-
-	* getdefs/*: largely reworked to implement option extraction from
-	input files.
-	* getdefs/bootstrap.dir: new
-	* getdefs/gdinit.c: new
-
-2001-11-20  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expExtract.c(ag_scm_find_file): new scheme function
-	* agen5/test/extract.test: test (find-file)
-
-2001-11-10  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expString.c(shell_stringify): code from ag_scm_shell_str
-	(ag_scm_shell_str): use that procedure
-	(ag_scm_sub_shell_str): new procedure that uses it, too.
-	This procedure emits a back quoted shell string.
-	* agen5/test/shell.test: add testing for the new function.
-	Expand the testing for all three flavors of shell strings.
-	* autoopts/autoopts.c(optionVersion): use a non-empty string
-	* autoopts/optcode.tpl(doUsageOpt): accommodate C++
-	* autoopts/optmain.tpl(main): ditto
-	* autoopts/test/handler.test: adjust for C++ accommodations
-
-2001-11-05  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/optmain.tpl: allow output to be compiled by C++
-
-2001-11-03  Bruce Korb  <bkorb@gnu.org>
-
-	* compat/strsignal.def: supply defaults, in case the search fails
-
-2001-11-03  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/autoopts.c(optionVersion): replace AO_ANNOUNCE_LEVEL
-	with AO values that are maintained.
-	* agen5/funcCase.c: 'load_proc:' is obsolete
-	Protect against segfaults when macro arguments are missing.
-	* agen5/funcDef.c: ditto
-	* agen5/funcEval.c: ditto
-	* agen5/funcFor.c: ditto
-	* agen5/funcIf.c: ditto
-	* agen5/functions.c: ditto
-	* agen5/functions.h: INCLUDE macro must now test for missing arg
-	* agen5/opts.def(copyright): move email address
-	* autoopts/agman1.tpl: prefer eaddres from copyright
-	* config/missing: "--run" is now often passed in -- accommodate
-	Update the download address for autogen.
-	* doc/compete.tpl: fix English a bit.
-
-2001-10-31  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/autogen.c(abendSignal): use test & exit inside signal handler,
-	not assert().
-	* agen5/funcFor.c(mLoad_For): make sure the FOR macro has arguments
-	before starting the scan  :-)
-	* agen5/test/for.test: test a FOR macro without any arguments
-	* agen5/fsm.tpl(c output): replace "|no.*" regex with "(no.*){0,1}"
-	* Makefile.am(ChangeLog): old versions no longer distributed.
-	They may be obtained via CVS from CVS servers.
-
-2001-10-28  Bruce Korb  <bkorb@gnu.org>
-
-	* ChangeLog: renamed to ChangeLog.3, tagged release rel-5-2-11
