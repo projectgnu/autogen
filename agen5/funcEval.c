@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.14 2000/03/01 04:35:12 bruce Exp $
+ *  $Id: funcEval.c,v 1.15 2000/03/04 20:38:44 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -27,6 +27,7 @@
 #ifndef DEFINE_LOAD_FUNCTIONS
 
 #include "autogen.h"
+#include "expGuile.h"
 
 #include <compat/compat.h>
 #ifdef WITH_INCLUDED_REGEX
@@ -133,6 +134,7 @@ evalExpression( ag_bool* pMustFree )
     case EMIT_EXPRESSION:
     {
         static char z[ 32 ];
+        int len;
 
         SCM res = gh_eval_str( pzText );
 
@@ -140,29 +142,53 @@ evalExpression( ag_bool* pMustFree )
             AGFREE( (void*)pzText );
             *pMustFree = AG_FALSE;
         }
+        pzText = z;
 
-        if (gh_string_p( res ))
-            pzText = SCM_CHARS( res );
+        switch (gh_type_e( res )) {
+        case GH_TYPE_BOOLEAN:         
+            strcpy( z, SCM_NFALSEP(res) ? "1" : "0" ); break;
 
-        else if (gh_char_p( res )) {
-            z[0] = gh_scm2char( res );
-            z[1] = NUL;
-            pzText = z;
+        case GH_TYPE_STRING:
+        case GH_TYPE_SYMBOL:
+            len = SCM_LENGTH(res);
+            memcpy( z, SCM_CHARS(res), len );
+            z[ len ] = NUL;
+            break;
+
+        case GH_TYPE_CHAR:
+            z[0] = gh_scm2char(res); z[1] = NUL; break;
+
+        case GH_TYPE_VECTOR:
+            pzText = "** Vector **"; break;
+
+        case GH_TYPE_PAIR:
+            pzText = "** Pair **"; break;
+
+        case GH_TYPE_NUMBER:
+            sprintf( z, "%ld", gh_scm2long(res) ); break;
+
+        case GH_TYPE_PROCEDURE:
+#ifdef SCM_SUBR_ENTRY
+            sprintf( z, "** Procedure 0x%08X **", SCM_SUBR_ENTRY(res) ); break;
+#else
+            pzText = "** PROCEDURE **"; break;
+#endif
+
+        case GH_TYPE_LIST:
+            pzText = "** LIST **"; break;
+
+        case GH_TYPE_INEXACT:
+            pzText = "** INEXACT **"; break;
+
+        case GH_TYPE_EXACT:
+            pzText = "** EXACT **"; break;
+
+        case GH_TYPE_UNDEFINED:
+            pzText = (char*)zNil; break;
+
+        default:
+            pzText = "** UNKNOWN **"; break;
         }
-
-        else if (gh_number_p( res )) {
-            sprintf( z, "%ld", gh_scm2long( res ));
-            pzText = z;
-        }
-
-        else if (gh_boolean_p( res )) {
-            z[0] = SCM_NFALSEP( res ) ? '1' : '0';
-            z[1] = NUL;
-            pzText = z;
-        }
-        else
-            pzText = (char*)zNil;
-
         break;
     }
 
@@ -357,7 +383,7 @@ MAKE_LOAD_PROC( Expr )
 
     pzCopy = pT->pNext;
 
-    while (isspace( *pzSrc ) && (srcLen-- > 0))  pzSrc++;
+    while (isspace( *pzSrc ))  pzSrc++, srcLen--;
     if (! isalpha( *pzSrc )) {
         tSCC zMsg[] = "Conditional expression must start with a name";
         LOAD_ABORT( pT, pMac, zMsg );
@@ -366,17 +392,18 @@ MAKE_LOAD_PROC( Expr )
 
     srcLen -= copyDefReference( pT, pMac, &pzCopy, &pzSrc, srcLen );
 
-    if (srcLen <= 0) {
+    if (pzSrc >= pzSrcEnd) {
         if (pMac->res != EMIT_VALUE) {
             tSCC zAb[] = "No replacement text for unfound value";
             tSCC zFm[] = "No formatting string for format expr";
             fprintf( stderr, zTplErr, pT->pzFileName, pMac->lineNo,
                      (pMac->res == EMIT_IF_ABSENT) ? zAb : zFm );
+	    LOAD_ABORT( pT, pMac, "definition expression" );
         }
         pMac->ozText = 0;
     } else {
         char* pz = pzCopy;
-        int   ct = srcLen;
+        long  ct = srcLen = (long)(pzSrcEnd - pzSrc);
 
         pMac->ozText = (pzCopy - pT->pzTemplText);
         /*
