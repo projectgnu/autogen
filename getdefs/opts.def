@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *   $Id: opts.def,v 4.2 2005/01/19 01:49:59 bkorb Exp $
  */
 
 /*
@@ -113,25 +113,25 @@ flag = {
     stack_arg;
     descrip   = "subblock definition names";
     doc = <<- _EOF_
-		This option is used to create shorthand entries for nested definitions.
-		For example, with:
-		@table @r
-		@item using subblock thus
-		@code{--subblock=arg=argname,type,null}
-		@item and defining an @code{arg} thus
-		@code{arg: this, char *}
-		@item will then expand to:
-		@code{arg = @{ argname = this; type = "char *"; @};}
-		@end table
-		The "this, char *" string is separated at the commas, with the
-		white space removed.  You may use characters other than commas by
-		starting the value string with a punctuation character other than
-		a single or double quote character.  You may also omit intermediate
-		values by placing the commas next to each other with no intervening
-		white space.  For example, "+mumble++yes+" will expand to:
-		@*
-		@code{arg = @{ argname = mumble; null = "yes"; @};}.
-		_EOF_;
+	This option is used to create shorthand entries for nested definitions.
+	For example, with:
+	@table @r
+	@item using subblock thus
+	@code{--subblock=arg=argname,type,null}
+	@item and defining an @code{arg} thus
+	@code{arg: this, char *}
+	@item will then expand to:
+	@code{arg = @{ argname = this; type = "char *"; @};}
+	@end table
+	The "this, char *" string is separated at the commas, with the
+	white space removed.  You may use characters other than commas by
+	starting the value string with a punctuation character other than
+	a single or double quote character.  You may also omit intermediate
+	values by placing the commas next to each other with no intervening
+	white space.  For example, "+mumble++yes+" will expand to:
+	@*
+	@code{arg = @{ argname = mumble; null = "yes"; @};}.
+	_EOF_;
 };
 
 flag = {
@@ -142,21 +142,21 @@ flag = {
     stack_arg;
     descrip   = "attribute with list of values";
     doc = <<- _EOF_
-		This option is used to create shorthand entries for definitions
-		that generally appear several times.  That is, they tend to be
-		a list of values.  For example, with:
-		@*
-		@code{listattr=foo} defined, the text:
-		@*
-		@code{foo: this, is, a, multi-list} will then expand to:
-		@*
-		@code{foo = 'this', 'is', 'a', 'multi-list';}
-		@*
-		The texts are separated by the commas, with the
-		white space removed.  You may use characters other than commas by
-		starting the value string with a punctuation character other than
-		a single or double quote character.
-		_EOF_;
+	This option is used to create shorthand entries for definitions
+	that generally appear several times.  That is, they tend to be
+	a list of values.  For example, with:
+	@*
+	@code{listattr=foo} defined, the text:
+	@*
+	@code{foo: this, is, a, multi-list} will then expand to:
+	@*
+	@code{foo = 'this', 'is', 'a', 'multi-list';}
+	@*
+	The texts are separated by the commas, with the
+	white space removed.  You may use characters other than commas by
+	starting the value string with a punctuation character other than
+	a single or double quote character.
+	_EOF_;
 };
 
 flag = {
@@ -355,9 +355,10 @@ There are two special ``entry types'':
 /* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
 prog_man_descrip = <<- END_MAN_DESCRIP
-	This program extracts \fBAutoGen\fP definitions from a list of source files.
-	Definitions are delimited by "/*=<entry-type> <entry-name>\n" and "=*/\n".
-	From that, this program creates a definition of the following form:
+	This program extracts \fBAutoGen\fP definitions from a list of
+	source files.  Definitions are delimited by "/*=<entry-type>
+	<entry-name>\n" and "=*/\n".  From that, this program creates
+	a definition of the following form:
 
 	    #line nnn "source-file-name"
 	    entry_type = {
@@ -365,10 +366,12 @@ prog_man_descrip = <<- END_MAN_DESCRIP
 	        ...
 	    };
 
-	The ellipsis `...' is filled in by text found between the two delimiters, with
-	everything up through the first sequence of asterisks deleted on every line.
-	Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
-	(or 'ifndef') and a name `if_name', then the above entry will appear as:
+	The ellipsis `...' is filled in by text found between the two
+	delimiters, with everything up through the first sequence of
+	asterisks deleted on every line.  Additionally, if the
+	`<entry-name>' is followed by a comma, the word `ifdef' (or
+	'ifndef') and a name `if_name', then the above entry will
+	appear as:
 
 	.nf
 	.na

@@ -114,7 +114,8 @@ forkAutogen( tCC* pzInput )
    (join "\n" (stack "keyword"))  )=] };
             pzArg = malloc( [= (+ 4 (string-length (get "name")))
                         =] + strlen( kwlist[ OPT_VALUE_[=(. opt-name)=] ] ) );
-            sprintf( pzArg, "--[=name=]=%s", kwlist[ OPT_VALUE_[=(. opt-name)=] ] );
+            sprintf( pzArg, "--[=name=]=%s", kwlist[ OPT_VALUE_[=
+                        (. opt-name)=] ] );
             addArg( pzArg, ix++ );[=
 
           ==*  num                 =]

@@ -23,7 +23,8 @@ export VERBOSE VERBOSE_ARG
 
 #  Touch the stamp-* files so bootstrap.dir won't try to build them
 #
-touch -t 200001010000 agen5/stamp-opts agen5/stamp-directive agen5/stamp-exprini agen5/stamp-fsm agen5/stamp-parse
+touch -t 200001010000 agen5/stamp-opts agen5/stamp-directive \
+		agen5/stamp-exprini agen5/stamp-fsm agen5/stamp-parse
 
 for f in  agen5/autogen.1          agen5/autogen.menu \
           agen5/autogen.texi       agen5/cgi-fsm.h \

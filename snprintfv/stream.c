@@ -71,7 +71,8 @@ stream_not_writable (int ch, STREAM *stream)
  * The address of the newly allocated and initialised stream is returned.
  **/
 STREAM *
-stream_new (snv_pointer dets, unsigned long limit, StreamGet get_func, StreamPut put_func)
+stream_new (snv_pointer dets, unsigned long limit,
+            StreamGet get_func, StreamPut put_func)
 {
   STREAM *new = snv_new (STREAM, 1);
 

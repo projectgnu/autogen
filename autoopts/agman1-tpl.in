@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-12-17 12:47:09 bkorb"
+## Time-stamp:      "2005-01-18 17:48:12 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.2 2005/01/19 01:49:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -83,7 +83,8 @@ sed \
       #
       :+]
 .\" Mixture of short (flag) options and long options
-.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP " [[=| ]\fIvalue\fP]]..."[+:
+.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP [+:#
+:+]" [[=| ]\fIvalue\fP]]..."[+:
 
     ELSE no long options:+][+:
 

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-01-09 10:43:45 bkorb"
+## Time-stamp:      "2005-01-18 17:27:56 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.2 2005/01/14 20:37:31 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.3 2005/01/19 01:49:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -126,13 +126,14 @@ cat >&3 <<- \EOMacro
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 cp ${top_srcdir}/pkg/libopts/COPYING* .
 
+vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 exec 3> Makefile.am
 cat >&3 <<-	EOMakefile
 	## LIBOPTS Makefile
 	MAINTAINERCLEANFILES  = Makefile.in
 	lib_LTLIBRARIES       = libopts.la
 	libopts_la_SOURCES    = libopts.c
-	libopts_la_LDFLAGS    = -version-info ${AM_LDFLAGS} ${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
+	libopts_la_LDFLAGS    = -version-info ${AM_LDFLAGS} ${vers}
 	EXTRA_DIST            = `echo COPYING*` compat \\
 	EOMakefile
 

@@ -299,7 +299,8 @@ funcdecl>0 {
 	    # Extract return type
 	    type[fname] = $0;
 	    sub(/^[ \t]*typedef[ \t]+/, "", type[fname]); # strip "typedef"
-	    sub(/[ \t]+[A-Z_]*P[A-Z]* *\(\(/, " (", type[fname]); # and __P/PARAMS macro
+	    # and __P/PARAMS macro
+	    sub(/[ \t]+[A-Z_]*P[A-Z]* *\(\(/, " (", type[fname]);
 	    sub(/[ \t]*[(].*$/, "", type[fname]); # strip arguments
 	    sub(/[ \t]*[_A-Za-z][_A-Za-z0-9]*[ \t]*$/, "", type[fname]);
 

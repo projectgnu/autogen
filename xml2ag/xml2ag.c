@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.2 2005/01/09 03:20:28 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.3 2005/01/19 01:49:59 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -140,6 +140,9 @@ main( int argc, char** argv )
     }
 
     {
+        static const char z_not_doc[] =
+            "/* type %d doc is not DOCUMENT or HTML_DOCUMENT */\n";
+
         xmlNodePtr pRoot = printHeader( pDoc );
         printAttrs( pRoot->properties );
         switch (pDoc->type) {
@@ -148,8 +151,7 @@ main( int argc, char** argv )
             printChildren( pRoot->children );
             break;
         default:
-            fprintf( outFp, "/* type %d doc is not DOCUMENT or HTML_DOCUMENT */\n",
-                    pDoc->type );
+            fprintf( outFp, z_not_doc, pDoc->type );
         }
     }
 

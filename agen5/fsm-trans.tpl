@@ -159,8 +159,8 @@ DEFINE machine-step  =][=
         nxtSt = [=(. PFX)=]_ST_INVALID;
         [=(. trans-name)=] = [=(. trans-valu)=];
     } else {
-        const [= (. t-trans) =]* pTT = [=(. pfx)=]_trans_table[ [=(. pfx)
-                                  =]_state ] + trans_evt;
+        const [= (. t-trans) =]* pTT =
+            [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
         nxtSt = firstNext = pTT->next_state;
         [=(. trans-name)=] = pTT->[=(. trans-field)=];
     }

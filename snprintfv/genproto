@@ -66,7 +66,8 @@ format=${FORMAT-GNUC_PRINTF}
 global=${GLOBAL-GLOBAL_DATA}
 scope=${SCOPE-SCOPE}
 
-filter="${AWK-awk} $debug -v mode=$mode -v format=$format -v global=$global -v scope=$scope -f $1"
+filter_args="-v mode=$mode -v format=$format -v global=$global -v scope=$scope"
+filter="${AWK-awk} $debug ${filter_args} -f $1"
 
 # Read in the source file expanding @protos foo.c lines using the
 # gendoc.awk script

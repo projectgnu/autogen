@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.2 2005/01/19 01:49:59 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:
@@ -29,16 +29,16 @@ AC_ARG_WITH(opts-exec-prefix,
                           Exec prefix where autoopts is installed (optional)])
 
 AC_ARG_ENABLE(opts-test,
-[  --disable-opts-test     Do not try to compile and run a test autoopts program])
+[  --disable-opts-test     Do not try to run a test AutoOpts program])
 
   if test x$with_opts_exec_prefix != x ; then
-    autoopts_config_args="$autoopts_config_args --exec-prefix=$with_opts_exec_prefix"
+    aocfg_args="$aocfg_args --exec-prefix=$with_opts_exec_prefix"
     if test x${AUTOOPTS_CONFIG+set} != xset ; then
       AUTOOPTS_CONFIG=$with_opts_exec_prefix/bin/autoopts-config
     fi
   fi
   if test x$with_opts_prefix != x ; then
-     autoopts_config_args="$autoopts_config_args --prefix=$with_opts_prefix"
+     aocfg_args="$aocfg_args --prefix=$with_opts_prefix"
     if test x${AUTOOPTS_CONFIG+set} != xset ; then
       AUTOOPTS_CONFIG=$with_opts_prefix/bin/autoopts-config
     fi
@@ -57,17 +57,17 @@ AC_ARG_ENABLE(opts-test,
     min_cur=9
     min_rev=0
     min_age=0
-    AUTOGEN=`$AUTOOPTS_CONFIG $autoopts_config_args --autogen`
-    AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --cflags`
-    AUTOGEN_LDFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
-    AUTOOPTS_LIBS=`$AUTOOPTS_CONFIG $autoopts_config_args --libs`
+    AUTOGEN=`$AUTOOPTS_CONFIG $aocfg_args --autogen`
+    AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $aocfg_args --cflags`
+    AUTOGEN_LDFLAGS=`$AUTOOPTS_CONFIG $aocfg_args --pkgdatadir`
+    AUTOOPTS_LIBS=`$AUTOOPTS_CONFIG $aocfg_args --libs`
 changequote(,)dnl
-    autoopts_config_version=`$AUTOOPTS_CONFIG $autoopts_config_args --version`
-    autoopts_config_current=`echo $autoopts_config_version | \
+    aocfg_version=`$AUTOOPTS_CONFIG $aocfg_args --version`
+    aocfg_current=`echo $aocfg_version | \
       sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\1/'`
-    autoopts_config_revision=`echo $autoopts_config_version | \
+    aocfg_revision=`echo $aocfg_version | \
       sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\2/'`
-    autoopts_config_age=`echo $autoopts_config_version | \
+    aocfg_age=`echo $aocfg_version | \
       sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\3/'`
 changequote([,])dnl
     if test "x$enable_opts_test" != "xno" ; then
@@ -90,7 +90,7 @@ changequote([,])dnl
 #include <stdlib.h>
 
 static const char zBadVer[] = "\n\\
-*** 'autoopts-config --version' returned $autoopts_config_current:$autoopts_config_revision:$autoopts_config_age,\n\\
+*** 'autoopts-config --version' returned $aocfg_current:$aocfg_revision:$aocfg_age,\n\\
 ***                but autoopts returned (%d:%d:0)\n\\
 *** If autoopts-config was correct, then it is best to remove the old version\n\\
 *** of autoopts. You may also be able to fix the error by modifying your\n\\
@@ -129,15 +129,15 @@ main ()
         exit(1);
     }
 
-    if (  (current  != $autoopts_config_current)
-       || (revision != $autoopts_config_revision)) {
+    if (  (current  != $aocfg_current)
+       || (revision != $aocfg_revision)) {
         printf( zBadVer, current, revision);
         return 1;
     }
 #if defined (AO_CURRENT) && defined (AO_REVISION) && defined (AO_AGE)
-    if (  ($autoopts_config_current  != AO_CURRENT)
-       || ($autoopts_config_revision != AO_REVISION)
-       || ($autoopts_config_age      != AO_AGE))  {
+    if (  ($aocfg_current  != AO_CURRENT)
+       || ($aocfg_revision != AO_REVISION)
+       || ($aocfg_age      != AO_AGE))  {
         printf("*** autoopts header files (version %d:%d:%d) do not match\n",
                AO_CURRENT, AO_REVISION, AO_AGE);
         printf("*** library (version %d:%d:0)\n", current, revision);
@@ -145,13 +145,13 @@ main ()
     }
 #endif
 
-    if (  ($autoopts_config_current - $autoopts_config_age > $min_cur)
-       || (  ($autoopts_config_current - $autoopts_config_age == $min_cur)
-          && ($autoopts_config_revision >= $min_rev) ))
+    if (  ($aocfg_current - $aocfg_age > $min_cur)
+       || (  ($aocfg_current - $aocfg_age == $min_cur)
+          && ($aocfg_revision >= $min_rev) ))
         return 0;
 
-    printf(zOldVer, $autoopts_config_current, $autoopts_config_revision,
-           $autoopts_config_age);
+    printf(zOldVer, $aocfg_current, $aocfg_revision,
+           $aocfg_age);
     return 1;
 }
 ],, no_autoopts=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
@@ -186,7 +186,7 @@ _EOF_
          AC_TRY_LINK([
 #include <options.h>
 #include <stdio.h>
-],      [ return strcmp("$autoopts_config_current:$autoopts_config_revision:$autoopts_config_age", optionVersion()); ],
+], [return strcmp("$aocfg_current:$aocfg_revision:$aocfg_age", optionVersion());],
         [ cat << _EOF_
 *** The test program compiled, but did not run. This usually means that
 *** the run-time linker is not finding libopts or finding the wrong version

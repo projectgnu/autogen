@@ -238,7 +238,8 @@ cgi_run_fsm(
             nxtSt = CGI_ST_INVALID;
             trans = CGI_TR_INVALID;
         } else {
-            const t_cgi_transition* pTT = cgi_trans_table[ cgi_state ] + trans_evt;
+            const t_cgi_transition* pTT =
+                cgi_trans_table[ cgi_state ] + trans_evt;
             nxtSt = firstNext = pTT->next_state;
             trans = pTT->transition;
         }

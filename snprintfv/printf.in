@@ -117,7 +117,8 @@ typedef struct printf_info
  * @pa_u_long_long_int: the widest unsigned integer type in use on the host
  * @pa_float: a %float
  * @pa_double: a %double
- * @pa_long_double: a long %double, or a simple %double if it is the widest floating-point type in use on the host
+ * @pa_long_double: a long %double, or a simple %double if it is
+ *                  the widest floating-point type in use on the host
  * @pa_string: a %const pointer to %char
  * @pa_wstring: a %const pointer to %wchar_t
  * @pa_pointer: a generic pointer
@@ -154,16 +155,19 @@ typedef union printf_arg
 #define PRINTF_ERROR(pi, str) \
         printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FCN, str);
 typedef int printf_function (STREAM *stream, struct printf_info *pparser,
-							 union printf_arg const * args);
-typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
-									 int *argtypes);
+			     union printf_arg const * args);
+typedef int printf_arginfo_function (
+	struct printf_info *pparser,
+	size_t n,
+	int *argtypes);
 
 /**
  * spec_entry:
  * @spec: the specifier character that was matched
  * @type: when @arg is NULL, the type of the only argument to the specifier
- * @fmt: the handler function to actually print the arguments to the specifier
- * @arg: the handler function to tell %printf about the types of the arguments to the specifier
+ * @fmt:  the handler function to actually print the arguments to the specifier
+ * @arg:  the handler function to tell %printf about the types of the arguments
+ *        to the specifier
  * @user: the user data for the specifier, accessible to the handler function
  *
  * This is returned by register_printf_function. 
@@ -181,9 +185,11 @@ spec_entry;
 
 /**
  * register_callback_function: printf.h
- * @spec: the character which will trigger the functions, cast to an unsigned int.
- * @fmt: the handler function to actually print the arguments to the specifier
- * @arg: the handler function to tell %printf about the types of the arguments to the specifier
+ * @spec: the character which will trigger the functions,
+ *        cast to an unsigned int.
+ * @fmt:  the handler function to actually print the arguments to the specifier
+ * @arg:  the handler function to tell %printf about the types of the arguments
+ *        to the specifier
  * 
  * Register the pair made of @fmt and @arg, so that it is called
  * when @spec is encountered in a format string.  If you create
@@ -200,7 +206,11 @@ spec_entry;
  * Returns %NULL if @func was not successfully registered, a
  * %spec_entry with the information on the function if it was.
  **/
-typedef spec_entry *register_callback_function (unsigned spec, printf_function *func, printf_arginfo_function *arginfo);
+typedef spec_entry *
+register_callback_function (
+	unsigned spec,
+	printf_function *func,
+	printf_arginfo_function *arginfo);
 
 /* Codes to determine basic types.
 

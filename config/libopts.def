@@ -69,7 +69,7 @@ test   = {
   };
 
   doc =
-	"AutoGen won't work without a POSIX compliant regular expression library.";
+  "AutoGen won't work without a POSIX compliant regular expression library.";
 };
 
 test = {
