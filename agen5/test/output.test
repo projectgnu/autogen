@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/06/24 00:33:20 $
+# Last Modified:     $Date: 2001/08/25 00:18:17 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: output.test,v 1.1 2001/06/24 00:33:20 bkorb Exp $
+# $Id: output.test,v 1.2 2001/08/25 00:18:17 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,14 +29,25 @@ cat > $testname.tpl <<'EOF'
 <=(out-push-new)
 
 =>This is sample output
-<= `echo Goodbye.`  =><=
+<= `echo echoed text.`  =><=
+(out-suspend "here")
+(out-push-new)
+=>This text is from another diversion.
+<=
+(out-suspend "there")
+=>This is the first output text.
+<=(out-resume "here")
+=>
+Final text<=
 
 (define text (out-pop #t)) =><=
 
 DEFINE wrapper
 
 =>BEGIN
-<=(. text)=>
+<=(out-resume "there") (out-pop #t)
+=><=
+(. text)=>
 END<=
 
 ENDDEF wrapper =><=
@@ -49,10 +60,13 @@ EOF
 
 echo creating $testname.out in `pwd`
 # this is the output we should expect to see
-cat > $testname.out <<'EOF'
+cat > $testname.samp <<'EOF'
+This is the first output text.
 BEGIN
+This text is from another diversion.
 This is sample output
-Goodbye.
+echoed text.
+Final text
 END
 Done.
 EOF
@@ -64,8 +78,8 @@ $AGEXE -b $testname -T $testname.tpl --no-def || \
 
 # # # # # # # TEST RESULTS # # # # # #
 
-cmp -s $testname.test $testname.out || \
-  failure "`diff $testname.test $testname.out`"
+cmp -s $testname.samp $testname.test || \
+  failure "`diff $testname.samp $testname.test`"
 
 cleanup
 # end of output.test

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.22 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: funcFor.c,v 1.23 2001/08/25 00:18:17 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -233,9 +233,9 @@ ag_scm_for_by( SCM by )
     SCM
 ag_scm_for_sep( SCM obj )
 {
-    if ((! pFS->for_loading) || (! gh_string_p( obj )))
+    if (! pFS->for_loading)
         return SCM_UNDEFINED;
-    pFS->for_pzSep = strdup( SCM_CHARS( obj ));
+    pFS->for_pzSep = strdup( ag_scm2zchars( obj, "separator str" ));
     return SCM_BOOL_T;
 }
 
@@ -716,5 +716,6 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of funcFor.c */

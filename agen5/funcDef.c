@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.37 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: funcDef.c,v 1.38 2001/08/25 00:18:17 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -441,7 +441,7 @@ build_defs( int defCt, tDefList* pList )
             res = gh_eval_str( pList->pzExpr );
 
             if (gh_string_p( res )) {
-                pList->de.pzValue = strdup( SCM_CHARS( res ));
+                pList->de.pzValue = strdup( ag_scm2zchars( res, "eval res" ));
             }
             else if (gh_number_p( res )) {
                 pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
@@ -646,13 +646,10 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
      */
     macName = eval( pT->pzTemplText + pMac->ozName );
 
-    if (! gh_string_p( macName )) {
-        pzText = asprintf( zNoResolution, "??not string??" );
-        LOAD_ABORT( pT, pMac, pzText );
-    }
-    pInv = findTemplate( SCM_CHARS( macName ));
+    pInv = findTemplate( ag_scm2zchars( macName, "macro name" ));
     if (pInv == (tTemplate*)NULL) {
-        pzText = asprintf( zNoResolution, SCM_CHARS( macName ) );
+        pzText = asprintf( zNoResolution,
+                           ag_scm2zchars( macName, "macro name" ));
         LOAD_ABORT( pT, pMac, pzText );
     }
 

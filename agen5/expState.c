@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.27 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: expState.c,v 1.28 2001/08/25 00:18:17 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -215,15 +215,8 @@ ag_scm_base_name( void )
     SCM
 ag_scm_count( SCM obj )
 {
-    int    ent_len;
-    char*  pzEntName;
+    int ent_len = count_entries( ag_scm2zchars( obj, "ag object" ));
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pzEntName = gh_scm2newstr( obj, NULL );
-    ent_len = count_entries( pzEntName );
-    free( (void*)pzEntName );
     return gh_int2scm( ent_len );
 }
 
@@ -269,17 +262,10 @@ ag_scm_exist_p( SCM obj )
 {
     ag_bool x;
     SCM     res;
-    char*   pz;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( obj, NULL );
-    if (findDefEntry( pz, &x ) == NULL)
+    if (findDefEntry( ag_scm2zchars( obj, "ag object" ), &x ) == NULL)
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
-
-    free( (void*)pz );
 
     return res;
 }
@@ -298,17 +284,10 @@ ag_scm_exist_p( SCM obj )
 ag_scm_ag_function_p( SCM obj )
 {
     SCM     res;
-    char*   pz;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( obj, NULL );
-    if (findTemplate( pz ) == NULL)
+    if (findTemplate( ag_scm2zchars( obj, "ag user macro" )) == NULL)
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
-
-    free( (void*)pz );
 
     return res;
 }
@@ -337,15 +316,12 @@ ag_scm_ag_function_p( SCM obj )
 ag_scm_match_value_p( SCM op, SCM obj, SCM test )
 {
     if (  (! gh_procedure_p( op   ))
-       || (! gh_string_p(    obj  ))
-       || (! gh_string_p(    test )) )
+       || (! gh_string_p(    obj  )) )
         return SCM_UNDEFINED;
 
-    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-        char* pzTest = gh_scm2newstr( test, NULL );
-        fprintf( pfTrace, "searching for `%s'", pzTest );
-        free( (void*)pzTest );
-    }
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf( pfTrace, "searching for `%s'",
+				 ag_scm2zchars( test, "test value" ));
 
     return find_entry_value( op, obj, test );
 }
@@ -364,14 +340,8 @@ ag_scm_get( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     x;
-    char*       pz;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, &x );
-    free( (void*)pz );
+    pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &x );
 
     if ((pE == (tDefEntry*)NULL) || (pE->valType != VALTYP_TEXT))
         return gh_str02scm( "" );
@@ -393,14 +363,8 @@ ag_scm_high_lim( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     isIndexed;
-    char*       pz;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, &isIndexed );
-    free( (void*)pz );
+    pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &isIndexed );
 
     /*
      *  IF we did not find the entry we are looking for
@@ -433,15 +397,10 @@ ag_scm_high_lim( SCM obj )
     SCM
 ag_scm_len( SCM obj )
 {
-    char*       pz;
     int         len;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
+    len = entry_length( ag_scm2zchars( obj, "ag value" ));
 
-    pz = gh_scm2newstr( obj, NULL );
-    len = entry_length( pz );
-    free( (void*)pz );
     return gh_int2scm( len );
 }
 
@@ -459,14 +418,8 @@ ag_scm_low_lim( SCM obj )
 {
     tDefEntry*  pE;
     ag_bool     x;
-    char*       pz;
 
-    if (! gh_string_p( obj ))
-        return SCM_UNDEFINED;
-
-    pz = gh_scm2newstr( obj, NULL );
-    pE = findDefEntry( pz, &x );
-    free( (void*)pz );
+    pE = findDefEntry( ag_scm2zchars( obj, "ag value" ), &x );
 
     /*
      *  IF we did not find the entry we are looking for
@@ -527,7 +480,7 @@ ag_scm_tpl_file_line( SCM fmt )
     char*   pz;
 
     if (gh_string_p( fmt ))
-        pzFmt = gh_scm2newstr( fmt, NULL );
+        pzFmt = ag_scm2zchars( fmt, "file/line format" );
 
     {
         size_t  maxlen = strlen( pCurTemplate->pzFileName )
@@ -538,9 +491,6 @@ ag_scm_tpl_file_line( SCM fmt )
     }
 
     sprintf( pz, pzFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );
-
-    if (pzFmt != zFmt)
-        free( (void*)pzFmt );
 
     {
         SCM res = gh_str02scm( pz );
@@ -555,5 +505,6 @@ ag_scm_tpl_file_line( SCM fmt )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expState.c */

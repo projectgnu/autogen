@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.29 2001/07/22 20:03:56 bkorb Exp $
+ *  $Id: funcCase.c,v 1.30 2001/08/25 00:18:17 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -118,15 +118,9 @@ Select_Compare( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_contains_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM   res;
-
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
 
     res = (strstr( pzText, pzSubstr) == (char*)NULL) ? SCM_BOOL_F : SCM_BOOL_T;
 
@@ -172,11 +166,9 @@ Select_Compare_End( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_ends_with_p( SCM text, SCM substr )
 {
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    return (SUCCESSFUL( Select_Compare_End( SCM_CHARS( text ),
-                                            SCM_CHARS( substr ))))
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
+    return (SUCCESSFUL( Select_Compare_End( pzText, pzSubstr )))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
@@ -213,11 +205,9 @@ Select_Compare_Start( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_starts_with_p( SCM text, SCM substr )
 {
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    return (SUCCESSFUL( Select_Compare_Start( SCM_CHARS( text ),
-                                              SCM_CHARS( substr ))))
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
+    return (SUCCESSFUL( Select_Compare_Start( pzText, pzSubstr )))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
@@ -249,15 +239,10 @@ Select_Compare_Full( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_equals_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM   res;
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
     res = (strcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
 
     if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS)
@@ -303,15 +288,15 @@ Select_Equivalent( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_contains_eqv_p( SCM text, SCM substr )
 {
+	tSCC zSrch[] = "search string";
     char* pzSubstr;
     SCM   res;
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-    pzSubstr = strdup( SCM_CHARS( substr ));
+    AGDUPSTR( pzSubstr, ag_scm2zchars( substr, zSrch ), zSrch );
 
     upString( pzSubstr );
-    if (SUCCESSFUL( Select_Equivalent( SCM_CHARS( text ), pzSubstr )))
+    if (SUCCESSFUL( Select_Equivalent( ag_scm2zchars( text, "sample text" ),
+                                       pzSubstr )))
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     AGFREE( (void*)pzSubstr );
@@ -353,11 +338,9 @@ Select_Equivalent_End( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_ends_eqv_p( SCM text, SCM substr )
 {
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    return (SUCCESSFUL( Select_Equivalent_End( SCM_CHARS( text ),
-                                               SCM_CHARS( substr ))))
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
+    return (SUCCESSFUL( Select_Equivalent_End( pzText, pzSubstr )))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
@@ -394,11 +377,9 @@ Select_Equivalent_Start( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_starts_eqv_p( SCM text, SCM substr )
 {
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    return (SUCCESSFUL( Select_Equivalent_Start( SCM_CHARS( text ),
-                                                 SCM_CHARS( substr ))))
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
+    return (SUCCESSFUL( Select_Equivalent_Start( pzText, pzSubstr )))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
 
@@ -434,11 +415,15 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
     char* pzSubstr;
     SCM   res;
 
+    /*
+     *  We are overloading the "=" operator.  Our arguments may be
+     *  numbers...
+     */
     if (! gh_string_p( text ) || ! gh_string_p( substr ))
         return scm_num_eq_p( text, substr );
 
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
+    pzText   = ag_scm2zchars( text, "text to match" );
+    pzSubstr = ag_scm2zchars( substr, "match expr" );
 
     res = (streqvcmp( pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
 
@@ -500,12 +485,10 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
     SCM      res;
     regex_t  re;
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
+    compile_re( &re, ag_scm2zchars( substr, "match expr" ), REG_EXTENDED );
 
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
-
-    if (regexec( &re, SCM_CHARS( text ), 0, (regmatch_t*)NULL, 0 ) == 0)
+    if (regexec( &re, ag_scm2zchars( text, "text to match" ), 0,
+                 (regmatch_t*)NULL, 0 ) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -516,21 +499,14 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM      res;
     regex_t  re;
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
+    compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
-
-    if (regexec( &re, SCM_CHARS( text ), 0, (regmatch_t*)NULL, 0 ) == 0)
+    if (regexec( &re, pzText, 0, (regmatch_t*)NULL, 0 ) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -589,21 +565,13 @@ Select_Match_End( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_end_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
-    pzText = SCM_CHARS( text );
+    compile_re( &re, pzSubstr, REG_EXTENDED );
 
     if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
@@ -619,21 +587,13 @@ ag_scm_string_end_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
-    pzText = SCM_CHARS( text );
+    compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
     if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
@@ -697,20 +657,13 @@ Select_Match_Start( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_start_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
+    compile_re( &re, pzSubstr, REG_EXTENDED );
 
     if (regexec( &re, SCM_CHARS( text ), 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
@@ -726,20 +679,13 @@ ag_scm_string_start_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED | REG_ICASE );
+    compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
     if (regexec( &re, SCM_CHARS( text ), 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
@@ -807,21 +753,13 @@ Select_Match_Full( char* pzText, char* pzMatch )
     SCM
 ag_scm_string_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
 
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
-
-    compile_re( &re, SCM_CHARS( substr ), REG_EXTENDED );
-    pzText = SCM_CHARS( text );
+    compile_re( &re, pzSubstr, REG_EXTENDED );
 
     if (regexec( &re, pzText, 2, m, 0 ) != 0)
          res = SCM_BOOL_F;
@@ -838,18 +776,11 @@ ag_scm_string_match_p( SCM text, SCM substr )
     SCM
 ag_scm_string_eqv_match_p( SCM text, SCM substr )
 {
-    char* pzText;
-    char* pzSubstr;
-
+    char* pzText   = ag_scm2zchars( text, "text to match" );
+    char* pzSubstr = ag_scm2zchars( substr, "match expr" );
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
-
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
-        return SCM_UNDEFINED;
-
-    pzText = SCM_CHARS( text );
-    pzSubstr = SCM_CHARS( substr );
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
@@ -1313,5 +1244,6 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of funcCase.c */

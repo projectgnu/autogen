@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 1.15 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: expOutput.c,v 1.16 2001/08/25 00:18:17 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -38,9 +38,18 @@
 #  define S_IAMB      (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)
 #endif
 
-STATIC int outputDepth = 1;
+typedef struct {
+    tCC*        pzSuspendName;
+    tFpStack*   pOutDesc;
+} tSuspendName;
+
+STATIC int            suspendCt   = 0;
+STATIC int            suspAllocCt = 0;
+STATIC tSuspendName*  pSuspended  = NULL;
+STATIC int            outputDepth = 1;
 
 STATIC void addWriteAccess( char* pzFileName );
+
 
 
     EXPORT void
@@ -179,6 +188,86 @@ ag_scm_out_pop( SCM ret_contents )
     outputDepth--;
     closeOutput( AG_FALSE );
     return res;
+}
+
+
+/*=gfunc out_suspend
+ *
+ * what:   suspend current output file
+ * exparg: suspName, A name tag for reactivating
+ * doc:  
+ *  If there has been a @code{push} on the output, then set aside the
+ *  output descriptor for later reactiviation with @code{(out-resume "xxx")}.
+ *  The tag name need not reflect the name of the output file.  In fact,
+ *  the output file may be an anonymous temporary file.  You may also
+ *  change the tag every time you suspend output to a file, because the
+ *  tag names are forgotten as soon as the file has been "resumed".
+=*/
+    SCM
+ag_scm_out_suspend( SCM suspName )
+{
+    SCM res = SCM_UNDEFINED;
+    tCC* pzSuspName = ag_scm2zchars( suspName, "suspend name" );
+
+    if (pCurFp->pPrev == (tFpStack*)NULL) {
+        fputs( "ERROR:  Cannot pop output with no output pushed\n",
+               stderr );
+        LOAD_ABORT( pCurTemplate, pCurMacro, "expr failed" );
+    }
+
+    if (++suspendCt > suspAllocCt) {
+        suspAllocCt += 8;
+        if (pSuspended == NULL)
+            pSuspended = (tSuspendName*)
+                AGALOC( suspAllocCt * sizeof( tSuspendName ),
+                        "suspended file list" );
+        else
+            pSuspended = (tSuspendName*)
+                AGREALOC( (void*)pSuspended,
+                          suspAllocCt * sizeof( tSuspendName ),
+                          "augmenting suspended file list" );
+    }
+
+    pSuspended[ suspendCt-1 ].pzSuspendName = gh_scm2newstr( suspName, NULL );
+    pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
+    pCurFp = pCurFp->pPrev;
+    outputDepth--;
+
+    return res;
+}
+
+
+/*=gfunc out_resume
+ *
+ * what:   resume current output file
+ * exparg: suspName, A name tag for reactivating
+ * doc:  
+ *  If there has been a suspended output, then make that output descriptor
+ *  current again.  That output must have been suspended with the same tag
+ *  name given to this routine as its argument.
+=*/
+    SCM
+ag_scm_out_resume( SCM suspName )
+{
+    int  ix  = 0;
+    tCC* pzName = ag_scm2zchars( suspName, "resume name" );
+
+    for (; ix < suspendCt; ix++) {
+        if (strcmp( pSuspended[ ix ].pzSuspendName, pzName ) == 0) {
+            pSuspended[ ix ].pOutDesc->pPrev = pCurFp;
+            pCurFp = pSuspended[ ix ].pOutDesc;
+            free( (void*)pSuspended[ ix ].pzSuspendName );
+            if (ix < --suspendCt)
+                pSuspended[ ix ] = pSuspended[ suspendCt ];
+            ++outputDepth;
+            return SCM_UNDEFINED;
+        }
+    }
+
+    fprintf( stderr, "ERROR: no output file was suspended as ``%s''\n",
+             pzName );
+    LOAD_ABORT( pCurTemplate, pCurMacro, "resume failed" );
+    return SCM_UNDEFINED;
 }
 
 
@@ -326,16 +415,22 @@ ag_scm_out_depth( void )
 /*=gfunc out_name
  *
  * what: current output file name
- * doc:  Returns the name of the current output file.
+ * doc:  Returns the name of the current output file.  If the current file
+ *       is a temporary, unnamed file, then it will scan up the chain until
+ *       a real output file name is found.
  *       @xref{output controls}.
 =*/
     SCM
 ag_scm_out_name( void )
 {
-    return gh_str02scm( pCurFp->pzOutName );
+    tFpStack* p = pCurFp;
+    while (p->flags & FPF_UNLINK)  p = p->pPrev;
+    return gh_str02scm( p->pzOutName );
 }
+
 /*
  * Local Variables:
- * c-file-style: "stroustrup"
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
  * End:
  * end of expOutput.c */

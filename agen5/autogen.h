@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.23 2001/08/23 03:22:05 bkorb Exp $
+ *  $Id: autogen.h,v 1.24 2001/08/25 00:18:17 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -405,6 +405,24 @@ struct mem_mgmt {
 size_t strlcpy( char* dest, const char* src, size_t n );
 #endif
 
+static inline char* ag_scm2zchars( SCM s, tCC* type )
+{
+    if (! gh_string_p( s )) {
+        tSCC zNotStr[] = "ERROR: %s is not a string\n";
+        fprintf( stderr, zNotStr, type );
+        LOAD_ABORT( pCurTemplate, pCurMacro, zNotStr+14 );
+    }
+
+    if (SCM_SUBSTRP(s))
+        s = scm_makfromstr( SCM_ROCHARS(s), SCM_ROLENGTH(s), 0 );
+    return SCM_CHARS(s);
+}
+
 #include "proto.h"
 #endif /* AUTOGEN_HDR */
-/* end of autogen.h */
+/*
+ * Local Variables:
+ * c-file-style: "Stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * end of autogen.h */
