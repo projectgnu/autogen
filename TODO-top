@@ -2,23 +2,14 @@
 
 * In Progress
 
-** create an internal 'tr' function.  There are insoluable
-   incompatibilities between the various implementations.
-   I don't want to configure it :(.
-** write some autoconf magic to find out whether it is safe to add
-   O_BINARY to [f[re]]open calls, and fix up calls in body of code.
-** Write an argv style parsing agPrint.c
-*** Need to add compat/snprintf.c and replace use of sprintf w/ snprintf
-    throughout!  This really needs to support %n$ notation too =/O|
-*** ANSI format specifiers: cdeEfgGiosuxX with conversion quals h and l
+*** Need to replace use of sprintf w/ snprintf throughout!
+*** ANSI format specifiers: ceEfgG with conversion quals h and l
+*** rewrite in guile (instead of C)
 
 * Pending
 
 ** new arg for setting time of output files
-** Use compat.h vararg/stdarg macros.
 ** need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
-** when the dust has settled on glibc-2, try an AXP build against it.  Autogen
-   exposes some (well, one, at least) bugs in Digital's libc.
 ** Rework the shell string processing in the definitions file so
    that backquoted text is immediately passed to the shell and
    then concatenated with the surrounding text.  This will require
@@ -26,9 +17,8 @@
    point to contiguous source text or to allocated memory.
 ** Try to sort out the server chaining stuff once and for all... I
    suspect the pipeline will need to be built up in reverse like bash...
-** Need to add compat/alloca.c, or else use byacc instead of bison for
+** Need to use byacc instead of bison for
    distribution (bison parsers rely on a working alloca -- yeuck!!)
-   Let's use byacc!!
   - Macro: AC_FUNC_ALLOCA
      This macro does not try to get `alloca' from the System V R3
      `libPW' or the System V R4 `libucb' because those libraries
@@ -36,11 +26,11 @@
      versions do not even contain `alloca' or contain a buggy version.
      If you still want to use their `alloca', use `ar' to extract
      `alloca.o' from them instead of compiling `alloca.c'.
+** All errors from autogen/getdefs etc. should start with,
+   `basename(argv[0])'.
 
 *  Possibilities for the (distant) future:
 
 ** implement _FOR x IN a, b, c, ...
-** rewrite in guile (instead of C)
-** parse the autogen macros with a guile translator
 ** write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.

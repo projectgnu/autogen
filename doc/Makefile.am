@@ -8,7 +8,7 @@
 ## Last Modified:   Fri Mar 26 11:45:51 1999
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.13 1999/03/26 19:53:02 bkorb Exp $
+## $Id: Makefile.am,v 2.14 1999/04/14 17:44:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -27,7 +27,13 @@ MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
 ODEF            = $(top_srcdir)/src/opts.def
 
-DEFSRC		= $(top_srcdir)/src/agFun*.c \
+DEFSRC		= \
+		$(top_srcdir)/src/agFunCase.c \
+		$(top_srcdir)/src/agFunEval.c \
+		$(top_srcdir)/src/agFunFor.c \
+		$(top_srcdir)/src/agFunIf.c \
+		$(top_srcdir)/src/agFunOut.c \
+		$(top_srcdir)/src/agFunc.c \
 		$(top_srcdir)/src/agDirect.c \
 		$(top_srcdir)/src/agExpr.c \
 		$(top_srcdir)/autoopts/opthead.tpl

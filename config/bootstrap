@@ -9,7 +9,7 @@
 # Last Modified:     Fri Mar 19 12:47:18 1999
 #            by:     Bruce Korb <korb@datadesign.com>
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.6 1999/03/19 20:58:50 bkorb Exp $
+# $Id: bootstrap,v 1.7 1999/04/14 17:44:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -36,12 +36,12 @@ AUTOHEADER=autoheader
 ACLOCAL=aclocal
 AUTOMAKE=:
 sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in | \
-	fgrep -q AM_INIT_AUTOMAKE && AUTOMAKE=automake
+	fgrep AM_INIT_AUTOMAKE > /dev/null && AUTOMAKE=automake
 
 # See whether the configure template requires libtool.
 LIBTOOLIZE=:
 sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in | \
-	fgrep -q AM_PROG_LIBTOOL && LIBTOOLIZE=libtoolize
+	fgrep AM_PROG_LIBTOOL > /dev/null && LIBTOOLIZE=libtoolize
 
 DIE=0
 

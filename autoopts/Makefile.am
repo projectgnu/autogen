@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Tue Mar 16 11:21:39 1999				      
-##            by:   Gary V. Vaughan <garyv@oranda.demon.co.uk>		      
+## Last Modified:   Tue Apr 13 08:10:01 1999
+##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.11 1999/03/16 15:54:57 bkorb Exp $
+## $Id: Makefile.am,v 2.12 1999/04/14 17:44:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,7 +20,8 @@ lib_LTLIBRARIES = libopts.la
 libopts_la_SOURCES = \
 		autoopts.c pgusage.c putshell.c save.c \
 		stack.c usage.c version.c streqvcmp.c \
-		autoopts.h options.h streqv.h makeshell.c
+		autoopts.h options.h streqv.h makeshell.c \
+		snprintfv.h snprintfv.c
 
 libopts_la_LDFLAGS = -version-info @LT_CURRENT@:@LT_REVISION@:@LT_AGE@
 

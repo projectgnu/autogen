@@ -1,6 +1,5 @@
 New in 4.5
-* Compiles with cygwin tools, provided you link compat/snprintf.c and
-  GNU regex.
+* Compiles with cygwin tools, provided you link GNU regex.
 * *Much* enhanced portability.  AutoGen really should compile in just
   about any POSIX environment.
 * Overhauled the configuration to help programs which want to use

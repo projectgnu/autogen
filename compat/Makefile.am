@@ -7,17 +7,17 @@
 ## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
 ## Maintainer:       Bruce Korb <korbb@datadesign.com>
 ## Created:          Mon Jun 30 15:35:12 1997	
-## Last Modified:    Wed Oct 21 07:12:04 1998
+## Last Modified:    Tue Apr 13 08:23:43 1999
 ##            by:    Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.1 1998/10/21 14:28:14 bkorb Exp $
+## $Id: Makefile.am,v 2.2 1999/04/14 17:44:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 
 EXTRA_DIST = @COMPAT_SRC@
 GEN_SRC    = strsignal.h
-MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
+MAINTAINERCLEANFILES = Makefile.in
 AGEXE      = $(top_builddir)/src/autogen
 
 all:

@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
- * Last Modified:     Tue Nov 24 08:15:35 1998
+ * Last Modified:     Wed Apr 14 09:26:27 1999
  *            by:     Bruce Korb <korb@datadesign.com>
  *
- * $Id: compat.h,v 2.2 1999/03/17 16:55:18 bkorb Exp $
+ * $Id: compat.h,v 2.3 1999/04/14 17:44:03 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -17,17 +17,6 @@
 #   define EXTERN extern "C"
 #else
 #   define EXTERN extern
-#endif
-
-/* Some machines forget this! */
-
-# ifndef EXIT_FAILURE
-#   define EXIT_SUCCESS 0
-#   define EXIT_FAILURE 1
-# endif
-
-#ifndef NUL
-#  define NUL '\0'
 #endif
 
 #undef STATIC
@@ -82,6 +71,17 @@
 
 #include <stdio.h>
 #include <ctype.h>
+
+/* Some machines forget this! */
+
+# ifndef EXIT_FAILURE
+#   define EXIT_SUCCESS 0
+#   define EXIT_FAILURE 1
+# endif
+
+#ifndef NUL
+#  define NUL '\0'
+#endif
 
 #ifndef FOPEN_BINARY_FLAG
 #  ifdef USE_FOPEN_BINARY
@@ -153,8 +153,12 @@
 
 #if SIZEOF_CHARP > SIZEOF_INT
    typedef long t_word;
+   #define WORD_MAX  LONG_MAX
+   #define WORD_MIN  LONG_MIN
 #else /* SIZEOF_CHARP <= SIZEOF_INT */
    typedef int t_word;
+   #define WORD_MAX  INT_MAX
+   #define WORD_MIN  INT_MIN
 #endif
 
 #ifndef HAVE_PATHFIND

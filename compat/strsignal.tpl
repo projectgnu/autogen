@@ -1,5 +1,5 @@
 {#autogen template 
-# $Id: strsignal.tpl,v 2.0 1998/09/22 22:17:26 bkorb Exp $
+# $Id: strsignal.tpl,v 2.1 1999/04/14 17:44:04 bkorb Exp $
 h #}
 /*
 {#_eval "# *  " _DNE#}
@@ -19,6 +19,7 @@ static char zBad_{#_eval _index "#%d" _printf "#[]" +
   _ENDIF#}{#
 /signal#}
 
+#ifndef HAVE_SYS_SIGLIST
 static char* sys_siglist[] = {{#_FOR signal FROM 0 BY 1
      #}{#
       _IF _index 3 % 0 =#}
@@ -35,6 +36,7 @@ static char* sys_siglist[] = {{#_FOR signal FROM 0 BY 1
       _ENDIF #}{#
 
 /signal #} };
+#endif /* HAVE_SYS_SIGLIST */
 
 static char* signal_names[] = {{#_FOR signal FROM 0 BY 1
     #}{#

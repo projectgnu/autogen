@@ -1,3 +1,83 @@
+1999-04-13  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* compat/Makefile.am (MAINTAINERCLEANFILES): Don't remove
+	$(GEN_SRC) as these files are needed to bootstrap AutoGen on some
+	systems!
+
+	* config/ctime.m4: Use extra ac-2.13 AC_DEFINE arguments.
+	* config/openmode.m4: ditto.
+	* config/regcomp.m4: ditto.
+	* config/strftime.m4: ditto.
+	* config/acconfig.h: Remove defines: ALLOCATED_CTIME;
+	USE_FOPEN_BINARY; USE_FOPEN_TEXT; HAVE_REGCOMP; WITH_DMALLOC.
+
+	* TODO: Updated.  Removed completed items from ``In Progress''
+	section.
+	* NEWS: Updated.  No longer need compat/snprintf.c to link
+	under cygwin.
+
+	* config/siglist.m4 (AG_VAR_SYS_SIGLIST): New macro to check for
+	sys_siglist.
+	* configure.in: Use AG_VAR_SYS_SIGLIST.
+	(AC_CHECK_FUNCS): Check for psignal() definition in the standard
+	libraries.
+	* strsignal.tpl (sys_siglist): Only define this array if autoconf
+	couldn't find the system version.
+	Reported by Ralf S. Engelschall <rse@engelschall.com>
+
+1999-04-12  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* config/acconfig.h(HAVE_SNPRINTF, HAVE_VSNPRINTF): Removed.
+	* config/vsnprintf.m4: deleted.
+	* configure.in(AG_FUNC_*SNPRINTF_DOLLAR): Removed.  These macros
+	are no longer required; this functionality is subsumed into
+	autoopts/snprintfv.[ch].
+
+	* autoopts/autoopts.h: include snprintfv.h to get typedefs and
+	replacement /.*printf.*/ functions.
+	* src/autogen.h: ditto.
+
+	* src/agExpr.c (evalExpr_PRINTF): Wrap arguments correctly to
+	make a suitable argv array for sprintfv.
+	* src/agPrint.c (safePrintf): Take an argv array instead of a
+	va_list and pass it to sprintfv.  Remove PRINTF_RETURNS_VOID
+	delimited code as sprintfv never uses it.
+	(getSection): Removed.
+
+	* src/autogen.h (AGDUPSTR): Don't refer to pzDupFrom (which might
+	not exist), and use the safer dupString function.
+
+1999-04-09  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* autoopts/snprintfv.c: New file to do reliable %n$ format
+	parsing, and with a *printfv API to take a vector of pointers
+	in place of the traditional va_list.  THIS IS ALPHA QUALITY
+	CODE ONLY: CAVEAT EMPTOR.
+	* autoopts/snprintfv.h: New file with public definitions for
+	use of snprintfv.c API.
+	* autoopts/Makefile.am (libopts_la_SOURCES): added snprintfv.c
+	and snprintfv.h.
+	* compat/snprintf.c: Deleted.
+
+	* config/acconfig.h: Added wchar_t.  Removed PACKAGE and
+	VERSION (which are added automatically by automake-1.4).
+	* configure.in: Added check for wchar_t.
+
+	* VERSION: Fixed the banner spacing routine without using
+	grep -q.
+
+	* configure.in: Don't look in libPW for alloca(), as it contains
+	plenty of other garbage which upsets some systems.
+
+	1999-03-31  Bruce Korb <autogen@autogen.freeservers.com>
+
+	* ./VERSION: updated version, removed non-portable "grep -q"
+
+	* config/bootstrap: removed non-portable "grep -q"
+
+	* doc/Makefile.am: since DEFSRC is used in dependency,
+	it cannot contain wild cards.
+
 1999-03-26  Bruce Korb <autogen@autogen.freeservers.com>
 
 	* src/agTempl.c(parseTemplate): We need to count lines *before* 
@@ -117,9 +197,9 @@
 	* autoopts/pgusage.c (doPagedUsage): ditto.
 	* autoopts/makeshell.c (textToVariable, loadTrailer): ditto.
 	* autoopts/autoopts.c (filePreset): ditto.
-	
+
 	* autoopts/Makefile.am (EXTRA_DIST): Added autoopts-config.in.
-	
+
 1998-11-22 Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* tests/optgen.test, tests/opthelp.test: reenabled these tests.
@@ -143,10 +223,10 @@
 	Changed to $srcdir.
 	* configure.in:  Removed attempt to pass positional parameters to
 	a sourced script.
-	
+
 	* config/bootstrap: changed >&- redirections to >/dev/null for
 	compatibility with ash (/bin/sh on debian and cygwin).
-	
+
 	* autoopts/Makefile.am: install autoopts-config.
 	* autoopts/autoopts-config.in: new file.  A shell script
 	which configure substitutes so that when installed it can
@@ -216,7 +296,7 @@
 	* columns/* I now actually have it working completely.
 	* src/agGetDef.c if reading definitions from stdin,
 	the file must be left open so server shells work correctly
-	
+
 1998-10-15  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* MakeRules.in (.def.c, .def.h):  When a built source is
@@ -292,7 +372,7 @@
 	* src/agShell
 	Added some code to make clearer what may have failed,
 	should the shell command go away or abend.
-	
+
 1998-09-23  Bruce Korb <korbb@datadesign.com>
 	* autoopts/Makefile.am
 	* autoopts/opthead.tpl
@@ -405,10 +485,9 @@
 
 	It always fails for me with opts.hlp2 (the link line in the test
 	complains of no main function):
-	
+
 	./opts.test: ./autogen: No such file or directory
 
-	
 	* doc/auto_gen.tpl (Installation): updated the documentation of
 	this node to reflect the way I have been running tests.
 

@@ -1,11 +1,11 @@
-#! /bin/echo Autogen_Version_4.4,_but_it_should_be_sourced
+#! /bin/echo Autogen_Version_4.5,_but_this_should_be_sourced
 # -*- Mode: Ksh -*-
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:     Tue Nov 24 07:48:33 1998
+# Last Modified:     Tue Apr 13 09:20:32 1999
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # by:                Bruce Korb <korb@datadesign.com>
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".2"
+AG_PATCHLEVEL=".3"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Library versioning for libopts
@@ -64,11 +64,11 @@ fi
 # Display version numbers banner for my sanity!
 #
 soname=$LT_LIBRARY.`expr $LT_CURRENT - $LT_AGE`.$LT_AGE.$LT_REVISION
-spaces="                                "
+spaces="                                        "
 while :
 do
   string="$PACKAGE-$VERSION$spaces$soname"
-  if echo "$string" | grep -q '^.\{78,\}$'; then
+  if echo "$string" | grep '^.\{78,\}$' > /dev/null; then
     break
   fi
   spaces=" $spaces"
