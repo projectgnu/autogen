@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.13 2000/03/29 03:17:18 bruce Exp $
+ *  $Id: expState.c,v 1.14 2000/03/29 05:10:19 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -291,8 +291,13 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
     tDefEntry*  pE;
     tDefEntry*  pMembers;
     SCM         field;
+    tSCC        zFailed[] = "failed\n";
+    tSCC        zSucc[]   = "SUCCESS\n";
 
     char* pzField = strchr( pzName, '.' );
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf( pfTrace, " in \"%s\" -- ", pzName );
 
     if (pzField != (char*)NULL)
         *(pzField++) = NUL;
@@ -306,6 +311,8 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
         if (pzField != (char*)NULL)
             pzField[-1] = '.';
 
+        if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+            fputs( zFailed, pfTrace );
         return SCM_BOOL_F;
     }
 
@@ -313,16 +320,26 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
      *  No subfield?  Check the values
      */
     if (pzField == (char*)NULL) {
-        if (pE->valType != VALTYP_TEXT)
+        if (pE->valType != VALTYP_TEXT) {
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                fputs( zFailed, pfTrace );
             return SCM_BOOL_F;
+        }
 
         field = gh_str02scm( pE->pzValue );
-        if (isIndexed)
-            return gh_call2( op, field, test );
+        if (isIndexed) {
+            field = gh_call2( op, field, test );
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                fputs( (field == SCM_BOOL_T) ? zSucc : zFailed, pfTrace );
+            return field;
+        }
 
         for (;;) {
-            if (gh_call2( op, field, test ) == SCM_BOOL_T)
+            if (gh_call2( op, field, test ) == SCM_BOOL_T) {
+                if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                    fputs( zSucc, pfTrace );
                 return SCM_BOOL_T;
+            }
 
             pE = pE->pTwin;
             if (pE == (tDefEntry*)NULL)
@@ -330,14 +347,20 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
 
             field = gh_str02scm( pE->pzValue );
         }
+
+        if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+            fputs( zFailed, pfTrace );
         return SCM_BOOL_F;
     }
 
     /*
      *  a subfield for a text macro?  return FALSE
      */
-    if (pE->valType == VALTYP_TEXT)
+    if (pE->valType == VALTYP_TEXT) {
+        if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+            fputs( zFailed, pfTrace );
         return SCM_BOOL_F;
+    }
 
     /*
      *  Search the members for what we want.
@@ -482,6 +505,9 @@ ag_scm_match_value_p( SCM op, SCM obj, SCM test )
        || (! gh_string_p(    obj  ))
        || (! gh_string_p(    test )) )
         return SCM_UNDEFINED;
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf( pfTrace, "searching for `%s'", SCM_CHARS( test ));
 
     return find_entry_value( op, obj, test, pDefContext );
 }

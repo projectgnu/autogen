@@ -1,3 +1,8 @@
+2000-03-28  Bruce Korb  <autogen@linuxbox.com>
+
+	* agen5/expState.c(ag_scm_match_value_p):  New Guile expr function.
+	* agen5/funcCase.c:  add expression processing tracing
+
 2000-03-18  Bruce Korb  <autogen@linuxbox.com>
 
 	* autoopts/doc.tpl:  Highlighted and documented the AutoMan and
