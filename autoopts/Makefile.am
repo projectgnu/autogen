@@ -7,27 +7,36 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/04/01 03:19:42 $
+## Last Modified:   $Date: 2002/04/14 20:48:23 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.4 2002/04/01 03:19:42 bkorb Exp $
+## $Id: Makefile.am,v 3.5 2002/04/14 20:48:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-SUBDIRS		= @OPTS_TESTDIR@
+SUBDIRS  = @OPTS_TESTDIR@
 
+DISTCLEANFILES = option*.3 libopts.????
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = @INCLIST@ $(GUILE_INC)
-man_MANS        = autoopts-config.1
+GENMAN   = 
+man_MANS = autoopts-config.1 $(GENMAN)
 
 pkgdata_DATA	= \
-        aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \
-        optlib.tpl    optmain.tpl   stdoptions.def
+    aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
+    options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl \
+    stdoptions.def options_h.tpl
 
 GENSRC		= genshell.c genshell.h
+HDRS        = autoopts.h options.h  streqv.h
+CSRC        = \
+	autoopts.c boolean.c enumeration.c makeshell.c \
+	numeric.c  pgusage.c putshell.c    restore.c   \
+	save.c     stack.c   streqvcmp.c   usage.c     version.c
+
 EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) COPYING $(man_MANS) \
-	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def
+	TODO autoopts.m4 bootstrap.dir autoopts-config.in genshell.def funcs.def
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
@@ -36,11 +45,7 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##  libopts_la_SOURCES does _NOT_ include $(GENSRC) !!
 ##  It is compiled as a part of the makeshell module.
 ##
-libopts_la_SOURCES = \
-	autoopts.c   autoopts.h   boolean.c   enumeration.c  \
-	makeshell.c  numeric.c    options.h   pgusage.c      \
-	putshell.c   save.c       stack.c     streqv.h       \
-	streqvcmp.c  usage.c      version.c
+libopts_la_SOURCES = $(HDRS) $(CSRC)
 
 libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la @COMPATOBJ@
 libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
@@ -69,5 +74,15 @@ pathfind.lo : $(top_srcdir)/compat/pathfind.c
 
 ../snprintfv/snprintfv/libsnprintfvc.la :
 	cd ../snprintfv/snprintfv ; $(MAKE) libsnprintfvc.la
+
+install-data-local : install-man3
+
+$(GENMAN) : funcs.def
+	if [ -x ../agen5/autogen ] ; then \
+	echo ../agen5/autogen -Tagman3.tpl funcs.def ; \
+	../agen5/autogen -Tagman3.tpl funcs.def ; else true ; fi
+
+libopts.texi : ../agen5/autogen funcs.def
+	../agen5/autogen -Taginfo3.tpl funcs.def
 
 # Makefile.am ends here

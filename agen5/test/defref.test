@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2002/04/14 20:48:23 $
+#            by: bkorb
 #
-# $Id: defref.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: defref.test,v 3.1 2002/04/14 20:48:23 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,7 +23,7 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > $testname.tpl <<_EOF_
+cat > ${testname}.tpl <<_EOF_
 <= AutoGen5 template test =>
 The last of each list:<=
 FOR list =>
@@ -49,8 +49,8 @@ _EOF_
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 # Create the files we need in the test environment
-cat > $testname.def <<_EOF_
-AutoGen definitions $testname;
+cat > ${testname}.def <<_EOF_
+AutoGen definitions "${testname}." "tpl";
 list =    { val = L0.first, L0.second, L0.last; },
           { Val[0] = L1.first;  val[2] = L1.second-and-last; };
 List[3] = { val = L3.third.all; },
@@ -59,7 +59,7 @@ _EOF_
 
 # # # # # # # # # # ANTICIPATED RESULT # # # # # # # # #
 
-cat > $testname.out <<_EOF_
+cat > ${testname}.out <<_EOF_
 The last of each list:
   list[0] -> L0.last
   list[1] -> L1.second-and-last
@@ -82,8 +82,9 @@ The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)
 _EOF_
 
-$AGEXE $testname.def || failure AutoGen failed
-cmp -s $testname.test $testname.out || failure unexpected output
+$AGEXE ${testname}.def || failure AutoGen failed
+cmp -s ${testname}.test ${testname}.out || \
+  failure "`diff ${testname}.test ${testname}.out`"
 
 cleanup
 # end of defref.test

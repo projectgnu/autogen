@@ -823,8 +823,12 @@ For other names, AutoGen will first try to use the POSIX version of the
 @code{sysinfo(2)} system call.  Failing that, it will try for the POSIX
 @code{uname(2)} call.  If neither is available, then only
 "@code{__autogen__}" will be inserted into the environment.
+In all cases, the associated names are converted to lower case, surrounded
+by doubled underscores and non-symbol characters are replaced with
+underscores.
 
-If @code{sysinfo(2)} is available, the strings associated with
+With Solaris on a sparc platform, @code{sysinfo(2)} is available.
+The following strings are used:
 
 @itemize @bullet
 @item
@@ -840,11 +844,6 @@ If @code{sysinfo(2)} is available, the strings associated with
 @item
 @code{SI_MACHINE} (e.g., "__sun4u__")
 @end itemize
-@noindent
-are used.  The associated names are converted to lower case, surrounded
-by doubled underscores and non-symbol characters are replaced with
-underscores.  For example, for Solaris on a sparc platform, you would
-get these definitions:
 
 For Linux and other operating systems that only support the
 @code{uname(2)} call, AutoGen will use these values:
@@ -935,12 +934,31 @@ Extraction from autogen.texi
 @section Alternate Definition Forms
 @cindex Alternate Definition
 
+There are two other methods for supplying data values for templates
+and a third in the planning stages.
+
+@table @samp
+@item no definitions
 It is entirely possible to write a template that does not depend upon
 external definitions.  Such a template would likely have an unvarying
 output, but be convenient nonetheless because of an external library
 of either AutoGen or Scheme functions, or both.  This can be accommodated
 by providing the @code{--override-tpl} and @code{--no-definitions}
 options on the command line.  @xref{autogen Invocation}.
+
+@item CGI
+AutoGen behaves as a CGI server if the definitions input is from stdin
+and the environment variable @code{REQUEST_METHOD} is defined
+and set to either "GET" or "POST", @xref{AutoGen CGI}.  Obviously,
+all the values are constrained to strings because there is no way
+to represent nested values.
+
+@item XML
+Someday, I plan to map XML data directly into AutoGen definitions.
+This will enable you to extract information from arbitrary XML source
+and insert it into AutoGen templates.
+
+@end table
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

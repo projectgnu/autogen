@@ -10,12 +10,34 @@ case "$1" in
   ${AUTOGEN} -L. genshell.def
   ;;
 
+*libopts.texi )
+  ${AUTOGEN} -Taginfo3.tpl funcs.def
+  ;;
+
+*optionProcess.3 )
+  ;;
+
 * )
   #  This is likely a bootstrap.  Don't build if it exists
   #
   if [ ! -f genshell.c ]
   then
     ${AUTOGEN} -L. genshell.def
+  fi
+  if [ ! -f funcs.def ]
+  then
+    getdefs assign='library=opts; header=your-opts.h' linenum srcfile \
+      template=options_h output=funcs.def \
+      restore.c autoopts.c boolean.c enumeration.c \
+      guileopt.c makeshell.c numeric.c pgusage.c putshell.c \
+      save.c stack.c streqvcmp.c usage.c version.c
+
+    ${AUTOGEN} funcs.def
+    ${AUTOGEN} -Tagman3.tpl funcs.def
+    f=`echo option*.3`
+    sed "s/^GENMAN .*/GENMAN = $f/" Makefile.am > XX$$
+    mv -f XX$$ Makefile.am
+    rm -f $f
   fi
   ;;
 esac

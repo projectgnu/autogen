@@ -1,3 +1,24 @@
+2002-04-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/defref.test(testname.def): verify that the template
+	name can be pieced together from definition strings.
+	* autoopts/Makefile.am: write a rule that evades the insistance of
+	creating the option*.3 man pages at "make all" time.  Instead, we
+	do it at "make install" time.  (../agen5/autogen must pre-exist)
+
+2002-04-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c(ag_scm_makefile_script): trim all leading whitespace
+	and only look for a tab in the last of those characters.
+	* autoopts/agman3.tpl: new library template
+	* autoopts/aginfo3.tpl: ditto
+	* autoopts/Makefile.am: incorporate the new templates and rules for them
+	* autoopts/*.c: doc the visible entry points
+	* autoopts/options.h: obsolete.  Generated from:
+	* autoopts/options_h.tpl: extract external function decs from docs.
+	* autoopts/bootstrap.dir: actual rules for generating options.h and
+	the man pages and the libopts.texi file
+
 2002-04-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h(FPF_NOCHMOD): for marking /dev/null as NO-chmod(2)

@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.6 2002/04/09 00:08:46 bkorb Exp $
+ *  $Id: expMake.c,v 3.7 2002/04/14 20:48:23 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -105,14 +105,20 @@ ag_scm_makefile_script( SCM text )
 
     SCM    res;
     char*  pzText = ag_scm2zchars( text, "GPL line prefix" );
-    char   tabch  = (*pzText == '\t') ? NUL : '\t';
+    char   tabch;
     size_t sz     = strlen( pzText ) + 2;
 
     /*
      *  skip all blank lines and other initial white space
      *  in the source string.
      */
-    while (isspace( *pzText ))  pzText++;
+    if (! isspace( *pzText ))
+        tabch = '\t';
+    else {
+        while (isspace( *++pzText ))  ;
+        tabch  = (pzText[-1] == '\t') ? NUL : '\t';
+    }
+
     if (*pzText == NUL)
         return gh_str02scm( "" );
 

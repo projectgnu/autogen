@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.4 2002/04/04 06:44:26 bkorb Exp $
+ *  $Id: autoopts.c,v 3.5 2002/04/14 20:48:23 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1462,18 +1462,29 @@ checkConsistency( pOpts )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  THESE ROUTINES ARE CALLABLE FROM THE GENERATED OPTION PROCESSING CODE
- *
- *  optionLoadLine
- *
- *  This is a user callable routine for setting options from, for
- *  example, the contents of a file that they read in.
  */
+/*=export_func  optionLoadLine
+ *
+ * what:  process a string for an option name and value
+ *
+ * arg:   tOptions*,   pOpts,  program options descriptor
+ * arg:   const char*, pzLine, NUL-terminated text
+ *
+ * doc:   This is a user callable routine for setting options from, for
+ *        example, the contents of a file that they read in.
+ *        Only one option may appear in the text.  It will be treated
+ *        as a normal (non-preset) option.
+ *
+ * err:   Invalid options are silently ignored.  Invalid option arguments
+ *        will cause a warning to print, but the function will return.
+=*/
 void optionLoadLine( pOpts, pzLine )
     tOptions*  pOpts;
-    char*      pzLine;
+    tCC*       pzLine;
 {
     tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
-    loadOptionLine( pOpts, &st, pzLine, DIRECTION_PROCESS );
+    char* pz = strdup( pzLine );
+    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
 }
 
 
@@ -1526,11 +1537,13 @@ void doLoadOpt( pOpts, pOptDesc )
 }
 
 
-/*
- *  optionVersion
+/*=export_func  optionVersion
  *
- *  Return the compiled version number.
- */
+ * what:     Return the compiled version number
+ * ret_type: const char*
+ * ret_desc: the version string in constant memory
+ * doc:      The returned string cannot be modified.
+=*/
 const char*
 optionVersion()
 {
@@ -1541,10 +1554,28 @@ optionVersion()
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*=export_func optionProcess
  *
- *  Define the option processing routine
- */
+ * what: the main option processing routine
+ *
+ * arg:  + tOptions* + pOpts + program options descriptor +
+ * arg:  + int       + argc  + program arg count  +
+ * arg:  + char**    + argv  + program arg vector +
+ * ret_type:  int
+ * ret_desc:  the count of the arguments processed
+ *
+ * doc:  The number of elements processed always includes the program name.
+ *       If one of the arguments is "--", then it is counted and the
+ *       processing stops.  If an error was encountered and errors are
+ *       to be tolerated, then the returned value is the index of the
+ *       argument causing the error.
+ *
+ * err:  Errors will cause diagnostics to be printed.  'exit(3)' may or
+ *       may not be called.  It depends upon whether or not the options
+ *       were generated with the "allow-errors" attribute, or if the
+ *       ERRSKIP_OPTERR or ERRSTOP_OPTERR macros were invoked.
+=*/
 int
 optionProcess( pOpts, argCt, argVect )
     tOptions*  pOpts;
@@ -1657,7 +1688,6 @@ optionProcess( pOpts, argCt, argVect )
 
     return pOpts->curOptIdx;
 }
-
 /*
  * Local Variables:
  * c-file-style: "stroustrup"

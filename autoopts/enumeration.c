@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.1 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: enumeration.c,v 3.2 2002/04/14 20:48:23 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -85,10 +85,25 @@ enumError( pOpts, pOD, paz_names, name_ct )
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
 }
 
-/*
- *  Run the usage output through a pager.
- *  This is very handy if it is very long.
- */
+
+/*=export_func  optionEnumerationVal
+ * what:  put the option state into Guile symbols
+ * private:
+ *
+ * arg:   tOptions*, pOpts,     the program options descriptor
+ * arg:   tOptDesc*, pOD,       enumeration option description
+ * arg:   tCC**,     paz_names, list of enumeration names
+ * arg:   int,       name_ct,   number of names in list
+ *
+ * ret_type:  char*
+ * ret_desc:  the enumeration value cast as a char*
+ *
+ * doc:   This converts the pzLastArg string from the option description
+ *        into the index corresponding to an entry in the name list.
+ *        This will match the generated enumeration value.
+ *        Full matches are always accepted.  Partial matches are accepted
+ *        if there is only one partial match.
+=*/
 char*
 optionEnumerationVal( pOpts, pOD, paz_names, name_ct )
     tOptions* pOpts;

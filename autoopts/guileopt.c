@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.1 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: guileopt.c,v 3.2 2002/04/14 20:48:23 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -54,6 +54,15 @@
 
 #include "autoopts.h"
 
+/*=export_func  export_options_to_guile
+ * what:  put the option state into Guile symbols
+ * private:
+ *
+ * arg:   tOptions*, pOpts, the program options descriptor
+ * doc:   This routine will emit Guile/Scheme code that puts the option
+ *        processing state into Scheme symbols known to the Guile
+ *        interpreter.
+=*/
 void
 export_options_to_guile( pOpts )
     tOptions* pOpts;

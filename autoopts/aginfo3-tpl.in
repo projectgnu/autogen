@@ -1,0 +1,88 @@
+{+ AutoGen5 template  -*- nroff -*-
+
+## ---------------------------------------------------------------------
+## aginfo3.tpl -- Template for function texi doc
+##
+##  AutoOpts copyright 1992-2002 Bruce Korb
+##
+## Time-stamp:      "2002-04-11 18:06:25 bkorb"
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
+## Created:         Mon Jun 28 15:35:12 1999
+##              by: bkorb
+## ---------------------------------------------------------------------
+## $Id: aginfo3-tpl.in,v 3.1 2002/04/14 20:48:23 bkorb Exp $
+## ---------------------------------------------------------------------
+
+null
+
+(setenv "SHELL" "/bin/sh")
+
++}{+
+
+(out-switch (string-append
+  "lib"
+  (if (exist? "library") (get "library") (shell "basename `pwd`"))
+  ".texi" ))
+
+(out-push-new (shellf "echo %s | sed 's,texi$,menu,'" (out-name)))
+
++}{+
+
+FOR export_func     +}{+
+  IF (not (exist? "private"))
++}* lib{+(sprintf "%-24s" (string-append
+       (get "library") "-" (get "name") "::"))
+    +} {+name+}
+{+
+
+  ENDIF private  +}{+
+
+ENDFOR export_func  +}{+
+
+(out-pop)           +}{+
+
+FOR export_func                +}{+
+  IF (not (exist? "private"))
+
++}
+
+@node lib{+library+}-{+name+}
+@subsection {+name+}
+
+This routine is to {+what+}.
+
+Usage:
+@example
+{+ % ret-type "%s res = "
++}{+name+}({+
+  IF (exist? "arg") +} {+
+    FOR arg ", " +}{+arg-name+}{+
+    ENDFOR +} {+
+  ENDIF +});
+@end example{+
+  IF (or (exist? "arg") (exist? "ret-type")) +}
+Where:
+@table @samp{+
+    FOR arg "\n" +}
+@item {+arg-name+}
+is of type @code{{+arg-type+}}.
+It is the {+arg-desc+}.{+
+    ENDFOR+}{+
+    IF (exist? "ret-type") +}
+@item res{+
+    ENDIF +}
+@end table{+
+
+  ENDIF
++}
+
+{+doc+}
+{+ % err "\n%s\n" +}{+
+
+  ENDIF private  +}{+
+
+ENDFOR  export_func
+
+
++}

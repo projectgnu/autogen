@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.3 2002/01/31 03:56:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.4 2002/04/14 20:48:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -168,7 +168,7 @@ ENDFOR directive=]
 @node    Full Syntax
 @section YACC Language Grammar
 
-The processing directives and comments are not
+The preprocessing directives and comments are not
 part of the grammar.  They are handled by the scanner/lexer.
 The following was extracted directly from the defParse.y source file:
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.3 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: putshell.c,v 3.4 2002/04/14 20:48:23 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -59,7 +59,7 @@
 /*
  *  Make sure embedded single quotes come out okay
  */
-    static void
+static void
 putQuotedStr( char* pzStr )
 {
     if (pzStr != (char*)NULL) for (;;) {
@@ -75,7 +75,14 @@ putQuotedStr( char* pzStr )
 }
 
 
-    void
+/*=export_func  putBourneShell
+ * what:  write a portable shell script to parse options
+ * private:
+ * arg:   tOptions*, pOpts, the program options descriptor
+ * doc:   This routine will emit portable shell script text for parsing
+ *        the options described in the option definitions.
+=*/
+void
 putBourneShell( tOptions* pOpts )
 {
     int         optIx = 0;
