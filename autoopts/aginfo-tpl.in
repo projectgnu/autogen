@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.19 2001/05/09 05:25:59 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.20 2001/07/22 20:03:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -32,9 +32,8 @@ prog_name
 (out-push-new (shellf "echo %s | sed 's/texi$/menu/'" (out-name)) )
 =]* [= % prog_name (sprintf "%%-32s"  "%s Invocation::")
      =] Invoking [=prog_name=]
-[=(out-pop)=]
-[=(dne "# ")=]
-
+[=(out-pop)
+  (dne "# " "# ")=]
 @end ignore
 [=
 
@@ -90,7 +89,8 @@ ENDFOR flag=][=
 
 This is the automatically generated usage text for [=prog_name=]:
 
-@format
+@exampleindent 0
+@example
 [= (shellf "PROG=./%1$s
 
     if [ ! -f ${PROG} ]
@@ -116,7 +116,7 @@ This is the automatically generated usage text for [=prog_name=]:
                                    "help" ))
 
     )  =]
-@end format[=
+@end example[=
 
 #  FOR all options, except the `documentation' options, ...  =][=
 

@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.43 2001/06/24 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 2.44 2001/07/22 20:03:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -68,6 +68,8 @@ AGEXE		= `cd $(top_builddir)/agen5 ; pwd`/@AGEXE@
 
 AGARGS		= base-name=autogen autogen=$(AGEXE) \
 		agarg="-L$(srcdir) -L$(top_srcdir) -t60"
+
+TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,6.5in'
 
 ##  The "touch" garbage is because automake is too miserably aggressive
 ##  in its dependency checking on files that it "knows" are source files

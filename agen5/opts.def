@@ -3,10 +3,8 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.30 2001/06/24 00:47:56 bkorb Exp $
- */
-
-/*
+ *   $Id: opts.def,v 1.31 2001/07/22 20:03:56 bkorb Exp $
+ *
  *  AutoGen copyright 1992-2000 Bruce Korb
  *
  *  AutoGen is free software.
@@ -71,20 +69,23 @@ version = `
 explain =
 "AutoGen creates text files from templates using external definitions.";
 
-detail =
+detail = <<-  _END_DETAIL
+	The definitions file (`<def-file>') can be specified with the
+	`definitions' option or as the command argument, but not both.
+	Omitting it or specifying `-' will result in reading definitions from
+	standard input.
 
-"The definitions file (`<def-file>') can be specified with the
-`definitions' option or as the command argument, but not both.
-Omitting it or specifying `-' will result in reading definitions from
-standard input.
+	The output file names are based on the template, but generally use the
+	base name of the definition file.  If standard in is read for the
+	definitions, then `stdin' will be used for that base name.  The
+	suffixes to the base name are gotten from the template.  However, the
+	template file may specify the entire output file name.  The generated
+	files are always created in the current directory.  If you need to
+	place output in an alternate directory, `cd' to that directory and use
+	the `--templ_dirs' option to search the original directory.
 
-The output file names are based on the template, but generally use the
-base name of the definition file.  If standard in is read for the
-definitions, then `stdin' will be used for that base name.  The
-suffixes to the base name are gotten from the template.  However, the
-template file may specify the entire output file name.
-
-`loop-limit' is used in debugging to stop runaway expansions.";
+	`loop-limit' is used in debugging to stop runaway expansions.
+	_END_DETAIL;
 
 flag = {
     name      = templ_dirs;
@@ -526,25 +527,26 @@ detail =
 that contain repetitive text with varied substitutions.
 See the info documentation for details.';
 
-prog_man_descrip =
-'\fBAutoGen\fP is a tool designed for generating program files that contain
-repetitive text with varied substitutions.  Its goal is to simplify the
-maintenance of programs that contain large amounts of repetitious text.
-This is especially valuable if there are several blocks of such text
-that must be kept synchronized.
-.PP
-One common example is the problem of maintaining the code required for
-processing program options.  Processing options requires a minimum of
-four different constructs be kept in proper order in different places in
-your program.  You need at least: The flag character in the flag
-string, code to process the flag when it is encountered, a global
-state variable or two, and a line in the usage text.
-You will need more things besides this if you choose to implement
-long option names, rc/ini file processing, environment variables
-and so on.
+prog_man_descrip =<<-  _END_MAN_DESCRIP
+	\fBAutoGen\fP is a tool designed for generating program files that contain
+	repetitive text with varied substitutions.  Its goal is to simplify the
+	maintenance of programs that contain large amounts of repetitious text.
+	This is especially valuable if there are several blocks of such text
+	that must be kept synchronized.
+	.PP
+	One common example is the problem of maintaining the code required for
+	processing program options.  Processing options requires a minimum of
+	four different constructs be kept in proper order in different places
+	in your program.  You need at least: The flag character in the flag
+	string, code to process the flag when it is encountered, a global
+	state variable or two, and a line in the usage text.
+	You will need more things besides this if you choose to implement
+	long option names, rc/ini file processing, environment variables
+	and so on.
 
-All of this can be done mechanically; with the proper templates and this
-program.';
+	All of this can be done mechanically; with the proper templates
+	and this program.
+	_END_MAN_DESCRIP;
 
 man_doc = '.SH "SEE ALSO"
 This program is documented more fully in the

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.13 2001/07/13 04:23:55 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.14 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -44,6 +44,27 @@
 
 tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  doSchemeExpr
+ *
+ *  Process a scheme specification
+ */
+    STATIC tCC*
+doSchemeExpr( tCC* pzData, tCC* pzFileName, int lineNo )
+{
+    char* pzEnd = (char*)pzData + strlen( pzData );
+    char  ch;
+
+    pzEnd = (char*)skipScheme( pzData, pzEnd );
+    ch = *pzEnd;
+    *pzEnd = NUL;
+    gh_eval_str( pzData );
+    *pzEnd = ch;
+    return (tCC*)pzEnd;
+}
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -143,7 +164,6 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
 findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
 {
     tCC* pzData = *ppzData;
-    te_pm_event res_tkn;
 
  skipWhiteSpace:
     while (isspace( *pzData )) {
@@ -162,77 +182,81 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
         }
     }
 
+    *ppzData = pzData; /* in case we return */
+
     /*
      *  After the end marker has been found,
      *  anything else is really the start of the data.
      */
-    if (fsm_state == PM_ST_END_MARK) {
-        *ppzData = pzData;
+    if (fsm_state == PM_ST_END_MARK)
         return PM_EV_END_PSEUDO;
-    }
 
     /*
      *  IF the token starts with an alphanumeric,
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
     if (isalnum( *pzData )) {
-        if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
-            res_tkn = isspace( pzData[ sizeof(zAgName)-1 ])
-                ? PM_EV_AUTOGEN : PM_EV_SUFFIX;
+        if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0)
+            return isspace( pzData[ sizeof(zAgName)-1 ])
+                   ? PM_EV_AUTOGEN : PM_EV_SUFFIX;
 
-        } else if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0) {
-            res_tkn = isspace( pzData[ sizeof(zAgName)-1 ])
-                ? PM_EV_TEMPLATE : PM_EV_SUFFIX;
+        if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0)
+            return isspace( pzData[ sizeof(zAgName)-1 ])
+                   ? PM_EV_TEMPLATE : PM_EV_SUFFIX;
 
-        } else
-            res_tkn = PM_EV_SUFFIX;
+        return PM_EV_SUFFIX;
+    }
+
+    /*
+     *  Several transition tokens are enabled once
+     *  the "template" keyword has been processed.
+     */
+    if (fsm_state == PM_ST_TEMPL) {
+        switch (*pzData) {
+        case '-':
+            if ((pzData[1] == '*') && (pzData[2] == '-'))
+                return PM_EV_ED_MODE;
+            /* FALLTHROUGH */
+
+        case '.':
+        case '_':
+            return PM_EV_SUFFIX;
+
+        case '(':
+            return PM_EV_SCHEME;
+        }
     }
 
     /*
      *  IF the character is '#' and we are at the start of a line,
      *  THEN the entire line is white space.  Skip it.
      */
-    else if ((*pzData == '#') && line_start) {
+    if ((*pzData == '#') && line_start) {
         pzData = strchr( pzData+1, '\n' );
         if (pzData == (char*)NULL)
             return PM_EV_INVALID;
 
         goto skipWhiteSpace;
-
     }
 
     /*
      *  IF the next sequence is "-*-"
      *  THEN we found an edit mode marker
      */
-    else if (strncmp( pzData, "-*-", 3 ) == 0)
-        res_tkn = PM_EV_ED_MODE;
+    if (strncmp( pzData, "-*-", 3 ) == 0)
+        return PM_EV_ED_MODE;
 
-    /*
-     *  IF we are accepting suffixes at this point, then we will
-     *  accept these three characters as the start of a suffix
-     */
-    else if (  (fsm_state == PM_ST_TEMPL)
-            && (  (*pzData == '.')
-               || (*pzData == '-')
-               || (*pzData == '_')
-            )  )
-        res_tkn = PM_EV_SUFFIX;
     /*
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    else if (ispunct( *pzData ))
-        res_tkn = PM_EV_MARKER;
+    if (ispunct( *pzData ))
+        return PM_EV_MARKER;
 
     /*
      *  Otherwise, it is just junk.
      */
-    else
-        res_tkn = PM_EV_INVALID;
-
-    *ppzData = pzData;
-    return res_tkn;
+    return PM_EV_INVALID;
 }
 
 
@@ -355,6 +379,10 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
             pzData = doSuffixSpec( pzData, pzFileName, templLineNo );
             break;
 
+        case PM_TR_TEMPL_SCHEME:
+            pzData = doSchemeExpr( pzData, pzFileName, templLineNo );
+            break;
+
         case PM_TR_END_MARK_ED_MODE:
         case PM_TR_INVALID:
             pm_invalid_transition( fsm_state, fsm_tkn );
@@ -372,6 +400,20 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
         }
 
         fsm_state = nxt_state;
+    }
+
+    /*
+     *  It is possible that the template writer specified a shell to use.
+     *  If the server shell has not already started, we'll catch it later.
+     *  If it has started, then check for a shell change & shut it down
+     *  if it has been changed.
+     */
+    if (serverArgs[0] != NULL) {
+        char* pz = getenv( "SHELL" );
+        if ((pz != NULL) && (strcmp( pz, serverArgs[0] ) != 0)) {
+            closeServer();
+            serverArgs[0] = pz;
+        }
     }
 
     return pzData;

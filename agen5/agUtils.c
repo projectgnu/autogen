@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.12 2001/05/19 22:18:56 bkorb Exp $
+ *  $Id: agUtils.c,v 1.13 2001/07/22 20:03:56 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -37,15 +37,15 @@
    static void finalMemCheck( void );
 #endif
 
-STATIC const char* skipQuote( const char* pzQte );
+STATIC tCC* skipQuote( tCC* pzQte );
 
 
 #ifndef HAVE_STRLCPY
     size_t
-strlcpy( char* dest, const char* src, size_t n )
+strlcpy( char* dest, tCC* src, size_t n )
 {
     char* pz = dest;
-    const char* ps = src;
+    tCC* ps = src;
     size_t sz = 0;
 
     for (;;) {
@@ -187,8 +187,8 @@ doOptions( int arg_ct, char** arg_vec )
 }
 
 
-    EXPORT const char*
-getDefine( const char* pzDefName )
+    EXPORT tCC*
+getDefine( tCC* pzDefName )
 {
     char**  ppz;
     int     ct;
@@ -217,7 +217,7 @@ getDefine( const char* pzDefName )
 
 
     EXPORT unsigned int
-doEscapeChar( const char* pzIn, char* pRes )
+doEscapeChar( tCC* pzIn, char* pRes )
 {
     unsigned int  res = 1;
 
@@ -385,8 +385,8 @@ spanQuote( char* pzQte )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-    STATIC const char*
-skipQuote( const char* pzQte )
+    STATIC tCC*
+skipQuote( tCC* pzQte )
 {
     char  q = *pzQte++;        /*  Save the quote character type */
 
@@ -430,8 +430,8 @@ skipQuote( const char* pzQte )
 }
 
 
-    EXPORT const char*
-skipScheme( const char* pzSrc,  const char* pzEnd )
+    EXPORT tCC*
+skipScheme( tCC* pzSrc,  tCC* pzEnd )
 {
     int  level = 0;
 
@@ -455,10 +455,10 @@ skipScheme( const char* pzSrc,  const char* pzEnd )
 }
 
 
-    EXPORT const char*
-skipExpression( const char* pzSrc, size_t len )
+    EXPORT tCC*
+skipExpression( tCC* pzSrc, size_t len )
 {
-    const char* pzEnd = pzSrc + len;
+    tCC* pzEnd = pzSrc + len;
 
  guess_again:
 
@@ -468,7 +468,7 @@ skipExpression( const char* pzSrc, size_t len )
     switch (*pzSrc) {
     case ';':
         pzSrc = strchr( pzSrc, '\n' );
-        if (pzSrc == (const char*)NULL)
+        if (pzSrc == (tCC*)NULL)
             return pzEnd;
         goto guess_again;
 
@@ -494,7 +494,7 @@ skipExpression( const char* pzSrc, size_t len )
 
 
     void*
-ag_alloc( size_t sz, const char* pzWhat )
+ag_alloc( size_t sz, tCC* pzWhat )
 {
     void* p = malloc( sz );
     if ((p == (void*)NULL) && (pzWhat != NULL)) {
@@ -506,7 +506,7 @@ ag_alloc( size_t sz, const char* pzWhat )
 
 
     void*
-ag_realloc( void* p, size_t sz, const char* pzWhat )
+ag_realloc( void* p, size_t sz, tCC* pzWhat )
 {
     void* np = p ? realloc( p, sz ) : malloc( sz );
     if (np == (void*)NULL) {
@@ -523,7 +523,7 @@ ag_realloc( void* p, size_t sz, const char* pzWhat )
 
 
     char*
-ag_strdup( const char* pz, const char* pzWhat )
+ag_strdup( tCC* pz, tCC* pzWhat )
 {
     char*   pzRes;
     size_t  len = strlen( pz )+1;
@@ -553,7 +553,7 @@ STATIC tMemMgmt memHead = { &memHead, &memHead, (char*)NULL, "ROOT" };
 
 
     void*
-ag_alloc( size_t sz, const char* pzWhat, const char* pz )
+ag_alloc( size_t sz, tCC* pzWhat, tCC* pz )
 {
     size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
     tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
@@ -583,7 +583,7 @@ ag_alloc( size_t sz, const char* pzWhat, const char* pz )
 
 
     void*
-ag_realloc( void* p, size_t sz, const char* pzWhat, const char* pz )
+ag_realloc( void* p, size_t sz, tCC* pzWhat, tCC* pz )
 {
     size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
     tMemMgmt*   np  = ((tMemMgmt*)p)-1;
@@ -660,7 +660,7 @@ ag_free( void* p )
 }
 
 
-    static void
+    STATIC void
 finalMemCheck( void )
 {
     tMemMgmt*  pMM = memHead.pNext;
@@ -676,7 +676,7 @@ finalMemCheck( void )
 
 
     char*
-ag_strdup( const char* pz, const char* pzDupFrom, const char* pzWhat )
+ag_strdup( tCC* pz, tCC* pzDupFrom, tCC* pzWhat )
 {
     char*   pzRes;
     size_t  len = strlen( pz )+1;

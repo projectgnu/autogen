@@ -1,0 +1,86 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# for.test --- test functionality of switching shells
+#
+#  The test will verify that a real shell processes the declarations
+#  and our weirdo shell handles the template.
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     $Date: 2001/07/22 20:03:56 $
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: shell.test,v 1.1 2001/07/22 20:03:56 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+cat > $testname.c <<'_EOF_'
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+char buf[ 4096 ];
+int
+main( int argc, char** argv )
+{
+  for (;;) {
+    char* pz = fgets(buf, sizeof(buf),stdin);
+    if (pz == NULL)
+      break;
+    while (isspace(*pz)) pz++;
+    if (strncmp( pz, "cd ", 3 ) == 0) /* drop the cd commands */
+      continue;
+    if ((strncmp( pz, "echo", 4 ) == 0) && isspace( pz[4] )) {
+      pz += 5;
+      while (isspace(*pz)) pz++;  /* suppress the 'echo' */
+    }
+    if (*pz == '\0') pz--;  /* always force a newline */
+    fputs( pz, stdout );
+    fflush( stdout );
+  }
+  return 0;
+}
+_EOF_
+$CC -o $testname $testname.c
+
+#  The backslashes are stripped by the here-doc processing
+#
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test
+   (setenv "SHELL" "./$testname") =>
+<=\` echo SHELL=\$SHELL \`=>
+Some <=dummy=> text
+<=\`   : This is a final test \`=>
+_EOF_
+
+echo creating $testname.def
+exec 4> $testname.def
+echo 'AutoGen Definitions shell.tpl;' >&4
+echo 'dummy = `echo "mumble"`;' >&4
+exec 4>&-
+
+# this is the output we should expect to see
+cat > $testname.sample <<'_EOF_'
+SHELL=$SHELL
+Some mumble text
+: This is a final test
+_EOF_
+
+$AGEXE $testname.def || failure "$AGEXE $testname.def"
+cmp -s $testname.test $testname.sample || \
+    failure "`diff -c $testname.test $testname.sample`"
+
+cleanup
+# end of for.test

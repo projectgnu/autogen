@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.30 2001/07/17 02:47:04 bkorb Exp $
+ *  $Id: expString.c,v 1.31 2001/07/22 20:03:56 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -220,10 +220,10 @@ ag_scm_in_p( SCM obj, SCM list )
     pz1  = SCM_CHARS(  obj );
     lenz = SCM_LENGTH( obj );
 
-	/*
-	 *  If the second argument is a string somehow, then treat
-	 *  this as a straight out string comparison
-	 */
+    /*
+     *  If the second argument is a string somehow, then treat
+     *  this as a straight out string comparison
+     */
     if (gh_string_p( list )) {
         if (  (SCM_LENGTH( list ) == lenz)
            && (strncmp( pz1, SCM_CHARS( list ), lenz ) == 0) )

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.28 2001/07/17 02:35:14 bkorb Exp $
+ *  $Id: funcCase.c,v 1.29 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -939,7 +939,8 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *    This macro ends the @code{CASE} function template block.
  *    For a complete description, @xref{CASE}.
 =*/
-MAKE_HANDLER_PROC( Case )
+    tMacro*
+mFunc_Case( tTemplate* pT, tMacro* pMac )
 {
     typedef tSuccess (t_match_proc)( char*, char* );
     /*
@@ -1073,7 +1074,8 @@ static tpLoadProc apSelectOnly[ FUNC_CT ] = { (tpLoadProc)NULL };
  *  This function is called to set up (load) the macro
  *  when the template is first read in (before processing).
  */
-MAKE_LOAD_PROC( Case )
+    tMacro*
+mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen     = (size_t)pMac->res;   /* macro len  */
     tCaseStack     save_stack = current_case;
@@ -1182,7 +1184,8 @@ MAKE_LOAD_PROC( Case )
  *    against the sample text expression evaluated in the @code{CASE}
  *    macro.  @xref{CASE}.
 =*/
-MAKE_LOAD_PROC( Select )
+    tMacro*
+mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     const char*    pzScan = *ppzScan;  /* text after macro */
     char*          pzCopy = pT->pNext; /* next text dest   */

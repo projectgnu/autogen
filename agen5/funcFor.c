@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.21 2001/07/15 23:07:21 bkorb Exp $
+ *  $Id: funcFor.c,v 1.22 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -565,7 +565,8 @@ doForEach( tTemplate*   pT,
  *    This macro ends the @code{FOR} function template block.
  *    For a complete description @xref{FOR}.
 =*/
-MAKE_HANDLER_PROC( For )
+    tMacro*
+mFunc_For( tTemplate* pT, tMacro* pMac )
 {
     tMacro*     pMRet = pT->aMacros + pMac->endIndex;
     ag_bool     isIndexed;
@@ -637,7 +638,8 @@ MAKE_HANDLER_PROC( For )
 
 tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
-MAKE_LOAD_PROC( For )
+    tMacro*
+mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*        pzCopy = pT->pNext; /* next text dest   */
     const char*  pzSrc  = (const char*)pMac->ozText; /* macro text */

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.21 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: autogen.h,v 1.22 2001/07/22 20:03:56 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -86,9 +86,6 @@ typedef struct template_lib_marker tTlibMark;
  */
 typedef tMacro* (tLoadProc)( tTemplate*, tMacro*, const char** ppzScan );
 typedef tLoadProc* tpLoadProc;
-#define MAKE_LOAD_PROC( n ) \
-    tMacro* \
-mLoad_ ## n ( tTemplate*  pT,  tMacro*  pMac, const char**  ppzScan )
 
 /*
  *  Procedure for handling a template function
@@ -96,9 +93,6 @@ mLoad_ ## n ( tTemplate*  pT,  tMacro*  pMac, const char**  ppzScan )
  */
 typedef tMacro* (tHdlrProc)( tTemplate*, tMacro* );
 typedef tHdlrProc* tpHdlrProc;
-#define MAKE_HANDLER_PROC( n ) \
-    tMacro* \
-mFunc_ ## n ( tTemplate* pT,  tMacro* pMac )
 
 /*
  *  This must be included after the function prototypes
@@ -264,7 +258,7 @@ MODE tTemplate*  pNamedTplList    VALUE( (tTemplate*)NULL );
 /*
  *  Template Processing Globals
  */
-MODE const char* pzCurSfx         VALUE( (char*)NULL );
+MODE tCC*        pzCurSfx         VALUE( (char*)NULL );
 MODE time_t      outTime          VALUE( 0 );
 MODE tFpStack*   pCurFp           VALUE( (tFpStack*)NULL );
 MODE tOutSpec*   pOutSpecList     VALUE( (tOutSpec*)NULL );
@@ -273,6 +267,8 @@ MODE char*       pzCurStart       VALUE( (char*)NULL );
 MODE off_t       curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( (FILE*)NULL );
+
+MODE tCC*        serverArgs[2]    VALUE( { (char*)NULL } );
 
 /*
  *  AutoGen definiton and template context

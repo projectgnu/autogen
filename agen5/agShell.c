@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.12 2001/06/28 02:09:37 bkorb Exp $
+ *  $Id: agShell.c,v 1.13 2001/07/22 20:03:56 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -41,14 +41,13 @@
 /*
  *  Dual pipe opening of a child process
  */
-STATIC tpChar  defArgs[]  = { (char*)NULL, (char*)NULL };
 STATIC tpfPair serverPair = { (FILE*)NULL, (FILE*)NULL };
 STATIC pid_t   serverId   = NULLPROCESS;
 STATIC tpChar  pCurDir    = (char*)NULL;
 STATIC ag_bool errClose   = AG_FALSE;
 
 tSCC   zTxtBlock[] = "Text Block";
-tSCC   zCmdFmt[]   = "\\cd %s\n%s\n\necho\necho %s\n";
+tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s\n";
 
 const char* pzLastCmd = (const char*)NULL;
 
@@ -123,7 +122,7 @@ serverSetup( void )
         tSCC zTrap[] =
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done";
+            "done\n" "unalias cd 2>/dev/null >&2\n";
         char* pz;
         pzLastCmd = zTrap;
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
@@ -156,7 +155,6 @@ serverSetup( void )
 }
 
 
-
 /*
  *  chainOpen
  *
@@ -168,18 +166,18 @@ serverSetup( void )
  */
     EXPORT int
 chainOpen( int       stdinFd,
-           tpChar*   ppArgs,
+           tCC**     ppArgs,
            pid_t*    pChild  )
 {
     tFdPair   stdoutPair = { -1, -1 };
     pid_t     chId;
-    char*     pzShell;
+    tCC*      pzShell;
 
     /*
      *  If we did not get an arg list, use the default
      */
-    if (ppArgs == (tpChar*)NULL)
-        ppArgs = defArgs;
+    if (ppArgs == (tCC**)NULL)
+        ppArgs = serverArgs;
 
     /*
      *  If the arg list does not have a program,
@@ -273,7 +271,7 @@ chainOpen( int       stdinFd,
      */
     setvbuf( stdout, (char*)NULL, _IONBF, 0 );
 
-    execvp( pzShell, ppArgs );
+    execvp( (char*)pzShell, (char**)ppArgs );
     fprintf( stderr, "Error %d:  Could not execvp( '%s', ... ):  %s\n",
              errno, pzShell, strerror( errno ));
     AG_ABEND;
@@ -291,7 +289,7 @@ chainOpen( int       stdinFd,
  *  The return value is the process id of the created process.
  */
     EXPORT pid_t
-openServer( tFdPair* pPair, tpChar* ppArgs )
+openServer( tFdPair* pPair, tCC** ppArgs )
 {
     pid_t     chId;
 
@@ -318,7 +316,7 @@ openServer( tFdPair* pPair, tpChar* ppArgs )
  *  into file pointers instead.
  */
     EXPORT pid_t
-openServerFP( tpfPair* pfPair, tpChar* ppArgs )
+openServerFP( tpfPair* pfPair, tCC** ppArgs )
 {
     tFdPair   fdPair;
     pid_t     chId = openServer( &fdPair, ppArgs );
@@ -433,7 +431,7 @@ runShell( const char*  pzCmd )
      *  THEN try to start it.
      */
     if (serverId == NULLPROCESS) {
-        serverId = openServerFP( &serverPair, defArgs );
+        serverId = openServerFP( &serverPair, serverArgs );
         if (serverId > 0)
             serverSetup();
     }

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.19 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: functions.c,v 1.20 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -51,7 +51,8 @@ tSCC zCantInc[] = "cannot include file";
  *  @samp{CASE} and extending through the respective terminating
  *  macro functions.
 =*/
-MAKE_HANDLER_PROC( Include )
+    tMacro*
+mFunc_Include( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pNewTpl;
     ag_bool    needFree;
@@ -116,7 +117,8 @@ MAKE_HANDLER_PROC( Include )
  *
  *  You may not specify @code{UNKNOWN} explicitly.
 =*/
-MAKE_HANDLER_PROC( Unknown )
+    tMacro*
+mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pInv = findTemplate( pT->pzTemplText + pMac->ozName );
     if (pInv != (tTemplate*)NULL) {
@@ -164,7 +166,8 @@ MAKE_HANDLER_PROC( Unknown )
  *  unnamed:
  *  load_proc:
 =*/
-MAKE_HANDLER_PROC( Bogus )
+    tMacro*
+mFunc_Bogus( tTemplate* pT, tMacro* pMac )
 {
     tSCC z[] = "%d (%s) is an unknown macro function, or has no handler";
     char* pz = asprintf( z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
@@ -182,7 +185,8 @@ MAKE_HANDLER_PROC( Bogus )
  *  handler_proc:
  *  unnamed:
 =*/
-MAKE_HANDLER_PROC( Text )
+    tMacro*
+mFunc_Text( tTemplate* pT, tMacro* pMac )
 {
     fputs( pT->pzTemplText + pMac->ozText, pCurFp->pFile );
     fflush( pCurFp->pFile );
@@ -206,7 +210,8 @@ MAKE_HANDLER_PROC( Text )
  *    If the native macro name code is @code{#}, then the
  *    entire macro function is treated as a comment and ignored.
 =*/
-MAKE_LOAD_PROC( Comment )
+    tMacro*
+mLoad_Comment( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     memset( (void*)pMac, 0, sizeof( *pMac ));
     return pMac;
@@ -219,7 +224,8 @@ MAKE_LOAD_PROC( Comment )
  *  Move any text into the text offset field.
  *  This is used as the default load mechanism.
  */
-MAKE_LOAD_PROC( Unknown )
+    tMacro*
+mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*          pzCopy = pT->pNext;
     const char*    pzSrc;
@@ -318,7 +324,8 @@ MAKE_LOAD_PROC( Unknown )
  *  However, the load function pointer for those functions points
  *  here, until an "IF" function is encountered.
  */
-MAKE_LOAD_PROC( Bogus )
+    tMacro*
+mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
     long           srcLen = (long)pMac->res;           /* macro len  */

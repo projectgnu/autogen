@@ -1,3 +1,25 @@
+2001-07-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(defArgs) rename to "serverArgs" and export.
+	Retype to "tCC**", too.
+	* agen5/autogen.h(serverArgs): new global
+	(MAKE_HANDLER_PROC): the interface is stable now.  Macro not needed.
+	(MAKE_LOAD_PROC): ditto
+	* agen5/funcCase.c: skip macro
+	* agen5/funcDef.c: ditto
+	* agen5/funcEval.c: ditto
+	* agen5/funcFor.c: ditto
+	* agen5/funcIf.c: ditto
+	* agen5/functions.c: ditto
+	* agen5/loadPseudo.c(doSchemeExpr): Process a scheme expr in the
+	pseudo macro
+	(findTokenType): a '(' now marks a scheme expression
+	* agen5/pseudo.def(scheme): new transition
+
+2001-07-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.h: Add ISPATHCHAR
+
 2001-07-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcEval.c: fflush output after write

@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2001/07/13 04:04:56 $
+## Last Modified:   $Date: 2001/07/22 20:03:56 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.24 2001/07/13 04:04:56 bkorb Exp $
+## $Id: Makefile.am,v 1.25 2001/07/22 20:03:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
@@ -18,7 +18,7 @@ TESTS      = \
 	get.test        gperf.test   heredef.test include.test \
 	license.test    match.test   nestmac.test opts.test \
 	output.test     reorder.test snarf.test   stack.test \
-	string.test     suffix.test  in.test
+	string.test     suffix.test  shell.test   in.test
 
 EXTRA_DIST = defs $(TESTS)
 

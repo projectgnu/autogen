@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.34 2001/06/24 00:47:56 bkorb Exp $
+ *  $Id: funcDef.c,v 1.35 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -592,7 +592,8 @@ prepInvokeArgs( tMacro* pMac )
  *      a breakpoint on the #n case element below and step through
  *      the processing of interesting parts of your template.
 =*/
-MAKE_HANDLER_PROC( Debug )
+    tMacro*
+mFunc_Debug( tTemplate* pT, tMacro* pMac )
 {
     static int dummy = 0;
 
@@ -830,7 +831,8 @@ build_defs( int defCt, tDefList* pList )
  *
  *  This routine runs the invocation.
  */
-MAKE_HANDLER_PROC( Define )
+    tMacro*
+mFunc_Define( tTemplate* pT, tMacro* pMac )
 {
     tDefList*   pList  = (tDefList*)pMac->res;
     int         defCt  = pMac->sibIndex;
@@ -908,7 +910,8 @@ MAKE_HANDLER_PROC( Define )
  *  the first time the macro is processed and evaluated again every
  *  time the macro is evaluated.
 =*/
-MAKE_HANDLER_PROC( Invoke )
+    tMacro*
+mFunc_Invoke( tTemplate* pT, tMacro* pMac )
 {
     char* pzText;
     SCM   macName;
@@ -969,13 +972,15 @@ MAKE_HANDLER_PROC( Invoke )
  *  what:   Loads the debug function so you can set breakpoints
  *          at load time, too :-)
 =*/
-MAKE_LOAD_PROC( Debug )
+    tMacro*
+mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     return mLoad_Unknown( pT, pMac, ppzScan );
 }
 
 
-MAKE_LOAD_PROC( Define )
+    tMacro*
+mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     tSCC         zNameNeeded[] = "DEFINE requires a name";
     char*        pzCopy;             /* next text dest   */

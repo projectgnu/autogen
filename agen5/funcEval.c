@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.31 2001/07/15 23:07:21 bkorb Exp $
+ *  $Id: funcEval.c,v 1.32 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -380,7 +380,8 @@ eval( const char* pzExpr )
  *   macro is inferred.  The result of the expression evaluation
  *   (@pxref{expression syntax}) is written to the current output.
 =*/
-MAKE_HANDLER_PROC( Expr )
+    tMacro*
+mFunc_Expr( tTemplate* pT, tMacro* pMac )
 {
     ag_bool needFree;
     char* pz = evalExpression( &needFree );
@@ -421,7 +422,8 @@ exprType( char* pz )
 /*
  *  mLoad_Expression
  */
-MAKE_LOAD_PROC( Expr )
+    tMacro*
+mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*    pzCopy; /* next text dest   */
     tCC*     pzSrc  = (const char*)pMac->ozText; /* macro text */

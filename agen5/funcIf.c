@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.13 2001/06/06 04:19:57 uid24370 Exp $
+ *  $Id: funcIf.c,v 1.14 2001/07/22 20:03:56 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -129,7 +129,8 @@ eval_true( void )
  *    This macro ends the @code{IF} function template block.
  *    For a complete description @xref{IF}.
 =*/
-MAKE_HANDLER_PROC( If )
+    tMacro*
+mFunc_If( tTemplate* pT, tMacro* pMac )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     tMacro* pIf  = pMac;
@@ -212,7 +213,8 @@ MAKE_HANDLER_PROC( If )
  *    This macro ends the @code{WHILE} function template block.
  *    For a complete description @xref{WHILE}.
 =*/
-MAKE_HANDLER_PROC( While )
+    tMacro*
+mFunc_While( tTemplate* pT, tMacro* pMac )
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     int     ct   = 0;
@@ -266,7 +268,8 @@ STATIC tLoadProc mLoad_Elif, mLoad_Else;
  *    @code{IF} function.  Its expression argument is evaluated as are
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
-MAKE_LOAD_PROC( Elif )
+    tMacro*
+mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     /*
      *  Load the expression
@@ -290,7 +293,8 @@ MAKE_LOAD_PROC( Elif )
  *    It denotes the start of an alternate template block for
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
-MAKE_LOAD_PROC( Else )
+    tMacro*
+mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     /*
      *  After processing an "ELSE" macro,
@@ -313,14 +317,16 @@ MAKE_LOAD_PROC( Else )
 }
 
 
-MAKE_LOAD_PROC( Ending )
+    tMacro*
+mLoad_Ending( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     memset( (void*)pMac, 0, sizeof( *pMac ));
     return (tMacro*)NULL;
 }
 
 
-MAKE_LOAD_PROC( If )
+    tMacro*
+mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -387,7 +393,8 @@ MAKE_LOAD_PROC( If )
 }
 
 
-MAKE_LOAD_PROC( While )
+    tMacro*
+mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
