@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-## Copyright (C) 1997 Gary V Vaughan
+## Copyright (C) 2003 Bruce Korb
 ## 
-## Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>	      
+## Author:           Bruce Korb <bkorb@gnu.org>
 ## Maintainer:       Bruce Korb <bkorb@gnu.org>
 ## Created:          Mon Jun 30 15:35:12 1997	
 ## Last Modified:    Thu Jul 29 08:30:10 1999				      
 ##            by:    Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2002/03/12 05:12:14 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2003/02/16 00:04:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

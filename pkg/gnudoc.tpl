@@ -3,7 +3,9 @@
 html=autogen.html
 
 # Time-stamp: "2002-02-02 13:10:02 bkorb"
-# Version:    "$Revision: 3.1 $
+# Version:    "$Revision: 3.2 $
+
+# AutoGen Options copyright 1992-2003 Bruce Korb
 
 =]
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
@@ -109,7 +111,7 @@ href="mailto:webmasters@www.gnu.org"><em>webmasters@www.gnu.org</em></a>,
 send other questions to
 <a href="mailto:gnu@gnu.org"><em>gnu@gnu.org</em></a>.
 <p>
-Copyright (C) 2002 Free Software Foundation, Inc.,
+Copyright (C) 2002, 2003 Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA  02111,  USA
 <p>
 Verbatim copying and distribution of this entire article is

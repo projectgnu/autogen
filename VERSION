@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Copyright (C) 1999-2002 Bruce Korb
+# Copyright (C) 1999-2003 Bruce Korb
 #
 # Time-stamp:        "2003-02-03 11:07:54 bkorb"
 # by:                Bruce Korb <bkorb@gnu.org>
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".2pre9"
+AG_PATCHLEVEL=".2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

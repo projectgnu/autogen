@@ -2,7 +2,7 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-2001 Bruce Korb
+##  AutoGen Copyright (C) 1992-2003 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.15 2003/02/05 02:40:26 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.16 2003/02/16 00:04:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi

@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##  Autoopts copyright 1992-2002 Bruce Korb
+##  Autoopts copyright 1992-2003 Bruce Korb
 ## 
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2003/02/04 00:29:12 $
+## Last Modified:   $Date: 2003/02/16 00:04:39 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.15 2003/02/04 00:29:12 bkorb Exp $
+## $Id: Makefile.am,v 3.16 2003/02/16 00:04:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcCase.c,v 3.10 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: funcCase.c,v 3.11 2003/02/16 00:04:39 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 /*
- *  AutoGen copyright 1992-2002 Bruce Korb
+ *  AutoGen copyright 1992-2003 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-##    AutoGen copyright 1992-2002 Bruce Korb
+##    AutoGen copyright 1992-2003 Bruce Korb
 ##
 ## Time-stamp:      "2002-06-11 18:39:40 bkorb"
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2002/06/20 22:05:07 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2003/02/16 00:04:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs

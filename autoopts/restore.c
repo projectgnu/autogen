@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.3 2002/09/21 17:27:15 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.4 2003/02/16 00:04:40 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2002 Bruce Korb
+ *  Automated Options copyright 1992-2003 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

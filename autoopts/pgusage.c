@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 3.4 2003/01/14 05:04:21 bkorb Exp $
+ *  $Id: pgusage.c,v 3.5 2003/02/16 00:04:40 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2002 Bruce Korb
+ *  Automated Options copyright 1992-2003 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,12 +1,12 @@
 
 /*
- *  $Id: funcIf.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: funcIf.c,v 3.5 2003/02/16 00:04:39 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
 
 /*
- *  AutoGen copyright 1992-2002 Bruce Korb
+ *  AutoGen copyright 1992-2003 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

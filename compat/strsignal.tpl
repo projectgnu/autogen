@@ -1,6 +1,6 @@
 < AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 3.1 2002/05/31 00:26:15 bkorb Exp $
+# $Id: strsignal.tpl,v 3.2 2003/02/16 00:04:40 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -8,7 +8,7 @@ h >
 /*
 <(dne " *  ")>
  *
- *  copyright 1992-1999 Bruce Korb
+ *  copyright 1992-2003 Bruce Korb
  *
 <(gpl "AutoGen" " *  ")>
  */

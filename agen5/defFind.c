@@ -1,12 +1,12 @@
 /*
- *  $Id: defFind.c,v 3.7 2003/01/23 21:45:31 bkorb Exp $
+ *  $Id: defFind.c,v 3.8 2003/02/16 00:04:39 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
  */
 
 /*
- *  AutoGen copyright 1992-2002 Bruce Korb
+ *  AutoGen copyright 1992-2003 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

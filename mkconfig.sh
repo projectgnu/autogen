@@ -1,61 +1,75 @@
-#! /bin/sh
+#! /bin/ksh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# Time-stamp:        "2002-07-11 12:44:40 bkorb"
+# Time-stamp:        "2003-02-15 16:01:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 3.5 2002/07/11 20:28:44 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 3.6 2003/02/16 00:04:39 bkorb Exp $
 # ----------------------------------------------------------------------
+case "$1" in
+-CVS ) update_cvs=true  ;;
+*    ) update_cvs=false ;;
+esac
 
-if [ "$1" = "-CVS" ]
-then update_cvs=false
-else update_cvs=true ; fi
-
-exec 5> temp.config
-
-GENLIST="agen5/directive.h
-	 agen5/cgi-fsm.h
-	 agen5/defParse.c
-	 agen5/defParse.h
-	 agen5/expr.h
-	 agen5/expr.ini
-	 agen5/opts.[ch]
-	 agen5/pseudo-fsm.h
-	 agen5/autogen.menu
-	 agen5/autogen.texi
-	 autoopts/genshell.[ch]
-	 autoopts/options.h
-	 autoopts/funcs.def
-	 compat/strsignal.h
-	 columns/opts.[ch]
-	 config/ag_*.m4"
-
-for f in ${GENLIST}
-do
-  [ -f $f ] || {
-    echo "Error:  cannot generate configure without $f" >&2
-    exit 1
-  }
-done
-touch_list="`egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
-             sed 's@.*## *\(.*\) GEN-RULE@agen5/\1@' `"
-
-if ${update_cvs} && [ -d CVS ]
+sd=`cd \`dirname $0\` > /dev/null 2>&1 && pwd`
+if [ -z "$sd" ]
 then
-  rm -f ./configure
-  cvs update configure > /dev/null 2>&1 || \
-    update_cvs=false
-else
-  update_cvs=false
+  echo "Cannot locate source directory for $0" >&2
+  exit 1
 fi
 
-[ -f doc/autogen.texi ] || {
-  echo '@setfilename completely.bogus' > doc/autogen.texi
-  touch -t 200001010000 doc/autogen.texi
+cd || exit 1
+[ -d tmp ] || mkdir tmp || exit 1
+cd tmp || exit 1
+
+cfgfile=`pwd`/config$$.tmp
+exec 5> ${cfgfile}
+
+tmpag=`pwd`/ag$$
+
+if test -f ${tmpag} || test -d ${tmpag}
+then rm -rf ${tmpag} || exit 1 ; fi
+
+mkdir ${tmpag} || exit 1
+cd ${tmpag} || exit 1
+
+( cd ${sd}
+  tar cf - `find * -type f | \
+  egrep -v '(CVS/|\.cvsignore)'`
+) | tar -xvf -
+
+find * -type f | xargs chmod u+w
+find * -type d | xargs chmod 755
+
+bstr=`set -- c*f*g/bootstrap ; echo $1`
+sh $bstr || {
+  print -u2 "error:  bootstrap failed"
+  exit 1
 }
+
+nl='
+'
+GENLIST=''
+for f in `find * -type f | sort`
+do
+  case "$f" in
+  */stamp*  | \
+  configure | \
+  *.in      | \
+  *~        | \
+  aclocal*  | \
+  autom4*  ) : ;;
+  * )
+    [ -f ${sd}/${f} ] || GENLIST="${GENLIST}${f}${nl}"
+    ;;
+  esac
+done
+
+touch_list="`egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
+             sed 's@.*## *\(.*\) GEN-RULE@agen5/\1@' `"
 
 #  Make sure the new file removes the current collection of files
 #
@@ -92,9 +106,9 @@ touch -t 200001010000 `echo ${touch_list}`
 
 _EOF_
 
-for f in ./configure ${GENLIST}
+for f in ${GENLIST}
 do echo $f ; done | \
-columns -I10 --first='for f in ' --line=' \' >&5
+columns --spread=1 -I10 --first='for f in ' --line=" \\" >&5
 
 cat <<'_EOF_' >&5
 do
@@ -127,28 +141,31 @@ sh ${VERBOSE_ARG} config/bootstrap $@ || exit 1
 cd $SVDIR
 sh ${VERBOSE_ARG} ${SRCDIR}/configure $@
 
-# configure ends here
+# noag-boot.sh ends here
 _EOF_
 
 exec 5>&-
 
-if cmp configure temp.config
+if cmp ${cfgfile} ${sd}/noag-boot.sh
 then
-  echo configure is unchanged
-  rm -f temp.config
+  echo noag-boot.sh is unchanged
+  rm -f ${cfgfile}
+
+elif ${update_cvs:-false}
+then
+  cd $sd
+  cvs edit noag-boot.sh
+  mv -f ${cfgfile} noag-boot.sh
+  cvs commit -m'CVS-ed noag-boot.sh script update' noag-boot.sh
+
 else
-  if $update_cvs
-  then
-    cvs edit configure
-    mv -f temp.config configure
-    cvs commit -m'CVS-ed configure script update' configure
-  else
-    (
-      echo configure would change:
-      echo diff -c configure temp.config
-      diff -c configure temp.config
-    ) | ${PAGER-more}
-  fi
+  ( cd $sd
+    echo noag-boot.sh would change:
+    echo diff -c noag-boot.sh ${cfgfile}
+    diff -c noag-boot.sh ${cfgfile}
+  ) | ${PAGER-more}
 fi
+
+rm -rf ${tmpag}
 
 # :mkconfig ends here

@@ -1,12 +1,12 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.11 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.12 2003/02/16 00:04:39 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
 /*
- *  AutoGen copyright 1992-2002 Bruce Korb
+ *  AutoGen copyright 1992-2003 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##    AutoGen copyright 1992-1999 Bruce Korb
+##    AutoGen copyright 1992-2003 Bruce Korb
 ## 
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ## Maintainer:	    Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.3 2002/06/20 22:05:07 bkorb Exp $
+## $Id: Makefile.am,v 3.4 2003/02/16 00:04:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns

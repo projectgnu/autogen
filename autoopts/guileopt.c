@@ -1,12 +1,12 @@
 
 /*
- *  $Id: guileopt.c,v 3.3 2002/10/27 04:59:01 bkorb Exp $
+ *  $Id: guileopt.c,v 3.4 2003/02/16 00:04:40 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
 
 /*
- *  Automated Options copyright 1992-2002 Bruce Korb
+ *  Automated Options copyright 1992-2003 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

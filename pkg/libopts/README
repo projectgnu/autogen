@@ -21,7 +21,10 @@ Usage Instructions for autoconf/automake/libtoolized projects:
    Whatever directory you choose, if it is not ".", then
    be sure to tell autoconf about it with:
 
-      AC_CONFIG_AUX_DIR( [config] )
+      AC_CONFIG_AUX_DIR(config)
+
+   This is one macro where you *MUST* remember to *NOT* quote
+   the argument.  If you do, automake will get lost.
 
 2. Add the following to your ``configure.ac'' file:
 
@@ -34,12 +37,27 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 3. Add the following to your top level ``Makefile.am'' file:
 
       include $(srcdir)/libopts/MakeDefs.inc
+      EXTRA_DIST = $(LIBOPTS_REDIST) <...>
       SUBDIRS = <...> $(LIBOPTS_DIR) <...>
+      if NEED_LIBOPTS
+         <<Makefile.am text for when building libopts>>
+      else
+         <<Makefile.am text for when libopts not needed>>
+      endif
 
-   where ``<...>'' can be whatever other directories you may
-   need.  They must be properly ordered.  ``AUTOOPTS_CHECK''
-   will ensure that ``$(LIBOPTS_DIR)'' is empty if compiling
-   libopts is not necessary.
+   where ``<...>'' can be whatever other files or directories
+   you may need.  The SUBDIRS must be properly ordered.
+   ``LIBOPTS_CHECK'' will ensure that ``$(LIBOPTS_DIR)''
+   is empty if compiling libopts is not necessary.
+
+   Unfortunately, the "redist" stuff is all necessary to get the
+   correct set of files in your distribution.  If you simply add,
+   "libopts", you'll include unmodifiable files that will cause
+   distcheck to fail.  If you try to name all the files yourself,
+   you'll miss some when the distribution changes.  Therefore,
+   we have the magic "MakeDefs.inc" file in the distribution.
+
+   You may not need the "NEED_LIBOPTS" construct, but it's there.
 
 4. Add ``$(LIBOPTS_CFLAGS)'' to relevant compiler flags and
    ``$(LIBOPTS_LDADD)'' to relevant link options whereever
@@ -69,7 +87,7 @@ will need to hand craft the rules for building the library.
 
 LICENSING:
 
-This material is copyright 1993-2002 by Bruce Korb.
+This material is copyright 1993-2003 by Bruce Korb.
 You are licensed to use this under the terms of either
 the GNU Lesser General Public License (see: COPYING.lgpl), or,
 at your option, the modified Berkeley Software Distribution

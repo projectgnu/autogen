@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2003-02-05 21:10:35 bkorb"
+## Time-stamp:      "2003-02-15 14:51:21 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.17 2003/02/06 05:10:51 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.18 2003/02/16 00:04:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -107,32 +107,22 @@ cat >> libopts.m4 <<-	EOMacro
 	  then
 	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
 	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
-	    build_libopts_dir=''
+	    LIBOPTS_DIR=''
 	  else
 	    LIBOPTS_LDADD='\$(top_builddir)/libopts/libopts.la'
 	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/libopts'
 	    INVOKE_LIBOPTS_MACROS
-	    build_libopts_dir=true
+	    LIBOPTS_DIR=true
 	  fi
-	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${build_libopts_dir}"])
+	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${LIBOPTS_DIR}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
+	  AC_SUBST(LIBOPTS_DIR)
 	  AC_CONFIG_FILES([libopts/Makefile])
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
 
 [ -f Makefile.am ] && rm -f Makefile.am
-
-cat > MakeDefs.inc <<-	EOMakeDefs
-	## LIBOPTS Makefile Fragment
-	if NEED_LIBOPTS
-	  LIBOPTS_DIR  = libopts
-	else
-	  LIBOPTS_DIR  =
-	endif
-	LIBOPTS_LDADD  = @LIBOPTS_LDADD@
-	LIBOPTS_CFLAGS = @LIBOPTS_CFLAGS@
-	EOMakeDefs
 
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 cp ${top_srcdir}/pkg/libopts/COPYING* .
@@ -140,16 +130,22 @@ cp ${top_srcdir}/pkg/libopts/COPYING* .
 exec 3> Makefile.am
 cat >&3 <<-	EOMakefile
 	## LIBOPTS Makefile
-	EXTRA_DIST            = `echo COPYING*` MakeDefs.inc compat
+	EXTRA_DIST            = `echo COPYING*` compat
 	MAINTAINERCLEANFILES  = Makefile.in
 	lib_LTLIBRARIES       = libopts.la
 	libopts_la_SOURCES    = \\
 	EOMakefile
 
+cols="${top_builddir}/columns/columns -I4 --spread=1"
+
 ls -1 *.[ch] | \
-  ${top_builddir}/columns/columns -I4 --spread=1 --line-sep='  \' >&3
+   ${cols} --line-sep="  \\" >&3
 
 exec 3>&-
+
+echo "LIBOPTS_REDIST = libopts/Makefile.in \\" > MakeDefs.inc
+ls -1 | \
+    ${cols} -f'libopts/%s' --line-sep="  \\" >> MakeDefs.inc
 
 if gzip --version > /dev/null 2>&1
 then
@@ -163,3 +159,4 @@ fi
 cd ..
 tar cvf - ${tag} | $gz --best > ${top_builddir}/autoopts/${tag}.${sfx}
 rm -rf ${tag}
+## end of mklibsrc.sh

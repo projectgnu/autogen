@@ -3,7 +3,7 @@
 ## ---------------------------------------------------------------------
 ## aginfo3.tpl -- Template for function texi doc
 ##
-##  AutoOpts copyright 1992-2002 Bruce Korb
+##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
 ## Time-stamp:      "2002-05-07 21:01:49 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -11,7 +11,7 @@
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo3-tpl.in,v 3.4 2002/05/11 20:23:52 bkorb Exp $
+## $Id: aginfo3-tpl.in,v 3.5 2003/02/16 00:04:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi

@@ -1,3 +1,12 @@
+2003-02-15  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/libopts/README: corrected spelling of check macro & documented
+	the automake conditional that is also generated.
+	* pkg/libopts/mklibsrc.sh: correctly emit the documented substitution
+	variable.  The doc was ahead of the code. :-)  Also, reworked the
+	contents of MakeDefs.inc file.  It contains LIBOPTS_REDIST giving the
+	list of files that client programs need to redistribute.
+
 2003-02-05  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/equiv.test: Some seds leave no space at

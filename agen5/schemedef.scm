@@ -1,5 +1,5 @@
 
-;;;  AutoGen copyright 1992-2002 Bruce Korb
+;;;  AutoGen copyright 1992-2003 Bruce Korb
 
 (use-modules (ice-9 common-list))
 

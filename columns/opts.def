@@ -1,11 +1,11 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.4 2002/12/19 01:35:37 bkorb Exp $
+ *   $Id: opts.def,v 3.5 2003/02/16 00:04:40 bkorb Exp $
  */
 
 /*
- *  AutoGen copyright 1992-1999 Bruce Korb
+ *  AutoGen copyright 1992-2003 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
