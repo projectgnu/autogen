@@ -25,7 +25,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
 * Template File::        AutoGen Template
-* Augmenting AutoGen::   Augmenting AutoGen
+* Augmenting AutoGen::   Augmenting AutoGen Features
 * autogen Invocation::   Invoking AutoGen
 * Installation::         Configuring and Installing
 * AutoOpts::             Automated Option Processing
@@ -1435,7 +1435,7 @@ status.  @xref{AutoGen Functions}.
 
 @page
 @node Augmenting AutoGen
-@chapter Augmenting AutoGen
+@chapter Augmenting AutoGen Features
 @cindex Augmenting AutoGen
 
 AutoGen was designed to be simple to enhance.  You can do it by
@@ -3004,7 +3004,18 @@ flag character to restrict special meanings to the shell.
 
 The output file will be the RC/INI file name (default or provided
 by @code{rcfile}) in the last directory named in a @code{homerc}
-definition
+definition.
+
+This option may be set from within your program by invoking the
+"@code{SET_OPT_SAVE_OPTS(@i{filename})}" macro (@pxref{SET_OPT_name}).
+Invoking this macro will set the file name for saving the option
+processing state, but the state will @strong{not} actually be saved.
+You must call @code{optionSaveFile} to do that
+(@pxref{libopts-optionSaveFile}).  @strong{CAVEAT:} if, after invoking
+this macro, you call @code{optionProcess}, the option processing state
+will be saved to this file and @code{optionProcess} will not return.
+You may wish to invoke @code{CLEAR_OPT( SAVE_OPTS )}
+(@pxref{CLEAR_OPT}) beforehand.
 
 @item load-opts -<
 This option will load options from the named file.  They
@@ -3392,9 +3403,16 @@ too.  Beware that the argument is not reallocated, so the value must not
 be on the stack or deallocated in any other way for as long as the value
 might get referenced.
 
+If you have supplied at least one @file{homerc} file (@pxref{}),
+this macro will be emitted for the @code{--save-opts} option.
+
 @example
-SET_OPT_NAME( "string-value" );
+SET_OPT_SAVE_OPTS( "filename" );
 @end example
+
+@noindent
+@xref{automatic options} for a discussion of the implications of using
+this particular example.
 
 @node STACKCT_OPT
 @subsection STACKCT_OPT( <NAME> ) - Stacked Arg Count
