@@ -1,4 +1,4 @@
-[= autogen template -*-texinfo-*-
+[= AutoGen5 template -*-texinfo-*-
 
 ##  Documentation template
 ## 
@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.28 1999/08/30 17:50:32 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.29 1999/10/22 00:26:35 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -22,26 +22,25 @@ texi=autogen.texi =]
 @c %**end of header
 
 @ignore
-[=_eval "" _DNE=]
+[=(dne "")=]
 
 Plus bits and pieces gathered from all over the source/build
 directories:
-[=_FOR infile=]
-        [=infile=][=
-/infile =]
 [=
-_EVAL '
-  echo "        ${top_srcdir}/autoopts/autoopts.texi"
-  for f in ${top_builddir}/*/*.menu
-  do echo "     $f"
-     echo "     `echo $f|sed \'s/\.menu$/\.texi/\'`"
-  done' _shell =]
+FOR infile=]
+	[=infile=][=
+ENDFOR infile =]
+[=`echo "\t${top_srcdir}/autoopts/autoopts.texi"
+   for f in ${top_builddir}/*/*.menu
+   do echo "\t$f"
+      echo "\t\`echo $f|sed 's/\\.menu$/.texi/'\`"
+   done` =]
 
 @end ignore
 
-@set EDITION [=_EVAL "echo ${AG_REVISION}" _shell=]
-@set VERSION [=_EVAL "echo ${AG_REVISION}" _shell=]
-@set UPDATED [=_EVAL 'date "+%B %Y"' _shell =]
+@set EDITION [=`echo ${AG_REVISION}`=]
+@set VERSION [=`echo ${AG_REVISION}`=]
+@set UPDATED [=`date "+%B %Y"`=]
 
 @dircategory GNU programming tools
 @direntry
@@ -52,9 +51,10 @@ _EVAL '
 This file documents [=package=] Version @value{VERSION}
 
 AutoGen copyright @copyright{} [=copyright=] Bruce Korb
+AutoOpts copyright @copyright{} [=copyright=] Bruce Korb
 snprintfv copyright @copyright{} 1999 Gary V. Vaughan
 
-[=_eval AutoGen "" _gpl=]
+[=(gpl "AutoGen" "")=]
 
 @ignore
 Permission is granted to process this file through TeX and print the
@@ -75,14 +75,13 @@ notice identical to this one except for the removal of this paragraph
 
 @page
 @vskip 0pt plus 1filll
-[=_eval AutoGen copyright _get owner _get
-       "#3$%s copyright %s %s" _printf=]
+AutoGen copyright @copyright{} [=copyright=] Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,
 @sp 2
 Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
-[=_eval AutoGen "" _gpl=]
+[=(gpl "AutoGen" "")=]
 @end titlepage
 
 @ifinfo
@@ -650,11 +649,9 @@ directives must have the hash character (@code{#}) in column 1.
 
 The ignored directives are:
 [=
-_FOR directive =][=
-  _IF dummy _exist
-    =]@samp{#[=name _down=]}, [=
-  _ENDIF =][=
-/directive=] and @samp{#if}.
+FOR directive =][=
+  % dummy (string-downcase! "@samp{#%s}, ") =][=
+ENDFOR directive=] and @samp{#if}.
 Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
 including the @code{#else} clause.
@@ -663,17 +660,14 @@ The AutoGen directives that affect the processing of
 definitions are:
 
 @table @code[=
-_FOR directive "\n"=][=
-  _IF text _exist
-    =]
-@item #[=name _down =][=
-    _IF arg _exist =] [=arg=][=
-    _ENDIF=]
-@cindex #[=name _down=]
-@cindex [=name _down=] directive
+FOR directive "\n" =][=
+  IF (exist? "text") =]
+@item #[=% name (string-downcase! "%s") =][= % arg " %s" =]
+@cindex #[=% name (string-downcase! "%s") =]
+@cindex [=% name (string-downcase! "%s") =] directive
 [=text=][=
-  _ENDIF=][=
-/directive=]
+  ENDIF=][=
+ENDFOR directive=]
 @end table
 
 @node Comments
@@ -748,10 +742,8 @@ The following was extracted directly from the agParse.y source file:
 Extracted from $top_srcdir/src/agParse.y
 @end ignore
 @example
-[=_eval
-  "sed -n -e '/^definitions/,$p' $top_srcdir/src/agParse.y |
-  sed -e 's/{/@{/g' -e 's/}/@}/g' "
-  _shell=]
+[=`sed -n -e '/^definitions/,$p' $top_srcdir/src/agParse.y |
+  sed -e 's/{/@{/g' -e 's/}/@}/g' `=]
 @end example
 
 @ignore
@@ -789,11 +781,12 @@ discussion below.  If it begins with any other character (white space
 being ignored), then it is in error and processing will stop.
 
 @menu[=
-_FOR macfunc =][=
-  _IF desc _exist =]
-* [=name #:: + "#%-16s" _printf=] [=name _up=] - [=what=][=
-  _ENDIF =][=
-/macfunc=]
+FOR macfunc =][=
+  IF (exist? "desc") =]
+* [=(sprintf "%-16s" (string-append (get "name") "::"))
+  =] [=(string-upcase (get "name"))=] - [=what=][=
+  ENDIF =][=
+ENDFOR macfunc=]
 @end menu
 
 @node template id
@@ -866,46 +859,42 @@ character after the new-line that follows the end macro marker.
 #  FOR each defined function,
       this code will insert the extracted documentation =][=
 
-_FOR macfunc =][=
-  _IF desc _exist =]
+FOR macfunc =][=
+  IF (exist? "desc") =]
 
 @node [=name=]
-@section [=name _up=] - [=what=]
-@findex [=name _up=][=
-    _FOR cindex =]
+@section [=% name (string-upcase! "%s") =] - [=what=]
+@findex [=% name (string-upcase! "%s") =][=
+    FOR cindex =]
 @cindex [=cindex=][=
-    /cindex=]
+    ENDFOR cindex=]
 
 [=desc=][=
-    _IF table _exist =][=
-      _CASE table _get =][=
-      _ agexpr_func =]
-@table @samp[=
-         _FOR evalexpr =]
-@findex [=name _up=]
-@item [=name _up=]
-[=descrip=]
-[=
-         /evalexpr
-=]
-@end table[=
-      _ESAC =][=
-    _ENDIF =][=
-
-  _ENDIF "unnamed does not exist" =][=
-/macfunc=]
+  ENDIF desc exists =][=
+ENDFOR macfunc=]
 
 @ignore
+
+@table @samp[=
+FOR evalexpr =]
+@findex [=% name (string-upcase! "%s") =]
+@item [=% name (string-upcase! "%s") =]
+[=descrip=]
+[=
+ENDFOR evalexpr
+=]
+@end table[=
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Copy of generated file ${top_builddir}/src/autogen.texi
 @end ignore
 @page
 
-[=_EVAL '
+[=`
 if [ -s ${top_builddir}/src/autogen.texi ]
 then cat ${top_builddir}/src/autogen.texi
 else cat ${top_srcdir}/src/autogen.texi
-fi' _shell=]
+fi`=]
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
@@ -997,7 +986,7 @@ autoopts.texi input
 @node AutoOpts
 @chapter Automated Option Processing
 @cindex autoopts
-[=_INCLUDE autoopts/autoopts.texi=]
+[=# INCLUDE autoopts/autoopts.texi =]
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Absorbed documents from the add-ons
@@ -1018,25 +1007,35 @@ the primary reason why many people would even look into AutoGen
 at all, I decided to leave it in the list of chapters.
 
 @menu
-[=_EVAL 'for f in ${top_builddir}/*/*.menu
+[=`
+
+for f in ${top_builddir}/*/*.menu
 do
   case $f in
     *src/autogen.menu ) : ;;
-    * ) cat $f ;; esac ;  done' _shell =]
+    * ) cat $f ;;
+  esac
+done
+
+echo '
 @end menu
 
-[=_EVAL 'TOPSRC=`cd ${top_srcdir} ; pwd`
-TOPBUILD=`cd ${top_builddir} ; pwd`
+'
+
+TOPSRC=\`cd ${top_srcdir} ; pwd\`
+TOPBUILD=\`cd ${top_builddir} ; pwd\`
 for f in ${top_srcdir}/*/*.menu
 do 
    if [ "$f" = ${top_srcdir}/src/autogen.menu ] ; then : ; else
-   echo \'@page\'
-   echo \'@ignore\'
-   echo \'Copy of $f and associated .texi\'
-   echo \'@end ignore\'
-   cat `echo $f | sed \'s/\.menu$/\.texi/\'`
+   echo '@page'
+   echo '@ignore'
+   echo 'Copy of $f and associated .texi'
+   echo '@end ignore'
+   cat \`echo $f | sed 's/\\.menu$/.texi/'\`
    fi
-done' _shell =]
+done
+
+` =]
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
