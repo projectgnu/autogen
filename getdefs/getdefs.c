@@ -1,14 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.19 1999/10/28 03:36:29 bruce Exp $
+ *  $Id: getdefs.c,v 2.20 1999/10/31 00:16:42 bruce Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  * 
    Author:            Bruce Korb <autogen@linuxbox.com>
    Maintainer:        Bruce Korb <autogen@linuxbox.com>
    Created:           Mon Jun 30 15:35:12 1997
-   Last Modified:     Tue Aug  3 16:09:54 1999				    */
-/*            by:     Bruce Korb <autogen@linuxbox.com>			    */
+   Last Modified:     Tue Aug  3 16:09:54 1999                              */
+/*            by:     Bruce Korb <autogen@linuxbox.com>                     */
 
 #include <errno.h>
 #include <sys/types.h>
@@ -737,7 +737,7 @@ quoteDone:
  *  correctly reconstruct it.
  */
     char*
-emitString( char** ppzText, char* pzOut )
+emitSubblockString( char** ppzText, char sepChar, char* pzOut )
 {
     char*  pzText  = *ppzText;
     char*  pcComma;
@@ -758,10 +758,10 @@ emitString( char** ppzText, char* pzOut )
     }
 
     /*
-     *  Look for the comma that separates this entry text
+     *  Look for the character that separates this entry text
      *  from the entry text for the next attribute
      */
-    pcComma = strchr( pzText, ',' );
+    pcComma = strchr( pzText, sepChar );
     if (pcComma == (char*)NULL) {
         pcEnd = pzText + strlen( pzText );
         pcComma = pcEnd-1;
@@ -811,6 +811,7 @@ emitSubblock( char* pzDefList, char* pzText, char* pzOut )
     tSCC  zStart[] = " = {\n        ";
     tSCC  zEnd[]   = "\n    };\n";
     int   newlineDone = 1;
+    char  sepChar = ',';
 
     /*
      *  Advance past subblock name to the entry name list
@@ -820,48 +821,67 @@ emitSubblock( char* pzDefList, char* pzText, char* pzOut )
     pzOut += sizeof( zStart ) - 1;
 
     /*
+     *  See if there is an alternate separator character.
+     *  It must be a punctuation character that is not also
+     *  a quote character.
+     */
+    if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
+        sepChar = *(pzText++);
+
+    /*
      *  Loop for as long as we have text entries and subblock
      *  attribute names, ...
      */
     do  {
-        while (isspace( *pzText )) pzText++;
-        if (*pzText == NUL)
-            break;
-
         /*
-         *  IF the text is just a comma, then we skip the entry
+         *  IF the first character is the separator,
+         *  THEN this entry is skipped.
          */
-        if (*pzText == ',') {
+        if (*pzText == sepChar) {
             pzText++;
             while ((! isspace( *pzDefList )) && (*pzDefList != NUL))
                 pzDefList++;
+            continue;
+        }
 
-        } else {
+        /*
+         *  Copy out the attribute name
+         */
+        for (;;) {
             if (! newlineDone) {
                 strcpy( pzOut, zStart + 4 );
                 pzOut += sizeof( zStart ) - 5;
             }
 
-            /*
-             *  Copy out the attribute name
-             */
-            for (;;) {
-                *pzOut++ = *pzDefList++;
-                if (*pzDefList == ' ') {
-                    pzDefList++;
-                    break;
-                }
-                if (*pzDefList == NUL)
-                    break;
+            *pzOut++ = *pzDefList++;
+            if (*pzDefList == ' ') {
+                pzDefList++;
+                break;
             }
-
-            /*
-             *  Copy out the assignment operator and emit the string
-             */
-            *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
-            pzOut = emitString( &pzText, pzOut );
-            newlineDone = 0;
+            if (*pzDefList == NUL)
+                break;
         }
+
+        /*
+         *  Skip leading white space in the attribute
+         */
+        while (isspace( *pzText )) pzText++;
+        if ((*pzText == NUL) || (*pzText == sepChar)) {
+            *pzOut++ = ';';
+            *pzOut++ = '\n';
+            if (*pzText == NUL)
+                break;
+            pzText++;
+            continue;
+        }
+
+        /*
+         *  Copy out the assignment operator and emit the string
+         */
+        *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
+        pzOut = emitSubblockString( &pzText, sepChar, pzOut );
+        newlineDone = 0;
+
     } while (isalpha( *pzDefList ));
     strcpy( pzOut, zEnd );
     return pzOut + sizeof( zEnd ) - 1;
