@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.4 1998/07/02 23:00:26 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.5 1998/07/08 17:29:04 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -857,8 +857,81 @@ definitions.  The first describes the program and option
 processing attributes, the second group describes the name,
 usage and other attributes related to each option.
 
-[=_EVAL "sed -n '/^@menu/,/^@end ignore/p' $top_srcdir/autoopts/options.tpl |
-sed -e 's/`/@code{/g' -e \"s/'/}/g\"" _shell =]
+@menu
+* program attributes::    Program Description and Attributes
+* option attributes::     Option Attributes
+* standard options::      Automatically Supported Options
+* example options::       Autogen's option definitions
+@end menu
+
+[=_EVAL "sed -n '/^@node program attributes/,/^@ignore/p' \
+        $top_srcdir/autoopts/options.tpl |
+sed -e's/`/@code{/g' \
+    -es/\\\'/}/g     \
+    -e's/^\\([a-zA-Z]\\)/@item \\1/'  \
+    -e 's/^[ \t]*//' " _shell =]
+@end ignore
+
+@node standard options
+@subsection Automatically Supported Options
+@cindex standard options
+
+Autoopts provides automated support for four options.
+@code{help} and @code{more-help} are always provided.
+@code{version} is provided if @code{version} is defined
+in the option definitions.  @code{save-opts} is provided
+if @code{homerc} is defined.
+
+Below are the option names and flag values.
+The flag characters are activated iff at least one user-defined
+option uses a flag value.
+
+@table @samp
+@item help -?
+This option will immediately invoke the @code{USAGE()} procedure
+and display the usage line, a description of each option with
+its description and option usage information.  This is followed
+by the contents of the definition of the @code{detail} text macro.
+
+@item more-help -!
+This option is identical to the @code{help} option, except that
+it also includes the contents of the @code{detail-file} file
+(if provided and found), plus the output is passed through
+a pager program.  (@code{more} by default, or the program identified
+by the @code{PAGER} environment variable.)
+
+@item version -v
+This will print the program name, title and version.
+If it is followed by the letter @code{c} and
+a value for @code{copyright} and @code{owner} have been provided,
+then the copyright will be printed, too.
+If it is followed by the letter @code{n}, then the full
+copyright notice (if available) will be printed.
+
+@item save-opts ->
+This option will cause the option state to be printed in
+RC/INI file format when option processing is done but not
+yet verified for consistency.  The program will terminate
+successfully without running when this has completed.
+
+The output file will be the RC/INI file name (default or provided
+by @code{rcfile}) in the last directory named in a @code{homerc}
+definition
+@end table
+
+@node example options
+@subsection Autogen's option definitions
+@cindex example options
+
+Below is the option definition file used by autogen.
+It will cause to be generated the interface and code files described
+in the next two sections and the usage information
+sampled above in the chapter on "Running the program".
+
+@example
+[=_EVAL "sed '-es/@/@@/g' '-es/{/@{/g' '-es/}/@}/g' $top_srcdir/src/opts.def"
+        _shell=]
+@end example
 
 @node opts.h
 @section User Interface
