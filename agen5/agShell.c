@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.5 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: agShell.c,v 1.6 2000/06/21 14:46:06 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -40,10 +40,6 @@
 
 #include "autogen.h"
 
-#ifndef HAVE_SIGSEND
-#  include <compat/sigsend.c>
-#endif
-
 /*
  *  Dual pipe opening of a child process
  */
@@ -68,7 +64,7 @@ closeServer( void )
     if (serverId == NULLPROCESS)
         return;
 
-    sigsend( P_PID, (id_t) serverId, SIGKILL );
+    kill( serverId, SIGKILL );
     serverId = NULLPROCESS;
     fclose( serverPair.pfRead );
     fclose( serverPair.pfWrite );

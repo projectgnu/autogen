@@ -2,6 +2,7 @@
 
 	* agen5/expString.c( ag_scm_prefix ): return the result SCM instead
 	of the source SCM  :-}
+	* agen5/agShell.c(closeServer): use kill(2) instead of sigsend(3)
 
 2000-05-15  Bruce Korb  <bkorb@gnu.org>
 
