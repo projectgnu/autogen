@@ -8,7 +8,7 @@ dnl Created:	       Sun Nov 15 23:37:14 1998
 dnl Last Modified:     Mon May 17 01:02:44 1999				
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 3.1 2002/08/24 03:17:33 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 3.2 2002/09/11 03:30:32 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl 
 dnl Code:
@@ -16,7 +16,7 @@ dnl Code:
 # serial 1
 
 dnl AG_PATH_AUTOOPTS([MIN-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
-dnl Test for AUTOOPTS, and define AUTOGEN, AUTOOPTS_CFLAGS, AUTOGEN_TPLIB
+dnl Test for AUTOOPTS, and define AUTOGEN, AUTOOPTS_CFLAGS, AUTOGEN_LDFLAGS
 dnl      and AUTOOPTS_LIBS.
 dnl
 AC_DEFUN(AG_PATH_AUTOOPTS,
@@ -56,7 +56,7 @@ AC_ARG_ENABLE(opts-test,
   else
     AUTOGEN=`$AUTOOPTS_CONFIG $autoopts_config_args --autogen`
     AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --cflags`
-    AUTOGEN_TPLIB=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
+    AUTOGEN_LDFLAGS=`$AUTOOPTS_CONFIG $autoopts_config_args --pkgdatadir`
     AUTOOPTS_LIBS=`$AUTOOPTS_CONFIG $autoopts_config_args --libs`
 changequote(,)dnl
     autoopts_config_version=`$AUTOOPTS_CONFIG $autoopts_config_args --version`
@@ -248,7 +248,7 @@ _EOF_
   fi
   AC_SUBST(AUTOGEN)
   AC_SUBST(AUTOOPTS_CFLAGS)
-  AC_SUBST(AUTOGEN_TPLIB)
+  AC_SUBST(AUTOGEN_LDFLAGS)
   AC_SUBST(AUTOOPTS_LIBS)
   rm -f confopts.def conf.optstest
 ])
