@@ -1,4 +1,4 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   Thu Aug  5 10:18:42 1999				      
-##            by:   Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:   $Date: 2000/09/16 16:04:26 $
+##            by:   Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.26 2000/09/16 07:31:40 bkorb Exp $
+## $Id: Makefile.am,v 1.27 2000/09/16 16:04:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -31,7 +31,7 @@ MAINTAINERCLEANFILES = Makefile.in
 GEN_SRC = opts.c opts.h directive.h functions.h expr.ini expr.h \
 	defParse.c defParse.h autogen.1 autogen.menu autogen.texi proto.h
 
-pkgdata_DATA	= schemedef.scm
+pkgdata_DATA	= schemedef.scm fsm.tpl
 man_MANS        = autogen.1
 
 EXTRA_DIST	= directive.tpl functions.tpl opts.def snarf.tpl pseudo.x \
