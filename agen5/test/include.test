@@ -9,42 +9,44 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: include.test,v 1.2 1999/10/28 03:36:29 bruce Exp $
+# $Id: include.test,v 1.3 2000/03/11 19:45:21 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test "$srcdir" = "$0" && srcdir=.
     test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
 
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-# Create the files we need in the test environment
-cat > $testname.def <<EOF
-autogen definitions $testname;
-test_name = $testname;
-EOF
-
-cat > $testname.in <<'_EOF_'
-((< autogen template test >))
-testing `((<test_name>))' output.
+echo creating $testname.in
+cat > $testname.in <<_EOF_
+<= AutoGen5 Template test =>
+Verify:  <= \`echo This is an $testname test\` =>
 _EOF_
 
+echo creating $testname.tpl
 cat > $testname.tpl <<_EOF_
-<= autogen template test =>
-<=_INCLUDE $testname.in=>
+[= AutoGen5 Template test =]
+[= Include "$testname.in" =]
 _EOF_
 
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating $testname.out
 # this is the output we should expect to see
-cat > $testname.out <<'_EOF_'
-testing `include' output.
-
+cat > $testname.out <<_EOF_
+Verify:  This is an $testname test
 _EOF_
 
-$AUTOGEN || exit 1
+AGEN="$AGEN --no-def -T $testname.tpl -b $testname"
+echo $AGEN
+$AGEN || failure $AGEN failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
+cleanup
 # end of include.test
