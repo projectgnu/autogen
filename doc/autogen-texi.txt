@@ -2482,6 +2482,15 @@ will be @i{GNU-ish style}.  Either default may be overridden by the user with
 the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
 or @code{autoopts}, it will alter the style appropriately.  This attribute
 will conflict with the @code{usage} attribute.
+
+@cindex reorder-args
+@item reorder-args
+Some applications traditionally require that the command operands be intermixed
+with the command options.  In order to handle that, the arguments must be
+reordered.  If you are writing such an application, specify this global option.
+All of the options (and any associated option arguments) will be brought to
+the beginning of the argument list.  New applications should not use this
+feature, if at all possible.
 @end table
 
 @node option attributes

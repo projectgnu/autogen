@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.23 2003/11/23 02:07:44 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.24 2003/11/23 06:24:43 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -217,6 +217,13 @@ or by a single hyphen and the flag character.\n";
         tSCC zNumberOpt[]  =
             "The '-#<number>' option may omit the hash char\n";
         fputs( zNumberOpt, option_usage_fp );
+    }
+
+    if ((pOptions->fOptSet & OPTPROC_REORDER) != 0) {
+        tSCC zReorder[]  =
+            "Operands and options may be intermixed.  "
+            "They will be reordered.\n";
+        fputs( zReorder, option_usage_fp );
     }
 
     if (pOptions->pzExplain != NULL)

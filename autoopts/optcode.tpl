@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.21 2003/08/22 03:19:27 bkorb Exp $
+#$Id: optcode.tpl,v 3.22 2003/11/23 06:24:43 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -357,7 +357,7 @@ tOptions [=(. pname)=]Options = {
                                             (exist? "flag.disable"))     =]
     + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
-    + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-opts")      =]
+    + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
     + OPTPROC_GNUUSAGE[=   ENDIF=] ),
     0, NULL,

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-11-22 21:20:18 bkorb"
+# Time-stamp:        "2003-11-22 22:05:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 3.7 2003/11/23 05:21:21 bkorb Exp $
+# $Id: errors.test,v 3.8 2003/11/23 06:24:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,6 +32,7 @@ argument="arg ..." \
 long_opts="yes" \
 ${SHELL-sh} -x ${stdopts} option second:fumble
 
+echo 'reorder-args;' >> ${testname}.def
 sed '/"second"/a\
     must-set;' ${testname}.def > ${testname}.tmp
 mv -f ${testname}.tmp ${testname}.def
@@ -63,6 +64,7 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
 
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+Operands and options may be intermixed.  They will be reordered.
 
 The following option preset mechanisms are supported:
  - reading file errorsRC/.test_errorsrc
@@ -111,7 +113,6 @@ sed '/second option/a\
     max = "10";' ${testname}.def > XX
 mv -f XX ${testname}.def
 cat >> ${testname}.def << '_EOF_'
-reorder-opts;
 flag = {
     name = "another";
     max  = '5';

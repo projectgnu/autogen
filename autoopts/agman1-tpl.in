@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-07-07 19:12:39 bkorb"
+## Time-stamp:      "2003-11-22 22:03:02 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.24 2003/07/11 01:03:13 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.25 2003/11/23 06:24:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -33,9 +33,9 @@ AutoGen5 template man=%s.1
 [+: % prog-name (string-downcase! "%s") :+] \- [+: prog-title :+]
 .SH SYNOPSIS
 .B [+:
-  (define tmp-str   "")
   (define use-flags (if (exist? "flag.value") #t #f))
   (string-downcase! (get "prog-name"))
+
 :+][+:
     ;; * * * * * * * * * * * * * * * * * * * * * * * * *
     ;;
@@ -116,7 +116,13 @@ All arguments are named options.[+:
   IF (exist? "argument") :+]
 .br
 .in +8
-[+:argument:+][+:
+[+: argument :+][+:
+
+    IF (exist? "reorder-args") :+]
+.br
+Operands and options may be intermixed.  They will be reordered.
+[+: ENDIF :+][+:
+
   ELIF (or (exist? "long_opts") use-flags) :+]
 .PP
 All arguments must be options.[+:
