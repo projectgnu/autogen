@@ -46,9 +46,6 @@
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
 #include "autogen.h"
-#ifdef DEBUG_ENABLED
-#  define DEBUG
-#endif
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 

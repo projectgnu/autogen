@@ -116,7 +116,7 @@ cat > pkginfo.tpl <<- EOF
 	EOF
 
 cd ${agdir}
-${AGEXE} --writable -L${pkgdst} -Tpkginfo.tpl opts.def
+${AGexe} --writable -L${pkgdst} -Tpkginfo.tpl opts.def
 mv -f pkginfo ${pkgdst}/.
 cd ${pkgdst}
 rm -f pkginfo.tpl

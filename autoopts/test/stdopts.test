@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2004-07-09 12:02:27 bkorb"
+# Time-stamp:        "2004-11-01 14:38:50 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 3.7 2004/10/30 20:43:56 bkorb Exp $
+# $Id: stdopts.test,v 3.8 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,13 +23,13 @@ set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
-cat > $testname.def <<_EOF_
+echo "creating ${testname}.def in `pwd`"
+cat > ${testname}.def <<_EOF_
 
 AutoGen Definitions options;
 
-prog-name = test_$testname;
-prog-title = "$testname test";
+prog-name = test_${testname};
+prog-title = "${testname} test";
 test-main;
 long-opts;
 
@@ -46,8 +46,8 @@ compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hbase <<'_EOF_'
 test_stdopts - stdopts test
 USAGE:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 
@@ -70,24 +70,28 @@ The valid "verbose" option keywords are:
   silent quiet brief informative verbose
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+#  When building with DEBUG set, we get an unanticipated option:
+#
+grep -v 'run program with debugging info' ${testname}.help > ${testname}.hres
 
-./$testname --verbose=exp > /dev/null 2>&1 && \
-  failure $testname accepted ambiguous keyword
+cmp -s ${testname}.h[br]* || \
+  failure "`diff ${testname}.h[br]*`"
 
-./$testname --verbose=inf > $testname.out || \
-  failure $testname did not handle its options
+./${testname} --verbose=exp > /dev/null 2>&1 && \
+  failure ${testname} accepted ambiguous keyword
 
-cat > $testname.oex <<_EOF_
+./${testname} --verbose=inf > ${testname}.out || \
+  failure ${testname} did not handle its options
+
+cat > ${testname}.oex <<_EOF_
 OPTION_CT=1
 export OPTION_CT
 TEST_STDOPTS_VERBOSE='informative'
 export TEST_STDOPTS_VERBOSE
 _EOF_
 
-cmp -s $testname.o* || \
-  failure "`diff $testname.o??`"
+cmp -s ${testname}.o* || \
+  failure "`diff ${testname}.o??`"
 
 cleanup
 # end of keyword.test

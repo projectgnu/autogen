@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2004-02-01 12:28:48 bkorb"
+# Time-stamp:        "2004-11-01 14:49:46 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.15 2004/10/30 20:43:56 bkorb Exp $
+# $Id: error.test,v 3.16 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -68,9 +68,9 @@ cmp -s  ${testname}.err  ${testname}.out1 || \
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 2 # # # # # # #
 
-echo creating ${testname}.out2
+echo creating ${testname}.base2
 # this is the output we should expect to see
-cat > ${testname}.out2 <<'_EOF_'
+cat > ${testname}.base2 <<'_EOF_'
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
 Error in template error.tpl, line 13
@@ -86,8 +86,10 @@ ${AGexe} --no-def -T${testname}.tpl --base=${testname} \
   2> ${testname}.err2 \
   && failure Unexpected success for AutoGen
 
-cmp -s ${testname}.err2 ${testname}.out2 || \
-  failure "actual->expected `diff -c ${testname}.err2 ${testname}.out2`"
+egrep -v 'Giving up in ' ${testname}.err2 > ${testname}.res2
+
+cmp -s ${testname}.base2 ${testname}.res2 || \
+  failure "actual->expected `diff -c ${testname}.base2 ${testname}.res2`"
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 3 # # # # # # #
 
@@ -152,14 +154,15 @@ ${AGexe} -T ${testname}.tpl5 -b ${testname} --no-defin \
   2> ${testname}.out5 > /dev/null
  [ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
 
-cat > ${testname}.samp5 <<'EOF'
+egrep -v 'Giving up in functions' ${testname}.out5 > ${testname}.samp5
+cat > ${testname}.base5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:
 	ENDIF
 EOF
 
-cmp -s  ${testname}.samp5  ${testname}.out5 || \
-  failure "`diff -c ${testname}.samp5 ${testname}.out5`"
+cmp -s  ${testname}.base5  ${testname}.samp5 || \
+  failure "`diff -c ${testname}.base5 ${testname}.samp5`"
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 

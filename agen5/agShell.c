@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.24 2004/02/27 18:45:01 bkorb Exp $
+ *  $Id: agShell.c,v 3.25 2004/11/02 04:03:59 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -142,16 +142,20 @@ serverSetup( void )
                 "&& (emulate sh) >/dev/null 2>&1\n"
             "then\n"
             "  emulate sh\n"
-            "  NULLCMD=:\n"
-            "else if test -n \"${BASH_VERSION+set}\" "
-                  "&& (set -o posix) >/dev/null 2>&1\n"
+            "  NULLCMD=:\n\n"
+            "else\n  if test -n \"${BASH_VERSION+set}\" "
+                       "&& (set -o posix) >/dev/null 2>&1\n"
             "then\n"
             "  set -o posix\n"
             "fi ; fi\n"
 
             "for f in 1 2 5 6 7 13 14\n"
             "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done\n" "unalias cd 2>/dev/null >&2\n" "AG_pid=\000.........\n";
+            "done\n"
+            "test -n \"${CDPATH}\" && { CDPATH=''\n"
+            "  unset CDPATH 2>&null\n}\n"
+            "unalias cd 2>/dev/null >&2\n"
+            "AG_pid=\000.........\n";
         static char* pzPid = NULL;
         char* pz;
         pzLastCmd = zTrap;

@@ -39,7 +39,7 @@ cd ${builddir}
 AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
 specfile=autogen-${AG_VERSION}.spec
 agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
-${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
+${AGexe} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
 cd ${HOME}
 rpmbuild -ba ${builddir}/${specfile} || exit 1

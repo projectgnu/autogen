@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2003-05-18 19:06:25 bkorb"
+# Time-stamp:      "2004-11-01 15:33:52 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: html.test,v 3.8 2004/10/30 20:43:56 bkorb Exp $
+# $Id: html.test,v 3.9 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -72,7 +72,7 @@ CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
 export CONTENT_LENGTH REQUEST_METHOD QUERY_STRING
 
-${AGexe} > ${testname}.test || \
+${AGexe} | egrep -v '^in state' > ${testname}.test || \
   failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
@@ -100,8 +100,8 @@ Failing Guile command:  = = = = =
 
 =================================
 _EOF_
-
-cmp -s ${testname}-2.samp ${testname}-2.test || \
+egrep -v '^in state' ${testname}-2.test > ${testname}-2.res
+cmp -s ${testname}-2.samp ${testname}-2.res || \
   failure "`diff ${testname}-2.samp ${testname}-2.test`"
 
 cleanup

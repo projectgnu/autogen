@@ -1,13 +1,13 @@
 #! /bin/ksh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# Time-stamp:        "2004-09-29 18:48:58 bkorb"
+# Time-stamp:        "2004-11-01 11:58:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 3.11 2004/10/03 02:56:23 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 3.12 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;
@@ -21,7 +21,7 @@ then
   exit 1
 fi
 
-tmpag=$(mktemp -d $HOME/tmp/ZZXXXXXX.d 2>/dev/null)
+tmpag=$( (mktemp -d $HOME/tmp/ZZXXXXXX.d) 2>/dev/null)
 test -z "${tmpag}" && tmpag=$HOME/tmp/ZZ$$.d && mkdir -p ${tmpag}
 
 cd ${tmpag} || exit 1

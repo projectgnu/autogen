@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2004-10-30 11:33:27 bkorb"
+# Time-stamp:      "2004-11-01 16:32:44 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.7 2004/10/30 20:43:56 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.8 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -37,6 +37,7 @@
 # can be generated after checkout using this bootstrap procedure.
 
 # Code:
+VERBOSE=true
 if [ -z "${VERBOSE}" ]
 then VERBOSE=false ; VERBOSE_ARG=""
 else VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ; fi
@@ -44,8 +45,6 @@ export VERBOSE VERBOSE_ARG
 SHELL=${SHELL:-$(which ksh 2>/dev/null)}
 test -z "${SHELL}" && SHELL=/bin/ksh
 export SHELL
-
-set -e
 
 # Figure out the absolute path to the working directory.
 #
@@ -69,6 +68,8 @@ srcdir=$(cd ${srcdir} ; pwd)
 #
 MISSING="${wd}/missing"
 export MISSING
+
+set -e
 
 #  Check for AutoGen version 5.
 #
@@ -218,8 +219,14 @@ _EOF_
 
   # Execute this in a sub-shell so we don't lose our start location.
   (
+    set -x
     cd $top
     echo bootstrapping in `pwd`
+
+    # test -f Make.def && \
+    #    ${AGexe} --show-shell --show-defs -bMakefile Make.def
+    test -f Make.def && \
+       ${AGexe} -bMakefile Make.def
 
     # remove any stale config.cache
     doit rm -f config.cache

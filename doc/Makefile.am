@@ -9,7 +9,7 @@
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.30 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 3.31 2004/11/02 04:03:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -72,7 +72,7 @@ TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'
 texi         : texi-stamp
 autogen.texi : texi
 
-texi-stamp : autogen.def $(AGEXE) $(CLexe)
+texi-stamp : autogen.def $(AGexe) $(CLexe)
 	$(AG_ENV) ; \
 	CC="$(CC)" CFLAGS='$(CFLAGS)' \
 	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \

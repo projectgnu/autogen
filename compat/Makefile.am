@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-27 19:50:36 bkorb"
+## Time-stamp:      "2004-11-01 08:40:35 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2004/11/02 04:03:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -18,7 +18,6 @@ EXTRA_DIST = bootstrap.dir compat.h libgen.h pathfind.c strftime.c \
 
 GEN_SRC    = strsignal.h
 MAINTAINERCLEANFILES = Makefile.in
-AGEXE      = $(top_builddir)/src/autogen
 
 all:
 	:

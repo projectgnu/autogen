@@ -1,18 +1,19 @@
-#! /bin/sh
+#! /bin/ksh
 #  -*- Mode: Shell-script -*-
 # for.test --- test functionality of `for' function
 #
-# Time-stamp:        "2004-10-01 19:24:54 bkorb"
+# Time-stamp:        "2004-11-01 12:20:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2004/10/02 02:49:07 $
+# Last Modified:     $Date: 2004/11/02 04:03:59 $
 #            by: bkorb
 #
-# $Id: daemon.test,v 3.1 2004/10/02 02:49:07 bkorb Exp $
+# $Id: daemon.test,v 3.2 2004/11/02 04:03:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
-tdir=$(mktemp -d $PWD/.daemon-XXXXXX.d 2>/dev/null) || {
+tdir=$( (mktemp -d $PWD/.daemon-XXXXXX.d) 2>/dev/null)
+test -z "${tdir}" && {
   tdir=$PWD/.daemon-$$.d
   rm -rf ${tdir}
   mkdir ${tdir} || exit 1

@@ -1,9 +1,9 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 3.1 2004/10/23 18:19:13 bkorb Exp $
+# $Id: announce.txt,v 3.2 2004/11/02 04:03:59 bkorb Exp $
 
-tfile=$(mktemp ./agaXXXXXX.txt) 2>/dev/null
+tfile=$( (mktemp ./agaXXXXXX.txt) 2>/dev/null )
 test -z "${tfile}" && tfile=aga$$.txt
 
 eval $(egrep '^A[GO]_[A-Z0-9_]*=' VERSION)

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.36 2004/10/11 23:33:34 bkorb Exp $
+ *  $Id: autogen.h,v 3.37 2004/11/02 04:03:59 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -468,7 +468,11 @@ MODE v2c_t p2p VALUE( { NULL } );
 #else
 # define AG_ABEND(s)  ag_abend(s)
 #endif
-#undef  DEBUG
+#ifdef DEBUG_FSM
+# define DEBUG
+#else
+# undef  DEBUG
+#endif
 
 #define AG_ABEND_IN(t,m,s) \
     STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)

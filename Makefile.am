@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-07-24 12:45:15 bkorb"
+## Time-stamp:      "2004-11-01 08:50:22 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.20 2004/08/12 03:29:15 bkorb Exp $
+## $Id: Makefile.am,v 3.21 2004/11/02 04:03:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -52,10 +52,12 @@ pkg         : package
 package     :
 	cd pkg && $(MAKE) $@ pkgtype="$(pkgtype)"
 
+if HAVE_XML_LIB
+release     : distcheck
+else
 release     :
-if !HAVE_XML_LIB
 	echo "Distributions cannot be made with a partial build" >&2
 	exit 1
 endif
-	$(MAKE) distcheck
+
 ## Makefile.am ends here
