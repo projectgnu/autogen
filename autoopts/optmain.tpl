@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.11 2003/05/02 01:52:58 bkorb Exp $
+# $Id: optmain.tpl,v 3.12 2003/05/06 02:14:25 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -98,9 +98,9 @@ main( int argc, char** argv )
      *  Stash a pointer to the options we are generating.
      *  `genshellUsage()' will use it.
      */
-    pShellParseOptions = &[=prog-name=]Options;
+    pShellParseOptions = &[=(. pname)=]Options;
     (void)optionProcess( &genshelloptOptions, argc, argv );
-    putShellParse( &[=prog-name=]Options );[=
+    putShellParse( &[=(. pname)=]Options );[=
 
   ELIF
       ;;  Also check to see if the user supplies all the code for main()
@@ -108,22 +108,15 @@ main( int argc, char** argv )
 [= main-text =][=
 
   ELSE=]
-    (void)optionProcess( &[=prog-name=]Options, argc, argv );[=
+    (void)optionProcess( &[=(. pname)=]Options, argc, argv );[=
 
-    IF  ;;  the user is specifying a routine to call, then call that procedure
-
-        (> (string-length (get "test-main")) 3) =]
-
+    (set! opt-name (get "test-main"))
+    (if (<= (string-length opt-name) 3)
+        (set! opt-name "putBourneShell")) =]
     {
-        void [=test-main=]( tOptions* );
-        [=test-main=]( &[=prog-name=]Options );
+        void [= (. opt-name) =]( tOptions* );
+        [= (. opt-name) =]( &[=(. pname)=]Options );
     }[=
-
-   ELSE  Call our library procedure for emitting shell results
-    =]
-    putBourneShell( &[=prog-name=]Options );[=
-
-    ENDIF =][=
   ENDIF=]
     return EXIT_SUCCESS;
 }
@@ -141,40 +134,11 @@ DEFINE declare-option-callbacks      =][=
 
    #  For test builds, no need to call option procs  =][=
 
-  IF (exist? "test-main")            =]
+  IF (. make-test-main)                =]
 #if ! defined( [=(. main-guard)=] )[=
-  ENDIF
+  ENDIF                              =][=
 
-  =]
-/*
- *  Procedures to call when option(s) are encountered
- */[=
-
-
-  FOR flag                           =][=
-    (set-flag-names)                 =][=
-
-    CASE arg-type                    =][=
-    =*  key                          =]
-static tOptProc doOpt[=(. cap-name)  =];[=
-    =*  bool                         =][=
-    =*  num                          =][=
-      IF (exist? "arg-range")        =]
-static tOptProc doOpt[=(. cap-name)  =];[=
-      ENDIF                          =][=
-    *                                =][=
-      IF (exist? "call-proc")        =]
-extern tOptProc [=(get "call-proc")  =];[=
-
-      ELIF (or (exist? "extract-code")
-               (exist? "flag-code")) =]
-static tOptProc doOpt[=(. cap-name)  =];[=
-
-      ENDIF                          =][=
-    ESAC                             =][=
-  ENDFOR                             =][=
- 
-  IF (exist? "test-main")            =][=
+  IF (. make-test-main)            =][=
 
      # "A test environment is to be generated" =]
 
@@ -183,32 +147,32 @@ static tOptProc doOpt[=(. cap-name)  =];[=
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
  */[=
-    FOR flag            =][=
+    FOR flag                    =][=
     (set! cap-name (string->c-name! (string-capitalize! (get "name"))) ) =][=
 
-      IF (exist? "call-proc") =]
-#define [=(get "call-proc")   =] [=
+      IF (exist? "call-proc")   =]
+#define [=(get "call-proc")     =] [=
           IF (~ (get "max") "1{0,1}")
-                        =]NULL[=
-          ELSE          =]stackOptArg[=
-          ENDIF         =][=
+                                =]NULL[=
+          ELSE                  =]stackOptArg[=
+          ENDIF                 =][=
 
       ELIF (or (exist? "flag-code")
                (exist? "extract-code")
                (exist? "arg-range")) =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
-                        =]NULL[=
-          ELSE          =]stackOptArg[=
-          ENDIF         =][=
+                                =]NULL[=
+          ELSE                  =]stackOptArg[=
+          ENDIF                 =][=
 
       ELIF (=* (get "arg-type") "key")  =]
 static tOptProc doOpt[=(. cap-name)  =];[=
-      ENDIF             =][=
+      ENDIF                     =][=
 
-    ENDFOR flag         =]
+    ENDFOR flag                 =]
 #endif /* defined( [=(. main-guard)=] ) */[=
-  ENDIF (exist? "test-main") =]
+  ENDIF (. make-test-main)      =]
 [=
 
 ENDDEF
@@ -347,7 +311,7 @@ DEFINE define-option-callbacks  =][=
            (exist? "extract-code")
            (exist? "arg-range") ) =][=
 
-      IF (exist? "test-main") =]
+      IF (. make-test-main) =]
 
 #if ! defined( [= (. main-guard) =] )[=
 
@@ -369,7 +333,7 @@ DEFINE define-option-callbacks  =][=
       ENDIF =]
 }[=
 
-  IF (exist? "test-main") =]
+  IF (. make-test-main) =]
 
 #endif /* ! defined [= (. main-guard) =] */[=
 

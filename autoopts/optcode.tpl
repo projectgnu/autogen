@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.15 2003/05/02 01:01:59 bkorb Exp $
+#$Id: optcode.tpl,v 3.16 2003/05/06 02:14:25 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -28,37 +28,51 @@ tSCC zCopyrightNotice[] =
        [=
   CASE (get "copyright.type") =][=
 
-    =  gpl  =][=(kr-string (gpl  (. prog-name) "" ))=][=
-
-    = lgpl  =][=(kr-string (lgpl (. prog-name) (get "copyright.owner")
-                                "" ))=][=
-
-    =  bsd  =][=(kr-string (bsd  (. prog-name) (get "copyright.owner")
-                                "" ))=][=
-
-    = note  =][=(kr-string (get "copyright.text"))=][=
-
+    =  gpl  =][=(kr-string (gpl  prog-name "" ))=][=
+    = lgpl  =][=(kr-string (lgpl prog-name (get "copyright.owner") "" ))=][=
+    =  bsd  =][=(kr-string (bsd  prog-name (get "copyright.owner") "" ))=][=
+    = note  =][=(kr-string (get  "copyright.text"))=][=
     *       =]"Copyrighted"[=
 
   ESAC =];[=
 
 ENDIF "copyright notes"=]
-[=
+extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
+  (exist? "homerc") ", doLoadOpt")   =][=
 
-IF (exist? "flag.call-proc")
+  (define proc-list "doUsageOpt\n")  =][=
 
-=]
-[= (shell (string-append
-"columns -I16 --first='extern tOptProc ' -S, <<_EOF_\n"
-(join "\n" (stack "flag.call-proc")) "\n_EOF_" )) =];[=
+  FOR flag                           =][=
+    (set-flag-names)                 =][=
 
-ENDIF
+    CASE arg-type                    =][=
+    =*  key                          =][=
+        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
+    =*  bool                         =][=
+    =*  num                          =][=
+      IF (exist? "arg-range")        =][=
+        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
+      ENDIF                          =][=
+    *                                =][=
+      IF (exist? "call-proc")        =][=
+        (set! proc-list (string-append proc-list (get "call-proc") "\n")) =][=
 
-=]
+      ELIF (or (exist? "extract-code")
+               (exist? "flag-code")) =][=
+        (set! proc-list (string-append proc-list "doOpt" cap-name "\n")) =][=
+
+      ENDIF                          =][=
+    ESAC                             =][=
+  ENDFOR    flag
+
+=][=
+
+(shell (string-append
+"columns -I16 --first=';\nstatic tOptProc ' -S, --spread=1 <<_EOF_\n"
+         proc-list "_EOF_" )) =];
 extern tUsageProc [=
-  (define usage-proc (if (exist? "usage") (get "usage") "optionUsage"))
+  (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
-
 [=
 IF (exist? "include") =]
 /*
@@ -128,7 +142,6 @@ tSCC zSave_Opts_Name[] = "save-opts";
 /*
  *  Load_Opts option description:
  */
-extern tOptProc doLoadOpt;
 tSCC    zLoad_OptsText[]     = "Load options from an rc file";
 tSCC    zLoad_Opts_NAME[]    = "LOAD_OPTS";
 tSCC    zNotLoad_Opts_Name[] = "no-load-opts";
@@ -145,27 +158,19 @@ IF (or (exist? "flag.flag-code")
 
   invoke declare-option-callbacks  =][=
 
-ENDIF   =]
-/*
- *  These are always callable, whether
- *  [=(. main-guard)=] is defined or not
- */
-static tOptProc doUsageOpt;[=
+ENDIF   =][=
+
 IF (exist? "version")       =][=
-  IF (exist? "test-main")   =]
-#ifdef [=(. main-guard)=]
-  extern tOptProc  doVersionStderr;
+  IF (. make-test-main)       =]
+#ifdef [=(. main-guard)     =]
 # define DOVERPROC doVersionStderr
 #else
-  extern tOptProc  doVersion;
 # define DOVERPROC doVersion
 #endif /* [=(. main-guard)=] */[=
   ELSE  =]
-extern  tOptProc  doVersion;
 #define DOVERPROC doVersion[=
   ENDIF =][=
 ENDIF =]
-extern tOptProc doPagedUsage;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -319,23 +324,17 @@ ELSE                    =]
 ENDIF                   =][=
 
 IF (exist? "detail")    =]
-
 tSCC    zDetail[]     = [= (patch-text "detail") =];[=
 
 ELSE                    =]
-
-#define zDetail NULL[=
-ENDIF                   =]
-
-extern  tUsageProc [= (. usage-proc) =];[=
+#define zDetail         NULL[=
+ENDIF                   =][=
 
 IF (exist? "version")   =]
-
 tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
 
 ELSE                    =]
-
-#define zFullVersion NULL[=
+#define zFullVersion    NULL[=
 ENDIF                   =]
 
 tOptions [=(. pname)=]Options = {
@@ -399,7 +398,7 @@ IF (or (exist? "flag.flag-code")
 
 ENDIF                              =][=
 
-IF (exist? "test-main")            =][=
+IF (. make-test-main)                =][=
 
   IF (exist? "guile-main")         =][=
      (error "both ``test-main'' and ``guile-main'' have been defined") =][=
@@ -409,8 +408,7 @@ IF (exist? "test-main")            =][=
   ENDIF                            =][=
 
 ELIF (exist? "guile-main")         =][=
-  `echo invoking build-guile-main >&2` =][=
-     invoke build-guile-main       =][=
+  invoke build-guile-main          =][=
 
 ENDIF "test/guile main"
 

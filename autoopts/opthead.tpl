@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.9 2003/04/04 04:44:54 bkorb Exp $
+# $Id: opthead.tpl,v 3.10 2003/05/06 02:14:25 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
@@ -58,11 +58,7 @@ ENDIF (exist? version) =]
     (up-c-name "flag[].name") =] )
  */[=
 (sprintf "
-#ifdef __STDC__
-#  define       %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_ ## n]
-#else
-#  define       %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_/**/n]
-#endif
+#define         %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_ ## n]
 #define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
 #define      %1$sOPT_ARG(n) (%1$sDESC(n).pzLastArg)
 #define    STATE_%1$sOPT(n) (%1$sDESC(n).fOptState & OPTST_SET_MASK)

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.8 2003/05/02 01:52:58 bkorb Exp $
+# $Id: optlib.tpl,v 3.9 2003/05/06 02:14:25 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -322,9 +322,8 @@ static const int
          immed-disable  "OPTST_DISABLE_IMM | " =][=
          must-set       "OPTST_MUST_SET | "    =][=
          ? enabled      "OPTST_INITENABLED"
-                        "OPTST_DISABLED"    =] | [=
-         ? no-preset    "OPTST_NO_INIT"
-                        "OPTST_INIT"           =])[=
+                        "OPTST_DISABLED"       =][=
+         no-preset      " | OPTST_NO_INIT"     =])[=
 ENDDEF   emit-nondoc-option     =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -1,3 +1,9 @@
+2003-05-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(descrip): double backslashes for nroff
+	* autoopts/opt*.tpl: regularize some usage.
+	* columns/columns.c(handleIndent): fix column number computation
+
 2003-05-03  Bruce Korb  <bkorb@gnu.org>
 
 	* */*.c: remove proc type indentation from obsolete coding style.

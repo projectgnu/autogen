@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-12 15:58:44 bkorb"
+## Time-stamp:      "2003-05-05 18:02:12 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.20 2003/04/13 21:42:13 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.21 2003/05/06 02:14:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -30,11 +30,12 @@ AutoGen5 template man=%s.1
 :+]
 .\"
 .SH NAME
-[+: % prog_name (string-downcase! "%s") :+] \- [+:prog_title:+]
+[+: % prog-name (string-downcase! "%s") :+] \- [+: prog-title :+]
 .SH SYNOPSIS
 .B [+:
+  (define tmp-str   "")
   (define use-flags (if (exist? "flag.value") #t #f))
-  (string-downcase! (get "prog_name"))
+  (string-downcase! (get "prog-name"))
 :+][+:
     ;; * * * * * * * * * * * * * * * * * * * * * * * * *
     ;;
@@ -66,7 +67,7 @@ sed \
  -e 's/^ *@ *end *table/.br/' \
  -e 's/^@item/.sp 1/' \
  -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
- -e 's/``\([a-zA-Z0-9:~=_ -]*\)'"''"'/\\fI\1\\fP/g' \
+ -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\fI\1\\fP/g' \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 [+:
   IF (define named-mode (not (or use-flags (exist? "long_opts") )))
@@ -133,16 +134,16 @@ IF (exist? "explain") :+]
 ENDIF :+]
 .SH "DESCRIPTION"
 This manual page documents, briefly, the \fB[+:
-    (string-downcase! (get "prog_name")) :+]\fP command.
+    (string-downcase! (get "prog-name")) :+]\fP command.
 [+:
 
-IF (exist? "prog_man_descrip")   :+][+:
-  FOR prog_man_descrip "\n.PP\n" :+][+:
-    prog_man_descrip             :+][+:
+IF (exist? "prog-man-descrip")   :+][+:
+  FOR prog-man-descrip "\n.PP\n" :+][+:
+    (string-substitute (get "prog-man-descrip") "\\" "\\\\") :+][+:
   ENDFOR                         :+][+:
 ELIF (exist? "detail")           :+][+:
   FOR detail  "\n.PP\n"          :+][+:
-    detail                       :+][+:
+    (string-substitute (get "detail") "\\" "\\\\") :+][+:
   ENDFOR                         :+][+:
 ELSE
   :+]Its description is not documented.[+:
@@ -180,18 +181,18 @@ FOR flag
   (set! opt-name (string-tr! opt-name optname-from optname-to))
   (set! dis-name (string-tr! dis-name optname-from optname-to))
 
-  (if (not (exist? "arg_type"))
+  (if (not (exist? "arg-type"))
       (set! opt-arg "")
       (set! opt-arg (string-append "\\fI"
-            (if (exist? "arg_name") (get "arg_name")
-                (string-downcase! (get "arg_type")))
+            (if (exist? "arg-name") (get "arg-name")
+                (string-downcase! (get "arg-type")))
             "\\fP" ))
   )
   :+][+:
   IF (not (exist? "documentation")) :+]
 .TP[+:
     IF (exist? "value") :+][+:
-      IF (exist? "long_opts") :+][+:
+      IF (exist? "long-opts") :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -200,13 +201,13 @@ FOR flag
           *
           :+]
 .BR -[+:value:+][+:
-          IF (not (exist? "arg_type")) :+] ", " --[+:
+          IF (not (exist? "arg-type")) :+] ", " --[+:
           ELSE  :+] " [+:(. opt-arg):+], " --[+:
           ENDIF :+][+: (. opt-name)    :+][+:
-          IF (exist? "arg_type")       :+][+:
-              ? arg_optional " [ =" ' "=" '
+          IF (exist? "arg-type")       :+][+:
+              ? arg-optional " [ =" ' "=" '
               :+][+:  (. opt-arg)      :+][+:
-              arg_optional " ]"        :+][+:
+              arg-optional " ]"        :+][+:
           ENDIF :+][+:
           IF (exist? "disable") :+], " \fB--[+:(. dis-name):+]\fP"[+:
           ENDIF :+][+:
@@ -220,16 +221,16 @@ FOR flag
           *
           :+]
 .BR -[+:value:+][+:
-          IF (exist? "arg_type") :+][+:
-            arg_optional "["     :+] "[+:(. opt-arg):+][+:
-            arg_optional '"]"'   :+][+:
-          ENDIF:+][+:
-        ENDIF  :+][+:
+          IF (exist? "arg-type") :+][+:
+            arg-optional "["     :+] "[+:(. opt-arg):+][+:
+            arg-optional '"]"'   :+][+:
+          ENDIF " :+][+:
+        ENDIF     :+][+:
 
 
       ELSE  value does not exist -- named option only  :+][+:
 
-        IF (not (exist? "long_opts")) :+][+:
+        IF (not (exist? "long-opts")) :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -239,10 +240,10 @@ FOR flag
           *
           :+]
 .BR [+: (. opt-name) :+][+:
-          IF (exist? "arg_type") :+] [+:
-             ? arg_optional " [ =" ' "=" '
+          IF (exist? "arg-type") :+] [+:
+             ? arg-optional " [ =" ' "=" '
              :+][+:(. opt-arg):+][+:
-             arg_optional "]" :+][+:
+             arg-optional "]" :+][+:
           ENDIF:+][+:
           IF (exist? "disable") :+], " \fB[+:(. dis-name):+]\fP"[+:
           ENDIF :+][+:
@@ -257,15 +258,15 @@ FOR flag
           *
           :+]
 .BR --[+: (. opt-name) :+][+:
-          IF (exist? "arg_type") :+] "[+:
-            arg_optional "["     :+]=[+:(. opt-arg):+][+:
-            arg_optional "]"     :+]"[+:
+          IF (exist? "arg-type") :+] "[+:
+            arg-optional "["     :+]=[+:(. opt-arg):+][+:
+            arg-optional "]"     :+]"[+:
           ENDIF:+][+:
           IF (exist? "disable") :+], " \fB--[+:(. dis-name):+]\fP"[+:
           ENDIF :+][+:
         ENDIF  :+][+:
       ENDIF :+]
-[+:descrip:+].[+:
+[+: (string-substitute (get "descrip") "\\" "\\\\") :+].[+:
       IF (exist? "min") :+]
 This option is required to appear.[+:ENDIF:+][+:
       IF (exist? "max") :+]
@@ -283,7 +284,7 @@ The \fI[+:(. dis-name):+]\fP form will [+:
       ENDIF:+][+:
       IF (exist? "enabled") :+]
 This option is enabled by default.[+:ENDIF:+][+:
-      IF (exist? "no_preset") :+]
+      IF (exist? "no-preset") :+]
 This option may not be preset with environment variables
 or in initialization (rc) files.[+:ENDIF:+][+:
       IF (and (exist? "default") named-mode) :+]
@@ -291,12 +292,12 @@ This option is the default option.[+:
       ENDIF:+][+:
       IF (exist? "equivalence") :+]
 This option is a member of the [+:equivalence:+] class of options.[+:ENDIF:+][+:
-      IF (exist? "flags_must") :+]
+      IF (exist? "flags-must") :+]
 This option must appear in combination with the following options:
-[+: FOR flags_must ", " :+][+:flags_must:+][+:ENDFOR:+].[+:ENDIF:+][+:
-      IF (exist? "flags_cant") :+]
+[+: FOR flags-must ", " :+][+:flags-must:+][+:ENDFOR:+].[+:ENDIF:+][+:
+      IF (exist? "flags-cant") :+]
 This option must not appear in combination with any of the following options:
-[+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:
+[+: FOR flags-cant ", " :+][+:flags-cant:+][+:ENDFOR:+].[+:
       ENDIF:+][+:
       IF (exist? "arg-default") :+]
 The default [+:(. opt-arg):+] for this option is:
@@ -304,7 +305,7 @@ The default [+:(. opt-arg):+] for this option is:
 [+: arg-default :+][+:
       ENDIF:+]
 .sp
-[+: doc :+][+:
+[+: (string-substitute (get "doc") "\\" "\\\\") :+][+:
 
   ENDIF (not (exist? "documentation")) :+][+:
 
@@ -427,22 +428,18 @@ is searched for within those directories.[+:
 
 
 ENDIF       :+][+:
-IF (exist? "man_doc") :+]
-[+:man_doc:+][+:
+IF (exist? "man-doc") :+]
+[+:man-doc:+][+:
 ENDIF:+][+:
 
-IF (or (exist? "copyright.author") (exist? "copyright.owner")) :+]
+IF (define tmp-str (get "copyright.author" (get "copyright.owner")))
+   (> (string-length tmp-str) 0) :+]
 .SH AUTHOR
-[+: ?% copyright.author '%s' (get "copyright.owner")
-  :+][+:
+[+: (. tmp-str) :+][+:
 
-  (define bug-text "\n.br\nPlease send bug reports to:  %s\n")
-
-  (if (exist? "copyright.eaddr")
-      (sprintf bug-text (get "copyright.eaddr"))
-  (if (exist? "eaddr")
-      (sprintf bug-text (get "eaddr"))
-  ))       :+][+:
+ (set! tmp-str (get "copyright.eaddr" (get "eaddr")))
+ (if (> (string-length tmp-str) 0)
+   (string-append "\n.br\nPlease send bug reports to:  " tmp-str "\n") ) :+][+:
 
   CASE copyright.type :+][+:
    =  gpl  :+]
@@ -473,7 +470,7 @@ _End_Of_Man_[+:
 
 (shell (out-pop #t) ) :+]
 .PP
-This manual page was \fIAutoGen\fP-erated from the \fB[+:prog_name:+]\fP
+This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.[+: #
 
 agman.tpl ends here  :+]

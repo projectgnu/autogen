@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.6 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: columns.c,v 3.7 2003/05/06 02:14:25 bkorb Exp $
  */
 
 /*
@@ -180,8 +180,8 @@ handleIndent( char* pzIndentArg )
                 goto colsCounted;
 
             case '\t':
-                colCt += OPT_VALUE_TAB_WIDTH
-                       - (colCt % OPT_VALUE_TAB_WIDTH);
+                colCt += OPT_VALUE_TAB_WIDTH;
+                colCt -= (colCt % OPT_VALUE_TAB_WIDTH);
                 break;
 
             case '\n':
