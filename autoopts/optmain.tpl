@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.10 2000/10/27 15:18:20 bkorb Exp $
+# $Id: optmain.tpl,v 2.11 2000/10/29 01:43:32 bkorb Exp $
 
 =]
 [=
@@ -251,14 +251,28 @@ DEFINE define-option-callbacks  =][=
       invoke callback-proc-header  =][=
       IF (not (exist? "arg_default"))
 =]    tSCC zDef[2] = { 0x7F, 0 };
-[=    ENDIF
+[=    ENDIF =][=
+
+    IF (> (len "arg_optional") 0) =]
+    te_[=(string-append Cap-prefix cap-name)=] def_val = [=
+       IF (not (=* (get "arg_optional") low-name))
+             =][=(. UP-name)=]_[=
+       ENDIF =][=(string-upcase! (string->c-name! (get "arg_optional")))
+             =];[=
+    ENDIF
 =]    tSCC* az_names[] = {[=
       IF (not (exist? "arg_default")) =] zDef,[=
       ENDIF  =]
 [=(shellf "columns -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
+[=
 
+    IF (> (len "arg_optional") 0) =]
+    if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
+        pOptDesc->pzLastArg = (char*)def_val;
+    else[=
+    ENDIF =]
     pOptDesc->pzLastArg =
         optionEnumerationVal( pOptions, pOptDesc, az_names, [=
         (+ (count "keyword") (if (exist? "arg_default") 0 1)) =] );

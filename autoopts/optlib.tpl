@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.22 2000/10/28 23:12:52 bkorb Exp $
+# $Id: optlib.tpl,v 1.23 2000/10/29 01:43:32 bkorb Exp $
 
 =]
 [=

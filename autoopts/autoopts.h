@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.17 2000/10/28 23:12:51 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.18 2000/10/29 01:43:31 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
