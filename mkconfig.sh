@@ -9,7 +9,7 @@
 # Last Modified:     Mon Aug  9 10:15:42 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 2.4 2000/03/21 03:14:27 bruce Exp $
+# @(#) $Id: mkconfig.sh,v 2.5 2000/03/21 03:14:43 bruce Exp $
 # ----------------------------------------------------------------------
 
 exec 5> temp.config
@@ -85,7 +85,6 @@ then
   echo configure is unchanged
   rm -f temp.config
 else
-  exit 0
   cvs edit configure
   mv -f temp.config configure
   cvs commit -m'CVS-ed configure script update' configure
