@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.5 2002/02/01 03:36:35 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -413,6 +413,8 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
     if (serverArgs[0] != NULL) {
         char* pz = getenv( "SHELL" );
         if ((pz != NULL) && (strcmp( pz, serverArgs[0] ) != 0)) {
+            fprintf( pfTrace, "Changing server shell from %s to %s\n",
+                     serverArgs[0], pz );
             closeServer();
             serverArgs[0] = pz;
         }
