@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.59 2000/08/13 21:21:21 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.60 2000/09/26 20:46:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1270,7 +1270,7 @@ These are the AutoGen native macros:
 FOR macfunc =][=
   IF (exist? "desc") =]
 * [=% name (sprintf "%%-18s" "%s::")
-  =] [=(string-upcase (get "name"))=] - [=what=][=
+  =] [=(string-upcase! (get "name"))=] - [=what=][=
   ENDIF =][=
 ENDFOR macfunc=]
 @end menu
