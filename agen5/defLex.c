@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.4 1999/11/30 02:37:15 bruce Exp $
+ *  $Id: defLex.c,v 1.5 1999/12/01 04:17:21 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -61,8 +61,8 @@ int    aKeywordTkn[] = { KEYWORD_TABLE };
 #define ERROR  (-1)
 #define FINISH (-1)
 
-STATIC int   loadScheme( void );
-STATIC void  alist_to_autogen_def( SCM alist );
+STATIC void  loadScheme( void );
+STATIC void  alist_to_autogen_def( void );
 STATIC char* assembleName( char* pzScan, YYSTYPE* pRetVal );
 STATIC char* assembleString( char* pzScan );
 
@@ -179,10 +179,34 @@ scanAgain:
     }
 
     case '(':
-        lastToken = loadScheme();
-        if (lastToken != TK_STRING)
-            goto scanAgain;
+        loadScheme();
         break;
+
+    case '\\':
+        if (strncmp( pCurCtx->pzScan+1, "'(", 2) == 0) {
+            alist_to_autogen_def();
+            goto scanAgain;
+
+        } else {
+            char* pz = strchr( pCurCtx->pzScan, ';' );
+
+            for (;;) {
+                if (pz == (char*)NULL) {
+                    pz = pCurCtx->pzScan + strlen( pCurCtx->pzScan );
+                    break;
+                }
+                if (isspace( pz[1] )) {
+                    *pz = NUL;
+                    pz[1] = ';';
+                    break;
+                }
+                pz = strchr( pz+1, ';' );
+            }
+
+            lastToken = TK_STRING;
+            yylval = (YYSTYPE)pz;
+            break;
+        }
 
     case '`':
     {
@@ -319,13 +343,12 @@ yyerror( char* s )
 }
 
 
-    STATIC int
+    STATIC void
 loadScheme( void )
 {
     char* pzText = pCurCtx->pzScan;
     char* pzEnd  = (char*)skipScheme( pzText, pzText + strlen( pzText ));
     char  endCh  = *pzEnd;
-    int   retTok = TK_STRING;
     int   schemeLen = (pzEnd - pzText);
     int   stringLen;
     SCM   res;
@@ -340,7 +363,6 @@ loadScheme( void )
     procState = PROC_STATE_LOAD_DEFS;
     pCurCtx->pzScan = pzEnd;
     *pzEnd = endCh;
-    pCurCtx->pzScan = pzEnd;
 
     switch (gh_type_e( res )) {
     case GH_TYPE_BOOLEAN:
@@ -371,24 +393,13 @@ loadScheme( void )
         else pzText = asprintf( "%ld", gh_scm2long( res ));
         break;
 
-    case GH_TYPE_LIST:
-    case GH_TYPE_PAIR:
-        retTok = TK_DEFINITIONS;
-        alist_to_autogen_def( res );
-        break;
-
-    case GH_TYPE_VECTOR:
-    case GH_TYPE_PROCEDURE:
-    case GH_TYPE_INEXACT:
-    case GH_TYPE_EXACT:
     default:
         /* Emit a complaint */
         pzText = "";
     }
 
-    if (retTok == TK_STRING)
-        yylval = (YYSTYPE)pzText;
-    return retTok;
+    yylval = (YYSTYPE)pzText;
+    lastToken = TK_STRING;
 }
 
 /*
@@ -396,45 +407,51 @@ loadScheme( void )
  *  into AutoGen definitions.
  */
     STATIC void
-alist_to_autogen_def( SCM alist )
+alist_to_autogen_def( void )
 {
     tSCC   zSchemeText[] = "Scheme Computed Definitions";
-    char*  pzStart;
+    tSCC   zWrap[] = "(alist->autogen-def %s)";
+
+    char*  pzText  = ++(pCurCtx->pzScan);
+    char*  pzEnd   = (char*)skipScheme( pzText, pzText + strlen( pzText ));
+
     SCM    res;
     tScanCtx*  pCtx;
 
-    static SCM proc = SCM_UNDEFINED;
-
-    if (proc == SCM_UNDEFINED) {
-        tSCC z[] = "(module-ref (cdr (the-module)) "
-            " 'alist->autogen-def)";
-        tSCC zFailed[] = "Guile lookup failed for `alist->autogen-def'\n";
-
-        proc = gh_eval_str( (char*)z );
-
-        if (proc == SCM_UNDEFINED) {
-            fputs( zFailed, stderr );
-            exit( EXIT_FAILURE );
-        }
+    /*
+     *  Wrap the scheme expression with the `alist->autogen-def' function
+     */
+    {
+        char endCh = *pzEnd;
+        *pzEnd = NUL;
+        pzText = asprintf( zWrap, pzText );
+        *pzEnd = endCh;
     }
 
-    res = scm_apply(proc, alist, SCM_EOL);
+    /*
+     *  NUL terminate the Scheme expression, run it, then restore
+     *  the NUL-ed character.
+     */
+    procState = PROC_STATE_GUILE_PRELOAD;
+    res       = gh_eval_str( pzText );
+    procState = PROC_STATE_LOAD_DEFS;
+    pCurCtx->pzScan = pzEnd;
+    AGFREE( (void*)pzText );
 
     /*
      *  The result *must* be a string, or we choke.
      */
     if (! gh_string_p( res )) {
-        tSCC zEr[] = "Error:  Scheme expression does not yield string:\n"
-            "\tin %s on line %d\n";
-        fprintf( stderr, zEr, pCurCtx->pzFileName, pCurCtx->lineNo );
-        exit( EXIT_FAILURE );
+        tSCC zEr[] = "Error:  Scheme expression does not yield string:\n";
+        fputs( zEr, stderr );
+        AG_ABEND;
     }
 
     /*
      *  Now, push the resulting string onto the input stack.
      */
-    pzStart = SCM_CHARS( res );
-    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + strlen( pzStart ));
+    pzText = SCM_CHARS( res );
+    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + 4 + strlen( pzText ));
     if (pCtx == (tScanCtx*)NULL) {
         fprintf( stderr, zAllocErr, pzProg,
                  sizeof( tScanCtx ), "scheme expression" );
@@ -454,7 +471,7 @@ alist_to_autogen_def( SCM alist )
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
-    strcpy( pCtx->pzScan, pzStart );
+    strcpy( pCtx->pzScan, pzText );
     /*
      *  At this point, the next token will be obtained
      *  from the newly allocated context structure.
