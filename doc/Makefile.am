@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.27 1999/10/30 16:45:19 bruce Exp $
+## $Id: Makefile.am,v 2.28 1999/10/30 16:46:35 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -60,7 +60,7 @@ ADDON_TEXI	= \
 		$(top_srcdir)/getdefs/getdefs.texi \
 		$(top_srcdir)/snprintfv/snprintfv.texi
 
-DOC_INCLUDES	= $(AGSRCDIR)/agParse.y \
+DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
 		$(AGSRCDIR)/opts.h \
 		$(AGSRCDIR)/autogen.menu \
 		$(AGSRCDIR)/autogen.texi \
