@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.5 1999/10/16 18:02:37 bruce Exp $
+ *  $Id: autogen.c,v 1.6 1999/11/11 04:36:17 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -51,6 +51,7 @@ inner_main( int argc, char** argv )
      */
     procState = PROC_STATE_LOAD_TPL;
     ag_init();
+    gh_eval_str( "(add-hook! before-error-hook error-source-line)" );
     pTF = loadTemplate( pzTemplFileName );
 
     procState = PROC_STATE_EMITTING;
