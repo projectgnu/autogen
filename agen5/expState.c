@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.2 1999/10/30 18:12:46 bruce Exp $
+ *  $Id: expState.c,v 1.3 1999/10/30 20:25:28 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -281,6 +281,8 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
 
 /*=gfunc count
  *
+ * exparg: ag-name
+ *
  * doc:  Count the number of entries for a definition.
  *      The input argument must be a string containing the name
  *      of the AutoGen values to be counted.  If there is no
@@ -317,20 +319,22 @@ ag_scm_def_file( void )
 
 /*=gfunc exist_p
  *
- * doc: return SCM_BOOL_T iff a specified name has a value.
- *     The name may include indexes and/or member names.
- *     All but the last member name must be an aggregate definition.
- *     For example:
- *     @example
- *     (exist? "foo[3].bar.baz")
- *     @end example
- *     will yield true if all of the following is true:
- *     @*
- *     There is a member value of either group or string type
- *     named @code{baz} for some group value @code{bar} that
- *     is a member of the @code{foo} group with index @code{3}.
- *     There may be multiple entries of @code{bar} within
- *     @code{foo}, only one needs to contain a value for @{baz}.
+ * exparg: ag-name
+ *
+ * doc:  return SCM_BOOL_T iff a specified name has a value.
+ *       The name may include indexes and/or member names.
+ *       All but the last member name must be an aggregate definition.
+ *       For example:
+ *       @example
+ *       (exist? "foo[3].bar.baz")
+ *       @end example
+ *       will yield true if all of the following is true:
+ *       @*
+ *       There is a member value of either group or string type
+ *       named @code{baz} for some group value @code{bar} that
+ *       is a member of the @code{foo} group with index @code{3}.
+ *       There may be multiple entries of @code{bar} within
+ *       @code{foo}, only one needs to contain a value for @code{baz}.
 =*/
     SCM
 ag_scm_exist_p( SCM obj )
@@ -345,6 +349,8 @@ ag_scm_exist_p( SCM obj )
 
 
 /*=gfunc get
+ *
+ * exparg: ag-name
  *
  * doc:  get the first string value associated with the name.
 =*/
@@ -367,6 +373,8 @@ ag_scm_get( SCM obj )
 
 
 /*=gfunc high_lim
+ *
+ * exparg: ag-name
  *
  * doc:  Returns the highest index associated with an array of definitions.
 =*/
@@ -401,6 +409,8 @@ ag_scm_high_lim( SCM obj )
 
 /*=gfunc len
  *
+ * exparg: ag-name
+ *
  * doc: If the named object is a group definition, then "len" is
  *     the same as "count".  Otherwise, if it is one or more text
  *     definitions, then it is the sum of their string lengths.
@@ -419,6 +429,8 @@ ag_scm_len( SCM obj )
 
 
 /*=gfunc low_lim
+ *
+ * exparg: ag-name
  *
  * doc:  Returns the lowest index associated with an array of definitions.
 =*/
