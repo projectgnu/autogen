@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.3 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expState.c,v 3.4 2002/01/22 02:49:53 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -455,8 +455,7 @@ ag_scm_low_lim( SCM obj )
  * what:   get the current suffix
  *
  * doc:
- *  Returns the current active suffix.  See @code{generate} in the
- *  @code{Declarations Input} section above.
+ *  Returns the current active suffix (@pxref{pseudo macro}).
 =*/
     SCM
 ag_scm_suffix( void )
