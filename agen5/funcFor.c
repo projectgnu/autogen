@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.3 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: funcFor.c,v 1.4 1999/10/28 03:24:48 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -88,7 +88,7 @@ ag_scm_for_index( void )
     SCM
 ag_scm_for_from( SCM obj )
 {
-    if ((! for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
         return SCM_UNDEFINED;
     forInfo.for_from = gh_scm2int( obj );
     return SCM_BOOL_T;
@@ -105,7 +105,7 @@ ag_scm_for_from( SCM obj )
     SCM
 ag_scm_for_to( SCM obj )
 {
-    if ((! for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
         return SCM_UNDEFINED;
     forInfo.for_to = gh_scm2int( obj );
     return SCM_BOOL_T;
@@ -124,7 +124,7 @@ ag_scm_for_to( SCM obj )
     SCM
 ag_scm_for_by( SCM obj )
 {
-    if ((! for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
         return SCM_UNDEFINED;
     forInfo.for_by = gh_scm2int( obj );
     return SCM_BOOL_T;
@@ -142,7 +142,7 @@ ag_scm_for_by( SCM obj )
     SCM
 ag_scm_for_sep( SCM obj )
 {
-    if ((! for_loading) || (! gh_string_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_string_p( obj )))
         return SCM_UNDEFINED;
     forInfo.for_pzSep = strdup( SCM_CHARS( obj ));
     return SCM_BOOL_T;
