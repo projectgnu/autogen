@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Wednesday March  3, 2005 at 08:58:11 PM PST
+ *  It has been AutoGen-ed  Sunday January 23, 2005 at 03:33:47 PM PST
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -239,7 +239,7 @@ cgi_run_fsm(
             trans = CGI_TR_INVALID;
         } else {
             const t_cgi_transition* pTT =
-                cgi_trans_table[ cgi_state ] + trans_evt;
+            cgi_trans_table[ cgi_state ] + trans_evt;
             nxtSt = firstNext = pTT->next_state;
             trans = pTT->transition;
         }
@@ -328,4 +328,11 @@ cgi_run_fsm(
     }
     return cgi_state;
 }
-/* end of cgi-fsm.c */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of cgi-fsm.c */

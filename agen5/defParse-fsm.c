@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Wednesday March  3, 2004 at 08:58:11 PM PST
+ *  It has been AutoGen-ed  Sunday January 23, 2005 at 03:33:47 PM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -612,7 +612,8 @@ dp_run_fsm( void )
             nxtSt = DP_ST_INVALID;
             pT    = dp_do_invalid;
         } else {
-            const t_dp_transition* pTT = dp_trans_table[ dp_state ] + trans_evt;
+            const t_dp_transition* pTT =
+            dp_trans_table[ dp_state ] + trans_evt;
             nxtSt = firstNext = pTT->next_state;
             pT    = pTT->trans_proc;
         }
@@ -634,4 +635,11 @@ dp_run_fsm( void )
     }
     return dp_state;
 }
-/* end of defParse-fsm.c */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of defParse-fsm.c */

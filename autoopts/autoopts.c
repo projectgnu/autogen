@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.4 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: autoopts.c,v 4.5 2005/01/23 23:52:49 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -67,9 +67,6 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
 static tSuccess
 nextOption( tOptions* pOpts, tOptState* pOptState );
-
-static void
-doRcFiles( tOptions* pOpts );
 
 static tSuccess
 doPresets( tOptions* pOpts );

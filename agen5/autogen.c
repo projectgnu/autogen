@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.4 2005/01/23 23:33:04 bkorb Exp $
+ *  $Id: autogen.c,v 4.5 2005/01/23 23:52:49 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -44,10 +44,17 @@ static void
 signalExit( int sig );
 
 static void
+abendSignal( int sig );
+
+static void
+ignoreSignal( int sig );
+
+static void
 doneCheck( void );
 
 static void
-signalSetup( sighandler_proc_t*, sighandler_proc_t* );
+signalSetup( sighandler_proc_t* chldHandler,
+             sighandler_proc_t* dfltHandler );
 /* = = = END-STATIC-FORWARD = = = */
 
 static void

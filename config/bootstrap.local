@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-01-21 21:38:25 bkorb"
+# Time-stamp:        "2005-01-23 15:52:21 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.4 2005/01/22 16:21:16 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.5 2005/01/23 23:52:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -174,7 +174,7 @@ pre )
           sed 's,^,  ,;s,$, \\,;$s,\\$,]),' >&4
       exec 4>&-
 
-      sed -e "/^AC_INIT(/s@,.*,@,${AG_VERSION},@" \
+      sed -e "/^AC_INIT(/s@,.*,@,[${AG_VERSION}],@" \
           -e '/==ADD_CONFIG_FILES==/r configure.files' \
           -e '/==ADD_CONFIG_FILES==/d' ${config_file} > configure.tmp
 
