@@ -55,7 +55,7 @@ dnl
 dnl @synopsis  [=(. mac-name)=]
 dnl
 dnl @success-result[=
-  IF (< (count "action") (count "action.no")) =]:  there is no output[=
+  IF (<= (count "action") (count "action.no")) =]:  there is no output[=
   ELSE         =]
 dnl[=
     FOR action =][=
@@ -112,9 +112,9 @@ ENDIF     =]
 dnl
 AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
-  (define test-text (get "code"))
-  (if (> (string-length test-text) 0)
-      (set! test-text (string-append "[" (protect-text test-text) "]"  )))
+  (define c-text (get "code"))
+  (if (> (string-length c-text) 0)
+      (set! c-text (string-append "[[" (protect-text c-text) "]]"  )))
 
   mac-name  =]],[[=
 
@@ -149,7 +149,7 @@ ENDDEF  end-feat-test  =][=
 
 # # # # # # # # # # EMIT RESULTS # # # # # # # # # # =][=
 
-DEFINE  emit-results     =][=
+DEFINE  emit-results   =][=
 
   (define good-subst 0 )
   (define bad-subst  0 )
@@ -311,10 +311,13 @@ ENDDEF  try-disable             =][=
 DEFINE  try-test                =][=
 
   start-feat-test               =]
-  AC_CACHE_VAL([[=(. cv-name)=]],[ changequote(<<<,>>>)
-    if [= (sub-shell-str (get "code")) =] > /dev/null 2>&1
-    then [=(. cv-name)=]=yes
-    else [=(. cv-name)=]=no ; fi changequote([,])
+  AC_CACHE_VAL([[=(. cv-name)=]],[
+    [=(. cv-name)=]=[= (sub-shell-str (get "code")) =] 2> /dev/null
+    if [ $? -ne 0 ]
+    then [=(. cv-name)=]=no
+    else if [ -z "$[=(. cv-name)=]" ]
+         then [=(. cv-name)=]=yes
+    fi ; fi
   ]) # end of CACHE_VAL
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results         =][=
@@ -327,8 +330,7 @@ DEFINE  try-run                 =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_RUN([=
-     (. test-text)=],
+  AC_TRY_RUN([=(. c-text)=],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no],[[=
         (. cv-name)=]=no]
   ) # end of TRY_RUN[=
@@ -342,8 +344,7 @@ DEFINE  try-link                =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_LINK([=
-     (. test-text)=],
+  AC_TRY_LINK([=(. c-text)=],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
   ) # end of TRY_LINK[=
   end-feat-test                 =][=
@@ -356,8 +357,7 @@ DEFINE  try-compile             =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_COMPILE([= % includes "[%s]" =],[=
-     (. test-text)=],
+  AC_TRY_COMPILE([= % includes "[%s]" =],[=(. c-text)=],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
   ) # end of TRY_COMPILE[=
   end-feat-test                 =][=

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.4 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: functions.c,v 3.5 2002/02/08 05:41:21 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -47,9 +47,9 @@ tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
  *  arguments are eval-ed, so you may compute the name of the file to
  *  be included.  The included file must not contain any incomplete
  *  function blocks.  Function blocks are template text beginning with
- *  any of the macro functions @samp{IF}, @samp{FOR}, @samp{WHILE}, and
- *  @samp{CASE} and extending through the respective terminating
- *  macro functions.
+ *  any of the macro functions @samp{CASE}, @samp{DEFINE}, @samp{FOR},
+ *  @samp{IF} and @samp{WHILE}; extending through their respective
+ *  terminating macro functions.
 =*/
     tMacro*
 mFunc_Include( tTemplate* pT, tMacro* pMac )

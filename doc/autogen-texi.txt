@@ -1333,12 +1333,30 @@ AutoGen provides a means for redirecting the template output
 to different files.  It is accomplished by providing a set of
 Scheme functions named @code{out-*} (@pxref{AutoGen Functions}).
 
-These functions allow you to logically "push" output files onto a stack
-and return to previous files by "pop"ing them back off.  At the end of
-processing the template for a particular suffix (@pxref{pseudo macro}),
-all the files in the output stack are closed and popped off.
-Consequently, at the start of the processing of a template, there is
-only one output file on the stack.  That file cannot be popped off.
+@table @samp
+@item out-push (@pxref{SCM out-push-new})
+This allows you to logically "push" output files onto a stack.
+
+@item out-pop (@pxref{SCM out-pop})
+This function closes the current output file and resumes
+output to the next one in the stack.
+
+@item out-suspend (@pxref{SCM out-suspend})
+This function does not close the current output, but instead
+sets it aside for resumption with
+
+@item out-resume (@pxref{SCM out-resume})
+This will put a named file descriptor back onto the top of
+stack so that it becomes the current output again.
+
+@item out-switch (@pxref{SCM out-switch})
+This closes the current output and creates a new file,
+purging any preexisting one.  This is a shortcut for "pop"
+followed by "push", but can also be done at the base level.
+
+@item out-move (@pxref{SCM out-move})
+Renames the current output file without closing it.
+@end table
 
 There are also several functions for determining the output
 status.  @xref{AutoGen Functions}.
@@ -1640,7 +1658,7 @@ Several template files and a scheme script in @file{share/autogen}, needed
 for Automated Option Processing (@pxref{AutoOpts}), parsing definitions
 written with scheme syntax (@pxref{Dynamic Text}), the templates for
 producing documentation for your program (@pxref{documentation attributes}),
-and AutoFSM.
+autoconf test macros, and AutoFSM.
 
 @item
 Info-style help files as @file{info/autogen.info*}.
@@ -1667,7 +1685,7 @@ However, you may wish to insert @code{make check}
 before the @code{make install} command.
 
 If you do perform a @code{make check} and there are any failures, you
-will find the results in @code{tests/FAILURES}.  Needless to say, I
+will find the results in @code{<module>/test/FAILURES}.  Needless to say, I
 would be interested in seeing the contents of those files and any
 associated messages.  If you choose to go on and analyze one of these
 failures, you will need to invoke the test scripts individually.  You
