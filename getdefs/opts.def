@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.16 1999/11/02 04:39:05 bruce Exp $
+ *   $Id: opts.def,v 2.17 1999/11/05 02:32:47 bruce Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ flag = {
     stack_arg;
     descrip   = "subblock definition names";
     doc =
-    "This option is used to create shorthand entries for subblocks.\n"
+    "This option is used to create shorthand entries for nested definitions.\n"
     "For example, with:\n"
     "@*\n@code{subblock=arg=argname,type,null} defined, the text:\n"
     "@*\n@code{arg: this, char *} will then expand to:\n"
@@ -291,10 +291,10 @@ a definition of the following form:
         ...
     };
 
-The ellipsis `...' is filled in by text found between the two delimiters,
-with everything up through the first sequence of asterisks deleted on every
-line.  Additionally, if the `<entry-name>' is followed by a comma, the word
-`ifdef' or 'ifndef' and a name `if_name', then the above entry will appear as:
+The ellipsis `...' is filled in by text found between the two delimiters, with
+everything up through the first sequence of asterisks deleted on every line.
+Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
+(or 'ifndef') and a name `if_name', then the above entry will appear as:
 
 @format
     #ifdef if_name
@@ -328,11 +328,10 @@ From that, this program creates a definition of the following form:
     @};
 @end format
 
-The ellipsis `...' is filled in by text found between the two delimiters,
-with everything up through the first sequence of asterisks deleted
-on every line.  Additionally, if the `<entry-name>' is followed
-by a comma, the word `if' and a name `if_name', then the above entry
-will appear as:
+The ellipsis `...' is filled in by text found between the two delimiters, with
+everything up through the first sequence of asterisks deleted on every line.
+Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
+(or 'ifndef') and a name `if_name', then the above entry will appear as:
 
 @format
     #ifdef if_name
@@ -342,4 +341,8 @@ will appear as:
         ...
     @};
     #endif
-@end format";
+@end format
+
+@noindent
+Also, with the use of the @code{subblock} option, you can specify a nested
+value, @xref{getdefs subblock}.";
