@@ -47,31 +47,13 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
     fi
   fi
 
-  AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
   AM_WITH_DMALLOC
 
   # ----------------------------------------------------------------------
   # check for various programs used during the build.
   # ----------------------------------------------------------------------
-  AC_PROG_CC
-  AM_PROG_CC_STDC
-  AC_C_CONST
-  AC_C_INLINE
-  AC_EXEEXT
-  AM_PROG_LIBTOOL
-  AC_PROG_INSTALL
   AC_PROG_AWK
-
-  # ----------------------------------------------------------------------
-  # check for standard headers.
-  # ----------------------------------------------------------------------
-  AC_HEADER_STDC
-  AC_CHECK_HEADERS(stdlib.h sys/types.h memory.h limits.h values.h errno.h)
-
-  # If string.h is present define HAVE_STRING_H, otherwise if strings.h
-  # is present define HAVE_STRINGS_H.
-  AC_CHECK_HEADERS(string.h strings.h, break)
-
+  AC_CHECK_HEADER(wchar.h)
   dnl am_cv_prog_cc_stdc is set by AC_PROG_CC_STDC
   case x$am_cv_prog_cc_stdc in
   xno)
@@ -103,8 +85,12 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   # Checks for typedefs
   # ----------------------------------------------------------------------
   AC_CHECK_TYPE(wchar_t, unsigned int)
+  AC_CHECK_TYPE(wint_t,  unsigned int)
   AC_CHECK_TYPE(long double)
   AC_CHECK_TYPE(intmax_t)
+  if [ X$ac_cv_c_long_double != Xno ] ; then
+    AC_CHECK_FUNCS(ldexpl)
+  fi
   AC_TYPE_SIZE_T
 
   # ----------------------------------------------------------------------
@@ -114,18 +100,3 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   AC_CHECK_LIB(m, log)
   AC_CHECK_FUNCS(copysign copysignl)
 ])
-
-AC_DEFUN([SNPRINTFV_VERSION],[
-  SNV_CURRENT=2;    AC_SUBST(SNV_CURRENT)
-  SNV_REVISION=0;   AC_SUBST(SNV_REVISION)
-  SNV_AGE=0;        AC_SUBST(SNV_AGE)
-
-
-dnl @synopsis  SNPRINTFV_CHECK
-dnl
-dnl If autoopts-config works, add the linking information to LIBS.
-dnl Otherwise, add ``snprintfv-0.99''
-dnl to SUBDIRS and run all the config tests that the library needs.
-dnl
-AC_DEFUN([SNPRINTFV_CHECK],[
-]) ## end of snprintfv.m4

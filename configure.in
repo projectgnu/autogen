@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2002 Bruce Korb
 dnl
-dnl Time-stamp:      "2002-12-06 17:58:34 bkorb"
+dnl Time-stamp:      "2002-12-10 21:25:40 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.13 2002/12/07 04:45:03 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.14 2002/12/14 16:02:38 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -20,8 +20,8 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
-
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.13 $),)dnl
+AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.14 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -64,7 +64,6 @@ MAKEFLAGS=
 MAKELEVEL=
 unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 
-ifdef([AC_LIBTOOL_WIN32_DLL], AC_LIBTOOL_WIN32_DLL)
 AM_WITH_DMALLOC
 
 # ----------------------------------------------------------------------
@@ -76,6 +75,8 @@ AC_EXEEXT
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
+AC_C_CONST
+AC_C_INLINE
 
 # ----------------------------------------------------------------------
 # Check for standard headers.
@@ -139,8 +140,6 @@ AC_DEFINE_UNQUOTED(SNV_LONG_DOUBLE,$snv_long_double,
                    [Define this to the long+double type])
 AC_CHECK_TYPES([u_short, u_int, u_long, id_t, wchar_t])
 AC_CHECK_TYPES([long long, uintmax_t])
-AC_C_CONST
-AC_C_INLINE
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int, 4)
 
@@ -167,6 +166,10 @@ then
   fi
 fi >&2
 
+# ----------------------------------------------------------------------
+# Do SNPRINTFV macros
+# ----------------------------------------------------------------------
+INVOKE_SNPRINTFV_MACROS
 # ----------------------------------------------------------------------
 # Generate the make files.
 # ----------------------------------------------------------------------

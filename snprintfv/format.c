@@ -43,7 +43,7 @@
 #define snv_default_spec_table	format_LTX_snv_default_spec_table
 #endif
 
-#ifdef HAVE_LONG_DOUBLE
+#ifdef HAVE_LDEXPL
 extern long double frexpl (long double x, int *exp);
 extern long double ldexpl (long double x, int exp);
 #else

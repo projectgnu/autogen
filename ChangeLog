@@ -1,4 +1,40 @@
+2002-12-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c(ag_scm_dne): add another optional argument.
+	If the first arg is "-d", then do not insert a date and shift args 1.
+	* agen5/opts.def(define): Make note of when and how the -D arguments
+	get exported into the environment variables.
+	* autoopts/agman1.tpl(flags_must): fix opton spelling
+	* autoopts/autoopts.c(optionLoadLine): fix AGDUPSTR usage.
+	* autoopts/makeshell.c(emitSetup): fix type cast
+	* autoopts/save.c(optionSaveFile): ditto
+	* autoopts/streqvcmp.c(streqvmap): silence a stupid Sun warning
+	* doc/autogen.texi: use correct xref macro
+
 2002-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defReduce.c(freeEntry): new
+	(getEntry): export for use
+	* agen5/funcCase.c: remove 'alias:' entries
+	* agen5/funcEval.c: ditto
+	* agen5/functions.c: ditto
+	* agen5/funcFor.c(mLoad_For): implement FOR x IN ...
+	(mFunc_For): ditto
+	* agen5/test/forin.test: test new functinality
+	* agen5/test/Makefile.am(forin.test): run new test
+	* agen5/functions.h(expr_8): allow for names to start with '.'
+	(current context lookup only)
+	* agen5/tpLoad.c(mUnload_For): unload
+	(mUnload_Match): unload
+	(unloadTemplate): new function
+	* autoopts/autoopts.h: read snprintfv/printf.h -- must use snv
+	* autoopts/makeshell.c: remove duplicate #includes and clean up
+	unused code
+	* autoopts/putshell.c: ditto
+	* config/bootstrap.local: clean up sedding of configure.in
+	and copy the snprintfv m4 macros into the config directory
+
+2002-12-08  Bruce Korb  <bkorb@gnu.org>
 
 	==5.4.8 Released
 

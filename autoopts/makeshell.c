@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.5 2002/10/27 04:59:01 bkorb Exp $
+ *  $Id: makeshell.c,v 3.6 2002/12/14 16:02:38 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -48,19 +48,14 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-#include <stdio.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <utime.h>
-#include <sys/stat.h>
-
 #ifdef __STDC__
 
 #include "autoopts.h"
+
+#include <sys/wait.h>
+#include <time.h>
+#include <utime.h>
+
 #include "genshell.c"
 
 tOptions*  pShellParseOptions = (tOptions*)NULL;
@@ -666,7 +661,7 @@ emitSetup( tOptions* pOpts )
          *  to a string before printing the default value.
          */
         if (pOptDesc->fOptState & OPTST_ENUMERATION) {
-            (*(pOptDesc->pOptProc))( (tOptDesc*)2UL, pOptDesc );
+            (*(pOptDesc->pOptProc))( (tOptions*)2UL, pOptDesc );
             pzDefault = pOptDesc->pzLastArg;
         }
 
@@ -1080,7 +1075,7 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
 }
 #else
 int putShellParse( pOpts )
-    tOptions* pOpts;
+    char* pOpts;
 {
     fputs( "putShellParse disabled for pre-ANSI C\n", stderr );
     exit( EXIT_FAILURE );

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2002-11-10 16:57:53 bkorb"
+ *  Time-stamp:      "2002-12-09 17:44:44 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.8 2002/12/07 04:45:03 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.9 2002/12/14 16:02:38 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -152,6 +152,8 @@ typedef struct {
 #  define TAGMEM( m, t )
 
 #else  /* AUTOGEN_BUILD is defined: */
+#  include <snprintfv/printf.h>
+
 #  ifndef MEMDEBUG
      extern void* aopts_alloc( size_t, const char* );
      extern void* aopts_realloc( void*, size_t, const char* );

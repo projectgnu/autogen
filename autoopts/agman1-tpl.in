@@ -10,7 +10,7 @@
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.16 2002/11/08 16:56:57 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.17 2002/12/14 16:02:38 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -289,14 +289,14 @@ This option is the default option.[+:
       IF (exist? "equivalence") :+]
 This option is a member of the [+:equivalence:+] class of options.[+:ENDIF:+][+:
       IF (exist? "flags_must") :+]
-This opton must appear in combination with the following options:
+This option must appear in combination with the following options:
 [+: FOR flags_must ", " :+][+:flags_must:+][+:ENDFOR:+].[+:ENDIF:+][+:
       IF (exist? "flags_cant") :+]
 This option must not appear in combination with any of the following options:
 [+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:
       ENDIF:+][+:
       IF (exist? "arg-default") :+]
-The default [+:(. opt-arg):+] for this opton is:
+The default [+:(. opt-arg):+] for this option is:
 .ti +4
 [+: arg-default :+][+:
       ENDIF:+]

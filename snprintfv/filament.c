@@ -231,7 +231,7 @@ fildelete (fil)
  * is not entirely safe to use the strfoo() API to examine the contents
  * of the return value.
  **/
-inline char *
+char *
 filval (fil)
      Filament *fil;
 {
@@ -249,7 +249,7 @@ filval (fil)
  * The length of @fil, including any embedded nulls, but excluding the
  * terminating null, is returned.
  **/
-inline size_t
+size_t
 fillen (fil)
      Filament *fil;
 {
@@ -268,7 +268,7 @@ fillen (fil)
  * at that index cast to an int is returned, otherwise @n is outside
  * this range and -1 is returned.
  **/
-inline int
+int
 filelt (fil, n)
      Filament *fil;
      size_t n;
@@ -290,7 +290,7 @@ filelt (fil, n)
  * A pointer to the null terminated string (along with any embedded nulls)
  * which is the result of this concatenation is returned.
  **/
-inline char *
+char *
 filcat (fil, str)
      Filament *fil;
      const char *str;

@@ -115,6 +115,8 @@ extern "C" {
 #define MAX_INT MAXINT
 #define MIN_INT MININT
 
+#include <wchar.h>
+
 #if ENABLE_NLS
 # include <libintl.h>
 # define _(Text) gettext (Text)

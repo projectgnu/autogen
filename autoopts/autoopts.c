@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.19 2002/10/12 18:12:00 bkorb Exp $
+ *  $Id: autoopts.c,v 3.20 2002/12/14 16:02:38 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1531,7 +1531,8 @@ void optionLoadLine( pOpts, pzLine )
     tCC*       pzLine;
 {
     tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
-    char* pz = AGDUPSTR( pzLine, pzLine, "user option line" );
+    char* pz;
+    AGDUPSTR( pz, pzLine, "user option line" );
     loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
     AGFREE( pz );
 }

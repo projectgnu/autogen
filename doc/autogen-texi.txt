@@ -2885,7 +2885,7 @@ a disablement prefix will cause undefined results.
 If all of this is confusing, then don't mess with equivalenced stacked
 option arguments.  If you really want to know, the AutoGen @code{--define}
 option (@pxref{autogen define}) has a stacked argument, and @code{--undefine}
-(@xref{autogen undefine}) is equivalenced to it.
+(@pxref{autogen undefine}) is equivalenced to it.
 @end table
 
 @node documentation attributes

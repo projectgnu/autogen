@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.2 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.3 2002/12/14 16:02:38 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -141,11 +141,16 @@ streqvcmp( s1, s2 )
 }
 
 
+#ifdef __STDC__
+void
+streqvmap( char From, char To, int ct )
+#else
 void
 streqvmap( From, To, ct )
     char From;
     char To;
     int  ct;
+#endif
 {
     if (ct == 0) {
         ct = sizeof( charmap ) - 1;

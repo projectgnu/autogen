@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.6 2002/10/27 04:59:01 bkorb Exp $
+ *  $Id: putshell.c,v 3.7 2002/12/14 16:02:38 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -49,8 +49,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
-#include <stdio.h>
 
 #ifdef __STDC__
 #include "autoopts.h"
@@ -216,7 +214,7 @@ putBourneShell( tOptions* pOpts )
 }
 #else
 int putBourneShell( pOpts )
-    tOptions* pOpts;
+    char* pOpts;
 {
     fputs( "putBourneShell disabled for pre-ANSI C\n", stderr );
     exit( EXIT_FAILURE );

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.6 2002/11/08 16:56:57 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.7 2002/12/14 16:02:38 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -180,7 +180,7 @@ findFileName( pOpts )
                 *pzDirCh = '/';
                 stBuf.st_mode = S_IFREG;
 
-                break;  /* bail out of error condition */
+                continue;  /* bail out of error condition */
             }
 
             *pzDirCh = '/';
@@ -444,7 +444,7 @@ optionSaveFile( pOpts )
                  *  enumeration value back into a string suitable for printing.
                  *  We restore the numeric value after printing.
                  */
-                (*(p->pOptProc))( (tOptDesc*)2UL, p );
+                (*(p->pOptProc))( (tOptions*)2UL, p );
                 printEntry( fp, p, p->pzLastArg );
                 p->pzLastArg = (char*)enumVal;
                 break;
