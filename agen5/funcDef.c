@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.17 1999/11/04 02:22:47 bruce Exp $
+ *  $Id: funcDef.c,v 1.18 1999/11/04 04:37:00 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -481,18 +481,23 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 /*=macfunc INVOKE
  *
  *  handler_proc:
- *  what:  Invoke an AutoGen defined macro
+ *  what:  Invoke a User Defined Macro
+ *
  *  desc:
- *      Each iteration may select a different macro.
- *      A macro name _must_ be found, or it chokes and dies.
- *      Macro arguments may be passed, as in the conventional
- *      @example
- *      [+ mac_name arg=... +]
- *      @end example
- *      The following is equivalent to the above:
- *      @example
- *      [+ INVOKE "mac_name" arg=... +]
- *      @end example
+ *
+ *  User defined macros may be invoked explicitly or implicitly.
+ *  If you invoke one implicitly, the macro must begin with the
+ *  name of the defined macro.  Consequently, this may @strong{not}
+ *  be a computed value.  If you explicitly invoke a user defined macro,
+ *  the macro begins with the macro name @code{INVOKE} followed by
+ *  a @i{simple expression} that must yield a known user defined macro.
+ *  A macro name _must_ be found, or AutoGen will issue a diagnostic
+ *  and exit.
+ *
+ *  Arguments are passed to the invoked macro by name.
+ *  The text following the macro name must consist of a series of
+ *  names each of which is followed by an equal sign (@code{=}) and
+ *  a @i{simple expression} that yields a string.
 =*/
 MAKE_HANDLER_PROC( Invoke )
 {

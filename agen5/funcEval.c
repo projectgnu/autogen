@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.9 1999/11/02 04:08:00 bruce Exp $
+ *  $Id: funcEval.c,v 1.10 1999/11/04 04:36:55 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -300,97 +300,11 @@ eval( const char* pzExpr )
  *  load_proc:
  *
  *  desc:
- *   Referring back to the general format:
- *   @example
- *   [[ <apply-code> ] <value-name> ] [ <expression-1> [ <expression-2> ]]
- *   @end example
- *
- *   @noindent
- *   the result of the evaluation will depend on what apply code
- *   has been provided, whether or not there is an associated value
- *   for the value name, and whether or not expressions are specified.
- *
- *   The syntax rules are:
- *
- *   @enumerate
- *   @item
- *   If no value name is provided, then the rest of the macro is presumed
- *   to be an expression and evaluated.  It @strong{must} start with one
- *   of the expression processing characters.  See below.
- *   @item
- *   If no expression is provided, then there must be a value name
- *   and there may not be an apply code.  The result will either be
- *   the empty string, or the AutoGen value associated with value name.
- *   @item
- *   If the apply code is either @code{?} or @code{?%}, then two
- *   expressions must be provided, otherwise only one expression
- *   may be provided.
- *   @end enumerate
- *
- *   The apply codes used are as follows:
- *
- *   @table @samp
- *   @item @code{-}
- *   The expression that follows the value name will be processed
- *   only if the named value is @strong{not} found.
- *
- *   @item @code{?}
- *   There must be @strong{two} space separated expressions following
- *   the value name.  The first is selected if the value name is found,
- *   otherwise the second expression is selected.
- *
- *   @item @code{%}
- *   The first expression that follows the name will be used as a
- *   format string to sprintf.  The data argument will be the value
- *   named after the @code{%} character.
- *
- *   @item @code{?%}
- *   This combines the functions of @code{?}and @code{%}, but for
- *   obvious reasons, only the first expression will be used as a
- *   format argument.
- *
- *   @item not-supplied
- *   The macro will be skipped if there is no AutoGen value associated with
- *   the @code{<value-name>}.  If there is an associated value, then the
- *   expression result is the result of evaluating @code{<expression-1>}
- *   (if present), otherwise it is the value associated with
- *   @code{<value-name>}.
- *   @end table
- *
- *   The expression clauses are interpreted differently,
- *   depending on the first character:
- *
- *   @table @samp
- *   @item @code{;} (semi-colon)
- *   This is a Scheme comment character and must preceed Scheme code.
- *   AutoGen will strip it and pass the result to the Guile Scheme
- *   interpreter.
- *
- *   @item @code{(} (open parenthesis)
- *   This is a Scheme expression.  Guile will interpret it.
- *   It must end before the end macro marker.
- *
- *   @item @code{'} (single quote)
- *   This is a @i{fairly} raw text string.  It is not completely raw
- *   because backslash escapes are processed before 3 special characters:
- *   single quote (@code{'}), the hash character (@code{#}) and
- *   backslash (@code{\\}).
- *
- *   @item @code{"} (double quote)
- *   This is a cooked text string.  The string is processed as in a
- *   K and R quoted string.  That is to say, adjacent strings are not
- *   concatenated together.
- *
- *   @item @code{`} (back quote)
- *   This is a shell expression.  The AutoGen server shell will
- *   interpret it.  The result of the expression will be the
- *   output of the shell script.  The string is processed as in
- *   the cooked string before being passed to the shell.
- *
- *   @item anything else
- *   Is presumed to be a literal string.  It becomes the result
- *   of the expression.
- *   @end table
+ *   This macro does not have a name to cause it to be invoked
+ *   explicitly, though if a macro starts with one of the apply codes
+ *   or one of the simple expression markers, then an expression
+ *   macro is inferred.  The result of the expression evaluation
+ *   (@xref{expression syntax}) is written to the current output.
 =*/
 MAKE_HANDLER_PROC( Expr )
 {
