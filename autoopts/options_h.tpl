@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.3 2002/04/14 20:48:23 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.4 2002/05/02 03:23:44 bkorb Exp $
 
 =][=
 
@@ -208,7 +208,7 @@ struct specOptIndex {
  *  fields.  This way, the "optionProcess()" routine may exit with an
  *  informative message instead of, for example, seg faulting.
  */
-#define  OPTIONS_STRUCT_VERSION  49155
+#define  OPTIONS_STRUCT_VERSION  53252
 
 struct options {
     const int         structVersion;

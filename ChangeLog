@@ -1,3 +1,8 @@
+2002-05-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(zSchemeInit): add macro for determining existence and
+	type of a Scheme definition.
+
 2002-04-19  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcCase.c: consolodate the debugging printing

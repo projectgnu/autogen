@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.13 2002/04/01 03:19:42 bkorb Exp $
+ *  $Id: autogen.c,v 3.14 2002/05/02 03:23:44 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -41,7 +41,9 @@ tSCC zSchemeInit[] =
 "             \"_\" header-file \"_GUARD\" ))))\n"
 "      (sprintf \"#ifndef %1$s\\n#define %1$s\" header-guard)\n"
 ")  )\n"
-"(define autogen-version \"" AUTOGEN_VERSION "\")";
+"(define autogen-version \"" AUTOGEN_VERSION "\")\n"
+"(define-macro (defined-as predicate symbol)\n"
+"  `(and (defined? ',symbol) (,predicate ,symbol)))";
 
 STATIC sigjmp_buf  abendJumpEnv;
 
