@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: C -*-
 
-# $Id: snarf.tpl,v 1.3 1999/10/28 03:25:02 bruce Exp $
+# $Id: snarf.tpl,v 1.4 1999/11/03 05:14:26 bruce Exp $
 
 ini =]
 /*
@@ -53,10 +53,22 @@ void
   FOR gfunc =]
   gh_new_procedure( (char*)s_[=name=],
                       [=
-      % group "%s_"     =]scm_[=% name (sprintf "%%-28s" "%s,")=] [=
-      IF (exist? "req") =][=req=][=ELSE=]1[=ENDIF=], [=
-      IF (exist? "opt") =][=opt=][=ELSE=]0[=ENDIF=], [=
-      IF (exist? "var") =][=var=][=ELSE=]0[=ENDIF=] );[=
+      % group "%s_"     =]scm_[= % name (sprintf "%%-28s" "%s,") =] [=
+
+    IF (not (exist? "exparg"))
+       =]0, 0, 0[=
+
+    ELIF (not (exist? "exparg.arg_list")) =][=
+       (- (count "exparg") (count "exparg.arg_optional")) =], [=
+       (count "exparg.arg_optional" ) =], 0[=
+
+    ELIF (not (exist? "exparg.arg_optional")) =][=
+       (- (count "exparg") 1) =], 0, 1[=
+
+    ELSE =][=
+       (- (count "exparg") (count "exparg.arg_optional")) =], [=
+       (- (count "exparg.arg_optional" ) 1) =], 1[=
+    ENDIF =] );[=
   ENDFOR gfunc =][=
 
   FOR syntax =]
