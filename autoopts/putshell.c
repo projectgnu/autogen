@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 2.3 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: putshell.c,v 2.4 2000/10/20 03:32:04 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -83,6 +83,9 @@ putBourneShell( tOptions* pOpts )
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
     tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d\nexport %1$s_%2$s\n";
     tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
+    tSCC zOptValFmt[] = "%s_%s='";
+    tSCC zOptEnd[]    = "'\nexport %s_%s\n";
+    tSCC zFullOptFmt[]= "%1$s_%2$s='%3$s'\nexport %1$s_%2$s\n";
 
     printf( zOptCtFmt, pOpts->curOptIdx-1 );
 
@@ -134,6 +137,25 @@ putBourneShell( tOptions* pOpts )
                     (int)(pOD->pzLastArg) );
 
         /*
+         *  If the argument type is an enumeration, then it is much
+         *  like a text value, except we call the callback function
+         *  to emit the value corresponding to the "pzLastArg" number.
+         */
+        else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
+            printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
+            (*(pOD->pOptProc))( (tOptions*)1UL, pOD );
+            printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
+        }
+
+        /*
+         *  If the argument type is numeric, the last arg pointer
+         *  is really the VALUE of the string that was pointed to.
+         */
+        else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
+            printf( zFullOptFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
+                    ((int)(pOD->pzLastArg) == 0) ? "false" : "true" );
+
+        /*
          *  IF the option has an empty value,
          *  THEN we set the argument to the occurrence count.
          */
@@ -147,9 +169,6 @@ putBourneShell( tOptions* pOpts )
          *  This option has a text value
          */
         else {
-            tSCC zOptValFmt[] = "%s_%s='";
-            tSCC zOptEnd[]    = "'\nexport %s_%s\n";
-
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
             putQuotedStr( pOD->pzLastArg );
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
