@@ -6,6 +6,8 @@
 	* configure.in: removed reference to sigsend.c
 	* compat/Makefile.am: removed reference to sigsend.c
 	* compat/sigsend.c: removed
+	* :mkconfig: corrected touch format
+	* configure: regenerated with corrected touch format
 
 2000-06-21  Bruce Korb  <bkorb@gnu.org>
 
