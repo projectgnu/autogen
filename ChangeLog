@@ -1,8 +1,12 @@
 2003-04-10  Bruce Korb  <bkorb@gnu.org>
 
-	* expOutput.c(ag_scm_out_push_new): mkstemp uses the O_CREAT flag.
+	* agen5/Makefile.am(autogen_LDADD): add the Guile link stuff here.
+
+2003-04-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c(ag_scm_out_push_new): mkstemp uses the O_CREAT flag.
 	This is incompatibile with the fdopen option "a+" on OSR5.
-	* tpProcess.c(openOutFile): incorrect arg list for printf.
+	* agen5/tpProcess.c(openOutFile): incorrect arg list for printf.
 
 2003-04-03  Bruce Korb  <bkorb@gnu.org>
 

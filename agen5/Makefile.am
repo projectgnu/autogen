@@ -9,7 +9,7 @@
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.20 2003/02/16 00:04:39 bkorb Exp $
+## $Id: Makefile.am,v 3.21 2003/04/11 21:40:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -48,8 +48,8 @@ autogen_SOURCES = $(GEN_CSRC) \
   funcIf.c      functions.c   functions.h   loadPseudo.c  tpLoad.c   \
   tpParse.c     tpProcess.c
 
-autogen_LDADD	= $(top_builddir)/autoopts/libopts.la
-autogen_LDFLAGS = $(DYNAMIC_AG) $(LIBGUILE_LIBS)
+autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
+autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
 FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 		functions.c
