@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.1 1998/09/14 14:33:53 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.2 1998/09/15 17:16:10 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -177,10 +177,9 @@ strequate( const char* s )
 
 
     void
-strtransform( char* s )
+strtransform( char* d, char* s )
 {
-    while (*s) {
-        *s = charmap[ (unsigned)*(s) ];
-        s++;
-    }
+    do  {
+        *(d++) = (char)charmap[ (unsigned)*s ];
+    } while (*(s++) != NUL);
 }
