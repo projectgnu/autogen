@@ -1,7 +1,7 @@
 
 /*
  *  agLex.c
- *  $Id: defLex.c,v 1.6 2000/02/15 04:25:34 bruce Exp $
+ *  $Id: defLex.c,v 1.7 2000/02/28 00:48:11 bruce Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -544,6 +544,7 @@ assembleName( char* pzScan, YYSTYPE* pRetVal )
             zNameChars[ (unsigned)'[' ] = 0;
             zNameChars[ (unsigned)']' ] = 0;
             zNameChars[ (unsigned)';' ] = 0;
+            zNameChars[ (unsigned)',' ] = 0;
             zNameChars[ (unsigned)'"' ] = 0;
             zNameChars[ (unsigned)'`' ] = 0;
             zNameChars[ (unsigned)'\'' ] = 0;
