@@ -1,6 +1,6 @@
 /*
  *  agGetDef.c
- *  $Id: defLoad.c,v 1.1 1999/10/14 00:33:53 bruce Exp $
+ *  $Id: defLoad.c,v 1.2 1999/10/16 17:47:42 bruce Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -281,8 +281,6 @@ readDefines( void )
     size_t   sizeLeft;
     ag_bool  useStdin;
     FILE*    fp;
-
-    procState = PROC_STATE_LOAD_DEFS;
 
     /*
      *  Start our definitions tree with a magical root
