@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.25 2000/04/04 13:22:18 bkorb Exp $
+## $Id: Makefile.am,v 2.26 2000/08/11 15:05:47 gvv Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -38,7 +38,7 @@ libopts_la_SOURCES = \
 		autoopts.h options.h streqv.h makeshell.c
 
 libopts_la_LDFLAGS = -no-undefined \
-		-version-info @AO_VERSION@:@AO_REVISION@
+		-version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
 
 bin_SCRIPTS	= autoopts-config
