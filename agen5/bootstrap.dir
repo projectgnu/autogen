@@ -38,6 +38,16 @@ else
     AG=./${ag}
 fi
 
+if [ -z "${DEBUG_OPTS}" ]
+then
+  if egrep 'define DEBUG' opts.h > /dev/null 2>&1
+  then
+    DEBUG_OPTS=-DDEBUG=1
+  else
+    DEBUG_OPTS=-UDEBUG
+  fi
+fi
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # For the following to work, we must temporarily install
