@@ -1,4 +1,4 @@
-2001-12-10  Bruce Korb  <bkorb@gnu.org>
+2001-12-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcDef.c(parseMacroArgs): run argument names through
 	strtransform();
