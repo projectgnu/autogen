@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.8 2000/04/07 13:28:31 bkorb Exp $
+ *  $Id: defDirect.c,v 1.9 2000/08/11 13:45:47 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -564,6 +564,7 @@ doDir_ifndef( char* pzArg, char* pzScan )
     STATIC char*
 doDir_include( char* pzArg, char* pzScan )
 {
+    tSCC*      apzSfx[] = { "def", NULL };
     tScanCtx*  pCtx;
     size_t     inclSize;
     char       zFullName[ MAXPATHLEN + 1 ];
@@ -576,7 +577,7 @@ doDir_include( char* pzArg, char* pzScan )
         return pzScan;
     pCurCtx->pzScan  = pzScan;
 
-    if (! SUCCESSFUL( findFile( pzArg, zFullName ))) {
+    if (! SUCCESSFUL( findFile( pzArg, zFullName, apzSfx ))) {
         tSCC zFmt[] = "WARNING:  cannot find `%s' definitions file\n";
         fprintf( stderr, zFmt, pzArg );
         return pzScan;

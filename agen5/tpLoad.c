@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.7 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.8 2000/08/11 13:45:47 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -57,10 +57,11 @@ findTemplate( tCC* pzTemplName )
  *  list trying to find the base template file name.
  */
     EXPORT tSuccess
-findFile( tCC* pzFName, char* pzFullName )
+findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 {
     char*   pzRoot;
     char*   pzSfx;
+    void*   deallocAddr = NULL;
 
     /*
      *  Expand leading environment variables.
@@ -100,6 +101,7 @@ findFile( tCC* pzFName, char* pzFullName )
              *  FIXME:  this is a memory leak
              */
             AGDUPSTR( pzFName, pzFullName );
+            deallocAddr = (void*)pzFName;
             pzEnd[-1] = '/';
         } else {
             pzFName = pzDef;
@@ -116,6 +118,8 @@ findFile( tCC* pzFName, char* pzFullName )
      */
     if (access( pzFName, R_OK ) == 0) {
         strcpy( pzFullName, pzFName );
+        if (deallocAddr != NULL)
+            AGFREE( deallocAddr );
         return SUCCESS;
     }
 
@@ -130,16 +134,23 @@ findFile( tCC* pzFName, char* pzFullName )
              : strchr( pzFName, '.' );
 
     /*
-     *  Check for an immediately accessible suffixed file
+     *  IF the file does not already have a suffix,
+     *  THEN try the suffixes that are okay for this file.
      */
-    if (pzSfx == (char*)NULL) {
-        snprintf( pzFullName, MAXPATHLEN, "%s.agl", pzFName );
-        if (access( pzFullName, R_OK ) == 0)
-            return SUCCESS;
+    if ((pzSfx == (char*)NULL) && (papSuffixList != NULL)) {
+        tCC** papSL = papSuffixList;
 
-        snprintf( pzFullName, MAXPATHLEN, "%s.tpl", pzFName );
-        if (access( pzFullName, R_OK ) == 0)
-            return SUCCESS;
+        char* pzEnd = pzFullName +
+            snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN, "%s.", pzFName );
+
+        do  {
+            strcpy( pzEnd, *(papSL++) );
+            if (access( pzFullName, R_OK ) == 0) {
+                if (deallocAddr != NULL)
+                    AGFREE( deallocAddr );
+                return SUCCESS;
+            }
+        } while (*papSL != NULL);
     }
 
     if (*pzFName == '/')
@@ -156,20 +167,30 @@ findFile( tCC* pzFName, char* pzFullName )
         do  {
             tSCC zDirFmt[] = "%s/%s";
             char*   pzDir  = *(ppzDir--);
-            char*   pzEnd  = pzFullName;
 
-            pzEnd += snprintf( pzFullName, MAXPATHLEN, zDirFmt, pzDir, pzFName );
+            char*   pzEnd  = pzFullName
+                + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
+                            zDirFmt, pzDir, pzFName );
 
             if (access( pzFullName, R_OK ) == 0)
                 return SUCCESS;
-            if (pzSfx == (char*)NULL) {
-                strcpy( pzEnd, ".agl" );
-                if (access( pzFullName, R_OK ) == 0)
-                    return SUCCESS;
 
-                strcpy( pzEnd, ".tpl" );
-                if (access( pzFullName, R_OK ) == 0)
-                    return SUCCESS;
+            /*
+             *  IF the file does not already have a suffix,
+             *  THEN try the ones that are okay for this file.
+             */
+            if ((pzSfx == (char*)NULL) && (papSuffixList != NULL)) {
+                tCC** papSL = papSuffixList;
+                *(pzEnd++) = '.';
+
+                do  {
+                    strcpy( pzEnd, *(papSL++) );
+                    if (access( pzFullName, R_OK ) == 0) {
+                        if (deallocAddr != NULL)
+                            AGFREE( deallocAddr );
+                        return SUCCESS;
+                    }
+                } while (*papSL != NULL);
             }
         } while (--ct > 0);
     }
@@ -197,17 +218,45 @@ findFile( tCC* pzFName, char* pzFullName )
             return FAILURE;
 
         pzFound = pathfind( pzPath, pzFName, "rs" );
-        if ((pzFound == (char*)NULL) && (pzSfx == (char*)NULL)) do {
-            snprintf( pzFullName, MAXPATHLEN, "%s.agl", pzFName );
-            pzFound = pathfind( pzPath, pzFullName, "rs" );
-            if (pzFound != (char*)NULL)
-                break;
-            snprintf( pzFullName, MAXPATHLEN, "%s.tpl", pzFName );
-            pzFound = pathfind( pzPath, pzFullName, "rs" );
-        } while (AG_FALSE);
 
-        if (pzFound == (char*)NULL)
-            return FAILURE;
+        /*
+         *  IF we could not find the bare name on the path,
+         *  THEN try all the suffixes we have available, too.
+         */
+        if (  (pzFound == (char*)NULL)
+           && (pzSfx == (char*)NULL)
+           && (papSuffixList != NULL)) {
+            tCC**   papSL = papSuffixList;
+            char*   pzEnd;
+
+            /*
+             *  IF our target name already has a suffix,
+             *  THEN we won't try to supply our own.
+             */
+            if (pzSfx != (char*)NULL) {
+                if (deallocAddr != NULL)
+                    AGFREE( deallocAddr );
+                return FAILURE;
+            }
+
+            pzEnd  = pzFullName
+                + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
+                            "%s.", pzFName );
+
+            for (;;) {
+                strcpy( pzEnd, *papSL );
+
+                if (access( pzFullName, R_OK ) == 0)
+                    break;
+
+                if (*++papSL == NULL)
+                    return FAILURE;
+
+            } while (*papSL != NULL);
+        }
+
+        if (deallocAddr != NULL)
+            AGFREE( deallocAddr );
 
         strcpy( pzFullName, pzFound );
         return SUCCESS;
@@ -640,24 +689,23 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-    EXPORT tTemplate*
-loadTemplate( tCC* pzFileName )
+    EXPORT void
+mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
 {
-    size_t       dataSize;
     void*        pDataMap;
     int          fd;
-
     static char  zRealFile[ MAXPATHLEN ];
 
     /*
      *  Find the template file somewhere
      */
-    if (! SUCCESSFUL( findFile( pzFileName, zRealFile ))) {
-        tSCC zFindTemplFile[] = "find template file";
+    if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList ))) {
+        tSCC zMapDataFile[] = "map data file";
         fprintf( stderr, zCannot, pzProg, ENOENT,
-                 zFindTemplFile, pzFileName, strerror( ENOENT ));
+                 zMapDataFile, pzFileName, strerror( ENOENT ));
         AG_ABEND;
     }
+    AGDUPSTR( pMapInfo->pzFileName, zRealFile );
 
     /*
      *  The template file must really be a file.
@@ -679,35 +727,52 @@ loadTemplate( tCC* pzFileName )
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;
-        dataSize = stbf.st_size;
+        pMapInfo->size = stbf.st_size+1;
     }
 
     /*
      *  Now open it and map it into memory
      */
-    fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
-    if (fd == -1) {
+    pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
+    if (pMapInfo->fd == -1) {
         tSCC zOpen[] = "open";
         fprintf( stderr, zCannot, pzProg, errno,
                  zOpen, zRealFile, strerror( errno ));
         AG_ABEND;
     }
 
-    pDataMap = mmap( (void*)NULL, dataSize + 1, PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE, fd, (off_t)0 );
-    if (pDataMap == (void*)(-1)) {
+    pMapInfo->pData =
+        mmap( (void*)NULL, pMapInfo->size, PROT_READ | PROT_WRITE,
+              MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
+
+    if (pMapInfo->pData == (void*)(-1)) {
         tSCC zMmap[] = "mmap";
         fprintf( stderr, zCannot, pzProg, errno,
                  zMmap, zRealFile, strerror( errno ));
         AG_ABEND;
     }
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Starting with the current directory, search the directory
+ *  list trying to find the base template file name.
+ */
+    EXPORT tTemplate*
+loadTemplate( tCC* pzFileName )
+{
+    tSCC*        apzSfx[] = { "tpl", "agl", NULL };
+    static tMapInfo  mapInfo;
+
+    mapDataFile( pzFileName, &mapInfo, apzSfx );
 
     /*
      *  Check for a binary template.  If it is, it must
      *  be the current revision, or we choke.
      */
     {
-        tTemplate*  p = (tTemplate*)pDataMap;
+        tTemplate*  p = (tTemplate*)mapInfo.pData;
 
         if (p->magic.magic.i[0] == magicMark.magic.i[0]) {
             tSCC zOutOfDate[] = "out-of-date binary template";
@@ -716,8 +781,8 @@ loadTemplate( tCC* pzFileName )
             tCC* pz;
 
             if (p->magic.magic.i[1] == magicMark.magic.i[1]) {
-                p->fd = fd;
-                return templateFixup( p, dataSize );
+                p->fd = mapInfo.fd;
+                return templateFixup( p, mapInfo.size-1 );
             }
 
             if (p->magic.revision < TEMPLATE_REVISION)
@@ -727,7 +792,7 @@ loadTemplate( tCC* pzFileName )
             else
                 pz = zChange;
 
-            fprintf( stderr, zTplErr, zRealFile, 0, pz );
+            fprintf( stderr, zTplErr, mapInfo.pzFileName, 0, pz );
             AG_ABEND;
         }
     }
@@ -736,13 +801,13 @@ loadTemplate( tCC* pzFileName )
         size_t       macroCt;
         tTemplate*   pRes;
         size_t       alocSize;
-        tCC*  pzData;
+        tCC*         pzData;
 
         /*
          *  Process the leading pseudo-macro.  The template proper
          *  starts immediately after it.
          */
-        pzData = loadPseudoMacro( (tCC*)pDataMap, zRealFile );
+        pzData = loadPseudoMacro( (tCC*)mapInfo.pData, mapInfo.pzFileName );
 
         /*
          *  Count the number of macros in the template.  Compute
@@ -752,8 +817,8 @@ loadTemplate( tCC* pzFileName )
          */
         macroCt = countMacros( pzData );
         alocSize = sizeof( *pRes ) + (macroCt * sizeof( tMacro ))
-                   + dataSize - (pzData - (tCC*)pDataMap)
-                   + strlen( zRealFile ) + 0x10;
+                   + mapInfo.size - (pzData - (tCC*)mapInfo.pData)
+                   + strlen( mapInfo.pzFileName ) + 0x10;
         alocSize &= ~0x0F;
         pRes = (tTemplate*)AGALOC( alocSize );
         memset( (void*)pRes, 0, alocSize );
@@ -767,11 +832,11 @@ loadTemplate( tCC* pzFileName )
         pRes->fd        = -1;
         strcpy( pRes->zStartMac, zStartMac );
         strcpy( pRes->zEndMac, zEndMac );
-        loadMacros( pRes, zRealFile, (char*)NULL, pzData );
+        loadMacros( pRes, mapInfo.pzFileName, (char*)NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize );
 
-        munmap( pDataMap, dataSize+1 );
-        close( fd );
+        munmap( mapInfo.pData, mapInfo.size );
+        close( mapInfo.fd );
         return templateFixup( pRes, pRes->descSize );
     }
 }

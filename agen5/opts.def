@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.23 2000/04/07 13:28:31 bkorb Exp $
+ *   $Id: opts.def,v 1.24 2000/08/11 13:45:47 bkorb Exp $
  */
 
 /*
@@ -168,9 +168,11 @@ flag = {
     "option processing is complete.\n";
 
     flag_code = '    int saveState = procState;
-    char zPath[ MAXPATHLEN ];
     char* pz;
-    if (! SUCCESSFUL( findFile( pOptDesc->pzLastArg, zPath ))) {
+    char  zPath[ MAXPATHLEN ];
+    tSCC* apzSfx[] = { "scm", NULL };
+
+    if (! SUCCESSFUL( findFile( pOptDesc->pzLastArg, zPath, apzSfx ))) {
         fprintf( stderr, "Cannot locate scheme file `%s\'\n",
                  pOptDesc->pzLastArg );
         USAGE( EXIT_FAILURE );

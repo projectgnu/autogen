@@ -1,6 +1,18 @@
 2000-08-10  Bruce Korb  <bkorb@gnu.org>
 
+	* Applied fixes from home.
 	* agen5/expFormat.c: clean up the BSD license
+	* autogen/agen5/autogen.h: Set maximum size of a suffix in a suffix list,
+	defined a structure to contain everything we need to know about
+	a mmap-ed file
+	* autogen/agen5/bootstrap.dir(proto.h): date stamp the file
+	* autogen/agen5/defDirect.c: use suffix list argument for "findFile"
+	* autogen/agen5/expFormat.c: license function reads text from a file
+	* autogen/agen5/opts.def: use suffix list argument for "findFile"
+	* autogen/agen5/tpLoad.c: Export a new function, "loadFile", add
+	a suffix list for "findFile", deallocate a once-only memory leak
+	* autogen/autoopts/options.h: correct struct version id
+	* autogen/configure: regenerate
 
 2000-08-09  Bruce Korb  <bkorb@gnu.org>
 

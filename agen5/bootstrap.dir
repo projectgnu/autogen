@@ -280,7 +280,7 @@ do
   proto.h )
     ( cat <<-	_EOF_
 	/*
-	 * AutoGen Globally exported prototypes
+	 * AutoGen Globally exported prototypes `date`
 	 */
 	#ifndef AUTOGEN_PROTOTYPES_H
 	#define AUTOGEN_PROTOTYPES_H

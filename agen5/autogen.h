@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.13 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: autogen.h,v 1.14 2000/08/11 13:45:47 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -72,6 +72,8 @@ typedef struct macro_desc    tMacro;
 typedef struct template_desc tTemplate;
 typedef struct for_info      tForInfo;
 typedef struct template_lib_marker tTlibMark;
+
+#define MAX_SUFFIX_LEN  8  /* maximum length of a file name suffix */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -206,6 +208,13 @@ struct fpStack {
     FILE*       pFile;
     char*       pzName;
 };
+
+typedef struct {
+    tCC*        pzFileName;
+    int         fd;
+    size_t      size;
+    void*       pData;
+} tMapInfo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

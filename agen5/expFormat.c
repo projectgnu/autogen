@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.18 2000/08/10 22:46:53 bkorb Exp $
+ *  $Id: expFormat.c,v 1.19 2000/08/11 13:45:47 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -394,6 +394,131 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 
     res = gh_str02scm( pzRes );
     AGFREE( (void*)pzRes );
+    return res;
+}
+
+
+/*=gfunc license
+ *
+ * what:  an arbitrary license
+ *
+ * exparg: lic_name, file name of the license
+ * exparg: prog_name, name of the program under the BSD
+ * exparg: owner, Grantor of the BSD License
+ * exparg: prefix, String for starting each output line
+ *
+ * doc:
+ *  Emit a string that contains the named license.  The license text
+ *  is read from a file named, @code{lic_name}.lic, searching the standard
+ *  directories.  The file contents are used as a format argument
+ *  to @code{printf}(3), with @code{prog_name} and @code{owner} as
+ *  the two string formatting arguments.  Each output line is automatically
+ *  prefixed with the string @code{prefix}.
+=*/
+    SCM
+ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
+{
+    static tMapInfo mi = { NULL, 0, 0, NULL };
+
+    char*     pzRes;
+    SCM       res;
+
+    if (! (   gh_string_p( license )
+           && gh_string_p( prog_name )
+           && gh_string_p( owner )
+           && gh_string_p( prefix )))
+        return SCM_UNDEFINED;
+
+    {
+        char* pzLicense = SCM_CHARS( license );
+
+        /*
+         *  Set the current file name.
+         *  If it changes, then unmap the old data
+         */
+        if (mi.pzFileName == NULL)
+            AGDUPSTR( mi.pzFileName, pzLicense );
+
+        else if (strcmp( mi.pzFileName, pzLicense ) != 0) {
+            munmap( mi.pData, mi.size );
+            close( mi.fd );
+            mi.pData = NULL;
+            AGFREE( (void*)mi.pzFileName );
+            AGDUPSTR( mi.pzFileName, pzLicense );
+        }
+    }
+
+    if (mi.pData == (char*)NULL) {
+        tSCC*  apzSfx[] = { "lic", NULL };
+        mapDataFile( mi.pzFileName, &mi, apzSfx );
+    }
+
+    {
+        char*  pzName   = SCM_CHARS( prog_name );
+        char*  pzOwner  = SCM_CHARS( owner );
+
+        pzRes = asprintf( (char*)mi.pData, pzName, pzOwner );
+
+        if (pzRes == (char*)NULL) {
+            fprintf( stderr, zAllocErr, pzProg, -1, "license string" );
+            LOAD_ABORT( pCurTemplate, pCurMacro, zFmtAlloc );
+        }
+    }
+
+    {
+        char*   pzPfx    = SCM_CHARS( prefix );
+        char*   pzScan   = pzRes;
+        char*   pzOut;
+        size_t  pfx_size = strlen( pzPfx );
+        size_t  out_size = 1;
+
+        /*
+         *  Figure out how much space we need (text size plus
+         *  a prefix size for each newline)
+         */
+        for (;;) {
+            switch (*(pzScan++)) {
+            case NUL:
+                goto exit_count;
+            case '\n':
+                out_size += pfx_size;
+                /* FALLTHROUGH */
+            default:
+                out_size++;
+            }
+        } exit_count:;
+
+        /*
+         *  Create our output buffer and insert the first prefix
+         */
+        res    = scm_makstr( out_size, 0 );
+        pzOut  = SCM_CHARS( res );
+        strcpy( pzOut, pzPfx );
+        pzOut += pfx_size;
+        pzScan = pzRes;
+
+        for (;;) {
+            switch (*(pzOut++) = *(pzScan++)) {
+            case NUL:
+                goto exit_copy;
+
+            case '\n':
+                strcpy( pzOut, pzPfx );
+                pzOut += pfx_size;
+                break;
+
+            default:
+                break;
+            }
+        }
+    } exit_copy:;
+
+    /*
+     *  We allocated a temporary buffer that has all the formatting done,
+     *  but need the prefixes on each line.
+     */
+    AGFREE( (void*)pzRes );
+
     return res;
 }
 /* end of expFormat.c */
