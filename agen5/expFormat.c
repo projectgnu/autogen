@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.23 2000/09/16 15:45:37 bkorb Exp $
+ *  $Id: expFormat.c,v 1.24 2000/09/16 15:58:08 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -154,14 +154,19 @@ ag_scm_dne( SCM prefix, SCM first )
 {
     char*    pzPfx;
     char*    pzRes;
-    char*    pzFirst = zNil;
+    tCC*     pzFirst = zNil;
     SCM      res;
     char     zTimeBuf[ 128 ];
 
     if (! gh_string_p( prefix ))
         return SCM_UNDEFINED;
+
     pzPfx = SCM_CHARS( prefix );
 
+    /*
+     *  IF we also have a 'first' prefix string,
+     *  THEN we set it to something other than ``zNil'' and deallocate later.
+     */
     if (gh_string_p( first )) {
         pzFirst = SCM_CHARS( first );
         pzFirst = asprintf( zDne1, pzFirst, pzPfx );
