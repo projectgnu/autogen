@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.2 1999/11/07 04:13:25 bruce Exp $
+ *  $Id: tpParse.c,v 1.3 1999/11/07 05:34:09 bruce Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -130,8 +130,8 @@ skipMacro( tCC* pzStartMark )
     int  depth;
 
     depth = 1;
-    pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
     pzEndMark   = strstr( pzStartMark + startMacLen, zEndMac );
+    pzStartMark = strstr( pzStartMark + startMacLen, zStartMac );
 
     /*
      *  Starting state:
