@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.22 2000/04/05 14:39:54 bkorb Exp $
+ *   $Id: opts.def,v 1.23 2000/04/07 13:28:31 bkorb Exp $
  */
 
 /*
@@ -59,14 +59,14 @@ detail =
 
 "The definitions file (`<def-file>') can be specified with the
 `definitions' option or as the command argument, but not both.
-Omitting it or specifying `-' will result in reading definitions
-from standard input.
+Omitting it or specifying `-' will result in reading definitions from
+standard input.
 
-The output file names are based on the template, but generally use
-the base name of the definition file.  If standard in is read for
-the definitions, then `stdin' will be used for that base name.
-The suffixes to the base name are gotten from the template.
-However, the template file may specify the entire name.
+The output file names are based on the template, but generally use the
+base name of the definition file.  If standard in is read for the
+definitions, then `stdin' will be used for that base name.  The
+suffixes to the base name are gotten from the template.  However, the
+template file may specify the entire output file.
 
 `loop-limit' is used in debugging to stop runaway expansions.";
 
@@ -160,7 +160,7 @@ flag = {
     descrip   = "Scheme code file to load";
     settable;
     doc =
-    "Use this argument to preload Scheme scripts into the Guile\n"
+    "Use this argument to pre-load Scheme scripts into the Guile\n"
     "interpreter before template processing begins.\n"
     "Please note that the AutoGen specific functions are not loaded\n"
     "until after argument processing.  So, though they may be specified\n"

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.19 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: funcCase.c,v 1.20 2000/04/07 13:28:31 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -281,7 +281,7 @@ ag_scm_string_equals_p( SCM text, SCM substr )
  * doc:  Test to see if a string contains an equivalent string.
  *       `equivalent' means the strings match, but without regard
  *       to character case.  In other words, it is a case insensitive
- *       comapare.
+ *       compare.
 =*/
     STATIC tSuccess
 Select_Equivalent( char* pzText, char* pzMatch )
@@ -901,7 +901,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  If a comparison, use an equal sign (@code{=}).
  *  If a pattern match, use a tilde (@code{~}).
  *  @item
- *  Is the match case senstive?
+ *  Is the match case sensitive?
  *  If alphabetic case is important, double the tilde or equal sign.
  *  @end enumerate
  *

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.14 2000/03/29 05:10:19 bruce Exp $
+ *  $Id: expState.c,v 1.15 2000/04/07 13:28:31 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -490,7 +490,7 @@ ag_scm_exist_p( SCM obj )
  * doc:  This function answers the question, "Is there an AutoGen value named
  *       @code{ag-name} with a value that matches the pattern @code{test-str}
  *       using the match function @code{op}?"  Return SCM_BOOL_T iff at least
- *       one occurrance of the specified name has such a value.  The operator
+ *       one occurrence of the specified name has such a value.  The operator
  *       can be any function that takes two string arguments and yields a
  *       boolean.  It is expected that you will use one of the string matching
  *       functions provided by AutoGen.

@@ -1,3 +1,16 @@
+2000-04-06  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/auto_gen.tpl:  Document the "here string" construct
+	* agen5/defDirect.c:  doc cleanup
+	* agen5/expState.c:  doc cleanup
+	* agen5/funcCase.c:  doc cleanup
+	* agen5/funcDef.c:  doc cleanup
+	* agen5/opts.def:  doc cleanup
+	* autoopts/doc.tpl:  doc cleanup
+	* doc/autobuild/autobuild.html:  doc cleanup
+	* doc/compatlib/compatlib.html:  doc cleanup
+	* getdefs/opts.def:  doc cleanup
+
 2000-04-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defLex.c:  Implemented a "here string" construct

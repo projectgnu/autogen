@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.20 2000/04/04 16:44:12 bkorb Exp $
+ *   $Id: opts.def,v 2.21 2000/04/07 13:28:51 bkorb Exp $
  */
 
 /*
@@ -206,7 +206,7 @@ flag = {
     arg_name    = file;
     descrip     = "Output file to open";
     doc =
-    "If you are not sending the output to an Augogen process,\n"
+    "If you are not sending the output to an AutoGen process,\n"
     "you may name an output file instead.";
 };
 
@@ -243,8 +243,8 @@ flag = {
     descrip     = "AutoGen Argument";
     flags_cant  = output;
     doc =
-    "This is a passthrough argument.  It allows you to have AutoGen invoked\n"
-    "with any arbitrary argument.";
+    "This is a pass-through argument.  It allows you to specify any\n"
+    "arbitrary argument to be passed to AutoGen.";
 };
 
 flag = {

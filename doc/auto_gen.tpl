@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.55 2000/04/05 14:39:54 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.56 2000/04/07 13:28:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -33,7 +33,7 @@ directories:
 @set EDITION [=`echo ${AG_REVISION}`=]
 @set VERSION [=`echo ${AG_REVISION}`=]
 @set UPDATED [=`date "+%B %Y"`=]
-@set CDATE   1992-[=`date +%Y`=]
+@set COPYRIGHT [=(get "copyright.date")=]
 
 @dircategory GNU programming tools
 @direntry
@@ -43,9 +43,9 @@ directories:
 @ifinfo
 This file documents [=package=] Version @value{VERSION}
 
-AutoGen copyright @copyright{} @value{CDATE} Bruce Korb
-AutoOpts copyright @copyright{} @value{CDATE} Bruce Korb
-snprintfv copyright @copyright{} 1999 Gary V. Vaughan
+AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
+AutoOpts copyright @copyright{} @value{COPYRIGHT} Bruce Korb
+snprintfv copyright @copyright{} 1999-2000 Gary V. Vaughan
 
 [=(gpl "AutoGen" "")=]
 
@@ -61,11 +61,11 @@ notice identical to this one except for the removal of this paragraph
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{bkorb@@gnu.org}
+@author @email{autogen@@linuxave.org}
 
 @page
 @vskip 0pt plus 1filll
-AutoGen copyright @copyright{} @value{CDATE} Bruce Korb
+AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,
 @sp 2
@@ -150,10 +150,10 @@ For a full list of the Automated Option features, @xref{Features}.
 @node Generalities
 @section The Purpose of AutoGen
 
-The idea of this program is to to construct an output file by instantiating
-a template file that contains the general text of the desired output file.
-That template includes substitution expressions and sections of text that
-are replicated under the control of separate definition files.
+The idea of this program is to have a text file, a template if
+you will, that contains the general text of the desired output file.
+That file includes substitution expressions and sections of text that are
+replicated under the control of separate definition files.
 
 @cindex design goals
 
@@ -174,7 +174,7 @@ go back and clean up older definition files.  Reduce incompatibilities!
 
 @item
 Multiple values for a given name create an array of values.  This array of
-values is used to control the repetition of sections of the template.
+values is used to control the replication of sections of the template.
 
 @item
 There are named collections of definitions.  They form a nested hierarchy.
@@ -196,7 +196,7 @@ expressions are less cryptic than the shell methods.
 @item
 These same markers are used, in conjunction with enclosed keywords, to
 indicate sections of text that are to be skipped and for sections of
-text that were to be repeated.  This is a major improvement over using C
+text that are to be repeated.  This is a major improvement over using C
 preprocessing macros.  With the C preprocessor, you have no way of
 selecting output text because it is an @i{un}varying, mechanical
 substitution process.
@@ -398,15 +398,16 @@ Sincerely,
 @cindex .def file
 
 This chapter describes the syntax and semantics of the AutoGen
-definition file.  Knowledge of identification, simple and compound
-definition syntax is required to instantiate a template.  Consequently,
-we keep it very simple.  For "advanced" users, there are preprocessing
-directives and comments that may be used as well.
+definition file.  In order to instantiate a template, you normally must
+provide a definitions file that identifies itself and contains some
+value definitions.  Consequently, we keep it very simple.  For
+"advanced" users, there are preprocessing directives and comments that
+may be used as well.
 
 The definitions file is used to associate values with names.  When
 multiple values are associated with a single name, an implicit array of
 values is formed.  Values may be either simple strings or compound
-collections of value-name pairs.  An array may not contain both simple
+collections of name-value pairs.  An array may not contain both simple
 and compound members.  Fundamentally, it is as simple as:
 
 @example
@@ -426,18 +427,18 @@ ignored, along with all following text through the matching
 C macro substitution is @strong{not} performed.
 
 @menu
-* Identification::  The First Definition
-* Definitions::     Simple and Compound Definitions
+* Identification::  The Identification Definition
+* Definitions::     Named Definitions
 * Dynamic Text::    Dynamic Text
 * Directives::      Controlling What Gets Processed
 * Comments::        Commenting Your Definitions
 * Example::         What it all looks like.
 * Full Syntax::     YACC Language Grammar
-* Definitionless::  AutoGen without Definitions
+* Definition-less::  AutoGen without Definitions
 @end menu
 
 @node Identification
-@section The First Definition
+@section The Identification Definition
 @cindex identification
 
 The first definition in this file is used to identify it as a
@@ -453,6 +454,12 @@ template name and a terminating semi-colon (@code{;}).  That is:
 Note that, other than the name @var{template-name}, the words
 @samp{AutoGen} and @samp{Definitions} are searched for without case
 sensitivity.  Most lookups in this program are case insensitive.
+
+@noindent
+Also, if the input contains more identification definitions,
+they will be ignored.  This is done so that you may include
+(@xref{Directives}) other definition files without an identification
+conflict.
 
 @cindex template, file name
 @cindex .tpl, file name
@@ -477,10 +484,8 @@ If AutoGen fails to find the template file in one of these places,
 it prints an error message and exits.
 
 @node Definitions
-@section Simple and Compound Definitions
+@section Named Definitions
 @cindex definitions
-@cindex simple definitions
-@cindex compound definitions
 
 Any name may have multiple values associated with it in the definition
 file.  If there is more than one instance, the @strong{only} way to
@@ -488,17 +493,39 @@ expand all of the copies of it is by using the FOR (@xref{FOR}.) text
 function on it, as described in the next chapter.
 
 There are two kinds of definitions, @samp{simple} and @samp{compound}.
-They are defined thus:
+They are defined thus (@xref{Full Syntax}):
 
 @example
 compound_name '=' '@{' definition-list '@}' ';'
 
-text_name '=' string ';'
+simple_name '=' string ';'
 
 no_text_name ';'
 @end example
 
 @noindent
+@code{No_text_name} is a simple definition with a shorthand empty string
+value.  The string values for definitions may be specified in any of
+several formation rules.
+
+@menu
+* Naming::                   Naming a Value
+* def-list::                 Definition List
+* double-quote-string::      Double Quote String
+* single-quote-string::      Single Quote String
+* simple-string::            An Unquoted String
+* shell-generated::          Shell Output String
+* scheme-generated::         Scheme Result String
+* here-string::              A Here String
+* concat-string::            Concatenated Strings
+@end menu
+
+@cindex simple definitions
+@cindex compound definitions
+
+@node Naming
+@subsection Naming a Value
+
 The names may be a simple name taking the next available index,
 or may specify an index by name or number.  For example:
 
@@ -511,11 +538,9 @@ txt_name[ DEF_NAME ]
 @code{DEF_NAME} must be defined to have a numeric value.
 If you do specify an index, you must take care not to cause conflicts.
 
-@noindent
-@code{No_text_name} is a text definition with a shorthand empty string
-value.
+@node def-list
+@subsection Definition List
 
-@noindent
 @code{definition-list} is a list of definitions that may or may not
 contain nested compound definitions.  Any such definitions may
 @strong{only} be expanded within a @code{FOR} block iterating over the
@@ -536,18 +561,19 @@ list = @{ list_element = omega;  last;
          list_info    = "final omega stuff"; @};
 @end example
 
-@cindex simple definitions, format
-The string values for definitions may be specified in one of five
-formation rules:
+@node double-quote-string
+@subsection Double Quote String
 
-@table @samp
-@item with a double quote @code{"}
 @cindex string, double quote
 The string follows the C-style escaping (@code{\}, @code{\n}, @code{\f},
 @code{\v}, etc.), plus octal character numbers specified as @code{\ooo}.
 The difference from "C" is that the string may span multiple lines.
+Like ANSI "C", a series of these strings, possibly intermixed with
+single quote strings, will be concatenated together.
 
-@item with a single quote @code{'}
+@node single-quote-string
+@subsection Single Quote String
+
 @cindex string, single quote
 This is similar to the shell single-quote string.  However, escapes
 @code{\} are honored before another escape, single quotes @code{'}
@@ -570,11 +596,19 @@ foo = '
 ';
 @end example
 
-@item with a back quote @code{`}
+@*
+As with the double quote string, a series of these, even intermixed
+with double quote strings, will be concatenated together.
+
+@node shell-generated
+@subsection Shell Output String
+@cindex shell-generated string
+
 @cindex string, shell output
-This is treated identically with the double quote, except that the
-resulting string is written to a shell server process and the definition
-takes on the value of the output string.
+This is assembled according to the same rules as the double quote string,
+except that there is no concatenation of strings and the resulting string is
+written to a shell server process.  The definition takes on the value of
+the output string.
 
 NB:  The text is interpreted by a server shell.  There may be
 left over state from previous @code{`} processing and it may
@@ -582,27 +616,71 @@ leave state for subsequent processing.  However, a @code{cd}
 to the original directory is always issued before the new
 command is issued.
 
-A definition utilizing a backquote may not be joined with any other text.
+@node simple-string
+@subsection An Unquoted String
 
-@item without surrounding quotes
-The string must not contain any of the characters special to the
-definition text (e.g. @code{"}, @code{#}, @code{'}, @code{(}, @code{)},
-@code{,}, @code{;}, @code{=}, @code{[}, @code{]}, @code{`}, @code{@{},
-@code{@}} or any white space character).  Basically, if the string looks
-like it is a normal file name or variable name, and it is not one of two
-keywords (@samp{autogen} or @samp{definitions}) then it is OK to not
-quote it, otherwise you should.
+A simple string that does not contain white space @i{may} be left
+unquoted.  The string must not contain any of the characters special to
+the definition text (i.e. @code{"}, @code{#}, @code{'}, @code{(},
+@code{)}, @code{,}, @code{;}, @code{<}, @code{=}, @code{>}, @code{[},
+@code{]}, @code{`}, @code{@{}, or @code{@}}).  This list is subject to
+change, but it will never contain period (@code{.}), slash (@code{/}),
+colon (@code{:}), hyphen (@code{-}) or backslash (@code{\}).  Basically,
+if the string looks like it is a normal DOS or UNIX file or variable
+name, and it is not one of two keywords (@samp{autogen} or
+@samp{definitions}) then it is OK to not quote it, otherwise you should.
 
-@item a Scheme expression starting with an open parenthesis @code{(}
+@node scheme-generated
+@subsection Scheme Result String
+
+A scheme result string must begin with an open parenthesis @code{(}.
 The scheme expression will be evaluated by Guile and the
 value will be the result.  The AutoGen expression functions
 are @strong{dis}abled at this stage, so do not use them.
-@end table
 
-If single or double quote characters are used, then you
-also have the option, a la ANSI-C syntax, of implicitly
-concatenating a series of them together, with intervening
-white space ignored.
+@node here-string
+@subsection A Here String
+@cindex here-string
+
+A @samp{here string} is formed in much the same way as a shell here doc.
+It is denoted with a doubled less than character and, optionally, a
+hyphen.  This is followed by optional horizontal white space and an
+ending marker-identifier.  This marker must follow the syntax rules
+for identifiers.  Unlike the shell version, however, you must not quote
+this marker.  The resulting string will start with the first character
+on the next line and continue up to but not including the newline that
+precedes the line that begins with the marker token.  No backslash or
+any other kind of processing is done on this string.  The characters are
+copied directly into the result string.
+
+Here are two examples:
+@example
+str1 = <<-  STR_END
+        $quotes = " ' `
+        STR_END;
+
+str2 = <<   STR_END
+        $quotes = " ' `
+        STR_END;
+STR_END;
+@end example
+The first string contains no new line characters.
+The first character is the dollar sign, the last the back quote.
+
+The second string contains one new line character.  The first character
+is the tab character preceeding the dollar sign.  The last character is
+the semicolon after the @code{STR_END}.  That @code{STR_END} does not
+end the string because it is not at the beginning of the line.  In the
+preceeding case, the leading tab was stripped.
+
+@node concat-string
+@subsection Concatenated Strings
+@cindex concat-string
+
+If single or double quote characters are used,
+then you also have the option, a la ANSI-C syntax,
+of implicitly concatenating a series of them together,
+with intervening white space ignored.
 
 NOTE: You @strong{cannot} use directives to alter the string
 content.  That is,
@@ -639,35 +717,13 @@ an escape @code{\} or join them with previous lines:
 @section Dynamic Text
 @cindex Dynamic Definition Text
 
-There are several methods for including dynamic content inside a
-definitions file.  Two of them are mentioned above (@xref{Definitions})
-in the discussion of string formation rules.  They are:
+There are several methods for including dynamic content inside a definitions
+file.  Three of them are mentioned above (@xref{shell-generated}, and
+@xref{scheme-generated}) in the discussion of string formation rules.
+Another method uses the @code{#shell} processing directive.
+It will be discussed in the next section (@xref{Directives}).
+Guile/Scheme may also be used to yield to create definitions.
 
-@enumerate
-@item
-Back quoted text that gets processed by the shell into a single
-text value.
-@item
-Text surrounded by parentheses that is handed off to Guile for
-interpretation.  The result must be a single string that is used
-for a single text value.
-@end enumerate
-
-@noindent
-The third method will be discussed in the next section (@xref{Directives}):
-
-@enumerate 3
-@item
-The @code{#shell} and @code{#endshell} directives delimit a block of
-shell script that yields a "document" that gets parsed as AutoGen
-definitions.  Consequently, more than one definition may result.
-@end enumerate
-
-@noindent
-Finally, Guile/Scheme may be used to yield to create definitions:
-
-@enumerate 4
-@item
 When the Scheme expression is preceeded by a backslash and single
 quote, then the expression is expected to be an alist of
 names and values that will be used to create AutoGen definitions.
@@ -690,13 +746,12 @@ name2 = (another-expr);
 
 @noindent
 Under the covers, the expression gets handed off to a Guile function
-named @code{alist->autogen-def} in an expression that looks like:
+named @code{alist->autogen-def} in an expression that looks like this:
 
 @example
 (alist->autogen-def
     ( (name (value-expression))  (name2 (another-expr)) ) )
 @end example
-@end enumerate
 
 @node Directives
 @section Controlling What Gets Processed
@@ -823,9 +878,9 @@ Extracted from $top_srcdir/agen5/defParse.y
    sed -e 's/{/@{/g' -e 's/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
 @end example
 
-@node Definitionless
+@node Definition-less
 @section AutoGen without Definitions
-@cindex Definitionless
+@cindex Definition-less
 
 It is entirely possible to write a template that does not depend upon
 external definitions.  Such a template would likely have an unvarying
@@ -909,7 +964,7 @@ It is also helpful to avoid using the comment marker (@code{#});
 the POSIXly acceptable file name characters period (@code{.}),
 hyphen (@code{-}) and underscore (@code{_}); and finally, it is
 advisable to avoid using any of the quote characters:  double,
-single or backquote.  But there is no special check for any of
+single or back-quote.  But there is no special check for any of
 these advisories.
 
 @noindent
@@ -938,11 +993,12 @@ characters.  However, additionally, it may not begin with any of the
 POSIX file name characters and it may not contain the start macro
 marker.
 
-This pseudo macro may appear on one or several lines of text.  Intermixed
-may be comment lines (completely blank or starting with the hash character
-@code{#} in column 1), and file content type markers (text between
-@code{-*-} pairs on a single line).  This may be used to establish editing
-"modes" for the file.  These are ignored by AutoGen.
+This pseudo macro may appear on one or several lines of text.
+Intermixed may be comment lines (completely blank or starting with the
+hash character @code{#} in column 1), and file content markers (text
+between @code{-*-} pairs on a single line).  This may be used to
+establish editing "modes" for the file.  These are ignored by
+AutoGen.
 
 The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
@@ -983,7 +1039,7 @@ The result of the expression evaluation will depend on what apply code
 has been provided, whether or not there is an associated value
 for the value name, and whether or not expressions are specified.
 
-The semantic rules are:
+The syntax rules are:
 
 @enumerate
 @item
@@ -1080,7 +1136,7 @@ AutoGen uses Guile to interpret Scheme expressions within AutoGen
 macros.  All of the normal Guile functions are available, plus
 several more that have been added to be able to query AutoGen state;
 provide information for AutoGen processing; and also augment the
-repertore of string manipulation functions.
+repertoire of string manipulation functions.
 
 However, please take note that these functions are not loaded and
 thus not made available until after the command line options have
@@ -1443,3 +1499,14 @@ to instead use this tool.
 @page
 @contents
 @bye
+@c  LocalWords:  AutoGen texinfo Korb tpl bruce Exp texi autogen setfilename AG
+@c  LocalWords:  settitle setchapternewpage dne dircategory direntry ifinfo gpl
+@c  LocalWords:  AutoOpts snprintfv titlepage vskip pt filll sp dir xref cindex
+@c  LocalWords:  AutoGen's noindent rc ini enum IDX const az upcase ENDFOR ESAC
+@c  LocalWords:  optargs egcs inclhack sh fixincl autoconf endif var templ dirs
+@c  LocalWords:  def txt foo cd STR str ifdef alist downcase sprintf arg lexer
+@c  LocalWords:  srcfile linenum subblock defParse srcdir sed POSIX printf expr
+@c  LocalWords:  stdout expr func gfunc tr findex exparg desc desc sep macfunc
+@c  LocalWords:  ing getdefs libopts src ksh forcomma csh env Sourced autoopts
+@c  LocalWords:  mkmerge builddir ADDON AutoGetopts getopt glibc argp perl awk
+@c  LocalWords:  printindex cp fn

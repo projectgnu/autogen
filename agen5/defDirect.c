@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.7 2000/04/04 16:44:12 bkorb Exp $
+ *  $Id: defDirect.c,v 1.8 2000/04/07 13:28:31 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -424,7 +424,7 @@ doDir_elif( char* pzArg, char* pzScan )
  *
  *  text:
  *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
- *  If it follows the @code{#if}, then it will be ignored.  Othewise,
+ *  If it follows the @code{#if}, then it will be ignored.  Otherwise,
  *  it will change the processing state to the reverse of what it was.
 =*/
     STATIC char*
@@ -723,7 +723,7 @@ doDir_line( char* pzArg, char* pzScan )
  *  text:
  *  Invokes $SHELL or /bin/sh on a script that should generate
  *  AutoGen definitions.  It does this using the same server
- *  process that handles the backquoted @code{`} text.
+ *  process that handles the back-quoted @code{`} text.
 =*/
     STATIC char*
 doDir_shell( char* pzArg, char* pzScan )

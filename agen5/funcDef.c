@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.26 2000/04/04 13:21:41 bkorb Exp $
+ *  $Id: funcDef.c,v 1.27 2000/04/07 13:28:31 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -946,7 +946,7 @@ MAKE_HANDLER_PROC( Invoke )
  *       As of this writing, however, the macro arguments are not
  *       well implemented.  Each entry of the list must be a string
  *       that starts with a name, followed by an equal sign followed
- *       by the text value.  This is not very Schemy.  Don't rely on this.
+ *       by the text value.  This is not very Schemey.  Don't rely on this.
 =*/
     SCM
 ag_scm_ag_invoke( SCM macName, SCM list )
