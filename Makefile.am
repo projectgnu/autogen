@@ -1,18 +1,18 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2002-06-12 18:38:15 bkorb"
+## Time-stamp:      "2002-07-03 16:43:55 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.6 2002/06/15 20:20:21 bkorb Exp $
+## $Id: Makefile.am,v 3.7 2002/07/03 23:44:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 NOSHELL_DIRS = compat config snprintfv autoopts agen5
-SHELL_DIRS   = $(NOSHELL_DIRS) columns getdefs doc
-XML2AG_DIR   = @XML2AG_DIR@
+SHELL_DIRS   = $(NOSHELL_DIRS) columns getdefs
+XML2AG_DIR   = @XML2AG_DIR@ doc
 SUBDIRS      = @TOP_DIRLIST@
 
 EXTRA_DIST	= VERSION TODO NOTES configure
