@@ -1,5 +1,6 @@
 [=autogen template include
- $Id: opthead.tpl,v 1.11 1998/08/17 14:19:05 bkorb Exp $ =]
+#$Id: opthead.tpl,v 2.0 1998/08/21 20:30:58 bkorb Exp $
+=]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
 
@@ -163,7 +164,7 @@ _ENDIF version-exists =]
  *  the UPPER_CASED option name (as in the te[=prefix _cap=]OptIndex
  *  enumeration above).  e.g. HAVE_[=prefix _up #_ +=]OPT( [=
 
-          flag[0]=][=name _up=][=/flag=] )
+    _FOR flag[0]=][=name _up=][=/flag=] )
  */[=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *

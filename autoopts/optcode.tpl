@@ -1,5 +1,6 @@
 [=autogen template include
- $Id: optcode.tpl,v 1.10 1998/08/17 14:19:04 bkorb Exp $ =]
+#$Id: optcode.tpl,v 2.0 1998/08/21 20:31:00 bkorb Exp $
+=]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
