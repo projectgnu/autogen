@@ -1,3 +1,12 @@
+1999-08-04  Bruce Korb <autogen@linuxbox.com>
+
+	* config/bootstrap.local: Add a hack to insert code at
+	the start of configure.  This code will make the build
+	tree a symlink copy of the source tree.
+
+	* */*.tpl: put a space between the sed '-e' flag and the
+	associated text.
+	
 1999-07-30  Gary V. Vaughan  <gary@oranda.demon.co.uk>
 
 	* TODO: Added a Known Bugs section.
@@ -44,6 +53,12 @@
 
 	* */Makefile.am: renamed and added the bootstrap script to
 	`bootstrap.dir'.
+
+	* autoopts/aginfo.tpl: A new, distributed template that generates
+	the "invoking" chapters for programs that use automated options.
+
+	* autoopts/agman1.tpl: A new, distributed template that generates
+	man pages for programs that use automated options.
 
 1999-07-23  Gary V. Vaughan  <gary@oranda.demon.co.uk>
 
