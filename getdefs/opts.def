@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.22 2000/09/14 03:42:36 bkorb Exp $
+ *   $Id: opts.def,v 2.23 2000/09/18 20:15:54 bkorb Exp $
  */
 
 /*
@@ -35,7 +35,7 @@ eaddr          = "AutoGen@linuxave.org";
 prog_name      = "getdefs";
 prog_title     = "AutoGen Definition Extraction Tool";
 
-version        = 1;
+version        = "1.1";
 
 flag = {
     name      = "defs_to_get";
