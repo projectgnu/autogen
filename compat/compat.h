@@ -8,7 +8,7 @@
  * Last Modified:     Fri Jul 30 12:34:46 1999
  *            by: bkorb
  *
- * $Id: compat.h,v 3.1 2002/03/23 05:06:56 bkorb Exp $
+ * $Id: compat.h,v 3.2 2002/07/31 02:44:55 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -193,40 +193,6 @@
 #  include <libgen.h>
 #endif
 
-#define UNUSED_COMPAT
-#ifdef UNUSED_COMPAT
-
-# ifdef HAVE_MEMORY_H
-#   include <memory.h>
-# endif
-
-/* use the gnu fast memcpy if we have access to it */
-# if __GNUC__ > 1
-#     define memcpy(d,s,n)	__builtin_memcpy ((d),(s),(n))
-# endif
-
-/* otherwise redefine the mem* functions only if they do not exist */
-# ifdef HAVE_MEMCPY_LATER
-#   if __GNUC__ <= 1
-#     define memcpy(d,s,n)	bcopy((s),(d),(n))
-#   endif
-#   define memmove(d,s,n)	bcopy((s),(d),(n))
-#   define memcmp(d,s,n)	bcmp ((s),(d),(n))
-# endif
-
-
-/* variable argument parsing - use VA_START(ap, last) in source files */
-# undef VA_START
-# ifdef HAVE_VARARGS_H
-#   include <varargs.h>
-#   define VA_START(ap, last)	va_start(ap)
-# elif HAVE_STDARG_H
-#   include <stdarg.h>
-#   define VA_START		va_start
-#   define va_alist		...
-# endif
-
-#endif /* UNUSED_COMPAT */
 #endif /* COMPAT_H */
 
 /* compat.h ends here */
