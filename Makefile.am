@@ -4,10 +4,10 @@
 ##
 ## Maintainer:	     Bruce Korb <bkorb@gnu.org>
 ## Created:	     Mon Jun 30 15:35:12 1997				
-## Last Modified:    $Date: 2000/09/11 01:03:44 $
+## Last Modified:    $Date: 2000/09/11 01:43:45 $
 ##            by:    Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.17 2000/09/11 01:03:44 bkorb Exp $
+## $Id: Makefile.am,v 2.18 2000/09/11 01:43:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -26,9 +26,12 @@ all : .configure.patch
 	BOOTSTRAP=addlink sh ${top_srcdir}/config/bootstrap.local
 	@touch $@
 
-dist-hook:
-	@chmod u+w ${top_srcdir}/doc/autogen.texi
-	echo '@setfilename completely.bogus' > ${top_srcdir}/doc/autogen.texi
-	@touch -t 200001010000 ${top_srcdir}/doc/autogen.texi
+##  The following is a "nice try", but no cigar.  The make rules are *really*
+##  insistent that they get a valid .texi file distributed.  Grr. 
+## 
+## dist-hook:
+## 	@chmod u+w ${top_srcdir}/doc/autogen.texi
+## 	echo '@setfilename completely.bogus' > ${top_srcdir}/doc/autogen.texi
+## 	@touch -t 200001010000 ${top_srcdir}/doc/autogen.texi
 
 ## Makefile.am ends here
