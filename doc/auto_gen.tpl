@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.34 1999/10/30 20:22:48 bruce Exp $
+## $Id: auto_gen.tpl,v 2.35 1999/10/30 20:33:22 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -914,7 +914,9 @@ FOR gfunc =]
         (string-tr! "%s" "A-Z_^" "a-z--") )) =][=
   FOR exparg "," =] [=arg_name=][=
   ENDFOR exparg =][=
-  ellipsis ", ..." =]
+  IF (exist? "ellipsis") =][=
+    exparg "," =] ...[=
+  ENDIF =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
