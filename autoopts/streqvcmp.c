@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 2.2 1998/09/15 17:16:10 bkorb Exp $
+ *  $Id: streqvcmp.c,v 2.3 1998/09/15 17:19:51 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -55,6 +55,7 @@
 
 #include <sys/types.h>
 #include <string.h>
+#include "autoopts.h"
 
 /*
  * This array is designed for mapping upper and lower case letter
@@ -114,7 +115,7 @@ strneqvcmp( const char* s1,
         if (dif != 0)
             return dif;
 
-        if (u1 == '\0')
+        if (u1 == NUL)
             return 0;
     }
 
@@ -134,7 +135,7 @@ streqvcmp( const char* s1,
         if (dif != 0)
             return dif;
 
-        if (u1 == '\0')
+        if (u1 == NUL)
             return 0;
     }
 }
@@ -168,9 +169,9 @@ streqvmap( char chFrom,
     void
 strequate( const char* s )
 {
-    if ((s != (char*)NULL) && (*s != '\0')) {
+    if ((s != (char*)NULL) && (*s != NUL)) {
         unsigned char equiv = (unsigned)*s;
-        while (*s != '\0')
+        while (*s != NUL)
             charmap[ (unsigned)*(s++) ] = equiv;
     }
 }

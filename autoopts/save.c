@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.0 1998/08/23 10:39:20 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.1 1998/09/15 17:19:50 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -67,7 +67,7 @@ findDirName( tOptions*  pOpts )
         return (char*)NULL;
 
     pzDir = pOpts->pOptDesc[ pOpts->specOptIdx.save_opts ].pzLastArg;
-    if ((pzDir != (char*)NULL) && (*pzDir != '\0'))
+    if ((pzDir != (char*)NULL) && (*pzDir != NUL))
         return pzDir;
 
     /*
@@ -95,7 +95,7 @@ findDirName( tOptions*  pOpts )
         char* pzEnv;
 
         if (pzEndDir != (char*)NULL)
-            *(pzEndDir++) = '\0';
+            *(pzEndDir++) = NUL;
 
         /*
          *  Make sure we can get the env value (after stripping off
@@ -166,7 +166,7 @@ findFileName( tOptions*  pOpts )
             }
 
             if (pzDirCh != (char*)NULL) {
-                *pzDirCh = '\0';
+                *pzDirCh = NUL;
                 if (  (stat( pzDir, &stBuf ) == 0)
                    && S_ISDIR( stBuf.st_mode )) {
 
@@ -272,7 +272,7 @@ printEntry( FILE* fp, tOptDesc* p, char*  pzLA )
              *  Print the continuation and the text from the current line
              */
             fputs( "\\\n", fp );
-            *pzNl = '\0';
+            *pzNl = NUL;
             fputs( pzLA, fp );
             *pzNl = '\n';   /* Restore the newline */
 
