@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.3 2002/03/29 02:22:17 bkorb Exp $
+#$Id: optcode.tpl,v 3.4 2002/04/04 06:44:26 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -263,10 +263,9 @@ tSCC   zUsageTitle[] =
 
 IF (exist? "homerc") =]
 tSCC   zRcName[]     = "[=
-  IF (> (string-length (get "rcfile")) 0)
-        =][=rcfile=][=
-  ELSE  =].[=(. pname-down)=]rc[=
-  ENDIF =]";
+  (if (not (exist? "rcfile"))
+      (string-append "." pname-down "rc")
+      (get "rcfile") ) =]";
 tSCC*  apzHomeList[] = {[=
   FOR homerc=]
        [= (kr-string (get "homerc")) =],[=

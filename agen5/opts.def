@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.4 2002/03/29 04:11:19 bkorb Exp $
+ *   $Id: opts.def,v 3.5 2002/04/04 06:44:26 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -352,6 +352,8 @@ flag = {
     name        = loop_limit;
     arg_type    = number;
     arg_default = 256;
+    arg_range   = "-1";
+    arg_range   = "1->0x1000000"; /* 16 million */
     arg_name    = lim;
     descrip     = "Limit on increment loops";
     doc =

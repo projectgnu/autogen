@@ -1,3 +1,23 @@
+2002-04-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl: Allow an empty "rcfile" value to mean that
+	"homerc" is a file name, rather than a directory name.
+	* autoopts/optmain.tpl: clean up the display of the range for usage
+	* autoopts/usage.c(optionUsage): ditto
+	(printInitList): new routine for helping to do this
+	* agen5/opts.def: Add range check for loop-limit option.
+
+2002-04-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c(printInitList): new print the list of RC/INI/config
+	files.  Do not append an rcfile name if there is none or if the
+	homerc value is a directory.
+	* autoopts/optcode.tpl(zRcName): distinguish between an unspecified
+	rcfile value and a supplied empty string.
+	* autoopts/agman1.tpl(doc): fix sed expression (thx to David Bacher)
+	* autoopts/autoopts.c(doLoadOpt): make sure that a file specified
+	for loading actually exists.  Non existence is only okay for RC files.
+
 2002-03-29  Alexandre Duret-Lutz
 
 	* agen5/autogen.c (signalSetup): Don't set the SIGCHLD handler twice.

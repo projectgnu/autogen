@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.3 2002/03/29 02:22:17 bkorb Exp $
+ *  $Id: autoopts.c,v 3.4 2002/04/04 06:44:26 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1489,13 +1489,40 @@ void doLoadOpt( pOpts, pOptDesc )
 {
     /*
      *  IF the option is not being disabled,
-     *  THEN load the file.
+     *  THEN load the file.  There must be a file.
      *  (If it is being disabled, then the disablement processing
      *  already took place.  It must be done to suppress preloading
      *  of ini/rc files.)
      */
-    if (! DISABLED_OPT( pOptDesc ))
+    if (! DISABLED_OPT( pOptDesc )) {
+        struct stat sb;
+        if (stat( pOptDesc->pzLastArg, &sb ) != 0) {
+            tSCC zMsg[] =
+                "File error %d (%s) opening %s for loading options\n";
+
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+                return;
+
+            fprintf( stderr, zMsg, errno, strerror( errno ),
+                     pOptDesc->pzLastArg );
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            /* NOT REACHED */
+        }
+
+        if (! S_ISREG( sb.st_mode )) {
+            tSCC zMsg[] =
+                "error:  cannot load options from non-regular file %s\n";
+
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+                return;
+
+            fprintf( stderr, zMsg, pOptDesc->pzLastArg );
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            /* NOT REACHED */
+        }
+
         filePreset( pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS );
+    }
 }
 
 

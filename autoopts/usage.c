@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.1 2002/03/29 02:22:18 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.2 2002/04/04 06:44:26 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -66,7 +66,6 @@ tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
 tSCC zOptsOnly[]   = "All arguments are named options.\n";
 tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
 tSCC zProhib[]     = "prohibits these options:\n";
-tSCC zRange[]      = "\t\t\t\t- must lie within the range:\n";
 tSCC zReqThese[]   = "requires these options:\n";
 tSCC zTabHypAnd[]  = "\t\t\t\t-- and ";
 tSCC zTabHyp[]     = "\t\t\t\t- ";
@@ -92,6 +91,9 @@ tSCC zNoFlags[]    =
 "Options are specified by their name and either single\n\
 or doubled %ss.  Flag characters are not interpreted.\n";
 
+static void printInitList PROTO(( tCC** papz, ag_bool*, tCC* ));
+
+#define fp stderr
 
 void
 optionUsage( pOptions, exitCode )
@@ -100,7 +102,6 @@ optionUsage( pOptions, exitCode )
 {
     tCC*    pOptFmt;
     tCC*    pOptTitle;
-    FILE*   fp = stderr;
     ag_bool displayEnum = AG_FALSE;
 
     fprintf( fp, pOptions->pzUsageTitle, pOptions->pzProgName );
@@ -284,7 +285,6 @@ optionUsage( pOptions, exitCode )
             if (  (pOD->fOptState & OPTST_NUMERIC)
                   && (pOD->pOptProc != NULL)
                   && (pOD->pOptProc != optionNumericVal) ) {
-                fputs( zRange, stderr );
                 (*(pOD->pOptProc))( pOptions, NULL );
             }
 
@@ -387,27 +387,11 @@ optionUsage( pOptions, exitCode )
      */
     if (exitCode == EXIT_SUCCESS) {
         ag_bool  initIntro = AG_TRUE;
-        tSCC     zPathFmt[] = " - reading file %s/%s\n";
 
         /*
          *  Display all the places we look for RC files
          */
-        if (pOptions->papzHomeList != (const char**)NULL) {
-            const char** papzHL = pOptions->papzHomeList;
-            for (;;) {
-                const char* pzPath = *(papzHL++);
-
-                if (pzPath == (char*)NULL)
-                    break;
-
-                if (initIntro) {
-                    fputs( zIntro, fp );
-                    initIntro = AG_FALSE;
-                }
-
-                fprintf( fp, zPathFmt, pzPath, pOptions->pzRcName );
-            }
-        }
+        printInitList( pOptions->papzHomeList, &initIntro, pOptions->pzRcName );
 
         /*
          *  Let the user know about environment variable settings
@@ -445,6 +429,49 @@ optionUsage( pOptions, exitCode )
     }
 
     exit( exitCode );
+}
+
+static void
+printInitList( papz, pInitIntro, pzRc )
+    tCC** papz;
+    ag_bool* pInitIntro;
+    tCC*  pzRc;
+{
+    tSCC zPathFmt[] = " - reading file %s";
+
+    if (papz == NULL)
+        return;
+
+    fputs( zIntro, fp );
+    *pInitIntro = AG_FALSE;
+
+    for (;;) {
+        const char* pzPath = *(papz++);
+
+        if (pzPath == (char*)NULL)
+            break;
+
+        /*
+         *  Print the name of the "homerc" file.  If the "rcfile" name is
+         *  not empty, we may or may not print that, too...
+         */
+        fprintf( fp, zPathFmt, pzPath );
+        if (*pzRc != NUL) {
+            struct stat sb;
+
+            /*
+             *  IF the "homerc" file either does not exist or is a directory,
+             *  then assume it is a directory and append the "rcfile" name.
+             */
+            if (  (stat( pzPath, &sb ) != 0)
+              ||  S_ISDIR( sb.st_mode )  ) {
+                fputc( '/', fp );
+                fputs( pzRc, fp );
+            }
+        }
+
+        fputc( '\n', fp );
+    }
 }
 
 /*

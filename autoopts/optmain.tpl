@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.2 2002/03/29 02:22:17 bkorb Exp $
+# $Id: optmain.tpl,v 3.3 2002/04/04 06:44:26 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -254,7 +254,7 @@ DEFINE range-option-code
 (if (not (=* (get "arg_type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
 
-=]    static struct {int rmin, rmax;} optRange[ [=(count "arg_range")=] ] = {
+=]    static const struct {const int rmin, rmax;} rng[ [=(count "arg_range")=] ] = {
 [=(out-push-new)      =][=
   FOR arg_range ",\n" =][=
     CASE arg_range    =][=
@@ -270,7 +270,11 @@ DEFINE range-option-code
              (shellf "f=`echo '%s'|sed 's/->/, /'`
                      echo \"{ $f }\"" (get "arg_range")) =][=
 
-      *               =]{ [=arg_range=], INT_MIN }[=
+      ~~ -{0,1}[0-9]+ =]{ [=arg_range=], INT_MIN }[=
+
+      *  =][= (error (string-append "Invalid range spec:  ``"
+              (get "arg_range") "''" ))  =][=
+
     ESAC arg_range    =][=
   ENDFOR =][=
   (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
@@ -283,33 +287,45 @@ DEFINE range-option-code
 
     val = atoi( pOptDesc->pzLastArg );
     for (ix = 0; ix < [=(count "arg_range")=]; ix++) {
-        if (val == optRange[ix].rmin)
+        if (val < rng[ix].rmin)
+            continue;  /* ranges need not be ordered. */
+        if (val == rng[ix].rmin)
             goto valid_return;
-        if (optRange[ix].rmax == INT_MIN)
+        if (rng[ix].rmax == INT_MIN)
             continue;
-        if (val < optRange[ix].rmin)
-            continue;
-        if (val <= optRange[ix].rmax)
+        if (val <= rng[ix].rmax)
             goto valid_return;
     }
 
-    fprintf( stderr, "%s error:  %s option value ``%s''is out of range.\n"
-             "\tit must lie in the range:",
+    fprintf( stderr, "%s error:  %s option value ``%s''is out of range.\n",
              pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->pzLastArg );
     pzIndent = "\t";
 
-  emit_ranges:
+  emit_ranges:[=
+
+
+  IF (> (count "arg_range") 1) =]
+    fprintf( stderr, "%sit must lie in one of the ranges:\n", pzIndent );
     for ( ix=0;; ) {
-        if (optRange[ix].rmax == 0)
-             fprintf( stderr, "%s%d", pzIndent, optRange[ix].rmin );
+        if (rng[ix].rmax == INT_MIN)
+             fprintf( stderr, "%s%d exactly", pzIndent, rng[ix].rmin );
         else fprintf( stderr, "%s%d to %d", pzIndent,
-                      optRange[ix].rmin, optRange[ix].rmax );
+                      rng[ix].rmin, rng[ix].rmax );
         if (++ix >= [=(count "arg_range")=])
             break;
         fputs( ", or\n", stderr );
     }
 
-    fputc( '\n', stderr );
+    fputc( '\n', stderr );[=
+
+  ELIF (*==* (get "arg_range") "->")  =]
+    fprintf( stderr, "%sit must lie in the range: %d to %d\n",
+             pzIndent, rng[0].rmin, rng[0].rmax );[=
+
+  ELSE  =]
+    fprintf( stderr, "%sit must be: %d exactly\n", pzIndent, rng[0].rmin );[=
+
+  ENDIF =]
     if (pOptDesc == NULL)
         return;
 
