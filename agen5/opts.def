@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.7 2002/06/08 19:54:52 bkorb Exp $
+ *   $Id: opts.def,v 3.8 2002/07/22 01:24:38 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -45,6 +45,17 @@ prog-title     = "XML to AutoGen Definiton Converter";
 argument       = "[ <def-file> ]";
 long_opts;
 
+version = `
+    if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
+        top_srcdir=..
+    fi
+    if test ! -f $top_srcdir/VERSION ; then
+        echo "#error $top_srcdir/VERSION file missing"
+    else
+        . $top_srcdir/VERSION > /dev/null
+        echo $AG_VERSION
+    fi`;
+
 #ifndef XML2AG
 config-header  = config.h;
 
@@ -63,17 +74,6 @@ include = <<-  _END_INCLUDE
 	#endif
 	typedef void (init_proc_t)( void );
 	_END_INCLUDE;
-
-version = `
-    if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
-        top_srcdir=..
-    fi
-    if test ! -f $top_srcdir/VERSION ; then
-        echo "#error $top_srcdir/VERSION file missing"
-    else
-        . $top_srcdir/VERSION > /dev/null
-        echo $AG_VERSION
-    fi`;
 
 explain =
 "AutoGen creates text files from templates using external definitions.";
