@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2002/03/23 05:06:56 $
+#  Last Modified:     $Date: 2002/08/19 00:47:56 $
 #             by: bkorb
 #
 # This template uses the following definitions:
@@ -75,34 +75,6 @@ ENDFOR test     =][=
     (out-pop #t)) =][=
 (prefix "  " (join "\n" (stack "do-always")))
 =]
-]) # end AC_DEFUN of [=(. do-all-name)=]
-[=
-
-;; # # # # # # # # # Makefile.am # # # # # # # # # # #
-
-(out-switch "Makefile.am")
-(dne "##  " "##  ")     =]
-##
-## ---------------------------------------------------------------------
-## $Id: conftest.tpl,v 3.7 2002/03/23 05:06:56 bkorb Exp $
-## ---------------------------------------------------------------------
-
-GENERATED_M4 = [=
-  IF (not separate-macros)
-        =][=(. ofile-list)=][=
-  ELSE  =]\
-[=(shellf "columns -I'\t' --spread=2 --line-sep=' \\' <<_EOF_\n%s\n_EOF_\n"
-          ofile-list)=][=
-  ENDIF =]
-
-pkgdata_DATA = conftest.tpl confmacs.tpl
-
-EXTRA_DIST = missing bootstrap autogen.spec \
-	$(pkgdata_DATA) $(GENERATED_M4) misc.def bootstrap.local
-
-MAINTAINERCLEANFILES = Makefile.in config.guess config.sub install-sh \
-	ltconfig ltmain.sh missing mkinstalldirs $(GENERATED_M4)
-all:
-	:[=
+]) # end AC_DEFUN of [=(. do-all-name)=][=
 
 # end conftest.tpl     =]

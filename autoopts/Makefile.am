@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/08/10 19:10:30 $
+## Last Modified:   $Date: 2002/08/19 00:47:56 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.11 2002/08/10 19:10:30 bkorb Exp $
+## $Id: Makefile.am,v 3.12 2002/08/19 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,11 +23,12 @@ INCLUDES = @INCLIST@
 GENMAN   = optionFree.3 optionLoadLine.3 optionProcess.3 optionRestore.3 \
 optionSaveFile.3 optionSaveState.3 optionVersion.3
 man_MANS = autoopts-config.1 $(GENMAN)
+libsrc   = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
-pkgdata_DATA	= \
+nodist_pkgdata_DATA	= $(libsrc)
+pkgdata_DATA	= stdoptions.def options_h.tpl \
     aginfo.tpl agman1.tpl  agman3.tpl aginfo3.tpl \
-    options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl \
-    stdoptions.def options_h.tpl
+    options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 
 GENSRC		= genshell.c genshell.h
 HDRS        = autoopts.h options.h  streqv.h
@@ -83,8 +84,12 @@ $(GENMAN) : funcs.def
 libopts.texi : ../agen5/autogen funcs.def
 	../agen5/autogen -DLEVEL=subsection -Taginfo3.tpl -b libopts funcs.def
 
-srcdist : libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
-libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz:
+##  "AutoMake" insists on building this before it is ready to be built.
+##  Therefore, no-op this (successfully) until the proper time.
+##
+libsrc : $(libsrc)
+$(libsrc) :
+	if [ ! -x  $(top_builddir)/columns/columns ] ; then exit 0 ; fi ; \
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
 	export top_srcdir top_builddir ; \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \

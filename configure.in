@@ -1,30 +1,28 @@
-dnl  -*- Mode: M4 -*- 
-
+dnl  -*- Mode: M4 -*-
+dnl
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
-dnl Copyright (C) 1997-1999, 2001 Bruce Korb
+dnl Copyright (C) 1997-2002 Bruce Korb
 dnl
+dnl Time-stamp:      "2002-08-18 15:47:14 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    $Date: 2002/08/10 02:08:35 $
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.8 2002/08/10 02:08:35 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.9 2002/08/19 00:47:56 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
-
-AC_INIT([autogen],5.2,[bug-autogen@gnu.org])
-
+AC_INIT([autogen],5.4,[autogen-bugs@lists.sf.net])
 AC_CONFIG_SRCDIR(agen5/autogen.c)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.8 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.9 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile

@@ -67,9 +67,9 @@ cat >> libopts.m4 <<-	EOMacro
 	  AC_CACHE_VAL([lo_cv_test_autoopts],[
 	    aoconfig=\${lo_cv_with_autoopts_config}
 	    lo_cv_test_autoopts=\`\${aoconfig} --libs\` 2> /dev/null
-	    if [ \$? -ne 0 ]
+	    if test \$? -ne 0
 	    then lo_cv_test_autoopts=no
-	    else if [ -z "\$lo_cv_test_autoopts" ]
+	    else if test -z "\$lo_cv_test_autoopts"
 	         then lo_cv_test_autoopts=yes
 	    fi ; fi
 	  ]) # end of CACHE_VAL
@@ -108,5 +108,5 @@ sed s,'\${tag}',"${tag}",g ../libopts/README > README
 cp ../libopts/COPYING* .
 
 cd ..
-tar cvf - ${tag} | gzip --best > ${top_builddir}/${tag}.tar.gz
+tar cvf - ${tag} | gzip --best > ${top_builddir}/autoopts/${tag}.tar.gz
 rm -rf ${tag}

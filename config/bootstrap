@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     $Date: 2002/08/17 21:08:13 $
+# Last Modified:     $Date: 2002/08/19 00:47:56 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 3.3 2002/08/17 21:08:13 bkorb Exp $
+# @(#) $Id: bootstrap,v 3.4 2002/08/19 00:47:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -48,12 +48,12 @@ set -e
 # Figure out the absolute path to the working directory.
 #
 wd=`echo $0|sed 's,/[^/]*$,,'`
-test -z "$wd" && wd=.
-wd=`cd $wd ; pwd`
+test -z "${wd}" && wd=.
+wd=`cd ${wd} ; pwd`
 
 # Search for a configure.in
 #
-for srcdir in $wd $wd/.. .. .; do
+for srcdir in ${wd} ${wd}/.. .. .; do
     test -f $srcdir/configure.ac && break
     test -f $srcdir/configure.in && break
 done
@@ -66,7 +66,7 @@ export config_file srcdir
 
 #  This missing function is used in many places
 #
-MISSING="`cd ${srcdir}/config ; pwd`/missing"
+MISSING="${wd}/missing"
 export MISSING
 
 #  Check for AutoGen version 5.
@@ -95,8 +95,8 @@ esac
 #
 BOOTSTRAP=pre
 export BOOTSTRAP
-test -f $wd/bootstrap.local && \
-  sh ${VERBOSE_ARG} $wd/bootstrap.local $@
+test -f ${wd}/bootstrap.local && \
+  sh ${VERBOSE_ARG} ${wd}/bootstrap.local $@
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -259,7 +259,7 @@ done ) || exit 1
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
-test -f $wd/bootstrap.local && . $wd/bootstrap.local $@
+test -f ${wd}/bootstrap.local && . ${wd}/bootstrap.local $@
 
 # Local Variables:
 # mode: shell-script

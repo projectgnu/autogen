@@ -1,3 +1,16 @@
+2002-08-18  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(libsrc): Make this a non-distributed but
+	installable pkgdata_DATA file
+	* autoopts/autoopts-config.in: rework to use a list of options
+	* config/bootstrap(missing): use working directory, don't insist
+	upon "config" as the configury directory.
+	* config/conftest.tpl(Makefile.am): don't generate
+	* config/Makefile.am: restored
+	* configure.in(AC_INIT): update the version tag and bug address
+	* doc/Makefile.am(autogen.def): Put this in the standard build sequence
+	* pkg/libopts/mklibsrc.sh(if): use "test" instead of "[" - M4 quoting
+
 2002-08-12  Bruce Korb  <bkorb@gnu.org>
 
 	* pkg/libopts/mklibsrc.sh: genshell.[ch] are not relevant

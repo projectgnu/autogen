@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.11 2002/08/11 17:36:13 bkorb Exp $
+## $Id: Makefile.am,v 3.12 2002/08/19 00:47:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,8 +23,7 @@ all : $(INFO_DEPS)
 
 info_TEXINFOS   = autogen.texi
 
-EXTRA_DIST	= auto_gen.tpl autogen.info \
-		snprintfv.texi snprintfv.menu
+EXTRA_DIST	= auto_gen.tpl autogen.info snprintfv.texi snprintfv.menu
 
 MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES = texi-stamp
@@ -79,28 +78,24 @@ TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,7.0in'
 texi         : texi-stamp
 autogen.texi : texi
 
-texi-stamp : $(DOC_DEPENDS)
-	@cd $(srcdir) && chmod u+w .
-	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ... ; \
+texi-stamp : autogen.def
 	top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	AGEXE=$(AGEXE) CC="$(CC)" COLUMNS_EXE="$(COLUMNS_EXE)" \
-	ADDON_MENU="$(ADDON_MENU)" \
-	ADDON_TEXI="$(ADDON_TEXI)" \
+	ADDON_MENU="$(ADDON_MENU)" ADDON_TEXI="$(ADDON_TEXI)" \
 	DOC_DEPENDS="$(DOC_DEPENDS) `echo $(GETDEF_SRC)`" \
-	$(GETDEFS) $(AGARGS) $(DEFCOPY) $(GETDEF_SRC)
-	@touch $@ ; if [ -f autogen.info ] ; then chmod u+w autogen.info || : ; fi
+	$(AGEXE) -L$(srcdir) -L$(top_srcdir) autogen.def
+	@touch $@
+	@chmod u+w $(srcdir) . || :
 
-##  The following rule is for debugging generation problems:
-##
 autogen.def : $(DOC_DEPENDS)
 	@echo $(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	ADDON_MENU="$(ADDON_MENU)" \
-	ADDON_TEXI="$(ADDON_TEXI)" \
-	DOC_DEPENDS="$(DOC_DEPENDS)" \
 	$(GETDEFS) output=$@ $(DEFCOPY) $(GETDEF_SRC)
-	@touch $@
 
+##  During the product build, the following .texi and .menu files may not
+##  have been built 'cuz the needed programs are not yet in place.
+##  Do them now.
+##
 ../agen5/autogen.menu : ../agen5/autogen.texi
 ../agen5/autogen.texi :
 	cd ../agen5 && $(MAKE) autogen.texi
@@ -119,10 +114,10 @@ autogen.def : $(DOC_DEPENDS)
 	then [ -d ../xml2ag ] || mkdir ../xml2ag ; \
 	echo "* xml2ag Invocation::             No invoking xml2ag" \
 	     > ../xml2ag/xml2ag.menu ; \
-	exec 3> ../xml2ag/xml2ag.texi ; \
-	echo "@node columns Invocation" >&3 ; \
-	echo "@section No invoking columns" >&3 ; \
-	echo "This program is not available without libxml2." >&3 ; \
+	( echo "@node xml2ag Invocation" >&3 ; \
+	  echo "@section No invoking xml2ag" >&3 ; \
+	  echo "This program is not available without libxml2." \
+	) > ../xml2ag/xml2ag.texi ; \
 	else cd ../xml2ag ; $(MAKE) doc-stamp ; fi
 
 ../autoopts/libopts.texi :
