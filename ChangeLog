@@ -1,3 +1,20 @@
+2004-02-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am: remove defParse.y, add defParse.def + its FSM
+	* agen5/autogen.h: add definition parsing globals,
+	rename "tDefStack" to "tDefCtx" -> ripples throughout
+	"pzValue" in definition entry now a union -> more ripples
+	* defLoad.c: mostly rewritten
+	* defReduce.c: deleted
+	* defParse.def: new
+	* defParse-fsm.c: new parsing code
+	* fsm*.tpl: reworked to make the state table more comprehensible
+	* agen5/test/error.test: adjust for FSM error reporting
+	* autoopts/getopt.tpl: accommodate vanilla "getopt(3C)", too
+	* autoopts/opthead.tpl(xx-value): disallow empty values if long-opts
+	are not allowed.
+	* autoopts/test/getopt.test: fix up to accommodate non-long-opt progs.
+
 2004-01-14  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(AO_gettext): rename from strdup - add gettext

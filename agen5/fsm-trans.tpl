@@ -8,7 +8,8 @@
 
 DEFINE state-table  =]
 
-  /* STATE [= (get "st_ix") =]:  [= state =] */
+  /* STATE [= (get "st_ix") =]:  [=
+              (. PFX)=]_ST_[= (string-upcase! (get "state")) =] */
   { [=
   (shellf "state=%s" (string-upcase! (get "state"))) =][=
 

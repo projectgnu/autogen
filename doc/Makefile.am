@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.18 2004/01/14 02:41:16 bkorb Exp $
+## $Id: Makefile.am,v 3.19 2004/02/01 21:09:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,7 +48,7 @@ ADDON_TEXI	= \
 		../xml2ag/xml2ag.texi \
 		$(srcdir)/snprintfv.texi
 
-DOC_INCLUDES	= $(AGSRCDIR)/defParse.y \
+DOC_INCLUDES	= $(AGSRCDIR)/defParse-fsm.c \
 		$(AGSRCDIR)/opts.h \
 		../agen5/autogen.menu \
 		../autoopts/libopts.texi \

@@ -62,9 +62,11 @@ transition =
 
 /*
  *  When looking for the next named object, you either get the name,
- *  or end a block or end the input.
+ *  or end a block or end the input.  If you get an "autogen" token, ignore it.
+ *  We likely got it due to a #include.
  */
 transition =
+{ tst = need_name;    tev   = "autogen";    next = need_def;  ttype = noop; },
 { tst = need_name;    tev   = var_name;     next = have_name; },
 { tst = need_name;    tev   = lit_c_brace;  next = have_value;
                       ttype = end_block; },

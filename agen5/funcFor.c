@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.15 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: funcFor.c,v 3.16 2004/02/01 21:09:52 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -294,11 +294,11 @@ doForByStep( tTemplate* pT,
              tMacro*    pMac,
              tDefEntry* pFoundDef )
 {
-    int         loopCt   = 0;
+    int         loopCt    = 0;
     tDefEntry   textDef;
     ag_bool     invert    = (pFS->for_by < 0);
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
-    tDefStack   stack     = currDefCtx;
+    tDefCtx     ctx       = currDefCtx;
 
     if (pFS->for_pzSep == NULL)
         pFS->for_pzSep = "";
@@ -377,7 +377,7 @@ doForByStep( tTemplate* pT,
          *  IF we have a non-base definition, use the old def context
          */
         if (! gotNewDef)
-            currDefCtx = stack;
+            currDefCtx = ctx;
 
         /*
          *  ELSE IF this macro is a text type
@@ -388,7 +388,7 @@ doForByStep( tTemplate* pT,
             textDef.pNext = textDef.pTwin = NULL;
 
             currDefCtx.pDefs = &textDef;
-            currDefCtx.pPrev = &stack;
+            currDefCtx.pPrev = &ctx;
         }
 
         /*
@@ -396,8 +396,8 @@ doForByStep( tTemplate* pT,
          *       macro's values
          */
         else {
-            currDefCtx.pDefs = (tDefEntry*)(void*)pFoundDef->pzValue;
-            currDefCtx.pPrev = &stack;
+            currDefCtx.pDefs = pFoundDef->val.pDefEntry;
+            currDefCtx.pPrev = &ctx;
         }
 
         pFS->for_lastFor = (invert)
@@ -417,7 +417,7 @@ doForByStep( tTemplate* pT,
         pFS->for_index = nextIdx;
     }
 
-    currDefCtx = stack;  /* Restore the def context */
+    currDefCtx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
@@ -426,10 +426,10 @@ doForEach( tTemplate*   pT,
            tMacro*      pMac,
            tDefEntry*   pFoundDef )
 {
-    int loopCt = 0;
-    tDefStack   stack = currDefCtx;
+    int     loopCt = 0;
+    tDefCtx ctx    = currDefCtx;
 
-    currDefCtx.pPrev = &stack;
+    currDefCtx.pPrev = &ctx;
 
     for (;;) {
         tDefEntry  textDef;
@@ -447,7 +447,7 @@ doForEach( tTemplate*   pT,
 
             currDefCtx.pDefs = &textDef;
         } else {
-            currDefCtx.pDefs = (tDefEntry*)(void*)pFoundDef->pzValue;
+            currDefCtx.pDefs = pFoundDef->val.pDefEntry;
         }
 
         /*
@@ -478,7 +478,7 @@ doForEach( tTemplate*   pT,
         fflush( pCurFp->pFile );
     }
 
-    currDefCtx = stack;  /* Restore the def context */
+    currDefCtx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
@@ -518,10 +518,10 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
     do  {
         tDefEntry* pDef = getEntry();
 
-        pDef->pzDefName = pzName;
-        pDef->index     = ix++;
-        pDef->valType   = VALTYP_TEXT;
-        pDef->pzValue   = pz;
+        pDef->pzDefName  = pzName;
+        pDef->index      = ix++;
+        pDef->valType    = VALTYP_TEXT;
+        pDef->val.pzText = pz;
 
         switch (*pz) {
         case '\'':

@@ -45,7 +45,7 @@
  */
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
-static char*        pz_new_name   = NULL;
+static char* pz_new_name = NULL;
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
@@ -382,10 +382,10 @@ dp_do_end_block(
     te_dp_event trans_evt )
 {
 /*  START == END BLOCK == DO NOT CHANGE THIS COMMENT  */
-    if (--stackDepth < 0)
+    if (stackDepth <= 0)
         yyerror( "Too many close braces" );
 
-    pCurrentEntry = ppParseStack[ stackDepth ];
+    pCurrentEntry = ppParseStack[ stackDepth-- ];
     return maybe_next;
 /*  END   == END BLOCK == DO NOT CHANGE THIS COMMENT  */
 }

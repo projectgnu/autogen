@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2003-05-18 19:07:17 bkorb"
+# Time-stamp:        "2004-02-01 12:28:48 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.13 2003/05/22 04:23:01 bkorb Exp $
+# $Id: error.test,v 3.14 2004/02/01 21:09:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -123,9 +123,10 @@ sed 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
 echo creating ${testname}.out4
 # this is the output we should expect to see
 cat > ${testname}.out4 <<'_EOF_'
-syntax error:  in error2.def on line 2
-	token in error:  VAR_NAME is broken;
-
+FSM Error:  in state 5 (have_name), event 3 (var_name) is invalid
+invalid transition:  in error2.def on line 2
+	token in error:  var_name:  ``is broken;
+''
 
 	[[...<error-text>]]  broken;
 

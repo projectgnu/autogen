@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.15 2004/01/14 02:41:16 bkorb Exp $
+# $Id: opthead.tpl,v 3.16 2004/02/01 21:09:52 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
@@ -114,12 +114,14 @@ are used identically to the user-generated VALUE defines.
 :=]
 [=
 IF (exist? "flag.value") =][=
-  IF (exist? "version") =]
+  IF (exist? "version")  =]
 #define [= (. VALUE-pfx) =]VERSION        [=
     IF (not (exist? "version-value")) =]'v'[=
     ELSE      =][=
       CASE (get "version-value")  =][=
-      == ""   =][= (. INDEX-pfx) =]VERSION[=
+      == ""   =][= (if (not (exist? "long-opts"))
+                       (error "'version-value' may not be empty")) INDEX-pfx
+              =]VERSION[=
       == "'"  =]'\''[=
       ~~ .    =]'[=version-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
@@ -132,7 +134,9 @@ IF (exist? "flag.value") =][=
     IF (not (exist? "save-opts-value")) =]'>'[=
     ELSE      =][=
       CASE (get "save-opts-value")  =][=
-      == ""   =][= (. INDEX-pfx) =]SAVE_OPTS[=
+      == ""   =][= (if (not (exist? "long-opts"))
+                       (error "'save-opts-value' may not be empty")) INDEX-pfx
+              =]SAVE_OPTS[=
       == "'"  =]'\''[=
       ~~ .    =]'[=save-opts-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
@@ -142,7 +146,9 @@ IF (exist? "flag.value") =][=
     IF (not (exist? "load-opts-value")) =]'<'[=
     ELSE      =][=
       CASE (get "load-opts-value")  =][=
-      == ""   =][= (. INDEX-pfx) =]LOAD_OPTS[=
+      == ""   =][= (if (not (exist? "long-opts"))
+                       (error "'load-opts-value' may not be empty")) INDEX-pfx
+              =]LOAD_OPTS[=
       == "'"  =]'\''[=
       ~~ .    =]'[=load-opts-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
@@ -154,7 +160,9 @@ IF (exist? "flag.value") =][=
     IF (not (exist? "help-value")) =]'?'[=
     ELSE      =][=
       CASE (get "help-value")  =][=
-      == ""   =][= (. INDEX-pfx) =]HELP[=
+      == ""   =][= (if (not (exist? "long-opts"))
+                       (error "'help-value' may not be empty")) INDEX-pfx
+              =]HELP[=
       == "'"  =]'\''[=
       ~~ .    =]'[=help-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=
@@ -164,7 +172,9 @@ IF (exist? "flag.value") =][=
     IF (not (exist? "more-help-value")) =]'!'[=
     ELSE      =][=
       CASE (get "more-help-value")  =][=
-      == ""   =][= (. INDEX-pfx) =]MORE_HELP[=
+      == ""   =][= (if (not (exist? "long-opts"))
+                       (error "'more-help-value' may not be empty")) INDEX-pfx
+              =]MORE_HELP[=
       == "'"  =]'\''[=
       ~~ .    =]'[=more-help-value=]'[=
       *       =][=(error "value (flag) codes must be single characters") =][=

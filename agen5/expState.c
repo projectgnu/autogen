@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.14 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: expState.c,v 3.15 2004/02/01 21:09:52 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -47,7 +47,7 @@ entry_length( char* pzName )
         if (pDE == NULL)
             break;
         if (pDE->valType == VALTYP_TEXT)
-            res += strlen( pDE->pzValue );
+            res += strlen( pDE->val.pzText );
         else
             res++;
     }
@@ -115,7 +115,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
             return SCM_BOOL_F; /* Cannot match string -- not a text value */
         }
 
-        field  = gh_str02scm( pE->pzValue );
+        field  = gh_str02scm( pE->val.pzText );
         result = gh_call2( op, field, test );
         if (! isIndexed)
             while (result == SCM_BOOL_F) {
@@ -124,7 +124,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
                 if (pE == NULL)
                     break;
 
-                field = gh_str02scm( pE->pzValue );
+                field = gh_str02scm( pE->val.pzText );
                 result = gh_call2( op, field, test );
             }
 
@@ -147,12 +147,13 @@ find_entry_value( SCM op, SCM obj, SCM test )
      */
     pzField[-1] = '.';
     {
-        SCM field = gh_str02scm( pzField );
+        SCM field   = gh_str02scm( pzField );
         SCM result;
-        tDefStack    stack   = currDefCtx;
-        currDefCtx.pPrev     = &stack;
+        tDefCtx ctx = currDefCtx;
 
-        currDefCtx.pDefs = (tDefEntry*)(void*)(pE->pzValue);
+        currDefCtx.pPrev = &ctx;
+        currDefCtx.pDefs = pE->val.pDefEntry;
+
         result = find_entry_value( op, field, test );
 
         if (! isIndexed)
@@ -162,11 +163,11 @@ find_entry_value( SCM op, SCM obj, SCM test )
                 if (pE == NULL)
                     break;
 
-                currDefCtx.pDefs = (tDefEntry*)(void*)(pE->pzValue);
+                currDefCtx.pDefs = pE->val.pDefEntry;
                 result = find_entry_value( op, field, test );
             }
 
-        currDefCtx = stack;
+        currDefCtx = ctx;
         return result;
     }
 }
@@ -345,7 +346,7 @@ ag_scm_get( SCM agName, SCM altVal )
         return gh_str02scm( "" );
     }
 
-    return gh_str02scm( pE->pzValue );
+    return gh_str02scm( pE->val.pzText );
 }
 
 

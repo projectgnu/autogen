@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.17 2004/01/14 02:41:16 bkorb Exp $
+ *  $Id: expString.c,v 3.18 2004/02/01 21:09:52 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -952,7 +952,7 @@ ag_scm_stack( SCM obj )
         if (pDE->valType != VALTYP_TEXT)
             return SCM_UNDEFINED;
 
-        str  = gh_str02scm( pDE->pzValue );
+        str  = gh_str02scm( pDE->val.pzText );
         *pos = scm_cons( str, SCM_EOL );
         pos  = SCM_CDRLOC( *pos );
     }

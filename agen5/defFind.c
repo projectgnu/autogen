@@ -1,8 +1,7 @@
 /*
- *  $Id: defFind.c,v 3.12 2003/05/26 03:14:59 bkorb Exp $
- *  This module loads the definitions, calls yyparse to decipher them,
- *  and then makes a fixup pass to point all children definitions to
- *  their parent definition (except the fixed "rootEntry" entry).
+ *  $Id: defFind.c,v 3.13 2004/02/01 21:09:52 bkorb Exp $
+ *
+ *  This module locates definitions.
  */
 
 /*
@@ -370,7 +369,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
  *  to traverse the list of twins).
  */
 STATIC tDefEntry*
-defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
+defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
 {
     char*        pcBrace;
     char         breakCh;
@@ -411,7 +410,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        pE = pDefStack->pDefs;
+        pE = pDefCtx->pDefs;
         if (pE == NULL)
             return NULL;
 
@@ -436,8 +435,8 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefStack = pDefStack->pPrev;
-        if (pDefStack == NULL)
+        pDefCtx = pDefCtx->pPrev;
+        if (pDefCtx == NULL)
             return NULL;
     } found_def_entry:;
 
@@ -511,14 +510,14 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
      */
     nestingDepth++;
     {
-        tDefStack stack = { NULL, &currDefCtx };
+        tDefCtx ctx = { NULL, &currDefCtx };
 
-        stack.pDefs = (tDefEntry*)pE->pzValue;
+        ctx.pDefs = pE->val.pDefEntry;
 
         for (;;) {
             tDefEntry* res;
 
-            res = defEntrySearch( pzName, &stack, pIsIndexed );
+            res = defEntrySearch( pzName, &ctx, pIsIndexed );
             if ((res != NULL) || (breakCh == '[')) {
                 nestingDepth--;
                 return res;
@@ -526,7 +525,7 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
             pE = pE->pTwin;
             if (pE == NULL)
                 break;
-            stack.pDefs = (tDefEntry*)pE->pzValue;
+            ctx.pDefs = pE->val.pDefEntry;
         }
     }
 
@@ -552,7 +551,7 @@ findDefEntry( char* pzName, ag_bool* pIsIndexed )
  *  not try to traverse the list of twins).
  */
 STATIC tDefEntry**
-entryListSearch( char* pzName, tDefStack* pDefStack )
+entryListSearch( char* pzName, tDefCtx* pDefCtx )
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
 
@@ -587,7 +586,7 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        pE = pDefStack->pDefs;
+        pE = pDefCtx->pDefs;
         if (pE == NULL) {
             /*
              *  Make sure we are not nested.  Once we start to nest,
@@ -624,8 +623,8 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefStack = pDefStack->pPrev;
-        if (pDefStack == NULL)
+        pDefCtx = pDefCtx->pPrev;
+        if (pDefCtx == NULL)
             goto not_found;
     } found_def_entry:;
 
@@ -702,18 +701,18 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
      */
     defList.nestLevel++;
     {
-        tDefStack stack = { NULL, &currDefCtx };
+        tDefCtx ctx = { NULL, &currDefCtx };
 
-        stack.pDefs = (tDefEntry*)pE->pzValue;
+        ctx.pDefs = pE->val.pDefEntry;
 
         for (;;) {
-            (void)entryListSearch( pzName, &stack );
+            (void)entryListSearch( pzName, &ctx );
             if (breakCh == '[')
                 break;
             pE = pE->pTwin;
             if (pE == NULL)
                 break;
-            stack.pDefs = (tDefEntry*)pE->pzValue;
+            ctx.pDefs = pE->val.pDefEntry;
         }
     }
     defList.nestLevel--;

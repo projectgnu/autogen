@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2004-01-17 08:01:51 bkorb"
+## Time-stamp:      "2004-02-01 12:57:44 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.27 2004/01/17 18:00:04 bkorb Exp $
+## $Id: Makefile.am,v 3.28 2004/02/01 21:09:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -23,10 +23,7 @@ DEFINITIONS = cgi.def opts.def pseudo.def
 GENDOCS     = autogen.texi autogen.menu autogen.1
 CLEANFILES  = $(GENDOCS)
 STAMPS      = stamp-directive stamp-exprini stamp-opts stamp-fsm
-
-#  GEN_CSRC omits defParse.c and defParse.h because automake understands
-#
-GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h \
+GEN_CSRC    = opts.c opts.h directive.h expr.ini expr.h proto.h \
 	cgi-fsm.c cgi-fsm.h pseudo-fsm.h
 GEN_SRC = $(GEN_CSRC) $(GENDOCS)
 
@@ -40,7 +37,7 @@ bin_PROGRAMS = autogen
 csrc = \
   autogen.c      agCgi.c       agShell.c     agUtils.c     defParse-fsm.h \
   autogen.h      defDirect.c   defFind.c     defLoad.c     defParse-fsm.c \
-  defLex.c       defReduce.c   expExtract.c  expFormat.c   expGperf.c \
+  defLex.c       expExtract.c  expFormat.c   expGperf.c \
   expGuile.c     expMake.c     expOutput.c   expPrint.c    expState.c \
   expString.c    funcCase.c    funcDef.c     funcEval.c    funcFor.c  \
   funcIf.c       functions.c   functions.h   loadPseudo.c  tpLoad.c   \
@@ -53,10 +50,11 @@ autogen_SOURCES = $(GEN_CSRC)
 autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
-FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
-		functions.c
-EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
-		expString.c expGperf.c expExtract.c $(FUNCLIST)
+FUNCLIST        = \
+	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
+EXPRLIST        = \
+	expFormat.c expGuile.c expOutput.c  expPrint.c expState.c \
+	expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 AM_YFLAGS = -d
 
@@ -95,7 +93,7 @@ stamp-exprini : $(EXPRLIST) snarf.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-fsm GEN-RULE
-stamp-fsm : pseudo.def fsm.tpll fsm-macro.tpl fsm-trans.tpl
+stamp-fsm : pseudo.def fsm.tpl fsm-macro.tpl fsm-trans.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-parse GEN-RULE

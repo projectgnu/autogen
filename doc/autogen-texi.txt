@@ -410,7 +410,7 @@ C macro substitution is @strong{not} performed.
 * Predefines::            Pre-defined Names
 * Comments::              Commenting Your Definitions
 * Example::               What it all looks like.
-* Full Syntax::           YACC Language Grammar
+* Full Syntax::           Finite State Machine Grammar
 * Alternate Definition::  Alternate Definition Forms
 @end menu
 

@@ -4,14 +4,12 @@
 
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
-  Time-stamp:        "2003-12-31 13:25:26 bkorb"
+  Time-stamp:        "2004-02-01 12:05:01 bkorb"
 _EOF_
 \` `
 +][+
   (if (not (exist? "settable"))
       (error "'settable' must be specified globally for getopt_long\n"))
-  (if (not (exist? "long-opts"))
-      (error "getopt_long requires long option names\n"))
   (define prog-name (string->c-name! (get "prog-name")))
   (define PROG-NAME (string-upcase prog-name))
   (out-move (string-append "getopt-" prog-name ".c"))
@@ -26,30 +24,30 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 3.2 2004/01/14 02:41:16 bkorb Exp $
+ *  $Id: getopt.tpl,v 3.3 2004/02/01 21:09:52 bkorb Exp $
  */
-#include <config.h>
 #include <sys/types.h>
-#include "[+ (base-name) +].h"
+#include <stdlib.h>
+#include "[+ (base-name) +].h"[+
+
+IF (exist? "long-opts") +]
 #include <getopt.h>
-#include "system.h"
 
 /*
  *  getopt_long option descriptor
  */
 static struct option a_long_opts[] = {[+
 
-FOR flag            +][+
- (sprintf
+  FOR flag            +][+
+    (sprintf
 
-   "\n  { %-20s %d, NULL, VALUE_OPT_%s },"
+       "\n  { %-20s %d, NULL, VALUE_OPT_%s },"
           (string-append (c-string (get "name")) ",")
           (if (exist? "arg-type") 1 0)
           (string-upcase (string->c-name! (get "name")))
- ) +][+
+    ) +][+
 
-ENDFOR flag
-          (sprintf "%s," (c-string (get "name")))
+  ENDFOR flag
 
 +]
   { "help",              0, NULL, VALUE_OPT_HELP },[+
@@ -58,7 +56,7 @@ IF (exist? "version") +]
 ENDIF +]
   { NULL,                0, NULL, 0 }
 };
-
+[+ ENDIF +]
 /*
  *  Option flag character list
  */
@@ -121,9 +119,11 @@ optionUsage (tOptions* pOptions, int status)
    ${CC:-cc} ${CFLAGS} -o %1$s ${sdir}/%3$s.c ${LDFLAGS} || \
       kill -9 ${AG_pid}
    (./%1$s -: 2>&1) | \
-      sed '1d;/more-help/d;s/--version\\[=arg\\]/--version      /'
+      sed '1d;/more-help/d
+           s/--version\\[=arg\\]/--version      /
+           /version information and exit/s/-v \\[arg\\]/-v      /'
    cd ..
-   rm -rf ${td}"
+   [ \"${VERBOSE:-false}\" = true ] || rm -rf ${td}"
     (get "prog-name")
     (. PROG-NAME)
     (base-name)
@@ -235,7 +235,8 @@ usage_must (const char* pz_what, const char* pz_must)
  *  Process the options for the "[+(. prog-name)+]" program.
  *  This function was generated to use the getopt_long(3GNU) function.
  *  There are [+ (+ (count "flag") (if (exist? "version") 2 1))
-              +] options for this program, including "help"[+
+              +] options for this program,
+ * including "help (usage)"[+
     IF (exist? "version") +] and "version"[+ ENDIF +].
  */
 int
@@ -251,7 +252,12 @@ process_[+(. prog-name)+]_opts (int argc, char** argv)
   }
 
   for (;;) {
-    switch (getopt_long (argc, argv, z_opts, a_long_opts, NULL)) {
+    switch ([+
+
+IF (exist? "long-opts")
+      +]getopt_long (argc, argv, z_opts, a_long_opts, NULL)[+
+ELSE  +]getopt (argc, argv, z_opts)[+
+ENDIF +]) {
     case  -1: goto leave_processing;
     case   0: break;[+
     FOR flag  +][+

@@ -63,10 +63,10 @@ do
   *         ) mod="? ? ?" ;;
   esac
 
-  print -u4 "  1  d  none ${d} ${mod}"
-done
+  echo "  1  d  none ${d} ${mod}"
+done >&4
 
-print -u4 "! default 0644 root sys"
+echo "! default 0644 root sys" >&4
 
 find * -type f | \
 while read f
@@ -74,15 +74,15 @@ do
   if [ -x "$f" ]
   then mod=0755
   else mod=0644 ; fi
-  print -u4 "  1  f  none ${f} $mod root sys"
-done
+  echo "  1  f  none ${f} $mod root sys"
+done >&4
 
 find * -type l | \
 while read l
 do
   f=`ls -l $l | sed 's,.* -> ,,'`
-  print -u4 "  1  s  none ${l}=${f}"
-done
+  echo "  1  s  none ${l}=${f}"
+done >&4
 
 exec 4>&-
 cd ${pkgdst}

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.20 2003/12/27 15:06:40 bkorb Exp $
+ *  $Id: funcDef.c,v 3.21 2004/02/01 21:09:52 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -166,7 +166,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 
         switch (*pzScan) {
         case NUL:
-            pDL->de.pzValue = (char*)zNil; goto fill_in_array_done;
+            pDL->de.val.pzText = (char*)zNil; goto fill_in_array_done;
 
         default:
             AG_ABEND_IN( pT, pMac, "name not followed by '='" );
@@ -179,7 +179,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  The name was separated by space, but has no value
              */
             if (*pzScan != '=') {
-                pDL->de.pzValue = (char*)zNil;
+                pDL->de.val.pzText = (char*)zNil;
                 if (*pzScan == NUL)
                     goto fill_in_array_done;
                 goto fill_in_array_continue;
@@ -239,8 +239,8 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             /*
              *  Default:  the raw sequence of characters is the value
              */
-            pDL->de.pzValue = pDL->pzExpr;
-            pDL->pzExpr     = NULL;
+            pDL->de.val.pzText = pDL->pzExpr;
+            pDL->pzExpr        = NULL;
         }
 
         /*
@@ -413,7 +413,7 @@ build_defs( int defCt, tDefList* pList )
         }
         case NUL:
             pList->pzExpr = NULL;
-            pList->de.pzValue = (char*)zNil;
+            pList->de.val.pzText = (char*)zNil;
             break;
 
         case '(':
@@ -431,15 +431,15 @@ build_defs( int defCt, tDefList* pList )
             res = ag_eval( pList->pzExpr );
 
             if (gh_string_p( res )) {
-                AGDUPSTR( pList->de.pzValue, ag_scm2zchars( res, "eval res" ),
+                AGDUPSTR( pList->de.val.pzText, ag_scm2zchars(res, "eval res"),
                           "dup eval res" );
             }
             else if (gh_number_p( res )) {
-                pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
-                snprintf( pList->de.pzValue, 16, "%ld", gh_scm2ulong( res ));
+                pList->de.val.pzText = AGALOC( 16, "number buf" );
+                snprintf( pList->de.val.pzText, 16, "%ld", gh_scm2ulong( res ));
             }
             else
-                AGDUPSTR( pList->de.pzValue, zNil, "empty string" );
+                AGDUPSTR( pList->de.val.pzText, zNil, "empty string" );
             break;
         }
 
@@ -448,7 +448,7 @@ build_defs( int defCt, tDefList* pList )
                 fprintf( pfTrace, "shell eval for arg %d:\n\t`%s'\n",
                          pCurMacro->sibIndex - defCt, pList->pzExpr+1 );
             }
-            pList->de.pzValue = runShell( pList->pzExpr+1 );
+            pList->de.val.pzText = runShell( pList->pzExpr+1 );
             break;
         }
     } while (pList++, --defCt > 0);
@@ -521,7 +521,7 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
 {
     tDefList*   pList  = (tDefList*)pMac->res;
     int         defCt  = pMac->sibIndex;
-    tDefStack   stack;
+    tDefCtx     ctx;
 
     pT = (tTemplate*)pMac->funcPrivate;
 
@@ -536,8 +536,8 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
      *  IF we have no special definitions, then do not nest definitions
      */
     if (defCt != 0) {
-        stack  = currDefCtx;
-        currDefCtx.pPrev = &stack;
+        ctx  = currDefCtx;
+        currDefCtx.pPrev = &ctx;
         build_defs( defCt, pList );
     }
 
@@ -550,14 +550,14 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
     }
 
     if (defCt != 0)
-        currDefCtx = stack;
+        currDefCtx = ctx;
 
     if ((defCt = pMac->sibIndex) > 0) {
         pList = (tDefList*)pMac->res;
         while (defCt-- > 0) {
             if (pList->pzExpr != NULL) {
-                AGFREE( (void*)pList->de.pzValue );
-                pList->de.pzValue = NULL;
+                AGFREE( (void*)pList->de.val.pzText );
+                pList->de.val.pzText = NULL;
             }
             pList++;
         }

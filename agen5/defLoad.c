@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 3.18 2004/01/17 18:00:04 bkorb Exp $
+ *  $Id: defLoad.c,v 3.19 2004/02/01 21:09:52 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -25,255 +25,203 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC int compareIndex( const void* p1, const void* p2 );
-STATIC void fixTwins( tDefEntry** ppNode );
-STATIC void massageDefTree( tDefEntry** ppNode );
+STATIC tDefEntry* pFreeEntryList = NULL;
+STATIC void*      pAllocList     = NULL;
 
-#if defined( DEBUG_ENABLED )
-static char zFmt[ 64 ];
-#endif
+#define ENTRY_SPACE        (4096 - sizeof(void*))
+#define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(tDefEntry))
+#define ENTRY_ALLOC_SIZE   \
+    ((ENTRY_ALLOC_CT * sizeof( tDefEntry )) + sizeof(void*))
 
-STATIC int
-compareIndex( const void* p1, const void* p2 )
+EXPORT void
+freeEntry( tDefEntry* pDE )
 {
-    tDefEntry* pE1 = *((tDefEntry**)p1);
-    tDefEntry* pE2 = *((tDefEntry**)p2);
-    int  res = pE1->index - pE2->index;
-    if (res == 0)
-        AG_ABEND( aprf( "two %s definitions have index %ld\n", pE1->pzDefName,
-                        pE1->index ));
-
-    return res;
+    pDE->pNext = pFreeEntryList;
+    pFreeEntryList = pDE;
 }
 
 
-/*
- *  fixTwins
- *
- *  If the twins are unnumbered, then we assign numbers.
- *  Once they are all numbered, then we sort them.
- *  Once they are all sorted, then we link them together
- *  in that order.
- */
-STATIC void
-fixTwins( tDefEntry** ppNode )
+EXPORT tDefEntry*
+getEntry( void )
 {
-    long curMax = -1;
-    int  twinCt = 0;
-    void** p;
-    int  idx;
-    tDefEntry* pTw  = *ppNode;
-    tDefEntry* pNxt = pTw->pNext;
-    void*  ap[ 16 ];
+    tDefEntry*  pRes = pFreeEntryList;
 
-    pTw->pNext = NULL;
+    if (pRes != NULL) {
+        pFreeEntryList = pRes->pNext;
 
-    /*
-     *  Do the initial twin scan, assigning index numbers as needed
-     */
-    do  {
-        if (pTw->index == NO_INDEX)
-            pTw->index = ++curMax;
-
-        else if (pTw->index > curMax)
-            curMax = pTw->index;
-
-        twinCt++;
-        pTw = pTw->pTwin;
-    } while (pTw != NULL);
-
-    /*
-     *  Try to avoid allocating a pointer array,
-     *  but do so if we have to to avoid arbitrary limits.
-     */
-    if (twinCt <= 16) {
-        p = ap;
     } else {
-        p = AGALOC( twinCt * sizeof( void* ), "twin sort pointer array" );
+        int   ct = ENTRY_ALLOC_CT-1;
+        void* p  = AGALOC( ENTRY_ALLOC_SIZE, "definition headers" );
+
+        *((void**)p) = pAllocList;
+        pAllocList   = p;
+        pRes = pFreeEntryList = (tDefEntry*)((void**)p + 1);
+
+        /*
+         *  This is a post-loop test loop.  It will cycle one fewer times
+         *  than there are 'tDefEntry' structs in the memory we just alloced.
+         */
+        do  {
+            tDefEntry* pNxt = pRes+1;
+            pRes->pNext = pNxt;
+
+            /*
+             *  When the loop ends, "pRes" will point to the last allocated
+             *  structure instance.  That is the one we will return.
+             */
+            pRes = pNxt;
+        } while (--ct > 0);
+
+        /*
+         *  Unlink the last entry from the chain.  The next time this
+         *  routine is called, the *FIRST* structure in this list will
+         *  be returned.
+         */
+        pRes[-1].pNext = NULL;
     }
 
-    /*
-     *  Sort all the twins by their index number.
-     *  Reinsert the "next" pointer into the new first entry
-     */
-    for (pTw = *ppNode, idx = 0;
-         pTw != NULL;
-         idx++, pTw = pTw->pTwin) {
-        p[idx] = (void*)pTw;
-    }
-
-    qsort( (void*)p, twinCt, sizeof( void* ), compareIndex );
-    ((tDefEntry*)(p[0]))->pNext = pNxt;
-
-    /*
-     *  Chain them all together in their sorted order,
-     *  NULL terminating the list
-     */
-    for (idx = 0; idx < twinCt; idx++) {
-        *ppNode = (tDefEntry*)p[idx];
-        ppNode = &((tDefEntry*)(p[idx]))->pTwin;
-    }
-    *ppNode = NULL;
-
-    /*
-     *  If we allocated the pointer array, dump it now
-     */
-    if (p != ap)
-        AGFREE( (void*)p );
+    memset( (void*)pRes, 0, sizeof( *pRes ));
+    return pRes;
 }
 
 
 /*
- *  massageDefTree
- *
- *  The defReduce.c functions do not do everything.  It stuffs all the
- *  definitins into the definition tree, but it is easier to come back at the
- *  end and link together the "twins" (definitions with the same name, but
- *  different indexes).  This routine does that.  It is recursive, handling one
- *  level at a time.
+ *  Append a new entry at the end of a sibling (or twin) list.
  */
-STATIC void
-massageDefTree( tDefEntry** ppNode )
+STATIC tDefEntry*
+insertDef( tDefEntry* pDef )
 {
-    static int lvl = 0;
-    tDefEntry*  pNode;
+    tDefEntry* pList = ppParseStack[ stackDepth ];
 
-#if defined( DEBUG_ENABLED )
-    if (HAVE_OPT( SHOW_DEFS ))
-        snprintf( zFmt, 64, "%%%dd %%-%ds = ", 3 + (lvl * 2), 20 - (lvl * 2) );
-#endif
-
-    do  {
-        tDefEntry** ppNextSib  = NULL;
-
-        pNode = *ppNode;
-
-        /*
-         *  IF this node has a twin (definition with same name)
-         *  THEN ...
-         */
-        if (pNode->pTwin != NULL) {
-            fixTwins( ppNode );
-            pNode = *ppNode;  /* new first entry */
-
-            /*
-             *  Now go through the twin list and put in the reverse
-             *  pointers.  (We can go through _FOR loops in either
-             *  direction.)
-             */
-            {
-                tDefEntry* pNextTwin = pNode->pTwin;
-                tDefEntry* pPrevTwin = pNode;
-                do  {
-                    pNextTwin->pPrevTwin = pPrevTwin;
-                    pPrevTwin = pNextTwin;
-                    pNextTwin = pNextTwin->pTwin;
-                } while (pNextTwin != NULL);
-
-                /*
-                 *  The eldest twin has a baby twin pointer
-                 */
-                pNode->pEndTwin = pPrevTwin;
-            }
-
-        } else if (pNode->index == NO_INDEX) {
-            /*
-             *  No twins and no index means an index of zero
-             */
-            pNode->index = 0;
-        }
-
-        ppNode = &(pNode->pNext);
-
-    skipTwinFix:
-#if defined( DEBUG_ENABLED )
-        if (HAVE_OPT(SHOW_DEFS))
-            fprintf( pfTrace, zFmt, pNode->index, pNode->pzDefName );
-#endif
-
-        if (pNode->valType == VALTYP_BLOCK) {
-#if defined( DEBUG_ENABLED )
-            if (HAVE_OPT(SHOW_DEFS))
-                fputs( "{...}\n", pfTrace );
-#endif
-            /*
-             *  Do this same function on all the children of this
-             *  block definition.
-             */
-            lvl++;
-            massageDefTree( (tDefEntry**)&(pNode->pzValue) );
-            lvl--;
-        }
-
-#if defined( DEBUG_ENABLED )
-        /*
-         *  IF we are displaying definitions,
-         *  THEN show what we can on a single line for this text definition
-         */
-        else if (HAVE_OPT(SHOW_DEFS)) {
-            char* pz = pNode->pzValue;
-            int   ct = 32;
-            while (isspace( *pz )) pz++;
-            for (;;) {
-                char ch = *(pz++);
-                if (ch == NUL) {
-                    fputc( '\n', pfTrace );
-                    break;
-                }
-                fputc( ch, pfTrace );
-                if (ch == '\n')
-                    break;
-                if (--ct == 0) {
-                    fputc( '\n', pfTrace );
-                    break;
-                }
-            }
-        }
-#endif
-
-        /*
-         *  IF we have to deal with a twin,
-         *  THEN remember who the next sibling is and handle the twin
-         */
-        if (pNode->pTwin != NULL) {
-            /*
-             *  IF we do not already have a next sibling pointer,
-             *  THEN save it now.  We will clear this pointer when
-             *       we run out of twins.
-             */
-            if (ppNextSib == NULL)
-                ppNextSib = ppNode;
-
-            pNode = pNode->pTwin;
-            goto skipTwinFix;
-        }
-
-        /*
-         *  IF we stashed a next sibling pointer in order to handle
-         *  twins, THEN resume the scan from that point
-         */
-        if (ppNextSib != NULL)
-            ppNode = ppNextSib;
-
-    } while (*ppNode != NULL);
-}
-
-
-STATIC void
-parseDefinitions( void )
-{
-#if defined( DEBUG_ENABLED )
-    if (HAVE_OPT( SHOW_DEFS )) {
-        fprintf( pfTrace, "%d bytes of definition\n\n",
-                 strlen( pBaseCtx->pzData ));
-        fputs( pBaseCtx->pzData, pfTrace );
+    /*
+     *  If the current level is empty, then just insert this one and quit.
+     */
+    if (pList->val.pDefEntry == NULL) {
+        if (pDef->index == NO_INDEX)
+            pDef->index = 0;
+        pList->val.pDefEntry = pDef;
+        return pDef;
     }
-#endif
-    pCurCtx = pBaseCtx;
-    dp_run_fsm();
-    massageDefTree( &(rootDefCtx.pDefs) );
+    pList = pList->val.pDefEntry;
+
+    /*
+     *  Scan the list looking for a "twin" (same-named entry).
+     */
+    while (strcmp( pDef->pzDefName, pList->pzDefName ) != 0) {
+        /*
+         *  IF we are at the end of the list,
+         *  THEN put the new entry at the end of the list.
+         *       This is a new name in the current context.
+         *       The value type is forced to be the same type.
+         */
+        if (pList->pNext == NULL) {
+            pList->pNext = pDef;
+
+            if (pDef->index == NO_INDEX)
+                pDef->index = 0;
+            return pDef;
+        }
+
+        /*
+         *  Check the next sibling for a twin value.
+         */
+        pList = pList->pNext;
+    }
+
+    /*  * * * * *  WE HAVE FOUND A TWIN
+     *
+     *  Link in the new twin chain entry into the list.
+     */
+    if (pDef->index == NO_INDEX) {
+        tDefEntry* pT = pList->pEndTwin;
+        if (pT == NULL)
+            pT = pList;
+
+        pDef->index = pT->index + 1;
+        pT->pTwin = pDef;
+        pDef->pPrevTwin = pT;
+        pList->pEndTwin = pDef;
+
+    } else if (pList->index > pDef->index) {
+
+        /*
+         *  Insert the new entry before any other in the list.
+         *  We actually do this by leaving the pList pointer alone and swapping
+         *  the contents of the definition entry.
+         */
+        uDefValue val = pDef->val;
+        long      idx = pDef->index;
+
+        pDef->index   = pList->index;
+        pList->index  = idx;
+        pDef->val     = pList->val;
+        pList->val    = val;
+
+        /*
+         *  Link the pDef in between pList and pList->pTwin
+         */
+        pDef->pTwin   = pList->pTwin;
+        if (pDef->pTwin != NULL)
+            pDef->pTwin->pPrevTwin = pDef;
+
+        pDef->pPrevTwin = pList;
+        pList->pTwin  = pDef;
+        if (pList->pEndTwin == NULL)
+            pList->pEndTwin = pDef;
+
+        pDef = pList;  /* Return the replacement structure address */
+
+    } else {
+        tDefEntry* pL = pList;
+        tDefEntry* pT = pL->pTwin;
+
+        /*
+         *  Insert someplace after the first entry.  Scan the list until
+         *  we either find a larger index or we get to the end.
+         */
+        while ((pT != NULL) && (pT->index < pDef->index)) {
+            pL = pT;
+            pT = pT->pTwin;
+        }
+
+        pDef->pTwin = pT;
+
+        pL->pTwin = pDef;
+        pDef->pPrevTwin = pL;
+        if (pT == NULL)
+            pList->pEndTwin = pDef;
+        else
+            pT->pPrevTwin = pDef;
+    }
+
+    return pDef; /* sometimes will change */
 }
 
+
+EXPORT tDefEntry*
+findPlace( char* name, tCC* pzIndex )
+{
+    tDefEntry* pE = getEntry();
+
+    pE->pzDefName = name;
+
+    if (pzIndex == NULL)
+        pE->index = NO_INDEX;
+
+    else if (isdigit( *pzIndex ) || (*pzIndex == '-'))
+        pE->index = strtol( pzIndex, NULL, 0 );
+
+    else {
+        pzIndex = getDefine( pzIndex );
+        if (pzIndex != NULL)
+             pE->index = strtol( pzIndex, NULL, 0 );
+        else pE->index = NO_INDEX;
+    }
+
+    strtransform( pE->pzDefName, pE->pzDefName );
+    pE->valType   = VALTYP_UNKNOWN;
+    return (pCurrentEntry = insertDef( pE ));
+}
 
 /*
  *  readDefines
@@ -307,7 +255,8 @@ readDefines( void )
         OPT_ARG( DEFINITIONS )  = "stdin";
         if (getenv( "REQUEST_METHOD" ) != NULL) {
             loadCgi();
-            parseDefinitions();
+            pCurCtx = pBaseCtx;
+            dp_run_fsm();
             return;
         }
 
@@ -451,7 +400,9 @@ readDefines( void )
      */
     if (fp != stdin)
         fclose( fp );
-    parseDefinitions();
+
+    pCurCtx = pBaseCtx;
+    dp_run_fsm();
 }
 
 

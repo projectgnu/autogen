@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.23 2003/12/27 15:06:40 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.24 2004/02/01 21:09:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -158,23 +158,29 @@ ENDFOR directive=]
 [= get-text tag = COMMENTS =]
 
 @node    Full Syntax
-@section YACC Language Grammar
+@section Finite State Machine Grammar
 
-The preprocessing directives and comments are not
-part of the grammar.  They are handled by the scanner/lexer.
-The following was extracted directly from the defParse.y source file:
+The preprocessing directives and comments are not part of the grammar.  They
+are handled by the scanner/lexer.  The following was extracted directly from
+the generated defParse-fsm.c source file.  The "EVT:" is the token seen,
+the "STATE:" is the current state and the entries in this table describe
+the next state and the action to take.  Invalid transitions were removed
+from the table.
 
 @ignore
 Extracted from $top_srcdir/agen5/defParse.y
 @end ignore
 @example
-[= # extract the syntax from defParse.y, then escape the characters
-     that texi sees as operators and remove comments:  =][=
-`if test -z "$top_srcdir" || test ! -d "$top_srcdir"
- then top_srcdir=.. ; fi
- [ ! -f ${top_srcdir}/agen5/defParse.y ] && kill -2 ${AG_pid}
- sed -n -e '/^definitions/,$p' ${top_srcdir}/agen5/defParse.y |
- sed -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
+[= `
+
+if test -z "$top_srcdir" || test ! -d "$top_srcdir"
+then top_srcdir=.. ; fi
+f=${top_srcdir}/agen5/defParse-fsm.c
+[ ! -f ${f} ] && kill -2 ${AG_pid}
+sed -n -e '/^dp_trans_table/,/^};$/p' ${f} | \
+  sed '/ \&dp_do_invalid /d;/^ *}/d;s/@/@@/g;s/{/@{/g;s/}/@}/g'
+
+` =]
 @end example
 
 [= get-text tag = TEMPLATE =]

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: funcEval.c,v 3.19 2004/02/01 21:09:52 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -195,7 +195,7 @@ evalExpression( ag_bool* pMustFree )
                 }
 
                 *pMustFree = AG_TRUE;
-                pzText = aprf( pT->pzTemplText + pMac->ozText, pDef->pzValue );
+                pzText = aprf(pT->pzTemplText + pMac->ozText, pDef->val.pzText);
             }
 
             else if (pMac->ozText != 0)
@@ -211,7 +211,7 @@ evalExpression( ag_bool* pMustFree )
                     return (char*)zNil;
                 }
 
-                pzText = pDef->pzValue;
+                pzText = pDef->val.pzText;
             }
 
             code &= EMIT_PRIMARY_TYPE;
@@ -228,7 +228,7 @@ evalExpression( ag_bool* pMustFree )
             *pMustFree = AG_FALSE;
         }
 
-        pzText = pDef->pzValue;
+        pzText = pDef->val.pzText;
         break;
 
     case EMIT_EXPRESSION:

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.23 2004/01/17 18:00:04 bkorb Exp $
+ *  $Id: autogen.h,v 3.24 2004/02/01 21:09:52 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -211,11 +211,16 @@ typedef enum {
 
 #define NO_INDEX ((short)0x80DEAD)
 
-typedef struct def_stack tDefStack;
-struct def_stack {
+typedef struct sDefCtx tDefCtx;
+struct sDefCtx {
     tDefEntry* pDefs;        /* ptr to current def set     */
-    tDefStack* pPrev;        /* ptr to previous def set    */
+    tDefCtx*   pPrev;        /* ptr to previous def set    */
 };
+
+typedef union {
+    tDefEntry*  pDefEntry;
+    char*       pzText;
+} uDefValue;
 
 struct defEntry {
     tDefEntry* pNext;        /* next member of same level  */
@@ -225,7 +230,7 @@ struct defEntry {
     char*      pzDefName;    /* name of this member        */
     teValType  valType;      /* text/block/not defined yet */
     long       index;        /* index among twins          */
-    char*      pzValue;      /* string or list of children */
+    uDefValue  val;          /* string or list of children */
 };
 
 struct scanContext {
@@ -337,8 +342,8 @@ MODE tCC*        pzShellProgram   VALUE( NULL );
  *  and mFunc_For.  They are the only routines that dynamically
  *  push name/value pairs on the definition stack.
  */
-MODE tDefStack   currDefCtx       VALUE( { NULL } );
-MODE tDefStack   rootDefCtx       VALUE( { NULL } );
+MODE tDefCtx     currDefCtx       VALUE( { NULL } );
+MODE tDefCtx     rootDefCtx       VALUE( { NULL } );
 MODE tTemplate*  pCurTemplate     VALUE( NULL );
 MODE tCC*        pzLastScheme     VALUE( NULL );
 
@@ -373,6 +378,12 @@ MODE char*       pzDefineData     VALUE( NULL );
 MODE size_t      defineDataSize   VALUE( 0 );
 MODE char*       pz_token         VALUE( NULL );
 MODE te_dp_event lastToken        VALUE( DP_EV_INVALID );
+
+MODE int         stackDepth       VALUE( 0 );
+MODE int         stackSize        VALUE( 16 );
+MODE tDefEntry*  parseStack[16]   VALUE( { 0 } );
+MODE tDefEntry** ppParseStack     VALUE( parseStack );
+MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
