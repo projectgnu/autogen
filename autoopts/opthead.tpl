@@ -1,4 +1,4 @@
-[=autogen template include $Id: opthead.tpl,v 1.7 1998/07/14 13:35:04 bkorb Exp $ =]
+[=autogen template include $Id: opthead.tpl,v 1.8 1998/07/15 14:32:45 bkorb Exp $ =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
 
@@ -156,7 +156,7 @@ _ENDIF version-exists =]
 
 component = "DESC(<OPTION>)";
 
-title = "Option Descriptor Macro";
+title = "Option Descriptor";
 
 description = "This macro is used internally by other AutoOpt macros.
 It is not for general use.  It is used to obtain the option description
@@ -202,7 +202,7 @@ end-component
 
 component = "STATE_OPT(<OPTION>)";
 
-title = "Option Specification State";
+title = "Option State";
 
 description = "If you need to know if an option was set because of
 presetting actions (RC/INI processing or environment variables),
@@ -248,7 +248,7 @@ end-component
 
 component = "ISUNUSED_OPT(<OPTION>)";
 
-title = "Option Never Specified?";
+title = "Never Specified?";
 
 description = "This macro yields true if the option has
 never been specified, or has been cleared via the @code{CLEAR_OPT()} macro.";
@@ -278,7 +278,7 @@ end-component
 
 component = "STACKCT_OPT(<OPTION>)";
 
-title = "Count of stacked option args";
+title = "Stacked Arg Count";
 
 description = "When the option handling attribute is specified
 as @code{stack_arg}, this macro may be used to determine how
@@ -298,7 +298,7 @@ end-component
 
 component = "STACKLST_OPT(<OPTION>)";
 
-title = "Stacked Argument List";
+title = "Argument Stack";
 
 description = "The address of the list of pointers to the
 option arguments.  The pointers are ordered by the order in
@@ -574,7 +574,7 @@ end-component
 
 component = "ERRSTOP_OPTERR";
 
-title = "Turn on stopping for errors";
+title = "Stop on Errors";
 
 description = "After invoking this macro, if @code{optionProcess()}
 encounters an error, it will call @code{exit(1)} rather than return.

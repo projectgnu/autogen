@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.11 1998/07/14 22:06:56 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.12 1998/07/15 14:32:47 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -66,12 +66,12 @@ text files containing repetitive text with varying substitutions.
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
 @menu
-* Introduction::         Autogen's purpose
-* Generalities::         General ideas
+* Introduction::         Autogen's Purpose
+* Generalities::         General Ideas
 * Example Usage::        A Simple Example
 * Definitions File::     Macro Definitions File
 * Template File::        Output Template
-* Invocation::           Running the Program
+* Invocation::           Running Autogen
 * Installation::         What Gets Installed Where
 * Autoopts::             Automated Option Processing
 * Future::               Some ideas for the future.
@@ -124,31 +124,25 @@ uses the AutoOpt facility.
 @end ignore
 
 @node Generalities
-@chapter General ideas
+@chapter General Ideas
 @cindex m4
 
-The goal is to try to simplify the process of maintaining
-repetitive program text.  If there is a single block of text
-that needs repetitive substitutions, @code{#define}
-macros frequently fill the bill.  Sometimes, though, they are
-not quite powerful enough and you will need to use something
-like @code{m4}.  When appropriate, those approaches are much
-simpler than autogen.
+The goal is to try to simplify the process of maintaining repetitive
+program text.  If there is a single block of text that needs repetitive
+substitutions, @code{#define} macros frequently fill the bill.  They do
+not always work because they are inflexible and even sometimes obscure.
+In many of these cases, @code{M4} will work quite well.  When
+appropriate, those approaches are much simpler than autogen.  Even then
+@code{M4} is often inadequate because the entire substitution lists must
+be repeated in the proper contexts throughout the base text (template).
 
 @cindex design goals
-Autogen has been designed for
-addressing the problem when there are the same or similar
-substitutions required in multiple blocks of repeating text.
-@code{#define}s do not always work because they are inflexible
-and even sometimes obscure.  @code{m4} is often inadequate
-because the entire substitution lists must be repeated in
-the proper contexts throughout the base text (template).
-
-Autogen addresses these problems by separating
-the substitution text (macro definitions) from the template
-text.  The template text makes references to the definitions
-in order to compute text to insert into the template and
-to compute which part of the template to process at each step.
+Autogen addresses these problems by being extremely flexible in the
+kinds of substitutions that can be performed and by separating the
+substitution text (macro definitions) from the template text.  The
+template text makes references to the definitions in order to compute
+text to insert into the template and to compute which part of the
+template to process at each step.
 
 @table @samp
 @item template text
@@ -212,9 +206,9 @@ To do this, you need a template or two that can be expanded
 into the files you want.  In this program, we use a single
 template that is capable of multiple output files.
 
-Assuming we have chosen our markers to be '[#' and '#]' to
-start and end our macros, we have a template something like this
-(a full description of this is in the next chapter, "Complete Syntax"):
+Assuming we have chosen our markers to be '[#' and '#]' to start
+and end our macros, we have a template something like this.
+(For a full description, @xref{Template File}.)
 
 @example
 [#autogen template h c #]
@@ -265,7 +259,7 @@ This file consists of an identity statement that identifies it as a
 autogen file, followed by block and text macro definitions.
 Intermingled may be C-style comments and C preprocessing directives.
 All C preprocessing directives are identified, but many
-@strong{especially @code{if}} are ignored.
+(notably @code{if}) are ignored.
 
 @menu
 * Identification::  The First Definition
@@ -369,14 +363,14 @@ The string values for the text macros may be specified in one of four
 quoting rules:
 
 @table @samp
-@item with a double quote @code{"}
+@item with a double quote @code{(")}
 @cindex string, double quote
 The string follows the
 C-style escaping (@code{\}, @code{\n}, @code{\f}, @code{\v}, etc., plus
 octal character numbers specified as @code{\ooo}.  The difference
 from "C" is that the string may span multiple lines.
 
-@item with a single quote "'"
+@item with a single quote @code{(')}
 @cindex string, single quote
 This is similar to the shell single-quote string.  However, escapes
 @code{\} are honored before another escape, single quotes @code{'}
@@ -399,7 +393,7 @@ foo = '
 ';
 @end example
 
-@item with a back quote @code{`}
+@item with a back quote @code{(`)}
 @cindex string, shell output
 This is treated identically with the double quote, except that the
 resulting string is written to a shell server process and the macro
@@ -460,11 +454,11 @@ an escape @code{\} or join them with previous lines:
 @section Controlling What Gets Processed
 @cindex directives
 
-Directives can @strong{only} be reliably processed if the '#' character
-is the first character on a line.  Also, if you want a '#' as the first
-character of a line in one of your string assignments, you should either
-escape it by preceeding it with a backslash @samp{\}, or by embedding
-it in the string as in @samp{"\n#"}.
+Definition processing directives can @strong{only} be reliably processed
+if the '#' character is the first character on a line.  Also, if you
+want a '#' as the first character of a line in one of your string
+assignments, you should either escape it by preceeding it with a
+backslash @samp{\}, or by embedding it in the string as in @code{"\n#"}.
 
 All of the normal C preprocessing directives are recognized,
 plus an additional @code{#shell} @code{#endshell} pair.
@@ -562,7 +556,9 @@ a_block = @{
 @node    Full Syntax
 @section YACC Language Grammar
 
-Extracted fromt the agParse.y source file:
+The processing directives and comments are not
+part of the grammar.  They are handled by the scanner/lexer.
+The following was extracted directly from the agParse.y source file:
 
 @example
 [=_eval
@@ -611,46 +607,11 @@ their argument lists.  The entries have been alphabatized:
 
 @menu[=
 _FOR agfunc_func =][=
-  _IF unnamed _exist ! deprecated _exist ! & =]
+  _IF desc _exist deprecated _exist ! & =]
 * [=name #:: + "#%-16s" _printf=] [=name _up=] - [=what=][=
   _ENDIF =][=
 /agfunc_func=]
 @end menu
-
-If the macro text begins with an alphabetic character, the
-macro function invoked is selected by default.  The default
-depends on the type of macro named by the first token in the
-macro.  @xref{Definitions File} chapter, for detailed
-information on how macro types are determined.
-
-@table @samp
-@item block macros
-The @code{FOR} function is invoked over the text that starts
-after the closing @code{end} mark and ends just before the
-opening @code{mark} marker containing a slash @code{/} and
-the block macro name.
-
-@item text macros
-The @code{EVAL} function is invoked, including all the
-processing arguments.  If there are multiple copies of the
-text macro, the one with the highest index is selected.  If
-you wish to retrieve all the defined values for a text macro
-named @code{txt}, you would need to code:
-
-@example
-[#_FOR txt#][#txt#][#/txt#]
-@end example
-@noindent
-Inside the domain of the @code{_FOR} function, only the
-@code{txt} value for the current index is visible.
-
-@item undefined macros
-It is treated as a comment; no function is invoked.
-@end table
-
-@noindent
-A @code{template block} is template text that does not have any
-incomplete @code{case}, @code{for} or @code{if} macro functions.
 
 @node template id
 @section Format of the Pseudo Macro
@@ -727,7 +688,7 @@ capable of finding a balancing parenthesis.
       this code will insert the extracted documentation =][=
 
 _FOR agfunc_func =][=
-  _IF unnamed _exist ! deprecated _exist ! & =]
+  _IF desc _exist deprecated _exist ! & =]
 
 @node [=name=]
 @section [=name _up=] - [=what=]
@@ -760,11 +721,11 @@ _FOR agfunc_func =][=
 @end ignore
 
 @node Invocation
-@chapter Running the program
+@chapter Running Autogen
 @cindex invocation
 
 @code{Autogen} accepts the following options,
-as shown in this AutoOpt generated usage text:
+as shown in this AutoOpts generated usage text:
 
 @example
 [=_eval "#../src/autogen --help 2>&1 |
@@ -1027,6 +988,8 @@ This option will cause the option state to be printed in
 RC/INI file format when option processing is done but not
 yet verified for consistency.  The program will terminate
 successfully without running when this has completed.
+Note that for most shells you will have to quote or escape the
+flag character to restrict special meanings to the shell.
 
 The output file will be the RC/INI file name (default or provided
 by @code{rcfile}) in the last directory named in a @code{homerc}
@@ -1108,6 +1071,14 @@ To use autoopts in your application:
 @item
 Create a file @samp{myopts.def},
 according to the documentation above.
+@item
+Run autogen to create the option interface file (@code{myopts.h})
+and the option descriptor code (@code{myopts.c}):
+
+@example
+autogen -L $prefix/share/autogen myopts.def
+@end example
+
 @item
 In all your source files where you need to refer to option state,
 @code{#include "myopts.h"} (generated for you).
