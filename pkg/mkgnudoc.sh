@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Time-stamp: "2002-02-02 13:06:03 bkorb"
-# Version:    "$Revision: 3.1 $
+# Version:    "$Revision: 3.2 $
 
 d=`dirname $0`
 [ -f ${d}/mkgnudoc.sh ] || {
@@ -52,13 +52,14 @@ for f in autogen*.info*
 do gzip -c $f > autogen-${AG_VERSION}/info/$f.gz
 done
 
-[ -f autogen.ps ] || make autogen.ps
-
-##  How do I make the text files??
+[ -f autogen.ps  ] || make autogen.ps
+[ -f autogen.txt ] || make autogen.txt
 
 gzip -c autogen.dvi  > autogen-${AG_VERSION}/dvi/autogen.dvi.gz
 gzip -c autogen.ps   > autogen-${AG_VERSION}/ps/autogen.ps.gz
 gzip -c autogen.texi > autogen-${AG_VERSION}/info/autogen.info.gz
+gzip -c autogen.txt  > autogen-${AG_VERSION}/text/autogen.txt.gz
+cp   -f autogen.txt    autogen-${AG_VERSION}/text/.
 
 echo generating doc page
 cd autogen-${AG_VERSION}

@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2002/02/05 02:23:22 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -108,6 +108,10 @@ web : www/doc/autogen_toc.html
  
 ../columns/columns.texi :
 	@cd ../columns/ ; $(MAKE) $$mf gen
+
+autogen.txt : autogen.texi
+	makeinfo --fill-column=70 --no-split --paragraph-indent=0 \
+	         --no-headers --output=$@ autogen.texi
 
 autogen.lsm : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
