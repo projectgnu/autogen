@@ -30,3 +30,7 @@ script:
 
 This script basically turns the build directory into a symlink
 copy of the source directory.
+
+As a consequence of this, doing a "make distcheck" will fail.
+It will fail because the distcheck process makes a distribution
+from a tree where this process has _not_ been done.
