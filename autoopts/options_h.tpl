@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.3 2005/01/09 03:20:27 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -260,8 +260,21 @@ typedef struct {
     unsigned char*  tkn_list[1];
 } token_list_t;
 
+/*
+ *  Hide the interface - it pollutes a POSIX claim, but leave it for
+ *  anyone #include-ing this header
+ */
+#define strneqvcmp      option_strneqvcmp
+#define streqvcmp       option_streqvcmp
+#define streqvmap       option_streqvmap
+#define strequate       option_strequate
+#define strtransform    option_strtransform
+
 #ifdef  __cplusplus
 extern "C" {
+#define CPLUSPLUS_CLOSER }
+#else
+#define CPLUSPLUS_CLOSER
 #endif
 
 /*
@@ -284,14 +297,14 @@ FOR export_func         =][=
       (begin
         (set! if-text    (string-append "\n#ifndef " (get "ifndef")))
         (set! note-text  (sprintf note-fmt (get "name") (get "ifndef") " not"))
-	(set! end-text   (sprintf "\n#endif /* %s */" (get "ifndef")))
+	(set! end-text   (sprintf "#endif /* %s */\n" (get "ifndef")))
       )
 
   (if (exist? "ifdef")
       (begin
         (set! if-text    (string-append "\n#ifdef " (get "ifdef")))
         (set! note-text  (sprintf note-fmt (get "name") (get "ifdef") ""))
-	(set! end-text   (sprintf "\n#endif /* %s */" (get "ifdef")))
+	(set! end-text   (sprintf "#endif /* %s */\n" (get "ifdef")))
       )
 
   (begin
@@ -353,9 +366,7 @@ ENDFOR export-func
 /*  AutoOpts PRIVATE FUNCTIONS:  */
 tOptProc stackOptArg, unstackOptArg, optionBooleanVal, optionNumericVal;
 [= (out-resume "priv") (out-pop #t) =]
-#ifdef  __cplusplus
-}
-#endif
+CPLUSPLUS_CLOSER
 #endif /* [=(. header-guard)=] */
 /*
  * Local Variables:

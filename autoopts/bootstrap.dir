@@ -3,30 +3,6 @@
 AGexe=${AGexe-autogen}
 noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 
-make_funcs_def()
-{
-    files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
-      sed '/^CSRC/d;s/[=\\]//'`\ ../compat/pathfind.c
-    getdefs linenum srcfile template=options_h output=funcs.def $files
-    chmod u+w funcs.def
-    eval "`egrep '^AO_' ../VERSION`"
-    cat >> funcs.def <<-	_END_VERS_INFO_
-	vers-info = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
-	vers-curr = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
-	vers-min  = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
-	vers-min-str = "`expr $AO_CURRENT - $AO_AGE`:0:0";
-	library   = opts;
-	/*
-	 *  THIS FILE IS DISTRIBUTED
-	 *
-	 *  This file is used to construct options.h + doc files.  Because it is
-	 *  such a nuisance to get the build ordering correct, we distribute
-	 *  this.  It should be constructed after all binaries are built.
-	 */
-	_END_VERS_INFO_
-    ${AGexe} funcs.def
-}
-
 case "$1" in
 *genshell.c )
   #  We were probably invoked by make
@@ -41,26 +17,9 @@ case "$1" in
   ${AGexe} -Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def
   ;;
 
-*optionProcess.3 )
-  ${AGexe} -Tagman3.tpl funcs.def
-  ;;
-
 * )
-  #  This is likely a bootstrap.  Don't build genshell.c if it exists
+  #  This is likely a bootstrap.
   #
-  if [ ! -f genshell.c ]
-  then
-    ${AGexe} -L. genshell.def
-  fi
-  ${AGexe} -L. usage-txt.def
-  if [ ! -f funcs.def ] || [ ! -f options.h ]
-  then
-    make_funcs_def
-  fi
-
-  f=ao$$.h
-  exec 4> $f
-  sed '/=== LOCAL PROCEDURES ===/q' autoopts.h >&4
   :mkfwd -p `egrep -l '^LOCAL ' *.c`
   ;;
 esac

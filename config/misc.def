@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/01/01 00:20:58 $
+ *  Last Modified:     $Date: 2005/01/09 03:20:27 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: misc.def,v 4.2 2005/01/09 03:20:27 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.1 $";
+version = "$Revision: 4.2 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -26,7 +26,6 @@ test = {
 		    AC_SUBST(AGEN5_TESTS)
 		    OPTS_TESTDIR=test
 		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
-		    AM_CONDITIONAL(DO_SHELL_CMDS,true)
 		_EOF_; };
 
     action = { no; act-type = script;
@@ -34,8 +33,9 @@ test = {
 		TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
 		    OPTS_TESTDIR=
 		    AGEN5_TESTS='$(NOSHELL_TESTS)'
-		    AM_CONDITIONAL(DO_SHELL_CMDS,false)
 		_EOF_; };
+
+    conditional = DO_SHELL_CMDS;
 
     doc = <<-  _EOF_
 	If you wish to use AutoGen as a CGI service, template shell scripts
@@ -142,15 +142,11 @@ test   = {
   action = { yes; act-type = script;
              act-text = 'CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
                         '    LIBS="${ag_save_LIBS}"' "\n"
-                        '    AM_CONDITIONAL(HAVE_XML_LIB,true)' "\n"
                         '    ';
            };
   run-mode   =  "link";
 
-  action   = { asis; no;
-    act-type = script;
-    act-text = 'AM_CONDITIONAL(HAVE_XML_LIB,false)';
-  };
+  conditional = HAVE_XML_LIB;
 
   doc = <<- _END_OF_DOC_
 		xml2ag won't work without libxml2, so either the methods

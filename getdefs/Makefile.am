@@ -4,18 +4,18 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-10-30 11:50:11 bkorb"
+## Time-stamp:      "2005-01-08 18:55:04 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+## $Id: Makefile.am,v 4.2 2005/01/09 03:20:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
 bin_PROGRAMS    = getdefs
-gdsrcs          = getdefs.h getdefs.c gdemit.c gdinit.c opts.c
+gdsrcs          = getdefs.h proto.h getdefs.c gdemit.c gdinit.c opts.c
 getdefs_SOURCES = proto.h
 nodist_getdefs_SOURCES = gd.c opts.h
 

@@ -3674,9 +3674,9 @@ if (HAVE_OPT( NAME )) @{
 @subsection OPT_VALUE_name - Option Argument Value
 @findex OPT_VALUE_name
 
-This macro gets emitted only for options that take numeric or keyword
-arguments.  The macro yields a word-sized integer containing the
-enumeration or numeric value of the option argument.
+This macro gets emitted only for options that take numeric, keyword or
+set membership arguments.  The macro yields a word-sized integer
+containing the enumeration or numeric value of the option argument.
 
 @example
 int opt_val = OPT_VALUE_NAME;

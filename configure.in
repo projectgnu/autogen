@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2004 Bruce Korb
 dnl
-dnl Time-stamp:      "2004-10-30 11:58:35 bkorb"
+dnl Time-stamp:      "2005-01-08 12:28:53 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.1 2005/01/01 00:16:53 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.2 2005/01/09 03:20:27 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-users@lists.sf.net])
@@ -22,7 +22,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.1 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.2 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -171,12 +171,6 @@ AC_CHECK_LIB(gen, pathfind)
 # Check for Dynamic library stuff
 # ----------------------------------------------------------------------
 AC_CHECK_LIB(dl, dlopen)
-AC_CHECK_FUNCS(dlopen)
-[if test $ac_cv_func_dlopen = yes
-then DYNAMIC_AG=-export-dynamic
-else DYNAMIC_AG=""
-fi]
-AC_SUBST(DYNAMIC_AG)
 
 # ----------------------------------------------------------------------
 # Checks for typedefs, structures, and compiler characteristics.
@@ -203,9 +197,10 @@ AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
 
 # ----------------------------------------------------------------------
-# Checks for standard functions.
+# Checks for various functions.
 # ----------------------------------------------------------------------
-AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf realpath)
+AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf realpath \
+               dlopen pathfind)
 AC_SEARCH_LIBS(copysign, [m],
                [AC_DEFINE(HAVE_COPYSIGN, 1,
                           [Define to 1 if you have the `copysign' function.])])
@@ -215,6 +210,17 @@ AC_SEARCH_LIBS(copysignl, [m],
 AC_SEARCH_LIBS(modfl, [m],
                [AC_DEFINE(HAVE_MODFL, 1,
                           [Define to 1 if you have the `modfl' function.])])
+
+# ----------------------------------------------------------------------
+# Check for the functions needed from libgen and libdl
+# ----------------------------------------------------------------------
+
+AM_CONDITIONAL([NEED_PATHFIND], [test X$ac_cv_func_pathfind = Xyes])
+[if test X$ac_cv_func_dlopen = Xyes
+then DYNAMIC_AG=-export-dynamic
+else DYNAMIC_AG=""
+fi]
+AC_SUBST(DYNAMIC_AG)
 
 # ----------------------------------------------------------------------
 # Do all our own macros

@@ -2,12 +2,12 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2004-10-14 18:35:54 bkorb"
+ *  Time-stamp:      "2005-01-08 12:13:21 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ * $Id: compat.h,v 4.2 2005/01/09 03:20:27 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -144,7 +144,7 @@
 #include <utime.h>
 
 #ifdef HAVE_UNISTD_H
-#   include <unistd.h>
+#  include <unistd.h>
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -155,14 +155,6 @@
 #   define EXTERN extern "C"
 #else
 #   define EXTERN extern
-#endif
-
-#undef STATIC
-
-#ifdef DEBUG
-#  define STATIC
-#else
-#  define STATIC static
 #endif
 
 /* some systems #def errno! and others do not declare it!! */
@@ -213,11 +205,6 @@
 #ifndef HAVE_STRCHR
 #  define strchr        index
 #  define strrchr       rindex
-#endif
-
-#ifndef HAVE_PATHFIND
-#  define  pathfind  option_pathfind
-   EXTERN char *pathfind(const char *, const char *, const char *);
 #endif
 
 #ifdef USE_FOPEN_BINARY

@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+ *  $Id: columns.c,v 4.2 2005/01/09 03:20:27 bkorb Exp $
  */
 
 /*
@@ -52,11 +52,23 @@ size_t  lineWidth  = 79;
 size_t  columnCt   = 0;
 size_t  columnSz   = 0;
 
-void readLines( void );
-void writeRows( void );
-void writeColumns( void );
-int  handleIndent( tCC* pzIndentArg );
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static int
+handleIndent( tCC* pzIndentArg );
 
+static void
+readLines( void );
+
+static void
+writeColumns( void );
+
+static void
+writeRows( void );
+
+static int
+compProc( const void* p1, const void* p2 );
+/* = = = END-STATIC-FORWARD = = = */
 
 int
 main( int    argc,
@@ -136,7 +148,7 @@ main( int    argc,
 }
 
 
-int
+static int
 handleIndent( tCC* pzIndentArg )
 {
     char* pz;
@@ -214,7 +226,7 @@ handleIndent( tCC* pzIndentArg )
 }
 
 
-void
+static void
 readLines( void )
 {
     int   sepLen;
@@ -365,7 +377,7 @@ readLines( void )
 }
 
 
-void
+static void
 writeColumns( void )
 {
     char zFmt[ 12 ];
@@ -508,7 +520,7 @@ writeColumns( void )
 }
 
 
-void
+static void
 writeRows( void )
 {
     char zFmt[ 12 ];
@@ -593,7 +605,7 @@ writeRows( void )
 /*
  *  Line comparison procedure
  */
-int
+static int
 compProc( const void* p1, const void* p2 )
 {
     const char* pz1 = *(char* const*)p1;

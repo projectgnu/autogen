@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.2 2005/01/09 03:20:28 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -56,39 +56,33 @@ tSCC* typeName[] = {
     "XINCLUDE_END",
     "DOCB_DOCUMENT_NODE" };
 
-int    level = 0;
-
-#undef STATIC
-#ifdef DEBUG
-# define STATIC
-#else
-# define STATIC static
-#endif
-
+int   level = 0;
 FILE* outFp;
 
+#define CHUNK_SZ  4096
+
 /* = = = START-STATIC-FORWARD = = = */
-STATIC char*
+/* static forward declarations maintained by :mkfwd */
+static char*
 loadFile( FILE* fp, size_t* pzSize );
 
-STATIC void
+static void
 emitIndentation( void );
 
-STATIC char*
+static char*
 trim( const char* pzSrc, size_t* pSz );
 
-STATIC xmlNodePtr
+static xmlNodePtr
 printHeader( xmlDocPtr pDoc );
 
-STATIC void
+static void
 printAttrs( xmlAttrPtr pAttr );
 
-STATIC void
+static void
 printNode( xmlNodePtr pNode );
 
-STATIC void
+static void
 printChildren( xmlNodePtr pNode );
-
 /* = = = END-STATIC-FORWARD = = = */
 #define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
 
@@ -164,8 +158,7 @@ main( int argc, char** argv )
 }
 
 
-#define CHUNK_SZ  4096
-STATIC char*
+static char*
 loadFile( FILE* fp, size_t* pzSize )
 {
     size_t  asz = CHUNK_SZ;
@@ -197,7 +190,7 @@ loadFile( FILE* fp, size_t* pzSize )
 }
 
 
-STATIC void
+static void
 emitIndentation( void )
 {
     int indent = level * 2;
@@ -205,7 +198,7 @@ emitIndentation( void )
 }
 
 
-STATIC char*
+static char*
 trim( const char* pzSrc, size_t* pSz )
 {
     static char   zNil[1] = "";
@@ -284,7 +277,7 @@ trim( const char* pzSrc, size_t* pSz )
     return pzData;
 }
 
-STATIC xmlNodePtr
+static xmlNodePtr
 printHeader( xmlDocPtr pDoc )
 {
     tSCC zDef[] = "AutoGen Definitions %s%s;\n";
@@ -338,7 +331,7 @@ printHeader( xmlDocPtr pDoc )
     return pRootNode;
 }
 
-STATIC void
+static void
 printAttrs( xmlAttrPtr pAttr )
 {
     while (pAttr != NULL) {
@@ -367,7 +360,7 @@ printAttrs( xmlAttrPtr pAttr )
 }
 
 
-STATIC void
+static void
 printNode( xmlNodePtr pNode )
 {
     switch (pNode->type) {
@@ -466,7 +459,7 @@ printNode( xmlNodePtr pNode )
 }
 
 
-STATIC void
+static void
 printChildren( xmlNodePtr pNode )
 {
     while (pNode != NULL) {

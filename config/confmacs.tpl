@@ -279,10 +279,15 @@ DEFINE  emit-results   =][=
   then[=
   ENDIF           =][=
     (. bad-text)  =]
-  fi[= (if (> (+ good-subst bad-subst) 0)
-           (string-append "\n  AC_SUBST([" sub-name "])" ))
+  fi[=
 
-  =][=
+  (if (> (+ good-subst bad-subst) 0)
+     (string-append "\n  AC_SUBST([" sub-name "])" ))  =][=
+
+  FOR conditional =]
+  AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" != Xno])[=
+  ENDFOR cond..   =][=
+
 ENDDEF  emit-results   =][=
 
 # # # # # # # # # # ENABLEMENT # # # # # # # # # # =][=

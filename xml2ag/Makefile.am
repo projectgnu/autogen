@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-10-27 19:34:22 bkorb"
+## Time-stamp:      "2005-01-08 19:02:25 bkorb"
 ## Copyright (c):   2003-2004 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.1 2005/01/01 00:20:57 bkorb Exp $
+## $Id: Makefile.am,v 4.2 2005/01/09 03:20:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 

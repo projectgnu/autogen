@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/01/01 00:20:58 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Last Modified:     $Date: 2005/01/09 03:20:28 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.2 2005/01/09 03:20:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -37,52 +37,7 @@ do
   case $f  in
 
   proto.h )
-    rm -f $f
-    exec 4> $f
-    cat >&4 <<- _EOF_
-		/* -*- buffer-read-only: t -*- vi: set ro:
-		 *
-		 * Getdefs Globally exported prototypes `date`
-		 */
-		#ifndef GETDEFS_PROTOTYPES_H
-		#define GETDEFS_PROTOTYPES_H
-		_EOF_
-
-    for g in `egrep -l '^EXPORT' *.c`
-    do
-      echo
-      echo "/* exports from $g */"
-      sed -n '/^EXPORT /,/)$/p' $g | \
-        sed 's/^EXPORT */\
-extern /;s/)$/);/'
-    done >&4
-    set +x
-    echo >&4
-    echo "#endif /* GETDEFS_PROTOTYPES_H */" >&4
-    exec 4>&-
-
-    chmod 444 $f
-    ;;
-
-  forward )
-    for g in *.c
-    do
-      ( sed -n '1,/^\/\* FORWARD/p'     $g
-        sed -n '/^\/\* END-FORWARD/,$p' $g | \
-          sed -n '/^STATIC /,/)$/p' | \
-          sed 's/^STATIC /\
-STATIC /;s/)$/);/'
-        sed -n '/^\/\* END-FORWARD/,$p' $g
-      ) > $g.new
-
-      if cmp $g $g.new > /dev/null
-      then
-        rm -f $g.new
-      else
-        mv -f $g.new $g
-        echo "New forward declarations in $g"
-      fi
-    done
+    :mkfwd -p || { echo no working :mkfwd program ; exit 1 ; }
     ;;
 
   sort )

@@ -1,33 +1,33 @@
 /*
- *  $Id: gdinit.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: gdinit.c,v 4.2 2005/01/09 03:20:28 bkorb Exp $
  *
  *    getdefs copyright 1999-2004 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2005/01/01 00:20:58 $
+ *  Last Modified:     $Date: 2005/01/09 03:20:28 $
  *            by: bkorb
  */
 
 tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
-/* FORWARD */
-
-STATIC char*
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static char*
 compressOptionText( char* pzS, char* pzE );
 
-STATIC char*
+static char*
 fixupSubblockString( tCC* pzSrc );
 
-STATIC void
+static void
 loadStdin( void );
-/* END-FORWARD */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  compressOptionText
  */
-STATIC char*
+static char*
 compressOptionText( char* pzS, char* pzE )
 {
     char* pzR = pzS;  /* result      */
@@ -76,7 +76,7 @@ compressOptionText( char* pzS, char* pzE )
 /*
  *  fixupSubblockString
  */
-STATIC char*
+static char*
 fixupSubblockString( tCC* pzSrc )
 {
     char*   pzString;
@@ -164,7 +164,7 @@ fixupSubblockString( tCC* pzSrc )
  *  the first 4096 bytes of a comment line.  So, rather than all these
  *  problems, we just choke on it.
  */
-STATIC void
+static void
 loadStdin( void )
 {
     char z[ 4096 ];
@@ -209,7 +209,7 @@ loadStdin( void )
  *  and "=\*\/" as a single option.  If that option is the SUBBLOCK
  *  option, it will need to be massaged for use.
  */
-EXPORT void
+LOCAL void
 processEmbeddedOptions( char* pzText )
 {
     tSCC zStStr[] = "/*=--";
@@ -256,7 +256,7 @@ processEmbeddedOptions( char* pzText )
  *     (if we are to use these things).
  *  -  Initialize the user name characters array.
  */
-EXPORT void
+LOCAL void
 validateOptions( void )
 {
     /*

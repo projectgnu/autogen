@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-01-08 16:17:51 bkorb"
+ *  Time-stamp:      "2005-01-08 16:31:51 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.2 2005/01/09 00:25:06 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.3 2005/01/09 03:20:27 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -267,16 +267,6 @@ typedef struct {
 extern FILE* option_usage_fp;
 
 extern tOptProc doVersion, doPagedUsage, doLoadOpt;
-
-/*
- *  Hide the interface - it pollutes a POSIX claim
- */
-#define strneqvcmp      option_strneqvcmp
-#define streqvcmp       option_streqvcmp
-#define equivalent      option_equivalent 
-#define strequate       option_strequate
-#define streqvmap       option_streqvmap
-#define strtransform    option_strtransform
 
 #define LOCAL static
 #include "proto.h"

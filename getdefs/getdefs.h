@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: getdefs.h,v 4.2 2005/01/09 03:20:28 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2004-10-30 11:44:48 bkorb"
+ *  Time-stamp:        "2005-01-08 18:51:27 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -17,25 +17,12 @@
 #include "compat/compat.h"
 #include <sys/wait.h>
 #include <utime.h>
-#include "options.h"
-#include "autoopts.h"
-#include "streqv.h"
-
 #include REGEX_HEADER
 
 #include "opts.h"
+#include "autoopts/autoopts.h"
 
 #define EXPORT
-#undef STATIC
-#  ifdef DEBUG
-#    define STATIC
-#  else
-#    define STATIC static
-#  endif
-
-#define MODE
-#define VALUE(v) = v
-#define DEF_STRING(n,s) tCC n[] = s
 
 #define MAXNAMELEN 256
 
@@ -51,24 +38,25 @@
 
 #define AG_NAME_CHAR(c) (zUserNameCh[(unsigned)(c)] & 2)
 #define USER_NAME_CH(c) (zUserNameCh[(unsigned)(c)] & 1)
-MODE char zUserNameCh[ 256 ] VALUE( { '\0' } );
+char zUserNameCh[ 256 ] = { '\0' };
 
 /*
  *  Index database string pointers.
  */
-MODE char*    pzIndexText VALUE( NULL ); /* all the text    */
-MODE char*    pzEndIndex  VALUE( NULL ); /* end of current  */
-MODE char*    pzIndexEOF  VALUE( NULL ); /* end of file     */
-MODE size_t   indexAlloc  VALUE( 0 );           /* allocation size */
+char*    pzIndexText = NULL; /* all the text    */
+char*    pzEndIndex  = NULL; /* end of current  */
+char*    pzIndexEOF  = NULL; /* end of file     */
+size_t   indexAlloc  = 0;    /* allocation size */
 
 /*
  *  Name of program to process output (normally ``autogen'')
  */
-MODE tCC*     pzAutogen   VALUE( "autogen" );
+tCC*     pzAutogen   = "autogen";
 
 /*
  *  const global strings
  */
+#define DEF_STRING(n,s) tCC n[] = s
 DEF_STRING( zGlobal,     "\n/* GLOBALDEFS */\n" );
 DEF_STRING( zLineId,     "\n#line %d \"%s\"\n" );
 DEF_STRING( zMallocErr,  "Error:  could not allocate %d bytes for %s\n" );
@@ -93,34 +81,32 @@ DEF_STRING( zDne,
  *  The patterns we accept for output may specify a particular group,
  *  certain members within certain groups or all members of all groups
  */
-MODE tCC*    pzDefPat   VALUE( NULL );
-MODE regex_t define_re;
-MODE regex_t attrib_re;
+tCC*    pzDefPat   = NULL;
+regex_t define_re;
+regex_t attrib_re;
 
 /*
  *  The output file pointer.  It may be "stdout".
  *  It gets closed when we are done.
  */
-MODE FILE*  evtFp       VALUE( (FILE*)NULL );
+FILE*  evtFp       = (FILE*)NULL;
 
 /*
  *  The output file modification time.  Only used if we
  *  have specified a real file for output (not stdout).
  */
-MODE time_t modtime     VALUE( 0 );
+time_t modtime     = 0;
 
 /*
  *  The array of pointers to the output blocks.
  *  We build them first, then sort them, then print them out.
  */
-MODE char**  papzBlocks VALUE( (char**)NULL );
-MODE size_t  blkUseCt   VALUE(  0 );
-MODE size_t  blkAllocCt VALUE(  0 );
+char**  papzBlocks = (char**)NULL;
+size_t  blkUseCt   = 0;
+size_t  blkAllocCt = 0;
+pid_t   agPid      = -1;
 
-MODE pid_t   agPid      VALUE( -1 );
-
-#include "proto.h"
-
+#define LOCAL static
 #endif /* GETDEFS_HEADER */
 
 /* emacs

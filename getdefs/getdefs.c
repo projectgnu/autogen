@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: getdefs.c,v 4.2 2005/01/09 03:20:28 bkorb Exp $
  *
  *    getdefs copyright 1999-2004 Bruce Korb
  *
- *  Time-stamp:        "2004-10-07 09:04:35 bkorb"
+ *  Time-stamp:        "2005-01-08 13:38:01 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -16,54 +16,54 @@ tSCC zBogusDef[] = "Bogus definition:\n%s\n";
  *  Forward procedure pointers
  */
 typedef int (compar_func)(const void *, const void *);
-STATIC compar_func compar_text, compar_defname;
+static compar_func compar_text, compar_defname;
 
-/* FORWARD */
-
-STATIC char*
+/* START-STATIC-FORWARD */
+/* static forward declarations maintained by :mkfwd */
+static char*
 assignIndex( char*  pzOut,  char*  pzDef );
 
-STATIC int
+static int
 awaitAutogen( void );
 
-STATIC void
+static void
 buildDefinition(
     char*    pzDef,
     tCC*     pzFile,
     int      line,
     char*    pzOut );
 
-STATIC tSuccess
+static tSuccess
 buildPreamble(
     char**   ppzDef,
     char**   ppzOut,
     tCC*     pzFile,
     int      line );
 
-STATIC int
+static int
 compar_defname( const void* p1, const void* p2 );
 
-STATIC int
+static int
 compar_text( const void* p1, const void* p2 );
 
-STATIC void
+static void
 doPreamble( FILE* outFp );
 
-STATIC void
+static void
 printEntries( FILE* fp );
 
-STATIC void
+static void
 processFile( tCC* pzFile );
 
-STATIC void
+static void
 setFirstIndex( void );
 
-STATIC FILE*
+static FILE*
 startAutogen( void );
 
-STATIC void
+static void
 updateDatabase( void );
-/* END-FORWARD */
+/* END-STATIC-FORWARD */
 
 #ifndef HAVE_STRSIGNAL
 #  include "compat/strsignal.c"
@@ -141,7 +141,7 @@ main( int    argc,
 /*
  *  assignIndex
  */
-STATIC char*
+static char*
 assignIndex( char*  pzOut,  char*  pzDef )
 {
     char*  pzMatch;
@@ -245,7 +245,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
 /*
  *  awaitAutogen
  */
-STATIC int
+static int
 awaitAutogen( void )
 {
     int  status;
@@ -275,7 +275,7 @@ awaitAutogen( void )
 /*
  *  buildDefinition
  */
-STATIC void
+static void
 buildDefinition(
     char*    pzDef,
     tCC*     pzFile,
@@ -389,7 +389,7 @@ buildDefinition(
 /*
  *  buildPreamble
  */
-STATIC tSuccess
+static tSuccess
 buildPreamble(
     char**   ppzDef,
     char**   ppzOut,
@@ -494,7 +494,7 @@ buildPreamble(
 /*
  *  compar_defname
  */
-STATIC int
+static int
 compar_defname( const void* p1, const void* p2 )
 {
     tCC* pzS1 = *(tCC* const*)p1;
@@ -537,7 +537,7 @@ compar_defname( const void* p1, const void* p2 )
  *  earlier.  When we get here, we wil fail to find the "zNameTag"
  *  string and EXIT_FAILURE.
  */
-STATIC int
+static int
 compar_text( const void* p1, const void* p2 )
 {
     char* pz1 = strstr( *(tCC* const*)p1, zNameTag );
@@ -598,7 +598,7 @@ compar_text( const void* p1, const void* p2 )
 /*
  *  doPreamble
  */
-STATIC void
+static void
 doPreamble( FILE* outFp )
 {
     /*
@@ -664,7 +664,7 @@ doPreamble( FILE* outFp )
 /*
  *  loadFile
  */
-EXPORT char*
+LOCAL char*
 loadFile( tCC* pzFname )
 {
     FILE*  fp = fopen( pzFname, "r" FOPEN_BINARY_FLAG );
@@ -736,7 +736,7 @@ loadFile( tCC* pzFname )
 /*
  *  printEntries
  */
-STATIC void
+static void
 printEntries( FILE* fp )
 {
     int     ct  = blkUseCt;
@@ -761,7 +761,7 @@ printEntries( FILE* fp )
 /*
  *  processFile
  */
-STATIC void
+static void
 processFile( tCC* pzFile )
 {
     char* pzText = loadFile( pzFile ); /* full text */
@@ -875,7 +875,7 @@ processFile( tCC* pzFile )
 /*
  *  setFirstIndex
  */
-STATIC void
+static void
 setFirstIndex( void )
 {
     char    zNm[ 128 ] = "";
@@ -929,7 +929,7 @@ setFirstIndex( void )
 /*
  *  startAutogen
  */
-STATIC FILE*
+static FILE*
 startAutogen( void )
 {
     char*  pz;
@@ -1151,7 +1151,7 @@ startAutogen( void )
 /*
  *  updateDatabase
  */
-STATIC void
+static void
 updateDatabase( void )
 {
     FILE* fp;

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: autogen.h,v 4.2 2005/01/09 03:20:27 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -76,8 +76,6 @@ typedef unsigned char* tpChar;
 
 #include "expr.h"
 #include "autoopts/autoopts.h"
-#include "streqv.h"
-
 #include "cgi-fsm.h"
 #include "defParse-fsm.h"
 
@@ -462,7 +460,7 @@ MODE v2c_t p2p VALUE( { NULL } );
 #ifdef DEBUG_ENABLED
 # define AG_ABEND(s)  ag_abend_at(s,__FILE__,__LINE__)
 #else
-# define AG_ABEND(s)  ag_abend(s)
+# define AG_ABEND(s)  ag_abend_at(s)
 #endif
 #ifdef DEBUG_FSM
 # define DEBUG

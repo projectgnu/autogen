@@ -26,8 +26,6 @@
 #define cc_t   const unsigned char
 #define ch_t   unsigned char
 
-#include "tokenize.h"
-
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static void

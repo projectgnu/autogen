@@ -1,3 +1,22 @@
+2004-01-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options_h.tpl(streqv*): export these functions for programs
+	that include the "options.h" header.
+	autoopts/streqv.h: obsolete
+	* autoopts/streqvcmp.c(streqv*): doc the functions so they are exported
+	* autoopts/tokenize.h: obsolete
+	* autoopts/tokenize.c(tokenize.h): don't include obsolete header
+	(string_tokenize): doc the function so it is exported
+	*/*.c: regularize the methods for declaring functions
+	* compat/pathfind.c(pathfind): add to libopts if no native version
+	* compat/compat.h(pathfind): remove declaration.
+	* compat/libgen.h: obsolete
+	* compat/strcspn.c(strcspn): part of POSIX.  We require POSIX.
+	* config/confmacs.tpl(conditional): new test result type.  It must
+	live in unconditional code.
+	* config/misc.def(DO_SHELL_CMDS): new conditional
+	(HAVE_XML_LIB): ditto
+
 2004-12-31  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.5 Released

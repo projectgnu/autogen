@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2004-11-01 16:32:44 bkorb"
+# Time-stamp:      "2005-01-08 17:25:14 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.2 2005/01/09 03:20:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -37,8 +37,8 @@
 # can be generated after checkout using this bootstrap procedure.
 
 # Code:
-VERBOSE=true
-if [ -z "${VERBOSE}" ]
+
+if test -z "${VERBOSE}" -o "${VERBOSE}" = false
 then VERBOSE=false ; VERBOSE_ARG=""
 else VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ; fi
 export VERBOSE VERBOSE_ARG
@@ -103,8 +103,8 @@ export AGexe GDexe CLexe
 #
 BOOTSTRAP=pre
 export BOOTSTRAP
-test -f ${wd}/bootstrap.local && \
-  ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local ${1+"$@"}
+test ! -f ${wd}/bootstrap.local || \
+   ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local $@ || exit 1
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -260,13 +260,13 @@ done
 
 # Execute (NOTE: not source!) any bootstrap.dir scripts we find in
 # the source tree.
-
-bootstraps=$(find . -name bootstrap.dir | egrep -v '/CVS/' | sort)
-for f in ${bootstraps}
+#
+bootstrap_list=$(find . -name bootstrap.dir | egrep -v '/CVS/' | sort)
+for f in ${bootstrap_list}
 do
   ( cd $(dirname $f)
     srcdir=.
-    echo running bootstrap.dir in `pwd`
+    echo running POST-bootstrap.dir in `pwd`
     ${SHELL} ${VERBOSE_ARG} ./bootstrap.dir recursive
   ) || exit 1
 done

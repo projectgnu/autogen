@@ -1,32 +1,32 @@
 /*
- *  $Id: gdemit.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: gdemit.c,v 4.2 2005/01/09 03:20:28 bkorb Exp $
  *
  *    getdefs copyright 1999-2004 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2005/01/01 00:20:58 $
+ *  Last Modified:     $Date: 2005/01/09 03:20:28 $
  *            by: bkorb
  */
 
-/* FORWARD */
-
-STATIC void
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static void
 compressDef( char* pz );
 
-STATIC char*
+static char*
 emitListattr( char* pzText, char* pzOut );
 
-STATIC char*
+static char*
 emitQuote( char** ppzText, char* pzOut );
 
-STATIC char*
+static char*
 emitSubblock( tCC* pzDefList, char* pzText, char* pzOut );
 
-STATIC char*
+static char*
 emitSubblockString( char** ppzText, char sepChar, char* pzOut );
-/* END-FORWARD */
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  compressDef
@@ -44,7 +44,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut );
  *  and any line that does not is ignored.  So, here we strip off
  *  that prefix before we go ahead and try to parse it.
  */
-STATIC void
+static void
 compressDef( char* pz )
 {
     char* pzStrt = pz;
@@ -166,7 +166,7 @@ compressDef( char* pz )
 /*
  *  emitDefinition
  */
-EXPORT char*
+LOCAL char*
 emitDefinition( char* pzDef, char* pzOut )
 {
     char   sep_char;
@@ -267,7 +267,7 @@ emitDefinition( char* pzDef, char* pzOut )
 /*
  *  emitListattr
  */
-STATIC char*
+static char*
 emitListattr( char* pzText, char* pzOut )
 {
     tSCC  zStart[]  = " = ";
@@ -330,7 +330,7 @@ emitListattr( char* pzText, char* pzOut )
  *  The text is quoted, so copy it as is, ensuring that escaped
  *  characters are not used to end the quoted text.
  */
-STATIC char*
+static char*
 emitQuote( char** ppzText, char* pzOut )
 {
     char*  pzText = *ppzText;
@@ -367,7 +367,7 @@ quoteDone:
 /*
  *  emitSubblock
  */
-STATIC char*
+static char*
 emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
 {
     tSCC  zStart[]  = " = {";
@@ -481,7 +481,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
  *  Emit a string in a fashion that autogen will be able to
  *  correctly reconstruct it.
  */
-STATIC char*
+static char*
 emitSubblockString( char** ppzText, char sepChar, char* pzOut )
 {
     char*  pzText  = *ppzText;
