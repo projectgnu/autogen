@@ -1,3 +1,15 @@
+2004-11-14  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(handleOption): object to a reuse of an
+	equivalenced-to option IFF it has been defined on the command line.
+	This still needs more work:  stacked options may interleave.
+	* options.tpl(callback procedure):  user callbacks can have only
+	no opt args or string opt args.
+	* optlib.tpl(have-proc): allow conditional options to reference
+	non-option-specific callback procedures.
+	* *EVERYWHERE*: consistently name and use executable and executable
+	path environment variables:  AGnam, AGexe, CLnam, CLexe, GDnam, GDexe
+
 2004-10-24  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.4 Released

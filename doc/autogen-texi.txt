@@ -2501,11 +2501,11 @@ should not use this feature, if at all possible.  This feature is
 For each option you wish to specify, you must have a block macro named
 @code{flag} defined.  There are two required attributes: @code{name} and
 @code{descrip}.  If any options do not have a @code{value} (traditional flag
-character) attribute, then the @code{long-opts} global text macro must also
+character) attribute, then the @code{long-opts} program attribute must also
 be defined.  As a special exception, if no options have a @code{value}
 @strong{and} @code{long-opts} is not defined @strong{and} @code{argument} is
-not defined, then all arguments to the program are named.  In this case, the
-@code{-} and @code{--} command line option markers are optional.
+not defined, then all arguments to the program are named options.  In this
+case, the @code{-} and @code{--} command line option markers are optional.
 
 @menu
 * Required Attributes::         Required Attributes
@@ -2687,13 +2687,13 @@ option description text in the usage output.  Libraries may choose
 to make it settable so that the library can determine which command
 line option is the first one that pertains to the library.
 
-If present, this option disables all other attributes except
-@code{settable}, @code{call_proc} and @code{flag_code}.  @code{settable}
-must be and is only specified if @code{call_proc} or @code{flag_code}
-has been specified.  When present, the @code{descrip} attribute will be
-displayed only when the @code{--help} option has been specified.  It
-will be displayed flush to the left hand margin and may consist of one
-or more lines of text.  The name of the option will not be printed.
+If present, this option disables all other attributes except @code{settable},
+@code{call-proc} and @code{flag_-ode}.  @code{settable} must be and is only
+specified if @code{call-proc}, @code{extract-code} or @code{flag-code} has
+been specified.  When present, the @code{descrip} attribute will be displayed
+only when the @code{--help} option has been specified.  It will be displayed
+flush to the left hand margin and may consist of one or more lines of text.
+The name of the option will not be printed.
 
 Documentation options are for clarifying the usage text and will not
 appear in generated man pages or in the generated invoking texinfo doc.
@@ -2776,28 +2776,39 @@ when this option is present
 @subsubsection Option Argument Specification
 @cindex Option Arguments
 
-Several attributes relate to the handling of arguments to options.
-Each may appear only once, except for the @code{arg-range} attribute.
-It may appear as often as may be needed.
+Command line options come in three flavors:  options that do not
+take arguments, those that do and those that may.  Without an
+"arg-type" attribute, AutoOpts will not process an argument to an
+option.  If "arg-type" is specified and "arg-optional" is also
+specified, then the next command line token will be taken to
+be an argument, unless it looks like the name of another option.
+
+If the argument type is specified to be anything other than "str[ing]", then
+AutoOpts will specify a callback procedure to handle the argument.  Some of
+these procedures will be created and inserted into the generated @code{.c}
+file, and others are already built into the @file{libopts} library.
+Therefore, if you write your own callback procedure
+(@pxref{Option Argument Handling}), then you must either not specify an
+"arg-type" attribute, or else specify it to be of type "str[ing]".  Your
+callback function will be able to place its own restrictions on what that
+string may contain or represent.
 
 @table @samp
 @cindex arg-type
 @item arg-type
-This specifies the type of argument the option will take.
-If not present, the option cannot take an argument.
-If present, it must be one of the following five.
-The bracketed part of the name is optional.
+This specifies the type of argument the option will take.  If not present,
+the option cannot take an argument.  If present, it must be one of the
+following five.  The bracketed part of each name is optional.
 
 @table @samp
 @item str[@i{ing}]
-The argument may be any arbitrary string.
+The argument may be any arbitrary string, though your program or option
+callback procedure may place additional constraints upon it.
 
 @item num[@i{ber}]
-The argument must be a correctly formed integer, without any trailing
-U's or L's.  If you specify your own callback validation routine,
-read the @code{arg-range} section below for some considerations.
-AutoOpts contains a library procedure to convert the string to a number.
-If you specify range checking with @code{arg-range}, then AutoOpts
+The argument must be a correctly formed integer, without any trailing U's or
+L's.  AutoOpts contains a library procedure to convert the string to a
+number.  If you specify range checking with @code{arg-range}, then AutoOpts
 produces a special purpose procedure for this option.
 
 @item bool[@i{ean}]
@@ -2900,54 +2911,43 @@ argument value supplied for the option must match one of the range
 entries.  Each arg-range should consist of either an integer by itself
 or an integer range.  The integer range is specified by one or two
 integers separated by the two character sequence, @code{->}.
+Be sure to quote the entire range string.  The definitions parser will
+not accept the range syntax as a single string token.
 
-The generated procedure imposes some constraints:
+The generated procedure imposes the range constraints as follows:
 @itemize @bullet
 @item
 A number by itself will match that one value.
 @item
-The high end of the range may not be @code{INT_MIN},
-both for obvious reasons and because
-that value is used to indicate a single-valued match.
+The high end of the range may not be @code{INT_MIN}, both for obvious
+reasons and because that value is used to indicate a single-valued match.
 @item
 An omitted lower value implies a lower bound of INT_MIN.
 @item
 An omitted upper value implies a upper bound of INT_MAX.
 @item
 The argument value is required.  It may not be optional.
+@item
+The value must match one of the entries.  If it can match more than one,
+then you have redundancies, but no harm will come of it.
 @end itemize
-
-The usage procedure displays these ranges by calling the callback
-with the @code{pOptDesc} pointer set to @code{NULL}.  Therefore,
-all callback procedures designed to handle options with numeric
-arguments @strong{must} be prepared to handle a call with that
-pointer set @code{NULL}.  When that argument is set @code{NULL},
-you may wish to emit a line of usage information.  Do something
-like this:
-@example
-    if (pOptDesc == NULL) @{
-        fprintf( option_usage_fp, "\t\t\t  something\n" );
-        return;
-    @}
-@end example
-Note the @code{option_usage_fp}.  Usage text is sometimes redirected
-to pipes or stdout in addition to stderr.  If your validation fails,
-you should set @code{option_usage_fp} to @code{stderr}.  See the
-function, @code{doOptTimeout()} in @file{autogen/agen5/opts.c} for
-a complete example.
 @end table
 
 @node Option Argument Handling
 @subsubsection Option Argument Handling
 @cindex Option Argument Handling
 
-AutoOpts will automatically generate a callback procedure for options
-with enumerated keyword, set membership and numeric arguments with
-range checking.  If you have specified such an option, you may not
-specify any of the attributes listed here.  Otherwise, you may pick
-zero or one of the following attributes.  The first two attributes
-interact with the @code{documentation} and @code{settable} attributes,
-@xref{Special Option Handling}.
+AutoOpts will either specify or automatically generate callback procedures
+for options that take specialized arguments.  The only option argument types
+that are not specialized are plain string arguments and no argument at all.
+For options that fall into one of those two categories, you may specify your
+own callback function, as specified below.  If the option takes a string
+argument, then you may specify that the option is to be handled by the
+@code{libopts} library procedures @code{stackOptArg()} or
+@code{unstackOptArg()} (see below).  Finally, @code{documentation} options
+(@ref{Special Option Handling}) may also be marked as settable and have
+special callback functions (either @code{flag-code}, @code{extract-code}, or
+@code{call-proc}).
 
 @table @samp
 @cindex flag-code
@@ -2997,23 +2997,17 @@ pointer to a list of pointers to the argument values
 (@code{STACKLST_OPT(NAME)}).  Obviously, for a stackable argument,
 the @code{max} attribute needs to be set higher than @code{1}.
 
-If two options are equivalenced (@pxref{Special Option Handling}) and
-specify this attribute, then the ``equivalenced-to'' option will add
-entries to the stack, and the ``equivalencing'' option, if specified,
-will @i{remove} entries that match the regular expression argument.  The
-pattern, "@code{.*}" will efficiently remove all the entries in the
-stack.  It would not be useful to have more than two options in this
-equivalence class.
+If this stacked argument option has a disablement prefix, then the entire
+stack of arguments will be cleared by specifying the option with that
+disablement prefix.
 
-If the stacked option has a disablement prefix, then the entire
-stack of arguments will be cleared even more efficiently than the
-"@code{.*}" regular expression.  A stacked, equivalencing option with
-a disablement prefix will cause undefined results.
-
-If all of this is confusing, then don't mess with equivalenced stacked
-option arguments.  If you really want to know, the AutoGen @code{--define}
-option (@pxref{autogen define}) is a stacked argument, and @code{--undefine}
-(@pxref{autogen undefine}) is equivalenced to it.
+@cindex unstack-arg
+@item unstack-arg
+Call a special library routine to remove (``unstack'') strings
+from a @code{stack-arg} option stack.  This attribute must name
+the option that is to be ``unstacked''.  Neither this option nor
+the stacked argument option it references may be equivalenced to
+another option.
 @end table
 
 @node documentation attributes
@@ -3094,11 +3088,9 @@ its description and option usage information.  This is followed
 by the contents of the definition of the @code{detail} text macro.
 
 @item more-help -!
-This option is identical to the @code{help} option, except that
-it also includes the contents of the @code{detail-file} file
-(if provided and found), plus the output is passed through
-a pager program.  (@code{more} by default, or the program identified
-by the @code{PAGER} environment variable.)
+This option is identical to the @code{help} option, except that the
+output is passed through a pager program.  (@code{more} by default, or
+the program identified by the @code{PAGER} environment variable.)
 
 @item version -v
 This will print the program name, title and version.  If it is followed by

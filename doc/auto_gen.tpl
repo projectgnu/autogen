@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.31 2004/11/02 04:03:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.32 2004/11/21 21:31:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -37,6 +37,11 @@ texi=autogen.texi
       exit 1
     fi" ))
 
+(define texi-escape-encode (lambda (in-str)
+   (string-substitute in-str
+      '("@"   "{"   "}")
+      '("@@"  "@{"  "@}")
+)  ))
 =]
 \input texinfo
 @ignore
@@ -96,7 +101,7 @@ notice identical to this one except for the removal of this paragraph.
 @title AutoGen - @value{TITLE}
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
-@author @email{[=(shellf "echo '%s' | sed 's,@,@@,g'" e-addr )=]}
+@author @email{[=(texi-escape-encode e-addr)=]}
 
 @page
 @vskip 0pt plus 1filll
@@ -563,10 +568,12 @@ prog-name  = default-test;
 prog-title = 'Default Option Example';
 homerc     = '$$/../share/default-test', '$HOME', '.';
 environrc;
-test-main  = yes;
 long-opts;
 gnu-usage;
 version    = '1.0';
+main = {
+  main-type = shell-process;
+};
 #define DEBUG_FLAG
 #define WARN_FLAG
 #define WARN_LEVEL
@@ -580,7 +587,7 @@ version    = '1.0';
 #include stdoptions.def
 [=
 
- (out-pop #t)
+ (texi-escape-encode (out-pop #t))
 
 =]@end example
 
@@ -589,8 +596,8 @@ Running a few simple commands on that definition file:
 
 @example
 autogen default-test.def
-copts="-DTEST_DEFAULT_TEST_OPTS -I$@{prefix@}/include"
-lopts="-L$@{prefix@}/lib -lopts -lm"
+copts="-DTEST_DEFAULT_TEST_OPTS `autoopts-config cflags`"
+lopts="`autoopts-config ldflags`"
 cc -o default-test $@{copts@} default-test.c $@{lopts@}
 @end example
 

@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2004/08/12 03:26:58 $
+ *  Last Modified:     $Date: 2004/11/21 21:31:25 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.35 2004/08/12 03:26:58 bkorb Exp $
+ *  $Id: misc.def,v 3.36 2004/11/21 21:31:25 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.35 $";
+version = "$Revision: 3.36 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -283,6 +283,35 @@ test = {
     "See if long long works";
 };
 
+test   = {
+  name     = "ldflags";
+  type     = "test";
+  check    = "runtime library dirs can be specified";
+  code     = <<- _END_OF_CODE_
+        echo 'int main() { return 0; }' > conftest.$ac_ext
+        libs="${LIBS}"
+        LIBS="${LIBS} -Wl,-R/tmp"
+        if (eval $ac_link) > /dev/null 2>&1
+        then echo '-Wl,-R' ; rm -f conftest* ; exit 0 ; fi
+        LIBS="${libs} -R/tmp"
+        if (eval $ac_link) > /dev/null 2>&1
+        then echo '-R' ; rm -f conftest* ; exit 0 ; fi
+        rm -f conftest* ; exit 1
+	_END_OF_CODE_;
+  code-quoting  = asis;
+
+  action   = { yes; act-type=subst;  act-text = "${ag_cv_test_ldflags}"; };
+  action   = { yes; act-quoting = asis;
+    act-type = script;
+    act-text = 'LIBS="${ag_cv_test_ldflags}${libdir} ${LIBS}"'; };
+
+  doc = <<- _END_OF_DOC_
+	This test determines whether `-R/path/to/libs' or
+	`-Wl,-R/path/to/libs' should be used to find a runtime
+	dynamic library.
+	_END_OF_DOC_;
+};
+
 test = {
     name   = debug;
     type   = enable;
@@ -293,12 +322,12 @@ test = {
      */
     action = { act-type = script; asis;
       act-text = <<- _EOF_
-		AC_DEFINE([DEBUG_ENABLED], [1],
-		        [Define this if debugging is enabled])
+	AC_DEFINE([DEBUG_ENABLED], [1],
+	          [Define this if debugging is enabled])
 	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
 	    f=`which dmalloc 2>/dev/null`
 	    [ -n "$f" ] && LIBS="${LIBS} -ldmalloc"
-		_EOF_; };
+	_EOF_; };
 
     doc = <<-  _EOF_
 	This option will enable two debugging options for AutoGen.

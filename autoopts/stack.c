@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.16 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: stack.c,v 3.17 2004/11/21 21:31:25 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -166,12 +166,6 @@ stackOptArg( pOpts, pOptDesc )
 
     if (pOptDesc->optActualIndex != pOptDesc->optIndex)
         pOptDesc = pOpts->pOptDesc + pOptDesc->optActualIndex;
-
-    /*
-     *  Being called is the most authoritative way to be sure an
-     *  option wants to have its argument values stacked...
-     */
-    pOptDesc->fOptState |= OPTST_STACKED;
 
     /*
      *  IF this is a negated ('+'-marked) option

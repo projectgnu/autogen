@@ -2,29 +2,28 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-28 17:47:17 bkorb"
+## Time-stamp:      "2004-11-21 13:02:28 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.37 2004/10/30 20:43:56 bkorb Exp $
+## $Id: Makefile.am,v 3.38 2004/11/21 21:31:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
 INCLUDES        = @INCLIST@
 TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
-GENDOCS         = autogen.texi autogen.menu autogen.1
-CLEANFILES      = $(GENDOCS)
-STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm stamp-parse
+CLEANFILES      = autogen.texi autogen.menu autogen.1
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
-GEN_SRC         = $(GEN_CSRC) $(GENDOCS)
+STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm \
+                  stamp-man stamp-texi stamp-parse
 pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
-man_MANS        = autogen.1
+nodist_man_MANS = autogen.1
 
 DISTCLEANFILES  = $(STAMPS) ag.c
-MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
+MAINTAINERCLEANFILES = Makefile.in $(GEN_CSRC)
 
 bin_PROGRAMS    = autogen
 
@@ -55,7 +54,6 @@ EXPRLIST        = \
 
 AM_YFLAGS = -d
 
-all  : $(AGnam)
 ag.c : Makefile
 	( echo '#define DEFINING' ; echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done ) > $@
@@ -69,7 +67,6 @@ SUFFIXES = .i
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-GEN_LIST = $(STAMPS) $(GENDOCS)
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) builddir=$(builddir) \
 	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
@@ -98,29 +95,29 @@ stamp-parse : defParse.def fsm.tpl fsm-macro.tpl fsm-trans.tpl
 proto.h :
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
-## autogen.texi GEN-RULE
-autogen.texi : $(STAMPS)
+## stamp-texi GEN-RULE
+stamp-texi : $(STAMPS)
 	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
 	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
 	test -f $(GDexe) || $(MAKE) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
-## autogen.1 GEN-RULE
-autogen.1 : opts.def
+## stamp-man GEN-RULE
+stamp-man : opts.def
 	@test -f $(AGnam) || $(MAKE) $(AGnam) ; \
 	test -f $(CLexe) || $(MAKE) $(CLexe) ; \
 	test -f $(GDexe) || $(MAKE) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
-gen : $(GEN_LIST)
+autogen.1 : stamp-man
+autogen.texi : stamp-texi
+gen : $(STAMPS)
 
 $(GDexe) :
 	cd ../getdefs ; $(MAKE) $(GDnam)
 
 $(CLexe) :
 	cd ../columns ; $(MAKE) $(CLnam)
-
-dist : autogen.texi autogen.1
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \

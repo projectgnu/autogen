@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.30 2004/10/30 20:43:56 bkorb Exp $
+# $Id: optmain.tpl,v 3.31 2004/11/21 21:31:25 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -357,10 +357,10 @@ DEFINE build-main               =][= FOR main[] =][=
      build-guile-main           =][=
 
   == shell-process              =][=
-     INVOKE build-test-main  test-main = "putBourneShell"
+     INVOKE build-test-main  test-main = "putBourneShell" =][=
 
   == shell-parser               =][=
-     INVOKE build-test-main  test-main = "putShellParse" =][=
+     INVOKE build-test-main  test-main = "putShellParse"  =][=
 
   == main                       =][=
      INVOKE build-test-main     =][=

@@ -532,10 +532,10 @@ DEFINE  try-test                =][=
   start-feat-test               =]
   AC_CACHE_VAL([[=(. cv-name)=]],[
     [=(. cv-name)=]=[= (sub-shell-str
-      (string-append "exec 2> /dev/null ; " (get "code")) ) =]
-    if [ $? -ne 0 ]
+      (string-append "exec 2> /dev/null\n" (get "code")) ) =]
+    if test $? -ne 0
     then [=(. cv-name)=]=no
-    elif [ -z "$[=(. cv-name)=]" ]
+    elif test -z "$[=(. cv-name)=]"
     then [=(. cv-name)=]=no
     fi
   ]) # end of CACHE_VAL of [=(. cv-name)=]

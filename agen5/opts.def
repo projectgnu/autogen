@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.34 2004/10/15 01:48:34 bkorb Exp $
+ *   $Id: opts.def,v 3.35 2004/11/21 21:31:25 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -657,7 +657,6 @@ flag = {
     arg-name    = value;
     max         = NOLIMIT;
     descrip     = "name to add to definition list";
-    equivalence = define;
     stack-arg;
 #ifndef XML2AG
     settable;
@@ -698,8 +697,7 @@ flag = {
     arg-name    = name-pat;
     max         = NOLIMIT;
     descrip     = "definition list removal pattern";
-    equivalence = define;
-    stack-arg;
+    unstack-arg = define;
 #ifndef XML2AG
     no-preset;
     settable;

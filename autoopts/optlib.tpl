@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.29 2004/11/16 02:50:21 bkorb Exp $
+# $Id: optlib.tpl,v 3.30 2004/11/21 21:31:25 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -92,15 +92,20 @@ DEFINE save-name-morphs
 
     (set! have-proc #t)
     (set! is-priv   #f)
-    (if (or (not (exist? "equivalence"))
-            (== (up-c-name "equivalence") UP-name) )
-        (set! proc-name "stackOptArg")
-        (set! proc-name "unstackOptArg")  )
+    (set! proc-name "stackOptArg")
     (set! test-name (if need-stacking proc-name "NULL"))
     (set! is-extern #t)
 
   =][=
+  ELIF (exist? "unstack-arg")   =][=
 
+    (set! have-proc #t)
+    (set! is-priv   #f)
+    (set! proc-name "unstackOptArg")
+    (set! test-name (if need-stacking proc-name "NULL"))
+    (set! is-extern #t)
+
+  =][=
   ELSE =][=
     CASE arg-type               =][=
     =*   bool                   =][=
@@ -325,27 +330,35 @@ typedef enum {[=
 
   IF (== (up-c-name "equivalence") UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
-                =] ([=(. descriptor)=].optActualValue)
+                 =] ([=(. descriptor)=].optActualValue)
 #define WHICH_[=(. UP-prefix)=]IDX_[=(sprintf "%-14s" UP-name)
-                =] ([=(. descriptor)=].optActualIndex)[=
-  ENDIF =][=
+                 =] ([=(. descriptor)=].optActualIndex)[=
+  ENDIF          =][=
   IF (exist? "settable") =][=
 
-    IF  (or (not (exist? "equivalence"))
-            (== (up-c-name "equivalence") UP-name)) =][=
+    IF (exist? "unstack-arg") =][=
 
       set-defines
-           set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
-           set-index = (for-index)
-           opt-state = OPTST_SET  =][=
+           set-desc  = (string-append UP-prefix "DESC("
+                           (up-c-name "unstack-arg") ")" )
+           set-index = (index-name "unstack-arg")
+           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
-    ELSE  "is equivalenced"       =][=
+    ELIF (and (exist? "equivalence")
+              (not (== (up-c-name "equivalence") UP-name))) =][=
 
       set-defines
            set-desc  = (string-append UP-prefix "DESC("
                            (up-c-name "equivalence") ")" )
            set-index = (index-name "equivalence")
            opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
+
+    ELSE  "is equivalenced"       =][=
+
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
+           set-index = (for-index)
+           opt-state = OPTST_SET  =][=
 
     ENDIF is/not equivalenced     =][=
 
@@ -596,7 +609,7 @@ DEFINE Option_Descriptor =][=
      /* equiv idx, value */ [=
           IF (== (up-c-name "equivalence") UP-name)
               =]NO_EQUIVALENT, 0,[=
-          ELIF (exist? "equivalence")
+          ELIF (or (exist? "equivalence") (exist? "unstack-arg"))
               =]NOLIMIT, NOLIMIT,[=
           ELSE
               =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=],[=
@@ -607,11 +620,13 @@ DEFINE Option_Descriptor =][=
          ELSE                          =]MUST[=
          ENDIF =],
      /* equivalenced to  */ [=
-         (if (and (exist? "equivalence")
-                  (not (== (up-c-name "equivalence") UP-name)) )
-             (index-name "equivalence")
-             "NO_EQUIVALENT"
-         ) =],
+         (if (exist? "unstack-arg")
+             (index-name "unstack-arg")
+             (if (and (exist? "equivalence")
+                      (not (== (up-c-name "equivalence") UP-name)) )
+                 (index-name "equivalence")
+                 "NO_EQUIVALENT"
+         )   ) =],
      /* min, max, act ct */ [=(if (exist? "min") (get "min") "0")=], [=
          (if (=* (get "arg-type") "set") "NOLIMIT"
              (if (exist? "max") (get "max") "1") ) =], 0,

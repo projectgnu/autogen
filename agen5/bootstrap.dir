@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2004/11/02 04:03:59 $
+# Last Modified:     $Date: 2004/11/21 21:31:25 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.24 2004/11/02 04:03:59 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.25 2004/11/21 21:31:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -43,7 +43,8 @@ top_srcdir=${top_srcdir:-..}
 top_builddir=${top_builddir:-..}
 srcdir=${srcdir:-.}
 builddir=${builddir:-.}
-eval "`egrep '^AG_' ${top_srcdir}/VERSION | sed 's,^AG,export AG,'`"
+eval "`egrep '^AG_' ${top_srcdir}/VERSION | \
+       sed 's,^\(AG[^=]*\)\(.*\),\1\2 export \1,'`"
 
 export top_builddir top_srcdir builddir srcdir
 
@@ -63,17 +64,17 @@ set_exe_var() {
     d=$(cd $dir ; pwd)
     if [ -x $d/$prog ]
     then
-      echo export ${var}exe=$d/$prog
+      echo ${var}exe=$d/$prog export ${var}exe
     else
       eval f=\$${var}exe
       if test -x "$f"
       then
-        echo export ${var}exe=$f
+        echo ${var}exe=$f export ${var}exe
       else
         f=$(type $prog 2> /dev/null | \
             sed -e "s;^${prog} is [^/]*/;/;")
         case ${f} in
-        */${prog} )  echo export ${var}exe=${f} ;;
+        */${prog} )  echo ${var}exe=${f} export ${var}exe ;;
         * ) echo unset ${var}exe ;;
         esac
       fi
@@ -102,7 +103,7 @@ if [ $# -eq 0 ]
 then
   echo Looking in ${top_srcdir}/agen5/Makefile.am for GEN-RULE
   set -- `egrep '##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
-          sed 's/.*## *\(.*\) GEN-RULE/\1/' `
+          awk '{ print $2 }' `
   if $force ; then :
   else
     t=""
@@ -231,7 +232,7 @@ do
     date > stamp-directive
     ;;
 
-  autogen.texi | autogen.menu )
+  stamp-texi | autogen.texi | autogen.menu )
     # Construct the info doc
     #
     if test -z "${AGexe}" -o -z "${CLexe}"
@@ -245,7 +246,7 @@ do
     ${AGexe} ${eopt} opts.def
     ;;
 
-  autogen.1 )
+  stamp-man | autogen.1 )
     # Construct the man page
     #
     if test -z "${AGexe}" -o -z "${CLexe}"

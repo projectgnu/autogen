@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.43 2004/11/16 02:50:21 bkorb Exp $
+ *  $Id: autoopts.c,v 3.44 2004/11/21 21:31:25 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -100,8 +100,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
 
     /*
      *  IF we are presetting options, then we will ignore any un-presettable
-     *  options.  They are the ones either marked as such, or equivalenced to
-     *  a different option.
+     *  options.  They are the ones either marked as such.
      */
     if (  ((pOpts->fOptSet & OPTPROC_PRESETTING) != 0)
        && ((pOD->fOptState & OPTST_NO_INIT) != 0)
