@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 1.4 1999/10/14 23:54:47 bruce Exp $
+ *  $Id: autogen.h,v 1.5 1999/10/14 23:59:24 bruce Exp $
  *  Global header file for AutoGen
  */
 
@@ -33,8 +33,8 @@ typedef enum {
     PROC_STATE_INIT,       /* set up `atexit' and load Guile   */
     PROC_STATE_OPTIONS,    /* processing command line options  */
     PROC_STATE_GUILE_PRELOAD,
-    PROC_STATE_LIB_LOAD,
     PROC_STATE_LOAD_DEFS,  /* Loading value definitions        */
+    PROC_STATE_LIB_LOAD,   /* Loading library template         */
     PROC_STATE_LOAD_TPL,   /* Loading primary template         */
     PROC_STATE_EMITTING,   /* processing templates             */
     PROC_STATE_INCLUDING,  /* loading an included template     */
@@ -50,7 +50,7 @@ typedef enum {
     longjmp( fileAbort, FAILURE ) )
 
 #define LOAD_ABORT( pT, pM, m ) STMTS( \
-    if (procState >= PROC_STATE_LOAD_TPL) \
+    if (procState >= PROC_STATE_LIB_LOAD) \
         fprintf( stderr, zTplErr, (pT)->pzFileName, (pM)->lineNo, m ); \
     AG_ABEND )
 
