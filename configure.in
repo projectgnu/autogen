@@ -10,10 +10,10 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <korb@datadesign.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.22 1999/09/08 22:08:43 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.23 1999/10/26 03:06:29 bruce Exp $
 dnl --------------------------------------------------------------------
 
-AC_INIT(src/autogen.c)
+AC_INIT(agen5/autogen.c)
 
 . $srcdir/VERSION
 
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.22 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.23 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
