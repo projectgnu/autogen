@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.15 2000/03/05 02:26:50 bruce Exp $
+## $Id: Makefile.am,v 1.16 2000/03/05 02:32:28 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -65,13 +65,16 @@ clean :
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN-RULE" comments - used by bootstrap.dir
 ##
+STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
+GEN_LIST = $(STAMPS) autogen.texi autogen.1 defParse.c
+
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
 
 ## stamp-directive GEN-RULE
-stamp-directive:
+stamp-directive: defDirect.c
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
 
@@ -86,7 +89,6 @@ stamp-exprini : $(EXPRLIST) snarf.tpl
 	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
 
 ## autogen.texi GEN-RULE
-STAMPS  = stamp-directive stamp-exprini stamp-functions stamp-opts
 autogen.texi : $(STAMPS) ../getdefs/getdefs ../columns/columns AutoGen
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	DEBUG_OPTS=$(OPTDBG) sh ./bootstrap.dir $@
@@ -99,10 +101,9 @@ autogen.1 : opts.def
 ## defParse.c GEN-RULE
 defParse.c defParse.h : defParse.y
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	YACC="$(YACC)" DEBUG_OPTS="$(OPTDBG)" \
-	sh ./bootstrap.dir defParse.h
+	YACC="$(YACC)" sh ./bootstrap.dir $@
 
-gen : defParse.h autogen.texi autogen.1
+gen : $(GEN_LIST)
 
 ../getdefs/getdefs :
 	cd ../getdefs ; $(MAKE)
