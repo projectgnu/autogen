@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.35 2004/08/12 03:24:00 bkorb Exp $
+ *  $Id: autoopts.c,v 3.36 2004/08/16 01:09:21 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -753,7 +753,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
             /*
              *  Process only NON immediate actions
              */
-            if (DO_NORMAL_TIME(st.flags))
+            if (DO_NORMALY(st.flags) || DO_SECOND_TIME(st.flags))
                 break;
             continue;
 
@@ -1161,10 +1161,14 @@ optionProcess(
         }
 
         /*
-         *  IF this is not an immediate-attribute option, then do it.
+         *  IF this is not being processed normally (i.e. is immediate action)
+         *  THEN skip it (unless we are supposed to do it a second time).
          */
-        if (! DO_NORMAL_TIME(optState.flags))
-            continue;
+        if (! DO_NORMALY(optState.flags)) {
+            if (! DO_SECOND_TIME(optState.flags))
+                continue;
+            optState.pOD->optOccCt--; /* don't count last time */
+        }
 
         if (! SUCCESSFUL( handleOption( pOpts, &optState ))) {
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)

@@ -1,0 +1,89 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# immediate.test      ---  test immediate option handling
+#
+# Time-stamp:        "2004-08-15 16:38:05 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+#
+# $Id: immediate.test,v 3.1 2004/08/16 01:09:21 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+set -x
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating ${testname}.def in `pwd`"
+
+cat > ${testname}.def << _EOF_
+AutoGen definitions options;
+
+prog-name  = "test_${testname}";
+prog-title = "Test AutoOpts for ${testname}";
+include    = "#include <stdio.h>\nint invocation_ct = 0;";
+
+flag = {
+    name      = "second";
+    descrip   = "The second option descrip";
+    immediate     = also;
+    immed-disable = also;
+    disable   = not;
+    arg-type  = string;
+    flag-code = "    invocation_ct++;";
+};
+
+main = {
+    main-type = main;
+    main-text = '    printf( "invocation_ct = %d\\n", invocation_ct );';
+};
+
+_EOF_
+
+INC=`echo ${INC} | sed 's/-lguile//;s/-lqthreads//'`
+CFLAGS="-static -g `echo ${CFLAGS} | \
+  sed 's,-O2,,;s/-g//'`"
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
+  failure AutoGen could not process
+
+compile "help"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating ${testname}.hlp
+cat > ${testname}.hlp << '_EOF_'
+test_immediate - Test AutoOpts for immediate
+USAGE:  immediate [ <option-name>[{=| }<val>] ]...
+   Arg Option-Name    Description
+   Str second         The second option descrip
+				- disabled as --not-second
+   no  help           Display usage information and exit
+   no  more-help      Extended usage information passed thru pager
+
+All arguments are named options.
+_EOF_
+
+cmp -s ${testname}.help ${testname}.hlp || { set +x ; \
+  failure "`diff -c ${testname}.hlp ${testname}.help`" ; }
+
+f=`./${testname} second=hand`
+test "$f" = "invocation_ct = 2" || \
+  failure "enabled option not processed twice"
+
+f=`./${testname} not-second`
+test "$f" = "invocation_ct = 2" || \
+  failure "DIS-abled option not processed twice"
+
+cleanup
+# end of immediate.test

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.31 2004/08/15 12:36:20 bkorb Exp $
+#$Id: optcode.tpl,v 3.32 2004/08/16 01:09:21 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -372,13 +372,7 @@ IF (or (exist? "flag.flag-code")
 ENDIF                              =][=
 
 IF (. make-test-main)              =][=
-
-  IF (exist? "guile-main")         =][=
-     (error "both ``test-main'' and ``guile-main'' have been defined") =][=
-
-  ELSE                             =][=
-     invoke build-test-main        =][=
-  ENDIF                            =][=
+  invoke build-test-main           =][=
 
 ELIF (exist? "guile-main")         =][=
   invoke build-guile-main          =][=

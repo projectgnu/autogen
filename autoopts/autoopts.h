@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2004-08-14 07:33:27 bkorb"
+ *  Time-stamp:      "2004-08-15 16:17:49 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.25 2004/08/14 20:36:57 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.26 2004/08/16 01:09:21 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -237,12 +237,14 @@ typedef struct {
     || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
         == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
 
-#define DO_NORMAL_TIME(_flg) \
-    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
-    || (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
-                  (OPTST_DISABLED|OPTST_TWICE))                 \
+#define DO_NORMALY(_flg) ( \
+       (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
     || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
-                  OPTST_DISABLED)                               \
+                  OPTST_DISABLED)  )
+
+#define DO_SECOND_TIME(_flg) ( \
+       (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
+                  OPTST_TWICE)                                  \
     || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_TWICE))  ==     \
                   (OPTST_DISABLED|OPTST_DISABLE_TWICE)  ))
 

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.23 2004/08/15 12:36:20 bkorb Exp $
+# $Id: optlib.tpl,v 3.24 2004/08/16 01:09:21 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -457,28 +457,33 @@ static const int
       ENDFOR flags-cant =] NO_EQUIVALENT };[=
     ENDIF =]
 #define [=(. UP-name)=]_FLAGS       ([=
+         ? enabled      "OPTST_INITENABLED"
+                        "OPTST_DISABLED"       =][=
+         stack-arg      " | OPTST_STACKED"     =][=
+         must-set       " | OPTST_MUST_SET"    =][=
+         no-preset      " | OPTST_NO_INIT"     =][=
+
          CASE arg-type  =][=
-         =*   num       =]OPTST_NUMERIC | [=
-         =*   bool      =]OPTST_BOOLEAN | [=
-         =*   key       =]OPTST_ENUMERATION | [=
-         =*   set       =]OPTST_MEMBER_BITS | [=
-         ESAC           =][=
-         stack-arg      "OPTST_STACKED | "     =][=
+         =*  num        =] | OPTST_NUMERIC[=
+         =*  bool       =] | OPTST_BOOLEAN[=
+         =*  key        =] | OPTST_ENUMERATION[=
+         =*  set        =] | OPTST_MEMBER_BITS[=
+         ~* "str|bool"  =][= # nothing   =][=
+         == ""          =][= # nothing   =][=
+         *              =][=
+         (error (string-append "unknown arg type '"
+                (get "arg-type") "' for " flg-name)) =][=
+         ESAC arg-type  =][=
 
          CASE immediate =][=
-         =    also      =]OPTST_IMM | OPTST_TWICE | [=
-         =    *         =][= immediate "OPTST_IMM | " =][=
+         =    also      =] | OPTST_IMM | OPTST_TWICE[=
+         *              =][= immediate " | OPTST_IMM" =][=
          ESAC immediate =][=
 
          CASE immed-disable  =][=
-         =    also      =]OPTST_DISABLE_IMM | OPTST_DISABLE_TWICE | [=
-         =    *         =][= immediate "OPTST_DISABLE_IMM | " =][=
-         ESAC immed-disable  =][=
-
-         must-set       "OPTST_MUST_SET | "    =][=
-         ? enabled      "OPTST_INITENABLED"
-                        "OPTST_DISABLED"       =][=
-         no-preset      " | OPTST_NO_INIT"     =])[=
+         =    also           =] | OPTST_DISABLE_IMM | OPTST_DISABLE_TWICE[=
+         *                   =][= immediate       " | OPTST_DISABLE_IMM" =][=
+         ESAC immed-disable  =])[=
 ENDDEF   emit-nondoc-option
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.26 2004/08/14 20:36:57 bkorb Exp $
+# $Id: optmain.tpl,v 3.27 2004/08/16 01:09:21 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -84,7 +84,8 @@ DEFINE build-test-main
 
 int
 main( int argc, char** argv )
-{[=
+{
+    int res = EXIT_SUCCESS;[=
 
   IF (= (get "test-main") "putShellParse") =]
     extern tOptions  genshelloptOptions;
@@ -99,9 +100,14 @@ main( int argc, char** argv )
     (void)optionProcess( &genshelloptOptions, argc, argv );
     putShellParse( &[=(. pname)=]Options );[=
 
-  ELIF
-      ;;  Also check to see if the user supplies all the code for main()
-      (exist? "main-text") =]
+  ELIF (exist? "main-text") =][=
+    IF (not (exist? "option-code")) =]
+    {
+        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
+        argc -= ct;
+        argv += ct;
+    }[=
+    ENDIF    =]
 [= main-text =][=
 
   ELSE=]
@@ -115,7 +121,7 @@ main( int argc, char** argv )
         [= (. opt-name) =]( &[=(. pname)=]Options );
     }[=
   ENDIF=]
-    return EXIT_SUCCESS;
+    return res;
 }
 #endif  /* defined [= (. main-guard) =] */[=
 
@@ -249,28 +255,31 @@ ENDDEF  for-each-main
 DEFINE build-main       =][= FOR main[] =][=
 
  CASE main-type         =][=
- == guile               =][=
-    build-guile-main    =][=
+  == guile               =][=
+     build-guile-main    =][=
 
- == shell-process       =][=
-INVOKE build-test-main  test-main = "putBourneShell"
+  == shell-process       =][=
+     INVOKE build-test-main  test-main = "putBourneShell"
 
- == shell-parser        =][=
-INVOKE build-test-main  test-main = "putShellParse"
+  == shell-parser        =][=
+     INVOKE build-test-main  test-main = "putShellParse" =][=
 
- == main                =][=
-INVOKE build-test-main  main-text = (get "code")
+  == main                =][=
+     INVOKE build-test-main =][=
 
- == include             =][=
-    INCLUDE tpl         =][=
+  == include             =][=
+     INCLUDE tpl         =][=
 
- == invoke              =][=
-    INVOKE (get "func") =][=
+  == invoke              =][=
+     INVOKE (get "func") =][=
 
- == for-each            =][=
-    INVOKE for-each-main=][=
+  == for-each            =][=
+     INVOKE for-each-main=][=
  
- ESAC =][= ENDFOR =][=
+  *                      =][=
+     (error (sprintf "unknown/invalid main-type: '%s'" (get "main-type"))) =][=
+
+  ESAC =][= ENDFOR =][=
 
 ENDDEF build-main
 
