@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 11:17:56 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: endmac.test,v 1.4 1999/11/06 19:56:58 bruce Exp $
+# $Id: endmac.test,v 1.5 1999/11/07 03:39:59 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,7 +23,7 @@ fi
 
 cat > $testname.tpl <<EOF
 <=AutoGen5 template test=>>
-<=`pwd`=>>
+ENDMAC 1 <=`pwd`=>>
 <=# comment this test fails because the '=' is bound to 'test' >>
 This is a test
 EOF
@@ -33,7 +33,7 @@ echo failure $testname test succeeded
 
 cat > $testname.tpl <<EOF
 <=AutoGen5 template test =>>
-<=`echo print this message` =>>
+ENDMAC 2 <=`echo print this message` =>>
 <=# comment This test succeeds because the '=' is not part of 'test' =>>
 This is a test
 EOF
@@ -43,7 +43,7 @@ echo first successful $testname test succeeded
 
 cat > $testname.tpl <<EOF
 <+AutoGen5 template test+>>
-<+(define foo "print this message")  (. foo) +>>
+ENDMAC 3 <+(define foo "print this message")  (. foo) +>>
 <+# comment The '+' is not joined because it is neither '=' nor
             a legal file name character +>>
 This is a test
