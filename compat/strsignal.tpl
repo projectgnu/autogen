@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 3.5 2004/03/19 18:26:15 bkorb Exp $
+# $Id: strsignal.tpl,v 3.6 2004/12/09 04:35:22 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -84,7 +84,12 @@ static const unsigned int sigInfoOffset[] = {
   info-refs
   "_EOF_"  ))           =] };
 
-#endif /* HAVE_SYS_SIGLIST */
+#endif /* MAX_SIGNAL_NUMBER */
+
+#ifndef HAVE_STRSIGNAL
+extern char * strsignal( int signo );
+#endif
+
 #ifdef DEBUG_STRSIGNAL
 #include <stdio.h>
 
@@ -97,7 +102,8 @@ main( int argc, char** argv )
     do {
         printf( "%3d  %-10s  %s\n", sig, SIGNAL_NAME(sig),
                 SIGNAL_INFO(sig) );
-    } while (SIGNAL_IN_RANGE(++sig));
+        ++sig;
+    } while (SIGNAL_IN_RANGE(sig));
     return 0;
 }
 #endif /* DEBUG */

@@ -1,3 +1,10 @@
+2004-12-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c: comments + superfluous code
+	* compat/strsignal.tpl(strsignal): declare it if not available.
+	* config/libopts.def(ENABLE_FMEMOPEN): define it if we have either
+	"fopencookie" (GNU), or "funopen" (BSD).
+
 2004-11-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/bootstrap.dir(export): avoid ksh-isms

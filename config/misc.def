@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2004/11/21 21:31:25 $
+ *  Last Modified:     $Date: 2004/12/09 04:35:22 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.36 2004/11/21 21:31:25 bkorb Exp $
+ *  $Id: misc.def,v 3.37 2004/12/09 04:35:22 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.36 $";
+version = "$Revision: 3.37 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -339,6 +339,11 @@ test = {
 do-always = <<- _END_ALWAYS_
 
 	AC_CHECK_FUNCS(fopencookie funopen, break)
+	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
+	*yes* )
+	   AC_DEFINE([ENABLE_FMEMOPEN], 1, "Define if we can use it")
+	   ;;
+	esac
 	AC_C_INLINE
 	AC_CACHE_CHECK([for static inline], [snv_cv_static_inline], [
 	AC_TRY_COMPILE([static inline foo(bar) int bar; { return bar; }],

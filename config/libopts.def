@@ -28,27 +28,27 @@ test   = {
   check    = "a working libregex can be found";
   libname  = "";
   code     = <<- _END_OF_CODE_
-		#include <stdio.h>
-		#include <stdlib.h>
-		#include <sys/types.h>
-		#include REGEX_HEADER
-		static regex_t re;
-		void comp_re( const char* pzPat ) {
-		  int res = regcomp( &re, pzPat, REG_EXTENDED|REG_ICASE|REG_NEWLINE );
-		  if (res == 0) return;
-		  exit( res ); }
-		int main() {
-		  regmatch_t m[2];
-		  comp_re( "^.*\$"   );
-		  comp_re( "()|no.*" );
-		  comp_re( "."       );
-		  if (regexec( &re, "X", 2, m, 0 ) != 0)  return 1;
-		  if ((m[0].rm_so != 0) || (m[0].rm_eo != 1)) {
-		    fputs( "error: regex -->.<-- did not match\n", stderr );
-		    return 1;
-		  }
-		  return 0; }
-		_END_OF_CODE_;
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <sys/types.h>
+	#include REGEX_HEADER
+	static regex_t re;
+	void comp_re( const char* pzPat ) {
+	  int res = regcomp( &re, pzPat, REG_EXTENDED|REG_ICASE|REG_NEWLINE );
+	  if (res == 0) return;
+	  exit( res ); }
+	int main() {
+	  regmatch_t m[2];
+	  comp_re( "^.*\$"   );
+	  comp_re( "()|no.*" );
+	  comp_re( "."       );
+	  if (regexec( &re, "X", 2, m, 0 ) != 0)  return 1;
+	  if ((m[0].rm_so != 0) || (m[0].rm_eo != 1)) {
+	    fputs( "error: regex -->.<-- did not match\n", stderr );
+	    return 1;
+	  }
+	  return 0; }
+	_END_OF_CODE_;
   run-mode   =  "run";
   code-mode  =  "all";
 
@@ -56,16 +56,16 @@ test   = {
     act-type = script;
     act-text = <<-  _END_OF_ACTION
     	cat >&2 <<'_EOF_'
-			I cannot detect POSIX compliant regcomp/regexec routines.
-			These are required for AutoGen to work correctly.  If you have
-			such a library present on your system, you must specify it by
-			setting the LIBS environment variable, e.g., "LIBS='-lregex'".
-			If you do not have such a library on your system, then you should
-			download and install, for example, the one from:
-			    ftp://ftp.gnu.org/gnu/rx/
-			_EOF_
-		AC_MSG_ERROR([Cannot find working POSIX regex library])
-		_END_OF_ACTION ;
+		I cannot detect POSIX compliant regcomp/regexec routines.
+		These are required for AutoGen to work correctly.  If you have
+		such a library present on your system, you must specify it by
+		setting the LIBS environment variable, e.g., "LIBS='-lregex'".
+		If you do not have such a library on your system, then you should
+		download and install, for example, the one from:
+		    ftp://ftp.gnu.org/gnu/rx/
+		_EOF_
+	AC_MSG_ERROR([Cannot find working POSIX regex library])
+	_END_OF_ACTION ;
   };
 
   doc =
@@ -78,13 +78,13 @@ test = {
     check  = "ctime() allocates memory for its result";
     action = { act-type = define; };
     code   = <<-  _EOF_
-		#include <time.h>
-		int main (int argc, char** argv) {
-		   time_t  timeVal = time( (time_t*)NULL );
-		   char*   pzTime  = ctime( &timeVal );
-		   free( (void*)pzTime );
-		   return 0; }
-		_EOF_;
+	#include <time.h>
+	int main (int argc, char** argv) {
+	   time_t  timeVal = time( (time_t*)NULL );
+	   char*   pzTime  = ctime( &timeVal );
+	   free( (void*)pzTime );
+	   return 0; }
+	_EOF_;
 
     doc =
     "Check whether we need to free the memory returned by ctime.";
@@ -97,13 +97,13 @@ test = {
     action = { act-type = define; };
 
     code   = <<-  _EOF_
-		#include <string.h>
-		#include <stdlib.h>
-		int main (int argc, char** argv) {
-		   char* pz = pathfind( getenv( "PATH" ), "sh", "x" );
-		   return (pz == 0) ? 1 : 0;
-		}
-		_EOF_;
+	#include <string.h>
+	#include <stdlib.h>
+	int main (int argc, char** argv) {
+	   char* pz = pathfind( getenv( "PATH" ), "sh", "x" );
+	   return (pz == 0) ? 1 : 0;
+	}
+	_EOF_;
 
     doc =
     "Not all systems have pathfind(3).  See if we need to substitute.\n"
@@ -117,24 +117,24 @@ test = {
     check = "strftime() works";
     action = { act-type = define; };
     code  = <<-  _EOF_
-		#include <time.h>
-		#include <string.h>
-		char t_buf[ 64 ];
-		int main() {
-		  static const char z[] = "Thursday Aug 28 240";
-		  struct tm tm;
-		  tm.tm_sec   = 36;  /* seconds after the minute [0, 61]  */
-		  tm.tm_min   = 44;  /* minutes after the hour [0, 59] */
-		  tm.tm_hour  = 12;  /* hour since midnight [0, 23] */
-		  tm.tm_mday  = 28;  /* day of the month [1, 31] */
-		  tm.tm_mon   =  7;  /* months since January [0, 11] */
-		  tm.tm_year  = 86;  /* years since 1900 */
-		  tm.tm_wday  =  4;  /* days since Sunday [0, 6] */
-		  tm.tm_yday  = 239; /* days since January 1 [0, 365] */
-		  tm.tm_isdst =  1;  /* flag for daylight savings time */
-		  strftime( t_buf, sizeof( t_buf ), "%A %b %d %j", &tm );
-		  return (strcmp( t_buf, z ) != 0); }
-		_EOF_;
+	#include <time.h>
+	#include <string.h>
+	char t_buf[ 64 ];
+	int main() {
+	  static const char z[] = "Thursday Aug 28 240";
+	  struct tm tm;
+	  tm.tm_sec   = 36;  /* seconds after the minute [0, 61]  */
+	  tm.tm_min   = 44;  /* minutes after the hour [0, 59] */
+	  tm.tm_hour  = 12;  /* hour since midnight [0, 23] */
+	  tm.tm_mday  = 28;  /* day of the month [1, 31] */
+	  tm.tm_mon   =  7;  /* months since January [0, 11] */
+	  tm.tm_year  = 86;  /* years since 1900 */
+	  tm.tm_wday  =  4;  /* days since Sunday [0, 6] */
+	  tm.tm_yday  = 239; /* days since January 1 [0, 365] */
+	  tm.tm_isdst =  1;  /* flag for daylight savings time */
+	  strftime( t_buf, sizeof( t_buf ), "%A %b %d %j", &tm );
+	  return (strcmp( t_buf, z ) != 0); }
+	_EOF_;
 
     doc =
     "Check for existence and functioning of strftime routine.";
@@ -151,17 +151,17 @@ test = {
       act-text = "AC_DEFINE([FOPEN_BINARY_FLAG],\"\",\n\t"
                  "[fopen(3) accepts a 'b' in the mode flag])"; };
     code   = <<- _EOF_
-		#include <stdio.h>
-		int main (int argc, char** argv) {
-		FILE* fp = fopen("conftest.$ac_ext", "rb");
-		return (fp == NULL) ? 1 : fclose(fp); }
-		_EOF_;
+	#include <stdio.h>
+	int main (int argc, char** argv) {
+	FILE* fp = fopen("conftest.$ac_ext", "rb");
+	return (fp == NULL) ? 1 : fclose(fp); }
+	_EOF_;
     doc = <<- _END_OF_DOC_
-		Test whether fopen accepts a "b" in the mode string for binary file
-		opening.  This makes no difference on most unices, but some OSes
-		convert every newline written to a file to two bytes (CR LF), and
-		every CR LF read from a file is silently converted to a newline.
-		_END_OF_DOC_;
+	Test whether fopen accepts a "b" in the mode string for binary file
+	opening.  This makes no difference on most unices, but some OSes
+	convert every newline written to a file to two bytes (CR LF), and
+	every CR LF read from a file is silently converted to a newline.
+	_END_OF_DOC_;
 };
 
 test = {
@@ -175,15 +175,15 @@ test = {
       act-text = "AC_DEFINE([FOPEN_TEXT_FLAG],\"\",\n\t"
                  "[fopen(3) accepts a 't' in the mode flag])"; };
     code   = <<- _EOF_
-		#include <stdio.h>
-		int main (int argc, char** argv) {
-		FILE* fp = fopen("conftest.$ac_ext", "rt");
-		return (fp == NULL) ? 1 : fclose(fp); }
-		_EOF_;
+	#include <stdio.h>
+	int main (int argc, char** argv) {
+	FILE* fp = fopen("conftest.$ac_ext", "rt");
+	return (fp == NULL) ? 1 : fclose(fp); }
+	_EOF_;
     doc = <<- _END_OF_DOC_
-		Test whether fopen accepts a "t" in the mode string for text file
-		opening.  This makes no difference on most unices, but some OSes
-		convert every newline written to a file to two bytes (CR LF), and
-		every CR LF read from a file is silently converted to a newline.
-		_END_OF_DOC_;
+	Test whether fopen accepts a "t" in the mode string for text file
+	opening.  This makes no difference on most unices, but some OSes
+	convert every newline written to a file to two bytes (CR LF), and
+	every CR LF read from a file is silently converted to a newline.
+	_END_OF_DOC_;
 };

@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-10-07 08:26:52 bkorb"
+ * Time-stamp:      "2004-12-08 20:25:11 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -16,7 +16,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the author nor the name of any other contributor
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -32,8 +32,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
-#ifdef ENABLE_FMEMOPEN
+#if defined(ENABLE_FMEMOPEN)
 
 /*=--subblock=arg=arg_type,arg_name,arg_desc =*/
 /*=*
@@ -81,8 +80,6 @@
    typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
    typedef int     (cookie_close_function_t)(void *);
 
-#else
-#  error  OOPS
 #endif
 
 #define PROP_TABLE \
@@ -93,10 +90,6 @@ _Prop_( binary,     "byte data - not string"  ) \
 _Prop_( create,     "allocate the string"     ) \
 _Prop_( truncate,   "start writing at start"  ) \
 _Prop_( allocated,  "we allocated the buffer" )
-
-#ifndef NUL
-# define NUL '\0'
-#endif
 
 #define _Prop_(n,s)   BIT_ID_ ## n,
 typedef enum { PROP_TABLE BIT_CT } fmem_flags_e;
