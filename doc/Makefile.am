@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Fri Mar 26 11:45:51 1999
-##            by:   Bruce Korb <korb@datadesign.com>
+## Last Modified:   Wed Jun 30 09:12:51 1999				      
+##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.14 1999/04/14 17:44:05 bkorb Exp $
+## $Id: Makefile.am,v 2.15 1999/07/07 14:23:16 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -85,5 +85,10 @@ LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	   echo "ERROR: $(srcdir)/$@ has been corrupted"; \
 	  fi; \
 	fi
+
+autogen.info : doc
+
+doc :
+	ln -s $(top_srcdir)/snprintfv/doc ./doc
 
 # Makefile.am ends here

@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.12 1999/02/26 15:58:33 bkorb Exp $
+ *   $Id: opts.def,v 1.13 1999/07/07 14:23:16 bkorb Exp $
  */
 
 /*
@@ -28,14 +28,10 @@ copyright = "1998";
 copyright_gpl;
 
 owner          = "Bruce Korb";
+eaddr          = "autogen@linuxbox.com";
 prog_name      = "columns";
 prog_title     = "Columnize Input Text";
 long_opts;
-
-explain =
-'This program will read a list of text items from standard in
-or a specified input file and produce a columnized listing of all
-the non-blank lines.';
 
 version = 1;
 
@@ -43,6 +39,7 @@ flag = {
     name      = width;
     value     = W;
     flag_arg  = "=79";
+    arg_name  = num;
     descrip   = "Maximum Line Width";
     doc       =
     "This option specifies the full width of the output line,\n"
@@ -57,17 +54,19 @@ flag = {
     name      = columns;
     value     = c;
     flag_arg  = "=0";
+    arg_name  = count;
     descrip   = "Desired number of columns";
     doc =
     "Use this option to specify exactly how many columns to produce.\n"
     "If that many columns will not fit within @var{line_width}, then\n"
-    "the number will automatically be reduced to that which will fit.";
+    "the count will be reduced to the number that fit.";
 };
 
 flag = {
     name      = col_width;
     value     = w;
     flag_arg  = "=0";
+    arg_name  = num;
     descrip   = "Set width of each column";
     doc =
     "Use this option to specify exactly how many characters are to be\n"
@@ -78,6 +77,7 @@ flag = {
 flag = {
     name      = spread;
     flag_arg  = "=0";
+    arg_name  = num;
     descrip   = "maximum spread added to column width";
     doc =
     "Use this option to specify exactly how many characters may be\n"
@@ -89,6 +89,7 @@ flag = {
     name      = indent;
     value     = I;
     flag_arg  = ":";
+    arg_name  = l-pfx;
     descrip   = "Line prefix or indentation";
     doc =
     "If a number, then this many spaces will be inserted at the start of\n"
@@ -99,6 +100,7 @@ flag = {
 flag = {
     name      = tab_width;
     flag_arg  = "=8";
+    arg_name  = num;
     descrip   = "tab width";
     doc =
     "If an indentation string contains tabs, then this value is used to\n"
@@ -109,6 +111,7 @@ flag = {
     name      = sort;
     value     = s;
     flag_arg;
+    arg_name  = key-pat;
     descrip   = "Sort input text";
     doc =
     "Causes the input text to be sorted.  If an argument is supplied,\n"
@@ -121,6 +124,7 @@ flag = {
     name      = format;
     value     = f;
     flag_arg  = ':';
+    arg_name  = fmt-str;
     descrip   = "Formatting string for each input";
     doc =
     "If you need to reformat each input text, the argument to this\n"
@@ -132,6 +136,7 @@ flag = {
     name      = separation;
     value     = S;
     flag_arg  = ':';
+    arg_name  = sep-str;
     descrip   = "Separation string - follows all but last";
     doc =
     "Use this option if, for example, you wish a comma to appear after\n"
@@ -141,6 +146,7 @@ flag = {
 flag = {
     name      = line_separation;
     flag_arg  = ':';
+    arg_name  = sep-str;
     descrip   = "string at end of all lines but last";
     doc =
     "Use this option if, for example, you wish a backslash to appear at\n"
@@ -160,6 +166,7 @@ column, instead of the final row, may be shorter than the others.";
 flag = {
     name      = page_len;
     flag_arg  = "=0";
+    arg_name  = num;
     descrip   = "Page Length";
     doc =
     "This many lines will be printed before a form feed is emitted.\n"
@@ -171,6 +178,7 @@ flag = {
     name      = input;
     value     = i;
     flag_arg  = ":";
+    arg_name  = file;
     descrip   = "Input file (if not stdin)";
     flag_code =
 '    FILE* fp = freopen( pOptDesc->pzLastArg, "r" FOPEN_BINARY_FLAG, stdin );
@@ -195,3 +203,42 @@ include = "#include <stdio.h>\n"
           "#else\n"
           "#  define FOPEN_BINARY_FLAG\n"
           "#endif";
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Program Documentation
+ */
+
+detail =
+
+'This program will read a list of text items from standard in or a
+specified input file and produce a columnized listing of all the
+non-blank lines.  Leading white space on each line is preserved, but
+trailing white space is stripped.  Methods of applying per-entry and
+per-line embellishments are provided.  See the formatting and
+separation arguments below.
+
+This program is used by AutoGen to help clean up and organize
+its output.';
+
+/* prog_man_descrip = -- unchanged; */
+
+man_doc = '.SH "SEE ALSO"
+This program is documented more fully in the Columns section
+of the Add-On chapter in the
+.IR AutoGen
+Info system documentation.';
+
+
+prog_info_descrip =
+
+'This program will read a list of text items from standard in or a
+specified input file and produce a columnized listing of all the
+non-blank lines.  Leading white space on each line is preserved, but
+trailing white space is stripped.  Methods of applying per-entry and
+per-line embellishments are provided.  See the formatting and
+separation arguments below.
+
+This program is used by AutoGen to help clean up and organize
+its output.';

@@ -1,18 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.15 1999/06/14 19:15:56 bkorb Exp $
+ *  $Id: getdefs.c,v 2.16 1999/07/07 14:23:17 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
- * Author:            Bruce Korb <korbb@datadesign.com>
- * Maintainer:        Bruce Korb <korbb@datadesign.com>
- * Created:           Mon Jun 30 15:35:12 1997
- * Last Modified:     Mon Jun 14 12:07:09 1999				    */
- *            by:     Bruce Korb <korb@datadesign.com>			    */
- */
-
-#define DEFINE
-#include "getdefs.h"
+   Author:            Bruce Korb <korbb@datadesign.com>
+   Maintainer:        Bruce Korb <korbb@datadesign.com>
+   Created:           Mon Jun 30 15:35:12 1997
+   Last Modified:     Wed Jun 30 09:05:06 1999				    */
+/*            by:     Bruce Korb <korb@datadesign.com>			    */
 
 #include <errno.h>
 #include <sys/types.h>
@@ -21,9 +17,9 @@
 #include <unistd.h>
 #include <utime.h>
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include "config.h"
+#define DEFINE
+#include "getdefs.h"
 
 #ifndef HAVE_STRSIGNAL
 #  include "compat/strsignal.c"
