@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.10 2002/05/24 01:44:42 bkorb Exp $
+ *  $Id: autoopts.c,v 3.11 2002/06/23 16:47:15 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -74,12 +74,6 @@
 
 
 #define ISNAMECHAR( c )    (isalnum(c) || ((c) == '_') || ((c) == '-'))
-
-tSCC zBadVer[] = "Automated Options Processing Error!\n\
-\t%s called optionProcess with structure version %d.%d.%d.\n\
-\tThis library was compiled with version %d.%d.%d\n\
-\tand requires a minimum structure version of %d.%d.%d\n";
-
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' cannot have an argument\n";
@@ -783,10 +777,24 @@ doImmediateOpts( pOpts )
        && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
           || (pOpts->structVersion < MIN_OPTION_VERSION     )
        )  )  {
-        fprintf( stderr, zBadVer, pOpts->origArgVect[0],
-                 NUM_TO_VER( pOpts->structVersion ),
-                 NUM_TO_VER( OPTIONS_STRUCT_VERSION ),
-                 NUM_TO_VER( MIN_OPTION_VERSION ));
+
+        tSCC zErr[] =
+            "Automated Options Processing Error!\n";
+        tSCC zVer[] =
+            "\t%s called optionProcess with structure version %d.%d.%d.\n";
+        tSCC zBig[] =
+            "\tThis exceeds the library compiled version:  %d.%d.%d\n";
+        tSCC zSml[] =
+            "\tThis is less than the minimum livrary version: %d.%d.%d\n";
+
+        fputs( zErr, stderr );
+        fprintf( stderr, zVer, pOpts->origArgVect[0],
+                 NUM_TO_VER( pOpts->structVersion ));
+        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
+            fprintf( stderr, zBig, NUM_TO_VER( OPTIONS_STRUCT_VERSION ));
+        else
+            fprintf( stderr, zSml, NUM_TO_VER( MIN_OPTION_VERSION ));
+
         exit( EXIT_FAILURE );
     }
 
