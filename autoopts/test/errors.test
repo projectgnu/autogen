@@ -5,13 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2003-03-08 12:05:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/05/24 01:44:42 $
-#            by: bkorb
 #
-# $Id: errors.test,v 3.3 2002/05/24 01:44:42 bkorb Exp $
+# $Id: errors.test,v 3.4 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -62,8 +61,8 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file errorsRC/.test_errorsrc

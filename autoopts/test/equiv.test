@@ -5,13 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2003-03-08 12:05:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/02/06 05:07:39 $
-#            by: bkorb
 #
-# $Id: equiv.test,v 3.5 2003/02/06 05:07:39 bkorb Exp $
+# $Id: equiv.test,v 3.6 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -96,8 +95,8 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The valid omega option keywords are:
 	uno
@@ -128,8 +127,8 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The valid omega option keywords are:
 	uno
@@ -143,7 +142,7 @@ cmp -s ${testname}.h*lp || \
     `diff -c ${testname}.h*lp`"
 
 cat > ${testname}.outbase <<_EOF_
-18 102 714 /tmp/use
+18 99 696 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2

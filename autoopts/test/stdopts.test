@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/03/29 02:21:47 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2003/03/08 21:19:52 $
+#            by: bkorb
 #
-# $Id: stdopts.test,v 3.1 2002/03/29 02:21:47 bkorb Exp $
+# $Id: stdopts.test,v 3.2 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -64,8 +64,8 @@ Auto-supported Options:
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The valid verbose option keywords are:
 	silent

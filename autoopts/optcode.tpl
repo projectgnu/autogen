@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.11 2003/02/16 00:04:40 bkorb Exp $
+#$Id: optcode.tpl,v 3.12 2003/03/08 21:19:52 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -51,7 +51,9 @@ IF (exist? "flag.call-proc")
 ENDIF
 
 =]
-extern tUsageProc [= ?% usage "%s" "optionUsage" =];
+extern tUsageProc [=
+  (define usage-proc (if (exist? "usage") (get "usage") "optionUsage"))
+  usage-proc =];
 
 [=
 IF (exist? "include") =]
@@ -319,12 +321,9 @@ tSCC    zDetail[]     = [= (patch-text "detail") =];[=
 ELSE                    =]
 
 #define zDetail NULL[=
-ENDIF                   =][=
+ENDIF                   =]
 
-IF (not (exist? "usage")) =]
-
-extern  tUsageProc optionUsage;[=
-ENDIF=][=
+extern  tUsageProc [= (. usage-proc) =];[=
 
 IF (exist? "version")   =]
 
@@ -337,12 +336,10 @@ ENDIF                   =]
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
-    NULL,         NULL,        zPROGNAME,
-    zRcName,      zCopyright,  zCopyrightNotice,
-    zFullVersion, apzHomeList, zUsageTitle,
-    zExplain,     zDetail,     NULL,
-    [=IF (exist? "usage")=][=usage=][=
-      ELSE               =]optionUsage[=ENDIF=],
+    NULL,           NULL,           zPROGNAME,
+    zRcName,        zCopyright,     zCopyrightNotice,
+    zFullVersion,   apzHomeList,    zUsageTitle,
+    zExplain,       zDetail,        NULL,           [= (. usage-proc) =],
     ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
     + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
     + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long_opts")         =]
@@ -355,7 +352,8 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-opts")      =]
-    + OPTPROC_REORDER[=    ENDIF=] ),
+    + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
+    + OPTPROC_GNUUSAGE[=   ENDIF=] ),
     0, NULL,
     { INDEX_[= (. UP-prefix) =]OPT_MORE_HELP,
       [=IF (exist? "homerc")

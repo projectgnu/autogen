@@ -1,3 +1,25 @@
+2003-03-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(OPTPROC_GNUUSAGE): set the flag when needed.
+	* autoopts/options_h.tpl(OPTPROC_GNUUSAGE): define the flag
+	* autoopts/test/Makefile.am(usage.test): new test
+	* autoopts/test/usage.test: new test script
+	* autoopts/test/equiv.test: clean up short/long option description
+	* autoopts/test/errors.test: likewise
+	* autoopts/test/keyword.test: likewise
+	* autoopts/test/rc.test: likewise
+	* autoopts/test/shell.test: likewise
+	* autoopts/test/stdopts.test: likewise
+	* autoopts/usage.c(optionUsage): likewise + incorporate changes for
+	GNU-style usage message
+
+2003-03-07  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(usage-proc): define Guile symbol in one place and
+	use it elsewhere instead of recomputing.
+	* autoopts/options.tpl(disabling flags): this is illegal.
+	You get arrested for it.
+
 2003-03-02  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am(package): propagate $(pkgtype)

@@ -11,27 +11,32 @@ srcdir=`cd ${srcdir} > /dev/null ; pwd`
 cd ${top_builddir}
 top_builddir=`pwd`
 
+rm -rf ./AGPKG
 mkdir AGPKG
 cd AGPKG
+HOME=`pwd`
+set -x
+mkdir -p BUILD SOURCES SPECS RPMS SRPMS
+echo "%_topdir $PWD" > .rpmmacros
 
-mkdir BUILD SOURCES SPECS RPMS SRPMS
-echo "topdir:  $PWD" > rpmrc
-
-( cd ..
-  ${MAKE} dist
+[ -f ../autogen-${AG_VERSION}.tar.gz ] || (
+  cd ..
+  ${MAKE} dist || exit 1
   set -x
-  mv autogen-${AG_VERSION}.tar.gz AGPKG/SOURCES/. )
+) || exit 1
 
+ln ../autogen-${AG_VERSION}.tar.gz SOURCES/.
 printf "\n\nPACKAGING RPM FOR LINUX\n\n"
 
 cd ${builddir}
 AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
 rpmfile=autogen-${AG_VERSION}.spec
 agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
-${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def
+${AGEXE} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
-cd ${top_builddir}/AGPKG
-rpm --buildroot `pwd` --rcfile=rpmrc -ba ${builddir}/${rpmfile}
+cd ${HOME}
+rpm -ba ${builddir}/${rpmfile} || exit 1
+rm -f .rpmmacros
 
 ## Local Variables:
 ## mode: shell-script

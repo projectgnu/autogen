@@ -5,13 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
+# Time-stamp:        "2003-03-08 12:08:01 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/01/14 05:04:21 $
-#            by: bkorb
 #
-# $Id: shell.test,v 3.4 2003/01/14 05:04:21 bkorb Exp $
+# $Id: shell.test,v 3.5 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -54,8 +53,8 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 _EOF_
 
 cmp -s $testname.h*lp || \
@@ -112,8 +111,8 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 Note that `shell' is only useful if the output file does not already
 exist.  If it does, then the shell name and optional first argument
@@ -139,8 +138,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 _EOF_
 
 cmp -s $testname.h*lp || \
@@ -160,8 +159,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).'
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
@@ -172,8 +171,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).'
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.'
 
 
 TEST_SHELL_OPTION="${TEST_SHELL_OPTION}"

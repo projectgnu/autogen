@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2002-09-28 17:14:23 bkorb"
+# Time-stamp:        "2003-03-08 12:04:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 3.2 2002/09/29 00:16:20 bkorb Exp $
+# $Id: keyword.test,v 3.3 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -72,8 +72,8 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ./keyword.cfg

@@ -6,7 +6,7 @@
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.17 2003/03/03 00:54:30 bkorb Exp $
+## $Id: Makefile.am,v 3.18 2003/03/08 21:19:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -16,7 +16,7 @@ XML2AG_DIR     = @XML2AG_DIR@ doc pkg
 SUBDIRS        = @TOP_DIRLIST@
 config_dist    = config/missing config/misc.def config/libopts.def
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
-pkg_dist       = pkg/autogen.spec.in config/bootstrap.local
+pkg_dist       = config/bootstrap.local
 EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(pkgdata_DATA)
 DISTCLEANFILES = .conf-stamp stamp-h
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \

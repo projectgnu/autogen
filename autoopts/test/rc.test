@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
+# Time-stamp:        "2003-03-08 12:06:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2002/05/24 01:44:42 $
-#            by: bkorb
 #
-# $Id: rc.test,v 3.2 2002/05/24 01:44:42 bkorb Exp $
+# $Id: rc.test,v 3.3 2003/03/08 21:19:52 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -54,8 +53,8 @@ USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character (option value).
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ./rc.rc/rc.file

@@ -7,7 +7,7 @@ Release: [=`echo $AG_MAJOR_VERSION`=]
 Copyright: GPL
 Group: Development/Tools
 Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
-BuildRoot: [=`cd ${top_builddir} > /dev/null && pwd`=]
+BuildRoot: [=`cd ${top_builddir}/AGPKG > /dev/null && pwd`=]
 BuildRequires: gzip texinfo libtool > 1.3 guile
 
 %description
@@ -56,7 +56,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 }
 %endif
 
-(cd $RPM_BUILD_ROOT && find . ! -type d 
+( cd $RPM_BUILD_ROOT && find . ! -type d 
 ) | sed "s,^\./,/,g" > [= prog-name =]-filelist
 
 %clean
@@ -68,7 +68,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %changelog
 * Fri Aug 9 2002 Bruce Korb <bkorb@gnu.org>
-- Pull stuff from Thomas Steudten's version of this file[=
+- Pull stuff from Thomas Steudten's version of this file[= #'
 
 ## Local Variables:
 ## mode: shell-script
@@ -76,4 +76,4 @@ rm -rf ${RPM_BUILD_ROOT}
 ## indent-tabs-mode: nil
 ## tab-width: 4
 ## End:
-## end of autogen.spec.in =]
+## end of spec.tpl =]

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.10 2003/02/16 00:04:40 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.11 2003/03/08 21:19:52 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -73,6 +73,8 @@ tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
 tSCC zNoReq_Short_Title[]   = "  Flg Arg Option-Name    Description\n";
 tSCC zNoReq_NoShort_Title[] = "   Arg Option-Name    Description\n";
 tSCC zNrmOptFmt[]           = " %1$3s %2$-14s %4$s\n";
+tSCC zGnuOptFmt[]           = ", --%1$-14s %2$s\n";
+tSCC zShrtGnuOptFmt[]       = "\t%2$s\n";
 
 tSCC zReq_Short_Title[]     = "  Flg Arg Option-Name   Req?  Description\n";
 tSCC zReq_NoShort_Title[]   = "   Arg Option-Name   Req?  Description\n";
@@ -82,12 +84,11 @@ tSCC zIntro[]      = "\n\
 The following option preset mechanisms are supported:\n";
 
 tSCC zFlagOkay[]   =
-"Options may be specified by doubled hyphens and their name\n\
-or by a single hyphen and the flag character (option value).\n";
+"Options are specified by doubled hyphens and their name\n\
+or by a single hyphen and the flag character.\n";
 
 tSCC zNoFlags[]    =
-"Options are specified by their name and either single\n\
-or doubled %ss.  Flag characters are not interpreted.\n";
+"Options are specified by single or double hyphens and their name.\n";
 
 FILE* option_usage_fp = NULL;
 
@@ -112,64 +113,123 @@ optionUsage( pOptions, exitCode )
 
     fprintf( option_usage_fp, pOptions->pzUsageTitle, pOptions->pzProgName );
 
+    do {
+        char* pz = getenv( "AUTOOPTS_USAGE" );
+        if (pz == NULL) break;
+        if (streqvcmp( pz, "gnu" ) == 0) {
+            pOptions->fOptSet |= OPTPROC_GNUUSAGE;
+            break;
+        }
+        if (streqvcmp( pz, "autoopts" ) == 0) {
+            pOptions->fOptSet &= ~OPTPROC_GNUUSAGE;
+            break;
+        }
+    } while (0);
+
     /*
      *  Determine which header and which option formatting string to use
      */
-    switch (pOptions->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
-    case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
-        pOptTitle = zNoReq_Short_Title;
-        pOptFmt   = zNrmOptFmt;
-        break;
+    if ((pOptions->fOptSet & OPTPROC_GNUUSAGE) != 0) {
+        switch (pOptions->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
+        case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
+            pOptTitle = zNoReq_Short_Title;
+            /*
+             *  We have short options.  Do we have long ones, too?
+             */
+            pOptFmt   = (pOptions->fOptSet & OPTPROC_LONGOPT)
+                ? zGnuOptFmt : zShrtGnuOptFmt;
+            break;
 
-    case OPTPROC_NO_REQ_OPT:
-        pOptTitle = zNoReq_NoShort_Title;
-        pOptFmt   = zNrmOptFmt;
-        break;
+        case OPTPROC_NO_REQ_OPT:
+            pOptTitle = zNoReq_NoShort_Title;
+            pOptFmt   = zGnuOptFmt + 2; /* skip short opt separator */
+            break;
 
-    case OPTPROC_SHORTOPT:
-        pOptTitle = zReq_Short_Title;
-        pOptFmt   = zReqOptFmt;
-        break;
+        case OPTPROC_SHORTOPT:
+            pOptTitle = zReq_Short_Title;
+            /*
+             *  We have short options.  Do we have long ones, too?
+             */
+            pOptFmt   = (pOptions->fOptSet & OPTPROC_LONGOPT)
+                ? zGnuOptFmt : zShrtGnuOptFmt;
+            break;
 
-    default:
-    case 0:
-        pOptTitle = zReq_NoShort_Title;
-        pOptFmt   = zReqOptFmt;
+        default:
+        case 0:
+            pOptTitle = zReq_NoShort_Title;
+            pOptFmt   = zGnuOptFmt + 2; /* skip short opt separator */
+        }
+
+        fputc( '\n', option_usage_fp );
+
+    } else {
+        switch (pOptions->fOptSet & (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT)) {
+        case (OPTPROC_NO_REQ_OPT | OPTPROC_SHORTOPT):
+            pOptTitle = zNoReq_Short_Title;
+            pOptFmt   = zNrmOptFmt;
+            break;
+
+        case OPTPROC_NO_REQ_OPT:
+            pOptTitle = zNoReq_NoShort_Title;
+            pOptFmt   = zNrmOptFmt;
+            break;
+
+        case OPTPROC_SHORTOPT:
+            pOptTitle = zReq_Short_Title;
+            pOptFmt   = zReqOptFmt;
+            break;
+
+        default:
+        case 0:
+            pOptTitle = zReq_NoShort_Title;
+            pOptFmt   = zReqOptFmt;
+        }
+
+        /*
+         *  When we exit with EXIT_SUCCESS and the first option is a doc option,
+         *  we do *NOT* want to emit the column headers.  Otherwise, we do.
+         */
+        if (  (exitCode != EXIT_SUCCESS)
+           || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) == 0) )
+
+            fputs( pOptTitle, option_usage_fp );
     }
 
-    /*
-     *  When we exit with EXIT_SUCCESS and the first option is a doc option,
-     *  we do *NOT* want to emit the column headers.  Otherwise, we do.
-     */
-    if (  (exitCode != EXIT_SUCCESS)
-       || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) == 0) )
-
-        fputs( pOptTitle, option_usage_fp );
-
     {
+        tSCC  zBreak[]    = "\n%s\n\n%s";
+        tSCC  zGnuBreak[] = "\n%s\n\n";
+        tSCC  zGnuSpace[] = "      ";
+        tCC*  pzBrk;
+        tCC*  pzSpc;
+
         int        ct     = pOptions->optCt;
         int        optNo  = 0;
         tOptDesc*  pOD    = pOptions->pOptDesc;
         int        docCt  = 0;
 
-        do  {
-            tSCC  zReqArg[]  = "YES";
-            tSCC  zNumArg[]  = "Num";
-            tSCC  zKeyArg[]  = "KWd";
-            tSCC  zBoolArg[] = "T/F";
-            tSCC  zOptArg[]  = "opt";
-            tSCC  zNoArg[]   = "no ";
-            tSCC  zBreak[]   = "\n%s\n\n%s";
-            tSCC  zAuto[]    = "Auto-supported Options:";
+        if (pOptions->fOptSet & OPTPROC_GNUUSAGE) {
+            pzBrk = zGnuBreak;
+            pzSpc = zGnuSpace;
+        } else {
+            pzBrk = zBreak;
+            pzSpc = zGnuSpace + 1;
+        }
 
-            tCC*  pzArgType;
+        do  {
+            tSCC  zReqArg[]   = "YES";
+            tSCC  zNumArg[]   = "Num";
+            tSCC  zKeyArg[]   = "KWd";
+            tSCC  zBoolArg[]  = "T/F";
+            tSCC  zOptArg[]   = "opt";
+            tSCC  zNoArg[]    = "no ";
+            tSCC  zAuto[]     = "Auto-supported Options:";
 
             if ((pOD->fOptState & OPTST_OMITTED) != 0)
                 continue;
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
                 if (exitCode == EXIT_SUCCESS) {
-                    fprintf( option_usage_fp, zBreak, pOD->pzText, pOptTitle );
+                    fprintf( option_usage_fp, pzBrk, pOD->pzText, pOptTitle );
                     docCt++;
                 }
 
@@ -187,7 +247,7 @@ optionUsage( pOptions, exitCode )
                && (exitCode == EXIT_SUCCESS)
                && (docCt > 0)
                && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
-                fprintf( option_usage_fp, zBreak, zAuto, pOptTitle );
+                fprintf( option_usage_fp, pzBrk, zAuto, pOptTitle );
 
             /*
              *  Flag prefix:  IF no flags at all, then omit it.
@@ -195,37 +255,45 @@ optionUsage( pOptions, exitCode )
              *  then blank, else print it.
              */
             if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
-                 fputs( "  ",   option_usage_fp );
+                fputs( "  ",   option_usage_fp );
             else if (! isgraph( pOD->optValue))
-                 fputs( "     ", option_usage_fp );
-            else fprintf( option_usage_fp, "   -%c", pOD->optValue );
-
-            /*
-             *  convert arg type code into a string
-             */
-            if ((pOD->fOptState & OPTST_NUMERIC) != 0)
-                pzArgType = zNumArg;
-
-            else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
-                pzArgType = zBoolArg;
-
-            else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
-                displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
-                pzArgType = zKeyArg;
-            }
-
-            else switch (pOD->optArgType) {
-            case ':': pzArgType = zReqArg; break;
-            case '?': pzArgType = zOptArg; break;
-            default:
-            case ' ': pzArgType = zNoArg;  break;
+                fputs( pzSpc, option_usage_fp );
+            else {
+                fprintf( option_usage_fp, "   -%c", pOD->optValue );
             }
 
             /*
              *  Print the option description
              */
-            fprintf( option_usage_fp, pOptFmt, pzArgType, pOD->pz_Name,
-                     (pOD->optMinCt != 0) ? zReqArg : zOptArg, pOD->pzText );
+            if (pOptions->fOptSet & OPTPROC_GNUUSAGE)
+                fprintf( option_usage_fp, pOptFmt, pOD->pz_Name, pOD->pzText );
+
+            else {
+                /*
+                 *  convert arg type code into a string
+                 */
+                tCC*  pzArgType;
+                if ((pOD->fOptState & OPTST_NUMERIC) != 0)
+                    pzArgType = zNumArg;
+
+                else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
+                    pzArgType = zBoolArg;
+
+                else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
+                    displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
+                    pzArgType = zKeyArg;
+                }
+
+                else switch (pOD->optArgType) {
+                case ':': pzArgType = zReqArg; break;
+                case '?': pzArgType = zOptArg; break;
+                default:
+                case ' ': pzArgType = zNoArg;  break;
+                }
+
+                fprintf( option_usage_fp, pOptFmt, pzArgType, pOD->pz_Name,
+                         (pOD->optMinCt != 0) ? zReqArg : zOptArg, pOD->pzText );
+            }
 
             /*
              *  IF we were not invoked because of the --help option,
@@ -371,8 +439,8 @@ optionUsage( pOptions, exitCode )
      *  Describe the mechanics of denoting the options
      */
     {
-        tCC*   pzFmt   =  (pOptions->fOptSet & OPTPROC_SHORTOPT)
-                          ? zFlagOkay : zNoFlags;
+        tCC* pzFmt = (pOptions->fOptSet & OPTPROC_SHORTOPT)
+                     ? zFlagOkay : zNoFlags;
 
         if ((pOptions->fOptSet & OPTPROC_LONGOPT) != 0)
             fputs( pzFmt, option_usage_fp );

@@ -1,21 +1,22 @@
 ##  -*- Mode: Makefile -*- 
-## ---------------------------------------------------------------------
-## Makefile.am -- process this file with automake to produce Makefile.in
 ##
+## Makefile.am
+##
+## Time-stamp:      "2003-03-08 11:58:01 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Fri July 18
-## Last Modified:   $Date: 2003/02/04 00:29:12 $
-##            by: bkorb
+## Last Modified:   $Date: 2003/03/08 21:19:52 $
+##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2003/02/04 00:29:12 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2003/03/08 21:19:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
 testsubdir = ./testdir
 CPPFLAGS   = @CPPFLAGS@
 TESTS      = argument.test cond.test equiv.test errors.test guile.test \
-	handler.test keyword.test rc.test shell.test stdopts.test vers.test
+	handler.test keyword.test rc.test shell.test stdopts.test usage.test \
+    vers.test
 
 MAINTAINERCLEANFILES	= Makefile.in
 
