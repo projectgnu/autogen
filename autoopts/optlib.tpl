@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.30 2001/09/21 03:09:48 bkorb Exp $
+# $Id: optlib.tpl,v 1.31 2001/09/22 04:05:08 bkorb Exp $
 
 =]
 [=
@@ -99,12 +99,6 @@ Emit the #define's for a single option
 
 DEFINE Option_Defines    =][=
 
-  IF   (exist? "ifdef")  =]
-#ifdef [=(get "ifdef")=][=
-  ELIF (exist? "ifndef") =]
-#ifndef [=(get "ifndef")=][=
-  ENDIF ifdef/ifndef     =][=
-
   IF (=* (get "arg_type") "key") =]
 typedef enum {[=
          IF (not (exist? "arg_default")) =] [=
@@ -175,41 +169,7 @@ typedef enum {[=
 
     ENDIF is/not equivalenced =][=
 
-  ENDIF settable =]
-#define [=(. UP-name)=]_FLAGS ([=
-         CASE arg_type  =][=
-         =*   num       =]OPTST_NUMERIC | [=
-         =*   bool      =]OPTST_BOOLEAN | [=
-         =*   key       =]OPTST_ENUMERATION | [=
-         ESAC           =][=
-         stack_arg      "OPTST_STACKED | "     =][=
-         immediate      "OPTST_IMM | "         =][=
-         immed_disable  "OPTST_DISABLE_IMM | " =][=
-         ? enabled      "OPTST_INITENABLED"
-                        "OPTST_DISABLED"    =] | [=
-         ? no_preset    "OPTST_NO_INIT"
-                        "OPTST_INIT"           =])[=
-
-  IF (or (exist? "ifdef") (exist? "ifndef")) =]
-
-#else   /* disable [=(. cap-name)=] */
-#define [=(. UP-name)=]_FLAGS (OPTST_OMITTED | OPTST_NO_INIT)[=
-  IF (exist? "arg_default") =]
-#define z[=(. cap-name)=]DefaultArg NULL[=
-  ENDIF =][=
-  IF (exist? "flags_must")  =]
-#define a[=(. cap-name)=]MustList   NULL[=
-  ENDIF =][=
-  IF (exist? "flags_cant")  =]
-#define a[=(. cap-name)=]CantList   NULL[=
-  ENDIF =]
-#define z[=(. cap-name)=]Text       NULL
-#define z[=(. cap-name)=]_NAME      NULL
-#define z[=(. cap-name)=]_Name      NULL
-#define zNot[=(. cap-name)=]_Name   NULL
-#define zNot[=(. cap-name)=]_Pfx    NULL
-#endif  /* ifdef/ifndef  */[=
-  ENDIF ifdef/ifndef     =][=
+  ENDIF settable =][=
 
 ENDDEF
 =][=
@@ -218,7 +178,15 @@ ENDDEF
 
 Define the arrays of values associated with an option (strings, etc.) =][=
 
-DEFINE Option_Strings =][=
+IF (exist? "preserve-case")     =][=
+  (define optname-from "_^")
+  (define optname-to   "--")    =][=
+ELSE                            =][=
+  (define optname-from "A-Z_^")
+  (define optname-to   "a-z--") =][=
+ENDIF                           =][=
+
+DEFINE   Option_Strings         =][=
 
 (set! cap-name (string-capitalize! (get "name")))
 (set! UP-name  (string-upcase cap-name))
@@ -228,7 +196,13 @@ DEFINE Option_Strings =][=
   IF (or (exist? "flags_must") (exist? "flags_cant")) =] with
  *  "Must also have options" and "Incompatible options"[=
   ENDIF =]:
- */
+ */[=
+
+  IF   (exist? "ifdef")  =]
+#ifdef [=(get "ifdef")=][=
+  ELIF (exist? "ifndef") =]
+#ifndef [=(get "ifndef")=][=
+  ENDIF ifdef/ifndef     =]
 tSCC    z[=(. cap-name)=]Text[] =
         [=(kr-string (get "descrip"))=];[=
 
@@ -245,7 +219,7 @@ tSCC    z[= (sprintf "%-25s" (string-append cap-name
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Name[]"))
              =]= "[=
        (string-tr! (string-append (get "disable") "-" (get "name"))
-                   "A-Z_^" "a-z--") =]";
+                   optname-from optname-to) =]";
 tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
              =]= "[=(string-downcase! (get "disable"))=]";[=
 
@@ -255,7 +229,7 @@ tSCC    zNot[= (sprintf "%-23s" (string-append cap-name "_Pfx[]"))
       IF (> (len "enable") 0) =]
 tSCC    z[=(sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
         (string-tr! (string-append (get "enable") "-" (get "name"))
-                    "A-Z_^" "a-z--") =]";[=
+                    optname-from optname-to) =]";[=
       ELSE =]
 #define z[=(sprintf "%-27s " (string-append cap-name
         "_Name")) =](zNot[= (. cap-name) =]_Name + [=
@@ -272,7 +246,7 @@ tSCC    z[=(sprintf "%-26s" (string-append cap-name "_Name[]")) =]= "[=
 tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
              =]= "[= (string-tr! (string-append
         (if (exist? "enable") (string-append (get "enable") "-") "")
-        (get "name"))   "A-Z_^" "a-z--") =]";[=
+        (get "name"))   optname-from optname-to) =]";[=
 
     ENDIF (> (len "disable") 0) =][=
 
@@ -330,8 +304,44 @@ static const int
       FOR flags_cant =]
     INDEX_[= (. UP-prefix) =]OPT_[= (string-upcase! (get "flags_cant")) =],[=
       ENDFOR flags_cant =] NO_EQUIVALENT };[=
-    ENDIF =][=
+    ENDIF =]
+#define [=(. UP-name)=]_FLAGS       ([=
+         CASE arg_type  =][=
+         =*   num       =]OPTST_NUMERIC | [=
+         =*   bool      =]OPTST_BOOLEAN | [=
+         =*   key       =]OPTST_ENUMERATION | [=
+         ESAC           =][=
+         stack_arg      "OPTST_STACKED | "     =][=
+         immediate      "OPTST_IMM | "         =][=
+         immed_disable  "OPTST_DISABLE_IMM | " =][=
+         ? enabled      "OPTST_INITENABLED"
+                        "OPTST_DISABLED"    =] | [=
+         ? no_preset    "OPTST_NO_INIT"
+                        "OPTST_INIT"           =])[=
+  ELSE  documentation exists:          =]
+#define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ENDIF (not (exist? "documentation")) =][=
+
+  IF (or (exist? "ifdef") (exist? "ifndef")) =]
+
+#else   /* disable [=(. cap-name)=] */
+#define [=(. UP-name)=]_FLAGS       OPTST_OMITTED[=
+  IF (exist? "arg_default") =]
+#define z[=(. cap-name)=]DefaultArg NULL[=
+  ENDIF =][=
+  IF (exist? "flags_must")  =]
+#define a[=(. cap-name)=]MustList   NULL[=
+  ENDIF =][=
+  IF (exist? "flags_cant")  =]
+#define a[=(. cap-name)=]CantList   NULL[=
+  ENDIF =]
+#define z[=(. cap-name)=]Text       NULL
+#define z[=(. cap-name)=]_NAME      NULL
+#define z[=(. cap-name)=]_Name      NULL
+#define zNot[=(. cap-name)=]_Name   NULL
+#define zNot[=(. cap-name)=]_Pfx    NULL
+#endif  /* ifdef/ifndef  */[=
+  ENDIF ifdef/ifndef     =][=
 
 ENDDEF Option_Strings =][=
 
@@ -350,7 +360,7 @@ DEFINE Option_Descriptor =][=
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 0, 0,
-     /* opt state flags  */ OPTST_DOCUMENT | OPTST_NO_INIT,
+     /* opt state flags  */ [=(. UP-name)=]_FLAGS,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,

@@ -1,16 +1,16 @@
 [= AutoGen5 template texi
 
 ##  Documentation template
-## 
-##  AutoGen Copyright (C) 1992-1999 Bruce Korb
-## 
+##
+##  AutoGen Copyright (C) 1992-2001 Bruce Korb
+##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul  8 15:06:49 1999				      
-##            by:     Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:     $Date: 2001/09/22 04:05:08 $
+##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.21 2001/09/21 03:09:48 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.22 2001/09/22 04:05:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -114,22 +114,34 @@ This is the automatically generated usage text for [=prog_name=]:
                                    "help" ))
 
     )  =]
-@end example[=
+@end example
+@exampleindent 4[=
 
 #  FOR all options, except the `documentation' options, ...  =][=
+
+IF (define opt-name "")
+   (exist? "preserve-case")     =][=
+   (define optname-from "_^")
+   (define optname-to   "--")   =][=
+ELSE                            =][=
+  (define optname-from "A-Z_^")
+  (define optname-to   "a-z--") =][=
+ENDIF                           =][=
 
 FOR flag=][=
 
   IF (not (exist? "documentation")) =]
 
-@node [=(. down-prog-name)=] [=% name (string-tr! "%s" "A-Z^_" "a-z--") =]
+@node [=
+    (set! opt-name (string-tr! (get "name") optname-from optname-to))
+    (string-append down-prog-name " " opt-name)=]
 @[=CASE (getenv "LEVEL") =][=
    = chapter    =][=
    = section    =]sub[=
    = subsection =]subsub[=
-   ESAC =]section [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] option[=
+   ESAC =]section [=(. opt-name)=] option[=
           % value " (-%s)" =]
-@cindex [=(. down-prog-name)=]-[=% name (string-tr! "%s" "A-Z^_" "a-z--")=]
+@cindex [=(. down-prog-name)=]-[=(. opt-name)=]
 
 [=descrip=].[=
 

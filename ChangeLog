@@ -1,5 +1,12 @@
 2001-09-21  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/aginfo.tpl: accept "preserve-case" program attribute
+	* autoopts/optlib.tpl: ditto
+	* autoopts/agman1.tpl: ditto
+	* doc/autogen.texi: improve the documentation for the pre-defined names
+
+2001-09-20  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/agman1.tpl(copyright): clean up licensing comment
 	* autoopts/autoopts.h(SKIP_OPT): add a macro for testing for _either_
 	the DOCUMENT or OMITTED bits being set.  "OMITTED" is now used for

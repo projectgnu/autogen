@@ -1,31 +1,28 @@
 [+:   -*- nroff -*-
 AutoGen5 template man=%s.1
-:+]
-[+:
+
 ## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
-## 
+##
 ##  AutoOpts copyright 1992-2001 Bruce Korb
-## 
+##
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:     Tue Aug  3 15:43:56 1999				      
-##            by:     Bruce Korb <bkorb@gnu.org>			      
+## Last Modified:   $Date: 2001/09/22 04:05:08 $
+##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.15 2001/09/21 03:09:48 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.16 2001/09/22 04:05:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
-1999-06-28 modified to be template  Bruce Korb <bkorb@gnu.org>
-1999-07-04 nroff tweaks, Jim Van Zandt <jrv@vanzandt.mv.com>
-1999-10-18 reworked as AutoGen5 template
-
-## Code:
-:+].TH [+: % prog_name (string-upcase! "%s") :+] 1 [+:
+:+]
+.TH [+: % prog_name (string-upcase! "%s") :+] 1 [+:
   `date +%Y-%m-%d` :+] "" "Programmer's Manual"
 [+:
 
+;; The following "dne" argument is a string of 5 characters:
+;; '.' '\\' '"' and two spaces.  It _is_ hard to read.
+;;
 (dne ".\\\"  ")
 
 :+]
@@ -41,7 +38,7 @@ AutoGen5 template man=%s.1
       #
       :+]
 .B [+: (string-downcase! (get "prog_name")) :+][+:
-  DEBUG 0 :+][+:
+
   IF (exist? "flag.value")  :+][+:
     IF (exist? "long_opts") :+][+:
 
@@ -116,11 +113,23 @@ This manual page documents, briefly, the \fB[+:
 
 :+][+:
 
+(define opt-name "")            :+][+:
+
+IF (exist? "preserve-case")     :+][+:
+  (define optname-from "_^")
+  (define optname-to   "--")    :+][+:
+ELSE                            :+][+:
+  (define optname-from "A-Z_^")
+  (define optname-to   "a-z--") :+][+:
+ENDIF                           :+][+:
+
 FOR flag
 
 :+][+:
-  #  Skip the documentation options!
-  #
+  ;;  Skip the documentation options!
+  ;;
+  (set! opt-name (string-tr! (get "name") optname-from optname-to))
+
   :+][+:
   IF (not (exist? "documentation")) :+]
 .TP[+:
@@ -135,14 +144,12 @@ FOR flag
           :+]
 .BR -[+:value:+][+:
           IF (not (exist? "arg_name")) :+] ", " --[+:
-          ELSE :+] " \fI[+:arg_name:+]\fP, " --[+:
-          ENDIF :+][+:% name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
-          IF (exist? "arg_name") :+][+:
-            IF (exist? "arg_optional") :+] [ =[+:
-            ELSE :+] "=" [+:
-            ENDIF :+]\fI[+:arg_name:+]\fP[+:
-            IF (exist? "arg_optional") :+] ][+:
-            ENDIF :+][+:
+          ELSE  :+] " \fI[+:arg_name:+]\fP, " --[+:
+          ENDIF :+][+: (. opt-name)    :+][+:
+          IF (exist? "arg_name")       :+][+:
+              ? arg_optional " [ =" ' "=" '
+              :+]\fI[+:  arg_name      :+]\fP[+:
+              arg_optional " ]"        :+][+:
           ENDIF:+][+:
 
 
@@ -156,10 +163,8 @@ FOR flag
           :+]
 .BR -[+:value:+][+:
           IF (exist? "arg_name") :+][+:
-            IF (exist? "arg_optional") :+][[+:
-            ENDIF :+] "\fI[+:arg_name:+]\fP[+:
-            IF (exist? "arg_optional") :+]"]"[+:
-            ENDIF :+][+:
+            arg_optional "["     :+] "\fI[+:arg_name:+]\fP[+:
+            arg_optional '"]"'   :+][+:
           ENDIF:+][+:
         ENDIF  :+][+:
 
@@ -175,14 +180,12 @@ FOR flag
           *  Special magic:  All arguments are named options.
           *
           :+]
-.BR [+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
-        IF (exist? "arg_name") :+] [+:
-          IF (exist? "arg_optional") :+] [ =[+:
-          ELSE :+] "=" [+:
-          ENDIF :+]\fI[+:arg_name:+]\fP[+:
-          IF (exist? "arg_optional") :+]][+:
-          ENDIF :+][+:
-        ENDIF:+][+:
+.BR [+: (. opt-name) :+][+:
+           IF (exist? "arg_name") :+] [+:
+              ? arg_optional " [ =" ' "=" '
+              :+]\fI[+:arg_name:+]\fP[+:
+              arg_optional "]" :+][+:
+           ENDIF:+][+:
 
 
         ELSE   :+][+:
@@ -193,12 +196,10 @@ FOR flag
           *  The program, instead, only accepts long options.
           *
           :+]
-.BR --[+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
+.BR --[+: (. opt-name) :+][+:
           IF (exist? "arg_name") :+] "[+:
-            IF (exist? "arg_optional") :+][[+:
-            ENDIF :+]=\fI[+:arg_name:+]\fP[+:
-            IF (exist? "arg_optional") :+]][+:
-            ENDIF :+]"[+:
+            arg_optional "["     :+]=\fI[+:arg_name:+]\fP[+:
+            arg_optional "]"     :+]"[+:
           ENDIF:+][+:
         ENDIF  :+][+:
       ENDIF :+]
@@ -269,7 +270,7 @@ IF (exist? "homerc") :+]
 .TP
 .BR [+: IF (exist? "flag.value") :+]-> " \fIrcfile\fP, --" [+:
       ELIF (exist? "long_opt") :+]--[+:
-      ENDIF:+]save-opts "[=\fIrcfile\fP] 
+      ENDIF:+]save-opts "[=\fIrcfile\fP]
 Save the option state to \fIrcfile\fP.
 .TP
 .BR [+: IF (exist? "flag.value") :+]-< " \fIrcfile\fP, --" [+:
