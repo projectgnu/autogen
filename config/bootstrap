@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Thu Jun  3 14:14:42 1999				      
+# Last Modified:     Thu Jun  3 14:32:22 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.9 1999/06/03 21:15:28 bkorb Exp $
+# $Id: bootstrap,v 1.10 1999/06/03 21:34:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -182,18 +182,23 @@ done
 test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
     || rm -f doc/autogen.texi
 
-autogen --help > /dev/null || {
+autogen --help > /dev/null 2>&1 || {
   echo AutoGen not available
   exit 0
 }
 
-getdefs --help > /dev/null || {
+getdefs --help > /dev/null 2>&1 || {
   echo getdefs not available
   exit 0
 }
 
-columns --help > /dev/null || {
+columns --help > /dev/null 2>&1 || {
   echo columns not available
+  exit 0
+}
+
+which which > /dev/null 2>&1 || {
+  echo Cannot determine program locations
   exit 0
 }
 
@@ -201,7 +206,9 @@ find . -name bootstrap |
 egrep -v '(CVS/Base/|config/bootstrap)'   |
 while read f
 do
-  (cd `dirname $f` ; sh `basename $f`)
+  (cd `dirname $f`
+   echo running bootstrap in `pwd`
+   sh bootstrap )
 done
 
 OPTDIR=`pwd`/autoopts
@@ -212,7 +219,12 @@ sed 's;\.def$;;'        |
 while read f
 do
   if [ ! -f ${f}.c ]
-  then ( cd `dirname $f` ; autogen -L $OPTDIR opts.def ) ; fi
+  then
+    ( cd `dirname $f`
+      echo bootstrapping options in `pwd`
+      autogen -L $OPTDIR opts.def
+    )
+  fi
 done
 
 # bootstrap ends here
