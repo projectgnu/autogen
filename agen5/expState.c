@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.5 1999/11/03 05:17:38 bruce Exp $
+ *  $Id: expState.c,v 1.6 1999/11/04 05:10:28 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -280,6 +280,7 @@ find_any_entry( char* pzName, tDefEntry* pCurDef )
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*=gfunc count
+ * what:   number of entries for a definition
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -303,6 +304,7 @@ ag_scm_count( SCM obj )
 
 
 /*=gfunc def_file
+ * what:   name of the definitions file
  *
  * doc:  Get the name of the definitions file.
  *       Returns the name of the source file containing the AutoGen
@@ -316,10 +318,11 @@ ag_scm_def_file( void )
 
 
 /*=gfunc exist_p
+ * what:   Test for an AutoGen value for a name
  *
  * exparg: ag-name, name of AutoGen value
  *
- * doc:  return SCM_BOOL_T iff a specified name has a value.
+ * doc:  return SCM_BOOL_T iff a specified name has an AutoGen value.
  *       The name may include indexes and/or member names.
  *       All but the last member name must be an aggregate definition.
  *       For example:
@@ -347,6 +350,7 @@ ag_scm_exist_p( SCM obj )
 
 
 /*=gfunc get
+ * what:   get the AutoGen value for a name
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -371,6 +375,7 @@ ag_scm_get( SCM obj )
 
 
 /*=gfunc high_lim
+ * what:   get the highest index for a name
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -406,6 +411,7 @@ ag_scm_high_lim( SCM obj )
 
 
 /*=gfunc len
+ * what:   get the number of elements for a name
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -427,6 +433,7 @@ ag_scm_len( SCM obj )
 
 
 /*=gfunc low_lim
+ * what:   get the lowest index for a name
  *
  * exparg: ag-name, name of AutoGen value
  *
@@ -459,6 +466,7 @@ ag_scm_low_lim( SCM obj )
 
 
 /*=gfunc suffix
+ * what:   get the current active suffix
  *
  * doc:
  *  Returns the current active suffix.  See @code{generate} in the
@@ -472,6 +480,7 @@ ag_scm_suffix( void )
 
 
 /*=gfunc tpl_file
+ * what:   get the template file name
  *
  * doc:  Returns the name of the current template file.
 =*/

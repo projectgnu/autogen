@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.4 1999/11/03 05:18:23 bruce Exp $
+ *  $Id: expFormat.c,v 1.5 1999/11/04 05:12:25 bruce Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -103,6 +103,7 @@ tSCC zFmtAlloc[] = "asprintf allocation";
 
 
 /*=gfunc dne
+ * what:  Emit a "Do Not Edit" warning string
  *
  * exparg: prefix, string for starting each output line
  * doc:  Generate a "Do Not Edit" warning string.
@@ -141,6 +142,7 @@ ag_scm_dne( SCM prefix )
 
 
 /*=gfunc error
+ * what:  Display an error message and exit
  *
  * exparg: @message@message to display before exiting@@
  * doc:
@@ -217,6 +219,7 @@ ag_scm_error( SCM res )
 
 
 /*=gfunc gpl
+ * what:  Emit the GNU public license
  *
  * exparg: prog-name, name of the program under the GPL
  * exparg: prefix, String for starting each output line
@@ -258,6 +261,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
 
 
 /*=gfunc lgpl
+ * what:  Emit the GNU library public license
  *
  * exparg: prog_name, name of the program under the LGPL
  * exparg: owner, Grantor of the LGPL
