@@ -1,0 +1,149 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*- 
+# ----------------------------------------------------------------------
+# bootstrap --- maintainer's bootstrap script
+#
+# Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
+# Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
+# Created:        Thu Apr  9 00:40:23 1998
+# Last Modified:  $Date: 1998/06/22 02:38:48 $
+#            by:  Bruce Korb <korbb@datadesign.com>
+# ----------------------------------------------------------------------
+# $Id: bootstrap,v 1.1 1998/06/22 02:38:48 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Code:
+
+DIE=0
+
+# Figure out the absolute path to the working directory.
+srcdir=`echo $0|sed 's,/[^/]*$,,'`
+test -z "$srcdir" && srcdir=.
+srcdir=`(cd $srcdir ; pwd)`
+
+# ----------------------------------------------------------------------
+# Make sure all of the maintainer tools required for bootstrap are
+# available on the host machine.
+# ----------------------------------------------------------------------
+
+# Assume autoconf will be present until we can prove otherwise.
+AUTOCONF=autoconf
+AUTOHEADER=autoheader
+
+# Or automake.
+ACLOCAL=aclocal
+AUTOMAKE=:
+sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in | \
+	fgrep -q AM_INIT_AUTOMAKE && AUTOMAKE=automake
+
+# See whether the configure template requires libtool.
+LIBTOOLIZE=:
+sed 's,#.*$,,;s,dnl[ \t].*$,,' configure.in | \
+	fgrep -q AM_PROG_LIBTOOL && LIBTOOLIZE=libtoolize
+
+# We must be using autoconf (or we wouldn't need this script!).
+$AUTOCONF --version >&- 2>&-
+if test $? -ne 0; then
+	cat <<-	EOF
+	**Error**: You must have \`autoconf\' installed to bootstrap autogen.
+	Download the appropriate package for your distribution,
+	or get the source at ftp://ftp.gnu.org/pub/gnu/autoconf-2.12.tar.gz
+	EOF
+	AUTOHEADER=:
+  	DIE=1
+fi
+
+# If autoconf failed we don't bother testing for autoheader.
+$AUTOHEADER --version >&- 2>&-
+if test $? -ne 0; then
+	cat <<-	EOF
+	**Error**: Missing \`autoheader\'.  The version of \`autoconf\'
+	installed doesn\'t appear recent enough.
+	Download the appropriate package for your distribution,
+	or get the source at ftp://ftp.gnu.org/pub/gnu/autoconf-2.12.tar.gz
+	EOF
+	DIE=1
+fi
+
+# Check for the presence of libtool.
+$LIBTOOLIZE --version >&- 2>&-
+if test $? -ne 0; then
+	cat <<-	EOF
+	**Error**: You must have \`libtool\' installed to bootstrap autogen.
+	Download the appropriate package for your distribution,
+	or get the source at ftp://ftp.gnu.org/pub/gnu/libtool-1.2.tar.gz
+	EOF
+	DIE=1
+fi
+
+# Check for the presence of automake.
+$AUTOMAKE --version >&- 2>&-
+if test $? -ne 0; then
+	cat <<-	EOF
+	**Error**: You must have \`automake\' installed to bootstrap autogen.
+	Download the appropriate package for your distribution,
+	or get the source at ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz
+	EOF
+	ACLOCAL=:
+	DIE=1
+fi
+
+# If automake failed we don't bother testing for aclocal.
+$ACLOCAL --version >&- 2>&-
+if test $? -ne 0; then
+	cat <<-	EOF
+	**Error**: Missing \`aclocal\'.  The version of \`automake\'
+	installed doesn\'t appear recent enough.
+	Download the appropriate package for your distribution,
+	or get the source at ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz
+	EOF
+	DIE=1
+fi
+
+# If any of the above tests failed, abort at this point.
+test "$DIE" -ne 0 && exit $DIE
+
+# Still here?  Run through all of the required autogeneration tools in
+# each directory which contains a configure.in file...
+for i in `find $srcdir -name configure.in -print`
+do
+	# Find the top directory with respect to the current configure.in.
+	top=`echo $i|sed 's,/[^/]*$,,'`
+	case $i in
+		/* | [A-Za-z]:\\*) ;;
+		*) top=`(cd $top && pwd)` ;;
+	esac
+	echo bootstrapping in $top
+
+	# A brief check to make sure we are not running in the wrong
+	# directory.
+	initfile=`fgrep AC_INIT $top/configure.in | sed 's,^.*(,,;s,).*$,,'`
+	if test -z "$initfile" || test ! -f $initfile; then
+		cat <<- EOF
+		**Error**: Directory \`$top\' does not look like a valid
+		top-level directory.
+	
+		EOF
+	fi
+
+	# Execute this in a sub-shell so we don't lose our start location.
+	(
+		cd $top
+
+		# Use auxdir if set in configure.in.
+		auxdir=${auxdir-`fgrep CONFIG_AUX_DIR configure.in | \
+			sed 's,^.*(,,;s,).*$,,'`}
+		test -n "$auxdir" || auxdir=$srcdir
+		test -d $auxdir || auxdir=.
+
+		$LIBTOOLIZE	--force
+		$ACLOCAL	-I $auxdir
+		$AUTOHEADER	-l $auxdir
+		$AUTOMAKE	--add-missing
+		$AUTOMAKE	--gnu
+		$AUTOHEADER	-l $auxdir
+		$AUTOCONF
+	)
+done
+
+# bootstrap ends here
