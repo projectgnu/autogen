@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Mon Jun 21 12:59:56 1999                                
+## Last Modified:     Wed Jul  7 11:48:50 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.17 1999/06/21 20:04:37 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.18 1999/07/07 19:12:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1013,8 +1013,9 @@ do cat $f ; done' _shell =]
 @end menu
 
 [=_EVAL 'for f in ${top_builddir}/*/*.menu
-do echo '@page'
-   cat `echo $f|sed \'s/\.menu$/\.texi/\'`
+do echo \'@page\'
+   sed s/\'${top_builddir}\'/"${top_builddir}"/ `echo $f|
+       sed \'s/\.menu$/\.texi/\'`
 done' _shell =]
 
 @ignore

@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Wed Jul  7 08:04:27 1999				      
+## Last Modified:   Wed Jul  7 11:26:41 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.16 1999/07/07 15:04:30 bkorb Exp $
+## $Id: Makefile.am,v 2.17 1999/07/07 19:12:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -42,5 +42,9 @@ include_HEADERS = options.h
 
 makeshell.o : genshell.c
 genshell.c : genshell.def
+
+../snprintfv/snprintfv.h :
+	if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
+	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
 
 # Makefile.am ends here
