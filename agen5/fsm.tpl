@@ -179,4 +179,11 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
   `rm -f .fsm.*`        =][=
 
 ESAC (suffix) =]
-/* end of [=(out-name)=] */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of [=(out-name)=] */

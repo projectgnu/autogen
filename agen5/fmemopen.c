@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-02-20 09:15:57 bkorb"
+ * Time-stamp:      "2004-09-01 18:05:45 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -565,4 +565,11 @@ fmemopen(void *buf, size_t len, const char *pMode)
     }
 }
 #endif /* ENABLE_FMEMOPEN */
-/* end of fmemopen.c */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of fmemopen.c */
