@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: C -*-
 
-# $Id: snarf.tpl,v 1.7 2000/09/16 15:45:37 bkorb Exp $
+# $Id: snarf.tpl,v 1.8 2000/10/17 15:34:36 bkorb Exp $
 
 ini =]
 [= (out-push-new (string-append (base-name) ".h"))
@@ -47,7 +47,7 @@ DEFINE string_content =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
     IF (exist? "string") =][=(c-string (get "string"))=][=
     ELSE =]"[= % name `echo %s |
-       sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/_to_/->/'` =]"[=
+       sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'` =]"[=
     ENDIF =];[=
 ENDDEF =][=
 

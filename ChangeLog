@@ -1,19 +1,17 @@
+2000-10-17  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expGuile.c: add string->c-name function
+
 2000-10-16  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/stdoptions.def:  Provide a set of standard options that
-	clients can take advantage of easily.
+	clients can take advantage of easily.  Add `boolean' and `keyword'
+	option argument types.  Handle `numeric' arguments seamlessly.
 	* VERSION: this change breaks compatibility  :-(
-	* autoopts/autoopts.c:  Handle the new arg_type attribute
-	* autoopts/boolean.c:  Handle the new arg_type attribute
-	* autoopts/doc.tpl:  Handle the new arg_type attribute
-	* autoopts/enumeration.c:  Handle the new arg_type attribute
-	* autoopts/numeric.c:  Handle the new arg_type attribute
-	* autoopts/optcode.tpl:  Handle the new arg_type attribute
-	* autoopts/opthead.tpl:  Handle the new arg_type attribute
-	* autoopts/options.h:  Handle the new arg_type attribute
-	* autoopts/options.tpl:  Handle the new arg_type attribute
-	* autoopts/optlib.tpl:  Handle the new arg_type attribute
-	* autoopts/optmain.tpl:  Handle the new arg_type attribute
+	* autoopts/boolean.c:  New file for options with boolean args
+	* autoopts/enumeration.c:  New file for options with keyword args
+	* autoopts/numeric.c:  New file for options with numeric args
+	* autoopts/*:  Handle the new arg_type attribute
 	* autoopts/Makefile.am:  Add and distribute the new files
 	* autoopts/test/argument.test:  Test the new arg_type attribute
 	* autoopts/test/stdopts.def:  Test the new arg_type attribute

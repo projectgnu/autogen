@@ -13,7 +13,7 @@ AutoGen5 template man=%s.1
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.13 2000/04/05 14:39:54 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.14 2000/10/17 15:34:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -140,10 +140,10 @@ FOR flag
           ELSE :+] " \fI[+:arg_name:+]\fP, " --[+:
           ENDIF :+][+:% name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
           IF (exist? "arg_name") :+][+:
-            IF (= (len "flag_arg") 0) :+] [ =[+:
+            IF (exist? "arg_optional") :+] [ =[+:
             ELSE :+] "=" [+:
             ENDIF :+]\fI[+:arg_name:+]\fP[+:
-            IF (= (len "flag_arg") 0) :+] ][+:
+            IF (exist? "arg_optional") :+] ][+:
             ENDIF :+][+:
           ENDIF:+][+:
 
@@ -158,9 +158,9 @@ FOR flag
           :+]
 .BR -[+:value:+][+:
           IF (exist? "arg_name") :+][+:
-            IF (= (len "flag_arg") 0) :+][[+:
+            IF (exist? "arg_optional") :+][[+:
             ENDIF :+] "\fI[+:arg_name:+]\fP[+:
-            IF (= (len "flag_arg") 0) :+]"]"[+:
+            IF (exist? "arg_optional") :+]"]"[+:
             ENDIF :+][+:
           ENDIF:+][+:
         ENDIF  :+][+:
@@ -179,10 +179,10 @@ FOR flag
           :+]
 .BR [+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
         IF (exist? "arg_name") :+] [+:
-          IF (= (len "flag_arg") 0) :+] [ =[+:
+          IF (exist? "arg_optional") :+] [ =[+:
           ELSE :+] "=" [+:
           ENDIF :+]\fI[+:arg_name:+]\fP[+:
-          IF (= (len "flag_arg") 0) :+]][+:
+          IF (exist? "arg_optional") :+]][+:
           ENDIF :+][+:
         ENDIF:+][+:
 
@@ -197,9 +197,9 @@ FOR flag
           :+]
 .BR --[+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
           IF (exist? "arg_name") :+] "[+:
-            IF (= (len "flag_arg") 0) :+][[+:
+            IF (exist? "arg_optional") :+][[+:
             ENDIF :+]=\fI[+:arg_name:+]\fP[+:
-            IF (= (len "flag_arg") 0) :+]][+:
+            IF (exist? "arg_optional") :+]][+:
             ENDIF :+]"[+:
           ENDIF:+][+:
         ENDIF  :+][+:

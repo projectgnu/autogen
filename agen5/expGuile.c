@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 1.15 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: expGuile.c,v 1.16 2000/10/17 15:34:36 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -242,6 +242,47 @@ ag_scm_sum( SCM list )
     } while (--len > 0);
 
     return gh_long2scm( sum );
+}
+
+
+/*=gfunc string_to_c_name_x
+ *
+ * what:   map non-name chars to underscore
+ * general_use:
+ *
+ * exparg: str , input/output string
+ *
+ * doc:  Change all the characters that are invalid in a C name token
+ *       into underscores.
+=*/
+    SCM
+ag_scm_string_to_c_name_x( SCM str )
+{
+    tSCC  zFun[] = "ag_scm_string_upcase_x";
+    int   len;
+    char* pz;
+
+    if (! gh_string_p( str ))
+        scm_wrong_type_arg( zFun, 1, str );
+
+    len = SCM_LENGTH( str );
+    pz  = SCM_CHARS( str );
+    while (--len >= 0) {
+        char ch = *pz;
+        if (! isalnum( ch )) {
+            if ((! isprint( ch )) && (ch != '\t')) {
+                scm_misc_error( zFun,
+                                "cannot map unprintable chars to C name chars",
+                                str );
+                /* NOTREACHED */
+            }
+
+            *pz = '_';
+        }
+        pz++;
+    }
+
+    return str;
 }
 
 
