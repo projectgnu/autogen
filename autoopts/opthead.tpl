@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.7 1998/09/28 19:33:01 bkorb Exp $
+#$Id: opthead.tpl,v 2.8 1998/11/25 21:19:39 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -40,8 +40,14 @@ _SETENV DEFNAME prog_name _get _outfile
 [=
 _IF copyright _exist=]
 /*
- * [=_eval prog_name _get _cap copyright _get owner _get
-       "#3$%s copyright %s %s" _printf=][=
+ * [=
+  _IF prog_file_name _exist =][=
+     _eval prog_file_name _get _cap copyright _get owner _get
+           "#3$%s copyright %s %s" _printf=][=
+  _ELSE=][=
+     _eval prog_name _get _cap copyright _get owner _get
+           "#3$%s copyright %s %s" _printf=][=
+  _ENDIF=][=
 
   _IF copyright_note _exist=]
  *
@@ -49,11 +55,21 @@ _IF copyright _exist=]
 
   _ELIF copyright_gpl _exist=]
  *
-[=_eval prog_name _get _cap "# * " _gpl=][=
+[=
+    _IF prog_file_name _exist =][=
+      _eval prog_file_name _get _cap "# * " _gpl=][=
+    _ELSE =][=
+      _eval prog_name _get _cap "# * " _gpl=][=
+    _ENDIF =][=
 
   _ELIF copyright_lgpl _exist=]
  *
-[=_eval prog_name _get _cap owner _get "# * " _lgpl=][=
+[=
+    _IF prog_file_name _exist =][=
+      _eval prog_file_name _get _cap owner _get "# * " _lgpl=][=
+    _ELSE =][=
+      _eval prog_name _get _cap owner _get "# * " _lgpl=][=
+    _ENDIF =][=
   _ENDIF "copyright notes" =]
  */[=
 _ENDIF "copyright exists" =]
@@ -151,7 +167,9 @@ _ENDIF=]
 
 _IF version _exist =]
 #define [=prog_name _up=]_VERSION       [=version _str=]
-#define [=prog_name _up=]_FULL_VERSION  "[=prog_name=] - [=prog_title
+#define [=prog_name _up=]_FULL_VERSION  "[=
+  _IF prog_file_name _exist =][=prog_file_name=][=
+  _ELSE=][=prog_name=][=_ENDIF=] - [=prog_title
                                              "# - " +=]Ver. [=version=]"[=
 _ENDIF version-exists =]
 

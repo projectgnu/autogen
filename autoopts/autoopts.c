@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.4 1998/10/08 14:06:54 bkorb Exp $
+ *  $Id: autoopts.c,v 2.5 1998/11/25 21:19:30 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.4 1998/10/08 14:06:54 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.5 1998/11/25 21:19:30 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -470,7 +470,7 @@ optionLoadLine( tOptions*  pOpts, char*  pzLine )
     STATIC void
 filePreset( tOptions*  pOpts, const char* pzFileName )
 {
-    FILE*  fp  = fopen( pzFileName, (const char*)"r" );
+    FILE*  fp  = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
     u_int saveOpt = pOpts->fOptSet;
 
     char  zLine[ 0x1000 ];

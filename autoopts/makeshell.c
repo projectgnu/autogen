@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.14 1998/11/04 23:18:24 bkorb Exp $
+ *  $Id: makeshell.c,v 2.15 1998/11/25 21:19:35 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -526,7 +526,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 
     default:
         close( pipeFd[1] );
-        fp = fdopen( pipeFd[0], "r" );
+        fp = fdopen( pipeFd[0], "r" FOPEN_BINARY_FLAG );
     }
 
     for (;;) {
@@ -986,7 +986,7 @@ loadTrailer( const char* pzFile )
         }
 
         pzData = (char*)malloc( stbf.st_size + 1 );
-        fp = fopen( pzFile, "r" );
+        fp = fopen( pzFile, "r" FOPEN_BINARY_FLAG );
 
         sizeLeft = stbf.st_size;
         pzScan   = pzData;
@@ -1023,7 +1023,7 @@ loadTrailer( const char* pzFile )
 
     } while (AG_FALSE);
 
-    freopen( pzFile, "w", stdout );
+    freopen( pzFile, "w" FOPEN_BINARY_FLAG, stdout );
     return pzData;
 }
 

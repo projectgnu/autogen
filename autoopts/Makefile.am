@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Fri Oct 30 09:31:26 1998
+## Last Modified:   Wed Nov 25 13:16:21 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.8 1998/10/30 17:32:29 bkorb Exp $
+## $Id: Makefile.am,v 2.9 1998/11/25 21:19:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -24,11 +24,11 @@ libopts_la_SOURCES = \
 
 libopts_la_LDFLAGS = -version-info @LT_CURRENT@:@LT_REVISION@:@LT_AGE@
 
-datadir		= $(prefix)/share
 pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl
-EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.texi \
+EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.texi autoopts-config.in \
 		genshell.def genshell.c genshell.h
 INCLUDES	= -I$(top_srcdir) -I$(srcdir) -I$(top_builddir) -I.
+bin_SCRIPTS	= autoopts-config
 include_HEADERS = options.h
 MAINTAINERCLEANFILES = Makefile.in
 

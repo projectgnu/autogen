@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.1 1998/09/15 17:19:50 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.2 1998/11/25 21:19:41 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -300,7 +300,7 @@ optionSave( tOptions* pOpts )
     {
         tOptDesc* pOD = pOpts->pOptDesc;
         int       ct  = pOpts->presetOptCt;
-        FILE*     fp  = fopen( pzFName, "w" );
+        FILE*     fp  = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
 
         if (fp == (FILE*)NULL) {
             fprintf( stderr, zWarn, pOpts->pzProgName );

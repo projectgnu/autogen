@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 2.1 1998/10/30 16:49:10 bkorb Exp $
+ *  $Id: pgusage.c,v 2.2 1998/11/25 21:19:40 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -84,7 +84,7 @@ doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
         /*
          *  Set stderr to this temporary file
          */
-        if (freopen( zPageUsage, "w", stderr ) != stderr)
+        if (freopen( zPageUsage, "w" FOPEN_BINARY_FLAG, stderr ) != stderr)
             _exit( EXIT_FAILURE );
 
         pagerState = PAGER_STATE_READY;

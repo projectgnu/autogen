@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.2 1998/10/30 16:49:11 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.3 1998/11/25 21:19:32 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -78,6 +78,14 @@
 #ifndef EXIT_SUCCESS
 #  define  EXIT_SUCCESS 0
 #  define  EXIT_FAILURE 1
+#endif
+
+#ifndef FOPEN_BINARY_FLAG
+#  ifdef USE_FOPEN_BINARY
+#    define FOPEN_BINARY_FLAG	"b"
+#  else
+#    define FOPEN_BINARY_FLAG
+#  endif
 #endif
 
 #undef STATIC

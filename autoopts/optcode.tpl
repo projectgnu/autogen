@@ -1,11 +1,17 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.8 1998/10/30 16:49:14 bkorb Exp $
+#$Id: optcode.tpl,v 2.9 1998/11/25 21:19:37 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
-       [=prog_name _cap copyright _get owner _get
-       "#3$%s copyright %s %s, all rights reserved" _printf _str=];[=
+       [=
+    _IF prog_file_name _exist=][=
+        prog_file_name _cap copyright _get owner _get
+        "#3$%s copyright %s %s, all rights reserved" _printf _str=][=
+    _ELSE =][=
+        prog_name _cap copyright _get owner _get
+       "#3$%s copyright %s %s, all rights reserved" _printf _str=][=
+    _ENDIF=];[=
   _ELSE =]
 #define zCopyright (const char*)NULL[=
   _ENDIF=][=
@@ -18,13 +24,23 @@ static const char zCopyrightNotice[] =
 _ELIF copyright_gpl _exist
 =]
 static const char zCopyrightNotice[] =
-       [=prog_name _cap "#" _gpl _str=];[=
+       [=
+  _IF prog_file_name _exist =][=
+      prog_name _cap "#" _gpl _str=][=
+  _ELSE =][=
+      prog_name _cap "#" _gpl _str=][=
+  _ENDIF=];[=
 
 _ELIF copyright_lgpl _exist
 =]
 static const char zCopyrightNotice[] =
-       [=prog_name _cap owner _get "#" _lgpl _str=];[=
-  _ELSE =]
+       [=
+  _IF prog_file_name _exist =][=
+      prog_file_name _cap owner _get "#" _lgpl _str=][=
+  _ELSE=][=
+      prog_name _cap owner _get "#" _lgpl _str=][=
+  _ENDIF=];[=
+_ELSE =]
 #define zCopyrightNotice (const char*)NULL[=
 
 _ENDIF "copyright notes"
