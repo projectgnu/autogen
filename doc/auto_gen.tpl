@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.48 2000/03/12 21:39:07 bruce Exp $
+## $Id: auto_gen.tpl,v 2.49 2000/03/13 00:04:33 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -42,8 +42,8 @@ directories:
 @ifinfo
 This file documents [=package=] Version @value{VERSION}
 
-AutoGen copyright @copyright{} [=copyright=] Bruce Korb
-AutoOpts copyright @copyright{} [=copyright=] Bruce Korb
+AutoGen copyright @copyright{} [=copyright.date=] Bruce Korb
+AutoOpts copyright @copyright{} [=copyright.date=] Bruce Korb
 snprintfv copyright @copyright{} 1999 Gary V. Vaughan
 
 [=(gpl "AutoGen" "")=]
@@ -64,7 +64,7 @@ notice identical to this one except for the removal of this paragraph
 
 @page
 @vskip 0pt plus 1filll
-AutoGen copyright @copyright{} [=copyright=] Bruce Korb
+AutoGen copyright @copyright{} [=copyright.date=] Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,
 @sp 2
