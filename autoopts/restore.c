@@ -1,6 +1,6 @@
 
 /*
- *  restore.c  $Id: restore.c,v 3.9 2003/11/23 19:15:28 bkorb Exp $
+ *  restore.c  $Id: restore.c,v 3.10 2003/11/24 17:20:47 bkorb Exp $
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -61,7 +61,10 @@
  * doc:   This routine will allocate enough memory to save the current
  *        option processing state.  If this routine has been called before,
  *        that memory will be reused.  You may only save one copy of the
- *        option state.  This routine may be called before optionProcess(3).
+ *        option state.  This routine may be called before optionProcess(3AO).
+ *        If you do call it before the first call to optionProcess, then
+ *        you may also change the contents of argc/argv after you call
+ *        optionRestore(3AO)
  *
  * err:   If it fails to allocate the memory,
  *        it will print a message to stderr and exit.
@@ -102,6 +105,9 @@ optionSaveState( tOptions* pOpts )
  * doc:  Copy back the option state from saved memory.
  *       The allocated memory is left intact, so this routine can be
  *       called repeatedly without having to call optionSaveState again.
+ *       If you are restoring a state that was saved before the first call
+ *       to optionProcess(3AO), then you may change the contents of the
+ *       argc/argv parameters to optionProcess.
  *
  * err:  If you have not called @code{optionSaveState} before, a diagnostic is
  *       printed to @code{stderr} and exit is called.
