@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: genshell.def,v 2.3 1999/07/07 19:42:32 bkorb Exp $
+ *   $Id: genshell.def,v 2.4 1999/10/06 14:13:34 bkorb Exp $
  */
 
 /*
@@ -45,9 +45,27 @@ flag = {
 
 flag = {
     name      = shell;
+    disable   = no;
+    enabled;
     value     = s;
     flag_arg  = ":";
     descrip   = 'Shell name (follows "#!" magic)';
+};
+
+flag = {
+    name      =  name_prefix;
+    disable   =  no;
+    flag_arg  =  ":";
+    descrip   =  "Prefix for option variable names";
+    value     =  p;
+};
+
+flag = {
+    name      =  case;
+    disable   =  down;
+    enable    =  up;
+    enabled;
+    descrip   =  "character case of variable names";
 };
 
 explain =

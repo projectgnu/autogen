@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.17 1999/07/07 19:41:00 bkorb Exp $
+ *  $Id: makeshell.c,v 2.18 1999/10/06 14:13:34 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -73,7 +73,7 @@ static const char zStartMarker[] =
 "#  DO NOT EDIT THIS SECTION";
 
 static const char zPreamble[] =
-"#!%s\n%s OF %s\n#\n"
+"%s OF %s\n#\n"
 "#  From here to the next `-- do not modify this marker --',\n"
 "#  the text has been generated %s\n";
 
@@ -86,7 +86,7 @@ static const char zMultiDef[] = "\n"
 
 static const char zSingleDef[] = "\n"
 "unset %1$s_%2$s\n"
-"%1$s_%2$s=''\n"
+"%1$s_%2$s='%3$s'\n"
 "export %1$s_%2$s\n";
 
 /* * * * * * * * * * * * * * * * * * * * *
@@ -396,6 +396,9 @@ putShellParse( tOptions* pOpts )
     if (HAVE_OPT( SHELL ))
         pzShell = OPT_ARG( SHELL );
 
+    else if (! ENABLED_OPT( SHELL ))
+	pzShell = (char*)NULL;
+
     else if ((pzShell = getenv( "SHELL" )),
              pzShell == (char*)NULL)
 
@@ -464,7 +467,7 @@ putShellParse( tOptions* pOpts )
     printf( zLoopEnd, pOpts->pzPROGNAME, zTrailerMarker );
     if ((pzTrailer != (char*)NULL) && (*pzTrailer != '\0'))
         fputs( pzTrailer, stdout );
-    else
+    else if (ENABLED_OPT( SHELL ))
         printf( "\nenv | egrep %s_\n", pOpts->pzPROGNAME );
 
     fflush( stdout );
@@ -587,7 +590,10 @@ emitUsage( tOptions* pOpts )
              pzOutName = OPT_ARG( SCRIPT );
         else pzOutName = "stdout";
 
-        printf( zPreamble, pzShell, zStartMarker, pzOutName, zTimeBuf );
+        if (pzShell != (char*)NULL)
+            printf( "#!%s\n", pzShell );
+
+        printf( zPreamble, zStartMarker, pzOutName, zTimeBuf );
 
         /*
          *  Get a copy of the original program name in lower case
@@ -627,16 +633,29 @@ emitSetup( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
     int       optionCt = pOpts->presetOptCt;
+    const char* pzFmt;
+    const char* pzValue;
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
+        char zVal[20];
 
         if (  ((pOptDesc->fOptState & OPTST_DOCUMENT) != 0)
            || (pOptDesc->pz_NAME == (char*)NULL) )
             continue;
 
         if (pOptDesc->optMaxCt > 1)
-             printf( zMultiDef,  pOpts->pzPROGNAME, pOptDesc->pz_NAME );
-        else printf( zSingleDef, pOpts->pzPROGNAME, pOptDesc->pz_NAME );
+             pzFmt = zMultiDef;
+        else pzFmt = zSingleDef;
+
+        if (pOptDesc->fOptState & OPTST_NUMERIC) {
+            sprintf( zVal, "%d", pOptDesc->pzLastArg );
+            pzValue = zVal;
+        } else if (pOptDesc->pzLastArg == (char*)NULL)
+            pzValue = "";
+        else
+            pzValue = pOptDesc->pzLastArg;
+
+        printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME, pzValue );
     }
 }
 
