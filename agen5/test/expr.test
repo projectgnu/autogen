@@ -1,0 +1,37 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
+#
+# Author:	     Bruce Korb <autogen@linuxbox.com>
+# Maintainer:	     Bruce Korb <autogen@linuxbox.com>
+# Created:	     Sat Mar 28 14:21:31 1998
+# Last Modified:  $Date: 1999/11/03 06:10:25 $
+#            by:     Bruce Korb <autogen@linuxbox.com>
+#
+# $Id: expr.test,v 1.1 1999/11/03 06:10:25 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+BLOCKOPT="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
+GETOPTS="assign=group=ag defs=gfunc templ=snarf srcfile base-name=expr"
+FILES=""
+for f in ${EXPRLIST}
+do
+  EXPRLIST="${EXPRLIST} ${top_srcdir}/agen5/$f"
+done
+
+echo ${GETDEFS} ${BLOCKOPT} ${GETOPTS} autogen=${AGEXE} ${FILES}
+${GETDEFS} ${BLOCKOPT} ${GETOPTS} autogen=${AGEXE} ${FILES}
+
+diff expr.ini ${top_srcdir}/agen5/
+
+# subblock.test ends here
