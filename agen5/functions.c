@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.11 2000/03/01 04:35:12 bruce Exp $
+ *  $Id: functions.c,v 1.12 2000/03/11 19:44:04 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -58,11 +58,29 @@ tSCC zCantInc[] = "cannot include file";
 MAKE_HANDLER_PROC( Include )
 {
     tTemplate* pNewTpl;
-    ag_bool needFree;
-    char* pz = evalExpression( &needFree );
+    ag_bool    needFree;
+    char*      pzFile = evalExpression( &needFree );
+    tMacro*    pM;
 
-    if (*pz != NUL) {
-        pNewTpl = loadTemplate( pz );
+    if (*pzFile != NUL) {
+        pNewTpl = loadTemplate( pzFile );
+
+        /*
+         *  Strip off trailing white space from included templates
+         */
+        pM = pNewTpl->aMacros + (pNewTpl->macroCt - 1);
+        if (pM->funcCode == FTYP_TEXT) {
+            char* pz  = pNewTpl->pzTemplText + pM->ozText;
+            char* pzE = pz + strlen( pz );
+            while ((pzE > pz) && isspace( pzE[-1] ))  --pzE;
+
+            /*
+             *  IF there is no text left, remove the macro entirely
+             */
+            if (pz == pzE)
+                 --(pNewTpl->macroCt);
+            else *pzE = NUL;
+        }
 
         if (OPT_VALUE_TRACE > TRACE_NOTHING) {
             tSCC zTplFmt[] = "Template %s included\n";
@@ -81,7 +99,7 @@ MAKE_HANDLER_PROC( Include )
     }
 
     if (needFree)
-        AGFREE( (void*)pz );
+        AGFREE( (void*)pzFile );
 
     return pMac + 1;
 }
