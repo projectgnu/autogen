@@ -151,16 +151,16 @@ DEFINE preamble
 
 =][=
 
-  IF  (== (suffix) "c") =][=
-     (set! fsm-source ".fsm.code")
-     (set-writable)     =][=
-  ELSE                  =][=
-     (define pfx     (string->c-name! (string-downcase!
+  (if (== (suffix) "c")
+      (begin
+        (set! fsm-source ".fsm.code")
+        (set-writable) )
+      (begin
+        (define pfx     (string->c-name! (string-downcase!
                         (if (exist? "prefix") (get "prefix") (base-name))  )))
-     (define PFX     (string-upcase pfx))
-     (define fsm-source ".fsm.head")  =][=
-  ENDIF                 =][=
-
+        (define PFX     (string-upcase pfx))
+        (define fsm-source ".fsm.head") )
+  )
   (dne " *  " "/*  ")  =]
  *
  *  Automated Finite State Machine

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.5 2002/02/01 03:36:35 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.6 2002/06/15 01:12:13 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -256,7 +256,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
     /*
      *  Otherwise, it is just junk.
      */
-    return PM_EV_INVALID;
+    AG_ABEND( "Invalid template file" );
 }
 
 
@@ -301,12 +301,11 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 {
     tSCC zMarkErr[] = "start/end macro mark too long";
     tSCC zBadMark[] = "bad template marker in %s on line %d:\n\t%s";
-#   define BAD_MARKER( t ) STMTS( \
-            char* pz = asprintf( zBadMark, pzFileName, templLineNo, t ); \
-            AG_ABEND( pz ); )
+#   define BAD_MARKER( t ) \
+            AG_ABEND( asprintf( zBadMark, pzFileName, templLineNo, t ))
 
     te_pm_state fsm_state  = PM_ST_INIT;
-    ag_bool      line_start = AG_TRUE;  /* set TRUE first time only */
+    ag_bool     line_start = AG_TRUE;  /* set TRUE first time only */
 
     templLineNo  = 1;
 

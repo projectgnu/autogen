@@ -1,3 +1,8 @@
+2002-06-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-macro.tpl(suffix): put it all in Scheme
+	* agen5/loadPseudo.c(loadPseudoMacro): avoid segfaults on empty files
+
 2002-06-13  Bruce Korb  <bkorb@gnu.org>
 
 	* defLex.c(yylex): prevent compilers from caching a changable value
