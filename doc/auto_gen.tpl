@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.10 1998/07/14 22:04:22 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.11 1998/07/14 22:06:56 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -1142,6 +1142,7 @@ with the following additional arguments:
 @example
 myopts.o -L $prefix/lib -lopts
 @end example
+@end itemize
 
 @node dependencies
 @section Autogen Inter-dependency Graph
