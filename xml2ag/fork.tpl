@@ -4,8 +4,9 @@
  *  This module will fire up autogen and have it read definitions
  *  from its standard-in.
  */
-#include "opts.h"
-#  include <fcntl.h>
+#include "xmlopts.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 static void
 addArg( char* pzArg, int ix )
@@ -28,7 +29,6 @@ addArg( char* pzArg, int ix )
 void
 forkAutogen( char* pzInput )
 {
-    FILE* fp;
     tSCC zErr[] = "%s fs ERROR %d (%s) on %s\n";
     int fd[2];
 
@@ -61,10 +61,8 @@ forkAutogen( char* pzInput )
         errno = 0;
         outFp = fdopen( fd[1], "w" );
         if (outFp == NULL) {
-            int err = errno;
-            fprintf( stderr, "outFp is NULL, stdout is 0x%08p\n", stdout );
             fprintf( stderr, zErr, xml2agOptions.pzProgName,
-                     err, strerror( err ), "fdopen(2) w/ pipe[1]" );
+                     errno, strerror( errno ), "fdopen(2) w/ pipe[1]" );
             exit( EXIT_FAILURE );
         }
         close( fd[0] );

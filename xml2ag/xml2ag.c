@@ -2,7 +2,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "opts.h"
+#include "xmlopts.h"
 
 tSCC zConflict[] =
     "the file name operand conflicts with the definitions option.\n";

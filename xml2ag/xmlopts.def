@@ -2,10 +2,6 @@
 
 autogen definitions options;
 
-#define XML2AG
-
-#include agen5/opts.def
-
 export = "
 \#include <stdio.h>
 \#include <unistd.h>
@@ -38,17 +34,37 @@ flag = {
 FLAG_CODE_END ;
 };
 
+#define XML2AG
+
+#include opts.def
 
 explain = <<-  END_EXPLAIN
 	This program will convert any arbitrary XML file into equivalent
-	AutoGen definitions.
+	AutoGen definitions, and invoke AutoGen.
 	END_EXPLAIN ;
 
 detail = <<-  END_DETAIL
-	The template will be derived from the first of the following:
-	1.  the ``--override-tpl'' command line option
-	2.  a top level XML definition for "template".
-	3.  the base name of the input (or ``--base-name'' option) plus ".tpl".
+	The template will be derived from either:
+	*  the ``--override-tpl'' command line option
+	*  a top level XML attribute named, "template"
+
+	The ``base-name'' for the output will similarly be either:
+	*  the ``--base-name'' command line option
+	*  the base name of the .xml file
+	END_DETAIL ;
+
+prog-man-descrip = <<-  END_DETAIL
+	The template will be derived from either:
+	.br
+	*  the \fB--override-tpl\fP command line option
+	.br
+	*  a top level XML attribute named, "template"
+	.sp 1
+	The ``base-name'' for the output will similarly be either:
+	.br
+	*  the \fB--base-name\fP command line option
+	.br
+	*  the base name of the .xml file
 	END_DETAIL ;
 
 /* end of opts.def */
