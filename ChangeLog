@@ -1,3 +1,9 @@
+2000-07-28  Bruce Korb  <bkorb@gnu.org>
+
+	* config/autogen.spec.in: new file - precursor for autogen.spec
+	* configure.in: configure the above file
+	* MakeRules.in: obsolete
+
 2000-07-26  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c(ag_scm_tpl_line): deleted
