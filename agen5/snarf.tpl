@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: C -*-
 
-# $Id: snarf.tpl,v 1.2 1999/10/27 02:19:58 bruce Exp $
+# $Id: snarf.tpl,v 1.3 1999/10/28 03:25:02 bruce Exp $
 
 ini =]
 /*
@@ -25,10 +25,10 @@ ENDDEF =][=
 
   FOR gfunc =][=
     string_content =][=
-  ENDFOR gfunc =][=
-
+  ENDFOR gfunc =]
+[=
   FOR gfunc =]
-extern t_scm_callout_proc [=% group %s_ =]scm_[=name=];[=
+extern t_scm_callout_proc [=% group "%s_" =]scm_[=name=];[=
   ENDFOR gfunc =][=
 
   FOR syntax =][=
@@ -44,7 +44,7 @@ extern t_scm_callout_proc [=% group %s_ =]scm_[=name=];[=
  *  [=% group "%s " =]Initialization procedure
  */
 void
-[=% group %s_=]init( void )
+[=% group "%s_" =]init( void )
 {[=
   IF (exist? "init_code") =]
   [=init_code=][=
@@ -53,7 +53,7 @@ void
   FOR gfunc =]
   gh_new_procedure( (char*)s_[=name=],
                       [=
-      % group %s_=]scm_[=% name (sprintf "%%-28s" "%s,")=] [=
+      % group "%s_"     =]scm_[=% name (sprintf "%%-28s" "%s,")=] [=
       IF (exist? "req") =][=req=][=ELSE=]1[=ENDIF=], [=
       IF (exist? "opt") =][=opt=][=ELSE=]0[=ENDIF=], [=
       IF (exist? "var") =][=var=][=ELSE=]0[=ENDIF=] );[=
