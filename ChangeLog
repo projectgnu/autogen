@@ -1,3 +1,9 @@
+2000-09-13  Bruce Korb  <bkorb@gnu.org>
+
+	* getdefs/*:  Moved all global vars to getdefs.h.
+	Implemented a method for specifying global definitions.
+	* getdefs/test/subblock.test: exercized the method
+
 2000-09-10  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.h(pathfind): duplicates declaration from

@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 2.21 2000/04/07 13:28:51 bkorb Exp $
+ *   $Id: opts.def,v 2.22 2000/09/14 03:42:36 bkorb Exp $
  */
 
 /*
@@ -277,7 +277,11 @@ following form:\n
     };\n
 The ellipsis '...' is filled in by text found between the two
 delimiters, with everything up through the first sequence of
-asterisks deleted on every line.";
+asterisks deleted on every line.
+
+Also, if ``<entry-type>'' is an asterisk (``*''), then the entry_type
+enclosure and the name entry will be omitted and the ellipsis will
+become top-level definitions.";
 
 
 /* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */
@@ -348,4 +352,8 @@ Additionally, if the `<entry-name>' is followed by a comma, the word `ifdef'
 
 @noindent
 Also, with the use of the @code{subblock} option, you can specify a nested
-value, @xref{getdefs subblock}.";
+value, @xref{getdefs subblock}.
+
+Also, if @code{<entry-type>} is an asterisk (@code{*}), then the entry_type
+enclosure and the name entry will be omitted and the ellipsis will
+become top-level definitions.";
