@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.13 2002/07/11 00:48:07 bkorb Exp $
+ *  $Id: autoopts.c,v 3.14 2002/07/11 02:06:09 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -777,22 +777,41 @@ doImmediateOpts( pOpts )
        && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
           || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
+#if  defined( __STDC__ ) || defined( __cplusplus )
+        tSCC zErr[] =
+            "Automated Options Processing Error!\n"
+            "\t%s called optionProcess with structure version %d:%d:%d.\n";
+        tSCC zBig[] =
+            "\tThis exceeds the compiled library version:  "
+            OPTIONS_VERSION_STRING "\n";
+        tSCC zSml[] =
+            "\tThis is less than the minimum library version:  "
+            OPTIONS_MIN_VER_STRING "\n";
 
+        fprintf( stderr, zErr, pOpts->origArgVect[0],
+                 NUM_TO_VER( pOpts->structVersion ));
+        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
+            fputs( zBig, stderr );
+        else
+            fputs( zSml, stderr );
+#else
         tSCC zErr[] =
             "Automated Options Processing Error!\n";
         tSCC zVer[] =
-            "\t%s called optionProcess with structure version %s.\n";
+            "\t%s called optionProcess with structure version %d:%d:%d.\n";
         tSCC zBig[] =
-            "\tThis exceeds the library compiled version:  %d:%d:%d\n";
+            "\tThis exceeds the compiled library version:  %s\n";
         tSCC zSml[] =
-            "\tThis is less than the minimum livrary version: %d:%d:%d\n";
+            "\tThis is less than the minimum library version: %s\n";
 
         fputs( zErr, stderr );
-        fprintf( stderr, zVer, pOpts->origArgVect[0], OPTIONS_VERSION_STRING );
+        fprintf( stderr, zVer, pOpts->origArgVect[0],
+                 NUM_TO_VER( pOpts->structVersion ));
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-            fprintf( stderr, zBig, NUM_TO_VER( OPTIONS_STRUCT_VERSION ));
+            fprintf( stderr, zBig, OPTIONS_VERSION_STRING );
         else
-            fprintf( stderr, zSml, NUM_TO_VER( MIN_OPTION_VERSION ));
+            fprintf( stderr, zSml, OPTIONS_MIN_VER_STRING );
+#endif
 
         exit( EXIT_FAILURE );
     }

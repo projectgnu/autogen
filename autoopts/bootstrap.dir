@@ -37,6 +37,7 @@ case "$1" in
 		vers-info = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
 		vers-curr = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
 		vers-min  = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
+		vers-min-str = "`expr $AO_CURRENT - $AO_AGE`:0:0";
 		_END_VERS_INFO_
     ${AUTOGEN} funcs.def
     ${AUTOGEN} -Tagman3.tpl funcs.def

@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.9 2002/07/11 00:48:07 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.10 2002/07/11 02:06:09 bkorb Exp $
 
 =][=
 
@@ -204,9 +204,10 @@ struct specOptIndex {
 [=# /*
      *  These "vers" values are manipulated by the contents of ../VERSION
      */ =]
-#define  OPTIONS_STRUCT_VERSION  [=  vers-curr =]
-#define  OPTIONS_MINIMUM_VERSION [=  vers-min  =]
-#define  OPTIONS_VERSION_STRING  "[= vers-info =]"
+#define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
+#define  OPTIONS_VERSION_STRING  "[= vers-info    =]"
+#define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
+#define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 
 struct options {
     const int         structVersion;

@@ -2471,9 +2471,9 @@ Bourne shell commands that can be eval-ed by a Bourne-derived shell to
 incorporate the digested options into the shell's environment,
 @xref{shell options}.  You would use it thus:
 @example
-eval `./programopts $@@`
-if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
-shift $@{OPTION_CT@}
+eval "`./programopts $@@`"
+test -z "$@{OPTION_CT@}" ] && exit 1
+test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
 
 @item
@@ -2507,16 +2507,14 @@ Specifies the program version and activates the VERSION option.
 @cindex option attributes
 
 For each option you wish to specify, you must have a block macro named
-@code{flag} defined.  It @strong{MUST} contain at least two defined text
-values named @code{name} and @code{descrip}.  If any options do not have a
-@code{value} macro, then the @code{long-opts} global text macro must be
-defined.  As a special exception, if no options have a @code{value}
-@strong{and} @code{long-opts} is not defined @strong{and} @code{argument} is
-not defined, then all arguments to the program are named.  In this case, the
-@code{-} and @code{--} command line option markers are optional.
-
-There are four categories of option attributes.  The fifth section below
-describes what data are available for writing option processing code.
+@code{flag} defined.  There are two required attributes: @code{name} and
+@code{descrip}.  If any options do not have a @code{value} (traditional
+flag character) attribute, then the @code{long-opts} global text macro
+must also be defined.  As a special exception, if no options have a
+@code{value} @strong{and} @code{long-opts} is not defined @strong{and}
+@code{argument} is not defined, then all arguments to the program are
+named.  In this case, the @code{-} and @code{--} command line option
+markers are optional.
 
 @menu
 * Required Attributes::         Required Attributes
@@ -2539,15 +2537,16 @@ Every option must have exactly one copy of both of these attributes.
 @item name
 Long name for the option.  Even if you are not accepting long options
 and are only accepting flags, it must be provided.  AutoOpts generates
-private, named storage that require this name.
+private, named storage that requires this name.
 
 @cindex descrip
 @item descrip
-Except for documentation options, a @strong{very} brief description
-of the option.  About 40 characters on one line, maximum.
-It appears on the @code{usage()} output next to the option name.
-Documentation options appear on one or more lines by themselves,
-visually separating the usage options.
+Except for documentation options, a @strong{very} brief description of
+the option.  About 40 characters on one line, maximum.  It appears on
+the @code{usage()} output next to the option name.  If, however, the
+option is a documentation option, it will appear on one or more lines by
+itself.  It is thus used to visually separate and comment upon groups of
+options in the usage text.
 @end table
 
 @node Common Attributes

@@ -5,7 +5,7 @@
 #
 # Copyright (C) 1999-2002 Bruce Korb
 #
-# Time-stamp:        "2002-07-10 17:25:26 bkorb"
+# Time-stamp:        "2002-07-10 17:54:22 bkorb"
 # by:                Bruce Korb <bkorb@gnu.org>
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
@@ -45,15 +45,12 @@ VERSION=$AG_VERSION
 PACKAGE=autogen
 
 #  Validate struct marker in autoopts/options.h
-#  The computation here must be kept in sync with
-#  MIN_OPTION_VERSION and NUM_TO_VER in autoopts/autoopts.h
+#  The computation here should be kept in sync automatically.
 #
 if [ -n "$srcdir" ] && [ -s $srcdir/autoopts/options.h ] ; then
   hdr=`egrep OPTIONS_STRUCT_VERSION $srcdir/autoopts/options.h |
        sed 's/.*OPTIONS_STRUCT_VERSION *//'`
-  lib=`expr '(' $AO_CURRENT   '*' 4096 ')' \
-          + '(' $AO_REVISION  '*'  128 ')' \
-          + $AO_AGE`
+  lib=`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`
 
   if [ ${hdr}0 -ne ${lib}0 ] ; then
     echo autoopts/options.h out of sync with version.
