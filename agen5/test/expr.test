@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 1999/11/03 06:35:02 $
+# Last Modified:  $Date: 1999/11/06 03:16:47 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.5 1999/11/03 06:35:02 bruce Exp $
+# $Id: expr.test,v 1.6 1999/11/06 03:16:47 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -41,4 +41,4 @@ sed '1,6d' ${top_srcdir}/agen5/expr.ini > expr.base
 diff expr.base expr.out || \
   failure `pwd`/expr.ini differs from ${top_srcdir}/agen5/expr.ini
 
-# subblock.test ends here
+# expr.test ends here
