@@ -4,20 +4,20 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2002/01/25 02:25:03 $
- *             by:     Bruce Korb <bkorb@gnu.org>
+ *  Last Modified:     $Date: 2002/02/03 01:29:28 $
+ *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.3 2002/01/25 02:25:03 bkorb Exp $
+ *  $Id: misc.def,v 3.4 2002/02/03 01:29:28 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.3 $";
+version = "$Revision: 3.4 $";
 
 test = {
     name   = allocated_ctime;
     type   = run;
     check  = "ctime() allocates memory for its result";
-    action = define;
+    action = { act-type = define; };
     code   = <<-  _EOF_
 		#include <time.h>
 		int main (int argc, char** argv) {
@@ -35,14 +35,9 @@ test = {
     name   = pathfind;
     type   = run;
     check  = "pathfind(3) works";
-    bad-do = <<-  _EOF_
-		if test x$ac_cv_lib_gen_pathfind = xyes
-		then :
-		else
-		  COMPATOBJ="$COMPATOBJ pathfind.lo"
-		fi
-		_EOF_ ;
-    action = define;
+    action = { act-type = define; };
+    action = { no; act-type = script;
+               act-text = 'COMPATOBJ="$COMPATOBJ pathfind.lo"'; };
 
     code   = <<-  _EOF_
 		#include <string.h>
@@ -63,7 +58,7 @@ test = {
     name   = posix_regcomp;
     type   = run;
     check  = "POSIX compliant regcomp()/regexec()";
-    action = define;
+    action = { act-type = define; };
     code   = <<-  _EOF_
 		#include <sys/types.h>
 		#include <regex.h>
@@ -85,7 +80,7 @@ test = {
     name   = posix_sysinfo;
     type   = run;
     check  = "sysinfo(2) is POSIX";
-    action = define;
+    action = { act-type = define; };
     code   = <<- _EOF_
 		#include <sys/systeminfo.h>
 		int main() { char z[ 256 ];
@@ -101,8 +96,9 @@ test = {
     name   = strcspn;
     type   = run;
     check  = "strcspn matches prototype and works";
-    bad-do =
-       'COMPATOBJ="$COMPATOBJ strcspn.lo"';
+    action = { act-type = define; };
+    action = { no; act-type = script;
+               act-text = 'COMPATOBJ="$COMPATOBJ strcspn.lo"'; };
 
     code   = <<-  _EOF_
 		#include <string.h>
@@ -112,7 +108,6 @@ test = {
 		   return strcspn( zAcc, zRej ) - 5;
 		}
 		_EOF_;
-    action = define;
 
     doc =
     "Not all systems have strcspn(3).  See if we need to substitute.\n"
@@ -131,7 +126,7 @@ test = {
     name  = strftime;
     type  = run;
     check = "strftime() works";
-    action = define;
+    action = { act-type = define; };
     code  = <<-  _EOF_
 		#include <time.h>
 		char t_buf[ 64 ];
@@ -159,7 +154,9 @@ test = {
     name   = sys_siglist;
     type   = run;
     check  = "there is a global text array sys_siglist";
-    action = define, substitute;
+    action = { act-type = define; };
+    action = { act-type = subst; };
+
     code   = <<-  _EOF_
 		#include <signal.h>
 		int main() {
@@ -176,7 +173,7 @@ test = {
     name   = uname_syscall;
     type   = run;
     check  = "uname(2) is POSIX";
-    action = define;
+    action = { act-type = define; };
     code   = <<- _EOF_
 		#include <sys/utsname.h>
 		int main() { struct utsname unm;
@@ -188,25 +185,26 @@ test = {
 
 test = {
     name   = shell;
-    type   = enable;
+    type   = disable;
     check  = 'using shell scripts';
-    define;
-    enable;  /* enabled by default */
+    action = { act-type = define; };
 
-    yes-action = <<-  _EOF_
-		    AC_SUBST(OPTS_TESTDIR)
+    action = { act-type = script;
+      act-text = <<-  _EOF_
+		AC_SUBST(OPTS_TESTDIR)
 		    AC_SUBST(TOP_DIRLIST)
 		    AC_SUBST(AGEN5_TESTS)
 		    TOP_DIRLIST='$(SHELL_DIRS)'
 		    OPTS_TESTDIR=test
 		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
-		_EOF_;
+		_EOF_; };
 
-    no-action  = <<-  _EOF_
-		    TOP_DIRLIST='$(NOSHELL_DIRS)'
+    action = { no; act-type = script;
+      act-text = <<-  _EOF_
+		TOP_DIRLIST='$(NOSHELL_DIRS)'
 		    OPTS_TESTDIR=
 		    AGEN5_TESTS='$(NOSHELL_TESTS)'
-		_EOF_;
+		_EOF_; };
 
     doc = <<-  _EOF_
 	AutoGen is now capable of acting as a CGI service.  In that capacity,
@@ -222,17 +220,16 @@ test = {
     name   = debug;
     type   = enable;
     check  = 'wanting autogen debugging';
-    define;
-    disable;  /* disabled by default */
+    action = { act-type = define; };
     /*
      *  What to do for non-default
      */
-    yes-action = <<- _EOF_
+    action = { act-type = script;
+      act-text = <<- _EOF_
 		CPPFLAGS="-DDEBUG $CPPFLAGS"
-	    changequote(,)dnl
 	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
-	    changequote([,])dnl
-	_EOF_;
+		_EOF_; };
+
     doc = <<-  _EOF_
 	This option will enable two debugging options for AutoGen.
 	viz., --show-defs (dump out the definition tree)
