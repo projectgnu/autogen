@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.20 2000/10/27 15:18:20 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.21 2000/10/28 18:17:32 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -72,19 +72,18 @@
 #define OPTST_SET_MASK     0x0000F  /* mask of flags that show set state */
 
 #define OPTST_EQUIVALENCE  0x00010  /* selected by equiv'ed option       */
-#define OPTST_DISABLED     0x00020  /* option with disable marker        */
+#define OPTST_DISABLED     0x00020  /* option is in disabled state       */
 
 #define OPTST_NO_INIT      0x00100  /* option cannot be preset           */
-#define OPTST_NUMBER_OPT   0x00200  /* option is number option           */
+#define OPTST_NUMBER_OPT   0x00200  /* opt value (flag) is any digit     */
 #define OPTST_STACKED      0x00400  /* opt uses stackOptArg procedure    */
-#define OPTST_DISABLEOK    0x00800  /* option may be disabled            */
-#define OPTST_INITENABLED  0x01000  /* option defaults to enabled        */
-#define OPTST_DOCUMENT     0x02000  /* opt is for documentation only     */
-#define OPTST_ENUMERATION  0x04000  /* opt is an enum (keyword list)     */
-#define OPTST_BOOLEAN      0x08000  /* opt is boolean-valued             */
-#define OPTST_NUMERIC      0x10000  /* option has numeric value          */
-#define OPTST_IMM          0x20000  /* process option on first pass      */
-#define OPTST_DISABLE_IMM  0x40000  /* process disablement on first pass */
+#define OPTST_INITENABLED  0x00800  /* option defaults to enabled        */
+#define OPTST_ENUMERATION  0x01000  /* opt arg is an enum (keyword list) */
+#define OPTST_BOOLEAN      0x02000  /* opt arg is boolean-valued         */
+#define OPTST_NUMERIC      0x04000  /* opt arg has numeric value         */
+#define OPTST_DOCUMENT     0x08000  /* opt is for documentation only     */
+#define OPTST_IMM          0x10000  /* process option on first pass      */
+#define OPTST_DISABLE_IMM  0x20000  /* process disablement on first pass */
 
 #define OPTST_PERSISTENT   0xFFF00  /* mask of flags that do not change  */
 
@@ -108,16 +107,14 @@
 #define OPTPROC_LONGOPT     0x0001 /* Process long style options      */
 #define OPTPROC_SHORTOPT    0x0002 /* Process short style "flags"     */
 #define OPTPROC_ERRSTOP     0x0004 /* Stop on argument errors         */
-#define OPTPROC_DISABLEOK   0x0008 /* Disabling options are allowed   */
-#define OPTPROC_DISABLEDOPT 0x0010 /* Current option is disabled      */
-#define OPTPROC_NO_REQ_OPT  0x0020 /* no options are required         */
-#define OPTPROC_NUM_OPT     0x0040 /* there is a number option        */
-#define OPTPROC_INITDONE    0x0080 /* have initializations been done? */
-#define OPTPROC_NEGATIONS   0x0100 /* any negation options?           */
-#define OPTPROC_ENVIRON     0x0200 /* check environment?              */
-#define OPTPROC_PLUSMARKS   0x0400 /* Use '+' flag markers?           */
-#define OPTPROC_NO_ARGS     0x0800 /* Disallow remaining arguments    */
-#define OPTPROC_ARGS_REQ    0x1000 /* Require arguments after options */
+#define OPTPROC_DISABLEDOPT 0x0008 /* Current option is disabled      */
+#define OPTPROC_NO_REQ_OPT  0x0010 /* no options are required         */
+#define OPTPROC_NUM_OPT     0x0020 /* there is a number option        */
+#define OPTPROC_INITDONE    0x0040 /* have initializations been done? */
+#define OPTPROC_NEGATIONS   0x0080 /* any negation options?           */
+#define OPTPROC_ENVIRON     0x0100 /* check environment?              */
+#define OPTPROC_NO_ARGS     0x0200 /* Disallow remaining arguments    */
+#define OPTPROC_ARGS_REQ    0x0400 /* Require arguments after options */
 
 #define STMTS(s)  do { s; } while (0)
 

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.45 2000/10/28 01:15:28 bkorb Exp $
+#$Id: optcode.tpl,v 2.46 2000/10/28 18:17:32 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -241,7 +241,7 @@ IF (exist? "homerc")
      /* option argument  */ ARG_MUST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_DISABLEOK,
+     /* opt state flags  */ OPTST_DISABLE_IMM,
      /* last opt argumnt */ (char*)NULL,
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
@@ -318,8 +318,7 @@ tOptions [=(. pname)=]Options = {
     [=IF (exist? "usage")=][=usage=][=
       ELSE               =]optionUsage[=ENDIF=],
     ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
-    + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.disable")      =]
-    + OPTPROC_DISABLEOK[=  ENDIF=][=IF      (exist? "flag.value")        =]
+    + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
     + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long_opts")         =]
     + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
     + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]

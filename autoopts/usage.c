@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.14 2000/10/27 15:18:20 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.15 2000/10/28 18:17:32 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -61,7 +61,6 @@
 #endif
 
 tSCC zOptsOnly[]   = "All arguments are named options.\n";
-tSCC zInverted[]   = "Flag options are disabled with a '+' marker.\n";
 tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
 tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
 tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
@@ -92,8 +91,8 @@ tSCC zIntro[]      = "\n\
 The following option preset mechanisms are supported:\n";
 
 tSCC zFlagOkay[]   =
-"Options may be specified by doubled %1$ss and their name\n\
-or by a single %1$s and the flag character/option value.\n";
+"Options may be specified by doubled hyphens and their name\n\
+or by a single hyphen and the flag character (option value).\n";
 
 tSCC zNoFlags[]    =
 "Options are specified by their name and either single\n\
@@ -357,20 +356,16 @@ DEF_PROC_2( void optionUsage,
      *  Describe the mechanics of denoting the options
      */
     {
-        u_int  fOptSet = pOptions->fOptSet;
-        tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;
+        tCC*   pzFmt   =  (pOptions->fOptSet & OPTPROC_SHORTOPT)
+                          ? zFlagOkay : zNoFlags;
 
-        if ((fOptSet & OPTPROC_PLUSMARKS) != 0)
-            fputs( zInverted, fp );
+        if ((pOptions->fOptSet & OPTPROC_LONGOPT) != 0)
+            fputs( pzFmt, fp );
 
-        if ((fOptSet & OPTPROC_LONGOPT) != 0)
-            fprintf( fp, pzFmt,
-                     (fOptSet & OPTPROC_DISABLEOK) ? "marker" : "hyphen" );
-
-        else if ((fOptSet & OPTPROC_SHORTOPT) == 0)
+        else if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
             fputs( zOptsOnly, fp );
 
-        if ((fOptSet & OPTPROC_NUM_OPT) != 0)
+        if ((pOptions->fOptSet & OPTPROC_NUM_OPT) != 0)
             fputs( zNumberOpt, fp );
     }
 
@@ -383,7 +378,6 @@ DEF_PROC_2( void optionUsage,
      */
     if (exitCode == EXIT_SUCCESS) {
         ag_bool  initIntro = AG_TRUE;
-        u_int    fOptSet   = pOptions->fOptSet;
         tSCC     zPathFmt[] = " - reading file %s/%s\n";
 
         /*
@@ -425,7 +419,6 @@ DEF_PROC_2( void optionUsage,
             int        ct     = pOptions->optCt;
             int        optNo  = 0;
             tOptDesc*  pOD    = pOptions->pOptDesc;
-            int        docCt  = 0;
 
             fputc( '\n', fp );
             fflush( fp );

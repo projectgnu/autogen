@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 1.8 2000/10/11 16:19:19 bkorb Exp $
+ *  $Id: agShell.c,v 1.9 2000/10/28 18:17:32 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -75,6 +75,7 @@ closeServer( void )
     STATIC void
 sigHandler( int signo )
 {
+    extern char* strsignal PROTO(( int ));
     fprintf( stderr, "Closing server:  %s signal (%d) received\n",
              strsignal( signo ), signo );
     errClose = AG_TRUE;

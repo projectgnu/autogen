@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.20 2000/10/21 23:27:35 bkorb Exp $
+# $Id: optlib.tpl,v 1.21 2000/10/28 18:17:32 bkorb Exp $
 
 =]
 [=
@@ -356,7 +356,6 @@ DEFINE Option_Descriptor =][=
          =*   bool                     =]OPTST_BOOLEAN | [=
          =*   key                      =]OPTST_ENUMERATION | [=
          ESAC           =][=
-         IF (exist? "disable")         =]OPTST_DISABLEOK | [=   ENDIF=][=
          IF (exist? "stack_arg")       =]OPTST_STACKED | [=     ENDIF=][=
          IF (not (exist? "enabled"))   =]OPTST_DISABLED | [=
          ELSE                          =]OPTST_INITENABLED | [= ENDIF=][=

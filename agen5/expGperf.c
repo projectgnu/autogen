@@ -1,6 +1,5 @@
-
 /*
- *  $Id: expGperf.c,v 1.4 2000/09/30 14:59:01 bkorb Exp $
+ *  $Id: expGperf.c,v 1.5 2000/10/28 18:17:32 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -171,10 +170,9 @@ ag_scm_make_gperf( SCM name, SCM hlist )
 ag_scm_gperf( SCM name, SCM str )
 {
     ag_bool mustFree = AG_FALSE;
-    int     nameLen, strLen, cmdLen;
+    int     nameLen, strLen;
     char*   pzCmd;
     char*   pzStr;
-    char*   pzName = zScribble;
 
     if ((! gh_string_p( str )) || (! gh_string_p( name )))
         return SCM_UNDEFINED;

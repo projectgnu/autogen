@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: shell.test,v 1.12 2000/10/08 00:15:02 bkorb Exp $
+# $Id: shell.test,v 1.13 2000/10/28 18:17:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -53,7 +53,7 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -! no  more-help      Extended usage information passed thru pager
 
 Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character/option value.
+or by a single hyphen and the flag character (option value).
 _EOF_
 
 cmp -s $testname.h*lp || \
@@ -110,8 +110,8 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options may be specified by doubled markers and their name
-or by a single marker and the flag character/option value.
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character (option value).
 
 Note that `shell' is only useful if the output file does not already
 exist.  If it does, then the shell name and optional first argument
@@ -136,7 +136,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -! no  more-help      Extended usage information passed thru pager
 
 Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character/option value.
+or by a single hyphen and the flag character (option value).
 _EOF_
 
 cmp -s $testname.h*lp || \
@@ -157,7 +157,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -! no  more-help      Extended usage information passed thru pager
 
 Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character/option value.'
+or by a single hyphen and the flag character (option value).'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
@@ -169,7 +169,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -! no  more-help      Extended usage information passed thru pager
 
 Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character/option value.'
+or by a single hyphen and the flag character (option value).'
 
 
 TEST_SHELL_OPTION=''

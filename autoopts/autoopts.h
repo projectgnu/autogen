@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 2.15 2000/10/27 15:18:19 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 2.16 2000/10/28 18:17:32 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -100,7 +100,7 @@
 
 #ifndef FOPEN_BINARY_FLAG
 #  ifdef USE_FOPEN_BINARY
-#    define FOPEN_BINARY_FLAG	"b"
+#    define FOPEN_BINARY_FLAG   "b"
 #  else
 #    define FOPEN_BINARY_FLAG
 #  endif
@@ -108,7 +108,7 @@
 
 #ifndef FOPEN_TEXT_FLAG
 #  ifdef USE_TEXT_BINARY
-#    define FOPEN_TEXT_FLAG	"t"
+#    define FOPEN_TEXT_FLAG     "t"
 #  else
 #    define FOPEN_TEXT_FLAG
 #  endif
@@ -161,12 +161,19 @@ typedef enum {
     ENV_NON_IMM
 } teEnvPresetType;
 
+typedef enum {
+    TOPT_UNDEFINED = 0,
+    TOPT_SHORT,
+    TOPT_LONG,
+    TOPT_DEFAULT
+} teOptType;
+
 typedef struct {
     tOptDesc*  pOD;
     u_long     flags;
+    teOptType  optType;
     int        argType;
     char*      pzOptArg;
-    ag_bool    isLongOpt;
 } tOptState;
 
 #ifdef MEMDEBUG
@@ -182,6 +189,8 @@ typedef struct {
 #  define AGREALOC( p, c)  realloc( p, c )
 #  define AGFREE( p )      free( p )
 #endif
+
+extern void optionUsage PROTO(( tOptions*, int exitCode ));
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*

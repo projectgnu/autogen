@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.26 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: makeshell.c,v 2.27 2000/10/28 18:17:32 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -50,6 +50,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -386,9 +387,6 @@ STATIC char* loadTrailer( const char* );
     void
 putShellParse( tOptions* pOpts )
 {
-    tOptDesc* pOptDesc = pOpts->pOptDesc;
-    int       optionCt = pOpts->optCt;
-
     /*
      *  Check for our SHELL option now.
      *  IF the output file contains the "#!" magic marker,
@@ -526,6 +524,8 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
             pOD->pzLastArg = "c";
             doVersion( pOpts, pOD );
             /* NOTREACHED */
+
+        default:
             exit( EXIT_FAILURE );
         }
 
@@ -653,7 +653,7 @@ emitSetup( tOptions* pOpts )
         else pzFmt = zSingleDef;
 
         if (pOptDesc->fOptState & OPTST_NUMERIC) {
-            snprintf( zVal, sizeof( zVal ), "%d", pOptDesc->pzLastArg );
+            snprintf( zVal, sizeof( zVal ), "%ld", (tUL)pOptDesc->pzLastArg );
             pzValue = zVal;
         } else if (pOptDesc->pzLastArg == (char*)NULL)
             pzValue = "";
@@ -967,9 +967,9 @@ setShell( char** ppzData, char* pzEndMarker )
      *  THEN the 'rest' output starts on the next line.
      */
     if (pzEndMarker == (char*)NULL) {
-        *ppzData = strchr( pz, '\n' );
-        if (*ppzData != (char*)NULL)
-            *ppzData++;
+        (*ppzData) = strchr( pz, '\n' );
+        if ((*ppzData) != (char*)NULL)
+            (*ppzData)++;
     }
 
     /*

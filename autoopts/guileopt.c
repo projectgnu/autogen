@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 1.3 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: guileopt.c,v 1.4 2000/10/28 18:17:32 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -50,6 +50,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <guile/gh.h>
+
 #include "autoopts.h"
 
 DEF_PROC_1( void export_options_to_guile,
@@ -109,7 +111,7 @@ DEF_PROC_1( void export_options_to_guile,
          *  IF the option can occur several times, then emit the count.
          */
         if (pOD->optMaxCt > 1) {
-            sprintf( z, "(define opt-ct-%s %d)\n",
+            sprintf( z, "(define opt-ct-%s %ld)\n",
                      pOD->pz_Name, pOD->optOccCt );
 #ifdef DEBUG
             fputs( z, stderr );

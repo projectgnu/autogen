@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 2.5 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: enumeration.c,v 2.6 2000/10/28 18:17:32 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -102,15 +102,16 @@ DEF_PROC_4( char* optionEnumerationVal,
      *  IF there is no option struct pointer, then we are being
      *  called (indirectly) by the usage or putshell routine.
      *  They want the keyword or keyword list to be printed.
+     *  The returned result is ignored.
      */
     switch ((u_long)pOpts) {
     case 0UL:
         enumError( pOpts, pOD, paz_names, name_ct );
-        return;
+        return (char*)0UL;
 
     case 1UL:
         fputs( paz_names[ (int)(pOD->pzLastArg) ], stdout );
-        return;
+        return (char*)0UL;
 
     default:
         break;

@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: errors.test,v 1.8 2000/10/27 15:18:19 bkorb Exp $
+# $Id: errors.test,v 1.9 2000/10/28 18:17:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -53,7 +53,7 @@ USAGE:  errors [ -<flag> | --<name> ]... arg ...
    -! no  more-help      Extended usage information passed thru pager
 
 Options may be specified by doubled hyphens and their name
-or by a single hyphen and the flag character/option value.
+or by a single hyphen and the flag character (option value).
 _EOF_
 
 cmp -s $testname.h*lp || \

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 2.6 2000/10/27 15:18:20 bkorb Exp $
+ *  $Id: pgusage.c,v 2.7 2000/10/28 18:17:32 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -79,7 +79,7 @@ DEF_PROC_2( void doPagedUsage,
     case PAGER_STATE_INITIAL:
     {
         my_pid  = getpid();
-        snprintf( zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", my_pid );
+        snprintf( zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", (tUL)my_pid );
         unlink( zPageUsage );
 
         /*
@@ -120,7 +120,7 @@ DEF_PROC_2( void doPagedUsage,
          */
         snprintf( zPageUsage, sizeof(zPageUsage),
                   "%s /tmp/use.%lu ; rm -f /tmp/use.%2$lu",
-                  pzPager, my_pid );
+                  pzPager, (tUL)my_pid );
         fclose( stderr );
         dup2( STDOUT_FILENO, STDERR_FILENO );
 
