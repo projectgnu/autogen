@@ -5,7 +5,7 @@
 #
 # Copyright (C) 1999 Bruce Korb
 #
-# Last Modified:     Tue Aug  3 16:14:20 1999				      
+# Last Modified:     Mon Aug  9 09:46:27 1999				      
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # by:                Bruce Korb <korb@datadesign.com>			      
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=4
 AG_MINOR_VERSION=5
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".6pre"
+AG_PATCHLEVEL=".6"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
