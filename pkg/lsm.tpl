@@ -33,9 +33,16 @@ Author:         korb@datadesign.com (Bruce Korb)
 Maintained-by:  korbb@datadesign.com (Bruce Korb)
 
 Primary-site:   sunsite.unc.edu /pub/Linux/devel/lang/macro/
-                [=_EVAL "cd .. ; set -- auto*.gz
-                  echo `expr $(wc -c < $1) / 1024` kB $1"
-                  _shell=]
+                [=
+_EVAL '
+cd $top_builddir
+set -- autogen*.gz
+if [ $# -gt 1 ]
+then shift `expr $# - 1` ; fi
+
+ct="`expr \\( \`wc -c < $1\` + 1023 \\) / 1024`"
+echo $ct KB $1
+' _shell =]
 
 Alternate-site:
 
