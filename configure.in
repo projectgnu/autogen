@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2002 Bruce Korb
 dnl
-dnl Time-stamp:      "2002-08-18 15:47:14 bkorb"
+dnl Time-stamp:      "2002-08-18 18:14:01 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.9 2002/08/19 00:47:56 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.10 2002/08/19 02:14:09 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_PREREQ(2.50)
@@ -22,7 +22,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.9 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.10 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -75,8 +75,6 @@ AM_WITH_DMALLOC
 AC_PROG_CC
 AC_PROG_CC_STDC
 AC_EXEEXT
-ifdef([AC_LIBTOOL_WIN32_DLL],
-   AC_LIBTOOL_WIN32_DLL)
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
@@ -86,8 +84,8 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 # ----------------------------------------------------------------------
 AC_HEADER_STDC
 AC_HEADER_DIRENT
-AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h)
-AC_CHECK_HEADERS(sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
+AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h \
+    sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
 
 # If stdarg.h is present define HAVE_STDARG_H, otherwise if varargs.h
 # is present define HAVE_VARARGS_H.

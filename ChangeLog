@@ -5,11 +5,17 @@
 	* autoopts/autoopts-config.in: rework to use a list of options
 	* config/bootstrap(missing): use working directory, don't insist
 	upon "config" as the configury directory.
-	* config/conftest.tpl(Makefile.am): don't generate
-	* config/Makefile.am: restored
+	* config/conftest.tpl(Makefile.am): don't generate, move text to ..
+	* Makefile.am(DIST): distribute files from config/ directory
 	* configure.in(AC_INIT): update the version tag and bug address
 	* doc/Makefile.am(autogen.def): Put this in the standard build sequence
+	and kludge the source directory so the .info file can get rebuilt when
+	we are doing a "make distcheck".  Ick.
 	* pkg/libopts/mklibsrc.sh(if): use "test" instead of "[" - M4 quoting
+	* pkg/libopts/README: add more details about what one needs to do.
+	**NINE** steps are now enumerated.
+	* pkg/libopts/mklibsrc.sh(LIBOPTS_DIST): needed as "extra dist" stuff
+	for when libopts is already installed.
 
 2002-08-12  Bruce Korb  <bkorb@gnu.org>
 

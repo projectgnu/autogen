@@ -11,11 +11,24 @@ Usage Instructions for autoconf/automake/libtoolized projects:
 2. Add ''${tag}/Makefile'' to the list of configured files
 3. Move libopts.m4 to your autoconf macro directory
 4. Add ''AUTOOPTS_CHECK'' to your configure.ac file.
-5. Add ''@LIBOPTS_DIR@'' to your subdirectory build list.
+5. Add ''@LIBOPTS_DIR@'' to your SUBDIRS directory build list.
    It will be empty if not needed, otherwise ''${tag}''.
 6. Add ''@LIBOPTS_CFLAGS@'' to any mumble_CFLAGS that need it
 7. Add ''@LIBOPTS_LDADD@'' to any mumble_LDADD variables that
    will be linking against libopts.
+8. Make sure your object files explicitly depend upon the
+   generated options header file.  e.g.:
+
+     $(prog_OBJECTS) : prog-opts.h
+     prog-opts.h : prog-opts.c
+     prog-opts.c : prog-opts.def
+         autogen prog-opts.def
+9. Add ''@LIBOPTS_DIST@'' to "EXTRA_DIST".  If ''@LIBOPTS_DIR@''
+   is empty, it won't get built, but still needs to be distributed.
+   If it is not empty, it will automatically get distributed, so
+   ''@LIBOPTS_DIST@'' will be left empty.
+
+See how simple?  :-)
 
 If your package does not utilize the auto* tools, then you
 will need to hand craft the rules for building the library.
