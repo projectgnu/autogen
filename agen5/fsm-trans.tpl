@@ -162,14 +162,24 @@ DEFINE machine-step  =][=
             [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
 #endif[=
 
-
   IF (=* (get "method") "case")  =][=
     run-switch    =][=
   ELSE            =][=
     run-callback  =][=
-  ENDIF           =]
+  ENDIF
+
+=]
+#ifdef DEBUG
+    if (nxtSt != firstNext)
+        printf( "transition code changed destination state to %s(%d)\n",
+                [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
+#endif[=
+
+  IF (not (=* (get "type") "reent")) =]
+    [=(. pfx)=]_state = nxtSt;[=
+  ENDIF  =]
 [=
-ENDDEF       =][=
+ENDDEF  machine-step     =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -232,7 +242,10 @@ DEFINE make-step-proc  =]
  *  [=(. PFX)=]_ST_INIT and returns [=(. PFX)=]_ST_INIT.
  */
 [=mode=]te_[=(. pfx)=]_state
-[=(. pfx)=]_step(
+[=(. pfx)=]_step([=
+  IF (=* (get "type") "reent") =]
+    te_[= (. pfx) =]_state [= (. pfx) =]_state,[=
+  ENDIF  =]
     te_[= (. pfx) =]_event trans_evt[=
   FOR cookie =],
     [=cookie=][=
@@ -246,15 +259,17 @@ DEFINE stepping-machine
 {[=
     fsm-proc-variables  =]
 
-    if ((unsigned)[=(. pfx)=]_state >= [=(. PFX)=]_ST_INVALID) {
-        [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
+    if ((unsigned)[=(. pfx)=]_state >= [=(. PFX)=]_ST_INVALID) {[=
+  IF (=* (get "type") "step") =]
+        [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;[=
+  ENDIF  =]
         return [=(. PFX)=]_ST_INIT;
     }
 [=  machine-step =]
 
 [=(extract fsm-source "    /* %s == FINISH STEP == %s */")=]
 
-    return [=(. pfx)=]_state;
+    return nxtSt;
 }[=
 
 

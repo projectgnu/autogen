@@ -82,19 +82,6 @@ ENDDEF emit-cookie-args   =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE trans-change
-
-=]
-#ifdef DEBUG
-    if (nxtSt != firstNext)
-        printf( "transition code changed destination state to %s(%d)\n",
-                [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
-#endif[=
-
-ENDDEF trans-change    =][=
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
-
 DEFINE build-callback     =]
 static te_[=(. pfx)=]_state
 [=cb_prefix=]_[=cb_name=]([= emit-cookie-args =]
@@ -117,9 +104,6 @@ DEFINE run-callback
       (shellf "echo '%s'|sed 's,.*[ \t],,'" (get "cookie")) =], [=
 
   ENDFOR     =][=(. pfx)=]_state, nxtSt, trans_evt );[=
-
-  trans-change=]
-    [=(. pfx)=]_state = nxtSt;[=
 
 ENDDEF run-callback    =][=
 
@@ -159,9 +143,6 @@ DEFINE run-switch         =][=
            pfx "_state, trans_evt ));" ))=]
     }[=
 
-  trans-change=]
-    [=(. pfx)=]_state = nxtSt;[=
-
 ENDDEF run-switch       =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
@@ -177,9 +158,6 @@ DEFINE preamble
      (define pfx     (string->c-name! (string-downcase!
                         (if (exist? "prefix") (get "prefix") (base-name))  )))
      (define PFX     (string-upcase pfx))
-     (define hdrname (out-name))
-     (define guard   (string-upcase! (string->c-name! 
-                     (string-append hdrname "_GUARD" )  )))
      (define fsm-source ".fsm.head")  =][=
   ENDIF                 =][=
 

@@ -35,8 +35,7 @@ CASE (suffix) =][=
  *      to select the next state from the current state.
  *      [=(. PFX)=]_EV_INVALID is always defined at the end.
  */
-#ifndef [=(. guard)=]
-#define [=(. guard)=]
+[=(make-header-guard "autofsm")=]
 
 /*
  *  Finite State machine States
@@ -78,17 +77,17 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
     #
     #   We are implementing the machine.  Declare the external  =][=
 
-    CASE type  =][=
+    CASE type     =][=
 
-    =* step    =][= make-step-proc mode = "extern " =];[=
+    ~* step|reent =][= make-step-proc mode = "extern " =];[=
 
-    =* loop    =][= make-loop-proc mode = "extern " =];[=
+    =* loop       =][= make-loop-proc mode = "extern " =];[=
 
-    *          =][=
-    (error (sprintf
-           "invalid FSM type:  ``%s'' must be ``looping'' or ``stepping''"
-           (get "type"))) =][=
-    ESAC       =][=
+    *             =][=
+    (error (string-append "invalid FSM type:  ``" (get "type")
+           "'' must be ``looping'', ``stepping'' or ``reentrant''" ))
+    =][=
+    ESAC          =][=
 
     #  End external procedure declarations
     #
@@ -106,7 +105,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
         (get "method"))) =][=
   ESAC         =]
 
-#endif /* [=(. guard)=] */[=
+#endif /* [=(. header-guard)=] */[=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -123,7 +122,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 
 =]
 #define DEFINE_FSM
-#include "[=(. hdrname)=]"
+#include "[=(. header-file)=]"
 #include <stdio.h>
 
 /*
@@ -173,7 +172,7 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 
   =*  loop              =][=
     looping-machine     =][=
-  =*  step              =][=
+  ~*  step|reent        =][=
     stepping-machine    =][=
   ESAC                  =][=
 
