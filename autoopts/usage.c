@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.4 2002/07/27 04:13:35 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.5 2002/07/27 04:24:41 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -381,10 +381,6 @@ optionUsage( pOptions, exitCode )
     if (pOptions->pzExplain != NULL)
         fputs( pOptions->pzExplain, fp );
 
-    if (pOptions->pzBugAddr != NULL)
-        fprintf( fp, "\nplease send bug reports to:  %s\n",
-                 pOptions->pzBugAddr );
-
     /*
      *  IF the user is asking for help (thus exiting with SUCCESS),
      *  THEN see what additional information we can provide.
@@ -432,6 +428,10 @@ optionUsage( pOptions, exitCode )
         if (pOptions->pzDetail != NULL)
             fputs( pOptions->pzDetail, fp );
     }
+
+    if (pOptions->pzBugAddr != NULL)
+        fprintf( fp, "\nplease send bug reports to:  %s\n",
+                 pOptions->pzBugAddr );
 
     exit( exitCode );
 }
