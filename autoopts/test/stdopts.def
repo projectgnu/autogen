@@ -13,9 +13,9 @@ prog_name  = "test_${testname}";
 prog_title = "Test AutoOpts for ${testname}";
 _EOF_
 
-if ! ${no_test_main:-false}
+if [ -n "${test_main}" ]
 then
-  echo "test_main  = yes;" >&5
+  echo "test_main  = '${test_main}';" >&5
 fi
 
 if [ -n "${argument}" ]
