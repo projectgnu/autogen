@@ -47,6 +47,37 @@ DEFINE set_defines set_desc set_index opt_state =]
 ENDDEF
 =][=
 
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+  Emit the copyright comment
+
+  =][=
+
+DEFINE Option_Copyright =][=
+IF (exist? "copyright") =]
+/*
+ * [=(sprintf "%s copyright %s %s - all rights reserved"
+     (. prog-name) (get "copyright") (get "owner") ) =][=
+
+  IF (exist? "copyright_note") =]
+ *
+[=(get "copyright_note")=][=
+
+  ELIF (exist? "copyright_gpl") =]
+ *
+[=(gpl (. prog-name) " * " ) =][=
+
+  ELIF (exist? "copyright_lgpl") =]
+ *
+[=(lgpl (. prog-name) (get "owner") " * " ) =][=
+
+  ENDIF "copyright notes" =]
+ */[=
+ENDIF "copyright exists" =][=
+ENDDEF
+
+=][=
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Emit the #define's for a single option
