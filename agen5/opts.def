@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.12 1999/11/16 05:27:28 bruce Exp $
+ *   $Id: opts.def,v 1.13 2000/03/04 22:13:16 bruce Exp $
  */
 
 /*
@@ -34,8 +34,7 @@ eaddr          = "AutoGen@linuxbox.com";
 prog_name      = "AutoGen";
 prog_title     = "The Automated Program Generator";
 argument       = "[ <def-file> ]";
-homerc         = $HOME;
-homerc         = ".";
+homerc         = $HOME, ".";
 environrc;
 long_opts;
 include        = '#include "autogen.h"';
