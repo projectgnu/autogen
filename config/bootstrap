@@ -6,15 +6,36 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Jun 21 11:14:25 1999				      
+# Last Modified:     Wed Jul  7 13:00:30 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.15 1999/07/07 16:04:20 bkorb Exp $
+# $Id: bootstrap,v 1.16 1999/07/07 20:00:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
 
 chmod +x snprintfv/config/genproto
+
+autogen --help > /dev/null 2>&1 || {
+  echo AutoGen not available
+  exit 0
+}
+
+getdefs --help > /dev/null 2>&1 || {
+  echo getdefs not available
+  exit 0
+}
+
+columns --help > /dev/null 2>&1 || {
+  echo columns not available
+  exit 0
+}
+
+(
+  cd config
+  echo Genning config/ctime.m4
+  autogen ctime.def
+) || exit 1
 
 # Figure out the absolute path to the working directory.
 wd=`echo $0|sed 's,/[^/]*$,,'`
@@ -184,31 +205,10 @@ done
 test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
     || rm -f doc/autogen.texi
 
-autogen --help > /dev/null 2>&1 || {
-  echo AutoGen not available
-  exit 0
-}
-
-getdefs --help > /dev/null 2>&1 || {
-  echo getdefs not available
-  exit 0
-}
-
-columns --help > /dev/null 2>&1 || {
-  echo columns not available
-  exit 0
-}
-
 which which > /dev/null 2>&1 || {
   echo Cannot determine program locations
   exit 0
 }
-
-(
-  cd config
-  echo Genning config/ctime.m4
-  autogen ctime.def
-) || exit 1
 
 find . -name bootstrap |
 egrep -v '(CVS/Base/|config/bootstrap)'   |
