@@ -2,20 +2,19 @@
 
 /* pathfind.c --- find a FILE  MODE along PATH */
 
-/* Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
+/*
+ * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 1998/05/26 19:00:35 $
+ * Last Modified:    $Date: 1998/08/03 15:46:07 $
  *            by:    Bruce Korb <korbb@datadesign.com>
  *
- * $Id: pathfind.c,v 1.2 1998/05/26 19:00:35 bkorb Exp $
+ * $Id: pathfind.c,v 1.3 1998/08/03 15:46:07 bkorb Exp $
  */
 
 /* Code: */
 
 #include "compat.h"
 #ifndef HAVE_PATHFIND
-
-/* Code: */
 
 #ifndef STATIC
 #  ifdef DEBUG
@@ -122,7 +121,8 @@ pathfind( const char*  path,
     return pathName;
 }
 
-/* Turn STRING	(a pathname) into an  absolute	pathname, assuming  that
+/*
+ * Turn STRING  (a pathname) into an  absolute  pathname, assuming  that
  * DOT_PATH contains the symbolic location of  `.'.  This always returns
  * a new string, even if STRING was an absolute pathname to begin with.
  */
@@ -133,37 +133,38 @@ make_absolute( const char *string, const char *dot_path )
     int result_len;
   
     if (!dot_path || *string == '/') {
-	result = strdup( string );
+        result = strdup( string );
     } else {
-	if (dot_path && dot_path[0]) {
-	    result = malloc( 2 + strlen( dot_path ) + strlen( string ) );
-	    strcpy( result, dot_path );
-	    result_len = strlen( result );
-	    if (result[result_len - 1] != '/') {
-		result[result_len++] = '/';
-		result[result_len] = '\0';
-	    }	 
-	} else {
-	    result = malloc( 3 + strlen( string ) );
-	    result[0] = '.'; result[1] = '/'; result[2] = '\0';
-	    result_len = 2;
-	}
+        if (dot_path && dot_path[0]) {
+            result = malloc( 2 + strlen( dot_path ) + strlen( string ) );
+            strcpy( result, dot_path );
+            result_len = strlen( result );
+            if (result[result_len - 1] != '/') {
+                result[result_len++] = '/';
+                result[result_len] = '\0';
+            }    
+        } else {
+            result = malloc( 3 + strlen( string ) );
+            result[0] = '.'; result[1] = '/'; result[2] = '\0';
+            result_len = 2;
+        }
 
-	strcpy( result + result_len, string );
+        strcpy( result + result_len, string );
     }
 
     return result;
 }
 
-/* Canonicalize PATH, and return a  new path.  The new path differs from
+/*
+ * Canonicalize PATH, and return a  new path.  The new path differs from
  * PATH in that:
  *
- *    Multiple `/'s	are collapsed to a single `/'.
- *    Leading `./'s	are removed.
- *    Trailing `/.'s	 are removed.
- *    Trailing `/'s	are removed.
+ *    Multiple `/'s     are collapsed to a single `/'.
+ *    Leading `./'s     are removed.
+ *    Trailing `/.'s    are removed.
+ *    Trailing `/'s     are removed.
  *    Non-leading `../'s and trailing `..'s are handled by removing
- *		      portions of the path.
+ *                    portions of the path.
  */
 STATIC char*
 canonicalize_pathname( char *path )
@@ -179,73 +180,74 @@ canonicalize_pathname( char *path )
     /* Walk along RESULT looking for things to compact. */
     i = 0;
     while (result[i]) {
-	while (result[i] != '\0' && result[i] != '/')
-	    i++;
+        while (result[i] != '\0' && result[i] != '/')
+            i++;
 
-	start = i++;
+        start = i++;
 
-	/* If we didn't find any  slashes, then there is nothing left to
-	 * do.
-	 */
-	if (!result[start])
-	    break;
+        /* If we didn't find any  slashes, then there is nothing left to
+         * do.
+         */
+        if (!result[start])
+            break;
 
-	/* Handle multiple `/'s in a row. */
-	while (result[i] == '/')
-	    i++;
+        /* Handle multiple `/'s in a row. */
+        while (result[i] == '/')
+            i++;
 
 #if !defined (apollo)
-	if ((start + 1) != i)
+        if ((start + 1) != i)
 #else
-	if ((start + 1) != i && (start != 0 || i != 2))
+        if ((start + 1) != i && (start != 0 || i != 2))
 #endif /* apollo */
-	{
-	    strcpy( result + start + 1, result + i );
-	    i = start + 1;
-	}
+        {
+            strcpy( result + start + 1, result + i );
+            i = start + 1;
+        }
 
-	/* Handle backquoted `/'. */
-	if (start > 0 && result[start - 1] == '\\')
-	    continue;
+        /* Handle backquoted `/'. */
+        if (start > 0 && result[start - 1] == '\\')
+            continue;
 
-	/* Check for trailing `/', and `.' by itself. */
-	if ((start && !result[i])
-	    || (result[i] == '.' && !result[i+1])) {
-	    result[--i] = '\0';
-	    break;
-	}
+        /* Check for trailing `/', and `.' by itself. */
+        if ((start && !result[i])
+            || (result[i] == '.' && !result[i+1])) {
+            result[--i] = '\0';
+            break;
+        }
 
-	/* Check for `../', `./' or trailing `.' by itself. */
-	if (result[i] == '.') {
-	    /* Handle `./'. */
-	    if (result[i + 1] == '/') {
-		strcpy( result + i, result + i + 1 );
-		i = (start < 0) ? 0 : start;
-		continue;
-	    }
+        /* Check for `../', `./' or trailing `.' by itself. */
+        if (result[i] == '.') {
+            /* Handle `./'. */
+            if (result[i + 1] == '/') {
+                strcpy( result + i, result + i + 1 );
+                i = (start < 0) ? 0 : start;
+                continue;
+            }
 
-	    /* Handle `../' or trailing `..' by itself. */
-	    if (result[i + 1] == '.' &&
-		(result[i + 2] == '/' || !result[i + 2])) {
-		while (--start > -1 && result[start] != '/')
-		    ;
-		strcpy( result + start + 1, result + i + 2 );
-		i = (start < 0) ? 0 : start;
-		continue;
-	    }
-	}
+            /* Handle `../' or trailing `..' by itself. */
+            if (result[i + 1] == '.' &&
+                (result[i + 2] == '/' || !result[i + 2])) {
+                while (--start > -1 && result[start] != '/')
+                    ;
+                strcpy( result + start + 1, result + i + 2 );
+                i = (start < 0) ? 0 : start;
+                continue;
+            }
+        }
     }
 
     if (!*result) {
-	*result = stub_char;
-	result[1] = '\0';
+        *result = stub_char;
+        result[1] = '\0';
     }
 
     return result;
 }
 
-/* Given a  string containing units of information separated  by colons,
- * return the next one	pointed to by (P_INDEX), or NULL if there are no
+/*
+ * Given a  string containing units of information separated  by colons,
+ * return the next one  pointed to by (P_INDEX), or NULL if there are no
  * more.  Advance (P_INDEX) to the character after the colon.
  */
 STATIC char*
