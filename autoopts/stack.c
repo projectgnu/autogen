@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 2.1 1999/06/14 18:07:56 bkorb Exp $
+ *  $Id: stack.c,v 2.2 1999/06/15 14:46:33 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -68,6 +68,11 @@
     void
 unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
 {
+    /*
+     *  IF the target system is too feeble to have a POSIX regex,
+     *  THEN it is also too feeble to unstack option arguments
+     */
+#ifdef HAVE_POSIX_REGCOMP
     regex_t   pzExpBuf;
     tArgList* pAL = (tArgList*)pOptDesc->optCookie;
     int       ct, sIdx, dIdx;
@@ -101,6 +106,7 @@ unstackOptArg( tOptions*  pOpts, tOptDesc*  pOptDesc )
     }
 
     regfree( &pzExpBuf );
+#endif
 }
 
 
