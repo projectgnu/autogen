@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.47 2000/03/11 21:36:17 bruce Exp $
+## $Id: auto_gen.tpl,v 2.48 2000/03/12 21:39:07 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -819,10 +819,10 @@ Extracted from $top_srcdir/agen5/defParse.y
 @end ignore
 @example
 [= # extract the syntax from defParse.y, then escape the characters
-     that texi sees as operators:  =][=
+     that texi sees as operators and remove comments:  =][=
 
  ` sed -n -e '/^definitions/,$p' $top_srcdir/agen5/defParse.y |
-   sed -e 's/{/@{/g' -e 's/}/@}/g' ` =]
+   sed -e 's/{/@{/g' -e 's/}/@}/g' -e '/^\\/\\*/,/^ \\*\\//d' ` =]
 @end example
 
 @node Definitionless
@@ -1052,7 +1052,7 @@ The expression must end before the end macro marker.
 This is a @i{fairly} raw text string.  It is not completely raw
 because backslash escapes are processed before 3 special characters:
 single quote (@code{'}), the hash character (@code{#}) and
-backslash (@code{\\}).
+backslash (@code{\}).
 
 @item @code{"} (double quote)
 This is a cooked text string.  The string is processed as in a
@@ -1103,10 +1103,7 @@ FOR gfunc =][=
       (if (exist? "string") (get "string") func-name))
  =]
 * SCM [= (sprintf "%-20s" (string-append func-str "::"))
-  =][=
-  IF (exist? "what") =][=what=][=
-  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
-  ENDIF =][=
+  =][= (string-append "@file{" func-name "} - " (get "what")) =][=
 ENDFOR gfunc =]
 @end menu
 
@@ -1120,10 +1117,7 @@ FOR gfunc =][=
       (if (exist? "string") (get "string") func-name))
  =]
 @node SCM [= (. func-str) =]
-@subsection [=
-  IF (exist? "what") =][=what=][=
-  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
-  ENDIF =]
+@subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
 @ignore
