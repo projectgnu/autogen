@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     $Date: 2003/04/13 21:42:13 $
+## Last Modified:     $Date: 2003/05/26 03:14:59 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.8 2003/04/13 21:42:13 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.9 2003/05/26 03:14:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -29,17 +29,21 @@ prog_name
  =] Invoking [=
 prog_name
 =]
-@cindex [= % prog_name
- (define down-prog-name (string-downcase! "%s"))
- (. down-prog-name) =] invocation
+@cindex [=
+ (define down-prog-name (string-downcase! (get "prog-name")))
+ down-prog-name =] invocation
 @ignore
 [=
-(out-push-new (shellf
-"f=`echo %1$s | sed 's/texi$/menu/'`
- echo $f" (out-name)) )
-=]* [= % prog_name (sprintf "%%-32s"  "%s Invocation::")
-     =] Invoking [=prog_name=]
-[=(out-pop)
+
+ (out-push-new (string-substitute (out-name) ".texi" ".menu"))
+
+ (sprintf "* %-32s Invoking %s\n"
+  (string-append (get "prog-name") " Invocation::")
+  (get "prog-name") )
+
+=][=
+
+  (out-pop)
   (dne "# " "# ")=]
 @end ignore
 [=explain=]
@@ -70,8 +74,8 @@ This software is released under [=
 ENDIF =]
 
 @menu
-* [=(sprintf "%s %-24s" (. down-prog-name) "usage::")
-  =] [=prog_name=] usage help[=
+* [=(sprintf "%s %-24s %s" down-prog-name "usage::" (get "prog-name"))
+  =] usage help[=
      (if (exist? "flag.value") " (-?)") =]
 [=(out-push-new (string-append (out-name) ".tmp"))
   (shell (string-append "f=" (out-name))) =][=

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.19 2003/05/22 04:23:01 bkorb Exp $
+ *  $Id: defLex.c,v 3.20 2003/05/26 03:14:59 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */

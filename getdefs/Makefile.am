@@ -4,13 +4,14 @@
 ##
 ##    AutoGen copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-21 17:58:00 bkorb"
+## Time-stamp:      "2003-05-18 11:42:53 bkorb"
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.10 2003/04/22 01:40:20 bkorb Exp $
+## $Id: Makefile.am,v 3.11 2003/05/26 03:14:59 bkorb Exp $
 ## ---------------------------------------------------------------------
+TARG = getdefs
 
 bin_PROGRAMS    = getdefs
 gdsrcs          = getdefs.h getdefs.c gdemit.c gdinit.c opts.c
@@ -22,8 +23,8 @@ BUILT_SOURCES   = opts.c opts.h
 EXTRA_DIST      = opts.def $(gdsrcs)
 AGEXE           = $(top_builddir)/agen5/@AGEXE@ -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
-man_MANS        = getdefs.1
-DOCFILES        = getdefs.texi getdefs.menu getdefs.1
+man_MANS        = $(TARG).1
+DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_getdefs_SOURCES) *-stamp
 INCLUDES        = @INCLIST@
@@ -37,16 +38,18 @@ gd.c : $(gdsrcs)
 	  for f in $(gdsrcs) ; do echo "#include \"$$f\"" ; done ) > $@
 
 opts.h : opts.def
-	top_builddir=$(top_builddir) COLUMNS_EXE=`cd ../columns;pwd`/columns \
-	$(AGEXE) -L$(top_srcdir)/autoopts $(srcdir)/opts.def
+	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) ; \
+	export top_builddir top_srcdir ; \
+	COLUMNS_EXE=`cd ../columns;pwd`/columns \
+	$(AGEXE) $(srcdir)/opts.def
 
 $(DOCFILES) : doc-stamp
 
-doc-stamp : opts.def getdefs$(EXEEXT)
-	top_builddir=$(top_builddir) \
-	$(AGEXE) -Taginfo -bgetdefs -DLEVEL=section \
-		$(top_srcdir)/getdefs/opts.def
-	$(AGEXE) -T agman1 -b getdefs $(srcdir)/opts.def
+doc-stamp : opts.def $(TARG)$(EXEEXT)
+	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) ; \
+	export top_builddir top_srcdir ; \
+	$(AGEXE) -Tagman1 -b$(TARG) $(srcdir)/opts.def ; \
+	$(AGEXE) -Taginfo -b$(TARG) -DLEVEL=section $(srcdir)/opts.def
 	@touch $@
 
 # Makefile.am ends here

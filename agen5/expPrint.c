@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: expPrint.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -100,15 +100,15 @@ EXPORT SCM
 run_printf( char* pzFmt, int len, SCM alist )
 {
     SCM     res;
+    void*   args[8];
     void**  arglist;
     void**  argp;
 
-    void**  freelist;
-    void**  freep;
-
-    arglist  =
-    argp     = (void**)AGALOC( 2 * (len+1) * sizeof(void*), "aprintfv buffer" );
-    freelist = freep = argp + len + 1;
+    if (len < 8)
+        arglist = argp = args;
+    else
+        arglist =
+        argp    = (void**)malloc( (len+1) * sizeof(void));
 
     while (len-- > 0) {
         SCM  car = SCM_CAR( alist );
@@ -137,7 +137,7 @@ run_printf( char* pzFmt, int len, SCM alist )
 
         case GH_TYPE_SYMBOL:
         case GH_TYPE_STRING:
-            *(freep++) = *(argp++) = (void*)gh_scm2newstr( car, NULL );
+            *(argp++) = (void*)ag_scm2zchars( car, "printf str" );
             break;
 
         case GH_TYPE_PROCEDURE:
@@ -162,10 +162,9 @@ run_printf( char* pzFmt, int len, SCM alist )
         free( pzBuf );
     }
 
-    while (freelist < freep)
-        free( *(freelist++) );
+    if (arglist != args)
+        AGFREE( (void*)arglist );
 
-    AGFREE( (void*)arglist );
     return res;
 }
 

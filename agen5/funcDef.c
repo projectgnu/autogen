@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.18 2003/05/18 17:12:30 bkorb Exp $
+ *  $Id: funcDef.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */

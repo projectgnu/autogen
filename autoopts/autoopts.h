@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-04-28 18:41:25 bkorb"
+ *  Time-stamp:      "2003-05-25 19:21:39 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.15 2003/04/29 01:51:05 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.16 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -130,43 +130,32 @@ typedef struct {
     char*      pzOptArg;
 } tOptState;
 
-#if defined( __STDC__ ) || defined( __cplusplus )
-#  ifndef PROTO
-#    define PROTO(s) s
-#  endif
-
-#else
-#  ifndef PROTO
-#    define PROTO(s) ()
-#  endif
-
-#endif
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  MEMORY DEBUGGING
- */
-
-#ifndef AUTOGEN_BUILD
 #  define AGALOC( c, w )        malloc( c )
 #  define AGREALOC( p, c, w )   realloc( p, c )
-#  define AGDUPSTR( p, s, w )   strdup( p )
 #  define AGFREE( p )           free( p )
 #  define TAGMEM( m, t )
 
-#else  /* AUTOGEN_BUILD is defined: */
+#ifndef AUTOGEN_BUILD
+#  define AGDUPSTR( p, s, w )   p = strdup( s )
+
+#else /* AUTOGEN_BUILD is defined, use snprintfv and a private strdup: */
 #  include <snprintfv/printf.h>
 
-   extern void* aopts_alloc( size_t, const char* );
-   extern void* aopts_realloc( void*, size_t, const char* );
-   extern char* aopts_strdup( const char* pz, const char* );
-
-#  define AGALOC( c, w )      aopts_alloc( c, w )
-#  define AGREALOC( p, c, w ) aopts_realloc( p, c, w )
 #  define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w )
-#  define AGFREE( p )         free( p )
-#  define TAGMEM( m, t )
 
+/*
+ *  There are some systems out there where autogen is broken if "strdup"
+ *  is allowed to duplicate strings smaller than 32 bytes.  This ensures
+ *  that we work.  We also round up everything up to 32 bytes.
+ */
+static inline char*
+aopts_strdup( tCC* pz, tCC* pzWhat )
+{
+    size_t  len = strlen( pz )+1;
+    char*   pzRes = AGALOC( (len + 0x20) & ~0x1F, pzWhat );
+    memcpy( pzRes, pz, len );
+    return pzRes;
+}
 #endif /* AUTOGEN_BUILD */
 
 /*
@@ -178,13 +167,13 @@ extern FILE* option_usage_fp;
  *  optionUsage print the usage text for the program described by the
  *  option descriptor.  Does not return.  Calls ``exit(3)'' with exitCode.
  */
-extern void optionUsage PROTO(( tOptions*, int exitCode ));
+extern void optionUsage( tOptions*, int exitCode );
 
 /*
  *  optionSave saves the option state into an RC or INI file in
  *  the *LAST* defined directory in the papzHomeList.
  */
-void    optionSave PROTO((   tOptions* pOpts ));
+extern void optionSave( tOptions* pOpts );
 
 /*
  *  optionMakePath  --  translate and construct a path
@@ -193,11 +182,11 @@ void    optionSave PROTO((   tOptions* pOpts ));
  *  is a ``$''.  If it starts with two dollar characters, then the path
  *  is relative to the location of the executable.
  */
-ag_bool optionMakePath PROTO((
+extern ag_bool optionMakePath(
     char*    pzBuf,
     size_t   bufSize,
     tCC*     pzName,
-    tCC*     pzProgPath ));
+    tCC*     pzProgPath );
 
 extern tOptProc doVersion, doPagedUsage, doLoadOpt;
 

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.20 2003/04/21 03:35:35 bkorb Exp $
+ *   $Id: opts.def,v 3.21 2003/05/26 03:14:59 bkorb Exp $
  *
  *  AutoGen copyright 1992-2003 Bruce Korb
  *
@@ -542,7 +542,7 @@ flag = {
     descrip     = "Show the definition tree";
 #ifndef XML2AG
     no_preset;
-    ifdef       = DEBUG;
+    ifdef       = DEBUG_ENABLED;
     doc =
     "This will print out the complete definition tree before processing\n"
     "the template.";
@@ -556,7 +556,7 @@ flag = {
     descrip     = "Show shell commands";
 #ifndef XML2AG
     no_preset;
-    ifdef       = DEBUG;
+    ifdef       = DEBUG_ENABLED;
     doc =
     "This will cause @code{set -x} to be executed in the shell, with\n"
     "the resultant output printed to /dev/tty.  This option will have no\n"

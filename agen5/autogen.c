@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.30 2003/05/24 02:49:48 bkorb Exp $
+ *  $Id: autogen.c,v 3.31 2003/05/26 03:14:59 bkorb Exp $
  *  This is the main routine for autogen.
  */
 

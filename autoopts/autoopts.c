@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.24 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: autoopts.c,v 3.25 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -82,9 +82,7 @@ typedef int tDirection;
  *  if any.
  */
 STATIC tSuccess
-loadValue( pOpts, pOptState )
-    tOptions*  pOpts;
-    tOptState* pOptState;
+loadValue( tOptions* pOpts, tOptState* pOptState )
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -165,10 +163,7 @@ loadValue( pOpts, pOptState )
  *  Find the long option descriptor for the current option
  */
 STATIC tSuccess
-longOptionFind( pOpts, pzOptName, pOptState )
-    tOptions*   pOpts;
-    char*       pzOptName;
-    tOptState*  pOptState;
+longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
 {
     ag_bool    disable  = AG_FALSE;
     char*      pzEq     = strchr( pzOptName, '=' );
@@ -298,10 +293,7 @@ longOptionFind( pOpts, pzOptName, pOptState )
  *  Find the short option descriptor for the current option
  */
 STATIC tSuccess
-shortOptionFind( pOpts, optValue, pOptState )
-    tOptions*   pOpts;
-    tUC         optValue;
-    tOptState*  pOptState;
+shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
     int        ct   = pOpts->optCt;
@@ -366,9 +358,7 @@ shortOptionFind( pOpts, optValue, pOptState )
  *  Find the option descriptor for the current option
  */
 STATIC tSuccess
-findOptDesc( pOpts, pOptState )
-    tOptions*  pOpts;
-    tOptState* pOptState;
+findOptDesc( tOptions* pOpts, tOptState* pOptState )
 {
     /*
      *  IF we are continuing a short option list (e.g. -xyz...)
@@ -448,9 +438,7 @@ findOptDesc( pOpts, pOptState )
  *  without consequence (side effect).
  */
 STATIC tSuccess
-nextOption( pOpts, pOptState )
-    tOptions*   pOpts;
-    tOptState*  pOptState;
+nextOption( tOptions* pOpts, tOptState* pOptState )
 {
     tSuccess res;
 
@@ -638,11 +626,11 @@ nextOption( pOpts, pOptState )
  *  is relative to the location of the executable.
  */
 ag_bool
-optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
-    char*    pzBuf;
-    size_t   bufSize;
-    tCC*     pzName;
-    tCC*     pzProgPath;
+optionMakePath(
+    char*    pzBuf,
+    size_t   bufSize,
+    tCC*     pzName,
+    tCC*     pzProgPath )
 {
     if (bufSize <= strlen( pzName ))
         return AG_FALSE;
@@ -760,8 +748,7 @@ optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
  *  doImmediateOpts - scan the command line for immediate action options
  */
 STATIC tSuccess
-doImmediateOpts( pOpts )
-    tOptions*  pOpts;
+doImmediateOpts( tOptions* pOpts )
 {
     /*
      *  IF the struct version is not the current, and also
@@ -772,7 +759,7 @@ doImmediateOpts( pOpts )
        && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
           || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
-#if  defined( __STDC__ ) || defined( __cplusplus )
+
         tSCC zErr[] =
             "Automated Options Processing Error!\n"
             "\t%s called optionProcess with structure version %d:%d:%d.\n";
@@ -789,24 +776,6 @@ doImmediateOpts( pOpts )
             fputs( zBig, stderr );
         else
             fputs( zSml, stderr );
-#else
-        tSCC zErr[] =
-            "Automated Options Processing Error!\n";
-        tSCC zVer[] =
-            "\t%s called optionProcess with structure version %d:%d:%d.\n";
-        tSCC zBig[] =
-            "\tThis exceeds the compiled library version:  %s\n";
-        tSCC zSml[] =
-            "\tThis is less than the minimum library version: %s\n";
-
-        fputs( zErr, stderr );
-        fprintf( stderr, zVer, pOpts->origArgVect[0],
-                 NUM_TO_VER( pOpts->structVersion ));
-        if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-            fprintf( stderr, zBig, OPTIONS_VERSION_STRING );
-        else
-            fprintf( stderr, zSml, OPTIONS_MIN_VER_STRING );
-#endif
 
         exit( EXIT_FAILURE );
     }
@@ -884,11 +853,11 @@ doImmediateOpts( pOpts )
 
 
 STATIC void
-loadOptionLine( pOpts, pOS, pzLine, direction )
-    tOptions*  pOpts;
-    tOptState* pOS;
-    char*      pzLine;
-    tDirection direction;
+loadOptionLine(
+    tOptions*  pOpts,
+    tOptState* pOS,
+    char*      pzLine,
+    tDirection direction )
 {
     /*
      *  Strip off the first token on the line.
@@ -1016,10 +985,10 @@ loadOptionLine( pOpts, pOS, pzLine, direction )
  *  Load a file containing presetting information (an RC file).
  */
 STATIC void
-filePreset( pOpts, pzFileName, direction )
-    tOptions*     pOpts;
-    const char*   pzFileName;
-    int           direction;
+filePreset(
+    tOptions*     pOpts,
+    const char*   pzFileName,
+    int           direction )
 {
     typedef enum { SEC_NONE, SEC_LOOKING, SEC_PROCESS } teSec;
     teSec   sec     = SEC_NONE;
@@ -1130,9 +1099,7 @@ filePreset( pOpts, pzFileName, direction )
  *  This routine should process in all, immediate or normal modes....
  */
 STATIC void
-doEnvPresets( pOpts, type )
-    tOptions*       pOpts;
-    teEnvPresetType type;
+doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 {
     int        ct;
     tOptState  st;
@@ -1252,8 +1219,7 @@ doEnvPresets( pOpts, type )
  *  doPresets - check for preset values from an rc file or the envrionment
  */
 STATIC tSuccess
-doPresets( pOpts )
-    tOptions*  pOpts;
+doPresets( tOptions* pOpts )
 {
 #   define SKIP_RC_FILES \
     DISABLED_OPT(&(pOpts->pOptDesc[ pOpts->specOptIdx.save_opts+1]))
@@ -1364,8 +1330,7 @@ doPresets( pOpts )
  *  Make sure that the argument list passes our consistency tests.
  */
 STATIC int
-checkConsistency( pOpts )
-    tOptions*  pOpts;
+checkConsistency( tOptions* pOpts )
 {
     int       errCt = 0;
 
@@ -1541,9 +1506,7 @@ void optionLoadLine( pOpts, pzLine )
  *  This is callable from the option descriptor.
  *  It is referenced when homerc files are enabled.
  */
-void doLoadOpt( pOpts, pOptDesc )
-    tOptions*  pOpts;
-    tOptDesc*  pOptDesc;
+void doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
 {
     /*
      *  IF the option is not being disabled,
@@ -1594,7 +1557,7 @@ void doLoadOpt( pOpts, pOptDesc )
  *  The returned string cannot be modified.
 =*/
 const char*
-optionVersion()
+optionVersion( void )
 {
     static const char zVersion[] =
         STR( AO_CURRENT.AO_REVISION );
@@ -1635,10 +1598,10 @@ optionVersion()
  *       ERRSKIP_OPTERR or ERRSTOP_OPTERR macros were invoked.
 =*/
 int
-optionProcess( pOpts, argCt, argVect )
-    tOptions*  pOpts;
-    int        argCt;
-    char**     argVect;
+optionProcess(
+    tOptions*  pOpts,
+    int        argCt,
+    char**     argVect )
 {
     /*
      *  Establish the real program name, the program full path,

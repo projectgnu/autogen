@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 3.9 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: funcIf.c,v 3.10 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */

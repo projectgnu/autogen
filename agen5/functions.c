@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.16 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: functions.c,v 3.17 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module implements text functions.
  */

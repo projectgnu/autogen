@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.8 2003/04/29 01:51:05 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.9 2003/05/26 03:14:59 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -185,64 +185,6 @@ strtransform( d, s )
         *(d++) = (char)charmap[ (unsigned)*s ];
     } while (*(s++) != NUL);
 }
-
-#ifdef AUTOGEN_BUILD
-tSCC  zAllocErr[] = "AutoOpts allocation failed for %d bytes of %s\n";
-
-void*
-aopts_alloc( size_t sz, tCC* pzWhat )
-{
-    void* p = malloc( sz );
-    if ((p == NULL) && (pzWhat != NULL)) {
-        fprintf( stderr, zAllocErr, sz, pzWhat );
-        exit( EXIT_FAILURE );
-    }
-    return p;
-}
-
-
-void*
-aopts_realloc( void* p, size_t sz, tCC* pzWhat )
-{
-    void* np = p ? realloc( p, sz ) : malloc( sz );
-    if (np == NULL) {
-        if (pzWhat != NULL) {
-            fprintf( stderr, zAllocErr, sz, pzWhat );
-            exit( EXIT_FAILURE );
-        }
-
-        if (p != NULL)
-            free( p );
-    }
-
-    return np;
-}
-
-
-char*
-aopts_strdup( tCC* pz, tCC* pzWhat )
-{
-    char*   pzRes;
-    size_t  len = strlen( pz )+1;
-
-    /*
-     *  There are some systems out there where autogen is
-     *  broken if "strdup" is allowed to duplicate strings
-     *  smaller than 32 bytes.  This ensures that we work.
-     *  We also round up everything up to 32 bytes.
-     */
-    if (len < 0x20)
-         len = 0x20;
-    else len = (len + 0x20) & ~0x1F;
-
-    pzRes = aopts_alloc( len, pzWhat );
-
-    if (pzRes != NULL)
-        strcpy( pzRes, pz );
-
-    return pzRes;
-}
-#endif /* AUTOGEN_BUILD */
 
 /*
  * Local Variables:

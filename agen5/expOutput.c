@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.17 2003/05/24 02:49:48 bkorb Exp $
+ *  $Id: expOutput.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */

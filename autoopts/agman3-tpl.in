@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2002-06-10 17:10:34 bkorb"
+## Time-stamp:      "2003-05-25 15:06:13 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman3-tpl.in,v 3.4 2003/02/16 00:04:40 bkorb Exp $
+## $Id: agman3-tpl.in,v 3.5 2003/05/26 03:14:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 null
@@ -44,7 +44,7 @@ FOR export_func                +}{+
 {+
 
 ;; The following "dne" argument is a string of 5 characters:
-;; '.' '\\' '"' and two spaces.  It _is_ hard to read.
+;; '.' '\\' '"' and two spaces.  It _is_ hard to read. "
 ;;
 (dne ".\\\"  ")
 
@@ -54,17 +54,17 @@ FOR export_func                +}{+
 {+name+} - {+what+}
 .sp 1
 .SH SYNOPSIS
+{+IF (exist? "header") +}
+#include <\fI{+header+}\fP>
+.br{+
+  ENDIF+}
 cc [...] -o outfile infile.c -l{+library+} [...]
-{+
-
-  IF (exist? "header") +}
-#include "\fI{+header+}\fP"
-{+ENDIF+}
+.sp 1
 {+ ?% ret-type "%s" void
 +} \fB{+name+}\fP({+
   IF (not (exist? "arg")) +}void{+
   ELSE  +}{+
-    FOR arg ", " +}{+arg-type+} {+arg-name+}{+
+    FOR arg ", " +}{+arg-type+} \fI{+arg-name+}\fP{+
     ENDFOR arg +}{+
   ENDIF +});
 .sp 1
@@ -92,6 +92,14 @@ sed \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 {+
 (get "doc")    +}{+
+  IF (exist? "arg") +}{+
+    FOR arg         +}
+.TP
+.IR {+ arg-name +}
+{+ arg-desc  +}{+
+
+    ENDFOR  arg     +}{+
+  ENDIF  arg exists +}{+
 
   IF (exist? "ret-type") +}
 .sp 1
@@ -112,8 +120,14 @@ _End_Of_Man_{+
 .SH SEE ALSO
 The \fIinfo\fP documentation for the \fI-l{+library+}\fP library.
 .br
-{+(shellf "echo '%s' | \
-sed 's,%s(3) ,,;s/3) $/3)/;s/(3) /(3), /g'" see-also (get "name"))+}
+{+
+(define tmp-txt (get "see"))
+(if (> (string-length see-also) 0)
+    (set! tmp-txt (string-append see-also ", " tmp-txt))  )
+
+(shellf "set -x ;echo '%s' | \
+sed 's@%s(3) @@;s/3) $/3)/;s/(3) /(3), /g;s/, *,/,/g;s/^, *//'"
+    tmp-txt (get "name")) +}
 {+
 
     (out-pop)    +}{+

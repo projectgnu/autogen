@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.14 2003/05/18 17:12:30 bkorb Exp $
+ *  $Id: funcFor.c,v 3.15 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */

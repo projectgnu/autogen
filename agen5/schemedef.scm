@@ -89,13 +89,40 @@
 
 (add-hook! before-error-hook error-source-line)
 
-;;; /*=sfunc make-header-guard
+;;; /*=sfunc   make_header_guard
 ;;;  *
-;;;  * what:   maximum value in list
+;;;  * what:   create ifndef/define guard
 ;;;  *
-;;;  * exparg: list , list of values.  Strings are converted to numbers ,, list
+;;;  * exparg: name , header group name
 ;;;  *
-;;;  * doc:  Return the maximum value in the list
+;;;  * doc:    This function will create a @code{#ifndef}/@code{#define}
+;;;  *         sequence for protecting a header from multiple evaluation.
+;;;  *         It will also set the Scheme variable @code{header-file}
+;;;  *         to the name of the file being protected and it will set
+;;;  *         @code{header-guard} to the name of the @code{#define} being
+;;;  *         used to protect it.  It is expected that this will be used
+;;;  *         as follows:
+;;;  *         @example
+;;;  *         [+ (make-header-guard "group_name") +]
+;;;  *         ...
+;;;  *         #endif /* [+ (. header-guard) +]
+;;;  *
+;;;  *         #include "[+ (. header-file)  +]"
+;;;  *         @end example
+;;;  *         @noindent
+;;;  *         The @code{#define} name is composed as follows:
+;;;  *
+;;;  *         @enumerate
+;;;  *         @item
+;;;  *         The first element is the string argument and a separating
+;;;  *         underscore.
+;;;  *         @item
+;;;  *         That is followed by the name of the header file with
+;;;  *         illegal characters mapped to underscores.
+;;;  *         @item
+;;;  *         The end of the name is always, "@code{_GUARD}".
+;;;  *         @end enumerate
+;;;  *         
 ;;; =*/
 ;;;
 (define header-file  "")
@@ -114,6 +141,19 @@
 (define-macro (defined-as predicate symbol)
   `(and (defined? ',symbol) (,predicate ,symbol)))
 
+;;; /*=sfunc   html_escape_encode
+;;;  *
+;;;  * what:   encode html special characters
+;;;  * general-use:
+;;;  *
+;;;  * exparg: str , string to make substitutions in
+;;;  *
+;;;  * doc:    This function will replace replace the characters @code{'&'},
+;;;  *         @code{'<'} and @code{'>'} characters with the HTML/XML
+;;;  *         escape-encoded strings (@code{"&amp;"}, @code{"&lt;"}, and
+;;;  *         @code{"&gt;"}, respectively).
+;;; =*/
+;;;
 (define html-escape-encode (lambda (str)
     (string-substitute str
           '("&"      "<"     ">")
@@ -123,36 +163,5 @@
 (use-modules (ice-9 debug))
 
 (read-enable 'positions)
-
-;;; (define (eval-client-input str)
-;;;   (stack-catch #t
-;;; 
-;;;     (lambda ()
-;;;       (call-with-input-string
-;;;         (string-append "(begin " str "\n)")
-;;;         (lambda (p)
-;;;           (set-port-filename! p (tpl-file))
-;;;           (set-port-line! p (string->number (tpl-file-line "%2$d")))
-;;;           (primitive-eval (read p)) ) ) )
-;;; 
-;;;     (lambda (key . args)
-;;;       (apply display-error
-;;;          (fluid-ref the-last-stack)
-;;;          (current-error-port)
-;;;          args)
-;;;       (set! stack-saved? #f)
-;;;       (error "exiting") )
-;;; ) )
-
-;;;
-;;; Testing:
-;;;
-;;; guile> (alist->autogen-def '(
-;;;         ( foo "foolish value" )
-;;;         ( bar (
-;;;                  (mumble "mumbling")
-;;;                  (frummitz "stuff" )
-;;;         )      )
-;;;    )  )
 
 ;;; end of agen5/schemedef.scm

@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.16 2003/05/10 03:11:10 bkorb Exp $
+ *  $Id: agCgi.c,v 3.17 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned

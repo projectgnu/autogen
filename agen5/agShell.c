@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.18 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: agShell.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
  *  Manage a server shell process
  */
 

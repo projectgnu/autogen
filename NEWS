@@ -1,3 +1,11 @@
+New in 5.5.5 - May, 2003
+* More improvements in man page appearance
+* minor bug fixes here and there
+* better docs on partitioned ini (rc) files
+* updated snprintfv library
+* improved handling of errors in CGI processing
+* many warning cleanups
+
 New in 5.5.3 - March, 2003
 * AutoOpts' usage procedure has been enhanced to produce either AutoOpts
   standard usage or usage that looks more like current GNU practices.
@@ -10,32 +18,3 @@ New in 5.5.2 - February, 2003
 * stash offsets in uintptr_t types so this thing works when
   sizeof(void*) != sizeof(off_t)
 * still more configury fixes.  It will never, ever end.
-
-New in 5.5 - December 15, 2002
-* The FOR macro will now accept a list of values, as in:
-  [= FOR v IN one, "two , part" three =]
-* snprintfv-0.99f was fully incorporated, saving 300K of distribution
-  space and a lot of configure time.
-* The 'dne' function will accept "-d" as the first argument in order
-  to suppress the date from the output.
-
-New in 5.4.8 - December 10, 2002
-* Freed AutoOpts from libguile.  It was never really dependent.
-* new snprintfv library incorporated
-
-New in 5.4.4 5.4.3 and 5.4.2
-* The libopts.tar.gz file is now installed
-* Miscelleaneous option state saving bugs were fixed
-* man page templates were cleaned up
-* .texi-isms were removed from usage output
-* a GCC aliasing bug was fixed.
-
-New in 5.4.1
-* Improved the configurability of the libopts tear-off library.
-
-New in 5.4
-* AutoOpts documentation and usage text now uses the copyright.eaddr value
-  as the "send bug reports to" address.
-  AutoGen command line options may now be embedded in template and definitions
-  files.  The template files support the scheme function (set-option "..."),
-  and definition files support the directive, "#option ...".

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.14 2003/05/02 01:01:59 bkorb Exp $
+ *  $Id: expString.c,v 3.15 2003/05/26 03:14:59 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */

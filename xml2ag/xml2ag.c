@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.13 2003/05/18 17:06:53 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.14 2003/05/26 03:14:59 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -230,7 +230,7 @@ trim( const char* pzSrc, size_t* pSz )
             if (pSz != NULL) *pSz = 0;
             return "";
         }
-        strSize = (pzEnd - pzSrc) + 1;
+        strSize = (pzEnd - pzSrc);
     }
 
     /*
@@ -248,15 +248,15 @@ trim( const char* pzSrc, size_t* pSz )
     }
 
     if (dataLen <= strSize) {
-        strSize = (strSize + 0x1000) & ~0x0FFF;
+        size_t sz = (strSize + 0x1000) & ~0x0FFF;
         if (pzData != NULL)
-             pzData = malloc( strSize );
-        else pzData = realloc( pzData, strSize );
+             pzData = malloc( sz );
+        else pzData = realloc( pzData, sz );
         if (pzData == NULL) {
-            fprintf( stderr, "ENOMEM allocating 0x%lX bytes", strSize );
+            fprintf( stderr, "ENOMEM allocating 0x%lX bytes", sz );
             exit( EXIT_FAILURE );
         }
-        dataLen = strSize;
+        dataLen = sz;
     }
 
     /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 3.17 2003/05/18 17:12:30 bkorb Exp $
+ *  $Id: funcEval.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */

@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2003/05/24 02:49:48 $
+ *  Last Modified:     $Date: 2003/05/26 03:14:59 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.28 2003/05/24 02:49:48 bkorb Exp $
+ *  $Id: misc.def,v 3.29 2003/05/26 03:14:59 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.28 $";
+version = "$Revision: 3.29 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -44,27 +44,6 @@ test = {
 	completely disable subshell services by specifying, --disable-shell.
 	In the default, enabled state, the "yes-subst[itution]" will enable
 	the getdefs, columns and doc subdirectory builds.
-	_EOF_;
-};
-
-test = {
-    name   = debug;
-    type   = enable;
-    check  = 'wanting autogen debugging';
-    action = { act-type = define; };
-    /*
-     *  What to do for non-default
-     */
-    action = { act-type = script;
-      act-text = <<- _EOF_
-		CPPFLAGS="-DDEBUG $CPPFLAGS"
-	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
-		_EOF_; };
-
-    doc = <<-  _EOF_
-	This option will enable two debugging options for AutoGen.
-	viz., --show-defs (dump out the definition tree)
-	and --show-shell (print out all shell commands via `set -x')
 	_EOF_;
 };
 
@@ -250,6 +229,30 @@ test = {
 		_EOF_;
     doc =
     "See if long long works";
+};
+
+test = {
+    name   = debug;
+    type   = enable;
+    check  = 'wanting autogen debugging';
+    action = { act-type = define; };
+    /*
+     *  What to do for non-default
+     */
+    action = { act-type = script; asis;
+      act-text = <<- _EOF_
+		AC_DEFINE([DEBUG_ENABLED], [1],
+		        [Define this if debugging is enabled])
+	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
+	    f=`which dmalloc 2>/dev/null`
+	    [ -n "$f" ] && LIBS="${LIBS} -ldmalloc"
+		_EOF_; };
+
+    doc = <<-  _EOF_
+	This option will enable two debugging options for AutoGen.
+	viz., --show-defs (dump out the definition tree)
+	and --show-shell (print out all shell commands via `set -x')
+	_EOF_;
 };
 
 do-always = <<- _END_ALWAYS_

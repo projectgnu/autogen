@@ -1,0 +1,90 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# convert.test --- test XML -> AutoGen conversion
+#
+## Time-stamp:      "2003-05-18 12:04:07 bkorb"
+## Author:          Bruce Korb <bkorb@gnu.org>
+## Maintainer:      Bruce Korb <bkorb@gnu.org>
+## Created:         Sun May 18, 2003
+#
+# $Id: convert.test,v 1.1 2003/05/26 03:14:59 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+case "X${VERBOSE}" in
+X | X[nNfF]* ) VERBOSE=false ;;
+* ) set -x ;   VERBOSE=true ;;
+esac
+
+# A standard failure function
+failure()
+{
+  cd ${testsubdir}
+  test -d ../FAILURES || mkdir ../FAILURES
+  l=`echo *`
+  ( \cd ../FAILURES ; rm -f $l )
+  mv -f * ../FAILURES
+  echo "$*"
+  exit 1
+}
+
+srcdir=`pwd`
+testname=convert
+[ -d ${testsubdir} ] || mkdir ${testsubdir}
+cd ${testsubdir}
+testsubdir=`pwd`
+
+${XML2AG} -O ${testname}.out <<'_EndOfXML_'
+<?xml version="1.0"?>
+<ag_example template="sample.tpl">
+  <mumble attr="foo">
+    <grumble>
+      &lt;stumble around the 'XML'.&gt;
+    </grumble>
+    mumble-1
+    <!-- This is just a
+         /* multi-line comment */ -->
+    mumble-2
+    <grumble>
+      grumble &amp; "grumble" &amp; grumble.
+    </grumble>
+    mumble, mumble
+  </mumble>
+  <stumble upon="rough going"/>
+</ag_example>
+_EndOfXML_
+
+cat > ${testname}.samp <<'_EndOfSample_'
+/* Parsed from stdin */
+AutoGen Definitions sample.tpl;
+XML-version = '1.0';
+XML-standalone = true;
+template = 'sample.tpl';
+mumble = {
+  content = '';
+  attr = 'foo';
+  grumble = {
+    content = '';
+    text = '<stumble around the \'XML\'.>';
+  };
+  text = 'mumble-1';
+  /* This is just a
+         /* multi-line comment * / */
+  text = 'mumble-2';
+  grumble = {
+    content = '';
+    text = 'grumble & "grumble" & grumble.';
+  };
+  text = 'mumble, mumble';
+};
+stumble = {
+  content = '';
+  upon = 'rough going';
+};
+_EndOfSample_
+
+cmp -s ${testname}.samp ${testname}.out || \
+	failure "`diff ${testname}.samp ${testname}.out`"
+
+${VERBOSE} || { cd ${srcdir} ; rm -rf ${testsubdir} ; }

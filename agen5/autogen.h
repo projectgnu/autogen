@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.19 2003/05/22 04:23:01 bkorb Exp $
+ *  $Id: autogen.h,v 3.20 2003/05/26 03:14:59 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -357,7 +357,7 @@ size_t strlcpy( char* dest, const char* src, size_t n );
 
 #include "proto.h"
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
 # define AG_ABEND(s)  ag_abend_at(s,__FILE__,__LINE__)
 #else
 # define AG_ABEND(s)  ag_abend(s)
