@@ -1,6 +1,6 @@
 (-: AutoGen5 template 
 
-# $Id: strsignal.tpl,v 2.3 1999/10/28 02:24:18 bruce Exp $
+# $Id: strsignal.tpl,v 2.4 1999/10/28 02:24:53 bruce Exp $
 
 h :-)
 /*
@@ -17,7 +17,7 @@ FOR signal (for-from 0) (for-by 1) :-)(-:
   IF (exist? "signame") :-)
 static char zSig_(-: % signame (sprintf "%%-13s" "%s[]"):-) =
 "SIG(-:signame:-)";(-:
-  (out-push-add ".sig.liststr)" :-)
+  (out-push-add ".sig.liststr") :-)
 static char zInf_(-: % signame (sprintf "%%-13s" "%s[]"):-) = "(-:sigtext:-)";(-:
   (out-pop) :-)(-:
   ELSE  :-)
