@@ -1570,11 +1570,12 @@ interpretation.
 
 @menu
 * configuring::    Configuring AutoGen
+* signal names::   Signal Names
 * installing::     Installing AutoGen
 @end menu
 
 @node configuring
-@section configuring
+@section Configuring AutoGen
 @cindex configuring
 
 AutoGen is configured and built using Libtool, Automake and Autoconf.
@@ -1625,8 +1626,43 @@ directory, @samp{make} the @samp{autogen.texi} file and all will
 be well thereafter.
 @end table
 
+@node signal names
+@section Signal Names
+@cindex Signal Names
+
+When AutoGen is first built, it tries to use @code{psignal(3)},
+@code{sys_siglist}, @code{strsigno(3)} and @code{strsignal(3)} from
+the host operating system.  In their absence, the distributed mapping
+is used.  However, once you have installed autogen, the mapping can
+be rebuilt on the host operating system.  To do this, you must perform
+the following steps:
+
+@enumerate
+@item
+Build and install AutoGen in a place where it will be found in your
+search path.
+
+@item
+@code{cd $@{top_srcdir@}/compat}
+
+@item
+@code{autogen strsignal.def}
+
+@item
+Verify the results by examining the @file{strsignal.h} file produced.
+
+@item
+Re-build and re-install AutoGen.
+@end enumerate
+
+If you have any problems or peculiarities that cause this process to
+fail on your platform, please send me copies of the header files
+containing the signal names and numbers, along with the full path names
+of these files.  I will endeavor to fix it.  There is a shell script
+inside of @file{strsignal.def} that tries to hunt down the information.
+
 @node installing
-@section installing
+@section Installing AutoGen
 @cindex Installing
 
 There are several files that get installed.  The number depend
