@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2000/03/19 22:52:00 $
+# Last Modified:  $Date: 2000/03/26 17:04:45 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.12 2000/03/19 22:52:00 bruce Exp $
+# $Id: expr.test,v 1.13 2000/03/26 17:04:45 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -20,6 +20,13 @@ if test -z "$srcdir"; then
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
+
+# # # # # # # TEMPLATE & DEFINITIONS FILES # # # # # # # # #
+#
+#  We construct this by pulling down the sources from the
+#  AutoGen source directory.  We will also copy out the same
+#  commands as are used there.
+
 workdir=`pwd`
 cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
    ${top_srcdir}/agen5/func*.c $workdir
@@ -33,9 +40,12 @@ sed -n '/  expr.ini /,/date > stamp-exprini/p' \
   ${top_srcdir}/agen5/bootstrap.dir | \
     sed -e 1d -e '$d' >> ./${testname}.sh
 
+#  Remove the lines that *will* be different, always...
+#
 sh -x ./${testname}.sh
 sed '/DO NOT EDIT/,/and the template/d' ./expr.ini > expr.out
-sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini > expr.base
+sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
+    > expr.base
 
 diff expr.base expr.out || \
   failure expr.ini differs from ${top_srcdir}/agen5/expr.ini
