@@ -1,6 +1,8 @@
 
 /* -*- Mode: Text -*- */
 
+#ifndef HAVE_STD_OPT_DOC
+#define HAVE_STD_OPT_DOC 1
 flag = {
     name        = autoopts_std_options;
     documentation;
@@ -8,6 +10,7 @@ flag = {
 'The following options are commonly used and are provided and supported
 by AutoOpts:';
 };
+#endif
 
 #ifdef  ALL_STD_OPTS
 #define DEBUG
@@ -55,7 +58,7 @@ flag = {
  *  VERBOSE output
  */
 #ifdef  VERBOSE_FLAG
-#define VERBOSE
+#define VERBOSE 1
 #endif
 
 #ifdef VERBOSE
@@ -66,6 +69,11 @@ flag = {
 #endif
 #ifdef VERBOSE_LEVEL
     arg_type = number;
+#endif
+#ifdef VERBOSE_ENUM
+    arg-type = keyword;
+    keyword  = silent, quiet, brief, informative, verbose;
+    arg-default = brief;
 #endif
     descrip = 'run program with progress info';
     doc =
@@ -137,9 +145,20 @@ flag = {
 #ifdef  QUIET_FLAG
 #define QUIET
 #endif
+#ifdef  SILENT_FLAG
+#define SILENT
+#endif
+
 #ifdef QUIET_SILENT
 #define QUIET
 #define SILENT
+#else
+
+#ifdef QUIET
+#ifdef SILENT
+#define QUIET_SILENT
+#endif
+#endif
 #endif
 
 #ifdef QUIET
@@ -161,10 +180,6 @@ flag = {
 };
 #endif
 
-#ifdef  SILENT_FLAG
-#define SILENT
-#endif
-
 #ifdef SILENT
 flag = {
     name    = silent;
@@ -177,7 +192,7 @@ flag = {
 #ifdef SILENT_LEVEL
     arg_type = number;
 #endif
-    descrip = 'run without unnecessary output;
+    descrip = 'run without unnecessary output';
     doc =
     "Specifying this option will cause the program to disable progress\n"
     "information.";

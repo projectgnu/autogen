@@ -245,8 +245,8 @@ ENDFOR   transition           =][=
 
 (define trans-ct
   (shellf
-    "env | egrep ^FSM_TRANS_ | \
-    sed 's/^.*%s//;s/ .*$/,/' | \
+    "env | egrep '^FSM_TRANS_' | \
+    sed 's/^.*%s//;s/ .*$/,/'  | \
     sort -u > .fsm.xlist
     echo `wc -l < .fsm.xlist` "
     (if (=* (get "method") "call")

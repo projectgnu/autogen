@@ -1,5 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 1.3 1999/10/28 02:50:52 bruce Exp $
+# $Id: directive.tpl,v 1.4 2001/10/13 18:48:48 bkorb Exp $
+
+(setenv "SHELL" "/bin/sh")
+
 h =]
 /*
 [=(dne " *  ")=]

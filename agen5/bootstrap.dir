@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/10/01 23:51:33 $
+# Last Modified:     $Date: 2001/10/13 18:48:48 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 1.34 2001/10/01 23:51:33 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 1.35 2001/10/13 18:48:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -127,8 +127,7 @@ then
   * )
     GD=""
     test "X${BOOTSTRAP}" = X \
-      && echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD}).  Giving up"
-    exit 1
+      && echo "Cannot locate GD (GDEXE=${GDEXE}, GD=${GD})."
     ;;
   esac
 fi 2>/dev/null

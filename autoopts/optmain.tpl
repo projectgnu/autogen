@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 2.15 2001/10/01 23:51:33 bkorb Exp $
+# $Id: optmain.tpl,v 2.16 2001/10/13 18:48:48 bkorb Exp $
 
 =]
 [=
@@ -250,7 +250,7 @@ DEFINE range-option-code
              (shellf "f=`echo '%s'|sed 's/->/, /'`
                      echo \"{ $f }\"" (get "arg_range")) =][=
 
-      *               =]{ [=arg_range=], INT_MAX-1 }[=
+      *               =]{ [=arg_range=], INT_MIN }[=
     ESAC arg_range    =][=
   ENDFOR =][=
   (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
@@ -265,7 +265,7 @@ DEFINE range-option-code
     for (ix = 0; ix < [=(count "arg_range")=]; ix++) {
         if (val == optRange[ix].rmin)
             goto valid_return;
-        if (optRange[ix].rmax == INT_MAX-1)
+        if (optRange[ix].rmax == INT_MIN)
             continue;
         if (val < optRange[ix].rmin)
             continue;

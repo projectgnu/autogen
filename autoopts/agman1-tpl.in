@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/09/29 17:08:56 $
+## Last Modified:   $Date: 2001/10/13 18:48:48 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.17 2001/09/29 17:08:56 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.18 2001/10/13 18:48:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 :+]
@@ -112,7 +112,7 @@ This manual page documents, briefly, the \fB[+:
    Describe each option
 
 :+][+:
-
+(define opt-arg  "")
 (define opt-name "")            :+][+:
 
 IF (exist? "preserve-case")     :+][+:
@@ -129,7 +129,13 @@ FOR flag
   ;;  Skip the documentation options!
   ;;
   (set! opt-name (string-tr! (get "name") optname-from optname-to))
-
+  (if (not (exist? "arg_type"))
+      (set! opt-arg "")
+      (set! opt-arg (string-append "\\fI"
+            (if (exist? "arg_name") (get "arg_name")
+                (string-downcase! (get "arg_type")))
+            "\\fP" ))
+  )
   :+][+:
   IF (not (exist? "documentation")) :+]
 .TP[+:
@@ -143,12 +149,12 @@ FOR flag
           *
           :+]
 .BR -[+:value:+][+:
-          IF (not (exist? "arg_name")) :+] ", " --[+:
-          ELSE  :+] " \fI[+:arg_name:+]\fP, " --[+:
+          IF (not (exist? "arg_type")) :+] ", " --[+:
+          ELSE  :+] " [+:(. opt-arg):+], " --[+:
           ENDIF :+][+: (. opt-name)    :+][+:
-          IF (exist? "arg_name")       :+][+:
+          IF (exist? "arg_type")       :+][+:
               ? arg_optional " [ =" ' "=" '
-              :+]\fI[+:  arg_name      :+]\fP[+:
+              :+][+:  (. opt-arg)      :+][+:
               arg_optional " ]"        :+][+:
           ENDIF:+][+:
 
@@ -162,8 +168,8 @@ FOR flag
           *
           :+]
 .BR -[+:value:+][+:
-          IF (exist? "arg_name") :+][+:
-            arg_optional "["     :+] "\fI[+:arg_name:+]\fP[+:
+          IF (exist? "arg_type") :+][+:
+            arg_optional "["     :+] "[+:(. opt-arg):+][+:
             arg_optional '"]"'   :+][+:
           ENDIF:+][+:
         ENDIF  :+][+:
@@ -181,9 +187,9 @@ FOR flag
           *
           :+]
 .BR [+: (. opt-name) :+][+:
-           IF (exist? "arg_name") :+] [+:
+           IF (exist? "arg_type") :+] [+:
               ? arg_optional " [ =" ' "=" '
-              :+]\fI[+:arg_name:+]\fP[+:
+              :+][+:(. opt-arg):+][+:
               arg_optional "]" :+][+:
            ENDIF:+][+:
 
@@ -197,8 +203,8 @@ FOR flag
           *
           :+]
 .BR --[+: (. opt-name) :+][+:
-          IF (exist? "arg_name") :+] "[+:
-            arg_optional "["     :+]=\fI[+:arg_name:+]\fP[+:
+          IF (exist? "arg_type") :+] "[+:
+            arg_optional "["     :+]=[+:(. opt-arg):+][+:
             arg_optional "]"     :+]"[+:
           ENDIF:+][+:
         ENDIF  :+][+:

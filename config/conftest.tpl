@@ -4,7 +4,7 @@ m4
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2001/09/29 20:42:44 $
+#  Last Modified:     $Date: 2001/10/13 18:48:48 $
 #             by:     Bruce Korb <bkorb@gnu.org>
 #
 # This template uses the following definitions:
@@ -16,7 +16,9 @@ m4
 # 2.c  check - short display name for user entertainment
 # 2.d  code  - the test code to compile, link and/or run.
 # 2.e  doc   - useful explanitory text
-#
+
+(setenv "SHELL" "/bin/sh")
+
 =][=
 (dne "dnl " "dnl ") =]
 dnl

@@ -1,18 +1,6 @@
-\input texinfo
-@c %**start of header
+
 @setfilename autogen.info
-@settitle AutoGen
-@setchapternewpage off
-@c %**end of header
 
-@ignore
-EDIT THIS FILE WITH CAUTION  (autogen.texi)
-
-It has been AutoGen-ed  Friday September 21, 2001 at 12:57:16 PM PDT
-From the definitions    stdin
-and the template file   auto_gen
-
-@end titlepage
 @ignore
 START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
@@ -319,7 +307,6 @@ appended.  The program you use as a shell must emit the single
 argument @code{mumble} on a line by itself.
 @end enumerate
 
-@page
 @node Testimonial
 @section A User's Perspective
 
@@ -1452,17 +1439,19 @@ The three man pages for the three executables are installed in man/man1.
 @end enumerate
 
 This program, library and supporting files can be installed
-with two commands:
+with three commands:
 
 @itemize @bullet
 @item
 <src-dir>/configure [ <configure-options> ]
 @item
+make
+@item
 make install
 @end itemize
 
-However, you may wish to insert @code{make}
-and @code{make check} before the second command.
+However, you may wish to insert @code{make check}
+before the @code{make install} command.
 
 If you do perform a @code{make check} and there are any failures, you
 will find the results in @code{tests/FAILURES}.  Needless to say, I
@@ -1473,8 +1462,11 @@ may do so by specifying the test (or list of test) in the TESTS make
 variable, thus:
 
 @example
-make TESTS=test-name.test check
+gmake TESTS=test-name.test check
 @end example
+
+I specify @code{gmake} because most makes will not let you override
+internal definitions with command line arguments.  @code{gmake} does.
 
 All of the AutoGen tests are written to honor the contents of the
 @t{VERBOSE} environment variable.  Normally, any commentary generated
@@ -1483,13 +1475,14 @@ variable is set.  So, to see what is happening during the test, you
 might invoke the following with @i{bash} or @i{ksh}:
 
 @example
-VERBOSE=1 make TESTS="for.test forcomma.test" check
+VERBOSE=1 gmake TESTS="for.test forcomma.test" check
 @end example
 
+@noindent
 Or equivalently with @i{csh}:
 
 @example
-env VERBOSE=1 make TESTS="for.test forcomma.test" check
+env VERBOSE=1 gmake TESTS="for.test forcomma.test" check
 @end example
 
 @ignore
@@ -1507,16 +1500,16 @@ Library extentions (LGPL).  It is in no way a "lesser" license.
 You have greater license with it.
 
 @menu
-* Features::          AutoOpts Features
-* Comparison::        Competitive Feature Analysis
-* Quick Start::       Quick Start
-* opts.def::          Option Definitions File
-* AutoOpts API::      Programmatic Interface
-* option descriptor:: Option Descriptor File
-* Using AutoOpts::    Using AutoOpts
-* shell options::     AutoOpts for Shell Scripts
-* AutoInfo::          Automated @samp{Invoking Info} Doc
-* AutoMan pages::     Automated Man Pages
+* Features::            AutoOpts Features
+* Comparison::          Competitive Feature Analysis
+* Quick Start::         Quick Start
+* Option Definitions::  Option Definitions
+* AutoOpts API::        Programmatic Interface
+* option descriptor::   Option Descriptor File
+* Using AutoOpts::      Using AutoOpts
+* shell options::       AutoOpts for Shell Scripts
+* AutoInfo::            Automated @samp{Invoking Info} Doc
+* AutoMan pages::       Automated Man Pages
 @end menu
 
 @node Features
@@ -1524,12 +1517,15 @@ You have greater license with it.
 @cindex features
 
 AutoOpts supports option processing; option state saving; and
-program documentation with the following features:
+program documentation with innumerable features.  Here, we list
+a few obvious ones and some important ones, but the full list is
+really defined by all the attributes defined in the @ref{Option Definitions}
+section.
 
 @enumerate
 @item
 POSIX-compliant short (flag) option processing, if your options specify
-at least one option @code{value} (@pxref{Optional Attributes}).
+at least one option @code{value} (@pxref{Common Attributes}).
 
 @item
 GNU-style long options processing, if you specify @code{long-opts}
@@ -1552,39 +1548,20 @@ Store the option state into an initialization/rc file.
 @xref{saving rc files}.
 
 @item
-Options may stand by themselves or have required or optional arguments.
+Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
+Such options may default to either an enabled or a disabled state.  You
+may also provide an enablement prifix, too, e.g., @code{--allow-mumble}
+and @code{--prevent-mumble}.
 
 @item
-Option arguments may be arbitrary strings or constrained to numbers
-or a list of keywords.
+Verify that required options are present the required minimum number of
+times on the command line, and do not appear more than the maximum
+number of times.  @xref{Common Attributes}.
 
 @item
-Options may default to an enabled or a disabled state.  If they default
-to enabled, then you must provide a disablement prefix to allow users
-to disable the option.
-
-@item
-If you provide a disablement prefix, then you may provide an enablement
-prifix, too.  e.g., @code{--allow-mumble} and @code{--prevent-mumble}.
-
-@item
-Verify that required options are present the
-required minimum number of times on the command line.
-@xref{Optional Attributes}.
-
-@item
-Verify that options do not appear more than the maximum number
-of times.
-@xref{Optional Attributes}.
-
-@item
-Verify that conflicting options do not appear together.
-@xref{Multiply Optional}.
-
-@item
-Verify that options that require the presence of other options
-are, in fact, used in the presence of other options.
-@xref{Multiply Optional}.
+Verify that conflicting options do not appear together, and that options
+that require the presence of other options are, in fact, used in the
+presence of other options.  @xref{Option Conflict Attributes}.
 
 @item
 Provides a callable routine (@pxref{optionLoadLine}) to parse a line of
@@ -1593,30 +1570,16 @@ you may stash options in a text file you process and pass the relevant
 text for option processing.)
 
 @item
-@code{help} and @code{more-help} are automatically supported.
-@code{more-help} will automatically page the generated help.
-AutoOpts produces usage information through the library routine
-@code{optionUsage()}.  It will print out the invocation syntax and a
-list of every option.
-
-@noindent
-Two levels of usage are supported.  If the user supplies an invalid
-(unknown) option, then the @i{brief} mode is emitted.  That contains
-simply the usage line and listing of valid options.  The @i{extended}
-mode is used when the @samp{--help} or @samp{--more-help} is specified
-on the command line.  This mode will add information about how the
-option is treated (if there is any special treatment for it), and it
-will display any @samp{detail} text specified for the program.
+@code{--help} and @code{--version} are automatically supported.
+@code{--more-help} will page the generated help.
+@code{--version} is activated by specifying a @code{version}
+program attribute.
 
 @item
-By adding a @samp{doc} and @samp{arg_name} attributes to each option,
+By adding a @samp{doc} and @samp{arg-name} attributes to each option,
 AutoGen will also be able to produce a man page and the @samp{invoking}
 section of a texinfo document.  These documentation templates will also
 weave in the @samp{explain} and @samp{detail} program attributes as well.
-
-@item
-Produce a #define for the program version that can be
-used by the library routine @samp{doVersion()}.
 
 @item
 Insert the option processing state into Scheme-defined variables.
@@ -1624,42 +1587,27 @@ Thus, Guile based applications that are linked with private
 @code{main()} routines can take advantage of all of AutoOpts' functionality.
 
 @item
-If @code{TEST_MAIN} is defined, the output @file{.c} file will contain a
+If @code{test-main} is defined, the output @file{.c} file will contain a
 main routine that will be compiled when @code{TEST_<prog-name>_OPTS} is
 defined.  @xref{shell options}.  If you choose to compile this program,
 it is currently capable of producing one of three results:
 
 @enumerate a
 @item
-If @code{TEST_MAIN} is defined to contain 3 or fewer characters
-(e.g., "yes"), then it will produce a program that processes the
-arguments and writes to standard out portable shell commands
-containing the digested options (i.e., it will call @code{putBourneShell}).
+A program that processes the arguments and writes to standard out
+portable shell commands containing the digested options.
 
 @item
-If @code{TEST_MAIN} is set to @code{putShellParse}, it will produce a
-program that will generate portable shell commands to parse the defined
+A program that will generate portable shell commands to parse the defined
 options.  The expectation is that this result will be copied into a
 shell script and used there.
 
 @item
-If @code{TEST_MAIN} is set to anything else, it must be
-a routine name and that routine will be called with
-a pointer to the option descriptions as the single argument.
-You must supply this routine and, obviously, you can
-cause it to do whatever you wish it to do.
+@code{test-main} may specify a routine that will be called with a
+pointer to the option descriptions as the single argument.  You must
+supply this routine and, obviously, you can cause it to do whatever you
+wish it to do.
 @end enumerate
-
-@item
-Long options can be specified as having enabling or disabling prefixes.
-For example, the @code{mumble} option may have an enabling @code{must}
-prefix and a disabling @code{dont}, yielding @code{--must-mumble} and
-@code{--dont-mumble} as recognized options.  @code{--mumble} will
-@strong{not} be recognized.
-
-@item
-If a global program attribute @code{version} is supplied, then
-a GNU-compliant @samp{--version} option will be supported.
 
 @item
 There are facilities in place to allow libraries to intermingle their
@@ -1770,11 +1718,12 @@ Only one occurrence is to be allowed, specifying one or the other.
 First, specify your program attributes and its options to AutoOpts,
 as with the following example.
 
-@smallexample
+@example
 AutoGen Definitions options;
 prog-name     = check;
 prog-title    = "Checkout Automated Options";
 long-opts;
+test_main;
 
 flag = @{
     name      = check_dirs;
@@ -1791,14 +1740,14 @@ flag = @{
     disable   = dont;     /* mark as enable/disable type */
                           /* option.  Disable as `dont-' */
 @};
-@end smallexample
+@end example
 
 @noindent
 Then perform the following steps:
 
 @enumerate
 @item
-@code{autogen -L $prefix/share/autogen -DTEST_MAIN=yes checkopt.def}
+@code{autogen -L $prefix/share/autogen checkopt.def}
 @item
 @code{cc -o check -DTEST_CHECK_OPTS -g checkopt.c -L $prefix/lib -lopts}
 @end enumerate
@@ -1806,7 +1755,7 @@ Then perform the following steps:
 @noindent
 And now, @code{./check --help} yields:
 
-@smallexample
+@example
 check - Checkout Automated Options
 USAGE:  check [-<flag> [<val>]]... [--<name>[@{=| @}<val>]]...
   Flg Arg Option-Name    Description
@@ -1819,19 +1768,21 @@ USAGE:  check [-<flag> [<val>]]... [--<name>[@{=| @}<val>]]...
 
 Options may be specified by doubled markers and their name
 or by a single marker and the flag character/option value.
-@end smallexample
+@end example
 
+@noindent
 Normally, however, you would compile @file{checkopt.c} as in:
 
-@smallexample
+@example
 cc -o checkopt.o -I$prefix/include -c checkopt.c
-@end smallexample
+@end example
 
+@noindent
 and link @file{checkopt.o} with the rest of your program.
 The main program causes the options to be processed
 by calling @code{optionProcess}:
 
-@smallexample
+@example
 main( int argc, char** argv )
 @{
   @{
@@ -1839,40 +1790,55 @@ main( int argc, char** argv )
     argc -= optct;
     argv += optct;
   @}
-@end smallexample
+@end example
 
 The options are tested and used as in the following fragment:
 
-@smallexample
+@example
   if (HAVE_OPT( SHOW_DEFS )) @{
     int    dirct = STACKCT_OPT( CHECK_DIRS );
     char** dirs  = STACKLST_OPT( CHECK_DIRS );
     while (dirct-- > 0) @{
       char* dir = *dirs++;
       ...
-@end smallexample
+@end example
 
 A lot of magic happens to make this happen.
-The rest of this chapter will help you learn how to specify
-the option processing and how to examine the resulting state.
+The rest of this chapter will describe the myriad of option attributes
+supported by AutoOpts.  However, keep in mind that, in general, you won't
+need much more than what was described in this "quick start" section.
 
-@node opts.def
-@section Option Definitions File
-@cindex opts.def
+@node Option Definitions
+@section Option Definitions
+@cindex Option Definitions
 
-This file contains the AutoGen definitions that describe the options for
-a particular program.  There are several groups of definitions.  The
-first describes the program and over-all option processing attributes.
-The second group describes the name, usage and other attributes related
-to each option.  The third group are used for documenting your program
-and are @strong{not} used for command line processing.  The last section
-below will describe the command line options that are automatically
-provided by AutoOpts.
+AutoOpts uses an AutoGen definitions file for the definitions of the
+program options and overall configuration attributes.
+The complete list of program and option attributes is quite extensive,
+so if you are reading to understand how to use AutoOpts, I recommend
+reading the "Quick Start" section (@pxref{Quick Start}) and paying
+attention to the following:
 
-The list of program and option attributes is quite extensive.  Keep in
-mind that the majority are rarely used and can be safely ignored.
-However, when you have special option processing requirements, the
-flexibility is there.
+@enumerate
+@item
+@code{prog-name}, @code{prog-title}, and @code{argument}, program
+attributes, @xref{program attributes}.
+@item
+@code{name} and @code{descrip} option attributes, @xref{Required Attributes}.
+@item
+@code{value} (flag character) and @code{min} (occurrence counts)
+option attributes, @xref{Common Attributes}.
+@item
+@code{arg-type} from the option argument specification section,
+@xref{Option Arguments}.
+@item
+Highly recommended, but not required, are the several "man" and
+"info" documentation attributes, @xref{documentation attributes}.
+@end enumerate
+
+Keep in mind that the majority are rarely used and can be safely
+ignored.  However, when you have special option processing requirements,
+the flexibility is there.
 
 @menu
 * program attributes::        Program Description Attributes
@@ -1901,10 +1867,10 @@ be transformed via @code{string->c_name!} (@pxref{SCM string->c-name!}).
 @item prog-title
 This attribute is required and may be any descriptive text.
 
-@cindex prog_desc
-@item prog_desc @strong{and}
-@cindex opts_ptr
-@itemx opts_ptr
+@cindex prog-desc
+@item prog-desc @strong{and}
+@cindex opts-ptr
+@itemx opts-ptr
 These define global pointer variables that point to the program
 descriptor and the first option descriptor for a library option.  This
 is intended for use by certain libraries that need command line and/or
@@ -1916,8 +1882,8 @@ is marked as @code{settable}.  The library client program will invoke the
 @code{SET_OPTION} macro which will invoke a handler function that will
 finally set these global variables.
 
-@cindex allow_errors
-@item allow_errors
+@cindex allow-errors
+@item allow-errors
 The presence of this attribute indicates ignoring any command line
 option errors.  This may also be turned on and off by invoking the
 macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
@@ -1933,9 +1899,14 @@ absence of command line argument following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
 
+@cindex before-guile-boot
+@item before-guile-boot
+If @code{guile-main} has been specified and if this is specified
+as well, then this code will be inserted into the actual @code{main()}
+procedure before @code{gh_enter()} is called.
+
 @cindex copyright
 @item copyright
-
 The @code{copyright} is a structured value containing three to five
 values.  If @code{copyright} is used, then the first three are required.
 
@@ -1957,6 +1928,8 @@ if @file{type} is set to @file{NOTE}.
 @item
 @file{author} - in case the author name is to appear in the documentation
 and is different from the copyright owner.
+@item
+@file{eaddr} - email address of the author or copyright holder.
 @end enumerate
 @*
 An example of this might be:
@@ -1964,6 +1937,7 @@ An example of this might be:
 copyright = @{
     date  = "1992-2001";
     owner = "Bruce Korb";
+    eaddr = 'bkorb@@gnu.org';
     type  = GPL;
 @};
 @end example
@@ -1989,7 +1963,7 @@ is indicated by setting the value to the disablement prefix.
 So, for example, if the disablement prefix were @code{dont}, then
 you can disable the @code{optname} option by setting the
 @code{PROGRAM_OPTNAME} environment variable to `@i{dont}'.
-@xref{Optional Attributes}.
+@xref{Common Attributes}.
 
 @cindex explain
 @item explain
@@ -2001,6 +1975,15 @@ This string is inserted into the .h interface file.  Generally used for
 global variables or @code{#include} directives required by
 @code{flag_code} text and shared with other program text.
 
+@cindex guile-main
+@item guile-main
+Creates a guile-style main and inner-main procedures.
+The inner main procedure will call @code{optionProcess()} and will
+invoke any code specified by this attribute.  If this attribute
+does not specify any code, then calls to the AutoOpts library procedure
+@code{export_options_to_guile()} and then @code{scm_shell()} will
+be inserted into @code{inner_main()}.
+
 @cindex homerc
 @item homerc
 Specifies either a directory or a file using a specific path (like @code{.}
@@ -2008,7 +1991,7 @@ or @file{/usr/local/share/progname}) or an environment variable (like
 @file{$HOME/rc/} or @file{$PREFIX/share/progname}) or the directory
 where the executable was found (@file{$$[/...]}) to use to try to find
 the rcfile.  Use as many as you like.  The presence of this attribute
-activates the @code{SAVE_OPTS} and @code{LOAD_OPTS} options.
+activates the @code{--save-opts} and @code{--load-opts} options.
 @xref{loading rc files}.
 
 @cindex include
@@ -2017,20 +2000,25 @@ This string is inserted into the .c file.  Generally used for global
 variables required only by @code{flag_code} program text.
 
 @cindex long-opts
+@cindex named option mode
 @item long-opts
 Presence indicates GNU-standard long option processing.  If any options
 do not have an option value (flag character) specified, and least one
 does specify such a value, then you must specify @code{long-opts}.  If
 none of your options specify an option value (flag character) and you do
-not specify @code{long-opts}, then:
+not specify @code{long-opts}, then command line arguments are processed
+in "named option mode".  This means that:
 
 @itemize @bullet
 @item
-all program arguments are processed as named options
+Every command line argument must be a long option.
 @item
-the flag markers @code{-} and @code{--} are completely optional
+The flag markers @code{-} and @code{--} are completely optional.
 @item
-the @code{argument} program attribute is disallowed
+The @code{argument} program attribute is disallowed.
+@item
+One of the options may be specified as the default
+(as long as it has a required option argument).
 @end itemize
 
 @cindex prefix
@@ -2054,33 +2042,6 @@ However, if you specify this attribute, then they will display
 in the case used in their specification.  Command line options
 will still be matched without case sensitivity.
 
-@cindex test_main
-@item test_main
-Creates a test main procedure for testing option processing.  The
-resulting program may also be used to process the arguments of a shell
-script.  You would use it thus:
-
-@example
-eval `./programopts $@@`
-if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
-shift $@{OPTION_CT@}
-@end example
-
-@cindex guile-main
-@item guile-main
-Creates a guile-style main and inner-main procedures.
-The inner main procedure will call @code{optionProcess()} and will
-invoke any code specified by this attribute.  If this attribute
-does not specify any code, then calls to the AutoOpts library procedure
-@code{export_options_to_guile()} and then @code{scm_shell()} will
-be inserted into @code{inner_main()}.
-
-@cindex before-guile-boot
-@item before-guile-boot
-If @code{guile-main} has been specified and if this is specified
-as well, then this code will be inserted into the actual @code{main()}
-procedure before @code{gh_enter()} is called.
-
 @cindex rcsection
 @item rcsection
 If you have a collection of option descriptions that are intended
@@ -2100,6 +2061,18 @@ matching section is searched for.
 For exampe, if the @code{foo-bar} options had a sectioned RC file,
 then a line containing @code{[FOO_BAR]} would be searched for.
 
+@cindex test-main
+@item test-main
+Creates a test main procedure for testing option processing.  The
+resulting program may also be used to process the arguments of a shell
+script.  You would use it thus:
+
+@example
+eval `./programopts $@@`
+if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
+shift $@{OPTION_CT@}
+@end example
+
 @cindex usage
 @item usage
 Optionally names the usage procedure, if the library routine
@@ -2111,28 +2084,6 @@ Of course, you will need to provide that procedure.
 @cindex version
 @item version
 Specifies the program version and activates the VERSION option.
-
-@cindex automatic option flags
-@item automatic option flags
-If POSIX-style flag options are being used by an application,
-then the flag characters for the automatically supported options
-are normally selected by AutoOpts.  However, because you cannot
-make a choice that everyone will accept, it is also possible to
-specify the flag character to use.  The five automatic options,
-the attribute to use to change the flag character, and the default
-flag characters are:
-@example
---help         help-value       -?
---more-help    more-help-value  -!
---version      version-value    -v
---save-opts    save-opts-value  ->
---load-opts    load-opts-value  -<
-@end example
-Note that some of these default characters are special to the shell.
-Your users will need to quote them to use them.
-
-If the @code{value} specified is empty, then the flag for that option
-is disabled.  Otherwise, the value must be set to a single character.
 @end table
 
 @node option attributes
@@ -2153,12 +2104,12 @@ describes what data are available for writing option processing code.
 
 @menu
 * Required Attributes::         Required Attributes
-* Optional Attributes::         Singly Optional Attributes
+* Common Attributes::           Common Option Attributes
+* Special Option Handling::     Special Option Handling
 * Immediate Action::            Immediate Action Attributes
-* Multiply Optional::           Multiply Optional Attributes
-* Option Arguments::            Option Argument Processing
-* Option Processing::           Special Option Processing
-* Option Processing Data::      Data for Option Processing
+* Option Conflict Attributes::  Option Conflict Attributes
+* Option Arguments::            Option Argument Specification
+* Option Argument Handling::    Option Argument Handling
 @end menu
 
 @node Required Attributes
@@ -2183,30 +2134,14 @@ Documentation options appear on one or more lines by themselves,
 visually separating the usage options.
 @end table
 
-@node Optional Attributes
-@subsubsection Singly Optional Attributes
-@cindex Optional Attributes
+@node Common Attributes
+@subsubsection Common Option Attributes
+@cindex Common Option Attributes
 
 These option attributes are optional.  Any that do appear in the
 definition of a flag, may appear only once.
 
 @table @samp
-@cindex documentation
-@item documentation
-If present, disables all other attributes except @code{settable},
-@code{call_proc} and @code{flag_code}.  @code{settable} must be and is
-only specified if @code{call_proc} or @code{flag_code} has been specified.
-When present, the @code{descrip} attribute will be displayed only
-when the @code{--help} option has been specified.  It will be displayed
-flush to the left hand margin and may consist of one or more lines
-of text.  The name of the option will not be printed.
-
-The option may be made settable if, for example, you are supplying
-options to a client program.  In that fashion, your handler routine for
-the documentation option can save the address of the program descriptor
-and your first option (@code{prog_desc} and @code{opts_ptr}) in global
-pointers.
-
 @cindex value
 @item value
 The flag character to specify for traditional option flags.  e.g. @code{-L}.
@@ -2224,16 +2159,18 @@ Maximum occurrence count (invalid if @var{disable} present).
 @cindex enable
 @item enable
 Long-name prefix for enabling the option (invalid if @var{disable}
-@strong{not} present).
+@strong{not} present).  Only useful if long option names are being
+processed.
 
 @cindex disable
 @item disable
-Prefix for disabling (inverting sense of) the option.
+Prefix for disabling (inverting sense of) the option.  Only useful
+if long option names are being processed.
 
 @cindex enabled
 @item enabled
 If default is for option being enabled.  (Otherwise, the OPTST_DISABLED
-bit is set at compile time.)
+bit is set at compile time.)  Only useful if the option can be disabled.
 
 @item ifdef
 @itemx ifndef
@@ -2249,9 +2186,17 @@ ifdef = WITH_MUMBLING;
 
 @noindent
 Note that case and spelling must match whatever you are using.
+@end table
 
-@cindex no_preset
-@item no_preset
+@node Special Option Handling
+@subsubsection Special Option Handling
+@cindex Special Option Handling
+
+These option attributes do not fit well with other categories.
+
+@table @samp
+@cindex no-preset
+@item no-preset
 If presetting this option is not allowed.  (Thus, environment variables
 and values set in rc/ini files will be ignored.)
 
@@ -2299,15 +2244,20 @@ default:    /* cannot happen */
 @}
 @end example
 
-@cindex default
-@item default
-If your program processes its arguments in named-option mode, then you
-may select @strong{one} of your options to be the default option.  That
-option must have a required option argument.
+@cindex documentation
+@item documentation
+This attribute means the option exists for the purpose of separating
+option description text in the usage output.  Libraries may choose
+to make it settable so that the library can determine which command
+options is the first one that pertains to the library.
 
-If you have done this, then any arguments that do not match an option
-name and do not contain an equal sign (@code{=}) will be interpreted as
-option arguments to the default option.
+If present, this option disables all other attributes except
+@code{settable}, @code{call_proc} and @code{flag_code}.  @code{settable}
+must be and is only specified if @code{call_proc} or @code{flag_code}
+has been specified.  When present, the @code{descrip} attribute will be
+displayed only when the @code{--help} option has been specified.  It
+will be displayed flush to the left hand margin and may consist of one
+or more lines of text.  The name of the option will not be printed.
 @end table
 
 @node Immediate Action
@@ -2348,9 +2298,9 @@ specified so that the @code{--no-load-opts} command line option will
 suppress the processing of RC files and environment variables.
 @end table
 
-@node Multiply Optional
-@subsubsection Multiply Optional Attributes
-@cindex Multiply Optional
+@node Option Conflict Attributes
+@subsubsection Option Conflict Attributes
+@cindex Option Conflict Attributes
 
 These attributes may be used as many times as you need.
 They are used at the end of the option processing to verify
@@ -2362,28 +2312,28 @@ requirements, but it simple to implement and covers the
 more common situations.
 
 @table @samp
-@cindex flags_must
-@item flags_must
+@cindex flags-must
+@item flags-must
 one entry for every option that @strong{must} be present
 when this option is present
 
-@cindex flags_cant
-@item flags_cant
+@cindex flags-cant
+@item flags-cant
 one entry for every option that @strong{cannot} be present
 when this option is present
 @end table
 
 @node Option Arguments
-@subsubsection Option Argument Processing
+@subsubsection Option Argument Specification
 @cindex Option Arguments
 
 Several attributes relate to the handling of arguments to options.
-Each may appear only once, except for the @code{arg_range} attribute.
+Each may appear only once, except for the @code{arg-range} attribute.
 It may appear as often as may be needed.
 
 @table @samp
-@cindex arg_type
-@item arg_type
+@cindex arg-type
+@item arg-type
 This specifies the type of argument the option will take.
 If not present, the option cannot take an argument.
 If present, it must be one of the following four.
@@ -2396,9 +2346,9 @@ The argument may be any arbitrary string.
 @item num[@i{ber}]
 The argument must be a correctly formed number, without any trailing
 U's or L's.  If you specify your own callback validation routine,
-read the @code{arg_rangs} section below for some considerations.
+read the @code{arg-range} section below for some considerations.
 AutoOpts contains a library procedure to convert the string to a number.
-If you specify range checking with @code{arg_range}, then AutoOpts
+If you specify range checking with @code{arg-range}, then AutoOpts
 produces a special purpose procedure for this option.
 
 @item bool[@i{ean}]
@@ -2416,39 +2366,57 @@ specified a default value, the value @code{OPT_NAME_UNDEFINED} will be
 inserted with the value zero.  The option will be initialized to that
 value.  You may now use this in your code as follows:
 
-@smallexample
+@example
 te_Opt_Name opt = OPT_VALUE_OPT_NAME;
 switch (opt) @{
 case OPT_NAME_UNDEFINED:  /* undefined things */ break;
 case OPT_NAME_KEYWORD:    /* `keyword' things */ break;
 default: /* utterly impossible */ ;
 @}
-@end smallexample
+@end example
 
 AutoOpts produces a special purpose procedure for this option.
 @end table
 
-@cindex arg_optional
-@item arg_optional
+@cindex keyword
+@item keyword
+If the @code{arg-type} is @code{keyword}, then you have to specify the
+list of keywords by a series of @code{keyword} entries.
+
+@cindex arg-optional
+@item arg-optional
 This attribute indicates that the user does not have to supply an
-argument for the option.  This is only valid if the @var{arg_type} is
+argument for the option.  This is only valid if the @var{arg-type} is
 @code{string} or @code{keyword}.  If it is @code{keyword}, then
 this attribute may also specify the default keyword to assume when
 the argument is not supplied.  Without such a specification, the
 default keyword will be the zero-valued keyword.
 
-@cindex arg_default
-@item arg_default
+@cindex arg-default
+@item arg-default
 This specifies the default value to be used when the option is
 not specified or preset.
 
-@cindex arg_range
-@item arg_range
-If the @code{arg_type} is @code{number}, then @code{arg_range}s may be
+@cindex default
+@item default
+If your program processes its arguments in named option mode (See
+``long-opts'' in @ref{program attributes}), then you may select
+@strong{one} of your options to be the default option.  Do so with this
+attribute.  The option so specified must have an @code{arg-type}
+specified, but not the @code{arg-optional} attribute.  That is to say,
+the option argument must be required.
+
+If you have done this, then any arguments that do not match an option
+name and do not contain an equal sign (@code{=}) will be interpreted as
+an option argument to the default option.
+
+@cindex arg-range
+@item arg-range
+If the @code{arg-type} is @code{number}, then @code{arg-range}s may be
 specified, too.  If you specify one or more of these option attributes,
 then AutoOpts will create a callback procedure for handling it.  The
 argument value supplied for the option must match one of the range
-entries.  Each arg_range should consist of either an integer by itself
+entries.  Each arg-range should consist of either an integer by itself
 or an integer range.  The integer range is specified by one or two
 integers separated by the two character sequence, @code{->}.
 
@@ -2457,8 +2425,9 @@ The generated procedure imposes some constraints:
 @item
 A number by itself will match that one value.
 @item
-The high end of the range may not be @code{INT_MAX-1}.
-That value is used to indicate a single-valued match.
+The high end of the range may not be @code{INT_MIN},
+both for obvious reasons and because
+that value is used to indicate a single-valued match.
 @item
 An omitted lower value implies a lower bound of INT_MIN.
 @item
@@ -2474,9 +2443,9 @@ arguments @strong{must} be prepared to handle a call with that
 pointer set @code{NULL}.
 @end table
 
-@node Option Processing
-@subsubsection Special Option Processing
-@cindex Option Processing
+@node Option Argument Handling
+@subsubsection Option Argument Handling
+@cindex Option Argument Handling
 
 AutoOpts will automatically generate a callback procedure for options
 with enumerated keyword arguments and numeric arguments with range
@@ -2485,7 +2454,7 @@ of the attributes listed here.
 
 Otherwise, you may pick zero or one of the following attributes.
 The first two attributes interact with the @code{documentation} and
-@code{settable} attributes.  See their documentation above.
+@code{settable} attributes, @xref{Special Option Handling}.
 
 @table @samp
 @cindex flag_code
@@ -2535,13 +2504,212 @@ pointer to a list of pointers to the argument values
 (@code{STACKLST_OPT(NAME)}).
 @end table
 
+@node documentation attributes
+@subsection Man and Info doc Attributes
+@cindex documentation attributes
+
+AutoOpts includes AutoGen templates for producing abbreviated man pages
+and for producing the invoking section of an info document.  To take
+advantage of these templates, you must add several attributes to your
+option definitions.
+
+@table @samp
+@cindex option documentation
+@item doc
+First, every @code{flag} definition must have a @code{doc} attribute
+defined and many will need an @code{arg-name} attribute as well.  The
+@code{doc} text should be in plain sentences with minimal formatting.  The
+Texinfo commands @code{@@code}, and @code{@@var} will have its enclosed
+text made into @strong{\fB} entries in the man page, and the @code{@@file}
+text will be made into @strong{\fI} entries.  The @code{arg-name} attribute
+is used to display the option's argument in the man page.
+
+@cindex option argument name
+@item arg-name
+If an option has an argument, the argument should have a name for
+documentation purposes.  It will default to @code{arg-type}, but
+it will likely be clearer with something else like, @code{file-name}
+instead of @code{string} (the type).
+
+@cindex prog-man-descrip
+@cindex prog-info-descrip
+@item prog-man-descrip
+@itemx prog-info-descrip
+Then, you need to supply a brief description of what your program does.
+If you already have a @code{detail} definition, this may be sufficient.
+If not, or if you need special formatting for one of the manual formats,
+then you will need either a definition for @code{prog-man-descrip} or
+@code{prog-info-descrip} or both.  These will be inserted verbatim
+in the man page document and the info document, respectively.
+
+@cindex man-doc
+@item man-doc
+Finally, if you need to add man page sections like @code{SEE ALSO} or
+@code{USAGE} or other, put that text in a @code{man-doc} definition.  This
+text will be inserted verbatim in the man page after the @code{OPTIONS}
+section and before the @code{AUTHOR} section.
+@end table
+
+@node automatic options
+@subsection Automatically Supported Options
+@cindex automatic options
+
+AutoOpts provides automated support for five options.  @code{help} and
+@code{more-help} are always provided.  @code{version} is provided if
+@code{version} is defined in the option definitions.  @code{save-opts}
+and @code{load-opts} are provided if at least one @code{homerc} is
+defined.
+
+Below are the option names and flag values.  The flags are activated if
+and only if at least one user-defined option also uses a flag value.
+These flags may be deleted or changed to characters of your choosing by
+specifying @code{xxx-value = "y";}, where @code{xxx}
+is one of the five names below and @code{y} is either empty or the
+character of your choice.  For example, to change the help flag from
+@code{?} to @code{h}, specify @code{help-value = "h";}; and to require
+that @code{save-opts} be specified only with its long option name,
+specify @code{save-opts-value = "";}.
+
+@table @samp
+@item help -?
+This option will immediately invoke the @code{USAGE()} procedure
+and display the usage line, a description of each option with
+its description and option usage information.  This is followed
+by the contents of the definition of the @code{detail} text macro.
+
+@item more-help -!
+This option is identical to the @code{help} option, except that
+it also includes the contents of the @code{detail-file} file
+(if provided and found), plus the output is passed through
+a pager program.  (@code{more} by default, or the program identified
+by the @code{PAGER} environment variable.)
+
+@item version -v
+This will print the program name, title and version.
+If it is followed by the letter @code{c} and
+a value for @code{copyright} and @code{owner} have been provided,
+then the copyright will be printed, too.
+If it is followed by the letter @code{n}, then the full
+copyright notice (if available) will be printed.
+
+@item save-opts ->
+This option will cause the option state to be printed in
+RC/INI file format when option processing is done but not
+yet verified for consistency.  The program will terminate
+successfully without running when this has completed.
+Note that for most shells you will have to quote or escape the
+flag character to restrict special meanings to the shell.
+
+The output file will be the RC/INI file name (default or provided
+by @code{rcfile}) in the last directory named in a @code{homerc}
+definition
+
+@item load-opts -<
+This option will load options from the named file.  They
+will be treated exactly as if they were loaded from the
+normally found RC/INI files, but will not be loaded until
+the option is actually processed.  This can also be used
+within an RC/INI file causing them to nest.
+
+It is ultimately intended that specifying the option,
+@code{no-load-opts} will suppress the processing of rc/ini files and
+environment variables.  To do this, AutoOpts must first implement
+pre-scanning of the options, environment and rc files.
+@end table
+
+@node standard options
+@subsection Library of Standard Options
+@cindex standard options
+
+AutoOpts has developed a set of standardized options.
+You may incorporate these options in your program simply by adding
+a @code{#define} for the options you want, and the line,
+
+@example
+#include stdoptions.def
+@end example
+
+@noindent
+in your option definitions.  The supported options are specified thus:
+
+@example
+#define BRIEF
+#define DEBUG
+#define DIRECTORY
+#define DRY_RUN
+#define INPUT
+#define INTERACTIVE
+#define OUTPUT
+#define QUIET
+#define SILENT
+#define VERBOSE
+#define WARN
+@end example
+
+By default, only the long form of the option will be available.
+To specify the short (flag) form, suffix these names with @code{_FLAG}.
+e.g.,
+
+@example
+#define DEBUG_FLAG
+@end example
+
+@node AutoOpts API
+@section Programmatic Interface
+@cindex AutoOpts API
+
+The user interface for access to the argument information is completely
+defined in the generated header file and in the portions of the
+distributed file "options.h" that are marked "public".
+
+In the following macros, text marked @code{<OPT_NAME>} or @code{optname}
+is the name of the option @strong{in upper case} and @strong{segmented
+with underscores @code{_}}.  The macros and enumerations defined in the
+options header (interface) file are used as follows:
+
+To see how these @code{#define} macros are used in a program,
+the reader is referred to the several @file{opts.h} files
+included with the AutoGen sources.
+
+@menu
+* Option Processing Data::  Data for Option Processing
+* CLEAR_OPT::               CLEAR_OPT( <NAME> ) - Clear Option Markings
+* COUNT_OPT::               COUNT_OPT( <NAME> ) - Definition Count
+* DESC::                    DESC( <NAME> ) - Option Descriptor
+* DISABLE_OPT_name::        DISABLE_OPT_name - Disable an option
+* ENABLED::                 ENABLED( <NAME> ) - Is Option Enabled?
+* ERRSKIP_OPTERR::          ERRSKIP_OPTERR - Ignore Option Errors
+* ERRSTOP_OPTERR::          ERRSTOP_OPTERR - Stop on Errors
+* HAVE_OPT::                HAVE_OPT( <NAME> ) - Have this option?
+* ISSEL_OPT::               ISSEL_OPT( <NAME> ) - Is Option Selected?
+* ISUNUSED_OPT::            ISUNUSED_OPT( <NAME> ) - Never Specified?
+* OPTION_CT::               OPTION_CT - Full Count of Options
+* OPT_ARG::                 OPT_ARG( <NAME> ) - Option Argument String
+* OPT_VALUE_name::          OPT_VALUE_name - Option Argument Value
+* RESTART_OPT::             RESTART_OPT( n ) - Resume Option Processing
+* SET_OPT_name::            SET_OPT_name - Force an option to be set
+* STACKCT_OPT::             STACKCT_OPT( <NAME> ) - Stacked Arg Count
+* STACKLST_OPT::            STACKLST_OPT( <NAME> ) - Argument Stack
+* START_OPT::               START_OPT - Restart Option Processing
+* STATE_OPT::               STATE_OPT( <NAME> ) - Option State
+* USAGE::                   USAGE( exit-code ) - Usage invocation macro
+* VALUE_OPT_name::          VALUE_OPT_name - Option Flag Value
+* VERSION::                 VERSION - Version and Full Version
+* WHICH_IDX_name::          WHICH_IDX_name - Which Equivalenced Index
+* WHICH_OPT_name::          WHICH_OPT_name - Which Equivalenced Option
+* teOptIndex::              teOptIndex - Option Index and Enumeration
+* OPTIONS_STRUCT_VERSION::  OPTIONS_STRUCT_VERSION - active version
+* libopts procedures::      libopts Procedures
+@end menu
+
 @node Option Processing Data
-@subsubsection Data for Option Processing
+@subsection Data for Option Processing
 @cindex Option Processing Data
 
-The following fields may be used in the following ways and may be used
-for read only.  The first set is addressed from the @code{tOptDesc*}
-pointer:
+This section describes the data that may be accessed from within the
+option processing callback routines.  The following fields may be used
+in the following ways and may be used for read only.  The first set is
+addressed from the @code{tOptDesc*} pointer:
 
 @table @samp
 @cindex optIndex
@@ -2649,187 +2817,6 @@ Note@:  these fields get filled in during the first call to
 @code{optionProcess()}.  All other fields are private, for the exclusive
 use of AutoOpts code and is subject to change.
 
-@node documentation attributes
-@subsection Man and Info doc Attributes
-@cindex documentation attributes
-
-AutoOpts includes AutoGen templates for producing abbreviated man pages
-and for producing the invoking section of an info document.  To take
-advantage of these templates, you must add several attributes to your
-option definitions.
-
-@cindex doc
-First, every @code{flag} definition must have a @code{doc} attribute
-defined and many will need an @code{arg_name} attribute as well.  The
-@code{doc} text should be in plain sentences with minimal formatting.  The
-Texinfo commands @code{@@code}, and @code{@@var} will have its enclosed
-text made into @strong{\fB} entries in the man page, and the @code{@@file}
-text will be made into @strong{\fI} entries.  The @code{arg_name} attribute
-is used to display the option's argument in the man page.
-
-@cindex detail
-@cindex prog_man_descrip
-@cindex prog_info_descrip
-Then, you need to supply a brief description of what your program does.
-If you already have a @code{detail} definition, this may be sufficient.
-If not, or if you need special formatting for one of the manual formats,
-then you will need either a definition for @code{prog_man_descrip} or
-@code{prog_info_descrip} or both.  These will be inserted verbatim
-in the man page document and the info document, respectively.
-
-@cindex man_doc
-Finally, if you need to add man page sections like @code{SEE ALSO} or
-@code{USAGE} or other, put that text in a @code{man_doc} definition.  This
-text will be inserted verbatim in the man page after the @code{OPTIONS}
-section and before the @code{AUTHOR} section.
-
-@node automatic options
-@subsection Automatically Supported Options
-@cindex automatic options
-
-AutoOpts provides automated support for five options.  @code{help} and
-@code{more-help} are always provided.  @code{version} is provided if
-@code{version} is defined in the option definitions.  @code{save-opts}
-and @code{load-opts} are provided if at least one @code{homerc} is
-defined.
-
-Below are the option names and flag values.  The flags are activated if
-and only if at least one user-defined option also uses a flag value.
-They may be changed to characters of your choosing by specifying
-the program options @code{mumble-value = 'x';}, where @code{mumble} is
-one of the names below and @code{x} is the character of your choice.
-
-@table @samp
-@item help -?
-This option will immediately invoke the @code{USAGE()} procedure
-and display the usage line, a description of each option with
-its description and option usage information.  This is followed
-by the contents of the definition of the @code{detail} text macro.
-
-@item more-help -!
-This option is identical to the @code{help} option, except that
-it also includes the contents of the @code{detail-file} file
-(if provided and found), plus the output is passed through
-a pager program.  (@code{more} by default, or the program identified
-by the @code{PAGER} environment variable.)
-
-@item version -v
-This will print the program name, title and version.
-If it is followed by the letter @code{c} and
-a value for @code{copyright} and @code{owner} have been provided,
-then the copyright will be printed, too.
-If it is followed by the letter @code{n}, then the full
-copyright notice (if available) will be printed.
-
-@item save-opts ->
-This option will cause the option state to be printed in
-RC/INI file format when option processing is done but not
-yet verified for consistency.  The program will terminate
-successfully without running when this has completed.
-Note that for most shells you will have to quote or escape the
-flag character to restrict special meanings to the shell.
-
-The output file will be the RC/INI file name (default or provided
-by @code{rcfile}) in the last directory named in a @code{homerc}
-definition
-
-@item load-opts -<
-This option will load options from the named file.  They
-will be treated exactly as if they were loaded from the
-normally found RC/INI files, but will not be loaded until
-the option is actually processed.  This can also be used
-within an RC/INI file causing them to nest.
-
-It is ultimately intended that specifying the option,
-@code{no-load-opts} will suppress the processing of rc/ini files and
-environment variables.  To do this, AutoOpts must first implement
-pre-scanning of the options, environment and rc files.
-@end table
-
-@node standard options
-@subsection Library of Standard Options
-@cindex standard options
-
-AutoOpts has developed a set of standardized options.
-You may incorporate these options in your program simply by adding
-a @code{#define} for the options you want, and the line,
-
-@smallexample
-#include stdoptions.def
-@end smallexample
-
-@noindent
-in your option definitions.  The supported options are specified thus:
-
-@smallexample
-#define DEBUG
-#define VERBOSE
-#define WARN
-#define BRIEF
-#define QUIET
-#define SILENT
-#define DRY_RUN
-#define OUTPUT
-#define INPUT
-#define DIRECTORY
-#define INTERACTIVE
-@end smallexample
-
-By default, only the long form of the option will be available.
-To specify the short (flag) form, suffix these names with @code{_FLAG}.
-e.g.,
-
-@smallexample
-#define DEBUG_FLAG
-@end smallexample
-
-@node AutoOpts API
-@section Programmatic Interface
-@cindex AutoOpts API
-
-The user interface for access to the argument information is completely
-defined in the generated header file and in the portions of the
-distributed file "options.h" that are marked "public".
-
-In the following macros, text marked @code{<OPT_NAME>} or @code{optname}
-is the name of the option @strong{in upper case} and @strong{segmented
-with underscores @code{_}}.  The macros and enumerations defined in the
-options header (interface) file are used as follows:
-
-To see how these @code{#define} macros are used in a program,
-the reader is referred to the several @file{opts.h} files
-included with the AutoGen sources.
-
-@menu
-* CLEAR_OPT::               CLEAR_OPT( <NAME> ) - Clear Option Markings
-* COUNT_OPT::               COUNT_OPT( <NAME> ) - Definition Count
-* DESC::                    DESC( <NAME> ) - Option Descriptor
-* DISABLE_OPT_name::        DISABLE_OPT_name - Disable an option
-* ENABLED::                 ENABLED( <NAME> ) - Is Option Enabled?
-* ERRSKIP_OPTERR::          ERRSKIP_OPTERR - Ignore Option Errors
-* ERRSTOP_OPTERR::          ERRSTOP_OPTERR - Stop on Errors
-* HAVE_OPT::                HAVE_OPT( <NAME> ) - Have this option?
-* ISSEL_OPT::               ISSEL_OPT( <NAME> ) - Is Option Selected?
-* ISUNUSED_OPT::            ISUNUSED_OPT( <NAME> ) - Never Specified?
-* OPTION_CT::               OPTION_CT - Full Count of Options
-* OPT_ARG::                 OPT_ARG( <NAME> ) - Option Argument String
-* OPT_VALUE_name::          OPT_VALUE_name - Option Argument Value
-* RESTART_OPT::             RESTART_OPT( n ) - Resume Option Processing
-* SET_OPT_name::            SET_OPT_name - Force an option to be set
-* STACKCT_OPT::             STACKCT_OPT( <NAME> ) - Stacked Arg Count
-* STACKLST_OPT::            STACKLST_OPT( <NAME> ) - Argument Stack
-* START_OPT::               START_OPT - Restart Option Processing
-* STATE_OPT::               STATE_OPT( <NAME> ) - Option State
-* USAGE::                   USAGE( exit-code ) - Usage invocation macro
-* VALUE_OPT_name::          VALUE_OPT_name - Option Flag Value
-* VERSION::                 VERSION - Version and Full Version
-* WHICH_IDX_name::          WHICH_IDX_name - Which Equivalenced Index
-* WHICH_OPT_name::          WHICH_OPT_name - Which Equivalenced Option
-* teOptIndex::              teOptIndex - Option Index and Enumeration
-* OPTIONS_STRUCT_VERSION::  OPTIONS_STRUCT_VERSION - active version
-* libopts procedures::      libopts Procedures
-@end menu
-
 @node CLEAR_OPT
 @subsection CLEAR_OPT( <NAME> ) - Clear Option Markings
 @findex CLEAR_OPT
@@ -2902,7 +2889,7 @@ on option errors, invoke this option.  It is reversible.
 After invoking this macro, if @code{optionProcess()}
 encounters an error, it will call @code{exit(1)} rather than return.
 This is the default processing mode.  It can be overridden by
-specifying @code{allow_errors} in the definitions file,
+specifying @code{allow-errors} in the definitions file,
 or invoking the macro @xref{ERRSKIP_OPTERR}.
 
 @node HAVE_OPT
@@ -3231,11 +3218,11 @@ in the option structure.  It will also write out the number of arguments
 consumed by option processing.  The output result can be eval-ed by
 a shell in the following manner:
 
-@smallexample
+@example
 eval "`handle-prog-opts $@{1+\"$@@\"@}`"
 [ -z "$OPTION_CT" ] && exit 1
 shift $OPTION_CT
-@end smallexample
+@end example
 
 @noindent
 This routine is normally specified by specifying
@@ -3351,7 +3338,7 @@ Both of these methods are enabled by running AutoGen on
 the definitions file with the additional global attribute:
 
 @example
-test_main [ = proc-to-call ] ;
+test-main [ = proc-to-call ] ;
 @end example
 
 If you do not supply a @code{proc-to-call}, it will default
@@ -3405,10 +3392,10 @@ Extraction from autogen.texi
 Using the option definitions for an AutoOpt client program, the
 @file{aginfo.tpl} template will produce texinfo text that documents the
 invocation of your program.  The text emitted is designed to be included
-in the full texinfo document for your product.  It is not a
-stand-alone document.  The usage text included in this document for the
-@file{autogen}, @file{getdefs} and @file{columns} programs is all
-generated using this template.
+in the full texinfo document for your product.  It is not a stand-alone
+document.  The usage text for the @ref{autogen usage},
+@ref{getdefs usage} and @ref{columns usage} programs, are included in
+this document and are all generated using this template.
 
 Two files will be produced, a @file{.texi} file and a @file{.menu} file.
 You should include the @file{.menu} file in your document where you wish
@@ -3429,7 +3416,7 @@ and option meanings for the @@file@{your-program@} program.
 
 @noindent
 However, if your program's option definitions include a
-@samp{prog_info_descrip} section, then that is what will be used instead.
+@samp{prog-info-descrip} section, then that is what will be used instead.
 
 These files are produced by invoking the following command:
 
@@ -3451,7 +3438,7 @@ Using the option definitions for an AutoOpt client program,
 the @samp{agman1.tpl} template will produce an nroff document
 suitable for use as a @samp{man(1)} page document for a command
 line command.  The description section of the document is either
-the @samp{prog_man_descrip} text, if present, or the @samp{detail}
+the @samp{prog-man-descrip} text, if present, or the @samp{detail}
 text.
 
 Each option in the option definitions file is fully documented

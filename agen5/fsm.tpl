@@ -4,6 +4,8 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
+(setenv "SHELL" "/bin/sh")
+
 =]
 [=
 
@@ -41,7 +43,7 @@ CASE (suffix) =][=
 #define [=(. PFX)=]_STATE_CT  [=(+ 1 (count "state"))=]
 typedef enum {
 [=
-  (shellf "columns --spread=1 -I4 -S, -f'%s_ST_%%s' <<_EOF_
+  (shellf "${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%s_ST_%%s' <<_EOF_
 INIT
 %s
 INVALID
@@ -57,7 +59,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "state"))) )=]
 #define [=(. PFX)=]_EVENT_CT [=(count "event")=]
 typedef enum {
 [= compute-transitions =][=
-  (shellf "columns --spread=1 -I4 -S, -f'%s_EV_%%s' <<_EOF_
+  (shellf "${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'%s_EV_%%s' <<_EOF_
 %s
 INVALID
 _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
@@ -197,7 +199,7 @@ tSCC zSt[=(string-capitalize! (get "state"))=][] = [=
 =]
 tSCC* apzStates[] = {
 [=(shellf
-"columns --spread=1 -I4 -S, -f'zSt%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zSt%%s' <<'_EOF_'
 Init
 %s
 _EOF_"
@@ -212,7 +214,7 @@ tSCC zEv[=(string-capitalize! (get "event"))=][] = [=
 =]
 tSCC* apzEvents[] = {
 [=(shellf
-"columns --spread=1 -I4 -S, -f'zEv%%s' <<'_EOF_'
+"${COLUMNS_EXE-columns} --spread=1 -I4 -S, -f'zEv%%s' <<'_EOF_'
 %s
 Invalid
 _EOF_"

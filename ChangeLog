@@ -1,3 +1,16 @@
+2001-10-12  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/aginfo.tpl: minor cleanup
+	* autoopts/agman1.tpl: ditto
+	* autoopts/options.tpl(documentation): do not require a flag value
+	* autoopts/optmain.tpl(rmax): use INT_MIN as single-value marker
+	* autoopts/stdoptions.def(quiet/silent): make them work together better
+	(VERBOSE_ENUM): allow this to specify levels of verbosity
+	* doc/autogen.texi(option features): condense description
+	(Option Definitions): cleanup
+	* doc/compete.tpl: emphasize similarities and differences
+	* doc/compete.def: remove redundand definitions
+
 2001-10-01  Bruce Korb  <bkorb@gnu.org>
 
 	* everywhere: much doc cleanups
@@ -8,12 +21,15 @@
 	* autoopts/usage.c: call numeric argument callback procedures to get
 	any range information they may want to add for extended usage.
 	* autoopts/makeshell.c: fix pointer reference
+	* agen5/fsm.tpl(columns): use $COLUMNS_EXE, if passed in
+	* */*.tpl: specify the shell to use
 
 2001-10-01  Albert Chin  <china@thewrittenword.com>
 
 	* agen5/agUtils.c(doOptions): not all systems with POSIX sysinfo
 	support SI_PLATFORM.
 	* agen5/bootstrap.dir(COLUMNS_EXE): needs to be exported
+	* agen5/fsm-macro.tpl(egrep): on some shells, '^' must be quoted.
 
 2001-09-29  Bruce Korb  <bkorb@gnu.org>
 

@@ -10,14 +10,20 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.72 2001/10/01 23:51:33 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.73 2001/10/13 18:48:48 bkorb Exp $
 ## ---------------------------------------------------------------------
-##
-texi=autogen.texi =]
+
+texi=autogen.texi
+
+(setenv "SHELL" "/bin/sh")
+
+=]
 \input texinfo
-@letterpaper
+@ignore
+\internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
+@end ignore
 @c %**start of header
-@setfilename autogen.info
+@setfilename [=(base-name)=].info
 @settitle AutoGen
 @setchapternewpage off
 @c %**end of header
