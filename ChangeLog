@@ -1,3 +1,8 @@
+2002-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optlib.tpl(usage-line): provide text for the "false"
+	path.  Guile chokes on appending #f to a string.
+
 2002-10-30  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expPrint.c(ag_scm_hide_email): new function

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.3 2002/09/10 02:15:01 bkorb Exp $
+# $Id: optlib.tpl,v 3.4 2002/11/05 01:53:41 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -522,16 +522,16 @@ DEFINE USAGE_LINE   =][=
 
   (define usage-line (string-append "USAGE:  %s "
 
-      ;; If at least one option has a minimum occurrence count
-      ;; we use curly brackets around the option syntax.
-      ;;
-      (if (not (exist? "flag.min")) "[ " "{ ")
+    ;; If at least one option has a minimum occurrence count
+    ;; we use curly brackets around the option syntax.
+    ;;
+    (if (not (exist? "flag.min")) "[ " "{ ")
 
     (if (exist? "flag.value")
         (string-append "-<flag>" flag-arg
            (if (exist? "long_opts") " | " "") )
-        (if (not (exist? "long_opts"))
-           (string-append "<option-name>" opt-arg))  )
+        (if (not (exist? "long-opts"))
+           (string-append "<option-name>" opt-arg) "" )  )
 
     (if (exist? "long_opts")
         (string-append "--<name>" opt-arg) "" )
