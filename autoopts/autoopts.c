@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.34 2004/05/22 00:15:45 bkorb Exp $
+ *  $Id: autoopts.c,v 3.35 2004/08/12 03:24:00 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -669,23 +669,8 @@ doImmediateOpts( tOptions* pOpts )
         /*
          *  IF this *is* an immediate-attribute option, then do it.
          */
-        switch (optState.flags & (OPTST_DISABLE_IMM|OPTST_IMM)) {
-        case 0:                   /* never */
+        if (! DO_IMMEDIATELY(optState.flags))
             continue;
-
-        case OPTST_DISABLE_IMM:   /* do enabled options later */
-            if ((optState.flags & OPTST_DISABLED) == 0)
-                continue;
-            break;
-
-        case OPTST_IMM:           /* do disabled options later */
-            if ((optState.flags & OPTST_DISABLED) != 0)
-                continue;
-            break;
-
-        case OPTST_DISABLE_IMM|OPTST_IMM: /* always */
-            break;
-        }
 
         if (! SUCCESSFUL( handleOption( pOpts, &optState )))
             break;
@@ -760,27 +745,17 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
             /*
              *  Process only immediate actions
              */
-            if (st.flags & OPTST_DISABLED) {
-                if ((st.flags & OPTST_DISABLE_IMM) == 0)
-                    continue;
-            } else {
-                if ((st.flags & OPTST_IMM) == 0)
-                    continue;
-            }
-            break;
+            if (DO_IMMEDIATELY(st.flags))
+                break;
+            continue;
 
         case ENV_NON_IMM:
             /*
              *  Process only NON immediate actions
              */
-            if (st.flags & OPTST_DISABLED) {
-                if ((st.flags & OPTST_DISABLE_IMM) != 0)
-                    continue;
-            } else {
-                if ((st.flags & OPTST_IMM) != 0)
-                    continue;
-            }
-            break;
+            if (DO_NORMAL_TIME(st.flags))
+                break;
+            continue;
 
         default: /* process everything */
             break;
@@ -955,12 +930,12 @@ doPresets( tOptions* pOpts )
     if (  (pOpts->papzHomeList == NULL)
        || SKIP_RC_FILES(pOpts) )  {
         doEnvPresets( pOpts, ENV_ALL );
-        return SUCCESS;
     }
-
-    doEnvPresets( pOpts, ENV_IMM );
-    doRcFiles(    pOpts );
-    doEnvPresets( pOpts, ENV_NON_IMM );
+    else {
+        doEnvPresets( pOpts, ENV_IMM );
+        doRcFiles(    pOpts );
+        doEnvPresets( pOpts, ENV_NON_IMM );
+    }
     return SUCCESS;
 }
 
@@ -1188,23 +1163,8 @@ optionProcess(
         /*
          *  IF this is not an immediate-attribute option, then do it.
          */
-        switch (optState.flags & (OPTST_DISABLE_IMM|OPTST_IMM)) {
-        case 0:                   /* always */
-            break;
-
-        case OPTST_DISABLE_IMM:   /* disabled options already done */
-            if ((optState.flags & OPTST_DISABLED) != 0)
-                continue;
-            break;
-
-        case OPTST_IMM:           /* enabled options already done */
-            if ((optState.flags & OPTST_DISABLED) == 0)
-                continue;
-            break;
-
-        case OPTST_DISABLE_IMM|OPTST_IMM: /* opt already done */
+        if (! DO_NORMAL_TIME(optState.flags))
             continue;
-        }
 
         if (! SUCCESSFUL( handleOption( pOpts, &optState ))) {
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)

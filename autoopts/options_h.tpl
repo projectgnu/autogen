@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.19 2004/02/01 21:26:45 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.20 2004/08/12 03:24:00 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -35,30 +35,81 @@ h=options.h
  *  for "opt_name" are available.
  */
 
-#define OPTST_INIT         0x000000  /* Initial compiled value            */
-#define OPTST_SET          0x000001  /* Set via the "SET_OPT()" macro     */
-#define OPTST_PRESET       0x000002  /* Set via an RC/INI file            */
-#define OPTST_DEFINED      0x000004  /* Set via a command line option     */
-#define OPTST_SET_MASK     0x000007  /* mask of flags that show set state */
+#define OPTST_INIT           0x0000000  /* Initial compiled value            */
+#define OPTST_SET            0x0000001  /* Set via the "SET_OPT()" macro     */
+#define OPTST_PRESET         0x0000002  /* Set via an RC/INI file            */
+#define OPTST_DEFINED        0x0000004  /* Set via a command line option     */
 
-#define OPTST_EQUIVALENCE  0x000010  /* selected by equiv'ed option       */
-#define OPTST_DISABLED     0x000020  /* option is in disabled state       */
+#define OPTST_SET_MASK       0x0000007  /* mask of flags that show set state */
 
-#define OPTST_NO_INIT      0x000100  /* option cannot be preset           */
-#define OPTST_NUMBER_OPT   0x000200  /* opt value (flag) is any digit     */
-#define OPTST_STACKED      0x000400  /* opt uses stackOptArg procedure    */
-#define OPTST_INITENABLED  0x000800  /* option defaults to enabled        */
-#define OPTST_ENUMERATION  0x001000  /* opt arg is an enum (keyword list) */
-#define OPTST_BOOLEAN      0x002000  /* opt arg is boolean-valued         */
-#define OPTST_NUMERIC      0x004000  /* opt arg has numeric value         */
-#define OPTST_DOCUMENT     0x008000  /* opt is for documentation only     */
-#define OPTST_IMM          0x010000  /* process option on first pass      */
-#define OPTST_DISABLE_IMM  0x020000  /* process disablement on first pass */
-#define OPTST_OMITTED      0x040000  /* compiled out of program           */
-#define OPTST_MUST_SET     0x080000  /* must be set or pre-set            */
-#define OPTST_MEMBER_BITS  0x100000  /* opt arg sets set membership bits  */
+#define OPTST_EQUIVALENCE    0x0000010  /* selected by equiv'ed option       */
+#define OPTST_DISABLED       0x0000020  /* option is in disabled state       */
 
-#define OPTST_PERSISTENT   0xFFFF00  /* mask of flags that do not change  */
+#define OPTST_NO_INIT        0x0000100  /* option cannot be preset           */
+#define OPTST_NUMBER_OPT     0x0000200  /* opt value (flag) is any digit     */
+#define OPTST_STACKED        0x0000400  /* opt uses stackOptArg procedure    */
+#define OPTST_INITENABLED    0x0000800  /* option defaults to enabled        */
+#define OPTST_ENUMERATION    0x0001000  /* opt arg is an enum (keyword list) */
+#define OPTST_BOOLEAN        0x0002000  /* opt arg is boolean-valued         */
+#define OPTST_NUMERIC        0x0004000  /* opt arg has numeric value         */
+#define OPTST_DOCUMENT       0x0008000  /* opt is for documentation only     */
+#define OPTST_IMM            0x0010000  /* process option on first pass      */
+#define OPTST_DISABLE_IMM    0x0020000  /* process disablement on first pass */
+#define OPTST_OMITTED        0x0040000  /* compiled out of program           */
+#define OPTST_MUST_SET       0x0080000  /* must be set or pre-set            */
+#define OPTST_MEMBER_BITS    0x0100000  /* opt arg sets set membership bits  */
+#define OPTST_TWICE          0x0200000  /* process option twice - imm + reg  */
+#define OPTST_DISABLE_TWICE  0x0400000  /* process disabled option twice     */
+
+#define OPTST_PERSISTENT     0xFFFFF00  /* mask of flags that do not change  */
+
+/*
+ *  Options are examined at two times:  at immediate handling time and at
+ *  normal handling time.  If an option is disabled, the timing may be
+ *  different from the handling of the undisabled option.  So, here's how
+ *  it works:
+ *
+ *  A) handling at "immediate" time, either 1 or 2:
+ *
+ *  1.  The "option is disabled" bit is *NOT* set (OPTST_DISABLED)
+ *      IMM           must be set
+ *      DISABLE_IMM   don't care
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *
+ *  2.  The "option is disabled" bit *IS* set (OPTST_DISABLED)
+ *      IMM           don't care
+ *      DISABLE_IMM   must be set
+ *      TWICE         don't care
+ *      DISABLE_TWICE don't care
+ *
+ *  B) handling at "regular" time, either 1 or 2:
+ *
+ *  1.  The "option is disabled" bit is *NOT* set (OPTST_DISABLED)
+ *      IMM           must *NOT* be set -- *OR*
+ *      TWICE         must be set
+ *      DISABLE_IMM   don't care
+ *      DISABLE_TWICE don't care
+ *
+ *  2.  The "option is disabled" bit *IS* set (OPTST_DISABLED)
+ *      IMM           don't care
+ *      TWICE         don't care
+ *      DISABLE_IMM   must *NOT* be set -- *OR*
+ *      DISABLE_TWICE must be set
+ */
+#define DO_IMMEDIATELY(_flg) \
+    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM)) == OPTST_IMM) \
+    || (   ((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    \
+        == (OPTST_DISABLED|OPTST_DISABLE_IMM)  ))
+
+#define DO_NORMAL_TIME(_flg) \
+    (  (((_flg) & (OPTST_DISABLED|OPTST_IMM))            == 0)  \
+    || (((_flg) & (OPTST_DISABLED|OPTST_TWICE))          ==     \
+                  (OPTST_DISABLED|OPTST_TWICE))                 \
+    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_IMM))    ==     \
+                  OPTST_DISABLED)                               \
+    || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_TWICE))  ==     \
+                  (OPTST_DISABLED|OPTST_DISABLE_TWICE)  ))
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)
