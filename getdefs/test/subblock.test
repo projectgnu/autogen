@@ -1,15 +1,15 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# forcomma.test --- test the subblock parameter to getdefs
+# subblock.test --- test the subblock parameter to getdefs
 #
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 1999/11/03 05:35:55 $
+# Last Modified:  $Date: 2000/03/05 13:15:34 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: subblock.test,v 1.3 1999/11/03 05:35:55 bruce Exp $
+# $Id: subblock.test,v 1.4 2000/03/05 13:15:34 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
