@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.8 2002/01/25 18:24:18 bkorb Exp $
+ *  $Id: autogen.c,v 3.9 2002/01/30 02:37:37 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -108,17 +108,32 @@ main( int    argc,
 STATIC void
 signalExit( int sig )
 {
-    tSCC zErr[] = "AutoGen aborting on signal %d (%s)\n";
-    tSCC zAt[]  = "processing template %s\n"
-                  "            on line %d\n"
-                  "       for function %s (%d)\n";
-
     if (*pzOopsPrefix != NUL) {
         fputs( pzOopsPrefix, stderr );
         pzOopsPrefix = "";
     }
 
-    fprintf( stderr, zErr, sig, strsignal( sig ));
+    {
+        tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
+        tSCC* apzStateName[] = {
+            "INIT",
+            "OPTIONS",
+            "GUILE_PRELOAD"
+            "LOAD_DEFS",
+            "LIB_LOAD",
+            "LOAD_TPL",
+            "EMITTING",
+            "INCLUDING",
+            "CLEANUP",
+            "ABORTING",
+            "DONE"
+        }
+
+        fprintf( stderr, zErr, sig, strsignal( sig ),
+                 ((unsigned)procState <= PROC_STATE_DONE)
+                 ? apzStateName[ procState ] : "** BOGUS **" );
+    }
+
     fflush( stderr );
     fflush( stdout );
     if (pfTrace != stderr )
@@ -129,6 +144,9 @@ signalExit( int sig )
      *  so that the template writer knows where to look for their problem.
      */
     if (pCurTemplate != NULL) {
+        tSCC zAt[]  = "processing template %s\n"
+                      "            on line %d\n"
+                      "       for function %s (%d)\n";
         int f;
 
         if ( pCurMacro == NULL ) {
