@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.12 2000/03/29 03:08:30 bruce Exp $
+ *  $Id: expState.c,v 1.13 2000/03/29 03:17:18 bruce Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -316,7 +316,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
         if (pE->valType != VALTYP_TEXT)
             return SCM_BOOL_F;
 
-        field = gh_str2scm( pE->pzValue, strlen( pE->pzValue ));
+        field = gh_str02scm( pE->pzValue );
         if (isIndexed)
             return gh_call2( op, field, test );
 
@@ -328,7 +328,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
             if (pE == (tDefEntry*)NULL)
                 break;
 
-            field = gh_str2scm( pE->pzValue, strlen( pE->pzValue ));
+            field = gh_str02scm( pE->pzValue );
         }
         return SCM_BOOL_F;
     }
@@ -343,7 +343,7 @@ find_entry_value( SCM op, SCM obj, SCM test, tDefEntry* pCurDef )
      *  Search the members for what we want.
      */
     pzField[-1] = '.';
-    field       = gh_str2scm( pzField, strlen( pzField ));
+    field       = gh_str02scm( pzField );
     pMembers    = (tDefEntry*)(void*)(pE->pzValue);
 
     if (isIndexed) {
@@ -464,13 +464,13 @@ ag_scm_exist_p( SCM obj )
  * exparg: ag-name,  name of AutoGen value
  * exparg: test-str, string to test against
  *
- * doc:  This function answers the question, "Is there a value named
- *       @code{ag-name} that matches the pattern @code{test-str} using the
- *       match function @code{op}?"  Return SCM_BOOL_T iff at least one
- *       occurrance of the specified name has an AutoGen value matching the
- *       test string.  The operator can be any function that takes two string
- *       arguments and yields a boolean.  It is expected that you will use one
- *       of the string matching functions provided by AutoGen.
+ * doc:  This function answers the question, "Is there an AutoGen value named
+ *       @code{ag-name} with a value that matches the pattern @code{test-str}
+ *       using the match function @code{op}?"  Return SCM_BOOL_T iff at least
+ *       one occurrance of the specified name has such a value.  The operator
+ *       can be any function that takes two string arguments and yields a
+ *       boolean.  It is expected that you will use one of the string matching
+ *       functions provided by AutoGen.
  *       @*
  *       The value name must follow the same rules as the
  *       @code{ag-name} argument for @code{exist?} (@xref{SCM exist?}).
