@@ -10,6 +10,26 @@
 	argument, "process" method depending on mode:  KEEP, UNCOOKED and COOKED.
 	(loadOptionLine): use the new function.
 	* autoopts/test/rc.test: test this new stuff
+	* autoopts/Makefile.am(install-data-hook): sed in stuff derived from
+	config.h (we cannot install that).
+	* autoopts/autoopts.h(pzNest): new arg type for usage text
+	* autoopts/enumeration.c(enumError): arg types now handled via an enum
+	instead of bits in a mask.
+	* autoopts/guileopt.c(export_options_to_guile): ditto
+	* autoopts/makeshell.c(emitSetup): ditto
+	* autoopts/putshell.c: the same
+	* autoopts/save.c: again
+	* autoopts/usage.c: and some more
+	* autoopts/optlib.tpl: and again
+	* autoopts/optcode.tpl: ditto, also rearranged man option structure
+	* autoopts/options_h.tpl: new macros and enums for arg types
+	Also rearranged main option structure, as we will be incompatible anyway.
+	* autoopts/usage-txt.def: new strings for the new arg types
+	* autoopts/test/*: Must specify the "config.h" header now.
+	* config/libopts.def: either stdint.h or inttypes.h is required now
+	* doc/auto_gen.tpl: make sure compiles pick up config.h
+	* pkg/libopts/mklibsrc.sh: do *not* pick up config.h.  It will be
+	generated at build time.
 
 2004-02-12  Bruce Korb  <bkorb@gnu.org>
 

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-14 08:24:59 bkorb"
+ *  Time-stamp:      "2005-02-14 16:47:00 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.9 2005/02/14 16:25:37 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.10 2005/02/15 01:34:13 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -193,6 +193,7 @@ typedef struct {
     tCC*    pzKey;
     tCC*    pzKeyL;
     tCC*    pzBool;
+    tCC*    pzNest;
     tCC*    pzOpt;
     tCC*    pzNo;
     tCC*    pzBrk;

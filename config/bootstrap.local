@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-02-12 10:59:22 bkorb"
+# Time-stamp:        "2005-02-14 14:00:56 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.8 2005/02/13 01:48:00 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.9 2005/02/15 01:34:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.4 2005/02/14 16:25:37 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:23:20 bkorb"
+ *  $Id: makeshell.c,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+ * Time-stamp:      "2005-02-14 14:25:43 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -684,26 +684,30 @@ emitSetup( tOptions* pOpts )
          *  IF this is an enumeration/bitmask option, then convert the value
          *  to a string before printing the default value.
          */
-        if (pOptDesc->fOptState & OPTST_ENUMERATION) {
+        switch (OPTST_GET_ARGTYPE(pOptDesc->fOptState)) {
+        case OPARG_TYPE_ENUMERATION:
             (*(pOptDesc->pOptProc))( (tOptions*)2UL, pOptDesc );
             pzDefault = pOptDesc->pzLastArg;
-        }
+            break;
 
         /*
          *  Numeric and membership bit options are just printed as a number.
          */
-        else if (pOptDesc->fOptState & (OPTST_NUMERIC | OPTST_MEMBER_BITS)) {
+        case OPARG_TYPE_NUMERIC:
+        case OPARG_TYPE_MEMBERSHIP:
             snprintf( zVal, sizeof( zVal ), "%ld", (tUL)pOptDesc->pzLastArg );
             pzDefault = zVal;
-        }
+            break;
 
-        else if (pOptDesc->pzLastArg == NULL) {
-            if (pzFmt == zSingleDef)
-                pzFmt = zSingleNoDef;
-            pzDefault = NULL;
+        default:
+            if (pOptDesc->pzLastArg == NULL) {
+                if (pzFmt == zSingleDef)
+                    pzFmt = zSingleNoDef;
+                pzDefault = NULL;
+            }
+            else
+                pzDefault = pOptDesc->pzLastArg;
         }
-        else
-            pzDefault = pOptDesc->pzLastArg;
 
         printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME, pzDefault );
     }

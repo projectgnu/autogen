@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-02-05 07:53:02 bkorb"
+# Time-stamp:        "2005-02-14 16:53:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: enums.test,v 4.5 2005/02/05 15:55:22 bkorb Exp $
+# $Id: enums.test,v 4.6 2005/02/15 01:34:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,6 +29,7 @@ autogen definitions options;
 
 prog-name   = ${testname}-test;
 prog-title  = 'test complex main procedure';
+config-header = config.h;
 
 argument    = '[ <node> ]';
 long-opts;

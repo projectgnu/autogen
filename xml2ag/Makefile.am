@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-02-09 18:56:20 bkorb"
+## Time-stamp:      "2005-02-14 15:31:07 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999				      
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/02/13 01:48:00 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/02/15 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -35,7 +35,7 @@ all : gen
 gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
 
 x.c : $(csrcs)
-	for f in $(csrcs) ; do echo "#include \"$$f\"" ; done > $@
+	for f in config.h $(csrcs) ; do echo "#include \"$$f\"" ; done > $@
 
 xmlopts.c $(xml2ag_OBJECTS) : xmlopts.h
 

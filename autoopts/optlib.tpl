@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.4 2005/02/14 16:25:37 bkorb Exp $
+# $Id: optlib.tpl,v 4.5 2005/02/15 01:34:13 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-14 08:22:23 bkorb"
+# Time-stamp:      "2005-02-14 14:53:04 bkorb"
 
 =][=
 
@@ -127,6 +127,13 @@ DEFINE save-name-morphs
     ~*   key|set                =][=
          (set! test-name proc-name)
          (set! is-extern #f)
+         (set! have-proc #t)    =][=
+
+    ~*   hier|nest              =][=
+         (set! proc-name "optionNestedValue")
+         (set! test-name proc-name)
+         (set! is-extern #t)
+         (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
     *                           =][=
@@ -474,7 +481,7 @@ tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
     ENDIF                       =][=
 
 
-    IF (exist? "flags_must") =]
+    IF (exist? "flags-must") =]
 static const int
     a[=(. cap-name)=]MustList[] = {[=
       FOR flags-must =]
@@ -498,11 +505,24 @@ static const int
          no-preset      " | OPTST_NO_INIT"     =][=
 
          CASE arg-type  =][=
-         =*  num        =] | OPTST_NUMERIC[=
-         =*  bool       =] | OPTST_BOOLEAN[=
-         =*  key        =] | OPTST_ENUMERATION[=
-         =*  set        =] | OPTST_MEMBER_BITS[=
-         ~* "str|bool"  =][= # nothing   =][=
+         =*  num        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
+
+         =*  bool       =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=
+
+         =*  key        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_ENUMERATION)[=
+
+         =*  set        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_MEMBERSHIP)[=
+
+         ~*  hier|nest  =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_HIERARCHY)[=
+
+         =*  str        =] \
+	| OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
+
          == ""          =][= # nothing   =][=
          *              =][=
          (error (string-append "unknown arg type '"

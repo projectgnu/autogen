@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2003-08-23 15:21:38 bkorb"
+## Time-stamp:      "2005-02-14 17:04:46 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 # Maintainer:       Bruce Korb <bkorb@gnu.org>
 # Created:          Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: usage.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: usage.test,v 4.2 2005/02/15 01:34:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -613,6 +613,7 @@ emit_defs()
 	AutoGen Definitions options;
 	prog-name  = test_$1;
 	prog-title = "Checkout $1 Options";
+	config-header = 'config.h';
 	test-main;
 	_EOF_
 

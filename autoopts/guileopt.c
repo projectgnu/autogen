@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.5 2005/02/14 16:25:37 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:23:24 bkorb"
+ *  $Id: guileopt.c,v 4.6 2005/02/15 01:34:13 bkorb Exp $
+ * Time-stamp:      "2005-02-14 14:30:24 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -99,7 +99,7 @@ export_options_to_guile( pOpts )
          *  take numeric arguments will always have a value set.)
          */
         if (UNUSED_OPT( pOD )) {
-            if (pOD->fOptState & OPTST_NUMERIC) {
+            if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
                 sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
                          (uintptr_t)pOD->pzLastArg );
 #ifdef DEBUG
@@ -153,7 +153,7 @@ export_options_to_guile( pOpts )
         /*
          *  IF the option takes a numeric value, set the value
          */
-        else if (pOD->fOptState & OPTST_NUMERIC) {
+        else if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
             sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
                      (uintptr_t)pOD->pzLastArg );
 #ifdef DEBUG

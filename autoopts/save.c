@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.8 2005/02/14 16:25:37 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:21:28 bkorb"
+ *  save.c  $Id: save.c,v 4.9 2005/02/15 01:34:13 bkorb Exp $
+ * Time-stamp:      "2005-02-14 14:59:26 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -284,7 +284,7 @@ printEntry(
      *  IF the option is numeric only,
      *  THEN the char pointer is really the number
      */
-    if ((p->fOptState & OPTST_NUMERIC) != 0)
+    if (OPTST_GET_ARGTYPE(p->fOptState) == OPARG_TYPE_NUMERIC)
         fprintf( fp, "  %d\n", (t_word)pzLA );
 
     /*
@@ -343,9 +343,6 @@ printEntry(
  * and do nothing.  If the output file cannot be created or updated, a message
  * will be printed to @code{stderr} and the routine will return.
 =*/
-#define ARGTYPE (OPTST_NUMERIC \
-  | OPTST_STACKED | OPTST_ENUMERATION | OPTST_MEMBER_BITS | OPTST_BOOLEAN )
-
 void
 optionSaveFile( tOptions* pOpts )
 {
@@ -436,32 +433,34 @@ optionSaveFile( tOptions* pOpts )
             continue;
         }
 
-        arg_state = p->fOptState & ARGTYPE;
+        arg_state = OPTST_GET_ARGTYPE(p->fOptState);
         switch (arg_state) {
         case 0:
-        case OPTST_NUMERIC:
+        case OPARG_TYPE_NUMERIC:
             printEntry( fp, p, p->pzLastArg );
             break;
 
-        case OPTST_STACKED:
-        {
-            tArgList*  pAL = (tArgList*)p->optCookie;
-            int        uct = pAL->useCt;
-            tCC**      ppz = pAL->apzArgs;
+        case OPARG_TYPE_STRING:
+            if (p->fOptState & OPTST_STACKED) {
+                tArgList*  pAL = (tArgList*)p->optCookie;
+                int        uct = pAL->useCt;
+                tCC**      ppz = pAL->apzArgs;
 
-            /*
-             *  Disallow multiple copies of disabled options.
-             */
-            if (uct > 1)
-                p->fOptState &= ~OPTST_DISABLED;
+                /*
+                 *  Disallow multiple copies of disabled options.
+                 */
+                if (uct > 1)
+                    p->fOptState &= ~OPTST_DISABLED;
 
-            while (uct-- > 0)
-                printEntry( fp, p, *(ppz++) );
+                while (uct-- > 0)
+                    printEntry( fp, p, *(ppz++) );
+            } else {
+                printEntry( fp, p, p->pzLastArg );
+            }
             break;
-        }
 
-        case OPTST_ENUMERATION:
-        case OPTST_MEMBER_BITS:
+        case OPARG_TYPE_ENUMERATION:
+        case OPARG_TYPE_MEMBERSHIP:
         {
             tCC* val = p->pzLastArg;
             /*
@@ -470,7 +469,7 @@ optionSaveFile( tOptions* pOpts )
              */
             (*(p->pOptProc))( (tOptions*)2UL, p );
             printEntry( fp, p, p->pzLastArg );
-            if ((p->pzLastArg != NULL) && (arg_state != OPTST_ENUMERATION))
+            if ((p->pzLastArg != NULL) && (arg_state != OPARG_TYPE_ENUMERATION))
                 /*
                  *  bit flag and enumeration strings get allocated
                  */
@@ -479,12 +478,12 @@ optionSaveFile( tOptions* pOpts )
             break;
         }
 
-        case OPTST_BOOLEAN:
+        case OPARG_TYPE_BOOLEAN:
             printEntry( fp, p, (p->pzLastArg != 0) ? "true" : "false" );
             break;
 
         default:
-            break; /* bogus - skip it */
+            break; /* cannot handle - skip it */
         }
     } while ( (pOD++), (--ct > 0));
 

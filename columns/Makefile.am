@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-02-09 18:57:24 bkorb"
+## Time-stamp:      "2005-02-14 15:13:48 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>                    
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.3 2005/02/13 01:48:00 bkorb Exp $
+## $Id: Makefile.am,v 4.4 2005/02/15 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -38,7 +38,7 @@ all : gen
 columns.1 columns.menu columns.texi : gen-stamp
 
 cols.c : Makefile
-	for f in $(csrc) ; do echo "#include \"$$f\"" ; done > $@
+	for f in config.h $(csrc) ; do echo "#include \"$$f\"" ; done > $@
 
 gen-stamp : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-02-12 11:27:26 bkorb"
+## Time-stamp:      "2005-02-14 17:14:30 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.5 2005/02/13 01:48:00 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.6 2005/02/15 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -31,7 +31,10 @@ mkdir ${tag} ${tag}/compat ${tag}/autoopts
 #
 cd ${top_builddir}/autoopts
 files=`fgrep '#include' libopts.c | \
-       sed 's,"$,,;s,#.*",,;/^streqvcmp.c$/d;/^autoopts.h$/d'`
+       sed -e 's,"$,,;s,#.*",,' \
+           -e '/^streqvcmp\.c$/d' \
+           -e '/^config\.h$/d' \
+           -e '/^autoopts\.h$/d'`
 for f in libopts.c ${files}
 do
   if test -f ${f}

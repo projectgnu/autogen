@@ -1,18 +1,20 @@
 #! /bin/sh
-# Last Modified:     $Date: 2005/01/01 00:21:00 $
-# ident              $Id: stdopts.def,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+#
+## Time-stamp:      "2005-02-14 16:37:03 bkorb"
+## ident            $Id: stdopts.def,v 4.2 2005/02/15 01:34:13 bkorb Exp $
 
 #  This is the standard set of options for testing option processing
 #  It is expected to be dot
 
 exec 5> $testname.def
-cat >&5 <<_EOF_
+cat >&5 <<- _EOF_
 
-AutoGen definitions options;
+	AutoGen definitions options;
 
-prog_name  = "test_${testname}";
-prog_title = "Test AutoOpts for ${testname}";
-_EOF_
+	config-header = 'config.h';
+	prog-name  = "test_${testname}";
+	prog-title = "Test AutoOpts for ${testname}";
+	_EOF_
 
 echo test_main $test_main
 if [ -n "${test_main}" ]

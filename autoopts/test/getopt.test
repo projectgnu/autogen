@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2005-01-23 15:30:53 bkorb"
+# Time-stamp:        "2005-02-14 17:03:48 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.2 2005/01/23 23:33:06 bkorb Exp $
+# $Id: getopt.test,v 4.3 2005/02/15 01:34:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,9 +29,10 @@ cat >> ${testname}.def <<_EOF_
 
 AutoGen definitions options;
 
-prog_name  = "test_${testname}";
-prog_title = "Test AutoOpts for ${testname}";
-test_main  = 'yes';
+prog-name  = "test_${testname}";
+prog-title = "Test AutoOpts for ${testname}";
+test-main  = 'yes';
+config-header = 'config.h';
 
 settable;
 version = '1.2.3';

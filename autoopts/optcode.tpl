@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.9 2005/02/14 16:25:37 bkorb Exp $
+#$Id: optcode.tpl,v 4.10 2005/02/15 01:34:13 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-14 08:22:52 bkorb"
+# Time-stamp:      "2005-02-14 17:02:18 bkorb"
 
 =][=
 
@@ -154,7 +154,7 @@ IF (exist? "version")   =]
      /* option argument  */ ARG_MAY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_INIT,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -199,10 +199,10 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ '?',
+     /* option argument  */ ARG_MAY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_INIT,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -216,7 +216,8 @@ IF (exist? "homerc")
      /* option argument  */ ARG_MUST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_DISABLE_IMM,
+     /* opt state flags  */ OPTST_DISABLE_IMM | \
+			OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -319,10 +320,7 @@ ENDIF                   =][=
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
-    NULL,         NULL,         zPROGNAME,
-    zRcName,      zCopyright,   zCopyrightNotice,
-    zFullVersion, apzHomeList,  zUsageTitle,
-    zExplain,     zDetail,      NULL,           [= (. usage-proc) =],
+    0, NULL,                    /* original argc + argv    */
     ( OPTPROC_BASE[=                IF (not (exist? "allow-errors"))     =]
     + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
     + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long-opts")         =]
@@ -340,26 +338,29 @@ tOptions [=(. pname)=]Options = {
                                             (exist? "flag.immed-disable")
                                             (exist? "homerc")  )         =]
     + OPTPROC_HAS_IMMED[=  ENDIF=] ),
-    0, NULL,
+    0, NULL,                    /* current option index, current option */
+    NULL,         NULL,         zPROGNAME,
+    zRcName,      zCopyright,   zCopyrightNotice,
+    zFullVersion, apzHomeList,  zUsageTitle,
+    zExplain,     zDetail,      optDesc,
+    zBugsAddr,                  /* address to send bugs to */
+    NULL, NULL,                 /* extensions/saved state  */
+    [= (. usage-proc) =],       /* usage procedure */
+    translate_option_strings,   /* translation procedure */
+    /*
+     *  Indexes to special options
+     */
     { [= (. INDEX-pfx) =]MORE_HELP,
       [=IF (exist? "homerc")
              =][= (. INDEX-pfx) =]SAVE_OPTS[=
         ELSE =] 0 /* no option state saving */[=
         ENDIF=],
-      [= IF (>= number-opt-index 0)
-              =][= (. number-opt-index) =] /* index of '-#' option */[=
-         ELSE =]NO_EQUIVALENT /* no '-#' option */[=
-         ENDIF  =],
-      [=
-         IF (>= default-opt-index 0)
-              =][= (. default-opt-index) =] /* index of default opt */[=
-         ELSE =]NO_EQUIVALENT /* no default option */[=
-         ENDIF =] },
-    [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */,
-    optDesc,
-    0, NULL,          /* original argc + argv    */
-    zBugsAddr,        /* address to send bugs to */
-    translate_option_strings
+      [= (if (>= number-opt-index 0) number-opt-index "NO_EQUIVALENT")
+        =] /* index of '-#' option */,
+      [= (if (>= default-opt-index 0) default-opt-index "NO_EQUIVALENT")
+        =] /* index of default opt */
+    },
+    [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */
 };
 
 /*

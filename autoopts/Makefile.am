@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-14 05:59:50 bkorb"
+## Time-stamp:      "2005-02-14 15:28:15 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.13 2005/02/14 14:09:54 bkorb Exp $
+## $Id: Makefile.am,v 4.14 2005/02/15 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -104,7 +104,7 @@ EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 libopts.c : $(HDRS) $(CSRC)
-	( echo '#define AUTOOPTS_INTERNAL' ; \
+	( echo '#define AUTOOPTS_INTERNAL' ; echo '#include "config.h"' ; \
 	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
@@ -153,5 +153,18 @@ $(libsrc) :
 
 autoopts.pc : mk-autoopts-pc
 	$(SHELL) mk-autoopts-pc $@
+
+install-data-hook:
+	@set -x ; \
+	grep 'define +HAVE_STDINT_H' $(top_builddir)/config.h >/dev/null \
+	  && intfile=stdint || intfile=inttypes ; \
+	grep 'define +HAVE_LIMITS_H' $(top_builddir)/config.h >/dev/null \
+	  && limfile=limits || limfile=sys/limits ; \
+	sed -e '/if defined(HAVE_STDINT/,/include.*inttypes/d' \
+	    -e "s@.endif.*HAVE_STDINT/INTTYPES.*@#include <$$intfile.h>@" \
+	    -e '/if defined(HAVE_LIMITS/,/include.*sys\/limits/d' \
+	    -e "s@.endif.*HAVE_LIMITS/SYS_LIM.*@#include <$$limfile.h>@" \
+	  autoopts/options.h \
+	  > $(DESTDIR)$(includedir)/autoopts/options.h
 
 # Makefile.am ends here

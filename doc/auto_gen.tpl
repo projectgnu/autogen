@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.4 2005/01/23 23:33:06 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.5 2005/02/15 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -615,8 +615,9 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (shell (string-append "
-
+set -x
 OPTDIR=`cd ${top_builddir}/autoopts >/dev/null; pwd`
+TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
 
 if [ -f ${libs}/libopts.a ]
@@ -624,10 +625,12 @@ then libs=\"${libs}/libopts.a\"
 else libs=\"-L ${libs} -lopts\"
 fi
 libs=\"${libs} ${LIBS}\"
+incs=\"-I${TOPDIR} -I${OPTDIR}\"
 
 exec 3>&1
 (
   cd ${tempdir}
+  echo 'config-header = \"config.h\";' >> default-test.def
   HOME='' ${AGexe} -L${OPTDIR} default-test.def
   if [ ! -f default-test.c ]
   then
@@ -636,7 +639,7 @@ exec 3>&1
     exit 1
   fi
 
-  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -I${OPTDIR}\"
+  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${incs}\"
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 
   if [ ! -x ./default-test ]
@@ -648,8 +651,10 @@ exec 3>&1
   true
 ) > ${tempdir}/default-test.log 2>&1
 
-test $? -eq 0 || exit 1
-
+test $? -eq 0 || {
+  echo \"Check ${tempdir}/default-test.log file\" >&2
+  exit 1
+}
 HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
    sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
 
@@ -733,20 +738,22 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-opts="-o genshellopt -DTEST_GETDEFS_OPTS -I${OPTDIR}"
+opts="-o genshellopt -DTEST_GETDEFS_OPTS ${incs}"
 
 ( cat ${top_srcdir}/getdefs/opts.def
   echo "test_main = 'putShellParse';"
+  echo 'config-header = "config.h";'
 ) | (
+  set -x
   cd ${tempdir}
   HOME='' ${AGexe} -t40 -L${OPTDIR} -bgenshellopt -- -
 
-  ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
+  ${CC} ${CFLAGS} ${opts} ${incs} genshellopt.c ${libs}
 ) > ${tempdir}/genshellopt.log 2>&1
 
 if [ ! -x ${tempdir}/genshellopt ]
 then
-  echo "NO GENSHELLOPT PROGRAM" >&2
+  echo "NO GENSHELLOPT PROGRAM - See ${tempdir}/genshellopt.log" >&2
   kill -TERM $AG_pid
   exit 1
 fi

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2004-08-15 16:38:05 bkorb"
+# Time-stamp:        "2005-02-14 17:04:17 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: immediate.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: immediate.test,v 4.2 2005/02/15 01:34:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -31,6 +31,7 @@ AutoGen definitions options;
 prog-name  = "test_${testname}";
 prog-title = "Test AutoOpts for ${testname}";
 include    = "#include <stdio.h>\nint invocation_ct = 0;";
+config-header = 'config.h';
 
 flag = {
     name      = "second";

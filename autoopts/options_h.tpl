@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.5 2005/02/14 16:25:37 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.6 2005/02/15 01:34:13 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -22,6 +22,17 @@ h=options.h
 [=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
  */
 [=(make-header-guard "autoopts")=]
+#if defined(HAVE_STDINT_H)
+# include <stdint.h>
+#elif defined(HAVE_INTTYPES_H)
+# include <inttypes.h>
+#endif /* HAVE_STDINT/INTTYPES_H */
+
+#if defined(HAVE_LIMITS_H)
+# include <limits.h>
+#elif defined(HAVE_SYS_LIMITS_H)
+# include <sys/limits.h>
+#endif /* HAVE_LIMITS/SYS_LIMITS_H */
 
 /*
  *  PUBLIC DEFINES
@@ -37,6 +48,22 @@ h=options.h
  *  for "opt_name" are available.
  */
 
+#define OPTST_SET_ARGTYPE(n) ((n) << 12)
+#define OPTST_GET_ARGTYPE(f) (((f) & OPTST_ARG_TYPE_MASK) >> 12)
+
+typedef enum {
+    OPARG_TYPE_NONE          = 0,
+    OPARG_TYPE_STRING        = 1,       /* vanilla string */
+    OPARG_TYPE_ENUMERATION   = 2,       /* opt arg is an enum (keyword list) */
+    OPARG_TYPE_BOOLEAN       = 3,       /* opt arg is boolean-valued         */
+    OPARG_TYPE_MEMBERSHIP    = 4,       /* opt arg sets set membership bits  */
+    OPARG_TYPE_NUMERIC       = 5,       /* opt arg has numeric value         */
+    OPARG_TYPE_HIERARCHY     = 6        /* option arg is hierarchical value  */
+} ao_argtype_t;
+
+/*
+ *  Bits in the fOptState option descriptor field.
+ */
 #define OPTST_INIT           0x0000000  /* Initial compiled value            */
 #define OPTST_SET            0x0000001  /* Set via the "SET_OPT()" macro     */
 #define OPTST_PRESET         0x0000002  /* Set via an RC/INI file            */
@@ -51,15 +78,12 @@ h=options.h
 #define OPTST_NUMBER_OPT     0x0000200  /* opt value (flag) is any digit     */
 #define OPTST_STACKED        0x0000400  /* opt uses stackOptArg procedure    */
 #define OPTST_INITENABLED    0x0000800  /* option defaults to enabled        */
-#define OPTST_ENUMERATION    0x0001000  /* opt arg is an enum (keyword list) */
-#define OPTST_BOOLEAN        0x0002000  /* opt arg is boolean-valued         */
-#define OPTST_NUMERIC        0x0004000  /* opt arg has numeric value         */
-#define OPTST_DOCUMENT       0x0008000  /* opt is for documentation only     */
+#define OPTST_ARG_TYPE_MASK  0x000F000  /* bits used to specify opt arg type */
 #define OPTST_IMM            0x0010000  /* process option on first pass      */
 #define OPTST_DISABLE_IMM    0x0020000  /* process disablement on first pass */
 #define OPTST_OMITTED        0x0040000  /* compiled out of program           */
 #define OPTST_MUST_SET       0x0080000  /* must be set or pre-set            */
-#define OPTST_MEMBER_BITS    0x0100000  /* opt arg sets set membership bits  */
+#define OPTST_DOCUMENT       0x0100000  /* opt is for documentation only     */
 #define OPTST_TWICE          0x0200000  /* process option twice - imm + reg  */
 #define OPTST_DISABLE_TWICE  0x0400000  /* process disabled option twice     */
 
@@ -152,8 +176,8 @@ typedef tUsageProc* tpUsageProc;
  *  a flag may appear multiple times without limit.  "NO_EQUIVALENT"
  *  is an illegal value for 'optIndex' (option description index).
  */
-#define NOLIMIT          ((tUC)~0)
-#define OPTION_LIMIT     0x7F
+#define NOLIMIT          USHRT_MAX
+#define OPTION_LIMIT     SHRT_MAX
 #define NO_EQUIVALENT    (OPTION_LIMIT+1)
 
 /*
@@ -176,18 +200,18 @@ struct argList {
  *  Only the fields marked "PUBLIC" are for public use.
  */
 struct optDesc {
-    tCUC              optIndex;         /* PUBLIC */
-    tCUC              optValue;         /* PUBLIC */
-    tUC               optActualIndex;   /* PUBLIC */
-    tUC               optActualValue;   /* PUBLIC */
+    uint16_t          optIndex;         /* PUBLIC */
+    uint16_t          optValue;         /* PUBLIC */
+    uint16_t          optActualIndex;   /* PUBLIC */
+    uint16_t          optActualValue;   /* PUBLIC */
 
-    tUC               optArgType;
-    tCUC              optEquivIndex;    /* PUBLIC */
-    tCUC              optMinCt;
-    tCUC              optMaxCt;
+    uint16_t          optArgType;
+    uint16_t          optEquivIndex;    /* PUBLIC */
+    uint16_t          optMinCt;
+    uint16_t          optMaxCt;
 
-    tUL               optOccCt;         /* PUBLIC */
-    tUL               fOptState;        /* PUBLIC */
+    uint32_t          optOccCt;         /* PUBLIC */
+    uint32_t          fOptState;        /* PUBLIC */
     tCC*              pzLastArg;        /* PUBLIC */
     void*             optCookie;        /* PUBLIC */
 
@@ -208,10 +232,10 @@ struct optDesc {
  */
 typedef struct specOptIndex tSpecOptIndex;
 struct specOptIndex {
-    tUC               more_help;
-    tUC               save_opts;
-    tUC               number_option;
-    tUC               default_opt;
+    uint16_t          more_help;
+    uint16_t          save_opts;
+    uint16_t          number_option;
+    uint16_t          default_opt;
 };
 [=# /*
      *  These "vers" values are manipulated by the contents of ../VERSION
@@ -228,6 +252,12 @@ typedef void (option_translation_proc_t)(void);
 
 struct options {
     const int         structVersion;
+    int               origArgCt;
+    char**            origArgVect;
+    tUI               fOptSet;
+    tUI               curOptIdx;
+    char*             pzCurOpt;
+
     const char*       pzProgPath;
     const char*       pzProgName;
     const char*       pzPROGNAME;
@@ -239,19 +269,18 @@ struct options {
     const char*       pzUsageTitle;
     const char*       pzExplain;
     const char*       pzDetail;
+    tOptDesc*         pOptDesc;
+    const char*       pzBugAddr;
+
+    void*             pExtensions;
     void*             pSavedState;
+
     tpUsageProc       pUsageProc;
-    tUI               fOptSet;
-    tUI               curOptIdx;
-    char*             pzCurOpt;
+    option_translation_proc_t* pTransProc;
+
     tSpecOptIndex     specOptIdx;
     const int         optCt;
     const int         presetOptCt;
-    tOptDesc*         pOptDesc;
-    int               origArgCt;
-    char**            origArgVect;
-    const char*       pzBugAddr;
-    option_translation_proc_t* pTransProc;
 };
 
 /*
