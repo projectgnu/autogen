@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.17 2003/05/03 23:59:05 bkorb Exp $
+ *  $Id: expFormat.c,v 3.18 2003/05/04 21:50:19 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -136,7 +136,7 @@ tSCC zFmtAlloc[] = "asprintf allocation";
  *       The first argument must be, specifically, "@code{-d}".  That is used
  *       to signify that the date stamp should not be inserted into the output.
 =*/
-    SCM
+SCM
 ag_scm_dne( SCM prefix, SCM first, SCM opt )
 {
     int      noDate  = 0;
