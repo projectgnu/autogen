@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday February  1, 2004 at 11:08:06 AM PST
+ *  It has been AutoGen-ed  Tuesday March  2, 2004 at 02:09:41 PM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -97,7 +97,7 @@ struct transition {
 static const t_dp_transition
 dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
 
-  /* STATE :  DP_ST_INIT */
+  /* STATE 0:  DP_ST_INIT */
   { { DP_ST_NEED_DEF, NULL },                       /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -114,7 +114,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_DEF */
+  /* STATE 1:  DP_ST_NEED_DEF */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_NEED_TPL, NULL },                       /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -131,7 +131,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_TPL */
+  /* STATE 2:  DP_ST_NEED_TPL */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -148,7 +148,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_SEMI */
+  /* STATE 3:  DP_ST_NEED_SEMI */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -165,7 +165,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_NAME */
+  /* STATE 4:  DP_ST_NEED_NAME */
   { { DP_ST_NEED_DEF, NULL },                       /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_DONE, &dp_do_need_name_end },           /* EVT:  End-Of-File */
@@ -182,7 +182,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_HAVE_NAME */
+  /* STATE 5:  DP_ST_HAVE_NAME */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -199,7 +199,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_VALUE */
+  /* STATE 6:  DP_ST_NEED_VALUE */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -216,7 +216,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_IDX */
+  /* STATE 7:  DP_ST_NEED_IDX */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -233,7 +233,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_NEED_CBKT */
+  /* STATE 8:  DP_ST_NEED_CBKT */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -250,7 +250,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INDX_NAME, NULL }                       /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_INDX_NAME */
+  /* STATE 9:  DP_ST_INDX_NAME */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -267,7 +267,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid }               /* EVT:  ] */
   },
 
-  /* STATE :  DP_ST_HAVE_VALUE */
+  /* STATE 10:  DP_ST_HAVE_VALUE */
   { { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  autogen */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  definitions */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  End-Of-File */
@@ -605,11 +605,4 @@ dp_run_fsm( void )
     }
     return dp_state;
 }
-/*
- * Local Variables:
- * mode: C
- * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
- * tab-width: 4
- * End:
- * end of defParse-fsm.c */
+/* end of defParse-fsm.c */
