@@ -1,3 +1,9 @@
+2002-03-03  Bruce Korb  <bkorb@gnu.org> 
+
+	* agen5/functions.c(mLoad_Bogus): handle the case when the text pointer
+	is NULL.
+	* agen5/test/error.test: test for this
+
 2002-03-01  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expOutput.c(ag_scm_out_pop): you cannot read one unit of zero

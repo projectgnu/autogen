@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.5 2002/02/08 05:41:21 bkorb Exp $
+ *  $Id: functions.c,v 3.6 2002/03/04 00:56:19 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -352,11 +352,16 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     tCC* pzSrc = (const char*)pMac->ozText; /* macro text */
     char z[ 64 ];
 
-    strncpy( z, pzSrc, 63 );
-    z[63] = NUL;
+    if (pzSrc == NULL)
+        pzSrc = apzFuncNames[ pMac->funcCode ];
+    else {
+        strncpy( z, pzSrc, 63 );
+        z[63] = NUL;
+        pzSrc = z;
+    }
 
     pzSrc = asprintf( "Unknown macro or invalid context in %s line %d:\n\t%s",
-                      pT->pzFileName, pMac->lineNo, z );
+                      pT->pzFileName, pMac->lineNo, pzSrc );
 
     AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */

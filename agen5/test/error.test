@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2002-01-30 15:41:16 bkorb"
+# Time-stamp:        "2002-03-03 16:52:17 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+#            by: bkorb
 #
-# $Id: error.test,v 3.7 2002/01/31 03:55:54 bkorb Exp $
+# $Id: error.test,v 3.8 2002/03/04 00:56:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -135,6 +135,26 @@ $AGEXE ${testname}2.def 2> ${testname}.err4 && failure unexpected success
 grep -v 'Giving up in' ${testname}.err4 >  ${testname}.err
 cmp -s  ${testname}.err  ${testname}.out4 || \
   failure "`diff -c ${testname}.out4 ${testname}.err`"
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl5
+cat > ${testname}.tpl5 <<'_EOF_'
+<= AutoGen5 template fnord null =>
+THIS TEXT SHOULD BE DELETED!!
+<= ENDIF =>
+_EOF_
+$AGEXE -T ${testname}.tpl5 -b ${testname} --no-defin > ${testname}.out5 2>&1 && \
+  failure "$AGEXE was okay with bogus input"
+
+cat > ${testname}.samp5 <<EOF
+Error in template error.tpl5, line 3
+	Unknown macro or invalid context in error.tpl5 line 3:
+	ENDIF
+EOF
+
+cmp -s  ${testname}.samp5  ${testname}.out5 || \
+  failure "`diff -c ${testname}.samp5  ${testname}.out5`"
 
 cleanup
 # end of error.test
