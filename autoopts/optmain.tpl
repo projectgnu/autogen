@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 3.18 2003/08/22 03:19:27 bkorb Exp $
+# $Id: optmain.tpl,v 3.19 2003/12/27 15:06:40 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -234,7 +234,8 @@ DEFINE range-option-code
   ENDFOR =][=
   (shellf "${COLUMNS_EXE} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
-    int val, ix;
+    long val;
+    int ix;
     tCC* pzIndent = "\t\t\t\t  ";
     extern FILE* option_usage_fp;
 

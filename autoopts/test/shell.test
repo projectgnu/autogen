@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-07-10 18:20:17 bkorb"
+# Time-stamp:        "2003-12-06 11:21:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 3.7 2003/07/11 01:25:30 bkorb Exp $
+# $Id: shell.test,v 3.8 2003/12/27 15:06:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -176,9 +176,11 @@ or by a single hyphen and the flag character.'
 
 
 TEST_SHELL_OPTION="${TEST_SHELL_OPTION}"
+TEST_SHELL_OPTION_set=false
 export TEST_SHELL_OPTION
 
 TEST_SHELL_SECOND="${TEST_SHELL_SECOND}"
+TEST_SHELL_SECOND_set=false
 export TEST_SHELL_SECOND
 
 OPT_PROCESS=true
@@ -210,10 +212,11 @@ do
         'opti' | \
         'optio' | \
         'option' )
-            if [ -n "${TEST_SHELL_OPTION}" ] ; then
+            if [ -n "${TEST_SHELL_OPTION}" ] && ${TEST_SHELL_OPTION_set} ; then
                 echo Error:  duplicate OPTION option >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
+            TEST_SHELL_OPTION_set=true
             OPT_NAME='OPTION'
             OPT_ARG_NEEDED=YES
             ;;
@@ -223,10 +226,11 @@ do
         'seco' | \
         'secon' | \
         'second' )
-            if [ -n "${TEST_SHELL_SECOND}" ] ; then
+            if [ -n "${TEST_SHELL_SECOND}" ] && ${TEST_SHELL_SECOND_set} ; then
                 echo Error:  duplicate SECOND option >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
+            TEST_SHELL_SECOND_set=true
             OPT_NAME='SECOND'
             eval TEST_SHELL_SECOND${OPT_ELEMENT}=true
             export TEST_SHELL_SECOND${OPT_ELEMENT}
@@ -298,19 +302,21 @@ do
 
         case "${OPT_CODE}" in
         'o' )
-            if [ -n "${TEST_SHELL_OPTION}" ] ; then
+            if [ -n "${TEST_SHELL_OPTION}" ] && ${TEST_SHELL_OPTION_set} ; then
                 echo Error:  duplicate OPTION option >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
+            TEST_SHELL_OPTION_set=true
             OPT_NAME='OPTION'
             OPT_ARG_NEEDED=YES
             ;;
 
         's' )
-            if [ -n "${TEST_SHELL_SECOND}" ] ; then
+            if [ -n "${TEST_SHELL_SECOND}" ] && ${TEST_SHELL_SECOND_set} ; then
                 echo Error:  duplicate SECOND option >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
+            TEST_SHELL_SECOND_set=true
             OPT_NAME='SECOND'
             eval TEST_SHELL_SECOND${OPT_ELEMENT}=true
             export TEST_SHELL_SECOND${OPT_ELEMENT}

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.13 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: expState.c,v 3.14 2003/12/27 15:06:40 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -185,7 +185,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
 SCM
 ag_scm_base_name( void )
 {
-    return gh_str02scm( OPT_ARG( BASE_NAME ));
+    return gh_str02scm( (char*)(void*)OPT_ARG( BASE_NAME ));
 }
 
 
@@ -221,7 +221,7 @@ ag_scm_count( SCM obj )
 SCM
 ag_scm_def_file( void )
 {
-    return gh_str02scm( pBaseCtx->pzFileName );
+    return gh_str02scm( (char*)(void*)pBaseCtx->pzFileName );
 }
 
 
@@ -486,7 +486,7 @@ ag_scm_suffix( void )
 SCM
 ag_scm_tpl_file( void )
 {
-    return gh_str02scm( pzTemplFileName );
+    return gh_str02scm( (char*)(void*)pzTemplFileName );
 }
 
 

@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 3.7 2003/05/06 02:14:25 bkorb Exp $
+ *  $Id: columns.c,v 3.8 2003/12/27 15:06:40 bkorb Exp $
  */
 
 /*
@@ -23,6 +23,9 @@
  *             59 Temple Place - Suite 330,
  *             Boston,  MA  02111-1307, USA.
  */
+#ifndef NUL
+# define NUL '\0'
+#endif
 
 struct print_list {
     char**     papz;
@@ -41,8 +44,8 @@ char zLine[ 133 ];
 char zFmtLine[ 133 ];
 
 char**  papzLines  = (char**)NULL;
-char*   pzLinePfx  = (char*)NULL;
-char*   pzFirstPfx = (char*)NULL;
+tCC*    pzLinePfx  = NULL;
+tCC*    pzFirstPfx = NULL;
 size_t  allocCt    = 0;
 size_t  usedCt     = 0;
 size_t  lineWidth  = 79;
@@ -52,7 +55,7 @@ size_t  columnSz   = 0;
 void readLines( void );
 void writeRows( void );
 void writeColumns( void );
-int  handleIndent( char* pzIndentArg );
+int  handleIndent( tCC* pzIndentArg );
 
 
 int
@@ -80,23 +83,26 @@ main( int    argc,
              *  Compute it, but do not let it be larger than
              *  the indentation value.
              */
-            char*  pzSave = pzLinePfx;
+            tCC*   pzSave = pzLinePfx;
             size_t firstSize = handleIndent( OPT_ARG( FIRST_INDENT ));
             pzFirstPfx = pzLinePfx;
-            pzLinePfx = pzSave;
+            pzLinePfx  = pzSave;
 
             /*
              *  Now force the first line prefix to have the same size
              *  as the indentSize
              */
             if (firstSize > indentSize) {
+                char* p = malloc( indentSize + 1 );
+                strncpy( p, pzFirstPfx, indentSize );
+                p[ indentSize ] = NUL;
+                pzFirstPfx = p;
                 fprintf( stderr, "Warning: prefix `%s' has been truncated to ",
                          pzFirstPfx );
-                pzFirstPfx[ indentSize ] = '\0';
                 fprintf( stderr, "`%s'\n", pzFirstPfx );
 
             } else if (firstSize < indentSize) {
-                char* tmp = (char*)malloc( indentSize + 1 );
+                char* tmp = malloc( indentSize + 1 );
                 char  z[10];
                 snprintf( z, sizeof(z), "%%-%ds", indentSize );
                 snprintf( tmp, indentSize + 1, z, pzFirstPfx );
@@ -131,7 +137,7 @@ main( int    argc,
 
 
 int
-handleIndent( char* pzIndentArg )
+handleIndent( tCC* pzIndentArg )
 {
     char* pz;
     int   colCt = strtol( pzIndentArg, &pz, 0 );
@@ -140,6 +146,8 @@ handleIndent( char* pzIndentArg )
      *  IF the indent argument is a number
      */
     if (*pz == '\0') {
+        char* p;
+
         /*
          *  AND that number is reasonable, ...
          */
@@ -149,8 +157,8 @@ handleIndent( char* pzIndentArg )
         /*
          *  Allocate a string to hold the line prefix
          */
-        pzLinePfx = (char*)malloc( colCt + 1 );
-        if (pzLinePfx == (char*)NULL) {
+        pzLinePfx = p = malloc( colCt + 1 );
+        if (pzLinePfx == NULL) {
             fprintf( stderr, "Cannot malloc %d bytes\n", colCt + 1 );
             exit( EXIT_FAILURE );
         }
@@ -158,16 +166,18 @@ handleIndent( char* pzIndentArg )
         /*
          *  Set it to a NUL terminated string of spaces
          */
-        memset( (void*)pzLinePfx, ' ', colCt );
-        pzLinePfx[ colCt ] = '\0';
+        memset( p, ' ', colCt );
+        p[ colCt ] = '\0';
 
     } else {
+        tCC* p;
         /*
          *  Otherwise, set the line prefix to whatever the string is.
          *  It will not be the empty string because that is handled
          *  as an indent count of zero and is ignored.
          */
-        pz = pzLinePfx = pzIndentArg;
+        pzLinePfx = pzIndentArg;
+        p = pzIndentArg;
         colCt =  0;
         for (;;) {
             /*
@@ -175,7 +185,7 @@ handleIndent( char* pzIndentArg )
              *  the prefix.  We might consider restricted format
              *  strings some time in the future, but not now.
              */
-            switch (*pz++) {
+            switch (*p++) {
             case '\0':
                 goto colsCounted;
 
@@ -222,7 +232,7 @@ readLines( void )
         char*   pzText = fgets( zLine, sizeof( zLine ), stdin );
         int     len;
 
-        if (pzText == (char*)NULL)
+        if (pzText == NULL)
             break;
 
         /*
@@ -430,7 +440,7 @@ writeColumns( void )
         char*  pzL;
         char*  pzE;
 
-        if (pzLinePfx != (char*)NULL)
+        if (pzLinePfx != NULL)
             fputs( pzLinePfx, stdout );
 
         /*
@@ -517,7 +527,7 @@ writeRows( void )
         *pz = '\0';
     }
 
-    if (pzFirstPfx != (char*)NULL) {
+    if (pzFirstPfx != NULL) {
         fputs( pzFirstPfx, stdout );
         pzFirstPfx = pzLinePfx;
     }
@@ -568,7 +578,7 @@ writeRows( void )
                 /*
                  *  Start the next line with any required indentation
                  */
-                if (pzFirstPfx != (char*)NULL) {
+                if (pzFirstPfx != NULL) {
                     fputs( pzFirstPfx, stdout );
                     pzFirstPfx = pzLinePfx;
                 }
@@ -586,8 +596,8 @@ writeRows( void )
 int
 compProc( const void* p1, const void* p2 )
 {
-    char* pz1 = *(char**)p1;
-    char* pz2 = *(char**)p2;
+    const char* pz1 = *(char* const*)p1;
+    const char* pz2 = *(char* const*)p2;
     return strcmp( pz1, pz2 );
 }
 /*

@@ -27,7 +27,7 @@ addArg( char* pzArg, int ix )
 
 
 void
-forkAutogen( char* pzInput )
+forkAutogen( tCC* pzInput )
 {
     tSCC zErr[] = "%s fs ERROR %d (%s) on %s\n";
     int fd[2];
@@ -75,8 +75,8 @@ forkAutogen( char* pzInput )
         else {
             char* pz = strrchr( pzInput, '.' );
             if (pz != NULL) {
-                pzInput = strdup( pzInput );
-                pz = strrchr( pzInput, '.' );
+                pzInput = pz = strdup( pzInput );
+                pz = strrchr( pz, '.' );
                 *pz = '\0';
             }
         }
@@ -123,7 +123,7 @@ forkAutogen( char* pzInput )
           ==*  num                 =]
             pzArg = malloc( [= (+ 16 (string-length (get "name")))
                         =] );
-            sprintf( pzArg, "--[=name=]=%d", OPT_VALUE_[=(. opt-name)=] );
+            sprintf( pzArg, "--[=name=]=%d", (int)OPT_VALUE_[=(. opt-name)=] );
             addArg( pzArg, ix++ );[=
 
           ==*  bool                =]
@@ -135,9 +135,9 @@ forkAutogen( char* pzInput )
           ==*  str                 =][=
                IF (exist? "max")   =]
             int    optCt = STACKCT_OPT( [=(. opt-name)=] );
-            char** ppOA  = STACKLST_OPT( [=(. opt-name)=] );
+            tCC**  ppOA  = STACKLST_OPT( [=(. opt-name)=] );
             do  {
-                char* pA = *(ppOA++);
+                tCC* pA = *(ppOA++);
                 pzArg = malloc( [= (+ 4 (string-length (get "name")))
                         =] + strlen( pA ));
                 sprintf( pzArg, "--[=name=]=%s", pA );

@@ -1,13 +1,13 @@
 /*
- *  $Id: gdemit.c,v 3.4 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: gdemit.c,v 3.5 2003/12/27 15:06:40 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2003/04/22 01:40:20 $
- *            by:      Bruce Korb <bkorb@gnu.org>
+ *  Last Modified:     $Date: 2003/12/27 15:06:40 $
+ *            by: bkorb
  */
 
 /* FORWARD */
@@ -22,7 +22,7 @@ STATIC char*
 emitQuote( char** ppzText, char* pzOut );
 
 STATIC char*
-emitSubblock( char* pzDefList, char* pzText, char* pzOut );
+emitSubblock( tCC* pzDefList, char* pzText, char* pzOut );
 
 STATIC char*
 emitSubblockString( char** ppzText, char sepChar, char* pzOut );
@@ -199,11 +199,10 @@ emitDefinition( char* pzDef, char* pzOut )
 
     if (HAVE_OPT( SUBBLOCK )) {
         int    ct  = STACKCT_OPT(  SUBBLOCK );
-        char** ppz = STACKLST_OPT( SUBBLOCK );
-        char*  pz;
+        tCC**  ppz = STACKLST_OPT( SUBBLOCK );
 
         do  {
-            pz = *ppz++;
+            tCC* pz = *ppz++;
             if (strcmp( pz, zEntryName ) == 0)
                 return emitSubblock( pz, pzDef, pzOut );
         } while (--ct > 0);
@@ -211,12 +210,10 @@ emitDefinition( char* pzDef, char* pzOut )
 
     if (HAVE_OPT( LISTATTR )) {
         int    ct  = STACKCT_OPT(  LISTATTR );
-        char** ppz = STACKLST_OPT( LISTATTR );
-        char*  pz   = zEntryName;
+        tCC**  ppz = STACKLST_OPT( LISTATTR );
 
         do  {
-            pz = *ppz++;
-            if (strcmp( pz, zEntryName ) == 0)
+            if (strcmp( *ppz++, zEntryName ) == 0)
                 return emitListattr( pzDef, pzOut );
         } while (--ct > 0);
     }
@@ -364,7 +361,7 @@ quoteDone:
  *  emitSubblock
  */
 STATIC char*
-emitSubblock( char* pzDefList, char* pzText, char* pzOut )
+emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
 {
     tSCC  zStart[]  = " = {";
     tSCC  zAttr[]   = "\n        ";

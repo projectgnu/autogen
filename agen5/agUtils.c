@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.20 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: agUtils.c,v 3.21 2003/12/27 15:06:39 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -154,7 +154,7 @@ doOptions( int arg_ct, char** arg_vec )
      *  IF we do not have a base-name option, then we compute some value
      */
     if (! HAVE_OPT( BASE_NAME )) do {
-        char* pz;
+        tCC*  pz;
         char* pzD;
 
         if (! ENABLED_OPT( DEFINITIONS )) {
@@ -194,14 +194,17 @@ doOptions( int arg_ct, char** arg_vec )
      *  IF we have some defines to put in our environment, ...
      */
     if (HAVE_OPT( DEFINE )) {
-        int        ct  = STACKCT_OPT(  DEFINE );
-        char**     ppz = STACKLST_OPT( DEFINE );
+        int     ct  = STACKCT_OPT(  DEFINE );
+        tCC**   ppz = STACKLST_OPT( DEFINE );
 
         do  {
-            char* pz = *(ppz++);
+            tCC* pz = *(ppz++);
             /*
              *  IF there is no associated value,  THEN set it to '1'.
              *  There are weird problems with empty defines.
+             *  FIXME:  we loose track of this memory.  Don't know what to do,
+             *  really, there is no good recovery mechanism for environment
+             *  data.
              */
             if (strchr( pz, '=' ) == NULL) {
                 size_t siz = strlen( pz )+3;
@@ -215,7 +218,7 @@ doOptions( int arg_ct, char** arg_vec )
             /*
              *  Now put it in the environment
              */
-            putenv( pz );
+            putenv( (char*)pz );
         } while (--ct > 0);
     }
 
@@ -299,14 +302,14 @@ addSysEnv( char* pzEnvName )
 EXPORT tCC*
 getDefine( tCC* pzDefName )
 {
-    char**  ppz;
+    tCC**   ppz;
     int     ct;
     if (HAVE_OPT( DEFINE )) {
         ct  = STACKCT_OPT(  DEFINE );
         ppz = STACKLST_OPT( DEFINE );
 
         while (ct-- > 0) {
-            char* pz   = *(ppz++);
+            tCC*  pz   = *(ppz++);
             char* pzEq = strchr( pz, '=' );
             int   res;
 

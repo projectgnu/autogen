@@ -5,13 +5,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2003 Bruce Korb
 dnl
-dnl Time-stamp:      "2003-08-07 19:39:22 bkorb"
+dnl Time-stamp:      "2003-12-07 11:02:10 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 3.20 2003/08/21 02:06:08 bkorb Exp $
+dnl Code: $Id: configure.in,v 3.21 2003/12/27 15:06:39 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([autogen],[5.4],[autogen-bugs@lists.sf.net])
@@ -21,7 +21,7 @@ AC_CANONICAL_TARGET
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
-ifdef([AC_REVISION],AC_REVISION($Revision: 3.20 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 3.21 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -69,45 +69,91 @@ AM_WITH_DMALLOC
 # ----------------------------------------------------------------------
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
+# =================
+# AC_PROG_CC
+# =================
 AC_PROG_CC
+# =================
+# AC_PROG_CC_STDC
+# =================
 AC_PROG_CC_STDC
+# =================
+# AC_EXEEXT
+# =================
 AC_EXEEXT
+# =================
+# AC_PROG_INSTALL
+# =================
 AC_PROG_INSTALL
+# =================
+# AC_PROG_LIBTOOL
+# =================
 AC_PROG_LIBTOOL
+# =================
+# AC_CHECK_PROG
+# =================
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
+# =================
+# AC_C_CONST
+# =================
 AC_C_CONST
+# =================
+# AC_C_INLINE
+# =================
 AC_C_INLINE
 
 # ----------------------------------------------------------------------
 # Check for standard headers.
 # ----------------------------------------------------------------------
+# =================
+# AC_HEADER_STDC
+# =================
 AC_HEADER_STDC
+# =================
+# AC_HEADER_DIRENT
+# =================
 AC_HEADER_DIRENT
 
 # ----------------------------------------------------------------------
-# Check for list of headers.
+# AC_CHECK_HEADERS Check for list of headers.
 # ----------------------------------------------------------------------
-AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/file.h sys/param.h \
-    error.h sys/types.h libgen.h sys/stat.h sys/time.h setjmp.h stdlib.h)
+AC_CHECK_HEADERS(errno.h unistd.h fcntl.h memory.h sys/param.h \
+ libgen.h sys/time.h setjmp.h )
 
-# If stdarg.h is present define HAVE_STDARG_H, otherwise if varargs.h
-# is present define HAVE_VARARGS_H.
+if   test "${ac_cv_header_stdint_h+set}" = set \
+  || test "${ac_cv_header_inttypes_h+set}" = set
+then : ; else
+  AC_MSG_ERROR([You must have stding. or inttypes.h on your system])
+fi
+
+# =================
+# AC_CHECK_HEADERS: stdarg.h is present define HAVE_STDARG_H, otherwise
+# if varargs.h is present define HAVE_VARARGS_H.
+# =================
 AC_CHECK_HEADERS(stdarg.h varargs.h, break)
 
+# =================
 # Similarly for the string.h and strings.h headers
+# =================
 AC_CHECK_HEADERS(string.h strings.h, break)
 
+# =================
 # ...and limits headers
+# =================
 AC_CHECK_HEADERS(limits.h sys/limits.h values.h, break)
 
+# =================
 # ...and directory read headers
+# =================
 AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
 
+# =================
 # Check for P_PID definition in <sys/procset.h>
+# =================
 AC_CHECK_HEADERS(sys/procset.h)
 
 # ----------------------------------------------------------------------
-# Check for SVR4 libgen, and use it if it defines pathfind.
+# AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
 # ----------------------------------------------------------------------
 AC_CHECK_LIB(gen, pathfind)
 
@@ -130,10 +176,6 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SIGNAL
-# AC_TYPE_UINTPTR_T
-AC_CHECK_TYPES( uintptr_t, [: have uintptr_t],
-   [AC_DEFINE(uintptr_t, [unsigned long],
-   [define if you do not have one])])
 # AC_C_LONG_DOUBLE
 AC_C_LONG_DOUBLE
 if test x$ac_cv_type_long_double = xno; then
@@ -144,7 +186,7 @@ fi
 # AC_DEFINE_UNQUOTED for SNV_LONG_DOUBLE
 AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
                    [Define this to the long+double type])
-AC_CHECK_TYPES([u_short, u_int, u_long, id_t, wchar_t])
+AC_CHECK_TYPES([u_int])
 AC_CHECK_TYPES([long long, uintmax_t])
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int, 4)

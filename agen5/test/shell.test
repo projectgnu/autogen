@@ -9,10 +9,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2003/02/07 01:48:55 $
+# Last Modified:     $Date: 2003/12/27 15:06:40 $
 #            by: bkorb
 #
-# $Id: shell.test,v 3.3 2003/02/07 01:48:55 bkorb Exp $
+# $Id: shell.test,v 3.4 2003/12/27 15:06:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
@@ -77,7 +77,7 @@ echo creating ${testname}.def
 cat >${testname}.def <<'EOF'
 AutoGen Definitions shell.tpl;
 
-foo = "'foo' \"foo\" `foo` $foo";
+foo = "''foo'' 'foo' \"foo\" `foo` $foo";
 foo = '\\\'bar\\\' \\"bar\\" \`bar\` \$bar';
 foo = '\\\\\'BAZ\\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ';
 EOF
@@ -88,10 +88,10 @@ cat > ${testname}.sample <<'_EOF_'
 SHELL=$SHELL
 Some mumble text
 
-foo[0]       = 'foo' "foo" `foo` $foo
-raw-shell-str: ''\''foo'\'' "foo" `foo` $foo'
-shell-str:     "'foo' \"foo\" `foo` $foo"
-sub-shell-str: `'foo' "foo" \`foo\` $foo`
+foo[0]       = ''foo'' 'foo' "foo" `foo` $foo
+raw-shell-str: \'\''foo'\'\'' '\''foo'\'' "foo" `foo` $foo'
+shell-str:     "''foo'' 'foo' \"foo\" `foo` $foo"
+sub-shell-str: `''foo'' 'foo' "foo" \`foo\` $foo`
 
 foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
 raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
@@ -112,12 +112,12 @@ then cleanup
      exit 0
 fi
 
-if fgrep 'SHELL=' > /dev/null 2>&1
+if fgrep 'SHELL=' ${testname}.test > /dev/null 2>&1
 then
-  if fgrep 'SHELL=$SHELL' > /dev/null 2>&1
+  if fgrep 'SHELL=$SHELL' ${testname}.test > /dev/null 2>&1
   then : ; else
-    cat >&9 <<- '_EOF_'
-		The shell.test output file does not start with "SHELL=$SHELL"
+    cat >&9 <<- _EOF_
+		The ${testname}.test output file does not start with "SHELL=\$SHELL"
 		This is because you have a Guile library that cannot modify
 		the environment.  This is a known breakage on some platforms
 		(viz., BSD derivatives).  Sorry.

@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-11-23 11:28:38 bkorb"
+ *  Time-stamp:      "2003-12-21 09:55:40 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.20 2003/12/03 02:45:08 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.21 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -65,6 +65,12 @@
 
 #include "options.h"
 #include "streqv.h"
+
+#define AO_NAME_LIMIT    127
+#define AO_NAME_SIZE     (AO_NAME_LIMIT + 1)
+#ifndef MAXPATHLEN
+#  define MAXPATHLEN     4096
+#endif
 
 /*
  *  Convert the number to a list usable in a printf call
@@ -183,6 +189,7 @@ extern FILE* option_usage_fp;
 extern tOptProc doVersion, doPagedUsage, doLoadOpt;
 
 #define LOCAL static
+#ifdef AUTOOPTS_INTERNAL
 /* === LOCAL PROCEDURES === */
 
 /* autoopts.c */
@@ -209,7 +216,7 @@ static void
 optionSort( tOptions* pOpts );
 
 /* === END LOCALS === */
-
+#endif /* GUILE_OPTIONS */
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*
  * Local Variables:

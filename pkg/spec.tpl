@@ -1,5 +1,6 @@
 [= AutoGen5 Template spec =]
-
+%define prefix  %{?_prefix}%{!?_prefix:[=`echo $prefix`=]}
+%define infodir %{?_infodir}%{!?_infodir:/usr/info}
 %define __spec_install_post  /usr/lib/rpm/brp-strip ;[=
 `test -x /usr/lib/rpm/brp-strip-static-archive && \
    echo ' /usr/lib/rpm/brp-strip-static-archive ;'`
@@ -13,8 +14,7 @@ Release: [=`echo $AG_MAJOR_VERSION`=]
 Copyright: GPL
 Group: Development/Tools
 Source: http://prdownload.sourceforge.net/autogen/autogen-[= version =].tar.gz
-BuildRoot: [=`cd ${top_builddir}/AGPKG > /dev/null && pwd`
-           =]/BUILD/ROOT
+BuildRoot: %{_tmppath}/%{name}-root
 
 %description
 AutoGen is a tool designed for generating program files that contain
@@ -31,11 +31,11 @@ autofsm BSD   This is a template for producing finite state machine programs
 The Copyright itself is privately held by Bruce Korb.
 
 %prep
-%setup
+%setup -q
 chmod -R +rw *
 
 %build
-./configure --prefix=[=`echo $prefix`=]
+./configure --prefix=%{prefix} --infodir=%{infodir}
 make CFLAGS="$RPM_OPT_FLAGS"
 
 if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd; then
@@ -54,14 +54,36 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 ( cd $RPM_BUILD_ROOT && find . ! -type d 
 ) | sed "s,^\./,/,g" > [= prog-name =]-filelist
 
+%post
+/sbin/ldconfig
+/sbin/install-info --info-dir=%{infodir} %{infodir}/autogen.info*
+
+%preun
+/sbin/install-info --delete --info-dir=%{infodir} %{infodir}/autogen.info*
+
+%postun -p /sbin/ldconfig
+
 %clean
 rm -rf ${RPM_BUILD_ROOT}
 
 %files -f [= prog-name =]-filelist
 %defattr(-,root,root)
-%doc [A-T][A-Z]* ChangeLog
 
-%changelog
+%doc AUTHORS TODO COPYING NEWS NOTES THANKS README VERSION
+
+%changelog[=`
+nm=\`getpwnam -N 2> /dev/null\`
+if [ -n "${nm}" ]
+then
+  echo
+  echo "* \`date '+%a %b %e %Y'\` ${nm} <\`getpwnam -n\`@\`
+     hostname 2>/dev/null\`>"
+  echo "- Regenerated"
+fi`=]
+* Tue Dec 16 2003 Richard Zidlicky <rz@linux-m68k.org> 5.5.7pre5-5
+- fix %%doc
+- add post/pre scriptlets
+- change default prefix
 * Sat Mar 15 2003 Bruce Korb <bkorb@gnu.org>
 - Rework as a template to automatically produce a properly configured RPM
 * Fri Aug 9 2002 Bruce Korb <bkorb@gnu.org>

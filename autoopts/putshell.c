@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.16 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: putshell.c,v 3.17 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -50,28 +50,65 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/* === STATIC PROCS === */
-STATIC void
-putQuotedStr( char* pzStr );
-
-/* === END STATIC PROCS === */
-
 /*
- *  Make sure embedded single quotes come out okay
+ *  Make sure embedded single quotes come out okay.  The initial quote has
+ *  been emitted and the closing quote will be upon return.
  */
 STATIC void
-putQuotedStr( char* pzStr )
+putQuotedStr( tCC* pzStr )
 {
-    if (pzStr != (char*)NULL) for (;;) {
-        char* pz = strchr( pzStr, '\'' );
-        if (pz != (char*)NULL)
-            *pz = NUL;
-        fputs( pzStr, stdout );
-        if (pz == (char*)NULL)
-            break;
-        fputs( "'\"'\"'", stdout );
-        pzStr = pz+1;
+    /*
+     *  Handle empty strings to make the rese of the logic simpler.
+     */
+    if ((pzStr == NULL) || (*pzStr == NUL)) {
+        fputs( "''", stdout );
+        return;
     }
+
+    /*
+     *  Emit any single quotes/apostrophes at the start of the string and
+     *  bail if that is all we need to do.
+     */
+    while (*pzStr == '\'') {
+        fputs( "\\'", stdout );
+        pzStr++;
+    }
+    if (*pzStr == NUL)
+        return;
+
+    /*
+     *  Start the single quote string
+     */
+    fputc( '\'', stdout );
+    for (;;) {
+        tCC* pz = strchr( pzStr, '\'' );
+        if (pz == NULL)
+            break;
+
+        /*
+         *  Emit the string up to the single quote (apostrophe) we just found.
+         */
+        fwrite( pzStr, (pz - pzStr), 1, stdout );
+        fputc( '\'', stdout );
+        pzStr = pz;
+
+        /*
+         *  Emit an escaped apostrophe for every one we find.
+         *  If that ends the string, do not re-open the single quotes.
+         */
+        while (*++pzStr == '\'')   fputs( "\\'", stdout );
+        if (*pzStr == NUL)
+            return;
+
+        fputc( '\'', stdout );
+    }
+
+    /*
+     *  If we broke out of the loop, we must still emit the remaining text
+     *  and then close the single quote string.
+     */
+    fputs( pzStr, stdout );
+    fputc( '\'', stdout );
 }
 
 
@@ -89,8 +126,8 @@ putBourneShell( tOptions* pOpts )
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
     tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d # 0x%3$X\nexport %1$s_%2$s\n";
     tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
-    tSCC zOptValFmt[] = "%s_%s='";
-    tSCC zOptEnd[]    = "'\nexport %s_%s\n";
+    tSCC zOptValFmt[] = "%s_%s=";
+    tSCC zOptEnd[]    = "\nexport %s_%s\n";
     tSCC zFullOptFmt[]= "%1$s_%2$s='%3$s'\nexport %1$s_%2$s\n";
     tSCC zEquiv[]     = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s_MODE\n";
 
@@ -154,7 +191,7 @@ putBourneShell( tOptions* pOpts )
                 printf( "=%1$d # 0x%1$X\n", val );
                 val <<= 1;
             }
-            free( pOD->pzLastArg );
+            free( (void*)(pOD->pzLastArg) );
             continue;
         }
 
@@ -174,21 +211,21 @@ putBourneShell( tOptions* pOpts )
            && (pOD->optCookie != (void*)NULL) )  {
             tSCC zOptCookieCt[] = "%1$s_%2$s_CT=%3$d\nexport %1$s_%2$s_CT\n";
 
-            tArgList*  pAL = (tArgList*)pOD->optCookie;
-            char**     ppz = pAL->apzArgs;
-            int        ct  = pAL->useCt;
+            tArgList*    pAL = (tArgList*)pOD->optCookie;
+            tCC**        ppz = pAL->apzArgs;
+            int          ct  = pAL->useCt;
 
             printf( zOptCookieCt, pOpts->pzPROGNAME, pOD->pz_NAME, ct );
 
             while (--ct >= 0) {
-                tSCC zOptNumArg[] = "%s_%s_%d='";
-                tSCC zOptEnd[]    = "'\nexport %s_%s_%d\n";
+                tSCC zOptNumArg[] = "%s_%s_%d=";
+                tSCC zOptEnd[]    = "\nexport %s_%s_%d\n";
 
                 printf( zOptNumArg, pOpts->pzPROGNAME, pOD->pz_NAME,
-                        pAL->useCt-ct );
+                        pAL->useCt - ct );
                 putQuotedStr( *(ppz++) );
                 printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME,
-                        pAL->useCt-ct );
+                        pAL->useCt - ct );
             }
         }
 
@@ -207,7 +244,7 @@ putBourneShell( tOptions* pOpts )
          */
         else if ((pOD->fOptState & OPTST_NUMERIC) != 0)
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    (int)(pOD->pzLastArg) );
+                    (uintptr_t)(pOD->pzLastArg) );
 
         /*
          *  If the argument type is an enumeration, then it is much
@@ -216,7 +253,9 @@ putBourneShell( tOptions* pOpts )
          */
         else if ((pOD->fOptState & OPTST_ENUMERATION) != 0) {
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
+            fputc( '\'', stdout );
             (*(pOD->pOptProc))( (tOptions*)1UL, pOD );
+            fputc( '\'', stdout );
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
         }
 
@@ -226,13 +265,13 @@ putBourneShell( tOptions* pOpts )
          */
         else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
             printf( zFullOptFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    ((int)(pOD->pzLastArg) == 0) ? "false" : "true" );
+                    ((uintptr_t)(pOD->pzLastArg) == 0) ? "false" : "true" );
 
         /*
          *  IF the option has an empty value,
          *  THEN we set the argument to the occurrence count.
          */
-        else if (  (pOD->pzLastArg == (char*)NULL)
+        else if (  (pOD->pzLastArg == NULL)
                 || (pOD->pzLastArg[0] == NUL) )
 
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,

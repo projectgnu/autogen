@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.14 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.15 2003/12/27 15:06:40 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -92,14 +92,14 @@ printChildren( xmlNodePtr pNode );
 /* = = = END-STATIC-FORWARD = = = */
 #define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
 
-extern void forkAutogen( char* pzInput );
+extern void forkAutogen( tCC* pzInput );
 
 
 int
 main( int argc, char** argv )
 {
     xmlDocPtr pDoc;
-    char*     pzFile = NULL;
+    tCC*      pzFile = NULL;
 
     {
         int ct = optionProcess( &xml2agOptions, argc, argv );
@@ -208,13 +208,14 @@ emitIndentation( void )
 STATIC char*
 trim( const char* pzSrc, size_t* pSz )
 {
+    static char   zNil[1] = "";
     static char*  pzData  = NULL;
     static size_t dataLen = 0;
     size_t        strSize;
 
     if (pzSrc == NULL) {
         if (pSz != NULL) *pSz = 0;
-        return "";
+        return zNil;
     }
 
     /*
@@ -228,7 +229,7 @@ trim( const char* pzSrc, size_t* pSz )
 
         if (pzEnd <= pzSrc) {
             if (pSz != NULL) *pSz = 0;
-            return "";
+            return zNil;
         }
         strSize = (pzEnd - pzSrc);
     }
@@ -249,11 +250,11 @@ trim( const char* pzSrc, size_t* pSz )
 
     if (dataLen <= strSize) {
         size_t sz = (strSize + 0x1000) & ~0x0FFF;
-        if (pzData != NULL)
+        if (pzData == NULL)
              pzData = malloc( sz );
         else pzData = realloc( pzData, sz );
         if (pzData == NULL) {
-            fprintf( stderr, "ENOMEM allocating 0x%lX bytes", sz );
+            fprintf( stderr, "ENOMEM allocating 0x%X bytes", (unsigned)sz );
             exit( EXIT_FAILURE );
         }
         dataLen = sz;
@@ -287,7 +288,7 @@ STATIC xmlNodePtr
 printHeader( xmlDocPtr pDoc )
 {
     tSCC zDef[] = "AutoGen Definitions %s%s;\n";
-    char* pzSfx = ".tpl";
+    tCC* pzSfx = ".tpl";
 
     xmlNodePtr pRootNode = xmlDocGetRootElement( pDoc );
     xmlChar*   pTpl = NULL;
@@ -301,10 +302,10 @@ printHeader( xmlDocPtr pDoc )
     if (HAVE_OPT( OVERRIDE_TPL )) {
         if (strchr( OPT_ARG( OVERRIDE_TPL ), '.' ) != NULL)
             pzSfx = "";
-        pzTpl = (xmlChar*)OPT_ARG( OVERRIDE_TPL );
+        pzTpl = (xmlChar*)(void*)OPT_ARG( OVERRIDE_TPL );
     }
     else {
-        pTpl = xmlGetProp( pRootNode, (xmlChar*)"template" );
+        pTpl = xmlGetProp( pRootNode, (xmlChar*)(void*)"template" );
         if (pTpl == NULL) {
             fprintf( stderr, "No template was specified.\n" );
             exit( EXIT_FAILURE );
@@ -344,7 +345,7 @@ printAttrs( xmlAttrPtr pAttr )
         char* pzCont = (char*)pAttr->children->content;
 
         emitIndentation();
-        fputs( (char*)pAttr->name, outFp );
+        fputs( (char*)(void*)pAttr->name, outFp );
         fputs( " = ", outFp );
         if (pAttr->children->children == NULL)
             fprintf( outFp, "'%s';\n", TRIM( pzCont, NULL ));
@@ -375,7 +376,7 @@ printNode( xmlNodePtr pNode )
         size_t sz;
         char*  pzTxt;
         emitIndentation();
-        fputs( (char*)pNode->name, outFp );
+        fputs( (char*)(void*)pNode->name, outFp );
         pzTxt = TRIM( pNode->content, &sz );
 
         if (  (pNode->properties == NULL)

@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 3.4 2003/11/23 19:15:28 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 3.5 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -83,6 +83,9 @@ mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
         if (pOS->pzOptArg != (char*)NULL)
             return SUCCESS;
         break;
+
+    default:
+        return FAILURE;
     }
     if (pOpts->curOptIdx >= pOpts->origArgCt)
         return FAILURE;
@@ -117,6 +120,9 @@ mayHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
         if (pOS->pzOptArg != (char*)NULL)
             return SUCCESS;
         break;
+
+    default:
+        return FAILURE;
     }
     if (pOpts->curOptIdx >= pOpts->origArgCt)
         return PROBLEM;

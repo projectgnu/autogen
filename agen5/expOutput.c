@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 3.18 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: expOutput.c,v 3.19 2003/12/27 15:06:39 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -454,7 +454,7 @@ ag_scm_out_name( void )
 {
     tFpStack* p = pCurFp;
     while (p->flags & FPF_UNLINK)  p = p->pPrev;
-    return gh_str02scm( p->pzOutName );
+    return gh_str02scm( (void*)p->pzOutName );
 }
 
 

@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.13 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: stack.c,v 3.14 2003/12/27 15:06:40 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -51,9 +51,6 @@
 
 #include REGEX_HEADER
 
-/* === STATIC PROCS === */
-/* === END STATIC PROCS === */
-
 /*=export_func  unstackOptArg
  * private:
  *
@@ -97,10 +94,10 @@ unstackOptArg( pOpts, pOptDesc )
          *  we are keeping a define.
          */
         for (i = 0, dIdx = 0, ct = pAL->useCt; --ct >= 0; i++) {
-            char*     pzSrc = pAL->apzArgs[ i ];
+            tCC*      pzSrc = pAL->apzArgs[ i ];
             char*     pzEq  = strchr( pzSrc, '=' );
 
-            if (pzEq != (char*)NULL)
+            if (pzEq != NULL)
                 *pzEq = NUL;
 
             res = regexec( &re, pzSrc, (size_t)0, (regmatch_t*)NULL, 0 );
@@ -116,7 +113,7 @@ unstackOptArg( pOpts, pOptDesc )
 
             default:
             case REG_NOMATCH:
-                if (pzEq != (char*)NULL)
+                if (pzEq != NULL)
                     *pzEq = '=';
 
                 /*
@@ -162,7 +159,7 @@ stackOptArg( pOpts, pOptDesc )
     tOptDesc*  pOptDesc;
 {
     tArgList* pAL;
-    char* pzLast = pOptDesc->pzLastArg;
+    tCC* pzLast = pOptDesc->pzLastArg;
 
     if (pOptDesc->optArgType == ARG_NONE)
         return;
@@ -192,7 +189,7 @@ stackOptArg( pOpts, pOptDesc )
 
     pAL = (tArgList*)pOptDesc->optCookie;
 
-    if (pzLast == (char*)NULL)
+    if (pzLast == NULL)
         return;
 
     /*

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.20 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: enumeration.c,v 3.21 2003/12/27 15:06:40 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -170,10 +170,6 @@ optionEnumerationVal(
     tCC**         paz_names,
     unsigned int  name_ct )
 {
-    size_t        len;
-    uintptr_t     idx;
-    uintptr_t     res = name_ct;
-
     /*
      *  IF the program option descriptor pointer is invalid,
      *  then it is some sort of special request.
@@ -190,7 +186,7 @@ optionEnumerationVal(
         /*
          *  print the name string.
          */
-        fputs( paz_names[ (int)(pOD->pzLastArg) ], stdout );
+        fputs( paz_names[ (uintptr_t)(pOD->pzLastArg) ], stdout );
         return (char*)0UL;
 
     case 2UL:
@@ -301,7 +297,7 @@ optionSetMembers(
     }
 
     {
-        char*     pzArg = pOD->pzLastArg;
+        tCC*      pzArg = pOD->pzLastArg;
         uintptr_t res;
         if ((pzArg == NULL) || (*pzArg == NUL)) {
             pOD->optCookie = NULL;
@@ -311,7 +307,6 @@ optionSetMembers(
         res = (uintptr_t)pOD->optCookie;
         for (;;) {
             tSCC zSpn[] = " ,|+\t\r\f\n";
-            char ch;
             int  iv, len;
 
             pzArg += strspn( pzArg, zSpn );
@@ -322,34 +317,43 @@ optionSetMembers(
             len = strcspn( pzArg, zSpn );
             if (len == 0)
                 break;
-            ch = pzArg[len];
-            pzArg[len] = NUL;
 
-            if ((len == 3) && (strcmp( pzArg, "all" ) == 0)) {
+            if ((len == 3) && (strncmp( pzArg, "all", 3 ) == 0)) {
                 if (iv)
                      res = 0;
                 else res = ~0;
             }
-            else if ((len == 4) && (strcmp( pzArg, "none" ) == 0)) {
+            else if ((len == 4) && (strncmp( pzArg, "none", 4 ) == 0)) {
                 if (! iv)
                     res = 0;
             }
-            else {
+            else do {
                 char* pz;
                 uintptr_t bit = strtoul( pzArg, &pz, 0 );
 
-                if (*pz != NUL)
-                   bit = 1UL << findName(pzArg, pOpts, pOD, paz_names, name_ct);
+                if (pz != pzArg + len) {
+                    char z[ AO_NAME_SIZE ];
+                    tCC* p;
+                    if (*pz != NUL) {
+                        if (len >= AO_NAME_LIMIT)
+                            break;
+                        strncpy( z, pzArg, len );
+                        z[len] = NUL;
+                        p = z;
+                    } else {
+                        p = pzArg;
+                    }
 
+                    bit = 1UL << findName(p, pOpts, pOD, paz_names, name_ct);
+                }
                 if (iv)
                      res &= ~bit;
                 else res |= bit;
-            }
+            } while (0);
 
-            if (ch == NUL)
+            if (pzArg[len] == NUL)
                 break;
-            pzArg += len;
-            *(pzArg++) = ch;
+            pzArg += len + 1;
         }
         if (name_ct < (8 * sizeof( uintptr_t ))) {
             res &= (1UL << name_ct) - 1UL;

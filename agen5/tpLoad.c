@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.20 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.21 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -134,12 +134,11 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
          *  for the file.  We always force one copy of this option.
          */
         int     ct     = STACKCT_OPT(  TEMPL_DIRS );
-        char**  ppzDir = STACKLST_OPT( TEMPL_DIRS ) + ct - 1;
+        tCC**   ppzDir = STACKLST_OPT( TEMPL_DIRS ) + ct - 1;
 
         do  {
             tSCC    zDirFmt[] = "%s/%s";
-            char*   pzDir  = *(ppzDir--);
-
+            tCC*    pzDir  = *(ppzDir--);
             char*   pzEnd;
 
             /*

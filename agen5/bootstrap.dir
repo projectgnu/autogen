@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2003/11/23 02:07:44 $
+# Last Modified:     $Date: 2003/12/27 15:06:39 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.13 2003/11/23 02:07:44 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.14 2003/12/27 15:06:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -274,7 +274,7 @@ do
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
     echo ${AG} ${eopt} ./opts.def
-    ${AG} ${eopt} ./opts.def && touch autogen.1
+    ${AG} ${eopt} ./opts.def
     ;;
 
   proto.h )

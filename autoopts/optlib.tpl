@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.15 2003/11/23 02:07:44 bkorb Exp $
+# $Id: optlib.tpl,v 3.16 2003/12/27 15:06:40 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -20,7 +20,7 @@ DEFINE set-defines set-desc set-index opt-state =]
         [=set-desc=].fOptState &= OPTST_PERSISTENT; \
         [=set-desc=].fOptState |= [=opt-state=][=
   IF (exist? "arg-type")=]; \
-        [=set-desc=].pzLastArg  = (char*)(a)[=
+        [=set-desc=].pzLastArg  = (tCC*)(a)[=
   ENDIF  =][=
   IF (or (exist? "call-proc")
          (exist? "flag-code")
@@ -462,7 +462,7 @@ DEFINE Option_Descriptor =][=
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
      /* last opt argumnt */ [=
          IF (exist? "arg-default")
-              =](char*)z[=(. cap-name)=]DefaultArg[=
+              =]z[=(. cap-name)=]DefaultArg[=
          ELSE =]NULL[= ENDIF =],
      /* arg list/cookie  */ [=
             (if (and (=* (get "arg-type") "set") (exist? "arg-default"))

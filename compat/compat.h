@@ -3,16 +3,157 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2002-09-21 13:38:29 bkorb"
+ *  Time-stamp:      "2003-12-27 06:39:01 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.5 2003/04/19 02:40:33 bkorb Exp $
+ * $Id: compat.h,v 3.6 2003/12/27 15:06:40 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
 
+#include <config.h>
+
+#ifndef HAVE_SYS_TYPES_H
+#  error NEED <sys/types.h>
+#endif
+
+#ifndef HAVE_SYS_STAT_H
+#  error NEED <sys/stat.h>
+#endif
+
+#ifndef HAVE_STRING_H
+#  error NEED <string.h>
+#endif
+
+#ifndef HAVE_ERRNO_H
+#  error NEED <errno.h>
+#endif
+
+#ifndef HAVE_STDLIB_H
+#  error NEED <stdlib.h>
+#endif
+
+#ifndef HAVE_MEMORY_H
+#  error NEED <memory.h>
+#endif
+
+#if (! defined(HAVE_LIMITS_H)) && (! defined(HAVE_SYS_LIMITS_H))
+#  error NEED <limits.h> *OR* <sys/limits.h>
+#endif
+
+#if (! defined(HAVE_STDINT_H)) && (! defined(HAVE_INTTYPES_H))
+#  error NEED <stdint.h> *OR* <inttypes.h>
+#endif
+
+#ifndef HAVE_SETJMP_H
+#  error NEED <setjmp.h>
+#endif
+
+#ifndef HAVE_STRSIGNAL
+   const char * strsignal( int signo );
+#else
+#  define  _GNU_SOURCE /* for strsignal in GNU's libc */
+#  define  __USE_GNU   /* exact same thing as above   */
+#endif
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  SYSTEM HEADERS:
+ */
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/param.h>
+#if HAVE_SYS_PROCSET_H
+#  include <sys/procset.h>
+#endif
+#include <sys/stat.h>
+#include <sys/wait.h>
+
+#if defined( HAVE_POSIX_SYSINFO )
+#  include <sys/systeminfo.h>
+#elif defined( HAVE_UNAME_SYSCALL )
+#  include <sys/utsname.h>
+#endif
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  USER HEADERS:
+ */
+#include <stdio.h>
+#include <assert.h>
+#include <ctype.h>
+
+/*
+ *  Directory opening stuff:
+ */
+# if defined (_POSIX_SOURCE)
+/* Posix does not require that the d_ino field be present, and some
+   systems do not provide it. */
+#    define REAL_DIR_ENTRY(dp) 1
+# else /* !_POSIX_SOURCE */
+#    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
+# endif /* !_POSIX_SOURCE */
+
+# if defined (HAVE_DIRENT_H)
+#   include <dirent.h>
+#   define D_NAMLEN(dirent) strlen((dirent)->d_name)
+# else /* !HAVE_DIRENT_H */
+#   define dirent direct
+#   define D_NAMLEN(dirent) (dirent)->d_namlen
+#   if defined (HAVE_SYS_NDIR_H)
+#     include <sys/ndir.h>
+#   endif /* HAVE_SYS_NDIR_H */
+#   if defined (HAVE_SYS_DIR_H)
+#     include <sys/dir.h>
+#   endif /* HAVE_SYS_DIR_H */
+#   if defined (HAVE_NDIR_H)
+#     include <ndir.h>
+#   endif /* HAVE_NDIR_H */
+#   if !defined (HAVE_SYS_NDIR_H) && \
+       !defined (HAVE_SYS_DIR_H)  && \
+       !defined (HAVE_NDIR_H)
+#     include "ndir.h"
+#   endif /* !HAVE_SYS_NDIR_H && !HAVE_SYS_DIR_H && !HAVE_NDIR_H */
+# endif /* !HAVE_DIRENT_H */
+
+#include <errno.h>
+#ifdef HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+#if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
+#  include <libgen.h>
+#endif
+#ifdef HAVE_LIMITS_H
+#  include <limits.h>
+#else
+#  include <sys/limits.h>
+#endif
+#include <memory.h>
+#include <setjmp.h>
+#include <signal.h>
+
+#if defined( HAVE_STDINT_H )
+#  include <stdint.h>
+#else
+#  include <inttypes.h>
+#endif
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <time.h>
+#include <utime.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  FIXUPS and CONVIENCE STUFF:
+ */
 #ifdef __cplusplus
 #   define EXTERN extern "C"
 #else
@@ -27,69 +168,10 @@
 #  define STATIC static
 #endif
 
-#ifndef PARAMS
-#  if __STDC__
-#    ifndef NOPROTOS
-#      define PARAMS(args)      args
-#    endif
-#  endif
-#  ifndef PARAMS
-#    define PARAMS(args)        ()
-#  endif
-#endif
-
-#include <config.h>
-
-#ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-#else
-#  error NEED <sys/types.h>
-#endif
-
-#ifdef HAVE_SYS_STAT_H
-#  include <sys/stat.h>
-#else
-#  error NEED <sys/stat.h>
-#endif
-
-#ifdef STDC_HEADERS
-#  ifndef HAVE_STRING_H
-#     define HAVE_STRING_H  1
-#  endif
-#  ifndef HAVE_STDLIB_H
-#     define HAVE_STDLIB_H  1
-#  endif
-#endif
-
-#ifdef HAVE_STDLIB_H
-#  include <stdlib.h>
-#else
-#  error NEED <stdlib.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#else
-#  error NEED <errno.h>
-#endif
-
-#ifdef HAVE_MEMORY_H
-#  include <memory.h>
-#else
-#  error NEED <memory.h>
-#endif
-
 /* some systems #def errno! and others do not declare it!! */
 #ifndef errno
    extern       int     errno;
 #endif
-
-#include <stdio.h>
-#include <ctype.h>
 
 /* Some machines forget this! */
 
@@ -102,12 +184,6 @@
 #  define NUL '\0'
 #endif
 
-#ifdef HAVE_LIMITS_H
-#  include <limits.h>
-#elif HAVE_SYS_LIMITS_H
-#  include <sys/limits.h>
-#endif
-
 #if !defined (MAXPATHLEN) && defined (HAVE_SYS_PARAM_H)
 #  include <sys/param.h>
 #endif /* !MAXPATHLEN && HAVE_SYS_PARAM_H */
@@ -117,7 +193,7 @@
 #endif /* !MAXPATHLEN && PATH_MAX */
 
 #if !defined (MAXPATHLEN)
-#  define MAXPATHLEN 1024
+#  define MAXPATHLEN 4096
 #endif /* MAXPATHLEN */
 
 # ifndef LONG_MAX
@@ -138,20 +214,8 @@
 #  define strrchr       rindex
 #endif
 
-#if HAVE_STRING_H
-#  include <string.h>
-#elif HAVE_STRINGS_H
-#  include <strings.h>
-#else
-   extern char *strchr(), *strrchr();
-#endif
-
-#if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
-#  include <libgen.h>
-#endif
-
 #ifndef HAVE_PATHFIND
-  EXTERN char *pathfind PARAMS((const char *, const char *, const char *));
+  EXTERN char *pathfind(const char *, const char *, const char *);
 #endif
 
 #ifndef NULL
@@ -190,42 +254,6 @@
    typedef int t_word;
    #define WORD_MAX  INT_MAX
    #define WORD_MIN  INT_MIN
-#endif
-
-# if defined (_POSIX_SOURCE)
-/* Posix does not require that the d_ino field be present, and some
-   systems do not provide it. */
-#    define REAL_DIR_ENTRY(dp) 1
-# else /* !_POSIX_SOURCE */
-#    define REAL_DIR_ENTRY(dp) (dp->d_ino != 0)
-# endif /* !_POSIX_SOURCE */
-
-# if defined (HAVE_DIRENT_H)
-#   include <dirent.h>
-#   define D_NAMLEN(dirent) strlen((dirent)->d_name)
-# else /* !HAVE_DIRENT_H */
-#   define dirent direct
-#   define D_NAMLEN(dirent) (dirent)->d_namlen
-#   if defined (HAVE_SYS_NDIR_H)
-#     include <sys/ndir.h>
-#   endif /* HAVE_SYS_NDIR_H */
-#   if defined (HAVE_SYS_DIR_H)
-#     include <sys/dir.h>
-#   endif /* HAVE_SYS_DIR_H */
-#   if defined (HAVE_NDIR_H)
-#     include <ndir.h>
-#   endif /* HAVE_NDIR_H */
-#   if !defined (HAVE_SYS_NDIR_H) && \
-       !defined (HAVE_SYS_DIR_H)  && \
-       !defined (HAVE_NDIR_H)
-#     include "ndir.h"
-#   endif /* !HAVE_SYS_NDIR_H && !HAVE_SYS_DIR_H && !HAVE_NDIR_H */
-# endif /* !HAVE_DIRENT_H */
-
-#ifdef HAVE_SETJMP_H
-#  include <setjmp.h>
-#else
-#  error NEED <setjmp.h>
 #endif
 
 #endif /* COMPAT_H */

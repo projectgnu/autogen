@@ -36,6 +36,8 @@ extern "C" {
 #define SNV_END_EXTERN_C
 #endif
 
+#define NO_FLOAT_PRINTING
+
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
 #endif

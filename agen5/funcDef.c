@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 3.19 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: funcDef.c,v 3.20 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -436,7 +436,7 @@ build_defs( int defCt, tDefList* pList )
             }
             else if (gh_number_p( res )) {
                 pList->de.pzValue = (char*)AGALOC( 16, "number buf" );
-                snprintf( pList->de.pzValue, 16, "%d", gh_scm2ulong( res ));
+                snprintf( pList->de.pzValue, 16, "%ld", gh_scm2ulong( res ));
             }
             else
                 AGDUPSTR( pList->de.pzValue, zNil, "empty string" );

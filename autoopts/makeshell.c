@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.15 2003/12/03 02:45:08 bkorb Exp $
+ *  $Id: makeshell.c,v 3.16 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -57,17 +57,37 @@ tOptions*  pShellParseOptions = (tOptions*)NULL;
  *
  *  Setup Format Strings
  */
-static const char zStartMarker[] =
+tSCC zStartMarker[] =
 "# # # # # # # # # # -- do not modify this marker --\n#\n"
 "#  DO NOT EDIT THIS SECTION";
 
-static const char zPreamble[] =
+tSCC zPreamble[] =
 "%s OF %s\n#\n"
 "#  From here to the next `-- do not modify this marker --',\n"
 "#  the text has been generated %s\n";
 
-static const char zEndPreamble[] =
+tSCC zEndPreamble[] =
 "#  From the %s option definitions\n#\n";
+
+tSCC zMultiDef[] = "\n"
+"if test -z \"${%1$s_%2$s}\"\n"
+"then\n"
+"  %1$s_%2$s_CT=0\n"
+"else\n"
+"  %1$s_%2$s_CT=1\n"
+"  %1$s_%2$s_1=\"${%1$s_%2$s}\"\n"
+"fi\n"
+"export %1$s_%2$s_CT";
+
+tSCC zSingleDef[] = "\n"
+"%1$s_%2$s=\"${%1$s_%2$s-'%3$s'}\"\n"
+"%1$s_%2$s_set=false\n"
+"export %1$s_%2$s\n";
+
+tSCC zSingleNoDef[] = "\n"
+"%1$s_%2$s=\"${%1$s_%2$s}\"\n"
+"%1$s_%2$s_set=false\n"
+"export %1$s_%2$s\n";
 
 /* * * * * * * * * * * * * * * * * * * * *
  *
@@ -77,7 +97,7 @@ static const char zEndPreamble[] =
  *  all options are named options (loop only)
  *  regular, marked option processing.
  */
-static const char zLoopCase[] = "\n"
+tSCC zLoopCase[] = "\n"
 "OPT_PROCESS=true\n"
 "OPT_ARG=\"$1\"\n\n"
 "while ${OPT_PROCESS} && [ $# -gt 0 ]\ndo\n"
@@ -92,7 +112,7 @@ static const char zLoopCase[] = "\n"
 "        shift\n"
 "        ;;\n\n";
 
-static const char zLoopOnly[] = "\n"
+tSCC zLoopOnly[] = "\n"
 "OPT_ARG=\"$1\"\n\n"
 "while [ $# -gt 0 ]\ndo\n"
 "    OPT_ELEMENT=''\n"
@@ -107,16 +127,16 @@ static const char zLoopOnly[] = "\n"
  *  then we must have selectors for each acceptable option
  *  type (long option, flag character and non-option)
  */
-static const char zLongSelection[] =
+tSCC zLongSelection[] =
 "    --* )\n";
 
-static const char zFlagSelection[] =
+tSCC zFlagSelection[] =
 "    -* )\n";
 
-static const char zEndSelection[] =
+tSCC zEndSelection[] =
 "        ;;\n\n";
 
-static const char zNoSelection[] =
+tSCC zNoSelection[] =
 "    * )\n"
 "         OPT_PROCESS=false\n"
 "         ;;\n"
@@ -126,7 +146,7 @@ static const char zNoSelection[] =
  *
  *  LOOP END
  */
-static const char zLoopEnd[] =
+tSCC zLoopEnd[] =
 "    if [ -n \"${OPT_ARG_VAL}\" ]\n"
 "    then\n"
 "        eval %1$s_${OPT_NAME}${OPT_ELEMENT}=\"'${OPT_ARG_VAL}'\"\n"
@@ -141,7 +161,7 @@ static const char zLoopEnd[] =
 "unset OPT_CODE || :\n"
 "unset OPT_ARG_VAL || :\n%2$s";
 
-static const char zTrailerMarker[] = "\n"
+tSCC zTrailerMarker[] = "\n"
 "# # # # # # # # # #\n#\n"
 "#  END OF AUTOMATED OPTION PROCESSING\n"
 "#\n# # # # # # # # # # -- do not modify this marker --\n";
@@ -150,22 +170,22 @@ static const char zTrailerMarker[] = "\n"
  *
  *  OPTION SELECTION
  */
-static const char zOptionCase[] =
+tSCC zOptionCase[] =
 "        case \"${OPT_CODE}\" in\n";
 
-static const char zOptionPartName[] =
+tSCC zOptionPartName[] =
 "        '%s' | \\\n";
 
-static const char zOptionFullName[] =
+tSCC zOptionFullName[] =
 "        '%s' )\n";
 
-static const char zOptionFlag[] =
+tSCC zOptionFlag[] =
 "        '%c' )\n";
 
-static const char zOptionEndSelect[] =
+tSCC zOptionEndSelect[] =
 "            ;;\n\n";
 
-static const char zOptionUnknown[] =
+tSCC zOptionUnknown[] =
 "        * )\n"
 "            echo Unknown %s: \"${OPT_CODE}\" >&2\n"
 "            echo \"$%s_USAGE_TEXT\"\n"
@@ -179,60 +199,62 @@ static const char zOptionUnknown[] =
  *
  *  Formats for emitting the text for handling particular options
  */
-static const char zTextExit[] =
+tSCC zTextExit[] =
 "            echo \"$%s_%s_TEXT\"\n"
 "            exit 0\n";
 
-static const char zPagedUsageExit[] =
+tSCC zPagedUsageExit[] =
 "            echo \"$%s_LONGUSAGE_TEXT\" | ${PAGER-more}\n"
 "            exit 0\n";
 
-static const char zCmdFmt[] =
+tSCC zCmdFmt[] =
 "            %s\n";
 
-static const char zCountTest[] =
+tSCC zCountTest[] =
 "            if [ $%1$s_%2$s_CT -ge %3$d ] ; then\n"
 "                echo Error:  more than %3$d %2$s options >&2\n"
 "                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n";
 
-static const char zMultiArg[] =
+tSCC zMultiArg[] =
 "            %1$s_%2$s_CT=`expr ${%1$s_%2$s_CT} + 1`\n"
 "            OPT_ELEMENT=\"_${%1$s_%2$s_CT}\"\n"
 "            OPT_NAME='%2$s'\n";
 
-static const char zSingleArg[] =
-"            if [ -n \"${%1$s_%2$s}\" ] ; then\n"
+tSCC zSingleArg[] =
+"            if [ -n \"${%1$s_%2$s}\" ] && ${%1$s_%2$s_set} ; then\n"
 "                echo Error:  duplicate %2$s option >&2\n"
 "                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n"
+"            %1$s_%2$s_set=true\n"
 "            OPT_NAME='%2$s'\n";
 
-static const char zNoMultiArg[] =
+tSCC zNoMultiArg[] =
 "            %1$s_%2$s_CT=0\n"
 "            OPT_ELEMENT=''\n"
 "            %1$s_%2$s='%3$s'\n"
 "            export %1$s_%2$s\n"
 "            OPT_NAME='%2$s'\n";
 
-static const char zNoSingleArg[] =
-"            if [ -n \"${%1$s_%2$s}\" ] ; then\n"
+tSCC zNoSingleArg[] =
+"            if [ -n \"${%1$s_%2$s}\" ] && ${%1$s_%2$s_set} ; then\n"
 "                echo Error:  duplicate %2$s option >&2\n"
 "                echo \"$%1$s_USAGE_TEXT\"\n"
 "                exit 1 ; fi\n"
+"            %1$s_%2$s_set=true\n"
 "            %1$s_%2$s='%3$s'\n"
 "            export %1$s_%2$s\n"
 "            OPT_NAME='%2$s'\n";
 
-static const char zMayArg[]  =
+tSCC zMayArg[]  =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
 "            export %1$s_%2$s${OPT_ELEMENT}\n"
 "            OPT_ARG_NEEDED=OK\n";
 
-static const char zMustArg[] =
+tSCC zMustArg[] =
 "            OPT_ARG_NEEDED=YES\n";
 
-static const char zCantArg[] =
+tSCC zCantArg[] =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
 "            export %1$s_%2$s${OPT_ELEMENT}\n"
 "            OPT_ARG_NEEDED=NO\n";
@@ -243,7 +265,7 @@ static const char zCantArg[] =
  *
  *  Formats for emitting the text for handling long option types
  */
-static const char zLongOptInit[] =
+tSCC zLongOptInit[] =
 "        OPT_CODE=`echo \"X${OPT_ARG}\"|sed 's/^X-*//'`\n"
 "        shift\n"
 "        OPT_ARG=\"$1\"\n\n"
@@ -251,7 +273,7 @@ static const char zLongOptInit[] =
 "            OPT_ARG_VAL=`echo \"${OPT_CODE}\"|sed 's/^[^=]*=//'`\n"
 "            OPT_CODE=`echo \"${OPT_CODE}\"|sed 's/=.*$//'` ;; esac\n\n";
 
-static const char zLongOptArg[] =
+tSCC zLongOptArg[] =
 "        case \"${OPT_ARG_NEEDED}\" in\n"
 "        NO )\n"
 "            OPT_ARG_VAL=''\n"
@@ -287,11 +309,11 @@ static const char zLongOptArg[] =
  *
  *  Formats for emitting the text for handling flag option types
  */
-static const char zFlagOptInit[] =
+tSCC zFlagOptInit[] =
 "        OPT_CODE=`echo \"X${OPT_ARG}\" | sed 's/X-\\(.\\).*/\\1/'`\n"
 "        OPT_ARG=` echo \"X${OPT_ARG}\" | sed 's/X-.//'`\n\n";
 
-static const char zFlagOptArg[] =
+tSCC zFlagOptArg[] =
 "        case \"${OPT_ARG_NEEDED}\" in\n"
 "        NO )\n"
 "            if [ -n \"${OPT_ARG}\" ]\n"
@@ -338,7 +360,7 @@ static const char zFlagOptArg[] =
 "            ;;\n"
 "        esac\n";
 
-static char*  pzShell   = (char*)NULL;
+tSCC* pzShell   = (char*)NULL;
 static char*  pzLeader  = (char*)NULL;
 static char*  pzTrailer = (char*)NULL;
 
@@ -393,7 +415,7 @@ putShellParse( tOptions* pOpts )
         pzShell = OPT_ARG( SHELL );
 
     else if (! ENABLED_OPT( SHELL ))
-        pzShell = (char*)NULL;
+        pzShell = NULL;
 
     else if ((pzShell = getenv( "SHELL" )),
              pzShell == (char*)NULL)
@@ -482,7 +504,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
     int  pipeFd[2];
     FILE* fp;
 
-#   define _TT_(n) static const char z ## n [] = #n;
+#   define _TT_(n) tSCC z ## n [] = #n;
     TEXTTO_TABLE
 #   undef _TT_
 #   define _TT_(n) z ## n ,
@@ -571,7 +593,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 STATIC void
 emitUsage( tOptions* pOpts )
 {
-    char     zTimeBuf[ 128 ];
+    char     zTimeBuf[ AO_NAME_SIZE ];
 
     /*
      *  First, switch stdout to the output file name.
@@ -583,31 +605,33 @@ emitUsage( tOptions* pOpts )
         fputs( pzLeader, stdout );
 
     {
-        char*    pzOutName;
-        char*    pz;
+        tSCC    zStdout[] = "stdout";
+        tCC*    pzOutName;
 
         {
             time_t    curTime = time( (time_t*)NULL );
             struct tm*  pTime = localtime( &curTime );
-            strftime( zTimeBuf, 128, "%A %B %e, %Y at %r %Z", pTime );
+            strftime( zTimeBuf, AO_NAME_SIZE, "%A %B %e, %Y at %r %Z", pTime );
         }
 
         if (HAVE_OPT( SCRIPT ))
              pzOutName = OPT_ARG( SCRIPT );
-        else pzOutName = "stdout";
+        else pzOutName = zStdout;
 
-        if ((pzLeader == NULL) && (pzShell != (char*)NULL))
+        if ((pzLeader == NULL) && (pzShell != NULL))
             printf( "#! %s\n", pzShell );
 
         printf( zPreamble, zStartMarker, pzOutName, zTimeBuf );
+    }
 
-        /*
-         *  Get a copy of the original program name in lower case
-         */
-        pzOutName = zTimeBuf;
-        pz        = (char*)pOpts->pzPROGNAME;
+    /*
+     *  Get a copy of the original program name in lower case
+     */
+    {
+        char* pzPN = zTimeBuf;
+        tCC*  pz   = pOpts->pzPROGNAME;
         for (;;) {
-            if ((*pzOutName++ = tolower( *pz++ )) == '\0')
+            if ((*pzPN++ = tolower( *pz++ )) == '\0')
                 break;
         }
     }
@@ -645,18 +669,6 @@ emitSetup( tOptions* pOpts )
     const char* pzDefault;
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
-        tSCC zMultiDef[] = "\n"
-            "%1$s_%2$s_CT=0\n"
-            "export %1$s_%2$s_CT\n";
-
-        tSCC zSingleDef[] = "\n"
-            "%1$s_%2$s=\"${%1$s_%2$s-'%3$s'}\"\n"
-            "export %1$s_%2$s\n";
-
-        tSCC zSingleNoDef[] = "\n"
-            "%1$s_%2$s=\"${%1$s_%2$s}\"\n"
-            "export %1$s_%2$s\n";
-
         char zVal[16];
 
         /*
@@ -688,7 +700,8 @@ emitSetup( tOptions* pOpts )
         }
 
         else if (pOptDesc->pzLastArg == (char*)NULL) {
-            pzFmt     = zSingleNoDef;
+            if (pzFmt == zSingleDef)
+                pzFmt = zSingleNoDef;
             pzDefault = NULL;
         }
         else
@@ -1055,7 +1068,7 @@ genshelloptUsage( tOptions*  pOpts, int exitCode )
      *  Separate the makeshell usage from the client usage
      */
     {
-        static const char zMsg[] =
+        tSCC zMsg[] =
             "\n= = = = = = = =\n\n"
             "This incarnation of genshell will produce\n"
              "a shell script to parse the options for %s:\n\n";

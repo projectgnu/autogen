@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.29 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: autoopts.c,v 3.30 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -85,7 +85,7 @@ doImmediateOpts( tOptions* pOpts );
 STATIC void
 doEnvPresets( tOptions* pOpts, teEnvPresetType type );
 
-STATIC tSuccess
+STATIC void
 doRcFiles( tOptions* pOpts );
 
 STATIC tSuccess
@@ -718,7 +718,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
     tOptState  st;
     char*      pzFlagName;
     size_t     spaceLeft;
-    char       zEnvName[ 128 ];
+    char       zEnvName[ AO_NAME_SIZE ];
 
     /*
      *  Finally, see if we are to look at the environment
@@ -732,7 +732,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 
     pzFlagName = zEnvName
         + snprintf( zEnvName, sizeof( zEnvName ), "%s_", pOpts->pzPROGNAME );
-    spaceLeft = sizeof( zEnvName ) - (pzFlagName - zEnvName) - 1;
+    spaceLeft = AO_NAME_SIZE - (pzFlagName - zEnvName) - 1;
 
     for (;ct-- > 0; st.pOD++) {
         /*
@@ -831,7 +831,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
 /*
  *  doPresets - check for preset values from an rc file or the envrionment
  */
-STATIC tSuccess
+STATIC void
 doRcFiles( tOptions* pOpts )
 {
     int   idx;

@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 3.5 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: gdinit.c,v 3.6 2003/12/27 15:06:40 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2003/04/22 01:40:20 $
+ *  Last Modified:     $Date: 2003/12/27 15:06:40 $
  *            by: bkorb
  */
 
@@ -16,6 +16,9 @@ tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
 STATIC char*
 compressOptionText( char* pzS, char* pzE );
+
+STATIC char*
+fixupSubblockString( tCC* pzSrc );
 
 STATIC void
 loadStdin( void );
@@ -73,40 +76,48 @@ compressOptionText( char* pzS, char* pzE )
 /*
  *  fixupSubblockString
  */
-EXPORT void
-fixupSubblockString( char* pz )
+STATIC char*
+fixupSubblockString( tCC* pzSrc )
 {
-    char*   pzString = pz;
-    char*   p;
+    char*   pzString;
+    char*   pzDest;
+    char*   pzCopy;
+
+    pzString = strdup( pzSrc );
+
     /*
      *  Make sure we find the '=' separator
      */
-    p = strchr( pz, '=' );
-    if (p == (char*)NULL) {
-        fprintf( stderr, zNoList, pzString );
-        USAGE( EXIT_FAILURE );
-    }
+    {
+        char* p = strchr( pzString, '=' );
+        if (p == NULL) {
+            fprintf( stderr, zNoList, pzString );
+            USAGE( EXIT_FAILURE );
+        }
 
-    /*
-     *  NUL the equal char
-     */
-    *p++ = NUL;
-    pz = p;
+        /*
+         *  NUL the equal char
+         */
+        *p++ = NUL;
 
-    /*
-     *  Make sure at least one attribute name is defined
-     */
-    while (isspace( *pz )) pz++;
-    if (*pz == NUL) {
-        fprintf( stderr, zNoList, pzString );
-        USAGE( EXIT_FAILURE );
+        pzDest = p;
+
+        /*
+         *  Make sure at least one attribute name is defined
+         */
+        while (isspace( *p )) p++;
+        if (*p == NUL) {
+            fprintf( stderr, zNoList, pzString );
+            USAGE( EXIT_FAILURE );
+        }
+        pzCopy = p;
     }
 
     for (;;) {
         /*
          *  Attribute names must start with an alpha
          */
-        if (! isalpha( *pz )) {
+        if (! isalpha( *pzCopy )) {
             fprintf( stderr, "ERROR:  attribute names must start "
                      "with an alphabetic character:\n\t%s\n",
                      pzString );
@@ -116,26 +127,28 @@ fixupSubblockString( char* pz )
         /*
          *  Copy the name.  (maybe.  "p" and "pz" may be equal)
          */
-        while (isalnum( *pz ) || (*pz == '_'))
-            *p++ = *pz++;
+        while (isalnum( *pzCopy ) || (*pzCopy == '_'))
+            *pzDest++ = *pzCopy++;
 
         /*
          *  Skip over one comma (optional) and any white space
          */
-        while (isspace( *pz )) pz++;
-        if (*pz == ',')
-            pz++;
+        while (isspace( *pzCopy )) pzCopy++;
+        if (*pzCopy == ',')
+            pzCopy++;
 
-        while (isspace( *pz )) pz++;
-        if (*pz == NUL)
+        while (isspace( *pzCopy )) pzCopy++;
+        if (*pzCopy == NUL)
             break;
         /*
          *  The final string contains only one space
          */
-        *p++ = ' ';
+        *pzDest++ = ' ';
     }
 
-    *p = NUL;
+    *pzDest = NUL;
+
+    return pzString;
 }
 
 
@@ -156,7 +169,7 @@ loadStdin( void )
 {
     char z[ 4096 ];
     int    ct  = 0;
-    char** ppz = STACKLST_OPT( INPUT );
+    tCC**  ppz = STACKLST_OPT( INPUT );
 
     if (isatty( STDIN_FILENO )) {
         fputs( "getdefs error:  no inputs were specified and stdin is a tty\n",
@@ -222,8 +235,8 @@ processEmbeddedOptions( char* pzText )
         optionLoadLine( &getdefsOptions, pzStart );
 
         if (HAVE_OPT( SUBBLOCK ) && (sblct != STACKCT_OPT( SUBBLOCK ))) {
-            char**  ppz = STACKLST_OPT( SUBBLOCK );
-            fixupSubblockString( ppz[ sblct ] );
+            tCC** ppz = STACKLST_OPT( SUBBLOCK );
+            ppz[ sblct ] = fixupSubblockString( ppz[ sblct ] );
         }
         pzText = pzEnd + sizeof( zEndSt );
     }
@@ -255,11 +268,11 @@ validateOptions( void )
                    "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
 
     } else {
-        char*  pz  = OPT_ARG( DEFS_TO_GET );
+        tCC*   pz  = OPT_ARG( DEFS_TO_GET );
         size_t len = strlen( pz ) + 16;
+        char*  bf  = malloc( len );
 
-        pzDefPat = (char*)malloc( len );
-        if (pzDefPat == (char*)NULL) {
+        if (bf == NULL) {
             fprintf( stderr, zMallocErr, len, "definition pattern" );
             exit( EXIT_FAILURE );
         }
@@ -268,7 +281,8 @@ validateOptions( void )
          *  IF a pattern has been supplied, enclose it with
          *  the '/' '*' '=' part of the pattern.
          */
-        snprintf( pzDefPat, len, "/\\*=(%s)", pz );
+        snprintf( bf, len, "/\\*=(%s)", pz );
+        pzDefPat = bf;
     }
 
     /*
@@ -299,10 +313,8 @@ validateOptions( void )
      *  Prepare each sub-block entry so we can parse easily later.
      */
     if (HAVE_OPT( SUBBLOCK )) {
-        tSCC    zNoList[] = "ERROR:  block attr must have name list:\n"
-                            "\t%s\n";
         int     ct  = STACKCT_OPT(  SUBBLOCK );
-        char**  ppz = STACKLST_OPT( SUBBLOCK );
+        tCC**   ppz = STACKLST_OPT( SUBBLOCK );
 
         /*
          *  FOR each SUBBLOCK argument,
@@ -310,7 +322,8 @@ validateOptions( void )
          *      separated by a single space and NUL terminated.
          */
         do  {
-            fixupSubblockString( *(ppz++) );
+            *ppz = fixupSubblockString( *ppz );
+            ppz++;
         } while (--ct > 0);
     }
 
@@ -324,7 +337,7 @@ validateOptions( void )
      */
     {
         int    ct  = STACKCT_OPT(  INPUT );
-        char** ppz = STACKLST_OPT( INPUT );
+        tCC**  ppz = STACKLST_OPT( INPUT );
         struct stat stb;
 
         if ((ct == 1) && (strcmp( *ppz, "-" ) == 0)) {
@@ -357,13 +370,13 @@ validateOptions( void )
      *       THEN it must be new or empty.  Allocate several K to start.
      */
     if (   HAVE_OPT( ORDERING )
-       && (OPT_ARG( ORDERING ) != (char*)NULL)) {
+       && (OPT_ARG( ORDERING ) != NULL)) {
         tSCC zIndexPreamble[] =
             "# -*- buffer-read-only: t -*- vi: set ro:\n"
             "#\n# DO NOT EDIT THIS FILE - it is auto-edited by getdefs\n";
 
         pzIndexText = loadFile( OPT_ARG( ORDERING ));
-        if (pzIndexText == (char*)NULL) {
+        if (pzIndexText == NULL) {
             pzIndexText = pzEndIndex  = pzIndexEOF =
                 (char*)malloc( 0x4000 );
             indexAlloc = 0x4000;
@@ -381,10 +394,10 @@ validateOptions( void )
         strequate( "_-^" );
     }
 
-    if (OPT_ARG( SRCFILE ) == (char*)NULL)
+    if (OPT_ARG( SRCFILE ) == NULL)
         OPT_ARG( SRCFILE ) = "srcfile";
 
-    if (OPT_ARG( LINENUM ) == (char*)NULL)
+    if (OPT_ARG( LINENUM ) == NULL)
         OPT_ARG( LINENUM ) = "linenum";
 
     {

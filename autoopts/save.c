@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.16 2003/11/23 19:15:28 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.17 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -53,24 +53,24 @@
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
 /* === STATIC PROCS === */
-STATIC char*
+STATIC tCC*
 findDirName( tOptions* pOpts );
 
-STATIC char*
+STATIC tCC*
 findFileName( tOptions* pOpts );
 
 STATIC void
 printEntry(
     FILE*      fp,
     tOptDesc*  p,
-    char*      pzLA );
+    tCC*       pzLA );
 
 /* === END STATIC PROCS === */
 
-STATIC char*
+STATIC tCC*
 findDirName( tOptions* pOpts )
 {
-    char*  pzDir;
+    tCC*  pzDir;
 
     if (pOpts->specOptIdx.save_opts == 0)
         return (char*)NULL;
@@ -84,12 +84,12 @@ findDirName( tOptions* pOpts )
      *  we can stash the RC (INI) file.
      */
     {
-        const char** papz = pOpts->papzHomeList;
-        if (papz == (const char**)NULL)
-            return (char*)NULL;
+        tCC* const* papz = pOpts->papzHomeList;
+        if (papz == NULL)
+            return NULL;
 
-        while (papz[1] != (char*)NULL) papz++;
-        pzDir = (char*)(*papz);
+        while (papz[1] != NULL) papz++;
+        pzDir = *papz;
     }
 
     /*
@@ -99,66 +99,67 @@ findDirName( tOptions* pOpts )
         return pzDir;
 
     {
-        char* pzEndDir = strchr( ++pzDir, '/' );
+        tCC*  pzEndDir = strchr( ++pzDir, '/' );
         char* pzFileName;
         char* pzEnv;
 
-        if (pzEndDir != (char*)NULL)
-            *(pzEndDir++) = NUL;
+        if (pzEndDir != NULL) {
+            char z[ AO_NAME_SIZE ];
+            if ((pzEndDir - pzDir) > AO_NAME_LIMIT )
+                return NULL;
+            strncpy( z, pzDir, (pzEndDir - pzDir) );
+            z[ (pzEndDir - pzDir) ] = NUL;
+            pzEnv = getenv( z );
+        } else {
 
-        /*
-         *  Make sure we can get the env value (after stripping off
-         *  any trailing directory or file names)
-         */
-        pzEnv = getenv( pzDir );
+            /*
+             *  Make sure we can get the env value (after stripping off
+             *  any trailing directory or file names)
+             */
+            pzEnv = getenv( pzDir );
+        }
+
         if (pzEnv == (char*)NULL) {
             fprintf( stderr, zWarn, pOpts->pzProgName );
             fprintf( stderr, "'%s' not defined\n", pzDir );
-            return (char*)NULL;
+            return NULL;
         }
 
-        if (pzEndDir == (char*)NULL)
+        if (pzEndDir == NULL)
             return pzEnv;
 
         {
-            size_t sz = strlen( pzEnv ) + 2;
-            if (pzEndDir != NULL)
-                sz += strlen( pzEndDir );
+            size_t sz = strlen( pzEnv ) + strlen( pzEndDir );
             pzFileName = (char*)AGALOC( sz, "dir name" );
         }
 
+        if (pzFileName == NULL)
+            return NULL;
+
         /*
-         *  IF we stripped something off, now tack it back on.
+         *  Glue together the full name into the allocated memory.
+         *  FIXME: We lose track of this memory.
          */
-        if (pzFileName == (char*)NULL)
-            return (char*)NULL;
-
-        strcpy( pzFileName, pzEnv );
-        pzDir = pzFileName + strlen( pzFileName );
-
-        while ((pzDir > pzFileName) && (pzDir[-1] == '/')) pzDir--;
-        *(pzDir++) = '/';
-        strcpy( pzDir, pzEndDir );
+        sprintf( pzFileName, "%s/%s", pzEnv, pzEndDir );
         return pzFileName;
     }
 }
 
 
-STATIC char*
+STATIC tCC*
 findFileName( tOptions* pOpts )
 {
-    char*  pzDir;
+    tCC*   pzDir;
     tSCC   zNoStat[] = "error %d (%s) stat-ing %s\n";
     struct stat stBuf;
 
     pzDir = findDirName( pOpts );
-    if (pzDir == (char*)NULL)
-        return (char*)NULL;
+    if (pzDir == NULL)
+        return NULL;
 
     /*
-     *  See if we can find the specified directory.
-     *  We use a once-only loop structure so we can bail
-     *  out if we can recover from the unusual condition.
+     *  See if we can find the specified directory.  We use a once-only loop
+     *  structure so we can bail out early.
      */
     if (stat( pzDir, &stBuf ) != 0) do {
 
@@ -167,33 +168,31 @@ findFileName( tOptions* pOpts )
          *  path to a file name that has not been created yet.
          */
         if (errno == ENOENT) {
+            char z[MAXPATHLEN];
+
             /*
-             *  Strip off the last component,
-             *  stat the remaining string
-             *  and that string must name a directory
+             *  Strip off the last component, stat the remaining string and
+             *  that string must name a directory
              */
-            char*  pzDirCh = strrchr( pzDir, '/' );
-            if (pzDirCh == (char*)NULL) {
+            char* pzDirCh = strrchr( pzDir, '/' );
+            if (pzDirCh == NULL) {
                 stBuf.st_mode = S_IFREG;
                 break;  /* bail out of error condition */
             }
 
-            *pzDirCh = NUL;
-            if (  (stat( pzDir, &stBuf ) == 0)
+            strncpy( z, pzDir, pzDirCh - pzDir );
+            z[ pzDirCh - pzDir ] = NUL;
+
+            if (  (stat( z, &stBuf ) == 0)
                && S_ISDIR( stBuf.st_mode )) {
 
                 /*
-                 *  We found the directory.
-                 *  Restore the file name and mark the
-                 *  full name as a regular file
+                 *  We found the directory.  Restore the file name and
+                 *  mark the full name as a regular file
                  */
-                *pzDirCh = '/';
                 stBuf.st_mode = S_IFREG;
-
-                continue;  /* bail out of error condition */
+                break;  /* bail out of error condition */
             }
-
-            *pzDirCh = '/';
         }
 
         /*
@@ -201,7 +200,7 @@ findFileName( tOptions* pOpts )
          */
         fprintf( stderr, zWarn, pOpts->pzProgName );
         fprintf( stderr, zNoStat, errno, strerror( errno ), pzDir );
-        return (char*)NULL;
+        return NULL;
     } while (0);
 
     /*
@@ -230,7 +229,7 @@ findFileName( tOptions* pOpts )
                 fprintf( stderr, zWarn, pOpts->pzProgName );
                 fprintf( stderr, zNoStat, errno, strerror( errno ),
                          pzDir );
-                return (char*)NULL;
+                return NULL;
             }
 
             /*
@@ -247,7 +246,7 @@ findFileName( tOptions* pOpts )
     if (! S_ISREG( stBuf.st_mode )) {
         fprintf( stderr, zWarn, pOpts->pzProgName );
         fprintf( stderr, "'%s' is not a regular file.\n", pzDir );
-        return (char*)NULL;
+        return NULL;
     }
 
     /*
@@ -262,7 +261,7 @@ STATIC void
 printEntry(
     FILE*      fp,
     tOptDesc*  p,
-    char*      pzLA )
+    tCC*       pzLA )
 {
     /*
      *  There is an argument.  Pad the name so values line up
@@ -286,24 +285,21 @@ printEntry(
     else {
         fputc( ' ', fp ); fputc( ' ', fp );
         for (;;) {
-            char* pzNl = strchr( pzLA, '\n' );
+            tCC* pzNl = strchr( pzLA, '\n' );
 
             /*
              *  IF this is the last line
-             *  THEN print it and bail
+             *  THEN bail and print it
              */
-            if (pzNl == (char*)NULL)
+            if (pzNl == NULL)
                 break;
 
             /*
              *  Print the continuation and the text from the current line
              */
+            fwrite( pzLA, pzNl - pzLA, 1, fp );
+            pzLA = pzNl+1; /* advance the Last Arg pointer */
             fputs( "\\\n", fp );
-            *pzNl = NUL;
-            fputs( pzLA, fp );
-            *pzNl = '\n';   /* Restore the newline */
-
-            pzLA  = pzNl+1; /* advance the Last Arg pointer */
         }
 
         /*
@@ -340,13 +336,12 @@ printEntry(
   | OPTST_STACKED | OPTST_ENUMERATION | OPTST_MEMBER_BITS | OPTST_BOOLEAN )
 
 void
-optionSaveFile( pOpts )
-    tOptions* pOpts;
+optionSaveFile( tOptions* pOpts )
 {
-    char*  pzFName;
+    tCC*  pzFName;
 
     pzFName = findFileName( pOpts );
-    if (pzFName == (char*)NULL)
+    if (pzFName == NULL)
         return;
 
     {
@@ -433,7 +428,7 @@ optionSaveFile( pOpts )
             {
                 tArgList*  pAL = (tArgList*)p->optCookie;
                 int        uct = pAL->useCt;
-                char**     ppz = pAL->apzArgs;
+                tCC**      ppz = pAL->apzArgs;
 
                 /*
                  *  Disallow multiple copies of disabled options.
@@ -448,7 +443,7 @@ optionSaveFile( pOpts )
 
             case OPTST_ENUMERATION:
             {
-                char* val = p->pzLastArg;
+                tCC* val = p->pzLastArg;
                 /*
                  *  This is a magic incantation that will convert the
                  *  enumeration value back into a string suitable for printing.
@@ -461,7 +456,7 @@ optionSaveFile( pOpts )
 
             case OPTST_MEMBER_BITS:
             {
-                char* val = p->pzLastArg;
+                tCC* val = p->pzLastArg;
                 /*
                  *  This is a magic incantation that will convert the
                  *  bit flag values back into a string suitable for printing.
@@ -469,7 +464,10 @@ optionSaveFile( pOpts )
                 (*(p->pOptProc))( (tOptions*)2UL, p );
                 printEntry( fp, p, p->pzLastArg );
                 if (p->pzLastArg != NULL)
-                    free( p->pzLastArg ); /* bit flag strings get allocated */
+                    /*
+                     *  bit flag strings get allocated
+                     */
+                    free( (void*)p->pzLastArg );
                 p->pzLastArg = val;
                 break;
             }

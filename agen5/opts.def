@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.21 2003/05/26 03:14:59 bkorb Exp $
+ *   $Id: opts.def,v 3.22 2003/12/27 15:06:40 bkorb Exp $
  *
  *  AutoGen copyright 1992-2003 Bruce Korb
  *
@@ -83,7 +83,10 @@ include = <<-  _END_INCLUDE
 	# endif
 	#endif
 	typedef void (init_proc_t)( void );
+	tCC* pzTemplFileName = NULL;
 	_END_INCLUDE;
+
+export = 'extern tCC* pzTemplFileName;';
 
 explain =
 "AutoGen creates text files from templates using external definitions.";
@@ -139,9 +142,7 @@ flag = {
     "Definition files specify the standard template that is to be expanded.\n"
     "This option will override that name and expand a different template.";
 
-    flag_code =
-"    extern char* pzTemplFileName;
-    pzTemplFileName = pOptDesc->pzLastArg;";
+    flag_code = "    pzTemplFileName = pOptDesc->pzLastArg;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif

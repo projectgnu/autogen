@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 3.6 2003/11/23 19:15:28 bkorb Exp $
+ *  $Id: guileopt.c,v 3.7 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -102,7 +102,7 @@ export_options_to_guile( pOpts )
         if (UNUSED_OPT( pOD )) {
             if (pOD->fOptState & OPTST_NUMERIC) {
                 sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                         (int) pOD->pzLastArg );
+                         (uintptr_t)pOD->pzLastArg );
 #ifdef DEBUG
                 fputs( z, stderr );
 #endif
@@ -137,7 +137,7 @@ export_options_to_guile( pOpts )
         if (pOD->optCookie != (void*)NULL) {
             tArgList* pAL = (tArgList*)pOD->optCookie;
             int       act = pAL->useCt;
-            char**    ppa = pAL->apzArgs;
+            tCC**     ppa = pAL->apzArgs;
             char*     pz  = z;
 
             pz += sprintf( pz, "(define opt-args-%s `(", pOD->pz_Name );
@@ -156,7 +156,7 @@ export_options_to_guile( pOpts )
          */
         else if (pOD->fOptState & OPTST_NUMERIC) {
             sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                     (int)pOD->pzLastArg );
+                     (uintptr_t)pOD->pzLastArg );
 #ifdef DEBUG
             fputs( z, stderr );
 #endif

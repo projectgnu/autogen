@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.11 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: getdefs.c,v 3.12 2003/12/27 15:06:40 bkorb Exp $
  *
  *    getdefs copyright 1999-2003 Bruce Korb
  *
- *  Time-stamp:        "2003-04-21 17:55:36 bkorb"
+ *  Time-stamp:        "2003-12-20 10:32:56 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -29,7 +29,7 @@ awaitAutogen( void );
 STATIC void
 buildDefinition(
     char*    pzDef,
-    char*    pzFile,
+    tCC*     pzFile,
     int      line,
     char*    pzOut );
 
@@ -37,7 +37,7 @@ STATIC tSuccess
 buildPreamble(
     char**   ppzDef,
     char**   ppzOut,
-    char*    pzFile,
+    tCC*     pzFile,
     int      line );
 
 STATIC int
@@ -53,7 +53,7 @@ STATIC void
 printEntries( FILE* fp );
 
 STATIC void
-processFile( char* pzFile );
+processFile( tCC* pzFile );
 
 STATIC void
 setFirstIndex( void );
@@ -91,7 +91,7 @@ main( int    argc,
      */
     {
         int    ct  = STACKCT_OPT(  INPUT );
-        char** ppz = STACKLST_OPT( INPUT );
+        tCC**  ppz = STACKLST_OPT( INPUT );
 
         do  {
             processFile( *ppz++ );
@@ -128,7 +128,7 @@ main( int    argc,
      *     AND we have augmented the contents,
      *  THEN append the new entries to the file.
      */
-    if ((pzIndexText != (char*)NULL) && (pzEndIndex != pzIndexEOF))
+    if ((pzIndexText != NULL) && (pzEndIndex != pzIndexEOF))
         updateDatabase();
 
     if (agPid != -1)
@@ -159,7 +159,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
      * THEN put the index into the output.
      */
     pzMatch = strstr( pzIndexText, pzDef );
-    if (pzMatch != (char*)NULL) {
+    if (pzMatch != NULL) {
         pzMatch += len;
         while (isspace( *pzMatch )) pzMatch++;
         while ((*pzOut++ = *pzMatch++) != ']') ;
@@ -175,7 +175,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
         indexAlloc +=  0x1FFF;
         indexAlloc &= ~0x0FFF;
         pz = (char*)realloc( (void*)pzIndexText, indexAlloc );
-        if (pz == (char*)NULL) {
+        if (pz == NULL) {
             fputs( "Realloc of index text failed\n", stderr );
             exit( EXIT_FAILURE );
         }
@@ -206,7 +206,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
          *  Find the last entry for the current category of entries
          */
         pzMatch = strstr( pzIndexText, pzDef );
-        if (pzMatch == (char*)NULL) {
+        if (pzMatch == NULL) {
             /*
              *  No entries for this category.  Use default index.
              */
@@ -217,7 +217,7 @@ assignIndex( char*  pzOut,  char*  pzDef )
 
         for (;;) {
             char* pzn = strstr( pzMatch + len, pzDef );
-            if (pzn == (char*)NULL)
+            if (pzn == NULL)
                 break;
             pzMatch = pzn;
         }
@@ -278,7 +278,7 @@ awaitAutogen( void )
 STATIC void
 buildDefinition(
     char*    pzDef,
-    char*    pzFile,
+    tCC*     pzFile,
     int      line,
     char*    pzOut )
 {
@@ -288,7 +288,7 @@ buildDefinition(
     ag_bool    these_are_global_defs = (*pzDef == '*');
     tSuccess   preamble;
     int        re_res;
-    char*      pzNextDef = (char*)NULL;
+    char*      pzNextDef = NULL;
     regmatch_t match[2];
 
     if (these_are_global_defs) {
@@ -322,7 +322,7 @@ buildDefinition(
              *  Set the "next" pointer to the start of the next attribute name.
              */
             pzDef[ match[0].rm_so ] = NUL;
-            if (pzNextDef != (char*)NULL)
+            if (pzNextDef != NULL)
                 pzOut = emitDefinition( pzNextDef, pzOut );
             pzNextDef = pzDef = pzDef + match[1].rm_so;
             break;
@@ -331,7 +331,7 @@ buildDefinition(
             /*
              *  No more attributes.
              */
-            if (pzNextDef == (char*)NULL) {
+            if (pzNextDef == NULL) {
                 *pzOut++ = '\n'; *pzOut++ = '#';
                 sprintf( pzOut,  zNoData, pzFile, line );
                 fputs( pzOut, stderr );
@@ -364,7 +364,7 @@ buildDefinition(
 
     if (HAVE_OPT( COMMON_ASSIGN )) {
         int    ct  = STACKCT_OPT(  COMMON_ASSIGN );
-        char** ppz = STACKLST_OPT( COMMON_ASSIGN );
+        tCC**  ppz = STACKLST_OPT( COMMON_ASSIGN );
         do  {
             pzOut += sprintf( pzOut, "    %s;\n", *ppz++ );
         } while (--ct > 0);
@@ -393,7 +393,7 @@ STATIC tSuccess
 buildPreamble(
     char**   ppzDef,
     char**   ppzOut,
-    char*    pzFile,
+    tCC*     pzFile,
     int      line )
 {
     char* pzDef = *ppzDef;
@@ -403,7 +403,7 @@ buildPreamble(
     char* pzDefText = zDefText;
     char  zNameText[ MAXNAMELEN ];
     char* pzNameText = zNameText;
-    char* pzIfText   = (char*)NULL;
+    char* pzIfText   = NULL;
 
     /*
      *  Copy out the name of the entry type
@@ -443,7 +443,7 @@ buildPreamble(
     }
 
     pzDef = strchr( pzDef, '\n' );
-    if (pzDef == (char*)NULL) {
+    if (pzDef == NULL) {
         fprintf( stderr, zNoData, pzFile, line );
         return FAILURE;
     }
@@ -456,7 +456,7 @@ buildPreamble(
      *  entry type name into the output.
      */
     pzOut += sprintf( pzOut, zLineId, line, pzFile );
-    if (pzIfText != (char*)NULL)
+    if (pzIfText != NULL)
         pzOut += sprintf( pzOut, "#%s\n", pzIfText );
     {
         char*  pz = zDefText+1;
@@ -469,7 +469,7 @@ buildPreamble(
      *  THEN build the string by which we are indexing
      *       and insert the index into the output.
      */
-    if (pzIndexText != (char*)NULL) {
+    if (pzIndexText != NULL) {
         sprintf( pzDefText, "  %s'", zNameText );
         pzOut = assignIndex( pzOut, zDefText );
     }
@@ -487,7 +487,7 @@ buildPreamble(
      *  Returning "PROBLEM" means the caller must emit the "#endif\n"
      *  at the end of the definition.
      */
-    return (pzIfText != (char*)NULL) ? PROBLEM : SUCCESS;
+    return (pzIfText != NULL) ? PROBLEM : SUCCESS;
 }
 
 
@@ -497,24 +497,24 @@ buildPreamble(
 STATIC int
 compar_defname( const void* p1, const void* p2 )
 {
-    char* pzS1 = *(char**)p1;
-    char* pz1  = strstr( pzS1, zNameTag );
-    char* pzS2 = *(char**)p2;
-    char* pz2  = strstr( pzS2, zNameTag );
+    tCC* pzS1 = *(tCC* const*)p1;
+    tCC* pz1  = strstr( pzS1, zNameTag );
+    tCC* pzS2 = *(tCC* const*)p2;
+    tCC* pz2  = strstr( pzS2, zNameTag );
 
-    if (pz1 == (char*)NULL) {
-        if (strncmp( *(char**)p1, zGlobal, sizeof( zGlobal )-1 ) == 0)
+    if (pz1 == NULL) {
+        if (strncmp( *(tCC* const*)p1, zGlobal, sizeof( zGlobal )-1 ) == 0)
             return -1;
 
-        fprintf( stderr, zBogusDef, *(char**)p1 );
+        fprintf( stderr, zBogusDef, *(tCC* const*)p1 );
         exit( EXIT_FAILURE );
     }
 
-    if (pz2 == (char*)NULL) {
-        if (strncmp( *(char**)p2, zGlobal, sizeof( zGlobal )-1 ) == 0)
+    if (pz2 == NULL) {
+        if (strncmp( *(tCC* const*)p2, zGlobal, sizeof( zGlobal )-1 ) == 0)
             return 1;
 
-        fprintf( stderr, zBogusDef, *(char**)p2 );
+        fprintf( stderr, zBogusDef, *(tCC* const*)p2 );
         exit( EXIT_FAILURE );
     }
 
@@ -540,41 +540,41 @@ compar_defname( const void* p1, const void* p2 )
 STATIC int
 compar_text( const void* p1, const void* p2 )
 {
-    char* pz1 = strstr( *(char**)p1, zNameTag );
+    char* pz1 = strstr( *(tCC* const*)p1, zNameTag );
     char* pe1;
-    char* pz2 = strstr( *(char**)p2, zNameTag );
+    char* pz2 = strstr( *(tCC* const*)p2, zNameTag );
     char* pe2;
     int   res;
 
-    if (pz1 == (char*)NULL) {
-        if (strncmp( *(char**)p1, zGlobal, sizeof( zGlobal )-1 ) == 0)
+    if (pz1 == NULL) {
+        if (strncmp( *(tCC* const*)p1, zGlobal, sizeof( zGlobal )-1 ) == 0)
             return -1;
 
-        fprintf( stderr, zBogusDef, *(char**)p1 );
+        fprintf( stderr, zBogusDef, *(tCC* const*)p1 );
         exit( EXIT_FAILURE );
     }
 
-    if (pz2 == (char*)NULL) {
-        if (strncmp( *(char**)p2, zGlobal, sizeof( zGlobal )-1 ) == 0)
+    if (pz2 == NULL) {
+        if (strncmp( *(tCC* const*)p2, zGlobal, sizeof( zGlobal )-1 ) == 0)
             return 1;
 
-        fprintf( stderr, zBogusDef, *(char**)p2 );
+        fprintf( stderr, zBogusDef, *(tCC* const*)p2 );
         exit( EXIT_FAILURE );
     }
 
     pz1 += sizeof( zNameTag )-1;
     pe1 = strchr( pz1, '\'' );
 
-    if (pe1 == (char*)NULL) {
-        fprintf( stderr, zBogusDef, *(char**)p1 );
+    if (pe1 == NULL) {
+        fprintf( stderr, zBogusDef, *(tCC* const*)p1 );
         exit( EXIT_FAILURE );
     }
 
     pz2 += sizeof( zNameTag )-1;
     pe2 = strchr( pz2, '\'' );
 
-    if (pe2 == (char*)NULL) {
-        fprintf( stderr, zBogusDef, *(char**)p2 );
+    if (pe2 == NULL) {
+        fprintf( stderr, zBogusDef, *(tCC* const*)p2 );
         exit( EXIT_FAILURE );
     }
 
@@ -608,14 +608,14 @@ doPreamble( FILE* outFp )
 
     if (HAVE_OPT( FILELIST )) {
         tSCC   zFmt[] = "%-12s = '%s';\n";
-        char*  pzName = OPT_ARG( FILELIST );
+        tCC*   pzName = OPT_ARG( FILELIST );
 
-        if (pzName == (char*)NULL)
+        if (pzName == NULL)
             pzName = "infile";
 
         if (HAVE_OPT( INPUT )) {
             int    ct  = STACKCT_OPT(  INPUT );
-            char** ppz = STACKLST_OPT( INPUT );
+            tCC**  ppz = STACKLST_OPT( INPUT );
 
             do  {
                 fprintf( outFp, zFmt, pzName, *ppz++ );
@@ -624,7 +624,7 @@ doPreamble( FILE* outFp )
 
         if (HAVE_OPT( COPY )) {
             int    ct  = STACKCT_OPT(  COPY );
-            char** ppz = STACKLST_OPT( COPY );
+            tCC**  ppz = STACKLST_OPT( COPY );
 
             do  {
                 fprintf( outFp, zFmt, pzName, *ppz++ );
@@ -639,7 +639,7 @@ doPreamble( FILE* outFp )
      */
     if (HAVE_OPT( COPY )) {
         int    ct  = STACKCT_OPT(  COPY );
-        char** ppz = STACKLST_OPT( COPY );
+        tCC**  ppz = STACKLST_OPT( COPY );
         do  {
             fprintf( outFp, "#include %s\n", *ppz++ );
         } while (--ct > 0);
@@ -652,7 +652,7 @@ doPreamble( FILE* outFp )
      */
     if (HAVE_OPT( ASSIGN )) {
         int    ct  = STACKCT_OPT(  ASSIGN );
-        char** ppz = STACKLST_OPT( ASSIGN );
+        tCC**  ppz = STACKLST_OPT( ASSIGN );
         do  {
             fprintf( outFp, "%s;\n", *ppz++ );
         } while (--ct > 0);
@@ -665,7 +665,7 @@ doPreamble( FILE* outFp )
  *  loadFile
  */
 EXPORT char*
-loadFile( char* pzFname )
+loadFile( tCC* pzFname )
 {
     FILE*  fp = fopen( pzFname, "r" FOPEN_BINARY_FLAG );
     int    res;
@@ -674,7 +674,7 @@ loadFile( char* pzFname )
     size_t rdsz;
 
     if (fp == (FILE*)NULL)
-        return (char*)NULL;
+        return NULL;
     /*
      *  Find out how much data we need to read.
      *  And make sure we are reading a regular file.
@@ -705,7 +705,7 @@ loadFile( char* pzFname )
      *  Allocate the space we need for the ENTIRE file.
      */
     pzRead = pzText = (char*)malloc( rdsz + 1 );
-    if (pzText == (char*)NULL) {
+    if (pzText == NULL) {
         fprintf( stderr, "Error: could not allocate %d bytes\n",
                  rdsz + 1 );
         exit( EXIT_FAILURE );
@@ -762,7 +762,7 @@ printEntries( FILE* fp )
  *  processFile
  */
 STATIC void
-processFile( char* pzFile )
+processFile( tCC* pzFile )
 {
     char* pzText = loadFile( pzFile ); /* full text */
     char* pzScan;  /* Scanning Pointer  */
@@ -773,7 +773,7 @@ processFile( char* pzFile )
     char* pzOut;
     regmatch_t  matches[MAX_SUBMATCH+1];
 
-    if (pzText == (char*)NULL) {
+    if (pzText == NULL) {
         fprintf( stderr, "Error %d (%s) read opening %s\n",
                  errno, strerror( errno ), pzFile );
         exit( EXIT_FAILURE );
@@ -815,7 +815,7 @@ processFile( char* pzFile )
 
         pzDef = pzScan + matches[0].rm_so + sizeof( "/*=" ) - 1;
         pzNext = strstr( pzDef, "=*/" );
-        if (pzNext == (char*)NULL) {
+        if (pzNext == NULL) {
             fprintf( stderr, zNoEnd, pzFile, lineNo );
             exit( EXIT_FAILURE );
         }
@@ -826,7 +826,7 @@ processFile( char* pzFile )
          */
         for (;;) {
             pzScan = strchr( pzScan, '\n' );
-            if (pzScan++ == (char*)NULL)
+            if (pzScan++ == NULL)
                 break;
             if (pzScan >= pzDef)
                 break;
@@ -842,7 +842,7 @@ processFile( char* pzFile )
         pzScan = pzDef;
         for (;;) {
             pzScan = strchr( pzScan, '\n' );
-            if (pzScan++ == (char*)NULL)
+            if (pzScan++ == NULL)
                 break;
             linesInDef++;
         }
@@ -955,7 +955,7 @@ startAutogen( void )
          *  THEN copy the leading part that consists of name-like characters.
          */
         if (HAVE_OPT( DEFS_TO_GET )) {
-            char* pzS = OPT_ARG( DEFS_TO_GET );
+            tCC* pzS = OPT_ARG( DEFS_TO_GET );
             pzBase = malloc( strlen( pzS ) + 3 );
             strcpy( pzBase, "-b" );
 
@@ -975,14 +975,14 @@ startAutogen( void )
          */
         if (pzBase == NULL) {
             char zSrch[ MAXPATHLEN ];
-            if (getcwd( zSrch, sizeof( zSrch )) == (char*)NULL) {
+            if (getcwd( zSrch, sizeof( zSrch )) == NULL) {
                 fprintf( stderr, "Error %d (%s) on getcwd\n", errno,
                          strerror( errno ));
                 exit( EXIT_FAILURE );
             }
 
             pz = strrchr( zSrch, '/' );
-            if (pz == (char*)NULL)
+            if (pz == NULL)
                  pz = zSrch;
             else pz++;
             pzBase = malloc( strlen( pz ) + 3 );
@@ -1023,7 +1023,7 @@ startAutogen( void )
 
             if (HAVE_OPT( INPUT )) {
                 int    ct  = STACKCT_OPT(  INPUT );
-                char** ppz = STACKLST_OPT( INPUT );
+                tCC**  ppz = STACKLST_OPT( INPUT );
                 do  {
                     fprintf( fp, zFileFmt, *ppz++ );
                 } while (--ct > 0);
@@ -1037,7 +1037,7 @@ startAutogen( void )
             if (! ENABLED_OPT( AUTOGEN ))
                 return stdout;
 
-            if (  ( OPT_ARG( AUTOGEN ) != (char*)NULL)
+            if (  ( OPT_ARG( AUTOGEN ) != NULL)
                && (*OPT_ARG( AUTOGEN ) != NUL ))
                 pzAutogen = OPT_ARG( AUTOGEN );
 
@@ -1108,7 +1108,7 @@ startAutogen( void )
 
         } else {
             int    ct  = STACKCT_OPT(  AGARG );
-            char** ppz = STACKLST_OPT( AGARG );
+            tCC**  ppz = STACKLST_OPT( AGARG );
 
             argCt += ct;
             paparg = pparg = (tCC**)malloc( argCt * sizeof( char* ));
@@ -1122,14 +1122,14 @@ startAutogen( void )
         *pparg++ = pzBase;
         *pparg++ = "--";
         *pparg++ = "-";
-        *pparg++ = (char*)NULL;
+        *pparg++ = NULL;
 
 #ifdef DEBUG
         fputc( '\n', stderr );
         pparg = paparg;
         for (;;) {
             fputs( *pparg++, stderr );
-            if (*pparg == (char*)NULL)
+            if (*pparg == NULL)
                 break;
             fputc( ' ', stderr );
         }
@@ -1137,7 +1137,7 @@ startAutogen( void )
         fputc( '\n', stderr );
 #endif
 
-        execvp( pzAutogen, (char**)paparg );
+        execvp( pzAutogen, (char**)(void*)paparg );
         fprintf( stderr, "Error %d (%s) exec of %s %s %s %s\n",
                  errno, strerror( errno ),
                  paparg[0], paparg[1], paparg[2], paparg[3] );

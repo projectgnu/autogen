@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.16 2003/11/23 02:07:44 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.17 2003/12/27 15:06:40 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -160,7 +160,7 @@ typedef struct argList tArgList;
 struct argList {
     int               useCt;
     int               allocCt;
-    char*             apzArgs[ MIN_ARG_ALLOC_CT ];
+    tCC*              apzArgs[ MIN_ARG_ALLOC_CT ];
 };
 
 /*
@@ -180,7 +180,7 @@ struct optDesc {
 
     tUL               optOccCt;         /* PUBLIC */
     tUL               fOptState;        /* PUBLIC */
-    char*             pzLastArg;        /* PUBLIC */
+    tCC*              pzLastArg;        /* PUBLIC */
     void*             optCookie;        /* PUBLIC */
 
     const int *       pOptMust;

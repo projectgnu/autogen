@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 3.15 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: expString.c,v 3.16 2003/12/27 15:06:40 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -292,7 +292,7 @@ shell_stringify( SCM obj, char qt )
  */
 STATIC void
 do_substitution(
-    char*       pzStr,
+    tCC*        pzStr,
     scm_sizet   strLen,
     SCM         match,
     SCM         repl,
@@ -306,12 +306,12 @@ do_substitution(
     int   endL    = strLen;
 
     int   repCt   = 0;
-    char* pz      = pzStr;
+    tCC*  pz      = pzStr;
     char* pzRes;
     char* pzScan;
 
     for (;;) {
-        char* pzNxt = strstr( pz, pzMatch );
+        tCC* pzNxt = strstr( pz, pzMatch );
         if (pzNxt == NULL)
             break;
         repCt++;
@@ -325,12 +325,12 @@ do_substitution(
     if (repCt == 0)
         return;
 
-    endL  = endL + (replL * repCt) - (matchL * repCt);
+    endL   = endL + (replL * repCt) - (matchL * repCt);
     pzScan = pzRes = AGALOC( endL + 1, "substitution" );
-    pz    = pzStr;
+    pz     = pzStr;
 
     for (;;) {
-        char* pzNxt = strstr( pz, pzMatch );
+        tCC* pzNxt = strstr( pz, pzMatch );
         if (pzNxt == NULL)
             break;
         if (pz != pzNxt) {
@@ -746,26 +746,44 @@ ag_scm_shellf( SCM fmt, SCM alist )
 SCM
 ag_scm_raw_shell_str( SCM obj )
 {
-    static const char zQ[] = "'\\''";
-
-    size_t     dtaSize;
     char*      pzDta;
     char*      pz;
-    SCM        res;
+    char*      pzFree;
 
-    pzDta   = ag_scm2zchars( obj, "AG Object" );
-    dtaSize = SCM_LENGTH( obj ) + 3;
-    pz = pzDta-1;
-    for (;;) {
-        pz = strchr( pz+1, '\'' );
-        if (pz == NULL)
-            break;
-        dtaSize += STRSIZE( zQ );
+    pzDta = ag_scm2zchars( obj, "AG Object" );
+
+    {
+        size_t dtaSize = SCM_LENGTH( obj ) + 3; /* NUL + 2 quotes */
+        pz = pzDta-1;
+        for (;;) {
+            pz = strchr( pz+1, '\'' );
+            if (pz == NULL)
+                break;
+            dtaSize += 3; /* '\'' -> 3 additional chars */
+        }
+
+        pzFree = pz = AGALOC( dtaSize + 2, "raw string" );
     }
 
-    res = scm_makstr( (scm_sizet)dtaSize, 0 );
-    pz  = SCM_CHARS( res );
+    /*
+     *  Handle leading single quotes before starting the first quote.
+     */
+    while (*pzDta == '\'') {
+        *(pz++) = '\\';
+        *(pz++) = '\'';
 
+        /*
+         *  IF pure single quotes, then we're done.
+         */
+        if (*++pzDta == NUL) {
+            *pz = NUL;
+            goto returnString;
+        }
+    }
+
+    /*
+     *  Start quoting.  If the string is empty, we wind up with two quotes.
+     */
     *(pz++) = '\'';
 
     for (;;) {
@@ -774,14 +792,32 @@ ag_scm_raw_shell_str( SCM obj )
             goto loopDone;
 
         case '\'':
-            strcpy( pz, zQ+1 );
-            pz += STRSIZE( zQ ) - 1;
+            /*
+             *  We've inserted a single quote, which ends the quoting session.
+             *  Now, insert escaped quotes for every quote char we find, then
+             *  restart the quoting.
+             */
+            pzDta--;
+            do {
+                *(pz++) = '\\';
+                *(pz++) = '\'';
+            } while (*++pzDta == '\'');
+            if (*pzDta == NUL) {
+                *pz = NUL;
+                goto returnString;
+            }
+            *(pz++) = '\'';
         }
     } loopDone:;
     pz[-1] = '\'';
     *pz    = NUL;
 
-    return res;
+ returnString:
+    {
+        SCM res = scm_makfrom0str( pzFree );
+        AGFREE( pzFree );
+        return res;
+    }
 }
 
 
@@ -826,10 +862,10 @@ ag_scm_raw_shell_str( SCM obj )
  *  @code{raw-shell-str}, @code{shell-str} and @code{sub-shell-str} functions.
  *
  *  @example
- *  foo[0]           'foo' "foo" `foo` $foo
- *  raw-shell-str -> ''\''foo'\'' "foo" `foo` $foo'
- *  shell-str     -> "'foo' \"foo\" `foo` $foo"
- *  sub-shell-str -> `'foo' "foo" \`foo\` $foo`
+ *  foo[0]           ''foo'' 'foo' "foo" `foo` $foo
+ *  raw-shell-str -> \'\''foo'\'\'' '\''foo'\'' "foo" `foo` $foo'
+ *  shell-str     -> "''foo'' 'foo' \"foo\" `foo` $foo"
+ *  sub-shell-str -> `''foo'' 'foo' "foo" \`foo\` $foo`
  *
  *  foo[1]           \'bar\' \"bar\" \`bar\` \$bar
  *  raw-shell-str -> '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
@@ -1099,7 +1135,7 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
     len   = SCM_LENGTH( Str );
 
     if (gh_string_p( Match ))
-        do_substitution( (char*)pzStr, len, Match, Repl,
+        do_substitution( pzStr, len, Match, Repl,
                          (char**)&pzStr, &len );
     else
         do_multi_subs( (char**)&pzStr, &len, Match, Repl );

@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 3.10 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: getdefs.h,v 3.11 2003/12/27 15:06:40 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2003-04-21 17:55:45 bkorb"
+ *  Time-stamp:        "2003-12-20 10:35:05 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -54,9 +54,9 @@ MODE char zUserNameCh[ 256 ] VALUE( { '\0' } );
 /*
  *  Index database string pointers.
  */
-MODE char*    pzIndexText VALUE( (char*)NULL ); /* all the text    */
-MODE char*    pzEndIndex  VALUE( (char*)NULL ); /* end of current  */
-MODE char*    pzIndexEOF  VALUE( (char*)NULL ); /* end of file     */
+MODE char*    pzIndexText VALUE( NULL ); /* all the text    */
+MODE char*    pzEndIndex  VALUE( NULL ); /* end of current  */
+MODE char*    pzIndexEOF  VALUE( NULL ); /* end of file     */
 MODE size_t   indexAlloc  VALUE( 0 );           /* allocation size */
 
 /*
@@ -91,7 +91,7 @@ DEF_STRING( zDne,
  *  The patterns we accept for output may specify a particular group,
  *  certain members within certain groups or all members of all groups
  */
-MODE char*   pzDefPat   VALUE( (char*)NULL );
+MODE tCC*    pzDefPat   VALUE( NULL );
 MODE regex_t define_re;
 MODE regex_t attrib_re;
 

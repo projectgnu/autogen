@@ -4,12 +4,12 @@
 ##
 ##  Autoopts copyright 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-11-23 08:14:49 bkorb"
+## Time-stamp:      "2003-12-21 09:46:48 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.22 2003/11/23 19:16:36 bkorb Exp $
+## $Id: Makefile.am,v 3.23 2003/12/27 15:06:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -61,7 +61,8 @@ bin_SCRIPTS	= autoopts-config
 include_HEADERS = options.h
 
 libopts.c : autoopts.h $(CSRC)
-	( for f in autoopts.h $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
+	( echo '#define AUTOOPTS_INTERNAL' ; \
+	for f in autoopts.h $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
 genshell.c : genshell.def

@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.21 2003/05/26 03:14:59 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.22 2003/12/27 15:06:40 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -291,7 +291,7 @@ closeOutput( ag_bool purge )
 STATIC void
 openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 {
-    char*  pzDefFile;
+    tCC*  pzDefFile;
 
     /*
      *  Figure out what to use as the base name of the output file.
@@ -304,24 +304,28 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      *  Remove any suffixes in the last file name
      */
     {
-        char*  p = strrchr( pzDefFile, '/' );
-        if (p == NULL)
-            p = pzDefFile;
+        char   z[ MAXPATHLEN ];
+        tCC*   pS = strrchr( pzDefFile, '/' );
+        char*  pE;
+        if (pS == NULL)
+            pS = pzDefFile;
 
-        p = strchr( p, '.' );
-        if (p != NULL)
-            *p = NUL;
+        pE = strchr( pS, '.' );
+        if (pE != NULL) {
+            memcpy( z, pS, pE - pS );
+            z[ pE - pS ] = NUL;
+            pS = z;
+        }
+
         /*
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        pStk->pzOutName = aprf( pOutSpec->pzFileFmt, pzDefFile,
+        pStk->pzOutName = aprf( pOutSpec->pzFileFmt, pS,
                                 pOutSpec->zSuffix );
         if (pStk->pzOutName == NULL)
             AG_ABEND( aprf( "Cannot format file name:  ``%s''",
                             pOutSpec->pzFileFmt ));
-        if (p != NULL)
-            *p = '.';
     }
 
     pCurFp = pStk;
@@ -332,7 +336,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Make the output a no-op, but perform the operations.
          */
         AGFREE( (void*)pStk->pzOutName );
-        pStk->pzOutName = (char*)zDevNull;
+        pStk->pzOutName = zDevNull;
         pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
         pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG "+" );
         if (pStk->pFile != NULL)
@@ -348,7 +352,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      */
     if (HAVE_OPT( SKIP_SUFFIX )) {
         int     ct  = STACKCT_OPT(  SKIP_SUFFIX );
-        char**  ppz = STACKLST_OPT( SKIP_SUFFIX );
+        tCC**   ppz = STACKLST_OPT( SKIP_SUFFIX );
 
         while (--ct >= 0) {
             if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0)

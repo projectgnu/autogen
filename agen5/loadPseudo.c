@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 3.17 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: loadPseudo.c,v 3.18 2003/12/27 15:06:40 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -260,6 +260,8 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state, ag_bool line_start )
      *  Otherwise, it is just junk.
      */
     AG_ABEND( "Invalid template file" );
+    /* NOTREACHED */
+    return PM_EV_INVALID;
 }
 
 

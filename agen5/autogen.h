@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.21 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: autogen.h,v 3.22 2003/12/27 15:06:39 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -28,7 +28,6 @@
 #define AUTOGEN_HDR_H
 
 #include "agUtils.h"
-#include "compat/compat.h"
 #include "expr.h"
 #include "autoopts/autoopts.h"
 #include "streqv.h"
@@ -183,7 +182,7 @@ struct defEntry {
 struct scanContext {
     tScanCtx*   pCtx;
     char*       pzScan;
-    char*       pzFileName;
+    tCC*        pzFileName;
     char*       pzData;
     int         lineNo;
 };
@@ -204,7 +203,7 @@ struct fpStack {
     int         flags;
     tFpStack*   pPrev;
     FILE*       pFile;
-    char*       pzOutName;
+    tCC*        pzOutName;
 };
 
 typedef struct {
@@ -244,7 +243,6 @@ struct for_state {
  */
 #define pzProg   autogenOptions.pzProgName
 MODE teProcState procState        VALUE( PROC_STATE_INIT );
-MODE char*       pzTemplFileName  VALUE( NULL );
 MODE tTemplate*  pNamedTplList    VALUE( NULL );
 MODE tCC*        pzOopsPrefix     VALUE( "" );
 
@@ -346,18 +344,24 @@ size_t strlcpy( char* dest, const char* src, size_t n );
 
 #include "proto.h"
 
+typedef union {
+    const void*  cp;
+    void*        p;
+} v2c_t;
+MODE v2c_t p2p VALUE( { NULL } );
+
 #ifdef DEBUG_ENABLED
 # define AG_ABEND(s)  ag_abend_at(s,__FILE__,__LINE__)
 #else
 # define AG_ABEND(s)  ag_abend(s)
 #endif
 #define AG_ABEND_IN(t,m,s) \
-                      STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
+    STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
     if (! gh_string_p( s ))
-        AG_ABEND( aprf( (char*)zNotStr, type ));
+        AG_ABEND( aprf( zNotStr, type ));
 
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr( SCM_ROCHARS(s), SCM_ROLENGTH(s), 0 );

@@ -1,3 +1,20 @@
+2003-12-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c(ag_scm_out_name): constness warning
+	* compat/compat.h(__USE_GNU): define before including string.h
+	* getdefs/gdinit.c(validateOptions): zNoList is not used
+	* xml2ag/fork.tpl(forkAutogen): cast OPT_VALUE to int (warning)
+	* xml2ag/xml2ag.c(trim): printf format arg warning
+
+2003-12-20  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: Clean up constness of various variables
+
+2003-12-14  Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/mkpkg.linux: put %_tmppath in the .rpmmacros also
+	* pkg/spec.tpl: use it.
+
 2003-12-07  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: tag the entries to make them easier to find in configure

@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-11-15 14:29:46 bkorb"
+## Time-stamp:      "2003-12-07 11:28:30 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.25 2003/11/23 02:07:44 bkorb Exp $
+## $Id: Makefile.am,v 3.26 2003/12/27 15:06:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -114,7 +114,7 @@ autogen.texi : $(STAMPS) @AGEXE@ ../getdefs/getdefs ../columns/columns
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## autogen.1 GEN-RULE
-autogen.1 : opts.def
+autogen.1 : opts.def @AGEXE@ ../getdefs/getdefs ../columns/columns
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 gen : $(GEN_LIST)

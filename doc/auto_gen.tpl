@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.22 2003/12/03 02:45:08 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.23 2003/12/27 15:06:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -701,7 +701,7 @@ fi
 
 ${tempdir}/genshellopt --help | \
   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
-set -x
+
 echo
 echo
 ${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || kill -HUP $AG_pid

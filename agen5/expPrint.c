@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.19 2003/05/31 23:15:06 bkorb Exp $
+ *  $Id: expPrint.c,v 3.20 2003/12/27 15:06:40 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -124,7 +124,7 @@ run_printf( char* pzFmt, int len, SCM alist )
             break;
 
         case GH_TYPE_CHAR:
-            *(argp++) = (void*)(int)gh_scm2char( car );
+            *(argp++) = (void*)(uintptr_t)gh_scm2char( car );
             break;
 
         case GH_TYPE_PAIR:

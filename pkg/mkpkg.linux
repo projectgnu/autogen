@@ -24,7 +24,8 @@ cd AGPKG
 HOME=`pwd`
 set -x
 mkdir -p BUILD SOURCES SPECS RPMS SRPMS
-echo "%_topdir $PWD" > .rpmmacros
+echo "%_tmppath ${top_builddir}/AGPKG/BUILD
+%_topdir $PWD" > .rpmmacros
 
 [ -f ../autogen-${AG_VERSION}.tar.gz ] || (
   cd ..
