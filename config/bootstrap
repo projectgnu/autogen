@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Jun 14 15:24:32 1999				      
+# Last Modified:     Mon Jun 21 11:14:25 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.12 1999/06/15 16:36:52 bkorb Exp $
+# $Id: bootstrap,v 1.13 1999/06/21 18:14:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -214,7 +214,7 @@ while read f
 do
   (cd `dirname $f`
    echo running bootstrap in `pwd`
-   sh bootstrap )
+   sh bootstrap recursive )
 done
 
 OPTDIR=`pwd`/autoopts
