@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 3.1 2002/03/29 02:22:18 bkorb Exp $
+/*  $Id: version.c,v 3.2 2002/06/14 02:11:36 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -59,10 +59,11 @@ tSCC zBadArg[] =
 \t'c' - version and copyright\n\
 \t'n' - version and copyright notice\n";
 
-void
-doVersion( pOpts, pOD )
+static void
+printVersion( pOpts, pOD, fp )
     tOptions*  pOpts;
     tOptDesc*  pOD;
+    FILE*      fp;
 {
     char swCh;
 
@@ -71,9 +72,9 @@ doVersion( pOpts, pOD )
     else swCh = pOD->pzLastArg[0];
 
     if (pOpts->pzFullVersion != (char*)NULL)
-         fputs( pOpts->pzFullVersion, stdout );
-    else fputs( pOpts->pzProgName,    stdout );
-    fputc( '\n', stdout );
+         fputs( pOpts->pzFullVersion, fp );
+    else fputs( pOpts->pzProgName,    fp );
+    fputc( '\n', fp );
 
     switch (swCh) {
     case NUL:
@@ -84,26 +85,26 @@ doVersion( pOpts, pOD )
     case 'c':
     case 'C':
         if (pOpts->pzCopyright != (char*)NULL) {
-            fputs( pOpts->pzCopyright, stdout );
-            fputc( '\n', stdout );
+            fputs( pOpts->pzCopyright, fp );
+            fputc( '\n', fp );
         }
-        printf( zAOV, optionVersion() );
+        fprintf( fp, zAOV, optionVersion() );
         break;
 
     case 'n':
     case 'N':
         if (pOpts->pzCopyright != (char*)NULL) {
-            fputs( pOpts->pzCopyright, stdout );
-            fputc( '\n', stdout );
-            fputc( '\n', stdout );
+            fputs( pOpts->pzCopyright, fp );
+            fputc( '\n', fp );
+            fputc( '\n', fp );
         }
 
         if (pOpts->pzCopyNotice != (char*)NULL) {
-            fputs( pOpts->pzCopyNotice, stdout );
-            fputc( '\n', stdout );
+            fputs( pOpts->pzCopyNotice, fp );
+            fputc( '\n', fp );
         }
 
-        printf( zAOV, optionVersion() );
+        fprintf( fp, zAOV, optionVersion() );
         break;
 
     default:
@@ -112,6 +113,22 @@ doVersion( pOpts, pOD )
     }
 
     exit( EXIT_SUCCESS );
+}
+
+void
+doVersion( pOpts, pOD )
+    tOptions*  pOpts;
+    tOptDesc*  pOD;
+{
+    printVersion( pOpts, pOD, stdout );
+}
+
+void
+doVersionStderr( pOpts, pOD )
+    tOptions*  pOpts;
+    tOptDesc*  pOD;
+{
+    printVersion( pOpts, pOD, stderr );
 }
 
 /*

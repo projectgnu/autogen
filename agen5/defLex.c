@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.7 2002/06/11 00:32:42 bkorb Exp $
+ *  $Id: defLex.c,v 3.8 2002/06/14 02:11:36 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -126,7 +126,12 @@ scanAgain:
     case '#':
     {
         extern char* processDirective( char* );
-        pCurCtx->pzScan = processDirective( pCurCtx->pzScan+1 );
+        char* pz = processDirective( pCurCtx->pzScan+1 );
+        /*
+         *  Ensure that the compiler doesn't try to save a copy of
+         *  "pCurCtx" in a register.  It must be reloaded from memory.
+         */
+        pCurCtx->pzScan = pz;
         goto scanAgain;
     }
 

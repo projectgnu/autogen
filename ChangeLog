@@ -1,3 +1,13 @@
+2002-06-13  Bruce Korb  <bkorb@gnu.org>
+
+	* defLex.c(yylex): prevent compilers from caching a changable value
+	* autoopts/autoopts-config.in: don't try to provide a REGEX_LIB subs.
+	* autoopts/optcode.tpl(doVersion): when compiling for a generated main,
+	divert version output to stderr.
+	* autoopts/save.c: remove redundant test + restrict scope of variable.
+	* autoopts/version.c(doVersionStderr): new proc for generated mains.
+	* doc/autogen.texi(XML): improve doc on how it is used.
+	
 2002-06-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am(getdefs): use the configured name

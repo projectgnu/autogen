@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.4 2002/04/04 06:44:26 bkorb Exp $
+#$Id: optcode.tpl,v 3.5 2002/06/14 02:11:36 bkorb Exp $
 
 # Automated Options copyright 1992-2002 Bruce Korb
 
@@ -141,8 +141,19 @@ ENDIF   =]
  *  TEST_[=(. pname-up)=]_OPTS is defined or not
  */
 static tOptProc doUsageOpt;[=
-IF (exist? "version") =]
-extern tOptProc doVersion;[=
+IF (exist? "version")       =][=
+  IF (exist? "test_main")   =]
+#ifdef TEST_[=(. pname-up)=]_OPTS
+  extern tOptProc  doVersionStderr;
+# define DOVERPROC doVersionStderr
+#else
+  extern tOptProc  doVersion;
+# define DOVERPROC doVersion
+#endif /* TEST_[=(. pname-up)=]_OPTS */[=
+  ELSE  =]
+extern  tOptProc  doVersion;
+#define DOVERPROC doVersion[=
+  ENDIF =][=
 ENDIF =]
 extern tOptProc doPagedUsage;
 
@@ -187,7 +198,7 @@ IF (exist? "version") =]
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ doVersion,
+     /* option proc      */ DOVERPROC,
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
      /* disablement strs */ NULL, NULL },[=
 ENDIF=]

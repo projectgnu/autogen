@@ -959,6 +959,32 @@ AutoGen comes with a program named, @code{xml2ag}.  Its output can
 either be redirected to a file for later use, or the program can
 be used as an AutoGen wrapper.  @xref{xml2ag Invocation}.
 
+The introductory template example (@pxref{Example Usage}) can be rewritten
+in XML as follows:
+
+@example
+<EXAMPLE  template="list.tpl">
+<LIST list_element="alpha"
+      list_info="some alpha stuff"/>
+<LIST list_info="more beta stuff"
+      list_element="beta"/>
+<LIST list_element="omega"
+      list_info="final omega stuff"/>
+</EXAMPLE>
+@end example
+
+A more XML-normal form might look like this:
+@example
+<EXAMPLE  template="list.tpl">
+<LIST list_element="alpha">some alpha stuff</LIST>
+<LIST list_element="beta" >more beta stuff</LIST>
+<LIST list_element="omega">final omega stuff</LIST>
+</EXAMPLE>
+@end example
+@noindent
+but you would have to change the template @code{list_info} references
+into @code{text} references.
+
 @item standard AutoGen definitions
 Of course.  :-)
 

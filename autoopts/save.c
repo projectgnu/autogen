@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.2 2002/05/11 20:23:52 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.3 2002/06/14 02:11:36 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -167,22 +167,22 @@ findFileName( pOpts )
                 break;  /* bail out of error condition */
             }
 
-            if (pzDirCh != (char*)NULL) {
-                *pzDirCh = NUL;
-                if (  (stat( pzDir, &stBuf ) == 0)
-                   && S_ISDIR( stBuf.st_mode )) {
+            *pzDirCh = NUL;
+            if (  (stat( pzDir, &stBuf ) == 0)
+               && S_ISDIR( stBuf.st_mode )) {
 
-                    /*
-                     *  We found the directory.
-                     *  Restore the file name and mark the
-                     *  full name as a regular file
-                     */
-                    *pzDirCh = '/';
-                    stBuf.st_mode = S_IFREG;
+                /*
+                 *  We found the directory.
+                 *  Restore the file name and mark the
+                 *  full name as a regular file
+                 */
+                *pzDirCh = '/';
+                stBuf.st_mode = S_IFREG;
 
-                    break;  /* bail out of error condition */
-                }
+                break;  /* bail out of error condition */
             }
+
+            *pzDirCh = '/';
         }
 
         /*
@@ -198,11 +198,13 @@ findFileName( pOpts )
      *  THEN tack on the RC file name
      */
     if (S_ISDIR( stBuf.st_mode )) {
-        size_t sz     = strlen( pzDir ) + strlen( pOpts->pzRcName );
-        char*  pzPath = (char*)AGALOC( sz );
+        size_t sz = strlen( pzDir ) + strlen( pOpts->pzRcName ) + 2;
 
-        pzDir = pzPath;
-        snprintf( pzPath, sz, "%s%c%s", pzDir, '/', pOpts->pzRcName );
+        {
+            char*  pzPath = (char*)AGALOC( sz );
+            snprintf( pzPath, sz, "%s/%s", pzDir, pOpts->pzRcName );
+            pzDir = pzPath;
+        }
 
         /*
          *  IF we cannot stat the object for any reason other than

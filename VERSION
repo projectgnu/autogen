@@ -5,7 +5,7 @@
 #
 # Copyright (C) 1999, 2002 Bruce Korb
 #
-# Time-stamp:        "2002-06-12 18:37:09 bkorb"
+# Time-stamp:        "2002-06-13 19:06:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # by:                Bruce Korb <bkorb@gnu.org>
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=3
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".8pre7"
+AG_PATCHLEVEL=".8pre8"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
