@@ -79,6 +79,9 @@ prog-man-descrip = <<-  END_DETAIL
 	*  the \fB--override-tpl\fP command line option
 	.br
 	*  a top level XML attribute named, "template"
+	.br
+	One or the other \fBmust\fP be provided, or the program will
+	exit with a failure message.
 	.sp 1
 	The ``base-name'' for the output will similarly be either:
 	.br
@@ -95,6 +98,9 @@ prog-info-descrip = <<-  END_DETAIL
 	@item
 	A top level XML attribute named, "@code{template}"
 	@end itemize
+	@noindent
+	One or the other @strong{must} be provided, or the program will
+	exit with a failure message.
 
 	The @emph{base-name} for the output will similarly be either:
 	@itemize @bullet
