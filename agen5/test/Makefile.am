@@ -8,12 +8,13 @@
 ## Last Modified:   Feb 27, 2000
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.12 2000/03/11 02:03:49 bruce Exp $
+## $Id: Makefile.am,v 1.13 2000/03/11 18:36:00 bruce Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
-	alist.test case.test define.test defref.test endmac.test error.test \
-	expr.test for.test forfrom.test nestmac.test opts.test reorder.test
+	alist.test case.test define.test defref.test directives.test \
+	endmac.test error.test expr.test for.test forfrom.test \
+	nestmac.test opts.test reorder.test
 
 EXTRA_DIST = defs $(TESTS)
 
