@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.11 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.12 2000/09/28 04:16:47 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -98,7 +98,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
             /*
              *  FIXME:  this is a memory leak
              */
-            AGDUPSTR( pzFName, pzFullName );
+            AGDUPSTR( pzFName, pzFullName, "find file name" );
             deallocAddr = (void*)pzFName;
             pzEnd[-1] = '/';
         } else {
@@ -429,7 +429,7 @@ mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
                  zMapDataFile, pzFileName, strerror( ENOENT ));
         AG_ABEND;
     }
-    AGDUPSTR( pMapInfo->pzFileName, zRealFile );
+    AGDUPSTR( pMapInfo->pzFileName, zRealFile, "map data file" );
 
     /*
      *  The template file must really be a file.

@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.9 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: defLoad.c,v 1.10 2000/09/28 04:16:47 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -436,7 +436,7 @@ readDefines( void )
     }
 
     *pzData = NUL;
-    AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ) );
+    AGDUPSTR( pBaseCtx->pzFileName, OPT_ARG( DEFINITIONS ), "def file name" );
 
     /*
      *  Close the input file, parse the data

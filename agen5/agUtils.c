@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.6 2000/09/28 03:51:39 bkorb Exp $
+ *  $Id: agUtils.c,v 1.7 2000/09/28 04:12:13 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -486,6 +486,31 @@ ag_realloc( void* p, size_t sz, const char* pzWhat )
     return np;
 }
 
+
+    char*
+ag_strdup( const char* pz, const char* pzWhat )
+{
+    char*   pzRes;
+    size_t  len = strlen( pz )+1;
+
+    /*
+     *  There are some systems out there where autogen is
+     *  broken if "strdup" is allowed to duplicate strings
+     *  smaller than 32 bytes.  This ensures that we work.
+     *  We also round up everything up to 32 bytes.
+     */
+    if (len < 0x20)
+         len = 0x20;
+    else len = (len + 0x20) & ~0x1F;
+
+    pzRes = ag_alloc( len, pzWhat );
+
+    if (pzRes != (char*)NULL)
+        strcpy( pzRes, pz );
+
+    return pzRes;
+}
+
 #else
 STATIC tMemMgmt memHead = { &memHead, &memHead, (char*)NULL, "ROOT" };
 #define CHECK_CT 128
@@ -616,7 +641,7 @@ finalMemCheck( void )
 
 
     char*
-dupString( const char* pz, const char* pzDupFrom )
+ag_strdup( const char* pz, const char* pzDupFrom, const char* pzWhat )
 {
     char*   pzRes;
     size_t  len = strlen( pz )+1;
@@ -628,18 +653,14 @@ dupString( const char* pz, const char* pzDupFrom )
      *  We also round up everything up to 32 bytes.
      */
     if (len < 0x20)
-        len = 0x20;
+         len = 0x20;
     else len = (len + 0x20) & ~0x1F;
 
-    pzRes = ag_alloc( len, pzDupFrom );
+    pzRes = ag_alloc( len, pzWhat, pzDupFrom );
 
-    if (pzRes == (char*)NULL) {
-        fprintf( stderr, zAllocErr, pzProg,
-                 len, "strdup" );
-        AG_ABEND;
-    }
+    if (pzRes != (char*)NULL)
+        strcpy( pzRes, pz );
 
-    strcpy( pzRes, pz );
     return pzRes;
 }
 #endif

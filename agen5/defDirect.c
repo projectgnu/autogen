@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 1.10 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: defDirect.c,v 1.11 2000/09/28 04:16:47 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -624,7 +624,7 @@ doDir_include( char* pzArg, char* pzScan )
      */
     pCtx->pCtx       = pCurCtx;
     pCurCtx          = pCtx;
-    AGDUPSTR( pCtx->pzFileName, zFullName );
+    AGDUPSTR( pCtx->pzFileName, zFullName, "def file name" );
 
     pCtx->pzScan     =
     pCtx->pzData     =
@@ -702,7 +702,7 @@ doDir_line( char* pzArg, char* pzScan )
         *pz = NUL;
     }
     AGFREE( (void*)pCurCtx->pzFileName );
-    AGDUPSTR( pCurCtx->pzFileName, pzArg );
+    AGDUPSTR( pCurCtx->pzFileName, pzArg, "line directive file name" );
 
     return pzScan;
 }
@@ -793,7 +793,7 @@ doDir_shell( char* pzArg, char* pzScan )
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR( pCtx->pzFileName, zShellText );
+    AGDUPSTR( pCtx->pzFileName, zShellText, zShellText );
     pCtx->pzScan     =
     pCtx->pzData     = (char*)(pCtx+1);
     pCtx->lineNo     = 0;
