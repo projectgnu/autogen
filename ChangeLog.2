@@ -1,3 +1,22 @@
+1998-10-30  Bruce Korb <korbb@datadesign.com>
+	* MakeRules.in
+	`test x$i(srcdir)' *had* to be a mistype of `test x$(srcdir)'!!
+	* autoopts/pgusage.c
+	`doPagedUsage' can now be called in any of three states.
+	* autoopts/autoopts.h
+	Support for the tri-state `doPagedUsage()'
+	* autoopts/makeshell.c, autoopts/genshell.def
+	The putShellParse routine now has its own program options
+	and a special usage routine (prints its own usage, PLUS
+	the usage for the script it generates!!)
+	* autoopts/optcode.tpl
+	Corrected some unusual syntax and added support for putShellParse
+	help (needs a global pointer to the subject option descriptor).
+	* autoopts/autoopts.texi
+	Added better docs for this.
+	* autoopts/Makefile.am
+	genshell.def, genshell.c, and genshell.h need distributing.
+
 1998-10-26  Bruce Korb <korbb@datadesign.com>
 	* autoopts/optcode.tpl
 	* autoopts/autoopts.texi
