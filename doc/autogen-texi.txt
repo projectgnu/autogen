@@ -1888,7 +1888,6 @@ commercial programs.
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
 * option descriptor::   Option Descriptor File
-* Generated main::      Generating main procedures
 * Using AutoOpts::      Using AutoOpts
 * Presetting Options::  Presetting Options
 * shell options::       AutoOpts for Shell Scripts
@@ -2176,7 +2175,7 @@ the flexibility is there.
 @menu
 * program attributes::        Program Description Attributes
 * information attributes::    Program Information Attributes
-* deprecated main::           Generated main Procedures (deprecated)
+* Generated main::            Generating main procedures
 * option attributes::         Option Attributes
 * documentation attributes::  Man and Info doc Attributes
 * automatic options::         Automatically Supported Options
@@ -2298,93 +2297,274 @@ Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
 @end table
 
-@node deprecated main
-@subsection Generated main Procedures (deprecated)
+@node Generated main
+@subsection Generating main procedures
+@cindex main procedure
 
-@strong{The following is deprecated.  Users are encouraged to use the
-@i{main} description (@pxref{Generated main}) for specifying the type
-and content of a generated main procedure.}
-[[note to self: move some of this text to the new section.]]
+When AutoOpts generates the code to parse the command line options, it has
+the ability to produce any of several types of @code{main()} procedures.
+This is done by specifying a global structured value for @code{main}.  The
+values that it contains are dependent on the value set for the one value it
+must have: @code{main-type}.
 
-AutoOpts can generate the main procedure in certain circumstances.
-It will do this to help with integrating with the guile library environment,
-and for creating a program to convert command line options into environment
-variables for use in processing shell script options and for
-testing the command line interface.
+The recognized values for @code{main-type} are:
+@menu
+* main guile::              guile: main and inner_main procedures
+* main shell-process::      shell-process: emit Bourne shell results
+* main shell-parser::       shell-parser: emit Bourne shell script
+* main main::               main: user supplied main procedure
+* main include::            include: code emitted from included template
+* main invoke::             invoke: code emitted from AutoGen macro
+* main for-each::           for-each: perform function on each argument
+* main each-or-stdin::      each-or-stdin: each argument or on stdin
+@end menu
 
-@table @samp
-@item guile-main
-Creates a guile-style main and inner-main procedures.
-The inner main procedure will call @code{optionProcess()} and will
-invoke any code specified by this attribute.  If this attribute
-does not specify any code, then calls to the AutoOpts library procedure
-@code{export_options_to_guile()} and then @code{scm_shell()} will
-be inserted into @code{inner_main()}.
-
-@strong{Instead of this, use @ref{Generated main} procedures, specifying
-a @code{main-type} of @code{guile} (@pxref{main guile}).}
-
-@item before-guile-boot
-If @code{guile-main} has been specified and if this is specified
-as well, then this code will be inserted into the actual @code{main()}
-procedure before @code{gh_enter()} is called.
-
-@strong{Instead of this, use @ref{Generated main} procedures, specifying
-a @code{main-type} of @code{guile} (@pxref{main guile}) and add the
-@code{before-guile-boot} attribute.}
-
-@cindex main-text
-@item main-text
-If you need to specify the content of the main procedure generated
-for the "option testing" program, you can do that with this attribute.
-The result will be a procedure that looks similar to this:
+Here is an example of an @code{include} variation:
 
 @example
-int main( int argc, char** argv ) @{
-[+  main-text  +]
-    return EXIT_SUCCESS;
-@}
+main = @{
+  main-type = include;
+  tpl       = "main-template.tpl";
+@};
 @end example
 
-@strong{Instead of this, use @ref{Generated main} procedures, specifying
-a @code{main-type} of @code{main} (@pxref{main main}) and add the
-@code{code} attribute.}
+@node main guile
+@subsubsection guile: main and inner_main procedures
 
-@cindex test-main
-@item test-main
-Creates a test main procedure for testing option processing.  The
-resulting program may also be used for several purposes.
+When the @code{main-type} is specified to be @code{guile},
+a @code{main()} procedure is generated that calls @code{gh_enter()}, providing
+it with a generated @code{inner_main()} to invoke.  If you must perform
+certain tasks before calling @code{gh_enter()}, you may specify such code
+in the value for the @code{before-guile-boot} attribute.
 
-@strong{Instead of this, use @ref{Generated main} procedures, specifying
-a @code{main-type} of @code{main} (@pxref{main main}) and add the
-@code{test-main} attribute.}
+The @code{inner_main()} procedure itself will process the command line
+arguments (by calling @code{optionProcess()},
+@pxref{libopts-optionProcess}), and then either invoke the code
+specified with the @code{guile-main} attribute, or else export the
+parsed options to Guile symbols and invoke the @code{scm_shell()}
+function from the Guile library.  This latter will render the program
+nearly identical to the stock @code{guile(1)} program.
 
-@enumerate
-@item
-If the text of @code{test-main} is short (3 or fewer characters), the
-generated main() will call putBourneShell.  That routine will emit
-Bourne shell commands that can be eval-ed by a Bourne-derived shell to
-incorporate the digested options into the shell's environment,
-@xref{shell options}.  You would use it thus:
+@node main shell-process
+@subsubsection shell-process: emit Bourne shell results
+
+This will produce a @code{main()} procedure that parses the command line
+options and emits to @code{stdout} Bourne shell commands that puts the
+option state into environment variables.  This can be used within a
+shell script as follows:
+
 @example
-eval "`./programopts $@@`"
+unset OPTION_CT
+eval "`opt_parser \"$@@\"`"
 test -z "$@{OPTION_CT@}" && exit 1
 test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
 
-@item
-If the text of @code{test-main} contains @code{putShellParse}, the
-program will generate portable Bourne shell commands that will parse the
-command line options.  The expectation is that this result will be
-copied into a shell script and used there, @xref{shell options}.
+If the option parsing code detects an error or a request for usage,
+it will not emit an assignment to OPTION_CT and the script should just
+exit.  If the options are set consistently, then something along the
+lines of the following will be written to @code{stdout} and evaled:
 
-@item
-Any other text must be the name of a routine that you will write yourself.
-That routine will be called after processing the command line options
-and it will be passed the option processing descriptor pointer as its
-sole argument.
-@end enumerate
-@end table
+@example
+    OPTION_CT=4
+    export OPTION_CT
+    MYPROG_SECOND='first'
+    export MYPROG_SECOND
+    MYPROG_ANOTHER=1 # 0x1
+    export MYPROG_ANOTHER
+@end example
+
+@noindent
+If the arguments are to be reordered, however, then the resulting set
+of operands will be emitted and @code{OPTION_CT} gets set to zero.
+For example, the following would be appended to the above:
+
+@example
+    set -- 'operand1' 'operand2' 'operand3'
+    OPTION_CT=0
+@end example
+
+@noindent
+@code{OPTION_CT} is set to zero since it is not necessary to shift
+off any options.
+
+@node main shell-parser
+@subsubsection shell-parser: emit Bourne shell script
+
+This will produce a @code{main()} procedure that emits a shell script
+that will parse the command line options.  That script can be emitted
+to @code{stdout} or inserted or substituted into a pre-existing shell
+script file.  Improbable markers are used to identify previously inserted
+parsing text:
+
+@example
+# # # # # # # # # # -- do not modify this marker --
+@end example
+
+@noindent
+The program is also pretty insistent upon starting its parsing script
+on the second line.
+
+@node main main
+@subsubsection main: user supplied main procedure
+
+You must supply a value for the @code{main-text} attribute.
+You may also supply a value for @code{option-code}.  If you do, then
+the @code{optionProcess} invocation will not be emitted into the code.
+AutoOpts will wrap the text inside of:
+
+@example
+int
+main( int argc, char** argv )
+@{
+    @{
+        int ct = optionProcess( &<<prog-name>>Options, argc, argv );
+        argc -= ct;
+        argv += ct;
+    @}
+<<your text goes here>>
+@}
+@end example
+
+@noindent
+so you can most conveniently set the value with a ``@code{here string}''
+(@pxref{here-string}):
+
+@example
+code = <<- _EndOfMainProc_
+	<<your text goes here>>
+	_EndOfMainProc_;
+@end example
+
+@node main include
+@subsubsection include: code emitted from included template
+
+You must write a template to produce your main procedure.
+You specify the name of the template with the @code{tpl} attribute
+and it will be incorporated at the point where AutoOpts is ready
+to emit the @code{main()} procedure.
+
+This can be very useful if, in your working environment, you have
+many programs with highly similar @code{main()} procedures.  All you need
+to do is parameterize the variations and specify which variant is needed
+within the @code{main} AutoOpts specification.  Since you are coding
+the template for this, the attributes needed for this variation would
+be dictated by your template.
+
+@node main invoke
+@subsubsection invoke: code emitted from AutoGen macro
+
+You must write a template to produce your main procedure.  That template
+must contain a definition for the function specified with the @code{func}
+attribute to this @code{main()} procedure specification.  Typically, this
+template will be incorporated by using the @code{--lib-template} option
+(@pxref{autogen lib-template}) in the AutoGen invocation.  Otherwise, this
+variation operates in much the same way as ``@code{include}''
+(@pxref{main include}) method.
+
+@node main for-each
+@subsubsection for-each: perform function on each argument
+
+This produces a main procedure that invokes a procedure once for each
+operand on the command line (non-option arguments), @strong{OR} once
+for each non-blank, non-comment @code{stdin} input line.  Leading and
+trailing white space is trimmed from the input line and comment lines
+are lines that begin with a hash ('#') character.  (If anyone ever asks,
+I could make it specifiable, as the code to do this is emitted into
+the output and is not part of libopts.)
+
+@strong{NB}:
+The @code{argument} program attribute (@pxref{program attributes})
+must either begin with the @code{[} character, or be omitted and
+default to "@code{[ <file> [...]]}".
+
+The name of the procedure must be specified with the
+@code{handler-proc} attribute.  That procedure is presumed to be
+external, but if you provide the code for it, then the procedure is
+emitted as a static procedure in the generated code.  The profile of
+the procedure must be:
+
+@example
+int @i{my_handler}( const char *pz_operand );
+@end example
+
+If you provide the code, then your @code{main()} procedure specification
+will look something like this:
+
+@example
+main = @{
+  main-type    = for-each;
+  handler-proc = @i{my_handler};
+  @i{my_handler}-code = <<- EndOfMyCode
+	/* whatever you want to do */
+	EndOfMyCode;
+@};
+@end example
+
+@noindent
+and the emitted procedure will look like this:
+
+@example
+static int
+@i{my_handler}( const char* pz_entry )
+@{
+    int res = 0;
+    <<@i{my_handler}-code goes here>>
+    return res;
+@}
+@end example
+
+Exit code reporting is cumulative.  If the called procedure needs
+to cause a fail-exit, it is expected to call @code{exit(3)} directly.
+If you want to cause a warning exit code, then this handler function
+should return a non-zero status.  That value will be @strong{OR}-ed into
+a result integer for computing the final exit code.  E.g., here is part
+of the emitted code:
+
+@example
+    int res = 0;
+    if (argc > 0) @{
+        do  @{
+            res |= @i{my_handler}( *(argv++) );
+        @} while (--argc > 0);
+    @} else @{ ...
+@end example
+
+You may also specify some main procedure start up code with the
+@code{main-init} attribute.  Any code specified by that attribute will
+be inserted immediately after the option processing call.
+
+@node main each-or-stdin
+@subsubsection each-or-stdin: each argument or on stdin
+
+This is very similar to the for-each main procedure (@pxref{main for-each}).
+The difference is that the callout procedure is passed a read-only
+@code{FILE*} pointer and a pointer to the file name:
+
+@example
+extern int @i{my_handler}( FILE* in_fp, const char* pz_file_name );
+@end example
+@noindent
+If there are no command line operands, then this function is invoked
+much like:
+
+@example
+res = @i{my_handler}( stdin, "stdin" );
+exit( res );
+@end example
+
+If there are command line operands, then each operand is processed as follows:
+@example
+const char* pzF = *(argv++);
+FILE* fp = fopen( pzF, "r" );
+if (fp == NULL) @{
+    fprintf( stderr, "prog-name fs ERROR:  %d (%s) opening %s\n",
+             errno, strerror( errno ), pzF );
+    return EXIT_FAILURE;
+@}
+res |= @i{my_handler}( fp, pzF );
+fclose( fp );
+@end example
 
 @node information attributes
 @subsection Program Information Attributes
@@ -3755,277 +3935,6 @@ information provided in the option definitions, plus a number of static
 strings and any callout procedures that are specified or required.  You
 should never have need for looking at this, except, perhaps, to examine
 the code generated for implementing the @code{flag_code} construct.
-
-@c === SECTION MARKER
-
-@node Generated main
-@section Generating main procedures
-@cindex main procedure
-
-When AutoOpts generates the code to parse the command line options, it has
-the ability to produce any of several types of @code{main()} procedures.
-This is done by specifying a global structured value for @code{main}.  The
-values that it contains are dependent on the value set for the one value it
-must have: @code{main-type}.
-
-The recognized values for @code{main-type} are:
-@menu
-* main guile::              guile: main and inner_main procedures
-* main shell-process::      shell-process: emit Bourne shell results
-* main shell-parser::       shell-parser: emit Bourne shell script
-* main main::               main: user supplied main procedure
-* main include::            include: code emitted from included template
-* main invoke::             invoke: code emitted from AutoGen macro
-* main for-each::           for-each: perform function on each argument
-* main each-or-stdin::      each-or-stdin: each argument or on stdin
-@end menu
-
-Here is an example of an @code{include} variation:
-
-@example
-main = @{
-  main-type = include;
-  tpl       = "main-template.tpl";
-@};
-@end example
-
-@node main guile
-@subsection guile: main and inner_main procedures
-
-When the @code{main-type} is specified to be @code{guile},
-a @code{main()} procedure is generated that calls @code{gh_enter()}, providing
-it with a generated @code{inner_main()} to invoke.  If you must perform
-certain tasks before calling @code{gh_enter()}, you may specify such code
-in the value for the @code{before-guile-boot} attribute.
-
-The @code{inner_main()} procedure itself will process the command line
-arguments (by calling @code{optionProcess()},
-@pxref{libopts-optionProcess}), and then either invoke the code
-specified with the @code{guile-main} attribute, or else export the
-parsed options to Guile symbols and invoke the @code{scm_shell()}
-function from the Guile library.  This latter will render the program
-nearly identical to the stock @code{guile(1)} program.
-
-@node main shell-process
-@subsection shell-process: emit Bourne shell results
-
-This will produce a @code{main()} procedure that parses the command line
-options and emits to @code{stdout} Bourne shell commands that puts the
-option state into environment variables.  This can be used within a
-shell script as follows:
-
-@example
-unset OPTION_CT
-eval "`opt_parser \"$@@\"`"
-test -z "$@{OPTION_CT@}" && exit 1
-test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
-@end example
-
-If the option parsing code detects an error or a request for usage,
-it will not emit an assignment to OPTION_CT and the script should just
-exit.  If the options are set consistently, then something along the
-lines of the following will be written to @code{stdout} and evaled:
-
-@example
-    OPTION_CT=4
-    export OPTION_CT
-    MYPROG_SECOND='first'
-    export MYPROG_SECOND
-    MYPROG_ANOTHER=1 # 0x1
-    export MYPROG_ANOTHER
-@end example
-
-@noindent
-If the arguments are to be reordered, however, then the resulting set
-of operands will be emitted and @code{OPTION_CT} gets set to zero.
-For example, the following would be appended to the above:
-
-@example
-    set -- 'operand1' 'operand2' 'operand3'
-    OPTION_CT=0
-@end example
-
-@noindent
-@code{OPTION_CT} is set to zero since it is not necessary to shift
-off any options.
-
-@node main shell-parser
-@subsection shell-parser: emit Bourne shell script
-
-This will produce a @code{main()} procedure that emits a shell script
-that will parse the command line options.  That script can be emitted
-to @code{stdout} or inserted or substituted into a pre-existing shell
-script file.  Improbable markers are used to identify previously inserted
-parsing text:
-
-@example
-# # # # # # # # # # -- do not modify this marker --
-@end example
-
-@noindent
-The program is also pretty insistent upon starting its parsing script
-on the second line.
-
-@node main main
-@subsection main: user supplied main procedure
-
-You must supply a value for the @code{main-text} attribute.
-You may also supply a value for @code{option-code}.  If you do, then
-the @code{optionProcess} invocation will not be emitted into the code.
-AutoOpts will wrap the text inside of:
-
-@example
-int
-main( int argc, char** argv )
-@{
-    @{
-        int ct = optionProcess( &<<prog-name>>Options, argc, argv );
-        argc -= ct;
-        argv += ct;
-    @}
-<<your text goes here>>
-@}
-@end example
-
-@noindent
-so you can most conveniently set the value with a ``@code{here string}''
-(@pxref{here-string}):
-
-@example
-code = <<- _EndOfMainProc_
-	<<your text goes here>>
-	_EndOfMainProc_;
-@end example
-
-@node main include
-@subsection include: code emitted from included template
-
-You must write a template to produce your main procedure.
-You specify the name of the template with the @code{tpl} attribute
-and it will be incorporated at the point where AutoOpts is ready
-to emit the @code{main()} procedure.
-
-This can be very useful if, in your working environment, you have
-many programs with highly similar @code{main()} procedures.  All you need
-to do is parameterize the variations and specify which variant is needed
-within the @code{main} AutoOpts specification.  Since you are coding
-the template for this, the attributes needed for this variation would
-be dictated by your template.
-
-@node main invoke
-@subsection invoke: code emitted from AutoGen macro
-
-You must write a template to produce your main procedure.  That template
-must contain a definition for the function specified with the @code{func}
-attribute to this @code{main()} procedure specification.  Typically, this
-template will be incorporated by using the @code{--lib-template} option
-(@pxref{autogen lib-template}) in the AutoGen invocation.  Otherwise, this
-variation operates in much the same way as ``@code{include}''
-(@pxref{main include}) method.
-
-@node main for-each
-@subsection for-each: perform function on each argument
-
-This produces a main procedure that invokes a procedure once for each
-operand on the command line (non-option arguments), @strong{OR} once
-for each non-blank, non-comment @code{stdin} input line.  Leading and
-trailing white space is trimmed from the input line and comment lines
-are lines that begin with a hash ('#') character.  (If anyone ever asks,
-I could make it specifiable, as the code to do this is emitted into
-the output and is not part of libopts.)
-
-@strong{NB}:
-The @code{argument} program attribute (@pxref{program attributes})
-must either begin with the @code{[} character, or be omitted and
-default to "@code{[ <file> [...]]}".
-
-The name of the procedure must be specified with the
-@code{handler-proc} attribute.  That procedure is presumed to be
-external, but if you provide the code for it, then the procedure is
-emitted as a static procedure in the generated code.  The profile of
-the procedure must be:
-
-@example
-int @i{my_handler}( const char *pz_operand );
-@end example
-
-If you provide the code, then your @code{main()} procedure specification
-will look something like this:
-
-@example
-main = @{
-  main-type    = for-each;
-  handler-proc = @i{my_handler};
-  @i{my_handler}-code = <<- EndOfMyCode
-	/* whatever you want to do */
-	EndOfMyCode;
-@};
-@end example
-
-@noindent
-and the emitted procedure will look like this:
-
-@example
-static int
-@i{my_handler}( const char* pz_entry )
-@{
-    int res = 0;
-    <<@i{my_handler}-code goes here>>
-    return res;
-@}
-@end example
-
-Exit code reporting is cumulative.  If the called procedure needs
-to cause a fail-exit, it is expected to call @code{exit(3)} directly.
-If you want to cause a warning exit code, then this handler function
-should return a non-zero status.  That value will be @strong{OR}-ed into
-a result integer for computing the final exit code.  E.g., here is part
-of the emitted code:
-
-@example
-    int res = 0;
-    if (argc > 0) @{
-        do  @{
-            res |= @i{my_handler}( *(argv++) );
-        @} while (--argc > 0);
-    @} else @{ ...
-@end example
-
-You may also specify some main procedure start up code with the
-@code{main-init} attribute.  Any code specified by that attribute will
-be inserted immediately after the option processing call.
-
-@node main each-or-stdin
-@subsection each-or-stdin: each argument or on stdin
-
-This is very similar to the for-each main procedure (@pxref{main for-each}).
-The difference is that the callout procedure is passed a read-only
-@code{FILE*} pointer and a pointer to the file name:
-
-@example
-extern int @i{my_handler}( FILE* in_fp, const char* pz_file_name );
-@end example
-@noindent
-If there are no command line operands, then this function is invoked
-much like:
-
-@example
-res = @i{my_handler}( stdin, "stdin" );
-exit( res );
-@end example
-
-If there are command line operands, then each operand is processed as follows:
-@example
-const char* pzF = *(argv++);
-FILE* fp = fopen( pzF, "r" );
-if (fp == NULL) @{
-    fprintf( stderr, "prog-name fs ERROR:  %d (%s) opening %s\n",
-             errno, strerror( errno ), pzF );
-    return EXIT_FAILURE;
-@}
-res |= @i{my_handler}( fp, pzF );
-fclose( fp );
-@end example
 
 @c === SECTION MARKER
 

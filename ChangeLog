@@ -1,3 +1,18 @@
+2004-11-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/bootstrap.dir(export): avoid ksh-isms
+	* agen5/opts.def(define): use the new "unstack" not "equivalence".
+	* autoopts/autoopts-config.in(ldopts): emit `-R' link option, too.
+	* autoopts/autoopts.c(handleOption): finish new equivalencing stuff
+	* autoopts/options.tpl(unstack-arg): new attribute - handle it
+	* autoopts/optlib.tpl(unstack-arg): ditto
+	* autoopts/save.c(optionSaveFile): avoid unnecessary casts
+	* autoopts/stack.c(stackOptArg): avoid unnecessary work
+	* autoopts/test/equiv.test: modify for testing new mechanisms
+	* config/confmacs.tpl(try-test): avoid using square brackets
+	* config/misc.def(ldflags): new test for how to use `-R' link option
+	* pkg/libopts/mklibsrc.sh: simplify the quoting
+
 2004-11-14  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(handleOption): object to a reuse of an

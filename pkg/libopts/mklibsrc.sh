@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2004-05-09 11:41:55 bkorb"
+## Time-stamp:      "2004-11-22 16:30:16 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 3.21 2004/05/13 04:27:30 bkorb Exp $
+## $Id: mklibsrc.sh,v 3.22 2004/11/24 21:03:15 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -71,7 +71,8 @@ ${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable <<-	'_EOF_'
 	#include      libopts.def
 	_EOF_
 
-cat >> libopts.m4 <<-	EOMacro
+exec 3>> libopts.m4
+cat >&3 <<-	EOMacro
 
 	dnl @synopsis  LIBOPTS_CHECK
 	dnl
@@ -82,39 +83,41 @@ cat >> libopts.m4 <<-	EOMacro
 	AC_DEFUN([LIBOPTS_CHECK],[
 	`sed -n '/Check for standard headers/,/gen, pathfind/p' \
 	     ${top_srcdir}/configure.in`
+	EOMacro
 
+cat >&3 <<- \EOMacro
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
 	  AC_ARG_WITH([autoopts-config],
         AC_HELP_STRING([--with-autoopts-config],
 	                   [specify the config-info script]),
-	    [lo_cv_with_autoopts_config=\${with_autoopts_config}],
+	    [lo_cv_with_autoopts_config=${with_autoopts_config}],
 	    AC_CACHE_CHECK([whether autoopts-config is specified],
 	       lo_cv_with_autoopts_config,
 	       lo_cv_with_autoopts_config=autoopts-config)
 	  ) # end of AC_ARG_WITH
 	  AC_CACHE_VAL([lo_cv_test_autoopts],[
-	    aoconfig=\${lo_cv_with_autoopts_config}
-	    lo_cv_test_autoopts=\`\${aoconfig} --libs\` 2> /dev/null
-	    if test \$? -ne 0
+	    aoconfig=${lo_cv_with_autoopts_config}
+	    lo_cv_test_autoopts=`${aoconfig} --libs` 2> /dev/null
+	    if test $? -ne 0
 	    then lo_cv_test_autoopts=no
-	    else if test -z "\$lo_cv_test_autoopts"
+	    else if test -z "$lo_cv_test_autoopts"
 	         then lo_cv_test_autoopts=yes
 	    fi ; fi
 	  ]) # end of CACHE_VAL
-	  AC_MSG_RESULT([\${lo_cv_test_autoopts}])
+	  AC_MSG_RESULT([${lo_cv_test_autoopts}])
 
-	  if test "X\${lo_cv_test_autoopts}" != Xno
+	  if test "X${lo_cv_test_autoopts}" != Xno
 	  then
-	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
-	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
+	    LIBOPTS_LDADD="${lo_cv_test_autoopts}"
+	    LIBOPTS_CFLAGS="`${aoconfig} --cflags`"
 	    NEED_LIBOPTS_DIR=''
 	  else
-	    LIBOPTS_LDADD='\$(top_builddir)/libopts/libopts.la'
-	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/libopts'
+	    LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
+	    LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
 	    INVOKE_LIBOPTS_MACROS
 	    NEED_LIBOPTS_DIR=true
 	  fi
-	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "\${NEED_LIBOPTS_DIR}"])
+	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "${NEED_LIBOPTS_DIR}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
 	  AC_CONFIG_FILES([libopts/Makefile])

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 3.20 2004/05/22 00:17:32 bkorb Exp $
+ *  save.c  $Id: save.c,v 3.21 2004/11/24 21:03:15 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -370,7 +370,7 @@ optionSaveFile( tOptions* pOpts )
              *  The return values for ctime(), localtime(), and gmtime()
              *  normally point to static data that is overwritten by each call.
              */
-            free( (void*)pzTime );
+            free( pzTime );
 #endif
         }
 
@@ -451,7 +451,7 @@ optionSaveFile( tOptions* pOpts )
                     /*
                      *  bit flag strings get allocated
                      */
-                    free( (void*)p->pzLastArg );
+                    free( p->pzLastArg );
                 p->pzLastArg = val;
                 break;
             }
