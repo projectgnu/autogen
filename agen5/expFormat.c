@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.4 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expFormat.c,v 3.5 2002/02/02 21:19:57 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -167,9 +167,24 @@ ag_scm_dne( SCM prefix, SCM first )
         strftime( zScribble, 128, "%A %B %e, %Y at %r %Z", pTime );
     }
 
-    pzRes = asprintf( ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
-                      pzPrefix, pCurFp->pzOutName, zScribble,
-                      OPT_ARG( DEFINITIONS ), pzTemplFileName, pzFirst );
+    {
+        const char* pz;
+        if (! ENABLED_OPT( DEFINITIONS ))
+            pz = "<<no definitions>>";
+
+        else if (*pzOopsPrefix != NUL)
+            pz = "<<CGI-definitions>>";
+
+        else {
+            pz = OPT_ARG( DEFINITIONS );
+            if (strcmp( pz, "-" ) == 0)
+                pz = "stdin";
+        }
+
+        pzRes = asprintf( ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
+                          pzPrefix, pCurFp->pzOutName, zScribble,
+                          pz, pzTemplFileName, pzFirst );
+    }
 
     if (pzRes == NULL)
         AG_ABEND( asprintf( zAllocErr, pzProg, -1, "Do-Not-Edit string" ));
