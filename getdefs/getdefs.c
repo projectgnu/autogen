@@ -1,12 +1,12 @@
 /*
- *  $Id: getdefs.c,v 3.1 2001/12/10 03:57:16 bkorb Exp $
+ *  $Id: getdefs.c,v 3.2 2002/01/10 15:25:05 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/12/10 03:57:16 $
+ *  Last Modified:     $Date: 2002/01/10 15:25:05 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
@@ -872,10 +872,6 @@ processFile( char* pzFile )
         }
         papzBlocks[ blkUseCt-1 ] = pzDta;
     }
-
-    if (lineNo == 1)
-        fprintf( stderr, "Warning:  no copies of pattern `%s' were found in "
-                 "%s\n", pzDefPat, pzFile );
 
     free( (void*)pzText );
 }
