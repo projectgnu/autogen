@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.9 2003/05/06 02:14:25 bkorb Exp $
+# $Id: optlib.tpl,v 3.10 2003/05/18 17:09:27 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -77,21 +77,21 @@ DEFINE Option_Copyright =][=
 IF (exist? "copyright") =]
 /*
  * [=(sprintf "%s copyright %s %s - all rights reserved"
-     (. prog-name) (get "copyright.date") (get "copyright.owner") ) =][=
+     prog-name (get "copyright.date") (get "copyright.owner") ) =][=
 
   CASE (get "copyright.type") =][=
 
     =  gpl  =]
  *
-[=(gpl (. prog-name) " * " ) =][=
+[=(gpl  prog-name " * " ) =][=
 
     = lgpl  =]
  *
-[=(lgpl (. prog-name) (get "copyright.owner") " * " ) =][=
+[=(lgpl prog-name (get "copyright.owner") " * " ) =][=
 
     =  bsd  =]
  *
-[=(bsd  (. prog-name) (get "copyright.owner") " * " ) =][=
+[=(bsd  prog-name (get "copyright.owner") " * " ) =][=
 
     = note  =]
  *
@@ -543,7 +543,7 @@ DEFINE USAGE_LINE   =][=
           ;;
           (if (< 80 (+ (string-length usage-line)
                 (len "argument")
-                (len "prog-name") ))
+                (string-length prog-name) ))
               " \\\n\t\t"  " ")
           (get "argument")  ))
   )

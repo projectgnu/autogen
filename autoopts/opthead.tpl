@@ -1,12 +1,12 @@
 [= autogen5 template
 
-# $Id: opthead.tpl,v 3.10 2003/05/06 02:14:25 bkorb Exp $
+# $Id: opthead.tpl,v 3.11 2003/05/18 17:09:27 bkorb Exp $
 # Automated Options copyright 1992-2003 Bruce Korb
 
 =]
 /*
  *  This file contains the programmatic interface to the Automated
- *  Options generated for the [=(. prog-name)=] program.
+ *  Options generated for the [=prog-name=] program.
  *  These macros are documented in the AutoGen info file in the
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
  */
@@ -46,9 +46,9 @@ ENDIF =]
 
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
 IF (exist? "version") =]
-#define [=(. UP-prog)=]_VERSION       [=(c-string (get "version"))=]
-#define [=(. UP-prog)=]_FULL_VERSION  "[=
-  (. prog-name) =] - [= % prog_title "%s - " =]Ver. [=version=]"[=
+#define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
+#define [=(. pname-up)=]_FULL_VERSION  "[=
+  prog-name =] - [= % prog-title "%s - " =]Ver. [=version=]"[=
 ENDIF (exist? version) =]
 
 /*
@@ -74,7 +74,8 @@ ENDIF (exist? version) =]
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
 
-  UP-prefix (get "prog-name")
+  UP-prefix pname
+
 ) =]
 
 /*
@@ -194,9 +195,9 @@ ENDIF
 /*
  *  Interface defines not associated with particular options
  */
-#define  ERRSKIP_[=(. UP-prefix)=]OPTERR STMTS( [=prog-name
+#define  ERRSKIP_[=(. UP-prefix)=]OPTERR STMTS( [=(. pname)
                          =]Options.fOptSet &= ~OPTPROC_ERRSTOP )
-#define  ERRSTOP_[=(. UP-prefix)=]OPTERR STMTS( [=prog_name
+#define  ERRSTOP_[=(. UP-prefix)=]OPTERR STMTS( [=(. pname)
                          =]Options.fOptSet |= OPTPROC_ERRSTOP )
 #define  RESTART_[=(. UP-prefix)=]OPT(n) STMTS( \
                 [=(. pname)=]Options.curOptIdx = (n); \
@@ -211,7 +212,7 @@ ENDIF
 
 /* * * * * *
  *
- *  Declare the [=(. prog-name)=] option descriptor.
+ *  Declare the [=prog-name=] option descriptor.
  */
 #ifdef  __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.16 2003/05/06 02:14:25 bkorb Exp $
+#$Id: optcode.tpl,v 3.17 2003/05/18 17:09:27 bkorb Exp $
 
 # Automated Options copyright 1992-2003 Bruce Korb
 
@@ -68,7 +68,7 @@ extern tOptProc doVersionStderr, doVersion, doPagedUsage[= (if
 =][=
 
 (shell (string-append
-"columns -I16 --first=';\nstatic tOptProc ' -S, --spread=1 <<_EOF_\n"
+"${COLUMNS_EXE} -I16 --first=';\nstatic tOptProc ' -S, --spread=1 <<_EOF_\n"
          proc-list "_EOF_" )) =];
 extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
