@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.31 1999/10/28 03:36:29 bruce Exp $
+## $Id: auto_gen.tpl,v 2.32 1999/10/30 16:40:27 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -26,15 +26,7 @@ texi=autogen.texi =]
 
 Plus bits and pieces gathered from all over the source/build
 directories:
-[=
-FOR infile=]
-	[=infile=][=
-ENDFOR infile =]
-[=`echo "\t${top_srcdir}/autoopts/autoopts.texi"
-   for f in ${top_builddir}/*/*.menu
-   do echo "\t$f"
-      echo "\t\`echo $f|sed 's/\\.menu$/.texi/'\`"
-   done` =]
+[= ` for f in ${DOC_DEPENDS} ; do echo "    $f" ; done ` =]
 
 @end ignore
 
@@ -677,10 +669,17 @@ FOR directive "\n" =][=
 @item #[=% name (string-downcase! "%s") =][= % arg " %s" =]
 @cindex #[=% name (string-downcase! "%s") =]
 @cindex [=% name (string-downcase! "%s") =] directive
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
 [=text=][=
   ENDIF=][=
 ENDFOR directive=]
 @end table
+
+@ignore
+Resume input from auto_gen.tpl
+@end ignore
 
 @node Comments
 @section Commenting Your Definitions
@@ -754,8 +753,11 @@ The following was extracted directly from the agParse.y source file:
 Extracted from $top_srcdir/agen5/defParse.y
 @end ignore
 @example
-[=`sed -n -e '/^definitions/,$p' $top_srcdir/agen5/defParse.y |
-  sed -e 's/{/@{/g' -e 's/}/@}/g' `=]
+[= # extract the syntax from defParse.y, then escape the characters
+     that texi sees as operators:  =][=
+
+ ` sed -n -e '/^definitions/,$p' $top_srcdir/agen5/defParse.y |
+   sed -e 's/{/@{/g' -e 's/}/@}/g' ` =]
 @end example
 
 @ignore
@@ -880,11 +882,16 @@ FOR macfunc =][=
     FOR cindex =]
 @cindex [=cindex=][=
     ENDFOR cindex=]
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
 
 [=desc=][=
   ENDIF desc exists =][=
 ENDFOR macfunc=]
 @ignore
+
+Resume source from auto_gen.tpl
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -895,6 +902,9 @@ ENDFOR macfunc=]
 FOR gfunc =]
 @findex [=% name (string-upcase! "%s") =]
 @item [=% name (string-upcase! "%s") =]
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
 [=descrip=]
 [=
 ENDFOR evalexpr
@@ -905,14 +915,11 @@ ENDFOR evalexpr
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+Invocation section from [= ` echo ${top_srcdir}/agen5/autogen.texi ` =]
 @end ignore
 @page
 
-[=`
-if [ -s ${top_builddir}/src/autogen.texi ]
-then cat ${top_builddir}/src/autogen.texi
-else cat ${top_srcdir}/src/autogen.texi
-fi`=]
+[= ` cat ${top_srcdir}/agen5/autogen.texi ` =]
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
@@ -1026,31 +1033,20 @@ at all, I decided to leave it in the list of chapters.
 
 @menu
 [=`
-
-for f in ${top_builddir}/*/*.menu
-do
-  case $f in
-    *src/autogen.menu ) : ;;
-    * ) cat $f ;;
-  esac
-done
+cat  ${ADDON_MENU}
 
 echo '
 @end menu
 
 '
 
-TOPSRC=\`cd ${top_srcdir} ; pwd\`
-TOPBUILD=\`cd ${top_builddir} ; pwd\`
-for f in ${top_srcdir}/*/*.menu
+for f in ${ADDON_TEXI}
 do 
-   if [ "$f" = ${top_srcdir}/src/autogen.menu ] ; then : ; else
    echo '@page'
    echo '@ignore'
-   echo 'Copy of $f and associated .texi'
+   echo 'Copy of $f'
    echo '@end ignore'
-   cat \`echo $f | sed 's/\\.menu$/.texi/'\`
-   fi
+   cat $f
 done
 
 ` =]
