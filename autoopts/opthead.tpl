@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.8 1998/11/25 21:19:39 bkorb Exp $
+#$Id: opthead.tpl,v 2.9 1999/02/25 17:31:38 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -194,7 +194,7 @@ _ENDIF version-exists =]
  *  This macro is used internally by other AutoOpt macros.
  *  It is not for general use.  It is used to obtain the option description
  *  corresponding to its @strong{UPPER CASED} option name argument.
- *  This is primarily used in the following macro definitions:
+ *  This is primarily used in other macro definitions.
 =*/
 =]
 #define     [=prefix _up #_ +=]DESC(n)     [=prog_name
@@ -263,7 +263,7 @@ _ENDIF version-exists =]
  *  "If you need to know if an option was set because of
  *  presetting actions (RC/INI processing or environment variables),
  *  versus a command line entry versus one of the SET/DISABLE macros,
- *  then use this macro.  It will contain one of four values:
+ *  then use this macro.  It will yield one of four values:
  *  @code{OPTST_INIT}, @code{OPTST_SET}, @code{OPTST_PRESET}
  *  or @code{OPTST_DEFINED}.  It is used thus:
  *

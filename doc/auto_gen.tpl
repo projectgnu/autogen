@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Fri Jan 29 07:12:38 1999
+## Last Modified:     Thu Feb 25 09:20:05 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.7 1999/02/24 18:53:27 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.8 1999/02/25 17:31:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -73,7 +73,7 @@ notice identical to this one except for the removal of this paragraph
 [=_eval AutoGen copyright _get owner _get
        "#3$%s copyright %s %s" _printf=]
 @sp 2
-This is the first edition of the GNU AutoGen documentation,
+This is the second edition of the GNU AutoGen documentation,
 @sp 2
 Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
@@ -92,13 +92,11 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 
 @menu
 * Introduction::         AutoGen's Purpose
-* Generalities::         General Ideas
-* Example Usage::        A Simple Example
-* Definitions File::     Macro Definitions File
-* Template File::        Output Template
+* Definitions File::     AutoGen Definitions File
+* Template File::        AutoGen Template
 * Invocation::           Running AutoGen
 * Installation::         What Gets Installed Where
-* Autoopts::             Automated Option Processing
+* AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
 * Future::               Some ideas for the future.
 * Concept Index::        General index
@@ -115,15 +113,16 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 @chapter Introduction
 @cindex Introduction
 
-AutoGen is a tool for automatically generating arbitrary text
-files that contain repetitive text with varying substitutions.
-This is particularly useful if you have several types of repetitive
-text that all need to be kept in sync with each other.
+AutoGen is a tool designed for generating program files that contain
+repetitive text with varied substitutions.  Its goal is to simplify the
+maintainence of programs that contain large amounts of repetitious text.
+This is especially valuable if there are several blocks of such text
+that must be kept synchronized.
 
-One application for this would be, for example, processing
-program options.  Processing options requires a minimum of four
-different constructs be kept in proper order in different places in
-your program.  You need minimally:
+One common example is the problem of maintaining the code required for
+processing program options.  Processing options requires a minimum of
+four different constructs be kept in proper order in different places in
+your program.  You need at least:
 
 @enumerate
 @item
@@ -133,124 +132,154 @@ code to process the flag when it is encountered
 @item
 a global variable (typically something like:  @samp{int sflg = 0;})
 @item
-and please do not forget a line in the usage text :-)
+a line in the usage text
 @end enumerate
 
 @noindent
 You will need more things besides this if you choose to implement
-long option names, rc/ini file processing, and environment variables.
+long option names, rc/ini file processing, environment variables
+and so on.
 
 All of these things can be kept in sync mechanically,
 with the proper templates and this program.
 In fact, I have already done so and AutoGen already
-uses the AutoOpt facility.
+uses such a facility.  @xref{AutoOpts}.
 
-@ignore
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-@end ignore
-@page
+@menu
+* Generalities::         General Ideas
+* Example Usage::        A Simple Example
+* Testimonial::          A User's Perspective
+@end menu
+
 @node Generalities
-@chapter General Ideas
+@section General Ideas
 @cindex m4
 
-The goal is to try to simplify the process of maintaining repetitive
-program text.  If there is a single block of text that needs repetitive
-substitutions, @code{#define} macros frequently fill the bill.  They do
-not always work because they are inflexible and even sometimes obscure.
-In many of these cases, @code{M4} will work quite well.  When
-appropriate, those approaches are much simpler than AutoGen.  Even then
-@code{M4} is often inadequate because the entire substitution lists must
-be repeated in the proper contexts throughout the base text (template).
-
+The initial idea of this program was to have a text file, a template if
+you will, that contained the text of the desired output file, with a few
+additional features.
 @cindex design goals
-AutoGen addresses these problems by being extremely flexible in the
-kinds of substitutions that can be performed and by separating the
-substitution text (macro definitions) from the template text.  The
-template text makes references to the definitions in order to compute
-text to insert into the template and to compute which part of the
-template to process at each step.
 
-@table @samp
-@item template text
-@cindex .tpl file
-@cindex template file
-This is the template used to create the output files.
-It contains text that is copied to the output verbatim and
-text between escape markers (denoted at the beginning of the file).
-The text between markers is used to generate replacement text,
-control the output or to control the processing of the template.
+@enumerate
+@item
+The text would need special markers to indicate where substitutions were
+required (a la the @code{$@{VAR@}} construct in a shell @code{here} doc.
+Without this, there is no point.
 
-Conventionally, it uses the file name suffix @code{tpl}.
+@item
+It would also need a way to indicate sections of text that were to be
+skipped and for sections of text that were to be repeated.  This is a
+major improvement over using C preprocessing macros.  With the C
+preprocessor, you have no way of selecting output text.  It is an
+@i{un}varying, mechanical substitution process.
 
-@item macro definitions
-@cindex .def file
-@cindex definition file
-This file is named on the @code{autogen} invocation line.
-It identifies the template that the definitions are to be used with
-and it contains text macro and group macro definitions.
+@item
+There also needed to be methods for carefully controlling the output.
+Sometimes, it is just simply easier and clearer to compute some text or
+a value in one context when its application needs to be later.  So,
+methods were devised for saving text or values for later use.
+@end enumerate
 
-Conventionally, it uses the file name suffix @code{def}.
-@end table
+This template needs to be driven by a separate file of named values; a
+definitions file.  My goal here is to require a template user to specify
+@strong{only} those data that are necessary to describe his application of
+the template.  By completely isolating the definitions from the template
+it becomes possible to greatly increase the flexibility of the
+implementation (template).  So, the important attributes of the
+definitions are:
 
-@ignore
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-@end ignore
-@page
+@enumerate
+@item
+The definitions should be completely separate from the template.
+
+@item
+Each datum should be named.  That way, they can be rearranged,
+augmented and become obsolete without it being necessary to go
+back and clean up older definition files.  Reduce obsolescense!
+
+@item
+There should be named collections, a hierarchy, of definitions.
+Associated values need to be collected and associated with a group name.
+That way, the associated data can be used collectively for sets of
+substitutions.
+@end enumerate
+
 @node Example Usage
-@chapter A Simple Example
+@section A Simple Example
 @cindex example, simple
 @cindex simple example
 
-Assume you have a list of names and you wish to keep them in an array
-and you want an enumerated index for each entry and that it is too
-much trouble to do by hand:
+Assume you have an enumeration of names and you wish to associate some
+string with each name.  Assume also, for the sake of this example,
+that it is either too complex or too large to maintain easily by hand.
 
 @noindent
-You have list.h:
+In a header file, @file{list.h}, you define the enumeration
+and the global array containing the associated strings:
 
 @example
-#ifndef HEADER
-#define HEADER
-
-#define IDX_ALPHA    0
-#define IDX_BETA     1
-#define IDX_OMEGA    2
+typedef enum @{
+        IDX_ALPHA,
+        IDX_BETA,
+        IDX_OMEGA @}  list_enum;
 
 extern const char* az_name_list[ 3 ];
-#endif
 @end example
 
 @noindent
-and you have list.c:
+Then you also have @file{list.c} that defines the actual
+strings:
 
 @example
 #include "list.h"
-const char* az_name_list[ 3 ] = @{
+const char* az_name_list[] = @{
         "some alpha stuff",
         "more beta stuff",
         "dumb omega stuff" @};
 @end example
 
-To do this, you need a template or two that can be expanded
-into the files you want.  In this program, we use a single
+@noindent
+First, we will define the information that is unique for
+each enumeration name/string pair.
+
+@example
+autogen definitions list;
+list = @{ list_element = alpha;
+         list_info    = "some alpha stuff"; @};
+list = @{ list_info    = "more beta stuff";
+         list_element = beta; @};
+list = @{ list_element = omega;
+         list_info    = "dumb omega stuff"; @};
+@end example
+
+The @code{autogen definitions list;} entry defines the file as an
+AutoGen definition file.  That is followed by three @code{list}
+entries that define the associations between the enumeration
+names and the strings.  The order of the differently named
+elements inside of list is unimportant.  They are reversed inside
+of the @code{beta} entry and that will not affect the output.
+
+Now, to actually create the output, we need a template or two that can
+be expanded into the files you want.  In this program, we use a single
 template that is capable of multiple output files.
 
-Assuming we have chosen our markers to be '[#' and '#]' to start
-and end our macros, we have a template something like this.
+It looks something like this.
 (For a full description, @xref{Template File}.)
 
 @example
 [#autogen template h c #]
 [#_IF _SFX h = #]
-[#_FOR list#]
-#define IDX_[#list_element _up#]  [#_eval _index#][# /list #]
+typedef enum @{[#
+   _FOR list , #]
+        IDX_[#list_element _up#][#
+   /list #] @}  list_enum;
 
 extern const char* az_name_list[ [#_eval list _count #] ];
-#endif[#
+[#
 
 _ELIF _SFX c = #]
 #include "list.h"
-const char* az_name_list[ [#_eval list _hival 1 + #] ] = @{[#
+const char* az_name_list[] = @{[#
 _FOR list ,#]
         "[#list_info#]"[#
 /list #] @};[#
@@ -258,29 +287,97 @@ _FOR list ,#]
 _ENDIF header/program #]
 @end example
 
-@noindent
-and along with this must be included the macro definitions:
+The @code{[#autogen template h c #]} text tells AutoGen that this is a
+template file; that it is to be processed twice; that the start macro
+marker is @code{[#}; and the end marker is @code{#]}.  The template will
+be processed first with a suffix value of @code{h} and then with
+@code{c}.
 
-@example
-autogen definitions list;
-list = @{ list_element = alpha;
-         list_info    = "some alpha stuff"; @};
-list = @{ list_element = beta;
-         list_info    = "more beta stuff"; @};
-list = @{ list_element = omega;
-         list_info    = "dumb omega stuff"; @};
-@end example
+The @code{[#_IF _SFX h = #]} and @code{[#_ELIF _SFX c = #]} clauses
+select different text for the two different passes.  In this example,
+the output is nearly disjoint and could have been put in two separate
+templates.  However, sometimes there are common sections and this is
+just an example.
 
-@noindent
-Furthermore, if we ever need a name/enumeration mapping again,
-we can always write a new set of definitions for the old template.
+The @code{[#_FOR list ,#]} and @code{[# /list #]} clauses delimit
+blocks of text that will be repeated for every definition of @code{list}.
+Inside of that block, the definition name-value pairs that
+are members of each @code{list} are available for substitutions.
+
+The remainder of the macros are expressions.  Some of these contain
+special expression functions to obtain certain values or modify the
+values before they are inserted into the output.  For example,
+@code{_count} yields the number of definitions of a particular name,
+and @code{_up} will change a string to all upper case.
+
+@node Testimonial
+@section A User's Perspective
+
+@format
+        Subject: Re: Sysadmin Package
+           Date: Thu, 24 Sep 1998
+           From: "Gary V. Vaughan"
+             To: Alexandre
+             CC: autoconf <autoconf@@gnu.org>
+
+> Bruce Korb <korb@@datadesign.com> writes:
+> 
+> > I would like to recommend my tool.  It exactly and precisely
+> > addresses these very problems in a manner far simpler than M4.
+
+Alexandre Oliva wrote:
+> 
+> I'd appreciate opinions from others about advantages/disadvantages of
+> each of these macro packages.
+@end format
+
+I am using AutoGen in my pet project, and find one of its best points to
+be that it separates the operational data from the implementation.
+
+Indulge me for a few paragraphs, and all will be revealed:
+In the manual, Bruce cites the example of maintaining command line flags
+inside the source code; traditionally spreading usage information, flag
+names, letters and processing across several functions (if not files). 
+Investing the time in writing a sort of boiler plate (a template in
+AutoGen terminology) pays by moving all of the option details (usage,
+flags names etc.) into a well structured table (a definition file if you
+will),  so that adding a new command line option becomes a simple matter
+of adding a set of details to the table.
+
+So far so good!  Of course, now that there is a template, writing all of
+that tedious optargs processing and usage functions is no longer an
+issue.  Creating a table of the options needed for the new project and
+running AutoGen generates all of the option processing code in C
+automatically from just the tabular data.  AutoGen in fact already ships
+with such a template... AutoOpts.
+
+One final consequence of the good separation in the design of AutoGen is
+that it is retargettable to a greater extent.  The
+egcs/contib/fixinc/inclhack.def can equally be used (with different
+templates) to create a shellscript (inclhack.sh) or a c program
+(inclhack.c).
+
+This is just the tip of the iceberg.  AutoGen is far more powerful than
+these examples might indicate, and has many other varied uses.  I am
+certain Bruce or I could supply you with many and varied examples, and I
+would heartily recommend that you try it for your project and see for
+yourself how it compares to m4.
+
+As an aside, I would be interested to see whether someone might be
+persuaded to rationalise autoconf with AutoGen in place of m4...  Ben,
+are you listening?  autoconf-3.0! `kay?  =)O|
+
+@format
+Sincerely,
+        Gary V. Vaughan
+@end format
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
 @node Definitions File
-@chapter Macro Definitions File
+@chapter AutoGen Definitions File
 @cindex definitions file
 @cindex .def file
 
@@ -602,7 +699,7 @@ The following was extracted directly from the agParse.y source file:
 @end ignore
 @page
 @node Template File
-@chapter Output Template
+@chapter AutoGen Template
 @cindex template file
 @cindex .tpl file
 
@@ -832,7 +929,7 @@ env VERBOSE=1 make TESTS="for.test forcomma.test" check
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
-@node Autoopts
+@node AutoOpts
 @chapter Automated Option Processing
 @cindex autoopts
 [=_INCLUDE autoopts/autoopts.texi=]
