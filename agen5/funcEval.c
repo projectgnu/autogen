@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.15 2000/03/04 20:38:44 bruce Exp $
+ *  $Id: funcEval.c,v 1.16 2000/03/04 22:40:05 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -80,7 +80,7 @@ evalExpression( ag_bool* pMustFree )
             if ((code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) == 0)
                 return (char*)zNil;
             pzText =  pT->pzTemplText + pMac->endIndex;
-            code = (code & EMIT_SECONDARY_TYPE) >> 4;
+            code   = EMIT_STRING;
         }
 
         /*
@@ -398,7 +398,7 @@ MAKE_LOAD_PROC( Expr )
             tSCC zFm[] = "No formatting string for format expr";
             fprintf( stderr, zTplErr, pT->pzFileName, pMac->lineNo,
                      (pMac->res == EMIT_IF_ABSENT) ? zAb : zFm );
-	    LOAD_ABORT( pT, pMac, "definition expression" );
+            LOAD_ABORT( pT, pMac, "definition expression" );
         }
         pMac->ozText = 0;
     } else {
