@@ -1,3 +1,8 @@
+2001-08-04  Bruce Korb  <bkorb@gnu.org>
+
+	* snprintfv/snprintfv/format.c: broken ptr dereference and
+	unsigned format types are treated as signed.
+
 2001-07-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/functions.h: new - no longer generated
