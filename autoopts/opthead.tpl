@@ -1,4 +1,4 @@
-{@autogen template include $Id: opthead.tpl,v 1.3 1998/06/17 20:21:05 bkorb Exp $ @}
+{@autogen template include $Id: opthead.tpl,v 1.4 1998/06/17 20:34:32 bkorb Exp $ @}
 {@ # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." @}{@
 
@@ -239,7 +239,7 @@ _ENDIF@}
 #define    CLEAR_{@prefix _up #_ +@}OPT(n) STMTS( \
                  {@prefix _up #_ +@}DESC(n).fOptState &= ~OPTST_SET_MASK; \
                  {@prefix _up #_ +@}DESC(n).fOptState |= OPTST_INIT | AODFT_{@
-                           prefix _up #_ +@}OPT_{@name _up@}; \
+                           prefix _up #_ +@}OPT_ ## n; \
                  {@prefix _up #_ +@}DESC(n).optCookie = (void*)NULL )
 #define    STATE_{@prefix _up #_ +@}OPT(n) ({@prefix _up #_ +
                  @}DESC(n).fOptState & OPTST_SET_MASK)
