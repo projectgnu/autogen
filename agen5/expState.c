@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 3.16 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: expState.c,v 3.17 2004/02/05 04:45:30 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -187,6 +187,37 @@ SCM
 ag_scm_base_name( void )
 {
     return gh_str02scm( (char*)(void*)OPT_ARG( BASE_NAME ));
+}
+
+
+/*=gfunc chdir
+ *
+ * what:   Change current directory
+ *
+ * exparg: dir, new directory name
+ *
+ * doc:  Sets the current directory for AutoGen.  Shell commands will run
+ *       from this directory as well.  This is a wrapper around the Guile
+ *       native function.
+=*/
+SCM
+ag_scm_chdir( SCM dir )
+{
+    tSCC zChdirDir[] = "chdir directory";
+
+    scm_chdir( dir );
+
+    /*
+     *  We're still here, so we have a valid argument.
+     */
+    if (pCurDir != NULL)
+        free( pCurDir );
+    {
+        char* pz = ag_scm2zchars( dir, zChdirDir );
+        pCurDir = malloc( SCM_LENGTH( dir ) + 1 );
+        strcpy( pCurDir, pz );
+    }
+    return dir;
 }
 
 
@@ -482,11 +513,20 @@ ag_scm_suffix( void )
  *
  * what:   get the template file name
  *
+ * exparg: full_path, include full path to file, optonal
+ *
  * doc:  Returns the name of the current template file.
 =*/
 SCM
-ag_scm_tpl_file( void )
+ag_scm_tpl_file( SCM full )
 {
+    if (gh_boolean_p( full ) && SCM_NFALSEP( full )) {
+        tSCC* sfx[] = { "tpl", NULL };
+        char z[MAXPATHLEN];
+        if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx )))
+            return gh_str02scm( z );
+    }
+
     return gh_str02scm( (char*)(void*)pzTemplFileName );
 }
 

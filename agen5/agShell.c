@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.21 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: agShell.c,v 3.22 2004/02/05 04:45:29 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -111,8 +111,12 @@ serverSetup( void )
     {
         static int doneOnce = 0;
         if (doneOnce++ == 0) {
+            char* p = malloc( MAXPATHLEN );
+            if (p == NULL)
+                AG_ABEND( "cannot allocate path name" );
+
             (void)atexit( &closeServer );
-            pCurDir = getcwd( NULL, MAXPATHLEN+1 );
+            pCurDir = getcwd( p, MAXPATHLEN );
 #if defined( DEBUG_ENABLED )
             if (HAVE_OPT( SHOW_SHELL ))
                 fputs( "\nServer First Start\n", pfTrace );
@@ -157,8 +161,7 @@ serverSetup( void )
         if (pzPid == NULL)
             pzPid = zTrap + strlen( zTrap );
         sprintf( pzPid, "%d\n", getpid() );
-        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir,
-                 pzLastCmd, zShDone );
+        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );
         pz = loadData( serverPair.pfRead );
 #if defined( DEBUG_ENABLED )

@@ -1366,22 +1366,33 @@ Extraction from autogen.texi
 @node output controls
 @section Redirecting Output
 @cindex Redirecting Output
+@cindex diversion
 
-AutoGen provides a means for redirecting the template output
-to different files.  It is accomplished by providing a set of
-Scheme functions named @code{out-*} (@pxref{AutoGen Functions}).
+AutoGen provides a means for redirecting the template output to different
+files or, in @file{M4} parlance, to various diversions.  It is accomplished
+by providing a set of Scheme functions named @code{out-*}
+(@pxref{AutoGen Functions}).
 
 @table @samp
-@item out-push (@pxref{SCM out-push-new})
+@item out-push-new (@pxref{SCM out-push-new})
 This allows you to logically "push" output files onto a stack.
+If you supply a string name, then a file by that name is created
+to hold the output.  If you do not supply a name, then the text is
+written to a scratchpad and retrieved by passing a ``@code{#t}'' argument
+to the @code{out-pop} (@pxref{SCM out-pop}) function.
 
 @item out-pop (@pxref{SCM out-pop})
-This function closes the current output file and resumes
-output to the next one in the stack.
+This function closes the current output file and resumes output to the next
+one in the stack.  At least one output must have been pushed onto the output
+stack with the @code{out-push-new} (@pxref{SCM out-push-new}) function.  If
+``@code{#t}'' is passed in as an argument, then the entire contents of the
+diversion (or file) is returned.
 
 @item out-suspend (@pxref{SCM out-suspend})
-This function does not close the current output, but instead
-sets it aside for resumption with
+This function does not close the current output, but instead sets it aside
+for resumption by the given name with @code{out-resume}.  The current output
+must have been pushed on the output queue with @code{out-push-new}
+(@pxref{SCM out-push-new}).
 
 @item out-resume (@pxref{SCM out-resume})
 This will put a named file descriptor back onto the top of
@@ -1390,7 +1401,7 @@ stack so that it becomes the current output again.
 @item out-switch (@pxref{SCM out-switch})
 This closes the current output and creates a new file,
 purging any preexisting one.  This is a shortcut for "pop"
-followed by "push", but can also be done at the base level.
+followed by "push", but this can also be done at the base level.
 
 @item out-move (@pxref{SCM out-move})
 Renames the current output file without closing it.

@@ -1,5 +1,11 @@
 2004-02-02  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/agShell.c(serverSetup): do not rely on "getcwd" doing allocation
+	* agen5/expState.c(ag_scm_chdir): new wrapper for scm_chdir
+	(ag_scm_tpl_file): call "findFile()" if ``#t'' is passed in
+
+2004-02-02  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/Makefile.am(DEFINITIONS): distribute defParse.def, too.
 	* agen5/autogen.h(FMEM_IOCTL_SAVE_BUF): do not deallocate buf ioctl
 	* agen5/expOutput.c(ag_scm_out_push_new): use anonymous temp file
