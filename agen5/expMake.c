@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 3.5 2002/03/27 05:13:35 bkorb Exp $
+ *  $Id: expMake.c,v 3.6 2002/04/09 00:08:46 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -38,7 +38,7 @@
  *
  * doc:
  *  This function will take ordinary shell script text and reformat it
- *  so that it will work properly inside of a shell script.
+ *  so that it will work properly inside of a makefile shell script.
  *  Not every shell construct can be supported; the intent is to have
  *  most ordinary scripts work without much, if any, alteration.
  *
