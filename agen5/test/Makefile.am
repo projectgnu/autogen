@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   Feb 27, 2000
+## Last Modified:   $Date: 2000/09/30 15:09:43 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.20 2000/09/30 15:08:49 bkorb Exp $
+## $Id: Makefile.am,v 1.21 2000/09/30 15:09:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     Wed Mar 1 2000
+# Last Modified:     $Date: 2000/09/30 15:09:43 $
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: heredef.test,v 1.1 2000/04/06 17:11:14 bkorb Exp $
+# $Id: heredef.test,v 1.2 2000/09/30 15:09:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
