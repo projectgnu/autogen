@@ -97,27 +97,6 @@ fillen (Filament *fil)
 }
 
 /**
- * filelt:
- * @fil: The Filament being queried.
- * @n: A zero based index into @fil.
- *
- * This function looks for the @n'th element of @fil.
- *
- * Return value:
- * If @n is an index inside the Filament @fil, then the character stored
- * at that index cast to an int is returned, otherwise @n is outside
- * this range and -1 is returned.
- **/
-SNV_INLINE int
-filelt (Filament *fil, ssize_t n)
-{
-  if ((n >= 0) && (n < fil->length))
-    return (int) fil->value[n];
-  else
-    return -1;
-}
-
-/**
  * filncat:
  * @fil: The destination Filament of the concatenation.
  * @str: The address of the source bytes for concatenation.

@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.23 2004/10/02 21:40:57 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.24 2004/10/10 00:40:02 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -251,18 +251,6 @@ struct options {
     const char*       pzBugAddr;
     option_translation_proc_t* pTransProc;
 };
-
-#if defined( __STDC__ ) || defined( __cplusplus )
-
-#else
-#  ifndef void
-#    define void int
-#  endif
-
-#  ifndef const
-#    define const
-#  endif
-#endif
 
 #ifdef  __cplusplus
 extern "C" {

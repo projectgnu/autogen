@@ -6,8 +6,8 @@
 
 (dne " *  " "/*  ") =]
  *
- *  This file handles all the bookkeeping required for keeping track
- *  of all the little tiny strings used by the AutoOpts library.
+ *  This file handles all the bookkeeping required for tracking
+ *  all the little tiny strings used by the AutoOpts library.
  *  There are [= (count "utxt") =] of them.
  *
 [= (lgpl "AutoOpts" "Bruce Korb" " *  ") =]
@@ -23,7 +23,11 @@
 typedef struct {
   int       field_ct;[=
 FOR utxt =]
-  [= (sprintf "%-9s" (string-append (get "ut-type") "*"))
+  [=
+   ;; A few of these are modifiable, though most are not.  That's why
+   ;; we can't use an array
+   ;;
+   (sprintf "%-9s" (string-append (get "ut-type") "*"))
   =] utpz_[= ut-name =];[=
 ENDFOR =]
 } usage_text_t;

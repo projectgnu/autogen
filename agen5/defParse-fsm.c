@@ -458,6 +458,8 @@ dp_do_invalid(
 /*  START == INVALID == DO NOT CHANGE THIS COMMENT  */
     dp_invalid_transition( initial, trans_evt );
     yyerror( "invalid transition" );
+    /* NOTREACHED */
+    return DP_ST_INVALID;
 /*  END   == INVALID == DO NOT CHANGE THIS COMMENT  */
 }
 

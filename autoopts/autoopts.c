@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.39 2004/10/02 21:40:56 bkorb Exp $
+ *  $Id: autoopts.c,v 3.40 2004/10/10 00:40:02 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -138,7 +138,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
              *     it was not the same equivalenced-to option,
              *  THEN we have a usage problem.
              */
-            fprintf( stderr, zMultiEquiv, p->pz_Name, pOD->pz_Name,
+            fprintf( stderr, (char*)zMultiEquiv, p->pz_Name, pOD->pz_Name,
                      (pOpts->pOptDesc + p->optActualIndex)->pz_Name);
             return FAILURE;
         }
@@ -244,7 +244,7 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
          *  THEN ...
          */
         else if (  (pOD->pz_DisableName != NULL)
-                && (strneqvcmp( pzOptName, pOD->pz_DisableName, nameLen ) == 0)
+                && (strneqvcmp(pzOptName, pOD->pz_DisableName, nameLen) == 0)
                 )  {
             disable  = AG_TRUE;
 
@@ -744,10 +744,10 @@ doRegularOpts( tOptions* pOpts )
 STATIC void
 doRcFiles( tOptions* pOpts )
 {
-    int   idx;
-    int   inc = DIRECTION_PRESET;
-    tCC*  pzPath;
-    char  zFileName[ 4096 ];
+    int     idx;
+    int     inc = DIRECTION_PRESET;
+    cch_t*  pzPath;
+    char    zFileName[ 4096 ];
 
     /*
      *  Find the last RC entry (highest priority entry)

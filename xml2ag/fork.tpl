@@ -4,9 +4,6 @@
  *  This module will fire up autogen and have it read definitions
  *  from its standard-in.
  */
-#include "xmlopts.h"
-#include <fcntl.h>
-#include <sys/stat.h>
 
 static void
 addArg( char* pzArg, int ix )

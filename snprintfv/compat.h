@@ -135,6 +135,9 @@ typedef int snv_wint_t;
 #  ifndef const
 #    define const	__const
 #  endif
+#  ifndef inline
+#    define inline	__inline
+#  endif
 #  ifndef signed
 #    define signed	__signed
 #  endif

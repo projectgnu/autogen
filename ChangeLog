@@ -1,3 +1,13 @@
+2004-10-09  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defParse-fsm.c(dp_do_invalid): return invalid
+	* autoopts/autoopts.c: warning patrol
+	* autoopts/options_h.tpl: remove unneeded defines (void and const)
+	* snprintfv/compat.h: pedantic GCC requires "inline" #define
+	* snprintfv/filament.in(filelt): not used
+	* xml2ag/fork.tpl: #include-s belong in header, so:
+	* xml2ag/xmlopts.def: include them here
+
 2004-10-07  Matt Kraai  <kraai@ftbfs.org>
 
 	* configure.in(AC_TYPE_SIGNAL): deleted, not really used
