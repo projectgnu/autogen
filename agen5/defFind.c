@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 1.14 2001/05/09 05:25:59 bkorb Exp $
+ *  $Id: defFind.c,v 1.15 2001/06/22 02:43:08 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -517,7 +517,10 @@ defEntrySearch( char* pzName, tDefStack* pDefStack, ag_bool* pIsIndexed )
      */
     nestingDepth++;
     {
-        tDefStack stack = { (tDefEntry*)pE->pzValue, &currDefCtx };
+        tDefStack stack = { NULL, &currDefCtx };
+
+        stack.pDefs = (tDefEntry*)pE->pzValue;
+
         for (;;) {
             tDefEntry* res;
 
@@ -713,7 +716,10 @@ entryListSearch( char* pzName, tDefStack* pDefStack )
      */
     defList.nestLevel++;
     {
-        tDefStack stack = { (tDefEntry*)pE->pzValue, &currDefCtx };
+        tDefStack stack = { NULL, &currDefCtx };
+
+        stack.pDefs = (tDefEntry*)pE->pzValue;
+
         for (;;) {
             (void)entryListSearch( pzName, &stack );
             if (breakCh == '[')

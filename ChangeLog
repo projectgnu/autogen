@@ -1,3 +1,8 @@
+2001-06-21  Albert Chin  <china@thewrittenword.com>
+
+	* agen5/defFind.c: Separate the non-static initilization from
+	the local variable definition.  It's not ANSI.
+
 2001-06-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
 
         * agen5/Makefile.am (INCLUDES): Move guile's includes after
