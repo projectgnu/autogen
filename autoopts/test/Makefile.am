@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   Feb 27, 2000
+## Last Modified:   $Date: 2002/03/29 02:21:47 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.1 2001/12/10 01:19:35 bkorb Exp $
+## $Id: Makefile.am,v 3.2 2002/03/29 02:21:47 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS   = argument.test cond.test equiv.test errors.test guile.test \

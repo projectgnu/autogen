@@ -1,5 +1,6 @@
 #! /bin/sh
-#  -*- Mode: Shell-script -*-
+# Last Modified:     $Date: 2002/03/29 02:21:47 $
+# ident              $Id: stdopts.def,v 3.1 2002/03/29 02:21:47 bkorb Exp $
 
 #  This is the standard set of options for testing option processing
 #  It is expected to be dot
