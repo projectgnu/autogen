@@ -1,5 +1,5 @@
 {#autogen template 
-# $Id: strsignal.tpl,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+# $Id: strsignal.tpl,v 2.0 1998/09/22 22:17:26 bkorb Exp $
 h #}
 /*
 {#_eval "# *  " _DNE#}
