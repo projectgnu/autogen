@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
-#
+
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.15 1998/07/16 21:48:46 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.16 1998/07/18 05:34:58 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo

@@ -1,62 +1,4 @@
-1998-07-15  Ellen Korb <ellen@mport.com>
-	* many files
-	Cleaned up documentation a bit.
-
-1998-07-14  Bruce Korb <korbb@datadesign.com>
-
-	* autoopts/optcode.tpl
-	Moved in the declarations of the callout procedures.
-	They do not need to be exported to the world.  They should be
-	called via the pointers only.
-
-	Removed the initialization of the filler field.  It has
-	been rendered useless now.
-
-	* autoopts/opthead.tpl
-	Removed the declarations of the callout procedures.
-	Cleaned up the commentary and documentation.  Greatly.
-
-	* autoopts/usage.c
-	A couple of innocuous changes to try to avoid the shared library
-	problem with formatting output to stderr.
-
-	* autoopts/options.tpl
-	Expanded commentary on the valid use of arguments in "flag_code".
-
-	* autoopts/options.h
-	Removed a useless fill field.  Bumped the revision field.
-
-	* doc/Makefile.am
-	Added autoopts/opthead.tpl to the dependency list for
-	autogen.texi.  The opts.h header documentation is now intertwined
-	with the code to emit the file.
-
-	* doc/auto_gen.tpl
-	Added documentation of the opts.h macro usage (extracting
-	the body of it from definitions gotten from autoopts/opthead.tpl).
-
-	* doc/autogen.def
-	Added shell code for extracting definitions from autoopts/opthead.tpl).
-
-	* src/opts.def
-	Simplified the syntax of the definition for `explain'.
-
-	* src/opts.[ch]sav
-	I am retaining these because this mutual dependency is more
-	problematical than the ag*.def ones.
-
-1998-07-08  Bruce Korb <korbb@datadesign.com>
-
-	* autoopts/optcode.tpl
-	Simplified the formation of the initialization by
-	#defining variable names to (const char*)NULL when not present
-	Added pzDisablePfx, used as a special value for environment
-	variable presetting.  Not used anywhere else.
-
-	* autoopts/options.tpl
-	Reformatted the descriptions of the macros to make them
-	more human readable.  Used 'sed' to convert the text back
-	to something texinfo can use.
+1998-07-30  Bruce Korb <korbb@datadesign.com>
 
 	* autoopts/Makefile.am
 	Distribute the TODO file, too.
@@ -68,6 +10,23 @@
 	was removed.  The RC/INI files no longer need the +/- prefix
 	to the option name, either.
 
+	* autoopts/optcode.tpl
+	Moved in the declarations of the callout procedures.
+	They do not need to be exported to the world.  They should be
+	called via the pointers only.
+
+	Removed the initialization of the filler field.  It has
+	been rendered useless now.
+
+	Simplified the formation of the initialization by
+	#defining variable names to (const char*)NULL when not present
+	Added pzDisablePfx, used as a special value for environment
+	variable presetting.  Not used anywhere else.
+
+	* autoopts/opthead.tpl
+	Removed the declarations of the callout procedures.
+	Cleaned up the commentary and documentation.  Greatly.
+
 	* autoopts/options.h
 	Changed "NEGATABLE" to "DISABLEOK".
 	Added "INITENABLED".  Removed the "AODFT_*" defines.
@@ -75,15 +34,41 @@
 	Added pzDisablePfx, used as a special value for environment
 	variable presetting.  Not used anywhere else.
 
+	Removed a useless fill field.  Bumped the revision field.
+
+	* autoopts/options.tpl
+	Expanded commentary on the valid use of arguments in "flag_code".
+
+	Reformatted the descriptions of the macros to make them
+	more human readable.  Used 'sed' to convert the text back
+	to something texinfo can use.
+
 	* autoopts/save.c
 	Removed the '+' prefix for disabled options.
 	We use the prefixed long option name now.
 
 	* autoopts/usage.c
+	A couple of innocuous changes to try to avoid the shared library
+	problem with formatting output to stderr.
+
 	Print the disablement long option name, when applicable.
 
+	* doc/Makefile.am
+	Added autoopts/opthead.tpl to the dependency list for
+	autogen.texi.  The opts.h header documentation is now intertwined
+	with the code to emit the file.
+
 	* doc/auto_gen.tpl
+	Added documentation of the opts.h macro usage (extracting
+	the body of it from definitions gotten from autoopts/opthead.tpl).
+
 	Documented the options that autoopts maintains automatically.
+
+	* doc/autogen.def
+	Added shell code for extracting definitions from autoopts/opthead.tpl).
+
+	* many files
+	Cleaned up documentation a bit.
 
 	* src/agShell.c
 	Added code to print the failing command when the shell is
@@ -95,6 +80,13 @@
 	* src/escapech.c
 	The advance count should be zero when escaped new-lines are
 	encountered, too.  (a la "C" code)
+
+	* src/opts.[ch]sav
+	I am retaining these because this mutual dependency is more
+	problematical than the ag*.def ones.
+
+	* src/opts.def
+	Simplified the syntax of the definition for `explain'.
 
 	* src/tokenize.c
 	When advance count is zero, it really refers to the destination,

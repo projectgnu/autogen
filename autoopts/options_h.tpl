@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.7 1998/07/16 18:31:38 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 1.8 1998/07/18 05:34:51 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -183,21 +183,25 @@ struct argList {
     char*             apzArgs[ MIN_ARG_ALLOC_CT ];
 };
 
+/*
+ *  Descriptor structure for each option.
+ *  Only the fields marked "PUBLIC" are for public use.
+ */
 struct optDesc {
-    tCUC              optIndex;
-    tCUC              optValue;
-    tUC               optActualIndex;
-    tUC               optActualValue;
+    tCUC              optIndex;         /* PUBLIC */
+    tCUC              optValue;         /* PUBLIC */
+    tUC               optActualIndex;   /* PUBLIC */
+    tUC               optActualValue;   /* PUBLIC */
 
     tUC               optArgType;
-    tCUC              optEquivIndex;
+    tCUC              optEquivIndex;    /* PUBLIC */
     tCUC              optMinCt;
     tCUC              optMaxCt;
 
-    tUC               optOccCt;
-    tUS               fOptState;
-    char*             pzLastArg;
-    void*             optCookie;
+    tUC               optOccCt;         /* PUBLIC */
+    tUS               fOptState;        /* PUBLIC */
+    char*             pzLastArg;        /* PUBLIC */
+    void*             optCookie;        /* PUBLIC */
 
     const int *       pOptMust;
     const int *       pOptCant;
@@ -210,6 +214,10 @@ struct optDesc {
     const char*       pz_DisablePfx;
 };
 
+/*
+ *  Some options need special processing, so we store their
+ *  indexes in a known place:
+ */
 typedef struct specOptIndex tSpecOptIndex;
 struct specOptIndex {
     tUC               more_help;

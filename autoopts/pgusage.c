@@ -1,6 +1,6 @@
 
 /*
- *  $Id: pgusage.c,v 1.2 1998/07/16 18:31:43 bkorb Exp $
+ *  $Id: pgusage.c,v 1.3 1998/07/18 05:34:56 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -58,6 +58,10 @@
 
 #include "autoopts.h"
 
+/*
+ *  Run the usage output through a pager.
+ *  This is very handy if it is very long.
+ */
     void
 doPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {

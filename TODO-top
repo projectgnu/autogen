@@ -25,7 +25,7 @@
   works from the current source tree, rather than a tree built from the
   distribution tarball... this should be fixed.
 
-#  Possibilities for the future:
+#  Possibilities for the (distant) future:
 
 * implement _FOR x IN a, b, c, ...
 * rewrite in guile (instead of C)

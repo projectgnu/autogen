@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.7 1998/07/16 18:31:42 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.8 1998/07/18 05:34:55 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -54,6 +54,9 @@
 #include "autoopts.h"
 
 #ifndef HAVE_PATHFIND
+/*
+ *  The pathfind() routine either does not work or is not SVR4
+ */
 #  include <compat/pathfind.c>
 #endif
 

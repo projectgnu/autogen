@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.5 1998/07/16 18:31:40 bkorb Exp $
+ *  $Id: autoopts.c,v 1.6 1998/07/18 05:34:54 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -50,6 +50,7 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
+
 #define __EXTENSIONS__
 #include <sys/types.h>
 #include <sys/param.h>
@@ -70,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.5 1998/07/16 18:31:40 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.6 1998/07/18 05:34:54 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";

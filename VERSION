@@ -5,7 +5,7 @@
 #
 # Copyright (C) 1998 Bruce Korb
 #
-# Last Modified:  $Date: 1998/07/14 19:19:22 $
+# Last Modified:  $Date: 1998/07/18 05:34:44 $
 # Author:         Bruce Korb <korbb@datadesign.com>
 # Maintainer:     Bruce Korb <korbb@datadesign.com>
 #          by:    Bruce Korb <korbb@datadesign.com>
@@ -20,10 +20,12 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 MAINTAINER='Bruce Korb <korbb@datadesign.com>'
 
 # For automake
+#
 VERSION=$AG_VERSION
 PACKAGE=autogen
 
 # For my sanity!
+#
 echo "configuring $PACKAGE $VERSION"
 
 # VERSION ends here

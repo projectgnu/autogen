@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 1.2 1998/07/16 18:31:37 bkorb Exp $
+ *  $Id: putshell.c,v 1.3 1998/07/18 05:34:50 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -71,6 +71,7 @@ putQuotedStr( char* pzStr )
         pzStr = pz+1;
     }
 }
+
 
     void
 putBourneShell( tOptions* pOpts )
