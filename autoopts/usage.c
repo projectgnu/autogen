@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.12 2000/10/20 00:03:29 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.13 2000/10/20 02:46:37 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -142,7 +142,7 @@ DEF_PROC_2( , void, optionUsage,
      *  Doc options are emitted only if the exitCode is SUCCESS.
      */
     if (  (exitCode != EXIT_SUCCESS)
-       || ((pOptions->pOptDesc & OPTST_DOCUMENT) != 0) )
+       || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) != 0) )
 
         fputs( pOptTitle, fp );
 
