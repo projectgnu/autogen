@@ -59,11 +59,11 @@ AutoGen ${i} opts.def
 AutoGen -L ../autoopts ${DEBUG_OPTS} opts.def
 date > stamp-opts
 
-getdefs AutoGen=autogen base-name=directive template=directive defDirect.c
+getdefs AutoGen=AutoGen base-name=directive template=directive defDirect.c
 date > stamp-directive
 
-getdefs AutoGen=autogen base-name=functions template=functions \
-		defs=macfunc func*.c
+getdefs AutoGen=AutoGen base-name=functions template=functions \
+        defs=macfunc linenum srcfile filelist func*.c
 date > stamp-functions
 
 getdefs assign=group=ag defs=gfunc templ=snarf out=expr.def \
