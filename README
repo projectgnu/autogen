@@ -18,21 +18,11 @@ Mailing lists can be found on SourceForge:
 
     autogen-users@lists.sourceforge.net
 
-
 AutoGen requires:
-1.  POSIX regular expression library
-    Use the --with-regex-prefix and --with-regex-lib, or
-    the --with-included-regex  options to autoconf if
-    it cannot otherwise locate a suitable library.
+1.  POSIX regular expression library.  If not available by default, use
+    the --with-regex-* options to specify how to find, use and link to it.
 2.  an ANSI C compiler
 3.  The Guile version of a Scheme processing language.
-
-Note to SCO/OS5 users:
-	This product uses libtool.  It apparently behaves incorrectly
-	in the presence of gcc and consequently needs to use /bin/cc.
-	Configure this program with:
-
-		CC=/bin/cc ./configure
 
 Installation note:
 AutoGen does *NOT* contain any compiled-in configuration information.
