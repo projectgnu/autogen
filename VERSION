@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Copyright (C) 1999, 2002 Bruce Korb
+# Copyright (C) 1999-2002 Bruce Korb
 #
 # Time-stamp:        "2002-06-13 19:06:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
@@ -14,7 +14,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=3
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".8"
+AG_PATCHLEVEL=".9pre1"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -30,9 +30,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=14
+AO_CURRENT=15
 AO_REVISION=0
-AO_AGE=5
+AO_AGE=6
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0

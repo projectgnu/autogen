@@ -1,3 +1,9 @@
+2002-06-20  Bruce Korb  <bkorb@gnu.org>
+
+	* columns/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+	* getdefs/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+	* xml2ag/Makefile.am(doc-stamp): dependency on exe needs $(EXEEXT)
+
 2002-06-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fsm-macro.tpl(suffix): put it all in Scheme

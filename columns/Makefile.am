@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Jul 29 13:40:42 1999				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.2 2002/02/23 01:57:47 bkorb Exp $
+## $Id: Makefile.am,v 3.3 2002/06/20 22:05:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -36,7 +36,7 @@ all : gen
 
 columns.1 columns.menu columns.texi : gen-stamp
 
-gen-stamp : opts.def columns
+gen-stamp : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -Taginfo -bcolumns -DLEVEL=section \
 		$(top_srcdir)/columns/opts.def

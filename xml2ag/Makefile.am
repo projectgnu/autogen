@@ -9,7 +9,7 @@
 ## Created:	        Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 2002/06/13 02:00:40 bkorb Exp $
+## $Id: Makefile.am,v 1.6 2002/06/20 22:05:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -42,7 +42,7 @@ fork.c : fork.tpl xmlopts.def
 
 $(DOCFILES) : doc-stamp
 
-doc-stamp : xmlopts.def $(TARG)
+doc-stamp : xmlopts.def $(TARG)$(EXEEXT)
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -L$(top_srcdir)/autoopts -Taginfo -b$(TARG) -DLEVEL=section \
 		$(top_srcdir)/$(TARG)/xmlopts.def

@@ -9,7 +9,7 @@
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.7 2002/06/13 02:00:40 bkorb Exp $
+## $Id: Makefile.am,v 3.8 2002/06/20 22:05:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = getdefs
@@ -38,7 +38,7 @@ opts.h : opts.def
 
 $(DOCFILES) : doc-stamp
 
-doc-stamp : opts.def getdefs
+doc-stamp : opts.def getdefs$(EXEEXT)
 	top_builddir=$(top_builddir) \
 	$(AGEXE) -Taginfo -bgetdefs -DLEVEL=section \
 		$(top_srcdir)/getdefs/opts.def

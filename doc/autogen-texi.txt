@@ -2153,7 +2153,7 @@ cc -o checkopt.o -I$prefix/include -c checkopt.c
 @noindent
 and link @file{checkopt.o} with the rest of your program.
 The main program causes the options to be processed
-by calling @code{optionProcess}:
+by calling @code{optionProcess} (@pxref{libopts-optionProcess}):
 
 @example
 main( int argc, char** argv )
