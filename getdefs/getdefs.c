@@ -1,17 +1,18 @@
 /*
- *  $Id: getdefs.c,v 3.0 2001/12/09 19:46:06 bkorb Exp $
+ *  $Id: getdefs.c,v 3.1 2001/12/10 03:57:16 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
- *  Last Modified:     $Date: 2001/12/09 19:46:06 $
+ *  Last Modified:     $Date: 2001/12/10 03:57:16 $
  *            by:      Bruce Korb <bkorb@gnu.org>
  */
 
 #define DEFINE
 #include "getdefs.h"
+#include "proto.h"
 
 tSCC zBogusDef[] = "Bogus definition:\n%s\n";
 
