@@ -1,0 +1,207 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# string.test --- test string formation rules
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: string.test,v 1.1 2000/03/26 18:53:55 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+#  There are five different things we need to examine:
+#
+#  1.  That the autogen internal string.
+#  2.  What we expect that string to contain.
+#  3.  What is generated as the "C" representation
+#  4.  What is generated for raw shell strings
+#  5.  What is generated for "cooked" shell strings
+#
+#  We will compare all these things by generating a C program that
+#  will test the various strings and a shell script to invoke the
+#  program with the two shell string formats for arguments.
+#  The program will also write out the expected string value.
+#  That value will be compared with what autogen wrote out
+#  as its internal value.
+#
+#  All this stuff must be generated carefully.
+#  Specifically, the '${testname}' expressions need to
+#  be expanded in certain parts of the output file.
+#  In those areas, the eof marker must *not* be quoted.
+#  In other places (e.g., where defining the strings),
+#  rather than hassle with understanding shell quoting rules,
+#  instead we *will* quote the EOF marker to avoid
+#  any shell interpretation at all!!
+#
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+[= AutoGen5 Template test =]
+[=
+
+CASE (suffix)  =][=
+
+  ==  c
+
+=]#include <stdio.h>
+#include <string.h>
+
+#ifndef STDOUT_FILENO
+#  define STDOUT_FILENO 1
+#endif[=
+
+
+  ;;  Create a file containing nothing but the
+  ;;  autogen internal contents of the string
+  ;;
+  (out-push-new ${testname}.raw)
+
+  =][=string=][=
+
+  (out-pop)
+
+=]
+
+char zTestFile[] = "${testname}.raw";
+_EOF_
+
+cat >> ${testname}.tpl <<'_EOF_'
+char zGened[]  = [=(c-string  (get "string"))=];
+char zKrGen[]  = [=(kr-string (get "string"))=];
+char zExpect[] = "'\f\r\b\v\t\a\n\n"
+       "\\f\\r\\b\\v\\t\\a\\n\n"
+       "\"Wow!\"  This'll be \\hard\\'\n"
+       "#endif /* .\n"
+       "and it'll be a \"hassle\"."
+       "\001\002\003\377\n'";
+
+
+int checkStr( char* pz, char* pzWhat )
+{
+    static const char zNotMatch[] =
+        "%s generated string did not match expected string\n"
+        "Expected string:\n%s\n\n"
+        "Generated string:\n%s\n\n";
+
+    if (strcmp( zExpect, pz ) != 0) {
+        fprintf( stderr, zNotMatch, pzWhat, zExpect, pz);
+        return 1;
+    }
+    return 0;
+}
+
+
+int main( int argc, char** argv )
+{
+    int  resCode = 0;
+
+    /*
+     *  Write out the expected value to a file.
+     *  The "cmp" program will compare it with the
+     *  internal version autogen wrote out itself.
+     */
+    write( STDOUT_FILENO, zExpect, sizeof( zExpect )-1);
+    close( STDOUT_FILENO );
+
+    if (sizeof( zGened ) != sizeof( zExpect )) {
+        fputs( "Expected and generated string sizes do not match.\n",
+               stderr );
+        resCode = 1;
+    }
+
+    if (strlen( zGened ) != sizeof( zGened )-1) {
+        fputs( "The generated string contains a NUL.\n", stderr );
+        resCode++;
+    }
+
+    if (checkStr( zGened,  "'C' program" ))
+        resCode++;
+
+    if (checkStr( zKrGen,  "K&R 'C' program" ))
+        resCode++;
+
+    if (checkStr( argv[1], "Raw shell" ))
+        resCode++;
+
+    if (checkStr( argv[2], "Cooked shell" ))
+        resCode++;
+
+    return resCode;
+}[=
+
+  == sh
+
+=]#! /bin/sh
+
+./${testname} [=(raw-shell-str (get "string"))
+           =] [=(shell-str (get "string"))=] > ${testname}.out
+res=\$?
+cmp ${testname}.out ${testname}.raw > /dev/null 2>&1
+
+if [ \$? -ne 0 ]
+then
+  echo the AutoGen internal content did not match expectations
+  res=\`expr \$res + 1\`
+fi
+if [ \$res -eq 0 ]
+then
+  echo All string comparisons pass
+else
+  echo There were \$res string test failures
+  exit $res
+fi[=
+
+ESAC
+
+=]
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+cat > $testname.def <<_EOF_
+autogen definitions $testname;
+
+string =
+    "'\f\r\b\v\t\a\n
+"
+    '\f\r\b\v\t\a\n
+'
+    '"Wow!"  This\'ll be \\hard\\\'
+\#endif /* .
+'
+    "and it'll be a \"hassle\"."
+    "\001\002\003\377\n'";
+
+_EOF_
+
+# # # # # # # # # # RUN THE TESTS # # # # # # # # # # #
+
+CC=${CC-cc}
+SHELL=${SHELL-/bin/sh}
+
+echo $AGEN $testname.def
+$AGEN $testname.def || failure $AGEN failed
+
+${CC-gcc} -o ${testname} ${testname}.c || \
+    failure cannot compile generated ${testname}.c 
+
+chmod +x *.sh
+
+./${testname}.sh || failure strings do not match
+
+cleanup
+# end of string.test
