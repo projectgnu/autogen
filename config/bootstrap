@@ -6,10 +6,10 @@
 # Author:            Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Maintainer:        Gary V. Vaughan <gary@oranda.demon.co.uk>
 # Created:           Thu Apr  9 00:40:23 1998
-# Last Modified:     Mon Aug 30 10:34:32 1999				      
+# Last Modified:     Mon Aug 30 11:11:28 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 1.21 1999/08/30 17:34:47 bkorb Exp $
+# @(#) $Id: bootstrap,v 1.22 1999/08/30 18:11:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Commentary:
@@ -48,6 +48,11 @@ DIE=0
 # Figure out the absolute path to the working directory.
 wd=`echo $0|sed 's,/[^/]*$,,'`
 test -z "$wd" && wd=.
+
+# Search for a configure.in
+for srcdir in $wd $wd/.. .. .; do
+    test -f $srcdir/configure.in && break
+done
  
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
@@ -55,11 +60,6 @@ test -z "$wd" && wd=.
 # to be called before the main script, or afterwards.
 BOOTSTRAP=pre
 test -f $wd/bootstrap.local && . $wd/bootstrap.local
-
-# Search for a configure.in
-for srcdir in $wd $wd/.. .. .; do
-    test -f $srcdir/configure.in && break
-done
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
