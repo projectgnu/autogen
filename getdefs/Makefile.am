@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2004 Bruce Korb
 ##
-## Time-stamp:      "2004-02-05 20:38:07 bkorb"
+## Time-stamp:      "2004-02-20 10:52:06 bkorb"
 ## Copyright (c):   1997-2004 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.14 2004/02/14 22:12:45 bkorb Exp $
+## $Id: Makefile.am,v 3.15 2004/02/20 20:18:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -31,7 +31,7 @@ MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_getdefs_SOURCES) *-stamp
 INCLUDES        = @INCLIST@
 AG_ENV          = top_builddir=$(top_builddir) \
-  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`/columns:$$PATH ; \
+  top_srcdir=$(top_srcdir) PATH=`cd ../columns >/dev/null && pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 COLUMNS_EXE     = $(top_builddir)/columns/columns$(EXEEXT)
 

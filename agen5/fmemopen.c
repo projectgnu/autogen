@@ -2,7 +2,7 @@
  * Copyright (c) 2004
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2004-02-14 19:25:42 bkorb"
+ * Time-stamp:      "2004-02-20 09:15:57 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -67,20 +67,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__linux)
+#if defined(HAVE_FOPENCOOKIE)
 #  include <libio.h>
    typedef _IO_off64_t  fmem_off_t;
    typedef int          seek_pos_t;
 
-#elif defined(__bsd)
-#  include "local.h"
+#elif defined(HAVE_FUNOPEN)
    typedef size_t  fmem_off_t;
    typedef fpos_t  seek_pos_t;
 
-   typedef int     (cookie_close_function_t)(void *);
    typedef int     (cookie_read_function_t )(void *, char *, int);
-   typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
    typedef int     (cookie_write_function_t)(void *, const char *, int);
+   typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
+   typedef int     (cookie_close_function_t)(void *);
 
 #else
 #  error  OOPS
@@ -561,7 +560,7 @@ fmemopen(void *buf, size_t len, const char *pMode)
                         (cookie_seek_function_t* )fmem_seek,
                         (cookie_close_function_t*)fmem_close );
 #else
-#       error We have neither fopencookie(3GNU) nor funopen(3BSD)
+#       include "We have neither fopencookie(3GNU) nor funopen(3BSD)"
 #endif
     }
 }

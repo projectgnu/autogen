@@ -1,13 +1,13 @@
 #! /bin/ksh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# Time-stamp:        "2003-02-15 16:33:35 bkorb"
+# Time-stamp:        "2004-02-20 12:15:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 3.8 2003/12/03 02:45:08 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 3.9 2004/02/20 20:18:49 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;
@@ -21,25 +21,11 @@ then
   exit 1
 fi
 
-cd || exit 1
-[ -d tmp ] || mkdir tmp || exit 1
-cd tmp || exit 1
-
-cfgfile=`pwd`/config$$.tmp
-exec 5> ${cfgfile}
-
-tmpag=`pwd`/ag$$
-
-if test -f ${tmpag} || test -d ${tmpag}
-then rm -rf ${tmpag} || exit 1 ; fi
-
-mkdir ${tmpag} || exit 1
+tmpag=`mktemp -d $HOME/tmp/ZZXXXXXX.d`
 cd ${tmpag} || exit 1
-
-( cd ${sd}
-  tar cf - `find * -type f | \
-  egrep -v '(CVS/|\.cvsignore)'`
-) | tar -xvf -
+cfgfile=`cd .. >/dev/null && pwd`/config$$.tmp
+exec 5> ${cfgfile}
+cp -frp ${sd}/* .
 
 find * -type f | xargs chmod u+w
 find * -type d | xargs chmod 755
@@ -56,12 +42,13 @@ GENLIST=''
 for f in `find * -type f | sort`
 do
   case "$f" in
-  */stamp*  | \
-  configure | \
-  *.in      | \
-  *~        | \
-  aclocal*  | \
-  autom4*  ) : ;;
+  */stamp*    | \
+  configure   | \
+  config*.tmp | \
+  *.in        | \
+  *~          | \
+  aclocal*    | \
+  autom4*     ) : ;;
   * )
     [ -f ${sd}/${f} ] || GENLIST="${GENLIST}${f}${nl}"
     ;;

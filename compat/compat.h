@@ -3,12 +3,12 @@
 /* --- fake the preprocessor into handlng portability */
 
 /*
- *  Time-stamp:      "2003-12-27 06:39:01 bkorb"
+ *  Time-stamp:      "2004-02-20 09:37:03 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 3.6 2003/12/27 15:06:40 bkorb Exp $
+ * $Id: compat.h,v 3.7 2004/02/20 20:18:49 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -52,7 +52,7 @@
 #endif
 
 #ifndef HAVE_STRSIGNAL
-   const char * strsignal( int signo );
+   char * strsignal( int signo );
 #else
 #  define  _GNU_SOURCE /* for strsignal in GNU's libc */
 #  define  __USE_GNU   /* exact same thing as above   */
@@ -222,18 +222,18 @@
 #  define NULL 0
 #endif
 
-#ifndef FOPEN_BINARY_FLAG
-#  ifdef USE_FOPEN_BINARY
+#ifdef USE_FOPEN_BINARY
+#  ifndef FOPEN_BINARY_FLAG
 #    define FOPEN_BINARY_FLAG   "b"
-#  else
+#  endif
+#  ifndef FOPEN_TEXT_FLAG
+#    define FOPEN_TEXT_FLAG     "t"
+#  endif
+#else
+#  ifndef FOPEN_BINARY_FLAG
 #    define FOPEN_BINARY_FLAG
 #  endif
-#endif
-
-#ifndef FOPEN_TEXT_FLAG
-#  ifdef USE_TEXT_BINARY
-#    define FOPEN_TEXT_FLAG     "t"
-#  else
+#  ifndef FOPEN_TEXT_FLAG
 #    define FOPEN_TEXT_FLAG
 #  endif
 #endif
