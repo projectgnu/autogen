@@ -1,0 +1,87 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# vers.test ---  test vers program attribute
+#                    make sure that when it is not specified
+#                    then option processing consumes all args.
+#
+# Author:            Bruce Korb <autogen@linuxbox.com>
+# Maintainer:        Bruce Korb <autogen@linuxbox.com>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <autogen@linuxbox.com>			      
+#
+# $Id: vers.test,v 1.1 2000/03/12 01:45:07 bruce Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+. ${stdopts} option second
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+echo creating $testname.hlp
+cat > $testname.hlp <<'_EOF_'
+test_vers - Test AutoOpts for vers
+USAGE:  vers [-<flag> [<val>]]... 
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s no  second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+./$testname -v 2> /dev/null && \
+  failure $testname should not accept version option
+
+ver="`echo '$Revision: 1.1 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+echo "version = '$ver';" >> $testname.def
+
+echo $AGEN $testname.def
+$AGEN $testname.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+./$testname -v 2> /dev/null || \
+  failure "$testname '*SHOULD*' not accept version option"
+
+echo recreating $testname.hlp
+cat > $testname.hlp <<_EOF_
+test_vers - Test AutoOpts for vers - Ver. $ver
+USAGE:  vers [-<flag> [<val>]]... 
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s no  second         The second option descrip
+   -v opt version        Output version information and exit
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s $testname.h*lp || \
+  failure help output mismatch
+
+cleanup
+# end of vers.test
