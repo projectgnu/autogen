@@ -1,0 +1,65 @@
+#! /bin/sh
+
+[ -z "$1" ] && {
+  sh $0 help
+  exit 1
+}
+
+exec >&2
+
+if [ "X$1" = "Xold" ]
+then
+  shift
+  message='**ERROR**:  ``'$1"'' is too out-of-date to bootstrap AutoGen"
+else
+  message='**ERROR**:  You must have ``'$1"'' installed to bootstrap AutoGen."
+fi
+message="$message
+You must either download the AutoGen distribution package or
+get the up-to-date "'``'$1"'' package from:"
+
+case "$1" in
+autogen )
+  echo "$message"
+  echo "    ${2-http://download.sourceforge.net/AutoGen/}"
+  ;;
+
+autoconf )
+  echo "$message"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/autoconf/}"
+  ;;
+
+autoheader )
+  echo "$message"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/autoconf/}"
+  ;;
+
+libtoolize )
+  echo "$message"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/libtool/}"
+  ;;
+
+automake )
+  echo "$message"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/automake/}"
+  ;;
+
+aclocal )
+  echo "$message"
+  echo "    ${2-ftp://ftp.gnu.org/gnu/automake/}"
+  ;;
+
+help )
+  echo '``missing'"''" is used to issue a message and workaround information
+  echo for missing development tools.  The tools missing knows about are:
+  echo "   " `egrep '^[a-z0-9_-]* *\)' $0 | sed -e 's/ .*//' -e /^help/d `
+  exit 0
+  ;;
+
+* )
+  echo "$message"
+  ;;
+
+esac
+
+exit 1
