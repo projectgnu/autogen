@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.13 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.14 2000/09/29 03:19:13 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -255,6 +255,9 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
 
         if (deallocAddr != NULL)
             AGFREE( deallocAddr );
+
+        if (pzFound == NULL)
+            return FAILURE;
 
         strcpy( pzFullName, pzFound );
         return SUCCESS;
