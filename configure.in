@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Wed Aug  4 09:52:09 1999				      
 dnl            by:    Bruce Korb <autogen@linuxbox.com>			      
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.31 2000/03/11 23:21:22 bruce Exp $
+dnl Code: $Id: configure.in,v 2.32 2000/03/19 00:55:28 bruce Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(agen5/autogen.c)
@@ -22,7 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.31 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.32 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -32,9 +32,12 @@ AC_SUBST(AG_MAJOR_VERSION)
 AC_SUBST(AG_MINOR_VERSION)
 AC_SUBST(AO_VERSION)
 AC_SUBST(AO_REVISION)
-AC_DEFINE_UNQUOTED(AO_CURRENT,$AO_CURRENT,[Define this to the autoopts current number])
-AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,[Define this to the autoopts age number])
-AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,[Define this to the autoopts revision number])
+AC_DEFINE_UNQUOTED(AO_VERSION,$AO_VERSION,
+                   [Define this to the autoopts current number])
+AC_DEFINE_UNQUOTED(AO_REVISION,$AO_REVISION,
+                   [Define this to the autoopts revision number])
+AC_DEFINE_UNQUOTED(AO_PATCHLEVEL,$AO_PATCHLEVEL,
+                   [Define this to the autoopts patch level])
 
 # ----------------------------------------------------------------------
 # Set up the environment to configure the snprintv subpackage using
