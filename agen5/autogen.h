@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.32 2004/07/22 02:48:10 bkorb Exp $
+ *  $Id: autogen.h,v 3.33 2004/07/31 18:51:31 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -27,8 +27,8 @@
 #ifndef AUTOGEN_HDR_H
 #define AUTOGEN_HDR_H
 
-#include "compat/compat.h"
 #include "config.h"
+#include "compat/compat.h"
 
 #if defined(HAVE_FOPENCOOKIE) || defined(HAVE_FUNOPEN)
 #  define ENABLE_FMEMOPEN
@@ -40,16 +40,6 @@
 #include "opts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
-#ifdef SOME_OTHER_TIME
-typedef union printf_arg ag_printf_arg_u_t;
-#else
-typedef union {
-    unsigned char pa_char;
-    unsigned int  pa_u_int;
-    unsigned long pa_u_long_int;
-    const char*   pa_string;
-} ag_printf_arg_u_t;
-#endif
 
 #ifndef STR
 #  define _STR(s) #s
@@ -363,6 +353,13 @@ MODE tDefCtx     currDefCtx       VALUE( { NULL } );
 MODE tDefCtx     rootDefCtx       VALUE( { NULL } );
 MODE tTemplate*  pCurTemplate     VALUE( NULL );
 MODE tCC*        pzLastScheme     VALUE( NULL );
+#ifdef DAEMON_ENABLED
+/*
+ *  When operating as a daemon, autogen can be told to reload
+ *  its options the next time it wakes up (send it a SIGHUP).
+ */
+MODE ag_bool     redoOptions      VALUE( AG_TRUE );
+#endif
 
 /*
  *  Current Macro

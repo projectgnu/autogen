@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.26 2004/02/15 02:42:36 bkorb Exp $
+ *   $Id: opts.def,v 3.27 2004/07/31 18:51:31 bkorb Exp $
  *
  *  AutoGen copyright 1992-2004 Bruce Korb
  *
@@ -135,7 +135,7 @@ flag = {
     arg_name  = tpl-file;
     descrip   = "Override template file";
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     doc =
     "Definition files specify the standard template that is to be expanded.\n"
     "This option will override that name and expand a different template.";
@@ -178,7 +178,7 @@ flag = {
     arg_name  = name;
     descrip   = "Base name for output file(s)";
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     doc =
     "A template may specify the exact name of the output file.  Normally,\n"
     "it does not.  Instead, the name is composed of the base name of the\n"
@@ -200,8 +200,9 @@ flag = {
     descrip   = "Definitions input file";
 #ifndef XML2AG
     disable   = no;
-    no_preset;
+    no-preset;
     enabled;
+    settable;
     doc =
     "Use this argument to specify the input definitions file with a\n"
     "command line option.  If you do not specify this option, then\n"
@@ -333,7 +334,7 @@ flag = {
     max        = NOLIMIT;
     stack_arg;
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     doc =
     "Occasionally, it may not be desirable to produce all of the output\n"
     "files specified in the template.  (For example, only the @file{.h}\n"
@@ -353,7 +354,7 @@ flag = {
     descrip    = "specify this output suffix";
     max        = NOLIMIT;
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     doc = <<-	_EOF_
 	If you wish to override the suffix specifications in the template,
 	you can use one or more copies of this option.  See the suffix
@@ -428,7 +429,7 @@ flag = {
     disable    = not;
 #ifndef XML2AG
     settable;
-    no_preset;
+    no-preset;
     doc = "This option will leave output files writable."
           "Normally, output files are read-only.";
 #else
@@ -560,7 +561,7 @@ flag = {
     name        = show_defs;
     descrip     = "Show the definition tree";
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     ifdef       = DEBUG_ENABLED;
     doc =
     "This will print out the complete definition tree before processing\n"
@@ -574,12 +575,35 @@ flag = {
     name        = show_shell;
     descrip     = "Show shell commands";
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     ifdef       = DEBUG_ENABLED;
-    doc =
-    "This will cause @code{set -x} to be executed in the shell, with\n"
-    "the resultant output printed to /dev/tty.  This option will have no\n"
-    "effect if @samp{--disable-shell} was specified at configure time.";
+    doc = <<-  _EODoc_
+	This will cause @code{set -x} to be executed in the shell, with
+	the resultant output printed to /dev/tty.  This option will have no
+	effect if @samp{--disable-shell} was specified at configure time.
+	_EODoc_;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+flag = {
+    name        = daemon;
+    value       = d;
+    arg_type    = string;
+    arg_name    = connect-type;
+    descrip     = "TCP port or fattach file name";
+#ifndef XML2AG
+    ifdef       = DAEMON_ENABLED;
+    no-preset;
+    flag-code   = '    SET_OPT_DEFINITIONS("-");';
+    doc = <<-  _EODoc_
+	If you wish to be able to run AutoGen as a daemon process, specify this
+	option.  The resulting daemon will be able to receive requests on either
+	a socket or over a named pipe (fattach-ed to a file).  A number is
+	presumed to be a port number; anything else should be a file name.
+	The "fattach(2)" call must function properly.
+	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -589,9 +613,10 @@ flag = {
 flag = {
     name        = doc_control;
     documentation;
-    descrip =
-'These options can be used to control what gets processed
-in the definitions files and template files.';
+    descrip = <<-  _EODoc_
+	These options can be used to control what gets processed
+	in the definitions files and template files.
+	_EODoc_;
 };
 #endif
 
@@ -606,29 +631,31 @@ flag = {
     stack_arg;
 #ifndef XML2AG
     settable;
-    doc =
-    "The AutoGen define names are used for the following purposes:\n\n"
-    "@enumerate\n"
-    "@item\n"
-    "Sections of the AutoGen definitions may be enabled or disabled\n"
-    "by using C-style #ifdef and #ifndef directives.\n"
-    "@item\n"
-    "When defining a value for a name, you may specify the index\n"
-    "for a particular value.  That index may be a literal value,\n"
-    "a define option or a value #define-d in the definitions themselves.\n"
-    "@item\n"
-    "The name of a file may be prefixed with @code{$NAME/}.\n"
-    "The @code{$NAME} part of the name string will be replaced with\n"
-    "the define-d value for @code{NAME}.\n"
-    "@item\n"
-    "When AutoGen is finished loading the definitions, the defined values\n"
-    "are exported to the environment with, @code{putenv(3)}.\n"
-    "These values can then be used in shell scripts with @code{$@{NAME@}}\n"
-    "references and in templates with @code{(getenv \"NAME\")}.\n"
-    "@item\n"
-    "While processing a template, you may specify an index to retrieve\n"
-    "a specific value.  That index may also be a define-d value.\n"
-    "@end enumerate\n";
+    doc = <<-  _EODoc_
+	The AutoGen define names are used for the following purposes:
+
+	@enumerate
+	@item
+	Sections of the AutoGen definitions may be enabled or disabled
+	by using C-style #ifdef and #ifndef directives.
+	@item
+	When defining a value for a name, you may specify the index
+	for a particular value.  That index may be a literal value,
+	a define option or a value #define-d in the definitions themselves.
+	@item
+	The name of a file may be prefixed with @code{$NAME/}.
+	The @code{$NAME} part of the name string will be replaced with
+	the define-d value for @code{NAME}.
+	@item
+	When AutoGen is finished loading the definitions, the defined values
+	are exported to the environment with, @code{putenv(3)}.
+	These values can then be used in shell scripts with @code{$@{NAME@}}
+	references and in templates with @code{(getenv "NAME")}.
+	@item
+	While processing a template, you may specify an index to retrieve
+	a specific value.  That index may also be a define-d value.
+	@end enumerate
+	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -644,7 +671,7 @@ flag = {
     equivalence = define;
     stack_arg;
 #ifndef XML2AG
-    no_preset;
+    no-preset;
     settable;
     doc =
     "Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing\n"
@@ -667,8 +694,8 @@ that contain repetitive text with varied substitutions.
 See the info documentation for details.';
 
 prog_man_descrip =<<-  _END_MAN_DESCRIP
-	\fBAutoGen\fP is a tool designed for generating program files that contain
-	repetitive text with varied substitutions.  Its goal is to simplify the
+	\fBAutoGen\fP is designed for generating program files that contain
+	repetitive text with varied substitutions.  The goal is to simplify the
 	maintenance of programs that contain large amounts of repetitious text.
 	This is especially valuable if there are several blocks of such text
 	that must be kept synchronized.
@@ -696,11 +723,11 @@ Info system documentation.
 .ti +4
 autogen -T man.tpl --base-name=autogen opts.def
 .sp
-This command produced this man page from the AutoGen
-option definition file.  It overrides the template
-specified in \fIopts.def\fP (normally \fIoptions.tpl\fP)
-and uses \fIman.tpl\fP.  It also overrides the \fBbase-name\fP of
-the output file, which is normally derived from the input
+
+This command produced this man page from the AutoGen option definition file.
+It overrides the template specified in \fIopts.def\fP (normally
+\fIoptions.tpl\fP) and uses \fIman.tpl\fP.  It also overrides the
+\fBbase-name\fP of the output file, which is normally derived from the input
 definition file name (viz. \fIopts\fP).';
 
 #endif /* XML2AG */

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-04-02 11:19:31 bkorb"
+## Time-stamp:      "2004-07-30 20:51:38 bkorb"
 ## Copyright (c):   1992-2004 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.34 2004/04/03 17:18:57 bkorb Exp $
+## $Id: Makefile.am,v 3.35 2004/07/31 18:51:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -35,15 +35,18 @@ MAINTAINERCLEANFILES = Makefile.in $(GEN_SRC)
 bin_PROGRAMS    = autogen
 
 csrc = \
-  autogen.c   agCgi.c       agShell.c    agUtils.c     defParse-fsm.h \
-  autogen.h   defDirect.c   defFind.c    defLoad.c     defParse-fsm.c \
-  defLex.c    expExtract.c  expFormat.c  expGperf.c    expString.c    \
-  expGuile.c  expMake.c     expOutput.c  expPrint.c    expState.c \
-  fmemopen.c  funcCase.c    funcDef.c    funcEval.c    funcFor.c  \
-  funcIf.c    functions.c   functions.h  loadPseudo.c  tpLoad.c   \
-  tpParse.c   tpProcess.c   cgi-fsm.c    cgi-fsm.h     opts.c
+    autogen.c   agCgi.c     agInit.c       agShell.c  cgi-fsm.c    \
+    defDirect.c agUtils.c   defParse-fsm.c defLex.c   defLoad.c    \
+    defFind.c   expFormat.c expGperf.c     expGuile.c expExtract.c \
+    expOutput.c expPrint.c  expState.c     expMake.c  fmemopen.c   \
+    funcCase.c  funcDef.c   expString.c    funcFor.c  funcIf.c     \
+    functions.c funcEval.c  loadPseudo.c   opts.c     tpLoad.c     \
+    tpProcess.c tpParse.c
 
-EXTRA_DIST = $(csrc) $(DEFINITIONS) $(TEMPLATES) bootstrap.dir schemedef.scm
+hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
+
+EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
+             bootstrap.dir schemedef.scm
 
 nodist_autogen_SOURCES = ag.c
 autogen_SOURCES = $(GEN_CSRC)
@@ -60,11 +63,9 @@ AM_YFLAGS = -d
 
 all : @AGEXE@
 
-ag.c : $(csrc)
+ag.c : $(csrc) $(hsrc)
 	( echo '#define DEFINING' ; echo '#include "autogen.h"' ; \
-	for f in $(csrc) ; do case "$$f" in \
-	  *.c ) echo "#include \"$$f\"" ;; \
-	  esac ; done ) > $@
+	for f in $(csrc) ; do echo "#include \"$$f\"" ; done ) > $@
 
 SUFFIXES = .i
 .c.i :

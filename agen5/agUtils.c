@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.22 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: agUtils.c,v 3.23 2004/07/31 18:51:31 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -25,7 +25,6 @@
  *             Boston,  MA  02111-1307, USA.
  */
 
-STATIC void addSysEnv( char* pzEnvName );
 STATIC tCC* skipQuote( tCC* pzQte );
 
 #ifndef HAVE_STRLCPY
@@ -81,36 +80,6 @@ aprf( const char* pzFmt, ... )
 EXPORT void
 doOptions( int arg_ct, char** arg_vec )
 {
-    void ag_init( void );
-    /*
-     *  Initialize all the Scheme functions.
-     */
-    ag_init();
-    pzLastScheme = zSchemeInit;
-    ag_scm_c_eval_string_from_file_line( zSchemeInit, "directive.h",
-                                         SCHEME_INIT_LINE );
-#ifndef scm_t_port
-    {
-        tSCC zInitRest[] =
-            "(add-hook! before-error-hook error-source-line)\n"
-            "(use-modules (ice-9 stack-catch))";
-        pzLastScheme = zInitRest;
-        ag_scm_c_eval_string_from_file_line( zInitRest, __FILE__, __LINE__-3 );
-    }
-#endif
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zBT[] = "(debug-enable 'backtrace)";
-        pzLastScheme = zBT;
-        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
-    }
-    pzLastScheme = NULL;
-
-    procState = PROC_STATE_OPTIONS;
-    /*
-     *  Set the last resort search directory first (lowest priority)
-     */
-    SET_OPT_TEMPL_DIRS( "$$/../share/autogen" );
-
     /*
      *  Advance the argument counters and pointers past any
      *  command line options
@@ -220,81 +189,6 @@ doOptions( int arg_ct, char** arg_vec )
              */
             putenv( (char*)pz );
         } while (--ct > 0);
-    }
-
-    {
-        char z[ 128 ] = "__autogen__";
-#if defined( HAVE_POSIX_SYSINFO )
-        static const int nm[] = {
-            SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
-#ifdef      SI_PLATFORM
-            SI_PLATFORM,
-#endif
-            SI_MACHINE };
-        int ix;
-        long sz;
-        char* pz = z+2;
-
-        addSysEnv( z );
-        for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
-            sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
-            if (sz > 0) {
-                sz += 2;
-                while (z[sz-1] == NUL)  sz--;
-                strcpy( z + sz, "__" );
-                addSysEnv( z );
-            }
-        }
-
-#elif defined( HAVE_UNAME_SYSCALL )
-        struct utsname unm;
-
-        addSysEnv( z );
-        if (uname( &unm ) != 0) {
-            fprintf( stderr, "Error %d (%s) making uname(2) call\n",
-                     errno, strerror( errno ));
-            exit( EXIT_FAILURE );
-        }
-
-        sprintf( z+2, "%s__", unm.sysname );
-        addSysEnv( z );
-
-        sprintf( z+2, "%s__", unm.machine );
-        addSysEnv( z );
-
-        sprintf( z+2, "%s__", unm.nodename );
-        addSysEnv( z );
-#else
-
-        addSysEnv( z );
-#endif
-    }
-}
-
-
-STATIC void
-addSysEnv( char* pzEnvName )
-{
-    tSCC zFmt[] = "%s=1";
-    int i = 2;
-
-    for (;;) {
-        if (isupper( pzEnvName[i] ))
-            pzEnvName[i] = tolower( pzEnvName[i] );
-        else if (! isalnum( pzEnvName[i] ))
-            pzEnvName[i] = '_';
-
-        if (pzEnvName[ ++i ] == NUL)
-            break;
-    }
-    if (getenv( pzEnvName ) == NULL) {
-        char* pz;
-
-        if (OPT_VALUE_TRACE > TRACE_NOTHING)
-            fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
-        pz = aprf( zFmt, pzEnvName );
-        TAGMEM( pz, "Added environment var" );
-        putenv( pz );
     }
 }
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.32 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: autogen.c,v 3.33 2004/07/31 18:51:31 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -45,7 +45,7 @@ STATIC void signalExit( int sig );
 STATIC void
 inner_main( int argc, char** argv )
 {
-    doOptions( argc, argv );
+    initialize( argc, argv );
 
     procState = PROC_STATE_LOAD_DEFS;
     readDefines();
@@ -386,6 +386,15 @@ signalSetup( void )
 #endif
             sa.sa_handler = SIG_IGN;
             break;
+
+#ifdef DAEMON_ENABLED
+        case SIGHUP:
+            if (HAVE_OPT( DAEMON )) {
+                sa.sa_handler = handleSighup;
+                break;
+            }
+            /* FALLTHROUGH */
+#endif
 
         default:
             sa.sa_handler = abendSignal;
