@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: agUtils.c,v 3.15 2003/04/29 01:51:05 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -26,11 +26,6 @@
  */
 
 STATIC void addSysEnv( char* pzEnvName );
-
-#ifdef MEMDEBUG
-   static void finalMemCheck( void );
-#endif
-
 STATIC tCC* skipQuote( tCC* pzQte );
 
 #ifndef HAVE_STRLCPY
@@ -70,14 +65,7 @@ aprf( const char* pzFmt, ... )
     va_start( ap, pzFmt );
     (void)vasprintf( &pz, pzFmt, ap );
     va_end( ap );
-#ifdef MEMDEBUG
-    {
-        char* pzDup;
-        AGDUPSTR( pzDup, pz, "aprf" );
-        free( pz );
-        pz = pzDup;
-    }
-#endif
+
     if (pz == NULL) {
         tSCC zMsg[] = "could not allocate for or formatting failed on:\n";
         char z[ 256 ];
@@ -120,6 +108,7 @@ doOptions( int arg_ct, char** arg_vec )
         default:
             fprintf( stderr, zOnlyOneSrc, pzProg );
             USAGE( EXIT_FAILURE );
+            /* NOTREACHED */
 
         case 0:
             if (! HAVE_OPT( DEFINITIONS ))
@@ -192,6 +181,7 @@ doOptions( int arg_ct, char** arg_vec )
             if (strchr( pz, '=' ) == NULL) {
                 size_t siz = strlen( pz )+3;
                 char*  p   = AGALOC( siz, "env define" );
+
                 strcpy( p, pz );
                 strcpy( p+siz-3, "=1" );
                 pz = p;

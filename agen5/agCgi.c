@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.14 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: agCgi.c,v 3.15 2003/04/29 01:51:05 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -69,8 +69,9 @@ typedef enum {
     NAME_CT
 } tNameIdx;
 
-#define pzMethod nameValueMap[ REQUEST_METHOD_IDX ].pzValue
-#define pzQuery  nameValueMap[ QUERY_STRING_IDX   ].pzValue
+#define pzCgiMethod nameValueMap[ REQUEST_METHOD_IDX ].pzValue
+#define pzCgiQuery  nameValueMap[ QUERY_STRING_IDX   ].pzValue
+#define pzCgiLength nameValueMap[ CONTENT_LENGTH_IDX ].pzValue
 
 static const char zOops[] =
 "Content-type: text/plain\n\n"
@@ -81,15 +82,41 @@ static char* parseInput( char* pzSrc, int len );
 EXPORT void
 loadCgi( void )
 {
-    int textLen = 0;
-    char* pzText  = NULL;
-
+    /*
+     *  Redirect stderr to a file.  If it gets used, we must trap it
+     *  and emit the content-type: preamble before actually emitting it.
+     *  First, tho, do a simple stderr->stdout redirection just in case
+     *  we stumble before we're done with this.
+     */
     dup2( STDOUT_FILENO, STDERR_FILENO );
-    (void)fdopen( STDERR_FILENO, "w" );
+    (void)fdopen( STDERR_FILENO, "w" FOPEN_BINARY_FLAG );
+    pzOopsPrefix = zOops;
+    {
+        char* pzTemp;
+        int tmpfd;
+        char* pz = getenv( "TEMP" );
+        if (pz == NULL) {
+            pz = getenv( "TMP" );
+            if (pz == NULL)
+                pz = "/tmp";
+        }
 
+        pzTmpStderr = aprf( "%s/agtmp.XXXXXX", pz );
+        TAGMEM( pzTmpStderr, "temp stderr file template" );
+        tmpfd = mkstemp( pzTmpStderr );
+        if (tmpfd < 0)
+            AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
+        dup2( tmpfd, STDERR_FILENO );
+        close( tmpfd );
+    }
+
+    /*
+     *  Pull the CGI-relevant environment variables.  Anything we don't find
+     *  gets an empty string default.
+     */
     {
         tNameMap* pNM = nameValueMap;
-        tNameIdx  ix  = SERVER_SOFTWARE_IDX;
+        tNameIdx  ix  = 0;
 
         do  {
             pNM->pzValue = getenv( pNM->pzName );
@@ -98,65 +125,57 @@ loadCgi( void )
         } while (pNM++, ++ix < NAME_CT);
     }
 
-    textLen = atoi( nameValueMap[ CONTENT_LENGTH_IDX ].pzValue );
-
-    if (strcasecmp( pzMethod, "POST" ) == 0) {
-        if (textLen == 0)
-            AG_ABEND( "No CGI data were received" );
-
-        pzText  = AGALOC( (textLen + 32) & ~0x000F, "CGI POST text" );
-        if (pzText == NULL)
-            AG_ABEND( aprf( "%s: %d bytes for CGI input", zAllocErr, textLen ));
-
-        if (fread( pzText, 1, textLen, stdin ) != textLen)
-            AG_ABEND( aprf( zCannot, errno, "read", "CGI text",
-                            strerror( errno )));
-
-        pzText[ textLen ] = NUL;
-
-        pzQuery = pzText;
-        pzText  = parseInput( pzText, textLen );
-		AGFREE( pzQuery );
-
-    } else if (strcasecmp( pzMethod, "GET" ) == 0) {
-        if (textLen == 0)
-            textLen = strlen( pzQuery );
-        pzText = parseInput( pzQuery, textLen );
-
-    } else
-        AG_ABEND( "invalid request method" );
-
-    pzText = AGREALOC( pzText, strlen( pzText )+1, "CGI input" );
-    pzOopsPrefix = zOops;
-
     pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "CGI context" );
     memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
+
+    {
+        int   textLen = atoi( pzCgiLength );
+        char* pzText;
+
+        if (strcasecmp( pzCgiMethod, "POST" ) == 0) {
+            if (textLen == 0)
+                AG_ABEND( "No CGI data were received" );
+
+            pzText  = AGALOC( textLen + 1, "CGI POST text" );
+            if (fread( pzText, 1, textLen, stdin ) != textLen)
+                AG_ABEND( aprf( zCannot, errno, "read", "CGI text",
+                                strerror( errno )));
+
+            pzText[ textLen ] = NUL;
+
+            pBaseCtx->pzData = parseInput( pzText, textLen );
+            AGFREE( pzText );
+
+        } else if (strcasecmp( pzCgiMethod, "GET" ) == 0) {
+            if (textLen == 0)
+                textLen = strlen( pzCgiQuery );
+            pBaseCtx->pzData = parseInput( pzCgiQuery, textLen );
+
+        } else {
+            AG_ABEND( aprf( "invalid CGI request method: ``%s''", pzCgiMethod ));
+            /* NOTREACHED */
+#ifdef  WARNING_WATCH
+            pzText = NULL;
+#endif
+        }
+    }
+
     pBaseCtx->lineNo     = 1;
     pBaseCtx->pzFileName = "@@ CGI Definitions @@";
-    pBaseCtx->pzScan     = \
-    pBaseCtx->pzData     = pzText;
+    pBaseCtx->pzScan     = pBaseCtx->pzData;
 }
 
 
 static char*
 parseInput( char* pzSrc, int len )
 {
-    tSCC zDef[] = "Autogen Definitions cgi;\n";
-    int   outlen = (len * 2) + sizeof( zDef );
-    char* pzRes = AGALOC( outlen, "CGI Definitions" );
+    tSCC   zDef[] = "Autogen Definitions cgi;\n";
+#   define defLen   (sizeof( zDef ) - 1)
+    char*  pzRes  = AGALOC( (len * 2) + defLen + 1, "CGI Definitions" );
 
-    if (pzRes == NULL)
-        pzRes = "cannout allocate output buffer\n";
-
-    else {
-        strcpy( pzRes, zDef );
-        (void)cgi_run_fsm( pzSrc, len, pzRes + sizeof( zDef ) - 1, outlen );
-        return pzRes;
-    }
-
-    AG_ABEND( pzRes );
-    /* NOTREACHED */
-    return pzRes;
+    memcpy( pzRes, zDef, defLen );
+    (void)cgi_run_fsm( pzSrc, len, pzRes + defLen, len*2 );
+    return AGREALOC( pzRes, strlen( pzRes )+1, "CGI input" );
 }
 
 /*

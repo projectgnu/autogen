@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.9 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: expGuile.c,v 3.10 2003/04/29 01:51:05 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -242,7 +242,8 @@ ag_scm_sum( SCM list )
     SCM
 ag_scm_string_to_c_name_x( SCM str )
 {
-    tSCC  zFun[] = "ag_scm_string_upcase_x";
+    tSCC  zFun[] = "ag_scm_string_to_c_name_x";
+    tSCC  zMap[] = "cannot map unprintable chars to C name chars";
     int   len;
     char* pz;
 
@@ -262,9 +263,7 @@ ag_scm_string_to_c_name_x( SCM str )
                 *pz = '_';
 
             else
-                scm_misc_error( zFun,
-                                "cannot map unprintable chars to C name chars",
-                                str );
+                scm_misc_error( zFun, zMap, str );
         }
         pz++;
     }

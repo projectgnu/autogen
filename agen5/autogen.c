@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 3.23 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: autogen.c,v 3.24 2003/04/29 01:51:05 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -87,6 +87,8 @@ inner_main( int argc, char** argv )
      */
     ag_init();
     gh_eval_str( (char*)zSchemeInit );
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        gh_eval_str( "(debug-enable 'backtrace)" );
     pTF = loadTemplate( pzTemplFileName );
 
     procState = PROC_STATE_EMITTING;
@@ -232,7 +234,7 @@ doneCheck( void )
             /*
              *  Emit the CGI page header for an error message.
              */
-            fputs( pzOopsPrefix, stderr );
+            fputs( pzOopsPrefix, stdout );
             pzOopsPrefix = "";
         }
 
@@ -251,8 +253,6 @@ doneCheck( void )
         /* FALLTHROUGH */
 
     default:
-        _exit( EXIT_FAILURE ); /* exit immediately -- no more processing */
-
     case PROC_STATE_INIT:
     case PROC_STATE_OPTIONS:
         break; /* continue failure exit */
@@ -260,6 +260,32 @@ doneCheck( void )
     case PROC_STATE_DONE:
         break; /* continue normal exit */
     }
+
+    /*
+     *  IF we diverted stderr, then now is the time to copy the text to stdout.
+     */
+    if (pzTmpStderr == NULL)
+        return;
+
+    do {
+        long pos = ftell( stderr );
+        char* pz;
+
+        /*
+         *  Don't bother with the overhead if there is no work to do.
+         */
+        if (pos <= 0)
+            break;
+        pz = AGALOC( pos, "stderr redirected text" );
+        rewind( stderr );
+        fread( pz, 1, pos, stderr );
+        fwrite( pz, 1, pos, stdout );
+        AGFREE( pz );
+    } while (0);
+
+    fclose( stderr );
+    unlink( pzTmpStderr );
+    AGFREE( pzTmpStderr );
 }
 
 
@@ -302,6 +328,7 @@ ag_abend( tCC* pzMsg )
             /* NOTREACHED */
         default:
             exit(EXIT_FAILURE);
+            /* NOTREACHED */
         }
     }
 }
@@ -314,11 +341,6 @@ signalSetup( void )
     int    sigNo = 1;
 
     atexit( doneCheck );
-
-#ifdef MEMDEBUG
-    atexit( &finalMemCheck );
-#endif
-
     sa.sa_flags   = 0;
     sigemptyset( &sa.sa_mask );
 

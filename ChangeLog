@@ -1,3 +1,32 @@
+2003-04-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c(MEMDEBUG): remove this stuff as better tools are around
+	* agen5/agUtils.h: ditto
+	* agen5/autogen.c: ditto
+	* agen5/defReduce.c: ditto
+	* agen5/tpLoad.c: ditto
+	* autoopts/autoopts.h: ditto
+	* autoopts/autoopts.h: ditto
+	* autoopts/streqv.h: ditto
+	* autoopts/streqvcmp.c: ditto
+	* columns/opts.def: rely on snprintfv so old platforms won't choke
+	* config/misc.def(libguile): include the correct headers for the test
+	* config/missing: upgrade to current version
+	* xml2ag/xml2ag.c(trim): rework to avoid fixed size limitations
+	* xml2ag/xmlopts.def(export): Need to define NUL and include ctype.h
+
+2003-04-26  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agCgi.c(loadCgi): redirect stderr to a temp file so that it
+	can get rewound and written to stdout in case of an error.
+	* agen5/autogen.c(inner_main): enable Guile backtraces when we have
+	our own tracing turned on.
+	(doneCheck): if we have a redirected stderr, copy the text to the
+	stdout and unlink the file.
+	* agen5/autogen.h(pzTmpStderr): non-NULL -> redirected stderr
+	* agen5/tpProcess.c(doStdoutTemplate): properly handle messages for HTML
+	* agen5/test/html.test: test HTML failure mode
+
 2003-04-21  Bruce Korb  <bkorb@gnu.org>
 
 	* */*.[ch]: remove unnecessary includes

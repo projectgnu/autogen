@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2003-04-20 18:35:05 bkorb"
+ *  Time-stamp:      "2003-04-28 18:41:25 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 3.14 2003/04/21 03:35:35 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.15 2003/04/29 01:51:05 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -157,39 +157,16 @@ typedef struct {
 #else  /* AUTOGEN_BUILD is defined: */
 #  include <snprintfv/printf.h>
 
-#  ifndef MEMDEBUG
-     extern void* aopts_alloc( size_t, const char* );
-     extern void* aopts_realloc( void*, size_t, const char* );
-     extern char* aopts_strdup( const char* pz, const char* );
+   extern void* aopts_alloc( size_t, const char* );
+   extern void* aopts_realloc( void*, size_t, const char* );
+   extern char* aopts_strdup( const char* pz, const char* );
 
-#    define AGALOC( c, w )      aopts_alloc( c, w )
-#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w )
-#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w )
-#    define AGFREE( p )         free( p )
-#    define TAGMEM( m, t )
+#  define AGALOC( c, w )      aopts_alloc( c, w )
+#  define AGREALOC( p, c, w ) aopts_realloc( p, c, w )
+#  define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w )
+#  define AGFREE( p )         free( p )
+#  define TAGMEM( m, t )
 
-#  else  /* MEMDEBUG *IS* defined: */
-     typedef struct mem_mgmt      tMemMgmt;
-     struct mem_mgmt {
-         tMemMgmt*   pNext;
-         tMemMgmt*   pPrev;
-         char*       pEnd;
-         const char* pzWhence;
-     };
-
-     extern void* aopts_alloc( size_t, const char* );
-     extern void* aopts_realloc( void*, size_t, const char* );
-     extern char* aopts_strdup( const char* pz, const char* );
-     extern void  aopts_free( void* );
-
-#    define AO_HERE  " in " __FILE__ " at " STR( __LINE__ )
-#    define AGALOC( c, w )      aopts_alloc( c, w AO_HERE )
-#    define AGREALOC( p, c, w ) aopts_realloc( p, c, w AO_HERE )
-#    define AGDUPSTR( p, s, w ) p = aopts_strdup( s, w " - strdup" AO_HERE )
-#    define AGFREE( p )         aopts_free( p )
-#    define TAGMEM( m, t )      STMTS( tMemMgmt* p  = ((tMemMgmt*)m)-1; \
-                                p->pzWhence = t " - TAGGED" AO_HERE; )
-#  endif /* MEMDEBUG */
 #endif /* AUTOGEN_BUILD */
 
 /*

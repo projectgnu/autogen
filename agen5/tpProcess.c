@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.17 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.18 2003/04/29 01:51:05 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -85,6 +85,7 @@ STATIC void
 doStdoutTemplate( tTemplate* pTF )
 {
     tSCC zNone[]  = "* NONE *";
+    tSCC zBadR[]  = "%sBogus return from setjmp:  %d\n";
     int  jmpcode  = setjmp( fileAbort );
     SCM  res;
     tCC* pzRes;
@@ -94,14 +95,20 @@ doStdoutTemplate( tTemplate* pTF )
         break;
 
     case PROBLEM:
-        if (*pzOopsPrefix != NUL)
-            fprintf( pfTrace, "%soutput was abandoned\n", pzOopsPrefix );
+        if (*pzOopsPrefix != NUL) {
+            fprintf( stdout, "%soutput was abandoned\n", pzOopsPrefix );
+            pzOopsPrefix = "";
+        }
         fclose( stdout );
         return;
 
     default:
-        fprintf( pfTrace, "%sBogus return from setjmp:  %d\n",
-                 pzOopsPrefix, jmpcode );
+        if (*pzOopsPrefix != NUL) {
+            fprintf( stdout, zBadR, pzOopsPrefix, jmpcode );
+            pzOopsPrefix = "";
+        } else {
+            fprintf( pfTrace, zBadR+2, jmpcode );
+        }
 
     case FAILURE:
         exit( EXIT_FAILURE );

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.15 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: autogen.h,v 3.16 2003/04/29 01:51:05 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -260,6 +260,7 @@ MODE char*       pzCurStart       VALUE( NULL );
 MODE uintptr_t   curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( NULL );
+MODE char*       pzTmpStderr      VALUE( NULL );
 
 MODE tCC*        serverArgs[2]    VALUE( { NULL } );
 MODE tCC*        pzShellProgram   VALUE( NULL );

@@ -6,16 +6,20 @@ autogen definitions options;
 
 export = <<-  EOExport
 	#include <stdio.h>
-	#include <unistd.h>
+	#include <ctype.h>
 	#include <errno.h>
 	#include <limits.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include <unistd.h>
 
 	#include <libxml/parser.h>
 	#include <libxml/tree.h>
 
 	extern FILE* outFp;
+	#ifndef NUL
+	#  define NUL '\0'
+	#endif
 	EOExport;
 
 flag = {

@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.7 2003/04/22 01:40:20 bkorb Exp $
+ *   $Id: opts.def,v 3.8 2003/04/29 01:51:05 bkorb Exp $
  */
 
 /*
@@ -42,6 +42,7 @@ export = <<- EOExport
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "snprintfv/printf.h"
 	EOExport;
 
 version = "1.1";

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 3.17 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: tpLoad.c,v 3.18 2003/04/29 01:51:05 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -451,61 +451,6 @@ loadTemplate( tCC* pzFileName )
     }
 }
 
-#ifdef MEMDEBUG
-STATIC void
-mUnload_For( tMacro* pMac )
-{
-    tDefEntry* pDE = pMac->funcPrivate;
-    if (pDE == NULL)
-        return;
-    AGFREE( (void*)pDE->pzDefName );
-
-    do  {
-        tDefEntry* pNext = pDE->pTwin;
-        freeEntry( pDE );
-        pDE = pNext;
-    } while (pDE != NULL);
-}
-
-STATIC void
-mUnload_Match( tMacro* pMac )
-{
-    if (pMac->funcPrivate != NULL)
-        AGFREE( (void*)pMac->funcPrivate );
-}
-
-    void
-unloadTemplate( tTemplate* pT )
-{
-    {
-        int     ct = pT->macroCt;
-        tMacro* pM = pT->aMacros;
-
-        while (--ct >= 0) {
-            if (   (pM->funcCode & 0xFFF8)
-                == FTYP_SELECT_MATCH_FULL)
-
-                mUnload_Match( pM );
-
-            else switch (pM->funcCode) {
-
-            case FTYP_FOR: mUnload_For( pM ); break;
-            }
-            pM++;
-        }
-    }
-
-    if (pT->fd < 0)
-        AGFREE( (void*)pT );
-    else {
-        int     fd = pT->fd;
-        void*   addr = (void*)pT;
-        size_t  size = pT->descSize;
-        close( fd );
-        munmap( addr, size );
-    }
-}
-#endif
 /*
  * Local Variables:
  * mode: C

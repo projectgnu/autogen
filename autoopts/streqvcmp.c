@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 3.7 2003/04/21 03:35:35 bkorb Exp $
+ *  $Id: streqvcmp.c,v 3.8 2003/04/29 01:51:05 bkorb Exp $
  *
  *  String Equivalence Comparison
  *
@@ -188,7 +188,6 @@ strtransform( d, s )
 
 #ifdef AUTOGEN_BUILD
 tSCC  zAllocErr[] = "AutoOpts allocation failed for %d bytes of %s\n";
-#ifndef MEMDEBUG
 
 void*
 aopts_alloc( size_t sz, tCC* pzWhat )
@@ -243,180 +242,6 @@ aopts_strdup( tCC* pz, tCC* pzWhat )
 
     return pzRes;
 }
-
-#else /* MEMDEBUG is defined: */
-
-STATIC tMemMgmt memHead = { &memHead, &memHead, NULL, "ROOT" };
-#define CHECK_CT 128
-#define SPARE    128
-
-#ifdef AUTOGEN_BUILD
-/*
- *  Weak definition (strong one in agen)
- */
-FILE* pfTrace;
-#endif
-
-
-void*
-aopts_alloc( size_t sz, tCC* pzWhat )
-{
-    size_t    asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
-    tMemMgmt* p = (tMemMgmt*)malloc( asz & ~0x3F );
-
-    if (p == NULL) {
-        if (pzWhat == NULL)
-            return NULL;
-
-        fprintf( stderr, zAllocErr, sz, pzWhat );
-        exit( EXIT_FAILURE );
-    }
-
-    /*
-     *  Link new entry to end of chain
-     */
-    p->pPrev        = memHead.pPrev;
-    p->pPrev->pNext = p;
-    memHead.pPrev   = p;
-    p->pNext        = &memHead;
-
-    p->pEnd = ((char*)(p+1)) + sz;
-    memset( (void*)p->pEnd, '~', CHECK_CT );
-    p->pzWhence = pzWhat;
-
-    return (void*)(p+1);
-}
-
-
-void*
-aopts_realloc( void* p, size_t sz, tCC* pzWhat )
-{
-    size_t      asz = sz + sizeof( tMemMgmt ) + CHECK_CT + SPARE;
-    tMemMgmt*   np;
-    tMemMgmt    sv;
-
-    if (p == NULL)
-        return aopts_alloc( sz, pzWhat );
-
-    np  = ((tMemMgmt*)p)-1;
-    sv  = *np;
-
-    checkMem( np );
-    np = (tMemMgmt*)(p ? realloc( (void*)np, asz & ~0x3F )
-                       : malloc( asz & ~0x3F ));
-
-    if (np == NULL) {
-        if (pzWhat == NULL) {
-            if (p != NULL)
-                free( (void*)p );
-
-            /*
-             *  Unlink old entry
-             */
-            sv.pPrev->pNext = sv.pNext;
-            sv.pNext->pPrev = sv.pPrev;
-            return NULL;
-        }
-
-        fprintf( stderr, zAllocErr, sz, pzWhat );
-        exit( EXIT_FAILURE );
-    }
-
-    /*
-     *  Link other entries to new allocation
-     */
-    np->pPrev->pNext = np;
-    np->pNext->pPrev = np;
-
-    np->pEnd = ((char*)(np+1)) + sz;
-    memset( (void*)np->pEnd, '~', CHECK_CT );
-    np->pzWhence = pzWhat;
-
-    return (void*)(np+1);
-}
-
-
-void
-checkMem( tMemMgmt* pMM )
-{
-    char* p  = pMM->pEnd;
-    int   ct = CHECK_CT;
-
-    do  {
-        if (*(p++) != '~') {
-#ifdef AUTOGEN_BUILD
-            fprintf( pfTrace, "Stray pointer %d bytes after %d-byte %s end\n",
-                     CHECK_CT - ct, pMM->pEnd - (char*)(pMM+1),
-                     pMM->pzWhence );
-            fclose( pfTrace );
-#endif
-            fclose( stderr );
-            fclose( stdout );
-            p = NULL;
-            *p = '~'; /* SEG FAULT */
-            _exit( EXIT_FAILURE );
-        }
-    } while (--ct > 0);
-}
-
-
-void
-aopts_free( void* p )
-{
-    tMemMgmt*   np  = ((tMemMgmt*)p)-1;
-    checkMem( np );
-
-    /*
-     *  Unlink old entry
-     */
-    np->pPrev->pNext = np->pNext;
-    np->pNext->pPrev = np->pPrev;
-    free( (void*)np );
-}
-
-
-void
-finalMemCheck( void )
-{
-#ifdef AUTOGEN_BUILD
-    tMemMgmt*  pMM = memHead.pNext;
-
-    fputs( "\nResidual allocation list:\n", pfTrace );
-    while (pMM != &memHead) {
-        checkMem( pMM );
-        fprintf( pfTrace, "%12d bytes from %s\n",
-                 pMM->pEnd - (char*)(pMM+1), pMM->pzWhence );
-        pMM = pMM->pNext;
-    }
-#endif
-}
-
-
-char*
-aopts_strdup( tCC* pz, tCC* pzWhat )
-{
-    char*   pzRes;
-    size_t  len = strlen( pz )+1;
-
-    /*
-     *  There are some systems out there where autogen is
-     *  broken if "strdup" is allowed to duplicate strings
-     *  smaller than 32 bytes.  This ensures that we work.
-     *  We also round up everything up to 32 bytes.
-     */
-    if (len < 0x20)
-         len = 0x20;
-    else len = (len + 0x20) & ~0x1F;
-
-    pzRes = aopts_alloc( len, pzWhat );
-
-    if (pzRes != NULL)
-        strcpy( pzRes, pz );
-
-    return pzRes;
-}
-
-#endif /* MEMDEBUG */
 #endif /* AUTOGEN_BUILD */
 
 /*

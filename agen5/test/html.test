@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2002-09-28 13:23:27 bkorb"
+# Time-stamp:      "2003-04-27 16:16:24 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: html.test,v 3.4 2002/09/29 00:16:20 bkorb Exp $
+# $Id: html.test,v 3.5 2003/04/29 01:51:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,7 +32,7 @@ Content-Type: text/plain
 The submitted form does not contain a valid template<?
   IF (exist? "template") ?> (<?template?>) <?ENDIF?>.<?
 ENDDEF                                             ?><?
-
+  (if (exist? "break") (define foo bogus))         ?><?
 IF (not (exist? "template"))                       ?><?
   form-error                                       ?><?
 
@@ -67,7 +67,7 @@ Content-Type: text/html
 _EOF_
 
 # # # # # # # RUN AUTOGEN # # # # # #
-set -x
+
 REQUEST_METHOD=GET
 QUERY_STRING="mumble=fumble+bumble&foo=bar&template=${testname}"
 CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
@@ -81,6 +81,24 @@ $AGEXE > ${testname}.test || \
 
 cmp -s ${testname}.samp ${testname}.test || \
   failure "`diff ${testname}.samp ${testname}.test`"
+
+QUERY_STRING="${QUERY_STRING}&break=true"
+CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
+
+$AGEXE > ${testname}-2.test && \
+  failure autogen unexpectedly succeeded
+
+cat > ${testname}-2.samp <<'_EOF_'
+Content-type: text/plain
+
+AutoGen form processing error:
+ERROR: Unbound variable: bogus
+Scheme evaluation error.  AutoGen ABEND-ing in template
+	cgi.tpl on line 9
+_EOF_
+
+cmp -s ${testname}-2.samp ${testname}-2.test || \
+  failure "`diff ${testname}-2.samp ${testname}-2.test`"
 
 cleanup
 # end of html.test

@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 1.11 2003/04/22 01:40:20 bkorb Exp $
+ *  $Id: xml2ag.c,v 1.12 2003/04/29 01:51:05 bkorb Exp $
  *  This is the main routine for xml2ag.
  */
 
@@ -208,38 +208,79 @@ emitIndentation( void )
 STATIC char*
 trim( const char* pzSrc, size_t* pSz )
 {
-    static char z[ 4096 * 16 ];
-    const char* pzEnd;
+    static char*  pzData  = NULL;
+    static size_t dataLen = 0;
+    size_t        strSize;
 
     if (pzSrc == NULL) {
-        z[0] = '\0';
         if (pSz != NULL) *pSz = 0;
-        return z;
+        return "";
     }
 
+    /*
+     *  Trim leading and trailing white space.
+     */
     while (isspace( *pzSrc ))  pzSrc++;
-    pzEnd = pzSrc + strlen( pzSrc );
-    while ((pzEnd > pzSrc) && isspace( pzEnd[-1] ))  pzEnd--;
 
-    if (pzEnd <= pzSrc) {
-        z[0] = '\0';
-        if (pSz != NULL) *pSz = 0;
-    } else {
-        char* pzDest = z;
+    {
+        const char* pzEnd = pzSrc + strlen( pzSrc );
+        while ((pzEnd > pzSrc) && isspace( pzEnd[-1] ))  pzEnd--;
+
+        if (pzEnd <= pzSrc) {
+            if (pSz != NULL) *pSz = 0;
+            return "";
+        }
+        strSize = (pzEnd - pzSrc) + 1;
+    }
+
+    /*
+     *  Count the extra backslashes required and ensure our buffer is
+     *  big enough to hold the newly formed string.
+     */
+    {
+        const char* pz = pzSrc;
+        for (;;) {
+            pz += strcspn( pz, "'\\" );
+            if (*(pz++) == NUL)
+                break;
+            strSize++;
+        }
+    }
+
+    if (dataLen <= strSize) {
+        strSize = (strSize + 0x1000) & ~0x0FFF;
+        if (pzData != NULL)
+             pzData = malloc( strSize );
+        else pzData = realloc( pzData, strSize );
+        if (pzData == NULL) {
+            fprintf( stderr, "ENOMEM allocating 0x%lX bytes", strSize );
+            exit( EXIT_FAILURE );
+        }
+        dataLen = strSize;
+    }
+
+    /*
+     *  Copy the data, adding backslashes in front of
+     *  single quotes and backslashes.
+     */
+    {
+        char* pzDest = pzData;
         for (;;) {
             switch (*(pzDest++) = *(pzSrc++)) {
-            case '\'': strcpy( (pzDest++)-1, "\\'" ); break;
+            case '\'': pzDest[-1]  = '\\'; *(pzDest++) = '\''; break;
             case '\\': *(pzDest++) = '\\'; break;
+            case NUL:  goto set_size;
             }
-            if (pzSrc == pzEnd)
+            if (pzDest == pzData + strSize)
                 break;
         }
 
         *pzDest = '\0';
-        if (pSz != NULL) *pSz = pzDest - &(z[0]);
     }
 
-    return z;
+ set_size:
+    if (pSz != NULL) *pSz = strSize;
+    return pzData;
 }
 
 STATIC xmlNodePtr

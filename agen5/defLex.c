@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.16 2003/04/21 03:35:34 bkorb Exp $
+ *  $Id: defLex.c,v 3.17 2003/04/29 01:51:05 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -144,7 +144,7 @@ scanAgain:
          *  We NUL it out in the text to ensure that any
          *  names encountered are NUL terminated.
          */
-        lastToken = *pCurCtx->pzScan;
+        lastToken = *(pCurCtx->pzScan);
         *(pCurCtx->pzScan++) = NUL;
 
         /*
