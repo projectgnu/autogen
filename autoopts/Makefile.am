@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Fri Jun  4 07:52:27 1999				      
+## Last Modified:   Tue Jul  6 14:32:59 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.14 1999/06/04 14:52:30 bkorb Exp $
+## $Id: Makefile.am,v 2.15 1999/07/06 21:34:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,7 +22,7 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 
 EXTRA_DIST	= $(pkgdata_DATA) TODO autoopts.m4 autoopts.texi bootstrap \
 		autoopts-config.in config-opts.def \
-		genshell.def genshell.c genshell.h
+		genshell.def genshell.c genshell.h agman.tpl
 
 m4datadir	= $(datadir)/aclocal
 m4data_DATA	= autoopts.m4
@@ -34,7 +34,7 @@ libopts_la_SOURCES = \
 		autoopts.h options.h streqv.h makeshell.c
 libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
-pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl
+pkgdata_DATA	= optcode.tpl opthead.tpl options.tpl libhead.tpl agman.tpl
 
 bin_SCRIPTS	= autoopts-config
 
