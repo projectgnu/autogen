@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-10-06 19:59:20 bkorb"
+## Time-stamp:      "2002-10-12 09:06:46 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.16 2002/10/07 03:09:35 bkorb Exp $
+## $Id: Makefile.am,v 3.17 2002/10/12 18:12:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -56,7 +56,7 @@ FUNCLIST =	funcCase.c  funcDef.c   funcEval.c  funcFor.c   funcIf.c \
 EXPRLIST =	expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 		expString.c expGperf.c expExtract.c $(FUNCLIST)
 
-YFLAGS = -d
+AM_YFLAGS = -d
 
 all : @AGEXE@
 

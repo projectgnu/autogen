@@ -1,3 +1,11 @@
+2002-10-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am(YFLAGS): change to AM_YFLAGS for automake 1.7.
+	Can't use am1.7 anyway, though.
+	* autoopts/autoopts.c(optionMakePath): documentary changes
+	* autoopts/usage.c(optionUsage): printInitList needs the full program
+	path, not just the program name.
+
 2002-10-06  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am(autogen_LDFLAGS): add guile flags

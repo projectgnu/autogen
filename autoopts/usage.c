@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 3.6 2002/09/21 17:27:15 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 3.7 2002/10/12 18:12:00 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -390,7 +390,7 @@ optionUsage( pOptions, exitCode )
          *  Display all the places we look for RC files
          */
         printInitList( pOptions->papzHomeList, &initIntro,
-                       pOptions->pzRcName, pOptions->pzProgName );
+                       pOptions->pzRcName, pOptions->pzProgPath );
 
         /*
          *  Let the user know about environment variable settings

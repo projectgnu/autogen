@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.18 2002/10/01 04:18:50 bkorb Exp $
+ *  $Id: autoopts.c,v 3.19 2002/10/12 18:12:00 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -660,7 +660,7 @@ optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
     }
 
     /*
-     *  IF the name starts with "$$", then it must start be "$$" or
+     *  IF the name starts with "$$", then it must be "$$" or
      *  it must start with "$$/".  In either event, replace the "$$"
      *  with the path to the executable and append a "/" character.
      */
@@ -668,6 +668,19 @@ optionMakePath( pzBuf, bufSize, pzName, pzProgPath )
         tCC*  pzPath;
         tCC*  pz;
 
+        switch (pzName[2]) {
+        case '/':
+        case NUL:
+            break;
+        default:
+            return AG_FALSE;
+        }
+
+        /*
+         *  See if the path is included in the program name.
+         *  If it is, we're done.  Otherwise, we have to hunt
+         *  for the program using "pathfind".
+         */
         if (strchr( pzProgPath, '/' ) != (char*)NULL)
             pzPath = pzProgPath;
         else {
