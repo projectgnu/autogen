@@ -20,7 +20,7 @@ AC_CANONICAL_SYSTEM
 . $srcdir/VERSION
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 1.1 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 1.1.1.1 $),)dnl
 
 # ----------------------------------------------------------------------
 # If `configure' is invoked (in)directly via `make', ensure that it

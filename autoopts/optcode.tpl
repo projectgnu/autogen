@@ -1,4 +1,4 @@
-{@autogen template include $Id: optcode.tpl,v 1.1 1998/04/29 23:14:31 bkorb Exp $ @}
+{@autogen template include $Id: optcode.tpl,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $ @}
 {@_IF copyright _exist
 @}
 static const char zCopyright[] =

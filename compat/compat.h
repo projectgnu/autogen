@@ -7,7 +7,7 @@
  * Created:          Mon Jun 30 15:54:46 1997
  * Last Modified:    1998/04/01 at 08:58:00
  *            by:    Bruce Korb <korbb@datadesign.com>
- * $Id: compat.h,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ * $Id: compat.h,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1

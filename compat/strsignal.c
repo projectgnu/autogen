@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  $Id: strsignal.c,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $
  */
 
 #include "compat.h"

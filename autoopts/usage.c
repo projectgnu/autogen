@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.

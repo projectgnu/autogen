@@ -3,7 +3,7 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: strsignal.def,v 1.1 1998/04/29 23:14:32 bkorb Exp $
+ *  $Id: strsignal.def,v 1.1.1.1 1998/04/29 23:14:32 bkorb Exp $
  */
 
 #shell

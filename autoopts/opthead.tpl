@@ -1,4 +1,4 @@
-{@autogen template include $Id: opthead.tpl,v 1.1 1998/04/29 23:14:31 bkorb Exp $ @}
+{@autogen template include $Id: opthead.tpl,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $ @}
 {@ # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." @}{@
 

@@ -6,7 +6,7 @@
  * Created:           Tue Jun 24 15:07:31 1997
  * Last Modified:    1998/03/10 at 08:19:08
  *            by:    Bruce Korb <korbb@datadesign.com>
- * $Id: pathfind.c,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+ * $Id: pathfind.c,v 1.1.1.1 1998/04/29 23:14:31 bkorb Exp $
  */
 
 /* Code: */
