@@ -1752,219 +1752,16 @@ white space is trimmed from the value, but otherwise new lines are
 not discarded.  The caller is expected to have NUL terminated the
 string at the correct point.
 
-@page
-@node Comparison
-@section Competitive Feature Analysis
+@ignore
+END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
-Here is a feature comparison of AutoOpts and five other command line
-parser generators.  They all read a file that describes the program
-options and produce code to parse command line options.  Each has their
-own format for describing options.
+@ignore
+START == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
-All versions support both short options (flags) and GNU-type long
-options.  clig, however, is unique in that you must choose one or the
-other.  Either way, clig options are introduced with a single hyphen.
-The other packages identify long options with doubled hyphens.
-
-@enumerate
-@item
-AutoOpts is a component of AutoGen.  AutoGen has many capabilities, but
-here we concentrate on the portion called AutoOpts.  AutoOpts is the
-most general of these programs, and has the most extensive
-documentation.  It is the only one that supports shell scripts as well
-as C programs.  It also supports command option processing from a configuration
-file or the environment.
-
-@item
-clig generates a skeleton man page and can also update a previously
-generated man page.
-
-@item
-genparse.
-
-@item
-gaa supports option input from a configuration file as well as the
-command line.  NOTE HOWEVER: gaa is not maintained.
-
-@item
-gengetopt is the only one that generates a skeleton main.c
-instead of a separate parsing function.  Since you must edit this
-file to create your program, rerunning gengetopt will wipe out
-any such changes.
-
-@item
-wyg uses flex and bison to generate a configuration file parser,
-but uses getopt_long to parse the command line options.
-@end enumerate
-
-@multitable @columnfractions .26 .1 .1 .1 .1 .1 .1
-@item package
-@tab 1
-@tab 2
-@tab 3
-@tab 4
-@tab 5
-@tab 6
-@item C language app
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@item shell script app
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item package result
-@tab parser
-@tab parser
-@tab parser
-@tab parser
-@tab main.c
-@tab parser
-@item config file input
-@tab yes
-@tab no
-@tab no
-@tab yes
-@tab no
-@tab yes
-@item environment input
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item config file output
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item command line
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@item parameter types
-@tab [1]
-@tab 4
-@tab 5
-@tab 5
-@tab 11
-@tab 4
-@item callback functions
-@tab yes
-@tab no
-@tab yes
-@tab yes
-@tab yes
-@tab no
-@item multiple parameters
-@tab yes
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@item optional parameters
-@tab yes
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@item default values
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab no
-@tab yes
-@item range checks
-@tab no
-@tab yes
-@tab yes
-@tab no
-@tab no
-@tab no
-@item enumeration options
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item option data
-@tab struct
-@tab struct
-@tab struct
-@tab struct
-@tab vars
-@tab struct
-@item usage()
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@tab yes
-@item man page
-@tab yes
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@item texinfo usage
-@tab yes
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item makefile
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@tab no
-@item developer dependencies
-@tab Guile
-@tab tcl
-@tab none
-@tab none
-@tab none
-@tab bison,flex
-@item user dependencies
-@tab [2]
-@tab none
-@tab none
-@tab none
-@tab none
-@tab none
-@end multitable
-
- [1] See the lengthy list of features @xref{Features}.
-
- [2] There is a user-visible dependency iff the developer does a
-dynamic link to the libopts.so library.  Developers are free to either
-link statically or ship libopts.so with their product.  A Debian
-package would need only a dependency on the package supplying libopts
-(libopts9, at present).
-
- The Guile library is now generally pre-installed on all GNU/Linux systems.
-
- -- James R. Van Zandt
 @page
 @node Quick Start
 @section Quick Start
@@ -3523,7 +3320,7 @@ may specify the shell program to use on the first shell script line.
 That program's usage text would look something like this:
 
 @ignore
-END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == END-AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 

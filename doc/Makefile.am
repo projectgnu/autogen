@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.45 2001/09/21 03:09:48 bkorb Exp $
+## $Id: Makefile.am,v 2.46 2001/09/23 01:30:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,7 +23,7 @@ all : $(INFO_DEPS) LSM
 info_TEXINFOS   = autogen.texi
 
 EXTRA_DIST	= auto_gen.tpl autogen.info LSM LSM.tpl \
-		snprintfv.texi snprintfv.menu
+		snprintfv.texi snprintfv.menu compete.def compete.tpl
 
 MAINTAINERCLEANFILES = Makefile.in autogen.texi
 
@@ -56,7 +56,7 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 		$(OPTIONS_DEF) \
 		$(ADDON_MENU) \
 		$(ADDON_TEXI) \
-		$(DOC_INCLUDES)
+		$(DOC_INCLUDES) compete.def compete.tpl
 
 DEFCOPY		= copy=$(OPTIONS_DEF)
 
@@ -75,6 +75,9 @@ TEXI2DVI_FLAGS =  --texinfo='@pagesizes 9.5in,6.5in'
 ##  in its dependency checking on files that it "knows" are source files
 ##
 autogen.texi : $(DOC_DEPENDS)
+	@set -x ; if [ -x $(AGEXE) ] ; \
+	then $(AGEXE) -L$(top_srcdir)/doc $(top_srcdir)/doc/compete.def ; \
+	else autogen -L$(top_srcdir)/doc $(top_srcdir)/doc/compete.def ; fi
 	@-[ -f $(top_srcdir)/doc/$@ ] && cp -f $(top_srcdir)/doc/$@ $@.ori
 	@echo $(GETDEFS) $(AGARGS) $(DEFCOPY) ...
 	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.29 2001/09/21 03:09:48 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.30 2001/09/23 01:30:02 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -238,7 +238,7 @@ struct specOptIndex {
  *  fields.  This way, the "optionProcess()" routine may exit with an
  *  informative message instead of, for example, page faulting.
  */
-#define  OPTIONS_STRUCT_VERSION  40961
+#define  OPTIONS_STRUCT_VERSION  45058
 
 struct options {
     const int         structVersion;
@@ -276,52 +276,10 @@ extern "C" {
 #    define PROTO(s) s
 #  endif
 
-/*
- *  All this "DEF_PROC_*" weirdness is so that I can compile the option
- *  processing code with a K&R compiler.  Yuck.  Don't use them unless
- *  you really have to.  (Still better than ugly if-defs, tho.)
- */
-#define DEF_PROC_0( id ) \
-          id( void ); \
-          id( void )
-
-#define DEF_PROC_1( id, a1_type, a1_name ) \
-          id( a1_type a1_name ); \
-          id( a1_type a1_name )
-
-#define DEF_PROC_2( id, a1t, a1n, a2t, a2n ) \
-          id( a1t a1n, a2t a2n ); \
-          id( a1t a1n, a2t a2n )
-
-#define DEF_PROC_3( id, a1t, a1n, a2t, a2n, a3t, a3n ) \
-          id( a1t a1n, a2t a2n, a3t a3n ); \
-          id( a1t a1n, a2t a2n, a3t a3n )
-
-#define DEF_PROC_4( id, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
-          id( a1t a1n, a2t a2n, a3t a3n, a4t a4n ); \
-          id( a1t a1n, a2t a2n, a3t a3n, a4t a4n )
-
 #else
 #  ifndef PROTO
 #    define PROTO(s) ()
 #  endif
-
-#define DEF_PROC_0( id ) \
-          id()
-
-#define DEF_PROC_1( id, a1_type, a1_name ) \
-          id( a1_name ) a1_type a1_name;
-
-#define DEF_PROC_2( id, a1t, a1n, a2t, a2n ) \
-          id( a1n, a2n ) a1t a1n; a2t a2n;
-
-#define DEF_PROC_3( id, a1t, a1n, a2t, a2n, a3t, a3n ) \
-          id( a1n, a2n, a3n ) \
-          a1t a1n; a2t a2n; a3t a3n;
-
-#define DEF_PROC_4( id, a1t, a1n, a2t, a2n, a3t, a3n, a4t, a4n ) \
-          id( a1n, a2n, a3n ) \
-          a1t a1n; a2t a2n; a3t a3n; a4t a4n;
 
 #  ifndef void
 #    define void int

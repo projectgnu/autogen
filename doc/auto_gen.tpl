@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by:     Bruce Korb <bkorb@gnu.org>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.69 2001/09/21 03:09:48 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.70 2001/09/23 01:30:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -362,6 +362,9 @@ the command line and initialization file options, and the documentation
 that should go with your program as well.
 
 [= get-text tag = autoopts =]
+[=`${AGEXE} -L ${top_srcdir}/doc compete.def
+   cat compete.texi`=]
+[= get-text tag = "end-autoopts" =]
 
 @example
 [= `

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 1.31 2001/09/22 04:05:08 bkorb Exp $
+# $Id: optlib.tpl,v 1.32 2001/09/23 01:30:02 bkorb Exp $
 
 =]
 [=
@@ -99,6 +99,12 @@ Emit the #define's for a single option
 
 DEFINE Option_Defines    =][=
 
+  IF   (exist? "ifdef")  =]
+#ifdef [=(get "ifdef")=][=
+  ELIF (exist? "ifndef") =]
+#ifndef [=(get "ifndef")=][=
+  ENDIF ifdef/ifndef     =][=
+
   IF (=* (get "arg_type") "key") =]
 typedef enum {[=
          IF (not (exist? "arg_default")) =] [=
@@ -171,6 +177,10 @@ typedef enum {[=
 
   ENDIF settable =][=
 
+  IF (or (exist? "ifdef") (exist? "ifndef")) =]
+#endif[=
+  ENDIF =][=
+
 ENDDEF
 =][=
 
@@ -186,27 +196,7 @@ ELSE                            =][=
   (define optname-to   "a-z--") =][=
 ENDIF                           =][=
 
-DEFINE   Option_Strings         =][=
-
-(set! cap-name (string-capitalize! (get "name")))
-(set! UP-name  (string-upcase cap-name))
-=]
-/*
- *  [=(. cap-name)=] option description[=
-  IF (or (exist? "flags_must") (exist? "flags_cant")) =] with
- *  "Must also have options" and "Incompatible options"[=
-  ENDIF =]:
- */[=
-
-  IF   (exist? "ifdef")  =]
-#ifdef [=(get "ifdef")=][=
-  ELIF (exist? "ifndef") =]
-#ifndef [=(get "ifndef")=][=
-  ENDIF ifdef/ifndef     =]
-tSCC    z[=(. cap-name)=]Text[] =
-        [=(kr-string (get "descrip"))=];[=
-
-  IF (not (exist? "documentation")) =][=
+DEFINE   emit-nondoc-option     =][=
   #
   #  This is *NOT* a documentation option: =]
 tSCC    z[= (sprintf "%-25s" (string-append cap-name
@@ -318,23 +308,55 @@ static const int
                         "OPTST_DISABLED"    =] | [=
          ? no_preset    "OPTST_NO_INIT"
                         "OPTST_INIT"           =])[=
-  ELSE  documentation exists:          =]
+ENDDEF   emit-nondoc-option     =][=
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+Define the arrays of values associated with an option (strings, etc.) =][=
+
+DEFINE   Option_Strings         =][=
+
+(set! cap-name (string-capitalize! (get "name")))
+(set! UP-name  (string-upcase cap-name))
+=]
+/*
+ *  [=(. cap-name)=] option description[=
+  IF (or (exist? "flags_must") (exist? "flags_cant")) =] with
+ *  "Must also have options" and "Incompatible options"[=
+  ENDIF =]:
+ */[=
+
+  IF   (exist? "ifdef")  =]
+#ifdef [=(get "ifdef")=][=
+  ELIF (exist? "ifndef") =]
+#ifndef [=(get "ifndef")=][=
+  ENDIF ifdef/ifndef     =]
+tSCC    z[=(. cap-name)=]Text[] =
+        [=(kr-string (get "descrip"))=];[=
+
+  IF (exist? "documentation")     =]
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
-  ENDIF (not (exist? "documentation")) =][=
+  ELSE  NOT a doc option:         =][=
+     emit-nondoc-option           =][=
+  ENDIF  (exist? "documentation") =][=
 
   IF (or (exist? "ifdef") (exist? "ifndef")) =]
 
 #else   /* disable [=(. cap-name)=] */
-#define [=(. UP-name)=]_FLAGS       OPTST_OMITTED[=
-  IF (exist? "arg_default") =]
+#define VALUE_[=(. UP-prefix)=]OPT_[=(. UP-name)=] NO_EQUIVALENT
+#define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
+
+    IF (exist? "arg_default") =]
 #define z[=(. cap-name)=]DefaultArg NULL[=
-  ENDIF =][=
-  IF (exist? "flags_must")  =]
+    ENDIF =][=
+
+    IF (exist? "flags_must")  =]
 #define a[=(. cap-name)=]MustList   NULL[=
-  ENDIF =][=
-  IF (exist? "flags_cant")  =]
+    ENDIF =][=
+
+    IF (exist? "flags_cant")  =]
 #define a[=(. cap-name)=]CantList   NULL[=
-  ENDIF =]
+    ENDIF =]
 #define z[=(. cap-name)=]Text       NULL
 #define z[=(. cap-name)=]_NAME      NULL
 #define z[=(. cap-name)=]_Name      NULL
