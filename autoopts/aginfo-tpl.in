@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.13 2000/03/19 19:22:46 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.14 2000/03/19 22:03:49 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -152,10 +152,6 @@ This option is enabled by default.[=
     IF (exist? "no_preset") =]
 This option may not be preset with environment variables
 or in initialization (rc) files.[=
-    ENDIF=][=
-
-    IF (exist? "settable") =]
-This option can be set within the program using a special purpose macro.[=
     ENDIF=][=
 
     IF (exist? "equivalence") =]
