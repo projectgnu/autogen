@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.13 1998/11/04 22:55:19 bkorb Exp $
+ *  $Id: makeshell.c,v 2.14 1998/11/04 23:18:24 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -158,7 +158,7 @@ static const char zLoopEnd[] =
 "unset OPT_ARG\n"
 "unset OPT_NAME\n"
 "unset OPT_CODE\n"
-"unset OPT_ARG_VAL\n%s";
+"unset OPT_ARG_VAL\n%2$s";
 
 static const char zTrailerMarker[] = "\n"
 "# # # # # # # # # #\n#\n"
