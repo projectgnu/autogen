@@ -1,3 +1,46 @@
+1998-08-17  Bruce Korb <korbb@datadesign.com>
+	* Makefile.am
+	configure needs to depend on the VERSION
+
+	* autoopts/Makefile.am
+	Added new file to distribute:  autoopts/libhead.tpl.
+
+	* autoopts/libhead.tpl.
+	New template for producing an interface file for libraries
+	that require options in the client program command line.
+
+	* autoopts/options.h
+	Added an option type, "DOCUMENT" for adding commentary
+	to the usage text.
+
+	* autoopts/autoopts.c
+	When searching for an option, ignore any entries marked, "DOCUMENT".
+
+	* autoopts/usage.c
+	* autoopts/save.c
+	Added special handling of DOCUMENT type options.
+
+	* autoopts/putshell.c
+	Fixed format for broken printf.
+
+
+	* autoopts/opt*.tpl
+	Special handling for DOCUMENT type options.
+
+	* doc/auto_gen.tpl
+	Documented DOCUMENT options.
+
+	* src/opts.def
+	Took advantage of the new feature to add comments to the usage.
+	Also added "no_preset" attribute to several options.
+
+	* src/agFun*.c
+	Added some cross referencing to the document.
+
+	* tests/opts.test
+	Added some verbose output.
+	Corrected comparison output based on printf bug.
+
 1998-07-30  Bruce Korb <korbb@datadesign.com>
 
 	* autoopts/Makefile.am

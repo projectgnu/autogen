@@ -1,5 +1,5 @@
 [=autogen template include
- $Id: optcode.tpl,v 1.9 1998/07/18 05:34:49 bkorb Exp $ =]
+ $Id: optcode.tpl,v 1.10 1998/08/17 14:19:04 bkorb Exp $ =]
 [=_IF copyright _exist
 =]
 static const char zCopyright[] =
@@ -55,7 +55,7 @@ _IF include _exist=]
 [=_ENDIF "include exists" =][=
 
 
-_FOR FLAG
+_FOR FLAG "\n"
 
 
 =]
@@ -65,54 +65,62 @@ _FOR FLAG
  *  "Must also have options" and "Incompatible options"[=
   _ENDIF=]:
  */
-tSCC    z[=name _cap  "Text[] ="  + %-28s _printf =] [=descrip _str=];
+tSCC    z[=name _cap=]Text[] =
+       [=descrip _str=];[=
+  _IF documentation _exist ! =]
 tSCC    z[=name _cap "#_NAME[] =" + %-28s _printf =] "[=name _up=]";[=
 
-  _IF disable _len 0 > =]
+    _IF disable _len 0 > =]
 tSCC    zNot[=name _cap "#_Name[] =" + %-25s _printf =] "[=disable _down=]-[=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";
 tSCC    zNot[=name _cap "#_Pfx[] =" + %-25s _printf =] "[=disable _down=]";[=
-    _IF enable _len 0 > =]
+
+      _IF enable _len 0 > =]
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down=]-[=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
 
-    _ELSE "Enable does not exist" =]
+      _ELSE "Enable does not exist" =]
 #define z[=name _cap "#_Name" + %-28s _printf
           =] (zNot[=name _cap=]_Name + [=_eval disable _len 1 + =])[=
-    _ENDIF=][=
+      _ENDIF "" =][=
 
-  _ELSE "Disable does not exist" =]
+    _ELSE "Disable does not exist" =]
 #define zNot[=name _cap "#_Pfx"   + %-25s _printf =] (const char*)NULL
 #define zNot[=name _cap "#_Name"  + %-25s _printf =] (const char*)NULL
 tSCC    z[=name _cap "#_Name[] =" + %-28s _printf =] "[=enable _down #- +=][=
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell=]";[=
 
-  _ENDIF =][=
+    _ENDIF "disable" =][=
+
 
   # IF  there is a non-zero length argument
         *AND* it is not ':'
         *AND* it is not a numeric value, ...  =][=
 
-  _IF flag_arg _len 0 >
+    _IF flag_arg _len 0 >
       flag_arg _get #: !=
       flag_arg _get #=.* ~ !  & & =]
 tSCC    z[=name _cap "DefaultArg[] =" + %-28s _printf =] [=flag_arg _str=];[=
-  _ENDIF =][=
+    _ENDIF "" =][=
 
-  _IF flags_must _exist=]
+
+    _IF flags_must _exist=]
 static const int
     a[=name _cap=]MustList[] = {[=_FOR flags_must=]
     INDEX_[=prefix _up #_ +=]OPT_[=flags_must _up=],[=/flags_must
            =] NO_EQUIVALENT};[=
-  _ENDIF =][=
+    _ENDIF "" =][=
 
-  _IF flags_cant _exist=]
+
+    _IF flags_cant _exist=]
 static const int
     a[=name _cap=]CantList[] = {[=_FOR flags_cant=]
     INDEX_[=prefix _up #_ +=]OPT_[=flags_cant _up=],[=/flags_cant
            =] NO_EQUIVALENT};[=
-  _ENDIF=]
-[=
+
+    _ENDIF "flags_cant _exist" =][=
+
+  _ENDIF documentation =][=
 
 /FLAG
 
@@ -169,7 +177,7 @@ static tOptProc doOpt[=name _cap=];[=
   /FLAG=]
 [=
  
-  _IF TEST_MAIN _env ! ! test_main _exist |=][=
+  _IF TEST_MAIN _env ! ! test_main _exist | =][=
 
      # "A test environment is to be generated" =]
 
@@ -211,10 +219,35 @@ extern tOptProc doPagedUsage;
  *
  *  Define the [=prog_name _cap=] Option Descriptions.
  */
-static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
+static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=
+
+_FOR flag "\n" =][=
+
+  _IF documentation _exist =]
+  {  /* entry idx, value */ 0, 0,
+     /* equiv idx, value */ 0, 0,
+     /* option argument  */ ARG_NONE,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OPTST_DOCUMENT | OPTST_NO_INIT,
+     /* last opt argumnt */ (char*)NULL,
+     /* arg list/cookie  */ (void*)NULL,
+     /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
+     /* option proc      */ [=
+         _IF   call_proc _exist=][=call_proc=][=
+         _ELIF flag_code _exist=]doOpt[=name _cap=][=
+         _ELSE                 =](tpOptProc)NULL[=
+         _ENDIF =],
+     /* desc, NAME, name */ z[=name _cap=]Text, (const char*)NULL,
+                            (const char*)NULL,
+     /* disablement strs */ (const char*)NULL, (const char*)NULL },[=
+
+  _ELSE
+
+=]
   {  /* entry idx, value */ [=
           _eval _index=], VALUE_[=prefix _up #_ +=]OPT_[=name _up=],
-     /* equiv idx value  */ [=
+     /* equiv idx, value */ [=
           _IF equivalence _exist equivalence _get name _get = &
               =]NO_EQUIVALENT, 0,[=
           _ELIF equivalence _exist
@@ -258,7 +291,7 @@ static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
          _IF flags_must _exist=]a[=name _cap=]MustList[=
          _ELSE                =](const int*)NULL[=_ENDIF=], [=
          _IF flags_cant _exist=]a[=name _cap=]CantList[=
-         _ELSE                =](const int*)NULL[=_ENDIF=], 
+         _ELSE                =](const int*)NULL[=_ENDIF=],
      /* option proc      */ [=
          _IF   call_proc _exist=][=call_proc=][=
          _ELIF flag_code _exist=]doOpt[=name _cap=][=
@@ -268,12 +301,18 @@ static tOptDesc optDesc[ [=prefix _up #_ +=]OPTION_CT ] = {[=_FOR flag=]
                       =]stackOptArg[=
                _ELSE  =]unstackOptArg[=_ENDIF=][=
          _ELSE               =](tpOptProc)NULL[=_ENDIF=],
-     /* opt name & text  */ z[=name _cap=]Text,  z[=name _cap=]_NAME,
+     /* desc, NAME, name */ z[=name _cap=]Text,  z[=name _cap=]_NAME,
                             z[=name _cap=]_Name,
-     /* disablement strs */ zNot[=name _cap=]_Name, zNot[=name _cap=]_Pfx },
-[=/flag=][=
+     /* disablement strs */ zNot[=name _cap=]_Name, zNot[=name _cap=]_Pfx },[=
+
+  _ENDIF documentation =][=
+
+/flag
+
+=][=
 
 _IF version _exist=]
+
   {  /* entry idx, value */ INDEX_[=prefix _up #_ +=]OPT_VERSION, VALUE_[=
                                     prefix _up #_ +=]OPT_VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
@@ -285,10 +324,11 @@ _IF version _exist=]
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doVersion,
-     /* opt name & text  */ zVersionText,      (const char*)NULL,
+     /* desc, NAME, name */ zVersionText,      (const char*)NULL,
                             zVersion_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL },
-[=_ENDIF=]
+     /* disablement strs */ (const char*)NULL, (const char*)NULL },[=
+_ENDIF=]
+
   {  /* entry idx, value */ INDEX_[=prefix _up #_ +=]OPT_HELP, VALUE_[=
                                     prefix _up #_ +=]OPT_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
@@ -300,7 +340,7 @@ _IF version _exist=]
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doUsageOpt,
-     /* opt name & text  */ zHelpText,         (const char*)NULL,
+     /* desc, NAME, name */ zHelpText,         (const char*)NULL,
                             zHelp_Name,
      /* disablement strs */ (const char*)NULL, (const char*)NULL },
 
@@ -315,9 +355,9 @@ _IF version _exist=]
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ doPagedUsage,
-     /* opt name & text  */ zMore_HelpText,    (const char*)NULL,
+     /* desc, NAME, name */ zMore_HelpText,    (const char*)NULL,
                             zMore_Help_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL, }[=
+     /* disablement strs */ (const char*)NULL, (const char*)NULL }[=
 
 _IF homerc _exist
 =],
@@ -333,9 +373,9 @@ _IF homerc _exist
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ (const int*)NULL,  (const int*)NULL,
      /* option proc      */ (tOptProc*)NULL,
-     /* opt name & text  */ zSave_OptsText,    (const char*)NULL,
+     /* desc, NAME, name */ zSave_OptsText,    (const char*)NULL,
                             zSave_Opts_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL, }[=
+     /* disablement strs */ (const char*)NULL, (const char*)NULL }[=
 _ENDIF=]
 };
 
@@ -365,16 +405,14 @@ tSCC   zUsageTitle[] = "[=prog_name=] - " [=prog_title _str=]
               argument _len 16 >= &
               =]\\\n"
     "\t\t[=_ENDIF=]" [=argument _str=] "[=
-        _ELIF flag.value _exist ! long_opts _exist ! & =][=
-            _ERROR _dfile
-                " definitions allow neither option flags nor long options" + =][=
         _ENDIF=]\n";[=
 
 _IF homerc  _exist=]
-tSCC   zRcName[]     = "[=_IF rcfile _len          =][=rcfile=][=
-                        _ELIF TARGETOS _env DOS = !=].[=prog_name _down=]rc[=
-                        _ELSE                      =][=prog_name  _up=].INI[=
-                        _ENDIF=]";
+tSCC   zRcName[]     = "[=
+  _IF rcfile _len            =][=rcfile=][=
+  _ELIF TARGETOS _env DOS = !=].[=prog_name _down=]rc[=
+  _ELSE                      =][=prog_name  _up=].INI[=
+  _ENDIF=]";
 tSCC*  apzHomeList[] = {[=_FOR homerc=]
        [=homerc _str=],[=/homerc=]
        (char*)NULL };[=

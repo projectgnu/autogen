@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 1.8 1998/07/18 05:34:51 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 1.9 1998/08/17 14:19:06 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -79,6 +79,7 @@
 #define OPTST_STACKED      0x0800  /* opt uses stackOptArg procedure    */
 #define OPTST_DISABLEOK    0x1000  /* option may be disabled            */
 #define OPTST_INITENABLED  0x2000  /* option defaults to enabled        */
+#define OPTST_DOCUMENT     0x4000  /* opt is for documentation only     */
 #define OPTST_PERSISTENT   0xFF00  /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
@@ -129,6 +130,7 @@
 #define tCC       const char
 #define tUS       unsigned short
 #define tUI       unsigned int
+#define tUL       unsigned long
 
 /*
  *  It is so disgusting that there must be so many ways

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 1.8 1998/07/18 05:34:55 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 1.9 1998/08/17 14:19:11 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -67,6 +67,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
     tSCC  zReqOptFmt[]   = " %3s %-14s %-5s%s\n";
     tSCC  zNrmOptFmt[]   = " %1$3s %2$-14s %4$s\n";
     tCC*  pOptFmt;
+    tCC*  pOptTitle;
     FILE* fp = stderr;
 
     fprintf( fp, pOptions->pzUsageTitle, pOptions->pzProgName );
@@ -79,8 +80,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
     {
         tSCC zOptTitle[] = "  Flg Arg Option-Name    Description\n";
 
-        fputs( zOptTitle, fp );
-        pOptFmt = zNrmOptFmt;
+        pOptTitle = zOptTitle;
+        pOptFmt   = zNrmOptFmt;
         break;
     }
 
@@ -88,8 +89,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
     {
         tSCC zOptTitle[] = "   Arg Option-Name    Description\n";
 
-        fputs( zOptTitle, fp );
-        pOptFmt = zNrmOptFmt;
+        pOptTitle = zOptTitle;
+        pOptFmt   = zNrmOptFmt;
         break;
     }
 
@@ -97,8 +98,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
     {
         tSCC zOptTitle[] = "  Flg Arg Option-Name   Req?  Description\n";
 
-        fputs( zOptTitle, fp );
-        pOptFmt = zReqOptFmt;
+        pOptTitle = zOptTitle;
+        pOptFmt   = zReqOptFmt;
         break;
     }
 
@@ -107,11 +108,13 @@ optionUsage( tOptions*  pOptions, int exitCode )
     {
         tSCC zOptTitle[] = "   Arg Option-Name   Req?  Description\n";
 
-        fputs( zOptTitle, fp );
-        pOptFmt = zReqOptFmt;
+        pOptTitle = zOptTitle;
+        pOptFmt   = zReqOptFmt;
         break;
     }
     }
+
+    fputs( pOptTitle, fp );
 
     {
         int        ct     = pOptions->optCt;
@@ -124,6 +127,13 @@ optionUsage( tOptions*  pOptions, int exitCode )
             tSCC  zOptArg[] = "opt";
             tSCC  zNoArg[]  = "no ";
             tCC*  pzArgType;
+
+            if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
+                if (exitCode == EXIT_SUCCESS)
+                    fprintf( fp, "\n%s\n\n%s", pOD->pzText, pOptTitle );
+
+                continue;
+            }
 
             /*
              *  Flag prefix:  IF no flags at all, then omit it.
@@ -297,6 +307,8 @@ optionUsage( tOptions*  pOptions, int exitCode )
         }  while (pOD++, optNo++, (--ct > 0));
     }
 
+    fputc( '\n', fp );
+
     {
         tSCC zOptsOnly[]  = "All arguments are named options.\n";
         tSCC zInverted[]  = "Flag options are disabled with a '+' marker.\n";
@@ -304,11 +316,11 @@ optionUsage( tOptions*  pOptions, int exitCode )
 
         tSCC zFlagOkay[]    =
             "Options may be specified by doubled %1$ss and their name\n"
-            "or by a single %1$s and the option character value.\n";
+            "or by a single %1$s and the flag character/option value.\n";
 
         tSCC zNoFlags[]     =
             "Options are specified by their name and either single\n"
-            "or doubled %ss.  The option characters are not interpreted.\n";
+            "or doubled %ss.  Flag characters are not interpreted.\n";
 
         u_int  fOptSet = pOptions->fOptSet;
         tCC*   pzFmt   =  (fOptSet & OPTPROC_SHORTOPT) ? zFlagOkay : zNoFlags;

@@ -1,8 +1,8 @@
 #  -*- Mode: Outline -*-
 
+* new arg for setting time of output files
+* implement support for '#line' directive in definitions
 * Use compat.h vararg/stdarg macros.
-* Convert my (Gary's) code to match your (Bruce's) coding style.
-  (Stroustrup's style, actually)
 * need to write a compat/strcspn.c and add AC_REPLACE_FUNC(strcspn).
 * persuade FSF to patch autoconf so that the AC_CHECK_TYPE(id_t) code doesn't
   pick up `pid_t` (just a change to the regular expression), then fix
@@ -30,5 +30,6 @@
 * implement _FOR x IN a, b, c, ...
 * rewrite in guile (instead of C)
 * parse the autogen macros with a guile translator
+* write a general definition extraction tool (a la src/makedefs.sh)
 * write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.

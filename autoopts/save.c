@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 1.3 1998/07/09 17:15:36 bkorb Exp $
+ *  save.c  $Id: save.c,v 1.4 1998/08/17 14:19:10 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -347,6 +347,9 @@ optionSave( tOptions* pOpts )
                 continue;
 
             if ((pOD->fOptState & OPTST_NO_INIT) != 0)
+                continue;
+
+            if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
                 continue;
 
             if (  (pOD->optEquivIndex != NO_EQUIVALENT)

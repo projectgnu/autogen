@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.17 1998/07/30 21:58:07 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.18 1998/08/17 14:19:15 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -183,6 +183,9 @@ much trouble to do by hand:
 You have list.h:
 
 @example
+#ifndef HEADER
+#define HEADER
+
 #define IDX_ALPHA    0
 #define IDX_BETA     1
 #define IDX_OMEGA    2
@@ -216,7 +219,7 @@ and end our macros, we have a template something like this.
 [#_FOR list#]
 #define IDX_[#list_element _up#]  [#_eval _index#][# /list #]
 
-extern const char* az_name_list[ [#_eval list _hival 1 + #] ];
+extern const char* az_name_list[ [#_eval list _count #] ];
 #endif[#
 
 _ELIF _SFX c = #]
@@ -647,18 +650,9 @@ between @code{-*-} pairs on a single line).  This may be used to
 establish editing "modes" for the file.  These are ignored by
 autogen.
 
-The template proper starts after the pseudo-macro.
-The starting character is the first character that meets one
-of the following conditions:
-
-@enumerate
-@item
-It is the first character of a start-macro marker, or
-@item
-the first non-whitespace character, or
-@item
-the first character after a new-line.
-@end enumerate
+The template proper starts after the pseudo-macro.  The starting
+character is either the first non-whitespace character or the first
+character after the new-line that follows the end macro marker.
 
 So, assuming we want to use @code{[#} and @code{#]} as the start and
 end macro markers, and we wish to produce a @file{.c} and a @file{.h}
@@ -764,7 +758,7 @@ An include file in @code{include/options.h}, needed for
 Automated Option Processing (see next chapter).
 
 @item
-Three template files in @code{share/autogen/opt*.tpl}, needed for
+Four template files in @code{share/autogen/*.tpl}, needed for
 Automated Option Processing (see next chapter).
 
 @item
@@ -792,46 +786,7 @@ I would be interested in seeing the contents of those files and
 any associated messages.  If you choose to go on and analyze
 one of these failures, you will have to invoke the test script
 by hand.  Automake does not provide an easy way to do this
-and there are some things you have to do to make it work.
-
-Here is the code from the make file that runs each test:
-@example
-TESTS_ENVIRONMENT = testsubdir=$(testsubdir) \
-        top_srcdir=$(top_srcdir) CC=$(CC)
-
-srcdir=$(srcdir); export srcdir; \
-for tst in $(TESTS); do \
-  if test -f $$tst; then dir=.; \
-  else dir="$(srcdir)"; fi; \
-  if $(TESTS_ENVIRONMENT) $$dir/$$tst; then \
-    all=`expr $$all + 1`; \
-    echo "PASS: $$tst"; \
-  elif test $$? -ne 77; then \
-    all=`expr $$all + 1`; \
-    failed=`expr $$failed + 1`; \
-    echo "FAIL: $$tst"; \
-  fi; \
-done
-@end example
-
-Notes:
-@itemize @bullet
-@item
-@samp{testsubdir} is a configured value that defaults to @samp{testdir}.
-@item
-@samp{srcdir} is a configured value that defaults to @samp{.}.
-@item
-@samp{top_srcdir} needs to be set correctly.
-@item
-@samp{CC} needs to refer to an ANSI-compliant compiler.
-@end itemize
-
-So, you must invoke the @samp{test-name.test} file thus,
-replacing @code{.} and @code{..} as needed:
-
-@example
-testsubdir=testdir top_srcdir=.. srcdir=. ./test-name.test
-@end example
+and there may be some variables you have to set to make it work.
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -846,8 +801,8 @@ of processing options, keeping usage text up to date and so on.
 This package allows you to specify several program attributes,
 innumerable options and option attributes, then it produces
 all the code necessary to parse and handle the command line
-and initialization file options.  See @samp{features}
-for a more complete description.
+and initialization file options.
+For a more complete description, @xref{Features}.
 
 @menu
 * Features::          Autoopts Features

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 1.3 1998/07/18 05:34:50 bkorb Exp $
+ *  $Id: putshell.c,v 1.4 1998/08/17 14:19:08 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -88,6 +88,9 @@ putBourneShell( tOptions* pOpts )
         if (UNUSED_OPT( pOD ))
             continue;
 
+        if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
+            continue;
+
         /*
          *  We assume stacked arguments if the cookie is non-NULL
          */
@@ -143,7 +146,7 @@ putBourneShell( tOptions* pOpts )
          */
         else {
             tSCC zOptValFmt[] = "%s_%s='";
-            tSCC zOptEnd[]    = "'\nexport %1$s_%s\n";
+            tSCC zOptEnd[]    = "'\nexport %s_%s\n";
 
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
             putQuotedStr( pOD->pzLastArg );

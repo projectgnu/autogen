@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.6 1998/07/18 05:34:54 bkorb Exp $
+ *  $Id: autoopts.c,v 1.7 1998/08/17 14:19:02 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,10 +71,10 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.6 1998/07/18 05:34:54 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.7 1998/08/17 14:19:02 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
-tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";
+tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
 tSCC zIllOptChr[]   = "%s: illegal option -- %c\n";
 tSCC zIllOptStr[]   = "%s: %s option -- %s\n";
 tSCC zIllegal[]     = "illegal";
@@ -239,6 +239,9 @@ longOptionFind( tOptions*  pOpts,
     } else nameLen = strlen( pzOptName );
 
     do  {
+        if ((pOD->fOptState & OPTST_DOCUMENT) != 0)
+            continue;
+
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
             /*
              *  Remember the index for later.
@@ -267,7 +270,6 @@ longOptionFind( tOptions*  pOpts,
          */
         else
             if (  (pOD->pz_DisableName != (char*)NULL)
-               && (pzEq == (char*)NULL)
                && (strneqvcmp( pzOptName, pOD->pz_DisableName, nameLen ) == 0)
                )  {
             /*
@@ -337,7 +339,8 @@ shortOptionFind( tOptions*  pOpts,
          *  IF the values match,
          *  THEN we stop here
          */
-        if (optValue == pRes->optValue)
+        if (  ((pRes->fOptState & OPTST_DOCUMENT) == 0)
+           && (optValue == pRes->optValue)  )
             return pRes;
 
         /*
@@ -702,6 +705,7 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
     ag_bool   isLongOpt      = AG_FALSE;
     tOptDesc* pRes           = (tOptDesc*)NULL;
     u_long    optFlags       = OPTST_DEFINED;
+    tUC       argType;
 
     /*
      *  IF we are starting,
@@ -851,7 +855,14 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
      *  or be optional.  We detect the latter by examining for an option
      *  marker on the next possible argument.
      */
-    switch (pRes->optArgType) {
+    if ((optFlags & OPTST_DISABLED) != 0)
+         argType = ARG_NONE;
+    else argType = pRes->optArgType;
+
+    pRes->fOptState &= OPTST_PERSISTENT;
+    pRes->fOptState |= optFlags;
+
+    switch (argType) {
     case ARG_MUST:
         /*
          *  An option argument is required.
@@ -952,15 +963,13 @@ optionGet( tOptions*   pOpts, int argCt, char** argVect )
             (pOpts->pzCurOpt)++;
         } else {
             if (strchr( pOpts->pzCurOpt, '=' ) != (char*)NULL) {
-                fprintf( stderr, zNoArg, pOpts->pzProgPath, pRes->pz_Name );
+                fprintf( stderr, zNoDisableArg, pOpts->pzProgPath,
+                         pRes->pz_Name );
                 goto errorBail;
             }
             pOpts->pzCurOpt = (char*)NULL;
         }
     }
-
-    pRes->fOptState &= OPTST_PERSISTENT;
-    pRes->fOptState |= optFlags;
 
     if ((pRes->fOptState & OPTST_NUMERIC) != 0) {
         if (pRes->pzLastArg == (char*)NULL) {

@@ -1,5 +1,5 @@
 [=autogen template include
- $Id: opthead.tpl,v 1.10 1998/07/18 05:34:57 bkorb Exp $ =]
+ $Id: opthead.tpl,v 1.11 1998/08/17 14:19:05 bkorb Exp $ =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
 
@@ -88,17 +88,27 @@ default:
 end-component.
 =]
 typedef enum {[=
-_FOR flag=]
-        INDEX_[=prefix _up #_ +=]OPT_[=name _up=],[=
+_FOR flag=][=
+  _IF documentation _exist ! =]
+        INDEX_[=prefix _up #_ +=]OPT_[=name _up #%-16s _printf
+               =] =[=_EVAL _index #%3d _printf=],[=
+  _ENDIF =][=
 /FLAG=][=
+
+_EVAL flag _count "OPTCT=%d" _printf _shell =][=
+
 _IF version _exist=]
-        INDEX_[=prefix _up #_ +=]OPT_VERSION,[=
+        INDEX_[=prefix _up #_ +=]OPT_VERSION          = [=
+                _EVAL "echo $OPTCT ; OPTCT=`expr $OPTCT + 1`" _shell=],[=
 _ENDIF=]
-        INDEX_[=prefix _up #_ +=]OPT_HELP,
-        INDEX_[=prefix _up #_ +=]OPT_MORE_HELP[=
+        INDEX_[=prefix _up #_ +=]OPT_HELP             = [=
+                _EVAL "echo $OPTCT ; OPTCT=`expr $OPTCT + 1`" _shell=],
+        INDEX_[=prefix _up #_ +=]OPT_MORE_HELP        = [=
+                _EVAL "echo $OPTCT ; OPTCT=`expr $OPTCT + 1`" _shell=][=
 
 _IF homerc _exist=],
-        INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS[=
+        INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS        = [=
+                _EVAL "echo $OPTCT" _shell=][=
 _ENDIF=]
 } te[=prefix _cap=]OptIndex;
 [=#
@@ -110,7 +120,8 @@ component = OPTION_CT;
 title = "Full Count of Options";
 
 description = "The full count of all options, both those defined
-and those generated automatically by AutoOpts.";
+and those generated automatically by AutoOpts.  This is primarily
+used to initialize the program option descriptor structure.";
 
 end-component
 =][=#
@@ -134,7 +145,9 @@ description = "If the @code{version} attribute is defined for the program,
 then a stringified version will be #defined as PROGRAM_VERSION and
 PROGRAM_FULL_VERSION.  PROGRAM_FULL_VERSION is used for printing
 the program version in response to the version option.  The version
-option is automatically supplied in response to this attribute, too.";
+option is automatically supplied in response to this attribute, too.
+
+You may access PROGRAM_VERSION via @code{programOptions.pzFullVersion}.";
 
 end-component
 =][=
@@ -161,7 +174,8 @@ title = "Option Descriptor";
 
 description = "This macro is used internally by other AutoOpt macros.
 It is not for general use.  It is used to obtain the option description
-corresponding to its @strong{UPPER CASED} option name argument.";
+corresponding to its @strong{UPPER CASED} option name argument.
+This is primarily used in the following macro definitions:";
 
 end-component
 =]
@@ -176,11 +190,17 @@ component = "HAVE_OPT(<OPTION>)";
 title = "Have this option?";
 
 description = "This macro yields true if the option has been specified
-in any fashion at all.";
+in any fashion at all.  It is used thus:
+
+@example
+if (HAVE_OPT( OPT_NAME )) @{
+    <do-things-associated-with-opt-name>;
+@}
+@end example";
 
 end-component
 =]
-#define     HAVE_[=prefix _up #_ +=]OPT(n) (! UNUSED_OPT(&   [=prefix _up #_ +
+#define     HAVE_[=prefix _up #_ +=]OPT(n) (! UNUSED_OPT(&[=prefix _up #_ +
                  =]DESC(n)))[=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -192,7 +212,14 @@ title = "Option Argument String";
 description = "The option argument value as a pointer to string.
 Note that argument values that have been specified as numbers
 are stored as numbers.  For such options, use instead the
-OPT_VALUE_<OPTION> define.";
+OPT_VALUE_<OPTION> define.  It is used thus:
+
+@example
+if (HAVE_OPT( OPT_NAME )) @{
+    char* p = OPT_ARG( OPT_NAME );
+    <do-things-with-opt-name-argument-string>;
+@}
+@end example";
 
 end-component
 =]
@@ -210,7 +237,26 @@ presetting actions (RC/INI processing or environment variables),
 versus a command line entry versus one of the SET/DISABLE macros,
 then use this macro.  It will contain one of four values:
 @code{OPTST_INIT}, @code{OPTST_SET}, @code{OPTST_PRESET}
-or @code{OPTST_DEFINED}.";
+or @code{OPTST_DEFINED}.  It is used thus:
+
+@example
+switch (STATE_OPT( OPT_NAME )) @{
+    case OPTST_INIT:
+        not-preset, set or on the command line.  (unless CLEAR-ed)
+
+    case OPTST_SET:
+        option set via the SET_OPT_OPT_NAME() macro.
+
+    case OPTST_PRESET:
+        option set via an RC/INI file or environment variable
+
+    case OPTST_DEFINED:
+        option set via a command line option.
+
+    default:
+        cannot happen :)
+@}
+@end example";
 
 end-component
 =]
@@ -224,7 +270,13 @@ component = "COUNT_OPT(<OPTION>)";
 title = "Definition Count";
 
 description = "This macro will tell you how many times the option was
-specified on the command line.  It does not include counts of preset options.";
+specified on the command line.  It does not include counts of preset options.
+
+@example
+if (COUNT_OPT( OPT_NAME ) != desired-count) @{
+    make-an-undesireable-message.
+@}
+@end example";
 
 end-component
 =]
@@ -242,7 +294,7 @@ specified either on the command line or via a SET/DISABLE macro.";
 
 end-component
 =]
-#define    ISSEL_[=prefix _up #_ +=]OPT(n) (SELECTED_OPT(&   [=prefix _up #_ +
+#define    ISSEL_[=prefix _up #_ +=]OPT(n) (SELECTED_OPT(&[=prefix _up #_ +
                  =]DESC(n)))[=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -288,7 +340,19 @@ many of them actually got stacked.
 Do not use this on options that have not been stacked or has not been
 specified (the @code{stack_arg} attribute must have been specified,
 and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
-Otherwise, you will likely page fault.";
+Otherwise, you will likely page fault.
+
+@example
+if (HAVE_OPT( OPT_NAME )) @{
+    int     ct = STACKCT_OPT(  OPT_NAME );
+    char**  pp = STACKLST_OPT( OPT_NAME );
+
+    do  @{
+        char* p = *pp++;
+        do-things-with-p;
+    @} while (--ct > 0);
+@}
+@end example";
 
 end-component
 =]
@@ -309,7 +373,19 @@ command line processing.
 Do not use this on options that have not been stacked or has not been
 specified (the @code{stack_arg} attribute must have been specified,
 and @code{HAVE_OPT(<OPTION>)} must yield TRUE).
-Otherwise, you will likely page fault.";
+Otherwise, you will likely page fault.
+
+@example
+if (HAVE_OPT( OPT_NAME )) @{
+    int     ct = STACKCT_OPT(  OPT_NAME );
+    char**  pp = STACKLST_OPT( OPT_NAME );
+
+    do  @{
+        char* p = *pp++;
+        do-things-with-p;
+    @} while (--ct > 0);
+@}
+@end example";
 
 end-component
 =]
@@ -323,7 +399,8 @@ component = "CLEAR_OPT(<OPTION>)";
 title = "Clear Option Markings";
 
 description = "Make as if the option had never been specified.
-@code{HAVE_OPT(<OPTION>)} will fail after invoking this macro.";
+@code{HAVE_OPT(<OPTION>)} will yield @code{FALSE}
+after invoking this macro.";
 
 end-component
 =]
@@ -344,7 +421,16 @@ Option specific definitions
  *  Interface defines for specific options.
  */[=
 
-_FOR flag=][=#
+_FOR flag =][=
+ _IF documentation _exist =][=
+   _IF call_proc _exist flag_code _exist | =]
+#define SET_[=prefix _up #_ +=]OPT_[=name _up=]   STMTS( \
+        (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
+                           prog_name=]Options, \
+                [=prog_name=]Options.pOptDesc + [=_eval _index=] )[=
+   _ENDIF "callout procedure exists" =][=
+
+ _ELSE "not a documentation option" =][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -357,7 +443,16 @@ specify an option on the command line.  If @code{value} was not
 specified for the option, then it is a unique number associated
 with the option.  @code{option value} refers to this value,
 @code{option argument} refers to the (optional) argument to the
-option.";
+option.
+
+@example
+switch (WHICH_OPT_OTHER_OPT) @{
+case VALUE_OPT_OPT_NAME:
+    this-option-was-really-opt-name;
+case VALUE_OPT_OTHER_OPT:
+    this-option-was-really-other-opt;
+@}
+@end example";
 
 end-component
 =]
@@ -383,7 +478,11 @@ title = "Option Argument Value";
 
 description = "This macro gets emitted only for options that
 take numeric arguments.  The macro yields a word-sized integer
-containing the numeric value of the option argument.";
+containing the numeric value of the option argument.
+
+@example
+int opt_val = OPT_VALUE_OPT_NAME;
+@end example";
 
 end-component
 =][=
@@ -401,7 +500,16 @@ title = "Which Equivalenced Option";
 
 description = "This macro gets emitted only for equivalenced-to
 options.  It is used to distinguish which of the several
-equivalence class members set the equivalenced-to option.";
+equivalence class members set the equivalenced-to option.
+
+@example
+switch (WHICH_OPT_OTHER_OPT) @{
+case VALUE_OPT_OPT_NAME:
+    this-option-was-really-opt-name;
+case VALUE_OPT_OTHER_OPT:
+    this-option-was-really-other-opt;
+@}
+@end example";
 
 end-component
 =][=
@@ -421,7 +529,11 @@ option has the @code{setable} attribute specified.
 
 The form of the macro will actually depend on whether the
 option is equivalenced to another, has an option argument
-and/or has an assigned handler procedure.";
+and/or has an assigned handler procedure.
+
+@example
+SET_OPT_OPT_NAME( \"string-value\" );
+@end example";
 
 end-component
 =][=
@@ -434,8 +546,7 @@ end-component
 #define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
       _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
         [=prefix _up #_ +=]DESC([=name _up
-                       =]).optActualIndex = INDEX_[=prefix _up #_ +
-                       =]OPT_[=name _up=]; \
+                       =]).optActualIndex = [=_eval _index=]; \
         [=prefix _up #_ +=]DESC([=name _up
                        =]).optActualValue = VALUE_[=prefix _up #_ +
                        =]OPT_[=name _up=]; \
@@ -451,18 +562,16 @@ end-component
           stack_arg _exist |=]; \
         (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
                   prog_name=]Options, \
-                [=prog_name=]Options.pOptDesc + INDEX_[=
-                         prefix _up #_ +=]OPT_[=name _up=] )[=
+                [=prog_name=]Options.pOptDesc + [=_eval _index=] )[=
       _ENDIF "callout procedure exists" =] )[=
 
 
-    _ELSE
+    _ELSE "not equivalenced"
 =]
 #define SET_[=prefix _up #_ +=]OPT_[=name _up=][=
       _IF flag_arg _exist=](a)[=_ENDIF=]   STMTS( \
         [=prefix _up #_ +=]DESC([=equivalence _up
-                       =]).optActualIndex = INDEX_[=prefix _up #_ +
-                       =]OPT_[=name _up=]; \
+                       =]).optActualIndex = [=_eval _index=]; \
         [=prefix _up #_ +=]DESC([=equivalence _up
                        =]).optActualValue = VALUE_[=prefix _up #_ +
                        =]OPT_[=name _up=]; \
@@ -484,8 +593,9 @@ end-component
                          prefix _up #_ +=]OPT_[=equivalence _up=] )[=
       _ENDIF "callout procedure exists" =] )[=
 
-    _ENDIF=][=
-  _ENDIF=][=#
+    _ENDIF is/not equivalenced =][=
+
+  _ENDIF setable =][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -499,7 +609,12 @@ always be CLEAR-ed (see above).
 
 The form of the macro will actually depend on whether the
 option is equivalenced to another, and/or has an assigned
-handler procedure.  This macro does not allow an option argument.";
+handler procedure.  Unlike the @code{SET_OPT} macro,
+this macro does not allow an option argument.
+
+@example
+DISABLE_OPT_OPT_NAME;
+@end example";
 
 end-component
 =][=
@@ -515,8 +630,7 @@ end-component
         stack_arg _exist |=]; \
         (*([=prefix _up #_ +=]DESC([=name _up=]).pOptProc))( &[=
                   prog_name=]Options, \
-                [=prog_name=]Options.pOptDesc + INDEX_[=
-                         prefix _up #_ +=]OPT_[=name _up=] )[=
+                [=prog_name=]Options.pOptDesc + [=_eval _index=] )[=
      _ENDIF "callout procedure exists" =] )[=
 
   _ENDIF setable/disableable-exists =][=#
@@ -525,7 +639,9 @@ end-component
 
 End of option-specific defines
 
-=][=
+ =][=
+
+ _ENDIF documentation =][=
 /flag=][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
