@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.4 1998/09/16 20:45:02 bkorb Exp $
+#$Id: optcode.tpl,v 2.5 1998/09/21 21:37:14 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -136,23 +136,38 @@ tSCC zHelp_Name[] = "help";
  *  More_Help option description:
  */
 tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[] = "more-help";
-[=_IF version _exist=] 
+tSCC zMore_Help_Name[] = "more-help";[=
+_IF version _exist
+=]
+
 /*
  *  Version option description:
  */
 tSCC zVersionText[]  = "Output version information and exit";
-tSCC zVersion_Name[] = "version";
-[=_ENDIF=][=_IF homerc _exist=]
+tSCC zVersion_Name[] = "version";[=
+_ENDIF =][=
+_IF homerc _exist
+=]
+
 /*
  *  Save_Opts option description:
  */
-tSCC zSave_OptsText[]  = "Save the computed option state to an rc file";
+tSCC zSave_OptsText[]  = "Save the option state to an rc file";
 tSCC zSave_Opts_Name[] = "save-opts";
-[=_ENDIF=][=
+
+/*
+ *  Load_Opts option description:
+ */
+extern tOptProc doLoadOpt;
+tSCC    zLoad_OptsText[]     = "Load options from an rc file";
+tSCC    zLoad_Opts_NAME[]    = "LOAD_OPTS";
+tSCC    zNotLoad_Opts_Name[] = "no-load-opts";
+tSCC    zNotLoad_Opts_Pfx[]  = "no";
+#define zLoad_Opts_Name        (zNotLoad_Opts_Name + 3)[=
+_ENDIF =][=
 
 
-_IF flag.flag_code _exist flag.call_proc _exist |=][=
+_IF flag.flag_code _exist flag.call_proc _exist | =][=
 
    # "For test builds, no need to call option procs" =][=
 
@@ -175,8 +190,7 @@ extern tOptProc [=call_proc=];[=
 static tOptProc doOpt[=name _cap=];[=
 
     _ENDIF=][=
-  /FLAG=]
-[=
+  /FLAG=][=
  
   _IF TEST_MAIN _env ! ! test_main _exist | =][=
 
@@ -380,7 +394,22 @@ _IF homerc _exist
      /* option proc      */ (tOptProc*)NULL,
      /* desc, NAME, name */ zSave_OptsText,    (const char*)NULL,
                             zSave_Opts_Name,
-     /* disablement strs */ (const char*)NULL, (const char*)NULL }[=
+     /* disablement strs */ (const char*)NULL, (const char*)NULL },
+
+  {  /* entry idx, value */ INDEX_[=prefix _up #_ +=]OPT_LOAD_OPTS, VALUE_[=
+                                    prefix _up #_ +=]OPT_LOAD_OPTS,
+     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* option argument  */ ARG_MUST,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
+     /* opt state flags  */ OPTST_DISABLEOK | OPTST_DISABLED | OPTST_INIT,
+     /* last opt argumnt */ (char*)NULL,
+     /* arg list/cookie  */ (void*)NULL,
+     /* must/cannot opts */ (const int*)NULL, (const int*)NULL,
+     /* option proc      */ doLoadOpt,
+     /* desc, NAME, name */ zLoad_OptsText,  zLoad_Opts_NAME,
+                            zLoad_Opts_Name,
+     /* disablement strs */ zNotLoad_Opts_Name, zNotLoad_Opts_Pfx }[=
 _ENDIF=]
 };
 
@@ -419,8 +448,10 @@ tSCC   zRcName[]     = "[=
   _ELIF TARGETOS _env DOS = !=].[=prog_name _down=]rc[=
   _ELSE                      =][=prog_name  _up=].INI[=
   _ENDIF=]";
-tSCC*  apzHomeList[] = {[=_FOR homerc=]
-       [=homerc _str=],[=/homerc=]
+tSCC*  apzHomeList[] = {[=
+  _FOR homerc=]
+       [=homerc _str=],[=
+  /homerc=]
        (char*)NULL };[=
 _ELSE=]
 #define zRcName     (tCC*)NULL
@@ -475,7 +506,8 @@ tOptions [=prog_name=]Options = {
     0, (char*)NULL,
     { INDEX_[=prefix _up #_ +=]OPT_MORE_HELP,
       [=_IF homerc _exist=]INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS[=
-        _ELSE            =] 0 /* no option state saving */[=_ENDIF=],
+        _ELSE            =] 0 /* no option state saving */[=
+        _ENDIF=],
       [=_IF NUMBER_OPTION _env
              =][=_eval NUMBER_OPTION _env =] /* index of '-#' option */[=
         _ELSE=]NO_EQUIVALENT /* no '-#' option */[=_ENDIF=],

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.1 1998/09/14 14:33:50 bkorb Exp $
+ *  $Id: autoopts.c,v 2.2 1998/09/21 21:37:13 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -71,7 +71,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 2.1 1998/09/14 14:33:50 bkorb Exp $"
+#ident "$Id: autoopts.c,v 2.2 1998/09/21 21:37:13 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoDisableArg[]= "%s: disabled `%s' cannot have an argument\n";
@@ -528,6 +528,27 @@ filePreset( tOptions*  pOpts, const char* pzFileName )
 
     pOpts->fOptSet = saveOpt;
     fclose( fp );
+}
+
+
+/*
+ *  doLoadOpt
+ *
+ *  This is callable from the option descriptor.
+ *  It is referenced when homerc files are enabled.
+ */
+    void
+doLoadOpt( tOptions*  pOpts, tOptDesc* pOptDesc )
+{
+    /*
+     *  IF the option is not being disabled,
+     *  THEN load the file.
+     *  (If it is being disabled, then the disablement processing
+     *  already took place.  It must be done to suppress preloading
+     *  of ini/rc files.)
+     */
+    if (! DISABLED_OPT( pOptDesc ))
+        filePreset( pOpts, pOptDesc->pzLastArg );
 }
 
 

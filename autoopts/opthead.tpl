@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.2 1998/08/24 08:43:49 bkorb Exp $
+#$Id: opthead.tpl,v 2.3 1998/09/21 21:37:15 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -109,7 +109,9 @@ _ENDIF=]
 
 _IF homerc _exist=],
         INDEX_[=prefix _up #_ +=]OPT_SAVE_OPTS        = [=
-                _EVAL "echo $OPTCT" _shell=][=
+                _EVAL "echo $OPTCT ; OPTCT=`expr $OPTCT + 1`" _shell=],
+        INDEX_[=prefix _up #_ +=]OPT_LOAD_OPTS        = [=
+                _EVAL "echo $OPTCT ; OPTCT=`expr $OPTCT + 1`" _shell=][=
 _ENDIF=]
 } te[=prefix _cap=]OptIndex;
 [=#
@@ -125,16 +127,8 @@ and those generated automatically by AutoOpts.  This is primarily
 used to initialize the program option descriptor structure.";
 
 end-component
-=][=#
-
-The '+ 2' is for the HELP and MORE_HELP options.
-The 'version' and 'homerc' existence macros add zero or one.
-
 =]
-#define [=prefix _up #_ +=]OPTION_CT    [=_eval
-                  flag _count 2 +
-                  version _exist +
-                  homerc  _exist + =][=#
+#define [=prefix _up #_ +=]OPTION_CT    [=_eval "echo $OPTCT" _shell =][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -666,7 +660,8 @@ _IF flag.value _exist =][=
   _ENDIF =][=
 
   _IF homerc _exist=]
-#define VALUE_[=prefix _up #_ +=]OPT_SAVE_OPTS      '>'[=
+#define VALUE_[=prefix _up #_ +=]OPT_SAVE_OPTS      '>'
+#define VALUE_[=prefix _up #_ +=]OPT_LOAD_OPTS      '<'[=
   _ENDIF
 =]
 #define VALUE_[=prefix _up #_ +=]OPT_HELP           '?'
@@ -681,7 +676,9 @@ _ELSE "flag.value *DOES NOT* exist" =][=
   _ENDIF=][=
   _IF homerc _exist =]
 #define VALUE_[=prefix _up #_ +=]OPT_SAVE_OPTS      INDEX_[=
-                                      prefix _up #_ +=]OPT_SAVE_OPTS[=
+                                      prefix _up #_ +=]OPT_SAVE_OPTS
+#define VALUE_[=prefix _up #_ +=]OPT_SAVE_OPTS      INDEX_[=
+                                      prefix _up #_ +=]OPT_LOAD_OPTS[=
   _ENDIF=]
 #define VALUE_[=prefix _up #_ +=]OPT_HELP           INDEX_[=
                                       prefix _up #_ +=]OPT_HELP

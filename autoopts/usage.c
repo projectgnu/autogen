@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.1 1998/09/14 14:33:55 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.2 1998/09/21 21:37:18 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -120,6 +120,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
         int        ct     = pOptions->optCt;
         int        optNo  = 0;
         tOptDesc*  pOD    = pOptions->pOptDesc;
+        int        docCt  = 0;
 
         do  {
             tSCC  zReqArg[] = "YES";
@@ -133,14 +134,25 @@ optionUsage( tOptions*  pOptions, int exitCode )
             tCC*  pzArgType;
 
             if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {
-                if (exitCode == EXIT_SUCCESS)
+                if (exitCode == EXIT_SUCCESS) {
                     fprintf( fp, zBreak, pOD->pzText, pOptTitle );
+                    docCt++;
+                }
 
                 continue;
             }
 
+            /*
+             *  IF       this is the first auto-opt maintained option
+             *    *AND*  we are doing a full help
+             *    *AND*  there are documentation options
+             *    *AND*  the last one was not a doc option,
+             *  THEN document that the remaining options are not user opts
+             */
             if (  (pOptions->presetOptCt == pOD->optIndex)
-               && (exitCode == EXIT_SUCCESS) )
+               && (exitCode == EXIT_SUCCESS)
+               && (docCt > 0)
+               && (pOD[-1].fOptState & OPTST_DOCUMENT == 0) )
                 fprintf( fp, zBreak, zAuto, pOptTitle );
 
             /*
