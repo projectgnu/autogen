@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Tue Aug  3 17:13:20 1999				      
+# Last Modified:     Wed Aug  4 09:55:37 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.12 1999/08/04 00:13:32 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.13 1999/08/04 16:55:47 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -55,6 +55,29 @@ post )
     # remove the fake file so we don't forget to generate it later.
     test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
         || rm -f doc/autogen.texi
+    (  sed 1q configure
+       cat <<-	'_EOF_'
+
+	START_DIR=`pwd`
+	SRCDIR=`echo $0 | sed 's;/[^/]*$;;'`
+	SRCDIR=`cd $SRCDIR && pwd`
+	test "$SRCDIR" = "$START_DIR" || {
+	  ( cd $SRCDIR
+	    find . -type d ) |
+	  egrep -v CVS/ |
+	  while read f ; do mkdir $f ; done
+	  ( cd $SRCDIR
+	    find . -type f ) |
+	  egrep -v CVS/ |
+	  while read f ; do ln -s $SRCDIR/$f $f ; done
+	  sh ./configure $@
+	  exit 0
+	}
+
+_EOF_
+        sed 1d configure ) > configure.tmp
+
+    mv -f configure.tmp configure
     ;;
 
 esac
