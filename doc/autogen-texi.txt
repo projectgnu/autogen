@@ -744,6 +744,12 @@ several are ignored.  There is also an additional @code{#shell} -
 @code{#endshell} pair.  Another minor difference is that AutoGen
 directives must have the hash character (@code{#}) in column 1.
 
+The final tweak is that @code{#!} is treated as a comment line.
+Using this feature, you can use:  @samp{#! /usr/local/bin/autogen}
+as the first line of a definitons file, set the mode to executable
+and "run" the definitions file as if it were a direct invocation of
+AutoGen.  This was done for its hack value.
+
 The ignored directives are:
 @ignore
 END   == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
