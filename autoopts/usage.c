@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.6 2000/04/04 13:22:18 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.7 2000/09/30 20:03:28 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -247,6 +247,15 @@ optionUsage( tOptions*  pOptions, int exitCode )
             if (pOD->pz_DisableName != (char*)NULL )  {
                 tSCC zDis[] = "\t\t\t\t- disabled as --%s\n";
                 fprintf( fp, zDis, pOD->pz_DisableName );
+            }
+
+            /*
+             *  IF the option defaults to being enabled,
+             *  THEN print that out
+             */
+            if (pOD->fOptState & OPTST_INITENABLED)  {
+                tSCC zEnab[] = "\t\t\t\t- enabled by default\n";
+                fputs( zEnab, fp );
             }
 
             /*
