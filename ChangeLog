@@ -1,3 +1,12 @@
+2002-02-02  Bruce Korb  <bkorb@gnu.org>
+
+	* config/conf*.tpl: reworked to correspond to web site.
+	* configure.in: AG_ENABLE_SHELL renamed to AG_DISABLE_SHELL
+	* agen5/agShell.c: ENABLE_SHELL is now SHELL_ENABLED
+	* doc/*: added and reworked docs.
+	* doc/gnudoc.tpl: template for www.gnu.org/manuals page.
+	* doc/mkgnudoc.sh: script to construct above pages
+
 2002-01-30  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(zSchemeInit): add make-header-guard Scheme function

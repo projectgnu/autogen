@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 3.6 2002/01/29 03:05:54 bkorb Exp $
+ *  $Id: agShell.c,v 3.7 2002/02/03 01:34:13 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -40,7 +40,7 @@
 
 tSCC   zTxtBlock[] = "Text Block";
 
-#ifndef ENABLE_SHELL
+#ifndef SHELL_ENABLED
  void closeServer( void ) { }
 
  int chainOpen( int stdinFd, tCC** ppArgs, pid_t* pChild ) { return -1; }
@@ -368,7 +368,7 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
     pfPair->pfWrite = fdopen( fdPair.writeFd, "w" FOPEN_TEXT_FLAG );
     return chId;
 }
-#endif /* ENABLE_SHELL */
+#endif /* SHELL_ENABLED */
 
 
 /*
@@ -455,7 +455,7 @@ loadData( FILE* fp )
                      "resizing text output" );
 }
 
-#ifdef ENABLE_SHELL
+#ifdef SHELL_ENABLED
 /*
  *  Run a semi-permanent server shell.  The program will be the
  *  one named by the environment variable $SHELL, or default to "sh".
@@ -529,7 +529,7 @@ runShell( const char*  pzCmd )
     }
 }
 
-#endif /* ! ENABLE_SHELL */
+#endif /* ! SHELL_ENABLED */
 /*
  * Local Variables:
  * c-file-style: "stroustrup"
