@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.35 1999/11/02 04:08:08 bruce Exp $
+## $Id: Makefile.am,v 2.36 2000/03/05 21:50:07 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -113,6 +113,6 @@ $(top_srcdir)/columns/columns.texi :
 
 LSM : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
 	top_srcdir=$(top_srcdir) \
-	$(AGEXE) -T LSM.tpl $(OPTIONS_DEF)
+	$(AGEXE) -T $(srcdir)/LSM.tpl $(OPTIONS_DEF)
 
 # Makefile.am ends here
