@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.6 2005/02/20 02:15:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -727,7 +727,7 @@ fn
 @node script-parser
 @subsection Parsing with a Portable Script
 
-If you had used @code{test-main = putShellParse} instead, then you can,
+If you had used @code{test-main = optionParseShell} instead, then you can,
 at this point, merely run the program and it will write the parsing
 script to standard out.  You may also provide this program with command
 line options to specify the shell script file to create or edit, and you
@@ -741,7 +741,7 @@ and the script parser itself would be very verbose:
 opts="-o genshellopt -DTEST_GETDEFS_OPTS ${incs}"
 
 ( cat ${top_srcdir}/getdefs/opts.def
-  echo "test_main = 'putShellParse';"
+  echo "test_main = 'optionParseShell';"
   echo 'config-header = "config.h";'
 ) | (
   set -x

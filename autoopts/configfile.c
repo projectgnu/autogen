@@ -1,7 +1,7 @@
 
 /*
- *  $Id: configfile.c,v 4.8 2005/02/14 19:02:37 bkorb Exp $
- * Time-stamp:      "2005-02-14 10:58:37 bkorb"
+ *  $Id: configfile.c,v 4.9 2005/02/20 02:15:48 bkorb Exp $
+ * Time-stamp:      "2005-02-19 15:20:36 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -153,6 +153,127 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
 }
 
 
+static char*
+parseValueType(
+    tOptions*     pOpts,
+    char*         pzText,
+    tOptionValue* pType )
+{
+    return strchr( pzText, '>' );
+}
+
+
+static char*
+parseKeyWordType(
+    tOptions*     pOpts,
+    char*         pzText,
+    tOptionValue* pType )
+{
+    return strchr( pzText, '>' );
+}
+
+
+static char*
+parseSetMemType(
+    tOptions*     pOpts,
+    char*         pzText,
+    tOptionValue* pType )
+{
+    return strchr( pzText, '>' );
+}
+
+
+static char*
+parseLoadMode(
+    char*               pzText,
+    tOptionLoadMode*    pMode )
+{
+    size_t cooked_len   = strlen(zLoadCooked);
+    size_t uncooked_len = strlen(zLoadUncooked);
+    size_t keep_len     = strlen(zLoadKeep);
+
+    if (strncmp( pzText, zLoadCooked, cooked_len ) == 0) {
+        if ((pzText[cooked_len] == '>') || isspace(pzText[cooked_len])) {
+            *pMode = OPTION_LOAD_COOKED;
+            return pzText + cooked_len + 1;
+        }
+
+    } else if (strncmp( pzText, zLoadUncooked, uncooked_len ) == 0) {
+        if ((pzText[uncooked_len] == '>') || isspace(pzText[uncooked_len])) {
+            *pMode = OPTION_LOAD_UNCOOKED;
+            return pzText + uncooked_len + 1;
+        }
+
+    } else if (strncmp( pzText, zLoadKeep, keep_len ) == 0) {
+        if ((pzText[keep_len] == '>') || isspace(pzText[keep_len])) {
+            *pMode = OPTION_LOAD_KEEP;
+            return pzText + keep_len + 1;
+        }
+    }
+
+    pzText = strchr( pzText, '>' );
+    if (pzText != NULL)
+        pzText++;
+    return pzText;
+}
+
+
+static char*
+parseAttributes(
+    tOptions*           pOpts,
+    char*               pzText,
+    tOptionLoadMode*    pMode,
+    tOptionValue*       pType )
+{
+    do  {
+        switch (*pzText) {
+        case '>': return pzText+1;
+
+        default:
+        case NUL: return NULL;
+
+        case ' ':
+        case '\t':
+        case '\n':
+        case '\f':
+        case '\r':
+        case '\v':
+            break;
+        }
+
+        while (isspace( *++pzText ))   ;
+
+        {
+            size_t len = strlen( zLoadType );
+            if (strncmp( pzText, zLoadType, len ) == 0) {
+                pzText = parseValueType( pOpts, pzText+len, pType );
+                continue;
+            }
+        }
+
+        {
+            size_t len = strlen( zKeyWords );
+            if (strncmp( pzText, zKeyWords, len ) == 0) {
+                pzText = parseKeyWordType( pOpts, pzText+len, pType );
+                continue;
+            }
+        }
+
+        {
+            size_t len = strlen( zSetMembers );
+            if (strncmp( pzText, zSetMembers, len ) == 0) {
+                pzText = parseSetMemType( pOpts, pzText+len, pType );
+                continue;
+            }
+        }
+
+        pzText = parseLoadMode( pzText, pMode );
+    } while (pzText != NULL);
+
+    return pzText;
+}
+
+
 /*
  *  handleStructure -- "pzText" points to a '<' character, followed by an alpha.
  *  The end of the entry is either the "/>" following the name, or else a
@@ -169,8 +290,8 @@ handleStructure(
     size_t uncooked_len = strlen(zLoadUncooked);
     size_t keep_len     = strlen(zLoadKeep);
 
-    load_mode_t   mode  = LOAD_UNCOOKED;
-    char* pzName        = ++pzText;
+    tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
+    char* pzName         = ++pzText;
     char* pcNulPoint;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
@@ -189,12 +310,12 @@ handleStructure(
             pzText += keep_len;
             memmove( pzD, pzText, strlen(pzText)+1 );
             pzText = pzD;
-            mode = LOAD_KEEP;
+            mode = OPTION_LOAD_KEEP;
 
         } else if (strncmp( pzText, zLoadCooked, cooked_len ) == 0) {
             pzText += cooked_len;
             memset( pzD, ' ', cooked_len );
-            mode = LOAD_COOKED;
+            mode = OPTION_LOAD_COOKED;
 
         } else if (strncmp( pzText, zLoadUncooked, uncooked_len ) == 0) {
             pzText += uncooked_len;
@@ -216,7 +337,7 @@ handleStructure(
             return NULL;
         *pzText = NUL;
         pzText += 2;
-        loadOptionLine( pOpts, pOS, pzName, direction, LOAD_KEEP );
+        loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_KEEP );
         return pzText;
 
     case '>':
@@ -293,7 +414,7 @@ handleConfig(
     if (pzText > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
-        loadOptionLine( pOpts, pOS, pzName, direction, LOAD_UNCOOKED );
+        loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED );
         return pzEnd;
     }
 
@@ -349,7 +470,7 @@ handleConfig(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine( pOpts, pOS, pzName, direction, LOAD_UNCOOKED );
+    loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED );
 
     return pzEnd;
 }
@@ -467,7 +588,7 @@ filePreset(
     /*
      *  IF this is called via "optionProcess", then we are presetting.
      *  This is the default and the PRESETTING bit will be set.
-     *  If this is called via "configFileLoad", then the bit is not set
+     *  If this is called via "optionFileLoad", then the bit is not set
      *  and we consider stuff set herein to be "set" by the client program.
      */
     if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
@@ -605,7 +726,7 @@ internalFileLoad( tOptions* pOpts )
 }
 
 
-/*=export_func configFileLoad
+/*=export_func optionFileLoad
  *
  * what: Load the locatable config files, in order
  *
@@ -637,7 +758,7 @@ internalFileLoad( tOptions* pOpts )
  *       always be returned.
 =*/
 int
-configFileLoad( tOptions* pOpts, const char* pzProgram )
+optionFileLoad( tOptions* pOpts, const char* pzProgram )
 {
     if (! SUCCESSFUL( validateOptionsStruct( pOpts, pzProgram )))
         return -1;
@@ -648,7 +769,7 @@ configFileLoad( tOptions* pOpts, const char* pzProgram )
 }
 
 
-/*=export_func  doLoadOpt
+/*=export_func  optionLoadOpt
  * private:
  *
  * what:  Load an option rc/ini file
@@ -659,7 +780,7 @@ configFileLoad( tOptions* pOpts, const char* pzProgram )
  *  Processes the options found in the file named with pOptDesc->pzLastArg.
 =*/
 void
-doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
+optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
 {
     /*
      *  IF the option is not being disabled,

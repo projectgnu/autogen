@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-12-06 11:21:10 bkorb"
+# Time-stamp:        "2005-02-19 17:59:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 4.1 2005/01/01 00:21:00 bkorb Exp $
+# $Id: shell.test,v 4.2 2005/02/20 02:15:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -87,7 +87,7 @@ _EOF_
 cmp -s $testname.test $testname.out || \
   failure "`diff $testname.out $testname.test`"
 
-sed '/test_main/s/yes/putShellParse/' $testname.def > XX
+sed '/test_main/s/yes/optionParseShell/' $testname.def > XX
 mv -f XX $testname.def
 
 echo ${AG_L} $testname.def

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.8 2005/02/14 16:25:37 bkorb Exp $
+# $Id: optmain.tpl,v 4.9 2005/02/20 02:15:48 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -98,9 +98,9 @@ main( int argc, char** argv )
 {
     int res = EXIT_SUCCESS;[=
 
-  IF (= (get "test-main") "putShellParse") =]
+  IF (= (get "test-main") "optionParseShell") =]
     extern tOptions  genshelloptOptions;
-    extern void      putShellParse( tOptions* );
+    extern void      optionParseShell( tOptions* );
     extern tOptions* pShellParseOptions;
 
     /*
@@ -109,7 +109,7 @@ main( int argc, char** argv )
      */
     pShellParseOptions = &[=(. pname)=]Options;
     (void)optionProcess( &genshelloptOptions, argc, argv );
-    putShellParse( &[=(. pname)=]Options );[=
+    optionParseShell( &[=(. pname)=]Options );[=
 
   ELIF (exist? "main-text") =][=
     IF (not (exist? "option-code")) =]
@@ -131,7 +131,7 @@ main( int argc, char** argv )
 
     (set! opt-name (get "test-main"))
     (if (<= (string-length opt-name) 3)
-        (set! opt-name "putBourneShell")) =]
+        (set! opt-name "optionPutShell")) =]
     {
         void [= (. opt-name) =]( tOptions* );
         [= (. opt-name) =]( &[=(. pname)=]Options );
@@ -452,10 +452,10 @@ DEFINE build-main               =][= FOR main[] =][=
      build-guile-main           =][=
 
   == shell-process              =][=
-     INVOKE build-test-main  test-main = "putBourneShell" =][=
+     INVOKE build-test-main  test-main = "optionPutShell"   =][=
 
   == shell-parser               =][=
-     INVOKE build-test-main  test-main = "putShellParse"  =][=
+     INVOKE build-test-main  test-main = "optionParseShell" =][=
 
   == main                       =][=
      INVOKE build-test-main     =][=
@@ -493,16 +493,16 @@ DEFINE declare-option-callbacks
   (define undef-proc-names "")
   (define extern-proc-list (string-append
 
-    "doPagedUsage\n"
+    "optionPagedUsage\n"
 
-    (if (exist? "version") "doVersion\n" "")
+    (if (exist? "version") "optionPrintVersion\n" "")
   ) )
 
   (define extern-test-list (string-append
 
-    "doPagedUsage\n"
+    "optionPagedUsage\n"
 
-    (if (exist? "version") "doVersionStderr\n" "")
+    (if (exist? "version") "optionVersionStderr\n" "")
   ) )
 
   (define emit-decl-list (lambda(txt-var is-extern)
@@ -510,7 +510,7 @@ DEFINE declare-option-callbacks
     (set! txt-var (shellf "
       (egrep -v '^%s$' | sort -u | \
       sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
-          (if is-extern "NULL" "(NULL|stackOptArg|unstackOptArg)")
+          (if is-extern "NULL" "(NULL|optionStackArg|optionUnstackArg)")
           txt-var ))
 
     (shellf (if (< (string-length txt-var) 72)
@@ -575,7 +575,7 @@ DEFINE declare-option-callbacks
 =]
 #if defined([=(. main-guard)=])
 /*
- *  Under test, omit argument processing, or call stackOptArg,
+ *  Under test, omit argument processing, or call optionStackArg,
  *  if multiple copies are allowed.
  */
 extern tOptProc

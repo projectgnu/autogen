@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.5 2005/02/07 18:19:01 bkorb Exp $
+ *  $Id: agShell.c,v 4.6 2005/02/20 02:15:48 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -139,34 +139,11 @@ serverSetup( void )
     errClose = AG_FALSE;
 
     {
-        static char zTrap[] =
-            /*
-             *  IF it is possible to put the base shell into POSIX/Bourne mode,
-             *  THEN do so...
-             */
-            "if test -n \"${ZSH_VERSION+set}\" "
-                "&& (emulate sh) >/dev/null 2>&1\n"
-            "then\n"
-            "  emulate sh\n"
-            "  NULLCMD=:\n\n"
-            "else\n  if test -n \"${BASH_VERSION+set}\" "
-                       "&& (set -o posix) >/dev/null 2>&1\n"
-            "then\n"
-            "  set -o posix\n"
-            "fi ; fi\n"
-
-            "for f in 1 2 5 6 7 13 14\n"
-            "do trap \"echo trapped on $f >&2\" $f 2>/dev/null\n"
-            "done\n"
-            "test -n \"${CDPATH}\" && { CDPATH=''\n"
-            "  unset CDPATH 2>&null\n}\n"
-            "( unalias cd ) 2>/dev/null >&2 && unalias cd\n"
-            "AG_pid=\000.........\n";
         static char* pzPid = NULL;
         char* pz;
-        pzLastCmd = zTrap;
+        pzLastCmd = zShellInit;
         if (pzPid == NULL)
-            pzPid = zTrap + strlen( zTrap );
+            pzPid = zShellInit + strlen(zShellInit);
         sprintf( pzPid, "%d\n", getpid() );
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
         (void)fflush( serverPair.pfWrite );

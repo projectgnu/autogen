@@ -26,7 +26,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.3 2005/02/14 16:25:37 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.4 2005/02/20 02:15:48 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -136,7 +136,7 @@ optionUsage (tOptions* pOptions, int status)
 }
 
 void
-doPagedUsage(
+optionPagedUsage(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -146,7 +146,7 @@ doPagedUsage(
 }
 
 void
-doVersion(
+optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -287,7 +287,7 @@ ENDIF +]) {
       /* NOTREACHED */
 [+ IF (exist? "version") +]
     case VALUE_OPT_VERSION:
-      doVersion (&[+ (. prog-name) +]Options, &DESC(VERSION));
+      optionPrintVersion (&[+ (. prog-name) +]Options, &DESC(VERSION));
       /* NOTREACHED */
 [+ ENDIF +]
     default:

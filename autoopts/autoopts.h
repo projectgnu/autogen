@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-14 16:47:00 bkorb"
+ *  Time-stamp:      "2005-02-19 15:17:04 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.10 2005/02/15 01:34:13 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.11 2005/02/20 02:15:48 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -110,38 +110,11 @@ typedef int tSuccess;
 #define HADGLITCH( p )     ((p) >  SUCCESS)
 
 /*
- *  When loading a line (or block) of text as an option, the value can
- *  be processed in any of several modes:
- *
- *  @table @samp
- *  @item keep
- *  Every part of the value between the delimiters is saved.
- *
- *  @item uncooked
- *  Even if the value begins with quote characters, do not do quote processing.
- *
- *  @item cooked
- *  If the value looks like a quoted string, then process it.
- *  Double quoted strings are processed the way strings are in "C" programs,
- *  except they are treated as regular characters if the following character
- *  is not a well-established escape sequence.
- *  Single quoted strings (quoted with apostrophies) are handled the way
- *  strings are handled in shell scripts, *except* that backslash escapes
- *  are honored before backslash escapes and apostrophies.
- *  @end table
- */
-typedef enum {
-    LOAD_COOKED,
-    LOAD_UNCOOKED,
-    LOAD_KEEP
-} load_mode_t;
-
-/*
- *  The pager state is used by doPagedUsage() procedure.
+ *  The pager state is used by optionPagedUsage() procedure.
  *  When it runs, it sets itself up to be called again on exit.
  *  If, however, a routine needs a child process to do some work
  *  before it is done, then 'pagerState' must be set to
- *  'PAGER_STATE_CHILD' so that doPagedUsage() will not try
+ *  'PAGER_STATE_CHILD' so that optionPagedUsage() will not try
  *  to run the pager program before its time.
  */
 typedef enum {
@@ -349,7 +322,7 @@ typedef struct {
  */
 extern FILE* option_usage_fp;
 
-extern tOptProc doVersion, doPagedUsage, doLoadOpt;
+extern tOptProc optionPrintVersion, optionPagedUsage, optionLoadOpt;
 
 #define LOCAL static
 #include "proto.h"

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.10 2005/02/14 15:28:29 bkorb Exp $
- *  Time-stamp:      "2005-02-14 07:25:49 bkorb"
+ *  $Id: load.c,v 4.11 2005/02/20 02:15:48 bkorb Exp $
+ *  Time-stamp:      "2005-02-19 15:27:03 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -54,7 +54,7 @@
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static char*
-findArg( char* pzTxt, load_mode_t mode );
+findArg( char* pzTxt, tOptionLoadMode mode );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
@@ -236,7 +236,7 @@ optionMakePath(
 
 
 static char*
-findArg( char* pzTxt, load_mode_t mode )
+findArg( char* pzTxt, tOptionLoadMode mode )
 {
     tSCC zBrk[] = " \t:=";
     char* pzEnd = strpbrk( pzTxt, zBrk );
@@ -253,7 +253,7 @@ findArg( char* pzTxt, load_mode_t mode )
      *  character that follows the end of the configurable name, regardless
      *  of which character caused it.
      */
-    if (mode == LOAD_KEEP) {
+    if (mode == OPTION_LOAD_KEEP) {
         *(pzEnd++) = NUL;
         return pzEnd;
     }
@@ -279,7 +279,7 @@ findArg( char* pzTxt, load_mode_t mode )
         while (isspace(pz[-1]) && (pz > pzEnd))  pz--;
         *pz = NUL;
 
-        if ((mode == LOAD_UNCOOKED) || (pzEnd == pz))
+        if ((mode == OPTION_LOAD_UNCOOKED) || (pzEnd == pz))
             return pzEnd;
 
         if ((pz[-1] != '"') && (pz[-1] != '\''))
@@ -300,7 +300,7 @@ findArg( char* pzTxt, load_mode_t mode )
 /*
  *  Load an option from a block of text.  The text must start with the
  *  configurable/option name and be followed by its associated value.
- *  That value may be processed in any of several ways.  See "load_mode_t"
+ *  That value may be processed in any of several ways.  See "tOptionLoadMode"
  *  in autoopts.h.
  */
 LOCAL void
@@ -309,7 +309,7 @@ loadOptionLine(
     tOptState*  pOS,
     char*       pzLine,
     tDirection  direction,
-    load_mode_t load_mode )
+    tOptionLoadMode   load_mode )
 {
     while (isspace( *pzLine ))  pzLine++;
 
@@ -442,7 +442,7 @@ optionLoadLine(
     tOptState st = OPTSTATE_INITIALIZER(SET);
     char* pz;
     AGDUPSTR( pz, pzLine, "user option line" );
-    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS, LOAD_UNCOOKED );
+    loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS, OPTION_LOAD_UNCOOKED );
     AGFREE( pz );
 }
 /*

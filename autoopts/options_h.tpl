@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.6 2005/02/15 01:34:13 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.7 2005/02/20 02:15:48 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -37,15 +37,18 @@ h=options.h
 /*
  *  PUBLIC DEFINES
  *
- *  The following defines may be used in applications that need to test
- *  the state of an option.  To test against these masks and values,
- *  a pointer to an option descriptor must be obtained.  There are two
- *  ways:  1.  inside an option processing procedure, it is the second
- *  argument, conventionally "tOptDesc* pOD".  2.  Outside of an option
- *  procedure (or to reference a different option descriptor), use
- *  either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".  See the
- *  relevant generated header file to determine which and what values
- *  for "opt_name" are available.
+ *  The following defines may be used in applications that need to test the
+ *  state of an option.  To test against these masks and values, a pointer
+ *  to an option descriptor must be obtained.  There are two ways:
+ *
+ *  1. inside an option processing procedure, it is the second argument,
+ *  conventionally "tOptDesc* pOD".
+ *
+ *  2.  Outside of an option procedure (or to reference a different option
+ *  descriptor), use either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".
+ *
+ *  See the relevant generated header file to determine which and what
+ *  values for "opt_name" are available.
  */
 
 #define OPTST_SET_ARGTYPE(n) ((n) << 12)
@@ -59,7 +62,19 @@ typedef enum {
     OPARG_TYPE_MEMBERSHIP    = 4,       /* opt arg sets set membership bits  */
     OPARG_TYPE_NUMERIC       = 5,       /* opt arg has numeric value         */
     OPARG_TYPE_HIERARCHY     = 6        /* option arg is hierarchical value  */
-} ao_argtype_t;
+} teOptArgType;
+
+typedef struct optionValue {
+    teOptArgType        valType;
+    union {
+        const char*     pzStr;          /* valType == OPARG_TYPE_STRING      */
+        int             enumVal;        /* valType == OPARG_TYPE_ENUMERATION */
+        int             boolVal;        /* valType == OPARG_TYPE_BOOLEAN     */
+        long            setVal;         /* valType == OPARG_TYPE_MEMBERSHIP  */
+        long            longVal;        /* valType == OPARG_TYPE_NUMERIC     */
+        void*           nestVal;        /* valType == OPARG_TYPE_HIERARCHY   */
+    } v;
+} tOptionValue;
 
 /*
  *  Bits in the fOptState option descriptor field.
@@ -76,7 +91,7 @@ typedef enum {
 
 #define OPTST_NO_INIT        0x0000100  /* option cannot be preset           */
 #define OPTST_NUMBER_OPT     0x0000200  /* opt value (flag) is any digit     */
-#define OPTST_STACKED        0x0000400  /* opt uses stackOptArg procedure    */
+#define OPTST_STACKED        0x0000400  /* opt uses optionStackArg procedure */
 #define OPTST_INITENABLED    0x0000800  /* option defaults to enabled        */
 #define OPTST_ARG_TYPE_MASK  0x000F000  /* bits used to specify opt arg type */
 #define OPTST_IMM            0x0010000  /* process option on first pass      */
@@ -230,8 +245,8 @@ struct optDesc {
  *  Some options need special processing, so we store their
  *  indexes in a known place:
  */
-typedef struct specOptIndex tSpecOptIndex;
-struct specOptIndex {
+typedef struct optSpecIndex tOptSpecIndex;
+struct optSpecIndex {
     uint16_t          more_help;
     uint16_t          save_opts;
     uint16_t          number_option;
@@ -248,7 +263,7 @@ struct specOptIndex {
 /*
  *  The procedure generated for translating option text
  */
-typedef void (option_translation_proc_t)(void);
+typedef void (tOptionXlateProc)(void);
 
 struct options {
     const int         structVersion;
@@ -276,9 +291,9 @@ struct options {
     void*             pSavedState;
 
     tpUsageProc       pUsageProc;
-    option_translation_proc_t* pTransProc;
+    tOptionXlateProc* pTransProc;
 
-    tSpecOptIndex     specOptIdx;
+    tOptSpecIndex     specOptIdx;
     const int         optCt;
     const int         presetOptCt;
 };
@@ -300,6 +315,33 @@ typedef struct {
 #define streqvmap       option_streqvmap
 #define strequate       option_strequate
 #define strtransform    option_strtransform
+
+/*
+ *  When loading a line (or block) of text as an option, the value can
+ *  be processed in any of several modes:
+ *
+ *  @table @samp
+ *  @item keep
+ *  Every part of the value between the delimiters is saved.
+ *
+ *  @item uncooked
+ *  Even if the value begins with quote characters, do not do quote processing.
+ *
+ *  @item cooked
+ *  If the value looks like a quoted string, then process it.
+ *  Double quoted strings are processed the way strings are in "C" programs,
+ *  except they are treated as regular characters if the following character
+ *  is not a well-established escape sequence.
+ *  Single quoted strings (quoted with apostrophies) are handled the way
+ *  strings are handled in shell scripts, *except* that backslash escapes
+ *  are honored before backslash escapes and apostrophies.
+ *  @end table
+ */
+typedef enum {
+    OPTION_LOAD_COOKED,
+    OPTION_LOAD_UNCOOKED,
+    OPTION_LOAD_KEEP
+} tOptionLoadMode;
 
 #ifdef  __cplusplus
 extern "C" {
@@ -395,7 +437,7 @@ ENDFOR export-func
 
 =]
 /*  AutoOpts PRIVATE FUNCTIONS:  */
-tOptProc stackOptArg, unstackOptArg, optionBooleanVal, optionNumericVal;
+tOptProc optionStackArg, optionUnstackArg, optionBooleanVal, optionNumericVal;
 [= (out-resume "priv") (out-pop #t) =]
 CPLUSPLUS_CLOSER
 #endif /* [=(. header-guard)=] */

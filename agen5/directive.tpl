@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+# $Id: directive.tpl,v 4.3 2005/02/20 02:15:48 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -98,6 +98,51 @@ tSCC zSchemeInit[] =
 
  ;; "
 =][= # " =]; /* for emacs: ' */ /* " */
+
+/*
+ *  The shell initialization string.  It is not in "const" memory because
+ *  we have to write our PID into it.
+ */
+static char zShellInit[] =
+    [= #  Things this scriptlett has to do:
+
+1.  Open fd 8 as a duplicate of 2.  It will remain open.
+    Divert 2 to /dev/null for the duration of the initialization.
+2.  Do zsh and bash specific things to make those shells act normal.
+3.  Trap a number of common signals so we can ignore them
+4.  Make sure that the "cd" builtin does not emit text to stdout
+5.  Set up a macro that prints a message, kills autogen and exits
+6.  Restore stderr to whereever it used to be.
+
+=][= (out-push-new)
+=]exec 8>&2 2>/dev/null
+
+if test -n "${ZSH_VERSION+set}" && (emulate sh) 1>&2
+then
+  emulate sh
+  NULLCMD=:
+
+else if test -n "${BASH_VERSION+set}" && (set -o posix) 1>&2
+then
+  set -o posix
+fi ; fi
+
+for f in 1 2 5 6 7 13 14
+do trap "echo trapped on $f >&2" $f ; done
+
+test -n "${CDPATH}" && {
+  CDPATH=''
+  unset CDPATH
+}
+( unalias cd ) 1>&2 && unalias cd
+die() {
+  echo $* >&8
+  kill -TERM ${AG_pid}
+  exit 1
+}
+exec 2>&8
+AG_pid=[=
+(c-string (out-pop #t))=] "\000.........";
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {

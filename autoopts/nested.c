@@ -1,7 +1,9 @@
 
 /*
- *  $Id: numeric.c,v 4.5 2005/02/20 02:15:48 bkorb Exp $
- *  Time-stamp:      "2005-02-14 08:22:56 bkorb"
+ *  $Id: nested.c,v 4.1 2005/02/20 02:15:48 bkorb Exp $
+ *  Time-stamp:      "2005-02-19 17:00:37 bkorb"
+ *
+ *   Automated Options Nested Values module.
  */
 
 /*
@@ -47,37 +49,37 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/*=export_func  optionNumericVal
+
+/*=export_func  optionLoadNested
  * private:
  *
- * what:  Decipher a boolean value
+ * what:  parse a hierarchical option argument
+ * arg:   + tOptDesc*       + pOptDesc + the descriptor for this arg +
+ * arg:   + tOptionLoadMode + mode     + the value formation mode    +
+ *
+ * doc:
+ *  A nested value needs to be parsed
+=*/
+void
+optionLoadNested( tOptDesc* pOD, tOptionLoadMode mode )
+{
+    return;
+}
+
+/*=export_func  optionNestedVal
+ * private:
+ *
+ * what:  parse a hierarchical option argument
  * arg:   + tOptions* + pOpts    + program options descriptor +
  * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
  *
  * doc:
- *  Decipher a numeric value.
+ *  Nested value was found on the command line
 =*/
 void
-optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
+optionNestedVal( tOptions* pOpts, tOptDesc* pOD )
 {
-    char* pz;
-    long  val;
-
-    /*
-     *  Numeric options may have a range associated with it.
-     *  If it does, the usage procedure requests that it be
-     *  emitted by passing a NULL pOD pointer.
-     */
-    if ((pOD == NULL) || (pOD->pzLastArg == NULL))
-        return;
-
-    val = strtol( pOD->pzLastArg, &pz, 0 );
-    if (*pz != NUL) {
-        fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->pzLastArg );
-        (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
-    }
-
-    pOD->pzLastArg = (char*)val;
+    optionLoadNested( pOD, OPTION_LOAD_UNCOOKED );
 }
 /*
  * Local Variables:
@@ -86,4 +88,4 @@ optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of autoopts/numeric.c */
+ * end of autoopts/nested.c */

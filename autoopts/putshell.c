@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+ *  $Id: putshell.c,v 4.6 2005/02/20 02:15:48 bkorb Exp $
  * Time-stamp:      "2005-02-14 14:55:01 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -119,7 +119,7 @@ putQuotedStr( tCC* pzStr )
 }
 
 
-/*=export_func  putBourneShell
+/*=export_func  optionPutShell
  * what:  write a portable shell script to parse options
  * private:
  * arg:   tOptions*, pOpts, the program options descriptor
@@ -127,7 +127,7 @@ putQuotedStr( tCC* pzStr )
  *        the options described in the option definitions.
 =*/
 void
-putBourneShell( tOptions* pOpts )
+optionPutShell( tOptions* pOpts )
 {
     int  optIx = 0;
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-14 15:28:15 bkorb"
+## Time-stamp:      "2005-02-19 17:54:27 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.14 2005/02/15 01:34:13 bkorb Exp $
+## $Id: Makefile.am,v 4.15 2005/02/20 02:15:48 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,7 +22,7 @@ PATHFIND_MAN=
 endif
 
 GENMAN      = $(PATHFIND_MAN) \
-    configFileLoad.3  optionFree.3      optionLoadLine.3  optionProcess.3 \
+    optionFileLoad.3  optionFree.3      optionLoadLine.3  optionProcess.3 \
     optionRestore.3   optionSaveFile.3  optionSaveState.3 optionVersion.3 \
     strequate.3       streqvcmp.3       streqvmap.3       string_tokenize.3 \
     strneqvcmp.3      strtransform.3
@@ -43,9 +43,9 @@ HDRS        = $(GENHDRS) autoopts.h proto.h
 CSRC        = \
     autoopts.c  \
     boolean.c   configfile.c cook.c      enumeration.c environment.c \
-    genshell.c  load.c       makeshell.c numeric.c     pgusage.c     \
-    putshell.c  restore.c    save.c      sort.c        stack.c       \
-    streqvcmp.c text_mmap.c  tokenize.c  usage.c       version.c
+    genshell.c  load.c       makeshell.c nested.c      numeric.c     \
+    pgusage.c   putshell.c   restore.c   save.c        sort.c        \
+    stack.c     streqvcmp.c  text_mmap.c tokenize.c    usage.c       version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
@@ -156,14 +156,18 @@ autoopts.pc : mk-autoopts-pc
 
 install-data-hook:
 	@set -x ; \
-	grep 'define +HAVE_STDINT_H' $(top_builddir)/config.h >/dev/null \
+	egrep 'define +HAVE_STDINT_H' $(top_builddir)/config.h >/dev/null \
 	  && intfile=stdint || intfile=inttypes ; \
-	grep 'define +HAVE_LIMITS_H' $(top_builddir)/config.h >/dev/null \
+	egrep 'define +HAVE_LIMITS_H' $(top_builddir)/config.h >/dev/null \
 	  && limfile=limits || limfile=sys/limits ; \
+	egrep 'define +HAVE_PATHFIND' $(top_builddir)/config.h >/dev/null \
+	  && sed_pathfind='/^#.*if.* HAVE_PATHFIND/d' \
+	  || sed_pathfind='/ifndef HAVE_PATHFIND/,/endif.*HAVE_PATHFIND/d' ; \
 	sed -e '/if defined(HAVE_STDINT/,/include.*inttypes/d' \
 	    -e "s@.endif.*HAVE_STDINT/INTTYPES.*@#include <$$intfile.h>@" \
 	    -e '/if defined(HAVE_LIMITS/,/include.*sys\/limits/d' \
 	    -e "s@.endif.*HAVE_LIMITS/SYS_LIM.*@#include <$$limfile.h>@" \
+	    -e "$${sed_pathfind}" \
 	  autoopts/options.h \
 	  > $(DESTDIR)$(includedir)/autoopts/options.h
 

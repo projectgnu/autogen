@@ -2,7 +2,7 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2005-02-14 16:49:55 bkorb"
+ * Time-stamp:      "2005-02-19 14:20:32 bkorb"
  *
  *  AutoOpts copyright 1992-2005 Bruce Korb
  *
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.7 2005/02/15 01:34:13 bkorb Exp $
+   $Id: usage-txt.def,v 4.8 2005/02/20 02:15:48 bkorb Exp $
  */
 
 /*
@@ -53,70 +53,57 @@ utxt = { ut-type = cch_t;
 };
 #endif
 
-utxt = { ut-type = cch_t;
-         ut-name = AO_Bad;
+utxt = { ut-name = AO_Bad;
          ut-text = "AutoOpts function called without option descriptor\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = AO_Big;
+utxt = { ut-name = AO_Big;
          ut-text = "\tThis exceeds the compiled library version:  ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = AO_Err;
+utxt = { ut-name = AO_Err;
          ut-text =
             "Automated Options Processing Error!\n"
             "\t%s called AutoOpts function with structure version %d:%d:%d.\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = AO_Sml;
+utxt = { ut-name = AO_Sml;
          ut-text = "\tThis is less than the minimum library version:  ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = All;
+utxt = { ut-name = All;
          ut-text = "all";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Alt;
+utxt = { ut-name = Alt;
          ut-text = "\t\t\t\t- an alternate for %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = AmbigKey;
+utxt = { ut-name = AmbigKey;
          ut-text = "%s error:  the keyword `%s' is ambiguous\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Ambiguous;
+utxt = { ut-name = Ambiguous;
          ut-text = "ambiguous";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ArgsMust;
+utxt = { ut-name = ArgsMust;
          ut-text = "%s: Command line arguments required\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = AtMost;
+utxt = { ut-name = AtMost;
          ut-text = "%4$d %1$s%s options allowed\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Auto;
+utxt = { ut-name = Auto;
          ut-text = "version and help options:";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = BadPipe;
+utxt = { ut-name = BadPipe;
          ut-text = "Error %d (%s) from the pipe(2) syscall\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = BadVerArg;
+utxt = { ut-name = BadVerArg;
          ut-text =
 "ERROR: version option argument '%c' invalid.  Use:\n\
 \t'v' - version only\n\
@@ -124,80 +111,65 @@ utxt = { ut-type = cch_t;
 \t'n' - version and copyright notice\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = CantFmt;
+utxt = { ut-name = CantFmt;
          ut-text = "ERROR:  %s option conflicts with the %s option\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = CantSave;
+utxt = { ut-name = CantSave;
          ut-text = "%s(optionSaveState): error: cannot allocate %d bytes\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = DefaultOpt;
+utxt = { ut-name = DefaultOpt;
          ut-text = "\t\t\t\t- default option for unnamed options\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Dis;
+utxt = { ut-name = Dis;
          ut-text = "\t\t\t\t- disabled as --%s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Enab;
+utxt = { ut-name = Enab;
          ut-text = "\t\t\t\t- enabled by default\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Equiv;
+utxt = { ut-name = Equiv;
          ut-text = "-equivalence";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ErrOnly;
+utxt = { ut-name = ErrOnly;
          ut-text = "ERROR:  only ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ExamineFmt;
+utxt = { ut-name = ExamineFmt;
          ut-text = " - examining environment variables named %s_*\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = FiveSpaces;
+utxt = { ut-name = FiveSpaces;
          ut-text = "     ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = FlagOkay;
+utxt = { ut-name = FlagOkay;
          ut-text =
 "Options are specified by doubled hyphens and their name\n\
 or by a single hyphen and the flag character.\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = FmtFmt;
+utxt = { ut-name = FmtFmt;
          ut-text = "%%-%ds %%s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ForkFail;
+utxt = { ut-name = ForkFail;
          ut-text = "fs error %d (%s) on fork - cannot obtain %s usage\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = FSErrOptLoad;
+utxt = { ut-name = FSErrOptLoad;
          ut-text = "File error %d (%s) opening %s for loading options\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = FSErrReadFile;
+utxt = { ut-name = FSErrReadFile;
          ut-text = "fs error %d (%s) reading file %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Genshell;
+utxt = { ut-name = Genshell;
          ut-text =
             "\n= = = = = = = =\n\n"
             "This incarnation of genshell will produce\n"
@@ -209,8 +181,7 @@ utxt = { ut-type = char;
          ut-text = "=T/F";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = GnuBreak;
+utxt = { ut-name = GnuBreak;
          ut-text = "\n%s\n\n";
 };
 
@@ -224,8 +195,7 @@ utxt = { ut-type = char;
          ut-text = "=Mbr";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = GnuNestArg;
+utxt = { ut-name = GnuNestArg;
          ut-text = "=Cplx";
 };
 
@@ -234,13 +204,11 @@ utxt = { ut-type = char;
          ut-text = "=num";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = GnuOptArg;
+utxt = { ut-name = GnuOptArg;
          ut-text = "[=arg]";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = GnuOptFmt;
+utxt = { ut-name = GnuOptFmt;
          ut-text = "--%2$s%1$s";
 };
 
@@ -249,253 +217,236 @@ utxt = { ut-type = char;
          ut-text = "=str";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = HomePath;
+utxt = { ut-name = HomePath;
          ut-text = " - reading file /... %s's exe directory .../%s \n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = IllOptChr;
+utxt = { ut-name = IllOptChr;
          ut-text = "%s: illegal option -- %c\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = IllOptStr;
+utxt = { ut-name = IllOptStr;
          ut-text = "%s: %s option -- %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Illegal;
+utxt = { ut-name = Illegal;
          ut-text = "illegal";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = InvalOptDesc;
+utxt = { ut-name = InvalOptDesc;
          ut-text = "AutoOpts ERROR:  invalid option descriptor for %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = LoadCooked;
-         ut-text = "cooked>";
+utxt = { ut-name = KeyWords;
+         ut-text = "words=";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = LoadUncooked;
-         ut-text = "uncooked>";
+utxt = { ut-name = LoadCooked;
+         ut-text = "cooked";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = LoadKeep;
-         ut-text = "keep>";
+utxt = { ut-name = LoadKeep;
+         ut-text = "keep";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Members;
+utxt = { ut-name = LoadType;
+         ut-text = "type=";
+};
+
+utxt = { ut-name = LoadUncooked;
+         ut-text = "uncooked";
+};
+
+utxt = { ut-name = LtypeNumber;
+         ut-text = "number";
+};
+
+utxt = { ut-name = LtypeString;
+         ut-text = "string";
+};
+
+utxt = { ut-name = LtypeBool;
+         ut-text = "bool";
+};
+
+utxt = { ut-name = LtypeKeyword;
+         ut-text = "keyword";
+};
+
+utxt = { ut-name = LtypeSetMembership;
+         ut-text = "set";
+};
+
+utxt = { ut-name = Members;
          ut-text = "\t\t\t\t- is a set membership option\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = MisArg;
+utxt = { ut-name = MisArg;
          ut-text = "%s: option `%s' requires an argument\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = MultiEquiv;
+utxt = { ut-name = MultiEquiv;
          ut-text = "Equivalenced option '%s' was equivalenced to both\n"
                    "\t'%s' and '%s'";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Must;
+utxt = { ut-name = Must;
          ut-text = "\t\t\t\t- must appear between %d and %d times\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NeedOne;
+utxt = { ut-name = NeedOne;
          ut-text = "ERROR:  The %s option is required\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoArg;
+utxt = { ut-name = NoArg;
          ut-text = "%s: option `%s' cannot have an argument\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoArgs;
+utxt = { ut-name = NoArgs;
          ut-text = "%s: Command line arguments not allowed\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoCreat;
+utxt = { ut-name = NoCreat;
          ut-text = "error %d (%s) creating %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoFlags;
+utxt = { ut-name = NoFlags;
          ut-text =
 "Options are specified by single or double hyphens and their name.\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoKey;
+utxt = { ut-name = NoKey;
          ut-text = "%s error:  `%s' does not match any keywords\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoLim;
+utxt = { ut-name = NoLim;
          ut-text = "\t\t\t\t- may appear multiple times\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoPreset;
+utxt = { ut-name = NoPreset;
          ut-text = "\t\t\t\t- may not be preset\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoRq_NoShrtTtl;
+utxt = { ut-name = NoRq_NoShrtTtl;
          ut-text = "   Arg Option-Name    Description\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoRq_ShrtTtl;
+utxt = { ut-name = NoRq_ShrtTtl;
          ut-text = "  Flg Arg Option-Name    Description\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoStat;
+utxt = { ut-name = NoStat;
          ut-text = "error %d (%s) stat-ing %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NoState;
+utxt = { ut-name = NoState;
          ut-text = "%s(optionRestore): error: no saved option state\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = None;
+utxt = { ut-name = None;
          ut-text = "none";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NotDef;
+utxt = { ut-name = NotDef;
          ut-text = "'%s' not defined\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NotEnough;
+utxt = { ut-name = NotEnough;
          ut-text = "ERROR:  The %s option must appear %d times\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NotFile;
+utxt = { ut-name = NotFile;
          ut-text = "error:  cannot load options from non-regular file %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NotNumber;
+utxt = { ut-name = NotNumber;
          ut-text = "%s error:  `%s' is not a recognizable number\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NrmOptFmt;
+utxt = { ut-name = NrmOptFmt;
          ut-text = " %3s %s";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = NumberOpt;
+utxt = { ut-name = NumberOpt;
          ut-text = "The '-#<number>' option may omit the hash char\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = OneSpace;
+utxt = { ut-name = OneSpace;
          ut-text = " ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = OnlyOne;
+utxt = { ut-name = OnlyOne;
          ut-text = "one %s%s option allowed\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = OptsOnly;
+utxt = { ut-name = OptsOnly;
          ut-text = "All arguments are named options.\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = PathFmt;
+utxt = { ut-name = PathFmt;
          ut-text = " - reading file %s";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = PlsSendBugs;
+utxt = { ut-name = PlsSendBugs;
          ut-text = "\nplease send bug reports to:  %s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Preset;
+utxt = { ut-name = Preset;
          ut-text = "\t\t\t\t- may NOT appear - preset only\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = PresetFile;
+utxt = { ut-name = PresetFile;
          ut-text = "#  preset/initialization file\n#  %s#\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = PresetIntro;
+utxt = { ut-name = PresetIntro;
          ut-text = "\n\
 The following option preset mechanisms are supported:\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Prog;
+utxt = { ut-name = Prog;
          ut-text = "program";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Prohib;
+utxt = { ut-name = Prohib;
          ut-text = "prohibits these options:\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Reorder;
+utxt = { ut-name = Reorder;
          ut-text =
             "Operands and options may be intermixed.  "
             "They will be reordered.\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ReqFmt;
+utxt = { ut-name = ReqFmt;
          ut-text = "ERROR:  %s option requires the %s option\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ReqOptFmt;
+utxt = { ut-name = ReqOptFmt;
          ut-text = " %3s %-14s %s";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ReqThese;
+utxt = { ut-name = ReqThese;
          ut-text = "requires these options:\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Req_NoShrtTtl;
+utxt = { ut-name = Req_NoShrtTtl;
          ut-text = "   Arg Option-Name   Req?  Description\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Req_ShrtTtl;
+utxt = { ut-name = Req_ShrtTtl;
          ut-text = "  Flg Arg Option-Name   Req?  Description\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = SepChars;
+utxt = { ut-name = SepChars;
          ut-text = "-_^";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = SetMemberSettings;
+utxt = { ut-name = SetMembers;
+         ut-text = "members=";
+};
+
+utxt = { ut-name = SetMemberSettings;
          ut-text = <<E_O_F
 or you may use a numeric representation.  Preceding these with a '!' will
 clear the bits, specifying 'none' will clear all bits, and 'all' will set them
@@ -504,98 +455,79 @@ all.  Multiple entries may be passed as an option argument list.
 E_O_F ;
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ShrtGnuOptFmt;
+utxt = { ut-name = ShrtGnuOptFmt;
          ut-text = "%s";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = SixSpaces;
+utxt = { ut-name = SixSpaces;
          ut-text = "      ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdBoolArg;
+utxt = { ut-name = StdBoolArg;
          ut-text = "T/F";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdBreak;
+utxt = { ut-name = StdBreak;
          ut-text = "\n%s\n\n%s";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdKeyArg;
+utxt = { ut-name = StdKeyArg;
          ut-text = "KWd";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdKeyLArg;
+utxt = { ut-name = StdKeyLArg;
          ut-text = "Mbr";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdNestArg;
+utxt = { ut-name = StdNestArg;
          ut-text = "=Cpx";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdNoArg;
+utxt = { ut-name = StdNoArg;
          ut-text = "no ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdNumArg;
+utxt = { ut-name = StdNumArg;
          ut-text = "Num";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdOptArg;
+utxt = { ut-name = StdOptArg;
          ut-text = "opt";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdReqArg;
+utxt = { ut-name = StdReqArg;
          ut-text = "YES";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = StdStrArg;
+utxt = { ut-name = StdStrArg;
          ut-text = "Str";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = TabHyp;
+utxt = { ut-name = TabHyp;
          ut-text = "\t\t\t\t- ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = TabHypAnd;
+utxt = { ut-name = TabHypAnd;
          ut-text = "\t\t\t\t-- and ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = Tabout;
+utxt = { ut-name = Tabout;
          ut-text = "\t\t\t\t%s\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ThreeSpaces;
+utxt = { ut-name = ThreeSpaces;
          ut-text = "   ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = TwoSpaces;
+utxt = { ut-name = TwoSpaces;
          ut-text = "  ";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = UpTo;
+utxt = { ut-name = UpTo;
          ut-text = "\t\t\t\t- may appear up to %d times\n";
 };
 
-utxt = { ut-type = cch_t;
-         ut-name = ValidKeys;
+utxt = { ut-name = ValidKeys;
          ut-text = "The valid \"%s\" option keywords are:\n";
 };
 

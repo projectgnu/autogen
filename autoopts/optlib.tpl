@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+# $Id: optlib.tpl,v 4.6 2005/02/20 02:15:48 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-14 14:53:04 bkorb"
+# Time-stamp:      "2005-02-19 09:27:13 bkorb"
 
 =][=
 
@@ -27,7 +27,7 @@ DEFINE save-name-morphs
 
    Every option descriptor has a pointer to a handler procedure.  That
    pointer may be NULL.  We generate a procedure for keyword,
-   set-membership and range checked options.  "stackOptArg" is called
+   set-membership and range checked options.  "optionStackArg" is called
    if "stack-arg" is specified.  The specified procedure is called if
    "call-proc" is specified.  Finally, we insert the specified code for
    options with "flag-code" or "extract-code" attributes.
@@ -38,7 +38,7 @@ DEFINE save-name-morphs
    if either the program is intended to digest options for an incorporating
    shell script, or else if the user wants a quick program to show off the
    usage text and command line parsing.  For that environment, all callbacks
-   are disabled except "stackOptArg" for stacked arguments and the
+   are disabled except "optionStackArg" for stacked arguments and the
    keyword set membership options.
 
  =][=
@@ -67,7 +67,7 @@ DEFINE save-name-morphs
     (set! is-extern #t)
     (set! is-priv   #f)
     (set! proc-name (get "call-proc"))
-    (set! test-name (if need-stacking "stackOptArg" "NULL"))
+    (set! test-name (if need-stacking "optionStackArg" "NULL"))
 
   =][=
   ELIF (or (exist? "extract-code")
@@ -78,7 +78,7 @@ DEFINE save-name-morphs
     (set! have-proc #t)
     (set! is-extern #f)
     (set! test-name (if (exist? "arg-range") proc-name
-                        (if need-stacking "stackOptArg" "NULL")  ))
+                        (if need-stacking "optionStackArg" "NULL")  ))
 
   =][=
   ELIF (exist? "flag-proc")     =][=
@@ -86,7 +86,7 @@ DEFINE save-name-morphs
     (set! have-proc #t)
     (set! is-priv   #f)
     (set! proc-name (string-append "doOpt" (cap-c-name "flag-proc")))
-    (set! test-name (if need-stacking "stackOptArg" "NULL"))
+    (set! test-name (if need-stacking "optionStackArg" "NULL"))
     (set! is-extern #f)
 
   =][=
@@ -94,7 +94,7 @@ DEFINE save-name-morphs
 
     (set! have-proc #t)
     (set! is-priv   #f)
-    (set! proc-name "stackOptArg")
+    (set! proc-name "optionStackArg")
     (set! test-name (if need-stacking proc-name "NULL"))
     (set! is-extern #t)
 
@@ -103,7 +103,7 @@ DEFINE save-name-morphs
 
     (set! have-proc #t)
     (set! is-priv   #f)
-    (set! proc-name "unstackOptArg")
+    (set! proc-name "optionUnstackArg")
     (set! test-name (if need-stacking proc-name "NULL"))
     (set! is-extern #t)
 
@@ -130,7 +130,7 @@ DEFINE save-name-morphs
          (set! have-proc #t)    =][=
 
     ~*   hier|nest              =][=
-         (set! proc-name "optionNestedValue")
+         (set! proc-name "optionNestedVal")
          (set! test-name proc-name)
          (set! is-extern #t)
          (set! is-priv   #f)

@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 4.3 2005/02/14 16:25:37 bkorb Exp $
+ *  $Id: stack.c,v 4.4 2005/02/20 02:15:48 bkorb Exp $
  *  Time-stamp:      "2005-02-14 08:21:23 bkorb"
  *
  *  This is a special option processing routine that will save the
@@ -53,7 +53,7 @@
 
 #include REGEX_HEADER
 
-/*=export_func  unstackOptArg
+/*=export_func  optionUnstackArg
  * private:
  *
  * what:  Remove option args from a stack
@@ -64,7 +64,7 @@
  *  Invoked for options that are equivalenced to stacked options.
 =*/
 void
-unstackOptArg( pOpts, pOptDesc )
+optionUnstackArg( pOpts, pOptDesc )
     tOptions*  pOpts;
     tOptDesc*  pOptDesc;
 {
@@ -145,7 +145,7 @@ unstackOptArg( pOpts, pOptDesc )
 }
 
 
-/*=export_func  stackOptArg
+/*=export_func  optionStackArg
  * private:
  *
  * what:  put option args on a stack
@@ -156,7 +156,7 @@ unstackOptArg( pOpts, pOptDesc )
  *  Keep an entry-ordered list of option arguments.
 =*/
 void
-stackOptArg( pOpts, pOptDesc )
+optionStackArg( pOpts, pOptDesc )
     tOptions*  pOpts;
     tOptDesc*  pOptDesc;
 {

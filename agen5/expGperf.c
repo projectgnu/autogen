@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: expGperf.c,v 4.3 2005/02/20 02:15:48 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -44,7 +44,7 @@ tSCC zMakeGperf[] =
 
 /*
  *  From here to the matching closing paren, we are constructing the
- *  pgerf input file with every character written to stdout
+ *  gperf input file with every character written to stdout
  */
 "cat <<'_EOF_'\n"
 "%%{\n"

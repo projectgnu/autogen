@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.10 2005/02/15 01:34:13 bkorb Exp $
+#$Id: optcode.tpl,v 4.11 2005/02/20 02:15:48 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-14 17:02:18 bkorb"
+# Time-stamp:      "2005-02-19 18:12:35 bkorb"
 
 =][=
 
@@ -16,8 +16,8 @@ IF (exist? "flag.arg-range")
 
 ENDIF  =][=
 
-IF (or (= "putBourneShell" (get "main.shell-process"))
-       (= "putShellParse"  (get "main.shell-parser"))
+IF (or (= "optionPutShell"    (get "main.shell-process"))
+       (= "optionParseShell"  (get "main.shell-parser"))
        (exist? "main.code")) =]
 #define [= (set! make-test-main #t) main-guard =] 1[=
 ENDIF
@@ -126,9 +126,9 @@ ENDIF (exist? "homerc") =][=
 
 IF (and (exist? "version") make-test-main) =]
 #ifdef [=(. main-guard)     =]
-# define DOVERPROC doVersionStderr
+# define DOVERPROC optionVersionStderr
 #else
-# define DOVERPROC doVersion
+# define DOVERPROC optionPrintVersion
 #endif /* [=(. main-guard)=] */[=
 ENDIF   =]
 
@@ -158,7 +158,8 @@ IF (exist? "version")   =]
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ [=(if make-test-main "DOVERPROC" "doVersion")=],
+     /* option proc      */ [=
+         (if make-test-main "DOVERPROC" "optionPrintVersion")=],
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
      /* disablement strs */ NULL, NULL },[=
 
@@ -188,7 +189,7 @@ ENDIF =]
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ doPagedUsage,
+     /* option proc      */ optionPagedUsage,
      /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
      /* disablement strs */ NULL, NULL }[=
 
@@ -221,7 +222,7 @@ IF (exist? "homerc")
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ doLoadOpt,
+     /* option proc      */ optionLoadOpt,
      /* desc, NAME, name */ zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name,
      /* disablement strs */ zNotLoad_Opts_Name, zNotLoad_Opts_Pfx }[=
 
@@ -312,7 +313,7 @@ ENDIF                   =][=
 =]
 #if defined(ENABLE_NLS)
 # define OPTPROC_BASE OPTPROC_TRANSLATE
-  static option_translation_proc_t translate_option_strings;
+  static tOptionXlateProc translate_option_strings;
 #else
 # define OPTPROC_BASE OPTPROC_NONE
 # define translate_option_strings NULL

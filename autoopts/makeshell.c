@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+ *  $Id: makeshell.c,v 4.6 2005/02/20 02:15:48 bkorb Exp $
  * Time-stamp:      "2005-02-14 14:25:43 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -393,7 +393,7 @@ static void
 openOutput( const char* pzFile );
 /* = = = END-STATIC-FORWARD = = = */
 
-/*=export_func  putShellParse
+/*=export_func  optionParseShell
  * private:
  *
  * what:  Decipher a boolean value
@@ -403,7 +403,7 @@ openOutput( const char* pzFile );
  *  Emit a shell script that will parse the command line options.
 =*/
 void
-putShellParse( tOptions* pOpts )
+optionParseShell( tOptions* pOpts )
 {
     /*
      *  Check for our SHELL option now.
@@ -542,7 +542,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
 
         case TT_VERSION:
             pOD->pzLastArg = "c";
-            doVersion( pOpts, pOD );
+            optionPrintVersion( pOpts, pOD );
             /* NOTREACHED */
 
         default:
@@ -645,7 +645,7 @@ emitUsage( tOptions* pOpts )
         int       optionCt = pOpts->optCt;
 
         for (;;) {
-            if (pOptDesc->pOptProc == doVersion) {
+            if (pOptDesc->pOptProc == optionPrintVersion) {
                 textToVariable( pOpts, TT_VERSION, pOptDesc );
                 break;
             }
@@ -717,13 +717,13 @@ emitSetup( tOptions* pOpts )
 static void
 printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
-    if (pOptDesc->pOptProc == doVersion)
+    if (pOptDesc->pOptProc == optionPrintVersion)
         printf( zTextExit, pOpts->pzPROGNAME, "VERSION" );
 
-    else if (pOptDesc->pOptProc == doPagedUsage)
+    else if (pOptDesc->pOptProc == optionPagedUsage)
         printf( zPagedUsageExit, pOpts->pzPROGNAME );
 
-    else if (pOptDesc->pOptProc == doLoadOpt) {
+    else if (pOptDesc->pOptProc == optionLoadOpt) {
         printf( zCmdFmt, "echo 'Warning:  Cannot load options files' >&2" );
         printf( zCmdFmt, "OPT_ARG_NEEDED=YES" );
 
@@ -768,7 +768,7 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 static void
 printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
 {
-    if (pOptDesc->pOptProc == doLoadOpt) {
+    if (pOptDesc->pOptProc == optionLoadOpt) {
         printf( zCmdFmt, "echo 'Warning:  Cannot suppress the loading of "
                 "options files' >&2" );
 

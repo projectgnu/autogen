@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2005-02-14 17:03:48 bkorb"
+# Time-stamp:        "2005-02-19 18:05:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.3 2005/02/15 01:34:13 bkorb Exp $
+# $Id: getopt.test,v 4.4 2005/02/20 02:15:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -164,7 +164,7 @@ please send bug reports to:  bkorb@gnu.org\n"), stdout);
 }
 
 void
-doPagedUsage(
+optionPagedUsage(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -173,7 +173,7 @@ doPagedUsage(
 }
 
 void
-doVersion(
+optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -297,7 +297,7 @@ process_test_getopt_opts (int argc, char** argv)
       /* NOTREACHED */
 
     case VALUE_OPT_VERSION:
-      doVersion (&test_getoptOptions, &DESC(VERSION));
+      optionPrintVersion (&test_getoptOptions, &DESC(VERSION));
       /* NOTREACHED */
 
     default:
@@ -405,7 +405,7 @@ please send bug reports to:  bkorb@gnu.org\n"), stdout);
 }
 
 void
-doPagedUsage(
+optionPagedUsage(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -414,7 +414,7 @@ doPagedUsage(
 }
 
 void
-doVersion(
+optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
@@ -538,7 +538,7 @@ process_test_getopt_opts (int argc, char** argv)
       /* NOTREACHED */
 
     case VALUE_OPT_VERSION:
-      doVersion (&test_getoptOptions, &DESC(VERSION));
+      optionPrintVersion (&test_getoptOptions, &DESC(VERSION));
       /* NOTREACHED */
 
     default:

@@ -4369,9 +4369,9 @@ test-main [ = proc-to-call ] ;
 @end example
 
 If you do not supply a @code{proc-to-call}, it will default to
-@code{putBourneShell}.  That will produce a program that will process the
+@code{optionPutShell}.  That will produce a program that will process the
 options and generate shell text for the invoking shell to interpret
-(@pxref{binary-parser}).  If you supply the name, @code{putShellParse}, then
+(@pxref{binary-parser}).  If you supply the name, @code{optionParseShell}, then
 you will have a program that will generate a shell script that can parse the
 options (@pxref{script-parser}).  If you supply a different procedure name,
 you will have to provide that routine and it may do whatever you like.
