@@ -62,9 +62,7 @@ SNV_INLINE unsigned spec_hash (unsigned spec);
 SNV_INLINE void spec_init (void);
 SNV_INLINE spec_entry *spec_lookup (unsigned spec);
 static void spec_insert (spec_entry * pentry);
-static int do_printfv (STREAM *stream,
-                       const char *format,
-                       union printf_arg const args[]);
+static int do_printfv (STREAM *stream, const char *format, union printf_arg const args[]);
 
 /* FIXME:  We are assuming an ASCII character set where all the
            printable characters are between SPACE and DEL. */
@@ -144,9 +142,7 @@ spec_lookup (unsigned spec)
  * %spec_entry with the information on the function if it was.
  **/
 spec_entry *
-register_printf_function (unsigned spec,
-                          printf_function *fmt,
-                          printf_arginfo_function *arg)
+register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_function *arg)
 {
   spec_entry *new, *old;
   old = spec_lookup (spec);
@@ -168,9 +164,7 @@ register_printf_function (unsigned spec,
 }
 
 static int
-call_argtype_function (struct printf_info *const pinfo,
-                       int **argtypes,
-                       spec_entry *spec)
+call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_entry *spec)
 {
   int n;
   int argindex = (pinfo->dollar && !IS_MODIFIER (spec))
@@ -264,9 +258,7 @@ printf_strerror (void)
 
 /* (re)initialise the memory used by PPARSER. */
 static inline void
-parser_init (struct printf_info *pinfo,
-	     const char *format,
-	     const union printf_arg *args)
+parser_init (struct printf_info *pinfo, const char *format, const union printf_arg *args)
 {
   memset (pinfo, 0, sizeof (struct printf_info));
   pinfo->format = format;
@@ -309,13 +301,7 @@ parser_reset (struct printf_info *pinfo)
  * returned.
  **/
 char *
-printf_error (struct printf_info *pinfo,
-	      const char *file,
-	      int line,
-	      const char *func1,
-	      const char *func2,
-	      const char *func3,
-	      const char *error_message)
+printf_error (struct printf_info *pinfo, const char *file, int line, const char *func1, const char *func2, const char *func3, const char *error_message)
 {
   int i;
   char *result;
@@ -418,8 +404,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
 		      info.spec = *info.format;
 		      info.extra = spec->user;
 		      info.type = spec->type;
-		      status = (*spec->arg) (&info, n - argindex,
-		                             argtypes + argindex);
+		      status = (*spec->arg) (&info, n - argindex, argtypes + argindex);
 		    }
 		  else
 		    {
@@ -1385,8 +1370,7 @@ snv_vsnprintf (char buffer[], unsigned long limit, const char *format, va_list a
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_snprintfv (char buffer[], unsigned long limit, const char *format,
-               snv_constpointer const args[])
+snv_snprintfv (char buffer[], unsigned long limit, const char *format, snv_constpointer const args[])
 {
   int count_or_errorcode;
   STREAM *out = stream_new (&buffer, limit - 1, NULL, snv_bufputc);

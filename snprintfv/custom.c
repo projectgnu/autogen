@@ -103,9 +103,7 @@ printf_generic_info (struct printf_info *const pinfo, size_t n, int *argtypes)
  * The number of characters output.
  **/
 int
-printf_generic (STREAM *stream,
-                struct printf_info *const pinfo,
-                union printf_arg const *args)
+printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int len = 0, count_or_errorcode = SNV_OK;
   char *p = NULL;

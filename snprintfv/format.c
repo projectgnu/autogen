@@ -172,11 +172,7 @@ print_float_round (long double fract, int *exp, char *start, char *end,
 }
 
 static int
-print_float (struct printf_info *pinfo,
-             char *startp,
-             char *endp,
-             int *signp,
-             long double n)
+print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, long double n)
 {
   int prec, fmtch;
   char *p, *t;
@@ -304,8 +300,7 @@ print_float (struct printf_info *pinfo,
 
 	  if (fract)
 	    startp =
-	      print_float_round (fract, (int *) NULL, startp, t - 1,
-	                         (char) 0, signp);
+	      print_float_round (fract, (int *) NULL, startp, t - 1, (char) 0, signp);
 	}
 
       break;
@@ -329,8 +324,7 @@ print_float (struct printf_info *pinfo,
 	  if (!prec && ++p < endp)
 	    {
 	      fract = 0;
-	      startp = print_float_round ((long double) 0, &expcnt, startp,
-	                                  t - 1, *p, signp);
+	      startp = print_float_round ((long double) 0, &expcnt, startp, t - 1, *p, signp);
 	    }
 
 	  /* adjust expcnt for digit in front of decimal */
@@ -371,8 +365,7 @@ print_float (struct printf_info *pinfo,
 	    while (--prec && fract);
 
 	  if (fract)
-	    startp = print_float_round (fract, &expcnt, startp, t - 1,
-	                                (char) 0, signp);
+	    startp = print_float_round (fract, &expcnt, startp, t - 1, (char) 0, signp);
 	}
       break;
 
@@ -493,9 +486,7 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 
    This is messy, suggestion for simplifying it are gladly accepted.  */
 static int
-printf_numeric_param_info (struct printf_info *const pinfo,
-                           size_t n,
-                           int *argtypes)
+printf_numeric_param_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   const char *pEnd = NULL;
   int found = 0, allowed_states, new_state;
@@ -699,9 +690,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 
 
 static int
-printf_char (STREAM *stream,
-             struct printf_info *const pinfo,
-             union printf_arg const *args)
+printf_char (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
   char ch = '\0';
@@ -818,9 +807,7 @@ printf_float (STREAM *stream, struct printf_info *const pinfo, union printf_arg 
 #endif
 
 static int
-printf_count (STREAM *stream,
-              struct printf_info *const pinfo,
-              union printf_arg const *args)
+printf_count (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   if (pinfo->is_char)
     *(char *) (args->pa_pointer) = pinfo->count;
@@ -841,9 +828,7 @@ printf_count (STREAM *stream,
 }
 
 static int
-printf_integer (STREAM *stream,
-                struct printf_info *const pinfo,
-                union printf_arg const *args)
+printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   static const char digits_lower[] = "0123456789abcdefghijklmnopqrstuvwxyz";
   static const char digits_upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -984,9 +969,7 @@ printf_integer (STREAM *stream,
 }
 
 static int
-printf_pointer (STREAM *stream,
-                struct printf_info *const pinfo,
-                union printf_arg const *args)
+printf_pointer (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int count_or_errorcode = SNV_OK;
 
@@ -1039,9 +1022,7 @@ printf_pointer (STREAM *stream,
 }
 
 static int
-printf_string (STREAM *stream,
-               struct printf_info *const pinfo,
-               union printf_arg const *args)
+printf_string (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
   int len = 0, count_or_errorcode = SNV_OK;
   const char *p = NULL;

@@ -480,7 +480,7 @@ funcdecl>0 {
 	    # We have just seen two consecutive keywords or "void", both of
 	    # which mark an ANSI declaration, and need to reset for the next
 	    # header
-	    funcdecl = 0;
+	    funcdecl = 3;
 
 	    # Is this a printf attributable prototype?  Look for
 	    # ``format,'' in the penultimate argument:
