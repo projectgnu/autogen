@@ -28,7 +28,7 @@ Keywords:       macro, m4, cpp, code generation, preprocessor,
                 options, getopts
 
 Author:         korb@datadesign.com (Bruce Korb)
-                garyv@oranda.demon.co.uk (Gary V. Vaughan)
+                gvaughan@oranda.demon.co.uk (Gary V. Vaughan)
 
 Maintained-by:  korbb@datadesign.com (Bruce Korb)
 
