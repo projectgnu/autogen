@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: C -*-
 
-# $Id: optlib.tpl,v 1.14 2000/10/07 22:52:08 bkorb Exp $
+# $Id: optlib.tpl,v 1.15 2000/10/16 00:07:25 bkorb Exp $
 
 =]
 [=
@@ -131,7 +131,7 @@ DEFINE Option_Defines =]
            set_index = (for-index)
            opt_state = OPTST_SET =][=
 
-    ELSE "not equivalenced"   =][=DEBUG 0=][=
+    ELSE "not equivalenced"   =][=
       set_defines
            set_desc  = (string-append UP-prefix "DESC("
                            (string-upcase! (get "equivalence")) ")" )

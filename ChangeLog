@@ -1,3 +1,10 @@
+2000-10-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/opt*.tpl: implemented xxx-value global attributes to allow
+	the specification of flag characters for auto-supported options.
+	* autoopts/doc.tpl: document it
+	* autoopts/test/vers.test: test it
+
 2000-10-12  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defFind.c: The cannonicalization of value names downcased

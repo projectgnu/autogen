@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.20 2000/10/10 12:33:40 bkorb Exp $
+# $Id: opthead.tpl,v 2.21 2000/10/16 00:07:24 bkorb Exp $
 =]
 [=
 
@@ -146,17 +146,61 @@ are used identically to the user-generated VALUE defines.
 [=
 IF (exist? "flag.value") =][=
   IF (exist? "version") =]
-#define VALUE_[=(. UP-prefix)=]OPT_VERSION        'v'[=
-  ENDIF =][=
+#define VALUE_[=(. UP-prefix)=]OPT_VERSION        [=
+    IF (not (exist? "version_value")) =]'v'[=
+    ELSE      =][=
+      CASE (get "version_value")  =][=
+      == ""   =]INDEX_[=(. UP-prefix)=]OPT_VERSION[=
+      == "'"  =]"'"[=
+      ~~ .    =]'[=version_value=]'[=
+      *       =][=(error "value (flag) codes must be single characters") =][=
+      ESAC    =][=
+    ENDIF     =][=
+  ENDIF       =][=
 
   IF (exist? "homerc")=]
-#define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      '>'
-#define VALUE_[=(. UP-prefix)=]OPT_LOAD_OPTS      '<'[=
+#define VALUE_[=(. UP-prefix)=]OPT_SAVE_OPTS      [=
+    IF (not (exist? "save_opts_value")) =]'>'[=
+    ELSE      =][=
+      CASE (get "save_opts_value")  =][=
+      == ""   =]INDEX_[=(. UP-prefix)=]OPT_SAVE_OPTS[=
+      == "'"  =]"'"[=
+      ~~ .    =]'[=save_opts_value=]'[=
+      *       =][=(error "value (flag) codes must be single characters") =][=
+      ESAC    =][=
+    ENDIF     =]
+#define VALUE_[=(. UP-prefix)=]OPT_LOAD_OPTS      [=
+    IF (not (exist? "load_opts_value")) =]'<'[=
+    ELSE      =][=
+      CASE (get "load_opts_value")  =][=
+      == ""   =]INDEX_[=(. UP-prefix)=]OPT_LOAD_OPTS[=
+      == "'"  =]"'"[=
+      ~~ .    =]'[=load_opts_value=]'[=
+      *       =][=(error "value (flag) codes must be single characters") =][=
+      ESAC    =][=
+    ENDIF     =][=
   ENDIF
 =]
-#define VALUE_[=(. UP-prefix)=]OPT_HELP           '?'
-#define VALUE_[=(. UP-prefix)=]OPT_MORE_HELP      '!'[=
-
+#define VALUE_[=(. UP-prefix)=]OPT_HELP           [=
+    IF (not (exist? "help_value")) =]'?'[=
+    ELSE      =][=
+      CASE (get "help_value")  =][=
+      == ""   =]INDEX_[=(. UP-prefix)=]OPT_HELP[=
+      == "'"  =]"'"[=
+      ~~ .    =]'[=help_value=]'[=
+      *       =][=(error "value (flag) codes must be single characters") =][=
+      ESAC    =][=
+    ENDIF     =]
+#define VALUE_[=(. UP-prefix)=]OPT_MORE_HELP      [=
+    IF (not (exist? "more_help_value")) =]'!'[=
+    ELSE      =][=
+      CASE (get "more_help_value")  =][=
+      == ""   =]INDEX_[=(. UP-prefix)=]OPT_MORE_HELP[=
+      == "'"  =]"'"[=
+      ~~ .    =]'[=more_help_value=]'[=
+      *       =][=(error "value (flag) codes must be single characters") =][=
+      ESAC    =][=
+    ENDIF     =][=
 
 ELSE "flag.value *DOES NOT* exist" =][=
 

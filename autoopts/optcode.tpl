@@ -1,5 +1,5 @@
-[= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.38 2000/10/08 00:21:28 bkorb Exp $
+[= autogen5 template  -*- Mode: Text -*-
+#$Id: optcode.tpl,v 2.39 2000/10/16 00:07:24 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
