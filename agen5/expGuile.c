@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 3.2 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: expGuile.c,v 3.3 2002/02/02 19:22:13 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -317,7 +317,7 @@ ag_scm_string_upcase_x( SCM str )
 
 /*=gfunc string_upcase
  *
- * what:   make a new string be upper case
+ * what:   upper case a new string
  * general_use:
  *
  * exparg: str , input string
@@ -385,7 +385,7 @@ ag_scm_string_capitalize_x( SCM str )
 
 /*=gfunc string_capitalize
  *
- * what:   make a new string be capitalized
+ * what:   capitalized a new string
  * general_use:
  *
  * exparg: str , input string
@@ -445,7 +445,7 @@ ag_scm_string_downcase_x( SCM str )
 
 /*=gfunc string_downcase
  *
- * what:   make a new string be lower case
+ * what:   lower case a new string
  * general_use:
  *
  * exparg: str , input string
