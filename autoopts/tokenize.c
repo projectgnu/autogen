@@ -1,6 +1,6 @@
 /*
  *  This file defines the string_tokenize interface
- * Time-stamp:      "2005-02-14 08:20:31 bkorb"
+ * Time-stamp:      "2005-02-20 17:18:14 bkorb"
  *
  *  string_tokenize copyright 2005 Bruce Korb
  *
@@ -290,4 +290,4 @@ main( int argc, char** argv )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of agen5/autogen.c */
+ * end of autoopts/tokenize.c */

@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+ *  $Id: strsignal.c,v 4.2 2005/02/21 23:01:08 bkorb Exp $
  */
 
 #include "compat.h"
@@ -109,3 +109,12 @@ strsignal( int signo )
     return NULL;
 }
 #endif  /* HAVE_STRSIGNAL */
+
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of compat/strsignal.c */

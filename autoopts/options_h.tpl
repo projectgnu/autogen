@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.9 2005/02/20 23:00:55 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.10 2005/02/21 23:01:08 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -55,24 +55,24 @@ h=options.h
 #define OPTST_GET_ARGTYPE(f) (((f) & OPTST_ARG_TYPE_MASK) >> 12)
 
 typedef enum {
-    OPARG_TYPE_NONE          = 0,
-    OPARG_TYPE_STRING        = 1,       /* default type/ vanilla string      */
-    OPARG_TYPE_ENUMERATION   = 2,       /* opt arg is an enum (keyword list) */
-    OPARG_TYPE_BOOLEAN       = 3,       /* opt arg is boolean-valued         */
-    OPARG_TYPE_MEMBERSHIP    = 4,       /* opt arg sets set membership bits  */
-    OPARG_TYPE_NUMERIC       = 5,       /* opt arg has numeric value         */
-    OPARG_TYPE_HIERARCHY     = 6        /* option arg is hierarchical value  */
+    OPARG_TYPE_NONE             = 0,
+    OPARG_TYPE_STRING           = 1,    /* default type/ vanilla string      */
+    OPARG_TYPE_ENUMERATION      = 2,    /* opt arg is an enum (keyword list) */
+    OPARG_TYPE_BOOLEAN          = 3,    /* opt arg is boolean-valued         */
+    OPARG_TYPE_MEMBERSHIP       = 4,    /* opt arg sets set membership bits  */
+    OPARG_TYPE_NUMERIC          = 5,    /* opt arg has numeric value         */
+    OPARG_TYPE_HIERARCHY        = 6     /* option arg is hierarchical value  */
 } teOptArgType;
 
 typedef struct optionValue {
     teOptArgType        valType;
     union {
-        const char*     pzStr;          /* valType == OPARG_TYPE_STRING      */
-        int             enumVal;        /* valType == OPARG_TYPE_ENUMERATION */
-        int             boolVal;        /* valType == OPARG_TYPE_BOOLEAN     */
-        long            setVal;         /* valType == OPARG_TYPE_MEMBERSHIP  */
-        long            longVal;        /* valType == OPARG_TYPE_NUMERIC     */
-        void*           nestVal;        /* valType == OPARG_TYPE_HIERARCHY   */
+        char            strVal[1];      /* OPARG_TYPE_STRING      */
+        int             enumVal;        /* OPARG_TYPE_ENUMERATION */
+        int             boolVal;        /* OPARG_TYPE_BOOLEAN     */
+        long            setVal;         /* OPARG_TYPE_MEMBERSHIP  */
+        long            longVal;        /* OPARG_TYPE_NUMERIC     */
+        void*           nestVal;        /* OPARG_TYPE_HIERARCHY   */
     } v;
 } tOptionValue;
 

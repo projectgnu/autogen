@@ -168,3 +168,12 @@ printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   /* Return the number of characters emitted. */
   return count_or_errorcode;
 }
+
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of snprintfv/custom.c */

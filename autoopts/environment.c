@@ -1,7 +1,7 @@
 
 /*
- *  $Id: environment.c,v 4.6 2005/02/20 23:00:55 bkorb Exp $
- * Time-stamp:      "2005-02-20 14:10:55 bkorb"
+ *  $Id: environment.c,v 4.7 2005/02/21 23:01:08 bkorb Exp $
+ * Time-stamp:      "2005-02-20 17:18:54 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -250,6 +250,7 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
         handleOption( pOpts, &st );
     }
 }
+
 /*
  * Local Variables:
  * mode: C
@@ -257,4 +258,4 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of agen5/autogen.c */
+ * end of autoopts/environment.c */

@@ -210,4 +210,11 @@ stream_get (STREAM *stream)
   return (*stream->get_func) (stream);
 }
 
-/* stream.c ends here */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of snprintfv/stream.c */

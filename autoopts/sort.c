@@ -1,7 +1,7 @@
 
 /*
- *  sort.c  $Id: sort.c,v 4.6 2005/02/20 23:00:55 bkorb Exp $
- * Time-stamp:      "2005-02-20 14:01:21 bkorb"
+ *  sort.c  $Id: sort.c,v 4.7 2005/02/21 23:01:08 bkorb Exp $
+ * Time-stamp:      "2005-02-20 17:18:41 bkorb"
  *
  *  This module implements argument sorting.
  */
@@ -366,4 +366,4 @@ optionSort( tOptions* pOpts )
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of autoopts/usage.c */
+ * end of autoopts/sort.c */

@@ -279,5 +279,13 @@ strtoul( const char *nptrm, char **endptr, register int base );
 #endif
 
 SNV_END_EXTERN_C
-#endif /* SNPRINTFV_COMPAT_H
-          compat.h ends here  */
+#endif /* SNPRINTFV_COMPAT_H */
+
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of snprintfv/compat.h */

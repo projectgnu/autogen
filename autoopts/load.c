@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.12 2005/02/20 23:00:55 bkorb Exp $
- *  Time-stamp:      "2005-02-20 13:30:43 bkorb"
+ *  $Id: load.c,v 4.13 2005/02/21 23:01:08 bkorb Exp $
+ *  Time-stamp:      "2005-02-20 16:36:09 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -447,6 +447,5 @@ optionLoadLine(
  * c-file-style: "stroustrup"
  * tab-width: 4
  * indent-tabs-mode: nil
- * tab-width: 4
  * End:
  * end of autoopts/load.c */

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-02-14 08:50:15 bkorb"
+# Time-stamp:        "2005-02-21 11:52:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.5 2005/02/14 16:52:31 bkorb Exp $
+# $Id: rc.test,v 4.6 2005/02/21 23:01:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -171,4 +171,12 @@ cmp  ${testname}.cmds ${testname}.test || {
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 cleanup
-# end of vers.test
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of rc.test

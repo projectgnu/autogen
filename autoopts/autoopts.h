@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-20 13:21:47 bkorb"
+ *  Time-stamp:      "2005-02-20 16:48:39 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.13 2005/02/20 23:00:55 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.14 2005/02/21 23:01:08 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -173,6 +173,11 @@ typedef struct {
     tCC*    pzSpc;
     tCC*    pzOptFmt;
 } arg_types_t;
+
+typedef struct {
+    char*           pzName;
+    tOptionValue    val;
+} tNameValue;
 
 #  define AGALOC( c, w )        malloc( c )
 #  define AGREALOC( p, c, w )   realloc( p, c )

@@ -1500,4 +1500,11 @@ snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
   return count_or_errorcode;
 }
 
-/* snprintfv.c ends here */
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * tab-width: 4
+ * indent-tabs-mode: nil
+ * End:
+ * end of snprintfv/printfv.c */

@@ -1,7 +1,7 @@
 /*
- * $Id: text_mmap.c,v 4.2 2005/02/14 16:25:37 bkorb Exp $
+ * $Id: text_mmap.c,v 4.3 2005/02/21 23:01:08 bkorb Exp $
  *
- * Time-stamp:      "2005-02-14 08:20:53 bkorb"
+ * Time-stamp:      "2005-02-20 17:18:28 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
@@ -301,9 +301,12 @@ text_munmap( tmap_info_t* pMI )
     return pMI->txt_errno;
 #endif /* HAVE_MMAP */
 }
+
 /*
  * Local Variables:
+ * mode: C
  * c-file-style: "stroustrup"
+ * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * text_mmap ends here */
+ * end of autoopts/text_mmap.c */

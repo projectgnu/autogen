@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.10 2005/02/20 23:00:55 bkorb Exp $
- *  Time-stamp:      "2005-02-20 13:17:16 bkorb"
+ *  $Id: autoopts.c,v 4.11 2005/02/21 23:01:08 bkorb Exp $
+ *  Time-stamp:      "2005-02-20 16:36:01 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1026,6 +1026,5 @@ optionProcess(
  * c-file-style: "stroustrup"
  * tab-width: 4
  * indent-tabs-mode: nil
- * tab-width: 4
  * End:
  * end of autoopts/autoopts.c */

@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2005
  *	Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2005-01-23 15:32:31 bkorb"
+ * Time-stamp:      "2005-02-20 17:25:46 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -586,4 +586,4 @@ fmemopen(void *buf, size_t len, const char *pMode)
  * tab-width: 4
  * indent-tabs-mode: nil
  * End:
- * end of fmemopen.c */
+ * end of agen5/fmemopen.c */
