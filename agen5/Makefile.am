@@ -4,12 +4,12 @@
 ##
 ##    AutoGen copyright (C) 1992-2003 Bruce Korb
 ##
-## Time-stamp:      "2003-04-21 18:07:32 bkorb"
+## Time-stamp:      "2003-05-16 12:14:54 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.23 2003/04/22 01:40:20 bkorb Exp $
+## $Id: Makefile.am,v 3.24 2003/05/18 17:13:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -30,7 +30,7 @@ GEN_CSRC = opts.c opts.h directive.h expr.ini expr.h proto.h \
 	cgi-fsm.c cgi-fsm.h pseudo-fsm.h
 GEN_SRC = $(GEN_CSRC) defParse.c defParse.h $(GENDOCS)
 
-pkgdata_DATA = schemedef.scm fsm.tpl fsm-macro.tpl fsm-trans.tpl
+pkgdata_DATA = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 man_MANS     = autogen.1
 
 MAINTAINERCLEANFILES = Makefile.in $(STAMPS) $(GEN_SRC)
