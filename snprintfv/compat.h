@@ -305,17 +305,8 @@ typedef int compatboolean;
 typedef SNV_LONG_DOUBLE snv_long_double;
 
 #ifndef HAVE_STRTOUL
-extern unsigned long strtoul( const char *nptrm,
-							  char **endptr,
-							  register int base );
-#endif
-
-#ifndef HAVE_LDEXPL
-extern long double ldexpl(long double x, int exp);
-#endif
-
-#ifndef HAVE_FREXPL
-extern long double frexpl(long double x, int *exp);
+extern unsigned long
+strtoul( const char *nptrm, char **endptr, register int base );
 #endif
 
 SNV_END_EXTERN_C
