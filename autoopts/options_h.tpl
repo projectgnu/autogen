@@ -1,12 +1,10 @@
-[= AutoGen5 Template   -*- Mode: C -*-
+[= AutoGen5 Template -*- Mode: C -*-
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.10 2005/02/21 23:01:08 bkorb Exp $
-
 # Automated Options copyright 1992-2005 Bruce Korb
-
-# Time-stamp:      "2005-02-14 05:59:50 bkorb"
+# Time-stamp:      "2005-02-23 13:51:57 bkorb"
+# ID:  $Id: options_h.tpl,v 4.11 2005/03/06 18:33:52 bkorb Exp $
 
 =][=
 
@@ -22,6 +20,8 @@ h=options.h
 [=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
  */
 [=(make-header-guard "autoopts")=]
+#include <sys/types.h>
+
 #if defined(HAVE_STDINT_H)
 # include <stdint.h>
 #elif defined(HAVE_INTTYPES_H)
@@ -51,9 +51,6 @@ h=options.h
  *  values for "opt_name" are available.
  */
 
-#define OPTST_SET_ARGTYPE(n) ((n) << 12)
-#define OPTST_GET_ARGTYPE(f) (((f) & OPTST_ARG_TYPE_MASK) >> 12)
-
 typedef enum {
     OPARG_TYPE_NONE             = 0,
     OPARG_TYPE_STRING           = 1,    /* default type/ vanilla string      */
@@ -66,6 +63,7 @@ typedef enum {
 
 typedef struct optionValue {
     teOptArgType        valType;
+    char*               pzName;
     union {
         char            strVal[1];      /* OPARG_TYPE_STRING      */
         int             enumVal;        /* OPARG_TYPE_ENUMERATION */
@@ -75,6 +73,9 @@ typedef struct optionValue {
         void*           nestVal;        /* OPARG_TYPE_HIERARCHY   */
     } v;
 } tOptionValue;
+
+#define OPTST_SET_ARGTYPE(n) ((n) << 12)
+#define OPTST_GET_ARGTYPE(f) (((f) & OPTST_ARG_TYPE_MASK) >> 12)
 
 /*
  *  Bits in the fOptState option descriptor field.
@@ -444,5 +445,4 @@ CPLUSPLUS_CLOSER
  * indent-tabs-mode: nil
  * End:
  * [=(out-name)=] ends here */[=
-
 ## optexport.tpl ends here  =]
