@@ -1,97 +1,97 @@
-{(   -*- nroff -*-
-autogen template man=%s.1
-)}
-{(
+[+:   -*- nroff -*-
+AutoGen5 template man=%s.1
+:+]
+[+:
 ## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
 ## 
 ##  AutoOpts copyright 1992-1999 Bruce Korb
 ## 
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-## Maintainer:      Bruce Korb <korbb@datadesign.com>
+## Maintainer:      Bruce Korb <autogen@linuxbox.com>
 ## Created:         Mon Jun 28 15:35:12 1999
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
-##            by:     Bruce Korb <korb@datadesign.com>			      
+##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.5 1999/08/03 22:44:27 bkorb Exp $
+## $Id: agman1-tpl.in,v 2.6 1999/10/22 00:28:21 bruce Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
 1999-06-28 modified to be template  Bruce Korb <autogen@linuxbox.com>
 1999-07-04 nroff tweaks, Jim Van Zandt <jrv@vanzandt.mv.com>
+1999-10-18 reworked as AutoGen5 template
 
 ## Code:
-)}.TH {(prog_name _up)} 1 {(
-  _EVAL "date +%Y-%m-%d" _shell)} "" "Programmer's Manual"
-{(
+:+].TH [+: % prog_name (string-upcase! "%s") :+] 1 [+:
+  `date +%Y-%m-%d` :+] "" "Programmer's Manual"
+[+:
 
-_EVAL '.\"  ' _DNE
+(dne ".\\\"  ")
 
-)}
+:+]
 .\"
 .SH NAME
-{(prog_name _down)} \- {(prog_title)}
-.SH SYNOPSIS{(
+[+: % prog_name (string-downcase! "%s") :+] \- [+:prog_title:+]
+.SH SYNOPSIS[+:
 
       # * * * * * * * * * * * * * * * * * * * * * * * * *
       #
       #  Display the command line prototype,
       #  based only on the argument processing type.
       #
-      )}
-.B {(
-  _IF prog_file_name _exist )}{(prog_file_name)}{(
-  _ELSE)}{(prog_name _down)}{(
-  _ENDIF)}{(
-
-  _IF flag.value _exist )}{(
-    _IF long_opts _exist )}{(
+      :+]
+.B [+: (if (exist? "prog_file_name")
+           (get "prog_file_name")
+           (string-downcase! (get "prog_name") )) :+][+:
+  DEBUG 0 :+][+:
+  IF (exist? "flag.value") :+][+:
+    IF (exist? "long_opts") :+][+:
 
       # * * * * *
       #
-      )}
+      :+]
 .\" Mixture of short (flag) options and long options
-.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP " [[=| ]\fIvalue\fP]]..."{(
+.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP " [[=| ]\fIvalue\fP]]..."[+:
 
-    _ELSE )}{(
+    ELSE no long options:+][+:
 
       # * * * * *
       #
-      )}
+      :+]
 .\" Short (flag) options only
-.RB [ -\fIflag\fP " [\fIvalue\fP]]..."{(
-    _ENDIF )}{(
+.RB [ -\fIflag\fP " [\fIvalue\fP]]..."[+:
+    ENDIF :+][+:
 
-  _ELIF long_opts _exist )}{(
+  ELIF (exist? "long_opts") :+][+:
 
       # * * * * *
       #
-      )}
+      :+]
 .\" Long options only
-.RB [ --\fIopt-name\fP [ = "| ] \fIvalue\fP]]..."{(
+.RB [ --\fIopt-name\fP [ = "| ] \fIvalue\fP]]..."[+:
 
-  _ELIF argument _exist ! )}{(
+  ELIF  (not (exist? "argument")) :+][+:
 
       # * * * * *
       #
-      )}
+      :+]
 .\" All arguments are named options.
 .RI [ opt-name "[\fB=\fP" value ]]...
 .PP
-All arguments are named options.{(
+All arguments are named options.[+:
 
-  _ELSE )}{(
-    _ERROR "Named option programs cannot have arguments" )}{(
-  _ENDIF )}{(
+  ELSE :+][+:
+    (error "Named option programs cannot have arguments") :+][+:
+  ENDIF :+][+:
 
-  _IF argument _exist )}
+  IF (exist? "argument") :+]
 .br
 .in +8
-{(argument)}{(
-  _ELIF long_opts _exist flag.value _exist | )}
+[+:argument:+][+:
+  ELIF (or (exist? "long_opts") (exist? "flag.value")) :+]
 .PP
-All arguments must be options.{(
-  _ENDIF )}{(
+All arguments must be options.[+:
+  ENDIF :+][+:
 
       # * * * * * * * * * * * * * * * * * * * * * * * * *
       #
@@ -99,76 +99,76 @@ All arguments must be options.{(
       #  otherwise use the 'detail' help option.  If not that,
       #  then the thing is undocumented.
       #
-      )}
+      :+]
 .SH "DESCRIPTION"
-This manual page documents, briefly, the \fB{(prog_name _down)}\fP command.
-{(
-_IF prog_man_descrip _exist
-    )}{(prog_man_descrip)}{(
-_ELIF detail _exist
-    )}{(detail)}{(
-_ELSE
-    )}Its description is not documented.{(
-_ENDIF)}
-.SH OPTIONS{(
+This manual page documents, briefly, the \fB[+:
+    (string-downcase! (get "prog_name")) :+]\fP command.
+[+:
+(if (exist? "prog_man_descrip")
+    (get "prog_man_descrip")
+    (if (exist? "detail")
+        (get "detail")
+        "Its description is not documented."
+)   )  :+]
+.SH OPTIONS[+:
 
 # * * * * * * * * * * * * * * * * * * * * * * * * *
 #
    Describe each option
 
-)}{(
+:+][+:
 
-_FOR flag
+FOR flag
 
-)}{(
+:+][+:
   #  Skip the documentation options!
   #
-  )}{(
-  _IF documentation _exist ! )}
-.TP{(
-      _IF value _exist )}{(
-        _IF long_opts _exist )}{(
+  :+][+:
+  IF (not (exist? "documentation")) :+]
+.TP[+:
+    IF (exist? "value") :+][+:
+      IF (exist? "long_opts") :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
           *  The option has a flag value (character) AND
           *  the program uses long options
           *
-          )}
-.BR -{(value)}{(
-          _IF arg_name _exist ! )} ", " --{(
-          _ELSE )} " \fI{(arg_name)}\fP, " --{(
-          _ENDIF )}{(name #_^ #-- _tr _down)}{(
-          _IF arg_name _exist)}{(
-            _IF flag_arg _len 0 = )} [ ={(
-            _ELSE )} "=" {(
-            _ENDIF )}\fI{(arg_name)}\fP{(
-            _IF flag_arg _len 0 = )} ]{(
-            _ENDIF )}{(
-          _ENDIF)}{(
+          :+]
+.BR -[+:value:+][+:
+          IF (not (exist? "arg_name")) :+] ", " --[+:
+          ELSE :+] " \fI[+:arg_name:+]\fP, " --[+:
+          ENDIF :+][+:% name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
+          IF (exist? "arg_name") :+][+:
+            IF (= (len "flag_arg") 0) :+] [ =[+:
+            ELSE :+] "=" [+:
+            ENDIF :+]\fI[+:arg_name:+]\fP[+:
+            IF (= (len "flag_arg") 0) :+] ][+:
+            ENDIF :+][+:
+          ENDIF:+][+:
 
 
-        _ELSE   )}{(
+        ELSE   :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
           *  The option has a flag value (character) BUT
           *  the program does _NOT_ use long options
           *
-          )}
-.BR -{(value)}{(
-          _IF arg_name _exist)}{(
-            _IF flag_arg _len 0 = )}[{(
-            _ENDIF )} "\fI{(arg_name)}\fP{(
-            _IF flag_arg _len 0 = )}"]"{(
-            _ENDIF )}{(
-          _ENDIF)}{(
-        _ENDIF  )}{(
+          :+]
+.BR -[+:value:+][+:
+          IF (exist? "arg_name") :+][+:
+            IF (= (len "flag_arg") 0) :+][[+:
+            ENDIF :+] "\fI[+:arg_name:+]\fP[+:
+            IF (= (len "flag_arg") 0) :+]"]"[+:
+            ENDIF :+][+:
+          ENDIF:+][+:
+        ENDIF  :+][+:
 
 
-      _ELSE  value does not exist -- named option only  )}{(
+      ELSE  value does not exist -- named option only  :+][+:
 
-        _IF long_opts _exist ! )}{(
+        IF (not (exist? "long_opts")) :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -176,48 +176,60 @@ _FOR flag
           *  The program does _NOT_ use long options either.
           *  Special magic:  All arguments are named options.
           *
-          )}
-.BR {(name #_^ #-- _tr _down)}{(
-        _IF arg_name _exist)} {(
-          _IF flag_arg _len 0 = )} [ ={(
-          _ELSE )} "=" {(
-          _ENDIF )}\fI{(arg_name)}\fP{(
-          _IF flag_arg _len 0 = )}]{(
-          _ENDIF )}{(
-        _ENDIF)}{(
+          :+]
+.BR [+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
+        IF (exist? "arg_name") :+] [+:
+          IF (= (len "flag_arg") 0) :+] [ =[+:
+          ELSE :+] "=" [+:
+          ENDIF :+]\fI[+:arg_name:+]\fP[+:
+          IF (= (len "flag_arg") 0) :+]][+:
+          ENDIF :+][+:
+        ENDIF:+][+:
 
 
-        _ELSE   )}{(
+        ELSE   :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
           *  The option does not have a flag value (character).
           *  The program, instead, only accepts long options.
           *
-          )}
-.BR --{(name #_^ #-- _tr _down)}{(
-          _IF arg_name _exist)} "{(
-            _IF flag_arg _len 0 = )}[{(
-            _ENDIF )}=\fI{(arg_name)}\fP{(
-            _IF flag_arg _len 0 = )}]{(
-            _ENDIF )}"{(
-          _ENDIF)}{(
-        _ENDIF  )}{(
-      _ENDIF )}
-{(descrip)}{(
-      _IF min           _exist
-          max           _exist |
-          enabled       _exist |
-          no_preset     _exist |
-          setable       _exist |
-          equivalence   _exist |
-          flags_must    _exist |
-          flags_cant    _exist | )}.
-Special attributes apply to this option.
-See the invocation section in the info document.{(
-      _ENDIF)}
+          :+]
+.BR --[+: % name (string-tr! "%s" "A-Z_^" "a-z--") :+][+:
+          IF (exist? "arg_name") :+] "[+:
+            IF (= (len "flag_arg") 0) :+][[+:
+            ENDIF :+]=\fI[+:arg_name:+]\fP[+:
+            IF (= (len "flag_arg") 0) :+]][+:
+            ENDIF :+]"[+:
+          ENDIF:+][+:
+        ENDIF  :+][+:
+      ENDIF :+]
+[+:descrip:+][+:
+      IF (exist? "min") :+]
+This option is required to appear.[+:ENDIF:+][+:
+      IF (exist? "max") :+]
+This option may appear [+:
+          IF % max (= "%s" "NOLIMIT")
+          :+]an unlimited number of times[+:ELSE
+          :+]up to [+:max:+] times[+:ENDIF:+].[+:ENDIF:+][+:
+      IF (exist? "enabled") :+]
+This option is enabled by default.[+:ENDIF:+][+:
+      IF (exist? "no_preset") :+]
+This option may not be preset with environment variables
+or in initialization (rc) files.[+:ENDIF:+][+:
+      IF (exist? "settable") :+]
+This option can be set within the program using a special purpose
+macro.[+:ENDIF:+][+:
+      IF (exist? "equivalence") :+]
+This option is a member of the [+:equivalence:+] class of options.[+:ENDIF:+][+:
+      IF (exist? "flags_must") :+]
+This opton must appear in combination with the following options:
+[+: FOR flags_must ", " :+][+:flags_must:+][+:ENDFOR:+].[+:ENDIF:+][+:
+      IF (exist? "flags_cant") :+]
+This option must not appear in combination with any of the following options:
+[+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:ENDIF:+]
 .sp
-{( # SED
+[+: # SED
    -e convert @code into \fB...\fP phrases
    -e convert @file into \fI...\fP phrases
    -e convert @var into \fB...\fP phrases
@@ -230,8 +242,7 @@ See the invocation section in the info document.{(
    NB:  backslashes are interpreted three times: by AutoGen, sed and nroff.
         Thus, for nroff to see one backslash, use four (4)!!
 
-   ))}{(
-doc "sed \
+   ):+][+: % doc `sed \
  -e 's;@code{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
  -e 's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
  -e 's;@var{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
@@ -239,62 +250,65 @@ doc "sed \
  -e '/@ *example/,/@ *end *example/s/^/    /' \
  -e '/^ *@ *example/d' \
  -e 's/^ *@ *end *example/.br/' \
- -e 's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_"
-    _printf _shell )}{(
+ -e 's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_` :+][+:
 
-  _ENDIF documentation _exist ! )}{(
+  ENDIF documentation _exist ! :+][+:
 
-/flag
+ENDFOR flag
 
 
-)}
+:+]
 .TP
-.BR {(_IF flag.value _exist)}\-? , " --{(
-      _ELIF long_opt _exist)}--{(_ENDIF)}help
+.BR [+:IF (exist? "flag.value") :+]\-? , " --[+:
+      ELIF (exist? "long_opt") :+]--[+:
+      ENDIF:+]help
 Display usage information and exit.
 .TP
-.BR {(_IF flag.value _exist)}-! , " --{(
-      _ELIF long_opt _exist)}--{(_ENDIF)}more-help
-Extended usage information passed thru pager.{(
+.BR [+:IF (exist? "flag.value") :+]-! , " --[+:
+      ELIF (exist? "long_opt") :+]--[+:
+      ENDIF:+]more-help
+Extended usage information passed thru pager.[+:
 
 
-_IF homerc _exist )}
+IF (exist? "homerc") :+]
 .TP
-.BR {(_IF flag.value _exist)}-> " \fIrcfile\fP, --" {(
-      _ELIF long_opt _exist)}--{(_ENDIF)}save-opts "[=\fIrcfile\fP] 
+.BR [+: IF (exist? "flag.value") :+]-> " \fIrcfile\fP, --" [+:
+      ELIF (exist? "long_opt") :+]--[+:
+      ENDIF:+]save-opts "[=\fIrcfile\fP] 
 Save the option state to \fIrcfile\fP.
 .TP
-.BR {(_IF flag.value _exist)}-< " \fIrcfile\fP, --" {(
-      _ELIF long_opt _exist)}--{(_ENDIF)}load-opts "=\fIrcfile\fP"
+.BR [+: IF (exist? "flag.value") :+]-< " \fIrcfile\fP, --" [+:
+      ELIF (exist? "long_opt") :+]--[+:
+      ENDIF:+]load-opts "=\fIrcfile\fP"
 Load options from \fIrcfile\fP.
 .TP
 .BR  --no-load-opts
-Disable loading options from an rc file.{(
-_ENDIF)}{(
+Disable loading options from an rc file.[+:
+ENDIF (exist? "homerc") :+][+:
 
 
-_IF version _exist )}
+IF (exist? "version") :+]
 .TP
-.BR {(_IF flag.value _exist)}\-v " \fI[v|c|n]\fP, " --{(
-      _ELIF long_opt _exist)}--{(_ENDIF)}version "\fI[=v|c|n]\fP"
+.BR [+:  IF (exist? "flag.value") :+]\-v " \fI[v|c|n]\fP, " --[+:
+      ELIF (exist? "long_opt") :+]--[+:ENDIF:+]version "\fI[=v|c|n]\fP"
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
-print the full copyright notice.{(
-_ENDIF
+print the full copyright notice.[+:
+ENDIF
 
 
-)}{(
-_IF explain _exist )}
+:+][+:
+IF explain _exist :+]
 .PP
-{(explain)}{(
-_ENDIF)}{(
-_IF man_doc _exist )}
-{(man_doc)}{(
-_ENDIF)}
+[+:explain:+][+:
+ENDIF:+][+:
+IF man_doc _exist :+]
+[+:man_doc:+][+:
+ENDIF:+]
 .SH AUTHOR
-{(owner)}{(eaddr "# <%s>" _printf)}
+[+:owner:+][+:% eaddr "<%s>" :+]
 .PP
-This manual page was \fIAutoGen\fP-erated from the \fB{(prog_name)}\fP
-option definitions.{(
+This manual page was \fIAutoGen\fP-erated from the \fB[+:prog_name:+]\fP
+option definitions.[+: #
 
-agman.tpl ends here  )}
+agman.tpl ends here  :+]

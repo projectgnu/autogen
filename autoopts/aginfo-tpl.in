@@ -1,5 +1,5 @@
-[= autogen template texi=%s.texi =]
-[=
+[= AutoGen5 template texi=%s.texi
+
 ##  Documentation template
 ## 
 ##  AutoGen Copyright (C) 1992-1999 Bruce Korb
@@ -10,93 +10,110 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.4 1999/07/08 22:06:56 bkorb Exp $
+## $Id: aginfo-tpl.in,v 2.5 1999/10/22 00:28:20 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
+=]
+@node [=
 
-=]@node [=prog_name=] Invocation
-@[=_EVAL LEVEL _env=] Invoking [=prog_name=]
-@cindex [=prog_name _down=] invocation
+prog_name
+
+=] Invocation
+@[=
+ (getenv "LEVEL")
+ =] Invoking [=
+prog_name
+=]
+@cindex [=% prog_name
+ (define down-prog-name (string-downcase "%s"))
+ (. down-prog-name) =] invocation
 @ignore
-[=_OUTPUT push-new _outfile "echo %s | sed 's/texi$/menu/'"
-          _printf _shell
-=]* [=prog_name " Invocation::" + #%-32s _printf
-=] Invoking [=prog_name=]
-[=_OUTPUT pop=]
-[= _EVAL "#" _DNE =]
+[=
+(out-push-new (shell
+    (sprintf "echo %s | sed 's/texi$/menu/'" (out-name)) ) )
+=]* [= % prog_name (sprintf "%%-32s"  "%s Invocation::")
+     =] Invoking [=prog_name=]
+[=(out-pop)=]
+[=(dne "# ")=]
 
 @end ignore
+[=
 
-[=_IF prog_info_descrip _exist
-    =][=prog_info_descrip=][=
-  _ELSE
-=]This [=_EVAL LEVEL _env _down=] documents the @code{AutoOpts}
+IF (exist? "prog_info_descrip")  =]
+[= prog_info_descrip =][=
+
+ELSE =]
+This [=(string-downcase! (getenv "LEVEL"))=] documents the @code{AutoOpts}
 generated usage text and option meanings for [=prog_name=].[=
-  _ENDIF=]
+ENDIF=]
 
 @menu
-* [=prog_name " usage::" + #%-32s _printf _down
-=] [=prog_name=] Usage
-[=_OUTPUT push-new _outfile #.tmp + =][=
-_FOR flag =][=
-  _IF doc _len 0 >
-=]* [=prog_name name _get #:: + "#2$%s %-24s" _printf A-Z^_ a-z-- _tr
-=] [=name #A-Z^_ #a-z-- _tr=] Option
-[=_ENDIF =][=
-/flag=][=
-_OUTPUT pop =][=
-_eval _outfile "f=%s ; sort $f.tmp ; rm -f $f.tmp" _printf _shell
-=]
+* [=(string-tr!
+          (sprintf "%s %-24s" (get "prog_name") "usage::")
+          "A-Z^_" "a-z--" ) =] [=prog_name=] Usage
+[=(out-push-new (string-append (out-name) ".tmp"))
+  (shell (string-append "f=" (out-name))) =][=
+FOR flag =][=
+  IF (> (len "doc") 0)
+=]* [=(string-tr!
+          (sprintf "%s %-24s" (get "prog_name")
+                 (string-append (get "name") "::") )
+          "A-Z^_" "a-z--" )
+     =] [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] Option
+[=ENDIF =][=
+ENDFOR flag=][=
+(out-pop) =][=
+`sort $f ; rm -f $f` =]
 @end menu
 
-@node [=prog_name _down=] usage
-@[=_CASE LEVEL _env _down=][=
-   _ chapter    =][=
-   _ section    =]sub[=
-   _ subsection =]subsub[=
-  _ESAC =]section [=prog_name=] Usage
-@cindex [=prog_name _down=] usage
+@node [=(. down-prog-name)=] usage
+@[=CASE (getenv "LEVEL") =][=
+   = chapter    =][=
+   = section    =]sub[=
+   = subsection =]subsub[=
+   ESAC =]section [=prog_name=] Usage
+@cindex [=(. down-prog-name)=] usage
 
 This is the automatically generated usage text for [=prog_name=]:
 
 @example
 
-[=_IF prog_file_name _exist
-  =][=prog_file_name "PROG=%s" _shell =][=
-  _ELSE
-  =][=
-prog_name "PROG=%s
-if [ ! -f ${PROG} ] ; then PROG=`echo $PROG | tr '[A-Z]' '[a-z]'` ; fi
-if [ ! -f ${PROG} ] ; then PROG=`echo $PROG | tr x_ x-` ; fi"
+[=
+IF (exist? "prog_file_name") =][=
+  % prog_file_name `PROG=%s` =][=
+ELSE =][=
+  % prog_name `PROG=%s
+    if [ ! -f ${PROG} ]
+    then PROG=\`echo $PROG | tr '[A-Z]' '[a-z]'\` ; fi
+    if [ ! -f ${PROG} ]
+    then PROG=\`echo $PROG | tr x_ x-\` ; fi` =][=
+ENDIF=][=
 
-  _printf _shell =][=
-  _ENDIF=][=
+IF (exist? "long_opts") =][=
+    `HELP=--help` =][=
+ELIF (exist? "flag.value") =][=
+    `HELP='-?'` =][=
+ELSE =][=
+    `HELP=help` =][=
+ENDIF =][=
 
-  _IF long_opts _exist =][=
-    _EVAL "HELP=--help" _shell =][=
-  _ELIF flag.value _exist =][=
-    _EVAL "HELP='-?'" _shell =][=
-  _ELSE =][=
-    _EVAL "HELP=help" _shell =][=
-  _ENDIF =][=
-
-_EVAL "#./${PROG} ${HELP} 2>&1 |
-  sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g'"  _shell=]
+`./${PROG} ${HELP} 2>&1 |
+  sed -e 's/{/@{/g' -e 's/}/@}/g' -e 's/\t/        /g' `=]
 @end example
 
 [=
-_FOR flag=][=
-  _IF doc _len 0 > =]
-@node [=prog_name _down=] [=name A-Z^_ a-z-- _tr=]
-@[=_CASE LEVEL _env _down=][=
-   _ chapter    =][=
-   _ section    =]sub[=
-   _ subsection =]subsub[=
-  _ESAC =]section [=name #A-Z^_ #a-z-- _tr=] Option
-@cindex [=prog_name _down=]-[=name A-Z^_ a-z-- _tr=]
+FOR flag=][=
+   IF (> (len "doc") 0) =]
+@node [=(. down-prog-name)=] [=% name (string-tr! "%s" "A-Z^_" "a-z--") =]
+@[=CASE (getenv "LEVEL") =][=
+   = chapter    =][=
+   = section    =]sub[=
+   = subsection =]subsub[=
+   ESAC =]section [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] Option
+@cindex [=(. down-prog-name)=]-[=% name (string-tr! "%s" "A-Z^_" "a-z--")=]
 
 [=doc=]
-[=_ENDIF=][=
-/flag=][=
+[=ENDIF=][=
+ENDFOR flag=][=
 
 aginfo.tpl ends here =]
