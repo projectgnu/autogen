@@ -341,7 +341,7 @@ DEFINE Option_Descriptor =][=
                             =]_Name, zNot[=(. cap-name)=]_Pfx },[=
   ENDIF =][=
 
-ENDDEF Option_Descriptor =][= =][=
+ENDDEF Option_Descriptor =][=
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
