@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Thu Aug  5 10:42:39 1999				      
+# Last Modified:     Mon Aug  9 09:25:13 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.17 1999/08/05 17:42:49 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.18 1999/08/09 16:25:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -70,7 +70,7 @@ post )
 	  done
 
 	  ( cd $top_srcdir
-	    find . -type f -o -type l -print ) |
+	    find . \( -type f -o -type l \) -print ) |
 	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
 	  while read f
 	  do
