@@ -1,3 +1,7 @@
+2003-04-18  Bruce Korb  <bkorb@gnu.org>
+
+	* */*.[ch]: retag the ending of source files.
+
 2003-04-16  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/enumeration.c(optionEnumerationVal): change intptr_t's to

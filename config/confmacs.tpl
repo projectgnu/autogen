@@ -20,6 +20,7 @@ DEFINE preamble
       (set! test-name "test_name")
       (string->c-name! test-name) )
 
+  (define author-name (get "author"))
   (define up-name     (string-upcase    test-name))
   (define down-name   (string-downcase  test-name))
   (define group-id    (string-downcase! (get "group")))
@@ -106,22 +107,22 @@ dnl   * a short script is run[=
     ENDIF (= (count "action.no") 0) =][=
 
     IF   (define doc-text (get "doc"))
-     (> (string-length doc-text) 0) =]
+      (> (string-length doc-text) 0) =]
 dnl
 dnl @description
-[=(prefix "dnl   " doc-text) =][=
+[=(prefix "dnl " doc-text) =][=
     ENDIF =][=
 
-    IF  (exist? "author") =]
+    IF  (> (string-length author-name) 0) =]
 dnl
 dnl @version "[=
 
  (strftime "%d-%B-%Y at %H:%M"
            (localtime (current-time)) ) =]"
 dnl
-dnl @author [=author=][=
+dnl @author [=(. author-name)=][=
 
-    ENDIF (exist? "author") =]
+    ENDIF     =]
 dnl[=
 
   ENDIF separate-macros
@@ -140,7 +141,7 @@ AC_DEFUN([[=
 
   ELSE   =]
 
-ERROR:  invalid conftest function:   [= (. fcn-name) =][=
+ERROR:  invalid conftest function:   ``[= (. fcn-name) =]''[=
 
   ENDIF  =]
 [=(prefix "  " (join "\n" (stack "always")))
@@ -512,7 +513,7 @@ DEFINE  try-test                =][=
     fi
   ]) # end of CACHE_VAL of [=(. cv-name)=]
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
-  emit-results         =][=
+  emit-results                  =][=
 
 ENDDEF  try-disable             =][=
 
