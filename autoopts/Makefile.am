@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2000/10/02 04:20:04 $
+## Last Modified:   $Date: 2000/10/03 19:14:08 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.30 2000/10/02 04:20:04 bkorb Exp $
+## $Id: Makefile.am,v 2.31 2000/10/03 19:14:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -49,7 +49,6 @@ libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
 
 libguileopts_la_SOURCES = guileopt.c
 libguileopts_la_LDFLAGS = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
-libguileopts_la_LIBADD  = ./libopts.la
 
 bin_SCRIPTS	= autoopts-config
 
