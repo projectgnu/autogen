@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.17 1999/10/22 00:28:23 bruce Exp $
+#$Id: optcode.tpl,v 2.18 1999/10/28 01:23:35 bruce Exp $
 =]
 [=
 
@@ -28,7 +28,7 @@ ELIF (exist? "copyright_lgpl")
 =]
 static const char zCopyrightNotice[] =
        [=
-       (c-string (gpl (. prog-name) (get "owner") "" )) =];[=
+       (c-string (lgpl (. prog-name) (get "owner") "" )) =];[=
 
 ELSE =]
 #define zCopyrightNotice (const char*)NULL[=
