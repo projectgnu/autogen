@@ -7,10 +7,10 @@ dnl
 dnl Author:           Bruce Korb <korbb@datadesign.com>
 dnl Maintainer:       Bruce Korb <korbb@datadesign.com>
 dnl Created:          Mon Jun 30 15:10:13 1997
-dnl Last Modified:    Tue Nov 24 09:30:32 1998
+dnl Last Modified:    Thu Jan 21 15:28:48 1999
 dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.5 1998/12/08 18:34:28 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.6 1999/01/26 15:41:40 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.5 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.6 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -47,8 +47,9 @@ unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
 AC_PROG_CC
-ifdef([AC_EXEEXT],[AC_EXEEXT],[AM_CYGWIN32])
-ifdef([AC_PROG_INSTALL],[AC_PROG_INSTALL],[AM_PROG_INSTALL])
+ifdef([AC_EXEEXT],[AC_EXEEXT],[AC_CYGWIN32])
+###ifdef([AC_PROG_INSTALL],[AC_PROG_INSTALL],[AM_PROG_INSTALL])
+AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 AC_PROG_YACC
 AG_PROG_MAKE_INCLUDE

@@ -1,15 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.10 1998/12/08 18:34:46 bkorb Exp $
+ *  $Id: getdefs.c,v 2.11 1999/01/26 15:41:40 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
  * Author:            Bruce Korb <korbb@datadesign.com>
  * Maintainer:        Bruce Korb <korbb@datadesign.com>
  * Created:           Mon Jun 30 15:35:12 1997
- * Last Modified:     Wed Nov 25 13:18:08 1998
+ * Last Modified:     Tue Jan 26 07:37:15 1999
  *            by:     Bruce Korb <korb@datadesign.com>
- *
  */
 
 #define DEFINE
@@ -1109,9 +1108,11 @@ buildPreamble(
         char*  pz = zDefText+1;
         while (isalnum( *pz ) || (*pz == '_'))
             *pzOut++ = *pz++;
-        if (*pz == '.')
-             pzMembership = pz+1;
-        else pzMembership = (char*)NULL;
+        if (*pz == '.') {
+            pzMembership = pz+1;
+            *pz = NUL;
+        } else
+            pzMembership = (char*)NULL;
     }
 
     /*
