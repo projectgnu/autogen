@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.33 1999/10/31 00:32:01 bruce Exp $
+## $Id: Makefile.am,v 2.34 1999/10/31 18:36:57 bruce Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -78,7 +78,7 @@ DOC_DEPENDS	= $(DOC_TEMPLATE) \
 DEFCOPY		= copy=$(OPTIONS_DEF)
 
 GET_OPTS	= srcfile linenum filelist template=auto_gen
-BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_ellipsis
+BLOCKOPT	= subblock=exparg=arg_name,arg_desc,arg_optional,arg_list
 GETDEFS		= $(top_builddir)/getdefs/getdefs $(GET_OPTS) $(BLOCKOPT)
 
 AGEXE		= AutoGen
