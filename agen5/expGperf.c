@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGperf.c,v 1.1 2000/09/30 02:36:25 bkorb Exp $
+ *  $Id: expGperf.c,v 1.2 2000/09/30 02:39:34 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -66,7 +66,7 @@ tSCC zRunGperf[] = "${gperf_%s} %s || exit 1";
  * what:   build a perfect hash function
  * general_use:
  *
- * exparg: str  , name of hash list
+ * exparg: name , name of hash list
  * exparg: list , list of strings to hash ,, list
  *
  * doc:  build a program to perform perfect hashes of a known
@@ -154,8 +154,8 @@ ag_scm_make_gperf( SCM name, SCM hlist )
  * what:   perform a perfect hash function
  * general_use:
  *
- * exparg: name , string to hash
- * exparg: str  , name of hash list
+ * exparg: name , name of hash list
+ * exparg: str  , string to hash
  *
  * doc:  Hash the input string
 =*/
