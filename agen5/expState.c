@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 1.21 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: expState.c,v 1.22 2000/09/28 03:51:39 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -683,7 +683,7 @@ ag_scm_tpl_file_line( void )
                        + sizeof( zFmt ) + 3 * sizeof( int );
         if (maxlen >= sizeof( zScribble ))
             pz = (char*)AGALOC( maxlen, "file-line buffer" );
-        else pz = z;
+        else pz = zScribble;
     }
 
     sprintf( pz, zFmt, pCurTemplate->pzFileName, pCurMacro->lineNo );

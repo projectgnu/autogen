@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 1.10 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: tpLoad.c,v 1.11 2000/09/28 03:51:39 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -544,7 +544,7 @@ loadTemplate( tCC* pzFileName )
                    + mapInfo.size - (pzData - (tCC*)mapInfo.pData)
                    + strlen( mapInfo.pzFileName ) + 0x10;
         alocSize &= ~0x0F;
-        pRes = (tTemplate*)AGALOC( alocSize, "primary template" );
+        pRes = (tTemplate*)AGALOC( alocSize, "main template" );
         memset( (void*)pRes, 0, alocSize );
 
         /*

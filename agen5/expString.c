@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.21 2000/09/27 20:38:54 bkorb Exp $
+ *  $Id: expString.c,v 1.22 2000/09/28 03:51:39 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -320,7 +320,7 @@ ag_scm_join( SCM sep, SCM list )
         }
 
         cpy_len = SCM_LENGTH( car );
-        memcpy( (void*)pzRes, SCM_ROCHARS( scm ), cpy_len );
+        memcpy( (void*)pzRes, SCM_ROCHARS( car ), cpy_len );
         pzRes += cpy_len;
 
         /*

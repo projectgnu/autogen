@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 1.5 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: agUtils.c,v 1.6 2000/09/28 03:51:39 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -137,7 +137,7 @@ doOptions( int arg_ct, char** arg_vec )
              */
             if (strchr( pz, '=' ) == (char*)NULL) {
                 size_t siz = strlen( pz )+3;
-                char*  p   = AGALOC( siz );
+                char*  p   = AGALOC( siz, "env define" );
                 strcpy( p, pz );
                 strcat( p, "=1" );
                 pz = p;

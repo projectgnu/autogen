@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 1.12 2000/09/28 03:12:27 bkorb Exp $
+ *  $Id: expPrint.c,v 1.13 2000/09/28 03:51:39 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -282,7 +282,7 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 
     len   = SCM_LENGTH( fmt );
     memcpy( (void*)zScribble, (void*)SCM_CHARS( fmt ), len );
-    zScratch[ len ] = NUL;
+    zScribble[ len ] = NUL;
 
     res   = run_printf( zScribble, list_len, alist );
 
