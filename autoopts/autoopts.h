@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 3.2 2002/03/29 02:22:17 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.3 2002/06/15 16:27:27 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -83,7 +83,7 @@
  *  Some systems have broken printf's!!
  *  So, always link with our own stdio library :-(
  */
-#include <snprintfv/snprintfv.h>
+#include "snprintfv/snprintfv.h"
 
 #ifndef NUL
 #  define NUL '\0'
