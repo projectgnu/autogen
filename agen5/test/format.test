@@ -1,0 +1,66 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# format.test --- Count format string arguments.
+#
+# Time-stamp:        "2002-10-29 18:25:19 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           7/12/2001
+#            by: bkorb
+#
+# $Id: format.test,v 3.1 2002/10/31 05:20:56 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
+[++ AutoGen5 template test ++]
+[++
+
+FOR fmt "\n"
+
+++]Fmt [++(+ 1 (for-index))++] has [++(format-arg-count (get "fmt"))
+++] args: [++(c-string (get "fmt"))++][++
+
+ENDFOR
+
+++][++(hide-email "Bruce Korb" "bkorb" "gnu.org")++]
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating ${testname}.def
+cat > ${testname}.def <<_EOF_
+AutoGen definitions ${testname};
+fmt = "none";
+fmt = "one %s val";
+fmt = "two %s (%d%%) vals";
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+set -x
+echo creating ${testname}.base
+# this is the output we should expect to see
+cat > ${testname}.base <<'_EOF_'
+Fmt 1 has 0 args: "none"
+Fmt 2 has 1 args: "one %s val"
+Fmt 3 has 2 args: "two %s (%d%%) vals"
+_EOF_
+
+$AGEXE ${testname}.def || failure $AGEXE failed
+cmp -s ${testname}.base ${testname}.test || \
+   failure "`diff ${testname}.base ${testname}.test`"
+
+cleanup
+# end of format.test

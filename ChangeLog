@@ -1,3 +1,8 @@
+2002-10-30  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expPrint.c(ag_scm_hide_email): new function
+	* agen5/test/format.test: modify - test the functionality
+
 2002-10-25  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expPrint.c(ag_scm_format_arg_count): new function

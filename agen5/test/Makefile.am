@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/05/30 01:31:08 $
+## Last Modified:   $Date: 2002/10/31 05:24:42 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.5 2002/05/30 01:31:08 bkorb Exp $
+## $Id: Makefile.am,v 3.6 2002/10/31 05:24:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -18,7 +18,7 @@ NOSHELL_TESTS = \
   alist.test    case.test     defref.test   dynref.test   endmac.test  \
   for.test      forfrom.test  get.test      gperf.test    heredef.test \
   html.test     in.test       license.test  make.test     match.test   \
-  reorder.test  stack.test    string.test
+  reorder.test  stack.test    string.test   format.test
 
 MAINTAINERCLEANFILES = Makefile.in
 

@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2002/05/30 01:31:08 $
+## Last Modified:   $Date: 2002/10/31 05:20:56 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.4 2002/05/30 01:31:08 bkorb Exp $
+## $Id: Makefile.am,v 3.5 2002/10/31 05:20:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -27,7 +27,7 @@ TESTS_ENVIRONMENT = \
 	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
 	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
-	INC="@INCLIST@ $(CPPFLAGS)" \
+	INC="@INCLIST@ $(CPPFLAGS) $(GUILE_CPPFLAGS)" \
 	testsubdir=$(testsubdir) \
 	srcdir=`pwd` \
 	top_srcdir=`cd $(top_srcdir) ; pwd`

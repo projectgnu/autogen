@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2002/08/19 00:47:56 $
+## Last Modified:   $Date: 2002/10/31 05:20:56 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.12 2002/08/19 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 3.13 2002/10/31 05:20:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -49,11 +49,12 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##
 libopts_la_SOURCES = $(HDRS) $(CSRC)
 
-libopts_la_LIBADD = ../snprintfv/snprintfv/libsnprintfvc.la
+libopts_la_LIBADD  = ../snprintfv/snprintfv/libsnprintfvc.la
 libopts_la_LDFLAGS = -version-info @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
-libguileopts_la_SOURCES = guileopt.c
-libguileopts_la_LDFLAGS = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
+libguileopts_la_SOURCES  = guileopt.c
+libguileopts_la_CFLAGS   = $(GUILE_CPPFLAGS)
+libguileopts_la_LDFLAGS  = -version-info @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
 bin_SCRIPTS	= autoopts-config
 

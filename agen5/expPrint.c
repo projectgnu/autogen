@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 3.9 2002/10/27 04:59:01 bkorb Exp $
+ *  $Id: expPrint.c,v 3.10 2002/10/31 05:20:56 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -252,6 +252,62 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
     SCM   res      = run_printf( pzFmt, list_len, alist );
 
     return  scm_display( res, port );
+}
+
+
+/*=gfunc hide_email
+ *
+ * what:  convert eaddr to javascript
+ * general_use:
+ *
+ * exparg: display, display text
+ * exparg: eaddr,   email address
+ *
+ * doc:    Hides an email address as a java scriptlett.
+ *         The 'mailto:' tag and the email address are coded bytes
+ *         rather than plain text.  They are also broken up.
+=*/
+SCM
+ag_scm_hide_email( SCM display, SCM eaddr )
+{
+    tSCC zStrt[]  = "<script language=\"JavaScript\" type=\"text/javascript\">\n"
+                    "<!--\n"
+                    "var one = 'm&#97;';\n"
+                    "var two = 'i&#108;t';\n"
+                    "document.write('<a href=\"' + one + two );\n"
+                    "document.write('&#111;:";
+    tSCC zEnd[]   = "');\n"
+        "document.write('\" >%s</a>');\n"
+        "//-->\n</script>";
+    tSCC zFmt[]   = "&#%d;";
+    char*  pzDisp = ag_scm2zchars( display, pzFormatName );
+    char*  pzEadr = ag_scm2zchars( eaddr,   pzFormatName );
+    SCM    res;
+
+    {
+        size_t sz = (strlen( pzEadr ) * sizeof( zFmt ))
+            + sizeof( zStrt ) + sizeof( zEnd ) + strlen( pzDisp );
+
+        res = scm_makstr( sz, 0 );
+    }
+
+    {
+        char* pz = SCM_CHARS( res );
+        char* p  = pz;
+
+        strcpy( pz, zStrt );
+        pz += sizeof( zStrt ) - 1;
+
+        for (;;) {
+            if (*pzEadr == NUL)
+                break;
+            pz += sprintf( pz, zFmt, *(pzEadr++) );
+        }
+
+        sprintf( pz, zEnd, pzDisp );
+    }
+
+    return res;
 }
 
 
