@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 1.2 1998/06/17 20:21:07 bkorb Exp $
+ *  $Id: autoopts.c,v 1.3 1998/07/02 23:00:21 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -70,7 +70,7 @@
 #include <streqv.h>
 #include "autoopts.h"
 
-#ident "$Id: autoopts.c,v 1.2 1998/06/17 20:21:07 bkorb Exp $"
+#ident "$Id: autoopts.c,v 1.3 1998/07/02 23:00:21 bkorb Exp $"
 
 tSCC zMisArg[]      = "%s: option `%s' requires an argument\n";
 tSCC zNoArg[]       = "%s: option `%s' doesn't allow an argument\n";
@@ -303,14 +303,13 @@ longOptionFind( tOptions*  pOpts,
         *pzEq = NUL;
     } else nameLen = strlen( pzOptName );
 
-    for (;;) {
+    do  {
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
-
             /*
              *  Remember the index for later.
              */
             matchIdx = idx;
-    
+
             /*
              *  IF we have a complete match
              *  THEN it takes priority over any already located partial
@@ -319,13 +318,42 @@ longOptionFind( tOptions*  pOpts,
                 matchCt = 1;
                 break;
             }
-    
-            matchCt++;
+
+            if (++matchCt > 1)
+		break;
         }
-        if (++idx >= idxLim)
-            break;
-        pOD++;
-    }
+
+        /*
+         *  IF       there is a disable name
+         *     *AND* no argument value has been supplied
+         *              (disabled options may have no argument)
+         *     *AND* the option name matches the disable name
+         *  THEN ...
+         */
+        else
+            if (  (pOD->pz_DisableName != (char*)NULL)
+               && (pzEq == (char*)NULL)
+               && (strneqvcmp( pzOptName, pOD->pz_DisableName, nameLen ) == 0)
+               )  {
+            /*
+             *  Remember the index for later.
+             */
+            matchIdx = idx;
+            disable  = AG_TRUE;
+
+            /*
+             *  IF we have a complete match
+             *  THEN it takes priority over any already located partial
+             */
+            if (pOD->pz_DisableName[ nameLen ] == NUL) {
+                matchCt = 1;
+                break;
+            }
+
+            if (++matchCt > 1)
+                break;
+        }
+    } while (pOD++, idx++, (idx >= idxLim));
 
     if (pzEq != (char*)NULL)
         *pzEq = '=';
@@ -1005,6 +1033,15 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
 {
     tOptDesc* pOD;
     int       errCt = 0;
+
+    if (pOpts->structVersion != OPTIONS_STRUCT_VERSION) {
+        tSCC zBadVer[] = "Automated Options Processing Error!\n"
+            "\toptionProcess was called by %s with structure version %d\n"
+            "\tThis library was compiled with version "
+            STR( OPTIONS_STRUCT_VERSION ) "\n";
+        fprintf( stderr, zBadVer, argVect[0], pOpts->structVersion );
+        exit( EXIT_FAILURE );
+    }
 
     /*
      *  Establish the real program name, the program full path,

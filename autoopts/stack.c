@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 1.3 1998/06/22 03:10:14 bkorb Exp $
+ *  $Id: stack.c,v 1.4 1998/07/02 23:00:23 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -158,7 +158,3 @@ stackOptArg( tOptions*  pOpts, tOptDesc* pOptDesc )
     pAL->apzArgs[ (pAL->useCt)++ ] = pOptDesc->pzLastArg;
     pOptDesc->optCookie = (void*)pAL;
 }
-
-#ifndef HAVE_REGCOMP
-#  include <compat/regex.c>
-#endif

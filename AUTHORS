@@ -10,13 +10,12 @@ information and generate a static version.  (It uses autogen,
 so a generated version must be distributed also. :)
 
 Bruce Korb and Gary V. Vaughan:
-In the directory config, regcomp.m4.
+In the directory config, regcomp.m4 and bootstrap.
 
 Gary V. Vaughan:
-bootstrap and release scripts.
 changes throughout to aid portability of C code.
 wrote the autoconf files, Makefile.am and configure.in.
-in the directory config; bootstrap, ctime.m4, make.m4 and release.
+in the directory config; ctime.m4, make.m4 and release.
 in the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
 sigsend.c, libgen.h
 in the directory tests; almost *.test
@@ -30,6 +29,3 @@ In the directory compat; strsignal.c
 
 Doug Gwyn, Richard Stallman:
 in the directory compat, ndir.h
-
-FSF:
-In the directory compat; regex.c, regex.h

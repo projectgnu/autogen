@@ -1,3 +1,20 @@
+1998-07-02  Gary V. Vaughan  <garyv@oranda.demon.co.uk>
+
+	* VERSION: removed a spurious hyphen, and bumped patchlevel
+	to 4.3.3
+
+	* autoopts/stack.c: removed compat/regex.h reference again.
+
+	* config/bootstrap: reinstated the search code... we need this
+	to find the directory that has the configure.in in it, so that
+	libtool/automake/autoconf run from there rather than in the config
+	directory (which simply doesn't work!).  The wd isn't strictly
+	necessary, but it obfuscates the code if we overload srcdir.
+
+	* doc/Makefile.am: removed some duplicated lines introduced by a
+	misapplied patch.  Added autogen.texi to the list of files to be
+	removed on a maintainer-clean, now that BUILT_SOURCES is not set.
+
 1998-06-30  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
 
 	* src/makedef.sh: replace a lot of hairy shell script with a
@@ -326,45 +343,45 @@
 
 1998-03-18  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 
-        * AUTHORS: Resynchronised with recent file removals/additions.
+	  * AUTHORS: Resynchronised with recent file removals/additions.
 
-        * ChangeLog: Removed entries pertaining to patches which were
-        ultimately rejected.
+	  * ChangeLog: Removed entries pertaining to patches which were
+	  ultimately rejected.
 
-        * acinclude.m4: New file.
-        * configure.in: Tidied up in light of acinclude.m4.
+	  * acinclude.m4: New file.
+	  * configure.in: Tidied up in light of acinclude.m4.
 
-        * {autoopts,src}/Makefile.am, configure.in:
-        Small fixes to get VPATH build (and hence make distcheck)
-        working again.
+	  * {autoopts,src}/Makefile.am, configure.in:
+	  Small fixes to get VPATH build (and hence make distcheck)
+	  working again.
 
-        * compat.h: Much removed.  Parts reordered.
+	  * compat.h: Much removed.  Parts reordered.
 
-        * libgen.h, compat.h: Broken K&R support code deleted.
+	  * libgen.h, compat.h: Broken K&R support code deleted.
 
-        * various:  Rationalised use of boolean type.  ag_bool, AG_FALSE
-        and AG_TRUE are used everywhere except regex.c now, and are
-        word size integers for maximum cpu register efficiency.
+	  * various:  Rationalised use of boolean type.  ag_bool, AG_FALSE
+	  and AG_TRUE are used everywhere except regex.c now, and are
+	  word size integers for maximum cpu register efficiency.
 
-        * agParse.c, agParse.y:  Regenerated with Berserkly Yacc (to
-        remove reliance on alloca).
+	  * agParse.c, agParse.y:  Regenerated with Berserkly Yacc (to
+	  remove reliance on alloca).
 
 1998-03-04  Gary V Vaughan  <garyv@aethos.co.uk>
 
-        * autoopts/usage.c:
-        Removed lines which included sys/param.h inside a #ifdef which
-        was always false.
+	  * autoopts/usage.c:
+	  Removed lines which included sys/param.h inside a #ifdef which
+	  was always false.
 
-        * autoopts/autoopts.c:
-        Removed lines which included libgen.h inside a #ifdef which
-        was always false.
+	  * autoopts/autoopts.c:
+	  Removed lines which included libgen.h inside a #ifdef which
+	  was always false.
 
-        * MakeRules.in: Stripped a whole bunch of stuff duplicated by
-        automake generated Makefile.in's.
+	  * MakeRules.in: Stripped a whole bunch of stuff duplicated by
+	  automake generated Makefile.in's.
 
-        * compat/maxpath.h:
-        Removed a couple of lines which look for limits.h; this is done
-        already by compat.h.
+	  * compat/maxpath.h:
+	  Removed a couple of lines which look for limits.h; this is done
+	  already by compat.h.
 
 1998-03-02  Gary V Vaughan  <garyv@aethos.co.uk>
 
@@ -892,19 +909,19 @@ Tue Jul 22 09:47:45 1997 GMT Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 
 Mon Jul 21 16:54:26 1997  Gary V Vaughan  <gvaughan@oranda.demon.co.uk>
 
-      * tests/opts.sh:
-      Changed magic number to #!/bin/sh incase we don't have ksh.
+	* tests/opts.sh:
+	Changed magic number to #!/bin/sh incase we don't have ksh.
 
-      * src/Makefile.am (autogen_LDADD):
-      Removed explicit link of libgen (incase we don't have it on the
-      target machine).
+	* src/Makefile.am (autogen_LDADD):
+	Removed explicit link of libgen (incase we don't have it on the
+	target machine).
 
-      * configure.in (AC_CHECK_LIB):
-      Conditionally add -lgen to the final link libraries.
+	* configure.in (AC_CHECK_LIB):
+	Conditionally add -lgen to the final link libraries.
 
-      * configure.in (AC_CHECK_SIZEOF):
-      Removed size check of void* (not portable - use char* instead),
-      and long (not used by code).
+	* configure.in (AC_CHECK_SIZEOF):
+	Removed size check of void* (not portable - use char* instead),
+	and long (not used by code).
 
 Mon Jul 21 Bruce Korb
 

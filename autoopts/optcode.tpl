@@ -1,4 +1,4 @@
-{@autogen template include $Id: optcode.tpl,v 1.2 1998/06/17 20:21:06 bkorb Exp $ @}
+{@autogen template include $Id: optcode.tpl,v 1.3 1998/07/02 23:00:19 bkorb Exp $ @}
 {@_IF copyright _exist
 @}
 static const char zCopyright[] =
@@ -47,30 +47,56 @@ _FOR FLAG
 @}
 /*
  *  {@name _cap@} option description{@
-_IF flags_must _exist flags_cant _exist | @} with
- *  "Must also have options" and "Incompatible options"{@_ENDIF@}:
+  _IF flags_must _exist flags_cant _exist | @} with
+ *  "Must also have options" and "Incompatible options"{@
+  _ENDIF@}:
  */
-tSCC z{@name _cap@}Text[]  = {@descrip _str@};
-tSCC z{@name _cap@}_NAME[] = "{@name _up@}";
-tSCC z{@name _cap@}_Name[] = "{@
+tSCC    z{@name _cap  "Text[] ="  + %-28s _printf @} {@descrip _str@};
+tSCC    z{@name _cap "#_NAME[] =" + %-28s _printf @} "{@name _up@}";{@
+
+  _IF disable _len 0 > @}
+tSCC    zNot{@name _cap "#_Name[] =" + %-25s _printf @} "{@disable _down@}-{@
     name _down "echo '%s'|tr -- '_^' '--'" _printf _shell@}";{@
 
- # "IF there is a non-zero length argument *AND* it is not ':' ..." @}{@
+    _IF enable _len 0 > @}
+tSCC    z{@name _cap "#_Name[] =" + %-28s _printf @} "{@enable _down@}-{@
+    name _down "echo '%s'|tr -- '_^' '--'" _printf _shell@}";{@
 
-_IF flag_arg _len 0 >
-    flag_arg _get #: !=
-    flag_arg _get #=.* ~ !  & & @}
-static char z{@name _cap@}DefaultArg[] = {@flag_arg _str@};{@_ENDIF@}{@
+    _ELSE "Enable does not exist" @}
+#define z{@name _cap "#_Name[] =" + %-28s _printf
+          @} (zNot{@name _cap@}_Name + {@_eval disable _len 1 + @}){@
+    _ENDIF@}{@
 
-_IF flags_must _exist@}
-static const int a{@name _cap@}MustList[] = {{@_FOR flags_must@}
+  _ELSE "Disable does not exist" @}
+#define zNot{@name _cap "#_Name" + %-25s _printf @} (const char*)NULL
+tSCC    z{@name _cap "#_Name[] =" + %-28s _printf @} "{@enable _down #- +@}{@
+    name _down "echo '%s'|tr -- '_^' '--'" _printf _shell@}";{@
+
+  _ENDIF @}{@
+
+  # IF  there is a non-zero length argument
+        *AND* it is not ':'
+        *AND* it is not a numeric value, ...  @}{@
+
+  _IF flag_arg _len 0 >
+      flag_arg _get #: !=
+      flag_arg _get #=.* ~ !  & & @}
+tSCC    z{@name _cap "DefaultArg[] =" + %-28s _printf @} {@flag_arg _str@};{@
+  _ENDIF @}{@
+
+  _IF flags_must _exist@}
+static const int
+    a{@name _cap@}MustList[] = {{@_FOR flags_must@}
     INDEX_{@prefix _up #_ +@}OPT_{@flags_must _up@},{@/flags_must
-           @} NO_EQUIVALENT};{@_ENDIF@}{@
+           @} NO_EQUIVALENT};{@
+  _ENDIF @}{@
 
-_IF flags_cant _exist@}
-static const int a{@name _cap@}CantList[] = {{@_FOR flags_cant@}
+  _IF flags_cant _exist@}
+static const int
+    a{@name _cap@}CantList[] = {{@_FOR flags_cant@}
     INDEX_{@prefix _up #_ +@}OPT_{@flags_cant _up@},{@/flags_cant
-           @} NO_EQUIVALENT};{@_ENDIF@}
+           @} NO_EQUIVALENT};{@
+  _ENDIF@}
 {@
 
 /FLAG
@@ -228,7 +254,7 @@ static tOptDesc optDesc[ {@prefix _up #_ +@}OPTION_CT ] = {{@_FOR flag@}
                _ELSE  @}unstackOptArg{@_ENDIF@}{@
          _ELSE               @}(tpOptProc)NULL{@_ENDIF@},
      /* opt name & text  */ z{@name _cap@}Text,  z{@name _cap@}_NAME,
-                            z{@name _cap@}_Name, (const char*)NULL },
+                            z{@name _cap@}_Name, zNot{@name _cap@}_Name },
 {@/flag@}{@
 
 _IF version _exist@}
@@ -367,6 +393,7 @@ _ELSE@}
 _ENDIF@}
 
 tOptions {@prog_name@}Options = {
+    OPTIONS_STRUCT_VERSION,
     (char*)NULL, (char*)NULL, zPROGNAME,
     zRcName,
     {@_IF copyright _exist@}zCopyright{@_ELSE@}(char*)NULL{@_ENDIF@},
