@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 2.20 1999/11/04 02:22:47 bruce Exp $
+ *  $Id: makeshell.c,v 2.21 1999/11/10 02:25:33 bruce Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -153,12 +153,13 @@ static const char zLoopEnd[] =
 "        export %1$s_${OPT_NAME}${OPT_ELEMENT}\n"
 "    fi\n"
 "done\n\n"
-"unset OPT_PROCESS\n"
-"unset OPT_ELEMENT\n"
-"unset OPT_ARG\n"
-"unset OPT_NAME\n"
-"unset OPT_CODE\n"
-"unset OPT_ARG_VAL\n%2$s";
+"unset OPT_PROCESS || :\n"
+"unset OPT_ELEMENT || :\n"
+"unset OPT_ARG || :\n"
+"unset OPT_ARG_NEEDED || :\n"
+"unset OPT_NAME || :\n"
+"unset OPT_CODE || :\n"
+"unset OPT_ARG_VAL || :\n%2$s";
 
 static const char zTrailerMarker[] = "\n"
 "# # # # # # # # # #\n#\n"
@@ -246,15 +247,15 @@ static const char zNoSingleArg[] =
 static const char zMayArg[]  =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
 "            export %1$s_%2$s${OPT_ELEMENT}\n"
-"            OPT_ARG=OK\n";
+"            OPT_ARG_NEEDED=OK\n";
 
 static const char zMustArg[] =
-"            OPT_ARG=YES\n";
+"            OPT_ARG_NEEDED=YES\n";
 
 static const char zCantArg[] =
 "            eval %1$s_%2$s${OPT_ELEMENT}=true\n"
 "            export %1$s_%2$s${OPT_ELEMENT}\n"
-"            OPT_ARG=NO\n";
+"            OPT_ARG_NEEDED=NO\n";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -263,7 +264,7 @@ static const char zCantArg[] =
  *  Formats for emitting the text for handling long option types
  */
 static const char zLongOptInit[] =
-"        OPT_CODE=`echo \"${OPT_ARG}\"|sed 's/^--//'`\n"
+"        OPT_CODE=`echo \"X${OPT_ARG}\"|sed 's/^X--//'`\n"
 "        shift\n"
 "        OPT_ARG=\"$1\"\n\n"
 "        case \"${OPT_CODE}\" in *=* )\n"
@@ -271,7 +272,7 @@ static const char zLongOptInit[] =
 "            OPT_CODE=`echo \"${OPT_CODE}\"|sed 's/=.*$//'` ;; esac\n\n";
 
 static const char zLongOptArg[] =
-"        case \"${OPT_ARG}\" in\n"
+"        case \"${OPT_ARG_NEEDED}\" in\n"
 "        NO )\n"
 "            OPT_ARG_VAL=''\n"
 "            ;;\n\n"
@@ -307,11 +308,11 @@ static const char zLongOptArg[] =
  *  Formats for emitting the text for handling flag option types
  */
 static const char zFlagOptInit[] =
-"        OPT_CODE=`echo \"${OPT_ARG}\" | sed 's/-\\(.\\).*/\\1/'`\n"
-"        OPT_ARG=` echo \"${OPT_ARG}\" | sed 's/-.//'`\n\n";
+"        OPT_CODE=`echo \"X${OPT_ARG}\" | sed 's/X-\\(.\\).*/\\1/'`\n"
+"        OPT_ARG=` echo \"X${OPT_ARG}\" | sed 's/X-.//'`\n\n";
 
 static const char zFlagOptArg[] =
-"        case \"${OPT_ARG}\" in\n"
+"        case \"${OPT_ARG_NEEDED}\" in\n"
 "        NO )\n"
 "            if [ -n \"${OPT_ARG}\" ]\n"
 "            then\n"
@@ -672,14 +673,14 @@ printOptionAction( tOptions* pOpts, tOptDesc* pOptDesc )
 
     else if (pOptDesc->pOptProc == doLoadOpt) {
         printf( zCmdFmt, "echo 'Warning:  Cannot load options files' >&2" );
-        printf( zCmdFmt, "OPT_ARG=YES" );
+        printf( zCmdFmt, "OPT_ARG_NEEDED=YES" );
 
     } else if (pOptDesc->pz_NAME == (char*)NULL) {
 
         if (pOptDesc->pOptProc == (tOptProc*)NULL) {
             printf( zCmdFmt, "echo 'Warning:  Cannot save options files' "
                     ">&2" );
-            printf( zCmdFmt, "OPT_ARG=OK" );
+            printf( zCmdFmt, "OPT_ARG_NEEDED=OK" );
         } else
             printf( zTextExit, pOpts->pzPROGNAME, "LONGUSAGE" );
 
@@ -726,7 +727,7 @@ printOptionInaction( tOptions* pOpts, tOptDesc* pOptDesc )
         printf( zNoMultiArg, pOpts->pzPROGNAME,
                 pOptDesc->pz_NAME, pOptDesc->pz_DisablePfx );
 
-    printf( zCmdFmt, "OPT_ARG=NO" );
+    printf( zCmdFmt, "OPT_ARG_NEEDED=NO" );
     fputs( zOptionEndSelect, stdout );
 }
 
