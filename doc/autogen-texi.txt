@@ -377,11 +377,11 @@ value definitions.  Consequently, we keep it very simple.  For
 "advanced" users, there are preprocessing directives and comments that
 may be used as well.
 
-The definitions file is used to associate values with names.  When
-multiple values are associated with a single name, an implicit array of
-values is formed.  Values may be either simple strings or compound
-collections of name-value pairs.  An array may not contain both simple
-and compound members.  Fundamentally, it is as simple as:
+The definitions file is used to associate values with names.  Every
+value is implicitly an array of values, even if there is only one value.
+Values may be either simple strings or compound collections of
+name-value pairs.  An array may not contain both simple and compound
+members.  Fundamentally, it is as simple as:
 
 @example
 prog_name = "autogen";
@@ -402,6 +402,7 @@ C macro substitution is @strong{not} performed.
 @menu
 * Identification::        The Identification Definition
 * Definitions::           Named Definitions
+* Index Assignments::     Assigning an Index to a Definition
 * Dynamic Text::          Dynamic Text
 * Directives::            Controlling What Gets Processed
 * Predefines::            Pre-defined Names
@@ -483,7 +484,6 @@ value.  The string values for definitions may be specified in any of
 several formation rules.
 
 @menu
-* Naming::                   Naming a Value
 * def-list::                 Definition List
 * double-quote-string::      Double Quote String
 * single-quote-string::      Single Quote String
@@ -496,21 +496,6 @@ several formation rules.
 
 @cindex simple definitions
 @cindex compound definitions
-
-@node Naming
-@subsection Naming a Value
-
-The names may be a simple name taking the next available index,
-or may specify an index by name or number.  For example:
-
-@example
-txt_name
-txt_name[2]
-txt_name[ DEF_NAME ]
-@end example
-@noindent
-@code{DEF_NAME} must be defined to have a numeric value.
-If you do specify an index, you must take care not to cause conflicts.
 
 @node def-list
 @subsection Definition List
@@ -556,7 +541,7 @@ to disambiguate lines starting with a hash character inside
 of a quoted string.  In other words,
 
 @example
-foo = '
+fumble = '
 #endif
 ';
 @end example
@@ -565,7 +550,7 @@ could be misinterpreted by the definitions scanner, whereas
 this would not:
 
 @example
-foo = '
+fumble = '
 \#endif
 ';
 @end example
@@ -661,9 +646,9 @@ NB@:  You @strong{cannot} use directives to alter the string
 content.  That is,
 
 @example
-str = "foo"
+str = "fumble"
 #ifdef LATER
-      "bar"
+      "stumble"
 #endif
       ;
 @end example
@@ -673,9 +658,9 @@ will result in a syntax error.  The preprocessing directives are not
 carried out by the C preprocessor.  However,
 
 @example
-str = '"foo\n"
+str = '"fumble\n"
 #ifdef LATER
-"     bar\n"
+"     stumble\n"
 #endif
 ';
 @end example
@@ -686,7 +671,69 @@ and @samp{#endif} in the string.  But it may also wreak
 havoc with the definition processing directives.  The hash
 characters in the first column should be disambiguated with
 an escape @code{\} or join them with previous lines:
-@code{"foo\n#ifdef LATER...}.
+@code{"fumble\n#ifdef LATER...}.
+
+@node Index Assignments
+@section Assigning an Index to a Definition
+@cindex Definition Index
+
+In AutoGen, every name is implicitly an array of values.
+When assigning values, they are usually implicitly
+assiged to the next highest slot.  They can also be
+specified explicitly:
+
+@example
+mumble[9] = stumble;
+mumble[0] = grumble;
+@end example
+
+@noindent
+If, subsequently, you assign a value to @code{mumble} without an
+index, its index will be @code{10}, not @code{1}.
+If indexes are specified, they must not cause conflicts.
+
+@code{#define}-d names may also be used for index values.
+This is equivalent to the above:
+
+@example
+#define FIRST 0
+#define LAST  9
+mumble[LAST]  = stumble;
+mumble[FIRST] = grumble;
+@end example
+
+All values in a range do @strong{not} have to be filled in.
+If you leave gaps, then you will have a sparse array.  This
+is fine (@pxref{FOR}).  You have your choice of iterating
+over all the defined values, or iterating over a range
+of slots.  This:
+
+@example
+[+ FOR mumble +][+ ENDFOR +]
+@end example
+
+@noindent
+iterates over all and only the defined entries, whereas this:
+
+@example
+[+ FOR mumble (for-by 1) +][+ ENDFOR +]
+@end example
+
+@noindent
+will iterate over all 10 "slots".  Your template will
+likely have to contain something like this:
+
+@example
+[+ IF (exist? (sprintf "mumble[%d]" (for-index))) +]
+@end example
+
+@noindent
+or else "mumble" will have to be a compound value that,
+say, always contains a "grumble" value:
+
+@example
+[+ IF (exist? "grumble") +]
+@end example
 
 @node Dynamic Text
 @section Dynamic Text
@@ -1138,12 +1185,12 @@ and double quote strings, the result is the result of the sprintf operation.
 Naturally, if @code{value-name} is not defined, the result is the empty
 string.
 
-For example, assume that @code{foo} had the string value, @code{bar}:
+For example, assume that @code{fumble} had the string value, @code{stumble}:
 @example
-[+ % foo `printf '%%x\\n' $%s` +]
+[+ % fumble `printf '%%x\\n' $%s` +]
 @end example
-This would cause the shell to evaluate "@code{printf '%x\n' $bar}".
-Assuming that the shell variable @code{bar} had a numeric value,
+This would cause the shell to evaluate "@code{printf '%x\n' $stumble}".
+Assuming that the shell variable @code{stumble} had a numeric value,
 the expression result would be that number, in hex.  Note the need
 for doubled percent characters and backslashes.
 
@@ -1160,12 +1207,12 @@ This combines the functions of @samp{?} and @samp{%}.  If @code{value-name} is
 defined, it behaves exactly like @samp{%}, above, using @code{basic-expr-1}.
 If not defined, then @code{basic-expr-2} is evaluated.
 
-For example, assume again that @code{foo} had the string value, @code{bar}:
+For example, assume again that @code{fumble} had the string value, @code{stumble}:
 @example
-[+ ?% foo `cat $%s` `pwd` +]
+[+ ?% fumble `cat $%s` `pwd` +]
 @end example
-This would cause the shell to evaluate "@code{cat $bar}".
-If @code{foo} were not defined, then the result would be the name
+This would cause the shell to evaluate "@code{cat $stumble}".
+If @code{fumble} were not defined, then the result would be the name
 of our current directory.
 @end table
 
@@ -1875,8 +1922,11 @@ wish it to do.
 @end enumerate
 
 @item
-There are facilities in place to allow libraries to intermingle their
-command line and initialization options with client program options.
+Library suppliers can specify command line options that their
+client programs will accept.  They specify option definitions
+that get @code{#include}-d into the client option definitions
+and they specify an "anchor" option that has a callback and must be invoked.
+That will give the library access to the option state for their options.
 @end enumerate
 
 @noindent
@@ -2344,8 +2394,8 @@ after that is a square close bracket (@code{]}), then the section is
 processed and the file closed.  Otherwise, the section is ignored and a
 matching section is searched for.
 
-For exampe, if the @code{foo-bar} options had a sectioned RC file,
-then a line containing @code{[FOO_BAR]} would be searched for.
+For exampe, if the @code{fumble-stumble} options had a sectioned RC file,
+then a line containing @code{[FUMBLE_STUMBLE]} would be searched for.
 
 @cindex test-main
 @item test-main
@@ -3968,7 +4018,7 @@ to instead use this tool.
 @c  LocalWords:  AutoOpts snprintfv titlepage vskip pt filll sp dir xref cindex
 @c  LocalWords:  AutoGen's noindent rc ini enum IDX const az upcase ENDFOR ESAC
 @c  LocalWords:  optargs egcs inclhack sh fixincl autoconf endif var templ dirs
-@c  LocalWords:  def txt foo cd STR str ifdef alist downcase sprintf arg lexer
+@c  LocalWords:  def txt cd STR str ifdef alist downcase sprintf arg lexer
 @c  LocalWords:  srcfile linenum subblock defParse srcdir sed POSIX printf expr
 @c  LocalWords:  stdout expr func gfunc tr findex exparg desc desc sep macfunc
 @c  LocalWords:  ing getdefs libopts src ksh forcomma csh env Sourced autoopts

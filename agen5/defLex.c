@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 3.5 2002/01/19 07:35:23 bkorb Exp $
+ *  $Id: defLex.c,v 3.6 2002/04/06 19:11:44 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -342,7 +342,9 @@ yyerror( char* s )
 
     AG_ABEND( asprintf( "%s:  in %s on line %d\n"
                         "\ttoken in error:  %s\n"
-                        "\t[[...<error-text>]] %s\n\n",
+                        "\t[[...<error-text>]] %s\n\n"
+                        "Likely causes:  a mismatched quote, a value that needs "
+                        "quoting,\n\t\tor a missing semi-colon\n",
                         s, pCurCtx->pzFileName, pCurCtx->lineNo, pz,
                         pCurCtx->pzScan ));
 }

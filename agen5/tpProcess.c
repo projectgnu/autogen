@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.7 2002/01/19 07:35:24 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.8 2002/04/06 19:11:44 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -234,7 +234,8 @@ processTemplate( tTemplate* pTF )
 EXPORT void
 closeOutput( ag_bool purge )
 {
-    removeWriteAccess( fileno( pCurFp->pFile ));
+    if ((pCurFp->flags & FPF_NOCHMOD) == 0)
+        removeWriteAccess( fileno( pCurFp->pFile ));
 
     fclose( pCurFp->pFile );
 
@@ -325,14 +326,13 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
         while (--ct >= 0) {
             if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0) {
-                tSCC zDevNull[] = "/dev/null";
 
             openNull:
                 /*
                  *  Make the output a no-op, but perform the operations.
                  */
                 pStk->pzOutName = (char*)zDevNull;
-                pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK;
+                pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
                 pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG );
                 if (pStk->pFile != NULL)
                     return;

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 3.6 2002/01/31 02:29:13 bkorb Exp $
+ *  $Id: autogen.h,v 3.7 2002/04/06 19:11:44 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -194,6 +194,7 @@ struct outSpec {
 #define FPF_UNLINK     0x0002  /* unlink file (temp file) */
 #define FPF_NOUNLINK   0x0004  /* do not unlink file      */
 #define FPF_STATIC_NM  0x0008  /* name statically alloced */
+#define FPF_NOCHMOD    0x0010  /* do not chmod(2) file    */
 
 struct fpStack {
 	int         flags;
@@ -321,6 +322,7 @@ MKSTRING( TplWarn,   "Warning in template %s, line %d\n\t%s\n" );
 MKSTRING( FileLine,  "\tfrom %s line %d\n" );
 MKSTRING( ShDone,    "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( NotStr,    "ERROR: %s is not a string\n" );
+MKSTRING( DevNull,   "/dev/null" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

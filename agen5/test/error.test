@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2002-03-18 18:15:08 bkorb"
+# Time-stamp:        "2002-04-06 10:18:53 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.9 2002/03/19 04:11:41 bkorb Exp $
+# $Id: error.test,v 3.10 2002/04/06 19:11:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -130,6 +130,8 @@ syntax error:  in error2.def on line 2
 	[[...<error-text>]]  broken;
 
 
+Likely causes:  a mismatched quote, a value that needs quoting,
+		or a missing semi-colon
 _EOF_
 
 echo $AGEXE ${testname}.def

@@ -1,5 +1,18 @@
 2002-04-03  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/autogen.h(FPF_NOCHMOD): for marking /dev/null as NO-chmod(2)
+	* agen5/defLex.c(yyerror): add commentary on the likely causes of errors
+	* agen5/defParse.y(filename): allow strings to be used for
+	the template name.
+	* agen5/tpProcess.c(closeOutput): only remove write access if the
+	FPF_NOCHMOD bit is not set.  Mark /dev/null as such a file.
+	* agen5/test/error.test: add likely cause text to end of sample output.
+	* doc/autogen.texi(Index Assignments): new, clearer discussion of how
+	to use them and what they are for.
+	(Naming a Value): obsolete -- folded into above.
+
+2002-04-03  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/optcode.tpl: Allow an empty "rcfile" value to mean that
 	"homerc" is a file name, rather than a directory name.
 	* autoopts/optmain.tpl: clean up the display of the range for usage
