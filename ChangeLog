@@ -1,22 +1,28 @@
 2000-08-12  Bruce Korb  <bkorb@gnu.org>
 
-	autoopts/autoopts.c(valid_path):  new procedure.  If a path is
-	prefixed with "$$", replace that text with the path to the
-	executable.
-	autoopts/optcode.tpl: Change "exerc" to emit an homerc entry "$$"
+	* autoopts/autoopts.c(valid_path):  new procedure.  If a path is
+	prefixed with "$$", replace it with the path to the executable.
+	(doPresets): only call pathfind on the program
+	name if it does not contain a directory name.
+	* autoopts/optcode.tpl: Change "exerc" to emit an homerc entry "$$"
 	instead of the now obsolete flag.
-	autoopts/doc.tpl: document the new behavior
+	* autoopts/doc.tpl: document the new behavior
+
+	* autoopts/test/rc.test: new - test the new feature
+	* autoopts/test/Makefile.am: activate test
+	* autoopts/test/defs: compile test programs with debugging symbols
+	* autoopts/test/stdopts.def: correct shell case syntax
 
 2000-08-12  Bruce Korb  <bkorb@gnu.org>
 
-	agen5/expString.c(ag_scm_join): the lists can arrive as nested lists.
+	* agen5/expString.c(ag_scm_join): the lists can arrive as nested lists.
 	(ag_scm_stack): did the implementation.
-	agen5/defFind.c(copyDefReference): obsoleted
+	* agen5/defFind.c(copyDefReference): obsoleted
 	(cannonicalizeName): replacement procedure - more flexible
-	agen5/agUtils.h: ISNAMECHAR now includes the hyphen
-	agen5/funcEval.c: use ``cannonicalizeName'' instead of ``copy...''
-	agen5/functions.c: ditto
-	agen5/test/Makefile.am: add test for Scheme function ``stack''
+	* agen5/agUtils.h: ISNAMECHAR now includes the hyphen
+	* agen5/funcEval.c: use ``cannonicalizeName'' instead of ``copy...''
+	* agen5/functions.c: ditto
+	* agen5/test/Makefile.am: add test for Scheme function ``stack''
 
 2000-08-11  Gary V. Vaughan  <gvv@techie.com>
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.16 2000/08/28 20:42:12 bkorb Exp $
+ *  $Id: autoopts.c,v 2.17 2000/08/29 12:48:59 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -567,9 +567,14 @@ valid_path( char*       pzBuf,  size_t      bufSize,
     }
 
     if (pzName[1] == '$') {
-        char*  pzPath = pathfind( getenv( (const char*)"PATH" ),
-                                  pzProgPath, (const char*)"x" );
+        char*  pzPath;
         char* pz;
+
+        if (strchr( pzProgPath, DIR_SEP_CHAR ) != (char*)NULL)
+            pzPath = pzProgPath;
+        else
+            pzPath = pathfind( getenv( (const char*)"PATH" ),
+                                  pzProgPath, (const char*)"x" );
 
         if (pzPath == (char*)NULL)
             return AG_FALSE;
@@ -677,15 +682,13 @@ doPresets( tOptions*  pOpts )
      */
     if (pOpts->papzHomeList != (const char**)NULL) {
         const char** papzHL = pOpts->papzHomeList;
-        for (;;) {
-            const char* pzPath = *(papzHL++);
+	const char*  pzPath = *(papzHL++);
 
-            /*
-             *  Break when done
-             */
-            if (pzPath == (char*)NULL)
-                break;
-
+        /*
+         *  For every path in the home list, ...
+         */
+        while ( pzPath = *(papzHL++),
+	       pzPath != (char*)NULL) {
             if (! valid_path( zFileName, sizeof( zFileName ),
                               pzPath, pOpts->pzProgPath ))
                 continue;

@@ -1,0 +1,109 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# rc.test ---  test loading and saving of rc files
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+# Last Modified:     Fri Oct  1 10:27:21 1999				      
+#            by:     Bruce Korb <bkorb@gnu.org>			      
+#
+# $Id: rc.test,v 1.1 2000/08/29 12:48:59 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating ${testname}.def in `pwd`"
+
+testname="${testname}" test_main="yes" \
+argument="mumble" long_opts="yes" \
+${SHELL-sh} ${stdopts} option second:init third:
+
+cat >> ${testname}.def <<_EOF_
+homerc = "\$\$/${testname}.rc";
+rcfile = ${testname}.file;
+_EOF_
+
+echo $AGEN ${testname}.def
+$AGEN ${testname}.def || \
+  failure AutoGen could not process
+
+# # # # # # # # # # VALIDATE HELP # # # # # # # # #
+
+cat > ${testname}.hlp <<_EOF_
+test_rc - Test AutoOpts for rc
+USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s YES second         The second option descrip
+   -t YES third          The third option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+   -> opt save-opts      Save the option state to an rc file
+   -< YES load-opts      Load options from an rc file
+				- disabled as --no-load-opts
+				- may appear without limit
+
+Options may be specified by doubled hyphens and their name
+or by a single hyphen and the flag character/option value.
+
+The following option preset mechanisms are supported:
+ - reading file \$\$/rc.rc/rc.file
+_EOF_
+
+compile "--help"
+
+cmp ${testname}.hlp ${testname}.help || \
+  failure "help files do not compare for ${testname} test"
+
+# # # # # # # # # # DO THE REAL TEST # # # # # # # # #
+
+#  Install an initialization for the "second" option.
+#  That goes into the ${testname}.rc directory.
+#  We change into the ${testname}.run directory and run the program.
+#  It should pick up the value saved into the ${testname}.rc dir.
+#
+mkdir ${testname}.rc ${testname}.run
+
+echo from `pwd`:
+echo "./${testname} --second=third '->'${testname}.rc/${testname}.file"
+./${testname} --second=third '->'${testname}.rc/${testname}.file
+
+ls -l ${testname}.rc/${testname}.file
+
+cd ${testname}.run
+echo from `pwd`:
+echo '../${testname} -t xxx MUMBLE > ${testname}.cmds'
+../${testname} -t xxx MUMBLE > ${testname}.cmds
+
+#  This is what the output should be:
+#
+cat > ${testname}.test <<'_EOF_'
+OPTION_CT=2
+export OPTION_CT
+TEST_RC_SECOND='third'
+export TEST_RC_SECOND
+TEST_RC_THIRD='xxx'
+export TEST_RC_THIRD
+_EOF_
+
+
+cmp  ${testname}.cmds ${testname}.test || {
+  cd ..
+  failure ${testname}.cmds AND ${testname}.test do not compare equal
+}
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+cleanup
+# end of vers.test

@@ -34,13 +34,13 @@ fi
 for flag
 do
     case "$flag" in
-    *:* )
+    ?*:?* )
         arg=`echo $flag | sed 's/.*://'`
 	flag=`echo $flag | sed 's/:.*//'`
 	arg="    flag_arg = ':$arg';"
 	;;
 
-    *: )
+    ?*: )
 	flag=`echo $flag | sed 's/://'`
 	arg="    flag_arg = ':';"
 	;;
