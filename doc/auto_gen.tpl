@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.16 1998/07/18 05:34:58 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.17 1998/07/30 21:58:07 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -84,7 +84,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Introduction
 @chapter Introduction
 @cindex Introduction
@@ -122,7 +122,7 @@ uses the AutoOpt facility.
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Generalities
 @chapter General Ideas
 @cindex m4
@@ -169,7 +169,7 @@ Conventionally, it uses the file name suffix @code{def}.
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Example Usage
 @chapter A Simple Example
 @cindex example, simple
@@ -249,7 +249,7 @@ we can always write a new set of definitions for the old template.
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Definitions File
 @chapter Macro Definitions File
 @cindex definitions file
@@ -570,7 +570,7 @@ The following was extracted directly from the agParse.y source file:
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Template File
 @chapter Output Template
 @cindex template file
@@ -719,7 +719,7 @@ _FOR agfunc_func =][=
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Invocation
 @chapter Running Autogen
 @cindex invocation
@@ -735,7 +735,7 @@ as shown in this AutoOpts generated usage text:
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Installation
 @chapter What Gets Installed Where
 @cindex Installation
@@ -836,7 +836,7 @@ testsubdir=testdir top_srcdir=.. srcdir=. ./test-name.test
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Autoopts
 @chapter Automated Option Processing
 @cindex autoopts
@@ -1234,7 +1234,7 @@ support option processing and the brief form of usage text.
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-
+@page
 @node Future
 @chapter Some ideas for the future.
 @cindex futures
@@ -1254,16 +1254,16 @@ Fixup current tools that contain
 miserably complex perl, shell, sed, awk and m4 scripts
 to instead use this tool.
 @end itemize
-
+@page
 @node Concept Index
 @unnumbered Concept Index
 
 @printindex cp
-
+@page
 @node Function Index
 @unnumbered Function Index
 
 @printindex fn
-
+@page
 @contents
 @bye
