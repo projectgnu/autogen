@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Tue Mar 16 14:10:25 1999
-##            by:     Bruce Korb <korb@datadesign.com>
+## Last Modified:     Mon Jun 14 12:09:37 1999                                
+##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.15 1999/03/17 16:55:20 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.16 1999/06/14 19:15:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -478,7 +478,7 @@ it prints an error message and exits.
 
 Any name may have multiple values associated with it in the definition
 file.  If there is more than one instance, the @strong{only} way to
-expand all of the copies of it is by using the _FOR (@xref{FOR}) text
+expand all of the copies of it is by using the _FOR (@xref{FOR}.) text
 function on it, as described in the next chapter.
 
 There are two kinds of definitions, @samp{simple} and @samp{compound}.

@@ -9,7 +9,6 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <regex.h>
 #include <streqv.h>
 
 #include "opts.h"

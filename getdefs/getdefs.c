@@ -1,14 +1,14 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.c,v 2.14 1999/06/03 19:43:28 bkorb Exp $
+ *  $Id: getdefs.c,v 2.15 1999/06/14 19:15:56 bkorb Exp $
  *
  *    getdefs copyright 1998 Bruce Korb
  * 
  * Author:            Bruce Korb <korbb@datadesign.com>
  * Maintainer:        Bruce Korb <korbb@datadesign.com>
  * Created:           Mon Jun 30 15:35:12 1997
- * Last Modified:     Tue Jan 26 07:37:15 1999
- *            by:     Bruce Korb <korb@datadesign.com>
+ * Last Modified:     Mon Jun 14 12:07:09 1999				    */
+ *            by:     Bruce Korb <korb@datadesign.com>			    */
  */
 
 #define DEFINE
@@ -21,10 +21,18 @@
 #include <unistd.h>
 #include <utime.h>
 
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #ifndef HAVE_STRSIGNAL
-#  include <compat/strsignal.c>
+#  include "compat/strsignal.c"
+#endif
+
+#ifdef WITH_INCLUDED_REGEX
+#  include "compat/gnu-regex.h"
+#else
+#  include <regex.h>
 #endif
 
 #ifndef FOPEN_BINARY_FLAG
