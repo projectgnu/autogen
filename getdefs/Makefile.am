@@ -10,7 +10,7 @@
 ## Last Modified:   Mon Sep 28 12:05:08 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.4 1998/09/28 20:01:51 bkorb Exp $
+## $Id: Makefile.am,v 2.5 1998/09/28 20:03:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS = getdefs
@@ -18,7 +18,7 @@ bin_PROGRAMS = getdefs
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h opts.def
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu
-EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.tpl
+EXTRA_DIST	= $(GEN_SRC) opts.def getdefs.texi getdefs.tpl
 
 getdefs_LDADD	= $(top_builddir)/autoopts/libopts.la
 
