@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.3 1999/10/31 00:18:11 bruce Exp $
+ *  $Id: expString.c,v 1.4 1999/10/31 19:08:16 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -169,7 +169,7 @@ makeString( tCC*    pzText,
 /*=gfunc in_p
  *
  * exparg: test-string, string to look for
- * exparg: string-list, list of strings to check,, ellipsis
+ * exparg: string-list, list of strings to check,, list
  *
  * opt:  1
  * doc:  Return SCM_BOOL_T if the first argument is duplicated
@@ -204,7 +204,7 @@ ag_scm_in_p( SCM obj, SCM list )
 /*=gfunc join
  *
  * exparg: separator, string to insert between entries
- * exparg: list, list of strings to join,, ellipsis
+ * exparg: list, list of strings to join,, list
  *
  * opt:  1
  * doc:  With the first argument as the separator string,
