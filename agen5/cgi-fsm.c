@@ -225,7 +225,7 @@ cgi_run_fsm(
             case '=': trans_evt = CGI_EV_EQUAL;     break;
             case '+': trans_evt = CGI_EV_SPACE;     break;
             case '%': trans_evt = CGI_EV_ESCAPE;    break;
-            case '&': trans_evt = CGI_EV_SEPERATOR; break;
+            case '&': trans_evt = CGI_EV_SEPARATOR; break;
             default:  trans_evt = CGI_EV_OTHER;     break;
             }
         }

@@ -1,18 +1,16 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 3.0 2001/12/09 19:23:13 bkorb Exp $
+# $Id: directive.tpl,v 3.1 2002/03/29 04:11:19 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
 h =]
-/*
-[=(dne " *  ")=]
+[=(dne " *  " "/*  ")=]
  *
- *  copyright 1992-2001 Bruce Korb
+ *  copyright 1992-2002 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  */
-#ifndef AUTOGEN_DIRECTIVE_H
-#define AUTOGEN_DIRECTIVE_H
+[=(make-header-guard "directive")=]
 
 typedef char* (tDirProc)( char* pzArg, char* pzScan );
 
@@ -63,6 +61,6 @@ FOR directive , =]
   ENDIF=]0 }[=
 ENDFOR directive=] };
 
-#endif /* AUTOGEN_DIRECTIVE_H */[= #
+#endif /* [=(. header-guard)=] */[= #
 
 end of directive.tpl  =]

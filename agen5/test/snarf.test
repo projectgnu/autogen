@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2002/01/19 07:35:24 $
-#            by:     Bruce Korb <bkorb@gnu.org>
+# Last Modified:     $Date: 2002/03/29 04:11:19 $
+#            by: bkorb
 #
-# $Id: snarf.test,v 3.1 2002/01/19 07:35:24 bkorb Exp $
+# $Id: snarf.test,v 3.2 2002/03/29 04:11:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -78,7 +78,7 @@ cat > ${testname}.ini.OK <<_EOF_
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2001 Bruce Korb
+ *  copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  
@@ -126,7 +126,7 @@ _init( void )
 _EOF_
 
 cmp ${testname}.ini.* || \
-    failure cmp ${testname}.ini.*
+    failure "`diff ${testname}.ini.*`"
 
 # # # # # # # # # # EXPECTED HEADER FILE # # # # # # #
 
@@ -135,7 +135,7 @@ cat > ${testname}.h.OK <<_EOF_
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2001 Bruce Korb
+ *  copyright 1992-2002 Bruce Korb
  *
  *  AutoGen is free software.
  *  
@@ -156,8 +156,8 @@ cat > ${testname}.h.OK <<_EOF_
  *
  *  Guile Implementation Routines - for the test group
  */
-#ifndef GUILE_PROC_DECLS
-#define GUILE_PROC_DECLS
+#ifndef GUILE_PROCS_SNARF_H_GUARD
+#define GUILE_PROCS_SNARF_H_GUARD
 #include <guile/gh.h>
 
 typedef enum {
@@ -180,7 +180,7 @@ teGuileType gh_type_e( SCM );
 extern SCM test_scm_test_to_example_x( SCM );
 extern SCM test_scm_sym_bumble_it;
 
-#endif /* GUILE_PROC_DECLS */
+#endif /* GUILE_PROCS_SNARF_H_GUARD */
 _EOF_
 
 cmp ${testname}.h.* || \

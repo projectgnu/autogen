@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 3.2 2002/01/13 08:04:33 bkorb Exp $
+ *  $Id: expExtract.c,v 3.3 2002/03/29 04:11:19 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -292,7 +292,6 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
 /*=gfunc find_file
  *
  * what:   locate a file in the search path
- * general_use:
  * exparg: file-name,  name of file with text
  * exparg: @suffix  @  file suffix to try, too   @ opt @
  *

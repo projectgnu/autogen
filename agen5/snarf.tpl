@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 3.0 2001/12/09 19:23:14 bkorb Exp $
+# $Id: snarf.tpl,v 3.1 2002/03/29 04:11:19 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -76,14 +76,13 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2001 Bruce Korb
+ *  copyright 1992-2002 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
  *  Guile Implementation Routines[=% group " - for the %s group" =]
  */
-#ifndef GUILE_PROC_DECLS
-#define GUILE_PROC_DECLS
+[=(make-header-guard  "GUILE_PROCS")=]
 #include <guile/gh.h>
 
 typedef enum {
@@ -118,21 +117,21 @@ extern SCM [=(. scm-prefix)=]sym_[=name=];[=
   ENDIF =][=
 ENDFOR =]
 
-#endif /* GUILE_PROC_DECLS */
+#endif /* [=(. header-guard)=] */
 [=
 (out-pop)
 =][=
 
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2001 Bruce Korb
+ *  copyright 1992-2002 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
  *  Guile Initializations - [=% group (string-capitalize! "%s ")
                             =]Global Variables
  */
-#include "[= (base-name) =].h"[=
+#include "[= (. header-file) =]"[=
 
 DEFINE string_content =]
 static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
