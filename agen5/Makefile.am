@@ -10,7 +10,7 @@
 ## Last Modified:   Thu Aug  5 10:18:42 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.8 1999/11/06 18:53:59 bruce Exp $
+## $Id: Makefile.am,v 1.9 1999/11/06 22:14:47 bruce Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS		= test
@@ -24,7 +24,7 @@ AGEXE		= $(top_builddir)/agen5/AutoGen
 
 AGARGS  	= autogen=$(AGEXE)
 OPTDBG		= `if ( echo @CPPFLAGS@|egrep DDEBUG) >/dev/null 2>&1 ; \
-		  then echo -DDEBUG=1 ; fi`
+		  then echo -DDEBUG=1 ; else echo -UDEBUG ; fi`
 
 MAINTAINERCLEANFILES = Makefile.in
 
