@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.4 1999/10/17 22:15:44 bruce Exp $
+ *  $Id: functions.c,v 1.5 1999/10/28 04:31:28 bruce Exp $
  *
  *  This module implements text functions.
  */
@@ -93,23 +93,27 @@ MAKE_HANDLER_PROC( Error )
 =*/
 MAKE_HANDLER_PROC( Include )
 {
+    tTemplate* pNewTpl;
     ag_bool needFree;
     char* pz = evalExpression( &needFree );
 
     if (*pz != NUL) {
-        pT = loadTemplate( pz );
+        pNewTpl = loadTemplate( pz );
 
         if (OPT_VALUE_TRACE > TRACE_NOTHING) {
             tSCC zTplFmt[] = "Template %s included\n";
             tSCC zLinFmt[] = "\tfrom %s line %d\n";
-            fprintf( pfTrace, zTplFmt, pT->pzFileName );
+            fprintf( pfTrace, zTplFmt, pNewTpl->pzFileName );
             if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
                 fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
                          pMac->lineNo );
         }
 
-        generateBlock( pT, pT->aMacros, pT->aMacros + pT->macroCt, pCurDef );
-        unloadTemplate( pT );
+        generateBlock( pNewTpl, pNewTpl->aMacros,
+                       pNewTpl->aMacros + pNewTpl->macroCt,
+                       pCurDef );
+        unloadTemplate( pNewTpl );
+        pCurTemplate = pT;
     }
 
     if (needFree)
