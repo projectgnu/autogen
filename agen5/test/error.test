@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: error.test,v 1.3 2000/02/28 00:21:26 bruce Exp $
+# $Id: error.test,v 1.4 2000/03/11 10:59:07 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -45,9 +45,31 @@ ESAC =>
 this is never seen
 _EOF_
 
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
+echo creating $testname.def
+cat > $testname.def <<'_EOF_'
+autogen definitions alist;
+#error The error contains a `#error' directive
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating $testname.out1
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > $testname.out1 <<'_EOF_'
+#error directive -- The error contains a `#error' directive
+_EOF_
+
+$AGEN $testname.def 2> $testname.err1 && failure unexpected success
+grep -v 'Giving up in' $testname.err1 >  $testname.err
+cmp -s  $testname.err  $testname.out1 || failure unexpected output
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating $testname.out2
+# this is the output we should expect to see
+cat > $testname.out2 <<_EOF_
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
 DEFINITIONS ERROR in error.tpl line 13 for error.null:
@@ -59,9 +81,10 @@ _EOF_
 # this is *supposed* to exit with a failure status
 echo autogen --no-def -T$testname.tpl --base=$testname >&2
 $AGEN --no-def -T$testname.tpl --base=$testname \
-  2> $testname.errout \
+  2> $testname.err2 \
   && failure Unexpected success for AutoGen
 
-cmp -s $testname.errout $testname.out || failure unexpected output
+cmp -s $testname.err2 $testname.out2 || failure unexpected output
 
+cleanup
 # end of error.test
