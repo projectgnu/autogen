@@ -288,7 +288,7 @@ cgi_run_fsm(
 
             z[0] = *(pzSrc++);
             z[1] = *(pzSrc++);
-            z[2] = '\0';
+            z[2] = NUL;
             inlen -= 2;
 
             switch (*(pzOut++) = (int)strtol( z, NULL, 16 )) {

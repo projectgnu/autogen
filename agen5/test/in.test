@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # in.test --- Verify that the "in?" predicate works
 #
-# Time-stamp:        "2002-10-26 09:41:04 bkorb"
+# Time-stamp:        "2002-12-10 21:38:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           7/12/2001
 #            by: bkorb
 #
-# $Id: in.test,v 3.1 2002/10/26 16:41:25 bkorb Exp $
+# $Id: in.test,v 3.2 2002/12/14 02:25:33 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,48 +23,59 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
-[++ AutoGen5 template test ++][++
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
+[++ AutoGen5 template out ++][++
 
-  IF
-  (define stack-list (stack "foo.bar"))
-  (in? (get "baz") stack-list)           ++]success[++
-  ELSE   ++]FAIL[++
-  ENDIF  ++]
-[++
+(define stack-list (stack "foo.bar"))
+(string-append
+  (if (in? (get "baz") stack-list) "success" "FAIL")
+  "\n"
+  (if (in? (get "oops") stack-list) "FAIL" "success")
+) ++][++
 
-  IF (in? (get "oops") stack-list)       ++]FAIL[++
-  ELSE   ++]success[++
-  ENDIF
+IF .true ++]
+success[++
+ELSE     ++]
+FAILURE[++
+ENDIF    ++]-[++ .true ++][++
 
-++]
+IF .false ++]
+FAILURE[++
+ELSE     ++]
+success[++
+ENDIF    ++]-[++ .false ++]
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo creating $testname.def
-cat > $testname.def <<_EOF_
-AutoGen definitions $testname;
+echo creating ${testname}.def
+cat > ${testname}.def <<_EOF_
+AutoGen definitions ${testname};
 foo  = { bar = one; };
 foo  = { bar = two; };
 foo  = { bar = three; };
 foo  = { bar = four; };
 baz  = three;
 oops = oops;
+true = true;
+false = false;
 _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
-echo creating $testname.out
+echo creating ${testname}.ok
 # this is the output we should expect to see
-cat > $testname.out <<'_EOF_'
+cat > ${testname}.ok <<'_EOF_'
 success
 success
+success-true
+success-false
 _EOF_
 
-$AGEXE $testname.def || failure $AGEXE failed
-cmp -s $testname.test $testname.out || failure unexpected output
+$AGEXE ${testname}.def || failure $AGEXE failed
+cmp -s ${testname}.ok ${testname}.out || \
+  failure "`diff ${testname}.ok ${testname}.test`"
 
 cleanup
 # end of in.test

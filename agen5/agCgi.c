@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: agCgi.c,v 3.10 2002/12/14 02:25:33 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -124,7 +124,7 @@ loadCgi( void )
             AG_ABEND( aprf( zCannot, errno, "read", "CGI text",
                                 strerror( errno )));
 
-        pzText[ textLen ] = '\0';
+        pzText[ textLen ] = NUL;
 
         pzQuery = pzText;
         pzText  = parseInput( pzText, textLen );

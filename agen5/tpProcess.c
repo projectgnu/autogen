@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 3.9 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: tpProcess.c,v 3.10 2002/12/14 02:25:33 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -71,7 +71,7 @@ generateBlock( tTemplate*   pT,
                 fputs( "  ", pfTrace );
                 for (ct=0; ct < 32; ct++) {
                     char ch = *(pz++);
-                    if (ch == '\0')
+                    if (ch == NUL)
                         break;
                     if (ch == '\n')
                         break;

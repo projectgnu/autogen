@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 3.4 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: funcFor.c,v 3.5 2002/12/14 02:25:33 bkorb Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -493,6 +493,108 @@ doForEach( tTemplate*   pT,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
+
+STATIC void
+load_ForIn( char* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
+{
+    char* pzName = pT->pzTemplText + pMac->ozName;
+    int   ix     = 0;
+    char* pz;
+    tDefEntry*  pPrev = NULL;
+
+    /*
+     *  Find the first text value
+     */
+    pzSrc  += 2;
+    srcLen -= 3;
+    while (isspace( *++pzSrc ))  srcLen--;
+    if (*pzSrc == NUL)
+        AG_ABEND_IN( pT, pMac, "FOR x IN ... has no list" );
+
+    {
+        size_t nmlen = strlen( pzName );
+
+        pz = AGALOC( srcLen + 2 + nmlen, "copy of FOR x IN ... text" );
+        strcpy( pz, pzName );
+        pzName = pz;
+        pz += nmlen + 1;
+    }
+
+    memcpy( pz, pzSrc, srcLen );
+    pz[ srcLen ] = NUL;
+
+    do  {
+        tDefEntry* pDef = getEntry();
+        int foundComma  = 0;
+
+        pDef->pzDefName = pzName;
+        pDef->index     = ix++;
+        pDef->valType   = VALTYP_TEXT;
+        pDef->pzValue   = pz;
+
+        switch (*pz) {
+        case '\'':
+        case '"':
+            pz = spanQuote( pz );
+            /*
+             *  Clean up trailing commas
+             */
+            while (isspace( *pz ))  pz++;
+            if (*pz == ',')
+                pz++;
+            break;
+
+        default:
+            for (;;) {
+                char ch = *(pz++);
+                switch (ch) {
+                case ' ': case '\t': case '\f': case '\v': case '\n':
+                    pz[-1] = NUL;
+                    if (*pz != ',')
+                        break;
+                    pz++;
+                    /* FALLTHROUGH */
+
+                case ',':
+                    pz[-1] = NUL;
+                    break;
+
+                case NUL:
+                    pz--;
+                    break;
+
+                default:
+                    continue;
+                }
+                break;
+            }
+            break;
+        }
+
+        /*
+         *  Clean up trailing white space
+         */
+        while (isspace( *pz ))  pz++;
+
+        /*
+         *  IF there is a previous entry, link its twin to this one.
+         *  OTHERWISE, it is the head of the twin list.
+         *  Link to funcPrivate.
+         */
+        if (pPrev != NULL)
+            pPrev->pTwin = pDef;
+        else
+            pMac->funcPrivate = pDef;
+
+        pPrev = pDef;
+    } while (*pz != NUL);
+
+    pMac->ozText = 0;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 /*=macfunc FOR
  *
  *  what:    Emit a template block multiple times
@@ -509,11 +611,18 @@ doForEach( tTemplate*   pT,
  *  @example
  *  FOR <value-name> (...Scheme expression list
  *  @end example
+ *  or
+ *  @example
+ *  FOR <value-name> IN "quoted string" unquoted-string ...
+ *  @end example
  *
- *  The first argument must be the name of an AutoGen value.  If there is
- *  no value associated with the name, the FOR loop block is skipped
- *  entirely.  The scope of the @code{FOR} function extends to the
- *  corresponding ENDFOR macro.
+ *  Other than for the last form, the first argument must be the name of an
+ *  AutoGen value.  If there is no value associated with the name, the
+ *  @code{FOR} loop block is skipped entirely.  The scope of the @code{FOR}
+ *  function extends to the corresponding @code{ENDFOR} macro.  The last form
+ *  will create an array of string values that only exists within the context
+ *  of this @code{FOR} loop, and a @code{separator-string} must be coded into
+ *  the loop using the @code{(last-for?)} predicate (@pxref{SCM last-for?}).
  *
  *  If there are any further arguments, if the first character is either
  *  a semi-colon (@code{;}) or an opening parenthesis (@code{(}), then
@@ -576,17 +685,21 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
     tDefEntry*  pDef;
     int         loopCt;
 
-    pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
-    if (pDef == NULL) {
-        if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-            fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
-                     pT->pzTemplText + pMac->ozName );
+    if (pMac->funcPrivate != NULL)
+        pDef = pMac->funcPrivate;
+    else {
+        pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
+        if (pDef == NULL) {
+            if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
+                fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
+                         pT->pzTemplText + pMac->ozName );
 
-            if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                    fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+            }
+
+            return pMRet;
         }
-
-        return pMRet;
     }
 
     if (++(forInfo.fi_depth) > forInfo.fi_alloc) {
@@ -639,15 +752,13 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
 
 #endif /* DEFINE_LOAD_FUNCTIONS defined */
 
-tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
-
     tMacro*
 mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
-    char*        pzCopy = pT->pNext; /* next text dest   */
-    const char*  pzSrc  = (const char*)pMac->ozText; /* macro text */
-    int          srcLen = (int)pMac->res;            /* macro len  */
-    tMacro*      pEndMac;
+    char*   pzCopy = pT->pNext; /* next text dest   */
+    tCC*    pzSrc  = (const char*)pMac->ozText; /* macro text */
+    int     srcLen = (int)pMac->res;            /* macro len  */
+    tMacro* pEndMac;
 
     /*
      *  Save the global macro loading mode
@@ -685,25 +796,43 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     }
 
     while (ISNAMECHAR( *pzSrc )) *(pzCopy++) = *(pzSrc++);
-    *(pzCopy++) = '\0';
+    *(pzCopy++) = NUL;
 
-    if (pT->pzTemplText[ pMac->ozName ] == '\0')
+    if (pT->pzTemplText[ pMac->ozName ] == NUL)
         AG_ABEND_IN( pT, pMac, "invalid FOR loop variable" );
 
     /*
-     *  Copy the rest of the macro text into the "text" string
+     *  Skip space to the start of the text following the iterator name
      */
     while (isspace( *pzSrc )) pzSrc++;
     srcLen -= pzSrc - (char*)pMac->ozText;
-    if (srcLen <= 0)
+
+    /*
+     *  No source -> zero offset to text
+     */
+    if (srcLen <= 0) {
         pMac->ozText = 0;
+    }
+
+    /*
+     *  FOR foo IN ...  -> no text, but we create an array of text values
+     */
+    else if (   (strneqvcmp( pzSrc, "in", 2 ) == 0)
+             && isspace( pzSrc[2] )) {
+        load_ForIn( pzSrc, srcLen, pT, pMac );
+    }
+
+    /*
+     *  *EITHER* a:  FOR foo "<<separator>>"
+     *  *OR*         FOR foo (scheme ...) ...
+     */
     else {
         char* pzCopied = pzCopy;
         pMac->ozText = pzCopy - pT->pzTemplText;
         do  {
             *(pzCopy++) = *(pzSrc++);
         } while (--srcLen > 0);
-        *(pzCopy++) = '\0';
+        *(pzCopy++) = NUL;
         if ((*pzCopied == '"') || (*pzCopied == '\''))
             spanQuote( pzCopied );
     }

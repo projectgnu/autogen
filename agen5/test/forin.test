@@ -1,0 +1,73 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# forin.test --- test forin functionality
+#
+# Time-stamp:        "2002-12-08 18:41:35 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999
+#
+# $Id: forin.test,v 3.1 2002/12/14 02:25:33 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
+    test "${VERBOSE+set}" != set && VERBOSE=1
+fi
+. $srcdir/defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+set -x
+echo creating ${testname}.tpl in `pwd`
+cat > ${testname}.tpl <<_EOF_
+[+ AutoGen5 template out +]
+[+
+FOR t IN build host target      +][+
+  FOR v IN alias cpu vendor os  +]
+[+t+]_[+v+]=@[+t+]_[+v+]@[+
+  ENDFOR  +]
+[+t+]_canonical=@[+t+]_cpu@-@[+t+]_vendor@-@[+t+]_os@
+[+
+
+ENDFOR
+
++]
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
+
+echo creating ${testname}.ok
+# this is the output we should expect to see
+cat > ${testname}.ok <<'_EOF_'
+
+build_alias=@build_alias@
+build_cpu=@build_cpu@
+build_vendor=@build_vendor@
+build_os=@build_os@
+build_canonical=@build_cpu@-@build_vendor@-@build_os@
+
+host_alias=@host_alias@
+host_cpu=@host_cpu@
+host_vendor=@host_vendor@
+host_os=@host_os@
+host_canonical=@host_cpu@-@host_vendor@-@host_os@
+
+target_alias=@target_alias@
+target_cpu=@target_cpu@
+target_vendor=@target_vendor@
+target_os=@target_os@
+target_canonical=@target_cpu@-@target_vendor@-@target_os@
+
+_EOF_
+
+$AGEXE --no-def -T${testname}.tpl -b ${testname} || \
+  failure $AGEXE failed
+cmp -s ${testname}.ok ${testname}.out || \
+  failure "`diff ${testname}.ok ${testname}.out`"
+exit 0
+cleanup
+# end of forin.test

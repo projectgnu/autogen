@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.12 2002/12/07 04:45:03 bkorb Exp $
+ *   $Id: opts.def,v 3.13 2002/12/14 02:25:33 bkorb Exp $
  *
  *  AutoGen copyright 1992-2002 Bruce Korb
  *
@@ -589,9 +589,14 @@ flag = {
     "for a particular value.  That index may be a literal value,\n"
     "a define option or a value #define-d in the definitions themselves.\n"
     "@item\n"
-    "The name of a file may be prefixed with @code{$NAME}.\n"
-    "That part of the name string will be replaced with\n"
+    "The name of a file may be prefixed with @code{$NAME/}.\n"
+    "The @code{$NAME} part of the name string will be replaced with\n"
     "the define-d value for @code{NAME}.\n"
+    "@item\n"
+    "When AutoGen is finished loading the definitions, the defined values\n"
+    "are exported to the environment with, @code{putenv(3)}.\n"
+    "These values can then be used in shell scripts with @code{$@{NAME@}}\n"
+    "references and in templates with @code{(getenv \"NAME\")}.\n"
     "@item\n"
     "While processing a template, you may specify an index to retrieve\n"
     "a specific value.  That index may also be a define-d value.\n"

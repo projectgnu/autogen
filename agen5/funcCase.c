@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 3.8 2002/09/21 17:27:15 bkorb Exp $
+ *  $Id: funcCase.c,v 3.9 2002/12/14 02:25:33 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1060,10 +1060,6 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*=macfunc SELECT
  *
  *  what:    Selection block for CASE function
- *  alias: ~
- *  alias: =
- *  alias: *
- *
  *  desc:
  *    This macro selects a block of text by matching an expression
  *    against the sample text expression evaluated in the @code{CASE}
@@ -1186,8 +1182,8 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
             *(pzCopy++) = *(pzSrc++);
         } while (--srcLen > 0);
     }
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0';
+    *(pzCopy++) = NUL;
+    *(pzCopy++) = NUL;
     pT->pNext = pzCopy;
 
     if ((*pzScan == '"') || (*pzScan == '\''))

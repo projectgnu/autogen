@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 3.7 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: expFormat.c,v 3.8 2002/12/14 02:25:33 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -124,8 +124,9 @@ tSCC zNil[]      = "";
  *
  * what:  '"Do Not Edit" warning'
  *
- * exparg: prefix, string for starting each output line
+ * exparg: prefix,       string for starting each output line
  * exparg: first_prefix, for the first output line, opt
+ * exparg: optpfx,       shifted prefix, opt
  *
  * doc:  Generate a "DO NOT EDIT" or "EDIT WITH CARE" warning string.
  *       Which depends on whether or not the @code{--writable} command line
@@ -139,10 +140,16 @@ tSCC zNil[]      = "";
  *       @noindent
  *       The warning string also includes information about the template used
  *       to construct the file and the definitions used in its instantiation.
+ *
+ *       The optional third argument is used when the first argument is actually
+ *       an invocation option and the prefix arguments get shifted.
+ *       The first argument must be, specifically, "@code{-d}".  That is used
+ *       to signify that the date stamp should not be inserted into the output.
 =*/
     SCM
-ag_scm_dne( SCM prefix, SCM first )
+ag_scm_dne( SCM prefix, SCM first, SCM opt )
 {
+    int      noDate  = 0;
     char     zScribble[ 128 ];
     char*    pzRes;
     tCC*     pzFirst = zNil;
@@ -150,6 +157,18 @@ ag_scm_dne( SCM prefix, SCM first )
     tCC*     pzPrefix = ag_scm2zchars( prefix, "prefix" );
     if (strlen( pzPrefix ) > 128 )
         AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+
+    /*
+     *  Check for the ``-d'' option
+     */
+    if (gh_string_p( prefix )) {
+        int len = SCM_LENGTH( prefix );
+        if ((len == 2) && (strncmp( SCM_CHARS( prefix ), "-d", 2 ) == 0)) {
+            noDate = 1;
+            prefix = first;
+            first  = opt;
+        }
+    }
 
     /*
      *  IF we also have a 'first' prefix string,
@@ -164,7 +183,9 @@ ag_scm_dne( SCM prefix, SCM first )
                             ag_scm2zchars( first, "first-prefix" ), pzPrefix );
     }
 
-    {
+    if (noDate) {
+        zScribble[0] = NUL;
+    } else {
         time_t    curTime = time( NULL );
         struct tm*  pTime = localtime( &curTime );
         strftime( zScribble, 128, "%A %B %e, %Y at %r %Z", pTime );
@@ -261,7 +282,7 @@ ag_scm_error( SCM res )
 
     case GH_TYPE_CHAR:
         zNum[0] = gh_scm2char( res );
-        if ((zNum[0] == '\0') || (zNum[0] == '0'))
+        if ((zNum[0] == NUL) || (zNum[0] == '0'))
             abort = PROBLEM;
         zNum[1] = NUL;
         pzMsg = zNum;

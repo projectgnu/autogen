@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 3.8 2002/12/07 04:45:03 bkorb Exp $
+ *  $Id: functions.c,v 3.9 2002/12/14 02:25:33 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -222,13 +222,12 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
 /*=macfunc COMMENT
  *
  *  what:  A block of comment to be ignored
- *  alias:  #
  *
+ *  desc:
  *    This function can be specified by the user, but there will
  *    never be a situation where it will be invoked at emit time.
  *    The macro is actually removed from the internal representation.
  *
- *  desc:
  *    If the native macro name code is @code{#}, then the
  *    entire macro function is treated as a comment and ignored.
 =*/
@@ -324,8 +323,8 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     do  {
         *(pzCopy++) = *(pzSrc++);
     } while (--srcLen > 0);
-    *(pzCopy++) = '\0';
-    *(pzCopy++) = '\0'; /* double terminate */
+    *(pzCopy++) = NUL;
+    *(pzCopy++) = NUL; /* double terminate */
 
     pT->pNext = pzCopy;
 

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.6 2002/03/27 04:45:29 bkorb Exp $
+ *  $Id: tpParse.c,v 3.7 2002/12/14 02:25:33 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -110,7 +110,7 @@ whichFunc( tCC** ppzScan )
         char* pzCopy = pCurTemplate->pNext;
         while (ISNAMECHAR( *pzFuncName ))
             *(pzCopy++) = *(pzFuncName++);
-        *(pzCopy++) = '\0';
+        *(pzCopy++) = NUL;
         *ppzScan = pzFuncName;
         pCurTemplate->pNext = pzCopy;
     }
@@ -221,7 +221,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                 if ((*(pzCopy++) = *(pzScan++)) == '\n')
                     templLineNo++;
             } while (pzScan < pzEnd);
-            *(pzCopy++) = '\0';
+            *(pzCopy++) = NUL;
             pM++;
             pT->pNext = pzCopy;
         }
