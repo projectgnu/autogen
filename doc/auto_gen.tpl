@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Feb 25 09:20:05 1999
+## Last Modified:     Thu Feb 25 13:31:46 1999
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.8 1999/02/25 17:31:40 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.9 1999/02/25 21:33:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -85,8 +85,8 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 @top [=prog_title=]
 @comment  node-name,  next,  previous,  up
 
-This file documents the [=prog_title=] package for creating an arbitrary
-text files containing repetitive text with varying substitutions.
+This file documents AutoGen, a tool designed for generating program
+files that contain repetitive text with varied substitutions.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
@@ -163,8 +163,8 @@ additional features.
 @enumerate
 @item
 The text would need special markers to indicate where substitutions were
-required (a la the @code{$@{VAR@}} construct in a shell @code{here} doc.
-Without this, there is no point.
+required.  (A la the @code{$@{VAR@}} construct in a shell @code{here} doc.
+Without this, there is no point.)
 
 @item
 It would also need a way to indicate sections of text that were to be
@@ -195,7 +195,7 @@ The definitions should be completely separate from the template.
 @item
 Each datum should be named.  That way, they can be rearranged,
 augmented and become obsolete without it being necessary to go
-back and clean up older definition files.  Reduce obsolescense!
+back and clean up older definition files.  Reduce incompatibilities!
 
 @item
 There should be named collections, a hierarchy, of definitions.
@@ -353,7 +353,7 @@ with such a template... AutoOpts.
 
 One final consequence of the good separation in the design of AutoGen is
 that it is retargettable to a greater extent.  The
-egcs/contib/fixinc/inclhack.def can equally be used (with different
+egcs/gcc/fixinc/inclhack.def can equally be used (with different
 templates) to create a shellscript (inclhack.sh) or a c program
 (inclhack.c).
 
@@ -381,15 +381,28 @@ Sincerely,
 @cindex definitions file
 @cindex .def file
 
-This file consists of an identity statement that identifies it as a
-AutoGen file, followed by block and text macro definitions.
-Intermingled may be C-style comments and C preprocessing directives.
-All C preprocessing directives are identified, but many
-(notably @code{if}) are ignored.
+This chapter describes the syntax and semantics of the AutoGen
+definition file.  Knowledge of this syntax is required of anyone that
+uses AutoGen to instantiate a template.  Consequently, we keep it
+simple.
+
+The definitions file is used to associate values with names.  When
+multiple values are associated with a single name, an implicit array of
+values is formed.  Values may be either simple strings or compound
+collections of value-name pairs.  An array may not contain both simple
+and compound members.  For a simple example, @xref{Example Usage} or
+@xref{Example}.
+
+For purposes of commenting and controlling the processing of the
+definitions, C-style comments and most C preprocessing directives are
+honored.  The major exception is that the @code{#if} directive is
+ignored, along with all following text through the matching
+@code{#endif} directive.  The C preprocessor is not actually invoked, so
+C macro substitution is @strong{not} performed.
 
 @menu
 * Identification::  The First Definition
-* Definitions::     Text Macros and Block Macros
+* Definitions::     Simple and Compound Definitions
 * Directives::      Controlling What Gets Processed
 * Comments::        Commenting Your Definitions
 * Example::         What it all looks like.
@@ -431,30 +444,30 @@ For a @code{foobar} template, your identification definition will look
 like this:
 
 @example
-Autogen Definitions foobar;
+AutoGen Definitions foobar;
 @end example
 
 @noindent
-Note that, other than the name @code{foobar}, the words @samp{autogen}
+Note that, other than the name @code{foobar}, the words @samp{AutoGen}
 and @samp{definitions} are searched for without case sensitivity.
 Most lookups in this program are case insensitive.
 
 @node Definitions
-@section Text Macros and Block Macros
-@cindex macros
-@cindex text macros
-@cindex block macros
+@section Simple and Compound Definitions
+@cindex definitions
+@cindex simple definitions
+@cindex compound definitions
 
-Any macro may appear multiple times in the definition file.
-If there is more than one instance, the @strong{only} way
-to expand all of the copies of it is by using the @code{_FOR}
-text function on the macro, as described in the next chapter.
+Any name may have multiple values associated with it in the definition
+file.  If there is more than one instance, the @strong{only} way to
+expand all of the copies of it is by using the _FOR (@xref{FOR}) text
+function on it, as described in the next chapter.
 
-There are two kinds of macro definitions, @samp{text} and @samp{block}.
-Macros are defined thus:
+There are two kinds of definitions, @samp{simple} and @samp{compound}.
+They are defined thus:
 
 @example
-block_name '=' '@{' definition-list '@}' ';'
+compound_name '=' '@{' definition-list '@}' ';'
 
 text_name '=' string ';'
 
@@ -462,13 +475,13 @@ no_text_name ';'
 @end example
 
 @noindent
-The macro names may be a simple name taking the next available index,
+The names may be a simple name taking the next available index,
 or may specify an index by name or number.  For example:
 
 @example
-mac_name
-mac_name[2]
-mac_name[ DEF_NAME ]
+txt_name
+txt_name[2]
+txt_name[ DEF_NAME ]
 @end example
 @noindent
 @code{DEF_NAME} must be defined to have a numeric value.
@@ -482,21 +495,20 @@ value.
 @code{definition-list} is a list of definitions that may or may not
 contain nested block definitions.  Any such definitions may @strong{only}
 be expanded within the a @code{FOR} block iterating over the
-containing block macro.
+containing compound definition.  @xref{FOR}.
 
-@cindex text macros, format
-The string values for the text macros may be specified in one of four
-quoting rules:
+@cindex simple definitions, format
+The string values for definitions may be specified in one of four
+formation rules:
 
 @table @samp
-@item with a double quote @code{(")}
+@item with a double quote @code{"}
 @cindex string, double quote
-The string follows the
-C-style escaping (@code{\}, @code{\n}, @code{\f}, @code{\v}, etc., plus
-octal character numbers specified as @code{\ooo}.  The difference
-from "C" is that the string may span multiple lines.
+The string follows the C-style escaping (@code{\}, @code{\n}, @code{\f},
+@code{\v}, etc.), plus octal character numbers specified as @code{\ooo}.
+The difference from "C" is that the string may span multiple lines.
 
-@item with a single quote @code{(')}
+@item with a single quote @code{'}
 @cindex string, single quote
 This is similar to the shell single-quote string.  However, escapes
 @code{\} are honored before another escape, single quotes @code{'}
@@ -510,7 +522,7 @@ foo = '
 ';
 @end example
 
-could be misinterpreted by the definitions parser, whereas
+could be misinterpreted by the definitions scanner, whereas
 this would not:
 
 @example
@@ -519,10 +531,10 @@ foo = '
 ';
 @end example
 
-@item with a back quote @code{(`)}
+@item with a back quote @code{`}
 @cindex string, shell output
 This is treated identically with the double quote, except that the
-resulting string is written to a shell server process and the macro
+resulting string is written to a shell server process and the definition
 takes on the value of the output string.
 
 NB:  The text in interpreted by a server shell.  There may be
@@ -646,7 +658,7 @@ autogen definitions @samp{template-name};
  *  This is a comment that describes what these
  *  definitions are all about.
  */
-globel = "value for a global text macro.";
+globel = "value for a global text definition.";
 
 /*
  *  Include a standard set of definitions
@@ -656,7 +668,7 @@ globel = "value for a global text macro.";
 a_block = @{
     a_field;
     /*
-     *  You might want to document sub-block macros, too
+     *  You might want to document sub-block definitions, too
      */
     a_subblock = @{
         sub_name  = first;
