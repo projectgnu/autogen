@@ -1884,7 +1884,7 @@ commercial programs.
 * AutoOpts API::        Programmatic Interface
 * option descriptor::   Option Descriptor File
 * Using AutoOpts::      Using AutoOpts
-* Presetting Options::  Presetting Options
+* Presetting Options::  Configuring your program
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
@@ -4123,12 +4123,12 @@ also a web page that describes what you need to do:
 @c === SECTION MARKER
 
 @node Presetting Options
-@section Presetting Options
+@section Configuring your program
 @cindex shell options
 
 AutoOpts supports the notion of ``presetting'' the value or state of an option.
 The values may be obtained either from environment variables or from
-initialization files (@file{rc} or @file{ini} files).  In order to take
+configuration files (@file{rc} or @file{ini} files).  In order to take
 advantage of this, the AutoOpts client program must specify these features
 in the option descriptor file (@pxref{program attributes}) with the
 @code{rcfile} or @code{environrc} attributes.
@@ -4144,15 +4144,15 @@ in the option descriptor file (@pxref{program attributes}) with the
 @subsection configuration file presets
 @cindex rcfile
 
-Initialization files are enabled by specifying the program attribute
-@code{homerc} (@pxref{program attributes}).  The initialization values
+Configuration files are enabled by specifying the program attribute
+@code{homerc} (@pxref{program attributes}).  The configured values
 are identified by the long option name followed by white space and any
 associated value.  The value, if any, will continue through the end of
 the last line not continued with a backslash.  Leading and trailing
 white space is stripped.  The newlines are retained, though the preceding
 backslashes are removed.
 
-Initialization files are selected both by the @code{homerc} entries and,
+Configuration files are selected both by the @code{homerc} entries and,
 optionally, via a command line option.  The first component of the
 @code{homerc} entry may be an environment variable such as @code{$HOME}, or
 it may also be @code{$$} (@strong{two} dollar sign characters) to specify
@@ -4176,26 +4176,98 @@ immediate action option.  Its presence in the last @code{homerc} file will
 prevent the processing of any prior @code{homerc} files because its effect
 is immediate.
 
-Initialization file processing can be completely suppressed by specifying
+Configuration file processing can be completely suppressed by specifying
 @code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
 the environment (if @code{environrc} has been specified).
+
+Configuration file format:
+@menu
+* config name-value::       assigning a value to a configurable
+* config nested-values::    hierarchical values
+* config sections::         configuration file sections
+* config comments::         comments in the configuration file
+@end menu
+
+@node config name-value
+@subsubsection assigning a value to a configurable
+
+The basic syntax is a name followed by a value on a single line.  They are
+separated from each other by either white space, a colon (@code{:}) or an
+equal sign (@code{=}).  The colon or equal sign may optionally be surrounded
+by additional white space.  If more than one value line is needed, a
+backslash (@code{\}) may be used to continue the value.  The backslash (but
+not the newline) will be erased.  Leading and trailing white space is always
+stripped from the value.
+
+If you need more control over the content of the value, you may enclose the
+value in XML style @code{<name> value </name>} brackets.  Within these
+brackets you need not (must not) continue the value data with backslashes.
+You may also select the string formation rules to use, juxt add the attribute
+after the name, thus: @code{<name keep>}.
+
+@table @samp
+@item keep
+This mode will keep all text between the brackets and not strip any
+white space.
+@item uncooked
+This mode strips leading and trailing white space, but not do any
+quote processing.  This is the default and need not be specified.
+@item cooked
+Strings are formed and concatenated if, after stripping leading and trailing
+white space, the text begins and ends with either single (') or double (")
+quote characters.  That processing is identical to the string formation used
+in AutoGen definition files (@pxref{Definitions}), except that you may not
+use backquotes.
+@end table
+
+@node config nested-values
+@subsubsection hierarchical values
+
+Not implemented.  Exact syntax and supporting library interface are under
+discussion.
+
+@node config sections
+@subsubsection configuration file sections
 
 Configuration files may be sectioned.
 @cindex sectioned config file
 If, for example, you have a collection of programs that work closely
 together and, likely, have a common set of options, these programs may use a
-single, sectioned, configuration file.  It may be partitioned by lines that
-commence with the square open bracket (@code{[}).  All text before the first
-such a line is always processed.  Once such a line is found, the
-@strong{upper-cased} c-variable-syntax program name will be compared against
-the text following that bracket.  If there is a match and the next character
-after that is a square close bracket (@code{]}), then the section is
-processed and the file closed.  Otherwise, the section is ignored and a
-matching section is searched for.
+single, sectioned, configuration file.  The file may be sectioned in either
+of two ways.  The two ways may not be intermixed in a single configuration
+file.  All text before the first segmentation line is processed, then only
+the segment that applies:
 
-For example, if the @code{fumble-stumble} options had a sectioned
-configuration file, then a line containing exactly @code{[FUMBLE_STUMBLE]}
-would be searched for.
+@table @samp
+@item [PROG_NAME]
+The file is partitioned by lines that contains an square open bracket
+(@code{[}), the @strong{upper-cased} c-variable-syntax program name
+and a square close bracket (@code{]}).
+For example, if the @code{prog-name} program had a sectioned
+configuration file, then a line containing exactly @code{[PROG_NAME]}
+would be processed.
+
+@item <?program prog-name>
+The ``@code{<?}'' marker indicates an XML directive.
+The ``@code{program}'' directive is interpreted by the configuration file
+processor to segment the file in the same way as the ``@code{[PROG_NAME]}''
+sectioning is done.  Any other XML directives are treated as comments
+@end table
+
+@node config comments
+@subsubsection comments in the configuration file
+
+Comments are lines beginning with a hash mark (@code{#}),
+XML-style comments (@code{<!-- arbitrary text -->}), and
+unrecognized XML directives.
+
+@example
+# this is a comment
+<!-- this is also
+     a comment -->
+<?this is
+  a bad comment ;->
+@end example
 
 @node saving rcfile
 @subsection Saving the presets into a configuration file
