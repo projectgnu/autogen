@@ -15,7 +15,8 @@
 [=_IF prog_info_descrip _exist
     =][=prog_info_descrip=][=
   _ELSE
-    =][=detail=][=
+=]This [=_EVAL LEVEL _env _down=] documents the @code{AutoOpts}
+generated usage text and option meanings for [=prog_name=].[=
   _ENDIF=]
 
 @menu
