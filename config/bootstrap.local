@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <korb@datadesign.com>
 # Maintainer:        Bruce Korb <korb@datadesign.com>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     Thu Jul 29 11:13:28 1999				      
+# Last Modified:     Thu Jul 29 11:20:36 1999				      
 #            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 1.7 1999/07/29 18:13:38 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 1.8 1999/07/29 18:20:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 case ${BOOTSTRAP} in
@@ -26,15 +26,15 @@ pre )
     then touch 0101000070 ${srcdir}/doc/autogen.texi ; fi
 
     if ( type whence | egrep 'not found' ) > /dev/null 2>&1
-    then : ; else alias whence=which ; fi
+    then whence=whence ; else whence=which ; fi
 
-    f=`whence byacc`
+    f=`$whence byacc 2>/dev/null`
     if [ -z "$f" ]
     then
-        f=`whence yacc`
+        f=`$whence yacc 2>/dev/null`
         if [ -z "$f" ]
         then
-            f=`whence bison`
+            f=`$whence bison 2>/dev/null`
         fi
     fi
     if [ ! -z "$f" ]
