@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGperf.c,v 1.3 2000/09/30 02:42:44 bkorb Exp $
+ *  $Id: expGperf.c,v 1.4 2000/09/30 14:59:01 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -33,29 +33,46 @@
 #include "expr.h"
 
 tSCC zMakeGperf[] =
-"gperf_%3$s=.ZZPURGE.$$/%3$s\n"
+"gperf_%2$s=.ZZPURGE.$$/%2$s\n"
 "[ -d .ZZPURGE.$$ ] || mkdir .ZZPURGE.$$\n"
-"( ( while ps -p %4$d ; do sleep 3 ; done\n"
+"( ( while ps -p %3$d ; do sleep 3 ; done\n"
 "    rm -rf .ZZPURGE.$$ ) > /dev/null 2>&1 & )\n"
-"cd .ZZPURGE.$$ || echo 'cannot mkdir and enter .ZZPURGE.$$' >&2\n"
-"( echo '#include <stdio.h>'\n"
-"  gperf -D -k'*' 2> /dev/null\n"
-"  cat <<'_EOF_'\n"
-"int\n"
-"main( int argc, char** argv )\n"
-"{\n"
-"    char* pz  = argv[1];\n"
-"    long  adr = (long)in_word_set( pz, strlen( pz ));\n"
-"    if (adr == 0)\n"
+"cd .ZZPURGE.$$ || {\n"
+"  echo 'cannot mkdir and enter .ZZPURGE.$$' >&2\n"
+"  exit 1\n}\n"
+
+"( cat <<'_EOF_'\n"
+"%%{\n"
+"#include <stdio.h>\n"
+"typedef struct index t_index;\n"
+"%%}\n"
+"struct index { char* name; int idx; };\n"
+"%%%%\n"
+"_EOF_\n"
+
+"idx=1\n"
+"while read f\n"
+"do echo \"${f}, ${idx}\"\n"
+"   idx=`expr ${idx} + 1`\n"
+"done <<_EOLIST_\n"
+"%1$s\n"
+"_EOLIST_\n"
+
+"cat <<'_EOF_'\n"
+"%%%%\n"
+"int main( int argc, char** argv ) {\n"
+"    char*    pz = argv[1];\n"
+"    t_index* pI = in_word_set( pz, strlen( pz ));\n"
+"    if (pI == NULL)\n"
 "        return 1;\n"
-"    printf( \"%%04X\\n\", adr & 0x0%1$X );\n"
+"    printf( \"0x%%02X\\n\", pI->idx );\n"
 "    return 0;\n"
 "}\n"
 "_EOF_\n"
-") > %3$s.c <<_EOLIST_\n"
-"%2$s\n"
-"_EOLIST_\n"
-"make %3$s";
+
+") | tee %2$s.gperf | gperf -t -D -k'*' > %2$s.c || exit 1\n"
+
+"make %2$s || exit 1";
 
 
 tSCC zRunGperf[] = "${gperf_%s} %s || exit 1";
@@ -105,7 +122,6 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      */
     {
         int listLen = SCM_LENGTH( hlist );
-        long    mask     = 0x00FFUL;
         char*   pzCmd;
 
         if ((listLen + nameLen + 2) < sizeof( zScribble ))
@@ -118,18 +134,11 @@ ag_scm_make_gperf( SCM name, SCM hlist )
         memcpy( pzList, SCM_CHARS( hlist ), listLen );
         pzList[ listLen ] = NUL;
 
-        /*
-         *  The algorithm requires a mask big enough to get all the
-         *  distinguishing bits of the address of some strings.
-         */
-        while (mask < listLen)
-            mask = (mask << 1) | 1UL;
-
-        pzCmd = asprintf( zMakeGperf, mask, pzList, zScribble, getpid() );
+        pzCmd = asprintf( zMakeGperf, pzList, zScribble, getpid() );
         if (pzCmd == (char*)NULL) {
-            fprintf( stderr, "Error using mask %0X, list %s for ``%s''\n\n",
-                     mask, pzList, zScribble );
-            fprintf( stderr, zMakeGperf, mask, pzList, zScribble, getpid() );
+            fprintf( stderr, "Error using %s list:  ``%s''\n\n",
+                     zScribble, pzList );
+            fprintf( stderr, zMakeGperf, pzList, zScribble, getpid() );
 
             LOAD_ABORT( pCurTemplate, pCurMacro, "formatting shell command" );
         }
@@ -140,7 +149,6 @@ ag_scm_make_gperf( SCM name, SCM hlist )
          *  Run the command and ignore the results.
          *  In theory, the program should be ready.
          */
-        fputs( pzCmd, stderr );;
         pzList = runShell( pzCmd );
         AGFREE( pzCmd );
         AGFREE( pzList );
