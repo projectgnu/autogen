@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.3 1999/10/14 22:35:51 bruce Exp $
+ *  $Id: autogen.c,v 1.4 1999/10/14 22:39:40 bruce Exp $
  *  This is the main routine for autogen.
  */
 
@@ -134,6 +134,7 @@ doneCheck( void )
             int status;
 
             pclose( pfTrace );
+            closeServer();
             while (wait( &status ) > 0)  ;
         }
         else fclose( pfTrace );
