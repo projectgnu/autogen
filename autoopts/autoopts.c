@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.11 2000/03/11 18:31:18 bruce Exp $
+ *  $Id: autoopts.c,v 2.12 2000/03/12 01:18:27 bruce Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -1064,7 +1064,7 @@ optionVersion( void )
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-    const char*
+    STATIC int
 checkConsistency( tOptions* pOpts, int argCt )
 {
     int       errCt = 0;
@@ -1154,11 +1154,10 @@ checkConsistency( tOptions* pOpts, int argCt )
        && (argCt > pOpts->curOptIdx)) {
         fprintf( stderr, "%s: Command line arguments not allowed\n",
                  pOpts->pzProgName );
-        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+        ++errCt;
     }
 
-    if (errCt != 0)
-        (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    return errCt;
 }
 
 
@@ -1240,8 +1239,11 @@ optionProcess( tOptions*  pOpts, int argCt, char** argVect )
      *  IF we are checking for errors,
      *  THEN look for too few occurrences of required options
      */
-    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
-        checkConsistency( pOpts, argCt );
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
+        errCt += checkConsistency( pOpts, argCt );
+        if (errCt != 0)
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+    }
 
     return pOpts->curOptIdx;
 }
