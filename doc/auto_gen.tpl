@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.40 1999/11/04 02:22:47 bruce Exp $
+## $Id: auto_gen.tpl,v 2.41 1999/11/04 05:38:08 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -771,7 +771,7 @@ external definitions.  Such a template would likely have an unvarying
 output, but be convenient nonetheless because of an external library
 of either AutoGen or Scheme functions, or both.  This can be accommodated
 by providing the @code{--override-tpl} and @code{--no-definitions}
-options on the command line.  @xref{Invoking AutoGen}.
+options on the command line.  @xref{AutoGen Invocation}.
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -806,15 +806,10 @@ and the usage of the AutoGen native macros.  Users may augment
 these by defining their own macros.  @xref{DEFINE}.
 
 @menu
-* pseudo macro::     Format of the Pseudo Macro
-* macro format::     General format of AutoGen Macros
-* output controls::  Redirecting Output[=
-FOR macfunc =][=
-  IF (exist? "desc") =]
-* [=% name (sprintf "%%-18s" "%s::")
-  =] [=(string-upcase (get "name"))=] - [=what=][=
-  ENDIF =][=
-ENDFOR macfunc=]
+* pseudo macro::       Format of the Pseudo Macro
+* expression syntax::  Macro Expression Syntax
+* native macros::      AutoGen Native Macros
+* output controls::    Redirecting Output
 @end menu
 
 @node pseudo macro
@@ -886,70 +881,161 @@ The template proper starts after the pseudo-macro.  The starting
 character is either the first non-whitespace character or the first
 character after the new-line that follows the end macro marker.
 
-@node macro format
-@section General format of AutoGen Macros
-@cindex macro format
+@node expression syntax
+@section Macro Expression Syntax
+@cindex expression syntax
 
-The syntax of an AutoGen macro is approximately:
+The syntax of a full AutoGen expression is:
 
 @example
-[ <macro-name> ] [[ <apply-code> ] <value-name> ] \
-         [ <expression-1> [ <expression-2> ]]
+[[ <apply-code> ] <value-name> ] [ <simple-expr-1> [ <simple-expr-2> ]]
 @end example
-
+@noindent
 Where
 @table @samp
-@item <macro-name>
-is one of the defined macros, or its alias (e.g. @xref{COMMENT}.)
 @item <apply-code>
-is any of @code{-}, @code{?}, @code{%} or @code{?%} (@xref{EXPR}.);
+is any of @code{-}, @code{?}, @code{%} or @code{?%} (see below).
 @item <value-name>
 is a (possibly unknown) AutoGen value name (@xref{EXPR}.)
-@item <expression-1>
-is either a Scheme expression starting with either @code{;} or @code{(};
+@item <simple-expr-1>
+is either a Scheme expression starting with @code{;} or @code{(};
 a shell expression surrounded with @code{`}; or a string, quoted or
 unquoted.
-@item <expression-1>
+@item <simple-expr-2>
 is as above, but only if the @code{?} or @code{?%} apply-code has
 been specified.
 @end table
 
-There are a couple of exceptions, and there are also
-some semantic constraints.
+There are some places where only a simple expression (i.e. just the
+@code{<simple-expr-1>} clause) is allowed.  I hope I have clearly
+marked which macros have those requirements.  Otherwise, in the
+macro descriptions that follow, a @i{full expression} refers to
+what we are describing here.
+
+The result of the expression evaluation will depend on what apply code
+has been provided, whether or not there is an associated value
+for the value name, and whether or not expressions are specified.
+
+The syntax rules are:
 
 @enumerate
 @item
-The macro may not be empty.
-
+The expression may not be empty.
 @item
-If the macro begins with a name that is not a known AutoGen native
-macro, then it is labeled as @code{UNKNOWN}.  UNKNOWN macros are
-resolved into @code{INVOKE} or @code{EXPR} when they are first
-encountered during template expansion.  If the name is known to be a user
-@code{DEFINE}d macro, then it is resolved to @code{INVOKE}.  These are
-@i{im}plicit @code{INVOKE} and @code{EXPR} macro invocations.
-
-You cannot explicitly specify @code{UNKNOWN}.
-@xref{INVOKE}.  @xref{EXPR}.  @xref{UNKNOWN}.
-
+If no value name is provided, then the rest of the macro is presumed to
+be an expression and is evaluated.  It usually must start with one of
+the expression processing characters.  See below.
 @item
-Explicit @code{INVOKE} macros must be followed by an expression that
-yields a known user defined AutoGen macro.  Implicit macro invocations
-do not evaluate an expression to determine the name.  Both formats are
-followed by a list of name/string value pairs.  The string values are
-expressions, as described above.
+If no expression is provided, then there must be a value name
+and there may not be an apply code.  The result will either be
+the empty string, or the AutoGen value associated with value name.
+@item
+If the apply code is either @code{?} or @code{?%}, then two
+expressions must be provided, otherwise only one expression
+may be provided.
+@end enumerate
+
+The apply codes used are as follows:
+
+@table @samp
+@item @code{-}
+The expression that follows the value name will be processed
+only if the named value is @strong{not} found.
+
+@item @code{?}
+There must be @strong{two} space separated expressions following
+the value name.  The first is selected if the value name is found,
+otherwise the second expression is selected.
+
+@item @code{%}
+The first expression that follows the name will be used as a
+format string to sprintf.  The data argument will be the value
+named after the @code{%} character.
+
+@item @code{?%}
+This combines the functions of @code{?}and @code{%}, but for
+obvious reasons, only the first expression will be used as a
+format argument.
+
+@item not-supplied
+The macro will be skipped if there is no AutoGen value associated with
+the @code{<value-name>}.  If there is an associated value, then the
+expression result is the result of evaluating @code{<expression-1>}
+(if present), otherwise it is the value associated with
+@code{<value-name>}.
+@end table
+
+The simple expression clauses are interpreted differently,
+depending on the first character:
+
+@table @samp
+@item @code{;} (semi-colon)
+This is a Scheme comment character and must preceed Scheme code.
+AutoGen will strip it and pass the result to the Guile Scheme
+interpreter.
+
+@item @code{(} (open parenthesis)
+This is a Scheme expression.  Guile will interpret it.
+The expression must end before the end macro marker.
+
+@item @code{'} (single quote)
+This is a @i{fairly} raw text string.  It is not completely raw
+because backslash escapes are processed before 3 special characters:
+single quote (@code{'}), the hash character (@code{#}) and
+backslash (@code{\\}).
+
+@item @code{"} (double quote)
+This is a cooked text string.  The string is processed as in a
+K and R quoted string.  That is to say, adjacent strings are not
+concatenated together.
+
+@item @code{`} (back quote)
+This is a shell expression.  The AutoGen server shell will
+interpret it.  The result of the expression will be the
+output of the shell script.  The string is processed as in
+the cooked string before being passed to the shell.
+
+@item anything else
+Is presumed to be a literal string.  It becomes the result
+of the expression.
+@end table
+
+@ignore
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+@end ignore
+@node native macros
+@section AutoGen Native Macros
+@cindex native macros
+
+This section describes the various AutoGen natively defined macros.
+The general syntax is:
+
+@example
+[ @{ <native-macro-name> | <user-defined-name> @} ] [ <arg> ... ]
+@end example
+
+@noindent
+The syntax for @code{<argument>} depends on the particular macro,
+but is generally a full expression (@xref{expression syntax}).
+Here are the exceptions to that general rule:
+
+@enumerate
+@item
+@code{INVOKE} macros, implicit or explicit, must be followed by
+a list of name/string value pairs.  The string values are
+@i{simple expressions}, as described above.
 
 That is, the @code{INVOKE} syntax is either:
 @example
 <user-macro-name> [ <name> [ = <expression> ] ... ]
 @end example
+@noindent
 or
 @example
 INVOKE <name-expression> [ <name> [ = <expression> ] ... ]
 @end example
-
-Block or nested values are not allowed.  @code{<name>} may be repeated,
-creating an array of @code{<name>} values.
 
 @item
 AutoGen FOR macros must be in one of two forms:
@@ -957,11 +1043,16 @@ AutoGen FOR macros must be in one of two forms:
 @example
 FOR <name> [ <separator-string> ]
 @end example
+@noindent
 or
 @example
 FOR <name> (...Scheme expression list)
 @end example
-where @code{<name>} must be a simple name.  @xref{FOR}.
+@noindent
+where @code{<name>} must be a simple name and the Scheme expression list
+is expected to contain one or more of the @code{for-from},
+@code{for-to}, @code{for-by}, and @code{for-sep} functions.
+(@xref{FOR}, and @xref{Scheme Functions})
 
 @item
 AutoGen @code{DEFINE} macros must be followed by a simple name.
@@ -969,8 +1060,41 @@ Anything after that is ignored.  @xref{DEFINE}.
 
 @item
 The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
-macros ignore everything after the macro name.  @xref{COMMENT}.
+macros take no arguments and ignore everything after the macro name
+(e.g. @xref{COMMENT})
 @end enumerate
+
+@noindent
+These are the AutoGen native macros:
+@menu[=
+FOR macfunc =][=
+  IF (exist? "desc") =]
+* [=% name (sprintf "%%-18s" "%s::")
+  =] [=(string-upcase (get "name"))=] - [=what=][=
+  ENDIF =][=
+ENDFOR macfunc=]
+@end menu
+[=
+
+#  FOR each defined function,
+      this code will insert the extracted documentation =][=
+
+FOR macfunc =][=
+  IF (exist? "desc") =]
+
+@node [=name=]
+@subsection [=% name (string-upcase! "%s") =] - [=what=]
+@ignore
+Extracted from [=srcfile=] on line [=linenum=].
+@end ignore
+@findex [=% name (string-upcase! "%s") =][=
+    FOR cindex =]
+@cindex [=cindex=][=
+    ENDFOR cindex=]
+
+[=desc=][=
+  ENDIF desc exists =][=
+ENDFOR macfunc=]
 
 @node output controls
 @section Redirecting Output
@@ -990,33 +1114,7 @@ That file cannot be popped off.
 
 There are also several functions for determining the output
 status.  @xref{Scheme Functions}.
-@ignore
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-@end ignore
-
-[=
-
-#  FOR each defined function,
-      this code will insert the extracted documentation =][=
-
-FOR macfunc =][=
-  IF (exist? "desc") =]
-
-@node [=name=]
-@section [=% name (string-upcase! "%s") =] - [=what=]
-@ignore
-Extracted from [=srcfile=] on line [=linenum=].
-@end ignore
-@findex [=% name (string-upcase! "%s") =][=
-    FOR cindex =]
-@cindex [=cindex=][=
-    ENDFOR cindex=]
-
-[=desc=][=
-  ENDIF desc exists =][=
-ENDFOR macfunc=]
 @ignore
 
 Resume text from auto_gen.tpl
@@ -1034,9 +1132,29 @@ several more that have been added to be able to query AutoGen state;
 provide information for AutoGen processing; and also augment the
 repertore of string manipulation functions.
 
-@table @samp[=
+However, please take note that these functions are not loaded and
+thus not made available until after the command line options have
+been processed and the AutoGen definitions have been loaded.
+They may, of course, be used in Scheme functions that get defined
+at those times, but they cannot be invoked.
+
+@menu[=
 (define func-name "")
 (define func-str "") =][=
+FOR gfunc =][=
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+ =]
+* SCM-[= (sprintf "%-26s" (string-append func-name "::"))
+  =][=
+  IF (exist? "what") =][=what=][=
+  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
+  ENDIF =][=
+ENDFOR gfunc =]
+@end menu
+
+[=
 FOR gfunc =][=
   (set! func-name (shell (sprintf "echo '%s' |
     sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
@@ -1045,16 +1163,22 @@ FOR gfunc =][=
   (set! func-str
       (if (exist? "string") (get "string") func-name))
  =]
+@node SCM-[= (. func-name) =]
+@section [=
+  IF (exist? "what") =][=what=][=
+  ELSE =][= (. func-name) =] - AutoGen/Scheme function[=
+  ENDIF =]
 @findex [=(. func-name)=][=
 % string "\n@findex %s" =]
 @ignore
 Extracted from [=srcfile=] on line [=linenum=].
 @end ignore
-@item [=(. func-str)=][=
-  FOR exparg "," =] [=
+Usage:  ([=(. func-str)=][=
+  FOR exparg =] [=
     arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
     arg_optional " ]" =][=
-  ENDFOR exparg =]
+  ENDFOR exparg =])
+@*
 [= string (string-append func-name ":  ") =][=doc=]
 [=
   IF (exist? "exparg") =]
@@ -1073,7 +1197,6 @@ This Scheme function takes no arguments.[=
   ENDIF =][=
 ENDFOR gfunc
 =]
-@end table
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
