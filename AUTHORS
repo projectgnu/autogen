@@ -18,6 +18,7 @@ in the directory config; ctime.m4, make.m4 and release.
 in the directory compat; basename.c, dirname.c, compat.h, pathfind.c,
 sigsend.c, libgen.h
 in the directory tests; almost *.test
+snprintfv/*
 
 Brian Fox, Chet Ramey:
 sections of files borrowed from bash-2.0 incorporated into
