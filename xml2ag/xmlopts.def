@@ -2,8 +2,6 @@
 
 autogen definitions options;
 
-#option templ-dir  $top_srcdir/autoopts
-
 export = <<-  EOExport
 	#include <sys/types.h>
 	#include <sys/stat.h>
@@ -43,20 +41,21 @@ flag = {
     "By default, the output is handed to an AutoGen for processing.\n"
     "However, you may save the definitions to a file instead.";
 
-    flag_code = << FLAG_CODE_END
-    if (strcmp( pOptDesc->pzLastArg, "-" ) == 0)
-        return;
+    flag_code = <<- FLAG_CODE_END
+	    if (strcmp( pOptDesc->pzLastArg, "-" ) == 0)
+	        return;
 
-    if (freopen( pOptDesc->pzLastArg, "w", stdout ) == NULL) {
-        fprintf( stderr, "Error %d (%s) opening `%s' for output",
-                 errno, strerror( errno ), pOptDesc->pzLastArg );
-        exit( EXIT_FAILURE );
-    }
-FLAG_CODE_END ;
+	    if (freopen( pOptDesc->pzLastArg, "w", stdout ) == NULL) {
+	        fprintf( stderr, "Error %d (%s) opening `%s' for output",
+	                 errno, strerror( errno ), pOptDesc->pzLastArg );
+	        exit( EXIT_FAILURE );
+	    }
+	FLAG_CODE_END ;
 };
 
 #define XML2AG
 #option templ-dir  $top_srcdir/agen5
+#option templ-dir  $top_srcdir/autoopts
 #include opts.def
 
 explain = <<-  END_EXPLAIN

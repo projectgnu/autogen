@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.5 2005/01/24 20:27:42 bkorb Exp $
+ *  $Id: defDirect.c,v 4.6 2005/01/26 01:09:32 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -428,18 +428,19 @@ doDir_define( char* pzArg, char* pzScan )
      *       directive itself, giving us the space needed.
      */
     if (! isspace( *pzArg )) {
-        size_t shift_len = strlen(pzName)-1;
-        pzName--;
+        char* pzS = pzName;
+        char* pzD = --pzName;
+
         *pzArg = NUL;
-        memmove( pzName, pzName+1, shift_len );
-        pzName[shift_len]   = '=';
-        pzName[shift_len+1] = NUL;
+        while ((*(pzD++) = *(pzS++)) != NUL)   ;
+        pzD[-1] = '=';
+        pzD[ 0] = NUL;
 
     } else {
         /*
          *  Otherwise, insert the '=' and move any data up against it.
-         *  We only accept one space separated token.  We are not
-         *  ANSI-C compliant.  ;-)
+         *  We only accept one name-type, space separated token.
+         *  We are not ANSI-C.  ;-)
          */
         char*  pz = pzArg+1;
         *pzArg++ = '=';
@@ -448,7 +449,7 @@ doDir_define( char* pzArg, char* pzScan )
         for (;;) {
             if ((*pzArg++ = *pz++) == NUL)
                 break;
-            if (isspace( *pz )) {
+            if (! ISNAMECHAR( *pz )) {
                 *pzArg = NUL;
                 break;
             }
