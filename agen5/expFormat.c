@@ -1,7 +1,7 @@
 
 /*
  *  expFormat.c
- *  $Id: expFormat.c,v 1.16 2000/08/10 21:46:17 bkorb Exp $
+ *  $Id: expFormat.c,v 1.17 2000/08/10 21:48:09 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -95,8 +95,8 @@ static const char zBsd[] =
 "%2$s3. All advertising materials mentioning features or use of this software\n"
 "%2$s   must display the following acknowledgement:\n"
 "%2$s     This product includes software developed by %3$s.\n"
-"%2$s4. Neither the name `%3$s' nor the names of any other\n"
-"%2$s   contributors may be used to endorse or promote products derived\n"
+"%2$s4. Neither the name ``%3$s'' nor the name of any other\n"
+"%2$s   contributor may be used to endorse or promote products derived\n"
 "%2$s   from this software without specific prior written permission.\n"
 "%2$s\n"
 "%2$sTHIS SOFTWARE IS PROVIDED BY %3$s ``AS IS'' AND\n"
