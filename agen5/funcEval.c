@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.16 2000/03/04 22:40:05 bruce Exp $
+ *  $Id: funcEval.c,v 1.17 2000/03/04 23:48:03 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -80,7 +80,7 @@ evalExpression( ag_bool* pMustFree )
             if ((code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) == 0)
                 return (char*)zNil;
             pzText =  pT->pzTemplText + pMac->endIndex;
-            code   = EMIT_STRING;
+            code   = ((code & EMIT_SECONDARY_TYPE) >> 4);
         }
 
         /*
@@ -327,6 +327,29 @@ MAKE_HANDLER_PROC( Expr )
 #endif /* DEFINE_LOAD_FUNCTIONS */
 
 
+    static int
+exprType( char* pz )
+{
+    switch (*pz) {
+    case ';':
+    case '(':
+        return EMIT_EXPRESSION;
+
+    case '`':
+        spanQuote( pz );
+        return EMIT_SHELL;
+
+    case '"':
+    case '\'':
+        spanQuote( pz );
+        /* FALLTHROUGH */
+
+    default:
+        return EMIT_STRING;
+    }
+}
+
+
 /*
  *  mLoad_Expression
  */
@@ -401,6 +424,7 @@ MAKE_LOAD_PROC( Expr )
             LOAD_ABORT( pT, pMac, "definition expression" );
         }
         pMac->ozText = 0;
+
     } else {
         char* pz = pzCopy;
         long  ct = srcLen = (long)(pzSrcEnd - pzSrc);
@@ -409,40 +433,37 @@ MAKE_LOAD_PROC( Expr )
         /*
          *  Copy the expression
          */
-        do  {
-            *(pzCopy++) = *(pzSrc++);
-        } while (--ct > 0);
-        *(pzCopy++) = '\0';
-        *(pzCopy++) = '\0'; /* double terminate */
+        do { *(pzCopy++) = *(pzSrc++); } while (--ct > 0);
+        *(pzCopy++) = '\0'; *(pzCopy++) = '\0'; /* double terminate */
 
+        /*
+         *  IF this expression has an "if-present" and "if-not-present"
+         *  THEN find the ending expression...
+         */
         if ((pMac->res & EMIT_ALWAYS) != 0) {
             char* pzNextExpr = (char*)skipExpression( pz, srcLen );
-            if (pzNextExpr < pz + srcLen) {
-                if (! isspace( *pzNextExpr ))
-                    LOAD_ABORT( pT, pMac, "No space between expressions" );
 
-                *(pzNextExpr++) = NUL;
-                while (isspace( *pzNextExpr ))  pzNextExpr++;
-                pMac->endIndex = pzNextExpr - pT->pzTemplText;
-            }
+            /*
+             *  The next expression must be within bounds and space separated
+             */
+            if (pzNextExpr >= pz + srcLen)
+                LOAD_ABORT( pT, pMac, "`?' needs two expressions" );
+
+            if (! isspace( *pzNextExpr ))
+                LOAD_ABORT( pT, pMac, "No space between expressions" );
+
+            /*
+             *  NUL terminate the first expression, skip intervening
+             *  white space and put the secondary expression's type
+             *  into the macro type code as the "secondary type".
+             */
+            *(pzNextExpr++) = NUL;
+            while (isspace( *pzNextExpr ))  pzNextExpr++;
+            pMac->res |= (exprType( pzNextExpr ) << 4);
+            pMac->endIndex = pzNextExpr - pT->pzTemplText;
         }
 
-        switch (*pz) {
-        case ';':
-        case '(':
-            pMac->res |= EMIT_EXPRESSION;
-            break;
-
-        case '`':
-            pMac->res |= EMIT_SHELL;
-            spanQuote( pz );
-            break;
-
-        case '"':
-        case '\'':
-            spanQuote( pz );
-            pMac->res |= EMIT_STRING;
-        }
+        pMac->res |= exprType( pz );
     }
 
     pT->pNext = pzCopy;
