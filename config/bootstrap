@@ -6,10 +6,10 @@
 # Author:         Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Maintainer:     Gary V. Vaughan <gvaughan@oranda.demon.co.uk>
 # Created:        Thu Apr  9 00:40:23 1998
-# Last Modified:     Sat May 22 00:18:57 1999				
-#            by:     Gary V. Vaughan <gary@oranda.goldfish>		
+# Last Modified:     Thu Jun  3 14:14:42 1999				      
+#            by:     Bruce Korb <korb@datadesign.com>			      
 # ----------------------------------------------------------------------
-# $Id: bootstrap,v 1.8 1999/06/03 19:43:28 bkorb Exp $
+# $Id: bootstrap,v 1.9 1999/06/03 21:15:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Code:
@@ -181,5 +181,38 @@ done
 # remove the fake file so we don't forget to generate it later.
 test "`sed 2q doc/autogen.texi`" != "@setfilename fnord" \
     || rm -f doc/autogen.texi
+
+autogen --help > /dev/null || {
+  echo AutoGen not available
+  exit 0
+}
+
+getdefs --help > /dev/null || {
+  echo getdefs not available
+  exit 0
+}
+
+columns --help > /dev/null || {
+  echo columns not available
+  exit 0
+}
+
+find . -name bootstrap |
+egrep -v '(CVS/Base/|config/bootstrap)'   |
+while read f
+do
+  (cd `dirname $f` ; sh `basename $f`)
+done
+
+OPTDIR=`pwd`/autoopts
+
+find . -name 'opts.def' |
+egrep -v 'CVS/Base/'    |
+sed 's;\.def$;;'        |
+while read f
+do
+  if [ ! -f ${f}.c ]
+  then ( cd `dirname $f` ; autogen -L $OPTDIR opts.def ) ; fi
+done
 
 # bootstrap ends here
