@@ -9,41 +9,58 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: forfrom.test,v 1.2 1999/10/28 03:36:29 bruce Exp $
+# $Id: forfrom.test,v 1.3 2000/03/04 23:54:23 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test "$srcdir" = "$0" && srcdir=.
     test -z "$srcdir" && srcdir=.
+    test "$srcdir" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1
 fi
 . $srcdir/defs
 
-# Create the files we need in the test environment
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating $testname.tpl
+cat > $testname.tpl <<_EOF_
+<= AutoGen5 template test =>
+<=
+
+FOR list (for-by 3) (for-sep ",\n")
+
+  =>list[<=(for-index)=>] = <=
+    ?% elt 'this is "%s"' EMPTY=><=
+
+ENDFOR
+
+=>
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
 cat > $testname.def <<EOF
-autogen definitions $testname;
-list = { elt = one; };
-list = { elt = two; };
-list = { elt = three; };
-list = { elt = fnord; };
+AutoGen definitions $testname;
+list[1] = { elt = one; };
+list[3] = { elt = three; };
+list[5] = { elt = five; };
+list[7] = { elt = seven; };
+list[9] = { elt = nine; };
 EOF
 
-cat > $testname.tpl <<EOF
-<= autogen template test =>
-<=_FOR list FROM 1 TO (list _HILIM 1 -)=><=elt=>
-<=/list=>
-EOF
+# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # # # #
 
+echo creating $testname.out
 # this is the output we should expect to see
-cat > $testname.out <<EOF
-two
-three
+cat > $testname.out <<'_EOF_'
+list[1] = this is "one",
+list[4] = EMPTY,
+list[7] = this is "seven"
+_EOF_
 
-EOF
-
-$AUTOGEN || exit 1
+$AGEN $testname.def || failure could not run AutoGen
 cmp -s $testname.test $testname.out || failure unexpected output
 
 # end of forfrom.test
