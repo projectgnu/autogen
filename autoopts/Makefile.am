@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   1998/04/01 at 08:57:58
+## Last Modified:   $Date: 1998/05/26 19:04:04 $
 ##            by:   Bruce Korb <korbb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.1 1998/04/29 23:14:31 bkorb Exp $
+## $Id: Makefile.am,v 1.2 1998/05/26 19:04:04 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
