@@ -1,0 +1,22 @@
+
+autogen definitions fsm;
+
+method = case;
+type   = loop;
+cookie = "const char* pzSrc";
+cookie = "int inlen";
+cookie = "char* pzOut";
+cookie = "int outlen";
+
+state = name, value;
+event = alpha, name_char, equal, space, escape, other, seperator, end;
+
+transition = 
+ { tst = init; tev = alpha; next = name; ttype = stash; },
+ { tst = name; tev = alpha, name_char;   ttype = stash; },
+ { tst = name; tev = equal; next = value; },
+ { tst = value; tev = *;    ttype = stash; },
+ { tst = value; tev = space; },
+ { tst = value; tev = escape; },
+ { tst = value; tev = end;       next = done; ttype = seperate; },
+ { tst = value; tev = seperator; next = init; ttype = seperate; };
