@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Fri Aug 15 12:04 1997
-## Last Modified:   Tue Aug  3 10:37:36 1999				      
+## Last Modified:   Tue Aug  3 16:18:52 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.19 1999/08/03 17:39:01 bkorb Exp $
+## $Id: Makefile.am,v 2.20 1999/08/03 23:19:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -61,10 +61,11 @@ autogen.texi : auto_gen.tpl $(DEFSRC) $(ODEF) $(TPLINC) $(SNVDOC)
 
 www/doc/autogen_toc.html : autogen.texi
 	@mkdir -f www/doc > /dev/null 2>&1
-	cd www/doc ; texi2html -split_chapter -verbose \
-		$(top_builddir)/doc/autogen.texi
+	texi2html -menu -split_chapter -verbose autogen.texi
+	mv -f *.html www/doc
 	@touch $@
 
+html : web
 web : www/doc/autogen_toc.html
 
 $(top_builddir)/getdefs/getdefs.texi :
@@ -90,9 +91,5 @@ autogen.info : doc
 
 doc :
 	ln -s $(top_srcdir)/snprintfv/doc ./doc
-
-html : autogen.texi
-	cd www/doc ; ln -s ../../autogen.texi ; \
-	texi2html -I ../.. -menu -split_node autogen.texi
 
 # Makefile.am ends here
