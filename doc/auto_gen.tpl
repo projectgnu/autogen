@@ -10,7 +10,7 @@
 ## Last Modified:     Mon Aug 30 10:50:10 1999                                
 ##            by:     Bruce Korb <autogen@linuxbox.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.49 2000/03/13 00:04:33 bruce Exp $
+## $Id: auto_gen.tpl,v 2.50 2000/03/19 23:11:37 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1391,8 +1391,7 @@ at all, I decided to leave it in the list of chapters.
 [=`
 cat  ${ADDON_MENU}
 
-echo '
-@end menu
+echo '@end menu
 
 '
 
@@ -1400,7 +1399,8 @@ for f in ${ADDON_TEXI}
 do
    echo '@page'
    echo '@ignore'
-   echo 'Copy of $f'
+   echo '* * * * * * * * * * * * * * * * *'
+   echo 'Copy of text from $f'
    echo '@end ignore'
    cat $f
 done
