@@ -1,3 +1,18 @@
+2003-02-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/heredef.test: quote the heredoc marker and compare
+	the output with a sample output.
+	* agen5/test/shell.test: document known failures on BSD-derived systems
+	* agen5/tpParse.c: use uintptr_t instead of off_t
+	* autoopts/agman1.tpl: replace @emph and @strong, too
+	* getdefs/gdinit.c: constrain file name list reading to non-tty input
+	* getdefs/getdefs.c: aesthetic cleanup
+	* getdefs/opts.def: update copyright date and version and add an
+	explanation about reading file names from stdin.
+	* doc/auto_gen.tpl(autogen.texi): hunt for the file, do not assume
+	the source directory.
+	* getdefs/bootstrap.dir: remove debugging "set -x"
+
 2003-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* config/confmacs.tpl(try-withlib): rewritten and now generates

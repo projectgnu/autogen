@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 3.5 2002/09/21 17:27:16 bkorb Exp $
+ *  $Id: getdefs.c,v 3.6 2003/02/05 02:40:26 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
- *  Time-stamp:        "2002-09-21 10:13:02 bkorb"
+ *  Time-stamp:        "2003-02-03 18:08:01 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -77,7 +77,7 @@ updateDatabase( void );
  *
  *   MAIN
  */
-    int
+int
 main( int    argc,
       char** argv )
 {
@@ -96,6 +96,7 @@ main( int    argc,
     {
         int    ct  = STACKCT_OPT(  INPUT );
         char** ppz = STACKLST_OPT( INPUT );
+
         do  {
             processFile( *ppz++ );
         } while (--ct > 0);
@@ -607,8 +608,6 @@ compar_text( const void* p1, const void* p2 )
 STATIC void
 doPreamble( FILE* outFp )
 {
-    char* pzName;
-
     /*
      *  Emit the "autogen definitions xxx;" line
      */
@@ -616,22 +615,24 @@ doPreamble( FILE* outFp )
 
     if (HAVE_OPT( FILELIST )) {
         tSCC   zFmt[] = "%-12s = '%s';\n";
-
-        int    ct  = STACKCT_OPT(  INPUT );
-        char** ppz = STACKLST_OPT( INPUT );
-
-        pzName = OPT_ARG( FILELIST );
+        char*  pzName = OPT_ARG( FILELIST );
 
         if (pzName == (char*)NULL)
             pzName = "infile";
 
-        do  {
-            fprintf( outFp, zFmt, pzName, *ppz++ );
-        } while (--ct > 0);
+        if (HAVE_OPT( INPUT )) {
+            int    ct  = STACKCT_OPT(  INPUT );
+            char** ppz = STACKLST_OPT( INPUT );
+
+            do  {
+                fprintf( outFp, zFmt, pzName, *ppz++ );
+            } while (--ct > 0);
+        }
 
         if (HAVE_OPT( COPY )) {
-            ct  = STACKCT_OPT(  COPY );
-            ppz = STACKLST_OPT( COPY );
+            int    ct  = STACKCT_OPT(  COPY );
+            char** ppz = STACKLST_OPT( COPY );
+
             do  {
                 fprintf( outFp, zFmt, pzName, *ppz++ );
             } while (--ct > 0);
@@ -1017,8 +1018,6 @@ startAutogen( void )
             tSCC   zFileFmt[] = " *      %s\n";
             const char* pzFmt;
 
-            int    ct  = STACKCT_OPT(  INPUT );
-            char** ppz = STACKLST_OPT( INPUT );
             FILE*  fp;
 
             if (strcmp( OPT_ARG( OUTPUT ), "-") == 0)
@@ -1028,9 +1027,13 @@ startAutogen( void )
             fp = fopen( OPT_ARG( OUTPUT ), "w" FOPEN_BINARY_FLAG );
             fprintf( fp, zDne, OPT_ARG( OUTPUT ));
 
-            do  {
-                fprintf( fp, zFileFmt, *ppz++ );
-            } while (--ct > 0);
+            if (HAVE_OPT( INPUT )) {
+                int    ct  = STACKCT_OPT(  INPUT );
+                char** ppz = STACKLST_OPT( INPUT );
+                do  {
+                    fprintf( fp, zFileFmt, *ppz++ );
+                } while (--ct > 0);
+            }
 
             fputs( " */\n", fp );
             return fp;

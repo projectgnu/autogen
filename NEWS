@@ -1,3 +1,9 @@
+New in 5.5.2 - February, 2003
+* Fixes for FreeBSD weirdisms with sed, dlopen(), and the Guile library
+* stash offsets in uintptr_t types so this thing works when
+  sizeof(void*) != sizeof(off_t)
+* still more configury fixes.  It will never, ever end.
+
 New in 5.5 - December 15, 2002
 * The FOR macro will now accept a list of values, as in:
   [= FOR v IN one, "two , part" three =]

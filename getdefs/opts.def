@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 3.5 2002/12/19 01:35:37 bkorb Exp $
+ *   $Id: opts.def,v 3.6 2003/02/05 02:40:26 bkorb Exp $
  */
 
 /*
@@ -26,7 +26,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2001";
+    date   = "1999-2003";
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = "autogen-bugs@lists.sf.net";
@@ -34,9 +34,13 @@ copyright = {
 
 prog_name     = "getdefs";
 prog_title    = "AutoGen Definition Extraction Tool";
-
-version       = "1.3";
+version       = "1.4";
 homerc        = /dev/null;
+explain       = <<- EndExplanation
+	If no @code{input} argument is provided or is set to simply "-", and if
+	@code{stdin} is not a @code{tty}, then the list of input files will be
+	read from @code{stdin}.
+	EndExplanation;
 
 flag = {
     name      = "defs_to_get";
@@ -83,9 +87,8 @@ flag = {
 flag = {
     name      = input;
     arg_type  = string;
-    arg_name  = file;
+    arg_name  = src-file;
     max       = NOLIMIT;
-    min       = 1;
     settable;
     stack_arg;
     default;

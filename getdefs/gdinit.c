@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 3.1 2002/05/05 03:07:07 bkorb Exp $
+ *  $Id: gdinit.c,v 3.2 2003/02/05 02:40:26 bkorb Exp $
  *
  *    getdefs copyright 1999-2001 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2002/05/05 03:07:07 $
+ *  Last Modified:     $Date: 2003/02/05 02:40:26 $
  *            by: bkorb
  */
 #include "getdefs.h"
@@ -159,6 +159,12 @@ loadStdin( void )
     int    ct  = 0;
     char** ppz = STACKLST_OPT( INPUT );
 
+    if (isatty( STDIN_FILENO )) {
+        fputs( "getdefs error:  no inputs were specified and stdin is a tty\n",
+               stderr );
+        USAGE( EXIT_FAILURE );
+    }
+
     while (fgets( z, sizeof( z ), stdin ) != NULL) {
         char* pz = z + strlen( z );
 
@@ -308,6 +314,9 @@ validateOptions( void )
             fixupSubblockString( *(ppz++) );
         } while (--ct > 0);
     }
+
+    if (! HAVE_OPT( INPUT ))
+        SET_OPT_INPUT( "-" );
 
     /*
      *  Make sure each of the input files is findable.

@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2001/12/29 11:24:56 $
+# Last Modified:     $Date: 2003/02/05 02:40:26 $
 #            by:     Bruce Korb <bkorb@gnu.org>
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 3.1 2001/12/29 11:24:56 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 3.2 2003/02/05 02:40:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -48,7 +48,6 @@ do
 		#define GETDEFS_PROTOTYPES_H
 		_EOF_
 
-    set -x
     for g in `egrep -l '^EXPORT' *.c`
     do
       echo

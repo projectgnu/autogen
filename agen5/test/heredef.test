@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/09 19:44:56 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2003/02/05 02:40:26 $
+#            by: bkorb
 #
-# $Id: heredef.test,v 3.0 2001/12/09 19:44:56 bkorb Exp $
+# $Id: heredef.test,v 3.1 2003/02/05 02:40:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,7 +23,7 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > $testname.tpl <<_EOF_
+cat > ${testname}.tpl <<'_EOF_'
 <= AutoGen5 template test =>
 <=
 
@@ -39,11 +39,16 @@ cat > $testname.tpl <<_EOF_
 =>OKAY:  <= (c-string (get "string3")) =>
 _EOF_
 
+# # # # # # # # # # SAMPLE FILE # # # # # # # # #
+cat > ${testname}.sample <<\_EOF_
+OKAY:  "\"`Testing'"
+_EOF_
+
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 # Create the files we need in the test environment
-echo "AutoGen definitions $testname;" > $testname.def
-cat >> $testname.def <<'_EOF_'
+echo "AutoGen definitions ${testname};" > ${testname}.def
+cat >> ${testname}.def <<'_EOF_'
 
 string1 = <<- AG_EOF
 	"`Testing'
@@ -57,7 +62,11 @@ string3 = "\"`Testing'";
 
 _EOF_
 
-$AGEXE $testname.def || failure $testname AutoGen failed
+$AGEXE ${testname}.def || failure ${testname} AutoGen failed
 
-cleanup
+if cmp ${testname}.test ${testname}.sample
+then cleanup
+else failure "`diff ${testname}.sample ${testname}.test`"
+fi
+
 # end of heredef.test

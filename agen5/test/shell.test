@@ -9,10 +9,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2001/12/24 14:13:33 $
-#            by:     Bruce Korb <bkorb@gnu.org>			      
+# Last Modified:     $Date: 2003/02/05 02:40:26 $
+#            by: bkorb
 #
-# $Id: shell.test,v 3.1 2001/12/24 14:13:33 bkorb Exp $
+# $Id: shell.test,v 3.2 2003/02/05 02:40:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -105,8 +105,12 @@ sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
 _EOF_
 
 $AGEXE ${testname}.def || failure "$AGEXE ${testname}.def"
-cmp -s ${testname}.test ${testname}.sample || \
-    failure "`diff -c ${testname}.test ${testname}.sample`"
-
-cleanup
+if cmp -s ${testname}.test ${testname}.sample
+then cleanup
+else
+     echo 'If the shell.test output file does not start with "SHELL=$SHELL"'
+     echo 'then you have a Guile library that cannot modify the environment'
+     echo 'This is a known breakage on platforms (esp. BSD derivatives).'
+     failure "`set +x;diff -c ${testname}.test ${testname}.sample`"
+fi
 # end of for.test

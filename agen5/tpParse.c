@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 3.8 2003/01/05 19:14:32 bkorb Exp $
+ *  $Id: tpParse.c,v 3.9 2003/02/05 02:40:26 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -260,7 +260,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             while ((pzMark < pzMacEnd) && isspace( *pzMark ))  pzMark++;
             while ((pzMacEnd > pzMark) && isspace( pzMacEnd[-1] )) pzMacEnd--;
             if (pzMark != pzMacEnd) {
-                pM->ozText = (off_t)pzMark;
+                pM->ozText = (uintptr_t)pzMark;
                 pM->res    = (long)(pzMacEnd - pzMark);
             }
         }

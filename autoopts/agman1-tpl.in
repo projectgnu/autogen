@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2002 Bruce Korb
 ##
-## Time-stamp:      "2002-11-07 08:49:38 bkorb"
+## Time-stamp:      "2003-02-03 17:22:22 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.17 2002/12/14 16:02:38 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.18 2003/02/05 02:40:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -47,10 +47,12 @@ AutoGen5 template man=%s.1
 
 :+]
 sed \
- -e 's;@code{\([^}]*\)};\\fB\1\\fP;g' \
- -e  's;@var{\([^}]*\)};\\fB\1\\fP;g' \
- -e 's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
- -e 's;@file{\([^}]*\)};\\fI\1\\fP;g' \
+ -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
+ -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
+ -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
+ -e   's;@file{\([^}]*\)};\\fI\1\\fP;g' \
+ -e   's;@emph{\([^}]*\)};\\fI\1\\fP;g' \
+ -e 's;@strong{\([^}]*\)};\\fB\1\\fP;g' \
  -e 's/@\([{}]\)/\1/g' \
  -e 's,^\$\*$,.br,' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \

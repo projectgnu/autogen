@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.14 2003/01/05 19:14:32 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.15 2003/02/05 02:40:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -490,15 +490,18 @@ ENDFOR macfunc=]
 
 Invocation section from [= `
 
+f=../agen5/autogen.texi
+[ -f $f ] || f=${top_srcdir}/agen5/autogen.texi
+
 cat <<_EOF_
-${top_srcdir}/agen5/autogen.texi
+${f}
 
 @end ignore
 @page
 
 _EOF_
 
-cat ${top_srcdir}/agen5/autogen.texi ` =]
+cat ${f}` =]
 
 [= get-text tag = installation =]
 
