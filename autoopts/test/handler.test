@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/01/22 16:21:16 $
+# Last Modified:     $Date: 2005/01/24 02:30:49 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.4 2005/01/22 16:21:16 bkorb Exp $
+# $Id: handler.test,v 4.5 2005/01/24 02:30:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -94,13 +94,13 @@ ${AG_L} ${testname}.def || \
 # vary too much, so sed them away.
 #
 sed -e '1,/Create the static procedure(s) declared above/d' \
-    -e '/extracted from.*near line/d' -e /^#line/d \
+    -e '/extracted from.*near line/d' -e '/^#line/d' \
     ${testname}.c > ${testname}.test
 
 # # # # # # # # # # SAMPLE OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.sample
-cat > ${testname}.sample <<'_EOF_'
+cat > ${testname}.sample <<\_EOF_
  */
 static void
 doUsageOpt(

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2004-12-31 16:32:51 bkorb"
+# Time-stamp:        "2005-01-23 18:06:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: enums.test,v 4.2 2005/01/01 00:33:12 bkorb Exp $
+# $Id: enums.test,v 4.3 2005/01/24 02:30:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -140,7 +140,7 @@ _EOF_
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > ${testname}.tpl <<__EOF
+cat > ${testname}.tpl <<\__EOF
 [= AutoGen5 Template -*- Mode: C -*- =]
 [=(define proc-list "")=]
 typedef int (do_proc_t)( void );
@@ -154,12 +154,13 @@ extern do_proc_t
 do_proc_t* do_proc[] = {
 [= (. proc-list) =] };
 
-[=(shellf "procs='%s' ; ix=0 ; for p in \${procs}
+[=(shellf "procs='%s' ; ix=0 ; for p in ${procs}
 do
-  echo int \${p%%,}'( void ) {'
-  echo 'fputs( \"'\${p%%,}'\\\\n\", stdout );'
-  echo return \${ix}'; }'
-  ix=\`expr \$ix + 1\`
+  p=`echo $p | sed s/,//`
+  echo int ${p}'( void ) {'
+  echo 'fputs( \"'${p}'\\\\n\", stdout );'
+  echo return ${ix}'; }'
+  ix=`expr $ix + 1`
 done" proc-list) =]
 
 int
@@ -191,7 +192,9 @@ set_options( int mode, const char* pzArg )
 {
     exit( atoi( pzArg ));
 }
+__EOF
 
+cat >> ${testname}.tpl <<__EOF
 int
 main( int argc, char** argv )
 {
@@ -274,8 +277,8 @@ cmp -s ${testname}.h*lp || \
 ix=0
 for f in one two three four five six seven eight nine ten
 do
-  ix=$(( ix + 1 ))
-  txt=$(./${testname} -p $f)
+  ix=`expr $ix + 1`
+  txt=`./${testname} -p $f`
   test $? -eq $ix || \
     failure "'./${testname} -p $f' did not yield $ix"
   test "${txt}" = "do_print_${f}" || \
