@@ -1,3 +1,33 @@
+1998-07-08  Bruce Korb <korbb@datadesign.com>
+
+	* autoopts/optcode.tpl
+	Simplified the formation of the initialization by
+	#defining variable names to (const char*)NULL when not present
+
+	* autoopts/options.tpl
+	Reformatted the descriptions of the macros to make them
+	more human readable.  Used 'sed' to convert the text back
+	to something texinfo can use.
+
+	* doc/auto_gen.tpl
+	Documented the options that autoopts maintains automatically.
+
+	* src/agShell.c
+	Added code to print the failing command when the shell is
+	interrupted by a signal.
+
+	* src/autogen.c
+	Removed unneeded white space
+
+	* src/escapech.c
+	The advance count should be zero when escaped new-lines are
+	encountered, too.  (a la "C" code)
+
+	* src/tokenize.c
+	When advance count is zero, it really refers to the destination,
+	whereas it otherwise indicates advancing the scan pointer
+	by that amount.
+
 1998-07-02  Bruce Korb <korbb@datadesign.com>
 	* AUTHORS
 	regex.* are no longer distributed with autogen.
