@@ -11,7 +11,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <bkorb@gnu.org>			      
 #
-# $Id: argument.test,v 1.6 2000/06/22 18:04:50 bkorb Exp $
+# $Id: argument.test,v 1.7 2000/10/17 02:57:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -29,7 +29,7 @@ set -x
 echo "creating $testname.def in `pwd`"
 testname="$testname" test_main="${test_main}" \
 argument="${argument}" long_opt="${long_opt}" \
-${SHELL-sh} ${stdopts} option second
+${SHELL-sh} ${stdopts} option:'opt init' second=020
 
 echo $AGEN $testname.def
 $AGEN $testname.def || \
@@ -43,10 +43,10 @@ compile "-?"
 echo creating $testname.hlp
 cat > $testname.hlp <<'_EOF_'
 test_argument - Test AutoOpts for argument
-USAGE:  argument [ -<flag> ]...
+USAGE:  argument [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
-   -o no  option         The option option descrip
-   -s no  second         The second option descrip
+   -o YES option         The option option descrip
+   -s Num second         The second option descrip
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
@@ -58,7 +58,10 @@ cmp -s $testname.h*lp || \
 ./$testname mumble 2> /dev/null && \
   failure $testname should not accept non-options
 
-./$testname -o -s > /dev/null || \
+./$testname -s mumble 2> /dev/null && \
+  failure $testname should not accept bad options
+
+./$testname -o string -s 99 > /dev/null || \
   failure $testname did not handle its options
 
 cleanup

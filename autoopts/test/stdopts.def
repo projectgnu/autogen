@@ -37,13 +37,25 @@ do
     ?*:?* )
         arg=`echo $flag | sed 's/.*://'`
 	flag=`echo $flag | sed 's/:.*//'`
-	arg="    flag_arg = ':$arg';"
+	arg="    arg_type = string; arg_default = '$arg';"
+	;;
+
+    ?*=[0-9]* )
+        arg=`echo $flag | sed 's/.*=//'`
+	flag=`echo $flag | sed 's/=.*//'`
+	arg="    arg_type = number; arg_default = '$arg';"
 	;;
 
     ?*: )
 	flag=`echo $flag | sed 's/://'`
-	arg="    flag_arg = ':';"
+	arg="    arg_type = 'string';"
 	;;
+
+    ?*= )
+	flag=`echo $flag | sed 's/=//'`
+	arg="    arg_type = 'number';"
+	;;
+
     * )
 	unset arg
 	;;

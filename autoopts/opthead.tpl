@@ -1,5 +1,5 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 2.22 2000/10/16 00:26:50 bkorb Exp $
+# $Id: opthead.tpl,v 2.23 2000/10/17 02:57:00 bkorb Exp $
 =]
 [=
 
@@ -110,11 +110,15 @@ ENDIF (exist? version) =]
  *  Interface defines for specific options.
  */[=
   (define UP-name "")
+  (define cap-name "")
+  (define low-name "")
   (define descriptor "")
   (define opt-name "")   =][=
 
 FOR flag =][=
   (set! UP-name    (string-upcase! (get "name")))
+  (set! cap-name   (string-capitalize UP-name))
+  (set! low-name   (string-downcase UP-name))
   (set! opt-name   (string-append UP-prefix "OPT_" UP-name))
   (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" )) =][=
 
@@ -125,11 +129,11 @@ FOR flag =][=
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=(for-index)=] )[=
 
-   ENDIF =][=
- ELSE "not a documentation option" =][=
-   Option_Defines =][=
- ENDIF documentation =][=
-ENDFOR flag=][=#
+   ENDIF              =][=
+ ELSE                 =][=
+   Option_Defines     =][=
+ ENDIF                =][=
+ENDFOR                =][=#
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

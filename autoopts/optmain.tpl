@@ -1,4 +1,4 @@
-[= AutoGen5 Template -*- Mode: C -*- =]
+[= AutoGen5 Template -*- Mode: text -*- =]
 [=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -136,19 +136,26 @@ DEFINE declare-option-callbacks  =][=
  */[=
 
 
-  FOR flag =][=
+  FOR flag                           =][=
     (set! cap-name (string-capitalize! (get "name"))) =][=
 
-    IF (exist? "call_proc") =]
-extern tOptProc [=(get "call_proc")=];[=
+    CASE arg_type                    =][=
+    =*  enum                         =]
+static tOptProc doOpt[=(. cap-name)  =];[=
+    =*  bool                         =][=
+    =*  num                          =][=
+    *                                =][=
+      IF (exist? "call_proc")        =]
+extern tOptProc [=(get "call_proc")  =];[=
 
-    ELIF (exist? "flag_code") =]
-static tOptProc doOpt[=(. cap-name)=];[=
+      ELIF (exist? "flag_code")      =]
+static tOptProc doOpt[=(. cap-name)  =];[=
 
-    ENDIF =][=
-  ENDFOR flag   =][=
+      ENDIF                          =][=
+    ESAC                             =][=
+  ENDFOR                             =][=
  
-  IF (exist? "test_main") =][=
+  IF (exist? "test_main")            =][=
 
      # "A test environment is to be generated" =]
 
@@ -157,26 +164,28 @@ static tOptProc doOpt[=(. cap-name)=];[=
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
  */[=
-    FOR flag =][=
+    FOR flag            =][=
     (set! cap-name (string-capitalize! (get "name"))) =][=
 
       IF (exist? "call_proc") =]
 #define [=(get "call_proc")   =] [=
           IF (~ (get "max") "1{0,1}")
-               =](tpOptProc)NULL[=
-          ELSE =]stackOptArg[=
-          ENDIF=][=
+                        =](tpOptProc)NULL[=
+          ELSE          =]stackOptArg[=
+          ENDIF         =][=
 
       ELIF (exist? "flag_code")  =]
 #define doOpt[=(. cap-name)   =] [=
           IF (~ (get "max") "1{0,1}")
-               =](tpOptProc)NULL[=
-          ELSE =]stackOptArg[=
-          ENDIF=][=
+                        =](tpOptProc)NULL[=
+          ELSE          =]stackOptArg[=
+          ENDIF         =][=
 
-      ENDIF=][=
+      ELIF (=* (get "arg_type") "enum") =]
+#define doOpt[=(. cap-name)   =] (tpOptProc)NULL[=
+      ENDIF             =][=
 
-    ENDFOR flag=]
+    ENDFOR flag         =]
 #endif /* defined( TEST_[=(. pname-up)=]_OPTS ) */[=
   ENDIF (exist? "test_main") =]
 [=
@@ -201,26 +210,30 @@ DEFINE define-option-callbacks  =][=
 
   FOR flag =][=
 
-    IF (exist? "flag_code") =]
+    IF (or (exist? "flag_code") (=* (get "arg_type") "enum")) =][=
+       (set! UP-name    (string-upcase! (get "name")))
+       (set! cap-name   (string-capitalize UP-name))
+       (set! low-name   (string-downcase UP-name))      =]
 
 /* * * * * * *
  *
  *   For the "[=(string-capitalize! (get "name"))=] Option".
  */
-#if defined( __STDC__ ) || defined( __cplusplus )
-    static void
-doOpt[=(string-capitalize (get "name"))
-     =]( tOptions* pOptions, tOptDesc* pOptDesc )
-#else
-int doOpt[=(string-capitalize (get "name"))
-         =]( pOptions, pOptDesc )
-    tOptions*  pOptions;
-    tOptDesc*  pOptDesc;
-#endif
+DEF_PROC_2( static, void, doOpt[=(string-capitalize (get "name")) =],
+            tOptions*, pOptions, tOptDesc*, pOptDesc )
 {
-[=flag_code=]
+[=  ENDIF        =][=
+    IF (exist? "flag_code") =][=
+       flag_code =]
 }[=
-    ENDIF "flag_code _exist" =][=
+    ELSE
+=]    tSCC* az_names[] = {
+[=(shellf "columns -I8 --spread=3 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
+          (join "\n" (stack "keyword")) )=]
+    pOptDesc->pzLastArg = doEnumerationOption( pOptions, pOptDesc,
+                                               az_names, [=(count "keyword")=] );
+}[=
+    ENDIF        =][=
   ENDFOR flag =][=
 
   IF (exist? "test_main") =]

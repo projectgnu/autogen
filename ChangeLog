@@ -2,6 +2,22 @@
 
 	* autoopts/stdoptions.def:  Provide a set of standard options that
 	clients can take advantage of easily.
+	* VERSION: this change breaks compatibility  :-(
+	* autoopts/autoopts.c:  Handle the new arg_type attribute
+	* autoopts/boolean.c:  Handle the new arg_type attribute
+	* autoopts/doc.tpl:  Handle the new arg_type attribute
+	* autoopts/enumeration.c:  Handle the new arg_type attribute
+	* autoopts/numeric.c:  Handle the new arg_type attribute
+	* autoopts/optcode.tpl:  Handle the new arg_type attribute
+	* autoopts/opthead.tpl:  Handle the new arg_type attribute
+	* autoopts/options.h:  Handle the new arg_type attribute
+	* autoopts/options.tpl:  Handle the new arg_type attribute
+	* autoopts/optlib.tpl:  Handle the new arg_type attribute
+	* autoopts/optmain.tpl:  Handle the new arg_type attribute
+	* autoopts/Makefile.am:  Add and distribute the new files
+	* autoopts/test/argument.test:  Test the new arg_type attribute
+	* autoopts/test/stdopts.def:  Test the new arg_type attribute
+	* autoopts/usage.c:  Handle the new arg_type attribute
 
 2000-10-15  Bruce Korb  <bkorb@gnu.org>
 

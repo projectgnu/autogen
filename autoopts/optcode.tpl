@@ -1,5 +1,5 @@
 [= autogen5 template  -*- Mode: Text -*-
-#$Id: optcode.tpl,v 2.39 2000/10/16 00:07:24 bkorb Exp $
+#$Id: optcode.tpl,v 2.40 2000/10/17 02:57:00 bkorb Exp $
 =]
 #include "[=(. hdrname)=]"
 [=
@@ -156,11 +156,9 @@ FOR flag "\n" =][=
       (error (sprintf "\n\tDefault argument %d duplicates %d\n"
                       (for-index) default-opt-index) ))
 
-  ;;  IF this is the default option AND this option takes an argument,
-  ;;  THEN remember this index
+  ;;  IF this is the default option then remember this index
   ;;
-  (if (and (exist? "default")
-           (> (len "flag_arg") 0))
+  (if (and (exist? "default"))
       (set! default-opt-index (for-index)) ) =][=
 
 ENDFOR flag

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.16 2000/10/07 22:52:08 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.17 2000/10/17 02:57:00 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -65,21 +65,26 @@
  *  for "opt_name" are available.
  */
 
-#define OPTST_INIT         0x0000  /* Initial compiled value            */
-#define OPTST_SET          0x0001  /* Set via the "SET_OPT()" macro     */
-#define OPTST_PRESET       0x0002  /* Set via an RC/INI file            */
-#define OPTST_DEFINED      0x0004  /* Set via a command line option     */
-#define OPTST_SET_MASK     0x000F  /* mask of flags that show set state */
-#define OPTST_EQUIVALENCE  0x0010  /* selected by equiv'ed option       */
-#define OPTST_DISABLED     0x0020  /* option with disable marker        */
-#define OPTST_NO_INIT      0x0100  /* option cannot be preset           */
-#define OPTST_NUMBER_OPT   0x0200  /* option is number option           */
-#define OPTST_NUMERIC      0x0400  /* option has numeric value          */
-#define OPTST_STACKED      0x0800  /* opt uses stackOptArg procedure    */
-#define OPTST_DISABLEOK    0x1000  /* option may be disabled            */
-#define OPTST_INITENABLED  0x2000  /* option defaults to enabled        */
-#define OPTST_DOCUMENT     0x4000  /* opt is for documentation only     */
-#define OPTST_PERSISTENT   0xFF00  /* mask of flags that do not change  */
+#define OPTST_INIT         0x00000  /* Initial compiled value            */
+#define OPTST_SET          0x00001  /* Set via the "SET_OPT()" macro     */
+#define OPTST_PRESET       0x00002  /* Set via an RC/INI file            */
+#define OPTST_DEFINED      0x00004  /* Set via a command line option     */
+#define OPTST_SET_MASK     0x0000F  /* mask of flags that show set state */
+
+#define OPTST_EQUIVALENCE  0x00010  /* selected by equiv'ed option       */
+#define OPTST_DISABLED     0x00020  /* option with disable marker        */
+
+#define OPTST_NO_INIT      0x00100  /* option cannot be preset           */
+#define OPTST_NUMBER_OPT   0x00200  /* option is number option           */
+#define OPTST_STACKED      0x00400  /* opt uses stackOptArg procedure    */
+#define OPTST_DISABLEOK    0x00800  /* option may be disabled            */
+#define OPTST_INITENABLED  0x01000  /* option defaults to enabled        */
+#define OPTST_DOCUMENT     0x02000  /* opt is for documentation only     */
+#define OPTST_ENUMERATION  0x04000  /* opt is an enum (keyword list)     */
+#define OPTST_BOOLEAN      0x08000  /* opt is boolean-valued             */
+#define OPTST_NUMERIC      0x10000  /* option has numeric value          */
+
+#define OPTST_PERSISTENT   0xFFF00  /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)
@@ -129,7 +134,6 @@
 #define tCUC      const unsigned char
 #define tUC       unsigned char
 #define tCC       const char
-#define tUS       unsigned short
 #define tUI       unsigned int
 #define tUL       unsigned long
 
@@ -201,8 +205,8 @@ struct optDesc {
     tCUC              optMinCt;
     tCUC              optMaxCt;
 
-    tUC               optOccCt;         /* PUBLIC */
-    tUS               fOptState;        /* PUBLIC */
+    tUL               optOccCt;         /* PUBLIC */
+    tUL               fOptState;        /* PUBLIC */
     char*             pzLastArg;        /* PUBLIC */
     void*             optCookie;        /* PUBLIC */
 
@@ -358,10 +362,17 @@ void    putBourneShell PROTO(( tOptions* pOpts ));
 void    export_options_to_guile PROTO(( tOptions* ));
 
 /*
+ *  doEnumerationOption will find a string in a table of strings and
+ *  return the index cast as a char* value.  USAGE will be invoked if
+ *  the string is not found in the table.
+ */
+char*   optionEnumerationVal PROTO(( tOptions*, tOptDesc*, tCC**, int ));
+
+/*
  *  stackOptArg saves the option argument into an option-specific list.
  *  It will allocate the list the first time and extend it as needed.
  */
-tOptProc stackOptArg, unstackOptArg;
+tOptProc stackOptArg, unstackOptArg, optionBooleanVal, optionNumericVal;
 
 #ifdef  __cplusplus
 }

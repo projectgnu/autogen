@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   $Date: 2000/10/15 22:13:41 $
+## Last Modified:   $Date: 2000/10/17 02:57:00 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.32 2000/10/15 22:13:41 bkorb Exp $
+## $Id: Makefile.am,v 2.33 2000/10/17 02:57:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -23,7 +23,7 @@ INCLUDES	= -I$(top_srcdir)/snprintfv -I$(top_srcdir) \
 
 pkgdata_DATA	= \
         aginfo.tpl    agman1.tpl    optcode.tpl   opthead.tpl   options.tpl  \
-        optlib.tpl    optmain.tpl
+        optlib.tpl    optmain.tpl   stdoptions.def
 
 GENSRC		= genshell.c genshell.h
 EXTRA_DIST	= $(pkgdata_DATA)  $(GENSRC) \
@@ -39,8 +39,9 @@ lib_LTLIBRARIES = libopts.la libguileopts.la
 ##  It is compiled as a part of the makeshell module.
 ##
 libopts_la_SOURCES = \
-	autoopts.c   autoopts.h   makeshell.c  options.h \
-	pgusage.c    putshell.c   save.c       stack.c      streqv.h \
+	autoopts.c   autoopts.h   boolean.c   enumeration.c  \
+	makeshell.c  numeric.c    options.h   pgusage.c      \
+	putshell.c   save.c       stack.c     streqv.h       \
 	streqvcmp.c  usage.c      version.c
 
 libopts_la_LDFLAGS = -no-undefined \

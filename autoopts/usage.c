@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.8 2000/10/07 22:52:08 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.9 2000/10/17 02:57:00 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -66,10 +66,9 @@ tSCC zNumberOpt[]  = "The '-#<number>' option may omit the hash char\n";
 tSCC zHomePath[]   = " - reading file /... %s's exe directory .../%s \n";
 tSCC zExamineFmt[] = " - examining environment variables named %s_*\n";
 tSCC zMust[]       = "\t\t\t\t- must appear between %d and %d times\n";
-tSCC zNoLim[]      = "\t\t\t\t- may appear without limit\n";
+tSCC zNoLim[]      = "\t\t\t\t- may appear multiple times\n";
 tSCC zPreset[]     = "\t\t\t\t- may NOT appear - preset only\n";
 tSCC zUpTo[]       = "\t\t\t\t- may appear up to %d times\n";
-tSCC zReqFlag[]    = "\t\t\t\t- a required option\n";
 tSCC zNoPreset[]   = "\t\t\t\t- may not be preset\n";
 tSCC zAlt[]        = "\t\t\t\t- an alternate for %s\n";
 tSCC zEnab[]       = "\t\t\t\t- enabled by default\n";
@@ -146,6 +145,8 @@ DEF_PROC_2( , void, optionUsage,
         do  {
             tSCC  zReqArg[] = "YES";
             tSCC  zNumArg[] = "Num";
+            tSCC  zKeyArg[] = "Key";
+            tSCC  zBolArg[] = "Bol";
             tSCC  zOptArg[] = "opt";
             tSCC  zNoArg[]  = "no ";
             tSCC  zBreak[]  = "\n%s\n\n%s";
@@ -191,6 +192,13 @@ DEF_PROC_2( , void, optionUsage,
              */
             if ((pOD->fOptState & OPTST_NUMERIC) != 0)
                 pzArgType = zNumArg;
+
+	    else if ((pOD->fOptState & OPTST_BOOLEAN) != 0)
+                pzArgType = zBolArg;
+
+	    else if ((pOD->fOptState & OPTST_ENUMERATION) != 0)
+                pzArgType = zKeyArg;
+
             else switch (pOD->optArgType) {
             case ':': pzArgType = zReqArg; break;
             case '?': pzArgType = zOptArg; break;
@@ -298,13 +306,6 @@ DEF_PROC_2( , void, optionUsage,
              */
             switch (pOD->optMinCt) {
             case 1:
-                /*
-                 *  One is required.
-                 *  We mention maximums in the next case element.
-                 */
-                fputs( zReqFlag, fp );
-                /*FALLTHROUGH*/
-
             case 0:
                 /*
                  *  IF the max is more than one, print an "UP TO" message

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.23 2000/10/07 22:52:08 bkorb Exp $
+ *  $Id: autoopts.c,v 2.24 2000/10/17 02:57:00 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -183,18 +183,10 @@ DEF_PROC_2( STATIC, ag_bool, loadValue,
 DEF_PROC_2( STATIC, void, loadPresetValue, tOptions*, pOpts, tOptDesc*, pOD )
 {
     /*
-     *  IF the option is numeric,
-     *  THEN make sure it is not an omit (no/NO) value,
-     *       and then set the pointer to the numeric value
-     */
-    if ((pOD->fOptState & OPTST_NUMERIC) != 0) {
-        pOD->pzLastArg = (char*)strtol( pOD->pzLastArg, (char**)NULL, 0 );
-
-    /*
-     *  OTHERWISE, the interpretation of the option value depends
+     *  The interpretation of the option value depends
      *  on the type of value argument the option takes
      */
-    } else switch (pOD->optArgType ) {
+    switch (pOD->optArgType ) {
     case ARG_MAY:
         if (pOD->pzLastArg == NULL)
             break;
@@ -1090,19 +1082,6 @@ DEF_PROC_3( STATIC, tOptDesc*, optionGet,
               pOpts->pzCurOpt = (char*)NULL;
           }
       }
-
-    /*
-     *  IF this option requires a numeric value,
-     *  THEN convert it to a number now.
-     */
-    if ((pRes->fOptState & OPTST_NUMERIC) != 0) {
-        if (pRes->pzLastArg == (char*)NULL) {
-            pOpts->curOptIdx = argCt;
-            pOpts->pzCurOpt  = (char*)NULL;
-            return NO_OPT_DESC;  /* ERROR COMPLETION */
-        }
-        pRes->pzLastArg = (char*)strtol( pRes->pzLastArg, (char**)NULL, 0 );
-    }
 
     return pRes;  /* SUCCESSFUL RETURN */
 }
