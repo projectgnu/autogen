@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     $Date: 2003/05/26 03:14:59 $
+## Last Modified:     $Date: 2003/07/09 02:23:55 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 3.9 2003/05/26 03:14:59 bkorb Exp $
+## $Id: aginfo-tpl.in,v 3.10 2003/07/09 02:23:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -225,6 +225,29 @@ must not appear in combination with any of the following options:
       ENDFOR=].
 [=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
+
+    IF  (~* (get "arg-type") "key|set") =]@item
+This option takes a keyword as its argument[=
+
+      CASE arg-type   =][=
+      =* key          =][= (set! extra-ct (+ extra-ct 1)) =].
+The argument sets an enumeration value that can be tested by comparing[=
+
+      =* set          =][= (set! extra-ct (+ extra-ct 1)) =] list.
+Each entry turns on or off membership bits.  These bits can be tested
+with bit tests against[=
+      ESAC arg-type   =] the option value macro ([=
+(string-upcase (string-append
+(if (exist? "prefix") (string-append (get "prefix") "_") "")
+"OPT_VALUE_" (get "name")  )) =]).
+The available keywords are:
+@example
+[= (shellf "columns --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+            (join "\n" (stack "keyword"))  ) =]
+@end example
+[=
+
+    ENDIF key/set arg =][=
 
     IF (> extra-ct 0) =][=
       (set! extra-text (out-pop #t)) =]
