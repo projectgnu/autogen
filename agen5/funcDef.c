@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 1.21 1999/11/07 04:13:25 bruce Exp $
+ *  $Id: funcDef.c,v 1.22 1999/11/09 04:58:14 bruce Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -197,11 +197,11 @@ spanTemplate( char* pzQte, tDefList* pDefList )
     char* pzStartMark   = pCurTemplate->zStartMac;
 
     char* pzStartMacro  = strstr( pzQte, pzStartMark );
-    char* pzExpEnd = (char*)skipExpression( pzQte, strlen( pzQte ));
+    char* pzExpEnd = (char*)skipNestedExpression( pzQte, strlen( pzQte ));
     char* pzText = pzQte;
     char* p;
     char  q;
-    int   mac_ct = 0;
+    int   mac_ct = 1;
 
     if ((pzStartMacro == (char*)NULL) || (pzExpEnd < pzStartMacro))
         return spanQuote( pzQte );
@@ -224,7 +224,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
          *  THEN it is time to skip over it.
          */
         if (pzQte == pzStartMacro) {
-            mac_ct++;
+            mac_ct += 2;
             pzQte = (char*)skipMacro( pzStartMacro ) + endMacLen;
             memcpy( (void*)p, pzStartMacro, (pzQte - pzStartMacro) );
             p += (pzQte - pzStartMacro);
@@ -273,7 +273,9 @@ spanTemplate( char* pzQte, tDefList* pDefList )
  NUL_termination:
 
     {
-        size_t alocSize = sizeof( tTemplate ) + (mac_ct * sizeof( tMacro))
+        tSCC zAnon[] = "* anonymous *";
+        size_t alocSize = sizeof( tTemplate ) + sizeof( zAnon )
+            + (mac_ct * sizeof( tMacro))
             + (pzQte - pzText) + strlen( pCurTemplate->pzFileName ) + 16;
         tTemplate* pNewT;
         alocSize &= ~0x0F;
@@ -284,7 +286,7 @@ spanTemplate( char* pzQte, tDefList* pDefList )
         pNewT->fd       = -1;
         strcpy( pNewT->zStartMac, pCurTemplate->zStartMac );
         strcpy( pNewT->zEndMac, pCurTemplate->zEndMac );
-        loadMacros( pNewT, pCurTemplate->pzFileName, (char*)NULL, pzText );
+        loadMacros( pNewT, pCurTemplate->pzFileName, zAnon, pzText );
         pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize );
         pNewT = templateFixup( pNewT, pNewT->descSize );
         sprintf( pzText, "[ 0x%08X ]", pNewT );
@@ -398,7 +400,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         while (isspace( *pzScan ))     pzScan++;
         pDL->pzExpr = pzScan;
         pDL->de.valType = VALTYP_TEXT;
-        pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
+        pzScan = (char*)skipNestedExpression( pzScan, strlen( pzScan ));
 
         /*
          *  Figure out what kind of expression we have
@@ -427,6 +429,11 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             /*
              *  Process the quoted strings now
              */
+            if ((pzScan - pDL->pzExpr) < 24) {
+                char* pz = (char*)AGALOC( 24 );
+                memcpy( (void*)pz, pDL->pzExpr, (pzScan - pDL->pzExpr) );
+                pDL->pzExpr = pz;
+            }
             spanTemplate( pDL->pzExpr, pDL );
 
             /*
@@ -604,6 +611,7 @@ anonymousTemplate( void* p, tDefEntry* pCurDef )
     pfp = (tFpStack*)AGALOC( sizeof( tFpStack ));
     pfp->pPrev = NULL;
     pfp->pzName = (char*)zTFil;
+    pCurFp = pfp;
 
     unlink( zTFil );
     pfp->pFile = fopen( zTFil, "w+" FOPEN_BINARY_FLAG );

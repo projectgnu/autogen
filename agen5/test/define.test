@@ -9,7 +9,7 @@
 # Last Modified:     Fri Oct  1 10:27:21 1999				      
 #            by:     Bruce Korb <autogen@linuxbox.com>			      
 #
-# $Id: define.test,v 1.1 1999/11/06 19:56:40 bruce Exp $
+# $Id: define.test,v 1.2 1999/11/09 04:58:14 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -91,7 +91,7 @@ cat > $testname.out <<_EOF_
 0 Argument list:
 	arg[ 0 ] = one
 	arg[ 1 ] = the second arg = the second
-	arg[ 2 ] = Saturday, 11/06/99
+	arg[ 2 ] = `date +'%A, %D'`
 	arg[ 3 ] = done.
 
      non first/last value: secondary = 2
