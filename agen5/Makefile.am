@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
-## Last Modified:   $Date: 2002/04/01 03:19:42 $
+## Last Modified:   $Date: 2002/04/20 00:38:44 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.8 2002/04/01 03:19:42 bkorb Exp $
+## $Id: Makefile.am,v 3.9 2002/04/20 00:38:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS     = test
@@ -118,7 +118,7 @@ gen : $(GEN_LIST)
 dist : autogen.texi autogen.1
 
 ../snprintfv/snprintfv.h :
-	@if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
+	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
 	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
 
 # Makefile.am ends here
