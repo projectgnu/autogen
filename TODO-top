@@ -27,6 +27,5 @@
 * implement _FOR x IN a, b, c, ...
 * rewrite in guile (instead of C)
 * parse the autogen macros with a guile translator
-* write a general definition extraction tool (a la src/makedefs.sh)
 * write code for "autogetopt" (GNU getopt), or
   possibly the new glibc argp parser.
