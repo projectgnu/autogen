@@ -5,7 +5,7 @@ AutoGen5 template man=%s.1
 ## ---------------------------------------------------------------------
 ## agman1.tpl -- Template for command line man pages
 ## 
-##  AutoOpts copyright 1992-1999 Bruce Korb
+##  AutoOpts copyright 1992-2000 Bruce Korb
 ## 
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <autogen@linuxbox.com>
@@ -13,7 +13,7 @@ AutoGen5 template man=%s.1
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.7 2000/03/13 00:00:51 bruce Exp $
+## $Id: agman1-tpl.in,v 2.8 2000/03/19 19:16:06 bruce Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -204,7 +204,7 @@ FOR flag
           ENDIF:+][+:
         ENDIF  :+][+:
       ENDIF :+]
-[+:descrip:+][+:
+[+:descrip:+].[+:
       IF (exist? "min") :+]
 This option is required to appear.[+:ENDIF:+][+:
       IF (exist? "max") :+]
@@ -230,22 +230,21 @@ This option must not appear in combination with any of the following options:
 [+: FOR flags_cant ", " :+][+:flags_cant:+][+:ENDFOR:+].[+:ENDIF:+]
 .sp
 [+: # SED
-   -e convert @code into \fB...\fP phrases
-   -e convert @file into \fI...\fP phrases
-   -e convert @var into \fB...\fP phrases
-   -e Remove the '@' prefix from curly braces
-   -e Indent example regions
-   -e Delete example command
-   -e Replade "end example" command with ".br"
-   -e Replace "@*" command with ".br"
+   convert @code, @var and @samp into \fB...\fP phrases
+   convert @file into \fI...\fP phrases
+   convert @var into \fB...\fP phrases
+   Remove the '@' prefix from curly braces
+   Indent example regions
+   Delete example command
+   Replace "end example" command with ".br"
+   Replace "@*" command with ".br"
 
    NB:  backslashes are interpreted three times: by AutoGen, sed and nroff.
         Thus, for nroff to see one backslash, use four (4)!!
 
    ):+][+: % doc `sed \
- -e 's;@code{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e 's;@\\(code|var|samp\\){\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
  -e 's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
- -e 's;@var{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
  -e 's/@\\([{}]\\)/\\1/' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \
  -e '/^ *@ *example/d' \
@@ -311,8 +310,8 @@ ENDIF:+]
 .PP
 Released under [+:
 CASE copyright.type :+][+:
- =  gpl :+]the GNU Public License[+:
- = lgpl :+]the GNU Public License with Library Extensions[+:
+ =  gpl :+]the GNU General Public License[+:
+ = lgpl :+]the GNU General Public License with Library Extensions[+:
  =  bsd :+]the Free BSD License[+:
  *      :+]a proprietary copyright[+:
 ESAC :+].

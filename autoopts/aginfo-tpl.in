@@ -10,7 +10,7 @@
 ## Last Modified:     Thu Jul  8 15:06:49 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 2.10 2000/03/16 02:25:43 bruce Exp $
+## $Id: aginfo-tpl.in,v 2.11 2000/03/19 19:16:14 bruce Exp $
 ## ---------------------------------------------------------------------
 ##
 =]
@@ -62,7 +62,7 @@ ESAC =].
 [=(out-push-new (string-append (out-name) ".tmp"))
   (shell (string-append "f=" (out-name))) =][=
 FOR flag =][=
-  IF (> (len "doc") 0)
+  IF (not (exist? "documentation"))
 =]* [=(sprintf
          "%s %-24s"
          (. down-prog-name)
@@ -90,7 +90,7 @@ This is the automatically generated usage text for [=prog_name=]:
 
 @example
 
-[= (shell (sprintf "PROG=%1$s
+[= (shellf "PROG=%1$s
 
     if [ ! -f ${PROG} ]
     then PROG=`echo $PROG | tr '[A-Z]' '[a-z]'` ; fi
@@ -112,12 +112,15 @@ This is the automatically generated usage text for [=prog_name=]:
         (if (exist? "flag.value")  "-?"
                                    "help" ))
 
-    ))  =]
-@end example
+    )  =]
+@end example[=
 
-[=
+#  FOR all options, except the `documentation' options, ...  =][=
+
 FOR flag=][=
-   IF (> (len "doc") 0) =]
+
+  IF (not (exist? "documentation")) =]
+
 @node [=(. down-prog-name)=] [=% name (string-tr! "%s" "A-Z^_" "a-z--") =]
 @[=CASE (getenv "LEVEL") =][=
    = chapter    =][=
@@ -127,8 +130,54 @@ FOR flag=][=
           % value " (-%s)" =]
 @cindex [=(. down-prog-name)=]-[=% name (string-tr! "%s" "A-Z^_" "a-z--")=]
 
-[=doc=]
-[=ENDIF=][=
+[=descrip=].[=
+
+    IF (exist? "min") =]
+This option is required to appear.[=
+    ENDIF=][=
+
+    IF (exist? "max") =]
+This option may appear [=
+      IF % max (= "%s" "NOLIMIT")
+       =]an unlimited number of times[=
+      ELSE
+       =]up to [=max=] times[=
+      ENDIF=].[=
+    ENDIF=][=
+
+    IF (exist? "enabled") =]
+This option is enabled by default.[=
+    ENDIF=][=
+
+    IF (exist? "no_preset") =]
+This option may not be preset with environment variables
+or in initialization (rc) files.[=
+    ENDIF=][=
+
+    IF (exist? "settable") =]
+This option can be set within the program using a special purpose macro.[=
+    ENDIF=][=
+
+    IF (exist? "equivalence") =]
+This option is a member of the [=equivalence=] class of options.[=
+    ENDIF=][=
+
+    IF (exist? "flags_must") =]
+This opton must appear in combination with the following options:
+[=     FOR flags_must ", " =][=flags_must=][=
+       ENDFOR=].[=
+    ENDIF=][=
+
+    IF (exist? "flags_cant") =]
+This option must not appear in combination with any of the following options:
+[=     FOR flags_cant ", " =][=flags_cant=][=
+       ENDFOR=].[=
+    ENDIF=]
+
+[= ?% doc '%s' "This option is undocumented." =][=
+
+
+  ENDIF  `doc' exists =][=
 ENDFOR flag=][=
 
 aginfo.tpl ends here =]
