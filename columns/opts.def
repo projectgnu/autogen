@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.16 1999/09/22 15:13:29 bkorb Exp $
+ *   $Id: opts.def,v 1.17 1999/09/22 15:17:33 bkorb Exp $
  */
 
 /*
@@ -100,6 +100,7 @@ flag = {
 flag = {
     name      = first_indent;
     flag_arg  = ":";
+    flags_must= indent;
     arg_name  = l-pfx;
     descrip   = "First line prefix";
     doc =
