@@ -10,7 +10,7 @@
 ## Last Modified:     Wed Sep 23 10:44:02 1998
 ##            by:     Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.1 1998/09/23 20:29:08 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.2 1998/09/24 17:43:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -91,7 +91,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Invocation::           Running Autogen
 * Installation::         What Gets Installed Where
 * Autoopts::             Automated Option Processing
-* GenDefs::              Extract Definitions from Source
+* GetDefs::              Extract Definitions from Source
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::	 Function index
@@ -818,12 +818,11 @@ and there may be some variables you have to set to make it work.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
 @page
-@node GenDefs
+@node GetDefs
 @chapter Extract Definitions from Source
-@cindex gendefs
+@cindex getdefs
 [=_INCLUDE getdefs/getdefs.texi=]
-Also included with autogen is a tool for extracting definitions
-from 
+
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore

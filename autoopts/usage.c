@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 2.3 1998/09/22 23:23:09 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 2.4 1998/09/24 17:43:54 bkorb Exp $
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -327,7 +327,7 @@ optionUsage( tOptions*  pOptions, int exitCode )
 
             if (  NAMED_OPTS( pOptions )
                && (pOptions->specOptIdx.default_opt == pOD->optIndex))
-                fputs( "\t\t\t\t- is the default option for unnamed options\n",
+                fputs( "\t\t\t\t- default option for unnamed options\n",
                        fp );
         }  while (pOD++, optNo++, (--ct > 0));
     }

@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: opthead.tpl,v 2.5 1998/09/23 20:29:03 bkorb Exp $
+#$Id: opthead.tpl,v 2.6 1998/09/24 17:43:57 bkorb Exp $
 =]
 [= # "This is the first time through.  Save the output file name
               so the 'C' file can '#include' it easily." =][=
@@ -219,7 +219,7 @@ _ENDIF version-exists =]
  *  "The option argument value as a pointer to string.
  *  Note that argument values that have been specified as numbers
  *  are stored as numbers.  For such options, use instead the
- *  OPT_VALUE_<OPTION> define.  It is used thus:
+ *  @code{OPT_VALUE_optname} define.  It is used thus:
  *
  *  @example
  *  if (HAVE_OPT( OPT_NAME )) @{\n"
@@ -344,7 +344,7 @@ _ENDIF version-exists =]
  *  Yields true if the option defaults to disabled and
  *  @code{ISUNUSED_OPT()} would yield true.  It also yields true if
  *  the option has been specified with a disablement prefix,
- *  disablement value or the @code{DISABLE_OPT_<OPTION>} macro was invoked.
+ *  disablement value or the @code{DISABLE_OPT_OPT_NAME} macro was invoked.
 =*/
 =]
 #define  ENABLED_[=prefix _up #_ +=]OPT(n) (! DISABLED_OPT(& [=prefix _up #_ +
@@ -795,8 +795,7 @@ _ENDIF=][=#
  *
  *  description:
  *
- *  This is just a shortcut for @xref{RESTART_OPT(n)},
- *  where @code{n} equals @code{1}.
+ *  This is just a shortcut for RESTART_OPT(1) (@xref{RESTART_OPT}).
 =*/
 =]
 #define    START_[=prefix _up #_ +=]OPT    RESTART_[=prefix _up #_ +
