@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 1.6 1999/10/31 22:45:03 bruce Exp $
+ *  $Id: funcCase.c,v 1.7 1999/10/31 23:09:01 bruce Exp $
  *
  *  This module implements the _CASE text function.
  */
@@ -699,7 +699,7 @@ Select_Match_Always( char* pzText, char* pzMatch )
  *  desc:
  *
  *  The arguments are evaluated and converted to a string, if necessary.
- *  @xref{EXPR}.  The scope of the macro is up to the next ESAC.
+ *  (@xref{EXPR}.)  The scope of the macro is up to the next ESAC.
  *  Within the scope of a CASE, this string is matched against case
  *  selection macros.  There are sixteen match macros that are derived
  *  from four different ways the test may be performed.
