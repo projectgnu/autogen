@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 1.9 1999/11/02 04:08:00 bruce Exp $
+ *   $Id: opts.def,v 1.10 1999/11/06 03:25:41 bruce Exp $
  */
 
 /*
@@ -299,6 +299,11 @@ flag = {
     "This will cause @code{set -x} to be executed in the shell, with\n"
     "the resultant output printed to /dev/tty.";
 };
+export = "#undef DEBUG\n#define DEBUG 1";
+#else
+export = "#ifdef DEBUG\n"
+         "#error DEBUG defined, but not defined for options\n"
+         "#endif";
 #endif
 
 flag = {
