@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+# $Id: optlib.tpl,v 4.3 2005/02/13 01:48:00 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -627,7 +627,9 @@ DEFINE Option_Descriptor =][=
                  (index-name "equivalence")
                  "NO_EQUIVALENT"
          )   ) =],
-     /* min, max, act ct */ [=(if (exist? "min") (get "min") "0")=], [=
+     /* min, max, act ct */ [=
+         (if (exist? "min") (get "min")
+             (if (exist? "must-set") "1" "0" )) =], [=
          (if (=* (get "arg-type") "set") "NOLIMIT"
              (if (exist? "max") (get "max") "1") ) =], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,

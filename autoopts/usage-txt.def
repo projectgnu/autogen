@@ -28,7 +28,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.3 2005/01/23 23:33:06 bkorb Exp $
+   $Id: usage-txt.def,v 4.4 2005/02/13 01:48:00 bkorb Exp $
  */
 
 /*
@@ -182,6 +182,16 @@ utxt = { ut-type = cch_t;
 utxt = { ut-type = cch_t;
          ut-name = ForkFail;
          ut-text = "fs error %d (%s) on fork - cannot obtain %s usage\n";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = FSErrOptLoad;
+         ut-text = "File error %d (%s) opening %s for loading options\n";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = FSErrReadFile;
+         ut-text = "fs error %d (%s) reading file %s\n";
 };
 
 utxt = { ut-type = cch_t;
@@ -413,6 +423,11 @@ utxt = { ut-type = cch_t;
          ut-name = PresetIntro;
          ut-text = "\n\
 The following option preset mechanisms are supported:\n";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = Prog;
+         ut-text = "program";
 };
 
 utxt = { ut-type = cch_t;

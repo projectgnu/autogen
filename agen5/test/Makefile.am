@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-10-30 13:07:53 bkorb"
+## Time-stamp:      "2005-02-12 17:12:41 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2005/02/13 01:47:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -51,5 +51,13 @@ $(TESTS) : perm-stamp
 
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test || :
+
+tests-current :
+	if test -f .sdir ; then for f in $(TESTS) ; do \
+	cp `cat .sdir`/$$f $$f ; done ; fi
+
+verbose : tests-current
+	rm -rf FAILURES testdir ; \
+	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
 
 # Makefile.am ends here

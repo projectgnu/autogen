@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2004-11-29 18:46:58 bkorb"
+## Time-stamp:      "2005-02-09 18:58:57 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2005/01/23 23:33:04 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2005/02/13 01:47:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -44,7 +44,7 @@ EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
 nodist_autogen_SOURCES = ag.c
 autogen_SOURCES = $(GEN_CSRC)
 autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
-autogen_LDFLAGS = $(DYNAMIC_AG)
+autogen_LDFLAGS = $(DYNAMIC_AG) -rpath $(libdir)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
 FUNCLIST        = \
 	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c

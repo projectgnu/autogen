@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.6 2005/02/04 03:57:11 bkorb Exp $
+ *  $Id: load.c,v 4.7 2005/02/13 01:48:00 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -52,12 +52,6 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
-static void
-loadOptionLine(
-    tOptions*  pOpts,
-    tOptState* pOS,
-    char*      pzLine,
-    tDirection direction );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
@@ -238,7 +232,7 @@ optionMakePath(
 }
 
 
-static void
+LOCAL void
 loadOptionLine(
     tOptions*  pOpts,
     tOptState* pOS,
@@ -374,121 +368,6 @@ loadOptionLine(
 }
 
 
-/*
- *  filePreset
- *
- *  Load a file containing presetting information (a configuration file).
- */
-LOCAL void
-filePreset(
-    tOptions*     pOpts,
-    const char*   pzFileName,
-    int           direction )
-{
-    typedef enum { SEC_NONE, SEC_LOOKING, SEC_PROCESS } teSec;
-    teSec   sec     = SEC_NONE;
-    FILE*   fp      = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
-    u_int   saveOpt = pOpts->fOptSet;
-    char    zLine[ 0x1000 ];
-
-    if (fp == NULL)
-        return;
-
-    /*
-     *  DO NOT STOP ON ERRORS.  During preset, they are ignored.
-     */
-    pOpts->fOptSet &= ~OPTPROC_ERRSTOP;
-
-    /*
-     *  FOR each line in the file...
-     */
-    while (fgets( zLine, sizeof( zLine ), fp ) != NULL) {
-        char*  pzLine = zLine;
-
-        for (;;) {
-            pzLine += strlen( pzLine );
-
-            /*
-             *  IF the line is full, we stop...
-             */
-            if (pzLine >= zLine + (sizeof( zLine )-2))
-                break;
-            /*
-             *  Trim of trailing white space.
-             */
-            while ((pzLine > zLine) && isspace(pzLine[-1])) pzLine--;
-            *pzLine = NUL;
-            /*
-             *  IF the line is not continued, then exit the loop
-             */
-            if (pzLine[-1] != '\\')
-                break;
-            /*
-             *  insert a newline and get the continuation
-             */
-            pzLine[-1] = '\n';
-            fgets( pzLine, sizeof( zLine ) - (int)(pzLine - zLine), fp );
-        }
-
-        pzLine = zLine;
-        while (isspace( *pzLine )) pzLine++;
-
-        switch (*pzLine) {
-        case NUL:
-        case '#':
-            /*
-             *  Ignore blank and comment lines
-             */
-            continue;
-
-        case '[':
-            /*
-             *  Enter a section IFF sections are requested and the section
-             *  name matches.  If the file is not sectioned,
-             *  then all will be handled.
-             */
-            if (pOpts->pzPROGNAME == NULL)
-                goto fileDone;
-
-            switch (sec) {
-            case SEC_NONE:
-                sec = SEC_LOOKING;
-                /* FALLTHROUGH */
-
-            case SEC_LOOKING:
-            {
-                int secNameLen = strlen( pOpts->pzPROGNAME );
-                if (  (strncmp( pzLine+1, pOpts->pzPROGNAME, secNameLen ) != 0)
-                   || (pzLine[secNameLen+1] != ']')  )
-                    continue;
-                sec = SEC_PROCESS;
-                break;
-            }
-
-            case SEC_PROCESS:
-                goto fileDone;
-            }
-            break;
-
-        default:
-            /*
-             *  Load the line only if we are not in looking-for-section state
-             */
-            if (sec == SEC_LOOKING)
-                continue;
-        }
-
-        {
-            tOptState st = { NULL, OPTST_PRESET, TOPT_UNDEFINED, 0, NULL };
-            loadOptionLine( pOpts, &st, pzLine, direction );
-        }
-    } fileDone:;
-
-    pOpts->fOptSet = saveOpt;
-    fclose( fp );
-}
-
-
 /*=export_func  optionLoadLine
  *
  * what:  process a string for an option name and value
@@ -516,62 +395,12 @@ optionLoadLine(
     tOptions*  pOpts,
     tCC*       pzLine )
 {
-    tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
+    tOptState st = OPTSTATE_INITIALIZER(SET);
     char* pz;
     AGDUPSTR( pz, pzLine, "user option line" );
     loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
     AGFREE( pz );
 }
-
-
-/*=export_func  doLoadOpt
- * private:
- *
- * what:  Load an option rc/ini file
- * arg:   + tOptions* + pOpts    + program options descriptor +
- * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
- *
- * doc:
- *  Processes the options found in the file named with pOptDesc->pzLastArg.
-=*/
-void
-doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
-{
-    /*
-     *  IF the option is not being disabled,
-     *  THEN load the file.  There must be a file.
-     *  (If it is being disabled, then the disablement processing
-     *  already took place.  It must be done to suppress preloading
-     *  of ini/rc files.)
-     */
-    if (! DISABLED_OPT( pOptDesc )) {
-        struct stat sb;
-        if (stat( pOptDesc->pzLastArg, &sb ) != 0) {
-            tSCC zMsg[] =
-                "File error %d (%s) opening %s for loading options\n";
-
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
-
-            fprintf( stderr, zMsg, errno, strerror( errno ),
-                     pOptDesc->pzLastArg );
-            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            /* NOT REACHED */
-        }
-
-        if (! S_ISREG( sb.st_mode )) {
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
-
-            fprintf( stderr, zNotFile, pOptDesc->pzLastArg );
-            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
-            /* NOT REACHED */
-        }
-
-        filePreset( pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS );
-    }
-}
-
 /*
  * Local Variables:
  * mode: C

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-01-21 21:51:25 bkorb"
+## Time-stamp:      "2005-02-12 11:27:26 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.4 2005/01/22 16:21:16 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.5 2005/02/13 01:48:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -61,17 +61,9 @@ cp pathfind.c compat.h ${top_builddir}/pkg/${tag}/compat/.
 
 cd ${top_builddir}/pkg/${tag}
 
-${top_builddir}/agen5/autogen -L ${top_srcdir}/config --writable <<-	'_EOF_'
-
-	autogen definitions conftest.tpl;
-	output-file = libopts.m4;
-	group       = libopts;
-	#define       LIBOPTS  1
-	#include      libopts.def
-	_EOF_
-
-exec 3>> libopts.m4
-cat >&3 <<-	EOMacro
+cp ${top_srcdir}/config/libopts.m4 .
+chmod u+w libopts.m4
+cat >> libopts.m4 <<-	\EOMacro
 
 	dnl @synopsis  LIBOPTS_CHECK
 	dnl
@@ -80,14 +72,9 @@ cat >&3 <<-	EOMacro
 	dnl to SUBDIRS and run all the config tests that the library needs.
 	dnl
 	AC_DEFUN([LIBOPTS_CHECK],[
-	`sed -n '/Check for standard headers/,/gen, pathfind/p' \
-	     ${top_srcdir}/configure.in`
-	EOMacro
-
-cat >&3 <<- \EOMacro
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
 	  AC_ARG_WITH([autoopts-config],
-        AC_HELP_STRING([--with-autoopts-config],
+          AC_HELP_STRING([--with-autoopts-config],
 	                   [specify the config-info script]),
 	    [lo_cv_with_autoopts_config=${with_autoopts_config}],
 	    AC_CACHE_CHECK([whether autoopts-config is specified],

@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 4.3 2005/01/23 23:33:06 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 4.4 2005/02/13 01:48:00 bkorb Exp $
  *
  *  This module implements argument sorting.
  */
@@ -204,7 +204,7 @@ optionSort( tOptions* pOpts )
     int    optsIdx = 0;
     int    opdsIdx = 0;
 
-    tOptState os = { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL };
+    tOptState os = OPTSTATE_INITIALIZER(DEFINED);
 
     /*
      *  Disable for POSIX conformance

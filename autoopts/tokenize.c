@@ -205,7 +205,7 @@ copy_raw( ch_t** ppDest, cc_t** ppSrc )
  * There are two types of quoted strings: single quoted (@code{'}) and
  * double quoted (@code{"}).  Singly quoted strings are fairly raw in that
  * escape characters (@code{\\}) are simply another character, except when
- * preceeding the following characters:
+ * preceding the following characters:
  * @example
  * @code{\\}  double backslashes reduce to one
  * @code{'}   incorporates the single quote into the string

@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-02-05 08:04:46 bkorb"
+# Time-stamp:        "2005-02-12 10:59:22 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.7 2005/02/07 18:19:01 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.8 2005/02/13 01:48:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -192,7 +192,8 @@ pre )
       $GDexe --version ) > /dev/null || exit 1
 
     ( cd ${srcdir}/config
-      set -x
+      set -x -e
+      ${AGexe} -L. libopts.def
       ${AGexe} -L. misc.def
     ) || exit 1
     cp ${srcdir}/snprintfv/snprintfv.m4 ${srcdir}/config/.

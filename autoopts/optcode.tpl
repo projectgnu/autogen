@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.7 2005/02/04 05:10:07 bkorb Exp $
+#$Id: optcode.tpl,v 4.8 2005/02/13 01:48:00 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -152,7 +152,7 @@ IF (exist? "version")   =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_MAY,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max act ct  */ 0, 1, 0,
+     /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
@@ -168,7 +168,7 @@ ENDIF =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max act ct  */ 0, 1, 0,
+     /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
@@ -182,7 +182,7 @@ ENDIF =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ ARG_NONE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max act ct  */ 0, 1, 0,
+     /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,
@@ -200,7 +200,7 @@ IF (exist? "homerc")
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max act ct  */ 0, 1, 0,
+     /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_INIT,
      /* last opt argumnt */ NULL,
      /* arg list/cookie  */ NULL,

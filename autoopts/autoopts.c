@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.7 2005/02/07 18:19:01 bkorb Exp $
+ *  $Id: autoopts.c,v 4.8 2005/02/13 01:47:59 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -688,7 +688,7 @@ doImmediateOpts( tOptions* pOpts )
      *  are marked for immediate processing.
      */
     for (;;) {
-        tOptState optState = OPTSTATE_INITIALIZER;
+        tOptState optState = OPTSTATE_INITIALIZER(PRESET);
 
         switch (nextOption( pOpts, &optState )) {
         case FAILURE: goto optionsDone;
@@ -721,7 +721,7 @@ doRegularOpts( tOptions* pOpts )
      *  non-standard programs that require it.)
      */
     for (;;) {
-        tOptState optState = OPTSTATE_INITIALIZER;
+        tOptState optState = OPTSTATE_INITIALIZER(DEFINED);
 
         switch (nextOption( pOpts, &optState )) {
         case FAILURE: goto optionsDone;
@@ -771,7 +771,7 @@ doPresets( tOptions* pOpts )
     }
     else {
         doEnvPresets( pOpts, ENV_IMM );
-        if (configFileLoad( pOpts, NULL ) < 0)
+        if (internalFileLoad( pOpts ) < 0)
             return FAILURE;
         doEnvPresets( pOpts, ENV_NON_IMM );
     }

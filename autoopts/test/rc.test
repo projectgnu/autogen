@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-02-03 19:09:48 bkorb"
+# Time-stamp:        "2005-02-12 08:12:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.3 2005/02/04 03:57:11 bkorb Exp $
+# $Id: rc.test,v 4.4 2005/02/13 01:48:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -24,7 +24,10 @@ fi
 
 echo "creating ${testname}.def in `pwd`"
 
-testname="${testname}" test_main="yes" \
+export testname
+export TESTNAME=`echo ${testname} | tr '[a-z]' '[A-Z]'`
+
+test_main="yes" \
 argument="mumble" long_opts="yes" \
 ${SHELL-sh} ${stdopts} option second:init third:
 
@@ -99,8 +102,9 @@ _EOF_
 
 
 cmp  ${testname}.cmds ${testname}.test || {
+  df="`diff -c ${testname}.test ${testname}.cmds`"
   cd ..
-  failure ${testname}.cmds AND ${testname}.test do not compare equal
+  failure "${df}"
 }
 
 # # # # # # # # # # SECOND TEST OUTPUT FILE # # # # # # # # #
@@ -108,9 +112,14 @@ cmp  ${testname}.cmds ${testname}.test || {
 cat >> ../${testname}.rc/${testname}.file  <<_EOF_
 [TEST_MUMBLE]
 second    fourth
-[TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
+<!--  This is a comment
+      and it should have no effect -->
+[TEST_${TESTNAME}]
 second  = fifth
-[TEST_`echo ${testname} | tr '[a-z]' '[A-Z]'`]
+
+# this is another comment
+#
+[TEST_STUMBLE]
 second  : sixth
 _EOF_
 
@@ -128,8 +137,9 @@ export TEST_RC_THIRD
 _EOF_
 
 cmp  ${testname}.cmds ${testname}.test || {
+  df="`diff -c ${testname}.test ${testname}.cmds`"
   cd ..
-  failure ${testname}.cmds AND ${testname}.test do not compare equal
+  failure "${df}"
 }
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #

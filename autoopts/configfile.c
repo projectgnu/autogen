@@ -1,6 +1,6 @@
 
 /*
- *  $Id: configfile.c,v 4.1 2005/02/11 01:33:57 bkorb Exp $
+ *  $Id: configfile.c,v 4.2 2005/02/13 01:48:00 bkorb Exp $
  *
  *  configuration/rc/ini file handling.
  */
@@ -47,6 +47,42 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
+
+/* = = = START-STATIC-FORWARD = = = */
+/* static forward declarations maintained by :mkfwd */
+static char*
+handleConfig(
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction );
+
+static char*
+handleStructure(
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction );
+
+static char*
+handleDirective(
+    tOptions*     pOpts,
+    char*         pzText );
+
+static char*
+handleComment( char* pzText );
+
+static char*
+handleProgramSection(
+    tOptions*     pOpts,
+    char*         pzText );
+
+static void
+filePreset(
+    tOptions*     pOpts,
+    const char*   pzFileName,
+    int           direction );
+/* = = = END-STATIC-FORWARD = = = */
 
 /*
  *  Make sure the option descriptor is there and that we understand it.
@@ -116,46 +152,324 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
 }
 
 
-/*=export_func configFileLoad
+/*
+ *  handleConfig -- "pzText" points to the start of some value name.
+ */
+static char*
+handleConfig(
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction )
+{
+    char* pzName = pzText++;
+    char* pzEnd  = strchr( pzText, '\n' );
+
+    while (ISNAMECHAR( *pzText ))  pzText++;
+    while (isspace( *pzText )) pzText++;
+    if (pzText > pzEnd) {
+    name_only:
+        *pzEnd++ = NUL;
+        loadOptionLine( pOpts, pOS, pzName, direction );
+        return pzEnd;
+    }
+
+    /*
+     *  Either the first character after the name is a ':' or '=',
+     *  or else we must have skipped over white space.  Anything else
+     *  is an invalid format and we give up parsing the text.
+     */
+    if ((*pzText == '=') || (*pzText == ':')) {
+        while (isspace( *++pzText ))   ;
+        if (pzText > pzEnd)
+            goto name_only;
+    } else if (! isspace(pzText[-1]))
+        return NULL;
+
+    /*
+     *  IF the value is continued, remove the backslash escape and push "pzEnd"
+     *  on to a newline *not* preceded by a backslash.
+     */
+    if (pzEnd[-1] == '\\') {
+        char* pcD = pzEnd-1;
+        char* pcS = pzEnd;
+
+        for (;;) {
+            char ch = *(pcS++);
+            switch (ch) {
+            case NUL:
+                pcS = NULL;
+
+            case '\n':
+                *pcD = NUL;
+                pzEnd = pcS;
+                goto copy_done;
+
+            case '\\':
+                if (*pcS == '\n') {
+                    ch = *(pcS++);
+                }
+                /* FALLTHROUGH */
+            default:
+                *(pcD++) = ch;
+            }
+        } copy_done:;
+
+    } else {
+        /*
+         *  The newline was not preceded by a backslash.  NUL it out
+         */
+        *(pzEnd++) = NUL;
+    }
+
+    fprintf( stderr, "Loading option:  ``%s''\n", pzName );
+
+    /*
+     *  "pzName" points to what looks like text for one option/configurable.
+     *  It is NUL terminated.  Process it.
+     */
+    loadOptionLine( pOpts, pOS, pzName, direction );
+
+    return pzEnd;
+}
+
+
+/*
+ *  handleStructure -- "pzText" points to a '<' character, followed by an alpha.
+ */
+static char*
+handleStructure(
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction )
+{
+    char* pzName = ++pzText;
+    while (ISNAMECHAR( *pzText ))  pzText++;
+
+    /*
+     *  The name marker must end in either ">" or "/>".  If not we
+     *  give up on this entry.  We don't know what this file might be.
+     */
+    if (*pzText == '/') {
+        if (pzText[1] != '>')
+            return NULL;
+        *pzText = NUL;
+        pzText += 2;
+        loadOptionLine( pOpts, pOS, pzName, direction );
+        return pzText;
+    }
+
+    if (*pzText != '>') {
+        pzText = strchr( pzText, '>');
+        if (pzText != NULL)
+            pzText++;
+        return pzText;
+    }
+
+    *pzText = NUL;
+
+    /*
+     *  Find the end of the option text and NUL terminate it
+     */
+    {
+        char   z[64], *pz = z;
+        size_t len = (pzText - pzName) + 4;
+        if (len > sizeof(z))
+            pz = AGALOC(len, "scan name");
+
+        sprintf( pz, "</%s>", pzName );
+        *pzText = ' ';
+        pzText = strstr( pzText, pz );
+        if (pz != z) free(pz);
+
+        if (pzText == NULL)
+            return pzText;
+
+        *pzText = NUL;
+        
+        pzText += len-1;
+    }
+
+    /*
+     *  "pzName" points to what looks like text for one option/configurable.
+     *  It is NUL terminated.  Process it.
+     */
+    loadOptionLine( pOpts, pOS, pzName, direction );
+
+    return pzText;
+}
+
+
+/*
+ *  handleDirective -- "pzText" points to a "<?" sequence
+ */
+static char*
+handleDirective(
+    tOptions*     pOpts,
+    char*         pzText )
+{
+    char   ztitle[16] = "<?";
+    size_t title_len = strlen( zProg );
+    size_t name_len;
+
+    if (  (strncmp( pzText+2, zProg, title_len ) != 0)
+       || (! isspace( pzText[title_len+2] )) )  {
+        pzText = strchr( pzText+2, '>' );
+        if (pzText != NULL)
+            pzText++;
+        return pzText;
+    }
+
+    name_len = strlen( pOpts->pzProgName );
+    strcpy( ztitle+2, zProg );
+    title_len += 2;
+
+    do  {
+        pzText += title_len;
+
+        if (isspace(*pzText)) {
+            while (isspace(*pzText))  pzText++;
+            if (  (strneqvcmp( pzText, pOpts->pzProgName, name_len ) == 0)
+               && (pzText[name_len] == '>'))  {
+                pzText += name_len + 1;
+                break;
+            }
+        }
+
+        pzText = strstr( pzText, ztitle );
+    } while (pzText != NULL);
+
+    return pzText;
+}
+
+
+/*
+ *  handleComment -- "pzText" points to a "<!" sequence
+ */
+static char*
+handleComment( char* pzText )
+{
+    char* pz = strstr( pzText, "-->" );
+    if (pz != NULL)
+        pz += 3;
+    return pz;
+}
+
+
+/*
+ *  handleProgramSection -- "pzText" points to a '[' character.
+ */
+static char*
+handleProgramSection(
+    tOptions*     pOpts,
+    char*         pzText )
+{
+    size_t len = strlen( pOpts->pzPROGNAME );
+    if (   (strncmp( pzText+1, pOpts->pzPROGNAME, len ) == 0)
+        && (pzText[len+1] == ']'))
+        return strchr( pzText + len + 2, '\n' );
+
+    if (len > 16)
+        return NULL;
+
+    {
+        char z[24];
+        sprintf( z, "[%s]", pOpts->pzPROGNAME );
+        pzText = strstr( pzText, z );
+    }
+
+    if (pzText != NULL)
+        pzText = strchr( pzText, '\n' );
+    return pzText;
+}
+
+
+/*
+ *  filePreset
  *
- * what: Load the locatable config files, in order
- *
- * arg:  + tOptions*   + pOpts  + program options descriptor +
- * arg:  + const char* + pzProg + program name +
- *
- * ret_type:  int
- * ret_desc:  0 -> SUCCESS, -1 -> FAILURE
- *
- * doc:
- *
- * This function looks in all the specified directories for a configuration
- * file ("rc" file or "ini" file) and processes any found twice.  The first
- * time through, they are processed in reverse order (last file first).  At
- * that time, only "immediate action" configurables are processed.  For
- * example, if the last named file specifies not processing any more
- * configuration files, then no more configuration files will be processed.
- * Such an option in the @strong{first} named directory will have no effect.
- *
- * Once the immediate action configurables have been handled, then the
- * directories are handled in normal, forward order.  In that way, later
- * config files can override the settings of earlier config files.
- *
- * See the AutoOpts documentation for a thorough discussion of the
- * config file format.
- *
- * err:  Returns the value, "-1" if the option (config file) descriptor
- *       is out of date or indecipherable.  Otherwise, the value "0" will
- *       always be returned.
-=*/
-int
-configFileLoad( tOptions* pOpts, const char* pzProgram )
+ *  Load a file containing presetting information (a configuration file).
+ */
+static void
+filePreset(
+    tOptions*     pOpts,
+    const char*   pzFileName,
+    int           direction )
+{
+    tmap_info_t   cfgfile;
+    char*         pzFileText =
+        text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
+    char*         pzEndText;
+    tOptState     st = OPTSTATE_INITIALIZER(PRESET);
+
+    if (pzFileText == MAP_FAILED)
+        return;
+
+    /*
+     *  IF this is called via "optionProcess", then we are presetting.
+     *  This is the default and the PRESETTING bit will be set.
+     *  If this is called via "configFileLoad", then the bit is not set
+     *  and we consider stuff set herein to be "set" by the client program.
+     */
+    if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
+        st.flags = OPTST_SET;
+
+    pzEndText = pzFileText + cfgfile.txt_size;
+
+    do  {
+        while (isspace( *pzFileText ))  pzFileText++;
+
+        if (isalpha( *pzFileText )) {
+            pzFileText = handleConfig( pOpts, &st, pzFileText, direction );
+
+        } else switch (*pzFileText) {
+        case '<':
+            if (isalpha( pzFileText[1] ))
+                pzFileText = handleStructure(pOpts, &st, pzFileText, direction);
+
+            else switch (pzFileText[1]) {
+            case '?':
+                pzFileText = handleDirective( pOpts, pzFileText );
+                break;
+
+            case '!':
+                pzFileText = handleComment( pzFileText );
+                break;
+
+            case '/':
+                pzFileText = strchr( pzFileText+2, '>' );
+                if (pzFileText++ != NULL)
+                    break;
+
+            default:
+                goto all_done;
+            }
+            break;
+
+        case '[':
+            pzFileText = handleProgramSection( pOpts, pzFileText );
+            break;
+
+        case '#':
+            pzFileText = strchr( pzFileText+1, '\n' );
+            break;
+
+        default:
+            goto all_done; /* invalid format */
+        }
+    } while (pzFileText != NULL);
+
+ all_done:
+    text_munmap( &cfgfile );
+}
+
+
+LOCAL int
+internalFileLoad( tOptions* pOpts )
 {
     int     idx;
     int     inc = DIRECTION_PRESET;
     char    zFileName[ 4096 ];
-
-    if (! SUCCESSFUL( validateOptionsStruct( pOpts, pzProgram )))
-        return -1;
 
     if (pOpts->papzHomeList == NULL)
         return 0;
@@ -229,10 +543,95 @@ configFileLoad( tOptions* pOpts, const char* pzProgram )
             inc =  DIRECTION_PROCESS;
         }
     } /* For every path in the home list, ... */
-
-    return 0;
 }
 
+
+/*=export_func configFileLoad
+ *
+ * what: Load the locatable config files, in order
+ *
+ * arg:  + tOptions*   + pOpts  + program options descriptor +
+ * arg:  + const char* + pzProg + program name +
+ *
+ * ret_type:  int
+ * ret_desc:  0 -> SUCCESS, -1 -> FAILURE
+ *
+ * doc:
+ *
+ * This function looks in all the specified directories for a configuration
+ * file ("rc" file or "ini" file) and processes any found twice.  The first
+ * time through, they are processed in reverse order (last file first).  At
+ * that time, only "immediate action" configurables are processed.  For
+ * example, if the last named file specifies not processing any more
+ * configuration files, then no more configuration files will be processed.
+ * Such an option in the @strong{first} named directory will have no effect.
+ *
+ * Once the immediate action configurables have been handled, then the
+ * directories are handled in normal, forward order.  In that way, later
+ * config files can override the settings of earlier config files.
+ *
+ * See the AutoOpts documentation for a thorough discussion of the
+ * config file format.
+ *
+ * err:  Returns the value, "-1" if the option (config file) descriptor
+ *       is out of date or indecipherable.  Otherwise, the value "0" will
+ *       always be returned.
+=*/
+int
+configFileLoad( tOptions* pOpts, const char* pzProgram )
+{
+    if (! SUCCESSFUL( validateOptionsStruct( pOpts, pzProgram )))
+        return -1;
+
+    pOpts->pzProgName = pzProgram;
+    return internalFileLoad( pOpts );
+}
+
+
+/*=export_func  doLoadOpt
+ * private:
+ *
+ * what:  Load an option rc/ini file
+ * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  Processes the options found in the file named with pOptDesc->pzLastArg.
+=*/
+void
+doLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
+{
+    /*
+     *  IF the option is not being disabled,
+     *  THEN load the file.  There must be a file.
+     *  (If it is being disabled, then the disablement processing
+     *  already took place.  It must be done to suppress preloading
+     *  of ini/rc files.)
+     */
+    if (! DISABLED_OPT( pOptDesc )) {
+        struct stat sb;
+        if (stat( pOptDesc->pzLastArg, &sb ) != 0) {
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+                return;
+
+            fprintf( stderr, zFSErrOptLoad, errno, strerror( errno ),
+                     pOptDesc->pzLastArg );
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            /* NOT REACHED */
+        }
+
+        if (! S_ISREG( sb.st_mode )) {
+            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+                return;
+
+            fprintf( stderr, zNotFile, pOptDesc->pzLastArg );
+            (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
+            /* NOT REACHED */
+        }
+
+        filePreset(pOpts, pOptDesc->pzLastArg, DIRECTION_PROCESS);
+    }
+}
 /*
  * Local Variables:
  * mode: C

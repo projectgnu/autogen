@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-01-23 15:31:08 bkorb"
+ *  Time-stamp:      "2005-02-12 09:42:38 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.6 2005/01/23 23:33:05 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.7 2005/02/13 01:48:00 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -84,6 +84,8 @@
 typedef int tDirection;
 #define DIRECTION_PRESET  -1
 #define DIRECTION_PROCESS  1
+#define DIRECTION_CALLED   0
+
 #define PROCESSING(d)     ((d)>0)
 #define PRESETTING(d)     ((d)<0)
 
@@ -137,13 +139,13 @@ typedef enum {
 
 typedef struct {
     tOptDesc*  pOD;
+    tCC*       pzOptArg;
     tUL        flags;
     teOptType  optType;
     int        argType;
-    tCC*       pzOptArg;
 } tOptState;
-#define OPTSTATE_INITIALIZER \
-    { NULL, OPTST_DEFINED, TOPT_UNDEFINED, 0, NULL }
+#define OPTSTATE_INITIALIZER(st) \
+    { NULL, NULL, OPTST_ ## st, TOPT_UNDEFINED, 0 }
 
 #define TEXTTO_TABLE \
         _TT_( LONGUSAGE ) \
@@ -254,6 +256,56 @@ typedef struct {
                   OPTST_TWICE)                                  \
     || (((_flg) & (OPTST_DISABLED|OPTST_DISABLE_TWICE))  ==     \
                   (OPTST_DISABLED|OPTST_DISABLE_TWICE)  ))
+
+/*
+ *  text_mmap structure.  Only active on platforms with mmap(2).
+ */
+#ifdef HAVE_SYS_MMAN_H
+#  include <sys/mman.h>
+#else
+#  ifndef  PROT_READ
+#   define PROT_READ    0x01
+#  endif
+#  ifndef  PROT_WRITE
+#   define PROT_WRITE   0x02
+#  endif
+#  ifndef  MAP_SHARED
+#   define MAP_SHARED   0x01
+#  endif
+#  ifndef  MAP_PRIVATE
+#   define MAP_PRIVATE  0x02
+#  endif
+#endif
+
+#ifndef MAP_FAILED
+#  define  MAP_FAILED   ((void*)-1)
+#endif
+
+#ifndef  _SC_PAGESIZE
+# ifdef  _SC_PAGE_SIZE
+#  define _SC_PAGESIZE _SC_PAGE_SIZE
+# endif
+#endif
+
+/*
+ *  This is an output only structure used by text_mmap and text_munmap.
+ *  Clients must not alter the contents and must provide it to both
+ *  the text_mmap and text_munmap procedures.  BE ADVISED: if you are
+ *  mapping the file with PROT_WRITE the NUL byte at the end MIGHT NOT
+ *  BE WRITABLE.  In any event, that byte is not be written back
+ *  to the source file.  ALSO: if "txt_data" is valid and "txt_errno"
+ *  is not zero, then there *may* not be a terminating NUL.
+ */
+typedef struct {
+    void*       txt_data;      /* text file data   */
+    size_t      txt_size;      /* actual file size */
+    int         txt_fd;        /* file descriptor  */
+    size_t      txt_full_size; /* mmaped mem size  */
+    int         txt_zero_fd;   /* fd for /dev/zero */
+    int         txt_errno;     /* warning code     */
+    int         txt_prot;      /* "prot" flags     */
+    int         txt_flags;     /* mapping type     */
+} tmap_info_t;
 
 /*
  *  Define and initialize all the user visible strings.
