@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 2.28 2000/10/28 18:17:32 bkorb Exp $
+ *  $Id: autoopts.c,v 2.29 2000/11/03 03:11:30 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -92,10 +92,10 @@ tSCC zEquiv[]       = "-equivalence";
 tSCC zErrOnly[]     = "ERROR:  only ";
 
 typedef int tDirection;
-#define DIRECTION_PRESET   1
-#define DIRECTION_PROCESS -1
-#define PROCESSING(d)     ((d)<0)
-#define PRESETTING(d)     ((d)>0)
+#define DIRECTION_PRESET  -1
+#define DIRECTION_PROCESS  1
+#define PROCESSING(d)     ((d)>0)
+#define PRESETTING(d)     ((d)<0)
 
 /*
  *  loadValue
@@ -990,10 +990,12 @@ DEF_PROC_3( STATIC void filePreset,
             const char*,  pzFileName,
             int,          direction )
 {
-    FILE*  fp  = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
-    u_int saveOpt = pOpts->fOptSet;
-
-    char  zLine[ 0x1000 ];
+    typedef enum { SEC_NONE, SEC_LOOKING, SEC_PROCESS } teSec;
+    teSec   sec     = SEC_NONE;
+    FILE*   fp      = fopen( pzFileName, (const char*)"r" FOPEN_BINARY_FLAG );
+    u_int   saveOpt = pOpts->fOptSet;
+    size_t  secNameLen;
+    char    zLine[ 0x1000 ];
 
     if (fp == (FILE*)NULL)
         return;
@@ -1037,16 +1039,54 @@ DEF_PROC_3( STATIC void filePreset,
         pzLine = zLine;
         while (isspace( *pzLine )) pzLine++;
 
-        /*
-         *  Ignore blank and comment lines
-         */
-        if ((*pzLine == NUL) || (*pzLine == '#'))
+        switch (*pzLine) {
+        case NUL:
+        case '#':
+            /*
+             *  Ignore blank and comment lines
+             */
             continue;
+
+        case '[':
+            /*
+             *  Enter a section IFF sections are requested and the section
+             *  name matches.  If the file is not sectioned,
+             *  then all will be handled.
+             */
+            if (pOpts->pzPROGNAME == (char*)NULL)
+                goto fileDone;
+
+            switch (sec) {
+            case SEC_NONE:
+                sec = SEC_LOOKING;
+                secNameLen = strlen( pOpts->pzPROGNAME );
+                /* FALLTHROUGH */
+
+            case SEC_LOOKING:
+                if (  (strncmp( pzLine+1, pOpts->pzPROGNAME, secNameLen ) != 0)
+                   || (pzLine[secNameLen+1] != ']')  )
+                    continue;
+                sec = SEC_PROCESS;
+                break;
+
+            case SEC_PROCESS:
+                goto fileDone;
+            }
+            break;
+
+        default:
+            /*
+             *  Load the line only if we are not in looking-for-section state
+             */
+            if (sec == SEC_LOOKING)
+                continue;
+        }
+
         {
-            tOptState st   = { NULL, OPTST_PRESET, TOPT_UNDEFINED, 0, NULL };
+            tOptState st = { NULL, OPTST_PRESET, TOPT_UNDEFINED, 0, NULL };
             loadOptionLine( pOpts, &st, pzLine, direction );
         }
-    }
+    } fileDone:;
 
     pOpts->fOptSet = saveOpt;
     fclose( fp );
@@ -1184,11 +1224,11 @@ DEF_PROC_1( STATIC tSuccess doPresets,
 #   define SKIP_RC_FILES \
     DISABLED_OPT(&(pOpts->pOptDesc[ pOpts->specOptIdx.save_opts+1]))
 
-    tSuccess  res;
-
-    res = doImmediateOpts( pOpts );
-    if (! SUCCESSFUL( res ))
-        return res;
+    {
+        tSuccess  res = doImmediateOpts( pOpts );
+        if (! SUCCESSFUL( res ))
+            return res;
+    }
 
     /*
      *  IF there are no RC files,
@@ -1203,25 +1243,40 @@ DEF_PROC_1( STATIC tSuccess doPresets,
     doEnvPresets( pOpts, ENV_IMM );
 
     {
-        int   idx = 0;
+        int   idx;
         int   inc = DIRECTION_PRESET;
         tCC*  pzPath;
         char  zFileName[ 4096 ];
 
         /*
-         *  For every path in the home list, ...  *TWICE*
+         *  Find the last RC entry (highest priority entry)
          */
-        while (idx >= 0) {
+        for (idx = 0; pOpts->papzHomeList[ idx+1 ] != NULL; ++idx)  ;
+
+        /*
+         *  For every path in the home list, ...  *TWICE* We start at the last
+         *  (highest priority) entry, work our way down to the lowest priority,
+         *  handling the immediate options.
+         *  Then we go back up, doing the normal options.
+         */
+        for (;;) {
             struct stat StatBuf;
+
+            /*
+             *  IF we've reached the bottom end, change direction
+             */
+            if (idx < 0) {
+                inc = DIRECTION_PROCESS;
+                idx = 0;
+            }
+
             pzPath = pOpts->papzHomeList[ idx ];
 
             /*
-             *  IF we've reached the top end, change direction
+             *  IF we've reached the top end, bail out
              */
-            if (pzPath == (char*)NULL) {
-                inc = DIRECTION_PROCESS;
-                pzPath = pOpts->papzHomeList[ --idx ];
-            }
+            if (pzPath = (char*)NULL)
+                break;
 
             idx += inc;
 
@@ -1253,14 +1308,14 @@ DEF_PROC_1( STATIC tSuccess doPresets,
             filePreset( pOpts, zFileName, inc );
 
             /*
-             *  IF we are now to skip RC files AND we are on the way up,
-             *  THEN change direction.  We must go down now.
+             *  IF we are now to skip RC files AND we are presetting,
+             *  THEN change direction.  We must go the other way.
              */
-            if ((SKIP_RC_FILES) && (inc > 0)) {
-                idx -= 2;
-                inc = -1;
+            if ((SKIP_RC_FILES) && PRESETTING(inc)) {
+                idx -= inc;  /* go back and reprocess current file */
+                inc =  DIRECTION_PROCESS;
             }
-        }
+        } /* For every path in the home list, ... */
     }
 
     doEnvPresets( pOpts, ENV_NON_IMM );

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 2.9 2000/10/27 15:18:20 bkorb Exp $
+ *  save.c  $Id: save.c,v 2.10 2000/11/03 03:11:30 bkorb Exp $
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -160,9 +160,9 @@ DEF_PROC_1( STATIC char* findFileName,
              *  and that string must name a directory
              */
             char*  pzDirCh = strrchr( pzDir, '/' );
-                        if (pzDirCh == (char*)NULL) {
+            if (pzDirCh == (char*)NULL) {
                 stBuf.st_mode = S_IFREG;
-                break;
+                break;  /* bail out of error condition */
             }
 
             if (pzDirCh != (char*)NULL) {
@@ -326,9 +326,8 @@ DEF_PROC_1( void optionSave,
                      pzTime );
 #ifdef HAVE_ALLOCATED_CTIME
             /*
-             *  The return values for ctime(), localtime(), and
-             *  gmtime() point to static data whose content is
-             *  overwritten by each call.
+             *  The return values for ctime(), localtime(), and gmtime()
+             *  normally point to static data that is overwritten by each call.
              */
             free( (void*)pzTime );
 #endif

@@ -1,3 +1,10 @@
+2000-11-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.[ch]: implement RC file sections, de-implement
+	"detail file" handling in "more-help" mode.
+	* autoopts/optcode.tpl: omit the detail file pointer
+	* autoopts/save.c: slight reformatting.
+
 2000-10-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*: much cleaning up

@@ -1,6 +1,6 @@
 
 /*
- *  options.h  $Id: options_h.tpl,v 2.24 2000/10/31 22:16:56 bkorb Exp $
+ *  options.h  $Id: options_h.tpl,v 2.25 2000/11/03 03:11:30 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -252,7 +252,7 @@ struct options {
     const char*       pzUsageTitle;
     const char*       pzExplain;
     const char*       pzDetail;
-    const char*       pzRcSection;
+    void*             futureUse1;
     tpUsageProc       pUsageProc;
     tUI               fOptSet;
     tUI               curOptIdx;
@@ -263,7 +263,7 @@ struct options {
     tOptDesc*         pOptDesc;
     int               origArgCt;
     char**            origArgVect;
-    void*             futureUse;
+    void*             futureUse2;
 };
 
 #ifdef  __cplusplus

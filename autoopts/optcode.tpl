@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 2.47 2000/10/31 22:16:55 bkorb Exp $
+#$Id: optcode.tpl,v 2.48 2000/11/03 03:11:30 bkorb Exp $
 
 =]
 #include "[=(. hdrname)=]"
@@ -292,12 +292,6 @@ ELSE
 #define zDetail (const char*)NULL[=
 ENDIF=][=
 
-IF (exist? "rcsection") =]
-tSCC    zRcSection[] = [= (kr-string (get "rcsection")) =];[=
-ELSE=]
-#define zRcSection (const char*)NULL[=
-ENDIF=][=
-
 IF (not (exist? "usage")) =]
 extern  tUsageProc optionUsage;[=
 ENDIF=][=
@@ -314,7 +308,7 @@ tOptions [=(. pname)=]Options = {
     (char*)NULL,    (char*)NULL,    zPROGNAME,
     zRcName,        zCopyright,     zCopyrightNotice,
     zFullVersion,   apzHomeList,    zUsageTitle,
-    zExplain,       zDetail,        zRcSection,
+    zExplain,       zDetail,        (void*)NULL,
     [=IF (exist? "usage")=][=usage=][=
       ELSE               =]optionUsage[=ENDIF=],
     ( OPTPROC_NONE[=                IF (not (exist? "allow_errors"))     =]
