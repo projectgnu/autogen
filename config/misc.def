@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2004/07/02 18:31:52 $
+ *  Last Modified:     $Date: 2004/08/12 03:26:58 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 3.34 2004/07/02 18:31:52 bkorb Exp $
+ *  $Id: misc.def,v 3.35 2004/08/12 03:26:58 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 3.34 $";
+version = "$Revision: 3.35 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -23,11 +23,10 @@ test = {
     action = { act-type = script;
       act-text = <<-  _EOF_
 		AC_SUBST(OPTS_TESTDIR)
-		    AC_SUBST(TOP_DIRLIST)
 		    AC_SUBST(AGEN5_TESTS)
-		    TOP_DIRLIST='$(SHELL_DIRS) $(XML2AG_DIR)'
 		    OPTS_TESTDIR=test
 		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
+		    AM_CONDITIONAL(DO_SHELL_CMDS,true)
 		_EOF_; };
 
     action = { no; act-type = script;
@@ -35,19 +34,34 @@ test = {
 		TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
 		    OPTS_TESTDIR=
 		    AGEN5_TESTS='$(NOSHELL_TESTS)'
+		    AM_CONDITIONAL(DO_SHELL_CMDS,false)
 		_EOF_; };
 
     doc = <<-  _EOF_
-	AutoGen is now capable of acting as a CGI service.  In that capacity,
-	it is extremely dangerous to allow text to be interpreted by a shell.
-	To ensure that that cannot happen accidentally, it is best to
-	completely disable subshell services by specifying, --disable-shell.
-	In the default, enabled state, the "yes-subst[itution]" will enable
-	the getdefs, columns and doc subdirectory builds.
+	If you wish to use AutoGen as a CGI service, template shell scripts
+	should be disabled.  It is extremely dangerous to allow text to be
+	interpreted by a shell.  To ensure that that cannot happen
+	accidentally, it is best to completely disable subshell services by
+	specifying, --disable-shell.  In the default, enabled state, the
+	"yes-subst[itution]" will enable the getdefs, columns and doc
+	subdirectory builds.
 	_EOF_;
 };
 
 #include libopts.def
+
+test   = {
+    name   = daemon;
+    type   = enable;
+    check  = 'using autogen as a daemon';
+    action = { act-type = define; };
+
+    doc = <<-  _EOF_
+	AutoGen may be used as a daemon process.  It will accept definitions
+	either over a socket connection or through a pipe fattach-ed to a file.
+	Which is selected by the argument to the @code{--daemon} option.
+	_EOF_;
+};
 
 test   = {
   name     = "guile";
@@ -101,16 +115,16 @@ test   = {
   action    = { no; asis;
     act-type  = script;
     act-text  = <<- _END_OF_SCRIPT_
-		AC_DEFINE([scm_primitive_eval_x], [scm_eval_x],
-		        [Define this if no scm_primitive_eval_x])
-		AC_DEFINE([scm_t_port], [scm_port], [Define this if no scm_t_port])
-		_END_OF_SCRIPT_; };
+	AC_DEFINE([scm_primitive_eval_x], [scm_eval_x],
+	        [Define this if no scm_primitive_eval_x])
+	AC_DEFINE([scm_t_port], [scm_port], [Define this if no scm_t_port])
+	_END_OF_SCRIPT_; };
 
   doc = <<- _END_OF_DOC_
-		Guile 1.4 does not have scm_primitive_eval_x,
-		but scm_eval_x will work as well.  If this is necessary, then the port
-		type structure will be named "scm_port" instead of "scm_t_port", too.
-		_END_OF_DOC_;
+	Guile 1.4 does not have scm_primitive_eval_x,
+	but scm_eval_x will work as well.  If this is necessary, then the port
+	type structure will be named "scm_port" instead of "scm_t_port", too.
+	_END_OF_DOC_;
 };
 
 test   = {
@@ -127,14 +141,15 @@ test   = {
   config   = { cflags-arg = '--cflags'; libs-arg = '--libs'; };
   action = { yes; act-type = script;
              act-text = 'CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
-                        '    LIBS="${ag_save_LIBS}"';
+                        '    LIBS="${ag_save_LIBS}"' "\n"
+                        '    AM_CONDITIONAL(HAVE_XML_LIB,true)' "\n"
+                        '    ';
            };
   run-mode   =  "link";
 
-  action   = { asis;
+  action   = { asis; no;
     act-type = script;
-    act-text = 'XML2AG_DIR=xml2ag
-    AC_SUBST([XML2AG_DIR])';
+    act-text = 'AM_CONDITIONAL(HAVE_XML_LIB,false)';
   };
 
   doc = <<- _END_OF_DOC_
@@ -142,6 +157,40 @@ test   = {
 		for finding the header and libraries must be provided,
 		or xml2-config must be found in the executable path.
 		_END_OF_DOC_;
+};
+
+test   = {
+  name          = "fattach";
+  type          = "run";
+  check    = "fattach runs";
+  code     = <<- _END_OF_CODE_
+        int fds[2];
+        pipe(fds);
+        return fattach(fds[0],__FILE__);
+_END_OF_CODE_;
+  run-mode      =  "null";
+  code-mode     =  "body";
+
+  action   = { yes; act-type=define; act-text = "1"; };
+
+  doc = "fattach(3) is available but non-functional on some systems.";
+};
+
+test   = {
+  name          = "connld";
+  type          = "run";
+  check    = "connld works";
+  code     = <<- _END_OF_CODE_
+        int fds[2];
+        pipe(fds);
+        return ioctl( fds[0], I_PUSH, "connld" );
+_END_OF_CODE_;
+  run-mode      =  "null";
+  code-mode     =  "body";
+
+  action   = { yes; act-type=define; act-text = "1"; };
+
+  doc = "fattach(3) is available but non-functional on some systems.";
 };
 
 test = {

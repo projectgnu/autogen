@@ -130,9 +130,16 @@ dnl[=
 =]
 AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
-  (define c-text (get "code"))
+  (define c-text (get "code"))  =][=
 
-  mac-name  =]],[[=
+  CASE code-mode  =][=
+  = body  =][=
+    (set! c-text (string-append "int main(int argc,char** argv) {\n"
+          c-text "\nreturn 0; }" )) =][=
+  = all   =][=
+  ESAC    =][=
+  
+  (. mac-name)    =]],[[=
 
   IF (ag-function? fcn-name) =][=
     INVOKE (. fcn-name) =][=
