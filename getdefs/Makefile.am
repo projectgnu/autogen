@@ -10,11 +10,11 @@
 ## Last Modified:   Thu Jul 29 13:41:31 1999				      
 ##            by:   Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.22 1999/10/29 02:36:50 bruce Exp $
+## $Id: Makefile.am,v 2.23 1999/10/31 16:21:26 bruce Exp $
 ## ---------------------------------------------------------------------
 
-bin_PROGRAMS = getdefs
-
+bin_PROGRAMS	= getdefs
+SUBDIRS		= test
 getdefs_SOURCES = getdefs.c getdefs.h opts.c opts.h
 
 GEN_SRC 	= opts.c opts.h getdefs.texi getdefs.menu getdefs.1
