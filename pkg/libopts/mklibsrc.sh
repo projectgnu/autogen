@@ -18,8 +18,6 @@ cp -f COPYING        \
       autoopts.h     \
       boolean.c      \
       enumeration.c  \
-      genshell.c     \
-      genshell.h     \
       numeric.c      \
       options.h      \
       pgusage.c      \
@@ -36,6 +34,7 @@ cd ../compat
 cp *.h pathfind.c ../pkg/${tag}/compat/.
 
 cd ../pkg/${tag}
+mv COPYING COPYING.lgpl
 
 files=`ls -1 *.[ch] | \
 	${top_builddir}/columns/columns -I4 --spread=1 --line='  \\' `
@@ -57,8 +56,17 @@ cat >> libopts.m4 <<-	EOMacro
 	dnl
 	AC_DEFUN([AUTOOPTS_CHECK],[
 	  AC_MSG_CHECKING([whether autoopts-config can be found])
+	  AC_ARG_WITH([autoopts-config],
+        AC_HELP_STRING([--with-autoopts-config],
+	                   [specify the config-info script]),
+	    [lo_cv_with_autoopts_config=\${with_autoopts_config}],
+	    AC_CACHE_CHECK([whether autoopts-config is specified],
+	       lo_cv_with_autoopts_config,
+	       lo_cv_with_autoopts_config=autoopts-config)
+	  ) # end of AC_ARG_WITH
 	  AC_CACHE_VAL([lo_cv_test_autoopts],[
-	    lo_cv_test_autoopts=\`autoopts-config --libs\` 2> /dev/null
+	    aoconfig=\${lo_cv_with_autoopts_config}
+	    lo_cv_test_autoopts=\`\${aoconfig} --libs\` 2> /dev/null
 	    if [ \$? -ne 0 ]
 	    then lo_cv_test_autoopts=no
 	    else if [ -z "\$lo_cv_test_autoopts" ]
@@ -69,13 +77,19 @@ cat >> libopts.m4 <<-	EOMacro
 	
 	  if test "X\${lo_cv_test_autoopts}" != Xno
 	  then
-	    LIBS="\${LIBS} \${lo_cv_test_autoopts}"
+	    LIBOPTS_LDADD="\${lo_cv_test_autoopts}"
+	    LIBOPTS_CFLAGS="\`\${aoconfig} --cflags\`"
+	    LIBOPTS_DIR=''
+	    AC_SUBST(LIBOPTS_LDADD)
+	    AC_SUBST(LIBOPTS_CFLAGS)
+	    AC_SUBST(LIBOPTS_DIR)
 	  else
+	    LIBOPTS_LDADD='\$(top_builddir)/'"${tag}/libopts.la"
+	    LIBOPTS_CFLAGS='-I\$(top_srcdir)/'"${tag}"
 	    INVOKE_LIBOPTS_MACROS
 	    LIBOPTS_DIR=${tag}
-	    AC_SUBST( LIBOPTS_DIR )
 	  fi
-	]) # end of AC_DEFUN of AUTOOPTS_CHECK
+	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
 
 [ -f Makefile.am ] && rm -f Makefile.am
