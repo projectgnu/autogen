@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2003-03-08 12:05:53 bkorb"
+# Time-stamp:        "2003-03-08 16:41:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 3.6 2003/03/08 21:19:52 bkorb Exp $
+# $Id: equiv.test,v 3.7 2003/03/09 00:47:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -74,7 +74,6 @@ $AGEN ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
-
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
@@ -142,7 +141,7 @@ cmp -s ${testname}.h*lp || \
     `diff -c ${testname}.h*lp`"
 
 cat > ${testname}.outbase <<_EOF_
-18 99 696 /tmp/use
+23 109 756 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2
