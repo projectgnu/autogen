@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 1.12 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: autogen.c,v 1.13 2000/10/11 17:01:23 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -199,5 +199,8 @@ signalSetup( void )
     sa.sa_handler = SIG_IGN;
     sigaction( SIGCHLD,  &sa, (struct sigaction*)NULL );
 }
-
-/* end of autogen.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of autogen.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 1.9 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: loadPseudo.c,v 1.10 2000/10/11 17:01:23 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -364,4 +364,8 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
 
     return pzData;
 }
-/* loadPseudo.c ends here */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of loadPseudo.c */

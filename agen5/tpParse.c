@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 1.7 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: tpParse.c,v 1.8 2000/10/11 17:01:23 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -379,4 +379,8 @@ parseTemplate( tTemplate* pT, tMacro* pM, tCC** ppzText )
     *ppzText = (const char*)NULL;
     return pM;
 }
-/* end of tpParse.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of tpParse.c */

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 1.10 2000/09/29 02:31:21 bkorb Exp $
+ *  $Id: funcIf.c,v 1.11 2000/10/11 17:01:23 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -444,4 +444,8 @@ MAKE_LOAD_PROC( While )
     papLoadProc = papLP;
     return pEndMac;
 }
-/* end of funcIf.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of funcIf.c */

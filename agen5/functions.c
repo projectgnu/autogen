@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 1.16 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: functions.c,v 1.17 2000/10/11 17:01:23 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -346,4 +346,8 @@ MAKE_LOAD_PROC( Bogus )
     /* NOTREACHED */
     return (tMacro*)NULL;
 }
-/* end of functions.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of functions.c */

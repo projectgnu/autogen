@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 1.11 2000/09/29 02:31:20 bkorb Exp $
+ *  $Id: defLoad.c,v 1.12 2000/10/11 17:01:23 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition (except the fixed "rootEntry" entry).
@@ -451,4 +451,8 @@ readDefines( void )
         massageDefTree( &pRoot, (tDefEntry*)NULL );
     }
 }
-/* end of defLoad.c */
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * End:
+ * end of defLoad.c */
