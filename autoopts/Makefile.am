@@ -7,10 +7,10 @@
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Thu Jul 29 08:22:08 1999				      
+## Last Modified:   Thu Jul 29 11:57:04 1999				      
 ##            by:   Bruce Korb <korb@datadesign.com>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.18 1999/07/29 15:48:18 bkorb Exp $
+## $Id: Makefile.am,v 2.19 1999/07/29 18:58:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -50,5 +50,8 @@ genshell.c : genshell.def
 ../snprintfv/snprintfv.h :
 	if [ ! -L ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
 	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
+
+../snprintfv/snprintfv/libsnprintfvc.la :
+	cd ../snprintfv/snprintfv ; $(MAKE) libsnprintfvc.la
 
 # Makefile.am ends here
