@@ -1,11 +1,11 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.1 2002/01/19 07:35:24 bkorb Exp $
+#$Id: optcode.tpl,v 3.2 2002/02/01 03:38:00 bkorb Exp $
 
 # Automated Options copyright 1992-2001 Bruce Korb
 
 =]
-#include "[=(. hdrname)=]"
+#include "[=(. header-file)=]"
 [=
 
 INCLUDE "optmain.tpl"

@@ -1,21 +1,7 @@
 [= autogen5 template
-# $Id: opthead.tpl,v 3.2 2002/01/19 07:35:24 bkorb Exp $
+
+# $Id: opthead.tpl,v 3.3 2002/02/01 03:38:00 bkorb Exp $
 # Automated Options copyright 1992-2001 Bruce Korb
-
-=]
-[=
-
-;;  This is the first time through.  Save the output file name
-;;  so the 'C' file can '#include' it easily."
-
-(define hdrname (out-name))
-
-;; The #define name we use to self-exclude the header"
-
-(define defname (string->c-name! (string-upcase!
-                (string-append prog-name "_" hdrname))))
-
-;; Let the real output begin...
 
 =]
 /*
@@ -24,9 +10,7 @@
  *  These macros are documented in the AutoGen info file in the
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
  */
-
-#ifndef [=(. defname)=]
-#define [=(. defname)=]
+[= (make-header-guard "autoopts") =]
 [= Option_Copyright =][=
 % config-header "\n#include \"%s\""=]
 #include <options.h>
@@ -269,4 +253,4 @@ ENDIF=]
 #ifdef  __cplusplus
 }
 #endif
-#endif /* [=(. defname)=] */
+#endif /* [=(. header-guard)=] */
