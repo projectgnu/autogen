@@ -1,5 +1,12 @@
+1999-10-31  Bruce Korb  <autogen@linuxbox.com>
+
+	* doc/auto_gen.tpl:  Reworked
+	* agen5/*:  Documentation rework
+	* getdefs/getdefs.c:  allow for empty string definitions
+	* getdefs/test/*:  Created a test case for getdefs
+	
 1999-10-27  Bruce Korb  <autogen@linuxbox.com>
 
 	AutoGen Version 5:
-	* src/*:  Reworked virtually everything.  See NEWS.
+	* agen5/*:  Reworked virtually everything.  See NEWS.
 	* */*.tpl: Reworked them to the new template format.
