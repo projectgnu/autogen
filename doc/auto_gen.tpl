@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Mon Jun 14 12:09:37 1999                                
+## Last Modified:     Mon Jun 21 12:59:56 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.16 1999/06/14 19:15:55 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.17 1999/06/21 20:04:37 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -52,6 +52,7 @@ _EVAL '
 This file documents [=package=] Version @value{VERSION}
 
 AutoGen copyright @copyright{} [=copyright=] Bruce Korb
+snprintfv copyright @copyright{} 1999 Gary V. Vaughan
 
 [=_eval AutoGen "" _gpl=]
 
@@ -67,6 +68,10 @@ notice identical to this one except for the removal of this paragraph
 @title AutoGen - [=prog_title=]
 @subtitle For version @value{VERSION}, @value{UPDATED}
 @author Bruce Korb
+@author @email{autogen@@linuxbox.com}
+
+@author Gary V. Vaughan
+@author @email{gary@@oranda.demon.co.uk}
 
 @page
 @vskip 0pt plus 1filll
