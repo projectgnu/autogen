@@ -5,10 +5,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   $Date: 2001/06/24 00:47:56 $
+## Last Modified:   $Date: 2001/07/13 04:04:56 $
 ##            by:   Bruce Korb <bkorb@gnu.org>			      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.23 2001/06/24 00:47:56 bkorb Exp $
+## $Id: Makefile.am,v 1.24 2001/07/13 04:04:56 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = \
@@ -18,7 +18,7 @@ TESTS      = \
 	get.test        gperf.test   heredef.test include.test \
 	license.test    match.test   nestmac.test opts.test \
 	output.test     reorder.test snarf.test   stack.test \
-	string.test     suffix.test
+	string.test     suffix.test  in.test
 
 EXTRA_DIST = defs $(TESTS)
 
@@ -32,11 +32,16 @@ EXPRLIST = expFormat.c expGuile.c  expOutput.c expPrint.c  expState.c \
 testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = \
+	CC="$(CC)" CFLAGS='@CFLAGS@' \
 	GDEXE=`cd $(top_builddir)/getdefs; pwd`/@GDEXE@ \
 	AGEXE=`cd $(top_builddir)/agen5  ; pwd`/@AGEXE@ \
+	COLUMNS_EXE="`cd $(top_builddir)/columns ; pwd`/@COLEXE@" \
+	INC="@INCLIST@ $(GUILE_INC)" \
 	testsubdir=$(testsubdir) \
-	top_srcdir=`cd $(top_srcdir) ; pwd` srcdir=`cd $(srcdir) ; pwd` \
-	top_builddir=`cd $(top_builddir) ; pwd` builddir=`cd $(builddir) ; pwd` \
+	top_builddir=`cd $(top_builddir) ; pwd` \
+	builddir=`cd $(builddir) ; pwd` \
+	srcdir=`pwd` \
+	top_srcdir=`cd $(top_srcdir) ; pwd` \
 	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
 
 distclean-local:
