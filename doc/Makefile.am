@@ -8,7 +8,7 @@
 ## Last Modified:   Thu Aug 12 17:19:38 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 3.9 2002/07/27 19:36:21 bkorb Exp $
+## $Id: Makefile.am,v 3.10 2002/07/29 03:24:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -131,10 +131,6 @@ autogen.def : $(DOC_DEPENDS)
 autogen.txt : autogen.texi
 	makeinfo --fill-column=70 --no-split --paragraph-indent=0 \
 	         --no-headers --output=$@ autogen.texi
-
-autogen.lsm : $(top_srcdir)/VERSION $(ODEF) LSM.tpl
-	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-	$(AGEXE) -T $(srcdir)/LSM.tpl $(OPTIONS_DEF)
 
 clobber : maintainer-clean
 
