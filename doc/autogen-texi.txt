@@ -4145,14 +4145,9 @@ in the option descriptor file (@pxref{program attributes}) with the
 @cindex rcfile
 
 Configuration files are enabled by specifying the program attribute
-@code{homerc} (@pxref{program attributes}).  The configured values
-are identified by the long option name followed by white space and any
-associated value.  The value, if any, will continue through the end of
-the last line not continued with a backslash.  Leading and trailing
-white space is stripped.  The newlines are retained, though the preceding
-backslashes are removed.
-
-Configuration files are selected both by the @code{homerc} entries and,
+@code{homerc} (@pxref{program attributes}).  Any option not marked
+with the ``no-preset'' attribute may appear in a configuration file.
+The files loaded are selected both by the @code{homerc} entries and,
 optionally, via a command line option.  The first component of the
 @code{homerc} entry may be an environment variable such as @code{$HOME}, or
 it may also be @code{$$} (@strong{two} dollar sign characters) to specify
@@ -4164,7 +4159,7 @@ homerc = "$$/../share/autogen";
 
 @noindent
 will cause the AutoOpts library to look in the normal autogen datadir
-for an configuration file.
+relative to the current installation directory for autogen.
 
 The configuration files are processed in the order they are specified by
 the @code{homerc} attribute, so that each new file will normally override
@@ -4202,7 +4197,7 @@ stripped from the value.
 If you need more control over the content of the value, you may enclose the
 value in XML style @code{<name> value </name>} brackets.  Within these
 brackets you need not (must not) continue the value data with backslashes.
-You may also select the string formation rules to use, juxt add the attribute
+You may also select the string formation rules to use, just add the attribute
 after the name, thus: @code{<name keep>}.
 
 @table @samp
@@ -4224,7 +4219,8 @@ use backquotes.
 @subsubsection hierarchical values
 
 Not implemented.  Exact syntax and supporting library interface are under
-discussion.
+discussion.  Hierarchicaly valued configurables will have to be specified
+with XML-style @code{<name> ... </name>} brackets.
 
 @node config sections
 @subsubsection configuration file sections
