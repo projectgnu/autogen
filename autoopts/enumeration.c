@@ -1,6 +1,6 @@
 
 /*
- *  $Id: enumeration.c,v 3.24 2004/05/22 00:15:45 bkorb Exp $
+ *  $Id: enumeration.c,v 3.25 2004/10/02 21:40:56 bkorb Exp $
  *
  *   Automated Options Paged Usage module.
  *
@@ -375,7 +375,7 @@ optionSetMembers(
         tCC*      pzArg = pOD->pzLastArg;
         uintptr_t res;
         if ((pzArg == NULL) || (*pzArg == NUL)) {
-            pOD->optCookie = NULL;
+            pOD->optCookie = (void*)0;
             return;
         }
 

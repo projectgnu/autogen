@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.38 2004/08/31 02:35:14 bkorb Exp $
+ *  $Id: autoopts.c,v 3.39 2004/10/02 21:40:56 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -100,6 +100,17 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
     pOD->pzLastArg =  pOptState->pzOptArg;
 
     /*
+     *  IF we are presetting options, then we will ignore any un-presettable
+     *  options.  They are the ones either marked as such, or equivalenced to
+     *  a different option.
+     */
+    if (  ((pOpts->fOptSet & OPTPROC_PRESETTING) != 0)
+       && (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
+          || (pOD->optEquivIndex != NO_EQUIVALENT)
+       )  )
+        return PROBLEM;
+
+    /*
      *  IF this is an equivalence class option,
      *  THEN
      *      Save the option value that got us to this option
@@ -108,15 +119,34 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      *      set the pointer to the equivalence class base
      */
     if (pOD->optEquivIndex != NO_EQUIVALENT) {
-        tOptDesc*  p = pOpts->pOptDesc + pOD->optEquivIndex;
+        tOptDesc* p = pOpts->pOptDesc + pOD->optEquivIndex;
+
+        if (p->optActualIndex == NO_EQUIVALENT) {
+            /*
+             *  First time through, copy over the state
+             *  and add in the equivalence flag
+             */
+            p->optActualValue = pOD->optValue;
+            p->optActualIndex = pOD->optIndex;
+            p->optCookie      = pOD->optCookie;
+            pOptState->flags |= OPTST_EQUIVALENCE;          
+        }
+
+        else if (p->optActualIndex != pOD->optIndex) {
+            /*
+             *  IF this option has been previously equivalenced and
+             *     it was not the same equivalenced-to option,
+             *  THEN we have a usage problem.
+             */
+            fprintf( stderr, zMultiEquiv, p->pz_Name, pOD->pz_Name,
+                     (pOpts->pOptDesc + p->optActualIndex)->pz_Name);
+            return FAILURE;
+        }
 
         /*
-         *  Add in the equivalence flag
+         *  Copy the most recent option argument
          */
-        pOptState->flags |= OPTST_EQUIVALENCE;
-        p->pzLastArg      = pOD->pzLastArg;
-        p->optActualValue = pOD->optValue;
-        p->optActualIndex = pOD->optIndex;
+        p->pzLastArg = pOD->pzLastArg;
         pOD = p;
 
     } else {
@@ -844,6 +874,10 @@ doPresets( tOptions* pOpts )
         return FAILURE;
 
     /*
+     *  Until we return from this procedure, disable non-presettable opts
+     */
+    pOpts->fOptSet |= OPTPROC_PRESETTING;
+    /*
      *  IF there are no RC files,
      *  THEN do any environment presets and leave.
      */
@@ -856,6 +890,8 @@ doPresets( tOptions* pOpts )
         doRcFiles(    pOpts );
         doEnvPresets( pOpts, ENV_NON_IMM );
     }
+    pOpts->fOptSet &= ~OPTPROC_PRESETTING;
+
     return SUCCESS;
 }
 

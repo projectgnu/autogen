@@ -1,6 +1,6 @@
 
 /*
- *  $Id: environment.c,v 3.1 2004/08/31 02:35:14 bkorb Exp $
+ *  $Id: environment.c,v 3.2 2004/10/02 21:40:56 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -94,8 +94,14 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
     sv_argv = pOpts->origArgVect;
     sv_flag = pOpts->fOptSet;
 
-    pOpts->origArgVect = pTL->tkn_list;
-    pOpts->origArgCt   = pTL->tkn_ct;
+    /*
+     *  We add a bogus pointer to the start of the list.  The program name
+     *  has already been pulled from "argv", so it won't get dereferenced.
+     *  The option scanning code will skip the "program name" at the start
+     *  of this list of tokens, so we accommodate this way ....
+     */
+    pOpts->origArgVect = (char**)(pTL->tkn_list - 1);
+    pOpts->origArgCt   = pTL->tkn_ct   + 1;
     pOpts->fOptSet    &= ~OPTPROC_ERRSTOP;
 
     pOpts->curOptIdx   = 1;
@@ -169,7 +175,8 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
         /*
          *  If presetting is disallowed, then skip this entry
          */
-        if ((st.pOD->fOptState & OPTST_NO_INIT) != 0)
+        if (  ((st.pOD->fOptState & OPTST_NO_INIT) != 0)
+           || (st.pOD->optEquivIndex != NO_EQUIVALENT)  )
             continue;
 
         /*

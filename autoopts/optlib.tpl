@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.25 2004/08/31 02:35:14 bkorb Exp $
+# $Id: optlib.tpl,v 3.26 2004/10/02 21:40:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -235,6 +235,11 @@ ENDDEF Option_Copyright
 Emit the #define's for a single option  =][=
 
 DEFINE Option_Defines             =][=
+  (define value-desc (string-append UP-prefix "DESC("
+          (if (exist? "equivalence")
+              (up-c-name "equivalence")
+              UP-name) ")" ))     =][=
+
   IF (hash-ref ifdef-ed flg-name) =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
   ENDIF =][=
@@ -252,24 +257,26 @@ typedef enum {[=
           (string-append UP-prefix UP-name) )=]
 } te_[=(string-append Cap-prefix cap-name)=];[=
 
-  =*   set                 =][=
+  =*   set                        =][=
     (define setmember-fmt (string-append "\n#define %-24s 0x%0"
-       (shellf "expr '(' %d + 3 ')' / 4" (count "keyword")) "XUL"
+       (shellf "expr '(' %d + 4 ')' / 4" (count "keyword")) "XUL"
        (if (> (count "keyword") 32) "L" "")  ))
     (define full-prefix (string-append UP-prefix UP-name) )  =][=
 
-    FOR    keyword   =][=
+    FOR    keyword                =][=
 
       (sprintf setmember-fmt
          (string->c-name! (string-append
              full-prefix "_" (string-upcase! (get "keyword")) ))
          (ash 1 (for-index))  ) =][=
 
-    ENDFOR keyword   =][=
+    ENDFOR keyword                =][=
 
-  ESAC  (get "arg-type")
+    (sprintf setmember-fmt (string->c-name! (string-append
+             full-prefix "_MEMBERSHIP_MASK"))
+             (- (ash 1 (count "keyword")) 1) )  =][=
 
-=]
+  ESAC  (get "arg-type")          =]
 #define VALUE_[=(sprintf "%-18s" opt-name)=] [=
      IF (exist? "value") =][=
         CASE (get "value") =][=
@@ -287,22 +294,21 @@ typedef enum {[=
 
   ~*  num        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(unsigned long*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
+                 =] (*(unsigned long*)(&[=(. value-desc)=].pzLastArg))[=
 
   =*  key        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] (*(te_[=(string-append Cap-prefix cap-name)
-                          =]*)(&[= (. OPT-pfx) =]ARG([=(. UP-name)=])))[=
+                          =]*)(&[=(. value-desc)=].pzLastArg))[=
 
   =*  set        =]
-#define [=(sprintf
-   "%1$sVALUE_%2$-14s (uintptr_t)(%3$sDESC(%2$s).optCookie)"
-   OPT-pfx UP-name UP-prefix)
+#define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
+                   OPT-pfx UP-name value-desc)
                  =][=
 
   =*  bool       =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(ag_bool*)(&[=(. OPT-pfx)=]ARG([=(. UP-name)=])))[=
+                 =] (*(ag_bool*)(&[=(. value-desc)=].pzLastArg))[=
 
   ESAC           =][=
   IF (== (up-c-name "equivalence") UP-name) =]

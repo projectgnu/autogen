@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 3.22 2004/08/31 02:35:14 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 3.23 2004/10/02 21:40:57 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -79,22 +79,23 @@ h=options.h
 /*
  *  Define any special processing flags
  */
-#define OPTPROC_NONE        0x0000
-#define OPTPROC_LONGOPT     0x0001 /* Process long style options      */
-#define OPTPROC_SHORTOPT    0x0002 /* Process short style "flags"     */
-#define OPTPROC_ERRSTOP     0x0004 /* Stop on argument errors         */
-#define OPTPROC_DISABLEDOPT 0x0008 /* Current option is disabled      */
-#define OPTPROC_NO_REQ_OPT  0x0010 /* no options are required         */
-#define OPTPROC_NUM_OPT     0x0020 /* there is a number option        */
-#define OPTPROC_INITDONE    0x0040 /* have initializations been done? */
-#define OPTPROC_NEGATIONS   0x0080 /* any negation options?           */
-#define OPTPROC_ENVIRON     0x0100 /* check environment?              */
-#define OPTPROC_NO_ARGS     0x0200 /* Disallow remaining arguments    */
-#define OPTPROC_ARGS_REQ    0x0400 /* Require arguments after options */
-#define OPTPROC_REORDER     0x0800 /* reorder arguments after options */
-#define OPTPROC_GNUUSAGE    0x1000 /* emit usage in GNU style         */
-#define OPTPROC_TRANSLATE   0x2000 /* Translate strings in tOptions   */
-#define OPTPROC_HAS_IMMED   0x4000 /* program defines immed options   */
+#define OPTPROC_NONE        0x000000
+#define OPTPROC_LONGOPT     0x000001 /* Process long style options      */
+#define OPTPROC_SHORTOPT    0x000002 /* Process short style "flags"     */
+#define OPTPROC_ERRSTOP     0x000004 /* Stop on argument errors         */
+#define OPTPROC_DISABLEDOPT 0x000008 /* Current option is disabled      */
+#define OPTPROC_NO_REQ_OPT  0x000010 /* no options are required         */
+#define OPTPROC_NUM_OPT     0x000020 /* there is a number option        */
+#define OPTPROC_INITDONE    0x000040 /* have initializations been done? */
+#define OPTPROC_NEGATIONS   0x000080 /* any negation options?           */
+#define OPTPROC_ENVIRON     0x000100 /* check environment?              */
+#define OPTPROC_NO_ARGS     0x000200 /* Disallow remaining arguments    */
+#define OPTPROC_ARGS_REQ    0x000400 /* Require arguments after options */
+#define OPTPROC_REORDER     0x000800 /* reorder arguments after options */
+#define OPTPROC_GNUUSAGE    0x001000 /* emit usage in GNU style         */
+#define OPTPROC_TRANSLATE   0x002000 /* Translate strings in tOptions   */
+#define OPTPROC_HAS_IMMED   0x004000 /* program defines immed options   */
+#define OPTPROC_PRESETTING  0x800000 /* opt processing in preset state  */
 
 #define STMTS(s)  do { s; } while (0)
 

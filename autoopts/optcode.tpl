@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 3.33 2004/08/31 02:35:14 bkorb Exp $
+#$Id: optcode.tpl,v 3.34 2004/10/02 21:40:56 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -63,9 +63,8 @@ extern tUsageProc [=
 IF (exist? "include") =]
 /*
  *  global included definitions
- */[=
-
-  (join "\n" (stack "include"))  =]
+ */
+[=(join "\n" (stack "include"))  =]
 [=ENDIF "include exists" =]
 #ifndef NULL
 #  define NULL 0

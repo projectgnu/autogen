@@ -1,16 +1,16 @@
 #! /bin/sh
-#  -*- Mode: Shell-script -*-
+#  -*- Mode: Shell-Script -*-
 # ----------------------------------------------------------------------
 # main.test ---  test main program attribute
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2004-03-19 13:25:28 bkorb"
+# Time-stamp:        "2004-10-02 08:43:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: main.test,v 3.1 2004/03/19 21:27:19 bkorb Exp $
+# $Id: main.test,v 3.2 2004/10/02 21:40:57 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

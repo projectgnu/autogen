@@ -8,7 +8,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 3.3 2004/07/22 02:48:10 bkorb Exp $
+   $Id: usage-txt.def,v 3.4 2004/10/02 21:40:57 bkorb Exp $
  */
 
 /*
@@ -240,6 +240,12 @@ utxt = { ut-type = cch_t;
 utxt = { ut-type = cch_t;
          ut-name = MisArg;
          ut-text = "%s: option `%s' requires an argument\n";
+};
+
+utxt = { ut-type = cch_t;
+         ut-name = MultiEquiv;
+         ut-text = "Equivalenced option '%s' was equivalenced to both\n"
+                   "\t'%s' and '%s'";
 };
 
 utxt = { ut-type = cch_t;

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 3.3 2004/02/01 21:26:45 bkorb Exp $
+ *  $Id: load.c,v 3.4 2004/10/02 21:40:56 bkorb Exp $
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -447,10 +447,9 @@ filePreset(
  *
  * doc:
  *
- * This is a user callable routine for setting options from, for
- * example, the contents of a file that they read in.
- * Only one option may appear in the text.  It will be treated
- * as a normal (non-preset) option.
+ * This is a client program callable routine for setting options from, for
+ * example, the contents of a file that they read in.  Only one option may
+ * appear in the text.  It will be treated as a normal (non-preset) option.
  *
  * When passed a pointer to the option struct and a string, it will
  * find the option named by the first token on the string and set
