@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.6 2005/02/20 02:15:48 bkorb Exp $
+# $Id: optlib.tpl,v 4.7 2005/02/20 02:29:46 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-19 09:27:13 bkorb"
+# Time-stamp:      "2005-02-19 18:20:51 bkorb"
 
 =][=
 
@@ -607,7 +607,7 @@ DEFINE Option_Descriptor =][=
 =]
   {  /* entry idx, value */ 0, 0,
      /* equiv idx, value */ 0, 0,
-     /* option argument  */ ARG_NONE,
+     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 0, 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS,
@@ -636,11 +636,9 @@ DEFINE Option_Descriptor =][=
           ELSE
               =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=],[=
           ENDIF=]
-     /* option argument  */ ARG_[=
-         IF (not (exist? "arg-type"))  =]NONE[=
-         ELIF (exist? "arg-optional")  =]MAY[=
-         ELSE                          =]MUST[=
-         ENDIF =],
+     /* option argument  */ '[=
+         (if (not (exist? "arg-type"))   " "
+             (if (exist? "arg-optional") "?" ":") ) =]',
      /* equivalenced to  */ [=
          (if (exist? "unstack-arg")
              (index-name "unstack-arg")

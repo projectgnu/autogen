@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-19 15:17:04 bkorb"
+ *  Time-stamp:      "2005-02-19 18:17:42 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.11 2005/02/20 02:15:48 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.12 2005/02/20 02:29:46 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -71,6 +71,10 @@
 #endif
 #undef  EXPORT
 #define EXPORT
+
+#define ARG_NONE  ' '
+#define ARG_MUST  ':'
+#define ARG_MAY   '?'
 
 /*
  *  Convert the number to a list usable in a printf call

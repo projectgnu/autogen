@@ -2,7 +2,7 @@
 
 h=options.h
 
-#ID:  $Id: options_h.tpl,v 4.7 2005/02/20 02:15:48 bkorb Exp $
+#ID:  $Id: options_h.tpl,v 4.8 2005/02/20 02:29:46 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -139,10 +139,6 @@ typedef struct optionValue {
 #define OPTPROC_PRESETTING  0x800000 /* opt processing in preset state  */
 
 #define STMTS(s)  do { s; } while (0)
-
-#define ARG_NONE  ' '
-#define ARG_MUST  ':'
-#define ARG_MAY   '?'
 
 /*
  *  The following must be #defined instead of typedef-ed

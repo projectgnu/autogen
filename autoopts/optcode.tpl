@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.11 2005/02/20 02:15:48 bkorb Exp $
+#$Id: optcode.tpl,v 4.12 2005/02/20 02:29:46 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-19 18:12:35 bkorb"
+# Time-stamp:      "2005-02-19 18:18:55 bkorb"
 
 =][=
 
@@ -151,7 +151,7 @@ IF (exist? "version")   =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ARG_MAY,
+     /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
@@ -168,7 +168,7 @@ ENDIF =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ARG_NONE,
+     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
@@ -182,7 +182,7 @@ ENDIF =]
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ARG_NONE,
+     /* option argument  */ ' ',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM,
@@ -200,7 +200,7 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ARG_MAY,
+     /* option argument  */ '?',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING),
@@ -214,7 +214,7 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
-     /* option argument  */ ARG_MUST,
+     /* option argument  */ ':',
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_DISABLE_IMM | \
