@@ -10,7 +10,7 @@ dnl Created:          Mon Jun 30 15:10:13 1997
 dnl Last Modified:    Tue Mar 16 07:39:41 1999
 dnl            by:    Bruce Korb <korb@datadesign.com>
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 2.7 1999/03/16 15:49:18 bkorb Exp $
+dnl Code: $Id: configure.in,v 2.8 1999/03/16 15:54:57 bkorb Exp $
 dnl --------------------------------------------------------------------
 
 AC_INIT(src/autogen.c)
@@ -21,7 +21,7 @@ AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-ifdef([AC_REVISION],AC_REVISION($Revision: 2.7 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 2.8 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -51,7 +51,6 @@ AC_EXEEXT
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 AC_PROG_YACC
-AG_PROG_MAKE_INCLUDE
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
 
 # ----------------------------------------------------------------------
@@ -155,7 +154,7 @@ AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 AC_SUBST(INCLUDES)
 AM_CONFIG_HEADER(config.h)
-AC_OUTPUT(Makefile MakeRules doc/Makefile compat/Makefile \
+AC_OUTPUT(Makefile doc/Makefile compat/Makefile \
 autoopts/Makefile autoopts/autoopts-config src/Makefile tests/Makefile \
 config/Makefile getdefs/Makefile columns/Makefile,
  [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])

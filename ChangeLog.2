@@ -1,3 +1,17 @@
+1999-03-16  Gary V. Vaughan  <gvaughan@oranda.demon.co.uk>
+
+	* MakeRules.in (SUFFIXES): automake uses a variable to name
+	suffixes.
+	(PACKAGE, VERSION, TEXI2HTML, YACC): removed.  These are
+	automatically defined by automake-1.4.
+	* Makefile.am: Use automake-1.4 include directive to avoid
+	breakage with `make distclean'.
+	* autoopts/Makefile.am: ditto.
+	* configure.in (AC_OUTPUT): MakeRules.in is now expanded after
+	being inlined by automake-1.4, rather than in a separate pass.
+	(AG_PROG_MAKE_INCLUDE): No longer required.
+	* config/make.m4: removed.
+
 1999-03-15  Gary V. Vaughan  <gvaughan@pranda.demon.co.uk>
 
        * configure.in: Use fixed autoconf-2.13 id_t type relplacement.

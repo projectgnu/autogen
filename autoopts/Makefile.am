@@ -2,19 +2,19 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## 
-##  Autoopts copyright 1992-1997 Bruce Korb
+##  Autoopts copyright 1992-1999 Bruce Korb
 ## 
 ## Author:          Bruce Korb <korbb@datadesign.com>
 ## Maintainer:      Bruce Korb <korbb@datadesign.com>
 ## Created:         Mon Jun 30 15:35:12 1997                                  
-## Last Modified:   Wed Nov 25 13:16:21 1998
-##            by:   Bruce Korb <korb@datadesign.com>
+## Last Modified:   Tue Mar 16 11:21:39 1999				      
+##            by:   Gary V. Vaughan <garyv@oranda.demon.co.uk>		      
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.10 1998/11/25 21:22:41 bkorb Exp $
+## $Id: Makefile.am,v 2.11 1999/03/16 15:54:57 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-@MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
+include $(top_srcdir)/MakeRules.in
 
 lib_LTLIBRARIES = libopts.la
 libopts_la_SOURCES = \
