@@ -25,6 +25,23 @@
 #  define VALUE(v)
 #endif
 
+/*
+ *  Procedure success codes
+ *
+ *  USAGE:  define procedures to return "tSuccess".  Test their results
+ *          with the SUCCEEDED, FAILED and HADGLITCH macros.
+ */
+#define SUCCESS  ((tSuccess) 0)
+#define FAILURE  ((tSuccess)-1)
+#define PROBLEM  ((tSuccess) 1)
+
+typedef int tSuccess;
+
+#define SUCCEEDED( p )     ((p) == SUCCESS)
+#define SUCCESSFUL( p )    SUCCEEDED( p )
+#define FAILED( p )        ((p) <  SUCCESS)
+#define HADGLITCH( p )     ((p) >  SUCCESS)
+
 MODE char*    pzDefText VALUE( (char*)NULL );
 
 MODE regex_t  attrib_re;

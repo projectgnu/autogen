@@ -1,8 +1,18 @@
 [= autogen template -*-texinfo-*-
 
-#  Documentation template
-#  $Id: auto_gen.tpl,v 1.18 1998/08/17 14:19:15 bkorb Exp $
-#
+##  Documentation template
+## 
+##  Autogen Copyright (C) 1992-1998 Bruce Korb
+## 
+## Author:            Bruce Korb <korbb@datadesign.com>
+## Maintainer:        Bruce Korb <korbb@datadesign.com>
+## Created:           Tue Sep 15 13:13:48 1998
+## Last Modified:     Tue Sep 15 14:48:25 1998
+##            by:     Bruce Korb <korb@datadesign.com>
+## ---------------------------------------------------------------------
+## $Id: auto_gen.tpl,v 1.19 1998/09/16 20:45:04 bkorb Exp $
+## ---------------------------------------------------------------------
+##
 texi=autogen.texi =]
 \input texinfo
 @c %**start of header
@@ -13,6 +23,13 @@ texi=autogen.texi =]
 
 @ignore
 [=_eval "" _DNE=]
+
+Plus bits and pieces gathered from all over the source/build
+directories.  See the dependencies in doc/Makefile.am,
+and note that some of them are, in turn, generated:
+
+[=_EVAL "for f in ${AGDEPS} ; do echo \"\t$f\" ; done" _shell=]
+
 @end ignore
 
 @set EDITION [=version=]
@@ -29,7 +46,7 @@ This file documents [=package=] Version @value{VERSION}
 
 Autogen copyright @copyright{} [=copyright=] Bruce Korb
 
-[=prog_name _cap "" _gpl=]
+[=_eval Autogen "" _gpl=]
 
 @ignore
 Permission is granted to process this file through TeX and print the
@@ -46,14 +63,14 @@ notice identical to this one except for the removal of this paragraph
 
 @page
 @vskip 0pt plus 1filll
-[=prog_name _cap copyright _get owner _get
+[=_eval Autogen copyright _get owner _get
        "#3$%s copyright %s %s" _printf=]
 @sp 2
 This is the first edition of the GNU Autogen documentation,
 @sp 2
 Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
-[=prog_name _cap "" _gpl=]
+[=_eval Autogen "" _gpl=]
 @end titlepage
 
 @ifinfo
@@ -74,6 +91,7 @@ This edition documents version @value{VERSION}, @value{UPDATED}.
 * Invocation::           Running Autogen
 * Installation::         What Gets Installed Where
 * Autoopts::             Automated Option Processing
+* GenDefs::              Extract Definitions from Source
 * Future::               Some ideas for the future.
 * Concept Index::        General index
 * Function Index::	 Function index
@@ -469,11 +487,11 @@ One minor difference though is that autogen
 directives must have the hash character @code{#} in column 1.
 Another difference is that several of them are ignored.  They are:
 [=
-_FOR agdirect_func =][=
+_FOR directive =][=
   _IF dummy _exist
     =]@samp{#[=name _down=]}, [=
   _ENDIF =][=
-/agdirect_func=] and @samp{#if}.
+/directive=] and @samp{#if}.
 Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
 including the @code{#else} clause.
@@ -482,7 +500,7 @@ The autogen directives that affect the processing of
 definitions are:
 
 @table @code[=
-_FOR agdirect_func "\n"=][=
+_FOR directive "\n"=][=
   _IF text _exist
     =]
 @item #[=name _down =][=
@@ -492,7 +510,7 @@ _FOR agdirect_func "\n"=][=
 @cindex [=name _down=] directive
 [=text=][=
   _ENDIF=][=
-/agdirect_func=]
+/directive=]
 @end table
 
 @node Comments
@@ -609,11 +627,11 @@ functionality is also used by many of the functions before examining
 their argument lists.  The entries have been alphabatized:
 
 @menu[=
-_FOR agfunc_func =][=
+_FOR macfunc =][=
   _IF desc _exist deprecated _exist ! & =]
 * [=name #:: + "#%-16s" _printf=] [=name _up=] - [=what=][=
   _ENDIF =][=
-/agfunc_func=]
+/macfunc=]
 @end menu
 
 @node template id
@@ -681,7 +699,7 @@ capable of finding a balancing parenthesis.
 #  FOR each defined function,
       this code will insert the extracted documentation =][=
 
-_FOR agfunc_func =][=
+_FOR macfunc =][=
   _IF desc _exist deprecated _exist ! & =]
 
 @node [=name=]
@@ -696,19 +714,19 @@ _FOR agfunc_func =][=
       _CASE table _get =][=
       _ agexpr_func =]
 @table @samp[=
-         _FOR agexpr_func =]
+         _FOR evalexpr =]
 @findex [=name _up=]
 @item [=name _up=]
 [=descrip=]
 [=
-         /agexpr_func
+         /evalexpr
 =]
 @end table[=
       _ESAC =][=
     _ENDIF =][=
 
   _ENDIF "unnamed does not exist" =][=
-/agfunc_func=]
+/macfunc=]
 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -722,7 +740,7 @@ _FOR agfunc_func =][=
 as shown in this AutoOpts generated usage text:
 
 @example
-[=_eval "#../src/autogen --help 2>&1 |
+[=_eval "#${top_builddir}/src/autogen --help 2>&1 |
         sed -e 's/{/@{/' -e 's/}/@}/' -e 's/\t/        /g'"  _shell=]
 @end example
 
@@ -795,397 +813,17 @@ and there may be some variables you have to set to make it work.
 @node Autoopts
 @chapter Automated Option Processing
 @cindex autoopts
-
-Included with autogen is a tool that virtually eliminates the hassle
-of processing options, keeping usage text up to date and so on.
-This package allows you to specify several program attributes,
-innumerable options and option attributes, then it produces
-all the code necessary to parse and handle the command line
-and initialization file options.
-For a more complete description, @xref{Features}.
-
-@menu
-* Features::          Autoopts Features
-* opts.def::          Option Definitions
-* opts.h::            User Interface
-* Macro Usage::       User Interface Usage
-* opts.c::            Data Structure and Callout Procs
-* Using Autoopts::    Using Autoopts
-* Quick Start::       Quick Start
-* dependencies::      Autogen Inter-dependency Graph
-@end menu
-
-@node Features
-@section Autoopts Features
-@cindex features
-
-Autoopts supports option processing and option state saving
-with the following features:
-
-@enumerate
-@item
-Process initialization/rc files
-(if specified in the definition and the file(s) exist).
-@item
-Process environment variable initializations
-(if specified in the definition and the variable(s) exist).
-@item
-Processes the command line options.
-@item
-Store the option state into an initialization/rc file
-(if init files are specified and the save options option
-is specified on the command line).
-@item
-Verify that required options are present the
-required minimum number of times on the command line.
-@item
-Verify that options do not appear more than the maximum number
-of times.
-@item
-Verify that conflicting options do not appear together.
-@item
-Verify that options that require the presence of other options
-are, in fact, used in the presence of other options.
-@item
-Provides a callable routine to parse a line of text as if
-it were a line from one of the RC/INI files.  (Consequently,
-you may stash options in a text file you process and pass
-the relevent text for option processing.)
-@item
-Produce usage information for the library routine "optionUsage()".
-Three levels of usage are supported:
-@table @samp
-@item Brief
-as when an option error is encountered.
-@item Normal
-as when "--help" is specified on the command line.
-@item Extended
-when "--more-help" is specified on the command line.
-This output is passed through a pager (the @code{more} program,
-if the PAGER environment variable is not set).
-This output differs from normal help only if a usage
-detail is specified.
-@end table
-@item
-Produce a #define for the program version that can be
-used by the library routine "doVersion()".
-@end enumerate
-
-Furthermore, there are provisions for enablement and disablement
-prefixes to the "long-name" versions of the options.  The option
-processing supports POSIX compliant options.  With the "long_opts"
-attribute set, it also supports GNU standard long options.
-There is automatic support for "help", "more-help", a GNU-compliant
-"version" and "save-opts" options.
-
-@node opts.def
-@section Option Definitions
-@cindex opts.def
-
-This file contains the autogen definitions that descrbes the
-options for a particular program.  There are two groups of
-definitions.  The first describes the program and option
-processing attributes, the second group describes the name,
-usage and other attributes related to each option.
-
-@menu
-* program attributes::    Program Description and Attributes
-* option attributes::     Option Attributes
-* standard options::      Automatically Supported Options
-* example options::       Autogen's option definitions
-@end menu
-
-[=_EVAL "sed -n '/^@node program attributes/,/^@ignore/p' \
-        $top_srcdir/autoopts/options.tpl |
-sed -e's/`/@code{/g' \
-    -es/\\\'/}/g     \
-    -e's/^\\([a-z][a-z_]*\\)/@cindex \\1\\\n@item \\1/' |
-sed -e's/^[ \t]*//' " _shell =]
-@end ignore
-
-@node standard options
-@subsection Automatically Supported Options
-@cindex standard options
-
-Autoopts provides automated support for four options.
-@code{help} and @code{more-help} are always provided.
-@code{version} is provided if @code{version} is defined
-in the option definitions.  @code{save-opts} is provided
-if @code{homerc} is defined.
-
-Below are the option names and flag values.
-The flag characters are activated iff at least one user-defined
-option uses a flag value.
-
-@table @samp
-@item help -?
-This option will immediately invoke the @code{USAGE()} procedure
-and display the usage line, a description of each option with
-its description and option usage information.  This is followed
-by the contents of the definition of the @code{detail} text macro.
-
-@item more-help -!
-This option is identical to the @code{help} option, except that
-it also includes the contents of the @code{detail-file} file
-(if provided and found), plus the output is passed through
-a pager program.  (@code{more} by default, or the program identified
-by the @code{PAGER} environment variable.)
-
-@item version -v
-This will print the program name, title and version.
-If it is followed by the letter @code{c} and
-a value for @code{copyright} and @code{owner} have been provided,
-then the copyright will be printed, too.
-If it is followed by the letter @code{n}, then the full
-copyright notice (if available) will be printed.
-
-@item save-opts ->
-This option will cause the option state to be printed in
-RC/INI file format when option processing is done but not
-yet verified for consistency.  The program will terminate
-successfully without running when this has completed.
-Note that for most shells you will have to quote or escape the
-flag character to restrict special meanings to the shell.
-
-The output file will be the RC/INI file name (default or provided
-by @code{rcfile}) in the last directory named in a @code{homerc}
-definition
-@end table
-
-@node example options
-@subsection Autogen's option definitions
-@cindex example options
-
-Below is the option definition file used by autogen.
-It will cause to be generated the interface and code files described
-in the next two sections and the usage information
-sampled above in the chapter on "Running the program".
-
-@example
-[=_EVAL "sed -n '/^copyright =/,$p' $top_srcdir/src/opts.def |
-         sed '-es/@/@@/g' '-es/{/@{/g' '-es/}/@}/g'"
-        _shell=]
-@end example
-
-@node opts.h
-@section User Interface
-@cindex opts.h
-@cindex interface file
-
-This file, along with the public #define-d values in <options.h>,
-provide the user accessible interface to the option information.
-If @code{prefix} has been defined for this program,
-then the defined prefix will be inserted into all of the
-generated macros and external names.  Below is an example from
-@code{autogen} itself:
-
-@example
-[=_EVAL "echo '#ifndef AUTOGEN_OPTS_H' ; echo '#ifndef AUTOGEN_OPTS_H' ; echo
-         sed -n '/^#include/,$p' $top_builddir/src/opts.h |
-         sed -e's/{/@{/g' -e's/}/@}/g'" _shell=]
-@end example
-
-@node Macro Usage
-@section User Interface Usage
-@cindex Macro Usage
-
-The macros and enumerations defined in the options
-header (interface) file are used as follows:
-
-@menu
-[=_FOR component=]
-* [=comp_name #:: + #%-28s _printf=] [=comp_name=] - [=title=][=
-/component=]
-@end menu
-[=
-_FOR component=]
-@node [=comp_name=]
-@subsection [=comp_name=] - [=title=]
-@cindex [=comp_name=]
-
-[=description=]
-[=/component=]
-
-@node opts.c
-@section Data Structure and Callout Procs
-@cindex opts.c
-
-This contains internal stuff subject to change.  Basically, it contains
-a single global data structure containing all the information provided
-in the option definitions, plus a number of static strings and any
-callout procedures that are specified or required.  You should never
-have need for looking at this, execpt to examine the code generated
-for implementing the @code{flag_code} construct.
-
-@node Using Autoopts
-@section Using Autoopts
-@cindex using autoopts
-
-To use autoopts in your application:
-
-@itemize @bullet
-@item
-Create a file @samp{myopts.def},
-according to the documentation above.
-@item
-Run autogen to create the option interface file (@code{myopts.h})
-and the option descriptor code (@code{myopts.c}):
-
-@example
-autogen -L $prefix/share/autogen myopts.def
-@end example
-
-@item
-In all your source files where you need to refer to option state,
-@code{#include "myopts.h"} (generated for you).
-@item
-In your main routine, code something along the lines of:
-
-@example
-main( int argc, char** argv )
-@{
-    @{
-        int arg_ct = optionProcess( &myprogOptions, argc, argv );
-        argc -= arg_ct;
-        if ((argc < ARGC_MIN) || (argc > ARGC_MAX)) @{
-            fprintf( stderr, "%s ERROR:  remaining args (%d) "
-                     "out of range\n", myprogOptions.pzProgName,
-                     argc );
-
-            USAGE( EXIT_FAILURE );
-        @}
-        argv += arg_ct;
-    @}
-    if (HAVE_OPT(OPT_NAME))
-        respond_to_opt_name();
-    ...
-@}
-@end example
-
-@item
-Compile @samp{myopts.c} and link your program
-with the following additional arguments:
-
-@example
-myopts.o -L $prefix/lib -lopts
-@end example
-@end itemize
-
-@node Quick Start
-@section Quick Start
-@cindex Quick Start
-
-Since it is generally easier to start with a live example
-that is simpler than the @code{autogen} example itself,
-here is an extremely simple @code{autoopt} example
-to play with and embellish into what you really need:
-
-@smallexample
-Autogen Definitions options;
-prog_name     = check;
-prog_title    = "Checkout Automated Options";
-long_opts;
-environrc;
-
-flag = @{
-    name      = check_dirs;
-    value     = L;
-    flag_arg  = ":";
-    max       = NOLIMIT;
-    stack_arg;
-    descrip   = "Checkout directory list";
-@};
-
-flag = @{
-    name      = show_defs;
-    descrip   = "Show the definition tree";
-    disable   = dont;
-@};
-@end smallexample
-
-@noindent
-Then perform the following steps:
-
-@enumerate
-@item
-@code{autogen -L $prefix/share/autogen -DTEST_MAIN=yes check.def}
-@item
-@code{cc -o check -DTEST_CHECK_OPTS -g check.c -L $prefix/lib -lopts}
-@end enumerate
-
-@noindent
-And now, @code{./check --help} yields:
-
-@smallexample
-check - Checkout Automated Options
-USAGE:  check [-<flag> [<val>]]... [--<name>[@{=| @}<val>]]... 
-  Flg Arg Option-Name    Description
-   -L YES check-dirs     Checkout directory list
-				- may appear without limit
-      no  show-defs      Show the definition tree
-				- disabled as --dont-show-defs
-   -? no  help           Display usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-Options may be disabled with a '+' marker.
-Options may be specified by doubled markers and their name
-or by a single marker and the option character value.
-
-The following option preset mechanisms are supported:
- - examining environment variables named CHECK_*
-@end smallexample
-
-@noindent
-and @code{./check --check=$HOME --dont-show --check=/usr/local/share} yields:
-
-@smallexample
-OPTION_CT=3
-export OPTION_CT
-CHECK_CHECK_DIRS_CT=2
-export CHECK_CHECK_DIRS_CT
-CHECK_CHECK_DIRS_1='/home2/bkorb'
-export CHECK_CHECK_DIRS_1
-CHECK_CHECK_DIRS_2='/usr/local/share'
-export CHECK_CHECK_DIRS_2
-CHECK_SHOW_DEFS=dont
-export CHECK_SHOW_DEFS
-@end smallexample
-
-@node dependencies
-@section Autogen Inter-dependency Graph
-@cindex autoopts dependencies
-
-Since autoopts requires autogen and autogen uses autoopts,
-the autogenned components of autogen were bootstrapped by
-the author and provided in the release.
-
-@ifinfo
-@code{Autogen} @strong{requires} a @sc{POSIX} regular expression
-library, such as @sc{GNU} regex.  Version 5 will probably require the
-@sc{GNU} guile library too.  Other @code{autogen} based packages are
-free to assume the presence of all of these; the interdependencies of
-these packages will thus be:
-
+[=_INCLUDE autoopts/autoopts.texi=]
 @ignore
-TODO: Figure out how to include an eps diagram in the printed manual.
-
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore
-@example
-                                  .--------(autogetopts)
-                                  V              |
-                autoopts<---->autogen--------.   |
-                   |              |          |   |
-                   |              V          |   |
-                   |           libguile--.   |   |
-                   |                     V   V   V
-                   `------------------->POSIX regex
-@end example
-
-@code{autogetopts} is an as-yet-to-be-implemented package
-that will generate the option processing loop, but call
-@code{getopts(3)} to parse the options.  It will @strong{only}
-support option processing and the brief form of usage text.
-@end ifinfo
-
+@page
+@node GenDefs
+@chapter Extract Definitions from Source
+@cindex gendefs
+[=_INCLUDE getdefs/getdefs.texi=]
+Also included with autogen is a tool for extracting definitions
+from 
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore

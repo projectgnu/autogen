@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:  $Date: 1998/08/17 14:19:13 $
-##            by:  Bruce Korb <korbb@datadesign.com>
+## Last Modified:   Tue Sep 15 14:55:24 1998
+##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 1.9 1998/08/17 14:19:13 bkorb Exp $
+## $Id: Makefile.am,v 1.10 1998/09/16 20:45:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,6 +20,7 @@ INFO_DEPS     = autogen.info
 all : $(INFO_DEPS) LSM
 
 @MAKEINCLUDE@ @MAKEQUOTE@$(top_builddir)/MakeRules@MAKEQUOTE@
+DOCDIRS         = -L$(top_srcdir)
 
 info_TEXINFOS   = autogen.texi
 
@@ -35,9 +36,12 @@ ODEF            = $(optdir)/opts.def
 DIRECT          = $(gendir)/agdirect.def
 EXPR            = $(gendir)/agexpr.def
 FUNC            = $(gendir)/agfunc.def
-AGINCLUDE       = $(ODEF) $(DIRECT) $(EXPR) $(FUNC) $(AODEFS) $(AOHEAD)
+AGDEPS          = $(ODEF) $(DIRECT) $(EXPR) $(FUNC) $(AODEFS) $(AOHEAD) \
+		$(top_srcdir)/src/agParse.y \
+		$(top_srcdir)/autoopts/autoopts.texi \
+		$(top_srcdir)/getdefs/getdefs.texi
 
-autogen.texi : auto_gen.tpl autogen.def $(AGINCLUDE)
+autogen.texi : auto_gen.tpl autogen.def $(AGDEPS)
 
 LSM : $(top_srcdir)/VERSION $(top_srcdir)/src/opts.def LSM.tpl
 	@if $(AGEXE) --version >&- 2>&- ; then \

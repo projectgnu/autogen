@@ -1,5 +1,5 @@
 [=autogen template include
-#$Id: optcode.tpl,v 2.3 1998/09/14 14:33:52 bkorb Exp $
+#$Id: optcode.tpl,v 2.4 1998/09/16 20:45:02 bkorb Exp $
 =]
 [=_IF copyright _exist
 =]
@@ -286,7 +286,7 @@ _FOR flag "\n" =][=
               =](char*)[=_eval flag_arg _get
               "echo %s|sed 's/=//'" _printf _shell =][=
 
-         _ELSE=]z[=name _cap=]DefaultArg[=_ENDIF=],
+         _ELSE=](char*)z[=name _cap=]DefaultArg[=_ENDIF=],
      /* arg list/cookie  */ (void*)NULL,
      /* must/cannot opts */ [=
          _IF flags_must _exist=]a[=name _cap=]MustList[=
