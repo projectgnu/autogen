@@ -1,0 +1,298 @@
+Bruce Korb
+From:	James R. Van Zandt [jrv@vanzandt.mv.com]
+Sent:	Sunday, July 04, 1999 12:48 PM
+To:	Bruce Korb
+Subject:	man.tpl
+
+Bruce -
+
+Here's a modified version of man.tpl for the autogen package.  I
+believe this generates better nroff.  There is one thing I could not
+fix.  I believe you are using this test to determine whether the
+argument is optional: "_IF flag_arg _len 0 = ".  However, this fails
+if the option has a default numerical value.  Thus, for example, the
+man page for columns does not indicate the fact that the argument for
+--spread is optional.
+
+I find the template code really hard to edit.  I think a colorizing
+emacs mode would help a lot: template markers in one color, macros in
+a second, and other code in a third.  However, I'm not an elisp
+programmer :-(
+
+	     - Jim Van Zandt
+
+
+{(   -*- nroff -*-
+
+autogen template man=%s.1
+
+)}
+{(#
+
+1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
+1999-06-28 modified to be template  Bruce Korb <autogen@linuxbox.com>
+1999-07-04 nroff tweaks, Jim Van Zandt <jrv@vanzandt.mv.com>
+
+)}.TH {(prog_name _up)} 1 {(
+  _EVAL "date +%Y-%m-%d" _shell)} "" "Programmer's Manual"
+{(
+
+_EVAL '.\"  ' _DNE
+
+)}
+.\"
+.SH NAME
+{(prog_name _down)} \- {(prog_title)}
+.SH SYNOPSIS
+.B {(
+  _IF prog_file_name _exist )}{(prog_file_name)}{(
+  _ELSE)}{(prog_name _down)}{(
+  _ENDIF)}{(
+
+  _IF flag.value _exist )}{(
+    _IF long_opts _exist )}{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  Mixture of short (flag) options and long options
+      #
+      )}
+.\" Mixture of short (flag) options and long options
+.RB [ -\fIflag\fP " [\fIvalue\fP]]... [" --\fIopt-name\fP [ = "| ]\fIvalue\fP]]..."{(
+
+    _ELSE )}{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  Short (flag) options only
+      #
+      )}
+.\" Short (flag) options only
+.RB [ -\fIflag\fP " [\fIvalue\fP]]..."{(
+    _ENDIF )}{(
+
+  _ELIF long_opts _exist )}{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  Long options only
+      #
+      )}
+.\" Long options only
+.RB [ --\fIopt-name\fP [ = "| ] \fIvalue\fP]]..."{(
+
+  _ELIF argument _exist ! )}{(
+
+      # * * * * * * * * * * * * * * * * * * * * * * * * *
+      #
+      #  All arguments are named options.
+      #
+      )}
+.\" All arguments are named options.
+.RI [ opt-name "[\fB=\fP" value ]]...
+.PP
+All arguments are named options.{(
+
+  _ELSE )}{(
+    _ERROR "Named option programs cannot have arguments" )}{(
+  _ENDIF )}{(
+
+  _IF argument _exist )}
+.br
+.in +8
+{(argument)}{(
+  _ENDIF )}
+.SH "DESCRIPTION"
+This manual page documents, briefly, the \fB{(prog_name _down)}\fP command.
+{(
+_IF prog_man_descrip _exist
+    )}{(prog_man_descrip)}{(
+_ELIF detail _exist
+    )}{(detail)}{(
+_ELSE
+    )}Its description is not documented.{(
+_ENDIF)}
+.SH OPTIONS{(
+
+#  When there are no flag characters and long options are disallowed,
+   the program options are all named options and they are handled
+   without the marker character (hyphen). )}{(
+
+_FOR flag
+
+)}{(
+  #  Skip the documentation options!
+  #
+  )}{(
+  _IF documentation _exist ! )}
+.TP{(
+      _IF value _exist )}{(
+        _IF long_opts _exist )}{(
+
+          # * * * * * * * * * * * * * * * * * * * *
+          *
+          *  The option has a flag value (character) AND
+          *  the program uses long options
+          *
+          )}
+.BR -{(value)}{(
+          _IF arg_name _exist ! )} ", " --{(
+          _ELSE )} " \fI{(arg_name)}\fP, " --{(
+          _ENDIF )}{(name #_^ #-- _tr _down)}{(
+          _IF arg_name _exist)}{(
+            _IF flag_arg _len 0 = )} [ ={(
+            _ELSE )} " " {(
+            _ENDIF )}\fI{(arg_name)}\fP{(
+            _IF flag_arg _len 0 = )} ]{(
+            _ENDIF )}{(
+          _ENDIF)}{(
+
+
+        _ELSE   )}{(
+
+          # * * * * * * * * * * * * * * * * * * * *
+          *
+          *  The option has a flag value (character) BUT
+          *  the program does _NOT_ use long options
+          *
+          )}
+.BR -{(value)}{(
+          _IF arg_name _exist)}{(
+            _IF flag_arg _len 0 = )}[{(
+            _ENDIF )} "\fI{(arg_name)}\fP{(
+            _IF flag_arg _len 0 = )}"]"{(
+            _ENDIF )}{(
+          _ENDIF)}{(
+        _ENDIF  )}{(
+
+
+      _ELSE  value does not exist -- named option only  )}{(
+
+        _IF long_opts _exist ! )}{(
+
+          # * * * * * * * * * * * * * * * * * * * *
+          *
+          *  The option does not have a flag value (character).
+          *  The program does _NOT_ use long options either.
+          *  Special magic:  All arguments are named options.
+          *
+          )}
+.BR {(name #_^ #-- _tr _down)}{(
+        _IF arg_name _exist)} {(
+          _IF flag_arg _len 0 = )} [ ={(
+          _ELSE )} "" {(
+          _ENDIF )}\fI{(arg_name)}\fP{(
+          _IF flag_arg _len 0 = )}]{(
+          _ENDIF )}{(
+        _ENDIF)}{(
+
+
+        _ELSE   )}{(
+
+          # * * * * * * * * * * * * * * * * * * * *
+          *
+          *  The option does not have a flag value (character).
+          *  The program, instead, only accepts long options.
+          *
+          )}
+.BR --{(name #_^ #-- _tr _down)}{(
+          _IF arg_name _exist)} "{(
+            _IF flag_arg _len 0 = )}[{(
+            _ENDIF )}" "=\fI{(arg_name)}\fP{(
+            _IF flag_arg _len 0 = )}]{(
+            _ENDIF )}"{(
+          _ENDIF)}{(
+        _ENDIF  )}{(
+      _ENDIF )}
+{(descrip)}{(
+      _IF min           _exist
+          max           _exist |
+          enabled       _exist |
+          no_preset     _exist |
+          setable       _exist |
+          equivalence   _exist |
+          flags_must    _exist |
+          flags_cant    _exist | )}.
+Special attributes apply to this option.
+See the invocation section in the info document.{(
+      _ENDIF)}
+.sp
+{( # SED
+   -e convert @code into \fB...\fP phrases
+   -e convert @file into \fI...\fP phrases
+   -e convert @var into \fB...\fP phrases
+   -e Remove the '@' prefix from curly braces
+   -e Indent example regions
+   -e Delete example command
+   -e Replade "end example" command with ".br"
+   -e Replace "@*" command with ".br"
+
+   NB:  backslashes are interpreted three times: by AutoGen, sed and nroff.
+        Thus, for nroff to see one backslash, use four (4)!!
+
+   ))}{(
+doc "sed \
+ -e's;@code{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e's;@file{\\([^}]*\\)\};\\\\fI\\1\\\\fP;g' \
+ -e's;@var{\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
+ -e's/@\\([{}]\\)/\\1/' \
+ -e'/@ *example/,/@ *end *example/s/^/    /' \
+ -e'/^ *@ *example/d' \
+ -e's/^ *@ *end *example/.br/' \
+ -e's/^@\\*/.br/' <<'_EOF_'\n%s\n_EOF_"
+    _printf _shell )}{(
+
+  _ENDIF documentation _exist ! )}{(
+
+/flag
+
+
+)}
+.TP
+.BR {(_IF flag.value _exist)}\-? , " --{(
+      _ELIF long_opt _exist)}--{(_ENDIF)}help
+Display usage information and exit.
+.TP
+.BR {(_IF flag.value _exist)}-! , " --{(
+      _ELIF long_opt _exist)}--{(_ENDIF)}more-help
+Extended usage information passed thru pager.{(
+
+
+_IF homerc _exist )}
+.TP
+.BR {(_IF flag.value _exist)}-> " \fIrcfile\fP, --" {(
+      _ELIF long_opt _exist)}--{(_ENDIF)}save-opts "[=\fIrcfile\fP] 
+Save the option state to \fIrcfile\fP.
+.TP
+.BR {(_IF flag.value _exist)}-< " \fIrcfile\fP, --" {(
+      _ELIF long_opt _exist)}--{(_ENDIF)}load-opts "=\fIrcfile\fP"
+Load options from \fIrcfile\fP.
+.TP
+.BR  --no-load-opts
+Disable loading options from an rc file.{(
+_ENDIF)}{(
+
+
+_IF version _exist )}
+.TP
+.BR {(_IF flag.value _exist)}\-v " [" v | c | n "], " --{(
+      _ELIF long_opt _exist)}--{(_ENDIF)}version [ =v | c | n ]
+Output version of program and exit.  The default mode is `v', a simple
+version.  The `c' mode will print copyright information and `n' will
+print the full copyright notice.{(
+_ENDIF
+
+
+)}{(
+_IF explain _exist )}
+.PP
+{(explain)}{(
+_ENDIF)}{(
+_IF man_doc _exist )}
+{(man_doc)}{(
+_ENDIF)}
+.SH AUTHOR
+{(owner)}{(eaddr "# <%s>" _printf)}
+.PP
+This manual page was \fIAutoGen\fP-erated from the \fB{(prog_name)}\fP
+option definitions.
