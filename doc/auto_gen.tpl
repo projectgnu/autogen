@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 3.16 2003/02/16 00:04:40 bkorb Exp $
+## $Id: auto_gen.tpl,v 3.17 2003/05/18 17:08:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -18,6 +18,8 @@ texi=autogen.texi
 (setenv "SHELL" "/bin/sh")
 
 (define texi-file-source (shell "
+    tempdir=`mktemp -d -sd ./.ag- 2>/dev/null || echo .ag-$$.dir`
+    [ -d ${tempdir} ] || mkdir ${tempdir}
     if [ -f autogen.texi ]
     then
       mv -f autogen.texi autogen.texi.ori
@@ -522,7 +524,89 @@ the command line and initialization file options, and the documentation
 that should go with your program as well.
 
 [= get-text tag = autoopts =]
-[= `
+
+Here is an example program that uses the following set of definitions:
+
+@example
+[=
+
+ (out-push-new (shellf "echo ${tempdir}/default-test.def"))
+
+=]AutoGen Definitions options;
+
+prog-name  = default-test;
+prog-title = 'Default Option Example';
+homerc     = '$$/../share/default-test', '$HOME', '.';
+environrc;
+test-main  = yes;
+long-opts;
+gnu-usage;
+version    = '1.0';
+#define DEBUG_FLAG
+#define WARN_FLAG
+#define WARN_LEVEL
+#define VERBOSE_FLAG
+#define VERBOSE_ENUM
+#define DRY_RUN_FLAG
+#define OUTPUT_FLAG
+#define INPUT_FLAG
+#define DIRECTORY_FLAG
+#define INTERACTIVE_FLAG
+#include stdoptions.def
+[=
+
+ (out-pop #t)
+
+=]@end example
+
+@noindent
+Running a few simple commands on that definition file:
+
+@example
+autogen default-test.def
+copts="-DTEST_DEFAULT_TEST_OPTS -I$@{prefix@}/include"
+lopts="-L$@{prefix@}/lib -lopts -lm"
+cc -o default-test $@{copts@} default-test.c $@{lopts@}
+@end example
+
+@noindent
+Yields a program which, when run with @file{--help}, prints out:
+
+@example
+[= (shell (string-append "
+OPTDIR=`cd ${top_srcdir}/autoopts >/dev/null; pwd`
+libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
+if [ -f ${libs}/libopts.a ]
+then libs=\"${libs}/libopts.a\"
+else libs=\"-L ${libs} -lopts\"
+fi
+opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS -g -I${OPTDIR}\"
+
+cd ${tempdir}
+HOME='' ${AGEXE} -L${OPTDIR} default-test.def 1>&2
+if [ ! -f default-test.c ]
+then
+  echo 'NO default-test.c PROGRAM' >&2
+  kill -TERM $AG_pid
+  exit 1
+fi
+
+${CC} ${opts} default-test.c ${libs} -lm 1>&2
+if [ ! -x ./default-test ]
+then
+  echo 'NO default-test EXECUTABLE' >&2
+  kill -TERM $AG_pid
+  exit 1
+fi
+HOME='$HOME/.default_testrc' ./default-test --help | \
+   sed 's,@,@@,g;s,{,@{,g;s,},@},g;s,\t,        ,g' " ))
+=]
+@end example
+[=
+
+get-text tag = autoopts-api =]
+[=`
+
 f=../autoopts/libopts.texi
 [ ! -f $f ] && f=${top_srcdir}/autoopts/libopts.texi
 [ -f $f ] || {
@@ -530,35 +614,35 @@ f=../autoopts/libopts.texi
   kill -n $AG_pid
   exit 1
 }
-cat $f` =]
-[= get-text tag = "autoopts-data" =]
+cat $f`
+
+=][=
+
+get-text tag = "autoopts-data" =]
 
 @example
 [= `
-
-[ ! -d .tmp ] && mkdir .tmp
-OPTDIR=\`cd ${top_srcdir}/autoopts ; pwd\`
-
-libs="\`cd ${OPTDIR} ; [ -d .libs ] && cd .libs ; pwd\`"
-if [ -f ${libs}/libopts.a ]
-then libs="${libs}/libopts.a"
-else libs="-L ${libs} -lopts"
-fi
 
 opts="-o genshellopt -DTEST_GETDEFS_OPTS -g -I${OPTDIR}"
 
 ( cat ${top_srcdir}/getdefs/opts.def
   echo "test_main = 'putShellParse';"
 ) | (
-  cd .tmp
+  cd ${tempdir}
   HOME='' ${AGEXE} -t40 -L${OPTDIR} -bgenshellopt -- -
 
   ${CC} ${opts} genshellopt.c ${libs} -lm
 ) > /dev/null 2>&1
 
-( .tmp/genshellopt --help 2>&1 ) |
+if [ ! -x ${tempdir}/genshellopt ]
+then
+  echo "NO GENSHELLOPT PROGRAM" >&2
+  kill -TERM $AG_pid
+  exit 1
+fi
+
+${tempdir}/genshellopt --help | \
   sed -e 's,\t,        ,g;s,@,@@,g;s,{,@{,g;s,},@},g'
-  rm -rf .tmp
 
 ` =]
 @end example
@@ -588,7 +672,8 @@ done
 ` =]
 [= get-text tag = Future =][=
 
-(shell "[ -f autogen.texi.ori ] && rm -f autogen.texi.ori")
+(shell "[ -f autogen.texi.ori ] && rm -f autogen.texi.ori
+       rm -rf ${tempdir}")
 (set-writable #t)
 
 ;; Local Variables:
