@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 3.3 2002/09/29 00:16:20 bkorb Exp $
+ *  $Id: makeshell.c,v 3.4 2002/10/01 04:18:50 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -1038,7 +1038,8 @@ genshelloptUsage( tOptions*  pOptions, int exitCode )
      *  gets it from the command line
      */
     {
-        char* pz = strdup( pShellParseOptions->pzPROGNAME );
+        char* pz;
+        AGDUPSTR( pz, pShellParseOptions->pzPROGNAME, "program name" );
         pShellParseOptions->pzProgName = pz;
         while (*pz != NUL) {
             *pz = tolower( *pz );

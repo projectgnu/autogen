@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.17 2002/09/30 04:15:26 bkorb Exp $
+ *  $Id: autoopts.c,v 3.18 2002/10/01 04:18:50 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -65,6 +65,8 @@ tSCC zIllOptChr[]   = "%s: illegal option -- %c\n";
 tSCC zIllegal[]     = "illegal";
 tSCC zIllOptStr[]   = "%s: %s option -- %s\n";
 tSCC zAmbiguous[]   = "ambiguous";
+tSCC zOptArg[]      = "option argument";
+
 
 tSCC zOnlyOne[]     = "one %s%s option allowed\n";
 tSCC zAtMost[]      = "%4$d %1$s%s options allowed\n";
@@ -984,13 +986,14 @@ loadOptionLine( pOpts, pOS, pzLine, direction )
 
     case ARG_MAY:
         if (*pOS->pzOptArg == NUL)
-            pOS->pzOptArg = NULL;
+             pOS->pzOptArg = NULL;
+        else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, zOptArg );
         break;
 
     case ARG_MUST:
         if (*pOS->pzOptArg == NUL)
              pOS->pzOptArg = "";
-        else pOS->pzOptArg = strdup( pOS->pzOptArg );
+        else AGDUPSTR( pOS->pzOptArg, pOS->pzOptArg, zOptArg );
         break;
     }
 
@@ -1222,7 +1225,7 @@ doEnvPresets( pOpts, type )
             case ARG_MUST:
                 if (*st.pzOptArg == NUL)
                      st.pzOptArg = "";
-                else st.pzOptArg = strdup( st.pzOptArg );
+                else AGDUPSTR( st.pzOptArg, st.pzOptArg, zOptArg );
                 break;
 
             default: /* no argument allowed */
@@ -1515,8 +1518,9 @@ void optionLoadLine( pOpts, pzLine )
     tCC*       pzLine;
 {
     tOptState st = { NULL, OPTST_SET, TOPT_UNDEFINED, 0, NULL };
-    char* pz = strdup( pzLine );
+    char* pz = AGDUPSTR( pzLine, pzLine, "user option line" );
     loadOptionLine( pOpts, &st, pz, DIRECTION_PROCESS );
+    AGFREE( pz );
 }
 
 

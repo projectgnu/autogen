@@ -1,3 +1,8 @@
+2002-09-30  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(AGDUPSTR): make sure to call this where needed!
+	* autoopts/makeshell.c: ditto.
+
 2002-09-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(loadOptionLine): fix broken storage of optional
