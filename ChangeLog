@@ -1,3 +1,21 @@
+2000-02-28  Bruce Korb  <autogen@linuxbox.com>
+
+	* agen5/defLex.c: Added comma to list of token characters.
+	* agen5/defReduce.c: reworked `addSibMacro' so the logic is
+	more comprehensible.  Downside:  I did tricky things with
+	a pointer to pointer.
+	* agen5/expFormat.c(ag_scm_error):  message now distinguishes
+	between errors and warnings.  Also, it is silent if there is
+	no warning message to print.
+	* agen5/functions.c( mfunc_Error ): obsoleted by Guile function
+	* " (insertSubscript):  New - for handling subscripted definition
+	references as an AutoGen "function" name.
+	* " (mload_Unknown): calls above function when a name
+	is immediately followed by a '[' character.
+	* agen5/tpProcess.c: commentary changes
+	* agen5/test/Makefile.am:  Added error.test and for.test
+	* agen5/test/error.test, agen5/test/for.test: new
+
 2000-02-14  Bruce Korb  <autogen@linuxbox.com>
 
 	* agen5/defParse.y:  Added syntax to allow for comma separated
