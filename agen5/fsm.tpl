@@ -6,31 +6,29 @@ x
 /*
 [= (dne " *  ") =]
  *
- *  Finite State Machine
+ *  Automated Finite State Machine
  *
- *  These are the recognized transition tokens.  ``invalid'' is predefined
- */
-typedef enum {
-[=
-(out-push-new ".fsm.tkn")
-
-  =][=
-
-FOR  token  "\n"
-
-  =]FST_[= (string-upcase! (get "token")) =][=
-
-ENDFOR    =]
-FST_INVALID[=
-
-(out-pop) =][=
-
-`columns --spread=3 -I4 -S, < .fsm.tkn`  =]
-} te_fsm_token;
-
-/*
- *  These are the available states.  ``init'', ``invalid'' and ``done''
- *  are all predefined.
+ *  This file describes a finite state machine.  It consists of three
+ *  enumerations:
+ *
+ *  1.  The available states.  FSS_INIT is always defined to be zero
+ *      and FSS_INVALID and FSS_DONE are always made the last entries.
+ *  2.  The transition tokens.  These enumerate the token values used
+ *      to select the next state from the current state.
+ *      FST_INVALID is always defined at the end.
+ *  3.  The list of valid state + transition token names.  Only the
+ *      transitions defined to be valid are enumerated.
+ *
+ *  Plus a transition table indexed by current state and then the
+ *  transition token enumeration.  The table contains both the next
+ *  state *and* the appropriate state/transition enumeration.
+ *
+ *  If you AutoGen this with "EXAMPLE" defined in your environment,
+ *  this template will also produce example code for your FSM.
+ *
+[=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
+ *
+ *  Here are the available states.
  */
 typedef enum {
 [=
@@ -74,6 +72,27 @@ FOR token
 ENDFOR
 
 =]
+
+/*
+ *  The transition tokens.
+ */
+typedef enum {
+[=
+(out-push-new ".fsm.tkn")
+
+  =][=
+
+FOR  token  "\n"
+
+  =]FST_[= (string-upcase! (get "token")) =][=
+
+ENDFOR    =]
+FST_INVALID[=
+
+(out-pop) =][=
+
+`columns --spread=3 -I4 -S, < .fsm.tkn`  =]
+} te_fsm_token;
 
 /*
  *  This enumerates all the valid state + token-name transitions.
@@ -132,10 +151,9 @@ struct transition {
 /*
  *  This table maps the state enumeration + the token enumeration to
  *  the transition enumeration code and the new state.
- *  The ``INVALID'' and ``DONE'' states do not have transitions.
- *  The DONE state will exit the loop (i.e. not continue).
- *  All transitions to the INVALID state go through the FSX_invalid
- *  transition, which exits the program (or, at least, returns).
+ *  It is indexed by first the current state and then the token code.
+ *  There are no transition entries defined for the INVALID or DONE
+ *  states, obviously  :-).
  */
 static t_transition trans_table[ [=
    (+ 1 (count "state")) =] ][ [=(count "token")=] ] = {
