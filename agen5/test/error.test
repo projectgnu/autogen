@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2002-04-06 10:18:53 bkorb"
+# Time-stamp:        "2003-05-17 10:37:11 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 3.10 2002/04/06 19:11:44 bkorb Exp $
+# $Id: error.test,v 3.11 2003/05/18 17:10:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -72,7 +72,7 @@ cmp -s  ${testname}.err  ${testname}.out1 || \
 
 echo creating ${testname}.out2
 # this is the output we should expect to see
-cat > ${testname}.out2 <<_EOF_
+cat > ${testname}.out2 <<'_EOF_'
 DEFINITIONS Warning in error.tpl line 8 for error.fnord:
 	0 this is really okay
 Error in template error.tpl, line 13
@@ -80,6 +80,13 @@ Error in template error.tpl, line 13
 	This is a multi-line
 	error to show how to exit
 	your template
+Failing Guile command:  = = = = =
+
+(error "This is a multi-line
+	error to show how to exit
+	your template")
+
+=================================
 _EOF_
 
 # this is *supposed* to exit with a failure status
@@ -148,17 +155,59 @@ cat > ${testname}.tpl5 <<'_EOF_'
 THIS TEXT SHOULD BE DELETED!!
 <= ENDIF =>
 _EOF_
-$AGEXE -T ${testname}.tpl5 -b ${testname} --no-defin > ${testname}.out5 2>&1 && \
-  failure "$AGEXE was okay with bogus input"
 
-cat > ${testname}.samp5 <<EOF
+$AGEXE -T ${testname}.tpl5 -b ${testname} --no-defin \
+  2> ${testname}.out5 > /dev/null
+ [ $? -ne 0 ] || failure "$AGEXE was okay with bogus input"
+
+cat > ${testname}.samp5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:
 	ENDIF
 EOF
 
 cmp -s  ${testname}.samp5  ${testname}.out5 || \
-  failure "`diff -c ${testname}.samp5  ${testname}.out5`"
+  failure "`diff -c ${testname}.samp5 ${testname}.out5`"
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+echo creating ${testname}.tpl6
+cat > ${testname}.tpl6 <<'_EOF_'
+<= AutoGen5 template fnord null =>
+This is a broken template, "nothing" is not defined.
+<= (
+if (exist? "nothing")
+   (error "it is broken
+   'cuz it's okay")
+   (stumble-over-unbound-variable)
+) =>
+End Of File
+_EOF_
+
+$AGEXE -T ${testname}.tpl6 -b ${testname} --no-defin \
+  2> ${testname}.out6 >/dev/null
+[ $? -ne 0 ] || failure "$AGEXE was okay with bogus input"
+
+cat > ${testname}.samp6 <<EOF
+${testname}.tpl6:7:4: In expression (stumble-over-unbound-variable):
+${testname}.tpl6:7:4: Unbound variable: stumble-over-unbound-variable
+Scheme evaluation error.  AutoGen ABEND-ing in template
+	error.tpl6 on line 3
+Failing Guile command:  = = = = =
+
+(
+if (exist? "nothing")
+   (error "it is broken
+   'cuz it's okay")
+   (stumble-over-unbound-variable)
+)
+
+=================================
+EOF
+
+## cmp -s  ${testname}.samp6  ${testname}.out6 || \
+##   failure "`diff -c ${testname}.samp6 ${testname}.out6`"
+diff -c ${testname}.samp6 ${testname}.out6
 
 cleanup
 # end of error.test
