@@ -13,7 +13,7 @@ AutoGen5 template man=%s.1
 ## Last Modified:     Tue Aug  3 15:43:56 1999				      
 ##            by:     Bruce Korb <autogen@linuxbox.com>			      
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 2.8 2000/03/19 19:16:06 bruce Exp $
+## $Id: agman1-tpl.in,v 2.9 2000/03/19 19:18:11 bruce Exp $
 ## ---------------------------------------------------------------------
 
 1999-06-26 original version, Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -240,7 +240,8 @@ This option must not appear in combination with any of the following options:
    Replace "@*" command with ".br"
 
    NB:  backslashes are interpreted three times: by AutoGen, sed and nroff.
-        Thus, for nroff to see one backslash, use four (4)!!
+        Thus, for nroff to see one backslash, use four (4)
+        and for nroff to output a backslash, use EIGHT (8)!!!!
 
    ):+][+: % doc `sed \
  -e 's;@\\(code|var|samp\\){\\([^}]*\\)\};\\\\fB\\1\\\\fP;g' \
