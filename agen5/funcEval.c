@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 1.6 1999/10/31 22:06:48 bruce Exp $
+ *  $Id: funcEval.c,v 1.7 1999/10/31 22:37:57 bruce Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -352,33 +352,35 @@ eval( const char* pzExpr )
  *   The macro will be skipped if there is no AutoGen value associated with
  *   the @code{<value-name>}.  If there is an associated value, then the
  *   expression result is the result of evaluating @code{<expression-1>}
- *   (if present), otherwise it is the value associated with @code{<value-name>}.
+ *   (if present), otherwise it is the value associated with
+ *   @code{<value-name>}.
  *   @end table
  *
  *   The expression clauses are interpreted differently,
  *   depending on the first character:
  *
  *   @table @samp
- *   @item @code{;}
+ *   @item @code{;} (semi-colon)
  *   This is a Scheme comment character and must preceed Scheme code.
  *   AutoGen will strip it and pass the result to the Guile Scheme
  *   interpreter.
  *
- *   @item @code{(}
+ *   @item @code{(} (open parenthesis)
  *   This is a Scheme expression.  Guile will interpret it.
  *   It must end before the end macro marker.
  *
- *   @item @code{'}
+ *   @item @code{'} (single quote)
  *   This is a @i{fairly} raw text string.  It is not completely raw
  *   because backslash escapes are processed before 3 special characters:
- *   @code{'}, @code{#} and @code{\}.
+ *   single quote (@code{'}), the hash character (@code{#}) and
+ *   backslash (@code{\\}).
  *
- *   @item @code{"}
+ *   @item @code{"} (double quote)
  *   This is a cooked text string.  The string is processed as in a
  *   K and R quoted string.  That is to say, adjacent strings are not
  *   concatenated together.
  *
- *   @item @code{`}
+ *   @item @code{`} (back quote)
  *   This is a shell expression.  The AutoGen server shell will
  *   interpret it.  The result of the expression will be the
  *   output of the shell script.  The string is processed as in
