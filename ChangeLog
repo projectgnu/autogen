@@ -1,0 +1,5 @@
+1999-10-27  Bruce Korb  <autogen@linuxbox.com>
+
+	AutoGen Version 5:
+	* src/*:  Reworked virtually everything.  See NEWS.
+	* */*.tpl: Reworked them to the new template format.
