@@ -7,10 +7,10 @@
 ## Author:            Bruce Korb <korbb@datadesign.com>
 ## Maintainer:        Bruce Korb <korbb@datadesign.com>
 ## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Thu Jul 29 13:53:30 1999                                
+## Last Modified:     Fri Jul 30 07:20:54 1999                                
 ##            by:     Bruce Korb <korb@datadesign.com>                        
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 2.24 1999/07/29 20:54:13 bkorb Exp $
+## $Id: auto_gen.tpl,v 2.25 1999/07/30 14:21:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 texi=autogen.texi =]
@@ -1032,7 +1032,8 @@ do
    echo \'@ignore\'
    echo \'Copy of $f and associated .texi\'
    echo \'@end ignore\'
-   sed s/\'${top_builddir}\'/"${top_builddir}"/ `echo $f|
+   sed -e s/\'${top_builddir}\'/"${top_builddir}"/ \
+       -e s/\'${top_srcdir}\'/"${top_srcdir}"/ `echo $f|
        sed \'s/\.menu$/\.texi/\'`
    fi
 done' _shell =]
