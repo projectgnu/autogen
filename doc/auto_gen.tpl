@@ -1,7 +1,7 @@
 [= autogen template -*-texinfo-*-
 #
 #  Documentation template
-#  $Id: auto_gen.tpl,v 1.13 1998/07/16 18:31:45 bkorb Exp $
+#  $Id: auto_gen.tpl,v 1.14 1998/07/16 21:30:21 bkorb Exp $
 #
 texi=autogen.texi =]
 \input texinfo
@@ -1116,7 +1116,6 @@ myopts.o -L $prefix/lib -lopts
 @end example
 @end itemize
 
-* Quick Start::       Quick Start
 @node Quick Start
 @section Quick Start
 @cindex Quick Start
@@ -1154,7 +1153,7 @@ Then perform the following steps:
 
 @enumerate
 @item
-@code{autogen -L $prefix/share/autogen check.def}
+@code{autogen -L $prefix/share/autogen -DTEST_MAIN=yes check.def}
 @item
 @code{cc -o check -DTEST_CHECK_OPTS -g check.c -L $prefix/lib -lopts}
 @end enumerate
@@ -1182,6 +1181,7 @@ The following option preset mechanisms are supported:
 
 @noindent
 and @code{./check --check=$HOME --dont-show --check=/usr/local/share} yields:
+
 @smallexample
 OPTION_CT=3
 export OPTION_CT
