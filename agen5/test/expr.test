@@ -6,10 +6,10 @@
 # Author:	     Bruce Korb <autogen@linuxbox.com>
 # Maintainer:	     Bruce Korb <autogen@linuxbox.com>
 # Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 1999/11/03 06:29:03 $
+# Last Modified:  $Date: 1999/11/03 06:31:45 $
 #            by:     Bruce Korb <autogen@linuxbox.com>
 #
-# $Id: expr.test,v 1.2 1999/11/03 06:29:03 bruce Exp $
+# $Id: expr.test,v 1.3 1999/11/03 06:31:45 bruce Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,7 +21,7 @@ if test -z "$srcdir"; then
 fi
 . $srcdir/defs
 workdir=`pwd`
-(cd .. ; cp $srcdir/snarf.tpl $workdir)
+(cd .. ; cp $srcdir/../snarf.tpl $workdir)
 
 BLOCKOPT="subblock=exparg=arg_name,arg_desc,arg_optional,arg_list"
 GETOPTS="assign=group=ag defs=gfunc templ=snarf srcfile base-name=expr"
