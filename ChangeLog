@@ -1,3 +1,32 @@
+2003-12-07  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: tag the entries to make them easier to find in configure
+	* agen5/Makefile.am(autogen.1): it depends on getdefs & columns, too.
+	* agen5/agUtils.h(fcntl.h): don't include if we don't have it
+	* agen5/bootstrap.dir(autogen.1): don't touch it after creation
+	* agen5/expPrint.c(run_printf): cast the SCM through uintptr_t
+	* autoopts/enumeration.c(optionEnumerationVal): use uintptr_t to
+	cast a char* to a scalar.
+	* autoopts/guileopt.c(export_options_to_guile): ditto
+	* autoopts/putshell.c(putBourneShell): ditto
+	* compat/compat.h(stdint.h): we now require this for building.
+	* agen5/expString.c(ag_scm_raw_shell_str): expand doc for new stuff
+	* autoopts/optmain.tpl(range-option-code): set value type to "long",
+	as it is more likely to match a pointer size.  The generated output
+	may or may not have access to stdint.h types.
+	* getdefs/Makefile.am(opts.h): getdefs and columns must be built first.
+
+2003-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c(ag_scm_raw_shell_str): minimize the switching
+	between quoted text and escaped single quotes for raw-shell-str.
+	* agen5/test/defs(testsubdir): correct spelling
+	* agen5/test/shell.test(raw-shell-str): correct for new results
+	* agen5/test/string.test(checkStr): make messages more explicit
+	* autoopts/makeshell.c(emitSetup): accommodate environment variable
+	"presets" for one-copy-only options.
+	* autoopts/test/shell.test: accommodate the new results
+
 2003-12-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/makeshell.c(emitMatchExpr): consolodate some code here &
@@ -146,313 +175,3 @@
 	* agen5/expMake.c(ag_scm_makefile_script): if we are supplying a start
 	of line tab character, it looks ugly to also use tab characters from
 	the source string, so strip them.
-
-2003-06-01  Bruce Korb  <bkorb@gnu.org>
-
-	==5.5.5 released.
-
-2003-05-30  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/schemedef.scm(before-error-hook): not part of Guile 1.4
-	(ice-9 stack-catch): also not part of 1.4
-	* agen5/agUtils.c(doOptions): above code moved here for 1.6
-	* agen5/autogen.h(unloadTemplate): always exist now
-	(unloadDefs): ditto
-	* agen5/defLex.c(assembleString): Allow comments within concatenated
-	string values.
-	* agen5/defLoad.c(unloadDefs): new dummy procedure
-	* agen5/expPrint.c(run_printf): sizeof pointer, not void
-	* agen5/loadPseudo.c(doSchemeExpr): accommodate HP/UX initializing
-	* agen5/tpLoad.c(unloadTemplate): new dummy procedure
-	* autoopts/agman3.tpl(example): accommodate example section
-	* autoopts/autoopts.h(aopts_strdup): obsolete
-	* autoopts/enumeration.c(optionEnumerationVal): the result number is
-	now unsigned.  Do not look for negative value.
-	* autoopts/optcode.tpl(number-arg): obsolete
-	* autoopts/opthead.tpl(FULL_VERSION): use sprintf for whole string
-	* autoopts/options.tpl: add test to ensure prog-title is defined.
-	* config/misc.def: define scm_t_port for Guile 1.4, too.
-	* doc/Makefile.am(texi-stamp): allow long timeout for linking on HP
-	* doc/auto_gen.tpl(default-test): rework how it gets built
-
-2003-05-23  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/agUtils.c(doOptions): move the ag_init call to here from main
-	* agen5/autogen.c(inner_main): move ag_init and zSchemeInit eval to
-	the initialization (option processing) function: doOptions.
-	* agen5/directive.tpl(zSchemeInit): create #define for file + line
-	* agen5/expOutput.c: make sure all output files are re-readable
-	(ag_scm_out_line): new - return the current output line number.
-	* agen5/snarf.tpl: simplify a bunch of stuff.
-	* agen5/test/snarf.test: adjust to tweaked syntax
-	* agen5/tpProcess.c(openOutFile): make output file re-readable
-	* config/bootstrap: bail on problem.
-	* config/confmacs.tpl: allow compile/link/run tests to specify cppflags
-	and libs.
-	* config/misc.def(eval-string): new - check for scm_primitive_eval_x()
-
-2003-05-18  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expGuile.c(ag_scm_string_upcase): avoid using gh_scm2newstr
-	(ag_scm_string_capitalize): ditto
-	(ag_scm_string_downcase): ditto
-	* agen5/funcFor.c(ag_scm_first_for_p): ditto
-	(ag_scm_last_for_p): ditto
-	(ag_scm_for_index): ditto
-	* agen5/test/error.test(tpl6): test file name/line number in Guile msg
-	(Doesn't work yet, so it doesn't fail yet either)
-	* xml2ag/xml2ag.c(trim): remove trailing newline, too.
-	* xml2ag/test/*: new
-	* xml2ag/Makefile.am: add test directory
-	* agen5/autogen.c(doneCheck): omit messages when leaving during AutoOpts
-	* agen5/autogen.h(ag_eval): allow for nested evaluations
-	* agen5/tpProcess.c(processTemplate): clear scheme code string ptr after
-	setjmp call.  We make that call only at the start of processing.
-
-2003-05-16  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/Makefile.am(pkgdata_DATA): do not install schemedef.scm
-	* agen5/autogen.c(zSchemeInit): move to schemedef.scm
-	(signalExit): remove state name table to global position
-	(doneCheck): print stopping state for all but DONE and ABORTING
-	* agen5/autogen.h(pzLastScheme): keep track of current scheme operation
-	(ag_eval): wrapper for either gh_eval_str or scm_call_1, depending
-	* agen5/bootstrap.dir: put the AG_* version stuff into environment
-	* agen5/defLex.c(alist_to_autogen_def): no need to load schemedef.scm
-	and replace gh_eval_str call with ag_eval.
-	* agen5/directive.tpl: convert schemedef.scm to a string initializer
-	* agen5/funcDef.c: replace gh_eval_str call with ag_eval
-	* agen5/funcEval.c: ditto
-	* agen5/loadPseudo.c: ditto
-	* agen5/schemedef.scm: add the code for error catching & display
-	* agen5/test/error.test: adjust for tweaked output
-	* agen5/test/html.test: ditto
-
-2003-05-15  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/optcode.tpl: Fix the regularized usage.
-	* autoopts/opthead.tpl(UP-prog): obsolete - use pname-up
-	(ERRSKIP): option struct name uses 'pname' not 'prog-name'.
-	* autoopts/options.tpl(cap-prog-name): obsolete
-	(UP-prog): obsolete
-	* doc/auto_gen.tpl(stdoptions): show an example
-	* doc/autogen.texi(ini files): describe how they can be partitioned
-	* pkg/mkgnudoc.sh(img src): fix the location string
-
-2003-05-12  Bruce Korb  <bkorb@gnu.org>
-
-	==5.5.4 released.
-
-2003-05-05  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/agman1.tpl(descrip): double backslashes for nroff
-	* autoopts/opt*.tpl: regularize some usage.
-	* columns/columns.c(handleIndent): fix column number computation
-
-2003-05-03  Bruce Korb  <bkorb@gnu.org>
-
-	* */*.c: remove proc type indentation from obsolete coding style.
-	* agen5/autogen.c: include compat/strsignal.c, if we need it.
-	* compat/strsignal.c(signo_max): unused - remove
-	(strsigno): ditto
-	(strtosigno): ditto
-	(psignal): ditto
-	* configure.in(psignal): don't configure it, either.
-
-2003-05-02  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expState.c(ag_scm_get): add an optional second argument - an
-	alternative string in case the named value is not found.
-	* agen5/expString.c: syntax cleanup
-	* autoopts/optcode.tpl: Remove K&R-isms
-	* autoopts/optmain.tpl: ditto + fix default optional argument handling
-	for keyword options.  also, use the up-c-name macro more
-	* autoopts/test/handler.test: test default optional keyword arguments
-	* autoopts/options.tpl: use the up-c-name macro more
-	* autoopts/optlib.tpl: ditto
-	* doc/autogen.texi: correct doc for using arg-optional with keyword opts
-
-2003-04-28  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/agUtils.c(MEMDEBUG): remove this stuff: we have better tools
-	* agen5/agUtils.h: ditto
-	* agen5/autogen.c: ditto
-	* agen5/defReduce.c: ditto
-	* agen5/tpLoad.c: ditto
-	* autoopts/autoopts.h: ditto
-	* autoopts/autoopts.h: ditto
-	* autoopts/streqv.h: ditto
-	* autoopts/streqvcmp.c: ditto
-	* columns/opts.def: rely on snprintfv so old platforms won't choke
-	* config/misc.def(libguile): include the correct headers for the test
-	* config/missing: upgrade to current version
-	* xml2ag/xml2ag.c(trim): rework to avoid fixed size limitations
-	* xml2ag/xmlopts.def(export): Need to define NUL and include ctype.h
-	* Makefile.am: distribute the generated and copied xxx.m4 files, too
-	* configure.in(INCLIST): remove the snprintfv directories.  We include
-	those files with a "snprintfv/" prefix, so it is not needed.
-
-2003-04-26  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/agCgi.c(loadCgi): redirect stderr to a temp file so that it
-	can get rewound and written to stdout in case of an error.
-	* agen5/autogen.c(inner_main): enable Guile backtraces when we have
-	our own tracing turned on.
-	(doneCheck): if we have a redirected stderr, copy the text to the
-	stdout and unlink the file.
-	* agen5/autogen.h(pzTmpStderr): non-NULL -> redirected stderr
-	* agen5/tpProcess.c(doStdoutTemplate): properly handle messages for HTML
-	* agen5/test/html.test: test HTML failure mode
-
-2003-04-21  Bruce Korb  <bkorb@gnu.org>
-
-	* */*.[ch]: remove unnecessary includes
-
-2003-04-20  Bruce Korb  <bkorb@gnu.org>
-
-	* */*.[ch]: warning patrol
-	* */Makefile.am: speed up:  use monolithic compilations
-	(speeds build + speeds execution)
-
-2003-04-18  Bruce Korb  <bkorb@gnu.org>
-
-	* */*.[ch]: retag the ending of source files.
-
-2003-04-16  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/enumeration.c(optionEnumerationVal): change intptr_t's to
-	uintptr_t's.  Makes no difference, but we config the latter, not former
-	* autoopts/save.c(optionSaveFile): ditto
-
-2003-04-13  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/*: minor cleanups triggered by using a new compiler
-
-2003-04-10  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/Makefile.am(autogen_LDADD): add the Guile link stuff here.
-
-2003-04-10  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expOutput.c(ag_scm_out_push_new): mkstemp uses the O_CREAT flag.
-	This is incompatibile with the fdopen option "a+" on OSR5.
-	* agen5/tpProcess.c(openOutFile): incorrect arg list for printf.
-
-2003-04-03  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/bootstrap.dir: fix comment
-	* autoopts/Makefile.am: do not install options_h.tpl
-	* autoopts/opt*.tpl: clean up syntax
-
-2003-04-01  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/options.tpl: Set up new variables OPT-pfx INDEX-pfx VALUE-pfx
-	* autoopts/optlib.tpl: use them and ensure that flags-cant, flags-must
-	equivalence and other option naming values get transformed the same
-	way "name" gets transformed everywhere.
-	* autoopts/optcode.tpl: ditto.
-	* autoopts/opthead.tpl: ditto.
-
-2003-03-15  Bruce Korb  <bkorb@gnu.org>
-
-	==5.5.3 released.
-
-	* pkg/mkpkg.linux: Finished.
-	* pkg/spec.tpl(BuildRoot): It must not conflict with %topdir.
-	(strip_binaries): doesn't work for me
-	(gzip_man): this either
-
-2003-03-13  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/opts.def(version): some egreps require '^'-s to be quoted
-	* autoopts/usage.c: initial space in absence of short option needs
-	to vary by non-gnu-style vs. standard
-	* autoopts/test/usage.test: accommodate
-
-2003-03-12  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/test/Makefile.am: some shells like to echo after a cd.
-	* agen5/test/opts.test: same issue
-	* autoopts/test/Makefile.am: and again + set LD_LIBRARY_PATH for Guile
-	* config/confmacs.tpl: Pass through the 'withlib' library directory so
-	the executables can have LD_LIBRARY_PATH set.
-	* getdefs/getdefs.c: Don't set a hard limit on the template name.
-	* getdefs/getdefs.h: Remove the template name with the hard coded len.
-	* getdefs/opts.def: the --template option is now settable
-
-2003-03-11  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/usage.c(printBareUsage): give arg handling type precedence
-	in the argument description over the argument format type.  Display
-	optional option arguments as "arg" instead of "opt".
-	* autoopts/test/equiv.test: accommodate
-	* autoopts/test/usage.test: accommodate
-	* autoopts/options.tpl: "usage" and "gnu-usage" conflict
-	* doc/autogen.texi: doc this new stuff
-	(information attributes): split the description attributes
-
-2003-03-10  Bruce Korb  <bkorb@gnu.org>
-
-	* VERSION: clean out cruft
-	* autoopts/usage.c: break up monolithic procedure & rework option
-	argument handling for GNU format usage.
-	* autoopts/test/usage.test: accommodate changes
-
-2003-03-09  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/usage.c(optionUsage): Separate more completely the GNU vs.
-	std option description format strings.
-	* autoopts/test/*.test: formatting tweaks
-	* AUTHORS: added Daniel Schregenberger as a new contributor
-	* agen5/expPrint.c: use asprintfv instead of trying to compute buf size
-	* snprintfv/printf.in(SNV_EMIT): force characters to be unsigned so we
-	don't confuse ourselves with error results.
-
-2003-03-08  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/optcode.tpl(OPTPROC_GNUUSAGE): set the flag when needed.
-	* autoopts/options_h.tpl(OPTPROC_GNUUSAGE): define the flag
-	* autoopts/test/Makefile.am(usage.test): new test
-	* autoopts/test/usage.test: new test script
-	* autoopts/test/equiv.test: clean up short/long option description
-	* autoopts/test/errors.test: likewise
-	* autoopts/test/keyword.test: likewise
-	* autoopts/test/rc.test: likewise
-	* autoopts/test/shell.test: likewise
-	* autoopts/test/stdopts.test: likewise
-	* autoopts/usage.c(optionUsage): likewise + incorporate changes for
-	GNU-style usage message + ensure the paged usage text gets flushed
-
-2003-03-07  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/optcode.tpl(usage-proc): define Guile symbol in one place and
-	use it elsewhere instead of recomputing.
-	* autoopts/options.tpl(disabling flags): this is illegal.
-	You get arrested for it.
-
-2003-03-02  Bruce Korb  <bkorb@gnu.org>
-
-	* Makefile.am(package): propagate $(pkgtype)
-	* pkg/...: more work, RPM's still wont work in alternate directory.
-	Followed the docs, tho....
-
-2003-02-28  Bruce Korb  <bkorb@gnu.org>
-
-	* Makefile.am: added rule for making packages in the pkg directory
-	* agen5/defReduce.c: allocation counts assumed 4 byte pointers
-	* agen5/expGuile.c: gh_scm2newstr takes a size_t* argument, not int*
-	* lcl-ag/agen5/funcFor.c: ditto
-	* agen5/opts.def: only evaluate the AG_* assignments
-	* autoopts/enumeration.c(optionEnumerationVal): the result must be
-	a pointer sized int.
-	* autoopts/save.c(optionSaveFile): when putting a pointer into a
-	scalar, ensure the scalar is as wide as a pointer.
-	* pkg/...: make packaging rules for Sun
-	* pkg/libopts/README: cleanup
-	* snprintfv/compat.h: undefine _STR and _CONC in case of conflict
-	* snprintfv/printf.c: allocate more than we need for our purposes.
-	This is still an snprintfv bug....
-
-2003-02-16  Bruce Korb  <bkorb@gnu.org>
-
-	==5.5.2 released.
