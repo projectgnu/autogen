@@ -1909,10 +1909,8 @@ Thus, Guile based applications that are linked with private
 @code{main()} routines can take advantage of all of AutoOpts' functionality.
 
 @item
-If @code{test-main} is defined, the output @file{.c} file will contain a
-main routine that will be compiled when @code{TEST_<prog-name>_OPTS} is
-defined.  @xref{shell options}.  If you choose to compile this program,
-it is currently capable of producing one of three results:
+Various forms of main procedures can be added to the output,
+@xref{Generated main}.  There are four basic forms:
 
 @enumerate a
 @item
@@ -1925,10 +1923,13 @@ options.  The expectation is that this result will be copied into a
 shell script and used there.
 
 @item
-@code{test-main} may specify a routine that will be called with a
-pointer to the option descriptions as the single argument.  You must
-supply this routine and, obviously, you can cause it to do whatever you
-wish it to do.
+A ``for-each'' main that will invoke a named function once for either
+each non-option argument on the command line or, if there are none,
+then once for each non-blank, non-comment input line read from stdin.
+
+@item
+A main procedure of your own design.  Its code can be supplied in the
+option description template or by incorporating another template.
 @end enumerate
 
 @item
@@ -2507,7 +2508,7 @@ Optionally names the usage procedure, if the library routine
 use a procedure by that name for displaying usage.  Of course, you will
 need to provide that procedure and it must conform to this profile:
 @example
-void optionUsage( tOptions* pOptions, int exitCode )
+void @i{my_usage}( tOptions* pOptions, int exitCode )
 @end example
 
 @cindex gnu-usage
