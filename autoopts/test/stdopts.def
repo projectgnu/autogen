@@ -32,23 +32,29 @@ echo >&5
 
 for flag
 do
+    case "$flag" in
+    *: )
+	flag=`echo $flag | sed 's/://'`
+	arg="    flag_arg = ':';"
+	;;
+    * )
+	arg='\c'
+	;;
+    esac
+
+    cat <<-_EOF_
+	flag = {
+	    name = "$flag";
+	    descrip = "The $flag option descrip";
+	_EOF_
+
     if ${use_flags}
     then
-        cat <<-_EOF_
-	flag = {
-	    name = "$flag";
-	    descrip = "The $flag option descrip";
-	    value = '`echo $flag | sed 's/\(.\).*/\1/'`';
-	};
-	_EOF_
-    else
-        cat <<-_EOF_
-	flag = {
-	    name = "$flag";
-	    descrip = "The $flag option descrip";
-	};
-	_EOF_
+	echo "    value = '`echo $flag | sed 's/\(.\).*/\1/'`';"
     fi
+    echo "$arg"
+    echo "};"
+    echo
 done >&5
 
 exec 5>&-
