@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 1.14 2000/03/12 20:40:36 bruce Exp $
+ *  $Id: expString.c,v 1.15 2000/03/28 01:57:03 bruce Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -478,7 +478,7 @@ ag_scm_raw_shell_str( SCM obj )
     pz[-1] = '\'';
     *pz    = NUL;
 
-    return obj;
+    return res;
 }
 
 
