@@ -10,7 +10,8 @@
 	* autoopts/save.c(optionSaveFile): renamed from optionSave.  exported now
 	* config/confmacs.tpl(withlib): add code to generate withlib testing.
 	* config/misc.def(guile): new withlib test
-
+	* agen5/fsm*.tpl(reent): implement reentrant FSM
+	
 2002-05-04  Bruce Korb  <bkorb@gnu.org>
 
 	* config/missing(makeinfo): fix syntax
