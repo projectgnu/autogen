@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 1.4 1999/10/28 03:24:48 bruce Exp $
+ *  $Id: funcFor.c,v 1.5 1999/10/31 19:14:30 bruce Exp $
  *
  *  This module implements the FOR text function.
  */
@@ -80,22 +80,26 @@ ag_scm_for_index( void )
 
 /*=gfunc for_from
  *
+ * exparg: from, the initial index for the AutoGen FOR macro
+ *
  *doc:  This function records the initial index information for an
  *      AutoGen FOR function.  It returns SCM_BOOL_T.
  *      This function is deactivated outside of the context of the
  *      evaluation of the arguments to the AutoGen FOR macro function.
 =*/
     SCM
-ag_scm_for_from( SCM obj )
+ag_scm_for_from( SCM from )
 {
-    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( from )))
         return SCM_UNDEFINED;
-    forInfo.for_from = gh_scm2int( obj );
+    forInfo.for_from = gh_scm2int( from );
     return SCM_BOOL_T;
 }
 
 
 /*=gfunc for_to
+ *
+ * exparg: to, the final index for the AutoGen FOR macro
  *
  *doc:  This function records the terminating value information for an
  *      AutoGen FOR function.  It returns SCM_BOOL_T.
@@ -103,16 +107,18 @@ ag_scm_for_from( SCM obj )
  *      evaluation of the arguments to the AutoGen FOR macro function.
 =*/
     SCM
-ag_scm_for_to( SCM obj )
+ag_scm_for_to( SCM to )
 {
-    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( to )))
         return SCM_UNDEFINED;
-    forInfo.for_to = gh_scm2int( obj );
+    forInfo.for_to = gh_scm2int( to );
     return SCM_BOOL_T;
 }
 
 
 /*=gfunc for_by
+ *
+ * exparg: by, the iteration increment for the AutoGen FOR macro
  *
  *doc:  This function records the "step by" information for an
  *      AutoGen FOR function.  It returns SCM_UNDEFINED if it is
@@ -122,16 +128,18 @@ ag_scm_for_to( SCM obj )
  *      the arguments to the @code{FOR} AutoGen function.
 =*/
     SCM
-ag_scm_for_by( SCM obj )
+ag_scm_for_by( SCM by )
 {
-    if ((! forInfo.for_loading) || (! gh_number_p( obj )))
+    if ((! forInfo.for_loading) || (! gh_number_p( by )))
         return SCM_UNDEFINED;
-    forInfo.for_by = gh_scm2int( obj );
+    forInfo.for_by = gh_scm2int( by );
     return SCM_BOOL_T;
 }
 
 
 /*=gfunc for_sep
+ *
+ * exparg: separator, the text to insert between each AutoGen FOR iteration
  *
  *doc:  This function records the separation string that gets
  *      inserted between each iteration of an
