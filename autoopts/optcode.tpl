@@ -1,8 +1,7 @@
 [= autogen5 template  -*- Mode: C -*-
-#$Id: optcode.tpl,v 2.19 1999/10/28 01:25:24 bruce Exp $
+#$Id: optcode.tpl,v 2.20 1999/10/30 17:09:07 bruce Exp $
 =]
 [=
-
 IF (exist? "copyright") 
 =]
 static const char zCopyright[] =
@@ -137,7 +136,7 @@ IF (or (exist? "flag.flag_code") (exist? "flag.call_proc")) =][=
  */[=
 
 
-  FOR FLAG =][=
+  FOR flag =][=
     (set! cap-name (string-capitalize! (get "name"))) =][=
 
     IF (exist? "call_proc") =]
@@ -147,7 +146,7 @@ extern tOptProc [=(get "call_proc")=];[=
 static tOptProc doOpt[=(. cap-name)=];[=
 
     ENDIF =][=
-  ENDFOR FLAG   =][=
+  ENDFOR flag   =][=
  
   IF (exist? "test_main") =][=
 
@@ -158,7 +157,7 @@ static tOptProc doOpt[=(. cap-name)=];[=
  *  Under test, omit argument processing, or call stackOptArg,
  *  if multiple copies are allowed.
  */[=
-    FOR FLAG =][=
+    FOR flag =][=
     (set! cap-name (string-capitalize! (get "name"))) =][=
 
       IF (exist? "call_proc") =]
@@ -174,7 +173,7 @@ static tOptProc doOpt[=(. cap-name)=];[=
           ENDIF=][=
 
       ENDIF=][=
-    ENDFOR FLAG=]
+    ENDFOR flag=]
 #endif /* defined( TEST_[=(. pname-up)=]_OPTS ) */[=
   ENDIF (exist? "test_main") =]
 [=
@@ -196,10 +195,20 @@ extern tOptProc doPagedUsage;
  *  Define the [=(. pname-cap)=] Option Descriptions.
  */
 static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
+
+(define default-opt-index -1)
 (define up-name "") =][=
 
 FOR flag "\n" =][=
   Option_Descriptor =][=
+
+  # IF this is the default option AND this option takes an argument,
+    THEN remember this index  =][=
+
+  (if (and (exist? "default")
+           (= (len "flag_arg") 0))
+      (set! default-opt-index (for-index)) ) =][=
+
 ENDFOR flag
 
 =][=
