@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 2.0 1998/08/23 10:39:19 bkorb Exp $
+ *  $Id: putshell.c,v 2.1 1999/07/07 15:46:46 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -133,7 +133,7 @@ putBourneShell( tOptions* pOpts )
 
         /*
          *  IF the option has an empty value,
-         *  THEN we set the argument to the occurrance count.
+         *  THEN we set the argument to the occurrence count.
          */
         else if (  (pOD->pzLastArg == (char*)NULL)
                 || (pOD->pzLastArg[0] == NUL) )
