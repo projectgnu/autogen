@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 3.30 2004/11/21 21:31:25 bkorb Exp $
+# $Id: optlib.tpl,v 3.31 2004/11/30 04:00:13 bkorb Exp $
 
 # Automated Options copyright 1992-2004 Bruce Korb
 
@@ -438,7 +438,7 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* bool                  =][=
           CASE arg-default      =][=
           ~ n.*|f.*|0           =]
-#define [=(. def-arg-name)=]((tCC*)((tCC*)AG_FALSE)[=
+#define [=(. def-arg-name)=]((tCC*)AG_FALSE)[=
           *                     =]
 #define [=(. def-arg-name)=]((tCC*)AG_TRUE)[=
           ESAC                  =][=
