@@ -1,6 +1,6 @@
 
 /*
- *  autoopts.h  $Id: autoopts.h,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 3.1 2001/12/10 01:13:09 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -172,7 +172,7 @@ typedef enum {
 
 typedef struct {
     tOptDesc*  pOD;
-    u_long     flags;
+    tUL        flags;
     teOptType  optType;
     int        argType;
     char*      pzOptArg;

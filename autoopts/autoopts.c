@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 3.1 2001/12/09 20:31:52 bkorb Exp $
+ *  $Id: autoopts.c,v 3.2 2001/12/10 01:13:09 bkorb Exp $
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -280,7 +280,7 @@ longOptionFind( pOpts, pzOptName, pOptState )
         if (disable)
             pOptState->flags |= OPTST_DISABLED;
 
-        pOptState->pOD = pOpts->pOptDesc + matchIdx;
+        pOptState->pOD      = pOpts->pOptDesc + matchIdx;
         pOptState->pzOptArg = pzEq;
         pOptState->optType  = TOPT_LONG;
         return SUCCESS;
@@ -339,7 +339,7 @@ shortOptionFind( pOpts, optValue, pOptState )
          *  THEN we stop here
          */
         if ((! SKIP_OPT(pRes)) && (optValue == pRes->optValue)) {
-            pOptState->pOD = pRes;
+            pOptState->pOD     = pRes;
             pOptState->optType = TOPT_SHORT;
             return SUCCESS;
         }
@@ -364,7 +364,8 @@ shortOptionFind( pOpts, optValue, pOptState )
      */
     if (  isdigit( optValue )
        && (pOpts->specOptIdx.number_option != NO_EQUIVALENT) ) {
-        pOptState->pOD = pOpts->pOptDesc + pOpts->specOptIdx.number_option;
+        pOptState->pOD = \
+        pRes           = pOpts->pOptDesc + pOpts->specOptIdx.number_option;
         (pOpts->pzCurOpt)--;
         pOptState->optType = TOPT_SHORT;
         return SUCCESS;
@@ -480,6 +481,7 @@ nextOption( pOpts, pOptState )
     res = findOptDesc( pOpts, pOptState );
     if (! SUCCESSFUL( res ))
         return res;
+    pOptState->flags |= (pOptState->pOD->fOptState & OPTST_PERSISTENT);
 
     /*
      *  Figure out what to do about option arguments.  An argument may be
@@ -832,7 +834,7 @@ doImmediateOpts( pOpts )
         /*
          *  IF this *is* an immediate-attribute option, then do it.
          */
-        switch (optState.pOD->fOptState & (OPTST_DISABLE_IMM|OPTST_IMM)) {
+        switch (optState.flags & (OPTST_DISABLE_IMM|OPTST_IMM)) {
         case 0:                   /* never */
             continue;
 
@@ -892,13 +894,13 @@ loadOptionLine( pOpts, pOS, pzLine, direction )
          */
         if (! SUCCESSFUL( longOptionFind( pOpts, pzLine, pOS )))
             return;
-        if (pOS->pOD->fOptState & OPTST_NO_INIT)
+        if (pOS->flags & OPTST_NO_INIT)
             return;
 
         pOS->pzOptArg = pz;
     }
 
-    switch (pOS->pOD->fOptState & (OPTST_IMM|OPTST_DISABLE_IMM)) {
+    switch (pOS->flags & (OPTST_IMM|OPTST_DISABLE_IMM)) {
     case 0:
         /*
          *  The selected option has no immediate action.
@@ -1149,7 +1151,7 @@ doEnvPresets( pOpts, type )
         st.pzOptArg = getenv( zEnvName );
         if (st.pzOptArg == (char*)NULL)
             continue;
-        st.flags    = OPTST_PRESET;
+        st.flags    = OPTST_PRESET | st.pOD->fOptState;
         st.optType  = TOPT_UNDEFINED;
         st.argType  = 0;
 
@@ -1165,10 +1167,10 @@ doEnvPresets( pOpts, type )
              *  Process only immediate actions
              */
             if (st.flags & OPTST_DISABLED) {
-                if ((st.pOD->fOptState & OPTST_DISABLE_IMM) == 0)
+                if ((st.flags & OPTST_DISABLE_IMM) == 0)
                     continue;
             } else {
-                if ((st.pOD->fOptState & OPTST_IMM) == 0)
+                if ((st.flags & OPTST_IMM) == 0)
                     continue;
             }
             break;
@@ -1178,10 +1180,10 @@ doEnvPresets( pOpts, type )
              *  Process only NON immediate actions
              */
             if (st.flags & OPTST_DISABLED) {
-                if ((st.pOD->fOptState & OPTST_DISABLE_IMM) != 0)
+                if ((st.flags & OPTST_DISABLE_IMM) != 0)
                     continue;
             } else {
-                if ((st.pOD->fOptState & OPTST_IMM) != 0)
+                if ((st.flags & OPTST_IMM) != 0)
                     continue;
             }
             break;
@@ -1571,7 +1573,7 @@ optionProcess( pOpts, argCt, argVect )
         /*
          *  IF this is not an immediate-attribute option, then do it.
          */
-        switch (optState.pOD->fOptState & (OPTST_DISABLE_IMM|OPTST_IMM)) {
+        switch (optState.flags & (OPTST_DISABLE_IMM|OPTST_IMM)) {
         case 0:                   /* always */
             break;
 

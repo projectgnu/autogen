@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
+ *  $Id: stack.c,v 3.1 2001/12/10 01:13:09 bkorb Exp $
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  */
@@ -64,7 +64,8 @@
 
 #include "autoopts.h"
 
-void unstackOptArg( pOpts, pOptDesc )
+void
+unstackOptArg( pOpts, pOptDesc )
     tOptions*  pOpts;
     tOptDesc*  pOptDesc;
 {
@@ -146,14 +147,19 @@ void unstackOptArg( pOpts, pOptDesc )
 }
 
 
-void stackOptArg( pOpts, pOptDesc )
+void
+stackOptArg( pOpts, pOptDesc )
     tOptions*  pOpts;
     tOptDesc*  pOptDesc;
 {
     tArgList* pAL;
+    char* pzLast = pOptDesc->pzLastArg;
 
     if (pOptDesc->optArgType == ARG_NONE)
         return;
+
+    if (pOptDesc->optActualIndex != pOptDesc->optIndex)
+        pOptDesc = pOpts->pOptDesc + pOptDesc->optActualIndex;
 
     /*
      *  Being called is the most authoritative way to be sure an
@@ -172,7 +178,7 @@ void stackOptArg( pOpts, pOptDesc )
 
     pAL = (tArgList*)pOptDesc->optCookie;
 
-    if (pOptDesc->pzLastArg == (char*)NULL)
+    if (pzLast == (char*)NULL)
         return;
 
     /*
@@ -208,7 +214,7 @@ void stackOptArg( pOpts, pOptDesc )
     /*
      *  Insert the new argument into the list
      */
-    pAL->apzArgs[ (pAL->useCt)++ ] = pOptDesc->pzLastArg;
+    pAL->apzArgs[ (pAL->useCt)++ ] = pzLast;
     pOptDesc->optCookie = (void*)pAL;
 }
 /*

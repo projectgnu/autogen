@@ -9,10 +9,10 @@ AutoGen5 template man=%s.1
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
-## Last Modified:   $Date: 2001/12/09 19:43:58 $
+## Last Modified:   $Date: 2001/12/10 01:13:09 $
 ##            by:     Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 3.0 2001/12/09 19:43:58 bkorb Exp $
+## $Id: agman1-tpl.in,v 3.1 2001/12/10 01:13:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 :+]
@@ -99,12 +99,18 @@ All arguments must be options.[+:
 This manual page documents, briefly, the \fB[+:
     (string-downcase! (get "prog_name")) :+]\fP command.
 [+:
-(if (exist? "prog_man_descrip")
-    (get "prog_man_descrip")
-    (if (exist? "detail")
-        (get "detail")
-        "Its description is not documented."
-)   )  :+]
+
+IF (exist? "prog_man_descrip")   :+][+:
+  FOR prog_man_descrip "\n.PP\n" :+][+:
+    prog_man_descrip             :+][+:
+  ENDFOR                         :+][+:
+ELIF (exist? "detail")           :+][+:
+  FOR detail  "\n.PP\n"          :+][+:
+    detail                       :+][+:
+  ENDFOR                         :+][+:
+ELSE
+  :+]Its description is not documented.[+:
+ENDIF :+]
 .SH OPTIONS[+:
 
 # * * * * * * * * * * * * * * * * * * * * * * * * *

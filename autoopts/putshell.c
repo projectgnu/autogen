@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 3.0 2001/12/09 19:43:59 bkorb Exp $
+ *  $Id: putshell.c,v 3.1 2001/12/10 01:13:09 bkorb Exp $
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -78,22 +78,48 @@ putQuotedStr( char* pzStr )
     void
 putBourneShell( tOptions* pOpts )
 {
-    int       optCt = pOpts->presetOptCt;
-    tOptDesc* pOD   = pOpts->pOptDesc;
+    int         optIx = 0;
     tSCC zOptCtFmt[]  = "OPTION_CT=%d\nexport OPTION_CT\n";
     tSCC zOptNumFmt[] = "%1$s_%2$s=%3$d\nexport %1$s_%2$s\n";
     tSCC zOptDisabl[] = "%1$s_%2$s=%3$s\nexport %1$s_%2$s\n";
     tSCC zOptValFmt[] = "%s_%s='";
     tSCC zOptEnd[]    = "'\nexport %s_%s\n";
     tSCC zFullOptFmt[]= "%1$s_%2$s='%3$s'\nexport %1$s_%2$s\n";
+    tSCC zEquiv[]     = "%1$s_%2$s_MODE='%3$s'\nexport %1$s_%2$s\n";
 
     printf( zOptCtFmt, pOpts->curOptIdx-1 );
 
-    for (;optCt-- > 0; pOD++) {
-        if (UNUSED_OPT( pOD ))
-            continue;
+    do  {
+        tOptDesc* pOD = pOpts->pOptDesc + optIx;
 
         if (SKIP_OPT(pOD))
+            continue;
+
+        /*
+         *  Equivalence classes are hard to deal with.  Where the
+         *  option data wind up kind of squishes around.  For the purposes
+         *  of emitting shell state, they are not recommended, but we'll
+         *  do something.  I guess we'll emit the equivalenced-to option
+         *  at the point in time when the base option is found.
+         */
+        if (pOD->optEquivIndex != NO_EQUIVALENT)
+            continue; /* equivalence to a different option */
+
+        /*
+         *  Equivalenced to a different option.  Process the current option
+         *  as the equivalenced-to option.  Keep the persistent state bits,
+         *  but copy over the set-state bits.
+         */
+        if (pOD->optActualIndex != optIx) {
+            tOptDesc* p = pOpts->pOptDesc + pOD->optActualIndex;
+            p->pzLastArg = pOD->pzLastArg;
+            p->fOptState &= OPTST_PERSISTENT;
+            p->fOptState |= pOD->fOptState & ~OPTST_PERSISTENT;
+            printf( zEquiv, pOpts->pzPROGNAME, pOD->pz_NAME, p->pz_NAME );
+            pOD = p;
+        }
+
+        if (UNUSED_OPT( pOD ))
             continue;
 
         /*
@@ -173,7 +199,7 @@ putBourneShell( tOptions* pOpts )
             putQuotedStr( pOD->pzLastArg );
             printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
         }
-    }
+    } while (++optIx < pOpts->presetOptCt );
 }
 #else
 int putBourneShell( pOpts )
