@@ -5,10 +5,10 @@
 ## Author:         Bruce Korb <korbb@datadesign.com>
 ## Maintainer:     Bruce Korb <korbb@datadesign.com>
 ## Created:        Fri Aug 15 12:04 1997
-## Last Modified:   Wed Sep 23 12:18:53 1998
+## Last Modified:   Wed Sep 23 14:30:10 1998
 ##            by:   Bruce Korb <korb@datadesign.com>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 2.4 1998/09/23 20:29:07 bkorb Exp $
+## $Id: Makefile.am,v 2.5 1998/09/23 21:51:52 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -50,8 +50,8 @@ autogen.def:	$(DEFSRC) $(ODEF)
 	@-touch $@
 
 autogen.texi : auto_gen.tpl autogen.def $(TPLINC)
-	$(top_builddir)/src/autogen -L$(top_srcdir) -bautogen \
-		autogen.def
+	$(top_builddir)/src/autogen -L$(top_srcdir) -L$(top_srcdir)/doc \
+		-bautogen ./autogen.def
 
 ##  This really should be the build rule:
 ##	$(GETDEFS) $(AGARGS) template=auto_gen $(DEFCOPY) $(DEFSRC)
