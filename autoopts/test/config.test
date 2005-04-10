@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-03-06 09:20:06 bkorb"
+# Time-stamp:        "2005-04-03 15:58:01 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: config.test,v 4.1 2005/03/06 20:16:08 bkorb Exp $
+# $Id: config.test,v 4.2 2005/04/10 20:32:23 bkorb Exp $
 # ----------------------------------------------------------------------
 # Common definitions
 if test -z "$srcdir"; then
@@ -49,7 +49,7 @@ cat > ${testname}.c <<-  _EOTest_
 	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
 
 	    case OPARG_TYPE_NUMERIC:
-	      printf( "number:   %d\n",      pGV->v.longVal ); break;
+	      printf( "integer:   %d\n",      pGV->v.longVal ); break;
 
 	    case OPARG_TYPE_HIERARCHY:
 	      printf( "nested:   0x%08lX\n", pGV->v.nestVal ); break;
@@ -126,7 +126,7 @@ cat > ${testname}.cfg <<-  \_EOConfig_
 	alpha, beta ', gamma'
 	<beta cooked>    "Carol\tTine\n"
 	</beta>
-	<zzyzx type=number> 42 </zzyzx>
+	<zzyzx type=integer> 42 </zzyzx>
 	_EOConfig_
 
 cat > ${testname}.res <<-  \_EOResult_
@@ -136,7 +136,7 @@ cat > ${testname}.res <<-  \_EOResult_
 	over everything.
 	alpha    -- no value
 	beta     -- string:   , gamma
-	zzyzx    -- number:   42
+	zzyzx    -- integer:   42
 	YES!!
 	alpha    -- no value
 	beta     -- string:   , gamma
@@ -147,7 +147,7 @@ cat > ${testname}.res <<-  \_EOResult_
 	nasty    -- nested:   0xXXXXXXXX
 	stumble  -- string:   The	quickbrown fox	jumped
 	over everything.
-	zzyzx    -- number:   42
+	zzyzx    -- integer:   42
 	./config.cfg -- nested:   0xXXXXXXXX
 	_EOResult_
 

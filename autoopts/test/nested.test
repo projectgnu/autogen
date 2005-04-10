@@ -3,14 +3,14 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2005-03-06 12:08:37 bkorb"
+# Time-stamp:        "2005-04-03 15:59:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/06 20:16:08 $
+# Last Modified:     $Date: 2005/04/10 20:32:23 $
 #            by: bkorb
 #
-# $Id: nested.test,v 4.1 2005/03/06 20:16:08 bkorb Exp $
+# $Id: nested.test,v 4.2 2005/04/10 20:32:23 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -89,7 +89,7 @@ cat >&5 <<- _EOF_
 	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
 
 	    case OPARG_TYPE_NUMERIC:
-	      printf( "number:   %d\n",      pGV->v.longVal ); break;
+	      printf( "integer:   %d\n",      pGV->v.longVal ); break;
 
 	    case OPARG_TYPE_HIERARCHY:
 	      printf( "nested:   0x%08lX\n", pGV->v.nestVal );
@@ -150,24 +150,24 @@ cat > ${testname}-res1.base <<_EOF_
 struct opt #1:
 struct   -- nested:   0xXXXXXXXX
 able     -- no value
-bar      -- number:   1234
+bar      -- integer:   1234
 foo      -- no value
 stumble  -- no value
 _EOF_
 
-./${testname} -s 'stumble, foo, <bar type=number>1234</bar> able' | \
+./${testname} -s 'stumble, foo, <bar type=integer>1234</bar> able' | \
 sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' > ${testname}-res1.out || \
   failure "FAILED: \
-./${testname} -s 'stumble, foo, <bar type=number>1234</bar> baz'"
+./${testname} -s 'stumble, foo, <bar type=integer>1234</bar> baz'"
 
 cmp -s ${testname}-res1.* || \
   failure "`diff ${testname}-res1.*`"
 
 # # # # # # # # # # DOUBLE ARG TEST # # # # # # # # #
 
-(./${testname} -s 'stumble, foo, <bar type=number>1234</bar>, able' \
-  -s 'foo, <bar type=number>4321</bar> <gr type=nested>one, two, three</gr>' | \
-sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
+(./${testname} -s 'stumble, foo, <bar type=integer>1234</bar>, able' \
+  -s 'foo, <bar type=integer>4321</bar> <gr type=nested>one, two, three</gr>' \
+    | sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
   failure "FAILED:  ./${testname} ${arg1} ${arg2}"
 
 cat > ${testname}-res2.base <<- _EOF_
@@ -175,13 +175,13 @@ cat > ${testname}-res2.base <<- _EOF_
 struct opt #1:
 struct   -- nested:   0xXXXXXXXX
 able     -- no value
-bar      -- number:   1234
+bar      -- integer:   1234
 foo      -- no value
 stumble  -- no value
 
 struct opt #2:
 struct   -- nested:   0xXXXXXXXX
-bar      -- number:   4321
+bar      -- integer:   4321
 foo      -- no value
 gr       -- nested:   0xXXXXXXXX
 one      -- no value

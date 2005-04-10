@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.15 2005/03/13 19:34:26 bkorb Exp $
- *  Time-stamp:      "2005-03-13 08:08:01 bkorb"
+ *  $Id: configfile.c,v 4.16 2005/04/10 20:32:23 bkorb Exp $
+ *  Time-stamp:      "2005-04-03 15:53:54 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -379,8 +379,8 @@ optionGetValue( const tOptionValue* pOld, const char* pzValName )
  *  This routine will return the next entry after the entry passed in.  At the
  *  end of the list, NULL will be returned.  If the entry is not found on the
  *  list, NULL will be returned and "@var{errno}" will be set to EINVAL.
- *  The "@var{pOldValue}" must have been gotten from a prior call to this routine
- *  or to "@code{opitonGetValue()}".
+ *  The "@var{pOldValue}" must have been gotten from a prior call to this
+ *  routine or to "@code{opitonGetValue()}".
  *
  * err:
  *  The returned result is NULL and errno is set:
@@ -1125,8 +1125,8 @@ parseValueType(
     }
 
     {
-        size_t len = strlen(zLtypeNumber);
-        if (strncmp( pzText, zLtypeNumber, len ) == 0) {
+        size_t len = strlen(zLtypeInteger);
+        if (strncmp( pzText, zLtypeInteger, len ) == 0) {
             if ((pzText[len] == '>') || isspace(pzText[len])) {
                 pType->valType = OPARG_TYPE_NUMERIC;
                 return pzText + len;

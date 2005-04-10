@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-02-28 14:02:24 bkorb"
+## Time-stamp:      "2005-04-10 09:18:12 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.16 2005/03/06 20:16:08 bkorb Exp $
+## $Id: Makefile.am,v 4.17 2005/04/10 20:32:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -53,7 +53,7 @@ STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
-CLIENT_TPLS = stdoptions.def rc-sample.tpl \
+CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
     aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
     optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
 PRIVATE_TPL = options_h.tpl usage-txt.tpl

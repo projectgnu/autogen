@@ -14,9 +14,14 @@ Extraction from autogen.texi
 This file documents AutoGen version @value{VERSION}.  It is a tool designed
 for generating program files that contain repetitive text with varied
 substitutions.  This document is very long because it is intended as a
-reference document.  For a quick start example, @xref{Example Usage}.  For a
-simple example of Automated Option processing, @xref{Quick Start}.  For a
-full list of the Automated Option features, @xref{Features}.
+reference document.  For a quick start example, @xref{Example Usage}.
+
+The AutoGen distribution includes the basic generator engine and
+several add-on libraries and programs.  Of the most general interest
+would be Automated Option processing, @xref{AutoOpts}, which also
+includes stand-alone support for configuration file parsing, @xref{Features}.
+Please see the ``Add-on packages for AutoGen'' section for additional
+programs and libraries associated with AutoGen.
 
 This edition documents version @value{VERSION}, @value{UPDATED}.
 
@@ -1873,6 +1878,11 @@ START == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
+All the features notwithstanding, some applications simply have
+well-established command line interfaces.  Even still, those programs
+may use the configuration file parsing portion of the library.
+See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
+
 AutoOpts is distributed under The GNU Lesser General Public License.
 "Lesser" meaning you have greater license with it and may link it into
 commercial programs.
@@ -1885,6 +1895,7 @@ commercial programs.
 * option descriptor::   Option Descriptor File
 * Using AutoOpts::      Using AutoOpts
 * Presetting Options::  Configuring your program
+* Config File Format::  Configuration File Format
 * shell options::       AutoOpts for Shell Scripts
 * AutoInfo::            Automated Info Docs
 * AutoMan pages::       Automated Man Pages
@@ -4175,95 +4186,8 @@ Configuration file processing can be completely suppressed by specifying
 @code{--no-load-opts} on the command line, or @code{PROGRAM_LOAD_OPTS=no} in
 the environment (if @code{environrc} has been specified).
 
-Configuration file format:
-@menu
-* config name-value::       assigning a value to a configurable
-* config nested-values::    hierarchical values
-* config sections::         configuration file sections
-* config comments::         comments in the configuration file
-@end menu
-
-@node config name-value
-@subsubsection assigning a value to a configurable
-
-The basic syntax is a name followed by a value on a single line.  They are
-separated from each other by either white space, a colon (@code{:}) or an
-equal sign (@code{=}).  The colon or equal sign may optionally be surrounded
-by additional white space.  If more than one value line is needed, a
-backslash (@code{\}) may be used to continue the value.  The backslash (but
-not the newline) will be erased.  Leading and trailing white space is always
-stripped from the value.
-
-If you need more control over the content of the value, you may enclose the
-value in XML style @code{<name> value </name>} brackets.  Within these
-brackets you need not (must not) continue the value data with backslashes.
-You may also select the string formation rules to use, just add the attribute
-after the name, thus: @code{<name keep>}.
-
-@table @samp
-@item keep
-This mode will keep all text between the brackets and not strip any
-white space.
-@item uncooked
-This mode strips leading and trailing white space, but not do any
-quote processing.  This is the default and need not be specified.
-@item cooked
-Strings are formed and concatenated if, after stripping leading and trailing
-white space, the text begins and ends with either single (') or double (")
-quote characters.  That processing is identical to the string formation used
-in AutoGen definition files (@pxref{basic expression}), except that you may not
-use backquotes.
-@end table
-
-@node config nested-values
-@subsubsection hierarchical values
-
-Not implemented.  Exact syntax and supporting library interface are under
-discussion.  Hierarchicaly valued configurables will have to be specified
-with XML-style @code{<name> ... </name>} brackets.
-
-@node config sections
-@subsubsection configuration file sections
-
-Configuration files may be sectioned.
-@cindex sectioned config file
-If, for example, you have a collection of programs that work closely
-together and, likely, have a common set of options, these programs may use a
-single, sectioned, configuration file.  The file may be sectioned in either
-of two ways.  The two ways may not be intermixed in a single configuration
-file.  All text before the first segmentation line is processed, then only
-the segment that applies:
-
-@table @samp
-@item [PROG_NAME]
-The file is partitioned by lines that contains an square open bracket
-(@code{[}), the @strong{upper-cased} c-variable-syntax program name
-and a square close bracket (@code{]}).
-For example, if the @code{prog-name} program had a sectioned
-configuration file, then a line containing exactly @code{[PROG_NAME]}
-would be processed.
-
-@item <?program prog-name>
-The ``@code{<?}'' marker indicates an XML directive.
-The ``@code{program}'' directive is interpreted by the configuration file
-processor to segment the file in the same way as the ``@code{[PROG_NAME]}''
-sectioning is done.  Any other XML directives are treated as comments
-@end table
-
-@node config comments
-@subsubsection comments in the configuration file
-
-Comments are lines beginning with a hash mark (@code{#}),
-XML-style comments (@code{<!-- arbitrary text -->}), and
-unrecognized XML directives.
-
-@example
-# this is a comment
-<!-- this is also
-     a comment -->
-<?this is
-  a bad comment ;->
-@end example
+See the ``Configuration File Format'' section (@pxref{Config File Format})
+for details on the format of the file.
 
 @node saving rcfile
 @subsection Saving the presets into a configuration file
@@ -4331,6 +4255,162 @@ the command line.
 Note that not all options may be preset.  Options that are specified with the
 @code{no-preset} attribute and the @code{--help}, @code{--more-help},
 and @code{--save-opts} auto-supported options may not be preset.
+
+@c === SECTION MARKER
+
+@node Config File Format
+@section Configuration File Format
+@cindex Configuration File
+
+The configuration file is designed to associate names and values, much like
+an AutoGen Definition File (@pxref{Definitions File}).  Unfortunately, the
+file formats are different.  Specifically, AutoGen Definitions provide for
+simpler methods for the precise control of a value string and provides for
+dynamically computed content.  Configuration files have some established
+traditions in their layout.  So, they are different, even though they do
+both allow for a single name to be associated with multiple values and they
+both allow for hierarchical values.
+
+@menu
+* config name/string-value::    assigning a string value to a configurable
+* config integer-values::       integer values
+* config nested-values::        hierarchical values
+* config sections::             configuration file sections
+* config comments::             comments in the configuration file
+@end menu
+
+@node config name/string-value
+@subsection assigning a string value to a configurable
+
+The basic syntax is a name followed by a value on a single line.  They are
+separated from each other by either white space, a colon (@code{:}) or an
+equal sign (@code{=}).  The colon or equal sign may optionally be surrounded
+by additional white space.  If more than one value line is needed, a
+backslash (@code{\}) may be used to continue the value.  The backslash (but
+not the newline) will be erased.  Leading and trailing white space is always
+stripped from the value.
+
+Fundamentally, it looks like this:
+
+@example
+name  value for that name
+name = another \
+     multi-line value \
+     for that name.
+name: a *third* value for ``name''
+@end example
+
+If you need more control over the content of the value, you may enclose the
+value in XML style brackets:
+@example
+<name>value </name>
+@end example
+@noindent
+Within these brackets you need not (must not) continue the value data with
+backslashes.  You may also select the string formation rules to use, just
+add the attribute after the name, thus: @code{<name keep>}.
+
+@table @samp
+@item keep
+This mode will keep all text between the brackets and not strip any
+white space.
+@item uncooked
+This mode strips leading and trailing white space, but not do any
+quote processing.  This is the default and need not be specified.
+@item cooked
+Strings are formed and concatenated if, after stripping leading and trailing
+white space, the text begins and ends with either single (') or double (")
+quote characters.  That processing is identical to the string formation used
+in AutoGen definition files (@pxref{basic expression}), except that you may not
+use backquotes.
+@end table
+
+And here is an example of an XML-styled value:
+
+@example
+<name cooked>
+    "This is\n\tanother multi-line\n"
+    "\tstring example."
+</name>
+@end example
+
+The string value associated with ``name'' will be exactly the text enclosed
+in quotes with the escaped characters ``cooked'' as you would expect
+(three text lines with the last line not ending with a newline, but
+ending with a period).
+
+@node config integer-values
+@subsection integer values
+
+A name can be specified as having an integer value.  To do this, you
+must use the XML-ish format and specify a ``type'' attribute for 
+the name:
+
+@example
+<name type=integer> 1234 </name>
+@end example
+
+Boolean, enumeration and set membership types will be added as time
+allows.  ``type=string'' is also supported, but also is the default.
+
+@node config nested-values
+@subsection hierarchical values
+
+In order to specify a hierarchical value, you *must* use XML-styled
+formatting:
+
+@example
+<structured-name>
+    [[....]]
+</structured-name>
+@end example
+
+@noindent
+The ellipsis may be filled with any legal configuration file name/value
+assignments.
+
+@node config sections
+@subsection configuration file sections
+
+Configuration files may be sectioned.
+@cindex sectioned config file
+If, for example, you have a collection of programs that work closely
+together and, likely, have a common set of options, these programs may use a
+single, sectioned, configuration file.  The file may be sectioned in either
+of two ways.  The two ways may not be intermixed in a single configuration
+file.  All text before the first segmentation line is processed, then only
+the segment that applies:
+
+@table @samp
+@item [PROG_NAME]
+The file is partitioned by lines that contains an square open bracket
+(@code{[}), the @strong{upper-cased} c-variable-syntax program name
+and a square close bracket (@code{]}).
+For example, if the @code{prog-name} program had a sectioned
+configuration file, then a line containing exactly @code{[PROG_NAME]}
+would be processed.
+
+@item <?program prog-name>
+The ``@code{<?}'' marker indicates an XML directive.
+The ``@code{program}'' directive is interpreted by the configuration file
+processor to segment the file in the same way as the ``@code{[PROG_NAME]}''
+sectioning is done.  Any other XML directives are treated as comments
+@end table
+
+@node config comments
+@subsection comments in the configuration file
+
+Comments are lines beginning with a hash mark (@code{#}),
+XML-style comments (@code{<!-- arbitrary text -->}), and
+unrecognized XML directives.
+
+@example
+# this is a comment
+<!-- this is also
+     a comment -->
+<?this is
+  a bad comment ;->
+@end example
 
 @c === SECTION MARKER
 

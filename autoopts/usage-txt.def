@@ -2,7 +2,7 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2005-03-06 10:03:26 bkorb"
+ * Time-stamp:      "2005-04-03 15:54:32 bkorb"
  *
  *  AutoOpts copyright 1992-2005 Bruce Korb
  *
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.10 2005/03/06 20:16:08 bkorb Exp $
+   $Id: usage-txt.def,v 4.11 2005/04/10 20:32:23 bkorb Exp $
  */
 
 /*
@@ -257,12 +257,12 @@ utxt = { ut-name = LoadUncooked;
          ut-text = "uncooked";
 };
 
-utxt = { ut-name = LtypeNest;
-         ut-text = "nested";
+utxt = { ut-name = LtypeInteger;
+         ut-text = "integer";
 };
 
-utxt = { ut-name = LtypeNumber;
-         ut-text = "number";
+utxt = { ut-name = LtypeNest;
+         ut-text = "nested";
 };
 
 utxt = { ut-name = LtypeString;

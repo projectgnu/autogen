@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-01-23 15:31:16 bkorb"
+## Time-stamp:      "2005-04-10 09:46:57 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman3-tpl.in,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+## $Id: agman3-tpl.in,v 4.3 2005/04/10 20:32:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 null
@@ -70,31 +70,8 @@ cc [...] -o outfile infile.c -l{+library+} [...]
 .sp 1
 .SH DESCRIPTION
 {+
-(out-push-new) +}
-sed \
- -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
- -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
- -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
- -e      's;@i{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@file{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@emph{\([^}]*\)};\\fI\1\\fP;g' \
- -e 's;@strong{\([^}]*\)};\\fB\1\\fP;g' \
- -e 's/@\([{}]\)/\1/g' \
- -e 's,^\$\*$,.br,' \
- -e '/@ *example/,/@ *end *example/s/^/    /' \
- -e 's/^ *@ *example/.nf/' \
- -e 's/^ *@ *end *example/.fi/' \
- -e '/^ *@ *noindent/d' \
- -e '/^ *@ *enumerate/d' \
- -e 's/^ *@ *end *enumerate/.br/' \
- -e '/^ *@ *table/d' \
- -e 's/^ *@ *end *table/.br/' \
- -e 's/^@item \(.*\)/.IR "\1"/' \
- -e 's/^@item/.sp 1/' \
- -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
- -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\fI\1\\fP/g' \
- -e 's/^@\*/.br/' <<'_End_Of_Man_'
-{+
+  INCLUDE "agman-lib.tpl"
++}{+
 (get "doc")    +}{+
   IF (exist? "arg") +}{+
     FOR arg         +}
@@ -128,10 +105,11 @@ sed \
 .in -5
 .fi{+
 
-  ENDIF +}
-_End_Of_Man_{+
+  ENDIF +}{+
 
-(shell (out-pop #t) ) +}
+emit-man-text
+
++}
 .SH SEE ALSO
 The \fIinfo\fP documentation for the \fI-l{+library+}\fP library.
 .br
