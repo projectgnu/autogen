@@ -4,7 +4,7 @@ h=options.h
 
 # Automated Options copyright 1992-2005 Bruce Korb
 # Time-stamp:      "2005-02-23 13:51:57 bkorb"
-# ID:  $Id: options_h.tpl,v 4.11 2005/03/06 18:33:52 bkorb Exp $
+# ID:  $Id: options_h.tpl,v 4.12 2005/04/16 16:38:51 bkorb Exp $
 
 =][=
 
@@ -22,16 +22,16 @@ h=options.h
 [=(make-header-guard "autoopts")=]
 #include <sys/types.h>
 
-#if defined(HAVE_STDINT_H)
-# include <stdint.h>
-#elif defined(HAVE_INTTYPES_H)
+#if ! defined(HAVE_STDINT_H) && defined(HAVE_INTTYPES_H)
 # include <inttypes.h>
+#else
+# include <stdint.h>
 #endif /* HAVE_STDINT/INTTYPES_H */
 
-#if defined(HAVE_LIMITS_H)
-# include <limits.h>
-#elif defined(HAVE_SYS_LIMITS_H)
+#if ! defined(HAVE_LIMITS_H) && defined(HAVE_SYS_LIMITS_H)
 # include <sys/limits.h>
+#else
+# include <limits.h>
 #endif /* HAVE_LIMITS/SYS_LIMITS_H */
 
 /*
