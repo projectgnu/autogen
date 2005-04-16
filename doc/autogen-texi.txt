@@ -4151,6 +4151,42 @@ in the option descriptor file (@pxref{program attributes}) with the
 * environrc::           environment variable presets
 @end menu
 
+It is also possible to configure your program @i{without} using
+the command line option parsing code.  This is done by using
+only the following four functions from the @file{libopts} library:
+
+@table @samp
+@item configFileLoad
+(@pxref{libopts-configFileLoad}) will parse the contents of a config
+file and return a pointer to a structure representing the hierarchical
+value.  The values are sorted alphabetically by the value name and all
+entries with the same name will retain their original order.
+Insertion sort is used.
+
+@item optionGetValue
+(@pxref{libopts-optionGetValue}) will find the first value within the
+hierarchy with a name that matches the name passed in.
+
+@item optionNextValue
+(@pxref{libopts-optionNextValue}) will return the next value that
+follows the value passed in as an argument.  If you wish to get all
+the values for a particular name, you must take note when the name
+changes.
+
+@item optionUnloadNested
+(@pxref{libopts-optionUnloadNested}).  The pointer passed in must be
+of type, @code{OPARG_TYPE_HIERARCHY} (see the autoopts/options.h
+header file).  @code{configFileLoad} will return a @code{tOptionValue}
+pointer of that type.  This function will release all the associated
+memory.  @code{AutoOpts} generated code uses this function for its own
+needs.  Client code should only call this function with pointers
+gotten from @code{configFileLoad}.
+@end table
+
+@menu
+* config example::      Config file only example
+@end menu
+
 @node loading rcfile
 @subsection configuration file presets
 @cindex rcfile
@@ -4256,6 +4292,65 @@ Note that not all options may be preset.  Options that are specified with the
 @code{no-preset} attribute and the @code{--help}, @code{--more-help},
 and @code{--save-opts} auto-supported options may not be preset.
 
+@node config example
+@subsection Config file only example
+@cindex rcfile
+@cindex Configuration File
+@cindex Configuration File example
+
+If for some reason it is difficult or unworkable to integrate configuration
+file processing with command line option parsing, the @code{libopts}
+(@pxref{libopts procedures}) library can still be used to process configuration
+files.  In this section you will see how to make and use a configuration
+file for changing the ``@t{Hello, World!}'' greeting.
+
+@example
+#include <sys/types.h>
+#include <pwd.h>
+#include <string.h>
+#include <unistd.h>
+#include <autoopts/options.h>
+int main( int argc, char** argv ) @{
+  char* greeting = "Hello";
+  char* greeted  = "World";
+  const tOptionValue* pOV = configFileLoad( "hello.conf" );
+
+  if (pOV != NULL) @{
+    const tOptionValue* pGetV = optionGetValue( pOV, "greeting" );
+
+    if (  (pGetV != NULL)
+       && (pGetV->valType == OPARG_TYPE_STRING))
+      greeting = strdup( pGetV->v.strVal );
+
+    pGetV = optionGetValue( pOV, "personalize" );
+    if (pGetV != NULL) @{
+      struct passwd* pwe = getpwuid( getuid() );
+      if (pwe != NULL)
+        greeted = strdup( pwe->pw_gecos );
+    @}
+
+    optionUnloadNested( pOV );
+  @}
+  printf( "%s, %s!\n", greeting, greeted );
+  return 0;
+@}
+@end example
+
+@noindent
+You may now compile and run this program thus:
+
+@example
+$ cc -o hello -I/usr/local hello.c -L/usr/local/lib -lopts
+$ ./hello
+Hello, World!
+$ echo 'greeting Buzz off' > hello.conf
+$ ./hello
+Buzz off, World!
+$ echo personalize > hello.conf
+$ ./hello
+Hello, Bruce Korb!
+@end example
+
 @c === SECTION MARKER
 
 @node Config File Format
@@ -4357,10 +4452,10 @@ allows.  ``type=string'' is also supported, but also is the default.
 @subsection hierarchical values
 
 In order to specify a hierarchical value, you *must* use XML-styled
-formatting:
+formatting, specifying a type that is shorter and easier to spell:
 
 @example
-<structured-name>
+<structured-name type=nested>
     [[....]]
 </structured-name>
 @end example
@@ -4386,16 +4481,21 @@ the segment that applies:
 The file is partitioned by lines that contains an square open bracket
 (@code{[}), the @strong{upper-cased} c-variable-syntax program name
 and a square close bracket (@code{]}).
-For example, if the @code{prog-name} program had a sectioned
-configuration file, then a line containing exactly @code{[PROG_NAME]}
+For example, if the @command{prog-name} program had a sectioned
+configuration file, then a line containing exactly @samp{[PROG_NAME]}
 would be processed.
 
 @item <?program prog-name>
-The ``@code{<?}'' marker indicates an XML directive.
-The ``@code{program}'' directive is interpreted by the configuration file
-processor to segment the file in the same way as the ``@code{[PROG_NAME]}''
-sectioning is done.  Any other XML directives are treated as comments
+The @code{<?} marker indicates an XML directive.
+The @code{program} directive is interpreted by the configuration file
+processor to segment the file in the same way as the @samp{[PROG_NAME]}
+sectioning is done.  Any other XML directives are treated as comments.
+
 @end table
+
+@noindent
+Segmentation does not apply if the config file is being parsed with
+the @code{configFileLoad(3AutoOpts)} function.
 
 @node config comments
 @subsection comments in the configuration file
