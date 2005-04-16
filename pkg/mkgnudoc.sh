@@ -1,19 +1,20 @@
 #! /bin/sh
 
-# Time-stamp: "2004-07-30 15:39:55 bkorb"
-# Version:    "$Revision: 4.1 $
+# Time-stamp: "2005-04-14 16:42:05 bkorb"
+# Version:    "$Revision: 4.2 $
 
 MAKE=${MAKE:-make}
 
 eval "`egrep '^AG_' ../VERSION`"
-[ -d autogen-${AG_VERSION} ] && rm -rf autogen-${AG_VERSION}
-mkdir autogen-${AG_VERSION} || {
-  echo cannot make directory autogen-${AG_VERSION} >&2
+ddir=autogen-${AG_VERSION}
+test -d ${ddir} && rm -rf ${ddir}
+mkdir ${ddir} || {
+  echo cannot make directory ${ddir} >&2
   exit 1
 }
 
-cd autogen-${AG_VERSION}
-dirlist='html_mono html_chapter html_node info text dvi pdf ps texi'
+cd ${ddir}
+dirlist='html_mono info text dvi pdf ps texi'
 mkdir ${dirlist} || {
   echo cannot make subdirectories: >&2
   echo ${dirlist} >&2
@@ -21,40 +22,48 @@ mkdir ${dirlist} || {
 }
 
 echo
-echo "Making documentation hierarchy for autogen-${AG_VERSION}"
+echo "Making documentation hierarchy for ${ddir}"
 echo
 cd ..
 [ -f autogen.info ] || ${MAKE}
 
 texi2html -menu -split=none    -verbose autogen.texi
-mv -f autogen.html autogen-${AG_VERSION}/html_mono/.
+mv -f autogen.html ${ddir}/html_mono/.
 echo mono done
 
 texi2html -menu -split=chapter -verbose autogen.texi
-mv -f autogen*.html autogen-${AG_VERSION}/html_chapter/.
+if test -d autogen/.
+then mv -f autogen ${ddir}/html_chapter
+else mkdir ${ddir}/html_chapter
+     mv -f autogen*.htm* ${ddir}/html_chapter/.
+fi
 echo chapter done
 
-texi2html -menu -split=section -verbose autogen.texi
-mv -f autogen*.html autogen-${AG_VERSION}/html_node/.
+texi2html -menu -split=node -verbose autogen.texi
+if test -d autogen/.
+then mv -f autogen ${ddir}/html_node
+else mkdir ${ddir}/html_node
+     mv -f autogen*.htm* ${ddir}/html_node/.
+fi
 echo node done
 
 for f in autogen*.info*
-do gzip -c $f > autogen-${AG_VERSION}/info/$f.gz
+do gzip -c $f > ${ddir}/info/$f.gz
 done
 
 [ -f autogen.ps  ] || ${MAKE} autogen.ps
 [ -f autogen.txt ] || ${MAKE} autogen.txt
 [ -f autogen.pdf ] || ${MAKE} autogen.pdf
 
-gzip -c autogen.dvi  > autogen-${AG_VERSION}/dvi/autogen.dvi.gz
-gzip -c autogen.pdf  > autogen-${AG_VERSION}/pdf/autogen.pdf.gz
-gzip -c autogen.ps   > autogen-${AG_VERSION}/ps/autogen.ps.gz
-gzip -c autogen.texi > autogen-${AG_VERSION}/texi/autogen.texi.gz
-gzip -c autogen.txt  > autogen-${AG_VERSION}/text/autogen.txt.gz
-cp   -f autogen.txt    autogen-${AG_VERSION}/text/.
+gzip -c autogen.dvi  > ${ddir}/dvi/autogen.dvi.gz
+gzip -c autogen.pdf  > ${ddir}/pdf/autogen.pdf.gz
+gzip -c autogen.ps   > ${ddir}/ps/autogen.ps.gz
+gzip -c autogen.texi > ${ddir}/texi/autogen.texi.gz
+gzip -c autogen.txt  > ${ddir}/text/autogen.txt.gz
+cp   -f autogen.txt    ${ddir}/text/.
 
 echo generating doc page
-cd autogen-${AG_VERSION}
+cd ${ddir}
 cat > TAG <<EOF
 <p align="center"><a href="http://www.anybrowser.org/campaign/"
    ><img src="/software/autogen/pix/abrowser.png"
@@ -76,4 +85,4 @@ body-end -i TAG */*.html
 autogen --no-def -T ${pkgsrcdir}/gnudoc.tpl
 rm -f TAG
 cd ..
-tar cvf - autogen-${AG_VERSION} | gzip > autogen-${AG_VERSION}-doc.tar.gz
+tar cvf - ${ddir} | gzip > ${ddir}-doc.tar.gz
