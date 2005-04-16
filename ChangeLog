@@ -8,6 +8,22 @@
 	(limits.h): similarly, prefer this to sys/limits.h, but demand one.
 	The generated "options.h" should now work outside the presence of
 	the "config.h" header.
+	* pkg/mkgnudoc.sh: rework for new version of texi2html
+	* xml2ag/xmlopts.def: clarify why the template name must be provided.
+
+2005-04-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman3.tpl: remove common code
+	* autoopts/agman1.tpl: ditto
+	* autoopts/agman-lib.tpl: new file for code common to the agman*.tpl
+	Primarily, it converts texi-isms into man page-isms.
+	* autoopts/Makefile.am: distribute the file, too.
+	* autoopts/configfile.c(optionGetValue): favor word "integer" for
+	integers instead of "number".
+	* autoopts/usage-txt.def: ditto
+	* autoopts/test/config.test: ditto
+	* autoopts/test/nested.test: ditto
+	* autoopts/optmain.tpl: set flag name at start of flag name loop.
 
 2005-03-13  Bruce Korb  <bkorb@gnu.org>
 
@@ -20,6 +36,7 @@
 	* agen5/expGperf.c: append gperf cleanup stuff to 'shell-cleanup'
 	* agen5/expOutput.c: rename of fmemopen
 	* agen5/fmemopen.c: reworked
+	* agen5/test/fmemopen.test: test the thing
 	* agen5/schemedef.scm(shell-cleanup): new text SCM variable
 	* README: with-libguile-link and not with-libguile-libdir
 	* agen5/agShell.c(zTrap): move to directive.tpl and rename
