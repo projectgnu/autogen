@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.4 2005/03/13 19:34:26 bkorb Exp $
+ *  $Id: expGperf.c,v 4.5 2005/04/16 16:39:38 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -133,6 +133,7 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
+        static const int makeGperfLine = __LINE__ + 2;
         static const char zCleanup[] =
             "(set! shell-cleanup (string-append shell-cleanup \"%s\n\"))\n";
         char* pzCmd;
@@ -148,7 +149,8 @@ ag_scm_make_gperf( SCM name, SCM hlist )
         pzCmd = aprf( zCleanup, pzList );
         AGFREE( pzList );
 
-        (void)scm_c_eval_string( pzCmd );
+        (void)ag_scm_c_eval_string_from_file_line(
+            pzCmd, __FILE__, makeGperfLine );
         AGFREE( pzCmd );
     }
     return SCM_BOOL_T;

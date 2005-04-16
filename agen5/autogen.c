@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.7 2005/03/13 19:34:26 bkorb Exp $
+ *  $Id: autogen.c,v 4.8 2005/04/16 16:39:38 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -203,8 +203,9 @@ doneCheck( void )
         "\t%s on line %d\n";
 
 #ifdef SHELL_ENABLED
-    scm_c_eval_string( "(if (> (string-length shell-cleanup) 0)"
-                       "    (shell shell-cleanup) )" );
+    ag_scm_c_eval_string_from_file_line(
+        "(if (> (string-length shell-cleanup) 0)"
+        "    (shell shell-cleanup) )", __FILE__, __LINE__ );
 #endif
 
     fflush( stdout );
