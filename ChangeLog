@@ -1,4 +1,15 @@
-2004-03-13  Bruce Korb  <bkorb@gnu.org>
+2005-04-16  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(doneCheck): avoid scm_c_eval_string 'cuz it is
+	not always available.  Use our own ag_scm_c_eval_string_from_file_line
+	* agen5/expGperf.c(ag_scm_make_gperf): ditto
+	* autoopts/options_h.tpl(stdint.h): pick up this header if either
+	HAVE_STDINT_H is defined or if HAVE_INTTYPES_H is not defined
+	(limits.h): similarly, prefer this to sys/limits.h, but demand one.
+	The generated "options.h" should now work outside the presence of
+	the "config.h" header.
+
+2005-03-13  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(checkConsistency): "must-set" means that a "set"
 	option is okay, too.
@@ -15,12 +26,12 @@
 	* agen5/directive.tpl(zShellInit): write as a straight-up shell script
 	and use the "c-string" macro to convert into a C initialization string.
 
-2004-02-20  Bruce Korb  <bkorb@gnu.org>
+2005-02-20  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/*: Remove "optArgType" from option descriptor and use
 	OPTST_GET_ARGTYPE() macro to determine this instead.
 
-2004-02-13  Bruce Korb  <bkorb@gnu.org>
+2005-02-13  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/cook.c: NEW - move all string cooking here
 	* agen5/agUtils.c(doEscapeChar): removed
@@ -53,7 +64,7 @@
 	* pkg/libopts/mklibsrc.sh: do *not* pick up config.h.  It will be
 	generated at build time.
 
-2004-02-12  Bruce Korb  <bkorb@gnu.org>
+2005-02-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/text_mmap.c: new - maps text files, always ensuring that
 	at least one NUL byte is after the last text byte.
@@ -68,7 +79,7 @@
 	case-insensitive naming -- use "def2" instead of ".DEF".
 	* fiddle with configury some more.
 
-2004-02-05  Bruce Korb  <bkorb@gnu.org>
+2005-02-05  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.6 Released
 
@@ -76,7 +87,7 @@
 	* autoopts/test/Makefile.am(verbose): testing special target
 	* autoopts/test/enums.test(do_proc[]): use printf, echo is unreliable
 
-2004-02-03  Bruce Korb  <bkorb@gnu.org>
+2005-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl(configuration): replace "rc" in more places
 	* autoopts/autoopts.c: ditto
@@ -90,7 +101,7 @@
 	(each-or-stdin-main): deleted.  Not a useful concept.
 	* doc/autogen.texi: doc this stuff.
 
-2004-01-23  Bruce Korb  <bkorb@gnu.org>
+2005-01-23  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/enums.test: fix ksh-isms
 	(echo): guard against builtin echo interpreting '\\'
@@ -100,7 +111,7 @@
 	* agen5/tpLoad.c(loadMacros): ditto
 	* autoopts/save.c(optionSaveFile): only free mem that was allocated
 
-2004-01-21  Bruce Korb  <bkorb@gnu.org>
+2005-01-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c(ag_scm_tpl_file_line): fix warning for 64 bits
 	(ag_scm_def_file_line): ditto
@@ -114,13 +125,12 @@
 	* doc/*: change references from "rc files" and "ini files" to
 	"configuration files".
 	* pkg/libopts/mklibsrc.sh: cope with the new header subdirectory
-	
-2004-01-17  Bruce Korb  <bkorb@gnu.org>
+	2005-01-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/opt*.tpl: Remove all the #line stuff.  Bad idea for AutoOpts.
 	* autoopts/save.c(findDirName): fix allocation size & mem leak.
 
-2004-01-16  Bruce Korb  <bkorb@gnu.org>
+2005-01-16  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h(tDefCtx): change name of file name to be unique
 	(tDefEntry): reorder to put int values at end and add definition
@@ -136,7 +146,7 @@
 	* agen5/defLex.c(assembleHereString): count the newline at the end
 	of the here string token, too.
 
-2004-01-15  Bruce Korb  <bkorb@gnu.org>
+2005-01-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am(configfile.c): new file
 	* autoopts/configfile.c: move config file code here
@@ -148,7 +158,7 @@
 	* autoopts/test/rc.test(cat): fix inconsistent output
 	* pkg/libopts/mklibsrc.sh(lo_cv_test_autoopts): handle test correctly
 
-2004-01-08  Bruce Korb  <bkorb@gnu.org>
+2005-01-08  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options_h.tpl(streqv*): export these functions for programs
 	that include the "options.h" header.
