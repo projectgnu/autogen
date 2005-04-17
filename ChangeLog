@@ -1,3 +1,8 @@
+2005-04-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options_h.tpl(stdint.h): Undo yesterday's changes
+	* autoopts/guileopt.c: include "config.h"
+
 2005-04-16  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(doneCheck): avoid scm_c_eval_string 'cuz it is
