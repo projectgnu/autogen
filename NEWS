@@ -1,4 +1,6 @@
 New in __CURRENT_VERSION__ - April, 2005
+
+AutoOpts:
 * "libopts" handles stand alone configuration file processing.
   Use the functions configFileLoad, optionGetValue, optionNextValue
   and optionUnloadNested.
