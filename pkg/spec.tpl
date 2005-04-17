@@ -8,7 +8,7 @@ Copyright:  Copyright (c) [= copyright.date =] by [= copyright.owner
 		=].  All rights reserved.  Licensed under GPL, [=#
 		=]version 2 or later.
 Group:      Development/Tools
-Source:     ftp://ftp.gnu.org/gnu/autogen/[= version =]/autogen-[= version
+Source:     ftp://ftp.gnu.org/gnu/autogen/rel[= version =]/autogen-[= version
 		=].tar.gz
 BuildRoot:  %{_tmppath}/%{name}-root
 
