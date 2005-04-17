@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2005-04-17 12:11:27 bkorb"
-# Version:    "$Revision: 4.3 $
+# Time-stamp: "2005-04-17 12:36:27 bkorb"
+# Version:    "$Revision: 4.4 $
 
 MAKE=${MAKE:-make}
 
@@ -78,11 +78,11 @@ EOF
 body-end -i TAG */*.html
 
 (cd html_mono
- gzip -c autogen.html > autogen.html.gz )
+ gzip -c --best autogen.html > autogen.html.gz )
 (cd html_chapter
- tar cf - autogen*.html | gzip > autogen_chapter_html.tar.gz )
+ tar cf - autogen*.html | gzip --best > autogen_chapter_html.tar.gz )
 (cd html_node
- tar cf - autogen*.html | gzip > autogen_node_html.tar.gz )
+ tar cf - autogen*.html | gzip --best > autogen_node_html.tar.gz )
 
 autogen --no-def -T ${pkgsrcdir}/gnudoc.tpl
 rm -f TAG
