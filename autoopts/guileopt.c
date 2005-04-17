@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.6 2005/02/15 01:34:13 bkorb Exp $
- * Time-stamp:      "2005-02-14 14:30:24 bkorb"
+ *  $Id: guileopt.c,v 4.7 2005/04/17 18:11:26 bkorb Exp $
+ * Time-stamp:      "2005-04-17 11:10:52 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -48,7 +48,7 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
-
+#include "config.h"
 #include <stdio.h>
 #include <guile/gh.h>
 
