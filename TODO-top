@@ -1,9 +1,7 @@
 #  -*- Mode: Outline -*-
-#  $Date: 2005/01/01 00:16:53 $
+#  $Date: 2005/04/17 19:51:00 $
 
 * Pending
-
-** noag-boot.sh needs to really work when autogen is not available.
 
 ** All errors from getdefs and columns should start with,
    `options.pzProgName' (aka 'basename(argv[0])').

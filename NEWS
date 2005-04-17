@@ -1,5 +1,19 @@
-New in __CURRENT_VERSION__ - February, 2005
-* Nothing.
+New in __CURRENT_VERSION__ - April, 2005
+* "libopts" handles stand alone configuration file processing.
+  Use the functions configFileLoad, optionGetValue, optionNextValue
+  and optionUnloadNested.
+
+* AutoOpts values can contain nested values, a la "getsubopts(3C)".
+  The syntaxes recognized are:
+  * that of getsubopts (except you do not specify which are acceptable
+    and values may be quoted)
+  * that of a config file (newline separated name/value pairs, per
+    traditional configuration file formatting)
+  * xml style where the associated values are marked with either of:
+      <val-name>...</val-name>
+      <named-no-value/>
+
+* The ever-present minor bug fixes and testing improvements.
 
 New in 5.6.6 - February 2005
 
