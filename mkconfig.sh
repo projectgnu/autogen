@@ -1,13 +1,13 @@
 #! /bin/ksh
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
-# Time-stamp:        "2005-04-17 09:56:59 bkorb"
+# Time-stamp:        "2005-04-17 10:09:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 4.2 2005/04/17 17:00:21 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 4.3 2005/04/17 17:10:36 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;
@@ -56,6 +56,7 @@ for f in $(find * -type f | fgrep -v CVS/ | sort)
 do
   case "$f" in
   */stamp*    | \
+  */*stamp    | \
   configure   | \
   config*.tmp | \
   *.in        | \
@@ -139,6 +140,13 @@ end_mark='\(and the template file\|It has been extracted by getdefs\)'
 for f in ${GENLIST}
 do
   sed "/${start_mark}/,/${end_mark}/d" ${f} > ${f}.XX || continue
+  touch -r ${f}.XX ${f}
+  mv -f ${f}.XX ${f}
+done
+
+for f in $(find . -type f -name proto.h)
+do
+  egrep -v '^ \* Generated' ${f} > $f.XX || continue
   touch -r ${f}.XX ${f}
   mv -f ${f}.XX ${f}
 done
