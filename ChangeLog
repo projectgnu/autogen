@@ -1,5 +1,7 @@
 2005-04-17  Bruce Korb  <bkorb@gnu.org>
 
+	= 5.7 Released
+
 	* autoopts/options_h.tpl(stdint.h): Undo yesterday's changes
 	* autoopts/guileopt.c: include "config.h"
 
