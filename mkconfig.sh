@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2005-04-17 10:19:41 bkorb"
-  echo ${2} | sed 's/[- :a-z]//g')
+  Time-stamp:        "2005-04-17 10:43:05 bkorb"
+  echo ${2} | sed 's/[^0-9]//g')
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Jul 30 10:57:13 1999			      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 4.4 2005/04/17 17:20:29 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 4.5 2005/04/17 17:52:45 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;
@@ -54,11 +54,19 @@ sh $bstr || die "error:  bootstrap failed"
 nl='
 '
 GENLIST=''
+STAMPLIST=''
+PROTOLIST=''
+
 for f in $(find * -type f | fgrep -v CVS/ | sort)
 do
   case "$f" in
   */stamp*    | \
-  */*stamp    | \
+  */*stamp    )
+    test -f ${sd}/${f} || STAMPLIST="${STAMPLIST}${f}${nl}" ;;
+
+  */proto.h   )
+    test -f ${sd}/${f} || PROTOLIST="${PROTOLIST}${f}${nl}" ;;
+
   configure   | \
   config*.tmp | \
   *.in        | \
@@ -101,12 +109,11 @@ cat <<- '_EOF_' >&5
 
 	#  Touch the stamp-* files so bootstrap.dir won't try to build them
 	#
-	touch -t 200001010000 \
 	_EOF_
 
-for f in $(
-  egrep '## stamp-.*GEN-RULE' agen5/Makefile.am | \
-    sed 's@.*## *\(.*\) GEN-RULE@agen5/\1@')
+print -u5 "touch -t ${timestamp} \\"
+
+for f in ${STAMPLIST}
 do echo $f
 done | columns --spread=1 -I8 --line=" \\" >&5
 
@@ -145,7 +152,7 @@ do
   mv -f ${f}.XX ${f}
 done
 
-for f in $(find . -type f -name proto.h)
+for f in ${PROTOLIST}
 do
   egrep -v '^ \* Generated' ${f} > $f.XX || continue
   mv -f ${f}.XX ${f}
@@ -185,7 +192,8 @@ then
   mv -f ${cfgfile} noag-boot.sh
   cvs commit -m'CVS-ed noag-boot.sh script update' noag-boot.sh
 
-else
+elif test -t 1
+then
   ( cd $sd
     echo noag-boot.sh would change:
     echo diff -c noag-boot.sh ${cfgfile}
