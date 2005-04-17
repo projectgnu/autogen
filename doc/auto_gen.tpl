@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.7 2005/04/10 20:32:23 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.8 2005/04/17 19:24:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -81,6 +81,7 @@ directories:
 @end direntry
 
 @ifinfo
+@ifnothtml
 This file documents @value{PACKAGE} Version @value{VERSION}
 
 AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
@@ -94,6 +95,7 @@ Permission is granted to process this file through TeX and print the
 results, provided the printed document carries copying permission
 notice identical to this one except for the removal of this paragraph.
 @end ignore
+@end ifnothtml
 @end ifinfo
 
 @finalout

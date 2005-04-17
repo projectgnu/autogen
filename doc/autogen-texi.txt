@@ -7,6 +7,7 @@ Extraction from autogen.texi
 @end ignore
 
 @ifinfo
+
 @node Top, Introduction, , (dir)
 @top The Automated Program Generator
 @comment  node-name,  next,  previous,  up
@@ -4301,8 +4302,9 @@ and @code{--save-opts} auto-supported options may not be preset.
 If for some reason it is difficult or unworkable to integrate configuration
 file processing with command line option parsing, the @code{libopts}
 (@pxref{libopts procedures}) library can still be used to process configuration
-files.  In this section you will see how to make and use a configuration
-file for changing the ``@t{Hello, World!}'' greeting.
+files.  Below is a ``@t{Hello, World!}'' greeting program that tries
+to load a configuration file @file{hello.conf} to see if it should use
+an alternate greeting or to personalize the salutation.
 
 @example
 #include <sys/types.h>
@@ -4329,7 +4331,7 @@ int main( int argc, char** argv ) @{
         greeted = strdup( pwe->pw_gecos );
     @}
 
-    optionUnloadNested( pOV );
+    optionUnloadNested( pOV ); /* deallocate config data */
   @}
   printf( "%s, %s!\n", greeting, greeted );
   return 0;
@@ -4340,7 +4342,8 @@ int main( int argc, char** argv ) @{
 You may now compile and run this program thus:
 
 @example
-$ cc -o hello -I/usr/local hello.c -L/usr/local/lib -lopts
+$ opts=`autoopts-config cflags ldflags`
+$ cc -o hello hello.c $@{opts@}
 $ ./hello
 Hello, World!
 $ echo 'greeting Buzz off' > hello.conf

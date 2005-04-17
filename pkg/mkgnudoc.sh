@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp: "2005-04-14 16:42:05 bkorb"
-# Version:    "$Revision: 4.2 $
+# Time-stamp: "2005-04-17 12:11:27 bkorb"
+# Version:    "$Revision: 4.3 $
 
 MAKE=${MAKE:-make}
 
@@ -27,11 +27,13 @@ echo
 cd ..
 [ -f autogen.info ] || ${MAKE}
 
-texi2html -menu -split=none    -verbose autogen.texi
+texiargs='--ifinfo -menu -verbose'
+
+texi2html ${texiargs} -split=none autogen.texi
 mv -f autogen.html ${ddir}/html_mono/.
 echo mono done
 
-texi2html -menu -split=chapter -verbose autogen.texi
+texi2html ${texiargs} -split=chapter autogen.texi
 if test -d autogen/.
 then mv -f autogen ${ddir}/html_chapter
 else mkdir ${ddir}/html_chapter
@@ -39,7 +41,7 @@ else mkdir ${ddir}/html_chapter
 fi
 echo chapter done
 
-texi2html -menu -split=node -verbose autogen.texi
+texi2html ${texiargs} -split=node autogen.texi
 if test -d autogen/.
 then mv -f autogen ${ddir}/html_node
 else mkdir ${ddir}/html_node
