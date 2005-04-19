@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.7 2005/03/06 20:16:08 bkorb Exp $
+# $Id: rc.test,v 4.8 2005/04/19 03:53:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -23,8 +23,9 @@ fi
 
 echo "creating ${testname}.def in `pwd`"
 
-export testname
-export TESTNAME=`echo ${testname} | tr '[a-z]' '[A-Z]'`
+testname
+TESTNAME=`echo ${testname} | tr '[a-z]' '[A-Z]'`
+export testname TESTNAME
 
 test_main="yes" \
 argument="mumble" long_opts="yes" \
