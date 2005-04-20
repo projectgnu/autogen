@@ -47,6 +47,7 @@ ln `find . -type f -name '*.rpm'` ${builddir}/.
 cd ${builddir}
 rm -rf ${HOME}
 ${VERBOSE} || ls -l *.rpm
+:
 
 ## Local Variables:
 ## mode: shell-script

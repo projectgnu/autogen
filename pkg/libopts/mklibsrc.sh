@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-02-28 14:21:19 bkorb"
+## Time-stamp:      "2005-04-19 19:59:31 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.7 2005/03/06 20:16:09 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.8 2005/04/20 03:08:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -74,35 +74,51 @@ cat >> libopts.m4 <<-	\EOMacro
 	dnl Otherwise, add \`\`libopts-${AO_CURRENT}.${AO_REVISION}.${AO_AGE}''
 	dnl to SUBDIRS and run all the config tests that the library needs.
 	dnl
-	AC_DEFUN([LIBOPTS_CHECK],[
-	  AC_MSG_CHECKING([whether autoopts-config can be found])
-	  AC_ARG_WITH([autoopts-config],
-          AC_HELP_STRING([--with-autoopts-config],
-	                   [specify the config-info script]),
-	    [lo_cv_with_autoopts_config=${with_autoopts_config}],
-	    AC_CACHE_CHECK([whether autoopts-config is specified],
-	       lo_cv_with_autoopts_config,
-	       lo_cv_with_autoopts_config=autoopts-config)
-	  ) # end of AC_ARG_WITH
-	  AC_CACHE_VAL([lo_cv_test_autoopts],[
-	    aoconfig=${lo_cv_with_autoopts_config}
-	    lo_cv_test_autoopts=`${aoconfig} --libs` 2> /dev/null
-	    if test $? -ne 0 -o -z "${lo_cv_test_autoopts}"
-	    then lo_cv_test_autoopts=no ; fi
-	  ]) # end of CACHE_VAL
-	  AC_MSG_RESULT([${lo_cv_test_autoopts}])
+	dnl Default to system libopts
+	NEED_LIBOPTS_DIR=''
 
-	  if test "X${lo_cv_test_autoopts}" != Xno
-	  then
-	    LIBOPTS_LDADD="${lo_cv_test_autoopts}"
-	    LIBOPTS_CFLAGS="`${aoconfig} --cflags`"
-	    NEED_LIBOPTS_DIR=''
-	  else
-	    LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
-	    LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
-	    INVOKE_LIBOPTS_MACROS
-	    NEED_LIBOPTS_DIR=true
-	  fi
+	AC_DEFUN([LIBOPTS_CHECK],[
+	  AC_ARG_ENABLE([local-libopts],
+	    AC_HELP_STRING([--enable-local-libopts],
+	       [Force using the supplied libopts tearoff code]),[
+	    if test x$enableval = xyes ; then
+	       AC_MSG_NOTICE([Using supplied libopts tearoff])
+	       LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
+	       LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
+	       INVOKE_LIBOPTS_MACROS
+	       NEED_LIBOPTS_DIR=true
+	    fi])
+
+	  if test -z "${NEED_LIBOPTS_DIR}" ; then
+	    AC_MSG_CHECKING([whether autoopts-config can be found])
+	    AC_ARG_WITH([autoopts-config],
+	       AC_HELP_STRING([--with-autoopts-config],
+	            [specify the config-info script]),
+	       [lo_cv_with_autoopts_config=${with_autoopts_config}],
+	       AC_CACHE_CHECK([whether autoopts-config is specified],
+	            lo_cv_with_autoopts_config,
+	            lo_cv_with_autoopts_config=autoopts-config)
+	     ) # end of AC_ARG_WITH
+	     AC_CACHE_VAL([lo_cv_test_autoopts],[
+	         aoconfig=${lo_cv_with_autoopts_config}
+	         lo_cv_test_autoopts=`${aoconfig} --libs` 2> /dev/null
+	         if test $? -ne 0 -o -z "${lo_cv_test_autoopts}"
+	        then lo_cv_test_autoopts=no ; fi
+	    ]) # end of CACHE_VAL
+	    AC_MSG_RESULT([${lo_cv_test_autoopts}])
+
+	    if test "X${lo_cv_test_autoopts}" != Xno
+	    then
+	      LIBOPTS_LDADD="${lo_cv_test_autoopts}"
+	      LIBOPTS_CFLAGS="`${aoconfig} --cflags`"
+	    else
+	      LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
+	      LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
+	      INVOKE_LIBOPTS_MACROS
+	      NEED_LIBOPTS_DIR=true
+	    fi
+	  fi # end of if test -z "${NEED_LIBOPTS_DIR}"
+
 	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "${NEED_LIBOPTS_DIR}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
@@ -140,7 +156,7 @@ exec 3>&-
 
 if gzip --version > /dev/null 2>&1
 then
-  gz=gzip
+  gz='gzip --best'
   sfx=tar.gz
 else
   gz=compress
@@ -150,6 +166,15 @@ fi
 cd ..
 echo ! cd `pwd`
 echo ! tar cvf ${tag}.${sfx} ${tag}
-tar cvf - ${tag} | $gz --best > ${top_builddir}/autoopts/${tag}.${sfx}
+tar cvf - ${tag} | $gz > ${top_builddir}/autoopts/${tag}.${sfx}
 rm -rf ${tag}
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
+## End:
+
 ## end of mklibsrc.sh

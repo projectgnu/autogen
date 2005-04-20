@@ -1,6 +1,10 @@
-2005-04-17  Bruce Korb  <bkorb@gnu.org>
+2005-04-19  Aaron Turner  <synfinatic@gmail.com>
 
 	= 5.7 Released
+
+	* pkg/libopts/mklibsrc.sh: add --enable-local-libopts
+
+2005-04-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options_h.tpl(stdint.h): Undo yesterday's changes
 	* autoopts/guileopt.c: include "config.h"
