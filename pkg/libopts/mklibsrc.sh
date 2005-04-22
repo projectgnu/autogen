@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-04-19 19:59:31 bkorb"
+## Time-stamp:      "2005-04-21 19:07:37 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.8 2005/04/20 03:08:40 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.9 2005/04/22 02:09:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -150,7 +150,8 @@ cat >&3 <<-	EOMakefile
 	EXTRA_DIST            = \\
 	EOMakefile
 
-ls -1 | egrep -v "^(libopts\.c|Makefile\.am)\$" \
+find * -type f \
+  | egrep -v '^(libopts\.c|Makefile\.am)$' \
   | ${CLexe} -I4 --spread=1 --line-sep="  \\" >&3
 exec 3>&-
 
