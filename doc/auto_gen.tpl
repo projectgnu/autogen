@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.8 2005/04/17 19:24:26 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.9 2005/04/22 02:36:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -617,7 +617,6 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (shell (string-append "
-set -x
 OPTDIR=`cd ${top_builddir}/autoopts >/dev/null; pwd`
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
