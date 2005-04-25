@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.8 2005/02/20 23:00:55 bkorb Exp $
+# $Id: optlib.tpl,v 4.9 2005/04/25 00:12:09 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-02-20 13:53:22 bkorb"
+# Time-stamp:      "2005-04-24 11:17:30 bkorb"
 
 =][=
 
@@ -189,7 +189,7 @@ DEFINE set-defines
   ENDIF  =][=
   IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
+                [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
   ENDIF "callout procedure exists" =] )[=
 
   IF (exist? "disable") =]
@@ -199,7 +199,7 @@ DEFINE set-defines
         [=set-desc=].pzLastArg  = NULL[=
     IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set-index=] )[=
+                [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
     ENDIF "callout procedure exists" =] )[=
 
   ENDIF disable exists =][=

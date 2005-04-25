@@ -1,6 +1,10 @@
-2005-04-19  Aaron Turner  <synfinatic@gmail.com>
+2005-04-24  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.7 Released
+
+	* autoopts/optlib.tpl(set-defines): end a C statement w/ a ';'
+
+2005-04-19  Aaron Turner  <synfinatic@gmail.com>
 
 	* pkg/libopts/mklibsrc.sh: add --enable-local-libopts
 
