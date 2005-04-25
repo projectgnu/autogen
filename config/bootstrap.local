@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-02-14 14:00:56 bkorb"
+# Time-stamp:        "2005-04-24 17:42:13 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.9 2005/02/15 01:34:13 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.10 2005/04/25 00:47:17 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -116,6 +116,11 @@ make_funcs_def()
 	_END_VERS_INFO_
   ${AGexe} funcs.def
   test -f options.h || exit 1
+
+  #  Regenerate the "genshell.h" 'cuz we just altered the template to
+  #  contain the header version number.
+  #
+  ${AGexe} -L. genshell.def || exit 1
   mv options.h autoopts/.
   ${AGexe} -Tagman3.tpl funcs.def || exit 1
   exec 4> Makefile.new
