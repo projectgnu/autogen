@@ -1,8 +1,8 @@
-[= autogen5 template
+[= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.5 2005/02/14 16:25:37 bkorb Exp $
+# $Id: opthead.tpl,v 4.6 2005/04/25 00:33:01 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-14 08:22:46 bkorb"
+# Time-stamp:      "2005-04-24 17:26:53 bkorb"
 
 =]
 /*
@@ -15,6 +15,12 @@
 [= Option_Copyright =][=
 % config-header "\n#include \"%s\""=]
 #include <autoopts/options.h>
+
+#define AO_TEMPLATE_VERSION XXX
+#if (AO_TEMPLATE_VERSION < OPTIONS_MINIMUM_VERSION) \
+ || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
+# error option template version mismatches autoopts/options.h header
+#endif
 
 /*
  *  Enumeration of each option:
@@ -284,3 +290,10 @@ ENDIF=]
 }
 #endif
 #endif /* [=(. header-guard)=] */
+/*
+ * Local Variables:
+ * Mode: C
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * options.h ends here */

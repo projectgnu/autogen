@@ -3,6 +3,10 @@
 	= 5.7 Released
 
 	* autoopts/optlib.tpl(set-defines): end a C statement w/ a ';'
+	* autoopts/options_h.tpl(AO_TEMPLATE_VERSION): burn the value into
+	the opthead.tpl template
+	* autoopts/opthead.tpl(AO_TEMPLATE_VERSION): Add code to verify that
+	the generated text matches the range of the installed libopts library.
 
 2005-04-19  Aaron Turner  <synfinatic@gmail.com>
 
