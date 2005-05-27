@@ -1,3 +1,12 @@
+2005-05-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(arg-range): add this to the option description.
+	* config/bootstrap.local(vers-template): new - template struct version
+	* autoopts/options_h.tpl(AO_TEMPLATE_VERSION): use the new value
+	* doc/auto_gen.tpl(quick start): generate the example and use the
+	"new" main procedure stuff.
+	* Upgrade libtool once again.
+
 2005-04-24  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.7 Released

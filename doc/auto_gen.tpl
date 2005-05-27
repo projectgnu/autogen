@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.9 2005/04/22 02:36:17 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.10 2005/05/27 17:39:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -125,7 +125,7 @@ Extracted from [=srcfile=] line [=linenum=].
 
 ENDDEF  =][=
 
-
+(define temp-txt "")
 (define text-tag "")=][=
 
 DEFINE get-text     =][=
@@ -562,16 +562,95 @@ produces all the code necessary to parse and handle the command line and
 configuration file options, and the documentation that should go with your
 program as well.[=
 
-get-text tag = autoopts =]
+get-text tag = autoopts
+
+=]
+@noindent
+First, specify your program attributes and its options to AutoOpts,
+as with the following example.
+
+@example
+[=
+
+(out-push-new (string-append temp-dir "/checkopt.def" ))
+
+=]AutoGen Definitions options;
+prog-name     = check;
+prog-title    = "Checkout Automated Options";
+long-opts;
+
+main = { main-type = shell-process; };
+
+flag = {
+    name      = check-dirs;
+    value     = L;        /* flag style option character */
+    arg-type  = string;   /* option argument indication  */
+    max       = NOLIMIT;  /* occurrence limit (none)     */
+    stack-arg;            /* save opt args in a stack    */
+    descrip   = "Checkout directory list";
+};
+
+flag = {
+    name      = show_defs;
+    descrip   = "Show the definition tree";
+    disable   = dont;     /* mark as enable/disable type */
+                          /* option.  Disable as `dont-' */
+};[=
+
+(texi-escape-encode (out-pop #t)) =]
+@end example
+
+@noindent
+Then perform the following steps:
+
+@enumerate
+[= (out-push-new)
+=]cfl="`autoopts-config cflags` -DTEST_CHECK_OPTS"
+lfl="`autoopts-config ldflags`"
+autogen checkopt.def
+cc -o check -g ${cfl} checkopt.c ${lfl}[=
+
+(define mkcheck-script (out-pop #t))
+(shell (string-append
+"while read f
+do echo '@item'
+   echo \"$f\" | \
+      sed 's,\\([@{}]\\),@\\1,g;s/^/@code{/;s/$/}/'
+done <<'_EOF_'\n"
+
+mkcheck-script "\n_EOF_" )) =]
+@item
+@code{./check --help}
+@end enumerate
+
+@noindent
+Running those commands yields:
+
+@example
+[= (texi-escape-encode (shell (string-append
+"cd ${tempdir}
+test -f check && rm -f check
+
+(" mkcheck-script ") > checkopt.err 2>&1
+
+test -x ./check || {
+  exec >&2
+  cat checkopt.err
+  kill -TERM ${AG_pid}
+  exit 1
+}
+./check --help | sed 's/\t/        /g'"
+) ) ) =]
+@end example
+
+[= get-text tag = autoopts-main =]
 
 Here is an example program that uses the following set of definitions:
 
 @example
 [=
 
- (out-push-new (shellf "
-    tempdir=%s
-    echo ${tempdir}/default-test.def" temp-dir ))
+ (out-push-new (string-append temp-dir "/default-test.def" ))
 
 =]AutoGen Definitions options;
 
@@ -680,6 +759,74 @@ cat $f`
 [=
 
 get-text tag = "autoopts-data"
+
+=]
+
+@example[=
+(out-push-new) =]
+#include <sys/types.h>
+#include <pwd.h>
+#include <string.h>
+#include <unistd.h>
+#include <autoopts/options.h>
+int main( int argc, char** argv ) {
+  char* greeting = "Hello";
+  char* greeted  = "World";
+  const tOptionValue* pOV = configFileLoad( "hello.conf" );
+
+  if (pOV != NULL) {
+    const tOptionValue* pGetV = optionGetValue( pOV, "greeting" );
+
+    if (  (pGetV != NULL)
+       && (pGetV->valType == OPARG_TYPE_STRING))
+      greeting = strdup( pGetV->v.strVal );
+
+    pGetV = optionGetValue( pOV, "personalize" );
+    if (pGetV != NULL) {
+      struct passwd* pwe = getpwuid( getuid() );
+      if (pwe != NULL)
+        greeted = strdup( pwe->pw_gecos );
+    }
+
+    optionUnloadNested( pOV ); /* deallocate config data */
+  }
+  printf( "%s, %s!\n", greeting, greeted );
+  return 0;
+}
+[= (define config-prog (out-pop #t))
+   (texi-escape-encode config-prog) =]
+@end example
+
+@noindent
+With that text in a file named ``hello.c'', this short script:
+
+@example
+[=
+(define run-cmd
+"opts=`autoopts-config cflags ldflags`
+cc -o hello hello.c ${opts}
+./hello
+echo 'greeting Buzz off' > hello.conf
+./hello
+echo personalize > hello.conf
+./hello")
+
+(texi-escape-encode run-cmd) =]
+@end example
+
+@noindent
+will produce the following output (for me):
+
+@example
+[= (shellf "cd ${tempdir}
+cat > hello.c <<'_EOF_'%s
+_EOF_
+%s
+rm -f hello*" config-prog run-cmd) =]
+@end example
+[=
+
+get-text tag = "ao-data2"
 
 =]
 [=

@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.6 2005/04/25 00:33:01 bkorb Exp $
+# $Id: opthead.tpl,v 4.7 2005/05/27 17:39:01 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-04-24 17:26:53 bkorb"
+# Time-stamp:      "2005-04-24 18:08:44 bkorb"
 
 =]
 /*
@@ -16,6 +16,13 @@
 % config-header "\n#include \"%s\""=]
 #include <autoopts/options.h>
 
+/*
+ *  Ensure that the library used for compiling this generated header is at
+ *  least as new as the version current when the header template was released
+ *  (not counting patch version increments).  Also ensure that the oldest
+ *  tolerable version is at least as old as what was current when the header
+ *  template was released.
+ */
 #define AO_TEMPLATE_VERSION XXX
 #if (AO_TEMPLATE_VERSION < OPTIONS_MINIMUM_VERSION) \
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)

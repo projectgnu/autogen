@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-04-10 10:31:43 bkorb"
+## Time-stamp:      "2005-05-27 10:13:32 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.7 2005/04/10 20:32:23 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.8 2005/05/27 17:39:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -306,6 +306,8 @@ This option must appear in combination with the following options:
 This option must not appear in combination with any of the following options:
 [+: FOR flags-cant ", " :+][+:flags-cant:+][+:ENDFOR:+].[+:
       ENDIF     :+][+:
+
+
       IF (~* (get "arg-type") "key|set") :+]
 This option takes a keyword as its argument[+:
 
@@ -332,10 +334,50 @@ The available keywords are:
 .nf
 .na
 [+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
-            (join "\n" (stack "keyword"))  ) :+]
+            (join "\n" (stack "keyword"))  )   :+]
 .fi
 .in -4[+: (if (exist? "arg-default") "\n.sp" ) :+][+:
+
+      ELIF (=* (get "arg-type") "num")         :+]
+This option takes an integer number as its argument.[+:
+
+        IF  (exist? "arg-range")  :+]
+The value of [+:(. opt-arg):+] is constrained to being:
+.in +4
+.nf
+.na[+:     FOR arg_range ", or"   :+]
+[+: (shellf "
+range='%s'
+
+case \"X${range}\" in
+X'->'?*  )
+  echo \"less than or equal to\" `
+    echo $range | sed 's/->//' ` ;;
+
+X?*'->'  )
+  echo \"greater than or equal to\" `
+    echo $range | sed 's/->.*//' ` ;;
+
+X?*'->'?* )
+  echo \"in the range \" `
+    echo $range | sed 's/->/ through /' ` ;;
+
+X?* )
+  echo exactly $range ;;
+
+X* ) echo $range is indeterminate
+esac"
+
+(get "arg-range") )
+:+][+:
+           ENDFOR arg-range :+]
+.fi
+.in -4[+:
+
+        ENDIF   :+][+:
+
       ENDIF     :+][+:
+
       IF (exist? "arg-default") :+]
 The default [+:(. opt-arg):+] for this option is:
 .ti +4

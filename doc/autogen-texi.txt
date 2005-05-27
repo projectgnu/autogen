@@ -2047,61 +2047,15 @@ An option to show or not show the definition tree being used.
 Only one occurrence is to be allowed, specifying one or the other.
 @end enumerate
 
-@noindent
-First, specify your program attributes and its options to AutoOpts,
-as with the following example.
+@ignore
+END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
-@example
-AutoGen Definitions options;
-prog-name     = check;
-prog-title    = "Checkout Automated Options";
-long-opts;
-test-main;
-
-flag = @{
-    name      = check-dirs;
-    value     = L;        /* flag style option character */
-    arg-type  = string;   /* option argument indication  */
-    max       = NOLIMIT;  /* occurrence limit (none)     */
-    stack-arg;            /* save opt args in a stack    */
-    descrip   = "Checkout directory list";
-@};
-
-flag = @{
-    name      = show_defs;
-    descrip   = "Show the definition tree";
-    disable   = dont;     /* mark as enable/disable type */
-                          /* option.  Disable as `dont-' */
-@};
-@end example
-
-@noindent
-Then perform the following steps:
-
-@enumerate
-@item
-@code{autogen checkopt.def}
-@item
-@code{cc -o check -DTEST_CHECK_OPTS -g checkopt.c -L $prefix/lib -lopts}
-@end enumerate
-
-@noindent
-And now, @code{./check --help} yields:
-
-@example
-check - Checkout Automated Options
-USAGE:  check [-<flag> [<val>]]... [--<name>[@{=| @}<val>]]...
-  Flg Arg Option-Name    Description
-   -L YES check-dirs     Checkout directory list
-                                - may appear without limit
-      no  show-defs      Show the definition tree
-                                - disabled as --dont-show-defs
-   -? no  help           Display usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-
-Options may be specified by doubled markers and their name
-or by a single marker and the flag character/option value.
-@end example
+@ignore
+START == AUTOOPTS-MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
 @noindent
 Normally, however, you would compile @file{checkopt.c} as in:
@@ -2868,30 +2822,35 @@ attribute interacts with the @var{documentation} attribute.
 @cindex equivalence
 @item equivalence
 Generally, when several options are mutually exclusive and basically serve
-the purpose of selecting one of several processing modes, these options
-can be considered an equivalence class.  Sometimes, it is just easier to
-deal with them as such.
+the purpose of selecting one of several processing modes, these options can
+be considered an equivalence class.  Sometimes, it is just easier to deal
+with them as such.  All members of the equivalence class must contain the
+same equivalenced-to option, including the equivalenced-to option itself.
+Thus, it must be a class member.
 
-For an option equivalence class, there is a single occurrence counter
-for all the members of the class.  All members of the equivalence class
-must contain the same equivalenced-to option, including the
-equivalenced-to option itself.  Thus, it must be a member.
-Such options may not be preset (be set from @file{rc} files or
-environment variables) and always conflict with each other
-(two members of the same equivalence class may not appear together).
+For an option equivalence class, there is a single occurrence counter for
+the class.  It can be referenced with the interface macro,
+@code{COUNT_OPT(BASE_OPTION)}, where ``BASE_OPTION'' is the equivalenced-to
+option name.
 
-Also, please take careful note:  since the options are
-mapped to the equivalenced-to option descriptor, any option
-argument values are mapped to that descriptor also.  Be sure
-you know which ``equivalent option'' was selected before getting
-the option argument value!
+Also, please take careful note: since the options are mapped to the
+equivalenced-to option descriptor, any option argument values are mapped to
+that descriptor also.  Be sure you know which ``equivalent option'' was
+selected before getting an option argument value!
 
-As an example, @code{cpio(1)} has three options @code{-o}, @code{-i},
-and @code{-p} that define the operational mode of the program
-(@code{create}, @code{extract} and @code{pass-through}, respectively).
-They form an equivalence class from which one and only one member must
-appear on the command line.  If @code{cpio} were an AutoOpt-ed program,
-then each of these option definitions would contain:
+During the presetting phase of option processing (@pxref{Presetting
+Options}), equivalenced options may be specified.  However, if different
+equivalanced members are specified, only the last instance will be
+recognized and the others will be discarded.  A conflict error is indicated
+only when multiple different members appear on the command line itself.
+
+As an example of where equivalenced options might be useful, @code{cpio(1)}
+has three options @code{-o}, @code{-i}, and @code{-p} that define the
+operational mode of the program (@code{create}, @code{extract} and
+@code{pass-through}, respectively).  They form an equivalence class from
+which one and only one member must appear on the command line.  If
+@code{cpio} were an AutoOpt-ed program, then each of these option
+definitions would contain:
 
 @example
 equivalence = create;
@@ -3411,7 +3370,7 @@ enumeration: @code{silent}, @code{quiet}, @code{brief},
 @code{brief}.
 
 @ignore
-END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AUTOOPTS-MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
@@ -4305,54 +4264,15 @@ file processing with command line option parsing, the @code{libopts}
 files.  Below is a ``@t{Hello, World!}'' greeting program that tries
 to load a configuration file @file{hello.conf} to see if it should use
 an alternate greeting or to personalize the salutation.
+@ignore
+END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
-@example
-#include <sys/types.h>
-#include <pwd.h>
-#include <string.h>
-#include <unistd.h>
-#include <autoopts/options.h>
-int main( int argc, char** argv ) @{
-  char* greeting = "Hello";
-  char* greeted  = "World";
-  const tOptionValue* pOV = configFileLoad( "hello.conf" );
-
-  if (pOV != NULL) @{
-    const tOptionValue* pGetV = optionGetValue( pOV, "greeting" );
-
-    if (  (pGetV != NULL)
-       && (pGetV->valType == OPARG_TYPE_STRING))
-      greeting = strdup( pGetV->v.strVal );
-
-    pGetV = optionGetValue( pOV, "personalize" );
-    if (pGetV != NULL) @{
-      struct passwd* pwe = getpwuid( getuid() );
-      if (pwe != NULL)
-        greeted = strdup( pwe->pw_gecos );
-    @}
-
-    optionUnloadNested( pOV ); /* deallocate config data */
-  @}
-  printf( "%s, %s!\n", greeting, greeted );
-  return 0;
-@}
-@end example
-
-@noindent
-You may now compile and run this program thus:
-
-@example
-$ opts=`autoopts-config cflags ldflags`
-$ cc -o hello hello.c $@{opts@}
-$ ./hello
-Hello, World!
-$ echo 'greeting Buzz off' > hello.conf
-$ ./hello
-Buzz off, World!
-$ echo personalize > hello.conf
-$ ./hello
-Hello, Bruce Korb!
-@end example
+@ignore
+START == AO-DATA2 == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
 @c === SECTION MARKER
 
@@ -4585,7 +4505,7 @@ if [ -z "$@{OPTION_CT@}" ] ; then exit 1 ; fi
 test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
 @ignore
-END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AO-DATA2 == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
