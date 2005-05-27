@@ -1,4 +1,9 @@
-New in __CURRENT_VERSION__ - April, 2005
+New in __CURRENT_VERSION__ - May, 2005
+
+* Update to libtool 1.5.18
+* add "arg-range" text to the generated man pages
+
+New in 5.7 - April, 2005
 
 AutoOpts:
 * "libopts" handles stand alone configuration file processing.
@@ -15,14 +20,10 @@ AutoOpts:
       <val-name>...</val-name>
       <named-no-value/>
 
-* The ever-present minor bug fixes and testing improvements.
-
 New in 5.6.6 - February 2005
 
 AutoOpts:
 * "pathfind" is now incorporated into libopts, if not natively supported
-* ':' was added as a legal name/value separation marker for config files
-* fixed a one-off allocation error that caused rare seg faults
 * "options.h" and "usage-txt.h" are installed into an "autoopts" subdir.
 * "for-each" main procedures can handle the arguments/input lists in
   several different ways, by calling the callback function with:
@@ -39,51 +40,9 @@ AutoGen:
 * autogen will no longer try to catch real time signals
 
 New in 5.6.5 - December, 2004
-* Cleaned up names of programs and executables.  They should all be
-  consistent now.
 * Equivalencing stacked argument options no longer has magical properties.
   "unstack-arg" is now equivalent to that old behavior.
 * Equivalenced options may now be preset with rc/ini files and
   environment variables.
 * ``autoopts-config ldflags'' will now emit the appropriate ``-R'' link option.
 * autoopts.pc will now be produced and installed
-
-New in 5.6.4 - October, 2004
-* fixed autoopts/test/enums.test - real newline characters are not
-  allowed in portable string constants -- it was a typo.
-* fixed some bootstrapping for Solaris -- /bin/sh thinks '^' is a '|'.
-* The '$$' expansion in locating the program will now use "realpath(3C)".
-  This way, if a program is installed in /opt/whatever/bin/program
-  and you run it via a symlink, '$$' will resolve to /opt/whatever/bin.
-
-New in 5.6.3 - October, 2004
-General:
-* various cleanups for -Wall and Cygwin builds
-
-AutoOpts:
-* The listing of enumerated option arguments is a bit more concise.
-* Options may be handled twice: once during the immediate phase and
-  again during the "normal" processing phase.
-* If environment variable "rc" processing is enabled, then the
-  "${PROGNAME}" environment variable will be processed - tokenizing it
-  and processing it as a list of command line options.  It may not
-  contain any command line operands.
-* a new main procedure type:  each-or-stdin  This will fopen() each
-  command line operand and pass the FILE* pointer to the callout procedure.
-  If there are no operands, then stdin is passed.
-* main() procedures can be specified more consistently
-
-AutoGen:
-* -Wall warning cleanups
-* exist and not-exist selection macros -- the CASE macro can now
-  select a clause based on value existence.  Previously, you could detect
-  an empty string and you then had to use the ``(exist? "name")'' function.
-* fixed tpl-file-line so that "%2$d" works for the format.
-* Added (emit) function that directly emits its args into output
-* keyword lists are columnized in usage text
-* distributed subdirectories no longer depend on also being built.
-
-getdefs (an AutoGen support utility):
-* With "listed" attributes, if you quote an entry, then the scanning code
-  has to push the scan forward to the next entry so we don't wind up with
-  a spurious empty entry!!
