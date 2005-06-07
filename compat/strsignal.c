@@ -14,8 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with strsignal.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *  
  *  As a special exception, Bruce Korb gives permission for additional
  *  uses of the text contained in the release of strsignal.
@@ -40,7 +40,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 4.2 2005/02/21 23:01:08 bkorb Exp $
+ *  $Id: strsignal.c,v 4.3 2005/06/07 22:25:13 bkorb Exp $
  */
 
 #include "compat.h"

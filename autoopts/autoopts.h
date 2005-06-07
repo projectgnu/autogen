@@ -2,7 +2,7 @@
 /*
  *  Time-stamp:      "2005-02-23 07:51:34 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.15 2005/03/06 20:16:08 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.16 2005/06/07 22:25:12 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -25,8 +25,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Automated Options.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *
  * As a special exception, Bruce Korb gives permission for additional
  * uses of the text contained in his release of AutoOpts.

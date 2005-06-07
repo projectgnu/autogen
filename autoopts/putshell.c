@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 4.6 2005/02/20 02:15:48 bkorb Exp $
+ *  $Id: putshell.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
  * Time-stamp:      "2005-02-14 14:55:01 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -24,8 +24,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Automated Options.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *
  * As a special exception, Bruce Korb gives permission for additional
  * uses of the text contained in his release of AutoOpts.

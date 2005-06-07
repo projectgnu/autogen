@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.5 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: expState.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -22,8 +22,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with AutoGen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  */
 
 /* = = = START-STATIC-FORWARD = = = */

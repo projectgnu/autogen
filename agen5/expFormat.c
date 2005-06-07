@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.2 2005/01/23 23:33:05 bkorb Exp $
+ *  $Id: expFormat.c,v 4.3 2005/06/07 22:25:12 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -21,15 +21,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with AutoGen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  */
 
 static const char zGpl[] =
 "%2$s%1$s is free software.\n%2$s\n"
 "%2$sYou may redistribute it and/or modify it under the terms of the\n"
 "%2$sGNU General Public License, as published by the Free Software\n"
-"%2$sFoundation; either version 2, or (at your option) any later version.\n"
+"%2$sFoundation; either version 2 of the License, or (at your option)\n"
+"%2$sany later version.\n"
 "%2$s\n"
 "%2$s%1$s is distributed in the hope that it will be useful,\n"
 "%2$sbut WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -37,10 +38,10 @@ static const char zGpl[] =
 "%2$sSee the GNU General Public License for more details.\n"
 "%2$s\n"
 "%2$sYou should have received a copy of the GNU General Public License\n"
-"%2$salong with %1$s.  See the file \"COPYING\".  If not,\n"
-"%2$swrite to:  The Free Software Foundation, Inc.,\n"
-"%2$s           59 Temple Place - Suite 330,\n"
-"%2$s           Boston,  MA  02111-1307, USA.";
+"%2$salong with %1$s.  If not, write to:\n"
+"%2$s\tThe Free Software Foundation, Inc.,\n"
+"%2$s\t51 Franklin Street, Fifth Floor\n"
+"%2$s\tBoston, MA  02110-1301, USA.";
 
 static const char zLgpl[] =
 "%2$s%1$s is free software; you can redistribute it and/or\n"
@@ -53,11 +54,11 @@ static const char zLgpl[] =
 "%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
 "%2$sLesser General Public License for more details.\n"
 "%2$s\n"
-"%2$sYou should have received a copy of the GNU Lesser General Public\n"
-"%2$sLicense along with %1$s; if not, write to:\n"
-"%2$s           The Free Software Foundation, Inc.,\n"
-"%2$s           59 Temple Place - Suite 330,\n"
-"%2$s           Boston,  MA  02111-1307, USA.";
+"%2$sYou should have received a copy of the GNU General Public License\n"
+"%2$salong with %1$s.  If not, write to:\n"
+"%2$s\tThe Free Software Foundation, Inc.,\n"
+"%2$s\t51 Franklin Street, Fifth Floor\n"
+"%2$s\tBoston, MA  02110-1301, USA.";
 
 static const char zBsd[] =
 "%2$s%1$s is free software copyrighted by %3$s.\n%2$s\n"

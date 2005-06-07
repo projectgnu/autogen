@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.13 2005/03/13 19:34:26 bkorb Exp $
+ *  $Id: autoopts.c,v 4.14 2005/06/07 22:25:12 bkorb Exp $
  *  Time-stamp:      "2005-03-13 08:39:23 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -25,8 +25,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Automated Options.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *
  * As a special exception, Bruce Korb gives permission for additional
  * uses of the text contained in his release of AutoOpts.

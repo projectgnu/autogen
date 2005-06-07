@@ -9,7 +9,7 @@
 # Last Modified:      Thu Aug  5 14:14:36 1999				      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.1 2005/01/01 00:20:59 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.2 2005/06/07 22:25:13 bkorb Exp $
 # ----------------------------------------------------------------------
 # Copyright (C) 1999 Gary V. Vaughan
 #
@@ -25,8 +25,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-# Boston, MA 02111-1307, USA.
+# the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301, USA.
 #
 # As a special exception to the GNU General Public License, if you
 # distribute this file as part of a program that also links with and

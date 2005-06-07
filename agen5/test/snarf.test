@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/06/07 22:25:12 $
 #            by: bkorb
 # Copyright:         1999-2005 by Bruce Korb
-# $Id: snarf.test,v 4.4 2005/03/13 19:30:08 bkorb Exp $
+# $Id: snarf.test,v 4.5 2005/06/07 22:25:12 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -97,8 +97,8 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *  You should have received a copy of the GNU General Public License
  *  along with AutoGen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *
  *  Guile Initializations - Test Global Variables
  */
@@ -154,8 +154,8 @@ cat > ${testname}.h.OK <<_EOF_
  *  You should have received a copy of the GNU General Public License
  *  along with AutoGen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  *
  *  Guile Implementation Routines - for the test group
  */

@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.4 2005/01/23 23:33:06 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.5 2005/06/07 22:25:13 bkorb Exp $
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2005 Bruce Korb
@@ -19,8 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with AutoGen.  See the file "COPYING".  If not,
  *  write to:  The Free Software Foundation, Inc.,
- *             59 Temple Place - Suite 330,
- *             Boston,  MA  02111-1307, USA.
+ *             51 Franklin Street, Fifth Floor,
+ *             Boston, MA  02110-1301, USA.
  */
 
 tSCC zConflict[] =
