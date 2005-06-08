@@ -9,7 +9,7 @@
 # Last Modified:      Thu Aug  5 14:14:36 1999				      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.2 2005/06/07 22:25:13 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.3 2005/06/08 22:58:52 bkorb Exp $
 # ----------------------------------------------------------------------
 # Copyright (C) 1999 Gary V. Vaughan
 #
@@ -40,18 +40,17 @@ srcdir=.
 cwd=`pwd`
 
 AWK=${AWK-awk}
-GENPROTO=./genproto
-GENPROTO_FLAGS=./gendoc.awk
-GENPROTO_ENVIRONMENT='FORMAT=SNV_GNUC_PRINTF'
+GENPROTO_ENVIRONMENT='FORMAT=SNV_GNUC_PRINTF /bin/sh ./genproto'
 
 # Generate the header files
 for file in [abd-z]*.in
 do
   header=`echo $file | sed 's,\.in$,.h,'`
+  test -z "${header}" && continue
   stamp=`echo $file|sed 's,\.in$,.stamp,'`
   temp=${header}T
-  eval $GENPROTO_ENVIRONMENT $GENPROTO $GENPROTO_FLAGS $srcdir/$file > $temp
-  if test x"$header" != x && cmp -s $header $temp; then
+  eval $GENPROTO_ENVIRONMENT ./gendoc.awk $srcdir/$file > $temp
+  if cmp -s $header $temp; then
     echo $header is unchanged; rm -f $temp;
   else
     echo creating $header; mv -f $temp $header;

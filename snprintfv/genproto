@@ -91,4 +91,4 @@ NR == 1 {
 
 exit 0
 
-# genproto.sh ends here
+# genproto ends here
