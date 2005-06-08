@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2005-03-07 13:07:10 bkorb"
+# Time-stamp:        "2005-06-07 17:01:20 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2005/06/07 22:25:12 $
+# Last Modified:     $Date: 2005/06/08 23:01:02 $
 #            by: bkorb
 # Copyright:         1999-2005 by Bruce Korb
-# $Id: snarf.test,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+# $Id: snarf.test,v 4.6 2005/06/08 23:01:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -87,7 +87,8 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *  
  *  You may redistribute it and/or modify it under the terms of the
  *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  Foundation; either version 2 of the License, or (at your option)
+ *  any later version.
  *  
  *  AutoGen is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -95,10 +96,10 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *  See the GNU General Public License for more details.
  *  
  *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  along with AutoGen.  If not, write to:
+ *  	The Free Software Foundation, Inc.,
+ *  	51 Franklin Street, Fifth Floor
+ *  	Boston, MA  02110-1301, USA.
  *
  *  Guile Initializations - Test Global Variables
  */
@@ -144,7 +145,8 @@ cat > ${testname}.h.OK <<_EOF_
  *  
  *  You may redistribute it and/or modify it under the terms of the
  *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  Foundation; either version 2 of the License, or (at your option)
+ *  any later version.
  *  
  *  AutoGen is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -152,10 +154,10 @@ cat > ${testname}.h.OK <<_EOF_
  *  See the GNU General Public License for more details.
  *  
  *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  along with AutoGen.  If not, write to:
+ *  	The Free Software Foundation, Inc.,
+ *  	51 Franklin Street, Fifth Floor
+ *  	Boston, MA  02110-1301, USA.
  *
  *  Guile Implementation Routines - for the test group
  */

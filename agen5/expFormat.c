@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.3 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expFormat.c,v 4.4 2005/06/08 23:01:02 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -54,8 +54,8 @@ static const char zLgpl[] =
 "%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
 "%2$sLesser General Public License for more details.\n"
 "%2$s\n"
-"%2$sYou should have received a copy of the GNU General Public License\n"
-"%2$salong with %1$s.  If not, write to:\n"
+"%2$sYou should have received a copy of the GNU Lesser General Public\n"
+"%2$sLicense along with %1$s.  If not, write to:\n"
 "%2$s\tThe Free Software Foundation, Inc.,\n"
 "%2$s\t51 Franklin Street, Fifth Floor\n"
 "%2$s\tBoston, MA  02110-1301, USA.";

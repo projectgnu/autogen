@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2005-03-06 09:13:06 bkorb"
+# Time-stamp:        "2005-06-07 16:16:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.6 2005/06/07 22:25:13 bkorb Exp $
+# $Id: getopt.test,v 4.7 2005/06/08 23:01:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -118,10 +118,10 @@ cat > ${testname}1-base.c <<\_EndOfSample_
  *  Lesser General Public License for more details.
  *  
  *  You should have received a copy of the GNU Lesser General Public
- *  License along with test_getopt; if not, write to:
- *             The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  License along with test_getopt.  If not, write to:
+ *  	The Free Software Foundation, Inc.,
+ *  	51 Franklin Street, Fifth Floor
+ *  	Boston, MA  02110-1301, USA.
  *
  */
 #include <sys/types.h>
@@ -341,10 +341,10 @@ cat > ${testname}2-base.c <<\_EndOfSample_
  *  Lesser General Public License for more details.
  *  
  *  You should have received a copy of the GNU Lesser General Public
- *  License along with test_getopt; if not, write to:
- *             The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  License along with test_getopt.  If not, write to:
+ *  	The Free Software Foundation, Inc.,
+ *  	51 Franklin Street, Fifth Floor
+ *  	Boston, MA  02110-1301, USA.
  *
  */
 #include <sys/types.h>
