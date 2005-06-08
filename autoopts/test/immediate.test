@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2005-03-06 09:13:04 bkorb"
+# Time-stamp:        "2005-06-07 18:14:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: immediate.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
+# $Id: immediate.test,v 4.4 2005/06/08 22:59:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -49,7 +49,7 @@ main = {
 _EOF_
 
 INC=`echo ${INC} | sed 's/-lguile//;s/-lqthreads//'`
-CFLAGS="-static -g `echo ${CFLAGS} | \
+CFLAGS="-g `echo ${CFLAGS} | \
   sed 's,-O2,,;s/-g//'`"
 
 echo ${AG_L} ${testname}.def
