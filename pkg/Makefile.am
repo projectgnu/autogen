@@ -1,13 +1,13 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-01-23 15:32:01 bkorb"
+## Time-stamp:      "2005-06-09 16:01:50 bkorb"
 ## Copyright (c):   2003-2005 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2005/01/23 23:33:06 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2005/06/18 17:33:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -35,7 +35,7 @@ package :
 	CLexe=$(CLexe) \
 	prefix=$(prefix) \
 	MAKE="$(MAKE)" \
-	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/=stage \
+	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/stage-pkg \
 	$(SHELL) mkpkg.sh
 
 pkg     : package

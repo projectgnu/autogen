@@ -126,3 +126,10 @@ pkgmk -d. -r ${pkgdst}/reloc,${pkgdst} -f ${pkgdst}/prototype
 pkgtrans -s . GNUagen.pkg GNUagen
 gzip --best GNUagen.pkg
 rm -rf ${pkgdst}
+
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## tab-width: 4
+## End:
+## end of mkpkg.sun
