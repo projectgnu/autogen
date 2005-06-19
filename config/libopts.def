@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/02/15 01:34:13 $
+ *  Last Modified:     $Date: 2005/06/19 23:04:28 $
  *  Time-stamp:        "2005-02-14 17:25:25 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.5 2005/02/15 01:34:13 bkorb Exp $
+ *  $Id: libopts.def,v 4.6 2005/06/19 23:04:28 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.5 $";
+version     = "$Revision: 4.6 $";
 output-file = libopts.m4;
 
 test   = {
@@ -245,11 +245,6 @@ do-always = <<-_EOF_
 	if test `eval echo '${'$as_ac_Header'}'` != yes; then
 	  AC_MSG_ERROR([You must have stdint.h or inttypes.h on your system])
 	fi
-
-	# =================
-	# ...and directory read headers
-	# =================
-	AC_CHECK_HEADERS(dirent.h ndir.h sys/ndir.h, break)
 
 	# ----------------------------------------------------------------------
 	# AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
