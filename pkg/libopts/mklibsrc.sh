@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-06-26 08:58:50 bkorb"
+## Time-stamp:      "2005-06-26 15:11:16 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.11 2005/06/26 16:24:45 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.12 2005/06/26 22:11:53 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -138,7 +138,7 @@ cat > configure.ac <<- EOConfig
 	AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 	AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 	AC_PROG_LIBTOOL
-	ifdef([AC_REVISION],AC_REVISION($Revision: 4.11 $),)dnl
+	ifdef([AC_REVISION],AC_REVISION($Revision: 4.12 $),)dnl
 	AC_SUBST(AO_CURRENT)
 	AC_SUBST(AO_REVISION)
 	AC_SUBST(AO_AGE)
@@ -202,9 +202,8 @@ cat >&3 <<- EObootstrap
 	  ls -C *.[ch] | sed 's/libopts\\.c//;s/\$/ \\\\/;\$s/ .\$//'
 	) > libopts/Makefile.am
 	( echo SUBDIRS = libopts
+	  echo nobase_include_HEADERS = autoopts/options.h autoopts/usage-txt.h
 	  echo EXTRA_DIST = COPYING COPYING.mbsd AUTHORS README ChangeLog NEWS '\\'
-	  # '
-	  echo '           ' autoopts/*.* '\\'
 	  # '
 	  echo '           ' compat/*.*
 	) > Makefile.am
