@@ -4044,10 +4044,10 @@ autoopts-config static-libs
 @node binary pre-installed
 @subsection binary distro, AutoOpts pre-installed
 
-If you will be distributing (or copying) your project to a system that
-does have AutoOpts installed, you will still need to ensure that the library
-is findable at program load time, or you will still have to statically
-link.  The former can be accomplished by linking your project with
+If you will be distributing (or copying) your project to a system that does
+have AutoOpts (or only ``libopts'') installed, you will still need to ensure
+that the library is findable at program load time, or you will still have to
+statically link.  The former can be accomplished by linking your project with
 @code{--rpath} or by setting the @code{LD_LIBRARY_PATH} appropriately.
 Otherwise, @xref{binary not installed}.
 
@@ -4090,6 +4090,19 @@ also a web page that describes what you need to do:
 @example
 @url{http://autogen.sourceforge.net/blocksort.html}
 @end example
+
+Alternatively, you can pull the @code{libopts} library sources into
+a build directory and build it for installation along with your package.
+This can be done approximately as follows:
+@example
+tar -xzvf `autoopts-config libsrc`
+cd libopts-*
+./bootstrap
+configure
+make
+make install
+@end example
+That will install the library, but not the headers or anything else.
 
 @c === SECTION MARKER
 
