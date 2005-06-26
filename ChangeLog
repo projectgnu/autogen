@@ -1,5 +1,7 @@
 2005-06-26  Bruce Korb  <bkorb@gnu.org>
 
+	= 5.7.1 Released
+
 	* autoopts/test/Makefile.am(TESTS_ENVIRONMENT): pass through "$(DEFS)"
 	* compat/compat.h(HAVE_CONFIG_H): error out if we don't have this
 	(limits.h): this is STDC.  Error out if we don't have it.
@@ -138,101 +140,3 @@
 2005-02-05  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.6 Released
-
-	* autoopts/agman1.tpl(main): doc the new forms of "main" procedures
-	* autoopts/test/Makefile.am(verbose): testing special target
-	* autoopts/test/enums.test(do_proc[]): use printf, echo is unreliable
-
-2005-02-03  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/agman1.tpl(configuration): replace "rc" in more places
-	* autoopts/autoopts.c: ditto
-	* autoopts/configfile.c: ditto
-	* autoopts/optcode.tpl: ditto
-	* autoopts/save.c: ditto
-	* autoopts/test/*.test: ditto
-	* autoopts/optmain.tpl(for-each): add a new attribute, "handler-type"
-	It specifies: plain operands, file names only, file pointers to the
-	files named, and content of the files.
-	(each-or-stdin-main): deleted.  Not a useful concept.
-	* doc/autogen.texi: doc this stuff.
-
-2005-01-23  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/test/enums.test: fix ksh-isms
-	(echo): guard against builtin echo interpreting '\\'
-	* autoopts/test/handler.test: fix ksh-isms
-	* agen5/autogen.c(signalSetup): do not override "RT" signals
-	* agen5/defDirect.c(doDir_define): use "memmove" for memory shift
-	* agen5/tpLoad.c(loadMacros): ditto
-	* autoopts/save.c(optionSaveFile): only free mem that was allocated
-
-2005-01-21  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expState.c(ag_scm_tpl_file_line): fix warning for 64 bits
-	(ag_scm_def_file_line): ditto
-	* agen5/schemedef.scm(c-file-line-fmt): new Scheme value
-	* agen5/test/heredef.test: tweak test
-	* agen5/test/opts.test: ditto
-	* autoopts/opt*.tpl: add tpl-file-line functions here and there.
-	* autoopts/Makefile.am(include_HEADERS): make them "nobase" as both
-	options.h and usage-txt.h are to be installed in an an "autoopts" subdir.
-	* */*: change #include directives
-	* doc/*: change references from "rc files" and "ini files" to
-	"configuration files".
-	* pkg/libopts/mklibsrc.sh: cope with the new header subdirectory
-	2005-01-17  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/opt*.tpl: Remove all the #line stuff.  Bad idea for AutoOpts.
-	* autoopts/save.c(findDirName): fix allocation size & mem leak.
-
-2005-01-16  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/autogen.h(tDefCtx): change name of file name to be unique
-	(tDefEntry): reorder to put int values at end and add definition
-	file name and line number.
-	* agen5/*: s/tDefCtx.pzFileName/tDefCtx.pzCtxFname/
-	* agen5/autogen.c(signalSetup): parameterize the functions to call
-	upon signal receipt so that core dumps can happen.
-	* agen5/defLoad.c(findPlace): insert def file name and line number
-	* agen5/defParse-fsm.c(dp_do_tpl_name): modify definitions root init.
-	* agen5/expState.c(ag_scm_def_file_line): new function to take advantage
-	of the new fields in the tDefEntry structure.
-	* agen5/test/heredef.test: test the definition file/line stuff
-	* agen5/defLex.c(assembleHereString): count the newline at the end
-	of the here string token, too.
-
-2005-01-15  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/Makefile.am(configfile.c): new file
-	* autoopts/configfile.c: move config file code here
-	* autoopts/autoopts.c(doRcFiles): move and rename to configFileLoad()
-	(ISNAMECHAR): remove
-	* autoopts/autoopts.h(ISNAMECHAR): add
-	* autoopts/load.c(loadOptionLine): add ':' to list of separation chars
-	* autoopts/usage-txt.def(AO_Bad): new message
-	* autoopts/test/rc.test(cat): fix inconsistent output
-	* pkg/libopts/mklibsrc.sh(lo_cv_test_autoopts): handle test correctly
-
-2005-01-08  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/options_h.tpl(streqv*): export these functions for programs
-	that include the "options.h" header.
-	autoopts/streqv.h: obsolete
-	* autoopts/streqvcmp.c(streqv*): doc the functions so they are exported
-	* autoopts/tokenize.h: obsolete
-	* autoopts/tokenize.c(tokenize.h): don't include obsolete header
-	(string_tokenize): doc the function so it is exported
-	*/*.c: regularize the methods for declaring functions
-	* compat/pathfind.c(pathfind): add to libopts if no native version
-	* compat/compat.h(pathfind): remove declaration.
-	* compat/libgen.h: obsolete
-	* compat/strcspn.c(strcspn): part of POSIX.  We require POSIX.
-	* config/confmacs.tpl(conditional): new test result type.  It must
-	live in unconditional code.
-	* config/misc.def(DO_SHELL_CMDS): new conditional
-	(HAVE_XML_LIB): ditto
-
-2004-12-31  Bruce Korb  <bkorb@gnu.org>
-
-	= 5.6.5 Released
