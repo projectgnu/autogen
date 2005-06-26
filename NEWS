@@ -3,6 +3,8 @@ New in __CURRENT_VERSION__ - June, 2005
 * Update to libtool 1.5.18
 * add "arg-range" text to the generated man pages
 * Update the FSF address
+* added a script to convert the "libopts" tarball into a full,
+  independently buildable, project.
 
 New in 5.7 - April, 2005
 

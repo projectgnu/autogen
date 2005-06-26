@@ -1,3 +1,13 @@
+2005-06-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/Makefile.am(TESTS_ENVIRONMENT): pass through "$(DEFS)"
+	* compat/compat.h(HAVE_CONFIG_H): error out if we don't have this
+	(limits.h): this is STDC.  Error out if we don't have it.
+	(dirent.h): ditto
+	* pkg/libopts/mklibsrc.sh(bootstrap): newly generated script for the
+	libopts tarball.  Running this script converts the tear-off library
+	into a stand alone project.
+
 2005-05-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/agman1.tpl(arg-range): add this to the option description.
@@ -6,6 +16,7 @@
 	* doc/auto_gen.tpl(quick start): generate the example and use the
 	"new" main procedure stuff.
 	* Upgrade libtool once again.
+	* Update the FSF address throughout
 
 2005-04-24  Bruce Korb  <bkorb@gnu.org>
 

@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2005-03-06 10:04:19 bkorb"
+## Time-stamp:      "2005-06-26 08:13:00 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/03/06 20:16:08 $
+## Last Modified:   $Date: 2005/06/26 16:24:45 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/03/06 20:16:08 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/06/26 16:24:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -22,7 +22,7 @@ TESTS      = nested.test \
 testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = AGexe=$(AGexe) CLexe=$(CLexe) GDexe=$(GDexe) \
-	CC="$(CC)" CFLAGS='$(CFLAGS)' \
+	CC="$(CC)" CFLAGS='$(DEFS) $(CFLAGS)' \
 	LD_LIBRARY_PATH=$(LIBGUILE_PATH):$${LD_LIBRARY_PATH-..} \
 	PATH="`cd $(top_builddir)/columns > /dev/null ; pwd`:$$PATH" \
 	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/ > /dev/null ; \

@@ -2,15 +2,19 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2005-02-20 17:17:51 bkorb"
+ *  Time-stamp:      "2005-06-26 08:18:00 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.3 2005/02/21 23:01:08 bkorb Exp $
+ * $Id: compat.h,v 4.4 2005/06/26 16:24:45 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
+
+#ifndef HAVE_CONFIG_H
+#  error "compat.h" requires "config.h"
+#endif
 
 #include <config.h>
 
@@ -104,11 +108,6 @@
 #   if defined (HAVE_NDIR_H)
 #     include <ndir.h>
 #   endif /* HAVE_NDIR_H */
-#   if !defined (HAVE_SYS_NDIR_H) && \
-       !defined (HAVE_SYS_DIR_H)  && \
-       !defined (HAVE_NDIR_H)
-#     include "ndir.h"
-#   endif /* !HAVE_SYS_NDIR_H && !HAVE_SYS_DIR_H && !HAVE_NDIR_H */
 # endif /* !HAVE_DIRENT_H */
 
 #include <errno.h>
@@ -122,11 +121,8 @@
 #if defined(HAVE_LIBGEN) && defined(HAVE_LIBGEN_H)
 #  include <libgen.h>
 #endif
-#ifdef HAVE_LIMITS_H
-#  include <limits.h>
-#else
-#  include <sys/limits.h>
-#endif
+
+#include <limits.h>
 #include <memory.h>
 #include <setjmp.h>
 #include <signal.h>

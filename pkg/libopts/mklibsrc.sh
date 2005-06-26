@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-06-18 10:32:36 bkorb"
+## Time-stamp:      "2005-06-26 08:58:50 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.10 2005/06/18 17:33:08 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.11 2005/06/26 16:24:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -128,6 +128,8 @@ cat >> libopts.m4 <<-	\EOMacro
 	EOMacro
 
 cat > configure.ac <<- EOConfig
+	# This configure.ac file is for use when "libopts" is an independent project.
+	#
 	AC_INIT([libopts],[${ao_rev}],[autogen-users@lists.sf.net])
 	AC_CONFIG_SRCDIR(libopts/autoopts.c)
 	AC_CONFIG_AUX_DIR(m4)
@@ -136,7 +138,7 @@ cat > configure.ac <<- EOConfig
 	AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 	AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 	AC_PROG_LIBTOOL
-	ifdef([AC_REVISION],AC_REVISION($Revision: 4.10 $),)dnl
+	ifdef([AC_REVISION],AC_REVISION($Revision: 4.11 $),)dnl
 	AC_SUBST(AO_CURRENT)
 	AC_SUBST(AO_REVISION)
 	AC_SUBST(AO_AGE)
@@ -177,23 +179,38 @@ cat > configure.ac <<- EOConfig
 	AC_CHECK_SIZEOF(long,  4)
 	AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf realpath \
 	               dlopen)
-	LIBOPTS_CHECK
-	AC_CONFIG_FILES([Makefile])
+	INVOKE_LIBOPTS_MACROS
+	AC_CONFIG_FILES([Makefile libopts/Makefile])
 	AM_CONFIG_HEADER(config.h:config-h.in)
 	AC_OUTPUT
 	EOConfig
 
-cat > bootstrap <<- EObootstrap
+exec 3> bootstrap
+cat >&3 <<- EObootstrap
 	#! /bin/sh
 	#  Run this script to convert this tear-off/add-in library into a separately
 	#  configurable package.  Once you do this, you cannot undo it.  Unroll the
 	#  original tarball again.
 	set -x -e
 	mkdir libopts
-	mv -f *.c *.h Make*.* libopts/.
-	echo SUBDIRS = libopts > Makefile.am
+	mv -f *.c *.h libopts/.
+	( sed '/EXTRA_DIST/,\$d' Makefile.am
+	  rm -f Make*
+	  echo 'EXTRA_DIST = \\'
+	  # '
+	  cd libopts
+	  ls -C *.[ch] | sed 's/libopts\\.c//;s/\$/ \\\\/;\$s/ .\$//'
+	) > libopts/Makefile.am
+	( echo SUBDIRS = libopts
+	  echo EXTRA_DIST = COPYING COPYING.mbsd AUTHORS README ChangeLog NEWS '\\'
+	  # '
+	  echo '           ' autoopts/*.* '\\'
+	  # '
+	  echo '           ' compat/*.*
+	) > Makefile.am
 	mkdir m4
-	mv *.m4 m4/.
+	sed '/LIBOPTS_CHECK/,\$d' libopts.m4 > m4/libopts.m4
+	rm -f libopts.m4
 	mv COPYING.lgpl COPYING
 	libtoolize --force
 	aclocal -I m4
@@ -202,6 +219,15 @@ cat > bootstrap <<- EObootstrap
 	autoconf
 	EObootstrap
 
+echo 'cat > README <''<- _EOreadme_' >&3
+
+cat >&3 <<- _EObootstrap
+	This is an unmodifiable source package for libopts.
+	It is not modifiable because it gets regenerated.  Edit the source.
+	_EOreadme_
+	_EObootstrap
+
+exec 3>&-
 chmod +x bootstrap
 
 cat > ChangeLog <<- EOChangeLog
