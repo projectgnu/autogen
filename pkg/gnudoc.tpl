@@ -1,11 +1,9 @@
 [= AutoGen5 Template -*- Mode: html -*-
 
-html=autogen.html
+html
 
-# Time-stamp: "2005-01-23 15:31:58 bkorb"
-# Version:    "$Revision: 4.3 $
-
-# AutoGen Options copyright 1992-2005 Bruce Korb
+# Time-stamp: "2005-07-01 09:23:36 bkorb"
+# Version:    "$Revision: 4.4 $
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -13,14 +11,14 @@ html=autogen.html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.3 2005/06/07 22:25:13 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.4 2005/07/01 16:34:02 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
 
   --><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-  <title>AutoGen - The Automated Program Generator</title>
+  <title>[= title =]</title>
   <meta http-equiv="content-type" content='text/html; charset=utf-8' />
   <link rel="stylesheet" type="text/css" href="/gnu.css" />
   <link rev="made" href="webmasters@gnu.org" />
@@ -35,7 +33,7 @@ html=autogen.html
 
 <body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000"
       vlink="#9900DD">
-<h3>AutoGen - Table of Contents</H3>
+<h3>[= project =] version [= version =] - Table of Contents</H3>
 
 <address>Free Software Foundation</address>
 <address>last updated [=`date '+%B %e, %Y'`=]</address>
@@ -49,11 +47,17 @@ html=autogen.html
 </p>
 <hr />
 
-<p>This manual (autogen) is available in the following formats:</p>[=
+<p>This manual for the <a href="/software/[=
+   (define proj-name (string-downcase! (get "project"))) proj-name
+   =]>[= project =] project</a> is available in the following formats:</p>[=
 
-(define (compute-size f)
+(define fnam "")
+(define fsiz 0)
+
+(define (compute-size dir sfx)
   (begin
-     (define fsiz (if (access? f R_OK)  (stat:size (stat f)) 0 ))
+     (set! fnam (string-append dir "/" proj-name sfx))
+     (set! fsiz (if (access? fnam R_OK)  (stat:size (stat fnam)) 0 ))
      (if (< fsiz 4096)
          (set! fsiz (number->string fsiz))
          (if (< fsiz (* 2 1024 1024))
@@ -65,48 +69,48 @@ html=autogen.html
 
 =]
 <ul>
-  <li>formatted in <a href="html_mono/autogen.html">HTML ([=
-      (compute-size "html_mono/autogen.html")
+  <li>formatted in <a href="html_mono/[= project =].html">HTML ([=
+      (compute-size "html_mono" ".html")
       =] characters)</a> entirely on one web page.
-  <li>formatted in <a href="html_mono/autogen.html.gz">HTML ([=
-      (compute-size "html_mono/autogen.html.gz")
+  <li>formatted in <a href="html_mono/[= project =].html.gz">HTML ([=
+      (compute-size "html_mono" ".html.gz")
       =] gzipped bytes)</a> entirely on one web page.
-  <li> formatted in <a href="html_chapter/autogen_toc.html">HTML</a>
+  <li> formatted in <a href="html_chapter/[= project =]_toc.html">HTML</a>
        with one web page per chapter.
-  <li> formatted in <a href="html_chapter/autogen_chapter_html.tar.gz">HTML ([=
-      (compute-size "html_chapter/autogen_chapter_html.tar.gz")
+  <li> formatted in <a href="html_chapter/[= project =]_chapter_html.tar.gz">HTML ([=
+      (compute-size "html_chapter" "_chapter_html.tar.gz")
       =] gzipped tar file)</a> with one web page per chapter.
-  <li> formatted in <a href="html_node/autogen_toc.html">HTML</a>
+  <li> formatted in <a href="html_node/[= project =]_toc.html">HTML</a>
        with one web page per node.
-  <li> formatted in <a href="html_node/autogen_node_html.tar.gz">HTML ([=
-      (compute-size "html_node/autogen_node_html.tar.gz")
+  <li> formatted in <a href="html_node/[= project =]_node_html.tar.gz">HTML ([=
+      (compute-size "html_node" "_node_html.tar.gz")
       =] gzipped tar file)</a> with one web page per node.
-  <li>formatted as an <a href="info/autogen.info.gz">Info document ([=
-      (compute-size "info/autogen.info.gz")
+  <li>formatted as an <a href="info/[= project =].info.gz">Info document ([=
+      (compute-size "info" ".info.gz")
       =] bytes gzipped tar file)</a>.
-  <li>formatted as <a href="text/autogen.txt">ASCII text ([=
-      (compute-size "text/autogen.txt")
+  <li>formatted as <a href="text/[= project =].txt">ASCII text ([=
+      (compute-size "text" ".txt")
       =] characters)</a>.
-  <li>formatted as <a href="text/autogen.txt.gz">ASCII text ([=
-      (compute-size "text/autogen.txt.gz")
+  <li>formatted as <a href="text/[= project =].txt.gz">ASCII text ([=
+      (compute-size "text" ".txt.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="dvi/autogen.dvi.gz">a TeX dvi file ([=
-      (compute-size "dvi/autogen.dvi.gz")
+  <li>formatted as <a href="dvi/[= project =].dvi.gz">a TeX dvi file ([=
+      (compute-size "dvi" ".dvi.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="pdf/autogen.pdf.gz">a PDF file ([=
-      (compute-size "pdf/autogen.pdf.gz")
+  <li>formatted as <a href="pdf/[= project =].pdf.gz">a PDF file ([=
+      (compute-size "pdf" ".pdf.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="ps/autogen.ps.gz">a PostScript file ([=
-      (compute-size "ps/autogen.ps.gz")
+  <li>formatted as <a href="ps/[= project =].ps.gz">a PostScript file ([=
+      (compute-size "ps" ".ps.gz")
       =] gzipped bytes)</a>.
-  <li>the original <a href="texi/autogen.texi.gz">Texinfo source ([=
-      (compute-size "texi/autogen.texi.gz")
+  <li>the original <a href="texi/[= project =].texi.gz">Texinfo source ([=
+      (compute-size "texi" ".texi.gz")
       =] gzipped bytes)</a>
 </ul>
 
 <p>(This page generated by the <a href="http://www.gnu.org/software/autogen"
 >autogen program</a> in conjunction with <a
-href="http://savannah.gnu.org/cgi-bin/viewcvs/autogen/autogen/pkg/gnudoc.tpl"
+href="http://savannah.gnu.org/cgi-bin/viewcvs/sharutils/sharutils/doc/gnudoc.tpl"
 >a very simple template</a>.)</p>
 
 <div class="copyright">
@@ -135,7 +139,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2005/06/07 22:25:13 $ $Author: bkorb $
+$Date: 2005/07/01 16:34:02 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>
