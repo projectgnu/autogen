@@ -2,8 +2,8 @@
 
 html
 
-# Time-stamp: "2005-07-01 09:23:36 bkorb"
-# Version:    "$Revision: 4.4 $
+# Time-stamp: "2005-07-01 09:37:28 bkorb"
+# Version:    "$Revision: 4.5 $
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -11,7 +11,7 @@ html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.4 2005/07/01 16:34:02 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.5 2005/07/01 16:37:52 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -49,7 +49,7 @@ html
 
 <p>This manual for the <a href="/software/[=
    (define proj-name (string-downcase! (get "project"))) proj-name
-   =]>[= project =] project</a> is available in the following formats:</p>[=
+   =]">[= project =] project</a> is available in the following formats:</p>[=
 
 (define fnam "")
 (define fsiz 0)
@@ -139,7 +139,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2005/07/01 16:34:02 $ $Author: bkorb $
+$Date: 2005/07/01 16:37:52 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>
