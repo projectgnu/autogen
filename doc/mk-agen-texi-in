@@ -1,0 +1,162 @@
+#! /bin/sh
+
+d=`dirname $0`
+d=`cd $d ; pwd`
+prog=${d}/`basename $0`
+
+test -z "${CC}"     && CC="@CC@"
+test -z "${CC}"     && `which cc`
+test -z "${CFLAGS}" && CFLAGS="@CFLAGS@"
+test -z "${LIBS}"   && LIBS="@LIBS@"
+test -z "${MAKE}"   && MAKE=`which make`
+
+# Give preference to configured SHELL
+#
+d=${SHELL}
+SHELL=@SHELL@
+test -z "${SHELL}"  && SHELL=$d
+
+export CC CFLAGS LIBS MAKE SHELL
+
+# Now auto-export variables:
+#
+set -a
+
+top_builddir=`cd @top_builddir@ ; pwd`
+top_srcdir=`cd @top_srcdir@ ; pwd`
+srcdir=`cd @srcdir@ ; pwd`
+PATH=${top_builddir}/columns:${PATH}
+
+
+#  Only generate the doc once.  Once done, never again.  Too hard
+#  to keep dependencies straight.  (It is an idempotent process, but
+#  easily leads to infinite loops or rebuilding during "distcheck"
+#  phase.  Both are a bit of a problem.....)
+#
+case `sed 1q autogen.texi` in
+*'input texinfo' )
+  chmod u+w ${top_builddir} ${top_builddir}/* 2>/dev/null
+  exit 0 ;;
+esac
+
+
+eval `egrep '^AG_[A-Z_]*' ${top_srcdir}/VERSION`
+
+AGsrc=${top_srcdir}/agen5
+AGbld=${top_builddir}/agen5
+AGexe=@AGexe@
+GDexe=@GDexe@
+CLexe=@CLexe@
+
+LIBS=${LIBS}\ `find ${top_builddir}/autoopts -name libopts.a -print`
+OPTIONS_DEF=${AGsrc}/opts.def
+DIRECTIVESRC=${AGsrc}/defDirect.c
+GETDEF_SRC=$(
+  echo ${AGsrc}/func*.c ${AGsrc}/exp*.c ${DIRECTIVESRC}  )
+
+ADDON_MENU=$(
+  for f in columns getdefs xml2ag
+  do
+    echo ${top_builddir}/${f}/${f}.menu
+  done)\ ${top_srcdir}/doc/snprintfv.menu
+
+ADDON_TEXI=$(
+  for f in columns getdefs xml2ag
+  do
+    echo ${top_builddir}/${f}/${f}.texi
+  done)\ ${top_srcdir}/doc/snprintfv.texi
+
+DOC_INCLUDES=$(
+  echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h
+  echo ${AGbld}/autogen.menu ${AGbld}/autogen.texi
+  echo ${top_builddir}/autoopts/libopts.texi )
+
+DOC_TEMPLATE=${srcdir}/auto_gen.tpl
+
+DOC_DEPENDS=$(
+  echo ${DOC_TEMPLATE} ${OPTIONS_DEF} ${ADDON_MENU} ${ADDON_TEXI}
+  echo ${DOC_INCLUDES} ${GETDEF_SRC} )
+
+set +a
+
+#  Validate everything:
+#
+bail_out() {
+   set -x
+   rm -f texi-stamp
+
+   exec 2>&8
+   cat texi$$.log
+   echo >&2
+   echo "$*" >&2
+   exit 1
+}
+
+# The executables must already be there
+#
+test -x ${AGexe} -a -x ${GDexe} -a ${CLexe} || exit 0
+
+exec 8>&2 2> texi$$.log
+echo $'\n\n\n\n' >&2
+
+set -x
+
+# the "texi" rule depends upon texi-stamp, so create this file first.
+#
+date > texi-stamp
+
+# See to it that the .texi files have been generated, too.
+#
+for f in ${ADDON_TEXI} ${AGbld}/autogen.texi \
+         ${top_builddir}/autoopts/libopts.texi
+do
+  test -f ${f} || (
+    cd `dirname ${f}`
+    ${MAKE} `basename ${f}` >&2
+  ) || bail_out MAKE of ${f} failed.
+done
+
+# We have our executables and texi's.  Collect the definitions:
+#
+exec 3> getdefs$$.cfg
+cat >&3 <<-  EOCat
+	output      autogen.def
+	copy        ${OPTIONS_DEF}
+	srcfile
+	linenum
+	template    auto_gen.tpl
+	EOCat
+
+for f in ${GETDEF_SRC}
+do
+  echo "input      " ${f}
+done >&3
+exec 3>&-
+echo + ${GDexe} load-opt=getdefs$$.cfg >&8
+${GDexe} load-opt=getdefs$$.cfg || bail_out cannot run ${GDexe}
+
+# Make sure we have all our sources and generate the doc
+#
+for f in ${DOC_DEPENDS}
+do test -f ${f} || bail_out cannot find doc file: ${f}
+done
+echo + ${AGexe} -t180 -L${srcdir} -L${top_srcdir} autogen.def >&8
+${AGexe} -t180 -L${srcdir} -L${top_srcdir} autogen.def || \
+  bail_out could not regenerate doc
+
+set +x
+exec 2>&8
+
+# dump the temporary files
+#
+rm -f texi$$.log autogen.def getdefs$$.cfg
+
+exit 0
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
+## End:
