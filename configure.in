@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2005 Bruce Korb
 dnl
-dnl Time-stamp:      "2005-02-12 11:28:10 bkorb"
+dnl Time-stamp:      "2005-07-09 16:05:40 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.6 2005/02/13 01:47:59 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.7 2005/07/09 23:12:14 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([AutoGen],[5.6.6],[autogen-users@lists.sf.net])
@@ -20,7 +20,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.6 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.7 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -214,6 +214,10 @@ AC_SUBST(INCLIST)
 AC_DEFINE( [AUTOGEN_BUILD], 1, [Define this if we are building AutoGen] )
 
 AM_CONFIG_HEADER(config.h:config-h.in)
+AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
+                [chmod +x doc/mk-agen-texi.sh])
+AC_CONFIG_FILES([doc/mk-libopts-texi.sh:doc/mk-libopts-texi-in],
+                [chmod +x doc/mk-libopts-texi.sh])
 ==ADD_CONFIG_FILES==
 
 AC_CONFIG_COMMANDS([stamp-h],
