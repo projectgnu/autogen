@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.10 2005/05/27 17:39:01 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.11 2005/07/09 22:54:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -19,8 +19,9 @@ texi=autogen.texi
 
 (define temp-dir (shell "
     tempdir=`(mktemp -d ./.ag-XXXXXX) 2>/dev/null`
-    [ -z \"${tempdir}\" ] && tempdir=.ag-$$.dir
-    [ -d ${tempdir} ] || mkdir ${tempdir} || kill -TERM ${AG_pid}
+    test -z \"${tempdir}\" && tempdir=.ag-$$.dir
+    test -d ${tempdir}  || mkdir ${tempdir} || die cannot mkdir ${tempdir}
+    tmpdir=`cd ${tmpdir} ; pwd` || die cannot cd ${tempdir}
     echo ${tempdir}" ))
 
 (define texi-file-source (shell "
@@ -32,9 +33,7 @@ texi=autogen.texi
     then
       echo autogen.texi
     else
-      echo \"Cannot locate original autogen.texi file\" >&2
-      kill -TERM ${AG_pid}
-      exit 1
+      die Cannot locate original autogen.texi file
     fi" ))
 
 (define texi-escape-encode (lambda (in-str)
@@ -42,6 +41,10 @@ texi=autogen.texi
       '("@"   "{"   "}")
       '("@@"  "@{"  "@}")
 )  ))
+
+(define temp-txt "")
+(define text-tag "")
+
 =]
 \input texinfo
 @ignore
@@ -125,9 +128,6 @@ Extracted from [=srcfile=] line [=linenum=].
 
 ENDDEF  =][=
 
-(define temp-txt "")
-(define text-tag "")=][=
-
 DEFINE get-text     =][=
 
 (set! text-tag
@@ -186,7 +186,7 @@ Extracted from $top_srcdir/agen5/defParse.y
 if test -z "$top_srcdir" || test ! -d "$top_srcdir"
 then top_srcdir=.. ; fi
 f=${top_srcdir}/agen5/defParse-fsm.c
-[ ! -f ${f} ] && kill -2 ${AG_pid}
+test -f ${f} || die missing generated file: $f
 sed -n -e '/^dp_trans_table/,/^};$/p' ${f} | \
   sed '/ \&dp_do_invalid /d;/^ *}/d;s/@/@@/g;s/{/@{/g;s/}/@}/g'
 
@@ -604,21 +604,14 @@ flag = {
 Then perform the following steps:
 
 @enumerate
-[= (out-push-new)
-=]cfl="`autoopts-config cflags` -DTEST_CHECK_OPTS"
-lfl="`autoopts-config ldflags`"
-autogen checkopt.def
-cc -o check -g ${cfl} checkopt.c ${lfl}[=
-
-(define mkcheck-script (out-pop #t))
-(shell (string-append
-"while read f
-do echo '@item'
-   echo \"$f\" | \
-      sed 's,\\([@{}]\\),@\\1,g;s/^/@code{/;s/$/}/'
-done <<'_EOF_'\n"
-
-mkcheck-script "\n_EOF_" )) =]
+@item
+@code{cflags="-DTEST_CHECK_OPTS `autoopts-config cflags`"}
+@item
+@code{ldflags="`autoopts-config ldflags`"}
+@item
+@code{autogen checkopt.def}
+@item
+@code{cc -o check -g $@{cflags@} checkopt.c $@{ldflags@}}
 @item
 @code{./check --help}
 @end enumerate
@@ -627,20 +620,22 @@ mkcheck-script "\n_EOF_" )) =]
 Running those commands yields:
 
 @example
-[= (texi-escape-encode (shell (string-append
+[= (texi-escape-encode (shell
 "cd ${tempdir}
+test -f checkopt.def || die cannot locate checkopt.def
 test -f check && rm -f check
 
-(" mkcheck-script ") > checkopt.err 2>&1
+(
+  autogen checkopt.def
+  ${CC-cc} -o check -DTEST_CHECK_OPTS ${CFLAGS} checkopt.c ${LIBS} ${LDFLAGS}
+) > checkopt.err 2>&1
 
 test -x ./check || {
-  exec >&2
-  cat checkopt.err
-  kill -TERM ${AG_pid}
-  exit 1
+  cat checkopt.err >&2
+  die cannot create checkopt program
 }
 ./check --help | sed 's/\t/        /g'"
-) ) ) =]
+) ) =]
 @end example
 
 [= get-text tag = autoopts-main =]
@@ -712,23 +707,12 @@ exec 3>&1
   cd ${tempdir}
   echo 'config-header = \"config.h\";' >> default-test.def
   HOME='' ${AGexe} -L${OPTDIR} default-test.def
-  if [ ! -f default-test.c ]
-  then
-    echo 'NO default-test.c PROGRAM' >&3
-    kill -TERM $AG_pid
-    exit 1
-  fi
+  test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${incs}\"
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 
-  if [ ! -x ./default-test ]
-  then
-    echo 'NO default-test EXECUTABLE' >&3
-    kill -TERM $AG_pid
-    exit 1
-  fi
-  true
+  test -x ./default-test || die 'NO default-test EXECUTABLE'
 ) > ${tempdir}/default-test.log 2>&1
 
 test $? -eq 0 || {
@@ -748,14 +732,10 @@ get-text tag = autoopts-api =]
 
 f=../autoopts/libopts.texi
 [ ! -f $f ] && f=${top_srcdir}/autoopts/libopts.texi
-[ -f $f ] || {
-  echo "Cannot locate libopts.texi" >&2
-  kill -n $AG_pid
-  exit 1
-}
-cat $f`
+test -f $f die "Cannot locate libopts.texi"
+cat $f
 
-=]
+`=]
 [=
 
 get-text tag = "autoopts-data"
@@ -763,7 +743,9 @@ get-text tag = "autoopts-data"
 =]
 
 @example[=
-(out-push-new) =]
+(out-push-new (string-append temp-dir "/hello.c"))
+
+=]
 #include <sys/types.h>
 #include <pwd.h>
 #include <string.h>
@@ -793,36 +775,35 @@ int main( int argc, char** argv ) {
   printf( "%s, %s!\n", greeting, greeted );
   return 0;
 }
-[= (define config-prog (out-pop #t))
-   (texi-escape-encode config-prog) =]
+[= (texi-escape-encode (out-pop #t)) =]
 @end example
 
 @noindent
 With that text in a file named ``hello.c'', this short script:
 
 @example
-[=
-(define run-cmd
-"opts=`autoopts-config cflags ldflags`
-cc -o hello hello.c ${opts}
+cc -o hello hello.c `autoopts-config cflags ldflags`
 ./hello
 echo 'greeting Buzz off' > hello.conf
 ./hello
 echo personalize > hello.conf
-./hello")
-
-(texi-escape-encode run-cmd) =]
+./hello
 @end example
 
 @noindent
 will produce the following output (for me):
 
 @example
-[= (shellf "cd ${tempdir}
-cat > hello.c <<'_EOF_'%s
-_EOF_
-%s
-rm -f hello*" config-prog run-cmd) =]
+[= (texi-escape-encode (shell "
+cd ${tempdir}
+cc -o hello hello.c ${CFLAGS} ${LIBS} ${LDFLAGS} || \
+  die cannot compile hello
+./hello
+echo 'greeting Buzz off' > hello.conf
+./hello
+echo personalize > hello.conf
+./hello"
+)) =]
 @end example
 [=
 
@@ -899,19 +880,16 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS ${incs}"
   ${CC} ${CFLAGS} ${opts} ${incs} genshellopt.c ${libs}
 ) > ${tempdir}/genshellopt.log 2>&1
 
-if [ ! -x ${tempdir}/genshellopt ]
-then
-  echo "NO GENSHELLOPT PROGRAM - See ${tempdir}/genshellopt.log" >&2
-  kill -TERM $AG_pid
-  exit 1
-fi
+test -x ${tempdir}/genshellopt || \
+  die "NO GENSHELLOPT PROGRAM - See ${tempdir}/genshellopt.log"
 
 ${tempdir}/genshellopt --help | \
   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
 
 echo
 echo
-${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || kill -HUP $AG_pid
+${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || \
+  die cannot create ${tempdir}/genshellopt.sh
 sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g' ${tempdir}/genshellopt.sh
 
 ` =]
@@ -942,7 +920,7 @@ done
 ` =]
 [= get-text tag = Future =][=
 
-(shell "[ -f autogen.texi.ori ] && rm -f autogen.texi.ori
+(shell "test -f autogen.texi.ori && rm -f autogen.texi.ori
        rm -rf ${tempdir}")
 (set-writable #t)
 

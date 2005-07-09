@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 4.4 2005/03/13 19:34:26 bkorb Exp $
+# $Id: errors.test,v 4.5 2005/07/09 22:54:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

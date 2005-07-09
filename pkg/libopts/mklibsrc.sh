@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-06-28 19:01:10 bkorb"
+## Time-stamp:      "2005-06-26 08:58:50 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.13 2005/07/01 16:34:02 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.14 2005/07/09 22:54:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -15,7 +15,6 @@ set -e -x
 
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
-export top_srcdir top_builddir
 
 [ -x ${top_builddir}/agen5/autogen ] || exit 0
 [ -x ${top_builddir}/columns/columns ] || exit 0
@@ -64,9 +63,6 @@ cp pathfind.c compat.h ${top_builddir}/pkg/${tag}/compat/.
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-cd ${top_builddir}/doc
-sh ${top_srcdir}/mk-libopts-texi.sh
-mv -f libopts.texi ../pkg/${tag}
 cd ${top_builddir}/pkg/${tag}
 
 cp ${top_srcdir}/config/libopts.m4 .
@@ -142,7 +138,7 @@ cat > configure.ac <<- EOConfig
 	AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 	AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 	AC_PROG_LIBTOOL
-	ifdef([AC_REVISION],AC_REVISION($Revision: 4.13 $),)dnl
+	ifdef([AC_REVISION],AC_REVISION($Revision: 4.14 $),)dnl
 	AC_SUBST(AO_CURRENT)
 	AC_SUBST(AO_REVISION)
 	AC_SUBST(AO_AGE)
@@ -196,12 +192,8 @@ cat >&3 <<- EObootstrap
 	#  configurable package.  Once you do this, you cannot undo it.  Unroll the
 	#  original tarball again.
 	set -x -e
-	mkdir libopts doc
+	mkdir libopts
 	mv -f *.c *.h libopts/.
-	mv -f libopts.texi doc/.
-	( cd doc
-	  makeinfo -I../autoopts -I . -o libopts.info libopts.texi
-	) || exit 1
 	( sed '/EXTRA_DIST/,\$d' Makefile.am
 	  rm -f Make*
 	  echo 'EXTRA_DIST = \\'
@@ -210,12 +202,11 @@ cat >&3 <<- EObootstrap
 	  ls -C *.[ch] | sed 's/libopts\\.c//;s/\$/ \\\\/;\$s/ .\$//'
 	) > libopts/Makefile.am
 	( echo SUBDIRS = libopts
-	  echo nobase_include_HEADERS = autoopts/options.h autoopts/usage-txt.h
 	  echo EXTRA_DIST = COPYING COPYING.mbsd AUTHORS README ChangeLog NEWS '\\'
 	  # '
-	  echo '           ' compat/*.* '\\'
+	  echo '           ' autoopts/*.* '\\'
 	  # '
-	  echo '           ' doc/*.*
+	  echo '           ' compat/*.*
 	) > Makefile.am
 	mkdir m4
 	sed '/LIBOPTS_CHECK/,\$d' libopts.m4 > m4/libopts.m4

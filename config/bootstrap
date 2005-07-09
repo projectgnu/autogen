@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2005-01-08 17:25:14 bkorb"
+# Time-stamp:      "2005-07-09 09:24:05 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.2 2005/01/09 03:20:27 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.3 2005/07/09 22:54:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -38,9 +38,10 @@
 
 # Code:
 
-if test -z "${VERBOSE}" -o "${VERBOSE}" = false
-then VERBOSE=false ; VERBOSE_ARG=""
-else VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ; fi
+case "$-" in
+*x* ) VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ;;
+*   ) VERBOSE=false; VERBOSE_ARG=""   ; set +x ;;
+esac
 export VERBOSE VERBOSE_ARG
 SHELL=${SHELL:-$(which ksh 2>/dev/null)}
 test -z "${SHELL}" && SHELL=/bin/ksh
