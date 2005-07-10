@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.11 2005/07/09 22:54:51 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.12 2005/07/10 20:17:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -25,15 +25,14 @@ texi=autogen.texi
     echo ${tempdir}" ))
 
 (define texi-file-source (shell "
-    if [ -f autogen.texi ]
+    if [ -f autogen-texi.txt ]
     then
-      mv -f autogen.texi autogen.texi.ori
-      echo autogen.texi.ori
-    elif [ -f ${top_srcdir}/doc/autogen.texi ]
+      echo autogen-texi.txt
+    elif [ -f ${top_srcdir}/doc/autogen-texi.txt ]
     then
-      echo autogen.texi
+      echo ${top_srcdir}/doc/autogen-texi.txt
     else
-      die Cannot locate original autogen.texi file
+      die Cannot locate original autogen-texi.txt file
     fi" ))
 
 (define texi-escape-encode (lambda (in-str)
@@ -920,8 +919,7 @@ done
 ` =]
 [= get-text tag = Future =][=
 
-(shell "test -f autogen.texi.ori && rm -f autogen.texi.ori
-       rm -rf ${tempdir}")
+(shell "rm -rf ${tempdir}")
 (set-writable #t)
 
 ;; Local Variables:

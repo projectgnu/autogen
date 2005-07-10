@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-04-24 18:07:49 bkorb"
+# Time-stamp:        "2005-07-10 12:58:08 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.11 2005/05/27 17:39:01 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.12 2005/07/10 20:17:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -150,6 +150,8 @@ MISSING=${MISSING-${srcdir}/config/missing}
 case ${BOOTSTRAP} in
 
 pre )
+    echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
+
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 
@@ -221,6 +223,7 @@ pre )
     ;;
 
 post )
+    rm -f  ${srcdir}/doc/autogen.texi
     add_make_links
     ;;
 

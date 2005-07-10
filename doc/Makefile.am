@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-07-09 15:16:35 bkorb"
+## Time-stamp:      "2005-07-10 13:13:18 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/07/09 22:54:51 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/07/10 20:17:40 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -27,29 +27,11 @@ info_TEXINFOS   = autogen.texi
 EXTRA_DIST	= auto_gen.tpl snprintfv.texi snprintfv.menu \
 		mk-libopts-texi-in mk-agen-texi-in
 
-DISTCLEANFILES  = texi-stamp
+MAINTAINERCLEANFILES  = MakeDep.inc
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'
 
-texi         :
-	@:
-
-autogen.texi : texi-stamp
-
-#  This dependency can only be satisfied if all executables exist.
-#  The reconstruction of the .texi file requires running these commands
-#  with the ``--help'' option in order to get the usage text into the doc.
-#
-texi-stamp : $(AGexe) $(CLexe) $(GDexe)
+autogen.texi : # self-depends upon all executables
 	MAKE="$(MAKE)" ./mk-agen-texi.sh
-
-$(AGexe) :
-	@cd ../agen5 && $(MAKE) $(AGnam)
-
-$(GDexe) :
-	@cd ../getdefs && $(MAKE) $(AGnam)
-
-$(CLexe) :
-	@cd ../columns && $(MAKE) $(CLnam)
 
 # Special rule for generating all the GNU standard formats.
 #
