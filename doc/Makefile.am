@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-07-10 13:13:18 bkorb"
+## Time-stamp:      "2005-07-11 20:40:38 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2005/07/10 20:17:40 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2005/07/13 02:51:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,7 +25,7 @@ all : $(INFO_DEPS)
 info_TEXINFOS   = autogen.texi
 
 EXTRA_DIST	= auto_gen.tpl snprintfv.texi snprintfv.menu \
-		mk-libopts-texi-in mk-agen-texi-in
+		mk-agen-texi-in
 
 MAINTAINERCLEANFILES  = MakeDep.inc
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'

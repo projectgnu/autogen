@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.12 2005/07/10 20:17:40 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.13 2005/07/13 02:51:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -920,7 +920,6 @@ done
 [= get-text tag = Future =][=
 
 (shell "rm -rf ${tempdir}")
-(set-writable #t)
 
 ;; Local Variables:
 ;; indent-tabs-mode: nil
