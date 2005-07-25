@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-02-23 07:51:34 bkorb"
+ *  Time-stamp:      "2005-07-25 12:05:56 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.16 2005/06/07 22:25:12 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.17 2005/07/25 19:29:18 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -66,9 +66,20 @@
 
 #define AO_NAME_LIMIT    127
 #define AO_NAME_SIZE     (AO_NAME_LIMIT + 1)
+
 #ifndef MAXPATHLEN
-#  define MAXPATHLEN     4096
+#  ifdef PATH_MAX
+#    define MAXPATHLEN   PATH_MAX
+#  else
+#    define MAXPATHLEN   4096
+#  endif
+#else
+#  if defined(PATH_MAX) && (PATH_MAX > MAXPATHLEN)
+#     undef  MAXPATHLEN
+#     define MAXPATHLEN  PATH_MAX
+#  endif
 #endif
+
 #undef  EXPORT
 #define EXPORT
 

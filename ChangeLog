@@ -1,3 +1,9 @@
+2005-07-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.h(MAXPATHLEN): make certain it is never less than
+	"PATH_MAX"
+	* autoopts/load.c(optionMakePath): use MAXPATHLEN instead of PATH_MAX.
+
 2005-07-09  Bruce Korb  <bkorb@gnu.org>
 
 	* doc/mk-agen-texi-in: new - extricate code from Makefile.am

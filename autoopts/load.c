@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.15 2005/06/07 22:25:12 bkorb Exp $
- *  Time-stamp:      "2005-02-23 14:22:26 bkorb"
+ *  $Id: load.c,v 4.16 2005/07/25 19:29:18 bkorb Exp $
+ *  Time-stamp:      "2005-07-25 12:04:43 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -220,9 +220,9 @@ optionMakePath(
         sprintf( pzBuf, "%s%s", pzDir, pzName );
     }
 
-#ifdef HAVE_REALPATH
+#if defined(HAVE_REALPATH)
     {
-        char z[ PATH_MAX+1 ];
+        char z[ MAXPATHLEN+1 ];
 
         if (realpath( pzBuf, z ) == NULL)
             return AG_FALSE;
