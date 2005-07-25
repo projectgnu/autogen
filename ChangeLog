@@ -2,7 +2,6 @@
 
 	* doc/mk-agen-texi-in: new - extricate code from Makefile.am
 	* doc/Makefile.am: remove that code
-	* doc/mk-libopts-texi-in: new - construct .texi file for libopts
 	* configure.in: configure these new files
 	* doc/auto_gen.tpl: Use the "die" function instead of kill $AG_pid
 	Also, remove usage of "autoopts-config" as it won't work unless
@@ -11,7 +10,8 @@
 	sharutils also.
 	* pkg/mkgnudoc.sh: tweaks to use the new template
 	* pkg/Makefile.am: alter the script's invocation, too.
-	* pkg/libopts/mklibsrc.sh: install the headers
+	* pkg/libopts/mklibsrc.sh: install the headers, don't create project
+	files -- leave  to libopts project to add those.
 
 2005-06-26  Bruce Korb  <bkorb@gnu.org>
 
