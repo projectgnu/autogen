@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/07/26 16:57:02 $
- *  Time-stamp:        "2005-07-25 16:08:05 bkorb"
+ *  Last Modified:     $Date: 2005/07/26 16:58:20 $
+ *  Time-stamp:        "2005-07-26 09:58:03 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.7 2005/07/26 16:57:02 bkorb Exp $
+ *  $Id: libopts.def,v 4.8 2005/07/26 16:58:20 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.7 $";
+version     = "$Revision: 4.8 $";
 output-file = libopts.m4;
 
 test   = {
@@ -103,6 +103,35 @@ test = {
     "Not all systems have pathfind(3).  See if we need to substitute.\n"
     "To make this work, you have to do horrible things.  See the doc\n"
     "for AG_CHECK_STRCSPN.";
+};
+
+test = {
+    name   = realpath;
+    type   = run;
+    check  = "we have a functional realpath(3C)";
+    action = { act-type = define; };
+
+    code   = <<-  _EOF_
+	#include <limits.h>
+	#include <stdlib.h>
+	int main (int argc, char** argv) {
+	#ifndef PATH_MAX
+	choke me!!
+	#else
+	   char zPath[PATH_MAX+1];
+	#endif
+	   char *pz = realpath(argv[0], zPath);
+	   return (pz == zPath) ? 0 : 1;
+	}
+	_EOF_;
+
+
+    doc = <<- _EODoc_
+	realpath only really works if PATH_MAX is defined.  If it is not defined,
+	the value may be obtained from pathconf(3C), but that value might be
+	unallocatable.  So, without a sane PATH_MAX, we won't be able to use
+	realpath(3C).
+	_EODoc_;
 };
 
 test = {

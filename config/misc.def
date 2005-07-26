@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/07/26 16:57:02 $
+ *  Last Modified:     $Date: 2005/07/26 16:58:20 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.4 2005/07/26 16:57:02 bkorb Exp $
+ *  $Id: misc.def,v 4.5 2005/07/26 16:58:20 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.4 $";
+version = "$Revision: 4.5 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -231,35 +231,6 @@ test = {
 	finally, you must add another artificial dependency, something like:
 	  makeshell.lo : genshell.c @COMPATOBJ@
 	It is all pretty horrific, but I have found nothing else that works.
-	_EODoc_;
-};
-
-test = {
-    name   = realpath;
-    type   = run;
-    check  = "we have a functional realpath(3C)";
-    action = { act-type = define; };
-
-    code   = <<-  _EOF_
-	#include <limits.h>
-	#include <stdlib.h>
-	int main (int argc, char** argv) {
-	#ifndef PATH_MAX
-	choke me!!
-	#else
-	   char zPath[PATH_MAX+1];
-	#endif
-	   char *pz = realpath(argv[0], zPath);
-	   return (pz == zPath) ? 0 : 1;
-	}
-	_EOF_;
-
-
-    doc = <<- _EODoc_
-	realpath only really works if PATH_MAX is defined.  If it is not defined,
-	the value may be obtained from pathconf(3C), but that value might be
-	unallocatable.  So, without a sane PATH_MAX, we won't be able to use
-	realpath(3C).
 	_EODoc_;
 };
 

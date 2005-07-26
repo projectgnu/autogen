@@ -9,7 +9,7 @@ dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.8 2005/07/13 02:51:45 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.9 2005/07/26 16:57:02 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([AutoGen],[5.6.6],[autogen-users@lists.sf.net])
@@ -20,7 +20,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.8 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.9 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -133,8 +133,7 @@ AC_CHECK_SIZEOF(long,  4)
 # ----------------------------------------------------------------------
 # Checks for various functions.
 # ----------------------------------------------------------------------
-AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf realpath \
-               dlopen)
+AC_CHECK_FUNCS(strchr setjmp sigsetjmp strsignal strlcpy snprintf dlopen)
 AC_SEARCH_LIBS(copysign, [m],
                [AC_DEFINE(HAVE_COPYSIGN, 1,
                           [Define to 1 if you have the `copysign' function.])])

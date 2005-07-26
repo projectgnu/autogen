@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.16 2005/07/25 19:29:18 bkorb Exp $
- *  Time-stamp:      "2005-07-25 12:04:43 bkorb"
+ *  $Id: load.c,v 4.17 2005/07/26 16:57:02 bkorb Exp $
+ *  Time-stamp:      "2005-07-25 16:10:52 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -220,7 +220,17 @@ optionMakePath(
         sprintf( pzBuf, "%s%s", pzDir, pzName );
     }
 
-#if defined(HAVE_REALPATH)
+#if defined(HAVE_CANONICALIZE_FILE_NAME)
+    do {
+        char* pz = canonicalize_file_name(pzBuf);
+        if (pz == NULL)
+            break;
+        if (strlen(pz) < MAXPATHLEN)
+            strcpy(pzBuf, pz);
+        free(pz);
+    } while (0);
+
+#elif defined(HAVE_REALPATH)
     {
         char z[ MAXPATHLEN+1 ];
 
