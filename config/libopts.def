@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/06/19 23:04:28 $
- *  Time-stamp:        "2005-02-14 17:25:25 bkorb"
+ *  Last Modified:     $Date: 2005/07/26 16:57:02 $
+ *  Time-stamp:        "2005-07-25 16:08:05 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.6 2005/06/19 23:04:28 bkorb Exp $
+ *  $Id: libopts.def,v 4.7 2005/07/26 16:57:02 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.6 $";
+version     = "$Revision: 4.7 $";
 output-file = libopts.m4;
 
 test   = {
@@ -250,5 +250,5 @@ do-always = <<-_EOF_
 	# AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
 	# ----------------------------------------------------------------------
 	AC_CHECK_LIB(gen, pathfind)
-	AC_CHECK_FUNCS(mmap)
+	AC_CHECK_FUNCS(mmap canonicalize_file_name)
 	_EOF_;
