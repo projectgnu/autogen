@@ -3,6 +3,10 @@
 	* autoopts/autoopts.h(MAXPATHLEN): make certain it is never less than
 	"PATH_MAX"
 	* autoopts/load.c(optionMakePath): use MAXPATHLEN instead of PATH_MAX.
+	and use canonicalize_file_name() when available.
+	* config/libopts.def(realpath): add test that includes testing for
+	the existence of PATH_MAX.
+	* configure.in(realpath): remove generic existence test
 
 2005-07-09  Bruce Korb  <bkorb@gnu.org>
 

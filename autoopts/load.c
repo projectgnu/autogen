@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.17 2005/07/26 16:57:02 bkorb Exp $
- *  Time-stamp:      "2005-07-25 16:10:52 bkorb"
+ *  $Id: load.c,v 4.18 2005/07/27 06:20:30 bkorb Exp $
+ *  Time-stamp:      "2005-07-26 10:39:46 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -55,6 +55,20 @@
 /* static forward declarations maintained by :mkfwd */
 static char*
 assembleArgValue( char* pzTxt, tOptionLoadMode mode );
+
+static ag_bool
+insertProgramPath(
+    char*   pzBuf,
+    int     bufSize,
+    tCC*    pzName,
+    tCC*    pzProgPath );
+
+static ag_bool
+insertEnvVal(
+    char*   pzBuf,
+    int     bufSize,
+    tCC*    pzName,
+    tCC*    pzProgPath );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
@@ -105,6 +119,8 @@ optionMakePath(
     tCC*    pzName,
     tCC*    pzProgPath )
 {
+    ag_bool res = AG_TRUE;
+
     if (bufSize <= strlen( pzName ))
         return AG_FALSE;
 
@@ -112,8 +128,16 @@ optionMakePath(
      *  IF not an environment variable, just copy the data
      */
     if (*pzName != '$') {
-        strncpy( pzBuf, pzName, bufSize );
-        return AG_TRUE;
+        char* pzS = pzName;
+        char* pzD = pzBuf;
+        int   ct  = bufSize;
+
+        for (;;) {
+            if ( (*(pzD++) = *(pzS++)) == NUL)
+                break;
+            if (--ct == 0)
+                return AG_FALSE;
+        }
     }
 
     /*
@@ -121,126 +145,138 @@ optionMakePath(
      *  it must start with "$$/".  In either event, replace the "$$"
      *  with the path to the executable and append a "/" character.
      */
-    if (pzName[1] == '$') {
-        tCC*    pzPath;
-        tCC*    pz;
+    else if (pzName[1] == '$')
+        res = insertProgramPath( pzBuf, bufSize, pzName, pzProgPath );
+    else
+        res = insertEnvVal( pzBuf, bufSize, pzName, pzProgPath );
 
-        switch (pzName[2]) {
-        case '/':
-        case NUL:
-            break;
-        default:
-            return AG_FALSE;
-        }
-
-        /*
-         *  See if the path is included in the program name.
-         *  If it is, we're done.  Otherwise, we have to hunt
-         *  for the program using "pathfind".
-         */
-        if (strchr( pzProgPath, '/' ) != NULL)
-            pzPath = pzProgPath;
-        else {
-            pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
-
-            if (pzPath == NULL)
-                return AG_FALSE;
-        }
-
-        pz = strrchr( pzPath, '/' );
-
-        /*
-         *  IF we cannot find a directory name separator,
-         *  THEN we do not have a path name to our executable file.
-         */
-        if (pz == NULL)
-            return AG_FALSE;
-
-        /*
-         *  Skip past the "$$" and, maybe, the "/".  Anything else is invalid.
-         */
-        pzName += 2;
-        switch (*pzName) {
-        case '/':
-            pzName++;
-        case NUL:
-            break;
-        default:
-            return AG_FALSE;
-        }
-
-        /*
-         *  Concatenate the file name to the end of the executable path.
-         *  The result may be either a file or a directory.
-         */
-        if ((pz - pzPath)+1 + strlen(pzName) >= bufSize)
-            return AG_FALSE;
-
-        memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
-        strcpy( pzBuf + (pz - pzPath) + 1, pzName );
-
-        /*
-         *  If the "pzPath" path was gotten from "pathfind()", then it was
-         *  allocated and we need to deallocate it.
-         */
-        if (pzPath != pzProgPath)
-             free( (void*)pzPath );
-    }
-
-    /*
-     *  See if the env variable is followed by specified directories
-     *  (We will not accept any more env variables.)
-     */
-    else {
-        char* pzDir = pzBuf;
-
-        for (;;) {
-            char ch = *++pzName;
-            if (! ISNAMECHAR( ch ))
-                break;
-            *(pzDir++) = ch;
-        }
-
-        if (pzDir == pzBuf)
-            return AG_FALSE;
-
-        *pzDir = NUL;
-
-        pzDir = getenv( pzBuf );
-
-        /*
-         *  Environment value not found -- skip the home list entry
-         */
-        if (pzDir == NULL)
-            return AG_FALSE;
-
-        if (strlen( pzDir ) + 1 + strlen( pzName ) >= bufSize)
-            return AG_FALSE;
-
-        sprintf( pzBuf, "%s%s", pzDir, pzName );
-    }
+    if (! res)
+        return AG_FALSE;
 
 #if defined(HAVE_CANONICALIZE_FILE_NAME)
     do {
         char* pz = canonicalize_file_name(pzBuf);
         if (pz == NULL)
-            break;
-        if (strlen(pz) < MAXPATHLEN)
+            return AG_FALSE;
+        if (strlen(pz) < bufSize)
             strcpy(pzBuf, pz);
         free(pz);
     } while (0);
 
 #elif defined(HAVE_REALPATH)
     {
-        char z[ MAXPATHLEN+1 ];
+        char z[ PATH_MAX+1 ];
 
         if (realpath( pzBuf, z ) == NULL)
             return AG_FALSE;
 
-        strcpy( pzBuf, z );
+        if (strlen(z) < bufSize)
+            strcpy( pzBuf, z );
     }
 #endif
 
+    return AG_TRUE;
+}
+
+
+static ag_bool
+insertProgramPath(
+    char*   pzBuf,
+    int     bufSize,
+    tCC*    pzName,
+    tCC*    pzProgPath )
+{
+    tCC*    pzPath;
+    tCC*    pz;
+    int     skip = 2;
+
+    switch (pzName[2]) {
+    case '/':
+        skip = 3;
+    case NUL:
+        break;
+    default:
+        return AG_FALSE;
+    }
+
+    /*
+     *  See if the path is included in the program name.
+     *  If it is, we're done.  Otherwise, we have to hunt
+     *  for the program using "pathfind".
+     */
+    if (strchr( pzProgPath, '/' ) != NULL)
+        pzPath = pzProgPath;
+    else {
+        pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
+
+        if (pzPath == NULL)
+            return AG_FALSE;
+    }
+
+    pz = strrchr( pzPath, '/' );
+
+    /*
+     *  IF we cannot find a directory name separator,
+     *  THEN we do not have a path name to our executable file.
+     */
+    if (pz == NULL)
+        return AG_FALSE;
+
+    pzName += skip;
+
+    /*
+     *  Concatenate the file name to the end of the executable path.
+     *  The result may be either a file or a directory.
+     */
+    if ((pz - pzPath)+1 + strlen(pzName) >= bufSize)
+        return AG_FALSE;
+
+    memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
+    strcpy( pzBuf + (pz - pzPath) + 1, pzName );
+
+    /*
+     *  If the "pzPath" path was gotten from "pathfind()", then it was
+     *  allocated and we need to deallocate it.
+     */
+    if (pzPath != pzProgPath)
+        free( (void*)pzPath );
+    return AG_TRUE;
+}
+
+
+static ag_bool
+insertEnvVal(
+    char*   pzBuf,
+    int     bufSize,
+    tCC*    pzName,
+    tCC*    pzProgPath )
+{
+    char* pzDir = pzBuf;
+
+    for (;;) {
+        char ch = *++pzName;
+        if (! ISNAMECHAR( ch ))
+            break;
+        *(pzDir++) = ch;
+    }
+
+    if (pzDir == pzBuf)
+        return AG_FALSE;
+
+    *pzDir = NUL;
+
+    pzDir = getenv( pzBuf );
+
+    /*
+     *  Environment value not found -- skip the home list entry
+     */
+    if (pzDir == NULL)
+        return AG_FALSE;
+
+    if (strlen( pzDir ) + 1 + strlen( pzName ) >= bufSize)
+        return AG_FALSE;
+
+    sprintf( pzBuf, "%s%s", pzDir, pzName );
     return AG_TRUE;
 }
 

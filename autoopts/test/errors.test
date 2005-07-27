@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-13 07:41:06 bkorb"
+# Time-stamp:        "2005-07-26 10:53:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 4.5 2005/07/09 22:54:51 bkorb Exp $
+# $Id: errors.test,v 4.6 2005/07/27 06:20:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -46,8 +46,8 @@ compile "--help"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+echo creating ${testname}.res-help
+cat > ${testname}.res-help <<'_EOF_'
 test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
@@ -68,8 +68,10 @@ The following option preset mechanisms are supported:
  - reading file errorsRC/.test_errorsrc
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "help output: `diff ${testname}.h*lp`"
+dir=`pwd -P` || dir=`pwd`
+sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+cmp -s ${testname}.*-help || \
+  failure "help output: `diff ${testname}.*-help`"
 
 ./${testname} -s foo -o -s bar 2> /dev/null && \
   failure ${testname} should not accept multiple options
@@ -104,8 +106,9 @@ ${AG_L} ${testname}.def || \
 
 compile "--help"
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.h*lp`"
+sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+cmp -s ${testname}.*-help || \
+  failure "help output: `diff ${testname}.*-help`"
 
 #  This time, having a duplicate should be ignored...
 #

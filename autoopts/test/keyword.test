@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2005-03-06 09:13:03 bkorb"
+# Time-stamp:        "2005-07-26 10:56:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.4 2005/03/06 20:16:08 bkorb Exp $
+# $Id: keyword.test,v 4.5 2005/07/27 06:20:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -63,8 +63,8 @@ compile "-X"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+echo creating ${testname}.res-help
+cat > ${testname}.res-help <<'_EOF_'
 test_keyword - Test AutoOpts for keyword
 USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -83,7 +83,7 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
- - reading file ./keyword.cfg
+ - reading file keyword.cfg
 
 The valid "trace" option keywords are:
   nothing templates block-macros expressions explanations
@@ -96,8 +96,10 @@ clear the bits, specifying 'none' will clear all bits, and 'all' will set them
 all.  Multiple entries may be passed as an option argument list.
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.h*lp`"
+dir=`pwd -P` || dir=`pwd`
+sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+cmp -s ${testname}.*-help || \
+  failure "help output: `diff ${testname}.*-help`"
 
 ./${testname} --trace=exp > /dev/null 2>&1 && \
   failure ${testname} accepted ambiguous keyword

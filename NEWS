@@ -1,4 +1,14 @@
-New in __CURRENT_VERSION__ - June, 2005
+New in __CURRENT_VERSION__ - July, 2005
+
+* template shell code may now use a shell function "die" that will print
+  an error message and shoot down the master autogen process.
+* the tear-off/add-in libopts library will now specify that the
+  "options.h" header is to be installed.
+* realpath(3C) usage in libopts has been cleaned up.  It is now only used
+  if PATH_MAX is defined for the platform.  canonicalize_file_name(3C) is
+  used where available.
+
+New in 5.7.1 - June, 2005
 
 * Update to libtool 1.5.18
 * add "arg-range" text to the generated man pages
@@ -41,11 +51,3 @@ AutoGen:
 * AutoGen macros were added for inserting definition file line numbers
   into the output files:  (def-file-line "value-name")
 * autogen will no longer try to catch real time signals
-
-New in 5.6.5 - December, 2004
-* Equivalencing stacked argument options no longer has magical properties.
-  "unstack-arg" is now equivalent to that old behavior.
-* Equivalenced options may now be preset with rc/ini files and
-  environment variables.
-* ``autoopts-config ldflags'' will now emit the appropriate ``-R'' link option.
-* autoopts.pc will now be produced and installed
