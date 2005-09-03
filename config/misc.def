@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/07/26 16:58:20 $
+ *  Last Modified:     $Date: 2005/09/03 22:49:50 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.5 2005/07/26 16:58:20 bkorb Exp $
+ *  $Id: misc.def,v 4.6 2005/09/03 22:49:50 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.5 $";
+version = "$Revision: 4.6 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -258,10 +258,10 @@ test = {
     check  = "uname(2) is POSIX";
     action = { act-type = define; };
     code   = <<- _EOF_
-		#include <sys/utsname.h>
-		int main() { struct utsname unm;
-		return uname( &unm ); }
-		_EOF_;
+	#include <sys/utsname.h>
+	int main() { struct utsname unm;
+	return uname( &unm ); }
+	_EOF_;
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
 };
@@ -272,8 +272,8 @@ test = {
     check  = "long long ints";
     action = { act-type = define; };
     code   = <<- _EOF_
-		long long i;
-		_EOF_;
+	long long i;
+	_EOF_;
     doc =
     "See if long long works";
 };

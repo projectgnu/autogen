@@ -160,7 +160,8 @@ ENDDEF  emit-macro   =][=
 
 Stash the result of a C/C++ feature test =][=
 
-DEFINE start-feat-test =]
+DEFINE start-feat-test =][=
+  (if (exist? "preamble") (prefix "  " (get "preamble"))) =]
   AC_MSG_CHECKING([whether [=(protect-text (get "check"))=]])[=
 ENDDEF start-feat-test =][=
 
@@ -215,7 +216,8 @@ DEFINE  emit-results   =][=
 
     == yes-define        =][=
       (set! good-text (string-append good-text
-            "\n    AC_DEFINE([" (sprintf good-define-name up-name) "],["
+            "\n    AC_DEFINE" (if (exist? "unquoted") "UNQUOTED" "")
+            "([" (sprintf good-define-name up-name) "],["
             (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if " (protect-text (get "check")) "])" ))
       =][=
@@ -233,7 +235,8 @@ DEFINE  emit-results   =][=
 
     ==  no-define        =][=
       (set! bad-text (string-append bad-text
-            "\n    AC_DEFINE([" (sprintf bad-define-name up-name) "],["
+            "\n    AC_DEFINE" (if (exist? "unquoted") "UNQUOTED" "")
+            "([" (sprintf bad-define-name up-name) "],["
             (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if '" (protect-text (get "check"))
                                        "' is not true])" ))

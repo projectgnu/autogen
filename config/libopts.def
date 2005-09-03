@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/07/26 16:58:20 $
- *  Time-stamp:        "2005-07-26 09:58:03 bkorb"
+ *  Last Modified:     $Date: 2005/09/03 22:49:50 $
+ *  Time-stamp:        "2005-08-28 10:59:45 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.8 2005/07/26 16:58:20 bkorb Exp $
+ *  $Id: libopts.def,v 4.9 2005/09/03 22:49:50 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.8 $";
+version     = "$Revision: 4.9 $";
 output-file = libopts.m4;
 
 test   = {
@@ -211,7 +211,7 @@ test = {
 	_END_OF_DOC_;
 };
 
-do-always = <<-_EOF_
+do-first = <<-_EOF_
 
 	# ----------------------------------------------------------------------
 	# Check for standard headers.
@@ -271,13 +271,15 @@ do-always = <<-_EOF_
 	# ...and int types headers
 	# =================
 	AC_CHECK_HEADERS(stdint.h inttypes.h, break)
-	if test `eval echo '${'$as_ac_Header'}'` != yes; then
-	  AC_MSG_ERROR([You must have stdint.h or inttypes.h on your system])
-	fi
+	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
+	   intptr_t, uintptr_t])
 
 	# ----------------------------------------------------------------------
 	# AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
 	# ----------------------------------------------------------------------
 	AC_CHECK_LIB(gen, pathfind)
 	AC_CHECK_FUNCS(mmap canonicalize_file_name)
+	# =================
+	# ...and int types
+	# =================
 	_EOF_;

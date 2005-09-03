@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.2 2005/01/09 03:20:27 bkorb Exp $
+# $Id: announce.txt,v 4.3 2005/09/03 22:49:50 bkorb Exp $
 
 tfile=$( (mktemp ./agaXXXXXX.txt) 2>/dev/null )
 test -z "${tfile}" && tfile=aga$$.txt
@@ -11,17 +11,17 @@ AO_VERSION=AutoOpts\ Version\ ${AO_CURRENT}.${AO_REVISION}
 
 exec 3> ${tfile}
 
-recip="bkorb@veritas.com info-gnu@gnu.org"
+recip="bkorb@gnu.org info-gnu@gnu.org"
 to="GNU Announcements <info-gnu@gnu.org>"
 
 cat >&3 <<_EOF_
-From: Bruce Korb <bkorb@veritas.com>
+From: Bruce Korb <bkorb@gnu.org>
 To: ${to}	
-Subject: AutoGen Version ${AG_VERSION}/${AO_VERSION}
+Subject: GNU AutoGen Version ${AG_VERSION}/${AO_VERSION}
 Reply-To: autogen-users@lists.sf.net
 
-AutoGen/AutoOpts is a two-part project that serves two separate purposes
-and are inextricably intertwined:
+GNU AutoGen/AutoOpts is a two-part project that serves two separate
+purposes and are inextricably intertwined:
 
 AutoGen is a tool designed to simplify the creation and maintenance of
 programs that contain large amounts of repetitious text. It is especially

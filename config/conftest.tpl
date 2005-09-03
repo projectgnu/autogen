@@ -4,7 +4,7 @@ null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
 #  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2005/01/01 00:20:58 $
+#  Last Modified:     $Date: 2005/09/03 22:49:50 $
 #             by: bkorb
 #
 # This template uses the following definitions:
@@ -51,6 +51,10 @@ dnl[=
 
 (if (not separate-macros) (out-push-new)) =]
 AC_DEFUN([[=(. do-all-name)=]],[[=
+
+IF (exist? "do-first") =]
+[=(prefix "  " (join "\n" (stack "do-first"))) =][=
+ENDIF do-first  =][=
 
 FOR test        =][=
   preamble      =][=

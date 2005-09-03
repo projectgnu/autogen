@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-07-09 20:59:32 bkorb"
+## Time-stamp:      "2005-08-28 08:58:27 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.15 2005/07/10 20:17:40 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.16 2005/09/03 22:49:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -79,13 +79,16 @@ cat >> libopts.m4 <<-	\EOMacro
 	NEED_LIBOPTS_DIR=''
 
 	AC_DEFUN([LIBOPTS_CHECK],[
+	  m4_pushdef([AO_Libopts_Dir],
+		    [ifelse($1, , [libopts], [$1])])
+	  AC_SUBST(LIBOPTS_DIR, AO_Libopts_Dir)
 	  AC_ARG_ENABLE([local-libopts],
 	    AC_HELP_STRING([--enable-local-libopts],
 	       [Force using the supplied libopts tearoff code]),[
 	    if test x$enableval = xyes ; then
 	       AC_MSG_NOTICE([Using supplied libopts tearoff])
-	       LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
-	       LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
+	       LIBOPTS_LDADD='$(top_builddir)/AO_Libopts_Dir/libopts.la'
+	       LIBOPTS_CFLAGS='-I$(top_srcdir)/AO_Libopts_Dir'
 	       INVOKE_LIBOPTS_MACROS
 	       NEED_LIBOPTS_DIR=true
 	    fi])
@@ -113,8 +116,8 @@ cat >> libopts.m4 <<-	\EOMacro
 	      LIBOPTS_LDADD="${lo_cv_test_autoopts}"
 	      LIBOPTS_CFLAGS="`${aoconfig} --cflags`"
 	    else
-	      LIBOPTS_LDADD='$(top_builddir)/libopts/libopts.la'
-	      LIBOPTS_CFLAGS='-I$(top_srcdir)/libopts'
+	      LIBOPTS_LDADD='$(top_builddir)/AO_Libopts_Dir/libopts.la'
+	      LIBOPTS_CFLAGS='-I$(top_srcdir)/AO_Libopts_Dir'
 	      INVOKE_LIBOPTS_MACROS
 	      NEED_LIBOPTS_DIR=true
 	    fi
@@ -123,7 +126,9 @@ cat >> libopts.m4 <<-	\EOMacro
 	  AM_CONDITIONAL([NEED_LIBOPTS], [test -n "${NEED_LIBOPTS_DIR}"])
 	  AC_SUBST(LIBOPTS_LDADD)
 	  AC_SUBST(LIBOPTS_CFLAGS)
-	  AC_CONFIG_FILES([libopts/Makefile])
+	  AC_SUBST(LIBOPTS_DIR, [${lo_libopts_dir}])
+	  AC_CONFIG_FILES([AO_Libopts_Dir/Makefile])
+	  m4_popdef([AO_Libopts_Dir])
 	]) # end of AC_DEFUN of LIBOPTS_CHECK
 	EOMacro
 
@@ -132,13 +137,7 @@ test -f Makefile.am && rm -f Makefile.am
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 cp ${top_srcdir}/pkg/libopts/COPYING* .
 
-cat > MakeDefs.inc <<- EODefs
-	if NEED_LIBOPTS
-	LIBOPTS_DIR = libopts
-	else
-	LIBOPTS_DIR =
-	endif
-	EODefs
+touch MakeDefs.inc
 
 vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 exec 3> Makefile.am

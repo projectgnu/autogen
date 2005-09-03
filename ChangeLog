@@ -1,3 +1,22 @@
+2005-08-28  Bruce Korb  <bkorb@gnu.org>
+
+	* compat/compat.h: fix up sized int types
+	* config/confmacs.tpl(emit-results): Allow for unquoted define values
+	* config/conftest.tpl(do-first): allow for an initial list of functions
+	* config/libopts.def(do-first): do common integer checks before the
+	specialized checks defined in the rest of this file.
+	* pkg/libopts/mklibsrc.sh(libopts.m4): add an optional argument to
+	LIBOPTS_CHECK -- viz., the directory where the libopts tear-off library
+	will live in a client project.
+	* pkg/libopts/README(LIBOPTS_CHECK): doc it
+
+2005-08-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in(usage): regularize
+	(everything): no longer a "regular" option
+	* autoopts/load.c(optionMakePath): vix constness and remove unnecessary
+	"do{...}while(0)" enclosure.
+
 2005-07-25  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.h(MAXPATHLEN): make certain it is never less than

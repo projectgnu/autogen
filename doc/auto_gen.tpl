@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.13 2005/07/13 02:51:45 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.14 2005/09/03 22:49:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -109,6 +109,7 @@ notice identical to this one except for the removal of this paragraph.
 
 @page
 @vskip 0pt plus 1filll
+
 AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,

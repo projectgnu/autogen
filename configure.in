@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2005 Bruce Korb
 dnl
-dnl Time-stamp:      "2005-07-09 16:05:40 bkorb"
+dnl Time-stamp:      "2005-08-28 09:12:24 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.9 2005/07/26 16:57:02 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.10 2005/09/03 22:49:50 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([AutoGen],[5.6.6],[autogen-users@lists.sf.net])
@@ -20,7 +20,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.9 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.10 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -129,6 +129,7 @@ AC_CHECK_TYPES([uintptr_t], ,
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
+AC_CHECK_SIZEOF(short, 2)
 
 # ----------------------------------------------------------------------
 # Checks for various functions.
