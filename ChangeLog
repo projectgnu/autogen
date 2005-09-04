@@ -1,3 +1,7 @@
+2005-09-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/getopt.test: disable unless autoopts-config installed.
+
 2005-08-28  Bruce Korb  <bkorb@gnu.org>
 
 	* compat/compat.h: fix up sized int types
@@ -14,7 +18,7 @@
 
 	* autoopts/autoopts-config.in(usage): regularize
 	(everything): no longer a "regular" option
-	* autoopts/load.c(optionMakePath): vix constness and remove unnecessary
+	* autoopts/load.c(optionMakePath): fix constness and remove unnecessary
 	"do{...}while(0)" enclosure.
 
 2005-07-25  Bruce Korb  <bkorb@gnu.org>
