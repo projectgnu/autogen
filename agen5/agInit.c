@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.5 2005/09/04 21:13:39 bkorb Exp $
  *
- *  Time-stamp:      "2005-01-08 14:30:36 bkorb"
+ *  Time-stamp:      "2005-07-27 10:13:38 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -84,9 +84,8 @@ initialize( int arg_ct, char** arg_vec )
             SI_PLATFORM,
 #endif
             SI_MACHINE };
-        int ix;
+        int  ix;
         long sz;
-        char* pz = z+2;
 
         addSysEnv( z );
         for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {

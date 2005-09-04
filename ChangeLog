@@ -21,6 +21,32 @@
 	* autoopts/load.c(optionMakePath): fix constness and remove unnecessary
 	"do{...}while(0)" enclosure.
 
+2005-07-28  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7.2 Released
+
+	* agen5/agCgi.c(loadCgi): Warnings
+	* agen5/agInit.c(initialize): ditto
+	* agen5/defLex.c(assembleName): ditto
+	* agen5/fsm-trans.tpl(machine-step): ditto
+	(fsm-proc-variables): ditto
+	* agen5/funcFor.c(doForByStep): ditto
+	* agen5/funcIf.c(eval_true): ditto
+	* agen5/opts.def(): ditto
+	* agen5/opts.def(load-scheme): ditto
+	* agen5/tpLoad.c(canReadFile): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	(filePreset): ditto
+	(handleStructure): ditto
+	* autoopts/nested.c(scanNameEntry): ditto
+	(sortNestedList): ditto
+	* compat/pathfind.c(extract_colon_unit): ditto
+	* snprintfv/format.c(printf_integer): ditto
+
+	* agen5/test/html.test: negative test fails on some platforms
+	* autoopts/test/errors.test: accommodate new file name  handling
+	* autoopts/test/keyword.test: ditto
+
 2005-07-25  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.h(MAXPATHLEN): make certain it is never less than

@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday January 23, 2005 at 03:33:47 PM PST
+ *  It has been AutoGen-ed  Wednesday July 27, 2005 at 12:46:37 PM PDT
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -200,7 +200,10 @@ cgi_run_fsm(
 {
     te_cgi_state cgi_state = CGI_ST_INIT;
     te_cgi_event trans_evt;
-    te_cgi_state nxtSt, firstNext;
+#ifdef DEBUG
+    te_cgi_state firstNext;
+#endif
+    te_cgi_state nxtSt;
     te_cgi_trans trans;
 
     while (cgi_state < CGI_ST_INVALID) {
@@ -240,7 +243,10 @@ cgi_run_fsm(
         } else {
             const t_cgi_transition* pTT =
             cgi_trans_table[ cgi_state ] + trans_evt;
-            nxtSt = firstNext = pTT->next_state;
+#ifdef DEBUG
+            firstNext = /* next line */
+#endif
+            nxtSt = pTT->next_state;
             trans = pTT->transition;
         }
 

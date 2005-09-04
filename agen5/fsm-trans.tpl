@@ -161,7 +161,10 @@ DEFINE machine-step  =][=
     } else {
         const [= (. t-trans) =]* pTT =
             [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
-        nxtSt = firstNext = pTT->next_state;
+#ifdef DEBUG
+        firstNext = /* next line */
+#endif
+        nxtSt = pTT->next_state;
         [=(. trans-name)=] = pTT->[=(. trans-field)=];
     }
 
@@ -196,7 +199,10 @@ ENDDEF  machine-step     =][=
 DEFINE fsm-proc-variables
 
   =]
-    te_[=(. pfx)=]_state nxtSt, firstNext;[=
+#ifdef DEBUG
+    te_[=(. pfx)=]_state firstNext;
+#endif
+    te_[=(. pfx)=]_state nxtSt;[=
     IF (=* (get "method") "call")  =]
     [=(. pfx)=]_callback_t* pT;[=
     ELSE  =]

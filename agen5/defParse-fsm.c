@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday January 23, 2005 at 03:33:47 PM PST
+ *  It has been AutoGen-ed  Wednesday July 27, 2005 at 12:46:37 PM PDT
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -599,7 +599,10 @@ dp_run_fsm( void )
 {
     te_dp_state dp_state = DP_ST_INIT;
     te_dp_event trans_evt;
-    te_dp_state nxtSt, firstNext;
+#ifdef DEBUG
+    te_dp_state firstNext;
+#endif
+    te_dp_state nxtSt;
     dp_callback_t* pT;
 
     while (dp_state < DP_ST_INVALID) {
@@ -614,7 +617,10 @@ dp_run_fsm( void )
         } else {
             const t_dp_transition* pTT =
             dp_trans_table[ dp_state ] + trans_evt;
-            nxtSt = firstNext = pTT->next_state;
+#ifdef DEBUG
+            firstNext = /* next line */
+#endif
+            nxtSt = pTT->next_state;
             pT    = pTT->trans_proc;
         }
 

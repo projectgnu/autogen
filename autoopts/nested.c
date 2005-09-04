@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
- *  Time-stamp:      "2005-03-06 12:11:57 bkorb"
+ *  $Id: nested.c,v 4.8 2005/09/04 21:13:39 bkorb Exp $
+ *  Time-stamp:      "2005-07-27 10:10:28 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -329,7 +329,6 @@ scanNameEntry( const char* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         /* FALLTHROUGH */
 
     case NUL:
-    no_value:
         addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0 );
         break;
 
@@ -561,7 +560,6 @@ sortNestedList( tArgList* pAL )
 {
     int ix;
     int lm = pAL->useCt;
-    void* ptr;
 
     /*
      *  This loop iterates "useCt" - 1 times.

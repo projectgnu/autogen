@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: agCgi.c,v 4.6 2005/09/04 21:14:06 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -119,7 +119,7 @@ loadCgi( void )
      */
     {
         tNameMap* pNM = nameValueMap;
-        tNameIdx  ix  = 0;
+        tNameIdx  ix  = (tNameIdx)0;
 
         do  {
             static char zNUL[1] = "";

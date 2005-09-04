@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.6 2005/09/04 21:13:39 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -63,7 +63,7 @@ canReadFile( tCC* pzFName )
         return AG_FALSE;
     if (! S_ISREG( stbf.st_mode ))
         return AG_FALSE;
-    return (access( pzFName, R_OK) == 0);
+    return (access( pzFName, R_OK) == 0) ? AG_TRUE : AG_FALSE;
 }
 
 

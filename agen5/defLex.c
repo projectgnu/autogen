@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: defLex.c,v 4.7 2005/09/04 21:13:39 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -544,7 +544,7 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
                 /*
                  *  Return the keyword token code instead of DP_EV_NAME
                  */
-                *pRetVal = aKeywordTkn[ kw_ix ];
+                *pRetVal = (te_dp_event)aKeywordTkn[ kw_ix ];
                 break;
             }
         } while (++kw_ix < KEYWORD_CT);

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: funcFor.c,v 4.6 2005/09/04 21:13:39 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -306,7 +306,7 @@ doForByStep( tTemplate* pT,
 {
     int         loopCt    = 0;
     tDefEntry   textDef;
-    ag_bool     invert    = (pFS->for_by < 0);
+    ag_bool     invert    = (pFS->for_by < 0) ? AG_TRUE : AG_FALSE;
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
     tDefCtx     ctx       = currDefCtx;
 
@@ -411,8 +411,8 @@ doForByStep( tTemplate* pT,
         }
 
         pFS->for_lastFor = (invert)
-            ? (nextIdx < pFS->for_to)
-            : (nextIdx > pFS->for_to);
+            ? ((nextIdx < pFS->for_to) ? AG_TRUE : AG_FALSE)
+            : ((nextIdx > pFS->for_to) ? AG_TRUE : AG_FALSE);
 
         generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex );
         loopCt++;

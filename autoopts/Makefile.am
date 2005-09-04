@@ -8,7 +8,7 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.17 2005/04/10 20:32:23 bkorb Exp $
+## $Id: Makefile.am,v 4.18 2005/09/04 21:13:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -22,12 +22,13 @@ PATHFIND_MAN=
 endif
 
 GENMAN      = $(PATHFIND_MAN) \
-    ao_string_tokenize.3 configFileLoad.3 optionFileLoad.3 optionFindValue.3 \
-    optionFree.3         optionGetValue.3 optionLoadLine.3 optionNextValue.3 \
-    optionProcess.3      optionRestore.3  optionSaveFile.3 optionSaveState.3 \
-    optionUnloadNested.3 optionVersion.3  strequate.3      streqvcmp.3       \
-    streqvmap.3          strneqvcmp.3     strtransform.3
-
+    ao_string_tokenize.3  configFileLoad.3      optionFileLoad.3 \
+    optionFindNextValue.3 optionFindValue.3     optionFree.3 \
+    optionGetValue.3      optionLoadLine.3      optionNextValue.3 \
+    optionProcess.3       optionRestore.3       optionSaveFile.3 \
+    optionSaveState.3     optionUnloadNested.3  optionVersion.3 \
+    strequate.3           streqvcmp.3           streqvmap.3 \
+    strneqvcmp.3          strtransform.3
 MAN_STAMP   = man3-stamp
 
 GENTEXI     = libopts.texi libopts.menu

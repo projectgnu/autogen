@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.18 2005/07/27 06:20:30 bkorb Exp $
- *  Time-stamp:      "2005-07-26 10:07:26 bkorb"
+ *  $Id: configfile.c,v 4.19 2005/09/04 21:13:39 bkorb Exp $
+ *  Time-stamp:      "2005-07-27 10:09:29 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -152,7 +152,7 @@ configFileLoad( const char* pzFile )
         return NULL; /* errno is set */
 
     pRes = optionLoadNested(pzText, pzFile, strlen(pzFile), OPTION_LOAD_COOKED);
- all_done:
+
     if (pRes == NULL) {
         int err = errno;
         text_munmap( &cfgfile );
@@ -442,7 +442,6 @@ filePreset(
     tmap_info_t   cfgfile;
     char*         pzFileText =
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
-    char*         pzEndText;
     tOptState     st = OPTSTATE_INITIALIZER(PRESET);
 
     if (pzFileText == MAP_FAILED)
@@ -461,8 +460,6 @@ filePreset(
      */
     if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
         st.flags = OPTST_SET;
-
-    pzEndText = pzFileText + cfgfile.txt_size;
 
     do  {
         while (isspace( *pzFileText ))  pzFileText++;
@@ -706,7 +703,6 @@ handleStructure(
 
     char* pzName = ++pzText;
     char* pcNulPoint;
-    char* pzValStart;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
     pcNulPoint = pzText;
@@ -738,7 +734,6 @@ handleStructure(
             pzText++;
         return pzText;
     }
-    pzValStart = ++pzText;
 
     /*
      *  If we are here, we have a value.  Separate the name from the

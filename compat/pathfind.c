@@ -5,10 +5,10 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 2005/03/06 20:16:08 $
+ * Last Modified:    $Date: 2005/09/04 21:13:39 $
  *            by: bkorb
  *
- * $Id: pathfind.c,v 4.3 2005/03/06 20:16:08 bkorb Exp $
+ * $Id: pathfind.c,v 4.4 2005/09/04 21:13:39 bkorb Exp $
  */
 
 /* Code: */
@@ -283,8 +283,6 @@ extract_colon_unit( char* pzDir, const char *string, int *p_index )
 {
     char*  pzDest = pzDir;
     int    ix     = *p_index;
-
-    const char*  pzSrc  = string + *p_index;
 
     if (string == NULL)
         return NULL;

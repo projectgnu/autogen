@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: funcIf.c,v 4.5 2005/09/04 21:13:39 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -69,7 +69,7 @@ eval_true( void )
     char* pz = evalExpression( &needFree );
 
     if (isdigit( *pz ))
-        res = atoi( pz );
+        res = (atoi(pz) == 0) ? AG_FALSE : AG_TRUE;
 
     else switch (*pz) {
     case NUL:
