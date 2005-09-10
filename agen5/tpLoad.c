@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.6 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.7 2005/09/10 18:35:05 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -346,68 +346,26 @@ templateFixup( tTemplate* pTList, size_t ttlSize )
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-LOCAL void
-mapDataFile( tCC* pzFileName, tMapInfo* pMapInfo, tCC** papSuffixList )
-{
-    tSCC zOpen[] = "open";
-
-    static char  zRealFile[ MAXPATHLEN ];
-
-    /*
-     *  Find the template file somewhere
-     */
-    if (! SUCCESSFUL( findFile( pzFileName, zRealFile, papSuffixList )))
-        AG_ABEND( aprf( zCannot, ENOENT, "map data file", pzFileName,
-                        strerror( ENOENT )));
-
-    AGDUPSTR( pMapInfo->pzFileName, zRealFile, "mmapped file name" );
-
-    /*
-     *  The template file must really be a file.
-     */
-    {
-        struct stat stbf;
-        if (stat( zRealFile, &stbf ) != 0)
-            AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile,
-                            strerror( errno )));
-
-        if (! S_ISREG( stbf.st_mode ))
-            AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile,
-                            "wrong file type" ));
-
-        if (outTime <= stbf.st_mtime)
-            outTime = stbf.st_mtime + 1;
-        pMapInfo->size = stbf.st_size+1;
-    }
-
-    /*
-     *  Now open it and map it into memory
-     */
-    pMapInfo->fd = open( zRealFile, O_EXCL | O_RDONLY, 0 );
-    if (pMapInfo->fd == -1)
-        AG_ABEND( aprf( zCannot, errno, zOpen, zRealFile, strerror( errno )));
-
-    pMapInfo->pData =
-        mmap( NULL, pMapInfo->size, PROT_READ | PROT_WRITE,
-              MAP_PRIVATE, pMapInfo->fd, (off_t)0 );
-
-    if (pMapInfo->pData == (void*)(-1))
-        AG_ABEND( aprf( zCannot, errno, "mmap", zRealFile, strerror( errno )));
-}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Starting with the current directory, search the directory
- *  list trying to find the base template file name.
- */
 LOCAL tTemplate*
 loadTemplate( tCC* pzFileName )
 {
-    tSCC*        apzSfx[] = { "tpl", "agl", NULL };
-    static tMapInfo  mapInfo;
+    static tmap_info_t  mapInfo;
 
-    mapDataFile( pzFileName, &mapInfo, apzSfx );
+    {
+        tSCC*       apzSfx[] = { "tpl", "agl", NULL };
+        static char zRealFile[ MAXPATHLEN ];
+
+        /*
+         *  Find the template file somewhere
+         */
+        if (! SUCCESSFUL( findFile( pzFileName, zRealFile, apzSfx )))
+            AG_ABEND( aprf( zCannot, ENOENT, "map data file", pzFileName,
+                            strerror( ENOENT )));
+
+        if (text_mmap( zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo )
+            == MAP_FAILED)
+            AG_ABEND( aprf( "Could not open template '%s'", pzFileName ));
+    }
 
     {
         size_t       macroCt;
@@ -424,8 +382,8 @@ loadTemplate( tCC* pzFileName )
          */
         pCurMacro    = NULL;
         pCurTemplate = &tmpTpl;
-        tmpTpl.pzFileName = mapInfo.pzFileName;
-        pzData = loadPseudoMacro( (tCC*)mapInfo.pData, mapInfo.pzFileName );
+        AGDUPSTR( tmpTpl.pzFileName, pzFileName, "mmapped file name" );
+        pzData = loadPseudoMacro( (tCC*)mapInfo.txt_data, tmpTpl.pzFileName );
 
         /*
          *  Count the number of macros in the template.  Compute
@@ -435,8 +393,8 @@ loadTemplate( tCC* pzFileName )
          */
         macroCt = countMacros( pzData );
         alocSize = sizeof( *pRes ) + (macroCt * sizeof( tMacro ))
-                   + mapInfo.size - (pzData - (tCC*)mapInfo.pData)
-                   + strlen( mapInfo.pzFileName ) + 0x10;
+                   + mapInfo.txt_size - (pzData - (tCC*)mapInfo.txt_data)
+                   + strlen( pzFileName ) + 0x10;
         alocSize &= ~0x0F;
         pRes = (tTemplate*)AGALOC( alocSize, "main template" );
         memset( (void*)pRes, 0, alocSize );
@@ -450,12 +408,11 @@ loadTemplate( tCC* pzFileName )
         pRes->fd        = -1;
         strcpy( pRes->zStartMac, zStartMac ); /* must fit */
         strcpy( pRes->zEndMac, zEndMac );     /* must fit */
-        loadMacros( pRes, mapInfo.pzFileName, NULL, pzData );
+        loadMacros( pRes, tmpTpl.pzFileName, NULL, pzData );
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize,
                                      "resize template" );
 
-        munmap( mapInfo.pData, mapInfo.size );
-        close( mapInfo.fd );
+        text_munmap( &mapInfo );
         pRes = templateFixup( pRes, pRes->descSize );
         pCurTemplate = pSaveTpl;
         pCurMacro    = pSaveMac;

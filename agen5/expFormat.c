@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.4 2005/06/08 23:01:02 bkorb Exp $
+ *  $Id: expFormat.c,v 4.5 2005/09/10 18:35:05 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -440,7 +440,7 @@ SCM
 ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 {
     char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
-    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
+    char*   pzPrg   = ag_scm2zchars( prog_name, "program name" );
     char*   pzOwner = ag_scm2zchars( owner, "owner" );
     char*   pzRes;
     SCM     res;
@@ -499,7 +499,10 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
     char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
     char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
     char*   pzOwner = ag_scm2zchars( owner, "owner" );
-    static tMapInfo mi = { NULL, 0, 0, NULL };
+    static struct {
+        tCC*    pzFN;
+        tmap_info_t mi;
+    } lic = { NULL, { NULL, 0, 0, 0, 0, 0, 0, 0 }};
 
     char*     pzRes;
     SCM       res;
@@ -508,38 +511,39 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         return SCM_UNDEFINED;
 
     {
+        tSCC*  apzSfx[] = { "lic", NULL };
+        static char zRealFile[ MAXPATHLEN ];
         char* pzLicense = ag_scm2zchars( license, "license file name" );
 
         /*
-         *  Set the current file name.
-         *  If it changes, then unmap the old data
+         *  Find the template file somewhere
          */
-        if (mi.pzFileName == NULL)
-            mi.pzFileName = pzLicense;
+        if (! SUCCESSFUL( findFile( pzLicense, zRealFile, apzSfx )))
+            AG_ABEND( aprf( zCannot, ENOENT, "map license file", pzLicense,
+                            strerror( ENOENT )));
 
-        else if (strcmp( mi.pzFileName, pzLicense ) != 0) {
-            munmap( mi.pData, mi.size );
-            close( mi.fd );
-            mi.pData = NULL;
-            AGFREE( (void*)mi.pzFileName );
-            mi.pzFileName = pzLicense;
+        if ((lic.pzFN != NULL) && (strcmp( zRealFile, lic.pzFN ) != 0)) {
+            text_munmap( &lic.mi );
+            AGFREE( (void*)lic.pzFN );
+            lic.pzFN = NULL;
+        }
+
+        if (lic.pzFN == NULL) {
+            if (text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi)
+                == MAP_FAILED)
+                AG_ABEND( aprf( "Could not open license file '%s'", pzLicense));
+
+            AGDUPSTR( lic.pzFN, zRealFile, "license file name" );
         }
     }
 
     /*
-     *  Make sure the data are loaded and trim any white space.
-     *  If the data pointer is NULL, then we have put a Guile-allocated
-     *  string pointer into mi.pzFileName.  "mapDataFile" will insert
-     *  an AGSTRDUP-ed string there.
+     *  Trim trailing white space.
      */
-    if (mi.pData == NULL) {
-        char* pz;
-        tSCC*  apzSfx[] = { "lic", NULL };
-
-        mapDataFile( mi.pzFileName, &mi, apzSfx );
-
-        pz = (char*)mi.pData + mi.size - 1;
-        while (isspace( pz[-1] )) pz--;
+    {
+        char* pz = (char*)lic.mi.txt_data + lic.mi.txt_size;
+        while (isspace( pz[-1] ) && (pz > (char*)lic.mi.txt_data))
+            pz--;
         *pz = NUL;
     }
 
@@ -560,7 +564,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
     /*
      *  Reformat the string with the given arguments
      */
-    pzRes = aprf( (char*)mi.pData, pzPrg, pzOwner );
+    pzRes = aprf( (char*)lic.mi.txt_data, pzPrg, pzOwner );
     {
         int     pfx_size = strlen( pzPfx );
         char*   pzScan   = pzRes;

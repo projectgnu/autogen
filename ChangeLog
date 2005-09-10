@@ -1,3 +1,19 @@
+2005-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c(ag_scm_license): use text_mmap() instead of mmap.
+	* agen5/tpLoad.c(loadTemplate): ditto
+	(mapDataFile): obsolete
+	* agen5/test/license.test: extend the license and template files to
+	a multiple of a page size.
+	* autoopts/autoopts.h(tmap_info_t): move to export header (options.h)
+	* autoopts/options_h.tpl(tmap_info_t): add, including a "we had to
+	allocate the data anyway" flag
+	* autoopts/text_mmap.c(text_mmap): export as a private function and
+	add code to cope with failure to provide a final NUL byte with mmap
+	on anonymous regions and/or /dev/null.
+	(text_munmap): free any allocated memory due to mmap-ping NUL failure
+	* config/libopts.def(dev_null): new device test
+
 2005-09-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/getopt.test: disable unless autoopts-config installed.

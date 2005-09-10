@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-04-24 18:09:13 bkorb"
-# ID:  $Id: options_h.tpl,v 4.16 2005/05/27 17:39:01 bkorb Exp $
+# Time-stamp:      "2005-09-10 10:58:05 bkorb"
+# ID:  $Id: options_h.tpl,v 4.17 2005/09/10 18:35:05 bkorb Exp $
 
 =][=
 
@@ -321,6 +321,27 @@ typedef struct {
 #define streqvmap       option_streqvmap
 #define strequate       option_strequate
 #define strtransform    option_strtransform
+
+/*
+ *  This is an output only structure used by text_mmap and text_munmap.
+ *  Clients must not alter the contents and must provide it to both
+ *  the text_mmap and text_munmap procedures.  BE ADVISED: if you are
+ *  mapping the file with PROT_WRITE the NUL byte at the end MIGHT NOT
+ *  BE WRITABLE.  In any event, that byte is not be written back
+ *  to the source file.  ALSO: if "txt_data" is valid and "txt_errno"
+ *  is not zero, then there *may* not be a terminating NUL.
+ */
+typedef struct {
+    void*       txt_data;      /* text file data   */
+    size_t      txt_size;      /* actual file size */
+    size_t      txt_full_size; /* mmaped mem size  */
+    int         txt_fd;        /* file descriptor  */
+    int         txt_zero_fd;   /* fd for /dev/zero */
+    int         txt_errno;     /* warning code     */
+    int         txt_prot;      /* "prot" flags     */
+    int         txt_flags;     /* mapping type     */
+    int         txt_alloc;     /* if we malloced memory */
+} tmap_info_t;
 
 /*
  *  When loading a line (or block) of text as an option, the value can

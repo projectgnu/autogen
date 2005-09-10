@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/09/03 22:49:50 $
- *  Time-stamp:        "2005-08-28 10:59:45 bkorb"
+ *  Last Modified:     $Date: 2005/09/10 18:35:05 $
+ *  Time-stamp:        "2005-09-10 11:09:13 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.9 2005/09/03 22:49:50 bkorb Exp $
+ *  $Id: libopts.def,v 4.10 2005/09/10 18:35:05 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.9 $";
+version     = "$Revision: 4.10 $";
 output-file = libopts.m4;
 
 test   = {
@@ -97,6 +97,24 @@ test = {
 	   char* pz = pathfind( getenv( "PATH" ), "sh", "x" );
 	   return (pz == 0) ? 1 : 0;
 	}
+	_EOF_;
+
+    doc =
+    "Not all systems have pathfind(3).  See if we need to substitute.\n"
+    "To make this work, you have to do horrible things.  See the doc\n"
+    "for AG_CHECK_STRCSPN.";
+};
+
+test = {
+    name   = dev_zero;
+    type   = test;
+    check  = "/dev/zero is readable device";
+    action = { act-type = define; };
+
+    code   = <<-  _EOF_
+	dzero=`ls -l /dev/zero | egrep ^c......r`
+	test -z "${dzero}" && exit 1
+	echo ${dzero}
 	_EOF_;
 
     doc =

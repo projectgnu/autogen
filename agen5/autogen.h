@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.6 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: autogen.h,v 4.7 2005/09/10 18:37:28 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -262,13 +262,6 @@ struct fpStack {
     FILE*       pFile;
     tCC*        pzOutName;
 };
-
-typedef struct {
-    tCC*        pzFileName;
-    int         fd;
-    size_t      size;
-    void*       pData;
-} tMapInfo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

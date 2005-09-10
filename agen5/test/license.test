@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # license.test --- test license functionality
 #
-# Time-stamp:        "2005-03-07 13:05:25 bkorb"
+# Time-stamp:        "2005-09-10 11:10:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/09/10 18:35:05 $
 #            by: bkorb
 #
-# $Id: license.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
+# $Id: license.test,v 4.3 2005/09/10 18:35:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,35 +21,81 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<_EOF_
 [= AutoGen5 template test =]
 /*
-[= (license "$testname" "$testname" "Auto-Gen" " *  " ) =]
+[= (license "${testname}" "${testname}" "Auto-Gen" " *  " ) =]
  */
 _EOF_
 
 # # # # # # # # # # LICENSE FILE # # # # # # # # #
 
-echo creating $testname.lic
-cat > $testname.lic <<'_EOF_'
+echo creating ${testname}.lic
+cat > ${testname}.lic <<'_EOF_'
 This is a bogus license granted by %2$s for %1$s.
 Use it in good health
 _EOF_
 
+# # # # # # # # # # EXTEND FILES TO PAGESIZE # # # # # # # # #
+
+exec 5> ${testname}-extend.c
+
+cat >&5 <<- _EOF_
+	#define HAVE_CONFIG_H 1
+	#include "config.h"
+	#include "compat/compat.h"
+
+	int main( int argc, char** argv ) {
+	char z_tail[] = "=]\n */\n";
+	long offset = 0L - strlen(z_tail);
+	struct stat sb;
+	char* file = *++argv;
+	size_t sz;
+	FILE* fp = fopen(file, "a");
+
+	if (fp == NULL) return 1;
+	if (stat(file, &sb) != 0) return 1;
+	sz = 0x2000 - (sb.st_size & 0x1FFFUL);
+	while (sz > 0) {
+	  putc( '\n', fp ); sz--; }
+	fclose(fp);
+
+	file = *++argv;
+	fp = fopen( file, "r+" );
+	if (fp == NULL) return 1;
+	if (stat(file, &sb) != 0) return 1;
+	fseek(fp, offset, SEEK_END);
+	sz = 0x2000 - (sb.st_size & 0x1FFFUL);
+	while (sz > 0) {
+	  putc( '\n', fp ); sz--; }
+	fputs(z_tail, fp);
+	fclose(fp);
+	return 0; }
+	_EOF_
+
+CFLAGS=$(
+  echo ${CFLAGS} -I${top_builddir} -I${top_builddir}/agen5)
+
+${CC} -g ${CFLAGS} -o ${testname}-extend ${testname}-extend.c || \
+  failure "Cannot compile ${testname}-extend.c"
+
+./${testname}-extend ${testname}.lic ${testname}.tpl
+ls -l ${testname}.???
+
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
-echo creating $testname.out
+echo creating ${testname}.out
 # this is the output we should expect to see
-cat > $testname.out <<_EOF_
+cat > ${testname}.out <<_EOF_
 /*
- *  This is a bogus license granted by Auto-Gen for $testname.
+ *  This is a bogus license granted by Auto-Gen for ${testname}.
  *  Use it in good health
  */
 _EOF_
 
-${AGexe} -b $testname --no-def -T $testname.tpl || failure ${AGexe} failed
-cmp -s $testname.test $testname.out || failure unexpected output
+${AGexe} -b ${testname} --no-def -T ${testname}.tpl || failure ${AGexe} failed
+cmp -s ${testname}.test ${testname}.out || failure unexpected output
 
 cleanup
 

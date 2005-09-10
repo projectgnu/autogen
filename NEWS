@@ -1,17 +1,21 @@
 New in __CURRENT_VERSION__ - September, 2005
 
+* Definition and license text files were mmap-ed in without checking for
+  the size being a multiple of a page.  strlen() would seg fault.
+  Horrible, horrible design of mmap!
+* disable autoopts/test/getopt.test unless autoopts has been fully installed.
+  (It requires getopt.tpl which requires a fully installed environment.)
+* several other usability improvements to the tear off library.
+
+New in 5.7.2 - July 2005
+
 * template shell code may now use a shell function "die" that will print
   an error message and shoot down the master autogen process.
 * the tear-off/add-in libopts library will now specify that the
   "options.h" header is to be installed.
-* several other usability improvements to the tear off library, too.
-  The 5.7.2-pre series is designed to iron out issues for folks wanting
-  to smoothly roll libopts into their distributions and installations.
 * realpath(3C) usage in libopts has been cleaned up.  It is now only used
   if PATH_MAX is defined for the platform.  canonicalize_file_name(3C) is
   used where available.
-* disable autoopts/test/getopt.test unless autoopts has been fully installed.
-  (It requires getopt.tpl which requires a fully installed environment.)
 
 New in 5.7.1 - June, 2005
 
