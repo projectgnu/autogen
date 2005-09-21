@@ -1,3 +1,15 @@
+2005-09-20  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(compat/snprintf.c): include if needed
+	(compat/strdup.c): ditto
+	* autoopts/autoopts.h: omit redundant includes
+	* compat/Makefile.am(strsignal.h): maintainer cleanable
+	* compat/compat.h: make sure we define all the "extra" stuff we need.
+	* compat/strdup.c: new
+	* compat/snprintf.c: new
+	* config/libopts.def: cleanups.  Add missing type and size checks
+	* pkg/libopts/mklibsrc.sh: adjust for changed contents of libopts.c
+
 2005-09-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expFormat.c(ag_scm_license): use text_mmap() instead of mmap.

@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-09-04 13:19:24 bkorb"
+## Time-stamp:      "2005-09-18 12:00:07 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.18 2005/09/04 20:24:49 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.19 2005/09/21 03:42:25 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -34,7 +34,7 @@ cd ${top_builddir}/autoopts
 files=`fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
            -e '/^streqvcmp\.c$/d' \
-           -e '/^config\.h$/d' \
+           -e '/^compat\/compat\.h$/d' \
            -e '/^autoopts\.h$/d'`
 for f in libopts.c ${files}
 do
@@ -72,7 +72,7 @@ cat >> libopts.m4 <<-	\EOMacro
 	dnl @synopsis  LIBOPTS_CHECK
 	dnl
 	dnl If autoopts-config works, add the linking information to LIBS.
-	dnl Otherwise, add \`\`libopts-${ao_rev}'' to SUBDIRS and run all
+	dnl Otherwise, add ``libopts-${ao_rev}'' to SUBDIRS and run all
 	dnl the config tests that the library needs.  Invoke the
 	dnl "INVOKE_LIBOPTS_MACROS" macro iff we are building libopts.
 	dnl

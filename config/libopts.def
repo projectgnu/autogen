@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/09/10 18:35:05 $
- *  Time-stamp:        "2005-09-10 11:09:13 bkorb"
+ *  Last Modified:     $Date: 2005/09/21 03:42:25 $
+ *  Time-stamp:        "2005-09-18 11:47:25 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.10 2005/09/10 18:35:05 bkorb Exp $
+ *  $Id: libopts.def,v 4.11 2005/09/21 03:42:25 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.10 $";
+version     = "$Revision: 4.11 $";
 output-file = libopts.m4;
 
 test   = {
@@ -231,9 +231,6 @@ test = {
 
 do-first = <<-_EOF_
 
-	# ----------------------------------------------------------------------
-	# Check for standard headers.
-	# ----------------------------------------------------------------------
 	# =================
 	# AC_HEADER_STDC
 	# =================
@@ -243,9 +240,9 @@ do-first = <<-_EOF_
 	# =================
 	AC_HEADER_DIRENT
 
-	# ----------------------------------------------------------------------
-	# AC_CHECK_HEADERS Check for list of headers.
-	# ----------------------------------------------------------------------
+	# =================
+	# AC_CHECK_HEADERS
+	# =================
 	AC_CHECK_HEADERS(dlfcn.h errno.h fcntl.h libgen.h memory.h netinet/in.h \
 	  setjmp.h sys/mman.h sys/param.h sys/poll.h sys/procset.h sys/select.h \
 	  sys/socket.h sys/stropts.h sys/time.h sys/un.h sys/wait.h unistd.h)
@@ -253,10 +250,10 @@ do-first = <<-_EOF_
 	# --------------------------------------------
 	# Verify certain entries from AC_CHECK_HEADERS
 	# --------------------------------------------
-	for f in sys_types sys_mman sys_param sys_stat sys_wait \
+	[for f in sys_types sys_mman sys_param sys_stat sys_wait \
 	         string errno stdlib memory setjmp
 	do eval as_ac_var=\${ac_cv_header_${f}_h+set}
-	   test "${as_ac_var}" = set || \
+	   test "${as_ac_var}" = set] || \
 	     AC_MSG_ERROR([You must have ${f}.h on your system])
 	done
 
@@ -265,7 +262,7 @@ do-first = <<-_EOF_
 	# if varargs.h is present define HAVE_VARARGS_H.
 	# =================
 	AC_CHECK_HEADERS(stdarg.h varargs.h, break)
-	if test `eval echo '${'$as_ac_Header'}'` != yes; then
+	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have stdarg.h or varargs.h on your system])
 	fi
 
@@ -273,7 +270,7 @@ do-first = <<-_EOF_
 	# Similarly for the string.h and strings.h headers
 	# =================
 	AC_CHECK_HEADERS(string.h strings.h, break)
-	if test `eval echo '${'$as_ac_Header'}'` != yes; then
+	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have string.h or strings.h on your system])
 	fi
 
@@ -281,7 +278,7 @@ do-first = <<-_EOF_
 	# ...and limits headers
 	# =================
 	AC_CHECK_HEADERS(limits.h sys/limits.h values.h, break)
-	if test `eval echo '${'$as_ac_Header'}'` != yes; then
+	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have one of limits.h, sys/limits.h or values.h])
 	fi
 
@@ -292,12 +289,21 @@ do-first = <<-_EOF_
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
 	   intptr_t, uintptr_t])
 
+	# =================
+	# uintptr type & sizes
+	# =================
+	AC_CHECK_TYPES([uintptr_t], ,
+	       [AC_DEFINE(uintptr_t, unsigned long,
+	                  [Alternate uintptr_t for systems without it.])])
+	AC_CHECK_SIZEOF(char*, 4)
+	AC_CHECK_SIZEOF(int,   4)
+	AC_CHECK_SIZEOF(long,  4)
+	AC_CHECK_SIZEOF(short, 2)
+
 	# ----------------------------------------------------------------------
 	# AC_CHECK_LIB for SVR4 libgen, and use it if it defines pathfind.
 	# ----------------------------------------------------------------------
 	AC_CHECK_LIB(gen, pathfind)
-	AC_CHECK_FUNCS(mmap canonicalize_file_name)
-	# =================
-	# ...and int types
-	# =================
+	AC_FUNC_VPRINTF
+	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup])
 	_EOF_;
