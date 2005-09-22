@@ -1,6 +1,6 @@
 
 #ifndef HAVE_VPRINTF
-choke-me: no vprintf and no snprintf
+#include "choke-me: no vprintf and no snprintf"
 #endif
 
 static int

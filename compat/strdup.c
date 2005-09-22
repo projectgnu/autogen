@@ -10,7 +10,7 @@ strdup( const char *s )
     if (s == NULL)
 	return NULL;
 
-    cp = (char *) malloc((unsigned) (strlen(s)+1));
+    cp = (char *) AGALOC((unsigned) (strlen(s)+1), "strdup");
 
     if (cp != NULL)
 	(void) strcpy(cp, s);
