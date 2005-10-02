@@ -1,3 +1,10 @@
+2005-10-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(compat/snprintf.c): always omit when building
+	full AutoGen with libsnprintfv
+	* autoopts/Makefile.am: indicate we have libsnprintfv
+	* pkg/libopts/mklibsrc.sh: remove that indication from tear-off lib.
+
 2005-09-21  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(compat/snprintf.c): include if needed

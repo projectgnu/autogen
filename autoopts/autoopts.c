@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.15 2005/09/21 03:42:25 bkorb Exp $
- *  Time-stamp:      "2005-09-18 11:48:37 bkorb"
+ *  $Id: autoopts.c,v 4.16 2005/10/02 17:00:21 bkorb Exp $
+ *  Time-stamp:      "2005-10-02 09:46:35 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -56,12 +56,15 @@
 #  include "compat/pathfind.c"
 #endif
 
-#ifndef HAVE_SNPRINTF
-#  include "compat/snprintf.c"
-#endif
+#ifndef HAVE_LIBSNPRINTFV
+# error we should have that library
+# ifndef HAVE_SNPRINTF
+#   include "compat/snprintf.c"
+# endif
 
-#ifndef HAVE_STRDUP
-#  include "compat/strdup.c"
+# ifndef HAVE_STRDUP
+#   include "compat/strdup.c"
+# endif
 #endif
 
 static const char zNil[] = "";

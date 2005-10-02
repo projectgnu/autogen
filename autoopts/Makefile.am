@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-09-20 19:27:57 bkorb"
+## Time-stamp:      "2005-10-02 09:49:52 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.19 2005/09/21 03:42:25 bkorb Exp $
+## $Id: Makefile.am,v 4.20 2005/10/02 17:00:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -109,6 +109,7 @@ EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 libopts.c : $(HDRS) $(CSRC)
 	( echo '#define AUTOOPTS_INTERNAL' ; \
 	echo '#include "compat/compat.h"' ; \
+	echo '#define HAVE_LIBSNPRINTFV' ; \
 	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
