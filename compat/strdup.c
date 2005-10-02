@@ -1,5 +1,5 @@
 /*
- * Define malloc and friends.
+ * Platforms without strdup ?!?!?!
  */
 
 static char *

@@ -2,12 +2,12 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2005-09-20 19:29:16 bkorb"
+ *  Time-stamp:      "2005-09-21 20:56:13 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.6 2005/09/21 03:42:25 bkorb Exp $
+ * $Id: compat.h,v 4.7 2005/10/02 16:34:45 bkorb Exp $
  */
 #ifndef COMPAT_H
 #define COMPAT_H 1
@@ -203,31 +203,31 @@
 #endif
 
 #ifndef HAVE_INT8_T
-  typedef signed char   int8_t;
+  typedef signed char       int8_t;
 #endif
 #ifndef HAVE_UINT8_T
-  typedef unsigned char uint8_t;
+  typedef unsigned char     uint8_t;
 #endif
 #ifndef HAVE_INT16_T
-  typedef signed short  int16_t;
+  typedef signed short      int16_t;
 #endif
 #ifndef HAVE_UINT16_T
-  typedef unsigned short uint16_t;
+  typedef unsigned short    uint16_t;
 #endif
 
 #ifndef HAVE_INT32_T
 # if SIZEOF_INT == 4
-	typedef signed int  int32_t;
+	typedef signed int      int32_t;
 # elif SIZEOF_LONG == 4
-	typedef signed int  int32_t;
+	typedef signed long     int32_t;
 # endif
 #endif
 
 #ifndef HAVE_UINT32_T
-# if SIZEOF_UINT == 4
-	typedef unsigned int uint32_t;
+# if SIZEOF_INT == 4
+	typedef unsigned int    uint32_t;
 # elif SIZEOF_LONG == 4
-	typedef unsigned int uint32_t;
+	typedef unsigned long   uint32_t;
 # else
 #   error Cannot create a uint32_t type.
 # endif

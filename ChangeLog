@@ -1,4 +1,4 @@
-2005-09-20  Bruce Korb  <bkorb@gnu.org>
+2005-09-21  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(compat/snprintf.c): include if needed
 	(compat/strdup.c): ditto
@@ -60,7 +60,6 @@
 	(fsm-proc-variables): ditto
 	* agen5/funcFor.c(doForByStep): ditto
 	* agen5/funcIf.c(eval_true): ditto
-	* agen5/opts.def(): ditto
 	* agen5/opts.def(load-scheme): ditto
 	* agen5/tpLoad.c(canReadFile): ditto
 	* autoopts/configfile.c(configFileLoad): ditto
