@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.16 2005/10/02 17:00:21 bkorb Exp $
- *  Time-stamp:      "2005-10-02 09:46:35 bkorb"
+ *  $Id: autoopts.c,v 4.17 2005/10/02 17:38:42 bkorb Exp $
+ *  Time-stamp:      "2005-10-02 10:37:29 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -57,7 +57,6 @@
 #endif
 
 #ifndef HAVE_LIBSNPRINTFV
-# error we should have that library
 # ifndef HAVE_SNPRINTF
 #   include "compat/snprintf.c"
 # endif
