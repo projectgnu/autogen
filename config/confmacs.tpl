@@ -216,7 +216,7 @@ DEFINE  emit-results   =][=
 
     == yes-define        =][=
       (set! good-text (string-append good-text
-            "\n    AC_DEFINE" (if (exist? "unquoted") "UNQUOTED" "")
+            "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
             "([" (sprintf good-define-name up-name) "],["
             (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if " (protect-text (get "check")) "])" ))
@@ -235,7 +235,7 @@ DEFINE  emit-results   =][=
 
     ==  no-define        =][=
       (set! bad-text (string-append bad-text
-            "\n    AC_DEFINE" (if (exist? "unquoted") "UNQUOTED" "")
+            "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
             "([" (sprintf bad-define-name up-name) "],["
             (if (> (string-length tmp-text) 0) tmp-text "1")
             "],\n        [Define this if '" (protect-text (get "check"))
