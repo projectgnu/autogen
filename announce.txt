@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.4 2005/09/04 20:24:49 bkorb Exp $
+# $Id: announce.txt,v 4.5 2005/10/22 21:57:43 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -41,16 +41,9 @@ pending further testing.")
   ftpurl=http://autogen.sf.net/data
   ;;
 
-*.*.* )
-  alpha_rel="This is a bugfix release of ${project}"
-  to_line='To: autogen-announce@lists.sf.net'
-  cc_line=""
-  ftpurl=ftp://ftp.gnu.org/gnu/${project}/rel-${AG_VERSION}
-  ;;
-
 * )
   alpha_rel=""
-  to_line='GNU Announcements <info-gnu@gnu.org>'
+  to_line='To: GNU Announcements <info-gnu@gnu.org>'
   cc_line="Cc: autogen-announce@lists.sf.net${nl}"
   recip=$(echo ${recip} info-gnu@gnu.org)
   ftpurl=ftp://ftp.gnu.org/gnu/${project}/rel-${AG_VERSION}
@@ -91,6 +84,8 @@ cat >&3 <<_EOF_
 AutoGen home:    http://www.gnu.org/software/${project}/
 primary ftp:     ${ftpurl}/
 .tar.gz:         ${ftpurl}/${project}-${AG_VERSION}.tar.gz
+library project: $(echo ${ftpurl} | \
+  sed "s,${project}/.*,libopts/rel${AO_CURRENT}.${AO_REVISION}/,")
 bug reports:     autogen-users at the SourceForge net domain
 bug archive:     http://sourceforge.net/mailarchive/forum.php?forum_id=7034
 maintainer:      Bruce Korb - bkorb at the usual GNU domain

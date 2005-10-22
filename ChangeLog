@@ -1,3 +1,39 @@
+2005-10-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(zCmdFmt): add a command number to the closing echo
+	(closeServer): flush the write buffer to be extra sure it is pushed
+	out and won't be read by the next process.
+	(SHOW_SHELL): obsolete option - use TRACE_SERVER_SHELL instead
+	(serverSetup): ditto
+	(chainOpen): flush tracing fp too.  Also, use it for stderr.
+	(loadData): is static.  Make it so.  Also, fgets may fail on the first
+	read of a new process instead of waiting for input.  Retry the read
+	if it fails and is not EOF.  Log both input to and output from the
+	server shell if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+	* agen5/fmemopen.c(_GNU_SOURCE): avoid duplicate define
+	* agen5/opts.def(show-shell): obsolete
+	(trace): server-shell is a new keyword
+	* autoopts/options_h.tpl(TEXT_MMAP_FAILED_ADDR): macro to test for mmap
+	failure cast in ways to make all platforms happy.
+	* agen5/expFormat.c(ag_scm_license): use the mmap failure test macro
+	* agen5/tpLoad.c(loadTemplate): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	* agen5/test/shell.test: rework so it can catch the timing issue fixed
+	in agShell.c.
+	* autoopts/test/Makefile.am(LD_LIBRARY_PATH): must be set to ensure we
+	get our built libraries ahead of installed libraries.
+	* config/bootstrap.local(tree_tops): be more selective about which files
+	we link into our build tree.
+
+2005-10-08  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7.3 Released
+
+	* agen5/fmemopen.c(_GNU_SOURCE): do not doubly define
+	* agen5/test/license.test(CFLAGS): do not use shell POSIX-isms
+	* autoopts/test/Makefile.am(LD_RUN_PATH): make sure we can find
+	the libguile library when running tests
+
 2005-10-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(compat/snprintf.c): always omit when building

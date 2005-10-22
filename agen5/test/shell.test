@@ -2,17 +2,17 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2005-03-07 13:07:27 bkorb"
+# Time-stamp:        "2005-10-22 14:04:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/10/22 21:57:43 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.3 2005/03/13 19:30:08 bkorb Exp $
+# $Id: shell.test,v 4.4 2005/10/22 21:57:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
@@ -26,85 +26,103 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > ${testname}.c <<'_EOF_'
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-char buf[ 4096 ];
-int
-main( int argc, char** argv )
-{
-  for (;;) {
-    char* pz = fgets(buf, sizeof(buf),stdin);
-    if (pz == NULL)
-      break;
-    while (isspace(*pz)) pz++;
-    if (strncmp( pz, "cd ", 3 ) == 0) /* drop the cd commands */
-      continue;
-    if ((strncmp( pz, "echo", 4 ) == 0) && isspace( pz[4] )) {
-      pz += 5;
-      while (isspace(*pz)) pz++;  /* suppress the 'echo' */
-    }
-    if (*pz == '\0') pz--;  /* always force a newline */
-    fputs( pz, stdout );
-    fflush( stdout );
-  }
-  return 0;
-}
-_EOF_
-$CC -o ${testname} ${testname}.c
+cat > ${testname}.c <<- \_EOF_
+	#include <stdio.h>
+	#include <string.h>
+	#include <ctype.h>
+	#define NUL '\0'
+	char buf[ 4096 ];
+	int
+	main( int argc, char** argv )
+	{
+	  char *pz;
+	  for (;;) {
+	    pz = fgets(buf, sizeof(buf),stdin);
+	    if (pz == NULL)
+	      return 1; /* must get something every time */
+	    while (isspace(*pz)) pz++;
+	    if (*pz != NUL) break; /* ignore initial blank lines */
+	  }
+
+	  for (;;) {
+	    if (*pz == '#') goto next_line;
+	    if (strncmp( pz, "cd ", 3 ) == 0) goto next_line;
+	    if ((strncmp( pz, "echo", 4 ) == 0) && isspace( pz[4] )) {
+	      pz += 5;
+	      while (isspace(*pz)) pz++;  /* suppress the 'echo' */
+	    }
+	    if (*pz == '\0') pz--;  /* always force a newline */
+	    fputs( pz, stdout );
+	    fflush( stdout );
+
+	  next_line:
+	    pz = fgets(buf, sizeof(buf),stdin);
+	    if (pz == NULL)
+	      break;
+	    while (isspace(*pz)) pz++;
+	  }
+	  return 0;
+	}
+	_EOF_
+
+$CC -o ${testname} ${testname}.c || \
+   failure "could not compile shell"
 
 #  The backslashes are stripped by the here-doc processing
 #
 echo creating ${testname}.tpl
-cat > ${testname}.tpl <<_EOF_
-<= AutoGen5 template test
-   (setenv "SHELL" "./${testname}") =>
-<=\` echo SHELL=\$SHELL \`=>
-Some <=dummy=> text
-<= FOR foo =>
-foo[<=(for-index)=>]       = <=foo=>
-raw-shell-str: <=(raw-shell-str (get "foo"))=>
-shell-str:     <=(shell-str (get "foo"))=>
-sub-shell-str: <=(sub-shell-str (get "foo"))=>
-<= ENDFOR =>
-<=\`   : This is a final test \`=>
-_EOF_
+cat > ${testname}.tpl <<-  _EOF_
+	<= AutoGen5 template test
+	   (setenv "SHELL" "./${testname}") =>
+	<=\` echo SHELL=\$SHELL \`=>
+	Some <=dummy=> text
+	<= FOR foo =>
+	foo[<=(for-index)=>]       = <=foo=>
+	raw-shell-str: <=(raw-shell-str (get "foo"))=>
+	shell-str:     <=(shell-str (get "foo"))=>
+	sub-shell-str: <=(sub-shell-str (get "foo"))=>
+	<= ENDFOR =>
+	<=\`   : This is a final test  \`=>
+	_EOF_
 
 echo creating ${testname}.def
-cat >${testname}.def <<'EOF'
-AutoGen Definitions shell.tpl;
+cat >${testname}.def <<- \_EOF_
+	AutoGen Definitions shell.tpl;
 
-foo = "''foo'' 'foo' \"foo\" `foo` $foo";
-foo = '\\\'bar\\\' \\"bar\\" \`bar\` \$bar';
-foo = '\\\\\'BAZ\\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ';
-EOF
-echo 'dummy = `echo "mumble"`;' >> ${testname}.def
+	foo = "''foo'' 'foo' \"foo\" `foo` $foo";
+	foo = '\\\'bar\\\' \\"bar\\" \`bar\` \$bar';
+	foo = '\\\\\'BAZ\\\\\' \\\\"BAZ\\\\" \\\`BAZ\\\` \\\$BAZ';
+	dummy = `echo "mumble"`; /* processed with regular shell */
+	_EOF_
 
 # this is the output we should expect to see
-cat > ${testname}.sample <<'_EOF_'
-SHELL=$SHELL
-Some mumble text
+cat > ${testname}.sample <<-  \_EOF_
+	SHELL=$SHELL
+	Some mumble text
 
-foo[0]       = ''foo'' 'foo' "foo" `foo` $foo
-raw-shell-str: \'\''foo'\'\'' '\''foo'\'' "foo" `foo` $foo'
-shell-str:     "''foo'' 'foo' \"foo\" `foo` $foo"
-sub-shell-str: `''foo'' 'foo' "foo" \`foo\` $foo`
+	foo[0]       = ''foo'' 'foo' "foo" `foo` $foo
+	raw-shell-str: \'\''foo'\'\'' '\''foo'\'' "foo" `foo` $foo'
+	shell-str:     "''foo'' 'foo' \"foo\" `foo` $foo"
+	sub-shell-str: `''foo'' 'foo' "foo" \`foo\` $foo`
 
-foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
-raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
-shell-str:     "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
-sub-shell-str: `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
+	foo[1]       = \'bar\' \"bar\" \`bar\` \$bar
+	raw-shell-str: '\'\''bar\'\'' \"bar\" \`bar\` \$bar'
+	shell-str:     "\\'bar\\' \\\"bar\\\" \`bar\` \$bar"
+	sub-shell-str: `\\'bar\\' \"bar\" \\\`bar\\\` \$bar`
 
-foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
-raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
-shell-str:     "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
-sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
+	foo[2]       = \\'BAZ\\' \\"BAZ\\" \\`BAZ\\` \\$BAZ
+	raw-shell-str: '\\'\''BAZ\\'\'' \\"BAZ\\" \\`BAZ\\` \\$BAZ'
+	shell-str:     "\\\\'BAZ\\\\' \\\\\"BAZ\\\\\" \\\`BAZ\\\` \\\$BAZ"
+	sub-shell-str: `\\\\'BAZ\\\\' \\\"BAZ\\\" \\\\\`BAZ\\\\\` \\\$BAZ`
 
-: This is a final test
-_EOF_
+	: This is a final test
+	_EOF_
 
-${AGexe} ${testname}.def || failure "${AGexe} ${testname}.def"
+trace="--trace-out=${testname}-trace.log --trace=server"
+
+${AGexe} ${trace} ${testname}.def || \
+   failure "${AGexe} ${testname}.def"
+
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup
      exit 0
@@ -129,7 +147,7 @@ failure "`set +x;diff -c ${testname}.sample ${testname}.test`"
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
+## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

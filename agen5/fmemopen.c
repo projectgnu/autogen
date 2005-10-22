@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2005
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2005-03-11 07:26:15 bkorb"
+ * Time-stamp:      "2005-10-08 10:41:06 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -55,7 +55,7 @@
  * - See the man page.
  */
 
-#if defined(__linux)
+#if defined(__linux) && ! defined(_GNU_SOURCE)
 #  define _GNU_SOURCE
 #endif
 

@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-07-11 20:40:46 bkorb"
+# Time-stamp:        "2005-10-12 08:46:42 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.13 2005/07/13 02:51:45 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.14 2005/10/22 21:57:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 add_make_links()
@@ -17,6 +17,7 @@ add_make_links()
 
   (
     sed 2q configure.tmp
+    print tree_tops=\"$(echo AUTHORS COPYING ChangeLog [I-Za-z]*)\"
     cat <<-	'_EOF_'
 
 	#MAKE LINK TREE
@@ -26,14 +27,14 @@ add_make_links()
 	top_srcdir=`cd $top_srcdir && pwd`
 	if test "$top_srcdir" = "$top_builddir" ; then : ; else
 	  ( cd $top_srcdir
-	    find [a-z]* -type d -print ) |
+	    find ${tree_tops} -type d -print 2>/dev/null) |
 	  grep -v '/CVS\|/RCS' |
 	  while read f
 	  do test -d $f || mkdir $f
 	  done
 
 	  ( cd $top_srcdir
-	    find [a-zA-Z]* \( -type f -o -type l \) -print ) |
+	    find ${tree_tops} \( -type f -o -type l \) -print 2>/dev/null) |
 	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
 	  while read f
 	  do

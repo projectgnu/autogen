@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2005-06-26 08:13:00 bkorb"
+## Time-stamp:      "2005-10-08 11:08:19 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/06/26 16:24:45 $
+## Last Modified:   $Date: 2005/10/22 21:57:43 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2005/06/26 16:24:45 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2005/10/22 21:57:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -23,7 +23,8 @@ testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = AGexe=$(AGexe) CLexe=$(CLexe) GDexe=$(GDexe) \
 	CC="$(CC)" CFLAGS='$(DEFS) $(CFLAGS)' \
-	LD_LIBRARY_PATH=$(LIBGUILE_PATH):$${LD_LIBRARY_PATH-..} \
+	LD_LIBRARY_PATH=$(LIBGUILE_PATH):$${LD_LIBRARY_PATH-../.libs} \
+	LD_RUN_PATH=$(LIBGUILE_PATH):$${LD_RUN_PATH-../.libs} \
 	PATH="`cd $(top_builddir)/columns > /dev/null ; pwd`:$$PATH" \
 	LIB="@LDFLAGS@ `cd $(top_builddir)/autoopts/.libs/ > /dev/null ; \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \

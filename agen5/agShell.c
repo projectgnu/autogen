@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: agShell.c,v 4.8 2005/10/22 21:57:43 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -47,8 +47,10 @@ static tpfPair serverPair = { NULL, NULL };
 static pid_t   serverId   = NULLPROCESS;
 static tpChar  pCurDir    = NULL;
 static ag_bool errClose   = AG_FALSE;
+static int     logCount   = 0;
+static tCC     logIntroFmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
 
-tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s\n";
+tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s - %d\n";
 
 const char* pzLastCmd = NULL;
 
@@ -59,6 +61,9 @@ sigHandler( int signo );
 
 static void
 serverSetup( void );
+
+static char*
+loadData( void );
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -79,6 +84,15 @@ closeServer( void )
      */
     if (procState != PROC_STATE_ABORTING) {
         (void)fclose( serverPair.pfRead );
+        /*
+         *  This is _completely_ wrong, but sometimes there are data left
+         *  hanging about that gets sucked up by the _next_ server shell
+         *  process.  That should never, ever be in any way possible, but
+         *  it is the only explanation for a second server shell picking up
+         *  the initialization string twice.  It must be a broken timing
+         *  issue in the Linux stdio code.  I have no other explanation.
+         */
+        fflush( serverPair.pfWrite );
         (void)fclose( serverPair.pfWrite );
     }
 
@@ -97,7 +111,7 @@ sigHandler( int signo )
     {
         const char* pz = (pzLastCmd == NULL)
             ? "?? unknown ??\n" : pzLastCmd;
-        fprintf( pfTrace, zCmdFmt, pCurDir, pz, zShDone );
+        fprintf( pfTrace, zCmdFmt, pCurDir, pz, zShDone, logCount );
     }
     pzLastCmd = NULL;
     closeServer();
@@ -120,13 +134,13 @@ serverSetup( void )
 
             (void)atexit( &closeServer );
             pCurDir = (tpChar)getcwd( p, MAXPATHLEN );
-#if defined( DEBUG_ENABLED )
-            if (HAVE_OPT( SHOW_SHELL ))
+
+            if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
                 fputs( "\nServer First Start\n", pfTrace );
         }
         else {
-            fputs( "\nServer Restart\n", pfTrace );
-#endif
+            if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+                fputs( "\nServer Restart\n", pfTrace );
         }
     }
 
@@ -145,16 +159,23 @@ serverSetup( void )
         if (pzPid == NULL)
             pzPid = zShellInit + strlen(zShellInit);
         sprintf( pzPid, "%d\n", getpid() );
-        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
+        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
+                 zShDone, ++logCount );
+
+        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+            fprintf( pfTrace, logIntroFmt, logCount );
+            fprintf( pfTrace, zCmdFmt, pCurDir, pzLastCmd, zShDone, logCount );
+        }
+
         (void)fflush( serverPair.pfWrite );
-        pz = loadData( serverPair.pfRead );
-#if defined( DEBUG_ENABLED )
-        if (HAVE_OPT( SHOW_SHELL ) && (*pz != NUL))
-            fprintf( pfTrace, "Trap set result:  `%s'\n", pz );
+        pz = loadData();
+        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+            fputs( "(result discarded)\n", pfTrace );
         AGFREE( (void*)pz );
     }
 
-    if (HAVE_OPT( SHOW_SHELL )) {
+#if defined( DEBUG_ENABLED )
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         tSCC zSetup[] = "set -x\n"
                         "exec 2> /dev/tty\n"
                         "trap\n"
@@ -163,13 +184,21 @@ serverSetup( void )
 
         fputs( "Server traps set\n", pfTrace );
         pzLastCmd = zSetup;
-        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd, zShDone );
+        fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
+                 zShDone, ++logCount );
+        if (pfTrace != stderr) {
+            fprintf( pfTrace, logIntroFmt, logCount );
+            fprintf( pfTrace, zCmdFmt, pCurDir, pzLastCmd, zShDone, logCount );
+        }
+
         (void)fflush( serverPair.pfWrite );
-        pz = loadData( serverPair.pfRead );
+        pz = loadData();
+        if (pfTrace != stderr)
+            fputs( "(result discarded)\n", pfTrace );
         fprintf( pfTrace, "Trap state:\n%s\n", pz );
-#endif
         AGFREE( (void*)pz );
     }
+#endif
     pzLastCmd = NULL;
 }
 
@@ -264,6 +293,7 @@ chainOpen( int       stdinFd,
 #endif
     fflush( stdout );
     fflush( stderr );
+    fflush( pfTrace );
 
     /*
      *  Call fork() and see which process we become
@@ -284,10 +314,10 @@ chainOpen( int       stdinFd,
 
         close( stdinFd );
         close( stdoutPair.writeFd );
-#if defined( DEBUG_ENABLED )
-        if (HAVE_OPT( SHOW_SHELL ))
+        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
             fprintf( pfTrace, "Server shell is pid %d\n", chId );
-#endif
+
+        fflush( pfTrace );
         return stdoutPair.readFd;
 
     case NULLPROCESS:  /* child - continue processing */
@@ -295,22 +325,26 @@ chainOpen( int       stdinFd,
     }
 
     /*
-     *  Close the pipe end handed back to the parent process
+     *  Close the pipe end handed back to the parent process,
+     *  plus stdin and stdout.
      */
     close( stdoutPair.readFd );
-
-    /*
-     *  Close our current stdin and stdout
-     */
     close( STDIN_FILENO );
     close( STDOUT_FILENO );
 
     /*
-     *  Make the fd passed in the stdin, and the write end of
-     *  the new pipe become the stdout.
+     *  Set stdin/out to the fd passed in and the write end of our new pipe.
      */
     fcntl( stdoutPair.writeFd, F_DUPFD, STDOUT_FILENO );
     fcntl( stdinFd,            F_DUPFD, STDIN_FILENO );
+
+    /*
+     *  set stderr to our trace file (if not stderr).
+     */
+    if (pfTrace != stderr) {
+        close( STDERR_FILENO );
+        fcntl( fileno(pfTrace), F_DUPFD, STDERR_FILENO );
+    }
 
     /*
      *  Make the output file unbuffered only.
@@ -318,10 +352,12 @@ chainOpen( int       stdinFd,
      */
     setvbuf( stdout, NULL, _IONBF, 0 );
 
-#if defined( DEBUG_ENABLED )
-    if (HAVE_OPT( SHOW_SHELL ))
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         fprintf( pfTrace, "Server shell %s starts\n", pzShell );
-#endif
+
+        fflush( pfTrace );
+    }
+
     execvp( (char*)pzShell, (char**)ppArgs );
     AG_ABEND( aprf( "Could not execvp( '%s', ... ):  %d - %s\n",
                     pzShell, errno, strerror( errno )));
@@ -391,13 +427,14 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
-LOCAL char*
-loadData( FILE* fp )
+static char*
+loadData( void )
 {
     char*   pzText;
     size_t  textSize;
     char*   pzScan;
     char    zLine[ 1024 ];
+    int     retryCt = 0;
 
     textSize = 4096;
     pzScan   = \
@@ -407,21 +444,26 @@ loadData( FILE* fp )
 
     for (;;) {
         size_t  usedCt;
-#ifdef OPT_VALUE_TIMEOUT
+
         /*
-         *  Set a timeout so we do not wait forever.
+         *  Set a timeout so we do not wait forever.  Sometimes we don't wait
+         *  at all and we should.  Retry in those cases (but not on EOF).
          */
         alarm( OPT_VALUE_TIMEOUT );
-        if (fgets( zLine, sizeof( zLine ), fp ) == NULL) {
+        if (fgets( zLine, sizeof( zLine ), serverPair.pfRead ) == NULL) {
             alarm( 0 );
-            break;
+
+            if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retryCt++ > 0))
+                fprintf( pfTrace, "fs err %d (%s) reading from server shell\n",
+                         errno, strerror(errno) );
+
+            if (feof( serverPair.pfRead ) || (retryCt > 32))
+                break;
+
+            continue;  /* no data - retry */
         }
         alarm( 0 );
 
-#else
-        if (fgets( zLine, sizeof( zLine ), fp ) == NULL)
-            break;
-#endif
         /*
          *  Check for magic character sequence indicating 'DONE'
          */
@@ -433,8 +475,10 @@ loadData( FILE* fp )
         /*
          *  Stop now if we are at EOF
          */
-        if (feof( fp ))
+        if (feof( serverPair.pfRead )) {
+            fputs( "feof on data load\n", pfTrace );
             break;
+        }
 
         pzScan += strlen( zLine );
         usedCt = (size_t)(pzScan - pzText);
@@ -464,9 +508,16 @@ loadData( FILE* fp )
      *  to the size actually used.
      */
     while ((pzScan > pzText) && isspace( pzScan[-1] )) pzScan--;
-    *pzScan = NUL;
-    return AGREALOC( (void*)pzText, (int)(pzScan - pzText) + 1,
-                     "resizing text output" );
+    textSize = (pzScan - pzText) + 1;
+
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+        fprintf( pfTrace, "\n= = = RESULT %d bytes:\n%s%s\n"
+                 "= = = = = = = = = = = = = = =\n",
+                 textSize, pzText, zLine );
+    }
+
+    *pzScan  = NUL;
+    return AGREALOC( (void*)pzText, textSize, "resizing text output" );
 }
 
 #ifdef SHELL_ENABLED
@@ -508,13 +559,13 @@ runShell( const char*  pzCmd )
      *  have it output a special marker that we can find.
      */
     pzLastCmd = pzCmd;
-#if defined( DEBUG_ENABLED )
-    if (HAVE_OPT( SHOW_SHELL )) {
-        fputc( '\n', pfTrace );
-        fprintf( pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone );
+    fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzCmd, zShDone, ++logCount );
+
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+        fprintf( pfTrace, logIntroFmt, logCount );
+        fprintf( pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone, logCount );
     }
-#endif
-    fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzCmd, zShDone );
+
     fflush( serverPair.pfWrite );
 
     if (errClose) {
@@ -527,7 +578,7 @@ runShell( const char*  pzCmd )
      *  a sigpipe or sigalrm (timeout), we will return the nil string.
      */
     {
-        char* pz = loadData( serverPair.pfRead );
+        char* pz = loadData();
         if (pz == NULL) {
             fprintf( pfTrace, zCmdFail, pzCmd );
             closeServer();

@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-09-10 10:58:05 bkorb"
-# ID:  $Id: options_h.tpl,v 4.17 2005/09/10 18:35:05 bkorb Exp $
+# Time-stamp:      "2005-10-16 15:15:53 bkorb"
+# ID:  $Id: options_h.tpl,v 4.18 2005/10/22 21:57:43 bkorb Exp $
 
 =][=
 
@@ -342,6 +342,8 @@ typedef struct {
     int         txt_flags;     /* mapping type     */
     int         txt_alloc;     /* if we malloced memory */
 } tmap_info_t;
+
+#define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) == MAP_FAILED)
 
 /*
  *  When loading a line (or block) of text as an option, the value can

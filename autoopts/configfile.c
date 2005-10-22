@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.19 2005/09/04 21:13:39 bkorb Exp $
- *  Time-stamp:      "2005-07-27 10:09:29 bkorb"
+ *  $Id: configfile.c,v 4.20 2005/10/22 21:57:43 bkorb Exp $
+ *  Time-stamp:      "2005-10-16 15:16:32 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -148,7 +148,7 @@ configFileLoad( const char* pzFile )
     char* pzText =
         text_mmap( pzFile, PROT_READ, MAP_PRIVATE, &cfgfile );
 
-    if (pzText == MAP_FAILED)
+    if (TEXT_MMAP_FAILED_ADDR(pzText))
         return NULL; /* errno is set */
 
     pRes = optionLoadNested(pzText, pzFile, strlen(pzFile), OPTION_LOAD_COOKED);
@@ -444,7 +444,7 @@ filePreset(
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
     tOptState     st = OPTSTATE_INITIALIZER(PRESET);
 
-    if (pzFileText == MAP_FAILED)
+    if (TEXT_MMAP_FAILED_ADDR(pzFileText))
         return;
 
     if (direction == DIRECTION_CALLED) {

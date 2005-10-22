@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.5 2005/09/10 18:35:05 bkorb Exp $
+ *  $Id: expFormat.c,v 4.6 2005/10/22 21:57:43 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -529,8 +529,8 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         }
 
         if (lic.pzFN == NULL) {
-            if (text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi)
-                == MAP_FAILED)
+            text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi);
+            if (TEXT_MMAP_FAILED_ADDR(lic.mi.txt_data))
                 AG_ABEND( aprf( "Could not open license file '%s'", pzLicense));
 
             AGDUPSTR( lic.pzFN, zRealFile, "license file name" );

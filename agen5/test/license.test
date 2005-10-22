@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # license.test --- test license functionality
 #
-# Time-stamp:        "2005-09-10 11:10:59 bkorb"
+# Time-stamp:        "2005-10-08 11:03:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/09/10 18:35:05 $
+# Last Modified:     $Date: 2005/10/22 21:57:43 $
 #            by: bkorb
 #
-# $Id: license.test,v 4.3 2005/09/10 18:35:05 bkorb Exp $
+# $Id: license.test,v 4.4 2005/10/22 21:57:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -74,8 +74,8 @@ cat >&5 <<- _EOF_
 	return 0; }
 	_EOF_
 
-CFLAGS=$(
-  echo ${CFLAGS} -I${top_builddir} -I${top_builddir}/agen5)
+CFLAGS=`
+  echo ${CFLAGS} -I${top_builddir} -I${top_builddir}/agen5`
 
 ${CC} -g ${CFLAGS} -o ${testname}-extend ${testname}-extend.c || \
   failure "Cannot compile ${testname}-extend.c"

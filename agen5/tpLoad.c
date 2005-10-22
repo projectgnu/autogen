@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.7 2005/09/10 18:35:05 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.8 2005/10/22 21:57:43 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -362,8 +362,8 @@ loadTemplate( tCC* pzFileName )
             AG_ABEND( aprf( zCannot, ENOENT, "map data file", pzFileName,
                             strerror( ENOENT )));
 
-        if (text_mmap( zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo )
-            == MAP_FAILED)
+        text_mmap( zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo );
+        if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
             AG_ABEND( aprf( "Could not open template '%s'", pzFileName ));
     }
 

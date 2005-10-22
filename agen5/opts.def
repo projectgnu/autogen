@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.4 2005/09/04 21:13:39 bkorb Exp $
+ *   $Id: opts.def,v 4.5 2005/10/22 21:57:43 bkorb Exp $
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *
@@ -462,8 +462,8 @@ flag = {
 #ifndef XML2AG
     doc = <<-  _EODoc_
 	This option prevents runaway loops.  For example, if you accidentally
-	specify, "FOR x (for-from 1) (for-to -1) (for-by 1)", it will take
-	a long time to finish.  If you do have more than 256 entries in tables,
+	specify, "FOR x (for-from 1) (for-to -1) (for-by 1)", it will take a
+	long time to finish.  If you do have more than 256 entries in tables,
 	you will need to specify a new limit with this option.
 	_EODoc_;
 #else
@@ -481,12 +481,14 @@ flag = {
     descrip     = "Time limit for servers";
 #ifndef XML2AG
     ifdef       = SHELL_ENABLED;
-    doc =
-    "AutoGen works with a shell server process.  Most normal commands\n"
-    "will complete in less than 10 seconds.  If, however, your commands\n"
-    "need more time than this, use this option.\n\n"
-    "The valid range is 0 to 3600 seconds (1 hour).\n"
-    "Zero will disable the server time limit.";
+    doc = <<-  _EOF_
+	AutoGen works with a shell server process.  Most normal commands will
+	complete in less than 10 seconds.  If, however, your commands need more
+	time than this, use this option.
+
+	The valid range is 0 to 3600 seconds (1 hour).
+	Zero will disable the server time limit.
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -498,16 +500,23 @@ flag = {
     arg-default = nothing;
     arg-name    = level;
     descrip     = "tracing level of detail";
-    keyword     = nothing, templates, block-macros, expressions, everything;
+    keyword     = nothing, server-shell, templates, block-macros,
+                  expressions, everything;
 
 #ifndef XML2AG
 	doc = <<-  _EOF_
 	This option will cause AutoGen to display a trace of its template
-	processing.  There are five levels:
+	processing.  There are six levels, each level including messages from
+	the previous levels:
 
 	@table @samp
 	@item nothing
 	Does no tracing at all (default)
+
+	@item server-shell
+	Traces all input and output to the server shell.  This includes a shell
+	"independent" initialization script about 30 lines long.  Its output is
+	discarded and not inserted into any template.
 
 	@item templates
 	Traces the invocation of @code{DEFINE}d macros and @code{INCLUDE}s
@@ -517,10 +526,11 @@ flag = {
 	@code{CASE} and @code{WHILE}.
 
 	@item expressions
-	Displays the results of expression evaluations
+	Displays the results of expression evaluations.
 
 	@item everything
-	Displays the invocation of every AutoGen macro, even @code{TEXT} macros.
+	Displays the invocation of every AutoGen macro, even @code{TEXT} macros
+	(i.e. the text outside of macro quotes).
 	@end table
 	_EOF_;
 #else
@@ -535,12 +545,13 @@ flag = {
     descrip     = "tracing output file or filter";
 #ifndef XML2AG
 
-    doc =
-    "The output specified may be either a file name, or, if the option\n"
-    "argument begins with the @code{pipe} operator (@code{|}),\n"
-    "a command that will receive the tracing output as standard in.\n"
-    "For example, @code{--traceout='| less'} will run the trace output\n"
-    "through the @code{less} program.";
+    doc = <<-  _EOF_
+	The output specified may be either a file name, or, if the option
+	argument begins with the @code{pipe} operator (@code{|}), a command
+	that will receive the tracing output as standard in.  For example,
+	@code{--traceout='| less'} will run the trace output through the
+	@code{less} program.
+	_EOF_;
 
     flag-code = <<- FLAG_CODE_END
 	    if (*pOptDesc->pzLastArg == '|')
@@ -571,22 +582,6 @@ flag = {
     doc =
     "This will print out the complete definition tree before processing\n"
     "the template.";
-#else
-    doc = "Pass-through AutoGen argument";
-#endif
-};
-
-flag = {
-    name        = show-shell;
-    descrip     = "Show shell commands";
-#ifndef XML2AG
-    no-preset;
-    ifdef       = DEBUG_ENABLED;
-    doc = <<-  _EODoc_
-	This will cause @code{set -x} to be executed in the shell, with
-	the resultant output printed to /dev/tty.  This option will have no
-	effect if @samp{--disable-shell} was specified at configure time.
-	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
