@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/01/23 23:33:05 $
+# Last Modified:     $Date: 2005/10/23 02:40:03 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.3 2005/01/23 23:33:05 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.4 2005/10/23 02:40:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -23,30 +23,30 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
-#  Dump the bootstrap recursive argument.  We're not interested.
+#  If the argument is "recursive", then we are bootstrapping.
+#  Otherwise, we are being invoked from "make".
 #
 if [ "$1" = recursive ]
 then
-    shift
+  top_srcdir=`cd ..;pwd`
+  top_builddir=${top_srcdir}
+  srcdir=`pwd`
+  builddir=${srcdir}
+  export top_builddir top_srcdir builddir srcdir
+  set -- `egrep '##.*GEN-RULE' ${srcdir}/Makefile.am | \
+          awk '{ print $2 }' `
+  t=""
+  for f
+  do [ ! -f $f ] && t="$t $f"
+  done
+  set -- $t
 fi
-
-#  Check for a "force" option
-#
-if [ "$1" = "-f" ]
-then force=true  ; shift
-else force=false ; fi
 
 #  Make sure we have a default for top build and source.
 #  Some of the templates need this information.
 #
-top_srcdir=${top_srcdir:-..}
-top_builddir=${top_builddir:-..}
-srcdir=${srcdir:-.}
-builddir=${builddir:-.}
 eval "`egrep '^AG_' ${top_srcdir}/VERSION | \
        sed 's,^\(AG[^=]*\)\(.*\),\1\2 export \1,'`"
-
-export top_builddir top_srcdir builddir srcdir
 
 #  disable any $HOME defaults
 #
@@ -95,28 +95,9 @@ CL  ${CLnam-columns}  ${builddir}/../columns
 EOF
 )"
 
-# # # # # # # # # # # # # # # # # # # # # # #
-#
-#  IF we have no remaining argument, then do everything unbuilt
-#
-if [ $# -eq 0 ]
-then
-  echo Looking in ${top_srcdir}/agen5/Makefile.am for GEN-RULE
-  set -- `egrep '##.*GEN-RULE' ${top_srcdir}/agen5/Makefile.am | \
-          awk '{ print $2 }' `
-  if $force ; then :
-  else
-    t=""
-    for f
-    do [ ! -f $f ] && t="$t $f"
-    done
-    set -- $t
-  fi
-fi
-
 #  Ensure complete success or a noticable failure
 #
-set -e
+set -e -x
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -155,8 +136,8 @@ do
       $force && exit 1
       continue
     fi
-    echo ${AGexe} -L ../autoopts opts.def
-    ${AGexe} -L ../autoopts opts.def
+    echo ${AGexe} -L ${top_srcdir}/autoopts ${srcdir}/opts.def
+    ${AGexe} -L ${top_srcdir}/autoopts ${srcdir}/opts.def
     date > stamp-opts
     ;;
 
@@ -192,13 +173,13 @@ do
     #  It has the exparg attribute names.
     #
     cat > expr.cfg <<- _EOConfig_
-		defs-to-get    gfunc
-		template       snarf
-		srcfile
-		assign         two-phase=yes
-		assign         group=ag
-		output         expr.def
-		_EOConfig_
+	defs-to-get    gfunc
+	template       snarf
+	srcfile
+	assign         two-phase=yes
+	assign         group=ag
+	output         expr.def
+	_EOConfig_
 
     echo ${GDexe} load=expr.cfg func*.c exp*.c
     set +e
@@ -221,11 +202,12 @@ do
       continue
     fi
     cat > directive.cfg <<- _EOConfig_
-		defs-to-get    directive
-		template       directive
-		output         directive.def
-		linenum
-		_EOConfig_
+	defs-to-get    directive
+	template       directive
+	output         directive.def
+	linenum
+	_EOConfig_
+
     ${GDexe} load=directive.cfg ${srcdir}/defDirect.c
     ${AGexe} -t30 directive.def
     rm -f directive.def directive.cfg
@@ -256,8 +238,8 @@ do
       continue
     fi
     eopt="-L ${top_srcdir}/autoopts -Tagman1 -bautogen"
-    echo ${AGexe} ${eopt} ./opts.def
-    ${AGexe} ${eopt} ./opts.def
+    echo ${AGexe} ${eopt} ${srcdir}/opts.def
+    ${AGexe} ${eopt} ${srcdir}/opts.def
     ;;
 
   fmemopen.3 )
@@ -288,6 +270,7 @@ then rm -f $rmlist ; fi
 # Local Variables:
 # mode:shell-script
 # sh-indentation:4
+# sh-basic-offset:4
 # indent-tabs-mode: nil
 # End:
 

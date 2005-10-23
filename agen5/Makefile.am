@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-02-21 11:48:29 bkorb"
+## Time-stamp:      "2005-10-22 16:53:15 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/02/21 23:01:08 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/10/23 02:40:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -103,9 +103,9 @@ stamp-texi : $(AGnam) $(CLexe) $(GDexe)
 stamp-man : opts.def $(AGnam) $(CLexe) $(GDexe)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
-autogen.1 : stamp-man
-autogen.texi : stamp-texi
-gen : stamp-texi
+autogen.1       : stamp-man
+autogen.texi    : stamp-texi
+gen      : stamp-texi
 
 $(GDexe) :
 	cd ../getdefs ; $(MAKE) $(GDnam)

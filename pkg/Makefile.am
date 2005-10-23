@@ -1,13 +1,13 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-07-01 09:16:31 bkorb"
+## Time-stamp:      "2005-10-22 19:23:30 bkorb"
 ## Copyright (c):   2003-2005 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/07/01 16:34:02 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/10/23 02:40:03 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -21,11 +21,11 @@ all : $(DISTCLEANFILES)
 
 autogen.lsm : $(top_srcdir)/VERSION lsm.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-	$(AGexe) -T $(srcdir)/lsm.tpl $(top_builddir)/agen5/opts.def
+	$(AGexe) -T $(srcdir)/lsm.tpl $(top_srcdir)/agen5/opts.def
 
 autogen.spec : $(top_srcdir)/VERSION spec.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-	$(AGexe) -T $(srcdir)/spec.tpl $(top_builddir)/agen5/opts.def
+	$(AGexe) -T $(srcdir)/spec.tpl $(top_srcdir)/agen5/opts.def
 
 package :
 	top_builddir=$(top_builddir) \
@@ -36,13 +36,13 @@ package :
 	prefix=$(prefix) \
 	MAKE="$(MAKE)" \
 	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/stage-pkg \
-	$(SHELL) mkpkg.sh
+	$(SHELL) $(srcdir)/mkpkg.sh
 
 pkg     : package
 
 ##  The following targets only work from CVS sources
 ##
-gnudoc :
+gnudoc  :
 	pkgsrcdir=`cd $(srcdir) ; pwd` ; \
 	cd $(top_builddir)/doc ; \
 	MAKE=$(MAKE) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh $(PACKAGE_STRING) \

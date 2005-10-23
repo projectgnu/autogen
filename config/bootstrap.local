@@ -4,52 +4,11 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-10-12 08:46:42 bkorb"
+# Time-stamp:        "2005-10-22 16:31:12 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.14 2005/10/22 21:57:44 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.15 2005/10/23 02:40:03 bkorb Exp $
 # ----------------------------------------------------------------------
-
-add_make_links()
-{
-  grep 'MAKE LINK TREE' configure > /dev/null && return 0 || :
-  mv configure configure.tmp || exit 1
-
-  (
-    sed 2q configure.tmp
-    print tree_tops=\"$(echo AUTHORS COPYING ChangeLog [I-Za-z]*)\"
-    cat <<-	'_EOF_'
-
-	#MAKE LINK TREE
-	#
-	top_builddir=`pwd`
-	top_srcdir=`echo $0 | sed 's,/[^/]*$,,'`
-	top_srcdir=`cd $top_srcdir && pwd`
-	if test "$top_srcdir" = "$top_builddir" ; then : ; else
-	  ( cd $top_srcdir
-	    find ${tree_tops} -type d -print 2>/dev/null) |
-	  grep -v '/CVS\|/RCS' |
-	  while read f
-	  do test -d $f || mkdir $f
-	  done
-
-	  ( cd $top_srcdir
-	    find ${tree_tops} \( -type f -o -type l \) -print 2>/dev/null) |
-	  grep -v '/CVS\|/RCS\|~$\|,v$\|/#' |
-	  while read f
-	  do
-	     test -f $f || ln -sf $top_srcdir/$f $f
-	  done
-	  top_srcdir=`pwd`
-	fi
-
-_EOF_
-    sed -e 1,2d configure.tmp
-  ) > configure
-
-  rm -f configure.tmp
-  chmod +x configure
-}
 
 locate_exe()
 {
@@ -225,11 +184,6 @@ pre )
 
 post )
     rm -f  ${srcdir}/doc/autogen.texi
-    add_make_links
-    ;;
-
-addlink )
-    add_make_links
     ;;
 esac
 

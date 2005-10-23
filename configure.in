@@ -3,24 +3,27 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2005 Bruce Korb
 dnl
-dnl Time-stamp:      "2005-08-28 09:12:24 bkorb"
+dnl Time-stamp:      "2005-10-22 16:19:08 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.10 2005/09/03 22:49:50 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.11 2005/10/23 02:40:02 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT([AutoGen],[5.6.6],[autogen-users@lists.sf.net])
 AC_CONFIG_SRCDIR(agen5/autogen.c)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
-. $srcdir/VERSION
+[. $srcdir/VERSION
+d=`dirname $0`
+ag_top_srcdir=`cd $d && pwd`
+ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.10 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.11 $),)dnl
 
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -185,10 +188,9 @@ test -f ./snprintfv/snprintfv/snprintfv.h \
 AGnam=autogen${ac_exeext}
 GDnam=getdefs${ac_exeext}
 CLnam=columns${ac_exeext}
-f=`cd ${top_builddir} > /dev/null ; pwd`
-AGexe=${f}/agen5/${AGnam}
-GDexe=${f}/getdefs/${GDnam}
-CLexe=${f}/columns/${CLnam}
+AGexe=${ag_top_builddir}/agen5/${AGnam}
+GDexe=${ag_top_builddir}/getdefs/${GDnam}
+CLexe=${ag_top_builddir}/columns/${CLnam}
 M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`
 ]
 AC_SUBST(M4_SRC)
@@ -202,7 +204,7 @@ AC_SUBST(CLexe)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 [
-if test "$top_srcdir" = "$top_builddir"
+if test "$ag_top_srcdir" = "$ag_top_builddir"
 then
  INCLIST='-I${top_builddir} -I${top_srcdir}/autoopts'
 else

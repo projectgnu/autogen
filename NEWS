@@ -1,4 +1,9 @@
-New in __CURRENT_VERSION__ - September, 2005
+New in __CURRENT_VERSION__ - October, 2005
+
+* Fixed a small timing hole where the read from the read end of the output
+  pipe of the server shell can fail.  (The read is retried.)
+
+New in 5.7.3 - October, 2005
 
 * Definition and license text files were mmap-ed in without checking for
   the size being a multiple of a page.  strlen() would seg fault.

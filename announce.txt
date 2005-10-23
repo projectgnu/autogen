@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.5 2005/10/22 21:57:43 bkorb Exp $
+# $Id: announce.txt,v 4.6 2005/10/23 02:40:02 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -25,10 +25,10 @@ nl='
 # Three levels of release:
 # x.y        -- a primary release
 # x.y.z      -- an alpha release
-# x.y.z-preX -- an unofficial testing release
+# x.y.zpreX  -- an unofficial testing release
 #
 case ${AG_VERSION} in
-*.*.*-* )
+*.*.*pre* )
   to_line='To: autogen-announce@lists.sf.net'
   cc_line=""
   alpha_rel=$(echo "\
@@ -50,28 +50,28 @@ pending further testing.")
   ;;
 esac
 
-cat >&3 <<_EOF_
-From: ${fullname} <${sender}@${domain}>
-Sender: ${sender}@${domain}
-${to_line}	
-Subject: GNU AutoGen Version ${AG_VERSION}/${AO_VERSION}
-Reply-To: autogen-users@lists.sf.net
-${cc_line}
-GNU AutoGen/AutoOpts is a two-part project that serves two separate
-purposes and are inextricably intertwined:
+cat >&3 <<- _EOF_
+	From: ${fullname} <${sender}@${domain}>
+	Sender: ${sender}@${domain}
+	${to_line}	
+	Subject: GNU AutoGen Version ${AG_VERSION}/${AO_VERSION}
+	Reply-To: autogen-users@lists.sf.net
+	${cc_line}
+	GNU AutoGen/AutoOpts is a two-part project that serves two separate
+	purposes and are inextricably intertwined:
 
-AutoGen is a tool designed to simplify the creation and maintenance of
-programs that contain large amounts of repetitious text. It is especially
-valuable in programs that have several blocks of text that must be kept
-synchronized.
+	AutoGen is a tool designed to simplify the creation and maintenance of
+	programs that contain large amounts of repetitious text.  It is
+	especially valuable in programs that have several blocks of text that
+	must be kept synchronized.
 
-AutoOpts is both an example of that and a project in its own right.
-It is a very powerful command line option parser consisting of a
-set of AutoGen templates and a run time library that nearly eliminates
-the hassle of managing, parsing and documenting program options.
+	AutoOpts is both an example of that and a project in its own right.
+	It is a very powerful command line option parser consisting of a set
+	of AutoGen templates and a run time library that nearly eliminates
+	the hassle of managing, parsing and documenting program options.
 
-New in ${AG_VERSION} - $(date '+%B, %Y')
-_EOF_
+	New in ${AG_VERSION} - $(date '+%B, %Y')
+	_EOF_
 
 test ${#alpha_rel} -gt 1 && print -u3 "${alpha_rel}\n\n"
 

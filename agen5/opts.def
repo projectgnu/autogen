@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.5 2005/10/22 21:57:43 bkorb Exp $
+ *   $Id: opts.def,v 4.6 2005/10/23 02:40:03 bkorb Exp $
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *
@@ -123,11 +123,12 @@ flag = {
     stack-arg;
 #ifndef XML2AG
     settable;
-    doc =
-    "Add a directory to the list of directories to search when opening\n"
-    "a template, either as the primary template or an included one.\n"
-    "The last entry has the highest priority in the search list.\n"
-    "That is to say, they are searched in reverse order.";
+    doc = <<-  _EOF_
+	Add a directory to the list of directories to search when opening
+	a template, either as the primary template or an included one.
+	The last entry has the highest priority in the search list.
+	That is to say, they are searched in reverse order.
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -141,9 +142,10 @@ flag = {
     descrip   = "Override template file";
 #ifndef XML2AG
     no-preset;
-    doc =
-    "Definition files specify the standard template that is to be expanded.\n"
-    "This option will override that name and expand a different template.";
+    doc = <<-  _EOF_
+	Definition files specify the standard template that is to be expanded.
+	This option will override that name and expand a different template.
+	_EOF_;
 
     flag-code = "    pzTemplFileName = pOptDesc->pzLastArg;";
 #else
@@ -159,10 +161,11 @@ flag = {
     descrip   = "Library template file";
     max       = NOLIMIT;
 #ifndef XML2AG
-    doc =
-    "DEFINE macros are saved from this template file for use in processing\n"
-    "the main macro file.  Template text aside from the DEFINE macros is\n"
-    "is ignored.";
+    doc = <<-  _EOF_
+	DEFINE macros are saved from this template file for use in processing
+	the main macro file.  Template text aside from the DEFINE macros is
+	is ignored.
+	_EOF_;
 
     flag-code = <<- _EOCode_
 	    tTemplate* pT;
@@ -185,14 +188,15 @@ flag = {
     descrip   = "Base name for output file(s)";
 #ifndef XML2AG
     no-preset;
-    doc =
-    "A template may specify the exact name of the output file.  Normally,\n"
-    "it does not.  Instead, the name is composed of the base name of the\n"
-    "definitions file with suffixes appended.  This option will override the\n"
-    "base name derived from the definitions file name.  This is required if\n"
-    "there is no definitions file and advisable if definitions are being\n"
-    "read from stdin.  If the definitions are being read from standard in,\n"
-    "the base name defaults to @file{stdin}.";
+    doc = <<-  _EOF_
+	A template may specify the exact name of the output file.  Normally,
+	it does not.  Instead, the name is composed of the base name of the
+	definitions file with suffixes appended.  This option will override the
+	base name derived from the definitions file name.  This is required if
+	there is no definitions file and advisable if definitions are being
+	read from stdin.  If the definitions are being read from standard in,
+	the base name defaults to @file{stdin}.
+	_EOF_;
 #else
     settable;
     doc = "Pass-through AutoGen argument";
@@ -209,13 +213,14 @@ flag = {
     no-preset;
     enabled;
     settable;
-    doc =
-    "Use this argument to specify the input definitions file with a\n"
-    "command line option.  If you do not specify this option, then\n"
-    "there must be a command line argument that specifies the file,\n"
-    "even if only to specify stdin with a hyphen (@code{-}).\n"
-    "Specify, @code{--no-definitions} when you wish to process\n"
-    "a template without any active AutoGen definitions.\n";
+    doc = <<-  _EOF_
+	Use this argument to specify the input definitions file with a
+	command line option.  If you do not specify this option, then
+	there must be a command line argument that specifies the file,
+	even if only to specify stdin with a hyphen (@code{-}).
+	Specify, @code{--no-definitions} when you wish to process
+	a template without any active AutoGen definitions.\n
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -337,11 +342,12 @@ flag = {
     stack-arg;
 #ifndef XML2AG
     no-preset;
-    doc =
-    "Occasionally, it may not be desirable to produce all of the output\n"
-    "files specified in the template.  (For example, only the @file{.h}\n"
-    "header file, but not the @file{.c} program text.)  To do this\n"
-    "specify @code{--skip-suffix=c} on the command line.";
+    doc = <<-  _EOF_
+	Occasionally, it may not be desirable to produce all of the output
+	files specified in the template.  (For example, only the @file{.h}
+	header file, but not the @file{.c} program text.)  To do this
+	specify @code{--skip-suffix=c} on the command line.
+	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif

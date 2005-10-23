@@ -38,7 +38,7 @@ printf "\n\nPACKAGING RPM FOR LINUX\n\n"
 cd ${builddir}
 AG_VERSION=`echo ${AG_VERSION} | sed 's,\.,-,g'`
 specfile=autogen-${AG_VERSION}.spec
-agargs="-T spec.tpl -b autogen-${AG_VERSION} --writable"
+agargs="-L ${srcdir} -T spec.tpl -b autogen-${AG_VERSION} --writable"
 ${AGexe} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
 cd ${HOME}
