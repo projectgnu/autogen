@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-10-22 16:32:27 bkorb"
+## Time-stamp:      "2005-10-28 16:14:22 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.3 2005/10/23 02:40:02 bkorb Exp $
+## $Id: Makefile.am,v 4.4 2005/10/28 23:14:33 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -31,8 +31,11 @@ endif
 cfg_gen        = config/ag_macros.m4 config/snprintfv.m4
 config_dist    = config/missing config/misc.def config/libopts.def $(cfg_gen)
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
+aclocaldir     = $(datadir)/aclocal
+aclocal_DATA   = config/liboptschk.m4
 pkg_dist       = config/bootstrap.local
-EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(pkgdata_DATA)
+dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
+EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(dist_data)
 DISTCLEANFILES = stamp-h
 MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
           configure libtool stamp-h.in config/ag_macros.m4
