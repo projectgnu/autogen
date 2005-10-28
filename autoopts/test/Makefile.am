@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2005-10-08 11:08:19 bkorb"
+## Time-stamp:      "2005-10-22 20:33:56 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/10/22 21:57:43 $
+## Last Modified:   $Date: 2005/10/28 23:16:45 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2005/10/22 21:57:43 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2005/10/28 23:16:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs stdopts.def $(TESTS)
@@ -30,16 +30,17 @@ TESTS_ENVIRONMENT = AGexe=$(AGexe) CLexe=$(CLexe) GDexe=$(GDexe) \
 	echo \`pwd\`/libopts.a \`pwd\`/libguileopts.a ` $(LIBS)" \
 	INC="-I`cd $(top_builddir)/autoopts > /dev/null ; pwd` \
 	-I`cd $(top_builddir) > /dev/null ; pwd` \
+	-I`cd $(top_srcdir) > /dev/null ; pwd` \
 	    $(INCLIST) $(CPPFLAGS) $(LIBGUILE_CFLAGS) $(LIBGUILE_LIBS)" \
 	testsubdir=$(testsubdir) \
-	srcdir=`pwd` \
+	srcdir=`cd $(srcdir) > /dev/null ; pwd` \
 	top_srcdir=`\cd $(top_srcdir) > /dev/null ; pwd` \
 	top_builddir=`\cd $(top_builddir) > /dev/null ; pwd`
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
 
-$(TESTS) : perm-stamp
+check : perm-stamp
 
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test || :

@@ -5,226 +5,226 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:13:08 bkorb"
+# Time-stamp:        "2005-10-22 20:41:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: enums.test,v 4.7 2005/03/06 20:16:08 bkorb Exp $
+# $Id: enums.test,v 4.8 2005/10/28 23:16:45 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
-if test -z "$srcdir"; then
+if test -z "${srcdir}"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
+    test -z "${srcdir}" && srcdir=.
+    test "${srcdir}" = "$0" && srcdir=.
 fi
-. $srcdir/defs
+. ${srcdir}/defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-cat > ${testname}.def <<_EOF_
-autogen definitions options;
+cat > ${testname}.def <<-  _EOF_
+	autogen definitions options;
 
-prog-name   = ${testname}-test;
-prog-title  = 'test complex main procedure';
-config-header = config.h;
+	prog-name   = ${testname}-test;
+	prog-title  = 'test complex main procedure';
+	config-header = config.h;
 
-argument    = '[ <node> ]';
-long-opts;
+	argument    = '[ <node> ]';
+	long-opts;
 
-flag = {
-   name     = print;
-   value    = p;
-   descrip  = 'Print operational info';
-   arg-type = keyword;
-   arg-name = type;
-   min      = 1;
-   equivalence = print;
-   keyword  = one, two, three, four, five, six, seven, eight, nine, ten;
-};
+	flag = {
+	   name     = print;
+	   value    = p;
+	   descrip  = 'Print operational info';
+	   arg-type = keyword;
+	   arg-name = type;
+	   min      = 1;
+	   equivalence = print;
+	   keyword  = one, two, three, four, five, six, seven, eight, nine, ten;
+	};
 
-flag = {
-   name     = dump-log;
-   value    = D;
-   descrip  = 'Dump the program log';
-   equivalence = print;
-};
+	flag = {
+	   name     = dump-log;
+	   value    = D;
+	   descrip  = 'Dump the program log';
+	   equivalence = print;
+	};
 
-flag = {
-   name     = all-dump;
-   value    = A;
-   equivalence = print;
-   descrip  = 'Dump everything we\'ve got';
-};
+	flag = {
+	   name     = all-dump;
+	   value    = A;
+	   equivalence = print;
+	   descrip  = 'Dump everything we\'ve got';
+	};
 
-flag = {
-   name     = set;
-   value    = s;
-   descrip  = 'set options';
-   arg-type = set;
-   arg-name = 'opt[, ...]';
-   arg-default = first,fifth,ninth,thirteenth;
-   equivalence = print;
-   keyword  = first, second, third, fourth, fifth, sixth, seventh, eighth,
-              ninth, tenth, eleventh, twelfth, thirteenth, fourteenth,
-              fifteenth, sixteenth;
-};
+	flag = {
+	   name     = set;
+	   value    = s;
+	   descrip  = 'set options';
+	   arg-type = set;
+	   arg-name = 'opt[, ...]';
+	   arg-default = first,fifth,ninth,thirteenth;
+	   equivalence = print;
+	   keyword  = first, second, third, fourth, fifth, sixth, seventh,
+	              eighth, ninth, tenth, eleventh, twelfth, thirteenth,
+	              fourteenth, fifteenth, sixteenth;
+	};
 
-flag = {
-   name     = unset;
-   value    = u;
-   descrip  = 'unset debug options';
-   arg-type = string;
-   arg-name = 'opt[, ...]';
-   equivalence = print;
-   flag-proc   = set;
-};
+	flag = {
+	   name     = unset;
+	   value    = u;
+	   descrip  = 'unset debug options';
+	   arg-type = string;
+	   arg-name = 'opt[, ...]';
+	   equivalence = print;
+	   flag-proc   = set;
+	};
 
-flag = {
-   name     = msg-num;
-   value    = m;
-   descrip  = 'message number';
-   no-preset;
-   arg-type = string;
-   arg-name = id;
-   max      = NOLIMIT;
+	flag = {
+	   name     = msg-num;
+	   value    = m;
+	   descrip  = 'message number';
+	   no-preset;
+	   arg-type = string;
+	   arg-name = id;
+	   max      = NOLIMIT;
 
-   flag-code = <<- _EndOfFlagCode_
-	    /*
-	     *  'set' and 'unset' must be acted upon immediately -- we may
-	     *  get more of them.
-	     */
-	    switch (WHICH_IDX_PRINT) {
-	    case NO_EQUIVALENT:
-	        /* FALLTHROUGH */
-	    case INDEX_OPT_PRINT:
-	        /* FALLTHROUGH */
-	    case INDEX_OPT_DUMP_LOG:
-	        /* FALLTHROUGH */
-	    case INDEX_OPT_ALL_DUMP:
-	        if (COUNT_OPT( MSG_NUM ) > 1) {
-	            fputs( "Except for 'set' and 'unset' functions, only "
-	                   "one 'msg-num' is allowed\n", stderr );
-	            USAGE( EXIT_FAILURE );
-	        }
-	        break;
-	    case INDEX_OPT_SET:
-	        set_options( 1, pOptDesc->pzLastArg );
-	        break;
-	    case INDEX_OPT_UNSET:
-	        set_options( 0, pOptDesc->pzLastArg );
-	        break;
-	    };
-	_EndOfFlagCode_;
-};
-/*
-cat <<_EOF_
- * for emacs */
+	   flag-code = <<- _EndOfFlagCode_
+		    /*
+		     *  'set' and 'unset' must be acted upon immediately
+		     *  -- we may get more of them.
+		     */
+		    switch (WHICH_IDX_PRINT) {
+		    case NO_EQUIVALENT:
+		        /* FALLTHROUGH */
+		    case INDEX_OPT_PRINT:
+		        /* FALLTHROUGH */
+		    case INDEX_OPT_DUMP_LOG:
+		        /* FALLTHROUGH */
+		    case INDEX_OPT_ALL_DUMP:
+		        if (COUNT_OPT( MSG_NUM ) > 1) {
+		            fputs( "Except for 'set' and 'unset' functions, "
+		                   "only one 'msg-num' is allowed\n", stderr );
+		            USAGE( EXIT_FAILURE );
+		        }
+		        break;
+		    case INDEX_OPT_SET:
+		        set_options( 1, pOptDesc->pzLastArg );
+		        break;
+		    case INDEX_OPT_UNSET:
+		        set_options( 0, pOptDesc->pzLastArg );
+		        break;
+		    };
+		_EndOfFlagCode_;
+	};
+	/*
+	cat <<_EOF_
+	 * for emacs */
 
-export = "#include <sys/types.h>\n"
-	 "#include <sys/stat.h>\n"
-	 "#include <stdio.h>\n"
-	 "#include <stdlib.h>\n"
-	 "#include <fcntl.h>\n"
-	 "#include \"config.h\"\n"
-	 "#include \"compat/compat.h\"";
+	export = "#include <sys/types.h>\n"
+		 "#include <sys/stat.h>\n"
+		 "#include <stdio.h>\n"
+		 "#include <stdlib.h>\n"
+		 "#include <fcntl.h>\n"
+		 "#include \"config.h\"\n"
+		 "#include \"compat/compat.h\"";
 
-include = 'void set_options( int mode, const char* pzArg );';
+		include = 'void set_options( int mode, const char* pzArg );';
 
-main = {
-   main-type = include;
-   tpl       = ${testname}.tpl;
-};
-_EOF_
+	main = {
+	   main-type = include;
+	   tpl       = ${testname}.tpl;
+	};
+	_EOF_
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 #
 #  In one case we must not use built in echo.
 #
-cat > ${testname}.tpl <<\__EOF
-[= AutoGen5 Template -*- Mode: C -*- =]
-[=(define proc-list "")=]
-typedef int (do_proc_t)( void );
-extern do_proc_t
-[=  (set! proc-list (string-append "do_print_undefined,\ndo_print_"
-                    (join ",\ndo_print_" (stack "flag[0].keyword"))  ))
-    (set! proc-list
-         (shell (string-append "columns -I4 --spread=1 <<_EOF_\n"
-	        proc-list "\n_EOF_")) )
-    proc-list =];
-do_proc_t* do_proc[] = {
-[= (. proc-list) =] };
+cat > ${testname}.tpl <<- \__EOF
+	[= AutoGen5 Template -*- Mode: C -*- =]
+	[=(define proc-list "")=]
+	typedef int (do_proc_t)( void );
+	extern do_proc_t
+	[=  (set! proc-list (string-append "do_print_undefined,\ndo_print_"
+	                    (join ",\ndo_print_" (stack "flag[0].keyword"))  ))
+	    (set! proc-list
+	         (shell (string-append "columns -I4 --spread=1 <<_EOF_\n"
+	            proc-list "\n_EOF_")) )
+	    proc-list =];
+	do_proc_t* do_proc[] = {
+	[= (. proc-list) =] };
 
-[=(shellf "procs='%s' ; ix=0 ; for p in ${procs}
-do
-  p=`echo $p | sed s/,//`
-  echo int ${p}'( void ) {'
-  printf 'fputs( \"'${p}'\\\\n\", stdout );\n'
-  echo return ${ix}'; }'
-  ix=`expr $ix + 1`
-done" proc-list) =]
+	[=(shellf "procs='%s' ; ix=0 ; for p in ${procs}
+	do
+	  p=`echo $p | sed s/,//`
+	  echo int ${p}'( void ) {'
+	  printf 'fputs( \"'${p}'\\\\n\", stdout );\n'
+	  echo return ${ix}'; }'
+	  ix=`expr $ix + 1`
+	done" proc-list) =]
 
-int
-do_dump_log(void)
-{
-    return WHICH_IDX_PRINT != INDEX_OPT_DUMP_LOG;
-}
+	int
+	do_dump_log(void)
+	{
+	    return WHICH_IDX_PRINT != INDEX_OPT_DUMP_LOG;
+	}
 
-int
-do_all_dump(void)
-{
-    return WHICH_IDX_PRINT != INDEX_OPT_ALL_DUMP;
-}
+	int
+	do_all_dump(void)
+	{
+	    return WHICH_IDX_PRINT != INDEX_OPT_ALL_DUMP;
+	}
 
-int
-do_set( int which_way )
-{
-    printf( "PRINT = 0x%lX\n", DESC(PRINT).optCookie );
-    printf( "SET   = 0x%lX\n", DESC(SET).optCookie );
-    if (which_way)
-        printf( "0x%lX\n", OPT_VALUE_SET );
-    else
-        printf( "0x%lX\n", (~ OPT_VALUE_SET) & SET_MEMBERSHIP_MASK );
-    return 0;
-}
+	int
+	do_set( int which_way )
+	{
+	    printf( "PRINT = 0x%lX\n", DESC(PRINT).optCookie );
+	    printf( "SET   = 0x%lX\n", DESC(SET).optCookie );
+	    if (which_way)
+	        printf( "0x%lX\n", OPT_VALUE_SET );
+	    else
+	        printf( "0x%lX\n", (~ OPT_VALUE_SET) & SET_MEMBERSHIP_MASK );
+	    return 0;
+	}
 
-void
-set_options( int mode, const char* pzArg )
-{
-    exit( atoi( pzArg ));
-}
-__EOF
+	void
+	set_options( int mode, const char* pzArg )
+	{
+	    exit( atoi( pzArg ));
+	}
+	__EOF
 
 cat >> ${testname}.tpl <<__EOF
-int
-main( int argc, char** argv )
-{
-    {
-        int ct = optionProcess( &${testname}_testOptions, argc, argv );
-        argc -= ct;
-        argv += ct;
-    }
+	int
+	main( int argc, char** argv )
+	{
+	    {
+	        int ct = optionProcess( &${testname}_testOptions, argc, argv );
+	        argc -= ct;
+	        argv += ct;
+	    }
 
-    if (argc > 1)
-        return EXIT_FAILURE;
+	    if (argc > 1)
+	        return EXIT_FAILURE;
 
-    /*
-     *  Invoke the proper operational procedure.
-     */
-    {
-        int res = 0;
-        switch (WHICH_IDX_PRINT) {
-        case INDEX_OPT_PRINT:    res = do_proc[OPT_VALUE_PRINT](); break;
-        case INDEX_OPT_DUMP_LOG: res = do_dump_log();  break;
-        case INDEX_OPT_ALL_DUMP: res = do_all_dump();  break;
-        case INDEX_OPT_SET:      res = do_set( 1 );    break;
-        case INDEX_OPT_UNSET:    res = do_set( 0 );    break;
-        }
-        return res;
-    }
-}
-__EOF
+	    /*
+	     *  Invoke the proper operational procedure.
+	     */
+	    {
+	        int res = 0;
+	        switch (WHICH_IDX_PRINT) {
+	        case INDEX_OPT_PRINT:    res = do_proc[OPT_VALUE_PRINT](); break;
+	        case INDEX_OPT_DUMP_LOG: res = do_dump_log();  break;
+	        case INDEX_OPT_ALL_DUMP: res = do_all_dump();  break;
+	        case INDEX_OPT_SET:      res = do_set( 1 );    break;
+	        case INDEX_OPT_UNSET:    res = do_set( 0 );    break;
+	        }
+	        return res;
+	    }
+	}
+	__EOF
 
 # # # # # # # # # # CREATE PROGRAM # # # # # # # # #
 
@@ -291,9 +291,10 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
+## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of enums.test
