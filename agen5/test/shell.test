@@ -2,17 +2,17 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2005-10-22 14:04:29 bkorb"
+# Time-stamp:        "2005-10-22 21:23:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/10/22 21:57:43 $
+# Last Modified:     $Date: 2005/10/28 23:15:56 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.4 2005/10/22 21:57:43 bkorb Exp $
+# $Id: shell.test,v 4.5 2005/10/28 23:15:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
@@ -65,7 +65,7 @@ cat > ${testname}.c <<- \_EOF_
 	}
 	_EOF_
 
-$CC -o ${testname} ${testname}.c || \
+${CC} -o ${testname} ${testname}.c || \
    failure "could not compile shell"
 
 #  The backslashes are stripped by the here-doc processing

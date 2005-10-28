@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # fmemopen.test --- fmemopen code
 #
-# Time-stamp:        "2005-03-07 14:57:37 bkorb"
+# Time-stamp:        "2005-10-22 21:22:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/10/28 23:15:56 $
 #            by: bkorb
 #
-# $Id: fmemopen.test,v 4.1 2005/03/13 19:30:08 bkorb Exp $
+# $Id: fmemopen.test,v 4.2 2005/10/28 23:15:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -90,7 +90,6 @@ main( int argc, char** argv )
 }
 _EOF_
 
-CFLAGS=$(echo ${CFLAGS} -I${top_builddir} -I${top_builddir}/agen5)
 ${CC} -g ${CFLAGS} -o ${testname} ${testname}-main.c || \
   failure "Cannot compile fmemopen.c"
 ./fmemopen 2> ${testname}.errors
