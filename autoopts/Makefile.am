@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-10-02 09:49:52 bkorb"
+## Time-stamp:      "2005-10-22 21:24:58 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.20 2005/10/02 17:00:21 bkorb Exp $
+## $Id: Makefile.am,v 4.21 2005/10/28 23:16:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -174,7 +174,7 @@ install-data-hook:
 	    -e '/if defined(HAVE_LIMITS/,/include.*sys\/limits/d' \
 	    -e "s@.endif.*HAVE_LIMITS/SYS_LIM.*@#include <$$limfile.h>@" \
 	    -e "$${sed_pathfind}" \
-	  autoopts/options.h \
+	  $(srcdir)/autoopts/options.h \
 	  > $(DESTDIR)$(includedir)/autoopts/options.h
 
 # Makefile.am ends here
