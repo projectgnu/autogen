@@ -15,13 +15,13 @@ Usage Instructions for autoconf/automake/libtoolized projects:
       rm -rf libopts libopts-*
       gunzip -c `autoopts-config libsrc` | tar -xvf -
       mv -f libopts-*.*.* libopts
-      cp -fp libopts/libopts.m4 config/.
+      cp -fp libopts/m4/*.m4 m4/.
 
-   I tend to put my configure auxiliary files in "config".
+   I tend to put my configure auxiliary files in "m4".
    Whatever directory you choose, if it is not ".", then
    be sure to tell autoconf about it with:
 
-      AC_CONFIG_AUX_DIR(config)
+      AC_CONFIG_AUX_DIR(m4)
 
    This is one macro where you *MUST* remember to *NOT* quote
    the argument.  If you do, automake will get lost.
