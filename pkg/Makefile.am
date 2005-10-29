@@ -1,19 +1,20 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-10-22 19:23:30 bkorb"
+## Time-stamp:      "2005-10-28 16:28:06 bkorb"
 ## Copyright (c):   2003-2005 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2005/10/23 02:40:03 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2005/10/29 00:13:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 DISTCLEANFILES = autogen.lsm
 PKG_FILES      = mkpkg.linux mkpkg.sh mkpkg.sun
-LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh
+LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh \
+		 libopts/libopts-add.m4
 TPL_FILES      = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
 EXTRA_DIST     = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
 

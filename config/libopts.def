@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/09/21 03:42:25 $
- *  Time-stamp:        "2005-09-18 11:47:25 bkorb"
+ *  Last Modified:     $Date: 2005/10/29 00:13:28 $
+ *  Time-stamp:        "2005-10-28 17:10:37 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.11 2005/09/21 03:42:25 bkorb Exp $
+ *  $Id: libopts.def,v 4.12 2005/10/29 00:13:28 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.11 $";
+version     = "$Revision: 4.12 $";
 output-file = libopts.m4;
 
 test   = {
@@ -230,7 +230,6 @@ test = {
 };
 
 do-first = <<-_EOF_
-
 	# =================
 	# AC_HEADER_STDC
 	# =================
@@ -257,41 +256,41 @@ do-first = <<-_EOF_
 	     AC_MSG_ERROR([You must have ${f}.h on your system])
 	done
 
-	# =================
+	# ================================================
 	# AC_CHECK_HEADERS: stdarg.h is present define HAVE_STDARG_H, otherwise
 	# if varargs.h is present define HAVE_VARARGS_H.
-	# =================
+	# ================================================
 	AC_CHECK_HEADERS(stdarg.h varargs.h, break)
 	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have stdarg.h or varargs.h on your system])
 	fi
 
-	# =================
+	# ================================================
 	# Similarly for the string.h and strings.h headers
-	# =================
+	# ================================================
 	AC_CHECK_HEADERS(string.h strings.h, break)
 	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have string.h or strings.h on your system])
 	fi
 
-	# =================
+	# =====================
 	# ...and limits headers
-	# =================
+	# =====================
 	AC_CHECK_HEADERS(limits.h sys/limits.h values.h, break)
 	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
 	  AC_MSG_ERROR([You must have one of limits.h, sys/limits.h or values.h])
 	fi
 
-	# =================
+	# ========================
 	# ...and int types headers
-	# =================
+	# ========================
 	AC_CHECK_HEADERS(stdint.h inttypes.h, break)
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
 	   intptr_t, uintptr_t])
 
-	# =================
+	# ====================
 	# uintptr type & sizes
-	# =================
+	# ====================
 	AC_CHECK_TYPES([uintptr_t], ,
 	       [AC_DEFINE(uintptr_t, unsigned long,
 	                  [Alternate uintptr_t for systems without it.])])

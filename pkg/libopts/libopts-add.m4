@@ -7,9 +7,9 @@ dnl the config tests that the library needs.  Invoke the
 dnl "INVOKE_LIBOPTS_MACROS" macro iff we are building libopts.
 dnl
 dnl Default to system libopts
-NEED_LIBOPTS_DIR=''
-
+dnl
 AC_DEFUN([LIBOPTS_CHECK],[
+  [NEED_LIBOPTS_DIR='']
   m4_pushdef([AO_Libopts_Dir],
 	    [ifelse($1, , [libopts], [$1])])
   AC_SUBST(LIBOPTS_DIR, AO_Libopts_Dir)
@@ -61,8 +61,8 @@ AC_DEFUN([LIBOPTS_CHECK],[
         LIBOPTS_CFLAGS="`${lo_cv_with_autoopts_config} --cflags`"
      else
         LIBOPTS_LDADD='$(top_builddir)/]AO_Libopts_Dir[/libopts.la'
-        LIBOPTS_CFLAGS='-I$(top_srcdir)/]AO_Libopts_Dir'
-        INVOKE_LIBOPTS_MACROS[
+        LIBOPTS_CFLAGS='-I$(top_srcdir)/]AO_Libopts_Dir['
+        NEED_LIBOPTS_DIR=true
      fi
   fi # end of if test -z "${NEED_LIBOPTS_DIR}"]
 
@@ -74,9 +74,9 @@ AC_DEFUN([LIBOPTS_CHECK],[
   m4_popdef([AO_Libopts_Dir])
 
   [if test -n "${NEED_LIBOPTS_DIR}" ; then]
-    INVOKE_LIBOPTS_MACROS[
-  elif "X${ag_boring_checks_complete}" = Xyes ; then : ; else]
-    ag_BORING_CHECKS
+    INVOKE_LIBOPTS_MACROS
+  else
+    INVOKE_LIBOPTS_MACROS_FIRST dnl get the standard things the macros define.
   [fi
 # end of AC_DEFUN of LIBOPTS_CHECK]
 ])
