@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.5 2005/06/07 22:25:13 bkorb Exp $
+ *  $Id: columns.c,v 4.6 2005/10/29 22:13:11 bkorb Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ main( int    argc,
              *  Compute it, but do not let it be larger than
              *  the indentation value.
              */
-            tCC*   pzSave = pzLinePfx;
+            tCC* pzSave = pzLinePfx;
             size_t firstSize = handleIndent( OPT_ARG( FIRST_INDENT ));
             pzFirstPfx = pzLinePfx;
             pzLinePfx  = pzSave;

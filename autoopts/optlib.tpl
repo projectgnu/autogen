@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.9 2005/04/25 00:12:09 bkorb Exp $
+# $Id: optlib.tpl,v 4.10 2005/10/29 22:13:11 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-04-24 11:17:30 bkorb"
+# Time-stamp:      "2005-10-29 13:55:36 bkorb"
 
 =][=
 
@@ -185,7 +185,7 @@ DEFINE set-defines
         [=set-desc=].fOptState &= OPTST_PERSISTENT; \
         [=set-desc=].fOptState |= [=opt-state=][=
   IF (exist? "arg-type")=]; \
-        [=set-desc=].pzLastArg  = (tCC*)(a)[=
+        [=set-desc=].pzLastArg  = (const char*)(a)[=
   ENDIF  =][=
   IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
@@ -442,18 +442,18 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        (exist? "arg-default")   =][=
        CASE arg-type            =][=
        =* num                   =]
-#define [=(. def-arg-name)=]((tCC*)[= arg-default =])[=
+#define [=(. def-arg-name)=]((const char*)[= arg-default =])[=
 
        =* bool                  =][=
           CASE arg-default      =][=
           ~ n.*|f.*|0           =]
-#define [=(. def-arg-name)=]((tCC*)AG_FALSE)[=
+#define [=(. def-arg-name)=]((const char*)AG_FALSE)[=
           *                     =]
-#define [=(. def-arg-name)=]((tCC*)AG_TRUE)[=
+#define [=(. def-arg-name)=]((const char*)AG_TRUE)[=
           ESAC                  =][=
 
        =* key                   =]
-#define [=(. def-arg-name)=]((tCC*)[=
+#define [=(. def-arg-name)=]((const char*)[=
           IF (=* (get "arg-default") (string-append Cap-prefix cap-name))
             =][= arg-default    =][=
           ELSE  =][=(string-append UP-prefix UP-name "_"

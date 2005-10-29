@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.5 2005/06/07 22:25:13 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.6 2005/10/29 22:13:11 bkorb Exp $
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2005 Bruce Korb
@@ -84,14 +84,14 @@ printChildren( xmlNodePtr pNode );
 /* = = = END-STATIC-FORWARD = = = */
 #define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
 
-extern void forkAutogen( tCC* pzInput );
+extern void forkAutogen( const char* pzInput );
 
 
 int
 main( int argc, char** argv )
 {
-    xmlDocPtr pDoc;
-    tCC*      pzFile = NULL;
+    xmlDocPtr   pDoc;
+    const char* pzFile = NULL;
 
     {
         int ct = optionProcess( &xml2agOptions, argc, argv );
@@ -281,7 +281,7 @@ static xmlNodePtr
 printHeader( xmlDocPtr pDoc )
 {
     tSCC zDef[] = "AutoGen Definitions %s%s;\n";
-    tCC* pzSfx = ".tpl";
+    const char* pzSfx = ".tpl";
 
     xmlNodePtr pRootNode = xmlDocGetRootElement( pDoc );
     xmlChar*   pTpl = NULL;

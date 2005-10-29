@@ -10,13 +10,23 @@ test -z "${CFLAGS}" && CFLAGS="@CFLAGS@"
 test -z "${LIBS}"   && LIBS="@LIBS@"
 test -z "${MAKE}"   && MAKE=`which make`
 
+INCLUDES="@DEFS@ "$(
+
+    for d in . @srcdir@ @top_builddir@ @top_srcdir@ \
+             @top_builddir@/autoopts @top_srcdir@/autoopts
+    do
+        (\cd ${d} ; pwd)
+    done | \
+    uniq | \
+    sed s/^/-I/ )
+
 # Give preference to configured SHELL
 #
 d=${SHELL}
 SHELL=@SHELL@
 test -z "${SHELL}"  && SHELL=$d
 
-export CC CFLAGS LIBS MAKE SHELL
+export CC CFLAGS LIBS MAKE SHELL INCLUDES
 
 # Now auto-export variables:
 #

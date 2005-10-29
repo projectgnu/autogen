@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-09-20 19:32:35 bkorb"
+ *  Time-stamp:      "2005-10-29 15:06:44 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.19 2005/09/21 03:42:25 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.20 2005/10/29 22:13:10 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -145,7 +145,7 @@ typedef enum {
 typedef struct {
     tOptDesc*  pOD;
     tCC*       pzOptArg;
-    tUL        flags;
+    tAoUL      flags;
     teOptType  optType;
 } tOptState;
 #define OPTSTATE_INITIALIZER(st) \

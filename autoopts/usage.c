@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.9 2005/06/07 22:25:13 bkorb Exp $
- * Time-stamp:      "2005-02-20 13:47:52 bkorb"
+ *  usage.c  $Id: usage.c,v 4.10 2005/10/29 22:13:11 bkorb Exp $
+ * Time-stamp:      "2005-10-29 14:04:54 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -51,10 +51,6 @@
  */
 
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
-
-#ifndef tSC
-#  define tSC static char
-#endif
 
 static arg_types_t argTypes;
 
@@ -485,7 +481,7 @@ printBareUsage(
         switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
         case OPARG_TYPE_ENUMERATION:
         case OPARG_TYPE_MEMBERSHIP:
-            displayEnum |= (pOD->pOptProc != NULL) ? AG_TRUE : AG_FALSE;
+            displayEnum = (pOD->pOptProc != NULL) ? AG_TRUE : displayEnum;
         }
     }
     return;

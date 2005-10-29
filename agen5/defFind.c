@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: defFind.c,v 4.5 2005/10/29 22:13:10 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -34,7 +34,7 @@ typedef struct defEntryList tDefEntryList;
 
 tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
 
-tSC zDefinitionName[ MAXPATHLEN ];
+static char zDefinitionName[ MAXPATHLEN ];
 
 static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
@@ -421,7 +421,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
-    *pIsIndexed |= (breakCh == '[');
+    if (breakCh == '[') *pIsIndexed = AG_TRUE;
 
     for (;;) {
         /*

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: pgusage.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
- * Time-stamp:      "2005-02-14 08:22:01 bkorb"
+ *  $Id: pgusage.c,v 4.7 2005/10/29 22:13:11 bkorb Exp $
+ * Time-stamp:      "2005-10-29 13:23:12 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -81,9 +81,9 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
     {
         my_pid  = getpid();
 #ifdef HAVE_SNPRINTF
-        snprintf( zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", (tUL)my_pid );
+        snprintf(zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", (tAoUL)my_pid);
 #else
-        sprintf( zPageUsage, "/tmp/use.%lu", (tUL)my_pid );
+        sprintf( zPageUsage, "/tmp/use.%lu", (tAoUL)my_pid );
 #endif
         unlink( zPageUsage );
 
@@ -126,9 +126,9 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
          *  Page the file and remove it when done.
          */
 #ifdef HAVE_SNPRINTF
-        snprintf( zPageUsage, sizeof(zPageUsage), zPage, pzPager, (tUL)my_pid );
+        snprintf(zPageUsage, sizeof(zPageUsage), zPage, pzPager, (tAoUL)my_pid);
 #else
-        sprintf( zPageUsage, zPage, pzPager, (tUL)my_pid );
+        sprintf( zPageUsage, zPage, pzPager, (tAoUL)my_pid );
 #endif
         fclose( stderr );
         dup2( STDOUT_FILENO, STDERR_FILENO );

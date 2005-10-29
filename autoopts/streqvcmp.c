@@ -1,7 +1,7 @@
 
 /*
- *  $Id: streqvcmp.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
- * Time-stamp:      "2005-04-10 14:05:53 bkorb"
+ *  $Id: streqvcmp.c,v 4.8 2005/10/29 22:13:11 bkorb Exp $
+ * Time-stamp:      "2005-10-29 14:05:07 bkorb"
  *
  *  String Equivalence Comparison
  *
@@ -103,9 +103,9 @@ static unsigned char charmap[] = {
  *
  * what: compare two strings with an equivalence mapping
  *
- * arg:  + tCC* + str1 + first string +
- * arg:  + tCC* + str2 + second string +
- * arg:  + int  + ct   + compare length +
+ * arg:  + const char* + str1 + first string +
+ * arg:  + const char* + str2 + second string +
+ * arg:  + int         + ct   + compare length +
  *
  * ret_type:  int
  * ret_desc:  the difference between two differing characters

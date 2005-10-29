@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.17 2005/10/02 17:38:42 bkorb Exp $
- *  Time-stamp:      "2005-10-02 10:37:29 bkorb"
+ *  $Id: autoopts.c,v 4.18 2005/10/29 22:13:10 bkorb Exp $
+ *  Time-stamp:      "2005-10-29 13:19:36 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -350,7 +350,7 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
  *  Find the short option descriptor for the current option
  */
 LOCAL tSuccess
-shortOptionFind( tOptions* pOpts, tUC optValue, tOptState* pOptState )
+shortOptionFind( tOptions* pOpts, tAoUC optValue, tOptState* pOptState )
 {
     tOptDesc*  pRes = pOpts->pOptDesc;
     int        ct   = pOpts->optCt;

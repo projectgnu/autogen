@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.8 2005/10/22 21:57:43 bkorb Exp $
+ *  $Id: agShell.c,v 4.9 2005/10/29 22:13:10 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -174,10 +174,8 @@ serverSetup( void )
         AGFREE( (void*)pz );
     }
 
-#if defined( DEBUG_ENABLED )
-    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
         tSCC zSetup[] = "set -x\n"
-                        "exec 2> /dev/tty\n"
                         "trap\n"
                         "echo server setup done\n";
         char* pz;
@@ -198,7 +196,6 @@ serverSetup( void )
         fprintf( pfTrace, "Trap state:\n%s\n", pz );
         AGFREE( (void*)pz );
     }
-#endif
     pzLastCmd = NULL;
 }
 

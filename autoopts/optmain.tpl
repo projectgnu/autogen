@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.10 2005/04/02 09:03:51 bkorb Exp $
+# $Id: optmain.tpl,v 4.11 2005/10/29 22:13:11 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-04-01 11:58:25 bkorb"
+# Time-stamp:      "2005-10-29 13:55:49 bkorb"
 
 =][=
 
@@ -745,7 +745,7 @@ DEFINE range-option-code
           (out-pop #t)) =] };
     long val;
     int ix;
-    tCC* pzIndent = "\t\t\t\t  ";
+    const char* pzIndent = "\t\t\t\t  ";
     extern FILE* option_usage_fp;
 
     if (pOptDesc == NULL) /* usage is requesting range list
@@ -876,7 +876,7 @@ DEFINE define-option-callbacks  =][=
 [=
 
       IF (exist? "arg-optional") =]
-    if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
+    if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)[=
          (string-append UP-name "_"    (if (> (len "arg-optional") 0)
             (up-c-name "arg-optional") (if (exist? "arg-default")

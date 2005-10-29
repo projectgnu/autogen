@@ -24,7 +24,7 @@ addArg( char* pzArg, int ix )
 
 
 void
-forkAutogen( tCC* pzInput )
+forkAutogen( const char* pzInput )
 {
     tSCC zErr[] = "%s fs ERROR %d (%s) on %s\n";
     int fd[2];
@@ -133,9 +133,9 @@ forkAutogen( tCC* pzInput )
           ==*  str                 =][=
                IF (exist? "max")   =]
             int    optCt = STACKCT_OPT( [=(. opt-name)=] );
-            tCC**  ppOA  = STACKLST_OPT( [=(. opt-name)=] );
+            const char**  ppOA  = STACKLST_OPT( [=(. opt-name)=] );
             do  {
-                tCC* pA = *(ppOA++);
+                const char* pA = *(ppOA++);
                 pzArg = malloc( [= (+ 4 (string-length (get "name")))
                         =] + strlen( pA ));
                 sprintf( pzArg, "--[=name=]=%s", pA );

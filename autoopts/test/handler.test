@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:18:26 bkorb"
+# Time-stamp:        "2005-10-29 14:52:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/06 20:16:08 $
+# Last Modified:     $Date: 2005/10/29 22:13:11 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.6 2005/03/06 20:16:08 bkorb Exp $
+# $Id: handler.test,v 4.7 2005/10/29 22:13:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -166,7 +166,7 @@ doOptFourth(
         "alpha",  "beta",   "gamma",  "omega"
     };
 
-    if (((tUL)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
+    if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)FOURTH_GAMMA;
     else
     pOptDesc->pzLastArg =

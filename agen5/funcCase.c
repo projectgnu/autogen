@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: funcCase.c,v 4.5 2005/10/29 22:13:10 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1262,8 +1262,8 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          *  Turn off the case comparison mode for regular expressions.
          *  We don't have to worry about it.  It is done for us.
          */
-        bitSet  = ~FTYP_SELECT_EQUIVALENT_FULL;
-        bitSet |= FTYP_SELECT_COMPARE_FULL; /* dont turn this bit off! */
+        bitSet    = ~FTYP_SELECT_EQUIVALENT_FULL;
+        bitSet   |= FTYP_SELECT_COMPARE_FULL; /* dont turn this bit off! */
         typ &= bitSet;
     }
 

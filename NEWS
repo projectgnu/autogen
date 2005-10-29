@@ -2,6 +2,8 @@ New in __CURRENT_VERSION__ - October, 2005
 
 * Fixed a small timing hole where the read from the read end of the output
   pipe of the server shell can fail.  (The read is retried.)
+* Eliminated the code that symlinked all the sources into the build directory.
+* Added a macro for testing mmap failure to accommodate a picky compiler.
 
 New in 5.7.3 - October, 2005
 

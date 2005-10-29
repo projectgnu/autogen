@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2005
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2005-10-08 10:41:06 bkorb"
+ * Time-stamp:      "2005-10-29 12:04:53 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -565,7 +565,7 @@ ag_fmemopen(void *buf, ssize_t len, const char *pMode)
              * append or read text mode -- find the end of the buffer
              * (the first NUL character)
              */
-            char *p = pFMC->buffer = buf;
+            unsigned char *p = pFMC->buffer = buf;
             pFMC->eof = 0;
             while ((*p != NUL) && (++(pFMC->eof) < len))  p++;
             pFMC->next_ix =

@@ -76,7 +76,7 @@ AC_DEFUN([LIBOPTS_CHECK],[
   [if test -n "${NEED_LIBOPTS_DIR}" ; then]
     INVOKE_LIBOPTS_MACROS
   else
-    INVOKE_LIBOPTS_MACROS_FIRST dnl get the standard things the macros define.
+    INVOKE_LIBOPTS_MACROS_FIRST
   [fi
 # end of AC_DEFUN of LIBOPTS_CHECK]
 ])

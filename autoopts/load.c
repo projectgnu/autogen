@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.19 2005/09/03 22:49:50 bkorb Exp $
- *  Time-stamp:      "2005-07-31 08:41:52 bkorb"
+ *  $Id: load.c,v 4.20 2005/10/29 22:13:10 bkorb Exp $
+ *  Time-stamp:      "2005-10-29 14:45:36 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -53,9 +53,6 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
-static char*
-assembleArgValue( char* pzTxt, tOptionLoadMode mode );
-
 static ag_bool
 insertProgramPath(
     char*   pzBuf,
@@ -69,16 +66,19 @@ insertEnvVal(
     int     bufSize,
     tCC*    pzName,
     tCC*    pzProgPath );
+
+static char*
+assembleArgValue( char* pzTxt, tOptionLoadMode mode );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath
  * private:
  *
  * what:  translate and construct a path
- * arg:   + char* + pzBuf      + The result buffer +
- * arg:   + int   + bufSize    + The size of this buffer +
- * arg:   + tCC*  + pzName     + The input name +
- * arg:   + tCC*  + pzProgPath + The full path of the current program +
+ * arg:   + char*       + pzBuf      + The result buffer +
+ * arg:   + int         + bufSize    + The size of this buffer +
+ * arg:   + const char* + pzName     + The input name +
+ * arg:   + const char* + pzProgPath + The full path of the current program +
  *
  * ret-type: ag_bool
  * ret-desc: AG_TRUE if the name was handled, otherwise AG_FALSE.

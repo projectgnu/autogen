@@ -42,7 +42,7 @@ agargs="-L ${srcdir} -T spec.tpl -b autogen-${AG_VERSION} --writable"
 ${AGexe} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
 cd ${HOME}
-rpmbuild -ba ${builddir}/${specfile} || exit 1
+RPM_OPT_FLAGS=-O3 rpmbuild -ba ${builddir}/${specfile} || exit 1
 ln `find . -type f -name '*.rpm'` ${builddir}/.
 cd ${builddir}
 rm -rf ${HOME}

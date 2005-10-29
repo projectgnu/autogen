@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.7 2005/05/27 17:39:01 bkorb Exp $
+# $Id: opthead.tpl,v 4.8 2005/10/29 22:13:10 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-04-24 18:08:44 bkorb"
+# Time-stamp:      "2005-10-29 13:52:50 bkorb"
 
 =]
 /*
@@ -220,7 +220,7 @@ IF (exist? "homerc") =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
-        [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (tCC*)(a) )[=
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (const char*)(a) )[=
 ENDIF
 =]
 

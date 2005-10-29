@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-10-16 15:15:53 bkorb"
-# ID:  $Id: options_h.tpl,v 4.18 2005/10/22 21:57:43 bkorb Exp $
+# Time-stamp:      "2005-10-29 15:06:59 bkorb"
+# ID:  $Id: options_h.tpl,v 4.19 2005/10/29 22:13:10 bkorb Exp $
 
 =][=
 
@@ -147,13 +147,13 @@ typedef struct optionValue {
  *  because "static const" cannot both be applied to a type,
  *  tho each individually can...so they all are
  */
-#define tSCC      static const char
-#define tSC       static char
-#define tCUC      const unsigned char
-#define tUC       unsigned char
-#define tCC       const char
-#define tUI       unsigned int
-#define tUL       unsigned long
+#define tSCC        static const char
+#define tCC         const char
+#define tAoSC       static char
+#define tAoUC       unsigned char
+#define tAoUI       unsigned int
+#define tAoUL       unsigned long
+#define tAoUS       unsigned short
 
 /*
  *  It is so disgusting that there must be so many ways
@@ -203,9 +203,9 @@ typedef struct argList tArgList;
 #define MIN_ARG_ALLOC_CT   6
 #define INCR_ARG_ALLOC_CT  8
 struct argList {
-    int               useCt;
-    int               allocCt;
-    tCC*              apzArgs[ MIN_ARG_ALLOC_CT ];
+    int             useCt;
+    int             allocCt;
+    tCC*            apzArgs[ MIN_ARG_ALLOC_CT ];
 };
 
 /*
@@ -213,30 +213,30 @@ struct argList {
  *  Only the fields marked "PUBLIC" are for public use.
  */
 struct optDesc {
-    uint16_t          optIndex;         /* PUBLIC */
-    uint16_t          optValue;         /* PUBLIC */
-    uint16_t          optActualIndex;   /* PUBLIC */
-    uint16_t          optActualValue;   /* PUBLIC */
+    tAoUS           optIndex;         /* PUBLIC */
+    tAoUS           optValue;         /* PUBLIC */
+    tAoUS           optActualIndex;   /* PUBLIC */
+    tAoUS           optActualValue;   /* PUBLIC */
 
-    uint16_t          optEquivIndex;    /* PUBLIC */
-    uint16_t          optMinCt;
-    uint16_t          optMaxCt;
-    uint16_t          optOccCt;         /* PUBLIC */
+    tAoUS           optEquivIndex;    /* PUBLIC */
+    tAoUS           optMinCt;
+    tAoUS           optMaxCt;
+    tAoUS           optOccCt;         /* PUBLIC */
 
-    uint32_t          fOptState;        /* PUBLIC */
-    uint32_t          reserved;
-    tCC*              pzLastArg;        /* PUBLIC */
-    void*             optCookie;        /* PUBLIC */
+    tAoUI           fOptState;        /* PUBLIC */
+    tAoUI           reserved;
+    tCC*            pzLastArg;        /* PUBLIC */
+    void*           optCookie;        /* PUBLIC */
 
-    const int *       pOptMust;
-    const int *       pOptCant;
-    tpOptProc         pOptProc;
-    const char*       pzText;
+    const int *     pOptMust;
+    const int *     pOptCant;
+    tpOptProc       pOptProc;
+    const char*     pzText;
 
-    const char*       pz_NAME;
-    const char*       pz_Name;
-    const char*       pz_DisableName;
-    const char*       pz_DisablePfx;
+    const char*     pz_NAME;
+    const char*     pz_Name;
+    const char*     pz_DisableName;
+    const char*     pz_DisablePfx;
 };
 
 /*
@@ -245,10 +245,10 @@ struct optDesc {
  */
 typedef struct optSpecIndex tOptSpecIndex;
 struct optSpecIndex {
-    uint16_t          more_help;
-    uint16_t          save_opts;
-    uint16_t          number_option;
-    uint16_t          default_opt;
+    tAoUS           more_help;
+    tAoUS           save_opts;
+    tAoUS           number_option;
+    tAoUS           default_opt;
 };
 [=
 
@@ -275,8 +275,8 @@ struct options {
     const int         structVersion;
     int               origArgCt;
     char**            origArgVect;
-    tUI               fOptSet;
-    tUI               curOptIdx;
+    unsigned int      fOptSet;
+    unsigned int      curOptIdx;
     char*             pzCurOpt;
 
     const char*       pzProgPath;
@@ -399,20 +399,20 @@ FOR export_func         =][=
       (begin
         (set! if-text    (string-append "\n#ifndef " (get "ifndef")))
         (set! note-text  (sprintf note-fmt (get "name") (get "ifndef") " not"))
-	(set! end-text   (sprintf "#endif /* %s */\n" (get "ifndef")))
+        (set! end-text   (sprintf "#endif /* %s */\n" (get "ifndef")))
       )
 
   (if (exist? "ifdef")
       (begin
         (set! if-text    (string-append "\n#ifdef " (get "ifdef")))
         (set! note-text  (sprintf note-fmt (get "name") (get "ifdef") ""))
-	(set! end-text   (sprintf "#endif /* %s */\n" (get "ifdef")))
+        (set! end-text   (sprintf "#endif /* %s */\n" (get "ifdef")))
       )
 
   (begin
         (set! if-text    "")
         (set! note-text  "")
-	(set! end-text   "")
+        (set! end-text   "")
   )  ))
 
  (not (exist? "private")) =]

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: environment.c,v 4.8 2005/06/07 22:25:12 bkorb Exp $
- * Time-stamp:      "2005-02-20 17:18:54 bkorb"
+ *  $Id: environment.c,v 4.9 2005/10/29 22:13:10 bkorb Exp $
+ * Time-stamp:      "2005-10-29 13:23:59 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -68,7 +68,7 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
     const char*   pczOptStr = getenv( pOpts->pzPROGNAME );
     token_list_t* pTL;
     int           sv_argc;
-    tUI           sv_flag;
+    tAoUI         sv_flag;
     char**        sv_argv;
 
     /*

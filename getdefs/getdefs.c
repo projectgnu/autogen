@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.3 2005/01/23 23:33:06 bkorb Exp $
+ *  $Id: getdefs.c,v 4.4 2005/10/29 22:13:11 bkorb Exp $
  *
  *    getdefs copyright 1999-2005 Bruce Korb
  *
- *  Time-stamp:        "2005-01-23 15:32:10 bkorb"
+ *  Time-stamp:        "2005-10-29 12:15:56 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -285,13 +285,14 @@ buildDefinition(
     tSCC zSrcFile[] = "    %s = '%s';\n";
     tSCC zLineNum[] = "    %s = '%d';\n";
 
-    ag_bool    these_are_global_defs = (*pzDef == '*');
+    ag_bool    these_are_global_defs;
     tSuccess   preamble;
     int        re_res;
     char*      pzNextDef = NULL;
     regmatch_t match[2];
 
-    if (these_are_global_defs) {
+    if (*pzDef == '*') {
+        these_are_global_defs = AG_TRUE;
         strcpy( pzOut, zGlobal );
         pzOut += sizeof( zGlobal )-1;
         pzOut += sprintf( pzOut, zLineId, line, pzFile );
@@ -300,6 +301,7 @@ buildDefinition(
         preamble = PROBLEM;
 
     } else {
+        these_are_global_defs = AG_FALSE;
         preamble = buildPreamble( &pzDef, &pzOut, pzFile, line );
         if (FAILED( preamble )) {
             *pzOut = NUL;

@@ -1,3 +1,42 @@
+2005-10-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(serverSetup): enable full shell tracing with
+	--trace=everything.
+	* througout: Reduce usage of tCC and tSCC and other abbrevs.  The
+	goal is to reduce dependencies on internal headers for generated code.
+	* doc/auto_gen.tpl(autogen): missed one.  Use ${AGexe} instead.
+	Also use ${INCLUDES} in the compiles
+	* doc/mk-agen-texi-in(INCLUDES): construct and export
+
+2005-10-28  Bruce Korb  <bkorb@gnu.org>
+
+	* GLOBAL: removed the code for forcing builddir == srcdir building.
+	That meant more careful determination of when to look for files in
+	the source tree and when they got built dynamically in the build dir.
+	* config/liboptschk.m4: new.  autoconf macro for determining whether or
+	not libopts has been installed and how it is to be used.
+	* Makefile.am: distribute and install that new file
+	* agen5/opts.def(show-shell): eliminate in favor of a new trace level
+	enumeration:  server-shell
+	* agen5/agShell.c(closeServer) flush write pipe before closing it.
+	Sometimes, the data get fed to a new process.
+	(serverSetup): trace server shell stuff if tracing level above the
+	newly enumerated level of TRACE_SERVER_SHELL.
+	(chainOpen): flush the trace file some more.
+	(loadData): retry reads if the pipe remains open and the read fails.
+	Sometimes, it fails without waiting on the first try to a serverprocess.
+	* agen5/bootstrap.dir(recursive): more things need to be set up for
+	bootstrapping that must not be done during a make step.
+	* autoopts/options_h.tpl(TEXT_MMAP_FAILED_ADDR): new macro
+	* agen5/expFormat.c(ag_scm_license): Use the new mmap failure macro
+	* agen5/tpLoad.c(loadTemplate): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	(filePreset): ditto
+	* agen5/test/Makefile.am(TESTS_ENVIRONMENT): set full path names
+	* agen5/test/defs(CFLAGS): set up properly for srcdir != builddir
+	* agen5/test/*.test: get CFLAGS from "defs" file.
+	* autoopts/Makefile.am(options.h): reference from source directory
+
 2005-10-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(zCmdFmt): add a command number to the closing echo

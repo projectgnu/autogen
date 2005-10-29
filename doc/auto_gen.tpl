@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.15 2005/09/04 21:13:39 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.16 2005/10/29 22:13:11 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -600,7 +600,11 @@ flag = {
 @end example
 
 @noindent
-Then perform the following steps:
+Then perform the following steps:[= #
+
+Developer note:  the following only works when AutoGen has been installed.
+Since this may be being built on a system where it has not been installed,
+the code below ensures we are running out tools out of the build directory =]
 
 @enumerate
 @item
@@ -623,10 +627,13 @@ Running those commands yields:
 "cd ${tempdir}
 test -f checkopt.def || die cannot locate checkopt.def
 test -f check && rm -f check
-
+cat >> checkopt.def <<- _EOF_
+	include = '#include \"compat/compat.h\"';
+	_EOF_
 (
-  autogen checkopt.def
-  ${CC-cc} -o check -DTEST_CHECK_OPTS ${CFLAGS} checkopt.c ${LIBS} ${LDFLAGS}
+  ${AGexe} -L${top_srcdir}/autoopts checkopt.def
+  opts=\"-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}\"
+  ${CC} ${opts} checkopt.c ${LIBS}
 ) > checkopt.err 2>&1
 
 test -x ./check || {
@@ -699,7 +706,6 @@ then libs=\"${libs}/libopts.a\"
 else libs=\"-L ${libs} -lopts\"
 fi
 libs=\"${libs} ${LIBS}\"
-incs=\"-I${TOPDIR} -I${OPTDIR}\"
 
 exec 3>&1
 (
@@ -708,7 +714,7 @@ exec 3>&1
   HOME='' ${AGexe} -L${OPTDIR} default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
-  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${incs}\"
+  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}\"
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
@@ -866,7 +872,7 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-opts="-o genshellopt -DTEST_GETDEFS_OPTS ${incs}"
+opts="-o genshellopt -DTEST_GETDEFS_OPTS ${INCLUDES}"
 
 ( cat ${top_srcdir}/getdefs/opts.def
   echo "test_main = 'optionParseShell';"
@@ -876,7 +882,7 @@ opts="-o genshellopt -DTEST_GETDEFS_OPTS ${incs}"
   cd ${tempdir}
   HOME='' ${AGexe} -t40 -L${OPTDIR} -bgenshellopt -- -
 
-  ${CC} ${CFLAGS} ${opts} ${incs} genshellopt.c ${libs}
+  ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
 ) > ${tempdir}/genshellopt.log 2>&1
 
 test -x ${tempdir}/genshellopt || \

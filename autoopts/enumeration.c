@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
- * Time-stamp:      "2005-02-14 14:29:55 bkorb"
+ *  $Id: enumeration.c,v 4.7 2005/10/29 22:13:10 bkorb Exp $
+ * Time-stamp:      "2005-10-29 13:36:32 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -222,7 +222,7 @@ findName(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   tCC**,         paz_names, list of enumeration names
+ * arg:   const char**,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
  * ret_type:  char*
@@ -280,7 +280,7 @@ optionEnumerationVal(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   tCC**,         paz_names, list of enumeration names
+ * arg:   const char**,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
  * doc:   This converts the pzLastArg string from the option description
