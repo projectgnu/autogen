@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2005-03-07 13:05:31 bkorb"
+# Time-stamp:        "2005-11-06 15:57:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/11/07 00:21:07 $
 #            by: bkorb
 #
-# $Id: heredef.test,v 4.4 2005/03/13 19:30:08 bkorb Exp $
+# $Id: heredef.test,v 4.5 2005/11/07 00:21:07 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -45,11 +45,11 @@ _EOF_
 # # # # # # # # # # SAMPLE FILE # # # # # # # # #
 cat > ${testname}.sample <<\_EOF_
 OKAY:  "\"`Testing'"
-FROM:  string1 extracted from heredef.def line 3
+FROM:  string1 extracted from heredef.def line 11
        string2 extracted
-#line 7 "heredef.def"
+#line 15 "heredef.def"
 
-       string3 extracted From heredef.def on line 11
+       string3 extracted From heredef.def on line 18
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -57,16 +57,23 @@ _EOF_
 # Create the files we need in the test environment
 echo "AutoGen definitions ${testname};" > ${testname}.def
 cat >> ${testname}.def <<\_EOF_
-
+#ifdef BOGUS
+/* Line 3 */
+#else
+#ifdef WRONG
+/* line 6 */
+#endif
+#endif
+/* line 9 */
 string1 = <<- AG_EOF
 	"`Testing'
-	AG_EOF;
-
+	AG_EOF; /* " */
+/* line 13 */
 string2 = <<- AG_EOF
 "`Testing'
-AG_EOF;
+AG_EOF; /* " */
 
-string3 = "\"`Testing'";
+string3 = "\"`Testing'";  /* line 18 */
 
 _EOF_
 

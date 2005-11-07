@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Wednesday July 27, 2005 at 12:46:37 PM PDT
+ *  It has been AutoGen-ed  Sunday November  6, 2005 at 03:58:43 PM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -104,6 +104,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -121,6 +122,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -138,6 +140,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  var_name */
     { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  other_name */
     { DP_ST_NEED_SEMI, &dp_do_tpl_name },           /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -155,6 +158,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_NEED_NAME, NULL },                      /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -172,6 +176,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_HAVE_NAME, &dp_do_need_name_var_name }, /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -189,6 +194,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_NEED_NAME, &dp_do_empty_val },          /* EVT:  ; */
     { DP_ST_NEED_VALUE, &dp_do_have_name_lit_eq },  /* EVT:  = */
@@ -206,6 +212,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  var_name */
     { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  other_name */
     { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  string */
+    { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  here_string */
     { DP_ST_HAVE_VALUE, &dp_do_str_value },         /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -223,6 +230,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_NEED_CBKT, &dp_do_indexed_name },       /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_NEED_CBKT, &dp_do_indexed_name },       /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -240,6 +248,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -257,6 +266,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_NEED_NAME, &dp_do_empty_val },          /* EVT:  ; */
     { DP_ST_NEED_VALUE, NULL },                     /* EVT:  = */
@@ -274,6 +284,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  var_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  other_name */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  string */
+    { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  here_string */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  number */
     { DP_ST_NEED_NAME, NULL },                      /* EVT:  ; */
     { DP_ST_INVALID, &dp_do_invalid },              /* EVT:  = */
@@ -307,6 +318,7 @@ tSCC zDpStrings[] =
        "var_name" "\0"
        "other_name" "\0"
        "string" "\0"
+       "here_string" "\0"
        "number" "\0"
        ";" "\0"
        "=" "\0"
@@ -336,14 +348,15 @@ tSCC zDpStrings[] =
 #define DpEvVar_Name_off 219
 #define DpEvOther_Name_off 228
 #define DpEvString_off 239
-#define DpEvNumber_off 246
-#define DpEvLit_Semi_off 253
-#define DpEvLit_Eq_off 255
-#define DpEvLit_Comma_off 257
-#define DpEvLit_O_Brace_off 259
-#define DpEvLit_C_Brace_off 261
-#define DpEvLit_Open_Bkt_off 263
-#define DpEvLit_Close_Bkt_off 265
+#define DpEvHere_String_off 246
+#define DpEvNumber_off 258
+#define DpEvLit_Semi_off 265
+#define DpEvLit_Eq_off 267
+#define DpEvLit_Comma_off 269
+#define DpEvLit_O_Brace_off 271
+#define DpEvLit_C_Brace_off 273
+#define DpEvLit_Open_Bkt_off 275
+#define DpEvLit_Close_Bkt_off 277
 
 
 static const size_t aszDpStates[] = {
@@ -355,9 +368,10 @@ static const size_t aszDpStates[] = {
 static const size_t aszDpEvents[] = {
     DpEvAutogen_off,       DpEvDefinitions_off,   DpEvEnd_off,
     DpEvVar_Name_off,      DpEvOther_Name_off,    DpEvString_off,
-    DpEvNumber_off,        DpEvLit_Semi_off,      DpEvLit_Eq_off,
-    DpEvLit_Comma_off,     DpEvLit_O_Brace_off,   DpEvLit_C_Brace_off,
-    DpEvLit_Open_Bkt_off,  DpEvLit_Close_Bkt_off, DpEvInvalid_off };
+    DpEvHere_String_off,   DpEvNumber_off,        DpEvLit_Semi_off,
+    DpEvLit_Eq_off,        DpEvLit_Comma_off,     DpEvLit_O_Brace_off,
+    DpEvLit_C_Brace_off,   DpEvLit_Open_Bkt_off,  DpEvLit_Close_Bkt_off,
+    DpEvInvalid_off };
 
 #define DP_EVT_NAME(t) ( (((unsigned)(t)) >= DP_EV_INVALID) \
     ? zDpStrings : zDpStrings + aszDpEvents[t])
@@ -558,6 +572,12 @@ dp_do_str_value(
 
     pCurrentEntry->val.pzText = pz_token;
     pCurrentEntry->valType = VALTYP_TEXT;
+
+    /*
+     *  The "here string" marker is the line before where the text starts.
+     */
+    if (trans_evt == DP_EV_HERE_STRING)
+        pCurrentEntry->srcLineNum++;
     return maybe_next;
 /*  END   == STR VALUE == DO NOT CHANGE THIS COMMENT  */
 }

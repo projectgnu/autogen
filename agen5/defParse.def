@@ -29,7 +29,7 @@ prefix = dp;
  * Non-terminal "events"
  */
 event  = "autogen", "definitions", end,
-         var_name, other_name, string, number;
+         var_name, other_name, string, here_string, number;
 
 /*
  * Terminal token-events
@@ -95,7 +95,7 @@ transition =
                       ttype = noop; };
 
 transition =
-{ tst  = need_value;  tev   = string, other_name, var_name, number;
+{ tst  = need_value;  tev   = string, here_string, other_name, var_name, number;
                       next  = have_value;      ttype = str_value; },
 { tst  = need_value;  tev   = lit_o_brace;     next  = need_name;
                       ttype = start_block; },

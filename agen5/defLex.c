@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.7 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: defLex.c,v 4.8 2005/11/07 00:21:07 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -169,7 +169,7 @@ scanAgain:
             return DP_EV_INVALID;
         }
 
-        lastToken = DP_EV_STRING;
+        lastToken = DP_EV_HERE_STRING;
         pCurCtx->pzScan = pz;
         break;
     }

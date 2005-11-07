@@ -24,8 +24,6 @@ cd AGPKG
 HOME=`pwd`
 set -x
 mkdir -p BUILD SOURCES SPECS RPMS SRPMS
-echo "%_tmppath ${top_builddir}/AGPKG/BUILD
-%_topdir $PWD" > .rpmmacros
 
 [ -f ../autogen-${AG_VERSION}.tar.gz ] || (
   cd ..
@@ -42,6 +40,24 @@ agargs="-L ${srcdir} -T spec.tpl -b autogen-${AG_VERSION} --writable"
 ${AGexe} ${agargs} ${top_srcdir}/agen5/opts.def || exit 1
 
 cd ${HOME}
+
+echo "%_tmppath ${top_builddir}/AGPKG/BUILD
+%_topdir $PWD" > .rpmmacros
+
+cat > .rpmrc <<- _EOF_
+
+	optflags: i386 -O3 -march=i486 -mcpu=i686
+	optflags: i486 -O3 -march=i486
+	optflags: i586 -O3 -march=i586 -mcpu=i686 -fmessage-length=0
+	optflags: i686 -O3 -march=i686 -mcpu=i686
+	optflags: athlon -O3 -march=athlon
+	optflags: ia64 -O3
+	optflags: x86_64 -O3
+	optflags: amd64 -O3
+	optflags: ia32e -O3
+
+	_EOF_
+
 RPM_OPT_FLAGS=-O3 rpmbuild -ba ${builddir}/${specfile} || exit 1
 ln `find . -type f -name '*.rpm'` ${builddir}/.
 cd ${builddir}
@@ -52,6 +68,7 @@ ${VERBOSE} || ls -l *.rpm
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
-## tab-width: 4
+## tab-width: 8
+## sh-basic-offset: 2
 ## End:
 ## end of mkpkg.linux

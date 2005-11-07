@@ -1,3 +1,15 @@
+2005-11-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defDirect.c(skipToEndif) count skipped newlines
+	(skipToElseEnd): ditto
+	* agen5/defLex.c(yylex): Separate the DP_EV_HERE_STRING as a different
+	token type so that the source line number can be adjusted.
+	* agen5/defParse.def: add the new token type to the FSM
+	* agen5/defParse-fsm.c: regenerate and in dp_do_str_value() bump the
+	line number when the token is DP_EV_HERE_STRING.
+	* agen5/test/heredef.test: line numbers are correct now.  Adjust.
+	* pkg/mkpkg.linux: crank up the optimizations for Linux packaging.
+
 2005-10-29  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(serverSetup): enable full shell tracing with

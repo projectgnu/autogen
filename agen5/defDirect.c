@@ -1,7 +1,7 @@
 
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: defDirect.c,v 4.8 2005/11/07 00:21:07 bkorb Exp $
  *  This module processes definition file directives.
  */
 
@@ -239,8 +239,11 @@ findDirective( char* pzDirName )
  *  while skipping a block of text due to a failed test.
  */
 static char*
-skipToEndif( char* pzScan )
+skipToEndif( char* pzStart )
 {
+    char* pzScan = pzStart;
+    char* pzRet;
+
     for (;;) {
         char*  pz;
         /*
@@ -269,8 +272,9 @@ skipToEndif( char* pzScan )
              */
             char* pz = strchr( pzScan, '\n' );
             if (pz != NULL)
-                return pz+1;
-            return pzScan + strlen( pzScan );
+                 pzRet = pz+1;
+            else pzRet = pzScan + strlen( pzScan );
+            goto leave;
         }
 
         case DIR_IFDEF:
@@ -288,6 +292,13 @@ skipToEndif( char* pzScan )
             break; /* ignore it */
         }  /* switch (findDirective( pzScan )) */
     }
+
+ leave:
+    while (pzStart < pzRet) {
+        if (*(pzStart++) == '\n')
+            pCurCtx->lineNo++;
+    }
+    return pzRet;
 }
 
 
@@ -299,8 +310,11 @@ skipToEndif( char* pzScan )
  *  "#if*def" test.
  */
 static char*
-skipToElseEnd( char* pzScan )
+skipToElseEnd( char* pzStart )
 {
+    char* pzScan = pzStart;
+    char* pzRet;
+
     for (;;) {
         char*  pz;
         /*
@@ -339,8 +353,9 @@ skipToElseEnd( char* pzScan )
              */
             char* pz = strchr( pzScan, '\n' );
             if (pz != NULL)
-                return pz+1;
-            return pzScan + strlen( pzScan );
+                 pzRet = pz+1;
+            else pzRet = pzScan + strlen( pzScan );
+            goto leave;
         }
 
         case DIR_IFDEF:
@@ -360,6 +375,13 @@ skipToElseEnd( char* pzScan )
             break;
         }  /* switch (findDirective( pzScan )) */
     }
+
+ leave:
+    while (pzStart < pzRet) {
+        if (*(pzStart++) == '\n')
+            pCurCtx->lineNo++;
+    }
+    return pzRet;
 }
 
 
