@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.6 2005/10/23 02:40:02 bkorb Exp $
+# $Id: announce.txt,v 4.7 2005/11/12 18:08:07 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -24,11 +24,11 @@ nl='
 
 # Three levels of release:
 # x.y        -- a primary release
-# x.y.z      -- an alpha release
+# x.y.z      -- a bug fix release
 # x.y.zpreX  -- an unofficial testing release
 #
 case ${AG_VERSION} in
-*.*.*pre* )
+*.*pre* )
   to_line='To: autogen-announce@lists.sf.net'
   cc_line=""
   alpha_rel=$(echo "\
@@ -76,8 +76,20 @@ cat >&3 <<- _EOF_
 test ${#alpha_rel} -gt 1 && print -u3 "${alpha_rel}\n\n"
 
 ( echo
-  cat NEWS ) | \
-  sed "1,/^New in ${AG_VERSION} -/d ; /^New in /,\$d" >&3
+  case ${AG_VERSION} in
+  *pre* )
+    echo "Here are the change log entries since the last release"
+    sed '/= [0-9.]* Released/,$d' ChangeLog | \
+    sed '$d' | sed '$d' | sed '$d'
+    ;;
+
+  * )
+    echo "Here are the 'NEWS' entries since the last release"
+    cat NEWS | \
+    sed "1,/^New in ${AG_VERSION} -/d ; /^New in /,\$d"
+    ;;
+  esac
+) >&3
 
 cat >&3 <<_EOF_
 
@@ -94,6 +106,6 @@ _EOF_
 exec 3>&-
 recip=bruce.korb@gmail.com
 
-sendmail ${recip} < ${tfile}
+echo "sendmail ${recip} < ${tfile}"
 
 echo rm -f ${tfile}

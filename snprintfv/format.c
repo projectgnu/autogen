@@ -876,7 +876,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
     {
       intmax_t svalue = 0L;
       svalue = fetch_intmax (pinfo, args);
-      is_negative = (svalue < 0);
+      is_negative = (svalue < 0) ? SNV_TRUE : SNV_FALSE;
       value = (uintmax_t) ABS (svalue);
     }
 

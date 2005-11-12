@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2005-07-10 12:54:14 bkorb"
+# Time-stamp:      "2005-11-12 08:03:50 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.4 2005/07/10 20:17:40 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.5 2005/11/12 18:08:08 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -81,13 +81,13 @@ case ${AGexe} in
      v=$($AGexe --version)
      case "$v" in
        *"Ver. 5."* ) : ;;
-       * ) print -u2 OUT OF DATE AutoGen: $v
+       * ) echo OUT OF DATE AutoGen: $v >&2
            exit 1 ;;
      esac
      ;;
 
 * )
-     print -u2 AutoGen requires autogen to bootstrap
+     echo AutoGen requires autogen to bootstrap >&2
      exit 1
      ;;
 esac
@@ -127,8 +127,8 @@ out_of_date()
     if test "X${1}" = "X${2}"
     then return 1 ; fi
 
-    tv=`IFS=" .";set -- ${1};echo $@`
-    bv=`IFS=" .";set -- ${2};echo $@`
+    tv=$(IFS=" .";set -- ${1};echo $@)
+    bv=$(IFS=" .";set -- ${2};echo $@)
 
     #  FOREVER...(as long as we have version number components)
     #
@@ -137,11 +137,11 @@ out_of_date()
         #  Extract the next component.  If they are not equal,
         #  then it is time to return 0 or 1.
         #
-        x=`set -- $tv;echo $1`
-        y=`set -- $bv;echo $1`
+        x=$(set -- $tv;echo $1)
+        y=$(set -- $bv;echo $1)
         if test "X$x" = "X$y" ; then :
         else
-            set -- `(echo $x return 0; echo $y return 1) | sort -n | sed 1q`
+            set -- $( (echo $x return 0; echo $y return 1) | sort -n | sed 1q)
             shift
             eval $@
         fi
@@ -149,8 +149,8 @@ out_of_date()
         #  Shift off the first component of each.  If the base version is done
         #  then the test version is more recent, otherwise the other way
         #
-        tv=`set -- $tv;shift;echo $@`
-        bv=`set -- $bv;shift;echo $@`
+        tv=$(set -- $tv;shift;echo $@)
+        bv=$(set -- $bv;shift;echo $@)
         [ -z "$bv" ] && return 1
         [ -z "$tv" ] && return 0
     done
@@ -222,7 +222,7 @@ _EOF_
   (
     set -x
     cd $top
-    echo bootstrapping in `pwd`
+    echo bootstrapping in ${PWD}
 
     # test -f Make.def && \
     #    ${AGexe} --show-shell --show-defs -bMakefile Make.def
@@ -233,8 +233,8 @@ _EOF_
     doit rm -f config.cache
 
     # Use auxdir if set in ${config_file}.
-    auxdir=${auxdir-`fgrep CONFIG_AUX_DIR ${config_file} | \
-        sed 's,^.*(,,;s,).*$,,'`}
+    auxdir=${auxdir-$(fgrep CONFIG_AUX_DIR ${config_file} | \
+        sed 's,^.*(,,;s,).*$,,')}
     test -n "$auxdir" || auxdir=$srcdir
     test -d $auxdir || auxdir=.
 
@@ -267,7 +267,7 @@ for f in ${bootstrap_list}
 do
   ( cd $(dirname $f)
     srcdir=.
-    echo running POST-bootstrap.dir in `pwd`
+    echo running POST-bootstrap.dir in ${PWD}
     ${SHELL} ${VERBOSE_ARG} ./bootstrap.dir recursive
   ) || exit 1
 done

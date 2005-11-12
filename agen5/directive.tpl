@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.4 2005/10/29 22:13:10 bkorb Exp $
+# $Id: directive.tpl,v 4.5 2005/11/12 18:08:08 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -34,13 +34,12 @@ struct dir_table {
 };
 
 /*
- *  Declare the procedures that will handle the directives
+ *  Declare the procedures that will handle the directives.
  */
 static tDirProc doDir_IGNORE;[=
 FOR directive    =][=
 
   (set! tmp-txt (get "name"))
-
   (set! dir-tbl (string-append dir-tbl
         (sprintf "    { %2d, zDirectives +%3d, doDir_%-10s 0 }"
                  (string-length tmp-txt) ix
@@ -66,9 +65,11 @@ static tDirProc doDir_[=name=];[=
 ENDFOR directive =]
 
 /*
- *  Define the constant string names for each directive
+ *  Define the constant string names for each directive.
+ *  We supply all the needed terminating NULs, so tell the compiler
+ *  the size to allocate.
  */
-static const char zDirectives[] =
+static const char zDirectives[[=(. ix)=]] =
 [= (shellf "columns --spread=1 -I3 <<%s_EOF_" dir-nms) =];
 
 /*
@@ -89,7 +90,7 @@ static tDirTable dirTable[ DIRECTIVE_CT ] = {
  *  This text has been extracted from [=`echo ${srcdir}/schemedef.scm`=]
  */
 #define SCHEME_INIT_FILE [= (c-string (out-name)) =]
-#define SCHEME_INIT_LINE [= # (+ (out-line) 2) =] 131
+#define SCHEME_INIT_LINE [= # (+ (out-line) 2) =] 119
 static const char zSchemeInit[] =
 [= (kr-string (shell
 
@@ -142,7 +143,7 @@ die() {
 }
 exec 2>&8
 AG_pid=[=
-(c-string (out-pop #t))=] "\000.........";
+(kr-string (out-pop #t))=] "\000.........";
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {

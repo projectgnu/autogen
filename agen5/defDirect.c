@@ -1,8 +1,14 @@
-
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.8 2005/11/07 00:21:07 bkorb Exp $
+ *  $Id: defDirect.c,v 4.9 2005/11/12 18:08:08 bkorb Exp $
  *  This module processes definition file directives.
+ *
+ *  blocksort spacing=2 \
+ *    output=defDirect-sorted.c \
+ *    input=defDirect.c \
+ *    pat='^/\*=directive' \
+ *    start='^doDir_IGNORE' \
+ *    trail='\+\+\+ End of Directives'
  */
 
 /*
@@ -32,62 +38,8 @@ tSCC zCheckList[] = "\n#";
 
 static int  ifdefLevel = 0;
 
-/* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
 static teDirectives
 findDirective( char* pzDirName );
-
-static char*
-skipToEndif( char* pzScan );
-
-static char*
-skipToElseEnd( char* pzScan );
-
-static char*
-doDir_IGNORE( char* pzArg, char* pzScan );
-
-static char*
-doDir_define( char* pzArg, char* pzScan );
-
-static char*
-doDir_elif( char* pzArg, char* pzScan );
-
-static char*
-doDir_else( char* pzArg, char* pzScan );
-
-static char*
-doDir_endif( char* pzArg, char* pzScan );
-
-static char*
-doDir_endshell( char* pzArg, char* pzScan );
-
-static char*
-doDir_error( char* pzArg, char* pzScan );
-
-static char*
-doDir_if( char* pzArg, char* pzScan );
-
-static char*
-doDir_ifdef( char* pzArg, char* pzScan );
-
-static char*
-doDir_ifndef( char* pzArg, char* pzScan );
-
-static char*
-doDir_include( char* pzArg, char* pzScan );
-
-static char*
-doDir_line( char* pzArg, char* pzScan );
-
-static char*
-doDir_option( char* pzArg, char* pzScan );
-
-static char*
-doDir_shell( char* pzArg, char* pzScan );
-
-static char*
-doDir_undef( char* pzArg, char* pzScan );
-/* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -291,6 +243,53 @@ skipToEndif( char* pzStart )
              */
             break; /* ignore it */
         }  /* switch (findDirective( pzScan )) */
+    }
+
+ leave:
+    while (pzStart < pzRet) {
+        if (*(pzStart++) == '\n')
+            pCurCtx->lineNo++;
+    }
+    return pzRet;
+}
+
+
+static char*
+skipToEndmac( char* pzStart )
+{
+    char* pzScan = pzStart;
+    char* pzRet;
+
+    for (;;) {
+        char*  pz;
+        /*
+         *  'pzScan' is pointing to the first character on a line.
+         *  Check for a directive on the current line before scanning
+         *  later lines.
+         */
+        if (*pzScan == '#')
+            pz = ++pzScan;
+        else {
+            pz = strstr( pzScan, zCheckList );
+            if (pz == NULL)
+                AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
+                                pCurCtx->lineNo ));
+
+            pzScan = pz + STRSIZE( zCheckList );
+        }
+
+        while (isspace( *pzScan )) pzScan++;
+
+        if (findDirective( pzScan ) == DIR_ENDMAC) {
+            /*
+             *  We found the endmac we are interested in
+             */
+            char* pz = strchr( pzScan, '\n' );
+            if (pz != NULL)
+                 pzRet = pz+1;
+            else pzRet = pzScan + strlen( pzScan );
+            break;
+        }
     }
 
  leave:
@@ -537,6 +536,19 @@ doDir_endif( char* pzArg, char* pzScan )
 }
 
 
+/*=directive endmac
+ *
+ *  text:
+ *  This terminates a "macdef", but must not ever be encountered directly.
+=*/
+static char*
+doDir_endmac( char* pzArg, char* pzScan )
+{
+    AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
+                    "endmac" ));
+}
+
+
 /*=directive endshell
  *
  *  text:
@@ -743,6 +755,12 @@ doDir_include( char* pzArg, char* pzScan )
 }
 
 
+/*=directive let
+ *
+ *  dummy:  let directives are ignored.
+=*/
+
+
 /*=directive line
  *
  *  text:
@@ -784,6 +802,19 @@ doDir_line( char* pzArg, char* pzScan )
     AGDUPSTR( pCurCtx->pzCtxFname, pzArg, "#line file name" );
 
     return pzScan;
+}
+
+
+/*=directive macdef
+ *
+ *  text:
+ *  This is a new AT&T research preprocessing directive.  Basically, it is
+ *  a multi-line #define that may include other preprocessing directives.
+=*/
+static char*
+doDir_macdef( char* pzArg, char* pzScan )
+{
+    return skipToEndmac( pzScan );
 }
 
 
@@ -930,6 +961,7 @@ doDir_undef( char* pzArg, char* pzScan )
     SET_OPT_UNDEFINE( pzArg );
     return pzScan;
 }
+
 
 /*+++ End of Directives +++*/
 /*
