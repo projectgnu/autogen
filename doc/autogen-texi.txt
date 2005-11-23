@@ -1,4 +1,4 @@
-
+@c -*- Mode: texinfo -*-
 @setfilename autogen.info
 
 @ignore
@@ -1071,12 +1071,19 @@ It tells autogen:
 
 @enumerate
 @item
-The punctuation characters used to demarcate the start of a macro.
-It may be up to seven characters long and must be the first non-whitespace
-characters in the file.
+The start macro marker.  It consists of punctuation characters used to
+demarcate the start of a macro.  It may be up to seven characters long and
+must be the first non-whitespace characters in the file.
+
+@noindent
+It is generally a good idea to use some sort of opening
+bracket in the starting macro and closing bracket in the ending
+macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
+in the starting macro).  It helps both visually and with editors
+capable of finding a balancing parenthesis.
 
 @item
-That start marker must be immediately followed by the marker strings
+That start marker must be immediately followed by the identifier strings
 "AutoGen5" and then "template", though capitalization is not important.
 @end enumerate
 
@@ -1127,31 +1134,57 @@ file for later text extraction (@pxref{SCM extract}).
 @example
 (shellf "mv -f %1$s.c %1$s.sav" (base-name))
 @end example
-
-@item
-Finally, the end-macro marker must be last.  It must not begin with a
-POSIX file name character, and if it begins with an equal sign, then it
-must be separated from any suffix specification by white space.
 @end enumerate
 
-It is generally a good idea to use some sort of opening
-bracket in the starting macro and closing bracket in the ending
-macro  (e.g. @code{@{}, @code{(}, @code{[}, or even @code{<}
-in the starting macro).  It helps both visually and with editors
-capable of finding a balancing parenthesis.  The closing marker
-may @strong{not} begin with an open parenthesis, as that is used
+@noindent
+After these must come the end macro marker:
+
+@enumerate 6
+@item
+The punctuation characters used to demarcate the end of a macro.
+Like the start marker, it must consist of seven or fewer punctuation
+characters.
+@end enumerate
+
+The ending macro marker has a few constraints on its content.  Some of
+them are just advisory, though.  There is no special check for advisory
+restrictions.
+
+@itemize @bullet
+@item
+It must not begin with a POSIX file name character (hyphen @code{-},
+underscore @code{_} or period @code{.}), the backslash (@code{\\}) or
+open parenthesis (@code{(}).  These are used to identify a suffix
+specification.
+
+@item
+If it begins with an equal sign, then it
+must be separated from any suffix specification by white space.
+
+@item
+The closing marker may not begin with an open parenthesis, as that is used
 to enclose a scheme expression.
 
-It is also helpful to avoid using the comment marker (@code{#});
-the POSIXly acceptable file name characters period (@code{.}),
-hyphen (@code{-}) and underscore (@code{_}); and finally, it is
-advisable to avoid using any of the quote characters@:  double,
-single or back-quote.  But there is no special check for any of
-these advisories.
+@item
+It cannot begin with a backslash, as that is used to indicate white
+space trimming after the end macro mark.  If, in the body of the template,
+you put the backslash character (@code{\}) before the end macro mark, then
+any white space characters after the mark and through the newline character
+are trimmed.
+
+@item
+It is also helpful to avoid using the comment marker (@code{#}).
+It might be seen as a comment within the pseudo macro.
+
+@item
+You should avoid using any of the quote characters@:  double,
+single or back-quote.  It won't confuse AutoGen, but it might well
+confuse you and/or your editor.
+@end itemize
 
 As an example, assume we want to use @code{[+} and @code{+]} as the start
 and end macro markers, and we wish to produce a @file{.c} and a @file{.h}
-file, then the first macro invocation will look something like this:
+file, then the pseudo macro might look something like this:
 
 @example
 [+ AutoGen5 template -*- Mode: emacs-mode-of-choice -*-

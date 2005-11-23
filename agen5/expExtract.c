@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expExtract.c,v 4.6 2005/11/23 00:09:29 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -219,6 +219,7 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  *      is found, then this text will be inserted between the START and END
  *      markers.
  * @end itemize
+ *
  * @noindent
  * The resulting strings are presumed to be unique within
  * the subject file.  As a simplified example:
@@ -235,6 +236,7 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  * example default
  * // END   - SOMETHING - DO NOT CHANGE THIS COMMENT
  * @end example
+ *
  * @noindent
  * The ``@code{example default}'' string can then be carried forward to
  * the next generation of the output, @strong{@i{provided}} the output

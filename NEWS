@@ -1,9 +1,14 @@
-New in __CURRENT_VERSION__ - October, 2005
+New in __CURRENT_VERSION__ - November, 2005
 
 * Fixed a small timing hole where the read from the read end of the output
   pipe of the server shell can fail.  (The read is retried.)
-* Eliminated the code that symlinked all the sources into the build directory.
+* Eliminated the configure code that symlinked all the sources into the
+  build directory.
 * Added a macro for testing mmap failure to accommodate a picky compiler.
+* The minor version number is being bumped.  There is a new (albeit tiny)
+  feature being added to the syntax.  See the doc on the pseudo-macro.
+* Fixed a bug wherein out-of-order definitions could get mistyped causing
+  various catastrophic results.
 
 New in 5.7.3 - October, 2005
 

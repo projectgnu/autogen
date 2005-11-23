@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/09/04 21:13:39 $
+ *  Last Modified:     $Date: 2005/11/23 00:09:29 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.7 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: misc.def,v 4.8 2005/11/23 00:09:29 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.7 $";
+version = "$Revision: 4.8 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -66,21 +66,24 @@ test   = {
   type     = "withlib";
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
-		#include <guile/gh.h>
-		#include <libguile/list.h>
-		int main () {
-		  SCM fumble, bumble, stumble;
-		  long lstumble;
-		  stumble = scm_cons( fumble, bumble );
-		  stumble = scm_display( fumble, bumble );
-		  lstumble = scm_ilength( fumble );
-		  stumble = scm_makstr( 1, 2 );
-		  stumble = gh_eval_str( "stumble" );
-		  scm_misc_error( "oops", "bad", bumble );
-		  stumble = scm_num_eq_p( fumble, bumble );
-		  scm_wrong_type_arg( "oops", 1, bumble );
-		  return 0; }
-		_END_OF_CODE_;
+	#include <guile/gh.h>
+	#include <libguile/list.h>
+	#if (SCM_MAJOR_VERSION > 1) || (SCM_MINOR_VERSION > 6)
+	choke me!
+	#endif
+	int main () {
+	  SCM fumble, bumble, stumble;
+	  long lstumble;
+	  stumble = scm_cons( fumble, bumble );
+	  stumble = scm_display( fumble, bumble );
+	  lstumble = scm_ilength( fumble );
+	  stumble = scm_makstr( 1, 2 );
+	  stumble = gh_eval_str( "stumble" );
+	  scm_misc_error( "oops", "bad", bumble );
+	  stumble = scm_num_eq_p( fumble, bumble );
+	  scm_wrong_type_arg( "oops", 1, bumble );
+	  return 0; }
+	_END_OF_CODE_;
   run-mode   =  "link";
 
   config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
@@ -94,11 +97,13 @@ test   = {
            };
 
   doc = <<- _END_OF_DOC_
-		AutoGen won't work without Guile, so either the methods
-		for finding the header and libraries must be provided,
-		or guile-config must be found in the executable path,
-		or we have to find the stuff in /usr or /usr/local.
-		_END_OF_DOC_;
+	AutoGen won't work without Guile, so either the methods for finding
+	the header and libraries must be provided, or guile-config must be
+	found in the executable path, or we have to find the stuff in /usr
+	or /usr/local.  We must also constrain ourself to Guile 1.6.x and
+	earlier.  The interfaces have changed in incompatible ways for 1.7
+	and that is an unstable version.  We will wait for 1.8.
+	_END_OF_DOC_;
 };
 
 test   = {
@@ -130,12 +135,12 @@ test   = {
   type     = "withlib";
   check    = "a working libxml2 can be found";
   code     = <<- _END_OF_CODE_
-		#include <libxml/parser.h>
-		#include <libxml/tree.h>
+	#include <libxml/parser.h>
+	#include <libxml/tree.h>
 
-		int main () {
-		xmlDocPtr p = xmlParseFile( "mumble.xml" ); }
-		_END_OF_CODE_;
+	int main () {
+	xmlDocPtr p = xmlParseFile( "mumble.xml" ); }
+	_END_OF_CODE_;
   config   = { cflags-arg = '--cflags'; libs-arg = '--libs'; };
   action = { yes; act-type = script;
              act-text = 'CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
@@ -147,10 +152,10 @@ test   = {
   conditional = HAVE_XML_LIB;
 
   doc = <<- _END_OF_DOC_
-		xml2ag won't work without libxml2, so either the methods
-		for finding the header and libraries must be provided,
-		or xml2-config must be found in the executable path.
-		_END_OF_DOC_;
+	xml2ag won't work without libxml2, so either the methods
+	for finding the header and libraries must be provided,
+	or xml2-config must be found in the executable path.
+	_END_OF_DOC_;
 };
 
 test   = {
@@ -193,11 +198,11 @@ test = {
     check  = "sysinfo(2) is POSIX";
     action = { act-type = define; };
     code   = <<- _EOF_
-		#include <sys/systeminfo.h>
-		int main() { char z[ 256 ];
-		long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
-		return (sz > 0) ? 0 : 1; }
-		_EOF_;
+	#include <sys/systeminfo.h>
+	int main() { char z[ 256 ];
+	long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
+	return (sz > 0) ? 0 : 1; }
+	_EOF_;
     doc =
     "Check that the POSIX compliant sysinfo(2) call works properly.\n"
     "Linux has its own weirdo alternative.";
@@ -209,16 +214,16 @@ test = {
     check  = "strcspn matches prototype and works";
     action = { act-type = define; };
     action = { no; act-type = script;
-			act-text = 'COMPATOBJ="$COMPATOBJ strcspn.lo"'; };
+		act-text = 'COMPATOBJ="$COMPATOBJ strcspn.lo"'; };
 
     code   = <<-  _EOF_
-		#include <string.h>
-		int main (int argc, char** argv) {
-		   char zRej[] = "reject";
-		   char zAcc[] = "a-ok-eject";
-		   return strcspn( zAcc, zRej ) - 5;
-		}
-		_EOF_;
+	#include <string.h>
+	int main (int argc, char** argv) {
+	   char zRej[] = "reject";
+	   char zAcc[] = "a-ok-eject";
+	   return strcspn( zAcc, zRej ) - 5;
+	}
+	_EOF_;
 
     doc = <<- _EODoc_
 	Not all systems have strcspn(3).  See if we need to substitute.
@@ -241,11 +246,11 @@ test = {
     action = { act-type = define; };
 
     code   = <<-  _EOF_
-		#include <signal.h>
-		int main() {
-		  const char* pz = sys_siglist[1];
-		  return (pz != 0) ? 0 : 1; }
-		_EOF_;
+	#include <signal.h>
+	int main() {
+	  const char* pz = sys_siglist[1];
+	  return (pz != 0) ? 0 : 1; }
+	_EOF_;
 
     doc =
     "Check that the POSIX compliant regular expression compiler\n"
@@ -258,10 +263,10 @@ test = {
     check  = "uname(2) is POSIX";
     action = { act-type = define; };
     code   = <<- _EOF_
-		#include <sys/utsname.h>
-		int main() { struct utsname unm;
-		return uname( &unm ); }
-		_EOF_;
+	#include <sys/utsname.h>
+	int main() { struct utsname unm;
+	return uname( &unm ); }
+	_EOF_;
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
 };
@@ -271,9 +276,7 @@ test = {
     type   = compile;
     check  = "long long ints";
     action = { act-type = define; };
-    code   = <<- _EOF_
-		long long i;
-		_EOF_;
+    code   = "long long i;";
     doc =
     "See if long long works";
 };

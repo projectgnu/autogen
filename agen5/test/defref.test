@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2005-03-07 13:05:46 bkorb"
+# Time-stamp:        "2005-11-22 15:43:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/11/23 00:09:29 $
 #            by: bkorb
 #
-# $Id: defref.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
+# $Id: defref.test,v 4.3 2005/11/23 00:09:29 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -50,9 +50,9 @@ _EOF_
 cat > ${testname}.def <<_EOF_
 AutoGen definitions "${testname}." "tpl";
 list =    { val = L0.first, L0.second, L0.last; },
-          { Val[0] = L1.first;  val[2] = L1.second-and-last; };
+          { val[2] = L1.second-and-last; Val[0] = L1.first;  };
 List[3] = { val = L3.third.all; },
-          { VAL[1] = L4.first; val[3] = L4.last; };
+          { val[3] = L4.last; VAL[2] = L4.middle;  VAL[1] = L4.first; };
 _EOF_
 
 # # # # # # # # # # ANTICIPATED RESULT # # # # # # # # #
@@ -74,7 +74,7 @@ The full list:
   list[0] ->  val[0]=L0.first,  val[1]=L0.second,  val[2]=L0.last
   list[1] ->  val[0]=L1.first,  val[2]=L1.second-and-last
   list[3] ->  val[0]=L3.third.all
-  list[4] ->  val[1]=L4.first,  val[3]=L4.last
+  list[4] ->  val[1]=L4.first,  val[2]=L4.middle,  val[3]=L4.last
 
 The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)

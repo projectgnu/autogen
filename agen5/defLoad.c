@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: defLoad.c,v 4.6 2005/11/23 00:09:29 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -90,7 +90,6 @@ getEntry( void )
     return pRes;
 }
 
-
 /*
  *  Append a new entry at the end of a sibling (or twin) list.
  */
@@ -155,23 +154,28 @@ insertDef( tDefEntry* pDef )
          *  We actually do this by leaving the pList pointer alone and swapping
          *  the contents of the definition entry.
          */
-        uDefValue val = pDef->val;
-        long      idx = pDef->index;
+        tDefEntry def = *pDef;
 
-        pDef->index   = pList->index;
-        pList->index  = idx;
-        pDef->val     = pList->val;
-        pList->val    = val;
+        memcpy( &(pDef->pzDefName), &(pList->pzDefName),
+                sizeof( def ) - ag_offsetof(tDefEntry, pzDefName) );
+
+        memcpy( &(pList->pzDefName), &(def.pzDefName),
+                sizeof( def ) - ag_offsetof(tDefEntry, pzDefName) );
 
         /*
-         *  Link the pDef in between pList and pList->pTwin
+         *  Contents are swapped.  Link "pDef" after "pList" and return "pList".
          */
-        pDef->pTwin   = pList->pTwin;
+        pDef->pTwin = pList->pTwin;
         if (pDef->pTwin != NULL)
             pDef->pTwin->pPrevTwin = pDef;
 
         pDef->pPrevTwin = pList;
         pList->pTwin  = pDef;
+
+        /*
+         *  IF this is the first twin, then the original list head is now
+         *  the "end twin".
+         */
         if (pList->pEndTwin == NULL)
             pList->pEndTwin = pDef;
 

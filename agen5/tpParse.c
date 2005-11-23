@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: tpParse.c,v 4.5 2005/11/23 00:09:29 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -26,6 +26,8 @@
  *             51 Franklin Street, Fifth Floor,
  *             Boston, MA  02110-1301, USA.
  */
+
+static int tplNestLevel = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -131,6 +133,7 @@ static tCC*
 findMacroEnd( tCC** ppzMark )
 {
     tCC* pzMark = *ppzMark + startMacLen;
+    tCC* pzFunc;
     tCC* pzNextMark;
     tCC* pzEndMark;
 
@@ -142,13 +145,32 @@ findMacroEnd( tCC** ppzMark )
             templLineNo++;
     }
 
+    pzFunc              = pzMark;
     pCurMacro->funcCode = whichFunc( &pzMark );
     pCurMacro->lineNo   = templLineNo;
-    *ppzMark     = pzMark;
+    *ppzMark            = pzMark;
 
+    /*
+     *  Find the end.  (We must.)  If the thing is empty, treat as a comment,
+     *  but warn about it.
+     */
     pzEndMark = strstr( pzMark, zEndMac );
     if (pzEndMark == NULL)
         AG_ABEND( "macro has no end" );
+
+    if (pzEndMark == pzFunc) {
+        pCurMacro->funcCode = FTYP_COMMENT;
+        fprintf( pfTrace, "WARNING: empty macro in %s line %d\n",
+                 pCurTemplate->pzFileName, templLineNo );
+        return pzEndMark;
+    }
+
+    /*
+     *  Back up over a preceding backslash.  It is a flag to indicate the
+     *  removal of the end of line white space.
+     */
+    if (pzEndMark[-1] == '\\')
+        pzEndMark--;
 
     pzNextMark = strstr( pzMark, zStartMac );
     if (pzNextMark == NULL)
@@ -161,25 +183,68 @@ findMacroEnd( tCC** ppzMark )
 }
 
 
+static tCC*
+nextMacroStart( tCC* pz, tMacro** ppM, tTemplate* pTpl )
+{
+    char*   pzCopy;
+    tCC*    pzEnd;
+    tCC*    res = strstr( pz, zStartMac );
+    tMacro* pM = *ppM;
+
+    if (res == pz)
+        return res;
+
+    /*
+     *  There is some text here.  Make a text macro entry.
+     */
+    pzCopy       = pTpl->pNext;
+    pzEnd        = (res != NULL) ? res : pz + strlen( pz );
+    pM->ozText   = pzCopy - pTpl->pzTemplText;
+    pM->funcCode = FTYP_TEXT;
+    pM->lineNo   = templLineNo;
+
+#if defined( DEBUG_ENABLED )
+    if (HAVE_OPT( SHOW_DEFS )) {
+        int ct = tplNestLevel;
+        fprintf( pfTrace, "%3d ", pM - pTpl->aMacros );
+        do { fputs( "  ", pfTrace ); } while (--ct > 0);
+
+        fprintf( pfTrace, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
+                 pM->lineNo, pM->endIndex, pzEnd - pz );
+    }
+#endif
+
+    do  {
+        if ((*(pzCopy++) = *(pz++)) == '\n')
+            templLineNo++;
+    } while (pz < pzEnd);
+
+    *(pzCopy++) = NUL;
+    *ppM        = pM + 1;
+    pTpl->pNext = pzCopy;
+
+    return res;  /* may be NULL, if there are no more macros */
+}
+
+
 LOCAL tMacro*
 parseTemplate( tMacro* pM, tCC** ppzText )
 {
     tCC* pzScan = *ppzText;
-    tTemplate* pT = pCurTemplate;
+    tTemplate* pTpl = pCurTemplate;
 
 #if defined( DEBUG_ENABLED )
     tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
     tSCC zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
-    static int level = 0;
     #define DEBUG_DEC(l)  l--
 
-    if (  ((level++) > 0)
+    if (  ((tplNestLevel++) > 0)
        && HAVE_OPT( SHOW_DEFS )) {
-        int ct = level;
+        int ct = tplNestLevel;
         tMacro* pPm = pM-1;
 
-        fprintf( pfTrace, "%3d ", pPm - pT->aMacros );
+        fprintf( pfTrace, "%3d ", pPm - pTpl->aMacros );
         do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
         fprintf( pfTrace, zTUndef, apzFuncNames[ pPm->funcCode ],
@@ -190,41 +255,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
 #endif
 
     for (;;) {
-        const char* pzMark = strstr( pzScan, zStartMac );
-
-        /*
-         *  IF there is any text, then make a text macro entry
-         */
-        if (pzMark != pzScan) {
-            char* pzCopy;
-            const char* pzEnd;
-
-            pzCopy = pT->pNext;
-            pzEnd = (pzMark != NULL)
-                ? pzMark : pzScan + strlen( pzScan );
-
-            pM->ozText    = pzCopy - pT->pzTemplText;
-            pM->funcCode  = FTYP_TEXT;
-            pM->lineNo    = templLineNo;
-#if defined( DEBUG_ENABLED )
-            if (HAVE_OPT( SHOW_DEFS )) {
-                int ct = level;
-                fprintf( pfTrace, "%3d ", pM - pT->aMacros );
-                do { fputs( "  ", pfTrace ); } while (--ct > 0);
-
-                fprintf( pfTrace, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
-                        pM->lineNo, pM->endIndex,
-                        pzEnd - pzScan );
-            }
-#endif
-            do  {
-                if ((*(pzCopy++) = *(pzScan++)) == '\n')
-                    templLineNo++;
-            } while (pzScan < pzEnd);
-            *(pzCopy++) = NUL;
-            pM++;
-            pT->pNext = pzCopy;
-        }
+        tCC* pzMark = nextMacroStart( pzScan, &pM, pTpl );
 
         /*
          *  IF no more macro marks are found,
@@ -265,7 +296,29 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             }
         }
 
-        pzScan += endMacLen;
+        /*
+         *  IF the end macro mark was preceded by a backslash, then we remove
+         *  trailing white space from there to the end of the line.
+         */
+        if ((*pzScan != '\\') || (strncmp( zEndMac, pzScan, endMacLen ) == 0))
+            pzScan += endMacLen;
+
+        else {
+            tCC* pz = ( pzScan += endMacLen + 1 );
+
+            /*
+             *  We are eating white space, do so only if there is white space
+             *  from the end macro marker to EOL.  Anything else on the line
+             *  will suppress the feature.
+             */
+            while (isspace( *pz )) {
+                if (*(pz++) == '\n') {
+                    templLineNo++;
+                    pzScan = pz;
+                    break;
+                }
+            }
+        }
 
         /*
          *  IF the called function returns a NULL next macro pointer,
@@ -273,18 +326,17 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *       will be non-NULL.
          */
         {
-#if ! defined( DEBUG_ENABLED )
-            tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pT, pM, &pzScan );
-#else
-            teFuncType ft = pM->funcCode;
-            int        ln = pM->lineNo;
+            tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pTpl, pM, &pzScan );
 
-            tMacro* pNM = (*(papLoadProc[ ft ]))( pT, pM, &pzScan );
+#if defined( DEBUG_ENABLED )
+            teFuncType ft  = pM->funcCode;
+            int        ln  = pM->lineNo;
+
             if (HAVE_OPT( SHOW_DEFS )) {
-                int ct = level;
+                int ct = tplNestLevel;
                 if (pM->funcCode == FTYP_BOGUS)
                      fputs( "    ", pfTrace );
-                else fprintf( pfTrace, "%3d ", pM - pT->aMacros );
+                else fprintf( pfTrace, "%3d ", pM - pTpl->aMacros );
 
                 do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
@@ -294,20 +346,20 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                     fprintf( pfTrace, zTDef, apzFuncNames[ ft ], pM->funcCode,
                              ln, pM->endIndex,
                              strlen( (pM->ozText == 0) ? ""
-                                     : (pT->pzTemplText + pM->ozText) ));
+                                     : (pTpl->pzTemplText + pM->ozText) ));
             }
 #endif
 
             if (pNM == NULL) {
                 *ppzText = pzScan;
-                DEBUG_DEC(level);
+                DEBUG_DEC(tplNestLevel);
                 return pM;
             }
             pM = pNM;
         }
     }
 
-    DEBUG_DEC(level);
+    DEBUG_DEC(tplNestLevel);
 
     /*
      *  We reached the end of the input string.

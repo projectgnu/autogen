@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.16 2005/10/29 22:13:11 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.17 2005/11/23 00:09:29 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -359,6 +359,9 @@ This section describes a number of general purpose functions that make
 the kind of string processing that AutoGen does a little easier.
 Unlike the AutoGen specific functions (@pxref{AutoGen Functions}),
 these functions are available for direct use during definition load time.
+The equality test (@pxref{SCM =}) is ``overloaded'' to do string equivalence
+comparisons.  If you are looking for inequality, the Scheme/Lisp way
+of spelling that is, ``(not (= ...))''.
 
 @menu[=
 (define func-name "")

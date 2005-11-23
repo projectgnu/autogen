@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # line.test --- test (tpl-file-line) functionality
 #
-# Time-stamp:        "2005-03-07 13:05:25 bkorb"
+# Time-stamp:        "2005-11-22 15:39:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/11/23 00:09:29 $
 #            by: bkorb
 #
-# $Id: line.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
+# $Id: line.test,v 4.3 2005/11/23 00:09:29 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -22,22 +22,23 @@ fi
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating ${testname}.tpl
-cat > ${testname}.tpl <<-  _EOTPL_
-	[= AutoGen5 Template txt =]
-	${testname} Test
-	[= (define ix 0) (define ct 63) =][=
-	WHILE (< ix ct) =]
-	[= (set! ix (+ ix 1)) (sprintf "test %2d of %2d:  " ix ct)
-	=][= (tpl-file-line "%2\$d") =][=
-	ENDWHILE=]
-	End ${testname} Test
-	_EOTPL_
+sed 's/^ *[0-9]*: //' > ${testname}.tpl <<  _EOTPL_
+ 1: [= AutoGen5 Template txt =]
+ 2: ${testname} Test
+ 3: [= (define ix 0) (define ct 63) =]
+ 4: [=WHILE (< ix ct) \=]
+ 5: [= (set! ix (+ ix 1))
+ 6:    (sprintf "test %2d of %2d:  %s\n" ix ct (tpl-file-line "%2\$d"))
+ 7: \=]
+ 7: [=ENDWHILE \=]
+ 8: End ${testname} Test
+_EOTPL_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 set -x
 echo creating ${testname}.out
 # this is the output we should expect to see
-cat > ${testname}.out <<- '_EOF_'
+cat > ${testname}.out <<- \_EOF_
 	line Test
 
 	End line Test
@@ -45,7 +46,7 @@ cat > ${testname}.out <<- '_EOF_'
 
 ${AGexe} --base=${testname} --no-def --override=${testname}.tpl || \
    failure ${AGexe} failed
-egrep -v ' of 63:  6$' ${testname}.txt > ${testname}.test
+egrep -v ' of 63:  5$' ${testname}.txt > ${testname}.test
 
 cmp -s ${testname}.test ${testname}.out || failure unexpected output
 

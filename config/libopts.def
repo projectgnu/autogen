@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/10/29 00:13:28 $
- *  Time-stamp:        "2005-10-28 17:10:37 bkorb"
+ *  Last Modified:     $Date: 2005/11/23 00:09:29 $
+ *  Time-stamp:        "2005-11-15 16:23:09 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.12 2005/10/29 00:13:28 bkorb Exp $
+ *  $Id: libopts.def,v 4.13 2005/11/23 00:09:29 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.12 $";
+version     = "$Revision: 4.13 $";
 output-file = libopts.m4;
 
 test   = {
@@ -286,13 +286,13 @@ do-first = <<-_EOF_
 	# ========================
 	AC_CHECK_HEADERS(stdint.h inttypes.h, break)
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
-	   intptr_t, uintptr_t])
+	   intptr_t])
 
 	# ====================
 	# uintptr type & sizes
 	# ====================
 	AC_CHECK_TYPES([uintptr_t], ,
-	       [AC_DEFINE(uintptr_t, unsigned long,
+	       [AC_DEFINE([uintptr_t], unsigned long,
 	                  [Alternate uintptr_t for systems without it.])])
 	AC_CHECK_SIZEOF(char*, 4)
 	AC_CHECK_SIZEOF(int,   4)

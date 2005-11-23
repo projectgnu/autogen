@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.9 2005/11/12 18:08:08 bkorb Exp $
+ *  $Id: defDirect.c,v 4.10 2005/11/23 00:09:29 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -292,7 +292,6 @@ skipToEndmac( char* pzStart )
         }
     }
 
- leave:
     while (pzStart < pzRet) {
         if (*(pzStart++) == '\n')
             pCurCtx->lineNo++;
@@ -546,6 +545,8 @@ doDir_endmac( char* pzArg, char* pzScan )
 {
     AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
                     "endmac" ));
+    /* NOTREACHED */
+    return NULL;
 }
 
 

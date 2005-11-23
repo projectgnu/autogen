@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # for.test --- test functionality of `for' function
 #
-# Time-stamp:        "2005-03-07 13:05:35 bkorb"
+# Time-stamp:        "2005-11-22 13:03:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/13 19:30:08 $
+# Last Modified:     $Date: 2005/11/23 00:09:29 $
 #            by: bkorb
 #
-# $Id: for.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
+# $Id: for.test,v 4.3 2005/11/23 00:09:29 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -22,41 +22,42 @@ fi
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
-<= AutoGen5 template test =>
-<=
-FOR list ",\n" =><=
-  IF (first-for?)
-     =>FIRST:  <=
-  ELIF (last-for?)
-     =>LAST:   <=
-  ELSE
-     =>MIDDLE: <=
-  ENDIF =><=elt[0]=><=
-ENDFOR =>
-<=
-FOR list-2        =><=
-  FOR list ", "
-    =><=bumble    =><=
-  ENDFOR          =><=
-ENDFOR            =>
-<=
-FOR list  ",\n"   =><=
-  FOR list-2
-    =><=(for-index "list")=>:  <=
-
-      IF (first-for? "list")
-         =>FIRST  <=
-      ELIF (last-for? "list")
-         =>LAST   <=
-      ELSE
-         =>MIDDLE <=
-      ENDIF       =><=
-
-      (tpl-file-line " on line %2\$d") =><=
-
-  ENDFOR          =><=
-ENDFOR            =>
+sed 's/^ *[0-9]*: //' > $testname.tpl <<_EOF_
+ 1: <= AutoGen5 template test =>
+ 2: <=
+ 3: FOR list ",\n" =><=
+ 4:   IF (first-for?)
+ 5:      =>FIRST:  <=
+ 6:   ELIF (last-for?)
+ 7:      =>LAST:   <=
+ 8:   ELSE
+ 9:      =>MIDDLE: <=
+10:   ENDIF =><=elt[0]=><=
+11: ENDFOR =>
+12: <=
+13: FOR list-2       \=>	  
+14: <=FOR list   ", "\=>
+15: <=bumble         \=>
+16: <=ENDFOR         \=>
+17: <=
+18: ENDFOR            =>
+19: <=
+20: FOR list  ",\n"   =><=
+21:   FOR list-2 \=>	
+22: <=(for-index "list")=>:  <=
+23: 
+24:       IF (first-for? "list")
+25:          =>FIRST  <=
+26:       ELIF (last-for? "list")
+27:          =>LAST   <=
+28:       ELSE
+29:          =>MIDDLE <=
+30:       ENDIF       =><=
+31: 
+32:       (tpl-file-line " on line %2\$d") =><=
+33: 
+34:   ENDFOR          =><=
+35: ENDFOR            =>
 _EOF_
 
 
@@ -77,10 +78,10 @@ MIDDLE: two.one,
 MIDDLE: three,
 LAST:   four
 mumble, mumble, mumble, mumble
-0:  FIRST   on line 31,
-1:  MIDDLE  on line 31,
-2:  MIDDLE  on line 31,
-3:  LAST    on line 31
+0:  FIRST   on line 32,
+1:  MIDDLE  on line 32,
+2:  MIDDLE  on line 32,
+3:  LAST    on line 32
 _EOF_
 
 ${AGexe} $testname.def || failure AutoGen failed

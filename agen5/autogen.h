@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.7 2005/09/10 18:37:28 bkorb Exp $
+ *  $Id: autogen.h,v 4.8 2005/11/23 00:09:29 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -55,6 +55,8 @@
 #endif
 
 #define YYSTYPE t_word
+
+#define ag_offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE *)0)->MEMBER)
 
 /*
  *  Dual pipe opening of a child process

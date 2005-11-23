@@ -1,3 +1,15 @@
+2005-11-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defDirect.c: warning patrol
+	* agen5/defLoad.c(insertDef): make sure all useful data are copied to
+	the proper place.
+	* agen5/tpParse.c(findMacroEnd): check for backslash before end macro
+	mark.  Back up over it if found.
+	(parseTemplate): Have it?  skip over end of line white space + newline.
+	* agen5/test/defref.test: test misordered definitions.
+	* agen5/test/for.test: test the backslash before end macro mark
+	* config/libopts.def: remove duplicate uintptr_t test.
+
 2005-11-06  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defDirect.c(skipToEndif) count skipped newlines
