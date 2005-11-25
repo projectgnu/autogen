@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.11 2005/11/25 18:57:15 bkorb Exp $
+ *  $Id: defDirect.c,v 4.12 2005/11/25 18:59:37 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -891,13 +891,13 @@ doDir_shell( char* pzArg, char* pzScan )
         char* pz = strstr( pzScan, zEndShell );
         if (pz == NULL)
             AG_ABEND( aprf("Missing #endshell after '#shell' in %s on line %d\n",
-                        pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+                           pCurCtx->pzCtxFname, pCurCtx->lineNo ));
 
         while (pzScan < pz) {
             if (*(pzScan++) == '\n') pCurCtx->lineNo++;
         }
 
-    *pzScan = NUL;
+        *pzScan = NUL;
     }
 
     /*
