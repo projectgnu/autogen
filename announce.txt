@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.7 2005/11/12 18:08:07 bkorb Exp $
+# $Id: announce.txt,v 4.8 2005/11/25 18:57:15 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -82,13 +82,13 @@ test ${#alpha_rel} -gt 1 && print -u3 "${alpha_rel}\n\n"
     sed '/= [0-9.]* Released/,$d' ChangeLog | \
     sed '$d' | sed '$d' | sed '$d'
     ;;
-
-  * )
-    echo "Here are the 'NEWS' entries since the last release"
-    cat NEWS | \
-    sed "1,/^New in ${AG_VERSION} -/d ; /^New in /,\$d"
-    ;;
   esac
+) >&3
+
+(
+  echo "Here are the 'NEWS' entries since the last release"
+  cat NEWS | \
+  sed "1,/^New in ${AG_VERSION} -/d ; /^New in /,\$d"
 ) >&3
 
 cat >&3 <<_EOF_

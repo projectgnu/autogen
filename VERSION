@@ -4,10 +4,10 @@
 #
 # Copyright (C) 1999-2005 Bruce Korb
 #
-# Time-stamp:        "2005-11-22 15:56:21 bkorb"
+# Time-stamp:        "2005-11-22 16:15:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2005/11/23 00:09:29 $
+# Last Committed:    $Date: 2005/11/25 18:57:15 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5

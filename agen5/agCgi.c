@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.6 2005/09/04 21:14:06 bkorb Exp $
+ *  $Id: agCgi.c,v 4.7 2005/11/25 18:57:15 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -97,7 +97,7 @@ loadCgi( void )
     pzOopsPrefix = zOops;
     {
         int tmpfd;
-        tCC* pz = getenv( "TEMP" );
+        tCC* pz = getenv( "TMPDIR" );
         if (pz == NULL) {
             pz = getenv( "TMP" );
             if (pz == NULL)

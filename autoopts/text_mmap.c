@@ -1,11 +1,12 @@
 /*
- * $Id: text_mmap.c,v 4.5 2005/09/10 18:35:05 bkorb Exp $
+ * $Id: text_mmap.c,v 4.6 2005/11/25 18:57:16 bkorb Exp $
  *
- * Time-stamp:      "2005-09-10 11:04:23 bkorb"
+ * Time-stamp:      "2005-11-25 10:21:31 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
 	((_prt & PROT_WRITE) && (_flg & (MAP_SHARED|MAP_PRIVATE) == MAP_SHARED))
+#define MAP_FAILED_PTR ((void*)MAP_FAILED)
 
 /*=export_func  text_mmap
  * private:
@@ -76,12 +77,12 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         struct stat sb;
         if (stat( pzFile, &sb ) != 0) {
             pMI->txt_errno = errno;
-            return MAP_FAILED;
+            return MAP_FAILED_PTR;
         }
 
         if (! S_ISREG( sb.st_mode )) {
             pMI->txt_errno = errno = EINVAL;
-            return MAP_FAILED;
+            return MAP_FAILED_PTR;
         }
 
         pMI->txt_size = sb.st_size;
@@ -115,7 +116,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
 
     if (pMI->txt_fd < 0) {
         pMI->txt_errno = errno;
-        return MAP_FAILED;
+        return MAP_FAILED_PTR;
     }
 
 #ifdef HAVE_MMAP /* * * * * WITH MMAP * * * * * */
@@ -124,7 +125,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
      *  return the failure.
      */
     pMI->txt_data = mmap( NULL, pMI->txt_size, prot, flags, pMI->txt_fd, 0 );
-    if (pMI->txt_data == MAP_FAILED) {
+    if (pMI->txt_data == MAP_FAILED_PTR) {
         pMI->txt_errno = errno;
         goto fail_return;
     }
@@ -164,7 +165,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
                 PROT_READ|PROT_WRITE,
                 MAP_ANONYMOUS|MAP_FIXED|MAP_SHARED, 0, 0 );
 
-        if (pNuls == MAP_FAILED) {
+        if (pNuls == MAP_FAILED_PTR) {
             pMI->txt_errno = errno;
             pMI->txt_full_size = pMI->txt_size;
         }
@@ -180,7 +181,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
                     (void*)(((char*)pMI->txt_data) + pMI->txt_size), pgsz,
                     PROT_READ, MAP_PRIVATE|MAP_FIXED, pMI->txt_zero_fd, 0 );
 
-            if (pNuls == MAP_FAILED) {
+            if (pNuls == MAP_FAILED_PTR) {
                 pMI->txt_errno = errno;
                 pMI->txt_full_size = pMI->txt_size;
                 close( pMI->txt_zero_fd );
@@ -254,7 +255,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         pMI->txt_fd = -1;
     }
     errno = pMI->txt_errno;
-    pMI->txt_data = MAP_FAILED;
+    pMI->txt_data = MAP_FAILED_PTR;
     return pMI->txt_data;
 }
 

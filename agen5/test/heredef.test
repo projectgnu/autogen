@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2005-11-06 15:57:21 bkorb"
+# Time-stamp:        "2005-11-22 16:50:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/11/07 00:21:07 $
+# Last Modified:     $Date: 2005/11/25 18:57:16 $
 #            by: bkorb
 #
-# $Id: heredef.test,v 4.5 2005/11/07 00:21:07 bkorb Exp $
+# $Id: heredef.test,v 4.6 2005/11/25 18:57:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,25 +21,25 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > ${testname}.tpl <<'_EOF_'
-<= AutoGen5 template test =>
-<=
-
-(if (not (= (get "string1") (get "string2")))
-    (error (sprintf "`%s' <> `%s'"
-                    (get "string1") (get "string2") ))  )
-
-=><=
-
-(if (not (= (get "string2") (get "string3")))
-    (error (sprintf "`%s' <> `%s'"
-                    (get "string1") (get "string2") ))  )
-=>OKAY:  <= (c-string (get "string3")) =>
-FROM:  string1 extracted <= (def-file-line "string1") =>
-       string2 extracted
-<=  (def-file-line "string2" c-file-line-fmt) =>
-       string3 extracted <=
-(def-file-line "string3" "From %1$s on line %2$d") =>
+sed 's/^ *[0-9]*:  //' > ${testname}.tpl <<\_EOF_
+ 1:  <= AutoGen5 template test =>
+ 2:  <=
+ 3:  
+ 4:  (if (not (= (get "string1") (get "string2")))
+ 5:      (error (sprintf "`%s' <> `%s'"
+ 6:                      (get "string1") (get "string2") ))  )
+ 7:  
+ 8:  =><=
+ 9:  
+10:  (if (not (= (get "string2") (get "string3")))
+11:      (error (sprintf "`%s' <> `%s'"
+12:                      (get "string1") (get "string2") ))  )
+13:  =>OKAY:  <= (c-string (get "string3")) =>
+14:  FROM:  string1 extracted <= (def-file-line "string1") =>
+15:         string2 extracted
+16:  <=  (def-file-line "string2" c-file-line-fmt) =>
+17:         string3 extracted <=
+18:  (def-file-line "string3" "From %1$s on line %2$d") =>
 _EOF_
 
 # # # # # # # # # # SAMPLE FILE # # # # # # # # #
@@ -56,25 +56,25 @@ _EOF_
 
 # Create the files we need in the test environment
 echo "AutoGen definitions ${testname};" > ${testname}.def
-cat >> ${testname}.def <<\_EOF_
-#ifdef BOGUS
-/* Line 3 */
-#else
-#ifdef WRONG
-/* line 6 */
-#endif
-#endif
-/* line 9 */
-string1 = <<- AG_EOF
-	"`Testing'
-	AG_EOF; /* " */
-/* line 13 */
-string2 = <<- AG_EOF
-"`Testing'
-AG_EOF; /* " */
-
-string3 = "\"`Testing'";  /* line 18 */
-
+sed 's/^ *[0-9]*:  //' >> ${testname}.def <<\_EOF_
+ 2:  #ifdef BOGUS
+ 3:  /* Line 3 */
+ 4:  #else
+ 5:  #ifdef WRONG
+ 6:  /* line 6 */
+ 7:  #endif
+ 8:  #endif
+ 9:  /* line 9 */
+10:  string1 = <<- AG_EOF
+11:  	"`Testing'
+12:  	AG_EOF; /* " */
+13:  /* line 13 */
+14:  string2 = <<- AG_EOF
+15:  "`Testing'
+16:  AG_EOF; /* " */
+17:  
+18:  string3 = "\"`Testing'";  /* line 18 */
+19:  
 _EOF_
 
 ${AGexe} ${testname}.def || failure ${testname} AutoGen failed

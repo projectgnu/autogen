@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.5 2005/10/29 22:13:10 bkorb Exp $
+ *  $Id: defFind.c,v 4.6 2005/11/25 18:57:15 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -120,7 +120,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         {
             char  svch = *pzScan;
             *pzScan = NUL;
-            pzVal    = getDefine( pzDef );
+            pzVal   = getDefine( pzDef, AG_TRUE );
             *pzScan = svch;
         }
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.8 2005/11/07 00:21:07 bkorb Exp $
+ *  $Id: defLex.c,v 4.9 2005/11/25 18:57:15 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -216,7 +216,7 @@ scanAgain:
         pCurCtx->pzScan = pz;
 
         if (pzShellProgram == NULL)
-            pzShellProgram = getDefine( zShellEnv );
+            pzShellProgram = getDefine( zShellEnv, AG_TRUE );
 
         lastToken = DP_EV_STRING;
         pz = runShell( (const char*)pz_token );

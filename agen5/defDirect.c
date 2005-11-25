@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.10 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: defDirect.c,v 4.11 2005/11/25 18:57:15 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -620,7 +620,7 @@ doDir_if( char* pzArg, char* pzScan )
 static char*
 doDir_ifdef( char* pzArg, char* pzScan )
 {
-    if (getDefine( pzArg ) == NULL)
+    if (getDefine( pzArg, AG_FALSE ) == NULL)
         return skipToElseEnd( pzScan );
     ifdefLevel++;
     return pzScan;
@@ -639,7 +639,7 @@ doDir_ifdef( char* pzArg, char* pzScan )
 static char*
 doDir_ifndef( char* pzArg, char* pzScan )
 {
-    if (getDefine( pzArg ) != NULL)
+    if (getDefine( pzArg, AG_FALSE ) != NULL)
         return skipToElseEnd( pzScan );
     ifdefLevel++;
     return pzScan;
@@ -887,12 +887,18 @@ doDir_shell( char* pzArg, char* pzScan )
     if (strncmp( pzText, zEndShell+1, STRSIZE( zEndShell )-1) == 0)
         return pzScan;
 
-    pzScan = strstr( pzScan, zEndShell );
-    if (pzScan == NULL)
-        AG_ABEND( aprf( "Missing #endshell after '#shell' in %s on line %d\n",
+    {
+        char* pz = strstr( pzScan, zEndShell );
+        if (pz == NULL)
+            AG_ABEND( aprf("Missing #endshell after '#shell' in %s on line %d\n",
                         pCurCtx->pzCtxFname, pCurCtx->lineNo ));
 
+        while (pzScan < pz) {
+            if (*(pzScan++) == '\n') pCurCtx->lineNo++;
+        }
+
     *pzScan = NUL;
+    }
 
     /*
      *  Advance the scan pointer to the next line after '#endshell'
@@ -909,7 +915,7 @@ doDir_shell( char* pzArg, char* pzScan )
     pCurCtx->pzScan  = pzScan;
 
     if (pzShellProgram == NULL)
-        pzShellProgram = getDefine( zShellEnv );
+        pzShellProgram = getDefine( zShellEnv, AG_TRUE );
 
     /*
      *  Run the shell command.  The output text becomes the

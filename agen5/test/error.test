@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2005-03-07 13:05:43 bkorb"
+# Time-stamp:        "2005-11-25 10:14:34 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.2 2005/03/13 19:30:08 bkorb Exp $
+# $Id: error.test,v 4.3 2005/11/25 18:57:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -111,7 +111,8 @@ ${AGexe} --no-def -T${testname}2.tpl --base=${testname} \
   2> ${testname}.tmp3 \
   && failure Unexpected success for AutoGen
 
-sed 's,on signal .* in state,on signal <text-varies> in state,' \
+sed -e 's,on signal .* in state,on signal <text-varies> in state,' \
+    -e '/trapped on [1-9]/d' \
   ${testname}.tmp3 > ${testname}.err3
 cmp -s ${testname}.err3 ${testname}.out3 || \
   failure "actual->expected `diff -c ${testname}.err3 ${testname}.out3`"

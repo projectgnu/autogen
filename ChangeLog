@@ -1,3 +1,32 @@
+2005-11-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c (doOptions): Add a boolean argument "check_env".
+	Sometimes we use environment variables for defined values, sometimes
+	we must not.
+	* agen5/defDirect.c (doDir_ifdef): do not use environment value
+	(doDir_shell): also properly count lines
+	* agen5/defFind.c (findEntryByIndex): Do use env. var.
+	* agen5/defLex.c (scanAgain): ditto
+	* agen5/defLoad.c (findPlace): ditto
+	* agen5/test/defs: do not list subdirectory contents when trying to
+	create the list of names of files to move.
+	* agen5/test/directives.test: add line numbers to here docs so we
+	can verify the message line numbers more easily.
+	* agen5/test/error.test: some platforms trigger a sigpipe in the server
+	shell after the shell has ``kill -TERM $AG_pid'' and not yet invoked,
+	"exit".  Strip out the 'trapped on' messages before comparing results.
+	* agen5/test/heredef.test: also add line numbers to here docs.
+	* autoopts/options_h.tpl (TEXT_MMAP_FAILED_ADDR): cast MAP_FAILED to a
+	void* pointer.  Some platforms define a value that cannot be compared
+	with a void* pointer.
+	* autoopts/text_mmap.c(MAP_FAILED_PTR): Always use that instead of
+	MAP_FAILED.  It is ``((void*)MAP_FAILED)'' and should always work.
+	* pkg/Makefile.am: use top_srcdir where needed, not top_builddir.
+	* pkg/libopts/mklibsrc.sh (LIBOPTS_CHECK): this is now part of autoopts.
+	Do not generate it here.
+	* snprintfv/format.c (printf_integer): warning niggle.
+	* xml2ag/Makefile.am: invoke our just-built autogen consistently.
+
 2005-11-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defDirect.c: warning patrol

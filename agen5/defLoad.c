@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.6 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: defLoad.c,v 4.7 2005/11/25 18:57:15 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -222,7 +222,7 @@ findPlace( char* name, tCC* pzIndex )
         pE->index = strtol( pzIndex, NULL, 0 );
 
     else {
-        pzIndex = getDefine( pzIndex );
+        pzIndex = getDefine( pzIndex, AG_TRUE );
         if (pzIndex != NULL)
              pE->index = strtol( pzIndex, NULL, 0 );
         else pE->index = NO_INDEX;

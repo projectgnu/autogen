@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: agUtils.c,v 4.7 2005/11/25 18:57:15 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -198,7 +198,7 @@ doOptions( int arg_ct, char** arg_vec )
 
 
 LOCAL tCC*
-getDefine( tCC* pzDefName )
+getDefine( tCC* pzDefName, ag_bool check_env )
 {
     tCC**   ppz;
     int     ct;
@@ -222,7 +222,7 @@ getDefine( tCC* pzDefName )
                 return (pzEq != NULL) ? pzEq+1 : "";
         }
     }
-    return getenv( pzDefName );
+    return check_env ? getenv( pzDefName ) : NULL;
 }
 
 
