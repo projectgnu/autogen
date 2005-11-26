@@ -81,7 +81,6 @@
 	* agen5/bootstrap.dir(recursive): more things need to be set up for
 	bootstrapping that must not be done during a make step.
 	* autoopts/options_h.tpl(TEXT_MMAP_FAILED_ADDR): new macro
-	* agen5/expFormat.c(ag_scm_license): Use the new mmap failure macro
 	* agen5/tpLoad.c(loadTemplate): ditto
 	* autoopts/configfile.c(configFileLoad): ditto
 	(filePreset): ditto

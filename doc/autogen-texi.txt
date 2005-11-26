@@ -1153,9 +1153,9 @@ restrictions.
 @itemize @bullet
 @item
 It must not begin with a POSIX file name character (hyphen @code{-},
-underscore @code{_} or period @code{.}), the backslash (@code{\\}) or
+underscore @code{_} or period @code{.}), the backslash (@code{\}) or
 open parenthesis (@code{(}).  These are used to identify a suffix
-specification.
+specification, indicate Scheme code and trim white space.
 
 @item
 If it begins with an equal sign, then it
