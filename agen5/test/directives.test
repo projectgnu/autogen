@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # directives.test --- test definition directives
 #
-# Time-stamp:        "2005-11-25 08:25:42 bkorb"
+# Time-stamp:        "2005-11-26 11:41:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/11/25 18:57:15 $
+# Last Modified:     $Date: 2005/12/03 16:26:15 $
 #            by: bkorb
 #
-# $Id: directives.test,v 4.3 2005/11/25 18:57:15 bkorb Exp $
+# $Id: directives.test,v 4.4 2005/12/03 16:26:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -104,7 +104,7 @@ _EOF_
 
 AGCMD="${AGexe} -DMUMBLE -DFOO=1"
 echo ${AGCMD} ${testname}.def
-${AGCMD} ${testname}.def || failure ${AGCMD} failed
+MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD} failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
 
