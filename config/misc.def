@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/11/23 00:09:29 $
+ *  Last Modified:     $Date: 2005/12/03 16:26:59 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.8 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: misc.def,v 4.9 2005/12/03 16:26:59 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.8 $";
+version = "$Revision: 4.9 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -72,7 +72,9 @@ test   = {
 	choke me!
 	#endif
 	int main () {
-	  SCM fumble, bumble, stumble;
+	  SCM fumble = SCM_UNDEFINED;
+	  SCM bumble = SCM_UNDEFINED;
+	  SCM stumble= SCM_UNDEFINED;
 	  long lstumble;
 	  stumble = scm_cons( fumble, bumble );
 	  stumble = scm_display( fumble, bumble );
@@ -105,6 +107,7 @@ test   = {
 	and that is an unstable version.  We will wait for 1.8.
 	_END_OF_DOC_;
 };
+
 
 test   = {
   name      = "eval_string";
