@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.12 2005/11/25 18:59:37 bkorb Exp $
+ *  $Id: defDirect.c,v 4.13 2005/12/03 16:23:45 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -615,7 +615,7 @@ doDir_if( char* pzArg, char* pzScan )
  *  text:
  *  The definitions that follow, up to the matching @code{#endif} will be
  *  processed only if there is a corresponding @code{-Dname} command line
- *  option.
+ *  option or if a @code{#define} of that name has been previously encountered.
 =*/
 static char*
 doDir_ifdef( char* pzArg, char* pzScan )
