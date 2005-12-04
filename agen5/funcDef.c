@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.5 2005/12/03 16:25:26 bkorb Exp $
+ *  $Id: funcDef.c,v 4.6 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -440,9 +440,9 @@ build_defs( int defCt, tDefList* pList )
                 fprintf( pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
                          pCurMacro->sibIndex - defCt, pList->pzExpr );
             }
-            res = ag_eval( pList->pzExpr );
 
-            if (scm_string_p( res )) {
+            res = ag_eval( pList->pzExpr );
+            if (AG_SCM_STRING_P( res )) {
                 AGDUPSTR( pList->de.val.pzText, ag_scm2zchars(res, "eval res"),
                           "dup eval res" );
             }
@@ -472,6 +472,8 @@ build_defs( int defCt, tDefList* pList )
  *  what:    Define a user AutoGen macro
  *  cindex:  define macro
  *  handler_proc:
+ *  load_proc:
+ *  unload-proc:
  *
  *  desc:
  *
@@ -518,6 +520,7 @@ build_defs( int defCt, tDefList* pList )
 /*=macfunc ENDDEF
  *
  *  what:   Ends a macro definition.
+ *  in-context:
  *
  *  desc:
  *    This macro ends the @code{DEFINE} function template block.
@@ -667,6 +670,13 @@ tMacro*
 mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     return mLoad_Unknown( pT, pMac, ppzScan );
+}
+
+
+void
+mUnload_Define( tMacro* pMac )
+{
+    unloadTemplate( (tTemplate*)(pMac->funcPrivate) );
 }
 
 

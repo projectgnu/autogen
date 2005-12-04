@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.6 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: funcFor.c,v 4.7 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -69,7 +69,7 @@ ag_scm_first_for_p( SCM which )
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! gh_string_p( which ))
+    if (! AG_SCM_STRING_P( which ))
         return (pFS->for_firstFor) ? SCM_BOOL_T : SCM_BOOL_F;
 
     {
@@ -106,7 +106,7 @@ ag_scm_last_for_p( SCM which )
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! gh_string_p( which ))
+    if (! AG_SCM_STRING_P( which ))
         return (pFS->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
 
     {
@@ -143,7 +143,7 @@ ag_scm_for_index( SCM which )
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! gh_string_p( which ))
+    if (! AG_SCM_STRING_P( which ))
         return gh_int2scm( pFS->for_index );
 
     {
@@ -599,6 +599,7 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
  *  cindex:  looping, for
  *  cindex:  for loop
  *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *  This macro has a slight variation on the standard syntax:
@@ -674,6 +675,7 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
 /*=macfunc ENDFOR
  *
  *  what:   Terminates the @code{FOR} function template block
+ *  in-context:
  *
  *  desc:
  *    This macro ends the @code{FOR} function template block.

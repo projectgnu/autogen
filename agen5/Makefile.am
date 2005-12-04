@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-11-12 10:11:14 bkorb"
+## Time-stamp:      "2005-11-30 16:38:12 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2005/11/23 00:09:29 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2005/12/04 00:57:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -33,8 +33,8 @@ csrc = \
     defFind.c   expFormat.c expGperf.c     expGuile.c expExtract.c \
     expOutput.c expPrint.c  expState.c     expMake.c  fmemopen.c   \
     funcCase.c  funcDef.c   expString.c    funcFor.c  funcIf.c     \
-    functions.c funcEval.c  loadPseudo.c   opts.c     tpLoad.c     \
-    tpProcess.c tpParse.c
+    functions.c funcEval.c  loadPseudo.c   opts.c     scmStrings.c \
+    tpLoad.c    tpProcess.c tpParse.c
 
 hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
 
@@ -68,7 +68,7 @@ SUFFIXES = .i
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	srcdir=$(srcdir) builddir=$(builddir) \
+	srcdir=$(srcdir) \
 	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
 ## stamp-opts GEN-RULE

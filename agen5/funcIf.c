@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.5 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: funcIf.c,v 4.6 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -106,6 +106,7 @@ eval_true( void )
  *  cindex:  conditional emit
  *  cindex:  if test
  *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *  Conditional block.  Its arguments are evaluated (@pxref{EXPR}) and
@@ -138,6 +139,7 @@ eval_true( void )
 /*=macfunc ENDIF
  *
  *  what:   Terminate the @code{IF} Template Block
+ *  in-context:
  *
  *  desc:
  *    This macro ends the @code{IF} function template block.
@@ -197,6 +199,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
  *  cindex:  conditional emit
  *  cindex:  while test
  *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *  Conditionally repeated block.  Its arguments are evaluated (@pxref{EXPR})
@@ -220,6 +223,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
 /*=macfunc ENDWHILE
  *
  *  what:   Terminate the @code{WHILE} Template Block
+ *  in-context:
  *
  *  desc:
  *    This macro ends the @code{WHILE} function template block.
@@ -260,6 +264,7 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
 /*=macfunc ELIF
  *
  *  what:   Alternate Conditional Template Block
+ *  in-context:
  *
  *  desc:
  *    This macro must only appear after an @code{IF} function, and
@@ -287,6 +292,7 @@ mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*=macfunc ELSE
  *
  *  what:   Alternate Template Block
+ *  in-context:
  *
  *  desc:
  *    This macro must only appear after an @code{IF} function,

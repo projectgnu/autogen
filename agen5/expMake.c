@@ -2,7 +2,7 @@
 /*  -*- Mode: C -*-
  *
  *  expMake.c
- *  $Id: expMake.c,v 4.3 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expMake.c,v 4.4 2005/12/04 00:57:30 bkorb Exp $
  *  This module implements Makefile construction functions.
  */
 
@@ -255,7 +255,7 @@ ag_scm_makefile_script( SCM text )
         } copy_done:;
 
         sz    = (pzOut - pzRes);
-        res   = scm_makstr( sz, 0 );
+        res   = AG_SCM_MKSTR( sz, 0 );
         pzOut = SCM_CHARS( res );
 
         memcpy( pzOut, pzRes, sz );

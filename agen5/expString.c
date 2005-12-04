@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expString.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -312,7 +312,7 @@ shell_stringify( SCM obj, char qt )
     }
 
     {
-        SCM res = scm_makstr( (scm_sizet)dtaSize, 0 );
+        SCM res = AG_SCM_MKSTR( (scm_sizet)dtaSize, 0 );
         memcpy( SCM_CHARS( res ), pzNew, dtaSize );
         AGFREE( pzNew );
         return res;
@@ -337,8 +337,8 @@ do_substitution(
 {
     char* pzMatch = ag_scm2zchars( match, "match text" );
     char* pzRepl  = ag_scm2zchars( repl,  "repl text" );
-    int   matchL  = SCM_LENGTH( match );
-    int   replL   = SCM_LENGTH( repl );
+    int   matchL  = AG_SCM_STRLEN( match );
+    int   replL   = AG_SCM_STRLEN( repl );
     int   endL    = strLen;
 
     int   repCt   = 0;
@@ -413,7 +413,7 @@ do_multi_subs(
         match = SCM_CDR( match );
         repl  = SCM_CDR( repl );
 
-        if (gh_string_p( matchCar )) {
+        if (AG_SCM_STRING_P( matchCar )) {
             do_substitution( pzStr, *pStrLen, matchCar, replCar,
                              &pzNxt, pStrLen );
 
@@ -461,18 +461,18 @@ ag_scm_in_p( SCM obj, SCM list )
     SCM   car;
     char* pz1;
 
-    if (! gh_string_p( obj ))
+    if (! AG_SCM_STRING_P( obj ))
         return SCM_UNDEFINED;
 
     pz1  = SCM_CHARS(  obj );
-    lenz = SCM_LENGTH( obj );
+    lenz = AG_SCM_STRLEN( obj );
 
     /*
      *  If the second argument is a string somehow, then treat
      *  this as a straight out string comparison
      */
-    if (gh_string_p( list )) {
-        if (  (SCM_LENGTH( list ) == lenz)
+    if (AG_SCM_STRING_P( list )) {
+        if (  (AG_SCM_STRLEN( list ) == lenz)
            && (strncmp( pz1, SCM_CHARS( list ), lenz ) == 0) )
             return SCM_BOOL_T;
         return SCM_BOOL_F;
@@ -495,13 +495,13 @@ ag_scm_in_p( SCM obj, SCM list )
          *  hands it to us, it magically becomes a nested list.
          *  This unravels that.
          */
-        if (! gh_string_p( car )) {
+        if (! AG_SCM_STRING_P( car )) {
             if (ag_scm_in_p( obj, car ) == SCM_BOOL_T)
                 return SCM_BOOL_T;
             continue;
         }
 
-        if (  (SCM_LENGTH( car ) == lenz)
+        if (  (AG_SCM_STRLEN( car ) == lenz)
            && (strncmp( pz1, SCM_CHARS( car ), lenz ) == 0) )
             return SCM_BOOL_T;
     }
@@ -534,7 +534,7 @@ ag_scm_join( SCM sep, SCM list )
     SCM        res;
     char*      pzRes;
 
-    if (! gh_string_p( sep ))
+    if (! AG_SCM_STRING_P( sep ))
         return SCM_UNDEFINED;
 
     sv_l_len = l_len = scm_ilength( list );
@@ -542,7 +542,7 @@ ag_scm_join( SCM sep, SCM list )
         return gh_str02scm( "" );
 
     pzSep   = SCM_ROCHARS( sep );
-    sep_len = SCM_LENGTH( sep );
+    sep_len = AG_SCM_STRLEN( sep );
     str_len = 0;
 
     /*
@@ -558,14 +558,14 @@ ag_scm_join( SCM sep, SCM list )
          *  hands it to us, it magically becomes a nested list.
          *  This unravels that.
          */
-        if (! gh_string_p( car )) {
+        if (! AG_SCM_STRING_P( car )) {
             if (car != SCM_UNDEFINED)
                 car = ag_scm_join( sep, car );
-            if (! gh_string_p( car ))
+            if (! AG_SCM_STRING_P( car ))
                 return SCM_UNDEFINED;
         }
 
-        str_len += SCM_LENGTH( car );
+        str_len += AG_SCM_STRLEN( car );
 
         if (--l_len <= 0)
             break;
@@ -574,7 +574,7 @@ ag_scm_join( SCM sep, SCM list )
     }
 
     l_len = sv_l_len;
-    res   = scm_makstr( str_len, 0 );
+    res   = AG_SCM_MKSTR( str_len, 0 );
     pzRes = SCM_CHARS( res );
 
     /*
@@ -589,10 +589,10 @@ ag_scm_join( SCM sep, SCM list )
         /*
          *  This unravels nested lists.
          */
-        if (! gh_string_p( car ))
+        if (! AG_SCM_STRING_P( car ))
             car = ag_scm_join( sep, car );
 
-        cpy_len = SCM_LENGTH( car );
+        cpy_len = AG_SCM_STRLEN( car );
         memcpy( (void*)pzRes, SCM_ROCHARS( car ), cpy_len );
         pzRes += cpy_len;
 
@@ -660,7 +660,7 @@ ag_scm_prefix( SCM prefix, SCM text )
         }
     } exit_count:;
 
-    res    = scm_makstr( (scm_sizet)out_size, 0 );
+    res    = AG_SCM_MKSTR( (scm_sizet)out_size, 0 );
     pzText = pzDta;
     pzDta  = SCM_CHARS( res );
     strcpy( pzDta, pzPfx );
@@ -717,7 +717,7 @@ ag_scm_prefix( SCM prefix, SCM text )
 SCM
 ag_scm_shell( SCM cmd )
 {
-    if (! gh_string_p( cmd ))
+    if (! AG_SCM_STRING_P( cmd ))
         return SCM_UNDEFINED;
     {
         char* pz = runShell( ag_scm2zchars( cmd, "command" ));
@@ -789,7 +789,7 @@ ag_scm_raw_shell_str( SCM obj )
     pzDta = ag_scm2zchars( obj, "AG Object" );
 
     {
-        size_t dtaSize = SCM_LENGTH( obj ) + 3; /* NUL + 2 quotes */
+        size_t dtaSize = AG_SCM_STRLEN( obj ) + 3; /* NUL + 2 quotes */
         pz = pzDta-1;
         for (;;) {
             pz = strchr( pz+1, '\'' );
@@ -1129,8 +1129,8 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 SCM
 ag_scm_string_tr( SCM Str, SCM From, SCM To )
 {
-    scm_sizet lenz  = SCM_LENGTH( Str );
-    SCM       res   = scm_makstr( lenz, 0 );
+    scm_sizet lenz  = AG_SCM_STRLEN( Str );
+    SCM       res   = AG_SCM_MKSTR( lenz, 0 );
     char*     pzDta = SCM_CHARS( res );
     memcpy( pzDta, SCM_CHARS( Str ), lenz );
     return ag_scm_string_tr_x( res, From, To );
@@ -1164,19 +1164,19 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
     scm_sizet  len;
     SCM        res;
 
-    if (! gh_string_p( Str ))
+    if (! AG_SCM_STRING_P( Str ))
         return SCM_UNDEFINED;
 
     pzStr = SCM_ROCHARS( Str );
-    len   = SCM_LENGTH( Str );
+    len   = AG_SCM_STRLEN( Str );
 
-    if (gh_string_p( Match ))
+    if (AG_SCM_STRING_P( Match ))
         do_substitution( pzStr, len, Match, Repl,
                          (char**)&pzStr, &len );
     else
         do_multi_subs( (char**)&pzStr, &len, Match, Repl );
 
-    res = scm_makstr( len, 0 );
+    res = AG_SCM_MKSTR( len, 0 );
     memcpy( SCM_CHARS( res ), pzStr, len );
 
     /*

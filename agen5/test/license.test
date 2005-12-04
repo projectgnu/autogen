@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # license.test --- test license functionality
 #
-# Time-stamp:        "2005-10-22 21:17:00 bkorb"
+# Time-stamp:        "2005-11-27 09:45:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/10/28 23:15:56 $
+# Last Modified:     $Date: 2005/12/04 00:57:31 $
 #            by: bkorb
 #
-# $Id: license.test,v 4.5 2005/10/28 23:15:56 bkorb Exp $
+# $Id: license.test,v 4.6 2005/12/04 00:57:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -39,21 +39,21 @@ _EOF_
 
 # # # # # # # # # # EXTEND FILES TO PAGESIZE # # # # # # # # #
 
-exec 5> ${testname}-extend.c
-
-cat >&5 <<- _EOF_
+cat > ${testname}-extend.c <<- _EOF_
 	#define HAVE_CONFIG_H 1
 	#include "config.h"
 	#include "compat/compat.h"
 
 	int main( int argc, char** argv ) {
 	char z_tail[] = "=]\n */\n";
-	long offset = 0L - strlen(z_tail);
+	long offset = 0L - (sizeof(z_tail) - 1);
 	struct stat sb;
-	char* file = *++argv;
+	char* file;
 	size_t sz;
-	FILE* fp = fopen(file, "a");
+	FILE* fp;
 
+	file = *++argv;
+	fp = fopen(file, "a");
 	if (fp == NULL) return 1;
 	if (stat(file, &sb) != 0) return 1;
 	sz = 0x2000 - (sb.st_size & 0x1FFFUL);
@@ -71,13 +71,15 @@ cat >&5 <<- _EOF_
 	  putc( '\n', fp ); sz--; }
 	fputs(z_tail, fp);
 	fclose(fp);
+
 	return 0; }
 	_EOF_
 
 ${CC} -g ${CFLAGS} -o ${testname}-extend ${testname}-extend.c || \
   failure "Cannot compile ${testname}-extend.c"
 
-./${testname}-extend ${testname}.lic ${testname}.tpl
+./${testname}-extend ${testname}.lic ${testname}.tpl || \
+  failure "Could not extend license/template files to 8KB"
 ls -l ${testname}.???
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #

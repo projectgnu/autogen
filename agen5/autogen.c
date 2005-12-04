@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.9 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: autogen.c,v 4.10 2005/12/04 00:57:30 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -63,6 +63,7 @@ inner_main( int argc, char** argv )
     initialize( argc, argv );
 
     procState = PROC_STATE_LOAD_DEFS;
+    ag_scmStrings_init();
     readDefines();
 
     /*
@@ -82,6 +83,7 @@ inner_main( int argc, char** argv )
     }
 
     unloadDefs();
+    ag_scmStrings_deinit();
 
     procState = PROC_STATE_DONE;
     exit( EXIT_SUCCESS );
@@ -205,7 +207,7 @@ doneCheck( void )
 #ifdef SHELL_ENABLED
     ag_scm_c_eval_string_from_file_line(
         "(if (> (string-length shell-cleanup) 0)"
-        "    (shell shell-cleanup) )", __FILE__, __LINE__ );
+        " (shell shell-cleanup) )", __FILE__, __LINE__ );
 #endif
 
     fflush( stdout );
@@ -238,6 +240,7 @@ doneCheck( void )
             pzOopsPrefix = zNil;
         }
 
+        AG_SCM_EVAL_STR( "(backtrace)" );
         fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
 
         /*

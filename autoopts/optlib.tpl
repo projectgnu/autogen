@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.10 2005/10/29 22:13:11 bkorb Exp $
+# $Id: optlib.tpl,v 4.11 2005/12/04 00:57:31 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
@@ -261,13 +261,12 @@ DEFINE Option_Defines             =][=
 
   =*   key                        =]
 typedef enum {[=
-         IF (not (exist? "arg-default")) =] [=
-            (string-append UP-prefix UP-name)=]_UNDEFINED = 0,[=
-         ENDIF  =]
-[=(shellf "for f in %s ; do echo %s_${f} ; done | \
-          ${CLexe} -I4 --spread=3 --sep=','"
+    (if (not (exist? "arg-default"))
+        (string-append " " enum-pfx "UNDEFINED = 0,")) =]
+[=(shellf
+"for f in %s ; do echo %s${f} ; done | ${CLexe} -I4 --spread=3 --sep=,"
           (string-upcase! (string->c-name! (join " " (stack "keyword"))))
-          (string-append UP-prefix UP-name) )=]
+    enum-pfx )=]
 } te_[=(string-append Cap-prefix cap-name)=];[=
 
   =*   set                        =][=
@@ -454,11 +453,8 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
 
        =* key                   =]
 #define [=(. def-arg-name)=]((const char*)[=
-          IF (=* (get "arg-default") (string-append Cap-prefix cap-name))
-            =][= arg-default    =][=
-          ELSE  =][=(string-append UP-prefix UP-name "_"
-                    (up-c-name "arg-default")) =][=
-          ENDIF =])[=
+          (emit (if (=* (get "arg-default") enum-pfx) "" enum-pfx))
+          (up-c-name "arg-default") =])[=
 
        =* set                   =]
 #define [=(. def-arg-name)=]NULL

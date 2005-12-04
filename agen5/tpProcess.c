@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -83,6 +83,7 @@ generateBlock( tTemplate*   pT,
 
         pCurMacro = pMac;
         pMac = (*(apHdlrProc[ fc ]))( pT, pMac );
+        ag_scmStrings_free();
     }
 }
 
@@ -155,7 +156,7 @@ doStdoutTemplate( tTemplate* pTF )
         if (strneqvcmp( pzRes, zCont, sizeof( zCont ) - 1) != 0)
             fputs( "Content-Type: text/html\n\n", stdout );
 
-        fwrite( pzRes, SCM_LENGTH( res ), 1, stdout );
+        fwrite( pzRes, AG_SCM_STRLEN( res ), 1, stdout );
     }
 
     fclose( stdout );

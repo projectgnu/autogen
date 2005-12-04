@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/10/23 02:40:03 $
+# Last Modified:     $Date: 2005/12/04 00:57:30 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.4 2005/10/23 02:40:03 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.5 2005/12/04 00:57:30 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -40,6 +40,12 @@ then
   do [ ! -f $f ] && t="$t $f"
   done
   set -- $t
+else
+  builddir=`pwd`
+  for f in top_srcdir top_builddir srcdir AGexe GDexe CLexe
+  do eval v=\${${f}}
+     test -z "${v}" && echo no value for ${f} && exit 1
+  done
 fi
 
 #  Make sure we have a default for top build and source.
@@ -84,7 +90,7 @@ set_exe_var() {
 #  Name our executable in one place and disable any $HOME defaults
 #  Use the local tools, if available.  Otherwise, look for them.
 #
-eval "$(
+eval $(
   while read var prog dir
   do
     set_exe_var
@@ -93,7 +99,7 @@ AG  ${AGnam-autogen}  ${builddir}
 GD  ${GDnam-getdefs}  ${builddir}/../getdefs
 CL  ${CLnam-columns}  ${builddir}/../columns
 EOF
-)"
+)
 
 #  Ensure complete success or a noticable failure
 #
@@ -252,6 +258,12 @@ do
     files=`allbut *.c - *fsm.c` 2>/dev/null
     test -z "${files}" && files=`echo *.c`
     :mkfwd -p ${files}
+    ;;
+
+  functions.def )
+    files=`fgrep -l '/*=macfunc' *.c`
+    opts='template=functions.tpl srcfile linenum defs=macfunc listattr=alias'
+    getdefs output=functions.def ${opts} ${files}
     ;;
 
   * )

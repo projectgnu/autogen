@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expGuile.c,v 4.5 2005/12/04 00:57:30 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -28,47 +28,30 @@
 LOCAL teGuileType
 gh_type_e( SCM typ )
 {
-    if (gh_boolean_p( typ ))
-        return GH_TYPE_BOOLEAN;
-
-    if (gh_symbol_p( typ ))
-        return GH_TYPE_SYMBOL;
-
-    if (gh_char_p( typ ))
-        return GH_TYPE_CHAR;
-
-    if (gh_vector_p( typ ))
-        return GH_TYPE_VECTOR;
-
-    if (gh_pair_p( typ ))
-        return GH_TYPE_PAIR;
-
-    if (gh_number_p( typ ))
-        return GH_TYPE_NUMBER;
-
-    if (gh_string_p( typ ))
-        return GH_TYPE_STRING;
-
-    if (gh_procedure_p( typ ))
-        return GH_TYPE_PROCEDURE;
-
-    if (gh_list_p( typ ))
-        return GH_TYPE_LIST;
-
-    if (gh_inexact_p( typ ))
-        return GH_TYPE_INEXACT;
-
-    if (gh_exact_p( typ ))
-        return GH_TYPE_EXACT;
+    if (gh_boolean_p(    typ ))   return GH_TYPE_BOOLEAN;
+    if (gh_symbol_p(     typ ))   return GH_TYPE_SYMBOL;
+    if (gh_char_p(       typ ))   return GH_TYPE_CHAR;
+    if (gh_vector_p(     typ ))   return GH_TYPE_VECTOR;
+    if (gh_pair_p(       typ ))   return GH_TYPE_PAIR;
+    if (gh_number_p(     typ ))   return GH_TYPE_NUMBER;
+    if (AG_SCM_STRING_P( typ ))   return GH_TYPE_STRING;
+    if (gh_procedure_p(  typ ))   return GH_TYPE_PROCEDURE;
+    if (gh_list_p(       typ ))   return GH_TYPE_LIST;
 
     return GH_TYPE_UNDEFINED;
 }
+
 
 LOCAL SCM
 ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
 {
     SCM port;
 
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+        fprintf( pfTrace, "eval from file %s line %d:\n%s\n", pzFile, line,
+                 pzExpr );
+    }
+#if GUILE_VERSION < 107000
     {
         tSCC zEx[] = "eval-string-from-file-line";
         SCM  expr  = scm_makfrom0str( pzExpr );
@@ -87,6 +70,29 @@ ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
         pt->line_number = line - 1;
         pt->file_name   = file;
     }
+#else
+    port = scm_open_input_string( scm_makfrom0str( pzExpr ));
+
+    {
+        static SCM file = SCM_UNDEFINED;
+        static char* pzOldFile = NULL;
+
+        if ((pzOldFile == NULL) || (strcmp( pzOldFile, pzFile ) != 0)) {
+            if (pzOldFile != NULL)
+                AGFREE( pzOldFile );
+
+            AGDUPSTR( pzOldFile, pzFile, "scheme file source" );
+        }
+
+        file = scm_from_locale_string( pzFile );
+        scm_set_port_filename_x( port, file );
+    }
+
+    {
+        SCM ln = scm_from_int( line );
+        scm_set_port_line_x( port, ln );
+    }
+#endif
 
     {
         SCM ans = SCM_UNSPECIFIED;
@@ -286,10 +292,10 @@ ag_scm_string_to_c_name_x( SCM str )
     int   len;
     char* pz;
 
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         scm_wrong_type_arg( zFun, 1, str );
 
-    len = SCM_LENGTH( str );
+    len = AG_SCM_STRLEN( str );
     pz  = SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
@@ -326,10 +332,10 @@ ag_scm_string_upcase_x( SCM str )
     int   len;
     char* pz;
 
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    len = SCM_LENGTH( str );
+    len = AG_SCM_STRLEN( str );
     pz  = SCM_CHARS( str );
     while (--len >= 0) {
          char ch = *pz;                                                         
@@ -356,10 +362,10 @@ SCM
 ag_scm_string_upcase( SCM str )
 {
     SCM res;
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
+    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_upcase_x( res );
     return res;
 }
@@ -381,10 +387,10 @@ ag_scm_string_capitalize_x( SCM str )
     char*   pz;
     ag_bool word_start = AG_TRUE;
 
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    len = SCM_LENGTH( str );
+    len = AG_SCM_STRLEN( str );
     pz  = SCM_CHARS( str );
 
     while (--len >= 0) {
@@ -423,10 +429,10 @@ SCM
 ag_scm_string_capitalize( SCM str )
 {
     SCM res;
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
+    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_capitalize_x( res );
     return res;
 }
@@ -447,10 +453,10 @@ ag_scm_string_downcase_x( SCM str )
     int   len;
     char* pz;
 
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    len = SCM_LENGTH( str );
+    len = AG_SCM_STRLEN( str );
     pz  = SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
@@ -477,10 +483,10 @@ SCM
 ag_scm_string_downcase( SCM str )
 {
     SCM res;
-    if (! gh_string_p( str ))
+    if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), SCM_LENGTH( str ));
+    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_downcase_x( res );
     return res;
 }

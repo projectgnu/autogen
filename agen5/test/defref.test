@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2005-11-22 15:43:43 bkorb"
+# Time-stamp:        "2005-12-03 16:01:06 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/11/23 00:09:29 $
+# Last Modified:     $Date: 2005/12/04 00:57:31 $
 #            by: bkorb
 #
-# $Id: defref.test,v 4.3 2005/11/23 00:09:29 bkorb Exp $
+# $Id: defref.test,v 4.4 2005/12/04 00:57:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -21,27 +21,27 @@ fi
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-cat > ${testname}.tpl <<_EOF_
-<= AutoGen5 template test =>
-The last of each list:<=
-FOR list =>
-  list[<=(for-index)=>] -> <=val[$]=><=
-ENDFOR =>
-
-The first of each list:<=
-FOR list =>
-  list[<=(for-index)=>] -> <=val[]=><=
-ENDFOR =>
-
-The full list:<=
-FOR list =>
-  list[<=(for-index)=>] -> <=
-  FOR val ", " => val[<=(for-index)=>]=<=val=><=
-  ENDFOR =><=
-ENDFOR =>
-
-The first value is:  <= ?% list[].val[]   "val = %s (first)" "Undefined??"=>
-The last value is:   <= ?% list[$].val[$] "val = %s (last)" "Undefined??"=>
+sed 's/^ *[0-9]*: //' > ${testname}.tpl <<_EOF_
+ 1: <= AutoGen5 template test =>
+ 2: The last of each list:<=
+ 3: FOR list =>
+ 4:   list[<= (for-index) =>] -> <= val[$] =><=
+ 5: ENDFOR =>
+ 6: 
+ 7: The first of each list:<=
+ 8: FOR list =>
+ 9:   list[<=(for-index)=>] -> <=val[]=><=
+10: ENDFOR =>
+11: 
+12: The full list:<=
+13: FOR list =>
+14:   list[<=(for-index)=>] -> <=
+15:   FOR val ", " => val[<=(for-index)=>]=<=val=><=
+16:   ENDFOR =><=
+17: ENDFOR =>
+18: 
+19: The first value is:  <= ?% list[].val[]   "val = %s (first)" "Undefined??"=>
+20: The last value is:   <= ?% list[$].val[$] "val = %s (last)" "Undefined??"=>
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #

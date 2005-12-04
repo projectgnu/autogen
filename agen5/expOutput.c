@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expOutput.c,v 4.6 2005/12/04 00:57:30 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -129,7 +129,7 @@ ag_scm_out_delete( void )
 SCM
 ag_scm_out_move( SCM new_file )
 {
-    size_t sz = SCM_LENGTH( new_file );
+    size_t sz = AG_SCM_STRLEN( new_file );
     char*  pz = (char*)AGALOC( sz + 1, "new file name string" );
     memcpy( pz, SCM_CHARS( new_file ), sz );
     pz[ sz ] = NUL;
@@ -166,7 +166,7 @@ ag_scm_out_pop( SCM ret_contents )
 
     if (gh_boolean_p( ret_contents ) && SCM_NFALSEP( ret_contents )) {
         long pos = ftell( pCurFp->pFile );
-        res = scm_makstr( pos, 0 );
+        res = AG_SCM_MKSTR( pos, 0 );
         if (pos != 0) {
             rewind( pCurFp->pFile );
             if (fread( SCM_CHARS( res ), pos, 1, pCurFp->pFile ) != 1)
@@ -270,11 +270,11 @@ ag_scm_out_push_add( SCM new_file )
     tFpStack* p;
     char*  pzNewFile;
 
-    if (! gh_string_p( new_file ))
+    if (! AG_SCM_STRING_P( new_file ))
         return SCM_UNDEFINED;
 
     {
-        size_t sz = SCM_LENGTH( new_file );
+        size_t sz = AG_SCM_STRLEN( new_file );
         pzNewFile = (char*)AGALOC( sz + 1, "append file name string" );
         memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
         pzNewFile[ sz ] = NUL;
@@ -324,8 +324,8 @@ ag_scm_out_push_new( SCM new_file )
     p->pPrev = pCurFp;
     p->flags = FPF_FREE;
 
-    if (gh_string_p( new_file )) {
-        size_t sz = SCM_LENGTH( new_file );
+    if (AG_SCM_STRING_P( new_file )) {
+        size_t sz = AG_SCM_STRLEN( new_file );
         pzNewFile = (char*)AGALOC( sz + 1, "new file name string" );
         memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
         pzNewFile[ sz ] = NUL;
@@ -412,10 +412,10 @@ ag_scm_out_switch( SCM new_file )
     struct utimbuf tbuf;
     char*  pzNewFile;
 
-    if (! gh_string_p( new_file ))
+    if (! AG_SCM_STRING_P( new_file ))
         return SCM_UNDEFINED;
     {
-        size_t sz = SCM_LENGTH( new_file );
+        size_t sz = AG_SCM_STRLEN( new_file );
         pzNewFile = (char*)AGALOC( sz + 1, "new file name string" );
         memcpy( pzNewFile, SCM_CHARS( new_file ), sz );
         pzNewFile[ sz ] = NUL;

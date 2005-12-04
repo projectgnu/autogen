@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.6 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: expExtract.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -136,23 +136,36 @@ static SCM
 buildEmptyText( const char* pzStart, const char* pzEnd,
                 SCM def )
 {
-    size_t mlen = strlen( pzStart ) + strlen( pzEnd );
+    size_t mlen = strlen( pzStart ) + strlen( pzEnd ) + 2;
     SCM res;
     char* pzDef;
     size_t dlen;
 
-    if (! gh_string_p( def ))
+    if (! AG_SCM_STRING_P( def )) {
+        pzDef = NULL;
         dlen = 0;
 
-    else {
-        dlen = SCM_LENGTH( def ) + 1;
+    } else {
+        dlen = AG_SCM_STRLEN( def ) + 1;
         pzDef = ag_scm2zchars( def, "default extract string" );
     }
 
-    res = scm_makstr( mlen + dlen + 1, 0 );
+#if GUILE_VERSION < 107000
+    res = AG_SCM_MKSTR( mlen + dlen + 1, 0 );
     if (dlen > 0)
          sprintf( SCM_CHARS( res ), "%s\n%s\n%s", pzStart, pzDef, pzEnd );
     else sprintf( SCM_CHARS( res ), "%s\n%s", pzStart, pzEnd );
+
+#else /* Guile >= 1.7.x */
+
+    pzDef = ag_scribble( mlen + dlen + 1 );
+
+    if (dlen > 0)
+         sprintf( pzDef, "%s\n%s\n%s", pzStart, pzDef, pzEnd );
+    else sprintf( pzDef, "%s\n%s", pzStart, pzEnd );
+
+    res = AG_SCM2ZSTR( pzDef );
+#endif
 
     return res;
 }
@@ -177,9 +190,12 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
         return buildEmptyText( pzStart, pzEnd, def );
 
     pzE += strlen( pzEnd );
-    res = scm_makstr( pzE - pzS, 0 );
+#if GUILE_VERSION < 107000
+    res = AG_SCM_MKSTR( pzE - pzS, 0 );
     memcpy( SCM_CHARS( res ), pzS, pzE - pzS );
-
+#else
+    res = scm_from_locale_stringn( pzS, pzE - pzS );
+#endif
     return res;
 }
 
@@ -270,7 +286,7 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
     const char* pzEnd;
     const char* pzText;
 
-    if (! gh_string_p( file ) || ! gh_string_p( marker ))
+    if (! AG_SCM_STRING_P( file ) || ! AG_SCM_STRING_P( marker ))
         return SCM_UNDEFINED;
 
     pzText = loadExtractData( ag_scm2zchars( file, "extract file" ));
@@ -279,7 +295,7 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
         const char* pzMarker = ag_scm2zchars( marker, "extract marker" );
         const char* pzCaveat = "DO NOT CHANGE THIS COMMENT";
 
-        if (gh_string_p( caveat ) && (SCM_LENGTH( caveat ) > 0))
+        if (AG_SCM_STRING_P( caveat ) && (AG_SCM_STRLEN( caveat ) > 0))
             pzCaveat = ag_scm2zchars( caveat, "extract caveat" );
 
         pzStart = aprf( pzMarker, "START", pzCaveat );
@@ -318,7 +334,7 @@ ag_scm_find_file( SCM file, SCM suffix )
     tSCC  zFun[] = "ag_scm_find_file";
     SCM res = SCM_UNDEFINED;
 
-    if (! gh_string_p( file ))
+    if (! AG_SCM_STRING_P( file ))
         scm_wrong_type_arg( zFun, 1, file );
 
     {
@@ -328,7 +344,7 @@ ag_scm_find_file( SCM file, SCM suffix )
         /*
          *  The suffix is optional.  If provided, it will be a string.
          */
-        if (gh_string_p( suffix )) {
+        if (AG_SCM_STRING_P( suffix )) {
             char* apz[2];
             apz[0] = ag_scm2zchars( suffix, "file suffix" );
             apz[1] = NULL;

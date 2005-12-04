@@ -1,5 +1,10 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[=(dne " *  " "/*  ")=]
+[=
+
+(define up-c-name  (lambda (ag-name)
+  (string-upcase! (string->c-name! (get ag-name)))  ))
+
+(dne " *  " "/*  ")=]
  *
  *  This module will fire up autogen and have it read definitions
  *  from its standard-in.
@@ -101,7 +106,7 @@ forkAutogen( const char* pzInput )
         }[=
 
         FOR flag                   =][=
-          IF (define opt-name (string-tr (get "name") "a-z^-" "A-Z__"))
+          IF (define opt-name (up-c-name "name"))
              (not (~~ opt-name "OVERRIDE_TPL|OUTPUT") ) =]
 
         if (HAVE_OPT( [=(. opt-name)=] )) {[=

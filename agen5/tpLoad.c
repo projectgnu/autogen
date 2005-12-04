@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.8 2005/10/22 21:57:43 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.9 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -350,6 +350,7 @@ LOCAL tTemplate*
 loadTemplate( tCC* pzFileName )
 {
     static tmap_info_t  mapInfo;
+    tTemplate* pRes;
 
     {
         tSCC*       apzSfx[] = { "tpl", "agl", NULL };
@@ -370,7 +371,6 @@ loadTemplate( tCC* pzFileName )
     {
         size_t       macroCt;
         tTemplate    tmpTpl;
-        tTemplate*   pRes;
         tTemplate*   pSaveTpl = pCurTemplate;
         tMacro*      pSaveMac = pCurMacro;
         size_t       alocSize;
@@ -416,13 +416,32 @@ loadTemplate( tCC* pzFileName )
         pRes = templateFixup( pRes, pRes->descSize );
         pCurTemplate = pSaveTpl;
         pCurMacro    = pSaveMac;
-        return pRes;
     }
+
+    return pRes;
 }
 
 extern void
 unloadTemplate( tTemplate* pT )
 {
+    if (0) {
+        tMacro* pMac = pT->aMacros;
+        int ct = pT->macroCt;
+
+        while (--ct >= 0) {
+            tpUnloadProc proc;
+            /*
+             *  There are no table entries for ``FTYP_SELECT_*''.
+             */
+            if (FUNC_CT > pMac->funcCode) {
+                proc = apUnloadProc[ pMac->funcCode ];
+                if (proc != NULL)
+                    (*proc)( pMac );
+            }
+            pMac++;
+        }
+        AGFREE( pT );
+    }
 }
 /*
  * Local Variables:

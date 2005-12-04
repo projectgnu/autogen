@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: funcEval.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -292,6 +292,7 @@ ag_scm_error_source_line( void )
     fprintf( stderr, zErr, pCurTemplate->pzTplName, pCurMacro->lineNo,
              pCurTemplate->pzTemplText + pCurMacro->ozText );
     fflush( stderr );
+    guileFailure = 1;
 
     return SCM_UNDEFINED;
 }
@@ -317,7 +318,7 @@ ag_scm_emit( SCM val )
         if (SCM_NULLP( val ))
             break;
 
-        if (gh_string_p( val )) {
+        if (AG_SCM_STRING_P( val )) {
             fputs( (char*)ag_scm2zchars( val, "emit val" ), pCurFp->pFile );
             fflush( pCurFp->pFile );
             break;
@@ -397,7 +398,10 @@ eval( const char* pzExpr )
 /*=macfunc EXPR
  *
  *  what:  Evaluate and emit an Expression
- *  alias: + - + ? + % + ; + ( + . + '`' + '"' + "'" +
+ *  alias: + - + ? + % + ; + ( + '`' + '"' + "'" + . +
+ *
+ *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *   This macro does not have a name to cause it to be invoked

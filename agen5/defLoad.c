@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.7 2005/11/25 18:57:15 bkorb Exp $
+ *  $Id: defLoad.c,v 4.8 2005/12/04 00:57:30 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -89,6 +89,7 @@ getEntry( void )
     memset( (void*)pRes, 0, sizeof( *pRes ));
     return pRes;
 }
+
 
 /*
  *  Append a new entry at the end of a sibling (or twin) list.
@@ -264,7 +265,7 @@ readDefines( void )
      *  the stdin input exceeds our initial allocation of 16K.
      */
     if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
-        OPT_ARG( DEFINITIONS )  = "stdin";
+        OPT_ARG( DEFINITIONS ) = "stdin";
         if (getenv( "REQUEST_METHOD" ) != NULL) {
             loadCgi();
             pCurCtx = pBaseCtx;
@@ -332,11 +333,14 @@ readDefines( void )
     /*
      *  Set the input file pointer, as needed
      */
-    fp = useStdin ? stdin
-                  : fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
-    if (fp == NULL)
-        AG_ABEND( aprf( zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                        strerror( errno )));
+    if (useStdin)
+        fp = stdin;
+    else {
+        fp = fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
+        if (fp == NULL)
+            AG_ABEND( aprf( zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
+                            strerror( errno )));
+    }
 
     /*
      *  Read until done...
@@ -410,7 +414,7 @@ readDefines( void )
      *  Close the input file, parse the data
      *  and alphabetically sort the definition tree contents.
      */
-    if (fp != stdin)
+    if (! useStdin)
         fclose( fp );
 
     pCurCtx = pBaseCtx;

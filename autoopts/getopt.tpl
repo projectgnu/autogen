@@ -2,7 +2,7 @@
 
    c=%s-temp.c
 
-# Time-stamp:      "2005-02-14 08:23:31 bkorb"
+# Time-stamp:      "2005-12-03 14:49:14 bkorb"
 
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
@@ -26,7 +26,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.4 2005/02/20 02:15:48 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.5 2005/12/04 00:57:31 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -118,12 +118,18 @@ optionUsage (tOptions* pOptions, int status)
    cd ${td}
    CFLAGS=\"${CFLAGS}  `autoopts-config cflags` -DTEST_%2$s_OPTS\"
    LDFLAGS=\"${LDFLAGS} `autoopts-config ldflags`\"
+   LDFLAGS=`echo ${LDFLAGS} | \
+      sed 's/-lguile[^ ]*//g;s/[^ ]*libguileopts[^ ]*//'`
+   : LD_LIBRARY_PATH $LD_LIBRARY_PATH
    ${CC:-cc} ${CFLAGS} -o %1$s ${sdir}/%3$s.c ${LDFLAGS} || \
-      kill -9 ${AG_pid}
-   (./%1$s -: 2>&1) | \
+      die 'could not build %1$s'
+   f=`guile-config link | sed 's/.*-L//;s/ .*//'`
+   f=`(LD_LIBRARY_PATH=$f ./%1$s -: 2>&1) | \
       sed '1d;/more-help/d
            s/--version\\[=arg\\]/--version      /
-           /version information and exit/s/-v \\[arg\\]/-v      /'
+           /version information and exit/s/-v \\[arg\\]/-v      /'`
+   test -z \"${f}\" && die 'Cannot get help from %1$s'
+   echo \"${f}\"
    cd ..
    [ \"${VERBOSE:-false}\" = true ] || rm -rf ${td}"
     (get "prog-name")

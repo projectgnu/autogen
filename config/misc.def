@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/12/03 16:26:59 $
+ *  Last Modified:     $Date: 2005/12/04 00:57:31 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.9 2005/12/03 16:26:59 bkorb Exp $
+ *  $Id: misc.def,v 4.10 2005/12/04 00:57:31 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.9 $";
+version = "$Revision: 4.10 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -68,8 +68,8 @@ test   = {
   code     = <<- _END_OF_CODE_
 	#include <guile/gh.h>
 	#include <libguile/list.h>
-	#if (SCM_MAJOR_VERSION > 1) || (SCM_MINOR_VERSION > 6)
-	choke me!
+	#if (SCM_MAJOR_VERSION > 1) || (SCM_MINOR_VERSION > 7)
+	choke me
 	#endif
 	int main () {
 	  SCM fumble = SCM_UNDEFINED;
@@ -108,6 +108,32 @@ test   = {
 	_END_OF_DOC_;
 };
 
+test   = {
+  name      = guile_version;
+  type      = test;
+  check     = "the guile version";
+  code      = <<- _END_OF_CODE_
+	( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'
+	_END_OF_CODE_;
+  code-quoting  = asis;
+
+  action   = { yes;
+    act-type = script;
+    act-text = <<- _END_OF_SCRIPT_
+	set -- `IFS=' .' ; echo ${ag_cv_test_guile_version}`
+	i=${3}
+	test -z "${i}" && i=0
+	ag_cv_test_guile_version=`expr ${1} \* 100000 + ${2} \* 1000 + ${i}`
+	AC_DEFINE_UNQUOTED(GUILE_VERSION, ${ag_cv_test_guile_version},
+	         define to Guile version expression)
+	_END_OF_SCRIPT_;
+  };
+
+  doc = <<- _END_OF_DOC_
+	We have to vary our interface all over the place because Guile keeps
+	changing.  Use a single version number.
+	_END_OF_DOC_;
+};
 
 test   = {
   name      = "eval_string";

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.5 2005/10/29 22:13:10 bkorb Exp $
+ *  $Id: funcCase.c,v 4.6 2005/12/04 00:57:30 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -443,7 +443,7 @@ ag_scm_string_eqv_p( SCM text, SCM substr )
      *  We are overloading the "=" operator.  Our arguments may be
      *  numbers...
      */
-    if (! gh_string_p( text ) || ! gh_string_p( substr ))
+    if (! AG_SCM_STRING_P( text ) || ! AG_SCM_STRING_P( substr ))
         return scm_num_eq_p( text, substr );
 
     pzText   = ag_scm2zchars( text, "text to match" );
@@ -853,6 +853,7 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
  *
  *  what:   Select one of several template blocks
  *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *
@@ -918,6 +919,7 @@ Select_Match_NonExistence( char* pzText, char* pzMatch )
 /*=macfunc ESAC
  *
  *  what:   Terminate the @code{CASE} Template Block
+ *  in-context:
  *
  *  desc:
  *    This macro ends the @code{CASE} function template block.
@@ -1139,6 +1141,7 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 /*=macfunc SELECT
  *
  *  what:    Selection block for CASE function
+ *  in-context:
  *  alias:   | ~ | = | * | ! | + |
  *  desc:
  *    This macro selects a block of text by matching an expression

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.9 2005/11/25 18:57:15 bkorb Exp $
+ *  $Id: defLex.c,v 4.10 2005/12/04 00:57:30 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -408,12 +408,12 @@ alist_to_autogen_def( void )
     /*
      *  The result *must* be a string, or we choke.
      */
-    if (! gh_string_p( res )) {
+    if (! AG_SCM_STRING_P( res )) {
         tSCC zEr[] = "Scheme definition expression does not yield string:\n";
         AG_ABEND( zEr );
     }
 
-    res_len   = SCM_LENGTH( res );
+    res_len   = AG_SCM_STRLEN( res );
     procState = PROC_STATE_LOAD_DEFS;
     pCurCtx->pzScan = pzEnd;
     AGFREE( (void*)pzText );
@@ -433,7 +433,8 @@ alist_to_autogen_def( void )
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
-    memcpy( (void*)(pCtx->pzScan), (void*)SCM_CHARS( res ), res_len );
+    memcpy( (void*)(pCtx->pzScan), ag_scm2zchars( res, "alist_to_autogen_def" ),
+            res_len );
     pCtx->pzScan[ res_len ] = NUL;
 
     /*

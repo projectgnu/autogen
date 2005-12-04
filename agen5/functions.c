@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: functions.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -32,6 +32,7 @@ tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
  *
  *  what:   Read in and emit a template block
  *  handler_proc:
+ *  load_proc:
  *
  *  desc:
  *
@@ -113,6 +114,7 @@ mLoad_Include( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *
  *  what:  Either a user macro or a value name.
  *  handler_proc:
+ *  load_proc:
  *  unnamed:
  *
  *  desc:
@@ -182,6 +184,7 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
  *
  *  what:  Out-of-context or unknown functions are bogus.
  *  handler_proc:
+ *  load_proc:
  *  unnamed:
 =*/
 tMacro*
@@ -214,7 +217,8 @@ mFunc_Text( tTemplate* pT, tMacro* pMac )
 /*=macfunc COMMENT
  *
  *  what:  A block of comment to be ignored
- *  alias: #
+ *  load_proc:
+ *  alias: "#"
  *
  *  desc:
  *    This function can be specified by the user, but there will

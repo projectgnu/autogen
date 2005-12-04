@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.6 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expState.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -224,7 +224,7 @@ ag_scm_chdir( SCM dir )
         free( pCurDir );
     {
         char* pz = ag_scm2zchars( dir, zChdirDir );
-        pCurDir = malloc( SCM_LENGTH( dir ) + 1 );
+        pCurDir = malloc( AG_SCM_STRLEN( dir ) + 1 );
         strcpy( (char*)pCurDir, pz );
     }
     return dir;
@@ -346,8 +346,8 @@ ag_scm_ag_function_p( SCM obj )
 SCM
 ag_scm_match_value_p( SCM op, SCM obj, SCM test )
 {
-    if (  (! gh_procedure_p( op   ))
-       || (! gh_string_p(    obj  )) )
+    if (  (! AG_SCM_IS_PROC(  op  ))
+       || (! AG_SCM_STRING_P( obj )) )
         return SCM_UNDEFINED;
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
@@ -377,12 +377,12 @@ ag_scm_get( SCM agName, SCM altVal )
     tDefEntry*  pE;
     ag_bool     x;
 
-    if (! gh_string_p( agName ))
+    if (! AG_SCM_STRING_P( agName ))
          pE = NULL;
     else pE = findDefEntry( ag_scm2zchars( agName, "ag value" ), &x );
 
     if ((pE == NULL) || (pE->valType != VALTYP_TEXT)) {
-        if (gh_string_p( altVal ))
+        if (AG_SCM_STRING_P( altVal ))
             return altVal;
         return gh_str02scm( "" );
     }
@@ -573,7 +573,7 @@ ag_scm_tpl_file_line( SCM fmt )
     tCC*    pzFmt = zFmt;
     char*   pz;
 
-    if (gh_string_p( fmt ))
+    if (AG_SCM_STRING_P( fmt ))
         pzFmt = ag_scm2zchars( fmt, "file/line format" );
 
     {
@@ -644,7 +644,7 @@ ag_scm_def_file_line( SCM obj, SCM fmt )
     if (pE == NULL)
         return SCM_UNDEFINED;
 
-    if (gh_string_p( fmt ))
+    if (AG_SCM_STRING_P( fmt ))
         pzFmt = ag_scm2zchars( fmt, "file/line format" );
 
     {

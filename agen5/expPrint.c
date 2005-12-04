@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: expPrint.c,v 4.5 2005/12/04 00:57:30 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -283,7 +283,7 @@ ag_scm_hide_email( SCM display, SCM eaddr )
         size_t sz = (strlen( pzEadr ) * sizeof( zFmt ))
             + sizeof( zStrt ) + sizeof( zEnd ) + strlen( pzDisp );
 
-        res = scm_makstr( sz, 0 );
+        res = AG_SCM_MKSTR( sz, 0 );
     }
 
     {
