@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-05-27 10:13:32 bkorb"
+## Time-stamp:      "2005-12-04 11:45:59 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.8 2005/05/27 17:39:01 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.9 2005/12/04 22:18:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -265,14 +265,14 @@ FOR flag
           *
           :+]
 .BR --[+: (. opt-name) :+][+:
-          IF (exist? "arg-type") :+] "[+:
+          IF (exist? "arg-type") :+] "[+: #" :+][+:
             arg-optional "["     :+]=[+:(. opt-arg):+][+:
-            arg-optional "]"     :+]"[+:
-          ENDIF:+][+:
+            arg-optional "]"     :+]"[+: #" :+][+:
+          ENDIF :+][+:
           IF (exist? "disable") :+], " \fB--[+:(. dis-name):+]\fP"[+:
           ENDIF :+][+:
-        ENDIF  :+][+:
-      ENDIF :+]
+        ENDIF   :+][+:
+      ENDIF     :+]
 [+: (string-substitute (get "descrip") "\\" "\\\\") :+].[+:
       IF (exist? "min") :+]
 This option is required to appear.[+:ENDIF:+][+:
@@ -333,7 +333,8 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: DEBUG
+:+][+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  )   :+]
 .fi
 .in -4[+: (if (exist? "arg-default") "\n.sp" ) :+][+:

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expState.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -124,7 +124,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
             return SCM_BOOL_F; /* Cannot match string -- not a text value */
         }
 
-        field  = gh_str02scm( pE->val.pzText );
+        field  = AG_SCM_STR02SCM( pE->val.pzText );
         result = gh_call2( op, field, test );
         if (! isIndexed)
             while (result == SCM_BOOL_F) {
@@ -133,7 +133,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
                 if (pE == NULL)
                     break;
 
-                field = gh_str02scm( pE->val.pzText );
+                field = AG_SCM_STR02SCM( pE->val.pzText );
                 result = gh_call2( op, field, test );
             }
 
@@ -156,7 +156,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
      */
     pzField[-1] = '.';
     {
-        SCM field   = gh_str02scm( pzField );
+        SCM field   = AG_SCM_STR02SCM( pzField );
         SCM result;
         tDefCtx ctx = currDefCtx;
 
@@ -195,7 +195,7 @@ find_entry_value( SCM op, SCM obj, SCM test )
 SCM
 ag_scm_base_name( void )
 {
-    return gh_str02scm( (char*)(void*)OPT_ARG( BASE_NAME ));
+    return AG_SCM_STR02SCM( (char*)(void*)OPT_ARG( BASE_NAME ));
 }
 
 
@@ -263,7 +263,7 @@ ag_scm_count( SCM obj )
 SCM
 ag_scm_def_file( void )
 {
-    return gh_str02scm( (char*)(void*)pBaseCtx->pzCtxFname );
+    return AG_SCM_STR02SCM( (char*)(void*)pBaseCtx->pzCtxFname );
 }
 
 
@@ -384,10 +384,10 @@ ag_scm_get( SCM agName, SCM altVal )
     if ((pE == NULL) || (pE->valType != VALTYP_TEXT)) {
         if (AG_SCM_STRING_P( altVal ))
             return altVal;
-        return gh_str02scm( "" );
+        return AG_SCM_STR02SCM( "" );
     }
 
-    return gh_str02scm( pE->val.pzText );
+    return AG_SCM_STR02SCM( pE->val.pzText );
 }
 
 
@@ -515,7 +515,7 @@ ag_scm_set_option( SCM opt )
 SCM
 ag_scm_suffix( void )
 {
-    return gh_str02scm( (char*)pzCurSfx );
+    return AG_SCM_STR02SCM( (char*)pzCurSfx );
 }
 
 
@@ -537,10 +537,10 @@ ag_scm_tpl_file( SCM full )
         tSCC* sfx[] = { "tpl", NULL };
         char z[MAXPATHLEN];
         if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx )))
-            return gh_str02scm( z );
+            return AG_SCM_STR02SCM( z );
     }
 
-    return gh_str02scm( (char*)(void*)pzTemplFileName );
+    return AG_SCM_STR02SCM( (char*)(void*)pzTemplFileName );
 }
 
 
@@ -592,7 +592,7 @@ ag_scm_tpl_file_line( SCM fmt )
     }
 
     {
-        SCM res = gh_str02scm( pz );
+        SCM res = AG_SCM_STR02SCM( pz );
         if (pz != zScribble)
             AGFREE( (void*)pz );
 
@@ -662,7 +662,7 @@ ag_scm_def_file_line( SCM obj, SCM fmt )
     }
 
     {
-        SCM res = gh_str02scm( pzScrib );
+        SCM res = AG_SCM_STR02SCM( pzScrib );
         if (pzScrib != zScribble)
             AGFREE( (void*)pzScrib );
 

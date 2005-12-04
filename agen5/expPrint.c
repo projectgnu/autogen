@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.5 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expPrint.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -168,7 +168,7 @@ run_printf( char* pzFmt, int len, SCM alist )
     {
         char*   pzBuf;
         ssize_t bfSize = safePrintf( &pzBuf, pzFmt, arglist );
-        res = gh_str2scm( pzBuf, bfSize );
+        res = AG_SCM_STR2SCM( pzBuf, bfSize );
         free( pzBuf );
     }
 
@@ -278,30 +278,24 @@ ag_scm_hide_email( SCM display, SCM eaddr )
     char*  pzDisp = ag_scm2zchars( display, pzFormatName );
     char*  pzEadr = ag_scm2zchars( eaddr,   pzFormatName );
     SCM    res;
-
-    {
-        size_t sz = (strlen( pzEadr ) * sizeof( zFmt ))
+    size_t str_size = (strlen( pzEadr ) * sizeof( zFmt ))
             + sizeof( zStrt ) + sizeof( zEnd ) + strlen( pzDisp );
 
-        res = AG_SCM_MKSTR( sz, 0 );
+    char*  pzRes  = ag_scribble( str_size );
+    char*  pzScan = pzRes;
+
+    strcpy( pzScan, zStrt );
+    pzScan += sizeof( zStrt ) - 1;
+
+    for (;;) {
+        if (*pzEadr == NUL)
+            break;
+        pzScan += sprintf( pzScan, zFmt, *(pzEadr++) );
     }
 
-    {
-        char* pz = SCM_CHARS( res );
+    pzScan += sprintf( pzScan, zEnd, pzDisp );
 
-        strcpy( pz, zStrt );
-        pz += sizeof( zStrt ) - 1;
-
-        for (;;) {
-            if (*pzEadr == NUL)
-                break;
-            pz += sprintf( pz, zFmt, *(pzEadr++) );
-        }
-
-        sprintf( pz, zEnd, pzDisp );
-    }
-
-    return res;
+    return AG_SCM_STR2SCM( pzRes, pzScan - pzRes );
 }
 
 

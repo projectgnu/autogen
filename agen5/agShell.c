@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.9 2005/10/29 22:13:10 bkorb Exp $
+ *  $Id: agShell.c,v 4.10 2005/12/04 22:18:40 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -272,7 +272,7 @@ chainOpen( int       stdinFd,
     }
 
 #if defined( DEBUG_ENABLED )
-    if (HAVE_OPT( SHOW_SHELL )) {
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
         tSCC   zPath[] = "PATH";
         tCC*   pzPath  = getenv( zPath );
 

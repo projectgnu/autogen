@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.5 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expGuile.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -63,7 +63,7 @@ ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
         scm_t_port* pt;
 
         if (  (file == SCM_UNDEFINED)
-           || (strcmp( SCM_CHARS( file ), pzFile ) != 0) )
+           || (strcmp( AG_SCM_CHARS( file ), pzFile ) != 0) )
             file = scm_makfrom0str( pzFile );
 
         pt = SCM_PTAB_ENTRY(port);
@@ -82,9 +82,9 @@ ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
                 AGFREE( pzOldFile );
 
             AGDUPSTR( pzOldFile, pzFile, "scheme file source" );
+            file = scm_from_locale_string( pzFile );
         }
 
-        file = scm_from_locale_string( pzFile );
         scm_set_port_filename_x( port, file );
     }
 
@@ -296,7 +296,7 @@ ag_scm_string_to_c_name_x( SCM str )
         scm_wrong_type_arg( zFun, 1, str );
 
     len = AG_SCM_STRLEN( str );
-    pz  = SCM_CHARS( str );
+    pz  = AG_SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
         if (! isalnum( ch )) {
@@ -336,7 +336,7 @@ ag_scm_string_upcase_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = SCM_CHARS( str );
+    pz  = AG_SCM_CHARS( str );
     while (--len >= 0) {
          char ch = *pz;                                                         
         if (islower( ch ))
@@ -365,8 +365,8 @@ ag_scm_string_upcase( SCM str )
     if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
-    ag_scm_string_upcase_x( res );
+    res = AG_SCM_STR2SCM( AG_SCM_CHARS( str ), AG_SCM_STRLEN( str ));
+    scm_string_upcase_x( res );
     return res;
 }
 
@@ -391,7 +391,7 @@ ag_scm_string_capitalize_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = SCM_CHARS( str );
+    pz  = AG_SCM_CHARS( str );
 
     while (--len >= 0) {
         char ch = *pz;
@@ -432,7 +432,7 @@ ag_scm_string_capitalize( SCM str )
     if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
+    res = AG_SCM_STR2SCM( AG_SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_capitalize_x( res );
     return res;
 }
@@ -457,7 +457,7 @@ ag_scm_string_downcase_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = SCM_CHARS( str );
+    pz  = AG_SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
         if (isupper( ch ))
@@ -486,7 +486,7 @@ ag_scm_string_downcase( SCM str )
     if (! AG_SCM_STRING_P( str ))
         return SCM_UNDEFINED;
 
-    res = gh_str2scm( SCM_CHARS( str ), AG_SCM_STRLEN( str ));
+    res = AG_SCM_STR2SCM( AG_SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_downcase_x( res );
     return res;
 }

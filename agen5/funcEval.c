@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: funcEval.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -373,7 +373,7 @@ eval( const char* pzExpr )
         (void)spanQuote( pzTemp );
         pzExpr = runShell( pzTemp );
         AGFREE( (void*)pzTemp );
-        res = gh_str02scm( (char*)pzExpr );
+        res = AG_SCM_STR02SCM( (char*)pzExpr );
         AGFREE( (void*)pzExpr );
         break;
 
@@ -386,7 +386,7 @@ eval( const char* pzExpr )
         /* FALLTHROUGH */
 
     default:
-        res = gh_str02scm( (char*)pzExpr );
+        res = AG_SCM_STR02SCM( (char*)pzExpr );
         if (allocated)
             AGFREE( (void*)pzExpr );
     }

@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expFormat.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -204,7 +204,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     if (pzRes == NULL)
         AG_ABEND( "Allocating Do-Not-Edit string" );
 
-    res = gh_str02scm( pzRes );
+    res = AG_SCM_STR02SCM( pzRes );
 
     /*
      *  Deallocate any temporary buffers.  pzFirst either points to
@@ -360,7 +360,7 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      */
     pzRes = aprf( zGpl, pzPrg, pzPfx );
 
-    res = gh_str02scm( pzRes );
+    res = AG_SCM_STR02SCM( pzRes );
     AGFREE( (void*)pzRes );
     return res;
 }
@@ -410,7 +410,7 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
      */
     pzRes = aprf( zLgpl, pzPrg, pzPfx, pzOwner );
 
-    res = gh_str02scm( pzRes );
+    res = AG_SCM_STR02SCM( pzRes );
     AGFREE( (void*)pzRes );
     return res;
 }
@@ -467,7 +467,7 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
      */
     pzRes = aprf( zBsd, pzPrg, pzPfx, pzOwner );
 
-    res = gh_str02scm( pzRes );
+    res = AG_SCM_STR02SCM( pzRes );
     AGFREE( (void*)pzRes );
     return res;
 }
@@ -567,6 +567,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         int     pfx_size = strlen( pzPfx );
         char*   pzScan   = pzRes;
         char*   pzOut;
+        char*   pzSaveRes;
         size_t  out_size = pfx_size;
 
         /*
@@ -588,8 +589,8 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         /*
          *  Create our output buffer and insert the first prefix
          */
-        res    = AG_SCM_MKSTR( out_size, 0 );
-        pzOut  = SCM_CHARS( res );
+        pzOut = pzSaveRes = ag_scribble( out_size );
+
         strcpy( pzOut, pzPfx );
         pzOut += pfx_size;
         pzScan = pzRes;
@@ -608,15 +609,16 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
                 break;
             }
         }
-    } exit_copy:;
+    exit_copy:;
 
-    /*
-     *  We allocated a temporary buffer that has all the formatting done,
-     *  but need the prefixes on each line.
-     */
-    AGFREE( (void*)pzRes );
+        /*
+         *  We allocated a temporary buffer that has all the
+         *  formatting done, but need the prefixes on each line.
+         */
+        AGFREE( (void*)pzRes );
 
-    return res;
+        return AG_SCM_STR2SCM( pzSaveRes, (pzOut - pzSaveRes) - 1);
+    }
 }
 /*
  * Local Variables:

@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2005-11-27 09:47:08 bkorb"
+# Time-stamp:        "2005-12-04 14:03:10 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.4 2005/12/04 00:57:31 bkorb Exp $
+# $Id: error.test,v 4.5 2005/12/04 22:18:41 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -181,8 +181,8 @@ End Of File
 _EOF_
 
 ${AGexe} -T ${testname}.tpl6 -b ${testname} --no-defin \
-  > /dev/null 2> ${testname}.out6
-[ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
+  > /dev/null 2> ${testname}.out6 && \
+  failure "Your Guile lib exits 0 on failure"
 
 cat > ${testname}.samp6 <<EOF
 ${testname}.tpl6:7:4: In expression (stumble-over-unbound-variable):

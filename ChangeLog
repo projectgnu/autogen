@@ -1,3 +1,11 @@
+2005-12-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h: Use a macro interface to make all the varied
+	variations of the Guile interface look the same.
+	* agen5/*: use these macro wrappers.
+	* agen5/bootstrap.dir: re-enable the generation of functions.h
+	* agen5/functions.tpl: re-add
+
 2005-11-25  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c (doOptions): Add a boolean argument "check_env".

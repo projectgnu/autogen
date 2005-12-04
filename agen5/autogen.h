@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.9 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: autogen.h,v 4.10 2005/12/04 22:18:40 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -472,18 +472,24 @@ MODE v2c_t p2p VALUE( { NULL } );
 #define AG_ABEND_IN(t,m,s) \
     STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
 
+extern void  ag_scmStrings_init(   void );
+extern void  ag_scmStrings_deinit( void );
+extern void  ag_scmStrings_free(   void );
+extern char* ag_scribble( size_t size );
+
+/*
+ *  Code variations based on the version of Guile:
+ */
 #if GUILE_VERSION < 106000
 
-# define ag_scmStrings_init()
-# define ag_scmStrings_deinit()
-# define ag_scmStrings_free()
-
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
-# define AG_SCM2ZSTR(_s)         scm_makfrom0str(_s)
 # define AG_SCM_STRING_P(_s)     gh_string_p(_s)
 # define AG_SCM_MKSTR(_s, _ch)   scm_makstr(_s, _ch)
 # define AG_SCM_EVAL_STR(_s)     gh_eval_str(_s)
 # define AG_SCM_IS_PROC(_p)      gh_procedure_p(_p)
+# define AG_SCM_CHARS(_s)        SCM_CHARS(_s)
+# define AG_SCM_STR2SCM(_st,_sz) gh_str2scm(_st,_sz)
+# define AG_SCM_STR02SCM(_s)     gh_str02scm(_s)
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
@@ -496,16 +502,15 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 }
 
 #elif GUILE_VERSION < 107000
-# define ag_scmStrings_init()
-# define ag_scmStrings_deinit()
-# define ag_scmStrings_free()
 
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
-# define AG_SCM2ZSTR(_s)         scm_makfrom0str(_s)
 # define AG_SCM_STRING_P(_s)     gh_string_p(_s)
 # define AG_SCM_MKSTR(_s, _ch)   scm_makstr(_s, _ch)
 # define AG_SCM_EVAL_STR(_s)     scm_c_eval_string(_s)
 # define AG_SCM_IS_PROC(_p)      scm_procedure_p(_p)
+# define AG_SCM_CHARS(_s)        SCM_CHARS(_s)
+# define AG_SCM_STR2SCM(_st,_sz) scm_mem2string(_st,_sz)
+# define AG_SCM_STR02SCM(_s)     scm_makfrom0str(_s)
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
@@ -516,19 +521,19 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
         s = scm_makfromstr( SCM_CHARS(s), SCM_LENGTH(s), 0 );
     return SCM_CHARS(s);  /* pre-Guile 1.7.x */
 }
-#else
-  extern void  ag_scmStrings_init(   void );
-  extern void  ag_scmStrings_deinit( void );
-  extern void  ag_scmStrings_free(   void );
-  extern char* ag_scm2zchars( SCM s, tCC* type );
-  extern char* ag_scribble( size_t size );
 
-# define AG_SCM_STRLEN(_s)       scm_c_string_length(_s)
-# define AG_SCM2ZSTR(_s)         scm_from_locale_string(_s)
+
+#else
+  extern char* ag_scm2zchars( SCM s, tCC* type );
+
+# define AG_SCM_STRLEN(_s)       SCM_STRING_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     scm_is_string(_s)
 # define AG_SCM_MKSTR(_s, _ch)   scm_c_make_string(_s, _ch)
 # define AG_SCM_EVAL_STR(_s)     scm_c_eval_string(_s)
 # define AG_SCM_IS_PROC(_p)      scm_is_true( scm_procedure_p( _p))
+# define AG_SCM_CHARS(_s)        SCM_STRING_CHARS(_s)
+# define AG_SCM_STR2SCM(_st,_sz) scm_from_locale_stringn(_st,_sz)
+# define AG_SCM_STR02SCM(_s)     scm_from_locale_string(_s)
 #endif
 
 static inline SCM ag_eval( tCC* pzStr )

@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expExtract.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -150,24 +150,13 @@ buildEmptyText( const char* pzStart, const char* pzEnd,
         pzDef = ag_scm2zchars( def, "default extract string" );
     }
 
-#if GUILE_VERSION < 107000
-    res = AG_SCM_MKSTR( mlen + dlen + 1, 0 );
-    if (dlen > 0)
-         sprintf( SCM_CHARS( res ), "%s\n%s\n%s", pzStart, pzDef, pzEnd );
-    else sprintf( SCM_CHARS( res ), "%s\n%s", pzStart, pzEnd );
-
-#else /* Guile >= 1.7.x */
-
     pzDef = ag_scribble( mlen + dlen + 1 );
 
     if (dlen > 0)
          sprintf( pzDef, "%s\n%s\n%s", pzStart, pzDef, pzEnd );
     else sprintf( pzDef, "%s\n%s", pzStart, pzEnd );
 
-    res = AG_SCM2ZSTR( pzDef );
-#endif
-
-    return res;
+    return AG_SCM_STR02SCM( pzDef );
 }
 
 
@@ -180,7 +169,6 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
 {
     const char* pzS = strstr( pzText, pzStart );
     const char* pzE;
-    SCM res;
 
     if (pzS == NULL)
         return buildEmptyText( pzStart, pzEnd, def );
@@ -190,13 +178,8 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
         return buildEmptyText( pzStart, pzEnd, def );
 
     pzE += strlen( pzEnd );
-#if GUILE_VERSION < 107000
-    res = AG_SCM_MKSTR( pzE - pzS, 0 );
-    memcpy( SCM_CHARS( res ), pzS, pzE - pzS );
-#else
-    res = scm_from_locale_stringn( pzS, pzE - pzS );
-#endif
-    return res;
+
+    return AG_SCM_STR2SCM( pzS, pzE - pzS );
 }
 
 
@@ -349,10 +332,10 @@ ag_scm_find_file( SCM file, SCM suffix )
             apz[0] = ag_scm2zchars( suffix, "file suffix" );
             apz[1] = NULL;
             if (SUCCESSFUL( findFile( pz, z, (tCC**)apz )))
-                res = gh_str02scm( z );
+                res = AG_SCM_STR02SCM( z );
 
         } else if (SUCCESSFUL( findFile( pz, z, NULL )))
-            res = gh_str02scm( z );
+            res = AG_SCM_STR02SCM( z );
     }
 
     return res;

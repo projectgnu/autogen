@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.10 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: autogen.c,v 4.11 2005/12/04 22:18:40 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -240,7 +240,7 @@ doneCheck( void )
             pzOopsPrefix = zNil;
         }
 
-        AG_SCM_EVAL_STR( "(backtrace)" );
+        scm_backtrace();
         fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
 
         /*

@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expString.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -308,12 +308,12 @@ shell_stringify( SCM obj, char qt )
         } loopDone2:;
 
         pz[-1]  = qt;
+        *pz     = NUL;
         dtaSize = (pz - pzNew);
     }
 
     {
-        SCM res = AG_SCM_MKSTR( (scm_sizet)dtaSize, 0 );
-        memcpy( SCM_CHARS( res ), pzNew, dtaSize );
+        SCM res = AG_SCM_STR2SCM( pzNew, dtaSize );
         AGFREE( pzNew );
         return res;
     }
@@ -464,7 +464,7 @@ ag_scm_in_p( SCM obj, SCM list )
     if (! AG_SCM_STRING_P( obj ))
         return SCM_UNDEFINED;
 
-    pz1  = SCM_CHARS(  obj );
+    pz1  = AG_SCM_CHARS(  obj );
     lenz = AG_SCM_STRLEN( obj );
 
     /*
@@ -473,7 +473,7 @@ ag_scm_in_p( SCM obj, SCM list )
      */
     if (AG_SCM_STRING_P( list )) {
         if (  (AG_SCM_STRLEN( list ) == lenz)
-           && (strncmp( pz1, SCM_CHARS( list ), lenz ) == 0) )
+           && (strncmp( pz1, AG_SCM_CHARS( list ), lenz ) == 0) )
             return SCM_BOOL_T;
         return SCM_BOOL_F;
     }
@@ -502,7 +502,7 @@ ag_scm_in_p( SCM obj, SCM list )
         }
 
         if (  (AG_SCM_STRLEN( car ) == lenz)
-           && (strncmp( pz1, SCM_CHARS( car ), lenz ) == 0) )
+           && (strncmp( pz1, AG_SCM_CHARS( car ), lenz ) == 0) )
             return SCM_BOOL_T;
     }
 
@@ -528,20 +528,20 @@ ag_scm_join( SCM sep, SCM list )
     int        l_len, sv_l_len;
     SCM        car;
     SCM        alist = list;
-    char*      pzSep;
     int        sep_len;
     scm_sizet  str_len;
-    SCM        res;
     char*      pzRes;
+    char*      pzSep;
+    char*      pzScan;
 
     if (! AG_SCM_STRING_P( sep ))
         return SCM_UNDEFINED;
 
     sv_l_len = l_len = scm_ilength( list );
     if (l_len == 0)
-        return gh_str02scm( "" );
+        return AG_SCM_STR02SCM( "" );
 
-    pzSep   = SCM_ROCHARS( sep );
+    pzSep   = AG_SCM_CHARS( sep );
     sep_len = AG_SCM_STRLEN( sep );
     str_len = 0;
 
@@ -574,8 +574,7 @@ ag_scm_join( SCM sep, SCM list )
     }
 
     l_len = sv_l_len;
-    res   = AG_SCM_MKSTR( str_len, 0 );
-    pzRes = SCM_CHARS( res );
+    pzRes = pzScan = ag_scribble( str_len );
 
     /*
      *  Now, copy each one into the output
@@ -593,19 +592,19 @@ ag_scm_join( SCM sep, SCM list )
             car = ag_scm_join( sep, car );
 
         cpy_len = AG_SCM_STRLEN( car );
-        memcpy( (void*)pzRes, SCM_ROCHARS( car ), cpy_len );
-        pzRes += cpy_len;
+        memcpy( (void*)pzScan, AG_SCM_CHARS( car ), cpy_len );
+        pzScan += cpy_len;
 
         /*
          *  IF we reach zero, then do not insert a separation and bail out
          */
         if (--l_len <= 0)
             break;
-        memcpy( (void*)pzRes, (void*)pzSep, sep_len );
-        pzRes += sep_len;
+        memcpy( (void*)pzScan, (void*)pzSep, sep_len );
+        pzScan += sep_len;
     }
 
-    return res;
+    return AG_SCM_STR2SCM( pzRes, str_len );
 }
 
 
@@ -638,9 +637,9 @@ ag_scm_prefix( SCM prefix, SCM text )
     char*    pzPfx;
     char*    pzText;
     char*    pzDta;
-    size_t   out_size;
+    size_t   out_size, rem_size;
     size_t   pfx_size;
-    SCM      res;
+    char*    pzRes;
 
     pzPfx   = ag_scm2zchars( prefix, "prefix" );
     pzDta   = \
@@ -660,32 +659,31 @@ ag_scm_prefix( SCM prefix, SCM text )
         }
     } exit_count:;
 
-    res    = AG_SCM_MKSTR( (scm_sizet)out_size, 0 );
     pzText = pzDta;
-    pzDta  = SCM_CHARS( res );
+    pzRes  = pzDta = ag_scribble( rem_size = out_size );
     strcpy( pzDta, pzPfx );
     pzDta    += pfx_size;
-    out_size -= pfx_size;
+    rem_size -= pfx_size;
     pfx_size++;
 
     for (;;) {
         char ch = *(pzText++);
         switch (ch) {
         case NUL:
-            if (out_size != 0)
+            if (rem_size != 0)
                 AG_ABEND( "(prefix ...) failed" );
 
-            return res;
+            return AG_SCM_STR2SCM( pzRes, out_size );
 
         case '\n':
             *pzDta    = ch;
             strcpy( pzDta+1, pzPfx );
             pzDta    += pfx_size;
-            out_size -= pfx_size;
+            rem_size -= pfx_size;
             break;
 
         default:
-            out_size--;
+            rem_size--;
             *(pzDta++) = ch;
             break;
         }
@@ -721,7 +719,7 @@ ag_scm_shell( SCM cmd )
         return SCM_UNDEFINED;
     {
         char* pz = runShell( ag_scm2zchars( cmd, "command" ));
-        cmd   = gh_str02scm( pz );
+        cmd   = AG_SCM_STR02SCM( pz );
         AGFREE( (void*)pz );
         return cmd;
     }
@@ -754,7 +752,7 @@ ag_scm_shellf( SCM fmt, SCM alist )
     fmt = run_printf( pz, len, alist );
 
     pz  = runShell( ag_scm2zchars( fmt, "shell script" ));
-    fmt = gh_str02scm( pz );
+    fmt = AG_SCM_STR02SCM( pz );
     AGFREE( (void*)pz );
     return fmt;
 }
@@ -979,7 +977,7 @@ ag_scm_stack( SCM obj )
         if (pDE->valType != VALTYP_TEXT)
             return SCM_UNDEFINED;
 
-        str  = gh_str02scm( pDE->val.pzText );
+        str  = AG_SCM_STR02SCM( pDE->val.pzText );
         *pos = scm_cons( str, SCM_EOL );
         pos  = SCM_CDRLOC( *pos );
     }
@@ -1104,8 +1102,9 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
             }
         } mapDone:;
 
-        pzTo = ag_scm2zchars( str, "string" );
-        while (*pzTo != NUL) {
+        pzTo = AG_SCM_CHARS( str );
+        i    = AG_SCM_STRLEN( str );
+        while (i-- > 0) {
             *pzTo = map[ (int)*pzTo ];
             pzTo++;
         }
@@ -1130,9 +1129,7 @@ SCM
 ag_scm_string_tr( SCM Str, SCM From, SCM To )
 {
     scm_sizet lenz  = AG_SCM_STRLEN( Str );
-    SCM       res   = AG_SCM_MKSTR( lenz, 0 );
-    char*     pzDta = SCM_CHARS( res );
-    memcpy( pzDta, SCM_CHARS( Str ), lenz );
+    SCM       res   = AG_SCM_STR2SCM( AG_SCM_CHARS(Str), lenz );
     return ag_scm_string_tr_x( res, From, To );
 }
 
@@ -1167,7 +1164,7 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
     if (! AG_SCM_STRING_P( Str ))
         return SCM_UNDEFINED;
 
-    pzStr = SCM_ROCHARS( Str );
+    pzStr = AG_SCM_CHARS( Str );
     len   = AG_SCM_STRLEN( Str );
 
     if (AG_SCM_STRING_P( Match ))
@@ -1176,14 +1173,13 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
     else
         do_multi_subs( (char**)&pzStr, &len, Match, Repl );
 
-    res = AG_SCM_MKSTR( len, 0 );
-    memcpy( SCM_CHARS( res ), pzStr, len );
+    res = AG_SCM_STR2SCM( pzStr, len );
 
     /*
      *  IF we have an allocated intermediate result,
      *  THEN we must free it.  We might have our original string.
      */
-    if (pzStr != SCM_ROCHARS( Str ))
+    if (pzStr != AG_SCM_CHARS( Str ))
         AGFREE( (char*)pzStr );
     return res;
 }

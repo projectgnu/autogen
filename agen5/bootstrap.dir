@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/12/04 00:57:30 $
+# Last Modified:     $Date: 2005/12/04 22:18:40 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.5 2005/12/04 00:57:30 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.6 2005/12/04 22:18:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -26,8 +26,8 @@
 #  If the argument is "recursive", then we are bootstrapping.
 #  Otherwise, we are being invoked from "make".
 #
-if [ "$1" = recursive ]
-then
+case "${1}" in
+(recursive)
   top_srcdir=`cd ..;pwd`
   top_builddir=${top_srcdir}
   srcdir=`pwd`
@@ -40,13 +40,25 @@ then
   do [ ! -f $f ] && t="$t $f"
   done
   set -- $t
-else
+  ;;
+
+("")
+  echo "Specify what you want bootstrapped"
+  exit 1
+  ;;
+
+(*)
   builddir=`pwd`
-  for f in top_srcdir top_builddir srcdir AGexe GDexe CLexe
-  do eval v=\${${f}}
-     test -z "${v}" && echo no value for ${f} && exit 1
-  done
-fi
+  top_srcdir=${top_srcdir-`cd ..;pwd`}
+  top_builddir=${top_builddir-`cd ..;pwd`}
+  srcdir=${srcdir-${builddir}}
+  AGexe=${AGexe-`which autogen`}
+  GDexe=${GDexe-`which getdefs`}
+  CLexe=${CLexe-`which columns`}
+
+  export top_srcdir top_builddir srcdir AGexe GDexe CLexe
+  ;;
+esac
 
 #  Make sure we have a default for top build and source.
 #  Some of the templates need this information.

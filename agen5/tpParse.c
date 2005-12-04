@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.5 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: tpParse.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -28,6 +28,10 @@
  */
 
 static int tplNestLevel = 0;
+
+#if defined(DEBUG_ENABLED)
+tSCC zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
+#endif
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -203,7 +207,7 @@ nextMacroStart( tCC* pz, tMacro** ppM, tTemplate* pTpl )
     pM->funcCode = FTYP_TEXT;
     pM->lineNo   = templLineNo;
 
-#if defined( DEBUG_ENABLED )
+#if defined(DEBUG_ENABLED)
     if (HAVE_OPT( SHOW_DEFS )) {
         int ct = tplNestLevel;
         fprintf( pfTrace, "%3d ", pM - pTpl->aMacros );
@@ -233,8 +237,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
     tCC* pzScan = *ppzText;
     tTemplate* pTpl = pCurTemplate;
 
-#if defined( DEBUG_ENABLED )
-    tSCC zTDef[]   = "%-10s (%d) line %d end=%d, strlen=%d\n";
+#if defined(DEBUG_ENABLED)
     tSCC zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
     #define DEBUG_DEC(l)  l--
@@ -328,7 +331,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
         {
             tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pTpl, pM, &pzScan );
 
-#if defined( DEBUG_ENABLED )
+#if defined(DEBUG_ENABLED)
             teFuncType ft  = pM->funcCode;
             int        ln  = pM->lineNo;
 

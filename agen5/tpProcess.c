@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -151,7 +151,7 @@ doStdoutTemplate( tTemplate* pTF )
          *  a content-type: prefix.  If not, we supply our own HTML prefix.
          */
         res   = ag_scm_out_pop( SCM_BOOL_T );
-        pzRes = SCM_CHARS( res );
+        pzRes = AG_SCM_CHARS( res );
 
         if (strneqvcmp( pzRes, zCont, sizeof( zCont ) - 1) != 0)
             fputs( "Content-Type: text/html\n\n", stdout );

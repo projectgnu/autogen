@@ -1,11 +1,10 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.1 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: scmStrings.c,v 4.2 2005/12/04 22:18:41 bkorb Exp $
  *  Temporary SCM strings.
  */
 
-#if GUILE_VERSION >= 107000
 typedef struct string_buf_s string_buf_t;
 
 struct string_buf_s {
@@ -20,6 +19,8 @@ static string_buf_t* ag_strbufs = NULL;
 void  ag_scmStrings_init( void )
 {
     ag_strbufs = NULL;
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        AG_SCM_EVAL_STR( "(debug-enable 'backtrace)" );
 }
 
 
@@ -78,6 +79,8 @@ ag_scribble( size_t size )
 }
 
 
+#if GUILE_VERSION >= 107000
+
 char*
 ag_scm2zchars( SCM s, tCC* type )
 {
@@ -89,7 +92,7 @@ ag_scm2zchars( SCM s, tCC* type )
         return &z;
     }
 
-    buf = ag_scribble( len );
+    buf = ag_scribble( len+2 );
 
     {
         size_t buflen = scm_to_locale_stringbuf( s, buf, len );
@@ -101,8 +104,7 @@ ag_scm2zchars( SCM s, tCC* type )
 
     return buf;
 }
-
-#endif /* GUILE_VERSION >= 107000 */
+#endif
 
 /*
  * Local Variables:

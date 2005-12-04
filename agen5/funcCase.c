@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.6 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: funcCase.c,v 4.7 2005/12/04 22:18:41 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1161,7 +1161,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     long           srcLen = pMac->res;           /* macro len  */
 
     tSCC zInvSel[] = "Invalid selection clause";
-    teFuncType typ = FTYP_SELECT_COMPARE_FULL;
+    int  typ       = (int)FTYP_SELECT_COMPARE_FULL;
 
     /*
      *  Set the global macro loading mode
@@ -1178,13 +1178,13 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     if (*pzSrc == '*') {
         pzSrc++;
         if (isspace( *pzSrc ) || (*pzSrc == NUL)) {
-            typ    = FTYP_SELECT_MATCH_ANYTHING;
+            typ    = (int)FTYP_SELECT_MATCH_ANYTHING;
             srcLen = 0;
             pMac->ozText = 0;
             goto selection_done;
         }
 
-        typ |= FTYP_SELECT_COMPARE_SKP_START;
+        typ |= (int)FTYP_SELECT_COMPARE_SKP_START;
     }
 
     /*
@@ -1196,7 +1196,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         /*
          *  Or in the pattern matching bit
          */
-        typ |= FTYP_SELECT_MATCH_FULL;
+        typ |= (int)FTYP_SELECT_MATCH_FULL;
         pMac->res = REG_EXTENDED;
         /* FALLTHROUGH */
 
@@ -1209,7 +1209,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         if (pzSrc[0] == pzSrc[-1]) {
             pzSrc++;
         } else {
-            typ |= FTYP_SELECT_EQUIVALENT_FULL;
+            typ |= (int)FTYP_SELECT_EQUIVALENT_FULL;
         }
         break;
 
@@ -1225,8 +1225,8 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         if ((pzSrc[1] != NUL) && (! isspace( pzSrc[1] )))
             goto bad_sel;
 
-        typ = (pzSrc[-1] == '!')
-            ? FTYP_SELECT_MATCH_NONEXISTENCE : FTYP_SELECT_MATCH_EXISTENCE;
+        typ = (int)((pzSrc[-1] == '!')
+            ? FTYP_SELECT_MATCH_NONEXISTENCE : FTYP_SELECT_MATCH_EXISTENCE);
         srcLen = 0;
         pMac->ozText = 0;
         goto selection_done;
@@ -1243,7 +1243,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     if (*pzSrc == '*') {
         pzSrc++;
-        typ |= FTYP_SELECT_COMPARE_SKP_END;
+        typ |= (int)FTYP_SELECT_COMPARE_SKP_END;
     }
 
     if (! isspace( *pzSrc ))
@@ -1257,7 +1257,8 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     /*
      *  See if we are doing case insensitive regular expressions
      */
-    if ((typ & FTYP_SELECT_EQV_MATCH_FULL) == FTYP_SELECT_EQV_MATCH_FULL) {
+    if (   (typ & (int)FTYP_SELECT_EQV_MATCH_FULL)
+        == (int)FTYP_SELECT_EQV_MATCH_FULL) {
         int  bitSet;
         pMac->res = REG_EXTENDED | REG_ICASE;
 
@@ -1265,9 +1266,9 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          *  Turn off the case comparison mode for regular expressions.
          *  We don't have to worry about it.  It is done for us.
          */
-        bitSet    = ~FTYP_SELECT_EQUIVALENT_FULL;
-        bitSet   |= FTYP_SELECT_COMPARE_FULL; /* dont turn this bit off! */
-        typ &= bitSet;
+        bitSet  = ~(int)FTYP_SELECT_EQUIVALENT_FULL;
+        bitSet |= (int)FTYP_SELECT_COMPARE_FULL; /* dont turn this bit off! */
+        typ    &= bitSet;
     }
 
     /*
@@ -1275,7 +1276,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     pzScan = pzCopy;
     pMac->ozText = (pzCopy - pT->pzTemplText);
-    if (typ == FTYP_SELECT_EQUIVALENT) {
+    if (typ == (int)FTYP_SELECT_EQUIVALENT) {
         do  {
             *(pzCopy++) = toupper( *(pzSrc++) );
         } while (--srcLen > 0);
@@ -1292,7 +1293,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         spanQuote( (char*)pzScan );
 
  selection_done:
-    pMac->funcCode = typ;
+    pMac->funcCode = (teFuncType)typ;
 
     current_case.pSelect->sibIndex = (pMac - pT->aMacros);
     current_case.pSelect = (tMacro*)pMac;

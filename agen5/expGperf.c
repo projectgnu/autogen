@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.7 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: expGperf.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -116,7 +116,7 @@ tSCC zRunGperf[] = "${gperf_%s} %s";
 SCM
 ag_scm_make_gperf( SCM name, SCM hlist )
 {
-    SCM     newline  = gh_str2scm( "\n", 1 );
+    SCM     newline  = AG_SCM_STR2SCM( "\n", 1 );
     char*   pzName   = ag_scm2zchars( name, "gperf name" );
     char*   pzList;
 
@@ -191,7 +191,7 @@ ag_scm_gperf( SCM name, SCM str )
     if (*pzStr == NUL)
         str = SCM_UNDEFINED;
     else
-        str = gh_str02scm( pzStr );
+        str = AG_SCM_STR02SCM( pzStr );
 
     AGFREE( pzCmd );
     AGFREE( pzStr );

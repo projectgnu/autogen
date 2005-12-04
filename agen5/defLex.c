@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.10 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: defLex.c,v 4.11 2005/12/04 22:18:40 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -433,8 +433,7 @@ alist_to_autogen_def( void )
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
-    memcpy( (void*)(pCtx->pzScan), ag_scm2zchars( res, "alist_to_autogen_def" ),
-            res_len );
+    memcpy( (void*)(pCtx->pzScan), (void*)AG_SCM_CHARS( res ), res_len );
     pCtx->pzScan[ res_len ] = NUL;
 
     /*
