@@ -5,19 +5,14 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2005-12-04 14:03:10 bkorb"
+# Time-stamp:        "2005-12-05 11:16:04 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.5 2005/12/04 22:18:41 bkorb Exp $
+# $Id: error.test,v 4.6 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`dirname $0`
-    test "${VERBOSE+set}" != set && VERBOSE=1
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
@@ -86,7 +81,12 @@ ${AGexe} --no-def -T${testname}.tpl --base=${testname} \
   2> ${testname}.err2 \
   && failure Unexpected success for AutoGen
 
-egrep -v 'Giving up in ' ${testname}.err2 > ${testname}.res2
+if test ${GUILE_VERSION} -gt 107000
+then
+  egrep -v 'Giving up in | is deprecated\.' ${testname}.err2
+else
+  egrep -v 'Giving up in ' ${testname}.err2
+fi > ${testname}.res2
 
 cmp -s ${testname}.base2 ${testname}.res2 || \
   failure "actual->expected `diff -c ${testname}.base2 ${testname}.res2`"
@@ -200,6 +200,16 @@ if (exist? "nothing")
 
 =================================
 EOF
+
+if test ${GUILE_VERSION} -gt 107000
+then
+  echo "WARNING:  Guile 1.7.x cannot display error line numbers" >&2
+  exec 3> ${testname}.samp6-tmp
+  echo 'ERROR: Unbound variable: stumble-over-unbound-variable' >&3
+  sed 1,2d ${testname}.samp6 >&3
+  exec 3>&-
+  mv -f ${testname}.samp6-tmp ${testname}.samp6
+fi
 
 cmp -s  ${testname}.samp6  ${testname}.out6 || \
   failure "`diff -c ${testname}.samp6 ${testname}.out6`"

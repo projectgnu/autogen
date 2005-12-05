@@ -5,21 +5,15 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:13:05 bkorb"
+# Time-stamp:        "2005-12-05 11:30:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: guile.test,v 4.3 2005/03/06 20:16:08 bkorb Exp $
+# $Id: guile.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -38,6 +32,7 @@ mv -f ${testname}.tmp ${testname}.def
 cat >> ${testname}.def <<_EOF_
 
 include = '#include <stdio.h>';
+include = '#include <string.h>';
 include = '#include <guile/gh.h>';
 guile-main;
 before-guile-boot = '    fputs( "guile starts\n", stdout );';

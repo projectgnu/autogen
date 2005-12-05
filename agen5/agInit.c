@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.5 2005/09/04 21:13:39 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.6 2005/12/05 20:46:43 bkorb Exp $
  *
- *  Time-stamp:      "2005-07-27 10:13:38 bkorb"
+ *  Time-stamp:      "2005-12-04 19:42:46 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -51,8 +51,8 @@ initialize( int arg_ct, char** arg_vec )
      */
     ag_init();
     pzLastScheme = zSchemeInit;
-    ag_scm_c_eval_string_from_file_line( zSchemeInit, "directive.h",
-                                         SCHEME_INIT_LINE );
+    ag_scm_c_eval_string_from_file_line( zSchemeInit, SCHEME_INIT_FILE,
+                                         schemeLine );
 #ifndef scm_t_port
     {
         tSCC zInitRest[] =
@@ -62,13 +62,8 @@ initialize( int arg_ct, char** arg_vec )
         ag_scm_c_eval_string_from_file_line( zInitRest, __FILE__, __LINE__-3 );
     }
 #endif
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zBT[] = "(debug-enable 'backtrace)";
-        pzLastScheme = zBT;
-        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
-    }
-    pzLastScheme = NULL;
 
+    pzLastScheme = NULL;
     procState = PROC_STATE_OPTIONS;
     /*
      *  Set the last resort search directory first (lowest priority)
@@ -125,18 +120,31 @@ initialize( int arg_ct, char** arg_vec )
 #ifndef DAEMON_ENABLED
     doOptions( arg_ct, arg_vec );
 
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        tSCC zBT[] = "(debug-enable 'backtrace)";
+        pzLastScheme = zBT;
+        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
+    }
+
 #else
     optionSaveState( &autogenOptions );
     doOptions( arg_ct, arg_vec );
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        tSCC zBT[] = "(debug-enable 'backtrace)";
+        pzLastScheme = zBT;
+        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
+    }
 
     if (! HAVE_OPT( DAEMON ))
         return;
 
     if (0) {
+        tSCC zDevNull[] =
 #ifndef DEBUG_ENABLED
-        tSCC zDevNull[] = "/dev/null";
+            "/dev/null";
 #else
-        tSCC zDevNull[] = "/tmp/AutoGenDebug.txt";
+            "/tmp/AutoGenDebug.txt";
 #endif /* DEBUG_ENABLED */
         becomeDaemon( "/", zDevNull, zDevNull, zDevNull );
     }

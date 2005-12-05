@@ -5,21 +5,15 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:13:11 bkorb"
+# Time-stamp:        "2005-12-05 11:53:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 4.2 2005/03/06 20:16:08 bkorb Exp $
+# $Id: argument.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -61,9 +55,16 @@ cmp -s ${testname}.h*lp || \
 ./${testname} -o string -s 99 > /dev/null || \
   failure ${testname} did not handle its options
 
-sed '/arg_type = number/a\
-    arg-range = "-1";\
-    arg-range = "3->021";' ${testname}.def > ${testname}2.def
+exec 3> ${testname}2.def
+sed '/arg_type = number/q' ${testname}.def >&3
+cat >&3 <<- _EOF_
+	    arg-range = "-1";
+	    arg-range = "3->021";
+	};
+	include = '#include <stdlib.h>';
+	_EOF_
+exec 3>&-
+
 testname=${testname}2
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process

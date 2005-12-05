@@ -1,3 +1,32 @@
+2005-12-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agInit.c(initialize): Test for trace level after doing options.
+	* agen5/autogen.c(main): keep deprecation quiet for Guile 1.7.x
+	(doneCheck): Force an error exit code when problems are found.
+	This is a problem only for Guile 1.7.x.
+	* agen5/autogen.h(AG_SCM_*): create a whole mess of wrapper macros so
+	we can avoid or adapt to changes to the Guile interface.
+	* agen5/bootstrap.dir(functions.h): resume generating it.  However,
+	we won't make any build rules for it.
+	* agen5/functions.h: remove it (for now).
+	* agen5/directive.tpl(schemeLine): set the Scheme line number correctly.
+	* agen5/expGuile.c(gh_type_e): use the new AG_SCM_* wrappers.
+	(ag_scm_c_eval_string_from_file_line): do things differently for 1.7.x
+	* agen5/*.c: Use the new wrappers & eliminate use of scm_makstr().
+	* agen5/test/defs: obsolete
+	* agen5/test/defs.in: new configurable file - replacing defs
+	* agen5/test/Makefile.am(TESTS_ENVIRONMENT): reduced in size by a lot
+	* agen5/test/*.test: source "defs" from build directory, not source.
+	* agen5/autoopts/defs: obsolete
+	* agen5/autoopts/defs.in: new configurable file - replacing defs
+	* agen5/autoopts/Makefile.am(TESTS_ENVIRONMENT): reduced in size by a lot
+	* agen5/autoopts/*.test: source "defs" from build directory, not source.
+	* agen5/test/error.test: Adapt to Guile 1.7: error line numbers do not
+	work, so sed them out of the result.
+	* config/misc.def(GUILE_VERSION): Compute a single number to represent
+	the current Guile version.  Make it both substitutable and a config.h
+	#define value.  Fail-exit the config if we cannot do this.
+
 2005-12-04  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h: Use a macro interface to make all the varied

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.7 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: funcFor.c,v 4.8 2005/12/05 20:46:43 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -144,7 +144,7 @@ ag_scm_for_index( SCM which )
         return SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P( which ))
-        return gh_int2scm( pFS->for_index );
+        return AG_SCM_INT2SCM( pFS->for_index );
 
     {
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
@@ -154,7 +154,7 @@ ag_scm_for_index( SCM which )
 
         do  {
             if (strcmp( p->for_pzName, pz ) == 0) {
-                res = gh_int2scm( p->for_index );
+                res = AG_SCM_INT2SCM( p->for_index );
                 break;
             }
             p--;
@@ -178,9 +178,9 @@ ag_scm_for_index( SCM which )
 SCM
 ag_scm_for_from( SCM from )
 {
-    if ((! pFS->for_loading) || (! gh_number_p( from )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( from )))
         return SCM_UNDEFINED;
-    pFS->for_from = gh_scm2int( from );
+    pFS->for_from = AG_SCM_SCM2INT( from );
     return SCM_BOOL_T;
 }
 
@@ -198,9 +198,9 @@ ag_scm_for_from( SCM from )
 SCM
 ag_scm_for_to( SCM to )
 {
-    if ((! pFS->for_loading) || (! gh_number_p( to )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( to )))
         return SCM_UNDEFINED;
-    pFS->for_to = gh_scm2int( to );
+    pFS->for_to = AG_SCM_SCM2INT( to );
     return SCM_BOOL_T;
 }
 
@@ -218,9 +218,9 @@ ag_scm_for_to( SCM to )
 SCM
 ag_scm_for_by( SCM by )
 {
-    if ((! pFS->for_loading) || (! gh_number_p( by )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( by )))
         return SCM_UNDEFINED;
-    pFS->for_by = gh_scm2int( by );
+    pFS->for_by = AG_SCM_SCM2INT( by );
     return SCM_BOOL_T;
 }
 

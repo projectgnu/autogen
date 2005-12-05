@@ -8,16 +8,10 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.8 2005/09/04 18:36:53 bkorb Exp $
+# $Id: getopt.test,v 4.9 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
-fi
-. $srcdir/defs
+. ./defs
 
 #  This test relies on being able to use the "getopt.tpl" template.
 #  Unfortunately, that template requires that autoopts be properly

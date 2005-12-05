@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.10 2005/12/04 22:18:40 bkorb Exp $
+ *  $Id: autogen.h,v 4.11 2005/12/05 20:46:43 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -484,12 +484,25 @@ extern char* ag_scribble( size_t size );
 
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     gh_string_p(_s)
-# define AG_SCM_MKSTR(_s, _ch)   scm_makstr(_s, _ch)
-# define AG_SCM_EVAL_STR(_s)     gh_eval_str(_s)
+# define AG_SCM_BOOL_P(_b)       gh_boolean_p(_b)
+# define AG_SCM_SYM_P(_s)        gh_symbol_p(_s)
 # define AG_SCM_IS_PROC(_p)      gh_procedure_p(_p)
+# define AG_SCM_CHAR_P(_c)       gh_char_p(_c)
+# define AG_SCM_VEC_P(_v)        gh_vector_p(_v)
+# define AG_SCM_PAIR_P(_p)       gh_pair_p(_p)
+# define AG_SCM_NUM_P(_n)        gh_number_p(_n)
+# define AG_SCM_LIST_P(_l)       gh_list_p(_l)
+
+# define AG_SCM_MKSTR(_s, _ch)   MUST NOT USE
+
+# define AG_SCM_EVAL_STR(_s)     gh_eval_str(_s)
 # define AG_SCM_CHARS(_s)        SCM_CHARS(_s)
 # define AG_SCM_STR2SCM(_st,_sz) gh_str2scm(_st,_sz)
 # define AG_SCM_STR02SCM(_s)     gh_str02scm(_s)
+# define AG_SCM_INT2SCM(_i)      gh_int2scm(_i)
+# define AG_SCM_SCM2INT(_i)      gh_scm2int(_i)
+# define AG_SCM_LONG2SCM(_i)     gh_long2scm(_i)
+# define AG_SCM_SCM2LONG(_i)     gh_scm2long(_i)
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
@@ -504,13 +517,26 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 #elif GUILE_VERSION < 107000
 
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
-# define AG_SCM_STRING_P(_s)     gh_string_p(_s)
-# define AG_SCM_MKSTR(_s, _ch)   scm_makstr(_s, _ch)
+# define AG_SCM_STRING_P(_s)     SCM_STRINGP(_s)
+# define AG_SCM_BOOL_P(_b)       SCM_BOOLP(_b)
+# define AG_SCM_SYM_P(_s)        SCM_SYMBOLP(_s)
+# define AG_SCM_IS_PROC(_p)      SCM_NFALSEP( scm_procedure_p(_p))
+# define AG_SCM_CHAR_P(_c)       SCM_CHARP(_c)
+# define AG_SCM_VEC_P(_v)        SCM_VECTORP(_v)
+# define AG_SCM_PAIR_P(_p)       SCM_NFALSEP( scm_pair_p(_p))
+# define AG_SCM_NUM_P(_n)        SCM_NUMBERP(_n)
+# define AG_SCM_LIST_P(_l)       SCM_NFALSEP( scm_list_p(_l))
+
+# define AG_SCM_MKSTR(_s, _ch)   MUST NOT USE
+
 # define AG_SCM_EVAL_STR(_s)     scm_c_eval_string(_s)
-# define AG_SCM_IS_PROC(_p)      scm_procedure_p(_p)
 # define AG_SCM_CHARS(_s)        SCM_CHARS(_s)
 # define AG_SCM_STR2SCM(_st,_sz) scm_mem2string(_st,_sz)
 # define AG_SCM_STR02SCM(_s)     scm_makfrom0str(_s)
+# define AG_SCM_INT2SCM(_i)      gh_int2scm(_i)
+# define AG_SCM_SCM2INT(_i)      gh_scm2int(_i)
+# define AG_SCM_LONG2SCM(_i)     gh_long2scm(_i)
+# define AG_SCM_SCM2LONG(_i)     gh_scm2long(_i)
 
 static inline char* ag_scm2zchars( SCM s, tCC* type )
 {
@@ -528,12 +554,25 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 
 # define AG_SCM_STRLEN(_s)       SCM_STRING_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     scm_is_string(_s)
-# define AG_SCM_MKSTR(_s, _ch)   scm_c_make_string(_s, _ch)
+# define AG_SCM_BOOL_P(_b)       SCM_BOOLP(_b)
+# define AG_SCM_SYM_P(_s)        SCM_SYMBOLP(_s)
+# define AG_SCM_IS_PROC(_p)      scm_is_true( scm_procedure_p(_p))
+# define AG_SCM_CHAR_P(_c)       SCM_CHARP(_c)
+# define AG_SCM_VEC_P(_v)        SCM_VECTORP(_v)
+# define AG_SCM_PAIR_P(_p)       scm_is_true( scm_pair_p(_p))
+# define AG_SCM_NUM_P(_n)        SCM_NUMBERP(_n)
+# define AG_SCM_LIST_P(_l)       SCM_NFALSEP( scm_list_p(_l))
+
+# define AG_SCM_MKSTR(_s, _ch)   MUST NOT USE
+
 # define AG_SCM_EVAL_STR(_s)     scm_c_eval_string(_s)
-# define AG_SCM_IS_PROC(_p)      scm_is_true( scm_procedure_p( _p))
 # define AG_SCM_CHARS(_s)        SCM_STRING_CHARS(_s)
 # define AG_SCM_STR2SCM(_st,_sz) scm_from_locale_stringn(_st,_sz)
 # define AG_SCM_STR02SCM(_s)     scm_from_locale_string(_s)
+# define AG_SCM_INT2SCM(_i)      gh_int2scm(_i)
+# define AG_SCM_SCM2INT(_i)      gh_scm2int(_i)
+# define AG_SCM_LONG2SCM(_i)     gh_long2scm(_i)
+# define AG_SCM_SCM2LONG(_i)     gh_scm2long(_i)
 #endif
 
 static inline SCM ag_eval( tCC* pzStr )

@@ -1,7 +1,7 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.2 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: scmStrings.c,v 4.3 2005/12/05 20:46:43 bkorb Exp $
  *  Temporary SCM strings.
  */
 
@@ -19,8 +19,6 @@ static string_buf_t* ag_strbufs = NULL;
 void  ag_scmStrings_init( void )
 {
     ag_strbufs = NULL;
-    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        AG_SCM_EVAL_STR( "(debug-enable 'backtrace)" );
 }
 
 

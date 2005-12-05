@@ -1,14 +1,14 @@
-#! /bin/ksh
+#! /bin/bash
 #  -*- Mode: Shell-script -*- 
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2005-12-03 12:44:10 bkorb"
+# Time-stamp:      "2005-12-05 09:26:31 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.6 2005/12/04 00:57:31 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.7 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -39,31 +39,37 @@
 # Code:
 
 case "$-" in
-*x* ) VERBOSE=true ; VERBOSE_ARG="-x" ; set -x ;;
-*   ) VERBOSE=false; VERBOSE_ARG=""   ; set +x ;;
+(*x*)   setx=set\ -x dashx=-x ;;
+(*)     setx=:       dashx=   ;;
 esac
-export VERBOSE VERBOSE_ARG
-SHELL=${SHELL:-$(which ksh 2>/dev/null)}
-test -z "${SHELL}" && SHELL=/bin/ksh
-export SHELL
+export setx dashx
+
+case "${SHELL}" in
+("" | *csh)
+    SHELL=$(which bash 2>/dev/null)
+    test -x "${SHELL}" || {
+        SHELL=$(which ksh 2>/dev/null)
+        test -x "${SHELL}" || SHELL=$(which sh)
+    }
+esac
 
 # Figure out the absolute path to the working directory.
 #
 wd=$(echo $0 | sed 's,/[^/]*$,,')
 test -z "${wd}" && wd=.
-wd=$(cd ${wd} ; pwd)
+wd=$(cd ${wd} && pwd) || exit 1
 
 # Search for a configure.in
 #
 for srcdir in ${wd} ${wd}/.. .. .; do
     config_file=configure.ac
-    test ! -f $srcdir/${config_file} || break
+    test ! -f ${srcdir}/${config_file} || break
     config_file=configure.in
-    test ! -f $srcdir/${config_file} || break
+    test ! -f ${srcdir}/${config_file} || break
 done
-test -f ${config_file}
+test -f "${srcdir}/${config_file}" || exit 1
 export config_file srcdir
-srcdir=$(cd ${srcdir} ; pwd)
+srcdir=$(cd ${srcdir} && pwd) || exit 1
 
 #  This missing function is used in many places
 #
@@ -105,7 +111,7 @@ export AGexe GDexe CLexe
 BOOTSTRAP=pre
 export BOOTSTRAP
 test ! -f ${wd}/bootstrap.local || \
-   ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local $@ || exit 1
+   ${SHELL} ${dashx} ${wd}/bootstrap.local $@ || exit 1
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -195,7 +201,7 @@ doit ()
 
 # Run through all of the required autogeneration tools in
 # each directory which contains a ${config_file} file...
-for i in $(find $srcdir -name ${config_file} -print | grep -v CVS/)
+for i in $(find ${srcdir} -name ${config_file} -print | grep -v CVS/)
 do
   # Find the top directory with respect to the current ${config_file}.
   top=$(dirname $i)
@@ -235,7 +241,7 @@ _EOF_
     # Use auxdir if set in ${config_file}.
     auxdir=${auxdir-`fgrep CONFIG_AUX_DIR ${config_file} | \
         sed 's,^.*(,,;s,).*$,,'`}
-    test -n "$auxdir" || auxdir=$srcdir
+    test -n "$auxdir" || auxdir=${srcdir}
     test -d $auxdir || auxdir=.
 
     if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
@@ -268,7 +274,7 @@ do
   ( cd $(dirname $f)
     srcdir=.
     echo running POST-bootstrap.dir in `pwd`
-    ${SHELL} ${VERBOSE_ARG} ./bootstrap.dir recursive
+    ${SHELL} ${dashx} ./bootstrap.dir recursive
   ) || exit 1
 done
 
@@ -278,7 +284,7 @@ done
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
 test ! -f ${wd}/bootstrap.local || \
-   ${SHELL} ${VERBOSE_ARG} ${wd}/bootstrap.local $@ || exit 1
+   ${SHELL} ${dashx} ${wd}/bootstrap.local $@ || exit 1
 
 # Local Variables:
 # mode: shell-script

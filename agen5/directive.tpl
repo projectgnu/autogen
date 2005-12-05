@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.5 2005/11/12 18:08:08 bkorb Exp $
+# $Id: directive.tpl,v 4.6 2005/12/05 20:46:43 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -90,7 +90,7 @@ static tDirTable dirTable[ DIRECTIVE_CT ] = {
  *  This text has been extracted from [=`echo ${srcdir}/schemedef.scm`=]
  */
 #define SCHEME_INIT_FILE [= (c-string (out-name)) =]
-#define SCHEME_INIT_LINE [= # (+ (out-line) 2) =] 119
+static const int  schemeLine = __LINE__+2;
 static const char zSchemeInit[] =
 [= (kr-string (shell
 

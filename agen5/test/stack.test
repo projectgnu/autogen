@@ -10,15 +10,10 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 #
-# $Id: stack.test,v 4.3 2005/03/13 19:30:08 bkorb Exp $
+# $Id: stack.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`dirname $0`
-    test "${VERBOSE+set}" != set && VERBOSE=1
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expState.c,v 4.9 2005/12/05 20:46:43 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -248,7 +248,7 @@ ag_scm_count( SCM obj )
 {
     int ent_len = count_entries( ag_scm2zchars( obj, "ag object" ));
 
-    return gh_int2scm( ent_len );
+    return AG_SCM_INT2SCM( ent_len );
 }
 
 
@@ -425,15 +425,15 @@ ag_scm_high_lim( SCM obj )
      *  ELSE search the twin list for the high entry
      */
     if (pE == NULL)
-        return gh_int2scm( 0 );
+        return AG_SCM_INT2SCM( 0 );
 
     if (isIndexed)
-        return gh_int2scm( pE->index );
+        return AG_SCM_INT2SCM( pE->index );
 
     if (pE->pEndTwin != NULL)
         pE = pE->pEndTwin;
 
-    return gh_int2scm( pE->index );
+    return AG_SCM_INT2SCM( pE->index );
 }
 
 
@@ -456,7 +456,7 @@ ag_scm_len( SCM obj )
 
     len = entry_length( ag_scm2zchars( obj, "ag value" ));
 
-    return gh_int2scm( len );
+    return AG_SCM_INT2SCM( len );
 }
 
 
@@ -482,9 +482,9 @@ ag_scm_low_lim( SCM obj )
      *  ELSE we have the low index.
      */
     if (pE == NULL)
-        return gh_int2scm( 0 );
+        return AG_SCM_INT2SCM( 0 );
 
-    return gh_int2scm( pE->index );
+    return AG_SCM_INT2SCM( pE->index );
 }
 
 
@@ -533,7 +533,7 @@ ag_scm_suffix( void )
 SCM
 ag_scm_tpl_file( SCM full )
 {
-    if (gh_boolean_p( full ) && SCM_NFALSEP( full )) {
+    if (AG_SCM_BOOL_P( full ) && SCM_NFALSEP( full )) {
         tSCC* sfx[] = { "tpl", NULL };
         char z[MAXPATHLEN];
         if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx )))

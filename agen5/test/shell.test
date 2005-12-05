@@ -6,23 +6,18 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/10/28 23:15:56 $
+# Last Modified:     $Date: 2005/12/05 20:46:44 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.5 2005/10/28 23:15:56 bkorb Exp $
+# $Id: shell.test,v 4.6 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`dirname $0`
-    test "${VERBOSE+set}" != set && VERBOSE=1
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 

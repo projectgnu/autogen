@@ -9,19 +9,13 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/03/06 20:16:08 $
+# Last Modified:     $Date: 2005/12/05 20:46:44 $
 #            by: bkorb
 #
-# $Id: vers.test,v 4.2 2005/03/06 20:16:08 bkorb Exp $
+# $Id: vers.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -59,7 +53,7 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 4.2 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 4.3 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
 echo ${AG_L} $testname.def

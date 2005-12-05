@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expPrint.c,v 4.7 2005/12/05 20:46:43 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -341,7 +341,7 @@ ag_scm_format_arg_count( SCM fmt )
         }
     } scanDone:;
 
-    return gh_int2scm( ct );
+    return AG_SCM_INT2SCM( ct );
 }
 /*
  * Local Variables:

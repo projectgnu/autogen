@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expGuile.c,v 4.7 2005/12/05 20:46:43 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -28,15 +28,15 @@
 LOCAL teGuileType
 gh_type_e( SCM typ )
 {
-    if (gh_boolean_p(    typ ))   return GH_TYPE_BOOLEAN;
-    if (gh_symbol_p(     typ ))   return GH_TYPE_SYMBOL;
-    if (gh_char_p(       typ ))   return GH_TYPE_CHAR;
-    if (gh_vector_p(     typ ))   return GH_TYPE_VECTOR;
-    if (gh_pair_p(       typ ))   return GH_TYPE_PAIR;
-    if (gh_number_p(     typ ))   return GH_TYPE_NUMBER;
+    if (AG_SCM_BOOL_P(   typ ))   return GH_TYPE_BOOLEAN;
+    if (AG_SCM_SYM_P(    typ ))   return GH_TYPE_SYMBOL;
     if (AG_SCM_STRING_P( typ ))   return GH_TYPE_STRING;
-    if (gh_procedure_p(  typ ))   return GH_TYPE_PROCEDURE;
-    if (gh_list_p(       typ ))   return GH_TYPE_LIST;
+    if (AG_SCM_IS_PROC(  typ ))   return GH_TYPE_PROCEDURE;
+    if (AG_SCM_CHAR_P(   typ ))   return GH_TYPE_CHAR;
+    if (AG_SCM_VEC_P(    typ ))   return GH_TYPE_VECTOR;
+    if (AG_SCM_PAIR_P(   typ ))   return GH_TYPE_PAIR;
+    if (AG_SCM_NUM_P(    typ ))   return GH_TYPE_NUMBER;
+    if (AG_SCM_LIST_P(   typ ))   return GH_TYPE_LIST;
 
     return GH_TYPE_UNDEFINED;
 }
@@ -51,28 +51,30 @@ ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
         fprintf( pfTrace, "eval from file %s line %d:\n%s\n", pzFile, line,
                  pzExpr );
     }
+
+    port = scm_open_input_string( AG_SCM_STR02SCM( pzExpr ));
+
 #if GUILE_VERSION < 107000
     {
-        tSCC zEx[] = "eval-string-from-file-line";
-        SCM  expr  = scm_makfrom0str( pzExpr );
-        port = scm_mkstrport( SCM_INUM0, expr, SCM_OPN | SCM_RDNG, zEx );
-    }
+        static SCM   file = SCM_UNDEFINED;
+        static char* pzFl = NULL;
 
-    {
-        static SCM file = SCM_UNDEFINED;
         scm_t_port* pt;
 
-        if (  (file == SCM_UNDEFINED)
-           || (strcmp( AG_SCM_CHARS( file ), pzFile ) != 0) )
-            file = scm_makfrom0str( pzFile );
+        if (  (pzFl == NULL)
+           || (strcmp( AG_SCM_CHARS( file ), pzFile ) != 0) )  {
+            if (pzFl != NULL)
+                AGFREE(pzFl);
+            AGDUPSTR(pzFl, pzFile, "eval file name");
+            file = AG_SCM_STR02SCM( pzFile );
+        }
 
         pt = SCM_PTAB_ENTRY(port);
         pt->line_number = line - 1;
         pt->file_name   = file;
     }
-#else
-    port = scm_open_input_string( scm_makfrom0str( pzExpr ));
 
+#else
     {
         static SCM file = SCM_UNDEFINED;
         static char* pzOldFile = NULL;
@@ -246,7 +248,7 @@ ag_scm_sum( SCM list )
     unsigned long sum = 0;
 
     if (len <= 0)
-        return gh_int2scm( 0 );
+        return AG_SCM_INT2SCM( 0 );
 
     do  {
         SCM  car = SCM_CAR( list );

@@ -1,0 +1,146 @@
+#! /bin/echo this_file_should_be_sourced,_not_executed
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# defs --- define the environment for autogen tests.
+#
+# Time-stamp:        "2005-12-05 11:23:30 bkorb"
+# Author:         Bruce Korb <bkorb@gnu.org>
+# Maintainer:     Bruce Korb <bkorb@gnu.org>
+# Created:        Fri Mar 27 21:15:30 1998
+#
+# $Id: defs.in,v 4.1 2005/12/05 20:46:44 bkorb Exp $
+# ----------------------------------------------------------------------
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  C O N F I G U R E D   V A L U E S
+#
+# Make sure srcdir is an absolute path.  Supply the variable
+# if it does not exist.  We want to be able to run the tests
+# stand-alone!!
+#
+srcdir=`cd "@srcdir@" && pwd `
+top_srcdir=`cd "@top_srcdir@" && pwd`
+CC="@CC@"
+LIB="@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@"
+INC="@INCLIST@ @LIBGUILE_CFLAGS@"
+GUILE_VERSION="@GUILE_VERSION@"
+LIBGUILE_PATH="@LIBGUILE_PATH@"
+AGexe="@AGexe@"
+GDexe="@GDexe@"
+CLexe="@CLexe@"
+AG_VERSION="@AG_VERSION@"
+
+builddir=`pwd`
+top_builddir=`cd ../.. && pwd`
+
+if test ${GUILE_VERSION} -gt 107000
+then
+  case ${AG_VERSION} in
+  *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
+  *     ) GUILE_WARN_DEPRECATED=no ;;
+  esac
+  export GUILE_WARN_DEPRECATED
+fi
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Set up paths that are sometimes necessary!
+#
+f=${top_builddir}/autoopts
+test -f ${f}/libopts.a || f=${f}/.libs
+LD_LIBRARY_PATH=${LIBGUILE_PATH}:${f}
+LIB="${f}/libopts.a ${f}/libguileopts.a ${LIB}"
+export LD_LIBRARY_PATH
+
+dirs=`
+for f in ${top_builddir} ${top_srcdir}
+do
+  for d in . autoopts agen5
+  do
+    (cd $f/$d && pwd)
+  done
+done | sort -u | sed s/^/-I/`
+
+INC="${CFLAGS} ${CPPFLAGS} ${INC} "`echo ${dirs}`
+
+f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
+PATH=${top_builddir}/columns:${f}:${PATH}
+
+stdopts=${srcdir}/stdopts.def
+progname=`echo "$0" | sed 's,^.*/,,'`
+testname=`echo "$progname" | sed 's,\..*$,,'`
+testsubdir=${testsubdir-testdir}
+
+#  All the tests will require the templates in the autoopts dir.
+#
+AG_L="${AGexe} -L`cd ${srcdir}/..;pwd`"
+
+#  In general, they will have a test main procedure, too.
+#
+test_main=yes
+
+# User can set VERBOSE to prevent output redirection
+case x$VERBOSE in
+  x[Nn][Oo] | x0 | x | x[Ff]* )
+    exec > /dev/null 2>&1
+    rm -rf $testsubdir
+    VERBOSE=false
+    ;;
+
+  x* )
+    set -x ; : VERBOSE is ${VERBOSE} ; VERBOSE=true
+    ;;
+esac
+use_flags=true
+
+test -d $testsubdir || mkdir $testsubdir
+cd $testsubdir || {
+  echo "Cannot make or change into $testsubdir"
+  exit 1
+}
+
+echo "=== Running $progname for ${testname} ==="
+chmod +w * > /dev/null 2>&1 || :
+
+# A standard failure function
+failure()
+{
+  ${VERBOSE} && set -x
+  if test -d ../FAILURES
+  then ( \cd ../FAILURES ; rm -rf ${testname}* .*${testname}* )
+  else mkdir ../FAILURES ; fi
+
+  ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
+  echo "$*"
+  exit 1
+}
+
+cleanup()
+{
+  if ${VERBOSE} ; then : ; else
+    cd ${builddir}
+    rm -rf $testsubdir
+  fi
+}
+
+compile()
+{
+  d=`echo TEST_TEST_${testname}_OPTS | tr '[a-z]' '[A-Z]'`
+  cmd="${CC} ${CFLAGS} -D$d ${INC} -o $testname $testname.c ${LIB}"
+  echo $cmd >&2
+  eval $cmd || \
+    failure cannot compile $testname.c
+  ./$testname $@ > $testname.help || \
+    failure cannot obtain help output for $testname
+}
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 4
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
+## End:
+
+# end of defs

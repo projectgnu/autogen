@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.6 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: funcIf.c,v 4.7 2005/12/05 20:46:43 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -481,7 +481,7 @@ ag_scm_set_writable( SCM set )
         break;
 
     default:
-        if (gh_boolean_p( set ) && (set == SCM_BOOL_F))
+        if (AG_SCM_BOOL_P( set ) && (set == SCM_BOOL_F))
             CLEAR_OPT( WRITABLE );
         else
             SET_OPT_WRITABLE;

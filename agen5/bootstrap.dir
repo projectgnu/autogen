@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/12/04 22:18:40 $
+# Last Modified:     $Date: 2005/12/05 20:46:43 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.6 2005/12/04 22:18:40 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.7 2005/12/05 20:46:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -34,7 +34,7 @@ case "${1}" in
   builddir=${srcdir}
   export top_builddir top_srcdir builddir srcdir
   set -- `egrep '##.*GEN-RULE' ${srcdir}/Makefile.am | \
-          awk '{ print $2 }' `
+          awk '{ print $2 }' ` functions.h
   t=""
   for f
   do [ ! -f $f ] && t="$t $f"
@@ -126,9 +126,9 @@ for t
 do
   echo Re-building "$t"
   case "$t" in
-  stamp-parse | \
-  defParse-fsm.c | \
-  defParse-fsm.h )
+  ( stamp-parse    | \
+    defParse-fsm.c | \
+    defParse-fsm.h )
     # Make the definition parser
     #
     if [ -z "${AGexe}" ]
@@ -144,8 +144,7 @@ do
     date > stamp-parse
     ;;
 
-  stamp-opts | \
-  opts.[ch] )
+  (stamp-opts | opts.[ch])
     # Make the option processing files:
     #
     if test -z "${AGexe}" -o -z "${CLexe}"
@@ -159,7 +158,7 @@ do
     date > stamp-opts
     ;;
 
-  stamp-fsm )
+  (stamp-fsm)
     # Make the pseudo-macro processing Finite State Machine
     #
     if [ -z "${AGexe}" ]
@@ -176,10 +175,10 @@ do
     date > stamp-fsm
     ;;
 
-  stamp-exprini | \
-  expr.h | \
-  expr.def | \
-  expr.ini )
+  ( stamp-exprini | \
+    expr.h   | \
+    expr.def | \
+    expr.ini )
     if test -z "${AGexe}" -o -z "${CLexe}" -o -z "${GDexe}"
     then
       echo "Cannot locate autogen or columns or getdefs"
@@ -210,9 +209,9 @@ do
     date > stamp-exprini
     ;;
 
-  stamp-directive | \
-  directive.def | \
-  directive.h )
+  (stamp-directive | \
+    directive.def  | \
+    directive.h )
     if test -z "${AGexe}" -o -z "${CLexe}"
     then
       echo "Cannot locate autogen or columns"
@@ -232,7 +231,7 @@ do
     date > stamp-directive
     ;;
 
-  stamp-texi | autogen.texi | autogen.menu )
+  (stamp-texi | autogen.texi | autogen.menu)
     # Construct the info doc
     #
     if test -z "${AGexe}" -o -z "${CLexe}"
@@ -246,7 +245,7 @@ do
     ${AGexe} ${eopt} opts.def
     ;;
 
-  stamp-man | autogen.1 )
+  (stamp-man | autogen.1)
     # Construct the man page
     #
     if test -z "${AGexe}" -o -z "${CLexe}"
@@ -260,25 +259,26 @@ do
     ${AGexe} ${eopt} ${srcdir}/opts.def
     ;;
 
-  fmemopen.3 )
+  (fmemopen.3)
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def fmemopen.c
     ${AGexe} -L ${top_srcdir}/autoopts fmemopen.def
     rm -f fmemopen.def
     ;;
 
-  proto.h )
+  (proto.h)
     files=`allbut *.c - *fsm.c` 2>/dev/null
     test -z "${files}" && files=`echo *.c`
     :mkfwd -p ${files}
     ;;
 
-  functions.def )
+  (functions.h)
     files=`fgrep -l '/*=macfunc' *.c`
     opts='template=functions.tpl srcfile linenum defs=macfunc listattr=alias'
     getdefs output=functions.def ${opts} ${files}
+    autogen functions.def
     ;;
 
-  * )
+  (*)
     echo "Don't know how to make $t"
     exit 1
     ;;

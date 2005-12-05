@@ -8,15 +8,10 @@
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Sat Mar 28 14:21:31 1998
 #
-# $Id: expr.test,v 4.3 2005/06/08 23:00:20 bkorb Exp $
+# $Id: expr.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir=`dirname $0`
-    test "${VERBOSE+set}" != set && VERBOSE=1
-fi
-. $srcdir/defs
+. ./defs
 
 # # # # # # # TEMPLATE & DEFINITIONS FILES # # # # # # # # #
 #

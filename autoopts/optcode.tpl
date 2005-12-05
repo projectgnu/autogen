@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.13 2005/02/20 23:00:55 bkorb Exp $
+#$Id: optcode.tpl,v 4.14 2005/12/05 20:46:44 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-02-20 13:01:50 bkorb"
+# Time-stamp:      "2005-12-05 11:12:01 bkorb"
 
 =][=
 
@@ -396,8 +396,9 @@ ENDIF "test/guile main"
 (tpl-file-line extract-fmt)
 =]
 #if ENABLE_NLS
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <autoopts/usage-txt.h>
 
 static char*

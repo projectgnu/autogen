@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.11 2005/12/04 22:18:40 bkorb Exp $
+ *  $Id: autogen.c,v 4.12 2005/12/05 20:46:43 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -103,9 +103,14 @@ main( int    argc,
 
     signalSetup( ignoreSignal, abendSignal );
 
+#if GUILE_VERSION >= 107000
+    if (getenv( "GUILE_WARN_DEPRECATED" ) == NULL)
+        putenv( "GUILE_WARN_DEPRECATED=no" );
+#endif
+
     gh_enter( argc, argv, inner_main );
     /* NOT REACHED */
-    return 0;
+    return EXIT_FAILURE;
 }
 
 static void
@@ -203,6 +208,9 @@ doneCheck( void )
     tSCC zErr[] =
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
         "\t%s on line %d\n";
+#if GUILE_VERSION >= 107000
+    int exit_code = EXIT_SUCCESS;
+#endif
 
 #ifdef SHELL_ENABLED
     ag_scm_c_eval_string_from_file_line(
@@ -240,7 +248,9 @@ doneCheck( void )
             pzOopsPrefix = zNil;
         }
 
-        scm_backtrace();
+        if (OPT_VALUE_TRACE > TRACE_NOTHING)
+            scm_backtrace();
+
         fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
 
         /*
@@ -253,6 +263,10 @@ doneCheck( void )
             closeOutput( AG_TRUE );
 #endif
         } while (pCurFp->pPrev != NULL);
+
+#if GUILE_VERSION >= 107000
+        exit_code = EXIT_FAILURE;
+#endif
         break; /* continue failure exit */
 
     default:
@@ -286,8 +300,13 @@ doneCheck( void )
     /*
      *  IF we diverted stderr, then now is the time to copy the text to stdout.
      */
-    if (pzTmpStderr == NULL)
+    if (pzTmpStderr == NULL) {
+#if GUILE_VERSION >= 107000
+        if (exit_code != EXIT_SUCCESS)
+            _exit( exit_code );
+#endif
         return;
+    }
 
     do {
         long pos = ftell( stderr );
@@ -309,6 +328,10 @@ doneCheck( void )
     unlink( pzTmpStderr );
     AGFREE( pzTmpStderr );
     pzTmpStderr = NULL;
+#if GUILE_VERSION >= 107000
+    if (exit_code != EXIT_SUCCESS)
+        _exit( exit_code );
+#endif
 }
 
 

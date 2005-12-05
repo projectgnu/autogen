@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/12/04 00:57:31 $
+ *  Last Modified:     $Date: 2005/12/05 20:46:44 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.10 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: misc.def,v 4.11 2005/12/05 20:46:44 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.10 $";
+version = "$Revision: 4.11 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -68,7 +68,7 @@ test   = {
   code     = <<- _END_OF_CODE_
 	#include <guile/gh.h>
 	#include <libguile/list.h>
-	#if (SCM_MAJOR_VERSION > 1) || (SCM_MINOR_VERSION > 7)
+	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 107
 	choke me
 	#endif
 	int main () {
@@ -102,9 +102,9 @@ test   = {
 	AutoGen won't work without Guile, so either the methods for finding
 	the header and libraries must be provided, or guile-config must be
 	found in the executable path, or we have to find the stuff in /usr
-	or /usr/local.  We must also constrain ourself to Guile 1.6.x and
-	earlier.  The interfaces have changed in incompatible ways for 1.7
-	and that is an unstable version.  We will wait for 1.8.
+	or /usr/local.  Since the Guile interface changes so wildly from
+	release to release, we have to explicitly accept every new minor
+	revision.  Sorry about that.
 	_END_OF_DOC_;
 };
 
@@ -113,25 +113,36 @@ test   = {
   type      = test;
   check     = "the guile version";
   code      = <<- _END_OF_CODE_
-	( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'
+	v=`( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'`
+	test -z "${v}" && v=`guile --version | sed 's/.*Guile *//;1q'`
+	test -z "${v}" && exit 1
+	echo ${v}
 	_END_OF_CODE_;
   code-quoting  = asis;
 
   action   = { yes;
-    act-type = script;
+    act-type = script; asis;
     act-text = <<- _END_OF_SCRIPT_
 	set -- `IFS=' .' ; echo ${ag_cv_test_guile_version}`
 	i=${3}
 	test -z "${i}" && i=0
-	ag_cv_test_guile_version=`expr ${1} \* 100000 + ${2} \* 1000 + ${i}`
-	AC_DEFINE_UNQUOTED(GUILE_VERSION, ${ag_cv_test_guile_version},
+	GUILE_VERSION=`expr ${1} \* 100000 + ${2} \* 1000 + ${i}`
+	AC_DEFINE_UNQUOTED(GUILE_VERSION, ${GUILE_VERSION},
 	         define to Guile version expression)
+	AC_SUBST(GUILE_VERSION)
+	_END_OF_SCRIPT_;
+  };
+
+  action   = { no;
+    act-type = script;
+    act-text = <<- _END_OF_SCRIPT_
+	AC_MSG_ERROR([Cannot determine Guile version number])
 	_END_OF_SCRIPT_;
   };
 
   doc = <<- _END_OF_DOC_
 	We have to vary our interface all over the place because Guile keeps
-	changing.  Use a single version number.
+	changing.  Use a single version number.  Fail if we cannot determine it.
 	_END_OF_DOC_;
 };
 

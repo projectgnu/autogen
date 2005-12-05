@@ -1360,6 +1360,9 @@ the shell.
 @item (STRING)
 A parenthesized expression.  It will be passed to the Guile
 interpreter for evaluation and replaced by the resulting value.
+If there is a Scheme error in this expression, Guile 1.4 and Guile 1.6
+will report the template line number where the error occurs.  Guile 1.7
+has lost this capability.
 
 Additionally, other than in the @code{%} and @code{?%} expressions, the
 Guile expressions may be introduced with the Guile comment character

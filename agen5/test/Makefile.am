@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-10-22 21:16:36 bkorb"
+## Time-stamp:      "2005-12-05 10:01:35 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/10/28 23:15:31 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2005/12/05 20:46:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -34,13 +34,8 @@ EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 		     expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 TESTS_ENVIRONMENT = \
-	CC="$(CC)" CFLAGS='$(CFLAGS)' \
+	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
 	testsubdir=$(testsubdir) \
-	top_builddir=`cd $(top_builddir) ; pwd` \
-	builddir=`cd $(builddir) ; pwd` \
-	srcdir=`cd $(srcdir) ; pwd` \
-	top_srcdir=`cd $(top_srcdir) ; pwd` \
-	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
 	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
 
 distclean-local:
