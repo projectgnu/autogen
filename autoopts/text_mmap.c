@@ -1,7 +1,7 @@
 /*
- * $Id: text_mmap.c,v 4.6 2005/11/25 18:57:16 bkorb Exp $
+ * $Id: text_mmap.c,v 4.7 2005/12/08 17:54:34 bkorb Exp $
  *
- * Time-stamp:      "2005-11-25 10:21:31 bkorb"
+ * Time-stamp:      "2005-12-05 13:40:56 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
@@ -163,38 +163,36 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
                 (void*)(((char*)pMI->txt_data) + pMI->txt_size),
                 pgsz,
                 PROT_READ|PROT_WRITE,
-                MAP_ANONYMOUS|MAP_FIXED|MAP_SHARED, 0, 0 );
+                MAP_ANONYMOUS|MAP_FIXED, 0, 0 );
 
-        if (pNuls == MAP_FAILED_PTR) {
-            pMI->txt_errno = errno;
-            pMI->txt_full_size = pMI->txt_size;
-        }
-#elif defined(HAVE_DEV_ZERO)
+        if (pNuls != MAP_FAILED_PTR)
+            return pMI->txt_data;
+
+        pMI->txt_errno = errno;
+#endif
+
+#if defined(HAVE_DEV_ZERO)
         pMI->txt_zero_fd = open( "/dev/zero", O_RDONLY );
 
         if (pMI->txt_zero_fd < 0) {
             pMI->txt_errno = errno;
-            pMI->txt_full_size = pMI->txt_size;
 
         } else {
             pNuls = mmap(
                     (void*)(((char*)pMI->txt_data) + pMI->txt_size), pgsz,
                     PROT_READ, MAP_PRIVATE|MAP_FIXED, pMI->txt_zero_fd, 0 );
 
-            if (pNuls == MAP_FAILED_PTR) {
-                pMI->txt_errno = errno;
-                pMI->txt_full_size = pMI->txt_size;
-                close( pMI->txt_zero_fd );
-                pMI->txt_zero_fd = -1;
-            }
-        }
-#else
-        /* Forget mmap */
-#endif
-    }
+            if (pNuls != MAP_FAILED_PTR)
+                return pMI->txt_data;
 
-    if (pMI->txt_size != pMI->txt_full_size)
-        return pMI->txt_data;
+            pMI->txt_errno = errno;
+            close( pMI->txt_zero_fd );
+            pMI->txt_zero_fd = -1;
+        }
+#endif
+
+        pMI->txt_full_size = pMI->txt_size;
+    }
 
     {
         void* p = AGALOC( pMI->txt_size+1, "file text" );

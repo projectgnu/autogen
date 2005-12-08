@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.7 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: expGuile.c,v 4.8 2005/12/08 17:54:34 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -52,7 +52,15 @@ ag_scm_c_eval_string_from_file_line( tCC* pzExpr, tCC* pzFile, int line )
                  pzExpr );
     }
 
+#if GUILE_VERSION < 106000
+    {
+        tSCC zEx[] = "eval-string-from-file-line";
+        SCM  expr  = scm_makfrom0str( pzExpr );
+        port = scm_mkstrport( SCM_INUM0, expr, SCM_OPN | SCM_RDNG, zEx );
+    }
+#else
     port = scm_open_input_string( AG_SCM_STR02SCM( pzExpr ));
+#endif
 
 #if GUILE_VERSION < 107000
     {

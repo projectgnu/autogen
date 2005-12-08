@@ -1,3 +1,10 @@
+2005-12-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/text_mmap.c(text_mmap): anonymous pages should not be
+	shared.  Some platforms will seg fault on that.
+	* agen5/expGuile.c(ag_scm_c_eval_string_from_file_line):
+	Guile 1.4.x does not know about scm_open_input_string().
+
 2005-12-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agInit.c(initialize): Test for trace level after doing options.
@@ -26,6 +33,8 @@
 	* config/misc.def(GUILE_VERSION): Compute a single number to represent
 	the current Guile version.  Make it both substitutable and a config.h
 	#define value.  Fail-exit the config if we cannot do this.
+	* autoopts/text_mmap.c(text_mmap): If a platform has both /dev/zero and
+	MAP_ANONYMOUS, then try /dev/zero if MAP_ANONYMOUS fails.
 
 2005-12-04  Bruce Korb  <bkorb@gnu.org>
 

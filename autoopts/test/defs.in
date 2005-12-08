@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:        "2005-12-05 11:23:30 bkorb"
+# Time-stamp:     "2005-12-05 16:55:42 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
 #
-# $Id: defs.in,v 4.1 2005/12/05 20:46:44 bkorb Exp $
+# $Id: defs.in,v 4.2 2005/12/08 17:54:34 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -19,20 +19,23 @@
 # if it does not exist.  We want to be able to run the tests
 # stand-alone!!
 #
+builddir=`pwd`
+top_builddir=`cd ../.. && pwd`
+
 srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
 CC="@CC@"
-LIB="@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@"
-INC="@INCLIST@ @LIBGUILE_CFLAGS@"
+
+LIB=`for f in @AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@
+do case "${f}" in -L*) echo -Wl,${f} ;; *) echo ${f} ;; done`
+
+INC="@LIBGUILE_CFLAGS@"
 GUILE_VERSION="@GUILE_VERSION@"
 LIBGUILE_PATH="@LIBGUILE_PATH@"
 AGexe="@AGexe@"
 GDexe="@GDexe@"
 CLexe="@CLexe@"
 AG_VERSION="@AG_VERSION@"
-
-builddir=`pwd`
-top_builddir=`cd ../.. && pwd`
 
 if test ${GUILE_VERSION} -gt 107000
 then
@@ -50,7 +53,7 @@ fi
 f=${top_builddir}/autoopts
 test -f ${f}/libopts.a || f=${f}/.libs
 LD_LIBRARY_PATH=${LIBGUILE_PATH}:${f}
-LIB="${f}/libopts.a ${f}/libguileopts.a ${LIB}"
+LIB=`echo ${f}/libopts.a ${f}/libguileopts.a ${LIB}`
 export LD_LIBRARY_PATH
 
 dirs=`
@@ -62,7 +65,7 @@ do
   done
 done | sort -u | sed s/^/-I/`
 
-INC="${CFLAGS} ${CPPFLAGS} ${INC} "`echo ${dirs}`
+INC="${CPPFLAGS} ${INC} "`echo ${dirs}`
 
 f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
 PATH=${top_builddir}/columns:${f}:${PATH}
@@ -143,4 +146,4 @@ compile()
 ## sh-basic-offset: 2
 ## End:
 
-# end of defs
+# end of defs.in
