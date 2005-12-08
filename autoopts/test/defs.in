@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2005-12-05 16:55:42 bkorb"
+# Time-stamp:     "2005-12-08 11:47:03 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
 #
-# $Id: defs.in,v 4.2 2005/12/08 17:54:34 bkorb Exp $
+# $Id: defs.in,v 4.3 2005/12/08 20:53:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -26,8 +26,15 @@ srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
 CC="@CC@"
 
-LIB=`for f in @AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@
-do case "${f}" in -L*) echo -Wl,${f} ;; *) echo ${f} ;; done`
+LIB=`
+for f in XXX \
+    @AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@
+do case "${f}" in
+   -L*) echo -Wl,${f} ;;
+   XXX) : ;;
+   *) echo ${f} ;;
+   esac
+done`
 
 INC="@LIBGUILE_CFLAGS@"
 GUILE_VERSION="@GUILE_VERSION@"
@@ -65,7 +72,7 @@ do
   done
 done | sort -u | sed s/^/-I/`
 
-INC="${CPPFLAGS} ${INC} "`echo ${dirs}`
+INC=`echo ${dirs}`" ${CPPFLAGS} ${INC} "
 
 f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
 PATH=${top_builddir}/columns:${f}:${PATH}

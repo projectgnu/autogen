@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.11 2005/12/04 00:57:31 bkorb Exp $
+# $Id: optlib.tpl,v 4.12 2005/12/08 20:53:50 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-10-29 13:55:36 bkorb"
+# Time-stamp:      "2005-12-08 12:04:40 bkorb"
 
 =][=
 
@@ -295,23 +295,23 @@ typedef enum {[=
   (set! tmp-val (for-index))
   (sprintf "%-18s" opt-name)=] [=
 
-  CASE  value =][=
-  !E          =][= (get-opt-value tmp-val) =][=
-  ==  "'"     =]'\''[=
-  ==  "\\"    =]'\\'[=
-  ~~  "[ -~]" =]'[=value=]'[=
+  CASE  value    =][=
+  !E             =][= (get-opt-value tmp-val) =][=
+  ==  "'"        =]'\''[=
+  ==  "\\"       =]'\\'[=
+  ~~  "[ -~]"    =]'[=value=]'[=
 
-  =*  num     =][=
+  =*  num        =][=
       (if (>= number-opt-index 0)
           (error "only one number option is allowed")  )
       (set! number-opt-index tmp-val)
       (get-opt-value tmp-val)   =][=
 
-  *           =][=(error (sprintf
+  *              =][=(error (sprintf
     "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
     (get "name") (get "value")))=][=
 
-  ESAC =][=
+  ESAC           =][=
 
   CASE arg-type  =][=
 
@@ -320,6 +320,8 @@ typedef enum {[=
                  =] (*(unsigned long*)(&[=(. value-desc)=].pzLastArg))[=
 
   =*  key        =]
+#define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
+                 =] optionKeywordName( &[=(. value-desc)=], (_v))
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] (*(te_[=(string-append Cap-prefix cap-name)
                           =]*)(&[=(. value-desc)=].pzLastArg))[=

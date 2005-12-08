@@ -3063,6 +3063,20 @@ default: /* utterly impossible */ ;
 
 AutoOpts produces a special purpose procedure for this option.
 
+If you have need for the string name of the selected keyword, you
+may obtain this with the macro, @code{OPT_OPTN_NAME_VAL2STR(val)}.
+The value you pass would normally be @code{OPT_VALUE_OPTN_NAME},
+but anything with numeric value that is legal for @code{te_Optn_Name}
+may be passed.  Anything out of range will result in the string,
+@code{"*INVALID*"} being returned.  The strings are read only.
+It may be used as in:
+
+@example
+te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
+printf( "you selected the %s keyword\n",
+        OPT_OPTN_NAME_VAL2STR(opt) );
+@end example
+
 @item set[@i{-membership}]
 The argument must be a list of names each of which must match the
 strings "@code{all}", "@code{none}" or one of the keywords specified

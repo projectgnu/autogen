@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.7 2005/10/29 22:13:10 bkorb Exp $
- * Time-stamp:      "2005-10-29 13:36:32 bkorb"
+ *  $Id: enumeration.c,v 4.8 2005/12/08 20:53:50 bkorb Exp $
+ * Time-stamp:      "2005-12-08 12:28:44 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -216,8 +216,35 @@ findName(
 }
 
 
-/*=export_func  optionEnumerationVal
+/*=export_func  optionKeywordName
  * what:  Convert between enumeration values and strings
+ * private:
+ *
+ * arg:   tOptDesc*,     pOD,       enumeration option description
+ * arg:   unsigned int,  enum_val,  the enumeration value to map
+ *
+ * ret_type:  const char*
+ * ret_desc:  the enumeration name from const memory
+ *
+ * doc:   This converts an enumeration value into the matching string.
+=*/
+const char*
+optionKeywordName(
+    tOptDesc*     pOD,
+    unsigned int  enum_val )
+{
+    const char* res;
+    const char* save = pOD->pzLastArg;
+    pOD->pzLastArg = (const char*)(uintptr_t)enum_val;
+    (*(pOD->pOptProc))( (void*)(2UL), pOD );
+    res = pOD->pzLastArg;
+    pOD->pzLastArg = save;
+    return res;
+}
+
+
+/*=export_func  optionEnumerationVal
+ * what:  Convert from a string to an enumeration value
  * private:
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
@@ -254,18 +281,29 @@ optionEnumerationVal(
         return (char*)0UL;
 
     case 1UL:
+    {
+        unsigned int ix = (uintptr_t)(pOD->pzLastArg);
         /*
          *  print the name string.
          */
-        fputs( paz_names[ (uintptr_t)(pOD->pzLastArg) ], stdout );
+        if (ix >= name_ct)
+            printf( "INVALID-%d", ix );
+        else
+            fputs( paz_names[ ix ], stdout );
         return (char*)0UL;
-
+    }
     case 2UL:
+    {
+        tSCC zInval[] = "*INVALID*";
+        unsigned int ix = (uintptr_t)(pOD->pzLastArg);
         /*
          *  Replace the enumeration value with the name string.
          */
-        return (char*)paz_names[ (uintptr_t)(pOD->pzLastArg) ];
+        if (ix >= name_ct)
+            return (char*)zInval;
 
+        return (char*)paz_names[ ix ];
+    }
     default:
         break;
     }

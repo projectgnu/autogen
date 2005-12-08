@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.7 2005/06/07 22:25:12 bkorb Exp $
- * Time-stamp:      "2005-02-14 14:55:01 bkorb"
+ *  $Id: putshell.c,v 4.8 2005/12/08 20:53:50 bkorb Exp $
+ * Time-stamp:      "2005-12-08 10:38:10 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -65,7 +65,7 @@ static void
 putQuotedStr( tCC* pzStr )
 {
     /*
-     *  Handle empty strings to make the rese of the logic simpler.
+     *  Handle empty strings to make the rest of the logic simpler.
      */
     if ((pzStr == NULL) || (*pzStr == NUL)) {
         fputs( "''", stdout );

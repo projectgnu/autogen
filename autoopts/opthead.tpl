@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.8 2005/10/29 22:13:10 bkorb Exp $
+# $Id: opthead.tpl,v 4.9 2005/12/08 20:53:50 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-10-29 13:52:50 bkorb"
+# Time-stamp:      "2005-12-08 11:20:14 bkorb"
 
 =]
 /*
@@ -252,7 +252,7 @@ ELSE  we have a prefix
 
   UP-prefix  pname ) =][=
 
-ENDIF    have/don't have prefix
+ENDIF    have/don't have prefix  '
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
