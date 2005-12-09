@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.8 2005/12/08 20:53:50 bkorb Exp $
- * Time-stamp:      "2005-12-08 12:28:44 bkorb"
+ *  $Id: enumeration.c,v 4.9 2005/12/09 14:38:03 bkorb Exp $
+ * Time-stamp:      "2005-12-09 06:37:15 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -233,13 +233,11 @@ optionKeywordName(
     tOptDesc*     pOD,
     unsigned int  enum_val )
 {
-    const char* res;
-    const char* save = pOD->pzLastArg;
-    pOD->pzLastArg = (const char*)(uintptr_t)enum_val;
-    (*(pOD->pOptProc))( (void*)(2UL), pOD );
-    res = pOD->pzLastArg;
-    pOD->pzLastArg = save;
-    return res;
+    tOptDesc od;
+
+    od.pzLastArg = (const char*)(uintptr_t)enum_val;
+    (*(pOD->pOptProc))( (void*)(2UL), &od );
+    return od.pzLastArg;
 }
 
 
