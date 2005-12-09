@@ -6,10 +6,10 @@
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2005/01/01 00:20:58 $
-#            by:  Bruce Korb <bkorb@gnu.org>
+# Last Modified:  $Date: 2005/12/09 20:14:22 $
+#            by: bkorb
 # ----------------------------------------------------------------------
-# $Id: defs,v 4.1 2005/01/01 00:20:58 bkorb Exp $
+# $Id: defs,v 4.2 2005/12/09 20:14:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Make sure srcdir is an absolute path.  Supply the variable
@@ -28,6 +28,11 @@ case "$srcdir" in
     /* | [A-Za-z]:\\*) ;;
     *) srcdir=`\cd $srcdir && pwd` ;;
 esac
+
+lo_dir=`cd ../../autoopts && pwd`
+test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
+LD_LIBRARY_PATH=${lo_dir}:${LD_LIBRARY_PATH-/dev/null}
+export LD_LIBRARY_PATH
 
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`

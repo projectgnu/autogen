@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2005/12/05 20:46:43 $
+# Last Modified:     $Date: 2005/12/09 20:14:22 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.7 2005/12/05 20:46:43 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.8 2005/12/09 20:14:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -39,6 +39,7 @@ case "${1}" in
   for f
   do [ ! -f $f ] && t="$t $f"
   done
+
   set -- $t
   ;;
 
@@ -48,6 +49,11 @@ case "${1}" in
   ;;
 
 (*)
+  lo_dir=`cd ../autoopts && pwd`
+  test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
+  LD_LIBRARY_PATH=${lo_dir}:${LD_LIBRARY_PATH-/dev/null}
+  export LD_LIBRARY_PATH
+
   builddir=`pwd`
   top_srcdir=${top_srcdir-`cd ..;pwd`}
   top_builddir=${top_builddir-`cd ..;pwd`}

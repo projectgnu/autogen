@@ -1929,6 +1929,7 @@ commercial programs.
 @menu
 * Features::            AutoOpts Features
 * Quick Start::         Quick Start
+* Multi-Threading::     Multi-Threading
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
 * option descriptor::   Option Descriptor File
@@ -2135,6 +2136,25 @@ A lot of magic happens to make this happen.
 The rest of this chapter will describe the myriad of option attributes
 supported by AutoOpts.  However, keep in mind that, in general, you won't
 need much more than what was described in this "quick start" section.
+
+@c === SECTION MARKER
+
+@node Multi-Threading
+@section Multi-Threading
+
+AutoOpts was designed to configure a program for running.  This generally
+happens before much real work has been started.  Consequently, it is
+expected to be run before multi-threaded applications have started multiple
+threads.  However, this is not always the case. Some applications may
+need to reset and reload their running configuration, and some may use
+@code{SET_OPT_xxx()} macros during processing.  If you need to dynamically
+change your option configuration in your multi-threaded application, it is
+your responsibility to prevent all threads from accessing the option
+configuration state, except the one altering the configuration.
+
+The various accessor macros (@code{HAVE_OPT()}, etc.) do not modify state
+and are safe to use in a multi-threaded application.  It is safe as long
+as no other thread is concurrently modifying state, of course.
 
 @c === SECTION MARKER
 

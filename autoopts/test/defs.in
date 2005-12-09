@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2005-12-08 11:47:03 bkorb"
+# Time-stamp:     "2005-12-09 11:53:35 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
 #
-# $Id: defs.in,v 4.3 2005/12/08 20:53:50 bkorb Exp $
+# $Id: defs.in,v 4.4 2005/12/09 20:14:22 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -59,7 +59,7 @@ fi
 #
 f=${top_builddir}/autoopts
 test -f ${f}/libopts.a || f=${f}/.libs
-LD_LIBRARY_PATH=${LIBGUILE_PATH}:${f}
+LD_LIBRARY_PATH=${f}:${LIBGUILE_PATH}
 LIB=`echo ${f}/libopts.a ${f}/libguileopts.a ${LIB}`
 export LD_LIBRARY_PATH
 
