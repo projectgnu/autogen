@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.5 2005/06/07 22:25:13 bkorb Exp $
+ *   $Id: opts.def,v 4.6 2005/12/13 19:16:44 bkorb Exp $
  */
 
 /*
@@ -32,8 +32,9 @@ copyright = {
     eaddr  = "autogen-users@lists.sf.net";
 };
 
-prog_name     = "getdefs";
-prog_title    = "AutoGen Definition Extraction Tool";
+prog-name     = "getdefs";
+prog-title    = "AutoGen Definition Extraction Tool";
+package       = 'GNU AutoGen';
 version       = "1.4";
 homerc        = /dev/null;
 explain       = <<- EndExplanation
@@ -44,8 +45,8 @@ explain       = <<- EndExplanation
 
 flag = {
     name      = "defs_to_get";
-    arg_type  = string;
-    arg_name  = reg-ex;
+    arg-type  = string;
+    arg-name  = reg-ex;
     descrip   = 'Regexp to look for after the "/*="';
     doc =
     "If you want definitions only from a particular category, or even\n"
@@ -55,9 +56,9 @@ flag = {
 
 flag = {
     name        = ordering;
-    arg_type    = string;
-    arg_optional;
-    arg_name    = file-name;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = file-name;
     disable     = no;
     enabled;
     descrip     = "Alphabetize or use named file";
@@ -74,8 +75,8 @@ flag = {
 flag = {
     name        = first_index;
 	arg_type    = number;
-    arg_default = 0;
-    arg_name    = first-index;
+    arg-default = 0;
+    arg-name    = first-index;
     descrip     = "The first index to apply to groups";
 	doc = <<-  _EOF_
 	By default, the first occurrence of a named definition will have an
@@ -86,8 +87,8 @@ flag = {
 
 flag = {
     name      = input;
-    arg_type  = string;
-    arg_name  = src-file;
+    arg-type  = string;
+    arg-name  = src-file;
     max       = NOLIMIT;
     settable;
     stack_arg;
@@ -107,8 +108,8 @@ flag = {
 
 flag = {
     name      = subblock;
-    arg_type  = string;
-    arg_name  = sub-def;
+    arg-type  = string;
+    arg-name  = sub-def;
     max       = NOLIMIT;
     stack_arg;
     descrip   = "subblock definition names";
@@ -136,8 +137,8 @@ flag = {
 
 flag = {
     name      = listattr;
-    arg_type  = string;
-    arg_name  = def;
+    arg-type  = string;
+    arg-name  = def;
     max       = NOLIMIT;
     stack_arg;
     descrip   = "attribute with list of values";
@@ -161,9 +162,9 @@ flag = {
 
 flag = {
     name        = filelist;
-    arg_type    = string;
-    arg_optional;
-    arg_name    = file;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = file;
     descrip     = "Insert source file names into defs";
     doc =
     "Inserts the name of each input file into the output definitions.\n"
@@ -185,8 +186,8 @@ flag = {
 
 flag = {
     name        = assign;
-    arg_type    = string;
-    arg_name    = ag-def;
+    arg-type    = string;
+    arg-name    = ag-def;
     max         = NOLIMIT;
     stack_arg;
     descrip     = "Global assignments";
@@ -197,8 +198,8 @@ flag = {
 
 flag = {
     name        = common_assign;
-    arg_type    = string;
-    arg_name    = ag-def;
+    arg-type    = string;
+    arg-name    = ag-def;
     max         = NOLIMIT;
     stack_arg;
     descrip     = "Assignments common to all blocks";
@@ -209,8 +210,8 @@ flag = {
 
 flag = {
     name        = copy;
-    arg_type    = string;
-    arg_name    = file;
+    arg-type    = string;
+    arg-name    = file;
     max         = NOLIMIT;
     stack_arg;
     descrip     = "File(s) to copy into definitions";
@@ -221,9 +222,9 @@ flag = {
 
 flag = {
     name        = srcfile;
-    arg_type    = string;
-    arg_optional;
-    arg_name    = file;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = file;
     descrip     = "Insert source file name into each def";
     doc =
     "Inserts the name of the input file where a definition was found\n"
@@ -236,9 +237,9 @@ flag = {
 
 flag = {
     name        = linenum;
-    arg_type    = string;
-    arg_optional;
-    arg_name    = def-name;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = def-name;
     descrip     = "Insert source line number into each def";
     doc =
     "Inserts the line number in the input file where a definition\n"
@@ -262,8 +263,8 @@ flag = {
 flag = {
     name        = output;
     equivalence = "autogen";
-    arg_type    = string;
-    arg_name    = file;
+    arg-type    = string;
+    arg-name    = file;
     descrip     = "Output file to open";
     doc =
     "If you are not sending the output to an AutoGen process,\n"
@@ -273,9 +274,9 @@ flag = {
 flag = {
     name        = "autogen";
     equivalence = "autogen";
-    arg_type    = string;
-    arg_optional;
-    arg_name    = ag-cmd;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = ag-cmd;
     disable     = "no";
     enabled;
     descrip     = "Invoke AutoGen with defs";
@@ -288,8 +289,8 @@ flag = {
 
 flag = {
     name        = template;
-    arg_type    = string;
-    arg_name    = file;
+    arg-type    = string;
+    arg-name    = file;
     settable;
     descrip     = "Template Name";
     doc =
@@ -298,8 +299,8 @@ flag = {
 
 flag = {
     name        = agarg;
-    arg_type    = string;
-    arg_name    = ag-opt;
+    arg-type    = string;
+    arg-name    = ag-opt;
     max         = NOLIMIT;
     stack_arg;
     descrip     = "AutoGen Argument";
@@ -311,8 +312,8 @@ flag = {
 
 flag = {
     name        = base_name;
-    arg_type    = string;
-    arg_name    = name;
+    arg-type    = string;
+    arg-name    = name;
     descrip     = "Base name for output file(s)";
     flags_cant  = output;
     doc =

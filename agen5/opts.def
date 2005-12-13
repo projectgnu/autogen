@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.8 2005/12/09 14:38:03 bkorb Exp $
+ *   $Id: opts.def,v 4.9 2005/12/13 19:16:44 bkorb Exp $
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *
@@ -46,6 +46,7 @@ environrc;
 prog-name      = xml2ag;
 prog-title     = "XML to AutoGen Definiton Converter";
 #endif
+package        = 'GNU AutoGen';
 
 argument       = "[ <def-file> ]";
 long-opts;

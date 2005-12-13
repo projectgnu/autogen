@@ -2649,7 +2649,8 @@ if @file{type} is set to @file{NOTE}.
 @file{author} - in case the author name is to appear in the documentation
 and is different from the copyright owner.
 @item
-@file{eaddr} - email address of the author or copyright holder.
+@file{eaddr} - email address for receiving praises and complaints.
+Typically that of the author or copyright holder.
 @end enumerate
 @*
 An example of this might be:
@@ -2670,6 +2671,12 @@ selected.
 @cindex explain
 @item explain
 Gives additional information whenever the usage routine is invoked..
+
+@cindex package
+@item package
+The name of the package the program belongs to.  This will appear
+parenthetically after the program name in the version and usage output,
+e.g.:  @code{autogen @i{(GNU autogen)} - The Automated Program Generator}.
 
 @cindex preserve-case
 @item preserve-case

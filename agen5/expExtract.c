@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expExtract.c,v 4.9 2005/12/13 19:16:44 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -136,27 +136,21 @@ static SCM
 buildEmptyText( const char* pzStart, const char* pzEnd,
                 SCM def )
 {
-    size_t mlen = strlen( pzStart ) + strlen( pzEnd ) + 2;
-    SCM res;
-    char* pzDef;
-    size_t dlen;
+    size_t mlen = strlen( pzStart ) + strlen( pzEnd ) + 3;
+    char* pzOut;
 
     if (! AG_SCM_STRING_P( def )) {
-        pzDef = NULL;
-        dlen = 0;
+        pzOut = ag_scribble( mlen );
+        sprintf( pzOut, "%s\n%s", pzStart, pzEnd );
 
     } else {
-        dlen = AG_SCM_STRLEN( def ) + 1;
-        pzDef = ag_scm2zchars( def, "default extract string" );
+        char* pzDef = ag_scm2zchars( def, "default extract string" );
+        mlen += AG_SCM_STRLEN( def ) + 1;
+        pzOut = ag_scribble( mlen );
+        sprintf( pzOut, "%s\n%s\n%s", pzStart, pzDef, pzEnd );
     }
 
-    pzDef = ag_scribble( mlen + dlen + 1 );
-
-    if (dlen > 0)
-         sprintf( pzDef, "%s\n%s\n%s", pzStart, pzDef, pzEnd );
-    else sprintf( pzDef, "%s\n%s", pzStart, pzEnd );
-
-    return AG_SCM_STR02SCM( pzDef );
+    return AG_SCM_STR02SCM( pzOut );
 }
 
 

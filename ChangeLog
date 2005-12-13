@@ -1,3 +1,10 @@
+2005-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c(buildEmptyText): clean it up.
+	* autoopts/options.tpl(version-text): new global used in two places
+	* autoopts/optlib.tpl: one of them
+	* autoopts/opthead.tpl: the other
+
 2005-12-08  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/text_mmap.c(text_mmap): anonymous pages should not be

@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.9 2005/12/08 20:53:50 bkorb Exp $
+# $Id: opthead.tpl,v 4.10 2005/12/13 19:16:44 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-12-08 11:20:14 bkorb"
+# Time-stamp:      "2005-12-13 11:12:57 bkorb"
 
 =]
 /*
@@ -61,8 +61,7 @@ ENDIF =]
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
 IF (exist? "version") =]
 #define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
-#define [=(. pname-up)=]_FULL_VERSION  [=(c-string (sprintf
-"%s - %s - Ver. %s" prog-name (get "prog-title") (get "version"))) =][=
+#define [=(. pname-up)=]_FULL_VERSION  [=(c-string version-text) =][=
 ENDIF (exist? version) =]
 
 /*

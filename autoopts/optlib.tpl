@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.12 2005/12/08 20:53:50 bkorb Exp $
+# $Id: optlib.tpl,v 4.13 2005/12/13 19:16:44 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-12-08 12:04:40 bkorb"
+# Time-stamp:      "2005-12-13 10:08:15 bkorb"
 
 =][=
 
@@ -700,7 +700,7 @@ Finally, if there are no minimum occurrence counts (i.e. all
 options are optional), then we put square brackets around the
 syntax. =][=
 
-DEFINE USAGE_LINE   =][=
+DEFINE usage_line   =][=
 
   ;;  Compute the option arguments
   ;;
@@ -746,13 +746,10 @@ DEFINE USAGE_LINE   =][=
   )
 
   (set! tmp-text
-  (kr-string (string-append prog-name " - " (get "prog-title")
-           (if (exist? "version") (string-append " - Ver. " (get "version"))
-               "" )
-           "\n" usage-line "\n" )) )
+  (kr-string (string-append version-text "\n" usage-line "\n" )) )
 
   tmp-text =][=
 
-ENDDEF USAGE_LINE
+ENDDEF usage_line
 
 =]

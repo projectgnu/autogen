@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.8 2005/12/08 20:53:50 bkorb Exp $
- * Time-stamp:      "2005-12-08 10:38:10 bkorb"
+ *  $Id: putshell.c,v 4.9 2005/12/13 19:16:44 bkorb Exp $
+ * Time-stamp:      "2005-12-13 10:28:47 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -200,7 +200,7 @@ optionPutShell( tOptions* pOpts )
                     else if (ch == NUL)      { pz--; goto name_done; }
                     else fputc( '_', stdout );
                 } name_done:;
-                printf( "=%1$d # 0x%1$X\n", val );
+                printf( "=%1$ld # 0x%1$lX\n", val );
                 val <<= 1;
             }
             free( (void*)(pOD->pzLastArg) );

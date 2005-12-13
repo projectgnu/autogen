@@ -34,8 +34,8 @@ export = <<-  EOExport
 flag = {
     name        = output;
     value       = O;
-    arg_type    = string;
-    arg_name    = file;
+    arg-type    = string;
+    arg-name    = file;
     descrip     = "Output file in lieu of AutoGen processing";
     doc =
     "By default, the output is handed to an AutoGen for processing.\n"
