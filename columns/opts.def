@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.4 2005/12/13 19:16:44 bkorb Exp $
+ *   $Id: opts.def,v 4.5 2005/12/13 20:03:25 bkorb Exp $
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *
@@ -29,7 +29,6 @@ copyright = {
     eaddr  = "autogen-users@lists.sf.net";
 };
 
-eaddr          = "bkorb@gnu.org";
 prog-name      = "columns";
 prog-title     = "Columnize Input Text";
 package        = 'GNU AutoGen';

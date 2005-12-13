@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-10-22 16:31:12 bkorb"
+# Time-stamp:        "2005-12-13 12:02:43 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.15 2005/10/23 02:40:03 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.16 2005/12/13 20:03:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -97,67 +97,43 @@ make_funcs_def()
   cd ${svdir}
 }
 
-#  IF the source dir is not known,
-#  THEN it is the directory above the directory that
-#       contains this file.
-#
-[ -z "${srcdir}" ] && {
-    srcdir=`echo $0 | sed 's;/[^/]*$;;'`
-}
-
-MISSING=${MISSING-${srcdir}/config/missing}
-
-case ${BOOTSTRAP} in
-
-pre )
-    echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
-
-    if test -f ${srcdir}/configure
-    then rm -f ${srcdir}/configure ; fi
-
-    byacc=`locate_exe byacc`
-    if [ -z "$byacc" ]
-    then
-        byacc=`locate_exe yacc`
-        if [ -z "$byacc" ]
-        then
-            byacc=`locate_exe bison`
-            if [ -z "$byacc" ]
-            then
-                echo cannot bootstrap -- no yacc parser
-                exit 1
-            fi
-        fi
-    fi
-    export byacc
-
+config_versions()
+{
+    set -a
+    . VERSION
+    set +a
     unset LANG || LANG=''
-    eval "`egrep '^AG_[A-Z_]*=' VERSION`"
+
     if grep '==ADD_CONFIG_FILES==' ${config_file} > /dev/null
     then
       exec 4> configure.files
-      echo 'AC_CONFIG_FILES([Makefile snprintfv/Makefile' >&4
-      find [a-rt-z]* -name 'Makefile.am' -o -name '*.in' | \
-          sed 's,\.\(am\|in\)$,,;/^configure$/d' | sort -u | \
-          sed 's,^,  ,;s,$, \\,;$s,\\$,]),' >&4
+      echo 'AC_CONFIG_FILES([\' >&4
+      #'
+      list=$(
+        find [a-rt-z]* snprintfv/Makefile.am Makefile.am \
+            -name 'Makefile.am' -o -name '*.in' | \
+          sed 's,\.\(am\|in\)$,,;/^configure$/d' | sort -u)
+      for f in ${list} ; do echo $f ; done | \
+          sed 's/^/    /;$s/$/ ])/' >&4
       exec 4>&-
 
-      sed -e "/^AC_INIT(/s@,.*,@,[${AG_VERSION}],@" \
+      sed -e "s/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/" \
           -e '/==ADD_CONFIG_FILES==/r configure.files' \
           -e '/==ADD_CONFIG_FILES==/d' ${config_file} > configure.tmp
 
       mv -f configure.tmp ${config_file}
       rm -f configure.files
     fi
+
+    for f in $(egrep -l 'eaddr +=' */*opts.def)
+    do sed "/eaddr  *=/s/= .*/= '${EADDR}';/" $f > X ; mv -f X $f
+    done
+
     if grep '__CURRENT_VERSION__' NEWS > /dev/null
     then
       sed "1s/__CURRENT_VERSION__.*/${AG_VERSION} - $(date '+%B %Y')/" NEWS > X
       mv -f X NEWS
     fi
-    test -z "${AGexe}" && exit 0
-
-    ( $CLexe --version  && \
-      $GDexe --version ) > /dev/null || exit 1
 
     ( cd ${srcdir}/config
       set -x -e
@@ -177,6 +153,52 @@ pre )
       cat ${f}
     done >&3
     exec 3>&-
+}
+
+check_tools()
+{
+    byacc=`locate_exe byacc`
+    if [ -z "$byacc" ]
+    then
+        byacc=`locate_exe yacc`
+        if [ -z "$byacc" ]
+        then
+            byacc=`locate_exe bison`
+            if [ -z "$byacc" ]
+            then
+                echo cannot bootstrap -- no yacc parser
+                exit 1
+            fi
+        fi
+    fi
+    export byacc
+    test -z "${AGexe}" -o -z "$GDexe" -o -z "$CLexe" && exit 1
+
+    ( $CLexe --version  && \
+      $GDexe --version  && \
+      $AGexe --version ) > /dev/null || exit 1
+}
+
+#  IF the source dir is not known,
+#  THEN it is the directory above the directory that
+#       contains this file.
+#
+[ -z "${srcdir}" ] && {
+    srcdir=`echo $0 | sed 's;/[^/]*$;;'`
+}
+
+MISSING=${MISSING-${srcdir}/config/missing}
+
+case ${BOOTSTRAP} in
+
+pre )
+    echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
+   
+    if test -f ${srcdir}/configure
+    then rm -f ${srcdir}/configure ; fi
+
+    check_tools
+    config_versions
     make_funcs_def
 
     exit 0

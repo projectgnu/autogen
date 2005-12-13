@@ -4,10 +4,10 @@
 #
 # Copyright (C) 1999-2005 Bruce Korb
 #
-# Time-stamp:        "2005-12-13 11:08:34 bkorb"
+# Time-stamp:        "2005-12-13 11:25:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2005/12/13 19:16:44 $
+# Last Committed:    $Date: 2005/12/13 20:03:25 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
@@ -41,7 +41,8 @@ GO_AGE=0
 # For automake
 #
 VERSION=$AG_VERSION
-PACKAGE=autogen
+PACKAGE='GNU autogen'
+EADDR=autogen-users@lists.sourceforge.net
 
 # Display version numbers banner for my sanity!
 #
