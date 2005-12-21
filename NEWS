@@ -1,5 +1,10 @@
 New in __CURRENT_VERSION__ - November, 2005
 
+* Nothing new yet.
+
+New in 5.8 - December, 2005
+
+* AutoGen now builds against Guile 1.7.x
 * Fixed a small timing hole where the read from the read end of the output
   pipe of the server shell can fail.  (The read is retried.)
 * Eliminated the configure code that symlinked all the sources into the
@@ -36,39 +41,3 @@ New in 5.7.1 - June, 2005
 * Update the FSF address
 * added a script to convert the "libopts" tarball into a full,
   independently buildable, project.
-
-New in 5.7 - April, 2005
-
-AutoOpts:
-* "libopts" handles stand alone configuration file processing.
-  Use the functions configFileLoad, optionGetValue, optionNextValue
-  and optionUnloadNested.
-
-* AutoOpts values can contain nested values, a la "getsubopts(3C)".
-  The syntaxes recognized are:
-  * that of getsubopts (except you do not specify which are acceptable
-    and values may be quoted)
-  * that of a config file (newline separated name/value pairs, per
-    traditional configuration file formatting)
-  * xml style where the associated values are marked with either of:
-      <val-name>...</val-name>
-      <named-no-value/>
-
-New in 5.6.6 - February 2005
-
-AutoOpts:
-* "pathfind" is now incorporated into libopts, if not natively supported
-* "options.h" and "usage-txt.h" are installed into an "autoopts" subdir.
-* "for-each" main procedures can handle the arguments/input lists in
-  several different ways, by calling the callback function with:
-  * whatever the argument was
-  * with the argument, after verifying it is really a file
-  * with an fopen-ed file pointer to the file
-  * with a pointer to the contents of the named file
-  This is documented in the docs and generated man pages for programs
-  that use it.
-
-AutoGen:
-* AutoGen macros were added for inserting definition file line numbers
-  into the output files:  (def-file-line "value-name")
-* autogen will no longer try to catch real time signals

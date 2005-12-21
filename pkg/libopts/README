@@ -3,7 +3,9 @@
 The contents of this tarball is designed to be incorporated into
 software packages that utilize the AutoOpts option automation
 package and are intended to be installed on systems that may not
-have libopts installed.
+have libopts installed.  It is redistributable under the terms
+of either the LGPL (see COPYING.lgpl) or under the terms of
+the advertising clause free BSD license (see COPYING.mbsd).
 
 Usage Instructions for autoconf/automake/libtoolized projects:
 

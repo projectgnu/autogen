@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expFormat.c,v 4.9 2005/12/21 22:13:34 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -503,7 +503,6 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
     } lic = { NULL, { NULL, 0, 0, 0, 0, 0, 0, 0 }};
 
     char*     pzRes;
-    SCM       res;
 
     if (! AG_SCM_STRING_P( license ))
         return SCM_UNDEFINED;

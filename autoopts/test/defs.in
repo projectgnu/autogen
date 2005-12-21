@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2005-12-09 11:53:35 bkorb"
+# Time-stamp:     "2005-12-16 09:12:09 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
 #
-# $Id: defs.in,v 4.4 2005/12/09 20:14:22 bkorb Exp $
+# $Id: defs.in,v 4.5 2005/12/21 22:13:34 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -70,7 +70,7 @@ do
   do
     (cd $f/$d && pwd)
   done
-done | sort -u | sed s/^/-I/`
+done | sort -u | sed 's/^/-I/'`
 
 INC=`echo ${dirs}`" ${CPPFLAGS} ${INC} "
 

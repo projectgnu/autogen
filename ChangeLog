@@ -4,6 +4,7 @@
 	* autoopts/options.tpl(version-text): new global used in two places
 	* autoopts/optlib.tpl: one of them
 	* autoopts/opthead.tpl: the other
+	* autoopts/optmain.tpl: fix bug in range-option-code (it must always be)
 	* autoopts/putshell.c(optionPutShell): "val" is a uintptr_t, so specify
 	"ld" and "lX" in the format strings.  "icc" still doesn't like it.
 	* autoopts/version.c(printVersion): if we have no pzFullVersion, then

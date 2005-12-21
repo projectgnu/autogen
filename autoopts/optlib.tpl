@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.13 2005/12/13 19:16:44 bkorb Exp $
+# $Id: optlib.tpl,v 4.14 2005/12/21 22:13:34 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-12-13 10:08:15 bkorb"
+# Time-stamp:      "2005-12-14 12:48:13 bkorb"
 
 =][=
 
@@ -18,6 +18,14 @@
 (define is-extern   #t)
 (define is-priv     #t)
 (define make-callback-procs #f)
+
+(define need-stacking (lambda()
+    (if (not (exist? "max"))
+        #f
+        (if (> (string->number (get "max")) 1)
+            #t
+            #f
+)   )   ))
 
 ;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  =][=
 
@@ -44,14 +52,6 @@ DEFINE save-name-morphs
  =][=
 
   IF
-
-    (define need-stacking (lambda()
-        (if (not (exist? "max"))
-            #f
-            (if (> (string->number (get "max")) 1)
-                #t
-                #f
-    )   )   ))
 
     (set-flag-names)
     (hash-create-handle! ifdef-ed flg-name

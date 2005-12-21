@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2005-12-13 10:52:24 bkorb"
+## Time-stamp:      "2005-12-09 11:41:09 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.7 2005/12/13 19:16:44 bkorb Exp $
+## $Id: Makefile.am,v 4.8 2005/12/21 22:13:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 

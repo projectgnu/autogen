@@ -1,13 +1,13 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-10-28 16:28:06 bkorb"
+## Time-stamp:      "2005-12-15 15:17:51 bkorb"
 ## Copyright (c):   2003-2005 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2005/10/29 00:13:28 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2005/12/21 22:13:35 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -17,6 +17,14 @@ LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh \
 		 libopts/libopts-add.m4
 TPL_FILES      = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
 EXTRA_DIST     = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
+DOCENV         = \
+	MAKE="$(MAKE)" \
+	PACKAGE="$(PACKAGE)" \
+	PACKAGE_BUGREPORT="$(PACKAGE_BUGREPORT)" \
+	PACKAGE_NAME="$(PACKAGE_NAME)" \
+	PACKAGE_STRING="$(PACKAGE_STRING)" \
+	PACKAGE_TARNAME="$(PACKAGE_TARNAME)" \
+	PACKAGE_VERSION="$(PACKAGE_VERSION)"
 
 all : $(DISTCLEANFILES)
 
@@ -35,9 +43,8 @@ package :
 	AGexe=$(AGexe) \
 	CLexe=$(CLexe) \
 	prefix=$(prefix) \
-	MAKE="$(MAKE)" \
 	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/stage-pkg \
-	$(SHELL) $(srcdir)/mkpkg.sh
+	$(DOCENV) $(SHELL) $(srcdir)/mkpkg.sh
 
 pkg     : package
 
@@ -46,7 +53,7 @@ pkg     : package
 gnudoc  :
 	pkgsrcdir=`cd $(srcdir) ; pwd` ; \
 	cd $(top_builddir)/doc ; \
-	MAKE=$(MAKE) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh $(PACKAGE_STRING) \
+	$(DOCENV) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh \
 		The Automated Program Generator
 
 ## Makefile.am ends here

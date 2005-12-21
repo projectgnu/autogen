@@ -1922,12 +1922,9 @@ well-established command line interfaces.  Even still, those programs
 may use the configuration file parsing portion of the library.
 See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 
-AutoOpts is distributed under The GNU Lesser General Public License.
-"Lesser" meaning you have greater license with it and may link it into
-commercial programs.
-
 @menu
 * Features::            AutoOpts Features
+* Licensing::           AutoOpts Licensing
 * Quick Start::         Quick Start
 * Multi-Threading::     Multi-Threading
 * Option Definitions::  Option Definitions
@@ -2056,6 +2053,36 @@ If you compile with @code{ENABLE_NLS} defined and @code{_()} defined to
 a localization function such as @code{gettext(3GNU)}, then the option
 processing code will be localizable (@pxref{i18n}).
 @end enumerate
+
+@c === SECTION MARKER
+
+@node Licensing
+@section AutoOpts Licensing
+@cindex Licensing
+
+When AutoGen is installed, the AutoOpts project is installed with it.
+AutoOpts includes various AutoGen templates and a pair of shared
+libraries.  These libraries may be used under the terms of the
+GNU Lesser General Public License (LGPL).
+
+One of these libraries (@code{libopts}) is needed by programs that are built
+using AutoOpts generated code.  This library is available as a separate
+``tear-off'' source tarball.  It is redistributable for use under either of
+two licenses: The GNU Lesser General Public License ("Lesser" meaning you
+have greater license with it and may link it into commercial programs), and
+the advertising-clause-free BSD license.  Both of these license terms are
+incorporated into appropriate COPYING files included with the @code{libopts}
+source tarball.  This source may be incorporated into your package with
+the following simple commands:
+
+@example
+rm -rf libopts libopts-*
+gunzip -c `autoopts-config libsrc` | \
+   tar -xvf -
+mv libopts-*.*.* libopts
+@end example
+
+View the @file{libopts/README} file for further integration information.
 
 @c === SECTION MARKER
 

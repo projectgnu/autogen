@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.11 2005/10/29 22:13:11 bkorb Exp $
+# $Id: optmain.tpl,v 4.12 2005/12/21 22:13:34 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
 
-# Time-stamp:      "2005-10-29 13:55:49 bkorb"
+# Time-stamp:      "2005-12-15 13:58:19 bkorb"
 
 =][=
 
@@ -523,6 +523,16 @@ DEFINE declare-option-callbacks
 
   FOR    flag   =][=
 
+    ;;  Fill in four strings with names of callout procedures:
+    ;;  extern-test-list - external callouts done IFF test main is built
+    ;;  static-test-list - static callouts done IFF test main is built
+    ;;  extern-proc-list - external callouts for normal compilation
+    ;;  static-proc-list - static callouts for normal compilation
+    ;;
+    ;;  For any of these that are under separate ifdef control, then
+    ;;  the name gets #defined to a "doUsageOpt" call.  That is a
+    ;;  static procedure that will always get called.
+
     (set! flg-name (get "name"))
     (if (hash-ref have-cb-procs flg-name)
         (begin
@@ -564,7 +574,9 @@ DEFINE declare-option-callbacks
                      "\n#ifdef %1$s\n#undef  %2$s\n#define %2$s NULL\n#endif"
                      (get "ifndef") tmp-val )  ))
           )   )
-    )   ) ""    =][=
+    )   )
+
+    ""          =][=
 
   ENDFOR flag   =][=
 
@@ -688,11 +700,20 @@ DEFINE callback-proc-header     =]
 =], when [= ifdef =] is #define-d.
  */
 #ifdef [= ifdef                 =][=
+    (set! endif-test-main (string-append
+	   (sprintf "\n#endif /* defined %s */" (get "ifdef"))
+	   endif-test-main
+    )) =][=
+
   ELIF (exist? "ifndef")
 
 =], when [= ifdef =] is *not* #define-d.
  */
 #ifndef [= ifndef               =][=
+    (set! endif-test-main (string-append
+	   (sprintf "\n#endif /* ! defined %s */" (get "ifndef"))
+	   endif-test-main
+    )) =][=
   ELSE                          =].
  */[=
 
@@ -720,26 +741,23 @@ DEFINE range-option-code
 =]    static const struct {const int rmin, rmax;} rng[ [=
       (count "arg-range")  =] ] = {
 [=(out-push-new)      =][=
-  FOR arg-range ",\n" =][=
+  FOR arg-range ",\n" =]{ [=
     CASE arg-range    =][=
       *==    "->"     =][=
-             (shellf "f=`echo '%s'|sed 's,->$,,'`
-                     echo \"{ $f, INT_MAX }\"" (get "arg-range")) =][=
+             (string-substitute (get "arg-range") "->" "") =], INT_MAX[=
 
-      ==*    "->"     =][=
-             (shellf "f=`echo '%s'|sed 's,^->,,'`
-                     echo \"{ INT_MIN, $f }\"" (get "arg-range")) =][=
+      ==*    "->"     =]INT_MIN, [=
+             (string-substitute (get "arg-range") "->" "") =][=
 
       *==*   "->"     =][=
-             (shellf "f=`echo '%s'|sed 's/->/, /'`
-                     echo \"{ $f }\"" (get "arg-range")) =][=
+             (string-substitute (get "arg-range") "->" ", ") =][=
 
-      ~~ -{0,1}[0-9]+ =]{ [=arg-range=], INT_MIN }[=
+      ~~ -{0,1}[0-9]+ =][=arg-range=], INT_MIN[=
 
       *  =][= (error (string-append "Invalid range spec:  ``"
               (get "arg-range") "''" ))  =][=
 
-    ESAC arg-range    =][=
+    ESAC arg-range    =] }[=
   ENDFOR =][=
   (shellf "${CLexe} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
@@ -805,106 +823,126 @@ DEFINE range-option-code
     return;
 
   valid_return:
-    pOptDesc->pzLastArg = (char*)val;[=
+    pOptDesc->pzLastArg = (char*)val;
+}[=
 
-ENDDEF  range-option-code
+ENDDEF   range-option-code
 
 # # # # # # # # # # # # # # # # =][=
 
-DEFINE define-option-callbacks  =][=
+DEFINE   keyword-code
 
-  FOR  flag  =][=
+=][=
 
-    (set! UP-name    (up-c-name "name"))
-    (set! cap-name   (string-capitalize UP-name))
-    (set! low-name   (string-downcase UP-name))      =][=
-
-    IF (or (exist? "flag-code")
-           (exist? "extract-code")
-           (exist? "arg-range") ) =][=
-
-      IF (. make-test-main) =]
-
-#if ! defined([=(. main-guard)=])[=
-
-      ENDIF =][=
-
-      invoke callback-proc-header  =][=
-
-      IF (exist? "flag-code")      =][=
-
-         flag-code                 =][=
-
-      ELIF (exist? "extract-code") =][=
-         (extract (string-append (base-name) ".c.save") (string-append
-                  "/*  %s =-= " cap-name " Opt Code =-= %s */"))
-         =][=
-
-      ELIF (exist? "arg-range")    =][=
-         range-option-code         =][=
-
-      ENDIF =]
-}[=
-
-  IF (exist? "ifdef")           =]
-#endif /* defined [= ifdef      =] */[=
-  ELIF (exist? "ifndef")        =]
-#endif /* ! defined [= ifndef   =] */[=
-  ENDIF ifdef / ifndef          =][=
-
-      IF (. make-test-main) =]
-
-#endif /* ! defined [= (. main-guard) =] */[=
-
-      ENDIF =][=
-
-
-    ELIF (=* (get "arg-type") "key") =][=
-
-      invoke callback-proc-header  =][=
-      IF (not (exist? "arg-default"))
-=]    tSCC zDef[2] = { 0x7F, 0 };
-[=    ENDIF
-
-=]    tSCC* azNames[] = {[=
-      IF (not (exist? "arg-default")) =] zDef,[=
-      ENDIF  =]
+(set! tmp-ct (count "keyword"))
+(if (not (exist? "arg-default"))
+    (begin
+      (set! tmp-ct (+ 1 tmp-ct))
+      "    tSCC zDef[2] = { 0x7F, 0 };\n"
+)   )
+=]    tSCC* azNames[[= (. tmp-ct) =]] = {[=
+  IF (not (exist? "arg-default")) =] zDef,[=
+  ENDIF  =]
 [=(shellf
   "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) ) =]
     };
 [=
 
-      IF (exist? "arg-optional") =]
+  IF (exist? "arg-optional")
+
+=]
     if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)[=
-         (string-append UP-name "_"    (if (> (len "arg-optional") 0)
-            (up-c-name "arg-optional") (if (exist? "arg-default")
-            (up-c-name "arg-default")
-            "UNDEFINED"  ))) =];
-    else[=
-      ENDIF =]
+             (string-append UP-name "_"    (if (> (len "arg-optional") 0)
+                (up-c-name "arg-optional") (if (exist? "arg-default")
+                (up-c-name "arg-default")
+                "UNDEFINED"  ))) =];
+    else
+        pOptDesc->pzLastArg =
+            optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
+[=
+
+  ELSE
+
+=]
     pOptDesc->pzLastArg =
-        optionEnumerationVal( pOptions, pOptDesc, azNames, [=
-        (+ (count "keyword") (if (exist? "arg-default") 0 1)) =] );
+        optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
+[=
+  ENDIF
+
+=]}[=
+
+ENDDEF   keyword-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE define-option-callbacks      =][=
+
+  FOR  flag  =][=
+
+    (set-flag-names)
+    (define endif-test-main "")
+
+;;; # # # # # # # # # # # # # # # # =][=
+
+    IF (or (exist? "extract-code")
+           (exist? "flag-code") )   =][=
+
+      (if make-test-main
+          (begin
+            (set! endif-test-main
+                  (sprintf "\n\n#endif /* defined(%s) */" main-guard))
+            (sprintf "\n\n#if ! defined(%s)" main-guard)
+      )   ) =][=
+
+      INVOKE callback-proc-header   =][=
+
+      IF (exist? "flag-code")       =][=
+         flag-code                  =][=
+      ELSE                          =][=
+
+         (extract (string-append (base-name) ".c.save") (string-append
+                  "/*  %s =-= " cap-name " Opt Code =-= %s */"))
+         =][=
+      ENDIF =]
 }[=
 
+# # # # # # # # # # # # # # # # # # =][=
 
-    ELIF (=* (get "arg-type") "set") =][=
+    ELIF (exist? "arg-range")       =][=
 
-      invoke callback-proc-header
+      INVOKE callback-proc-header   =][=
+      INVOKE range-option-code      =][=
+
+# # # # # # # # # # # # # # # # # # =][=
+
+    ELIF (=* (get "arg-type") "key")=][=
+
+      INVOKE callback-proc-header   =][=
+      INVOKE keyword-code           =][=
+
+# # # # # # # # # # # # # # # # # # =][=
+
+    ELIF (=* (get "arg-type") "set")=][=
+
+      INVOKE callback-proc-header
 =]    tSCC* azNames[] = {
 [=(shellf
   "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
-    optionSetMembers( pOptions, pOptDesc, azNames, [=
-        (count "keyword") =] );
+    const int nmCt = sizeof(azNames)/sizeof(azNames[0]);
+    optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
 }[=
 
+# # # # # # # # # # # # # # # # # # =][=
 
-    ENDIF       =][=
-  ENDFOR flag   =]
+    ENDIF                           =][=
+
+    (. endif-test-main)             =][=
+
+  ENDFOR flag                       =]
 [=
 
 ENDDEF define-option-callbacks

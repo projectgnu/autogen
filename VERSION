@@ -4,16 +4,16 @@
 #
 # Copyright (C) 1999-2005 Bruce Korb
 #
-# Time-stamp:        "2005-12-13 11:25:00 bkorb"
+# Time-stamp:        "2005-12-21 12:44:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2005/12/13 20:03:25 $
+# Last Committed:    $Date: 2005/12/21 22:13:34 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=8
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL="pre13"
+AG_PATCHLEVEL=".1pre3"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -41,7 +41,7 @@ GO_AGE=0
 # For automake
 #
 VERSION=$AG_VERSION
-PACKAGE='GNU autogen'
+PACKAGE='GNU AutoGen'
 EADDR=autogen-users@lists.sourceforge.net
 
 # Display version numbers banner for my sanity!

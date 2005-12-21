@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-12-05 11:21:41 bkorb"
+# Time-stamp:        "2005-12-15 14:00:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2005/12/21 22:13:34 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.8 2005/12/05 20:46:44 bkorb Exp $
+# $Id: handler.test,v 4.9 2005/12/21 22:13:34 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -127,7 +127,7 @@ doOptSecond(
     tOptDesc*   pOptDesc )
 {
     tSCC zDef[2] = { 0x7F, 0 };
-    tSCC* azNames[] = { zDef,
+    tSCC* azNames[5] = { zDef,
         "alpha",  "beta",   "gamma",  "omega"
     };
 
@@ -156,15 +156,15 @@ doOptFourth(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-    tSCC* azNames[] = {
+    tSCC* azNames[4] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
 
     if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
         pOptDesc->pzLastArg = (char*)FOURTH_GAMMA;
     else
-    pOptDesc->pzLastArg =
-        optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
+        pOptDesc->pzLastArg =
+            optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
 }
 
 /* * * * * * *
@@ -179,7 +179,8 @@ doOptSixth(
     tSCC* azNames[] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
-    optionSetMembers( pOptions, pOptDesc, azNames, 4 );
+    const int nmCt = sizeof(azNames)/sizeof(azNames[0]);
+    optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
 }
 
 
