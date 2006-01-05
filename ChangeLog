@@ -1,3 +1,8 @@
+2006-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/defs.in: set AGexe/GDexe/CLexe to full paths & export
+	* autoopts/options.tpl: display more information on failure
+
 2005-12-12  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expExtract.c(buildEmptyText): clean it up.
