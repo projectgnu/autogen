@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-01-08 17:22:25 bkorb"
+## Time-stamp:      "2006-01-08 19:14:52 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2006/01/09 01:36:42 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2006/01/09 03:35:12 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -25,12 +25,11 @@ NOSHELL_TESTS = \
 UNREADY_TESTS = daemon.test
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS      = @AGEN5_TESTS@
-EXTRA_DIST = $(TESTS) daemon.test
-FUNCLIST   = funcCase.c  funcDef.c  funcEval.c   funcFor.c   funcIf.c \
-		     functions.c
-EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
-		     expString.c expGperf.c expExtract.c $(FUNCLIST)
+TESTS       = @AGEN5_TESTS@
+EXTRA_DIST  = $(TESTS) daemon.test
+FUNCLIST    = funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
+EXPRLIST    = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
+	      expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 TESTS_ENVIRONMENT = \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
@@ -39,16 +38,19 @@ TESTS_ENVIRONMENT = \
 distclean-local:
 	-rm -rf testdir FAILURES
 
-check   : defs
+$(TESTS)    : defs
 
-defs    : ${top_builddir}/autoopts/test/defs
-	@set -x ; cp ${top_builddir}/autoopts/test/defs . ; \
+defs        : ${top_builddir}/autoopts/test/defs
+	@set -x ; \
+	sed -e '/^srcdir=/s@".*"@"$(srcdir)"@' \
+	    -e '/^top_srcdir=/s@".*"@"$(top_srcdir)"@' \
+	   ${top_builddir}/autoopts/test/defs > $@ ; \
 	cd $(srcdir) ; chmod +x *.test || :
 
 ${top_builddir}/autoopts/test/defs :
 	cd ${top_builddir}/autoopts/test ; $(MAKE) defs
 
-verbose : defs
+verbose     : defs
 	rm -rf FAILURES testdir ; \
 	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
 
