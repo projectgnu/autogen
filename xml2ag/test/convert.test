@@ -4,12 +4,12 @@
 # convert.test --- test XML -> AutoGen conversion
 #
 ## Copyright (c):   2003-2005 by Bruce Korb
-## Time-stamp:      "2003-05-18 12:04:07 bkorb"
+## Time-stamp:      "2006-01-07 10:23:47 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun May 18, 2003
 #
-# $Id: convert.test,v 4.2 2005/01/23 23:33:06 bkorb Exp $
+# $Id: convert.test,v 4.3 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
@@ -32,8 +32,8 @@ failure()
 
 srcdir=`pwd`
 testname=convert
-[ -d ${testsubdir} ] || mkdir ${testsubdir}
-cd ${testsubdir}
+[ -d testdir ] || mkdir testdir
+cd testdir
 testsubdir=`pwd`
 
 ${X2Aexe} -O ${testname}.out <<'_EndOfXML_'

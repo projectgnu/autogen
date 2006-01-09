@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-12-05 11:53:35 bkorb"
+# Time-stamp:        "2006-01-07 12:44:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: argument.test,v 4.4 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -18,8 +18,7 @@
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 echo "creating ${testname}.def in `pwd`"
-testname="${testname}" test_main="${test_main}" \
-argument="${argument}" long_opts="${long_opts}" \
+export testname test_main argument long_opts
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 
 echo ${AG_L} ${testname}.def
@@ -65,22 +64,22 @@ cat >&3 <<- _EOF_
 	_EOF_
 exec 3>&-
 
-testname=${testname}2
-${AG_L} ${testname}.def || \
+${AG_L} ${testname}2.def || \
   failure AutoGen could not process
-( sed '/^TEST MAIN PROCEDURE:/,$d' ${testname}.c
+( sed '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT2_/' ${testname}2.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );
   return 0; }
 EOF
 ) > XX
-mv ${testname}.c ${testname}.c.save
-mv -f XX ${testname}.c
+mv ${testname}2.c ${testname}2.c.save
+mv -f XX ${testname}2.c
 
+Csrc=${testname}2
 compile "-?"
 
-cat > ${testname}.hlp <<'_EOF_'
+cat > ${testname}2.hlp <<'_EOF_'
 test_argument - Test AutoOpts for argument
 USAGE:  argument2 [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -94,13 +93,13 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
 
 _EOF_
 
-cmp -s ${testname}.hlp ${testname}.help || \
+cmp -s ${testname}2.hlp ${testname}2.help || \
   failure "`diff ${testname}.hlp ${testname}.help`"
 
-./${testname} -o string -s 99 > /dev/null && \
+./${testname}2 -o string -s 99 > /dev/null && \
   failure ${testname} did not handle oversized option
 
-./${testname} -o string -s 10 > /dev/null || \
+./${testname}2 -o string -s 10 > /dev/null || \
   failure ${testname} did not handle its options
 
 cleanup

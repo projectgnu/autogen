@@ -3,13 +3,18 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2005-12-16 09:12:09 bkorb"
+# Time-stamp:     "2006-01-07 12:46:59 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
+# Last Modified:  $Date: 2006/01/09 01:36:42 $
 #
-# $Id: defs.in,v 4.5 2005/12/21 22:13:34 bkorb Exp $
+# $Id: defs.in,v 4.6 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
+
+progname=`echo "$0" | sed 's,^.*/,,'`
+testname=`echo "$progname" | sed 's,\..*$,,'`
+export progname testname
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -19,12 +24,39 @@
 # if it does not exist.  We want to be able to run the tests
 # stand-alone!!
 #
-builddir=`pwd`
-top_builddir=`cd ../.. && pwd`
-
 srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
 CC="@CC@"
+GUILE_VERSION="@GUILE_VERSION@"
+LIBGUILE_PATH="@LIBGUILE_PATH@"
+AG_VERSION="@AG_VERSION@"
+
+AGexe="@AGexe@"
+d=`dirname  ${AGexe}`
+f=`basename ${AGexe}`
+AGexe=`cd ${d} && pwd`/${f}
+
+GDexe="@GDexe@"
+d=`dirname  ${GDexe}`
+f=`basename ${GDexe}`
+GDexe=`cd ${d} && pwd`/${f}
+
+CLexe="@CLexe@"
+d=`dirname  ${CLexe}`
+f=`basename ${CLexe}`
+CLexe=`cd ${d} && pwd`/${f}
+
+builddir=`pwd`
+top_builddir=`cd ../.. && pwd`
+
+if test ${GUILE_VERSION} -gt 107000
+then
+  case ${AG_VERSION} in
+  *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
+  *     ) GUILE_WARN_DEPRECATED=no ;;
+  esac
+  export GUILE_WARN_DEPRECATED
+fi
 
 LIB=`
 for f in XXX \
@@ -37,31 +69,99 @@ do case "${f}" in
 done`
 
 INC="@LIBGUILE_CFLAGS@"
-GUILE_VERSION="@GUILE_VERSION@"
-LIBGUILE_PATH="@LIBGUILE_PATH@"
-AGexe="@AGexe@"
-GDexe="@GDexe@"
-CLexe="@CLexe@"
-AG_VERSION="@AG_VERSION@"
 
-if test ${GUILE_VERSION} -gt 107000
-then
-  case ${AG_VERSION} in
-  *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
-  *     ) GUILE_WARN_DEPRECATED=no ;;
-  esac
-  export GUILE_WARN_DEPRECATED
-fi
+export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
+
+be_silent()
+{
+    setx=:
+    VERBOSE=false
+    rm -rf testdir
+    msg=echo
+    mkdir testdir || exit 1
+}
+
+be_verbose()
+{
+    setx='set -x'
+    msg=:
+    VERBOSE=true
+    test -d testdir || mkdir testdir || exit 1
+    # exec > testdir/${testname}.log 2>&1
+}
+
+case "$-" in
+*x*) be_verbose ;;
+*)   case "${VERBOSE}" in
+     '' | [Nn]* | 0 | [Ff]* ) be_silent ;;
+     *)  be_verbose ;;
+     esac
+     ;;
+esac
+exec 8>&2 1>testdir/${testname}.log 2>&1
+set -x
+
+lo_dir=${top_builddir}/autoopts
+test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
+LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}:${LD_LIBRARY_PATH-/dev/null}
+LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
+export LD_LIBRARY_PATH
+
+# A standard failure function
+failure()
+{
+  ${setx}
+  if test -d ../FAILURES
+  then ( \cd ../FAILURES ; rm -rf ${testname}* .*${testname}* )
+  else mkdir ../FAILURES ; fi
+
+  set +x
+  exec > /dev/null 2>&8
+  cat ${testname}.log >&2
+  cd ${testsubdir}
+
+  ( mv -f ${testname}* .*${testname}* ../FAILURES || : )
+  echo FAILURE: "$*" >&8
+  exit 1
+}
+
+cleanup()
+{
+  ${setx}
+  if ${VERBOSE} ; then : ; else
+    cd ${builddir}
+    rm -rf testdir
+  fi
+  ${msg} ${testname} done
+}
+
+compile()
+{
+  ${setx}
+  test "X${Csrc}"  = "X" && Csrc="${testname}"
+  test "X${Cexe}"  = "X" && Cexe="${Csrc}"
+  test "X${Dnam}"  = "X" && Dnam="${testname}"
+
+  d=`echo TEST_TEST_${Dnam}_OPTS | tr '[a-z]-' '[A-Z]_'`
+  cmd="${CC} ${CFLAGS} -D$d ${INC} -o ${Cexe} ${Csrc}.c ${LIB}"
+  eval $cmd || \
+    failure cannot compile ${Csrc}.c
+
+  if test $# -gt 0
+  then
+    ./${Cexe} ${*} > ${Csrc}.help || \
+      failure cannot obtain help output for ${Csrc}
+  fi
+  Csrc='' Cexe='' Dnam=''
+}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#
-# Set up paths that are sometimes necessary!
-#
-f=${top_builddir}/autoopts
-test -f ${f}/libopts.a || f=${f}/.libs
-LD_LIBRARY_PATH=${f}:${LIBGUILE_PATH}
-LIB=`echo ${f}/libopts.a ${f}/libguileopts.a ${LIB}`
-export LD_LIBRARY_PATH
+
+cd testdir || {
+  echo "Cannot make or change into testdir" >&8
+  exit 1
+}
+testsubdir=`pwd`
 
 dirs=`
 for f in ${top_builddir} ${top_srcdir}
@@ -78,9 +178,6 @@ f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
 PATH=${top_builddir}/columns:${f}:${PATH}
 
 stdopts=${srcdir}/stdopts.def
-progname=`echo "$0" | sed 's,^.*/,,'`
-testname=`echo "$progname" | sed 's,\..*$,,'`
-testsubdir=${testsubdir-testdir}
 
 #  All the tests will require the templates in the autoopts dir.
 #
@@ -89,61 +186,10 @@ AG_L="${AGexe} -L`cd ${srcdir}/..;pwd`"
 #  In general, they will have a test main procedure, too.
 #
 test_main=yes
-
-# User can set VERBOSE to prevent output redirection
-case x$VERBOSE in
-  x[Nn][Oo] | x0 | x | x[Ff]* )
-    exec > /dev/null 2>&1
-    rm -rf $testsubdir
-    VERBOSE=false
-    ;;
-
-  x* )
-    set -x ; : VERBOSE is ${VERBOSE} ; VERBOSE=true
-    ;;
-esac
 use_flags=true
 
-test -d $testsubdir || mkdir $testsubdir
-cd $testsubdir || {
-  echo "Cannot make or change into $testsubdir"
-  exit 1
-}
-
-echo "=== Running $progname for ${testname} ==="
+: "=== Running $progname for ${testname} ==="
 chmod +w * > /dev/null 2>&1 || :
-
-# A standard failure function
-failure()
-{
-  ${VERBOSE} && set -x
-  if test -d ../FAILURES
-  then ( \cd ../FAILURES ; rm -rf ${testname}* .*${testname}* )
-  else mkdir ../FAILURES ; fi
-
-  ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
-  echo "$*"
-  exit 1
-}
-
-cleanup()
-{
-  if ${VERBOSE} ; then : ; else
-    cd ${builddir}
-    rm -rf $testsubdir
-  fi
-}
-
-compile()
-{
-  d=`echo TEST_TEST_${testname}_OPTS | tr '[a-z]' '[A-Z]'`
-  cmd="${CC} ${CFLAGS} -D$d ${INC} -o $testname $testname.c ${LIB}"
-  echo $cmd >&2
-  eval $cmd || \
-    failure cannot compile $testname.c
-  ./$testname $@ > $testname.help || \
-    failure cannot obtain help output for $testname
-}
 
 ## Local Variables:
 ## Mode: shell-script
@@ -153,4 +199,4 @@ compile()
 ## sh-basic-offset: 2
 ## End:
 
-# end of defs.in
+# defs.in ends here

@@ -2,16 +2,16 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2005-12-05 11:02:51 bkorb"
+## Time-stamp:      "2006-01-08 17:22:54 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2005/12/05 20:46:44 $
+## Last Modified:   $Date: 2006/01/09 01:36:42 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2005/12/05 20:46:44 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2006/01/09 01:36:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
-EXTRA_DIST = defs stdopts.def $(TESTS)
+EXTRA_DIST = defs.in stdopts.def $(TESTS)
 MAINTAINERCLEANFILES	= Makefile.in
 TESTS      = nested.test \
     argument.test cond.test   config.test enums.test   equiv.test \

@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # license.test --- test license functionality
 #
-# Time-stamp:        "2005-11-27 09:45:56 bkorb"
+# Time-stamp:        "2006-01-07 12:59:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/01/09 01:36:42 $
 #            by: bkorb
 #
-# $Id: license.test,v 4.7 2005/12/05 20:46:44 bkorb Exp $
+# $Id: license.test,v 4.8 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -52,8 +52,7 @@ cat > ${testname}-extend.c <<- _EOF_
 	if (fp == NULL) return 1;
 	if (stat(file, &sb) != 0) return 1;
 	sz = 0x2000 - (sb.st_size & 0x1FFFUL);
-	while (sz > 0) {
-	  putc( '\n', fp ); sz--; }
+	while (sz > 0) { putc( '\n', fp ); sz--; }
 	fclose(fp);
 
 	file = *++argv;
@@ -62,16 +61,15 @@ cat > ${testname}-extend.c <<- _EOF_
 	if (stat(file, &sb) != 0) return 1;
 	fseek(fp, offset, SEEK_END);
 	sz = 0x2000 - (sb.st_size & 0x1FFFUL);
-	while (sz > 0) {
-	  putc( '\n', fp ); sz--; }
+	while (sz > 0) { putc( '\n', fp ); sz--; }
 	fputs(z_tail, fp);
 	fclose(fp);
 
 	return 0; }
 	_EOF_
 
-${CC} -g ${CFLAGS} -o ${testname}-extend ${testname}-extend.c || \
-  failure "Cannot compile ${testname}-extend.c"
+Csrc=${testname}-extend
+compile
 
 ./${testname}-extend ${testname}.lic ${testname}.tpl || \
   failure "Could not extend license/template files to 8KB"
@@ -95,7 +93,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

@@ -1,3 +1,259 @@
+2005-10-08  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7.3 Released
+
+	* agen5/fmemopen.c(_GNU_SOURCE): do not doubly define
+	* agen5/test/license.test(CFLAGS): do not use shell POSIX-isms
+	* autoopts/test/Makefile.am(LD_RUN_PATH): make sure we can find
+	the libguile library when running tests
+
+2005-10-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(compat/snprintf.c): always omit when building
+	full AutoGen with libsnprintfv
+	* autoopts/Makefile.am: indicate we have libsnprintfv
+	* pkg/libopts/mklibsrc.sh: remove that indication from tear-off lib.
+
+2005-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(compat/snprintf.c): include if needed
+	(compat/strdup.c): ditto
+	* autoopts/autoopts.h: omit redundant includes
+	* compat/Makefile.am(strsignal.h): maintainer cleanable
+	* compat/compat.h: make sure we define all the "extra" stuff we need.
+	* compat/strdup.c: new
+	* compat/snprintf.c: new
+	* config/libopts.def: cleanups.  Add missing type and size checks
+	* pkg/libopts/mklibsrc.sh: adjust for changed contents of libopts.c
+
+2005-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c(ag_scm_license): use text_mmap() instead of mmap.
+	* agen5/tpLoad.c(loadTemplate): ditto
+	(mapDataFile): obsolete
+	* agen5/test/license.test: extend the license and template files to
+	a multiple of a page size.
+	* autoopts/autoopts.h(tmap_info_t): move to export header (options.h)
+	* autoopts/options_h.tpl(tmap_info_t): add, including a "we had to
+	allocate the data anyway" flag
+	* autoopts/text_mmap.c(text_mmap): export as a private function and
+	add code to cope with failure to provide a final NUL byte with mmap
+	on anonymous regions and/or /dev/null.
+	(text_munmap): free any allocated memory due to mmap-ping NUL failure
+	* config/libopts.def(dev_null): new device test
+
+2005-09-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/getopt.test: disable unless autoopts-config installed.
+
+2005-08-28  Bruce Korb  <bkorb@gnu.org>
+
+	* compat/compat.h: fix up sized int types
+	* config/confmacs.tpl(emit-results): Allow for unquoted define values
+	* config/conftest.tpl(do-first): allow for an initial list of functions
+	* config/libopts.def(do-first): do common integer checks before the
+	specialized checks defined in the rest of this file.
+	* pkg/libopts/mklibsrc.sh(libopts.m4): add an optional argument to
+	LIBOPTS_CHECK -- viz., the directory where the libopts tear-off library
+	will live in a client project.
+	* pkg/libopts/README(LIBOPTS_CHECK): doc it
+
+2005-08-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts-config.in(usage): regularize
+	(everything): no longer a "regular" option
+	* autoopts/load.c(optionMakePath): fix constness and remove unnecessary
+	"do{...}while(0)" enclosure.
+
+2005-07-28  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7.2 Released
+
+	* agen5/agCgi.c(loadCgi): Warnings
+	* agen5/agInit.c(initialize): ditto
+	* agen5/defLex.c(assembleName): ditto
+	* agen5/fsm-trans.tpl(machine-step): ditto
+	(fsm-proc-variables): ditto
+	* agen5/funcFor.c(doForByStep): ditto
+	* agen5/funcIf.c(eval_true): ditto
+	* agen5/opts.def(load-scheme): ditto
+	* agen5/tpLoad.c(canReadFile): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	(filePreset): ditto
+	(handleStructure): ditto
+	* autoopts/nested.c(scanNameEntry): ditto
+	(sortNestedList): ditto
+	* compat/pathfind.c(extract_colon_unit): ditto
+	* snprintfv/format.c(printf_integer): ditto
+
+	* agen5/test/html.test: negative test fails on some platforms
+	* autoopts/test/errors.test: accommodate new file name  handling
+	* autoopts/test/keyword.test: ditto
+
+2005-07-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.h(MAXPATHLEN): make certain it is never less than
+	"PATH_MAX"
+	* autoopts/load.c(optionMakePath): use MAXPATHLEN instead of PATH_MAX.
+	and use canonicalize_file_name() when available.
+	* config/libopts.def(realpath): add test that includes testing for
+	the existence of PATH_MAX.
+	* configure.in(realpath): remove generic existence test
+
+2005-07-09  Bruce Korb  <bkorb@gnu.org>
+
+	* doc/mk-agen-texi-in: new - extricate code from Makefile.am
+	* doc/Makefile.am: remove that code
+	* configure.in: configure these new files
+	* doc/auto_gen.tpl: Use the "die" function instead of kill $AG_pid
+	Also, remove usage of "autoopts-config" as it won't work unless
+	autogen has been pre-installed.
+	* pkg/gnudoc.tpl: genericize the template so it can be used with
+	sharutils also.
+	* pkg/mkgnudoc.sh: tweaks to use the new template
+	* pkg/Makefile.am: alter the script's invocation, too.
+	* pkg/libopts/mklibsrc.sh: install the headers, don't create project
+	files -- leave  to libopts project to add those.
+
+2005-06-26  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7.1 Released
+
+	* autoopts/test/Makefile.am(TESTS_ENVIRONMENT): pass through "$(DEFS)"
+	* compat/compat.h(HAVE_CONFIG_H): error out if we don't have this
+	(limits.h): this is STDC.  Error out if we don't have it.
+	(dirent.h): ditto
+	* pkg/libopts/mklibsrc.sh(bootstrap): newly generated script for the
+	libopts tarball.  Running this script converts the tear-off library
+	into a stand alone project.
+
+2005-05-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman1.tpl(arg-range): add this to the option description.
+	* config/bootstrap.local(vers-template): new - template struct version
+	* autoopts/options_h.tpl(AO_TEMPLATE_VERSION): use the new value
+	* doc/auto_gen.tpl(quick start): generate the example and use the
+	"new" main procedure stuff.
+	* Upgrade libtool once again.
+	* Update the FSF address throughout
+
+2005-04-24  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.7 Released
+
+	* autoopts/optlib.tpl(set-defines): end a C statement w/ a ';'
+	* autoopts/options_h.tpl(AO_TEMPLATE_VERSION): burn the value into
+	the opthead.tpl template
+	* autoopts/opthead.tpl(AO_TEMPLATE_VERSION): Add code to verify that
+	the generated text matches the range of the installed libopts library.
+
+2005-04-19  Aaron Turner  <synfinatic@gmail.com>
+
+	* pkg/libopts/mklibsrc.sh: add --enable-local-libopts
+
+2005-04-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options_h.tpl(stdint.h): Undo yesterday's changes
+	* autoopts/guileopt.c: include "config.h"
+
+2005-04-16  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(doneCheck): avoid scm_c_eval_string 'cuz it is
+	not always available.  Use our own ag_scm_c_eval_string_from_file_line
+	* agen5/expGperf.c(ag_scm_make_gperf): ditto
+	* autoopts/options_h.tpl(stdint.h): pick up this header if either
+	HAVE_STDINT_H is defined or if HAVE_INTTYPES_H is not defined
+	(limits.h): similarly, prefer this to sys/limits.h, but demand one.
+	The generated "options.h" should now work outside the presence of
+	the "config.h" header.
+	* pkg/mkgnudoc.sh: rework for new version of texi2html
+	* xml2ag/xmlopts.def: clarify why the template name must be provided.
+
+2005-04-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/agman3.tpl: remove common code
+	* autoopts/agman1.tpl: ditto
+	* autoopts/agman-lib.tpl: new file for code common to the agman*.tpl
+	Primarily, it converts texi-isms into man page-isms.
+	* autoopts/Makefile.am: distribute the file, too.
+	* autoopts/configfile.c(optionGetValue): favor word "integer" for
+	integers instead of "number".
+	* autoopts/usage-txt.def: ditto
+	* autoopts/test/config.test: ditto
+	* autoopts/test/nested.test: ditto
+	* autoopts/optmain.tpl: set flag name at start of flag name loop.
+
+2005-03-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c(checkConsistency): "must-set" means that a "set"
+	option is okay, too.
+	* autoopts/configfile.c: more work on it.
+	* autoopts/test/errors.test: test the consistency fix
+	* agen5/autogen.c(doneCheck): run any 'shell-cleanup's
+	* agen5/autogen.h(fmemopen): rename to ag_fmemopen
+	* agen5/expGperf.c: append gperf cleanup stuff to 'shell-cleanup'
+	* agen5/expOutput.c: rename of fmemopen
+	* agen5/fmemopen.c: reworked
+	* agen5/test/fmemopen.test: test the thing
+	* agen5/schemedef.scm(shell-cleanup): new text SCM variable
+	* README: with-libguile-link and not with-libguile-libdir
+	* agen5/agShell.c(zTrap): move to directive.tpl and rename
+	* agen5/directive.tpl(zShellInit): write as a straight-up shell script
+	and use the "c-string" macro to convert into a C initialization string.
+
+2005-02-20  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/*: Remove "optArgType" from option descriptor and use
+	OPTST_GET_ARGTYPE() macro to determine this instead.
+
+2005-02-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/cook.c: NEW - move all string cooking here
+	* agen5/agUtils.c(doEscapeChar): removed
+	* agen5/defLex.c(assembleString): removed
+	* autoopts/tokenize.c(copy_cooked): use cook book cook code.
+	* autoopts/autoopts.c(doPresets): internalFileLoad has no failure mode
+	* autoopts/configfile.c(internalFileLoad): so remove its return value
+	* autoopts/load.c(findArg): routine to separate and process the option
+	argument, "process" method depending on mode:  KEEP, UNCOOKED and COOKED.
+	(loadOptionLine): use the new function.
+	* autoopts/test/rc.test: test this new stuff
+	* autoopts/Makefile.am(install-data-hook): sed in stuff derived from
+	config.h (we cannot install that).
+	* autoopts/autoopts.h(pzNest): new arg type for usage text
+	* autoopts/enumeration.c(enumError): arg types now handled via an enum
+	instead of bits in a mask.
+	* autoopts/guileopt.c(export_options_to_guile): ditto
+	* autoopts/makeshell.c(emitSetup): ditto
+	* autoopts/putshell.c: the same
+	* autoopts/save.c: again
+	* autoopts/usage.c: and some more
+	* autoopts/optlib.tpl: and again
+	* autoopts/optcode.tpl: ditto, also rearranged man option structure
+	* autoopts/options_h.tpl: new macros and enums for arg types
+	Also rearranged main option structure, as we will be incompatible anyway.
+	* autoopts/usage-txt.def: new strings for the new arg types
+	* autoopts/test/*: Must specify the "config.h" header now.
+	* config/libopts.def: either stdint.h or inttypes.h is required now
+	* doc/auto_gen.tpl: make sure compiles pick up config.h
+	* pkg/libopts/mklibsrc.sh: do *not* pick up config.h.  It will be
+	generated at build time.
+
+2005-02-12  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/text_mmap.c: new - maps text files, always ensuring that
+	at least one NUL byte is after the last text byte.
+	* autoopts/Makefile.am: Add to sources
+	* autoopts/autoopts.h(tmap_info_t): and add to data structures
+	* autoopts/configfile.c(internalFileLoad): new function for new job
+	* autoopts/load.c(filePreset): move to "configfile.c"
+	(doLoadOpt): ditto
+	* autoopts/optlib.tpl(min): if there is no "min", but there is a
+	"must-set", then set optMinCt to 1 anyway.
+	* autoopts/test/main.test(main.DEF): accommodate file systems with
+	case-insensitive naming -- use "def2" instead of ".DEF".
+	* fiddle with configury some more.
+
 2005-02-05  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.6.6 Released

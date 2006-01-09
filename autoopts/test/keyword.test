@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2005-12-08 12:17:08 bkorb"
+# Time-stamp:        "2006-01-07 12:52:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.7 2005/12/08 20:53:50 bkorb Exp $
+# $Id: keyword.test,v 4.8 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -261,7 +261,9 @@ echo ${AG_L} ${testname}_2.def
 ${AG_L} ${testname}_2.def || \
   failure AutoGen could not process
 
-(testname=${testname}_2 ; compile "-X") || \
+Csrc=${testname}_2
+Dnam=${Csrc}
+compile "-X" || \
     failure "cannot compile ${testname}_2"
 
 val=`./${testname}_2 --trace=expr 2>&1` || \
@@ -277,7 +279,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

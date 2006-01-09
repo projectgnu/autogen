@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2005-10-22 21:25:05 bkorb"
+# Time-stamp:        "2006-01-07 10:55:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/01/09 01:36:42 $
 #            by: bkorb
 #
-# $Id: string.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: string.test,v 4.5 2006/01/09 01:36:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -207,14 +207,12 @@ _EOF_
 
 # # # # # # # # # # RUN THE TESTS # # # # # # # # # # #
 
-CC=${CC-cc}
 SHELL=${SHELL-/bin/sh}
 
 echo ${AGexe} $testname.def
 ${AGexe} $testname.def || failure ${AGexe} failed
 
-${CC} -o ${testname} ${testname}.c || \
-    failure cannot compile generated ${testname}.c 
+compile
 
 chmod +x *.sh
 

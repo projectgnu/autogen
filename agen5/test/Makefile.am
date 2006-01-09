@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-12-05 10:01:35 bkorb"
+## Time-stamp:      "2006-01-08 17:22:25 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2005/12/05 20:46:43 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2006/01/09 01:36:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -26,8 +26,7 @@ UNREADY_TESTS = daemon.test
 MAINTAINERCLEANFILES = Makefile.in
 
 TESTS      = @AGEN5_TESTS@
-testsubdir = testdir
-EXTRA_DIST = defs $(TESTS) daemon.test
+EXTRA_DIST = $(TESTS) daemon.test
 FUNCLIST   = funcCase.c  funcDef.c  funcEval.c   funcFor.c   funcIf.c \
 		     functions.c
 EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
@@ -35,23 +34,22 @@ EXPRLIST   = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 
 TESTS_ENVIRONMENT = \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
-	testsubdir=$(testsubdir) \
 	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
 
 distclean-local:
-	-rm -rf $(testsubdir) FAILURES
+	-rm -rf testdir FAILURES
 
-$(TESTS) : perm-stamp
+check   : defs
 
-perm-stamp :
+defs    : ${top_builddir}/autoopts/test/defs
+	@set -x ; cp ${top_builddir}/autoopts/test/defs . ; \
 	cd $(srcdir) ; chmod +x *.test || :
 
-tests-current :
-	if test -f .sdir ; then for f in $(TESTS) ; do \
-	cp `cat .sdir`/$$f $$f ; done ; fi
+${top_builddir}/autoopts/test/defs :
+	cd ${top_builddir}/autoopts/test ; $(MAKE) defs
 
-verbose : tests-current
-	rm -rf FAILURES $(testsubdir) ; \
+verbose : defs
+	rm -rf FAILURES testdir ; \
 	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
 
 # Makefile.am ends here
