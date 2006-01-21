@@ -1,7 +1,7 @@
 /*
- * $Id: text_mmap.c,v 4.7 2005/12/08 17:54:34 bkorb Exp $
+ * $Id: text_mmap.c,v 4.8 2006/01/21 18:35:09 bkorb Exp $
  *
- * Time-stamp:      "2005-12-05 13:40:56 bkorb"
+ * Time-stamp:      "2006-01-18 13:20:54 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
@@ -163,7 +163,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
                 (void*)(((char*)pMI->txt_data) + pMI->txt_size),
                 pgsz,
                 PROT_READ|PROT_WRITE,
-                MAP_ANONYMOUS|MAP_FIXED, 0, 0 );
+                MAP_ANONYMOUS|MAP_FIXED|MAP_PRIVATE, 0, 0 );
 
         if (pNuls != MAP_FAILED_PTR)
             return pMI->txt_data;
@@ -180,7 +180,8 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         } else {
             pNuls = mmap(
                     (void*)(((char*)pMI->txt_data) + pMI->txt_size), pgsz,
-                    PROT_READ, MAP_PRIVATE|MAP_FIXED, pMI->txt_zero_fd, 0 );
+                    PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_PRIVATE,
+                    pMI->txt_zero_fd, 0 );
 
             if (pNuls != MAP_FAILED_PTR)
                 return pMI->txt_data;
