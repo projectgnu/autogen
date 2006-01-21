@@ -2052,6 +2052,60 @@ format; otherwise, it will have no effect.
 If you compile with @code{ENABLE_NLS} defined and @code{_()} defined to
 a localization function such as @code{gettext(3GNU)}, then the option
 processing code will be localizable (@pxref{i18n}).
+
+@item
+Intermingled option processing.  AutoOpts options may be intermingled with
+command line operands and options processed with other parsing techniques.
+This is accomplished by setting the @code{allow-errors}
+(@pxref{program attributes}) attribute.  When processing reaches a point
+where @code{optionProcess} (@pxref{libopts-optionProcess}) needs to be called
+again, the current option can be set with @code{RESTART_OPT(n)}
+(@pxref{RESTART_OPT}) before calling @code{optionProcess}.
+
+@item
+library options.  An AutoOpt-ed library may export its options for use in
+an AutoOpt-ed program.  This is done by providing an option definition file
+that client programs @code{#include} into their own option definitions.
+The first option in that file should be something approximating:
+
+@example
+export  = 'tOptDesc* mylib_opts_desc_p;';
+include = 'tOptDesc* mylib_opts_desc_p = NULL;';
+
+flag = @{ name = libmine-doc; documentation;
+   settable;
+   desc = <<- _EOF_
+	These options are part of the libmine library.
+	They have been incorporated into this program.
+	_EOF_;
+   code = '  mylib_opts_desc_p = pOptDesc - 1;';
+@};
+@end example
+
+@noindent
+and the client program should invoke:
+
+@example
+SET_OPT_LIBMINE_DOC;
+@end example
+
+@noindent
+before calling any library routines.  The library can then refer to its
+options via @code{mylib_opts_desc_p}.  For example, if there were some
+option, @code{mumble}, its option descriptor would be:
+
+@example
+mylib_opts_desc_p + INDEX_OPT_MUMBLE
+@end example
+@noindent
+or, perhaps:
+@example
+#undef DESC
+#define DESC(n) mylib_opts_desc_p[INDEX_OPT_ ## n]
+if (mylib_opts_desc_p == NULL) @{
+  errno = EINVAL; return -1; @}
+if (HAVE_OPT(MUMBLE)) do_mumbly_things();
+@end example
 @end enumerate
 
 @c === SECTION MARKER
