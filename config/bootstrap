@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2005-12-05 09:26:31 bkorb"
+# Time-stamp:      "2006-01-12 16:38:21 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.7 2005/12/05 20:46:44 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.8 2006/01/21 18:36:04 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -75,6 +75,7 @@ srcdir=$(cd ${srcdir} && pwd) || exit 1
 #
 MISSING="${wd}/missing"
 export MISSING
+chmod +x ${MISSING} || exit 1
 
 set -e
 
@@ -179,7 +180,7 @@ do
 
     if out_of_date "${v}" "${reqver}"
     then
-      ${MISSING} old ${f}
+      echo ${f}-${v} is out of date \(older than ${reqver}\) >&2
       DIE="exit 1"
     fi
   fi
