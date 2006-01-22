@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2005-10-22 21:24:58 bkorb"
+## Time-stamp:      "2006-01-22 13:37:59 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.21 2005/10/28 23:16:24 bkorb Exp $
+## $Id: Makefile.am,v 4.22 2006/01/22 21:38:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -59,7 +59,7 @@ CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
     optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
 PRIVATE_TPL = options_h.tpl usage-txt.tpl
 TPL_FILES   = $(CLIENT_TPLS) $(PRIVATE_TPL)
-DEF_FILES   = genshell.def stdoptions.def usage-txt.def funcs.def
+DEF_FILES   = genshell.def stdoptions.def usage-txt.def $(srcdir)/funcs.def
 MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in COPYING
 pkgconfigdir=$(libdir)/pkgconfig
 
@@ -71,7 +71,7 @@ pkgconfigdir=$(libdir)/pkgconfig
 
 CLEANFILES                = tmp-* libopts.c
 DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
-MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) funcs.def
+MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) $(srcdir)/funcs.def
 
 man_MANS                  = autoopts-config.1 $(GENMAN)
 m4datadir                 = $(datadir)/aclocal
@@ -129,17 +129,18 @@ strcspn.lo : $(top_srcdir)/compat/strcspn.c
 install-data-local : install-man3
 
 $(GENMAN) : $(MAN_STAMP)
-$(MAN_STAMP) : funcs.def
+$(MAN_STAMP) : $(srcdir)/funcs.def
 	@if [ -x ../agen5/autogen ] ; then \
 	touch tmp-$@ ; \
-	echo ! $(AGexe) -Tagman3.tpl funcs.def ; \
-	$(AGexe) -Tagman3.tpl funcs.def ; \
+	echo ! $(AGexe) -Tagman3.tpl $(srcdir)/funcs.def ; \
+	$(AGexe) -Tagman3.tpl $(srcdir)/funcs.def ; \
 	mv -f tmp-$@ $@ ; else true ; fi
 
 $(GENTEXI) : $(TEXI_STAMP)
-$(TEXI_STAMP) : ../agen5/autogen funcs.def
+$(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
 	@touch tmp-$@ ; \
-	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts funcs.def" ; \
+	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts " ; \
+	cmd="$${cmd} $(srcdir)/funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
 gettext po      : usage-txt.po
