@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.9 2005/12/21 22:13:34 bkorb Exp $
+ *  $Id: expFormat.c,v 4.10 2006/01/24 21:29:19 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -305,7 +305,7 @@ ag_scm_error( SCM res )
      */
     if (*pzMsg != NUL) {
         char* pz = aprf( zFmt, (abort != PROBLEM) ? zErr : zWarn,
-                         pCurTemplate->pzFileName, pCurMacro->lineNo,
+                         pCurTemplate->pzTplFile, pCurMacro->lineNo,
                          pCurFp->pzOutName, pzMsg );
         if (abort != PROBLEM)
             AG_ABEND( pz );

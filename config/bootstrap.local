@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2005-12-13 12:02:43 bkorb"
+# Time-stamp:        "2006-01-22 13:00:43 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.16 2005/12/13 20:03:25 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.17 2006/01/24 21:29:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -93,7 +93,11 @@ make_funcs_def()
   echo "MAN_STAMP   = man3-stamp" >&4
   sed '1,/^MAN_STAMP /d' Makefile.am >&4
   exec 4>&-
-  mv -f Makefile.new Makefile.am
+  if cmp Makefile.new Makefile.am
+  then rm -f Makefile.new
+  else mv -f Makefile.new Makefile.am
+       echo "WARNING: Makefile.am has been updated"
+  fi
   cd ${svdir}
 }
 

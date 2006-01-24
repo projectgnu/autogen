@@ -1,3 +1,162 @@
+2005-12-05  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.8 Released
+
+	* agen5/agInit.c(initialize): Test for trace level after doing options.
+	* agen5/autogen.c(main): keep deprecation quiet for Guile 1.7.x
+	(doneCheck): Force an error exit code when problems are found.
+	This is a problem only for Guile 1.7.x.
+	* agen5/autogen.h(AG_SCM_*): create a whole mess of wrapper macros so
+	we can avoid or adapt to changes to the Guile interface.
+	* agen5/bootstrap.dir(functions.h): resume generating it.  However,
+	we won't make any build rules for it.
+	* agen5/functions.h: remove it (for now).
+	* agen5/directive.tpl(schemeLine): set the Scheme line number correctly.
+	* agen5/expGuile.c(gh_type_e): use the new AG_SCM_* wrappers.
+	(ag_scm_c_eval_string_from_file_line): do things differently for 1.7.x
+	* agen5/*.c: Use the new wrappers & eliminate use of scm_makstr().
+	* agen5/test/defs: obsolete
+	* agen5/test/defs.in: new configurable file - replacing defs
+	* agen5/test/Makefile.am(TESTS_ENVIRONMENT): reduced in size by a lot
+	* agen5/test/*.test: source "defs" from build directory, not source.
+	* agen5/autoopts/defs: obsolete
+	* agen5/autoopts/defs.in: new configurable file - replacing defs
+	* agen5/autoopts/Makefile.am(TESTS_ENVIRONMENT): reduced in size by a lot
+	* agen5/autoopts/*.test: source "defs" from build directory, not source.
+	* agen5/test/error.test: Adapt to Guile 1.7: error line numbers do not
+	work, so sed them out of the result.
+	* config/misc.def(GUILE_VERSION): Compute a single number to represent
+	the current Guile version.  Make it both substitutable and a config.h
+	#define value.  Fail-exit the config if we cannot do this.
+	* autoopts/text_mmap.c(text_mmap): If a platform has both /dev/zero and
+	MAP_ANONYMOUS, then try /dev/zero if MAP_ANONYMOUS fails.
+
+2005-12-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h: Use a macro interface to make all the varied
+	variations of the Guile interface look the same.
+	* agen5/*: use these macro wrappers.
+	* agen5/bootstrap.dir: re-enable the generation of functions.h
+	* agen5/functions.tpl: re-add
+
+2005-11-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c (doOptions): Add a boolean argument "check_env".
+	Sometimes we use environment variables for defined values, sometimes
+	we must not.
+	* agen5/defDirect.c (doDir_ifdef): do not use environment value
+	(doDir_shell): also properly count lines
+	* agen5/defFind.c (findEntryByIndex): Do use env. var.
+	* agen5/defLex.c (scanAgain): ditto
+	* agen5/defLoad.c (findPlace): ditto
+	* agen5/test/defs: do not list subdirectory contents when trying to
+	create the list of names of files to move.
+	* agen5/test/directives.test: add line numbers to here docs so we
+	can verify the message line numbers more easily.
+	* agen5/test/error.test: some platforms trigger a sigpipe in the server
+	shell after the shell has ``kill -TERM $AG_pid'' and not yet invoked,
+	"exit".  Strip out the 'trapped on' messages before comparing results.
+	* agen5/test/heredef.test: also add line numbers to here docs.
+	* autoopts/options_h.tpl (TEXT_MMAP_FAILED_ADDR): cast MAP_FAILED to a
+	void* pointer.  Some platforms define a value that cannot be compared
+	with a void* pointer.
+	* autoopts/text_mmap.c(MAP_FAILED_PTR): Always use that instead of
+	MAP_FAILED.  It is ``((void*)MAP_FAILED)'' and should always work.
+	* pkg/Makefile.am: use top_srcdir where needed, not top_builddir.
+	* pkg/libopts/mklibsrc.sh (LIBOPTS_CHECK): this is now part of autoopts.
+	Do not generate it here.
+	* snprintfv/format.c (printf_integer): warning niggle.
+	* xml2ag/Makefile.am: invoke our just-built autogen consistently.
+
+2005-11-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defDirect.c: warning patrol
+	* agen5/defLoad.c(insertDef): make sure all useful data are copied to
+	the proper place.
+	* agen5/tpParse.c(findMacroEnd): check for backslash before end macro
+	mark.  Back up over it if found.
+	(parseTemplate): Have it?  skip over end of line white space + newline.
+	* agen5/test/defref.test: test misordered definitions.
+	* agen5/test/for.test: test the backslash before end macro mark
+	* config/libopts.def: remove duplicate uintptr_t test.
+
+2005-11-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defDirect.c(skipToEndif) count skipped newlines
+	(skipToElseEnd): ditto
+	* agen5/defLex.c(yylex): Separate the DP_EV_HERE_STRING as a different
+	token type so that the source line number can be adjusted.
+	* agen5/defParse.def: add the new token type to the FSM
+	* agen5/defParse-fsm.c: regenerate and in dp_do_str_value() bump the
+	line number when the token is DP_EV_HERE_STRING.
+	* agen5/test/heredef.test: line numbers are correct now.  Adjust.
+	* pkg/mkpkg.linux: crank up the optimizations for Linux packaging.
+
+2005-10-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(serverSetup): enable full shell tracing with
+	--trace=everything.
+	* througout: Reduce usage of tCC and tSCC and other abbrevs.  The
+	goal is to reduce dependencies on internal headers for generated code.
+	* doc/auto_gen.tpl(autogen): missed one.  Use ${AGexe} instead.
+	Also use ${INCLUDES} in the compiles
+	* doc/mk-agen-texi-in(INCLUDES): construct and export
+
+2005-10-28  Bruce Korb  <bkorb@gnu.org>
+
+	* GLOBAL: removed the code for forcing builddir == srcdir building.
+	That meant more careful determination of when to look for files in
+	the source tree and when they got built dynamically in the build dir.
+	* config/liboptschk.m4: new.  autoconf macro for determining whether or
+	not libopts has been installed and how it is to be used.
+	* Makefile.am: distribute and install that new file
+	* agen5/opts.def(show-shell): eliminate in favor of a new trace level
+	enumeration:  server-shell
+	* agen5/agShell.c(closeServer) flush write pipe before closing it.
+	Sometimes, the data get fed to a new process.
+	(serverSetup): trace server shell stuff if tracing level above the
+	newly enumerated level of TRACE_SERVER_SHELL.
+	(chainOpen): flush the trace file some more.
+	(loadData): retry reads if the pipe remains open and the read fails.
+	Sometimes, it fails without waiting on the first try to a serverprocess.
+	* agen5/bootstrap.dir(recursive): more things need to be set up for
+	bootstrapping that must not be done during a make step.
+	* autoopts/options_h.tpl(TEXT_MMAP_FAILED_ADDR): new macro
+	* agen5/tpLoad.c(loadTemplate): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	(filePreset): ditto
+	* agen5/test/Makefile.am(TESTS_ENVIRONMENT): set full path names
+	* agen5/test/defs(CFLAGS): set up properly for srcdir != builddir
+	* agen5/test/*.test: get CFLAGS from "defs" file.
+	* autoopts/Makefile.am(options.h): reference from source directory
+
+2005-10-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(zCmdFmt): add a command number to the closing echo
+	(closeServer): flush the write buffer to be extra sure it is pushed
+	out and won't be read by the next process.
+	(SHOW_SHELL): obsolete option - use TRACE_SERVER_SHELL instead
+	(serverSetup): ditto
+	(chainOpen): flush tracing fp too.  Also, use it for stderr.
+	(loadData): is static.  Make it so.  Also, fgets may fail on the first
+	read of a new process instead of waiting for input.  Retry the read
+	if it fails and is not EOF.  Log both input to and output from the
+	server shell if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+	* agen5/fmemopen.c(_GNU_SOURCE): avoid duplicate define
+	* agen5/opts.def(show-shell): obsolete
+	(trace): server-shell is a new keyword
+	* autoopts/options_h.tpl(TEXT_MMAP_FAILED_ADDR): macro to test for mmap
+	failure cast in ways to make all platforms happy.
+	* agen5/expFormat.c(ag_scm_license): use the mmap failure test macro
+	* agen5/tpLoad.c(loadTemplate): ditto
+	* autoopts/configfile.c(configFileLoad): ditto
+	* agen5/test/shell.test: rework so it can catch the timing issue fixed
+	in agShell.c.
+	* autoopts/test/Makefile.am(LD_LIBRARY_PATH): must be set to ensure we
+	get our built libraries ahead of installed libraries.
+	* config/bootstrap.local(tree_tops): be more selective about which files
+	we link into our build tree.
+
 2005-10-08  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.7.3 Released

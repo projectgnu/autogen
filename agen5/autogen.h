@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.11 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: autogen.h,v 4.12 2006/01/24 21:29:19 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -191,12 +191,11 @@ struct macro_desc {
 
 struct template_desc {
     tTlibMark   magic;       /* TEMPLATE_MAGIC_MARKER    */
-    int         fd;          /* mmap file descriptor     */
     size_t      descSize;    /* Structure Size           */
     char*       pNext;       /* Next Pointer             */
     int         macroCt;     /* Count of Macros          */
-    tCC*        pzFileName;  /* Name of Macro File       */
-    char*       pzTplName;   /* Template Name Pointer    */
+    tCC*        pzTplFile;   /* Name of template file    */
+    char*       pzTplName;   /* Defined Macro Name       */
     char*       pzTemplText; /* offset of the text       */
     char        zStartMac[MAX_SUFFIX_LEN];
     char        zEndMac[MAX_SUFFIX_LEN];
@@ -424,9 +423,6 @@ MKSTRING( ShellEnv,   "SHELL" );
 MKSTRING( Nil,        "" );
 MKSTRING( DefaultNil, "" );
 
-extern void unloadTemplate( tTemplate* pT );
-extern void unloadDefs( void );
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  GLOBAL PROCEDURES
@@ -582,7 +578,7 @@ static inline SCM ag_eval( tCC* pzStr )
     pzLastScheme = pzStr;
 
     res = ag_scm_c_eval_string_from_file_line(
-        pzStr, pCurTemplate->pzFileName, pCurMacro->lineNo );
+        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo );
 
     pzLastScheme = pzSaveScheme;
     return res;

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-01-22 13:37:59 bkorb"
+## Time-stamp:      "2006-01-22 13:39:03 bkorb"
 ## Copyright (c):   1992-2005 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.22 2006/01/22 21:38:10 bkorb Exp $
+## $Id: Makefile.am,v 4.23 2006/01/24 21:29:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -140,7 +140,7 @@ $(GENTEXI) : $(TEXI_STAMP)
 $(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
 	@touch tmp-$@ ; \
 	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts " ; \
-	cmd="$${cmd} $(srcdir)/funcs.def" ; \
+	cmd="$${cmd} -L$(srcdir) $(srcdir)/funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
 gettext po      : usage-txt.po

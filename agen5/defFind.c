@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.6 2005/11/25 18:57:15 bkorb Exp $
+ *  $Id: defFind.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -40,7 +40,7 @@ static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
 #define ILLFORMEDNAME() \
     AG_ABEND( aprf( zNameRef, zDefinitionName, \
-              pCurTemplate->pzFileName, pCurMacro->lineNo ));
+              pCurTemplate->pzTplFile, pCurMacro->lineNo ));
 
 
 /* = = = START-STATIC-FORWARD = = = */
@@ -187,7 +187,7 @@ badName( char* pzD, const char* pzS, size_t srcLen )
     memcpy( (void*)pzD, (void*)pzS, srcLen );
     pzD[ srcLen ] = NUL;
     fprintf( pfTrace, zNameRef, pzD,
-             pCurTemplate->pzFileName, pCurMacro->lineNo );
+             pCurTemplate->pzTplFile, pCurMacro->lineNo );
     return srcLen + 1;
 }
 

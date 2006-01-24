@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.7 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: funcIf.c,v 4.8 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -170,7 +170,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
                          pMac->lineNo );
 
                 if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pIf->lineNo );
             }
 
@@ -185,7 +185,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
                  pCurTemplate->pzTemplText + pCurMacro->ozText );
 
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+            fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                      pIf->lineNo );
     }
 
@@ -238,7 +238,7 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
         fprintf( pfTrace, "WHILE `%s' loop in %s on line %d begins:\n",
                  pCurTemplate->pzTemplText + pCurMacro->ozText,
-                 pT->pzFileName, pMac->lineNo );
+                 pT->pzTplFile, pMac->lineNo );
 
     for (;;) {
         pCurTemplate = pT;
@@ -254,7 +254,7 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
         fprintf( pfTrace, "WHILE macro repeated %d times\n", ct );
 
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+            fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
     }
 
     return pRet;
@@ -477,7 +477,7 @@ ag_scm_set_writable( SCM set )
     switch (STATE_OPT( WRITABLE )) {
     case OPTST_DEFINED:
     case OPTST_PRESET:
-        fprintf( pfTrace, zWarn, pCurTemplate->pzFileName, pCurMacro->lineNo );
+        fprintf( pfTrace, zWarn, pCurTemplate->pzTplFile, pCurMacro->lineNo );
         break;
 
     default:

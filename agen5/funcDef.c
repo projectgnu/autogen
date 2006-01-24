@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.6 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: funcDef.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -543,7 +543,7 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
         fprintf( pfTrace, zTplInvoked, pT->pzTplName, defCt );
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+            fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                      pMac->lineNo );
     }
 
@@ -579,6 +579,15 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
     }
 
     return pMac+1;
+}
+
+
+void
+mUnload_Define( tMacro* pMac )
+{
+    void* p = (void*)(pMac->res);
+    if (p != NULL)
+        AGFREE(p);
 }
 
 
@@ -673,13 +682,6 @@ mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 }
 
 
-void
-mUnload_Define( tMacro* pMac )
-{
-    unloadTemplate( (tTemplate*)(pMac->funcPrivate) );
-}
-
-
 tMacro*
 mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
@@ -701,11 +703,12 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN set up the "DEFINE" block callout table.
      *  It is the standard table, except entries are inserted
      *  for functions that are enabled only while processing
-     *  a DEFINE block (i.e. "ENDDEF")
+     *  a DEFINE block (viz. "ENDDEF" and removing "DEFINE").
      */
     if (apDefineLoad[0] == NULL) {
         memcpy( (void*)apDefineLoad, apLoadProc, sizeof( apLoadProc ));
         apDefineLoad[ FTYP_ENDDEF ] = &mLoad_Ending;
+        apDefineLoad[ FTYP_DEFINE ] = &mLoad_Bogus;
     }
     papLoadProc = apDefineLoad;
 
@@ -713,9 +716,8 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         const char*    pzScan = *ppzScan;  /* text after macro */
         const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
         int            macCt  = pT->macroCt - (pMac - pT->aMacros);
-        int            fnameSize = strlen( pT->pzFileName ) + 1;
 
-        size_t alocSize = sizeof( *pNewT ) + fnameSize
+        size_t alocSize = sizeof( *pNewT )
             + (macCt * sizeof( tMacro )) + strlen( pzScan ) + 0x100;
         alocSize &= ~0x0F;
 
@@ -724,18 +726,21 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          */
         pNewT = (tTemplate*)AGALOC( alocSize, "AG macro definition" );
         memset( (void*)pNewT, 0, alocSize );
-        pNewT->magic    = pT->magic;
-        pNewT->fd       = 0;
-        pNewT->descSize = alocSize;
-        pNewT->macroCt  = macCt;
-        pNewT->pzFileName = (char*)(pNewT->aMacros + macCt);
-        memcpy( (void*)pNewT->pzFileName, pT->pzFileName, fnameSize );
-        pzCopy = pNewT->pzTplName = (void*)(pNewT->pzFileName + fnameSize);
+        pNewT->magic      = pT->magic;
+        pNewT->descSize   = alocSize;
+        pNewT->macroCt    = macCt;
+        pNewT->pzTplFile  = strdup(pT->pzTplFile);
+
+        pzCopy = pNewT->pzTplName = (void*)(pNewT->aMacros + macCt);
         if (! isalpha( *pzSrc ))
             AG_ABEND_IN( pT, pMac, zNameNeeded );
 
         while (ISNAMECHAR(*pzSrc))  *(pzCopy++) = *(pzSrc++);
     }
+
+    if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
+        fprintf( pfTrace, "Defining macro %s from %s\n",
+                 pNewT->pzTplName, pNewT->pzTplFile );
 
     *(pzCopy++) = NUL;
     pNewT->pzTemplText = pzCopy;
@@ -746,68 +751,68 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
     {
         tMacro* pMacEnd = parseTemplate( pNewT->aMacros, ppzScan );
+        int     ct;
 
         /*
          *  Make sure all of the input string was *NOT* scanned.
          */
         if (*ppzScan == NULL)
-            AG_ABEND_IN( pT, pMac, "parse ended unexpectedly" );
+            AG_ABEND_IN( pNewT, pNewT->aMacros, "parse ended unexpectedly" );
 
-        pNewT->macroCt = pMacEnd - &(pNewT->aMacros[0]);
+        ct = pMacEnd - pNewT->aMacros;
 
         /*
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
-        if ((void*)pMacEnd < (void*)(pNewT->pzFileName)) {
-            int  delta = pNewT->pzFileName - (char*)pMacEnd;
-            int  size  = (pNewT->pNext - pNewT->pzFileName);
-            memcpy( (void*)pMacEnd, (void*)(pNewT->pzFileName),
-                    size );
-            pNewT->pzFileName  -= delta;
+        if (ct < pNewT->macroCt) {
+            int   delta = sizeof(tMacro) * (pNewT->macroCt - ct);
+            void* data  = (pNewT->pzTplName == NULL) ?
+                pNewT->pzTemplText : pNewT->pzTplName;
+            int  size  = pNewT->pNext - (char*)data;
+            memmove( (void*)pMacEnd, data, size );
+
             pNewT->pzTemplText -= delta;
             pNewT->pNext       -= delta;
-            if (pNewT->pzTplName != 0)
-                pNewT->pzTplName -= delta;
+            pNewT->pzTplName   -= delta;
+            pNewT->macroCt      = ct;
         }
     }
 
     /*
-     *  Adjust the sizes.  Remove absolute pointers.
-     *  Reallocate to the correct size.  Restore
-     *  the offsets to pointer values.
+     *  Adjust the sizes.  Remove absolute pointers.  Reallocate to the correct
+     *  size.  Restore the offsets to pointer values.
      */
-    pNewT->descSize     = pNewT->pNext - (char*)pNewT;
-    pNewT->descSize    += 0x40;
-    pNewT->descSize    &= ~0x3F;
-    pNewT->pzFileName  -= (long)pNewT;
-    pNewT->pzTplName   -= (long)pNewT;
-    pNewT->pzTemplText -= (long)pNewT;
-    pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize,
-                                  "resize AG macro definition" );
-    pNewT->pzFileName  += (long)pNewT;
-    pNewT->pzTplName   += (long)pNewT;
-    pNewT->pzTemplText += (long)pNewT;
+    {
+        size_t sz = pNewT->pNext - (char*)pNewT;
+        if (sz < pNewT->descSize) {
+            pNewT->descSize     = sz;
+            pNewT->pzTplName   -= (long)pNewT;
+            pNewT->pzTemplText -= (long)pNewT;
+            pNewT = (tTemplate*)AGREALOC( (void*)pNewT, pNewT->descSize,
+                                          "resize AG macro definition" );
+            if (pNewT == NULL)
+                AG_ABEND( "failed to resize AG macro" );
 
-    /*
-     *  We cannot reallocate a smaller array because
-     *  the entries are all linked together and
-     *  realloc-ing it may cause it to move.
-     */
+            pNewT->pzTplName   += (long)pNewT;
+            pNewT->pzTemplText += (long)pNewT;
+        }
+    }
+
 #if defined( DEBUG_ENABLED )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";
-        fprintf( pfTrace, zSum, pNewT->macroCt, pNewT->pzFileName,
+        fprintf( pfTrace, zSum, pNewT->macroCt, pNewT->pzTplFile,
                  pNewT->descSize );
     }
 #endif
 
     pNewT->pNext  = (char*)pNamedTplList;
     pNamedTplList = pNewT;
-    papLoadProc = papLP;
+    papLoadProc   = papLP;
     memset( (void*)pMac, 0, sizeof(*pMac) );
-    pCurTemplate = pT;
+    pCurTemplate  = pT;
     return pMac;
 }
 /*

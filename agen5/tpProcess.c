@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -64,7 +64,7 @@ generateBlock( tTemplate*   pT,
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
 
             fprintf( pfTrace, zFmt, apzFuncNames[ fc ], pMac->funcCode,
-                     pT->pzFileName, pMac->lineNo );
+                     pT->pzTplFile, pMac->lineNo );
             if (pMac->ozText > 0) {
                 int   ct;
                 char* pz = pT->pzTemplText + pMac->ozText;

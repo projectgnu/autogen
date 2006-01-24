@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.8 2005/12/21 22:13:34 bkorb Exp $
+ *  $Id: expPrint.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -53,9 +53,15 @@ printFault( int sig )
 static ssize_t
 safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 {
-    tSCC zBadArgs[]  = "Bad args to sprintf";
-    tSCC zBadFmt[]   = "%s ERROR:  %s processing printf format:\n\t%s\n";
-
+#if ! defined(DEBUG_ENABLED)
+    /*
+     *  In normal operation (or during AutoGen testing), seg faults during the
+     *  printf operation are caused by bad input data.  During AutoGen
+     *  development, we do not supply bad printf arguments, so we want to
+     *  capture any segfaults when they happen with the correct stack trace.
+     *  Therefore, during AutoGen development, we do not protect against seg
+     *  faults.
+     */
     struct sigaction  saSave1;
     struct sigaction  saSave2;
 
@@ -74,7 +80,10 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
      *  THEN ...
      */
     {
-        int faultType = sigsetjmp( printJumpEnv, 0 );
+        tSCC zBadArgs[] = "Bad args to sprintf";
+        tSCC zBadFmt[]  = "%s ERROR:  %s processing printf format:\n\t%s\n";
+        int  faultType  = sigsetjmp( printJumpEnv, 0 );
+
         if (faultType != 0) {
 #ifndef HAVE_STRSIGNAL
             extern char* strsignal(int signo);
@@ -92,6 +101,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
             AG_ABEND( zBadArgs );
         }
     }
+#endif /* ! defined(DEBUG_ENABLED) */
 
     {
         size_t printSize = asprintfv( ppzBuf, pzFmt,
@@ -99,8 +109,10 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
         if ((printSize & ~0xFFFFFF) != 0)
             AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 
+#if ! defined(DEBUG_ENABLED)
         sigaction( SIGBUS,  &saSave1, NULL );
         sigaction( SIGSEGV, &saSave2, NULL );
+#endif
         return printSize;
     }
 }

@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.6 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: tpParse.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -40,6 +40,9 @@ whichFunc( tCC** ppzScan );
 
 static tCC*
 findMacroEnd( tCC** ppzMark );
+
+static tCC*
+nextMacroStart( tCC* pz, tMacro** ppM, tTemplate* pTpl );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -165,7 +168,7 @@ findMacroEnd( tCC** ppzMark )
     if (pzEndMark == pzFunc) {
         pCurMacro->funcCode = FTYP_COMMENT;
         fprintf( pfTrace, "WARNING: empty macro in %s line %d\n",
-                 pCurTemplate->pzFileName, templLineNo );
+                 pCurTemplate->pzTplFile, templLineNo );
         return pzEndMark;
     }
 
@@ -332,10 +335,9 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pTpl, pM, &pzScan );
 
 #if defined(DEBUG_ENABLED)
-            teFuncType ft  = pM->funcCode;
-            int        ln  = pM->lineNo;
-
             if (HAVE_OPT( SHOW_DEFS )) {
+                teFuncType ft  = pM->funcCode;
+                int        ln  = pM->lineNo;
                 int ct = tplNestLevel;
                 if (pM->funcCode == FTYP_BOGUS)
                      fputs( "    ", pfTrace );
@@ -345,11 +347,16 @@ parseTemplate( tMacro* pM, tCC** ppzText )
 
                 if (pM->funcCode == FTYP_BOGUS)
                      fprintf( pfTrace, zTUndef, apzFuncNames[ ft ], ft, ln );
-                else
+                else {
+                    const char* pz;
+                    if (ft >= FUNC_CT)
+                        ft = FTYP_SELECT;
+                    pz = (pM->ozText == 0)
+                        ? ""
+                        : (pTpl->pzTemplText + pM->ozText);
                     fprintf( pfTrace, zTDef, apzFuncNames[ ft ], pM->funcCode,
-                             ln, pM->endIndex,
-                             strlen( (pM->ozText == 0) ? ""
-                                     : (pTpl->pzTemplText + pM->ozText) ));
+                             ln, pM->endIndex, strlen( pz ));
+                }
             }
 #endif
 

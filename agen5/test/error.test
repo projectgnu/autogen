@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2005-12-05 11:16:04 bkorb"
+# Time-stamp:        "2006-01-22 12:16:15 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.6 2005/12/05 20:46:44 bkorb Exp $
+# $Id: error.test,v 4.7 2006/01/24 21:29:19 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -155,7 +155,7 @@ ${AGexe} -T ${testname}.tpl5 -b ${testname} --no-defin \
   > /dev/null 2> ${testname}.out5
  [ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
 
-egrep -v 'Giving up in functions' ${testname}.out5 > ${testname}.samp5
+egrep -v 'Giving up in .*functions\.c' ${testname}.out5 > ${testname}.samp5
 cat > ${testname}.base5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:

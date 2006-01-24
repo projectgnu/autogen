@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.17 2005/11/23 00:09:29 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.18 2006/01/24 21:29:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -700,7 +700,7 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (shell (string-append "
-OPTDIR=`cd ${top_builddir}/autoopts >/dev/null; pwd`
+OPTDIR=`cd ${top_builddir}/autoopts >/dev/null && pwd`
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
 
@@ -714,7 +714,7 @@ exec 3>&1
 (
   cd ${tempdir}
   echo 'config-header = \"config.h\";' >> default-test.def
-  HOME='' ${AGexe} -L${OPTDIR} default-test.def
+  HOME='' ${AGexe} -L${OPTDIR} -L${top_srcdir}/autoopts default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}\"
@@ -724,8 +724,7 @@ exec 3>&1
 ) > ${tempdir}/default-test.log 2>&1
 
 test $? -eq 0 || {
-  echo \"Check ${tempdir}/default-test.log file\" >&2
-  exit 1
+  die Check ${tempdir}/default-test.log file
 }
 HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
    sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
@@ -875,30 +874,51 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-opts="-o genshellopt -DTEST_GETDEFS_OPTS ${INCLUDES}"
+log=${tempdir}/genshellopt.log
 
-( cat ${top_srcdir}/getdefs/opts.def
-  echo "test_main = 'optionParseShell';"
-  echo 'config-header = "config.h";'
-) | (
+(
   set -x
+  opts="-o genshellopt -DTEST_GETDEFS_OPTS ${INCLUDES}"
+  exec 3> ${tempdir}/genshellopt.def
+  cat ${top_srcdir}/getdefs/opts.def >&3
+  echo "test_main = 'optionParseShell';" >&3
+  echo 'config-header = "config.h";' >&3
+  exec 3>&-
+
   cd ${tempdir}
-  HOME='' ${AGexe} -t40 -L${OPTDIR} -bgenshellopt -- -
+  cmd="valgrind --leak-check=full ${AGexe}"
+  HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts genshellopt.def
+  test $? -eq 0 || die "autogen failed to create genshellopt.c - See ${log}"
 
   ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
-) > ${tempdir}/genshellopt.log 2>&1
+  test $? -eq 0 || die "could not compile genshellopt.c - See ${log}"
+) > ${log} 2>&1
+
+` =][= `
 
 test -x ${tempdir}/genshellopt || \
-  die "NO GENSHELLOPT PROGRAM - See ${tempdir}/genshellopt.log"
+  die "NO GENSHELLOPT PROGRAM - See ${log}"
 
-${tempdir}/genshellopt --help | \
-  sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
+${tempdir}/genshellopt --help > ${tempdir}/genshellopt.hlp
 
-echo
-echo
+` =][= `
+
 ${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || \
   die cannot create ${tempdir}/genshellopt.sh
-sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g' ${tempdir}/genshellopt.sh
+
+` =][= `
+
+sedcmd='s,\t,        ,g;s,\\([@{}]\\),@\\1,g'
+sed "${sedcmd}" ${tempdir}/genshellopt.hlp
+cat <<- \_EOF_
+	@end example
+
+	@noindent
+	Resulting in the following script:
+	@example
+	_EOF_
+
+sed "${sedcmd}" ${tempdir}/genshellopt.sh
 
 ` =]
 @end example

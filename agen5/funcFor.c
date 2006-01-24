@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.8 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: funcFor.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -699,7 +699,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
                          pT->pzTemplText + pMac->ozName );
 
                 if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+                    fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
             }
 
             return pMRet;
@@ -724,7 +724,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
         fprintf( pfTrace, "FOR %s loop in %s on line %d begins:\n",
-                 pT->pzTemplText + pMac->ozName, pT->pzFileName,
+                 pT->pzTemplText + pMac->ozName, pT->pzTplFile,
                  pMac->lineNo );
 
     if (pT->pzTemplText[ pMac->ozText ] == '(') {
@@ -748,7 +748,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
                  pT->pzTemplText + pMac->ozName, loopCt );
 
         if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pT->pzFileName, pMac->lineNo );
+            fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
     }
 
     return pMRet;

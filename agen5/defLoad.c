@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.8 2005/12/04 00:57:30 bkorb Exp $
+ *  $Id: defLoad.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -244,6 +244,7 @@ findPlace( char* name, tCC* pzIndex )
 LOCAL void
 readDefines( void )
 {
+    tCC*     pzDefFile;
     char*    pzData;
     size_t   dataSize;
     size_t   sizeLeft;
@@ -258,14 +259,16 @@ readDefines( void )
         return;
     }
 
+    pzDefFile = OPT_ARG( DEFINITIONS );
+
     /*
      *  Check for stdin as the input file.  We use the current time
      *  as the modification time for stdin.  We also note it so we
      *  do not try to open it and we try to allocate more memory if
      *  the stdin input exceeds our initial allocation of 16K.
      */
-    if (strcmp( OPT_ARG( DEFINITIONS ), "-" ) == 0) {
-        OPT_ARG( DEFINITIONS ) = "stdin";
+    if (strcmp( pzDefFile, "-" ) == 0) {
+        pzDefFile = OPT_ARG( DEFINITIONS ) = "stdin";
         if (getenv( "REQUEST_METHOD" ) != NULL) {
             loadCgi();
             pCurCtx = pBaseCtx;
@@ -285,14 +288,14 @@ readDefines( void )
     else {
         struct stat stbf;
 
-        if (stat( OPT_ARG( DEFINITIONS ), &stbf ) != 0)
-            AG_ABEND( aprf( zCannot, errno, "stat", OPT_ARG( DEFINITIONS ),
-                            strerror( errno )));
+        if (stat( pzDefFile, &stbf ) != 0)
+            AG_ABEND( aprf( zCannot, errno, "stat",
+                            pzDefFile, strerror( errno )));
 
         if (! S_ISREG( stbf.st_mode )) {
             errno = EINVAL;
             AG_ABEND( aprf( zCannot, errno, "open non-regular file",
-                            OPT_ARG( DEFINITIONS ), strerror( errno )));
+                            pzDefFile, strerror( errno )));
         }
 
         /*
@@ -336,10 +339,10 @@ readDefines( void )
     if (useStdin)
         fp = stdin;
     else {
-        fp = fopen( OPT_ARG( DEFINITIONS ), "r" FOPEN_TEXT_FLAG );
+        fp = fopen( pzDefFile, "r" FOPEN_TEXT_FLAG );
         if (fp == NULL)
-            AG_ABEND( aprf( zCannot, errno, "open", OPT_ARG( DEFINITIONS ),
-                            strerror( errno )));
+            AG_ABEND( aprf( zCannot, errno, "open",
+                            pzDefFile, strerror( errno )));
     }
 
     /*
@@ -359,8 +362,8 @@ readDefines( void )
             if (feof( fp ) || useStdin)
                 break;
 
-            AG_ABEND( aprf( zCannot, errno, "read", OPT_ARG( DEFINITIONS ),
-                            strerror( errno )));
+            AG_ABEND( aprf( zCannot, errno, "read",
+                            pzDefFile, strerror( errno )));
         }
 
         /*
@@ -408,7 +411,7 @@ readDefines( void )
         AG_ABEND( "No definition data were read" );
 
     *pzData = NUL;
-    AGDUPSTR( pBaseCtx->pzCtxFname, OPT_ARG( DEFINITIONS ), "def file name" );
+    AGDUPSTR( pBaseCtx->pzCtxFname, pzDefFile, "def file name" );
 
     /*
      *  Close the input file, parse the data
@@ -422,9 +425,10 @@ readDefines( void )
 }
 
 
-void
+LOCAL void
 unloadDefs( void )
 {
+    return;
 }
 /*
  * Local Variables:

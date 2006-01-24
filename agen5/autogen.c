@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.12 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: autogen.c,v 4.13 2006/01/24 21:29:19 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -79,11 +79,8 @@ inner_main( int argc, char** argv )
         processTemplate( pTF );
 
         procState = PROC_STATE_CLEANUP;
-        unloadTemplate( pTF );
+        cleanup( pTF );
     }
-
-    unloadDefs();
-    ag_scmStrings_deinit();
 
     procState = PROC_STATE_DONE;
     exit( EXIT_SUCCESS );
@@ -161,7 +158,7 @@ signalExit( int sig )
             line = pCurMacro->lineNo;
             fnCd = pCurMacro->funcCode;
         }
-        pzFl = pCurTemplate->pzFileName;
+        pzFl = pCurTemplate->pzTplFile;
         if (pzFl == NULL)
             pzFl = "NULL file name";
         fprintf( stderr, zAt, pzFl, line, pzFn, fnCd );
@@ -251,7 +248,7 @@ doneCheck( void )
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
             scm_backtrace();
 
-        fprintf( stderr, zErr, pCurTemplate->pzFileName, pCurMacro->lineNo );
+        fprintf( stderr, zErr, pCurTemplate->pzTplFile, pCurMacro->lineNo );
 
         /*
          *  We got here because someone called exit early.
@@ -354,7 +351,7 @@ ag_abend_at( tCC* pzMsg
     if ((procState >= PROC_STATE_LIB_LOAD) && (pCurTemplate != NULL)) {
         int line = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
         fprintf( stderr, "Error in template %s, line %d\n\t",
-                 pCurTemplate->pzFileName, line );
+                 pCurTemplate->pzTplFile, line );
     }
     fputs( pzMsg, stderr );
     pzMsg += strlen( pzMsg );
@@ -419,6 +416,17 @@ signalSetup( sighandler_proc_t* chldHandler,
         case SIGKILL:
         case SIGSTOP:
             continue;
+
+#if defined(DEBUG_ENABLED)
+        case SIGBUS:
+        case SIGSEGV:
+            /*
+             *  While debugging AutoGen, we want seg faults to happen and
+             *  trigger core dumps.  Make sure this happens.
+             */
+            sa.sa_handler = SIG_DFL;
+            break;
+#endif
 
             /*
              *  Signals to ignore with SIG_IGN.

@@ -1,6 +1,6 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.1 2005/12/04 22:18:56 bkorb Exp $
+# $Id: functions.tpl,v 4.2 2006/01/24 21:29:19 bkorb Exp $
 
 =]
 [=
@@ -36,19 +36,21 @@
  *      If a function is neither has a special load procedure nor is
  *      situational, then the "Unknown" load method is applied.
  *
+ *  R - has a special remove (unload) procedure
+ *
  *  H - has a handler procedure defined.  Only these procedures should
  *      be encountered by the dispatcher during processing.
  *[=
 FOR macfunc =]
  *  [=
 
-  IF (exist? "alias")     =]A[=
+  IF (exist? "alias")          =]A[=
     IF (exist? "unnamed") =][=
       ERROR % name
          "The %s function is unnamed, but has aliases?!?!" =][=
     ENDIF =][=
-  ELIF (exist? "unnamed") =]U[=
-  ELSE                    =] [=
+  ELIF (exist? "unnamed")      =]U[=
+  ELSE                         =] [=
   ENDIF =] [=
 
   IF   (exist? "load_proc")    =]L[=
@@ -60,8 +62,10 @@ FOR macfunc =]
   ELSE                         =] [=
   ENDIF =] [=
 
-  IF (exist? "handler_proc")    =]H[=
-  ELSE                          =] [=
+  (if (exist? "unload-proc") "R" " ") =][=
+
+  IF (exist? "handler_proc")   =]H[=
+  ELSE                         =] [=
   ENDIF =] - [=
 
   % name (string-upcase! "%-12s") =][=what=][=

@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.10 2005/12/13 19:16:44 bkorb Exp $
+# $Id: opthead.tpl,v 4.11 2006/01/24 21:29:19 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-12-13 11:12:57 bkorb"
+# Time-stamp:      "2006-01-21 10:49:48 bkorb"
 
 =]
 /*
@@ -71,10 +71,38 @@ ENDIF (exist? version) =]
     (up-c-name "flag[].name") =] )
  */[=
 
+IF (exist? "library")
+
+=][=
+   (if (not (exist? "lib-name"))
+    (error (string-append prog-name " library did not specify lib-name")) )
+   (define lib-name (string->c-name! (get "lib-name")) ) =]
+extern tOptDesc*  [= (. lib-name) =]_optDesc_p;
+#define           [= (. UP-prefix) =]DESC(n) ([= (. lib-name)
+ =]_optDesc_p - 1 + INDEX_[= (. UP-prefix) =]OPT_ ## n)
+[=
+
+ELSE =][=
+
+  FOR lib-name          =]
+extern tOptDesc*  [= (string->c-name! (get "lib-name")) =]_optDesc_p;[=
+  ENDFOR  lib-name      =][=
+
+  IF (> 1 (string-length UP-prefix)) =]
+#define         DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n][=
+
+  ELSE not a library and have prefix   =]
+#define         [= (. UP-prefix)
+              =]DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_[= (. UP-prefix)
+                                                          =]OPT_ ## n][=
+
+  ENDIF prefix/not      =][=
+
+ENDIF library exists    =][=
+
 IF (> 1 (string-length UP-prefix))
 
 =]
-#define         DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n]
 #define     HAVE_OPT(n) (! UNUSED_OPT(& DESC(n)))
 #define      OPT_ARG(n) (DESC(n).pzLastArg)
 #define    STATE_OPT(n) (DESC(n).fOptState & OPTST_SET_MASK)
@@ -93,7 +121,6 @@ IF (> 1 (string-length UP-prefix))
 ELSE we have a prefix:
 
 =][=  (sprintf "
-#define         %1$sDESC(n) %2$sOptions.pOptDesc[INDEX_%1$sOPT_ ## n]
 #define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
 #define      %1$sOPT_ARG(n) (%1$sDESC(n).pzLastArg)
 #define    STATE_%1$sOPT(n) (%1$sDESC(n).fOptState & OPTST_SET_MASK)

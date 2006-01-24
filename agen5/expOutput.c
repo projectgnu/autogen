@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.8 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: expOutput.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -81,12 +81,21 @@ removeWriteAccess( int fd )
 static void
 addWriteAccess( char* pzFileName )
 {
-    struct stat    sbuf;
+    struct stat sbuf;
+
+#ifdef DEBUG_ENABLED
+    /*
+     *  "stat(2)" does not initialize the entire structure.
+     */
+    memset( &sbuf, NUL, sizeof(sbuf) );
+#endif
+
     stat( pzFileName, &sbuf );
+
     /*
      *  Or in the user write bit
      */
-    sbuf.st_mode = sbuf.st_mode | S_IWUSR;
+    sbuf.st_mode |= S_IWUSR;
     chmod( pzFileName, sbuf.st_mode & S_IAMB );
 }
 

@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.15 2005/12/13 19:16:44 bkorb Exp $
+#$Id: optcode.tpl,v 4.16 2006/01/24 21:29:19 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2005-12-13 10:08:26 bkorb"
+# Time-stamp:      "2006-01-21 10:30:31 bkorb"
 
 =][=
 
@@ -360,7 +360,17 @@ tOptions [=(. pname)=]Options = {
     },
     [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */
 };
+[=
 
+FOR lib-name
+
+=]
+tOptDesc* [= (string->c-name! (get "lib-name")) =]_optDesc_p = NULL;
+[=
+
+ENDFOR
+
+=]
 /*
  *  Create the static procedure(s) declared above.
  */

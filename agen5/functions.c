@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.5 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: functions.c,v 4.6 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -76,9 +76,9 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
         if (OPT_VALUE_TRACE > TRACE_NOTHING) {
             tSCC zTplFmt[] = "Template %s included\n";
             tSCC zLinFmt[] = "\tfrom %s line %d\n";
-            fprintf( pfTrace, zTplFmt, pNewTpl->pzFileName );
+            fprintf( pfTrace, zTplFmt, pNewTpl->pzTplFile );
             if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                fprintf( pfTrace, zLinFmt, pCurTemplate->pzFileName,
+                fprintf( pfTrace, zLinFmt, pCurTemplate->pzTplFile,
                          pMac->lineNo );
         }
 
@@ -132,8 +132,8 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
     tTemplate* pInv = findTemplate( pT->pzTemplText + pMac->ozName );
     if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf( pfTrace, zTrcFmt, "remapped to Define", pMac->funcCode,
-                     pT->pzFileName, pMac->lineNo );
+            fprintf( pfTrace, zTrcFmt, "remapped to 'Invoke'", pMac->funcCode,
+                     pT->pzTplFile, pMac->lineNo );
         pMac->funcCode    = FTYP_DEFINE;
         pMac->funcPrivate = (void*)pInv;
         parseMacroArgs( pT, pMac );
@@ -142,7 +142,7 @@ mFunc_Unknown( tTemplate* pT, tMacro* pMac )
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
         fprintf( pfTrace, zTrcFmt, "remapped to Expr", pMac->funcCode,
-                 pT->pzFileName, pMac->lineNo );
+                 pT->pzTplFile, pMac->lineNo );
         fprintf( pfTrace, "\tbased on %s\n", pT->pzTemplText + pMac->ozName );
     }
 
@@ -371,7 +371,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         pzMac = apzFuncNames[ ix ];
     }
 
-    pzSrc = aprf( zUnk, pT->pzFileName, pMac->lineNo, pzMac, pzSrc );
+    pzSrc = aprf( zUnk, pT->pzTplFile, pMac->lineNo, pzMac, pzSrc );
 
     AG_ABEND_IN( pT, pMac, pzSrc );
     /* NOTREACHED */

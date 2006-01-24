@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.7 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: funcCase.c,v 4.8 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -993,7 +993,7 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
                          pzSampleText );
 
                 if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pMac->lineNo );
             }
 
@@ -1018,7 +1018,7 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
                          pT->pzTemplText + pMac->ozText );
 
                 if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pCurTemplate->pzFileName,
+                    fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pMac->lineNo );
             }
 
@@ -1143,6 +1143,8 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *  what:    Selection block for CASE function
  *  in-context:
  *  alias:   | ~ | = | * | ! | + |
+ *  unload-proc:
+ *
  *  desc:
  *    This macro selects a block of text by matching an expression
  *    against the sample text expression evaluated in the @code{CASE}
@@ -1300,6 +1302,17 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
     return pMac + 1;
 }
+
+void
+mUnload_Select( tMacro* pMac )
+{
+    if (pMac->funcPrivate != NULL) {
+        regex_t* pRe = (regex_t*)pMac->funcPrivate;
+        regfree( pRe );
+        AGFREE(pRe);
+    }
+}
+
 /*
  * Local Variables:
  * mode: C

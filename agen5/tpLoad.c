@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.9 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.10 2006/01/24 21:29:19 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -243,24 +243,21 @@ loadMacros( tTemplate* pT,
         char*   pzText = (char*)(pMac + pT->macroCt);
         size_t  len;
 
-        pT->pzFileName = pzText;
-        len = strlen( pzF ) + 1;
-        memcpy( (void*)pzText, (void*)pzF, len );
-        pzText += len;
-        if (pzN != NULL) {
-            len = strlen( pzN ) + 1;
-            memcpy( (void*)pzText, (void*)pzN, len );
-            pzText += len;
-        }
+        pT->pzTplFile = strdup(pzF);
 
+        len = strlen( pzN ) + 1;
+        memcpy( (void*)pzText, (void*)pzN, len );
+        pT->pzTplName   = pzText;
+        pzText         += len;
         pT->pzTemplText = pzText;
-        pT->pNext = pzText + 1;
+        pT->pNext       = pzText + 1;
     }
 
     pCurTemplate = pT;
 
     {
         tMacro* pMacEnd = parseTemplate( pMac, &pzData );
+        int     ct;
 
         /*
          *  Make sure all of the input string was scanned.
@@ -268,32 +265,28 @@ loadMacros( tTemplate* pT,
         if (pzData != NULL)
             AG_ABEND( "Template parse ended unexpectedly" );
 
-        pT->macroCt = pMacEnd - pMac;
+        ct = pMacEnd - pMac;
 
         /*
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
-        if ((void*)pMacEnd < (void*)(pT->pzFileName)) {
-            int  delta = pT->pzFileName - (char*)pMacEnd;
-            int  size  = (pT->pNext - pT->pzFileName);
-            memmove( (void*)pMacEnd, (void*)(pT->pzFileName),
-                     size );
-            pT->pzFileName  -= delta;
+        if (ct < pT->macroCt) {
+            int   delta = sizeof(tMacro) * (pT->macroCt - ct);
+            void* data  =
+                (pT->pzTplName == NULL) ? pT->pzTemplText : pT->pzTplName;
+            int   size  = pT->pNext - (char*)data;
+            memmove( (void*)pMacEnd, data, size );
+
             pT->pzTemplText -= delta;
             pT->pNext       -= delta;
-            if (pT->pzTplName != 0)
-                pT->pzTplName -= delta;
+            pT->pzTplName   -= delta;
+            pT->macroCt      = ct;
         }
     }
 
-    pT->descSize     = pT->pNext - (char*)pT;
-    pT->descSize    += 0x40;
-    pT->descSize    &= ~0x3F;
-    pT->pzFileName  -= (long)pT;
-    pT->pzTplName    = 0;
-    pT->pzTemplText -= (long)pT;
-    pT->pNext        = NULL;
+    pT->descSize = pT->pNext - (char*)pT;
+    pT->pNext    = NULL;
 
     /*
      *  We cannot reallocate a smaller array because
@@ -307,37 +300,6 @@ loadMacros( tTemplate* pT,
         fprintf( pfTrace, zSum, pT->macroCt, pzF, pT->descSize );
     }
 #endif
-}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Convert a template from data file format to internal format.
- */
-LOCAL tTemplate*
-templateFixup( tTemplate* pTList, size_t ttlSize )
-{
-    tTemplate* pT = pTList;
-
-    for (;;) {
-        size_t  tplSize = pT->descSize;
-
-        pT->pzFileName  += (long)pT;
-        if (pT->pzTplName != (char*)0)
-            pT->pzTplName = 0;
-        pT->pzTemplText += (long)pT;
-
-        ttlSize -= tplSize;
-        if (ttlSize <= sizeof( tTemplate))
-            break;
-
-        pT->fd    = 0;
-        pT->pNext = (char*)pT + tplSize;
-        pT = (tTemplate*)(pT->pNext);
-    }
-
-    pT->pNext = NULL;
-    return pTList;
 }
 
 
@@ -370,8 +332,6 @@ loadTemplate( tCC* pzFileName )
 
     {
         size_t       macroCt;
-        tTemplate    tmpTpl;
-        tTemplate*   pSaveTpl = pCurTemplate;
         tMacro*      pSaveMac = pCurMacro;
         size_t       alocSize;
         tCC*         pzData;
@@ -381,9 +341,7 @@ loadTemplate( tCC* pzFileName )
          *  starts immediately after it.
          */
         pCurMacro    = NULL;
-        pCurTemplate = &tmpTpl;
-        AGDUPSTR( tmpTpl.pzFileName, pzFileName, "mmapped file name" );
-        pzData = loadPseudoMacro( (tCC*)mapInfo.txt_data, tmpTpl.pzFileName );
+        pzData = loadPseudoMacro( (tCC*)mapInfo.txt_data, pzFileName );
 
         /*
          *  Count the number of macros in the template.  Compute
@@ -405,44 +363,68 @@ loadTemplate( tCC* pzFileName )
         pRes->magic     = magicMark;
         pRes->descSize  = alocSize;
         pRes->macroCt   = macroCt;
-        pRes->fd        = -1;
         strcpy( pRes->zStartMac, zStartMac ); /* must fit */
         strcpy( pRes->zEndMac, zEndMac );     /* must fit */
-        loadMacros( pRes, tmpTpl.pzFileName, NULL, pzData );
+        loadMacros( pRes, pzFileName, "*template file*", pzData );
+
+        pRes->pzTplName   -= (long)pRes;
+        pRes->pzTemplText -= (long)pRes;
         pRes = (tTemplate*)AGREALOC( (void*)pRes, pRes->descSize,
                                      "resize template" );
+        pRes->pzTplName   += (long)pRes;
+        pRes->pzTemplText += (long)pRes;
 
         text_munmap( &mapInfo );
-        pRes = templateFixup( pRes, pRes->descSize );
-        pCurTemplate = pSaveTpl;
         pCurMacro    = pSaveMac;
     }
 
     return pRes;
 }
 
-extern void
+LOCAL void
 unloadTemplate( tTemplate* pT )
 {
-    if (0) {
-        tMacro* pMac = pT->aMacros;
-        int ct = pT->macroCt;
+    tMacro* pMac = pT->aMacros;
+    int ct = pT->macroCt;
 
-        while (--ct >= 0) {
-            tpUnloadProc proc;
-            /*
-             *  There are no table entries for ``FTYP_SELECT_*''.
-             */
-            if (FUNC_CT > pMac->funcCode) {
-                proc = apUnloadProc[ pMac->funcCode ];
-                if (proc != NULL)
-                    (*proc)( pMac );
-            }
-            pMac++;
-        }
-        AGFREE( pT );
+    while (--ct >= 0) {
+        tpUnloadProc proc;
+        unsigned int ix = pMac->funcCode;
+
+        /*
+         *  "select" functions get remapped, depending on the alias used
+         *  for the selection.  See the "teFuncType" enumeration in functions.h.
+         */
+        if (ix >= FUNC_CT)
+            ix = FTYP_SELECT;
+
+        proc = apUnloadProc[ ix ];
+        if (proc != NULL)
+            (*proc)( pMac );
+
+        pMac++;
     }
+
+    AGFREE( (void*)(pT->pzTplFile) );
+    AGFREE( pT );
 }
+
+LOCAL void
+cleanup( tTemplate* pTF )
+{
+    for (;;) {
+        tTemplate* pT = pNamedTplList;
+        if (pT == NULL)
+            break;
+        pNamedTplList = (tTemplate*)pT->pNext;
+        unloadTemplate( pT );
+    }
+    unloadTemplate( pTF );
+
+    unloadDefs();
+    ag_scmStrings_deinit();
+}
+
 /*
  * Local Variables:
  * mode: C
