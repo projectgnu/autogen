@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: funcDef.c,v 4.8 2006/01/24 23:19:11 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -243,6 +243,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
                 char* pz = (char*)AGALOC( 24, "quoted string" );
                 memcpy( (void*)pz, pDL->pzExpr, (pzScan - pDL->pzExpr) );
                 pDL->pzExpr = pz;
+                manageAllocatedData( pz );
             }
             spanQuote( pDL->pzExpr );
             /* FALLTHROUGH */

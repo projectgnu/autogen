@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: funcFor.c,v 4.10 2006/01/24 23:19:11 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -517,6 +517,7 @@ load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
         pz = AGALOC( srcLen + 2 + nmlen, "copy of FOR x IN ... text" );
         strcpy( pz, pzName );
         pzName = pz;
+        manageAllocatedData(pz);
         pz += nmlen + 1;
     }
 

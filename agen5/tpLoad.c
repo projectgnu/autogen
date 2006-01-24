@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.10 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.11 2006/01/24 23:19:11 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -412,6 +412,7 @@ unloadTemplate( tTemplate* pT )
 LOCAL void
 cleanup( tTemplate* pTF )
 {
+#if ! defined(DEBUG_ENABLED)
     for (;;) {
         tTemplate* pT = pNamedTplList;
         if (pT == NULL)
@@ -419,10 +420,14 @@ cleanup( tTemplate* pTF )
         pNamedTplList = (tTemplate*)pT->pNext;
         unloadTemplate( pT );
     }
-    unloadTemplate( pTF );
 
+    AGFREE( forInfo.fi_data );
+    unloadTemplate( pTF );
     unloadDefs();
     ag_scmStrings_deinit();
+
+    manageAllocatedData( NULL );
+#endif
 }
 
 /*

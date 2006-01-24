@@ -27,6 +27,8 @@
 	that there is one "lib-name" defined and use it in the definition of
 	the DESC() macro.  Otherwise, do the normal thing.
 	* config/bootstrap.local(Makefile.am): do a move-if-changed thing.
+	* agen5/defLoad.c(manageAllocatedData): clean up data at shutdown,
+	iff DEBUG_ENABLED.
 
 2006-01-20  Bruce Korb  <bkorb@gnu.org>
 

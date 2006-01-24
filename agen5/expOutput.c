@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: expOutput.c,v 4.10 2006/01/24 23:19:11 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -368,6 +368,7 @@ ag_scm_out_push_new( SCM new_file )
             }
 
             pzTemp = aprf( "%s/agtmp.XXXXXX", pz );
+            manageAllocatedData((void*)pzTemp);
             TAGMEM( pzTemp, "Saved temp file template" );
         }
 

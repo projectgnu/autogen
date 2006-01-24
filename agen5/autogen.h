@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.12 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: autogen.h,v 4.13 2006/01/24 23:19:11 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -433,16 +433,8 @@ extern size_t strlcpy( char* dest, const char* src, size_t n );
 #ifdef ENABLE_FMEMOPEN
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  IF we have fopencookie or funopen, then we also have our own fmemopen...
- *
- *  Special ioctl/"seek" requests
+ *  IF we have fopencookie or funopen, then we also have our own fmemopen
  */
-#define FMEM_IOCTL_BUF_ADDR  0x80000001
-
-/*
- *  Save the buffer on close
- */
-#define FMEM_IOCTL_SAVE_BUF  0x80000002
 
 extern FILE * ag_fmemopen (void *buf, ssize_t len, const char *mode);
 #endif
@@ -472,6 +464,12 @@ extern void  ag_scmStrings_init(   void );
 extern void  ag_scmStrings_deinit( void );
 extern void  ag_scmStrings_free(   void );
 extern char* ag_scribble( size_t size );
+
+#if defined(DEBUG_ENABLED)
+  extern void manageAllocatedData( void* pd );
+#else
+# define manageAllocatedData(_ptr)
+#endif
 
 /*
  *  Code variations based on the version of Guile:

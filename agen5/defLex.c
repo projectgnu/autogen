@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.11 2005/12/04 22:18:40 bkorb Exp $
+ *  $Id: defLex.c,v 4.12 2006/01/24 23:19:11 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -224,6 +224,7 @@ scanAgain:
             goto scanAgain;
         TAGMEM( pz, "shell definition string" );
         pz_token = pz;
+        manageAllocatedData( pz );
         break;
     }
 
@@ -357,6 +358,7 @@ loadScheme( void )
         AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
 
         pz_token = pzEnd;
+        manageAllocatedData( pz_token );
     }
 
     else {

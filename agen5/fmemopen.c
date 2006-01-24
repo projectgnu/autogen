@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2005
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2005-11-26 07:14:16 bkorb"
+ * Time-stamp:      "2006-01-24 14:47:47 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -311,7 +311,7 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
 
 
 static seek_pos_t
-fmem_seek (void *cookie, fmem_off_t *p_offset, int dir)
+fmem_seek( void *cookie, fmem_off_t *p_offset, int dir)
 {
     fmem_off_t new_pos;
     fmem_cookie_t *pFMC = cookie;
@@ -320,23 +320,6 @@ fmem_seek (void *cookie, fmem_off_t *p_offset, int dir)
     case SEEK_SET: new_pos = *p_offset;  break;
     case SEEK_CUR: new_pos = pFMC->next_ix  + *p_offset;  break;
     case SEEK_END: new_pos = pFMC->eof - *p_offset;  break;
-
-#ifdef UNVERIFIED_SEEK_DIRECTIONS
-    /*
-     *  This is how we get our IOCTL's.  There is no official way.
-     *  We cannot extract our cookie pointer from the FILE* struct
-     *  any other way.  :(  Fortunately, we know that "fmem_off_t"-s are
-     *  long-s and we know that sizeof(char*) == sizeof(long)  :-)
-     */
-    case FMEM_IOCTL_SAVE_BUF:
-        pFMC->mode &= ~FLAG_BIT(allocated);
-        /* FALLTHROUGH */
-
-    case FMEM_IOCTL_BUF_ADDR:
-        *(char**)p_offset = pFMC->buffer;
-        new_pos = pFMC->next_ix;
-        break;
-#   endif
 
     default:
         goto seek_oops;

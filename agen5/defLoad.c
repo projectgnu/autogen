@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.9 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: defLoad.c,v 4.10 2006/01/24 23:19:11 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -39,6 +39,40 @@ static tDefEntry*
 insertDef( tDefEntry* pDef );
 /* = = = END-STATIC-FORWARD = = = */
 
+#if defined(DEBUG_ENABLED)
+void
+manageAllocatedData( void* pd )
+{
+    static int    allocPtrCt   = 0;
+    static int    usedPtrCt    = 0;
+    static void** papAllocData = NULL;
+
+    if (pd == NULL) {
+        void** pp = papAllocData;
+        if (pp == NULL)
+            return;
+
+        while (--usedPtrCt >= 0)
+            AGFREE(*(pp++));
+
+        AGFREE(papAllocData);
+        papAllocData = NULL;
+
+    } else {
+        if (++usedPtrCt > allocPtrCt) {
+            allocPtrCt += 16;
+            papAllocData = (usedPtrCt > 1)
+                ? AGREALOC( papAllocData, allocPtrCt * sizeof(void*),
+                            "alloc table" )
+                : AGALOC( allocPtrCt * sizeof(void*), "new alloc table" );
+            if (papAllocData == NULL)
+                AG_ABEND( "failed alloc of papAllocData" );
+        }
+        papAllocData[usedPtrCt-1] = pd;
+    }
+}
+#endif
+
 LOCAL void
 freeEntry( tDefEntry* pDE )
 {
@@ -58,6 +92,8 @@ getEntry( void )
     } else {
         int   ct = ENTRY_ALLOC_CT-1;
         void* p  = AGALOC( ENTRY_ALLOC_SIZE, "definition headers" );
+
+        manageAllocatedData(p);
 
         *((void**)p) = pAllocList;
         pAllocList   = p;
@@ -256,6 +292,7 @@ readDefines( void )
         memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
         pBaseCtx->lineNo     = 1;
         pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
+        manageAllocatedData( pBaseCtx );
         return;
     }
 
@@ -412,6 +449,8 @@ readDefines( void )
 
     *pzData = NUL;
     AGDUPSTR( pBaseCtx->pzCtxFname, pzDefFile, "def file name" );
+    manageAllocatedData( pBaseCtx );
+    manageAllocatedData( (void*)pBaseCtx->pzCtxFname );
 
     /*
      *  Close the input file, parse the data

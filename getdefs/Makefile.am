@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2005 Bruce Korb
 ##
-## Time-stamp:      "2006-01-22 12:13:43 bkorb"
+## Time-stamp:      "2006-01-24 14:44:15 bkorb"
 ## Copyright (c):   1997-2005 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2006/01/24 21:29:19 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2006/01/24 23:19:11 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -24,7 +24,8 @@ AGENV           = LD_LIBRARY_PATH=`f=$(top_builddir)/autoopts ; \
 SUBDIRS         = test
 BUILT_SOURCES   = opts.c opts.h gd.c
 EXTRA_DIST      = opts.def $(gdsrcs)
-RUNAG           = valgrind --leak-check=full $(AGexe)
+## RUNAG        = valgrind $(AGexe)
+RUNAG           = $(AGexe)
 AGEXE_LIB       = $(AGENV) $(RUNAG) -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
