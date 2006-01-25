@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.16 2006/01/24 21:29:19 bkorb Exp $
+#$Id: optcode.tpl,v 4.17 2006/01/25 19:12:52 bkorb Exp $
 
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2006-01-21 10:30:31 bkorb"
+# Time-stamp:      "2006-01-25 07:50:05 bkorb"
 
 =][=
 
@@ -23,7 +23,11 @@ IF (or (= "optionPutShell"    (get "main.shell-process"))
 ENDIF
 =]
 #define OPTION_CODE_COMPILE 1
-#include "[= (. header-file) =]"
+#include "[=
+
+ (define lib-externs "")
+
+ header-file =]"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -84,6 +88,14 @@ IF (exist? "include") =]
 FOR flag "\n"      =][=
 
   Option_Strings   =][=
+
+  (if (exist? "lib-name") (begin
+      (set! lib-opt-ptr (string->c-name! (string-append
+                        (get "lib-name") "_" (get "name") "_optDesc_p")))
+      (set! lib-externs (string-append lib-externs
+                        (sprintf "tOptDesc const* %-16s = optDesc + %d;\n"
+                                 lib-opt-ptr (for-index) )  ))
+  )   )             =][=
 
 ENDFOR flag
 =]
@@ -227,7 +239,7 @@ ENDIF
 
 =]
 };
-
+[= (. lib-externs) =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Define the [= (. pname-cap) =] Option Environment

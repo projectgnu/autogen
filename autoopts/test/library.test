@@ -1,0 +1,154 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# ----------------------------------------------------------------------
+# library.test     ---  test library options
+#
+# Time-stamp:        "2006-01-25 09:36:00 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Maintainer:        Bruce Korb <bkorb@gnu.org>
+# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+#
+# $Id: library.test,v 4.1 2006/01/25 19:12:52 bkorb Exp $
+# ----------------------------------------------------------------------
+
+. ./defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+DEND=\<\<'- _DESC_END_'
+
+cat > ${testname}-libopts.def <<- _EODefs_
+	flag = { name = zzyzx-opts;
+	  documentation;
+	  lib-name = zzyzx;
+	  descrip = ${DEND}
+		This option introduces the options for the
+		zzyzx library.
+		_DESC_END_;
+	};
+	flag = {
+	  name  = library;
+	  value = c;
+	  ifdef = LIBOPTS;
+	  descrip = "library test";
+	  doc   = mumble;
+	};
+	_EODefs_
+
+cat > ${testname}-lib.def <<- _EODefs_
+
+	AutoGen definitions options;
+
+	prog-name  = ${testname};
+	prog-title = lib-${testname};
+	config-header = 'config.h';
+
+	library;
+	#include ${testname}-libopts.def
+	_EODefs_
+
+cat > ${testname}-prog.def <<- _EOF_
+
+	AutoGen definitions options;
+
+	prog-name  = test-lib-prog;
+	prog-title = 'Test ${testname} Program';
+	config-header = 'config.h';
+
+	flag = {
+	  name  = program;
+	  value = p;
+	  descrip = "${testname} program test";
+	  doc   = stumble;
+	};
+
+	#include ${testname}-libopts.def
+	_EOF_
+
+echo ${AG_L} ${testname}-lib.def
+${AG_L} ${testname}-lib.def || \
+  failure AutoGen could not process ${testname}-lib.def
+
+echo ${AG_L} ${testname}-prog.def
+${AG_L} ${testname}-prog.def || \
+  failure AutoGen could not process ${testname}-prog.def
+
+for f in lib prog
+do
+  sed -e '1,/include <autoopts\/options.h>/d' \
+      -e '/endif .* AUTOOPTS_.*_H_GUARD/,$d' \
+      -e 's/near line [0-9]*/near line XXX/' \
+      ${testname}-${f}.h > ${testname}-${f}.h-res || \
+   failure could not sed ${testname}-${f}.h
+done
+
+# # # # # # # # # # TEST PROGRAM # # # # # # # # # #
+
+cat > ${testname}-lib.c <<- _EOCode_
+	#include <stdlib.h>
+	#define LIBOPTS
+	#include "${testname}-lib.h"
+	void check_library_opt( void ) {
+	  if (HAVE_OPT(LIBRARY)) return;
+	  exit( EXIT_FAILURE ); }
+	_EOCode_
+test $? -eq 0 || failure cannot create ${testname}-lib.c
+
+${CC} ${CFLAGS} ${INC} -o ${testname}-lib.o -c ${testname}-lib.c
+test $? -eq 0 || failure cannot compile ${testname}-lib.c
+
+cat > ${testname}-main.c <<- _EOCode_
+	#include <stdio.h>
+	#include <stdlib.h>
+	#define LIBOPTS
+	#include "${testname}-prog.c"
+	extern void check_library_opt( void );
+	int main( int argc, char** argv ) {
+	  int ct = optionProcess( &test_lib_progOptions, argc, argv );
+	  check_library_opt();
+	  return EXIT_SUCCESS; }
+	_EOCode_
+
+${CC} ${CFLAGS} ${INC} -o ${testname} ${testname}-main.c ${testname}-lib.o ${LIB}
+test $? -eq 0 || failure cannot compile ${testname}-main.c
+
+./${testname} -c || failure library option not detected
+
+# # # # # # # # # # HELP OUTPUT # # # # # # # # # #
+
+./${testname} -? > ${testname}.help-sample
+
+cat > ${testname}.help-base <<- _EOHelp_
+test-lib-prog - Test library Program
+USAGE:  library [ -<flag> ]...
+  Flg Arg Option-Name    Description
+   -p no  program        library program test
+
+This option introduces the options for the
+zzyzx library.
+
+  Flg Arg Option-Name    Description
+   -c no  library        library test
+
+version and help options:
+
+  Flg Arg Option-Name    Description
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+	_EOHelp_
+
+cmp ${testname}.help-* || \
+  failure "help output mismatch:
+`diff ${testname}.help-*`"
+
+cleanup
+
+## Local Variables:
+## Mode: shell-script
+## tab-width: 8
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of library.test

@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.11 2006/01/24 21:29:19 bkorb Exp $
+# $Id: opthead.tpl,v 4.12 2006/01/25 19:12:52 bkorb Exp $
 # Automated Options copyright 1992-2005 Bruce Korb
-# Time-stamp:      "2006-01-21 10:49:48 bkorb"
+# Time-stamp:      "2006-01-25 08:34:12 bkorb"
 
 =]
 /*
@@ -15,7 +15,7 @@
 [= Option_Copyright =][=
 % config-header "\n#include \"%s\""=]
 #include <autoopts/options.h>
-
+[= IF (not (exist? "library")) =]
 /*
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
@@ -28,7 +28,7 @@
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
 # error option template version mismatches autoopts/options.h header
 #endif
-
+[= ENDIF not a library =]
 /*
  *  Enumeration of each option:
  */
@@ -41,21 +41,27 @@ ENDFOR flag =][=
 
 (define option-ct (count "flag")) =][=
 
-IF (exist? "version") =]
+IF (exist? "library") =]
+        LIBRARY_OPTION_COUNT[=
+
+ELSE        =][=
+
+  IF (exist? "version") =]
         [= (. INDEX-pfx) =]VERSION          = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
-ENDIF =]
+  ENDIF =]
         [= (. INDEX-pfx) =]HELP             = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
         [= (. INDEX-pfx) =]MORE_HELP        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
 
-IF (exist? "homerc") =],
+  IF (exist? "homerc") =],
         [= (. INDEX-pfx) =]SAVE_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
         [= (. INDEX-pfx) =]LOAD_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-ENDIF =]
+  ENDIF =][=
+ENDIF   =]
 } te[=(. Cap-prefix)=]OptIndex;
 
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
@@ -73,23 +79,15 @@ ENDIF (exist? version) =]
 
 IF (exist? "library")
 
-=][=
-   (if (not (exist? "lib-name"))
-    (error (string-append prog-name " library did not specify lib-name")) )
-   (define lib-name (string->c-name! (get "lib-name")) ) =]
-extern tOptDesc*  [= (. lib-name) =]_optDesc_p;
-#define           [= (. UP-prefix) =]DESC(n) ([= (. lib-name)
- =]_optDesc_p - 1 + INDEX_[= (. UP-prefix) =]OPT_ ## n)
-[=
+=]
+extern tOptDesc const* [= (. lib-opt-ptr) =];
+#define         [= (. UP-prefix) =]DESC(n) ([= (. lib-opt-ptr)
+ =][ [= (. INDEX-pfx) =] ## n ])[=
 
 ELSE =][=
 
-  FOR lib-name          =]
-extern tOptDesc*  [= (string->c-name! (get "lib-name")) =]_optDesc_p;[=
-  ENDFOR  lib-name      =][=
-
   IF (> 1 (string-length UP-prefix)) =]
-#define         DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n][=
+#define        DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n][=
 
   ELSE not a library and have prefix   =]
 #define         [= (. UP-prefix)
@@ -248,14 +246,17 @@ IF (exist? "homerc") =]
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (const char*)(a) )[=
 ENDIF
-=]
+=][=
 
+IF (not (exist? "library"))
+
+=]
 /*
  *  Interface defines not associated with particular options
  */
 #define ERRSKIP_[=
 
-IF (> 1 (string-length UP-prefix))
+  IF (> 1 (string-length UP-prefix))
 
 =][= (sprintf  "OPTERR  STMTS( %1$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
 #define ERRSTOP_OPTERR  STMTS( %1$sOptions.fOptSet |= OPTPROC_ERRSTOP )
@@ -266,7 +267,7 @@ IF (> 1 (string-length UP-prefix))
 #define USAGE(c)        (*%1$sOptions.pUsageProc)( &%1$sOptions, c )"
    pname ) =][=
 
-ELSE  we have a prefix
+  ELSE  we have a prefix
 
 =][= (sprintf  "%1$sOPTERR  STMTS( %2$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
 #define ERRSTOP_%1$sOPTERR  STMTS( %2$sOptions.fOptSet |= OPTPROC_ERRSTOP )
@@ -278,12 +279,18 @@ ELSE  we have a prefix
 
   UP-prefix  pname ) =][=
 
-ENDIF    have/don't have prefix  '
+  ENDIF    have/don't have prefix  ' =][=
+
+ENDIF is not a library
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 =][=
 (tpl-file-line extract-fmt)
+=][=
+
+IF (not (exist? "library"))
+
 =]
 /* * * * * *
  *
@@ -295,16 +302,16 @@ extern "C" {
 
 extern tOptions   [=(. pname)=]Options;[=
 
-IF (exist? "export")=]
+  IF (exist? "export")  =]
 
 /* * * * * *
  *
  *  Globals exported from the [=prog_title=] option definitions
  */
-[= FOR export "\n\n" =][=
-      export         =][=
-   ENDFOR export     =][=
-ENDIF=]
+[=  FOR export "\n\n"   =][=
+      export            =][=
+    ENDFOR export       =][=
+  ENDIF export exists   =]
 
 #ifndef _
 #  if ENABLE_NLS
@@ -321,7 +328,11 @@ ENDIF=]
 
 #ifdef  __cplusplus
 }
-#endif
+#endif[=
+
+ENDIF this is not a lib
+
+=]
 #endif /* [=(. header-guard)=] */
 /*
  * Local Variables:

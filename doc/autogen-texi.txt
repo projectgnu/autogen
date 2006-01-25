@@ -2062,50 +2062,14 @@ where @code{optionProcess} (@pxref{libopts-optionProcess}) needs to be called
 again, the current option can be set with @code{RESTART_OPT(n)}
 (@pxref{RESTART_OPT}) before calling @code{optionProcess}.
 
+See: @xref{library attributes}.
+
 @item
 library options.  An AutoOpt-ed library may export its options for use in
 an AutoOpt-ed program.  This is done by providing an option definition file
 that client programs @code{#include} into their own option definitions.
-The first option in that file should be something approximating:
-
-@example
-export  = 'tOptDesc* mylib_opts_desc_p;';
-include = 'tOptDesc* mylib_opts_desc_p = NULL;';
-
-flag = @{ name = libmine-doc; documentation;
-   settable;
-   desc = <<- _EOF_
-	These options are part of the libmine library.
-	They have been incorporated into this program.
-	_EOF_;
-   code = '  mylib_opts_desc_p = pOptDesc - 1;';
-@};
-@end example
-
-@noindent
-and the client program should invoke:
-
-@example
-SET_OPT_LIBMINE_DOC;
-@end example
-
-@noindent
-before calling any library routines.  The library can then refer to its
-options via @code{mylib_opts_desc_p}.  For example, if there were some
-option, @code{mumble}, its option descriptor would be:
-
-@example
-mylib_opts_desc_p + INDEX_OPT_MUMBLE
-@end example
-@noindent
-or, perhaps:
-@example
-#undef DESC
-#define DESC(n) mylib_opts_desc_p[INDEX_OPT_ ## n]
-if (mylib_opts_desc_p == NULL) @{
-  errno = EINVAL; return -1; @}
-if (HAVE_OPT(MUMBLE)) do_mumbly_things();
-@end example
+See ``AutoOpt-ed Library for AutoOpt-ed Program'' (@pxref{lib and program})
+for more details.
 @end enumerate
 
 @c === SECTION MARKER
@@ -2275,6 +2239,7 @@ the flexibility is there.
 
 @menu
 * program attributes::        Program Description Attributes
+* library attributes::        Options for Library Code
 * information attributes::    Program Information Attributes
 * Generated main::            Generating main procedures
 * option attributes::         Option Attributes
@@ -2398,6 +2363,127 @@ default: .<prog-name>rc
 Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
 @end table
+
+@node library attributes
+@subsection Options for Library Code
+@cindex library attributes
+
+Some libraries provide their own code for processing command line
+options, and this may be used by programs that utilize AutoOpts.
+You may also wish to write a library that gets configured with
+AutoOpts options and config files.  Such a library may either process its
+own options and configury routine, or it may export its option descriptions
+to programs that also use AutoOpts.  This section will describe how to
+do all of these different things.
+
+@menu
+* lib and program::         AutoOpt-ed Library for AutoOpt-ed Program
+* lib called::              AutoOpt-ed Library for Regular Program
+* prog calls lib::          AutoOpt-ed Program Calls Regular Library
+@end menu
+
+@node lib and program
+@subsubsection AutoOpt-ed Library for AutoOpt-ed Program
+
+The library source code must provide an option definition file that consists
+of only the @code{flag} entries.  The first @code{flag} entry must contain the
+following attributes:
+
+@table @samp
+@item name
+This name is used in the construction of a global pointer of type
+@code{tOptDesc const*}.  It is always required.
+@item documentation
+It tells @code{AutoOpts} that this option serves no normal purpose.
+It will be used to add usage clarity and to locate option descriptors
+in the library code.
+@item descrip
+This is a string that is inserted in the extended usage display
+before the options specific to the current library.  It is always required.
+@item lib-name
+This should match the name of the library.  This string is also used in
+the construction of the option descriptor pointer name.  In the end, it
+looks like this:
+@example
+extern tOptDesc const* <<lib-name>>_<<name>>_optDesc_p;
+@end example
+@noindent
+and is used in the macros generated for the library's @code{.h} file.
+@end table
+
+In order to compile this @code{AutoOpts} using library, you must create a
+special header that is not used by the client program.  This is accomplished
+by creating an option definition file that contains essentially exactly the
+following:
+
+@example
+AutoGen definitions options;
+prog-name  = does-not-matter;  // but is always required
+prog-title = 'also does not matter';  // also required
+config-header = 'config.h'; // optional, but common
+library;
+#include library-options-only.def
+@end example
+
+@noindent
+and nothing else.  AutoGen will produce only the @code{.h} file.
+You may now compile your library, referencing just this @code{.h} file.
+The macros it creates will utilize a global variable that will be defined
+by the @code{AutoOpts}-using client program.  That program will need to
+have the following @code{#include} in @i{its} option definition file:
+
+@example
+#include library-options-only.def
+@end example
+
+@noindent
+All the right things will magically happen so that the global variables
+named @code{<<lib-name>>_<<name>>_optDesc_p} are initialized correctly.
+For an example, please see the @code{AutoOpts} test script:
+@file{autoopts/test/library.test}.
+
+@node lib called
+@subsubsection AutoOpt-ed Library for Regular Program
+
+In this case, your library must provide an option processing function
+to a calling program.  This is accomplished by setting the @code{allow-errors}
+global option attribute.  Each time your option handling function is called,
+you must determine where your scan is to resume and tell the AutoOpts library
+by invoking:
+
+@example
+RESTART_OPT(next_arg_index);
+@end example
+
+@noindent
+and then invoke @code{not_opt_index = optionProcess(...)}.
+The @code{not_opt_index} value can be used to set @code{optind},
+if that is the global being used to scan the program argument array.
+
+In this method, do @strong{NOT} utilize the global @code{library} attribute.
+Your library must specify its options as if it were a complete program.
+You may choose to specify an alternate @code{usage()} function so that
+usage for other parts of the option interface may be displayed as well.
+See ``Program Information Attributes'' (@pxref{information attributes}).
+
+At the moment, there is no method for calling @code{optionUsage()} telling
+it to produce just the information about the options and not the program
+as a whole.  Some later revision after somebody asks.
+
+@node prog calls lib
+@subsubsection AutoOpt-ed Program Calls Regular Library
+
+As with providing an @code{AutoOpt}-ed library to a non-@code{AutoOpt}-ed
+program, you must write the option description file as if you were writing
+all the options for the program, but you should specify the
+@code{allow-errors} global option attribute and you will likely want an
+alternate @code{usage()} function (see ``Program Information Attributes''
+@pxref{information attributes}).  In this case, though, when
+@code{optionProcess()} returns, you need to test to see if there might be
+library options.  If there might be, then call the library's exported
+routine for handling command line options, set the next-option-to-process
+with the @code{RESTART_OPT()} macro, and recall @code{optionProcess()}.
+Repeat until done.
 
 @node Generated main
 @subsection Generating main procedures

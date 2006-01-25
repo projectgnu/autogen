@@ -1,3 +1,20 @@
+2006-01-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(lib-externs): collect declarations for
+	pointers to the option descriptors for library options and emit
+	them after the "optDesc" array has been defined.
+	* autoopts/opthead.tpl(library): omit help, version and option saving
+	stuff for libraries.  *do* include an external declaration for
+	the descriptor pointer that will be defined by client code.
+	Also, for libraries, skip over macros that manipulate the main
+	option structure.
+	* autoopts/options.tpl(library): For libraries, ensure that the first
+	option is a documentation option with a "lib-name" attribute.
+	Omit the ".c" output for libraries.
+	* autoopts/test/Makefile.am: add library.test
+	* autoopts/test/library.test: test this stuff
+	* doc/autogen-texi.txt: doc this stuff
+
 2006-01-24  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(inner_main): call new aggregated cleanup function
