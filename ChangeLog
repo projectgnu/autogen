@@ -1,3 +1,9 @@
+2006-01-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/text_mmap.c(text_mmap): request all the bytes desired.  If
+	the last one is past a page boundary, then change the mapping from the
+	file to anonymous (unmapped/zero) data.
+
 2006-01-25  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(lib-externs): collect declarations for

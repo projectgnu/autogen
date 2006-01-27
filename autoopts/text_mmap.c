@@ -1,7 +1,7 @@
 /*
- * $Id: text_mmap.c,v 4.8 2006/01/21 18:35:09 bkorb Exp $
+ * $Id: text_mmap.c,v 4.9 2006/01/27 22:28:09 bkorb Exp $
  *
- * Time-stamp:      "2006-01-18 13:20:54 bkorb"
+ * Time-stamp:      "2006-01-27 13:52:14 bkorb"
  */
 
 #define FILE_WRITABLE(_prt,_flg) \
@@ -124,7 +124,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
      *  do the mmap.  If we fail, then preserve errno, close the file and
      *  return the failure.
      */
-    pMI->txt_data = mmap( NULL, pMI->txt_size, prot, flags, pMI->txt_fd, 0 );
+    pMI->txt_data = mmap( NULL, pMI->txt_size+1, prot, flags, pMI->txt_fd, 0 );
     if (pMI->txt_data == MAP_FAILED_PTR) {
         pMI->txt_errno = errno;
         goto fail_return;
@@ -155,14 +155,14 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
             return pMI->txt_data;
 
         /*
-         *  Still here?  We have to append a page of NUL's
+         *  Still here?  We have to remap the trailing inaccessible page
+         *  either anonymously or to /dev/zero.
          */
         pMI->txt_full_size += pgsz;
 #if defined(MAP_ANONYMOUS)
         pNuls = mmap(
                 (void*)(((char*)pMI->txt_data) + pMI->txt_size),
-                pgsz,
-                PROT_READ|PROT_WRITE,
+                pgsz, PROT_READ|PROT_WRITE,
                 MAP_ANONYMOUS|MAP_FIXED|MAP_PRIVATE, 0, 0 );
 
         if (pNuls != MAP_FAILED_PTR)
@@ -180,7 +180,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         } else {
             pNuls = mmap(
                     (void*)(((char*)pMI->txt_data) + pMI->txt_size), pgsz,
-                    PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_PRIVATE,
+                    PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED,
                     pMI->txt_zero_fd, 0 );
 
             if (pNuls != MAP_FAILED_PTR)
