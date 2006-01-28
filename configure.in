@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2005 Bruce Korb
 dnl
-dnl Time-stamp:      "2005-12-13 11:45:04 bkorb"
+dnl Time-stamp:      "2006-01-28 12:48:45 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.12 2005/12/13 20:03:25 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.13 2006/01/28 21:26:57 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,8 +23,8 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.12 $),)dnl
-
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.13 $),)dnl
+[config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
 # ----------------------------------------------------------------------
@@ -192,7 +192,13 @@ AGexe=${ag_top_builddir}/agen5/${AGnam}
 GDexe=${ag_top_builddir}/getdefs/${GDnam}
 CLexe=${ag_top_builddir}/columns/${CLnam}
 M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`
+config_end_time=`date +%s 2>/dev/null`
+time_delta=`expr ${config_end_time} - ${config_start_time} 2>/dev/null`
+test -z "${time_delta}" && time_delta=10
+test ${time_delta} -lt 5 && time_delta=5
 ]
+AC_DEFINE_UNQUOTED(AG_DEFAULT_TIMEOUT, ${time_delta},
+                   [define to suitable timeout limit for shell command])
 AC_SUBST(M4_SRC)
 AC_SUBST(AGnam)
 AC_SUBST(GDnam)

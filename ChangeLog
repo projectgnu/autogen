@@ -1,3 +1,15 @@
+2006-01-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(loadData): guard against server disappearance.
+	* agen5/agUtils.c(zMakeGperf): move here from expGperf.c.  Easier to read
+	* agen5/expGperf.c(zMakeGperf): remove
+	(ag_scm_make_gperf): clean up cleanup and do the cleanup once only.
+	* agen5/opts.def(timeout): default value now a configurable
+	* agen5/test/gperf.test: trace the server shell text.  Makes it possible
+	to debug the thing.
+	* agen5/test/shell.test: increase the level of tracing to 'everything'.
+	* configure.in(AG_DEFAULT_TIMEOUT): base this on configure time.
+
 2006-01-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/text_mmap.c(text_mmap): request all the bytes desired.  If

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.9 2005/12/13 19:16:44 bkorb Exp $
+ *   $Id: opts.def,v 4.10 2006/01/28 21:26:57 bkorb Exp $
  *
  *  AutoGen copyright 1992-2005 Bruce Korb
  *
@@ -482,9 +482,9 @@ flag = {
     name        = timeout;
     value       = t;
     arg-type    = number;
-    arg-default = 10;
     arg-range   = "0->3600"; /* one hour limit */
     arg-name    = time-lim;
+
     descrip     = "Time limit for servers";
 #ifndef XML2AG
     ifdef       = SHELL_ENABLED;

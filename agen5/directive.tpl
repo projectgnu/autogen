@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.6 2005/12/05 20:46:43 bkorb Exp $
+# $Id: directive.tpl,v 4.7 2006/01/28 21:26:57 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -143,7 +143,74 @@ die() {
 }
 exec 2>&8
 AG_pid=[=
-(kr-string (out-pop #t))=] "\000.........";
+(kr-string (out-pop #t))=] "\000........."; /* K&R confuses emacs: " */
+
+
+#if defined(SHELL_ENABLED)
+/*
+ *  "gperf" functionality only works if the subshell is enabled.
+ */
+[= (out-push-new) \=]
+gpdir=.gperf.$$
+test -d ${gpdir} || mkdir ${gpdir} || die "cannot mkdir ${gpdir}"
+cd ${gpdir} || die cannot cd into ${gpdir}
+gpdir=`pwd`
+gperf_%2$s=${gpdir}/%2$s
+
+( cat <<- '_EOF_'
+	%%{
+	#include <stdio.h>
+	typedef struct index t_index;
+	%%}
+	struct index { char* name; int idx; };
+	%%%%
+	_EOF_
+
+  idx=1
+  while read f
+  do echo "${f}, ${idx}"
+     idx=`expr ${idx} + 1`
+  done <<- _EOLIST_
+%1$s
+	_EOLIST_
+
+  cat <<- '_EOF_'
+	%%%%
+	int main( int argc, char** argv ) {
+	    char*    pz = argv[1];
+	    t_index* pI = in_word_set( pz, strlen( pz ));
+	    if (pI == NULL)
+	        return 1;
+	    printf( "0x%%02X\n", pI->idx );
+	    return 0;
+	}
+	_EOF_
+) > %2$s.gperf
+
+gperf -t -D -k'*' %2$s.gperf > %2$s.c
+test $? -eq 0 || die "gperf failed on ${gpdir}/%2$s.gperf"
+
+res=`${MAKE-make} %2$s 2>&1`
+test $? -eq 0 -a -x ${gperf_%2$s} || \
+  die "could not build gperf program: ${res}"
+[=
+  (set! tmp-txt (out-pop #t))
+  (emit (sprintf "static const char zMakeGperf[%d] =\n"
+                 (+ 1 (string-length tmp-txt)) ))
+  (kr-string tmp-txt)
+=]; /* K&R confuses emacs: " */
+
+[= (out-push-new) \=]
+test -n "${gperf_%1$s}" || die 'no environment variable "gperf_%1$s"'
+test -x "${gperf_%1$s}" || die "no gperf program named  ${gperf_%1$s}"
+${gperf_%1$s} %2$s
+[=
+  (set! tmp-txt (out-pop #t))
+  (emit (sprintf "static const char zRunGperf[%d] =\n"
+                 (+ 1 (string-length tmp-txt)) ))
+  (kr-string tmp-txt)
+=]; /* K&R confuses emacs: " */
+#endif
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {

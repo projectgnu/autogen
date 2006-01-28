@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.8 2005/12/04 22:18:41 bkorb Exp $
+ *  $Id: expGperf.c,v 4.9 2006/01/28 21:26:57 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -36,66 +36,6 @@ ag_scm_gperf( SCM name, SCM str )
     return SCM_UNDEFINED;
 }
 #else
-
-tSCC zMakeGperf[] =
-"gperf_%2$s=.gperf.$$/%2$s\n"
-"[ -d .gperf.$$ ] || mkdir .gperf.$$\n"
-
-"cd .gperf.$$ || {\n"
-"  echo 'cannot mkdir and enter .gperf.$$' >&2\n"
-"  exit 1\n}\n"
-
-"dir=`pwd` \n( "
-
-/*
- *  From here to the matching closing paren, we are constructing the
- *  gperf input file with every character written to stdout
- */
-"cat <<'_EOF_'\n"
-"%%{\n"
-"#" "include <stdio.h>\n"
-"typedef struct index t_index;\n"
-"%%}\n"
-"struct index { char* name; int idx; };\n"
-"%%%%\n"
-"_EOF_\n"
-
-"idx=1\n"
-"while read f\n"
-"do echo \"${f}, ${idx}\"\n"
-"   idx=`expr ${idx} + 1`\n"
-"done <<_EOLIST_\n"
-"%1$s\n"
-"_EOLIST_\n"
-
-"cat <<'_EOF_'\n"
-"%%%%\n"
-"int main( int argc, char** argv ) {\n"
-"    char*    pz = argv[1];\n"
-"    t_index* pI = in_word_set( pz, strlen( pz ));\n"
-"    if (pI == NULL)\n"
-"        return 1;\n"
-"    printf( \"0x%%02X\\n\", pI->idx );\n"
-"    return 0;\n"
-"}\n"
-"_EOF_\n"
-
-/*
- *  Now save the text into a xx.gperf file and also pass it
- *  through a pipe to gperf for it to do its thing.
- */
-") | tee %2$s.gperf | gperf -t -D -k'*' > %2$s.c\n"
-
-/*
- *  actually build the program using "make"
- */
-"res=`make %2$s 2>&1`\n"
-"test $? -eq 0 || die \"${res}\"\n"
-"echo rm -rf ${dir}";
-
-
-tSCC zRunGperf[] = "${gperf_%s} %s";
-
 
 /*=gfunc make_gperf
  *
@@ -134,10 +74,11 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      */
     {
         static const int makeGperfLine = __LINE__ + 2;
-        static const char zCleanup[] =
-            "(set! shell-cleanup (string-append shell-cleanup \"%s\n\"))\n";
+        static const char* pzCleanup =
+            "(set! shell-cleanup (string-append shell-cleanup "
+            "\"rm -rf ${gpdir}\n\"))\n";
         char* pzCmd;
-        pzCmd = aprf( zMakeGperf, pzList, pzName, getpid() );
+        pzCmd = aprf( zMakeGperf, pzList, pzName );
 
         /*
          *  Run the command and ignore the results.
@@ -146,12 +87,11 @@ ag_scm_make_gperf( SCM name, SCM hlist )
         pzList = runShell( pzCmd );
         AGFREE( pzCmd );
 
-        pzCmd = aprf( zCleanup, pzList );
-        AGFREE( pzList );
-
-        (void)ag_scm_c_eval_string_from_file_line(
-            pzCmd, __FILE__, makeGperfLine );
-        AGFREE( pzCmd );
+        if (pzCleanup != NULL) {
+            (void)ag_scm_c_eval_string_from_file_line(
+                pzCleanup, __FILE__, makeGperfLine );
+            pzCleanup = NULL;
+        }
     }
     return SCM_BOOL_T;
 }

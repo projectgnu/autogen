@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.10 2005/12/04 22:18:40 bkorb Exp $
+ *  $Id: agShell.c,v 4.11 2006/01/28 21:26:57 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -441,14 +441,22 @@ loadData( void )
 
     for (;;) {
         size_t  usedCt;
+        char*   line_p;
 
         /*
          *  Set a timeout so we do not wait forever.  Sometimes we don't wait
          *  at all and we should.  Retry in those cases (but not on EOF).
          */
         alarm( OPT_VALUE_TIMEOUT );
-        if (fgets( zLine, sizeof( zLine ), serverPair.pfRead ) == NULL) {
-            alarm( 0 );
+        line_p = fgets( zLine, sizeof( zLine ), serverPair.pfRead );
+        alarm( 0 );
+
+        if (line_p == NULL) {
+            /*
+             *  Guard against a server timeout
+             */
+            if (serverId == NULLPROCESS)
+                break;
 
             if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retryCt++ > 0))
                 fprintf( pfTrace, "fs err %d (%s) reading from server shell\n",
@@ -459,7 +467,6 @@ loadData( void )
 
             continue;  /* no data - retry */
         }
-        alarm( 0 );
 
         /*
          *  Check for magic character sequence indicating 'DONE'
@@ -468,17 +475,16 @@ loadData( void )
             break;
 
         strcpy( pzScan, zLine );
+        pzScan += strlen( zLine );
+        usedCt = (size_t)(pzScan - pzText);
 
         /*
-         *  Stop now if we are at EOF
+         *  Stop now if server timed out or if we are at EOF
          */
-        if (feof( serverPair.pfRead )) {
+        if ((serverId == NULLPROCESS) || feof( serverPair.pfRead )) {
             fputs( "feof on data load\n", pfTrace );
             break;
         }
-
-        pzScan += strlen( zLine );
-        usedCt = (size_t)(pzScan - pzText);
 
         /*
          *  IF we are running low on space in our line buffer,
@@ -563,7 +569,8 @@ runShell( const char*  pzCmd )
         fprintf( pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone, logCount );
     }
 
-    fflush( serverPair.pfWrite );
+    if (serverPair.pfWrite != NULL)
+        fflush( serverPair.pfWrite );
 
     if (errClose) {
         fprintf( pfTrace, zCmdFail, pzCmd );
