@@ -1,5 +1,16 @@
 2006-01-28  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/test/defs.in(purge): removing directories can be very
+	difficult.  Do everything possible to either remove or move out of
+	the way.  This is due to secret NFS "busy" files that cannot be rm-ed.
+	* autoopts/text_mmap.c(text_mmap): The failed open return value is
+	the official "invalid file descriptor" needed for anonymous map calls
+	on some platforms.  OK.  Let's use it as our named and official value.
+	* config/confmacs.tpl(emit-results):  Be careful not to strip away a
+	"-L" that happens to appear within a file name.
+
+2006-01-28  Bruce Korb  <bkorb@gnu.org>
+
 	* agen5/agShell.c(loadData): guard against server disappearance.
 	* agen5/agUtils.c(zMakeGperf): move here from expGperf.c.  Easier to read
 	* agen5/expGperf.c(zMakeGperf): remove

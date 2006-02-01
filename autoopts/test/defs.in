@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-01-28 15:46:54 bkorb"
+# Time-stamp:     "2006-02-01 09:10:21 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/02/01 16:47:32 $
+# Last Modified:  $Date: 2006/02/01 17:14:53 $
 #
-# $Id: defs.in,v 4.7 2006/02/01 16:47:32 bkorb Exp $
+# $Id: defs.in,v 4.8 2006/02/01 17:14:53 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -63,6 +63,8 @@ INC="@LIBGUILE_CFLAGS@"
 
 export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
 
+#  If only the "rm(1)" command could be relied upon....
+#
 purge()
 {
   rm -rf ${*} 2>/dev/null
@@ -73,10 +75,13 @@ purge()
   test -z "$bad" && return 0
 
   set -- $bad
+  test "x${RANDOM}" = "x${RANDOM}" && RANDOM=`expr 0${RANDOM} + 1 2>/dev/null`
+
+  f=ZZPURGE-${1}-${RANDOM}-$$
   if test $# -gt 1
-  then mkdir ZZPURGE-${1}-${RANDOM}-$$
-       mv $* ZZPURGE-${1}-${RANDOM}-$$/.
-  else mv $1 ZZPURGE-${1}-${RANDOM}-$$
+  then mkdir ${f}
+       mv $* ${f}/.
+  else mv $1 ${f}
   fi
 }
 
