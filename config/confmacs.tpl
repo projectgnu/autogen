@@ -194,7 +194,8 @@ DEFINE  emit-results   =][=
       LIB%1$s_CFLAGS=\"${%2$s_cflags}\"
       LIB%1$s_LIBS=\"${%2$s_libs}\"
       case \"${LIB%1$s_LIBS}\" in *-L* )
-        LIB%1$s_PATH=`echo ${LIB%1$s_LIBS} | sed 's/.*-L[ \t]*//;s/[ \t].*//'`
+        LIB%1$s_PATH=`echo ,${LIB%1$s_LIBS} | \
+          sed 's/.*[, ]-L[ \t]*//;s/[ \t].*//'`
       ;; * ) LIB%1$s_PATH='' ;; esac]"
        up-name cv-name )))
 
