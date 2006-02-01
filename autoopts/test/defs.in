@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-01-07 12:46:59 bkorb"
+# Time-stamp:     "2006-01-28 15:46:54 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/01/09 01:36:42 $
+# Last Modified:  $Date: 2006/02/01 16:47:32 $
 #
-# $Id: defs.in,v 4.6 2006/01/09 01:36:42 bkorb Exp $
+# $Id: defs.in,v 4.7 2006/02/01 16:47:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -58,25 +58,33 @@ then
   export GUILE_WARN_DEPRECATED
 fi
 
-LIB=`
-for f in XXX \
-    @AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@
-do case "${f}" in
-   -L*) echo -Wl,${f} ;;
-   XXX) : ;;
-   *) echo ${f} ;;
-   esac
-done`
-
+LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
 INC="@LIBGUILE_CFLAGS@"
 
 export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
+
+purge()
+{
+  rm -rf ${*} 2>/dev/null
+  bad=''
+  for f
+  do test -f ${f} -o -d ${f} && bad="${bad} ${f}"
+  done
+  test -z "$bad" && return 0
+
+  set -- $bad
+  if test $# -gt 1
+  then mkdir ZZPURGE-${1}-${RANDOM}-$$
+       mv $* ZZPURGE-${1}-${RANDOM}-$$/.
+  else mv $1 ZZPURGE-${1}-${RANDOM}-$$
+  fi
+}
 
 be_silent()
 {
     setx=:
     VERBOSE=false
-    rm -rf testdir
+    purge testdir
     msg=echo
     mkdir testdir || exit 1
 }
@@ -108,11 +116,12 @@ LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
 export LD_LIBRARY_PATH
 
 # A standard failure function
+#
 failure()
 {
   ${setx}
   if test -d ../FAILURES
-  then ( \cd ../FAILURES ; rm -rf ${testname}* .*${testname}* )
+  then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
   else mkdir ../FAILURES ; fi
 
   set +x
@@ -121,6 +130,9 @@ failure()
   cd ${testsubdir}
 
   ( mv -f ${testname}* .*${testname}* ../FAILURES || : )
+  for f in core*
+  do test -f ${f} && mv -f ${f} ../FAILURES/${testname}-${f} ; done
+
   echo FAILURE: "$*" >&8
   exit 1
 }
@@ -130,7 +142,8 @@ cleanup()
   ${setx}
   if ${VERBOSE} ; then : ; else
     cd ${builddir}
-    rm -rf testdir
+    purge testdir
+    test -d testdir && mv testdir ZZJUNK
   fi
   ${msg} ${testname} done
 }
