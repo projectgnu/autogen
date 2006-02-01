@@ -1,8 +1,22 @@
 /*
- * $Id: text_mmap.c,v 4.9 2006/01/27 22:28:09 bkorb Exp $
+ * $Id: text_mmap.c,v 4.10 2006/02/01 16:46:31 bkorb Exp $
  *
- * Time-stamp:      "2006-01-27 13:52:14 bkorb"
+ * Time-stamp:      "2006-02-01 08:45:37 bkorb"
  */
+
+#ifndef MAP_ANONYMOUS 
+#  ifdef   MAP_ANON 
+#  define  MAP_ANONYMOUS   MAP_ANON 
+#  endif 
+#endif 
+
+/*
+ *  Some weird systems require that a specifically invalid FD number
+ *  get passed in as an argument value.  Which value is that?  Well,
+ *  as everybody knows, if open(2) fails, it returns -1, so that must
+ *  be the value.  :)
+ */
+#define AO_INVALID_FD  -1
 
 #define FILE_WRITABLE(_prt,_flg) \
 	((_prt & PROT_WRITE) && (_flg & (MAP_SHARED|MAP_PRIVATE) == MAP_SHARED))
@@ -114,7 +128,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         pMI->txt_fd = open( pzFile, o_flag );
     }
 
-    if (pMI->txt_fd < 0) {
+    if (pMI->txt_fd == AO_INVALID_FD) {
         pMI->txt_errno = errno;
         return MAP_FAILED_PTR;
     }
@@ -163,7 +177,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
         pNuls = mmap(
                 (void*)(((char*)pMI->txt_data) + pMI->txt_size),
                 pgsz, PROT_READ|PROT_WRITE,
-                MAP_ANONYMOUS|MAP_FIXED|MAP_PRIVATE, 0, 0 );
+                MAP_ANONYMOUS|MAP_FIXED|MAP_PRIVATE, AO_INVALID_FD, 0 );
 
         if (pNuls != MAP_FAILED_PTR)
             return pMI->txt_data;
@@ -174,7 +188,7 @@ text_mmap( const char* pzFile, int prot, int flags, tmap_info_t* pMI )
 #if defined(HAVE_DEV_ZERO)
         pMI->txt_zero_fd = open( "/dev/zero", O_RDONLY );
 
-        if (pMI->txt_zero_fd < 0) {
+        if (pMI->txt_zero_fd == AO_INVALID_FD) {
             pMI->txt_errno = errno;
 
         } else {
