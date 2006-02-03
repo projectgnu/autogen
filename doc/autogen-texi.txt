@@ -2370,11 +2370,11 @@ Specifies the program version and activates the VERSION option,
 
 Some libraries provide their own code for processing command line
 options, and this may be used by programs that utilize AutoOpts.
-You may also wish to write a library that gets configured with
-AutoOpts options and config files.  Such a library may either process its
-own options and configury routine, or it may export its option descriptions
-to programs that also use AutoOpts.  This section will describe how to
-do all of these different things.
+You may also wish to write a library that gets configured with AutoOpts
+options and config files.  Such a library may either supply its own
+configury routine and process its own options, or it may export its
+option descriptions to programs that also use AutoOpts.  This section
+will describe how to do all of these different things.
 
 @menu
 * lib and program::         AutoOpt-ed Library for AutoOpt-ed Program

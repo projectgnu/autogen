@@ -1,3 +1,8 @@
+2006-02-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in(LIB): add -lgen if /usr/lib/libgen.so exists
+	and -lgen is not already specified.
+
 2006-01-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/defs.in(purge): removing directories can be very
