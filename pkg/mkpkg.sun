@@ -35,7 +35,7 @@ then
   done
 fi
 
-cp -f ${pkgsrc}/../COPYING ./copyright
+cp -f ${top_srcdir}/COPYING ./copyright
 
 pkgdst=`pwd`
 [ -f prototype ] && rm -f prototype
@@ -116,7 +116,7 @@ cat > pkginfo.tpl <<- EOF
 	EOF
 
 cd ${agdir}
-${AGexe} --writable -L${pkgdst} -Tpkginfo.tpl opts.def
+${AGexe} --writable -L${pkgdst} -Tpkginfo.tpl ${top_srcdir}/agen5/opts.def
 mv -f pkginfo ${pkgdst}/.
 cd ${pkgdst}
 rm -f pkginfo.tpl
