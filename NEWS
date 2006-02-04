@@ -2,6 +2,15 @@ New in __CURRENT_VERSION__ - November, 2005
 
 * Nothing new yet.
 
+New in 5.8.3 - February 2006
+
+* Testing cleanups
+* To use mmap, you must first mmap more space than used by the file,
+  then, if the last bit laps into a page not backed by a file, you have
+  to remap that page anonymously.  If you do not first map pages not
+  backed by file data, you seg fault trying to remap pages on some systems.
+* Make a clean implementation of library option processing.
+
 New in 5.8 - December, 2005
 
 * AutoGen now builds against Guile 1.7.x
