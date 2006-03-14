@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/12/05 20:46:44 $
+ *  Last Modified:     $Date: 2006/03/14 11:33:23 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.11 2005/12/05 20:46:44 bkorb Exp $
+ *  $Id: misc.def,v 4.12 2006/03/14 11:33:23 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.11 $";
+version = "$Revision: 4.12 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -68,7 +68,7 @@ test   = {
   code     = <<- _END_OF_CODE_
 	#include <guile/gh.h>
 	#include <libguile/list.h>
-	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 107
+	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 108
 	choke me
 	#endif
 	int main () {
