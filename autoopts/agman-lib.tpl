@@ -10,7 +10,7 @@
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman-lib.tpl,v 4.1 2005/04/10 20:32:23 bkorb Exp $
+## $Id: agman-lib.tpl,v 4.2 2006/03/14 11:33:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included
@@ -54,6 +54,7 @@ AutoGen5 template null
  -e 's/^@item/.sp 1/' \
  -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
  -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\fI\1\\fP/g' \
+ -e "s/^'/\\'/" \
  -e 's/^@\*/.br/' <<'_End_Of_Man_'
 [+:
 
