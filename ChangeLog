@@ -1,3 +1,10 @@
+2006-03-23  Matt Kraai  <kraai@debian.org>
+
+	* getdefs/opts.def: fix quoting of file names
+	* agen5/test/gperf.test: remove too-short timeout (was for debugging)
+	* agen5/test/error.test: add another expression to the varied-output
+	removal "sed" expression.
+
 2006-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/defs.in(LIB): add -lgen if /usr/lib/libgen.so exists

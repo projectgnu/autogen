@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.6 2005/12/13 19:16:44 bkorb Exp $
+ *   $Id: opts.def,v 4.7 2006/03/24 15:32:27 bkorb Exp $
  */
 
 /*
@@ -371,7 +371,7 @@ prog_man_descrip = <<- END_MAN_DESCRIP
 	delimiters, with everything up through the first sequence of
 	asterisks deleted on every line.  Additionally, if the
 	`<entry-name>' is followed by a comma, the word `ifdef' (or
-	'ifndef') and a name `if_name', then the above entry will
+	`ifndef') and a name `if_name', then the above entry will
 	appear as:
 
 	.nf
@@ -446,7 +446,7 @@ of text, you must do something like this:
 
 @item
 If the `<entry-name>' is followed by a comma, the word `ifdef'
-(or 'ifndef') and a name `if_name', then the above entry will appear as:
+(or `ifndef') and a name `if_name', then the above entry will appear as:
 
 @example
 #ifdef if_name
