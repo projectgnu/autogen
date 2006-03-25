@@ -164,7 +164,10 @@ register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_fu
 }
 
 static int
-call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_entry *spec)
+call_argtype_function (
+    struct printf_info *const pinfo,
+    int **argtypes,
+    spec_entry *spec)
 {
   int n;
   int argindex = (pinfo->dollar && !IS_MODIFIER (spec))
@@ -216,11 +219,13 @@ call_argtype_function (struct printf_info *const pinfo, int **argtypes, spec_ent
 
       if (n < 0)
 	return n;
-      else if (argindex + n > pinfo->argc)
+      if (argindex + n > pinfo->argc)
         {
-	  *argtypes = snv_renew (int, *argtypes, argindex + n);
+          int new_ct = argindex + n;
+	  *argtypes = snv_renew (int, *argtypes, new_ct);
+          memset(*argtypes + pinfo->argc, PA_UNKNOWN,
+                 (new_ct - pinfo->argc) * sizeof(**argtypes));
 	  pinfo->argc = argindex + n;
-
 	  /* Call again... */
 	  pinfo->argindex = save_argindex;
 	  pinfo->format = save_format;
@@ -258,7 +263,10 @@ printf_strerror (void)
 
 /* (re)initialise the memory used by PPARSER. */
 static inline void
-parser_init (struct printf_info *pinfo, const char *format, const union printf_arg *args)
+parser_init (
+    struct printf_info *pinfo,
+    const char *format,
+    const union printf_arg *args)
 {
   memset (pinfo, 0, sizeof (struct printf_info));
   pinfo->format = format;
@@ -650,67 +658,85 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
       /* We scanned the format string to find the type of the arguments,
          so we can now cast it and store it correctly.  */
       for (index = 0; index < info.argc; index++)
-       switch (argtypes[index] & ~PA_FLAG_UNSIGNED)
-         {
-          case PA_CHAR:
-           args[index].pa_char = (char) *(const long int *)(ap + index);
-            break;
+        {
+          int tp = argtypes[index];
+          if ((tp & PA_TYPE_MASK) == PA_TYPE_MASK)
+            {
+              if (index + 1 == info.argc)
+                {
+                  info.argc--;
+                  break;
+                }
+              continue; /* Ignore it.  We allow skipping args, but the
+                         * user is responsible for ensuring a void* sized
+                         * spacer in the argument list.
+                         */
+            }
 
-          case PA_WCHAR:
-           args[index].pa_wchar = (snv_wchar_t) *(const long int *)(ap + index);
-            break;
+          switch (tp & ~PA_FLAG_UNSIGNED)
+            {
+            case PA_CHAR:
+              args[index].pa_char = (char) *(const long int *)(ap + index);
+              break;
 
-          case PA_INT|PA_FLAG_SHORT:
-           args[index].pa_short_int = (short int) *(const long int *)(ap + index);
-            break;
+            case PA_WCHAR:
+              args[index].pa_wchar =
+                (snv_wchar_t) *(const long int *)(ap + index);
+              break;
 
-          case PA_INT:
-           args[index].pa_int = (int) *(const long int *)(ap + index);
-            break;
+            case PA_INT|PA_FLAG_SHORT:
+              args[index].pa_short_int =
+                (short int) *(const long int *)(ap + index);
+              break;
 
-          case PA_INT|PA_FLAG_LONG:
-           args[index].pa_long_int = *(const long int *)(ap + index);
-            break;
+            case PA_INT:
+              args[index].pa_int = (int) *(const long int *)(ap + index);
+              break;
 
-          case PA_INT|PA_FLAG_LONG_LONG:
-           args[index].pa_long_long_int = **(const intmax_t **)(ap + index);
-            break;
+            case PA_INT|PA_FLAG_LONG:
+              args[index].pa_long_int = *(const long int *)(ap + index);
+              break;
 
-          case PA_FLOAT:
-           args[index].pa_float = **(const float **)(ap + index);
-            break;
+            case PA_INT|PA_FLAG_LONG_LONG:
+              args[index].pa_long_long_int = **(const intmax_t **)(ap + index);
+              break;
 
-          case PA_DOUBLE|PA_FLAG_LONG_DOUBLE:
+            case PA_FLOAT:
+              args[index].pa_float = **(const float **)(ap + index);
+              break;
+
+            case PA_DOUBLE|PA_FLAG_LONG_DOUBLE:
 #ifdef HAVE_LONG_DOUBLE
-           args[index].pa_long_double = **(const long double **)(ap + index);
-            break;
+              args[index].pa_long_double = **(const long double **)(ap + index);
+              break;
 #endif
-           /* else fall through */
+              /* else fall through */
 
-          case PA_DOUBLE:
-           args[index].pa_double = **(const double **)(ap + index);
-            break;
+            case PA_DOUBLE:
+              args[index].pa_double = **(const double **)(ap + index);
+              break;
 
-         /* Note that pointer types are dereferenced just once! */
-          case PA_STRING:
-           args[index].pa_string = *(const char **)(ap + index);
-            break;
+              /* Note that pointer types are dereferenced just once! */
+            case PA_STRING:
+              args[index].pa_string = *(const char **)(ap + index);
+              break;
 
-          case PA_WSTRING:
-           args[index].pa_wstring = *(const snv_wchar_t **)(ap + index);
-            break;
+            case PA_WSTRING:
+              args[index].pa_wstring = *(const snv_wchar_t **)(ap + index);
+              break;
 
-          case PA_POINTER:
-           args[index].pa_pointer = *(snv_constpointer *)(ap + index);
-            break;
-
-         default:
-            if (argtypes[index] & PA_FLAG_PTR)
+            case PA_POINTER:
               args[index].pa_pointer = *(snv_constpointer *)(ap + index);
-            else
-              args[index].pa_long_double = 0.0;
-            break;
-         }
+              break;
+
+            default:
+              if (argtypes[index] & PA_FLAG_PTR)
+                args[index].pa_pointer = *(snv_constpointer *)(ap + index);
+              else
+                args[index].pa_long_double = 0.0;
+              break;
+            }
+        }
     }
 
   if (printf_last_error)
@@ -804,7 +830,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 
 	  /*NOBREAK*/
 
-        default:	/* Just a character: ignore it. */
+        default: /* Just a character: ignore it. */
 	  continue;
 	}
      
@@ -1503,8 +1529,8 @@ snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
- * tab-width: 4
+ * c-file-style: "gnu"
+ * tab-width: 8
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/printfv.c */
