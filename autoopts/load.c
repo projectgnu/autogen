@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.20 2005/10/29 22:13:10 bkorb Exp $
+ *  $Id: load.c,v 4.21 2006/03/25 19:23:28 bkorb Exp $
  *  Time-stamp:      "2005-10-29 14:45:36 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

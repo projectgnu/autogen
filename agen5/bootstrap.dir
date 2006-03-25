@@ -3,15 +3,15 @@
 # ----------------------------------------------------------------------
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
-#    AutoGen copyright (C) 1992-2005 Bruce Korb
+#    AutoGen copyright (C) 1992-2006 Bruce Korb
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2006/01/24 21:29:19 $
+# Last Modified:     $Date: 2006/03/25 19:23:27 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.11 2006/01/24 21:29:19 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.12 2006/03/25 19:23:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.

@@ -1,8 +1,8 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.17 2006/01/25 19:12:52 bkorb Exp $
+#$Id: optcode.tpl,v 4.18 2006/03/25 19:23:28 bkorb Exp $
 
-# Automated Options copyright 1992-2005 Bruce Korb
+# Automated Options copyright 1992-2006 Bruce Korb
 # Time-stamp:      "2006-01-25 07:50:05 bkorb"
 
 =][=

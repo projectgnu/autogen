@@ -1,12 +1,12 @@
 /*
- *  $Id: configfile.c,v 4.20 2005/10/22 21:57:43 bkorb Exp $
+ *  $Id: configfile.c,v 4.21 2006/03/25 19:23:28 bkorb Exp $
  *  Time-stamp:      "2005-10-16 15:16:32 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.6 2005/12/05 20:46:43 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.7 2006/03/25 19:23:27 bkorb Exp $
  *
  *  Time-stamp:      "2005-12-04 19:42:46 bkorb"
  *
@@ -9,7 +9,7 @@
  */
 
 /*
- *  AutoGen copyright 1992-2005 Bruce Korb
+ *  AutoGen copyright 1992-2006 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

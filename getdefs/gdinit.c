@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 4.3 2005/01/23 23:33:06 bkorb Exp $
+ *  $Id: gdinit.c,v 4.4 2006/03/25 19:23:28 bkorb Exp $
  *
- *    getdefs copyright 1999-2005 Bruce Korb
+ *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2005/01/23 23:33:06 $
+ *  Last Modified:     $Date: 2006/03/25 19:23:28 $
  *            by: bkorb
  */
 

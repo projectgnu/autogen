@@ -1,6 +1,6 @@
 
 /*
- *  $Id: cook.c,v 4.4 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: cook.c,v 4.5 2006/03/25 19:23:28 bkorb Exp $
  *  Time-stamp:      "2005-05-20 13:58:56 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
@@ -8,7 +8,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

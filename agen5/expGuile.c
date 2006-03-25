@@ -1,12 +1,12 @@
 
 /*
- *  $Id: expGuile.c,v 4.8 2005/12/08 17:54:34 bkorb Exp $
+ *  $Id: expGuile.c,v 4.9 2006/03/25 19:23:27 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
 
 /*
- *  AutoGen copyright 1992-2005 Bruce Korb
+ *  AutoGen copyright 1992-2006 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

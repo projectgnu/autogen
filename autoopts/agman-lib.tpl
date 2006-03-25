@@ -2,7 +2,7 @@
 
 ## agman-lib.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2005 Bruce Korb
+##  AutoOpts copyright 1992-2006 Bruce Korb
 ##
 ## Time-stamp:      "2005-04-10 09:21:44 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
@@ -10,7 +10,7 @@
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman-lib.tpl,v 4.2 2006/03/14 11:33:00 bkorb Exp $
+## $Id: agman-lib.tpl,v 4.3 2006/03/25 19:23:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included

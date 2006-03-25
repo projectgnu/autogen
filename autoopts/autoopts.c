@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.18 2005/10/29 22:13:10 bkorb Exp $
+ *  $Id: autoopts.c,v 4.19 2006/03/25 19:23:28 bkorb Exp $
  *  Time-stamp:      "2005-10-29 13:19:36 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -10,7 +10,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,11 +1,11 @@
 /*
- *  $Id: defFind.c,v 4.7 2006/01/24 21:29:19 bkorb Exp $
+ *  $Id: defFind.c,v 4.8 2006/03/25 19:23:27 bkorb Exp $
  *
  *  This module locates definitions.
  */
 
 /*
- *  AutoGen copyright 1992-2005 Bruce Korb
+ *  AutoGen copyright 1992-2006 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the

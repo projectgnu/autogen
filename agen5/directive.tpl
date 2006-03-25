@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.7 2006/01/28 21:26:57 bkorb Exp $
+# $Id: directive.tpl,v 4.8 2006/03/25 19:23:27 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -14,7 +14,7 @@ h =]
 
   (string-append
      (dne " *  " "/*  ")
-     "\n *\n *  copyright 1992-2005 Bruce Korb\n *\n"
+     "\n *\n *  copyright 1992-2006 Bruce Korb\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"
      (make-header-guard "directive")

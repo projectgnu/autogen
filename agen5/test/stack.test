@@ -4,13 +4,13 @@
 # stack.test --- test stack and join functionality
 #
 ## Time-stamp:      "2005-03-07 13:05:17 bkorb"
-## Copyright (c):   1999-2005 by Bruce Korb
+## Copyright (c):   1999-2006 by Bruce Korb
 ##
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 #
-# $Id: stack.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: stack.test,v 4.5 2006/03/25 19:23:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2005-09-04 11:35:23 bkorb"
+# Time-stamp:        "2006-03-25 11:12:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.9 2005/12/05 20:46:44 bkorb Exp $
+# $Id: getopt.test,v 4.10 2006/03/25 19:23:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -40,7 +40,7 @@ help-value = 'h';
 gnu-usage;
 
 copyright = {
-    date  = "2003-2005";
+    date  = "2003-2006";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";
@@ -179,7 +179,7 @@ optionPrintVersion(
 {
   char* pz_by = _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2005 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2006 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -420,7 +420,7 @@ optionPrintVersion(
 {
   char* pz_by = _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2005 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2006 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 

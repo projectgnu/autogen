@@ -1,13 +1,13 @@
 
 /*
- *  $Id: nested.c,v 4.8 2005/09/04 21:13:39 bkorb Exp $
+ *  $Id: nested.c,v 4.9 2006/03/25 19:23:28 bkorb Exp $
  *  Time-stamp:      "2005-07-27 10:10:28 bkorb"
  *
  *   Automated Options Nested Values module.
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.12 2005/06/07 22:25:12 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.13 2006/03/25 19:23:28 bkorb Exp $
  * Time-stamp:      "2005-02-20 13:49:46 bkorb"
  *
  *  This module's routines will take the currently set options and
@@ -9,7 +9,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

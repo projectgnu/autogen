@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 4.5 2005/06/07 22:25:12 bkorb Exp $
+ *  $Id: boolean.c,v 4.6 2006/03/25 19:23:28 bkorb Exp $
  * Time-stamp:      "2005-02-14 08:24:12 bkorb"
  *
  *   Automated Options Paged Usage module.
@@ -10,7 +10,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

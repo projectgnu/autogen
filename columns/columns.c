@@ -1,11 +1,11 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.6 2005/10/29 22:13:11 bkorb Exp $
+ *  $Id: columns.c,v 4.7 2006/03/25 19:23:28 bkorb Exp $
  */
 
 /*
- *  Columns copyright 1992-2005 Bruce Korb
+ *  Columns copyright 1992-2006 Bruce Korb
  *
  *  Columns is free software.
  *  You may redistribute it and/or modify it under the terms of the

@@ -10,11 +10,13 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.19 2006/03/25 18:56:02 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.20 2006/03/25 19:23:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
 
+# Set up some global Scheme variables
+#
 (setenv "SHELL" "/bin/sh")
 
 (define temp-dir (shell "
@@ -44,8 +46,33 @@ texi=autogen.texi
 (define temp-txt "")
 (define text-tag "")
 
-=]
-\input texinfo
+=][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+@c Define some AutoGen macros:  =][=
+
+DEFINE id-file =]
+@ignore
+Generated [= (tpl-file-line) =].
+Extracted from [=srcfile=] line [=linenum=].
+@end ignore[=
+
+ENDDEF # # # # # # # # # # # # #=][=
+
+DEFINE get-text     =][=
+
+(set! text-tag
+   (string-append "@ignore\n%s == "
+      (string-upcase! (get "tag")) " == %s or the surrounding 'ignore's\n"
+      "Extraction from autogen.texi\n"
+      "@end ignore" ))
+
+(extract texi-file-source text-tag) =][=
+
+ENDDEF get-text
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+=]\input texinfo
 @ignore
 \internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
 @end ignore
@@ -57,7 +84,6 @@ texi=autogen.texi
 UPDATED=`date '+%B %Y'`
 cat <<_EOF_
 @set EDITION   ${AG_REVISION}
-@set VERSION   ${AG_REVISION}
 @set UPDATED   ${UPDATED}
 @set COPYRIGHT "    (get "copyright.date")
 "\n@set TITLE     " (get "prog_title")
@@ -124,8 +150,8 @@ notice identical to this one except for the removal of this paragraph.
 @finalout
 @titlepage
 @title AutoGen - @value{TITLE}
-@subtitle [=`
-  echo For version ${AG_REVISION}, ${UPDATED} `=]
+@subtitle For version [=`
+  echo ${AG_REVISION}, ${UPDATED} `=]
 @author Bruce Korb
 @author @email{[=(texi-escape-encode e-addr)=]}
 
@@ -139,29 +165,32 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 [=(gpl "AutoGen" "")=]
 @end titlepage
+
+@ifinfo
+
+@node Top, Introduction, , (dir)
+@top The Automated Program Generator
+@comment  node-name,  next,  previous,  up
+
+This file documents AutoGen version [=`
+  echo ${AG_REVISION}`=].  It is a tool designed
+for generating program files that contain repetitive text with varied
+substitutions.  This document is very long because it is intended as a
+reference document.  For a quick start example, @xref{Example Usage}.
+
+The AutoGen distribution includes the basic generator engine and
+several add-on libraries and programs.  Of the most general interest
+would be Automated Option processing, @xref{AutoOpts}, which also
+includes stand-alone support for configuration file parsing, @xref{Features}.
+Please see the ``Add-on packages for AutoGen'' section for additional
+programs and libraries associated with AutoGen.
+
+This edition documents version [=`echo ${AG_REVISION}, ${UPDATED}.`=]
 [=
 
-DEFINE id-file =]
-@ignore
-Generated [= (tpl-file-line) =].
-Extracted from [=srcfile=] line [=linenum=].
-@end ignore[=
+get-text tag = main
 
-ENDDEF  =][=
-
-DEFINE get-text     =][=
-
-(set! text-tag
-   (string-append "@ignore\n%s == "
-      (string-upcase! (get "tag")) " == %s or the surrounding 'ignore's\n"
-      "Extraction from autogen.texi\n"
-      "@end ignore" ))
-
-(extract texi-file-source text-tag) =][=
-
-ENDDEF get-text     =][=
-
-get-text tag = main =]
+=]
 [=
 FOR directive =][=
   (if (exist? "dummy")

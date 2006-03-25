@@ -2,7 +2,7 @@
 
 ## agman3.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2005 Bruce Korb
+##  AutoOpts copyright 1992-2006 Bruce Korb
 ##
 ## Time-stamp:      "2005-04-10 09:46:57 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman3-tpl.in,v 4.3 2005/04/10 20:32:23 bkorb Exp $
+## $Id: agman3-tpl.in,v 4.4 2006/03/25 19:23:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 null

@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.11 2006/02/04 21:41:29 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 4.12 2006/03/25 19:23:28 bkorb Exp $
  * Time-stamp:      "2006-02-04 13:35:26 bkorb"
  *
  *  This module implements the default usage procedure for
@@ -13,7 +13,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2005 Bruce Korb
+ *  Automated Options copyright 1992-2006 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

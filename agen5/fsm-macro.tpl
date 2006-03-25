@@ -1,6 +1,6 @@
 [= AutoGen5 Template
 
-#  AutoGen copyright 1992-2005 Bruce Korb
+#  AutoGen copyright 1992-2006 Bruce Korb
 
 =][=
 
@@ -207,7 +207,7 @@ DEFINE preamble
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001-2005  by  Bruce Korb
+ *  Copyright (c) 2001-2006  by  Bruce Korb
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=

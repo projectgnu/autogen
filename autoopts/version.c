@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 4.7 2005/12/13 19:16:44 bkorb Exp $
+/*  $Id: version.c,v 4.8 2006/03/25 19:23:28 bkorb Exp $
  * Time-stamp:      "2005-12-13 10:29:09 bkorb"
  *
  *  This module implements the default usage procedure for
@@ -7,7 +7,7 @@
  */
 
 static const char zAOV[] =
-    "Automated Options version %s, copyright (c) 1999-2005 Bruce Korb\n";
+    "Automated Options version %s, copyright (c) 1999-2006 Bruce Korb\n";
 
 /*  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the

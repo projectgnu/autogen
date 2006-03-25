@@ -3,12 +3,12 @@
 ## Makefile.am
 ##
 ## Time-stamp:      "2006-01-22 13:39:03 bkorb"
-## Copyright (c):   1992-2005 by Bruce Korb
+## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.23 2006/01/24 21:29:19 bkorb Exp $
+## $Id: Makefile.am,v 4.24 2006/03/25 19:23:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

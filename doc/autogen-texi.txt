@@ -6,26 +6,6 @@ START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
-@ifinfo
-
-@node Top, Introduction, , (dir)
-@top The Automated Program Generator
-@comment  node-name,  next,  previous,  up
-
-This file documents AutoGen version @value{VERSION}.  It is a tool designed
-for generating program files that contain repetitive text with varied
-substitutions.  This document is very long because it is intended as a
-reference document.  For a quick start example, @xref{Example Usage}.
-
-The AutoGen distribution includes the basic generator engine and
-several add-on libraries and programs.  Of the most general interest
-would be Automated Option processing, @xref{AutoOpts}, which also
-includes stand-alone support for configuration file parsing, @xref{Features}.
-Please see the ``Add-on packages for AutoGen'' section for additional
-programs and libraries associated with AutoGen.
-
-This edition documents version @value{VERSION}, @value{UPDATED}.
-
 @menu
 * Introduction::         AutoGen's Purpose
 * Definitions File::     AutoGen Definitions File
