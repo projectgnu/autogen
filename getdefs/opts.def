@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.8 2006/03/25 19:23:29 bkorb Exp $
+ *   $Id: opts.def,v 4.9 2006/03/25 19:27:09 bkorb Exp $
  */
 
 /*
@@ -26,7 +26,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2005";
+    date   = "1999-2006";
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = "autogen-users@lists.sf.net";
