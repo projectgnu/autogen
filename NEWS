@@ -1,6 +1,9 @@
-New in __CURRENT_VERSION__ - November, 2005
+New in __CURRENT_VERSION__ - March 2006
 
-* Nothing new yet.
+* Day 1 bug in snprintfv: numberd format elements can get mishandled.
+* more platform specific variations in test output are handled.
+* column 1 apostrophes in generated man page text are now escaped.
+* Guile release 1.8.x is accommodated (in progress 3/25/2006)
 
 New in 5.8.3 - February 2006
 

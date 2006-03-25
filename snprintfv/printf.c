@@ -484,7 +484,8 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 	    {
 	      /* We found the start of a format specifier! */
 	      spec_entry *spec;
-	      int status, argindex;
+	      int status;
+	      int argindex;
 
 	      parser_reset (&info);
 	      do
@@ -543,14 +544,13 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 
 	  /*NOBREAK*/
 
-        default:	/* Just a character: ignore it. */
-          /* Just a character: copy it. */
+	default:       /* Just a character: copy it. */
 	  SNV_EMIT (ch, stream, info.count);
 	  continue;
-        }
- 
-    error: 
-      /* Get here on error */ 
+	}
+
+    error:
+      /* Get here on error */
       info.count = -1;
       break;
     }
@@ -591,57 +591,61 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
   return_val_if_fail (format != NULL, SNV_ERROR);
 
   parser_init (&info, format, NULL);
+
+  /* Keep going until the format string runs out! */
   while (*info.format != EOS)
     {
       int ch = (int) *info.format++;
 
       switch (ch)
-       {
-       case SNV_CHAR_SPEC:
-         if (*info.format != SNV_CHAR_SPEC)
-           {
-             /* We found the start of a format specifier! */
-             spec_entry *spec;
+	{
+	case SNV_CHAR_SPEC:
+	  if (*info.format != SNV_CHAR_SPEC)
+	    {
+	      /* We found the start of a format specifier! */
+	      spec_entry *spec;
 
-             parser_reset (&info);
-             do
-               {
-                 /* Until we fill the stream (or get some other
-                    exception) or one of the handlers tells us
-                    we have reached the end of the specifier... */
-                 /* ...lookup the handler associated with the char
-                    we are looking at in the format string... */
-                 spec = spec_lookup (*info.format);
-                 if (spec == NULL)
-                   {
-                     PRINTF_ERROR (&info, "unregistered specifier");
-                     goto error;
-                   }
+	      parser_reset (&info);
+	      do
+		{
+		  /* Until we fill the stream (or get some other
+		     exception) or one of the handlers tells us
+		     we have reached the end of the specifier... */
 
-                 if (!IS_MODIFIER (spec) &&
-                     !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
-                   {
-                     PRINTF_ERROR (&info, "invalid combination of flags");
-                     goto error;
-                   }
+		  /* ...lookup the handler associated with the char
+		     we are looking at in the format string... */
+		  spec = spec_lookup (*info.format);
+		  if (spec == NULL)
+		    {
+		      PRINTF_ERROR (&info, "unregistered specifier");
+		      goto error;
+		    }
 
-                 /* ...and call the relevant handler.  */
-                 if (call_argtype_function (&info, &argtypes, spec) < 0)
-                   goto error;
+		  if (!IS_MODIFIER (spec) &&
+		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
+		    {
+		      PRINTF_ERROR (&info, "invalid combination of flags");
+		      goto error;
+		    }
 
-                 info.format++;
-               }
-             while (info.count >= 0 && IS_MODIFIER (spec));
-             continue;
-           }
-         /* An escaped CHAR_SPEC: ignore it (by falling through). */
-         ++info.format;
+		  /* ...and call the relevant handler. */
+		  if (call_argtype_function (&info, &argtypes, spec) < 0)
+		    goto error;
 
-         /*NOBREAK*/
+		  info.format++;
+		}
+	      while (info.count >= 0 && IS_MODIFIER (spec));
+	      continue;
+	    }
 
-        default:       /* Just a character: ignore it. */
-         continue;
-       }
+	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
+	  ++info.format;
+
+	  /*NOBREAK*/
+
+	default:       /* Just a character: ignore it. */
+	  continue;
+	}
 
     error:
       /* Get here on error */
@@ -1531,6 +1535,6 @@ snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
  * mode: C
  * c-file-style: "gnu"
  * tab-width: 8
- * indent-tabs-mode: nil
+ * indent-tabs-mode: t
  * End:
  * end of snprintfv/printfv.c */

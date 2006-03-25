@@ -2,7 +2,7 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-2005 Bruce Korb
+##  AutoGen Copyright (C) 1992-2006 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Maintainer:        Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.18 2006/01/24 21:29:19 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.19 2006/03/25 18:56:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -50,10 +50,44 @@ texi=autogen.texi
 \internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
 @end ignore
 @c %**start of header
+[=
+(define e-addr "bkorb@gnu.org")
+
+(shell (string-append "
+UPDATED=`date '+%B %Y'`
+cat <<_EOF_
+@set EDITION   ${AG_REVISION}
+@set VERSION   ${AG_REVISION}
+@set UPDATED   ${UPDATED}
+@set COPYRIGHT "    (get "copyright.date")
+"\n@set TITLE     " (get "prog_title")
+"\n@set PACKAGE   " (get "package")
+"\n_EOF_" ))
+
+=]
 @setfilename [=(base-name)=].info
-@settitle AutoGen
+@settitle AutoGen - @value{TITLE}
 @setchapternewpage off
 @c %**end of header
+@copying
+This manual is for GNU AutoGen version [= `
+  echo ${AG_REVISION}, updated ${UPDATED}` =].
+
+Copyright @copyright{} [= copyright.date =] by Bruce Korb.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under
+the terms of the GNU Free Documentation License, Version 1.1 or any later
+version published by the Free Software Foundation; with no Invariant
+Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the
+Back-Cover Texts as in (a) below.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify this
+GNU Manual, like GNU software.  Copies published by the Free Software
+Foundation raise funds for GNU development.''
+@end quotation
+@end copying
 
 @ignore
 [=(set-writable) (dne "")=]
@@ -63,19 +97,6 @@ directories:
 [= ` for f in ${DOC_DEPENDS} ; do echo "    $f" ; done ` =]
 
 @end ignore
-[=
-(define e-addr "bkorb@gnu.org")
-
-(shell (string-append "cat <<_EOF_
-@set EDITION   ${AG_REVISION}
-@set VERSION   ${AG_REVISION}
-@set UPDATED   `date '+%B %Y'`
-@set COPYRIGHT "    (get "copyright.date")
-"\n@set TITLE     " (get "prog_title")
-"\n@set PACKAGE   " (get "package")
-"\n_EOF_" ))
-
-=]
 
 @dircategory GNU programming tools
 @direntry
@@ -84,10 +105,10 @@ directories:
 
 @ifinfo
 @ifnothtml
-This file documents @value{PACKAGE} Version @value{VERSION}
+This file documents [= package =] Version [=`echo ${AG_REVISION}`=].
 
-AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
-AutoOpts copyright @copyright{} @value{COPYRIGHT} Bruce Korb
+AutoGen copyright @copyright{} [= copyright.date =] Bruce Korb
+AutoOpts copyright @copyright{} [= copyright.date =] Bruce Korb
 snprintfv copyright @copyright{} 1999-2000 Gary V. Vaughan
 
 [=(gpl "AutoGen" "")=]
@@ -103,13 +124,14 @@ notice identical to this one except for the removal of this paragraph.
 @finalout
 @titlepage
 @title AutoGen - @value{TITLE}
-@subtitle For version @value{VERSION}, @value{UPDATED}
+@subtitle [=`
+  echo For version ${AG_REVISION}, ${UPDATED} `=]
 @author Bruce Korb
 @author @email{[=(texi-escape-encode e-addr)=]}
 
 @page
 @vskip 0pt plus 1filll
-AutoGen copyright @copyright{} @value{COPYRIGHT} Bruce Korb
+AutoGen copyright @copyright{} [= copyright.date =] Bruce Korb
 @sp 2
 This is the second edition of the GNU AutoGen documentation,
 @sp 2
