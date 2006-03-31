@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.20 2006/03/25 19:23:28 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.21 2006/03/31 20:13:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -43,8 +43,10 @@ texi=autogen.texi
       '("@@"  "@{"  "@}")
 )  ))
 
-(define temp-txt "")
-(define text-tag "")
+(define temp-txt  "")
+(define text-tag  "")
+(define func-name "")
+(define func-str  "")
 
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -69,6 +71,19 @@ DEFINE get-text     =][=
 (extract texi-file-source text-tag) =][=
 
 ENDDEF get-text
+
+=][=
+
+DEFINE set-func-name =][=
+
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name)) =][=
+
+ENDDEF
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -188,7 +203,7 @@ programs and libraries associated with AutoGen.
 This edition documents version [=`echo ${AG_REVISION}, ${UPDATED}.`=]
 [=
 
-get-text tag = main
+INVOKE  get-text tag = main
 
 =]
 [=
@@ -214,9 +229,11 @@ FOR directive "\n" =][=
   ENDIF    =][=
 ENDFOR directive=]
 @end table
+[=
 
-[= get-text tag = COMMENTS =]
+INVOKE   get-text tag = COMMENTS
 
+=]
 @node    Full Syntax
 @section Finite State Machine Grammar
 
@@ -242,25 +259,15 @@ sed -n -e '/^dp_trans_table/,/^};$/p' ${f} | \
 
 ` =]
 @end example
+[=
 
-[= get-text tag = TEMPLATE =]
+INVOKE  get-text tag = TEMPLATE
 
+=]
 @ignore
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-[=
-(define func-name "")
-(define func-str "") =][=
 
-DEFINE set-func-name =][=
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
-
-  (set! func-str
-      (if (exist? "string") (get "string") func-name)) =][=
-
-ENDDEF =]
 @end ignore
 @page
 @node AutoGen Functions
@@ -475,8 +482,11 @@ It will replace "@code{&}", "@code{<}" and "@code{>}" with the strings,
 Arguments:
 @*
 str - string to transform
+[=
 
-[= get-text tag = MACROS =]
+INVOKE  get-text tag = MACROS
+
+=]
 @menu
 * AGMacro syntax::   AutoGen Macro Syntax[=
 FOR macfunc =][=
@@ -577,9 +587,11 @@ FOR macfunc =][=
 [=desc=][=
   ENDIF desc exists =][=
 ENDFOR macfunc=]
+[=
 
-[= get-text tag = augmenting =]
+INVOKE  get-text tag = augmenting
 
+=]
 @ignore
 
 Invocation section from [= `
@@ -596,9 +608,11 @@ ${f}
 _EOF_
 
 cat ${f}` =]
+[=
 
-[= get-text tag = installation =]
+INVOKE  get-text tag = installation
 
+=]
 @page
 @node AutoOpts
 @chapter Automated Option Processing
@@ -615,7 +629,7 @@ produces all the code necessary to parse and handle the command line and
 configuration file options, and the documentation that should go with your
 program as well.[=
 
-get-text tag = autoopts
+INVOKE  get-text tag = autoopts
 
 =]
 @noindent
@@ -697,9 +711,11 @@ test -x ./check || {
 ./check --help | sed 's/\t/        /g'"
 ) ) =]
 @end example
+[=
 
-[= get-text tag = autoopts-main =]
+INVOKE  get-text tag = autoopts-main
 
+=]
 Here is an example program that uses the following set of definitions:
 
 @example
@@ -785,7 +801,9 @@ exec 3>&-" ))
 @end example
 [=
 
-get-text tag = autoopts-api =]
+INVOKE  get-text tag = autoopts-api
+
+=]
 [=`
 
 f=../autoopts/libopts.texi
@@ -796,10 +814,9 @@ cat $f
 `=]
 [=
 
-get-text tag = "autoopts-data"
+INVOKE  get-text tag = "autoopts-data"
 
 =]
-
 @example[=
 (out-push-new (string-append temp-dir "/hello.c"))
 
@@ -865,7 +882,7 @@ echo personalize > hello.conf
 @end example
 [=
 
-get-text tag = "ao-data2"
+INVOKE  get-text tag = "ao-data2"
 
 =]
 [=
@@ -973,17 +990,23 @@ sed "${sedcmd}" ${tempdir}/genshellopt.sh
 
 ` =]
 @end example
-[= get-text tag = autoinfo =]
+[=
 
+INVOKE  get-text tag = autoinfo
+
+=]
 @menu
 * AutoFSM::                        Automated Finite State Machine
 * AutoXDR::                        Combined RPC Marshalling
 * AutoEvents::                     Automated Event Management
 [=`cat  ${ADDON_MENU}`=]
 @end menu
+[=
 
-[= get-text tag = autofsm =][=
-`
+INVOKE  get-text tag = autofsm
+
+=][= `
+
 echo
 
 for f in ${ADDON_TEXI}
@@ -997,7 +1020,11 @@ do
 done
 
 ` =]
-[= get-text tag = Future =][=
+[=
+
+INVOKE  get-text tag = Future
+
+=][=
 
 (shell "rm -rf ${tempdir}")
 
