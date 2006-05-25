@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.9 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: funcDef.c,v 4.10 2006/05/25 04:11:07 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -491,11 +491,12 @@ build_defs( int defCt, tDefList* pList )
  *  @end example
  *
  *  Once the macro has been defined, this new macro can be invoked by
- *  specifying the macro name as the first token after the start macro
- *  marker.  Alternatively, you may make the invocation explicitly invoke a
- *  defined macro by specifying @code{INVOKE} in the macro invocation.  If
- *  you do that, the macro name can be computed with an expression that gets
- *  evaluated every time the INVOKE macro is encountered.  @xref{INVOKE}.
+ *  specifying the macro name as the first token after the start macro marker.
+ *  Alternatively, you may make the invocation explicitly invoke a defined
+ *  macro by specifying @code{INVOKE} (@pxref{INVOKE}) in the macro
+ *  invocation.  If you do that, the macro name can be computed with an
+ *  expression that gets evaluated every time the INVOKE macro is encountered.
+ *  @xref{INVOKE}.
  *
  *  Any remaining text in the macro invocation will be used to create new
  *  name/value pairs that only persist for the duration of the processing of
@@ -517,6 +518,20 @@ build_defs( int defCt, tDefList* pList )
  *  @item
  *  Sequences of strings are not concatenated.
  *  @end enumerate
+ *
+ *  @quotation
+ *  @strong{NB:} The macro is extracted from the template as the template is
+ *  scanned.  You cannot conditionally define a macro by enclosing it in an
+ *  @code{IF}/@code{ENDIF} (@pxref{IF}) macro pair.  If you need to dynamically
+ *  select the format of a @code{DEFINE}d macro, then put the flavors into
+ *  separate template files that simply define macros.  @code{INCLUDE}
+ *  (@pxref{INCLUDE}) the appropriate template when you have computed which
+ *  you need.
+ *  @end quotation
+ *
+ *  Due to this, it is acceptable and even a good idea to place all the
+ *  @code{DEFINE} macros at the end of the template.  That puts the main
+ *  body of the template at the beginning of the file.
 =*/
 /*=macfunc ENDDEF
  *

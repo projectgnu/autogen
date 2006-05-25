@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2006 Bruce Korb
 ##
-## Time-stamp:      "2006-01-23 16:18:37 bkorb"
+## Time-stamp:      "2006-05-19 17:27:30 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.11 2006/03/25 19:23:28 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.12 2006/05/25 04:11:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -19,7 +19,10 @@ AutoGen5 template man=%s.1
 
 :+]
 .TH [+: % prog-name (string-upcase! "%s") :+] 1 [+:
-  `date +%Y-%m-%d` :+] "" "Programmer's Manual"
+  `date +%Y-%m-%d` :+] "[+:
+  IF (or (exist? "package") (exist? "version"))
+    :+]([+: package :+] [+: version :+])[+:
+  ENDIF :+]" "Programmer's Manual"
 [+:
 
 ;; The following "dne" argument is a string of 5 characters:
@@ -171,13 +174,16 @@ ENDIF - "main" exists
     (begin
       (define optname-from "A-Z_^")
       (define optname-to   "a-z--") )
-) :+][+:
+)
+(if (exist? "option-info")
+    (string-append "\n.PP\n" (get "option-info") "\n") ) :+][+:
 
 FOR flag
 
 :+][+:
-  ;;  Skip the documentation options!
-  ;;
+
+  IF
+
   (if (exist? "enable")
       (set! opt-name (string-append (get "enable") "-" (get "name")))
       (set! opt-name (get "name")) )
@@ -195,8 +201,15 @@ FOR flag
                 (string-downcase! (get "arg-type")))
             "\\fP" ))
   )
-  :+][+:
-  IF (not (exist? "documentation")) :+]
+
+  (exist? "documentation")
+
+:+]
+.SS "[+: descrip :+]"[+:
+
+  ELSE *NOT* documentation
+
+:+]
 .TP[+:
     IF (exist? "value") :+][+:
       IF (exist? "long-opts") :+][+:
@@ -385,7 +398,8 @@ The default [+:(. opt-arg):+] for this option is:
  [+: arg-default :+][+:
       ENDIF     :+]
 .sp
-[+: (if (exist? "doc")
+[+:
+ (if (exist? "doc")
         (string-substitute (get "doc") "\\" "\\\\")
         "This option has not been fully documented." ) :+][+:
 

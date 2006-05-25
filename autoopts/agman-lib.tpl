@@ -4,13 +4,13 @@
 ##
 ##  AutoOpts copyright 1992-2006 Bruce Korb
 ##
-## Time-stamp:      "2005-04-10 09:21:44 bkorb"
+## Time-stamp:      "2006-05-24 20:52:58 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: agman-lib.tpl,v 4.3 2006/03/25 19:23:28 bkorb Exp $
+## $Id: agman-lib.tpl,v 4.4 2006/05/25 04:11:07 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included
@@ -44,18 +44,19 @@ AutoGen5 template null
  -e '/@ *example/,/@ *end *example/s/^/    /' \
  -e 's/^ *@ *example/.nf/' \
  -e 's/^ *@ *end *example/.fi/' \
- -e '/^ *@ *noindent/d' \
- -e '/^ *@ *enumerate/d' \
+ -e  '/^ *@ *noindent/d' \
+ -e  '/^ *@ *enumerate/d' \
  -e 's/^ *@ *end *enumerate/.br/' \
- -e '/^ *@ *table/d' \
+ -e  '/^ *@ *table/d' \
  -e 's/^ *@ *end *table/.br/' \
  -e 's/^@item \(.*\)/.sp\
 .IR "\1"/' \
  -e 's/^@item/.sp 1/' \
  -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
- -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\fI\1\\fP/g' \
+ -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\(lq\1\\(rq/g' \
  -e "s/^'/\\'/" \
- -e 's/^@\*/.br/' <<'_End_Of_Man_'
+ -e 's/^@\*/.br/' \
+ -e 's/ -/ \\-/g;s/^\.in \\-/.in -/' <<'_End_Of_Man_'
 [+:
 
 DEFINE emit-man-text    :+]

@@ -1028,7 +1028,7 @@ pseudo macro.
 
 This chapter describes the format of the AutoGen template macros
 and the usage of the AutoGen native macros.  Users may augment
-these by defining their own macros.  @xref{DEFINE}.
+these by defining their own macros, @xref{DEFINE}.
 
 @menu
 * pseudo macro::       Format of the Pseudo Macro
@@ -1384,8 +1384,9 @@ The scope is subdivided by @code{SELECT} macros.
 You must have at least one @code{SELECT} macro.
 
 @item DEFINE
-This macro has scope through the @code{ENDDEF} macro.
-The defined user macro can never be a block macro.
+This macro has scope through the @code{ENDDEF} macro.  The defined
+user macro can never be a block macro.  This macro is extracted from
+the template @i{before} the template is processed.
 
 @item FOR
 This macro has scope through the @code{ENDFOR} macro.
