@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.10 2006/05/25 04:11:07 bkorb Exp $
+ *  $Id: funcDef.c,v 4.11 2006/05/27 16:46:44 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -496,7 +496,6 @@ build_defs( int defCt, tDefList* pList )
  *  macro by specifying @code{INVOKE} (@pxref{INVOKE}) in the macro
  *  invocation.  If you do that, the macro name can be computed with an
  *  expression that gets evaluated every time the INVOKE macro is encountered.
- *  @xref{INVOKE}.
  *
  *  Any remaining text in the macro invocation will be used to create new
  *  name/value pairs that only persist for the duration of the processing of
