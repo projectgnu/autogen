@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-02-01 09:10:21 bkorb"
+# Time-stamp:     "2006-05-27 09:42:14 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/02/03 15:10:01 $
+# Last Modified:  $Date: 2006/05/27 16:42:59 $
 #
-# $Id: defs.in,v 4.9 2006/02/03 15:10:01 bkorb Exp $
+# $Id: defs.in,v 4.10 2006/05/27 16:42:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -96,8 +96,14 @@ be_silent()
     setx=:
     VERBOSE=false
     purge testdir
-    msg=echo
-    mkdir testdir || exit 1
+
+    # Sometimes, MSDos FS cannot even rename the directory!!
+    #
+    if test -d testdir
+    then purge testdir/* testdir/.??*
+    else msg=echo
+         mkdir testdir || exit 1
+    fi
 }
 
 be_verbose()
@@ -154,7 +160,7 @@ cleanup()
   if ${VERBOSE} ; then : ; else
     cd ${builddir}
     purge testdir
-    test -d testdir && mv testdir ZZJUNK
+    test -d testdir && mv testdir ZZJUNK-$$
   fi
   ${msg} ${testname} done
 }
