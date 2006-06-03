@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.12 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: agShell.c,v 4.13 2006/06/03 19:06:43 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -103,6 +103,10 @@ closeServer( void )
 static void
 sigHandler( int signo )
 {
+    static int timeout_limit = 5;
+    if ((signo == SIGALRM) && (--timeout_limit <= 0))
+        AG_ABEND( "Server shell timed out 5 times" );
+
     fprintf( pfTrace, "Closing server:  %s signal (%d) received\n",
              strsignal( signo ), signo );
     errClose = AG_TRUE;

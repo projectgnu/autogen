@@ -1,3 +1,7 @@
+2006-06-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(sigHandler): if we hit SIGALRM 5 times, abort AutoGen.
+
 2006-06-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expOutput.c(ag_scm_ag_fprintf): new scheme function
