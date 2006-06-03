@@ -1,5 +1,6 @@
 2006-06-02  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/expOutput.c(ag_scm_ag_fprintf): new scheme function
 	* agen5/schemedef.scm(string-table-new): newly exported Scheme function
 	(string-table-add): also
 	(emit-string-table): finally
