@@ -48,7 +48,7 @@ LIBS=${LIBS}\ `find ${top_builddir}/autoopts -name libopts.a -print`
 OPTIONS_DEF=${AGsrc}/opts.def
 DIRECTIVESRC=${AGsrc}/defDirect.c
 GETDEF_SRC=$(
-  echo ${AGsrc}/func*.c ${AGsrc}/exp*.c ${DIRECTIVESRC}  )
+  echo ${AGsrc}/func*.c ${AGsrc}/exp*.c ${AGsrc}/schemedef.scm ${DIRECTIVESRC} )
 
 ADDON_MENU=$(
   for f in columns getdefs xml2ag

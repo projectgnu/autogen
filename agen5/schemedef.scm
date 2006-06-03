@@ -89,40 +89,62 @@
 
 (define shell-cleanup "")
 
-;;; /*=sfunc   make_header_guard
+;;; /*=gfunc   make_header_guard
 ;;;  *
-;;;  * what:   create ifndef/define guard
+;;;  * what:   make self-inclusion guard
 ;;;  *
 ;;;  * exparg: name , header group name
 ;;;  *
-;;;  * doc:    This function will create a @code{#ifndef}/@code{#define}
-;;;  *         sequence for protecting a header from multiple evaluation.
-;;;  *         It will also set the Scheme variable @code{header-file}
-;;;  *         to the name of the file being protected and it will set
-;;;  *         @code{header-guard} to the name of the @code{#define} being
-;;;  *         used to protect it.  It is expected that this will be used
-;;;  *         as follows:
-;;;  *         @example
-;;;  *         [+ (make-header-guard "group_name") +]
-;;;  *         ...
-;;;  *         #endif /* [+ (. header-guard) +]
+;;;  * doc:
+;;;  *   This function will create a @code{#ifndef}/@code{#define}
+;;;  *   sequence for protecting a header from multiple evaluation.
+;;;  *   It will also set the Scheme variable @code{header-file}
+;;;  *   to the name of the file being protected and it will set
+;;;  *   @code{header-guard} to the name of the @code{#define} being
+;;;  *   used to protect it.  It is expected that this will be used
+;;;  *   as follows:
+;;;  *   @example
+;;;  *   [+ (make-header-guard "group_name") +]
+;;;  *   ...
+;;;  *   #endif /* [+ (. header-guard) +]
 ;;;  *
-;;;  *         #include "[+ (. header-file)  +]"
-;;;  *         @end example
-;;;  *         @noindent
-;;;  *         The @code{#define} name is composed as follows:
+;;;  *   #include "[+ (. header-file)  +]"
+;;;  *   @end example
+;;;  *   @noindent
+;;;  *   The @code{#define} name is composed as follows:
 ;;;  *
-;;;  *         @enumerate
-;;;  *         @item
-;;;  *         The first element is the string argument and a separating
-;;;  *         underscore.
-;;;  *         @item
-;;;  *         That is followed by the name of the header file with
-;;;  *         illegal characters mapped to underscores.
-;;;  *         @item
-;;;  *         The end of the name is always, "@code{_GUARD}".
-;;;  *         @end enumerate
-;;;  *         
+;;;  *   @enumerate
+;;;  *   @item
+;;;  *   The first element is the string argument and a separating underscore.
+;;;  *   @item
+;;;  *   That is followed by the name of the header file with illegal
+;;;  *   characters mapped to underscores.
+;;;  *   @item
+;;;  *   The end of the name is always, "@code{_GUARD}".
+;;;  *   @item
+;;;  *   Finally, the entire string is mapped to upper case.
+;;;  *   @end enumerate
+;;;  *
+;;;  *   The final @code{#define} name is stored in an SCM symbol named
+;;;  *   @code{header-guard}.  Consequently, the concluding @code{#endif} for the
+;;;  *   file should read something like:
+;;;  *	 
+;;;  *   @example
+;;;  *   #endif /* [+ (. header-guard) +] */
+;;;  *   @end example
+;;;  *   
+;;;  *	 The name of the header file (the current output file) is also stored
+;;;  *   in an SCM symbol, @code{header-file}.  Therefore, if you are also
+;;;  *   generating a C file that uses the previously generated header file,
+;;;  *   you can put this into that generated file:
+;;;  *   
+;;;  *   @example
+;;;  *   #include "[+ (. header-file) +]"
+;;;  *   @end example
+;;;  *   
+;;;  *   Obviously, if you are going to produce more than one header file from
+;;;  *   a particular template, you will need to be careful how these SCM symbols
+;;;  *   get handled.
 ;;; =*/
 ;;;
 (define header-file  "")
@@ -142,7 +164,7 @@
 (define-macro (defined-as predicate symbol)
   `(and (defined? ',symbol) (,predicate ,symbol)))
 
-;;; /*=sfunc   html_escape_encode
+;;; /*=gfunc   html_escape_encode
 ;;;  *
 ;;;  * what:   encode html special characters
 ;;;  * general-use:
@@ -159,6 +181,104 @@
     (string-substitute str
           '("&"      "<"     ">")
           '("&amp;"  "&lt;"  "&gt;") ) ))
+
+(define stt-table   (make-hash-table 31))
+(define stt-curr    stt-table)
+(define stt-idx-tbl stt-table)
+(define stt-idx     0)
+
+;;; /*=gfunc   string_table_new
+;;;  *
+;;;  * what:   create a table for C program strings
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the array of characters
+;;;  *
+;;;  * doc:    This function will create an array of characters.   The
+;;;  *         companion functions, (@xref{SCM string-table-add}, and
+;;;  *         @pxref{SCM emit-string-table}) will insert text and emit the
+;;;  *         populated table, respectively.
+;;;  *
+;;;  *         With these functions, it should be much easier to construct
+;;;  *         structures containing string offsets instead of string pointers.
+;;;  *         That can be very useful when transmitting, storing or sharing
+;;;  *         data with different address spaces.
+;;;  *
+;;;  *         These functions use the global name space @code{stt-*} in
+;;;  *         addition to the function names.
+;;; =*/
+;;;
+(define string-table-new (lambda (st-name) (begin
+   (set! stt-curr (make-hash-table 31))
+   (hash-create-handle! stt-table st-name stt-curr)
+   (out-push-new)
+   (out-suspend st-name)
+   (set! stt-idx-tbl (make-hash-table 31))
+   (hash-create-handle! stt-curr "string-indexes" stt-idx-tbl)
+   (hash-create-handle! stt-curr "current-index"  0)
+   ""
+)))
+
+;;; /*=gfunc   string_table_add
+;;;  *
+;;;  * what:   Add a string entry to a string table
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the array of characters
+;;;  * exparg: str-val , the (possibly) new value to add
+;;;  *
+;;;  * doc:    Check for a duplicate string and, if none, then insert a new
+;;;  *         string into the string table.  In all cases, returns the
+;;;  *         character index of the beginning of the string in the table.
+;;;  *
+;;;  *         The returned index can be used in expressions like:
+;;;  *         @example
+;;;  *         string_array + <returned-value>
+;;;  *         @end example
+;;;  *         @noindent
+;;;  *         that will yield the address of the first byte of the inserted
+;;;  *         string.  See the @file{strtable.test} AutoGen test for a usage
+;;;  *         example.
+;;; =*/
+;;;
+(define string-table-add (lambda (st-name str-val) (begin
+   (set! stt-curr    (hash-ref stt-table   st-name))
+   (set! stt-idx-tbl (hash-ref stt-curr    "string-indexes"))
+   (set! stt-idx     (hash-ref stt-idx-tbl str-val))
+   (if (not (number? stt-idx))
+       (begin
+          (out-resume st-name)
+          (emit (sprintf "\"%s\\0\"\n" str-val))
+          (out-suspend st-name)
+          (set! stt-idx (hash-ref stt-curr "current-index"))
+          (hash-create-handle! stt-idx-tbl str-val stt-idx)
+          (hash-set! stt-curr "current-index"
+                    (+ stt-idx (string-length str-val) 1)  )
+   )   )
+   stt-idx
+)))
+
+;;; /*=gfunc   emit_string_table
+;;;  *
+;;;  * what:   output a string table
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the array of characters
+;;;  *
+;;;  * doc:    Emit into the current output stream a
+;;;  *         @code{static const char} array named @code{st-name}
+;;;  *         that will have @code{NUL} bytes between each inserted string.
+;;; =*/
+;;;
+(define emit-string-table (lambda (st-name) (begin
+   (set! stt-curr (hash-ref stt-table   st-name))
+   (set! stt-idx  (hash-ref stt-curr "current-index"))
+   (emit (sprintf "\nstatic const char %s[%d] =\n" st-name stt-idx))
+   (out-resume st-name)
+   (emit (shell (string-append
+          "columns --spread=1 -I4 <<\\_EOF_\n" (out-pop #t) "_EOF_" )))
+   (emit ";\n")
+)))
 
 (use-modules (ice-9 debug))
 

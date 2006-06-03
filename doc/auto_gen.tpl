@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.21 2006/03/31 20:13:27 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.22 2006/06/03 05:46:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -47,47 +47,13 @@ texi=autogen.texi
 (define text-tag  "")
 (define func-name "")
 (define func-str  "")
+(define func-name "")
+(define func-str  "")
 
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-@c Define some AutoGen macros:  =][=
-
-DEFINE id-file =]
-@ignore
-Generated [= (tpl-file-line) =].
-Extracted from [=srcfile=] line [=linenum=].
-@end ignore[=
-
-ENDDEF # # # # # # # # # # # # #=][=
-
-DEFINE get-text     =][=
-
-(set! text-tag
-   (string-append "@ignore\n%s == "
-      (string-upcase! (get "tag")) " == %s or the surrounding 'ignore's\n"
-      "Extraction from autogen.texi\n"
-      "@end ignore" ))
-
-(extract texi-file-source text-tag) =][=
-
-ENDDEF get-text
-
-=][=
-
-DEFINE set-func-name =][=
-
-  (set! func-name (shell (sprintf "echo '%s' |
-    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
-    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
-
-  (set! func-str
-      (if (exist? "string") (get "string") func-name)) =][=
-
-ENDDEF
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-=]\input texinfo
+\=]
+\input texinfo
 @ignore
 \internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
 @end ignore
@@ -287,17 +253,16 @@ of course, be used in Scheme functions that get defined at those times,
 but they cannot be invoked.
 
 @menu[=
-(define func-name "")
-(define func-str "") =][=
-FOR gfunc =][=
-  (if (not (exist? "name")) (error "NO NAME")) =][=
+
+FOR gfunc    =][=
+  (if (not (exist? "name"))
+      (error "NO NAME"))          =][=
+
   IF (not (exist? "general_use")) =][=
-    set-func-name =]
-* SCM [= (sprintf "%-22s" (string-append func-str "::"))
-  =][= (string-append "@file{" func-name "} - " (get "what")) =][=
-  ENDIF =][=
+    INVOKE emit-menu-entry        =][=
+  ENDIF      =][=
+
 ENDFOR gfunc =]
-* SCM make-header-guard::   @file{make-header-guard} - protect a header file
 * SCM autogen-version::     @file{autogen-version} - ``[= version =]''
 * SCM c-file-line-fmt::     format file info as, ``@code{#line nn "file"}''
 @end menu
@@ -305,88 +270,13 @@ ENDFOR gfunc =]
 [=
 FOR gfunc =][=
   IF (not (exist? "general_use")) =][=
-    set-func-name =]
-@node SCM [= (. func-str) =]
-@subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
-@findex [=(. func-name)=][=
-% string "\n@findex %s" =]
-[= id-file     =]
-Usage:  ([=(. func-str)=][=
-    FOR exparg =] [=
-      arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
-      arg_optional " ]" =][=
-    ENDFOR exparg =])
-@*
-[= string (string-append func-name "@:  ") =][=doc=]
-[=
-    IF (exist? "exparg") =]
-Arguments:[=
-      FOR exparg =]
-@*
-[=arg_name=] - [=
-    arg_optional "Optional - " =][=
-        IF (exist? "arg_desc") =][=arg_desc=][=
-        ELSE        =]Undocumented[=
-        ENDIF       =][=
-      ENDFOR exparg =][=
-    ELSE
-    =]
-This Scheme function takes no arguments.[=
-    ENDIF           =][=
-  ENDIF general_use =][=
+    INVOKE emit-scm-func          =][=
+  ENDIF general_use               =][=
 ENDFOR gfunc
 =]
 @ignore
 Generated [= (tpl-file-line) =].
 @end ignore
-
-@node SCM make-header-guard
-@subsection @file{make-header-guard} - make self-inclusion guard
-@findex make-header-guard
-@findex header-file
-@findex header-guard
-
-Emit a @code{#ifndef}/@code{#define} sequence based upon the output file
-name and the provided prefix.  It will also define a scheme variable
-named, @code{header-file} and @code{header-guard}.  The @code{#define}
-name is composed as follows:
-
-@enumerate
-@item
-The first element is the string argument and a separating underscore.
-@item
-That is followed by the name of the header file with illegal characters
-mapped to underscores.
-@item
-The end of the name is always, "@code{_GUARD}".
-@item
-Finally, the entire string is mapped to upper case.
-@end enumerate
-
-The final @code{#define} name is stored in an SCM symbol named
-@code{header-guard}.  Consequently, the concluding @code{#endif} for the
-file should read something like:
-
-@example
-#endif /* [+ (. header-guard) +] */
-@end example
-
-The name of the header file (the current output file) is also stored in an SCM
-symbol, @code{header-file}.  Therefore, if you are also generating a
-C file that uses the previously generated header file, you can put
-this into that generated file:
-
-@example
-#include "[+ (. header-file) +]"
-@end example
-
-Obviously, if you are going to produce more than one header file from
-a particular template, you will need to be careful how these SCM symbols
-get handled.
-
-Arguments:
-@*
-prefix - first segment of @code{#define} name
 
 @node SCM autogen-version
 @subsection @file{autogen-version} - autogen version number
@@ -422,67 +312,27 @@ comparisons.  If you are looking for inequality, the Scheme/Lisp way
 of spelling that is, ``(not (= ...))''.
 
 @menu[=
-(define func-name "")
-(define func-str "") =][=
-FOR gfunc =][=
+
+FOR gfunc                   =][=
+
   IF (exist? "general_use") =][=
-    set-func-name =]
-* SCM [= (sprintf "%-20s" (string-append func-str "::"))
-  =][= (string-append "@file{" func-name "} - " (get "what")) =][=
-  ENDIF =][=
-ENDFOR gfunc =]
-* SCM html-escape-encode::  @file{html-escape-encode} - escape special chars
+    INVOKE emit-menu-entry  =][=
+  ENDIF                     =][=
+
+ENDFOR gfunc
+
+=]
 @end menu
 
 [=
+
 FOR gfunc =][=
   IF (exist? "general_use") =][=
-    set-func-name =]
-@node SCM [= (. func-str) =]
-@subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
-@findex [=(. func-name)=][=
-% string "\n@findex %s" =]
-[= id-file     =]
-Usage:  ([=(. func-str)=][=
-    FOR exparg =] [=
-      arg_optional "[ " =][=arg_name=][= arg_list " ..." =][=
-      arg_optional " ]" =][=
-    ENDFOR exparg =])
-@*
-[= string (string-append func-name ":  ") =][=doc=]
-[=
-    IF (exist? "exparg") =]
-Arguments:[=
-      FOR exparg =]
-@*
-[=arg_name=] - [=
-    arg_optional "Optional - " =][=
-        IF (exist? "arg_desc") =][=arg_desc=][=
-        ELSE=]Undocumented[=
-        ENDIF=][=
-      ENDFOR exparg =][=
-    ELSE
-    =]
-This Scheme function takes no arguments.[=
-    ENDIF =][=
-  ENDIF general_use =][=
+    INVOKE emit-scm-func    =][=
+  ENDIF general_use         =][=
 ENDFOR gfunc
-=]
 
-@node SCM html-escape-encode
-@subsection @file{html-escape-encode} - escape special chars
-@findex html-escape-encode
-
-Usage:  (html-escape-encode str)
-@*
-Substitute escape sequences for characters that are special to HTML/XML.
-It will replace "@code{&}", "@code{<}" and "@code{>}" with the strings,
-"@code{&amp;}", "@code{&lt;}", and "@code{&gt;}", respectively.
-
-Arguments:
-@*
-str - string to transform
-[=
+=][=
 
 INVOKE  get-text tag = MACROS
 
@@ -1023,6 +873,101 @@ done
 [=
 
 INVOKE  get-text tag = Future
+
+=][=
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+=][=
+
+DEFINE id-file =]
+@ignore
+Generated [= (tpl-file-line) =].
+Extracted from [=srcfile=] line [=linenum=].
+@end ignore[=
+
+ENDDEF  id-file
+
+# # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE get-text     =][=
+
+(set! text-tag
+   (string-append "@ignore\n%s == "
+      (string-upcase! (get "tag")) " == %s or the surrounding 'ignore's\n"
+      "Extraction from autogen.texi\n"
+      "@end ignore" ))
+
+(extract texi-file-source text-tag) =][=
+
+ENDDEF get-text
+
+# # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE set-func-name =][=
+
+  (set! func-name (shell (sprintf "echo '%s' |
+    sed -e 's/-p$/?/' -e 's/-x$/!/' -e 's/-to-/->/'"
+    (string-tr! (get "name") "A-Z_^" "a-z--") )) )
+
+  (set! func-str
+      (if (exist? "string") (get "string") func-name)) =][=
+
+ENDDEF
+
+# # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-scm-func     =][=
+
+  INVOKE  set-func-name  =]
+@node SCM [= (. func-str)=]
+@subsection [= (string-append "@file{" func-name "} - " (get "what")) =]
+@findex [= (. func-name) =][=
+% string "\n@findex %s"  =]
+[=     id-file           =]
+Usage:  ([= (. func-str) =][=
+
+    FOR exparg           =] [=
+
+      arg_optional  "[ " =][=arg_name=][= arg_list " ..." =][=
+      arg_optional  " ]" =][=
+
+    ENDFOR   exparg      =])
+@*
+[= string (string-append func-name ":  ") =][=doc=]
+[=
+    IF (exist? "exparg") =]
+Arguments:[=
+      FOR exparg         =]
+@*
+[=arg_name=] - [=
+
+    arg_optional "Optional - " =][=
+        IF (exist? "arg_desc") =][=arg_desc=][=
+        ELSE             =]Undocumented[=
+        ENDIF            =][=
+
+      ENDFOR exparg      =][=
+
+    ELSE
+    =]
+This Scheme function takes no arguments.[=
+    ENDIF                =]
+[=
+
+ENDDEF
+
+# # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-menu-entry   =][=
+
+   INVOKE set-func-name  =][=
+   (sprintf "\n* SCM %-20s @file{%s} - %s"  (string-append func-str "::")
+            func-name (get "what"))
+   =][=
+ENDDEF  emit-menu-entry
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 =][=
 

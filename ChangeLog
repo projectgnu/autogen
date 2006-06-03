@@ -1,3 +1,11 @@
+2006-06-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/schemedef.scm(string-table-new): newly exported Scheme function
+	(string-table-add): also
+	(emit-string-table): finally
+	* agen5/test/strtable.test: test the stuff
+	* agen5/test/Makefile.am(strtable.test): run it
+
 2006-05-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/defs.in: cope with MS-DOS failure to rename file

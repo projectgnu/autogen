@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-01-08 19:14:52 bkorb"
+## Time-stamp:      "2006-06-02 22:26:42 bkorb"
 ## Copyright (c):   1997-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.8 2006/03/25 19:23:28 bkorb Exp $
+## $Id: Makefile.am,v 4.9 2006/06/03 05:46:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -21,7 +21,7 @@ NOSHELL_TESTS = \
   endmac.test  for.test     forfrom.test forin.test   format.test  get.test  \
   gperf.test   heredef.test html.test    in.test      license.test line.test \
   loop.test    make.test    match.test   reorder.test stack.test   stress.test \
-  string.test
+  string.test  strtable.test
 UNREADY_TESTS = daemon.test
 MAINTAINERCLEANFILES = Makefile.in
 

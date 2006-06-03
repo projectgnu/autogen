@@ -1,6 +1,14 @@
 @c -*- Mode: texinfo -*-
 @setfilename autogen.info
 
+This file serves two purposes:
+
+1) it provides that stupid (at)setfilename so that automake will
+   deign to produce the documentation
+
+2) a text repository for documentation that would make the doc
+   template more confusing.
+
 @ignore
 START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
