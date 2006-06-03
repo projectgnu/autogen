@@ -2,8 +2,8 @@
 
 html
 
-# Time-stamp: "2005-07-02 08:16:26 bkorb"
-# Version:    "$Revision: 4.6 $
+# Time-stamp: "2006-06-03 13:16:44 bkorb"
+# Version:    "$Revision: 4.7 $
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -11,7 +11,7 @@ html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.6 2005/07/09 22:54:51 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.7 2006/06/03 20:37:44 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -142,7 +142,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2005/07/09 22:54:51 $ $Author: bkorb $
+$Date: 2006/06/03 20:37:44 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

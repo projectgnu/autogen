@@ -1,13 +1,13 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-12-15 15:17:51 bkorb"
+## Time-stamp:      "2006-06-03 12:48:16 bkorb"
 ## Copyright (c):   2003-2006 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.8 2006/03/25 19:23:29 bkorb Exp $
+## $Id: Makefile.am,v 4.9 2006/06/03 20:37:44 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -54,6 +54,7 @@ gnudoc  :
 	pkgsrcdir=`cd $(srcdir) ; pwd` ; \
 	cd $(top_builddir)/doc ; \
 	$(DOCENV) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh \
+		"$(PACKAGE)" "$(PACKAGE_VERSION)" \
 		The Automated Program Generator
 
 ## Makefile.am ends here
