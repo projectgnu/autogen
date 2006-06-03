@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.14 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: autogen.h,v 4.15 2006/06/03 18:25:49 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -409,6 +409,7 @@ MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
 MKSTRING( NotStr,     "ERROR: %s is not a string\n" );
 MKSTRING( DevNull,    "/dev/null" );
 MKSTRING( ShellEnv,   "SHELL" );
+MKSTRING( Format,     "format" );
 
 /*
  *  It may seem odd that there are two 'nil' strings.  It is used by
@@ -478,6 +479,7 @@ extern char* ag_scribble( size_t size );
 
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     gh_string_p(_s)
+# define AG_SCM_NUMBER_P(_s)     gh_number_p(_s)
 # define AG_SCM_BOOL_P(_b)       gh_boolean_p(_b)
 # define AG_SCM_SYM_P(_s)        gh_symbol_p(_s)
 # define AG_SCM_IS_PROC(_p)      gh_procedure_p(_p)
@@ -512,6 +514,7 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 
 # define AG_SCM_STRLEN(_s)       SCM_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     SCM_STRINGP(_s)
+# define AG_SCM_NUMBER_P(_s)     SCM_NUMBERP(_s)
 # define AG_SCM_BOOL_P(_b)       SCM_BOOLP(_b)
 # define AG_SCM_SYM_P(_s)        SCM_SYMBOLP(_s)
 # define AG_SCM_IS_PROC(_p)      SCM_NFALSEP( scm_procedure_p(_p))
@@ -548,6 +551,7 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 
 # define AG_SCM_STRLEN(_s)       SCM_STRING_LENGTH(_s)
 # define AG_SCM_STRING_P(_s)     scm_is_string(_s)
+# define AG_SCM_NUMBER_P(_s)     scm_is_number(_s)
 # define AG_SCM_BOOL_P(_b)       SCM_BOOLP(_b)
 # define AG_SCM_SYM_P(_s)        SCM_SYMBOLP(_s)
 # define AG_SCM_IS_PROC(_p)      scm_is_true( scm_procedure_p(_p))

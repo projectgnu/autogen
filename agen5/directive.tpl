@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.8 2006/03/25 19:23:27 bkorb Exp $
+# $Id: directive.tpl,v 4.9 2006/06/03 18:25:49 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -17,7 +17,7 @@ h =]
      "\n *\n *  copyright 1992-2006 Bruce Korb\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"
-     (make-header-guard "directive")
+     (make-header-guard "autogen")
   )
 
 =]
@@ -91,14 +91,13 @@ static tDirTable dirTable[ DIRECTIVE_CT ] = {
  */
 #define SCHEME_INIT_FILE [= (c-string (out-name)) =]
 static const int  schemeLine = __LINE__+2;
-static const char zSchemeInit[] =
-[= (kr-string (shell
+static const char zSchemeInit[= (set! tmp-txt (shell
 
 "sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
- ;; "
-=][= # " =]; /* for emacs: ' */ /* " */
+(emit (sprintf "[%d] =\n" (+ (string-length tmp-txt) 1)))
+(kr-string tmp-txt) =];
 
 /*
  *  The shell initialization string.  It is not in "const" memory because

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.10 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expPrint.c,v 4.11 2006/06/03 18:25:49 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -32,7 +32,6 @@
 static sigjmp_buf printJumpEnv;
 static void   printFault( int sig );
 static ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
-tSCC pzFormatName[] = "format";
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -205,7 +204,7 @@ SCM
 ag_scm_sprintf( SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
+    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
 
     if (list_len <= 0)
         return fmt;
@@ -231,7 +230,7 @@ SCM
 ag_scm_printf( SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
+    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
 
     gh_display( run_printf( pzFmt, list_len, alist ));
     return SCM_UNDEFINED;
@@ -255,7 +254,7 @@ SCM
 ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 {
     int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, pzFormatName );
+    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
     SCM   res      = run_printf( pzFmt, list_len, alist );
 
     return  scm_display( res, port );
@@ -287,8 +286,8 @@ ag_scm_hide_email( SCM display, SCM eaddr )
         "document.write('\" >%s</a>');\n"
         "//-->\n</script>";
     tSCC zFmt[]   = "&#%d;";
-    char*  pzDisp = ag_scm2zchars( display, pzFormatName );
-    char*  pzEadr = ag_scm2zchars( eaddr,   pzFormatName );
+    char*  pzDisp = ag_scm2zchars( display, zFormat );
+    char*  pzEadr = ag_scm2zchars( eaddr,   zFormat );
     size_t str_size = (strlen( pzEadr ) * sizeof( zFmt ))
             + sizeof( zStrt ) + sizeof( zEnd ) + strlen( pzDisp );
 
@@ -340,7 +339,7 @@ ag_scm_hide_email( SCM display, SCM eaddr )
 SCM
 ag_scm_format_arg_count( SCM fmt )
 {
-    char* pzFmt = ag_scm2zchars( fmt, pzFormatName );
+    char* pzFmt = ag_scm2zchars( fmt, zFormat );
     int   ct    = 0;
     for (;;) {
         switch (*(pzFmt++)) {

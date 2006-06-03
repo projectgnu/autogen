@@ -189,23 +189,81 @@
 
 ;;; /*=gfunc   string_table_new
 ;;;  *
-;;;  * what:   create a table for C program strings
+;;;  * what:   create a string table
 ;;;  * general-use:
 ;;;  *
 ;;;  * exparg: st-name , the name of the array of characters
 ;;;  *
-;;;  * doc:    This function will create an array of characters.   The
-;;;  *         companion functions, (@xref{SCM string-table-add}, and
-;;;  *         @pxref{SCM emit-string-table}) will insert text and emit the
-;;;  *         populated table, respectively.
+;;;  * doc:
+;;;  *   This function will create an array of characters.  The companion
+;;;  *   functions, (@xref{SCM string-table-add}, and @pxref{SCM
+;;;  *   emit-string-table}) will insert text and emit the populated table,
+;;;  *   respectively.
 ;;;  *
-;;;  *         With these functions, it should be much easier to construct
-;;;  *         structures containing string offsets instead of string pointers.
-;;;  *         That can be very useful when transmitting, storing or sharing
-;;;  *         data with different address spaces.
+;;;  *   With these functions, it should be much easier to construct structures
+;;;  *   containing string offsets instead of string pointers.  That can be very
+;;;  *   useful when transmitting, storing or sharing data with different address
+;;;  *   spaces.
 ;;;  *
-;;;  *         These functions use the global name space @code{stt-*} in
-;;;  *         addition to the function names.
+;;;  *   @noindent
+;;;  *   Here is a brief example copied from the strtable.test test:
+;;;  *
+;;;  *   @example
+;;;  *      [+ (string-table-new "scribble")
+;;;  *    `'   (out-push-new)
+;;;  *    `'   (define ix 0)
+;;;  *    `'   (define ct 1)  +][+
+;;;  *      
+;;;  *      FOR str IN that was the week that was +][+
+;;;  *    `'  (set! ct (+ ct 1))
+;;;  *    `'  (set! ix (string-table-add "scribble" (get "str")))
+;;;  *      +]
+;;;  *    `'    scribble + [+ (. ix) +],[+
+;;;  *      ENDFOR  +]
+;;;  *    `'    NULL @};
+;;;  *      [+ (out-suspend "main")
+;;;  *    `'   (emit-string-table "scribble")
+;;;  *    `'   (ag-fprintf 0 "\nconst char *ap[%d] = @{" ct)
+;;;  *    `'   (out-resume "main")
+;;;  *    `'   (out-pop #t) +]
+;;;  *   @end example
+;;;  *
+;;;  *   @noindent
+;;;  *   Some explanation:
+;;;  *
+;;;  *   @noindent
+;;;  *   I added the @code{(out-push-new)} because the string table text is
+;;;  *   diverted into an output stream named, ``scribble'' and I want to have
+;;;  *   the string table emitted before the string table references.  The string
+;;;  *   table references are also emitted inside the @code{FOR} loop.  So, when
+;;;  *   the loop is done, the current output is suspended under the
+;;;  *   name, ``main'' and the ``scribble'' table is then emitted into the
+;;;  *   primary output.  (@code{emit-string-table} inserts its output directly
+;;;  *   into the current output stream.  It does not need to be the last
+;;;  *   function in an AutoGen macro block.)  Next I @code{ag-fprintf} the
+;;;  *   array-of-pointer declaration directly into the current output.
+;;;  *   Finally I restore the ``main'' output stream and @code{(out-pop #t)}-it
+;;;  *   into the main output stream.
+;;;  *
+;;;  *   Here is the result.  Note that duplicate strings are not repeated
+;;;  *   in the string table:
+;;;  *
+;;;  *   @example
+;;;  *      static const char scribble[18] =
+;;;  *    `'    "that\0" "was\0"  "the\0"  "week\0";
+;;;  *
+;;;  *      const char *ap[7] = @{
+;;;  *    `'    scribble + 0,
+;;;  *    `'    scribble + 5,
+;;;  *    `'    scribble + 9,
+;;;  *    `'    scribble + 13,
+;;;  *    `'    scribble + 0,
+;;;  *    `'    scribble + 5,
+;;;  *    `'    NULL @};
+;;;  *   @end example
+;;;  *
+;;;  *   These functions use the global name space @code{stt-*} in addition to
+;;;  *   the function names.
 ;;; =*/
 ;;;
 (define string-table-new (lambda (st-name) (begin
@@ -221,7 +279,7 @@
 
 ;;; /*=gfunc   string_table_add
 ;;;  *
-;;;  * what:   Add a string entry to a string table
+;;;  * what:   Add an entry to a string table
 ;;;  * general-use:
 ;;;  *
 ;;;  * exparg: st-name , the name of the array of characters

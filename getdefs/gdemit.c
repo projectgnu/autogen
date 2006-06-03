@@ -1,12 +1,12 @@
 /*
- *  $Id: gdemit.c,v 4.4 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: gdemit.c,v 4.5 2006/06/03 18:25:50 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2006/03/25 19:23:28 $
+ *  Last Modified:     $Date: 2006/06/03 18:25:50 $
  *            by: bkorb
  */
 
@@ -39,7 +39,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut );
  *  that every line be prefixed with something that matches the
  *  pattern:
  *
- *        "^[^*]*\*"
+ *        "^[^*]*\*+"
  *
  *  and any line that does not is ignored.  So, here we strip off
  *  that prefix before we go ahead and try to parse it.

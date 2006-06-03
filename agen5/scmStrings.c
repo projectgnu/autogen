@@ -1,7 +1,7 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.3 2005/12/05 20:46:43 bkorb Exp $
+ *  $Id: scmStrings.c,v 4.4 2006/06/03 18:25:49 bkorb Exp $
  *  Temporary SCM strings.
  */
 
@@ -95,7 +95,7 @@ ag_scm2zchars( SCM s, tCC* type )
     {
         size_t buflen = scm_to_locale_stringbuf( s, buf, len );
         if (buflen != len)
-            AG_ABEND( aprf("scm_string_length returned wrong value"
+            AG_ABEND( aprf("scm_string_length returned wrong value: "
                            "%d != %d\n", buflen, len));
         buf[ len ] = NUL;
     }

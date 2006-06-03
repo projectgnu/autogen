@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.11 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expOutput.c,v 4.12 2006/06/03 18:25:49 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -234,7 +234,7 @@ ag_scm_out_suspend( SCM suspName )
 
 /*=gfunc out_resume
  *
- * what:   resume current output file
+ * what:   resume suspended output file
  * exparg: suspName, A name tag for reactivating
  * doc:  
  *  If there has been a suspended output, then make that output descriptor
@@ -263,6 +263,82 @@ ag_scm_out_resume( SCM suspName )
                     pzName ));
     /* NOTREACHED */
     return SCM_UNDEFINED;
+}
+
+
+/*=gfunc ag_fprintf
+ *
+ * what:  format to autogen stream
+ * general_use:
+ *
+ * exparg: ag-diversion, AutoGen diversion name or number
+ * exparg: format,       formatting string
+ * exparg: format-arg,   list of arguments to formatting string, opt, list
+ *
+ * doc:  Format a string using arguments from the alist.
+ *       Write to a specified AutoGen diversion.
+ *       That may be either a specified suspended output stream
+ *       (@pxref{SCM out-suspend}) or an index into the output stack
+ *       (@pxref{SCM out-push-new}).  @code{(ag-fprintf 0 ...)} is
+ *       equivalent to @code{(emit (sprintf ...))}, and
+ *       @code{(ag-fprintf 1 ...)} sends output to the most recently
+ *       suspended output stream.
+=*/
+SCM
+ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
+{
+    static const char invalid_z[] = "ag-fprintf: 'port' is invalid";
+    int   list_len = scm_ilength( alist );
+    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
+    SCM   res      = run_printf( pzFmt, list_len, alist );
+
+    /*
+     *  If "port" is a string, it must match one of the suspended outputs.
+     *  Otherwise, we'll fall through to the abend.
+     */
+    if (AG_SCM_STRING_P(port)) {
+        int  ix  = 0;
+        tCC* pzName = ag_scm2zchars( port, "resume name" );
+
+        for (; ix < suspendCt; ix++) {
+            if (strcmp( pSuspended[ ix ].pzSuspendName, pzName ) == 0) {
+                tFpStack* pSaveFp = pCurFp;
+                pCurFp = pSuspended[ ix ].pOutDesc;
+                (void) ag_scm_emit( res );
+                pCurFp = pSaveFp;
+                return SCM_UNDEFINED;
+            }
+        }
+    }
+
+    /*
+     *  If "port" is a number, it is an index into the output stack with
+     *  "0" (zero) representing the current output and "1" the last suspended
+     *  output.  If the number is out of range, we'll fall through to the abend.
+     */
+    else if (AG_SCM_NUMBER_P(port)) do {
+        tFpStack* pSaveFp = pCurFp;
+        unsigned long val = gh_scm2ulong(port);
+
+        for (; val > 0; val--) {
+            pCurFp = pCurFp->pPrev;
+            if (pCurFp == NULL) {
+                pCurFp = pSaveFp;
+                goto fprintf_woops;
+            }
+        }
+
+        (void) ag_scm_emit( res );
+        pCurFp  = pSaveFp;
+        return SCM_UNDEFINED;
+        
+    } while (0);
+
+    /*
+     *  Still here?  We have a bad "port" specification.
+     */
+ fprintf_woops:
+    AG_ABEND( invalid_z );
 }
 
 

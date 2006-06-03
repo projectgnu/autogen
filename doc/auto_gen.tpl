@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.22 2006/06/03 05:46:51 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.23 2006/06/03 18:25:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -934,7 +934,11 @@ Usage:  ([= (. func-str) =][=
 
     ENDFOR   exparg      =])
 @*
-[= string (string-append func-name ":  ") =][=doc=]
+[= string (string-append func-name ":  ") =][=
+   (shell (string-append
+          "(set -x;sed \"s/^\\`'//\" <<\\_EODoc_\n"
+          (if (exist? "doc") (get "doc") "This function is not documented.")
+          "\n_EODoc_\n)" ))=]
 [=
     IF (exist? "exparg") =]
 Arguments:[=

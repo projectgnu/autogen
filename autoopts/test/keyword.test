@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2006-05-24 20:34:35 bkorb"
+# Time-stamp:        "2006-05-27 09:51:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.9 2006/05/25 04:11:07 bkorb Exp $
+# $Id: keyword.test,v 4.10 2006/06/03 18:25:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -58,7 +58,7 @@ compile "-X"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.res-help
-cat > ${testname}.res-help <<'_EOF_'
+cat > ${testname}.res-help <<\_EOF_
 test_keyword - Test AutoOpts for keyword
 USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -107,7 +107,7 @@ cmp -s ${testname}.*-help || \
 egrep -v '^#' ${testname}.cfg > ${testname}res.cfg || \
   failure ${testname} could not create ${testname}.cfg
 
-cat > ${testname}base.cfg <<- _EndIni_
+cat > ${testname}base.cfg <<- \_EndIni_
 	trace               expressions
 	sets                none + second + third + fourth + ninth + thirteenth
 	_EndIni_
@@ -115,7 +115,7 @@ cat > ${testname}base.cfg <<- _EndIni_
 cmp -s ${testname}base.cfg ${testname}res.cfg || \
   failure "`diff ${testname}base.cfg ${testname}res.cfg`"
 
-cat > ${testname}.t1-b <<- _EndTst_
+cat > ${testname}.t1-b <<- \_EndTst_
 	OPTION_CT=2
 	export OPTION_CT
 	TEST_KEYWORD_TRACE='expressions'
@@ -247,7 +247,7 @@ cmp -s ${testname}-base.1 ${testname}-res.1 || \
 
 exec 3> ${testname}_2.def
 sed '/^prog-name/s/";/_2";/;/^main *=/,$d' ${testname}.def >&3
-cat >&3 <<- _EOF_
+cat >&3 <<- \_EOF_
 	include = '#include <stdio.h>';
 	main = {
 	    main-type = main;
