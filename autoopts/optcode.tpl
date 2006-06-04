@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.19 2006/06/04 21:31:13 bkorb Exp $
+#$Id: optcode.tpl,v 4.20 2006/06/04 22:14:04 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-04 13:55:17 bkorb"
+# Time-stamp:      "2006-06-04 15:13:37 bkorb"
 
 =][=
 ;;; 
@@ -101,21 +101,6 @@ extern "C" {
 #endif
 [=
 
-IF (not (exist? "copyright") )
-
-=]
-#define zCopyright       NULL
-#define zCopyrightNotice NULL[=
-
-ELSE copyright exists:
-
-=]
-#define zCopyright       [=
-  (new-string-ref
-       (sprintf "%s copyright (c) %s %s, all rights reserved" prog-name
-                (get "copyright.date") (get "copyright.owner") ) ) =]
-#define zCopyrightNotice [=
-
   CASE (get "copyright.type") =][=
 
     =  gpl  =][=(set! tmp-text (gpl  prog-name "" ))=][=
@@ -124,21 +109,41 @@ ELSE copyright exists:
     = note  =][=(set! tmp-text (get  "copyright.text"))=][=
     *       =][=(set! tmp-text "Copyrighted")=][=
 
-  ESAC =][=  (new-string-ref tmp-text ) =][=
+  ESAC      =][=
 
-ENDIF copyright exists
+(if (not (exist? "copyright"))
+    (begin
+        (define cr-ref "NULL")
+        (define cr-note-ref "NULL")
+    )
+
+    (begin
+        (define cr-ref (new-string-ref
+             (sprintf "%s copyright (c) %s %s, all rights reserved"
+                 prog-name (get "copyright.date") (get "copyright.owner")
+        )    ))
+
+        (define cr-note-ref (new-string-ref tmp-text))
+)   )
 
 =]
 extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
 [=
-IF (exist? "include") =]
+
+IF (exist? "include")
+
+=]
 /*
  *  global included definitions
  */
 [=(join "\n" (stack "include"))  =]
-[=ENDIF "include exists" =]
+[=
+
+ENDIF "include exists"
+
+=]
 #ifndef NULL
 #  define NULL 0
 #endif
@@ -209,7 +214,7 @@ IF (exist? "homerc")
 
 ENDIF (exist? "homerc")     =][=
 
-  invoke declare-option-callbacks  =][=
+INVOKE declare-callbacks    =][=
 
 IF (and (exist? "version") make-test-main) =]
 #ifdef [=(. main-guard)     =]
@@ -333,6 +338,44 @@ ENDIF
 (define full-ver-ref (if (not (exist? "version")) "NULL"
         (new-string-ref version-text) ))
 
+(define patch-text (lambda (t-name)
+  (string-append
+    "\n"
+
+    (shell (string-append
+      "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n"
+      (get t-name)
+      "\n_EODetail_" ))
+
+    "\n"
+) ))
+
+(define explain-ref
+  (if (or (exist? "explain") (== (get "main.main-type") "for-each"))
+      (begin
+ 	 (if (exist? "explain")
+ 	     (set! tmp-text (patch-text "explain"))
+ 	     (set! tmp-text "")  )
+         (if (== (get "main.main-type") "for-each")
+             (set! tmp-text (string-append tmp-text
+
+"\nIf no arguments are provided, input arguments are read from stdin,
+one per line; blank and `#'-prefixed lines are comments.
+'stdin' may not be a terminal (tty).\n" ))
+
+         )
+
+         (new-string-ref tmp-text)
+      )
+
+      "NULL"
+) )
+
+(define detail-ref (if (not (exist? "detail")) "NULL"
+  (new-string-ref (patch-text "detail")) ))
+
+(tpl-file-line extract-fmt)
+
 =][=
 
 IF (exist? "homerc")
@@ -344,55 +387,13 @@ tSCC*  apzHomeList[] = {[=
   ENDFOR homerc=]
     NULL };[=
 
-ELSE                    =]
+ELSE
+
+=]
 #define apzHomeList NULL[=
-ENDIF                   =][=
 
-(define patch-text (lambda (t-name)
-  (set! tmp-text (kr-string (string-append "\n"
+ENDIF
 
-  (shell (string-append
-    "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n"
-    (get t-name)
-    "\n_EODetail_" ))
-  "\n" ))) ))
-
-                        =][=
-
-(define explain-ref
-  (if (or (exist? "explain") (== (get "main.main-type") "for-each"))
-      ()
-      "NULL"
-) )
-
-IF (or (exist? "explain") (== (get "main.main-type") "for-each"))  =]
-tSCC   zExplain[]     = [=
-
- (if (exist? "explain")
-     (patch-text "explain")
-     (set! tmp-text "")  )
-
- (if (== (get "main.main-type") "for-each")
-   (set! tmp-text (string-append tmp-text
-
-"\n\"If no arguments are provided, input arguments are read from stdin,\\n\\
-one per line; blank and '#'-prefixed lines are comments.\\n\\
-'stdin' may not be a terminal (tty).\\n\"" ))  )
-
- tmp-text =];[=
-
-ELSE                    =]
-#define zExplain NULL[=
-ENDIF                   =][=
-
-IF (exist? "detail")    =]
-tSCC    zDetail[]     = [= (patch-text "detail") tmp-text =];[=
-
-ELSE                    =]
-#define zDetail         NULL[=
-ENDIF                   =][=
-
-(tpl-file-line extract-fmt)
 =]
 #if defined(ENABLE_NLS)
 # define OPTPROC_BASE OPTPROC_TRANSLATE
@@ -424,10 +425,10 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_HAS_IMMED[=  ENDIF=] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         [= (. PROGNAME-ref) =],
-    [= (. rc-ref) =],      zCopyright,   zCopyrightNotice,
-    [= (. full-ver-ref) =], apzHomeList,  [= (. usage-ref) =],
-    zExplain,     zDetail,      optDesc,
-    [= (. bug-ref) =],                  /* address to send bugs to */
+    [= (. rc-ref)      =], [= (. cr-ref) =],   [= (. cr-note-ref) =],
+    [= (. full-ver-ref)=], apzHomeList,  [= (. usage-ref) =],
+    [= (. explain-ref) =], [= (. detail-ref) =],      optDesc,
+    [= (. bug-ref)     =], /* address to send bugs to */
     NULL, NULL,                 /* extensions/saved state  */
     [= (. usage-proc) =],       /* usage procedure */
     translate_option_strings,   /* translation procedure */
