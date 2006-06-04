@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.13 2006/03/25 19:23:28 bkorb Exp $
+# $Id: opthead.tpl,v 4.14 2006/06/04 21:31:13 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-01-25 08:34:12 bkorb"
+# Time-stamp:      "2006-06-04 10:16:56 bkorb"
 
 =]
 /*
@@ -10,6 +10,9 @@
  *  Options generated for the [=prog-name=] program.
  *  These macros are documented in the AutoGen info file in the
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
+ *
+ *  This header should be sourced by all modules that need access to the
+ *  state of the [= prog-name =] options.
  */
 [= (make-header-guard "autoopts") =]
 [= Option_Copyright =][=

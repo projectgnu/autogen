@@ -305,9 +305,7 @@
    (set! stt-idx     (hash-ref stt-idx-tbl str-val))
    (if (not (number? stt-idx))
        (begin
-          (out-resume st-name)
-          (emit (sprintf "\"%s\\0\"\n" str-val))
-          (out-suspend st-name)
+          (ag-fprintf st-name "%s \"\\0\"\n" (c-string str-val))
           (set! stt-idx (hash-ref stt-curr "current-index"))
           (hash-create-handle! stt-idx-tbl str-val stt-idx)
           (hash-set! stt-curr "current-index"
@@ -331,11 +329,16 @@
 (define emit-string-table (lambda (st-name) (begin
    (set! stt-curr (hash-ref stt-table   st-name))
    (set! stt-idx  (hash-ref stt-curr "current-index"))
-   (emit (sprintf "\nstatic const char %s[%d] =\n" st-name stt-idx))
+   (ag-fprintf 0 "\nstatic const char %s[%d] =\n" st-name stt-idx)
    (out-resume st-name)
    (emit (shell (string-append
-          "columns --spread=1 -I4 <<\\_EOF_\n" (out-pop #t) "_EOF_" )))
-   (emit ";\n")
+
+      ;; Remove any leading spaces -- columns adds them itself.
+      ;; End the last line with a semi-colon
+      ;;
+      "(set -x;sed 's/^ *//;$s/$/;/' | \
+      columns -I4 --spread=1
+      ) <<\\_EndStringTable_\n" (out-pop #t) "_EndStringTable_")))
 )))
 
 (use-modules (ice-9 debug))

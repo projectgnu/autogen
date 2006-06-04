@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-01-22 13:00:43 bkorb"
+# Time-stamp:        "2006-06-04 10:15:13 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.17 2006/01/24 21:29:19 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.18 2006/06/04 21:31:13 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -52,7 +52,7 @@ make_funcs_def()
   svdir=`pwd`
   cd ${srcdir}/autoopts
   test -d autoopts || mkdir autoopts
-  ${AGexe} -L. genshell.def || exit 1
+  ${AGexe} -L. genshell.def  || exit 1
   ${AGexe} -L. usage-txt.def || exit 1
   mv usage-txt.h autoopts/.
   files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \

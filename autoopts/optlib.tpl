@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.15 2006/03/25 19:23:28 bkorb Exp $
+# $Id: optlib.tpl,v 4.16 2006/06/04 21:31:13 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2005-12-14 12:48:13 bkorb"
+# Time-stamp:      "2006-06-04 13:09:29 bkorb"
 
 =][=
 
@@ -384,99 +384,92 @@ ENDDEF Option_Defines
 Define the arrays of values associated with an option (strings, etc.) =][=
 
 DEFINE   emit-nondoc-option     =][=
-  #
-  #  This is *NOT* a documentation option: =]
-tSCC    z[= (sprintf "%-25s" (string-append cap-name
-                    "_NAME[]" )) =] = "[=(. UP-name)=]";[=
+  ;;
+  ;;  This is *NOT* a documentation option:
+  ;;
+  (ag-fprintf 0 "\n#define z%-22s %s" (string-append cap-name "_NAME")
+            (new-string-ref UP-name) )
 
-  #  IF this option can be disabled,
-  #  THEN we must create the string for the disabled version
-  #  =][=
-  IF (> (len "disable") 0) =]
-tSCC    [=
+  (if (> (len "disable") 0)
+    (begin
+      (hash-create-handle! disable-name   flg-name (string-append
+          "zNot" cap-name "_Name" ))
+      (hash-create-handle! disable-prefix flg-name (string-append
+          "zNot" cap-name "_Pfx" ))
 
-    (hash-create-handle! disable-name   flg-name (string-append
-        "zNot" cap-name "_Name" ))
-    (hash-create-handle! disable-prefix flg-name (string-append
-        "zNot" cap-name "_Pfx" ))
+      (ag-fprintf 0 "\n#define zNot%-19s %s" (string-append cap-name "_Name")
+         (new-string-ref (string-tr!
+             (string-append (get "disable") "-" flg-name)
+             optname-from optname-to)) )
 
-    (sprintf "zNot%-23s" (string-append cap-name "_Name[]")) =]= "[=
+      (ag-fprintf 0 "\n#define zNot%-19s %s" (string-append cap-name "_Pfx")
+          (new-string-ref (string-downcase! (get "disable"))) )
 
-       (string-tr! (string-append (get "disable") "-" flg-name)
-                   optname-from optname-to) =]";
-tSCC    [= (sprintf "zNot%-23s" (string-append cap-name "_Pfx[]"))
-             =]= "[=(string-downcase! (get "disable"))=]";[=
+      (if (> (len "enable") 0)
+          (ag-fprintf 0 "\n#define z%-22s %s" (string-append cap-name "_Name")
+               (new-string-ref (string-tr! (string-append
+                   (get "enable") "-" flg-name) optname-from optname-to )) )
 
+          (ag-fprintf 0 "\n#define z%-22s %s" (string-append cap-name "_Name")
+               (string-append "(zNot" cap-name "_Name + "
+                    (number->string (+ (string-length (get "disable")) 1)) ")"
+    ) )   )    )
 
-      #  See if we can use a substring for the option name:
-      #  =][=
-      IF (> (len "enable") 0) =]
-tSCC    [=(sprintf "z%-26s" (string-append cap-name "_Name[]")) =]= "[=
-        (string-tr! (string-append (get "enable") "-" flg-name)
-                    optname-from optname-to) =]";[=
-      ELSE =]
-#define [=(sprintf "z%-27s " (string-append cap-name
-        "_Name")) =](zNot[= (. cap-name) =]_Name + [=
-        (+ (string-length (get "disable")) 1 ) =])[=
-      ENDIF =][=
+    (begin
+      (hash-create-handle! disable-name   flg-name "NULL")
+      (hash-create-handle! disable-prefix flg-name "NULL")
 
+      (ag-fprintf 0 "\n#define z%-22s %s" (string-append cap-name "_Name")
+             (new-string-ref (string-tr! (string-append
+                (if (exist? "enable") (string-append (get "enable") "-") "")
+                (get "name"))   optname-from optname-to ))
+  ) ) ) =][=
 
-    ELSE  No disablement of this option:
-    =][=
-    (hash-create-handle! disable-name   flg-name "NULL")
-    (hash-create-handle! disable-prefix flg-name "NULL") ""
-  =]
-tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
-             =]= "[= (string-tr! (string-append
-        (if (exist? "enable") (string-append (get "enable") "-") "")
-        (get "name"))   optname-from optname-to) =]";[=
+  #  Check for special attributes:  a default value
+  #  and conflicting or required options
+  =][=
+  IF (define def-arg-name (sprintf "z%-22s "
+             (string-append cap-name "DefaultArg" )))
 
-    ENDIF (> (len "disable") 0) =][=
+     (exist? "arg-default")  =][=
 
-    #  Check for special attributes:  a default value
-    #  and conflicting or required options
-    =][=
-    IF (define def-arg-name (sprintf "z%-27s "
-                 (string-append cap-name "DefaultArg" )))
-       (define def-arg-array (sprintf "z%-27s "
-                 (string-append cap-name "DefaultArg[]" )))
-       (exist? "arg-default")   =][=
-       CASE arg-type            =][=
-       =* num                   =]
+    CASE arg-type            =][=
+    =* num                   =]
 #define [=(. def-arg-name)=]((const char*)[= arg-default =])[=
 
-       =* bool                  =][=
-          CASE arg-default      =][=
-          ~ n.*|f.*|0           =]
+    =* bool                  =][=
+       CASE arg-default      =][=
+       ~ n.*|f.*|0           =]
 #define [=(. def-arg-name)=]((const char*)AG_FALSE)[=
-          *                     =]
+       *                     =]
 #define [=(. def-arg-name)=]((const char*)AG_TRUE)[=
-          ESAC                  =][=
+       ESAC                  =][=
 
-       =* key                   =]
+    =* key                   =]
 #define [=(. def-arg-name)=]((const char*)[=
           (emit (if (=* (get "arg-default") enum-pfx) "" enum-pfx))
           (up-c-name "arg-default") =])[=
 
-       =* set                   =]
+    =* set                   =]
 #define [=(. def-arg-name)=]NULL
 #define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=](void*)([=
-         IF (not (exist? "arg-default")) =]0[=
-         ELSE =][=
-           FOR    arg-default | =][=
-             (string->c-name! (string-append UP-prefix UP-name "_"
+      IF (not (exist? "arg-default")) =]0[=
+      ELSE =][=
+        FOR    arg-default | =][=
+          (string->c-name! (string-append UP-prefix UP-name "_"
                    (string-upcase! (get "arg-default")) ))  =][=
-           ENDFOR arg-default   =][=
-         ENDIF =])[=
+        ENDFOR arg-default   =][=
+      ENDIF =])[=
 
-       =* str                   =]
-tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
+    =* str                   =][=
+    (emit (string-append "\n#define " def-arg-name
+        (new-string-ref (get "arg-default")) )) =][=
 
-       *                        =][=
-          (error (string-append cap-name
-                 " has arg-default, but no valid arg-type"))  =][=
-       ESAC                     =][=
-    ENDIF                       =][=
+    *                        =][=
+    (error (string-append cap-name
+              " has arg-default, but no valid arg-type"))  =][=
+    ESAC                     =][=
+  ENDIF                      =][=
 
 
     IF (exist? "flags-must") =]
@@ -494,8 +487,10 @@ static const int
       FOR flags-cant =]
     [= (index-name "flags-cant") =],[=
       ENDFOR flags-cant =] NO_EQUIVALENT };[=
-    ENDIF =]
-#define [=(. UP-name)=]_FLAGS       ([=
+    ENDIF =][=
+
+    (sprintf "\n#define %-23s (" (string-append UP-name "_FLAGS")) =][=
+
          ? enabled      "OPTST_INITENABLED"
                         "OPTST_DISABLED"       =][=
          stack-arg      " | OPTST_STACKED"     =][=
@@ -555,9 +550,9 @@ DEFINE   Option_Strings
  */[=
   IF (hash-ref ifdef-ed flg-name) =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
-  ENDIF  ifdef-ed                 =]
-tSCC    z[=(. cap-name)=]Text[] =
-        [=(set! tmp-text (kr-string (get "descrip")))  tmp-text=];[=
+  ENDIF  ifdef-ed                 =][=
+  (sprintf "\n#define z%-22s %s"
+      (string-append cap-name "Text") (new-string-ref (get "descrip")) ) =][=
 
   IF (exist? "documentation")     =]
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
@@ -568,27 +563,33 @@ tSCC    z[=(. cap-name)=]Text[] =
   IF (hash-ref ifdef-ed flg-name) =]
 
 #else   /* disable [= (. cap-name)=] */
-#define VALUE_[=(string-append OPT-pfx UP-name)=] NO_EQUIVALENT
-#define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
+#define VALUE_[=(sprintf "%-17s" (string-append OPT-pfx UP-name))
+              =] NO_EQUIVALENT
+#define [= (sprintf "%-23s" (string-append UP-name "_FLAGS"))
+        =] (OPTST_OMITTED | OPTST_NO_INIT)[=
 
-    IF (exist? "arg-default") =]
-#define z[=(. cap-name)=]DefaultArg NULL[=
-    ENDIF =][=
+    (if (exist? "arg-default")
+        (ag-fprintf 0 "\n#define z%-22s NULL"
+            (string-append cap-name "DefaultArg"))  )
 
-    IF (exist? "flags-must")  =]
-#define a[=(. cap-name)=]MustList   NULL[=
-    ENDIF =][=
+    (if (exist? "flags-must")
+        (ag-fprintf 0 "\n#define z%-22s NULL"
+            (string-append cap-name "MustList"))  )
 
-    IF (exist? "flags-cant")  =]
-#define a[=(. cap-name)=]CantList   NULL[=
-    ENDIF =]
-#define z[=(. cap-name)=]Text       NULL
-#define z[=(. cap-name)=]_NAME      NULL
-#define z[=(. cap-name)=]_Name      NULL[=
-    IF (> (len "disable") 0) =]
-#define zNot[=(. cap-name)=]_Name   NULL
-#define zNot[=(. cap-name)=]_Pfx    NULL[=
-    ENDIF =]
+    (if (exist? "flags-cant")
+        (ag-fprintf 0 "\n#define z%-22s NULL"
+            (string-append cap-name "CantList"))  )
+
+    (ag-fprintf 0 "\n#define z%-22s NULL" (string-append cap-name "Text"))
+    (ag-fprintf 0 "\n#define z%-22s NULL" (string-append cap-name "_NAME"))
+    (ag-fprintf 0 "\n#define z%-22s NULL" (string-append cap-name "_Name"))
+
+    (if (> (len "disable") 0) (begin
+        (ag-fprintf 0 "\n#define zNot%-19s NULL"
+            (string-append cap-name "_Name"))
+        (ag-fprintf 0 "\n#define zNot%-19s NULL"
+            (string-append cap-name "_Pfx"))
+    )) =]
 #endif  /* [= ifdef =][= ifndef =] */[=
   ENDIF  ifdef-ed   =][=
 
@@ -682,74 +683,5 @@ DEFINE Option_Descriptor =][=
   ENDIF =][=
 
 ENDDEF Option_Descriptor
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-Compute the usage line.  It is complex because we are trying to
-encode as much information as we can and still be comprehensible.
-
-The rules are:  If any options have a "value" attribute, then
-there are flags allowed, so include "-<flag>" on the usage line.
-If the program has the "long_opts" attribute set, then we must
-have "<option-name>" or "--<name>" on the line, depending on
-whether or not there are flag options.  If any options take 
-arguments, then append "[<val>]" to the flag description and
-"[{=| }<val>]" to the option-name/name descriptions.  We won't
-worry about being correct if every option has a required argument.
-Finally, if there are no minimum occurrence counts (i.e. all
-options are optional), then we put square brackets around the
-syntax. =][=
-
-DEFINE usage_line   =][=
-
-  ;;  Compute the option arguments
-  ;;
-  (if (exist? "flag.arg-type")
-      (begin
-        (define flag-arg " [<val>]")
-        (define  opt-arg "[{=| }<val>]") )
-      (begin
-        (define flag-arg "")
-        (define  opt-arg "") )  )
-
-  (define usage-line (string-append "USAGE:  %s "
-
-    ;; If at least one option has a minimum occurrence count
-    ;; we use curly brackets around the option syntax.
-    ;;
-    (if (not (exist? "flag.min")) "[ " "{ ")
-
-    (if (exist? "flag.value")
-        (string-append "-<flag>" flag-arg
-           (if (exist? "long-opts") " | " "") )
-        (if (not (exist? "long-opts"))
-           (string-append "<option-name>" opt-arg) "" )  )
-
-    (if (exist? "long-opts")
-        (string-append "--<name>" opt-arg) "" )
-
-    (if (not (exist? "flag.min")) " ]..." " }...")
-  ) )
-
-  (if (exist? "argument")
-
-    (set! usage-line (string-append usage-line
-
-          ;; the USAGE line plus the program name plus the argument goes
-          ;; past 80 columns, then break the line, else separate with space
-          ;;
-          (if (< 80 (+ (string-length usage-line)
-                (len "argument")
-                (string-length prog-name) ))
-              " \\\n\t\t"  " ")
-          (get "argument")  ))
-  )
-
-  (set! tmp-text
-  (kr-string (string-append version-text "\n" usage-line "\n" )) )
-
-  tmp-text =][=
-
-ENDDEF usage_line
 
 =]

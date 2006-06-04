@@ -15,7 +15,9 @@
  *
 [= (lgpl "AutoOpts" "Bruce Korb" " *  ") =]
  */
-[= (make-header-guard "autoopts") =]
+[=
+(make-header-guard "autoopts")
+=]
 
 #undef  cch_t
 #define cch_t const char
@@ -47,19 +49,23 @@ extern usage_text_t option_usage_text;
  *  Provide a mapping from a short name to fields in this structure.
  */[=
 
+(string-table-new  "usage_txt")
+(define str-ix 0)
 (set! cch-ct 0)
-(define typed-list "")
-(define const-list "")  =][=
+(define const-list "")
+(define typed-list "")  =][=
 
 FOR utxt        =]
 #define z[= (sprintf "%-20s" (get "ut-name"))
         =] (option_usage_text.[=
 
   IF (exist? "ut-type") =]utpz_[= ut-name =][=
-       (set! typed-list (string-append typed-list "\n" (get "ut-name"))) =][=
-  ELSE no "ut-type"     =]apz_str[[=
-       (emit cch-ct) (set! cch-ct (+ cch-ct 1))
-       (set! const-list (string-append const-list "\n" (get "ut-name"))) =]][=
+     (set! typed-list (string-append typed-list "\n" (get "ut-name"))) =][=
+  ELSE
+    =][=
+    (ag-fprintf 0 "apz_str[%3d]" cch-ct)
+    (set! cch-ct (+ 1 cch-ct))
+    =][=
   ENDIF                 =])[=
 ENDFOR =]
 
@@ -69,12 +75,23 @@ ENDFOR =]
    *  xgettext (or equivalents) can extract these strings for translation.
    */
 [=
-FOR utxt =]
-  static [= (sprintf "%-7s"
-              (if (exist? "ut-type") (get "ut-type") "cch_t"))
-          =] eng_z[= ut-name =][] =
-       [= (kr-string (get "ut-text")) =];[=
-ENDFOR =]
+FOR utxt  =][=
+  (if (exist? "ut-type")
+      (sprintf "\n  static %-7s eng_z%s[] = %s;"
+              (get "ut-type") (get "ut-name") (kr-string (get "ut-text"))
+      )
+
+      (begin
+        (set! str-ix (string-table-add "usage_txt" (get "ut-text")))
+        (set! const-list (string-append const-list
+                         (sprintf "usage_txt +%4d\n" str-ix)  ))
+  )   )
+  =][=
+ENDFOR  utxt        =][=
+
+(emit-string-table "usage_txt")
+
+=]
 
   /*
    *  Now, define (and initialize) the structure that contains
@@ -88,8 +105,8 @@ ENDFOR =]
   "\n_EOF_" )) =]
     {
 [= (shell (string-append
-  "${CLexe:-columns} -W84 -I6 --spread=1 -S, -f'eng_z%s' <<_EOF_" const-list
-  "\n_EOF_" )) =]
+  "${CLexe:-columns} -W84 -I6 --spread=1 -S, <<_EOF_\n" const-list
+  "_EOF_" )) =]
     }
   };
 

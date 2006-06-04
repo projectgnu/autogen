@@ -1,13 +1,80 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.18 2006/03/25 19:23:28 bkorb Exp $
+#$Id: optcode.tpl,v 4.19 2006/06/04 21:31:13 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-01-25 07:50:05 bkorb"
+# Time-stamp:      "2006-06-04 13:55:17 bkorb"
 
 =][=
+;;; 
+;;;  Compute the usage line.  It is complex because we are trying to
+;;;  encode as much information as we can and still be comprehensible.
+;;;
+;;;  The rules are:  If any options have a "value" attribute, then
+;;;  there are flags allowed, so include "-<flag>" on the usage line.
+;;;  If the program has the "long_opts" attribute set, then we must
+;;;  have "<option-name>" or "--<name>" on the line, depending on
+;;;  whether or not there are flag options.  If any options take 
+;;;  arguments, then append "[<val>]" to the flag description and
+;;;  "[{=| }<val>]" to the option-name/name descriptions.  We won't
+;;;  worry about being correct if every option has a required argument.
+;;;  Finally, if there are no minimum occurrence counts (i.e. all
+;;;  options are optional), then we put square brackets around the
+;;;  syntax.
+;;;
 
-INCLUDE "optmain.tpl" =][=
+(define PROGNAME-ref (new-string-ref pname-up))
+
+;;  Compute the option arguments
+;;
+(if (exist? "flag.arg-type")
+    (set! tmp-val "[{=| }<val>]")
+    (set! tmp-val "")
+)
+
+(define usage-line (string-append "USAGE:  %s "
+
+  ;; If at least one option has a minimum occurrence count
+  ;; we use curly brackets around the option syntax.
+  ;;
+  (if (not (exist? "flag.min")) "[ " "{ ")
+
+  (if (exist? "flag.value")
+      (string-append "-<flag>"
+         (if (exist? "flag.arg-type") " [<val>]" "")
+         (if (exist? "long-opts") " | " "") )
+      (if (not (exist? "long-opts"))
+         (string-append "<option-name>" tmp-val) "" )  )
+
+  (if (exist? "long-opts")
+      (string-append "--<name>" tmp-val) "" )
+
+  (if (not (exist? "flag.min")) " ]..." " }...")
+) )
+
+(if (exist? "argument")
+  (set! usage-line (string-append usage-line
+
+        ;; the USAGE line plus the program name plus the argument goes
+        ;; past 80 columns, then break the line, else separate with space
+        ;;
+        (if (< 80 (+ (string-length usage-line)
+              (len "argument")
+              (string-length prog-name) ))
+            " \\\n\t\t"  " ")
+        (get "argument")  ))
+)
+
+(define usage-ref (new-string-ref (string-append
+        version-text "\n" usage-line "\n")))
+
+=][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+INCLUDE "optmain.tpl"
+
+=]
+
+[=
 
 IF (exist? "flag.arg-range")
 
@@ -31,21 +98,23 @@ ENDIF
 
 #ifdef  __cplusplus
 extern "C" {
-#endif[=
+#endif
+[=
 
 IF (not (exist? "copyright") )
 
 =]
 #define zCopyright       NULL
 #define zCopyrightNotice NULL[=
-ELSE  =]
-tSCC zCopyright[] =
-       [= (set! tmp-text (kr-string
-       (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
-                (get "copyright.date") (get "copyright.owner") )))
-       tmp-text =];
-tSCC zCopyrightNotice[] =
-       [=
+
+ELSE copyright exists:
+
+=]
+#define zCopyright       [=
+  (new-string-ref
+       (sprintf "%s copyright (c) %s %s, all rights reserved" prog-name
+                (get "copyright.date") (get "copyright.owner") ) ) =]
+#define zCopyrightNotice [=
 
   CASE (get "copyright.type") =][=
 
@@ -55,12 +124,9 @@ tSCC zCopyrightNotice[] =
     = note  =][=(set! tmp-text (get  "copyright.text"))=][=
     *       =][=(set! tmp-text "Copyrighted")=][=
 
-  ESAC =][=
+  ESAC =][=  (new-string-ref tmp-text ) =][=
 
-(emit (def-file-line "copyright.text" extract-fmt))
-(kr-string tmp-text) =];[=
-
-ENDIF "copyright notes"
+ENDIF copyright exists
 
 =]
 extern tUsageProc [=
@@ -87,7 +153,7 @@ IF (exist? "include") =]
 
 FOR flag "\n"      =][=
 
-  Option_Strings   =][=
+  INVOKE Option_Strings   =][=
 
   (if (exist? "lib-name") (begin
       (set! lib-opt-ptr (string->c-name! (string-append
@@ -103,36 +169,45 @@ ENDFOR flag
 /*
  *  Help/More_Help[= version "/Version"=] option descriptions:
  */
-tSCC zHelpText[]       = "Display usage information and exit";
-tSCC zHelp_Name[]      = "help";
+#define zHelpText           [=
+ (new-string-ref "Display usage information and exit") =]
+#define zHelp_Name          [= (new-string-ref "help") =]
 
-tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[] = "more-help";[=
+#define zMore_HelpText      [=
+ (new-string-ref "Extended usage information passed thru pager") =]
+#define zMore_Help_Name     [= (new-string-ref "more-help") =][=
 
 IF (exist? "version")
 
 =]
 
-tSCC zVersionText[]    = "Output version information and exit";
-tSCC zVersion_Name[]   = "version";[=
-ENDIF (exist? "version")  =][=
+#define zVersionText        [=
+ (new-string-ref "Output version information and exit") =]
+#define zVersion_Name       [= (new-string-ref "version") =][=
+
+ENDIF (exist? "version")    =][=
 
 IF (exist? "homerc")
+
 =]
 
 /*
  *  Save/Load_Opts option description:
  */
-tSCC zSave_OptsText[]     = "Save the option state to a config file";
-tSCC zSave_Opts_Name[]    = "save-opts";
+#define zSave_OptsText      [=
+ (new-string-ref "Save the option state to a config file") =]
+#define zSave_Opts_Name     [=
+ (new-string-ref "save-opts") =]
 
-tSCC zLoad_OptsText[]     = "Load options from a config file";
-tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
+#define zLoad_OptsText      [=
+ (new-string-ref "Load options from a config file") =]
+#define zLoad_Opts_NAME     [= (new-string-ref "LOAD_OPTS") =]
 
-tSCC zNotLoad_Opts_Name[] = "no-load-opts";
-tSCC zNotLoad_Opts_Pfx[]  = "no";
-#define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
-ENDIF (exist? "homerc") =][=
+#define zNotLoad_Opts_Name  [= (new-string-ref "no-load-opts") =]
+#define zNotLoad_Opts_Pfx   [= (new-string-ref "no") =]
+#define zLoad_Opts_Name     (zNotLoad_Opts_Name + 3)[=
+
+ENDIF (exist? "homerc")     =][=
 
   invoke declare-option-callbacks  =][=
 
@@ -243,24 +318,33 @@ ENDIF
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Define the [= (. pname-cap) =] Option Environment
- */
-tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
-tSCC   zUsageTitle[] =
-[= INVOKE usage_line =];[=
+ */[=
 
-IF (exist? "homerc") =]
-tSCC   zRcName[]     = "[=
-  (if (not (exist? "rcfile"))
-      (string-append "." pname-down "rc")
-      (get "rcfile") ) =]";
+(define rc-ref (if (not (exist? "homerc")) "NULL"
+        (new-string-ref (if (exist? "rcfile") (get "rcfile")
+             (string-append "." pname-down "rc")  ))  ))
+
+(define bug-ref (if (exist? "copyright.eaddr")
+        (new-string-ref (get "copyright.eaddr"))
+        (if (exist? "eaddr")
+        (new-string-ref (get "eaddr"))
+        "NULL"  )))
+
+(define full-ver-ref (if (not (exist? "version")) "NULL"
+        (new-string-ref version-text) ))
+
+=][=
+
+IF (exist? "homerc")
+
+=]
 tSCC*  apzHomeList[] = {[=
   FOR homerc            =]
-       [= (kr-string (get "homerc")) =],[=
+    [= (new-string-ref (get "homerc")) =],[=
   ENDFOR homerc=]
-       NULL };[=
+    NULL };[=
 
 ELSE                    =]
-#define zRcName     NULL
 #define apzHomeList NULL[=
 ENDIF                   =][=
 
@@ -273,17 +357,13 @@ ENDIF                   =][=
     "\n_EODetail_" ))
   "\n" ))) ))
 
-(define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
-
-(if (exist? "copyright.eaddr")
-    (sprintf bug-text (kr-string (get "copyright.eaddr")))
-
-    (if (exist? "eaddr")
-        (sprintf bug-text (kr-string (get "eaddr")))
-
-        "\n\n#define zBugsAddr NULL" )  )
-
                         =][=
+
+(define explain-ref
+  (if (or (exist? "explain") (== (get "main.main-type") "for-each"))
+      ()
+      "NULL"
+) )
 
 IF (or (exist? "explain") (== (get "main.main-type") "for-each"))  =]
 tSCC   zExplain[]     = [=
@@ -312,12 +392,6 @@ ELSE                    =]
 #define zDetail         NULL[=
 ENDIF                   =][=
 
-IF (exist? "version")   =]
-tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
-
-ELSE                    =]
-#define zFullVersion    NULL[=
-ENDIF                   =][=
 (tpl-file-line extract-fmt)
 =]
 #if defined(ENABLE_NLS)
@@ -349,11 +423,11 @@ tOptions [=(. pname)=]Options = {
                                             (exist? "homerc")  )         =]
     + OPTPROC_HAS_IMMED[=  ENDIF=] ),
     0, NULL,                    /* current option index, current option */
-    NULL,         NULL,         zPROGNAME,
-    zRcName,      zCopyright,   zCopyrightNotice,
-    zFullVersion, apzHomeList,  zUsageTitle,
+    NULL,         NULL,         [= (. PROGNAME-ref) =],
+    [= (. rc-ref) =],      zCopyright,   zCopyrightNotice,
+    [= (. full-ver-ref) =], apzHomeList,  [= (. usage-ref) =],
     zExplain,     zDetail,      optDesc,
-    zBugsAddr,                  /* address to send bugs to */
+    [= (. bug-ref) =],                  /* address to send bugs to */
     NULL, NULL,                 /* extensions/saved state  */
     [= (. usage-proc) =],       /* usage procedure */
     translate_option_strings,   /* translation procedure */
