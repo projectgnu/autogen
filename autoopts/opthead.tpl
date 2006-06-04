@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.14 2006/06/04 21:31:13 bkorb Exp $
+# $Id: opthead.tpl,v 4.15 2006/06/04 22:43:55 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-04 10:16:56 bkorb"
+# Time-stamp:      "2006-06-04 15:30:30 bkorb"
 
 =]
 /*
@@ -14,11 +14,15 @@
  *  This header should be sourced by all modules that need access to the
  *  state of the [= prog-name =] options.
  */
-[= (make-header-guard "autoopts") =]
-[= Option_Copyright =][=
-% config-header "\n#include \"%s\""=]
+[= (make-header-guard "autoopts")       =]
+[= INVOKE emit-cright                   =][=
+% config-header "\n#include \"%s\""     =]
 #include <autoopts/options.h>
-[= IF (not (exist? "library")) =]
+[=
+
+IF (not (exist? "library"))
+
+=]
 /*
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
@@ -31,38 +35,41 @@
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
 # error option template version mismatches autoopts/options.h header
 #endif
-[= ENDIF not a library =]
+[=
+
+ENDIF not a library
+
+=]
 /*
  *  Enumeration of each option:
  */
 typedef enum {[=
 FOR flag    =][=
   IF (not (exist? "documentation")) =]
-        [= (sprintf "%-26s =%3d," (index-name "name") (for-index)) =][=
+    [= (sprintf "%-26s =%3d," (index-name "name") (for-index)) =][=
   ENDIF     =][=
 ENDFOR flag =][=
 
-(define option-ct (count "flag")) =][=
+(define option-ct (count "flag"))
+(define next-opt-ct (lambda () (begin
+  (set! option-ct (+ option-ct 1))
+  (- option-ct 1)
+)))         =][=
 
 IF (exist? "library") =]
-        LIBRARY_OPTION_COUNT[=
+    LIBRARY_OPTION_COUNT[=
 
 ELSE        =][=
 
   IF (exist? "version") =]
-        [= (. INDEX-pfx) =]VERSION          = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
+    [= (. INDEX-pfx) =]VERSION          = [= (next-opt-ct) =],[=
   ENDIF =]
-        [= (. INDEX-pfx) =]HELP             = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
-        [= (. INDEX-pfx) =]MORE_HELP        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
+    [= (. INDEX-pfx) =]HELP             = [= (next-opt-ct) =],
+    [= (. INDEX-pfx) =]MORE_HELP        = [= (next-opt-ct) =][=
 
   IF (exist? "homerc") =],
-        [= (. INDEX-pfx) =]SAVE_OPTS        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
-        [= (. INDEX-pfx) =]LOAD_OPTS        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
+    [= (. INDEX-pfx) =]SAVE_OPTS        = [= (next-opt-ct) =],
+    [= (. INDEX-pfx) =]LOAD_OPTS        = [= (next-opt-ct) =][=
   ENDIF =][=
 ENDIF   =]
 } te[=(. Cap-prefix)=]OptIndex;

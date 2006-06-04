@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.16 2006/06/04 21:31:13 bkorb Exp $
+# $Id: optlib.tpl,v 4.17 2006/06/04 22:43:55 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-04 13:09:29 bkorb"
+# Time-stamp:      "2006-06-04 15:23:48 bkorb"
 
 =][=
 
@@ -210,7 +210,7 @@ ENDDEF set-defines
 
 Emit the copyright comment  =][=
 
-DEFINE Option_Copyright =][=
+DEFINE emit-cright =][=
 
 IF (exist? "copyright") =]
 /*
@@ -241,7 +241,7 @@ IF (exist? "copyright") =]
  */[=
 ENDIF "copyright exists" =][=
 
-ENDDEF Option_Copyright
+ENDDEF emit-cright
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -551,11 +551,12 @@ DEFINE   Option_Strings
   IF (hash-ref ifdef-ed flg-name) =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
   ENDIF  ifdef-ed                 =][=
-  (sprintf "\n#define z%-22s %s"
+  (ag-fprintf 0 "\n#define z%-22s %s"
       (string-append cap-name "Text") (new-string-ref (get "descrip")) ) =][=
 
-  IF (exist? "documentation")     =]
-#define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
+  IF (exist? "documentation")     =][=
+     (sprintf "\n#define %-23s" (string-append UP-name "_FLAGS"))
+        =] (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ELSE  NOT a doc option:         =][=
      emit-nondoc-option           =][=
   ENDIF  (exist? "documentation") =][=
