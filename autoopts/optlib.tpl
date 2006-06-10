@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.18 2006/06/10 16:44:42 bkorb Exp $
+# $Id: optlib.tpl,v 4.19 2006/06/10 18:07:21 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-10 09:22:59 bkorb"
+# Time-stamp:      "2006-06-10 10:19:27 bkorb"
 
 =][=
 
@@ -538,13 +538,14 @@ static const int
             ESAC arg-type  =][=
             (if (exist? "arg-optional") " | OPTST_ARG_OPTIONAL") =][=
          ENDIF arg-type exists  =])[=
+
 ENDDEF   emit-nondoc-option
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Define the arrays of values associated with an option (strings, etc.) =][=
 
-DEFINE   Option_Strings
+DEFINE   opt-strs
 
 =]
 /*
@@ -592,13 +593,60 @@ tSCC    z[=(. cap-name)=]Text[] =
 #endif  /* [= ifdef =][= ifndef =] */[=
   ENDIF  ifdef-ed   =][=
 
-ENDDEF Option_Strings
+ENDDEF opt-strs
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+Define the arrays of values associated with help/version/etc. =][=
+
+DEFINE   help-strs
+
+=]
+
+/*
+ *  Help/More_Help[= version "/Version"=] option descriptions:
+ */
+tSCC zHelpText[]       = "Display usage information and exit";
+tSCC zHelp_Name[]      = "help";
+
+tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
+tSCC zMore_Help_Name[] = "more-help";[=
+
+  IF (exist? "version")
+
+=]
+
+tSCC zVersionText[]    = "Output version information and exit";
+tSCC zVersion_Name[]   = "version";[=
+
+  ENDIF (exist? "version")  =][=
+
+  IF (exist? "homerc")
+
+=]
+
+/*
+ *  Save/Load_Opts option description:
+ */
+tSCC zSave_OptsText[]     = "Save the option state to a config file";
+tSCC zSave_Opts_Name[]    = "save-opts";
+
+tSCC zLoad_OptsText[]     = "Load options from a config file";
+tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
+
+tSCC zNotLoad_Opts_Name[] = "no-load-opts";
+tSCC zNotLoad_Opts_Pfx[]  = "no";
+#define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
+
+  ENDIF (exist? "homerc") =][=
+
+ENDDEF   help-strs
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Define the values for an option descriptor   =][=
 
-DEFINE Option_Descriptor =][=
+DEFINE opt-desc         =][=
   IF
      (set-flag-names)
 
@@ -681,6 +729,6 @@ DEFINE Option_Descriptor =][=
                               (hash-ref disable-prefix flg-name)=] },[=
   ENDIF =][=
 
-ENDDEF Option_Descriptor
+ENDDEF opt-desc
 
 =]

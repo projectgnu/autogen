@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.15 2006/06/10 16:44:42 bkorb Exp $
+# $Id: optmain.tpl,v 4.16 2006/06/10 18:07:21 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2005-12-15 13:58:19 bkorb"
+# Time-stamp:      "2006-06-10 10:17:09 bkorb"
 
 =][=
 
@@ -478,11 +478,11 @@ ENDDEF build-main
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-   DECLARE OPTION CALLBACKS
+   DECLARE OPTION CALLBACK PROCEDURES
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE declare-option-callbacks
+DEFINE decl-callbacks
 
    This is the test for whether or not to emit callback handling code:
 
@@ -681,7 +681,7 @@ static tOptProc
 
 (. undef-proc-names)  =][=
 
-ENDDEF declare-option-callbacks
+ENDDEF decl-callbacks
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

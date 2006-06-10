@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.21 2006/06/10 16:44:42 bkorb Exp $
+#$Id: optcode.tpl,v 4.22 2006/06/10 18:07:21 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-10 09:44:22 bkorb"
+# Time-stamp:      "2006-06-10 10:18:49 bkorb"
 
 =][=
 
@@ -130,12 +130,19 @@ extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
 [=
-IF (exist? "include") =]
+
+IF (exist? "include")
+
+=]
 /*
  *  global included definitions
  */
 [=(join "\n" (stack "include"))  =]
-[=ENDIF "include exists" =]
+[=
+
+ENDIF "include exists"
+
+=]
 #ifndef NULL
 #  define NULL 0
 #endif
@@ -148,9 +155,9 @@ IF (exist? "include") =]
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-FOR flag "\n"      =][=
+FOR flag "\n"           =][=
 
-  Option_Strings   =][=
+  INVOKE opt-strs       =][=
 
   (if (exist? "lib-name") (begin
       (set! lib-opt-ptr (string->c-name! (string-append
@@ -158,54 +165,27 @@ FOR flag "\n"      =][=
       (set! lib-externs (string-append lib-externs
                         (sprintf "tOptDesc const* %-16s = optDesc + %d;\n"
                                  lib-opt-ptr (for-index) )  ))
-  )   )             =][=
+  )   )                 =][=
 
 ENDFOR flag
-=]
 
-/*
- *  Help/More_Help[= version "/Version"=] option descriptions:
- */
-tSCC zHelpText[]       = "Display usage information and exit";
-tSCC zHelp_Name[]      = "help";
+=][=
 
-tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[] = "more-help";[=
+INVOKE  help-strs       =][=
+INVOKE decl-callbacks   =][=
 
-IF (exist? "version")
+IF (and (exist? "version") make-test-main)
 
 =]
-
-tSCC zVersionText[]    = "Output version information and exit";
-tSCC zVersion_Name[]   = "version";[=
-ENDIF (exist? "version")  =][=
-
-IF (exist? "homerc")
-=]
-
-/*
- *  Save/Load_Opts option description:
- */
-tSCC zSave_OptsText[]     = "Save the option state to a config file";
-tSCC zSave_Opts_Name[]    = "save-opts";
-
-tSCC zLoad_OptsText[]     = "Load options from a config file";
-tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
-
-tSCC zNotLoad_Opts_Name[] = "no-load-opts";
-tSCC zNotLoad_Opts_Pfx[]  = "no";
-#define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
-ENDIF (exist? "homerc") =][=
-
-  invoke declare-option-callbacks  =][=
-
-IF (and (exist? "version") make-test-main) =]
-#ifdef [=(. main-guard)     =]
+#ifdef [=(. main-guard) =]
 # define DOVERPROC optionVersionStderr
 #else
 # define DOVERPROC optionPrintVersion
 #endif /* [=(. main-guard)=] */[=
-ENDIF   =]
+
+ENDIF
+
+=]
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -215,7 +195,7 @@ static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
 
 FOR flag "\n"           =][=
 
-  INVOKE option_descriptor =][=
+  INVOKE opt-desc       =][=
 
 ENDFOR flag
 
