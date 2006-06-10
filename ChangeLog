@@ -1,3 +1,10 @@
+2006-06-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am(usage-txt.pot): remove rule
+	* autoopts/usage-txt.def(HomePath): unused string removal
+	* autoopts/usage-txt.tpl(pot): new output file: usage-txt.pot
+	* config/bootstrap.local: put generated .pot file into po directory
+
 2006-06-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c(sigHandler): if we hit SIGALRM 5 times, abort AutoGen.

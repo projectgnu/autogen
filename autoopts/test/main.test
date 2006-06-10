@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-06-04 14:55:42 bkorb"
+# Time-stamp:        "2005-03-06 09:13:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: main.test,v 4.5 2006/06/04 22:14:04 bkorb Exp $
+# $Id: main.test,v 4.6 2006/06/10 16:44:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -46,7 +46,7 @@ compile "-?"
 
 basehlp=${testname}.hlp
 echo creating ${basehlp}
-cat > ${basehlp} <<\_EOF_
+cat > ${basehlp} <<'_EOF_'
 test_main - Test AutoOpts for main
 USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
   Flg Arg Option-Name    Description
@@ -57,14 +57,13 @@ USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
 
 
 This is some explanatory text.
-
 If no arguments are provided, input arguments are read from stdin,
-one per line; blank and `#'-prefixed lines are comments.
+one per line; blank and '#'-prefixed lines are comments.
 'stdin' may not be a terminal (tty).
 _EOF_
 
 cmp -s ${testname}.h*lp || \
-  failure "help compare failure `diff -c ${basehlp} ${testname}.help`"
+  failure "`diff ${basehlp} ${testname}.help`"
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
 
@@ -80,12 +79,12 @@ Flg Arg Option-Name    Description
 -! no  more-help      Extended usage information passed thru pager
 This is some explanatory text.
 If no arguments are provided, input arguments are read from stdin,
-one per line; blank and `#'-prefixed lines are comments.
+one per line; blank and '#'-prefixed lines are comments.
 'stdin' may not be a terminal (tty).
 _EOF_
 
 cmp -s ${testname}.base ${testname}.out || \
-  failure "`diff -c ${testname}.base ${testname}.out`"
+  failure "`diff ${testname}.base ${testname}.out`"
 
 ./${testname} -s 5 the quick 'brown fox' > ${testname}.out2
 

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-01-22 13:39:03 bkorb"
+## Time-stamp:      "2006-06-04 16:37:23 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.24 2006/03/25 19:23:28 bkorb Exp $
+## $Id: Makefile.am,v 4.25 2006/06/10 16:44:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -98,7 +98,7 @@ bin_SCRIPTS               = autoopts-config
 nobase_include_HEADERS    = autoopts/options.h autoopts/usage-txt.h
 
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
-	$(MISC_FILES) $(DEF_FILES) mk-autoopts-pc.in
+	$(MISC_FILES) $(DEF_FILES) mk-autoopts-pc.in po
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -142,13 +142,6 @@ $(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
 	cmd="$(AGexe) -DLEVEL=subsection -Taginfo3.tpl -blibopts " ; \
 	cmd="$${cmd} -L$(srcdir) $(srcdir)/funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
-
-gettext po      : usage-txt.po
-usage-txt.po    : autoopts/usage-txt.h
-	gt=`which xgettext | sed 's,.* ,,'` ; \
-	test -x $${gt} || exit 0 ; \
-	opts='--omit-header -a -s ' ; \
-	$${gt} -o $@ $${opts} autoopts/usage-txt.h
 
 libsrc : $(libsrc)
 $(libsrc) :

@@ -2,7 +2,12 @@
 
   h
 
-=][=
+  pot
+
+=][=  CASE (suffix) =][=
+
+==  h               =][=
+
 (define cch-ct 0)
 (dne " *  " "/*  ") =]
  *
@@ -112,3 +117,54 @@ ENDFOR  utxt        =][=
 
 #endif /* DO_TRANSLATIONS */
 #endif /* [= (. header-guard) =] */
+[=
+
+
+==  pot
+
+
+\=]
+# Automated Option parsing usage text.
+# Copyright (C) [=`date +%Y`=] Free Software Foundation, Inc.
+# This file is distributed under the same license as the AutoOpts package.
+# Bruce Korb <bkorb@gnu.org> [=`date +%Y`=]
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: autogen [=`echo ${AG_VERSION}`=]\n"
+"Report-Msgid-Bugs-To: autogen-users@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-03 12:18-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+[=
+
+(define ref-list "")
+
+=][=
+
+FOR utxt
+  =][=
+  (set! ref-list (shellf
+     "set -x;list=`grep -n -E -w z%s *.c [agpo]*.h autoopts/*.h | \\
+         sed -n 's/\\([^:]*:[^:]*\\):.*/\\1/p'`
+     echo ${list}" (get "ut-name")))
+
+  (if (< (string-length ref-list) 2)
+      (error (sprintf "No references to z%s string" (get "ut-name")))  )
+
+  (sprintf "\n#: %s\nmsgid %s\n" ref-list (c-string (get "ut-text")))
+
+  =][=
+ENDFOR utxt
+
+=]
+[=
+
+ESAC
+
+\=]

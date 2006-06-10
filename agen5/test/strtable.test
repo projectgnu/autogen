@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2006-06-04 10:12:26 bkorb"
+# Time-stamp:        "2006-06-10 09:35:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2006/06/10 15:58:21 $
+# Last Modified:     $Date: 2006/06/10 16:44:42 $
 #            by: bkorb
 #
-# $Id: strtable.test,v 4.1 2006/06/10 15:58:21 bkorb Exp $
+# $Id: strtable.test,v 4.2 2006/06/10 16:44:42 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -43,7 +43,7 @@ ENDFOR
     NULL };
 [= (out-suspend "main")
    (emit-string-table "scribble")
-   (emit (sprintf "\n\n#define STRING_CT %d\n" ct))
+   (emit (sprintf "\n#define STRING_CT %d\n" ct))
    (ag-fprintf 0 "\nconst char *ap[%d] = {" (+ ct 1))
    (out-resume "main")
    (out-pop #t) =]
@@ -56,7 +56,7 @@ echo creating ${testname}.base
 cat > ${testname}.base <<'_EOF_'
 
 static const char scribble[18] =
-    "that" "\0"  "was" "\0"   "the" "\0"   "week" "\0";
+    "that\0" "was\0"  "the\0"  "week\0";
 
 #define STRING_CT 6
 
@@ -74,7 +74,7 @@ _EOF_
 ${AGexe} -b ${testname} -T ${testname}.tpl --no-defin || \
    failure ${AGexe} failed
 cmp -s ${testname}.base ${testname}.test || \
-   failure "bad output: `diff ${testname}.base ${testname}.test`"
+   failure "bad output: `diff -c ${testname}.base ${testname}.test`"
 
 cleanup
 

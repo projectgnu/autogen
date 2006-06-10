@@ -2,7 +2,7 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2005-04-03 15:54:32 bkorb"
+ * Time-stamp:      "2006-06-04 16:26:23 bkorb"
  *
  *  AutoOpts copyright 1992-2006 Bruce Korb
  *
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.13 2006/03/25 19:23:28 bkorb Exp $
+   $Id: usage-txt.def,v 4.14 2006/06/10 16:44:42 bkorb Exp $
  */
 
 /*
@@ -215,10 +215,6 @@ utxt = { ut-name = GnuOptFmt;
 utxt = { ut-type = char;
          ut-name = GnuStrArg;
          ut-text = "=str";
-};
-
-utxt = { ut-name = HomePath;
-         ut-text = " - reading file /... %s's exe directory .../%s \n";
 };
 
 utxt = { ut-name = IllOptChr;
