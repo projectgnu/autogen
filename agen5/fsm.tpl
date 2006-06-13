@@ -20,7 +20,7 @@ CASE (suffix) =][=
   INCLUDE "fsm-trans.tpl" =][=
   INCLUDE "fsm-macro.tpl" =][=
 
-  preamble     
+  INVOKE  preamble     
 
 =]
 /*
@@ -69,9 +69,9 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 } te_[=(. pfx)=]_event;
 [=
 
-  CASE method  =][=
+  CASE method     =][=
 
-  ~*  call|case=][=
+  ~*  call|case   =][=
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #
@@ -118,7 +118,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
   (if (~ (get "method") "(no.*){0,1}")
       (begin (shell "rm -f .fsm.*") (out-delete))  ) =][=
 
-  preamble     
+  INVOKE preamble     
 
 =]
 #define DEFINE_FSM
@@ -159,7 +159,7 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 
     WHILE `echo $#`     =][=
 
-      invoke build-callback
+      INVOKE build-callback
         cb_prefix = (string-append pfx "_do")
         cb_name   = (shell "echo $1 ; shift") =][=
 
@@ -178,7 +178,9 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 
   `rm -f .fsm.*`        =][=
 
-ESAC (suffix) =]
+ESAC (suffix)
+
+=]
 /*
  * Local Variables:
  * mode: C
