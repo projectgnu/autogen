@@ -4,68 +4,80 @@
 
 =][=
 
-(define tmp-text   "")
-(define offset-names "")
-(define next-offset 0)
-(define text-offset 0)  =][=
+DEFINE emit-invalid-msg =][=
 
-DEFINE add-text-string  =][=
-  (set! text-offset next-offset)
-  (set! offset-names (string-append offset-names
-        (sprintf "#define %s%s_off %d\n" Pfx (get "name") text-offset)  ))
-  (set! tmp-text (get "text"))
-  (set! next-offset (+ next-offset (string-length tmp-text) 1))
-  (c-string tmp-text) =] "\0"[=
+  ;; "defs" indexes will be diverted.  The 
+  (define tmp-text     "")
+  (define str-table    (string-append "z" Pfx "Strings"))
+  (string-table-new    str-table)
+  (define add-tbl-str  (lambda (ent-str)
+      (set! index-list (string-append index-list
+            (number->string (string-table-add str-table ent-str)) "\n" ))  ))
 
-ENDDEF add-text-string  =][=
+  (string-table-add str-table "** OUT-OF-RANGE **")
 
-DEFINE emit-invalid-msg =]
-tSCC z[=(. Pfx)=]Strings[] =
-       [= INVOKE add-text-string  name = Bogus  text = "** OUT-OF-RANGE **" =]
-       [= INVOKE add-text-string  name = FsmErr
-       text = "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" =]
-       [= INVOKE add-text-string  name = EvInvalid  text = invalid =]
-       [= INVOKE add-text-string  name = StInit     text = init =][=
+  (ag-fprintf 0 "\n#define %sFsmErr_off     %d\n" Pfx
+     (string-table-add str-table
+     "FSM Error:  in state %d (%s), event %d (%s) is invalid\n"))
 
-  FOR   state   =]
-       [= INVOKE add-text-string
-       name = (string-append "St" (string-capitalize! (get "state")))
-       text = (string-downcase! (get "state")) =][=
+  (define invalid-ix (string-table-add str-table "invalid"))
+  (ag-fprintf 0 "#define %sEvInvalid_off  %d\n" Pfx invalid-ix)
+
+  (define index-list (sprintf "%d\n" (string-table-add str-table "init")))
+  (ag-fprintf 0 "#define %sStInit_off     %s\n" Pfx index-list)
+
+  (out-push-new)
+
+=][=
+
+  FOR   state   =][=
+    (add-tbl-str (string-downcase! (get "state"))) =][=
   ENDFOR state  =][=
 
-  FOR   event   =]
-       [= INVOKE add-text-string
-       name = (string-append "Ev" (string-capitalize! (get "event")))
-       text = (if (exist? (get "event"))
+  (ag-fprintf 0 "\nstatic const size_t asz%sStates[%d] = {\n"
+      Pfx (+ 1 (count "state")) )
+  (emit (shell (string-append
+      "${CLexe-columns} --spread=1 -I4 -S, <<_EOF_\n"
+      index-list
+      "_EOF_"
+  )))
+
+  (set! index-list "")
+
+  " };\n"       =][=
+
+  FOR   event   =][=
+
+    (set! tmp-text (if (exist? (get "event"))
                      (get (get "event"))
-                     (string-downcase! (get "event"))  ) =][=
-  ENDFOR event  =];
+                     (string-downcase! (get "event"))  ))
+    (add-tbl-str tmp-text)
+    =][=
 
-[=(. offset-names)=]
+  ENDFOR event  =][=
 
-static const size_t asz[=(. Pfx)=]States[] = {
-[=(shellf
-"${CLexe-columns} --spread=1 -I4 -S, -f'%sSt%%s_off' <<'_EOF_'
-Init
-%s
-_EOF_"
-  Pfx
-  (string-capitalize! (join "\n" (stack "state")))  )=] };
+  (ag-fprintf 0 "\nstatic const size_t asz%sEvents[%d] = {\n"
+      Pfx (+ 1 (count "event")) )
 
-static const size_t asz[=(. Pfx)=]Events[] = {
-[=(shellf
-"${CLexe-columns} --spread=1 -I4 -S, -f'%sEv%%s_off' <<'_EOF_'
-%s
-Invalid
-_EOF_"
-  Pfx
-  (string-capitalize! (join "\n" (stack "event")))  )=] };
+  (emit (shell (string-append
+      "${CLexe-columns} --spread=1 -I4 -S, <<_EOF_\n"
+      index-list
+      (sprintf "%d\n" invalid-ix)
+      "_EOF_")))
+  (emit " };\n")
 
-#define [=(. PFX)=]_EVT_NAME(t) ( (((unsigned)(t)) >= [=(. PFX)=]_EV_INVALID) \
+  (out-suspend "strings")
+  (emit-string-table str-table)
+  (out-resume "strings")
+  (emit (out-pop #t)) =]
+
+#define [=(. PFX)
+    =]_EVT_NAME(t)   ( (((unsigned)(t)) >= [=(+ 1 (count "event"))=]) \
     ? z[=(. Pfx)=]Strings : z[=(. Pfx)
     =]Strings + asz[=(. Pfx)=]Events[t])
 
-#define [=(. PFX)=]_STATE_NAME(s) ( (((unsigned)(s)) > [=(. PFX)=]_ST_INVALID) \
+#define [=(. PFX)
+    =]_STATE_NAME(s) ( (((unsigned)(s)) >= [=(+ 1 (count "state"))=]) \
     ? z[=(. Pfx)=]Strings : z[=(. Pfx)
     =]Strings + asz[=(. Pfx)=]States[s])
 

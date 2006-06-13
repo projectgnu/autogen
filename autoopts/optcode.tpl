@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.22 2006/06/10 18:07:21 bkorb Exp $
+#$Id: optcode.tpl,v 4.23 2006/06/13 21:48:43 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-10 10:18:49 bkorb"
+# Time-stamp:      "2006-06-11 08:17:30 bkorb"
 
 =][=
 
@@ -53,14 +53,18 @@
 (if (exist? "argument")
   (set! usage-line (string-append usage-line
 
-        ;; the USAGE line plus the program name plus the argument goes
-        ;; past 80 columns, then break the line, else separate with space
-        ;;
-        (if (< 80 (+ (string-length usage-line)
-              (len "argument")
-              (string-length prog-name) ))
-            " \\\n\t\t"  " ")
-        (get "argument")  ))
+    ;; the USAGE line plus the program name plus the argument goes
+    ;; past 80 columns, then break the line, else separate with space
+    ;;
+    (if (< 80 (+ (string-length usage-line)
+          (len "argument")
+          (string-length prog-name) ))
+        " \\\n\t\t"
+        " "
+    )
+
+    (get "argument")
+  ))
 )
 (define usage-text (string-append version-text "\n" usage-line "\n"))
 

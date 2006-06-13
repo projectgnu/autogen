@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday November  6, 2005 at 03:58:43 PM PST
+ *  It has been AutoGen-ed  Tuesday June 13, 2006 at 02:42:42 PM PDT
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -51,10 +51,6 @@ static char* pz_new_name = NULL;
 
 #ifndef NULL
 #  define NULL 0
-#endif
-
-#ifndef tSCC
-#  define tSCC static const char
 #endif
 
 /*
@@ -297,86 +293,54 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
 };
 
 
-tSCC zDpStrings[] =
-       "** OUT-OF-RANGE **" "\0"
-       "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" "\0"
-       "invalid" "\0"
-       "init" "\0"
-       "need_def" "\0"
-       "need_tpl" "\0"
-       "need_semi" "\0"
-       "need_name" "\0"
-       "have_name" "\0"
-       "need_value" "\0"
-       "need_idx" "\0"
-       "need_cbkt" "\0"
-       "indx_name" "\0"
-       "have_value" "\0"
-       "autogen" "\0"
-       "definitions" "\0"
-       "End-Of-File" "\0"
-       "var_name" "\0"
-       "other_name" "\0"
-       "string" "\0"
-       "here_string" "\0"
-       "number" "\0"
-       ";" "\0"
-       "=" "\0"
-       "," "\0"
-       "{" "\0"
-       "}" "\0"
-       "[" "\0"
-       "]" "\0";
-
-#define DpBogus_off 0
-#define DpFsmErr_off 19
-#define DpEvInvalid_off 75
-#define DpStInit_off 83
-#define DpStNeed_Def_off 88
-#define DpStNeed_Tpl_off 97
-#define DpStNeed_Semi_off 106
-#define DpStNeed_Name_off 116
-#define DpStHave_Name_off 126
-#define DpStNeed_Value_off 136
-#define DpStNeed_Idx_off 147
-#define DpStNeed_Cbkt_off 156
-#define DpStIndx_Name_off 166
-#define DpStHave_Value_off 176
-#define DpEvAutogen_off 187
-#define DpEvDefinitions_off 195
-#define DpEvEnd_off 207
-#define DpEvVar_Name_off 219
-#define DpEvOther_Name_off 228
-#define DpEvString_off 239
-#define DpEvHere_String_off 246
-#define DpEvNumber_off 258
-#define DpEvLit_Semi_off 265
-#define DpEvLit_Eq_off 267
-#define DpEvLit_Comma_off 269
-#define DpEvLit_O_Brace_off 271
-#define DpEvLit_C_Brace_off 273
-#define DpEvLit_Open_Bkt_off 275
-#define DpEvLit_Close_Bkt_off 277
+#define DpFsmErr_off     19
+#define DpEvInvalid_off  75
+#define DpStInit_off     83
 
 
-static const size_t aszDpStates[] = {
-    DpStInit_off,       DpStNeed_Def_off,   DpStNeed_Tpl_off,
-    DpStNeed_Semi_off,  DpStNeed_Name_off,  DpStHave_Name_off,
-    DpStNeed_Value_off, DpStNeed_Idx_off,   DpStNeed_Cbkt_off,
-    DpStIndx_Name_off,  DpStHave_Value_off };
+static const char zDpStrings[279] =
+    "** OUT-OF-RANGE **\0"
+    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n\0"
+    "invalid\0"
+    "init\0"
+    "need_def\0"
+    "need_tpl\0"
+    "need_semi\0"
+    "need_name\0"
+    "have_name\0"
+    "need_value\0"
+    "need_idx\0"
+    "need_cbkt\0"
+    "indx_name\0"
+    "have_value\0"
+    "autogen\0"
+    "definitions\0"
+    "End-Of-File\0"
+    "var_name\0"
+    "other_name\0"
+    "string\0"
+    "here_string\0"
+    "number\0"
+    ";\0"
+    "=\0"
+    ",\0"
+    "{\0"
+    "}\0"
+    "[\0"
+    "]\0";
 
-static const size_t aszDpEvents[] = {
-    DpEvAutogen_off,       DpEvDefinitions_off,   DpEvEnd_off,
-    DpEvVar_Name_off,      DpEvOther_Name_off,    DpEvString_off,
-    DpEvHere_String_off,   DpEvNumber_off,        DpEvLit_Semi_off,
-    DpEvLit_Eq_off,        DpEvLit_Comma_off,     DpEvLit_O_Brace_off,
-    DpEvLit_C_Brace_off,   DpEvLit_Open_Bkt_off,  DpEvLit_Close_Bkt_off,
-    DpEvInvalid_off };
+static const size_t aszDpStates[11] = {
+    83,  88,  97,  106, 116, 126, 136, 147, 156, 166, 176 };
 
-#define DP_EVT_NAME(t) ( (((unsigned)(t)) >= DP_EV_INVALID) \
+static const size_t aszDpEvents[16] = {
+    187, 195, 207, 219, 228, 239, 246, 258, 265, 267, 269, 271, 273, 275, 277,
+    75 };
+
+
+#define DP_EVT_NAME(t)   ( (((unsigned)(t)) >= 16) \
     ? zDpStrings : zDpStrings + aszDpEvents[t])
 
-#define DP_STATE_NAME(s) ( (((unsigned)(s)) > DP_ST_INVALID) \
+#define DP_STATE_NAME(s) ( (((unsigned)(s)) >= 11) \
     ? zDpStrings : zDpStrings + aszDpStates[s])
 
 #ifndef EXIT_FAILURE

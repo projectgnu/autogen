@@ -134,10 +134,6 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 #ifndef NULL
 #  define NULL 0
 #endif
-
-#ifndef tSCC
-#  define tSCC static const char
-#endif
 [= CASE method  =][=
 
   =* "case"       =][=
