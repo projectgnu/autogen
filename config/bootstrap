@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2006-06-17 07:48:56 bkorb"
+# Time-stamp:      "2006-06-17 08:14:48 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.9 2006/06/17 15:06:15 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.10 2006/06/17 15:46:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -244,14 +244,9 @@ _EOF_
 
   # Execute this in a sub-shell so we don't lose our start location.
   (
-    set -x
+    ${setx}
     cd $top
     echo bootstrapping in ${PWD}
-
-    # test -f Make.def && \
-    #    ${AGexe} --show-shell --show-defs -bMakefile Make.def
-    test -f Make.def && \
-       ${AGexe} -bMakefile Make.def
 
     # remove any stale config.cache
     doit rm -f config.cache
@@ -262,32 +257,17 @@ _EOF_
     test -n "$auxdir" || auxdir=${srcdir}
     test -d $auxdir || auxdir=.
 
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
-      | egrep 'A[CM]_PROG_LIBTOOL' > /dev/null ; then
-      doit $LIBTOOLIZE    --force
-    fi
-
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
-      | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
-      doit $ACLOCAL       -I $auxdir
-    fi
-
+    doit $LIBTOOLIZE    --force
+    doit $ACLOCAL       -I $auxdir
     doit $AUTOHEADER
-
-    if sed 's,#.*$,,;s,dnl[ \t].*$,,' ${config_file} \
-      | egrep 'A(C|M)_INIT_AUTOMAKE' > /dev/null ; then
-      doit $AUTOMAKE      --gnu --add-missing
-    fi
-
+    doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
   ) || exit 1
 done
 
-# Execute (NOTE: not source!) any bootstrap.dir scripts we find in
-# the source tree.
-#
-bootstrap_list=$(find . -name bootstrap.dir | egrep -v '/CVS/' | sort)
-for f in ${bootstrap_list}
+for f in $(
+    find . -name bootstrap.dir | \
+        egrep -v '/CVS/')
 do
   ( cd $(dirname $f)
     srcdir=.

@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2006-01-22 12:16:15 bkorb"
+# Time-stamp:        "2006-06-17 08:39:22 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.9 2006/03/24 15:32:27 bkorb Exp $
+# $Id: error.test,v 4.10 2006/06/17 15:46:01 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -102,7 +102,7 @@ processing template error2.tpl
        for function EXPR (11)
 _EOF_
 
-sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `kill -TERM ${AG_pid}` =>,' \
+sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
     < ${testname}.tpl > ${testname}2.tpl
 
 # this is *supposed* to exit with a failure status

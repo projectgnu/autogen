@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.12 2006/03/25 19:27:09 bkorb Exp $
+ *   $Id: opts.def,v 4.13 2006/06/17 15:46:01 bkorb Exp $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -52,16 +52,13 @@ argument       = "[ <def-file> ]";
 long-opts;
 
 version = `
-    if test -z "$top_srcdir" || test ! -d "$top_srcdir"; then
+    if test ! -d "${top_srcdir}"; then
         echo "NOTICE:  Setting top_srcdir to .." >&2
         top_srcdir=..
     fi
-    if test ! -f $top_srcdir/VERSION ; then
-        echo "error $top_srcdir/VERSION file missing" >&2
-        kill -TERM $AG_pid
-    fi
-    f="\`egrep '^AG_'  $top_srcdir/VERSION\`"
-    eval "$f" > /dev/null
+    test -f ${top_srcdir}/VERSION || \
+        die "error ${top_srcdir}/VERSION file missing"
+    eval \`egrep '^AG_[A-Z_]*='  ${top_srcdir}/VERSION\` 2> /dev/null
     echo $AG_VERSION `;
 
 #ifndef XML2AG
