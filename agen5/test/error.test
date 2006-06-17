@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2006-06-17 08:39:22 bkorb"
+# Time-stamp:        "2006-06-17 10:02:31 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.10 2006/06/17 15:46:01 bkorb Exp $
+# $Id: error.test,v 4.11 2006/06/17 17:03:43 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -48,9 +48,9 @@ _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 1 # # # # # # #
 
-echo creating ${testname}.out1
+echo creating ${testname}.base1
 # this is the output we should expect to see
-cat > ${testname}.out1 <<'_EOF_'
+cat > ${testname}.base1 <<'_EOF_'
 #error directive -- in error.def on line 3
 	The definitions file has a `#error' directive
 _EOF_
@@ -58,8 +58,8 @@ _EOF_
 echo ${AGexe} ${testname}.def
 ${AGexe} ${testname}.def 2> ${testname}.err1 && failure unexpected success
 grep -v 'Giving up in' ${testname}.err1 >  ${testname}.err
-cmp -s  ${testname}.err  ${testname}.out1 || \
-  failure "actual->expected `diff -c ${testname}.err  ${testname}.out1`"
+cmp -s ${testname}.err ${testname}.base1 || \
+  failure "expected->actual `diff -c ${testname}.base1 ${testname}.err`"
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 2 # # # # # # #
 
@@ -75,9 +75,11 @@ Error in template error.tpl, line 13
 	your template
 _EOF_
 
+agopts="--no-def --base=${testname} --trace-out=${testname}.trc"
+
 # this is *supposed* to exit with a failure status
-echo autogen --no-def -T${testname}.tpl --base=${testname} >&2
-${AGexe} --no-def -T${testname}.tpl --base=${testname} \
+echo autogen -T${testname}.tpl ${agopts}2 >&2
+${AGexe} -T${testname}.tpl ${agopts}2 \
   2> ${testname}.err2 \
   && failure Unexpected success for AutoGen
 
@@ -86,16 +88,17 @@ then
   egrep -v 'Giving up in | is deprecated\.' ${testname}.err2
 else
   egrep -v 'Giving up in ' ${testname}.err2
-fi > ${testname}.res2
+fi >> ${testname}.trc2
 
-cmp -s ${testname}.base2 ${testname}.res2 || \
-  failure "actual->expected `diff -c ${testname}.base2 ${testname}.res2`"
+cmp -s ${testname}.base2 ${testname}.trc2 || \
+  failure "expected->actual `diff -c ${testname}.base2 ${testname}.trc2`"
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 3 # # # # # # #
 
-echo creating ${testname}.out3
+echo creating ${testname}.base3
 # this is the output we should expect to see
-cat > ${testname}.out3 <<_EOF_
+cat > ${testname}.base3 <<_EOF_
+testing death
 AutoGen aborting on signal <text-varies> in state EMITTING
 processing template error2.tpl
             on line 2
@@ -106,24 +109,24 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
     < ${testname}.tpl > ${testname}2.tpl
 
 # this is *supposed* to exit with a failure status
-echo autogen --no-def -T${testname}2.tpl --base=${testname} >&2
-${AGexe} --no-def -T${testname}2.tpl --base=${testname} \
+echo autogen -T${testname}2.tpl ${agopts}3 >&2
+${AGexe} -T${testname}2.tpl ${agopts}3 \
   2> ${testname}.tmp3 \
   && failure Unexpected success for AutoGen
 
 sed -e 's,on signal .* in state,on signal <text-varies> in state,' \
     -e '/trapped on [1-9]/d' -e '/^Abort\$/d' -e '/Broken pipe/d' \
-  ${testname}.tmp3 > ${testname}.err3
-cmp -s ${testname}.err3 ${testname}.out3 || \
-  failure "actual->expected `diff -c ${testname}.err3 ${testname}.out3`"
+  ${testname}.tmp3 >> ${testname}.trc3
+cmp -s ${testname}.trc3 ${testname}.base3 || \
+  failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"
 
 # # # # # # # # # # EXPECTED OUTPUT FILE 4 # # # # # # #
 
 sed 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
 
-echo creating ${testname}.out4
+echo creating ${testname}.base4
 # this is the output we should expect to see
-cat > ${testname}.out4 <<'_EOF_'
+cat > ${testname}.base4 <<'_EOF_'
 FSM Error:  in state 5 (have_name), event 3 (var_name) is invalid
 invalid transition:  in error2.def on line 2
 	token in error:  var_name:  ``is broken;
@@ -137,10 +140,10 @@ Likely causes:  a mismatched quote, a value that needs quoting,
 _EOF_
 
 echo ${AGexe} ${testname}.def
-${AGexe} ${testname}2.def 2> ${testname}.err4 && failure unexpected success
-grep -v 'Giving up in' ${testname}.err4 >  ${testname}.err
-cmp -s  ${testname}.err  ${testname}.out4 || \
-  failure "`diff -c ${testname}.out4 ${testname}.err`"
+${AGexe} ${testname}2.def 2> ${testname}.trc4 && failure unexpected success
+grep -v 'Giving up in' ${testname}.trc4 > ${testname}.err4
+cmp -s  ${testname}.err4 ${testname}.base4 || \
+  failure "expected->actual `diff -c ${testname}.base4 ${testname}.err4`"
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
@@ -151,7 +154,7 @@ THIS TEXT SHOULD BE DELETED!!
 <= ENDIF =>
 _EOF_
 
-${AGexe} -T ${testname}.tpl5 -b ${testname} --no-defin \
+${AGexe} -T ${testname}.tpl5 ${agopts}5 \
   > /dev/null 2> ${testname}.out5
  [ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
 
@@ -163,7 +166,7 @@ Error in template error.tpl5, line 3
 EOF
 
 cmp -s  ${testname}.base5  ${testname}.samp5 || \
-  failure "`diff -c ${testname}.base5 ${testname}.samp5`"
+  failure "expected->actual `diff -c ${testname}.base5 ${testname}.samp5`"
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
@@ -180,11 +183,11 @@ if (exist? "nothing")
 End Of File
 _EOF_
 
-${AGexe} -T ${testname}.tpl6 -b ${testname} --no-defin \
+${AGexe} -T ${testname}.tpl6 ${agopts}6 \
   > /dev/null 2> ${testname}.out6 && \
   failure "Your Guile lib exits 0 on failure"
 
-cat > ${testname}.samp6 <<EOF
+cat > ${testname}.base6 <<EOF
 ${testname}.tpl6:7:4: In expression (stumble-over-unbound-variable):
 ${testname}.tpl6:7:4: Unbound variable: stumble-over-unbound-variable
 Scheme evaluation error.  AutoGen ABEND-ing in template
@@ -204,15 +207,15 @@ EOF
 if test ${GUILE_VERSION} -gt 107000
 then
   echo "WARNING:  Guile 1.7.x cannot display error line numbers" >&2
-  exec 3> ${testname}.samp6-tmp
+  exec 3> ${testname}.base6-tmp
   echo 'ERROR: Unbound variable: stumble-over-unbound-variable' >&3
-  sed 1,2d ${testname}.samp6 >&3
+  sed 1,2d ${testname}.base6 >&3
   exec 3>&-
-  mv -f ${testname}.samp6-tmp ${testname}.samp6
+  mv -f ${testname}.base6-tmp ${testname}.base6
 fi
 
-cmp -s  ${testname}.samp6  ${testname}.out6 || \
-  failure "`diff -c ${testname}.samp6 ${testname}.out6`"
+cmp -s  ${testname}.base6  ${testname}.out6 || \
+  failure "expected->actual `diff -c ${testname}.base6 ${testname}.out6`"
 
 cleanup
 
