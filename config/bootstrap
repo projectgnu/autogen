@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2006-01-12 16:38:21 bkorb"
+# Time-stamp:      "2006-06-17 07:48:56 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.8 2006/01/21 18:36:04 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.9 2006/06/17 15:06:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -38,20 +38,38 @@
 
 # Code:
 
+case `set -o` in
+*posix*) set -o posix  ;;
+*) exec bash $0 ${1+"$@"} ;;
+esac
+
+case "${SHELL}" in
+(*[akz]sh) : ;;
+(*)
+  while : ; do
+    SHELL=$(which bash 2>/dev/null)
+    test -x "${SHELL}" && break
+
+    SHELL=$(which ksh 2>/dev/null)
+    test -x "${SHELL}" && break
+
+    SHELL=/usr/xpg4/bin/sh
+    test -x "${SHELL}" && break
+
+    SHELL=$(which sh 2>/dev/null)
+    test -x "${SHELL}" && break
+
+    echo ${0} unable to determine which shell to use. >&2
+    exit 1
+  done
+  ;;
+esac
+
 case "$-" in
 (*x*)   setx=set\ -x dashx=-x ;;
 (*)     setx=:       dashx=   ;;
 esac
 export setx dashx
-
-case "${SHELL}" in
-("" | *csh)
-    SHELL=$(which bash 2>/dev/null)
-    test -x "${SHELL}" || {
-        SHELL=$(which ksh 2>/dev/null)
-        test -x "${SHELL}" || SHELL=$(which sh)
-    }
-esac
 
 # Figure out the absolute path to the working directory.
 #
@@ -111,8 +129,7 @@ export AGexe GDexe CLexe
 #
 BOOTSTRAP=pre
 export BOOTSTRAP
-test ! -f ${wd}/bootstrap.local || \
-   ${SHELL} ${dashx} ${wd}/bootstrap.local $@ || exit 1
+( . ${wd}/bootstrap.local ${1+"$@"} ) || exit 1
 
 # ----------------------------------------------------------------------
 # Make sure all of the maintainer tools required for bootstrap are
@@ -134,8 +151,8 @@ out_of_date()
     if test "X${1}" = "X${2}"
     then return 1 ; fi
 
-    tv=`IFS=" .";set -- ${1};echo $@`
-    bv=`IFS=" .";set -- ${2};echo $@`
+    tv=$(IFS=" .";set -- ${1};echo ${1+"$@"})
+    bv=$(IFS=" .";set -- ${2};echo ${1+"$@"})
 
     #  FOREVER...(as long as we have version number components)
     #
@@ -144,20 +161,20 @@ out_of_date()
         #  Extract the next component.  If they are not equal,
         #  then it is time to return 0 or 1.
         #
-        x=`set -- $tv;echo $1`
-        y=`set -- $bv;echo $1`
+        x=$(set -- $tv;echo $1)
+        y=$(set -- $bv;echo $1)
         if test "X$x" = "X$y" ; then :
         else
-            set -- `(echo $x return 0; echo $y return 1) | sort -n | sed 1q`
+            set -- $( (echo $x return 0; echo $y return 1) | sort -n | sed 1q)
             shift
-            eval $@
+            eval ${1+"$@"}
         fi
 
         #  Shift off the first component of each.  If the base version is done
         #  then the test version is more recent, otherwise the other way
         #
-        tv=`set -- $tv;shift;echo $@`
-        bv=`set -- $bv;shift;echo $@`
+        tv=$(set -- $tv;shift;echo ${1+"$@"})
+        bv=$(set -- $bv;shift;echo ${1+"$@"})
         [ -z "$bv" ] && return 1
         [ -z "$tv" ] && return 0
     done
@@ -229,7 +246,7 @@ _EOF_
   (
     set -x
     cd $top
-    echo bootstrapping in `pwd`
+    echo bootstrapping in ${PWD}
 
     # test -f Make.def && \
     #    ${AGexe} --show-shell --show-defs -bMakefile Make.def
@@ -240,8 +257,8 @@ _EOF_
     doit rm -f config.cache
 
     # Use auxdir if set in ${config_file}.
-    auxdir=${auxdir-`fgrep CONFIG_AUX_DIR ${config_file} | \
-        sed 's,^.*(,,;s,).*$,,'`}
+    auxdir=${auxdir-$(fgrep CONFIG_AUX_DIR ${config_file} | \
+        sed 's,^.*(,,;s,).*$,,')}
     test -n "$auxdir" || auxdir=${srcdir}
     test -d $auxdir || auxdir=.
 
@@ -274,8 +291,8 @@ for f in ${bootstrap_list}
 do
   ( cd $(dirname $f)
     srcdir=.
-    echo running POST-bootstrap.dir in `pwd`
-    ${SHELL} ${dashx} ./bootstrap.dir recursive
+    echo running POST-bootstrap.dir in ${PWD}
+    . ./bootstrap.dir recursive
   ) || exit 1
 done
 
@@ -284,8 +301,7 @@ done
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 BOOTSTRAP=post
-test ! -f ${wd}/bootstrap.local || \
-   ${SHELL} ${dashx} ${wd}/bootstrap.local $@ || exit 1
+. ${wd}/bootstrap.local ${1+"$@"} || exit 1
 
 # Local Variables:
 # mode: shell-script

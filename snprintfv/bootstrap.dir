@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/echo This_file_must_be_sourced,_not_executed
 #  -*- Mode: Sh -*- 
 # ----------------------------------------------------------------------
 # bootstrap.dir --- script to create generated files in this directory
@@ -9,7 +9,7 @@
 # Last Modified:      Thu Aug  5 14:14:36 1999				      
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.3 2005/06/08 22:58:52 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.4 2006/06/17 15:06:15 bkorb Exp $
 # ----------------------------------------------------------------------
 # Copyright (C) 1999 Gary V. Vaughan
 #

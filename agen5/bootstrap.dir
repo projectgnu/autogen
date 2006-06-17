@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/echo This_file_must_be_sourced,_not_executed
 #
 # ----------------------------------------------------------------------
 # agen5/bootstrap.dir --- maintainer's bootstrap script
@@ -8,10 +8,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2006/06/03 05:46:51 $
+# Last Modified:     $Date: 2006/06/17 15:06:15 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.13 2006/06/03 05:46:51 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.14 2006/06/17 15:06:15 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.

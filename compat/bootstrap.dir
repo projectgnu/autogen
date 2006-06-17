@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/echo This_file_must_be_sourced,_not_executed
 
 if [ -n "${AGexe}" ]
 then
