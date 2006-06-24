@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.24 2006/06/24 23:34:51 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.25 2006/06/24 23:54:32 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -58,26 +58,13 @@ texi=autogen.texi
 \internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
 @end ignore
 @c %**start of header
-[=
-(define e-addr "bkorb@gnu.org")
-
-(shell (string-append "
-UPDATED=`date '+%B %Y'`
-cat <<_EOF_
-@set EDITION   ${AG_REVISION}
-@set UPDATED   ${UPDATED}
-@set COPYRIGHT "    (get "copyright.date")
-"\n@set TITLE     " (get "prog_title")
-"\n@set PACKAGE   " (get "package")
-"\n_EOF_" ))
-
-=]
 @setfilename [=(base-name)=].info
-@settitle AutoGen - @value{TITLE}
+@settitle AutoGen - [= prog-title =]
 @setchapternewpage off
 @c %**end of header
 @copying
 This manual is for GNU AutoGen version [= `
+  UPDATED=\`date '+%B %Y'\`
   echo ${AG_REVISION}, updated ${UPDATED}` =].
 
 Copyright @copyright{} [= copyright.date =] by Bruce Korb.
@@ -107,7 +94,7 @@ directories:
 
 @dircategory GNU programming tools
 @direntry
-* AutoGen: (autogen).         @value{TITLE}
+* AutoGen: (autogen).         [= prog-title =]
 @end direntry
 
 @ifinfo
@@ -130,7 +117,7 @@ notice identical to this one except for the removal of this paragraph.
 
 @finalout
 @titlepage
-@title AutoGen - @value{TITLE}
+@title AutoGen - [= prog-title =]
 @subtitle For version [=`
   echo ${AG_REVISION}, ${UPDATED} `=]
 @author Bruce Korb
