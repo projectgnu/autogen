@@ -1,3 +1,7 @@
+2006-06-24  Bruce Korb  <bkorb@gnu.org>
+
+	* EVERYWHERE: cleanups for warnings
+
 2006-06-10  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am(usage-txt.pot): remove rule
