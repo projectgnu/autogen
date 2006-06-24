@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.10 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expExtract.c,v 4.11 2006/06/24 23:34:50 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -100,7 +100,7 @@ loadExtractData( const char* pzNewFile )
             goto bad_return;
 
         do  {
-            size_t sz = fread( pzIn, 1, sbuf.st_size, fp );
+            size_t sz = fread( pzIn, 1, (unsigned)sbuf.st_size, fp );
             if (sz == 0) {
                 fprintf( stderr, "Error %d (%s) reading %d bytes of %s\n",
                          errno, strerror( errno ), (int)sbuf.st_size, pzFile );
@@ -173,7 +173,7 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
 
     pzE += strlen( pzEnd );
 
-    return AG_SCM_STR2SCM( pzS, pzE - pzS );
+    return AG_SCM_STR2SCM( pzS, (unsigned)(pzE - pzS) );
 }
 
 

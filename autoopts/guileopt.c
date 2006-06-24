@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.9 2006/03/25 19:23:28 bkorb Exp $
- * Time-stamp:      "2005-04-17 11:10:52 bkorb"
+ *  $Id: guileopt.c,v 4.10 2006/06/24 23:34:51 bkorb Exp $
+ * Time-stamp:      "2006-06-24 11:40:39 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -50,10 +50,18 @@
  */
 #include "config.h"
 #include <stdio.h>
+#if defined(HAVE_STRING_H)
+#  include <string.h>
+#elif defined(HAVE_STRINGS_H)
+#  include <strings.h>
+#else
+   choke me -- no strings header
+#endif
 #include <guile/gh.h>
 
 #include "autoopts/options.h"
-#include "autoopts.h"
+
+#define SKIP_OPT(p)  (((p)->fOptState & (OPTST_DOCUMENT|OPTST_OMITTED)) != 0)
 
 /*=export_func  export_options_to_guile
  * what:  put the option state into Guile symbols
@@ -65,8 +73,7 @@
  *        interpreter.
 =*/
 void
-export_options_to_guile( pOpts )
-    tOptions* pOpts;
+export_options_to_guile( tOptions* pOpts )
 {
     tOptDesc*  pOD = pOpts->pOptDesc;
     int        ct  = pOpts->presetOptCt;
@@ -122,7 +129,7 @@ export_options_to_guile( pOpts )
          *  IF the option can occur several times, then emit the count.
          */
         if (pOD->optMaxCt > 1) {
-            sprintf( z, "(define opt-ct-%s %ld)\n",
+            sprintf( z, "(define opt-ct-%s %d)\n",
                      pOD->pz_Name, pOD->optOccCt );
 #ifdef DEBUG
             fputs( z, stderr );

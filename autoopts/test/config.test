@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2005-04-03 15:58:01 bkorb"
+# Time-stamp:        "2006-06-24 14:09:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: config.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: config.test,v 4.4 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
@@ -19,6 +19,7 @@ cat > ${testname}.c <<-  _EOTest_
 	#include "config.h"
 	#include <autoopts/options.h>
 
+	int print_entry( const tOptionValue* pGV );
 	int print_entry( const tOptionValue* pGV ) {
 	  if (pGV == NULL) {
 	    fprintf( stderr, "ENTRY NOT FOUND\n" );
@@ -40,13 +41,13 @@ cat > ${testname}.c <<-  _EOTest_
 	              pGV->v.boolVal ? "TRUE" : "false" ); break;
 
 	    case OPARG_TYPE_MEMBERSHIP:
-	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
+	      printf( "members:  0x%08lX\n",  (unsigned long)pGV->v.setVal ); break;
 
 	    case OPARG_TYPE_NUMERIC:
-	      printf( "integer:   %d\n",      pGV->v.longVal ); break;
+	      printf( "integer:   %ld\n",      pGV->v.longVal ); break;
 
 	    case OPARG_TYPE_HIERARCHY:
-	      printf( "nested:   0x%08lX\n", pGV->v.nestVal ); break;
+	      printf( "nested:   0x%08lX\n",  (unsigned long)pGV->v.nestVal ); break;
 
 	    default:
 	      printf( "bad type: %d\n",      pGV->valType );

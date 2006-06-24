@@ -11,7 +11,7 @@
  */
 
 static void
-addArg( char* pzArg, int ix )
+addArg( const char* pzArg, int ix )
 {
     char** pArgv = xml2agOptions.origArgVect;
     if (ix >= xml2agOptions.origArgCt) {
@@ -24,7 +24,7 @@ addArg( char* pzArg, int ix )
         }
         xml2agOptions.origArgVect = pArgv;
     }
-    pArgv[ ix ] = pzArg;
+    pArgv[ ix ] = (void*)pzArg;
 }
 
 

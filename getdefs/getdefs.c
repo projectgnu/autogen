@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.5 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: getdefs.c,v 4.6 2006/06/24 23:34:51 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
- *  Time-stamp:        "2005-10-29 12:15:56 bkorb"
+ *  Time-stamp:        "2006-06-24 15:43:30 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -798,7 +798,7 @@ processFile( tCC* pzFile )
          *  Make sure there is a subexpression match!!
          */
         if (matches[1].rm_so == -1) {
-            char* pz;
+            char* pz = NULL;
             char  ch = NUL;
 
             pzDef = pzScan + matches[0].rm_so;
@@ -806,11 +806,10 @@ processFile( tCC* pzFile )
                 pz  = pzDef + 30;
                 ch  = *pz;
                 *pz = NUL;
-            } else
-                ch  = NUL;
+            }
 
             fprintf( stderr, zNoSubexp, lineNo, pzFile, pzDef );
-            if (ch != NUL)
+            if (pz != NULL)
                 *pz = ch;
             continue;
         }
@@ -1173,7 +1172,7 @@ updateDatabase( void )
         exit( EXIT_FAILURE );
     }
 
-    fwrite( pzIndexEOF, (pzEndIndex - pzIndexEOF), 1, fp );
+    fwrite( pzIndexEOF, (unsigned)(pzEndIndex - pzIndexEOF), 1, fp );
     fclose( fp );
     chmod( OPT_ARG( ORDERING ), 0444 );
 }

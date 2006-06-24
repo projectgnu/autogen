@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.23 2006/06/03 18:25:49 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.24 2006/06/24 23:34:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -672,13 +672,14 @@ INVOKE  get-text tag = "autoopts-data"
 
 =]
 #include <sys/types.h>
+#include <stdio.h>
 #include <pwd.h>
 #include <string.h>
 #include <unistd.h>
 #include <autoopts/options.h>
 int main( int argc, char** argv ) {
-  char* greeting = "Hello";
-  char* greeted  = "World";
+  const char* greeting = "Hello";
+  const char* greeted  = "World";
   const tOptionValue* pOV = configFileLoad( "hello.conf" );
 
   if (pOV != NULL) {

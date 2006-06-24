@@ -170,7 +170,7 @@ typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
  */
 typedef struct spec_entry
 {
-  int spec;
+  unsigned int spec_key;
   int unused;  /* for binary compatibility */
   int type;
   printf_function *fmt;

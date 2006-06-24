@@ -355,8 +355,8 @@ int
 dp_invalid_transition( te_dp_state st, te_dp_event evt )
 {
     /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
-    fprintf( stderr, zDpStrings + DpFsmErr_off, st, DP_STATE_NAME(st),
-             evt, DP_EVT_NAME(evt));
+    tCC* fmt_pz = zDpStrings + DpFsmErr_off;
+    fprintf( stderr, fmt_pz, st, DP_STATE_NAME(st), evt, DP_EVT_NAME(evt));
     /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
 
     return EXIT_FAILURE;
@@ -388,7 +388,7 @@ dp_do_end_block(
 {
 /*  START == END BLOCK == DO NOT CHANGE THIS COMMENT  */
     if (stackDepth <= 0)
-        yyerror( "Too many close braces" );
+        yyerror( (void*)"Too many close braces" );
 
     pCurrentEntry = ppParseStack[ stackDepth-- ];
     return maybe_next;
@@ -435,7 +435,7 @@ dp_do_invalid(
 {
 /*  START == INVALID == DO NOT CHANGE THIS COMMENT  */
     dp_invalid_transition( initial, trans_evt );
-    yyerror( "invalid transition" );
+    yyerror( (void*)"invalid transition" );
     /* NOTREACHED */
     return DP_ST_INVALID;
 /*  END   == INVALID == DO NOT CHANGE THIS COMMENT  */
@@ -449,7 +449,7 @@ dp_do_need_name_end(
 {
 /*  START == NEED NAME END == DO NOT CHANGE THIS COMMENT  */
     if (stackDepth != 0)
-        yyerror( "definition blocks were left open" );
+        yyerror( (void*)"definition blocks were left open" );
 
     /*
      *  We won't be using the parse stack any more.
@@ -502,7 +502,7 @@ dp_do_start_block(
 {
 /*  START == START BLOCK == DO NOT CHANGE THIS COMMENT  */
     if (pCurrentEntry->valType == VALTYP_TEXT)
-        yyerror( "assigning a block value to text name" );
+        yyerror( (void*)"assigning a block value to text name" );
     pCurrentEntry->valType = VALTYP_BLOCK; /* in case not yet determined */
 
     if (++stackDepth >= stackSize) {
@@ -532,7 +532,7 @@ dp_do_str_value(
 {
 /*  START == STR VALUE == DO NOT CHANGE THIS COMMENT  */
     if (pCurrentEntry->valType == VALTYP_BLOCK)
-        yyerror( "assigning a block value to text name" );
+        yyerror( (void*)"assigning a block value to text name" );
 
     pCurrentEntry->val.pzText = pz_token;
     pCurrentEntry->valType = VALTYP_TEXT;

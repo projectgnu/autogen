@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expFormat.c
- *  $Id: expFormat.c,v 4.11 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expFormat.c,v 4.12 2006/06/24 23:34:50 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -250,14 +250,14 @@ ag_scm_error( SCM res )
     tSCC      zWarn[]   = "Warning";
     tSCC      zBadMsg[] = "??? indecipherable error message ???";
     tCC*      pzMsg;
-    tSuccess  abort = FAILURE;
+    tSuccess  abrt = FAILURE;
     char      zNum[16];
     int       msgLen;
 
     switch (gh_type_e( res )) {
     case GH_TYPE_BOOLEAN:
         if (SCM_FALSEP( res ))
-            abort = PROBLEM;
+            abrt = PROBLEM;
         pzMsg = zNil;
         break;
 
@@ -265,7 +265,7 @@ ag_scm_error( SCM res )
     {
         unsigned long val = gh_scm2ulong( res );
         if (val == 0)
-            abort = PROBLEM;
+            abrt = PROBLEM;
         snprintf( zNum, sizeof( zNum ), "%d", (int)val );
         pzMsg = zNum;
         break;
@@ -274,7 +274,7 @@ ag_scm_error( SCM res )
     case GH_TYPE_CHAR:
         zNum[0] = gh_scm2char( res );
         if ((zNum[0] == NUL) || (zNum[0] == '0'))
-            abort = PROBLEM;
+            abrt = PROBLEM;
         zNum[1] = NUL;
         pzMsg = zNum;
         break;
@@ -290,9 +290,9 @@ ag_scm_error( SCM res )
          *  THEN this is just a warning that is ignored
          */
         if (msgLen <= 0)
-            abort = PROBLEM;
+            abrt = PROBLEM;
         else if (isdigit( *pzMsg ) && (strtol( pzMsg, NULL, 0 ) == 0))
-            abort = PROBLEM;
+            abrt = PROBLEM;
         break;
 
     default:
@@ -304,16 +304,16 @@ ag_scm_error( SCM res )
      *  THEN print it.
      */
     if (*pzMsg != NUL) {
-        char* pz = aprf( zFmt, (abort != PROBLEM) ? zErr : zWarn,
+        char* pz = aprf( zFmt, (abrt != PROBLEM) ? zErr : zWarn,
                          pCurTemplate->pzTplFile, pCurMacro->lineNo,
                          pCurFp->pzOutName, pzMsg );
-        if (abort != PROBLEM)
+        if (abrt != PROBLEM)
             AG_ABEND( pz );
         fputs( pz, pfTrace );
         AGFREE( (void*)pz );
     }
 
-    longjmp( fileAbort, abort );
+    longjmp( fileAbort, abrt );
     /* NOTREACHED */
     return SCM_UNDEFINED;
 }
@@ -616,7 +616,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
          */
         AGFREE( (void*)pzRes );
 
-        return AG_SCM_STR2SCM( pzSaveRes, (pzOut - pzSaveRes) - 1);
+        return AG_SCM_STR2SCM( pzSaveRes, (u_int)((pzOut - pzSaveRes) - 1));
     }
 }
 /*

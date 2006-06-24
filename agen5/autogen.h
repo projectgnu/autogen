@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.15 2006/06/03 18:25:49 bkorb Exp $
+ *  $Id: autogen.h,v 4.16 2006/06/24 23:34:50 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -373,9 +373,9 @@ MODE int         templLineNo      VALUE( 1 );
 MODE tScanCtx*   pBaseCtx         VALUE( NULL );
 MODE tScanCtx*   pCurCtx          VALUE( NULL );
 MODE tScanCtx*   pDoneCtx         VALUE( NULL );
-MODE int         endMacLen        VALUE( 0  );
+MODE u_int       endMacLen        VALUE( 0  );
 MODE char        zEndMac[   8 ]   VALUE( "" );
-MODE int         startMacLen      VALUE( 0  );
+MODE u_int       startMacLen      VALUE( 0  );
 MODE char        zStartMac[  8 ]  VALUE( "" );
 MODE int         guileFailure     VALUE( 0 );
 

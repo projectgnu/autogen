@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.13 2006/06/03 19:06:43 bkorb Exp $
+ *  $Id: agShell.c,v 4.14 2006/06/24 23:34:50 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -544,6 +544,8 @@ runShell( const char*  pzCmd )
      *  THEN try to start it.
      */
     if (serverId == NULLPROCESS) {
+        static char pz4_z[] = "PS4=>ag> ";
+        putenv(pz4_z);
         serverId = openServerFP( &serverPair, serverArgs );
         if (serverId > 0)
             serverSetup();

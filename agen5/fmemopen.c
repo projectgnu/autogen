@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2006
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2006-01-24 14:47:47 bkorb"
+ * Time-stamp:      "2006-06-24 12:32:16 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -134,11 +134,14 @@ static ssize_t
 fmem_write( void *cookie, const void *pBuf, size_t sz );
 
 static seek_pos_t
-fmem_seek (void *cookie, fmem_off_t *p_offset, int dir);
+fmem_seek( void *cookie, fmem_off_t *p_offset, int dir);
 
 static int
 fmem_close( void *cookie );
 /* = = = END-STATIC-FORWARD = = = */
+
+FILE * ag_fmemopen(void *buf, ssize_t len, const char *pMode);
+int fmem_ioctl( FILE* fp, int req, void* ptr );
 
 #ifdef TEST_FMEMOPEN
   static fmem_cookie_t* saved_cookie = NULL;
@@ -313,7 +316,7 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
 static seek_pos_t
 fmem_seek( void *cookie, fmem_off_t *p_offset, int dir)
 {
-    fmem_off_t new_pos;
+    size_t new_pos;
     fmem_cookie_t *pFMC = cookie;
 
     switch (dir) {
@@ -585,7 +588,7 @@ ag_fmemopen(void *buf, ssize_t len, const char *pMode)
         /*
          *  Unallocated file space is set to NULs.  Emulate that.
          */
-        pFMC->buffer = calloc(1, len);
+        pFMC->buffer = calloc(1, (unsigned)len);
         if (pFMC->buffer == NULL) {
             errno = ENOMEM;
             free( pFMC );

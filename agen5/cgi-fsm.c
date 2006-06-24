@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
  *  
- *  It has been AutoGen-ed  Wednesday July 27, 2005 at 12:46:37 PM PDT
+ *  It has been AutoGen-ed  Saturday June 24, 2006 at 11:54:48 AM PDT
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
@@ -51,10 +51,6 @@
 
 #ifndef NULL
 #  define NULL 0
-#endif
-
-#ifndef tSCC
-#  define tSCC static const char
 #endif
 
 /*
@@ -121,61 +117,51 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
 };
 
 
-tSCC zCgiStrings[] =
-       "** OUT-OF-RANGE **" "\0"
-       "FSM Error:  in state %d (%s), event %d (%s) is invalid\n" "\0"
-       "invalid" "\0"
-       "init" "\0"
-       "name" "\0"
-       "value" "\0"
-       "alpha" "\0"
-       "name_char" "\0"
-       "=" "\0"
-       "+" "\0"
-       "%" "\0"
-       "other" "\0"
-       "&" "\0"
-       "end" "\0";
-
-#define CgiBogus_off 0
-#define CgiFsmErr_off 19
-#define CgiEvInvalid_off 75
-#define CgiStInit_off 83
-#define CgiStName_off 88
-#define CgiStValue_off 93
-#define CgiEvAlpha_off 99
-#define CgiEvName_Char_off 105
-#define CgiEvEqual_off 115
-#define CgiEvSpace_off 117
-#define CgiEvEscape_off 119
-#define CgiEvOther_off 121
-#define CgiEvSeparator_off 127
-#define CgiEvEnd_off 129
+#define CgiFsmErr_off     19
+#define CgiEvInvalid_off  75
+#define CgiStInit_off     83
 
 
-static const size_t aszCgiStates[] = {
-    CgiStInit_off,  CgiStName_off,  CgiStValue_off };
+static const char zCgiStrings[133] =
+    "** OUT-OF-RANGE **\0"
+    "FSM Error:  in state %d (%s), event %d (%s) is invalid\n\0"
+    "invalid\0"
+    "init\0"
+    "name\0"
+    "value\0"
+    "alpha\0"
+    "name_char\0"
+    "=\0"
+    "+\0"
+    "%\0"
+    "other\0"
+    "&\0"
+    "end\0";
 
-static const size_t aszCgiEvents[] = {
-    CgiEvAlpha_off,     CgiEvName_Char_off, CgiEvEqual_off,
-    CgiEvSpace_off,     CgiEvEscape_off,    CgiEvOther_off,
-    CgiEvSeparator_off, CgiEvEnd_off,       CgiEvInvalid_off };
+static const size_t aszCgiStates[3] = {
+    83, 88, 93 };
 
-#define CGI_EVT_NAME(t) ( (((unsigned)(t)) >= CGI_EV_INVALID) \
+static const size_t aszCgiEvents[9] = {
+    99,  105, 115, 117, 119, 121, 127, 129, 75 };
+
+
+#define CGI_EVT_NAME(t)   ( (((unsigned)(t)) >= 9) \
     ? zCgiStrings : zCgiStrings + aszCgiEvents[t])
 
-#define CGI_STATE_NAME(s) ( (((unsigned)(s)) > CGI_ST_INVALID) \
+#define CGI_STATE_NAME(s) ( (((unsigned)(s)) >= 3) \
     ? zCgiStrings : zCgiStrings + aszCgiStates[s])
 
 #ifndef EXIT_FAILURE
 # define EXIT_FAILURE 1
 #endif
 
+static int cgi_invalid_transition( te_cgi_state st, te_cgi_event evt );
+
 /* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
  *
  *  Print out an invalid transition message and return EXIT_FAILURE
  */
-int
+static int
 cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
 {
     /* START == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */

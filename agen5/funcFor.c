@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.11 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: funcFor.c,v 4.12 2006/06/24 23:34:51 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -47,7 +47,7 @@ doForEach( tTemplate*   pT,
            tDefEntry*   pFoundDef );
 
 static void
-load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac );
+load_ForIn( tCC* pzSrc, u_int srcLen, tTemplate* pT, tMacro* pMac );
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -311,7 +311,7 @@ doForByStep( tTemplate* pT,
     tDefCtx     ctx       = currDefCtx;
 
     if (pFS->for_pzSep == NULL)
-        pFS->for_pzSep = "";
+        pFS->for_pzSep = (char*)zNil;
 
     /*
      *  IF the for-from and for-to values have not been set,
@@ -495,7 +495,7 @@ doForEach( tTemplate*   pT,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn( tCC* pzSrc, int srcLen, tTemplate* pT, tMacro* pMac )
+load_ForIn( tCC* pzSrc, u_int srcLen, tTemplate* pT, tMacro* pMac )
 {
     char* pzName = pT->pzTemplText + pMac->ozName;
     int   ix     = 0;
@@ -823,7 +823,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      */
     else if (   (strneqvcmp( pzSrc, "in", 2 ) == 0)
              && isspace( pzSrc[2] )) {
-        load_ForIn( pzSrc, srcLen, pT, pMac );
+        load_ForIn( pzSrc, (unsigned)srcLen, pT, pMac );
     }
 
     /*

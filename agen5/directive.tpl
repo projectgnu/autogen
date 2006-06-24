@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.9 2006/06/03 18:25:49 bkorb Exp $
+# $Id: directive.tpl,v 4.10 2006/06/24 23:34:50 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -188,7 +188,7 @@ gperf_%2$s=${gpdir}/%2$s
 
 gperf -t -D -k'*' %2$s.gperf > %2$s.c
 test $? -eq 0 || die "gperf failed on ${gpdir}/%2$s.gperf"
-
+export CFLAGS=-g
 res=`${MAKE-make} %2$s 2>&1`
 test $? -eq 0 -a -x ${gperf_%2$s} || \
   die "could not build gperf program: ${res}"

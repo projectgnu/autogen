@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.21 2006/03/25 19:23:28 bkorb Exp $
- *  Time-stamp:      "2005-10-29 14:45:36 bkorb"
+ *  $Id: load.c,v 4.22 2006/06/24 23:34:51 bkorb Exp $
+ *  Time-stamp:      "2006-06-24 10:43:29 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -235,7 +235,7 @@ insertProgramPath(
     if ((pz - pzPath)+1 + strlen(pzName) >= bufSize)
         return AG_FALSE;
 
-    memcpy( pzBuf, pzPath, (pz - pzPath)+1 );
+    memcpy( pzBuf, pzPath, (unsigned)((pz - pzPath)+1) );
     strcpy( pzBuf + (pz - pzPath) + 1, pzName );
 
     /*

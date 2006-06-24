@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.12 2006/06/03 18:25:49 bkorb Exp $
+ *  $Id: expOutput.c,v 4.13 2006/06/24 23:34:50 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -67,14 +67,14 @@ removeWriteAccess( int fd )
      *  Set our usage mask to all all the access
      *  bits that do not provide for write access
      */
-#   define USE_MASK ~(S_IWUSR|S_IWGRP|S_IWOTH)
+#   define USE_MASK ((unsigned)(~(S_IWUSR|S_IWGRP|S_IWOTH)))
     fstat( fd, &sbuf );
 
     /*
      *  Mask off the write permission bits, but ensure that
      *  the user read bit is set.
      */
-    sbuf.st_mode = (sbuf.st_mode & USE_MASK) | S_IRUSR;
+    sbuf.st_mode = ((unsigned)sbuf.st_mode & USE_MASK) | S_IRUSR;
     fchmod( fd, sbuf.st_mode & S_IAMB );
 }
 
@@ -174,7 +174,7 @@ ag_scm_out_pop( SCM ret_contents )
         AG_ABEND( "ERROR:  Cannot pop output with no output pushed\n" );
 
     if (AG_SCM_BOOL_P( ret_contents ) && SCM_NFALSEP( ret_contents )) {
-        long pos = ftell( pCurFp->pFile );
+        unsigned long pos = ftell( pCurFp->pFile );
 
         if (pos != 0) {
             char* pz = ag_scribble( pos );
@@ -339,6 +339,8 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
      */
  fprintf_woops:
     AG_ABEND( invalid_z );
+    /* NOTREACHED */
+    return SCM_UNDEFINED;
 }
 
 
@@ -436,7 +438,7 @@ ag_scm_out_push_new( SCM new_file )
         int tmpfd;
 
         if (pzTemp == NULL) {
-            char* pz = getenv( "TEMP" );
+            tCC* pz = getenv( "TEMP" );
             if (pz == NULL) {
                 pz = getenv( "TMP" );
                 if (pz == NULL)
@@ -466,7 +468,7 @@ ag_scm_out_push_new( SCM new_file )
          *  will get us here.
          */
         p->pFile  = ag_fmemopen( NULL, 0, "wb+" );
-        pzNewFile = "in-mem buffer";
+        pzNewFile = (char*)"in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
     }
 #   endif /* ENABLE_FMEMOPEN */

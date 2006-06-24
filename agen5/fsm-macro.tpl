@@ -85,19 +85,22 @@ DEFINE emit-invalid-msg =][=
 # define EXIT_FAILURE 1
 #endif
 
+static int [=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
+  (. pfx)=]_event evt );
+
 /* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
  *
  *  Print out an invalid transition message and return EXIT_FAILURE
  */
-int
+static int
 [=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
   (. pfx)=]_event evt )
 {
 [=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
   (sprintf
-"    fprintf( stderr, z%2$sStrings + %2$sFsmErr_off, st, %1$s_STATE_NAME(st),
-             evt, %1$s_EVT_NAME(evt));"
-     PFX Pfx ) )=]
+"    const char* fmt = z%1$sStrings + %1$sFsmErr_off;
+    fprintf( stderr, fmt, st, %2$s_STATE_NAME(st), evt, %2$s_EVT_NAME(evt));"
+      Pfx PFX ) )=]
 
     return EXIT_FAILURE;
 }

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.11 2006/06/03 18:25:49 bkorb Exp $
+ *  $Id: expPrint.c,v 4.12 2006/06/24 23:34:50 bkorb Exp $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -105,7 +105,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
     {
         size_t printSize = asprintfv( ppzBuf, pzFmt,
                                       (snv_constpointer*)argV );
-        if ((printSize & ~0xFFFFFF) != 0)
+        if ((printSize & ~0xFFFFFU) != 0) /* 1MB max */
             AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 
 #if ! defined(DEBUG_ENABLED)
@@ -137,7 +137,7 @@ run_printf( char* pzFmt, int len, SCM alist )
         switch (gh_type_e( car )) {
         default:
         case GH_TYPE_UNDEFINED:
-            *(argp++) = "???";
+            *(argp++) = (char*)"???";
             break;
 
         case GH_TYPE_BOOLEAN:
@@ -149,7 +149,7 @@ run_printf( char* pzFmt, int len, SCM alist )
             break;
 
         case GH_TYPE_PAIR:
-            *(argp++) = "..";
+            *(argp++) = (char*)"..";
             break;
 
         case GH_TYPE_NUMBER:
@@ -162,12 +162,12 @@ run_printf( char* pzFmt, int len, SCM alist )
             break;
 
         case GH_TYPE_PROCEDURE:
-            *(argp++) = "(*)()";
+            *(argp++) = (char*)"(*)()";
             break;
 
         case GH_TYPE_VECTOR:
         case GH_TYPE_LIST:
-            *(argp++) = "...";
+            *(argp++) = (char*)"...";
             break;
         }
     }
@@ -178,7 +178,7 @@ run_printf( char* pzFmt, int len, SCM alist )
      */
     {
         char*   pzBuf;
-        ssize_t bfSize = safePrintf( &pzBuf, pzFmt, arglist );
+        size_t  bfSize = safePrintf( &pzBuf, pzFmt, arglist );
         res = AG_SCM_STR2SCM( pzBuf, bfSize );
         free( pzBuf );
     }
@@ -305,7 +305,7 @@ ag_scm_hide_email( SCM display, SCM eaddr )
 
     pzScan += sprintf( pzScan, zEnd, pzDisp );
 
-    return AG_SCM_STR2SCM( pzRes, pzScan - pzRes );
+    return AG_SCM_STR2SCM( pzRes, (unsigned)(pzScan - pzRes));
 }
 
 

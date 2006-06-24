@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-06-04 16:30:29 bkorb"
+# Time-stamp:        "2006-06-24 11:34:45 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.19 2006/06/10 16:44:42 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.20 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -58,7 +58,8 @@ make_funcs_def()
   mv usage-txt.h   autoopts/.
   mv usage-txt.pot po/.
   files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
-      sed '/^CSRC/d;s/[=\\]//'`\ ../compat/pathfind.c
+      sed '/^CSRC/d;s/[=\\]//'
+      echo  ../compat/pathfind.c guileopt.c`
   getdefs linenum srcfile template=options_h output=funcs.def $files
   chmod u+w funcs.def
   eval "`egrep '^AO_' ../VERSION`"

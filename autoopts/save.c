@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.13 2006/03/25 19:23:28 bkorb Exp $
- * Time-stamp:      "2005-02-20 13:49:46 bkorb"
+ *  save.c  $Id: save.c,v 4.14 2006/06/24 23:34:51 bkorb Exp $
+ * Time-stamp:      "2006-06-24 10:52:21 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -108,7 +108,7 @@ findDirName( tOptions* pOpts, int* p_free )
             char z[ AO_NAME_SIZE ];
             if ((pzEndDir - pzDir) > AO_NAME_LIMIT )
                 return NULL;
-            strncpy( z, pzDir, (pzEndDir - pzDir) );
+            strncpy( z, pzDir, (unsigned)(pzEndDir - pzDir) );
             z[ (pzEndDir - pzDir) ] = NUL;
             pzEnv = getenv( z );
         } else {
@@ -182,7 +182,7 @@ findFileName( tOptions* pOpts, int* p_free_name )
                 continue;  /* bail out of error condition */
             }
 
-            strncpy( z, pzDir, pzDirCh - pzDir );
+            strncpy( z, pzDir, (unsigned)(pzDirCh - pzDir));
             z[ pzDirCh - pzDir ] = NUL;
 
             if (  (stat( z, &stBuf ) == 0)
@@ -308,7 +308,7 @@ printEntry(
             /*
              *  Print the continuation and the text from the current line
              */
-            fwrite( pzLA, pzNl - pzLA, 1, fp );
+            fwrite( pzLA, (unsigned)(pzNl - pzLA), 1, fp );
             pzLA = pzNl+1; /* advance the Last Arg pointer */
             fputs( "\\\n", fp );
         }

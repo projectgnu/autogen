@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2006-01-07 10:55:04 bkorb"
+# Time-stamp:        "2006-06-24 15:02:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/01/09 01:36:42 $
+# Last Modified:     $Date: 2006/06/24 23:34:51 $
 #            by: bkorb
 #
-# $Id: string.test,v 4.5 2006/01/09 01:36:42 bkorb Exp $
+# $Id: string.test,v 4.6 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -51,6 +51,7 @@ CASE (suffix)  =][=
 
 =]#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifndef STDOUT_FILENO
 #  define STDOUT_FILENO 1
@@ -72,7 +73,7 @@ char zTestFile[] = "${testname}.raw";
 _EOF_
 
 cat >> ${testname}.tpl <<'_EOF_'
-#line 83 "string.test"
+#line 77 "string.test"
 char zGened[]  = [=(c-string  (get "string"))=];
 char zKrGen[]  = [=(kr-string (get "string"))=];
 char zExpect[] = "'\f\r\b\v\t\a\n\n"
@@ -82,8 +83,8 @@ char zExpect[] = "'\f\r\b\v\t\a\n\n"
        "and it'll be a \"hassle\"."
        "\001\002\003\377\n'";
 #define expectSize (sizeof(zExpect) - 1)
-
-int checkStr( char* pz, char* pzWhat )
+int checkStr( char* pz, const char* pzWhat );
+int checkStr( char* pz, const char* pzWhat )
 {
     static const char zNotMatch[] =
         "%s generated string mismatches at offset %d of %d\n"

@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.8 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: defFind.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -404,7 +404,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
      *  an index yet).
      */
     if (nestingDepth == 0) {
-        canonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
         pzName = zDefinitionName;
 
         if (pIsIndexed != NULL)
@@ -585,7 +585,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
-        canonicalizeName( zDefinitionName, pzName, strlen( pzName ));
+        canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
         pzName = zDefinitionName;
         defList.usedCt = 0;
 

@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.16 2006/06/10 16:44:42 bkorb Exp $
+# $Id: opthead.tpl,v 4.17 2006/06/24 23:34:51 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-01-25 08:34:12 bkorb"
+# Time-stamp:      "2006-06-22 20:24:46 bkorb"
 
 =]
 /*
@@ -11,8 +11,7 @@
  *  These macros are documented in the AutoGen info file in the
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
  */
-[= (make-header-guard "autoopts") =]
-[= Option_Copyright =][=
+[= (make-header-guard "autoopts") =][=
 % config-header "\n#include \"%s\""=]
 #include <autoopts/options.h>
 [= IF (not (exist? "library")) =]
@@ -199,40 +198,40 @@ ENDDEF set-std-value        =][=
 IF (exist? "flag.value")    =][=
 
   IF (exist? "version")     =][=
-    set-std-value
+    INVOKE set-std-value
        val-name    = "version-value"
        val-UPNAME  = "VERSION"
        std-value   = "v"    =][=
   ENDIF  have "version"     =][=
 
   IF (exist? "homerc")      =][=
-    set-std-value
+    INVOKE set-std-value
        val-name    = "save-opts-value"
        val-UPNAME  = "SAVE_OPTS"
        std-value   = ">"    =][=
 
-    set-std-value
+    INVOKE set-std-value
        val-name    = "load-opts-value"
        val-UPNAME  = "LOAD_OPTS"
        std-value   = "<"    =][=
   ENDIF  have "homerc"      =][=
 
-  set-std-value
+  INVOKE set-std-value
        val-name    = "help-value"
        val-UPNAME  = "HELP"
        std-value   = "?"    =][=
 
-  set-std-value
+  INVOKE set-std-value
        val-name    = "more-help-value"
        val-UPNAME  = "MORE_HELP"
        std-value   = "!"    =][=
 
 ELSE  NO "flag.value"       =][=
 
-  IF (exist? "version") =]
+  IF (exist? "version")     =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
-  ENDIF=][=
-  IF (exist? "homerc") =]
+  ENDIF                     =][=
+  IF (exist? "homerc")      =]
 #define [= (. VALUE-pfx) =]SAVE_OPTS      [= (. INDEX-pfx) =]SAVE_OPTS
 #define [= (. VALUE-pfx) =]LOAD_OPTS      [= (. INDEX-pfx) =]LOAD_OPTS[=
   ENDIF=]
@@ -240,13 +239,12 @@ ELSE  NO "flag.value"       =][=
 #define [= (. VALUE-pfx) =]MORE_HELP      [= (. INDEX-pfx) =]MORE_HELP[=
 ENDIF=][=
 
-IF (exist? "homerc") =]
+IF (exist? "homerc")        =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (const char*)(a) )[=
-ENDIF
-=][=
+ENDIF                       =][=
 
 IF (not (exist? "library"))
 

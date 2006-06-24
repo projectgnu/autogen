@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.7 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: functions.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -50,7 +50,7 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
 {
     tTemplate* pNewTpl;
     ag_bool    needFree;
-    char*      pzFile = evalExpression( &needFree );
+    tCC*       pzFile = evalExpression( &needFree );
     tMacro*    pM;
 
     if (*pzFile != NUL) {
@@ -296,7 +296,7 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         /*
          *  Now copy over the full canonical name.  Check for errors.
          */
-        remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
+        remLen = canonicalizeName( pzCopy, pzSrc, (int)srcLen );
         if (remLen > srcLen)
             AG_ABEND_IN( pT, pMac, "Invalid definition name" );
 

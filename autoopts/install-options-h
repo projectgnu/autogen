@@ -1,0 +1,24 @@
+#! /bin/sh
+set -x
+
+srcdir=`dirname $0`
+srcdir=`cd ${srcdir} ; pwd`
+rm -f ${destdir}/options.h
+exec 3> ${destdir}/options.h
+sed '/^#include <sys/q' ${srcdir}/autoopts/options.h >&3
+
+if egrep 'define +HAVE_STDINT_H' ${top_builddir}/config.h >/dev/null
+then echo '#include <stdint.h>' >&3
+else echo '#include <inttypes.h>' >&3 ; fi
+
+if egrep 'define +HAVE_LIMITS_H' ${top_builddir}/config.h >/dev/null
+then echo '#include <limits.h>' >&3
+else echo '#include <sys/limits>' >&3 ; fi
+
+if egrep 'define +HAVE_U_INT' ${top_builddir}/config.h >/dev/null
+then :
+else echo 'typedef unsigned int u_int;' >&3 ; fi
+
+sed '1,/endif.*HAVE_LIMITS/d' ${srcdir}/autoopts/options.h >&3
+
+exec 3>&-

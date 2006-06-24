@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.19 2006/06/10 18:07:21 bkorb Exp $
+# $Id: optlib.tpl,v 4.20 2006/06/24 23:34:51 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-10 10:19:27 bkorb"
+# Time-stamp:      "2006-06-22 20:28:36 bkorb"
 
 =][=
 
@@ -210,10 +210,21 @@ ENDDEF set-defines
 
 Emit the copyright comment  =][=
 
-DEFINE Option_Copyright =][=
+DEFINE Option_Copyright =]
+/*
+ *  This file was produced by an AutoOpts template.  AutoOpts is a
+ *  copyrighted work.  This [=
+ (if (= "h" (suffix)) "header" "source") =] file is not encumbered by AutoOpts
+ *  licensing, but is provided under the licensing terms chosen by the
+ *  [= prog-name =] author or copyright holder.  AutoOpts is licensed under
+ *  the terms of the LGPL.  The redistributable library (``libopts'') is
+ *  licensed under the terms of either the LGPL or, at the users discretion,
+ *  the BSD license.  See the AutoOpts and/or libopts sources for details.[=
 
 IF (exist? "copyright") =]
-/*
+ *
+ * This source file is copyrighted and licensed under the following terms:
+ *
  * [=(sprintf "%s copyright %s %s - all rights reserved"
      prog-name (get "copyright.date") (get "copyright.owner") ) =][=
 
@@ -237,9 +248,10 @@ IF (exist? "copyright") =]
 
     *       =] * <<indeterminate license type>>[=
 
-  ESAC =]
- */[=
-ENDIF "copyright exists" =][=
+  ESAC =][=
+ENDIF "copyright exists" =]
+ */
+[=
 
 ENDDEF Option_Copyright
 

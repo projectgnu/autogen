@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.7 2006/03/25 19:23:29 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2006 Bruce Korb
@@ -133,7 +133,7 @@ main( int argc, char** argv )
     else {
         size_t sz;
         char*  pz = loadFile( stdin, &sz );
-        pDoc = xmlParseMemory( pz, sz );
+        pDoc = xmlParseMemory( pz, (int)sz );
         fprintf( outFp, "/* Parsed from stdin */\n" );
     }
 
@@ -242,7 +242,7 @@ trim( const char* pzSrc, size_t* pSz )
     }
 
     if (dataLen <= strSize) {
-        size_t sz = (strSize + 0x1000) & ~0x0FFF;
+        size_t sz = (strSize + 0x1000) & ~0x0FFFUL;
         if (pzData == NULL)
              pzData = malloc( sz );
         else pzData = realloc( pzData, sz );
@@ -421,7 +421,7 @@ printNode( xmlNodePtr pNode )
             char* pz = strstr( pzTxt, "*/" );
             if (pz == NULL)
                 break;
-            fwrite( pzTxt, (pz - pzTxt) + 1, 1, outFp );
+            fwrite( pzTxt, (unsigned)((pz - pzTxt) + 1), 1, outFp );
             pzTxt = pz+1;
             fputc( ' ', outFp );
         }

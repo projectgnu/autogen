@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-02-01 08:45:02 bkorb"
-# ID:  $Id: options_h.tpl,v 4.22 2006/03/25 19:23:28 bkorb Exp $
+# Time-stamp:      "2006-06-24 13:53:27 bkorb"
+# ID:  $Id: options_h.tpl,v 4.23 2006/06/24 23:34:51 bkorb Exp $
 
 =][=
 
@@ -80,31 +80,31 @@ typedef struct optionValue {
 /*
  *  Bits in the fOptState option descriptor field.
  */
-#define OPTST_INIT           0x0000000  /* Initial compiled value            */
-#define OPTST_SET            0x0000001  /* Set via the "SET_OPT()" macro     */
-#define OPTST_PRESET         0x0000002  /* Set via an RC/INI file            */
-#define OPTST_DEFINED        0x0000004  /* Set via a command line option     */
+#define OPTST_INIT           0x0000000U /* Initial compiled value            */
+#define OPTST_SET            0x0000001U /* Set via the "SET_OPT()" macro     */
+#define OPTST_PRESET         0x0000002U /* Set via an RC/INI file            */
+#define OPTST_DEFINED        0x0000004U /* Set via a command line option     */
 
-#define OPTST_SET_MASK       0x0000007  /* mask of flags that show set state */
+#define OPTST_SET_MASK       0x0000007U /* mask of flags that show set state */
 
-#define OPTST_EQUIVALENCE    0x0000010  /* selected by equiv'ed option       */
-#define OPTST_DISABLED       0x0000020  /* option is in disabled state       */
+#define OPTST_EQUIVALENCE    0x0000010U /* selected by equiv'ed option       */
+#define OPTST_DISABLED       0x0000020U /* option is in disabled state       */
 
-#define OPTST_NO_INIT        0x0000100  /* option cannot be preset           */
-#define OPTST_NUMBER_OPT     0x0000200  /* opt value (flag) is any digit     */
-#define OPTST_STACKED        0x0000400  /* opt uses optionStackArg procedure */
-#define OPTST_INITENABLED    0x0000800  /* option defaults to enabled        */
-#define OPTST_ARG_TYPE_MASK  0x000F000  /* bits used to specify opt arg type */
-#define OPTST_ARG_OPTIONAL   0x0010000  /* the option argument not required  */
-#define OPTST_IMM            0x0020000  /* process option on first pass      */
-#define OPTST_DISABLE_IMM    0x0040000  /* process disablement on first pass */
-#define OPTST_OMITTED        0x0080000  /* compiled out of program           */
-#define OPTST_MUST_SET       0x0100000  /* must be set or pre-set            */
-#define OPTST_DOCUMENT       0x0200000  /* opt is for documentation only     */
-#define OPTST_TWICE          0x0400000  /* process option twice - imm + reg  */
-#define OPTST_DISABLE_TWICE  0x0800000  /* process disabled option twice     */
+#define OPTST_NO_INIT        0x0000100U /* option cannot be preset           */
+#define OPTST_NUMBER_OPT     0x0000200U /* opt value (flag) is any digit     */
+#define OPTST_STACKED        0x0000400U /* opt uses optionStackArg procedure */
+#define OPTST_INITENABLED    0x0000800U /* option defaults to enabled        */
+#define OPTST_ARG_TYPE_MASK  0x000F000U /* bits used to specify opt arg type */
+#define OPTST_ARG_OPTIONAL   0x0010000U /* the option argument not required  */
+#define OPTST_IMM            0x0020000U /* process option on first pass      */
+#define OPTST_DISABLE_IMM    0x0040000U /* process disablement on first pass */
+#define OPTST_OMITTED        0x0080000U /* compiled out of program           */
+#define OPTST_MUST_SET       0x0100000U /* must be set or pre-set            */
+#define OPTST_DOCUMENT       0x0200000U /* opt is for documentation only     */
+#define OPTST_TWICE          0x0400000U /* process option twice - imm + reg  */
+#define OPTST_DISABLE_TWICE  0x0800000U /* process disabled option twice     */
 
-#define OPTST_PERSISTENT     0xFFFFF00  /* mask of flags that do not change  */
+#define OPTST_PERSISTENT     0xFFFFF00U /* mask of flags that do not change  */
 
 #define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
 #define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)
@@ -245,10 +245,10 @@ struct optDesc {
  */
 typedef struct optSpecIndex tOptSpecIndex;
 struct optSpecIndex {
-    tAoUS           more_help;
-    tAoUS           save_opts;
-    tAoUS           number_option;
-    tAoUS           default_opt;
+    const tAoUS         more_help;
+    const tAoUS         save_opts;
+    const tAoUS         number_option;
+    const tAoUS         default_opt;
 };
 [=
 
@@ -272,36 +272,36 @@ mv -f XXXX opthead.tpl" (get "vers-template"))
 typedef void (tOptionXlateProc)(void);
 
 struct options {
-    const int         structVersion;
-    int               origArgCt;
-    char**            origArgVect;
-    unsigned int      fOptSet;
-    unsigned int      curOptIdx;
-    char*             pzCurOpt;
+    const int           structVersion;
+    int                 origArgCt;
+    char**              origArgVect;
+    unsigned int        fOptSet;
+    unsigned int        curOptIdx;
+    char*               pzCurOpt;
 
-    const char*       pzProgPath;
-    const char*       pzProgName;
-    const char*       pzPROGNAME;
-    const char*       pzRcName;
-    const char*       pzCopyright;
-    const char*       pzCopyNotice;
-    const char*       pzFullVersion;
-    const char**      papzHomeList;
-    const char*       pzUsageTitle;
-    const char*       pzExplain;
-    const char*       pzDetail;
-    tOptDesc*         pOptDesc;
-    const char*       pzBugAddr;
+    const char*         pzProgPath;
+    const char*         pzProgName;
+    const char* const   pzPROGNAME;
+    const char* const   pzRcName;
+    const char* const   pzCopyright;
+    const char* const   pzCopyNotice;
+    const char* const   pzFullVersion;
+    const char* const*  papzHomeList;
+    const char* const   pzUsageTitle;
+    const char* const   pzExplain;
+    const char* const   pzDetail;
+    tOptDesc*   const   pOptDesc;
+    const char* const   pzBugAddr;
 
-    void*             pExtensions;
-    void*             pSavedState;
+    void*               pExtensions;
+    void*               pSavedState;
 
-    tpUsageProc       pUsageProc;
-    tOptionXlateProc* pTransProc;
+    tpUsageProc         pUsageProc;
+    tOptionXlateProc*   pTransProc;
 
-    tOptSpecIndex     specOptIdx;
-    const int         optCt;
-    const int         presetOptCt;
+    tOptSpecIndex       specOptIdx;
+    const int           optCt;
+    const int           presetOptCt;
 };
 
 /*

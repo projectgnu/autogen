@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.12 2006/03/25 19:23:28 bkorb Exp $
- * Time-stamp:      "2006-02-04 13:35:26 bkorb"
+ *  usage.c  $Id: usage.c,v 4.13 2006/06/24 23:34:51 bkorb Exp $
+ * Time-stamp:      "2006-06-24 13:44:20 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -76,10 +76,10 @@ printExtendedUsage(
 
 static void
 printInitList(
-    tCC**    papz,
-    ag_bool* pInitIntro,
-    tCC*     pzRc,
-    tCC*     pzPN );
+    tCC* const* papz,
+    ag_bool*    pInitIntro,
+    tCC*        pzRc,
+    tCC*        pzPN );
 
 static void
 printOneUsage(
@@ -395,10 +395,10 @@ printExtendedUsage(
  */
 static void
 printInitList(
-    tCC**    papz,
-    ag_bool* pInitIntro,
-    tCC*     pzRc,
-    tCC*     pzPN )
+    tCC* const* papz,
+    ag_bool*    pInitIntro,
+    tCC*        pzRc,
+    tCC*        pzPN )
 {
     char zPath[ MAXPATHLEN+1 ];
 

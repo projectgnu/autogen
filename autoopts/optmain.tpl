@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.16 2006/06/10 18:07:21 bkorb Exp $
+# $Id: optmain.tpl,v 4.17 2006/06/24 23:34:51 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-10 10:17:09 bkorb"
+# Time-stamp:      "2006-06-24 14:43:32 bkorb"
 
 =][=
 
@@ -168,7 +168,7 @@ DEFINE for-each-main            =][=
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 #include <unistd.h>
 
 static char*
@@ -402,7 +402,7 @@ main( int argc, char** argv )
      */
     else {
         int in_ct   = 0;
-        int pg_size = getpagesize();
+        size_t pg_size = getpagesize();
         char* buf   = malloc( pg_size );
         if (buf == NULL) {
             fputs( _("[=(. prog-name)
@@ -411,7 +411,7 @@ main( int argc, char** argv )
         }
 
         for (;;) {
-            char* pz = fgets( buf, pg_size, stdin );
+            char* pz = fgets( buf, (ssize_t)pg_size, stdin );
             if (pz == NULL)
                 break;
 
@@ -932,7 +932,7 @@ DEFINE define-option-callbacks      =][=
   "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
           (join "\n" (stack "keyword")) )=]
     };
-    const int nmCt = sizeof(azNames)/sizeof(azNames[0]);
+    const unsigned int nmCt = sizeof(azNames)/sizeof(azNames[0]);
     optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
 }[=
 

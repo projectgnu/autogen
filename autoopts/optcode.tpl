@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.23 2006/06/13 21:48:43 bkorb Exp $
+#$Id: optcode.tpl,v 4.24 2006/06/24 23:34:51 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-11 08:17:30 bkorb"
+# Time-stamp:      "2006-06-24 14:45:17 bkorb"
 
 =][=
 
@@ -466,9 +466,13 @@ ENDIF "test/guile main"
 =]
 #if ENABLE_NLS
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <autoopts/usage-txt.h>
+
+static char* AO_gettext( const char* pz );
+static void  coerce_it(void** s);
 
 static char*
 AO_gettext( const char* pz )
@@ -486,6 +490,10 @@ AO_gettext( const char* pz )
     }
     return pzRes;
 }
+
+static void coerce_it(void** s) { *s = AO_gettext(*s); }
+#define COERSION(_f) \
+  coerce_it((void*)&([= (. pname) =]Options._f))
 
 /*
  *  This invokes the translation code (e.g. gettext(3)).
@@ -535,8 +543,7 @@ translate_option_strings( void )
   FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle
                pzExplain pzDetail  =][=
 
-    (sprintf "\n    %1$sOptions.%2$-13s = AO_gettext(%1$sOptions.%2$s);"
-             pname (get "field"))  =][=
+    (sprintf "\n    COERSION(%s);" (get "field"))  =][=
 
   ENDFOR =]
 }

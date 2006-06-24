@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.13 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: defLex.c,v 4.14 2006/06/24 23:34:50 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -353,7 +353,7 @@ loadScheme( void )
     *pzEnd = endCh;
 
     pCurCtx->pzScan = pzEnd;
-    pzEnd = resolveSCM( res );
+    pzEnd = (char*)resolveSCM( res ); /* ignore const-ness */
     if (strlen( pzEnd ) >= schemeLen) {
         AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
 
@@ -386,7 +386,7 @@ alist_to_autogen_def( void )
     char*  pzEnd   = (char*)skipScheme( pzText, pzText + strlen( pzText ));
 
     SCM    res;
-    int    res_len;
+    u_int  res_len;
     tScanCtx*  pCtx;
 
     /*
@@ -568,7 +568,7 @@ assembleHereString( char* pzScan )
 {
     ag_bool  trimTabs = AG_FALSE;
     char     zMark[ MAX_HEREMARK_LEN ];
-    int      markLen = 0;
+    u_int    markLen = 0;
     char*    pzDest;
 
     /*

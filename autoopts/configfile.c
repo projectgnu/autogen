@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.21 2006/03/25 19:23:28 bkorb Exp $
- *  Time-stamp:      "2005-10-16 15:16:32 bkorb"
+ *  $Id: configfile.c,v 4.22 2006/06/24 23:34:51 bkorb Exp $
+ *  Time-stamp:      "2006-06-24 10:31:49 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -640,7 +640,7 @@ handleDirective(
 
         if (isspace(*pzText)) {
             while (isspace(*pzText))  pzText++;
-            if (  (strneqvcmp( pzText, pOpts->pzProgName, name_len ) == 0)
+            if (  (strneqvcmp( pzText, pOpts->pzProgName, (int)name_len) == 0)
                && (pzText[name_len] == '>'))  {
                 pzText += name_len + 1;
                 break;

@@ -93,14 +93,14 @@ spec_init (void)
   if (!is_init)
     {
       extern spec_entry snv_default_spec_table[];
-      unsigned index = 0;
+      unsigned ix = 0;
 
       memset (spec_table, 0, sizeof (spec_table));
-      while (snv_default_spec_table[index].spec != EOS)
+      while (snv_default_spec_table[ix].spec_key != EOS)
 	{
-	  unsigned hash = spec_hash (snv_default_spec_table[index].spec);
-	  spec_table[hash] = snv_default_spec_table + index;
-	  index++;
+	  unsigned hash = spec_hash (snv_default_spec_table[ix].spec_key);
+	  spec_table[hash] = snv_default_spec_table + ix;
+	  ix++;
 	}
 #ifdef SNV_LIBRARY_BUILD
       snv_load_all_modules ();
@@ -113,7 +113,7 @@ spec_init (void)
 SNV_INLINE void
 spec_insert (spec_entry *pentry)
 {
-  unsigned hash = spec_hash (pentry->spec);
+  unsigned hash = spec_hash (pentry->spec_key);
   spec_init ();
   spec_table[hash] = pentry;
 }
@@ -153,7 +153,7 @@ register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_fu
     return NULL;
 
   new = snv_new (spec_entry, 1);
-  new->spec = spec;
+  new->spec_key = spec;
   new->fmt = fmt;
   new->arg = arg;
   new->user = NULL;
@@ -208,12 +208,13 @@ call_argtype_function (
 
   else
     {
-      pinfo->spec = *pinfo->format;
+      pinfo->spec  = (unsigned)*(pinfo->format);
       pinfo->extra = spec->user;
-      pinfo->type = spec->type;
+      pinfo->type  = spec->type;
 
       if (pinfo->argc > argindex)
-        n = spec->arg(pinfo, pinfo->argc - argindex, *argtypes + argindex);
+        n = spec->arg(pinfo, (unsigned)(pinfo->argc - argindex),
+		      *argtypes + argindex);
       else
         n = spec->arg(pinfo, 0, NULL);
 
@@ -228,12 +229,12 @@ call_argtype_function (
 	  pinfo->argc = argindex + n;
 	  /* Call again... */
 	  pinfo->argindex = save_argindex;
-	  pinfo->format = save_format;
-	  pinfo->state = save_state;
-          pinfo->spec = *pinfo->format;
-          pinfo->extra = spec->user;
-          pinfo->type = spec->type;
-          n = spec->arg(pinfo, n, *argtypes + argindex);
+          pinfo->format   = save_format;
+          pinfo->state    = save_state;
+          pinfo->spec     = (unsigned)*(pinfo->format);
+          pinfo->extra    = spec->user;
+          pinfo->type     = spec->type;
+          n = spec->arg(pinfo, (unsigned)n, *argtypes + argindex);
 	}
     }
 
@@ -362,7 +363,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
 {
   struct printf_info info;
 
-  return_val_if_fail (format != NULL, -1);
+  return_val_if_fail (format != NULL, (size_t)(-1));
 
   parser_init (&info, format, NULL);
 
@@ -389,7 +390,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
 
 		  /* ...lookup the handler associated with the char
 		     we are looking at in the format string... */
-		  spec = spec_lookup (*info.format);
+		  spec = spec_lookup ((unsigned)*(info.format));
 		  if (spec == NULL)
 		    {
 		      PRINTF_ERROR (&info, "unregistered specifier");
@@ -409,10 +410,11 @@ parse_printf_format (const char *format, int n, int *argtypes)
 		  /* ...and call the relevant handler.  */
 		  if (spec->arg)
 		    {
-		      info.spec = *info.format;
-		      info.extra = spec->user;
-		      info.type = spec->type;
-		      status = (*spec->arg) (&info, n - argindex, argtypes + argindex);
+                      info.spec  = (unsigned)*(info.format);
+                      info.extra = spec->user;
+                      info.type  = spec->type;
+                      status     = (*spec->arg) (&info, (unsigned)(n - argindex),
+                                                 argtypes + argindex);
 		    }
 		  else
 		    {
@@ -496,7 +498,7 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 
 		  /* ...lookup the handler associated with the char
 		     we are looking at in the format string... */
-		  spec = spec_lookup (*info.format);
+		  spec = spec_lookup ((unsigned)*(info.format));
 		  if (spec == NULL)
 		    {
 		      PRINTF_ERROR (&info, "unregistered specifier");
@@ -511,9 +513,9 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 		    }
 
 		  /* ...and call the relevant handler. */
-		  info.spec = *info.format;
+		  info.spec  = (unsigned)*(info.format);
 		  info.extra = spec->user;
-		  info.type = spec->type;
+		  info.type  = spec->type;
 
 		  status = spec->arg ? (*spec->arg) (&info, 0, NULL) : 1;
 
@@ -614,7 +616,7 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
 
 		  /* ...lookup the handler associated with the char
 		     we are looking at in the format string... */
-		  spec = spec_lookup (*info.format);
+		  spec = spec_lookup ((unsigned)*(info.format));
 		  if (spec == NULL)
 		    {
 		      PRINTF_ERROR (&info, "unregistered specifier");
@@ -653,20 +655,24 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
       break;
     }
 
-  if (info.argc > 0)
+  if (info.argc == 0)
     {
-      int index;
+      args = NULL;
+    }
+  else
+    {
+      int idx;
 
       args = snv_new (union printf_arg, info.argc);
 
       /* We scanned the format string to find the type of the arguments,
          so we can now cast it and store it correctly.  */
-      for (index = 0; index < info.argc; index++)
+      for (idx = 0; idx < info.argc; idx++)
         {
-          int tp = argtypes[index];
+          int tp = argtypes[idx];
           if ((tp & PA_TYPE_MASK) == PA_TYPE_MASK)
             {
-              if (index + 1 == info.argc)
+              if (idx + 1 == info.argc)
                 {
                   info.argc--;
                   break;
@@ -680,64 +686,64 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
           switch (tp & ~PA_FLAG_UNSIGNED)
             {
             case PA_CHAR:
-              args[index].pa_char = (char) *(const long int *)(ap + index);
+              args[idx].pa_char = (char) *(const long int *)(ap + idx);
               break;
 
             case PA_WCHAR:
-              args[index].pa_wchar =
-                (snv_wchar_t) *(const long int *)(ap + index);
+              args[idx].pa_wchar =
+                (snv_wchar_t) *(const long int *)(ap + idx);
               break;
 
             case PA_INT|PA_FLAG_SHORT:
-              args[index].pa_short_int =
-                (short int) *(const long int *)(ap + index);
+              args[idx].pa_short_int =
+                (short int) *(const long int *)(ap + idx);
               break;
 
             case PA_INT:
-              args[index].pa_int = (int) *(const long int *)(ap + index);
+              args[idx].pa_int = (int) *(const long int *)(ap + idx);
               break;
 
             case PA_INT|PA_FLAG_LONG:
-              args[index].pa_long_int = *(const long int *)(ap + index);
+              args[idx].pa_long_int = *(const long int *)(ap + idx);
               break;
 
             case PA_INT|PA_FLAG_LONG_LONG:
-              args[index].pa_long_long_int = **(const intmax_t **)(ap + index);
+              args[idx].pa_long_long_int = **(const intmax_t **)(ap + idx);
               break;
 
             case PA_FLOAT:
-              args[index].pa_float = **(const float **)(ap + index);
+              args[idx].pa_float = **(const float **)(ap + idx);
               break;
 
             case PA_DOUBLE|PA_FLAG_LONG_DOUBLE:
 #ifdef HAVE_LONG_DOUBLE
-              args[index].pa_long_double = **(const long double **)(ap + index);
+              args[idx].pa_long_double = **(const long double **)(ap + idx);
               break;
 #endif
               /* else fall through */
 
             case PA_DOUBLE:
-              args[index].pa_double = **(const double **)(ap + index);
+              args[idx].pa_double = **(const double **)(ap + idx);
               break;
 
               /* Note that pointer types are dereferenced just once! */
             case PA_STRING:
-              args[index].pa_string = *(const char **)(ap + index);
+              args[idx].pa_string = *(const char **)(ap + idx);
               break;
 
             case PA_WSTRING:
-              args[index].pa_wstring = *(const snv_wchar_t **)(ap + index);
+              args[idx].pa_wstring = *(const snv_wchar_t **)(ap + idx);
               break;
 
             case PA_POINTER:
-              args[index].pa_pointer = *(snv_constpointer *)(ap + index);
+              args[idx].pa_pointer = *(snv_constpointer *)(ap + idx);
               break;
 
             default:
-              if (argtypes[index] & PA_FLAG_PTR)
-                args[index].pa_pointer = *(snv_constpointer *)(ap + index);
+              if (argtypes[idx] & PA_FLAG_PTR)
+                args[idx].pa_pointer = *(snv_constpointer *)(ap + idx);
               else
-                args[index].pa_long_double = 0.0;
+                args[idx].pa_long_double = 0.0;
               break;
             }
         }
@@ -806,7 +812,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 		     we have reached the end of the specifier... */
 		  /* ...lookup the handler associated with the char
 		     we are looking at in the format string... */
-		  spec = spec_lookup (*info.format);
+		  spec = spec_lookup ((unsigned)*(info.format));
 		  if (spec == NULL)
 		    {
 		      PRINTF_ERROR (&info, "unregistered specifier");
@@ -846,7 +852,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 
   if (info.argc > 0)
     {
-      int index;
+      int idx;
 
       args = snv_new (union printf_arg, info.argc);
 
@@ -861,62 +867,62 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 
          Thanks to Robert Lipe <robertlipe@usa.net> for explaining all
          this to me. */
-      for (index = 0; index < info.argc; index++)
-	switch (argtypes[index] & ~PA_FLAG_UNSIGNED)
+      for (idx = 0; idx < info.argc; idx++)
+	switch (argtypes[idx] & ~PA_FLAG_UNSIGNED)
 	  {
           case PA_CHAR:
-	    args[index].pa_char = va_arg (ap, int); /* Promoted.  */
+	    args[idx].pa_char = va_arg (ap, int); /* Promoted.  */
             break;
 
           case PA_WCHAR:
-	    args[index].pa_wchar = va_arg (ap, snv_wint_t); /* Promoted.  */
+	    args[idx].pa_wchar = va_arg (ap, snv_wint_t); /* Promoted.  */
             break;
 
           case PA_INT|PA_FLAG_SHORT:
-	    args[index].pa_short_int = va_arg (ap, int); /* Promoted.  */
+	    args[idx].pa_short_int = va_arg (ap, int); /* Promoted.  */
             break;
 
           case PA_INT:
-	    args[index].pa_int = va_arg (ap, int);
+	    args[idx].pa_int = va_arg (ap, int);
             break;
   
           case PA_INT|PA_FLAG_LONG:
-	    args[index].pa_long_int = va_arg (ap, long int);
+	    args[idx].pa_long_int = va_arg (ap, long int);
             break;
 
           case PA_INT|PA_FLAG_LONG_LONG:
-	    args[index].pa_long_long_int = va_arg (ap, intmax_t);
+	    args[idx].pa_long_long_int = va_arg (ap, intmax_t);
             break;
 
           case PA_FLOAT:
-	    args[index].pa_float = va_arg (ap, double); /* Promoted.  */
+	    args[idx].pa_float = va_arg (ap, double); /* Promoted.  */
             break;
 
           case PA_DOUBLE|PA_FLAG_LONG_DOUBLE:
-	    args[index].pa_long_double = va_arg (ap, long double);
+	    args[idx].pa_long_double = va_arg (ap, long double);
             break;
 
           case PA_DOUBLE:
-	    args[index].pa_double = va_arg (ap, double);
+	    args[idx].pa_double = va_arg (ap, double);
             break;
 
           case PA_STRING:
-	    args[index].pa_string = va_arg (ap, const char *);
+	    args[idx].pa_string = va_arg (ap, const char *);
             break;
 
           case PA_WSTRING:
-	    args[index].pa_wstring = va_arg (ap, const snv_wchar_t *);
+	    args[idx].pa_wstring = va_arg (ap, const snv_wchar_t *);
             break;
 
           case PA_POINTER:
-	    args[index].pa_pointer = va_arg (ap, void *);
+	    args[idx].pa_pointer = va_arg (ap, void *);
             break;
 
 	  default:
-            if (argtypes[index] & PA_FLAG_PTR)
-              args[index].pa_pointer = va_arg (ap, void *);
+            if (argtypes[idx] & PA_FLAG_PTR)
+              args[idx].pa_pointer = va_arg (ap, void *);
             else
-              args[index].pa_long_double = 0.0;
+              args[idx].pa_long_double = 0.0;
             break;
 	  }
     }

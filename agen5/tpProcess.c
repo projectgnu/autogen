@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.8 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.9 2006/06/24 23:34:51 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -319,7 +319,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 
         pE = strchr( pS, '.' );
         if (pE != NULL) {
-            memcpy( z, pS, pE - pS );
+            memcpy( z, pS, (unsigned)(pE - pS));
             z[ pE - pS ] = NUL;
             pS = z;
         }

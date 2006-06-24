@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.8 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: agCgi.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -133,8 +133,8 @@ loadCgi( void )
     memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
 
     {
-        int   textLen = atoi( pzCgiLength );
-        char* pzText;
+        size_t textLen = strtoul( pzCgiLength, NULL, 0 );
+        char*  pzText;
 
         if (strcasecmp( pzCgiMethod, "POST" ) == 0) {
             if (textLen == 0)
@@ -147,13 +147,13 @@ loadCgi( void )
 
             pzText[ textLen ] = NUL;
 
-            pBaseCtx->pzData = parseInput( pzText, textLen );
+            pBaseCtx->pzData = parseInput( pzText, (int)textLen );
             AGFREE( pzText );
 
         } else if (strcasecmp( pzCgiMethod, "GET" ) == 0) {
             if (textLen == 0)
                 textLen = strlen( pzCgiQuery );
-            pBaseCtx->pzData = parseInput( pzCgiQuery, textLen );
+            pBaseCtx->pzData = parseInput( pzCgiQuery, (int)textLen );
 
         } else {
             AG_ABEND( aprf( "invalid CGI request method: ``%s''", pzCgiMethod ));

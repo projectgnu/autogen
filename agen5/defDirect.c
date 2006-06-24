@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.14 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: defDirect.c,v 4.15 2006/06/24 23:34:50 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -154,7 +154,7 @@ findDirective( char* pzDirName )
 
     do  {
         if (  (strneqvcmp( pzDirName, pTbl[res].pzDirName,
-                           pTbl[res].nameSize ) == 0)
+                           (int)pTbl[res].nameSize ) == 0)
            && (  isspace( pzDirName[ pTbl[res].nameSize ])
               || (pzDirName[ pTbl[res].nameSize ] == NUL) )  )
             return res;
@@ -197,16 +197,15 @@ skipToEndif( char* pzStart )
     char* pzRet;
 
     for (;;) {
-        char*  pz;
         /*
          *  'pzScan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
         if (*pzScan == '#')
-            pz = ++pzScan;
+            pzScan++;
         else {
-            pz = strstr( pzScan, zCheckList );
+            char* pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
                 AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
                                 pCurCtx->lineNo ));
@@ -261,16 +260,15 @@ skipToEndmac( char* pzStart )
     char* pzRet;
 
     for (;;) {
-        char*  pz;
         /*
          *  'pzScan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
         if (*pzScan == '#')
-            pz = ++pzScan;
+            pzScan++;
         else {
-            pz = strstr( pzScan, zCheckList );
+            char* pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
                 AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
                                 pCurCtx->lineNo ));
@@ -314,16 +312,15 @@ skipToElseEnd( char* pzStart )
     char* pzRet;
 
     for (;;) {
-        char*  pz;
         /*
          *  'pzScan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
         if (*pzScan == '#')
-            pz = ++pzScan;
+            pzScan++;
         else {
-            pz = strstr( pzScan, zCheckList );
+            char* pz = strstr( pzScan, zCheckList );
             if (pz == NULL)
                 AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
                                 pCurCtx->lineNo ));
@@ -907,7 +904,7 @@ doDir_shell( char* pzArg, char* pzScan )
      */
     pzScan = strchr( pzScan + STRSIZE( zEndShell ), '\n' );
     if (pzScan == NULL)
-        pzScan = "";
+        pzScan = (void*)zNil;
 
     /*
      *  Save the scan pointer into the current context

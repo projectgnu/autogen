@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2005-10-29 15:06:44 bkorb"
+ *  Time-stamp:      "2006-06-24 11:52:19 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.21 2006/03/25 19:23:28 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.22 2006/06/24 23:34:51 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -178,8 +178,8 @@ typedef struct {
     tCC*    pzOptFmt;
 } arg_types_t;
 
-#  define AGALOC( c, w )        malloc( c )
-#  define AGREALOC( p, c, w )   realloc( p, c )
+#  define AGALOC( c, w )        malloc( (unsigned)c )
+#  define AGREALOC( p, c, w )   realloc( p, (unsigned)c )
 #  define AGFREE( p )           free( p )
 #  define AGDUPSTR( p, s, w )   p = strdup( s )
 #  define TAGMEM( m, t )
@@ -306,9 +306,6 @@ typedef struct {
 extern FILE* option_usage_fp;
 
 extern tOptProc optionPrintVersion, optionPagedUsage, optionLoadOpt;
-
-#define LOCAL static
-#include "proto.h"
 
 #endif /* AUTOGEN_AUTOOPTS_H */
 /*

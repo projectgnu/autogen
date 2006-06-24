@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # library.test     ---  test library options
 #
-# Time-stamp:        "2006-01-25 09:36:00 bkorb"
+# Time-stamp:        "2006-06-24 14:22:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999		      
 #
-# $Id: library.test,v 4.1 2006/01/25 19:12:52 bkorb Exp $
+# $Id: library.test,v 4.2 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -88,6 +88,7 @@ cat > ${testname}-lib.c <<- _EOCode_
 	#include <stdlib.h>
 	#define LIBOPTS
 	#include "${testname}-lib.h"
+	void check_library_opt( void );
 	void check_library_opt( void ) {
 	  if (HAVE_OPT(LIBRARY)) return;
 	  exit( EXIT_FAILURE ); }
@@ -104,7 +105,7 @@ cat > ${testname}-main.c <<- _EOCode_
 	#include "${testname}-prog.c"
 	extern void check_library_opt( void );
 	int main( int argc, char** argv ) {
-	  int ct = optionProcess( &test_lib_progOptions, argc, argv );
+	  (void)optionProcess( &test_lib_progOptions, argc, argv );
 	  check_library_opt();
 	  return EXIT_SUCCESS; }
 	_EOCode_

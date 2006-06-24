@@ -1,12 +1,12 @@
 /*
- *  $Id: gdemit.c,v 4.5 2006/06/03 18:25:50 bkorb Exp $
+ *  $Id: gdemit.c,v 4.6 2006/06/24 23:34:51 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2006/06/03 18:25:50 $
+ *  Last Modified:     $Date: 2006/06/24 23:34:51 $
  *            by: bkorb
  */
 
@@ -25,7 +25,7 @@ static char*
 emitSubblock( tCC* pzDefList, char* pzText, char* pzOut );
 
 static char*
-emitSubblockString( char** ppzText, char sepChar, char* pzOut );
+emitSubblockString( char** ppzText, u_int sepChar, char* pzOut );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -271,7 +271,7 @@ static char*
 emitListattr( char* pzText, char* pzOut )
 {
     tSCC  zStart[]  = " = ";
-    char  sepChar   = ',';
+    u_int sepChar   = ',';
     int   FirstAttr = 1;
 
     strcpy( pzOut, zStart );
@@ -283,7 +283,7 @@ emitListattr( char* pzText, char* pzOut )
      *  a quote character.
      */
     if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
-        sepChar = *(pzText++);
+        sepChar = (u_int)*(pzText++);
     while (isspace( *pzText )) pzText++;
 
     /*
@@ -300,7 +300,7 @@ emitListattr( char* pzText, char* pzOut )
          *  If the first thing we find is the separator char,
          *  then emit the empty string.
          */
-        if (*pzText == sepChar) {
+        if ((u_int)*pzText == sepChar) {
             *(pzOut++) = '\''; *(pzOut++) = '\'';
             pzText++;
             continue;
@@ -373,7 +373,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
     tSCC  zStart[]  = " = {";
     tSCC  zAttr[]   = "\n        ";
     tSCC  zEnd[]    = "\n    };\n";
-    char  sepChar   = ',';
+    u_int sepChar   = ',';
     int   FirstAttr = 1;
 
     /*
@@ -389,7 +389,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
      *  a quote character.
      */
     if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
-        sepChar = *(pzText++);
+        sepChar = (u_int)*(pzText++);
 
     /*
      *  Loop for as long as we have text entries and subblock
@@ -400,7 +400,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
          *  IF the first character is the separator,
          *  THEN this entry is skipped.
          */
-        if (*pzText == sepChar) {
+        if ((u_int)*pzText == sepChar) {
             pzText++;
             for (;;) {
                 switch (*++pzDefList) {
@@ -458,7 +458,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
          *  IF there are no data for this attribute,
          *  THEN we emit an empty definition.
          */
-        if (*pzText == sepChar) {
+        if ((u_int)*pzText == sepChar) {
             *pzOut++ = ';';
             pzText++;
             continue;
@@ -482,7 +482,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
  *  correctly reconstruct it.
  */
 static char*
-emitSubblockString( char** ppzText, char sepChar, char* pzOut )
+emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
 {
     char*  pzText  = *ppzText;
     char*  pcComma;
@@ -520,7 +520,7 @@ emitSubblockString( char** ppzText, char sepChar, char* pzOut )
      *  are to resume our text scan.  (i.e. at the comma, or the
      *  last character in the string)
      */
-    pcComma = strchr( pzText, sepChar );
+    pcComma = strchr( pzText, (int)sepChar );
     if (pcComma == (char*)NULL) {
         pcEnd = pzText + strlen( pzText );
         pcComma = pcEnd-1;

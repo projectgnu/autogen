@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.8 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: funcEval.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -33,11 +33,11 @@ static int
 exprType( char* pz );
 /* = = = END-STATIC-FORWARD = = = */
 
-LOCAL char*
+LOCAL tCC*
 resolveSCM( SCM s )
 {
     static char z[48];
-    char*  pzRes = z;
+    tCC*  pzRes = z;
 
     switch (gh_type_e( s )) {
     case GH_TYPE_BOOLEAN:         
@@ -105,21 +105,22 @@ resolveSCM( SCM s )
  *  It may need to be deallocated, so a boolean pointer is used
  *  to tell the caller.
  */
-LOCAL char*
+LOCAL tCC*
 evalExpression( ag_bool* pMustFree )
 {
     tTemplate*  pT      = pCurTemplate;
     tMacro*     pMac    = pCurMacro;
     ag_bool     isIndexed;
     tDefEntry*  pDef;
-    int         code = pMac->res;
-    char*       pzText;
+    int         code    = pMac->res;
+    tCC*        pzText  = NULL; /* warning patrol */
 
     *pMustFree = AG_FALSE;
 
     if ((code & EMIT_NO_DEFINE) != 0) {
         pzText = pT->pzTemplText + pMac->ozText;
-        code &= EMIT_PRIMARY_TYPE;
+        code  &= EMIT_PRIMARY_TYPE;
+        pDef   = NULL; /* warning patrol */
     }
 
     else {
@@ -205,7 +206,7 @@ evalExpression( ag_bool* pMustFree )
             }
 
             else if (pMac->ozText != 0)
-                 pzText = pT->pzTemplText + pMac->ozText;
+                pzText = pT->pzTemplText + pMac->ozText;
 
             else {
                 /*
@@ -414,7 +415,7 @@ tMacro*
 mFunc_Expr( tTemplate* pT, tMacro* pMac )
 {
     ag_bool needFree;
-    char* pz = evalExpression( &needFree );
+    tCC* pz = evalExpression( &needFree );
 
     fputs( pz, pCurFp->pFile );
     fflush( pCurFp->pFile );
@@ -536,7 +537,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          *  THEN find the ending expression...
          */
         if ((pMac->res & EMIT_ALWAYS) != 0) {
-            char* pzNextExpr = (char*)skipExpression( pz, srcLen );
+            char* pzNextExpr = (char*)skipExpression( pz, (unsigned)srcLen );
 
             /*
              *  The next expression must be within bounds and space separated

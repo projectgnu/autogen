@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.14 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: autogen.c,v 4.15 2006/06/24 23:34:50 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -306,7 +306,7 @@ doneCheck( void )
     }
 
     do {
-        long pos = ftell( stderr );
+        unsigned long pos = ftell( stderr );
         char* pz;
 
         /*
@@ -316,7 +316,7 @@ doneCheck( void )
             break;
         pz = AGALOC( pos, "stderr redirected text" );
         rewind( stderr );
-        fread( pz, 1, pos, stderr );
+        fread(  pz, 1, pos, stderr );
         fwrite( pz, 1, pos, stdout );
         AGFREE( pz );
     } while (0);

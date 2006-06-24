@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.12 2006/06/03 18:25:49 bkorb Exp $
+ *  $Id: funcDef.c,v 4.13 2006/06/24 23:34:50 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -53,6 +53,7 @@ static void
 build_defs( int defCt, tDefList* pList );
 /* = = = END-STATIC-FORWARD = = = */
 
+tMacro* mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
 
 static int
 orderDefList( const void* p1, const void* p2 )
@@ -119,7 +120,7 @@ LOCAL void
 parseMacroArgs( tTemplate* pT, tMacro* pMac )
 {
     char*        pzScan = pT->pzTemplText + pMac->ozText;
-    int          ct     = 0;
+    u_int        ct     = 0;
     tDefList*    pDL;
     tDefList*    pN;
 
@@ -137,8 +138,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
     while (*pzScan != NUL) {
         ct++;
         if (! isalpha( *pzScan )) {
-            fprintf( stderr, "On macro argument # %d:\n%s\n",
-                     ct, pzScan );
+            fprintf( stderr, "On macro argument # %d:\n%s\n", ct, pzScan );
             AG_ABEND_IN( pT, pMac, "no macro arg name" );
         }
 
@@ -241,7 +241,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              */
             if ((pzScan - pDL->pzExpr) < 24) {
                 char* pz = (char*)AGALOC( 24, "quoted string" );
-                memcpy( (void*)pz, pDL->pzExpr, (pzScan - pDL->pzExpr) );
+                memcpy((void*)pz, pDL->pzExpr, (unsigned)(pzScan - pDL->pzExpr));
                 pDL->pzExpr = pz;
                 manageAllocatedData( pz );
             }
@@ -282,7 +282,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
          *  if the strings compare equal.
          */
         pDL = (tDefList*)pMac->res;
-        qsort( (void*)pDL, ct, sizeof( tDefList ), orderDefList );
+        qsort( (void*)pDL, (size_t)ct, (size_t)sizeof(tDefList), orderDefList );
 
         /*
          *  Now, link them all together.  Singly linked list.
@@ -784,7 +784,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
             int   delta = sizeof(tMacro) * (pNewT->macroCt - ct);
             void* data  = (pNewT->pzTplName == NULL) ?
                 pNewT->pzTemplText : pNewT->pzTplName;
-            int  size  = pNewT->pNext - (char*)data;
+            size_t size = pNewT->pNext - (char*)data;
             memmove( (void*)pMacEnd, data, size );
 
             pNewT->pzTemplText -= delta;

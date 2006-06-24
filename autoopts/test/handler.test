@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-12-15 14:00:58 bkorb"
+# Time-stamp:        "2006-06-24 14:46:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/21 22:13:34 $
+# Last Modified:     $Date: 2006/06/24 23:34:51 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.9 2005/12/21 22:13:34 bkorb Exp $
+# $Id: handler.test,v 4.10 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -179,16 +179,20 @@ doOptSixth(
     tSCC* azNames[] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
-    const int nmCt = sizeof(azNames)/sizeof(azNames[0]);
+    const unsigned int nmCt = sizeof(azNames)/sizeof(azNames[0]);
     optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
 }
 
 
 #if ENABLE_NLS
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <autoopts/usage-txt.h>
+
+static char* AO_gettext( const char* pz );
+static void  coerce_it(void** s);
 
 static char*
 AO_gettext( const char* pz )
@@ -206,6 +210,10 @@ AO_gettext( const char* pz )
     }
     return pzRes;
 }
+
+static void coerce_it(void** s) { *s = AO_gettext(*s); }
+#define COERSION(_f) \
+  coerce_it((void*)&(handlerOptions._f))
 
 /*
  *  This invokes the translation code (e.g. gettext(3)).
@@ -249,12 +257,12 @@ translate_option_strings( void )
             pOD++;
         }
     }
-    handlerOptions.pzCopyright   = AO_gettext(handlerOptions.pzCopyright);
-    handlerOptions.pzCopyNotice  = AO_gettext(handlerOptions.pzCopyNotice);
-    handlerOptions.pzFullVersion = AO_gettext(handlerOptions.pzFullVersion);
-    handlerOptions.pzUsageTitle  = AO_gettext(handlerOptions.pzUsageTitle);
-    handlerOptions.pzExplain     = AO_gettext(handlerOptions.pzExplain);
-    handlerOptions.pzDetail      = AO_gettext(handlerOptions.pzDetail);
+    COERSION(pzCopyright);
+    COERSION(pzCopyNotice);
+    COERSION(pzFullVersion);
+    COERSION(pzUsageTitle);
+    COERSION(pzExplain);
+    COERSION(pzDetail);
 }
 
 #endif /* ENABLE_NLS */

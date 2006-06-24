@@ -38,7 +38,7 @@
  * Used to denote that there is no upper limit to the number of characters
  * that can safely be written to a stream.
  **/
-#define SNV_UNLIMITED           ~(0L)
+#define SNV_UNLIMITED           (~0UL)
 
 #ifdef __cplusplus
 extern "C"

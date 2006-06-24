@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.7 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: columns.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ size_t  columnSz   = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
-static int
+static uint32_t
 handleIndent( tCC* pzIndentArg );
 
 static void
@@ -145,11 +145,11 @@ main( int    argc,
 }
 
 
-static int
+static uint32_t
 handleIndent( tCC* pzIndentArg )
 {
     char* pz;
-    int   colCt = strtol( pzIndentArg, &pz, 0 );
+    uint32_t colCt = strtoul( pzIndentArg, &pz, 0 );
 
     /*
      *  IF the indent argument is a number
@@ -237,9 +237,9 @@ readLines( void )
      *  Read the input text, stripping trailing white space
      */
     for (;;) {
-        char*   pzL;
-        char*   pzText = fgets( zLine, sizeof( zLine ), stdin );
-        int     len;
+        char*     pzL;
+        char*     pzText = fgets( zLine, sizeof( zLine ), stdin );
+        uint32_t  len;
 
         if (pzText == NULL)
             break;

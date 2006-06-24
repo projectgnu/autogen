@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.9 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expGuile.c,v 4.10 2006/06/24 23:34:50 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -253,7 +253,7 @@ SCM
 ag_scm_sum( SCM list )
 {
     int  len = scm_ilength( list );
-    unsigned long sum = 0;
+    long sum = 0;
 
     if (len <= 0)
         return AG_SCM_INT2SCM( 0 );

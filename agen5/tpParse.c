@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.8 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: tpParse.c,v 4.9 2006/06/24 23:34:51 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -27,9 +27,9 @@
  *             Boston, MA  02110-1301, USA.
  */
 
+#if defined(DEBUG_ENABLED)
 static int tplNestLevel = 0;
 
-#if defined(DEBUG_ENABLED)
 tSCC zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 #endif
 
@@ -93,7 +93,7 @@ whichFunc( tCC** ppzScan )
     do  {
         av  = (hi + lo)/2;
         pNT = nameTypeTable + av;
-        cmp = strneqvcmp( pNT->pName, pzFuncName, pNT->cmpLen );
+        cmp = strneqvcmp( pNT->pName, pzFuncName, (int)pNT->cmpLen );
         if (cmp == 0) {
             /*
              *  Make sure we matched to the end of the token.

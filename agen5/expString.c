@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.9 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expString.c,v 4.10 2006/06/24 23:34:50 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -34,7 +34,7 @@ makeString( tCC*    pzText,
             size_t  newLineSize );
 
 static SCM
-shell_stringify( SCM obj, char qt );
+shell_stringify( SCM obj, u_int qt );
 
 static void
 do_substitution(
@@ -222,7 +222,7 @@ makeString( tCC*    pzText,
 
 
 static SCM
-shell_stringify( SCM obj, char qt )
+shell_stringify( SCM obj, u_int qt )
 {
     char*  pzDta;
     char*  pzNew;
@@ -370,10 +370,10 @@ do_substitution(
         if (pzNxt == NULL)
             break;
         if (pz != pzNxt) {
-            memcpy( pzScan, pz, (pzNxt - pz) );
+            memcpy( pzScan, pz, (unsigned)(pzNxt - pz) );
             pzScan += (pzNxt - pz);
         }
-        memcpy( pzScan, pzRepl, replL );
+        memcpy( pzScan, pzRepl, (unsigned)replL );
         pzScan += replL;
         pz = pzNxt + matchL;
     }
@@ -456,10 +456,10 @@ do_multi_subs(
 SCM
 ag_scm_in_p( SCM obj, SCM list )
 {
-    int   len;
-    int   lenz;
-    SCM   car;
-    char* pz1;
+    int     len;
+    size_t  lenz;
+    SCM     car;
+    char*   pz1;
 
     if (! AG_SCM_STRING_P( obj ))
         return SCM_UNDEFINED;
@@ -473,7 +473,7 @@ ag_scm_in_p( SCM obj, SCM list )
      */
     if (AG_SCM_STRING_P( list )) {
         if (  (AG_SCM_STRLEN( list ) == lenz)
-           && (strncmp( pz1, AG_SCM_CHARS( list ), lenz ) == 0) )
+           && (strncmp( pz1, AG_SCM_CHARS( list ), lenz) == 0))
             return SCM_BOOL_T;
         return SCM_BOOL_F;
     }
@@ -528,7 +528,7 @@ ag_scm_join( SCM sep, SCM list )
     int        l_len, sv_l_len;
     SCM        car;
     SCM        alist = list;
-    int        sep_len;
+    size_t     sep_len;
     scm_sizet  str_len;
     char*      pzRes;
     char*      pzSep;
@@ -580,7 +580,7 @@ ag_scm_join( SCM sep, SCM list )
      *  Now, copy each one into the output
      */
     for (;;) {
-        int cpy_len;
+        size_t cpy_len;
 
         car   = SCM_CAR( alist );
         alist = SCM_CDR( alist );
@@ -922,7 +922,7 @@ ag_scm_raw_shell_str( SCM obj )
 SCM
 ag_scm_shell_str( SCM obj )
 {
-    return shell_stringify( obj, '"' );
+    return shell_stringify( obj, (unsigned)'"' );
 }
 
 /*=gfunc sub_shell_str
@@ -940,7 +940,7 @@ ag_scm_shell_str( SCM obj )
 SCM
 ag_scm_sub_shell_str( SCM obj )
 {
-    return shell_stringify( obj, '`' );
+    return shell_stringify( obj, (unsigned)'`' );
 }
 
 

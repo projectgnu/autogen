@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-06-04 16:37:23 bkorb"
+## Time-stamp:      "2006-06-24 16:13:56 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.25 2006/06/10 16:44:42 bkorb Exp $
+## $Id: Makefile.am,v 4.26 2006/06/24 23:34:51 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,10 +25,10 @@ GENMAN      = $(PATHFIND_MAN) \
     ao_string_tokenize.3  configFileLoad.3      optionFileLoad.3 \
     optionFindNextValue.3 optionFindValue.3     optionFree.3 \
     optionGetValue.3      optionLoadLine.3      optionNextValue.3 \
-    optionProcess.3       optionRestore.3       optionSaveFile.3 \
-    optionSaveState.3     optionUnloadNested.3  optionVersion.3 \
-    strequate.3           streqvcmp.3           streqvmap.3 \
-    strneqvcmp.3          strtransform.3
+    optionOnlyUsage.3     optionProcess.3       optionRestore.3 \
+    optionSaveFile.3      optionSaveState.3     optionUnloadNested.3 \
+    optionVersion.3       strequate.3           streqvcmp.3 \
+    streqvmap.3           strneqvcmp.3          strtransform.3
 MAN_STAMP   = man3-stamp
 
 GENTEXI     = libopts.texi libopts.menu
@@ -98,7 +98,7 @@ bin_SCRIPTS               = autoopts-config
 nobase_include_HEADERS    = autoopts/options.h autoopts/usage-txt.h
 
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
-	$(MISC_FILES) $(DEF_FILES) mk-autoopts-pc.in po
+	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -110,6 +110,7 @@ libopts.c : $(HDRS) $(CSRC)
 	( echo '#define AUTOOPTS_INTERNAL' ; \
 	echo '#include "compat/compat.h"' ; \
 	echo '#define HAVE_LIBSNPRINTFV' ; \
+	echo '#define LOCAL static' ; \
 	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
@@ -155,20 +156,9 @@ autoopts.pc : mk-autoopts-pc
 	$(SHELL) mk-autoopts-pc $@
 
 install-data-hook:
-	@set -x ; \
-	egrep 'define +HAVE_STDINT_H' $(top_builddir)/config.h >/dev/null \
-	  && intfile=stdint || intfile=inttypes ; \
-	egrep 'define +HAVE_LIMITS_H' $(top_builddir)/config.h >/dev/null \
-	  && limfile=limits || limfile=sys/limits ; \
-	egrep 'define +HAVE_PATHFIND' $(top_builddir)/config.h >/dev/null \
-	  && sed_pathfind='/^#.*if.* HAVE_PATHFIND/d' \
-	  || sed_pathfind='/ifndef HAVE_PATHFIND/,/endif.*HAVE_PATHFIND/d' ; \
-	sed -e '/if defined(HAVE_STDINT/,/include.*inttypes/d' \
-	    -e "s@.endif.*HAVE_STDINT/INTTYPES.*@#include <$$intfile.h>@" \
-	    -e '/if defined(HAVE_LIMITS/,/include.*sys\/limits/d' \
-	    -e "s@.endif.*HAVE_LIMITS/SYS_LIM.*@#include <$$limfile.h>@" \
-	    -e "$${sed_pathfind}" \
-	  $(srcdir)/autoopts/options.h \
-	  > $(DESTDIR)$(includedir)/autoopts/options.h
+	@destdir='$(DESTDIR)$(includedir)/autoopts' \
+	top_builddir='$(top_builddir)' \
+	export destdir top_builddir ; \
+	$(SHELL) $(srcdir)/install-options-h
 
 # Makefile.am ends here

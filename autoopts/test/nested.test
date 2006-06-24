@@ -3,14 +3,14 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2005-04-03 15:59:26 bkorb"
+# Time-stamp:        "2006-06-24 14:08:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/06/24 23:34:51 $
 #            by: bkorb
 #
-# $Id: nested.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: nested.test,v 4.4 2006/06/24 23:34:51 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -58,7 +58,7 @@ cat >&5 <<- _EOF_
 	#include <stdio.h>
 
 	int print_nested( const tOptionValue* pGV );
-
+	int print_entry( const tOptionValue* pGV );
 	int print_entry( const tOptionValue* pGV ) {
 	  if (pGV == NULL) {
 	    fprintf( stderr, "ENTRY NOT FOUND\n" );
@@ -80,13 +80,13 @@ cat >&5 <<- _EOF_
 	              pGV->v.boolVal ? "TRUE" : "false" ); break;
 
 	    case OPARG_TYPE_MEMBERSHIP:
-	      printf( "members:  0x%08X\n",  pGV->v.setVal ); break;
+	      printf( "members:  0x%08lX\n",  (unsigned long)pGV->v.setVal ); break;
 
 	    case OPARG_TYPE_NUMERIC:
-	      printf( "integer:   %d\n",      pGV->v.longVal ); break;
+	      printf( "integer:   %ld\n",      pGV->v.longVal ); break;
 
 	    case OPARG_TYPE_HIERARCHY:
-	      printf( "nested:   0x%08lX\n", pGV->v.nestVal );
+	      printf( "nested:   0x%08lX\n",  (unsigned long)pGV->v.nestVal );
 	      return print_nested( pGV );
 	      break;
 
@@ -192,7 +192,7 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 8
+## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:
