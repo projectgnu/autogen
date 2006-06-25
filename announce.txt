@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.12 2005/12/21 22:13:34 bkorb Exp $
+# $Id: announce.txt,v 4.13 2006/06/25 00:51:11 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -17,7 +17,7 @@ AO_VERSION=AutoOpts\ Version\ ${AO_CURRENT}.${AO_REVISION}
 
 exec 3> ${tfile}
 
-recip=$(echo ${lname} autogen-announce@lists.sf.net)
+recip=$(echo ${lname} autogen-announce@lists.sourceforge.net)
 
 nl='
 '
@@ -29,7 +29,7 @@ nl='
 #
 case ${AG_VERSION} in
 *.*pre* )
-  to_line='To: autogen-announce@lists.sf.net'
+  to_line='To: autogen-announce@lists.sourceforge.net'
   cc_line=""
   alpha_rel=$(echo "\
 This is a *pre* release of ${project}.
@@ -37,14 +37,14 @@ This is a *pre* release of ${project}.
 It is temporarily stored at the following 'primary ftp' site,
 pending further testing.")
 
-  recip=autogen-announce@lists.sf.net
+  recip=autogen-announce@lists.sourceforge.net
   ftpurl=http://autogen.sf.net/data
   ;;
 
 * )
   alpha_rel=""
   to_line='To: GNU Announcements <info-gnu@gnu.org>'
-  cc_line="Cc: autogen-announce@lists.sf.net${nl}"
+  cc_line="Cc: autogen-announce@lists.sourceforge.net${nl}"
   recip=$(echo ${recip} info-gnu@gnu.org)
   ftpurl=ftp://ftp.gnu.org/gnu/${project}/rel${AG_VERSION}
   ;;
@@ -55,7 +55,7 @@ cat >&3 <<- _EOF_
 	Sender: ${sender}@${domain}
 	${to_line}	
 	Subject: GNU AutoGen Version ${AG_VERSION}/${AO_VERSION}
-	Reply-To: autogen-users@lists.sf.net
+	Reply-To: autogen-users@lists.sourceforge.net
 	${cc_line}
 	GNU AutoGen/AutoOpts is a two-part project that serves two separate
 	purposes and are inextricably intertwined:

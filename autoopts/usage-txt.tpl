@@ -150,9 +150,9 @@ msgstr ""
 FOR utxt
   =][=
   (set! ref-list (shellf
-     "(set -x;list=`grep -n -E -w z%s *.c [agpo]*.h | \\
+     "list=`grep -n -E -w z%s *.c [agpo]*.h | \\
          sed -n 's/\\([^:]*:[^:]*\\):.*/\\1/p'`
-     echo ${list})" (get "ut-name")))
+     echo ${list}" (get "ut-name")))
 
   (if (< (string-length ref-list) 2)
       (error (sprintf "No references to z%s string" (get "ut-name")))  )

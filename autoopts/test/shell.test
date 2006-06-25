@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: shell.test,v 4.5 2006/06/25 00:51:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -115,7 +115,7 @@ If the script file already exists and contains Automated Option Processing
 text, the second line of the file through the ending tag will be replaced
 by the newly generated text.  The first `#!' line will be regenerated.
 
-please send bug reports to:  autogen-users@lists.sf.net
+please send bug reports to:  autogen-users@lists.sourceforge.net
 
 = = = = = = = =
 

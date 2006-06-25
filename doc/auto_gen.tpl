@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.25 2006/06/24 23:54:32 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.26 2006/06/25 00:51:11 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -121,7 +121,7 @@ notice identical to this one except for the removal of this paragraph.
 @subtitle For version [=`
   echo ${AG_REVISION}, ${UPDATED} `=]
 @author Bruce Korb
-@author @email{[=(texi-escape-encode e-addr)=]}
+@author @email{[= (texi-escape-encode "bkorb@gnu.org") =]}
 
 @page
 @vskip 0pt plus 1filll
