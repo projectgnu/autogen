@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.20 2006/06/24 23:34:51 bkorb Exp $
- *  Time-stamp:      "2006-06-24 10:56:09 bkorb"
+ *  $Id: autoopts.c,v 4.21 2006/07/01 21:57:23 bkorb Exp $
+ *  Time-stamp:      "2006-07-01 14:41:46 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -64,6 +64,10 @@
 # ifndef HAVE_STRDUP
 #   include "compat/strdup.c"
 # endif
+#endif
+
+#ifndef HAVE_STRCHR
+#  include "compat/strchr.c"
 #endif
 
 static const char zNil[] = "";

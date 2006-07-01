@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/03/14 11:33:23 $
+ *  Last Modified:     $Date: 2006/07/01 21:57:23 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.12 2006/03/14 11:33:23 bkorb Exp $
+ *  $Id: misc.def,v 4.13 2006/07/01 21:57:23 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.12 $";
+version = "$Revision: 4.13 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -389,6 +389,17 @@ do-always = <<- _END_ALWAYS_
 	])
 	AC_DEFINE_UNQUOTED(SNV_INLINE, ${snv_cv_static_inline},
 	         [define to static or static inline])
+	[if test "X${libopts_cv_with_libregex}" = Xno
+	then
+	  echo "I cannot detect POSIX compliant regcomp/regexec routines.
+		These are required for AutoGen to work correctly.  If you have
+		such a library present on your system, you must specify it by
+		setting the LIBS environment variable, e.g., \"LIBS='-lregex'\".
+		If you do not have such a library on your system, then you should
+		download and install, for example, the one from:
+		    ftp://ftp.gnu.org/gnu/rx/" >&2]
+	  AC_MSG_ERROR([Cannot find working POSIX regex library])
+	[fi]
 	_END_ALWAYS_;
 
 /* misc.def ends here */

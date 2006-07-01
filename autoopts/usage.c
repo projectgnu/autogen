@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.13 2006/06/24 23:34:51 bkorb Exp $
- * Time-stamp:      "2006-06-24 13:44:20 bkorb"
+ *  usage.c  $Id: usage.c,v 4.14 2006/07/01 21:57:23 bkorb Exp $
+ * Time-stamp:      "2006-07-01 12:41:02 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -431,7 +431,7 @@ printInitList(
              */
             if (  (stat( pzPath, &sb ) == 0)
               &&  S_ISDIR( sb.st_mode ) ) {
-                fputc( '/', option_usage_fp );
+                fputc( DIRCH, option_usage_fp );
                 fputs( pzRc, option_usage_fp );
             }
         }

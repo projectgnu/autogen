@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2005/11/23 00:09:29 $
- *  Time-stamp:        "2005-11-15 16:23:09 bkorb"
+ *  Last Modified:     $Date: 2006/07/01 21:57:23 $
+ *  Time-stamp:        "2006-07-01 14:38:44 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.13 2005/11/23 00:09:29 bkorb Exp $
+ *  $Id: libopts.def,v 4.14 2006/07/01 21:57:23 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.13 $";
+version     = "$Revision: 4.14 $";
 output-file = libopts.m4;
 
 test   = {
@@ -63,22 +63,7 @@ test   = {
 	_END_OF_CODE_;
   run-mode   =  "run";
   code-mode  =  "all";
-
-  action   = { no; asis;
-    act-type = script;
-    act-text = <<-  _END_OF_ACTION
-    	cat >&2 <<'_EOF_'
-		I cannot detect POSIX compliant regcomp/regexec routines.
-		These are required for AutoGen to work correctly.  If you have
-		such a library present on your system, you must specify it by
-		setting the LIBS environment variable, e.g., "LIBS='-lregex'".
-		If you do not have such a library on your system, then you should
-		download and install, for example, the one from:
-		    ftp://ftp.gnu.org/gnu/rx/
-		_EOF_
-	AC_MSG_ERROR([Cannot find working POSIX regex library])
-	_END_OF_ACTION ;
-  };
+  action = { act-type = define; };
 
   doc =
   "AutoGen won't work without a POSIX compliant regular expression library.";
@@ -304,5 +289,5 @@ do-first = <<-_EOF_
 	# ----------------------------------------------------------------------
 	AC_CHECK_LIB(gen, pathfind)
 	AC_FUNC_VPRINTF
-	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup])
+	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr strrchr])
 	_EOF_;

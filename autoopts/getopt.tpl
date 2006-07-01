@@ -2,7 +2,7 @@
 
    c=%s-temp.c
 
-# Time-stamp:      "2005-12-03 14:49:14 bkorb"
+# Time-stamp:      "2006-07-01 12:43:30 bkorb"
 
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
@@ -26,7 +26,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.5 2005/12/04 00:57:31 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.6 2006/07/01 21:57:23 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -251,7 +251,7 @@ int
 process_[+(. prog-name)+]_opts (int argc, char** argv)
 {
   {
-    char* pz_prog = strrchr (argv[0], '/');
+    char* pz_prog = strrchr (argv[0], DIRCH);
     if (pz_prog != NULL)
       pz_prog++;
     else

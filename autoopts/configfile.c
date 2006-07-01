@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.22 2006/06/24 23:34:51 bkorb Exp $
- *  Time-stamp:      "2006-06-24 10:31:49 bkorb"
+ *  $Id: configfile.c,v 4.23 2006/07/01 21:57:23 bkorb Exp $
+ *  Time-stamp:      "2006-07-01 12:46:31 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -847,8 +847,8 @@ internalFileLoad( tOptions* pOpts )
                 continue;
 
             pz = zFileName + len;
-            if (pz[-1] != '/')
-                *(pz++) = '/';
+            if (pz[-1] != DIRCH)
+                *(pz++) = DIRCH;
             strcpy( pz, pOpts->pzRcName );
         }
 
@@ -1249,7 +1249,7 @@ validateOptionsStruct( tOptions* pOpts, const char* pzProgram )
      *  and the set of equivalent characters.
      */
     if (pOpts->pzProgName == NULL) {
-        const char* pz = strrchr( pzProgram, '/' );
+        const char* pz = strrchr( pzProgram, DIRCH );
 
         if (pz == NULL)
              pOpts->pzProgName = pzProgram;

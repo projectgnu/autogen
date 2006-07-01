@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.14 2006/06/24 23:34:51 bkorb Exp $
- * Time-stamp:      "2006-06-24 10:52:21 bkorb"
+ *  save.c  $Id: save.c,v 4.15 2006/07/01 21:57:23 bkorb Exp $
+ * Time-stamp:      "2006-07-01 12:41:27 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -100,7 +100,7 @@ findDirName( tOptions* pOpts, int* p_free )
         return pzDir;
 
     {
-        tCC*  pzEndDir = strchr( ++pzDir, '/' );
+        tCC*  pzEndDir = strchr( ++pzDir, DIRCH );
         char* pzFileName;
         char* pzEnv;
 
@@ -176,7 +176,7 @@ findFileName( tOptions* pOpts, int* p_free_name )
              *  Strip off the last component, stat the remaining string and
              *  that string must name a directory
              */
-            char* pzDirCh = strrchr( pzDir, '/' );
+            char* pzDirCh = strrchr( pzDir, DIRCH );
             if (pzDirCh == NULL) {
                 stBuf.st_mode = S_IFREG;
                 continue;  /* bail out of error condition */

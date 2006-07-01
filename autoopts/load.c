@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.22 2006/06/24 23:34:51 bkorb Exp $
- *  Time-stamp:      "2006-06-24 10:43:29 bkorb"
+ *  $Id: load.c,v 4.23 2006/07/01 21:57:23 bkorb Exp $
+ *  Time-stamp:      "2006-07-01 12:43:03 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -102,7 +102,7 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode );
  *
  *  Please note: both @code{$$} and @code{$NAME} must be at the start of the
  *     @code{pzName} string and must either be the entire string or be followed
- *     by the @code{'/'} character.
+ *     by the @code{'/'} (backslash on windows) character.
  *
  * err:  @code{AG_FALSE} is returned if:
  *       @*
@@ -195,7 +195,7 @@ insertProgramPath(
     int     skip = 2;
 
     switch (pzName[2]) {
-    case '/':
+    case DIRCH:
         skip = 3;
     case NUL:
         break;
@@ -208,7 +208,7 @@ insertProgramPath(
      *  If it is, we're done.  Otherwise, we have to hunt
      *  for the program using "pathfind".
      */
-    if (strchr( pzProgPath, '/' ) != NULL)
+    if (strchr( pzProgPath, DIRCH ) != NULL)
         pzPath = pzProgPath;
     else {
         pzPath = pathfind( getenv( "PATH" ), (char*)pzProgPath, "rx" );
@@ -217,7 +217,7 @@ insertProgramPath(
             return AG_FALSE;
     }
 
-    pz = strrchr( pzPath, '/' );
+    pz = strrchr( pzPath, DIRCH );
 
     /*
      *  IF we cannot find a directory name separator,

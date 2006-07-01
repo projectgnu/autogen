@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2005-10-28 16:19:20 bkorb"
+## Time-stamp:      "2006-07-01 14:45:02 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.22 2005/10/28 23:19:58 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.23 2006/07/01 21:57:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -58,7 +58,8 @@ sed '/broken printf/,/our own/d
   ${top_builddir}/pkg/${tag}/autoopts.h
 
 cd ../compat
-cp compat.h pathfind.c snprintf.c strdup.c ${top_builddir}/pkg/${tag}/compat/.
+cp compat.h pathfind.c snprintf.c strdup.c strchr.c \
+   ${top_builddir}/pkg/${tag}/compat/.
 
 #
 #  END WORK IN SOURCE DIRECTORY

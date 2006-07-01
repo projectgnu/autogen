@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2006-06-24 11:52:19 bkorb"
+ *  Time-stamp:      "2006-07-01 14:40:47 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.22 2006/06/24 23:34:51 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.23 2006/07/01 21:57:23 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -75,6 +75,12 @@
 
 #undef  EXPORT
 #define EXPORT
+
+#if defined(_WIN32)
+# define DIRch '\\'
+#else
+# define DIRCH '/'
+#endif
 
 /*
  *  Convert the number to a list usable in a printf call
@@ -290,6 +296,11 @@ typedef struct {
 # ifdef  _SC_PAGE_SIZE
 #  define _SC_PAGESIZE _SC_PAGE_SIZE
 # endif
+#endif
+
+#ifndef HAVE_STRCHR
+extern char* strchr( const char *s, int c);
+extern char* strrchr( const char *s, int c);
 #endif
 
 /*
