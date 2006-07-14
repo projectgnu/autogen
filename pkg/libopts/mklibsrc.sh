@@ -7,7 +7,7 @@
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.23 2006/07/01 21:57:23 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.24 2006/07/14 04:27:01 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -58,7 +58,7 @@ sed '/broken printf/,/our own/d
   ${top_builddir}/pkg/${tag}/autoopts.h
 
 cd ../compat
-cp compat.h pathfind.c snprintf.c strdup.c strchr.c \
+cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
    ${top_builddir}/pkg/${tag}/compat/.
 
 #
