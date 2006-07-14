@@ -9,11 +9,11 @@
 ## Created:         Mon Jun 30 15:35:12 1997				      
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2006/07/01 21:57:23 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2006/07/14 04:20:17 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 COMPAT_CSRC = pathfind.c snprintf.c strchr.c strdup.c strftime.c strsignal.c
-COMPAT_HDRS = compat.h strsignal.h
+COMPAT_HDRS = compat.h strsignal.h windows-config.h
 COMPAT_GEN  = bootstrap.dir strsignal.def strsignal.tpl
 EXTRA_DIST  = $(COMPAT_CSRC) $(COMPAT_HDRS) $(COMPAT_GEN)
 

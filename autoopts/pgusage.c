@@ -1,7 +1,7 @@
 
 /*
- *  $Id: pgusage.c,v 4.9 2006/06/24 23:34:51 bkorb Exp $
- * Time-stamp:      "2006-06-24 10:48:00 bkorb"
+ *  $Id: pgusage.c,v 4.10 2006/07/14 04:20:17 bkorb Exp $
+ * Time-stamp:      "2006-07-13 21:10:16 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -68,6 +68,9 @@ tePagerState pagerState = PAGER_STATE_INITIAL;
 void
 optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {
+#if defined(__windows__)
+    (*pOptions->pUsageProc)( pOptions, EXIT_SUCCESS );
+#else
     static pid_t     my_pid;
     char zPageUsage[ 1024 ];
 
@@ -142,6 +145,7 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
          */
         break;
     }
+#endif
 }
 
 /*

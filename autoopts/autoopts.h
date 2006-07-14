@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2006-07-01 14:40:47 bkorb"
+ *  Time-stamp:      "2006-07-13 18:11:31 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.23 2006/07/01 21:57:23 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.24 2006/07/14 04:20:17 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -77,7 +77,7 @@
 #define EXPORT
 
 #if defined(_WIN32)
-# define DIRch '\\'
+# define DIRCH '\\'
 #else
 # define DIRCH '/'
 #endif
@@ -108,8 +108,11 @@ typedef int tDirection;
  *  USAGE:  define procedures to return "tSuccess".  Test their results
  *          with the SUCCEEDED, FAILED and HADGLITCH macros.
  */
+#undef  SUCCESS
 #define SUCCESS  ((tSuccess) 0)
+#undef  FAILURE
 #define FAILURE  ((tSuccess)-1)
+#undef  PROBLEM
 #define PROBLEM  ((tSuccess) 1)
 
 typedef int tSuccess;
