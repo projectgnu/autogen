@@ -2,12 +2,12 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2006-07-13 18:27:36 bkorb"
+ *  Time-stamp:      "2006-07-15 08:27:23 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.9 2006/07/14 04:20:17 bkorb Exp $
+ * $Id: compat.h,v 4.10 2006/07/15 22:10:21 bkorb Exp $
  */
 #ifndef COMPAT_H_GUARD
 #define COMPAT_H_GUARD 1
@@ -15,7 +15,7 @@
 #if defined(HAVE_CONFIG_H)
 #  include <config.h>
 
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 #  include "windows-config.h"
 
 #else
@@ -62,6 +62,7 @@
 
 #  if ! defined(HAVE_SYS_POLL_H) && ! defined(HAVE_SYS_SELECT_H)
 #    error This system cannot support daemon processing
+     Choke Me.
 #  endif
 
 #  if HAVE_SYS_POLL_H
@@ -247,6 +248,7 @@
 	typedef unsigned long   uint32_t;
 # else
 #   error Cannot create a uint32_t type.
+    Choke Me.
 # endif
 #endif
 

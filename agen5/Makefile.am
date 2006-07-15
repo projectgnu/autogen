@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-11-30 16:38:12 bkorb"
+## Time-stamp:      "2006-07-15 08:41:17 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.8 2006/03/25 19:23:27 bkorb Exp $
+## $Id: Makefile.am,v 4.9 2006/07/15 22:10:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -41,9 +41,12 @@ hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
              bootstrap.dir schemedef.scm TODO
 
+LO_LIB          = $(top_builddir)/autoopts/libopts.la
+SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la
+
 nodist_autogen_SOURCES = ag.c
 autogen_SOURCES = $(GEN_CSRC)
-autogen_LDADD   = $(top_builddir)/autoopts/libopts.la $(LIBGUILE_LIBS)
+autogen_LDADD   = $(LO_LIB) $(SNV_LIB) $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
 FUNCLIST        = \
@@ -116,5 +119,8 @@ $(CLexe) :
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
 	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
+
+../snprintfv/libsnprintfv.la :
+	cd ../snprintfv ; $(MAKE) libsnprintfv.la
 
 # Makefile.am ends here

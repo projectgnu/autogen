@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2006
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2006-06-24 12:32:16 bkorb"
+ * Time-stamp:      "2006-07-15 08:28:08 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -82,6 +82,7 @@
 
 #else
 #  error  OOPS
+   Choke Me.
 #endif
 
 #define PROP_TABLE \

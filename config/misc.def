@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/07/01 21:57:23 $
+ *  Last Modified:     $Date: 2006/07/15 22:10:21 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.13 2006/07/01 21:57:23 bkorb Exp $
+ *  $Id: misc.def,v 4.14 2006/07/15 22:10:21 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.13 $";
+version = "$Revision: 4.14 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -22,18 +22,18 @@ test = {
 
     action = { act-type = script;
       act-text = <<-  _EOF_
-		AC_SUBST(OPTS_TESTDIR)
-		    AC_SUBST(AGEN5_TESTS)
-		    OPTS_TESTDIR=test
-		    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
-		_EOF_; };
+	AC_SUBST(OPTS_TESTDIR)
+	    AC_SUBST(AGEN5_TESTS)
+	    OPTS_TESTDIR=test
+	    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
+	_EOF_; };
 
     action = { no; act-type = script;
       act-text = <<-  _EOF_
-		TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
-		    OPTS_TESTDIR=
-		    AGEN5_TESTS='$(NOSHELL_TESTS)'
-		_EOF_; };
+	TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
+	    OPTS_TESTDIR=
+	    AGEN5_TESTS='$(NOSHELL_TESTS)'
+	_EOF_; };
 
     conditional = DO_SHELL_CMDS;
 
@@ -48,6 +48,23 @@ test = {
 	_EOF_;
 };
 
+test = {
+    name   = autoopts;
+    type   = disable;
+    check  = 'disable AutoOpts install';
+    action = { act-type = define; };
+
+    conditional = INSTALL_AUTOOPTS;
+
+    doc = <<-  _EOF_
+	In some build environments for AutoGen repackagers, it is not
+	desirable to install AutoOpts build products.  For such environments,
+	specify ``--disable-autoopts'' on the configure command line.
+	_EOF_;
+};
+
+#ifdef NOT_YET
+
 test   = {
     name   = daemon;
     type   = enable;
@@ -60,6 +77,8 @@ test   = {
 	Which is selected by the argument to the @code{--daemon} option.
 	_EOF_;
 };
+
+#endif
 
 test   = {
   name     = "guile";

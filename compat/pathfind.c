@@ -5,17 +5,17 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 2006/07/14 04:20:17 $
+ * Last Modified:    $Date: 2006/07/15 22:10:21 $
  *            by: bkorb
  *
- * $Id: pathfind.c,v 4.5 2006/07/14 04:20:17 bkorb Exp $
+ * $Id: pathfind.c,v 4.6 2006/07/15 22:10:21 bkorb Exp $
  */
 
 /* Code: */
 
 #include "compat.h"
 #ifndef HAVE_PATHFIND
-#if defined(__windows__)
+#if defined(__windows__) && !defined(__CYGWIN__)
 char*
 pathfind( const char*  path,
           const char*  fileName,
@@ -326,7 +326,7 @@ extract_colon_unit( char* pzDir, const char *string, int *p_index )
     *p_index = ix;
     return pzDir;
 }
-#endif /* __windows__ */
+#endif /* __windows__ / __CYGWIN__ */
 #endif /* HAVE_PATHFIND */
 
 /*

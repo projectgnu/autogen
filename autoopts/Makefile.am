@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-06-24 16:13:56 bkorb"
+## Time-stamp:      "2006-07-15 13:53:23 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.27 2006/07/15 14:42:42 bkorb Exp $
+## $Id: Makefile.am,v 4.28 2006/07/15 22:10:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -63,29 +63,19 @@ DEF_FILES   = genshell.def stdoptions.def usage-txt.def $(srcdir)/funcs.def
 MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in COPYING
 pkgconfigdir=$(libdir)/pkgconfig
 
-## # # # # # # # # # # # # # #
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
 ##   A U T O M A K E   V A R S
 ##
-## # # # # # # # # # # # # # #
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 CLEANFILES                = tmp-* libopts.c
 DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
 MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) $(srcdir)/funcs.def
-
-man_MANS                  = autoopts-config.1 $(GENMAN)
 m4datadir                 = $(datadir)/aclocal
-m4data_DATA               = autoopts.m4
-
-nodist_pkgdata_DATA       = $(libsrc)
-pkgconfig_SCRIPTS         = autoopts.pc
-pkgdata_DATA              = autoopts.m4 $(CLIENT_TPLS)
-
-lib_LTLIBRARIES           = libopts.la libguileopts.la
 
 nodist_libopts_la_SOURCES = libopts.c
 libopts_la_SOURCES        = $(HDRS)
-libopts_la_LIBADD         = ../snprintfv/libsnprintfv.la
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 
 libguileopts_la_SOURCES   = guileopt.c
@@ -93,12 +83,42 @@ libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
 libguileopts_la_LIBADD    = libopts.la
 libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
-bin_SCRIPTS               = autoopts-config
-
-nobase_include_HEADERS    = autoopts/options.h autoopts/usage-txt.h
-
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
+
+if INSTALL_AUTOOPTS
+INST_MANS                 = autoopts-config.1 $(GENMAN)
+INST_M4DATA               = autoopts.m4
+INST_ND_PKGDATA           = $(libsrc)
+INST_PKGCFG               = autoopts.pc
+INST_PKGDATA              = autoopts.m4 $(CLIENT_TPLS)
+INST_LIBS                 = libopts.la libguileopts.la
+NOINST_LIBS               =
+INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
+INST_SH                   = autoopts-config
+
+else !INSTALL_AUTOOPTS
+INST_MANS                 =
+INST_M4DATA               =
+INST_ND_PKGDATA           =
+INST_PKGCFG               =
+INST_PKGDATA              =
+INST_LIBS                 =
+NOINST_LIBS               = libopts.la libguileopts.la
+INST_HDRS                 =
+INST_SH                   =
+endif !INSTALL_AUTOOPTS
+
+man_MANS                  = $(INST_MANS)
+m4data_DATA               = $(INST_M4DATA)
+nodist_pkgdata_DATA       = $(INST_ND_PKGDATA)
+pkgconfig_SCRIPTS         = $(INST_PKGCFG)
+pkgdata_DATA              = $(INST_PKGDATA)
+lib_LTLIBRARIES           = $(INST_LIBS)
+noinst_LTLIBRARIES        = $(NOINST_LIBS)
+nobase_include_HEADERS    = $(INST_HDRS)
+bin_SCRIPTS               = $(INST_SH)
+
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -118,13 +138,6 @@ genshell.c : genshell.def
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c
-
-../snprintfv/snprintfv.h :
-	if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
-	ln -s $(top_srcdir)/snprintfv/snprintfv/snprintfv.h . ; fi
-
-../snprintfv/libsnprintfv.la :
-	cd ../snprintfv ; $(MAKE) libsnprintfv.la
 
 install-data-local : install-man3
 

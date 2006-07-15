@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2006-07-01 14:45:02 bkorb"
+## Time-stamp:      "2006-07-15 14:36:46 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.25 2006/07/15 14:42:42 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.26 2006/07/15 22:10:21 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -33,9 +33,7 @@ mkdir ${tag} ${tag}/compat ${tag}/autoopts ${tag}/m4
 cd ${top_builddir}/autoopts
 files=`fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
-           -e '/^streqvcmp\.c$/d' \
-           -e '/^compat\/compat\.h$/d' \
-           -e '/^autoopts\.h$/d'`
+           -e '/^compat\/compat\.h$/d' `
 
 for f in libopts.c ${files}
 do
@@ -47,15 +45,6 @@ done
 
 cd ${top_srcdir}/autoopts
 cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
-
-sed '/#ifdef AUTOGEN_BUILD/,/#endif.* AUTOGEN_BUILD/d' streqvcmp.c > \
-  ${top_builddir}/pkg/${tag}/streqvcmp.c
-
-sed '/broken printf/,/our own/d
-     /include.*"snprintfv/d
-     /#ifndef AUTOGEN_BUILD/d
-     /#else.* AUTOGEN_BUILD/,/#endif.* AUTOGEN_BUILD/d' autoopts.h > \
-  ${top_builddir}/pkg/${tag}/autoopts.h
 
 cd ../compat
 cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \

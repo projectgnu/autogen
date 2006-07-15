@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2006-07-13 18:11:31 bkorb"
+ *  Time-stamp:      "2006-07-15 13:52:50 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.24 2006/07/14 04:20:17 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.25 2006/07/15 22:10:21 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -76,7 +76,7 @@
 #undef  EXPORT
 #define EXPORT
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(__CYGWIN__)
 # define DIRCH '\\'
 #else
 # define DIRCH '/'
@@ -192,10 +192,6 @@ typedef struct {
 #  define AGFREE( p )           free( p )
 #  define AGDUPSTR( p, s, w )   p = strdup( s )
 #  define TAGMEM( m, t )
-
-#ifdef AUTOGEN_BUILD
-#  include <snprintfv/printf.h>
-#endif /* AUTOGEN_BUILD */
 
 /*
  *  DO option handling?

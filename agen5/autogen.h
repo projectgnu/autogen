@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.16 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: autogen.h,v 4.17 2006/07/15 22:10:20 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -24,8 +24,8 @@
  *             51 Franklin Street, Fifth Floor,
  *             Boston, MA  02110-1301, USA.
  */
-#ifndef AUTOGEN_HDR_H
-#define AUTOGEN_HDR_H
+#ifndef AUTOGEN_BUILD
+#define AUTOGEN_BUILD 1
 
 #include "config.h"
 #include "compat/compat.h"
@@ -586,7 +586,7 @@ static inline SCM ag_eval( tCC* pzStr )
     return res;
 }
 
-#endif /* AUTOGEN_HDR */
+#endif /* AUTOGEN_BUILD */
 /*
  * Local Variables:
  * mode: C

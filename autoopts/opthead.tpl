@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.17 2006/06/24 23:34:51 bkorb Exp $
+# $Id: opthead.tpl,v 4.18 2006/07/15 22:10:21 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-22 20:24:46 bkorb"
+# Time-stamp:      "2006-07-15 08:26:46 bkorb"
 
 =]
 /*
@@ -26,6 +26,7 @@
 #if (AO_TEMPLATE_VERSION < OPTIONS_MINIMUM_VERSION) \
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
 # error option template version mismatches autoopts/options.h header
+  Choke Me.
 #endif
 [= ENDIF not a library =]
 /*

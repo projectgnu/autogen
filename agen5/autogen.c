@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.15 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: autogen.c,v 4.16 2006/07/15 22:10:20 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -449,6 +449,7 @@ signalSetup( sighandler_proc_t* chldHandler,
 
 #ifdef DAEMON_ENABLED
 # error DAEMON-ization of AutoGen is not ready for prime time
+  Choke Me.
         case SIGHUP:
             if (HAVE_OPT( DAEMON )) {
                 sa.sa_handler = handleSighup;

@@ -9,7 +9,7 @@ dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.15 2006/06/24 23:34:50 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.16 2006/07/15 22:10:20 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,7 +23,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.15 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.16 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -223,7 +223,6 @@ else
 fi
 ]
 AC_SUBST(INCLIST)
-AC_DEFINE( [AUTOGEN_BUILD], 1, [Define this if we are building AutoGen] )
 
 case "$GCC" in
  yes)

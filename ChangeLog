@@ -1,3 +1,47 @@
+2006-07-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/install-options-h: new script for installing header
+	* autoopts/Makefile.am(INSTALL_AUTOOPTS): new AM_CONDITIONAL.
+	Do not install anything if configured with ``--disable-autoopts''
+	(libsnprintfv): do not compile or build against that convenience library.
+	(install-options-h): use this script for installing header.
+	* agen5/Makefile.am(LDADD): add libsnprintfv, not in libopts any more
+	* agen5/agShell.c(runShell): set PS4 to "ag> " in the shell environment
+	* agen5/autogen.h(header guard): guard with AUTOGEN_BUILD
+	* autoopts/autoopts.c: remove LIBSNPRINTFV stuff
+	* autoopts/autoopts.h(DIRCH): directory name separation character.
+	(SUCCESS): undef for benefit of Windows
+	(FAILURE): ditto
+	(PROBLEM): ditto, for symmetry
+	(snprintfv): remove
+	* autoopts/configfile.c(internalFileLoad): use DIRCH instead of '/'
+	(validateOptionsStruct): ditto
+	* autoopts/getopt.tpl(process_XXX_opts): ditto
+	* autoopts/load.c(insertProgramPath): ditto
+	* autoopts/save.c(findDirName): ditto
+	* autoopts/makeshell.c(textToVariable): disable emitting usage and
+	version text for shell option processing script output.
+	(genshelloptUsage): disable hosted usage output for the generated
+	genshell program (see "shell.test" if you need to understand).
+	* autoopts/pgusage.c(optionPagedUsage): For windows, just directly
+	invoke the usage generation procedure.  No piping through "more(1)".
+	* autoopts/stack.c(optionUnstackArg): the windows regex is too anemic
+	(or missing).  Do not use pattern matching for removing stacked args.
+	* columns/opts.def(snprintfv): header not needed.
+	* compat/windows-config.h: static config header for windows
+	* compat/Makefile.am: distribute it
+	* compat/compat.h(_WIN32): do funny things for windows environment
+	* compat/pathfind.c: disable for windows
+	* compat/strchr.c: new - required for windows
+	* config/libopts.def(regex): do not die if not found.  autogen must die
+	if not found, but libopts may hobble on.
+	* config/misc.def(autoopts): new disable option
+	(do-always): die if a regex library was not located.
+	* config/missing: update from upstream
+	* doc/auto_gen.tpl: @value{TITLE} is now broken.  Use autogen macros
+	to insert that text.
+	* pkg/libopts/mklibsrc.sh(windows-config.h): add to libopts sources
+
 2006-06-24  Bruce Korb  <bkorb@gnu.org>
 
 	* EVERYWHERE: cleanups for warnings
