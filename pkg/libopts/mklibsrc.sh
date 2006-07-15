@@ -7,7 +7,7 @@
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.24 2006/07/14 04:27:01 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.25 2006/07/15 14:42:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -33,10 +33,10 @@ mkdir ${tag} ${tag}/compat ${tag}/autoopts ${tag}/m4
 cd ${top_builddir}/autoopts
 files=`fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
-           -e '/HAVE_LIBSNPRINTFV$/d' \
            -e '/^streqvcmp\.c$/d' \
            -e '/^compat\/compat\.h$/d' \
            -e '/^autoopts\.h$/d'`
+
 for f in libopts.c ${files}
 do
   if test -f ${f}

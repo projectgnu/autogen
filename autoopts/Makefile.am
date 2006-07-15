@@ -8,7 +8,7 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.26 2006/06/24 23:34:51 bkorb Exp $
+## $Id: Makefile.am,v 4.27 2006/07/15 14:42:42 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -109,7 +109,6 @@ EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 libopts.c : $(HDRS) $(CSRC)
 	( echo '#define AUTOOPTS_INTERNAL' ; \
 	echo '#include "compat/compat.h"' ; \
-	echo '#define HAVE_LIBSNPRINTFV' ; \
 	echo '#define LOCAL static' ; \
 	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
