@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2006-07-15 14:36:46 bkorb"
+## Time-stamp:      "2006-07-16 08:21:48 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.26 2006/07/15 22:10:21 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.27 2006/07/16 15:27:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -25,6 +25,7 @@ tag=libopts-${ao_rev}
 cd ${top_builddir}/pkg
 [ ! -d ${tag} ] || rm -rf ${tag}
 mkdir ${tag} ${tag}/compat ${tag}/autoopts ${tag}/m4
+tagd=`pwd`/${tag}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -38,29 +39,29 @@ files=`fgrep '#include' libopts.c | \
 for f in libopts.c ${files}
 do
   if test -f ${f}
-  then cp -f ${f} ${top_builddir}/pkg/${tag}/${f}
-  else cp -f ${top_srcdir}/autoopts/${f} ${top_builddir}/pkg/${tag}/${f}
+  then cp -f ${f} ${tagd}/${f}
+  else cp -f ${top_srcdir}/autoopts/${f} ${tagd}/${f}
   fi
 done
 
 cd ${top_srcdir}/autoopts
-cp -f COPYING ${top_builddir}/pkg/${tag}/COPYING.lgpl
+cp -f COPYING ${tagd}/COPYING.lgpl
 
 cd ../compat
 cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
-   ${top_builddir}/pkg/${tag}/compat/.
+   ${tagd}/compat/.
 
 #
 #  END WORK IN SOURCE DIRECTORY
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-cd ${top_builddir}/pkg/${tag}
+cd ${tagd}
 
 cp ${top_srcdir}/config/libopts*.m4 m4/.
 chmod u+w m4/libopts.m4
 cat ${top_srcdir}/pkg/libopts/libopts-add.m4 >> m4/libopts.m4
-test -f Makefile.am && rm -f Makefile.am
+test ! -f Makefile.am || rm -f Makefile.am
 
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 cp ${top_srcdir}/pkg/libopts/COPYING* .
@@ -69,7 +70,7 @@ touch MakeDefs.inc
 
 vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 exec 3> Makefile.am
-cat >&3 <<-	EOMakefile
+cat >&3 <<- EOMakefile
 	## LIBOPTS Makefile
 	MAINTAINERCLEANFILES  = Makefile.in
 	lib_LTLIBRARIES       = libopts.la
@@ -101,7 +102,7 @@ rm -rf ${tag}
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
+## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

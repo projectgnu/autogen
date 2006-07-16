@@ -1,7 +1,7 @@
 
 /*
- *  $Id: pgusage.c,v 4.11 2006/07/15 22:10:21 bkorb Exp $
- * Time-stamp:      "2006-07-15 08:21:35 bkorb"
+ *  $Id: pgusage.c,v 4.12 2006/07/16 15:27:50 bkorb Exp $
+ * Time-stamp:      "2006-07-16 08:13:26 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -136,7 +136,7 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
         fclose( stderr );
         dup2( STDOUT_FILENO, STDERR_FILENO );
 
-        system( zPageUsage );
+        (void)system( zPageUsage );
     }
 
     case PAGER_STATE_CHILD:
