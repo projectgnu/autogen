@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-06-24 11:34:45 bkorb"
+# Time-stamp:        "2006-07-16 08:46:17 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.20 2006/06/24 23:34:51 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.21 2006/07/16 16:02:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -124,9 +124,17 @@ config_versions()
           sed 's/^/    /;$s/$/ ])/' >&4
       exec 4>&-
 
-      sed -e "s/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/" \
-          -e '/==ADD_CONFIG_FILES==/r configure.files' \
-          -e '/==ADD_CONFIG_FILES==/d' ${config_file} > configure.tmp
+      sed="-e 's/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/'"
+      case "${AG_PATCHLEVEL}" in
+      ( *[0-9]pre[1-9]* ) : ;;
+      ( * ) sed="${sed} -e '/^case .*GCC.* in/,/^esac/d'"
+            ;;
+      esac
+      sed="${sed} -e '/==ADD_CONFIG_FILES==/r configure.files'"
+      sed="${sed} -e '/==ADD_CONFIG_FILES==/d'"
+
+      : "sed ${sed} ${config_file} > configure.tmp"
+      eval sed ${sed} ${config_file} > configure.tmp
 
       mv -f configure.tmp ${config_file}
       rm -f configure.files

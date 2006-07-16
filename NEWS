@@ -1,4 +1,17 @@
-New in __CURRENT_VERSION__ - March 2006
+New in __CURRENT_VERSION__ July 2006
+
+* ag-fprintf will now allow you to emit text into a suspended output stream.
+* string tables have been implemented as a scheme function.  This makes it
+  very easy to produce an array of characters containing NUL termintaed
+  strings and have these string offsets (indexes) available for indexing into
+  the string arrays.
+* --disable-autoopts configure option.  If you have libopts/AutoOpts pre-
+  installed and do not want the install step to overwrite the installation,
+  then configure with this option.
+* The libopts code will omit Windows-unfriendly code if the compile defines
+  _WIN32 and does not define __CYGWIN__.
+
+New in 5.8.4 - March 2006
 
 * Day 1 bug in snprintfv: numberd format elements can get mishandled.
 * more platform specific variations in test output are handled.
