@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.4 2006/03/25 19:23:28 bkorb Exp $
+# $Id: snarf.tpl,v 4.5 2006/07/20 04:41:20 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -184,7 +184,7 @@ ENDDEF =][=
               "scm_init"))) =]
 void [=(. init-proc)=]( void );
 #define NEW_PROC( _An, _Ar, _Ao, _Ax ) \
-  gh_new_procedure( (char*)s_ ## _An, ag_scm_ ## _An, _Ar, _Ao, _Ax )
+  gh_new_procedure( (char*)s_ ## _An, (void*)ag_scm_ ## _An, _Ar, _Ao, _Ax )
 
 /*
  * [=group=] Initialization procedure.

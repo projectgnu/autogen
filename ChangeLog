@@ -1,3 +1,11 @@
+2006-07-19  David Taylor  <dtaylor@emc.com>
+
+	* agen5/tpProcess.c(openOutFile): increment past directory separator char
+
+2006-07-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/TODO: obsolete.  It's done now.
+
 2006-07-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/install-options-h: new script for installing header

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-07-15 08:41:17 bkorb"
+## Time-stamp:      "2006-07-19 21:40:04 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2006/07/15 22:10:20 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2006/07/20 04:41:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -39,7 +39,7 @@ csrc = \
 hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
 
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
-             bootstrap.dir schemedef.scm TODO
+             bootstrap.dir schemedef.scm
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.14 2006/06/25 00:51:11 bkorb Exp $
+ *   $Id: opts.def,v 4.15 2006/07/20 04:41:20 bkorb Exp $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -193,7 +193,11 @@ flag = {
 	base name derived from the definitions file name.  This is required if
 	there is no definitions file and advisable if definitions are being
 	read from stdin.  If the definitions are being read from standard in,
-	the base name defaults to @file{stdin}.
+	the base name defaults to @file{stdin}.  Any leading directory components
+	in the name will be silently removed.  If you wish the output file to
+	appear in a particular directory, it is recommended that you "cd" into
+	that directory first, or use directory names in the format specification
+	for the output suffix lists, @xref{pseudo macro}.
 	_EOF_;
 #else
     settable;

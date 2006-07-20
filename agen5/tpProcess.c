@@ -1,7 +1,7 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.9 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.10 2006/07/20 04:41:20 bkorb Exp $
  *  Parse and process the template data descriptions
  */
 
@@ -314,12 +314,16 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         char   z[ MAXPATHLEN ];
         tCC*   pS = strrchr( pzDefFile, '/' );
         char*  pE;
-        if (pS == NULL)
+        if (pS++ == NULL)
             pS = pzDefFile;
 
         pE = strchr( pS, '.' );
         if (pE != NULL) {
-            memcpy( z, pS, (unsigned)(pE - pS));
+            size_t len = (unsigned)(pE - pS);
+            if (len >= sizeof(z))
+                AG_ABEND( "--base-name name is too long" );
+
+            memcpy(z, pS, len);
             z[ pE - pS ] = NUL;
             pS = z;
         }
