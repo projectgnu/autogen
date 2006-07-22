@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.15 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: defDirect.c,v 4.16 2006/07/22 04:49:14 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -402,8 +402,73 @@ doDir_IGNORE( char* pzArg, char* pzScan )
 
 /*=directive assert
  *
- *  dummy:  Assert directives are ignored.
+ *  arg:  `shell-script` | (scheme-expr) | <anything else>
+ *
+ *  text:
+ *  If the @code{shell-script} or @code{scheme-expr} do not yield @code{true}
+ *  valued results, autogen will be aborted.  If @code{<anything else>} or
+ *  nothing at all is provided, then this directive is ignored.
+ *
+ *  When writing the shell script, remember this is on a preprocessing
+ *  line.  Multiple lines must be backslash continued and the result is a
+ *  single long line.  Separate multiple commands with semi-colons.
+ *
+ *  The result is @code{false} (and fails) if the result is empty, the
+ *  number zero, or a string that starts with the letters 'n' or 'f' ("no"
+ *  or "false").
 =*/
+static void
+check_assert_str( const char* pz, const char* pzArg )
+{
+    static const char fmt[] = "#assert yielded \"%s\":\n\t`%s`";
+
+    while (isspace(*pz)) pz++;
+
+    if (isdigit(*pz)) {
+        if (atoi(pz) == 0)
+            AG_ABEND( aprf( fmt, "0 (zero)", pzArg ));
+
+    } else switch (*pz) {
+    case 'f': case 'F': case 'n': case 'N': case NUL:
+        AG_ABEND( aprf( fmt, pz, pzArg ));
+    }
+}
+
+static char*
+doDir_assert( char* pzArg, char* pzScan )
+{
+    switch (*pzArg) {
+    case '`':
+    {
+        char* pzS = pzArg+1;
+        char* pzR;
+
+        pzR = strrchr(pzS, '`');
+        if (pzR == NULL)
+            break; /* not a valid script */
+
+        *pzR = NUL;
+        pzS = runShell( (const char*)pzS );
+        check_assert_str( pzS, pzArg );
+        free(pzS);
+        break;
+    }
+
+    case '(':
+    {
+        SCM res = ag_scm_c_eval_string_from_file_line(
+            pzArg, pCurCtx->pzCtxFname, pCurCtx->lineNo );
+        tCC* pzR = resolveSCM( res );
+        check_assert_str( pzR, pzArg );
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return pzScan;
+}
 
 
 /*=directive define

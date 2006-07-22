@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2006 Bruce Korb
 dnl
-dnl Time-stamp:      "2006-06-24 09:33:19 bkorb"
+dnl Time-stamp:      "2006-07-20 18:03:20 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.16 2006/07/15 22:10:20 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.17 2006/07/22 04:49:14 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,7 +23,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.16 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.17 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -126,9 +126,6 @@ fi
 AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
                    [Define this to the long+double type])
 AC_CHECK_TYPES([u_int, long long, uintmax_t])
-AC_CHECK_TYPES([uintptr_t], ,
-               [AC_DEFINE(uintptr_t, unsigned long,
-                          [Alternate uintptr_t for systems without it.])])
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
@@ -226,18 +223,9 @@ AC_SUBST(INCLIST)
 
 case "$GCC" in
  yes)
-    CFLAGS="$CFLAGS -Wall"
-    CFLAGS="$CFLAGS -Wcast-align"
-    # CFLAGS="$CFLAGS -Wcast-qual"
-    CFLAGS="$CFLAGS -Wconversion"
-    CFLAGS="$CFLAGS -Werror"
-    CFLAGS="$CFLAGS -Wfloat-equal"
-    CFLAGS="$CFLAGS -Wmissing-prototypes"
-    CFLAGS="$CFLAGS -Wpointer-arith"
-    CFLAGS="$CFLAGS -Wshadow"
-    CFLAGS="$CFLAGS -Wstrict-prototypes"
-    CFLAGS="$CFLAGS -Wwrite-strings"
-
+    CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wconversion \
+                 -Wmissing-prototypes -Wpointer-arith -Wshadow \
+                 -Wstrict-prototypes -Wwrite-strings -fno-strict-aliasing`
     ;;
 esac
 

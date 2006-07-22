@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-07-15 13:53:23 bkorb"
+## Time-stamp:      "2006-07-19 21:48:04 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.28 2006/07/15 22:10:21 bkorb Exp $
+## $Id: Makefile.am,v 4.29 2006/07/22 04:49:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -86,28 +86,14 @@ libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
-if INSTALL_AUTOOPTS
 INST_MANS                 = autoopts-config.1 $(GENMAN)
 INST_M4DATA               = autoopts.m4
 INST_ND_PKGDATA           = $(libsrc)
 INST_PKGCFG               = autoopts.pc
 INST_PKGDATA              = autoopts.m4 $(CLIENT_TPLS)
 INST_LIBS                 = libopts.la libguileopts.la
-NOINST_LIBS               =
 INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
 INST_SH                   = autoopts-config
-
-else !INSTALL_AUTOOPTS
-INST_MANS                 =
-INST_M4DATA               =
-INST_ND_PKGDATA           =
-INST_PKGCFG               =
-INST_PKGDATA              =
-INST_LIBS                 =
-NOINST_LIBS               = libopts.la libguileopts.la
-INST_HDRS                 =
-INST_SH                   =
-endif !INSTALL_AUTOOPTS
 
 man_MANS                  = $(INST_MANS)
 m4data_DATA               = $(INST_M4DATA)
@@ -115,7 +101,6 @@ nodist_pkgdata_DATA       = $(INST_ND_PKGDATA)
 pkgconfig_SCRIPTS         = $(INST_PKGCFG)
 pkgdata_DATA              = $(INST_PKGDATA)
 lib_LTLIBRARIES           = $(INST_LIBS)
-noinst_LTLIBRARIES        = $(NOINST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 

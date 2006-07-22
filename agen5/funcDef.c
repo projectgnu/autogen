@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.13 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: funcDef.c,v 4.14 2006/07/22 04:49:14 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -300,7 +300,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              *  THEN it is a "twin".  Link twins on the twin list.
              */
             if (streqvcmp( pDL->de.pzDefName, pN->de.pzDefName ) == 0) {
-                pN = linkTwins( pDL, pN, &ct );
+                pN = linkTwins( pDL, pN, (int*)&ct );
                 if (ct <= 0)
                     break;  /* pN is now invalid */
             }

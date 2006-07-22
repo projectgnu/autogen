@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.17 2006/07/15 22:10:20 bkorb Exp $
+ *  $Id: autogen.h,v 4.18 2006/07/22 04:49:14 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -31,6 +31,7 @@
 #include "compat/compat.h"
 
 #include REGEX_HEADER
+#include <libguile/scmconfig.h>
 #include <guile/gh.h>
 
 #include "opts.h"

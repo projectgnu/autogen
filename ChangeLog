@@ -1,3 +1,15 @@
+2006-07-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(main): cast around warning
+	* agen5/autogen.h: #include <libguile/scmconfig.h>
+	* agen5/defDirect.c(doDir_assert): implement
+	* agen5/expState.c(ag_scm_version_compare): convert a pair of dotted
+	version numbers into a fundamental integer type and run the passed-in
+	comparison function.
+	* agen5/test/directives.test: compare this new feature
+	* autoopts/Makefile.am: remove the dont-install functionality.
+	* config/misc.def: remove dont-install option
+
 2006-07-19  David Taylor  <dtaylor@emc.com>
 
 	* agen5/tpProcess.c(openOutFile): increment past directory separator char

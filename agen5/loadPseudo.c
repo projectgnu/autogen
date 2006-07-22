@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.5 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.6 2006/07/22 04:49:14 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -364,14 +364,14 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copyMarker( pzData, zStartMac, &startMacLen );
+            pzData = copyMarker( pzData, zStartMac, (int*)&startMacLen );
             if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copyMarker( pzData, zEndMac, &endMacLen );
+            pzData = copyMarker( pzData, zEndMac, (int*)&endMacLen );
             if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 

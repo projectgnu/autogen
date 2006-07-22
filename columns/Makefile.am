@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-07-15 15:01:20 bkorb"
+## Time-stamp:      "2006-07-20 19:47:12 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>                    
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.8 2006/07/15 22:10:21 bkorb Exp $
+## $Id: Makefile.am,v 4.9 2006/07/22 04:49:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -21,10 +21,8 @@ columns_LDADD   = $(LO_LIB) $(LIBGUILE_LIBS)
 
 BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
-AGENV           = LD_LIBRARY_PATH=`f=$(top_builddir)/autoopts ; \
-		test -d $${f}/.libs && echo $${f}/.libs || echo $${f}`
 
-RUNAG           = $(AGENV) $(AGexe) -L$(top_srcdir)/autoopts -bcolumns
+RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts -bcolumns
 man_MANS        = columns.1
 
 INCLUDES        = @INCLIST@

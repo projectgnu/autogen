@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/07/15 22:10:21 $
+ *  Last Modified:     $Date: 2006/07/22 04:49:14 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.14 2006/07/15 22:10:21 bkorb Exp $
+ *  $Id: misc.def,v 4.15 2006/07/22 04:49:14 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.14 $";
+version = "$Revision: 4.15 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -45,21 +45,6 @@ test = {
 	specifying, --disable-shell.  In the default, enabled state, the
 	"yes-subst[itution]" will enable the getdefs, columns and doc
 	subdirectory builds.
-	_EOF_;
-};
-
-test = {
-    name   = autoopts;
-    type   = disable;
-    check  = 'disable AutoOpts install';
-    action = { act-type = define; };
-
-    conditional = INSTALL_AUTOOPTS;
-
-    doc = <<-  _EOF_
-	In some build environments for AutoGen repackagers, it is not
-	desirable to install AutoOpts build products.  For such environments,
-	specify ``--disable-autoopts'' on the configure command line.
 	_EOF_;
 };
 

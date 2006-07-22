@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # directives.test --- test definition directives
 #
-# Time-stamp:        "2005-11-26 11:41:16 bkorb"
+# Time-stamp:        "2006-07-21 21:32:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/07/22 04:49:14 $
 #            by: bkorb
 #
-# $Id: directives.test,v 4.5 2005/12/05 20:46:44 bkorb Exp $
+# $Id: directives.test,v 4.6 2006/07/22 04:49:14 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -102,6 +102,22 @@ echo ${AGCMD} ${testname}.def
 MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD} failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
+
+echo '#assert `echo true`' >> ${testname}.inc
+MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD}-2 failed
+
+echo '#assert `echo false`' >> ${testname}.inc
+MORE=DOITWRONG ${AGCMD} ${testname}.def && failure ${AGCMD}-3 failed
+
+fgrep -v '#assert' ${testname}.inc > ${testname}2.inc
+mv -f ${testname}2.inc ${testname}.inc
+
+echo '#assert (version-compare > autogen-version "5.8.4")' >> ${testname}.inc
+MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD}-4 failed
+
+echo '#assert (version-compare <  autogen-version "5.8.4.63")' >> ${testname}.inc
+MORE=DOITWRONG ${AGCMD} ${testname}.def && failure ${AGCMD}-5 failed
+
 
 cleanup
 

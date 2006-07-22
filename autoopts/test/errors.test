@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-07-26 10:53:45 bkorb"
+# Time-stamp:        "2006-07-21 21:48:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 4.7 2005/12/05 20:46:44 bkorb Exp $
+# $Id: errors.test,v 4.8 2006/07/22 04:49:14 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.11 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expState.c,v 4.12 2006/07/22 04:49:14 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -26,6 +26,25 @@
  *             Boston, MA  02110-1301, USA.
  */
 
+#ifdef SCM_HAVE_T_UINT64
+  typedef uint64_t ver_type_t;
+# define VER_UNIT_SHIFT   16ULL
+# if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) >= 108
+#  define SCM_FROM(v)  scm_from_uint64(v)
+# else
+#  define SCM_FROM(v)  gh_ulong2scm((unsigned long)v)
+# endif
+
+#else
+  typedef uint32_t ver_type_t;
+# define VER_UNIT_SHIFT   8
+# ifdef HAVE_SCM_FROM_UINT32
+#  define SCM_FROM(v)  scm_from_uint32(v)
+# else
+#  define SCM_FROM(v)  gh_ulong2scm((unsigned long)v)
+# endif
+#endif
+
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static int
@@ -36,6 +55,9 @@ count_entries( char* pzName );
 
 static SCM
 find_entry_value( SCM op, SCM obj, SCM test );
+
+static ver_type_t
+str2int_ver( char* pz );
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -196,6 +218,78 @@ SCM
 ag_scm_base_name( void )
 {
     return AG_SCM_STR02SCM( (char*)(void*)OPT_ARG( BASE_NAME ));
+}
+
+
+/*=gfunc version_compare
+ *
+ * what:   compare two version numbers
+ * general_use:
+ *
+ * exparg: op, comparison operation
+ * exparg: v1, first version
+ * exparg: v2, compared-to version
+ *
+ * doc:  Converts v1 and v2 strings into 64 bit values and returns the
+ *       result of running 'op' on those values.  It assumes that the version
+ *       is a 1 to 4 part dot-separated series of numbers.  Suffixes like,
+ *       "5pre5" are presumed to be equal to the initial digits, e.g. "5".
+=*/
+static ver_type_t
+str2int_ver( char* pz )
+{
+    char* pzStr = pz;
+    ver_type_t  val = 0;
+    int ix = 4;
+
+    while (--ix >= 0) {
+        unsigned int v;
+        val <<= VER_UNIT_SHIFT;
+        while (isspace(*pz))  pz++;
+
+    next_number:
+        if (! isdigit(*pz)) break;
+        v = (unsigned int)strtoul(pz, &pz, 0) & ((1 << VER_UNIT_SHIFT) - 1);
+        if (pz == NULL)
+            break;
+        val += v;
+        if (*pz == '-') pz++;
+
+        switch (*pz) {
+        case 'p':
+            if ((pz[1] == 'r') && (pz[2] == 'e')) {
+                pz += 3;
+                val = (val << 2) - 1;
+                val <<= (VER_UNIT_SHIFT - 2);
+                if (--ix < 0) goto leave_str2int_ver;
+                goto next_number;
+            }
+            /* FALLTHROUGH */
+
+        default:
+            goto leave_str2int_ver;
+
+        case '.':
+            if (! isdigit( *(++pz) ))
+                goto leave_str2int_ver;
+            break;
+        }
+    } leave_str2int_ver: ;
+
+    while (--ix >= 0)  val <<= VER_UNIT_SHIFT;
+    fprintf( pfTrace, "0x%016llX <<== '%s'\n", (long long)val, pzStr );
+    return val;
+}
+
+SCM
+ag_scm_version_compare( SCM op, SCM v1, SCM v2 )
+{
+    tSCC  zVer[] = "version str";
+    ver_type_t  val1 = str2int_ver( ag_scm2zchars( v1, zVer ));
+    ver_type_t  val2 = str2int_ver( ag_scm2zchars( v2, zVer ));
+    v1 = SCM_FROM(val1);
+    v2 = SCM_FROM(val2);
+    return scm_apply( op, v1, scm_cons(v2, scm_listofnull));
 }
 
 

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.16 2006/07/15 22:10:20 bkorb Exp $
+ *  $Id: autogen.c,v 4.17 2006/07/22 04:49:14 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -102,7 +102,7 @@ main( int    argc,
 
 #if GUILE_VERSION >= 107000
     if (getenv( "GUILE_WARN_DEPRECATED" ) == NULL)
-        putenv( "GUILE_WARN_DEPRECATED=no" );
+        putenv( (char*)(void*)"GUILE_WARN_DEPRECATED=no" );
 #endif
 
     gh_enter( argc, argv, inner_main );

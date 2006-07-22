@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2006 Bruce Korb
 ##
-## Time-stamp:      "2006-01-24 14:44:15 bkorb"
+## Time-stamp:      "2006-07-20 19:46:52 bkorb"
 ## Copyright (c):   1997-2006 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2006/03/25 19:23:28 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2006/07/22 04:49:14 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -18,15 +18,13 @@ bin_PROGRAMS    = getdefs
 gdsrcs          = getdefs.h proto.h getdefs.c gdemit.c gdinit.c opts.c
 getdefs_SOURCES = proto.h
 nodist_getdefs_SOURCES = gd.c opts.h
-AGENV           = LD_LIBRARY_PATH=`f=$(top_builddir)/autoopts ; \
-		test -d $${f}/.libs && echo $${f}/.libs || echo $${f}`
 
 SUBDIRS         = test
 BUILT_SOURCES   = opts.c opts.h gd.c
 EXTRA_DIST      = opts.def $(gdsrcs)
 ## RUNAG        = valgrind $(AGexe)
 RUNAG           = $(AGexe)
-AGEXE_LIB       = $(AGENV) $(RUNAG) -L$(top_srcdir)/autoopts
+AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
