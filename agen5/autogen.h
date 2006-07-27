@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.18 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: autogen.h,v 4.19 2006/07/27 02:51:47 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -550,7 +550,12 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 #else
   extern char* ag_scm2zchars( SCM s, tCC* type );
 
-# define AG_SCM_STRLEN(_s)       SCM_STRING_LENGTH(_s)
+# if GUILE_VERSION < 108000
+#   define AG_SCM_STRLEN(_s)     SCM_STRING_LENGTH(_s)
+# else
+#   define AG_SCM_STRLEN(_s)     scm_c_string_length(_s)
+# endif
+
 # define AG_SCM_STRING_P(_s)     scm_is_string(_s)
 # define AG_SCM_NUMBER_P(_s)     scm_is_number(_s)
 # define AG_SCM_BOOL_P(_b)       SCM_BOOLP(_b)

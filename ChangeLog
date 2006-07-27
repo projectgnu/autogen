@@ -1,3 +1,10 @@
+2006-07-26  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/loadPseudo(doSuffixSpec): allow suffix format to be constructed
+	with a scheme expression.
+	* agen5/test/pseudo.test(new): test schemy suffix spec
+	* agen5/test/Makefile.am(pseudo.test): add test
+
 2006-07-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(main): cast around warning
@@ -9,6 +16,7 @@
 	* agen5/test/directives.test: compare this new feature
 	* autoopts/Makefile.am: remove the dont-install functionality.
 	* config/misc.def: remove dont-install option
+	* compat/snprintf.c: #include stdarg or vararg header
 
 2006-07-19  David Taylor  <dtaylor@emc.com>
 

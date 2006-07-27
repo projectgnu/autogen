@@ -1,6 +1,6 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.6 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.7 2006/07/27 02:51:47 bkorb Exp $
  *
  *  This module processes the "pseudo" macro
  */
@@ -98,17 +98,32 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    tSCC zSuffixSpecChars[] = "abcdefghijklmnopqrstuvwxyz"
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "-_./" "=%";
+    tSCC zSuffixSpecChars[] = "=%" "abcdefghijklmnopqrstuvwxyz"
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "-_./";
 
     tOutSpec*  pOS;
-    char*      pz;
+    tCC*       pzSfxFmt;
+    tCC*       pzResult;
     static tOutSpec**  ppOSList = &pOutSpecList;
 
     /*
      *  Skip over the suffix construct
      */
-    size_t spn = strspn( pzData, zSuffixSpecChars );
+    size_t spn = strspn( pzData, zSuffixSpecChars+2 );
+
+    if (pzData[spn] != '=') {
+        pzSfxFmt = NULL;
+    } else {
+        pzSfxFmt = pzData + spn;
+        if (pzSfxFmt[1] == '(') {
+            tCC *pe  = pzSfxFmt + 1 + strlen( pzSfxFmt + 1 );
+            tCC *ptr = skipScheme( pzSfxFmt+1, pe );
+            spn = ptr - pzData;
+        } else {
+            spn += strspn( pzSfxFmt, zSuffixSpecChars );
+        }
+    }
+    pzResult = pzData + spn;
 
     /*
      *  If pzFileName is NULL, then we are called by --select-suffix.
@@ -118,7 +133,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
     if (  (pzFileName != NULL)
        && (  (procState != PROC_STATE_LOAD_TPL)
           || HAVE_OPT( SELECT_SUFFIX )))
-        return pzData + spn;
+        return pzResult;
 
     /*
      *  Allocate the suffix structure
@@ -139,17 +154,37 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      *  THEN split it off from the suffix and set the formatting ptr.
      *  ELSE supply a default.
      */
-    strncpy( pOS->zSuffix, pzData, spn );
+    memcpy( pOS->zSuffix, pzData, spn );
     pOS->zSuffix[ spn ] = NUL;
 
-    pz = strchr( pOS->zSuffix, '=' );
+    if (pzSfxFmt != NULL) {
+        spn = pzSfxFmt - pzData;
+        pOS->zSuffix[spn] = NUL;
+        pzSfxFmt = pOS->zSuffix + spn + 1;
 
-    if (pz != NULL) {
-        tSCC zFileFmt3[] = "%s";
-        *pz++ = NUL;
-        if (*pz == NUL)
-             pOS->pzFileFmt = zFileFmt3;
-        else pOS->pzFileFmt = pz;
+        switch (*pzSfxFmt) {
+        case NUL:
+        {
+            tSCC zFileFmt3[] = "%s";
+            pOS->pzFileFmt = zFileFmt3;
+            break;
+        }
+
+        case '(':
+        {
+            SCM str =
+                ag_scm_c_eval_string_from_file_line(
+                    pzSfxFmt, pzFileName, lineNo );
+            tCC *pzStr;
+            AGDUPSTR( pzStr, resolveSCM( str ), "Scheme suffix format");
+            pOS->pzFileFmt = pzStr;
+            break;
+        }
+
+        default:
+            pOS->pzFileFmt = pzSfxFmt;
+            break;
+        }
 
     } else {
         tSCC zFileFmt1[] = "%s.%s";
@@ -164,7 +199,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
         else pOS->pzFileFmt = zFileFmt2;
     }
 
-    return pzData + spn;
+    return pzResult;
 }
 
 

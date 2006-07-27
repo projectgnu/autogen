@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.17 2006/06/24 23:34:51 bkorb Exp $
+# $Id: optmain.tpl,v 4.18 2006/07/27 02:51:47 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-24 14:43:32 bkorb"
+# Time-stamp:      "2006-07-22 08:37:12 bkorb"
 
 =][=
 
@@ -491,6 +491,7 @@ DEFINE decl-callbacks
  *  Declare option callback procedures
  */[=
   (define undef-proc-names "")
+  (define decl-type "")
   (define extern-proc-list (string-append
 
     "optionPagedUsage\n"
@@ -519,7 +520,20 @@ DEFINE decl-callbacks
           txt-var )  ))
 
   (define static-proc-list "doUsageOpt\n")
-  (define static-test-list static-proc-list)   =][=
+  (define static-test-list static-proc-list)
+  (define ifdef-fmt (string-append
+    "\n#if%1$sdef %2$s"
+    "\n  %3$s tOptProc %4$s;"
+    "\n#else /* not %2$s */"
+    "\n# define %4$s NULL"
+    "\n#endif /* def/not %2$s */"))
+
+  (define set-ifdef (lambda(n-or-def ifdef-cb ifdef-name) (begin
+     (set! decl-type (if (hash-ref is-ext-cb-proc flg-name) "extern" "static"))
+     (ag-fprintf 0 ifdef-fmt n-or-def ifdef-name decl-type ifdef-cb )
+  )))
+
+  =][=
 
   FOR    flag   =][=
 
@@ -529,10 +543,9 @@ DEFINE decl-callbacks
     ;;  extern-proc-list - external callouts for normal compilation
     ;;  static-proc-list - static callouts for normal compilation
     ;;
-    ;;  For any of these that are under separate ifdef control, then
-    ;;  the name gets #defined to a "doUsageOpt" call.  That is a
-    ;;  static procedure that will always get called.
-
+    ;;  Anything under the control of "if[n]def" has the declaration or
+    ;;  #define to NULL emitted immediately.
+    ;;
     (set! flg-name (get "name"))
     (if (hash-ref have-cb-procs flg-name)
         (begin
@@ -549,31 +562,15 @@ DEFINE decl-callbacks
 
           (set! tmp-val (hash-ref cb-proc-name flg-name))
 
+          (if (exist? "ifdef")  (set-ifdef ""  tmp-val (get "ifdef"))
+          (if (exist? "ifndef") (set-ifdef "n" tmp-val (get "ifdef"))
           (if (hash-ref is-ext-cb-proc flg-name)
-              (set! extern-proc-list (string-append extern-proc-list
-                    (hash-ref cb-proc-name flg-name) "\n" ))
+              (set! extern-proc-list (string-append
+                    extern-proc-list tmp-val "\n" ))
 
-              (set! static-proc-list (string-append static-proc-list
-                    (hash-ref cb-proc-name flg-name) "\n" ))
-          )
-
-          (if (exist? "ifdef") (begin
-              (emit (sprintf "\n#ifndef %s\n#define %s doUsageOpt\n#endif"
-                         (get "ifdef") tmp-val ))
-              (set! undef-proc-names (string-append undef-proc-names
-                 (sprintf
-                     "\n#ifndef %1$s\n#undef  %2$s\n#define %2$s NULL\n#endif"
-                     (get "ifdef") tmp-val )  ))
-          )   )
-
-          (if (exist? "ifndef") (begin
-              (emit (sprintf "\n#ifdef %s\n#define %s doUsageOpt\n#endif"
-                             (get "ifdef") tmp-val ))
-              (set! undef-proc-names (string-append undef-proc-names
-                 (sprintf
-                     "\n#ifdef %1$s\n#undef  %2$s\n#define %2$s NULL\n#endif"
-                     (get "ifndef") tmp-val )  ))
-          )   )
+              (set! static-proc-list (string-append
+                    static-proc-list tmp-val "\n" ))
+          )))
     )   )
 
     ""          =][=
@@ -582,10 +579,8 @@ DEFINE decl-callbacks
 
   IF (. make-test-main)
 
-=][=
-(tpl-file-line extract-fmt)
 =]
-#if defined([=(. main-guard)=])
+#if defined([=(tpl-file-line extract-fmt) main-guard =])
 /*
  *  Under test, omit argument processing, or call optionStackArg,
  *  if multiple copies are allowed.
