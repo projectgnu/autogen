@@ -1087,12 +1087,21 @@ stdout.  The current suffix for each pass can be determined with the
 @code{(suffix)} scheme function (@pxref{SCM suffix}).
 
 The suffix specification consists of a sequence of POSIX compliant file name
-characters and, optionally, an equal sign and a file name "printf"-style
-formatting string.  Two string arguments are allowed for that string:
-the base name of the definition file and the current suffix (that being
+characters and, optionally, an equal sign and a file name formatting
+specification.  That specification may be either an ordinary sequence
+of file name characters with zero, one or two "%s" formatting sequences
+in it, or else it may be a Scheme expression that, when evaluated,
+produces such a string.  The two string arguments allowed for that string are
+the base name of the definition file, and the current suffix (that being
 the text to the left of the equal sign).  (Note:  "POSIX compliant file
 name characters" consist of alphanumerics plus the period (@code{.}),
 hyphen (@code{-}) and underscore (@code{_}) characters.)
+
+If the suffix begins with one of these three latter characters and
+a formatting string is not specified, then that character is presumed to
+be the suffix separator.  Otherwise, without a specified format string,
+a single period will separate the suffix from the base name in constructing
+the output file name.
 
 @item
 Comment lines:  blank lines, lines starting with a hash mark [@code{#}]),
