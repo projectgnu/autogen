@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/07/22 04:49:14 $
+ *  Last Modified:     $Date: 2006/07/28 03:40:12 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.15 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: misc.def,v 4.16 2006/07/28 03:40:12 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.15 $";
+version = "$Revision: 4.16 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -66,8 +66,38 @@ test   = {
 #endif
 
 test   = {
-  name     = "guile";
-  type     = "withlib";
+  name     = setjmp;
+  type     = link;
+  check    = 'setjmp() links okay';
+  code     = <<- _EOCode_
+	#include <setjmp.h>
+	jmp_buf bf;
+	return setjmp(&bf);
+	_EOCode_;
+  action = {
+    act-type = script;
+    act-text = 'AC_DEFINE(HAVE_WORKING_SETJMP, 1, [setjmp links okay])';
+  };
+};
+
+test   = {
+  name     = sigsetjmp;
+  type     = link;
+  check    = 'sigsetjmp() links okay';
+  code     = <<- _EOCode_
+	#include <setjmp.h>
+	sigjmp_buf bf;
+	return sigsetjmp(&bf,0);
+	_EOCode_;
+  action = {
+    act-type = script;
+    act-text = 'AC_DEFINE(HAVE_WORKING_SIGSETJMP, 1, [sigsetjmp links okay])';
+  };
+};
+
+test   = {
+  name     = guile;
+  type     = withlib;
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
 	#include <guile/gh.h>
@@ -90,7 +120,7 @@ test   = {
 	  scm_wrong_type_arg( "oops", 1, bumble );
 	  return 0; }
 	_END_OF_CODE_;
-  run-mode   =  "link";
+  run-mode   =  link;
 
   config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
   action = { yes; act-type = script;
@@ -152,7 +182,7 @@ test   = {
 
 test   = {
   name      = "eval_string";
-  type      = "link";
+  type      = link;
   check     = "scm_primitive_eval_x links";
   cflags    = "${ag_cv_with_libguile_cflags}";
   libs      = "${ag_cv_with_libguile_libs}";
