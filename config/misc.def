@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/07/28 03:40:12 $
+ *  Last Modified:     $Date: 2006/08/01 19:29:58 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.16 2006/07/28 03:40:12 bkorb Exp $
+ *  $Id: misc.def,v 4.17 2006/08/01 19:29:58 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.16 $";
+version = "$Revision: 4.17 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -408,6 +408,7 @@ test = {
 
 do-always = <<- _END_ALWAYS_
 	INVOKE_LIBOPTS_MACROS
+	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
 	AC_CHECK_FUNCS(fopencookie funopen, break)
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
 	*yes* )

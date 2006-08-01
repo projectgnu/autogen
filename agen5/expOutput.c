@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.13 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: expOutput.c,v 4.14 2006/08/01 19:29:58 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -431,24 +431,14 @@ ag_scm_out_push_new( SCM new_file )
         /*
          *  IF we do not have fopencookie(3GNU) or funopen(3BSD), then this
          *  block is a pure "else" clause.  If we do have one of those, then
-         *  the block is executed when a file name is not s specified *and*
+         *  the block is executed when a file name is not specified *and*
          *  --no-fmemopen was *not* selected.
          */
-        tSCC* pzTemp = NULL;
+        static char const * pzTemp = NULL;
         int tmpfd;
 
-        if (pzTemp == NULL) {
-            tCC* pz = getenv( "TEMP" );
-            if (pz == NULL) {
-                pz = getenv( "TMP" );
-                if (pz == NULL)
-                    pz = "/tmp";
-            }
-
-            pzTemp = aprf( "%s/agtmp.XXXXXX", pz );
-            manageAllocatedData((void*)pzTemp);
-            TAGMEM( pzTemp, "Saved temp file template" );
-        }
+        if (pzTemp == NULL)
+            pzTemp = mkstempPat();
 
         AGDUPSTR( pzNewFile, pzTemp, "temp file name" );
         p->flags |= FPF_UNLINK;

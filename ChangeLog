@@ -4,6 +4,13 @@
 	with a scheme expression.
 	* agen5/test/pseudo.test(new): test schemy suffix spec
 	* agen5/test/Makefile.am(pseudo.test): add test
+	* agen5/autogen.h(SCM_STRING_LENGTH): newly obsolescent for Guile 1.8
+	* autoopts/optmain.tpl(ifdef): ifdef-ed/ifndef-ed callback procedures
+	must be individually declared.
+	* autoopts/streqvcmp.c(strrtransform): ansify the proc header
+	* autoopts/version.c(optionPrintVersion): ditto
+	(optionVersionStderr): ditto
+	* compat/snprintf.c: handle varargs correctly if using HAVE_VARARGS_H.
 
 2006-07-21  Bruce Korb  <bkorb@gnu.org>
 

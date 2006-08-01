@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.9 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: agUtils.c,v 4.10 2006/08/01 19:29:58 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -78,6 +78,35 @@ aprf( const char* pzFmt, ... )
         AG_ABEND( z );
     }
     return pz;
+}
+
+
+LOCAL char*
+mkstempPat( void )
+{
+    static char const * pzTmpDir = NULL;
+
+    if (pzTmpDir == NULL) {
+        static char const * const envlist[] = {
+            "TMPDIR", "TEMP", "TMP", NULL };
+        char const * const * penv = envlist;
+        for (;;) {
+            pzTmpDir = getenv(*penv);
+            if (pzTmpDir != NULL)
+                break;
+            if (*(++penv) == NULL) {
+                pzTmpDir = "/tmp";
+                break;
+            }
+        }
+    }
+
+    {
+        char* pzRes = aprf("%s/agtmp.XXXXXX", pzTmpDir);
+        manageAllocatedData((void*)pzRes);
+        TAGMEM( pzRes, "temp file template" );
+        return pzRes;
+    }
 }
 
 

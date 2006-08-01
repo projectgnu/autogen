@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: agCgi.c,v 4.10 2006/08/01 19:29:58 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -97,15 +97,7 @@ loadCgi( void )
     pzOopsPrefix = zOops;
     {
         int tmpfd;
-        tCC* pz = getenv( "TMPDIR" );
-        if (pz == NULL) {
-            pz = getenv( "TMP" );
-            if (pz == NULL)
-                pz = "/tmp";
-        }
-
-        pzTmpStderr = aprf( "%s/agtmp.XXXXXX", pz );
-        TAGMEM( pzTmpStderr, "temp stderr file template" );
+        pzTmpStderr = mkstempPat();
         tmpfd = mkstemp( pzTmpStderr );
         if (tmpfd < 0)
             AG_ABEND(aprf("failed to create temp file from `%s'", pzTmpStderr));

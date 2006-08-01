@@ -1104,7 +1104,7 @@ a single period will separate the suffix from the base name in constructing
 the output file name.
 
 @item
-Comment lines:  blank lines, lines starting with a hash mark [@code{#}]),
+Comments:  blank lines, lines starting with a hash mark [@code{#}]),
 and edit mode comments (text between pairs of @code{-*-} strings).
 
 @item
