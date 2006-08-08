@@ -287,7 +287,7 @@ zsh, you cannot do this.  Csh is sufficiently difficult to program that
 it is unsupported.  Zsh, though largely programmable, also has some
 anomalies that make it incompatible with AutoGen usage.  Therefore, when
 invoking AutoGen from these environments, you must be certain to set the
-SHELL environment variable to a Bourne-derived shell.  e.g., sh, ksh or
+SHELL environment variable to a Bourne-derived shell, e.g., sh, ksh or
 bash.
 
 Any shell you choose for your own scripts need to follow these basic
@@ -583,7 +583,7 @@ directory is always issued before the new command is issued.
 
 A simple string that does not contain white space @i{may} be left
 unquoted.  The string must not contain any of the characters special to
-the definition text (i.e. @code{"}, @code{#}, @code{'}, @code{(},
+the definition text (i.e., @code{"}, @code{#}, @code{'}, @code{(},
 @code{)}, @code{,}, @code{;}, @code{<}, @code{=}, @code{>}, @code{[},
 @code{]}, @code{`}, @code{@{}, or @code{@}}).  This list is subject to
 change, but it will never contain underscore (@code{_}), period
@@ -684,7 +684,7 @@ an escape @code{\} or join them with previous lines:
 
 In AutoGen, every name is implicitly an array of values.
 When assigning values, they are usually implicitly
-assiged to the next highest slot.  They can also be
+assigned to the next highest slot.  They can also be
 specified explicitly:
 
 @example
@@ -1365,7 +1365,7 @@ Additionally, other than in the @code{%} and @code{?%} expressions, the
 Guile expressions may be introduced with the Guile comment character
 (@code{;}) and you may put a series of Guile expressions within a single
 macro.  They will be implicitly evaluated as if they were arguments
-to the @code{(begin ...)} expression.  The result will be the the
+to the @code{(begin ...)} expression.  The result will be the
 result of the last Guile expression evaluated.
 @end table
 
@@ -1622,7 +1622,7 @@ with the @code{--lib-template} option
 
 As for AutoGen native macros, do not add any. It is easy to do, but I
 won't like it.  The basic functions needed to accomplish looping over
-and selecting blocks of text have proven to be sufficient over a period
+and selecting blocks of text have proved to be sufficient over a period
 of several years.  New text transformations can be easily added via any
 of the AutoGen extension methods, as discussed above.
 
@@ -2960,7 +2960,7 @@ definition of a flag, may appear only once.
 @table @samp
 @cindex value
 @item value
-The flag character to specify for traditional option flags.  e.g. @code{-L}.
+The flag character to specify for traditional option flags, e.g., @code{-L}.
 
 @cindex max
 @item max
@@ -3070,7 +3070,7 @@ selected before getting an option argument value!
 
 During the presetting phase of option processing (@pxref{Presetting
 Options}), equivalenced options may be specified.  However, if different
-equivalanced members are specified, only the last instance will be
+equivalenced members are specified, only the last instance will be
 recognized and the others will be discarded.  A conflict error is indicated
 only when multiple different members appear on the command line itself.
 
@@ -4485,7 +4485,7 @@ are the regular names with all special characters converted to
 underscores (@code{_}).)
 
 Option specific environment variables are processed after (and thus
-take precidence over) the contents of the @code{PROGRAM} environment
+take precedence over) the contents of the @code{PROGRAM} environment
 variable.  The option argument string for these options takes on the
 string value gotten from the environment.  Consequently, you can only
 have one instance of the @code{OPTNAME}.

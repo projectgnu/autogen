@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # pseudo.test --- test the select pseudo option
 #
-# Time-stamp:        "2006-07-26 19:46:50 bkorb"
+# Time-stamp:        "2006-08-01 13:34:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2006/07/27 02:51:47 $
+# Last Modified:     $Date: 2006/08/08 14:48:44 $
 #            by: bkorb
 #
-# $Id: pseudo.test,v 4.1 2006/07/27 02:51:47 bkorb Exp $
+# $Id: pseudo.test,v 4.2 2006/08/08 14:48:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -53,8 +53,6 @@ CASE (suffix) =][=
 
 ESAC =]
 _EOF_
-
-# # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 
 # # # # # # # # # # RUN TESTS # # # # # # #
 

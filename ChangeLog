@@ -1,3 +1,14 @@
+2006-08-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* doc/autogen-texi.txt: Fix some typos.
+
+2006-08-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c(mkstempPat): new function
+	* agen5/agCgi.c(loadCgi): use it
+	* agen5/expOutput.c(ag_scm_out_push_new): use it
+	* config/libopts.def(AC_CHECK_TYPES): check for uint_t, too
+
 2006-07-26  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/loadPseudo(doSuffixSpec): allow suffix format to be constructed

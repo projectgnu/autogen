@@ -5,11 +5,23 @@ New in __CURRENT_VERSION__ July 2006
   very easy to produce an array of characters containing NUL termintaed
   strings and have these string offsets (indexes) available for indexing into
   the string arrays.
-* --disable-autoopts configure option.  If you have libopts/AutoOpts pre-
-  installed and do not want the install step to overwrite the installation,
-  then configure with this option.
 * The libopts code will omit Windows-unfriendly code if the compile defines
   _WIN32 and does not define __CYGWIN__.
+* suffix specifications in the pseudo macro may now construct an output
+  file name format string using scheme code, a la:
+
+    [= autogen5 template
+    h=(string-append (getenv "TMPDIR") "/%s-hdr.h")  =]
+
+  The "%s" will still be replaced by the base name.
+* the scheme function "version-compare" will allow you to compare
+  two dotted version numbers.  These can be your own versions or
+  that of autogen.  The scheme variable ``autogen-version'' has been
+  around for a long time and may be used as one of the arguments.
+* #assert is now active in definition files.  If the text begins
+  with a back quote, it is handed off to the shell for processing.
+  If an open parenthesis, it is handed off to Guile.  If it is
+  anything else, it is ignored.
 
 New in 5.8.4 - March 2006
 
@@ -39,30 +51,3 @@ New in 5.8 - December, 2005
   feature being added to the syntax.  See the doc on the pseudo-macro.
 * Fixed a bug wherein out-of-order definitions could get mistyped causing
   various catastrophic results.
-
-New in 5.7.3 - October, 2005
-
-* Definition and license text files were mmap-ed in without checking for
-  the size being a multiple of a page.  strlen() would seg fault.
-  Horrible, horrible design of mmap!
-* disable autoopts/test/getopt.test unless autoopts has been fully installed.
-  (It requires getopt.tpl which requires a fully installed environment.)
-* several other usability improvements to the tear off library.
-
-New in 5.7.2 - July 2005
-
-* template shell code may now use a shell function "die" that will print
-  an error message and shoot down the master autogen process.
-* the tear-off/add-in libopts library will now specify that the
-  "options.h" header is to be installed.
-* realpath(3C) usage in libopts has been cleaned up.  It is now only used
-  if PATH_MAX is defined for the platform.  canonicalize_file_name(3C) is
-  used where available.
-
-New in 5.7.1 - June, 2005
-
-* Update to libtool 1.5.18
-* add "arg-range" text to the generated man pages
-* Update the FSF address
-* added a script to convert the "libopts" tarball into a full,
-  independently buildable, project.

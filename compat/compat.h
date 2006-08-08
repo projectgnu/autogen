@@ -2,12 +2,12 @@
 
 /* --- fake the preprocessor into handlng portability */
 /*
- *  Time-stamp:      "2006-07-15 08:27:23 bkorb"
+ *  Time-stamp:      "2006-08-08 07:37:12 bkorb"
  *
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.10 2006/07/15 22:10:21 bkorb Exp $
+ * $Id: compat.h,v 4.11 2006/08/08 14:48:44 bkorb Exp $
  */
 #ifndef COMPAT_H_GUARD
 #define COMPAT_H_GUARD 1
@@ -151,7 +151,7 @@
 
 #include <time.h>
 
-#ifndef __windows__
+#ifdef HAVE_UTIME_H
 #  include <utime.h>
 #endif
 
