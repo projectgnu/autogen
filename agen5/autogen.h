@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.19 2006/07/27 02:51:47 bkorb Exp $
+ *  $Id: autogen.h,v 4.20 2006/08/12 17:31:50 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -552,8 +552,12 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 
 # if GUILE_VERSION < 108000
 #   define AG_SCM_STRLEN(_s)     SCM_STRING_LENGTH(_s)
+#   define AG_SCM_CHARS(_s)      SCM_STRING_CHARS(_s)
+#   define AG_SCM_VEC_P(_v)      SCM_VECTORP(_v)
 # else
 #   define AG_SCM_STRLEN(_s)     scm_c_string_length(_s)
+#   define AG_SCM_CHARS(_s)      SCM_STRING_CHARS(_s)
+#   define AG_SCM_VEC_P(_v)      scm_is_vector(_v)
 # endif
 
 # define AG_SCM_STRING_P(_s)     scm_is_string(_s)
@@ -562,7 +566,6 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 # define AG_SCM_SYM_P(_s)        SCM_SYMBOLP(_s)
 # define AG_SCM_IS_PROC(_p)      scm_is_true( scm_procedure_p(_p))
 # define AG_SCM_CHAR_P(_c)       SCM_CHARP(_c)
-# define AG_SCM_VEC_P(_v)        SCM_VECTORP(_v)
 # define AG_SCM_PAIR_P(_p)       scm_is_true( scm_pair_p(_p))
 # define AG_SCM_NUM_P(_n)        SCM_NUMBERP(_n)
 # define AG_SCM_LIST_P(_l)       SCM_NFALSEP( scm_list_p(_l))
@@ -570,7 +573,6 @@ static inline char* ag_scm2zchars( SCM s, tCC* type )
 # define AG_SCM_MKSTR(_s, _ch)   MUST NOT USE
 
 # define AG_SCM_EVAL_STR(_s)     scm_c_eval_string(_s)
-# define AG_SCM_CHARS(_s)        SCM_STRING_CHARS(_s)
 # define AG_SCM_STR2SCM(_st,_sz) scm_from_locale_stringn(_st,_sz)
 # define AG_SCM_STR02SCM(_s)     scm_from_locale_string(_s)
 # define AG_SCM_INT2SCM(_i)      gh_int2scm(_i)

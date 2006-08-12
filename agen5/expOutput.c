@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.14 2006/08/01 19:29:58 bkorb Exp $
+ *  $Id: expOutput.c,v 4.15 2006/08/12 17:31:50 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -422,11 +422,10 @@ ag_scm_out_push_new( SCM new_file )
         addWriteAccess( pzNewFile );
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     }
-#   if defined(ENABLE_FMEMOPEN)
-    else if (! HAVE_OPT( NO_FMEMOPEN ))
-#   else
     else
-#   endif
+#if defined(ENABLE_FMEMOPEN)
+    if (! HAVE_OPT( NO_FMEMOPEN ))
+#endif
     {
         /*
          *  IF we do not have fopencookie(3GNU) or funopen(3BSD), then this
@@ -449,19 +448,19 @@ ag_scm_out_push_new( SCM new_file )
         p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
         close( tmpfd );
     }
-#   ifdef ENABLE_FMEMOPEN
-    else {
+#if defined(ENABLE_FMEMOPEN)
+    else
+    {
         /*
          *  This block is a pure "else" clause that is only compiled if neither
          *  "fopencookie" nor "funopen" is available in the local C library.
-         *  Otherwise, anonymous output without --no-fmemopen being selected
-         *  will get us here.
+         *  We reach here if --no-fmemopen was *not* on the command line.
          */
         p->pFile  = ag_fmemopen( NULL, 0, "wb+" );
         pzNewFile = (char*)"in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
     }
-#   endif /* ENABLE_FMEMOPEN */
+#endif /* ENABLE_FMEMOPEN */
 
     if (p->pFile == NULL)
         AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,

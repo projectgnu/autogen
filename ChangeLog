@@ -1,3 +1,9 @@
+2006-08-12  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/usage.c: Fix warning for a dumb compiler
+	* autoopts/autoopts.h: Fix warning for dumb environment (Windows)
+	* agen5/autogen.h: Fix warnings from new Guile deprecations
+
 2006-08-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* doc/autogen-texi.txt: Fix some typos.
