@@ -128,20 +128,20 @@
 ;;;  *   The final @code{#define} name is stored in an SCM symbol named
 ;;;  *   @code{header-guard}.  Consequently, the concluding @code{#endif} for the
 ;;;  *   file should read something like:
-;;;  *	 
+;;;  *
 ;;;  *   @example
 ;;;  *   #endif /* [+ (. header-guard) +] */
 ;;;  *   @end example
-;;;  *   
+;;;  *
 ;;;  *	 The name of the header file (the current output file) is also stored
 ;;;  *   in an SCM symbol, @code{header-file}.  Therefore, if you are also
 ;;;  *   generating a C file that uses the previously generated header file,
 ;;;  *   you can put this into that generated file:
-;;;  *   
+;;;  *
 ;;;  *   @example
 ;;;  *   #include "[+ (. header-file) +]"
 ;;;  *   @end example
-;;;  *   
+;;;  *
 ;;;  *   Obviously, if you are going to produce more than one header file from
 ;;;  *   a particular template, you will need to be careful how these SCM symbols
 ;;;  *   get handled.
@@ -213,7 +213,7 @@
 ;;;  *    `'   (out-push-new)
 ;;;  *    `'   (define ix 0)
 ;;;  *    `'   (define ct 1)  +][+
-;;;  *      
+;;;  *
 ;;;  *      FOR str IN that was the week that was +][+
 ;;;  *    `'  (set! ct (+ ct 1))
 ;;;  *    `'  (set! ix (string-table-add "scribble" (get "str")))

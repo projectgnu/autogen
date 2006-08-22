@@ -2,8 +2,8 @@
 
 html
 
-# Time-stamp: "2006-06-03 13:16:44 bkorb"
-# Version:    "$Revision: 4.7 $
+# Time-stamp: "2006-08-22 07:17:31 bkorb"
+# Version:    "$Revision: 4.8 $
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -11,7 +11,7 @@ html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.7 2006/06/03 20:37:44 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.8 2006/08/22 16:06:36 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -122,9 +122,9 @@ Return to the <a href="/home.html">GNU Project home page</a>.
 </p>
 
 <p>
-Please send FSF &amp; GNU inquiries to 
+Please send FSF &amp; GNU inquiries to
 <a href="mailto:gnu@gnu.org"><em>gnu@gnu.org</em></a>.
-There are also <a href="/home.html#ContactInfo">other ways to contact</a> 
+There are also <a href="/home.html#ContactInfo">other ways to contact</a>
 the FSF.
 <br />
 Please send broken links and other corrections (or suggestions) to
@@ -142,7 +142,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2006/06/03 20:37:44 $ $Author: bkorb $
+$Date: 2006/08/22 16:06:36 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

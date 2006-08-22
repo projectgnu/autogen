@@ -1,15 +1,15 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-#  -*- Mode: Sh -*- 
+#  -*- Mode: Sh -*-
 # ----------------------------------------------------------------------
 # bootstrap.dir --- script to create generated files in this directory
 #
 # Author:	      Gary V. Vaughan <gvv@techie.com>
 # Maintainer:	      Gary V. Vaughan <gvv@techie.com>
 # Created:	      Wed Jul 14 10:49:15 1999
-# Last Modified:      Thu Aug  5 14:14:36 1999				      
+# Last Modified:      Thu Aug  5 14:14:36 1999
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.4 2006/06/17 15:06:15 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.5 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 # Copyright (C) 1999 Gary V. Vaughan
 #

@@ -26,20 +26,20 @@
 	* README (Note to HP/UX users):  Removed.  AutoGen now passes
 	the test suite with the native regex implementation, and configure
 	will now turn on ANSI compatibility by itself.
-	
+
 	* MakeRules.in (TPLDIRS): add -L $(top_srcdir)/compat so that
 	autogen can rebuild strsignal.h.
 	* src/Makefile.am (TPLDIRS): ditto.
-	
+
 	* getdefs/Makefile.am (INCLUDES): add -I$(top_srcdir)/snprintfv so
 	that the compiler can find snprintfv.h.
-	
+
 	* autoopts/autoopts.c (#ident): Use a "static const char" array,
 	or else HP/UX cc barfs.
 
 	* configure.in (AM_PROG_CC_STDC): Required to put native compilers
 	into ANSI compatible mode.
-	
+
 1999-08-05  Bruce Korb <bkorb@gnu.org>
 
 	* config/bootstrap.local: Fixed the hack for inserting
@@ -55,7 +55,7 @@
 
 	* */*.tpl: put a space between the sed '-e' flag and the
 	associated text.
-	
+
 1999-07-30  Gary V. Vaughan  <gvv@techie.com>
 
 	* TODO: Added a Known Bugs section.
@@ -72,7 +72,7 @@
 
 	* configure.in:  Reapply patch to pass
 	--enable-snprintfv-convenience to snprintfv subconfigure.
-	
+
 	* configure.in (AC_CHECK_HEADERS): prefer stdarg.h over varargs.h:
 	Reapply this patch too.
 
@@ -91,7 +91,7 @@
 	* configure.in (AG_CHECK_LIB_REGEX): s/POSIX_REGCOMP/LIB_REGEX/g,
 	AC_CHECK_LIB_REGEX is a superset of the other, and is the only one
 	which provides the configure script cli options. Reapplied.
-	
+
 1999-07-29  Bruce Korb <bkorb@gnu.org>
 
 	* config/bootstrap.local: Add checks for working AutoGen.

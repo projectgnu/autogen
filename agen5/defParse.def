@@ -77,7 +77,7 @@ transition =
  *  or an '=' to start a value list or a '[' for an indexed value.
  */
 transition =
-{ tst = have_name;    tev   = lit_semi;        next = need_name;     
+{ tst = have_name;    tev   = lit_semi;        next = need_name;
                       ttype = empty_val; },
 { tst = have_name;    tev   = lit_eq;          next = need_value; },
 { tst = have_name;    tev   = lit_open_bkt;    next = need_idx; ttype = noop; },

@@ -1,4 +1,4 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
@@ -6,10 +6,10 @@
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18
-## Last Modified:   Thu Jul 29 13:42:18 1999				      
+## Last Modified:   Thu Jul 29 13:42:18 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2006/03/25 19:23:29 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2006/08/22 16:06:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = convert.test

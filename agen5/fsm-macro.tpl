@@ -6,7 +6,7 @@
 
 DEFINE emit-invalid-msg =][=
 
-  ;; "defs" indexes will be diverted.  The 
+  ;; "defs" indexes will be diverted.  The
   (define tmp-text     "")
   (define str-table    (string-append "z" Pfx "Strings"))
   (string-table-new    str-table)

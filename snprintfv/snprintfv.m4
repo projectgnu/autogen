@@ -3,7 +3,7 @@ dnl AC_SNPRINTFV_CONVENIENCE[(dir)] - sets LIBSNPRINTFV to the link flags for
 dnl the snprintfv convenience library and INCSNPRINTFV to the include flags for
 dnl the snprintfv header and adds --enable-snprintfv-convenience to the
 dnl configure arguments.  Note that AC_CONFIG_SUBDIRS is not called.  If DIR
-dnl is not provided, it is assumed to be `snprintfv'.  LIBSNPRINTFV will be 
+dnl is not provided, it is assumed to be `snprintfv'.  LIBSNPRINTFV will be
 dnl prefixed with '${top_builddir}/' and INCSNPRINTFV will be prefixed with
 dnl '${top_srcdir}/' (note the single quotes!).  If your package is not
 dnl flat and you're not using automake, define top_builddir and

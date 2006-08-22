@@ -1,6 +1,6 @@
-/*  
+/*
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
- *  
+ *
  *  It has been AutoGen-ed  Tuesday June 13, 2006 at 02:42:42 PM PDT
  *  From the definitions    defParse.def
  *  and the template file   fsm
@@ -10,7 +10,7 @@
  *  Copyright (c) 2001-2006  by  Bruce Korb
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
- *  
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
@@ -22,7 +22,7 @@
  *  3. Neither the name ``Bruce Korb'' nor the name of any other
  *     contributor may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *  
+ *
  *  AutoFSM IS PROVIDED BY Bruce Korb ``AS IS'' AND ANY EXPRESS
  *  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE

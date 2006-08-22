@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.15 2006/07/20 04:41:20 bkorb Exp $
+ *   $Id: opts.def,v 4.16 2006/08/22 16:06:36 bkorb Exp $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -566,7 +566,7 @@ flag = {
 	        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
 	    else
 	        pfTrace = fopen( pOptDesc->pzLastArg, "w" );
-	
+
 	    if (pfTrace == NULL) {
 	        fprintf( stderr, "Error %d (%s) opening `%s' for output",
 	                 errno, strerror( errno ), pOptDesc->pzLastArg );

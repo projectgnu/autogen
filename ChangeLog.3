@@ -181,7 +181,7 @@
 	* doc/compete.def: remove redundand definitions
 	* autoopts/test/stdopts.test: test functionality of stdoptions.def,
 	especially the keyword attributes for --verbose.
-	
+
 2001-10-01  Bruce Korb  <bkorb@gnu.org>
 
 	* everywhere: much doc cleanups
@@ -301,7 +301,7 @@
 	(build_defs): remove anonymous template handling code.  Obsolete.
 	agen5/tpProcess.c: use the new deallocation handling flags
 	* VERSION: bump the minor version
-	
+
 2001-08-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpProcess.c(openOutFile): always open /dev/null when the
@@ -310,7 +310,7 @@
 	SIGCHLD so that child processes do not inherit SIG_IGN and so we also
 	do not leave zombie children lying around.
 	* agen5/test/error.test: handle redirection of output to /dev/null
-	
+
 2001-08-16  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpParse.c(whichFunc): don't do a strcmp when subtraction works
@@ -394,7 +394,7 @@
 2001-07-02  Gary V. Vaughan  <gary@gnu.org>
 
 	* configure.in (GUILE_INC): Missing quote in sed expression.
-	
+
 2001-07-01  Gary V. Vaughan  <gary@gnu.org>
 
 	* configure.in (AC_CONFIG_HEADERS): Replaced with AM_CONFIG_HEADER.
@@ -460,7 +460,7 @@
 	deallocating the file output state structure.
 	* doc/auto_gen.tpl: the output file is now writable.
 	* agen5/expState.c(tpl-file-line): allow for an alternate format
-	
+
 2001-06-23  Albert Chin  <china@thewrittenword.com>
 
 	* autoopts/test/guile.test: avoid ``diff -q'' GNU-ism
@@ -487,7 +487,7 @@
 
         * agen5/Makefile.am (INCLUDES): Move guile's includes after
         autogen's local includes so that local files are found
-        before those that may have been installed in the same 
+        before those that may have been installed in the same
         directory as guile.
 
 2001-06-05  Bruce Korb  <bkorb@gnu.org>
@@ -498,7 +498,7 @@
 	* agen5/loadPseudo.c: changed names of generated constants
 	* agen5/pseudo.def: adjust to new templates
 	* autoopts/options.h: fix version number
-	
+
 2001-05-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c(doEnvPresets): correct size computation
@@ -622,7 +622,7 @@
 	* agen5/defFind.c(canonicalizeName): allow for leading '.'
 	(findEntryList): Disallow "nesting" when name starts with '.'
 	(findDefEntry): ditto
-	
+
 2001-03-21  Alexandre Duret-Lutz  <duret_g@epita.fr>
 
 	* agen5/autogen.c(abendSignal): Do not dereference pCurMacro if
@@ -665,7 +665,7 @@
 	Invoke ``scm_init'' when dl-opening a function library
 
 2001-03-07  Bruce Korb  <bkorb@gnu.org>
-	
+
 	* configure.in: check for dynamic library support
 	* agen5/Makefile.am: add -export-dynamic to link args, if supported
 	* agen5/opts.def(load-functions): add new option, disabled if not

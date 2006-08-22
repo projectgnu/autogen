@@ -93,7 +93,7 @@ fetch_intmax (struct printf_info *pinfo, union printf_arg const *arg)
 
   return (intmax_t) (signed int) arg->pa_int;
 }
- 
+
 #ifndef NO_FLOAT_PRINTING
 static long double
 fetch_double (struct printf_info *pinfo, union printf_arg const *arg)
@@ -668,7 +668,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	      pinfo->is_long = SNV_TRUE;
 	      break;
 	    }
-	 /*NOBREAK*/ 
+	 /*NOBREAK*/
 
 	case 'j':
 	case 'q':

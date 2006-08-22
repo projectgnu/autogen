@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-07-16 08:46:17 bkorb"
+# Time-stamp:        "2006-08-22 07:17:43 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.21 2006/07/16 16:02:02 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.22 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -208,7 +208,7 @@ case ${BOOTSTRAP} in
 
 pre )
     echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
-   
+
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 

@@ -1,14 +1,14 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2006-01-24 16:31:11 bkorb"
+## Time-stamp:      "2006-08-22 07:17:58 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2006/01/25 19:12:52 $
+## Last Modified:   $Date: 2006/08/22 16:06:36 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2006/01/25 19:12:52 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2006/08/22 16:06:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)

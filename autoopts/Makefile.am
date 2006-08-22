@@ -1,14 +1,14 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-07-19 21:48:04 bkorb"
+## Time-stamp:      "2006-08-22 07:18:02 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.29 2006/07/22 04:49:14 bkorb Exp $
+## $Id: Makefile.am,v 4.30 2006/08/22 16:06:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

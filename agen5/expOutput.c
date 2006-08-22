@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.15 2006/08/12 17:31:50 bkorb Exp $
+ *  $Id: expOutput.c,v 4.16 2006/08/22 16:06:35 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -103,7 +103,7 @@ addWriteAccess( char* pzFileName )
 /*=gfunc out_delete
  *
  * what: delete current output file
- * doc:  
+ * doc:
  *  Remove the current output file.  Cease processing the template for
  *  the current suffix.  It is an error if there are @code{push}-ed
  *  output files.  Use the @code{(error "0")} scheme function instead.
@@ -156,7 +156,7 @@ ag_scm_out_move( SCM new_file )
  *
  * what:   close current output file
  * exparg: disp, return contents of the file, optional
- * doc:  
+ * doc:
  *  If there has been a @code{push} on the output, then close that
  *  file and go back to the previously open file.  It is an error
  *  if there has not been a @code{push}.  @xref{output controls}.
@@ -196,7 +196,7 @@ ag_scm_out_pop( SCM ret_contents )
  *
  * what:   suspend current output file
  * exparg: suspName, A name tag for reactivating
- * doc:  
+ * doc:
  *  If there has been a @code{push} on the output, then set aside the
  *  output descriptor for later reactiviation with @code{(out-resume "xxx")}.
  *  The tag name need not reflect the name of the output file.  In fact,
@@ -236,7 +236,7 @@ ag_scm_out_suspend( SCM suspName )
  *
  * what:   resume suspended output file
  * exparg: suspName, A name tag for reactivating
- * doc:  
+ * doc:
  *  If there has been a suspended output, then make that output descriptor
  *  current again.  That output must have been suspended with the same tag
  *  name given to this routine as its argument.
@@ -331,7 +331,7 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
         (void) ag_scm_emit( res );
         pCurFp  = pSaveFp;
         return SCM_UNDEFINED;
-        
+
     } while (0);
 
     /*
@@ -349,7 +349,7 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
  * what:   append output to file
  * exparg: file-name, name of the file to append text to
  *
- * doc: 
+ * doc:
  *  Identical to @code{push-new}, except the contents are @strong{not}
  *  purged, but appended to.  @xref{output controls}.
 =*/

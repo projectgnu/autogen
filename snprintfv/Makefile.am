@@ -1,4 +1,4 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ## Copyright (C) 1998, 1999, 2000, 2002 Gary V. Vaughan

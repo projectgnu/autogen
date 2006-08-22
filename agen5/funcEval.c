@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: funcEval.c,v 4.10 2006/08/22 16:06:36 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -40,7 +40,7 @@ resolveSCM( SCM s )
     tCC*  pzRes = z;
 
     switch (gh_type_e( s )) {
-    case GH_TYPE_BOOLEAN:         
+    case GH_TYPE_BOOLEAN:
         z[0] = SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL;
         break;
 
@@ -286,7 +286,7 @@ evalExpression( ag_bool* pMustFree )
  *       that triggered the evaluation error.  You should not need to
  *       invoke this routine directly.  Guile will do it automatically.
 =*/
-SCM 
+SCM
 ag_scm_error_source_line( void )
 {
     tSCC zErr[] = "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
@@ -309,7 +309,7 @@ ag_scm_error_source_line( void )
  * doc:  Walk the tree of arguments, displaying the values of displayable
  *       SCM types.
 =*/
-SCM 
+SCM
 ag_scm_emit( SCM val )
 {
     for (;;) {

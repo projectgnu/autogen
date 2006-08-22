@@ -1,6 +1,6 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.2 2006/01/24 21:29:19 bkorb Exp $
+# $Id: functions.tpl,v 4.3 2006/08/22 16:06:36 bkorb Exp $
 
 =]
 [=
@@ -285,7 +285,7 @@ rm -f $file"
 static tpHdlrProc  apHdlrProc[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s"=]*/ &mFunc_[=
-  IF (exist? "handler_proc") 
+  IF (exist? "handler_proc")
      =][=% name (string-capitalize! "%s") =][=
   ELSE
      =]Bogus[=

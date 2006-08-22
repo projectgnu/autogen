@@ -1,16 +1,16 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
 ##    AutoGen copyright 1992-2006 Bruce Korb
 ##
-## Time-stamp:      "2006-07-20 19:46:52 bkorb"
+## Time-stamp:      "2006-08-22 07:17:40 bkorb"
 ## Copyright (c):   1997-2006 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.12 2006/07/22 04:49:14 bkorb Exp $
+## $Id: Makefile.am,v 4.13 2006/08/22 16:06:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 

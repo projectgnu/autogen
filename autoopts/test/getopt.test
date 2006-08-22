@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2006-07-01 13:30:19 bkorb"
+# Time-stamp:        "2006-08-22 08:46:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.11 2006/07/01 21:57:23 bkorb Exp $
+# $Id: getopt.test,v 4.12 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.10 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: expGuile.c,v 4.11 2006/08/22 16:06:35 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -348,7 +348,7 @@ ag_scm_string_upcase_x( SCM str )
     len = AG_SCM_STRLEN( str );
     pz  = AG_SCM_CHARS( str );
     while (--len >= 0) {
-         char ch = *pz;                                                         
+         char ch = *pz;
         if (islower( ch ))
             *pz = toupper( ch );
         pz++;

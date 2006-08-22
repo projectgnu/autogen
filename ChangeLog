@@ -222,7 +222,7 @@
 	* config/bootstrap: make sure ${MISSING} is executable and make the
 	"out of date" message more understandable.
 	* doc/autogen-texi.txt: describe library option handling.
-	
+
 2006-01-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/Makefile.am(defs): use file built in autoopts/test dir.

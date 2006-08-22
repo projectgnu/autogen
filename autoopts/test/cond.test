@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2005-03-06 09:13:10 bkorb"
+# Time-stamp:        "2006-08-22 07:17:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+# Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: cond.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: cond.test,v 4.4 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

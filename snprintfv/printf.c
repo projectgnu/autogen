@@ -133,10 +133,10 @@ spec_lookup (unsigned spec)
  * @fmt: the handler function to actually print the arguments to the specifier
  * @arg: the handler function to tell %printf about the types of the arguments
  *       to the specifier
- * 
+ *
  * Register the pair made of @fmt and @arg, so that it is called
  * when @spec is encountered in a format string.
- * 
+ *
  * Return value:
  * Returns %NULL if @func was not successfully registered, a
  * %spec_entry with the information on the function if it was.
@@ -279,7 +279,7 @@ parser_reset (struct printf_info *pinfo)
 {
   pinfo->is_long_double = pinfo->is_char = pinfo->is_short =
     pinfo->is_long = pinfo->alt = pinfo->space = pinfo->left =
-    pinfo->showsign = pinfo->group = pinfo->wide = 
+    pinfo->showsign = pinfo->group = pinfo->wide =
     pinfo->width = pinfo->spec = 0;
 
   pinfo->state = SNV_STATE_BEGIN;
@@ -300,11 +300,11 @@ parser_reset (struct printf_info *pinfo)
  * @func2: function where error was detected, if supplied by compiler.
  * @func3: ")" if function is supplied by compiler.
  * @error_message: new error message to append to @pinfo.
- * 
+ *
  * The contents of @error_message are appended to the @pinfo internal
  * error string, so it is safe to pass static strings or recycle the
  * original when this function returns.
- * 
+ *
  * Return value:
  * The address of the full accumulated error message in @pinfo is
  * returned.
@@ -343,7 +343,7 @@ printf_error (struct printf_info *pinfo, const char *file, int line, const char 
  * @format: a % delimited format string.
  * @n: the size of the @argtypes vector
  * @argtypes: a vector of ints, to be filled with the argument types from @format
- * 
+ *
  * Returns information about the number and types of
  * arguments expected by the template string @format.
  * The argument @n specifies the number of elements in the array
@@ -444,9 +444,9 @@ parse_printf_format (const char *format, int n, int *argtypes)
         default:	/* Just a character: ignore it. */
 	  continue;
 	}
-     
-    error: 
-      /* Get here on error */ 
+
+    error:
+      /* Get here on error */
       info.argc = -1;
       break;
     }
@@ -573,11 +573,11 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
  * @stream: an initialised stream structure.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to @stream.  If @stream is %NULL, only count the
  * number of characters needed to output the format.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -772,11 +772,11 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
  * @stream: an initialised stream structure.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to @stream.  If @stream is %NULL, only count the
  * number of characters needed to output the format.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -843,9 +843,9 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
         default: /* Just a character: ignore it. */
 	  continue;
 	}
-     
-    error: 
-      /* Get here on error */ 
+
+    error:
+      /* Get here on error */
       info.argc = -1;
       break;
     }
@@ -885,7 +885,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
           case PA_INT:
 	    args[idx].pa_int = va_arg (ap, int);
             break;
-  
+
           case PA_INT|PA_FLAG_LONG:
 	    args[idx].pa_long_int = va_arg (ap, long int);
             break;
@@ -947,11 +947,11 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
  * @stream: an initialised stream structure.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to @stream.  If @stream is %NULL, only count the
  * number of characters needed to output the format.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -976,10 +976,10 @@ stream_printf (STREAM * stream, const char *format, ...)
  * snv_fdputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
- * 
+ *
  * A StreamPut function for use in putting characters
  * into STREAMs holding a file descriptor.
- * 
+ *
  * Return value:
  * The value of @ch that has been put in @stream, or -1 in case of
  * an error (errno will be set to indicate the type of error).
@@ -997,10 +997,10 @@ snv_fdputc (int ch, STREAM *stream)
  * @fd: an open file descriptor.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to the file descriptor @fd.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1023,10 +1023,10 @@ snv_dprintf (int fd, const char *format, ...)
  * @fd: an open file descriptor.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to the file descriptor @fd.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1048,10 +1048,10 @@ snv_vdprintf (int fd, const char *format, va_list ap)
  * @fd: an open file descriptor.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to file descriptor @fd.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1073,11 +1073,11 @@ snv_dprintfv (int fd, const char *format, snv_constpointer const args[])
  * snv_fileputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
- * 
+ *
  * A StreamPut function for use in putting characters
  * into STREAMs holding a FILE*.
- * 
- * Return value: 
+ *
+ * Return value:
  * The value of @ch that has been put in @stream.
  **/
 int
@@ -1091,10 +1091,10 @@ snv_fileputc (int ch, STREAM *stream)
  * snv_printf: printf.h
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to the standard output stream.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1116,10 +1116,10 @@ snv_printf (const char *format, ...)
  * snv_vprintf: printf.h
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to the standard output stream.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1139,10 +1139,10 @@ snv_vprintf (const char *format, va_list ap)
  * snv_printfv: printf.h
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to the string @format,
  * and write the result to the standard output stream.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1163,10 +1163,10 @@ snv_printfv (const char *format, snv_constpointer const args[])
  * @file: a stdio.h FILE* stream.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to the @file stream.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1189,10 +1189,10 @@ snv_fprintf (FILE * file, const char *format, ...)
  * @file: a stdio.h FILE* stream.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to the @file stream.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1213,10 +1213,10 @@ snv_vfprintf (FILE *file, const char *format, va_list ap)
  * @file: a stdio.h FILE* stream.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to @file.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1237,10 +1237,10 @@ snv_fprintfv (FILE *file, const char *format, snv_constpointer const args[])
  * snv_bufputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
- * 
+ *
  * A StreamPut function for use in putting characters
  * into STREAMs holding a char buffer.
- * 
+ *
  * Return value:
  * The value of @ch that has been put in @stream.
  **/
@@ -1260,10 +1260,10 @@ snv_bufputc (ch, stream)
  * @buffer: a preallocated char* buffer.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to the string @buffer.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1286,10 +1286,10 @@ snv_sprintf (char buffer[], const char *format, ...)
  * @buffer: a preallocated char* buffer.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to the string @buffer.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1313,10 +1313,10 @@ snv_vsprintf (char buffer[], const char *format, va_list ap)
  * @buffer: a preallocated char* buffer.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to the string @buffer.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1341,11 +1341,11 @@ snv_sprintfv (char buffer[], const char *format, snv_constpointer const args[])
  * @limit: the maximum number of characters to write into @buffer.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to the string @buffer, truncating the formatted string
  * if it reaches @limit characters in length.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1369,11 +1369,11 @@ snv_snprintf (char buffer[], unsigned long limit, const char *format, ...)
  * @limit: the maximum number of characters to write into @buffer.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to the string @buffer, truncating the formatted string
  * if it reaches @limit characters in length.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1396,11 +1396,11 @@ snv_vsnprintf (char buffer[], unsigned long limit, const char *format, va_list a
  * @limit: the maximum number of characters to write into @buffer.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to the string @buffer, truncating the formatted string
  * if it reaches @limit characters in length.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1422,11 +1422,11 @@ snv_snprintfv (char buffer[], unsigned long limit, const char *format, snv_const
  * snv_filputc: printf.h
  * @ch: A single character to be added to @stream.
  * @stream: The stream in which to write @ch.
- * 
+ *
  * A StreamPut function for use in putting characters
  * into STREAMs holding a Filament*.
- * 
- * Return value: 
+ *
+ * Return value:
  * The value of @ch that has been put in @stream.
  **/
 int
@@ -1442,7 +1442,7 @@ snv_filputc (ch, stream)
  * @result: the address of a char * variable.
  * @format: a % delimited format string.
  * @va_alist: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @va_alist according to @format, and write
  * the results to an internally allocated buffer whose address is
  * stored in @result (and should be freed by the caller) unless
@@ -1450,9 +1450,9 @@ snv_filputc (ch, stream)
  *
  * Yes, this interface is cumbersome and totally useless.  It would
  * have been better to simply return the allocated address, but
- * it turns out that somebody wasn't thinking much when adding 
+ * it turns out that somebody wasn't thinking much when adding
  * asprintf to libiberty a few years ago.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.
@@ -1475,12 +1475,12 @@ snv_asprintf (char **result, const char *format, ...)
  * @result: the address of a char * variable.
  * @format: a % delimited format string.
  * @ap: a varargs/stdargs va_list.
- * 
+ *
  * Format the elements of @ap according to @format, and write
  * the results to an internally allocated buffer whose address is
  * stored in @result (and should be freed by the caller) unless
  * there is an error.
- * 
+ *
  * Above moaning for asprintf applies here too.
  *
  * Return value:
@@ -1508,14 +1508,14 @@ snv_vasprintf (char **result, const char *format, va_list ap)
  * @result: the address of a char * variable.
  * @format: a % delimited format string.
  * @args: a vector of argument addresses to match @format.
- * 
+ *
  * Format the elements of @args according to @format, and write
  * the results to an internally allocated buffer whose address is
  * stored in @result (and should be freed by the caller) unless
  * there is an error.
- * 
+ *
  * Above moaning for asprintf applies here too.
- * 
+ *
  * Return value:
  * The number of characters written is returned, unless there is
  * an error, when %SNV_ERROR is returned.

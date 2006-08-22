@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.10 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: expString.c,v 4.11 2006/08/22 16:06:35 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -245,7 +245,7 @@ shell_stringify( SCM obj, u_int qt )
                 break;
 
             default:
-                dtaSize++;            
+                dtaSize++;
             }
         } loopDone1:;
     }

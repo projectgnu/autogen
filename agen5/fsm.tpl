@@ -20,7 +20,7 @@ CASE (suffix) =][=
   INCLUDE "fsm-trans.tpl" =][=
   INCLUDE "fsm-macro.tpl" =][=
 
-  INVOKE  preamble     
+  INVOKE  preamble
 
 =]
 /*
@@ -118,7 +118,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
   (if (~ (get "method") "(no.*){0,1}")
       (begin (shell "rm -f .fsm.*") (out-delete))  ) =][=
 
-  INVOKE preamble     
+  INVOKE preamble
 
 =]
 #define DEFINE_FSM

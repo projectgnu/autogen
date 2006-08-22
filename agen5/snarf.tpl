@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.5 2006/07/20 04:41:20 bkorb Exp $
+# $Id: snarf.tpl,v 4.6 2006/08/22 16:06:36 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -214,7 +214,7 @@ void
       ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
     ENDIF =][=
   ENDFOR symbol =][=
-    
+
   (if (exist? "fini-code")
       (prefix "    " (get "fini-code")) "") =]
 }[= #

@@ -1,8 +1,8 @@
-##  -*- Mode: Makefile -*- 
+##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-07-26 19:33:47 bkorb"
+## Time-stamp:      "2006-08-22 07:18:16 bkorb"
 ## Copyright (c):   1997-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -10,7 +10,7 @@
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2006/07/27 02:51:47 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2006/08/22 16:06:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \

@@ -42,7 +42,7 @@ space       = "+";
 escape      = "%";
 separator   = "&";
 
-transition  = 
+transition  =
  { tst = init;  tev = alpha; next = name;     ttype = stash; },
  { tst = name;  tev = alpha, name_char;       ttype = stash; },
  { tst = name;  tev = equal; next = value; },

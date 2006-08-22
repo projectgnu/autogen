@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # for.test --- test functionality of `for' function
 #
-# Time-stamp:        "2005-11-22 13:03:41 bkorb"
+# Time-stamp:        "2006-08-22 08:57:09 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/08/22 16:06:36 $
 #            by: bkorb
 #
-# $Id: for.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: for.test,v 4.5 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -30,7 +30,7 @@ sed 's/^ *[0-9]*: //' > $testname.tpl <<_EOF_
 10:   ENDIF =><=elt[0]=><=
 11: ENDFOR =>
 12: <=
-13: FOR list-2       \=>	  
+13: FOR list-2       \=>
 14: <=FOR list   ", "\=>
 15: <=bumble         \=>
 16: <=ENDFOR         \=>

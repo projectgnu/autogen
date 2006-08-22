@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # library.test     ---  test library options
 #
-# Time-stamp:        "2006-06-24 14:22:36 bkorb"
+# Time-stamp:        "2006-08-22 07:17:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+# Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: library.test,v 4.2 2006/06/24 23:34:51 bkorb Exp $
+# $Id: library.test,v 4.3 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -1112,9 +1112,9 @@ Scheme expressions may be inserted in order to make configuration
 changes before template processing begins.
 It is used, for example, to allow the template writer to specify
 the shell program that must be used to interpret the shell commands in
-the template.  It can have no effect on any shell commands in the 
+the template.  It can have no effect on any shell commands in the
 definitions file, as that file will have been processed by the time
-the pseudo macro is interpreted. 
+the pseudo macro is interpreted.
 
 @example
 (setenv "SHELL" "/bin/sh")
@@ -3301,7 +3301,7 @@ If the @code{arg-type} is @code{keyword} or @code{set-membership},
 then you must specify the list of keywords by a series of
 @code{keyword} entries.  The interface file will contain values for
 @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each keyword entry.
-@code{keyword} option types will have an enumeration and 
+@code{keyword} option types will have an enumeration and
 @code{set-membership} option types will have a set of unsigned long bits
 @code{#define}-d.  If there are more than 32 bits defined, the @code{#define}
 will set unsigned long long values and you best be running on a
@@ -4618,7 +4618,7 @@ ending with a period).
 @subsection integer values
 
 A name can be specified as having an integer value.  To do this, you
-must use the XML-ish format and specify a ``type'' attribute for 
+must use the XML-ish format and specify a ``type'' attribute for
 the name:
 
 @example

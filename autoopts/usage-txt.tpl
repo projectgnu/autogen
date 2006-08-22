@@ -38,7 +38,7 @@ FOR utxt        =][=
                      (string-append (get "ut-type") "*")
                      (get "ut-name")  ))
       (set! cch-ct (+ cch-ct 1))  ) =][=
-  
+
 ENDFOR  utxt    =]
   cch_t*    apz_str[ [= (. cch-ct) =] ];
 } usage_text_t;

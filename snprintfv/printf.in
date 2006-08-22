@@ -166,7 +166,7 @@ typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
  * @arg: the handler function to tell %printf about the types of the arguments to the specifier
  * @user: the user data for the specifier, accessible to the handler function
  *
- * This is returned by register_printf_function. 
+ * This is returned by register_printf_function.
  */
 typedef struct spec_entry
 {
@@ -184,7 +184,7 @@ spec_entry;
  * @spec: the character which will trigger the functions, cast to an unsigned int.
  * @fmt: the handler function to actually print the arguments to the specifier
  * @arg: the handler function to tell %printf about the types of the arguments to the specifier
- * 
+ *
  * Register the pair made of @fmt and @arg, so that it is called
  * when @spec is encountered in a format string.  If you create
  * a shared library with an entry point named
@@ -195,7 +195,7 @@ spec_entry;
  * to %register_printf_function) to it.  This functionality is only
  * present when the library is installed, not when it is built as
  * a convenience library.
- * 
+ *
  * Return value:
  * Returns %NULL if @func was not successfully registered, a
  * %spec_entry with the information on the function if it was.

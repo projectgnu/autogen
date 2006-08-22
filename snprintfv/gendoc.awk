@@ -138,7 +138,7 @@ BEGIN {
     if ($0 ~ /^[ \t]*\*/) {
 	comment[fname] = comment[fname] $0 "\n";
     }
-	
+
     #
     # parameter description
     #
@@ -149,7 +149,7 @@ BEGIN {
 	paramname = $1;		# extract parameter name
 	sub(paramname, "");	# remove it from the description
 	sub(/^[ \t]*/, "");	# strip leading whitespace
-	
+
 	if ((fname,paramname) in paramdesc) {
 	    # this parameter is described twice for this function
 	    printf("%s: Error: parameter \"%s\" in %s has two descriptions.\n",
@@ -275,7 +275,7 @@ funcdecl>0 {
 
 	    type[fname] = $0;
 	    sub(/[ \t]+[a-zA-Z_][a-zA-Z_0-9]*;$/, "", type[fname]);
-	    
+
 	    decl[fname] = $0;
 	}
 	# Function pointer typedef
@@ -312,7 +312,7 @@ funcdecl>0 {
 	    argc = split($0, params, /,[ \t]*/);
 	    if (pointer) {
 	       decl[fname] = type[fname] " (*" fname ") (";
-	    } 
+	    }
 	    else {
 	       decl[fname] = type[fname] " " fname " (";
 	    }
@@ -414,7 +414,7 @@ funcdecl>0 {
 	    if (debug == 1 || index(debug, fname) != 0) {
 		printf("\ttype: >%s<\n", type[fname]) | "cat >&2";
 	    }
-	    
+
 	    decl[fname] = $0;
 
 	    sub(/^.*\(+/, "");	   # strip leading garbage
@@ -448,7 +448,7 @@ funcdecl>0 {
 		       "\t>%s<\n",
 		       program_name, fname, $0) | "cat >&2";
 	    }
-	    
+
 	    funcdecl = 2;		# wait for function prototype
 	    argc = 0;
 
@@ -503,7 +503,7 @@ funcdecl>0 {
 			   "\t>%s<\n",
 			   program_name, fname, $0) | "cat >&2";
 	    }
-	    
+
 	    if (use_format == 0  && (debug == 1 || index(debug, fname) != 0)) {
 		printf("%s: DEBUG(%s): ANSI function declaration found:\n" \
 		       "\t>%s<\n",
@@ -553,7 +553,7 @@ funcdecl>0 {
 	    funcdecl = 3;
 	    argc = 0;
 	}
-	
+
 	next;
     }
     if (funcdecl == 3) {	# the rest are K&R parameter declarations
@@ -581,7 +581,7 @@ funcdecl>0 {
 
 	    next;
 	}
-	    
+
 	# We did not see the "{" yet, so this must be another parameter
 	# declaration.
 	sub(/^[ \t]*/, "");	# strip leading garbage
@@ -620,7 +620,7 @@ END {
 	}
 	if (length(newlist)) {
 	    funclist = newlist;
-	    func_count = split(funclist, funcs); 
+	    func_count = split(funclist, funcs);
 	}
 
 	for (count = 1; count <= func_count; count++) {
@@ -629,7 +629,7 @@ END {
 	    print comment[fname] decl[fname] "\n";
 	}
     }
-	
+
     #
     # Print texinfo formatted blocks for each element described
     #
@@ -733,7 +733,7 @@ END {
 			postchar = substr(source, RSTART + RLENGTH, 1);
 		    }
 		    dest = dest substr(source, 0, RSTART - workaround);
-		    source = substr(source, RSTART + RLENGTH); 
+		    source = substr(source, RSTART + RLENGTH);
 		    if (match(prechar, /[^A-Za-z0-9_]/) \
 			&& match(postchar, /[^A-Za-z0-9_]/)) {
 			dest = dest "@var{" paramname "}";
@@ -751,7 +751,7 @@ END {
 		gsub("@@" paramname, "@var{" paramname "}", desc[fname]);
 		gsub("@@" paramname, "@var{" paramname "}", returnval[fname]);
 	    }
-	   
+
 	    # @deftypefn Category
 	    if (index(" " keywords[funcs[count]] " ", " alias ") ||
 		index(" " keywords[funcs[count]] " ", " macro ")) {
@@ -770,7 +770,7 @@ END {
 		printf "@deftypefn Function " decl[fname] "\n";
 	    }
 	    print "@fnindex " fname "\n";
-	    
+
 	    # param descriptions
 	    if (argc) {
 	        print index (decl[fname], "(") ? "Parameters:" : "Fields:";
@@ -804,8 +804,8 @@ END {
 		        postchar = substr(source, RSTART + RLENGTH, 1);
 		    }
 		    dest = dest substr(source, 0, RSTART - workaround);
-		    matched = substr(source, RSTART + 1, RLENGTH - 1); 
-		    source = substr(source, RSTART + RLENGTH); 
+		    matched = substr(source, RSTART + 1, RLENGTH - 1);
+		    source = substr(source, RSTART + RLENGTH);
 		    if (match(postchar, /[^A-Za-z0-9_]/)) {
 		        dest = dest "@code{" matched "}";
 		    } else {
@@ -865,8 +865,8 @@ END {
 		        postchar = substr(source, RSTART + RLENGTH, 1);
 		    }
 		    dest = dest substr(source, 0, RSTART - workaround);
-		    matched = substr(source, RSTART + 1, RLENGTH - 1); 
-		    source = substr(source, RSTART + RLENGTH); 
+		    matched = substr(source, RSTART + 1, RLENGTH - 1);
+		    source = substr(source, RSTART + RLENGTH);
 		    if (match(postchar, /[^A-Za-z0-9_]/)) {
 		        dest = dest "@code{" matched "}";
 		    } else {
@@ -923,7 +923,7 @@ END {
 
     # Keep lint happy:
     close("cat >&2");
-    
+
     exit status;
 }
 

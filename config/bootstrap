@@ -1,14 +1,14 @@
 #! /bin/bash
-#  -*- Mode: Shell-script -*- 
+#  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2006-06-17 08:14:48 bkorb"
+# Time-stamp:      "2006-08-22 07:17:43 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.10 2006/06/17 15:46:01 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.11 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -211,7 +211,7 @@ ${DIE}
 
 doit ()
 {
-  if test "x$1" != x: ; then 
+  if test "x$1" != x: ; then
     echo "RUN:  $@"
     eval "$@" || exit 1
   fi

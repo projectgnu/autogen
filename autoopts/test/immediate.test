@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2005-06-07 18:14:19 bkorb"
+# Time-stamp:        "2006-08-22 07:17:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999		      
+# Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: immediate.test,v 4.5 2005/12/05 20:46:44 bkorb Exp $
+# $Id: immediate.test,v 4.6 2006/08/22 16:06:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

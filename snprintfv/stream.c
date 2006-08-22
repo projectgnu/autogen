@@ -62,11 +62,11 @@ stream_not_writable (int ch, STREAM *stream)
  * @limit: the maximum number of consecutive bytes to fit in @dets.
  * @get_func: function to get a character from @dets stream.
  * @put_func: function to put a character in @dets stream.
- * 
+ *
  * Allocate and initialize a new %STREAM data type.  The @get_func
  * and @put_func can be NULL if you intend to create a non-readable
  * or non-writable stream, respectively.
- * 
+ *
  * Return value:
  * The address of the newly allocated and initialised stream is returned.
  **/
@@ -88,7 +88,7 @@ stream_new (snv_pointer dets, unsigned long limit, StreamGet get_func, StreamPut
 /**
  * stream_delete: destructor
  * @stream: The stream pending deletion
- * 
+ *
  * The memory associated with @stream is recycled.
 
  * Return value:
@@ -125,10 +125,10 @@ stream_details (STREAM *stream)
  * stream_put:
  * @ch: A single character to be placed in @stream.
  * @stream: The stream to be written to.
- * 
+ *
  * This function will @ch in @stream if that stream's output limit will
  * not be exceeded.
- * 
+ *
  * Return value:
  * If @stream is full, return 1.  Otherwise, if any other error occurs,
  * that error code is returned unchanged.  This is of course dependant
@@ -196,9 +196,9 @@ stream_puts (char *s, STREAM *stream)
 /**
  * stream_get:
  * @stream: The stream to be read from.
- * 
+ *
  * This function will try to read a single character from @stream.
- * 
+ *
  * Return value:
  * If an error occurs or the end of @stream is reached, -1 is returned.
  * Under normal circumstances the value if the character read (cast to

@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.13 2006/06/25 00:51:11 bkorb Exp $
+# $Id: announce.txt,v 4.14 2006/08/22 16:06:35 bkorb Exp $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -53,7 +53,7 @@ esac
 cat >&3 <<- _EOF_
 	From: ${fullname} <${sender}@${domain}>
 	Sender: ${sender}@${domain}
-	${to_line}	
+	${to_line}
 	Subject: GNU AutoGen Version ${AG_VERSION}/${AO_VERSION}
 	Reply-To: autogen-users@lists.sourceforge.net
 	${cc_line}

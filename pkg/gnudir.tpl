@@ -43,7 +43,7 @@ an enhanced XDR specification and the AutoXDR templates, AutoGen
 generates all the grunge code for marshalling and unmarshalling
 the arguments on both sides of the RPC request.
 
-%%category: software development, program build automation 
+%%category: software development, program build automation
 
 %%license: GPL, LGPL, BSD, public domain
 
@@ -67,16 +67,16 @@ the arguments on both sides of the RPC request.
 
 %%web-page: http://www.gnu.org/software/autogen
 
-%%support: 
+%%support:
 
 %%doc: Developer's reference manual available from
 http://www.gnu.org/manual/autogen/autogen.html
 
 %%developers: Bruce Korb <bkorb@gnu.org>, Gary V. Vaughan <gvv@technie.com>
 
-%%contributors: 
+%%contributors:
 
-%%sponsors: 
+%%sponsors:
 
 %%source-tarball: ftp://ftp.gnu.org/pub/gnu/autogen/autogen-5.3.2.tar.gz
 
@@ -86,7 +86,7 @@ http://www.gnu.org/manual/autogen/autogen.html
 
 %%debian: http://packages.debian.org/unstable/devel/autogen.html
 
-%%rpm: 
+%%rpm:
 
 %%repository: cvs.AutoGen.sourceforge.net:/cvsroot/AutoGen
 
@@ -94,7 +94,7 @@ http://www.gnu.org/manual/autogen/autogen.html
 
 %%source-language: C, Guile, Bourne shell
 
-%%supported-languages: 
+%%supported-languages:
 
 %%use-requirements: Guile, Bourne-like shell, POSIX environment
 
@@ -110,13 +110,13 @@ http://www.gnu.org/manual/autogen/autogen.html
 
 %%announce-news:
 
-%%help-list: <autogen-users@lists.sourceforge.net> 
+%%help-list: <autogen-users@lists.sourceforge.net>
 
 %%help-news:
 
 %%irc-help-channel:
 
-%%dev-list: <autogen-devel@lists.sourceforge.net> 
+%%dev-list: <autogen-devel@lists.sourceforge.net>
 
 %%dev-news:
 
@@ -126,7 +126,7 @@ http://www.gnu.org/manual/autogen/autogen.html
 
 %%bug-database:
 
-%%Entry Written By: Janet Casey <jcasey@gnu.org> 
+%%Entry Written By: Janet Casey <jcasey@gnu.org>
 
 
 
@@ -134,7 +134,7 @@ http://www.gnu.org/manual/autogen/autogen.html
 
 
 
- 
+
 
 
 

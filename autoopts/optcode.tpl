@@ -1,13 +1,13 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.24 2006/06/24 23:34:51 bkorb Exp $
+#$Id: optcode.tpl,v 4.25 2006/08/22 16:06:36 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-24 14:45:17 bkorb"
+# Time-stamp:      "2006-08-22 07:18:01 bkorb"
 
 =][=
 
-;;; 
+;;;
 ;;;  Compute the usage line.  It is complex because we are trying to
 ;;;  encode as much information as we can and still be comprehensible.
 ;;;
@@ -15,7 +15,7 @@
 ;;;  there are flags allowed, so include "-<flag>" on the usage line.
 ;;;  If the program has the "long_opts" attribute set, then we must
 ;;;  have "<option-name>" or "--<name>" on the line, depending on
-;;;  whether or not there are flag options.  If any options take 
+;;;  whether or not there are flag options.  If any options take
 ;;;  arguments, then append "[<val>]" to the flag description and
 ;;;  "[{=| }<val>]" to the option-name/name descriptions.  We won't
 ;;;  worry about being correct if every option has a required argument.

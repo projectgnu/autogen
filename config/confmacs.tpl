@@ -138,7 +138,7 @@ AC_DEFUN([[=
           c-text "\nreturn 0; }" )) =][=
   = all   =][=
   ESAC    =][=
-  
+
   (. mac-name)    =]],[[=
 
   IF (ag-function? fcn-name) =][=
