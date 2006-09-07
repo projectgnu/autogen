@@ -3,12 +3,16 @@
 	* autoopts/opthead.tpl(NO_OPTION_NAME_WARNINGS): new code to emit
 	warnings (or just clean up) in case some #define names conflict with
 	selected option names.
+	* agen5/expState.c(str2int_ver): emit version value iff tracing is on
+	* compat/compat.h(sys/mman.h): include only if HAVE_SYS_MMAN_H
 
 2006-08-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/usage.c: Fix warning for a dumb compiler
 	* autoopts/autoopts.h: Fix warning for dumb environment (Windows)
 	* agen5/autogen.h: Fix warnings from new Guile deprecations
+
+	= REL 5.8.5
 
 2006-08-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 

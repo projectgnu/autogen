@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.12 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: expState.c,v 4.13 2006/09/07 14:46:34 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -277,7 +277,8 @@ str2int_ver( char* pz )
     } leave_str2int_ver: ;
 
     while (--ix >= 0)  val <<= VER_UNIT_SHIFT;
-    fprintf( pfTrace, "0x%016llX <<== '%s'\n", (long long)val, pzStr );
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf( pfTrace, "0x%016llX <<== '%s'\n", (long long)val, pzStr );
     return val;
 }
 
