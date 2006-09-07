@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.10 2006/06/25 00:51:11 bkorb Exp $
+ *   $Id: opts.def,v 4.11 2006/09/07 00:36:26 bkorb Exp $
  */
 
 /*
@@ -42,6 +42,7 @@ explain       = <<- EndExplanation
 	@code{stdin} is not a @code{tty}, then the list of input files will be
 	read from @code{stdin}.
 	EndExplanation;
+guard-option-names;
 
 flag = {
     name      = "defs_to_get";

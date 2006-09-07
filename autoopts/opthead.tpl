@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.18 2006/07/15 22:10:21 bkorb Exp $
+# $Id: opthead.tpl,v 4.19 2006/09/07 00:36:26 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-07-15 08:26:46 bkorb"
+# Time-stamp:      "2006-09-06 16:41:06 bkorb"
 
 =]
 /*
@@ -69,7 +69,35 @@ IF (exist? "version") =]
 #define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
 #define [=(. pname-up)=]_FULL_VERSION  [=(c-string version-text) =][=
 ENDIF (exist? version) =]
+[=
 
+IF (define undef-list "")
+   (exist? "guard-option-names")
+
+=]
+/*
+ *  Make sure there are no #define name conflicts with the option names
+ */
+#ifndef NO_OPTION_NAME_WARNINGS[=
+  FOR    flag =][=
+    (set! opt-name   (string-upcase! (string->c-name! (get "name"))))
+    (set! undef-list (string-append undef-list "# undef " opt-name "\n"))
+    =]
+# ifdef [= (. opt-name) =]
+#  warn  undefining [= (. opt-name) =] due to option name conflict
+#  undef [= (. opt-name) =]
+# endif
+[=
+  ENDFOR flag =]
+#else  /* NO_OPTION_NAME_WARNINGS */
+[=
+(. undef-list)
+=]#endif /* NO_OPTION_NAME_WARNINGS */
+[=
+
+ENDIF guard-option-names
+
+=]
 /*
  *  Interface defines for all options.  Replace "n" with
  *  the UPPER_CASED option name (as in the te[=(. Cap-prefix)=]OptIndex

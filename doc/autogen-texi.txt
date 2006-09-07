@@ -1936,6 +1936,7 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 * AutoMan pages::       Automated Man Pages
 * getopt_long::         Using getopt(3C)
 * i18n::                Internationalizing AutoOpts
+* Naming Conflicts::    Naming Conflicts
 @end menu
 
 @c === SECTION MARKER
@@ -2360,6 +2361,16 @@ default: .<prog-name>rc
 @item version
 Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
+
+@cindex guard-option-names
+@item guard-option-names
+AutoOpts generates macros that presume that there are no @code{cpp} macros
+with the same name as the option name.  For example, if you have an option
+named, @code{debug}, then you must not use @code{#ifdef DEBUG} in your code.
+If you specify this option, every option name will be guarded.  If the name
+is @code{#define}-d, then a warning will be issued and the name undefined.
+If you do not specify this and there is a conflict, you will get strange
+error messages.
 @end table
 
 @node library attributes
@@ -5138,6 +5149,28 @@ procedure established with the @code{_()} preprocessing macro.
 The AutoOpts @code{libopts} library will always check for the
 ``compiled with NLS'' flag, so @code{libopts} does not need to be
 specially compiled.
+
+@c === SECTION MARKER
+
+@node Naming Conflicts
+@section Naming Conflicts
+@cindex Naming Conflicts
+
+AutoOpts generates a header file that contains many C preprocessing macros
+and several external names.  For the most part, they begin with either
+@code{opt_} or @code{option}, or else they end with @code{_opt}.  If this
+happens to conflict with other macros you are using, the conflict can be
+avoided by specifying an external name @code{prefix} (@pxref{program
+attributes}).
+
+Among these macros, several take an option name as a macro argument.
+Sometimes, this will inconveniently conflict.  For example, if you
+specify an option named, @code{debug}, the emitted code will presume
+that @code{DEBUG} is not a preprocessing name.  If it is so used, you
+will get a preprocessing error if you use, for example, @code{HAVE_OPT(DEBUG)}
+(@pxref{HAVE_OPT}) in your code.  You may trigger an obvious warning
+for such conflicts by specifying the @code{guard-option-names} attribute
+(@pxref{program attributes}).
 
 @page
 @node Add-Ons

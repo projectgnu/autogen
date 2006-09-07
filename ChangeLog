@@ -1,3 +1,9 @@
+2006-09-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/opthead.tpl(NO_OPTION_NAME_WARNINGS): new code to emit
+	warnings (or just clean up) in case some #define names conflict with
+	selected option names.
+
 2006-08-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/usage.c: Fix warning for a dumb compiler
