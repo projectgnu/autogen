@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.19 2006/09/07 00:36:26 bkorb Exp $
+# $Id: opthead.tpl,v 4.20 2006/09/07 15:19:02 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-06 16:41:06 bkorb"
+# Time-stamp:      "2006-09-07 08:03:50 bkorb"
 
 =]
 /*
@@ -69,40 +69,11 @@ IF (exist? "version") =]
 #define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
 #define [=(. pname-up)=]_FULL_VERSION  [=(c-string version-text) =][=
 ENDIF (exist? version) =]
-[=
 
-IF (define undef-list "")
-   (exist? "guard-option-names")
-
-=]
 /*
- *  Make sure there are no #define name conflicts with the option names
- */
-#ifndef NO_OPTION_NAME_WARNINGS[=
-  FOR    flag =][=
-    (set! opt-name   (string-upcase! (string->c-name! (get "name"))))
-    (set! undef-list (string-append undef-list "# undef " opt-name "\n"))
-    =]
-# ifdef [= (. opt-name) =]
-#  warn  undefining [= (. opt-name) =] due to option name conflict
-#  undef [= (. opt-name) =]
-# endif
-[=
-  ENDFOR flag =]
-#else  /* NO_OPTION_NAME_WARNINGS */
-[=
-(. undef-list)
-=]#endif /* NO_OPTION_NAME_WARNINGS */
-[=
-
-ENDIF guard-option-names
-
-=]
-/*
- *  Interface defines for all options.  Replace "n" with
- *  the UPPER_CASED option name (as in the te[=(. Cap-prefix)=]OptIndex
- *  enumeration above).  e.g. HAVE_[=(. UP-prefix)=]OPT( [=
-    (up-c-name "flag[].name") =] )
+ *  Interface defines for all options.  Replace "n" with the UPPER_CASED
+ *  option name (as in the te[=(. Cap-prefix)=]OptIndex enumeration above).
+ *  e.g. HAVE_[=(. UP-prefix)=]OPT( [= (up-c-name "flag[].name") =] )
  */[=
 
 IF (exist? "library")
@@ -165,7 +136,35 @@ ELSE we have a prefix:
   UP-prefix pname )   =][=
 
 ENDIF prefix/not      =]
+[=
 
+IF (define undef-list "")
+   (exist? "guard-option-names")
+
+=]
+/*
+ *  Make sure there are no #define name conflicts with the option names
+ */
+#ifndef NO_OPTION_NAME_WARNINGS[=
+  FOR    flag =][=
+    (set! opt-name   (up-c-name "name"))
+    (set! undef-list (string-append undef-list "# undef " opt-name "\n"))
+    =]
+# ifdef [= (. opt-name) =]
+#  warn  undefining [= (. opt-name) =] due to option name conflict
+#  undef [= (. opt-name) =]
+# endif
+[=
+  ENDFOR flag =]
+#else  /* NO_OPTION_NAME_WARNINGS */
+[=
+(. undef-list)
+=]#endif /* NO_OPTION_NAME_WARNINGS */
+[=
+
+ENDIF guard-option-names
+
+=]
 /*
  *  Interface defines for specific options.
  */[=

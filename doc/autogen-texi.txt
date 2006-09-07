@@ -2371,6 +2371,14 @@ If you specify this option, every option name will be guarded.  If the name
 is @code{#define}-d, then a warning will be issued and the name undefined.
 If you do not specify this and there is a conflict, you will get strange
 error messages.
+
+This will produce code that will warn you when conflicts get hidden.
+The builder of your program may suppress these warnings by adding
+this define to the compile command line:
+
+@example
+-DNO_OPTION_NAME_WARNINGS
+@end example
 @end table
 
 @node library attributes
@@ -2950,6 +2958,28 @@ For example, if your option name is, @code{debug} or @code{munged-up},
 you must not use the @code{#define} names @code{DEBUG} (or
 @code{MUNGED_UP}) in your program for non-AutoOpts related purposes.
 They are now used by AutoOpts.
+
+Sometimes (most especially under Windows), you may get a surprise.
+For example, @code{INTERFACE} is apparently a user space name that
+one should be free to use.  Windows usurps this name.  To solve this,
+you must do one of the following:
+
+@enumerate
+@item
+Change the name of your option
+@item
+add the attribute:
+
+@example
+export = '#undef YOUR_OPTION_NAME';
+@end example
+@item
+add the attribute (@pxref{program attributes}):
+
+@example
+guard-option-names;
+@end example
+@end enumerate
 
 @cindex descrip
 @item descrip
