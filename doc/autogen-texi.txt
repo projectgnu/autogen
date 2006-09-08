@@ -2367,7 +2367,7 @@ Specifies the program version and activates the VERSION option,
 AutoOpts generates macros that presume that there are no @code{cpp} macros
 with the same name as the option name.  For example, if you have an option
 named, @code{debug}, then you must not use @code{#ifdef DEBUG} in your code.
-If you specify this option, every option name will be guarded.  If the name
+If you specify this attribute, every option name will be guarded.  If the name
 is @code{#define}-d, then a warning will be issued and the name undefined.
 If you do not specify this and there is a conflict, you will get strange
 error messages.
@@ -2968,13 +2968,13 @@ you must do one of the following:
 @item
 Change the name of your option
 @item
-add the attribute:
+add the program attribute (@pxref{program attributes}):
 
 @example
-export = '#undef YOUR_OPTION_NAME';
+export = '#undef INTERFACE';
 @end example
 @item
-add the attribute (@pxref{program attributes}):
+add the program attribute:
 
 @example
 guard-option-names;
@@ -5149,36 +5149,26 @@ the global @code{prog-name} attribute in the option definition file.
 @section Internationalizing AutoOpts
 @cindex Internationalizing AutoOpts
 
-The generated code for AutoOpts will now enable and disable the translation
-of AutoOpts run time messages.  If @code{ENABLE_NLS} is defined at compile
-time, then the @code{_()} macro may be used to specify a translation
-function.  If undefined, it will default to @code{gettext(3GNU)}.
-@code{ENABLE_NLS} will enable a callback function that @code{optionProcess}
-will invoke at the beginning of option processing.  The strings returned by
-the translation function will be @code{strdup(3)-ed} and kept.  They will
-not be re-translated, even if the locale changes, but they will also not be
-dependent upon reused or unmappable memory.
+The generated code for AutoOpts will enable and disable the translation of
+AutoOpts run time messages.  If @code{ENABLE_NLS} is defined at compile time,
+then the @code{_()} macro may be used to specify a translation function.  If
+undefined, it will default to @code{gettext(3GNU)}.  This define will also
+enable a callback function that @code{optionProcess} invokes at the
+beginning of option processing.  The AutoOpts @code{libopts} library will
+always check for this ``compiled with NLS'' flag, so @code{libopts} does not
+need to be specially compiled.  The strings returned by the translation
+function will be @code{strdup(3)-ed} and kept.  They will not be
+re-translated, even if the locale changes, but they will also not be dependent
+upon reused or unmappable memory.
 
-To internationalize option processing, you should first internationalize
-your program.  Then, the option processing strings can be added to your
-translation text by processing the AutoOpts-generated @file{my-opts.c} file
-and the distributed @file{usage-txt.h} file.  The latter file contains all
-of the user display strings used by AutoOpts.  It can be extracted for your
-use, for example, as in:
-
-@example
-xgettext --omit -a -Lc -oopts.po $prefix/include/usage-txt.h
-@end example
-
-Simply run @file{xgettext}, or
-equivalent, on the distributed header, @file{usage-txt.h} and add it to the
-rest of your @code{i18n}.  When you call @code{optionProcess}, all of the
-user visible AutoOpts strings will be passed through the localization
-procedure established with the @code{_()} preprocessing macro.
-
-The AutoOpts @code{libopts} library will always check for the
-``compiled with NLS'' flag, so @code{libopts} does not need to be
-specially compiled.
+To internationalize option processing, you should first internationalize your
+program.  Then, the option processing strings can be added to your translation
+text by processing the AutoOpts-generated @file{my-opts.c} file and adding the
+distributed @file{po/usage-txt.pot} file.  (Also by extracting the strings
+yourself from the @file{usage-txt.h} file.)  When you call
+@code{optionProcess}, all of the user visible AutoOpts strings will be passed
+through the localization procedure established with the @code{_()}
+preprocessing macro.
 
 @c === SECTION MARKER
 
@@ -5186,21 +5176,25 @@ specially compiled.
 @section Naming Conflicts
 @cindex Naming Conflicts
 
-AutoOpts generates a header file that contains many C preprocessing macros
-and several external names.  For the most part, they begin with either
-@code{opt_} or @code{option}, or else they end with @code{_opt}.  If this
-happens to conflict with other macros you are using, the conflict can be
-avoided by specifying an external name @code{prefix} (@pxref{program
-attributes}).
+AutoOpts generates a header file that contains many C preprocessing macros and
+several external names.  For the most part, they begin with either @code{opt_}
+or @code{option}, or else they end with @code{_opt}.  If this happens to
+conflict with other macros you are using, or if you are compiling multiple
+option sets in the same compilation unit, the conflicts can be avoided.  You
+may specify an external name @code{prefix} (@pxref{program attributes}) for
+all of the names generated for a each set of option definitions.
 
 Among these macros, several take an option name as a macro argument.
-Sometimes, this will inconveniently conflict.  For example, if you
-specify an option named, @code{debug}, the emitted code will presume
-that @code{DEBUG} is not a preprocessing name.  If it is so used, you
-will get a preprocessing error if you use, for example, @code{HAVE_OPT(DEBUG)}
-(@pxref{HAVE_OPT}) in your code.  You may trigger an obvious warning
-for such conflicts by specifying the @code{guard-option-names} attribute
-(@pxref{program attributes}).
+Sometimes, this will inconveniently conflict.  For example, if you specify an
+option named, @code{debug}, the emitted code will presume that @code{DEBUG} is
+not a preprocessing name.  Or also, if you are building on a Windows platform,
+you may find that MicroSoft has usurped a number of user space names in its
+header files.  Consequently, you will get a preprocessing error if you use,
+for example, @code{HAVE_OPT(DEBUG)} or @code{HAVE_OPT(INTERNAL)}
+(@pxref{HAVE_OPT}) in your code.  You may trigger an obvious warning for such
+conflicts by specifying the @code{guard-option-names} attribute
+(@pxref{program attributes}).  That emitted code will also @code{#undef}-ine
+the conflicting name.
 
 @page
 @node Add-Ons

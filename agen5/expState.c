@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.13 2006/09/07 14:46:34 bkorb Exp $
+ *  $Id: expState.c,v 4.14 2006/09/08 16:27:47 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -226,14 +226,22 @@ ag_scm_base_name( void )
  * what:   compare two version numbers
  * general_use:
  *
- * exparg: op, comparison operation
+ * exparg: op, comparison operator
  * exparg: v1, first version
  * exparg: v2, compared-to version
  *
  * doc:  Converts v1 and v2 strings into 64 bit values and returns the
  *       result of running 'op' on those values.  It assumes that the version
  *       is a 1 to 4 part dot-separated series of numbers.  Suffixes like,
- *       "5pre5" are presumed to be equal to the initial digits, e.g. "5".
+ *       "5pre4" or "5-pre4" will be interpreted as two numbers.  The first
+ *       number ("5" in this case) will be decremented and the number after
+ *       the "pre" will be added to 0xC000.  (Unless your platform is unable
+ *       to support 64 bit integer arithmetic.  Then it will be added to 0xC0.)
+ *       Consequently, these yield true:
+ *       @example
+ *       (version-compare > "5.8.5"       "5.8.5-pre4")
+ *       (version-compare > "5.8.5-pre10" "5.8.5-pre4")
+ *       @end example
 =*/
 static ver_type_t
 str2int_ver( char* pz )
