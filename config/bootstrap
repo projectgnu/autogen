@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2006-08-22 07:17:43 bkorb"
+# Time-stamp:      "2006-09-09 12:16:21 bkorb"
 # Author:          Gary V. Vaughan <gary@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Thu Apr  9 00:40:23 1998
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.11 2006/08/22 16:06:36 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.12 2006/09/09 20:13:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -66,10 +66,10 @@ case "${SHELL}" in
 esac
 
 case "$-" in
-(*x*)   setx=set\ -x dashx=-x ;;
-(*)     setx=:       dashx=   ;;
+(*x*)   setx=set\ -x dashx=-x VERBOSE=true  ;;
+(*)     setx=:       dashx=   VERBOSE=false ;;
 esac
-export setx dashx
+export setx dashx VERBOSE
 
 # Figure out the absolute path to the working directory.
 #

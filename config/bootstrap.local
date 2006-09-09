@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-09-09 10:37:14 bkorb"
+# Time-stamp:        "2006-09-09 12:16:55 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.23 2006/09/09 19:09:36 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.24 2006/09/09 20:13:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
