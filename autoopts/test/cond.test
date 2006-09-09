@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2006-08-22 07:17:53 bkorb"
+# Time-stamp:        "2006-09-09 11:54:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: cond.test,v 4.4 2006/08/22 16:06:36 bkorb Exp $
+# $Id: cond.test,v 4.5 2006/09/09 19:09:36 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -21,7 +21,7 @@ argument="${argument}" long_opts="${long_opts}" \
 ${SHELL-sh} ${stdopts} option:'opt init' second=020
 cat >> ${testname}.def <<EOF
 flag = {
-  name = cond;
+  name  = condition;
   value = c;
   ifdef = COND;
   descrip = "cond test";
@@ -33,7 +33,7 @@ ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
-
+set -x
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
@@ -60,7 +60,7 @@ USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -c no  cond           cond test
+   -c no  condition      cond test
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
@@ -68,6 +68,20 @@ _EOF_
 
 cmp -s ${testname}.h*lp || \
   failure "`diff ${testname}.h*lp`"
+
+echo guard-option-names\; >> ${testname}.def
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+( eval $(echo ${cc_cmd} | sed 's/-Werror/-DSECOND/' ) 2>&1 ) \
+  | sed -n 's/.*#warning/#warning/p' > ${testname}-cc.log
+
+echo '#warning undefining SECOND due to option name conflict' \
+  > ${testname}-xx.log
+
+cmp -s ${testname}-??.log || \
+  failure "warning diffs:  `diff ${testname}-??.log`"
 
 cleanup
 

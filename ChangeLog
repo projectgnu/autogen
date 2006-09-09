@@ -5,6 +5,7 @@
 	selected option names.
 	* agen5/expState.c(str2int_ver): emit version value iff tracing is on
 	* compat/compat.h(sys/mman.h): include only if HAVE_SYS_MMAN_H
+	* autoopts/test/cond.test: test new stuff
 
 2006-08-12  Bruce Korb  <bkorb@gnu.org>
 

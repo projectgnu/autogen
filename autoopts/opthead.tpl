@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.20 2006/09/07 15:19:02 bkorb Exp $
+# $Id: opthead.tpl,v 4.21 2006/09/09 19:09:36 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-07 08:03:50 bkorb"
+# Time-stamp:      "2006-09-09 11:11:44 bkorb"
 
 =]
 /*
@@ -79,23 +79,16 @@ ENDIF (exist? version) =]
 IF (exist? "library")
 
 =]
-extern tOptDesc const* [= (. lib-opt-ptr) =];
-#define         [= (. UP-prefix) =]DESC(n) ([= (. lib-opt-ptr)
- =][ [= (. INDEX-pfx) =] ## n ])[=
+extern tOptDesc * const [= (. lib-opt-ptr) =];
+#define         [=
+   (sprintf "%sDESC(n) (%s[%s ## n])" UP-prefix lib-opt-ptr INDEX-pfx) =][=
 
-ELSE =][=
+ELSE not a library  =]
+#define         [=
+   (sprintf "%sDESC(n) %sOptions.pOptDesc[INDEX_%sOPT_ ## n]"
+            UP-prefix pname UP-prefix) =][=
 
-  IF (> 1 (string-length UP-prefix)) =]
-#define        DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_OPT_ ## n][=
-
-  ELSE not a library and have prefix   =]
-#define         [= (. UP-prefix)
-              =]DESC(n) [=(. pname)=]Options.pOptDesc[INDEX_[= (. UP-prefix)
-                                                          =]OPT_ ## n][=
-
-  ENDIF prefix/not      =][=
-
-ENDIF library exists    =][=
+ENDIF lib exists    =][=
 
 IF (> 1 (string-length UP-prefix))
 
@@ -138,28 +131,31 @@ ELSE we have a prefix:
 ENDIF prefix/not      =]
 [=
 
-IF (define undef-list "")
-   (exist? "guard-option-names")
+IF   (exist? "guard-option-names") =][=
+
+   (define undef-list "\n#else  /* NO_OPTION_NAME_WARNINGS */")
+   (define conf-warn-fmt (string-append
+   "\n# ifdef    %1$s"
+   "\n#  warning undefining %1$s due to option name conflict"
+   "\n#  undef   %1$s"
+   "\n# endif" ))
 
 =]
 /*
  *  Make sure there are no #define name conflicts with the option names
  */
-#ifndef NO_OPTION_NAME_WARNINGS[=
-  FOR    flag =][=
+#ifndef     NO_OPTION_NAME_WARNINGS[=
+  FOR  flag     =][=
+
     (set! opt-name   (up-c-name "name"))
-    (set! undef-list (string-append undef-list "# undef " opt-name "\n"))
-    =]
-# ifdef [= (. opt-name) =]
-#  warn  undefining [= (. opt-name) =] due to option name conflict
-#  undef [= (. opt-name) =]
-# endif
-[=
-  ENDFOR flag =]
-#else  /* NO_OPTION_NAME_WARNINGS */
-[=
-(. undef-list)
-=]#endif /* NO_OPTION_NAME_WARNINGS */
+    (set! undef-list (string-append undef-list "\n# undef " opt-name))
+    (sprintf conf-warn-fmt opt-name)
+    =][=
+
+  ENDFOR flag   =][=
+
+  (. undef-list)=]
+#endif  /*  NO_OPTION_NAME_WARNINGS */
 [=
 
 ENDIF guard-option-names

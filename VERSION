@@ -4,10 +4,10 @@
 #
 # Copyright (C) 1999-2006 Bruce Korb
 #
-# Time-stamp:        "2006-09-08 09:26:58 bkorb"
+# Time-stamp:        "2006-09-09 11:13:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2006/09/08 16:27:47 $
+# Last Committed:    $Date: 2006/09/09 19:09:36 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
@@ -31,7 +31,7 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 AO_LIBRARY=libopts.la
 AO_CURRENT=27
 AO_REVISION=4
-AO_AGE=2
+AO_AGE=3
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0
