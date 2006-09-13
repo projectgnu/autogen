@@ -1,3 +1,18 @@
+2006-09-10  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/aoconf.def: define values needed to describe configuration
+	* autoopts/aoconf.tpl: Template for generating autoopts-config.in,
+	autoopts-config.1, and mk-autoopts-pc.in
+	* autoopts/autoopts-config.in: obsolete
+	* autoopts/autoopts-config.1:  obsolete
+	* autoopts/mk-autoopts-pc.in:  obsolete
+	* autoopts/autoopts.h(AGALOC): use robust malloc/realloc/strdup
+	* autoopts/autoopts.c: re-add the robust versions for local only use
+	* autoopts/configfile.c(handleConfig): handle unterminated last line
+	* autoopts/text_mmap.c(text_mmap): remove pointless test
+	* agen5/autogen.c: Since libopts does not export the malloc wrappers,
+	they must be implemented here, too.
+	
 2006-09-05  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/opthead.tpl(NO_OPTION_NAME_WARNINGS): new code to emit

@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.17 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: autogen.c,v 4.18 2006/09/13 14:31:08 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -472,6 +472,49 @@ signalSetup( sighandler_proc_t* chldHandler,
 #ifndef HAVE_STRSIGNAL
 #  include <compat/strsignal.c>
 #endif
+
+LOCAL void *
+ao_malloc (size_t sz)
+{
+    void * res = malloc(sz);
+    if (res == NULL) {
+        fprintf( stderr, "malloc of %d bytes failed\n", sz );
+        exit( EXIT_FAILURE );
+    }
+    return res;
+}
+
+
+LOCAL void *
+ao_realloc (void *p, size_t sz)
+{
+    void * res = realloc(p, sz);
+    if (res == NULL) {
+        fprintf( stderr, "realloc of %d bytes at 0x%p failed\n", sz, p );
+        exit( EXIT_FAILURE );
+    }
+    return res;
+}
+
+
+LOCAL void
+ao_free (void *p)
+{
+    if (p != NULL)
+        free(p);
+}
+
+
+LOCAL char *
+ao_strdup (char const * str)
+{
+    char * res = strdup(str);
+    if (res == NULL) {
+        fprintf( stderr, "strdup of %d byte string failed\n", strlen(str) );
+        exit( EXIT_FAILURE );
+    }
+    return res;
+}
 
 /*
  * Local Variables:

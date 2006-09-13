@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-09-09 12:16:55 bkorb"
+# Time-stamp:        "2006-09-10 11:40:02 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.24 2006/09/09 20:13:27 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.25 2006/09/13 14:31:09 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -101,6 +101,8 @@ make_funcs_def()
   else mv -f Makefile.new Makefile.am
        echo "WARNING: Makefile.am has been updated"
   fi
+  :mkfwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c` > /dev/null 2>&1 || :
+  ${AGexe} aoconf.def
   cd ${svdir}
 }
 
@@ -205,20 +207,18 @@ MISSING=${MISSING-${srcdir}/config/missing}
 
 case ${BOOTSTRAP} in
 
-pre )
+( pre )
     echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
 
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 
     check_tools
-    config_versions
     make_funcs_def
-
-    exit 0
+    config_versions
     ;;
 
-post )
+( post )
     rm -f  ${srcdir}/doc/autogen.texi
     ;;
 esac

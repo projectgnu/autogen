@@ -1,12 +1,12 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2006-06-17 08:05:37 bkorb"
-# $Id: bootstrap.dir,v 4.7 2006/06/17 15:06:15 bkorb Exp $
+# Time-stamp:      "2006-09-10 11:31:36 bkorb"
+# $Id: bootstrap.dir,v 4.8 2006/09/13 14:31:08 bkorb Exp $
 #
 AGexe=${AGexe-autogen}
 noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 
 case "$1" in
-*genshell.c )
+( *genshell.c )
   #  We were probably invoked by make
   #
   $noag && test -f genshell.c && exit 0
@@ -14,14 +14,8 @@ case "$1" in
   ${AGexe} -L. genshell.def
   ;;
 
-*libopts.texi )
+( *libopts.texi )
   $noag && test -f libopts.texi && exit 0
   ${AGexe} -Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def
-  ;;
-
-* )
-  #  This is likely a bootstrap.
-  #
-  :mkfwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c`
   ;;
 esac

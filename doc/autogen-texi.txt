@@ -5182,7 +5182,7 @@ or @code{option}, or else they end with @code{_opt}.  If this happens to
 conflict with other macros you are using, or if you are compiling multiple
 option sets in the same compilation unit, the conflicts can be avoided.  You
 may specify an external name @code{prefix} (@pxref{program attributes}) for
-all of the names generated for a each set of option definitions.
+all of the names generated for each set of option definitions.
 
 Among these macros, several take an option name as a macro argument.
 Sometimes, this will inconveniently conflict.  For example, if you specify an
