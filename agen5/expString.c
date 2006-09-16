@@ -1,7 +1,7 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.11 2006/08/22 16:06:35 bkorb Exp $
+ *  $Id: expString.c,v 4.12 2006/09/16 22:30:00 bkorb Exp $
  *  This module implements expression functions that
  *  manipulate string values.
  */
@@ -459,7 +459,7 @@ ag_scm_in_p( SCM obj, SCM list )
     int     len;
     size_t  lenz;
     SCM     car;
-    char*   pz1;
+    tCC *   pz1;
 
     if (! AG_SCM_STRING_P( obj ))
         return SCM_UNDEFINED;
@@ -531,7 +531,7 @@ ag_scm_join( SCM sep, SCM list )
     size_t     sep_len;
     scm_sizet  str_len;
     char*      pzRes;
-    char*      pzSep;
+    tCC *      pzSep;
     char*      pzScan;
 
     if (! AG_SCM_STRING_P( sep ))
@@ -1102,7 +1102,7 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
             }
         } mapDone:;
 
-        pzTo = AG_SCM_CHARS( str );
+        pzTo = (char*)(void*)AG_SCM_CHARS( str );
         i    = AG_SCM_STRLEN( str );
         while (i-- > 0) {
             *pzTo = map[ (int)*pzTo ];

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.11 2006/08/22 16:06:35 bkorb Exp $
+ *  $Id: expGuile.c,v 4.12 2006/09/16 22:30:00 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -306,7 +306,7 @@ ag_scm_string_to_c_name_x( SCM str )
         scm_wrong_type_arg( zFun, 1, str );
 
     len = AG_SCM_STRLEN( str );
-    pz  = AG_SCM_CHARS( str );
+    pz  = (char*)(void*)AG_SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
         if (! isalnum( ch )) {
@@ -346,7 +346,7 @@ ag_scm_string_upcase_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = AG_SCM_CHARS( str );
+    pz  = (char*)(void*)AG_SCM_CHARS( str );
     while (--len >= 0) {
          char ch = *pz;
         if (islower( ch ))
@@ -401,7 +401,7 @@ ag_scm_string_capitalize_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = AG_SCM_CHARS( str );
+    pz  = (char*)(void*)AG_SCM_CHARS( str );
 
     while (--len >= 0) {
         char ch = *pz;
@@ -467,7 +467,7 @@ ag_scm_string_downcase_x( SCM str )
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN( str );
-    pz  = AG_SCM_CHARS( str );
+    pz  = (char*)(void*)AG_SCM_CHARS( str );
     while (--len >= 0) {
         char ch = *pz;
         if (isupper( ch ))

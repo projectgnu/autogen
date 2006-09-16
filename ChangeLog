@@ -8,6 +8,12 @@
 	* autoopts/optmain.tpl(handler-type): if we cannot open output, free
 	the allocated data space.
 	* GLOBALLY: replace tabs with spaces where possible
+	* agen5/autogen.h(AG_SCM_CHARS): use the Guile internal function
+	"scm_i_string_chars()" because there is no alternative.
+	* agen5/expGuile.c: forcefully ignore the read-only attribute of the
+	result returned by scm_i_string_chars.
+	* agen5/expString.c: use "char const" for two returned pointers, but
+	forcefully ignore the result in ag_scm_string_tr_x.
 
 2006-09-10  Bruce Korb  <bkorb@gnu.org>
 
