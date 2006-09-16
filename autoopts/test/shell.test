@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-09-16 12:30:37 bkorb"
+# Time-stamp:        "2006-09-16 13:28:09 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 4.6 2006/09/16 19:58:35 bkorb Exp $
+# $Id: shell.test,v 4.7 2006/09/16 20:37:07 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -80,7 +80,7 @@ _EOF_
 cmp -s $testname.test $testname.out || \
   failure "`diff $testname.out $testname.test`"
 
-sed '/test_main/s/yes/optionParseShell/' $testname.def > XX
+sed '/test-main/s/yes/optionParseShell/' $testname.def > XX
 mv -f XX $testname.def
 
 echo ${AG_L} $testname.def
@@ -135,8 +135,9 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 _EOF_
 
-cmp -s $testname.h*lp || \
-  failure script generator help output mismatch
+files=${testname}.hlp\ ${testname}.help
+cmp -s ${files} || \
+  failure "script generator help output mismatch: `diff -c ${files}`"
 
 # # # # # # # # # # SCRIPT OUTPUT FILE # # # # # # # # #
 

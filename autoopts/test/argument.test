@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-09-16 12:18:05 bkorb"
+# Time-stamp:        "2006-09-16 13:08:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: argument.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
+# $Id: argument.test,v 4.6 2006/09/16 20:37:07 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -56,7 +56,7 @@ cmp -s ${testname}.h*lp || \
   failure ${testname} did not handle its options
 
 exec 3> ${testname}2.def
-sed '/arg_type = number/q' ${testname}.def >&3
+sed '/arg-type = number/q' ${testname}.def >&3
 cat >&3 <<- _EOF_
 	    arg-range = "-1";
 	    arg-range = "3->021";
