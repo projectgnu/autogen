@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2006-01-07 11:19:02 bkorb"
+# Time-stamp:        "2006-09-16 12:16:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.10 2006/01/09 01:36:42 bkorb Exp $
+# $Id: rc.test,v 4.11 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -22,7 +22,8 @@ export TESTNAME
 
 test_main="yes" \
 argument="mumble" long_opts="yes" \
-${SHELL-sh} ${stdopts} option second:init third:
+${SHELLX} ${stdopts} option second:init third: || \
+    failure "Could not run stdopts.def"
 
 cat >> ${testname}.def <<_EOF_
 homerc = "\$\$/${testname}.rc";
@@ -166,7 +167,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

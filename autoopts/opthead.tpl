@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.21 2006/09/09 19:09:36 bkorb Exp $
+# $Id: opthead.tpl,v 4.22 2006/09/16 19:58:35 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
 # Time-stamp:      "2006-09-09 11:11:44 bkorb"
 
@@ -330,10 +330,15 @@ extern tOptions   [=(. pname)=]Options;[=
  *
  *  Globals exported from the [=prog_title=] option definitions
  */
-[=  FOR export "\n\n"   =][=
-      export            =][=
-    ENDFOR export       =][=
-  ENDIF export exists   =]
+[=  (join "\n\n" (stack "export")) =][=
+  ENDIF  export? =][=
+
+ (if (> (string-length added-hdr) 0)
+     (begin
+        (emit "\n")
+        (shellf "sort -u <<_EOF_\n%s_EOF_" added-hdr)
+ )   )
+=]
 
 #ifndef _
 #  if ENABLE_NLS

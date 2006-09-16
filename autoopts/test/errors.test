@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-07-27 19:26:50 bkorb"
+# Time-stamp:        "2006-09-16 12:17:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: errors.test,v 4.9 2006/07/28 03:40:11 bkorb Exp $
+# $Id: errors.test,v 4.10 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -23,7 +23,8 @@ testname="${testname}" \
 test_main="${test_main}" \
 argument="arg ..." \
 long_opts="yes" \
-${SHELL-sh} -x ${stdopts} option second:fumble
+${SHELLX} -x ${stdopts} option second:fumble || \
+    failure "Could not run stdopts.def"
 
 echo 'reorder-args;' >> ${testname}.def
 sed '/"second"/a\
@@ -169,7 +170,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

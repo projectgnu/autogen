@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:12:59 bkorb"
+# Time-stamp:        "2006-09-16 12:30:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 4.5 2006/06/25 00:51:11 bkorb Exp $
+# $Id: shell.test,v 4.6 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -25,7 +25,7 @@ echo "creating $testname.def in `pwd`"
 test_main="${test_main}"    \
  argument="reg-arg [ ... ]" \
 long_opts=true  \
-${SHELL} ${stdopts} option: second
+${SHELLX} ${stdopts} option: second || failure "Could not run stdopts.def"
 
 echo ${AG_L} $testname.def
 ${AG_L} $testname.def || \
@@ -442,7 +442,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

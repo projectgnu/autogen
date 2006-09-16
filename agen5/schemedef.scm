@@ -133,7 +133,7 @@
 ;;;  *   #endif /* [+ (. header-guard) +] */
 ;;;  *   @end example
 ;;;  *
-;;;  *	 The name of the header file (the current output file) is also stored
+;;;  *   The name of the header file (the current output file) is also stored
 ;;;  *   in an SCM symbol, @code{header-file}.  Therefore, if you are also
 ;;;  *   generating a C file that uses the previously generated header file,
 ;;;  *   you can put this into that generated file:

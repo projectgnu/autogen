@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2005-03-06 09:16:03 bkorb"
+# Time-stamp:        "2006-09-16 12:15:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: stdopts.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -16,21 +16,21 @@
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 echo "creating ${testname}.def in `pwd`"
-cat > ${testname}.def <<_EOF_
+cat > ${testname}.def <<- _EOF_
 
-AutoGen Definitions options;
+	AutoGen Definitions options;
 
-prog-name = test_${testname};
-prog-title = "${testname} test";
-config-header = 'config.h';
-test-main;
-long-opts;
+	prog-name = test_${testname};
+	prog-title = "${testname} test";
+	config-header = 'config.h';
+	test-main;
+	long-opts;
 
-#define VERBOSE_ENUM
-#define VERBOSE_FLAG
+	#define VERBOSE_ENUM
+	#define VERBOSE_FLAG
 
-#include stdoptions
-_EOF_
+	#include stdoptions
+	_EOF_
 
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
@@ -40,28 +40,28 @@ compile "-?"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-cat > ${testname}.hbase <<'_EOF_'
-test_stdopts - stdopts test
-USAGE:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+cat > ${testname}.hbase <<- _EOF_
+	test_stdopts - stdopts test
+	USAGE:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 
-The following options are commonly used and are provided and supported
-by AutoOpts:
+	The following options are commonly used and are provided and supported
+	by AutoOpts:
 
-  Flg Arg Option-Name    Description
-   -V KWd verbose        run program with progress info
+	  Flg Arg Option-Name    Description
+	   -V KWd verbose        run program with progress info
 
-version and help options:
+	version and help options:
 
-  Flg Arg Option-Name    Description
-   -? no  help           Display usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+	  Flg Arg Option-Name    Description
+	   -? no  help           Display usage information and exit
+	   -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+	Options are specified by doubled hyphens and their name
+	or by a single hyphen and the flag character.
 
-The valid "verbose" option keywords are:
-  silent quiet brief informative verbose
-_EOF_
+	The valid "verbose" option keywords are:
+	  silent quiet brief informative verbose
+	_EOF_
 
 #  When building with DEBUG set, we get an unanticipated option:
 #
@@ -90,7 +90,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

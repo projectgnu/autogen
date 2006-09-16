@@ -2,13 +2,13 @@ dnl  -*- Mode: M4 -*-
 dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
 dnl
-dnl Author:	           Gary V. Vaughan <gvaughan@localhost>
-dnl Maintainer:	       Gary V. Vaughan <gvaughan@localhost>
-dnl Created:	       Sun Nov 15 23:37:14 1998
+dnl Author:            Gary V. Vaughan <gvaughan@localhost>
+dnl Maintainer:        Gary V. Vaughan <gvaughan@localhost>
+dnl Created:           Sun Nov 15 23:37:14 1998
 cnl Time-stamp:        "2005-02-14 08:24:48 bkorb"
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.4 2005/02/14 16:25:37 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:

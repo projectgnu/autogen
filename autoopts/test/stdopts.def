@@ -1,7 +1,7 @@
 #! /bin/sh
 #
-## Time-stamp:      "2005-03-06 09:16:30 bkorb"
-## ident            $Id: stdopts.def,v 4.3 2005/03/06 20:16:08 bkorb Exp $
+## Time-stamp:      "2006-09-16 12:49:11 bkorb"
+## ident            $Id: stdopts.def,v 4.4 2006/09/16 19:58:35 bkorb Exp $
 
 #  This is the standard set of options for testing option processing
 #  It is expected to be dot
@@ -17,73 +17,62 @@ cat >&5 <<- _EOF_
 	_EOF_
 
 echo test_main $test_main
-if [ -n "${test_main}" ]
-then
-  echo "test_main  = '${test_main}';" >&5
-fi
-
-echo argument $argument
-if [ -n "${argument}" ]
-then
-  echo "argument   = '${argument}';" >&5
-fi
-
+echo argument  $argument
 echo long_opts $long_opts
-if [ -n "${long_opts}" ]
-then
-  echo "long_opts;" >&5
-fi
+
+test -n "${test_main}" && echo "test-main  = '${test_main}';" >&5
+test -n "${argument}"  && echo "argument   = '${argument}';" >&5
+test -n "${long_opts}" && echo "long-opts;" >&5
 
 for flag
 do
-    case "$flag" in
-    ?*:?* )
-        arg=`echo $flag | sed 's/.*://'`
-	flag=`echo $flag | sed 's/:.*//'`
-	arg="    arg_type = string; arg_default = '$arg';"
-	;;
+  case "$flag" in
+  ?*:?* )
+    arg=`echo $flag | sed 's/.*://'`
+    flag=`echo $flag | sed 's/:.*//'`
+    arg="    arg-type = string; arg_default = '$arg';"
+    ;;
 
-    ?*=[0-9]* )
-        arg=`echo $flag | sed 's/.*=//'`
-	flag=`echo $flag | sed 's/=.*//'`
-	arg="    arg_type = number; arg_default = '$arg';"
-	;;
+  ?*=[0-9]* )
+    arg=`echo $flag | sed 's/.*=//'`
+    flag=`echo $flag | sed 's/=.*//'`
+    arg="    arg-type = number; arg_default = '$arg';"
+    ;;
 
-    ?*: )
-	flag=`echo $flag | sed 's/://'`
-	arg="    arg_type = 'string';"
-	;;
+  ?*: )
+    flag=`echo $flag | sed 's/://'`
+    arg="    arg-type = string;"
+    ;;
 
-    ?*= )
-	flag=`echo $flag | sed 's/=//'`
-	arg="    arg_type = 'number';"
-	;;
+  ?*= )
+    flag=`echo $flag | sed 's/=//'`
+    arg="    arg-type = number;"
+    ;;
 
-    * )
-	unset arg
-	;;
-    esac
+  * )
+    unset arg
+    ;;
+  esac
 
-    cat <<-_EOF_
+  cat <<-_EOF_
 	flag = {
 	    name = "$flag";
 	    descrip = "The $flag option descrip";
 	_EOF_
 
-    if ${use_flags}
-    then
-	echo "    value = '`echo $flag | sed 's/\(.\).*/\1/'`';"
-    fi
-    [ -n "${arg}" ] && echo "${arg}"
-    echo "};"
-    echo
+  ${use_flags} && {
+    flag=`echo $flag | sed 's/\(.\).*/\1/'`
+    echo "    value = '${flag}';"
+  }
+  test -n "${arg}" && echo "${arg}"
+  echo "};"
+  echo
 done >&5
 
 exec 5>&-
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

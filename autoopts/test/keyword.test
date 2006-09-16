@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2006-05-27 09:51:56 bkorb"
+# Time-stamp:        "2006-09-16 12:17:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.10 2006/06/03 18:25:49 bkorb Exp $
+# $Id: keyword.test,v 4.11 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -18,7 +18,7 @@
 echo "creating ${testname}.def in `pwd`"
 testname="${testname}" test_main="" \
 argument="${argument}" long_opts="yes" \
-${SHELL-sh} ${stdopts} option:'opt init'
+${SHELLX} ${stdopts} option:'opt init' || failure "Could not run stdopts.def"
 cat >> ${testname}.def <<- _EndOfDef_
 	help_value = X;
 	homerc     = '.';

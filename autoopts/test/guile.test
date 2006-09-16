@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-12-05 11:30:23 bkorb"
+# Time-stamp:        "2006-09-16 12:17:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: guile.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: guile.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -21,7 +21,7 @@ echo "creating ${testname}.def in `pwd`"
 testname="${testname}" \
 argument='[ <guile-arg> ...]' \
 long_opts="true" \
-${SHELL-sh} ${stdopts} option second:
+${SHELLX} ${stdopts} option second: || failure "Could not run stdopts.def"
 
 sed -e '/name = "second"/a\
     max = NOLIMIT; stack_arg;' \
@@ -106,7 +106,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

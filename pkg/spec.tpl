@@ -5,11 +5,11 @@ Version:    [= version =]
 Vendor:     [= copyright.owner =] http://www.gnu.org/software/autogen
 Release:    [=`echo $AG_MAJOR_VERSION`=]
 Copyright:  Copyright (c) [= copyright.date =] by [= copyright.owner
-		=].  All rights reserved.  Licensed under GPL, [=#
-		=]version 2 or later.
+                =].  All rights reserved.  Licensed under GPL, [=#
+                =]version 2 or later.
 Group:      Development/Tools
 Source:     ftp://ftp.gnu.org/gnu/autogen/rel[= version =]/autogen-[= version
-		=].tar.gz
+                =].tar.gz
 BuildRoot:  %{_tmppath}/%{name}-root
 
 %description
@@ -34,11 +34,12 @@ chmod -R +rw *
 %configure
 make CFLAGS="$RPM_OPT_FLAGS"
 
-if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd; then
-	echo "switching to user nobody to run 'make check'"
-	chown -R nobody . ; su -c "umask 002; make check || touch FAIL" nobody
+if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd
+then
+    echo "switching to user nobody to run 'make check'"
+    chown -R nobody . ; su -c "umask 002; make check || touch FAIL" nobody
 else
-	make check
+    make check
 fi
 [ -f FAIL ] && exit 1
 

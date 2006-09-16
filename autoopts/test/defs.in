@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-09-09 10:42:55 bkorb"
+# Time-stamp:     "2006-09-16 12:33:45 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/09/09 19:09:36 $
+# Last Modified:  $Date: 2006/09/16 19:58:35 $
 #
-# $Id: defs.in,v 4.11 2006/09/09 19:09:36 bkorb Exp $
+# $Id: defs.in,v 4.12 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -218,12 +218,16 @@ AG_L="${AGexe} -L`cd ${srcdir}/..;pwd`"
 test_main=yes
 use_flags=true
 
-: "=== Running $progname for ${testname} ==="
+: "=== Running $progname for ${testname} using ${SHELL=sh} ==="
 chmod +w * > /dev/null 2>&1 || :
+export SHELL
+case "$-" in
+*x*) SHELLX="${SHELL} -x" ;;
+ * ) SHELLX="${SHELL}" ;;
+esac
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.18 2006/07/27 02:51:47 bkorb Exp $
+# $Id: optmain.tpl,v 4.19 2006/09/16 19:58:35 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
@@ -319,6 +319,7 @@ CASE handler-type =][=
         if (fd < 0) {
             fprintf( stderr, pz_fs_err, errno, strerror(errno), "open",
                      pz_fname );
+            free( file_text );
             return 1;
         }
 

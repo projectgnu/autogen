@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.20 2006/06/24 23:34:51 bkorb Exp $
+# $Id: optlib.tpl,v 4.21 2006/09/16 19:58:35 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
@@ -339,7 +339,8 @@ typedef enum {[=
                           =]*)(&[=(. value-desc)=].pzLastArg))[=
 
   =*  set        =]
-#define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
+#define [=(set! added-hdr (string-append added-hdr "#include <stdint.h>\n"))
+          (sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
                    OPT-pfx UP-name value-desc)
                  =][=
 
@@ -527,22 +528,22 @@ static const int
          IF (exist? "arg-type")                =][=
             CASE arg-type  =][=
             =*  num        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
 
             =*  bool       =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=
 
             =*  key        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_ENUMERATION)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_ENUMERATION)[=
 
             =*  set        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_MEMBERSHIP)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_MEMBERSHIP)[=
 
             ~*  hier|nest  =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_HIERARCHY)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_HIERARCHY)[=
 
             =*  str        =] \
-	| OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
 
             *              =][=
             (error (string-append "unknown arg type '"

@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: library.test,v 4.3 2006/08/22 16:06:36 bkorb Exp $
+# $Id: library.test,v 4.4 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -147,7 +147,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

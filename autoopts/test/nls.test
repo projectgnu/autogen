@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2006-08-22 08:41:07 bkorb"
+# Time-stamp:        "2006-09-16 12:17:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: nls.test,v 4.4 2006/08/22 16:06:36 bkorb Exp $
+# $Id: nls.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -18,7 +18,8 @@
 echo "creating ${testname}.def in `pwd`"
 testname="${testname}" test_main="YES" \
 argument="${argument}" long_opts="YES" \
-${SHELL-sh} ${stdopts} option:'opt init' second=020
+${SHELLX} ${stdopts} option:'opt init' second=020 || \
+    failure "Could not run stdopts.def"
 
 echo 'export = "extern char* gettext( const char* );";' >> ${testname}.def
 
@@ -74,7 +75,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

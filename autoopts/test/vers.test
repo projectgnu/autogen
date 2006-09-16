@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2005-03-06 09:18:35 bkorb"
+# Time-stamp:        "2006-09-16 12:31:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/09/16 19:58:35 $
 #            by: bkorb
 #
-# $Id: vers.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: vers.test,v 4.4 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -22,7 +22,7 @@
 echo "creating $testname.def in `pwd`"
 testname="$testname" test_main="${test_main}" \
 argument="${argument}" long_opts="${long_opts}" \
-${SHELL-sh} ${stdopts} option second
+${SHELLX} ${stdopts} option second || failure "Could not construct stdopts"
 echo 'help-value = h;' >> $testname.def
 echo 'version-value = V;' >> $testname.def
 
@@ -53,7 +53,7 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 4.3 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 4.4 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
 echo ${AG_L} $testname.def
@@ -85,7 +85,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

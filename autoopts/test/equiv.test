@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2005-03-06 09:15:40 bkorb"
+# Time-stamp:        "2006-09-16 12:17:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: equiv.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: equiv.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -19,7 +19,8 @@ echo "creating ${testname}.def in `pwd`"
 CFLAGS="-g -static" \
 testname="${testname}" test_main="${test_main}" \
 argument="${argument}" long_opts="${long_opts}" \
-${SHELL-sh} ${stdopts} option:'opt init' second=020
+${SHELLX} ${stdopts} option:'opt init' second=020 || \
+    failure "Could not run stdopts.def"
 cat >> ${testname}.def <<'_EOF_'
 long-opts;
 
@@ -252,7 +253,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

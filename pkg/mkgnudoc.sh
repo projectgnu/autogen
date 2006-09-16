@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Time-stamp: "2006-06-03 13:14:27 bkorb"
-# Version:    "$Revision: 4.7 $
+# Version:    "$Revision: 4.8 $
 
 MAKE=${MAKE:-make}
 pkgsrcdir=`dirname $0`
@@ -105,7 +105,6 @@ tar cf - ${ddir} | gzip > ${ddir}-doc.tar.gz
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

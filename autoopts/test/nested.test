@@ -7,10 +7,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/06/24 23:34:51 $
+# Last Modified:     $Date: 2006/09/16 19:58:35 $
 #            by: bkorb
 #
-# $Id: nested.test,v 4.4 2006/06/24 23:34:51 bkorb Exp $
+# $Id: nested.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -192,7 +192,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

@@ -1,3 +1,14 @@
+2006-09-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(limits.h): generally needed for UINT_MAX
+	* autoopts/options.tpl(added-hdr): new global string
+	* autoopts/opthead.tpl(added-hdr): if not empty, emit the sort -u list.
+	* autoopts/optlib.tpl(OPT_VALUE): when using the "optCookie" field as a
+	scalar, cast to "uintprt_t", requiring "stdint.h" header
+	* autoopts/optmain.tpl(handler-type): if we cannot open output, free
+	the allocated data space.
+	* GLOBALLY: replace tabs with spaces where possible
+
 2006-09-10  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/aoconf.def: define values needed to describe configuration

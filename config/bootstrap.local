@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-09-10 11:40:02 bkorb"
+# Time-stamp:        "2006-09-16 12:38:27 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.25 2006/09/13 14:31:09 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.26 2006/09/16 19:58:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -41,7 +41,7 @@ locate_exe()
         then
             echo ${f}/${name}
             return 0
-	fi
+        fi
     done
     return 1
 }
@@ -63,7 +63,7 @@ make_funcs_def()
   getdefs linenum srcfile template=options_h output=funcs.def $files
   chmod u+w funcs.def
   eval "`egrep '^AO_' ../VERSION`"
-  cat >> funcs.def <<-	_END_VERS_INFO_
+  cat >> funcs.def <<-  _END_VERS_INFO_
 	vers-info       = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
 	vers-curr       = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
 	vers-min        = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
@@ -216,6 +216,7 @@ case ${BOOTSTRAP} in
     check_tools
     make_funcs_def
     config_versions
+    chmod a+x ${srcdir}/*/test/*.test
     ;;
 
 ( post )

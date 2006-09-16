@@ -1,6 +1,6 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.25 2006/08/22 16:06:36 bkorb Exp $
+#$Id: optcode.tpl,v 4.26 2006/09/16 19:58:35 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 # Time-stamp:      "2006-08-22 07:18:01 bkorb"
@@ -74,12 +74,12 @@ INCLUDE "optmain.tpl"
 
 =]
 
+#include <limits.h>
 [=
 
 IF (exist? "flag.arg-range")
 
-=]#include <stdio.h>
-#include <limits.h>[=
+=]#include <stdio.h>[=
 
 ENDIF  =][=
 
