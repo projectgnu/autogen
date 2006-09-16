@@ -1,5 +1,8 @@
 AutoGen Definitions aoconf.tpl;
 
+// This file is used for bootstrapping only.  Useful _only_ for
+// checked out source files.
+
 cfg = {
    c-name   = prefix;
    c-val    = '@prefix@';
@@ -26,10 +29,11 @@ cfg = {
 };
 
 cfg = {
-   c-name   = pkgdatadir;
-   c-val    = '@pkgdatadir@';
+   c-name   = package;
+   c-val    = '@PACKAGE@';
    c-desc   = <<- _EOF_
-	The directory containing support files used by autogen.
+	The name of the package that provides \fBautoopts\fP.  This is always
+	"\fIautogen\fP".
 	_EOF_;
 };
 
@@ -84,15 +88,6 @@ cfg = {
 };
 
 cfg = {
-   c-name   = package;
-   c-val    = '@PACKAGE@';
-   c-desc   = <<- _EOF_
-	The name of the package that provides \fBautoopts\fP.  This is always
-	"\fIautogen\fP".
-	_EOF_;
-};
-
-cfg = {
    c-name   = version;
    c-val    = '@AO_CURRENT@:@AO_REVISION@:@AO_AGE@';
    c-desc   = <<- _EOF_
@@ -101,7 +96,23 @@ cfg = {
 };
 
 cfg = {
-   c-name   = autogen;
+   c-name   = dotver;
+   c-val    = '@AO_CURRENT@.@AO_REVISION@.@AO_AGE@';
+   c-desc   = <<- _EOF_
+	Print the currently installed version of autoopts, in dotted format.
+	_EOF_;
+};
+
+cfg = {
+   c-name   = pkgdatadir;
+   c-val    = '${datadir}/${package}';
+   c-desc   = <<- _EOF_
+	The directory containing support files used by autogen.
+	_EOF_;
+};
+
+cfg = {
+   c-name   = 'autogen';
    c-val    = '${bindir}/autogen${exeext}';
    c-desc   = <<- _EOF_
 	Print the full path name of the autogen executable.
@@ -126,16 +137,8 @@ cfg = {
 };
 
 cfg = {
-   c-name   = pkgdatadir;
-   c-val    = '${datadir}/${package}';
-   c-desc   = <<- _EOF_
-	Print the directory containing support files used by autogen.
-	_EOF_;
-};
-
-cfg = {
    c-name   = libsrc;
-   c-val    = '${pkgdatadir}/${tag}.tar.gz';
+   c-val    = '${pkgdatadir}/libopts-${dotver}.tar.gz';
    c-desc   = <<- _EOF_
 	The full path of the redistributable, tear-off libopts library source.
 	This file is in gzipped-tarball format.
@@ -160,8 +163,7 @@ cfg = {
 
 cfg = {
    c-name   = everything;
-   c-val    = '';
    c-desc   = <<- _EOF_
-	Print the list of names and values, one per line.
+	Print the list of all names and values, one per line.
 	_EOF_;
 };

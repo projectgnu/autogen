@@ -1,37 +1,83 @@
-[= AutoGen5 Template
+[= AutoGen5 Template -*- Mode: shell-script -*-
 
 in=autoopts-config.in
 
-## Time-stamp:      "2006-09-10 11:17:21 bkorb"
+## Time-stamp:      "2006-09-13 07:18:26 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.1 2006/09/10 18:20:03 bkorb Exp $
+## $Id: aoconf-tpl.in,v 4.2 2006/09/16 20:02:15 bkorb Exp $
+
+## This file is used for bootstrapping only.  Useful _only_ for
+## checked out source files.
 
 =]
+[=
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+MACROS:
+
+=][=
+
+DEFINE script-preamble
+
+\=]
 #! /bin/sh
 ## ---------------------------------------------------------------------
-## autoopts-config.in -- Tell a client where to find installed autoopts
+## [= (out-name) =] -- Describe AutoOpts configuration
 ##
 ##  Autoopts copyright 1992-2006 Bruce Korb
 ##
 [= (dne "## ") =]
-## ---------------------------------------------------------------------
-## Code:
-[=
+##[=
 
-FOR cfg  =]
-[= c-name =]="[=c-val=]"[=
-ENDFOR   =]
+FOR cfg  =][=
+  (if (exist? "c-val")
+      (sprintf def-fmt (get "c-name") (get "c-val")) )  =][=
+ENDFOR
 
-optlist="[= (join " " (stack "cfg.c-name")) =]"
+=]
 test -n "${ldopts}" && ldflags="${ldopts}${libdir} ${ldflags}"
 test "${includedir}" = "/usr/include" && cflags=""
+[=
 
-for o in $optlist everything
-do eval echo_${o}=false ; done
+ENDDEF script-preamble
+
+\=]
+[=
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+AUTOOPTS-CONFIG script:
+
+=][=
+
+(define opt-list (join "\n" (stack "cfg.c-name")))
+(define txt      "")
+(define name-len 0)
+(define name-max 0) =][=
+
+FOR cfg  =][= (set! name-len (string-length (get "c-name")))
+              (if (> name-len name-max) (set! name-max name-len)) =][=
+ENDFOR   =][=
+
+(set! name-max (+ 1 name-max))
+(define def-fmt (sprintf "\n%%%ds=\"%%s\"" name-max))
+(define ele-fmt (sprintf "\n  %%-%ds)"   name-max))
+(define cse-fmt (sprintf "\n  %%-%ds) val=\"${val} ${%%-%ds ;;"
+                         name-max (+ 2 name-max))) =][=
+
+INVOKE script-preamble \=]
+optlist="\
+[= (shellf "(
+sort | columns -I4 --spread=1
+) <<_EOF_
+%s
+_EOF_
+" opt-list)  =]"
 
 usage()
 {
@@ -43,10 +89,10 @@ usage()
   echo Usage: autoopts-config \<\<OPTION\>\> [ ... ]
   echo Options may be one or more of:
 
-  for o in $optlist everything
+  for o in $optlist
   do  echo "       ${o}"
   done | sed 's,_,-,g'
-  echo '"everything" will print out the list of all names and their values.'
+  echo 'NB: "everything" will print out the list of all names and values.'
   exit $#
 }
 
@@ -54,62 +100,64 @@ test $# -gt 0 || usage "No value specified"
 
 # Figure out what's wanted
 #
-while test $# -gt 0; do
-  o=`echo $1 | sed 's,^-*,,;s/-/_/g'`
-
-  case $o in
-  everything | \
-  \*)  echo_everything=true
-       break
-       ;;
-
-  help | h | \? )  usage     ;;
-
+val=''
+for o ; do
+  o=`echo ${o} | sed 's,^-*,,;s/-/_/g'`
+  case "$o" in
+  help | h | \? )    usage ;;
   *[!a-zA-Z0-9_]* ) usage "Invalid name:  ${o}" ;;
+[=
 
-  *)   eval f="\$echo_${o}" || usage "Unknown value:  ${o}"
-       [ -n "$f" ]          || usage "Unknown value:  ${o}"
-       eval echo_${o}=true
-       ;;
+FOR cfg         =][=
+
+  CASE c-name   =][=
+  =  everything =][=
+     (sprintf ele-fmt "everything") =]
+     for o in ${optlist}
+     do test ${o} = everything && continue
+        eval v=\"\${${o}}\"
+        test -z "${v}" && echo ${o} || \
+           printf "%-[= (. name-max) =]s $v\n" ${o}
+     done
+     exit 0
+     ;;[=
+  *             =][=
+     (set! txt (get "c-name"))
+     (sprintf cse-fmt txt (string-append txt "}\"")) =][=
+  ESAC          =][=
+
+ENDFOR
+
+=]
+
+  ( * ) usage "Unknown value name:  ${o}" ;;
   esac
-  shift
 done
 
-if ${echo_everything}
-then
-   for o in $optlist
-   do eval \${echo_${o}} || continue
+echo "${val}"
+## end of [= (out-name) =]
+[=
 
-      eval v=\"\${${o}}\"
-      printf "%-12s $v\n" ${o}
-   done
-else
-   val=''
-   for o in $optlist
-   do eval \${echo_${o}} || continue
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-      eval v=\"\${${o}}\"
-      val="${val} ${v}"
-   done
-   echo "${val}"
-fi
+MAN PAGE TEMPLATE:
 
-exit 0
-## end of [= (out-name) =] */
+\=]
 [= (out-switch "autoopts-config.1")
    (define tmp-dir (shell
       "tempdir=`(mktemp -d .ao-XXXXXX) 2>/dev/null`
       test -z \"${tempdir}\" && tempdir=${TMPDIR:-/tmp}/.ao-$$
       test -d ${tempdir} || mkdir -p ${tmpdir} || die cannot mkdir ${tempdir}
       echo ${tempdir}/" ))
-   (dne "\\\" " "\\\" ") \=]
+   (dne "\\\" " "\\\" ") =]
+\"
 .TH autoopts-config 1 [= `date '+%Y-%m-%d'` =] "" "Programmer's Manual"
 .SH NAME
 autoopts-config \- script to get information about installed version of
 autoopts
 .SH SYNOPSIS
 .B autoopts-config
-.B [<value-name> [...]] | everything
+.B { <value-name> [...] | everything }
 .PP
 .SH DESCRIPTION
 \fBautoopts-config\fP is a tool that is used by configure to determine
@@ -125,7 +173,11 @@ FOR cfg
 .TP
 .BR [= c-name =]
 .sp
-[= c-desc =]
+[= c-desc =][=
+  IF (exist? "c-val") =]
+.br
+The unconfigured value is:  [= c-val =][=
+  ENDIF      =]
 [= (out-pop) =][=
 
 ENDFOR cfg
@@ -140,10 +192,46 @@ AutoGen is the work of Bruce Korb <bkorb@gnu.org>.
 Bruce Korb <bkorb@gnu.org> and
 .br
 Luca Filipozzi <lfilipoz@debian.org>
-wrote this manpage.
+created this manpage.
 .PP
 AutoOpts is released under either the GNU General Public License with the
 Library exception (LGPL), or else the advertising clause free BSD license.
-Which license used is at the discretion of the licensee.[= #
+Which license used is at the discretion of the licensee.
+\" end of [= (out-name) =]
+[=
 
-end of aoconf.tpl  =]
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+AUTOOPTS.PC Generator script
+
+\=]
+[= (out-switch "mk-autoopts-pc.in") =][=
+
+INVOKE script-preamble \=]
+dirname=`dirname ${1}`
+test -d ${dirname} || mkdir -p ${dirname} || exit 1
+
+cat > ${1} <<-  _EOF_
+	Name:           AutoOpts
+	Description:    A semi-automated generated/library option parser
+	Version:        ${dotver}
+	Libs:           ${ldflags}
+	Cflags:         ${cflags}
+
+	# Variables (aka non-standard configury information):
+	#[=
+
+FOR   cfg       =][=
+  CASE c-name   =][=
+  ~~ everything|cflags|ldflags =][=
+  * =][= (sprintf "\n\t%1$s=\"${%1$s}\"" (get "c-name")) =][=
+  ESAC c-name   =][=
+
+ENDFOR
+
+=]
+	_EOF_
+## end of [= (out-name) =]
+[= #
+
+end of aoconf.tpl  \=]
