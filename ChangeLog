@@ -1,3 +1,28 @@
+2006-09-19  Aaron Turner  <synfinatic@gmail.com
+	Bruce Korb  <bkorb@gnu.org>
+
+	* pkg/libopts/libopts-add.m4(libopts-install): new ARG_ENABLE option
+	used to set INSTALL_LIBOPTS conditional
+	* pkg/libopts/mklibsrc.sh(LTLIBRARIES): use that conditional to decide
+	if lib_LTLIBRARIES controls libopts installation or noinst_LTLIBRARIES
+
+2006-09-04  Andreas Schwab  <schwab@suse.de>
+	(applied 2006-09-19)
+
+	* autoopts/configfile.c(optionFindValue): Fix aliasing
+	violations.
+	(optionFindNextValue): Likewise.
+	(optionGetValue): Likewise.
+	(optionNextValue): Likewise.
+	* autoopts/nested.c(unloadNestedArglist): Likewise.
+	* autoopts/optlib.tpl: [[Omitted due to lvalue issues]]
+	* agen5/agUtils.c(doOptions): Likewise.
+	* autoopts/tokenize.c(copy_cooked, copy_raw): Fix type of second
+	parameter and adjust casts.
+	(ao_string_tokenize): Cast arguments of ctype macros to unsigned
+	char.  Remove cast from second argument of copy_cooked and
+	copy_raw.
+
 2006-09-16  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(limits.h): generally needed for UINT_MAX

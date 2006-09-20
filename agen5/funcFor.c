@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.12 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: funcFor.c,v 4.13 2006/09/20 04:26:53 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -361,11 +361,11 @@ doForByStep( tTemplate* pT,
         if (loopLimit-- < 0) {
             fprintf( pfTrace, "too many FOR iterations in %s line %d\n",
                      pT->pzTplName, pMac->lineNo );
-            fprintf( pfTrace, "\texiting FOR %s from %d to %d "
-                     "by %d:\n\tmore than %ld iterations\n",
+            fprintf( pfTrace, "\texiting FOR %s from %d to %d by %d:\n"
+                     "\tmore than %d iterations\n",
                      pT->pzTemplText + pMac->ozText,
                      pFS->for_from, pFS->for_to, pFS->for_by,
-                     OPT_VALUE_LOOP_LIMIT );
+                     (int)OPT_VALUE_LOOP_LIMIT );
             break;
         }
 

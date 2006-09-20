@@ -2,12 +2,12 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2006-07-16 08:21:48 bkorb"
+## Time-stamp:      "2006-09-19 20:39:50 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.27 2006/07/16 15:27:50 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.28 2006/09/20 04:26:53 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -72,12 +72,16 @@ vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 exec 3> Makefile.am
 cat >&3 <<- EOMakefile
 	## LIBOPTS Makefile
-	MAINTAINERCLEANFILES  = Makefile.in
-	lib_LTLIBRARIES       = libopts.la
-	libopts_la_SOURCES    = libopts.c
-	libopts_la_CPPFLAGS   = -I\$(top_srcdir)
-	libopts_la_LDFLAGS    = -version-info ${AM_LDFLAGS} ${vers}
-	EXTRA_DIST            = \\
+	MAINTAINERCLEANFILES    = Makefile.in
+	if INSTALL_LIBOPTS
+	lib_LTLIBRARIES         = libopts.la
+	else
+	noinst_LTLIBRARIES      = libopts.la
+	endif
+	libopts_la_SOURCES      = libopts.c
+	libopts_la_CPPFLAGS     = -I\$(top_srcdir)
+	libopts_la_LDFLAGS      = -version-info ${AM_LDFLAGS} ${vers}
+	EXTRA_DIST              = \\
 	EOMakefile
 
 find * -type f \

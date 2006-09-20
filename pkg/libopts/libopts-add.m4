@@ -23,6 +23,11 @@ AC_DEFUN([LIBOPTS_CHECK],[
        NEED_LIBOPTS_DIR=true
     fi])
 
+  AC_ARG_ENABLE([libopts-install],
+    AC_HELP_STRING([--disable-libopts-install],
+       [Do not install libopts with client installation]))
+  AM_CONDITIONAL([INSTALL_LIBOPTS],[test "X${enable_libopts_install}" != Xno])
+
   [if test -z "${NEED_LIBOPTS_DIR}" ; then]
      AC_MSG_CHECKING([whether autoopts-config can be found])
      AC_ARG_WITH([autoopts-config],

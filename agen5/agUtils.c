@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.10 2006/08/01 19:29:58 bkorb Exp $
+ *  $Id: agUtils.c,v 4.11 2006/09/20 04:26:53 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -145,7 +145,7 @@ doOptions( int arg_ct, char** arg_vec )
     }
 
     if (! HAVE_OPT( TIMEOUT ))
-        OPT_VALUE_TIMEOUT = AG_DEFAULT_TIMEOUT;
+        OPT_ARG(TIMEOUT) = (char const *)AG_DEFAULT_TIMEOUT;
 
     /*
      *  IF the definitions file has been disabled,
