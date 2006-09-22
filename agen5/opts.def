@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.16 2006/08/22 16:06:36 bkorb Exp $
+ *   $Id: opts.def,v 4.17 2006/09/22 21:34:45 bkorb Exp $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -68,7 +68,7 @@ include = <<-  _END_INCLUDE
 	# ifdef HAVE_DLFCN_H
 	#  include <dlfcn.h>
 	# else
-	   extern void* dlopen(const char*,int);
+	   extern void* dlopen(char const*,int);
 	# endif
 
 	# ifndef  RTLD_GLOBAL
@@ -316,7 +316,7 @@ flag = {
 	    init_proc_t* proc;
 
 	    if (hdl == NULL) {
-	        const char* pzErr = dlerror();
+	        char const* pzErr = dlerror();
 	        fprintf( stderr, "dlopen(%s) error %d\n%s\n",
 	                 pOptDesc->pzLastArg, errno, pzErr );
 	        exit( EXIT_FAILURE );

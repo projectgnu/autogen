@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.14 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: defLex.c,v 4.15 2006/09/22 21:32:54 bkorb Exp $
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  */
@@ -219,7 +219,7 @@ scanAgain:
             pzShellProgram = getDefine( zShellEnv, AG_TRUE );
 
         lastToken = DP_EV_STRING;
-        pz = runShell( (const char*)pz_token );
+        pz = runShell( (char const*)pz_token );
         if (pz == NULL)
             goto scanAgain;
         TAGMEM( pz, "shell definition string" );

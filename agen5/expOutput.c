@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.16 2006/08/22 16:06:35 bkorb Exp $
+ *  $Id: expOutput.c,v 4.17 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -287,7 +287,7 @@ ag_scm_out_resume( SCM suspName )
 SCM
 ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
 {
-    static const char invalid_z[] = "ag-fprintf: 'port' is invalid";
+    static char const invalid_z[] = "ag-fprintf: 'port' is invalid";
     int   list_len = scm_ilength( alist );
     char* pzFmt    = ag_scm2zchars( fmt, zFormat );
     SCM   res      = run_printf( pzFmt, list_len, alist );

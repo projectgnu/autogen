@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.10 2006/08/01 19:29:58 bkorb Exp $
+ *  $Id: agCgi.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -29,7 +29,7 @@
  */
 
 typedef struct {
-    const char*  pzName;
+    char const*  pzName;
     char*        pzValue;
 } tNameMap;
 
@@ -73,7 +73,7 @@ typedef enum {
 #define pzCgiQuery  nameValueMap[ QUERY_STRING_IDX   ].pzValue
 #define pzCgiLength nameValueMap[ CONTENT_LENGTH_IDX ].pzValue
 
-static const char zOops[] =
+static char const zOops[] =
 "Content-type: text/plain\n\n"
 "AutoGen form processing error:\n";
 

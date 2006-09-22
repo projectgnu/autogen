@@ -122,7 +122,7 @@ cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
 #define CgiStInit_off     83
 
 
-static const char zCgiStrings[133] =
+static char const zCgiStrings[133] =
     "** OUT-OF-RANGE **\0"
     "FSM Error:  in state %d (%s), event %d (%s) is invalid\n\0"
     "invalid\0"
@@ -179,7 +179,7 @@ cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
  */
 te_cgi_state
 cgi_run_fsm(
-    const char* pzSrc,
+    char const* pzSrc,
     int inlen,
     char* pzOut,
     int outlen )

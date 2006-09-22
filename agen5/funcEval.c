@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.10 2006/08/22 16:06:36 bkorb Exp $
+ *  $Id: funcEval.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module evaluates macro expressions.
  */
@@ -357,7 +357,7 @@ ag_scm_emit( SCM val )
  *  the string.
  */
 LOCAL SCM
-eval( const char* pzExpr )
+eval( char const* pzExpr )
 {
     ag_bool allocated = AG_FALSE;
     char*   pzTemp;
@@ -456,7 +456,7 @@ tMacro*
 mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*    pzCopy; /* next text dest   */
-    tCC*     pzSrc  = (const char*)pMac->ozText; /* macro text */
+    tCC*     pzSrc  = (char const*)pMac->ozText; /* macro text */
     long     srcLen = (long)pMac->res;           /* macro len  */
     tCC*     pzSrcEnd = pzSrc + srcLen;
     tMacro*  pNextMac;

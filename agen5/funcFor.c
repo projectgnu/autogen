@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.13 2006/09/20 04:26:53 bkorb Exp $
+ *  $Id: funcFor.c,v 4.14 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -760,7 +760,7 @@ tMacro*
 mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*   pzCopy = pT->pNext; /* next text dest   */
-    tCC*    pzSrc  = (const char*)pMac->ozText; /* macro text */
+    tCC*    pzSrc  = (char const*)pMac->ozText; /* macro text */
     int     srcLen = (int)pMac->res;            /* macro len  */
     tMacro* pEndMac;
 

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcCase.c,v 4.10 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: funcCase.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module implements the CASE text function.
  */
@@ -1157,9 +1157,9 @@ mLoad_Case( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 static tMacro*
 mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
-    const char*    pzScan = *ppzScan;  /* text after macro */
+    char const*    pzScan = *ppzScan;  /* text after macro */
     char*          pzCopy = pT->pNext; /* next text dest   */
-    const char*    pzSrc  = (char*)pMac->ozText; /* macro text */
+    char const*    pzSrc  = (char*)pMac->ozText; /* macro text */
     long           srcLen = pMac->res;           /* macro len  */
 
     tSCC zInvSel[] = "Invalid selection clause";
@@ -1252,7 +1252,7 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         AG_ABEND_IN( pT, pMac, zInvSel );
 
     while (isspace(*pzSrc)) pzSrc++;
-    srcLen -= pzSrc - (const char*)pMac->ozText;
+    srcLen -= pzSrc - (char const*)pMac->ozText;
     if (srcLen <= 0)
         AG_ABEND_IN( pT, pMac, zInvSel );
 

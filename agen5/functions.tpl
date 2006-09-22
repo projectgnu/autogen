@@ -1,6 +1,6 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.3 2006/08/22 16:06:36 bkorb Exp $
+# $Id: functions.tpl,v 4.4 2006/09/22 21:34:45 bkorb Exp $
 
 =]
 [=
@@ -75,7 +75,7 @@ ENDFOR macfunc =]
 
 #define FUNC_CT    [= (count "macfunc") =]
 
-extern const char*  apzFuncNames[ FUNC_CT ];
+extern char const*  apzFuncNames[ FUNC_CT ];
 
 /*
  *  Enumerate all the function types, whether they have
@@ -246,7 +246,7 @@ egrep    '^[A-Z]' $file | sort | sed -e 's/^.*:://' -e '$s/,$//'
 
 rm -f $file ` =] };
 
-const char*  apzFuncNames[ FUNC_CT ] = {
+char const*  apzFuncNames[ FUNC_CT ] = {
 [=(out-push-new) =][=
 
 FOR macfunc "\n"    =]echo [=

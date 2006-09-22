@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.7 2006/03/25 19:23:27 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.8 2006/09/22 21:32:54 bkorb Exp $
  *
  *  Time-stamp:      "2005-12-04 19:42:46 bkorb"
  *
@@ -36,7 +36,7 @@ addSysEnv( char* pzEnvName );
 
 #ifdef DAEMON_ENABLED
  static ag_bool evalProto( tCC** ppzS, uint16_t* pProto );
- static void spawnPipe( const char* pzFile );
+ static void spawnPipe( char const* pzFile );
  static void spawnListens( tCC* pzPort, sa_family_t af );
  static void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
 #endif

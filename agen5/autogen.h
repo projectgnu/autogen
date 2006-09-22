@@ -1,7 +1,7 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.21 2006/09/16 22:30:00 bkorb Exp $
+ *  $Id: autogen.h,v 4.22 2006/09/22 21:34:45 bkorb Exp $
  *  Global header file for AutoGen
  */
 
@@ -125,7 +125,7 @@ typedef struct template_lib_marker tTlibMark;
  *
  *  Procedure for loading a template function
  */
-typedef tMacro* (tLoadProc)( tTemplate*, tMacro*, const char** ppzScan );
+typedef tMacro* (tLoadProc)( tTemplate*, tMacro*, char const** ppzScan );
 typedef tLoadProc* tpLoadProc;
 
 typedef void (tUnloadProc)( tMacro* );
@@ -251,7 +251,7 @@ struct scanContext {
 
 struct outSpec {
     tOutSpec*   pNext;
-    const char* pzFileFmt;
+    char const* pzFileFmt;
     char        zSuffix[ 1 ];
 };
 
@@ -399,7 +399,7 @@ MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
  *  GLOBAL STRINGS
  */
 #define MKSTRING( name, val ) \
-        MODE const char z ## name[ sizeof( val )] VALUE( val )
+        MODE char const z ## name[ sizeof( val )] VALUE( val )
 
 MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n" );
 MKSTRING( AllocErr,   "Allocation Failure" );
@@ -430,7 +430,7 @@ MKSTRING( DefaultNil, "" );
  *  GLOBAL PROCEDURES
  */
 #ifndef HAVE_STRLCPY
-extern size_t strlcpy( char* dest, const char* src, size_t n );
+extern size_t strlcpy( char* dest, char const* src, size_t n );
 #endif
 #ifdef ENABLE_FMEMOPEN
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -438,7 +438,7 @@ extern size_t strlcpy( char* dest, const char* src, size_t n );
  *  IF we have fopencookie or funopen, then we also have our own fmemopen
  */
 
-extern FILE * ag_fmemopen (void *buf, ssize_t len, const char *mode);
+extern FILE * ag_fmemopen (void *buf, ssize_t len, char const *mode);
 #endif
 #include "proto.h"
 

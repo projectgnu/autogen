@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.11 2006/09/20 04:26:53 bkorb Exp $
+ *  $Id: agUtils.c,v 4.12 2006/09/22 21:32:54 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -61,7 +61,7 @@ strlcpy( char* dest, tCC* src, size_t n )
 
 
 LOCAL char*
-aprf( const char* pzFmt, ... )
+aprf( char const* pzFmt, ... )
 {
     char* pz;
     va_list ap;

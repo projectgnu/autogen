@@ -237,7 +237,7 @@
 ;;;  *    `'    NULL @};
 ;;;  *      [+ (out-suspend "main")
 ;;;  *    `'   (emit-string-table "scribble")
-;;;  *    `'   (ag-fprintf 0 "\nconst char *ap[%d] = @{" ct)
+;;;  *    `'   (ag-fprintf 0 "\nchar const *ap[%d] = @{" ct)
 ;;;  *    `'   (out-resume "main")
 ;;;  *    `'   (out-pop #t) +]
 ;;;  *   @end example
@@ -263,10 +263,10 @@
 ;;;  *   in the string table:
 ;;;  *
 ;;;  *   @example
-;;;  *      static const char scribble[18] =
+;;;  *      static char const scribble[18] =
 ;;;  *    `'    "that\0" "was\0"  "the\0"  "week\0";
 ;;;  *
-;;;  *      const char *ap[7] = @{
+;;;  *      char const *ap[7] = @{
 ;;;  *    `'    scribble + 0,
 ;;;  *    `'    scribble + 5,
 ;;;  *    `'    scribble + 9,
@@ -336,14 +336,14 @@
 ;;;  * exparg: st-name , the name of the array of characters
 ;;;  *
 ;;;  * doc:    Emit into the current output stream a
-;;;  *         @code{static const char} array named @code{st-name}
+;;;  *         @code{static char const} array named @code{st-name}
 ;;;  *         that will have @code{NUL} bytes between each inserted string.
 ;;; =*/
 ;;;
 (define emit-string-table (lambda (st-name) (begin
    (set! stt-curr (hash-ref stt-table   st-name))
    (set! stt-idx  (hash-ref stt-curr "current-index"))
-   (ag-fprintf 0 "\nstatic const char %s[%d] =\n" st-name stt-idx)
+   (ag-fprintf 0 "\nstatic char const %s[%d] =\n" st-name stt-idx)
    (out-resume st-name)
 
    ;; Columnize the output.

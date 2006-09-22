@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.6 2006/08/22 16:06:36 bkorb Exp $
+# $Id: snarf.tpl,v 4.7 2006/09/22 21:34:45 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -132,7 +132,7 @@ ENDFOR symbol   =]
 #include "[= (. header-file) =]"[=
 
 DEFINE string-content   =]
-static const char s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
+static char const s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
     (c-string (if (exist? "string") (get "string") (shellf
 "echo '%s' | sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
       (get "name")  )))  =];[=

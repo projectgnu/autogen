@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.16 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: defDirect.c,v 4.17 2006/09/22 21:32:54 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -418,9 +418,9 @@ doDir_IGNORE( char* pzArg, char* pzScan )
  *  or "false").
 =*/
 static void
-check_assert_str( const char* pz, const char* pzArg )
+check_assert_str( char const* pz, char const* pzArg )
 {
-    static const char fmt[] = "#assert yielded \"%s\":\n\t`%s`";
+    static char const fmt[] = "#assert yielded \"%s\":\n\t`%s`";
 
     while (isspace(*pz)) pz++;
 
@@ -448,7 +448,7 @@ doDir_assert( char* pzArg, char* pzScan )
             break; /* not a valid script */
 
         *pzR = NUL;
-        pzS = runShell( (const char*)pzS );
+        pzS = runShell( (char const*)pzS );
         check_assert_str( pzS, pzArg );
         free(pzS);
         break;

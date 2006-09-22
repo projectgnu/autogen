@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.14 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: agShell.c,v 4.15 2006/09/22 21:32:54 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -33,7 +33,7 @@
 
  pid_t openServerFP( tpfPair* pfPair, tCC** ppArgs ) { return NOPROCESS; }
 
- char* runShell( const char* pzCmd ) {
+ char* runShell( char const* pzCmd ) {
      char* pz;
      AGDUPSTR( pz, pzCmd, "dummy shell command" );
      return pz;
@@ -52,7 +52,7 @@ static tCC     logIntroFmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
 
 tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s - %d\n";
 
-const char* pzLastCmd = NULL;
+char const* pzLastCmd = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -113,7 +113,7 @@ sigHandler( int signo )
 
     (void)fputs( "\nLast command issued:\n", pfTrace );
     {
-        const char* pz = (pzLastCmd == NULL)
+        char const* pz = (pzLastCmd == NULL)
             ? "?? unknown ??\n" : pzLastCmd;
         fprintf( pfTrace, zCmdFmt, pCurDir, pz, zShDone, logCount );
     }
@@ -535,7 +535,7 @@ loadData( void )
  *  we will shoot it and restart one later.
  */
 LOCAL char*
-runShell( const char*  pzCmd )
+runShell( char const*  pzCmd )
 {
     tSCC zCmdFail[] = "CLOSING SHELL SERVER - command failure:\n\t%s\n";
 

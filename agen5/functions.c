@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: functions.c,v 4.9 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module implements text functions.
  */
@@ -246,13 +246,13 @@ tMacro*
 mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*          pzCopy = pT->pNext;
-    const char*    pzSrc;
+    char const*    pzSrc;
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
     if (srcLen <= 0)
         goto return_emtpy_expression;
 
-    pzSrc = (const char*)pMac->ozText; /* macro text */
+    pzSrc = (char const*)pMac->ozText; /* macro text */
 
     switch (*pzSrc) {
     case ';':
@@ -348,7 +348,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     tSCC zUnk[] =
         "Unknown macro or invalid context in %s line %d:\n\t%s%s";
 
-    tCC* pzSrc = (const char*)pMac->ozText; /* macro text */
+    tCC* pzSrc = (char const*)pMac->ozText; /* macro text */
     tCC* pzMac;
 
     char z[ 64 ];

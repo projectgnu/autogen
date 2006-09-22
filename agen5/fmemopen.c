@@ -76,7 +76,7 @@
    typedef fpos_t  seek_pos_t;
 
    typedef int     (cookie_read_function_t )(void *, char *, int);
-   typedef int     (cookie_write_function_t)(void *, const char *, int);
+   typedef int     (cookie_write_function_t)(void *, char const *, int);
    typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
    typedef int     (cookie_close_function_t)(void *);
 
@@ -123,7 +123,7 @@ struct fmem_cookie_s {
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static int
-fmem_getmode( const char *pMode, mode_bits_t *pRes );
+fmem_getmode( char const *pMode, mode_bits_t *pRes );
 
 static int
 fmem_extend( fmem_cookie_t *pFMC, size_t new_size );
@@ -141,7 +141,7 @@ static int
 fmem_close( void *cookie );
 /* = = = END-STATIC-FORWARD = = = */
 
-FILE * ag_fmemopen(void *buf, ssize_t len, const char *pMode);
+FILE * ag_fmemopen(void *buf, ssize_t len, char const *pMode);
 int fmem_ioctl( FILE* fp, int req, void* ptr );
 
 #ifdef TEST_FMEMOPEN
@@ -149,7 +149,7 @@ int fmem_ioctl( FILE* fp, int req, void* ptr );
 #endif
 
 static int
-fmem_getmode( const char *pMode, mode_bits_t *pRes )
+fmem_getmode( char const *pMode, mode_bits_t *pRes )
 {
     if (pMode == NULL)
         return 1;
@@ -486,7 +486,7 @@ fmem_ioctl( FILE* fp, int req, void* ptr )
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
 =*/
 FILE *
-ag_fmemopen(void *buf, ssize_t len, const char *pMode)
+ag_fmemopen(void *buf, ssize_t len, char const *pMode)
 {
     fmem_cookie_t *pFMC;
 

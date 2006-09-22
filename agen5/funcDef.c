@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.14 2006/07/22 04:49:14 bkorb Exp $
+ *  $Id: funcDef.c,v 4.15 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -728,8 +728,8 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     papLoadProc = apDefineLoad;
 
     {
-        const char*    pzScan = *ppzScan;  /* text after macro */
-        const char*    pzSrc  = (const char*)pMac->ozText; /* macro text */
+        char const*    pzScan = *ppzScan;  /* text after macro */
+        char const*    pzSrc  = (char const*)pMac->ozText; /* macro text */
         int            macCt  = pT->macroCt - (pMac - pT->aMacros);
 
         size_t alocSize = sizeof( *pNewT )

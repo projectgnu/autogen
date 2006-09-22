@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.10 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: expGperf.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -74,7 +74,7 @@ ag_scm_make_gperf( SCM name, SCM hlist )
      */
     {
         static const int makeGperfLine = __LINE__ + 2;
-        static const char* pzCleanup =
+        static char const* pzCleanup =
             "(set! shell-cleanup (string-append shell-cleanup "
             "\"rm -rf ${gpdir}\n\"))\n";
         char* pzCmd;

@@ -298,7 +298,7 @@ dp_trans_table[ DP_STATE_CT ][ DP_EVENT_CT ] = {
 #define DpStInit_off     83
 
 
-static const char zDpStrings[279] =
+static char const zDpStrings[279] =
     "** OUT-OF-RANGE **\0"
     "FSM Error:  in state %d (%s), event %d (%s) is invalid\n\0"
     "invalid\0"

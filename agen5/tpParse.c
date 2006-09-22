@@ -2,7 +2,7 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.9 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: tpParse.c,v 4.10 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module will load a template and return a template structure.
  */
@@ -52,7 +52,7 @@ nextMacroStart( tCC* pz, tMacro** ppM, tTemplate* pTpl );
 static teFuncType
 whichFunc( tCC** ppzScan )
 {
-    const char*   pzFuncName = *ppzScan;
+    char const*   pzFuncName = *ppzScan;
     int           hi, lo, av;
     tNameType*    pNT;
     int           cmp;
@@ -281,8 +281,8 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *  text pointer to after the marker.
          */
         {
-            const char*  pzMacEnd = pzScan;
-            const char*  pz       = pzMark;
+            char const*  pzMacEnd = pzScan;
+            char const*  pz       = pzMark;
 
             for (;;pz++) {
                 pz = strchr( pz, '\n' );
@@ -348,7 +348,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                 if (pM->funcCode == FTYP_BOGUS)
                      fprintf( pfTrace, zTUndef, apzFuncNames[ ft ], ft, ln );
                 else {
-                    const char* pz;
+                    char const* pz;
                     if (ft >= FUNC_CT)
                         ft = FTYP_SELECT;
                     pz = (pM->ozText == 0)

@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.9 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: defFind.c,v 4.10 2006/09/22 21:32:54 bkorb Exp $
  *
  *  This module locates definitions.
  */
@@ -52,7 +52,7 @@ static void
 addResult( tDefEntry* pDE, tDefEntryList* pDEL );
 
 static size_t
-badName( char* pzD, const char* pzS, size_t srcLen );
+badName( char* pzD, char const* pzS, size_t srcLen );
 
 static tDefEntry*
 defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed );
@@ -106,7 +106,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
          *  '[XX]' means get the index from our definitions
          */
         char* pzDef = pzScan;
-        const char* pzVal;
+        char const* pzVal;
 
         if (! isalpha( *pzScan ))
             return NULL;
@@ -182,7 +182,7 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
 
 
 static size_t
-badName( char* pzD, const char* pzS, size_t srcLen )
+badName( char* pzD, char const* pzS, size_t srcLen )
 {
     memcpy( (void*)pzD, (void*)pzS, srcLen );
     pzD[ srcLen ] = NUL;
@@ -203,7 +203,7 @@ badName( char* pzD, const char* pzS, size_t srcLen )
  *  We start in CN_START.
  */
 LOCAL int
-canonicalizeName( char* pzD, const char* pzS, int srcLen )
+canonicalizeName( char* pzD, char const* pzS, int srcLen )
 {
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
@@ -215,7 +215,7 @@ canonicalizeName( char* pzD, const char* pzS, int srcLen )
 
     teConState state = CN_START_NAME;
 
-    const char* pzOri = pzS;
+    char const* pzOri = pzS;
     char*       pzDst = pzD;
     size_t      stLen = srcLen;
 

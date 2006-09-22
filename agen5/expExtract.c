@@ -1,7 +1,7 @@
 /*  -*- Mode: C -*-
  *
  *  expExtract.c
- *  $Id: expExtract.c,v 4.11 2006/06/24 23:34:50 bkorb Exp $
+ *  $Id: expExtract.c,v 4.12 2006/09/22 21:32:54 bkorb Exp $
  *  This module implements a file extraction function.
  */
 
@@ -27,15 +27,15 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
-static const char*
-loadExtractData( const char* pzNewFile );
+static char const*
+loadExtractData( char const* pzNewFile );
 
 static SCM
-buildEmptyText( const char* pzStart, const char* pzEnd,
+buildEmptyText( char const* pzStart, char const* pzEnd,
                 SCM def );
 
 static SCM
-extractText( const char* pzText, const char* pzStart, const char* pzEnd,
+extractText( char const* pzText, char const* pzStart, char const* pzEnd,
              SCM def );
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -46,11 +46,11 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
  */
-static const char*
-loadExtractData( const char* pzNewFile )
+static char const*
+loadExtractData( char const* pzNewFile )
 {
-    static const char* pzFile = NULL;
-    static const char* pzText = NULL;
+    static char const* pzFile = NULL;
+    static char const* pzText = NULL;
     struct stat  sbuf;
     char* pzIn;
 
@@ -89,7 +89,7 @@ loadExtractData( const char* pzNewFile )
     if (! HAVE_OPT( WRITABLE ))
         SET_OPT_WRITABLE;
 
-    pzText = (const char*)pzIn;
+    pzText = (char const*)pzIn;
 
     /*
      *  Suck up the file.  We must read it all.
@@ -133,7 +133,7 @@ loadExtractData( const char* pzNewFile )
  *  Either way, emit an empty enclosure.
  */
 static SCM
-buildEmptyText( const char* pzStart, const char* pzEnd,
+buildEmptyText( char const* pzStart, char const* pzEnd,
                 SCM def )
 {
     size_t mlen = strlen( pzStart ) + strlen( pzEnd ) + 3;
@@ -158,11 +158,11 @@ buildEmptyText( const char* pzStart, const char* pzEnd,
  *  If we got it, emit it.
  */
 static SCM
-extractText( const char* pzText, const char* pzStart, const char* pzEnd,
+extractText( char const* pzText, char const* pzStart, char const* pzEnd,
              SCM def )
 {
-    const char* pzS = strstr( pzText, pzStart );
-    const char* pzE;
+    char const* pzS = strstr( pzText, pzStart );
+    char const* pzE;
 
     if (pzS == NULL)
         return buildEmptyText( pzStart, pzEnd, def );
@@ -259,9 +259,9 @@ extractText( const char* pzText, const char* pzStart, const char* pzEnd,
 SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
 {
-    const char* pzStart;
-    const char* pzEnd;
-    const char* pzText;
+    char const* pzStart;
+    char const* pzEnd;
+    char const* pzText;
 
     if (! AG_SCM_STRING_P( file ) || ! AG_SCM_STRING_P( marker ))
         return SCM_UNDEFINED;
@@ -269,8 +269,8 @@ ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )
     pzText = loadExtractData( ag_scm2zchars( file, "extract file" ));
 
     {
-        const char* pzMarker = ag_scm2zchars( marker, "extract marker" );
-        const char* pzCaveat = "DO NOT CHANGE THIS COMMENT";
+        char const* pzMarker = ag_scm2zchars( marker, "extract marker" );
+        char const* pzCaveat = "DO NOT CHANGE THIS COMMENT";
 
         if (AG_SCM_STRING_P( caveat ) && (AG_SCM_STRLEN( caveat ) > 0))
             pzCaveat = ag_scm2zchars( caveat, "extract caveat" );

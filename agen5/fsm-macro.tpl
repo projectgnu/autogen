@@ -6,7 +6,7 @@
 
 DEFINE emit-invalid-msg =][=
 
-  ;; "defs" indexes will be diverted.  The
+  ;; "defs" indexes will be diverted.
   (define tmp-text     "")
   (define str-table    (string-append "z" Pfx "Strings"))
   (string-table-new    str-table)
@@ -98,7 +98,7 @@ static int
 {
 [=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
   (sprintf
-"    const char* fmt = z%1$sStrings + %1$sFsmErr_off;
+"    char const * const fmt = z%1$sStrings + %1$sFsmErr_off;
     fprintf( stderr, fmt, st, %2$s_STATE_NAME(st), evt, %2$s_EVT_NAME(evt));"
       Pfx PFX ) )=]
 

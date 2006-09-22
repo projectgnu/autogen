@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.10 2006/06/24 23:34:50 bkorb Exp $
+# $Id: directive.tpl,v 4.11 2006/09/22 21:34:45 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -69,7 +69,7 @@ ENDFOR directive =]
  *  We supply all the needed terminating NULs, so tell the compiler
  *  the size to allocate.
  */
-static const char zDirectives[[=(. ix)=]] =
+static char const zDirectives[[=(. ix)=]] =
 [= (shellf "columns --spread=1 -I3 <<%s_EOF_" dir-nms) =];
 
 /*
@@ -91,7 +91,7 @@ static tDirTable dirTable[ DIRECTIVE_CT ] = {
  */
 #define SCHEME_INIT_FILE [= (c-string (out-name)) =]
 static const int  schemeLine = __LINE__+2;
-static const char zSchemeInit[= (set! tmp-txt (shell
+static char const zSchemeInit[= (set! tmp-txt (shell
 
 "sed -e \"s/AUTOGEN_VERSION/${AG_VERSION}/;s/^[ \t]*//\" \\
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
@@ -194,7 +194,7 @@ test $? -eq 0 -a -x ${gperf_%2$s} || \
   die "could not build gperf program: ${res}"
 [=
   (set! tmp-txt (out-pop #t))
-  (emit (sprintf "static const char zMakeGperf[%d] =\n"
+  (emit (sprintf "static char const zMakeGperf[%d] =\n"
                  (+ 1 (string-length tmp-txt)) ))
   (kr-string tmp-txt)
 =]; /* K&R confuses emacs: " */
@@ -205,7 +205,7 @@ test -x "${gperf_%1$s}" || die "no gperf program named  ${gperf_%1$s}"
 ${gperf_%1$s} %2$s
 [=
   (set! tmp-txt (out-pop #t))
-  (emit (sprintf "static const char zRunGperf[%d] =\n"
+  (emit (sprintf "static char const zRunGperf[%d] =\n"
                  (+ 1 (string-length tmp-txt)) ))
   (kr-string tmp-txt)
 =]; /* K&R confuses emacs: " */
@@ -213,7 +213,7 @@ ${gperf_%1$s} %2$s
 
 #ifdef DAEMON_ENABLED
 typedef struct inet_family_map_s {
-    const char*     pz_name;
+    char const*     pz_name;
     unsigned short  nm_len;
     unsigned short  family;
 } inet_family_map_t;
