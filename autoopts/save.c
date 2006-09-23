@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.16 2006/07/16 15:27:50 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.17 2006/09/23 00:09:48 bkorb Exp $
  * Time-stamp:      "2006-07-16 08:13:22 bkorb"
  *
  *  This module's routines will take the currently set options and
@@ -370,7 +370,7 @@ optionSaveFile( tOptions* pOpts )
     }
 
     {
-        const char*  pz = pOpts->pzUsageTitle;
+        char const*  pz = pOpts->pzUsageTitle;
         fputs( "#  ", fp );
         do { fputc( *pz, fp ); } while (*(pz++) != '\n');
     }

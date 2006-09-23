@@ -1,12 +1,12 @@
 
-/*  $Id: version.c,v 4.9 2006/07/27 02:51:47 bkorb Exp $
+/*  $Id: version.c,v 4.10 2006/09/23 00:09:48 bkorb Exp $
  * Time-stamp:      "2006-07-26 18:38:16 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
 
-static const char zAOV[] =
+static char const zAOV[] =
     "Automated Options version %s, copyright (c) 1999-2006 Bruce Korb\n";
 
 /*  Automated Options is free software.
@@ -58,16 +58,16 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
 /*=export_func  optionVersion
  *
  * what:     return the compiled AutoOpts version number
- * ret_type: const char*
+ * ret_type: char const*
  * ret_desc: the version string in constant memory
  * doc:
  *  Returns the full version string compiled into the library.
  *  The returned string cannot be modified.
 =*/
-const char*
+char const*
 optionVersion( void )
 {
-    static const char zVersion[] =
+    static char const zVersion[] =
         STR( AO_CURRENT.AO_REVISION );
 
     return zVersion;
@@ -88,7 +88,7 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
         fputc( '\n', fp );
 
     } else {
-        const char *pz = pOpts->pzUsageTitle;
+        char const *pz = pOpts->pzUsageTitle;
         do { fputc( *pz, fp ); } while (*(pz++) != '\n');
     }
 

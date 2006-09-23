@@ -25,7 +25,7 @@
 =]
 
 #undef  cch_t
-#define cch_t const char
+#define cch_t char const
 
 /*
  *  One structure to hold all the pointers to all the stringlets.

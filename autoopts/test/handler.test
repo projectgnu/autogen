@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-06-24 14:46:35 bkorb"
+# Time-stamp:        "2006-09-22 15:35:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/09/16 19:58:35 $
+# Last Modified:     $Date: 2006/09/23 00:09:48 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.11 2006/09/16 19:58:35 bkorb Exp $
+# $Id: handler.test,v 4.12 2006/09/23 00:09:48 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -131,7 +131,7 @@ doOptSecond(
         "alpha",  "beta",   "gamma",  "omega"
     };
 
-    pOptDesc->pzLastArg =
+    pOptDesc->optArg.argIntptr =
         optionEnumerationVal( pOptions, pOptDesc, azNames, 5 );
 }
 
@@ -160,10 +160,11 @@ doOptFourth(
         "alpha",  "beta",   "gamma",  "omega"
     };
 
-    if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
-        pOptDesc->pzLastArg = (char*)FOURTH_GAMMA;
+    if (  ((unsigned long)pOptions > 0x0FUL)
+       && (pOptDesc->optArg.argString == NULL))
+        pOptDesc->optArg.argIntptr = FOURTH_GAMMA;
     else
-        pOptDesc->pzLastArg =
+        pOptDesc->optArg.argIntptr =
             optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
 }
 
