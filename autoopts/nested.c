@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.11 2006/09/23 00:12:48 bkorb Exp $
- *  Time-stamp:      "2005-07-27 10:10:28 bkorb"
+ *  $Id: nested.c,v 4.12 2006/09/23 01:44:37 bkorb Exp $
+ *  Time-stamp:      "2006-09-22 18:14:12 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -689,8 +689,8 @@ void
 optionNestedVal( tOptions* pOpts, tOptDesc* pOD )
 {
     tOptionValue* pOV =
-        optionLoadNested(pOD->pzLastArg, pOD->pz_Name, strlen( pOD->pz_Name ),
-                         OPTION_LOAD_UNCOOKED);
+        optionLoadNested(pOD->optArg.argString, pOD->pz_Name,
+                         strlen(pOD->pz_Name), OPTION_LOAD_UNCOOKED);
 
     if (pOV != NULL)
         addArgListEntry( &(pOD->optCookie), (void*)pOV );

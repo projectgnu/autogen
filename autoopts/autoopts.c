@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.24 2006/09/23 00:12:48 bkorb Exp $
- *  Time-stamp:      "2006-09-10 14:42:45 bkorb"
+ *  $Id: autoopts.c,v 4.25 2006/09/23 01:44:37 bkorb Exp $
+ *  Time-stamp:      "2006-09-22 18:21:53 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -148,7 +148,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
     tOptDesc* pOD = pOptState->pOD;
     tOptProc* pOP = pOD->pOptProc;
 
-    pOD->pzLastArg =  pOptState->pzOptArg;
+    pOD->optArg.argString = pOptState->pzOptArg;
 
     /*
      *  IF we are presetting options, then we will ignore any un-presettable
@@ -213,7 +213,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
          *  Copy the most recent option argument.  set membership state
          *  is kept in ``p->optCookie''.  Do not overwrite.
          */
-        p->pzLastArg = pOD->pzLastArg;
+        p->optArg.argString = pOD->optArg.argString;
         pOD = p;
 
     } else {

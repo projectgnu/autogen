@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.26 2006/09/23 00:12:48 bkorb Exp $
- *  Time-stamp:      "2006-09-10 13:57:10 bkorb"
+ *  $Id: configfile.c,v 4.27 2006/09/23 01:44:37 bkorb Exp $
+ *  Time-stamp:      "2006-09-22 18:01:50 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -921,7 +921,7 @@ optionFileLoad( tOptions* pOpts, char const* pzProgram )
  * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
  *
  * doc:
- *  Processes the options found in the file named with pOptDesc->pzLastArg.
+ *  Processes the options found in the file named with pOptDesc->optArg.argString.
 =*/
 void
 optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
@@ -935,12 +935,12 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
      */
     if (! DISABLED_OPT( pOptDesc )) {
         struct stat sb;
-        if (stat( pOptDesc->pzLastArg, &sb ) != 0) {
+        if (stat( pOptDesc->optArg.argString, &sb ) != 0) {
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
                 return;
 
             fprintf( stderr, zFSErrOptLoad, errno, strerror( errno ),
-                     pOptDesc->pzLastArg );
+                     pOptDesc->optArg.argString );
             (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
             /* NOT REACHED */
         }
@@ -949,12 +949,12 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
             if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
                 return;
 
-            fprintf( stderr, zNotFile, pOptDesc->pzLastArg );
+            fprintf( stderr, zNotFile, pOptDesc->optArg.argString );
             (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
             /* NOT REACHED */
         }
 
-        filePreset(pOpts, pOptDesc->pzLastArg, DIRECTION_CALLED);
+        filePreset(pOpts, pOptDesc->optArg.argString, DIRECTION_CALLED);
     }
 }
 

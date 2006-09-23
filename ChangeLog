@@ -1,3 +1,22 @@
+2006-09-22  Bruce Korb  <bkorb@gnu.org>
+
+	* THROUGHOUT: change "const char" to "char const"  The "const-ness"
+	attribute needs to follow what is const, except it *may* precede it
+	on the base type.  (It must follow any pointers it applies to.)
+	* autoopts/options_h.tpl(pzLastArg): is now a #define to a new union:
+	optArgBucket_t.
+	* autoopts/opt*.tpl: use the correct unionized name in emitted templates
+	Over time, fix this in the rest of the libopts/autoopts code.
+	* autoopts/boolean.c: use the boolean variation on the arg field
+	* autoopts/enumeration.c: use the uintptr_t variation on the arg field.
+	Retype the returned result of optionEnumerationVal to uintptr_t.
+	* autoopts/numeric.c: use the int variation on the arg field.
+	* autoopts/test/handler.test: adjust for template changes
+	* doc/auto_gen.tpl: require GCC to rebuild the doc:  pre-include config.h
+	because $top_builddir/autoopts/autoopts/options.h is referenced and
+	it does not include stdint.h without the config.h header defines.
+	stdint.h is now required to compile options.h correctly.
+
 2006-09-19  Aaron Turner  <synfinatic@gmail.com
 	Bruce Korb  <bkorb@gnu.org>
 
@@ -306,38 +325,3 @@
 	* autoopts/test/keyword.test: ditto
 	* autoopts/test/rc.test: ditto
 	* xml2ag/test/Makefile.am: 'testdir' is always the testing subdirectory.
-
-2006-01-05  Bruce Korb  <bkorb@gnu.org>
-
-	= 5.8.1 Released
-
-	* agen5/test/defs.in: set AGexe/GDexe/CLexe to full paths & export
-	* autoopts/options.tpl: display more information on failure
-
-2005-12-12  Bruce Korb  <bkorb@gnu.org>
-
-	* agen5/expExtract.c(buildEmptyText): clean it up.
-	* autoopts/options.tpl(version-text): new global used in two places
-	* autoopts/optlib.tpl: one of them
-	* autoopts/opthead.tpl: the other
-	* autoopts/optmain.tpl: fix bug in range-option-code (it must always be)
-	* autoopts/putshell.c(optionPutShell): "val" is a uintptr_t, so specify
-	"ld" and "lX" in the format strings.  "icc" still doesn't like it.
-	* autoopts/version.c(printVersion): if we have no pzFullVersion, then
-	pull the first line of the usage title.
-	* */opts.def(package): add this with "GNU AutoGen" to all option defs.
-
-2005-12-08  Bruce Korb  <bkorb@gnu.org>
-
-	* autoopts/text_mmap.c(text_mmap): anonymous pages should not be
-	shared.  Some platforms will seg fault on that.
-	* agen5/expGuile.c(ag_scm_c_eval_string_from_file_line):
-	Guile 1.4.x does not know about scm_open_input_string().
-	* autoopts/enumeration.c(optionKeywordName): new.  Map enumeration value
-	to the string name.
-	(optionEnumerationVal): accommodate this and validate the enum value.
-	* autoopts/optlib.tpl(OPT_<optname>_VAL2STR): new macro for invoking
-	the new (and private) function above.
-	* autoopts/test/keyword.test(keyword_2): new test for this.
-	* doc/autogen-texi.txt: doc it.
-

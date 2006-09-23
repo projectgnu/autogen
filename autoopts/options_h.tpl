@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-22 15:58:46 bkorb"
-# ID:  $Id: options_h.tpl,v 4.24 2006/09/23 00:11:49 bkorb Exp $
+# Time-stamp:      "2006-09-22 18:18:50 bkorb"
+# ID:  $Id: options_h.tpl,v 4.25 2006/09/23 01:44:37 bkorb Exp $
 
 =][=
 
@@ -234,7 +234,7 @@ struct optDesc {
     tAoUI           fOptState;        /* PUBLIC */
     tAoUI           reserved;
     optArgBucket_t  optArg;           /* PUBLIC */
-#   define          pzLastArg optArg.argString
+#   define          pzLastArg   optArg.argString
     void*           optCookie;        /* PUBLIC */
 
     const int *     pOptMust;

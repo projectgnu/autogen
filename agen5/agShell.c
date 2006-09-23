@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.15 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: agShell.c,v 4.16 2006/09/23 01:44:37 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -451,7 +451,7 @@ loadData( void )
          *  Set a timeout so we do not wait forever.  Sometimes we don't wait
          *  at all and we should.  Retry in those cases (but not on EOF).
          */
-        alarm( OPT_VALUE_TIMEOUT );
+        alarm( (unsigned int)OPT_VALUE_TIMEOUT );
         line_p = fgets( zLine, sizeof( zLine ), serverPair.pfRead );
         alarm( 0 );
 

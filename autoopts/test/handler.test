@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-09-22 15:35:27 bkorb"
+# Time-stamp:        "2006-09-22 17:36:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/09/23 00:09:48 $
+# Last Modified:     $Date: 2006/09/23 01:44:37 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.12 2006/09/23 00:09:48 bkorb Exp $
+# $Id: handler.test,v 4.13 2006/09/23 01:44:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -192,11 +192,11 @@ doOptSixth(
 #include <unistd.h>
 #include <autoopts/usage-txt.h>
 
-static char* AO_gettext( const char* pz );
+static char* AO_gettext( char const* pz );
 static void  coerce_it(void** s);
 
 static char*
-AO_gettext( const char* pz )
+AO_gettext( char const* pz )
 {
     char* pzRes;
     if (pz == NULL)

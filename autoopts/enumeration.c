@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.12 2006/09/23 00:12:48 bkorb Exp $
- * Time-stamp:      "2006-09-22 14:54:36 bkorb"
+ *  $Id: enumeration.c,v 4.13 2006/09/23 01:44:37 bkorb Exp $
+ * Time-stamp:      "2006-09-22 18:00:53 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -84,7 +84,7 @@ enumError(
 
     if (pOpts != NULL)
         fprintf( option_usage_fp, pz_enum_err_fmt,
-                 pOpts->pzProgName, pOD->pzLastArg );
+                 pOpts->pzProgName, pOD->optArg.argString );
 
     fprintf( option_usage_fp, zValidKeys, pOD->pz_Name );
 
@@ -235,9 +235,9 @@ optionKeywordName(
 {
     tOptDesc od;
 
-    od.pzLastArg = (char const*)(uintptr_t)enum_val;
+    od.optArg.argIntptr = enum_val;
     (*(pOD->pOptProc))( (void*)(2UL), &od );
-    return od.pzLastArg;
+    return od.optArg.argString;
 }
 
 
@@ -253,7 +253,7 @@ optionKeywordName(
  * ret_type:  uintptr_t
  * ret_desc:  the enumeration value
  *
- * doc:   This converts the pzLastArg string from the option description
+ * doc:   This converts the optArg.argString string from the option description
  *        into the index corresponding to an entry in the name list.
  *        This will match the generated enumeration value.
  *        Full matches are always accepted.  Partial matches are accepted
@@ -280,7 +280,7 @@ optionEnumerationVal(
 
     case 1UL:
     {
-        unsigned int ix = (uintptr_t)(pOD->pzLastArg);
+        unsigned int ix = pOD->optArg.argIntptr;
         /*
          *  print the name string.
          */
@@ -293,7 +293,7 @@ optionEnumerationVal(
     case 2UL:
     {
         tSCC zInval[] = "*INVALID*";
-        unsigned int ix = (uintptr_t)(pOD->pzLastArg);
+        unsigned int ix = pOD->optArg.argIntptr;
         /*
          *  Replace the enumeration value with the name string.
          */
@@ -306,7 +306,7 @@ optionEnumerationVal(
         break;
     }
 
-    return findName( pOD->pzLastArg, pOpts, pOD, paz_names, name_ct );
+    return findName( pOD->optArg.argString, pOpts, pOD, paz_names, name_ct );
 }
 
 
@@ -319,7 +319,7 @@ optionEnumerationVal(
  * arg:   char const**,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
- * doc:   This converts the pzLastArg string from the option description
+ * doc:   This converts the optArg.argString string from the option description
  *        into the index corresponding to an entry in the name list.
  *        This will match the generated enumeration value.
  *        Full matches are always accepted.  Partial matches are accepted
@@ -382,7 +382,7 @@ optionSetMembers(
             bits >>= 1;
         }
 
-        pOD->pzLastArg = pz = malloc( len );
+        pOD->optArg.argString = pz = malloc( len );
         /*
          *  Start by clearing all the bits.  We want to turn off any defaults
          *  because we will be restoring to current state, not adding to
@@ -409,7 +409,7 @@ optionSetMembers(
     }
 
     {
-        tCC*      pzArg = pOD->pzLastArg;
+        tCC*      pzArg = pOD->optArg.argString;
         uintptr_t res;
         if ((pzArg == NULL) || (*pzArg == NUL)) {
             pOD->optCookie = (void*)0;

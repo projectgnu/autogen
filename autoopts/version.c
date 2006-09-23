@@ -1,6 +1,6 @@
 
-/*  $Id: version.c,v 4.10 2006/09/23 00:09:48 bkorb Exp $
- * Time-stamp:      "2006-07-26 18:38:16 bkorb"
+/*  $Id: version.c,v 4.11 2006/09/23 01:44:37 bkorb Exp $
+ * Time-stamp:      "2006-09-22 18:15:00 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -79,9 +79,9 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
 {
     char swCh;
 
-    if (pOD->pzLastArg == NULL)
+    if (pOD->optArg.argString == NULL)
          swCh = 'v';
-    else swCh = pOD->pzLastArg[0];
+    else swCh = pOD->optArg.argString[0];
 
     if (pOpts->pzFullVersion != NULL) {
         fputs( pOpts->pzFullVersion, fp );

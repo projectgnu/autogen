@@ -2,51 +2,16 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2006-09-13 07:18:26 bkorb"
+## Time-stamp:      "2006-09-22 16:39:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Mon Jun 30 15:35:12 1997
-##            by: bkorb
+##
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.2 2006/09/16 20:02:15 bkorb Exp $
-
+## $Id: aoconf-tpl.in,v 4.3 2006/09/23 01:44:37 bkorb Exp $
+##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.
 
 =]
-[=
-
-# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-MACROS:
-
-=][=
-
-DEFINE script-preamble
-
-\=]
-#! /bin/sh
-## ---------------------------------------------------------------------
-## [= (out-name) =] -- Describe AutoOpts configuration
-##
-##  Autoopts copyright 1992-2006 Bruce Korb
-##
-[= (dne "## ") =]
-##[=
-
-FOR cfg  =][=
-  (if (exist? "c-val")
-      (sprintf def-fmt (get "c-name") (get "c-val")) )  =][=
-ENDFOR
-
-=]
-test -n "${ldopts}" && ldflags="${ldopts}${libdir} ${ldflags}"
-test "${includedir}" = "/usr/include" && cflags=""
-[=
-
-ENDDEF script-preamble
-
-\=]
 [=
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -130,7 +95,7 @@ ENDFOR
 
 =]
 
-  ( * ) usage "Unknown value name:  ${o}" ;;
+  * ) usage "Unknown value name:  ${o}" ;;
   esac
 done
 
@@ -140,16 +105,17 @@ echo "${val}"
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-MAN PAGE TEMPLATE:
+MAN PAGE TEMPLATE:  =][=
 
-\=]
-[= (out-switch "autoopts-config.1")
-   (define tmp-dir (shell
-      "tempdir=`(mktemp -d .ao-XXXXXX) 2>/dev/null`
-      test -z \"${tempdir}\" && tempdir=${TMPDIR:-/tmp}/.ao-$$
-      test -d ${tempdir} || mkdir -p ${tmpdir} || die cannot mkdir ${tempdir}
-      echo ${tempdir}/" ))
-   (dne "\\\" " "\\\" ") =]
+(out-switch "autoopts-config.1")
+(define tmp-dir (shell
+  "tempdir=`(mktemp -d .ao-XXXXXX) 2>/dev/null`
+   test -z \"${tempdir}\" && tempdir=${TMPDIR:-/tmp}/.ao-$$
+   test -d ${tempdir} || mkdir -p ${tmpdir} || die cannot mkdir ${tempdir}
+   echo ${tempdir}/" ))
+(dne "\\\" " "\\\" ")
+
+=]
 \"
 .TH autoopts-config 1 [= `date '+%Y-%m-%d'` =] "" "Programmer's Manual"
 .SH NAME
@@ -202,23 +168,16 @@ Which license used is at the discretion of the licensee.
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-AUTOOPTS.PC Generator script
+AUTOOPTS.PC Generator script     =][=
 
-\=]
-[= (out-switch "mk-autoopts-pc.in") =][=
+(out-switch "mk-autoopts-pc.in") =][=
 
 INVOKE script-preamble \=]
 dirname=`dirname ${1}`
 test -d ${dirname} || mkdir -p ${dirname} || exit 1
 
 cat > ${1} <<-  _EOF_
-	Name:           AutoOpts
-	Description:    A semi-automated generated/library option parser
-	Version:        ${dotver}
-	Libs:           ${ldflags}
-	Cflags:         ${cflags}
-
-	# Variables (aka non-standard configury information):
+	# pkg-config information for AutoOpts ${dotver}
 	#[=
 
 FOR   cfg       =][=
@@ -230,8 +189,47 @@ FOR   cfg       =][=
 ENDFOR
 
 =]
+
+	Name:           AutoOpts
+	Description:    A semi-automated generated/library option parser
+	URL:            http://www.gnu.org/software/autogen
+	Version:        ${dotver}
+	Libs:           ${ldflags}
+	Cflags:         ${cflags}
 	_EOF_
 ## end of [= (out-name) =]
-[= #
+[=
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+MACROS:
+
+=][=
+
+DEFINE script-preamble
+
+\=]
+#! /bin/sh
+## ---------------------------------------------------------------------
+## [= (out-name) =] -- Describe AutoOpts configuration
+##
+##  Autoopts copyright 1992-[=`date +%Y`=] Bruce Korb
+##
+[= (dne "## ") =]
+##[=
+
+FOR cfg  =][=
+  (if (exist? "c-val")
+      (sprintf def-fmt (get "c-name") (get "c-val")) )  =][=
+ENDFOR
+
+=]
+test -n "${ldopts}" && ldflags="${ldopts}${libdir} ${ldflags}"
+test "${includedir}" = "/usr/include" && cflags=""
+[=
+
+ENDDEF script-preamble
+
+=][= #
 
 end of aoconf.tpl  \=]

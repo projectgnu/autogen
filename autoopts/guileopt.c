@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.10 2006/06/24 23:34:51 bkorb Exp $
- * Time-stamp:      "2006-06-24 11:40:39 bkorb"
+ *  $Id: guileopt.c,v 4.11 2006/09/23 01:44:37 bkorb Exp $
+ * Time-stamp:      "2006-09-22 18:04:59 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -88,16 +88,10 @@ export_options_to_guile( tOptions* pOpts )
          */
         sprintf( z, "(define opt-enabled-%s #%c)\n", pOD->pz_Name,
                  (DISABLED_OPT(pOD) ? 'f' : 't'));
-#ifdef DEBUG
-        fputs( z, stderr );
-#endif
         gh_eval_str( z );
 
         sprintf( z, "(define have-opt-%s #%c)\n", pOD->pz_Name,
                  UNUSED_OPT( pOD ) ? 'f' : 't' );
-#ifdef DEBUG
-        fputs( z, stderr );
-#endif
         gh_eval_str( z );
 
         /*
@@ -108,18 +102,12 @@ export_options_to_guile( tOptions* pOpts )
         if (UNUSED_OPT( pOD )) {
             if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
                 sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                         (uintptr_t)pOD->pzLastArg );
-#ifdef DEBUG
-                fputs( z, stderr );
-#endif
+                         (int)pOD->optArg.argIntptr );
                 gh_eval_str( z );
             }
-            else if (pOD->pzLastArg != 0) {
+            else if (pOD->optArg.argString != 0) {
                 sprintf( z, "(define opt-arg-%s \"%s\")\n", pOD->pz_Name,
-                         pOD->pzLastArg );
-#ifdef DEBUG
-                fputs( z, stderr );
-#endif
+                         pOD->optArg.argString );
                 gh_eval_str( z );
             }
             continue;
@@ -131,9 +119,6 @@ export_options_to_guile( tOptions* pOpts )
         if (pOD->optMaxCt > 1) {
             sprintf( z, "(define opt-ct-%s %d)\n",
                      pOD->pz_Name, pOD->optOccCt );
-#ifdef DEBUG
-            fputs( z, stderr );
-#endif
             gh_eval_str( z );
         }
 
@@ -150,9 +135,6 @@ export_options_to_guile( tOptions* pOpts )
             while (--act >= 0)
                 pz += sprintf( pz, " \"%s\"", *(ppa++) );
             strcpy( pz, " ))\n" );
-#ifdef DEBUG
-            fputs( z, stderr );
-#endif
             gh_eval_str( z );
 
         }
@@ -162,22 +144,16 @@ export_options_to_guile( tOptions* pOpts )
          */
         else if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
             sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                     (uintptr_t)pOD->pzLastArg );
-#ifdef DEBUG
-            fputs( z, stderr );
-#endif
+                     (int)pOD->optArg.argIntptr );
             gh_eval_str( z );
         }
 
         /*
          *  IF the option has a string value, emit that.
          */
-        else if (pOD->pzLastArg != 0) {
+        else if (pOD->optArg.argString != 0) {
             sprintf( z, "(define opt-arg-%s \"%s\")\n", pOD->pz_Name,
-                     pOD->pzLastArg );
-#ifdef DEBUG
-            fputs( z, stderr );
-#endif
+                     pOD->optArg.argString );
             gh_eval_str( z );
         }
     }
@@ -187,7 +163,6 @@ export_options_to_guile( tOptions* pOpts )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/guileopt.c */

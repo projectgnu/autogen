@@ -1,4 +1,4 @@
-[= AutoGen5 Template
+[= AutoGen5 Template  -*- Mode: Scheme -*-
 
 #  AutoGen copyright 1992-2006 Bruce Korb
 
@@ -48,9 +48,9 @@ DEFINE emit-invalid-msg =][=
 
   FOR   event   =][=
 
-    (set! tmp-text (if (exist? (get "event"))
-                     (get (get "event"))
-                     (string-downcase! (get "event"))  ))
+    (set! tmp-text (get "event"))
+    (set! tmp-text
+          (if (exist? tmp-text) (get tmp-text) (string-downcase! tmp-text)))
     (add-tbl-str tmp-text)
     =][=
 
@@ -96,11 +96,13 @@ static int
 [=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
   (. pfx)=]_event evt )
 {
-[=(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" ""
-  (sprintf
-"    char const * const fmt = z%1$sStrings + %1$sFsmErr_off;
+[=
+(set! tmp-text (sprintf "\
+    char const * fmt = z%1$sStrings + %1$sFsmErr_off;
     fprintf( stderr, fmt, st, %2$s_STATE_NAME(st), evt, %2$s_EVT_NAME(evt));"
-      Pfx PFX ) )=]
+       Pfx  PFX ))
+
+(extract fsm-source "    /* %s == INVALID TRANS MSG == %s */" "" tmp-text)=]
 
     return EXIT_FAILURE;
 }
@@ -162,7 +164,6 @@ DEFINE build-switch    =]
   IF (== (get "cb_name") "NOOP") =]  break;[=
   ELSE =]
 [=
-
 (set! example-code (if (= (get "cb_name") "invalid") (sprintf
       "        exit( %1$s_invalid_transition( %1$s_state, trans_evt ));" pfx)
       (string-append "        nxtSt = HANDLE_" (get "cb_name") "();")  ))

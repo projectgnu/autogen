@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2006-08-22 08:46:25 bkorb"
+# Time-stamp:        "2006-09-22 17:36:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.13 2006/09/16 19:58:35 bkorb Exp $
+# $Id: getopt.test,v 4.14 2006/09/23 01:44:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -214,7 +214,7 @@ usage_too_few (tOptDesc* pOptDesc)
  *  on the command line.
  */
 static void
-usage_cannot (const char* pz_what, const char* pz_cant)
+usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char* pz = _("test_getopt error: the `%s' option conflicts with `%s'\n");
   printf (pz, pz_what, pz_cant);
@@ -226,7 +226,7 @@ usage_cannot (const char* pz_what, const char* pz_cant)
  *  together on the command line.
  */
 static void
-usage_must (const char* pz_what, const char* pz_must)
+usage_must (char const* pz_what, char const* pz_must)
 {
   char* pz = _("test_getopt error: the `%s' option requires `%s'\n");
   printf (pz, pz_what, pz_must);
@@ -455,7 +455,7 @@ usage_too_few (tOptDesc* pOptDesc)
  *  on the command line.
  */
 static void
-usage_cannot (const char* pz_what, const char* pz_cant)
+usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char* pz = _("test_getopt error: the `%s' option conflicts with `%s'\n");
   printf (pz, pz_what, pz_cant);
@@ -467,7 +467,7 @@ usage_cannot (const char* pz_what, const char* pz_cant)
  *  together on the command line.
  */
 static void
-usage_must (const char* pz_what, const char* pz_must)
+usage_must (char const* pz_what, char const* pz_must)
 {
   char* pz = _("test_getopt error: the `%s' option requires `%s'\n");
   printf (pz, pz_what, pz_must);

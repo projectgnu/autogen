@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2006-07-19 21:58:20 bkorb"
+# Time-stamp:        "2006-09-22 14:41:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2006/07/22 04:49:14 $
+# Last Modified:     $Date: 2006/09/23 01:44:37 $
 #            by: bkorb
 # Copyright:         1999-2006 by Bruce Korb
-# $Id: snarf.test,v 4.9 2006/07/22 04:49:14 bkorb Exp $
+# $Id: snarf.test,v 4.10 2006/09/23 01:44:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -99,10 +99,10 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *  Guile Initializations - Test Global Variables
  */
 #include "snarf.h"
-static const char s_test_to_example_x[]        = "test->example!";
-static const char s_guile_syntax_ele[]         = "guile-syntax-ele";
-static const char s_bumble_it[]                = "bumble-it";
-static const char s_mumble_check[]             = "mumble-check";
+static char const s_test_to_example_x[]        = "test->example!";
+static char const s_guile_syntax_ele[]         = "guile-syntax-ele";
+static char const s_bumble_it[]                = "bumble-it";
+static char const s_mumble_check[]             = "mumble-check";
        SCM test_scm_sym_bumble_it          = SCM_BOOL_F;
 static SCM test_scm_sym_mumble_check       = SCM_BOOL_F;
 

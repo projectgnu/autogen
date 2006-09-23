@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.15 2006/09/23 00:12:48 bkorb Exp $
- * Time-stamp:      "2006-07-24 21:30:51 bkorb"
+ *  $Id: makeshell.c,v 4.16 2006/09/23 01:44:37 bkorb Exp $
+ * Time-stamp:      "2006-09-22 18:19:24 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -545,7 +545,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
             exit( EXIT_FAILURE );
 
         case TT_VERSION:
-            pOD->pzLastArg = "c";
+            pOD->optArg.argString = "c";
             optionPrintVersion( pOpts, pOD );
             /* NOTREACHED */
 
@@ -692,7 +692,7 @@ emitSetup( tOptions* pOpts )
         switch (OPTST_GET_ARGTYPE(pOptDesc->fOptState)) {
         case OPARG_TYPE_ENUMERATION:
             (*(pOptDesc->pOptProc))( (tOptions*)2UL, pOptDesc );
-            pzDefault = pOptDesc->pzLastArg;
+            pzDefault = pOptDesc->optArg.argString;
             break;
 
         /*
@@ -700,18 +700,19 @@ emitSetup( tOptions* pOpts )
          */
         case OPARG_TYPE_NUMERIC:
         case OPARG_TYPE_MEMBERSHIP:
-            snprintf( zVal, sizeof( zVal ), "%ld", (tAoUL)pOptDesc->pzLastArg );
+            snprintf( zVal, sizeof( zVal ), "%d",
+                      (int)pOptDesc->optArg.argIntptr );
             pzDefault = zVal;
             break;
 
         default:
-            if (pOptDesc->pzLastArg == NULL) {
+            if (pOptDesc->optArg.argString == NULL) {
                 if (pzFmt == zSingleDef)
                     pzFmt = zSingleNoDef;
                 pzDefault = NULL;
             }
             else
-                pzDefault = pOptDesc->pzLastArg;
+                pzDefault = pOptDesc->optArg.argString;
         }
 
         printf( pzFmt, pOpts->pzPROGNAME, pOptDesc->pz_NAME, pzDefault );

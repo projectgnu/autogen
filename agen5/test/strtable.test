@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2006-06-10 09:35:39 bkorb"
+# Time-stamp:        "2006-09-22 14:40:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2006/06/10 16:44:42 $
+# Last Modified:     $Date: 2006/09/23 01:44:37 $
 #            by: bkorb
 #
-# $Id: strtable.test,v 4.2 2006/06/10 16:44:42 bkorb Exp $
+# $Id: strtable.test,v 4.3 2006/09/23 01:44:37 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -44,7 +44,7 @@ ENDFOR
 [= (out-suspend "main")
    (emit-string-table "scribble")
    (emit (sprintf "\n#define STRING_CT %d\n" ct))
-   (ag-fprintf 0 "\nconst char *ap[%d] = {" (+ ct 1))
+   (ag-fprintf 0 "\nchar const *ap[%d] = {" (+ ct 1))
    (out-resume "main")
    (out-pop #t) =]
 _EOF_
@@ -55,12 +55,12 @@ echo creating ${testname}.base
 # this is the output we should expect to see
 cat > ${testname}.base <<'_EOF_'
 
-static const char scribble[18] =
+static char const scribble[18] =
     "that\0" "was\0"  "the\0"  "week\0";
 
 #define STRING_CT 6
 
-const char *ap[7] = {
+char const *ap[7] = {
     scribble + 0,
     scribble + 5,
     scribble + 9,

@@ -1,3 +1,37 @@
+2006-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	= 5.8.1 Released
+
+	* agen5/test/defs.in: set AGexe/GDexe/CLexe to full paths & export
+	* autoopts/options.tpl: display more information on failure
+
+2005-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c(buildEmptyText): clean it up.
+	* autoopts/options.tpl(version-text): new global used in two places
+	* autoopts/optlib.tpl: one of them
+	* autoopts/opthead.tpl: the other
+	* autoopts/optmain.tpl: fix bug in range-option-code (it must always be)
+	* autoopts/putshell.c(optionPutShell): "val" is a uintptr_t, so specify
+	"ld" and "lX" in the format strings.  "icc" still doesn't like it.
+	* autoopts/version.c(printVersion): if we have no pzFullVersion, then
+	pull the first line of the usage title.
+	* */opts.def(package): add this with "GNU AutoGen" to all option defs.
+
+2005-12-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/text_mmap.c(text_mmap): anonymous pages should not be
+	shared.  Some platforms will seg fault on that.
+	* agen5/expGuile.c(ag_scm_c_eval_string_from_file_line):
+	Guile 1.4.x does not know about scm_open_input_string().
+	* autoopts/enumeration.c(optionKeywordName): new.  Map enumeration value
+	to the string name.
+	(optionEnumerationVal): accommodate this and validate the enum value.
+	* autoopts/optlib.tpl(OPT_<optname>_VAL2STR): new macro for invoking
+	the new (and private) function above.
+	* autoopts/test/keyword.test(keyword_2): new test for this.
+	* doc/autogen-texi.txt: doc it.
+
 2005-12-05  Bruce Korb  <bkorb@gnu.org>
 
 	= 5.8 Released
