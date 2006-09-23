@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: columns.c,v 4.9 2006/09/23 00:51:11 bkorb Exp $
  */
 
 /*
@@ -605,8 +605,8 @@ writeRows( void )
 static int
 compProc( const void* p1, const void* p2 )
 {
-    const char* pz1 = *(char* const*)p1;
-    const char* pz2 = *(char* const*)p2;
+    char const* pz1 = *(char* const*)p1;
+    char const* pz2 = *(char* const*)p2;
     return strcmp( pz1, pz2 );
 }
 /*

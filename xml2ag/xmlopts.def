@@ -28,7 +28,7 @@ export = <<-  EOExport
 	#ifndef NUL
 	#  define NUL '\0'
 	#endif
-	extern void forkAutogen( const char* pzInput );
+	extern void forkAutogen( char const* pzInput );
 	EOExport;
 
 flag = {

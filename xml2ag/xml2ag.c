@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.8 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.9 2006/09/23 00:48:46 bkorb Exp $
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2006 Bruce Korb
@@ -68,7 +68,7 @@ static void
 emitIndentation( void );
 
 static char*
-trim( const char* pzSrc, size_t* pSz );
+trim( char const* pzSrc, size_t* pSz );
 
 static xmlNodePtr
 printHeader( xmlDocPtr pDoc );
@@ -82,16 +82,16 @@ printNode( xmlNodePtr pNode );
 static void
 printChildren( xmlNodePtr pNode );
 /* = = = END-STATIC-FORWARD = = = */
-#define TRIM(s,psz) trim( (const char*)(s), (size_t*)(psz) )
+#define TRIM(s,psz) trim( (char const*)(s), (size_t*)(psz) )
 
-extern void forkAutogen( const char* pzInput );
+extern void forkAutogen( char const* pzInput );
 
 
 int
 main( int argc, char** argv )
 {
     xmlDocPtr   pDoc;
-    const char* pzFile = NULL;
+    char const* pzFile = NULL;
 
     {
         int ct = optionProcess( &xml2agOptions, argc, argv );
@@ -138,7 +138,7 @@ main( int argc, char** argv )
     }
 
     {
-        static const char z_not_doc[] =
+        static char const z_not_doc[] =
             "/* type %d doc is not DOCUMENT or HTML_DOCUMENT */\n";
 
         xmlNodePtr pRoot = printHeader( pDoc );
@@ -199,7 +199,7 @@ emitIndentation( void )
 
 
 static char*
-trim( const char* pzSrc, size_t* pSz )
+trim( char const* pzSrc, size_t* pSz )
 {
     static char   zNil[1] = "";
     static char*  pzData  = NULL;
@@ -217,7 +217,7 @@ trim( const char* pzSrc, size_t* pSz )
     while (isspace( *pzSrc ))  pzSrc++;
 
     {
-        const char* pzEnd = pzSrc + strlen( pzSrc );
+        char const* pzEnd = pzSrc + strlen( pzSrc );
         while ((pzEnd > pzSrc) && isspace( pzEnd[-1] ))  pzEnd--;
 
         if (pzEnd <= pzSrc) {
@@ -232,7 +232,7 @@ trim( const char* pzSrc, size_t* pSz )
      *  big enough to hold the newly formed string.
      */
     {
-        const char* pz = pzSrc;
+        char const* pz = pzSrc;
         for (;;) {
             pz += strcspn( pz, "'\\" );
             if (*(pz++) == NUL)
@@ -281,7 +281,7 @@ static xmlNodePtr
 printHeader( xmlDocPtr pDoc )
 {
     tSCC zDef[] = "AutoGen Definitions %s%s;\n";
-    const char* pzSfx = ".tpl";
+    char const* pzSfx = ".tpl";
 
     xmlNodePtr pRootNode = xmlDocGetRootElement( pDoc );
     xmlChar*   pTpl = NULL;

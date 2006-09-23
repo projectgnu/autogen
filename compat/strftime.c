@@ -175,7 +175,7 @@ localtime_r (t, tp)
 #if !defined (memset) && !HAVE_MEMSET && !_LIBC
 /* Some systems lack the `memset' function and we don't want to
    introduce additional dependencies.  */
-static const char spaces[16] = "                ";
+static char const spaces[16] = "                ";
 
 # define memset_space(P, Len) \
   do {                                                                        \
@@ -236,12 +236,12 @@ static const char spaces[16] = "                ";
    more reliable way to accept other sets of digits.  */
 #define ISDIGIT(Ch) ((unsigned int) (Ch) - '0' <= 9)
 
-static char *memcpy_lowcase __P ((char *dest, const char *src, size_t len));
+static char *memcpy_lowcase __P ((char *dest, char const *src, size_t len));
 
 static char *
 memcpy_lowcase (dest, src, len)
      char *dest;
-     const char *src;
+     char const *src;
      size_t len;
 {
   while (len-- > 0)
@@ -249,12 +249,12 @@ memcpy_lowcase (dest, src, len)
   return dest;
 }
 
-static char *memcpy_uppcase __P ((char *dest, const char *src, size_t len));
+static char *memcpy_uppcase __P ((char *dest, char const *src, size_t len));
 
 static char *
 memcpy_uppcase (dest, src, len)
      char *dest;
-     const char *src;
+     char const *src;
      size_t len;
 {
   while (len-- > 0)
@@ -333,13 +333,13 @@ static char const month_name[][10] =
 #if !defined _LIBC && HAVE_TZNAME && HAVE_TZSET
   /* Solaris 2.5 tzset sometimes modifies the storage returned by localtime.
      Work around this bug by copying *tp before it might be munged.  */
-  size_t _strftime_copytm __P ((char *, size_t, const char *,
+  size_t _strftime_copytm __P ((char *, size_t, char const *,
                                 const struct tm *));
   size_t
   strftime (s, maxsize, format, tp)
       char *s;
       size_t maxsize;
-      const char *format;
+      char const *format;
       const struct tm *tp;
   {
     struct tm tmcopy;
@@ -364,37 +364,37 @@ size_t
 strftime (s, maxsize, format, tp)
       char *s;
       size_t maxsize;
-      const char *format;
+      char const *format;
       const struct tm *tp;
 {
   int hour12 = tp->tm_hour;
 #ifdef _NL_CURRENT
-  const char *const a_wkday = _NL_CURRENT (LC_TIME, ABDAY_1 + tp->tm_wday);
-  const char *const f_wkday = _NL_CURRENT (LC_TIME, DAY_1 + tp->tm_wday);
-  const char *const a_month = _NL_CURRENT (LC_TIME, ABMON_1 + tp->tm_mon);
-  const char *const f_month = _NL_CURRENT (LC_TIME, MON_1 + tp->tm_mon);
-  const char *const ampm = _NL_CURRENT (LC_TIME,
+  char const *const a_wkday = _NL_CURRENT (LC_TIME, ABDAY_1 + tp->tm_wday);
+  char const *const f_wkday = _NL_CURRENT (LC_TIME, DAY_1 + tp->tm_wday);
+  char const *const a_month = _NL_CURRENT (LC_TIME, ABMON_1 + tp->tm_mon);
+  char const *const f_month = _NL_CURRENT (LC_TIME, MON_1 + tp->tm_mon);
+  char const *const ampm = _NL_CURRENT (LC_TIME,
                                         hour12 > 11 ? PM_STR : AM_STR);
   size_t aw_len = strlen (a_wkday);
   size_t am_len = strlen (a_month);
   size_t ap_len = strlen (ampm);
 #else
-  const char *const f_wkday = weekday_name[tp->tm_wday];
-  const char *const f_month = month_name[tp->tm_mon];
-  const char *const a_wkday = f_wkday;
-  const char *const a_month = f_month;
-  const char *const ampm = "AMPM" + 2 * (hour12 > 11);
+  char const *const f_wkday = weekday_name[tp->tm_wday];
+  char const *const f_month = month_name[tp->tm_mon];
+  char const *const a_wkday = f_wkday;
+  char const *const a_month = f_month;
+  char const *const ampm = "AMPM" + 2 * (hour12 > 11);
   size_t aw_len = 3;
   size_t am_len = 3;
   size_t ap_len = 2;
 #endif
   size_t wkday_len = strlen (f_wkday);
   size_t month_len = strlen (f_month);
-  const char *zone;
+  char const *zone;
   size_t zonelen;
   size_t i = 0;
   char *p = s;
-  const char *f;
+  char const *f;
 
   zone = NULL;
 #if !defined _LIBC && HAVE_TM_ZONE
@@ -406,7 +406,7 @@ strftime (s, maxsize, format, tp)
      the environment variable TZ to a new value before calling strftime()
      will influence the result (the %Z format) even if the information in
      TP is computed with a totally different time zone.  --drepper@gnu  */
-  zone = (const char *) tp->tm_zone;
+  zone = (char const *) tp->tm_zone;
 #endif
 #if HAVE_TZNAME
   /* POSIX.1 8.1.1 requires that whenever strftime() is called, the
@@ -436,7 +436,7 @@ strftime (s, maxsize, format, tp)
       int digits;               /* Max digits for numeric format.  */
       int number_value;         /* Numeric value to be printed.  */
       int negative_number;      /* 1 if the number is negative.  */
-      const char *subfmt;
+      char const *subfmt;
       char *bufp;
       char buf[1 + (sizeof (int) < sizeof (time_t)
                     ? INT_STRLEN_BOUND (time_t)
@@ -704,7 +704,7 @@ strftime (s, maxsize, format, tp)
             {
               /* Get the locale specific alternate representation of
                  the number NUMBER_VALUE.  If none exist NULL is returned.  */
-              const char *cp = _nl_get_alt_digit (number_value);
+              char const *cp = _nl_get_alt_digit (number_value);
 
               if (cp != NULL)
                 {

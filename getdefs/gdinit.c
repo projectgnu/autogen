@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 4.4 2006/03/25 19:23:28 bkorb Exp $
+ *  $Id: gdinit.c,v 4.5 2006/09/23 00:51:11 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2006/03/25 19:23:28 $
+ *  Last Modified:     $Date: 2006/09/23 00:51:11 $
  *            by: bkorb
  */
 
@@ -291,7 +291,7 @@ validateOptions( void )
      */
     {
         char zRER[ MAXNAMELEN ];
-        static const char zReErr[] =
+        static char const zReErr[] =
             "Regex error %d (%s):  Cannot compile reg expr:\n\t%s\n";
 
         int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );

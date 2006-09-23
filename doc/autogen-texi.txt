@@ -167,7 +167,7 @@ typedef enum @{
         IDX_BETA,
         IDX_OMEGA @}  list_enum;
 
-extern const char* az_name_list[ 3 ];
+extern char const* az_name_list[ 3 ];
 @end example
 
 @noindent
@@ -176,7 +176,7 @@ strings:
 
 @example
 #include "list.h"
-const char* az_name_list[] = @{
+char const* az_name_list[] = @{
         "some alpha stuff",
         "more beta stuff",
         "final omega stuff" @};
@@ -221,12 +221,12 @@ typedef enum @{[+
         IDX_[+ (string-upcase! (get "list_element")) +][+
    ENDFOR list +] @}  list_enum;
 
-extern const char* az_name_list[ [+ (count "list") +] ];
+extern char const* az_name_list[ [+ (count "list") +] ];
 [+
 
    ==  c  +]
 #include "list.h"
-const char* az_name_list[] = @{[+
+char const* az_name_list[] = @{[+
   FOR list "," +]
         "[+list_info+]"[+
   ENDFOR list +] @};[+
@@ -2714,7 +2714,7 @@ If you do not supply this attribute, your handler procedure must be
 the default type.  The profile of the procedure must be:
 
 @example
-int @i{my_handler}( const char *pz_entry );
+int @i{my_handler}( char const *pz_entry );
 @end example
 
 @noindent
@@ -2733,7 +2733,7 @@ where ``X'' may be any of the legal modes for @code{fopen(3C)}.  In this case,
 the profile for your procedure must be:
 
 @example
-int @i{my_handler}( const char* pz_fname, FILE* entry_fp );
+int @i{my_handler}( char const* pz_fname, FILE* entry_fp );
 @end example
 
 @item  text-of-file
@@ -2744,7 +2744,7 @@ disallows empty files.  Both require regular files.  In this case, the profile
 for your procedure must be:
 
 @example
-int @i{my_handler}( const char* pz_fname, char* file_text,
+int @i{my_handler}( char const* pz_fname, char* file_text,
                 size_t text_size );
 @end example
 
@@ -2778,7 +2778,7 @@ that looks like this:
 
 @example
 static int
-@i{my_handler}( const char* pz_entry )
+@i{my_handler}( char const* pz_entry )
 @{
     int res = 0;
     <<@i{my_handler}-code goes here>>

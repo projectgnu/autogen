@@ -11,7 +11,7 @@
  */
 
 static void
-addArg( const char* pzArg, int ix )
+addArg( char const* pzArg, int ix )
 {
     char** pArgv = xml2agOptions.origArgVect;
     if (ix >= xml2agOptions.origArgCt) {
@@ -29,7 +29,7 @@ addArg( const char* pzArg, int ix )
 
 
 void
-forkAutogen( const char* pzInput )
+forkAutogen( char const* pzInput )
 {
     tSCC zErr[] = "%s fs ERROR %d (%s) on %s\n";
     int fd[2];
@@ -138,9 +138,9 @@ forkAutogen( const char* pzInput )
           ==*  str                 =][=
                IF (exist? "max")   =]
             int    optCt = STACKCT_OPT( [=(. opt-name)=] );
-            const char**  ppOA  = STACKLST_OPT( [=(. opt-name)=] );
+            char const**  ppOA  = STACKLST_OPT( [=(. opt-name)=] );
             do  {
-                const char* pA = *(ppOA++);
+                char const* pA = *(ppOA++);
                 pzArg = malloc( [= (+ 4 (string-length (get "name")))
                         =] + strlen( pA ));
                 sprintf( pzArg, "--[=name=]=%s", pA );

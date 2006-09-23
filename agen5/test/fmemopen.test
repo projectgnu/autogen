@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/01/09 01:36:42 $
+# Last Modified:     $Date: 2006/09/23 00:51:11 $
 #            by: bkorb
 #
-# $Id: fmemopen.test,v 4.4 2006/01/09 01:36:42 bkorb Exp $
+# $Id: fmemopen.test,v 4.5 2006/09/23 00:51:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -44,7 +44,7 @@ cat >&5  <<_EOF_
 int
 main( int argc, char** argv )
 {
-    static const char zJump[] =
+    static char const zJump[] =
         "The quick brown fox jumped over the lazy dogs.\n";
 
     FILE*   fp = fmemopen( NULL, 0, "w+" );

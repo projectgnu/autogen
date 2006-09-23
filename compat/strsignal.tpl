@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 4.3 2006/03/25 19:23:28 bkorb Exp $
+# $Id: strsignal.tpl,v 4.4 2006/09/23 00:48:05 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -59,7 +59,7 @@ FOR signal (for-from 0) (for-by 1) =][=
 
 ENDFOR signal           =]
 
-static const char zSigNames[] =
+static char const zSigNames[] =
 [=(shell (string-append
   "columns -I4 --spread=1 <<'_EOF_'\n"
   sig-names
@@ -72,7 +72,7 @@ static const unsigned int sigNameOffset[] = {
   "_EOF_"  ))           =] };
 
 #ifndef HAVE_SYS_SIGLIST
-static const char zSigInfo[] =
+static char const zSigInfo[] =
 [=(shell (string-append
   "columns -I4 --spread=1 <<'_EOF_'\n"
   sig-info

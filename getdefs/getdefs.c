@@ -1,5 +1,5 @@
 /*
- *  $Id: getdefs.c,v 4.6 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: getdefs.c,v 4.7 2006/09/23 00:51:11 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
@@ -787,9 +787,9 @@ processFile( tCC* pzFile )
     while ( pzScan = pzNext,
             regexec( &define_re, pzScan, COUNT(matches), matches, 0 ) == 0) {
 
-        static const char zNoEnd[] =
+        static char const zNoEnd[] =
             "Error:  definition in %s at line %d has no end\n";
-        static const char zNoSubexp[] =
+        static char const zNoSubexp[] =
             "Warning: entry type not found on line %d in %s:\n\t%s\n";
 
         int  linesInDef = 0;

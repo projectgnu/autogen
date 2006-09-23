@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2006/08/08 14:48:44 $
+ *  Last Modified:     $Date: 2006/09/23 00:51:11 $
  *  Time-stamp:        "2006-07-29 09:32:07 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.16 2006/08/08 14:48:44 bkorb Exp $
+ *  $Id: libopts.def,v 4.17 2006/09/23 00:51:11 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.16 $";
+version     = "$Revision: 4.17 $";
 output-file = libopts.m4;
 
 test   = {
@@ -45,7 +45,7 @@ test   = {
 	#include <sys/types.h>
 	#include REGEX_HEADER
 	static regex_t re;
-	void comp_re( const char* pzPat ) {
+	void comp_re( char const* pzPat ) {
 	  int res = regcomp( &re, pzPat, REG_EXTENDED|REG_ICASE|REG_NEWLINE );
 	  if (res == 0) return;
 	  exit( res ); }
@@ -147,7 +147,7 @@ test = {
 	#include <string.h>
 	char t_buf[ 64 ];
 	int main() {
-	  static const char z[] = "Thursday Aug 28 240";
+	  static char const z[] = "Thursday Aug 28 240";
 	  struct tm tm;
 	  tm.tm_sec   = 36;  /* seconds after the minute [0, 61]  */
 	  tm.tm_min   = 44;  /* minutes after the hour [0, 59] */

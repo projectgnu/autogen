@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/06/24 23:34:51 $
+# Last Modified:     $Date: 2006/09/23 00:51:11 $
 #            by: bkorb
 #
-# $Id: string.test,v 4.6 2006/06/24 23:34:51 bkorb Exp $
+# $Id: string.test,v 4.7 2006/09/23 00:51:11 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -83,10 +83,10 @@ char zExpect[] = "'\f\r\b\v\t\a\n\n"
        "and it'll be a \"hassle\"."
        "\001\002\003\377\n'";
 #define expectSize (sizeof(zExpect) - 1)
-int checkStr( char* pz, const char* pzWhat );
-int checkStr( char* pz, const char* pzWhat )
+int checkStr( char* pz, char const* pzWhat );
+int checkStr( char* pz, char const* pzWhat )
 {
-    static const char zNotMatch[] =
+    static char const zNotMatch[] =
         "%s generated string mismatches at offset %d of %d\n"
         "Expected string:\n==>%s<==\n\n"
         "Generated string:\n-->%s<--\n\n";

@@ -29,7 +29,7 @@ autogen definitions fsm;
 
 method = case;
 type   = loop;
-cookie = "const char* pzSrc";
+cookie = "char const* pzSrc";
 cookie = "int inlen";
 cookie = "char* pzOut";
 cookie = "int outlen";

@@ -10,7 +10,7 @@
 ## Last Modified:     Mar 4, 2001
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.26 2006/06/25 00:51:11 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.27 2006/09/23 00:49:41 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -538,13 +538,14 @@ cat >> checkopt.def <<- _EOF_
 (
   ${AGexe} -L${top_srcdir}/autoopts checkopt.def
   opts=\"-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}\"
-  ${CC} ${opts} checkopt.c ${LIBS}
+  ${CC} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
 ) > checkopt.err 2>&1
 
 test -x ./check || {
   cat checkopt.err >&2
   die cannot create checkopt program
 }
+
 ./check --help | sed 's/\t/        /g'"
 ) ) =]
 @end example
@@ -665,8 +666,8 @@ INVOKE  get-text tag = "autoopts-data"
 #include <unistd.h>
 #include <autoopts/options.h>
 int main( int argc, char** argv ) {
-  const char* greeting = "Hello";
-  const char* greeted  = "World";
+  char const* greeting = "Hello";
+  char const* greeted  = "World";
   const tOptionValue* pOV = configFileLoad( "hello.conf" );
 
   if (pOV != NULL) {
