@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.22 2006/09/16 19:58:35 bkorb Exp $
+# $Id: opthead.tpl,v 4.23 2006/09/23 00:11:49 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-09 11:11:44 bkorb"
+# Time-stamp:      "2006-09-22 15:36:20 bkorb"
 
 =]
 /*
@@ -94,7 +94,7 @@ IF (> 1 (string-length UP-prefix))
 
 =]
 #define     HAVE_OPT(n) (! UNUSED_OPT(& DESC(n)))
-#define      OPT_ARG(n) (DESC(n).pzLastArg)
+#define      OPT_ARG(n) (DESC(n).optArg.argString)
 #define    STATE_OPT(n) (DESC(n).fOptState & OPTST_SET_MASK)
 #define    COUNT_OPT(n) (DESC(n).optOccCt)
 #define    ISSEL_OPT(n) (SELECTED_OPT(&DESC(n)))
@@ -112,7 +112,7 @@ ELSE we have a prefix:
 
 =][=  (sprintf "
 #define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
-#define      %1$sOPT_ARG(n) (%1$sDESC(n).pzLastArg)
+#define      %1$sOPT_ARG(n) (%1$sDESC(n).optArg.argString)
 #define    STATE_%1$sOPT(n) (%1$sDESC(n).fOptState & OPTST_SET_MASK)
 #define    COUNT_%1$sOPT(n) (%1$sDESC(n).optOccCt)
 #define    ISSEL_%1$sOPT(n) (SELECTED_OPT(&%1$sDESC(n)))
@@ -165,8 +165,9 @@ ENDIF guard-option-names
  *  Interface defines for specific options.
  */[=
 
-FOR flag              =][=
-  save-name-morphs    =][=
+FOR flag =][=
+
+  INVOKE save-name-morphs =][=
 
   IF (set! opt-name   (string-append OPT-pfx UP-name))
      (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" ))
@@ -267,7 +268,7 @@ IF (exist? "homerc")        =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
-        [=(. UP-prefix)=]DESC(SAVE_OPTS).pzLastArg  = (const char*)(a) )[=
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a) )[=
 ENDIF                       =][=
 
 IF (not (exist? "library"))
@@ -343,7 +344,7 @@ extern tOptions   [=(. pname)=]Options;[=
 #ifndef _
 #  if ENABLE_NLS
 #    include <stdio.h>
-     static inline char* aoGetsText( const char* pz ) {
+     static inline char* aoGetsText( char const* pz ) {
          if (pz == NULL) return NULL;
          return (char*)gettext( pz );
      }

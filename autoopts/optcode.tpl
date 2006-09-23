@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.26 2006/09/16 19:58:35 bkorb Exp $
+#$Id: optcode.tpl,v 4.27 2006/09/23 00:11:49 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-08-22 07:18:01 bkorb"
+# Time-stamp:      "2006-09-22 14:52:22 bkorb"
 
 =][=
 
@@ -214,7 +214,7 @@ IF (exist? "version")   =]
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
                           | OPTST_ARG_OPTIONAL, 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ [=
@@ -230,7 +230,7 @@ ENDIF =]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM, 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ doUsageOpt,
@@ -243,7 +243,7 @@ ENDIF =]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM, 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ optionPagedUsage,
@@ -261,7 +261,7 @@ IF (exist? "homerc")
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
                           | OPTST_ARG_OPTIONAL, 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ NULL,
@@ -275,7 +275,7 @@ IF (exist? "homerc")
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_DISABLE_IMM | \
 			OPTST_SET_ARGTYPE(OPARG_TYPE_STRING), 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ optionLoadOpt,
@@ -471,11 +471,11 @@ ENDIF "test/guile main"
 #include <unistd.h>
 #include <autoopts/usage-txt.h>
 
-static char* AO_gettext( const char* pz );
+static char* AO_gettext( char const* pz );
 static void  coerce_it(void** s);
 
 static char*
-AO_gettext( const char* pz )
+AO_gettext( char const* pz )
 {
     char* pzRes;
     if (pz == NULL)

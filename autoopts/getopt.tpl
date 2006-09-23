@@ -26,7 +26,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.6 2006/07/01 21:57:23 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.7 2006/09/23 00:12:48 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -212,7 +212,7 @@ usage_too_few (tOptDesc* pOptDesc)
  *  on the command line.
  */
 static void
-usage_cannot (const char* pz_what, const char* pz_cant)
+usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char* pz = _("[+(. prog-name)
     +] error: the `%s' option conflicts with `%s'\n");
@@ -229,7 +229,7 @@ usage_cannot (const char* pz_what, const char* pz_cant)
  *  together on the command line.
  */
 static void
-usage_must (const char* pz_what, const char* pz_must)
+usage_must (char const* pz_what, char const* pz_must)
 {
   char* pz = _("[+(. prog-name)
     +] error: the `%s' option requires `%s'\n");

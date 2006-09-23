@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.19 2006/09/16 19:58:35 bkorb Exp $
+# $Id: optmain.tpl,v 4.20 2006/09/23 00:11:49 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-07-22 08:37:12 bkorb"
+# Time-stamp:      "2006-09-22 14:51:08 bkorb"
 
 =][=
 
@@ -189,16 +189,16 @@ trim_input_line( char* pz_s )
 }[=
 
 CASE handler-type =][=
-=*  name         =][= (set! handler-arg-type "const char* pz_fname")
+=*  name         =][= (set! handler-arg-type "char const* pz_fname")
                       (define handler-proc "validate_fname")       =][=
 =*  file         =][=
-   (set! handler-arg-type "const char* pz_fname, FILE* entry_fp")
+   (set! handler-arg-type "char const* pz_fname, FILE* entry_fp")
                       (define handler-proc "validate_fname")       =][=
 *=* text         =][=
    (set! handler-arg-type
-         "const char* pz_fname, char* pz_file_text, size_t text_size")
+         "char const* pz_fname, char* pz_file_text, size_t text_size")
                       (define handler-proc "validate_fname")       =][=
-!E               =][= (set! handler-arg-type "const char* pz_entry")
+!E               =][= (set! handler-arg-type "char const* pz_entry")
                       (define handler-proc (get "handler-proc"))       =][=
 *                =][= (error) =][=
 ESAC             =][=
@@ -231,9 +231,9 @@ ENDIF
 IF (exist? "handler-type")  =]
 
 static int
-validate_fname( const char* pz_fname )
+validate_fname( char const* pz_fname )
 {
-    const char* pz_fs_err =
+    char const* pz_fs_err =
         _("fs error %d (%s) %s-ing %s\n");[=
 
   IF (*=* (get "handler-type") "text") =]
@@ -759,14 +759,14 @@ DEFINE range-option-code
           (out-pop #t)) =] };
     long val;
     int ix;
-    const char* pzIndent = "\t\t\t\t  ";
+    char const* pzIndent = "\t\t\t\t  ";
     extern FILE* option_usage_fp;
 
     if (pOptDesc == NULL) /* usage is requesting range list
                              option_usage_fp has already been set */
         goto emit_ranges;
 
-    val = atoi( pOptDesc->pzLastArg );
+    val = atoi( pOptDesc->optArg.argString );
     for (ix = 0; ix < [=(count "arg-range")=]; ix++) {
         if (val < rng[ix].rmin)
             continue;  /* ranges need not be ordered. */
@@ -779,8 +779,8 @@ DEFINE range-option-code
     }
 
     option_usage_fp = stderr;
-    fprintf( stderr, _("%s error:  %s option value ``%s''is out of range.\n"),
-             pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->pzLastArg );
+    fprintf(stderr, _("%s error:  %s option value ``%s''is out of range.\n"),
+            pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->optArg.argString);
     pzIndent = "\t";
 
   emit_ranges:[=
@@ -819,7 +819,7 @@ DEFINE range-option-code
     return;
 
   valid_return:
-    pOptDesc->pzLastArg = (char*)val;
+    pOptDesc->optArg.argString = (char*)val;
 }[=
 
 ENDDEF   range-option-code
@@ -848,21 +848,22 @@ DEFINE   keyword-code
   IF (exist? "arg-optional")
 
 =]
-    if (((unsigned long)pOptions > 0x0FUL) && (pOptDesc->pzLastArg == NULL))
-        pOptDesc->pzLastArg = (char*)[=
+    if (  ((unsigned long)pOptions > 0x0FUL)
+       && (pOptDesc->optArg.argString == NULL))
+        pOptDesc->optArg.argIntptr = [=
              (string-append UP-name "_"    (if (> (len "arg-optional") 0)
                 (up-c-name "arg-optional") (if (exist? "arg-default")
                 (up-c-name "arg-default")
                 "UNDEFINED"  ))) =];
     else
-        pOptDesc->pzLastArg =
+        pOptDesc->optArg.argIntptr =
             optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
 
   ELSE
 
 =]
-    pOptDesc->pzLastArg =
+    pOptDesc->optArg.argIntptr =
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
   ENDIF

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.11 2006/06/24 23:34:51 bkorb Exp $
- * Time-stamp:      "2006-06-24 10:46:02 bkorb"
+ *  $Id: enumeration.c,v 4.12 2006/09/23 00:12:48 bkorb Exp $
+ * Time-stamp:      "2006-09-22 14:54:36 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -223,19 +223,19 @@ findName(
  * arg:   tOptDesc*,     pOD,       enumeration option description
  * arg:   unsigned int,  enum_val,  the enumeration value to map
  *
- * ret_type:  const char*
+ * ret_type:  char const*
  * ret_desc:  the enumeration name from const memory
  *
  * doc:   This converts an enumeration value into the matching string.
 =*/
-const char*
+char const*
 optionKeywordName(
     tOptDesc*     pOD,
     unsigned int  enum_val )
 {
     tOptDesc od;
 
-    od.pzLastArg = (const char*)(uintptr_t)enum_val;
+    od.pzLastArg = (char const*)(uintptr_t)enum_val;
     (*(pOD->pOptProc))( (void*)(2UL), &od );
     return od.pzLastArg;
 }
@@ -247,11 +247,11 @@ optionKeywordName(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   const char**,  paz_names, list of enumeration names
+ * arg:   char const**,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
- * ret_type:  char*
- * ret_desc:  the enumeration value cast as a char*
+ * ret_type:  uintptr_t
+ * ret_desc:  the enumeration value
  *
  * doc:   This converts the pzLastArg string from the option description
  *        into the index corresponding to an entry in the name list.
@@ -259,7 +259,7 @@ optionKeywordName(
  *        Full matches are always accepted.  Partial matches are accepted
  *        if there is only one partial match.
 =*/
-char*
+uintptr_t
 optionEnumerationVal(
     tOptions*     pOpts,
     tOptDesc*     pOD,
@@ -276,7 +276,7 @@ optionEnumerationVal(
          *  print the list of enumeration names.
          */
         enumError( pOpts, pOD, paz_names, (int)name_ct );
-        return (char*)0UL;
+        return 0UL;
 
     case 1UL:
     {
@@ -288,7 +288,7 @@ optionEnumerationVal(
             printf( "INVALID-%d", ix );
         else
             fputs( paz_names[ ix ], stdout );
-        return (char*)0UL;
+        return 0UL;
     }
     case 2UL:
     {
@@ -298,15 +298,15 @@ optionEnumerationVal(
          *  Replace the enumeration value with the name string.
          */
         if (ix >= name_ct)
-            return (char*)zInval;
+            return (uintptr_t)zInval;
 
-        return (char*)paz_names[ ix ];
+        return (uintptr_t)paz_names[ ix ];
     }
     default:
         break;
     }
 
-    return (char*)findName( pOD->pzLastArg, pOpts, pOD, paz_names, name_ct );
+    return findName( pOD->pzLastArg, pOpts, pOD, paz_names, name_ct );
 }
 
 
@@ -316,7 +316,7 @@ optionEnumerationVal(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   const char**,  paz_names, list of enumeration names
+ * arg:   char const**,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
  * doc:   This converts the pzLastArg string from the option description

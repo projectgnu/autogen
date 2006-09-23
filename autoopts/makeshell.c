@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 4.14 2006/07/27 02:51:47 bkorb Exp $
+ *  $Id: makeshell.c,v 4.15 2006/09/23 00:12:48 bkorb Exp $
  * Time-stamp:      "2006-07-24 21:30:51 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -390,7 +390,7 @@ static void
 emitLong( tOptions* pOpts );
 
 static void
-openOutput( const char* pzFile );
+openOutput( char const* pzFile );
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionParseShell
@@ -503,7 +503,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
     TEXTTO_TABLE
 #   undef _TT_
 #   define _TT_(n) z ## n ,
-      static const char*  apzTTNames[] = { TEXTTO_TABLE };
+      static char const*  apzTTNames[] = { TEXTTO_TABLE };
 #   undef _TT_
 
 #if defined(__windows__) && !defined(__CYGWIN__)
@@ -668,8 +668,8 @@ emitSetup( tOptions* pOpts )
 {
     tOptDesc* pOptDesc = pOpts->pOptDesc;
     int       optionCt = pOpts->presetOptCt;
-    const char* pzFmt;
-    const char* pzDefault;
+    char const* pzFmt;
+    char const* pzDefault;
 
     for (;optionCt > 0; pOptDesc++, --optionCt) {
         char zVal[16];
@@ -928,7 +928,7 @@ emitLong( tOptions* pOpts )
 
 
 static void
-openOutput( const char* pzFile )
+openOutput( char const* pzFile )
 {
     FILE* fp;
     char* pzData = NULL;

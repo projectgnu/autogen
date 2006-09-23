@@ -8,7 +8,7 @@ dnl Created:           Sun Nov 15 23:37:14 1998
 cnl Time-stamp:        "2005-02-14 08:24:48 bkorb"
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.5 2006/09/16 19:58:35 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.6 2006/09/23 00:12:48 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:
@@ -89,7 +89,7 @@ changequote([,])dnl
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char zBadVer[] = "\n\\
+static char const zBadVer[] = "\n\\
 *** 'autoopts-config --version' returned $aocfg_current:$aocfg_revision:$aocfg_age,\n\\
 ***                but autoopts returned (%d:%d:0)\n\\
 *** If autoopts-config was correct, then it is best to remove the old version\n\\
@@ -100,7 +100,7 @@ static const char zBadVer[] = "\n\\
 *** the correct copy of autoopts-config, and remove the file config.cache\n\\
 *** before re-running configure.\n";
 
-static const char zOldVer[] = "\n\\
+static char const zOldVer[] = "\n\\
 *** An old version of autoopts (%d:%d:%d) was found.\n\\
 *** You need a version of autoopts newer than $min_cur:$min_rev:$min_age.  \
 The latest version of\n\\

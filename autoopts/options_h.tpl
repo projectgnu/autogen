@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-06-24 13:53:27 bkorb"
-# ID:  $Id: options_h.tpl,v 4.23 2006/06/24 23:34:51 bkorb Exp $
+# Time-stamp:      "2006-09-22 15:58:46 bkorb"
+# ID:  $Id: options_h.tpl,v 4.24 2006/09/23 00:11:49 bkorb Exp $
 
 =][=
 
@@ -147,8 +147,8 @@ typedef struct optionValue {
  *  because "static const" cannot both be applied to a type,
  *  tho each individually can...so they all are
  */
-#define tSCC        static const char
-#define tCC         const char
+#define tSCC        static char const
+#define tCC         char const
 #define tAoSC       static char
 #define tAoUC       unsigned char
 #define tAoUI       unsigned int
@@ -208,6 +208,14 @@ struct argList {
     tCC*            apzArgs[ MIN_ARG_ALLOC_CT ];
 };
 
+typedef union {
+    char const *    argString;
+    uintptr_t       argIntptr;
+    int             argInt;
+    unsigned int    argUint;
+    ag_bool         argBool;
+} optArgBucket_t;
+
 /*
  *  Descriptor structure for each option.
  *  Only the fields marked "PUBLIC" are for public use.
@@ -225,18 +233,19 @@ struct optDesc {
 
     tAoUI           fOptState;        /* PUBLIC */
     tAoUI           reserved;
-    tCC*            pzLastArg;        /* PUBLIC */
+    optArgBucket_t  optArg;           /* PUBLIC */
+#   define          pzLastArg optArg.argString
     void*           optCookie;        /* PUBLIC */
 
     const int *     pOptMust;
     const int *     pOptCant;
     tpOptProc       pOptProc;
-    const char*     pzText;
+    char const*     pzText;
 
-    const char*     pz_NAME;
-    const char*     pz_Name;
-    const char*     pz_DisableName;
-    const char*     pz_DisablePfx;
+    char const*     pz_NAME;
+    char const*     pz_Name;
+    char const*     pz_DisableName;
+    char const*     pz_DisablePfx;
 };
 
 /*
@@ -279,19 +288,19 @@ struct options {
     unsigned int        curOptIdx;
     char*               pzCurOpt;
 
-    const char*         pzProgPath;
-    const char*         pzProgName;
-    const char* const   pzPROGNAME;
-    const char* const   pzRcName;
-    const char* const   pzCopyright;
-    const char* const   pzCopyNotice;
-    const char* const   pzFullVersion;
-    const char* const*  papzHomeList;
-    const char* const   pzUsageTitle;
-    const char* const   pzExplain;
-    const char* const   pzDetail;
+    char const*         pzProgPath;
+    char const*         pzProgName;
+    char const* const   pzPROGNAME;
+    char const* const   pzRcName;
+    char const* const   pzCopyright;
+    char const* const   pzCopyNotice;
+    char const* const   pzFullVersion;
+    char const* const*  papzHomeList;
+    char const* const   pzUsageTitle;
+    char const* const   pzExplain;
+    char const* const   pzDetail;
     tOptDesc*   const   pOptDesc;
-    const char* const   pzBugAddr;
+    char const* const   pzBugAddr;
 
     void*               pExtensions;
     void*               pSavedState;

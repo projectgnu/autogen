@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.21 2006/09/16 19:58:35 bkorb Exp $
+# $Id: optlib.tpl,v 4.22 2006/09/23 00:11:49 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-06-22 20:28:36 bkorb"
+# Time-stamp:      "2006-09-22 15:47:06 bkorb"
 
 =][=
 
@@ -185,7 +185,7 @@ DEFINE set-defines
         [=set-desc=].fOptState &= OPTST_PERSISTENT; \
         [=set-desc=].fOptState |= [=opt-state=][=
   IF (exist? "arg-type")=]; \
-        [=set-desc=].pzLastArg  = (const char*)(a)[=
+        [=set-desc=].pzLastArg  = (char const*)(a)[=
   ENDIF  =][=
   IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
@@ -329,24 +329,23 @@ typedef enum {[=
 
   ~*  num        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(unsigned long*)(&[=(. value-desc)=].pzLastArg))[=
+                 =] ([=(. value-desc)=].optArg.argInt)[=
 
   =*  key        =]
 #define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
                  =] optionKeywordName( &[=(. value-desc)=], (_v))
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(te_[=(string-append Cap-prefix cap-name)
-                          =]*)(&[=(. value-desc)=].pzLastArg))[=
+                 =] ((te_[=(string-append Cap-prefix cap-name)
+                          =])[=(. value-desc)=].optArg.argIntptr)[=
 
   =*  set        =]
-#define [=(set! added-hdr (string-append added-hdr "#include <stdint.h>\n"))
-          (sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
+#define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
                    OPT-pfx UP-name value-desc)
                  =][=
 
   =*  bool       =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] (*(ag_bool*)(&[=(. value-desc)=].pzLastArg))[=
+                 =] ([=(. value-desc)=].optArg.argBool)[=
 
   ESAC           =][=
 
@@ -456,18 +455,18 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        (exist? "arg-default")   =][=
        CASE arg-type            =][=
        =* num                   =]
-#define [=(. def-arg-name)=]((const char*)[= arg-default =])[=
+#define [=(. def-arg-name)=]((char const*)[= arg-default =])[=
 
        =* bool                  =][=
           CASE arg-default      =][=
           ~ n.*|f.*|0           =]
-#define [=(. def-arg-name)=]((const char*)AG_FALSE)[=
+#define [=(. def-arg-name)=]((char const*)AG_FALSE)[=
           *                     =]
-#define [=(. def-arg-name)=]((const char*)AG_TRUE)[=
+#define [=(. def-arg-name)=]((char const*)AG_TRUE)[=
           ESAC                  =][=
 
        =* key                   =]
-#define [=(. def-arg-name)=]((const char*)[=
+#define [=(. def-arg-name)=]((char const*)[=
           (emit (if (=* (get "arg-default") enum-pfx) "" enum-pfx))
           (up-c-name "arg-default") =])[=
 
@@ -671,7 +670,7 @@ DEFINE opt-desc         =][=
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 0, 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS, 0,
-     /* last opt argumnt */ NULL,
+     /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ [=
@@ -710,10 +709,10 @@ DEFINE opt-desc         =][=
          (if (=* (get "arg-type") "set") "NOLIMIT"
              (if (exist? "max") (get "max") "1") ) =], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS, 0,
-     /* last opt argumnt */ [=
+     /* last opt argumnt */ { [=
          IF (exist? "arg-default")
               =]z[=(. cap-name)=]DefaultArg[=
-         ELSE =]NULL[= ENDIF =],
+         ELSE =]NULL[= ENDIF =] },
      /* arg list/cookie  */ [=
             (if (and (=* (get "arg-type") "set") (exist? "arg-default"))
                 (string-append cap-name "CookieBits") "NULL") =],

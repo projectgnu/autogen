@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.23 2006/09/13 14:31:08 bkorb Exp $
+ *  $Id: autoopts.c,v 4.24 2006/09/23 00:12:48 bkorb Exp $
  *  Time-stamp:      "2006-09-10 14:42:45 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -68,7 +68,7 @@
 #  include "compat/strchr.c"
 #endif
 
-static const char zNil[] = "";
+static char const zNil[] = "";
 
 #define SKIP_RC_FILES(po) \
     DISABLED_OPT(&((po)->pOptDesc[ (po)->specOptIdx.save_opts+1]))
@@ -230,11 +230,11 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      */
     if (  (pOD->fOptState & OPTST_DEFINED)
        && (++pOD->optOccCt > pOD->optMaxCt)  )  {
-        const char* pzEqv =
+        char const* pzEqv =
             (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
 
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-            const char* pzFmt = (pOD->optMaxCt > 1) ? zAtMost : zOnlyOne;
+            char const* pzFmt = (pOD->optMaxCt > 1) ? zAtMost : zOnlyOne;
             fputs( zErrOnly, stderr );
             fprintf( stderr, pzFmt, pOD->pz_Name, pzEqv,
                      pOD->optMaxCt );
