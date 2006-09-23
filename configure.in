@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2006 Bruce Korb
 dnl
-dnl Time-stamp:      "2006-07-27 20:24:52 bkorb"
+dnl Time-stamp:      "2006-09-22 21:20:18 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.18 2006/07/28 03:40:12 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.19 2006/09/23 04:33:12 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,7 +23,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.18 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.19 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -224,6 +224,8 @@ else
 fi
 ]
 AC_SUBST(INCLIST)
+[conf_shell=${CONFIG_SHELL-/bin/sh}]
+AC_SUBST(conf_shell)
 
 case "$GCC" in
  yes)

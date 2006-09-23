@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.16 2006/09/23 01:44:37 bkorb Exp $
+ *  $Id: agShell.c,v 4.17 2006/09/23 04:33:12 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -240,26 +240,34 @@ chainOpen( int       stdinFd,
             pzShell = pzShellProgram;
 
         else {
-            pzShell = getenv( zShellEnv );
-            if (pzShell == NULL)
-                pzShell = "sh";
-            pzShellProgram = pzShell;
-        }
+            static char const sh_z[] = "sh";
+            static char const bin_sh[] = "/bin/sh";
 
-        /*
-         *  Disallow 'csh' and 'tcsh', or any other *csh variation.
-         *  They invariably lead to problems.
-         */
-        {
-            size_t l = strlen( pzShell );
-            if (  (l > 2)
-               && (strcmp( pzShell + l - 3, "csh" ) == 0)  )  {
-                tSCC zBadShell[] =
-                    "Your shell is '%s'.  AutoGen will attempt to use 'sh'\n";
+            pzShellProgram = getenv( zShellEnv );
+            if (pzShellProgram == NULL) {
+            no_useful_SHELL:
+#               ifdef __sun
+                static char const xpg_sh[] = "/usr/xpg4/bin/sh";
 
-                fprintf( stdout, zBadShell, pzShell );
-                pzShell = "sh";
+                if (access(xpg_sh, X_OK) == 0)
+                    pzShellProgram = xpg_sh;
+                else
+#               endif
+                    if (access(bin_sh, X_OK) == 0)
+                         pzShellProgram = bin_sh;
+                    else pzShellProgram = sh_z;
+
+            } else {
+                char const * pze = pzShellProgram + strlen(pzShellProgram);
+                if (  ((pze - pzShellProgram) > 2)
+                   && (pze[-3] == 'c')
+                   && (pze[-2] == 's')
+                   && (pze[-1] == 'h'))  {
+                    goto no_useful_SHELL;
+                }
             }
+            putenv( aprf( "%s=%s", zShellEnv, pzShellProgram ));
+            pzShell = pzShellProgram;
         }
 
         *ppArgs = pzShell;

@@ -2,11 +2,11 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2006-09-22 16:39:34 bkorb"
+## Time-stamp:      "2006-09-22 21:17:40 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.3 2006/09/23 01:44:37 bkorb Exp $
+## $Id: aoconf-tpl.in,v 4.4 2006/09/23 04:33:12 bkorb Exp $
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.
@@ -66,7 +66,7 @@ test $# -gt 0 || usage "No value specified"
 # Figure out what's wanted
 #
 val=''
-for o ; do
+for o in "$@" ; do
   o=`echo ${o} | sed 's,^-*,,;s/-/_/g'`
   case "$o" in
   help | h | \? )    usage ;;
@@ -209,7 +209,7 @@ MACROS:
 DEFINE script-preamble
 
 \=]
-#! /bin/sh
+#! @conf_shell@
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
