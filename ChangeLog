@@ -1,3 +1,10 @@
+2006-09-24  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c(serverSetup): fix formatting element for pid_t types
+	(chainOpen): ditto
+	* agen5/autogen.h(ag_scm2zchars): move this inline procedure so it follows
+	the define of a macro it uses (Guile 1.4/5/6).
+
 2006-09-23  Bruce Korb  <bkorb@gnu.org>
 
 	* THROUGHOUT: change "const char" to "char const"  The "const-ness"

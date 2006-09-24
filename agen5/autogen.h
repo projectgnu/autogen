@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.24 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: autogen.h,v 4.25 2006/09/24 16:17:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:55:50 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-09-24 09:08:18 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 16:17:39 $
  *
  *  Global header file for AutoGen
  */
@@ -482,19 +482,6 @@ extern char* ag_scribble( size_t size );
  */
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
 
-  static inline char* ag_scm2zchars( SCM s, tCC* type )
-  {
-    if (! AG_SCM_STRING_P( s ))
-        AG_ABEND( aprf( zNotStr, type ));
-
-    if (SCM_SUBSTRP(s))
-        s = scm_makfromstr( SCM_CHARS(s), SCM_LENGTH(s), 0 );
-    return SCM_CHARS(s);
-  }
-
-# define AG_SCM_STRLEN(_s)              SCM_LENGTH(_s)
-# define AG_SCM_CHARS(_s)               SCM_CHARS(_s)
-
 #if GUILE_VERSION < 106000 /* Guile 1.4 */
 
 #   define AG_SCM_STRING_P(_s)          gh_string_p(_s)
@@ -523,6 +510,19 @@ extern char* ag_scribble( size_t size );
 #   define AG_SCM_STR2SCM(_st,_sz)      scm_mem2string(_st,_sz)
 #   define AG_SCM_STR02SCM(_s)          scm_makfrom0str(_s)
 #endif
+
+  static inline char* ag_scm2zchars( SCM s, tCC* type )
+  {
+    if (! AG_SCM_STRING_P( s ))
+        AG_ABEND( aprf( zNotStr, type ));
+
+    if (SCM_SUBSTRP(s))
+        s = scm_makfromstr( SCM_CHARS(s), SCM_LENGTH(s), 0 );
+    return SCM_CHARS(s);
+  }
+
+# define AG_SCM_STRLEN(_s)              SCM_LENGTH(_s)
+# define AG_SCM_CHARS(_s)               SCM_CHARS(_s)
 
 #else /* Guile 1.7 and following */
 

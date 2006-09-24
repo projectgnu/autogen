@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.19 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: agShell.c,v 4.20 2006/09/24 16:17:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:56:11 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-09-24 08:48:45 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 16:17:39 $
  *
  *  Manage a server shell process
  */
@@ -165,7 +165,7 @@ serverSetup( void )
         pzLastCmd = zShellInit;
         if (pzPid == NULL)
             pzPid = zShellInit + strlen(zShellInit);
-        sprintf( pzPid, "%d\n", getpid() );
+        sprintf( pzPid, "%u\n", (unsigned int)getpid() );
         fprintf( serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
                  zShDone, ++logCount );
 
@@ -327,7 +327,7 @@ chainOpen( int       stdinFd,
         close( stdinFd );
         close( stdoutPair.writeFd );
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf( pfTrace, "Server shell is pid %d\n", chId );
+            fprintf(pfTrace, "Server shell is pid %u\n", (unsigned int)chId);
 
         fflush( pfTrace );
         return stdoutPair.readFd;
