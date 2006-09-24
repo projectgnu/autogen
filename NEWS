@@ -1,4 +1,13 @@
-New in __CURRENT_VERSION__ July 2006
+New in __CURRENT_VERSION__ October 2006
+
+* AutoOpts code presumed that there were no #defines for the option
+  names.  You can now force aside such conflicts.
+* AutoOpts generated code unconditionally #includes limits.h and stdint.h.
+* aliased pointer cleanups should allow higher optimization of code.
+* The installation of the tear-off libopt library is now optional
+  to the installers of client projects.
+
+New in 5.8.5 July 2006
 
 * ag-fprintf will now allow you to emit text into a suspended output stream.
 * string tables have been implemented as a scheme function.  This makes it
@@ -22,32 +31,3 @@ New in __CURRENT_VERSION__ July 2006
   with a back quote, it is handed off to the shell for processing.
   If an open parenthesis, it is handed off to Guile.  If it is
   anything else, it is ignored.
-
-New in 5.8.4 - March 2006
-
-* Day 1 bug in snprintfv: numberd format elements can get mishandled.
-* more platform specific variations in test output are handled.
-* column 1 apostrophes in generated man page text are now escaped.
-* Guile release 1.8.x is accommodated (in progress 3/25/2006)
-
-New in 5.8.3 - February 2006
-
-* Testing cleanups
-* To use mmap, you must first mmap more space than used by the file,
-  then, if the last bit laps into a page not backed by a file, you have
-  to remap that page anonymously.  If you do not first map pages not
-  backed by file data, you seg fault trying to remap pages on some systems.
-* Make a clean implementation of library option processing.
-
-New in 5.8 - December, 2005
-
-* AutoGen now builds against Guile 1.7.x
-* Fixed a small timing hole where the read from the read end of the output
-  pipe of the server shell can fail.  (The read is retried.)
-* Eliminated the configure code that symlinked all the sources into the
-  build directory.
-* Added a macro for testing mmap failure to accommodate a picky compiler.
-* The minor version number is being bumped.  There is a new (albeit tiny)
-  feature being added to the syntax.  See the doc on the pseudo-macro.
-* Fixed a bug wherein out-of-order definitions could get mistyped causing
-  various catastrophic results.
