@@ -5,11 +5,11 @@
 ## Copyright (c):   2003-2006 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Fri July 18
+## Time-stamp:      "2006-09-23 19:33:26 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2006/09/24 02:57:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = convert.test

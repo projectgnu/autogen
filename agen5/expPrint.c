@@ -1,6 +1,9 @@
 
 /*
- *  $Id: expPrint.c,v 4.13 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expPrint.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:52:48 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide

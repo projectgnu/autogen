@@ -1,6 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.18 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expOutput.c,v 4.19 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:52:52 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
  *
  *  This module implements the output file manipulation function
  */

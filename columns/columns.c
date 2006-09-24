@@ -1,7 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.10 2006/09/24 02:10:45 bkorb Exp $
+ *  $Id: columns.c,v 4.11 2006/09/24 02:57:02 bkorb Exp $
+ *  Time-stamp:        "2006-09-23 19:46:54 bkorb"
  */
 
 /*

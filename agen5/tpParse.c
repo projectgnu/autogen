@@ -2,7 +2,10 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.11 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: tpParse.c,v 4.12 2006/09/24 02:57:02 bkorb Exp $
+ *
+ * Time-stamp:        "2006-09-23 19:49:23 bkorb"
+ * Last Committed:    $Date: 2006/09/24 02:57:02 $
  *
  *  This module will load a template and return a template structure.
  */

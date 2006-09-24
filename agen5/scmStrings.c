@@ -1,8 +1,11 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.5 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: scmStrings.c,v 4.6 2006/09/24 02:57:01 bkorb Exp $
  *  Temporary SCM strings.
+ *
+ * Time-stamp:        "2006-09-23 19:49:53 bkorb"
+ * Last Committed:    $Date: 2006/09/24 02:57:01 $
  */
 
 typedef struct string_buf_s string_buf_t;

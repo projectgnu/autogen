@@ -1,7 +1,10 @@
-/*  -*- Mode: C -*-
- *
+/*
  *  expExtract.c
- *  $Id: expExtract.c,v 4.13 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expExtract.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:53:51 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
  *  This module implements a file extraction function.
  */
 

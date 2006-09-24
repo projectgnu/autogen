@@ -3,8 +3,8 @@
 null
 
 #  Maintainer:        Bruce Korb <bkorb@gnu.org>
-#  Created:           Tue Nov 24 01:07:30 1998
-#  Last Modified:     $Date: 2005/10/29 00:13:27 $
+#  Time-stamp:        "2006-09-23 19:43:02 bkorb"
+#  Last Modified:     $Date: 2006/09/24 02:57:02 $
 #             by: bkorb
 #
 # This template uses the following definitions:

@@ -4,12 +4,11 @@
 # subblock.test --- test the subblock parameter to getdefs
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
-# Maintainer:	     Bruce Korb <bkorb@gnu.org>
-# Created:	     Sat Mar 28 14:21:31 1998
-# Last Modified:  $Date: 2006/08/22 16:06:36 $
+# Time-stamp:        "2006-09-23 19:37:56 bkorb"
+# Last Modified:  $Date: 2006/09/24 02:57:02 $
 #            by: bkorb
 #
-# $Id: index.test,v 4.2 2006/08/22 16:06:36 bkorb Exp $
+# $Id: index.test,v 4.3 2006/09/24 02:57:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

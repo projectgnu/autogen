@@ -2,6 +2,8 @@
 
 autogen definitions options;
 
+// Time-stamp:        "2006-09-23 19:32:30 bkorb"
+
 export = <<-  EOExport
 	#include <sys/types.h>
 	#include <sys/stat.h>

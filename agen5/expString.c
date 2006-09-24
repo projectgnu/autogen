@@ -1,7 +1,11 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.13 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expString.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:52:39 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
  *  This module implements expression functions that
  *  manipulate string values.
  */

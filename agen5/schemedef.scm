@@ -1,6 +1,9 @@
 
 ;;;  AutoGen copyright 1992-2006 Bruce Korb
 ;;;
+;;; Time-stamp:        "2006-09-23 19:50:26 bkorb"
+;;; Last Committed:    $Date: 2006/09/24 02:57:01 $
+;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
 ;;; GNU General Public License, as published by the Free Software
@@ -20,7 +23,7 @@
 ;;; This module defines all the scheme initialization for AutoGen.
 ;;; It gets sucked up into directives.h as a single ANSI-C string.
 ;;; Comments, blank lines and leading white space are omitted.
-
+;;;
 (use-modules (ice-9 common-list))
 
 (define identifier?

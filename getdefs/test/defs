@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Author:         Bruce Korb <bkorb@gnu.org>
-# Maintainer:     Bruce Korb <bkorb@gnu.org>
-# Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2005/12/09 20:14:22 $
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Time-stamp:        "2006-09-23 19:38:20 bkorb"
+# Last Modified:     $Date: 2006/09/24 02:57:02 $
 #            by: bkorb
-# ----------------------------------------------------------------------
-# $Id: defs,v 4.2 2005/12/09 20:14:22 bkorb Exp $
+#
+# $Id: defs,v 4.3 2006/09/24 02:57:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Make sure srcdir is an absolute path.  Supply the variable

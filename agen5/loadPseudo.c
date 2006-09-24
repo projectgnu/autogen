@@ -1,6 +1,9 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.8 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.9 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:51:08 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
  *
  *  This module processes the "pseudo" macro
  */

@@ -4,6 +4,9 @@
 
   pot
 
+# Time-stamp:        "2006-09-23 19:47:31 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:02 $
+
 =][=  CASE (suffix) =][=
 
 ==  h               =][=

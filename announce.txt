@@ -1,7 +1,10 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.14 2006/08/22 16:06:35 bkorb Exp $
+# $Id: announce.txt,v 4.15 2006/09/24 02:57:01 bkorb Exp $
+#
+# Time-stamp:        "2006-09-23 19:48:21 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:01 $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org

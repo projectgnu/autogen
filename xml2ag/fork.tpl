@@ -1,5 +1,5 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[=
+[= # Time-stamp:        "2006-09-23 19:33:48 bkorb" =][=
 
 (define up-c-name  (lambda (ag-name)
   (string-upcase! (string->c-name! (get ag-name)))  ))

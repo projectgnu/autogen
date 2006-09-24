@@ -1,6 +1,14 @@
-[= AutoGen5 template lsm=autogen.lsm
+[= AutoGen5 template
+
+lsm=autogen.lsm
 
 =]
+[= #
+
+# Time-stamp:        "2006-09-23 19:35:52 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:02 $
+
+\=]
 Begin4
 Title:          AutoGen
 

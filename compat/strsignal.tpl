@@ -1,6 +1,8 @@
 [= AutoGen5 template  -*- Mode: html -*-
 
-# $Id: strsignal.tpl,v 4.4 2006/09/23 00:48:05 bkorb Exp $
+# $Id: strsignal.tpl,v 4.5 2006/09/24 02:57:02 bkorb Exp $
+# Time-stamp:        "2006-09-23 19:44:50 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:02 $
 
 (setenv "SHELL" "/bin/sh")
 

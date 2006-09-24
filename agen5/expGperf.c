@@ -1,7 +1,12 @@
 /*
- *  $Id: expGperf.c,v 4.13 2006/09/24 02:19:09 bkorb Exp $
- *  This module implements the expression functions that should
- *  be part of Guile.
+ *  $Id: expGperf.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:53:25 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
+ *  Create a perfect hash function program and use it to compute
+ *  index values for a list of provided names.  It also documents how
+ *  to incorporate that hashing function into a generated C program.
  */
 
 /*
@@ -60,7 +65,7 @@ ag_scm_gperf( SCM name, SCM str )
  *       @end example
  *
  *       where @code{name} matches the name provided to this @code{make-perf}
- *       function.  @cose{gpdir} is the variable used to store the name of the
+ *       function.  @code{gpdir} is the variable used to store the name of the
  *       temporary directory used to stash all the files.
 =*/
 SCM

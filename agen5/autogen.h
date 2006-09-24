@@ -1,7 +1,11 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.23 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: autogen.h,v 4.24 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:55:50 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
  *  Global header file for AutoGen
  */
 

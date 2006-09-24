@@ -2,6 +2,9 @@
 
 AutoGen5 Template
 
+# Time-stamp:        "2006-09-23 19:43:30 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:02 $
+
 =][=
 
 (define restore-flags "")

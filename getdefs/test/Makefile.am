@@ -3,12 +3,11 @@
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Fri July 18
-## Last Modified:   Thu Jul 29 13:42:18 1999
+## Time-stamp:      "2006-09-23 19:39:02 bkorb"
+## Last Committed:  $Date: 2006/09/24 02:57:02 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.2 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.3 2006/09/24 02:57:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test

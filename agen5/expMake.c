@@ -1,8 +1,11 @@
 
-/*  -*- Mode: C -*-
- *
+/*
  *  expMake.c
- *  $Id: expMake.c,v 4.7 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expMake.c,v 4.8 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:53:11 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
  *  This module implements Makefile construction functions.
  */
 

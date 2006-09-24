@@ -1,6 +1,9 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.4 2006/09/22 21:34:45 bkorb Exp $
+# $Id: functions.tpl,v 4.5 2006/09/24 02:57:01 bkorb Exp $
+
+#  Time-stamp:        "2006-09-23 19:51:28 bkorb"
+#  Last Committed:    $Date: 2006/09/24 02:57:01 $
 
 =]
 [=

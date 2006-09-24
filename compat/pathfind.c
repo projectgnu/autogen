@@ -4,11 +4,12 @@
 
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
+ * Time-stamp:       "2006-09-23 19:46:16 bkorb"
  * Created:          Tue Jun 24 15:07:31 1997
- * Last Modified:    $Date: 2006/09/24 02:10:45 $
+ * Last Modified:    $Date: 2006/09/24 02:57:02 $
  *            by: bkorb
  *
- * $Id: pathfind.c,v 4.9 2006/09/24 02:10:45 bkorb Exp $
+ * $Id: pathfind.c,v 4.10 2006/09/24 02:57:02 bkorb Exp $
  */
 
 /* Code: */

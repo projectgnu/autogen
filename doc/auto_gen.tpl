@@ -5,12 +5,11 @@
 ##  AutoGen Copyright (C) 1992-2006 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Maintainer:        Bruce Korb <bkorb@gnu.org>
-## Created:           Tue Sep 15 13:13:48 1998
-## Last Modified:     Mar 4, 2001
+## Time-stamp:        "2006-09-23 19:41:29 bkorb"
+## Last Committed:    $Date: 2006/09/24 02:57:02 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.27 2006/09/23 00:49:41 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.28 2006/09/24 02:57:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi

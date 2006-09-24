@@ -4,12 +4,11 @@
 # getdefs/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Thu Jul 29 09:32:11 1999
-# Last Modified:     $Date: 2006/06/17 15:06:15 $
+# Time-stamp:        "2006-09-23 19:40:27 bkorb"
+# Last Modified:     $Date: 2006/09/24 02:57:02 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.4 2006/06/17 15:06:15 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.5 2006/09/24 02:57:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.

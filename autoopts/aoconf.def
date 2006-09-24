@@ -3,6 +3,9 @@ AutoGen Definitions aoconf.tpl;
 // This file is used for bootstrapping only.  Useful _only_ for
 // checked out source files.
 
+// Time-stamp:        "2006-09-23 19:48:07 bkorb"
+// Last Committed:    $Date: 2006/09/24 02:57:02 $
+
 cfg = {
    c-name   = prefix;
    c-val    = '@prefix@';

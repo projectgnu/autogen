@@ -1,7 +1,8 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.10 2006/09/24 02:10:45 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.11 2006/09/24 02:57:02 bkorb Exp $
+ *  Time-stamp:         "2006-09-23 19:32:57 bkorb"
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2006 Bruce Korb

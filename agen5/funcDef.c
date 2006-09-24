@@ -1,6 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.16 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: funcDef.c,v 4.17 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:51:46 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
  *
  *  This module implements the DEFINE text function.
  */

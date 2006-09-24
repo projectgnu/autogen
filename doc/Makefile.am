@@ -2,14 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-01-22 11:03:42 bkorb"
+## Time-stamp:      "2006-09-23 19:56:39 bkorb"
 ## Copyright (c):   1997-2006 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.8 2006/03/25 19:23:28 bkorb Exp $
+## $Id: Makefile.am,v 4.9 2006/09/24 02:57:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

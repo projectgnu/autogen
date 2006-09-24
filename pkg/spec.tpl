@@ -1,4 +1,5 @@
 [= AutoGen5 Template spec =]
+[= Time-stamp:        "2006-09-23 19:34:16 bkorb" \=]
 Summary:    AutoGen - [=prog-title=]
 Name:       [= prog-name =]
 Version:    [= version =]

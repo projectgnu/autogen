@@ -1,5 +1,8 @@
 #! /bin/sh
 
+# Time-stamp:        "2006-09-23 19:34:51 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:02 $
+
 case "${VERBOSE}" in
 "" | f* | F* | n* | N* )
    VERBOSE=false ;;

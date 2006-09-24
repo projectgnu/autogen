@@ -1,8 +1,13 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.11 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.12 2006/09/24 02:57:02 bkorb Exp $
+ *
  *  Parse and process the template data descriptions
+ *
+ * Time-stamp:        "2006-09-23 19:48:42 bkorb"
+ * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ *
  */
 
 /*

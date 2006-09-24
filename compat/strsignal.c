@@ -2,6 +2,9 @@
 /*
  *  strsignal is free software.
  *
+ * Time-stamp:        "2006-09-23 19:45:40 bkorb"
+ * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ *
  *  You may redistribute it and/or modify it under the terms of the
  *  GNU General Public License, as published by the Free Software
  *  Foundation; either version 2, or (at your option) any later version.
@@ -40,7 +43,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 4.5 2006/09/24 02:10:45 bkorb Exp $
+ *  $Id: strsignal.c,v 4.6 2006/09/24 02:57:02 bkorb Exp $
  */
 
 #include "compat.h"

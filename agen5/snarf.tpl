@@ -1,6 +1,8 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.7 2006/09/22 21:34:45 bkorb Exp $
+# $Id: snarf.tpl,v 4.8 2006/09/24 02:57:01 bkorb Exp $
+# Time-stamp:        "2006-09-23 19:49:44 bkorb"
+# Last Committed:    $Date: 2006/09/24 02:57:01 $
 
 (setenv "SHELL" "/bin/sh")
 

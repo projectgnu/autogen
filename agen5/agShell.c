@@ -1,6 +1,10 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.18 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: agShell.c,v 4.19 2006/09/24 02:57:01 bkorb Exp $
+ *
+ *  Time-stamp:        "2006-09-23 19:56:11 bkorb"
+ *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *
  *  Manage a server shell process
  */
 
