@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.12 2006/09/24 02:10:44 bkorb Exp $
+ *  $Id: expGperf.c,v 4.13 2006/09/24 02:19:09 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -55,7 +55,7 @@ ag_scm_gperf( SCM name, SCM str )
  *       into your C program with commands something like the following:
  *
  *       @example
- *       [+ (shellf "sed '/^int main(/,$d;/^#line/d' ${gpdir}/%s.c"
+ *       [+ (shellf "sed '/^int main(/,$d;/^#line/d' $@{gpdir@}/%s.c"
  *                  name ) +]
  *       @end example
  *
