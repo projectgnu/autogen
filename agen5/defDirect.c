@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.17 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: defDirect.c,v 4.18 2006/09/24 02:10:44 bkorb Exp $
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -1037,7 +1037,6 @@ doDir_undef( char* pzArg, char* pzScan )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/defDirect.c */

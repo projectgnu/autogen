@@ -1,6 +1,6 @@
 
 /*
- *  $Id: cook.c,v 4.7 2006/09/23 00:12:48 bkorb Exp $
+ *  $Id: cook.c,v 4.8 2006/09/24 02:10:45 bkorb Exp $
  *  Time-stamp:      "2006-06-24 11:29:58 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
@@ -349,7 +349,6 @@ ao_string_cook( char* pzScan, int* pLineCt )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/cook.c */

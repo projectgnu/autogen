@@ -11,7 +11,7 @@
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #            by: bkorb
 #
-# $Id: stress.test,v 4.5 2006/03/25 19:23:28 bkorb Exp $
+# $Id: stress.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -50,7 +50,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

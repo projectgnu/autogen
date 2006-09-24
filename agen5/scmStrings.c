@@ -1,7 +1,7 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.4 2006/06/03 18:25:49 bkorb Exp $
+ *  $Id: scmStrings.c,v 4.5 2006/09/24 02:10:44 bkorb Exp $
  *  Temporary SCM strings.
  */
 
@@ -108,7 +108,6 @@ ag_scm2zchars( SCM s, tCC* type )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/autogen.h */

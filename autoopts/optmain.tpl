@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.20 2006/09/23 00:11:49 bkorb Exp $
+# $Id: optmain.tpl,v 4.21 2006/09/24 02:10:45 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-09-22 14:51:08 bkorb"
+# Time-stamp:      "2006-09-23 10:53:56 bkorb"
 
 =][=
 
@@ -896,7 +896,8 @@ DEFINE define-option-callbacks      =][=
       INVOKE callback-proc-header   =][=
 
       IF (exist? "flag-code")       =][=
-         flag-code                  =][=
+         (def-file-line "flag-code" "    /* extracted from %s, line %d */\n")
+         =][=  flag-code            =][=
       ELSE                          =][=
 
          (extract (string-append (base-name) ".c.save") (string-append

@@ -6,13 +6,13 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/01/28 21:26:57 $
+# Last Modified:     $Date: 2006/09/24 02:10:44 $
 #            by: bkorb
 #
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.8 2006/01/28 21:26:57 bkorb Exp $
+# $Id: shell.test,v 4.9 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 exec 9>&2
@@ -141,7 +141,6 @@ failure "`set +x;diff -c ${testname}.sample ${testname}.test`"
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

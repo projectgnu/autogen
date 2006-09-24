@@ -5,11 +5,11 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2006-06-17 10:02:31 bkorb"
+# Time-stamp:        "2006-09-23 12:04:05 bkorb"
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.11 2006/06/17 17:03:43 bkorb Exp $
+# $Id: error.test,v 4.12 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -98,7 +98,7 @@ cmp -s ${testname}.base2 ${testname}.trc2 || \
 echo creating ${testname}.base3
 # this is the output we should expect to see
 cat > ${testname}.base3 <<_EOF_
-testing death
+Killing AutoGen:  testing death
 AutoGen aborting on signal <text-varies> in state EMITTING
 processing template error2.tpl
             on line 2
@@ -221,7 +221,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

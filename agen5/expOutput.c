@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expOutput.c,v 4.17 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: expOutput.c,v 4.18 2006/09/24 02:10:44 bkorb Exp $
  *
  *  This module implements the output file manipulation function
  */
@@ -316,7 +316,7 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
      *  "0" (zero) representing the current output and "1" the last suspended
      *  output.  If the number is out of range, we'll fall through to the abend.
      */
-    else if (AG_SCM_NUMBER_P(port)) do {
+    else if (AG_SCM_NUM_P(port)) do {
         tFpStack* pSaveFp = pCurFp;
         unsigned long val = gh_scm2ulong(port);
 
@@ -600,7 +600,6 @@ ag_scm_out_line( void )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/expOutput.c */

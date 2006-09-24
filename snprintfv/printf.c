@@ -1540,7 +1540,6 @@ snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
  * Local Variables:
  * mode: C
  * c-file-style: "gnu"
- * tab-width: 8
- * indent-tabs-mode: t
+ * indent-tabs-mode: nil
  * End:
  * end of snprintfv/printfv.c */

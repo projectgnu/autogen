@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcIf.c,v 4.10 2006/06/24 23:34:51 bkorb Exp $
+ *  $Id: funcIf.c,v 4.11 2006/09/24 02:10:44 bkorb Exp $
  *
  *  This module implements the _IF text function.
  */
@@ -493,7 +493,6 @@ ag_scm_set_writable( SCM set )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/funcIf.c */

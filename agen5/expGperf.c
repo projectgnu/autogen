@@ -1,5 +1,5 @@
 /*
- *  $Id: expGperf.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: expGperf.c,v 4.12 2006/09/24 02:10:44 bkorb Exp $
  *  This module implements the expression functions that should
  *  be part of Guile.
  */
@@ -50,8 +50,18 @@ ag_scm_gperf( SCM name, SCM str )
  *       named, @file{gperf_<name>} for use by the gperf function
  *       @xref{SCM gperf}.
  *
- *       This program will be obliterated within a few seconds after
- *       AutoGen exits.
+ *       This program will be obliterated as AutoGen exits.
+ *       However, you may incorporate the generated hashing function
+ *       into your C program with commands something like the following:
+ *
+ *       @example
+ *       [+ (shellf "sed '/^int main(/,$d;/^#line/d' ${gpdir}/%s.c"
+ *                  name ) +]
+ *       @end example
+ *
+ *       where @code{name} matches the name provided to this @code{make-perf}
+ *       function.  @cose{gpdir} is the variable used to store the name of the
+ *       temporary directory used to stash all the files.
 =*/
 SCM
 ag_scm_make_gperf( SCM name, SCM hlist )
@@ -66,19 +76,17 @@ ag_scm_make_gperf( SCM name, SCM hlist )
     /*
      *  Construct the newline separated list of values
      */
-    hlist = ag_scm_join( newline, hlist );
+    hlist  = ag_scm_join( newline, hlist );
     pzList = ag_scm2zchars( hlist, "hash list" );
 
     /*
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        static const int makeGperfLine = __LINE__ + 2;
+        static int  const  makeGperfLine = __LINE__ + 2;
         static char const* pzCleanup =
-            "(set! shell-cleanup (string-append shell-cleanup "
-            "\"rm -rf ${gpdir}\n\"))\n";
-        char* pzCmd;
-        pzCmd = aprf( zMakeGperf, pzList, pzName );
+            "(add-cleanup \"rm -rf ${gpdir}\")";
+        char* pzCmd = aprf( zMakeGperf, pzList, pzName );
 
         /*
          *  Run the command and ignore the results.
@@ -86,6 +94,8 @@ ag_scm_make_gperf( SCM name, SCM hlist )
          */
         pzList = runShell( pzCmd );
         AGFREE( pzCmd );
+        if (pzList != NULL)
+            free( pzList );
 
         if (pzCleanup != NULL) {
             (void)ag_scm_c_eval_string_from_file_line(
@@ -142,7 +152,6 @@ ag_scm_gperf( SCM name, SCM str )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/expGperf.c */

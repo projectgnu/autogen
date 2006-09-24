@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 4.11 2006/09/23 01:44:37 bkorb Exp $
+ *  $Id: stack.c,v 4.12 2006/09/24 02:10:45 bkorb Exp $
  *  Time-stamp:      "2006-09-22 18:13:19 bkorb"
  *
  *  This is a special option processing routine that will save the
@@ -259,7 +259,6 @@ optionStackArg(
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/stack.c */

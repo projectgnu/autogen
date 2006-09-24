@@ -1,5 +1,5 @@
 /*
- *  $Id: getdefs.c,v 4.7 2006/09/23 00:51:11 bkorb Exp $
+ *  $Id: getdefs.c,v 4.8 2006/09/24 02:10:45 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
@@ -1181,7 +1181,6 @@ updateDatabase( void )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of getdefs/getdefs.c */

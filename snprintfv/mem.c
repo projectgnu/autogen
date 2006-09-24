@@ -74,7 +74,6 @@ snv_strdup (const char *str)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/mem.c */

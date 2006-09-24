@@ -4,95 +4,22 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
+#  AutoGen copyright 1992-2006 Bruce Korb
+#  Time-stamp:      "2006-09-23 11:59:38 bkorb"
+
 (setenv "SHELL" "/bin/sh")
 (define fmt "")
-(shellf "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
-[ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name))
+(shellf "test -f %1$s-fsm.h && mv -f %1$s-fsm.h .fsm.head
+         test -f %1$s-fsm.c && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
-#  AutoGen copyright 1992-2006 Bruce Korb
+(define add-cleanup (lambda (t)
+   (set! shell-cleanup (string-append shell-cleanup "\n" t "\n"))  ))
+(add-cleanup "rm -f .fsm.*")
 
 =]
 [=
 
-CASE (suffix) =][=#
-
-PURPOSE:
-   This template collection will produce a finite state machine based on a
-   description of such a machine.  The presumption is that you generally
-   do not need to know what the current state is in order to determine what
-   kind of transition is to be taken.  That is to say, there is a global
-   transition table that is indexed by the current state and the next
-   transition type to determine the next state and trigger any optional
-   transition handling code.
-
-   The finite state machine may be either the master, driving the other
-   parts of the program, or act as a subroutine keeping track of state
-   between calls.  Consequently, the "type" attribute may be set to:
-
-   looping
-       If the machine processes transitions until it reaches a terminal
-       state (error or done).
-   stepping
-       If the FSM code will process a single transition and then return.
-   reentrant
-       This method is much the same as stepping, except that the caller
-       must save the current state and provide it on the next call.
-       In this fashion, an FSM may be used in a multi threaded application.
-
-   The machine can be constructed in either of three formats, depending
-   on the value of the "method" attribute:
-
-   callout
-       This method will use a callout table instead of a switch statement
-       to implement the machine.
-   case
-       This is the alternate implementation method.
-   none
-       Do not supply the "method" attribute.  Choosing this will cause only
-       the dispatch table to be created.  The implementation code is omitted.
-       The "type" attribute is then ignored.
-
-YOU SUPPLY:
-   "state"      The list of valid state names.  The "init" and "done" states
-                are automatically added to this.  If there are other terminal
-                states, they must set "nxtSt" to "done".
-   "event"      The list of valid transition types.
-   "type"       The machine structure type:  looping, stepping or reentrant
-   "method"     The implementation type: callout table, case statement or none.
-   "prefix"     A prefix to glue onto the front of created names
-   "cookie"     zero, one or more of these each containing a C type and name
-                suitable for use in a procedure header.  It is used to pass
-                through arguments to implementation code.
-
-   "transition" Define the handling for a transition from one state to another.
-                It contains:
-       "tst"    the starting state(s).  This may be one, or a list or '*'
-                to indicate all states.
-       "tev"    the event that triggers this transition.  This may also be
-                a list of events or a '*'.
-       "ttype"  the transition type.  By default it is named after the state
-                and event names, but by specifying a particular type, multiple
-                different transitions may invoke the same handling code.
-       "next"   the presumptive destination state.  "presumptive" because
-                the code that handles the transition may select a different
-                destination.  Doing that will violate mathematical models, but
-                it often makes writing this stuff easier.
-
-THE TEMPLATE PRODUCES:
-
-   a header file enumerating the states and events, and declaring the FSM
-   state machine procedure.
-
-   the code file with the implementation (provided "method" was specified).
-   This source file contains special comments around code that is to be
-   preserved from one regeneration to the next.  BE VERY CAREFUL: if you
-   change the name of a state or event, any code that was stored under the
-   old name will not be carried forward and is likely to get lost.
-   If you change names, then *save your work*.
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-=][=
+CASE (suffix) =][=
 
 == h =][=
 
@@ -195,7 +122,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 == c =][=
 
   (if (~ (get "method") "(no.*){0,1}")
-      (begin (shell "rm -f .fsm.*") (out-delete))  ) =][=
+      (out-delete)  ) =][=
 
   INVOKE preamble
 
@@ -243,8 +170,6 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
   ~*   step|reent       =][= stepping-machine =][=
   ESAC                  =][=
 
-  `rm -f .fsm.*`        =][=
-
 ESAC (suffix)
 
 =]
@@ -252,7 +177,6 @@ ESAC (suffix)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of [=(out-name)=] */

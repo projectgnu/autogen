@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 4.2 2005/01/09 03:20:28 bkorb Exp $
+ *  $Id: getdefs.h,v 4.3 2006/09/24 02:10:45 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
@@ -113,7 +113,6 @@ pid_t   agPid      = -1;
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of getdefs/getdefs.h */

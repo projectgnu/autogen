@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.24 2006/09/23 00:12:48 bkorb Exp $
+ *  $Id: load.c,v 4.25 2006/09/24 02:10:45 bkorb Exp $
  *  Time-stamp:      "2006-07-01 12:43:03 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
@@ -514,7 +514,6 @@ optionLoadLine(
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/load.c */

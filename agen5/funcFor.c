@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcFor.c,v 4.14 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: funcFor.c,v 4.15 2006/09/24 02:10:44 bkorb Exp $
  *
  *  This module implements the FOR text macro.
  */
@@ -855,7 +855,6 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/funcFor.c */

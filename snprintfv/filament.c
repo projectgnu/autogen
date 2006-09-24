@@ -227,7 +227,6 @@ _fil_extend (Filament *fil, size_t len, snv_bool_t copy)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/filament.c */

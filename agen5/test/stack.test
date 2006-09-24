@@ -10,7 +10,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 #
-# $Id: stack.test,v 4.5 2006/03/25 19:23:28 bkorb Exp $
+# $Id: stack.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -74,7 +74,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

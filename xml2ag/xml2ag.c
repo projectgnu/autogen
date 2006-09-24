@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.9 2006/09/23 00:48:46 bkorb Exp $
+ *  $Id: xml2ag.c,v 4.10 2006/09/24 02:10:45 bkorb Exp $
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2006 Bruce Korb
@@ -472,7 +472,6 @@ printChildren( xmlNodePtr pNode )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of xml2ag/xml2ag.c */

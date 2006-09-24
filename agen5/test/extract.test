@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2005/12/05 20:46:44 $
+# Last Modified:     $Date: 2006/09/24 02:10:44 $
 #            by: bkorb
 #
-# $Id: extract.test,v 4.3 2005/12/05 20:46:44 bkorb Exp $
+# $Id: extract.test,v 4.4 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -60,7 +60,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

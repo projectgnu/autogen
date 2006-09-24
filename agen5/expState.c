@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.14 2006/09/08 16:27:47 bkorb Exp $
+ *  $Id: expState.c,v 4.15 2006/09/24 02:10:44 bkorb Exp $
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
@@ -776,7 +776,6 @@ ag_scm_def_file_line( SCM obj, SCM fmt )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/expState.c */

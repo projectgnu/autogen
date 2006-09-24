@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.17 2006/09/22 21:34:45 bkorb Exp $
+ *   $Id: opts.def,v 4.18 2006/09/24 02:10:44 bkorb Exp $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -259,7 +259,8 @@ flag = {
 
 	    pz = aprf( "(load \"%s\")", zPath );
 	    procState = PROC_STATE_GUILE_PRELOAD;
-	    AG_SCM_EVAL_STR( pz );
+	    (void)ag_scm_c_eval_string_from_file_line(
+	                   pz, __FILE__, __LINE__);
 	    free( pz );
 	    procState = saveState;
 	_EOF_;

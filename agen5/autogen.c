@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.18 2006/09/13 14:31:08 bkorb Exp $
+ *  $Id: autogen.c,v 4.19 2006/09/24 02:10:44 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -213,6 +213,7 @@ doneCheck( void )
     ag_scm_c_eval_string_from_file_line(
         "(if (> (string-length shell-cleanup) 0)"
         " (shell shell-cleanup) )", __FILE__, __LINE__ );
+    closeServer();
 #endif
 
     fflush( stdout );
@@ -223,7 +224,6 @@ doneCheck( void )
             int status;
 
             pclose( pfTrace );
-            closeServer();
             while (wait( &status ) > 0)  ;
         }
         else fclose( pfTrace );
@@ -520,7 +520,6 @@ ao_strdup (char const * str)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/autogen.c */

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.12 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: agUtils.c,v 4.13 2006/09/24 02:10:44 bkorb Exp $
  *  This is the main routine for autogen.
  */
 
@@ -404,7 +404,6 @@ skipExpression( tCC* pzSrc, size_t len )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/agUtils.c */

@@ -8,7 +8,7 @@
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Sat Mar 28 14:21:31 1998
 #
-# $Id: expr.test,v 4.4 2005/12/05 20:46:44 bkorb Exp $
+# $Id: expr.test,v 4.5 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -52,7 +52,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

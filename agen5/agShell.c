@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.17 2006/09/23 04:33:12 bkorb Exp $
+ *  $Id: agShell.c,v 4.18 2006/09/24 02:10:44 bkorb Exp $
  *  Manage a server shell process
  */
 
@@ -136,7 +136,6 @@ serverSetup( void )
             if (p == NULL)
                 AG_ABEND( "cannot allocate path name" );
 
-            (void)atexit( &closeServer );
             pCurDir = (tpChar)getcwd( p, MAXPATHLEN );
 
             if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
@@ -616,7 +615,6 @@ runShell( char const*  pzCmd )
 /*
  * Local Variables:
  * mode: C
- * tab-width: 4
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcDef.c,v 4.15 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: funcDef.c,v 4.16 2006/09/24 02:10:44 bkorb Exp $
  *
  *  This module implements the DEFINE text function.
  */
@@ -447,7 +447,7 @@ build_defs( int defCt, tDefList* pList )
                 AGDUPSTR( pList->de.val.pzText, ag_scm2zchars(res, "eval res"),
                           "dup eval res" );
             }
-            else if (AG_SCM_NUMBER_P( res )) {
+            else if (AG_SCM_NUM_P( res )) {
                 pList->de.val.pzText = AGALOC( 16, "number buf" );
                 snprintf( pList->de.val.pzText, 16, "%ld", gh_scm2ulong( res ));
             }
@@ -834,7 +834,6 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/funcDef.c */

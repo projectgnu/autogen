@@ -6,7 +6,7 @@
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mkpkg.sh,v 4.3 2006/03/25 19:23:29 bkorb Exp $
+## $Id: mkpkg.sh,v 4.4 2006/09/24 02:10:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -27,6 +27,5 @@ fi
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
-## tab-width: 4
 ## End:
 ## mkpkg.sh ends here

@@ -1,12 +1,12 @@
 /*
- *  $Id: gdinit.c,v 4.5 2006/09/23 00:51:11 bkorb Exp $
+ *  $Id: gdinit.c,v 4.6 2006/09/24 02:10:45 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Sat Dec 1, 2001
- *  Last Modified:     $Date: 2006/09/23 00:51:11 $
+ *  Last Modified:     $Date: 2006/09/24 02:10:45 $
  *            by: bkorb
  */
 
@@ -420,7 +420,6 @@ validateOptions( void )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of getdefs/gdinit.c */

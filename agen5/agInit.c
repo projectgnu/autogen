@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.8 2006/09/22 21:32:54 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.9 2006/09/24 02:10:44 bkorb Exp $
  *
  *  Time-stamp:      "2005-12-04 19:42:46 bkorb"
  *
@@ -638,7 +638,6 @@ becomeDaemon( tCC* pzStdin,
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/agInit.c */

@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.11 2006/09/22 21:32:54 bkorb Exp $
+ *  $Id: agCgi.c,v 4.12 2006/09/24 02:10:44 bkorb Exp $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -177,7 +177,6 @@ parseInput( char* pzSrc, int len )
 /*
  * Local Variables:
  * mode: C
- * tab-width: 4
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:

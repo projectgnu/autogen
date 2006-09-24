@@ -88,20 +88,21 @@
 ) ) ) ) ) )         )
 
 (define shell-cleanup "")
+(define add-cleanup (lambda (t)
+   (set! shell-cleanup (string-append shell-cleanup "\n" t "\n"))  ))
 (define tmp-dir "")
 (define make-tmp-dir
   (lambda () 
     (begin (set! tmp-dir (shell
-  "tmp_dir=`mktemp -d .ag-XXXXXX` 2>/dev/null
+  "tmp_dir=`mktemp -d ./.ag-XXXXXX` 2>/dev/null
   test -d \"${tmp_dir}\" || {
     tmp_dir=${TMPDIR:-/tmp}/.ag-$$
     mkdir ${tmp_dir} || die cannot mkdir ${tmp_dir}
   } ; echo ${tmp_dir}" ))
 
-  (set! shell-cleanup (string-append shell-cleanup
-        "\nrm -rf " tmp-dir "\n")))
+  (add-cleanup (string-append  "rm -rf " tmp-dir))
 
-))
+)))
 
 ;;; /*=gfunc   make_header_guard
 ;;;  *

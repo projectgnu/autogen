@@ -68,7 +68,6 @@ ${VERBOSE} || ls -l *.rpm
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
-## tab-width: 8
 ## sh-basic-offset: 2
 ## End:
 ## end of mkpkg.linux

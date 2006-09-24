@@ -7,7 +7,7 @@
 ## Created:         Aug 20, 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.28 2006/09/20 04:26:53 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.29 2006/09/24 02:10:45 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -106,7 +106,6 @@ rm -rf ${tag}
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 8
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

@@ -173,7 +173,6 @@ printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_ar
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/custom.c */

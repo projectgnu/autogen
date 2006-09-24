@@ -638,7 +638,6 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/fmemopen.c */

@@ -1062,7 +1062,6 @@ strftime (s, maxsize, format, tp)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of compat/strftime.c */

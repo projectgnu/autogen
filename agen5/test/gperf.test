@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # gperf.test --- test functionality of `for' function
 #
-# Time-stamp:        "2006-01-28 10:59:04 bkorb"
+# Time-stamp:        "2006-09-23 12:17:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/03/24 15:32:27 $
+# Last Modified:     $Date: 2006/09/24 02:10:44 $
 #            by: bkorb
 #
-# $Id: gperf.test,v 4.5 2006/03/24 15:32:27 bkorb Exp $
+# $Id: gperf.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 if gperf --version > /dev/null 2>&1
@@ -68,7 +68,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

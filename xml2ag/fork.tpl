@@ -180,6 +180,5 @@ forkAutogen( char const* pzInput )
  * Local Variables:
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
- * tab-width: 4
  * End:
  * end of autogen.c */

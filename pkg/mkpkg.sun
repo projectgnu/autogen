@@ -130,6 +130,5 @@ rm -rf ${pkgdst}
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
-## tab-width: 4
 ## End:
 ## end of mkpkg.sun

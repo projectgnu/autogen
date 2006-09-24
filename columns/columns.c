@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.9 2006/09/23 00:51:11 bkorb Exp $
+ *  $Id: columns.c,v 4.10 2006/09/24 02:10:45 bkorb Exp $
  */
 
 /*
@@ -613,7 +613,6 @@ compProc( const void* p1, const void* p2 )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of columns/columns.c */

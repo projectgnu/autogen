@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 4.13 2006/09/23 01:44:37 bkorb Exp $
+ *  $Id: putshell.c,v 4.14 2006/09/24 02:10:45 bkorb Exp $
  * Time-stamp:      "2006-09-22 18:08:30 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -327,7 +327,6 @@ optionPutShell( tOptions* pOpts )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/putshell.c */

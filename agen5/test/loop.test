@@ -6,10 +6,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/03/25 16:47:36 $
+# Last Modified:     $Date: 2006/09/24 02:10:44 $
 #            by: bkorb
 #
-# $Id: loop.test,v 4.4 2006/03/25 16:47:36 bkorb Exp $
+# $Id: loop.test,v 4.5 2006/09/24 02:10:44 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -58,7 +58,6 @@ cleanup
 
 ## Local Variables:
 ## Mode: shell-script
-## tab-width: 4
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

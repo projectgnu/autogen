@@ -1,5 +1,5 @@
 /*
- *  $Id: configfile.c,v 4.27 2006/09/23 01:44:37 bkorb Exp $
+ *  $Id: configfile.c,v 4.28 2006/09/24 02:10:45 bkorb Exp $
  *  Time-stamp:      "2006-09-22 18:01:50 bkorb"
  *
  *  configuration/rc/ini file handling.
@@ -1273,7 +1273,6 @@ validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of autoopts/configfile.c */

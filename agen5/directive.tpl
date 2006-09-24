@@ -1,5 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
-# $Id: directive.tpl,v 4.11 2006/09/22 21:34:45 bkorb Exp $
+# $Id: directive.tpl,v 4.12 2006/09/24 02:10:44 bkorb Exp $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -122,10 +122,8 @@ then
   emulate sh
   NULLCMD=:
 
-else if test -n "${BASH_VERSION+set}" && (set -o posix) 1>&2
-then
-  set -o posix
-fi ; fi
+else case `set -o` in *posix*) set -o posix ;; esac
+fi
 
 for f in 1 2 5 6 7 13 14
 do trap "echo trapped on $f >&2" $f ; done
@@ -136,7 +134,7 @@ test -n "${CDPATH}" && {
 }
 ( unalias cd ) 1>&2 && unalias cd
 die() {
-  echo $* >&8
+  echo "Killing AutoGen:  $*" >&8
   kill -TERM ${AG_pid}
   exit 1
 }
@@ -150,8 +148,11 @@ AG_pid=[=
  *  "gperf" functionality only works if the subshell is enabled.
  */
 [= (out-push-new) \=]
-gpdir=.gperf.$$
-test -d ${gpdir} || mkdir ${gpdir} || die "cannot mkdir ${gpdir}"
+test -z ${gpdir} && {
+  gpdir=`mktemp -d ./.gperf.XXXXXX` 2>/dev/null
+  test -z "${gpdir}" && gpdir=.gperf.$$
+  test -d ${gpdir} || mkdir ${gpdir} || die "cannot mkdir ${gpdir}"
+}
 cd ${gpdir} || die cannot cd into ${gpdir}
 gpdir=`pwd`
 gperf_%2$s=${gpdir}/%2$s
@@ -186,12 +187,16 @@ gperf_%2$s=${gpdir}/%2$s
 	_EOF_
 ) > %2$s.gperf
 
-gperf -t -D -k'*' %2$s.gperf > %2$s.c
-test $? -eq 0 || die "gperf failed on ${gpdir}/%2$s.gperf"
+exec 2> %2$s.log
+gperf -t -D -k'*' %2$s.gperf > %2$s.c || \
+   die "gperf failed on ${gpdir}/%2$s.gperf
+      `cat %2$s.log`"
 export CFLAGS=-g
-res=`${MAKE-make} %2$s 2>&1`
+${MAKE-make} %2$s
 test $? -eq 0 -a -x ${gperf_%2$s} || \
-  die "could not build gperf program: ${res}"
+  die "could not build gperf program
+      `cat %2$s.log`"
+exec 2>&8
 [=
   (set! tmp-txt (out-pop #t))
   (emit (sprintf "static char const zMakeGperf[%d] =\n"

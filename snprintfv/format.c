@@ -1188,7 +1188,6 @@ spec_entry snv_default_spec_table[] = {
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/format.c */

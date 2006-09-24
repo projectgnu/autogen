@@ -285,7 +285,6 @@ SNV_END_EXTERN_C
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/compat.h */

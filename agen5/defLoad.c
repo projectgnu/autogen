@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.11 2006/03/25 19:23:27 bkorb Exp $
+ *  $Id: defLoad.c,v 4.12 2006/09/24 02:10:44 bkorb Exp $
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -473,7 +473,6 @@ unloadDefs( void )
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of agen5/defLoad.c */

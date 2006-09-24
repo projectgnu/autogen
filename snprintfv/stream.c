@@ -214,7 +214,6 @@ stream_get (STREAM *stream)
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
- * tab-width: 4
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/stream.c */
