@@ -2,8 +2,8 @@
 
 html
 
-# Time-stamp: "2006-08-22 07:17:31 bkorb"
-# Version:    "$Revision: 4.8 $
+# Time-stamp: "2006-09-27 20:10:55 bkorb"
+# Version:    "$Revision: 4.9 $
 
 =]
 <?xml version="1.0" encoding="utf-8" ?>
@@ -11,7 +11,7 @@ html
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.8 2006/08/22 16:06:36 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.9 2006/09/28 03:17:50 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -58,13 +58,18 @@ html
   (begin
      (set! fnam (string-append dir "/" proj-name sfx))
      (set! fsiz (if (access? fnam R_OK)  (stat:size (stat fnam)) 0 ))
-     (if (< fsiz 4096)
-         (set! fsiz (number->string fsiz))
-         (if (< fsiz (* 2 1024 1024))
-             (set! fsiz (sprintf "%dK"  (inexact->exact (/ fsiz 1024))))
-             (set! fsiz (sprintf "%dMB" (inexact->exact (/ fsiz 1048576))))
-     )   )
-     fsiz
+     (shellf "fsiz='%d'
+         if test ${fsiz} -lt 4096
+         then echo ${fsiz}
+         else
+           fsiz=`expr ${fsiz} / 1024`
+           if test ${fsiz} -lt 2048
+           then echo ${fsiz}K
+           else
+             fsiz=`expr ${fsiz} / 1024`
+             echo ${fsiz}M
+           fi
+         fi" fsiz)
 ) )
 
 =]
@@ -142,7 +147,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2006/08/22 16:06:36 $ $Author: bkorb $
+$Date: 2006/09/28 03:17:50 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

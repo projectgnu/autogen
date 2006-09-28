@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2006-09-16 12:17:55 bkorb"
+# Time-stamp:        "2006-09-27 19:49:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: cond.test,v 4.6 2006/09/16 19:58:35 bkorb Exp $
+# $Id: cond.test,v 4.7 2006/09/28 03:17:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -75,7 +75,8 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-( eval $(echo ${cc_cmd} | sed 's/-Werror/-DSECOND/' ) 2>&1 ) \
+( eval $(echo ${cc_cmd} | \
+  sed 's/-Werror//;s/-DTEST_TEST/-DSECOND -DTEST_TEST/' ) 2>&1 ) \
   | sed -n 's/.*#warning/#warning/p' > ${testname}-cc.log
 
 echo '#warning undefining SECOND due to option name conflict' \

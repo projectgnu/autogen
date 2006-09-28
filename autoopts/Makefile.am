@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-08-22 07:18:02 bkorb"
+## Time-stamp:      "2006-09-27 18:30:08 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.30 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.31 2006/09/28 03:17:50 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -57,9 +57,9 @@ LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
     aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
     optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
-PRIVATE_TPL = options_h.tpl usage-txt.tpl
-TPL_FILES   = $(CLIENT_TPLS) $(PRIVATE_TPL)
-DEF_FILES   = genshell.def stdoptions.def usage-txt.def $(srcdir)/funcs.def
+
+TPL_FILES   = $(CLIENT_TPLS)
+DEF_FILES   = genshell.def stdoptions.def $(srcdir)/funcs.def
 MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in COPYING
 pkgconfigdir=$(libdir)/pkgconfig
 
