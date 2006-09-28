@@ -1,8 +1,8 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.9 2006/09/28 01:26:16 bkorb Exp $
-# Time-stamp:        "2006-09-27 18:23:07 bkorb"
-# Last Committed:    $Date: 2006/09/28 01:26:16 $
+# $Id: snarf.tpl,v 4.10 2006/09/28 01:58:07 bkorb Exp $
+# Time-stamp:        "2006-09-27 18:33:31 bkorb"
+# Last Committed:    $Date: 2006/09/28 01:58:07 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -158,7 +158,7 @@ DEFINE mk-new-proc =][=
 
    (set! ix (add-to-g_nm))
 
-   (ag-fprintf 0 "\n    NEW_PROC(%4d, " ix) =][=
+   (ag-fprintf 0 "\n    NEW_PROC(g_nm +%4d, " ix) =][=
 
    IF (not (exist? "exparg"))
 
@@ -204,7 +204,7 @@ ENDDEF =][=
 typedef SCM (*gh_callback_t)__P((void));
 void [=(. init-proc)=]( void );
 #define NEW_PROC( _As, _Ar, _Ao, _Ax, _An ) \
-  gh_new_procedure( (char*)g_nm+_As, (gh_callback_t)(void*)ag_scm_ ## _An, \
+  gh_new_procedure( (char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An, \
                     _Ar, _Ao, _Ax )
 
 /*
