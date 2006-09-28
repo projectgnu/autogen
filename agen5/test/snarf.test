@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2006-09-22 14:41:16 bkorb"
+# Time-stamp:        "2006-09-27 15:36:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2006/09/24 02:10:44 $
+# Last Modified:     $Date: 2006/09/28 01:26:16 $
 #            by: bkorb
 # Copyright:         1999-2006 by Bruce Korb
-# $Id: snarf.test,v 4.11 2006/09/24 02:10:44 bkorb Exp $
+# $Id: snarf.test,v 4.12 2006/09/28 01:26:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -99,17 +99,23 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *  Guile Initializations - Test Global Variables
  */
 #include "snarf.h"
-static char const s_test_to_example_x[]        = "test->example!";
-static char const s_guile_syntax_ele[]         = "guile-syntax-ele";
-static char const s_bumble_it[]                = "bumble-it";
-static char const s_mumble_check[]             = "mumble-check";
        SCM test_scm_sym_bumble_it          = SCM_BOOL_F;
 static SCM test_scm_sym_mumble_check       = SCM_BOOL_F;
 
 
+#ifndef __P
+# if defined (__GNUC__) || (defined (__STDC__) && __STDC__)
+#  define __P(args) args
+# else
+#  define __P(args) ()
+# endif  /* GCC.  */
+#endif  /* Not __P.  */
+
+typedef SCM (*gh_callback_t)__P((void));
 void Chosen_init( void );
-#define NEW_PROC( _An, _Ar, _Ao, _Ax ) \
-  gh_new_procedure( (char*)s_ ## _An, (void*)ag_scm_ ## _An, _Ar, _Ao, _Ax )
+#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An ) \
+  gh_new_procedure( (char*)g_nm+_As, (gh_callback_t)(void*)ag_scm_ ## _An, \
+                    _Ar, _Ao, _Ax )
 
 /*
  * test Initialization procedure.
@@ -117,11 +123,15 @@ void Chosen_init( void );
 void
 Chosen_init( void )
 {
-    NEW_PROC( test_to_example_x,      0, 0, 1 );
-    scm_make_synt( s_guile_syntax_ele, scm_makacro, scm_m_undefine );
-    test_scm_sym_bumble_it = scm_permanent_object (SCM_CAR (scm_intern0 (s_bumble_it)));
-    test_scm_sym_mumble_check = scm_permanent_object (SCM_CAR (scm_intern0 (s_mumble_check)));
+static char const g_nm[35] =
+    "test->example!\0"        "\"guile_syntax_ele\",\0";
+
+    NEW_PROC(   0, 0, 0, 1, test_to_example_x);
+    scm_make_synt(g_nm+15, scm_makacro, scm_m_undefine);
+    test_scm_sym_bumble_it = scm_permanent_object(SCM_CAR (scm_intern0 (s_bumble_it)));
+    test_scm_sym_mumble_check = scm_permanent_object(SCM_CAR (scm_intern0 (s_mumble_check)));
 }
+#undef NEW_PROC
 _EOF_
 
 cmp ${testname}.ini.* || \

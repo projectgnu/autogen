@@ -4,6 +4,14 @@
 	(chainOpen): ditto
 	* agen5/autogen.h(ag_scm2zchars): move this inline procedure so it
 	follows the define of a macro it uses (Guile 1.4/5/6).
+	* autoopts/configfile.c: fix some obscure Solaris warnings
+	* autoopts/cook.c: ditto
+	* autoopts/load.c: ditto
+	* autoopts/nested.c: ditto
+	* autoopts/putshell.c: ditto
+	* autoopts/options.tpl: put autoopts version in header comment.
+	* autoopts/options_h.tpl: burn the number into options.tpl
+	* agen5/snarf.tpl: use string tables
 
 2006-09-23  Bruce Korb  <bkorb@gnu.org>
 

@@ -4,10 +4,10 @@
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2006-09-16 12:38:27 bkorb"
+# Time-stamp:        "2006-09-27 11:15:55 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.26 2006/09/16 19:58:35 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.27 2006/09/28 01:26:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -62,13 +62,14 @@ make_funcs_def()
       echo  ../compat/pathfind.c guileopt.c`
   getdefs linenum srcfile template=options_h output=funcs.def $files
   chmod u+w funcs.def
-  eval "`egrep '^AO_' ../VERSION`"
+  eval "`egrep '^A[GO]_' ../VERSION`"
+  vers_curr=$(expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION)
+  vers_min=$( expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
   cat >> funcs.def <<-  _END_VERS_INFO_
-	vers-info       = "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}";
-	vers-curr       = "`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_AGE`";
-	vers-min        = "`expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096`";
+	vers-curr       = "${vers_curr}";
+	vers-min        = "${vers_min}";
 	vers-min-str    = "`expr $AO_CURRENT - $AO_AGE`:0:0";
-	vers-template   = "`expr $AO_CURRENT '*' 4096`";
+	vers-sovers     = "${AO_SOVERS}";
 	library         = opts;
 	/*
 	 *  THIS FILE IS DISTRIBUTED

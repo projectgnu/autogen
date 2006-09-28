@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.20 2006/09/24 16:17:39 bkorb Exp $
+ *  $Id: agShell.c,v 4.21 2006/09/28 01:26:16 bkorb Exp $
  *
  *  Time-stamp:        "2006-09-24 08:48:45 bkorb"
- *  Last Committed:    $Date: 2006/09/24 16:17:39 $
+ *  Last Committed:    $Date: 2006/09/28 01:26:16 $
  *
  *  Manage a server shell process
  */
@@ -248,10 +248,12 @@ chainOpen( int       stdinFd,
 
             pzShellProgram = getenv( zShellEnv );
             if (pzShellProgram == NULL) {
-            no_useful_SHELL:
 #               ifdef __sun
                 static char const xpg_sh[] = "/usr/xpg4/bin/sh";
+#               endif
 
+            no_useful_SHELL:
+#               ifdef __sun
                 if (access(xpg_sh, X_OK) == 0)
                     pzShellProgram = xpg_sh;
                 else

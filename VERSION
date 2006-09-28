@@ -4,16 +4,16 @@
 #
 # Copyright (C) 1999-2006 Bruce Korb
 #
-# Time-stamp:        "2006-09-24 09:16:10 bkorb"
+# Time-stamp:        "2006-09-27 10:24:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2006/09/24 17:04:03 $
+# Last Committed:    $Date: 2006/09/28 01:26:16 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=8
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".6pre12"
+AG_PATCHLEVEL=".6pre14"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -40,13 +40,14 @@ GO_AGE=0
 
 # For automake
 #
-VERSION=$AG_VERSION
+VERSION=${AG_VERSION}
 PACKAGE='GNU AutoGen'
 EADDR=autogen-users@lists.sourceforge.net
 
 # Display version numbers banner for my sanity!
 #
-soname=$AO_LIBRARY-$AO_CURRENT:$AO_REVISION:$AO_AGE
+AO_SOVERS=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
+AO_SONAME=${AO_LIBRARY}-${AO_SOVERS}
 h='*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 
 cat <<EOF
@@ -54,7 +55,7 @@ $h$h*
 
                  A      U      T      O      G      E      N
 
-`printf "%-38s %38s\n" "$PACKAGE-$VERSION" "$soname" || :`
+`printf "%-38s %38s\n" "$PACKAGE-$VERSION" "${AO_SONAME}" || :`
 $h$h*
 EOF
 

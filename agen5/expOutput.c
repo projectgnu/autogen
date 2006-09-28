@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.19 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expOutput.c,v 4.20 2006/09/28 01:26:16 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:52:52 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-09-27 11:39:43 bkorb"
+ *  Last Committed:    $Date: 2006/09/28 01:26:16 $
  *
  *  This module implements the output file manipulation function
  */
@@ -335,12 +335,12 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
         pCurFp  = pSaveFp;
         return SCM_UNDEFINED;
 
+    fprintf_woops: ;
     } while (0);
 
     /*
      *  Still here?  We have a bad "port" specification.
      */
- fprintf_woops:
     AG_ABEND( invalid_z );
     /* NOTREACHED */
     return SCM_UNDEFINED;

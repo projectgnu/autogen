@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.23 2006/09/23 00:11:49 bkorb Exp $
+# $Id: opthead.tpl,v 4.24 2006/09/28 01:26:16 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-22 15:36:20 bkorb"
+# Time-stamp:      "2006-09-27 09:52:55 bkorb"
 
 =]
 /*
@@ -22,7 +22,7 @@
  *  tolerable version is at least as old as what was current when the header
  *  template was released.
  */
-#define AO_TEMPLATE_VERSION XXX
+#define AO_TEMPLATE_VERSION @AO_TEMPLATE_VERSION@
 #if (AO_TEMPLATE_VERSION < OPTIONS_MINIMUM_VERSION) \
  || (AO_TEMPLATE_VERSION > OPTIONS_STRUCT_VERSION)
 # error option template version mismatches autoopts/options.h header

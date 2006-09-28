@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-22 18:18:50 bkorb"
-# ID:  $Id: options_h.tpl,v 4.25 2006/09/23 01:44:37 bkorb Exp $
+# Time-stamp:      "2006-09-27 11:15:48 bkorb"
+# ID:  $Id: options_h.tpl,v 4.26 2006/09/28 01:26:16 bkorb Exp $
 
 =][=
 
@@ -266,12 +266,15 @@ struct optSpecIndex {
  ;;;
 
 (shellf "
-sed '/define AO_TEMPLATE_VERSION/s/SION .*/SION %s/' opthead.tpl > XXXX
-mv -f XXXX opthead.tpl" (get "vers-template"))
+sed 's/@AO_SOVERS@/%s/' options.tpl > XXXX
+mv -f XXXX options.tpl
+sed 's/@AO_TEMPLATE_VERSION@/%s/' opthead.tpl > XXXX
+mv -f XXXX opthead.tpl"
+ (get "vers-sovers") (get "vers-curr"))
 
 =]
 #define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
-#define  OPTIONS_VERSION_STRING  "[= vers-info    =]"
+#define  OPTIONS_VERSION_STRING  "[= vers-sovers  =]"
 #define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
 #define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 

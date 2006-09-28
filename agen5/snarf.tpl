@@ -1,8 +1,8 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.8 2006/09/24 02:57:01 bkorb Exp $
-# Time-stamp:        "2006-09-23 19:49:44 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:01 $
+# $Id: snarf.tpl,v 4.9 2006/09/28 01:26:16 bkorb Exp $
+# Time-stamp:        "2006-09-27 18:23:07 bkorb"
+# Last Committed:    $Date: 2006/09/28 01:26:16 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -71,6 +71,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
     the getdefs documentation.
 
 =][=
+(define ix 0)
 (define scm-prefix
         (if (exist? "group")
             (string-append (get "group") "_scm_")
@@ -126,54 +127,62 @@ ENDFOR symbol   =]
  *
  *  copyright 1992-2006 Bruce Korb
  *
-[=(gpl "AutoGen" " *  ")=]
+[=
+(string-table-new "g_nm")
+
+(define add-to-g_nm (lambda ()
+  (string-table-add "g_nm"
+    (if (exist? "string")
+        (get "string")
+        (shellf
+          "echo '%s' | sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
+          (get "name")  )  ) ) ))
+
+(gpl "AutoGen" " *  ")=]
  *
  *  Guile Initializations - [=% group (string-capitalize! "%s ")
                             =]Global Variables
  */
 #include "[= (. header-file) =]"[=
 
-DEFINE string-content   =]
-static char const s_[=% name (sprintf "%%-26s" "%s[]") =] = [=
-    (c-string (if (exist? "string") (get "string") (shellf
-"echo '%s' | sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
-      (get "name")  )))  =];[=
-ENDDEF  string-content   =][=
-
-  FOR gfunc  =][= INVOKE string-content =][= ENDFOR =][=
-  FOR syntax =][= INVOKE string-content =][= ENDFOR =][=
-  FOR symbol =][= INVOKE string-content =][= ENDFOR =][=
-
   FOR symbol =]
 [=  IF (exist? "global") =]      [=ELSE=]static[=ENDIF
     =] SCM [=(. scm-prefix)=]sym_[=% name %-18s =] = SCM_BOOL_F;[=
-  ENDFOR symbol =]
-[=
+  ENDFOR symbol
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=][=
+=]
+[=
 
-DEFINE mk-new-proc =]
-    NEW_PROC( [= % name (sprintf "%%-24s" "%s,") =][=
+DEFINE mk-new-proc =][=
 
-      IF (not (exist? "exparg"))
-       =]0, 0, 0[=
+   (set! ix (add-to-g_nm))
 
-      #  Count of all the arguments:       (count "exparg")
-         Of these, some may be optional:   (count "exparg.arg_optional")
-         Of the optional, one may be an arg_list.
-         The sum of the three numbers must be:  (count "exparg")  =][=
+   (ag-fprintf 0 "\n    NEW_PROC(%4d, " ix) =][=
 
-      ELIF (not (exist? "exparg.arg_list")) =][=
-       (- (count "exparg") (count "exparg.arg_optional")) =], [=
-       (count "exparg.arg_optional" ) =], 0[=
+   IF (not (exist? "exparg"))
 
-      ELIF (not (exist? "exparg.arg_optional")) =][=
-       (- (count "exparg") 1) =], 0, 1[=
+    =]0, 0, 0[=
 
-      ELSE =][=
-       (- (count "exparg") (count "exparg.arg_optional")) =], [=
-       (- (count "exparg.arg_optional" ) 1) =], 1[=
-      ENDIF =] );[=
+   #  Count of all the arguments:       (count "exparg")
+      Of these, some may be optional:   (count "exparg.arg_optional")
+      Of the optional, one may be an arg_list.
+      The sum of the three numbers must be:  (count "exparg")  =][=
+
+   ELIF (not (exist? "exparg.arg_list")) =][=
+    (- (count "exparg") (count "exparg.arg_optional")) =], [=
+    (count "exparg.arg_optional" ) =], 0[=
+
+   ELIF (not (exist? "exparg.arg_optional")) =][=
+    (- (count "exparg") 1) =], 0, 1[=
+
+   ELSE  =][=
+    (- (count "exparg") (count "exparg.arg_optional")) =], [=
+    (- (count "exparg.arg_optional" ) 1) =], 1[=
+   ENDIF =], [=
+
+   name =]);[=
+
 ENDDEF =][=
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -184,9 +193,19 @@ ENDDEF =][=
           (if (exist? "group")
               (string-append (get "group") "_init")
               "scm_init"))) =]
+#ifndef __P
+# if defined (__GNUC__) || (defined (__STDC__) && __STDC__)
+#  define __P(args) args
+# else
+#  define __P(args) ()
+# endif  /* GCC.  */
+#endif  /* Not __P.  */
+
+typedef SCM (*gh_callback_t)__P((void));
 void [=(. init-proc)=]( void );
-#define NEW_PROC( _An, _Ar, _Ao, _Ax ) \
-  gh_new_procedure( (char*)s_ ## _An, (void*)ag_scm_ ## _An, _Ar, _Ao, _Ax )
+#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An ) \
+  gh_new_procedure( (char*)g_nm+_As, (gh_callback_t)(void*)ag_scm_ ## _An, \
+                    _Ar, _Ao, _Ax )
 
 /*
  * [=group=] Initialization procedure.
@@ -194,6 +213,8 @@ void [=(. init-proc)=]( void );
 void
 [=(. init-proc)=]( void )
 {[=
+
+  (out-push-new)
 
   (if (exist? "init-code")
       (prefix "    " (get "init-code")) "") =][=
@@ -203,22 +224,28 @@ void
   ENDFOR gfunc          =][=
 
   FOR  syntax           =]
-    scm_make_synt( s_[=% name (sprintf "%%-16s" "%s,")=] [=type=], [=cfn=] );[=
+    scm_make_synt(g_nm+[= (add-to-g_nm) =], [=type=], [=cfn=]);[=
   ENDFOR syntax         =][=
 
   FOR symbol =]
-    [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object [=
+    [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object[=
     IF (not (and (exist? "init_val") (exist? "const_val")))
-         =](SCM_CAR (scm_intern0 (s_[=name=])));[=
+         =](SCM_CAR (scm_intern0 (g_nm+[= (add-to-g_nm) =])));[=
 
-    ELSE =](scm_intern0 (s_[=name=]));
+    ELSE            =](scm_intern0 (g_nm+[= (add-to-g_nm) =]));
     SCM_SETCDR ([=(. scm-prefix)=]sym_[=name=], [=
       ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
-    ENDIF =][=
-  ENDFOR symbol =][=
+    ENDIF           =][=
+  ENDFOR symbol     =][=
 
+  (out-suspend "main")
+  (emit-string-table "g_nm")
+  (out-resume "main")
+  (out-pop #t)      =][=
   (if (exist? "fini-code")
       (prefix "    " (get "fini-code")) "") =]
-}[= #
+}
+#undef NEW_PROC
+[= #
 
-end of snarf.tpl =]
+end of snarf.tpl \=]

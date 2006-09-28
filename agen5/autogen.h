@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.25 2006/09/24 16:17:39 bkorb Exp $
+ *  $Id: autogen.h,v 4.26 2006/09/28 01:26:16 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-24 09:08:18 bkorb"
- *  Last Committed:    $Date: 2006/09/24 16:17:39 $
+ *  Time-stamp:        "2006-09-27 11:42:20 bkorb"
+ *  Last Committed:    $Date: 2006/09/28 01:26:16 $
  *
  *  Global header file for AutoGen
  */
@@ -156,11 +156,11 @@ typedef tHdlrProc* tpHdlrProc;
 
 struct template_lib_marker {
     union {
-        char        str[4];  /* {'A', 'G', 'L', 'B'} */
-        long        i[1];
+        unsigned char   str[4];  /* {'A', 'G', 'L', 'B'} */
+        unsigned int    i[1];
     }           magic;
-    short       revision;    /* TEMPLATE_REVISION    */
-    short       funcSum;     /* FUNCTION_CKSUM       */
+    unsigned short      revision;    /* TEMPLATE_REVISION    */
+    unsigned short      funcSum;     /* FUNCTION_CKSUM       */
 };
 
 /*

@@ -1,9 +1,9 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.5 2006/09/24 02:57:01 bkorb Exp $
+# $Id: functions.tpl,v 4.6 2006/09/28 01:26:16 bkorb Exp $
 
-#  Time-stamp:        "2006-09-23 19:51:28 bkorb"
-#  Last Committed:    $Date: 2006/09/24 02:57:01 $
+#  Time-stamp:        "2006-09-27 11:58:53 bkorb"
+#  Last Committed:    $Date: 2006/09/28 01:26:16 $
 
 =]
 [=
@@ -78,7 +78,7 @@ ENDFOR macfunc =]
 
 #define FUNC_CT    [= (count "macfunc") =]
 
-extern char const*  apzFuncNames[ FUNC_CT ];
+extern char const * const apzFuncNames[ FUNC_CT ];
 
 /*
  *  Enumerate all the function types, whether they have
@@ -249,7 +249,7 @@ egrep    '^[A-Z]' $file | sort | sed -e 's/^.*:://' -e '$s/,$//'
 
 rm -f $file ` =] };
 
-char const*  apzFuncNames[ FUNC_CT ] = {
+char const * const apzFuncNames[ FUNC_CT ] = {
 [=(out-push-new) =][=
 
 FOR macfunc "\n"    =]echo [=
@@ -274,7 +274,8 @@ ENDFOR macfunc      =][=
 
 (shellf
 "set -- `sum %s`
-echo '#define FUNCTION_CKSUM ' `echo $1 | sed 's/^0*//'`
+sum=`printf '((unsigned short)0x%%04X)' $1`
+echo \"#define FUNCTION_CKSUM ${sum}\"
 rm -f $file"
 (out-name)) =]
 
