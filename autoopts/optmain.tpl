@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.21 2006/09/24 02:10:45 bkorb Exp $
+# $Id: optmain.tpl,v 4.22 2006/10/05 03:39:53 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-09-23 10:53:56 bkorb"
+# Time-stamp:      "2006-10-04 18:05:11 bkorb"
 
 =][=
 
@@ -757,7 +757,7 @@ DEFINE range-option-code
   ENDFOR =][=
   (shellf "${CLexe} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
-    long val;
+    int val;
     int ix;
     char const* pzIndent = "\t\t\t\t  ";
     extern FILE* option_usage_fp;
@@ -819,7 +819,7 @@ DEFINE range-option-code
     return;
 
   valid_return:
-    pOptDesc->optArg.argString = (char*)val;
+    pOptDesc->optArg.argInt = val;
 }[=
 
 ENDDEF   range-option-code

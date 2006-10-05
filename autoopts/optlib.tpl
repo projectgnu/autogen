@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.22 2006/09/23 00:11:49 bkorb Exp $
+# $Id: optlib.tpl,v 4.23 2006/10/05 03:39:53 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-09-22 15:47:06 bkorb"
+# Time-stamp:      "2006-10-04 16:45:12 bkorb"
 
 =][=
 
@@ -178,15 +178,25 @@ Emit the "#define SET_OPT_NAME ..." and "#define DISABLE_OPT_NAME ..."  =][=
 DEFINE set-defines
 
 =]
-#define SET_[=(. opt-name)=][=
-  IF (exist? "arg-type")=](a)[=ENDIF=]   STMTS( \
+#define SET_[=(. opt-name)=][= (if (exist? "arg-type") "(a)")
+  =]   STMTS( \
         [=set-desc=].optActualIndex = [=(for-index)=]; \
         [=set-desc=].optActualValue = VALUE_[=(. opt-name)=]; \
-        [=set-desc=].fOptState &= OPTST_PERSISTENT; \
+        [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
         [=set-desc=].fOptState |= [=opt-state=][=
-  IF (exist? "arg-type")=]; \
-        [=set-desc=].pzLastArg  = (char const*)(a)[=
-  ENDIF  =][=
+  CASE  arg-type =][=
+  =*  str        =]; \
+        [=set-desc=].optArg.argString = (a)[=
+  =*  num        =]; \
+        [=set-desc=].optArg.argInt = (a)[=
+  =*  bool       =]; \
+        [=set-desc=].optArg.argBool = (a)[=
+  =*  key        =]; \
+        [=set-desc=].optArg.argIntptr = (a)[=
+  =*  set        =]; \
+        [=set-desc=].optArg.argIntptr = (a)[=
+  ESAC arg-type  =][=
+
   IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
@@ -194,9 +204,9 @@ DEFINE set-defines
 
   IF (exist? "disable") =]
 #define DISABLE_[=(. opt-name)=]   STMTS( \
-        [=set-desc=].fOptState &= OPTST_PERSISTENT; \
+        [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
         [=set-desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
-        [=set-desc=].pzLastArg  = NULL[=
+        [=set-desc=].optArg.argString = NULL[=
     IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
@@ -327,7 +337,7 @@ typedef enum {[=
 
   CASE arg-type  =][=
 
-  ~*  num        =]
+  =*  num        =]
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] ([=(. value-desc)=].optArg.argInt)[=
 

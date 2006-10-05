@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.24 2006/09/28 01:26:16 bkorb Exp $
+# $Id: opthead.tpl,v 4.25 2006/10/05 03:39:53 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
 # Time-stamp:      "2006-09-27 09:52:55 bkorb"
 
@@ -103,7 +103,7 @@ IF (> 1 (string-length UP-prefix))
 #define  STACKCT_OPT(n) (((tArgList*)(DESC(n).optCookie))->useCt)
 #define STACKLST_OPT(n) (((tArgList*)(DESC(n).optCookie))->apzArgs)
 #define    CLEAR_OPT(n) STMTS( \
-                DESC(n).fOptState &= OPTST_PERSISTENT;   \
+                DESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \
                 if ( (DESC(n).fOptState & OPTST_INITENABLED) == 0) \
                     DESC(n).fOptState |= OPTST_DISABLED; \
                 DESC(n).optCookie = NULL )[=
@@ -121,7 +121,7 @@ ELSE we have a prefix:
 #define  STACKCT_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->useCt)
 #define STACKLST_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->apzArgs)
 #define    CLEAR_%1$sOPT(n) STMTS( \\
-                %1$sDESC(n).fOptState &= OPTST_PERSISTENT;   \\
+                %1$sDESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \\
                 if ( (%1$sDESC(n).fOptState & OPTST_INITENABLED) == 0) \\
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
@@ -266,7 +266,7 @@ ENDIF=][=
 
 IF (exist? "homerc")        =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
-        [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT; \
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT_MASK; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a) )[=
 ENDIF                       =][=

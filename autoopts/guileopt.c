@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.11 2006/09/23 01:44:37 bkorb Exp $
- * Time-stamp:      "2006-09-22 18:04:59 bkorb"
+ *  $Id: guileopt.c,v 4.12 2006/10/05 03:39:53 bkorb Exp $
+ * Time-stamp:      "2006-10-04 17:05:48 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -102,7 +102,7 @@ export_options_to_guile( tOptions* pOpts )
         if (UNUSED_OPT( pOD )) {
             if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
                 sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                         (int)pOD->optArg.argIntptr );
+                         (int)pOD->optArg.argInt );
                 gh_eval_str( z );
             }
             else if (pOD->optArg.argString != 0) {
@@ -144,7 +144,7 @@ export_options_to_guile( tOptions* pOpts )
          */
         else if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
             sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                     (int)pOD->optArg.argIntptr );
+                     (int)pOD->optArg.argInt );
             gh_eval_str( z );
         }
 

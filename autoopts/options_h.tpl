@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-27 11:15:48 bkorb"
-# ID:  $Id: options_h.tpl,v 4.26 2006/09/28 01:26:16 bkorb Exp $
+# Time-stamp:      "2006-10-04 20:38:47 bkorb"
+# ID:  $Id: options_h.tpl,v 4.27 2006/10/05 03:39:53 bkorb Exp $
 
 =][=
 
@@ -50,6 +50,24 @@ h=options.h
  *  See the relevant generated header file to determine which and what
  *  values for "opt_name" are available.
  */
+[=
+
+ ;;;
+ ;;; These "vers" values are manipulated by the contents of ../VERSION
+ ;;;
+
+(shellf "
+sed 's/@AO_SOVERS@/%s/' options.tpl > XXXX
+mv -f XXXX options.tpl
+sed 's/@AO_TEMPLATE_VERSION@/%s/' opthead.tpl > XXXX
+mv -f XXXX opthead.tpl"
+ (get "vers-sovers") (get "vers-curr"))
+
+=]
+#define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
+#define  OPTIONS_VERSION_STRING  "[= vers-sovers  =]"
+#define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
+#define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 
 typedef enum {
     OPARG_TYPE_NONE             = 0,
@@ -66,50 +84,38 @@ typedef struct optionValue {
     char*               pzName;
     union {
         char            strVal[1];      /* OPARG_TYPE_STRING      */
-        int             enumVal;        /* OPARG_TYPE_ENUMERATION */
-        int             boolVal;        /* OPARG_TYPE_BOOLEAN     */
-        long            setVal;         /* OPARG_TYPE_MEMBERSHIP  */
+        unsigned int    enumVal;        /* OPARG_TYPE_ENUMERATION */
+        unsigned int    boolVal;        /* OPARG_TYPE_BOOLEAN     */
+        unsigned long   setVal;         /* OPARG_TYPE_MEMBERSHIP  */
         long            longVal;        /* OPARG_TYPE_NUMERIC     */
         void*           nestVal;        /* OPARG_TYPE_HIERARCHY   */
     } v;
 } tOptionValue;
 
-#define OPTST_SET_ARGTYPE(n) ((n) << 12)
-#define OPTST_GET_ARGTYPE(f) (((f) & OPTST_ARG_TYPE_MASK) >> 12)
-
 /*
  *  Bits in the fOptState option descriptor field.
  */
-#define OPTST_INIT           0x0000000U /* Initial compiled value            */
-#define OPTST_SET            0x0000001U /* Set via the "SET_OPT()" macro     */
-#define OPTST_PRESET         0x0000002U /* Set via an RC/INI file            */
-#define OPTST_DEFINED        0x0000004U /* Set via a command line option     */
+[= `
+set -x
+autogen opt-state.def || die "Cannot regen opt-state.h"
+sed -e '1,/typedef.*_bits_t/d' \
+    -e 's/NO_BITS /INIT/' \
+    -e 's/_BIT / /' \
+    -e 's/_MASK     /_MASK /' \
+    -e '/ SET_OPT_STATE(/,$d' opt-state.h
+rm  -f opt-state.[ch]
+set +x
+` =]
 
-#define OPTST_SET_MASK       0x0000007U /* mask of flags that show set state */
+#define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)
 
-#define OPTST_EQUIVALENCE    0x0000010U /* selected by equiv'ed option       */
-#define OPTST_DISABLED       0x0000020U /* option is in disabled state       */
+#define SELECTED_OPT( pod )   ((pod)->fOptState  & OPTST_SELECTED_MASK)
+#define UNUSED_OPT(   pod )   (((pod)->fOptState & OPTST_SET_MASK) == 0)
+#define DISABLED_OPT( pod )   ((pod)->fOptState  & OPTST_DISABLED)
+#define OPTION_STATE( pod )   ((pod)->fOptState)
 
-#define OPTST_NO_INIT        0x0000100U /* option cannot be preset           */
-#define OPTST_NUMBER_OPT     0x0000200U /* opt value (flag) is any digit     */
-#define OPTST_STACKED        0x0000400U /* opt uses optionStackArg procedure */
-#define OPTST_INITENABLED    0x0000800U /* option defaults to enabled        */
-#define OPTST_ARG_TYPE_MASK  0x000F000U /* bits used to specify opt arg type */
-#define OPTST_ARG_OPTIONAL   0x0010000U /* the option argument not required  */
-#define OPTST_IMM            0x0020000U /* process option on first pass      */
-#define OPTST_DISABLE_IMM    0x0040000U /* process disablement on first pass */
-#define OPTST_OMITTED        0x0080000U /* compiled out of program           */
-#define OPTST_MUST_SET       0x0100000U /* must be set or pre-set            */
-#define OPTST_DOCUMENT       0x0200000U /* opt is for documentation only     */
-#define OPTST_TWICE          0x0400000U /* process option twice - imm + reg  */
-#define OPTST_DISABLE_TWICE  0x0800000U /* process disabled option twice     */
-
-#define OPTST_PERSISTENT     0xFFFFF00U /* mask of flags that do not change  */
-
-#define SELECTED_OPT( pod )  ( (pod)->fOptState & (OPTST_SET | OPTST_DEFINED))
-#define UNUSED_OPT(   pod )  (((pod)->fOptState & OPTST_SET_MASK) == 0)
-#define DISABLED_OPT( pod )  ( (pod)->fOptState & OPTST_DISABLED)
-#define OPTION_STATE( pod )  ((pod)->fOptState)
+#define OPTST_SET_ARGTYPE(n)  ((n) << OPTST_ARG_TYPE_1_ID)
+#define OPTST_GET_ARGTYPE(f)  (((f) & OPTST_ARG_TYPE_MASK)>>OPTST_ARG_TYPE_1_ID)
 
 /*
  *  PRIVATE INTERFACES
@@ -120,25 +126,19 @@ typedef struct optionValue {
  */
 
 /*
- *  Define any special processing flags
+ *  Define the processing state flags
  */
-#define OPTPROC_NONE        0x000000
-#define OPTPROC_LONGOPT     0x000001 /* Process long style options      */
-#define OPTPROC_SHORTOPT    0x000002 /* Process short style "flags"     */
-#define OPTPROC_ERRSTOP     0x000004 /* Stop on argument errors         */
-#define OPTPROC_DISABLEDOPT 0x000008 /* Current option is disabled      */
-#define OPTPROC_NO_REQ_OPT  0x000010 /* no options are required         */
-#define OPTPROC_NUM_OPT     0x000020 /* there is a number option        */
-#define OPTPROC_INITDONE    0x000040 /* have initializations been done? */
-#define OPTPROC_NEGATIONS   0x000080 /* any negation options?           */
-#define OPTPROC_ENVIRON     0x000100 /* check environment?              */
-#define OPTPROC_NO_ARGS     0x000200 /* Disallow remaining arguments    */
-#define OPTPROC_ARGS_REQ    0x000400 /* Require arguments after options */
-#define OPTPROC_REORDER     0x000800 /* reorder arguments after options */
-#define OPTPROC_GNUUSAGE    0x001000 /* emit usage in GNU style         */
-#define OPTPROC_TRANSLATE   0x002000 /* Translate strings in tOptions   */
-#define OPTPROC_HAS_IMMED   0x004000 /* program defines immed options   */
-#define OPTPROC_PRESETTING  0x800000 /* opt processing in preset state  */
+[= `
+
+autogen proc-state.def
+sed -e '1,/typedef.*_bits_t/d' \
+    -e 's/NO_BITS /NONE/' \
+    -e 's/_BIT / /' \
+    -e 's/_MASK    /_MASK/' \
+    -e '/OPTPROC_STATE_MASK/q' proc-state.h
+rm  -f proc-state.[ch]
+
+` =]
 
 #define STMTS(s)  do { s; } while (0)
 
@@ -211,9 +211,9 @@ struct argList {
 typedef union {
     char const *    argString;
     uintptr_t       argIntptr;
-    int             argInt;
-    unsigned int    argUint;
-    ag_bool         argBool;
+    long            argInt;
+    unsigned long   argUint;
+    unsigned char   argBool;
 } optArgBucket_t;
 
 /*
@@ -259,24 +259,6 @@ struct optSpecIndex {
     const tAoUS         number_option;
     const tAoUS         default_opt;
 };
-[=
-
- ;;;
- ;;; These "vers" values are manipulated by the contents of ../VERSION
- ;;;
-
-(shellf "
-sed 's/@AO_SOVERS@/%s/' options.tpl > XXXX
-mv -f XXXX options.tpl
-sed 's/@AO_TEMPLATE_VERSION@/%s/' opthead.tpl > XXXX
-mv -f XXXX opthead.tpl"
- (get "vers-sovers") (get "vers-curr"))
-
-=]
-#define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
-#define  OPTIONS_VERSION_STRING  "[= vers-sovers  =]"
-#define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
-#define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 
 /*
  *  The procedure generated for translating option text

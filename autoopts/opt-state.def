@@ -1,0 +1,52 @@
+AutoGen Definitions bits.tpl;
+
+mask-name = opt-state;
+prefix    = optst;
+
+bit[ 0]   = { b-name = set;           b-what = 'Set via the "SET_OPT()" macro'; };
+bit[ 1]   = { b-name = preset;        b-what = 'Set via an RC/INI file'; };
+bit[ 2]   = { b-name = defined;       b-what = 'Set via a command line option'; };
+
+bit[ 4]   = { b-name = equivalence;   b-what = 'selected by equiv\'ed option'; };
+bit[ 5]   = { b-name = disabled;      b-what = 'option is in disabled state'; };
+
+bit[ 8]   = { b-name = no-init;       b-what = 'option cannot be preset'; };
+bit[ 9]   = { b-name = number-opt;    b-what = 'opt value (flag) is any digit'; };
+bit[10]   = { b-name = stacked;       b-what = 'opt uses optionStackArg proc'; };
+bit[11]   = { b-name = initenabled;   b-what = 'option defaults to enabled'; };
+
+bit[12]   = { b-name = arg-type-1;    b-what = 'bit 1 of arg type enum'; };
+bit[13]   = { b-name = arg-type-2;    b-what = 'bit 2 of arg type enum'; };
+bit[14]   = { b-name = arg-type-3;    b-what = 'bit 3 of arg type enum'; };
+bit[15]   = { b-name = arg-type-4;    b-what = 'bit 4 of arg type enum'; };
+
+bit[16]   = { b-name = arg-optional;  b-what = 'the option arg not required'; };
+bit[17]   = { b-name = imm;           b-what = 'process opt on first pass'; };
+bit[18]   = { b-name = disable-imm;   b-what = 'process disablement immed.'; };
+bit[19]   = { b-name = omitted;       b-what = 'compiled out of program'; };
+bit[20]   = { b-name = must-set;      b-what = 'must be set or pre-set'; };
+bit[21]   = { b-name = document;      b-what = 'opt is for doc only'; };
+bit[22]   = { b-name = twice;         b-what = 'process opt twice - imm + reg'; };
+bit[23]   = { b-name = disable-twice; b-what = 'process disabled option twice'; };
+
+no-code;
+
+mask = {
+  m-name  = set;
+  b-name  = set, preset, defined;
+};
+
+mask = {
+  m-name  = mutable;
+  b-name  = set, preset, defined, equivalence, disabled;
+};
+
+mask = {
+  m-name  = selected;
+  b-name  = set, defined;
+};
+
+mask = {
+  m-name  = arg-type;
+  b-name  = arg-type-1, arg-type-2, arg-type-3, arg-type-4;
+};
