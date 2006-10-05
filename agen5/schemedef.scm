@@ -1,8 +1,8 @@
 
 ;;;  AutoGen copyright 1992-2006 Bruce Korb
 ;;;
-;;; Time-stamp:        "2006-09-23 19:50:26 bkorb"
-;;; Last Committed:    $Date: 2006/09/24 02:57:01 $
+;;; Time-stamp:        "2006-10-03 18:41:51 bkorb"
+;;; Last Committed:    $Date: 2006/10/05 03:40:44 $
 ;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
@@ -361,6 +361,19 @@
       ) <<\\_EndStringTable_\n" (out-pop #t) "_EndStringTable_")))
    (emit ";\n")
 )))
+
+;;; /*=gfunc   string_table_size
+;;;  *
+;;;  * what:   print the current size of a string table
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the array of characters
+;;;  *
+;;;  * doc:    Returns the current byte count of the string table.
+;;; =*/
+;;;
+(define string-table-size (lambda (st-name)
+  (hash-ref (hash-ref stt-table st-name) "current-index") ))
 
 (use-modules (ice-9 debug))
 
