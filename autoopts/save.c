@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.20 2006/10/05 03:39:53 bkorb Exp $
- * Time-stamp:      "2006-10-04 16:53:51 bkorb"
+ *  save.c  $Id: save.c,v 4.21 2006/10/06 05:27:22 bkorb Exp $
+ * Time-stamp:      "2006-10-05 21:09:18 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -462,7 +462,7 @@ optionSaveFile( tOptions* pOpts )
         case OPARG_TYPE_ENUMERATION:
         case OPARG_TYPE_MEMBERSHIP:
         {
-            uintptr_t val = p->optArg.argIntptr;
+            uintptr_t val = p->optArg.argEnum;
             /*
              *  This is a magic incantation that will convert the
              *  bit flag values back into a string suitable for printing.
@@ -475,13 +475,12 @@ optionSaveFile( tOptions* pOpts )
                  *  bit flag and enumeration strings get allocated
                  */
                 AGFREE( (void*)p->optArg.argString );
-            p->optArg.argIntptr = val;
+            p->optArg.argEnum = val;
             break;
         }
 
         case OPARG_TYPE_BOOLEAN:
-            printEntry( fp, p, (p->optArg.argBool != AG_FALSE)
-                        ? "true" : "false" );
+            printEntry( fp, p, p->optArg.argBool ? "true" : "false" );
             break;
 
         default:

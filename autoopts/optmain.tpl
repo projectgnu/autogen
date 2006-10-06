@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.22 2006/10/05 03:39:53 bkorb Exp $
+# $Id: optmain.tpl,v 4.23 2006/10/06 05:27:22 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-10-04 18:05:11 bkorb"
+# Time-stamp:      "2006-10-05 21:15:04 bkorb"
 
 =][=
 
@@ -850,20 +850,20 @@ DEFINE   keyword-code
 =]
     if (  ((unsigned long)pOptions > 0x0FUL)
        && (pOptDesc->optArg.argString == NULL))
-        pOptDesc->optArg.argIntptr = [=
+        pOptDesc->optArg.argEnum = [=
              (string-append UP-name "_"    (if (> (len "arg-optional") 0)
                 (up-c-name "arg-optional") (if (exist? "arg-default")
                 (up-c-name "arg-default")
                 "UNDEFINED"  ))) =];
     else
-        pOptDesc->optArg.argIntptr =
+        pOptDesc->optArg.argEnum =
             optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
 
   ELSE
 
 =]
-    pOptDesc->optArg.argIntptr =
+    pOptDesc->optArg.argEnum =
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
   ENDIF

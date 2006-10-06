@@ -1,8 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.13 2006/09/24 02:57:01 bkorb Exp $
-# Time-stamp:        "2006-09-23 19:54:16 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:01 $
+# $Id: directive.tpl,v 4.14 2006/10/06 05:27:22 bkorb Exp $
+# Time-stamp:        "2006-10-04 21:16:57 bkorb"
+# Last Committed:    $Date: 2006/10/06 05:27:22 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -100,7 +100,7 @@ static char const zSchemeInit[= (set! tmp-txt (shell
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
 (emit (sprintf "[%d] =\n" (+ (string-length tmp-txt) 1)))
-(kr-string tmp-txt) =];
+(kr-string tmp-txt) =]; /* ' // " // */
 
 /*
  *  The shell initialization string.  It is not in "const" memory because
@@ -143,7 +143,7 @@ die() {
 }
 exec 2>&8
 AG_pid=[=
-(kr-string (out-pop #t))=] "\000........."; /* K&R confuses emacs: " */
+(kr-string (out-pop #t))=] "\000........."; /* ' // " // */
 
 
 #if defined(SHELL_ENABLED)
@@ -205,7 +205,7 @@ exec 2>&8
   (emit (sprintf "static char const zMakeGperf[%d] =\n"
                  (+ 1 (string-length tmp-txt)) ))
   (kr-string tmp-txt)
-=]; /* K&R confuses emacs: " */
+=]; /* ' // " // */
 
 [= (out-push-new) \=]
 test -n "${gperf_%1$s}" || die 'no environment variable "gperf_%1$s"'
@@ -216,7 +216,7 @@ ${gperf_%1$s} %2$s
   (emit (sprintf "static char const zRunGperf[%d] =\n"
                  (+ 1 (string-length tmp-txt)) ))
   (kr-string tmp-txt)
-=]; /* K&R confuses emacs: " */
+=]; /* ' // " // */
 #endif
 
 #ifdef DAEMON_ENABLED

@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.23 2006/10/05 03:39:53 bkorb Exp $
+# $Id: optlib.tpl,v 4.24 2006/10/06 05:27:22 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-10-04 16:45:12 bkorb"
+# Time-stamp:      "2006-10-05 21:06:05 bkorb"
 
 =][=
 
@@ -192,7 +192,7 @@ DEFINE set-defines
   =*  bool       =]; \
         [=set-desc=].optArg.argBool = (a)[=
   =*  key        =]; \
-        [=set-desc=].optArg.argIntptr = (a)[=
+        [=set-desc=].optArg.argEnum = (a)[=
   =*  set        =]; \
         [=set-desc=].optArg.argIntptr = (a)[=
   ESAC arg-type  =][=
@@ -346,7 +346,7 @@ typedef enum {[=
                  =] optionKeywordName( &[=(. value-desc)=], (_v))
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] ((te_[=(string-append Cap-prefix cap-name)
-                          =])[=(. value-desc)=].optArg.argIntptr)[=
+                          =])[=(. value-desc)=].optArg.argEnum)[=
 
   =*  set        =]
 #define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"

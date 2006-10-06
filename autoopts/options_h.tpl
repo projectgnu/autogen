@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-04 20:46:49 bkorb"
-# ID:  $Id: options_h.tpl,v 4.28 2006/10/05 03:49:03 bkorb Exp $
+# Time-stamp:      "2006-10-05 20:39:26 bkorb"
+# ID:  $Id: options_h.tpl,v 4.29 2006/10/06 05:27:22 bkorb Exp $
 
 =][=
 
@@ -210,6 +210,7 @@ struct argList {
 
 typedef union {
     char const *    argString;
+    uintptr_t       argEnum;
     uintptr_t       argIntptr;
     long            argInt;
     unsigned long   argUint;

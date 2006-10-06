@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.21 2006/09/28 01:26:16 bkorb Exp $
+ *  $Id: agShell.c,v 4.22 2006/10/06 05:27:22 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-24 08:48:45 bkorb"
- *  Last Committed:    $Date: 2006/09/28 01:26:16 $
+ *  Time-stamp:        "2006-10-05 21:50:48 bkorb"
+ *  Last Committed:    $Date: 2006/10/06 05:27:22 $
  *
  *  Manage a server shell process
  */
@@ -288,23 +288,6 @@ chainOpen( int       stdinFd,
         return -1;
     }
 
-#if defined( DEBUG_ENABLED )
-    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        tSCC   zPath[] = "PATH";
-        tCC*   pzPath  = getenv( zPath );
-
-        if (pzPath == NULL)
-            pzPath = pzShell;
-
-        else {
-            pzPath = pathfind( pzPath, pzShell, "rxs" );
-            if (pzPath == NULL)
-                pzPath = pzShell;
-        }
-
-        fprintf( pfTrace, "Starting shell `%s'\n", pzPath );
-    }
-#endif
     fflush( stdout );
     fflush( stderr );
     fflush( pfTrace );

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: guileopt.c,v 4.12 2006/10/05 03:39:53 bkorb Exp $
- * Time-stamp:      "2006-10-04 17:05:48 bkorb"
+ *  $Id: guileopt.c,v 4.13 2006/10/06 05:27:22 bkorb Exp $
+ * Time-stamp:      "2006-10-05 21:04:56 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  */
@@ -80,18 +80,23 @@ export_options_to_guile( tOptions* pOpts )
     char z[ 4096 ];
 
     for (;--ct >= 0;pOD++) {
+        static char const opt_state[] =
+            "(define opt-enabled-%s #%c) "
+            "(define have-opt-%s #%c)";
+        static char const num_arg[]  = "(define opt-arg-%s %ld)\n";
+        static char const str_arg[]  = "(define opt-arg-%s \"%s\")\n";
+        static char const bool_arg[] = "(define opt-arg-%s #%c)\n";
+
+
         if (SKIP_OPT(pOD))
             continue;
 
         /*
          *  We always indicate the presence/absence enabled/disabled state.
          */
-        sprintf( z, "(define opt-enabled-%s #%c)\n", pOD->pz_Name,
-                 (DISABLED_OPT(pOD) ? 'f' : 't'));
-        gh_eval_str( z );
-
-        sprintf( z, "(define have-opt-%s #%c)\n", pOD->pz_Name,
-                 UNUSED_OPT( pOD ) ? 'f' : 't' );
+        sprintf( z, opt_state,
+                 pOD->pz_Name, DISABLED_OPT(pOD) ? 'f' : 't',
+                 pOD->pz_Name, UNUSED_OPT( pOD ) ? 'f' : 't' );
         gh_eval_str( z );
 
         /*
@@ -100,14 +105,33 @@ export_options_to_guile( tOptions* pOpts )
          *  take numeric arguments will always have a value set.)
          */
         if (UNUSED_OPT( pOD )) {
-            if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
-                sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                         (int)pOD->optArg.argInt );
+            switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+            case OPARG_TYPE_NONE:
+            case OPARG_TYPE_ENUMERATION:
+            case OPARG_TYPE_HIERARCHY:
+                /* forget it. */
+                break;
+
+            case OPARG_TYPE_STRING:
+                if (pOD->optArg.argString != 0) {
+                    sprintf(z, str_arg, pOD->pz_Name, pOD->optArg.argString);
+                    gh_eval_str( z );
+                }
+                break;
+
+            case OPARG_TYPE_BOOLEAN:
+                sprintf(z, bool_arg, pOD->pz_Name,
+                        pOD->optArg.argBool ? 't' : 'f');
                 gh_eval_str( z );
-            }
-            else if (pOD->optArg.argString != 0) {
-                sprintf( z, "(define opt-arg-%s \"%s\")\n", pOD->pz_Name,
-                         pOD->optArg.argString );
+                break;
+
+            case OPARG_TYPE_MEMBERSHIP:
+                if (pOD->optArg.argEnum == 0)
+                    break;
+                /* FALLTHROUGH */
+
+            case OPARG_TYPE_NUMERIC:
+                sprintf( z, num_arg, pOD->pz_Name, pOD->optArg.argInt );
                 gh_eval_str( z );
             }
             continue;
@@ -125,7 +149,7 @@ export_options_to_guile( tOptions* pOpts )
         /*
          *  IF there is a stack of option args, emit them as a list.
          */
-        if (pOD->optCookie != NULL) {
+        if ((pOD->optCookie != NULL) && (pOD->fOptState & OPTST_STACKED)) {
             tArgList* pAL = (tArgList*)pOD->optCookie;
             int       act = pAL->useCt;
             tCC**     ppa = pAL->apzArgs;
@@ -143,8 +167,7 @@ export_options_to_guile( tOptions* pOpts )
          *  IF the option takes a numeric value, set the value
          */
         else if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC) {
-            sprintf( z, "(define opt-arg-%s %d)\n", pOD->pz_Name,
-                     (int)pOD->optArg.argInt );
+            sprintf( z, num_arg, pOD->pz_Name, pOD->optArg.argInt );
             gh_eval_str( z );
         }
 
@@ -152,8 +175,7 @@ export_options_to_guile( tOptions* pOpts )
          *  IF the option has a string value, emit that.
          */
         else if (pOD->optArg.argString != 0) {
-            sprintf( z, "(define opt-arg-%s \"%s\")\n", pOD->pz_Name,
-                     pOD->optArg.argString );
+            sprintf( z, str_arg, pOD->pz_Name, pOD->optArg.argString );
             gh_eval_str( z );
         }
     }
