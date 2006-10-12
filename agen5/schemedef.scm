@@ -1,8 +1,8 @@
 
 ;;;  AutoGen copyright 1992-2006 Bruce Korb
 ;;;
-;;; Time-stamp:        "2006-10-09 18:46:48 bkorb"
-;;; Last Committed:    $Date: 2006/10/12 02:42:32 $
+;;; Time-stamp:        "2006-10-11 20:25:40 bkorb"
+;;; Last Committed:    $Date: 2006/10/12 03:36:43 $
 ;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
@@ -345,7 +345,7 @@
 ;;;  *         string-table-add.
 ;;; =*/
 ;;;
-(define string-table-add (lambda (st-name str-val)
+(define string-table-add-ref (lambda (st-name str-val)
    (string-append st-name "+"
       (number->string (string-table-add st-name str-val)) ) ))
 
