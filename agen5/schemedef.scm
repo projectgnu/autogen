@@ -1,8 +1,8 @@
 
 ;;;  AutoGen copyright 1992-2006 Bruce Korb
 ;;;
-;;; Time-stamp:        "2006-10-03 18:41:51 bkorb"
-;;; Last Committed:    $Date: 2006/10/05 03:40:44 $
+;;; Time-stamp:        "2006-10-09 18:46:48 bkorb"
+;;; Last Committed:    $Date: 2006/10/12 02:42:32 $
 ;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
@@ -331,6 +331,23 @@
    )   )
    stt-idx
 )))
+
+;;; /*=gfunc   string_table_add_ref
+;;;  *
+;;;  * what:   Add an entry to a string table, get reference
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the array of characters
+;;;  * exparg: str-val , the (possibly) new value to add
+;;;  *
+;;;  * doc:    Identical to string-table-add, except the value returned
+;;;  *         is the string "st-name" '+' and the index returned by
+;;;  *         string-table-add.
+;;; =*/
+;;;
+(define string-table-add (lambda (st-name str-val)
+   (string-append st-name "+"
+      (number->string (string-table-add st-name str-val)) ) ))
 
 ;;; /*=gfunc   emit_string_table
 ;;;  *
