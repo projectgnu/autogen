@@ -1,8 +1,8 @@
 
 ;;;  AutoGen copyright 1992-2006 Bruce Korb
 ;;;
-;;; Time-stamp:        "2006-10-11 20:25:40 bkorb"
-;;; Last Committed:    $Date: 2006/10/12 03:36:43 $
+;;; Time-stamp:        "2006-10-14 16:33:33 bkorb"
+;;; Last Committed:    $Date: 2006/10/14 23:39:58 $
 ;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
@@ -391,6 +391,54 @@
 ;;;
 (define string-table-size (lambda (st-name)
   (hash-ref (hash-ref stt-table st-name) "current-index") ))
+
+;;; /*=gfunc   gperf_code
+;;;  *
+;;;  * what:   emit the source of the generated gperf program
+;;;  * general-use:
+;;;  *
+;;;  * exparg: st-name , the name of the gperf hash list
+;;;  *
+;;;  * doc:
+;;;  *  Returns the contents of the emitted code, suitable
+;;;  *  for inclusion in another program.  The interface contains
+;;;  *  the following elements:
+;;;  *
+;;;  *  @table @samp
+;;;  *  @item struct @i{<st-name>}_index
+;;;  *  containg the fields: @code{@{char const * name, int const id; @};}
+;;;  *
+;;;  *  @item @i{<st-name>}_hash()
+;;;  *  This is the hashing function with local only scope (static).
+;;;  *
+;;;  *  @item @i{<st-name>}_find()
+;;;  *  This is the searching and validation function.  The first argument
+;;;  *  is the string to look up, the second is its length.
+;;;  *  It returns a pointer to the corresponding @code{@i{<st-name>}_index}
+;;;  *  entry.
+;;;  *  @end table
+;;;  *
+;;;  *  Use this in your template as follows where "@i{<st-name>}" was
+;;;  *  set to be "@code{lookup}":
+;;;  *
+;;;  *  @example
+;;;  *  [+ (make-gperf "lookup" (join "\n" (stack "name_list")))
+;;;  *     (gperf-code "lookup") +]
+;;;  *  void my_fun(char * str) @{
+;;;  *  struct lookup_index * li = lookup_find(str, strlen(str));
+;;;  *  if (li != NULL) printf("%s yields %d\n", str, li->idx);
+;;;  *  @end example
+;;; =*/
+;;;
+(define gperf-code (lambda (gp-name) (shellf
+  "sed -e '1,/^#line/d' \
+       -e '/#include/d' \
+       -e '/#line/d' \
+       -e '/^[ \t]*$/d' \
+       -e 's/^const struct /static const struct /' \
+       -e '/^int main(/,$d' ${gpdir}/%s.c"
+  gp-name
+)))
 
 (use-modules (ice-9 debug))
 

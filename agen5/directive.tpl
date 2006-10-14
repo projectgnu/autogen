@@ -1,8 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.15 2006/10/14 22:39:03 bkorb Exp $
-# Time-stamp:        "2006-10-14 15:30:39 bkorb"
-# Last Committed:    $Date: 2006/10/14 22:39:03 $
+# $Id: directive.tpl,v 4.16 2006/10/14 23:39:58 bkorb Exp $
+# Time-stamp:        "2006-10-14 16:18:21 bkorb"
+# Last Committed:    $Date: 2006/10/14 23:39:58 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -165,7 +165,7 @@ gperf_%2$s=${gpdir}/%2$s
 	%%{
 	#include <stdio.h>
 	%%}
-	struct %2$s_index { char* name; int idx; };
+	struct %2$s_index { char const * name; int const idx; };
 	%%%%
 	_EOF_
 
