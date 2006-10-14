@@ -1,5 +1,13 @@
 New in __CURRENT_VERSION__ October 2006
 
+* Tweaks for Windows' compat/windows-config.h
+* new string-table convenience functions:  string-table-add-ref and
+  string-table-size
+* fixed a value referencing bug in enumeration arg handling
+  (seen on platforms where sizeof(int) != sizeof(void*)).
+
+New in 5.8.6 October 2006
+
 * AutoOpts code presumed that there were no #defines for the option
   names.  You can now force aside such conflicts.
 * AutoOpts generated code unconditionally #includes limits.h and stdint.h.

@@ -1,8 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.14 2006/10/06 05:27:22 bkorb Exp $
-# Time-stamp:        "2006-10-04 21:16:57 bkorb"
-# Last Committed:    $Date: 2006/10/06 05:27:22 $
+# $Id: directive.tpl,v 4.15 2006/10/14 22:39:03 bkorb Exp $
+# Time-stamp:        "2006-10-14 15:30:39 bkorb"
+# Last Committed:    $Date: 2006/10/14 22:39:03 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -151,6 +151,7 @@ AG_pid=[=
  *  "gperf" functionality only works if the subshell is enabled.
  */
 [= (out-push-new) \=]
+gperf --version > /dev/null 2>&1 || die "no gperf program"
 test -z ${gpdir} && {
   gpdir=`mktemp -d ./.gperf.XXXXXX` 2>/dev/null
   test -z "${gpdir}" && gpdir=.gperf.$$
@@ -163,9 +164,8 @@ gperf_%2$s=${gpdir}/%2$s
 ( cat <<- '_EOF_'
 	%%{
 	#include <stdio.h>
-	typedef struct index t_index;
 	%%}
-	struct index { char* name; int idx; };
+	struct %2$s_index { char* name; int idx; };
 	%%%%
 	_EOF_
 
@@ -181,7 +181,7 @@ gperf_%2$s=${gpdir}/%2$s
 	%%%%
 	int main( int argc, char** argv ) {
 	    char*    pz = argv[1];
-	    t_index* pI = in_word_set( pz, strlen( pz ));
+	    struct %2$s_index* pI = %2$s_find( pz, strlen( pz ));
 	    if (pI == NULL)
 	        return 1;
 	    printf( "0x%%02X\n", pI->idx );
@@ -191,7 +191,8 @@ gperf_%2$s=${gpdir}/%2$s
 ) > %2$s.gperf
 
 exec 2> %2$s.log
-gperf -t -D -k'*' %2$s.gperf > %2$s.c || \
+gperf --language=ANSI-C -H %2$s_hash -N %2$s_find --null-strings \
+      -C -E -I -t %2$s.gperf > %2$s.c || \
    die "gperf failed on ${gpdir}/%2$s.gperf
       `cat %2$s.log`"
 export CFLAGS=-g
