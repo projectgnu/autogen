@@ -1,3 +1,12 @@
+2006-10-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl(version): it is now immediate action.
+	* autoopts/test/immediate.test: test it
+
+2006-10-15  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.8.7
+
 2006-10-09  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/schemedef.scm(string-table-size): new string table function
@@ -9,7 +18,7 @@
 
 2006-10-01  Bruce Korb  <bkorb@gnu.org>
 
-	= REL 5.8.5
+	= REL 5.8.6
 
 2006-09-24  Bruce Korb  <bkorb@gnu.org>
 

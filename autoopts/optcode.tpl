@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.27 2006/09/23 00:11:49 bkorb Exp $
+#$Id: optcode.tpl,v 4.28 2006/10/17 01:59:01 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-22 14:52:22 bkorb"
+# Time-stamp:      "2006-10-16 18:21:20 bkorb"
 
 =][=
 
@@ -213,7 +213,7 @@ IF (exist? "version")   =]
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL, 0,
+                          | OPTST_ARG_OPTIONAL | OPTST_IMM, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
