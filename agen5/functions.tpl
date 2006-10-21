@@ -1,9 +1,9 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.6 2006/09/28 01:26:16 bkorb Exp $
+# $Id: functions.tpl,v 4.7 2006/10/21 15:41:57 bkorb Exp $
 
-#  Time-stamp:        "2006-09-27 11:58:53 bkorb"
-#  Last Committed:    $Date: 2006/09/28 01:26:16 $
+#  Time-stamp:        "2006-10-20 17:08:37 bkorb"
+#  Last Committed:    $Date: 2006/10/21 15:41:57 $
 
 =]
 [=
@@ -142,7 +142,7 @@ ENDFOR macfunc =]
  */
 tpLoadProc apLoadProc[ FUNC_CT ] = {[=
 FOR macfunc "," =]
-    /* [=% name "%-10s" =]*/ &mLoad_[=
+    /* [=% name "%-10s" =]*/ mLoad_[=
   IF   (> (len "load_proc") 0)=][=% load_proc (string-capitalize! "%s") =][=
   ELIF (exist? "load_proc")   =][=% name (string-capitalize! "%s") =][=
   ELIF (exist? "in-context")  =]Bogus   /*dynamic*/[=
@@ -168,7 +168,6 @@ struct name_type {
     size_t      cmpLen;  /* compare length (sans NUL) */
     tCC*        pName;   /* ptr to name */
     teFuncType  fType;   /* function type enum */
-    int         unused;
 };
 
 /*
@@ -288,7 +287,7 @@ rm -f $file"
  */
 static tpHdlrProc  apHdlrProc[ FUNC_CT ] = {[=
 FOR macfunc "," =]
-    /* [=% name "%-10s"=]*/ &mFunc_[=
+    /* [=% name "%-10s"=]*/ mFunc_[=
   IF (exist? "handler_proc")
      =][=% name (string-capitalize! "%s") =][=
   ELSE

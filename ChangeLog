@@ -1,3 +1,13 @@
+2006-10-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c(signalExit): use the enum type for function code
+	(doneCheck): ftell(3) returns a signed value
+	* agen5/functions.tpl(apLoadProc): procedures don't need address-of
+	operator (lintian issue).
+	(apHdlrProc): ditto
+	* autoopts/sort.c(optionSort): do not set errno to zero.
+	* autoopts/stdoptions.def(SHORT_HELP): new "standard" option
+
 2006-10-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl(version): it is now immediate action.

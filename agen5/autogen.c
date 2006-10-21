@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.20 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: autogen.c,v 4.21 2006/10/21 15:41:57 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:56:03 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-10-21 08:15:03 bkorb"
+ *  Last Committed:    $Date: 2006/10/21 15:41:57 $
  *
  *  This is the main routine for autogen.
  */
@@ -146,7 +146,8 @@ signalExit( int sig )
         tSCC zAt[]  = "processing template %s\n"
                       "            on line %d\n"
                       "       for function %s (%d)\n";
-        int line, fnCd;
+        int line;
+        teFuncType fnCd;
         tCC* pzFn;
         tCC* pzFl;
 
@@ -156,7 +157,8 @@ signalExit( int sig )
             fnCd = -1;
 
         } else {
-            int f = (pCurMacro->funcCode > FUNC_CT)
+            teFuncType f =
+                (pCurMacro->funcCode > FUNC_CT)
                     ? FTYP_SELECT : pCurMacro->funcCode;
             pzFn = apzFuncNames[ f ];
             line = pCurMacro->lineNo;
@@ -310,7 +312,7 @@ doneCheck( void )
     }
 
     do {
-        unsigned long pos = ftell( stderr );
+        long pos = ftell( stderr );
         char* pz;
 
         /*
@@ -320,8 +322,8 @@ doneCheck( void )
             break;
         pz = AGALOC( pos, "stderr redirected text" );
         rewind( stderr );
-        fread(  pz, 1, pos, stderr );
-        fwrite( pz, 1, pos, stdout );
+        fread(  pz, 1, (size_t)pos, stderr );
+        fwrite( pz, 1, (size_t)pos, stdout );
         AGFREE( pz );
     } while (0);
 

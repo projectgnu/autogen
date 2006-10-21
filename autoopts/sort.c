@@ -1,7 +1,7 @@
 
 /*
- *  sort.c  $Id: sort.c,v 4.11 2006/09/24 02:10:45 bkorb Exp $
- * Time-stamp:      "2006-06-24 10:53:35 bkorb"
+ *  sort.c  $Id: sort.c,v 4.12 2006/10/21 15:41:57 bkorb Exp $
+ * Time-stamp:      "2006-10-18 11:29:04 bkorb"
  *
  *  This module implements argument sorting.
  */
@@ -210,19 +210,10 @@ optionSort( tOptions* pOpts )
     tOptState os = OPTSTATE_INITIALIZER(DEFINED);
 
     /*
-     *  Disable for POSIX conformance
+     *  Disable for POSIX conformance, or if there are no operands.
      */
-    if (getenv( "POSIXLY_CORRECT" ) != NULL) {
-        errno = 0;
-        return;
-    }
-
-    errno = ENOENT;
-
-    /*
-     *  If all arguments are named, we can't sort 'em.  There are no operands.
-     */
-    if (NAMED_OPTS(pOpts))
+    if (  (getenv( "POSIXLY_CORRECT" ) != NULL)
+       || NAMED_OPTS(pOpts))
         return;
 
     /*
@@ -268,7 +259,7 @@ optionSort( tOptions* pOpts )
         switch (pzArg[1]) {
         case NUL:
             /*
-             *  A regular option.  Put it on the operand list.
+             *  A single hyphen is an operand.
              */
             ppzOpds[ opdsIdx++ ] = pOpts->origArgVect[ (pOpts->curOptIdx)++ ];
             continue;
@@ -300,7 +291,7 @@ optionSort( tOptions* pOpts )
             break;
         }
         if (FAILED( res )) {
-            errno = EIO;
+            errno = EINVAL;
             goto freeTemps;
         }
 
@@ -320,7 +311,7 @@ optionSort( tOptions* pOpts )
             if (  (os.optType == TOPT_SHORT)
                && FAILED( checkShortOpts( pOpts, pzArg+2, &os,
                                           ppzOpts, &optsIdx )) )  {
-                errno = EIO;
+                errno = EINVAL;
                 goto freeTemps;
             }
 
