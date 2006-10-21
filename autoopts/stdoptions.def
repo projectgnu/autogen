@@ -1,7 +1,7 @@
 
 /* -*- Mode: Text -*-
 
- * Time-stamp:      "2006-10-18 10:54:42 bkorb"
+ * Time-stamp:      "2006-10-21 09:17:50 bkorb"
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
@@ -355,25 +355,36 @@ flag = {
  *  INPUT/OUTPUT short_help
  */
 #ifdef SHORT_HELP_FLAG
-#define SHORT_HELP
+# define SHORT_HELP
 #endif
 
 #ifdef SHORT_HELP
+include = <<- _EOF_
+	#include <sys/types.h>
+	#include <signal.h>
+	#include <unistd.h>
+	_EOF_;
+
 flag = {
     name      = short_help;
     descrip   = "Get short help text without an error exit";
+    immediate;
+    no-preset;
 #ifdef SHORT_HELP_FLAG
     value     = h;        /* flag style option character */
 #endif
     doc =
     "This option specifies that the abbreviated usage text should be emitted.";
     flag-code = <<- _EOF_
-	#   include <sys/types.h>
-	#   include <unistd.h>
-	    pid_t chid = fork();
+	    pid_t chid;
+	#   ifndef SIGCHLD
+	#     define SIGCHLD SIGCLD
+	#   endif
+	    signal(SIGCHLD, SIG_DFL); /* make sure we can wait for child */
+	    chid = fork();
 	    if (chid > 0) {
-	        int stat;
-	        waitpid(chid, &stat, 0);
+	        int sts;
+	        waitpid(chid, &sts, 0);
 	        exit( 0 );
 	    }
 	    (*(pOptions->pUsageProc))(pOptions, 1);

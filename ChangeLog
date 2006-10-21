@@ -7,6 +7,7 @@
 	(apHdlrProc): ditto
 	* autoopts/sort.c(optionSort): do not set errno to zero.
 	* autoopts/stdoptions.def(SHORT_HELP): new "standard" option
+	* agen5/opts.def: use short-help / -h
 
 2006-10-15  Bruce Korb  <bkorb@gnu.org>
 
