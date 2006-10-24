@@ -8,6 +8,14 @@
 	* autoopts/sort.c(optionSort): do not set errno to zero.
 	* autoopts/stdoptions.def(SHORT_HELP): new "standard" option
 	* agen5/opts.def: use short-help / -h
+	* agen5/defLex.c(apzKeywords): use enum instead of int
+	* agen5/fsm-macro.tpl(compute-transitions): procedure initializers
+	do not need address-of operators
+	* autoopts/enumeration.c: identify const pointers as such
+	* autoopts/optcode.tpl(patch-text): clean up the sed expression.
+	* autoopts/optmain.tpl(keyword-code): identify source and allow for
+	some "extra-code" to get tacked onto the end of the procedure.
+	(define-option-callbacks): identify the source for set-memberships too.
 
 2006-10-15  Bruce Korb  <bkorb@gnu.org>
 

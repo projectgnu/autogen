@@ -1,10 +1,10 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# $Id: optmain.tpl,v 4.23 2006/10/06 05:27:22 bkorb Exp $
+# $Id: optmain.tpl,v 4.24 2006/10/24 00:02:50 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-10-05 21:15:04 bkorb"
+# Time-stamp:      "2006-10-23 09:42:51 bkorb"
 
 =][=
 
@@ -834,14 +834,21 @@ DEFINE   keyword-code
 (if (not (exist? "arg-default"))
     (begin
       (set! tmp-ct (+ 1 tmp-ct))
-      "    tSCC zDef[2] = { 0x7F, 0 };\n"
+      (emit "    static char const zDef[2] = { 0x7F, 0 };\n")
 )   )
-=]    tSCC* azNames[[= (. tmp-ct) =]] = {[=
-  IF (not (exist? "arg-default")) =] zDef,[=
-  ENDIF  =]
-[=(shellf
-  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
-          (join "\n" (stack "keyword")) ) =]
+
+(emit (tpl-file-line extract-fmt))
+
+(sprintf "    static char const * const azNames[%d] = {" tmp-ct)
+
+=][=
+
+? arg-default "\n" " zDef,\n" =][=
+
+(shell (string-append
+  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
+   (join "\n" (stack "keyword"))
+  "\n_EOF_\n"  )) =]
     };
 [=
 
@@ -866,9 +873,23 @@ DEFINE   keyword-code
     pOptDesc->optArg.argEnum =
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
+
+  ENDIF    =][=
+
+  IF (exist? "extra-code")
+
+=]
+
+    if (((unsigned long)pOptions) <= 0x0FUL)
+        return; /* protect AutoOpts client code from internal callbacks */
+
+[= extra-code =]
+[=
+
   ENDIF
 
-=]}[=
+          \=]
+}[=
 
 ENDDEF   keyword-code
 
@@ -924,14 +945,19 @@ DEFINE define-option-callbacks      =][=
 
     ELIF (=* (get "arg-type") "set")=][=
 
-      INVOKE callback-proc-header
-=]    tSCC* azNames[] = {
-[=(shellf
-  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%%s\"' <<_EOF_\n%s\n_EOF_\n"
-          (join "\n" (stack "keyword")) )=]
+      INVOKE callback-proc-header   =][=
+
+(set! tmp-ct (count "keyword"))
+(emit (tpl-file-line extract-fmt))
+(ag-fprintf 0 "    static char const * const azNames[%d] = {\n" tmp-ct)
+
+(shell (string-append
+
+  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
+  (join "\n" (stack "keyword"))
+  "\n_EOF_\n" )) =]
     };
-    const unsigned int nmCt = sizeof(azNames)/sizeof(azNames[0]);
-    optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
+    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);
 }[=
 
 # # # # # # # # # # # # # # # # # # =][=

@@ -2,7 +2,7 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2006-06-04 16:26:23 bkorb"
+ * Time-stamp:      "2006-10-22 15:52:30 bkorb"
  *
  *  AutoOpts copyright 1992-2006 Bruce Korb
  *
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.14 2006/06/10 16:44:42 bkorb Exp $
+   $Id: usage-txt.def,v 4.15 2006/10/24 00:02:50 bkorb Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ utxt = { ut-name = Alt;
 };
 
 utxt = { ut-name = AmbigKey;
-         ut-text = "%s error:  the keyword `%s' is ambiguous\n";
+         ut-text = "%s error:  the keyword `%s' is ambiguous for %s\n";
 };
 
 utxt = { ut-name = Ambiguous;
@@ -316,7 +316,7 @@ utxt = { ut-name = NoFlags;
 };
 
 utxt = { ut-name = NoKey;
-         ut-text = "%s error:  `%s' does not match any keywords\n";
+         ut-text = "%s error:  `%s' does not match any %s keywords\n";
 };
 
 utxt = { ut-name = NoLim;

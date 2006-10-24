@@ -1,8 +1,8 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
 #  AutoGen copyright 1992-2006 Bruce Korb
-#  Time-stamp:        "2006-09-23 19:52:23 bkorb"
-#  Last Committed:    $Date: 2006/09/24 02:57:01 $
+#  Time-stamp:        "2006-10-21 09:35:29 bkorb"
+#  Last Committed:    $Date: 2006/10/24 00:02:50 $
 
 =][=
 
@@ -259,7 +259,7 @@ DEFINE compute-transitions     =][=
 (define proc-ptr-type
   (lambda (tp)
     (if (= tp "noop") "NULL"
-        (string-downcase! (string-append "&" pfx "_do_" tp))  )))
+        (string-downcase! (string-append pfx "_do_" tp))  )))
 =][=#
 ;;; Now replace the initial values with proper ones gotten from
 ;;; the trasition definitions.

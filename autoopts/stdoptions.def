@@ -1,7 +1,7 @@
 
 /* -*- Mode: Text -*-
 
- * Time-stamp:      "2006-10-21 09:17:50 bkorb"
+ * Time-stamp:      "2006-10-22 10:28:31 bkorb"
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
@@ -46,15 +46,18 @@
 
  */
 
-#ifndef HAVE_STD_OPT_DOC
-#define HAVE_STD_OPT_DOC 1
+#ifndef NO_STD_OPT_DOC
+# ifndef HAVE_STD_OPT_DOC
+#   define HAVE_STD_OPT_DOC 1
 flag = {
     name        = autoopts_std_options;
     documentation;
-    descrip =
-'The following options are commonly used and are provided and supported
-by AutoOpts:';
+    descrip = <<- _EOF_
+	The following options are commonly used and are provided and supported
+	by AutoOpts:
+	_EOF_;
 };
+# endif
 #endif
 
 #ifdef  ALL_STD_OPTS
@@ -361,7 +364,9 @@ flag = {
 #ifdef SHORT_HELP
 include = <<- _EOF_
 	#include <sys/types.h>
+	#include <sys/wait.h>
 	#include <signal.h>
+	#include <stdlib.h>
 	#include <unistd.h>
 	_EOF_;
 

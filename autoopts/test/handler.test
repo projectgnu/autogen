@@ -5,14 +5,14 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-10-05 21:06:59 bkorb"
+# Time-stamp:        "2006-10-23 09:42:50 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/10/06 05:27:22 $
+# Last Modified:     $Date: 2006/10/24 00:02:50 $
 #            by: bkorb
 #
-# $Id: handler.test,v 4.15 2006/10/06 05:27:22 bkorb Exp $
+# $Id: handler.test,v 4.16 2006/10/24 00:02:50 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -126,8 +126,9 @@ doOptSecond(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-    tSCC zDef[2] = { 0x7F, 0 };
-    tSCC* azNames[5] = { zDef,
+    static char const zDef[2] = { 0x7F, 0 };
+
+    static char const * const azNames[5] = { zDef,
         "alpha",  "beta",   "gamma",  "omega"
     };
 
@@ -157,7 +158,8 @@ doOptFourth(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-    tSCC* azNames[4] = {
+
+    static char const * const azNames[4] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
 
@@ -178,11 +180,11 @@ doOptSixth(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-    tSCC* azNames[] = {
+
+    static char const * const azNames[4] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
-    const unsigned int nmCt = sizeof(azNames)/sizeof(azNames[0]);
-    optionSetMembers( pOptions, pOptDesc, azNames, nmCt );
+    optionSetMembers(pOptions, pOptDesc, azNames, 4);
 }
 
 
@@ -272,6 +274,7 @@ translate_option_strings( void )
 #ifdef  __cplusplus
 }
 #endif
+/* handler.c ends here */
 _EOF_
 
 cmp -s ${testname}.test ${testname}.sample || { set +x ; \

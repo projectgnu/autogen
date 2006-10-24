@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.15 2006/10/06 05:27:22 bkorb Exp $
- * Time-stamp:      "2006-10-05 21:10:21 bkorb"
+ *  $Id: enumeration.c,v 4.16 2006/10/24 00:02:50 bkorb Exp $
+ * Time-stamp:      "2006-10-23 09:17:13 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -58,33 +58,33 @@ tSCC*  pz_enum_err_fmt;
 /* static forward declarations maintained by :mkfwd */
 static void
 enumError(
-    tOptions* pOpts,
-    tOptDesc* pOD,
-    tCC**     paz_names,
-    int       name_ct );
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC* const *  paz_names,
+    int           name_ct );
 
 static uintptr_t
 findName(
     tCC*          pzName,
     tOptions*     pOpts,
     tOptDesc*     pOD,
-    tCC**         paz_names,
+    tCC* const *  paz_names,
     unsigned int  name_ct );
 /* = = = END-STATIC-FORWARD = = = */
 
 static void
 enumError(
-    tOptions* pOpts,
-    tOptDesc* pOD,
-    tCC**     paz_names,
-    int       name_ct )
+    tOptions*     pOpts,
+    tOptDesc*     pOD,
+    tCC* const *  paz_names,
+    int           name_ct )
 {
     size_t max_len = 0;
     size_t ttl_len = 0;
 
     if (pOpts != NULL)
-        fprintf( option_usage_fp, pz_enum_err_fmt,
-                 pOpts->pzProgName, pOD->optArg.argString );
+        fprintf( option_usage_fp, pz_enum_err_fmt, pOpts->pzProgName,
+                 pOD->optArg.argString, pOD->pz_Name );
 
     fprintf( option_usage_fp, zValidKeys, pOD->pz_Name );
 
@@ -98,7 +98,7 @@ enumError(
      *  of all the names.
      */
     {
-        tCC** paz = paz_names;
+        tCC * const * paz = paz_names;
         int   ct  = name_ct;
 
         do  {
@@ -175,7 +175,7 @@ findName(
     tCC*          pzName,
     tOptions*     pOpts,
     tOptDesc*     pOD,
-    tCC**         paz_names,
+    tCC* const *  paz_names,
     unsigned int  name_ct )
 {
     uintptr_t     res = name_ct;
@@ -247,7 +247,7 @@ optionKeywordName(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   char const**,  paz_names, list of enumeration names
+ * arg:   char const * const *,  paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
  * ret_type:  uintptr_t
@@ -263,7 +263,7 @@ uintptr_t
 optionEnumerationVal(
     tOptions*     pOpts,
     tOptDesc*     pOD,
-    tCC**         paz_names,
+    tCC * const * paz_names,
     unsigned int  name_ct )
 {
     /*
@@ -316,7 +316,8 @@ optionEnumerationVal(
  *
  * arg:   tOptions*,     pOpts,     the program options descriptor
  * arg:   tOptDesc*,     pOD,       enumeration option description
- * arg:   char const**,  paz_names, list of enumeration names
+ * arg:   char const * const *,
+ *                       paz_names, list of enumeration names
  * arg:   unsigned int,  name_ct,   number of names in list
  *
  * doc:   This converts the optArg.argString string from the option description
@@ -329,7 +330,7 @@ void
 optionSetMembers(
     tOptions*     pOpts,
     tOptDesc*     pOD,
-    tCC**         paz_names,
+    tCC* const *  paz_names,
     unsigned int  name_ct )
 {
     /*

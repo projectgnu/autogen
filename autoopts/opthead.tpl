@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.25 2006/10/05 03:39:53 bkorb Exp $
+# $Id: opthead.tpl,v 4.26 2006/10/24 00:02:50 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-09-27 09:52:55 bkorb"
+# Time-stamp:      "2006-10-23 09:21:24 bkorb"
 
 =]
 /*
@@ -361,11 +361,10 @@ extern tOptions   [=(. pname)=]Options;[=
 ENDIF this is not a lib
 
 =]
-#endif /* [=(. header-guard)=] */
-/*
+#endif /* [=(. header-guard)=] */[= # /*
  * Local Variables:
  * Mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * options.h ends here */
+ * opthead.tpl ends here */=]

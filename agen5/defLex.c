@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.17 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: defLex.c,v 4.18 2006/10/24 00:02:50 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:54:51 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-10-21 09:40:15 bkorb"
+ *  Last Committed:    $Date: 2006/10/24 00:02:50 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -48,7 +48,7 @@ tSCC*  apzKeywords[] = { KEYWORD_TABLE };
 #undef _KW_
 
 #define _KW_(w) DP_EV_ ## w,
-int    aKeywordTkn[] = { KEYWORD_TABLE };
+te_dp_event aKeywordTkn[] = { KEYWORD_TABLE };
 #undef _KW_
 
 #define KEYWORD_CT  (sizeof( apzKeywords ) / sizeof( apzKeywords[0] ))
@@ -550,7 +550,7 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
                 /*
                  *  Return the keyword token code instead of DP_EV_NAME
                  */
-                *pRetVal = (te_dp_event)aKeywordTkn[ kw_ix ];
+                *pRetVal = aKeywordTkn[ kw_ix ];
                 break;
             }
         } while (++kw_ix < KEYWORD_CT);

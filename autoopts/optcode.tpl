@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.28 2006/10/17 01:59:01 bkorb Exp $
+#$Id: optcode.tpl,v 4.29 2006/10/24 00:02:50 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-16 18:21:20 bkorb"
+# Time-stamp:      "2006-10-23 09:21:08 bkorb"
 
 =][=
 
@@ -311,11 +311,21 @@ ELSE                    =]
 #define apzHomeList NULL[=
 ENDIF                   =][=
 
+(out-push-new)         \=]
+s/@[a-z]*{\([^{@}]*\)}/``\1''/g
+/^@\(end *\)*example/d
+s/^@item *$/\
+/[=
+
+(define patch-text-sed
+  (sprintf "sed %s <<\\_EODetail_\n"
+    (raw-shell-str (out-pop #t)) ) )
+
 (define patch-text (lambda (t-name)
   (set! tmp-text (kr-string (string-append "\n"
 
   (shell (string-append
-    "sed 's/@[a-z]*{\\([^{@}]*\\)}/``\\1'\"''/g\" <<'_EODetail_'\n"
+    patch-text-sed
     (get t-name)
     "\n_EODetail_" ))
   "\n" ))) ))
@@ -552,4 +562,10 @@ translate_option_strings( void )
 
 #ifdef  __cplusplus
 }
-#endif
+#endif[= # /*
+ * Local Variables:
+ * Mode: C
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * opthead.tpl ends here */=]
