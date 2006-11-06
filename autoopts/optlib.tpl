@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.24 2006/10/06 05:27:22 bkorb Exp $
+# $Id: optlib.tpl,v 4.25 2006/11/06 19:09:39 bkorb Exp $
 
 # Automated Options copyright 1992-2006 Bruce Korb
 
-# Time-stamp:      "2006-10-05 21:06:05 bkorb"
+# Time-stamp:      "2006-10-29 07:07:27 bkorb"
 
 =][=
 
@@ -345,8 +345,7 @@ typedef enum {[=
 #define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
                  =] optionKeywordName( &[=(. value-desc)=], (_v))
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ((te_[=(string-append Cap-prefix cap-name)
-                          =])[=(. value-desc)=].optArg.argEnum)[=
+                 =] ([=(. value-desc)=].optArg.argEnum)[=
 
   =*  set        =]
 #define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
@@ -591,7 +590,7 @@ tSCC    z[=(. cap-name)=]Text[] =
   IF (hash-ref ifdef-ed flg-name) =]
 
 #else   /* disable [= (. cap-name)=] */
-#define VALUE_[=(string-append OPT-pfx UP-name)=] NO_EQUIVALENT
+#define [=(string-append VALUE-pfx UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
     IF (exist? "arg-default") =]
@@ -695,15 +694,15 @@ DEFINE opt-desc         =][=
   ELSE
 
 =]
-  {  /* entry idx, value */ [=(for-index)=], VALUE_[=
-                              (string-append OPT-pfx UP-name)=],
+  {  /* entry idx, value */ [=(for-index)=], [=
+                              (string-append VALUE-pfx UP-name)=],
      /* equiv idx, value */ [=
           IF (== (up-c-name "equivalence") UP-name)
               =]NO_EQUIVALENT, 0[=
           ELIF (or (exist? "equivalence") (exist? "unstack-arg"))
               =]NOLIMIT, NOLIMIT[=
           ELSE
-              =][=(for-index)=], VALUE_[=(string-append OPT-pfx UP-name)=][=
+              =][=(for-index)=], [=(string-append VALUE-pfx UP-name)=][=
           ENDIF=],
      /* equivalenced to  */ [=
          (if (exist? "unstack-arg")

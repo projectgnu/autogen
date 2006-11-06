@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.26 2006/10/24 00:02:50 bkorb Exp $
+# $Id: opthead.tpl,v 4.27 2006/11/06 19:09:39 bkorb Exp $
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-23 09:21:24 bkorb"
+# Time-stamp:      "2006-10-24 18:15:35 bkorb"
 
 =]
 /*
@@ -79,16 +79,35 @@ ENDIF (exist? version) =]
 IF (exist? "library")
 
 =]
-extern tOptDesc * const [= (. lib-opt-ptr) =];
-#define         [=
-   (sprintf "%sDESC(n) (%s[%s ## n])" UP-prefix lib-opt-ptr INDEX-pfx) =][=
+extern tOptDesc * const [= (. lib-opt-ptr) =];[=
 
-ELSE not a library  =]
-#define         [=
-   (sprintf "%sDESC(n) %sOptions.pOptDesc[INDEX_%sOPT_ ## n]"
-            UP-prefix pname UP-prefix) =][=
+ENDIF is a library                    =][=
 
-ENDIF lib exists    =][=
+CASE guard-option-names               =][=
+!E                                    =][=
+      (set! tmp-val (string-append "[" INDEX-pfx "## n]"))
+      =][=
+
+=  full-enum                          =][=
+      (set! tmp-val "[n]")            =][=
+
+=* no-warn                            =][=
+      (set! tmp-val (string-append "[" INDEX-pfx "## n]"))
+      =][=
+
+*                                     =][=
+      (set! tmp-val (string-append "[" INDEX-pfx "## n]"))
+      =][=
+
+ESAC                                  =][=
+
+(if (exist? "library")
+    (set! tmp-val (string-append "(" lib-opt-ptr tmp-val ")"))
+    (set! tmp-val (string-append "(" pname "Options.pOptDesc" tmp-val ")")) )
+
+(ag-fprintf 0 "\n#define %8sDESC(n) " UP-prefix) tmp-val
+
+=][=
 
 IF (> 1 (string-length UP-prefix))
 
@@ -126,12 +145,26 @@ ELSE we have a prefix:
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
 
-  UP-prefix pname )   =][=
+  UP-prefix pname ) =][=
 
-ENDIF prefix/not      =]
+ENDIF prefix/not    =]
 [=
 
-IF   (exist? "guard-option-names") =][=
+CASE guard-option-names               =][=
+!E                                    =][=
+=  full-enum                          =][=
+
+
+=* no-warn                            =]
+/*
+ *  Make sure there are no #define name conflicts with the option names
+ */[=
+    FOR  flag                         =]
+#undef [= (up-c-name "name")          =][=
+    ENDFOR flag                       =][=
+
+
+*                                     =][=
 
    (define undef-list "\n#else  /* NO_OPTION_NAME_WARNINGS */")
    (define conf-warn-fmt (string-append
@@ -145,20 +178,20 @@ IF   (exist? "guard-option-names") =][=
  *  Make sure there are no #define name conflicts with the option names
  */
 #ifndef     NO_OPTION_NAME_WARNINGS[=
-  FOR  flag     =][=
+    FOR  flag       =][=
 
     (set! opt-name   (up-c-name "name"))
     (set! undef-list (string-append undef-list "\n# undef " opt-name))
     (sprintf conf-warn-fmt opt-name)
     =][=
 
-  ENDFOR flag   =][=
+    ENDFOR flag     =][=
 
   (. undef-list)=]
 #endif  /*  NO_OPTION_NAME_WARNINGS */
 [=
 
-ENDIF guard-option-names
+ESAC on guard-option-names
 
 =]
 /*
