@@ -2,13 +2,13 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2006-08-22 07:17:58 bkorb"
+## Time-stamp:      "2006-11-07 20:05:22 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2006/08/22 16:06:36 $
+## Last Modified:   $Date: 2006/11/20 00:25:20 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.12 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.13 2006/11/20 00:25:20 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
@@ -22,7 +22,7 @@ TESTS      = nested.test \
 testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = set -a ; \
-	CFLAGS='$(DEFS) $(CFLAGS)' CPPFLAGS=$(CPPFLAGS) \
+	CFLAGS='$(DEFS) $(CFLAGS)' CPPFLAGS='$(CPPFLAGS)' \
 	testsubdir=$(testsubdir)
 #`
 distclean-local:

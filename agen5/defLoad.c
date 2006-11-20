@@ -1,8 +1,8 @@
 /*
- *  $Id: defLoad.c,v 4.13 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: defLoad.c,v 4.14 2006/11/20 00:25:20 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:54:47 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-19 13:35:35 bkorb"
+ *  Last Committed:    $Date: 2006/11/20 00:25:20 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -418,6 +418,7 @@ readDefines( void )
          */
         if (sizeLeft == 0) {
             tScanCtx* p;
+            off_t dataOff;
 
             /*
              *  IF it is a regular file, then we are done
@@ -430,9 +431,9 @@ readDefines( void )
              *  Try to reallocate our input buffer.
              */
             dataSize += (sizeLeft = 0x1000);
-            p = (tScanCtx*)AGREALOC( (void*)pBaseCtx,
-                                     dataSize+4+sizeof( *pBaseCtx ),
-                                     "expanded file buffer" );
+            dataOff = pzData - pBaseCtx->pzData;
+            p = AGREALOC( (void*)pBaseCtx, dataSize+4+sizeof( *pBaseCtx ),
+                          "expanded file buffer" );
 
             /*
              *  The buffer may have moved.  Set the data pointer at an
@@ -442,7 +443,7 @@ readDefines( void )
             if (p != pBaseCtx) {
                 p->pzScan = \
                 p->pzData = (char*)(p+1);
-                pzData = p->pzData + (pzData - pBaseCtx->pzData);
+                pzData = p->pzData + dataOff;
                 pBaseCtx = p;
             }
         }

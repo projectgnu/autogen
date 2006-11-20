@@ -1,3 +1,8 @@
+2006-10-19  Matthias Kilian  <kili-sf@users.sourceforge.net>
+
+	* agen5/defLoad.c(readDefines): don't use pointer after realloc,
+	especially after it is known to have moved the data.
+
 2006-10-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c(signalExit): use the enum type for function code

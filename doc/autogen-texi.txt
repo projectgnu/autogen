@@ -2284,6 +2284,13 @@ absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
 
+@cindex config-header
+@item config-header
+@cindex configuration file
+The contents of this attribute should be just the name of the configuration
+file.  A "#include" naming this file will be inserted at the top of the
+generated header.
+
 @cindex environrc
 @item environrc
 Indicates looking in the environment for values of variables named,
@@ -2300,12 +2307,41 @@ Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
 @code{config-header}, below.
 
-@cindex config-header
-@item config-header
-@cindex configuration file
-The contents of this attribute should be just the name of the configuration
-file.  A "#include" naming this file will be inserted at the top of the
-generated header.
+@cindex guard-option-names
+@item guard-option-names
+AutoOpts generates macros that presume that there are no @code{cpp} macros
+with the same name as the option name.  For example, if you have an option
+named, @code{debug}, then you must not use @code{#ifdef DEBUG} in your code.
+If you specify this attribute, every option name will be guarded.  If the name
+is @code{#define}-d, then a warning will be issued and the name undefined.
+If you do not specify this and there is a conflict, you will get strange
+error messages.
+
+This attribute may be set to any of four recognized states:
+
+@itemize @bullet
+@item
+Not defined.  AutoOpts will behave as described above.
+
+@item
+Defined, but set to the empty string.  Text will be emitted into the header
+to undefine (@code{#undef}) any conflicting preprocessor macros.  The code
+will include compiler warnings (via @code{#warning}).  Some compilers are
+not ANSI-C-99 compliant yet and will error out on those warnings.  You may
+compile with @code{-DNO_OPTION_NAME_WARNINGS} to silence or mostly silence
+them.
+
+@item
+Defined and set to the string, ``@code{no-warning}''.  All of the needed
+@code{#undef}s will be emitted, without any conflict checking @code{#warning}
+directives emitted.
+
+@item
+Defined and set to the string, ``@code{full-enum}''.  The option manipulation
+preprocessor macros will not token paste the option names to the index
+enumeration prefix.  e.g. you will need to use @code{HAVE_OPT(INDEX_OPT_DEBUG)}
+instead of @code{HAVE_OPT(DEBUG)}.
+@end itemize
 
 @cindex homerc
 @item homerc
@@ -2361,24 +2397,6 @@ default: .<prog-name>rc
 @item version
 Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
-
-@cindex guard-option-names
-@item guard-option-names
-AutoOpts generates macros that presume that there are no @code{cpp} macros
-with the same name as the option name.  For example, if you have an option
-named, @code{debug}, then you must not use @code{#ifdef DEBUG} in your code.
-If you specify this attribute, every option name will be guarded.  If the name
-is @code{#define}-d, then a warning will be issued and the name undefined.
-If you do not specify this and there is a conflict, you will get strange
-error messages.
-
-This will produce code that will warn you when conflicts get hidden.
-The builder of your program may suppress these warnings by adding
-this define to the compile command line:
-
-@example
--DNO_OPTION_NAME_WARNINGS
-@end example
 @end table
 
 @node library attributes
