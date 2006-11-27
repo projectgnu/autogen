@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcEval.c,v 4.13 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: funcEval.c,v 4.14 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:43 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:56:18 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module evaluates macro expressions.
  */
@@ -460,7 +460,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*    pzCopy; /* next text dest   */
     tCC*     pzSrc  = (char const*)pMac->ozText; /* macro text */
-    long     srcLen = (long)pMac->res;           /* macro len  */
+    size_t   srcLen = (long)pMac->res;           /* macro len  */
     tCC*     pzSrcEnd = pzSrc + srcLen;
     tMacro*  pNextMac;
 
@@ -510,7 +510,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pzCopy = pT->pNext;
     pMac->ozName = (pzCopy - pT->pzTemplText);
     {
-        size_t remLen = canonicalizeName( pzCopy, pzSrc, srcLen );
+        size_t remLen = canonicalizeName( pzCopy, pzSrc, (int)srcLen );
         if (remLen > srcLen)
             AG_ABEND_IN( pT, pMac, "Invalid definition name" );
         pzSrc  += srcLen - remLen;
@@ -540,7 +540,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
          *  THEN find the ending expression...
          */
         if ((pMac->res & EMIT_ALWAYS) != 0) {
-            char* pzNextExpr = (char*)skipExpression( pz, (unsigned)srcLen );
+            char* pzNextExpr = (char*)skipExpression( pz, srcLen );
 
             /*
              *  The next expression must be within bounds and space separated

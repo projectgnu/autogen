@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.17 2006/10/06 05:27:22 bkorb Exp $
- * Time-stamp:      "2006-10-05 20:37:42 bkorb"
+ *  $Id: putshell.c,v 4.18 2006/11/27 01:55:18 bkorb Exp $
+ * Time-stamp:      "2006-11-26 14:44:08 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -95,7 +95,7 @@ putQuotedStr( tCC* pzStr )
         /*
          *  Emit the string up to the single quote (apostrophe) we just found.
          */
-        (void)fwrite( pzStr, (unsigned)(pz - pzStr), 1, stdout );
+        (void)fwrite( pzStr, (size_t)(pz - pzStr), (size_t)1, stdout );
         fputc( '\'', stdout );
         pzStr = pz;
 
@@ -179,7 +179,7 @@ optionPutShell( tOptions* pOpts )
             char const * pz;
             uintptr_t val = 1;
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    (uintptr_t)(pOD->optCookie) );
+                    (int)(uintptr_t)(pOD->optCookie) );
             pOD->optCookie = (void*)(uintptr_t)~0UL;
             (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
 
@@ -287,7 +287,7 @@ optionPutShell( tOptions* pOpts )
                 || (pOD->optArg.argString[0] == NUL) )
 
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
-                    (int)pOD->optOccCt );
+                    pOD->optOccCt );
 
         /*
          *  This option has a text value

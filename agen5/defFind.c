@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.12 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: defFind.c,v 4.13 2006/11/27 01:55:17 bkorb Exp $
  *
  *  Time-stamp:        "2006-09-23 19:55:01 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module locates definitions.
  */
@@ -37,7 +37,7 @@ typedef struct defEntryList tDefEntryList;
 
 tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
 
-static char zDefinitionName[ MAXPATHLEN ];
+static char zDefinitionName[ AG_PATH_MAX ];
 
 static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 

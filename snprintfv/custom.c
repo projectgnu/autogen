@@ -127,7 +127,7 @@ printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_ar
     }
 
   /* Print to a stream using a user-supplied function. */
-  fil = filnew (NULL, 0);
+  fil = filnew (NULL, (size_t)0);
   out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   user_func (out, pinfo, args);
   stream_delete (out);

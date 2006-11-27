@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.21 2006/10/06 05:27:22 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.22 2006/11/27 01:55:18 bkorb Exp $
  * Time-stamp:      "2006-10-05 21:09:18 bkorb"
  *
  *  This module's routines will take the currently set options and
@@ -108,7 +108,7 @@ findDirName( tOptions* pOpts, int* p_free )
             char z[ AO_NAME_SIZE ];
             if ((pzEndDir - pzDir) > AO_NAME_LIMIT )
                 return NULL;
-            strncpy( z, pzDir, (unsigned)(pzEndDir - pzDir) );
+            strncpy( z, pzDir, (size_t)(pzEndDir - pzDir) );
             z[ (pzEndDir - pzDir) ] = NUL;
             pzEnv = getenv( z );
         } else {
@@ -170,7 +170,7 @@ findFileName( tOptions* pOpts, int* p_free_name )
          *  path to a file name that has not been created yet.
          */
         if (errno == ENOENT) {
-            char z[MAXPATHLEN];
+            char z[AG_PATH_MAX];
 
             /*
              *  Strip off the last component, stat the remaining string and
@@ -182,7 +182,7 @@ findFileName( tOptions* pOpts, int* p_free_name )
                 continue;  /* bail out of error condition */
             }
 
-            strncpy( z, pzDir, (unsigned)(pzDirCh - pzDir));
+            strncpy( z, pzDir, (size_t)(pzDirCh - pzDir));
             z[ pzDirCh - pzDir ] = NUL;
 
             if (  (stat( z, &stBuf ) == 0)
@@ -285,7 +285,7 @@ printEntry(
      *  THEN the char pointer is really the number
      */
     if (OPTST_GET_ARGTYPE(p->fOptState) == OPARG_TYPE_NUMERIC)
-        fprintf( fp, "  %d\n", (t_word)pzLA );
+        fprintf( fp, "  %d\n", (int)(t_word)pzLA );
 
     /*
      *  OTHERWISE, FOR each line of the value text, ...
@@ -308,7 +308,7 @@ printEntry(
             /*
              *  Print the continuation and the text from the current line
              */
-            (void)fwrite( pzLA, (unsigned)(pzNl - pzLA), 1, fp );
+            (void)fwrite( pzLA, (size_t)(pzNl - pzLA), (size_t)1, fp );
             pzLA = pzNl+1; /* advance the Last Arg pointer */
             fputs( "\\\n", fp );
         }

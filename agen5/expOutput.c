@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.20 2006/09/28 01:26:16 bkorb Exp $
+ *  $Id: expOutput.c,v 4.21 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-27 11:39:43 bkorb"
- *  Last Committed:    $Date: 2006/09/28 01:26:16 $
+ *  Time-stamp:        "2006-11-26 15:38:29 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module implements the output file manipulation function
  */
@@ -180,9 +180,9 @@ ag_scm_out_pop( SCM ret_contents )
         unsigned long pos = ftell( pCurFp->pFile );
 
         if (pos != 0) {
-            char* pz = ag_scribble( pos );
+            char* pz = ag_scribble( (size_t)pos );
             rewind( pCurFp->pFile );
-            if (fread( pz, pos, 1, pCurFp->pFile ) != 1)
+            if (fread( pz, (size_t)pos, (size_t)1, pCurFp->pFile ) != 1)
                 AG_ABEND( aprf( "Error %d (%s) rereading output\n",
                                 errno, strerror( errno )));
             res = AG_SCM_STR2SCM( pz, pos );
@@ -459,7 +459,7 @@ ag_scm_out_push_new( SCM new_file )
          *  "fopencookie" nor "funopen" is available in the local C library.
          *  We reach here if --no-fmemopen was *not* on the command line.
          */
-        p->pFile  = ag_fmemopen( NULL, 0, "wb+" );
+        p->pFile  = ag_fmemopen(NULL, (size_t)0, "wb+");
         pzNewFile = (char*)"in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
     }

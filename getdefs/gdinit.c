@@ -1,11 +1,11 @@
 /*
- *  $Id: gdinit.c,v 4.7 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: gdinit.c,v 4.8 2006/11/27 01:55:18 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2006-09-23 19:39:48 bkorb"
- *  Last Modified:     $Date: 2006/09/24 02:57:02 $
+ *  Time-stamp:        "2006-11-26 16:44:07 bkorb"
+ *  Last Modified:     $Date: 2006/11/27 01:55:18 $
  *            by: bkorb
  */
 
@@ -56,7 +56,7 @@ compressOptionText( char* pzS, char* pzE )
         size_t len = (pzD - pzR);
         pzD = malloc( len + 1 );
         if (pzD == NULL) {
-            fprintf( stderr, "cannot dup %d byte string\n", pzD - pzR );
+            fprintf(stderr, "cannot dup %d byte string\n", (int)(pzD - pzR));
             exit( EXIT_FAILURE );
         }
 
@@ -176,7 +176,7 @@ loadStdin( void )
         USAGE( EXIT_FAILURE );
     }
 
-    while (fgets( z, sizeof( z ), stdin ) != NULL) {
+    while (fgets(z, (int)sizeof(z), stdin) != NULL) {
         char* pz = z + strlen( z );
 
         if (pz[-1] != '\n') {
@@ -272,7 +272,7 @@ validateOptions( void )
         char*  bf  = malloc( len );
 
         if (bf == NULL) {
-            fprintf( stderr, zMallocErr, len, "definition pattern" );
+            fprintf( stderr, zMallocErr, (int)len, "definition pattern" );
             exit( EXIT_FAILURE );
         }
 
@@ -376,8 +376,7 @@ validateOptions( void )
 
         pzIndexText = loadFile( OPT_ARG( ORDERING ));
         if (pzIndexText == NULL) {
-            pzIndexText = pzEndIndex  = pzIndexEOF =
-                (char*)malloc( 0x4000 );
+            pzIndexText = pzEndIndex = pzIndexEOF = malloc( (size_t)0x4000 );
             indexAlloc = 0x4000;
             pzEndIndex += sprintf( pzEndIndex, "%s", zIndexPreamble );
         } else {

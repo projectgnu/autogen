@@ -1,6 +1,6 @@
 
 /*
- *  $Id: nested.c,v 4.14 2006/09/28 01:26:16 bkorb Exp $
+ *  $Id: nested.c,v 4.15 2006/11/27 01:55:18 bkorb Exp $
  *  Time-stamp:      "2006-09-24 15:27:32 bkorb"
  *
  *   Automated Options Nested Values module.
@@ -305,7 +305,8 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
     while (isspace( (int)*pzScan )) {
         char ch = *(pzScan++);
         if ((ch == '\n') || (ch == ',')) {
-            addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0 );
+            addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL,
+                            (size_t)0);
             return pzScan - 1;
         }
     }
@@ -318,7 +319,8 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         case ',':  goto comma_char;
         case '"':
         case '\'': goto quote_char;
-        case NUL:  addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0);
+        case NUL:  addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL,
+                                   (size_t)0);
                    goto leave_scan_name;
         default:   goto default_char;
         }
@@ -329,7 +331,7 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         /* FALLTHROUGH */
 
     case NUL:
-        addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0 );
+        addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         break;
 
     case '"':
@@ -432,7 +434,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
     case '/':
         if (*++pzScan != '>')
             return NULL;
-        addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0 );
+        addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         return pzScan+2;
 
     default:  return NULL;
@@ -466,7 +468,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
 
     switch (valu.valType) {
     case OPARG_TYPE_NONE:
-        addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, 0 );
+        addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         break;
 
     case OPARG_TYPE_STRING:

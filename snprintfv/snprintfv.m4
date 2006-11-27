@@ -35,12 +35,17 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   test x"${enable_subdir-no}" != xno)
 
   AM_WITH_DMALLOC
+  AC_PROG_AWK
 
   # ----------------------------------------------------------------------
   # check for various programs used during the build.
+  # On OS/X, "wchar.h" needs "runetype.h" to work properly.
   # ----------------------------------------------------------------------
-  AC_PROG_AWK
-  AC_CHECK_HEADER(wchar.h)
+  AC_CHECK_HEADERS([runetype.h wchar.h], [], [],[
+    #if HAVE_RUNETYPE_H
+    # include <runetype.h>
+    #endif
+    ])
   dnl am_cv_prog_cc_stdc is set by AC_PROG_CC_STDC
   case x$am_cv_prog_cc_stdc in
   xno)

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.19 2006/10/06 05:27:22 bkorb Exp $
- * Time-stamp:      "2006-10-05 20:41:23 bkorb"
+ *  $Id: makeshell.c,v 4.20 2006/11/27 01:55:18 bkorb Exp $
+ * Time-stamp:      "2006-11-26 14:45:40 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -614,7 +614,7 @@ emitUsage( tOptions* pOpts )
         {
             time_t    curTime = time( NULL );
             struct tm*  pTime = localtime( &curTime );
-            strftime( zTimeBuf, AO_NAME_SIZE, "%A %B %e, %Y at %r %Z", pTime );
+            strftime(zTimeBuf, AO_NAME_SIZE, "%A %B %e, %Y at %r %Z", pTime );
         }
 
         if (HAVE_OPT( SCRIPT ))
@@ -946,7 +946,7 @@ openOutput( char const* pzFile )
 
     do  {
         char*    pzScan;
-        uint32_t sizeLeft;
+        size_t sizeLeft;
 
         /*
          *  IF we cannot stat the file,
@@ -964,7 +964,7 @@ openOutput( char const* pzFile )
             exit( EXIT_FAILURE );
         }
 
-        pzData = (char*)malloc( (unsigned)(stbf.st_size + 1) );
+        pzData = AGALOC(stbf.st_size + 1, "file data");
         fp = fopen( pzFile, "r" FOPEN_BINARY_FLAG );
 
         sizeLeft = (unsigned)stbf.st_size;
@@ -974,7 +974,7 @@ openOutput( char const* pzFile )
          *  Read in all the data as fast as our OS will let us.
          */
         for (;;) {
-            int inct = fread( (void*)pzScan, 1, sizeLeft, fp );
+            int inct = fread( (void*)pzScan, (size_t)1, sizeLeft, fp);
             if (inct == 0)
                 break;
 

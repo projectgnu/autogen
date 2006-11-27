@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.17 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: funcDef.c,v 4.18 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:46 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:55:10 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module implements the DEFINE text function.
  */
@@ -244,7 +244,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
              */
             if ((pzScan - pDL->pzExpr) < 24) {
                 char* pz = (char*)AGALOC( 24, "quoted string" );
-                memcpy((void*)pz, pDL->pzExpr, (unsigned)(pzScan - pDL->pzExpr));
+                memcpy((void*)pz, pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
                 pDL->pzExpr = pz;
                 manageAllocatedData( pz );
             }
@@ -452,7 +452,8 @@ build_defs( int defCt, tDefList* pList )
             }
             else if (AG_SCM_NUM_P( res )) {
                 pList->de.val.pzText = AGALOC( 16, "number buf" );
-                snprintf( pList->de.val.pzText, 16, "%ld", gh_scm2ulong( res ));
+                snprintf(pList->de.val.pzText, (size_t)16, "%ld",
+                         gh_scm2ulong( res ));
             }
             else
                 AGDUPSTR( pList->de.val.pzText, zNil, "empty string" );

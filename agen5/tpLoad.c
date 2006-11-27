@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.15 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.16 2006/11/27 01:55:18 bkorb Exp $
  *
- * Time-stamp:        "2006-09-23 19:49:27 bkorb"
- * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ * Time-stamp:        "2006-11-26 16:22:25 bkorb"
+ * Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module will load a template and return a template structure.
  */
@@ -89,7 +89,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  We will not mess with embedded ones.
      */
     if (*pzFName == '$') {
-        if (! optionMakePath( pzFullName, MAXPATHLEN, pzFName,
+        if (! optionMakePath( pzFullName, (int)AG_PATH_MAX, pzFName,
                               autogenOptions.pzProgPath ))
             return FAILURE;
 
@@ -107,7 +107,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
      *  Check for an immediately accessible file
      */
     if (canReadFile( pzFName )) {
-        strlcpy( pzFullName, pzFName, MAXPATHLEN );
+        strlcpy( pzFullName, pzFName, AG_PATH_MAX );
         goto findFileReturn;
     }
 
@@ -129,7 +129,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
         tCC** papSL = papSuffixList;
 
         char* pzEnd = pzFullName +
-            snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN, "%s.", pzFName );
+            snprintf( pzFullName, AG_PATH_MAX-MAX_SUFFIX_LEN, "%s.", pzFName );
 
         do  {
             strcpy( pzEnd, *(papSL++) ); /* must fit */
@@ -161,7 +161,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
              *  IF one of our template paths starts with '$', then expand it.
              */
             if (*pzDir == '$') {
-                if (! optionMakePath( pzFullName, MAXPATHLEN, pzDir,
+                if (! optionMakePath( pzFullName, (int)AG_PATH_MAX, pzDir,
                                       autogenOptions.pzProgPath ))
                     pzDir = ".";
                 else
@@ -171,7 +171,7 @@ findFile( tCC* pzFName, char* pzFullName, tCC** papSuffixList )
             }
 
             pzEnd  = pzFullName
-                + snprintf( pzFullName, MAXPATHLEN-MAX_SUFFIX_LEN,
+                + snprintf( pzFullName, AG_PATH_MAX-MAX_SUFFIX_LEN,
                             zDirFmt, pzDir, pzFName );
 
             if (canReadFile( pzFullName ))
@@ -319,7 +319,7 @@ loadTemplate( tCC* pzFileName )
 
     {
         tSCC*       apzSfx[] = { "tpl", "agl", NULL };
-        static char zRealFile[ MAXPATHLEN ];
+        static char zRealFile[ AG_PATH_MAX ];
 
         /*
          *  Find the template file somewhere

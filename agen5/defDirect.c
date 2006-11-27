@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.19 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: defDirect.c,v 4.20 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:55:08 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:28:50 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module processes definition file directives.
  *
@@ -728,7 +728,7 @@ doDir_include( char* pzArg, char* pzScan )
     tSCC*      apzSfx[] = { "def", NULL };
     tScanCtx*  pCtx;
     size_t     inclSize;
-    char       zFullName[ MAXPATHLEN + 1 ];
+    char       zFullName[ AG_PATH_MAX + 1 ];
 
     /*
      *  Ignore C-style includes.  This allows "C" files to be processed
@@ -804,7 +804,7 @@ doDir_include( char* pzArg, char* pzScan )
                             strerror( errno )));
 
         do  {
-            size_t rdct = fread( (void*)pz, 1, inclSize, fp );
+            size_t rdct = fread((void*)pz, (size_t)1, inclSize, fp);
 
             if (rdct == 0)
                 AG_ABEND( aprf( zCannot, errno, "read file", zFullName,

@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.13 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: funcCase.c,v 4.14 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:49 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 16:20:26 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module implements the CASE text function.
  */
@@ -491,12 +491,12 @@ Select_Match( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match re" );
-        compile_re( pRe, (char*)pzMatch, pCurMacro->res );
+        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec( (regex_t*)pCurMacro->funcPrivate, pzText, 0,
-                 NULL, 0 ) != 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)0,
+                 NULL, 0) != 0)
         return FAILURE;
     return SUCCESS;
 }
@@ -509,8 +509,8 @@ ag_scm_string_has_match_p( SCM text, SCM substr )
 
     compile_re( &re, ag_scm2zchars( substr, "match expr" ), REG_EXTENDED );
 
-    if (regexec( &re, ag_scm2zchars( text, "text to match" ), 0,
-                 NULL, 0 ) == 0)
+    if (regexec(&re, ag_scm2zchars( text, "text to match" ), (size_t)0,
+                 NULL, 0) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -528,7 +528,7 @@ ag_scm_string_has_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, pzText, 0, NULL, 0 ) == 0)
+    if (regexec(&re, pzText, (size_t)0, NULL, 0) == 0)
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
     regfree( &re );
@@ -573,11 +573,11 @@ Select_Match_End( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match end re" );
-        compile_re( pRe, (char*)pzMatch, pCurMacro->res );
+        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec( (regex_t*)pCurMacro->funcPrivate, pzText, 2, m, 0 ) != 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0) != 0)
         return FAILURE;
     if (m[0].rm_eo != strlen( pzText ))
         return FAILURE;
@@ -595,7 +595,7 @@ ag_scm_string_end_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_eo != strlen( pzText ))
          res = SCM_BOOL_F;
@@ -617,7 +617,7 @@ ag_scm_string_end_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_eo != strlen( pzText ))
          res = SCM_BOOL_F;
@@ -665,11 +665,11 @@ Select_Match_Start( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match start re" );
-        compile_re( pRe, (char*)pzMatch, pCurMacro->res );
+        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec( (regex_t*)pCurMacro->funcPrivate, pzText, 2, m, 0 ) != 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0) != 0)
         return FAILURE;
     if (m[0].rm_so != 0)
         return FAILURE;
@@ -687,7 +687,7 @@ ag_scm_string_start_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_so != 0)
          res = SCM_BOOL_F;
@@ -709,7 +709,7 @@ ag_scm_string_start_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (m[0].rm_so != 0)
          res = SCM_BOOL_F;
@@ -763,11 +763,11 @@ Select_Match_Full( tCC* pzText, tCC* pzMatch )
             fprintf( pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
                      pzMatch, pCurMacro->res );
         }
-        compile_re( pRe, (char*)pzMatch, pCurMacro->res );
+        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = pRe;
     }
 
-    if (regexec( (regex_t*)pCurMacro->funcPrivate, pzText, 2, m, 0 ) != 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0) != 0)
         return FAILURE;
 
     if (  (m[0].rm_eo != strlen( pzText ))
@@ -787,7 +787,7 @@ ag_scm_string_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (  (m[0].rm_eo != strlen( pzText ))
             || (m[0].rm_so != 0) )
@@ -810,7 +810,7 @@ ag_scm_string_eqv_match_p( SCM text, SCM substr )
 
     compile_re( &re, pzSubstr, REG_EXTENDED | REG_ICASE );
 
-    if (regexec( &re, pzText, 2, m, 0 ) != 0)
+    if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
     else if (  (m[0].rm_eo != strlen( pzText ))
             || (m[0].rm_so != 0) )

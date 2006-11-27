@@ -1,3 +1,9 @@
+2006-11-26  Bruce Korb  <bkorb@gnu.org>
+
+	* Everywhere: fixes to cope with sizeof(int) != sizeof(size_t).
+	* snprintfv/snprintfv.m4: Before testing for wchar.h, test for
+	runetype.h.  It's a weirdism needed by OS/X.
+
 2006-10-19  Matthias Kilian  <kili-sf@users.sourceforge.net>
 
 	* agen5/defLoad.c(readDefines): don't use pointer after realloc,

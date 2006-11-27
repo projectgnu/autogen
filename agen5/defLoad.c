@@ -1,8 +1,8 @@
 /*
- *  $Id: defLoad.c,v 4.14 2006/11/20 00:25:20 bkorb Exp $
+ *  $Id: defLoad.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-19 13:35:35 bkorb"
- *  Last Committed:    $Date: 2006/11/20 00:25:20 $
+ *  Time-stamp:        "2006-11-26 15:31:18 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -317,6 +317,7 @@ readDefines( void )
             return;
         }
 
+    accept_fifo:
         outTime  = time( NULL );
         dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
@@ -334,6 +335,9 @@ readDefines( void )
                             pzDefFile, strerror( errno )));
 
         if (! S_ISREG( stbf.st_mode )) {
+            if (S_ISFIFO(stbf.st_mode))
+                goto accept_fifo;
+
             errno = EINVAL;
             AG_ABEND( aprf( zCannot, errno, "open non-regular file",
                             pzDefFile, strerror( errno )));
@@ -390,7 +394,7 @@ readDefines( void )
      *  Read until done...
      */
     for (;;) {
-        size_t rdct = fread( (void*)pzData, 1, sizeLeft, fp );
+        size_t rdct = fread((void*)pzData, (size_t)1, sizeLeft, fp);
 
         /*
          *  IF we are done,

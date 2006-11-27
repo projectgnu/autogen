@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-11-07 20:13:37 bkorb"
+# Time-stamp:     "2006-11-26 17:03:50 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/11/20 00:25:20 $
+# Last Modified:  $Date: 2006/11/27 01:55:18 $
 #
-# $Id: defs.in,v 4.13 2006/11/20 00:25:20 bkorb Exp $
+# $Id: defs.in,v 4.14 2006/11/27 01:55:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -52,6 +52,7 @@ CLexe=`cd ${d} && pwd`/${f}
 
 builddir=`pwd`
 top_builddir=`cd ../.. && pwd`
+CFLAGS=`echo ${CFLAGS} | sed 's/-Werror//'`
 
 if test ${GUILE_VERSION} -gt 107000
 then

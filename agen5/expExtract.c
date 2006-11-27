@@ -1,9 +1,9 @@
 /*
  *  expExtract.c
- *  $Id: expExtract.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expExtract.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:53:51 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:54:43 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module implements a file extraction function.
  */
@@ -103,7 +103,7 @@ loadExtractData( char const* pzNewFile )
             goto bad_return;
 
         do  {
-            size_t sz = fread( pzIn, 1, (unsigned)sbuf.st_size, fp );
+            size_t sz = fread(pzIn, (size_t)1, (size_t)sbuf.st_size, fp);
             if (sz == 0) {
                 fprintf( stderr, "Error %d (%s) reading %d bytes of %s\n",
                          errno, strerror( errno ), (int)sbuf.st_size, pzFile );
@@ -176,7 +176,7 @@ extractText( char const* pzText, char const* pzStart, char const* pzEnd,
 
     pzE += strlen( pzEnd );
 
-    return AG_SCM_STR2SCM( pzS, (unsigned)(pzE - pzS) );
+    return AG_SCM_STR2SCM( pzS, (size_t)(pzE - pzS) );
 }
 
 
@@ -318,7 +318,7 @@ ag_scm_find_file( SCM file, SCM suffix )
         scm_wrong_type_arg( zFun, 1, file );
 
     {
-        char z[ MAXPATHLEN+1 ];
+        char z[ AG_PATH_MAX+1 ];
         char* pz = ag_scm2zchars( file, "file-name" );
 
         /*

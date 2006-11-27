@@ -213,10 +213,10 @@ call_argtype_function (
       pinfo->type  = spec->type;
 
       if (pinfo->argc > argindex)
-        n = spec->arg(pinfo, (unsigned)(pinfo->argc - argindex),
+        n = spec->arg(pinfo, (size_t)(pinfo->argc - argindex),
 		      *argtypes + argindex);
       else
-        n = spec->arg(pinfo, 0, NULL);
+        n = spec->arg(pinfo, (size_t)0, NULL);
 
       if (n < 0)
 	return n;
@@ -234,7 +234,7 @@ call_argtype_function (
           pinfo->spec     = (unsigned)*(pinfo->format);
           pinfo->extra    = spec->user;
           pinfo->type     = spec->type;
-          n = spec->arg(pinfo, (unsigned)n, *argtypes + argindex);
+          n = spec->arg(pinfo, (size_t)n, *argtypes + argindex);
 	}
     }
 
@@ -315,7 +315,7 @@ printf_error (struct printf_info *pinfo, const char *file, int line, const char 
   int i;
   char *result;
   if (pinfo->error == NULL)
-    pinfo->error = filnew (NULL, 0);
+    pinfo->error = filnew (NULL, (size_t)0);
   else
     filccat (pinfo->error, '\n');
 
@@ -413,7 +413,7 @@ parse_printf_format (const char *format, int n, int *argtypes)
                       info.spec  = (unsigned)*(info.format);
                       info.extra = spec->user;
                       info.type  = spec->type;
-                      status     = (*spec->arg) (&info, (unsigned)(n - argindex),
+                      status     = (*spec->arg) (&info, (size_t)(n - argindex),
                                                  argtypes + argindex);
 		    }
 		  else
@@ -517,7 +517,7 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 		  info.extra = spec->user;
 		  info.type  = spec->type;
 
-		  status = spec->arg ? (*spec->arg) (&info, 0, NULL) : 1;
+		  status = spec->arg ? (*spec->arg) (&info, (size_t)0, NULL) : 1;
 
 		  if (status < 0)
 		    goto error;
@@ -544,7 +544,7 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
 	  ++info.format;
 
-	  /*NOBREAK*/
+	  /*FALLTHROUGH*/
 
 	default:       /* Just a character: copy it. */
 	  SNV_EMIT (ch, stream, info.count);
@@ -989,7 +989,9 @@ snv_fdputc (int ch, STREAM *stream)
 {
   static char buf[1] = { 0 };
   buf[0] = (char) ch;
-  return write (SNV_POINTER_TO_INT (stream_details (stream)), buf, 1) ? ch : -1;
+  return
+    write ((int)SNV_POINTER_TO_INT (stream_details (stream)), buf, (size_t)1)
+      ? ch : -1;
 }
 
 /**
@@ -1492,7 +1494,7 @@ snv_vasprintf (char **result, const char *format, va_list ap)
 {
   int count_or_errorcode;
   char *base;
-  Filament *fil = filnew (NULL, 0);
+  Filament *fil = filnew (NULL, (size_t)0);
   STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   count_or_errorcode = stream_vprintf (out, format, ap);
 
@@ -1525,7 +1527,7 @@ snv_asprintfv (char **result, const char *format, snv_constpointer const args[])
 {
   int count_or_errorcode;
   char *base;
-  Filament *fil = filnew (NULL, 0);
+  Filament *fil = filnew (NULL, (size_t)0);
   STREAM *out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   count_or_errorcode = stream_printfv (out, format, args);
 

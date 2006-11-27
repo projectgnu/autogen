@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.21 2006/10/21 15:41:57 bkorb Exp $
+ *  $Id: autogen.c,v 4.22 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-10-21 08:15:03 bkorb"
- *  Last Committed:    $Date: 2006/10/21 15:41:57 $
+ *  Time-stamp:        "2006-11-26 15:05:02 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This is the main routine for autogen.
  */
@@ -322,8 +322,8 @@ doneCheck( void )
             break;
         pz = AGALOC( pos, "stderr redirected text" );
         rewind( stderr );
-        fread(  pz, 1, (size_t)pos, stderr );
-        fwrite( pz, 1, (size_t)pos, stdout );
+        fread(  pz, (size_t)1, (size_t)pos, stderr );
+        fwrite( pz, (size_t)1, (size_t)pos, stdout );
         AGFREE( pz );
     } while (0);
 
@@ -484,7 +484,7 @@ ao_malloc (size_t sz)
 {
     void * res = malloc(sz);
     if (res == NULL) {
-        fprintf( stderr, "malloc of %d bytes failed\n", sz );
+        fprintf(stderr, "malloc of %d bytes failed\n", (int)sz);
         exit( EXIT_FAILURE );
     }
     return res;
@@ -496,7 +496,7 @@ ao_realloc (void *p, size_t sz)
 {
     void * res = realloc(p, sz);
     if (res == NULL) {
-        fprintf( stderr, "realloc of %d bytes at 0x%p failed\n", sz, p );
+        fprintf(stderr, "realloc of %d bytes at 0x%p failed\n", (int)sz, p);
         exit( EXIT_FAILURE );
     }
     return res;
@@ -516,7 +516,7 @@ ao_strdup (char const * str)
 {
     char * res = strdup(str);
     if (res == NULL) {
-        fprintf( stderr, "strdup of %d byte string failed\n", strlen(str) );
+        fprintf(stderr, "strdup of %d byte string failed\n", (int)strlen(str));
         exit( EXIT_FAILURE );
     }
     return res;

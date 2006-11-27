@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.16 2006/10/24 00:02:50 bkorb Exp $
- * Time-stamp:      "2006-10-23 09:17:13 bkorb"
+ *  $Id: enumeration.c,v 4.17 2006/11/27 01:55:18 bkorb Exp $
+ * Time-stamp:      "2006-11-26 14:32:33 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -137,7 +137,7 @@ enumError(
         int   ent_no = 0;
         char  zFmt[16];  /* format for all-but-last entries on a line */
 
-        sprintf( zFmt, "%%-%ds", max_len );
+        sprintf( zFmt, "%%-%ds", (int)max_len );
         max_len = 78 / max_len; /* max_len is now max entries on a line */
         fputs( "  ", option_usage_fp );
 
@@ -186,7 +186,7 @@ findName(
      *  Multiple partial matches means we have an ambiguous match.
      */
     for (idx = 0; idx < name_ct; idx++) {
-        if (strncmp( (char*)paz_names[idx], (char*)pzName, len ) == 0) {
+        if (strncmp( (char*)paz_names[idx], (char*)pzName, len) == 0) {
             if (paz_names[idx][len] == NUL)
                 return idx;  /* full match */
 
@@ -431,12 +431,12 @@ optionSetMembers(
             if (len == 0)
                 break;
 
-            if ((len == 3) && (strncmp( pzArg, zAll, 3 ) == 0)) {
+            if ((len == 3) && (strncmp(pzArg, zAll, (size_t)3) == 0)) {
                 if (iv)
                      res = 0;
                 else res = ~0UL;
             }
-            else if ((len == 4) && (strncmp( pzArg, zNone, 4 ) == 0)) {
+            else if ((len == 4) && (strncmp(pzArg, zNone, (size_t)4) == 0)) {
                 if (! iv)
                     res = 0;
             }
@@ -450,7 +450,7 @@ optionSetMembers(
                     if (*pz != NUL) {
                         if (len >= AO_NAME_LIMIT)
                             break;
-                        strncpy( z, pzArg, (unsigned)len );
+                        strncpy( z, pzArg, (size_t)len );
                         z[len] = NUL;
                         p = z;
                     } else {

@@ -1,12 +1,12 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.12 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.13 2006/11/27 01:55:18 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2006-09-23 19:48:42 bkorb"
- * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ * Time-stamp:        "2006-11-26 16:13:22 bkorb"
+ * Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  */
 
@@ -158,10 +158,10 @@ doStdoutTemplate( tTemplate* pTF )
         res   = ag_scm_out_pop( SCM_BOOL_T );
         pzRes = AG_SCM_CHARS( res );
 
-        if (strneqvcmp( pzRes, zCont, sizeof( zCont ) - 1) != 0)
+        if (strneqvcmp( pzRes, zCont, (int)sizeof(zCont) - 1) != 0)
             fputs( "Content-Type: text/html\n\n", stdout );
 
-        fwrite( pzRes, AG_SCM_STRLEN( res ), 1, stdout );
+        fwrite( pzRes, AG_SCM_STRLEN(res), (size_t)1, stdout );
     }
 
     fclose( stdout );
@@ -316,7 +316,7 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
      *  Remove any suffixes in the last file name
      */
     {
-        char   z[ MAXPATHLEN ];
+        char   z[ AG_PATH_MAX ];
         tCC*   pS = strrchr( pzDefFile, '/' );
         char*  pE;
         if (pS++ == NULL)

@@ -1,10 +1,10 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.16 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expState.c,v 4.17 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:52:45 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:40:45 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
@@ -535,12 +535,12 @@ ag_scm_high_lim( SCM obj )
         return AG_SCM_INT2SCM( 0 );
 
     if (isIndexed)
-        return AG_SCM_INT2SCM( pE->index );
+        return AG_SCM_INT2SCM( (int)pE->index );
 
     if (pE->pEndTwin != NULL)
         pE = pE->pEndTwin;
 
-    return AG_SCM_INT2SCM( pE->index );
+    return AG_SCM_INT2SCM( (int)pE->index );
 }
 
 
@@ -559,9 +559,7 @@ ag_scm_high_lim( SCM obj )
 SCM
 ag_scm_len( SCM obj )
 {
-    int         len;
-
-    len = entry_length( ag_scm2zchars( obj, "ag value" ));
+    int len = entry_length( ag_scm2zchars( obj, "ag value" ));
 
     return AG_SCM_INT2SCM( len );
 }
@@ -591,7 +589,7 @@ ag_scm_low_lim( SCM obj )
     if (pE == NULL)
         return AG_SCM_INT2SCM( 0 );
 
-    return AG_SCM_INT2SCM( pE->index );
+    return AG_SCM_INT2SCM( (int)pE->index );
 }
 
 
@@ -642,7 +640,7 @@ ag_scm_tpl_file( SCM full )
 {
     if (AG_SCM_BOOL_P( full ) && SCM_NFALSEP( full )) {
         tSCC* sfx[] = { "tpl", NULL };
-        char z[MAXPATHLEN];
+        char z[AG_PATH_MAX];
         if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx )))
             return AG_SCM_STR02SCM( z );
     }

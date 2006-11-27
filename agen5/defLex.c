@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.18 2006/10/24 00:02:50 bkorb Exp $
+ *  $Id: defLex.c,v 4.19 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-10-21 09:40:15 bkorb"
- *  Last Committed:    $Date: 2006/10/24 00:02:50 $
+ *  Time-stamp:        "2006-11-26 15:30:42 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -183,7 +183,7 @@ scanAgain:
         break;
 
     case '\\':
-        if (strncmp( pCurCtx->pzScan+1, "'(", 2) == 0) {
+        if (strncmp( pCurCtx->pzScan+1, "'(", (size_t)2) == 0) {
             alist_to_autogen_def();
             goto scanAgain;
 
@@ -390,7 +390,7 @@ alist_to_autogen_def( void )
     char*  pzEnd   = (char*)skipScheme( pzText, pzText + strlen( pzText ));
 
     SCM    res;
-    u_int  res_len;
+    size_t res_len;
     tScanCtx*  pCtx;
 
     /*
@@ -572,7 +572,7 @@ assembleHereString( char* pzScan )
 {
     ag_bool  trimTabs = AG_FALSE;
     char     zMark[ MAX_HEREMARK_LEN ];
-    u_int    markLen = 0;
+    size_t   markLen = 0;
     char*    pzDest;
 
     /*

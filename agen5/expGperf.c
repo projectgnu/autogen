@@ -1,8 +1,8 @@
 /*
- *  $Id: expGperf.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expGperf.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:53:25 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:35:27 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
@@ -71,7 +71,7 @@ ag_scm_gperf( SCM name, SCM str )
 SCM
 ag_scm_make_gperf( SCM name, SCM hlist )
 {
-    SCM     newline  = AG_SCM_STR2SCM( "\n", 1 );
+    SCM     newline  = AG_SCM_STR2SCM("\n", (size_t)1);
     char*   pzName   = ag_scm2zchars( name, "gperf name" );
     char*   pzList;
 

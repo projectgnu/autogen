@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-09-27 18:30:08 bkorb"
+## Time-stamp:      "2006-11-26 13:45:49 bkorb"
 ## Copyright (c):   1992-2006 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.31 2006/09/28 03:17:50 bkorb Exp $
+## $Id: Makefile.am,v 4.32 2006/11/27 01:55:18 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -157,5 +157,9 @@ install-data-hook:
 	top_builddir='$(top_builddir)' \
 	export destdir top_builddir ; \
 	$(SHELL) $(srcdir)/install-options-h
+
+libopts.i : libopts.o
+	$(COMPILE) -E libopts.c > libopts-lines.i
+	egrep -v $$'^[ \t]*(#|$$)' libopts-lines.i > $@
 
 # Makefile.am ends here

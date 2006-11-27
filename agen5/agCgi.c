@@ -1,10 +1,10 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.13 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: agCgi.c,v 4.14 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:56:19 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:05:23 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -136,7 +136,7 @@ loadCgi( void )
                 AG_ABEND( "No CGI data were received" );
 
             pzText  = AGALOC( textLen + 1, "CGI POST text" );
-            if (fread( pzText, 1, textLen, stdin ) != textLen)
+            if (fread(pzText, (size_t)1, textLen, stdin) != textLen)
                 AG_ABEND( aprf( zCannot, errno, "read", "CGI text",
                                 strerror( errno )));
 

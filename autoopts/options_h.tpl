@@ -4,7 +4,7 @@ h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
 # Time-stamp:      "2006-10-05 20:39:26 bkorb"
-# ID:  $Id: options_h.tpl,v 4.29 2006/10/06 05:27:22 bkorb Exp $
+# ID:  $Id: options_h.tpl,v 4.30 2006/11/27 01:55:18 bkorb Exp $
 
 =][=
 
@@ -96,7 +96,6 @@ typedef struct optionValue {
  *  Bits in the fOptState option descriptor field.
  */
 [= `
-set -x
 autogen opt-state.def || die "Cannot regen opt-state.h"
 sed -e '1,/typedef.*_bits_t/d' \
     -e 's/NO_BITS /INIT/' \
@@ -104,7 +103,6 @@ sed -e '1,/typedef.*_bits_t/d' \
     -e 's/_MASK     /_MASK /' \
     -e '/ SET_OPT_STATE(/,$d' opt-state.h
 rm  -f opt-state.[ch]
-set +x
 ` =]
 
 #define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)

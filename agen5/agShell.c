@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.22 2006/10/06 05:27:22 bkorb Exp $
+ *  $Id: agShell.c,v 4.23 2006/11/27 01:55:17 bkorb Exp $
  *
- *  Time-stamp:        "2006-10-05 21:50:48 bkorb"
- *  Last Committed:    $Date: 2006/10/06 05:27:22 $
+ *  Time-stamp:        "2006-11-26 15:09:07 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
  *  Manage a server shell process
  */
@@ -136,11 +136,11 @@ serverSetup( void )
     {
         static int doneOnce = 0;
         if (doneOnce++ == 0) {
-            char* p = malloc( MAXPATHLEN );
+            char* p = malloc( AG_PATH_MAX );
             if (p == NULL)
                 AG_ABEND( "cannot allocate path name" );
 
-            pCurDir = (tpChar)getcwd( p, MAXPATHLEN );
+            pCurDir = (tpChar)getcwd( p, AG_PATH_MAX );
 
             if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
                 fputs( "\nServer First Start\n", pfTrace );
@@ -347,7 +347,7 @@ chainOpen( int       stdinFd,
      *  Make the output file unbuffered only.
      *  We do not want to wait for shell output buffering.
      */
-    setvbuf( stdout, NULL, _IONBF, 0 );
+    setvbuf(stdout, NULL, _IONBF, (size_t)0);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         fprintf( pfTrace, "Server shell %s starts\n", pzShell );
@@ -448,7 +448,7 @@ loadData( void )
          *  at all and we should.  Retry in those cases (but not on EOF).
          */
         alarm( (unsigned int)OPT_VALUE_TIMEOUT );
-        line_p = fgets( zLine, sizeof( zLine ), serverPair.pfRead );
+        line_p = fgets(zLine, (int)sizeof(zLine), serverPair.pfRead);
         alarm( 0 );
 
         if (line_p == NULL) {
@@ -516,7 +516,7 @@ loadData( void )
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         fprintf( pfTrace, "\n= = = RESULT %d bytes:\n%s%s\n"
                  "= = = = = = = = = = = = = = =\n",
-                 textSize, pzText, zLine );
+                 (int)textSize, pzText, zLine );
     }
 
     *pzScan  = NUL;

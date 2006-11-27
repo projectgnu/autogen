@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.27 2006/10/05 03:39:53 bkorb Exp $
- *  Time-stamp:      "2006-10-04 19:32:32 bkorb"
+ *  $Id: autoopts.c,v 4.28 2006/11/27 01:55:18 bkorb Exp $
+ *  Time-stamp:      "2006-11-26 14:44:39 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -93,7 +93,7 @@ ao_malloc( size_t sz )
 {
     void * res = malloc(sz);
     if (res == NULL) {
-        fprintf( stderr, "malloc of %d bytes failed\n", sz );
+        fprintf( stderr, "malloc of %d bytes failed\n", (int)sz );
         exit( EXIT_FAILURE );
     }
     return res;
@@ -105,7 +105,7 @@ ao_realloc( void *p, size_t sz )
 {
     void * res = realloc(p, sz);
     if (res == NULL) {
-        fprintf( stderr, "realloc of %d bytes at 0x%p failed\n", sz, p );
+        fprintf( stderr, "realloc of %d bytes at 0x%p failed\n", (int)sz, p );
         exit( EXIT_FAILURE );
     }
     return res;
@@ -125,7 +125,7 @@ ao_strdup( char const *str )
 {
     char * res = strdup(str);
     if (res == NULL) {
-        fprintf( stderr, "strdup of %d byte string failed\n", strlen(str) );
+        fprintf( stderr, "strdup of %d byte string failed\n", (int)strlen(str) );
         exit( EXIT_FAILURE );
     }
     return res;

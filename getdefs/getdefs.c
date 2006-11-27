@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.8 2006/09/24 02:10:45 bkorb Exp $
+ *  $Id: getdefs.c,v 4.9 2006/11/27 01:55:18 bkorb Exp $
  *
  *    getdefs copyright 1999-2006 Bruce Korb
  *
- *  Time-stamp:        "2006-06-24 15:43:30 bkorb"
+ *  Time-stamp:        "2006-11-26 16:42:14 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -698,7 +698,7 @@ loadFile( tCC* pzFname )
         if (rdsz < 16) {
             fprintf( stderr, "Error file %s only contains %d bytes.\n"
                      "\tit cannot contain autogen definitions\n",
-                     pzFname, rdsz );
+                     pzFname, (int)rdsz );
             exit( EXIT_FAILURE );
         }
     }
@@ -709,7 +709,7 @@ loadFile( tCC* pzFname )
     pzRead = pzText = (char*)malloc( rdsz + 1 );
     if (pzText == NULL) {
         fprintf( stderr, "Error: could not allocate %d bytes\n",
-                 rdsz + 1 );
+                 (int)rdsz + 1 );
         exit( EXIT_FAILURE );
     }
 
@@ -717,7 +717,7 @@ loadFile( tCC* pzFname )
      *  Read as much as we can get until we have read the file.
      */
     do  {
-        size_t rdct = fread( (void*)pzRead, 1, rdsz, fp );
+        size_t rdct = fread( (void*)pzRead, (size_t)1, rdsz, fp );
 
         if (rdct == 0) {
             fprintf( stderr, "Error %d (%s) reading file %s\n",
@@ -862,7 +862,7 @@ processFile( tCC* pzFile )
                                           blkAllocCt * sizeof( char* ));
             if (papzBlocks == (char**)NULL) {
                 fprintf( stderr, "Realloc error for %d pointers\n",
-                         blkAllocCt );
+                         (int)blkAllocCt );
                 exit( EXIT_FAILURE );
             }
         }
@@ -1172,7 +1172,7 @@ updateDatabase( void )
         exit( EXIT_FAILURE );
     }
 
-    fwrite( pzIndexEOF, (unsigned)(pzEndIndex - pzIndexEOF), 1, fp );
+    fwrite( pzIndexEOF, (size_t)(pzEndIndex - pzIndexEOF), (size_t)1, fp );
     fclose( fp );
     chmod( OPT_ARG( ORDERING ), 0444 );
 }

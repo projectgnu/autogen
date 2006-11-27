@@ -1,9 +1,9 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.9 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.10 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:08 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 16:21:28 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module processes the "pseudo" macro
  */
@@ -264,7 +264,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
     if (isalnum( *pzData )) {
-        if (strneqvcmp( pzData, zAgName, sizeof(zAgName)-1 ) == 0) {
+        if (strneqvcmp( pzData, zAgName, (int)sizeof(zAgName)-1 ) == 0) {
             if (isspace( pzData[ sizeof(zAgName)-1 ] )) {
                 *ppzData = pzData + sizeof(zAgName);
                 return PM_EV_AUTOGEN;
@@ -273,7 +273,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
             return PM_EV_SUFFIX;
         }
 
-        if (strneqvcmp( pzData, zTpName, sizeof(zTpName)-1 ) == 0) {
+        if (strneqvcmp( pzData, zTpName, (int)sizeof(zTpName)-1 ) == 0) {
             if (isspace( pzData[ sizeof(zTpName)-1 ] )) {
                 *ppzData = pzData + sizeof(zTpName)-1;
                 return PM_EV_TEMPLATE;
@@ -309,7 +309,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  IF the next sequence is "-*-"
      *  THEN we found an edit mode marker
      */
-    if (strncmp( pzData, "-*-", 3 ) == 0)
+    if (strncmp(pzData, "-*-", (size_t)3) == 0)
         return PM_EV_ED_MODE;
 
     /*

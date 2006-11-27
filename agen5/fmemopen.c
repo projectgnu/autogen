@@ -2,7 +2,7 @@
  * Copyright (c) 2004-2006
  *  Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2006-07-15 08:28:08 bkorb"
+ * Time-stamp:      "2006-11-26 15:42:06 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -589,7 +589,7 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         /*
          *  Unallocated file space is set to NULs.  Emulate that.
          */
-        pFMC->buffer = calloc(1, (unsigned)len);
+        pFMC->buffer = calloc((size_t)1, (size_t)len);
         if (pFMC->buffer == NULL) {
             errno = ENOMEM;
             free( pFMC );

@@ -1,10 +1,10 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2006-09-23 19:53:35 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:34:28 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:17 $
  *
- *  $Id: expFormat.c,v 4.15 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expFormat.c,v 4.16 2006/11/27 01:55:17 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
@@ -154,7 +154,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     /*
      *  Check for the ``-d'' option
      */
-    if ((pfxLen == 2) && (strncmp( pzPrefix, "-d", 2 ) == 0)) {
+    if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
         noDate   = 1;
         pfxLen   = AG_SCM_STRLEN( first );
         pzPrefix = ag_scm2zchars( first, "dne-prefix" );
@@ -182,7 +182,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     } else {
         time_t    curTime = time( NULL );
         struct tm*  pTime = localtime( &curTime );
-        strftime( zScribble, 128, "%A %B %e, %Y at %r %Z", pTime );
+        strftime( zScribble, (size_t)128, "%A %B %e, %Y at %r %Z", pTime );
     }
 
     {
@@ -512,7 +512,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 
     {
         tSCC*  apzSfx[] = { "lic", NULL };
-        static char zRealFile[ MAXPATHLEN ];
+        static char zRealFile[ AG_PATH_MAX ];
         char* pzLicense = ag_scm2zchars( license, "license file name" );
 
         /*
@@ -619,7 +619,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
          */
         AGFREE( (void*)pzRes );
 
-        return AG_SCM_STR2SCM( pzSaveRes, (u_int)((pzOut - pzSaveRes) - 1));
+        return AG_SCM_STR2SCM(pzSaveRes, (size_t)((pzOut - pzSaveRes) - 1));
     }
 }
 /*

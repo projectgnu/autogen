@@ -1,9 +1,9 @@
 
 /*
- *  $Id: functions.c,v 4.11 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: functions.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:33 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:51:14 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module implements text functions.
  */
@@ -359,7 +359,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     if (pzSrc != NULL) {
         z[0] = ':';
         z[1] = z[2] = ' ';
-        strncpy( z+3, pzSrc, 60 );
+        strncpy( z+3, pzSrc, (size_t)60 );
         z[63] = NUL;
         pzSrc = z;
     }

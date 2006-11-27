@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2006-09-10 14:43:25 bkorb"
+ *  Time-stamp:      "2006-11-26 15:20:34 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.29 2006/09/24 02:10:45 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.30 2006/11/27 01:55:18 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -58,18 +58,18 @@
 #include "compat/compat.h"
 
 #define AO_NAME_LIMIT    127
-#define AO_NAME_SIZE     (AO_NAME_LIMIT + 1)
+#define AO_NAME_SIZE     ((size_t)(AO_NAME_LIMIT + 1))
 
-#ifndef MAXPATHLEN
+#ifndef AG_PATH_MAX
 #  ifdef PATH_MAX
-#    define MAXPATHLEN   PATH_MAX
+#    define AG_PATH_MAX   ((size_t)PATH_MAX)
 #  else
-#    define MAXPATHLEN   4096
+#    define AG_PATH_MAX   ((size_t)4096)
 #  endif
 #else
 #  if defined(PATH_MAX) && (PATH_MAX > MAXPATHLEN)
-#     undef  MAXPATHLEN
-#     define MAXPATHLEN  PATH_MAX
+#     undef  AG_PATH_MAX
+#     define AG_PATH_MAX  ((size_t)PATH_MAX)
 #  endif
 #endif
 
@@ -195,10 +195,10 @@ typedef struct {
     tCC*    pzOptFmt;
 } arg_types_t;
 
-#define AGALOC( c, w )        ao_malloc( (unsigned)c )
-#define AGREALOC( p, c, w )   ao_realloc( p, (unsigned)c )
-#define AGFREE( p )           ao_free( p )
-#define AGDUPSTR( p, s, w )   p = ao_strdup( s )
+#define AGALOC( c, w )        ao_malloc((size_t)c)
+#define AGREALOC( p, c, w )   ao_realloc(p, (size_t)c)
+#define AGFREE( p )           ao_free(p)
+#define AGDUPSTR( p, s, w )   (p = ao_strdup(s))
 
 #define TAGMEM( m, t )
 

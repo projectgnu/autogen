@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expString.c,v 4.15 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:52:39 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 15:47:53 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -374,10 +374,10 @@ do_substitution(
         if (pzNxt == NULL)
             break;
         if (pz != pzNxt) {
-            memcpy( pzScan, pz, (unsigned)(pzNxt - pz) );
+            memcpy( pzScan, pz, (size_t)(pzNxt - pz) );
             pzScan += (pzNxt - pz);
         }
-        memcpy( pzScan, pzRepl, (unsigned)replL );
+        memcpy( pzScan, pzRepl, (size_t)replL );
         pzScan += replL;
         pz = pzNxt + matchL;
     }

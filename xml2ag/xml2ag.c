@@ -1,8 +1,8 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.11 2006/09/24 02:57:02 bkorb Exp $
- *  Time-stamp:         "2006-09-23 19:32:57 bkorb"
+ *  $Id: xml2ag.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
+ *  Time-stamp:         "2006-11-26 16:53:13 bkorb"
  *  This is the main routine for xml2ag.
  *
  *  xml2ag copyright 2002-2006 Bruce Korb
@@ -174,12 +174,12 @@ loadFile( FILE* fp, size_t* pzSize )
         }
 
         if (mem == NULL) {
-            fprintf( stderr, "Cannot allocate %d byte bufer\n", asz );
+            fprintf(stderr, "Cannot allocate %d byte bufer\n", (int)asz);
             exit( EXIT_FAILURE );
         }
 
         {
-            size_t rdct = fread( mem + usz, 1, CHUNK_SZ, fp );
+            size_t rdct = fread(mem + usz, (size_t)1, (size_t)CHUNK_SZ, fp);
             usz += rdct;
             if (rdct < CHUNK_SZ)
                 break;
@@ -422,7 +422,7 @@ printNode( xmlNodePtr pNode )
             char* pz = strstr( pzTxt, "*/" );
             if (pz == NULL)
                 break;
-            fwrite( pzTxt, (unsigned)((pz - pzTxt) + 1), 1, outFp );
+            fwrite(pzTxt, (size_t)((pz - pzTxt) + 1), (size_t)1, outFp);
             pzTxt = pz+1;
             fputc( ' ', outFp );
         }

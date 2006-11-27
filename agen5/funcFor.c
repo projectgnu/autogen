@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcFor.c,v 4.16 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: funcFor.c,v 4.17 2006/11/27 01:55:18 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:51:40 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-11-26 17:44:35 bkorb"
+ *  Last Committed:    $Date: 2006/11/27 01:55:18 $
  *
  *  This module implements the FOR text macro.
  */
@@ -50,7 +50,7 @@ doForEach( tTemplate*   pT,
            tDefEntry*   pFoundDef );
 
 static void
-load_ForIn( tCC* pzSrc, u_int srcLen, tTemplate* pT, tMacro* pMac );
+load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac );
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -498,7 +498,7 @@ doForEach( tTemplate*   pT,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn( tCC* pzSrc, u_int srcLen, tTemplate* pT, tMacro* pMac )
+load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
 {
     char* pzName = pT->pzTemplText + pMac->ozName;
     int   ix     = 0;
@@ -764,7 +764,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
     char*   pzCopy = pT->pNext; /* next text dest   */
     tCC*    pzSrc  = (char const*)pMac->ozText; /* macro text */
-    int     srcLen = (int)pMac->res;            /* macro len  */
+    size_t  srcLen = (size_t)pMac->res;         /* macro len  */
     tMacro* pEndMac;
 
     /*
@@ -814,22 +814,25 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     while (isspace( *pzSrc )) pzSrc++;
     srcLen -= pzSrc - (char*)pMac->ozText;
 
-    /*
+    /* * * * *
+     *
      *  No source -> zero offset to text
      */
-    if (srcLen <= 0) {
+    if ((ssize_t)srcLen <= 0) {
         pMac->ozText = 0;
     }
 
-    /*
+    /* * * * *
+     *
      *  FOR foo IN ...  -> no text, but we create an array of text values
      */
     else if (   (strneqvcmp( pzSrc, "in", 2 ) == 0)
              && isspace( pzSrc[2] )) {
-        load_ForIn( pzSrc, (unsigned)srcLen, pT, pMac );
+        load_ForIn( pzSrc, srcLen, pT, pMac );
     }
 
-    /*
+    /* * * * *
+     *
      *  *EITHER* a:  FOR foo "<<separator>>"
      *  *OR*         FOR foo (scheme ...) ...
      */
@@ -843,6 +846,9 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         if ((*pzCopied == '"') || (*pzCopied == '\''))
             spanQuote( pzCopied );
     }
+    /*
+     * * * * */
+
     pT->pNext = pzCopy;
 
     pEndMac = parseTemplate( pMac + 1, ppzScan );

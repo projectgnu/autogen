@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.29 2006/09/28 01:26:16 bkorb Exp $
- *  Time-stamp:      "2006-09-24 15:18:51 bkorb"
+ *  $Id: configfile.c,v 4.30 2006/11/27 01:55:18 bkorb Exp $
+ *  Time-stamp:      "2006-11-26 14:30:56 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -791,7 +791,7 @@ internalFileLoad( tOptions* pOpts )
 {
     int     idx;
     int     inc = DIRECTION_PRESET;
-    char    zFileName[ MAXPATHLEN+1 ];
+    char    zFileName[ AG_PATH_MAX+1 ];
 
     if (pOpts->papzHomeList == NULL)
         return;
@@ -829,7 +829,7 @@ internalFileLoad( tOptions* pOpts )
 
         idx += inc;
 
-        if (! optionMakePath( zFileName, sizeof( zFileName ),
+        if (! optionMakePath( zFileName, (int)sizeof(zFileName),
                               pzPath, pOpts->pzProgPath ))
             continue;
 

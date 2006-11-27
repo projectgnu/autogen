@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.11 2006/09/24 02:57:02 bkorb Exp $
- *  Time-stamp:        "2006-09-23 19:46:54 bkorb"
+ *  $Id: columns.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
+ *  Time-stamp:        "2006-11-26 16:33:52 bkorb"
  */
 
 /*
@@ -114,7 +114,7 @@ main( int    argc,
             } else if (firstSize < indentSize) {
                 char* tmp = malloc( indentSize + 1 );
                 char  z[10];
-                snprintf( z, sizeof(z), "%%-%ds", indentSize );
+                snprintf( z, sizeof(z), "%%-%ds", (int)indentSize );
                 snprintf( tmp, indentSize + 1, z, pzFirstPfx );
                 pzFirstPfx = tmp;
             }
@@ -167,7 +167,7 @@ handleIndent( tCC* pzIndentArg )
         /*
          *  Allocate a string to hold the line prefix
          */
-        pzLinePfx = p = malloc( colCt + 1 );
+        pzLinePfx = p = malloc( (size_t)colCt + 1 );
         if (pzLinePfx == NULL) {
             fprintf( stderr, "Cannot malloc %d bytes\n", colCt + 1 );
             exit( EXIT_FAILURE );
@@ -176,7 +176,7 @@ handleIndent( tCC* pzIndentArg )
         /*
          *  Set it to a NUL terminated string of spaces
          */
-        memset( p, ' ', colCt );
+        memset( p, ' ', (size_t)colCt );
         p[ colCt ] = '\0';
 
     } else {
@@ -238,9 +238,9 @@ readLines( void )
      *  Read the input text, stripping trailing white space
      */
     for (;;) {
-        char*     pzL;
-        char*     pzText = fgets( zLine, sizeof( zLine ), stdin );
-        uint32_t  len;
+        char*   pzL;
+        char*   pzText = fgets(zLine, (int)sizeof( zLine ), stdin);
+        size_t  len;
 
         if (pzText == NULL)
             break;
@@ -383,7 +383,7 @@ writeColumns( void )
     tpPrintList pPL;
 
     colCt = columnCt;
-    snprintf( zFmt, sizeof(zFmt), "%%-%ds", columnSz );
+    snprintf(zFmt, sizeof(zFmt), "%%-%ds", (int)columnSz);
 
     if (colCt == 1) {
         writeRows();
@@ -525,7 +525,7 @@ writeRows( void )
     int  colCt;
 
     colCt = columnCt;
-    snprintf( zFmt, sizeof(zFmt), "%%-%ds", columnSz );
+    snprintf(zFmt, sizeof(zFmt), "%%-%ds", (int)columnSz);
 
     /*
      *  IF we have a separator,
