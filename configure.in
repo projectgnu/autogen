@@ -3,13 +3,13 @@ dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
 dnl Copyright (C) 1997-2006 Bruce Korb
 dnl
-dnl Time-stamp:      "2006-09-22 21:20:18 bkorb"
+dnl Time-stamp:      "2006-12-02 10:43:05 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
 dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.20 2006/09/24 02:10:45 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.21 2006/12/02 18:50:06 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,7 +23,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.20 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.21 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -201,6 +201,8 @@ if test -z "${time_delta}"
 then time_delta=10
 elif test ${time_delta} -lt 5
 then time_delta=5 ; fi
+
+AG_TIMEOUT=${time_delta}
 ]
 AC_DEFINE_UNQUOTED(AG_DEFAULT_TIMEOUT, ${time_delta},
                    [define to suitable timeout limit for shell command])
@@ -211,7 +213,7 @@ AC_SUBST(CLnam)
 AC_SUBST(AGexe)
 AC_SUBST(GDexe)
 AC_SUBST(CLexe)
-
+AC_SUBST(AG_TIMEOUT)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 [
@@ -227,11 +229,12 @@ AC_SUBST(INCLIST)
 [conf_shell=${CONFIG_SHELL-/bin/sh}]
 AC_SUBST(conf_shell)
 
-case "$GCC" in
+case "${GCC}" in
  yes)
-    CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wconversion \
+    CFLAGS=`echo $CFLAGS -Wall -Wcast-align -Wconversion \
                  -Wmissing-prototypes -Wpointer-arith -Wshadow \
                  -Wstrict-prototypes -Wwrite-strings -fno-strict-aliasing`
+    test "X${WERROR}" = Xyes && CFLAGS="${CFLAGS} -Werror"
     ;;
 esac
 

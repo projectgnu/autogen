@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.30 2006/11/27 01:55:18 bkorb Exp $
- *  Time-stamp:      "2006-11-26 14:30:56 bkorb"
+ *  $Id: configfile.c,v 4.31 2006/12/02 18:50:06 bkorb Exp $
+ *  Time-stamp:      "2006-12-02 10:48:57 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -392,8 +392,8 @@ optionGetValue( const tOptionValue* pOld, char const* pzValName )
  *  @code{ENOENT} - the supplied @code{pOldValue} pointed to the last entry.
  *  @end itemize
 =*/
-const tOptionValue*
-optionNextValue( const tOptionValue* pOVList, const tOptionValue* pOldOV )
+tOptionValue const *
+optionNextValue( tOptionValue const * pOVList, tOptionValue const * pOldOV )
 {
     tArgList*     pAL;
     tOptionValue* pRes = NULL;
@@ -434,14 +434,14 @@ optionNextValue( const tOptionValue* pOVList, const tOptionValue* pOldOV )
  */
 static void
 filePreset(
-    tOptions*     pOpts,
-    char const*   pzFileName,
-    int           direction )
+    tOptions *      pOpts,
+    char const *    pzFileName,
+    int             direction )
 {
-    tmap_info_t   cfgfile;
-    char*         pzFileText =
+    tmap_info_t     cfgfile;
+    tOptState       st = OPTSTATE_INITIALIZER(PRESET);
+    unsigned char * pzFileText =
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
-    tOptState     st = OPTSTATE_INITIALIZER(PRESET);
 
     if (TEXT_MMAP_FAILED_ADDR(pzFileText))
         return;
@@ -695,15 +695,15 @@ handleProgramSection(
  */
 static char*
 handleStructure(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction )
+    tOptions *      pOpts,
+    tOptState *     pOS,
+    unsigned char * pzText,
+    int             direction )
 {
     tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
     tOptionValue     valu;
 
-    char* pzName = ++pzText;
+    char* pzName = (char*) ++pzText;
     char* pcNulPoint;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
@@ -1107,8 +1107,8 @@ parseSetMemType(
  */
 static char*
 parseValueType(
-    char*         pzText,
-    tOptionValue* pType )
+    unsigned char * pzText,
+    tOptionValue *  pType )
 {
     {
         size_t len = strlen(zLtypeString);

@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.26 2006/09/28 01:26:16 bkorb Exp $
+ *  $Id: autogen.h,v 4.27 2006/12/02 18:50:06 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-27 11:42:20 bkorb"
- *  Last Committed:    $Date: 2006/09/28 01:26:16 $
+ *  Time-stamp:        "2006-11-26 15:58:27 bkorb"
+ *  Last Committed:    $Date: 2006/12/02 18:50:06 $
  *
  *  Global header file for AutoGen
  */
@@ -378,9 +378,9 @@ MODE int         templLineNo      VALUE( 1 );
 MODE tScanCtx*   pBaseCtx         VALUE( NULL );
 MODE tScanCtx*   pCurCtx          VALUE( NULL );
 MODE tScanCtx*   pDoneCtx         VALUE( NULL );
-MODE u_int       endMacLen        VALUE( 0  );
+MODE size_t      endMacLen        VALUE( 0  );
 MODE char        zEndMac[   8 ]   VALUE( "" );
-MODE u_int       startMacLen      VALUE( 0  );
+MODE size_t      startMacLen      VALUE( 0  );
 MODE char        zStartMac[  8 ]  VALUE( "" );
 MODE int         guileFailure     VALUE( 0 );
 

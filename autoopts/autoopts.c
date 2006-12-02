@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.28 2006/11/27 01:55:18 bkorb Exp $
- *  Time-stamp:      "2006-11-26 14:44:39 bkorb"
+ *  $Id: autoopts.c,v 4.29 2006/12/02 18:50:06 bkorb Exp $
+ *  Time-stamp:      "2006-12-02 09:00:13 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -52,22 +52,6 @@
  * If you do not wish that, delete this exception notice.
  */
 
-#ifndef HAVE_PATHFIND
-#  include "compat/pathfind.c"
-#endif
-
-#ifndef HAVE_SNPRINTF
-#  include "compat/snprintf.c"
-#endif
-
-#ifndef HAVE_STRDUP
-#  include "compat/strdup.c"
-#endif
-
-#ifndef HAVE_STRCHR
-#  include "compat/strchr.c"
-#endif
-
 static char const zNil[] = "";
 
 #define SKIP_RC_FILES(po) \
@@ -98,7 +82,8 @@ ao_malloc( size_t sz )
     }
     return res;
 }
-
+#undef  malloc
+#define malloc(_s) ao_malloc(_s)
 
 LOCAL void *
 ao_realloc( void *p, size_t sz )
@@ -110,6 +95,8 @@ ao_realloc( void *p, size_t sz )
     }
     return res;
 }
+#undef  realloc
+#define realloc(_p,_s) ao_realloc(_p,_s)
 
 
 LOCAL void
@@ -118,6 +105,8 @@ ao_free( void *p )
     if (p != NULL)
         free(p);
 }
+#undef  free
+#define free(_p) ao_free(_p)
 
 
 LOCAL char *
@@ -130,7 +119,24 @@ ao_strdup( char const *str )
     }
     return res;
 }
+#undef  strdup
+#define strdup(_p) ao_strdup(_p)
 
+#ifndef HAVE_PATHFIND
+#  include "compat/pathfind.c"
+#endif
+
+#ifndef HAVE_SNPRINTF
+#  include "compat/snprintf.c"
+#endif
+
+#ifndef HAVE_STRDUP
+#  include "compat/strdup.c"
+#endif
+
+#ifndef HAVE_STRCHR
+#  include "compat/strchr.c"
+#endif
 
 /*
  *  handleOption

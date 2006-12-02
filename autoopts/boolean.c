@@ -1,7 +1,7 @@
 
 /*
- *  $Id: boolean.c,v 4.8 2006/09/24 02:10:45 bkorb Exp $
- * Time-stamp:      "2006-09-22 18:13:34 bkorb"
+ *  $Id: boolean.c,v 4.9 2006/12/02 18:50:06 bkorb Exp $
+ * Time-stamp:      "2006-11-28 17:48:19 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -67,16 +67,17 @@
 void
 optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
 {
-    long  val;
     char* pz;
     ag_bool  res = AG_TRUE;
 
     switch (*(pOD->optArg.argString)) {
     case '0':
-        val = strtol( pOD->optArg.argString, &pz, 0 );
+    {
+        long  val = strtol( pOD->optArg.argString, &pz, 0 );
         if ((val != 0) || (*pz != NUL))
             break;
         /* FALLTHROUGH */
+    }
     case 'N':
     case 'n':
     case 'F':

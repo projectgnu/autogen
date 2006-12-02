@@ -24,6 +24,7 @@ Extraction from autogen.texi
 * AutoOpts::             Automated Option Processing
 * Add-Ons::              Add-on packages for AutoGen
 * Future::               Some ideas for the future.
+* Copying This Manual::  Copying This Manual
 * Concept Index::        General index
 * Function Index::       Function index
 @end menu
@@ -5298,42 +5299,6 @@ to call a product.
 
 @ignore
 END   == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
-
-@ignore
-START == FUTURE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
-
-@page
-@node Future
-@chapter Some ideas for the future.
-@cindex futures
-
-Here are some things that might happen in the distant future.
-
-@itemize @bullet
-@item
-Fix up current tools that contain
-miserably complex perl, shell, sed, awk and m4 scripts
-to instead use this tool.
-@end itemize
-@page
-@node Concept Index
-@unnumbered Concept Index
-
-@printindex cp
-@page
-@node Function Index
-@unnumbered Function Index
-
-@printindex fn
-@page
-@contents
-@bye
-@ignore
-END   == FUTURE == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 

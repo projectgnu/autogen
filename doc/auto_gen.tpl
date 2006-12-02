@@ -5,11 +5,11 @@
 ##  AutoGen Copyright (C) 1992-2006 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2006-09-23 19:41:29 bkorb"
-## Last Committed:    $Date: 2006/09/24 02:57:02 $
+## Time-stamp:        "2006-12-02 06:35:45 bkorb"
+## Last Committed:    $Date: 2006/12/02 18:50:06 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.28 2006/09/24 02:57:02 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.29 2006/12/02 18:50:06 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -60,6 +60,7 @@ texi=autogen.texi
 @setfilename [=(base-name)=].info
 @settitle AutoGen - [= prog-title =]
 @setchapternewpage off
+@syncodeindex pg cp
 @c %**end of header
 @copying
 This manual is for GNU AutoGen version [= `
@@ -69,16 +70,10 @@ This manual is for GNU AutoGen version [= `
 Copyright @copyright{} [= copyright.date =] by Bruce Korb.
 
 @quotation
-Permission is granted to copy, distribute and/or modify this document under
-the terms of the GNU Free Documentation License, Version 1.1 or any later
-version published by the Free Software Foundation; with no Invariant
-Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the
-Back-Cover Texts as in (a) below.  A copy of the license is included in the
-section entitled ``GNU Free Documentation License.''
-
-(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify this
-GNU Manual, like GNU software.  Copies published by the Free Software
-Foundation raise funds for GNU development.''
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 @end quotation
 @end copying
 
@@ -131,6 +126,8 @@ This is the second edition of the GNU AutoGen documentation,
 Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 [=(gpl "AutoGen" "")=]
+
+@insertcopying
 @end titlepage
 
 @ifinfo
@@ -862,7 +859,42 @@ done
 
 INVOKE  get-text tag = Future
 
-=][=
+=]
+@page
+@node Future
+@chapter Some ideas for the future.
+@cindex futures
+
+Here are some things that might happen in the distant future.
+
+@itemize @bullet
+@item
+Fix up current tools that contain
+miserably complex perl, shell, sed, awk and m4 scripts
+to instead use this tool.
+@end itemize
+@node Copying This Manual
+@appendix Copying This Manual
+
+You may copy this manual under the terms of the FDL
+(@url{http://gnu.org/licenses/fdl.texi,the GNU Free Documentation License}).
+
+[=`sed '1,/^@appendixsec/d' fdl.texi`=]
+
+@page
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
+@page
+@node Function Index
+@unnumbered Function Index
+
+@printindex fn
+@page
+@contents
+@bye
+[=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

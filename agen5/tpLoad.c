@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.16 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.17 2006/12/02 18:50:06 bkorb Exp $
  *
- * Time-stamp:        "2006-11-26 16:22:25 bkorb"
- * Last Committed:    $Date: 2006/11/27 01:55:18 $
+ * Time-stamp:        "2006-12-02 10:33:18 bkorb"
+ * Last Committed:    $Date: 2006/12/02 18:50:06 $
  *
  *  This module will load a template and return a template structure.
  */
@@ -53,7 +53,7 @@ findTemplate( tCC* pzTemplName )
     while (pT != NULL) {
         if (streqvcmp( pzTemplName, pT->pzTplName ) == 0)
             break;
-        pT = (tTemplate*)(pT->pNext);
+        pT = (tTemplate*)(void*)(pT->pNext);
     }
     return pT;
 }
@@ -420,7 +420,7 @@ cleanup( tTemplate* pTF )
         tTemplate* pT = pNamedTplList;
         if (pT == NULL)
             break;
-        pNamedTplList = (tTemplate*)pT->pNext;
+        pNamedTplList = (tTemplate*)(void*)(pT->pNext);
         unloadTemplate( pT );
     }
 

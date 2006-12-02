@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 4.3 2006/09/24 02:10:45 bkorb Exp $
+ *  $Id: getdefs.h,v 4.4 2006/12/02 18:50:06 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2005-01-08 18:51:27 bkorb"
+ *  Time-stamp:        "2006-12-02 08:53:15 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -20,7 +20,34 @@
 #include REGEX_HEADER
 
 #include "opts.h"
-#include "autoopts/autoopts.h"
+
+/*
+ *  Procedure success codes
+ *
+ *  USAGE:  define procedures to return "tSuccess".  Test their results
+ *          with the SUCCEEDED, FAILED and HADGLITCH macros.
+ *
+ *  Microsoft sticks its nose into user space here, so for Windows' sake,
+ *  make sure all of these are undefined.
+ */
+#undef  SUCCESS
+#undef  FAILURE
+#undef  PROBLEM
+#undef  SUCCEEDED
+#undef  SUCCESSFUL
+#undef  FAILED
+#undef  HADGLITCH
+
+#define SUCCESS  ((tSuccess) 0)
+#define FAILURE  ((tSuccess)-1)
+#define PROBLEM  ((tSuccess) 1)
+
+typedef int tSuccess;
+
+#define SUCCEEDED( p )     ((p) == SUCCESS)
+#define SUCCESSFUL( p )    SUCCEEDED( p )
+#define FAILED( p )        ((p) <  SUCCESS)
+#define HADGLITCH( p )     ((p) >  SUCCESS)
 
 #define EXPORT
 
