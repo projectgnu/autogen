@@ -9,7 +9,7 @@
 # Created:           Fri Oct 1 10:27:30 PDT 1999
 #            by: bkorb
 #
-# $Id: error.test,v 4.13 2006/11/27 01:55:18 bkorb Exp $
+# $Id: error.test,v 4.14 2006/12/10 16:45:12 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -115,7 +115,7 @@ ${AGexe} -T${testname}2.tpl ${agopts}3 \
   && failure Unexpected success for AutoGen
 
 sed -e 's,on signal .* in state,on signal <text-varies> in state,' \
-    -e '/trapped on [1-9]/d' -e '/^Abort\$/d' -e '/Broken pipe/d' \
+    -e '/trapped on [1-9]/d' -e '/^Abort/d' -e '/Broken pipe/d' \
   ${testname}.tmp3 >> ${testname}.trc3
 cmp -s ${testname}.trc3 ${testname}.base3 || \
   failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"

@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.31 2006/12/02 18:50:06 bkorb Exp $
- *  Time-stamp:      "2006-12-02 10:48:57 bkorb"
+ *  $Id: configfile.c,v 4.32 2006/12/10 16:45:12 bkorb Exp $
+ *  Time-stamp:      "2006-12-02 15:13:41 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -393,7 +393,7 @@ optionGetValue( const tOptionValue* pOld, char const* pzValName )
  *  @end itemize
 =*/
 tOptionValue const *
-optionNextValue( tOptionValue const * pOVList, tOptionValue const * pOldOV )
+optionNextValue(tOptionValue const * pOVList,tOptionValue const * pOldOV )
 {
     tArgList*     pAL;
     tOptionValue* pRes = NULL;
@@ -434,13 +434,13 @@ optionNextValue( tOptionValue const * pOVList, tOptionValue const * pOldOV )
  */
 static void
 filePreset(
-    tOptions *      pOpts,
-    char const *    pzFileName,
-    int             direction )
+    tOptions*     pOpts,
+    char const*   pzFileName,
+    int           direction )
 {
-    tmap_info_t     cfgfile;
-    tOptState       st = OPTSTATE_INITIALIZER(PRESET);
-    unsigned char * pzFileText =
+    tmap_info_t   cfgfile;
+    tOptState     st = OPTSTATE_INITIALIZER(PRESET);
+    char*         pzFileText =
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
 
     if (TEXT_MMAP_FAILED_ADDR(pzFileText))
@@ -695,15 +695,15 @@ handleProgramSection(
  */
 static char*
 handleStructure(
-    tOptions *      pOpts,
-    tOptState *     pOS,
-    unsigned char * pzText,
-    int             direction )
+    tOptions*     pOpts,
+    tOptState*    pOS,
+    char*         pzText,
+    int           direction )
 {
     tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
     tOptionValue     valu;
 
-    char* pzName = (char*) ++pzText;
+    char* pzName = ++pzText;
     char* pcNulPoint;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
@@ -1107,8 +1107,8 @@ parseSetMemType(
  */
 static char*
 parseValueType(
-    unsigned char * pzText,
-    tOptionValue *  pType )
+    char*         pzText,
+    tOptionValue* pType )
 {
     {
         size_t len = strlen(zLtypeString);
