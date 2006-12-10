@@ -1,12 +1,12 @@
 #! /bin/sh
 ## mkpkg.sh --      create a native package
 ## Copyright (c):   2003-2006 by Bruce Korb
-## Time-stamp:      "2005-01-23 15:31:50 bkorb"
+## Time-stamp:      "2006-12-10 12:14:12 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mkpkg.sh,v 4.4 2006/09/24 02:10:45 bkorb Exp $
+## $Id: mkpkg.sh,v 4.5 2006/12/10 20:15:10 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -20,8 +20,12 @@ if [ -f ${srcdir}/mkpkg.${pkgtype} ]
 then
   . ${srcdir}/mkpkg.${pkgtype} || exit 1
 else
-  echo "No mkpkg script for ${pkgtype}" >&2
-  exit 1
+  pkgtype=`uname -s | tr 'A-Z' 'a-z'`
+  test -f ${srcdir}/mkpkg.${pkgtype} || {
+    echo "No mkpkg script for ${pkgtype}" >&2
+    exit 1
+  }
+  . ${srcdir}/mkpkg.${pkgtype} || exit 1
 fi
 
 ## Local Variables:
