@@ -1,10 +1,10 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: agCgi.c,v 4.16 2006/12/10 19:47:31 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:01:08 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2006-12-10 11:47:22 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:47:31 $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -119,7 +119,7 @@ loadCgi( void )
         do  {
             pNM->pzValue = getenv( pNM->pzName );
             if (pNM->pzValue == NULL)
-                pNM->pzValue = zNil;
+                pNM->pzValue = (char*)zNil;
         } while (pNM++, ++ix < NAME_CT);
     }
 
