@@ -37,6 +37,10 @@
 
 #include <stddef.h>
 
+#if HAVE_RUNETYPE_H
+# include <runetype.h>
+#endif
+
 #ifdef HAVE_WCHAR_H
 #  include <wchar.h>
 #endif

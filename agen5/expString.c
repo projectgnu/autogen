@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.15 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: expString.c,v 4.16 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:47:53 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2006-12-10 11:05:08 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -543,7 +543,7 @@ ag_scm_join( SCM sep, SCM list )
 
     sv_l_len = l_len = scm_ilength( list );
     if (l_len == 0)
-        return AG_SCM_STR02SCM( "" );
+        return AG_SCM_STR02SCM(zNil);
 
     pzSep   = AG_SCM_CHARS( sep );
     sep_len = AG_SCM_STRLEN( sep );

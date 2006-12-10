@@ -42,6 +42,7 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   # On OS/X, "wchar.h" needs "runetype.h" to work properly.
   # ----------------------------------------------------------------------
   AC_CHECK_HEADERS([runetype.h wchar.h], [], [],[
+    AC_INCLUDES_DEFAULT
     #if HAVE_RUNETYPE_H
     # include <runetype.h>
     #endif
@@ -76,8 +77,20 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   # ----------------------------------------------------------------------
   # Checks for typedefs
   # ----------------------------------------------------------------------
-  AC_CHECK_TYPE(wchar_t, unsigned int)
-  AC_CHECK_TYPE(wint_t,  unsigned int)
+  AC_CHECK_TYPE(wchar_t, [], [
+    AC_DEFINE_UNQUOTED([wchar_t], [unsigned int],
+        [Define to `unsigned int' if not found])])
+  AC_CHECK_TYPE(wint_t, [], [
+    AC_DEFINE_UNQUOTED([wint_t], [unsigned int],
+        [Define to `unsigned int' if not found])], [
+    AC_INCLUDES_DEFAULT
+    #if HAVE_RUNETYPE_H
+    # include <runetype.h>
+    #endif
+    #if HAVE_WCHAR_H
+    # include <wchar.h>
+    #endif
+    ])
   AC_CHECK_TYPE(long double)
   AC_CHECK_TYPE(intmax_t)
   AC_TYPE_SIZE_T

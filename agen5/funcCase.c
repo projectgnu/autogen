@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.14 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: funcCase.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 16:20:26 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2006-12-10 11:11:54 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module implements the CASE text function.
  */
@@ -841,13 +841,13 @@ Select_Match_Always( tCC* pzText, tCC* pzMatch )
 static tSuccess
 Select_Match_Existence( tCC* pzText, tCC* pzMatch )
 {
-    return (pzText != zDefaultNil) ? SUCCESS : FAILURE;
+    return (pzText != zNil) ? SUCCESS : FAILURE;
 }
 
 static tSuccess
 Select_Match_NonExistence( tCC* pzText, tCC* pzMatch )
 {
-    return (pzText == zDefaultNil) ? SUCCESS : FAILURE;
+    return (pzText == zNil) ? SUCCESS : FAILURE;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

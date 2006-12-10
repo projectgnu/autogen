@@ -369,12 +369,19 @@ dp_do_empty_val(
     te_dp_event trans_evt )
 {
 /*  START == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
+    static char * nil_pz = NULL;
+
     /*
      *  Our state is either "have-name" or "indx-name" and we found a ';',
      *  end of statement.  It is a string value with an empty string.
      */
     tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    pDE->val.pzText = (char*)zNil;
+    if (nil_pz == NULL) {
+        nil_pz = AGALOC( 1, "NUL byte" );
+        *nil_pz = NUL;
+    }
+
+    pDE->val.pzText = nil_pz;
     pDE->valType    = VALTYP_TEXT;
     return maybe_next;
 /*  END   == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */

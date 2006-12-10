@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.9 2006/09/24 02:10:44 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.10 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:      "2005-12-04 19:42:46 bkorb"
+ *  Time-stamp:      "2006-12-10 11:02:12 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -295,7 +295,7 @@ spawnPipe( tCC* pzFile )
                     continue;
 
                 case -1:
-                    AG_ABEND( aprf(zCannot, errno, "fork", "", strerror(errno)));
+                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, strerror(errno)));
 
                 case 0:
                 }
@@ -383,7 +383,7 @@ spawnPipe( tCC* pzFile )
                     continue;
 
                 case -1:
-                    AG_ABEND( aprf(zCannot, errno, "fork", "", strerror(errno)));
+                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, strerror(errno)));
 
                 case 0:
                 }
@@ -522,7 +522,7 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         if (new_conns > 0) {
             switch (fork()) {
             default: continue;
-            case -1: AG_ABEND(aprf(zCannot, errno, "fork", "", strerror(errno)));
+            case -1: AG_ABEND(aprf(zCannot, errno, "fork", zNil,strerror(errno)));
             case 0:  break;
             }
             break;

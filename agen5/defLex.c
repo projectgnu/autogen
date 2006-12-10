@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.19 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: defLex.c,v 4.20 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:30:42 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2006-12-10 11:03:53 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -281,23 +281,19 @@ NUL_error:
     return DP_EV_INVALID;
 
 lex_done:
-    {
-        tSCC zDone[] = "";
+    /*
+     *  First time through, return the DP_EV_END token.
+     *  Second time through, we really finish.
+     */
+    if (pCurCtx->pzScan == zNil) {
+        pCurCtx->pCtx = pDoneCtx;
+        pDoneCtx      = pCurCtx;
 
-        /*
-         *  First time through, return the DP_EV_END token.
-         *  Second time through, we really finish.
-         */
-        if (pCurCtx->pzScan == zDone) {
-            pCurCtx->pCtx = pDoneCtx;
-            pDoneCtx      = pCurCtx;
-
-            return DP_EV_INVALID;
-        }
-
-        pCurCtx->pzScan = (char*)zDone;
-        return DP_EV_END;
+        return DP_EV_INVALID;
     }
+
+    pCurCtx->pzScan = (char*)zNil;
+    return DP_EV_END;
 }
 
 

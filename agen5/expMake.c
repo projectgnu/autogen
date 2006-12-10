@@ -1,10 +1,10 @@
 
 /*
  *  expMake.c
- *  $Id: expMake.c,v 4.8 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: expMake.c,v 4.9 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:53:11 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-12-10 11:04:31 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module implements Makefile construction functions.
  */
@@ -120,7 +120,7 @@ ag_scm_makefile_script( SCM text )
     }
 
     if (*pzText == NUL)
-        return AG_SCM_STR02SCM( "" );
+        return AG_SCM_STR02SCM(zNil);
 
     {
         char*  pz  = strchr( pzText, '\n' );

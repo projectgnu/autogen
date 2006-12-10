@@ -1,3 +1,9 @@
+2006-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*: remove zDefaultNil because optimizers can save a byte and
+	use the same memory as zNil.  So, the empty string is now gotten from
+	allocated memory and zDefaultNil has been replaced with zNil everywhere.
+
 2006-12-03  Matt Kraai <kraai@debian.org>
 
 	* Remove an extra backslash in error.test.

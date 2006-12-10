@@ -114,6 +114,10 @@ extern "C" {
 #  include "must-have-stdarg-or-varargs"
 #endif
 
+#if HAVE_RUNETYPE_H
+# include <runetype.h>
+#endif
+
 #ifdef HAVE_WCHAR_H
 # include <wchar.h>
 #endif

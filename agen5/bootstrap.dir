@@ -7,10 +7,10 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Time-stamp:        "2006-09-23 19:27:18 bkorb"
-# Last Modified:     $Date: 2006/09/24 02:57:01 $
+# Last Modified:     $Date: 2006/12/10 19:45:00 $
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.16 2006/09/24 02:57:01 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.17 2006/12/10 19:45:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -59,6 +59,8 @@ case "${1}" in
   export top_srcdir top_builddir srcdir AGexe GDexe CLexe
   ;;
 esac
+
+top_srcdir=`cd ${top_srcdir} >/dev/null ; pwd`
 
 #  Make sure we have a default for top build and source.
 #  Some of the templates need this information.

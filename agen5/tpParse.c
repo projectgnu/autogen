@@ -2,10 +2,10 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.12 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: tpParse.c,v 4.13 2006/12/10 19:45:00 bkorb Exp $
  *
- * Time-stamp:        "2006-09-23 19:49:23 bkorb"
- * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ * Time-stamp:        "2006-12-10 11:05:56 bkorb"
+ * Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module will load a template and return a template structure.
  */
@@ -355,7 +355,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                     if (ft >= FUNC_CT)
                         ft = FTYP_SELECT;
                     pz = (pM->ozText == 0)
-                        ? ""
+                        ? zNil
                         : (pTpl->pzTemplText + pM->ozText);
                     fprintf( pfTrace, zTDef, apzFuncNames[ ft ], pM->funcCode,
                              ln, pM->endIndex, strlen( pz ));

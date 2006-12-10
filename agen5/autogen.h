@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.27 2006/12/02 18:50:06 bkorb Exp $
+ *  $Id: autogen.h,v 4.28 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:58:27 bkorb"
- *  Last Committed:    $Date: 2006/12/02 18:50:06 $
+ *  Time-stamp:        "2006-12-10 11:11:17 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  Global header file for AutoGen
  */
@@ -415,19 +415,7 @@ MKSTRING( NotStr,     "ERROR: %s is not a string\n" );
 MKSTRING( DevNull,    "/dev/null" );
 MKSTRING( ShellEnv,   "SHELL" );
 MKSTRING( Format,     "format" );
-
-/*
- *  It may seem odd that there are two 'nil' strings.  It is used by
- *  evalExpression() to distinguish between an actual value of a zero-
- *  length string, and a defaulted value because there was no value
- *  available.  (In fact, that routine will always select 'zDefaultNil'
- *  except when "runShell()" returns NULL.  A NULL result means an empty
- *  string that is valid (zNil) as opposed to an empty string due to
- *  an unknown value (zDefaultNil).  This distinction is utilized in
- *  the Select_Match_Existence() and Select_Match_NonExistence() functions.
- */
 MKSTRING( Nil,        "" );
-MKSTRING( DefaultNil, "" );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

@@ -1,10 +1,10 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.17 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: expState.c,v 4.18 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:40:45 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2006-12-10 11:04:48 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
@@ -491,7 +491,7 @@ ag_scm_get( SCM agName, SCM altVal )
     if ((pE == NULL) || (pE->valType != VALTYP_TEXT)) {
         if (AG_SCM_STRING_P( altVal ))
             return altVal;
-        return AG_SCM_STR02SCM( "" );
+        return AG_SCM_STR02SCM(zNil);
     }
 
     return AG_SCM_STR02SCM( pE->val.pzText );

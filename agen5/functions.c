@@ -1,9 +1,9 @@
 
 /*
- *  $Id: functions.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: functions.c,v 4.13 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:51:14 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2006-12-10 11:05:35 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module implements text functions.
  */
@@ -364,7 +364,7 @@ mLoad_Bogus( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         pzSrc = z;
     }
     else
-        pzSrc = "";
+        pzSrc = zNil;
 
     {
         int ix = pMac->funcCode;

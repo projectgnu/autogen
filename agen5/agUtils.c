@@ -1,10 +1,10 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.14 2006/09/24 02:57:01 bkorb Exp $
+ *  $Id: agUtils.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-09-23 19:56:07 bkorb"
- *  Last Committed:    $Date: 2006/09/24 02:57:01 $
+ *  Time-stamp:        "2006-12-10 11:02:27 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This is the main routine for autogen.
  */
@@ -255,7 +255,7 @@ getDefine( tCC* pzDefName, ag_bool check_env )
                 *pzEq = '=';
 
             if (res == 0)
-                return (pzEq != NULL) ? pzEq+1 : "";
+                return (pzEq != NULL) ? pzEq+1 : zNil;
         }
     }
     return check_env ? getenv( pzDefName ) : NULL;

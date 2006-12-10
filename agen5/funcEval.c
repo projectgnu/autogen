@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcEval.c,v 4.14 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: funcEval.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:56:18 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2006-12-10 11:13:02 bkorb"
+ *  Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  *  This module evaluates macro expressions.
  */
@@ -156,7 +156,7 @@ evalExpression( ag_bool* pMustFree )
                 /*
                  *  Emit only if found
                  */
-                return (char*)zDefaultNil;
+                return (char*)zNil;
 
             case (EMIT_IF_ABSENT | EMIT_ALWAYS):
                 /*
@@ -174,13 +174,13 @@ evalExpression( ag_bool* pMustFree )
             tSCC zBlock[] = "attempted to use block macro in eval expression";
 
             if ((code & EMIT_IF_ABSENT) != 0)
-                return (char*)zDefaultNil;
+                return (char*)zNil;
 
             if (  (pDef->valType != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
                 fprintf( pfTrace, zTplWarn, pT->pzTplFile, pMac->lineNo,
                          zBlock );
-                return (char*)zDefaultNil;
+                return (char*)zNil;
             }
 
             /*
@@ -201,7 +201,7 @@ evalExpression( ag_bool* pMustFree )
                 if (pDef->valType != VALTYP_TEXT) {
                     fprintf( pfTrace, zTplWarn, pT->pzTplFile, pMac->lineNo,
                              zBlock );
-                    return (char*)zDefaultNil;
+                    return (char*)zNil;
                 }
 
                 *pMustFree = AG_TRUE;
@@ -218,7 +218,7 @@ evalExpression( ag_bool* pMustFree )
                 if (pDef->valType != VALTYP_TEXT) {
                     fprintf( pfTrace, zTplWarn, pT->pzTplFile, pMac->lineNo,
                              zBlock );
-                    return (char*)zDefaultNil;
+                    return (char*)zNil;
                 }
 
                 pzText = pDef->val.pzText;

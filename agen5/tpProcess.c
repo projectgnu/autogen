@@ -1,12 +1,12 @@
 
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.13 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.14 2006/12/10 19:45:00 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2006-11-26 16:13:22 bkorb"
- * Last Committed:    $Date: 2006/11/27 01:55:18 $
+ * Time-stamp:        "2006-12-10 11:06:16 bkorb"
+ * Last Committed:    $Date: 2006/12/10 19:45:00 $
  *
  */
 
@@ -111,7 +111,7 @@ doStdoutTemplate( tTemplate* pTF )
     case PROBLEM:
         if (*pzOopsPrefix != NUL) {
             fprintf( stdout, "%soutput was abandoned\n", pzOopsPrefix );
-            pzOopsPrefix = "";
+            pzOopsPrefix = zNil;
         }
         fclose( stdout );
         return;
@@ -119,7 +119,7 @@ doStdoutTemplate( tTemplate* pTF )
     default:
         if (*pzOopsPrefix != NUL) {
             fprintf( stdout, zBadR, pzOopsPrefix, jmpcode );
-            pzOopsPrefix = "";
+            pzOopsPrefix = zNil;
         } else {
             fprintf( pfTrace, zBadR+2, jmpcode );
         }
@@ -222,7 +222,7 @@ processTemplate( tTemplate* pTF )
             if ((jumpCd != PROBLEM) && (jumpCd != FAILURE)) {
                 fprintf( pfTrace, "%sBogus return from setjmp:  %d\n",
                          pzOopsPrefix, jumpCd );
-                pzOopsPrefix = "";
+                pzOopsPrefix = zNil;
             }
 
             /*
