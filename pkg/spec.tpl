@@ -1,13 +1,11 @@
 [= AutoGen5 Template spec =]
-[= Time-stamp:        "2006-09-23 19:34:16 bkorb" \=]
+[= Time-stamp:        "2006-12-10 12:51:00 bkorb" \=]
 Summary:    AutoGen - [=prog-title=]
 Name:       [= prog-name =]
 Version:    [= version =]
 Vendor:     [= copyright.owner =] http://www.gnu.org/software/autogen
 Release:    [=`echo $AG_MAJOR_VERSION`=]
-Copyright:  Copyright (c) [= copyright.date =] by [= copyright.owner
-                =].  All rights reserved.  Licensed under GPL, [=#
-                =]version 2 or later.
+License:    GPL
 Group:      Development/Tools
 Source:     ftp://ftp.gnu.org/gnu/autogen/rel[= version =]/autogen-[= version
                 =].tar.gz
@@ -26,7 +24,9 @@ libopts LGPL  This is a tear-off, redistributable option processing library
 autofsm BSD   This is a template for producing finite state machine programs
 
 The Copyright itself is privately held by Bruce Korb.
-
+Copyright (c) [= copyright.date =] by [= copyright.owner
+                =].  All rights reserved.  Licensed under GPL, [=#
+                =]version 2 or later.
 %prep
 %setup -q
 chmod -R +rw *
