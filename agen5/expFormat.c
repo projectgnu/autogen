@@ -1,10 +1,10 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2006-11-26 15:34:28 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2006-12-15 14:12:13 bkorb"
+ *  Last Committed:    $Date: 2006/12/15 23:29:01 $
  *
- *  $Id: expFormat.c,v 4.16 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: expFormat.c,v 4.17 2006/12/15 23:29:01 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 

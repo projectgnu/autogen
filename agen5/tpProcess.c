@@ -1,12 +1,11 @@
-
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.14 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.15 2006/12/15 23:29:01 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2006-12-10 11:06:16 bkorb"
- * Last Committed:    $Date: 2006/12/10 19:45:00 $
+ * Time-stamp:        "2006-12-15 14:14:15 bkorb"
+ * Last Committed:    $Date: 2006/12/15 23:29:01 $
  *
  */
 
@@ -97,14 +96,13 @@ static void
 doStdoutTemplate( tTemplate* pTF )
 {
     tSCC zNoSfx[] = "* NONE *";
-    tSCC zBadR[]  = "%sBogus return from setjmp:  %d\n";
-    int  jmpcode  = setjmp( fileAbort );
+    tSCC zBadR[]  = "%sBogus return from setjmp\n";
     SCM  res;
     tCC* pzRes;
 
     pzLastScheme = NULL; /* We cannot be in Scheme processing */
 
-    switch (jmpcode) {
+    switch (setjmp (fileAbort)) {
     case SUCCESS:
         break;
 
@@ -118,10 +116,10 @@ doStdoutTemplate( tTemplate* pTF )
 
     default:
         if (*pzOopsPrefix != NUL) {
-            fprintf( stdout, zBadR, pzOopsPrefix, jmpcode );
+            fprintf( stdout, zBadR, pzOopsPrefix );
             pzOopsPrefix = zNil;
         } else {
-            fprintf( pfTrace, zBadR+2, jmpcode );
+            fprintf( pfTrace, zBadR+2 );
         }
 
     case FAILURE:
@@ -185,7 +183,6 @@ processTemplate( tTemplate* pTF )
 
     for (;;) {
         tOutSpec*  pOS    = pOutSpecList;
-        int        jumpCd = setjmp( fileAbort );
 
         /*
          * We cannot be in Scheme processing.  We've either just started
@@ -198,7 +195,8 @@ processTemplate( tTemplate* pTF )
         /*
          *  HOW was that we got here?
          */
-        if (jumpCd == SUCCESS) {
+        switch (setjmp( fileAbort )) {
+        case SUCCESS:
             /*
              *  Set the output file name buffer.
              *  It may get switched inside openOutFile.
@@ -216,15 +214,23 @@ processTemplate( tTemplate* pTF )
             do  {
                 closeOutput( AG_FALSE );  /* keep output */
             } while (pCurFp->pPrev != NULL);
-        }
+            break;
 
-        else {
-            if ((jumpCd != PROBLEM) && (jumpCd != FAILURE)) {
-                fprintf( pfTrace, "%sBogus return from setjmp:  %d\n",
-                         pzOopsPrefix, jumpCd );
-                pzOopsPrefix = zNil;
-            }
+        case PROBLEM:
+            /*
+             *  We got here by a long jump.  Close/purge the open files.
+             */
+            do  {
+                closeOutput( AG_TRUE );  /* discard output */
+            } while (pCurFp->pPrev != NULL);
+            break;
 
+        default:
+            fprintf( pfTrace, "%sBogus return from setjmp\n", pzOopsPrefix );
+            pzOopsPrefix = zNil;
+            /* FALLTHROUGH */
+
+        case FAILURE:
             /*
              *  We got here by a long jump.  Close/purge the open files.
              */
@@ -235,10 +241,8 @@ processTemplate( tTemplate* pTF )
             /*
              *  On failure (or unknown jump type), we quit the program, too.
              */
-            if (jumpCd != PROBLEM) {
-                procState = PROC_STATE_ABORTING;
-                exit( EXIT_FAILURE );
-            }
+            procState = PROC_STATE_ABORTING;
+            exit( EXIT_FAILURE );
         }
 
         /*

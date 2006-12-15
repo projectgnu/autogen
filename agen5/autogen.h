@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.28 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: autogen.h,v 4.29 2006/12/15 23:29:01 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:11:17 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2006-12-15 14:12:01 bkorb"
+ *  Last Committed:    $Date: 2006/12/15 23:29:01 $
  *
  *  Global header file for AutoGen
  */

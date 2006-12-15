@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.23 2006/12/15 03:05:53 bkorb Exp $
+ *  $Id: autogen.c,v 4.24 2006/12/15 23:29:01 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-14 18:17:30 bkorb"
- *  Last Committed:    $Date: 2006/12/15 03:05:53 $
+ *  Time-stamp:        "2006-12-15 14:12:23 bkorb"
+ *  Last Committed:    $Date: 2006/12/15 23:29:01 $
  *
  *  This is the main routine for autogen.
  */

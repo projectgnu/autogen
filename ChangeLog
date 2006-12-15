@@ -1,3 +1,9 @@
+2006-12-15  Eric Blake  <ebb9@byu.net>
+
+	* config/misc.def (setjmp, sigsetjmp): Follow POSIX rules for
+	[sig]setjmp.
+	* agen5/tpProcess.c (doStdoutTemplate, processTemplate): Likewise.
+
 2006-12-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (main): when sigsetjmp returns, you cannot capture

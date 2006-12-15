@@ -4,14 +4,14 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Time-stamp:        "2006-12-12 09:01:36 bkorb"
- *  Last Modified:     $Date: 2006/12/15 03:05:53 $
+ *  Last Modified:     $Date: 2006/12/15 23:29:01 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.20 2006/12/15 03:05:53 bkorb Exp $
+ *  $Id: misc.def,v 4.21 2006/12/15 23:29:01 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.20 $";
+version = "$Revision: 4.21 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -72,7 +72,9 @@ test   = {
   code     = <<- _EOCode_
 	#include <setjmp.h>
 	jmp_buf bf;
-	return setjmp(&bf);
+	if (setjmp(bf))
+	  return 0;
+	return 0;
 	_EOCode_;
   action = {
     act-type = script;
@@ -87,7 +89,9 @@ test   = {
   code     = <<- _EOCode_
 	#include <setjmp.h>
 	sigjmp_buf bf;
-	return sigsetjmp(bf,0);
+	if (sigsetjmp(bf,0))
+	  return 0;
+	return 0;
 	_EOCode_;
   action = {
     act-type = script;
