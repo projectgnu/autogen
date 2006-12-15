@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expPrint.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: expPrint.c,v 4.16 2006/12/15 03:05:53 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:38:58 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2006-12-14 18:21:28 bkorb"
+ *  Last Committed:    $Date: 2006/12/15 03:05:53 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -33,6 +33,8 @@
  */
 
 static sigjmp_buf printJumpEnv;
+static int        printJumpSignal = 0;
+
 static void   printFault( int sig );
 static ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
 
@@ -48,6 +50,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV );
 static void
 printFault( int sig )
 {
+    printJumpSignal = sig;
     siglongjmp( printJumpEnv, sig );
 }
 
@@ -77,16 +80,15 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
         sigaction( SIGSEGV, &sa, &saSave2 );
     }
 
-    /*
-     *  IF the sprintfv call below is going to address fault,
-     *  THEN ...
-     */
     {
         tSCC zBadArgs[] = "Bad args to sprintf";
         tSCC zBadFmt[]  = "%s ERROR:  %s processing printf format:\n\t%s\n";
-        int  faultType  = sigsetjmp( printJumpEnv, 0 );
 
-        if (faultType != 0) {
+        /*
+         *  IF the sprintfv call below is going to address fault,
+         *  THEN ...
+         */
+        if (sigsetjmp( printJumpEnv, 0 ) != 0) {
 #ifndef HAVE_STRSIGNAL
             extern char* strsignal(int signo);
 #endif
@@ -95,7 +97,8 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
              *  THEN perform that fprintf
              */
             if (sigsetjmp( printJumpEnv, 0 ) == 0)
-                fprintf(pfTrace, zBadFmt, pzProg, strsignal(faultType), pzFmt);
+                fprintf(pfTrace, zBadFmt, pzProg,
+                        strsignal(printJumpSignal), pzFmt);
 
             /*
              *  The "sprintfv" command below faulted, so we exit
@@ -106,8 +109,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 #endif /* ! defined(DEBUG_ENABLED) */
 
     {
-        size_t printSize = asprintfv( ppzBuf, pzFmt,
-                                      (snv_constpointer*)argV );
+        size_t printSize = asprintfv( ppzBuf, pzFmt, (snv_constpointer*)argV );
         if ((printSize & ~0xFFFFFU) != 0) /* 1MB max */
             AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 

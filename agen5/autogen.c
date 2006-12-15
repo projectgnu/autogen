@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.22 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: autogen.c,v 4.23 2006/12/15 03:05:53 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:05:02 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2006-12-14 18:17:30 bkorb"
+ *  Last Committed:    $Date: 2006/12/15 03:05:53 $
  *
  *  This is the main routine for autogen.
  */
@@ -36,6 +36,8 @@ tSCC* apzStateName[] = { STATE_TABLE };
 #undef _State_
 
 static sigjmp_buf  abendJumpEnv;
+static int         abendJumpSignal = 0;
+
 typedef void (sighandler_proc_t)( int sig );
 static sighandler_proc_t ignoreSignal, abendSignal;
 
@@ -96,11 +98,14 @@ main( int    argc,
       char** argv )
 {
     pfTrace = stderr;
-    {
-        int signo = sigsetjmp( abendJumpEnv, 0 );
-        if (signo != 0)
-            signalExit( signo );
-    }
+
+    /*
+     *  IF sigsetjmp returns with a signal number,
+     *  THEN you cannot capture the value portably.  So, the jumper has
+     *  stashed it for use now.
+     */
+    if (sigsetjmp( abendJumpEnv, 0 ) != 0)
+        signalExit( abendJumpSignal );
 
     signalSetup( ignoreSignal, abendSignal );
 
@@ -182,6 +187,7 @@ signalExit( int sig )
 static void
 abendSignal( int sig )
 {
+    abendJumpSignal = sig;
     siglongjmp( abendJumpEnv, sig );
 }
 

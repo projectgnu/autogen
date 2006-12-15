@@ -3,15 +3,15 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2006-09-23 19:32:10 bkorb"
- *  Last Modified:     $Date: 2006/09/24 02:57:02 $
+/*  Time-stamp:        "2006-12-12 09:01:36 bkorb"
+ *  Last Modified:     $Date: 2006/12/15 03:05:53 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.19 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: misc.def,v 4.20 2006/12/15 03:05:53 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.19 $";
+version = "$Revision: 4.20 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -87,7 +87,7 @@ test   = {
   code     = <<- _EOCode_
 	#include <setjmp.h>
 	sigjmp_buf bf;
-	return sigsetjmp(&bf,0);
+	return sigsetjmp(bf,0);
 	_EOCode_;
   action = {
     act-type = script;

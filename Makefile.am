@@ -1,14 +1,15 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2005-10-28 16:14:22 bkorb"
+## Time-stamp:      "2006-12-12 08:52:06 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.4 2005/10/28 23:14:33 bkorb Exp $
+## $Id: Makefile.am,v 4.5 2006/12/15 03:05:53 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
+ACLOCAL_AMFLAGS = -I config
 
 if DO_SHELL_CMDS
 if  HAVE_XML_LIB
