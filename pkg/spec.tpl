@@ -1,5 +1,5 @@
 [= AutoGen5 Template spec =]
-[= Time-stamp:        "2006-12-10 12:51:00 bkorb" \=]
+[= Time-stamp:        "2006-12-17 11:34:16 bkorb" \=]
 Summary:    AutoGen - [=prog-title=]
 Name:       [= prog-name =]
 Version:    [= version =]
@@ -58,7 +58,7 @@ if test \( -f autogen-filelist \
 then : ; else
   ( cd ${RPM_BUILD_ROOT}
     rm -f usr/share/info/dir
-    find . -type f | grep -v 'usr/share/doc'
+    find . -type f -o -type l | grep -v 'usr/share/doc'
   ) | sed -e 's@^\./@/@' \
           -e'/usr\/share\/info/s,$,.gz,' \
           -e'/usr\/share\/man/s,$,.gz,' \
