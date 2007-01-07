@@ -1,8 +1,8 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.10 2006/09/24 02:57:02 bkorb Exp $
- *  Time-stamp:        "2006-09-23 19:46:40 bkorb"
+ *   $Id: opts.def,v 4.11 2007/01/07 22:30:32 bkorb Exp $
+ *  Time-stamp:        "2007-01-02 14:54:56 bkorb"
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -33,7 +33,7 @@ copyright = {
 prog-name      = "columns";
 prog-title     = "Columnize Input Text";
 package        = 'GNU AutoGen';
-long_opts;
+long-opts;
 
 export = <<- EOExport
 	#include "config.h"

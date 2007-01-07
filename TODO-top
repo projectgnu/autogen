@@ -1,5 +1,8 @@
 #  -*- Mode: Outline -*-
-#  $Date: 2005/04/17 19:51:00 $
+#  $Date: 2007/01/07 22:30:32 $
+
+* the option templates need to check that no "value" entries
+  conflict.
 
 * Pending
 

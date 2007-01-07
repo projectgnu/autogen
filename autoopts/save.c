@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.22 2006/11/27 01:55:18 bkorb Exp $
- * Time-stamp:      "2006-10-05 21:09:18 bkorb"
+ *  save.c  $Id: save.c,v 4.23 2007/01/07 22:30:32 bkorb Exp $
+ * Time-stamp:      "2007-01-03 18:41:28 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -270,16 +270,25 @@ findFileName( tOptions* pOpts, int* p_free_name )
 
 static void
 printEntry(
-    FILE*      fp,
-    tOptDesc*  p,
+    FILE *     fp,
+    tOptDesc * p,
     tCC*       pzLA )
 {
     /*
-     *  There is an argument.  Pad the name so values line up
+     *  There is an argument.  Pad the name so values line up.
+     *  Not disabled *OR* this got equivalenced to another opt,
+     *  then use current option name.
+     *  Otherwise, there must be a disablement name.
      */
-    fprintf( fp, "%-18s",
-             (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name );
+    {
+        char const * pz;
+        if (! DISABLED_OPT(p) || (p->optEquivIndex != NO_EQUIVALENT))
+            pz = p->pz_Name;
+        else
+            pz = p->pz_DisableName;
 
+        fprintf(fp, "%-18s", pz);
+    }
     /*
      *  IF the option is numeric only,
      *  THEN the char pointer is really the number

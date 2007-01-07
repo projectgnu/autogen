@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-05 20:39:26 bkorb"
-# ID:  $Id: options_h.tpl,v 4.30 2006/11/27 01:55:18 bkorb Exp $
+# Time-stamp:      "2007-01-03 18:14:05 bkorb"
+# ID:  $Id: options_h.tpl,v 4.31 2007/01/07 22:30:32 bkorb Exp $
 
 =][=
 
@@ -220,14 +220,14 @@ typedef union {
  *  Only the fields marked "PUBLIC" are for public use.
  */
 struct optDesc {
-    tAoUS           optIndex;         /* PUBLIC */
-    tAoUS           optValue;         /* PUBLIC */
+    tAoUS const     optIndex;         /* PUBLIC */
+    tAoUS const     optValue;         /* PUBLIC */
     tAoUS           optActualIndex;   /* PUBLIC */
     tAoUS           optActualValue;   /* PUBLIC */
 
-    tAoUS           optEquivIndex;    /* PUBLIC */
-    tAoUS           optMinCt;
-    tAoUS           optMaxCt;
+    tAoUS const     optEquivIndex;    /* PUBLIC */
+    tAoUS const     optMinCt;
+    tAoUS const     optMaxCt;
     tAoUS           optOccCt;         /* PUBLIC */
 
     tAoUI           fOptState;        /* PUBLIC */

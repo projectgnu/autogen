@@ -1,11 +1,11 @@
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.15 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.16 2007/01/07 22:30:32 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2006-12-15 14:14:15 bkorb"
- * Last Committed:    $Date: 2006/12/15 23:29:01 $
+ * Time-stamp:        "2007-01-02 11:42:56 bkorb"
+ * Last Committed:    $Date: 2007/01/07 22:30:32 $
  *
  */
 
@@ -223,6 +223,7 @@ processTemplate( tTemplate* pTF )
             do  {
                 closeOutput( AG_TRUE );  /* discard output */
             } while (pCurFp->pPrev != NULL);
+            pzLastScheme = NULL; /* "problem" implies requested exit. */
             break;
 
         default:

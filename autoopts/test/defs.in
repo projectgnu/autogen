@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2006-11-26 17:03:50 bkorb"
+# Time-stamp:     "2007-01-02 11:34:39 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2006/11/27 01:55:18 $
+# Last Modified:  $Date: 2007/01/07 22:30:32 $
 #
-# $Id: defs.in,v 4.14 2006/11/27 01:55:18 bkorb Exp $
+# $Id: defs.in,v 4.15 2007/01/07 22:30:32 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -26,14 +26,17 @@ export progname testname
 #
 srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
-CC="@CC@"
-test -z "${CC}" && echo "No CC configured" && exit 1
 GUILE_VERSION="@GUILE_VERSION@"
 LIBGUILE_PATH="@LIBGUILE_PATH@"
 AG_VERSION="@AG_VERSION@"
 test -z "${CFLAGS}"     && CFLAGS="@DEFS@ @CFLAGS@"
 test -z "${CPPFLAGS}"   && CPPFLAGS="@CPPFLAGS@"
 test -z "${testsubdir}" && testsubdir=@testsubdir@
+test -z "${CC}"         && {
+  CC="@CC@"
+  test -z "${CC}" && echo "No CC configured" && exit 1
+}
+SHELL="@SHELL@"
 
 AGexe="@AGexe@"
 d=`dirname  ${AGexe}`

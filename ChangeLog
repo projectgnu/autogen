@@ -1,3 +1,18 @@
+2007-01-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c (processTemplate): NULL out the last scheme command
+	on "problem" exit, as the command has finished successfully.
+	* autoopts/options.tpl (must-set): disallow both "min" and "must-set"
+	for one option.  A non-zero "min" implies that it must be set, though
+	the converse is not true.
+	* autoopts/options_h.tpl (optDesc): mark as "const" the constant fields.
+	* autoopts/save.c (printEntry): an option can be marked as "disabled" if
+	it was selected by an equivalenced option.  Select option name carefully.
+
+2006-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.8.8
+
 2006-12-15  Eric Blake  <ebb9@byu.net>
 
 	* config/misc.def (setjmp, sigsetjmp): Follow POSIX rules for
