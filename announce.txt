@@ -1,10 +1,10 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.15 2006/09/24 02:57:01 bkorb Exp $
+# $Id: announce.txt,v 4.16 2007/01/09 22:26:38 bkorb Exp $
 #
 # Time-stamp:        "2006-09-23 19:48:21 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:01 $
+# Last Committed:    $Date: 2007/01/09 22:26:38 $
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -61,7 +61,8 @@ cat >&3 <<- _EOF_
 	Reply-To: autogen-users@lists.sourceforge.net
 	${cc_line}
 	GNU AutoGen/AutoOpts is a two-part project that serves two separate
-	purposes and are inextricably intertwined:
+	purposes.  The two parts are combined because they are inextricably
+	intertwined:
 
 	AutoGen is a tool designed to simplify the creation and maintenance of
 	programs that contain large amounts of repetitious text.  It is
