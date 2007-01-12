@@ -1,3 +1,8 @@
+2007-01-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/nested.c (scanNameEntry): break out of scan loop at end of
+	string, too.  :)
+
 2007-01-07  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpProcess.c (processTemplate): NULL out the last scheme command

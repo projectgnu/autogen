@@ -3353,6 +3353,25 @@ if (opt & OPTN_NAME_FIRST)
 
 AutoOpts produces a special purpose procedure for this option.
 
+@item hier[@i{archy}]
+@itemx nest[@i{ed}]
+This denotes an option with a structure-valued argument, a.k.a.
+``subopts'' in @code{getopts} terminology.  The argument is parsed
+and the values made available to the program via the find and
+find next calls (@xref{libopts-optionFindValue},
+@xref{libopts-optionGetValue}, and
+@pxref{libopts-optionFindNextValue}).
+
+@example
+tOptionValue * val = optionGetValue(VALUE_OPT_OPTN_NAME, "name");
+while (val != NULL) @{
+  process(val);
+  val = optionNextValue(VALUE_OPT_OPTN_NAME, val);
+  if (wrong_name(val, "name"))
+    break;
+@}
+@end example
+
 @end table
 
 @cindex keyword

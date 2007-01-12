@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.15 2006/11/27 01:55:18 bkorb Exp $
- *  Time-stamp:      "2006-09-24 15:27:32 bkorb"
+ *  $Id: nested.c,v 4.16 2007/01/12 01:01:20 bkorb Exp $
+ *  Time-stamp:      "2007-01-11 16:58:10 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -359,6 +359,11 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
             case '\n':
                 if ((pzScan > pzVal + 2) && (pzScan[-2] == '\\'))
                     continue;
+                pzScan++;
+                /* FALLTHROUGH */
+
+            case NUL:
+                pzScan--;
                 /* FALLTHROUGH */
 
             case ',':
