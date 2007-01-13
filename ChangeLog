@@ -1,3 +1,7 @@
+2007-01-12  Brian Utterback  <brian.utterback@sun.com>
+
+	* config/libopts.def (dev_zero): use "ls -lL" to test /dev/zero
+
 2007-01-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/nested.c (scanNameEntry): break out of scan loop at end of
