@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.16 2007/01/12 01:01:20 bkorb Exp $
- *  Time-stamp:      "2007-01-11 16:58:10 bkorb"
+ *  $Id: nested.c,v 4.17 2007/01/13 06:38:35 bkorb Exp $
+ *  Time-stamp:      "2007-01-12 22:35:46 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -292,21 +292,20 @@ addNestedValue( void** pp, char const* pzName, size_t nameLen,
  *  (if called for) and create the name/value association.
  */
 static char const*
-scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
+scanNameEntry(char const* pzName, tOptionValue* pRes, tOptionLoadMode mode)
 {
     tOptionValue* pNV;
-    char const* pzScan = pzName+1;
-    char const* pzVal;
-    size_t nameLen = 1;
-    size_t dataLen = 0;
+    char const * pzScan = pzName+1;
+    char const * pzVal;
+    size_t       nameLen = 1;
+    size_t       dataLen = 0;
 
     while (ISNAMECHAR( (int)*pzScan ))  { pzScan++; nameLen++; }
 
     while (isspace( (int)*pzScan )) {
         char ch = *(pzScan++);
         if ((ch == '\n') || (ch == ',')) {
-            addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL,
-                            (size_t)0);
+            addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL,(size_t)0);
             return pzScan - 1;
         }
     }
@@ -319,9 +318,7 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         case ',':  goto comma_char;
         case '"':
         case '\'': goto quote_char;
-        case NUL:  addStringValue( &(pRes->v.nestVal), pzName, nameLen, NULL,
-                                   (size_t)0);
-                   goto leave_scan_name;
+        case NUL:  goto nul_byte;
         default:   goto default_char;
         }
 
@@ -331,6 +328,7 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         /* FALLTHROUGH */
 
     case NUL:
+    nul_byte:
         addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         break;
 
@@ -340,8 +338,8 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         pzVal = pzScan;
         pzScan = scanQuotedString( pzScan );
         dataLen = pzScan - pzVal;
-        pNV = addStringValue( &(pRes->v.nestVal), pzName, nameLen,
-                              pzVal, dataLen );
+        pNV = addStringValue( &(pRes->v.nestVal), pzName, nameLen, pzVal,
+                              dataLen );
         if ((pNV != NULL) && (mode == OPTION_LOAD_COOKED))
             ao_string_cook( pNV->v.strVal, NULL );
         break;
@@ -356,18 +354,20 @@ scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
         for (;;) {
             char ch = *(pzScan++);
             switch (ch) {
+            case NUL:
+                pzScan--;
+                dataLen = pzScan - pzVal;
+                goto string_done;
+                /* FALLTHROUGH */
+
             case '\n':
                 if ((pzScan > pzVal + 2) && (pzScan[-2] == '\\'))
                     continue;
-                pzScan++;
-                /* FALLTHROUGH */
-
-            case NUL:
-                pzScan--;
                 /* FALLTHROUGH */
 
             case ',':
                 dataLen = (pzScan - pzVal) - 1;
+            string_done:
                 pNV = addStringValue( &(pRes->v.nestVal), pzName, nameLen,
                                       pzVal, dataLen );
                 if (pNV != NULL)
