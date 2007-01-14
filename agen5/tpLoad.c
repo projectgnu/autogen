@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.17 2006/12/02 18:50:06 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.18 2007/01/14 20:43:31 bkorb Exp $
  *
  * Time-stamp:        "2006-12-02 10:33:18 bkorb"
- * Last Committed:    $Date: 2006/12/02 18:50:06 $
+ * Last Committed:    $Date: 2007/01/14 20:43:31 $
  *
  *  This module will load a template and return a template structure.
  */
@@ -415,7 +415,10 @@ unloadTemplate( tTemplate* pT )
 LOCAL void
 cleanup( tTemplate* pTF )
 {
-#if ! defined(DEBUG_ENABLED)
+#if defined(DEBUG_ENABLED)
+    optionFree(&autogenOptions);
+#endif
+
     for (;;) {
         tTemplate* pT = pNamedTplList;
         if (pT == NULL)
@@ -430,7 +433,6 @@ cleanup( tTemplate* pTF )
     ag_scmStrings_deinit();
 
     manageAllocatedData( NULL );
-#endif
 }
 
 /*

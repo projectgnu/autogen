@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.29 2006/12/02 18:50:06 bkorb Exp $
- *  Time-stamp:      "2006-12-02 09:00:13 bkorb"
+ *  $Id: autoopts.c,v 4.30 2007/01/14 20:43:31 bkorb Exp $
+ *  Time-stamp:      "2007-01-13 10:08:12 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -153,6 +153,8 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      */
     tOptDesc* pOD = pOptState->pOD;
     tOptProc* pOP = pOD->pOptProc;
+    if (pOD->fOptState & OPTST_ALLOC_ARG)
+        AGFREE(pOD->optArg.argString);
 
     pOD->optArg.argString = pOptState->pzOptArg;
 

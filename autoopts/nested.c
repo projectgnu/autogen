@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.17 2007/01/13 06:38:35 bkorb Exp $
- *  Time-stamp:      "2007-01-12 22:35:46 bkorb"
+ *  $Id: nested.c,v 4.18 2007/01/14 20:43:31 bkorb Exp $
+ *  Time-stamp:      "2007-01-13 13:43:12 bkorb"
  *
  *   Automated Options Nested Values module.
  */
@@ -73,7 +73,7 @@ addNestedValue( void** pp, char const* pzName, size_t nameLen,
                 char* pzValue, size_t dataLen, tOptionLoadMode mode );
 
 static char const*
-scanNameEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode );
+scanNameEntry(char const* pzName, tOptionValue* pRes, tOptionLoadMode mode);
 
 static char const*
 scanXmlEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode );
@@ -514,6 +514,13 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes, tOptionLoadMode mode )
 }
 
 
+/*  unloadNestedArglist
+ *
+ *  Deallocate a list of option arguments.  This must have been gotten from
+ *  a hierarchical option argument, not a stacked list of strings.  It is
+ *  an internal call, so it is not validated.  The caller is responsible for
+ *  knowing what they are doing.
+ */
 static void
 unloadNestedArglist( tArgList* pAL )
 {
@@ -524,7 +531,7 @@ unloadNestedArglist( tArgList* pAL )
         tOptionValue* pNV = (tOptionValue*)(void*)*(ppNV++);
         if (pNV->valType == OPARG_TYPE_HIERARCHY)
             unloadNestedArglist( pNV->v.nestVal );
-        free( pNV );
+        AGFREE( pNV );
     }
 
     free( (void*)pAL );
@@ -534,7 +541,7 @@ unloadNestedArglist( tArgList* pAL )
 /*=export_func  optionUnloadNested
  *
  * what:  Deallocate the memory for a nested value
- * arg:   + const tOptionValue* + pOptVal + the hierarchical value +
+ * arg:   + tOptionValue const * + pOptVal + the hierarchical value +
  *
  * doc:
  *  A nested value needs to be deallocated.  The pointer passed in should
@@ -542,7 +549,7 @@ unloadNestedArglist( tArgList* pAL )
  *  @pxref{libopts-configFileLoad}).
 =*/
 void
-optionUnloadNested( const tOptionValue* pOV )
+optionUnloadNested( tOptionValue const * pOV )
 {
     if (pOV == NULL) return;
     if (pOV->valType != OPARG_TYPE_HIERARCHY) {

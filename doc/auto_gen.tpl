@@ -5,11 +5,11 @@
 ##  AutoGen Copyright (C) 1992-2006 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2006-12-02 06:35:45 bkorb"
-## Last Committed:    $Date: 2006/12/02 18:50:06 $
+## Time-stamp:        "2007-01-13 15:36:52 bkorb"
+## Last Committed:    $Date: 2007/01/14 20:43:31 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.29 2006/12/02 18:50:06 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.30 2007/01/14 20:43:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -956,7 +956,7 @@ Usage:  ([= (. func-str) =][=
 @*
 [= string (string-append func-name ":  ") =][=
    (shell (string-append
-          "(set -x;sed \"s/^\\`'//\" <<\\_EODoc_\n"
+          "(sed \"s/^\\`'//\" <<\\_EODoc_\n"
           (if (exist? "doc") (get "doc") "This function is not documented.")
           "\n_EODoc_\n)" ))=]
 [=

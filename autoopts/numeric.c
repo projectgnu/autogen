@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.10 2006/10/05 03:39:53 bkorb Exp $
- *  Time-stamp:      "2006-10-04 16:12:34 bkorb"
+ *  $Id: numeric.c,v 4.11 2007/01/14 20:43:31 bkorb Exp $
+ *  Time-stamp:      "2007-01-13 10:28:20 bkorb"
  */
 
 /*
@@ -75,6 +75,11 @@ optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
     if (*pz != NUL) {
         fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->optArg.argString );
         (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
+    }
+
+    if (pOD->fOptState & OPTST_ALLOC_ARG) {
+        AGFREE(pOD->optArg.argString);
+        pOD->fOptState &= ~OPTST_ALLOC_ARG;
     }
 
     pOD->optArg.argInt = val;

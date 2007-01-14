@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.20 2006/11/27 01:55:18 bkorb Exp $
- * Time-stamp:      "2006-11-26 14:45:40 bkorb"
+ *  $Id: makeshell.c,v 4.21 2007/01/14 20:43:31 bkorb Exp $
+ * Time-stamp:      "2007-01-13 10:27:38 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -545,6 +545,10 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
             exit( EXIT_FAILURE );
 
         case TT_VERSION:
+            if (pOD->fOptState & OPTST_ALLOC_ARG) {
+                AGFREE(pOD->optArg.argString);
+                pOD->fOptState &= ~OPTST_ALLOC_ARG;
+            }
             pOD->optArg.argString = "c";
             optionPrintVersion( pOpts, pOD );
             /* NOTREACHED */

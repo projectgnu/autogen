@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.18 2006/11/27 01:55:18 bkorb Exp $
- * Time-stamp:      "2006-11-26 14:44:08 bkorb"
+ *  $Id: putshell.c,v 4.19 2007/01/14 20:43:31 bkorb Exp $
+ * Time-stamp:      "2007-01-13 10:29:39 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -203,7 +203,10 @@ optionPutShell( tOptions* pOpts )
                 printf( "=%1$lu # 0x%1$lX\n", (unsigned long)val );
                 val <<= 1;
             }
-            free( (void*)(pOD->optArg.argString) );
+
+            AGFREE(pOD->optArg.argString);
+            pOD->optArg.argString = NULL;
+            pOD->fOptState &= ~OPTST_ALLOC_ARG;
             continue;
         }
 

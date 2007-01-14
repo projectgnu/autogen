@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2006-12-02 08:45:02 bkorb"
+ *  Time-stamp:      "2007-01-13 10:55:48 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.31 2006/12/02 18:50:06 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.32 2007/01/14 20:43:31 bkorb Exp $
  *  Time-stamp:      "2005-02-14 05:59:50 bkorb"
  *
  *  This file defines all the global structures and special values
@@ -196,8 +196,8 @@ typedef struct {
 } arg_types_t;
 
 #define AGALOC( c, w )        ao_malloc((size_t)c)
-#define AGREALOC( p, c, w )   ao_realloc(p, (size_t)c)
-#define AGFREE( p )           ao_free(p)
+#define AGREALOC( p, c, w )   ao_realloc((void*)p, (size_t)c)
+#define AGFREE( p )           ao_free((void*)p)
 #define AGDUPSTR( p, s, w )   (p = ao_strdup(s))
 
 static void *

@@ -14,6 +14,7 @@ bit[ 2] = { b-name = defined;       b-what = 'Set via a command line option'; };
 
 bit[ 4] = { b-name = equivalence;   b-what = 'selected by equiv\'ed option'; };
 bit[ 5] = { b-name = disabled;      b-what = 'option is in disabled state'; };
+bit[ 6] = { b-name = alloc-arg;     b-what = 'pzOptArg was allocated'; };
 
 bit[ 8] = { b-name = no-init;       b-what = 'option cannot be preset'; };
 bit[ 9] = { b-name = number-opt;    b-what = 'opt value (flag) is any digit'; };
@@ -43,7 +44,7 @@ mask = {
 
 mask = {
   m-name  = mutable;
-  b-name  = set, preset, defined, equivalence, disabled;
+  b-name  = set, preset, defined, equivalence, disabled, alloc-arg;
 };
 
 mask = {

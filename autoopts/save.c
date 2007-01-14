@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.23 2007/01/07 22:30:32 bkorb Exp $
- * Time-stamp:      "2007-01-03 18:41:28 bkorb"
+ *  save.c  $Id: save.c,v 4.24 2007/01/14 20:43:31 bkorb Exp $
+ * Time-stamp:      "2007-01-13 10:32:27 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -63,8 +63,8 @@ findFileName( tOptions* pOpts, int* p_free_name );
 
 static void
 printEntry(
-    FILE*      fp,
-    tOptDesc*  p,
+    FILE *     fp,
+    tOptDesc * p,
     tCC*       pzLA );
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -478,12 +478,16 @@ optionSaveFile( tOptions* pOpts )
              */
             (*(p->pOptProc))( (tOptions*)2UL, p );
             printEntry( fp, p, (void*)(p->optArg.argString));
+
             if (  (p->optArg.argString != NULL)
-               && (arg_state != OPARG_TYPE_ENUMERATION))
+               && (arg_state != OPARG_TYPE_ENUMERATION)) {
                 /*
-                 *  bit flag and enumeration strings get allocated
+                 *  set membership strings get allocated
                  */
                 AGFREE( (void*)p->optArg.argString );
+                p->fOptState &= ~OPTST_ALLOC_ARG;
+            }
+
             p->optArg.argEnum = val;
             break;
         }

@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.32 2006/12/10 16:45:12 bkorb Exp $
- *  Time-stamp:      "2006-12-02 15:13:41 bkorb"
+ *  $Id: configfile.c,v 4.33 2007/01/14 20:43:31 bkorb Exp $
+ *  Time-stamp:      "2007-01-13 12:49:10 bkorb"
  *
  *  configuration/rc/ini file handling.
  */
@@ -704,6 +704,7 @@ handleStructure(
     tOptionValue     valu;
 
     char* pzName = ++pzText;
+    char* pzData;
     char* pcNulPoint;
 
     while (ISNAMECHAR( *pzText ))  pzText++;
@@ -718,6 +719,7 @@ handleStructure(
             break;
         if (*pzText != '/')
             return NULL;
+        /* FALLTHROUGH */
 
     case '/':
         if (pzText[1] != '>')
@@ -738,10 +740,11 @@ handleStructure(
     }
 
     /*
-     *  If we are here, we have a value.  Separate the name from the
-     *  value for a moment.
+     *  If we are here, we have a value.  "pzText" points to a closing angle
+     *  bracket.  Separate the name from the value for a moment.
      */
     *pcNulPoint = NUL;
+    pzData = ++pzText;
 
     /*
      *  Find the end of the option text and NUL terminate it
@@ -755,7 +758,7 @@ handleStructure(
         sprintf( pz, "</%s>", pzName );
         *pzText = ' ';
         pzText = strstr( pzText, pz );
-        if (pz != z) free(pz);
+        if (pz != z) AGFREE(pz);
 
         if (pzText == NULL)
             return pzText;
@@ -767,8 +770,9 @@ handleStructure(
 
     /*
      *  Rejoin the name and value for parsing by "loadOptionLine()".
+     *  Erase any attributes parsed by "parseAttributes()".
      */
-    *(pcNulPoint++) = ' ';
+    memset(pcNulPoint, ' ', pzData - pcNulPoint);
 
     /*
      *  "pzName" points to what looks like text for one option/configurable.
@@ -921,7 +925,8 @@ optionFileLoad( tOptions* pOpts, char const* pzProgram )
  * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
  *
  * doc:
- *  Processes the options found in the file named with pOptDesc->optArg.argString.
+ *  Processes the options found in the file named with
+ *  pOptDesc->optArg.argString.
 =*/
 void
 optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )

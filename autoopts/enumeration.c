@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.17 2006/11/27 01:55:18 bkorb Exp $
- * Time-stamp:      "2006-11-26 14:32:33 bkorb"
+ *  $Id: enumeration.c,v 4.18 2007/01/14 20:43:31 bkorb Exp $
+ * Time-stamp:      "2007-01-13 10:22:35 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -266,6 +266,8 @@ optionEnumerationVal(
     tCC * const * paz_names,
     unsigned int  name_ct )
 {
+    uintptr_t res = 0UL;
+
     /*
      *  IF the program option descriptor pointer is invalid,
      *  then it is some sort of special request.
@@ -276,7 +278,7 @@ optionEnumerationVal(
          *  print the list of enumeration names.
          */
         enumError( pOpts, pOD, paz_names, (int)name_ct );
-        return 0UL;
+        break;
 
     case 1UL:
     {
@@ -288,8 +290,10 @@ optionEnumerationVal(
             printf( "INVALID-%d", ix );
         else
             fputs( paz_names[ ix ], stdout );
-        return 0UL;
+
+        break;
     }
+
     case 2UL:
     {
         tSCC zInval[] = "*INVALID*";
@@ -300,13 +304,21 @@ optionEnumerationVal(
         if (ix >= name_ct)
             return (uintptr_t)zInval;
 
-        return (uintptr_t)paz_names[ ix ];
-    }
-    default:
+        res = (uintptr_t)paz_names[ ix ];
         break;
     }
 
-    return findName( pOD->optArg.argString, pOpts, pOD, paz_names, name_ct );
+    default:
+        res = findName( pOD->optArg.argString, pOpts, pOD, paz_names, name_ct );
+
+        if (pOD->fOptState & OPTST_ALLOC_ARG) {
+            AGFREE(pOD->optArg.argString);
+            pOD->fOptState &= ~OPTST_ALLOC_ARG;
+            pOD->optArg.argString = NULL;
+        }
+    }
+
+    return res;
 }
 
 
@@ -383,7 +395,8 @@ optionSetMembers(
             bits >>= 1;
         }
 
-        pOD->optArg.argString = pz = malloc( len );
+        pOD->optArg.argString = pz = AGALOC( len, "enum name" );
+
         /*
          *  Start by clearing all the bits.  We want to turn off any defaults
          *  because we will be restoring to current state, not adding to
