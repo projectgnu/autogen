@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.18 2007/01/14 20:43:31 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.19 2007/01/16 18:53:15 bkorb Exp $
  *
  * Time-stamp:        "2006-12-02 10:33:18 bkorb"
- * Last Committed:    $Date: 2007/01/14 20:43:31 $
+ * Last Committed:    $Date: 2007/01/16 18:53:15 $
  *
  *  This module will load a template and return a template structure.
  */
@@ -415,9 +415,8 @@ unloadTemplate( tTemplate* pT )
 LOCAL void
 cleanup( tTemplate* pTF )
 {
-#if defined(DEBUG_ENABLED)
-    optionFree(&autogenOptions);
-#endif
+    if (HAVE_OPT(FREE_OPTIONS))
+        optionFree(&autogenOptions);
 
     for (;;) {
         tTemplate* pT = pNamedTplList;

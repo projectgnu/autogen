@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.20 2006/10/21 16:19:46 bkorb Exp $
- *  Time-stamp:        "2006-10-21 08:47:40 bkorb"
- *  Last Committed:    $Date: 2006/10/21 16:19:46 $
+ *   $Id: opts.def,v 4.21 2007/01/16 18:53:15 bkorb Exp $
+ *  Time-stamp:        "2007-01-16 08:03:22 bkorb"
+ *  Last Committed:    $Date: 2007/01/16 18:53:15 $
  *
  *  AutoGen copyright 1992-2006 Bruce Korb
  *
@@ -581,6 +581,12 @@ flag = {
 #endif
 };
 
+flag = {
+    name        = free-options;
+    descrip     = "Free options data at program termination";
+    doc = 'This is just for memory debugging purposes.';
+};
+
 /*
  *  These are for debugging AutoGen itself:
  */
@@ -643,7 +649,7 @@ flag = {
     doc = "Pass-through AutoGen argument";
 #endif
 };
-#endif
+#endif // DAEMON_ENABLED
 
 #ifndef XML2AG
 flag = {

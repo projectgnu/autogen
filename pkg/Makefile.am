@@ -7,7 +7,7 @@
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2006/06/03 20:37:44 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2007/01/16 18:53:15 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -30,7 +30,8 @@ all : $(DISTCLEANFILES)
 
 autogen.lsm : $(top_srcdir)/VERSION lsm.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-	$(AGexe) -T $(srcdir)/lsm.tpl $(top_srcdir)/agen5/opts.def
+	$(AGexe) -L$(top_srcdir)/autoopts -T $(srcdir)/lsm.tpl \
+	    $(top_srcdir)/agen5/opts.def
 
 autogen.spec : $(top_srcdir)/VERSION spec.tpl
 	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
