@@ -7,7 +7,7 @@
 # Time-stamp:        "2006-09-27 11:15:55 bkorb"
 #            by: bkorb
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.27 2006/09/28 01:26:16 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.28 2007/01/18 05:27:46 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -174,21 +174,6 @@ config_versions()
 
 check_tools()
 {
-    byacc=`locate_exe byacc`
-    if [ -z "$byacc" ]
-    then
-        byacc=`locate_exe yacc`
-        if [ -z "$byacc" ]
-        then
-            byacc=`locate_exe bison`
-            if [ -z "$byacc" ]
-            then
-                echo cannot bootstrap -- no yacc parser
-                exit 1
-            fi
-        fi
-    fi
-    export byacc
     test -z "${AGexe}" -o -z "$GDexe" -o -z "$CLexe" && exit 1
 
     ( $CLexe --version  && \

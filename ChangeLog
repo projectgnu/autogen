@@ -1,3 +1,15 @@
+2007-01-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.h (tOptionLoadMode): moved from option_h.tpl
+	(option_load_mode): new global
+	* autoopts/configfile.c (configFileLoad): propagate the string scan
+	mode via a global since it disappears going through an indirect call.
+	(handleStructure): use that global.
+	* autoopts/load.c (loadOptionLine): use the global
+	* autoopts/nested.c: use the global
+	* autoopts/options_h.tpl (tOptionLoadMode): do not externalize
+	* config/bootstrap.local (check_tools): do not bother looking for byacc
+
 2007-01-13  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/nested.c (scanNameEntry): break out of scan loop at end of

@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2007-01-03 18:14:05 bkorb"
-# ID:  $Id: options_h.tpl,v 4.31 2007/01/07 22:30:32 bkorb Exp $
+# Time-stamp:      "2007-01-17 16:29:40 bkorb"
+# ID:  $Id: options_h.tpl,v 4.32 2007/01/18 05:27:46 bkorb Exp $
 
 =][=
 
@@ -337,33 +337,6 @@ typedef struct {
 } tmap_info_t;
 
 #define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) ==  (void*)MAP_FAILED)
-
-/*
- *  When loading a line (or block) of text as an option, the value can
- *  be processed in any of several modes:
- *
- *  @table @samp
- *  @item keep
- *  Every part of the value between the delimiters is saved.
- *
- *  @item uncooked
- *  Even if the value begins with quote characters, do not do quote processing.
- *
- *  @item cooked
- *  If the value looks like a quoted string, then process it.
- *  Double quoted strings are processed the way strings are in "C" programs,
- *  except they are treated as regular characters if the following character
- *  is not a well-established escape sequence.
- *  Single quoted strings (quoted with apostrophies) are handled the way
- *  strings are handled in shell scripts, *except* that backslash escapes
- *  are honored before backslash escapes and apostrophies.
- *  @end table
- */
-typedef enum {
-    OPTION_LOAD_COOKED,
-    OPTION_LOAD_UNCOOKED,
-    OPTION_LOAD_KEEP
-} tOptionLoadMode;
 
 #ifdef  __cplusplus
 extern "C" {

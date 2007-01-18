@@ -1,5 +1,5 @@
 /*
- *  $Id: configfile.c,v 4.33 2007/01/14 20:43:31 bkorb Exp $
+ *  $Id: configfile.c,v 4.34 2007/01/18 05:27:46 bkorb Exp $
  *  Time-stamp:      "2007-01-13 12:49:10 bkorb"
  *
  *  configuration/rc/ini file handling.
@@ -145,13 +145,16 @@ configFileLoad( char const* pzFile )
 {
     tmap_info_t   cfgfile;
     tOptionValue* pRes = NULL;
+    tOptionLoadMode save_mode = option_load_mode;
+
     char* pzText =
         text_mmap( pzFile, PROT_READ, MAP_PRIVATE, &cfgfile );
 
     if (TEXT_MMAP_FAILED_ADDR(pzText))
         return NULL; /* errno is set */
 
-    pRes = optionLoadNested(pzText, pzFile, strlen(pzFile), OPTION_LOAD_COOKED);
+    option_load_mode = OPTION_LOAD_COOKED;
+    pRes = optionLoadNested(pzText, pzFile, strlen(pzFile));
 
     if (pRes == NULL) {
         int err = errno;
@@ -159,6 +162,8 @@ configFileLoad( char const* pzFile )
         errno = err;
     } else
         text_munmap( &cfgfile );
+
+    option_load_mode = save_mode;
     return pRes;
 }
 
@@ -700,7 +705,7 @@ handleStructure(
     char*         pzText,
     int           direction )
 {
-    tOptionLoadMode mode = OPTION_LOAD_UNCOOKED;
+    tOptionLoadMode mode = option_load_mode;
     tOptionValue     valu;
 
     char* pzName = ++pzText;
@@ -726,7 +731,7 @@ handleStructure(
             return NULL;
         *pzText = NUL;
         pzText += 2;
-        loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_KEEP );
+        loadOptionLine( pOpts, pOS, pzName, direction, mode );
         return pzText;
 
     case '>':

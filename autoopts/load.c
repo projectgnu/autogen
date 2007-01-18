@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.28 2007/01/14 20:43:31 bkorb Exp $
- *  Time-stamp:      "2007-01-13 09:51:28 bkorb"
+ *  $Id: load.c,v 4.29 2007/01/18 05:27:46 bkorb Exp $
+ *  Time-stamp:      "2007-01-17 16:46:42 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -50,6 +50,8 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  */
+
+tOptionLoadMode option_load_mode = OPTION_LOAD_UNCOOKED;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -338,7 +340,7 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode )
         return pzTxt + strlen(pzTxt);
 
     /*
-     *  If we are keeping all whitespace, then the value starts with the
+     *  If we are keeping all whitespace, then the  modevalue starts with the
      *  character that follows the end of the configurable name, regardless
      *  of which character caused it.
      */
@@ -356,9 +358,8 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode )
     *(pzEnd++) = NUL;
     while (isspace((int)*pzEnd))  pzEnd++;
     if (space_break && ((*pzEnd == ':') || (*pzEnd == '=')))
-        pzEnd++;
+        while (isspace((int)*++pzEnd))  ;
 
-    mungeString( pzEnd, mode );
     return pzEnd;
 }
 
@@ -476,7 +477,12 @@ loadOptionLine(
         }
     }
 
-    handleOption( pOpts, pOS );
+    {
+        tOptionLoadMode sv = option_load_mode;
+        option_load_mode = load_mode;
+        handleOption( pOpts, pOS );
+        option_load_mode = sv;
+    }
 }
 
 

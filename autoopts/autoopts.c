@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.30 2007/01/14 20:43:31 bkorb Exp $
- *  Time-stamp:      "2007-01-13 10:08:12 bkorb"
+ *  $Id: autoopts.c,v 4.31 2007/01/18 05:27:46 bkorb Exp $
+ *  Time-stamp:      "2007-01-17 16:39:29 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -929,9 +929,9 @@ checkConsistency( tOptions* pOpts )
 
             errCt++;
             if (pOD->optMinCt > 1)
-                fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
+                 fprintf( stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt );
             else fprintf( stderr, zNeedOne, pOD->pz_Name );
-           } while (0);
+        } while (0);
 
         if (--oCt <= 0)
             break;
