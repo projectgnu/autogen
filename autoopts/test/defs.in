@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2007-01-02 11:34:39 bkorb"
+# Time-stamp:     "2007-01-27 05:58:16 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 # Maintainer:     Bruce Korb <bkorb@gnu.org>
 # Created:        Fri Mar 27 21:15:30 1998
-# Last Modified:  $Date: 2007/01/07 22:30:32 $
+# Last Modified:  $Date: 2007/02/07 01:57:58 $
 #
-# $Id: defs.in,v 4.15 2007/01/07 22:30:32 bkorb Exp $
+# $Id: defs.in,v 4.16 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -29,6 +29,10 @@ top_srcdir=`cd "@top_srcdir@" && pwd`
 GUILE_VERSION="@GUILE_VERSION@"
 LIBGUILE_PATH="@LIBGUILE_PATH@"
 AG_VERSION="@AG_VERSION@"
+GREP="@GREP@"
+EGREP="@EGREP@"
+FGREP="@FGREP@"
+
 test -z "${CFLAGS}"     && CFLAGS="@DEFS@ @CFLAGS@"
 test -z "${CPPFLAGS}"   && CPPFLAGS="@CPPFLAGS@"
 test -z "${testsubdir}" && testsubdir=@testsubdir@

@@ -1,30 +1,24 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-06-03 12:48:16 bkorb"
-## Copyright (c):   2003-2006 by Bruce Korb
+## Time-stamp:      "2007-02-04 11:07:12 bkorb"
+## Copyright (c):   2003-2007 by Bruce Korb
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Sun Jul 28 20:37 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2007/01/16 18:53:15 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2007/02/07 01:57:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 DISTCLEANFILES = autogen.lsm
-PKG_FILES      = mkpkg.linux mkpkg.sh mkpkg.sun
+DEBIAN_FILES   = mkpkg.debian debian
+PKG_FILES      = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in $(DEBIAN_FILES)
 LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh \
 		 libopts/libopts-add.m4
 TPL_FILES      = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
 EXTRA_DIST     = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
-DOCENV         = \
-	MAKE="$(MAKE)" \
-	PACKAGE="$(PACKAGE)" \
-	PACKAGE_BUGREPORT="$(PACKAGE_BUGREPORT)" \
-	PACKAGE_NAME="$(PACKAGE_NAME)" \
-	PACKAGE_STRING="$(PACKAGE_STRING)" \
-	PACKAGE_TARNAME="$(PACKAGE_TARNAME)" \
-	PACKAGE_VERSION="$(PACKAGE_VERSION)"
+DOCENV         = MAKE="$(MAKE)"
 
 all : $(DISTCLEANFILES)
 
@@ -38,12 +32,7 @@ autogen.spec : $(top_srcdir)/VERSION spec.tpl
 	$(AGexe) -T $(srcdir)/spec.tpl $(top_srcdir)/agen5/opts.def
 
 package :
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir) \
-	srcdir=$(srcdir) \
-	AGexe=$(AGexe) \
-	CLexe=$(CLexe) \
-	prefix=$(prefix) \
+	pkgtype=$(pkgtype) \
 	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/stage-pkg \
 	$(DOCENV) $(SHELL) $(srcdir)/mkpkg.sh
 
@@ -57,5 +46,7 @@ gnudoc  :
 	$(DOCENV) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh \
 		"$(PACKAGE)" "$(PACKAGE_VERSION)" \
 		The Automated Program Generator
+
+.NOTPARALLEL:
 
 ## Makefile.am ends here

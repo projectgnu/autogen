@@ -1,17 +1,17 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.18 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: expState.c,v 4.19 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:04:48 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2007-02-03 08:13:52 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -641,7 +641,7 @@ ag_scm_tpl_file( SCM full )
     if (AG_SCM_BOOL_P( full ) && SCM_NFALSEP( full )) {
         tSCC* sfx[] = { "tpl", NULL };
         char z[AG_PATH_MAX];
-        if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx )))
+        if (SUCCESSFUL( findFile( pzTemplFileName, z, sfx, NULL )))
             return AG_SCM_STR02SCM( z );
     }
 

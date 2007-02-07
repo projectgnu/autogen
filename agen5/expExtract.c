@@ -1,15 +1,15 @@
 /*
  *  expExtract.c
- *  $Id: expExtract.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: expExtract.c,v 4.16 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:54:43 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2007-02-03 08:13:25 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This module implements a file extraction function.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -328,10 +328,10 @@ ag_scm_find_file( SCM file, SCM suffix )
             char* apz[2];
             apz[0] = ag_scm2zchars( suffix, "file suffix" );
             apz[1] = NULL;
-            if (SUCCESSFUL( findFile( pz, z, (tCC**)apz )))
+            if (SUCCESSFUL( findFile( pz, z, (tCC**)apz, NULL )))
                 res = AG_SCM_STR02SCM( z );
 
-        } else if (SUCCESSFUL( findFile( pz, z, NULL )))
+        } else if (SUCCESSFUL( findFile( pz, z, NULL, NULL )))
             res = AG_SCM_STR02SCM( z );
     }
 

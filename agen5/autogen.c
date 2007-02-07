@@ -1,16 +1,16 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.24 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: autogen.c,v 4.25 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-15 14:12:23 bkorb"
- *  Last Committed:    $Date: 2006/12/15 23:29:01 $
+ *  Time-stamp:        "2007-02-04 08:28:43 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This is the main routine for autogen.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -79,7 +79,7 @@ inner_main( int argc, char** argv )
     procState = PROC_STATE_LOAD_TPL;
 
     {
-        tTemplate* pTF = loadTemplate( pzTemplFileName );
+        tTemplate* pTF = loadTemplate(pzTemplFileName, NULL);
 
         procState = PROC_STATE_EMITTING;
         processTemplate( pTF );

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2006-09-16 12:17:23 bkorb"
+# Time-stamp:        "2007-01-27 05:59:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: keyword.test,v 4.11 2006/09/16 19:58:35 bkorb Exp $
+# $Id: keyword.test,v 4.12 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -104,7 +104,7 @@ cmp -s ${testname}.*-help || \
 ./${testname} --trace=expr --set=thirteen,ninth,third --save=${testname}.cfg || \
   failure ${testname} could not save its options
 
-egrep -v '^#' ${testname}.cfg > ${testname}res.cfg || \
+${EGREP} -v '^#' ${testname}.cfg > ${testname}res.cfg || \
   failure ${testname} could not create ${testname}.cfg
 
 cat > ${testname}base.cfg <<- \_EndIni_

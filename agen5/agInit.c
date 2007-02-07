@@ -1,15 +1,15 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.10 2006/12/10 19:45:00 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.11 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:      "2006-12-10 11:02:12 bkorb"
+ *  Time-stamp:      "2007-02-03 17:40:39 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -66,13 +66,16 @@ initialize( int arg_ct, char** arg_vec )
     pzLastScheme = NULL;
     procState = PROC_STATE_OPTIONS;
     /*
-     *  Set the last resort search directory first (lowest priority)
+     *  Set the last resort search directories first (lowest priority)
+     *  The lowest of the low is the config time install data dir.
+     *  Next is the *current* directory of this executable.
      */
+    SET_OPT_TEMPL_DIRS( "$@" );
     SET_OPT_TEMPL_DIRS( "$$/../share/autogen" );
 
     {
         char z[ 128 ] = "__autogen__";
-#if defined( HAVE_POSIX_SYSINFO )
+#if defined( HAVE_SOLARIS_SYSINFO )
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
 #ifdef      SI_PLATFORM

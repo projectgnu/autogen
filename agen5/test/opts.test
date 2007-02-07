@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # opts.test --- Verify the handling of options
 #
-# Time-stamp:       "2006-09-23 11:00:27 bkorb"
+# Time-stamp:       "2007-01-27 06:03:16 bkorb"
 # Author:	        Bruce Korb <bkorb@gnu.org>
 # Maintainer:	    Bruce Korb <bkorb@gnu.org>
 # Created:	        Sat Mar 28 14:21:31 1998
 #
-# $Id: opts.test,v 4.5 2006/09/24 02:10:44 bkorb Exp $
+# $Id: opts.test,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -37,7 +37,7 @@ set -x
 ls -l * ../VERSION > $testname.log
 
 echo Checking for "'define DEBUG'" options
-if grep 'define DEBUG' ${srcdir}/../opts.h
+if ${GREP} 'define DEBUG' ${srcdir}/../opts.h
 then
   AGCMD="${AGexe} -L ${top_srcdir}/autoopts -DDEBUG=1"
 else

@@ -2,21 +2,21 @@
 #  -*- Mode: Shell-script -*-
 # fmemopen.test --- fmemopen code
 #
-# Time-stamp:        "2006-01-07 11:59:10 bkorb"
+# Time-stamp:        "2007-01-27 06:03:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/09/24 02:10:44 $
+# Last Modified:     $Date: 2007/02/07 01:57:58 $
 #            by: bkorb
 #
-# $Id: fmemopen.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
+# $Id: fmemopen.test,v 4.7 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-if egrep 'define ENABLE_FMEMOPEN' ${top_builddir}/config.h >/dev/null
+if ${EGREP} 'define ENABLE_FMEMOPEN' ${top_builddir}/config.h >/dev/null
 then : ; else cleanup ; exit 0 ; fi
 
 exec 5> ${testname}-main.c

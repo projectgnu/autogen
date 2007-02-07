@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-09-16 12:17:27 bkorb"
+# Time-stamp:        "2007-01-27 05:59:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: guile.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
+# $Id: guile.test,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -69,7 +69,7 @@ _EOF_
 cmp -s ${testname}.h*lp || \
   failure "`diff ${testname}.hlp ${testname}.help`"
 
-f=`(./${testname} -- -v 2>&1) | grep 'GNU General Public Licence'`
+f=`(./${testname} -- -v 2>&1) | ${GREP} 'GNU General Public Licence'`
 
 test  -n "$f"  || \
   failure version does not show GPL

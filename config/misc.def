@@ -3,15 +3,15 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2006-12-12 09:01:36 bkorb"
- *  Last Modified:     $Date: 2006/12/15 23:29:01 $
+/*  Time-stamp:        "2007-02-03 17:40:09 bkorb"
+ *  Last Modified:     $Date: 2007/02/07 01:57:58 $
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.21 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: misc.def,v 4.22 2007/02/07 01:57:58 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.21 $";
+version = "$Revision: 4.22 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -151,10 +151,15 @@ test   = {
   type      = test;
   check     = "the guile version";
   code      = <<- _END_OF_CODE_
-	v=`( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'`
-	test -z "${v}" && v=`guile --version | sed 's/.*Guile *//;1q'`
-	test -z "${v}" && exit 1
-	echo ${v}
+	pkginfo=`dpkg --list 2>/dev/null | egrep 'guile-[0-9.]-dev'`
+	if test -n "${pkginfo}"
+	then echo ${pkginfo} | sed -e 's/.*guile-//' -e 's/-dev.*//'
+	else
+	  v=`( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'`
+	  test -z "${v}" && v=`guile --version | sed 's/.*Guile *//;1q'`
+	  test -z "${v}" && exit 1
+	  echo ${v}
+	fi
 	_END_OF_CODE_;
   code-quoting  = asis;
 
@@ -271,9 +276,9 @@ _END_OF_CODE_;
 };
 
 test = {
-    name   = posix_sysinfo;
+    name   = solaris_sysinfo;
     type   = run;
-    check  = "sysinfo(2) is POSIX";
+    check  = "sysinfo(2) is Solaris";
     action = { act-type = define; };
     code   = <<- _EOF_
 	#include <sys/systeminfo.h>
@@ -282,8 +287,8 @@ test = {
 	return (sz > 0) ? 0 : 1; }
 	_EOF_;
     doc =
-    "Check that the POSIX compliant sysinfo(2) call works properly.\n"
-    "Linux has its own weirdo alternative.";
+    "Check that the Solaris compliant sysinfo(2) call works properly.\n"
+    "Linux has its own special alternative.";
 };
 
 test = {
@@ -439,6 +444,9 @@ do-always = <<- _END_ALWAYS_
 		    ftp://ftp.gnu.org/gnu/rx/" >&2]
 	  AC_MSG_ERROR([Cannot find working POSIX regex library])
 	[fi]
+	AC_PROG_GREP
+	AC_PROG_EGREP
+	AC_PROG_FGREP
 	_END_ALWAYS_;
 
 /* misc.def ends here */

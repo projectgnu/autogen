@@ -1,5 +1,43 @@
+2007-02-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpLoad.c (findFile): add a "pzReferrer" argument.  The
+	dirname from that string is now used for searching for files.
+	That directory is used after the current dir and before the search
+	list.
+	(loadTemplate): also needs a referrer argument to pass through to
+	the findFile function.
+	* agen5/*.*: fix findFile & loadTemplate calls
+	* autoopts/load.c (optionMakePath): accept "$@" to mean pkgdatadir
+	* autoopts/Makefile.am (libopts_la_CFLAGS): define to:
+	-DPKGDATADIR='"$(pkgdatadir)"'
+
+2007-01-29  Andreas Schwab  <schwab@suse.de>
+
+	* agen5/loadPseudo.c (copyMarker): make the last arg be size_t*
+
+2007-01-27  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.8.9
+
+2007-01-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/nested.c (scanXmlEntry): do not include closing '>' in val
+	* */Makefile.am: mark with .NOTPARALLEL
+	* autoopts/test/defs.in: make GREP, EGREP and FGREP configurable
+	* */test/*.test: use these instead of fixed name commands
+	* autoopts/makeshell.c (optionParseShell): using a configurable in
+	a generated script is pretty pointless -- especially for code intended
+	to be removed.  Therefore, emit a plain, vanilla "grep" command.
+	* config/misc.def: special Debian dispensation: avoid using
+	"guile-config" to derive version since they do not use any standard
+	configuration tools.  Use "dpkg" to determine the Guile version.
+	use AC_PROG_GREP et al. for $(GREP) variables.
+
 2007-01-17  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/makeshell.c (optionParseShell): grep for environment variables
+	that start a line in the "env" output, not just anywhere
+	* autoopts/test/shell.test: adjust
 	* autoopts/autoopts.h (tOptionLoadMode): moved from option_h.tpl
 	(option_load_mode): new global
 	* autoopts/configfile.c (configFileLoad): propagate the string scan

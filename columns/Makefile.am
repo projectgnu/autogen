@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-08-22 07:17:47 bkorb"
-## Copyright (c):   1992-2006 by Bruce Korb
+## Time-stamp:      "2007-01-27 06:55:37 bkorb"
+## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2007/02/07 01:57:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -47,5 +47,7 @@ gen-stamp : opts.def columns$(EXEEXT)
 	$(RUNAG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 	$(RUNAG) -Tagman1 $(srcdir)/opts.def
 	@touch $@
+
+.NOTPARALLEL:
 
 # Makefile.am ends here

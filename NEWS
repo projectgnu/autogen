@@ -1,41 +1,16 @@
-New in __CURRENT_VERSION__ October 2006
+New in __CURRENT_VERSION__ January 2007
 
-* Tweaks for Windows' compat/windows-config.h
-* new string-table convenience functions:  string-table-add-ref and
-  string-table-size
+* GREP is now a configurable.  (Sheesh!)
+* options with hierarchical structure (nested values) had some
+  bugs in the config file parsing code.  Fixed.
+* Since YACC is not used any more, it is no longer required. :)
+
+New in 5.8.8 December 2006
+
+* --short-help/-h is now a standard option.  See stdoptions.def.
 * fixed a value referencing bug in enumeration arg handling
   (seen on platforms where sizeof(int) != sizeof(void*)).
-
-New in 5.8.6 October 2006
-
-* AutoOpts code presumed that there were no #defines for the option
-  names.  You can now force aside such conflicts.
-* AutoOpts generated code unconditionally #includes limits.h and stdint.h.
-* aliased pointer cleanups should allow higher optimization of code.
-* The installation of the tear-off libopt library is now optional
-  to the installers of client projects.
-
-New in 5.8.5 July 2006
-
-* ag-fprintf will now allow you to emit text into a suspended output stream.
-* string tables have been implemented as a scheme function.  This makes it
-  very easy to produce an array of characters containing NUL termintaed
-  strings and have these string offsets (indexes) available for indexing into
-  the string arrays.
-* The libopts code will omit Windows-unfriendly code if the compile defines
-  _WIN32 and does not define __CYGWIN__.
-* suffix specifications in the pseudo macro may now construct an output
-  file name format string using scheme code, a la:
-
-    [= autogen5 template
-    h=(string-append (getenv "TMPDIR") "/%s-hdr.h")  =]
-
-  The "%s" will still be replaced by the base name.
-* the scheme function "version-compare" will allow you to compare
-  two dotted version numbers.  These can be your own versions or
-  that of autogen.  The scheme variable ``autogen-version'' has been
-  around for a long time and may be used as one of the arguments.
-* #assert is now active in definition files.  If the text begins
-  with a back quote, it is handed off to the shell for processing.
-  If an open parenthesis, it is handed off to Guile.  If it is
-  anything else, it is ignored.
+* fixed some issues caused by extraordinary space optimizations
+* cope with the fact that you cannot directly capture the return
+  code in setjmp from a longjmp invocation. 8-O !!
+  viz., int res = setjmp(&ctx); is illegal.

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2006-09-16 12:15:57 bkorb"
+# Time-stamp:        "2007-01-27 06:04:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: stdopts.test,v 4.5 2006/09/16 19:58:35 bkorb Exp $
+# $Id: stdopts.test,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -65,7 +65,7 @@ cat > ${testname}.hbase <<- _EOF_
 
 #  When building with DEBUG set, we get an unanticipated option:
 #
-grep -v 'run program with debugging info' ${testname}.help > ${testname}.hres
+${GREP} -v 'run program with debugging info' ${testname}.help > ${testname}.hres
 
 cmp -s ${testname}.h[br]* || \
   failure "`diff ${testname}.h[br]*`"

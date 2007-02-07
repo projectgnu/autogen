@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2006-11-26 13:45:49 bkorb"
-## Copyright (c):   1992-2006 by Bruce Korb
+## Time-stamp:      "2007-02-03 08:34:36 bkorb"
+## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.32 2006/11/27 01:55:18 bkorb Exp $
+## $Id: Makefile.am,v 4.33 2007/02/07 01:57:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -76,6 +76,7 @@ m4datadir                 = $(datadir)/aclocal
 
 nodist_libopts_la_SOURCES = libopts.c
 libopts_la_SOURCES        = $(HDRS)
+libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 
 libguileopts_la_SOURCES   = guileopt.c
@@ -161,5 +162,7 @@ install-data-hook:
 libopts.i : libopts.o
 	$(COMPILE) -E libopts.c > libopts-lines.i
 	egrep -v $$'^[ \t]*(#|$$)' libopts-lines.i > $@
+
+.NOTPARALLEL:
 
 # Makefile.am ends here

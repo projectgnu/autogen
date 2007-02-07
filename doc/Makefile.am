@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-09-23 19:56:39 bkorb"
-## Copyright (c):   1997-2006 by Bruce Korb
+## Time-stamp:      "2007-01-27 06:55:21 bkorb"
+## Copyright (c):   1997-2007 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2006/09/24 02:57:02 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2007/02/07 01:57:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -39,5 +39,7 @@ autogen.txt : autogen.texi
 		--output=$@ autogen.texi
 
 clobber : maintainer-clean
+
+.NOTPARALLEL:
 
 # Makefile.am ends here

@@ -1,14 +1,14 @@
 
 /*
- *  $Id: makeshell.c,v 4.21 2007/01/14 20:43:31 bkorb Exp $
- * Time-stamp:      "2007-01-13 10:27:38 bkorb"
+ *  $Id: makeshell.c,v 4.22 2007/02/07 01:57:58 bkorb Exp $
+ * Time-stamp:      "2007-01-27 06:05:45 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
  */
 
 /*
- *  Automated Options copyright 1992-2006 Bruce Korb
+ *  Automated Options copyright 1992-2007 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -488,7 +488,7 @@ optionParseShell( tOptions* pOpts )
     if ((pzTrailer != NULL) && (*pzTrailer != '\0'))
         fputs( pzTrailer, stdout );
     else if (ENABLED_OPT( SHELL ))
-        printf( "\nenv | egrep %s_\n", pOpts->pzPROGNAME );
+        printf( "\nenv | grep '^%s_'\n", pOpts->pzPROGNAME );
 
     fflush( stdout );
     fchmod( STDOUT_FILENO, 0755 );

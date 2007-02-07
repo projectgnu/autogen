@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # line.test --- test (tpl-file-line) functionality
 #
-# Time-stamp:        "2005-11-22 15:39:51 bkorb"
+# Time-stamp:        "2007-01-27 06:03:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/09/24 02:10:44 $
+# Last Modified:     $Date: 2007/02/07 01:57:58 $
 #            by: bkorb
 #
-# $Id: line.test,v 4.5 2006/09/24 02:10:44 bkorb Exp $
+# $Id: line.test,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -41,7 +41,7 @@ cat > ${testname}.out <<- \_EOF_
 
 ${AGexe} --base=${testname} --no-def --override=${testname}.tpl || \
    failure ${AGexe} failed
-egrep -v ' of 63:  5$' ${testname}.txt > ${testname}.test
+${EGREP} -v ' of 63:  5$' ${testname}.txt > ${testname}.test
 
 cmp -s ${testname}.test ${testname}.out || failure unexpected output
 

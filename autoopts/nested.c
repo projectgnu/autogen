@@ -1,13 +1,13 @@
 
 /*
- *  $Id: nested.c,v 4.19 2007/01/18 05:27:46 bkorb Exp $
- *  Time-stamp:      "2007-01-17 16:28:59 bkorb"
+ *  $Id: nested.c,v 4.20 2007/02/07 01:57:58 bkorb Exp $
+ *  Time-stamp:      "2007-01-26 11:04:35 bkorb"
  *
  *   Automated Options Nested Values module.
  */
 
 /*
- *  Automated Options copyright 1992-2006 Bruce Korb
+ *  Automated Options copyright 1992-2007 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -455,7 +455,9 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
         option_load_mode = save_mode;
         return NULL;
 
-    case '>': break;
+    case '>':
+        pzScan++;
+        break;
     }
 
     pzVal = pzScan;

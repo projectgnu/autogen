@@ -1,15 +1,15 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2006-12-15 14:12:13 bkorb"
- *  Last Committed:    $Date: 2006/12/15 23:29:01 $
+ *  Time-stamp:        "2007-02-03 10:37:11 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
- *  $Id: expFormat.c,v 4.17 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: expFormat.c,v 4.18 2007/02/07 01:57:58 bkorb Exp $
  *  This module implements formatting expression functions.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -518,7 +518,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         /*
          *  Find the template file somewhere
          */
-        if (! SUCCESSFUL( findFile( pzLicense, zRealFile, apzSfx )))
+        if (! SUCCESSFUL( findFile( pzLicense, zRealFile, apzSfx, NULL )))
             AG_ABEND( aprf( zCannot, ENOENT, "map license file", pzLicense,
                             strerror( ENOENT )));
 

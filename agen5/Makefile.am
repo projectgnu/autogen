@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-07-19 21:40:04 bkorb"
-## Copyright (c):   1992-2006 by Bruce Korb
+## Time-stamp:      "2007-01-27 06:56:00 bkorb"
+## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2006/07/20 04:41:20 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2007/02/07 01:57:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -122,5 +122,7 @@ $(CLexe) :
 
 ../snprintfv/libsnprintfv.la :
 	cd ../snprintfv ; $(MAKE) libsnprintfv.la
+
+.NOTPARALLEL:
 
 # Makefile.am ends here

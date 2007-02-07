@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-##    AutoGen copyright 2002-2006 Bruce Korb
+##    AutoGen copyright 2002-2007 Bruce Korb
 ##
-## Time-stamp:      "2006-08-22 07:17:03 bkorb"
+## Time-stamp:      "2007-01-27 06:54:49 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.9 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.10 2007/02/07 01:57:59 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -58,5 +58,7 @@ doc-stamp : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(run_AG) -Tagman1 -b$(TARG) ; \
 	$(run_AG) -Taginfo -b$(TARG) -DLEVEL=section
 	@touch $@
+
+.NOTPARALLEL:
 
 # Makefile.am ends here

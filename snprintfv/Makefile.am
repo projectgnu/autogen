@@ -44,4 +44,6 @@ EXTRA_DIST = filament.in printf.in stream.in $(CSRC)
 snv.c : $(CSRC)
 	for f in $(CSRC) ; do echo "#include \"$$f\"" ; done > $@
 
+.NOTPARALLEL:
+
 # Makefile.am ends here

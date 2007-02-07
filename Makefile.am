@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-12-12 08:52:06 bkorb"
+## Time-stamp:      "2007-02-04 08:22:28 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.5 2006/12/15 03:05:53 bkorb Exp $
+## $Id: Makefile.am,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 ACLOCAL_AMFLAGS = -I config
@@ -61,5 +61,7 @@ release     :
 	echo "Distributions cannot be made with a partial build" >&2
 	exit 1
 endif
+
+.NOTPARALLEL:
 
 ## Makefile.am ends here

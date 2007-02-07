@@ -1,0 +1,281 @@
+
+autoopts for Debian
+----------------------
+
+   Here is a feature comparison of AutoOpts and several other command
+   line parser generators. All except argtable and argp share certain
+   characteristics:
+     * They read a file that describes the program options and produce
+       code to parse command line options. Each has their own format for
+       describing options.
+     * All versions support both short options (flags) and GNU-type long
+       options. clig, however, is unique in that you must choose one or
+       the other. Either way, clig options are introduced with a single
+       hyphen. The other packages identify long options with doubled
+       hyphens.
+     * They produce tailored code for parsing the command line.
+     * They support the C programming language.
+     * The global option state is stored in a global structure.
+     * They produce usage text.
+
+   argtable and argp create the option parsing information by calling
+   functions and initializing data structures, respectively.
+
+   The 9 parsers compared are:
+    1. AutoOpts is a component of AutoGen. AutoGen has many capabilities,
+       but here we concentrate on the portion called AutoOpts. AutoOpts
+       is the most general of these programs, and has the most extensive
+       documentation. It is the only one that supports shell and Scheme
+       scripts as well as C programs.
+    2. clig can generate either C or Tcl option parsing code. It can also
+       process multiple arguments per single option.
+    3. genparse generates a wrapper around ``getopt_long()'' to parse the
+       command line options.
+    4. gaa supports option input from a configuration file as well as the
+       command line. NOTE HOWEVER: gaa is not maintained.
+    5. gengetopt generates a C function that uses ``getopt_long()''
+       function to parse the command line options, to validate them and
+       fills a struct.
+    6. opt is a subroutine library. Options are specified by calling a
+       registration routine in the library, instead of using a separate
+       option specification file. Global option state is stored in
+       variables passed by address to the registration routine. It has
+       some strange syntax for its own options: '@' says to read a config
+       file, '$' says to go into interactive mode.
+    7. argtable is a little different from the others in that the
+       argument descriptor is built up dynamically with run time calls to
+       various constructor routines. There are eight argument descriptor
+       types (structure types) and three constructors for each type, plus
+       an ``end'' function.
+       Developers will need to incorporate the library into their
+       distribution.
+    8. wyg uses flex and bison to generate a configuration file parser,
+       but uses getopt_long to parse the command line options.
+    9. argp is a tiny step above ``getopts_long(3GNU)''. It handles
+       looping over the command line arguments, but does not handle the
+       individual options. It calls a hand crafted callback function that
+       must do a ``switch'' on the option key (flag character). The
+       needed information is conveyed to the ``argp_parse'' function via
+       a hand crafted complex data structure.
+
+   If a feature is present (or absent) in only one or two
+   implementations, then the "yes" or "no" is emphasised.
+
+   Comparative Analysis of 29 Differentiating Features
+   Feature  \  Parser # 1     2    3    4    5    6    7    8     9
+   shell script app     YES   no   no   no   no   no   no   no    no
+   Scheme app           YES   no   no   no   no   no   no   no    no
+   Perl app             no    no   no   no   no   YES  no   no    no
+   config file input    yes   no   no   yes  yes  yes  no   yes   no
+   config file output   YES   no   no   no   no   YES  no   no    no
+   config file library  YES   no   no   no   no   no   no   no    no
+   embedded options     YES   no   no   no   no   no   no   no    no
+   environment input    YES   no   no   no   no   YES  no   no    no
+   immediate handling   YES   no   no   no   no   no   no   no    no
+   callback functions   yes   NO   yes  yes  yes  yes  yes  NO    NO
+   getopt-long          yes   no   yes  no   yes  no   yes  yes   no
+   multiple occurrence  yes   yes  no   no   yes  no   yes  no    yes
+   option arg types     [1]   4    5    5    11   [3]  8    4     [1]
+   enumeration opts     YES   no   no   no   no   no   no   no    no
+   set membership opts  YES   no   no   no   no   no   no   no    no
+   optional argument    YES   YES  no   no   no   no   no   no    YES
+   standard opts        YES   no   no   no   no   no   no   no    no
+   library options      YES   no   no   no   no   no   no   no    YES
+   range checks         YES   YES  YES  no   no   no   no   no    no
+   consistency checks   YES   no   no   no   no   no   no   no    no
+   interactive          no    no   no   no   no   YES  no   no    no
+   reset/restart        YES   no   no   no   no   no   no   no    no
+   reordering           yes   no   yes  no   yes  no   yes  yes   no
+   main procedure       YES   no   no   no   no   no   no   no    no
+   man page             YES   YES  no   no   no   no   no   no    no
+   texinfo invoking     YES   no   no   no   no   no   no   no    no
+   i18n support         YES   no   no   no   no   no   no   no    no 
+   developer depends    Guile tcl  none none none none none bison none
+                                                            flex
+   user dependencies    [2]   none none none none none none none none
+
+   shell script app
+          This parser will either produce a shell script to parse
+          options, a program that emits digested information as a list of
+          environment variable assignments, or both. AutoOpts will
+          produce both.
+
+   Scheme app
+          For the Guile variation on scheme, AutoOpts will insert the
+          results of parsing initialization files, environment variables
+          and command line options into Guile/Scheme variables.
+
+   Perl app
+          This particular parser is primarily designed for Perl
+          applications.
+
+   config file input
+          Option settings can be obtained from one or more configuration
+          files.
+
+   config file output
+          By specifying the "--save-opts" option, the option processing
+          state will be saved to either a named file, or to the last
+          named search place (highest priority initialization file).
+
+   config file library
+          A separately callable interface is provided so programs may use
+          the config file parser code without having to also use the
+          option processing code.
+
+   embedded options
+          Option settings can be obtained from program input files. When
+          they are encountered, the text can be passed to a function that
+          will parse it and adjust the current option settings.
+
+   environment input
+          Option settings can be obtained from environment variables.
+
+   immediate handling
+          Sometimes it is necessary to handle options out of order. For
+          example, a command line option used to bypass initialization
+          files must be processed before processing initialization files.
+          Since command line options override initialization files, the
+          initialization files must be handled first. Option parsers that
+          have this "immediate handling" capability can process marked
+          options early.
+
+   callback functions
+          A means is provided for calling a user-supplied function when a
+          particular option is encountered.
+
+   getopt-long
+          Some developers are willing to forego some of the features of
+          AutoOpts in order to not have to futz with carrying a copy of
+          libopts with their project. AutoOpts can now generate an option
+          processing loop that uses getopt_long(3GNU) to parse the
+          options. Several other parsers require the library in order to
+          use it.
+
+   multiple occurrence
+          options may appear multiple times on the command line. Some of
+          the parsers constrain options to appearing once only.
+
+   option arg types
+          Some parsers have special treatment coded in for different
+          types of option arguments. "getopt", for example, treats them
+          all as strings. Others have a restricted list of handling
+          methods. (Converting integers to their binary values, for
+          example.) AutoOpts supports several, and also makes it easy to
+          roll your own via an integrated callback procedures.
+
+   enumeration opts
+          A numeric value is specified by name. The values are set with
+          an enumeration.
+
+   set membership opts
+          A set of bits are turned on, turned off and tested by name.
+
+   optional argument
+          refers to the argument to an option. POSIX and most command
+          line parsers require an option to either not have an argument
+          or else the argument must be supplied on the command line.
+          GNU's getopt_long and some of these parsers support the notion
+          of letting the option argument be "optional".
+
+   standard opts
+          are pre-defined options that can be trivially incorporated into
+          a user's set of options. They can also thereby be used for
+          standardizing on the flag character and option name. This can
+          also be viewed as a template for implementing project specific
+          standard options.
+
+   library options
+          Is there a means for handling options for library code without
+          having to manually incorporate them into a program's option
+          processing code? This is often handled by invoking additional
+          parsers for unknown options. AutoOpt-ed programs calling
+          AutoOpt-ed libraries may combine their option information
+          automatically, yielding a very consistent ``look and feel''.
+          AutoOpt-ed programs and libraries may work with such code by
+          not error-failing on unknown options and instead performing the
+          necessary actions when such options are encountered. ``argp''
+          code only works with libraries that support argp argument
+          handling functions.
+
+   range checks
+          These parsers will (optionally) validate that integer option
+          arguments have a value that lies within a specified range. Some
+          (e.g. AutoOpts) will allow for multiple ranges.
+
+   consistency checks
+          verify that conflicting options do not appear together, and
+          options that require other options are allowed only if those
+          other options are present.
+
+   interactive
+          means that the option processing package is able to
+          interactively query the user for option state.
+
+   reset/restart
+          means that you can save your current (possibly initial)
+          processing state and reprocess options. In this fashion, a
+          daemon process could reload its initialization (config) files.
+
+   reordering
+          Some traditional programs also require intermixed command line
+          options and operands. AutoOpts can move all the command options
+          to the beginning of the argument list and process them. NB:
+          "reordering" is implemented by getopt_long(3GNU), so it is
+          automatically incorporated into parsers that use that library
+          function.
+
+   main procedure
+          AutoOpts will produce any of several main procedures, including
+          versions for supporting shell scripts, Guile-based utilities,
+          mains that operate on either operand lists or lists read from
+          stdin, or even customized main procedures.
+
+   man page
+          The utility will take the argument description and produce a
+          usable "command and utility" man page.
+
+   texinfo invoking
+          The utility will take the argument description and produce a
+          usable "invoking" chapter or section for texinfo documentation.
+
+   i18n support
+          By compiling your code with ENABLE_NLS defined, you will enable
+          a translation function generated into your code. By providing
+          translations of the strings found in the distributed header
+          file, ${prefix}/include/usage-txt.h, AutoOpts error messages
+          and usage text will be translated before processing begins.
+
+   developer dependencies
+          An application developer that uses the parsing tool must have
+          the named tool(s) at his disposal.
+
+   user dependencies
+          A user must either have the referenced C library installed, or
+          else the developer must ship a copy of the library with his
+          application.
+
+   [1] Option argument handling is programmable. Several kinds of
+   argument attributes may be specified. See the list of features, Option
+   Argument Specification.
+
+   [2] There is a user-visible dependency iff the developer does a
+   dynamic link to the libopts.so library. Developers are free to ship
+   libopts with their product in either source or binary form. See the
+   AutoOpts page for details on the open-source licensing options.
+
+   A Debian package would need only a dependency on the package supplying
+   libopts (libopts-27, at present).
+
+   [3] opt supports a different argument type for each fundamental type,
+   plus booleans, inverted booleans, toggling options and a couple
+   others.
+
+   Also note that some of these parsers depend upon the GNU
+   getopt_long(3GNU) function. Those that do need to remember that it is
+   under the GNU LGPL license. Developers using the AutoOpts command line
+   parsing system may choose to use either the included libopts library
+   or getopt_long(3GNU) as the parsing engine.
+
+   -- James R. Van Zandt
+   -- Bruce Korb

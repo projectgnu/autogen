@@ -1,7 +1,15 @@
 #! /bin/sh
 
-# Time-stamp: "2006-06-03 13:14:27 bkorb"
-# Version:    "$Revision: 4.8 $
+## mkgnudoc.sh --   create a native package
+## Copyright (c):   2003-2007 by Bruce Korb
+## Time-stamp:      "2007-02-04 10:08:03 bkorb"
+##              by: bkorb
+## ---------------------------------------------------------------------
+## $Id: mkgnudoc.sh,v 4.9 2007/02/07 01:57:59 bkorb Exp $
+## ---------------------------------------------------------------------
+## Code:
+
+test -f pkg-env && . pkg-env
 
 MAKE=${MAKE:-make}
 pkgsrcdir=`dirname $0`
@@ -109,3 +117,4 @@ tar cf - ${ddir} | gzip > ${ddir}-doc.tar.gz
 ## sh-indentation: 2
 ## sh-basic-offset: 2
 ## End:
+## mkgnudoc.sh ends here

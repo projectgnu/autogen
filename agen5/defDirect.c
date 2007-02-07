@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.20 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: defDirect.c,v 4.21 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:28:50 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2007-02-03 08:08:26 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This module processes definition file directives.
  *
@@ -16,7 +16,7 @@
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -738,7 +738,8 @@ doDir_include( char* pzArg, char* pzScan )
         return pzScan;
     pCurCtx->pzScan  = pzScan;
 
-    if (! SUCCESSFUL( findFile( pzArg, zFullName, apzSfx ))) {
+    if (! SUCCESSFUL(
+            findFile( pzArg, zFullName, apzSfx, pCurCtx->pzCtxFname ))) {
         tSCC zFmt[] = "WARNING:  cannot find `%s' definitions file\n";
         fprintf( pfTrace, zFmt, pzArg );
         return pzScan;
@@ -761,7 +762,7 @@ doDir_include( char* pzArg, char* pzScan )
             return pzScan;
         }
         inclSize = stbf.st_size;
-        if (outTime < stbf.st_mtime)
+        if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;
     }
     if (inclSize == 0)

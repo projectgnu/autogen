@@ -1,15 +1,15 @@
 
 /*
- *  $Id: functions.c,v 4.13 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: functions.c,v 4.14 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:05:35 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2007-02-03 08:22:04 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This module implements text functions.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -57,7 +57,7 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
     tMacro*    pM;
 
     if (*pzFile != NUL) {
-        pNewTpl = loadTemplate( pzFile );
+        pNewTpl = loadTemplate(pzFile, pT->pzTplFile);
 
         /*
          *  Strip off trailing white space from included templates
@@ -72,7 +72,7 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
              *  IF there is no text left, remove the macro entirely
              */
             if (pz == pzE)
-                 --(pNewTpl->macroCt);
+                 pNewTpl->macroCt--;
             else *pzE = NUL;
         }
 

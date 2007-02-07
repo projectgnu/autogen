@@ -1,15 +1,15 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.10 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.11 2007/02/07 01:57:58 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 16:21:28 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2007-01-29 16:35:59 bkorb"
+ *  Last Committed:    $Date: 2007/02/07 01:57:58 $
  *
  *  This module processes the "pseudo" macro
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -49,7 +49,7 @@ static te_pm_event
 findTokenType( tCC**  ppzData, te_pm_state fsm_state );
 
 static tCC*
-copyMarker( tCC* pzData, char* pzMark, int* pCt );
+copyMarker( tCC* pzData, char* pzMark, size_t * pCt );
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -336,7 +336,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
  *  as we find punctuation characters.
  */
 static tCC*
-copyMarker( tCC* pzData, char* pzMark, int* pCt )
+copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
 {
     int ct = 0;
 
@@ -402,14 +402,14 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copyMarker( pzData, zStartMac, (int*)&startMacLen );
+            pzData = copyMarker( pzData, zStartMac, &startMacLen );
             if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copyMarker( pzData, zEndMac, (int*)&endMacLen );
+            pzData = copyMarker( pzData, zEndMac, &endMacLen );
             if (pzData == NULL)
                 BAD_MARKER( zMarkErr );
 

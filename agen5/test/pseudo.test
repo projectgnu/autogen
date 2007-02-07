@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # pseudo.test --- test the select pseudo option
 #
-# Time-stamp:        "2006-08-01 13:34:13 bkorb"
+# Time-stamp:        "2007-01-27 06:03:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2006/09/24 02:10:44 $
+# Last Modified:     $Date: 2007/02/07 01:57:58 $
 #            by: bkorb
 #
-# $Id: pseudo.test,v 4.3 2006/09/24 02:10:44 bkorb Exp $
+# $Id: pseudo.test,v 4.4 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -67,12 +67,12 @@ ${AGexe} --no-def -T${testname}.tpl -b${testname} || \
 f=${incdir}/${testname}-hdr.h
 test -f ${f} || \
    failure missing file: ${f}
-fgrep 'two file create h: HEADER FILE' ${f} || failure bad contents for $f
+${FGREP} 'two file create h: HEADER FILE' ${f} || failure bad contents for $f
 
 f=${srcdir}/${testname}-body.c
 test -f ${f} || \
    failure missing file: ${f}
-fgrep 'two file create c: BODY 4 FILE' ${f} || failure bad contents for $f
+${FGREP} 'two file create c: BODY 4 FILE' ${f} || failure bad contents for $f
 
 cleanup
 

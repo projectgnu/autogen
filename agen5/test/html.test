@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2005-07-27 12:42:51 bkorb"
+# Time-stamp:      "2007-01-27 06:03:39 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 # Maintainer:      Bruce Korb <bkorb@gnu.org>
 # Created:         Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: html.test,v 4.5 2006/09/24 02:10:44 bkorb Exp $
+# $Id: html.test,v 4.6 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -67,7 +67,7 @@ CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
 export CONTENT_LENGTH REQUEST_METHOD QUERY_STRING
 
-${AGexe} | egrep -v '^in state' > ${testname}.test || \
+${AGexe} | ${EGREP} -v '^in state' > ${testname}.test || \
   failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
@@ -95,7 +95,7 @@ Failing Guile command:  = = = = =
 
 =================================
 _EOF_
-egrep -v '^in state' ${testname}-2.test > ${testname}-2.res
+${EGREP} -v '^in state' ${testname}-2.test > ${testname}-2.res
 cmp -s ${testname}-2.samp ${testname}-2.res || {
   exec >&2
   echo Your Guile library does not handle error traps correctly and causes

@@ -2255,8 +2255,9 @@ the flexibility is there.
 The following global definitions are used to define attributes of the entire
 program.  These generally alter the configuration or global behavior of the
 AutoOpts option parser.  The first two are required of every program.  The
-rest have been alphabetized.  Except as noted, there may be only one copy of
-each of these definitions:
+third is required if there are to be any left over arguments (operands)
+after option processing.  The rest have been alphabetized.  Except as noted,
+there may be only one copy of each of these definitions:
 
 @table @samp
 @cindex prog-name
@@ -2268,22 +2269,23 @@ are derived using @code{string->c_name!} (@pxref{SCM string->c-name!}).
 @item prog-title
 This attribute is required and may be any descriptive text.
 
-@cindex allow-errors
-@item allow-errors
-The presence of this attribute indicates ignoring any command line
-option errors.  This may also be turned on and off by invoking the
-macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
-generated interface file.
-
 @cindex argument
 @item argument
-Specifies the syntax of the arguments that @strong{follow} the options.
+This attribute is required if your program uses operand arguments.
+It specifies the syntax of the arguments that @strong{follow} the options.
 It may not be empty, but if it is not supplied, then option processing
 must consume all the arguments.  If it is supplied and starts with an
 open bracket (@code{[}), then there is no requirement on the presence or
 absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
+
+@cindex allow-errors
+@item allow-errors
+The presence of this attribute indicates ignoring any command line
+option errors.  This may also be turned on and off by invoking the
+macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
+generated interface file.
 
 @cindex config-header
 @item config-header
@@ -2306,7 +2308,7 @@ global variables or @code{#include} directives required by
 @code{flag_code} text and shared with other program text.
 Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
-@code{config-header}, below.
+@code{config-header}, above.
 
 @cindex guard-option-names
 @item guard-option-names

@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2006-09-16 13:28:09 bkorb"
+# Time-stamp:        "2007-01-27 06:00:48 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: shell.test,v 4.7 2006/09/16 20:37:07 bkorb Exp $
+# $Id: shell.test,v 4.8 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -412,7 +412,7 @@ unset OPT_ARG_VAL || :
 #
 # # # # # # # # # # -- do not modify this marker --
 
-env | egrep TEST_SHELL_
+env | grep '^TEST_SHELL_'
 _EOF_
 
 # # # # # # # # # # SCRIPT OUTPUT TESTING # # # # # # # # #

@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # for.test --- test functionality of `for' function
 #
-# Time-stamp:        "2006-08-22 08:57:09 bkorb"
+# Time-stamp:        "2007-01-27 06:03:48 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
-# Last Modified:     $Date: 2006/09/24 02:10:44 $
+# Last Modified:     $Date: 2007/02/07 01:57:58 $
 #            by: bkorb
 #
-# $Id: for.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
+# $Id: for.test,v 4.7 2007/02/07 01:57:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -84,7 +84,7 @@ cmp -s $testname.test $testname.sample || \
     failure "`diff -c $testname.test $testname.sample`"
 
 echo '<= FOR =><= ENDFOR =>' >> $testname.tpl
-f=`(${AGexe} $testname.def 2>&1) | egrep 'requires iterator'`
+f=`(${AGexe} $testname.def 2>&1) | ${EGREP} 'requires iterator'`
 test -z "$f" && \
   failure "failed to detect missing FOR iterator"
 
