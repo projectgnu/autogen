@@ -1,10 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# $Id: optlib.tpl,v 4.25 2006/11/06 19:09:39 bkorb Exp $
+# $Id: optlib.tpl,v 4.26 2007/06/23 20:19:39 bkorb Exp $
 
-# Automated Options copyright 1992-2006 Bruce Korb
+# Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2006-10-29 07:07:27 bkorb"
+# Time-stamp:      "2007-04-15 10:24:23 bkorb"
 
 =][=
 
@@ -640,7 +640,19 @@ tSCC zMore_Help_Name[] = "more-help";[=
 tSCC zVersionText[]    = "Output version information and exit";
 tSCC zVersion_Name[]   = "version";[=
 
-  ENDIF (exist? "version")  =][=
+  ENDIF (exist? "version")      =][=
+
+  IF (exist? "usage-opt")
+
+=]
+
+/*
+ *  usage option description:
+ */
+tSCC zUsageText[]     = "Abbreviated usage to stdout";
+tSCC zUsage_Name[]    = "usage";[=
+
+  ENDIF (exist? "usage-opt")    =][=
 
   IF (exist? "homerc")
 

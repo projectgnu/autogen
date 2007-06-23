@@ -1,16 +1,16 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.29 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: autogen.h,v 4.30 2007/06/23 20:19:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-15 14:12:01 bkorb"
- *  Last Committed:    $Date: 2006/12/15 23:29:01 $
+ *  Time-stamp:        "2007-03-25 07:44:02 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
  *  Global header file for AutoGen
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -388,7 +388,6 @@ MODE int         guileFailure     VALUE( 0 );
  *  Definition Parsing Globals
  */
 MODE char*       pzDefineData     VALUE( NULL );
-MODE size_t      defineDataSize   VALUE( 0 );
 MODE char*       pz_token         VALUE( NULL );
 MODE te_dp_event lastToken        VALUE( DP_EV_INVALID );
 

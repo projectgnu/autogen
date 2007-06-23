@@ -2,9 +2,9 @@
 
 h=options.h
 
-# Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2007-01-17 16:29:40 bkorb"
-# ID:  $Id: options_h.tpl,v 4.32 2007/01/18 05:27:46 bkorb Exp $
+# Automated Options copyright 1992-2007 Bruce Korb
+# Time-stamp:      "2007-04-28 09:57:08 bkorb"
+# ID:  $Id: options_h.tpl,v 4.33 2007/06/23 20:19:39 bkorb Exp $
 
 =][=
 
@@ -33,6 +33,14 @@ h=options.h
 #elif defined(HAVE_SYS_LIMITS_H)
 # include <sys/limits.h>
 #endif /* HAVE_LIMITS/SYS_LIMITS_H */
+
+#if defined(HAVE_SYSEXITS_H)
+#  include <sysexits.h>
+#endif /* HAVE_SYSEXITS_H */
+
+#ifndef EX_USAGE
+#  define EX_USAGE              64
+#endif
 
 /*
  *  PUBLIC DEFINES
@@ -104,6 +112,11 @@ sed -e '1,/typedef.*_bits_t/d' \
     -e '/ SET_OPT_STATE(/,$d' opt-state.h
 rm  -f opt-state.[ch]
 ` =]
+
+#ifdef NO_OPTIONAL_OPT_ARGS
+# undef  OPTST_ARG_OPTIONAL
+# define OPTST_ARG_OPTIONAL   0
+#endif
 
 #define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)
 
@@ -265,7 +278,7 @@ struct optSpecIndex {
 typedef void (tOptionXlateProc)(void);
 
 struct options {
-    const int           structVersion;
+    int const           structVersion;
     int                 origArgCt;
     char**              origArgVect;
     unsigned int        fOptSet;
@@ -279,7 +292,7 @@ struct options {
     char const* const   pzCopyright;
     char const* const   pzCopyNotice;
     char const* const   pzFullVersion;
-    char const* const*  papzHomeList;
+    char const* const* const papzHomeList;
     char const* const   pzUsageTitle;
     char const* const   pzExplain;
     char const* const   pzDetail;
@@ -293,8 +306,8 @@ struct options {
     tOptionXlateProc*   pTransProc;
 
     tOptSpecIndex       specOptIdx;
-    const int           optCt;
-    const int           presetOptCt;
+    int const           optCt;
+    int const           presetOptCt;
 };
 
 /*

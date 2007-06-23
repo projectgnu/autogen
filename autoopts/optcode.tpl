@@ -1,9 +1,9 @@
 [= autogen5 template  -*- Mode: Text -*-
 
-#$Id: optcode.tpl,v 4.29 2006/10/24 00:02:50 bkorb Exp $
+#$Id: optcode.tpl,v 4.30 2007/06/23 20:19:39 bkorb Exp $
 
-# Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-23 09:21:08 bkorb"
+# Automated Options copyright 1992-2007 Bruce Korb
+# Time-stamp:      "2007-04-28 10:00:22 bkorb"
 
 =][=
 
@@ -167,7 +167,7 @@ FOR flag "\n"           =][=
       (set! lib-opt-ptr (string->c-name! (string-append
                         (get "lib-name") "_" (get "name") "_optDesc_p")))
       (set! lib-externs (string-append lib-externs
-                        (sprintf "tOptDesc const* %-16s = optDesc + %d;\n"
+                        (sprintf "tOptDesc * const %-16s = optDesc + %d;\n"
                                  lib-opt-ptr (for-index) )  ))
   )   )                 =][=
 
@@ -207,20 +207,29 @@ ENDFOR flag
 
 IF (exist? "version")   =]
 
+#ifdef NO_OPTIONAL_OPT_ARGS
+#  define VERSION_OPT_FLAGS     OPTST_IMM | OPTST_NO_INIT
+#else
+#  define VERSION_OPT_FLAGS     OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
+                                OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT
+#endif
+
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_IMM, 0,
+     /* opt state flags  */ VERSION_OPT_FLAGS, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ [=
          (if make-test-main "DOVERPROC" "optionPrintVersion")=],
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
-     /* disablement strs */ NULL, NULL },[=
+     /* disablement strs */ NULL, NULL },
+
+#undef VERSION_OPT_FLAGS
+[=
 
 ENDIF =]
 
@@ -229,7 +238,7 @@ ENDIF =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -242,13 +251,34 @@ ENDIF =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ optionPagedUsage,
      /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
      /* disablement strs */ NULL, NULL }[=
+
+IF (exist? "usage-opt")
+
+=],
+
+  {  /* entry idx, value */ [=
+        (. INDEX-pfx) =]USAGE, [= (. VALUE-pfx) =]USAGE,
+     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ doUsageOpt,
+     /* desc, NAME, name */ zUsageText, NULL, zUsage_Name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF
+
+=][=
 
 IF (exist? "homerc")
 
@@ -260,7 +290,7 @@ IF (exist? "homerc")
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL, 0,
+                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -273,8 +303,8 @@ IF (exist? "homerc")
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_DISABLE_IMM | \
-			OPTST_SET_ARGTYPE(OPARG_TYPE_STRING), 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) \
+			  | OPTST_DISABLE_IMM, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -427,7 +457,8 @@ tOptions [=(. pname)=]Options = {
       [= (if (>= default-opt-index 0) default-opt-index "NO_EQUIVALENT")
         =] /* index of default opt */
     },
-    [= (. UP-prefix) =]OPTION_CT, [=(count "flag")=] /* user option count */
+    [= (. option-ct) =] /* full option count */, [=
+       (count "flag")=] /* user option count */
 };
 [=
 
@@ -447,8 +478,16 @@ static void
 doUsageOpt(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
-{
-    [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );
+{[=
+
+IF (exist? "usage-opt") =]
+    int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
+        ? EXIT_SUCCESS : EX_USAGE;
+    [= (. UP-prefix) =]USAGE(ex_code);[=
+
+ELSE   =]
+    [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );[=
+ENDIF  =]
 }[=
 
 IF (or (exist? "flag.flag-code")

@@ -59,17 +59,46 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* These function pointers are exposed through the API incase a user
-   of this library needs to map our memory management routines to
-   their own (e.g. xmalloc). */
-
 typedef void* (malloc_proc_t )(size_t);
 typedef void* (realloc_proc_t)(snv_pointer, size_t);
 typedef void* (free_proc_t   )(snv_pointer);
 
-SNV_SCOPE malloc_proc_t*  snv_malloc;
-SNV_SCOPE realloc_proc_t* snv_realloc;
-SNV_SCOPE free_proc_t*    snv_free;
+/* These function pointers are exposed through the API incase a user
+   of this library needs to map our memory management routines to
+   their own (e.g. xmalloc). */
+
+/**
+ * snv_malloc:
+ * @count: The number of bytes to allocate.
+ *
+ * Allocates a fresh block of memory whose size is @count bytes.
+ *
+ * Return value:
+ * The pointer to the newly-allocated memory area.
+ */
+SNV_SCOPE malloc_proc_t *snv_malloc;
+
+/**
+ * snv_realloc:
+ * @old: The pointer to the block whose size must be changed.
+ * @count: The number of bytes to allocate.
+ *
+ * Reallocates a fresh block of memory pointed to by @old
+ * so that its size becomes @count bytes.
+ *
+ * Return value:
+ * The pointer to the newly-allocated memory area, possibly
+ * the same as @old.
+ */
+SNV_SCOPE realloc_proc_t *snv_realloc;
+
+/**
+ * snv_free:
+ * @old: The pointer to the block that must freed.
+ *
+ * Frees a block of memory pointed to by @old.
+ */
+SNV_SCOPE free_proc_t *snv_free;
 
 /* And these are reimplemented tout court because they are
    not fully portable.  */
@@ -85,7 +114,7 @@ extern char* snv_strdup (const char *str);
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
+ * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/mem.h */

@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-02-03 08:34:36 bkorb"
+## Time-stamp:      "2007-03-24 14:21:31 bkorb"
 ## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.33 2007/02/07 01:57:58 bkorb Exp $
+## $Id: Makefile.am,v 4.34 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -71,7 +71,7 @@ pkgconfigdir=$(libdir)/pkgconfig
 
 CLEANFILES                = tmp-* libopts.c
 DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
-MAINTAINERCLEANFILES      = Makefile.in $(GENHDRS) $(srcdir)/funcs.def
+MAINTAINERCLEANFILES      = $(GENHDRS) $(srcdir)/funcs.def
 m4datadir                 = $(datadir)/aclocal
 
 nodist_libopts_la_SOURCES = libopts.c

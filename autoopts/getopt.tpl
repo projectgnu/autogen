@@ -2,11 +2,9 @@
 
    c=%s-temp.c
 
-# Time-stamp:      "2006-07-01 12:43:30 bkorb"
-
 +][+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
-  Time-stamp:        "2005-02-07 10:18:18 bkorb"
+  Time-stamp:        "2007-05-09 06:55:37 bkorb"
 _EOF_
 \` `
 +][+
@@ -26,14 +24,24 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.7 2006/09/23 00:12:48 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.8 2007/06/23 20:19:39 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
-#include "[+ (base-name) +].h"[+
+#include <stdio.h>
+#include <string.h>
+#include <[+ (if (exist? "long-opts") "getopt" "unistd") +].h>
+#include "[+ (base-name) +].h"
+
+#ifndef DIRCH
+#  if defined(_WIN32) && !defined(__CYGWIN__)
+#    define DIRCH                  '\\'
+#  else
+#    define DIRCH                  '/'
+#  endif
+#endif[+
 
 IF (exist? "long-opts") +]
-#include <getopt.h>
 
 /*
  *  getopt_long option descriptor
@@ -124,7 +132,7 @@ optionUsage (tOptions* pOptions, int status)
    ${CC:-cc} ${CFLAGS} -o %1$s ${sdir}/%3$s.c ${LDFLAGS} || \
       die 'could not build %1$s'
    f=`guile-config link | sed 's/.*-L//;s/ .*//'`
-   f=`(LD_LIBRARY_PATH=$f ./%1$s -: 2>&1) | \
+   f=`(LD_LIBRARY_PATH=$f:${LD_LIBRARY_PATH} ./%1$s -: 2>&1) | \
       sed '1d;/more-help/d
            s/--version\\[=arg\\]/--version      /
            /version information and exit/s/-v \\[arg\\]/-v      /'`
@@ -156,7 +164,8 @@ optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-  char* pz_by = _("[+ # " +][+
+  char const * pz_by =
+    _("[+ # " +][+
 
   (sprintf "%s%s %s" prog-name
      (if (exist? "prog-group")
@@ -183,7 +192,8 @@ ESAC +][+ # " +]\n");
 static void
 usage_too_many (tOptDesc* pOptDesc)
 {
-  char* pz = _("[+(. prog-name)
+  char const * pz =
+    _("[+(. prog-name)
     +] error: the '%s' option appears more than %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
   USAGE( EXIT_FAILURE );
@@ -197,7 +207,8 @@ usage_too_many (tOptDesc* pOptDesc)
 static void
 usage_too_few (tOptDesc* pOptDesc)
 {
-  char* pz = _("[+(. prog-name)
+  char const * pz =
+    _("[+(. prog-name)
     +] error: the '%s' option must appear %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
   USAGE( EXIT_FAILURE );
@@ -214,7 +225,8 @@ usage_too_few (tOptDesc* pOptDesc)
 static void
 usage_cannot (char const* pz_what, char const* pz_cant)
 {
-  char* pz = _("[+(. prog-name)
+  char const * pz =
+    _("[+(. prog-name)
     +] error: the `%s' option conflicts with `%s'\n");
   printf (pz, pz_what, pz_cant);
   USAGE (EXIT_FAILURE);
@@ -231,7 +243,8 @@ usage_cannot (char const* pz_what, char const* pz_cant)
 static void
 usage_must (char const* pz_what, char const* pz_must)
 {
-  char* pz = _("[+(. prog-name)
+  char const * pz =
+    _("[+(. prog-name)
     +] error: the `%s' option requires `%s'\n");
   printf (pz, pz_what, pz_must);
   USAGE (EXIT_FAILURE);
@@ -251,7 +264,7 @@ int
 process_[+(. prog-name)+]_opts (int argc, char** argv)
 {
   {
-    char* pz_prog = strrchr (argv[0], DIRCH);
+    char const * pz_prog = strrchr (argv[0], DIRCH);
     if (pz_prog != NULL)
       pz_prog++;
     else

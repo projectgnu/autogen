@@ -2,13 +2,13 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-01-27 06:56:00 bkorb"
+## Time-stamp:      "2007-03-24 14:20:30 bkorb"
 ## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2007/02/07 01:57:58 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -23,7 +23,7 @@ pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
 nodist_man_MANS = autogen.1
 
 DISTCLEANFILES  = $(STAMPS) ag.c
-MAINTAINERCLEANFILES = Makefile.in $(GEN_CSRC)
+MAINTAINERCLEANFILES = $(GEN_CSRC)
 
 bin_PROGRAMS    = autogen
 

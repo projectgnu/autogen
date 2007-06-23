@@ -1,12 +1,12 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-02-04 08:22:28 bkorb"
+## Time-stamp:      "2007-03-24 14:20:20 bkorb"
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Mon Jun 30 15:35:12 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.6 2007/02/07 01:57:58 bkorb Exp $
+## $Id: Makefile.am,v 4.7 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 ACLOCAL_AMFLAGS = -I config
@@ -38,8 +38,6 @@ pkg_dist       = config/bootstrap.local
 dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
 EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(dist_data)
 DISTCLEANFILES = stamp-h
-MAINTAINERCLEANFILES = COPYING INSTALL Makefile.in aclocal.m4 config-h.in \
-          configure libtool stamp-h.in config/ag_macros.m4
 
 distcleancheck_listfiles = \
      find -type f -exec 'test -f $(srcdir)/{} || echo {} ;'

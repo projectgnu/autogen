@@ -1,11 +1,11 @@
 /*
- *  $Id: gdinit.c,v 4.8 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: gdinit.c,v 4.9 2007/06/23 20:19:39 bkorb Exp $
  *
- *    getdefs copyright 1999-2006 Bruce Korb
+ *    getdefs copyright 1999-2007 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2006-11-26 16:44:07 bkorb"
- *  Last Modified:     $Date: 2006/11/27 01:55:18 $
+ *  Time-stamp:        "2007-04-28 11:31:58 bkorb"
+ *  Last Modified:     $Date: 2007/06/23 20:19:39 $
  *            by: bkorb
  */
 
@@ -368,7 +368,7 @@ validateOptions( void )
      *       IF we cannot load the file,
      *       THEN it must be new or empty.  Allocate several K to start.
      */
-    if (   HAVE_OPT( ORDERING )
+    if (  HAVE_OPT( ORDERING )
        && (OPT_ARG( ORDERING ) != NULL)) {
         tSCC zIndexPreamble[] =
             "# -*- buffer-read-only: t -*- vi: set ro:\n"
@@ -392,11 +392,15 @@ validateOptions( void )
         strequate( "_-^" );
     }
 
-    if (OPT_ARG( SRCFILE ) == NULL)
-        OPT_ARG( SRCFILE ) = "srcfile";
+    {
+        char const * pz = OPT_ARG( SRCFILE );
+        if ((pz == NULL) || (*pz == NUL))
+            OPT_ARG( SRCFILE ) = "srcfile";
 
-    if (OPT_ARG( LINENUM ) == NULL)
-        OPT_ARG( LINENUM ) = "linenum";
+        pz = OPT_ARG( LINENUM );
+        if ((pz == NULL) || (*pz == NUL))
+            OPT_ARG( LINENUM ) = "linenum";
+    }
 
     {
         tSCC zAgNameChars[] = "abcdefghijklmnopqrstuvwxyz"

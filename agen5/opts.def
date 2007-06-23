@@ -3,11 +3,11 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.22 2007/02/07 01:57:58 bkorb Exp $
- *  Time-stamp:        "2007-02-03 10:36:50 bkorb"
- *  Last Committed:    $Date: 2007/02/07 01:57:58 $
+ *   $Id: opts.def,v 4.23 2007/06/23 20:19:39 bkorb Exp $
+ *  Time-stamp:        "2007-04-15 14:35:22 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
- *  AutoGen copyright 1992-2007 Bruce Korb
+ *  AutoGen Copyright (c) 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -27,7 +27,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date  = "1992-2006";
+    date  = "1992-2007";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
     type  = gpl;
@@ -43,6 +43,7 @@ prog-name      = "autogen";
 prog-title     = "The Automated Program Generator";
 homerc         =  $HOME, ".";
 environrc;
+usage-opt;
 
 #else
 prog-name      = xml2ag;
@@ -591,9 +592,10 @@ flag = {
 #ifndef XML2AG
     no-preset;
     ifdef       = DEBUG_ENABLED;
-    doc =
-    "This will print out the complete definition tree before processing\n"
-    "the template.";
+    doc = <<- _EOF_
+	This will print out the complete definition tree before processing
+	the template.
+	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -708,19 +710,15 @@ flag = {
 #ifndef XML2AG
     no-preset;
     settable;
-    doc =
-    "Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing\n"
-    "directives.  This option will cause the matching names to be\n"
-    "removed from the list of defined values.";
+    doc = <<- _EOF_
+	Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing
+	directives.  This option will cause the matching names to be
+	removed from the list of defined values.
+	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
 };
-
-#ifndef XML2AG
-#define SHORT_HELP_FLAG
-#include stdoptions
-#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

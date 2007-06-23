@@ -2,7 +2,7 @@
 /*
  * Time-stamp:        "2006-10-14 14:55:09 bkorb"
  *             by: bkorb
- * Last Committed:    $Date: 2006/10/14 22:39:03 $
+ * Last Committed:    $Date: 2007/06/23 20:19:39 $
  */
 #ifndef WINDOWS_CONFIG_HACKERY
 #define WINDOWS_CONFIG_HACKERY 1
@@ -92,6 +92,7 @@ typedef unsigned long uintptr_t;
 /* Include Windows headers */
 #include <windows.h>
 #include <winsock2.h>
+#include <limits.h>
 
 /*
  * Compatibility declarations for Windows, assuming SYS_WINNT

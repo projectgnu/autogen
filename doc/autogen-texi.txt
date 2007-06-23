@@ -607,15 +607,19 @@ are @strong{dis}abled at this stage, so do not use them.
 @cindex here-string
 
 A @samp{here string} is formed in much the same way as a shell here doc.
-It is denoted with a doubled less than character and, optionally, a
+It is denoted with two less than characters(@code{<<}) and, optionally, a
 hyphen.  This is followed by optional horizontal white space and an
 ending marker-identifier.  This marker must follow the syntax rules
 for identifiers.  Unlike the shell version, however, you must not quote
-this marker.  The resulting string will start with the first character
-on the next line and continue up to but not including the newline that
-precedes the line that begins with the marker token.  No backslash or
-any other kind of processing is done on this string.  The characters are
-copied directly into the result string.
+this marker.
+
+The resulting string will start with the first character on the next line
+and continue up to but not including the newline that precedes the line that
+begins with the marker token.  If a hyphen follows the less than characters,
+then leading tabs will be stripped and the terminating marker will be
+recognized even if preceded by tabs.  No backslash or any other kind of
+processing is done on this string.  The characters are copied directly into
+the result string.
 
 Here are two examples:
 @example
@@ -1084,7 +1088,7 @@ The next several components may be intermingled:
 Zero, one or more suffix specifications tell AutoGen how many times to
 process the template file.  No suffix specifications mean that it is to
 be processed once and that the generated text is to be written to
-stdout.  The current suffix for each pass can be determined with the
+@file{stdout}.  The current suffix for each pass can be determined with the
 @code{(suffix)} scheme function (@pxref{SCM suffix}).
 
 The suffix specification consists of a sequence of POSIX compliant file name
@@ -1352,7 +1356,7 @@ backslash sequences interpreted.
 A back quoted string.  When this expression is evaluated, STRING
 is first interpreted as a cooked string (as in `"STRING"') and
 evaluated as a shell expression by the AutoGen server shell.  This
-expression is replaced by the stdout output of
+expression is replaced by the @file{stdout} output of
 the shell.
 
 @item (STRING)
@@ -1762,7 +1766,7 @@ ENDIF                                              ?>
 This forces the template to be found in the "@code{cgi-tpl/}"
 directory.  Note also that there is no suffix specified in the
 pseudo macro (@pxref{pseudo macro}).  That tells AutoGen to emit
-the output to stdout.
+the output to @file{stdout}.
 
 The output is actually spooled until it is complete so that,
 in the case of an error, the output can be discarded and a proper
@@ -1993,18 +1997,31 @@ a text string as if it were from one of the rc/ini/config files,
 hereafter referred to as a configuration file.
 
 @item
-@code{--help} and @code{--version} are automatically supported.
-@code{--more-help} will page the generated help.
-
-@item
 By adding a @samp{doc} and @samp{arg-name} attributes to each option,
 AutoGen will also be able to produce a man page and the @samp{invoking}
 section of a texinfo document.
 
 @item
-Insert the option processing state into Scheme-defined variables.
-Thus, Guile based applications that are linked with private
-@code{main()} routines can take advantage of all of AutoOpts' functionality.
+There are several automatically supported options.  They will have short
+flags if any options have option flags and the flags are not suppressed.
+The associated flag may be altered or suppressed by specifying
+no value or an alternate character for ``@code{xxx-value;}'' in the option
+definition file.  ``@code{xxx}'' is the name of the option below:
+
+@table @samp
+@item --help
+@itemx --more-help
+These are always available.  ``@code{more-help}'' will pass the full usage
+text through a pager.
+@item --usage
+This is added to the option list if ``@code{usage-opt}'' is specified.
+It yields the abbreviated usage to @file{stdout}.
+@item --version
+This is added to the option list if ``@code{version = xxx;}'' is specified.
+@item --load-opts
+@itemx --save-opts
+These are added to the option list if ``@code{homerc}'' is specified.
+@end table
 
 @item
 Various forms of main procedures can be added to the output,
@@ -2070,6 +2087,11 @@ an AutoOpt-ed program.  This is done by providing an option definition file
 that client programs @code{#include} into their own option definitions.
 See ``AutoOpt-ed Library for AutoOpt-ed Program'' (@pxref{lib and program})
 for more details.
+
+@item
+Insert the option processing state into Scheme-defined variables.
+Thus, Guile based applications that are linked with private
+@code{main()} routines can take advantage of all of AutoOpts' functionality.
 @end enumerate
 
 @c === SECTION MARKER
@@ -2574,7 +2596,7 @@ nearly identical to the stock @code{guile(1)} program.
 @subsubsection shell-process: emit Bourne shell results
 
 This will produce a @code{main()} procedure that parses the command line
-options and emits to @code{stdout} Bourne shell commands that puts the
+options and emits to @file{stdout} Bourne shell commands that puts the
 option state into environment variables.  This can be used within a
 shell script as follows:
 
@@ -2588,7 +2610,7 @@ test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 If the option parsing code detects an error or a request for usage,
 it will not emit an assignment to OPTION_CT and the script should just
 exit.  If the options are set consistently, then something along the
-lines of the following will be written to @code{stdout} and evaled:
+lines of the following will be written to @file{stdout} and evaled:
 
 @example
     OPTION_CT=4
@@ -2618,7 +2640,7 @@ off any options.
 
 This will produce a @code{main()} procedure that emits a shell script
 that will parse the command line options.  That script can be emitted
-to @code{stdout} or inserted or substituted into a pre-existing shell
+to @file{stdout} or inserted or substituted into a pre-existing shell
 script file.  Improbable markers are used to identify previously inserted
 parsing text:
 
@@ -3397,6 +3419,9 @@ this attribute may also specify the default keyword to assume when
 the argument is not supplied.  If left empty, @var{arg-default} or
 the zero-valued keyword will be used.
 
+This is overridden and the options are required if the libopts library
+gets configured with @code{--disable-optional-args}.
+
 @cindex arg-default
 @item arg-default
 This specifies the default value to be used when the option is
@@ -3578,20 +3603,24 @@ section and before the @code{AUTHOR} section.
 @subsection Automatically Supported Options
 @cindex automatic options
 
-AutoOpts provides automated support for five options.  @code{help} and
+AutoOpts provides automated support for six options.  @code{help} and
 @code{more-help} are always provided.  @code{version} is provided if
 @code{version} is defined in the option definitions @xref{program attributes}.
 @code{save-opts} and @code{load-opts} are provided if at least
 one @code{homerc} is defined @xref{program attributes}.
 
 Below are the option names and flag values.  The flags are activated if and
-only if at least one user-defined option also uses a flag value.  These
-flags may be deleted or changed to characters of your choosing by specifying
-@code{xxx-value = "y";}, where @code{xxx} is one of the five names below and
-@code{y} is either empty or the character of your choice.  For example, to
-change the help flag from @code{?} to @code{h}, specify @code{help-value = "h";};
-and to require that @code{save-opts} be specified only with its long
-option name, specify @code{save-opts-value = "";}.
+only if at least one user-defined option also uses at least one flag value.
+These flags may be deleted or changed to characters of your choosing by
+specifying @code{xxx-value = "y";}, where @code{xxx} is one of the five names
+below and @code{y} is either empty or the character of your choice.  For
+example, to change the help flag from @code{?} to @code{h}, specify
+@code{help-value = "h";}; and to require that @code{save-opts} be specified
+only with its long option name, specify @code{save-opts-value = "";}.
+
+With the exception of the @code{load-opts} option, none of these automatically
+supported options will be recognized in configuration files or environment
+variables.
 
 @table @samp
 @item help -?
@@ -3604,6 +3633,11 @@ by the contents of the definition of the @code{detail} text macro.
 This option is identical to the @code{help} option, except that the
 output is passed through a pager program.  (@code{more} by default, or
 the program identified by the @code{PAGER} environment variable.)
+
+@item usage -u
+This option must be requested by specifying, @code{usage-opt} in the option
+definition file.  It will produce abbreviated help text to @file{stdout} and
+exit with zero status (@code{EXIT_SUCCESS}).
 
 @item version -v
 This will print the program name, title and version.  If it is followed by
@@ -3638,12 +3672,12 @@ and @code{optionProcess} will not return.  You may wish to invoke
 This option will load options from the named file.  They will be treated
 exactly as if they were loaded from the normally found configuration files, but
 will not be loaded until the option is actually processed.  This can also be
-used within another configuration file, causing them to nest.
+used within another configuration file, causing them to nest.  This is the
+@strong{only} option that can be activated inside of config files or with
+environment variables.
 
-It is ultimately intended that specifying the option,
-@code{no-load-opts} will suppress the processing of configuration files and
-environment variables.  To do this, AutoOpts must first implement
-pre-scanning of the options, environment and config files.
+Specifying the negated form of the option (@code{--no-load-opts}) will
+suppress the processing of configuration files and environment variables.
 @end table
 
 @node standard options
@@ -4143,10 +4177,25 @@ automatically.  This routine is expected to call @code{exit(3)} with
 the provided exit code.
 
 The @code{optionUsage} routine also behaves differently depending
-on the exit code.  If the exit code is zero, it is assumed that
-assistance has been requested.  Consequently, a little more
-information is provided than when displaying usage and exiting
-with a non-zero exit code.
+on the exit code.:
+
+@table @code
+@item EXIT_SUCCESS (the value zero)
+It is assumed that full usage help has been requested.  Consequently, more
+information is provided than when displaying usage and exiting with a
+non-zero exit code.  Output will be sent to @file{stdout} and the program will
+exit with a zero status code.
+
+@item EX_USAGE (64)
+The abbreviated usage will be printed to @file{stdout} and the program will
+exit with a zero status code.  ``EX_USAGE'' may or may not be 64.  If your
+system provides ``/usr/include/sysexits.h'' that has a different value,
+then that value will be used.
+
+@item any other value
+The abbreviated usage will be printed to stderr and the program will
+exit with the provided status code.
+@end table
 
 @node VALUE_OPT_name
 @subsection VALUE_OPT_name - Option Flag Value
@@ -5114,8 +5163,8 @@ are global definitions that apply to all the documented functions.
 @section Using getopt(3C)
 @cindex getopt_long
 
-There is now a template named, ``@code{getopt.tpl}'' that is distributed with
-autoopts.  With it, you will have another source file generated for you that
+There is a template named, ``@code{getopt.tpl}'' that is distributed with
+AutoOpts.  With it, you will have another source file generated for you that
 will utilize either the standard @code{getopt(3C)} or the GNU
 @code{getopt_long(3GNU)} function for parsing the command line arguments.
 Which is used is selected by the presence or absence of the @code{long-opts}
@@ -5181,7 +5230,10 @@ autogen -T getopt.tpl myprog-opts.def
 @noindent
 and you will have three new files: @file{myprog-opts.h}, @file{myprog-opts.c},
 and @file{getopt-progname.c}, where ``progname'' is the name specified with
-the global @code{prog-name} attribute in the option definition file.
+the global @code{prog-name} attribute in the option definition file.  You must
+compile and link both @file{.c} files into your program.  If there are link
+failures, then you are using AutoOpts features that require the @file{libopts}
+library.  You must remove these features.
 
 @c === SECTION MARKER
 

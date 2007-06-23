@@ -2,17 +2,16 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2006-11-07 20:05:22 bkorb"
+## Time-stamp:      "2007-04-29 12:42:33 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2006/11/20 00:25:20 $
+## Last Modified:   $Date: 2007/06/23 20:19:39 $
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.13 2006/11/20 00:25:20 bkorb Exp $
+## $Id: Makefile.am,v 4.14 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
-MAINTAINERCLEANFILES	= Makefile.in
 TESTS      = nested.test \
     argument.test cond.test    config.test enums.test   equiv.test \
     errors.test   getopt.test  guile.test  handler.test immediate.test \
@@ -35,6 +34,6 @@ perm-stamp :
 
 verbose :
 	rm -rf FAILURES testdir ; \
-	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
+	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
 
 # Makefile.am ends here

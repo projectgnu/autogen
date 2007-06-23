@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.31 2007/01/18 05:27:46 bkorb Exp $
- *  Time-stamp:      "2007-01-17 16:39:29 bkorb"
+ *  $Id: autoopts.c,v 4.32 2007/06/23 20:19:39 bkorb Exp $
+ *  Time-stamp:      "2007-04-15 11:10:40 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -10,7 +10,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2006 Bruce Korb
+ *  Automated Options copyright 1992-2007 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -53,9 +53,6 @@
  */
 
 static char const zNil[] = "";
-
-#define SKIP_RC_FILES(po) \
-    DISABLED_OPT(&((po)->pOptDesc[ (po)->specOptIdx.save_opts+1]))
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -238,14 +235,17 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
      */
     if (  (pOD->fOptState & OPTST_DEFINED)
        && (++pOD->optOccCt > pOD->optMaxCt)  )  {
-        char const* pzEqv =
-            (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
 
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-            char const* pzFmt = (pOD->optMaxCt > 1) ? zAtMost : zOnlyOne;
+            char const * pzEqv =
+                (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
+
             fputs( zErrOnly, stderr );
-            fprintf( stderr, pzFmt, pOD->pz_Name, pzEqv,
-                     pOD->optMaxCt );
+
+            if (pOD->optMaxCt > 1)
+                fprintf(stderr, zAtMost, pOD->optMaxCt, pOD->pz_Name, pzEqv);
+            else
+                fprintf(stderr, zOnlyOne, pOD->pz_Name, pzEqv);
         }
 
         return FAILURE;
@@ -694,7 +694,7 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
         case TOPT_DEFAULT:
             fputs( "AutoOpts lib error: defaulted to option with optional arg\n",
                    stderr );
-            exit( EXIT_FAILURE );
+            exit( EX_SOFTWARE );
         }
 
         /*
@@ -827,8 +827,21 @@ doRegularOpts( tOptions* pOpts )
 static tSuccess
 doPresets( tOptions* pOpts )
 {
+    tOptDesc * pOD = NULL;
+
     if (! SUCCESSFUL( doImmediateOpts( pOpts )))
         return FAILURE;
+
+    /*
+     *  IF this option set has a --save-opts option, then it also
+     *  has a --load-opts option.  See if a command line option has disabled
+     *  option presetting.
+     */
+    if (pOpts->specOptIdx.save_opts != 0) {
+        pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts + 1;
+        if (DISABLED_OPT(pOD))
+            return SUCCESS;
+    }
 
     /*
      *  Until we return from this procedure, disable non-presettable opts
@@ -838,13 +851,22 @@ doPresets( tOptions* pOpts )
      *  IF there are no config files,
      *  THEN do any environment presets and leave.
      */
-    if (  (pOpts->papzHomeList == NULL)
-       || SKIP_RC_FILES(pOpts) )  {
+    if (pOpts->papzHomeList == NULL) {
         doEnvPresets( pOpts, ENV_ALL );
     }
     else {
         doEnvPresets( pOpts, ENV_IMM );
-        internalFileLoad( pOpts );
+
+        /*
+         *  Check to see if environment variables have disabled presetting.
+         */
+        if ((pOD != NULL) && ! DISABLED_OPT(pOD))
+            internalFileLoad( pOpts );
+
+        /*
+         *  ${PROGRAM_LOAD_OPTS} value of "no" cannot disable other environment
+         *  variable options.  Only the loading of .rc files.
+         */
         doEnvPresets( pOpts, ENV_NON_IMM );
     }
     pOpts->fOptSet &= ~OPTPROC_PRESETTING;
@@ -1028,7 +1050,7 @@ optionProcess(
     char**     argVect )
 {
     if (! SUCCESSFUL( validateOptionsStruct( pOpts, argVect[0] )))
-        exit( EXIT_FAILURE );
+        exit( EX_SOFTWARE );
 
     /*
      *  Establish the real program name, the program full path,

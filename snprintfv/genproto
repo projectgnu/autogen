@@ -59,7 +59,10 @@ if test $# -lt 2; then
   exit 1
 fi
 
-file=$2
+case $2 in
+  */*) file=$2 ;;
+  *) file=./$2 ;;
+esac
 dir=`echo $file | sed 's,/[^/]*$,,'`
 mode=`echo $file | sed 's,^.*/,,g;s,\.in$,.h,'`
 format=${FORMAT-GNUC_PRINTF}
@@ -77,14 +80,14 @@ NR == 1 {
     printf "#line 1 \"%s\"\n", FILENAME
     do {
         if (tolower($1) != "@protos") {
-            print;
-            continue;
-        }
-        source = "'"$dir"'/" $2;
-        while ((getline < source) > 0) {
-            print | "'"$filter"'";
-        }
-        close("'"$filter"'");
+	    print;
+	    continue;
+	}
+	source = "'"$dir"'/" $2;
+	while ((getline < source) > 0) {
+	    print | "'"$filter"'";
+	}
+	close("'"$filter"'");
         printf "#line %d \"%s\"\n", NR + 1, FILENAME
     } while (getline > 0)
 }' $file

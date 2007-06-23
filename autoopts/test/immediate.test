@@ -8,7 +8,7 @@
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: immediate.test,v 4.9 2007/02/07 01:57:58 bkorb Exp $
+# $Id: immediate.test,v 4.10 2007/06/23 20:19:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -50,8 +50,8 @@ main = {
 _EOF_
 
 INC=`echo ${INC} | sed 's/-lguile//;s/-lqthreads//'`
-CFLAGS="-g `echo ${CFLAGS} | \
-  sed 's,-O2,,;s/-g//'`"
+CFLAGS="-g`echo ' '${CFLAGS}' ' | \
+  sed 's, -O2 , ,;s/ -g[^ ]* / /'`"
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \

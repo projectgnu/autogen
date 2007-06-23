@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2006-09-16 12:16:46 bkorb"
+# Time-stamp:        "2007-04-14 17:54:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Fri Oct 1 10:27:31 PDT 1999
 #
-# $Id: rc.test,v 4.11 2006/09/16 19:58:35 bkorb Exp $
+# $Id: rc.test,v 4.12 2007/06/23 20:19:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -28,6 +28,7 @@ ${SHELLX} ${stdopts} option second:init third: || \
 cat >> ${testname}.def <<_EOF_
 homerc = "\$\$/${testname}.rc";
 rcfile = ${testname}.file;
+environrc;
 _EOF_
 
 ${AG_L} ${testname}.def || \
@@ -54,6 +55,7 @@ or by a single hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ..../${testname}.rc/rc.file
+ - examining environment variables named TEST_RC_*
 _EOF_
 
 mkdir ${testname}.rc ${testname}.run
@@ -100,6 +102,24 @@ cmp  ${testname}.cmds ${testname}.test || {
   failure "${df}"
 }
 
+# # # # #
+
+TEST_RC=--no-load ../${testname} -t xxx MUMBLE > ${testname}-2.cmds
+
+#  This is what the output should be:
+#
+cat > ${testname}-2.test <<'_EOF_'
+OPTION_CT=2
+export OPTION_CT
+TEST_RC_THIRD='xxx'
+export TEST_RC_THIRD
+_EOF_
+
+cmp ${testname}-2.cmds ${testname}-2.test || {
+  df="`diff -c ${testname}-2.test ${testname}-2.cmds`"
+  cd ..
+  failure "${df}"
+}
 # # # # # # # # # # SECOND TEST OUTPUT FILE # # # # # # # # #
 
 cat >> ../${testname}.rc/${testname}.file  <<_EOF_

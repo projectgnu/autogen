@@ -7,7 +7,7 @@
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Created:          Mon Jun 30 15:54:46 1997
  *
- * $Id: compat.h,v 4.16 2007/02/07 01:57:58 bkorb Exp $
+ * $Id: compat.h,v 4.17 2007/06/23 20:19:39 bkorb Exp $
  */
 #ifndef COMPAT_H_GUARD
 #define COMPAT_H_GUARD 1
@@ -198,6 +198,11 @@
 #if !defined (MAXPATHLEN) && defined (PATH_MAX)
 #  define MAXPATHLEN PATH_MAX
 #endif /* !MAXPATHLEN && PATH_MAX */
+
+#if !defined (MAXPATHLEN) && defined(_MAX_PATH)
+#  define PATH_MAX _MAX_PATH
+#  define MAXPATHLEN _MAX_PATH
+#endif
 
 #if !defined (MAXPATHLEN)
 #  define MAXPATHLEN ((size_t)4096)

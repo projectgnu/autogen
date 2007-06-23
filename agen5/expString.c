@@ -1,17 +1,17 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.16 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: expString.c,v 4.17 2007/06/23 20:19:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:05:08 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2007-05-06 11:29:43 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -57,20 +57,13 @@ do_multi_subs(
     SCM         repl );
 /* = = = END-STATIC-FORWARD = = = */
 
-static SCM
-makeString( tCC*    pzText,
-            tCC*    pzNewLine,
-            size_t  newLineSize )
+static size_t
+string_size(char const * pzScn, size_t newLineSize)
 {
-    char     z[ 256 ];
-    char*    pzDta;
-    char*    pzFre;
-    tCC*     pzScn   = pzText;
-
     /*
      *  Start by counting the start and end quotes, plus the NUL.
      */
-    size_t   dtaSize = sizeof( "\"\"" );
+    size_t dtaSize = sizeof( "\"\"" );
 
     for (;;) {
         char ch = *(pzScn++);
@@ -90,7 +83,7 @@ makeString( tCC*    pzText,
          */
         else switch (ch) {
         case NUL:
-            goto loopBreak;
+            return dtaSize;
 
         case '\n':
             dtaSize += newLineSize;
@@ -108,7 +101,19 @@ makeString( tCC*    pzText,
         default:
             dtaSize += 4;
         }
-    } loopBreak:;
+    }
+}
+
+static SCM
+makeString( tCC*    pzText,
+            tCC*    pzNewLine,
+            size_t  newLineSize )
+{
+    char     z[ 256 ];
+    char*    pzDta;
+    char*    pzFre;
+    tCC*     pzScn   = pzText;
+    size_t   dtaSize = string_size(pzText, newLineSize);
 
     /*
      *  We now know how big the string is going to be.
@@ -117,8 +122,6 @@ makeString( tCC*    pzText,
     if (dtaSize >= sizeof(z))
          pzFre = pzDta = AGALOC( dtaSize, "quoting string" );
     else pzFre = pzDta = z;
-
-    pzScn = pzText;
 
     *(pzDta++) = '"';
 
@@ -224,97 +227,94 @@ makeString( tCC*    pzText,
     }
 }
 
+static size_t
+stringify_for_shell(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize)
+{
+    char * pz = pzNew;
+    *(pz++) = qt;
+
+    for (;;) {
+        char c = (*(pz++) = *(pzDta++));
+        switch (c) {
+        case NUL:
+            pz[-1]  = qt;
+            *pz     = NUL;
+            dtaSize = (pz - pzNew);
+
+            return (pz - pzNew);
+
+        case '\\':
+            /*
+             *  If someone went to the trouble to escape a backquote or a
+             *  dollar sign, then we should not neutralize it.  Note that
+             *  we handle a following backslash as a normal character.
+             *
+             *  i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
+             */
+            c = *pzDta;
+            switch (*pzDta) {
+            case '$':
+                break;
+
+            case '"':
+            case '`':
+                /*
+                 *  IF the ensuing quote character does *NOT* match the
+                 *  quote character for the string, then we will preserve
+                 *  the single copy of the backslash.  If it does match,
+                 *  then we will double the backslash and a third backslash
+                 *  will be inserted when we emit the quote character.
+                 */
+                if (c != qt)
+                    break;
+                /* FALLTHROUGH */
+
+            default:
+                *(pz++) = '\\';   /* \   -->  \\    */
+            }
+            break;
+
+        case '"': case '`':
+            if (c == qt) {
+                /*
+                 *  This routine does both `xx` and "xx" strings, we have
+                 *  to worry about this stuff differently.  I.e., in ""
+                 *  strings, add a single \ in front of ", and in ``
+                 *  preserve a add \ in front of `.
+                 */
+                pz[-1]  = '\\';       /* "   -->   \"   */
+                *(pz++) = c;
+            }
+        }
+    }
+}
 
 static SCM
 shell_stringify( SCM obj, u_int qt )
 {
-    char*  pzDta;
     char*  pzNew;
     size_t dtaSize = 3;
+    char*  pzDta   = ag_scm2zchars( obj, "AG Object" );
+    char*  pz      = pzDta;
 
-    pzDta = ag_scm2zchars( obj, "AG Object" );
+    for (;;) {
+        char c = *(pz++);
 
-    {
-        char*  pz = pzDta;
+        switch (c) {
+        case NUL:
+            goto loopDone1;
 
-        for (;;) {
-            char c = *(pz++);
+        case '"': case '`': case '\\':
+            dtaSize += 2;
+            break;
 
-            switch (c) {
-            case NUL:
-                goto loopDone1;
-
-            case '"': case '`': case '\\':
-                dtaSize += 2;
-                break;
-
-            default:
-                dtaSize++;
-            }
-        } loopDone1:;
-    }
+        default:
+            dtaSize++;
+        }
+    } loopDone1:;
 
     pzNew = AGALOC( dtaSize, "shell string" );
-
-    {
-        char* pz = pzNew;
-        *(pz++) = qt;
-
-        for (;;) {
-            char c = (*(pz++) = *(pzDta++));
-            switch (c) {
-            case NUL:
-                goto loopDone2;
-
-            case '\\':
-                /*
-                 *  If someone went to the trouble to escape a backquote or a
-                 *  dollar sign, then we should not neutralize it.  Note that
-                 *  we handle a following backslash as a normal character.
-                 *
-                 *  i.e.  \\ --> \\\\ *BUT* \\$ --> \\\$
-                 */
-                c = *pzDta;
-                switch (*pzDta) {
-                case '$':
-                    break;
-
-                case '"':
-                case '`':
-                    /*
-                     *  IF the ensuing quote character does *NOT* match the
-                     *  quote character for the string, then we will preserve
-                     *  the single copy of the backslash.  If it does match,
-                     *  then we will double the backslash and a third backslash
-                     *  will be inserted when we emit the quote character.
-                     */
-                    if (c != qt)
-                        break;
-                    /* FALLTHROUGH */
-
-                default:
-                    *(pz++) = '\\';   /* \   -->  \\    */
-                }
-                break;
-
-            case '"': case '`':
-                if (c == qt) {
-                    /*
-                     *  This routine does both `xx` and "xx" strings, we have
-                     *  to worry about this stuff differently.  I.e., in ""
-                     *  strings, add a single \ in front of ", and in ``
-                     *  preserve a add \ in front of `.
-                     */
-                    pz[-1]  = '\\';       /* "   -->   \"   */
-                    *(pz++) = c;
-                }
-            }
-        } loopDone2:;
-
-        pz[-1]  = qt;
-        *pz     = NUL;
-        dtaSize = (pz - pzNew);
-    }
+    dtaSize = stringify_for_shell(pzNew, qt, pzDta, dtaSize);
 
     {
         SCM res = AG_SCM_STR2SCM( pzNew, dtaSize );
@@ -1063,55 +1063,53 @@ ag_scm_c_string( SCM str )
 SCM
 ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 {
-    {
-        char  map[ 256 ];
-        int   i = 255;
-        char* pzFrom = ag_scm2zchars( from_xform, "string" );
-        char* pzTo   = ag_scm2zchars(   to_xform, "string" );
+    char  map[ 256 ];
+    int   i = 255;
+    char* pzFrom = ag_scm2zchars( from_xform, "string" );
+    char* pzTo   = ag_scm2zchars(   to_xform, "string" );
 
-        do  {
-            map[i] = i;
-        } while (--i > 0);
+    do  {
+        map[i] = i;
+    } while (--i > 0);
 
-        for (;i <= 255;i++) {
-            unsigned char fch = (unsigned char)*(pzFrom++);
-            unsigned char tch = (unsigned char)*(pzTo++);
+    for (;i <= 255;i++) {
+        unsigned char fch = (unsigned char)*(pzFrom++);
+        unsigned char tch = (unsigned char)*(pzTo++);
 
-            if (tch == NUL) {
-                pzTo--;
-                tch = pzTo[-1];
-            }
-
-            switch (fch) {
-            case NUL:
-                goto mapDone;
-
-            case '-':
-                if ((i > 0) && (tch == '-')) {
-                    unsigned char fs = (unsigned char)pzFrom[-2];
-                    unsigned char fe = (unsigned char)pzFrom[0];
-                    unsigned char ts = (unsigned char)pzTo[-2];
-                    unsigned char te = (unsigned char)pzTo[0];
-                    if (te != NUL) {
-                        while (fs < fe) {
-                            map[ fs++ ] = ts;
-                            if (ts < te) ts++;
-                        }
-                        break;
-                    }
-                }
-
-            default:
-                map[ fch ] = tch;
-            }
-        } mapDone:;
-
-        pzTo = (char*)(void*)AG_SCM_CHARS( str );
-        i    = AG_SCM_STRLEN( str );
-        while (i-- > 0) {
-            *pzTo = map[ (int)*pzTo ];
-            pzTo++;
+        if (tch == NUL) {
+            pzTo--;
+            tch = pzTo[-1];
         }
+
+        switch (fch) {
+        case NUL:
+            goto mapDone;
+
+        case '-':
+            if ((i > 0) && (tch == '-')) {
+                unsigned char fs = (unsigned char)pzFrom[-2];
+                unsigned char fe = (unsigned char)pzFrom[0];
+                unsigned char ts = (unsigned char)pzTo[-2];
+                unsigned char te = (unsigned char)pzTo[0];
+                if (te != NUL) {
+                    while (fs < fe) {
+                        map[ fs++ ] = ts;
+                        if (ts < te) ts++;
+                    }
+                    break;
+                }
+            }
+
+        default:
+            map[ fch ] = tch;
+        }
+    } mapDone:;
+
+    pzTo = (char*)(void*)AG_SCM_CHARS( str );
+    i    = AG_SCM_STRLEN( str );
+    while (i-- > 0) {
+        *pzTo = map[ (int)*pzTo ];
+        pzTo++;
     }
     return str;
 }

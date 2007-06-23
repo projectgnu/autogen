@@ -2,15 +2,15 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2006-08-22 07:18:16 bkorb"
-## Copyright (c):   1997-2006 by Bruce Korb
+## Time-stamp:      "2007-04-29 12:45:42 bkorb"
+## Copyright (c):   1997-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ## Created:         Fri July 18 1997
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2006/08/22 16:06:36 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
@@ -23,14 +23,12 @@ NOSHELL_TESTS = \
   loop.test    make.test    match.test   pseudo.test  reorder.test stack.test \
   stress.test  string.test  strtable.test
 
-UNREADY_TESTS = daemon.test
-MAINTAINERCLEANFILES = Makefile.in
-
-TESTS       = @AGEN5_TESTS@
-EXTRA_DIST  = $(TESTS) daemon.test
-FUNCLIST    = funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
-EXPRLIST    = expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
-	      expString.c expGperf.c expExtract.c $(FUNCLIST)
+UNREADY_TESTS   = daemon.test
+TESTS       	= @AGEN5_TESTS@
+EXTRA_DIST  	= $(TESTS) daemon.test
+FUNCLIST    	= funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
+EXPRLIST    	= expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
+	    	  expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 TESTS_ENVIRONMENT = \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
@@ -53,6 +51,6 @@ ${top_builddir}/autoopts/test/defs :
 
 verbose     : defs
 	rm -rf FAILURES testdir ; \
-	VERBOSE=true $(MAKE) check TESTS=$(TESTS)
+	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
 
 # Makefile.am ends here

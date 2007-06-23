@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2007-01-27 06:55:13 bkorb"
+## Time-stamp:      "2007-03-24 14:22:27 bkorb"
 ## Copyright (c):   1997-2007 by Bruce Korb
 ## Author:	        Bruce Korb <bkorb@gnu.org>
 ## Created:	        Mon Jun 30, 1997
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.14 2007/02/07 01:57:59 bkorb Exp $
+## $Id: Makefile.am,v 4.15 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
@@ -28,7 +28,6 @@ AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
-MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_getdefs_SOURCES) *-stamp
 INCLUDES        = @INCLIST@
 AG_ENV          = top_builddir=$(top_builddir) \

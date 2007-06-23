@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expPrint.c,v 4.16 2006/12/15 03:05:53 bkorb Exp $
+ *  $Id: expPrint.c,v 4.17 2007/06/23 20:19:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-14 18:21:28 bkorb"
- *  Last Committed:    $Date: 2006/12/15 03:05:53 $
+ *  Time-stamp:        "2007-03-25 08:02:07 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -13,7 +13,7 @@
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -109,7 +109,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 #endif /* ! defined(DEBUG_ENABLED) */
 
     {
-        size_t printSize = asprintfv( ppzBuf, pzFmt, (snv_constpointer*)argV );
+        int printSize = asprintfv( ppzBuf, pzFmt, (snv_constpointer*)argV );
         if ((printSize & ~0xFFFFFU) != 0) /* 1MB max */
             AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
 

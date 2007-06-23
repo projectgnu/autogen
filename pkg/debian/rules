@@ -1,7 +1,6 @@
 #!/usr/bin/make -f
 
 #export DH_VERBOSE=1
-export DH_COMPAT=4
 export DH_OPTIONS=
 
 CONFIGUREFLAGS=$(if $(findstring debug,$(DEB_BUILD_OPTIONS)),--enable-debug,)
@@ -23,7 +22,12 @@ build-stamp:
 	$(MAKE)
 	$(MAKE) check
 	$(MAKE) -C doc autogen.ps info
-	(cd doc; texi2html -split=chapter -subdir=html autogen.texi)
+	( cd doc ; \
+	  test ! -d html || rm -rf html ; \
+	  texi2html -split=chapter -subdir=html autogen.texi ; \
+	  test -d html || { mkdir html ; \
+	    set -- *.html ; test ! -f $${1} || mv $$* html/. ; } \
+	)
 	touch $@
 
 clean:

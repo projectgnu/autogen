@@ -2,8 +2,8 @@
 
 AutoGen5 Template
 
-# Time-stamp:        "2006-09-23 19:43:30 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:02 $
+# Time-stamp:        "2007-04-28 12:15:35 bkorb"
+# Last Committed:    $Date: 2007/06/23 20:19:39 $
 
 =][=
 
@@ -359,7 +359,7 @@ ENDDEF  set-language            =][=
 # # # # # # # # # # WITH # # # # # # # # # =][=
 
 DEFINE  try-with                =][=
-  emit-enablement
+  INVOKE emit-enablement
        arg-name  = WITH         =][=
 ENDDEF  try-with                =][=
 
@@ -367,9 +367,24 @@ ENDDEF  try-with                =][=
 
 DEFINE  try-without             =][=
   (set! cv-name (string-append group-pfx "cv_with_" down-name)) =][=
-  emit-enablement
+  INVOKE emit-enablement
        arg-name  = WITH         =][=
 ENDDEF  try-without             =][=
+
+# # # # # # # # # # ENABLE # # # # # # # # # =][=
+
+DEFINE  try-enable              =][=
+  INVOKE emit-enablement
+       arg-name  = ENABLE       =][=
+ENDDEF  try-enable              =][=
+
+# # # # # # # # # # DISABLE # # # # # # # # # =][=
+
+DEFINE  try-disable             =][=
+  (set! cv-name (string-append group-pfx "cv_enable_" down-name)) =][=
+  INVOKE emit-enablement
+       arg-name  = ENABLE       =][=
+ENDDEF  try-disable             =][=
 
 # # # # # # # # # # WITHLIB # # # # # # # =][=
 
@@ -522,21 +537,6 @@ DEFINE  try-withlib             =][=
 
 ENDDEF  try-withlib             =][=
 
-# # # # # # # # # # ENABLE # # # # # # # # # =][=
-
-DEFINE  try-enable              =][=
-  emit-enablement
-       arg-name  = ENABLE       =][=
-ENDDEF  try-enable              =][=
-
-# # # # # # # # # # DISABLE # # # # # # # # # =][=
-
-DEFINE  try-disable             =][=
-  (set! cv-name (string-append group-pfx "cv_enable_" down-name)) =][=
-  emit-enablement
-       arg-name  = ENABLE       =][=
-ENDDEF  try-disable             =][=
-
 # # # # # # # # # # TEST # # # # # # # # # =][=
 
 DEFINE  try-test                =][=
@@ -554,7 +554,7 @@ DEFINE  try-test                =][=
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results                  =][=
 
-ENDDEF  try-disable             =][=
+ENDDEF  try-test                =][=
 
 # # # # # # # # # # RUN # # # # # # # # # =][=
 

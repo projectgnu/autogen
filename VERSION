@@ -4,16 +4,16 @@
 #
 # Copyright (C) 1999-2007 Bruce Korb
 #
-# Time-stamp:        "2007-02-04 11:08:41 bkorb"
+# Time-stamp:        "2007-05-28 15:37:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2007/02/07 01:57:58 $
+# Last Committed:    $Date: 2007/06/23 20:19:39 $
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL="pre2"
+AG_PATCHLEVEL=".2pre2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -29,9 +29,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=28
+AO_CURRENT=29
 AO_REVISION=0
-AO_AGE=3
+AO_AGE=4
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0

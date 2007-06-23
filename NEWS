@@ -1,16 +1,33 @@
-New in __CURRENT_VERSION__ January 2007
+New in __CURRENT_VERSION__ May 2007
 
-* GREP is now a configurable.  (Sheesh!)
-* options with hierarchical structure (nested values) had some
-  bugs in the config file parsing code.  Fixed.
-* Since YACC is not used any more, it is no longer required. :)
+New in 5.9.1 May 2007
 
-New in 5.8.8 December 2006
+* getopt.tpl template is fixed to not require the internal header
+  autoopts/autoopts.h.
+* MAXPATHLEN will use _MAX_PATH on Windows platforms
+* new libopts configuration option: --disable-optional-args This will #define
+  NO_OPTIONAL_OPT_ARGS in config.h and cause the built library to ignore the
+  OPTST_ARG_OPTIONAL bit in an option descriptor.  autoopts generated code
+  compiled with NO_OPTIONAL_OPT_ARGS #defined will never have that bit set in
+  the option descriptors either.  If libopts has been so configured, then the
+  installed options.h header will contain: #define NO_OPTIONAL_OPT_ARGS 1 so
+  that client code will generally be compiled with that flag set.
+  The OPTST_ARG_OPTIONAL bit is ignored regardless.
+* Fixed up --load-opts environment variable processing.  You can
+  now correctly suppress config file loading with either:
+    PROGRAM_LOAD_OPTS=no
+    PROGRAM=--no-load-opts
+* added new auto-supported option, --usage.  It is incorporated
+  by specifying ``usage-opt;'' in the option definitions file.
+* libopts now uses several exit codes from sysexits.h:
+  EX_NOINPUT  (66) - a specified config file cannot be found
+  EX_SOFTWARE (70) - libopts error - please file a bug report
+  EX_CONFIG   (78) - a NULL option descriptor was passed in - user bug
 
-* --short-help/-h is now a standard option.  See stdoptions.def.
-* fixed a value referencing bug in enumeration arg handling
-  (seen on platforms where sizeof(int) != sizeof(void*)).
-* fixed some issues caused by extraordinary space optimizations
-* cope with the fact that you cannot directly capture the return
-  code in setjmp from a longjmp invocation. 8-O !!
-  viz., int res = setjmp(&ctx); is illegal.
+New in 5.9 March 2007
+
+* a script for producing Debian packages is included
+* including of templates and definitions now works more like
+  ``#include "foo"'' instead of ``#include <foo>''.
+* fixed sizeof(int) != sizeof(size_t) bug.
+* fixed incorrect argument number format string

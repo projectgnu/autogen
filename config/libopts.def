@@ -4,16 +4,16 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2007/01/13 06:14:53 $
- *  Time-stamp:        "2007-01-12 12:10:55 bkorb"
+ *  Last Modified:     $Date: 2007/06/23 20:19:39 $
+ *  Time-stamp:        "2007-04-28 11:46:40 bkorb"
  *             by: bkorb
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.18 2007/01/13 06:14:53 bkorb Exp $
+ *  $Id: libopts.def,v 4.19 2007/06/23 20:19:39 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.18 $";
+version     = "$Revision: 4.19 $";
 output-file = libopts.m4;
 
 test   = {
@@ -214,6 +214,25 @@ test = {
 	_END_OF_DOC_;
 };
 
+test = {
+    name   = optional_args;
+    type   = disable;
+    check  = 'not wanting optional option args';
+
+    /*
+     *  What to do for non-default
+     */
+    action = { no; act-type = script; asis;
+      act-text = <<- _EOF_
+	AC_DEFINE([NO_OPTIONAL_OPT_ARGS], [1],
+	          [Define this if optional arguments are disallowed])
+	_EOF_; };
+
+    doc = <<-  _EOF_
+	This option will cause optional option arguments to be required.
+	_EOF_;
+};
+
 do-first = <<-_EOF_
 	# =================
 	# AC_HEADER_STDC
@@ -230,7 +249,7 @@ do-first = <<-_EOF_
 	AC_CHECK_HEADERS(dlfcn.h errno.h fcntl.h libgen.h memory.h netinet/in.h \
 	  setjmp.h sys/mman.h sys/param.h sys/poll.h sys/procset.h sys/select.h \
 	  sys/socket.h sys/stropts.h sys/time.h sys/un.h sys/wait.h unistd.h    \
-	  utime.h )
+	  utime.h sysexits.h)
 
 	# --------------------------------------------
 	# Verify certain entries from AC_CHECK_HEADERS

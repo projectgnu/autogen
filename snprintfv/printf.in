@@ -151,12 +151,14 @@ typedef union printf_arg
  *
  * Append an error that will be returned by printf_strerror.
  */
-#define PRINTF_ERROR(pi, str) \
+#define PRINTF_ERROR(pi, str)                                         \
         printf_error(pi, __FILE__, __LINE__, SNV_ASSERT_FCN, str);
+
 typedef int printf_function (STREAM *stream, struct printf_info *pparser,
-							 union printf_arg const * args);
+                             union printf_arg const * args);
+
 typedef int printf_arginfo_function (struct printf_info *pparser, size_t n,
-									 int *argtypes);
+                                     int *argtypes);
 
 /**
  * spec_entry:
@@ -246,43 +248,47 @@ enum
  **/
 #define SNV_EMIT(ch, stream, count) \
   SNV_STMT_START { \
-    if (stream) \
+    if ((stream)) \
       { \
-	if (count >= 0) \
+	if ((count) >= 0) \
 	  { \
-	    int m_status = stream_put((unsigned char)(ch), stream); \
-	    count = m_status < 0 ? m_status : count + m_status; \
+	    int m_status = stream_put((unsigned char) (ch), (stream)); \
+	    (count) = m_status < 0 ? m_status : (count) + m_status; \
 	  } \
       } \
-    else count++; \
+    else \
+      { \
+        (void)(ch); \
+	(count)++; \
+      } \
   } SNV_STMT_END
 
 @protos format.c
-@protos printf.c
 @protos custom.c
+@protos printf.c
 
 /* If you don't want to use snprintfv functions for *all* of your string
    formatting API, then define COMPILING_SNPRINTFV_C and use the snv_
    prefix for the entry points below. */
 #ifndef COMPILING_PRINTF_C
-#undef  printf
-#undef  vprintf
-#undef  dprintf
-#undef  vdprintf
-#undef  fprintf
-#undef  vfprintf
-#undef  sprintf
-#undef  vsprintf
-#undef  snprintf
-#undef  vsnprintf
-#undef  asprintf
-#undef  vasprintf
-#undef  asprintfv
-#undef  dprintfv
-#undef  fprintfv
-#undef  sprintfv
-#undef  printfv
-#undef  snprintfv
+#undef printf
+#undef vprintf
+#undef dprintf
+#undef vdprintf
+#undef fprintf
+#undef vfprintf
+#undef sprintf
+#undef vsprintf
+#undef snprintf
+#undef vsnprintf
+#undef asprintf
+#undef vasprintf
+#undef asprintfv
+#undef dprintfv
+#undef fprintfv
+#undef sprintfv
+#undef printfv
+#undef snprintfv
 
 #define printf          snv_printf
 #define vprintf         snv_vprintf

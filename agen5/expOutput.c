@@ -1,15 +1,15 @@
 
 /*
- *  $Id: expOutput.c,v 4.22 2006/12/15 23:29:01 bkorb Exp $
+ *  $Id: expOutput.c,v 4.23 2007/06/23 20:19:39 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-15 14:12:17 bkorb"
- *  Last Committed:    $Date: 2006/12/15 23:29:01 $
+ *  Time-stamp:        "2007-05-28 15:29:21 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
  *  This module implements the output file manipulation function
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -597,6 +597,158 @@ ag_scm_out_line( void )
     } while(0);
 
     return AG_SCM_INT2SCM( lineNum );
+}
+
+#if 0
+// /*=gfunc   make_header_guard
+ *
+ * what:   make self-inclusion guard
+ *
+ * exparg: name , header group name
+ *
+ * doc:
+ *   This function will create a @code{#ifndef}/@code{#define}
+ *   sequence for protecting a header from multiple evaluation.
+ *   It will also set the Scheme variable @code{header-file}
+ *   to the name of the file being protected and it will set
+ *   @code{header-guard} to the name of the @code{#define} being
+ *   used to protect it.  It is expected that this will be used
+ *   as follows:
+ *   @example
+ *   [+ (make-header-guard "group_name") +]
+ *   ...
+ *   #endif /* [+ (. header-guard) +] */
+ *
+ *   #include "[+ (. header-file)  +]"
+ *   @end example
+ *   @noindent
+ *   The @code{#define} name is composed as follows:
+ *
+ *   @enumerate
+ *   @item
+ *   The first element is the string argument and a separating underscore.
+ *   @item
+ *   That is followed by the name of the header file with illegal
+ *   characters mapped to underscores.
+ *   @item
+ *   The end of the name is always, "@code{_GUARD}".
+ *   @item
+ *   Finally, the entire string is mapped to upper case.
+ *   @end enumerate
+ *
+ *   The final @code{#define} name is stored in an SCM symbol named
+ *   @code{header-guard}.  Consequently, the concluding @code{#endif} for the
+ *   file should read something like:
+ *
+ *   @example
+ *   #endif /* [+ (. header-guard) +] */
+ *   @end example
+ *
+ *   The name of the header file (the current output file) is also stored
+ *   in an SCM symbol, @code{header-file}.  Therefore, if you are also
+ *   generating a C file that uses the previously generated header file,
+ *   you can put this into that generated file:
+ *
+ *   @example
+ *   #include "[+ (. header-file) +]"
+ *   @end example
+ *
+ *   Obviously, if you are going to produce more than one header file from
+ *   a particular template, you will need to be careful how these SCM symbols
+ *   get handled.
+=*/
+#endif
+SCM
+ag_scm_make_header_guard(SCM name)
+{
+
+    char const * opz; // output file name string
+    size_t       osz;
+
+    char const * gpz; // guard name string
+    size_t       gsz;
+
+    {
+        tFpStack* p = pCurFp;
+        while (p->flags & FPF_UNLINK)  p = p->pPrev;
+        opz = p->pzOutName;
+        osz = strlen(opz);
+    }
+
+    /*
+     *  Construct the gard name using the leader (passed in or "HEADER")
+     *  and the trailer (always "_GUARD") and the output file name in between.
+     */
+    {
+        static char const hdr[] = "HEADER";
+        static char const grd[] = "_GUARD";
+
+        /*
+         *  Leader string and its length.  Usually passed, but defaults
+         *  to "HEADER"
+         */
+        char const * lpz = AG_SCM_STRING_P(name) ? AG_SCM_CHARS(name) : hdr;
+        size_t lsz = (lpz == hdr) ? (sizeof(hdr) - 1) : AG_SCM_STRLEN(name);
+
+        /*
+         *  Full, maximal length of output
+         */
+        size_t hsz = lsz + osz + sizeof(grd) + 1;
+        char * scan_p = AGALOC(hsz, "header guard string");
+
+        gpz = scan_p;
+        do  {
+            *(scan_p++) = toupper(*(lpz++));
+        } while (--lsz > 0);
+
+        /*
+         *  This copy converts non-alphanumerics to underscores,
+         *  but never inserts more than one at a time.  Thus, we may
+         *  not use all of the space in "gpz".
+         */
+        lpz = opz;
+        do  {
+            *(scan_p++) = '_';
+            while ((! isalnum(*lpz)) && (*lpz != NUL))  lpz++;
+            while (isalnum(*lpz))   *(scan_p++) = toupper(*(lpz++));
+        } while (*lpz != NUL);
+
+        memcpy(scan_p, grd, sizeof(grd));
+        gsz = (scan_p - gpz) + sizeof(grd) - 1;
+    }
+
+    {
+        static int  const line_no = __LINE__ + 2;
+        static char const setvar[] =
+            "(set! header-file \"%s\") "
+            "(set! header-guard \"%s\")";
+        char z[sizeof(setvar) + 256];
+        char * p = z;
+        size_t cmdsz = sizeof(setvar) + gsz + osz;
+        if (cmdsz > sizeof(z))
+            p = AGALOC(cmdsz, "Guile set cmd");
+        snprintf(p, cmdsz, setvar, opz, gpz);
+        (void)ag_scm_c_eval_string_from_file_line(
+            p, __FILE__, line_no);
+        if (p != z)
+            AGFREE(p);
+    }
+
+    {
+        static char const ifndef[] = "#ifndef %1$s\n#define %1$s 1";
+        char z[sizeof(ifndef) + 256];
+        char * p = z;
+        size_t strsz = sizeof(ifndef) + (2 * gsz);
+        if (strsz > sizeof(z))
+            p = AGALOC(strsz, "ifndef guard");
+        snprintf(p, strsz, ifndef, gpz);
+        name = AG_SCM_STR02SCM( p );
+        if (p != z)
+            AGFREE(p);
+    }
+
+    AGFREE(gpz);
+    return (name);
 }
 
 /*

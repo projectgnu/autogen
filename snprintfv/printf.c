@@ -93,18 +93,15 @@ spec_init (void)
   if (!is_init)
     {
       extern spec_entry snv_default_spec_table[];
-      unsigned ix = 0;
+      unsigned ix;
 
       memset (spec_table, 0, sizeof (spec_table));
-      while (snv_default_spec_table[ix].spec_key != EOS)
+      for (ix = 0; snv_default_spec_table[ix].spec_key != EOS; ix++)
 	{
 	  unsigned hash = spec_hash (snv_default_spec_table[ix].spec_key);
 	  spec_table[hash] = snv_default_spec_table + ix;
-	  ix++;
 	}
-#ifdef SNV_LIBRARY_BUILD
-      snv_load_all_modules ();
-#endif
+
       is_init = SNV_TRUE;
     }
 }
@@ -208,12 +205,12 @@ call_argtype_function (
 
   else
     {
-      pinfo->spec  = (unsigned)*(pinfo->format);
+      pinfo->spec = (unsigned)*(pinfo->format);
       pinfo->extra = spec->user;
-      pinfo->type  = spec->type;
+      pinfo->type = spec->type;
 
       if (pinfo->argc > argindex)
-        n = spec->arg(pinfo, (size_t)(pinfo->argc - argindex),
+        n = spec->arg(pinfo, (size_t) (pinfo->argc - argindex),
 		      *argtypes + argindex);
       else
         n = spec->arg(pinfo, (size_t)0, NULL);
@@ -235,7 +232,7 @@ call_argtype_function (
           pinfo->extra    = spec->user;
           pinfo->type     = spec->type;
           n = spec->arg(pinfo, (size_t)n, *argtypes + argindex);
-	}
+        }
     }
 
   if (!pinfo->dollar || !IS_MODIFIER (spec))
@@ -363,87 +360,82 @@ parse_printf_format (const char *format, int n, int *argtypes)
 {
   struct printf_info info;
 
-  return_val_if_fail (format != NULL, (size_t)(-1));
+  return_val_if_fail (format != NULL, (size_t)-1);
 
   parser_init (&info, format, NULL);
 
   while (*info.format != EOS)
     {
       int ch = (int) *info.format++;
+      spec_entry *spec;
+      int status;
+      int argindex;
 
-      switch (ch)
-	{
-	case SNV_CHAR_SPEC:
-	  if (*info.format != SNV_CHAR_SPEC)
-	    {
-	      /* We found the start of a format specifier! */
-	      spec_entry *spec;
-	      int status;
-	      int argindex;
+      if (ch != SNV_CHAR_SPEC)
+        continue;
 
-	      parser_reset (&info);
-	      do
-		{
-		  /* Until we fill the stream (or get some other
-		     exception) or one of the handlers tells us
-		     we have reached the end of the specifier... */
+      if (*info.format == SNV_CHAR_SPEC)
+        {
+          /* An escaped CHAR_SPEC: ignore it (by falling through). */
+          ++info.format;
+          continue;
+        }
 
-		  /* ...lookup the handler associated with the char
-		     we are looking at in the format string... */
-		  spec = spec_lookup ((unsigned)*(info.format));
-		  if (spec == NULL)
-		    {
-		      PRINTF_ERROR (&info, "unregistered specifier");
-		      goto error;
-		    }
+      /* We found the start of a format specifier! */
+      parser_reset (&info);
+      do
+        {
+          /* Until we fill the stream (or get some other
+             exception) or one of the handlers tells us
+             we have reached the end of the specifier... */
 
-		  if (!IS_MODIFIER (spec) &&
-		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
-		    {
-		      PRINTF_ERROR (&info, "invalid combination of flags");
-		      goto error;
-		    }
+          /* ...lookup the handler associated with the char
+             we are looking at in the format string... */
+          spec = spec_lookup ((unsigned)*(info.format));
+          if (spec == NULL)
+            {
+              PRINTF_ERROR (&info, "unregistered specifier");
+              goto error;
+            }
 
-	          argindex = info.dollar && !IS_MODIFIER (spec)
-			       ? info.dollar - 1 : info.argindex;
+          if (!IS_MODIFIER (spec) &&
+              !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
+            {
+              PRINTF_ERROR (&info, "invalid combination of flags");
+              goto error;
+            }
 
-		  /* ...and call the relevant handler.  */
-		  if (spec->arg)
-		    {
-                      info.spec  = (unsigned)*(info.format);
-                      info.extra = spec->user;
-                      info.type  = spec->type;
-                      status     = (*spec->arg) (&info, (size_t)(n - argindex),
-                                                 argtypes + argindex);
-		    }
-		  else
-		    {
-		      status = 1;
-		      if (n > argindex)
-			argtypes[argindex] = spec->type;
-		    }
+          argindex = info.dollar && !IS_MODIFIER (spec)
+            ? info.dollar - 1 : info.argindex;
 
-		  if (status < 0)
-		    goto error;
+          /* ...and call the relevant handler.  */
+          if (spec->arg)
+            {
+              info.spec = (unsigned)*(info.format);
+              info.extra = spec->user;
+              info.type = spec->type;
+              status = (*spec->arg) (&info, (size_t) (n - argindex),
+                                     argtypes + argindex);
+            }
+          else
+            {
+              status = 1;
+              if (n > argindex)
+                argtypes[argindex] = spec->type;
+            }
 
-		  info.argc = MAX (info.argc, argindex + status);
-		  if (!info.dollar || !IS_MODIFIER (spec))
-		    info.argindex += status;
+          if (status < 0)
+            goto error;
 
-		  info.format++;
-		}
-	      while (IS_MODIFIER (spec));
-	      continue;
-	    }
+          info.argc = MAX (info.argc, argindex + status);
+          if (!info.dollar || !IS_MODIFIER (spec))
+            info.argindex += status;
 
-	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
-	  ++info.format;
+          info.format++;
+        }
+      while (IS_MODIFIER (spec));
 
-	  /*NOBREAK*/
-
-        default:	/* Just a character: ignore it. */
-	  continue;
-	}
+      continue;
 
     error:
       /* Get here on error */
@@ -513,9 +505,9 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 		    }
 
 		  /* ...and call the relevant handler. */
-		  info.spec  = (unsigned)*(info.format);
+		  info.spec = (unsigned)*(info.format);
 		  info.extra = spec->user;
-		  info.type  = spec->type;
+		  info.type = spec->type;
 
 		  status = spec->arg ? (*spec->arg) (&info, (size_t)0, NULL) : 1;
 
@@ -546,10 +538,11 @@ do_printfv (STREAM *stream, const char *format, union printf_arg const args[])
 
 	  /*FALLTHROUGH*/
 
-	default:       /* Just a character: copy it. */
-	  SNV_EMIT (ch, stream, info.count);
-	  continue;
-	}
+        default:
+          /* Just a character: copy it. */
+          SNV_EMIT (ch, stream, info.count);
+          continue;
+        }
 
     error:
       /* Get here on error */
@@ -600,54 +593,54 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
       int ch = (int) *info.format++;
 
       switch (ch)
-	{
-	case SNV_CHAR_SPEC:
-	  if (*info.format != SNV_CHAR_SPEC)
-	    {
-	      /* We found the start of a format specifier! */
-	      spec_entry *spec;
+        {
+        case SNV_CHAR_SPEC:
+          if (*info.format != SNV_CHAR_SPEC)
+            {
+              /* We found the start of a format specifier! */
+              spec_entry *spec;
 
-	      parser_reset (&info);
-	      do
-		{
-		  /* Until we fill the stream (or get some other
-		     exception) or one of the handlers tells us
-		     we have reached the end of the specifier... */
+              parser_reset (&info);
+              do
+                {
+                  /* Until we fill the stream (or get some other
+                     exception) or one of the handlers tells us
+                     we have reached the end of the specifier... */
 
-		  /* ...lookup the handler associated with the char
-		     we are looking at in the format string... */
-		  spec = spec_lookup ((unsigned)*(info.format));
-		  if (spec == NULL)
-		    {
-		      PRINTF_ERROR (&info, "unregistered specifier");
-		      goto error;
-		    }
+                  /* ...lookup the handler associated with the char
+                     we are looking at in the format string... */
+                  spec = spec_lookup ((unsigned)*(info.format));
+                  if (spec == NULL)
+                    {
+                      PRINTF_ERROR (&info, "unregistered specifier");
+                      goto error;
+                    }
 
-		  if (!IS_MODIFIER (spec) &&
-		      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
-		    {
-		      PRINTF_ERROR (&info, "invalid combination of flags");
-		      goto error;
-		    }
+                  if (!IS_MODIFIER (spec) &&
+                      !(info.state & (SNV_STATE_BEGIN | SNV_STATE_SPECIFIER)))
+                    {
+                      PRINTF_ERROR (&info, "invalid combination of flags");
+                      goto error;
+                    }
 
-		  /* ...and call the relevant handler. */
-		  if (call_argtype_function (&info, &argtypes, spec) < 0)
-		    goto error;
+                  /* ...and call the relevant handler. */
+                  if (call_argtype_function (&info, &argtypes, spec) < 0)
+                    goto error;
 
-		  info.format++;
-		}
-	      while (info.count >= 0 && IS_MODIFIER (spec));
-	      continue;
-	    }
+                  info.format++;
+                }
+              while (info.count >= 0 && IS_MODIFIER (spec));
+              continue;
+            }
 
-	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
-	  ++info.format;
+          /* An escaped CHAR_SPEC: ignore it (by falling through). */
+          ++info.format;
 
-	  /*NOBREAK*/
+          /*FALLTHROUGH*/
 
-	default:       /* Just a character: ignore it. */
-	  continue;
-	}
+        default:       /* Just a character: ignore it. */
+          continue;
+        }
 
     error:
       /* Get here on error */
@@ -792,6 +785,8 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
   return_val_if_fail (format != NULL, SNV_ERROR);
 
   parser_init (&info, format, NULL);
+
+  /* Keep going until the format string runs out! */
   while (*info.format != EOS)
     {
       int ch = (int) *info.format++;
@@ -838,9 +833,9 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
 	  /* An escaped CHAR_SPEC: ignore it (by falling through). */
 	  ++info.format;
 
-	  /*NOBREAK*/
+	  /*FALLTHROUGH*/
 
-        default: /* Just a character: ignore it. */
+        default:	/* Just a character: ignore it. */
 	  continue;
 	}
 
@@ -990,7 +985,7 @@ snv_fdputc (int ch, STREAM *stream)
   static char buf[1] = { 0 };
   buf[0] = (char) ch;
   return
-    write ((int)SNV_POINTER_TO_INT (stream_details (stream)), buf, (size_t)1)
+    write ((int) SNV_POINTER_TO_LONG (stream_details (stream)), buf, (size_t) 1)
       ? ch : -1;
 }
 
@@ -1037,7 +1032,7 @@ int
 snv_vdprintf (int fd, const char *format, va_list ap)
 {
   int result;
-  STREAM *out = stream_new (SNV_INT_TO_POINTER (fd),
+  STREAM *out = stream_new (SNV_LONG_TO_POINTER (fd),
 	       		    SNV_UNLIMITED, NULL, snv_fdputc);
 
   result = stream_vprintf (out, format, ap);
@@ -1062,7 +1057,7 @@ int
 snv_dprintfv (int fd, const char *format, snv_constpointer const args[])
 {
   int result;
-  STREAM *out = stream_new (SNV_INT_TO_POINTER (fd),
+  STREAM *out = stream_new (SNV_LONG_TO_POINTER (fd),
 	       		    SNV_UNLIMITED, NULL, snv_fdputc);
 
   result = stream_printfv (out, format, args);
@@ -1087,6 +1082,13 @@ snv_fileputc (int ch, STREAM *stream)
 {
   FILE *fp = (FILE *) stream_details (stream);
   return putc (ch, fp);
+}
+
+static int
+snv_fileputc_unlocked (int ch, STREAM *stream)
+{
+  FILE *fp = (FILE *) stream_details (stream);
+  return SNV_PUTC_UNLOCKED (ch, fp);
 }
 
 /**
@@ -1130,9 +1132,12 @@ int
 snv_vprintf (const char *format, va_list ap)
 {
   int result;
-  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc);
+  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc_unlocked);
+  int tmp;
 
-  result = stream_vprintf (out, format, ap);
+  SNV_WITH_LOCKED_FP (stdout, tmp)
+    result = stream_vprintf (out, format, ap);
+
   stream_delete (out);
   return result;
 }
@@ -1153,9 +1158,11 @@ int
 snv_printfv (const char *format, snv_constpointer const args[])
 {
   int result;
-  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc);
+  STREAM *out = stream_new (stdout, SNV_UNLIMITED, NULL, snv_fileputc_unlocked);
+  int tmp;
 
-  result = stream_printfv (out, format, args);
+  SNV_WITH_LOCKED_FP (stdout, tmp)
+    result = stream_printfv (out, format, args);
   stream_delete (out);
   return result;
 }
@@ -1203,9 +1210,11 @@ int
 snv_vfprintf (FILE *file, const char *format, va_list ap)
 {
   int result;
-  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc);
+  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc_unlocked);
+  int tmp;
 
-  result = stream_vprintf (out, format, ap);
+  SNV_WITH_LOCKED_FP (file, tmp)
+    result = stream_vprintf (out, format, ap);
   stream_delete (out);
   return result;
 }
@@ -1227,9 +1236,12 @@ int
 snv_fprintfv (FILE *file, const char *format, snv_constpointer const args[])
 {
   int result;
-  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc);
+  STREAM *out = stream_new (file, SNV_UNLIMITED, NULL, snv_fileputc_unlocked);
+  int tmp;
 
-  result = stream_printfv (out, format, args);
+  SNV_WITH_LOCKED_FP (file, tmp)
+    result = stream_printfv (out, format, args);
+
   stream_delete (out);
   return result;
 }

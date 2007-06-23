@@ -1,8 +1,8 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  AutoGen copyright 1992-2006 Bruce Korb
-#  Time-stamp:        "2006-10-21 09:35:29 bkorb"
-#  Last Committed:    $Date: 2006/10/24 00:02:50 $
+#  AutoGen Copyright (c) 1992-2007 Bruce Korb
+#  Time-stamp:        "2007-03-24 12:20:12 bkorb"
+#  Last Committed:    $Date: 2007/06/23 20:19:39 $
 
 =][=
 
@@ -225,7 +225,7 @@ DEFINE preamble
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001-2006  by  Bruce Korb
+ *  Copyright (c) 2001-2007  by  Bruce Korb
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=
@@ -239,7 +239,7 @@ DEFINE compute-transitions     =][=
 ;;; Initialize every possible transition as invalid
 ;;;
 (define tr_name (if (=* (get "method") "call")
-                (string-append "&" pfx "_do_invalid")
+                (string-append pfx "_do_invalid")
                 (string-append PFX "_TR_INVALID")  ))
 (shellf
   "ev_list='%s' ; st_list='INIT %s'
@@ -252,7 +252,7 @@ DEFINE compute-transitions     =][=
    (string-upcase! (join " " (stack "state")))
    PFX tr_name )
 
-(define tev  "")
+(define tev   "")
 (define tst   "")
 (define ttype "")
 (define next  "")

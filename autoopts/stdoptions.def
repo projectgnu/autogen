@@ -1,9 +1,9 @@
 
 /* -*- Mode: Text -*-
 
- * Time-stamp:      "2006-10-22 10:28:31 bkorb"
+ * Time-stamp:      "2007-04-15 16:33:26 bkorb"
 
-# Automated Options copyright 1992-2006 Bruce Korb
+# Automated Options copyright 1992-2007 Bruce Korb
 
 # Automated Options is free software.
 # You may redistribute it and/or modify it under the terms of the
@@ -61,18 +61,31 @@ flag = {
 #endif
 
 #ifdef  ALL_STD_OPTS
-#define DEBUG
-#define VERBOSE
-#define WARN
 #define BRIEF
+#define DEBUG
+#define DIRECTORY
+#define DRY_RUN
+#define INPUT
+#define INTERACTIVE
+#define OUTPUT
 #define QUIET
 #define SILENT
-#define DRY_RUN
-#define OUTPUT
-#define INPUT
-#define DIRECTORY
-#define INTERACTIVE
-#define SHORT_HELP
+#define VERBOSE
+#define WARN
+#endif
+
+#ifdef ALL_FLAG_OPTS
+#define BRIEF_FLAG
+#define DEBUG_FLAG
+#define DIRECTORY_FLAG
+#define DRY_RUN_FLAG
+#define INPUT_FLAG
+#define INTERACTIVE_FLAG
+#define OUTPUT_FLAG
+#define QUIET_FLAG
+#define SILENT_FLAG
+#define VERBOSE_FLAG
+#define WARN_FLAG
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -262,7 +275,7 @@ flag = {
 flag = {
     name    = DRY_RUN;
 #ifdef DRY_RUN_FLAG
-    value   = d;
+    value   = R;
 #endif
     descrip = 'program will make no changes';
     doc =
@@ -350,50 +363,5 @@ flag = {
     descrip   = "use specified dir for I/O";
     doc =
     "This option specifies the directory to use for program input and output.";
-};
-#endif
-
-/* * * * * * * *
- *
- *  INPUT/OUTPUT short_help
- */
-#ifdef SHORT_HELP_FLAG
-# define SHORT_HELP
-#endif
-
-#ifdef SHORT_HELP
-include = <<- _EOF_
-	#include <sys/types.h>
-	#include <sys/wait.h>
-	#include <signal.h>
-	#include <stdlib.h>
-	#include <unistd.h>
-	_EOF_;
-
-flag = {
-    name      = short_help;
-    descrip   = "Get short help text without an error exit";
-    immediate;
-    no-preset;
-#ifdef SHORT_HELP_FLAG
-    value     = h;        /* flag style option character */
-#endif
-    doc =
-    "This option specifies that the abbreviated usage text should be emitted.";
-    flag-code = <<- _EOF_
-	    pid_t chid;
-	#   ifndef SIGCHLD
-	#     define SIGCHLD SIGCLD
-	#   endif
-	    signal(SIGCHLD, SIG_DFL); /* make sure we can wait for child */
-	    chid = fork();
-	    if (chid > 0) {
-	        int sts;
-	        waitpid(chid, &sts, 0);
-	        exit( 0 );
-	    }
-	    (*(pOptions->pUsageProc))(pOptions, 1);
-	    /*NOTREACHED*/
-	_EOF_;
 };
 #endif

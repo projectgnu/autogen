@@ -1,3 +1,35 @@
+autogen (1:5.9.1-0) experimental; urgency=low
+
+  * getopt.tpl template is fixed to not require the internal header
+    autoopts/autoopts.h.
+  * MAXPATHLEN will use _MAX_PATH on Windows platforms
+  * new libopts configuration option: --disable-optional-args This will #define
+    NO_OPTIONAL_OPT_ARGS in config.h and cause the built library to ignore the
+    OPTST_ARG_OPTIONAL bit in an option descriptor.  autoopts generated code
+    compiled with NO_OPTIONAL_OPT_ARGS #defined will never have that bit set in
+    the option descriptors either.  If libopts has been so configured, then the
+    installed options.h header will contain: #define NO_OPTIONAL_OPT_ARGS 1 so
+    that client code will generally be compiled with that flag set.
+    The OPTST_ARG_OPTIONAL bit is ignored regardless.
+  * Fixed up --load-opts environment variable processing.  You can
+    now correctly suppress config file loading with either:
+      PROGRAM_LOAD_OPTS=no
+      PROGRAM=--no-load-opts
+  * added new auto-supported option, --usage.  It is incorporated
+    by specifying ``usage-opt;'' in the option definitions file.
+  * libopts now uses several exit codes from sysexits.h:
+    EX_NOINPUT  (66) - a specified config file cannot be found
+    EX_SOFTWARE (70) - libopts error - please file a bug report
+    EX_CONFIG   (78) - a NULL option descriptor was passed in - user bug
+
+ -- Bruce Korb <bkorb@gnu.org>  Sat, 5 May 2007 12:00:00 -0800
+
+autogen (1:5.9-0) experimental; urgency=low
+
+  * remove gperf dependency.  It is not necessary for build.
+
+ -- Bruce Korb <bkorb@gnu.org>  Sun, 11 Mar 2007 09:15:00 -0800
+
 autogen (1:5.8.9-2) experimental; urgency=low
 
   * Decrement AO_AGE, closes: #409056.

@@ -34,7 +34,7 @@ extern "C" {
 #define SNV_END_EXTERN_C }
 #else
 #define SNV_END_EXTERN_C
-#endif
+#endif /* __cplusplus */
 
 #define NO_FLOAT_PRINTING
 
@@ -162,18 +162,31 @@ typedef int snv_wint_t;
    typedef char *snv_constpointer;
 #endif
 
-/* Define macros for storing integers inside pointers.
+#if defined(HAVE_FPUTC_UNLOCKED) && defined(HAVE_FLOCKFILE)
+#  define SNV_FPUTC_UNLOCKED fputc_unlocked
+#  define SNV_PUTC_UNLOCKED putc_unlocked
+#  define SNV_WITH_LOCKED_FP(fp, tmp_var) \
+     for (flockfile (fp), tmp_var = 1; \
+       tmp_var--; funlockfile (fp))
+#else
+#  define SNV_FPUTC_UNLOCKED fputc
+#  define SNV_PUTC_UNLOCKED putc
+#  define SNV_WITH_LOCKED_FP(fp, tmp_var) \
+     for (tmp_var = 1; tmp_var--; )
+#endif
+
+/*
+ * Define macros for storing integers inside pointers.
  * Be aware that it is only safe to use these macros to store `int'
  * values in `char*' (or `void*') words, and then extract them later.
  * Although it will work the other way round on many common
  * architectures, it is not portable to assume a `char*' can be
  * stored in an `int' and extracted later without loss of the msb's
  */
-
-#define SNV_POINTER_TO_INT(p)	((long)(p))
-#define SNV_POINTER_TO_UINT(p)	((unsigned long)(p))
-#define SNV_INT_TO_POINTER(i)	((snv_pointer)(long)(i))
-#define SNV_UINT_TO_POINTER(u)	((snv_pointer)(unsigned long)(u))
+#define SNV_POINTER_TO_LONG(p)	((long)(p))
+#define SNV_POINTER_TO_ULONG(p)	((unsigned long)(p))
+#define SNV_LONG_TO_POINTER(i)	((snv_pointer)(long)(i))
+#define SNV_ULONG_TO_POINTER(u)	((snv_pointer)(unsigned long)(u))
 
 typedef enum {
     SNV_FALSE = 0,
@@ -288,7 +301,7 @@ SNV_END_EXTERN_C
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
+ * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/compat.h */

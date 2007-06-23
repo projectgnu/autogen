@@ -4,8 +4,8 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  AutoGen copyright 1992-2006 Bruce Korb
-#  Time-stamp:      "2006-09-23 11:59:38 bkorb"
+#  AutoGen Copyright (c) 1992-2007 Bruce Korb
+#  Time-stamp:      "2007-03-24 12:20:28 bkorb"
 
 (setenv "SHELL" "/bin/sh")
 (define fmt "")

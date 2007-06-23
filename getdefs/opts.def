@@ -2,12 +2,11 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.12 2006/09/24 02:57:02 bkorb Exp $
- *   Time-stamp:         "2006-09-23 19:39:24 bkorb"
+ *   $Id: opts.def,v 4.13 2007/06/23 20:19:39 bkorb Exp $
  */
 
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  AutoGen copyright 1992-2007 Bruce Korb
  *
  *  AutoGen is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -27,7 +26,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2006";
+    date   = "1999-2007";
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = "autogen-users@lists.sourceforge.net";
@@ -50,10 +49,11 @@ flag = {
     arg-type  = string;
     arg-name  = reg-ex;
     descrip   = 'Regexp to look for after the "/*="';
-    doc =
-    "If you want definitions only from a particular category, or even\n"
-    "with names matching particular patterns, then specify this regular\n"
-    "expression for the text that must follow the @code{/*=}.";
+    doc = <<-  _EOF_
+	If you want definitions only from a particular category, or even
+	with names matching particular patterns, then specify this regular
+	expression for the text that must follow the @code{/*=}.
+	_EOF_;
 };
 
 flag = {
@@ -76,11 +76,11 @@ flag = {
 
 flag = {
     name        = first_index;
-	arg_type    = number;
+    arg_type    = number;
     arg-default = 0;
     arg-name    = first-index;
     descrip     = "The first index to apply to groups";
-	doc = <<-  _EOF_
+    doc = <<-  _EOF_
 	By default, the first occurrence of a named definition will have an
 	index of zero.  Sometimes, that needs to be a reserved value.  Provide
 	this option to specify a different starting point.
@@ -168,12 +168,15 @@ flag = {
     arg-optional;
     arg-name    = file;
     descrip     = "Insert source file names into defs";
-    doc =
-    "Inserts the name of each input file into the output definitions.\n"
-    "If no argument is supplied, the format will be:\n"
-    "@example\ninfile = '%s';\n@end example\n"
-    "If an argument is supplied, that string will be used for the entry\n"
-    "name instead of @var{infile}.";
+    doc = <<-  _EOF_
+	Inserts the name of each input file into the output definitions.
+	If no argument is supplied, the format will be:
+	@example
+	infile = '%s';
+	@end example
+	If an argument is supplied, that string will be used for the entry
+	name instead of @var{infile}.
+	_EOF_;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -193,9 +196,11 @@ flag = {
     max         = NOLIMIT;
     stack_arg;
     descrip     = "Global assignments";
-    doc =
-    "The argument to each copy of this option will be inserted into\n"
-    "the output definitions, with only a semicolon attached.";
+    doc = <<- _EOF_
+	The argument to each copy of this option will be inserted into
+	the output definitions, with only a semicolon attached.
+	_EOF_;
+
 };
 
 flag = {
@@ -205,9 +210,11 @@ flag = {
     max         = NOLIMIT;
     stack_arg;
     descrip     = "Assignments common to all blocks";
-    doc =
-    "The argument to each copy of this option will be inserted into\n"
-    "each output definition, with only a semicolon attached.";
+    doc = <<- _EOF_
+	The argument to each copy of this option will be inserted into
+	each output definition, with only a semicolon attached.
+	_EOF_;
+
 };
 
 flag = {
@@ -217,9 +224,11 @@ flag = {
     max         = NOLIMIT;
     stack_arg;
     descrip     = "File(s) to copy into definitions";
-    doc =
-    "The content of each file named by these options will be inserted into\n"
-    "the output definitions.";
+    doc = <<- _EOF_
+	The content of each file named by these options will be inserted into
+	the output definitions.
+	_EOF_;
+
 };
 
 flag = {
@@ -228,13 +237,17 @@ flag = {
     arg-optional;
     arg-name    = file;
     descrip     = "Insert source file name into each def";
-    doc =
-    "Inserts the name of the input file where a definition was found\n"
-    "into the output definition.\n"
-    "If no argument is supplied, the format will be:\n"
-    "@example\nsrcfile = '%s';\n@end example\n"
-    "If an argument is supplied, that string will be used for the entry\n"
-    "name instead of @var{srcfile}.";
+    doc = <<- _EOF_
+	Inserts the name of the input file where a definition was found
+	into the output definition.
+	If no argument is supplied, the format will be:
+	@example
+	srcfile = '%s';
+	@end example
+	If an argument is supplied, that string will be used for the entry
+	name instead of @var{srcfile}.
+	_EOF_;
+
 };
 
 flag = {
@@ -243,13 +256,17 @@ flag = {
     arg-optional;
     arg-name    = def-name;
     descrip     = "Insert source line number into each def";
-    doc =
-    "Inserts the line number in the input file where a definition\n"
-    "was found into the output definition.\n"
-    "If no argument is supplied, the format will be:\n"
-    "@example\nlinenum = '%s';\n@end example\n"
-    "If an argument is supplied, that string will be used for the entry\n"
-    "name instead of @var{linenum}.";
+    doc = <<- _EOF_
+	Inserts the line number in the input file where a definition
+	was found into the output definition.
+	If no argument is supplied, the format will be:
+	@example
+	linenum = '%s';
+	@end example
+	If an argument is supplied, that string will be used for the entry
+	name instead of @var{linenum}.
+	_EOF_;
+
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -268,9 +285,11 @@ flag = {
     arg-type    = string;
     arg-name    = file;
     descrip     = "Output file to open";
-    doc =
-    "If you are not sending the output to an AutoGen process,\n"
-    "you may name an output file instead.";
+    doc = <<- _EOF_
+	If you are not sending the output to an AutoGen process,
+	you may name an output file instead.
+	_EOF_;
+
 };
 
 flag = {
@@ -282,11 +301,13 @@ flag = {
     disable     = "no";
     enabled;
     descrip     = "Invoke AutoGen with defs";
-    doc =
-    "This is the default output mode.  Specifying @code{no-autogen} is\n"
-    "equivalent to @code{output=-}.  If you supply an argument to this\n"
-    "option, that program will be started as if it were AutoGen and\n"
-    "its standard in will be set to the output definitions of this program.";
+    doc = <<- _EOF_
+	This is the default output mode.  Specifying @code{no-autogen} is
+	equivalent to @code{output=-}.  If you supply an argument to this
+	option, that program will be started as if it were AutoGen and
+	its standard in will be set to the output definitions of this program.
+	_EOF_;
+
 };
 
 flag = {
@@ -307,9 +328,11 @@ flag = {
     stack_arg;
     descrip     = "AutoGen Argument";
     flags_cant  = output;
-    doc =
-    "This is a pass-through argument.  It allows you to specify any\n"
-    "arbitrary argument to be passed to AutoGen.";
+    doc = <<- _EOF_
+	This is a pass-through argument.  It allows you to specify any
+	arbitrary argument to be passed to AutoGen.
+	_EOF_;
+
 };
 
 flag = {
@@ -318,11 +341,13 @@ flag = {
     arg-name    = name;
     descrip     = "Base name for output file(s)";
     flags_cant  = output;
-    doc =
-    "When output is going to AutoGen, a base name must either be supplied\n"
-    "or derived.  If this option is not supplied, then it is taken from\n"
-    "the @code{template} option.  If that is not provided either, then\n"
-    "it is set to the base name of the current directory.";
+    doc = <<- _EOF_
+	When output is going to AutoGen, a base name must either be supplied
+	or derived.  If this option is not supplied, then it is taken from
+	the @code{template} option.  If that is not provided either, then
+	it is set to the base name of the current directory.
+	_EOF_;
+
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

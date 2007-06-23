@@ -67,7 +67,7 @@ FOR bit     =][=
 ENDFOR bit  =][=
 
   (define define-width (+ name-width 6 (string-length prefix)))
-  (define enum-fmt (sprintf "\n        %%-%ds =%%4d%%s /* %%-%ds */"
+  (define enum-fmt (sprintf "\n    %%-%ds =%%4d%%s /* %%-%ds */"
                             define-width desc-width))
 
 =][=

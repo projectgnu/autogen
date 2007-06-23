@@ -2,28 +2,24 @@
 
 html
 
-# Time-stamp: "2006-09-27 20:10:55 bkorb"
-# Version:    "$Revision: 4.9 $
+# Time-stamp: "2007-05-03 09:35:28 bkorb"
+# Version:    "$Revision: 4.10 $
 
 =]
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.9 2006/09/28 03:17:50 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.10 2007/06/23 20:19:39 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
 
-  --><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-  <title>[= title =]</title>
-  <meta http-equiv="content-type" content='text/html; charset=utf-8' />
-  <link rel="stylesheet" type="text/css" href="/gnu.css" />
-  <link rev="made" href="webmasters@gnu.org" />
-  <meta name="generator" content="AutoGen [=(. autogen-version)=]">
-</head>
+  -->
+<title>[= title =] - GNU Project - Free Software Foundation (FSF)</title>
+<meta http-equiv="content-type" content='text/html; charset=utf-8' />
+<meta name="generator" content="AutoGen [=(. autogen-version)=]"/>
+<!--#include virtual="/server/banner.html" -->
+<h3>[= project =] version [= version =] - Table of Contents</H3>
 
 <!-- This document is in XML, and xhtml 1.0 -->
 <!-- Please make sure to properly nest your tags -->
@@ -31,24 +27,13 @@ html
 <!-- consistent with W3C xhtml 1.0 and CSS standards -->
 <!-- See validator.w3.org -->
 
-<body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000"
-      vlink="#9900DD">
-<h3>[= project =] version [= version =] - Table of Contents</H3>
-
 <address>Free Software Foundation</address>
 <address>last updated [=`date '+%B %e, %Y'`=]</address>
-<p>
-<a href="/graphics/gnu-head.jpg">
-        <img src="/graphics/gnu-head-sm.jpg"
-        alt=" [image of the head of a GNU] "
-        width="129" height="122" />
-</a>
-<a href="/philosophy/gif.html">(no gifs due to patent problems)</a>
-</p>
-<hr />
 
 <p>The manual for the <a href="/software/[=
-   (define proj-name (string-downcase! (get "project"))) proj-name
+   (define proj-name (string-downcase! (get "project")))
+   (define package   (string-downcase! (get "package")))
+   package
    =]">[= project =] project</a> is available in the following formats:</p>[=
 
 (define fnam "")
@@ -56,7 +41,7 @@ html
 
 (define (compute-size dir sfx)
   (begin
-     (set! fnam (string-append dir "/" proj-name sfx))
+     (set! fnam (string-append dir "/" package sfx))
      (set! fsiz (if (access? fnam R_OK)  (stat:size (stat fnam)) 0 ))
      (shellf "fsiz='%d'
          if test ${fsiz} -lt 4096
@@ -74,44 +59,44 @@ html
 
 =]
 <ul>
-  <li>formatted in <a href="html_mono/[= (. proj-name) =].html">HTML ([=
+  <li>formatted in <a href="html_mono/[= (. package) =].html">HTML ([=
       (compute-size "html_mono" ".html")
       =] characters)</a> entirely on one web page.
-  <li>formatted in <a href="html_mono/[= (. proj-name) =].html.gz">HTML ([=
+  <li>formatted in <a href="html_mono/[= (. package) =].html.gz">HTML ([=
       (compute-size "html_mono" ".html.gz")
       =] gzipped bytes)</a> entirely on one web page.
-  <li> formatted in <a href="html_chapter/[= (. proj-name) =]_toc.html">HTML</a>
+  <li> formatted in <a href="html_chapter/[= (. package) =]_toc.html">HTML</a>
        with one web page per chapter.
-  <li> formatted in <a href="html_chapter/[= (. proj-name)
+  <li> formatted in <a href="html_chapter/[= (. package)
        =]_chapter_html.tar.gz">HTML ([=
       (compute-size "html_chapter" "_chapter_html.tar.gz")
       =] gzipped tar file)</a> with one web page per chapter.
-  <li> formatted in <a href="html_node/[= (. proj-name) =]_toc.html">HTML</a>
+  <li> formatted in <a href="html_node/[= (. package) =]_toc.html">HTML</a>
        with one web page per node.
-  <li> formatted in <a href="html_node/[= (. proj-name)
+  <li> formatted in <a href="html_node/[= (. package)
        =]_node_html.tar.gz">HTML ([=
       (compute-size "html_node" "_node_html.tar.gz")
       =] gzipped tar file)</a> with one web page per node.
-  <li>formatted as an <a href="info/[= (. proj-name)
+  <li>formatted as an <a href="info/[= (. package)
        =].info.gz">Info document ([=
       (compute-size "info" ".info.gz")
       =] bytes gzipped tar file)</a>.
-  <li>formatted as <a href="text/[= (. proj-name) =].txt">ASCII text ([=
+  <li>formatted as <a href="text/[= (. package) =].txt">ASCII text ([=
       (compute-size "text" ".txt")
       =] characters)</a>.
-  <li>formatted as <a href="text/[= (. proj-name) =].txt.gz">ASCII text ([=
+  <li>formatted as <a href="text/[= (. package) =].txt.gz">ASCII text ([=
       (compute-size "text" ".txt.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="dvi/[= (. proj-name) =].dvi.gz">a TeX dvi file ([=
+  <li>formatted as <a href="dvi/[= (. package) =].dvi.gz">a TeX dvi file ([=
       (compute-size "dvi" ".dvi.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="pdf/[= (. proj-name) =].pdf.gz">a PDF file ([=
+  <li>formatted as <a href="pdf/[= (. package) =].pdf.gz">a PDF file ([=
       (compute-size "pdf" ".pdf.gz")
       =] gzipped bytes)</a>.
-  <li>formatted as <a href="ps/[= (. proj-name) =].ps.gz">a PostScript file ([=
+  <li>formatted as <a href="ps/[= (. package) =].ps.gz">a PostScript file ([=
       (compute-size "ps" ".ps.gz")
       =] gzipped bytes)</a>.
-  <li>the original <a href="texi/[= (. proj-name) =].texi.gz">Texinfo source ([=
+  <li>the original <a href="texi/[= (. package) =].texi.gz">Texinfo source ([=
       (compute-size "texi" ".texi.gz")
       =] gzipped bytes)</a>
 </ul>
@@ -147,7 +132,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2006/09/28 03:17:50 $ $Author: bkorb $
+$Date: 2007/06/23 20:19:39 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

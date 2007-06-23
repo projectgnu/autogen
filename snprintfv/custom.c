@@ -176,7 +176,7 @@ printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_ar
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
+ * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/custom.c */

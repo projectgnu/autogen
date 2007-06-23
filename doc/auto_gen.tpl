@@ -2,14 +2,14 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-2006 Bruce Korb
+##  AutoGen Copyright (C) 1992-2007 Bruce Korb
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2007-01-13 15:36:52 bkorb"
-## Last Committed:    $Date: 2007/01/14 20:43:31 $
+## Time-stamp:        "2007-04-15 16:41:45 bkorb"
+## Last Committed:    $Date: 2007/06/23 20:19:39 $
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.30 2007/01/14 20:43:31 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.31 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -565,6 +565,7 @@ homerc     = '$$/../share/default-test', '$HOME', '.';
 environrc;
 long-opts;
 gnu-usage;
+usage-opt;
 version    = '1.0';
 main = {
   main-type = shell-process;

@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.9 2006/11/27 01:55:18 bkorb Exp $
+ *  $Id: getdefs.c,v 4.10 2007/06/23 20:19:39 bkorb Exp $
  *
- *    getdefs copyright 1999-2006 Bruce Korb
+ *    getdefs copyright 1999-2007 Bruce Korb
  *
- *  Time-stamp:        "2006-11-26 16:42:14 bkorb"
+ *  Time-stamp:        "2007-04-28 11:36:13 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Maintainer:        Bruce Korb <bkorb@gnu.org>
  *  Created:           Mon Jun 30 15:35:12 1997
@@ -612,7 +612,7 @@ doPreamble( FILE* outFp )
         tSCC   zFmt[] = "%-12s = '%s';\n";
         tCC*   pzName = OPT_ARG( FILELIST );
 
-        if (pzName == NULL)
+        if ((pzName == NULL) || (*pzName == NUL))
             pzName = "infile";
 
         if (HAVE_OPT( INPUT )) {

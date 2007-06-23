@@ -1,8 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.16 2006/10/14 23:39:58 bkorb Exp $
-# Time-stamp:        "2006-10-14 16:18:21 bkorb"
-# Last Committed:    $Date: 2006/10/14 23:39:58 $
+# $Id: directive.tpl,v 4.17 2007/06/23 20:19:39 bkorb Exp $
+# Time-stamp:        "2007-03-24 17:48:00 bkorb"
+# Last Committed:    $Date: 2007/06/23 20:19:39 $
 
 (setenv "SHELL" "/bin/sh")
 
@@ -17,7 +17,7 @@ h =]
 
   (string-append
      (dne " *  " "/*  ")
-     "\n *\n *  copyright 1992-2006 Bruce Korb\n *\n"
+     "\n *\n *  copyright 1992-2007 Bruce Korb\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"
      (make-header-guard "autogen")
@@ -192,11 +192,12 @@ gperf_%2$s=${gpdir}/%2$s
 
 exec 2> %2$s.log
 gperf --language=ANSI-C -H %2$s_hash -N %2$s_find --null-strings \
-      -C -E -I -t %2$s.gperf > %2$s.c || \
+      -C -E -I -t %2$s.gperf > %2$s-temp.c || \
    die "gperf failed on ${gpdir}/%2$s.gperf
       `cat %2$s.log`"
+egrep -v '^_*inline$' %2$s-temp.c > %2$s.c
 export CFLAGS=-g
-${MAKE-make} %2$s
+${MAKE-make} %2$s 1>&2
 test $? -eq 0 -a -x ${gperf_%2$s} || \
   die "could not build gperf program
       `cat %2$s.log`"

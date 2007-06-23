@@ -2,9 +2,9 @@
 AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
 /*
- * Time-stamp:      "2006-10-22 15:52:30 bkorb"
+ * Time-stamp:      "2007-02-13 11:28:26 bkorb"
  *
- *  AutoOpts copyright 1992-2006 Bruce Korb
+ *  AutoOpts copyright 1992-2007 Bruce Korb
  *
  *  AutoOpts is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.15 2006/10/24 00:02:50 bkorb Exp $
+   $Id: usage-txt.def,v 4.16 2007/06/23 20:19:39 bkorb Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ utxt = { ut-name = ArgsMust;
 };
 
 utxt = { ut-name = AtMost;
-         ut-text = "%4$d %1$s%s options allowed\n";
+         ut-text = "%d %s%s options allowed\n";
 };
 
 utxt = { ut-name = Auto;
@@ -413,8 +413,7 @@ utxt = { ut-name = Prohib;
 };
 
 utxt = { ut-name = Reorder;
-         ut-text =
-            "Operands and options may be intermixed.  "
+         ut-text = "Operands and options may be intermixed.  "
             "They will be reordered.\n";
 };
 

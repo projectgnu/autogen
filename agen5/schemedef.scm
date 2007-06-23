@@ -1,8 +1,8 @@
 
-;;;  AutoGen copyright 1992-2006 Bruce Korb
+;;;  AutoGen copyright 1992-2007 Bruce Korb
 ;;;
-;;; Time-stamp:        "2006-10-14 16:33:33 bkorb"
-;;; Last Committed:    $Date: 2006/10/14 23:39:58 $
+;;; Time-stamp:        "2007-05-28 09:15:16 bkorb"
+;;; Last Committed:    $Date: 2007/06/23 20:19:39 $
 ;;;
 ;;; AutoGen is free software.
 ;;; You may redistribute it and/or modify it under the terms of the
@@ -96,86 +96,20 @@
 (define tmp-dir "")
 (define make-tmp-dir
   (lambda () 
-    (begin (set! tmp-dir (shell
-  "tmp_dir=`mktemp -d ./.ag-XXXXXX` 2>/dev/null
+    (begin (if (= tmp-dir "") (set! tmp-dir (shell
+  "tmp_dir=`mktemp -d ${TMPDIR:-.}/.ag-XXXXXX` 2>/dev/null
   test -d \"${tmp_dir}\" || {
-    tmp_dir=${TMPDIR:-/tmp}/.ag-$$
+    tmp_dir=${TMPDIR:-.}/.ag-$$
     mkdir ${tmp_dir} || die cannot mkdir ${tmp_dir}
-  } ; echo ${tmp_dir}" ))
+  } ; echo ${tmp_dir}" ))))
 
-  (add-cleanup (string-append  "rm -rf " tmp-dir))
+  (add-cleanup (string-append
+   "test \"${VERBOSE:-false}\" = true || rm -rf " tmp-dir))
 
-)))
-
-;;; /*=gfunc   make_header_guard
-;;;  *
-;;;  * what:   make self-inclusion guard
-;;;  *
-;;;  * exparg: name , header group name
-;;;  *
-;;;  * doc:
-;;;  *   This function will create a @code{#ifndef}/@code{#define}
-;;;  *   sequence for protecting a header from multiple evaluation.
-;;;  *   It will also set the Scheme variable @code{header-file}
-;;;  *   to the name of the file being protected and it will set
-;;;  *   @code{header-guard} to the name of the @code{#define} being
-;;;  *   used to protect it.  It is expected that this will be used
-;;;  *   as follows:
-;;;  *   @example
-;;;  *   [+ (make-header-guard "group_name") +]
-;;;  *   ...
-;;;  *   #endif /* [+ (. header-guard) +]
-;;;  *
-;;;  *   #include "[+ (. header-file)  +]"
-;;;  *   @end example
-;;;  *   @noindent
-;;;  *   The @code{#define} name is composed as follows:
-;;;  *
-;;;  *   @enumerate
-;;;  *   @item
-;;;  *   The first element is the string argument and a separating underscore.
-;;;  *   @item
-;;;  *   That is followed by the name of the header file with illegal
-;;;  *   characters mapped to underscores.
-;;;  *   @item
-;;;  *   The end of the name is always, "@code{_GUARD}".
-;;;  *   @item
-;;;  *   Finally, the entire string is mapped to upper case.
-;;;  *   @end enumerate
-;;;  *
-;;;  *   The final @code{#define} name is stored in an SCM symbol named
-;;;  *   @code{header-guard}.  Consequently, the concluding @code{#endif} for the
-;;;  *   file should read something like:
-;;;  *
-;;;  *   @example
-;;;  *   #endif /* [+ (. header-guard) +] */
-;;;  *   @end example
-;;;  *
-;;;  *   The name of the header file (the current output file) is also stored
-;;;  *   in an SCM symbol, @code{header-file}.  Therefore, if you are also
-;;;  *   generating a C file that uses the previously generated header file,
-;;;  *   you can put this into that generated file:
-;;;  *
-;;;  *   @example
-;;;  *   #include "[+ (. header-file) +]"
-;;;  *   @end example
-;;;  *
-;;;  *   Obviously, if you are going to produce more than one header file from
-;;;  *   a particular template, you will need to be careful how these SCM symbols
-;;;  *   get handled.
-;;; =*/
-;;;
-(define header-file  "")
-(define header-guard "")
-(define (make-header-guard hdr-pfx)
-  (begin
-    (set! header-file  (out-name))
-    (set! header-guard (string-upcase! (string->c-name! (string-append
-      (if (string? hdr-pfx) hdr-pfx "HEADER") "_" header-file "_GUARD"
-      ))))
-    (sprintf "#ifndef %1$s\n#define %1$s" header-guard)
 ) )
 
+(define header-file     "")
+(define header-guard    "")
 (define autogen-version "AUTOGEN_VERSION")
 (define c-file-line-fmt "#line %2$d \"%1$s\"\n")
 

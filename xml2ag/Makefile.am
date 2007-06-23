@@ -4,13 +4,13 @@
 ##
 ##    AutoGen copyright 2002-2007 Bruce Korb
 ##
-## Time-stamp:      "2007-01-27 06:54:49 bkorb"
+## Time-stamp:      "2007-03-24 14:23:20 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Created:         Jun 10 2002
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2007/02/07 01:57:59 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -23,7 +23,6 @@ EXTRA_DIST      = xmlopts.def fork.tpl $(csrcs)
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
-MAINTAINERCLEANFILES = Makefile.in
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) *-stamp
 INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 AG_ENV          = top_builddir=$(top_builddir) \

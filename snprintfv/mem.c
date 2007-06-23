@@ -31,6 +31,10 @@
 #  include <config.h>
 #endif
 
+#ifdef HAVE_DMALLOC
+#  include <dmalloc.h>
+#endif
+
 #include "mem.h"
 
 
@@ -41,7 +45,6 @@
    Not also that if this file is compiled -DWITH_DMALLOC, the inclusion
    in mem.h will cause the malloc references below to be redirected
    correctly. */
-
 malloc_proc_t*  snv_malloc  = (malloc_proc_t*)malloc;
 realloc_proc_t* snv_realloc = (realloc_proc_t*)realloc;
 free_proc_t*    snv_free    = (free_proc_t*)free;
@@ -73,7 +76,7 @@ snv_strdup (const char *str)
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
+ * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/mem.c */

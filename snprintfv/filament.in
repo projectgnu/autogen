@@ -40,7 +40,7 @@ extern "C"
 #endif
 #endif				/* __cplusplus */
 
-#define FILAMENT_BUFSIZ       512
+#define FILAMENT_BUFSIZ       (512 - sizeof(char *) - (2 * sizeof(size_t)))
 
 /**
  * Filament:
@@ -94,6 +94,27 @@ SNV_INLINE size_t
 fillen (Filament *fil)
 {
   return fil->length;
+}
+
+/**
+ * filelt:
+ * @fil: The Filament being queried.
+ * @n: A zero based index into @fil.
+ *
+ * This function looks for the @n'th element of @fil.
+ *
+ * Return value:
+ * If @n is an index inside the Filament @fil, then the character stored
+ * at that index cast to an int is returned, otherwise @n is outside
+ * this range and -1 is returned.
+ **/
+SNV_INLINE int
+filelt (Filament *fil, ssize_t n)
+{
+  if ((n >= 0) && (n < fil->length))
+    return (int) fil->value[n];
+  else
+    return -1;
 }
 
 /**

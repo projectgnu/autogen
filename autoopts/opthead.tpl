@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.27 2006/11/06 19:09:39 bkorb Exp $
-# Automated Options copyright 1992-2006 Bruce Korb
-# Time-stamp:      "2006-10-24 18:15:35 bkorb"
+# $Id: opthead.tpl,v 4.28 2007/06/23 20:19:39 bkorb Exp $
+# Automated Options copyright 1992-2007 Bruce Korb
+# Time-stamp:      "2007-04-15 10:23:18 bkorb"
 
 =]
 /*
@@ -41,27 +41,32 @@ ENDFOR flag =][=
 
 (define option-ct (count "flag")) =][=
 
-IF (exist? "library") =]
+IF (exist? "library")           =]
         LIBRARY_OPTION_COUNT[=
 
-ELSE        =][=
+ELSE                            =][=
 
-  IF (exist? "version") =]
+  IF (exist? "version")         =]
         [= (. INDEX-pfx) =]VERSION          = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
-  ENDIF =]
+  ENDIF                         =]
         [= (. INDEX-pfx) =]HELP             = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
         [= (. INDEX-pfx) =]MORE_HELP        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
 
-  IF (exist? "homerc") =],
+  IF (exist? "usage-opt")       =],
+        [= (. INDEX-pfx) =]USAGE            = [=
+                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
+  ENDIF                         =][=
+
+  IF (exist? "homerc")          =],
         [= (. INDEX-pfx) =]SAVE_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
         [= (. INDEX-pfx) =]LOAD_OPTS        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-  ENDIF =][=
-ENDIF   =]
+  ENDIF                         =][=
+ENDIF                           =]
 } te[=(. Cap-prefix)=]OptIndex;
 
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
@@ -251,18 +256,35 @@ DEFINE set-std-value =]
    ~~ .    =]'[=(get tmp-val)=]'[=
    *       =][=(error "value (flag) codes must be single characters") =][=
    ESAC    =][=
-ENDDEF set-std-value        =][=
+ENDDEF set-std-value            =][=
 
-IF (exist? "flag.value")    =][=
+IF (exist? "flag.value")        =][=
 
-  IF (exist? "version")     =][=
+  IF (exist? "version")         =][=
     INVOKE set-std-value
        val-name    = "version-value"
        val-UPNAME  = "VERSION"
-       std-value   = "v"    =][=
-  ENDIF  have "version"     =][=
+       std-value   = "v"        =][=
+  ENDIF  have "version"         =][=
 
-  IF (exist? "homerc")      =][=
+  INVOKE set-std-value
+       val-name    = "help-value"
+       val-UPNAME  = "HELP"
+       std-value   = "?"        =][=
+
+  INVOKE set-std-value
+       val-name    = "more-help-value"
+       val-UPNAME  = "MORE_HELP"
+       std-value   = "!"        =][=
+
+  IF (exist? "usage-opt")       =][=
+  INVOKE set-std-value
+       val-name    = "usage-value"
+       val-UPNAME  = "USAGE"
+       std-value   = "u"        =][=
+  ENDIF  have "usage-opt"       =][=
+
+  IF (exist? "homerc")          =][=
     INVOKE set-std-value
        val-name    = "save-opts-value"
        val-UPNAME  = "SAVE_OPTS"
@@ -271,38 +293,31 @@ IF (exist? "flag.value")    =][=
     INVOKE set-std-value
        val-name    = "load-opts-value"
        val-UPNAME  = "LOAD_OPTS"
-       std-value   = "<"    =][=
-  ENDIF  have "homerc"      =][=
+       std-value   = "<"        =][=
+  ENDIF  have "homerc"          =][=
 
-  INVOKE set-std-value
-       val-name    = "help-value"
-       val-UPNAME  = "HELP"
-       std-value   = "?"    =][=
+ELSE  NO "flag.value"           =][=
 
-  INVOKE set-std-value
-       val-name    = "more-help-value"
-       val-UPNAME  = "MORE_HELP"
-       std-value   = "!"    =][=
-
-ELSE  NO "flag.value"       =][=
-
-  IF (exist? "version")     =]
+  IF (exist? "version")         =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
-  ENDIF                     =][=
-  IF (exist? "homerc")      =]
-#define [= (. VALUE-pfx) =]SAVE_OPTS      [= (. INDEX-pfx) =]SAVE_OPTS
-#define [= (. VALUE-pfx) =]LOAD_OPTS      [= (. INDEX-pfx) =]LOAD_OPTS[=
-  ENDIF=]
+  ENDIF  have "version"         =]
 #define [= (. VALUE-pfx) =]HELP           [= (. INDEX-pfx) =]HELP
 #define [= (. VALUE-pfx) =]MORE_HELP      [= (. INDEX-pfx) =]MORE_HELP[=
-ENDIF=][=
+  IF (exist? "usage-opt")       =]
+#define [= (. VALUE-pfx) =]USAGE          [= (. INDEX-pfx) =]USAGE[=
+  ENDIF  have "usage-opt"       =][=
+  IF (exist? "homerc")          =]
+#define [= (. VALUE-pfx) =]SAVE_OPTS      [= (. INDEX-pfx) =]SAVE_OPTS
+#define [= (. VALUE-pfx) =]LOAD_OPTS      [= (. INDEX-pfx) =]LOAD_OPTS[=
+  ENDIF  have "homerc"          =][=
+ENDIF    have flag.value/not    =][=
 
-IF (exist? "homerc")        =]
+IF (exist? "homerc")            =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT_MASK; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a) )[=
-ENDIF                       =][=
+ENDIF                           =][=
 
 IF (not (exist? "library"))
 

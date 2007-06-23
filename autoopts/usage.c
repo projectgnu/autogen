@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.18 2006/11/27 01:55:18 bkorb Exp $
- * Time-stamp:      "2006-07-01 12:41:02 bkorb"
+ *  usage.c  $Id: usage.c,v 4.19 2007/06/23 20:19:39 bkorb Exp $
+ * Time-stamp:      "2007-05-23 18:01:39 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -13,7 +13,7 @@
  */
 
 /*
- *  Automated Options copyright 1992-2006 Bruce Korb
+ *  Automated Options copyright 1992-2007 Bruce Korb
  *
  *  Automated Options is free software.
  *  You may redistribute it and/or modify it under the terms of the
@@ -169,12 +169,18 @@ optionOnlyUsage(
  *  formats.  The descriptor specifies the default, but AUTOOPTS_USAGE will
  *  over-ride this, providing the value of it is set to either "gnu" or
  *  "autoopts".  This routine will @strong{not} return.
+ *
+ *  If "exitCode" is "EX_USAGE" (normally 64), then output will to to stdout
+ *  and the actual exit code will be "EXIT_SUCCESS".
 =*/
 void
 optionUsage(
     tOptions* pOptions,
-    int       exitCode )
+    int       usage_exit_code )
 {
+    int actual_exit_code =
+        (usage_exit_code == EX_USAGE) ? EXIT_SUCCESS : usage_exit_code;
+
     displayEnum = AG_FALSE;
 
     /*
@@ -183,7 +189,7 @@ optionUsage(
      *  on successful exit (help was requested), otherwise error out.
      */
     if (option_usage_fp == NULL)
-        option_usage_fp = (exitCode != EXIT_SUCCESS) ? stderr : stdout;
+        option_usage_fp = (actual_exit_code != EXIT_SUCCESS) ? stderr : stdout;
 
     fprintf( option_usage_fp, pOptions->pzUsageTitle, pOptions->pzProgName );
 
@@ -207,13 +213,13 @@ optionUsage(
              *  option, we do *NOT* want to emit the column headers.
              *  Otherwise, we do.
              */
-            if (  (exitCode != EXIT_SUCCESS)
+            if (  (usage_exit_code != EXIT_SUCCESS)
                || ((pOptions->pOptDesc->fOptState & OPTST_DOCUMENT) == 0) )
 
                 fputs( pOptTitle, option_usage_fp );
         }
 
-        printOptionUsage( pOptions, exitCode, pOptTitle );
+        printOptionUsage( pOptions, usage_exit_code, pOptTitle );
     }
 
     /*
@@ -241,14 +247,14 @@ optionUsage(
      *  IF the user is asking for help (thus exiting with SUCCESS),
      *  THEN see what additional information we can provide.
      */
-    if (exitCode == EXIT_SUCCESS)
+    if (usage_exit_code == EXIT_SUCCESS)
         printProgramDetails( pOptions );
 
     if (pOptions->pzBugAddr != NULL)
         fprintf( option_usage_fp, zPlsSendBugs, pOptions->pzBugAddr );
     fflush( option_usage_fp );
 
-    exit( exitCode );
+    exit( actual_exit_code );
 }
 
 
@@ -344,12 +350,15 @@ printExtendedUsage(
     /*
      *  IF this particular option can NOT be preset
      *    AND some form of presetting IS allowed,
+     *    AND it is not an auto-managed option (e.g. --help, et al.)
      *  THEN advise that this option may not be preset.
      */
     if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
        && (  (pOptions->papzHomeList != NULL)
           || (pOptions->pzPROGNAME != NULL)
-       )  )
+          )
+       && (pOD->optIndex < pOptions->presetOptCt)
+       )
 
         fputs( zNoPreset, option_usage_fp );
 
@@ -478,20 +487,18 @@ printOneUsage(
          *  when the option argument is required, base the type string on the
          *  argument type.
          */
-        if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NONE) {
-            pzArgType = pAT->pzNo;
-
-        } else if (pOD->fOptState & OPTST_ARG_OPTIONAL) {
+        if (pOD->fOptState & OPTST_ARG_OPTIONAL) {
             pzArgType = pAT->pzOpt;
 
         } else switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        case OPARG_TYPE_NONE:        pzArgType = pAT->pzNo;   break;
         case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
         case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
         case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
         case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
         case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
         case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
-        default:                     goto bogus_desc;         break;
+        default:                     goto bogus_desc;
         }
 
         snprintf( z, sizeof(z), pAT->pzOptFmt, pzArgType, pOD->pz_Name,
@@ -509,7 +516,7 @@ printOneUsage(
 
  bogus_desc:
     fprintf( stderr, zInvalOptDesc, pOD->pz_Name );
-    exit( EXIT_FAILURE );
+    exit( EX_SOFTWARE );
 }
 
 

@@ -2,19 +2,20 @@
 
 ## mkgnudoc.sh --   create a native package
 ## Copyright (c):   2003-2007 by Bruce Korb
-## Time-stamp:      "2007-02-04 10:08:03 bkorb"
+## Time-stamp:      "2007-04-01 04:21:07 bkorb"
 ##              by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: mkgnudoc.sh,v 4.9 2007/02/07 01:57:59 bkorb Exp $
+## $Id: mkgnudoc.sh,v 4.10 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
-test -f pkg-env && . pkg-env
+scriptdir=`dirname $0`
+test -f ${scriptdir}/pkg-env && . ${scriptdir}/pkg-env
 
 MAKE=${MAKE:-make}
 pkgsrcdir=`dirname $0`
 pkgsrcdir=`cd ${pkgsrcdir} ; pwd`
-pkg=autogen
+pkg=${PACKAGE_TARNAME}
 ver="${PACKAGE_VERSION}"
 
 set -x
@@ -105,6 +106,7 @@ autogen --base-name=${pkg} -T ${pkgsrcdir}/gnudoc.tpl - <<- _EODefs_
 	title   = '${PACKAGE} - ${*}';
 	project = '${PACKAGE}';
 	version = '${ver}';
+	package = '${pkg}';
 	_EODefs_
 
 rm -f TAG

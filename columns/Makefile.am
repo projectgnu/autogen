@@ -2,14 +2,14 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-01-27 06:55:37 bkorb"
+## Time-stamp:      "2007-03-24 14:21:59 bkorb"
 ## Copyright (c):   1992-2007 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Maintainer:      Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2007/02/07 01:57:58 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2007/06/23 20:19:39 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -28,7 +28,7 @@ man_MANS        = columns.1
 INCLUDES        = @INCLIST@
 
 CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1 gen-stamp
-MAINTAINERCLEANFILES = Makefile.in $(CONFIG_CLEAN_FILES)
+MAINTAINERCLEANFILES = $(CONFIG_CLEAN_FILES)
 DISTCLEANFILES  = cols.c
 
 gen : $(BUILT_SOURCES)

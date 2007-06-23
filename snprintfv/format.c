@@ -35,6 +35,8 @@
 #  include <dmalloc.h>
 #endif
 
+#include <float.h>
+#include <math.h>
 #include <stddef.h>
 
 #if HAVE_RUNETYPE_H
@@ -48,16 +50,36 @@
 #include "printf.h"
 
 #ifndef NO_FLOAT_PRINTING
-# include <float.h>
-# include <math.h>
-
 # ifdef HAVE_LONG_DOUBLE
+#  ifndef HAVE_ISNANL
+#   define isnanl(x) ((x) != (x))
+#  endif
+#  ifndef HAVE_ISINFL
+#   define isinfl(x) isnanl ((x) - (x))
+#  endif
 #  ifndef HAVE_MODFL
-      static long double snv_modfl (long double x, long double *exp);
-#     define modfl snv_modfl
+static snv_long_double modfl (long double x, long double *exp);
+#  endif
+#  ifndef HAVE_COPYSIGNL
+static snv_long_double copysignl (long double x, long double y);
 #  endif
 # else
-#  define modfl(x,exp) modf((double)(x), (double*)(exp))
+#  ifdef HAVE_ISNAN
+#   define isnanl isnan
+#  else
+#   define isnanl(x) ((x) != (x))
+#  endif
+#  ifdef HAVE_ISINF
+#   define isinfl isinf
+#  else
+#   define isinfl(x) isnanl ((x) - (x))
+#  endif
+#  ifdef HAVE_COPYSIGN
+#   define copysignl copysign
+#  else
+#   define copysign(x, y) (((x) < 0.0 ^ (y) < 0.0) ? (x) * -1.0 : (x));
+#  endif
+#  define modfl modf
 # endif
 #endif
 
@@ -99,33 +121,18 @@ fetch_intmax (struct printf_info *pinfo, union printf_arg const *arg)
 }
 
 #ifndef NO_FLOAT_PRINTING
-static long double
+static snv_long_double
 fetch_double (struct printf_info *pinfo, union printf_arg const *arg)
 {
   if (pinfo->is_long_double)
-    return arg->pa_long_double;
+    return (snv_long_double) arg->pa_long_double;
   else
-    return (long double) (arg->pa_double);
+    return (snv_long_double) (arg->pa_double);
 }
 #endif
+
 
-
 #ifndef NO_FLOAT_PRINTING
-#ifndef HAVE_COPYSIGNL
-static long double
-copysignl (long double x, long double y)
-{
-#ifdef HAVE_COPYSIGN
-  return x * (long double) copysign (1.0, x * y);
-#else
-  /* If we do not have copysign, assume zero is unsigned (too risky to
-     assume we have infinities, which would allow to test with
-     (x < 0.0 && 1.0 / x < 0.0).  */
-  return (x < 0.0 ^ y < 0.0) ? x * -1.0 : x;
-#endif
-}
-#endif /* HAVE_COPYSIGNL */
-
 /* These two routines are cleaned up version of the code in libio 2.95.3
    (actually I got it from the Attic, not from the released tarball).
    The changes were mainly to share code between %f and %g (libio did
@@ -134,10 +141,10 @@ copysignl (long double x, long double y)
    from the old snprintfv code.  */
 
 static char *
-print_float_round (long double fract, int *exp, char *start, char *end,
+print_float_round (snv_long_double fract, int *exp, char *start, char *end,
 		   char ch, int *signp)
 {
-  long double tmp;
+  snv_long_double tmp;
   if (fract)
     (void) modfl (fract * 10, &tmp);
   else
@@ -176,21 +183,22 @@ print_float_round (long double fract, int *exp, char *start, char *end,
 }
 
 static int
-print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, long double n)
+print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, snv_long_double n)
 {
   int prec, fmtch;
   char *p, *t;
-  long double fract;
+  snv_long_double fract;
   int expcnt, gformat = 0;
-  long double integer, tmp;
+  snv_long_double integer, tmp;
   char expbuf[10];
 
   prec = pinfo->prec;
   fmtch = pinfo->spec;
   t = startp;
+  *signp = 0;
 
   /* Do the special cases: nans, infinities, zero, and negative numbers. */
-  if (n != n)
+  if (isnanl (n))
     {
       /* Not-a-numbers are printed as a simple string. */
       *t++ = fmtch < 'a' ? 'N' : 'n';
@@ -205,16 +213,14 @@ print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, lo
       n = -1.0 * n;
       *signp = '-';
     }
-  else
-    *signp = 0;
 
-  if ((n - n) != (n - n))
+  if (isinfl (n))
     {
       /* Infinities are printed as a simple string. */
       *t++ = fmtch < 'a' ? 'I' : 'i';
       *t++ = fmtch < 'a' ? 'N' : 'n';
       *t++ = fmtch < 'a' ? 'F' : 'f';
-      return t - startp;
+      goto set_signp;
     }
 
   expcnt = 0;
@@ -328,7 +334,7 @@ print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, lo
 	  if (!prec && ++p < endp)
 	    {
 	      fract = 0;
-	      startp = print_float_round ((long double) 0, &expcnt, startp, t - 1, *p, signp);
+	      startp = print_float_round ((snv_long_double) 0, &expcnt, startp, t - 1, *p, signp);
 	    }
 
 	  /* adjust expcnt for digit in front of decimal */
@@ -407,6 +413,7 @@ print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, lo
 	*t++ = *--p;
     }
 
+set_signp:
   if (!*signp)
     {
       if (pinfo->showsign)
@@ -672,7 +679,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	      pinfo->is_long = SNV_TRUE;
 	      break;
 	    }
-	 /*NOBREAK*/
+	 /*FALLTHROUGH*/
 
 	case 'j':
 	case 'q':
@@ -741,9 +748,11 @@ printf_char (STREAM *stream, struct printf_info *const pinfo, union printf_arg c
 #ifndef NO_FLOAT_PRINTING
 
 static int
-printf_float (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
+printf_float (STREAM *stream,
+	      struct printf_info *const pinfo,
+	      union printf_arg const *args)
 {
-  long double value = 0.0;
+  snv_long_double value = 0.0;
   int sign, len, count_or_errorcode = SNV_OK;
 #ifdef HAVE_LONG_DOUBLE
   char buffer[LDBL_MAX_10_EXP * 2 + 20], *p = buffer;
@@ -755,7 +764,7 @@ printf_float (STREAM *stream, struct printf_info *const pinfo, union printf_arg 
 
   /* Check for valid pre-state */
   if (pinfo->prec == -1)
-    pinfo->prec = SNV_POINTER_TO_INT (pinfo->extra);
+    pinfo->prec = SNV_POINTER_TO_LONG (pinfo->extra);
 
   /* Check for valid pre-state. */
   if (pinfo->prec <= -1
@@ -838,7 +847,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   static const char digits_upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const char *digits;
 
-  unsigned base = SNV_POINTER_TO_UINT (pinfo->extra);
+  unsigned base = SNV_POINTER_TO_ULONG (pinfo->extra);
   uintmax_t value = 0L;
   int type, count_or_errorcode = SNV_OK;
   char buffer[256], *p, *end;
@@ -880,7 +889,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
     {
       intmax_t svalue = 0L;
       svalue = fetch_intmax (pinfo, args);
-      is_negative = (svalue < 0) ? SNV_TRUE : SNV_FALSE;
+      is_negative = (svalue < 0);
       value = (uintmax_t) ABS (svalue);
     }
 
@@ -1088,11 +1097,11 @@ printf_string (STREAM *stream, struct printf_info *const pinfo, union printf_arg
 
 
 
-/* replacement for modfl follow.  */
+/* replacements for modfl and copysignl follow.  */
 
-#ifndef NO_FLOAT_PRINTING
-
-static long double snv_modfl (long double x, long double *exp)
+#if !defined NO_FLOAT_PRINTING && defined HAVE_LONG_DOUBLE
+# ifndef HAVE_MODFL
+static long double modfl (long double x, long double *exp)
 {
   /* To compute the integer part of a positive integer (in this case
      abs(X)), sum a big enough integer to the absolute value, so that
@@ -1120,8 +1129,23 @@ static long double snv_modfl (long double x, long double *exp)
       return x - (*exp = z);
     }
 }
+# endif /* !HAVE_MODFL */
 
-#endif
+# ifndef HAVE_COPYSIGNL
+long double
+copysignl (long double x, long double y)
+{
+#  ifdef HAVE_COPYSIGN
+  return x * (long double) copysign (1.0, x * y);
+#  else /* !HAVE_COPYSIGN */
+  /* If we do not have copysign, assume zero is unsigned (too risky to
+     assume we have infinities, which would allow to test with
+     (x < 0.0 && 1.0 / x < 0.0).  */
+  return (x < 0.0 ^ y < 0.0) ? x * -1.0 : x;
+#  endif /* !HAVE_COPYSIGN */
+}
+# endif /* !HAVE_COPYSIGNL */
+#endif /* !NO_FLOAT_PRINTING && HAVE_LONG_DOUBLE) */
 
 
 
@@ -1188,10 +1212,4 @@ spec_entry snv_default_spec_table[] = {
   {'\0', 0, PA_LAST, NULL, NULL, NULL}
 };
 
-/*
- * Local Variables:
- * mode: C
- * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
- * End:
- * end of snprintfv/format.c */
+/* format.c ends here */

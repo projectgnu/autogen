@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.25 2007/02/07 01:57:58 bkorb Exp $
+ *  $Id: autogen.c,v 4.26 2007/06/23 20:19:39 bkorb Exp $
  *
- *  Time-stamp:        "2007-02-04 08:28:43 bkorb"
- *  Last Committed:    $Date: 2007/02/07 01:57:58 $
+ *  Time-stamp:        "2007-03-25 07:47:12 bkorb"
+ *  Last Committed:    $Date: 2007/06/23 20:19:39 $
  *
  *  This is the main routine for autogen.
  */
@@ -490,7 +490,7 @@ ao_malloc (size_t sz)
 {
     void * res = malloc(sz);
     if (res == NULL) {
-        fprintf(stderr, "malloc of %d bytes failed\n", (int)sz);
+        fprintf(stderr, "malloc of %zd bytes failed\n", sz);
         exit( EXIT_FAILURE );
     }
     return res;
@@ -502,7 +502,7 @@ ao_realloc (void *p, size_t sz)
 {
     void * res = realloc(p, sz);
     if (res == NULL) {
-        fprintf(stderr, "realloc of %d bytes at 0x%p failed\n", (int)sz, p);
+        fprintf(stderr, "realloc of %zd bytes at 0x%p failed\n", sz, p);
         exit( EXIT_FAILURE );
     }
     return res;

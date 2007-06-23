@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2006-09-22 17:36:39 bkorb"
+# Time-stamp:        "2007-05-05 11:34:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Maintainer:        Bruce Korb <bkorb@gnu.org>
 # Created:           Wed Dec 31, 2003
 #
-# $Id: getopt.test,v 4.14 2006/09/23 01:44:37 bkorb Exp $
+# $Id: getopt.test,v 4.15 2007/06/23 20:19:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -20,6 +20,68 @@
 #
 f=`autoopts-config cflags`
 test -z "${f}" && echo ${testname} disabled -- autoopts not installed && exit 0
+
+compile_getopt() {
+  echo ${AG_L} ${testname}.def
+  ${AG_L} ${testname}.def || \
+    failure "AutoGen could not process ${testname}.def #${1}"
+
+  # Now we can generate the getopt loop from the template we just tweaked
+  # Remove the 'config.h' include from the generated header.  It was needed
+  # during the autogen run below, but we have to not have it later.
+  # (It is specified with the ``config-header = 'config.h';'' def line.)
+  #
+  ${AG_L} -L ${TMPDIR} -T getopt.tpl ${testname}.def || \
+    failure "could not generate getopt-test_${testname}.c"
+
+  egrep -v "include.*config\.h" ${testname}.h > X
+  mv -f X ${testname}.h
+
+  # Remove the variable comments so we can test against the expected result
+  #
+  sed '2,/and the template file/d
+      /\$Id:/d
+      /Last template edit:/d' getopt-test_${testname}.c \
+        > ${testname}${1}-getopt.c
+
+  # Finally, compile this thing:
+  #
+  ${CC:-cc} ${CFLAGS} -c ${testname}${1}-getopt.c || \
+    failure "could not compile ${testname}1-getopt.c"
+
+  cmp -s ${testname}${1}-base.c ${testname}${1}-getopt.c || { set +x ; \
+    failure "`diff ${testname}${1}-base.c ${testname}${1}-getopt.c`" ; }
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  Fix up a test-specific include directory:
+#
+# The getopt template presumes that everything has been installed.
+# However, we have to work with the local stuff.  So, remove the
+# "autoopts-config" probing and replace with local stuff:
+#
+TMPDIR=`pwd`/${testname}-inc
+mkdir ${TMPDIR} ${TMPDIR}/autoopts
+
+srcdir=`pwd`
+CFLAGS="-I ${TMPDIR} ${CFLAGS} ${INC}"
+LDFLAGS="${LDFLAGS} ${LIB}"
+export srcdir CFLAGS LDFLAGS TMPDIR
+
+aolib=${top_builddir}/autoopts/.libs/libopts.a
+test -f ${aolib} || aolib=${top_builddir}/autoopts/libopts.a
+
+sed -e '/ CFLAGS=/s@ *`autoopts-config cflags`@'" -I${top_srcdir}/autoopts@" \
+    -e '/ LDFLAGS=/s@ *`autoopts-config ldflags`@'" ${aolib}@" \
+    ${top_srcdir}/autoopts/getopt.tpl > ${TMPDIR}/getopt.tpl
+
+# In order to compile correctly, we have to temporarily install the options.h
+# header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:
+#
+destdir=${TMPDIR}/autoopts \
+top_builddir=${top_builddir} \
+${SHELL:-/bin/sh} ${top_srcdir}/autoopts/install-options-h
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -40,7 +102,7 @@ help-value = 'h';
 gnu-usage;
 
 copyright = {
-    date  = "2003-2006";
+    date  = "2003-2007";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";
@@ -93,21 +155,12 @@ flag = {
 };
 _EOF_
 
-echo ${AG_L} ${testname}.def
-${AG_L} ${testname}.def || \
-  failure AutoGen could not process
-srcdir=`pwd` CFLAGS="${CFLAGS} ${INC}" LDFLAGS="${LDFLAGS} ${LIB}" \
-${AG_L} -T getopt.tpl ${testname}.def
-sed '1,/and the template file/d
-    /\$Id:/d
-    /Last template edit:/d' getopt-test_${testname}.c \
-  > ${testname}-getopt.c
-
 # # # # # # # # # # BASE-1 OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}1-base.c
 
 cat > ${testname}1-base.c <<\_EndOfSample_
+/*  -*- buffer-read-only: t -*- vi: set ro:
  *
  *  test_getopt is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -128,7 +181,18 @@ cat > ${testname}1-base.c <<\_EndOfSample_
  */
 #include <sys/types.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "getopt.h"
+
+#ifndef DIRCH
+#  if defined(_WIN32) && !defined(__CYGWIN__)
+#    define DIRCH                  '\\'
+#  else
+#    define DIRCH                  '/'
+#  endif
+#endif
 /*
  *  Option flag character list
  */
@@ -177,9 +241,10 @@ optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-  char* pz_by = _("test_getopt 1.2.3\n\
+  char const * pz_by =
+    _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2006 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -193,7 +258,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 static void
 usage_too_many (tOptDesc* pOptDesc)
 {
-  char* pz = _("test_getopt error: the '%s' option appears more than %d times\n");
+  char const * pz =
+    _("test_getopt error: the '%s' option appears more than %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
   USAGE( EXIT_FAILURE );
 }
@@ -204,7 +270,8 @@ usage_too_many (tOptDesc* pOptDesc)
 static void
 usage_too_few (tOptDesc* pOptDesc)
 {
-  char* pz = _("test_getopt error: the '%s' option must appear %d times\n");
+  char const * pz =
+    _("test_getopt error: the '%s' option must appear %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
   USAGE( EXIT_FAILURE );
 }
@@ -216,7 +283,8 @@ usage_too_few (tOptDesc* pOptDesc)
 static void
 usage_cannot (char const* pz_what, char const* pz_cant)
 {
-  char* pz = _("test_getopt error: the `%s' option conflicts with `%s'\n");
+  char const * pz =
+    _("test_getopt error: the `%s' option conflicts with `%s'\n");
   printf (pz, pz_what, pz_cant);
   USAGE (EXIT_FAILURE);
 }
@@ -228,7 +296,8 @@ usage_cannot (char const* pz_what, char const* pz_cant)
 static void
 usage_must (char const* pz_what, char const* pz_must)
 {
-  char* pz = _("test_getopt error: the `%s' option requires `%s'\n");
+  char const * pz =
+    _("test_getopt error: the `%s' option requires `%s'\n");
   printf (pz, pz_what, pz_must);
   USAGE (EXIT_FAILURE);
 }
@@ -243,7 +312,7 @@ int
 process_test_getopt_opts (int argc, char** argv)
 {
   {
-    char* pz_prog = strrchr (argv[0], DIRCH);
+    char const * pz_prog = strrchr (argv[0], DIRCH);
     if (pz_prog != NULL)
       pz_prog++;
     else
@@ -331,6 +400,7 @@ _EndOfSample_
 echo creating ${testname}2-base.c
 
 cat > ${testname}2-base.c <<\_EndOfSample_
+/*  -*- buffer-read-only: t -*- vi: set ro:
  *
  *  test_getopt is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -351,8 +421,18 @@ cat > ${testname}2-base.c <<\_EndOfSample_
  */
 #include <sys/types.h>
 #include <stdlib.h>
-#include "getopt.h"
+#include <stdio.h>
+#include <string.h>
 #include <getopt.h>
+#include "getopt.h"
+
+#ifndef DIRCH
+#  if defined(_WIN32) && !defined(__CYGWIN__)
+#    define DIRCH                  '\\'
+#  else
+#    define DIRCH                  '/'
+#  endif
+#endif
 
 /*
  *  getopt_long option descriptor
@@ -418,9 +498,10 @@ optionPrintVersion(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
-  char* pz_by = _("test_getopt 1.2.3\n\
+  char const * pz_by =
+    _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2006 by Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -434,7 +515,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 static void
 usage_too_many (tOptDesc* pOptDesc)
 {
-  char* pz = _("test_getopt error: the '%s' option appears more than %d times\n");
+  char const * pz =
+    _("test_getopt error: the '%s' option appears more than %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
   USAGE( EXIT_FAILURE );
 }
@@ -445,7 +527,8 @@ usage_too_many (tOptDesc* pOptDesc)
 static void
 usage_too_few (tOptDesc* pOptDesc)
 {
-  char* pz = _("test_getopt error: the '%s' option must appear %d times\n");
+  char const * pz =
+    _("test_getopt error: the '%s' option must appear %d times\n");
   printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
   USAGE( EXIT_FAILURE );
 }
@@ -457,7 +540,8 @@ usage_too_few (tOptDesc* pOptDesc)
 static void
 usage_cannot (char const* pz_what, char const* pz_cant)
 {
-  char* pz = _("test_getopt error: the `%s' option conflicts with `%s'\n");
+  char const * pz =
+    _("test_getopt error: the `%s' option conflicts with `%s'\n");
   printf (pz, pz_what, pz_cant);
   USAGE (EXIT_FAILURE);
 }
@@ -469,7 +553,8 @@ usage_cannot (char const* pz_what, char const* pz_cant)
 static void
 usage_must (char const* pz_what, char const* pz_must)
 {
-  char* pz = _("test_getopt error: the `%s' option requires `%s'\n");
+  char const * pz =
+    _("test_getopt error: the `%s' option requires `%s'\n");
   printf (pz, pz_what, pz_must);
   USAGE (EXIT_FAILURE);
 }
@@ -484,7 +569,7 @@ int
 process_test_getopt_opts (int argc, char** argv)
 {
   {
-    char* pz_prog = strrchr (argv[0], DIRCH);
+    char const * pz_prog = strrchr (argv[0], DIRCH);
     if (pz_prog != NULL)
       pz_prog++;
     else
@@ -569,10 +654,7 @@ _EndOfSample_
 
 # # # # # # # # # # RESULTS TESTING # # # # # # # # #
 
-mv ${testname}-getopt.c ${testname}1-getopt.c
-
-cmp -s ${testname}1-base.c ${testname}1-getopt.c || { set +x ; \
-  failure "`diff ${testname}1-base.c ${testname}1-getopt.c`" ; }
+compile_getopt 1
 
 sed '/REMOVE/d;$a\
 long-opts;\
@@ -580,18 +662,7 @@ version-value;
 ' ${testname}.def > ${testname}2.def
 mv -f ${testname}2.def ${testname}.def
 
-echo ${AG_L} ${testname}.def
-${AG_L} ${testname}.def || \
-  failure AutoGen could not process
-srcdir=`pwd` CFLAGS="${CFLAGS} ${INC}" LDFLAGS="${LDFLAGS} ${LIB}" \
-${AG_L} -T getopt.tpl ${testname}.def
-sed '1,/and the template file/d
-    /\$Id:/d
-    /Last template edit:/d' getopt-test_${testname}.c \
-  > ${testname}2-getopt.c
-
-cmp -s ${testname}2-base.c ${testname}2-getopt.c || { set +x ; \
-  failure "`diff ${testname}2-base.c ${testname}2-getopt.c`" ; }
+compile_getopt 2
 
 cleanup
 

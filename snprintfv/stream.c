@@ -31,6 +31,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WITH_DMALLOC
+#  include <dmalloc.h>
+#endif
+
 #include "compat.h"
 #include "stream.h"
 #include "mem.h"
@@ -148,7 +152,7 @@ stream_put (int ch, STREAM *stream)
     return 1;
 
   stream->limit -= 1;
-  ch_or_errorcode = (*stream->put_func) ((unsigned char)ch, stream);
+  ch_or_errorcode = (*stream->put_func) ((unsigned char) ch, stream);
 
   return (ch_or_errorcode < 0) ? ch_or_errorcode : 1;
 }
@@ -184,7 +188,7 @@ stream_puts (char *s, STREAM *stream)
         return num + strlen (s);
 
       stream->limit -= 1;
-      ch_or_errorcode = (*stream->put_func) ((unsigned char)*s, stream);
+      ch_or_errorcode = (*stream->put_func) ((unsigned char) *s, stream);
 
       if (ch_or_errorcode < 0)
 	return ch_or_errorcode;
@@ -213,7 +217,7 @@ stream_get (STREAM *stream)
 /*
  * Local Variables:
  * mode: C
- * c-file-style: "stroustrup"
+ * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
  * end of snprintfv/stream.c */
