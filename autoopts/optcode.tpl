@@ -1,9 +1,29 @@
-[= autogen5 template  -*- Mode: Text -*-
+[= autogen5 template
 
-#$Id: optcode.tpl,v 4.30 2007/06/23 20:19:39 bkorb Exp $
+#$Id: optcode.tpl,v 4.31 2007/10/07 16:54:54 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-04-28 10:00:22 bkorb"
+# Time-stamp:      "2007-08-04 12:45:33 bkorb"
+
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb.
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 =][=
 
@@ -17,7 +37,7 @@
 ;;;  have "<option-name>" or "--<name>" on the line, depending on
 ;;;  whether or not there are flag options.  If any options take
 ;;;  arguments, then append "[<val>]" to the flag description and
-;;;  "[{=| }<val>]" to the option-name/name descriptions.  We won't
+;;;  "[{=| }<val>]" to the option-name/name descriptions.  We will not
 ;;;  worry about being correct if every option has a required argument.
 ;;;  Finally, if there are no minimum occurrence counts (i.e. all
 ;;;  options are optional), then we put square brackets around the
@@ -98,7 +118,10 @@ ENDIF
 
 #ifdef  __cplusplus
 extern "C" {
-#endif[=
+#endif
+
+/* TRANSLATORS: choose the translation for option names wisely because you
+                cannot ever change your mind. */[=
 
 IF (not (exist? "copyright") )
 
@@ -408,12 +431,20 @@ ENDIF                   =][=
 (tpl-file-line extract-fmt)
 =]
 #if defined(ENABLE_NLS)
-# define OPTPROC_BASE OPTPROC_TRANSLATE
+# define OPTPROC_BASE OPTPROC_TRANSLATE[=
+CASE   no-xlate         =][=
+!E                      =][=
+= opt-cfg               =] | OPTPROC_NXLAT_OPT_CFG[=
+= opt                   =] | OPTPROC_NXLAT_OPT[=
+*                       =][= (error "invalid value for 'no-xlate'") =][=
+ESAC   no-xlate         =]
   static tOptionXlateProc translate_option_strings;
 #else
 # define OPTPROC_BASE OPTPROC_NONE
 # define translate_option_strings NULL
 #endif /* ENABLE_NLS */
+[= INVOKE usage-text usage-type = full  \=]
+[= INVOKE usage-text usage-type = short \=]
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
@@ -458,7 +489,8 @@ tOptions [=(. pname)=]Options = {
         =] /* index of default opt */
     },
     [= (. option-ct) =] /* full option count */, [=
-       (count "flag")=] /* user option count */
+       (count "flag")=] /* user option count */,
+    [= (. pname) =]_full_usage, [= (. pname) =]_short_usage
 };
 [=
 
@@ -495,18 +527,18 @@ IF (or (exist? "flag.flag-code")
        (exist? "flag.arg-range")
        (match-value? ~* "flag.arg-type" "key|set")) =][=
 
-  invoke  define-option-callbacks  =][=
+  invoke define-option-callbacks=][=
 
-ENDIF                              =][=
+ENDIF                           =][=
 
-IF (. make-test-main)              =][=
-  invoke build-test-main           =][=
+IF (. make-test-main)           =][=
+  invoke build-test-main        =][=
 
-ELIF (exist? "guile-main")         =][=
-  invoke build-guile-main          =][=
+ELIF (exist? "guile-main")      =][=
+  invoke build-guile-main       =][=
 
-ELIF (exist? "main")               =][=
-  invoke build-main                =][=
+ELIF (exist? "main")            =][=
+  invoke build-main             =][=
 
 ENDIF "test/guile main"
 
@@ -554,57 +586,70 @@ translate_option_strings( void )
      *  Guard against re-translation.  It won't work.  The strings will have
      *  been changed by the first pass through this code.  One shot only.
      */
-    if (option_usage_text.field_ct == 0)
-        return;
-    /*
-     *  Do the translations.  The first pointer follows the field count field.
-     *  The field count field is the size of a pointer.
-     */
-    {
-        char** ppz = (char**)(void*)&(option_usage_text);
-        int    ix  = option_usage_text.field_ct;
+    if (option_usage_text.field_ct != 0) {
+
+        /*
+         *  Do the translations.  The first pointer follows the field count
+         *  field.  The field count field is the size of a pointer.
+         */
+        tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
+        char**    ppz = (char**)(void*)&(option_usage_text);
+        int       ix  = option_usage_text.field_ct;
 
         do {
             ppz++;
             *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
+[=
+
+  FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle pzExplain
+               pzDetail         =][=
+
+    (sprintf "\n        COERSION(%s);" (get "field"))  =][=
+
+  ENDFOR                        =][=
+
+  IF (exist? "full-usage")      =]
+        COERSION(pzFullUsage);[=
+  ENDIF                         =][=
+
+  IF (exist? "short-usage")     =]
+        COERSION(pzShortUsage);[=
+  ENDIF                         =]
+        option_usage_text.field_ct = 0;
+
+        for (ix = [=(. pname)=]Options.optCt; ix > 0; ix--, pOD++)
+            coerce_it((void*)&(pOD->pzText));
     }
-    option_usage_text.field_ct = 0;
 
-    {
+    if (([= (. pname) =]Options.fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
         tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
-        int       ix  = [=(. pname)=]Options.optCt;
+        int       ix;
 
-        for (;;) {[=
+        for (ix = [=(. pname)=]Options.optCt; ix > 0; ix--, pOD++) {[=
 
-  FOR field IN pzText pz_NAME pz_Name pz_DisableName pz_DisablePfx  =][=
+  FOR field IN pz_Name pz_DisableName pz_DisablePfx  =][=
 
-    (sprintf "\n            pOD->%1$-16s = AO_gettext(pOD->%1$s);"
-             (get "field"))  =][=
+    (sprintf "\n            coerce_it((void*)&(pOD->%1$s));"
+             (get "field"))     =][=
 
-  ENDFOR =]
-            if (--ix <= 0)
-                break;
-            pOD++;
+  ENDFOR                        =]
         }
-    }[=
-
-  FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle
-               pzExplain pzDetail  =][=
-
-    (sprintf "\n    COERSION(%s);" (get "field"))  =][=
-
-  ENDFOR =]
+        /* prevent re-translation */
+        [= (. pname)
+        =]Options.fOptSet |= OPTPROC_NXLAT_OPT_CFG | OPTPROC_NXLAT_OPT;
+    }
 }
 
 #endif /* ENABLE_NLS */
 
 #ifdef  __cplusplus
 }
-#endif[= # /*
+#endif[=
+ # /*
  * Local Variables:
  * Mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * opthead.tpl ends here */=]
+ * opthead.tpl ends here */    \=]

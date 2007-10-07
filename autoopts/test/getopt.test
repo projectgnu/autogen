@@ -3,12 +3,30 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2007-05-05 11:34:43 bkorb"
+# Time-stamp:        "2007-09-20 12:41:30 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Wed Dec 31, 2003
+##
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.15 2007/06/23 20:19:39 bkorb Exp $
+# $Id: getopt.test,v 4.16 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -20,22 +38,17 @@
 #
 f=`autoopts-config cflags`
 test -z "${f}" && echo ${testname} disabled -- autoopts not installed && exit 0
+CC="${CC} ${CFLAGS} ${INC}"
+CFLAGS=''
+INC=''
 
 compile_getopt() {
   echo ${AG_L} ${testname}.def
   ${AG_L} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  # Now we can generate the getopt loop from the template we just tweaked
-  # Remove the 'config.h' include from the generated header.  It was needed
-  # during the autogen run below, but we have to not have it later.
-  # (It is specified with the ``config-header = 'config.h';'' def line.)
-  #
   ${AG_L} -L ${TMPDIR} -T getopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
-
-  egrep -v "include.*config\.h" ${testname}.h > X
-  mv -f X ${testname}.h
 
   # Remove the variable comments so we can test against the expected result
   #
@@ -50,7 +63,7 @@ compile_getopt() {
     failure "could not compile ${testname}1-getopt.c"
 
   cmp -s ${testname}${1}-base.c ${testname}${1}-getopt.c || { set +x ; \
-    failure "`diff ${testname}${1}-base.c ${testname}${1}-getopt.c`" ; }
+    failure "`diff -c ${testname}${1}-base.c ${testname}${1}-getopt.c`" ; }
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -162,21 +175,18 @@ echo creating ${testname}1-base.c
 cat > ${testname}1-base.c <<\_EndOfSample_
 /*  -*- buffer-read-only: t -*- vi: set ro:
  *
- *  test_getopt is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ *  test_getopt is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU Lesser General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *  
- *  test_getopt is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ *  test_getopt is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
  *  
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with test_getopt.  If not, write to:
- *  	The Free Software Foundation, Inc.,
- *  	51 Franklin Street, Fifth Floor
- *  	Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 #include <sys/types.h>
@@ -209,8 +219,7 @@ optionUsage (tOptions* pOptions, int status)
              test_getoptOptions.pzProgName);
   else
     {
-      fputs (_(
-"test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
+      fputs (_("test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
 USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
    -o str     The option option descrip\n\
    -s str     The second option descrip\n\
@@ -244,7 +253,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
+Copyright (c) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -260,8 +269,8 @@ usage_too_many (tOptDesc* pOptDesc)
 {
   char const * pz =
     _("test_getopt error: the '%s' option appears more than %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -272,8 +281,8 @@ usage_too_few (tOptDesc* pOptDesc)
 {
   char const * pz =
     _("test_getopt error: the '%s' option must appear %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -284,9 +293,9 @@ static void
 usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char const * pz =
-    _("test_getopt error: the `%s' option conflicts with `%s'\n");
-  printf (pz, pz_what, pz_cant);
-  USAGE (EXIT_FAILURE);
+    _("test_getopt error: the `%s' option conflicts with the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_cant);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -297,9 +306,9 @@ static void
 usage_must (char const* pz_what, char const* pz_must)
 {
   char const * pz =
-    _("test_getopt error: the `%s' option requires `%s'\n");
-  printf (pz, pz_what, pz_must);
-  USAGE (EXIT_FAILURE);
+    _("test_getopt error: the `%s' option requires the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_must);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -362,7 +371,7 @@ process_test_getopt_opts (int argc, char** argv)
       break;
 
     case VALUE_OPT_HELP:
-      USAGE (EXIT_SUCCESS);
+      USAGE(EXIT_SUCCESS);
       /* NOTREACHED */
 
     case VALUE_OPT_VERSION:
@@ -370,7 +379,7 @@ process_test_getopt_opts (int argc, char** argv)
       /* NOTREACHED */
 
     default:
-      USAGE (EXIT_FAILURE);
+      USAGE(EXIT_FAILURE);
     }
   } leave_processing:;
 
@@ -402,21 +411,18 @@ echo creating ${testname}2-base.c
 cat > ${testname}2-base.c <<\_EndOfSample_
 /*  -*- buffer-read-only: t -*- vi: set ro:
  *
- *  test_getopt is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ *  test_getopt is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU Lesser General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *  
- *  test_getopt is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ *  test_getopt is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
  *  
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with test_getopt.  If not, write to:
- *  	The Free Software Foundation, Inc.,
- *  	51 Franklin Street, Fifth Floor
- *  	Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 #include <sys/types.h>
@@ -465,8 +471,7 @@ optionUsage (tOptions* pOptions, int status)
              test_getoptOptions.pzProgName);
   else
     {
-      fputs (_(
-"test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
+      fputs (_("test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
 USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
    -o, --option=str           The option option descrip\n\
    -s, --second=str           The second option descrip\n\
@@ -501,7 +506,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
+Copyright (c) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -517,8 +522,8 @@ usage_too_many (tOptDesc* pOptDesc)
 {
   char const * pz =
     _("test_getopt error: the '%s' option appears more than %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -529,8 +534,8 @@ usage_too_few (tOptDesc* pOptDesc)
 {
   char const * pz =
     _("test_getopt error: the '%s' option must appear %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -541,9 +546,9 @@ static void
 usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char const * pz =
-    _("test_getopt error: the `%s' option conflicts with `%s'\n");
-  printf (pz, pz_what, pz_cant);
-  USAGE (EXIT_FAILURE);
+    _("test_getopt error: the `%s' option conflicts with the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_cant);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -554,9 +559,9 @@ static void
 usage_must (char const* pz_what, char const* pz_must)
 {
   char const * pz =
-    _("test_getopt error: the `%s' option requires `%s'\n");
-  printf (pz, pz_what, pz_must);
-  USAGE (EXIT_FAILURE);
+    _("test_getopt error: the `%s' option requires the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_must);
+  USAGE(EXIT_FAILURE);
 }
 
 /*
@@ -619,7 +624,7 @@ process_test_getopt_opts (int argc, char** argv)
       break;
 
     case VALUE_OPT_HELP:
-      USAGE (EXIT_SUCCESS);
+      USAGE(EXIT_SUCCESS);
       /* NOTREACHED */
 
     case VALUE_OPT_VERSION:
@@ -627,7 +632,7 @@ process_test_getopt_opts (int argc, char** argv)
       /* NOTREACHED */
 
     default:
-      USAGE (EXIT_FAILURE);
+      USAGE(EXIT_FAILURE);
     }
   } leave_processing:;
 

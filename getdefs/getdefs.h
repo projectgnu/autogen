@@ -1,13 +1,27 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 4.4 2006/12/02 18:50:06 bkorb Exp $
+ *  $Id: getdefs.h,v 4.5 2007/10/07 16:54:54 bkorb Exp $
  *
  *    getdefs copyright 1999 Bruce Korb
  *
- *  Time-stamp:        "2006-12-02 08:53:15 bkorb"
+ *  Time-stamp:        "2007-07-04 11:57:38 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Maintainer:        Bruce Korb <bkorb@gnu.org>
- *  Created:           Mon Jun 30 15:35:12 1997
+ *
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef GETDEFS_HEADER

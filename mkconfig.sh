@@ -2,14 +2,29 @@
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2006-08-22 07:17:38 bkorb"
+  Time-stamp:        "2007-07-04 11:13:37 bkorb"
   echo ${2} | sed 's/[^0-9]//g')
-# Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Jul 30 10:57:13 1999
-#            by: bkorb
+##
+## Author:            Bruce Korb <bkorb@gnu.org>
+##            by: bkorb
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 4.6 2006/08/22 16:06:35 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 4.7 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;
@@ -91,6 +106,7 @@ cat <<- _EOF_ >&5
 	# ----------------------------------------------------------------------
 	_EOF_
 
+sed '1,/^##/d;/-----/q' $0 >&5
 cat <<- '_EOF_' >&5
 	SVDIR=`pwd`
 	cd `echo $0 | sed 's;/[^/]*$;;'`

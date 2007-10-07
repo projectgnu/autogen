@@ -1,7 +1,25 @@
 #! /bin/sh
 
-# Time-stamp:        "2006-12-02 06:45:43 bkorb"
-# Last Committed:    $Date: 2007/01/14 20:43:31 $
+# Time-stamp:        "2007-07-04 09:29:38 bkorb"
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
+#
+##
+##  This file is part of AutoGen.
+##
+##  AutoGen copyright 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 d=`dirname $0`
 d=`cd $d ; pwd`

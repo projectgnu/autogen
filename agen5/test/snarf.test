@@ -2,14 +2,29 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2007-05-28 15:24:39 bkorb"
+# Time-stamp:        "2007-07-04 11:31:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2007/06/23 20:19:39 $
+# Last Modified:     $Date: 2007/10/07 16:54:54 $
 #            by: bkorb
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 # Copyright:         1999-2007 by Bruce Korb
-# $Id: snarf.test,v 4.15 2007/06/23 20:19:39 bkorb Exp $
+# $Id: snarf.test,v 4.16 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -78,23 +93,18 @@ cat > ${testname}.ini.OK <<'_EOF_'
  *
  *  copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *  
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2 of the License, or (at your option)
- *  any later version.
- *  
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See the GNU General Public License for more details.
  *  
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  If not, write to:
- *  	The Free Software Foundation, Inc.,
- *  	51 Franklin Street, Fifth Floor
- *  	Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Guile Initializations - Test Global Variables
  */
@@ -147,23 +157,18 @@ cat > ${testname}.h.OK <<_EOF_
  *
  *  copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *  
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2 of the License, or (at your option)
- *  any later version.
- *  
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See the GNU General Public License for more details.
  *  
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  If not, write to:
- *  	The Free Software Foundation, Inc.,
- *  	51 Franklin Street, Fifth Floor
- *  	Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Guile Implementation Routines - for the test group
  */

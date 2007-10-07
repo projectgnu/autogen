@@ -1,10 +1,26 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.16 2007/01/09 22:26:38 bkorb Exp $
+# $Id: announce.txt,v 4.17 2007/10/07 16:54:54 bkorb Exp $
 #
-# Time-stamp:        "2006-09-23 19:48:21 bkorb"
-# Last Committed:    $Date: 2007/01/09 22:26:38 $
+# Time-stamp:        "2007-07-04 11:13:22 bkorb"
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 test -z "${sender}" && sender=bkorb
 domain=gnu.org
@@ -99,7 +115,7 @@ primary ftp:     ${ftpurl}/
 .tar.gz:         ${ftpurl}/${project}-${AG_VERSION}.tar.gz
 library project: $(echo ${ftpurl} | \
   sed "s,${project}/.*,libopts/rel${AO_CURRENT}.${AO_REVISION}/,")
-bug reports:     autogen-users at the SourceForge net domain
+bug reports:     autogen-users at the lists dot SourceForge net domain
 bug archive:     http://sourceforge.net/mailarchive/forum.php?forum_id=7034
 maintainer:      Bruce Korb - bkorb at the usual GNU domain
 _EOF_

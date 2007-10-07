@@ -3,15 +3,26 @@
 # ----------------------------------------------------------------------
 # stress.test --- stress test
 #
-## Time-stamp:      "2005-03-07 13:06:58 bkorb"
-## Copyright (c):   1999-2006 by Bruce Korb
-##
+## Time-stamp:      "2007-07-04 11:52:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:31 PDT 1999
-#            by: bkorb
-#
-# $Id: stress.test,v 4.6 2006/09/24 02:10:44 bkorb Exp $
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+# $Id: stress.test,v 4.7 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

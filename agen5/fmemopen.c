@@ -1,8 +1,7 @@
 /*-
- * Copyright (c) 2004-2006
- *  Bruce Korb.  All rights reserved.
+ * Copyright (c) 2004-2007 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2006-11-26 15:42:06 bkorb"
+ * Time-stamp:      "2007-07-04 11:20:11 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -121,7 +120,7 @@ struct fmem_cookie_s {
 };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static int
 fmem_getmode( char const *pMode, mode_bits_t *pRes );
 

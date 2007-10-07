@@ -1,28 +1,27 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
- *  Time-stamp:        "2006-11-26 16:33:52 bkorb"
- */
-
-/*
- *  Columns copyright 1992-2006 Bruce Korb
+ *  $Id: columns.c,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+ *  Time-stamp:        "2007-07-04 11:54:49 bkorb"
  *
+ *  Columns copyright (c) 1992-2007 Bruce Korb - all rights reserved
  *  Columns is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
  *
- *  Columns is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Columns.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef NUL
 # define NUL '\0'

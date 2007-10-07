@@ -1,4 +1,26 @@
-New in __CURRENT_VERSION__ May 2007
+New in __CURRENT_VERSION__ October 2007
+
+* libopts requires strsignal, so the config test has been moved.
+* fixed ``--save'' option bug
+* programs may now choose to have config files kept in cannonical form
+  ("C" locale), even if long option names are translated.  The option
+  definition file must contain ``no-xlate = opt-cfg;'' or
+  ``no-xlate = opt;''  See the documentation for details.
+
+New in 5.9.2 July 2007
+
+* GNU GPL v3 is now emitted with the "gpl" and "lgpl" functions.
+* 
+The most work was done for AutoOpts:
+
+* usage.tpl template has been added.
+* getopt.tpl uses this template for constructing its usage string.
+* if "short-usage" or "full-usage" can be used to specify the form
+  of the usage text:
+  * not supplied -> compute it at run time
+  * supplied, but empty -> use "usage.tpl" to compute it
+  * is a variable name -> insert into option structure
+  * is text -> emit the text and point to it from option structure
 
 New in 5.9.1 May 2007
 

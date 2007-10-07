@@ -9,6 +9,24 @@ This file serves two purposes:
 2) a text repository for documentation that would make the doc
    template more confusing.
 
+ *
+ *  This file is part of AutoGen.
+ *
+ *  AutoGen copyright 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 @ignore
 START == MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
@@ -1093,14 +1111,14 @@ be processed once and that the generated text is to be written to
 
 The suffix specification consists of a sequence of POSIX compliant file name
 characters and, optionally, an equal sign and a file name formatting
-specification.  That specification may be either an ordinary sequence
-of file name characters with zero, one or two "%s" formatting sequences
-in it, or else it may be a Scheme expression that, when evaluated,
-produces such a string.  The two string arguments allowed for that string are
-the base name of the definition file, and the current suffix (that being
-the text to the left of the equal sign).  (Note:  "POSIX compliant file
-name characters" consist of alphanumerics plus the period (@code{.}),
-hyphen (@code{-}) and underscore (@code{_}) characters.)
+specification.  That specification may be either an ordinary sequence of
+file name characters with zero, one or two "%s" formatting sequences in it,
+or else it may be a Scheme expression that, when evaluated, produces such a
+string.  The Scheme result may not be empty.  The two string arguments
+allowed for that string are the base name of the definition file, and the
+current suffix (that being the text to the left of the equal sign).  (Note:
+"POSIX compliant file name characters" consist of alphanumerics plus the
+period (@code{.}), hyphen (@code{-}) and underscore (@code{_}) characters.)
 
 If the suffix begins with one of these three latter characters and
 a formatting string is not specified, then that character is presumed to
@@ -1113,8 +1131,12 @@ Comments:  blank lines, lines starting with a hash mark [@code{#}]),
 and edit mode comments (text between pairs of @code{-*-} strings).
 
 @item
-Scheme expressions may be inserted in order to make configuration
-changes before template processing begins.
+Some scheme expressions may be inserted in order to make configuration
+changes before template processing begins.  ``@code{before template
+processing begins}'' means that there is no current output file, no current
+suffix and, basically, none of the AutoGen specific functions
+(@pxref{AutoGen Functions}) may be invoked.
+
 It is used, for example, to allow the template writer to specify
 the shell program that must be used to interpret the shell commands in
 the template.  It can have no effect on any shell commands in the
@@ -1408,7 +1430,9 @@ You must have at least one @code{SELECT} macro.
 @item DEFINE
 This macro has scope through the @code{ENDDEF} macro.  The defined
 user macro can never be a block macro.  This macro is extracted from
-the template @i{before} the template is processed.
+the template @i{before} the template is processed.  Consequently, you
+cannot select a definition based on context.  You can, however, place
+them all at the end of the file.
 
 @item FOR
 This macro has scope through the @code{ENDFOR} macro.
@@ -2102,14 +2126,13 @@ Thus, Guile based applications that are linked with private
 
 When AutoGen is installed, the AutoOpts project is installed with it.
 AutoOpts includes various AutoGen templates and a pair of shared
-libraries.  These libraries may be used under the terms of the
-GNU Lesser General Public License (LGPL).
+libraries.  These libraries may be used under the terms of version 3
+of the GNU Lesser General Public License (LGPL).
 
 One of these libraries (@code{libopts}) is needed by programs that are built
 using AutoOpts generated code.  This library is available as a separate
 ``tear-off'' source tarball.  It is redistributable for use under either of
-two licenses: The GNU Lesser General Public License ("Lesser" meaning you
-have greater license with it and may link it into commercial programs), and
+two licenses: The above mentioned GNU Lesser General Public License, and
 the advertising-clause-free BSD license.  Both of these license terms are
 incorporated into appropriate COPYING files included with the @code{libopts}
 source tarball.  This source may be incorporated into your package with
@@ -2330,7 +2353,30 @@ global variables or @code{#include} directives required by
 @code{flag_code} text and shared with other program text.
 Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
-@code{config-header}, above.
+@code{config-header}, above.n.
+
+@cindex full-usage
+@item full-usage
+If this attribute is provided, it may specify the full length
+usage text, or a variable name assignable to a ``char const *'' pointer,
+or it may be empty.  The meanings are determined by  the length.
+@itemize @bullet
+@item
+If not provided, the text will be computed as normal.
+@item
+If the length is zero, then the usage text will be derived from
+the current settings and inserted as text into the generated .c file.
+@item
+If the length is 1 to 32 bytes, then it is presumed to be a variable
+name that either points to or is an array of const chars.
+@item
+If it is longer than that, it is presumed to be the help text itself.
+This text will be inserted into the generated .c file.
+@end itemize
+
+This string should be readily translatable and provision will be made
+to translate it if this is provided and the source code is compiled with
+``ENABLE_NLS'' defined.
 
 @cindex guard-option-names
 @item guard-option-names
@@ -2405,6 +2451,22 @@ One of the options may be specified as the default
 (as long as it has a required option argument).
 @end itemize
 
+@cindex no-xlate
+@item no-xlate
+Modifies when or whether option names get translated.  If provided,
+it must be assigned one of two values:
+@table @samp
+@item opt-cfg
+to suppress option name translation for configuration file and and environment
+variable processing.
+@item opt
+to suppress option name translation completely.  The usage text will
+always be translated if @code{ENABLE_NLS} is defined and you have
+translations for that text.
+@end table
+See also the various ``@code{XLAT}'' interface entries in the
+AutoOpts Programmatic Interface section (@pxref{AutoOpts API}).
+
 @cindex prefix
 @item prefix
 This value is inserted into @strong{all} global names.  This will
@@ -2417,6 +2479,12 @@ Specifies the configuration file name.  This is only useful if you
 have provided at least one @code{homerc} attribute.
 @noindent
 default: .<prog-name>rc
+
+@cindex short-usage
+@item short-usage
+If this attribute is provided, it is used to specify an abbreviated
+version of the usage text.  This text is constructed in the same way
+as the ``full-usage'', described above.
 
 @cindex version
 @item version
@@ -2980,6 +3048,7 @@ case, the @code{-} and @code{--} command line option markers are optional.
 * Option Conflict Attributes::  Option Conflict Attributes
 * Option Arguments::            Option Argument Specification
 * Option Argument Handling::    Option Argument Handling
+* Internationalizing Options::  Internationalizing Options
 @end menu
 
 @node Required Attributes
@@ -3118,6 +3187,15 @@ is @code{#define}-d.  Watch those switch statements.
 These option attributes do not fit well with other categories.
 
 @table @samp
+@cindex translators
+@item   translators
+If you need to give the translators a special note about a particular option,
+please use this attribute.  It will get emitted into the generated @code{.c}
+text where the option related strings get defined.  To make a general comment
+about all of the option code, add comments to an @code{include}
+attribute (@pxref{program attributes}).  Do @strong{not} use this attribute
+globally, or it will get emitted into every option definition block.
+
 @cindex no-preset
 @item no-preset
 @cindex configuration file
@@ -3548,6 +3626,45 @@ the stacked argument option it references may be equivalenced to
 another option.
 @end table
 
+@node Internationalizing Options
+@subsubsection Internationalizing Options
+@cindex Internationalizing Options
+
+Normally, AutoOpts produces usage text that is difficult to translate.  It is
+pieced together on the fly using words and phrases scattered around here and
+there, piecing together toe document.  This does not translate well.
+
+Incorporated into this package are some ways around the problem.  First, you
+should specify the @code{full-usage} and @code{short-usage} program attributes
+(@pxref{program attributes}).  This will enable your translators to translate
+the usage text as a whole.
+
+Your translators will also be able to translate long option names.  The option
+name translations will then become the names searched for both on the command
+line and in configuration files.  However, it will not affect the names of
+environment variable names used to configure your program.
+
+If it is considered desireable to keep configuration files in the ``C''
+locale, then several macros are available to suppress or delay the
+translations of option names at run time.  These are all disabled if
+@code{ENABLE_NLS} is not defined at compile time.  These macros @strong{must}
+be invoked before the first invocation of @code{optionProcess}.
+
+@table @samp
+@item  OPT_NO_XLAT_CFG_NAMES
+@itemx OPT_XLAT_CFG_NAMES
+Disable (or enable) the translations of option names for configuration files.
+If you enable translation for config files, then they will be translated for
+command line options.
+
+@item  OPT_NO_XLAT_OPT_NAMES
+@itemx OPT_XLAT_OPT_NAMES
+Disable (or enable) the translations of option names for command line
+processing.  If you disable the translation for command line processing,
+you will also disable it for configuration file processing.  Once translated,
+the option names will remain translated.
+@end table
+
 @node documentation attributes
 @subsection Man and Info doc Attributes
 @cindex documentation attributes
@@ -3771,7 +3888,11 @@ included with the AutoGen sources.
 * ISUNUSED_OPT::            ISUNUSED_OPT( <NAME> ) - Never Specified?
 * OPTION_CT::               OPTION_CT - Full Count of Options
 * OPT_ARG::                 OPT_ARG( <NAME> ) - Option Argument String
+* OPT_NO_XLAT_CFG_NAMES::   OPT_NO_XLAT_CFG_NAMES - option name xlation
+* OPT_NO_XLAT_OPT_NAMES::   OPT_NO_XLAT_OPT_NAMES - option name xlation
 * OPT_VALUE_name::          OPT_VALUE_name - Option Argument Value
+* OPT_XLAT_CFG_NAMES::      OPT_XLAT_CFG_NAMES - option name xlation
+* OPT_XLAT_OPT_NAMES::      OPT_XLAT_OPT_NAMES - option name xlation
 * RESTART_OPT::             RESTART_OPT( n ) - Resume Option Processing
 * SET_OPT_name::            SET_OPT_name - Force an option to be set
 * STACKCT_OPT::             STACKCT_OPT( <NAME> ) - Stacked Arg Count
@@ -4030,17 +4151,65 @@ if (HAVE_OPT( NAME )) @{
 @}
 @end example
 
+@node OPT_NO_XLAT_CFG_NAMES
+@subsection OPT_NO_XLAT_CFG_NAMES - option name xlation
+@findex OPT_NO_XLAT_CFG_NAMES
+
+Invoking this macro will disable the translation of option names only while
+processing configuration files and environment variables.  This must be
+invoked before the first call to @code{optionProcess}..  You need not invoke
+this if your option definition file contains the attribute assignment,
+``@code{no-xlate = opt-cfg;}''.
+
+@node OPT_NO_XLAT_OPT_NAMES
+@subsection OPT_NO_XLAT_OPT_NAMES - option name xlation
+@findex OPT_NO_XLAT_OPT_NAMES
+
+Invoking this macro will completely disable the translation of option names.
+This must be invoked before the first call to @code{optionProcess}.  You need
+not invoke this if your option definition file contains the attribute
+assignment, ``@code{no-xlate = opt;}''.
+
 @node OPT_VALUE_name
 @subsection OPT_VALUE_name - Option Argument Value
 @findex OPT_VALUE_name
 
-This macro gets emitted only for options that take numeric, keyword or
-set membership arguments.  The macro yields a word-sized integer
-containing the enumeration or numeric value of the option argument.
+This macro gets emitted only for options that take numeric, keyword or set
+membership arguments.  The macro yields a word-sized integer containing the
+enumeration, bit set or numeric value for the option argument.
 
 @example
-int opt_val = OPT_VALUE_NAME;
+int opt_val = OPT_VALUE_name;
 @end example
+
+@node OPT_XLAT_CFG_NAMES
+@subsection OPT_XLAT_CFG_NAMES - option name xlation
+@findex OPT_XLAT_CFG_NAMES
+
+If @code{ENABLE_NLS} is defined, this macro will cause the translation of
+option names to happen before starting the processing of configuration files
+and environment variables.  This will change the recognition of options within
+the @code{$PROGRAMNAME} environment variable, but will not alter the names
+used for setting options via @code{$PROGRAMNAME_name} environment variables.
+
+This must be invoked before the first call to @code{optionProcess}.  You might
+need to use this macro if your option definition file contains the attribute
+assignment, ``@code{no-xlate = opt;}'' or ``@code{no-xlate = opt-cfg;}'', and
+you have determined in some way that you wish to override that.
+
+@node OPT_XLAT_OPT_NAMES
+@subsection OPT_XLAT_OPT_NAMES - option name xlation
+@findex OPT_XLAT_OPT_NAMES
+
+If @code{ENABLE_NLS} is defined, translate the option names before processing
+the command line options.  Long option names may thus be localized.
+(If the names were translated before configuration processing, they will
+not be re-translated.)
+
+This must be invoked before the first call to @code{optionProcess}.  You might
+need to use this macro if your option definition file contains the attribute
+assignment, ``@code{no-xlate = opt;}'' and you have determined in some way that
+you wish to override that.
 
 @node RESTART_OPT
 @subsection RESTART_OPT( n ) - Resume Option Processing

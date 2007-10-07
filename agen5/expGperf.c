@@ -1,33 +1,30 @@
 /*
- *  $Id: expGperf.c,v 4.15 2006/11/27 01:55:17 bkorb Exp $
+ *  $Id: expGperf.c,v 4.16 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2006-11-26 15:35:27 bkorb"
- *  Last Committed:    $Date: 2006/11/27 01:55:17 $
+ *  Time-stamp:        "2007-07-04 11:18:51 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.
+ *
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  AutoGen copyright 1992-2006 Bruce Korb
- *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
- *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
- */
 #ifndef SHELL_ENABLED
 SCM
 ag_scm_make_gperf( SCM name, SCM hlist )

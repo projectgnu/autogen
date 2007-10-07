@@ -1,41 +1,43 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.17 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: expString.c,v 4.18 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2007-05-06 11:29:43 bkorb"
- *  Last Committed:    $Date: 2007/06/23 20:19:39 $
+ *  Time-stamp:        "2007-07-06 13:34:10 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
- */
-
-/*
- *  AutoGen copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
+static size_t
+string_size(char const * pzScn, size_t newLineSize);
+
 static SCM
 makeString( tCC*    pzText,
             tCC*    pzNewLine,
             size_t  newLineSize );
+
+static size_t
+stringify_for_shell(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize);
 
 static SCM
 shell_stringify( SCM obj, u_int qt );

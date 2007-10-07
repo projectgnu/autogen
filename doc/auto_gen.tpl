@@ -2,14 +2,28 @@
 
 ##  Documentation template
 ##
-##  AutoGen Copyright (C) 1992-2007 Bruce Korb
-##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2007-04-15 16:41:45 bkorb"
-## Last Committed:    $Date: 2007/06/23 20:19:39 $
-##            by: bkorb
+## Time-stamp:        "2007-07-04 11:56:53 bkorb"
+## Last Committed:    $Date: 2007/10/07 16:54:54 $
+##
+##  This file is part of AutoGen.
+##
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.31 2007/06/23 20:19:39 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.32 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -790,7 +804,8 @@ log=${tempdir}/genshellopt.log
   exec 3>&-
 
   cd ${tempdir}
-  cmd="valgrind --leak-check=full ${AGexe}"
+  # cmd="valgrind --leak-check=full ${AGexe}"
+  cmd="${AGexe}"
   HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts genshellopt.def
   test $? -eq 0 || die "autogen failed to create genshellopt.c - See ${log}"
 

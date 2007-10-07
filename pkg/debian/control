@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Matt Kraai <kraai@debian.org>
 Build-Depends: autotools-dev, debhelper (>=4), gperf, guile-1.6-dev | libguile-dev, libxml2-dev, texinfo, tetex-bin, texi2html
-Standards-Version: 3.6.2
+Standards-Version: 3.7.2
 
 Package: autogen
 Architecture: any

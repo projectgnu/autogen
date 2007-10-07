@@ -1,24 +1,37 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-02-04 11:07:12 bkorb"
-## Copyright (c):   2003-2007 by Bruce Korb
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Sun Jul 28 20:37 2002
-##              by: bkorb
+## Time-stamp:      "2007-07-04 14:32:27 bkorb"
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2007/02/07 01:57:59 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
 DISTCLEANFILES = autogen.lsm
-DEBIAN_FILES   = mkpkg.debian debian
-PKG_FILES      = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in $(DEBIAN_FILES)
-LIBOPTS_FILES  = libopts/COPYING.mbsd libopts/README libopts/mklibsrc.sh \
-		 libopts/libopts-add.m4
-TPL_FILES      = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
-EXTRA_DIST     = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
-DOCENV         = MAKE="$(MAKE)"
+
+DEBIAN_FILES  = mkpkg.debian ALL SOURCES IN debian DIRECTORY
+LIBOPTS_FILES = ALL SOURCES IN pkg/libopts DIRECTORY
+TPL_FILES     = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
+PKG_FILES     = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in $(DEBIAN_FILES)
+EXTRA_DIST    = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
+DOCENV        = MAKE="$(MAKE)"
 
 all : $(DISTCLEANFILES)
 

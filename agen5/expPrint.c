@@ -1,35 +1,31 @@
 
 /*
- *  $Id: expPrint.c,v 4.17 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: expPrint.c,v 4.18 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2007-03-25 08:02:07 bkorb"
- *  Last Committed:    $Date: 2007/06/23 20:19:39 $
+ *  Time-stamp:        "2007-07-04 11:19:37 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
  *  a valid pointer, thus it will fault.  This code protects
  *  against the fault so an error message can be emitted instead of
  *  a core dump :-)
- */
-
-/*
- *  AutoGen copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 static sigjmp_buf printJumpEnv;
@@ -39,7 +35,7 @@ static void   printFault( int sig );
 static ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 printFault( int sig );
 

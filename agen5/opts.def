@@ -3,27 +3,25 @@
 autogen definitions options;
 
 /*
- *   $Id: opts.def,v 4.23 2007/06/23 20:19:39 bkorb Exp $
- *  Time-stamp:        "2007-04-15 14:35:22 bkorb"
- *  Last Committed:    $Date: 2007/06/23 20:19:39 $
+ *  $Id: opts.def,v 4.24 2007/10/07 16:54:54 bkorb Exp $
+ *  Time-stamp:        "2007-08-04 12:39:46 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
- *  AutoGen Copyright (c) 1992-2007 Bruce Korb
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 copyright = {
@@ -121,6 +119,7 @@ flag = {
     descrip   = "Template search directory list";
     max       = NOLIMIT;
     arg-name  = dir;
+    translators = 'the option argument is a file name';
     stack-arg;
 #ifndef XML2AG
     settable;

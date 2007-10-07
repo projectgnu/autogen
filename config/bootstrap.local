@@ -2,12 +2,27 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Thu Jul 29 09:32:11 1999
-# Time-stamp:        "2007-02-14 20:21:48 bkorb"
+# Time-stamp:        "2007-07-30 11:07:41 bkorb"
 #            by: bkorb
+##
+##  This file is part of AutoGen.
+##
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.29 2007/06/23 20:19:39 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.30 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -102,7 +117,7 @@ make_funcs_def()
   else mv -f Makefile.new Makefile.am
        echo "WARNING: Makefile.am has been updated"
   fi
-  :mkfwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c` > /dev/null 2>&1 || :
+  mk-fwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c` > /dev/null 2>&1 || :
   ${AGexe} aoconf.def
   cd ${svdir}
 }
@@ -221,10 +236,8 @@ check_tools()
 MISSING=${MISSING-${srcdir}/config/missing}
 
 case ${BOOTSTRAP} in
-
 ( pre )
     echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
-
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 
@@ -232,6 +245,21 @@ case ${BOOTSTRAP} in
     make_funcs_def
     config_versions
     chmod a+x ${srcdir}/*/test/*.test
+    exec 3> XXX$$
+    sed '/^DEBIAN_FILES *=/,$d' ${srcdir}/pkg/Makefile.am >&3
+
+    (\cd ${srcdir}/pkg ; ls -1d libopts/* ) | \
+        egrep -v '^libopts/(CVS|SCCS)$' | \
+        columns --spread=1 --first='LIBOPTS_FILES =' -I16 --line=" \\" >&3
+    echo >&3
+    (\cd ${srcdir}/pkg ; ls -1d mkpkg.debian debian/* ) | \
+        egrep -v '^debian/(CVS|SCCS)$' | \
+        columns --spread=1 --first='DEBIAN_FILES =' -I16 --line=" \\" >&3
+
+    sed '1,/LIBOPTS_FILES *=/d' ${srcdir}/pkg/Makefile.am >&3
+    exec 3>&-
+
+    mv -f XXX$$ ${srcdir}/pkg/Makefile.am
     ;;
 
 ( post )

@@ -1,31 +1,30 @@
 
 /*
- *  $Id: funcCase.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: funcCase.c,v 4.16 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:11:54 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2007-07-04 11:25:51 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  This module implements the CASE text function.
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
+
 /*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #undef  IS_LOW
@@ -78,7 +77,7 @@ static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
 static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 compile_re( regex_t* pRe, char* pzPat, int flags );
 

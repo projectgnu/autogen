@@ -2,15 +2,34 @@
 
 ## agman1.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2006 Bruce Korb
+##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2006-05-19 17:27:30 bkorb"
+## Time-stamp:      "2007-09-09 11:20:10 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Mon Jun 28 15:35:12 1999
 ##              by: bkorb
+##
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.12 2006/05/25 04:11:07 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.13 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -118,7 +137,7 @@ IF (exist? "explain") :+]
 [+:explain:+][+:
 ENDIF :+]
 .SH "DESCRIPTION"
-This manual page documents, briefly, the \fB[+:
+This manual page briefly documents the \fB[+:
     (. prog-name) :+]\fP command.
 [+:
 

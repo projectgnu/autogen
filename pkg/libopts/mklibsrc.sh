@@ -2,12 +2,26 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2006-09-19 20:39:50 bkorb"
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Aug 20, 2002
+## Time-stamp:      "2007-07-04 13:02:38 bkorb"
 ##              by: bkorb
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.29 2006/09/24 02:10:45 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.30 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -44,10 +58,9 @@ do
   fi
 done
 
-cd ${top_srcdir}/autoopts
-cp -f COPYING ${tagd}/COPYING.lgpl
+cp -f ${top_srcdir}/pkg/libopts/COPYING.* ${tagd}/.
 
-cd ../compat
+cd ${top_srcdir}/compat
 cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
    ${tagd}/compat/.
 
@@ -64,7 +77,6 @@ cat ${top_srcdir}/pkg/libopts/libopts-add.m4 >> m4/libopts.m4
 test ! -f Makefile.am || rm -f Makefile.am
 
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
-cp ${top_srcdir}/pkg/libopts/COPYING* .
 
 touch MakeDefs.inc
 

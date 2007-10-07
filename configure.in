@@ -1,15 +1,27 @@
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
-dnl Copyright (C) 1997-2007 Bruce Korb
-dnl
-dnl Time-stamp:      "2007-04-29 15:05:17 bkorb"
+dnl Time-stamp:      "2007-10-06 12:01:36 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
-dnl Maintainer:       Bruce Korb <bkorb@gnu.org>
-dnl Created:          Mon Jun 30 15:10:13 1997
 dnl            by: bkorb
+dnl
+dnl  This file is part of AutoGen.
+dnl  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+dnl
+dnl AutoGen is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by the
+dnl Free Software Foundation, either version 3 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl AutoGen is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+dnl See the GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License along
+dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.23 2007/06/23 20:19:39 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.24 2007/10/07 16:54:54 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -23,7 +35,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.23 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.24 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -48,7 +60,7 @@ AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,
 # Set up the environment to configure the snprintv subpackage using
 # this version of AutoGen (as opposed to any installed version).
 # ----------------------------------------------------------------------
-ac_configure_args="$ac_configure_args --enable-snprintfv-convenience"
+[ac_configure_args="$ac_configure_args --enable-snprintfv-convenience"
 ag_srcdir=`\cd $srcdir && pwd`
 if test x$ag_srcdir != x && test -d $ag_srcdir; then
   :
@@ -64,7 +76,7 @@ fi
 MFLAGS=
 MAKEFLAGS=
 MAKELEVEL=
-unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
+unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null]
 
 AM_WITH_DMALLOC
 
@@ -117,12 +129,11 @@ AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_C_LONG_DOUBLE
-if test x$ac_cv_type_long_double = xno; then
+[if test x$ac_cv_type_long_double = xno; then
   snv_long_double=double
 else
   snv_long_double='long double'
-fi
-
+fi]
 AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
                    [Define this to the long+double type])
 AC_CHECK_TYPES([u_int, long long, uintmax_t])
@@ -134,7 +145,7 @@ AC_CHECK_SIZEOF(short, 2)
 # ----------------------------------------------------------------------
 # Checks for various functions.
 # ----------------------------------------------------------------------
-AC_CHECK_FUNCS(strchr strsignal strlcpy snprintf dlopen)
+AC_CHECK_FUNCS(strchr strlcpy snprintf dlopen)
 AC_SEARCH_LIBS(copysign, [m],
                [AC_DEFINE(HAVE_COPYSIGN, 1,
                           [Define to 1 if you have the `copysign' function.])])
@@ -228,7 +239,7 @@ fi
 AC_SUBST(INCLIST)
 [conf_shell=${CONFIG_SHELL-/bin/sh}]
 AC_SUBST(conf_shell)
-
+[
 case "${GCC}" in
  yes)
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align \
@@ -236,7 +247,7 @@ case "${GCC}" in
                  -Wstrict-prototypes -Wwrite-strings -fno-strict-aliasing`
     ;;
 esac
-
+]
 AM_CONFIG_HEADER(config.h:config-h.in)
 AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
                 [chmod +x doc/mk-agen-texi.sh])

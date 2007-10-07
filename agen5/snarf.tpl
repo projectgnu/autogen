@@ -1,8 +1,26 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.11 2006/09/30 19:31:09 bkorb Exp $
-# Time-stamp:        "2006-09-30 12:22:38 bkorb"
-# Last Committed:    $Date: 2006/09/30 19:31:09 $
+# $Id: snarf.tpl,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+# Time-stamp:        "2007-07-04 11:28:40 bkorb"
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
+
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 
 (setenv "SHELL" "/bin/sh")
 
@@ -79,7 +97,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2006 Bruce Korb
+ *  copyright 1992-2007 Bruce Korb
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -125,7 +143,7 @@ ENDFOR symbol   =]
 
 (dne " *  " "/*  ")=]
  *
- *  copyright 1992-2006 Bruce Korb
+ *  copyright 1992-2007 Bruce Korb
  *
 [=
 (string-table-new "g_nm")

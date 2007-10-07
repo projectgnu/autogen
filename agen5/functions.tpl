@@ -1,9 +1,27 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.7 2006/10/21 15:41:57 bkorb Exp $
+# $Id: functions.tpl,v 4.8 2007/10/07 16:54:54 bkorb Exp $
 
-#  Time-stamp:        "2006-10-20 17:08:37 bkorb"
-#  Last Committed:    $Date: 2006/10/21 15:41:57 $
+#  Time-stamp:        "2007-07-04 11:27:05 bkorb"
+#  Last Committed:    $Date: 2007/10/07 16:54:54 $
+
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 
 =]
 [=

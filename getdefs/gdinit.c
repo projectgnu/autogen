@@ -1,12 +1,28 @@
 /*
- *  $Id: gdinit.c,v 4.9 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: gdinit.c,v 4.10 2007/10/07 16:54:54 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2007-04-28 11:31:58 bkorb"
- *  Last Modified:     $Date: 2007/06/23 20:19:39 $
+ *  Time-stamp:        "2007-07-04 11:57:21 bkorb"
+ *  Last Modified:     $Date: 2007/10/07 16:54:54 $
  *            by: bkorb
+ *
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";

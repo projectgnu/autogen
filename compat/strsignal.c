@@ -2,23 +2,25 @@
 /*
  *  strsignal is free software.
  *
- * Time-stamp:        "2006-09-23 19:45:40 bkorb"
- * Last Committed:    $Date: 2006/09/24 02:57:02 $
+ * Time-stamp:        "2007-07-04 09:48:02 bkorb"
+ * Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
  *
- *  strsignal is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with strsignal.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  As a special exception, Bruce Korb gives permission for additional
  *  uses of the text contained in the release of strsignal.
@@ -43,7 +45,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 4.6 2006/09/24 02:57:02 bkorb Exp $
+ *  $Id: strsignal.c,v 4.7 2007/10/07 16:54:54 bkorb Exp $
  */
 
 #include "compat.h"

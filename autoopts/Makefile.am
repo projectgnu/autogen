@@ -2,13 +2,31 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-03-24 14:21:31 bkorb"
-## Copyright (c):   1992-2007 by Bruce Korb
-##
+## Time-stamp:      "2007-07-15 15:49:09 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
+##
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.34 2007/06/23 20:19:39 bkorb Exp $
+## $Id: Makefile.am,v 4.35 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -48,7 +66,7 @@ CSRC        = \
     boolean.c   configfile.c cook.c      enumeration.c environment.c \
     genshell.c  load.c       makeshell.c nested.c      numeric.c     \
     pgusage.c   putshell.c   restore.c   save.c        sort.c        \
-    stack.c     streqvcmp.c  text_mmap.c tokenize.c    usage.c       version.c
+    stack.c     streqvcmp.c  text_mmap.c tokenize.c    usage.c version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
@@ -56,11 +74,11 @@ LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
 CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
     aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
-    optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl
+    optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl usage.tpl
 
 TPL_FILES   = $(CLIENT_TPLS)
 DEF_FILES   = genshell.def stdoptions.def $(srcdir)/funcs.def
-MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in COPYING
+MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in
 pkgconfigdir=$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

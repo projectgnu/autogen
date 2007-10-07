@@ -2,11 +2,45 @@
 
    c=%s-temp.c
 
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 +][+
+
 `stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
-  Time-stamp:        "2007-05-09 06:55:37 bkorb"
+  Time-stamp:        "2007-05-28 18:05:40 bkorb"
 _EOF_
 \` `
++][+
+
+DEFINE emit-usage-string    +][+
+
+  (out-push-new)            +][+
+  INCLUDE "usage.tpl"       +][+
+  (kr-string (string-append (shell (string-append
+  "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
+       -e 's/ --version\\[=arg\\]/ --version      /' \
+       -e '/ --more-help /d' <<_EOF_\n" (out-pop #t) "\n_EOF_"
+  )) "\n" ))  +][+
+
+ENDDEF
+
 +][+
   (if (not (exist? "settable"))
       (error "'settable' must be specified globally for getopt_long\n"))
@@ -24,7 +58,7 @@ _EOF_
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.8 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.9 2007/10/07 16:54:54 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -117,33 +151,8 @@ optionUsage (tOptions* pOptions, int status)
              [+ (. prog-name) +]Options.pzProgName);
   else
     {
-      fputs (_(
-[+ (kr-string (string-append (shellf
-  "[ \"${VERBOSE:-false}\" = true ] && set -x ; td=.opt-$$
-   rm -rf .opt-*
-   mkdir ${td}
-   sdir=`cd ${srcdir:-.} ; pwd`
-   cd ${td}
-   CFLAGS=\"${CFLAGS}  `autoopts-config cflags` -DTEST_%2$s_OPTS\"
-   LDFLAGS=\"${LDFLAGS} `autoopts-config ldflags`\"
-   LDFLAGS=`echo ${LDFLAGS} | \
-      sed 's/-lguile[^ ]*//g;s/[^ ]*libguileopts[^ ]*//'`
-   : LD_LIBRARY_PATH $LD_LIBRARY_PATH
-   ${CC:-cc} ${CFLAGS} -o %1$s ${sdir}/%3$s.c ${LDFLAGS} || \
-      die 'could not build %1$s'
-   f=`guile-config link | sed 's/.*-L//;s/ .*//'`
-   f=`(LD_LIBRARY_PATH=$f:${LD_LIBRARY_PATH} ./%1$s -: 2>&1) | \
-      sed '1d;/more-help/d
-           s/--version\\[=arg\\]/--version      /
-           /version information and exit/s/-v \\[arg\\]/-v      /'`
-   test -z \"${f}\" && die 'Cannot get help from %1$s'
-   echo \"${f}\"
-   cd ..
-   [ \"${VERBOSE:-false}\" = true ] || rm -rf ${td}"
-    (get "prog-name")
-    (. PROG-NAME)
-    (base-name)
-    ) "\n" )) +]), stdout);
+      fputs (_([+
+    INVOKE emit-usage-string  usage-type = short +]), stdout);
     }
 
   exit (status);
@@ -173,7 +182,7 @@ optionPrintVersion(
          "" )
      (get "version") ) +]\n\
 Written by [+(join ", " (stack "copyright.author"))+].\n\n\
-Copyright (C) [+ copyright.date +] by [+ copyright.owner +]\n[+
+Copyright (c) [+ copyright.date +] by [+ copyright.owner +]\n[+
 
 CASE copyright.type +][+
 *= gpl    +]\
@@ -195,8 +204,8 @@ usage_too_many (tOptDesc* pOptDesc)
   char const * pz =
     _("[+(. prog-name)
     +] error: the '%s' option appears more than %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMaxCt);
+  USAGE(EXIT_FAILURE);
 }
 [+
  IF (exist? "flag.min")
@@ -210,8 +219,8 @@ usage_too_few (tOptDesc* pOptDesc)
   char const * pz =
     _("[+(. prog-name)
     +] error: the '%s' option must appear %d times\n");
-  printf (pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
-  USAGE( EXIT_FAILURE );
+  fprintf (stderr, pz, pOptDesc->pz_Name, pOptDesc->optMinCt);
+  USAGE(EXIT_FAILURE);
 }
 [+
  ENDIF
@@ -227,9 +236,9 @@ usage_cannot (char const* pz_what, char const* pz_cant)
 {
   char const * pz =
     _("[+(. prog-name)
-    +] error: the `%s' option conflicts with `%s'\n");
-  printf (pz, pz_what, pz_cant);
-  USAGE (EXIT_FAILURE);
+    +] error: the `%s' option conflicts with the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_cant);
+  USAGE(EXIT_FAILURE);
 }
 [+
  ENDIF
@@ -245,9 +254,9 @@ usage_must (char const* pz_what, char const* pz_must)
 {
   char const * pz =
     _("[+(. prog-name)
-    +] error: the `%s' option requires `%s'\n");
-  printf (pz, pz_what, pz_must);
-  USAGE (EXIT_FAILURE);
+    +] error: the `%s' option requires the `%s' option.\n");
+  fprintf (stderr, pz, pz_what, pz_must);
+  USAGE(EXIT_FAILURE);
 }
 [+
  ENDIF
@@ -302,7 +311,7 @@ ENDIF +]) {
     ENDFOR +]
 
     case VALUE_OPT_HELP:
-      USAGE (EXIT_SUCCESS);
+      USAGE(EXIT_SUCCESS);
       /* NOTREACHED */
 [+ IF (exist? "version") +]
     case VALUE_OPT_VERSION:
@@ -310,7 +319,7 @@ ENDIF +]) {
       /* NOTREACHED */
 [+ ENDIF +]
     default:
-      USAGE (EXIT_FAILURE);
+      USAGE(EXIT_FAILURE);
     }
   } leave_processing:;
 [+

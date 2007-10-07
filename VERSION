@@ -2,18 +2,32 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Copyright (C) 1999-2007 Bruce Korb
-#
-# Time-stamp:        "2007-05-28 15:37:54 bkorb"
+# Time-stamp:        "2007-08-04 13:12:01 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2007/06/23 20:19:39 $
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
 
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".2pre2"
+AG_PATCHLEVEL=".3pre4"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -29,9 +43,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=29
+AO_CURRENT=31
 AO_REVISION=0
-AO_AGE=4
+AO_AGE=6
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0

@@ -1,31 +1,27 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.11 2007/02/07 01:57:58 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.12 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2007-01-29 16:35:59 bkorb"
- *  Last Committed:    $Date: 2007/02/07 01:57:58 $
+ *  Time-stamp:        "2007-07-06 12:15:42 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  This module processes the "pseudo" macro
- */
-
-/*
- *  AutoGen copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -41,7 +37,7 @@ tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static tCC*
 doSchemeExpr( tCC* pzData, tCC* pzFileName );
 
@@ -103,6 +99,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      */
     tSCC zSuffixSpecChars[] = "=%" "abcdefghijklmnopqrstuvwxyz"
           "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "-_./";
+    tSCC zEmptySpec[] = "Empty suffix format";
 
     tOutSpec*  pOS;
     tCC*       pzSfxFmt;
@@ -112,18 +109,21 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
     /*
      *  Skip over the suffix construct
      */
-    size_t spn = strspn( pzData, zSuffixSpecChars+2 );
+    size_t spn = strspn(pzData, zSuffixSpecChars+2);
 
     if (pzData[spn] != '=') {
         pzSfxFmt = NULL;
     } else {
-        pzSfxFmt = pzData + spn;
+        pzSfxFmt = pzData + spn; // "spn" includes format spec.
+
         if (pzSfxFmt[1] == '(') {
             tCC *pe  = pzSfxFmt + 1 + strlen( pzSfxFmt + 1 );
             tCC *ptr = skipScheme( pzSfxFmt+1, pe );
             spn = ptr - pzData;
         } else {
             spn += strspn( pzSfxFmt, zSuffixSpecChars );
+            if (pzSfxFmt == pzData + spn)
+                AG_ABEND(zEmptySpec);
         }
     }
     pzResult = pzData + spn;
@@ -139,67 +139,61 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
         return pzResult;
 
     /*
-     *  Allocate the suffix structure
+     *  Allocate Output Spec and link into the global list.  Copy all the
+     *  "spanned" text, including any '=' character, scheme expression or
+     *  file name format string.
      */
-    pOS = (tOutSpec*)AGALOC( sizeof( *pOS ) + (size_t)spn + 1,
-                             "Output Specification" );
-
-    /*
-     *  Link it into the global list
-     */
+    pOS = AGALOC(sizeof( *pOS ) + (size_t)spn + 1, "Output Specification");
     *ppOSList  = pOS;
     ppOSList   = &pOS->pNext;
     pOS->pNext = NULL;
+    memcpy( pOS->zSuffix, pzData, spn );
+    pOS->zSuffix[ spn ] = NUL;
 
     /*
-     *  Copy the data into the suffix field from our input buffer.
      *  IF the suffix contains its own formatting construct,
      *  THEN split it off from the suffix and set the formatting ptr.
      *  ELSE supply a default.
      */
-    memcpy( pOS->zSuffix, pzData, spn );
-    pOS->zSuffix[ spn ] = NUL;
-
     if (pzSfxFmt != NULL) {
-        spn = pzSfxFmt - pzData;
-        pOS->zSuffix[spn] = NUL;
-        pzSfxFmt = pOS->zSuffix + spn + 1;
+        size_t sfx_len = pzSfxFmt - pzData;
+        pOS->zSuffix[sfx_len++] = NUL;
+        pOS->pzFileFmt = pOS->zSuffix + sfx_len;
 
-        switch (*pzSfxFmt) {
-        case NUL:
-        {
-            tSCC zFileFmt3[] = "%s";
-            pOS->pzFileFmt = zFileFmt3;
-            break;
-        }
-
-        case '(':
-        {
+        if (*pOS->pzFileFmt == '(') {
             SCM str =
                 ag_scm_c_eval_string_from_file_line(
-                    pzSfxFmt, pzFileName, lineNo );
-            tCC *pzStr;
-            AGDUPSTR( pzStr, resolveSCM( str ), "Scheme suffix format");
-            pOS->pzFileFmt = pzStr;
-            break;
-        }
+                    pOS->pzFileFmt, pzFileName, lineNo );
+            size_t str_size;
 
-        default:
-            pOS->pzFileFmt = pzSfxFmt;
-            break;
+            pzSfxFmt = resolveSCM( str );
+            str_size = strlen(pzSfxFmt);
+
+            if (str_size == 0)
+                AG_ABEND(zEmptySpec);
+                
+            if (strspn(pzSfxFmt, zSuffixSpecChars) != str_size)
+                AG_ABEND(aprf("invalid file name chars in suffix:  %s",
+                              pzSfxFmt));
+
+            /*
+             *  IF the scheme replacement text fits in the space, don't
+             *  mess with allocating another string.
+             */
+            if (str_size < spn - sfx_len)
+                strcpy(pOS->zSuffix + sfx_len, pzSfxFmt);
+            else
+                AGDUPSTR(pOS->pzFileFmt, pzSfxFmt, "suffix format");
         }
 
     } else {
-        tSCC zFileFmt1[] = "%s.%s";
-        tSCC zFileFmt2[] = "%s%s";
-
         /*
          *  IF the suffix does not start with punctuation,
          *  THEN we will insert a '.' of our own.
          */
         if (isalnum( pOS->zSuffix[0] ))
-             pOS->pzFileFmt = zFileFmt1;
-        else pOS->pzFileFmt = zFileFmt2;
+             pOS->pzFileFmt = zFileFormat + 5;
+        else pOS->pzFileFmt = zFileFormat;
     }
 
     return pzResult;

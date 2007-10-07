@@ -2,13 +2,28 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-01-27 06:55:21 bkorb"
-## Copyright (c):   1997-2007 by Bruce Korb
+## Time-stamp:      "2007-07-04 11:11:50 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Created:         Fri Aug 15 12:04 1997
 ##            by: bkorb
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.10 2007/02/07 01:57:58 bkorb Exp $
+## $Id: Makefile.am,v 4.11 2007/10/07 16:54:54 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

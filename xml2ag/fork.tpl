@@ -1,5 +1,22 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2006-11-26 16:51:58 bkorb" =][=
+[= # Time-stamp:        "2007-07-04 11:43:06 bkorb"
+
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
+ =][=
 
 (define up-c-name  (lambda (ag-name)
   (string-upcase! (string->c-name! (get ag-name)))  ))

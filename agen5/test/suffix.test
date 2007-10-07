@@ -2,14 +2,28 @@
 #  -*- Mode: Shell-script -*-
 # suffix.test --- test the select suffix option
 #
-# Time-stamp:        "2007-01-27 06:02:24 bkorb"
+# Time-stamp:        "2007-07-04 11:31:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Maintainer:        Bruce Korb <bkorb@gnu.org>
-# Created:           Fri Oct 1 10:27:29 PDT 1999
-# Last Modified:     $Date: 2007/02/07 01:57:58 $
+# Last Modified:     $Date: 2007/10/07 16:54:54 $
 #            by: bkorb
-#
-# $Id: suffix.test,v 4.5 2007/02/07 01:57:58 bkorb Exp $
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+# $Id: suffix.test,v 4.6 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

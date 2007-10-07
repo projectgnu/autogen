@@ -2,10 +2,26 @@
 
 null
 
-#  Maintainer:        Bruce Korb <bkorb@gnu.org>
-#  Time-stamp:        "2006-09-23 19:43:02 bkorb"
-#  Last Modified:     $Date: 2006/09/24 02:57:02 $
+#  Time-stamp:        "2007-07-04 09:44:23 bkorb"
+#  Last Modified:     $Date: 2007/10/07 16:54:54 $
 #             by: bkorb
+##
+##  This file is part of AutoGen.
+##
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # This template uses the following definitions:
 #

@@ -27,9 +27,7 @@
 
 /* Code: */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include "compat.h"
 
 #ifdef WITH_DMALLOC
 #  include <dmalloc.h>

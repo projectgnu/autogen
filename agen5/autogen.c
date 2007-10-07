@@ -1,32 +1,28 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.26 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: autogen.c,v 4.27 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2007-03-25 07:47:12 bkorb"
- *  Last Committed:    $Date: 2007/06/23 20:19:39 $
+ *  Time-stamp:        "2007-07-22 09:00:32 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  This is the main routine for autogen.
- */
-
-/*
- *  AutoGen copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 tSCC zClientInput[] = "client-input";
@@ -42,7 +38,7 @@ typedef void (sighandler_proc_t)( int sig );
 static sighandler_proc_t ignoreSignal, abendSignal;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 inner_main( int argc, char** argv );
 
@@ -427,6 +423,13 @@ signalSetup( sighandler_proc_t* chldHandler,
              */
         case SIGKILL:
         case SIGSTOP:
+
+            /*
+             *  Signals we choose to leave alone.
+             */
+#ifdef SIGTSTP
+        case SIGTSTP:
+#endif
             continue;
 
 #if defined(DEBUG_ENABLED)
@@ -446,9 +449,6 @@ signalSetup( sighandler_proc_t* chldHandler,
         case 0: /* cannot happen, but the following might not be defined */
 #ifdef SIGWINCH
         case SIGWINCH:
-#endif
-#ifdef SIGTSTP
-        case SIGTSTP:  /* suspended  */
 #endif
 #ifdef SIGTTIN
         case SIGTTIN:  /* tty input  */

@@ -3,8 +3,28 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-04-28 09:57:08 bkorb"
-# ID:  $Id: options_h.tpl,v 4.33 2007/06/23 20:19:39 bkorb Exp $
+# Time-stamp:      "2007-08-04 11:13:06 bkorb"
+# ID:  $Id: options_h.tpl,v 4.34 2007/10/07 16:54:54 bkorb Exp $
+#
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 =][=
 
@@ -141,12 +161,12 @@ rm  -f opt-state.[ch]
  */
 [= `
 
-autogen proc-state.def
+autogen proc-state.def || die 'Cannot regen proc-state.h'
 sed -e '1,/typedef.*_bits_t/d' \
     -e 's/NO_BITS /NONE/' \
     -e 's/_BIT / /' \
     -e 's/_MASK    /_MASK/' \
-    -e '/OPTPROC_STATE_MASK/q' proc-state.h
+    -e '/^ *OPTPROC_NXLAT_[A-Z_]* *)/q' proc-state.h
 rm  -f proc-state.[ch]
 
 ` =]
@@ -249,15 +269,15 @@ struct optDesc {
 #   define          pzLastArg   optArg.argString
     void*           optCookie;        /* PUBLIC */
 
-    const int *     pOptMust;
-    const int *     pOptCant;
-    tpOptProc       pOptProc;
-    char const*     pzText;
+    int const * const   pOptMust;
+    int const * const   pOptCant;
+    tpOptProc   const   pOptProc;
+    char const* const   pzText;
 
-    char const*     pz_NAME;
-    char const*     pz_Name;
-    char const*     pz_DisableName;
-    char const*     pz_DisablePfx;
+    char const* const   pz_NAME;
+    char const* const   pz_Name;
+    char const* const   pz_DisableName;
+    char const* const   pz_DisablePfx;
 };
 
 /*
@@ -308,6 +328,8 @@ struct options {
     tOptSpecIndex       specOptIdx;
     int const           optCt;
     int const           presetOptCt;
+    char const *        pzFullUsage;
+    char const *        pzShortUsage;
 };
 
 /*

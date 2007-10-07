@@ -3,17 +3,33 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Created:           Tue Nov 24 01:07:30 1998
- *  Last Modified:     $Date: 2007/06/23 20:19:39 $
- *  Time-stamp:        "2007-04-28 11:46:40 bkorb"
+/*  Last Modified:     $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-10-06 11:58:09 bkorb"
  *             by: bkorb
+ *
+ *  This file is part of AutoGen.
+ *
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.19 2007/06/23 20:19:39 bkorb Exp $
+ *  $Id: libopts.def,v 4.20 2007/10/07 16:54:54 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.19 $";
+version     = "$Revision: 4.20 $";
 output-file = libopts.m4;
 
 test   = {
@@ -309,5 +325,6 @@ do-first = <<-_EOF_
 	# ----------------------------------------------------------------------
 	AC_CHECK_LIB(gen, pathfind)
 	AC_FUNC_VPRINTF
-	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr strrchr])
+	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
+	               strrchr strsignal])
 	_EOF_;

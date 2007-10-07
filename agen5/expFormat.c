@@ -1,67 +1,52 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2007-02-03 10:37:11 bkorb"
- *  Last Committed:    $Date: 2007/02/07 01:57:58 $
+ *  Time-stamp:        "2007-07-04 11:18:40 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
- *  $Id: expFormat.c,v 4.18 2007/02/07 01:57:58 bkorb Exp $
+ *  $Id: expFormat.c,v 4.19 2007/10/07 16:54:54 bkorb Exp $
  *  This module implements formatting expression functions.
- */
-
-/*
- *  AutoGen copyright 1992-2007 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 static char const zGpl[] =
-"%2$s%1$s is free software.\n%2$s\n"
-"%2$sYou may redistribute it and/or modify it under the terms of the\n"
-"%2$sGNU General Public License, as published by the Free Software\n"
-"%2$sFoundation; either version 2 of the License, or (at your option)\n"
-"%2$sany later version.\n"
-"%2$s\n"
-"%2$s%1$s is distributed in the hope that it will be useful,\n"
-"%2$sbut WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
+"%2$sunder the terms of the GNU General Public License as published by the\n"
+"%2$sFree Software Foundation, either version 3 of the License, or\n"
+"%2$s(at your option) any later version.\n%2$s\n"
+"%2$s%1$s is distributed in the hope that it will be useful, but\n"
+"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
 "%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"%2$sSee the GNU General Public License for more details.\n"
-"%2$s\n"
-"%2$sYou should have received a copy of the GNU General Public License\n"
-"%2$salong with %1$s.  If not, write to:\n"
-"%2$s\tThe Free Software Foundation, Inc.,\n"
-"%2$s\t51 Franklin Street, Fifth Floor\n"
-"%2$s\tBoston, MA  02110-1301, USA.";
+"%2$sSee the GNU General Public License for more details.\n%2$s\n"
+"%2$sYou should have received a copy of the GNU General Public License along\n"
+"%2$swith this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 static char const zLgpl[] =
-"%2$s%1$s is free software; you can redistribute it and/or\n"
-"%2$smodify it under the terms of the GNU Lesser General Public\n"
-"%2$sLicense as published by the Free Software Foundation; either\n"
-"%2$sversion 2.1 of the License, or (at your option) any later version.\n"
-"%2$s\n"
-"%2$s%1$s is distributed in the hope that it will be useful,\n"
-"%2$sbut WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
-"%2$sLesser General Public License for more details.\n"
-"%2$s\n"
-"%2$sYou should have received a copy of the GNU Lesser General Public\n"
-"%2$sLicense along with %1$s.  If not, write to:\n"
-"%2$s\tThe Free Software Foundation, Inc.,\n"
-"%2$s\t51 Franklin Street, Fifth Floor\n"
-"%2$s\tBoston, MA  02110-1301, USA.";
+"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
+"%2$sunder the terms of the GNU Lesser General Public License as published\n"
+"%2$sby the Free Software Foundation, either version 3 of the License, or\n"
+"%2$s(at your option) any later version.\n%2$s\n"
+"%2$s%1$s is distributed in the hope that it will be useful, but\n"
+"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"%2$sSee the GNU Lesser General Public License for more details.\n%2$s\n"
+"%2$sYou should have received a copy of the GNU Lesser General Public License\n"
+"%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 static char const zBsd[] =
 "%2$s%1$s is free software copyrighted by %3$s.\n%2$s\n"

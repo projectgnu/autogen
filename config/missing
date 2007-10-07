@@ -1,11 +1,11 @@
 #! /bin/sh
 # Common stub for a few missing GNU programs while installing.
 # Time-stamp:        "2006-09-23 19:27:18 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:02 $
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
 
 scriptversion=2006-09-23.19
 
-# Copyright (C) 1996, 1997, 1999, 2000, 2002, 2003, 2004, 2005, 2006
+# copyright (c)  by Bruce Korb - all rights reserved
 #   Free Software Foundation, Inc.
 # Originally by Fran,cois Pinard <pinard@iro.umontreal.ca>, 1996.
 

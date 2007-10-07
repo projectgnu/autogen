@@ -4,8 +4,28 @@
 
   pot
 
-# Time-stamp:        "2006-09-23 19:47:31 bkorb"
-# Last Committed:    $Date: 2006/09/24 02:57:02 $
+# Time-stamp:        "2007-07-04 13:33:38 bkorb"
+# Last Committed:    $Date: 2007/10/07 16:54:54 $
+
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 =][=  CASE (suffix) =][=
 
@@ -128,7 +148,7 @@ ENDFOR  utxt        =][=
 
 \=]
 # Automated Option parsing usage text.
-# Copyright (C) [=`date +%Y`=] Free Software Foundation, Inc.
+# copyright (c) [=`date +%Y`=] by Bruce Korb - all rights reserved
 # This file is distributed under the same license as the AutoOpts package.
 # Bruce Korb <bkorb@gnu.org> [=`date +%Y`=]
 #

@@ -3,14 +3,28 @@
 # ----------------------------------------------------------------------
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
-#    AutoGen copyright (C) 1992-2006 Bruce Korb
-#
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2006-09-23 19:27:18 bkorb"
-# Last Modified:     $Date: 2006/12/10 19:45:00 $
+# Time-stamp:        "2007-07-30 11:08:10 bkorb"
+# Last Modified:     $Date: 2007/10/07 16:54:54 $
 #            by: bkorb
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.dir,v 4.17 2006/12/10 19:45:00 bkorb Exp $
+# @(#) $Id: bootstrap.dir,v 4.18 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -272,7 +286,7 @@ do
   (proto.h)
     files=`allbut *.c - *fsm.c` 2>/dev/null
     test -z "${files}" && files=`echo *.c`
-    :mkfwd -p ${files}
+    mk-fwd -p ${files}
     ;;
 
   (functions.h)

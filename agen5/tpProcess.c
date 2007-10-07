@@ -1,38 +1,33 @@
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.16 2007/01/07 22:30:32 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.17 2007/10/07 16:54:54 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2007-01-02 11:42:56 bkorb"
- * Last Committed:    $Date: 2007/01/07 22:30:32 $
+ * Time-stamp:        "2007-07-06 12:09:05 bkorb"
+ * Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
- */
-
-/*
- *  AutoGen copyright 1992-2006 Bruce Korb
+ * This file is part of AutoGen.
+ * AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 static tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 doStdoutTemplate( tTemplate* pTF );
 
@@ -251,7 +246,20 @@ processTemplate( tTemplate* pTF )
          *  and free the old output spec.
          */
         pOutSpecList = pOS->pNext;
-        AGFREE( (void*)pOS );
+
+        /*
+         *  The format is either something inside of zFileFormat, we did not
+         *  allocate it.  If it is specifically zSuffix + strlen + 1, then
+         *  is it part of the pOS allocation.  Otherwise, we deallocate it.
+         */
+        if ((pOS->pzFileFmt < zFileFormat) ||
+            (pOS->pzFileFmt >= zFileFormat + sizeof(zFileFormat))) {
+            char const * pz = pOS->zSuffix + strlen(pOS->zSuffix) + 1;
+            if (pOS->pzFileFmt != pz)
+                AGFREE(pOS->pzFileFmt);
+        }
+
+        AGFREE(pOS);
 
         if (pOutSpecList == NULL)
             break;

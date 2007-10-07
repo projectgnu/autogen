@@ -1,27 +1,27 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.12 2006/11/27 01:55:18 bkorb Exp $
- *  Time-stamp:         "2006-11-26 16:53:13 bkorb"
+ *  $Id: xml2ag.c,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+ *  Time-stamp:         "2007-07-04 11:59:12 bkorb"
  *  This is the main routine for xml2ag.
  *
- *  xml2ag copyright 2002-2006 Bruce Korb
+ *  xml2ag copyright (c) 2002-2007 Bruce Korb - all rights reserved
  *
- *  xml2ag is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
  *
- *  xml2ag is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  AutoGen is free software: you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ *  AutoGen is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 tSCC zConflict[] =

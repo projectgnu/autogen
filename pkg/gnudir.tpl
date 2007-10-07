@@ -1,5 +1,5 @@
 %%comments:
-Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+copyright (c)  by Bruce Korb - all rights reserved
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or

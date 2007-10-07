@@ -1,8 +1,28 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.28 2007/06/23 20:19:39 bkorb Exp $
+# $Id: opthead.tpl,v 4.29 2007/10/07 16:54:54 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-04-15 10:23:18 bkorb"
+# Time-stamp:      "2007-08-04 12:10:26 bkorb"
+
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 =]
 /*
@@ -260,13 +280,6 @@ ENDDEF set-std-value            =][=
 
 IF (exist? "flag.value")        =][=
 
-  IF (exist? "version")         =][=
-    INVOKE set-std-value
-       val-name    = "version-value"
-       val-UPNAME  = "VERSION"
-       std-value   = "v"        =][=
-  ENDIF  have "version"         =][=
-
   INVOKE set-std-value
        val-name    = "help-value"
        val-UPNAME  = "HELP"
@@ -277,8 +290,15 @@ IF (exist? "flag.value")        =][=
        val-UPNAME  = "MORE_HELP"
        std-value   = "!"        =][=
 
+  IF (exist? "version")         =][=
+    INVOKE set-std-value
+       val-name    = "version-value"
+       val-UPNAME  = "VERSION"
+       std-value   = "v"        =][=
+  ENDIF  have "version"         =][=
+
   IF (exist? "usage-opt")       =][=
-  INVOKE set-std-value
+    INVOKE set-std-value
        val-name    = "usage-value"
        val-UPNAME  = "USAGE"
        std-value   = "u"        =][=
@@ -389,18 +409,39 @@ extern tOptions   [=(. pname)=]Options;[=
  )   )
 =]
 
-#ifndef _
-#  if ENABLE_NLS
+#if defined(ENABLE_NLS)
+# ifndef _
 #    include <stdio.h>
      static inline char* aoGetsText( char const* pz ) {
          if (pz == NULL) return NULL;
          return (char*)gettext( pz );
      }
 #    define _(s)  aoGetsText(s)
-#  else  /* ENABLE_NLS */
+# else  /* _() */
 #    define _(s)  s
-#  endif /* ENABLE_NLS */
-#endif
+# endif /* _() */
+
+# define OPT_NO_XLAT_CFG_NAMES  STMTS([=(. pname)=]Options.fOptSet |= \
+                                    OPTPROC_NXLAT_OPT_CFG;)
+# define OPT_NO_XLAT_OPT_NAMES  STMTS([=(. pname)=]Options.fOptSet |= \
+                                    OPTPROC_NXLAT_OPT|OPTPROC_NXLAT_OPT_CFG;)
+
+# define OPT_XLAT_CFG_NAMES     STMTS([=(. pname)=]Options.fOptSet &= \
+                                  ~(OPTPROC_NXLAT_OPT|OPTPROC_NXLAT_OPT_CFG);)
+# define OPT_XLAT_OPT_NAMES     STMTS([=(. pname)=]Options.fOptSet &= \
+                                  ~OPTPROC_NXLAT_OPT;)
+
+#else   /* ENABLE_NLS */
+# define OPT_NO_XLAT_CFG_NAMES
+# define OPT_NO_XLAT_OPT_NAMES
+
+# define OPT_XLAT_CFG_NAMES
+# define OPT_XLAT_OPT_NAMES
+
+# ifndef _
+#   define _(_s)  _s
+# endif
+#endif  /* ENABLE_NLS */
 
 #ifdef  __cplusplus
 }

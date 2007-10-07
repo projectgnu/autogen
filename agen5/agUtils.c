@@ -1,36 +1,32 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.15 2006/12/10 19:45:00 bkorb Exp $
+ *  $Id: agUtils.c,v 4.16 2007/10/07 16:54:54 bkorb Exp $
  *
- *  Time-stamp:        "2006-12-10 11:02:27 bkorb"
- *  Last Committed:    $Date: 2006/12/10 19:45:00 $
+ *  Time-stamp:        "2007-07-04 11:14:34 bkorb"
+ *  Last Committed:    $Date: 2007/10/07 16:54:54 $
  *
  *  This is the main routine for autogen.
- */
-
-/*
- *  AutoGen copyright 1992-2006 Bruce Korb
  *
- *  AutoGen is free software.
- *  You may redistribute it and/or modify it under the terms of the
- *  GNU General Public License, as published by the Free Software
- *  Foundation; either version 2, or (at your option) any later version.
+ *  This file is part of AutoGen.
+ *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
- *  AutoGen is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * AutoGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with AutoGen.  See the file "COPYING".  If not,
- *  write to:  The Free Software Foundation, Inc.,
- *             51 Franklin Street, Fifth Floor,
- *             Boston, MA  02110-1301, USA.
+ * AutoGen is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static tCC*
 skipQuote( tCC* pzQte );
 /* = = = END-STATIC-FORWARD = = = */

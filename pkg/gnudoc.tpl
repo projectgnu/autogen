@@ -2,14 +2,29 @@
 
 html
 
-# Time-stamp: "2007-05-03 09:35:28 bkorb"
-# Version:    "$Revision: 4.10 $
-
+# Time-stamp: "2007-07-04 11:41:17 bkorb"
+# Version:    "$Revision: 4.11 $
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 =]
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.10 2007/06/23 20:19:39 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.11 2007/10/07 16:54:54 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -132,7 +147,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2007/06/23 20:19:39 $ $Author: bkorb $
+$Date: 2007/10/07 16:54:54 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

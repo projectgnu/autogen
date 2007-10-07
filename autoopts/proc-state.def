@@ -1,23 +1,52 @@
 AutoGen Definitions bits.tpl;
 
+/*
+ *  This file is part of AutoOpts, a companion to AutoGen.
+ *  AutoOpts is free software.
+ *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *
+ *  AutoOpts is available under any one of two licenses.  The license
+ *  in use must be one of these two and the choice is under the control
+ *  of the user of the license.
+ *
+ *   The GNU Lesser General Public License, version 3 or later
+ *      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+ *
+ *   The Modified Berkeley Software Distribution License
+ *      See the file "COPYING.mbsd"
+ *
+ *  These files have the following md5sums:
+ *
+ *  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
+ *  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+ *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+ */
+
 mask-name = optproc-state;
 prefix    = optproc;
 
-bit     = { b-name = longopt;     b-what = 'Process long style options'; };
-bit     = { b-name = shortopt;    b-what = 'Process short style "flags"'; };
-bit     = { b-name = errstop;     b-what = 'Stop on argument errors'; };
-bit     = { b-name = disabledopt; b-what = 'Current option is disabled'; };
-bit     = { b-name = no-req-opt;  b-what = 'no options are required'; };
-bit     = { b-name = num-opt;     b-what = 'there is a number option'; };
-bit     = { b-name = initdone;    b-what = 'have initializations been done?'; };
-bit     = { b-name = negations;   b-what = 'any negation options?'; };
-bit     = { b-name = environ;     b-what = 'check environment?'; };
-bit     = { b-name = no-args;     b-what = 'Disallow remaining arguments'; };
-bit     = { b-name = args-req;    b-what = 'Require arguments after options'; };
-bit     = { b-name = reorder;     b-what = 'reorder operands after options'; };
-bit     = { b-name = gnuusage;    b-what = 'emit usage in GNU style'; };
-bit     = { b-name = translate;   b-what = 'Translate strings in tOptions'; };
-bit     = { b-name = has-immed;   b-what = 'program defines immed options'; };
+bit[ 0] = { b-name = longopt;     b-what = 'Process long style options'; };
+bit[ 1] = { b-name = shortopt;    b-what = 'Process short style "flags"'; };
+bit[ 2] = { b-name = errstop;     b-what = 'Stop on argument errors'; };
+bit[ 3] = { b-name = disabledopt; b-what = 'Current option is disabled'; };
+bit[ 4] = { b-name = no-req-opt;  b-what = 'no options are required'; };
+bit[ 5] = { b-name = num-opt;     b-what = 'there is a number option'; };
+bit[ 6] = { b-name = initdone;    b-what = 'have inits been done?'; };
+bit[ 7] = { b-name = negations;   b-what = 'any negation options?'; };
+bit[ 8] = { b-name = environ;     b-what = 'check environment?'; };
+bit[ 9] = { b-name = no-args;     b-what = 'Disallow remaining arguments'; };
+bit[10] = { b-name = args-req;    b-what = 'Require args after options'; };
+bit[11] = { b-name = reorder;     b-what = 'reorder operands after opts'; };
+bit[12] = { b-name = gnuusage;    b-what = 'emit usage in GNU style'; };
+bit[13] = { b-name = translate;   b-what = 'Translate strings in tOptions'; };
+bit[14] = { b-name = has-immed;   b-what = 'program defines immed options'; };
+bit[16] = { b-name = nxlat-opt-cfg; b-what = 'suppress for config only'; };
+bit[17] = { b-name = nxlat-opt;     b-what = 'suppress xlation always'; };
 bit[19] = { b-name = presetting;  b-what = 'opt processing in preset state'; };
 
 no-code;
+
+mask = {
+  m-name = no-xlat;
+  b-name = nxlat-opt-cfg, nxlat-opt;
+};

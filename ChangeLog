@@ -1,3 +1,73 @@
+2007-10-06  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.3
+
+	* autoopts/getopt.tpl (USAGE): function names belong next to the
+	opening parenthesis for their argument list.
+	* config/libopts.def (do-first): check for strsignal function.
+	* configure.in (AC_CHECK_FUNCS): don't check for strsignal here
+
+2007-09-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/save.c (optionSaveFile): If an option is in "disabled" state
+	because it was selected via an alias, then emit the name of the alias
+	option into the generated config file instead of faulting.
+
+2007-08-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (optionProcess): re-call the translation
+	procedure if: we have one, translations are active, we did not
+	translate option names before config processing, and we need to
+	before command line option processing.
+	* autoopts/configfile.c (validateOptionsStruct): if we are not to
+	translate option names for the command line, then we are also not
+	to translate for config time either.
+	* autoopts/optcode.tpl (translate_option_strings): rework it so that
+	option names are only translated when the OPTPROC_NXLAT_OPT_CFG
+	flag bit is turned off.
+	(OPTPROC_BASE): set that bit or OPTPROC_NXLAT_OPT, if requested.
+	* autoopts/opthead.tpl (XLAT): emit four macros for controlling the
+	setting of these two bits (both off, both on, and one or other on).
+	* autoopts/optlib.tpl (emit-nondoc-option): emit "TRANSLATORS:"
+	comment for any options with "translators" defined.
+	* autoopts/proc-state.def (bit[16]): define option name translation
+	suppression bits.
+	* doc/autogen-texi.txt: doc all this stuff
+
+2007-07-15  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.2
+
+	* autoopts/usage.tpl: new - emits usage text (full or short).
+	* autoopts/getopt.tpl: use it
+	* autoopts/optlib.tpl: use it, when the usage text string is empty
+	* autoopts/optcode.tpl (OPTPROC_X_LAT_USAGE): remove -- not needed
+	* autoopts/opthead.tpl (version): reorder it
+
+2007-07-14  Bruce Korb  <bkorb@gnu.org>
+
+	* VERSION: Going to revision 30 of the interface.
+	* agen5/loadPseudo.c (doSuffixSpec): require that there be something
+	after the '=' marker in a suffix specification.  Make sure any
+	allocated memory is deallocatable.
+	* agen5/tpProcess.c (processTemplate): deallocate the file name format
+	string, if necessary.
+	* autoopts/optcode.tpl (full-usage): new
+	(short-usage): new -- make it optional to have the full usage text
+	produced so that it can be readily translated.
+	* autoopts/options_h.tpl (struct options): add pzFullUsage and
+	pzShortUsage
+	* autoopts/optlib.tpl(usage-text): new macro for producing the text.
+	* autoopts/proc-state.def (bit): bit numbers must not ever wiggle, so
+	fix them all.
+	* autoopts/test/nls.test: augment for translatable usage text.
+	* autoopts/usage.c (optionUsage): give priority to usage strings over
+	computed usage text.
+
+2007-07-04  Bruce Korb  <bkorb@gnu.org>
+
+	* *EVERYWHERE*: update licensing terms to GPLv3
+
 2007-05-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/schemedef.scm (make-header-guard): remove
@@ -8,6 +78,8 @@
 	* snprintfv/printf.c: remove excessive logic nesting.
 
 2007-04-28  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.1
 
 	* autoopts/getopt.tpl: include stdio.h and string.h and #define a value
 	for DIRCH, setting it to '/' normally, but '\\' for Windows.

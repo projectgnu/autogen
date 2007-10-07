@@ -3,13 +3,26 @@
 # ----------------------------------------------------------------------
 # convert.test --- test XML -> AutoGen conversion
 #
-## Copyright (c):   2003-2006 by Bruce Korb
-## Time-stamp:      "2006-01-07 10:23:47 bkorb"
+## Time-stamp:      "2007-07-04 11:59:00 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Maintainer:      Bruce Korb <bkorb@gnu.org>
-## Created:         Sun May 18, 2003
+##
+##  This file is part of AutoGen.
+##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##
+##  AutoGen is free software: you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  AutoGen is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License along
+##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: convert.test,v 4.4 2006/03/25 19:23:29 bkorb Exp $
+# $Id: convert.test,v 4.5 2007/10/07 16:54:54 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions
