@@ -23,7 +23,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 +][+
 
-`stamp=\`sed 's,.*stamp:,,' <<'_EOF_'
+`stamp=\`sed 's,.*stamp:,,' <<\_EOF_
   Time-stamp:        "2007-05-28 18:05:40 bkorb"
 _EOF_
 \` `
@@ -58,7 +58,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.9 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.10 2007/10/28 19:27:54 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>

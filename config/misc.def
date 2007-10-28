@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 /*  Time-stamp:        "2007-07-04 09:31:45 bkorb"
- *  Last Modified:     $Date: 2007/10/07 16:54:54 $
+ *  Last Modified:     $Date: 2007/10/28 19:27:54 $
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,11 +24,11 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.23 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: misc.def,v 4.24 2007/10/28 19:27:54 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.23 $";
+version = "$Revision: 4.24 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -124,7 +124,7 @@ test   = {
 	#include <guile/gh.h>
 	#include <libguile/list.h>
 	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 108
-	choke me
+	This has not been tested with Guile 1.9.  Remove this line to proceed.
 	#endif
 	int main () {
 	  SCM fumble = SCM_UNDEFINED;

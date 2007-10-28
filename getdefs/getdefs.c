@@ -1,5 +1,5 @@
 /*
- *  $Id: getdefs.c,v 4.11 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: getdefs.c,v 4.12 2007/10/28 19:27:54 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *

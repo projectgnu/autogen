@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.24 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: agShell.c,v 4.25 2007/10/28 19:27:54 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:14:29 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-10-28 11:29:13 bkorb"
+ *  Last Committed:    $Date: 2007/10/28 19:27:54 $
  *
  *  Manage a server shell process
  *
@@ -239,8 +239,8 @@ chainOpen( int       stdinFd,
             pzShell = pzShellProgram;
 
         else {
-            static char const sh_z[] = "sh";
             static char const bin_sh[] = "/bin/sh";
+#           define sh_z (bin_sh + 5)
 
             pzShellProgram = getenv( zShellEnv );
             if (pzShellProgram == NULL) {
