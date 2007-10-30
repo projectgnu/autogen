@@ -2,7 +2,7 @@
 /*
  *  Time-stamp:      "2007-07-04 11:33:08 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.35 2007/10/07 16:54:54 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.36 2007/10/30 22:01:02 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -198,6 +198,7 @@ typedef struct {
     tCC*    pzStr;
     tCC*    pzReq;
     tCC*    pzNum;
+    tCC*    pzFile;
     tCC*    pzKey;
     tCC*    pzKeyL;
     tCC*    pzBool;

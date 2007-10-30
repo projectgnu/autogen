@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.17 2007/10/07 16:54:54 bkorb Exp $
+   $Id: usage-txt.def,v 4.18 2007/10/30 22:01:02 bkorb Exp $
  */
 
 /*
@@ -169,6 +169,18 @@ utxt = { ut-name = FSErrReadFile;
          ut-text = "fs error %d (%s) reading file %s\n";
 };
 
+utxt = { ut-name = FSOptError;
+         ut-text = "fs error %d (%s) on %s option:  %s file %s\n";
+};
+
+utxt = { ut-name = FileCannotExist;
+         ut-text = "\t\t\t\t- file must not pre-exist\n";
+};
+
+utxt = { ut-name = FileMustExist;
+         ut-text = "\t\t\t\t- file must pre-exist\n";
+};
+
 utxt = { ut-name = Genshell;
          ut-text =
             "\n= = = = = = = =\n\n"
@@ -188,6 +200,11 @@ utxt = { ut-name = GnuBreak;
 utxt = { ut-type = char;
          ut-name = GnuKeyArg;
          ut-text = "=KWd";
+};
+
+utxt = { ut-type = char;
+         ut-name = GnuFileArg;
+         ut-text = "=file";
 };
 
 utxt = { ut-type = char;
@@ -468,6 +485,10 @@ utxt = { ut-name = StdBoolArg;
 
 utxt = { ut-name = StdBreak;
          ut-text = "\n%s\n\n%s";
+};
+
+utxt = { ut-name = StdFileArg;
+         ut-text = "Fil";
 };
 
 utxt = { ut-name = StdKeyArg;

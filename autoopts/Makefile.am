@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-07-15 15:49:09 bkorb"
+## Time-stamp:      "2007-10-30 09:19:46 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.35 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.36 2007/10/30 22:01:02 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -63,10 +63,10 @@ HDRS        = $(GENHDRS) autoopts.h proto.h
 ##
 CSRC        = \
     autoopts.c  \
-    boolean.c   configfile.c cook.c      enumeration.c environment.c \
-    genshell.c  load.c       makeshell.c nested.c      numeric.c     \
-    pgusage.c   putshell.c   restore.c   save.c        sort.c        \
-    stack.c     streqvcmp.c  text_mmap.c tokenize.c    usage.c version.c
+    boolean.c configfile.c cook.c      enumeration.c environment.c \
+    file.c    genshell.c   load.c      makeshell.c   nested.c numeric.c \
+    pgusage.c putshell.c   restore.c   save.c        sort.c        \
+    stack.c   streqvcmp.c  text_mmap.c tokenize.c    usage.c version.c
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@

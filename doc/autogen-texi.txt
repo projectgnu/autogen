@@ -1953,9 +1953,9 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 * Features::            AutoOpts Features
 * Licensing::           AutoOpts Licensing
 * Quick Start::         Quick Start
-* Multi-Threading::     Multi-Threading
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
+* Multi-Threading::     Multi-Threading
 * option descriptor::   Option Descriptor File
 * Using AutoOpts::      Using AutoOpts
 * Presetting Options::  Configuring your program
@@ -2229,25 +2229,6 @@ need much more than what was described in this "quick start" section.
 
 @c === SECTION MARKER
 
-@node Multi-Threading
-@section Multi-Threading
-
-AutoOpts was designed to configure a program for running.  This generally
-happens before much real work has been started.  Consequently, it is
-expected to be run before multi-threaded applications have started multiple
-threads.  However, this is not always the case. Some applications may
-need to reset and reload their running configuration, and some may use
-@code{SET_OPT_xxx()} macros during processing.  If you need to dynamically
-change your option configuration in your multi-threaded application, it is
-your responsibility to prevent all threads from accessing the option
-configuration state, except the one altering the configuration.
-
-The various accessor macros (@code{HAVE_OPT()}, etc.) do not modify state
-and are safe to use in a multi-threaded application.  It is safe as long
-as no other thread is concurrently modifying state, of course.
-
-@c === SECTION MARKER
-
 @node Option Definitions
 @section Option Definitions
 @cindex Option Definitions
@@ -2283,14 +2264,17 @@ ignored.  However, when you have special option processing requirements,
 the flexibility is there.
 
 @menu
-* program attributes::        Program Description Attributes
-* library attributes::        Options for Library Code
-* information attributes::    Program Information Attributes
-* Generated main::            Generating main procedures
-* option attributes::         Option Attributes
-* documentation attributes::  Man and Info doc Attributes
-* automatic options::         Automatically Supported Options
-* standard options::          Library of Standard Options
+* program attributes::          Program Description Attributes
+* library attributes::          Options for Library Code
+* information attributes::      Program Information Attributes
+* Generated main::              Generating main procedures
+* option attributes::           Option Attributes
+* Option Arguments::            Option Argument Specification
+* Option Argument Handling::    Option Argument Handling
+* Internationalizing Options::  Internationalizing Options
+* documentation attributes::    Man and Info doc Attributes
+* automatic options::           Automatically Supported Options
+* standard options::            Library of Standard Options
 @end menu
 
 @node program attributes
@@ -2350,7 +2334,7 @@ upper cased @code{C-name} of a specific option.
 @item export
 This string is inserted into the .h interface file.  Generally used for
 global variables or @code{#include} directives required by
-@code{flag_code} text and shared with other program text.
+@code{flag-code} text and shared with other program text.
 Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
 @code{config-header}, above.n.
@@ -2427,7 +2411,7 @@ activates the @code{--save-opts} and @code{--load-opts} options.
 @cindex include
 @item include
 This string is inserted into the .c file.  Generally used for global
-variables required only by @code{flag_code} program text.
+variables required only by @code{flag-code} program text.
 
 @cindex long-opts
 @cindex named option mode
@@ -3043,12 +3027,17 @@ case, the @code{-} and @code{--} command line option markers are optional.
 @menu
 * Required Attributes::         Required Attributes
 * Common Attributes::           Common Option Attributes
-* Special Option Handling::     Special Option Handling
 * Immediate Action::            Immediate Action Attributes
 * Option Conflict Attributes::  Option Conflict Attributes
-* Option Arguments::            Option Argument Specification
-* Option Argument Handling::    Option Argument Handling
-* Internationalizing Options::  Internationalizing Options
+
+These option attributes do not fit well with the above categories.
+
+* opt-attr settable::           Program may set option
+* opt-attr no-preset::          NOT pre-configurable
+* opt-attr equivalence::        Option Equivalence Class
+* opt-attr default option::     Default Option
+* opt-attr documentation::      Option Sectioning Comment
+* opt-attr translators::        Translator Notes
 @end menu
 
 @node Required Attributes
@@ -3180,30 +3169,8 @@ is @code{#define}-d.  Watch those switch statements.
 @end itemize
 @end table
 
-@node Special Option Handling
-@subsubsection Special Option Handling
-@cindex Special Option Handling
-
-These option attributes do not fit well with other categories.
-
-@table @samp
-@cindex translators
-@item   translators
-If you need to give the translators a special note about a particular option,
-please use this attribute.  It will get emitted into the generated @code{.c}
-text where the option related strings get defined.  To make a general comment
-about all of the option code, add comments to an @code{include}
-attribute (@pxref{program attributes}).  Do @strong{not} use this attribute
-globally, or it will get emitted into every option definition block.
-
-@cindex no-preset
-@item no-preset
-@cindex configuration file
-If presetting this option is not allowed.  (Thus, environment variables
-and values set in configuration files will be ignored.)
-
-@cindex settable
-@item settable
+@node opt-attr settable
+@subsubsection Program may set option
 If the option can be set outside of option processing.  If this
 attribute is defined, special macros for setting this particular option
 will be inserted into the interface file.  For example,
@@ -3211,8 +3178,14 @@ will be inserted into the interface file.  For example,
 @code{SET_OPT_TEMPL_DIRS(a)} appears in the interface file.  This
 attribute interacts with the @var{documentation} attribute.
 
-@cindex equivalence
-@item equivalence
+@node opt-attr no-preset
+@subsubsection Option cannot be pre-configured
+@cindex configuration file
+If presetting this option is not allowed.  (Thus, environment variables
+and values set in configuration files will be ignored.)
+
+@node opt-attr equivalence
+@subsubsection Option Equivalence Class
 Generally, when several options are mutually exclusive and basically serve
 the purpose of selecting one of several processing modes, these options can
 be considered an equivalence class.  Sometimes, it is just easier to deal
@@ -3260,8 +3233,21 @@ default:    /* cannot happen */
 @}
 @end example
 
-@cindex documentation
-@item documentation
+@node opt-attr default option
+@subsubsection Default Option
+If your program processes its arguments in named option mode (See
+``long-opts'' in @ref{program attributes}), then you may select @strong{one}
+of your options to be the default option.  Do so with this attribute.  The
+option so specified must have an @code{arg-type} (@pxref{Option Arguments})
+specified, but not the @code{arg-optional} (@pxref{arg-optional}) attribute.
+That is to say, the option argument must be required.
+
+If you have done this, then any arguments that do not match an option
+name and do not contain an equal sign (@code{=}) will be interpreted as
+an option argument to the default option.
+
+@node opt-attr documentation
+@subsubsection Option Sectioning Comment
 This attribute means the option exists for the purpose of separating
 option description text in the usage output.  Libraries may choose
 to make it settable so that the library can determine which command
@@ -3277,7 +3263,15 @@ The name of the option will not be printed.
 
 Documentation options are for clarifying the usage text and will not
 appear in generated man pages or in the generated invoking texinfo doc.
-@end table
+
+@node opt-attr translators
+@subsubsection Translator Notes
+If you need to give the translators a special note about a particular option,
+please use this attribute.  It will get emitted into the generated @code{.c}
+text where the option related strings get defined.  To make a general comment
+about all of the option code, add comments to an @code{include}
+attribute (@pxref{program attributes}).  Do @strong{not} use this attribute
+globally, or it will get emitted into every option definition block.
 
 @node Immediate Action
 @subsubsection Immediate Action Attributes
@@ -3353,7 +3347,7 @@ when this option is present
 @end table
 
 @node Option Arguments
-@subsubsection Option Argument Specification
+@subsection Option Argument Specification
 @cindex Option Arguments
 
 Command line options come in three flavors:  options that do not
@@ -3373,153 +3367,65 @@ Therefore, if you write your own callback procedure
 callback function will be able to place its own restrictions on what that
 string may contain or represent.
 
-@table @samp
+Option argument handling attributes depend upon the value set for the
+@code{arg-type} attribute.
 @cindex arg-type
-@item arg-type
-This specifies the type of argument the option will take.  If not present,
-the option cannot take an argument.  If present, it must be one of the
-following five.  The bracketed part of each name is optional.
+It specifies the type of argument the option will take.  If not present,
+the option cannot take an argument.  If present, it must be an entry in
+the following table.  The first three letters is sufficient.
 
-@table @samp
-@item str[@i{ing}]
-The argument may be any arbitrary string, though your program or option
-callback procedure may place additional constraints upon it.
+@menu
+* arg-type string::         Arg Type String
+* arg-type number::         Arg Type Number
+* arg-type boolean::        Arg Type Boolean
+* arg-type keyword::        Arg Type Keyword
+* arg-type set membership:: Arg Type Set Membership
+* arg-type hierarchy::      Arg Type Hierarchical
+* arg-type file name::      Arg Type File Name
 
-@item num[@i{ber}]
-The argument must be a correctly formed integer, without any trailing U's or
-L's.  AutoOpts contains a library procedure to convert the string to a
-number.  If you specify range checking with @code{arg-range}, then AutoOpts
-produces a special purpose procedure for this option.
+Supporting attributes for particular argument types:
 
-@item bool[@i{ean}]
-The argument will be interpreted and always yield either AG_TRUE or
-AG_FALSE.  False values are@:  the empty string, the number zero, or a
-string that starts with @code{f}, @code{F}, @code{n} or @code{N}
-(representing False or No).  Anything else will be interpreted as True.
+* arg-keyword::             Keyword list
+* arg-optional::            Option Argument Optional
+* arg-default::             Default Option Argument Value
+* arg-range::               Numeric Range for Argument
+@end menu
 
-@item key[@i{word}]
-The argument must match a specified list of strings.
-Assuming you have named the option, @code{optn-name},
-the strings will be converted into an enumeration of type @code{te_Optn_Name}
-with the values @code{OPTN_NAME_KEYWORD}.  If you have @strong{not}
-specified a default value, the value @code{OPTN_NAME_UNDEFINED} will be
-inserted with the value zero.  The option will be initialized to that
-value.  You may now use this in your code as follows:
-
-@example
-te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
-switch (opt) @{
-case OPTN_NAME_UNDEFINED:  /* undefined things */ break;
-case OPTN_NAME_KEYWORD:    /* `keyword' things */ break;
-default: /* utterly impossible */ ;
-@}
-@end example
-
-AutoOpts produces a special purpose procedure for this option.
-
-If you have need for the string name of the selected keyword, you
-may obtain this with the macro, @code{OPT_OPTN_NAME_VAL2STR(val)}.
-The value you pass would normally be @code{OPT_VALUE_OPTN_NAME},
-but anything with numeric value that is legal for @code{te_Optn_Name}
-may be passed.  Anything out of range will result in the string,
-@code{"*INVALID*"} being returned.  The strings are read only.
-It may be used as in:
-
-@example
-te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
-printf( "you selected the %s keyword\n",
-        OPT_OPTN_NAME_VAL2STR(opt) );
-@end example
-
-@item set[@i{-membership}]
-The argument must be a list of names each of which must match the
-strings "@code{all}", "@code{none}" or one of the keywords specified
-for this option.  @code{all} will turn on all membership bits and
-@code{none} will turn them all off.  Specifying one of the keywords
-will turn on the corresponding set membership bit.  Literal numbers
-may also be used and may, thereby, set or clear more than one bit.
-Preceding a keyword or literal number with a bang (@code{!}  -
-exclamation point) will turn the bit(s) off.  The number of keywords
-allowed is constrained by the number of bits in a pointer, as the bit
-set is kept in a @code{void*}.
-
-If, for example, you specified @code{first} in your list of keywords,
-then you can use the following code to test to see if either @code{first}
-or @code{all} was specified:
-
-@example
-uintptr_t opt = OPT_VALUE_OPTN_NAME;
-if (opt & OPTN_NAME_FIRST)
-    /* OPTN_NAME_FIRST bit was set */ ;
-@end example
-
-AutoOpts produces a special purpose procedure for this option.
-
-@item hier[@i{archy}]
-@itemx nest[@i{ed}]
-This denotes an option with a structure-valued argument, a.k.a.
-``subopts'' in @code{getopts} terminology.  The argument is parsed
-and the values made available to the program via the find and
-find next calls (@xref{libopts-optionFindValue},
-@xref{libopts-optionGetValue}, and
-@pxref{libopts-optionFindNextValue}).
-
-@example
-tOptionValue * val = optionGetValue(VALUE_OPT_OPTN_NAME, "name");
-while (val != NULL) @{
-  process(val);
-  val = optionNextValue(VALUE_OPT_OPTN_NAME, val);
-  if (wrong_name(val, "name"))
-    break;
-@}
-@end example
-
-@end table
-
+@node arg-keyword
+@subsubsection Keyword list
 @cindex keyword
-@item keyword
-If the @code{arg-type} is @code{keyword} or @code{set-membership},
-then you must specify the list of keywords by a series of
-@code{keyword} entries.  The interface file will contain values for
-@code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each keyword entry.
-@code{keyword} option types will have an enumeration and
-@code{set-membership} option types will have a set of unsigned long bits
-@code{#define}-d.  If there are more than 32 bits defined, the @code{#define}
-will set unsigned long long values and you best be running on a
-64 bit platform.
+If the @code{arg-type} is @code{keyword} (@pxref{arg-type keyword}) or
+@code{set-membership} (@pxref{arg-type set membership}), then you must specify
+the list of keywords by a series of @code{keyword} entries.  The interface
+file will contain values for @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each
+keyword entry.  @code{keyword} option types will have an enumeration and
+@code{set-membership} option types will have a set of unsigned bits
+@code{#define}-d.
 
+
+@node arg-optional
+@subsubsection Option Argument Optional
 @cindex arg-optional
-@item arg-optional
-This attribute indicates that the user does not have to supply an
-argument for the option.  This is only valid if the @var{arg-type} is
-@code{string} or @code{keyword}.  If it is @code{keyword}, then
-this attribute may also specify the default keyword to assume when
-the argument is not supplied.  If left empty, @var{arg-default} or
-the zero-valued keyword will be used.
+This attribute indicates that the user does not have to supply an argument for
+the option.  This is only valid if the @var{arg-type} is @code{string}
+(@pxref{arg-type string}) or @code{keyword} (@pxref{arg-type keyword}).  If it
+is @code{keyword}, then this attribute may also specify the default keyword to
+assume when the argument is not supplied.  If left empty, @var{arg-default}
+(@pxref{arg-default}) or the zero-valued keyword will be used.
 
 This is overridden and the options are required if the libopts library
 gets configured with @code{--disable-optional-args}.
 
+
+@node arg-default
+@subsubsection Default Option Argument Value
 @cindex arg-default
-@item arg-default
-This specifies the default value to be used when the option is
+This specifies the default option argument value to be used when the option is
 not specified or preset.
 
-@cindex default
-@item default
-If your program processes its arguments in named option mode (See
-``long-opts'' in @ref{program attributes}), then you may select
-@strong{one} of your options to be the default option.  Do so with this
-attribute.  The option so specified must have an @code{arg-type}
-specified, but not the @code{arg-optional} attribute.  That is to say,
-the option argument must be required.
-
-If you have done this, then any arguments that do not match an option
-name and do not contain an equal sign (@code{=}) will be interpreted as
-an option argument to the default option.
-
+@node arg-range
+@subsubsection Numeric Range for Argument
 @cindex arg-range
-@item arg-range
 If the @code{arg-type} is @code{number}, then @code{arg-range}s may be
 specified, too.  If you specify one or more of these option attributes,
 then AutoOpts will create a callback procedure for handling it.  The
@@ -3547,22 +3453,154 @@ The argument value is required.  It may not be optional.
 The value must match one of the entries.  If it can match more than one,
 then you have redundancies, but no harm will come of it.
 @end itemize
+
+@node arg-type string
+@subsubsection Arg Type String
+The argument may be any arbitrary string, though your program or option
+callback procedure may place additional constraints upon it.
+
+
+@node arg-type number
+@subsubsection Arg Type Number
+The argument must be a correctly formed integer, without any trailing U's or
+L's.  AutoOpts contains a library procedure to convert the string to a
+number.  If you specify range checking with @code{arg-range}, then AutoOpts
+produces a special purpose procedure for this option.
+
+
+@node arg-type boolean
+@subsubsection Arg Type Boolean
+The argument will be interpreted and always yield either AG_TRUE or
+AG_FALSE.  False values are@:  the empty string, the number zero, or a
+string that starts with @code{f}, @code{F}, @code{n} or @code{N}
+(representing False or No).  Anything else will be interpreted as True.
+
+
+@node arg-type keyword
+@subsubsection Arg Type Keyword
+The argument must match a specified list of strings (@pxref{arg-keyword}).
+Assuming you have named the option, @code{optn-name}, the strings will be
+converted into an enumeration of type @code{te_Optn_Name} with the values
+@code{OPTN_NAME_KEYWORD}.  If you have @strong{not} specified a default value,
+the value @code{OPTN_NAME_UNDEFINED} will be inserted with the value zero.
+The option will be initialized to that value.  You may now use this in your
+code as follows:
+
+@example
+te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
+switch (opt) @{
+case OPTN_NAME_UNDEFINED:  /* undefined things */ break;
+case OPTN_NAME_KEYWORD:    /* `keyword' things */ break;
+default: /* utterly impossible */ ;
+@}
+@end example
+
+AutoOpts produces a special purpose procedure for this option.
+
+If you have need for the string name of the selected keyword, you
+may obtain this with the macro, @code{OPT_OPTN_NAME_VAL2STR(val)}.
+The value you pass would normally be @code{OPT_VALUE_OPTN_NAME},
+but anything with numeric value that is legal for @code{te_Optn_Name}
+may be passed.  Anything out of range will result in the string,
+@code{"*INVALID*"} being returned.  The strings are read only.
+It may be used as in:
+
+@example
+te_Optn_Name opt = OPT_VALUE_OPTN_NAME;
+printf( "you selected the %s keyword\n",
+        OPT_OPTN_NAME_VAL2STR(opt) );
+@end example
+
+
+@node arg-type set membership
+@subsubsection Arg Type Set Membership
+The argument must be a list of names each of which must match the strings
+"@code{all}", "@code{none}" or one of the keywords (@pxref{arg-keyword})
+specified for this option.  @code{all} will turn on all membership bits and
+@code{none} will turn them all off.  Specifying one of the keywords will turn
+on the corresponding set membership bit.  Literal numbers may also be used and
+may, thereby, set or clear more than one bit.  Preceding a keyword or literal
+number with a bang (@code{!}  - exclamation point) will turn the bit(s) off.
+The number of keywords allowed is constrained by the number of bits in a
+pointer, as the bit set is kept in a @code{void*}.
+
+If, for example, you specified @code{first} in your list of keywords,
+then you can use the following code to test to see if either @code{first}
+or @code{all} was specified:
+
+@example
+uintptr_t opt = OPT_VALUE_OPTN_NAME;
+if (opt & OPTN_NAME_FIRST)
+    /* OPTN_NAME_FIRST bit was set */ ;
+@end example
+
+AutoOpts produces a special purpose procedure for this option.
+
+
+@node arg-type hierarchy
+@subsubsection Arg Type Hierarchical
+Aliases: @code{hierarchy} and @code{nested}
+
+This denotes an option with a structure-valued argument, a.k.a.
+``subopts'' in @code{getopts} terminology.  The argument is parsed
+and the values made available to the program via the find and
+find next calls (@xref{libopts-optionFindValue},
+@xref{libopts-optionGetValue}, and
+@pxref{libopts-optionFindNextValue}).
+
+@example
+tOptionValue * val = optionGetValue(VALUE_OPT_OPTN_NAME, "name");
+while (val != NULL) @{
+  process(val);
+  val = optionNextValue(VALUE_OPT_OPTN_NAME, val);
+  if (wrong_name(val, "name"))
+    break;
+@}
+@end example
+
+
+@node arg-type file name
+@subsubsection Arg Type File Name
+This argument type will have some validations on the argument and,
+optionally, actually open the file.  You must specify several additonal
+attributes for the option:
+
+@table @samp
+@item file-exists
+If not specified or empty, then the directory portion of the name is checked.
+The directory must exist or the argument is rejected and the usage procedure
+is invoked.
+
+Otherwise, both the directory as above and the full name is tested for
+existence.  If the value begins with the two letters ``no'', then the file
+must not pre-exist.  Otherwise, the file is expected to exist.
+
+@item open-file
+If not specified or empty, the file is left alone.
+If the value begins with the four letters ``desc''[@i{riptor}], then
+@code{open(2)} is used and @code{optArg.argFd} is set.  Otherwise, the
+file is opened with @code{fopen} and @code{optArg.argFp} is set.
+
+@item file-mode
+If ``open-file'' is set and not empty, then you must specify the open mode.
+Set the value to the flag bits or mode string as appropriate for the open
+type.
 @end table
 
 @node Option Argument Handling
-@subsubsection Option Argument Handling
+@subsection Option Argument Handling
 @cindex Option Argument Handling
 
-AutoOpts will either specify or automatically generate callback procedures
-for options that take specialized arguments.  The only option argument types
-that are not specialized are plain string arguments and no argument at all.
-For options that fall into one of those two categories, you may specify your
-own callback function, as specified below.  If the option takes a string
-argument, then you may specify that the option is to be handled by the
-@code{libopts} library procedures @code{stackOptArg()} or
-@code{unstackOptArg()} (see below).  Finally, @code{documentation} options
-(@ref{Special Option Handling}) may also be marked as settable and have
-special callback functions (either @code{flag-code}, @code{extract-code}, or
+AutoOpts will either specify or automatically generate callback procedures for
+options that take specialized arguments.  The only option argument types that
+are not specialized are plain string arguments and no argument at all.  For
+options that fall into one of those two categories, you may specify your own
+callback function, as specified below.  If the option takes a string argument,
+then you may specify that the option is to be handled by the @code{libopts}
+library procedures @code{stackOptArg()} or @code{unstackOptArg()} (see below).
+Finally, @code{documentation} options (@pxref{opt-attr documentation}) may
+also be marked as @code{settable} (@pxref{opt-attr settable}) and have special
+callback functions (either @code{flag-code}, @code{extract-code}, or
 @code{call-proc}).
 
 @table @samp
@@ -3575,7 +3613,7 @@ The generated procedure will look like this:
 static void
 doOpt<name>( tOptions* pOptions, tOptDesc* pOptDesc )
 @{
-<flag_code>
+<flag-code>
 @}
 @end example
 
@@ -3584,7 +3622,7 @@ structures may be accessed.  @xref{Option Processing Data}.
 
 @cindex extract-code
 @item extract-code
-This is effectively identical to @code{flag_code}, except that the
+This is effectively identical to @code{flag-code}, except that the
 source is kept in the output file instead of the definitions file.
 A long comment is used to demarcate the code.  You must not modify
 that marker.  @i{Before} regenerating the option code file,
@@ -3601,17 +3639,17 @@ regarding the fields within the structures passed in as arguments.
 
 @cindex flag-proc
 @item flag-proc
-Name of another option whose @code{flag_code} can be executed
+Name of another option whose @code{flag-code} can be executed
 when this option is encountered.
 
 @cindex stack-arg
 @item stack-arg
 Call a special library routine to stack the option's arguments.  Special
-macros in the interface file are provided for determining how many of
-the options were found (@code{STACKCT_OPT(NAME)}) and to obtain a
-pointer to a list of pointers to the argument values
-(@code{STACKLST_OPT(NAME)}).  Obviously, for a stackable argument,
-the @code{max} attribute needs to be set higher than @code{1}.
+macros in the interface file are provided for determining how many of the
+options were found (@code{STACKCT_OPT(NAME)}) and to obtain a pointer to a
+list of pointers to the argument values (@code{STACKLST_OPT(NAME)}).
+Obviously, for a stackable argument, the @code{max} attribute
+(@pxref{Common Attributes}) needs to be set higher than @code{1}.
 
 If this stacked argument option has a disablement prefix, then the entire
 stack of arguments will be cleared by specifying the option with that
@@ -3627,7 +3665,7 @@ another option.
 @end table
 
 @node Internationalizing Options
-@subsubsection Internationalizing Options
+@subsection Internationalizing Options
 @cindex Internationalizing Options
 
 Normally, AutoOpts produces usage text that is difficult to translate.  It is
@@ -4477,6 +4515,25 @@ Extraction from autogen.texi
 
 @c === SECTION MARKER
 
+@node Multi-Threading
+@section Multi-Threading
+
+AutoOpts was designed to configure a program for running.  This generally
+happens before much real work has been started.  Consequently, it is
+expected to be run before multi-threaded applications have started multiple
+threads.  However, this is not always the case. Some applications may
+need to reset and reload their running configuration, and some may use
+@code{SET_OPT_xxx()} macros during processing.  If you need to dynamically
+change your option configuration in your multi-threaded application, it is
+your responsibility to prevent all threads from accessing the option
+configuration state, except the one altering the configuration.
+
+The various accessor macros (@code{HAVE_OPT()}, etc.) do not modify state
+and are safe to use in a multi-threaded application.  It is safe as long
+as no other thread is concurrently modifying state, of course.
+
+@c === SECTION MARKER
+
 @node option descriptor
 @section Option Descriptor File
 @cindex option descriptor
@@ -4487,7 +4544,7 @@ it contains a single global data structure containing all the
 information provided in the option definitions, plus a number of static
 strings and any callout procedures that are specified or required.  You
 should never have need for looking at this, except, perhaps, to examine
-the code generated for implementing the @code{flag_code} construct.
+the code generated for implementing the @code{flag-code} construct.
 
 @c === SECTION MARKER
 

@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.22 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: defDirect.c,v 4.23 2007/10/30 22:01:02 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:15:44 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-10-30 10:38:11 bkorb"
+ *  Last Committed:    $Date: 2007/10/30 22:01:02 $
  *
  *  This module processes definition file directives.
  *
@@ -511,7 +511,7 @@ doDir_define( char* pzArg, char* pzScan )
      */
     if (! isspace( *pzArg )) {
         char* pzS = pzName;
-        char* pzD = --pzName;
+        char* pzD = (pzName -= 6);
 
         *pzArg = NUL;
         while ((*(pzD++) = *(pzS++)) != NUL)   ;

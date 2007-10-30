@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.20 2007/10/07 16:54:54 bkorb Exp $
- * Time-stamp:      "2007-07-15 09:43:04 bkorb"
+ *  usage.c  $Id: usage.c,v 4.21 2007/10/30 22:01:02 bkorb Exp $
+ * Time-stamp:      "2007-10-30 11:34:38 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -321,13 +321,23 @@ printExtendedUsage(
         fprintf( option_usage_fp, zDis, pOD->pz_DisableName );
 
     /*
-     *  IF the numeric option has a special callback,
-     *  THEN call it, requesting the range or other special info
+     *  Check for argument types that have callbacks with magical properties
      */
-    if (  (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NUMERIC)
-       && (pOD->pOptProc != NULL)
-       && (pOD->pOptProc != optionNumericVal) ) {
-        (*(pOD->pOptProc))( pOptions, NULL );
+    switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+    case OPARG_TYPE_NUMERIC:
+        /*
+         *  IF the numeric option has a special callback,
+         *  THEN call it, requesting the range or other special info
+         */
+        if (  (pOD->pOptProc != NULL)
+              && (pOD->pOptProc != optionNumericVal) ) {
+            (*(pOD->pOptProc))(pOptions, NULL);
+        }
+        break;
+
+    case OPARG_TYPE_FILE:
+        (*(pOD->pOptProc))(pOptions, NULL);
+        break;
     }
 
     /*
@@ -495,6 +505,7 @@ printOneUsage(
         } else switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
         case OPARG_TYPE_NONE:        pzArgType = pAT->pzNo;   break;
         case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
+        case OPARG_TYPE_FILE       : pzArgType = pAT->pzFile; break;
         case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
         case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
         case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
@@ -657,6 +668,7 @@ setGnuOptFmts( tOptions* pOpts, tCC** ppT )
     argTypes.pzNum  = zGnuNumArg;
     argTypes.pzKey  = zGnuKeyArg;
     argTypes.pzKeyL = zGnuKeyLArg;
+    argTypes.pzFile = zGnuFileArg;
     argTypes.pzBool = zGnuBoolArg;
     argTypes.pzNest = zGnuNestArg;
     argTypes.pzOpt  = zGnuOptArg;
@@ -694,6 +706,7 @@ setStdOptFmts( tOptions* pOpts, tCC** ppT )
     argTypes.pzNum  = zStdNumArg;
     argTypes.pzKey  = zStdKeyArg;
     argTypes.pzKeyL = zStdKeyLArg;
+    argTypes.pzFile = zStdFileArg;
     argTypes.pzBool = zStdBoolArg;
     argTypes.pzNest = zStdNestArg;
     argTypes.pzOpt  = zStdOptArg;

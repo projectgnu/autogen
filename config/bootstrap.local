@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2007-07-30 11:07:41 bkorb"
+# Time-stamp:        "2007-10-30 09:16:53 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.30 2007/10/07 16:54:54 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.31 2007/10/30 22:01:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -64,7 +64,7 @@ locate_exe()
 make_funcs_def()
 {
   ${VERBOSE} && set -x
-  svdir=`pwd`
+  svdir=${PWD}
   cd ${srcdir}/autoopts
   test -d autoopts || mkdir autoopts
   test -d po       || mkdir po
@@ -72,18 +72,18 @@ make_funcs_def()
   ${AGexe} -L. usage-txt.def || exit 1
   mv usage-txt.h   autoopts/.
   mv usage-txt.pot po/.
-  files=`sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
+  files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
       sed '/^CSRC/d;s/[=\\]//'
-      echo  ../compat/pathfind.c guileopt.c`
+      echo  ../compat/pathfind.c guileopt.c)
   getdefs linenum srcfile template=options_h output=funcs.def $files
   chmod u+w funcs.def
-  eval "`egrep '^A[GO]_' ../VERSION`"
+  eval "$(egrep '^A[GO]_' ../VERSION)"
   vers_curr=$(expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION)
   vers_min=$( expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
   cat >> funcs.def <<-  _END_VERS_INFO_
 	vers-curr       = "${vers_curr}";
 	vers-min        = "${vers_min}";
-	vers-min-str    = "`expr $AO_CURRENT - $AO_AGE`:0:0";
+	vers-min-str    = "$(expr $AO_CURRENT - $AO_AGE):0:0";
 	vers-sovers     = "${AO_SOVERS}";
 	library         = opts;
 	/*
@@ -117,7 +117,7 @@ make_funcs_def()
   else mv -f Makefile.new Makefile.am
        echo "WARNING: Makefile.am has been updated"
   fi
-  mk-fwd -p `egrep -l '^LOCAL |START-STATIC-FORWARD' *.c` > /dev/null 2>&1 || :
+  mk-fwd -p $(egrep -l '^LOCAL |START-STATIC-FORWARD' *.c) > /dev/null 2>&1 || :
   ${AGexe} aoconf.def
   cd ${svdir}
 }
@@ -230,7 +230,7 @@ check_tools()
 #       contains this file.
 #
 [ -z "${srcdir}" ] && {
-    srcdir=`echo $0 | sed 's;/[^/]*$;;'`
+    srcdir=$(echo $0 | sed 's;/[^/]*$;;')
 }
 
 MISSING=${MISSING-${srcdir}/config/missing}

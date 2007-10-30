@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.22 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.23 2007/10/30 22:01:02 bkorb Exp $
  *
- * Time-stamp:        "2007-07-04 11:31:51 bkorb"
- * Last Committed:    $Date: 2007/10/07 16:54:54 $
+ * Time-stamp:        "2007-10-30 08:17:58 bkorb"
+ * Last Committed:    $Date: 2007/10/30 22:01:02 $
  *
  *  This module will load a template and return a template structure.
  *
@@ -144,18 +144,23 @@ findFile(tCC* pzFName, char* pzFullName, tCC** papSuffixList, tCC * pzReferrer)
 
         do  {
             char * pzEnd;
+            void * coerce;
 
             /*
              *  IF one of our template paths starts with '$', then expand it.
              */
             if (*pzDir == '$') {
                 if (! optionMakePath( pzFullName, (int)AG_PATH_MAX, pzDir,
-                                      autogenOptions.pzProgPath ))
-                    pzDir = curdir;
-                else
-                    AGDUPSTR( pzDir, pzFullName, "find directory name" );
+                                      autogenOptions.pzProgPath )) {
+                    coerce = (void *)pzDir;
+                    strcpy(coerce, curdir);
 
-                ppzDir[1] = pzDir; /* save the computed name for later */
+                } else {
+                    AGDUPSTR( pzDir, pzFullName, "find directory name" );
+                    coerce = (void *)ppzDir[1];
+                    free(coerce);
+                    ppzDir[1] = pzDir; /* save the computed name for later */
+                }
             }
 
             if ((*pzFName == '/') || (pzDir == curdir)) {

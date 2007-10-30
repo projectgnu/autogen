@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-08-04 11:13:06 bkorb"
-# ID:  $Id: options_h.tpl,v 4.34 2007/10/07 16:54:54 bkorb Exp $
+# Time-stamp:      "2007-10-30 09:21:48 bkorb"
+# ID:  $Id: options_h.tpl,v 4.35 2007/10/30 22:01:02 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -41,6 +41,7 @@ h=options.h
  */
 [=(make-header-guard "autoopts")=]
 #include <sys/types.h>
+#include <stdio.h>
 
 #if defined(HAVE_STDINT_H)
 # include <stdint.h>
@@ -104,7 +105,8 @@ typedef enum {
     OPARG_TYPE_BOOLEAN          = 3,    /* opt arg is boolean-valued         */
     OPARG_TYPE_MEMBERSHIP       = 4,    /* opt arg sets set membership bits  */
     OPARG_TYPE_NUMERIC          = 5,    /* opt arg has numeric value         */
-    OPARG_TYPE_HIERARCHY        = 6     /* option arg is hierarchical value  */
+    OPARG_TYPE_HIERARCHY        = 6,    /* option arg is hierarchical value  */
+    OPARG_TYPE_FILE             = 7     /* option arg names a file           */
 } teOptArgType;
 
 typedef struct optionValue {
@@ -119,6 +121,22 @@ typedef struct optionValue {
         void*           nestVal;        /* OPARG_TYPE_HIERARCHY   */
     } v;
 } tOptionValue;
+
+typedef enum {
+    FTYPE_MODE_MAY_EXIST        = 0x00,
+    FTYPE_MODE_MUST_EXIST       = 0x01,
+    FTYPE_MODE_MUST_NOT_EXIST   = 0x02,
+    FTYPE_MODE_EXIST_MASK       = 0x03,
+    FTYPE_MODE_NO_OPEN          = 0x00,
+    FTYPE_MODE_OPEN_FD          = 0x10,
+    FTYPE_MODE_FOPEN_FP         = 0x20,
+    FTYPE_MODE_OPEN_MASK        = 0x30
+} teOptFileType;
+
+typedef union {
+    int             file_flags;
+    char const *    file_mode;
+} tuFileMode;
 
 /*
  *  Bits in the fOptState option descriptor field.
@@ -246,6 +264,8 @@ typedef union {
     long            argInt;
     unsigned long   argUint;
     unsigned int    argBool;
+    FILE*           argFp;
+    int             argFd;
 } optArgBucket_t;
 
 /*
@@ -446,11 +466,11 @@ FOR export_func         =][=
   if-text
 
 =]
-extern [= ?% ret-type "%s" "void"  =] [=name=]( [=
+extern [= ?% ret-type "%s" "void"  =] [=name=]([=
    IF (not (exist? "arg"))
           =]void[=
    ELSE   =][=(join ", " (stack "arg.arg-type")) =][=
-   ENDIF  =] );
+   ENDIF  =]);
 [=
 
   (if (exist? "ifndef")

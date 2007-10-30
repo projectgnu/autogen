@@ -2,10 +2,10 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2007-08-04 13:12:01 bkorb"
+# Time-stamp:        "2007-10-30 09:03:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2007/10/07 16:57:00 $
+# Last Committed:    $Date: 2007/10/30 22:01:01 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".3"
+AG_PATCHLEVEL=".4pre2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -62,15 +62,17 @@ EADDR=autogen-users@lists.sourceforge.net
 #
 AO_SOVERS=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 AO_SONAME=${AO_LIBRARY}-${AO_SOVERS}
-h='*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
+h=`expr \( \( ${COLUMNS:-80} - 1 \) / 2 \) \* 2`
+h=`printf "*%${h}s" ''`
+h=`echo "$h"|sed 's/  /-*/g'`
 
 cat <<EOF
-$h$h*
+$h
 
                  A      U      T      O      G      E      N
 
 `printf "%-38s %38s\n" "$PACKAGE-$VERSION" "${AO_SONAME}" || :`
-$h$h*
+$h
 EOF
 
 # VERSION ends here

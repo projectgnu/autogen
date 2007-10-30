@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2007-07-04 10:17:40 bkorb"
+# Time-stamp:      "2007-10-30 11:41:11 bkorb"
 
-# $Id: optmain.tpl,v 4.25 2007/10/07 16:54:54 bkorb Exp $
+# $Id: optmain.tpl,v 4.26 2007/10/30 22:01:02 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -915,6 +915,57 @@ ENDDEF   keyword-code
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE   set-membership-code
+
+=][=
+
+(set! tmp-ct (count "keyword"))
+(emit (tpl-file-line extract-fmt))
+(ag-fprintf 0 "    static char const * const azNames[%d] = {\n" tmp-ct)
+
+(shell (string-append
+
+  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
+  (join "\n" (stack "keyword"))
+  "\n_EOF_\n" )) =]
+    };
+    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);
+}[=
+
+ENDDEF   set-membership-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE   file-name-code
+
+\=]
+    static teOptFileType const  type =
+        [= (set! tmp-val (get "open-file")) =][=
+   CASE file-exists                 =][=
+   == ""                            =]FTYPE_MODE_MAY_EXIST[=
+   =* "no"                          =]FTYPE_MODE_MUST_NOT_EXIST[=
+   *                                =]FTYPE_MODE_MUST_EXIST[=
+   ESAC =] + [= CASE open-file      =][=
+   == ""                            =]FTYPE_MODE_NO_OPEN[=
+   =* "desc"                        =]FTYPE_MODE_OPEN_FD[=
+   *                                =]FTYPE_MODE_FOPEN_FP[=
+   ESAC =];
+    static tuFileMode           mode;
+[= IF (or (=* tmp-val "desc") (== tmp-val "")) \=]
+    mode.file_flags = [= (if (exist? "file-mode") (get "file-mode") "0") =];
+[= ELSE \=]
+#ifndef FOPEN_BINARY_FLAG
+#  define FOPEN_BINARY_FLAG
+#endif
+    mode.file_mode = [= (c-string (get "file-mode")) =] FOPEN_BINARY_FLAG;
+[= ENDIF =]
+    optionFileCheck(pOptions, pOptDesc, type, mode);
+}[=
+
+ENDDEF   file-name-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
 DEFINE define-option-callbacks      =][=
 
   FOR  flag  =][=
@@ -956,32 +1007,26 @@ DEFINE define-option-callbacks      =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 
-    ELIF (=* (get "arg-type") "key")=][=
+    ELSE =][= CASE arg-type         =][=
 
+      =* key                        =][=
       INVOKE callback-proc-header   =][=
       INVOKE keyword-code           =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 
-    ELIF (=* (get "arg-type") "set")=][=
+      =* set                        =][=
 
       INVOKE callback-proc-header   =][=
-
-(set! tmp-ct (count "keyword"))
-(emit (tpl-file-line extract-fmt))
-(ag-fprintf 0 "    static char const * const azNames[%d] = {\n" tmp-ct)
-
-(shell (string-append
-
-  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
-  (join "\n" (stack "keyword"))
-  "\n_EOF_\n" )) =]
-    };
-    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);
-}[=
+      INVOKE set-membership-code    =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 
+      =* fil                        =][=
+      INVOKE callback-proc-header   =][=
+      INVOKE file-name-code         =][=
+
+      ESAC                          =][=
     ENDIF                           =][=
 
     (. endif-test-main)             =][=

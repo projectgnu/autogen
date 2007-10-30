@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-07-04 10:12:54 bkorb"
+# Time-stamp:        "2007-10-30 14:36:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: argument.test,v 4.7 2007/10/07 16:54:54 bkorb Exp $
+# $Id: argument.test,v 4.8 2007/10/30 22:01:02 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -73,6 +73,8 @@ cmp -s ${testname}.h*lp || \
 ./${testname} -o string -s 99 > /dev/null || \
   failure ${testname} did not handle its options
 
+# # # # # # # # # # T E S T   2 # # # # # # # # # # #
+
 exec 3> ${testname}2.def
 sed '/arg-type = number/q' ${testname}.def >&3
 cat >&3 <<- _EOF_
@@ -113,13 +115,69 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
 _EOF_
 
 cmp -s ${testname}2.hlp ${testname}2.help || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+  failure "`diff ${testname}2.hlp ${testname}2.help`"
 
 ./${testname}2 -o string -s 99 > /dev/null && \
   failure ${testname} did not handle oversized option
 
 ./${testname}2 -o string -s 10 > /dev/null || \
   failure ${testname} did not handle its options
+
+# # # # # # # # # # T E S T   3 # # # # # # # # # # #
+
+exec 3> ${testname}3.def
+sed '/value = .s.;/q' ${testname}.def >&3
+cat >&3 <<- _EOF_
+	    arg-type    = file;
+	    file-exists = yes;
+	    open-file   = fopen;
+	    file-mode   = "r";
+	};
+	_EOF_
+exec 3>&-
+
+${AG_L} ${testname}3.def || \
+  failure AutoGen could not process
+( sed '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT3_/' ${testname}3.c
+  cat <<EOF
+int main( int argc, char** argv ) {
+  optionProcess( &test_argumentOptions, argc, argv );
+  for (;;) { int ch = getc(OPT_VALUE_SECOND);
+    if (ch == EOF) break;
+    putc(ch, stdout); }
+  return fclose(OPT_VALUE_SECOND); }
+EOF
+) > XX
+mv ${testname}3.c ${testname}3.c.save
+mv -f XX ${testname}3.c
+
+Csrc=${testname}3
+compile "-?"
+
+cat > ${testname}3.hlp <<'_EOF_'
+test_argument - Test AutoOpts for argument
+USAGE:  argument3 [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o Str option         The option option descrip
+   -s Fil second         The second option descrip
+				- file must pre-exist
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${testname}3.hlp ${testname}3.help || \
+  failure "`diff ${testname}3.hlp ${testname}3.help`"
+
+./${testname}3 -o string -s `pwd`/bogusfilename.c > /dev/null && \
+  failure ${testname} handled non-existent file
+
+./${testname}3 -o string -s `pwd`/${testname}3.hlp > ${testname}3-a.hlp || \
+  failure ${testname} could not handle existing file
+
+cmp -s ${testname}3.hlp ${testname}3-a.hlp || \
+  failure "`diff ${testname}3.hlp ${testname}3-a.hlp`"
+# # # # # # # # # # T E S T   E N D # # # # # # # # # #
 
 cleanup
 

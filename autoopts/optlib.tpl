@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2007-08-04 13:01:07 bkorb"
+# Time-stamp:      "2007-10-30 10:47:39 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.27 2007/10/07 16:54:54 bkorb Exp $
+# $Id: optlib.tpl,v 4.28 2007/10/30 22:01:02 bkorb Exp $
 
 =][=
 
@@ -144,7 +144,7 @@ DEFINE save-name-morphs
          (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
-    ~*   key|set                =][=
+    ~*   key|set|fil            =][=
          (set! test-name proc-name)
          (set! is-extern #f)
          (set! have-proc #t)    =][=
@@ -205,7 +205,7 @@ DEFINE set-defines
         [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
         [=set-desc=].fOptState |= [=opt-state=][=
   CASE  arg-type =][=
-  =*  str        =]; \
+  ~*  str|fil    =]; \
         [=set-desc=].optArg.argString = (a)[=
   =*  num        =]; \
         [=set-desc=].optArg.argInt = (a)[=
@@ -414,6 +414,17 @@ typedef enum {[=
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] ([=(. value-desc)=].optArg.argBool)[=
 
+  =*  fil               =][=
+      CASE open-file    =][=
+      == ""             =][=
+      =* desc           =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argFd)[=
+      *                 =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argFp)[=
+      ESAC              =][=
+
   ESAC           =][=
 
 
@@ -465,7 +476,7 @@ Define the arrays of values associated with an option (strings, etc.) =][=
 DEFINE   emit-nondoc-option     =][=
   (if (exist? "translators")
       (string-append "\n" (shellf
-"(fmt --width 60|columns -I16 -c1 --first='/* TRANSLATORS:')<<\\_EOF_
+"${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_
 %s
 _EOF_" (get "translators")  ) " */" )  ) =][=
 
@@ -616,6 +627,9 @@ static const int
 
             =*  str        =] \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)[=
+
+            =*  fil        =] \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE)[=
 
             *              =][=
             (error (string-append "unknown arg type '"
