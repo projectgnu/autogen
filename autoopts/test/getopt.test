@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2007-09-20 12:41:30 bkorb"
+# Time-stamp:        "2007-10-28 15:24:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.16 2007/10/07 16:54:54 bkorb Exp $
+# $Id: getopt.test,v 4.17 2007/11/01 05:24:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -43,11 +43,11 @@ CFLAGS=''
 INC=''
 
 compile_getopt() {
-  echo ${AG_L} ${testname}.def
-  ${AG_L} ${testname}.def || \
+  echo ${AGexe} -L${TMPDIR} ${testname}.def
+  ${AGexe} -L${TMPDIR} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  ${AG_L} -L ${TMPDIR} -T getopt.tpl ${testname}.def || \
+  ${AGexe} -L${TMPDIR} -T getopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
 
   # Remove the variable comments so we can test against the expected result
@@ -74,8 +74,7 @@ compile_getopt() {
 # However, we have to work with the local stuff.  So, remove the
 # "autoopts-config" probing and replace with local stuff:
 #
-TMPDIR=`pwd`/${testname}-inc
-mkdir ${TMPDIR} ${TMPDIR}/autoopts
+mkdir -p ${TMPDIR}/autoopts
 
 srcdir=`pwd`
 CFLAGS="-I ${TMPDIR} ${CFLAGS} ${INC}"
@@ -85,9 +84,12 @@ export srcdir CFLAGS LDFLAGS TMPDIR
 aolib=${top_builddir}/autoopts/.libs/libopts.a
 test -f ${aolib} || aolib=${top_builddir}/autoopts/libopts.a
 
-sed -e '/ CFLAGS=/s@ *`autoopts-config cflags`@'" -I${top_srcdir}/autoopts@" \
-    -e '/ LDFLAGS=/s@ *`autoopts-config ldflags`@'" ${aolib}@" \
-    ${top_srcdir}/autoopts/getopt.tpl > ${TMPDIR}/getopt.tpl
+cd ${top_srcdir}/autoopts
+cp opt*.tpl getopt.tpl ${TMPDIR}/.
+sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
+    -e "/^ldflags=/s@=.*@='${aolib}'@" \
+    usage.tpl > ${TMPDIR}/usage.tpl
+cd ${srcdir}
 
 # In order to compile correctly, we have to temporarily install the options.h
 # header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:

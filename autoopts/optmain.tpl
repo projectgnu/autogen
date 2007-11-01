@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2007-10-30 11:41:11 bkorb"
+# Time-stamp:      "2007-10-31 20:09:06 bkorb"
 
-# $Id: optmain.tpl,v 4.26 2007/10/30 22:01:02 bkorb Exp $
+# $Id: optmain.tpl,v 4.27 2007/11/01 05:24:24 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -43,18 +43,18 @@ int    original_argc;
 char** original_argv;
 
 static void
-inner_main( int argc, char** argv )
+inner_main(int argc, char** argv)
 {
     original_argc = argc;
     original_argv = argv;
 
     {
-        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
-        char** new_argv = (char**)malloc( (argc - ct + 2)*sizeof(char*) );
+        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
+        char** new_argv = (char**)malloc((argc - ct + 2)*sizeof(char*));
 
         if (new_argv == NULL) {
-            fputs( _("[=(. pname)=] cannot allocate new argv\n"), stderr );
-            exit( EXIT_FAILURE );
+            fputs(_("[=(. pname)=] cannot allocate new argv\n"), stderr);
+            exit(EXIT_FAILURE);
         }
 
         /*
@@ -68,7 +68,7 @@ inner_main( int argc, char** argv )
         /*
          *  Copy the argument pointers, plus the terminating NULL ptr.
          */
-        memcpy( new_argv+1, argv + ct, argc * sizeof( char* ));
+        memcpy(new_argv+1, argv + ct, argc * sizeof(char*));
         argv = new_argv;
     }[=
 
@@ -80,13 +80,12 @@ inner_main( int argc, char** argv )
   ELSE  =]
 
     export_options_to_guile( &[=(. pname)=]Options );
-    scm_shell( argc, argv );[=
+    scm_shell(argc, argv);[=
   ENDIF =]
 }
 
 int
-main( int    argc,
-      char** argv )
+main(int argc, char** argv)
 {[=
   (if (exist? "before-guile-boot")
     (string-append (def-file-line "before-guile-boot" extract-fmt)
@@ -114,7 +113,7 @@ DEFINE build-test-main
 #if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
     int res = EXIT_SUCCESS;[=
 
@@ -192,7 +191,7 @@ DEFINE for-each-main            =][=
 #include <unistd.h>
 
 static char*
-trim_input_line( char* pz_s )
+trim_input_line(char* pz_s)
 {
     char* pz_e = pz_s + strlen( pz_s );
     while ((pz_e > pz_s) && isspace( pz_e[-1] ))  pz_e--;
@@ -227,7 +226,7 @@ IF (set! tmp-text (string-append (get "handler-proc") "-code"))
    (exist? tmp-text) =]
 
 static int
-[= handler-proc =]( [=(. handler-arg-type)=] )
+[= handler-proc =]([=(. handler-arg-type)=])
 {
     int res = 0;[=
    (string-append
@@ -251,7 +250,7 @@ ENDIF
 IF (exist? "handler-type")  =]
 
 static int
-validate_fname( char const* pz_fname )
+validate_fname(char const* pz_fname)
 {
     char const* pz_fs_err =
         _("fs error %d (%s) %s-ing %s\n");[=
@@ -386,7 +385,7 @@ ENDIF handler-type exists
 =]
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
     int res = 0;
     {
@@ -493,7 +492,7 @@ DEFINE build-main               =][= FOR main[] =][=
   *                             =][=
      (error (sprintf "unknown/invalid main-type: '%s'" (get "main-type"))) =][=
 
-  ESAC =][= ENDFOR =][=
+  ESAC =][= ENDFOR first-main   =][=
 
 ENDDEF build-main
 
@@ -707,11 +706,11 @@ ENDDEF decl-callbacks
 
 DEFINE callback-proc-header     =]
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the [=name=] option[=
 
-  IF (exist? "ifdef")
+  IF  (exist? "ifdef")
 
 =], when [= ifdef =] is #define-d.
  */
@@ -723,29 +722,31 @@ DEFINE callback-proc-header     =]
 
   ELIF (exist? "ifndef")
 
-=], when [= ifdef =] is *not* #define-d.
+=], when [= ifndef =] is *not* #define-d.
  */
 #ifndef [= ifndef               =][=
     (set! endif-test-main (string-append
 	   (sprintf "\n#endif /* ! defined %s */" (get "ifndef"))
 	   endif-test-main
     )) =][=
-  ELSE                          =].
+
+  ELSE  unconditional code:
+
+=].
  */[=
 
   ENDIF ifdef / ifndef
 
 =]
 static void
-doOpt[=(. cap-name) =](
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOpt[= (set! endif-test-main (string-append "\n}" endif-test-main))
+        cap-name =](tOptions* pOptions, tOptDesc* pOptDesc)
 {
 [=
 
 ENDDEF   callback-proc-header
 
-# # # # # # # # # # # # # # # # =][=
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE range-option-code
 
@@ -754,7 +755,8 @@ DEFINE range-option-code
 (if (not (=* (get "arg-type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
 
-=]    static const struct {const int rmin, rmax;} rng[ [=
+\=]
+    static const struct {const int rmin, rmax;} rng[ [=
       (count "arg-range")  =] ] = {
 [=(out-push-new)      =][=
   FOR arg-range ",\n" =]{ [=
@@ -839,16 +841,13 @@ DEFINE range-option-code
     return;
 
   valid_return:
-    pOptDesc->optArg.argInt = val;
-}[=
+    pOptDesc->optArg.argInt = val;[=
 
 ENDDEF   range-option-code
 
-# # # # # # # # # # # # # # # # =][=
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE   keyword-code
-
-=][=
+DEFINE   keyword-code           =][=
 
 (set! tmp-ct (count "keyword"))
 (if (not (exist? "arg-default"))
@@ -863,7 +862,7 @@ DEFINE   keyword-code
 
 =][=
 
-? arg-default "\n" " zDef,\n" =][=
+? arg-default "\n" " zDef,\n"   =][=
 
 (shell (string-append
   "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
@@ -884,7 +883,7 @@ DEFINE   keyword-code
                 "UNDEFINED"  ))) =];
     else
         pOptDesc->optArg.argEnum =
-            optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
+            optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
 [=
 
   ELSE
@@ -894,7 +893,7 @@ DEFINE   keyword-code
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
 
-  ENDIF    =][=
+  ENDIF                         =][=
 
   IF (exist? "extra-code")
 
@@ -903,13 +902,9 @@ DEFINE   keyword-code
     if (((unsigned long)pOptions) <= 0x0FUL)
         return; /* protect AutoOpts client code from internal callbacks */
 
-[= extra-code =]
-[=
+[= extra-code                   =][=
 
-  ENDIF
-
-          \=]
-}[=
+  ENDIF                         =][=
 
 ENDDEF   keyword-code
 
@@ -929,8 +924,7 @@ DEFINE   set-membership-code
   (join "\n" (stack "keyword"))
   "\n_EOF_\n" )) =]
     };
-    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);
-}[=
+    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);[=
 
 ENDDEF   set-membership-code
 
@@ -941,14 +935,14 @@ DEFINE   file-name-code
 \=]
     static teOptFileType const  type =
         [= (set! tmp-val (get "open-file")) =][=
-   CASE file-exists                 =][=
-   == ""                            =]FTYPE_MODE_MAY_EXIST[=
-   =* "no"                          =]FTYPE_MODE_MUST_NOT_EXIST[=
-   *                                =]FTYPE_MODE_MUST_EXIST[=
-   ESAC =] + [= CASE open-file      =][=
-   == ""                            =]FTYPE_MODE_NO_OPEN[=
-   =* "desc"                        =]FTYPE_MODE_OPEN_FD[=
-   *                                =]FTYPE_MODE_FOPEN_FP[=
+   CASE file-exists             =][=
+   == ""                        =]FTYPE_MODE_MAY_EXIST[=
+   =* "no"                      =]FTYPE_MODE_MUST_NOT_EXIST[=
+   *                            =]FTYPE_MODE_MUST_EXIST[=
+   ESAC =] + [= CASE open-file  =][=
+   == ""                        =]FTYPE_MODE_NO_OPEN[=
+   =* "desc"                    =]FTYPE_MODE_OPEN_FD[=
+   *                            =]FTYPE_MODE_FOPEN_FP[=
    ESAC =];
     static tuFileMode           mode;
 [= IF (or (=* tmp-val "desc") (== tmp-val "")) \=]
@@ -959,8 +953,7 @@ DEFINE   file-name-code
 #endif
     mode.file_mode = [= (c-string (get "file-mode")) =] FOPEN_BINARY_FLAG;
 [= ENDIF =]
-    optionFileCheck(pOptions, pOptDesc, type, mode);
-}[=
+    optionFileCheck(pOptions, pOptDesc, type, mode);[=
 
 ENDDEF   file-name-code
 
@@ -971,9 +964,9 @@ DEFINE define-option-callbacks      =][=
   FOR  flag  =][=
 
     (set-flag-names)
-    (define endif-test-main "")
+    (define endif-test-main "")     =][=
 
-;;; # # # # # # # # # # # # # # # # =][=
+# # # # # # # # # # # # # # # # # # =][=
 
     IF (or (exist? "extract-code")
            (exist? "flag-code") )   =][=
@@ -981,7 +974,7 @@ DEFINE define-option-callbacks      =][=
       (if make-test-main
           (begin
             (set! endif-test-main
-                  (sprintf "\n\n#endif /* defined(%s) */" main-guard))
+                  (sprintf "\n#endif /* defined(%s) */" main-guard))
             (sprintf "\n\n#if ! defined(%s)" main-guard)
       )   ) =][=
 
@@ -990,13 +983,13 @@ DEFINE define-option-callbacks      =][=
       IF (exist? "flag-code")       =][=
          (def-file-line "flag-code" "    /* extracted from %s, line %d */\n")
          =][=  flag-code            =][=
+
       ELSE                          =][=
 
          (extract (string-append (base-name) ".c.save") (string-append
                   "/*  %s =-= " cap-name " Opt Code =-= %s */"))
-         =][=
-      ENDIF =]
-}[=
+                                    =][=
+      ENDIF                         =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 
@@ -1031,8 +1024,7 @@ DEFINE define-option-callbacks      =][=
 
     (. endif-test-main)             =][=
 
-  ENDFOR flag                       =]
-[=
+  ENDFOR flag                       =][=
 
 ENDDEF define-option-callbacks
 

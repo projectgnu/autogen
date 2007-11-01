@@ -1,9 +1,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.12 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:        "2007-07-04 09:24:49 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  $Id: opts.def,v 4.13 2007/11/01 05:24:24 bkorb Exp $
+ *  Time-stamp:        "2007-10-28 09:30:24 bkorb"
+ *  Last Committed:    $Date: 2007/11/01 05:24:24 $
  *
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
@@ -33,6 +33,8 @@ prog-title     = "Columnize Input Text";
 package        = 'GNU AutoGen';
 long-opts;
 
+version = "1.2";
+
 export = <<- EOExport
 	#include "config.h"
 	#include <ctype.h>
@@ -41,7 +43,7 @@ export = <<- EOExport
 	#include <string.h>
 	EOExport;
 
-version = "1.1";
+include = "#include <errno.h>\n";
 
 flag = {
     name        = width;
@@ -49,14 +51,16 @@ flag = {
     arg-type    = number;
     arg-default = 79;
     arg-name    = num;
+    arg-range   = '16->4095';
     descrip     = "Maximum Line Width";
-    doc         =
-    "This option specifies the full width of the output line,\n"
-    "including any start-of-line indentation.  The output will fill\n"
-    "each line as completely as possible, unless the column width has\n"
-    "been explicitly specified.  If the maximum width is less than\n"
-    "the length of the widest input, you will get a single column\n"
-    "of output.";
+    doc         = <<- _EODoc_
+	This option specifies the full width of the output line,
+	including any start-of-line indentation.  The output will fill
+	each line as completely as possible, unless the column width has
+	been explicitly specified.  If the maximum width is less than
+	the length of the widest input, you will get a single column
+	of output.
+	_EODoc_;
 };
 
 flag = {
@@ -65,11 +69,13 @@ flag = {
     arg-type    = number;
     arg-default = 0;
     arg-name    = count;
+    arg-range   = '1->2048';
     descrip     = "Desired number of columns";
-    doc =
-    "Use this option to specify exactly how many columns to produce.\n"
-    "If that many columns will not fit within @var{line_width}, then\n"
-    "the count will be reduced to the number that fit.";
+    doc         = <<- _EODoc_
+	Use this option to specify exactly how many columns to produce.
+	If that many columns will not fit within @var{line_width}, then
+	the count will be reduced to the number that fit.
+	_EODoc_;
 };
 
 flag = {
@@ -78,11 +84,13 @@ flag = {
     arg-type    = number;
     arg-default = 0;
     arg-name    = num;
+    arg-range   = '1->2048';
     descrip     = "Set width of each column";
-    doc =
-    "Use this option to specify exactly how many characters are to be\n"
-    "allocated for each column.  If it is narrower than the widest entry,\n"
-    "it will be over-ridden with the required width.";
+    doc         = <<- _EODoc_
+	Use this option to specify exactly how many characters are to be
+	allocated for each column.  If it is narrower than the widest entry,
+	it will be over-ridden with the required width.
+	_EODoc_;
 };
 
 flag = {
@@ -90,11 +98,25 @@ flag = {
     arg-type    = number;
     arg-default = 0;
     arg-name    = num;
+    arg-range   = '1->1024';
     descrip     = "maximum spread added to column width";
-    doc =
-    "Use this option to specify exactly how many characters may be\n"
-    "added to each column.  It allows you to prevent columns from\n"
-    "becoming too far apart.";
+    doc         = <<- _EODoc_
+	Use this option to specify exactly how many characters may be
+	added to each column.  It allows you to prevent columns from
+	becoming too far apart.
+	_EODoc_;
+};
+
+flag = {
+    name        = fill;
+    descrip     = "Fill lines with input";
+    flags-cant  = spread, col_width, separation, line_separation, by_columns,
+                  sort;
+    doc         = <<- _EODoc_
+	Instead of columnizing the input text, fill the output lines
+	with the input lines.  Blank lines on input will cause a
+	blank line in the output.
+	_EODoc_;
 };
 
 flag = {
@@ -103,10 +125,11 @@ flag = {
     arg-type    = string;
     arg-name    = l-pfx;
     descrip     = "Line prefix or indentation";
-    doc =
-    "If a number, then this many spaces will be inserted at the start of\n"
-    "every line.  Otherwise, it is a line prefix that will be inserted\n"
-    "at the start of every line.";
+    doc         = <<- _EODoc_
+	If a number, then this many spaces will be inserted at the start of
+	every line.  Otherwise, it is a line prefix that will be inserted
+	at the start of every line.
+	_EODoc_;
 };
 
 flag = {
@@ -115,10 +138,11 @@ flag = {
     flags_must  = indent;
     arg-name    = l-pfx;
     descrip     = "First line prefix";
-    doc =
-    "If a number, then this many spaces will be inserted at the start of\n"
-    "the first line.  Otherwise, it is a line prefix that will be inserted\n"
-    "at the start of that line.";
+    doc         = <<- _EODoc_
+	If a number, then this many spaces will be inserted at the start of
+	the first line.  Otherwise, it is a line prefix that will be inserted
+	at the start of that line.
+	_EODoc_;
 };
 
 flag = {
@@ -127,9 +151,10 @@ flag = {
     arg-default = 8;
     arg-name    = num;
     descrip     = "tab width";
-    doc =
-    "If an indentation string contains tabs, then this value is used to\n"
-    "compute the ending column of the prefix string.";
+    doc         = <<- _EODoc_
+	If an indentation string contains tabs, then this value is used to
+	compute the ending column of the prefix string.
+	_EODoc_;
 };
 
 flag = {
@@ -139,11 +164,12 @@ flag = {
     arg-optional;
     arg-name    = key-pat;
     descrip     = "Sort input text";
-    doc =
-    "Causes the input text to be sorted.  If an argument is supplied,\n"
-    "it is presumed to be a pattern and the sort is based upon the\n"
-    "matched text.  If the pattern starts with or consists of\n"
-    "an asterisk (@code{*}), then the sort is case insensitive.";
+    doc         = <<- _EODoc_
+	Causes the input text to be sorted.  If an argument is supplied,
+	it is presumed to be a pattern and the sort is based upon the
+	matched text.  If the pattern starts with or consists of
+	an asterisk (@code{*}), then the sort is case insensitive.
+	_EODoc_;
 };
 
 flag = {
@@ -152,10 +178,11 @@ flag = {
     arg-type    = string;
     arg-name    = fmt-str;
     descrip     = "Formatting string for each input";
-    doc =
-    "If you need to reformat each input text, the argument to this\n"
-    "option is interpreted as an @code{sprintf(3)} format that is used\n"
-    "to produce each output entry.";
+    doc         = <<- _EODoc_
+	If you need to reformat each input text, the argument to this
+	option is interpreted as an @code{sprintf(3)} format that is used
+	to produce each output entry.
+	_EODoc_;
 };
 
 flag = {
@@ -164,9 +191,10 @@ flag = {
     arg-type    = string;
     arg-name    = sep-str;
     descrip     = "Separation string - follows all but last";
-    doc =
-    "Use this option if, for example, you wish a comma to appear after\n"
-    "each entry except the last.";
+    doc         = <<- _EODoc_
+	Use this option if, for example, you wish a comma to appear after
+	each entry except the last.
+	_EODoc_;
 };
 
 flag = {
@@ -174,18 +202,21 @@ flag = {
     arg-type    = string;
     arg-name    = sep-str;
     descrip     = "string at end of all lines but last";
-    doc =
-    "Use this option if, for example, you wish a backslash to appear at\n"
-    "the end of every line, except the last.";
+    doc         = <<- _EODoc_
+	Use this option if, for example, you wish a backslash to appear at
+	the end of every line, except the last.
+	_EODoc_;
 };
 
 flag = {
     name        = by_columns;
     descrip     = "Print entries in column order";
-    doc =
-"Normally, the entries are printed out in order by rows and then columns.
-This option will cause the entries to be ordered within columns.  The final
-column, instead of the final row, may be shorter than the others.";
+    doc         = <<- _EODoc_
+	Normally, the entries are printed out in order by rows and then columns.
+	This option will cause the entries to be ordered within columns.
+	The final column, instead of the final row, may be shorter than the
+	others.
+	_EODoc_;
 };
 
 #ifdef LATER
@@ -194,9 +225,10 @@ flag = {
     arg-type    = number;
     arg-name    = num;
     descrip     = "Page Length";
-    doc =
-    "This many lines will be printed before a form feed is emitted.\n"
-    "The 'by_columns' ordering will wrap columns within a page.";
+    doc         = <<- _EODoc_
+	This many lines will be printed before a form feed is emitted.
+	The 'by_columns' ordering will wrap columns within a page.
+	_EODoc_;
 };
 #endif
 
@@ -206,26 +238,19 @@ flag = {
     arg-type    = string;
     arg-name    = file;
     descrip     = "Input file (if not stdin)";
-    flag_code   =
+    flag-code   =
 '    FILE* fp = freopen( pOptDesc->pzLastArg, "r" FOPEN_BINARY_FLAG, stdin );
     if (fp == (FILE*)NULL) {
         fprintf( stderr, "Error %d (%s) opening %s\n",
                  errno, strerror( errno ), pOptDesc->pzLastArg );
         USAGE( EXIT_FAILURE );
     }';
-    doc =
-    "This program normally runs as a @code{filter}, reading from standard\n"
-    "input, columnizing and writing to standard out.  This option redirects\n"
-    "input to a file.";
+    doc         = <<- _EODoc_
+	This program normally runs as a @code{filter}, reading from standard
+	input, columnizing and writing to standard out.  This option redirects
+	input to a file.
+	_EODoc_;
 };
-
-include = "#include <stdio.h>\n"
-          "#include <errno.h>\n"
-          "#include <string.h>\n"
-          "#ifdef HAVE_CONFIG_H\n"
-          '#  include "config.h"'  "\n"
-          "#endif\n";
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

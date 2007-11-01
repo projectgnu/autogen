@@ -5,9 +5,9 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-08-04 12:49:41 bkorb"
+# Time-stamp:        "2007-10-31 20:12:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2007/11/01 05:24:24 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -30,7 +30,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: handler.test,v 4.17 2007/10/07 16:54:54 bkorb Exp $
+# $Id: handler.test,v 4.18 2007/11/01 05:24:24 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -52,7 +52,7 @@ flag = {
 flag = {
     name = second;
     descrip = "second description";
-    arg_type = keyword;
+    arg-type = keyword;
     keyword = alpha, beta, gamma, omega;
 };
 
@@ -65,7 +65,7 @@ flag = {
 flag = {
     name = fourth;
     descrip = "fourth description";
-    arg_type = keyword;
+    arg-type = keyword;
     keyword = alpha, beta, gamma, omega;
     arg-default = gamma;
     arg-optional;
@@ -80,7 +80,7 @@ flag = {
 flag = {
     name = sixth;
     descrip = "sixth description";
-    arg_type = set-member;
+    arg-type = set-member;
     keyword = alpha, beta, gamma, omega;
     arg-default = gamma, beta;
 };
@@ -121,28 +121,24 @@ doUsageOpt(
     USAGE( EXIT_SUCCESS );
 }
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the first option.
  */
 static void
-doOptFirst(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOptFirst(tOptions* pOptions, tOptDesc* pOptDesc)
 {
 /*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 SampleCode();
 /*  END   =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 }
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the second option.
  */
 static void
-doOptSecond(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
 {
     static char const zDef[2] = { 0x7F, 0 };
 
@@ -152,29 +148,26 @@ doOptSecond(
 
     pOptDesc->optArg.argEnum =
         optionEnumerationVal( pOptions, pOptDesc, azNames, 5 );
+
 }
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the third option.
  */
 static void
-doOptThird(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
 {
     /* extracted from handler.def, line 21 */
     SomeCodeOrOther();
 }
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the fourth option.
  */
 static void
-doOptFourth(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
 {
 
     static char const * const azNames[4] = {
@@ -186,17 +179,16 @@ doOptFourth(
         pOptDesc->optArg.argEnum = FOURTH_GAMMA;
     else
         pOptDesc->optArg.argEnum =
-            optionEnumerationVal( pOptions, pOptDesc, azNames, 4 );
+            optionEnumerationVal(pOptions, pOptDesc, azNames, 4);
+
 }
 
-/* * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   For the sixth option.
  */
 static void
-doOptSixth(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
 {
 
     static char const * const azNames[4] = {
@@ -204,7 +196,6 @@ doOptSixth(
     };
     optionSetMembers(pOptions, pOptDesc, azNames, 4);
 }
-
 
 #if ENABLE_NLS
 #include <stdio.h>

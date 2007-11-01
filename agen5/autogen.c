@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.27 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: autogen.c,v 4.28 2007/11/01 05:24:24 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-22 09:00:32 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-10-31 20:38:59 bkorb"
+ *  Last Committed:    $Date: 2007/11/01 05:24:24 $
  *
  *  This is the main routine for autogen.
  *
@@ -88,11 +88,10 @@ inner_main( int argc, char** argv )
     exit( EXIT_SUCCESS );
 }
 
-
 int
-main( int    argc,
-      char** argv )
+main(int argc, char** argv)
 {
+    optionSaveState(&autogenOptions);
     pfTrace = stderr;
 
     /*
@@ -220,7 +219,7 @@ doneCheck( void )
 #ifdef SHELL_ENABLED
     ag_scm_c_eval_string_from_file_line(
         "(if (> (string-length shell-cleanup) 0)"
-        " (shell shell-cleanup) )", __FILE__, __LINE__ );
+        " (shell shell-cleanup) )", __FILE__, __LINE__ - 1 );
     closeServer();
 #endif
 
@@ -228,7 +227,7 @@ doneCheck( void )
     fflush( stderr );
 
     if (pfTrace != stderr ) {
-        if (* OPT_ARG( TRACE_OUT ) == '|') {
+        if (trace_is_to_pipe) {
             int status;
 
             pclose( pfTrace );

@@ -1,6 +1,6 @@
 [=  AutoGen5 Template  -*- Mode: shell-script -*-
 
- help
+ help-text
 
 =][=
 
@@ -90,12 +90,13 @@ ENDFOR flag
 (out-push-new)  \=]
 
 cd ${tmp_dir}
-cflags=-DTEST_[= (string-upcase! (string->c-name! (get "prog-name"))) =]_OPTS=1
-cflags="${cflags} "`autoopts-config cflags`
-cflags="${cflags} "`autoopts-config ldflags`
+defs=-DTEST_[= (string-upcase! (string->c-name! (get "prog-name"))) =]_OPTS=1
+cflags=`autoopts-config cflags`
+ldflags=`autoopts-config ldflags`
+flags="${defs} ${cflags}"
 
 autogen [= prog-name=].def || die "Cannot gen [= prog-name =]"
-${CC:-cc} ${cflags} -g -o [= prog-name =] [= prog-name =].c || \
+${CC:-cc} ${flags} -g -o [= prog-name =] [= prog-name =].c ${ldflags} || \
   die cannot compile [= prog-name =].c in `pwd`
 ./[= prog-name =] [=
 

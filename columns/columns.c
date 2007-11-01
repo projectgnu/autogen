@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.13 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:        "2007-07-04 11:54:49 bkorb"
+ *  $Id: columns.c,v 4.14 2007/11/01 05:24:24 bkorb Exp $
+ *  Time-stamp:        "2007-10-28 15:55:26 bkorb"
  *
  *  Columns copyright (c) 1992-2007 Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -37,17 +37,18 @@ typedef struct print_list tPrintList, *tpPrintList;
 int maxEntryWidth = 0;
 int fillColumnCt  = 0;
 
-char zLine[ 133 ];
-char zFmtLine[ 133 ];
+#define LINE_LIMIT 4096
+char zLine[ LINE_LIMIT ];
+char zFmtLine[ LINE_LIMIT ];
 
 char**  papzLines  = (char**)NULL;
 tCC*    pzLinePfx  = NULL;
 tCC*    pzFirstPfx = NULL;
 size_t  allocCt    = 0;
 size_t  usedCt     = 0;
-size_t  lineWidth  = 79;
 size_t  columnCt   = 0;
 size_t  columnSz   = 0;
+size_t  indentSize = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
@@ -63,6 +64,9 @@ writeColumns( void );
 static void
 writeRows( void );
 
+static void
+writeFill( void );
+
 static int
 compProc( const void* p1, const void* p2 );
 /* = = = END-STATIC-FORWARD = = = */
@@ -76,12 +80,9 @@ main( int    argc,
         USAGE( EXIT_FAILURE );
     }
 
-    if (HAVE_OPT( WIDTH ))
-        lineWidth = OPT_VALUE_WIDTH;
-
     if (HAVE_OPT( INDENT )) {
-        size_t indentSize = handleIndent( OPT_ARG( INDENT ));
-        lineWidth -= indentSize;
+        indentSize = handleIndent( OPT_ARG( INDENT ));
+        OPT_VALUE_WIDTH -= indentSize;
 
         if (! HAVE_OPT( FIRST_INDENT ))
             pzFirstPfx = pzLinePfx;
@@ -102,13 +103,12 @@ main( int    argc,
              *  as the indentSize
              */
             if (firstSize > indentSize) {
-                char* p = malloc( indentSize + 1 );
-                strncpy( p, pzFirstPfx, indentSize );
-                p[ indentSize ] = NUL;
-                pzFirstPfx = p;
-                fprintf( stderr, "Warning: prefix `%s' has been truncated to ",
-                         pzFirstPfx );
-                fprintf( stderr, "`%s'\n", pzFirstPfx );
+                static char const zSepLine[] =
+                    "Note: prefix `%s' has been put on a separate line\n";
+                fputs(pzFirstPfx, stdout);
+                putc('\n', stdout);
+                fprintf( stderr, zSepLine, pzFirstPfx );
+                pzFirstPfx = pzLinePfx;
 
             } else if (firstSize < indentSize) {
                 char* tmp = malloc( indentSize + 1 );
@@ -121,7 +121,7 @@ main( int    argc,
     }
 
     if (HAVE_OPT( LINE_SEPARATION ))
-        lineWidth -= strlen( OPT_ARG( LINE_SEPARATION ));
+        OPT_VALUE_WIDTH -= strlen( OPT_ARG( LINE_SEPARATION ));
 
     if (HAVE_OPT( COL_WIDTH ))
         columnSz = OPT_VALUE_COL_WIDTH;
@@ -129,8 +129,8 @@ main( int    argc,
     if (HAVE_OPT( COLUMNS ))
         columnCt = OPT_VALUE_COLUMNS;
 
-    if (lineWidth <= 16)
-        lineWidth = 16;
+    if (OPT_VALUE_WIDTH <= 16)
+        OPT_VALUE_WIDTH = 16;
 
     readLines();
 
@@ -139,6 +139,8 @@ main( int    argc,
 
     if (HAVE_OPT( BY_COLUMNS ))
          writeColumns();
+    else if (HAVE_OPT(FILL))
+        writeFill();
     else writeRows();
 
     return EXIT_SUCCESS;
@@ -154,14 +156,8 @@ handleIndent( tCC* pzIndentArg )
     /*
      *  IF the indent argument is a number
      */
-    if (*pz == '\0') {
+    if ((*pz == '\0') && (colCt > 0) && (colCt < OPT_VALUE_WIDTH)) {
         char* p;
-
-        /*
-         *  AND that number is reasonable, ...
-         */
-        if (colCt <= 0)
-            return 0;
 
         /*
          *  Allocate a string to hold the line prefix
@@ -175,7 +171,7 @@ handleIndent( tCC* pzIndentArg )
         /*
          *  Set it to a NUL terminated string of spaces
          */
-        memset( p, ' ', (size_t)colCt );
+        memset(p, ' ', (size_t)colCt);
         p[ colCt ] = '\0';
 
     } else {
@@ -224,7 +220,7 @@ handleIndent( tCC* pzIndentArg )
 
 
 static void
-readLines( void )
+readLines(void)
 {
     int   sepLen;
 
@@ -249,9 +245,12 @@ readLines( void )
          */
         len = strlen( pzText );
         pzText += len;
-        while (isspace( pzText[-1] )) {
-            if (--pzText == zLine)
+        while (isspace(pzText[-1])) {
+            if (--pzText == zLine) {
+                if (HAVE_OPT(FILL))
+                    break;
                 goto next_line;
+            }
             len--;
         }
 
@@ -262,10 +261,9 @@ readLines( void )
          *  THEN the length is the result of the sprintf
          *  Else, compute the length.
          */
-        if (HAVE_OPT( FORMAT )) {
+        if (HAVE_OPT(FORMAT)) {
             pzText = zFmtLine;
-            len = snprintf( zFmtLine, sizeof(zFmtLine), OPT_ARG( FORMAT ),
-                            zLine );
+            len = snprintf(zFmtLine, sizeof(zFmtLine), OPT_ARG(FORMAT), zLine);
         } else {
             pzText = zLine;
         }
@@ -292,7 +290,7 @@ readLines( void )
          *  the entries may get reordered.
          */
         if (sepLen > 0)
-            strcat( pzL, OPT_ARG( SEPARATION ));
+            strcat( pzL, OPT_ARG(SEPARATION));
 
         if (len > maxEntryWidth)
             maxEntryWidth = len;
@@ -307,8 +305,8 @@ readLines( void )
     /*
      *  Set the line width to the amount of space we have to play with.
      */
-    if (lineWidth < maxEntryWidth)
-        lineWidth = maxEntryWidth;
+    if ((OPT_VALUE_WIDTH < maxEntryWidth) && (! HAVE_OPT(FILL)))
+        OPT_VALUE_WIDTH = maxEntryWidth;
 
     /*
      *  If we do not have a column size set,
@@ -320,13 +318,13 @@ readLines( void )
          *  THEN compute it.
          */
         if (columnCt == 0)
-            columnCt = lineWidth / maxEntryWidth;
+            columnCt = OPT_VALUE_WIDTH / maxEntryWidth;
 
         /*
          *  IF there are to be multiple columns, ...
          */
         if (columnCt > 1) {
-            int  spreadwidth = lineWidth - maxEntryWidth;
+            int  spreadwidth = OPT_VALUE_WIDTH - maxEntryWidth;
             int  sz = spreadwidth / (columnCt-1);
 
             /*
@@ -339,7 +337,7 @@ readLines( void )
                 columnCt = (spreadwidth / maxEntryWidth) + 1;
                 if (columnCt > 1)
                      columnSz = spreadwidth / (columnCt - 1);
-                else columnSz = lineWidth;
+                else columnSz = OPT_VALUE_WIDTH;
             }
         }
     }
@@ -360,8 +358,8 @@ readLines( void )
          *  THEN compute the number of columns.
          */
         if (  (columnCt == 0)
-           || ( ((columnSz * (columnCt-1)) + maxEntryWidth) > lineWidth ))
-            columnCt = ((lineWidth - maxEntryWidth) / columnSz) + 1;
+           || (((columnSz * (columnCt-1)) + maxEntryWidth) > OPT_VALUE_WIDTH))
+            columnCt = ((OPT_VALUE_WIDTH - maxEntryWidth) / columnSz) + 1;
     }
 
     /*
@@ -433,7 +431,7 @@ writeColumns( void )
          *  even if the user specified a count!!
          */
         colCt--;
-        rem   = lineWidth - (colCt * maxEntryWidth);
+        rem   = OPT_VALUE_WIDTH - (colCt * maxEntryWidth);
 
         if ((rem == 0) || (colCt < 2) || (columnSz > 0))
             fsz = maxEntryWidth;
@@ -498,7 +496,7 @@ writeColumns( void )
                 *pz = '\0';
             }
             fputs( pzE, stdout );
-            fputc( '\n', stdout );
+            putc( '\n', stdout );
             break;
         }
 
@@ -511,7 +509,7 @@ writeColumns( void )
         if (HAVE_OPT( LINE_SEPARATION ))
             fputs( OPT_ARG( LINE_SEPARATION ), stdout );
 
-        fputc( '\n', stdout );
+        putc( '\n', stdout );
         free( (void*)pzE );
     }
 }
@@ -558,7 +556,7 @@ writeRows( void )
              */
             if (--left <= 0) {
                 fputs( pzL, stdout );
-                fputc( '\n', stdout );
+                putc( '\n', stdout );
                 free( (void*)pzL );
                 break;
             }
@@ -582,7 +580,7 @@ writeRows( void )
                 if (HAVE_OPT( LINE_SEPARATION ))
                     fputs( OPT_ARG( LINE_SEPARATION ), stdout );
 
-                fputc( '\n', stdout );
+                putc( '\n', stdout );
 
                 /*
                  *  Start the next line with any required indentation
@@ -594,8 +592,93 @@ writeRows( void )
             }
 
             free( (void*)pzL );
-        } while (left > 0);
+        }
     }
+}
+
+static int
+emitWord(char const * word, size_t len, int col)
+{
+    static int ended_with_period = 0;
+
+    if (col > 0) {
+        if (len >= (OPT_VALUE_WIDTH - col)) {
+            putc('\n', stdout);
+            if (pzLinePfx != NULL)
+                fputs(pzLinePfx, stdout);
+            col = 0;
+
+        } else {
+            if (ended_with_period) {
+                putc(' ', stdout);
+                col++;
+            }
+            putc(' ', stdout);
+            col++;
+        }
+    }
+
+    fwrite(word, len, 1, stdout);
+    col += len;
+    ended_with_period = (word[len - 1] == '.');
+
+    return col;
+}
+
+
+static void
+writeFill( void )
+{
+    char**  ppzLL = papzLines;
+    size_t  left  = usedCt;
+    int     colNo = 0;
+
+    if (pzFirstPfx != NULL)
+        fputs(pzFirstPfx, stdout);
+
+    /*
+     *  FOR every entry we are to emit, ...
+     */
+    while (left-- > 0) {
+        char* pzL = *ppzLL;
+
+        while (isspace(*pzL))  pzL++;
+
+        /*
+         *  Blank lines are magical and trigger a blank line in output.
+         */
+        if (*pzL == NUL) {
+            if (colNo > 0) /* guard against multiple blank lines */
+                putc('\n', stdout);
+            putc('\n', stdout);
+            colNo = -2;
+            free(*(ppzLL++));
+            continue;
+        }
+
+        /*
+         *  We are going to emit some output.  Make sure we're indented.
+         */
+        if (colNo < 0) {
+            if (pzLinePfx != NULL)
+                fputs(pzLinePfx, stdout);
+            colNo = 0;
+        }
+
+        do {
+            size_t tknlen;
+
+            for (tknlen = 0; pzL[tknlen] != NUL; tknlen++)
+                if (isspace(pzL[tknlen]))
+                    break;
+            colNo = emitWord(pzL, tknlen, colNo);
+            pzL += tknlen;
+            while (isspace(*pzL))  pzL++;
+        } while (*pzL != NUL);
+
+        free(*(ppzLL++));
+    }
+    putc( '\n', stdout );
 }
 
 

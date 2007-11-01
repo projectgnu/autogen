@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.13 2007/11/01 05:24:24 bkorb Exp $
  *
  *  Time-stamp:      "2007-07-04 11:14:11 bkorb"
  *
@@ -126,8 +126,7 @@ initialize( int arg_ct, char** arg_vec )
     }
 
 #else
-    optionSaveState( &autogenOptions );
-    doOptions( arg_ct, arg_vec );
+    doOptions(arg_ct, arg_vec);
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
         tSCC zBT[] = "(debug-enable 'backtrace)";

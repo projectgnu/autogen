@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.24 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:        "2007-08-04 12:39:46 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  $Id: opts.def,v 4.25 2007/11/01 05:24:24 bkorb Exp $
+ *  Time-stamp:        "2007-10-31 20:34:14 bkorb"
+ *  Last Committed:    $Date: 2007/11/01 05:24:24 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -85,10 +85,11 @@ include = <<-  _END_INCLUDE
 	# endif
 	#endif
 	typedef void (init_proc_t)( void );
-	tCC* pzTemplFileName = NULL;
+	tCC*    pzTemplFileName  = NULL;
+	ag_bool trace_is_to_pipe = AG_FALSE;
 	_END_INCLUDE;
 
-export = 'extern tCC* pzTemplFileName;';
+export = "extern tCC* pzTemplFileName;\nextern ag_bool trace_is_to_pipe;";
 
 explain =
 "AutoGen creates text files from templates using external definitions.";
@@ -566,7 +567,8 @@ flag = {
 	_EOF_;
 
     flag-code = <<- FLAG_CODE_END
-	    if (*(pOptDesc->pzLastArg) == '|')
+	    trace_is_to_pipe = (*(pOptDesc->pzLastArg) == '|');
+	    if (trace_is_to_pipe)
 	        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
 	    else
 	        pfTrace = fopen( pOptDesc->pzLastArg, "w" );

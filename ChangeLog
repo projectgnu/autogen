@@ -1,15 +1,19 @@
-2007-10-27  Bruce Korb  <bkorb@gnu.org>
+2007-10-28  Bruce Korb  <bkorb@gnu.org>
 
-	* autoopts/autoopts.h (arg_types_t): add pzFile to list of known types
-	* autoopts/file.c: new
 	* autoopts/optcode.tpl (flag.arg-type): accept "file" as a new type.
 	* autoopts/optmain.tpl (file-name-code): implement callback for "file".
 	* autoopts/optlib.tpl (VALUE): implement new #define for opened files
 	* autoopts/options_h.tpl: enumerate the new option argument type.
+	* autoopts/autoopts.h (arg_types_t): add pzFile to list of known types
+	* autoopts/file.c: new implement the functionality
 	* autoopts/test/argument.test: test this stuff
 	* autoopts/usage-txt.def: add a few new translatable strings.
 	* autoopts/usage.c (printExtendedUsage): print file existence req.
 	* doc/autogen-texi.txt: doc this stuff
+	* agen5/autogen.c (doneCheck): the option strings are gone by the time
+	doneCheck() is called.  Use a global "trace_is_to_pipe" to track
+	whether trace output is going to a pipe or a file.
+	* agen5/opts.def (trace_is_to_pipe): define and set value
 
 2007-10-27  Bruce Korb  <bkorb@gnu.org>
 

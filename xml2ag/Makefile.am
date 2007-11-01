@@ -4,7 +4,7 @@
 ##
 ##    AutoGen copyright 2002-2007 Bruce Korb
 ##
-## Time-stamp:      "2007-07-04 11:43:00 bkorb"
+## Time-stamp:      "2007-10-28 10:28:23 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##              by: bkorb
@@ -26,7 +26,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.13 2007/11/01 05:24:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -35,14 +35,14 @@ csrcs           = xmlopts.h xml2ag.c xmlopts.c fork.c
 nodist_xml2ag_SOURCES = x.c
 BUILT_SOURCES   = x.c xmlopts.c xmlopts.h
 SUBDIRS         = test
-EXTRA_DIST      = xmlopts.def fork.tpl $(csrcs)
+EXTRA_DIST      = xmlopts.def fork.tpl fork.c xml2ag.c
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) *-stamp
 INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
-AG_ENV          = top_builddir=$(top_builddir) \
-  top_srcdir=$(top_srcdir) PATH=`cd ../columns;pwd`:$$PATH ; \
+AG_ENV          = top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
+  PATH=`cd ../columns;pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 
 run_AG = $(AGexe) -L$(top_srcdir)/autoopts --definition=$(srcdir)/xmlopts.def

@@ -4,7 +4,7 @@ AutoGen Definitions aoconf.tpl;
 // checked out source files.
 
 // Time-stamp:        "2007-07-04 10:35:14 bkorb"
-// Last Committed:    $Date: 2007/10/07 16:54:54 $
+// Last Committed:    $Date: 2007/11/01 05:24:24 $
 
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
@@ -30,7 +30,6 @@ AutoGen Definitions aoconf.tpl;
 
 cfg = {
    c-name   = prefix;
-   c-val    = '@prefix@';
    c-desc   = <<- _EOF_
 	The \fIautogen\fP package installation prefix.
 	_EOF_;
@@ -38,7 +37,6 @@ cfg = {
 
 cfg = {
    c-name   = datarootdir;
-   c-val    = '@datarootdir@';
    c-desc   = <<- _EOF_
 	The root directory for various data directories.
 	In this case, there is only one, "datadir".
@@ -47,7 +45,6 @@ cfg = {
 
 cfg = {
    c-name   = datadir;
-   c-val    = '@datadir@';
    c-desc   = <<- _EOF_
 	The directory for various data directories.
 	_EOF_;
@@ -64,7 +61,6 @@ cfg = {
 
 cfg = {
    c-name   = includedir;
-   c-val    = '@includedir@';
    c-desc   = <<- _EOF_
 	The directory where the AutoOpts headers are stored.
 	This does not include the "-I" prefix gotten by specifying "cflags".
@@ -73,7 +69,6 @@ cfg = {
 
 cfg = {
    c-name   = exec_prefix;
-   c-val    = '@exec_prefix@';
    c-desc   = <<- _EOF_
 	The installation root for libraries and executables.
 	_EOF_;
@@ -81,7 +76,6 @@ cfg = {
 
 cfg = {
    c-name   = bindir;
-   c-val    = '@bindir@';
    c-desc   = <<- _EOF_
 	The destination directory for executable scripts and programs
 	installed by the \fIautogen\fP package.
@@ -90,7 +84,6 @@ cfg = {
 
 cfg = {
    c-name   = libdir;
-   c-val    = '@libdir@';
    c-desc   = <<- _EOF_
 	The libopts installation directory.
 	_EOF_;
@@ -188,6 +181,7 @@ cfg = {
 
 cfg = {
    c-name   = everything;
+   c-val    = '';
    c-desc   = <<- _EOF_
 	Print the list of all names and values, one per line.
 	_EOF_;
