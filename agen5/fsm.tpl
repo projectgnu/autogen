@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2007-07-04 11:51:31 bkorb"
+#  Time-stamp:      "2007-11-04 17:34:51 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -147,6 +147,7 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 #define DEFINE_FSM
 #include "[=(. header-file)=]"
 #include <stdio.h>
+#include <ctype.h>
 
 /*
  *  Do not make changes to this file, except between the START/END

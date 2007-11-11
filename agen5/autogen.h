@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.31 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: autogen.h,v 4.32 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-06 11:23:43 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-10 15:04:13 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  Global header file for AutoGen
  *
@@ -35,6 +35,8 @@
 #include <guile/gh.h>
 
 #include "opts.h"
+#include "expr.h"
+#include "autoopts/autoopts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
 
@@ -42,10 +44,6 @@
 #  define _STR(s) #s
 #  define STR(s)  _STR(s)
 #endif
-
-#define ISNAMECHAR( c ) (isalnum(c) || ((c) == '_') || ((c) == '-'))
-
-#define STRSIZE( s )  (sizeof(s)-1)
 
 #ifdef DEFINING
 #  define VALUE( s )  = s
@@ -77,8 +75,8 @@ typedef struct {
 
 typedef unsigned char* tpChar;
 
-#include "expr.h"
-#include "autoopts/autoopts.h"
+#define STRSIZE( s )  (sizeof(s)-1)
+
 #include "cgi-fsm.h"
 #include "defParse-fsm.h"
 
@@ -252,6 +250,7 @@ struct scanContext {
 struct outSpec {
     tOutSpec*   pNext;
     char const* pzFileFmt;
+    ag_bool     deallocFmt;
     char        zSuffix[ 1 ];
 };
 

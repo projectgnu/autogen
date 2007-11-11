@@ -1,6 +1,6 @@
 /*
  *  This file defines the string_tokenize interface
- * Time-stamp:      "2007-07-04 10:09:43 bkorb"
+ * Time-stamp:      "2007-11-04 16:47:45 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -23,7 +23,6 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
-#include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 
@@ -192,7 +191,7 @@ ao_string_tokenize( char const* str )
      *  Trim leading white space.  Use "ENOENT" and a NULL return to indicate
      *  an empty string was passed.
      */
-    while (isspace( (ch_t)*str ))  str++;
+    while (IS_WHITESPACE(*str))  str++;
     if (*str == NUL) {
     bogus_str:
         errno = ENOENT;
@@ -209,9 +208,9 @@ ao_string_tokenize( char const* str )
 
         do {
             max_token_ct++;
-            while (! isspace( *++pz ))
+            while (! IS_WHITESPACE(*++pz))
                 if (*pz == NUL) goto found_nul;
-            while (isspace( *pz ))  pz++;
+            while (IS_WHITESPACE(*pz))  pz++;
         } while (*pz != NUL);
 
     found_nul:
@@ -235,9 +234,9 @@ ao_string_tokenize( char const* str )
             res->tkn_list[ res->tkn_ct++ ] = pzDest;
             for (;;) {
                 int ch = (ch_t)*str;
-                if (isspace( ch )) {
+                if (IS_WHITESPACE(ch)) {
                 found_white_space:
-                    while (isspace( (ch_t)*++str ))  ;
+                    while (IS_WHITESPACE(*++str))  ;
                     break;
                 }
 
@@ -249,7 +248,7 @@ ao_string_tokenize( char const* str )
                         errno = EINVAL;
                         return NULL;
                     }
-                    if (isspace( (ch_t)*str ))
+                    if (IS_WHITESPACE(*str))
                         goto found_white_space;
                     break;
 
@@ -260,7 +259,7 @@ ao_string_tokenize( char const* str )
                         errno = EINVAL;
                         return NULL;
                     }
-                    if (isspace( (ch_t)*str ))
+                    if (IS_WHITESPACE(*str))
                         goto found_white_space;
                     break;
 

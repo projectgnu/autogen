@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2007-07-04 11:33:08 bkorb"
+ *  Time-stamp:      "2007-11-04 16:44:06 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.36 2007/10/30 22:01:02 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.37 2007/11/11 06:13:28 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -32,6 +32,7 @@
 #define AUTOGEN_AUTOOPTS_H
 
 #include "compat/compat.h"
+#include "ag-char-map.h"
 
 #define AO_NAME_LIMIT           127
 #define AO_NAME_SIZE            ((size_t)(AO_NAME_LIMIT + 1))
@@ -85,8 +86,6 @@ typedef int tDirection;
 
 #define PROCESSING(d)           ((d)>0)
 #define PRESETTING(d)           ((d)<0)
-
-#define ISNAMECHAR( c )         (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
 /*
  *  Procedure success codes
@@ -213,7 +212,7 @@ typedef struct {
 
 #define AGALOC( c, w )          ao_malloc((size_t)c)
 #define AGREALOC( p, c, w )     ao_realloc((void*)p, (size_t)c)
-#define AGFREE( p )             ao_free((void*)p)
+#define AGFREE(_p)              do{void*X=(void*)_p;ao_free(X);}while(0)
 #define AGDUPSTR( p, s, w )     (p = ao_strdup(s))
 
 static void *

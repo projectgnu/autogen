@@ -1,7 +1,7 @@
 
 /*
- *  Time-stamp:        "2007-07-04 11:15:33 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-10 21:59:11 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -47,7 +47,7 @@ transition  =
  { tst = init;  tev = alpha; next = name;     ttype = stash; },
  { tst = name;  tev = alpha, name_char;       ttype = stash; },
  { tst = name;  tev = equal; next = value; },
- { tst = value; tev = *;                      ttype = stash; },
+ { tst = value; tev = '*';                    ttype = stash; },
  { tst = value; tev = space;                  ttype = stash; },
  { tst = value; tev = escape; },
  { tst = value; tev = end;       next = done; ttype = separate; },

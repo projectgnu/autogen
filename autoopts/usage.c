@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.21 2007/10/30 22:01:02 bkorb Exp $
- * Time-stamp:      "2007-10-30 11:34:38 bkorb"
+ *  usage.c  $Id: usage.c,v 4.22 2007/11/11 06:13:28 bkorb Exp $
+ * Time-stamp:      "2007-11-04 16:38:00 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -479,7 +479,7 @@ printOneUsage(
      */
     if ((pOptions->fOptSet & OPTPROC_SHORTOPT) == 0)
         fputs( pAT->pzSpc, option_usage_fp );
-    else if (! isgraph( pOD->optValue)) {
+    else if (! IS_GRAPHIC(pOD->optValue)) {
         if (  (pOptions->fOptSet & (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
            == (OPTPROC_GNUUSAGE|OPTPROC_LONGOPT))
             fputc( ' ', option_usage_fp );

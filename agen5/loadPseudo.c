@@ -1,9 +1,9 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.13 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-06 12:15:42 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-10 15:29:14 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module processes the "pseudo" macro
  *
@@ -88,7 +88,7 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName )
  *  Process a suffix specification
  */
 LOCAL tCC*
-doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
+doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
 {
     /*
      *  The following is the complete list of POSIX required-to-be-legal
@@ -97,36 +97,39 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    tSCC zSuffixSpecChars[] = "=%" "abcdefghijklmnopqrstuvwxyz"
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "-_./";
     tSCC zEmptySpec[] = "Empty suffix format";
 
     tOutSpec*  pOS;
     tCC*       pzSfxFmt;
     tCC*       pzResult;
+    size_t     spn;
     static tOutSpec**  ppOSList = &pOutSpecList;
 
     /*
      *  Skip over the suffix construct
      */
-    size_t spn = strspn(pzData, zSuffixSpecChars+2);
+    pzSfxFmt = pzData;
+    while (IS_SUFFIX_CHAR(*pzSfxFmt))  pzSfxFmt++;
 
-    if (pzData[spn] != '=') {
+    if (*pzSfxFmt != '=') {
+        pzResult = pzSfxFmt;
         pzSfxFmt = NULL;
-    } else {
-        pzSfxFmt = pzData + spn; // "spn" includes format spec.
 
-        if (pzSfxFmt[1] == '(') {
-            tCC *pe  = pzSfxFmt + 1 + strlen( pzSfxFmt + 1 );
-            tCC *ptr = skipScheme( pzSfxFmt+1, pe );
-            spn = ptr - pzData;
+    } else {
+        pzSfxFmt++;
+
+        if (*pzSfxFmt == '(') {
+            tCC *pe  = pzSfxFmt + strlen( pzSfxFmt );
+            pzResult = skipScheme( pzSfxFmt, pe );
+
         } else {
-            spn += strspn( pzSfxFmt, zSuffixSpecChars );
-            if (pzSfxFmt == pzData + spn)
+            pzResult = pzSfxFmt;
+            while (IS_SUFFIX_FMT(*pzResult)) pzResult++;
+
+            if (pzSfxFmt == pzResult)
                 AG_ABEND(zEmptySpec);
         }
     }
-    pzResult = pzData + spn;
 
     /*
      *  If pzFileName is NULL, then we are called by --select-suffix.
@@ -143,12 +146,17 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      *  "spanned" text, including any '=' character, scheme expression or
      *  file name format string.
      */
-    pOS = AGALOC(sizeof( *pOS ) + (size_t)spn + 1, "Output Specification");
+    spn = pzResult - pzData;
+    {
+        size_t sz = sizeof(*pOS) + spn + 1;
+        pOS = AGALOC(sz, "Output Specification");
+        memset(pOS, NUL, sz);
+    }
     *ppOSList  = pOS;
     ppOSList   = &pOS->pNext;
     pOS->pNext = NULL;
-    memcpy( pOS->zSuffix, pzData, spn );
-    pOS->zSuffix[ spn ] = NUL;
+    memcpy(pOS->zSuffix, pzData, spn);
+    pOS->zSuffix[spn] = NUL;
 
     /*
      *  IF the suffix contains its own formatting construct,
@@ -157,33 +165,36 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
      */
     if (pzSfxFmt != NULL) {
         size_t sfx_len = pzSfxFmt - pzData;
-        pOS->zSuffix[sfx_len++] = NUL;
+        pOS->zSuffix[sfx_len-1] = NUL;
         pOS->pzFileFmt = pOS->zSuffix + sfx_len;
 
         if (*pOS->pzFileFmt == '(') {
             SCM str =
                 ag_scm_c_eval_string_from_file_line(
                     pOS->pzFileFmt, pzFileName, lineNo );
-            size_t str_size;
+            size_t str_length;
+            char const * pz;
 
-            pzSfxFmt = resolveSCM( str );
-            str_size = strlen(pzSfxFmt);
+            pzSfxFmt = pz = resolveSCM( str );
+            str_length = strlen(pzSfxFmt);
 
-            if (str_size == 0)
+            if (str_length == 0)
                 AG_ABEND(zEmptySpec);
-                
-            if (strspn(pzSfxFmt, zSuffixSpecChars) != str_size)
-                AG_ABEND(aprf("invalid file name chars in suffix:  %s",
-                              pzSfxFmt));
+            while (IS_SUFFIX_FMT(*pz))  pz++;
+
+            if ((pz - pzSfxFmt) != str_length)
+                AG_ABEND(aprf("invalid chars in suffix format:  %s", pz));
 
             /*
              *  IF the scheme replacement text fits in the space, don't
              *  mess with allocating another string.
              */
-            if (str_size < spn - sfx_len)
+            if (str_length < spn - sfx_len)
                 strcpy(pOS->zSuffix + sfx_len, pzSfxFmt);
-            else
+            else {
                 AGDUPSTR(pOS->pzFileFmt, pzSfxFmt, "suffix format");
+                pOS->deallocFmt = AG_TRUE;
+            }
         }
 
     } else {
@@ -191,7 +202,7 @@ doSuffixSpec( tCC* pzData, tCC* pzFileName, int lineNo )
          *  IF the suffix does not start with punctuation,
          *  THEN we will insert a '.' of our own.
          */
-        if (isalnum( pOS->zSuffix[0] ))
+        if (IS_VAR_FIRST_CHAR(pOS->zSuffix[0]))
              pOS->pzFileFmt = zFileFormat + 5;
         else pOS->pzFileFmt = zFileFormat;
     }
@@ -221,7 +232,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
     ag_bool line_start = AG_FALSE;
 
  skipWhiteSpace:
-    while (isspace( *pzData )) {
+    while (IS_WHITESPACE(*pzData)) {
         if (*(pzData++) == '\n') {
             line_start = AG_TRUE;
             templLineNo++;
@@ -257,9 +268,9 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  IF the token starts with an alphanumeric,
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
-    if (isalnum( *pzData )) {
+    if (IS_VAR_FIRST_CHAR(*pzData)) {
         if (strneqvcmp( pzData, zAgName, (int)sizeof(zAgName)-1 ) == 0) {
-            if (isspace( pzData[ sizeof(zAgName)-1 ] )) {
+            if (IS_WHITESPACE(pzData[ sizeof(zAgName)-1 ])) {
                 *ppzData = pzData + sizeof(zAgName);
                 return PM_EV_AUTOGEN;
             }
@@ -268,7 +279,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
         }
 
         if (strneqvcmp( pzData, zTpName, (int)sizeof(zTpName)-1 ) == 0) {
-            if (isspace( pzData[ sizeof(zTpName)-1 ] )) {
+            if (IS_WHITESPACE(pzData[ sizeof(zTpName)-1 ])) {
                 *ppzData = pzData + sizeof(zTpName)-1;
                 return PM_EV_TEMPLATE;
             }
@@ -280,37 +291,32 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
     }
 
     /*
-     *  Several transition tokens are enabled once
-     *  the "template" keyword has been processed.
+     *  Handle emacs mode markers and scheme expressions only once we've
+     *  gotten past "init" state.
      */
-    if (fsm_state == PM_ST_TEMPL) {
+    if (fsm_state > PM_ST_INIT)
         switch (*pzData) {
         case '-':
             if ((pzData[1] == '*') && (pzData[2] == '-'))
                 return PM_EV_ED_MODE;
-            /* FALLTHROUGH */
-
-        case '.':
-        case '_':
-            return PM_EV_SUFFIX;
+            break;
 
         case '(':
             return PM_EV_SCHEME;
         }
-    }
 
     /*
-     *  IF the next sequence is "-*-"
-     *  THEN we found an edit mode marker
+     *  Alphanumerics and underscore are already handled.  Thus, it must be
+     *  a punctuation character that may introduce a suffix:  '.' '-' '_'
      */
-    if (strncmp(pzData, "-*-", (size_t)3) == 0)
-        return PM_EV_ED_MODE;
+    if (IS_SUFFIX_CHAR(*pzData))
+        return PM_EV_SUFFIX;
 
     /*
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    if (ispunct( *pzData ))
+    if (IS_PUNCTUATION( *pzData ))
         return PM_EV_MARKER;
 
     /*
@@ -336,7 +342,7 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
 
     for (;;) {
         char ch = *pzData;
-        if (! ispunct( ch ))
+        if (! IS_PUNCTUATION(ch))
             break;
         *(pzMark++) = ch;
         if (++ct >= sizeof( zStartMac ))
@@ -347,6 +353,10 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
 
     *pCt = ct;
     *pzMark = NUL;
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf(pfTrace, "marker ``%s'' loaded\n", pzMark - ct);
+
     return pzData;
 }
 

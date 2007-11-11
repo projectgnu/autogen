@@ -1,10 +1,10 @@
-[+:   -*- nroff -*-
+[+:   -*- Mode: nroff -*-
 
 ## agman1.tpl -- Template for command line man pages
 ##
 ##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2007-09-09 11:20:10 bkorb"
+## Time-stamp:      "2007-11-10 14:14:12 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -29,7 +29,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.14 2007/11/11 06:13:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1

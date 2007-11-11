@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-10-30 09:19:46 bkorb"
+## Time-stamp:      "2007-11-04 10:15:16 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.36 2007/10/30 22:01:02 bkorb Exp $
+## $Id: Makefile.am,v 4.37 2007/11/11 06:13:28 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -55,7 +55,7 @@ TEXI_STAMP  = texi-stamp
 libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h
-HDRS        = $(GENHDRS) autoopts.h proto.h
+HDRS        = $(GENHDRS) autoopts.h proto.h ag-char-map.h
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the

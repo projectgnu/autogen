@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.20 2007/10/07 16:54:54 bkorb Exp $
- * Time-stamp:      "2007-07-04 11:34:33 bkorb"
+ *  $Id: putshell.c,v 4.21 2007/11/11 06:13:28 bkorb Exp $
+ * Time-stamp:      "2007-11-04 16:39:57 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -167,14 +167,14 @@ optionPutShell( tOptions* pOpts )
             pz = pOD->optArg.argString + 7;
             while (*pz != NUL) {
                 printf( "typeset -x -i %s_", pOD->pz_NAME );
-                pz += strspn( pz, " +\t\n\f" );
+                while (IS_PLUS_N_SPACE(*pz))  pz++;
+
                 for (;;) {
                     int ch = *(pz++);
-                         if (islower( ch ))  fputc( toupper( ch ), stdout );
-                    else if (isalnum( ch ))  fputc( ch, stdout );
-                    else if (isspace( ch )
-                          || (ch == '+'))    goto name_done;
-                    else if (ch == NUL)      { pz--; goto name_done; }
+                         if (IS_LOWER_CASE(ch))   fputc(toupper(ch), stdout);
+                    else if (IS_UPPER_CASE(ch))   fputc(ch, stdout);
+                    else if (IS_PLUS_N_SPACE(ch)) goto name_done;
+                    else if (ch == NUL)           { pz--; goto name_done; }
                     else fputc( '_', stdout );
                 } name_done:;
                 printf( "=%1$lu # 0x%1$lX\n", (unsigned long)val );

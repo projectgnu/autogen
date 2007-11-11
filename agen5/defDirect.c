@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.23 2007/10/30 22:01:02 bkorb Exp $
+ *  $Id: defDirect.c,v 4.24 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-10-30 10:38:11 bkorb"
- *  Last Committed:    $Date: 2007/10/30 22:01:02 $
+ *  Time-stamp:        "2007-11-04 17:35:57 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module processes definition file directives.
  *
@@ -100,13 +100,15 @@ processDirective( char* pzScan )
     /*
      *  Find the start of the directive name
      */
-    while (isspace(*pzScan)) pzScan++;
+    while (IS_WHITESPACE(*pzScan)) pzScan++;
     pzDir = pzScan;
 
     /*
-     *  Find the *END* of the directive name
+     *  Find the *END* of the directive name.  If no name, bail out.
      */
-    while (ISNAMECHAR( *pzScan )) pzScan++;
+    while (IS_ALPHABETIC(*pzScan)) pzScan++;
+    if (pzDir == pzScan)
+        return pzEnd;
 
     /*
      *  IF there is anything that follows the name, ...
@@ -116,7 +118,7 @@ processDirective( char* pzScan )
          *  IF something funny immediately follows the directive name,
          *  THEN we will ignore it completely.
          */
-        if (! isspace( *pzScan ))
+        if (! IS_WHITESPACE(*pzScan))
             return pzEnd;
 
         /*
@@ -124,7 +126,7 @@ processDirective( char* pzScan )
          *  and find the start of anything else.
          */
         *pzScan++ = NUL;
-        while (isspace(*pzScan)) pzScan++;
+        while (IS_WHITESPACE(*pzScan)) pzScan++;
     }
 
     /*
@@ -132,7 +134,7 @@ processDirective( char* pzScan )
      */
     {
         char* pz = pzScan + strlen( pzScan );
-        while ((pz > pzScan) && isspace( pz[-1] )) pz--;
+        while ((pz > pzScan) && IS_WHITESPACE(pz[-1])) pz--;
         *pz = NUL;
     }
 
@@ -155,7 +157,7 @@ findDirective( char* pzDirName )
     do  {
         if (  (strneqvcmp( pzDirName, pTbl[res].pzDirName,
                            (int)pTbl[res].nameSize ) == 0)
-           && (  isspace( pzDirName[ pTbl[res].nameSize ])
+           && (  IS_WHITESPACE(pzDirName[ pTbl[res].nameSize ])
               || (pzDirName[ pTbl[res].nameSize ] == NUL) )  )
             return res;
 
@@ -213,7 +215,7 @@ skipToEndif( char* pzStart )
             pzScan = pz + STRSIZE( zCheckList );
         }
 
-        while (isspace( *pzScan )) pzScan++;
+        while (IS_WHITESPACE(*pzScan)) pzScan++;
 
         switch (findDirective( pzScan )) {
         case DIR_ENDIF:
@@ -276,7 +278,7 @@ skipToEndmac( char* pzStart )
             pzScan = pz + STRSIZE( zCheckList );
         }
 
-        while (isspace( *pzScan )) pzScan++;
+        while (IS_WHITESPACE(*pzScan)) pzScan++;
 
         if (findDirective( pzScan ) == DIR_ENDMAC) {
             /*
@@ -328,7 +330,7 @@ skipToElseEnd( char* pzStart )
             pzScan = pz + STRSIZE( zCheckList );
         }
 
-        while (isspace( *pzScan )) pzScan++;
+        while (IS_WHITESPACE(*pzScan)) pzScan++;
 
         switch (findDirective( pzScan )) {
         case DIR_ELSE:
@@ -422,9 +424,9 @@ check_assert_str( char const* pz, char const* pzArg )
 {
     static char const fmt[] = "#assert yielded \"%s\":\n\t`%s`";
 
-    while (isspace(*pz)) pz++;
+    while (IS_WHITESPACE(*pz)) pz++;
 
-    if (isdigit(*pz)) {
+    if (IS_DEC_DIGIT(*pz)) {
         if (atoi(pz) == 0)
             AG_ABEND( aprf( fmt, "0 (zero)", pzArg ));
 
@@ -491,9 +493,9 @@ doDir_define( char* pzArg, char* pzScan )
     /*
      *  Skip any #defines that do not look reasonable
      */
-    if (! isalpha( *pzArg ))
+    if (! IS_VAR_FIRST_CHAR( *pzArg ))
         return pzScan;
-    while (ISNAMECHAR( *pzArg )) pzArg++;
+    while (IS_VARIABLE_NAME( *pzArg )) pzArg++;
 
     /*
      *  IF this is a macro definition (rather than a value def),
@@ -509,7 +511,7 @@ doDir_define( char* pzArg, char* pzScan )
      *       Therefore, move the name back over the "#define"
      *       directive itself, giving us the space needed.
      */
-    if (! isspace( *pzArg )) {
+    if (! IS_WHITESPACE(*pzArg)) {
         char* pzS = pzName;
         char* pzD = (pzName -= 6);
 
@@ -526,12 +528,12 @@ doDir_define( char* pzArg, char* pzScan )
          */
         char*  pz = pzArg+1;
         *pzArg++ = '=';
-        while (isspace( *pz )) pz++;
+        while (IS_WHITESPACE(*pz)) pz++;
 
         for (;;) {
             if ((*pzArg++ = *pz++) == NUL)
                 break;
-            if (! ISNAMECHAR( *pz )) {
+            if (! IS_UNQUOTABLE(*pz)) {
                 *pzArg = NUL;
                 break;
             }
@@ -843,8 +845,8 @@ doDir_line( char* pzArg, char* pzScan )
      *
      *  Start by scanning up to and extracting the line number.
      */
-    while (isspace( *pzArg )) pzArg++;
-    if (! isdigit( *pzArg ))
+    while (IS_WHITESPACE(*pzArg)) pzArg++;
+    if (! IS_DEC_DIGIT(*pzArg))
         return pzScan;
 
     pCurCtx->lineNo = strtol( pzArg, &pzArg, 0 );
@@ -853,7 +855,7 @@ doDir_line( char* pzArg, char* pzScan )
      *  Now extract the quoted file name string.
      *  We dup the string so it won't disappear on us.
      */
-    while (isspace( *pzArg )) pzArg++;
+    while (IS_WHITESPACE(*pzArg)) pzArg++;
     if (*(pzArg++) != '"')
         return pzScan;
     {

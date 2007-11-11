@@ -1,11 +1,11 @@
 /*
- *  $Id: gdemit.c,v 4.10 2007/10/28 19:27:54 bkorb Exp $
+ *  $Id: gdemit.c,v 4.11 2007/11/11 06:13:28 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2007-07-04 11:38:02 bkorb"
- *  Last Modified:     $Date: 2007/10/28 19:27:54 $
+ *  Time-stamp:        "2007-11-04 10:37:09 bkorb"
+ *  Last Modified:     $Date: 2007/11/11 06:13:28 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
@@ -28,7 +28,7 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 compressDef( char* pz );
 

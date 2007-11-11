@@ -2,10 +2,10 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.14 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: tpParse.c,v 4.15 2007/11/11 06:13:28 bkorb Exp $
  *
- * Time-stamp:        "2007-07-04 11:31:58 bkorb"
- * Last Committed:    $Date: 2007/10/07 16:54:54 $
+ * Time-stamp:        "2007-11-10 14:45:11 bkorb"
+ * Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module will load a template and return a template structure.
  *
@@ -57,10 +57,10 @@ whichFunc( tCC** ppzScan )
     int           cmp;
 
     /*
-     *  IF the name starts with a punctuation,
-     *  THEN we will use strncmp instead of strneqvcmp to test values.
+     *  IF the name starts with a punctuation, then it is some sort of
+     *  alias.  Find the function in the alias portion of the table.
      */
-    if (ispunct( *pzFuncName )) {
+    if (IS_PUNCTUATION(*pzFuncName)) {
         hi = FUNC_ALIAS_HIGH_INDEX;
         lo = FUNC_ALIAS_LOW_INDEX;
         do  {
@@ -83,7 +83,7 @@ whichFunc( tCC** ppzScan )
         return FTYP_BOGUS;
     }
 
-    if (! isalpha( *pzFuncName ))
+    if (! IS_VAR_FIRST_CHAR(*pzFuncName))
         return FTYP_BOGUS;
 
     hi = FUNC_NAMES_HIGH_INDEX;
@@ -97,7 +97,7 @@ whichFunc( tCC** ppzScan )
             /*
              *  Make sure we matched to the end of the token.
              */
-            if (ISNAMECHAR( pzFuncName[pNT->cmpLen] ))
+            if (IS_VARIABLE_NAME(pzFuncName[pNT->cmpLen]))
                 break;
 
             /*
@@ -118,8 +118,14 @@ whichFunc( tCC** ppzScan )
     pCurMacro->ozName = (pCurTemplate->pNext - pCurTemplate->pzTemplText);
     {
         char* pzCopy = pCurTemplate->pNext;
-        while (ISNAMECHAR( *pzFuncName ))
+        while (IS_VALUE_NAME(*pzFuncName))
             *(pzCopy++) = *(pzFuncName++);
+        /*
+         *  Names are allowed to contain colons, but not end with them.
+         */
+        if (pzCopy[-1] == ':')
+            pzCopy--, pzFuncName--;
+
         *(pzCopy++) = NUL;
         *ppzScan = pzFuncName;
         pCurTemplate->pNext = pzCopy;
@@ -146,7 +152,7 @@ findMacroEnd( tCC** ppzMark )
     /*
      *  Set our pointers to the start of the macro text
      */
-    while (isspace( *pzMark )) {
+    while (IS_WHITESPACE(*pzMark)) {
         if (*(pzMark++) == '\n')
             templLineNo++;
     }
@@ -293,8 +299,11 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             /*
              *  Strip white space from the macro
              */
-            while ((pzMark < pzMacEnd) && isspace( *pzMark ))  pzMark++;
-            while ((pzMacEnd > pzMark) && isspace( pzMacEnd[-1] )) pzMacEnd--;
+            while ((pzMark < pzMacEnd) && IS_WHITESPACE(*pzMark))
+                pzMark++;
+            while ((pzMacEnd > pzMark) && IS_WHITESPACE(pzMacEnd[-1]))
+                pzMacEnd--;
+
             if (pzMark != pzMacEnd) {
                 pM->ozText = (uintptr_t)pzMark;
                 pM->res    = (long)(pzMacEnd - pzMark);
@@ -316,7 +325,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
              *  from the end macro marker to EOL.  Anything else on the line
              *  will suppress the feature.
              */
-            while (isspace( *pz )) {
+            while (IS_WHITESPACE(*pz)) {
                 if (*(pz++) == '\n') {
                     templLineNo++;
                     pzScan = pz;
@@ -331,7 +340,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
          *       will be non-NULL.
          */
         {
-            tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))( pTpl, pM, &pzScan );
+            tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))(pTpl, pM, &pzScan);
 
 #if defined(DEBUG_ENABLED)
             if (HAVE_OPT( SHOW_DEFS )) {

@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcEval.c,v 4.16 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: funcEval.c,v 4.17 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:26:16 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 16:53:04 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module evaluates macro expressions.
  *
@@ -544,7 +544,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
             if (pzNextExpr >= pz + srcLen)
                 AG_ABEND_IN( pT, pMac, "`?' needs two expressions" );
 
-            if (! isspace( *pzNextExpr ))
+            if (! IS_WHITESPACE(*pzNextExpr))
                 AG_ABEND_IN( pT, pMac, "No space between expressions" );
 
             /*
@@ -553,7 +553,7 @@ mLoad_Expr( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
              *  into the macro type code as the "secondary type".
              */
             *(pzNextExpr++) = NUL;
-            while (isspace( *pzNextExpr ))  pzNextExpr++;
+            while (IS_WHITESPACE(*pzNextExpr))  pzNextExpr++;
             pMac->res |= (exprType( pzNextExpr ) << EMIT_SECONDARY_SHIFT);
             pMac->endIndex = pzNextExpr - pT->pzTemplText;
         }

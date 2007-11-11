@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-10-30 09:21:48 bkorb"
-# ID:  $Id: options_h.tpl,v 4.35 2007/10/30 22:01:02 bkorb Exp $
+# Time-stamp:      "2007-11-03 17:24:19 bkorb"
+# ID:  $Id: options_h.tpl,v 4.36 2007/11/11 06:13:28 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -158,13 +158,12 @@ rm  -f opt-state.[ch]
 
 #define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)
 
-#define SELECTED_OPT( pod )   ((pod)->fOptState  & OPTST_SELECTED_MASK)
-#define UNUSED_OPT(   pod )   (((pod)->fOptState & OPTST_SET_MASK) == 0)
-#define DISABLED_OPT( pod )   ((pod)->fOptState  & OPTST_DISABLED)
-#define OPTION_STATE( pod )   ((pod)->fOptState)
-
-#define OPTST_SET_ARGTYPE(n)  ((n) << OPTST_ARG_TYPE_1_ID)
-#define OPTST_GET_ARGTYPE(f)  (((f) & OPTST_ARG_TYPE_MASK)>>OPTST_ARG_TYPE_1_ID)
+#define SELECTED_OPT(_od)     ((_od)->fOptState  & OPTST_SELECTED_MASK)
+#define UNUSED_OPT(  _od)     (((_od)->fOptState & OPTST_SET_MASK) == 0)
+#define DISABLED_OPT(_od)     ((_od)->fOptState  & OPTST_DISABLED)
+#define OPTION_STATE(_od)     ((_od)->fOptState)
+#define OPTST_SET_ARGTYPE(_n) ((_n) << OPTST_ARG_TYPE_1_ID)
+#define OPTST_GET_ARGTYPE(_f) (((_f)&OPTST_ARG_TYPE_MASK)>>OPTST_ARG_TYPE_1_ID)
 
 /*
  *  PRIVATE INTERFACES
@@ -223,14 +222,14 @@ typedef struct optNames tOptNames;
  *  The option procedures do the special processing for each
  *  option flag that needs it.
  */
-typedef void (tOptProc)( tOptions*  pOpts, tOptDesc* pOptDesc );
+typedef void (tOptProc)(tOptions*  pOpts, tOptDesc* pOptDesc);
 typedef tOptProc*  tpOptProc;
 
 /*
  *  The usage procedure will never return.  It calls "exit(2)"
  *  with the "exitCode" argument passed to it.
  */
-typedef void (tUsageProc)( tOptions* pOpts, int exitCode );
+typedef void (tUsageProc)(tOptions* pOpts, int exitCode);
 typedef tUsageProc* tpUsageProc;
 
 /*

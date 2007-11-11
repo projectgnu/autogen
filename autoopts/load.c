@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.31 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:      "2007-07-04 10:22:44 bkorb"
+ *  $Id: load.c,v 4.32 2007/11/11 06:13:28 bkorb Exp $
+ *  Time-stamp:      "2007-11-04 16:43:50 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -254,7 +254,7 @@ insertProgramPath(
      *  allocated and we need to deallocate it.
      */
     if (pzPath != pzProgPath)
-        free( (void*)pzPath );
+        AGFREE(pzPath);
     return AG_TRUE;
 }
 
@@ -270,7 +270,7 @@ insertEnvVal(
 
     for (;;) {
         int ch = (int)*++pzName;
-        if (! ISNAMECHAR( ch ))
+        if (! IS_VALUE_NAME(ch))
             break;
         *(pzDir++) = (char)ch;
     }
@@ -304,16 +304,16 @@ mungeString( char* pzTxt, tOptionLoadMode mode )
     if (mode == OPTION_LOAD_KEEP)
         return;
 
-    if (isspace( (int)*pzTxt )) {
+    if (IS_WHITESPACE(*pzTxt)) {
         char* pzS = pzTxt;
         char* pzD = pzTxt;
-        while (isspace( (int)*++pzS ))  ;
+        while (IS_WHITESPACE(*++pzS))  ;
         while ((*(pzD++) = *(pzS++)) != NUL)   ;
         pzE = pzD-1;
     } else
         pzE = pzTxt + strlen( pzTxt );
 
-    while ((pzE > pzTxt) && isspace( (int)pzE[-1] ))  pzE--;
+    while ((pzE > pzTxt) && IS_WHITESPACE(pzE[-1]))  pzE--;
     *pzE = NUL;
 
     if (mode == OPTION_LOAD_UNCOOKED)
@@ -363,11 +363,11 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode )
      *  because we'll have to skip over an immediately following ':' or '='
      *  (and the white space following *that*).
      */
-    space_break = isspace((int)*pzEnd);
+    space_break = IS_WHITESPACE(*pzEnd);
     *(pzEnd++) = NUL;
-    while (isspace((int)*pzEnd))  pzEnd++;
+    while (IS_WHITESPACE(*pzEnd))  pzEnd++;
     if (space_break && ((*pzEnd == ':') || (*pzEnd == '=')))
-        while (isspace((int)*++pzEnd))  ;
+        while (IS_WHITESPACE(*++pzEnd))  ;
 
     return pzEnd;
 }
@@ -387,7 +387,7 @@ loadOptionLine(
     tDirection  direction,
     tOptionLoadMode   load_mode )
 {
-    while (isspace( (int)*pzLine ))  pzLine++;
+    while (IS_WHITESPACE(*pzLine))  pzLine++;
 
     {
         char* pzArg = assembleArgValue( pzLine, load_mode );

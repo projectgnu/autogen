@@ -1,8 +1,8 @@
 #! /bin/sh
 set -x
 
-# Time-stamp:        "2007-07-04 10:23:13 bkorb"
-# Last Committed:    $Date: 2007/10/07 16:54:54 $
+# Time-stamp:        "2007-11-03 17:19:02 bkorb"
+# Last Committed:    $Date: 2007/11/11 06:13:28 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -31,7 +31,7 @@ srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 rm -f ${destdir}/options.h
 exec 3> ${destdir}/options.h
-sed '/^#include <sys/q' ${srcdir}/autoopts/options.h >&3
+sed '/^#include <stdio/q' ${srcdir}/autoopts/options.h >&3
 
 if egrep 'define +HAVE_STDINT_H' ${top_builddir}/config.h >/dev/null
 then echo '#include <stdint.h>' >&3

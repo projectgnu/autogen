@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.13 2007/11/01 05:24:24 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.14 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:      "2007-07-04 11:14:11 bkorb"
+ *  Time-stamp:      "2007-11-10 13:59:45 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -116,16 +116,6 @@ initialize( int arg_ct, char** arg_vec )
 #endif
     }
 
-#ifndef DAEMON_ENABLED
-    doOptions( arg_ct, arg_vec );
-
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zBT[] = "(debug-enable 'backtrace)";
-        pzLastScheme = zBT;
-        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
-    }
-
-#else
     doOptions(arg_ct, arg_vec);
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
@@ -133,6 +123,8 @@ initialize( int arg_ct, char** arg_vec )
         pzLastScheme = zBT;
         ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
     }
+
+#ifdef DAEMON_ENABLED
 
     if (! HAVE_OPT( DAEMON ))
         return;
@@ -167,9 +159,9 @@ addSysEnv( char* pzEnvName )
     int i = 2;
 
     for (;;) {
-        if (isupper( pzEnvName[i] ))
-            pzEnvName[i] = tolower( pzEnvName[i] );
-        else if (! isalnum( pzEnvName[i] ))
+        if (IS_UPPER_CASE(pzEnvName[i]))
+            pzEnvName[i] = tolower(pzEnvName[i]);
+        else if (! IS_ALPHANUMERIC(pzEnvName[i]))
             pzEnvName[i] = '_';
 
         if (pzEnvName[ ++i ] == NUL)
@@ -199,7 +191,7 @@ evalProto( tCC** ppzS, uint16_t* pProto )
 {
     tCC* pzS = *ppzS;
 
-    if (isalpha( *pzS )) {
+    if (IS_ALPHABETIC(*pzS)) {
         inet_family_map_t* pMap = inet_family_map;
         do  {
             if (strncmp( pzS, pMap->pz_name, pMap->nm_len ) == 0) {
@@ -210,7 +202,7 @@ evalProto( tCC** ppzS, uint16_t* pProto )
         } while ( (++pMap)->pz_name != NULL );
     }
 
-    return isdigit( *pzS );
+    return IS_DEC_DIGIT(*pzS);
 }
 
 

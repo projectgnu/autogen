@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.21 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:      "2007-08-03 23:03:45 bkorb"
+ *  $Id: nested.c,v 4.22 2007/11/11 06:13:28 bkorb Exp $
+ *  Time-stamp:      "2007-11-04 16:30:00 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -175,12 +175,12 @@ addBoolValue( void** pp, char const* pzName, size_t nameLen,
     pNV = AGALOC( sz, "option name/bool value pair" );
     if (pNV == NULL)
         return NULL;
-    while (isspace( (int)*pzValue ) && (dataLen > 0)) {
+    while (IS_WHITESPACE(*pzValue) && (dataLen > 0)) {
         dataLen--; pzValue++;
     }
     if (dataLen == 0)
         pNV->v.boolVal = 0;
-    else if (isdigit( (int)*pzValue ))
+    else if (IS_WHITESPACE(*pzValue))
         pNV->v.boolVal = atoi( pzValue );
     else switch (*pzValue) {
     case 'f':
@@ -215,7 +215,7 @@ addNumberValue( void** pp, char const* pzName, size_t nameLen,
     pNV = AGALOC( sz, "option name/bool value pair" );
     if (pNV == NULL)
         return NULL;
-    while (isspace( (int)*pzValue ) && (dataLen > 0)) {
+    while (IS_WHITESPACE(*pzValue) && (dataLen > 0)) {
         dataLen--; pzValue++;
     }
     if (dataLen == 0)
@@ -273,46 +273,34 @@ static char const*
 scanNameEntry(char const* pzName, tOptionValue* pRes)
 {
     tOptionValue* pNV;
-    char const * pzScan = pzName+1;
+    char const * pzScan = pzName+1; /* we know first char is a name char */
     char const * pzVal;
     size_t       nameLen = 1;
     size_t       dataLen = 0;
 
-    while (ISNAMECHAR( (int)*pzScan ))  { pzScan++; nameLen++; }
+    while (IS_OPTION_NAME(*pzScan))     { pzScan++; nameLen++; }
+    while (IS_HORIZ_WHITE(*pzScan))     pzScan++;
 
-    while (isspace( (int)*pzScan )) {
-        char ch = *(pzScan++);
-        if ((ch == '\n') || (ch == ',')) {
-            addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL,(size_t)0);
-            return pzScan - 1;
-        }
-    }
-
+re_switch:
     switch (*pzScan) {
     case '=':
     case ':':
-        while (isspace( (int)*++pzScan ))  ;
-        switch (*pzScan) {
-        case ',':  goto comma_char;
-        case '"':
-        case '\'': goto quote_char;
-        case NUL:  goto nul_byte;
-        default:   goto default_char;
-        }
+        while (IS_HORIZ_WHITE( (int)*++pzScan ))  ;
+        if ((*pzScan == '=') || (*pzScan == ':'))
+            goto default_char;
+        goto re_switch;
 
+    case '\n':
     case ',':
-    comma_char:
         pzScan++;
         /* FALLTHROUGH */
 
     case NUL:
-    nul_byte:
         addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         break;
 
     case '"':
     case '\'':
-    quote_char:
         pzVal = pzScan;
         pzScan = scanQuotedString( pzScan );
         dataLen = pzScan - pzVal;
@@ -378,7 +366,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
     tOptionValue* pNewVal;
     tOptionLoadMode save_mode = option_load_mode;
 
-    if (! isalpha((int)*pzName)) {
+    if (! IS_VAR_FIRST_CHAR(*pzName)) {
         switch (*pzName) {
         default:
             pzName = NULL;
@@ -400,7 +388,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
     }
 
     pzScan++;
-    while (ISNAMECHAR( (int)*pzScan ))  { pzScan++; nameLen++; }
+    while (IS_VALUE_NAME( (int)*pzScan ))  { pzScan++; nameLen++; }
     if (nameLen > 64)
         return NULL;
     valu.valType = OPARG_TYPE_STRING;
@@ -463,7 +451,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
         }
         valLen = (pzScan - pzVal);
         pzScan += nameLen + 3;
-        while (isspace(  (int)*pzScan ))  pzScan++;
+        while (IS_WHITESPACE(*pzScan))  pzScan++;
     }
 
     switch (valu.valType) {
@@ -630,7 +618,7 @@ optionLoadNested(char const* pzTxt, char const* pzName, size_t nameLen)
         errno = EINVAL;
         return NULL;
     }
-    while (isspace( (int)*pzTxt ))  pzTxt++;
+    while (IS_WHITESPACE(*pzTxt))  pzTxt++;
     if (*pzTxt == NUL) {
         errno = ENOENT;
         return NULL;
@@ -658,8 +646,8 @@ optionLoadNested(char const* pzTxt, char const* pzName, size_t nameLen)
      *  Scan until we hit a NUL.
      */
     do  {
-        while (isspace( (int)*pzTxt ))  pzTxt++;
-        if (isalpha( (int)*pzTxt )) {
+        while (IS_WHITESPACE( (int)*pzTxt ))  pzTxt++;
+        if (IS_VAR_FIRST_CHAR( (int)*pzTxt )) {
             pzTxt = scanNameEntry( pzTxt, pRes );
         }
         else switch (*pzTxt) {

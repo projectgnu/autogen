@@ -1,3 +1,24 @@
+2007-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/ag-char-map.h: new file with custom character categories
+	* all over: replace ctype macros with the character categories.
+	* agen5/defLex.c (assembleName): remove the "zNameChars" private
+	character category map
+	* autoopts/cook.c (ao_string_cook_escape_char): use the char
+	categories for detecting hex and octal numbers.
+
+2007-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c (compile_re): make the pattern argument
+	"char const *" because it does not modify the string, but
+	coerce it into "char *" because that is what "regcomp" uses.
+	* autoopts/autoopts.h (AGFREE): coerce the argument into being
+	deallocatable.
+	* autoopts/install-options-h (#include): the ending file name is
+	now "stdio.h", not "sys/types.h".
+	* autoopts/load.c (insertProgramPath): coerce the pointer to be
+	deallocated into "void *" from "char const *".
+
 2007-10-28  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl (flag.arg-type): accept "file" as a new type.

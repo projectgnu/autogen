@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # pseudo.test --- test the select pseudo option
 #
-# Time-stamp:        "2007-07-04 11:30:57 bkorb"
+# Time-stamp:        "2007-11-10 15:44:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2007/11/11 06:13:28 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: pseudo.test,v 4.5 2007/10/07 16:54:54 bkorb Exp $
+# $Id: pseudo.test,v 4.6 2007/11/11 06:13:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -32,43 +32,47 @@
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating ${testname}.tpl
-cat > ${testname}.tpl <<'_EOF_'
-[= AutoGen5 Template
+cat > ${testname}.tpl <<- \_EOF_
+	[= AutoGen5 Template
 
-(define f-name "")
+	(define f-name "")
 
-h=(begin
-    (set! f-name (string-append (getenv "incdir") "/%s-hdr.%s"))
-    (shellf
-    "d=`dirname %s`
-    test -d ${d} || mkdir -p $d || die cannot mkdir $d"
-    f-name)
-    f-name
-  )
+	h=(begin
+	    (set! f-name (getenv "incdir"))
+	    (if (not (string? f-name)) (set! f-name "."))
+	    (set! f-name (string-append f-name "/%s-hdr.%s"))
+	    (shellf
+	    "d=`dirname %s`
+	    test -d ${d} || mkdir -p $d || die cannot mkdir $d"
+	    f-name)
+	    f-name
+	  )
 
-c=(begin
-    (set! f-name (string-append (getenv "srcdir") "/%s-body.%s"))
-    (shellf
-    "d=`dirname %s`
-    test -d ${d} || mkdir -p $d || die cannot mkdir $d"
-    f-name)
-    f-name
-  )
+	c=(begin
+	    (set! f-name (getenv "srcdir"))
+	    (if (not (string? f-name)) (set! f-name "."))
+	    (set! f-name (string-append f-name "/%s-body.%s"))
+	    (shellf
+	    "d=`dirname %s`
+	    test -d ${d} || mkdir -p $d || die cannot mkdir $d"
+	    f-name)
+	    f-name
+	  )
 
-# end of pseudo
-=]
-[=
+	# end of pseudo
+	=]
+	[=
 
-(sprintf "two file create %s: " (suffix)) =][=
+	(sprintf "two file create %s: " (suffix)) =][=
 
-CASE (suffix) =][=
+	CASE (suffix) =][=
 
-== h =]HEADER FILE[=
-== c =]BODY 4 FILE[=
-*    =][= (error "woops") =][=
+	== h =]HEADER FILE[=
+	== c =]BODY 4 FILE[=
+	*    =][= (error "woops") =][=
 
-ESAC =]
-_EOF_
+	ESAC =]
+	_EOF_
 
 # # # # # # # # # # RUN TESTS # # # # # # #
 

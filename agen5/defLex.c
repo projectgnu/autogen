@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.21 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: defLex.c,v 4.22 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:16:53 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 17:36:53 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -84,7 +84,7 @@ scanAgain:
      *  We branch here after skipping over a comment
      *  or processing a directive (which may change our context).
      */
-    if (isspace( *pCurCtx->pzScan )) {
+    if (IS_WHITESPACE( *pCurCtx->pzScan )) {
         char* pz = pCurCtx->pzScan;
         if (*pz == '\n')
             pCurCtx->lineNo++;
@@ -94,7 +94,7 @@ scanAgain:
          *  This ensures that any names found previously
          *  are NUL terminated.
          */
-        while (isspace(*pz)) {
+        while (IS_WHITESPACE(*pz)) {
             if (*pz == '\n')
                 pCurCtx->lineNo++;
             pz++;
@@ -191,7 +191,7 @@ scanAgain:
                     pz = pCurCtx->pzScan + strlen( pCurCtx->pzScan );
                     break;
                 }
-                if (isspace( pz[1] )) {
+                if (IS_WHITESPACE( pz[1] )) {
                     *pz = NUL;
                     pz[1] = ';';
                     break;
@@ -455,9 +455,9 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
      *  Check for a number.
      *  Scan it in and advance "pzScan".
      */
-    if (  isdigit( *pzScan )
+    if (  IS_DEC_DIGIT( *pzScan )
        || (  (*pzScan == '-')
-          && isdigit( pzScan[1] )
+          && IS_DEC_DIGIT( pzScan[1] )
        )  )  {
         pz_token = pzScan;
         (void)strtol( pzScan, &pzScan, 0 );
@@ -465,67 +465,27 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
         return pzScan;
     }
 
+    if (! IS_UNQUOTABLE(*pzScan))
+        AG_ABEND( aprf("%s Error: Invalid input char '%c' in %s on line %d\n",
+                       pzProg, *pzScan, pCurCtx->pzCtxFname, pCurCtx->lineNo));
+
     {
-        static unsigned char zNameChars[ 256 ];
         unsigned char* pz = (unsigned char*)pzScan;
 
-        if (zNameChars[ (unsigned)'a' ] == 0) {
-            /*
-             *  Default to accepting as "OTHER_NAME" all characters
-             */
-            u_int  idx = ((unsigned)' ') + 1;
-            do  {
-                zNameChars[ idx ] = ISNAMECHAR(idx) ? 1 : 2;
-            } while (++idx <= (unsigned)'~');
+        while (IS_VALUE_NAME(*pz))          pz++;
 
-            /*
-             *  Now disallow entirely characters we use specially
-             */
-            zNameChars[ (unsigned)'"' ] = 0;
-            zNameChars[ (unsigned)'#' ] = 0;
-            zNameChars[ (unsigned)'(' ] = 0;
-            zNameChars[ (unsigned)')' ] = 0;
-            zNameChars[ (unsigned)',' ] = 0;
-            zNameChars[ (unsigned)';' ] = 0;
-            zNameChars[ (unsigned)'<' ] = 0;
-            zNameChars[ (unsigned)'=' ] = 0;
-            zNameChars[ (unsigned)'>' ] = 0;
-            zNameChars[ (unsigned)'[' ] = 0;
-            zNameChars[ (unsigned)'\''] = 0;
-            zNameChars[ (unsigned)']' ] = 0;
-            zNameChars[ (unsigned)'`' ] = 0;
-            zNameChars[ (unsigned)'{' ] = 0;
-            zNameChars[ (unsigned)'}' ] = 0;
-        }
-
-        /*
-         *  Skip over VAR_NAME characters
-         */
-        while (zNameChars[ *pz ] == 1) pz++;
-
-        /*
-         *  IF the next character terminates the token,
-         *  THEN see if we got any characters at all
-         *  ELSE skip over the rest of the OTHER_NAME
-         */
-        if (zNameChars[ *pz ] == 0) {
-            if (pz == (unsigned char*)pzScan)
-                AG_ABEND( aprf( "%s Error: Invalid input char '%c' "
-                                "in %s on line %d\n", pzProg, *pzScan,
-                                pCurCtx->pzCtxFname, pCurCtx->lineNo ));
-
-            *pRetVal = DP_EV_VAR_NAME;
-        } else {
+        if (IS_UNQUOTABLE(*pz)) {
             *pRetVal = DP_EV_OTHER_NAME;
-            while (zNameChars[ *pz ] != 0) pz++;
-        }
+            while (IS_UNQUOTABLE(*++pz))    ;
+        } else
+            *pRetVal = DP_EV_VAR_NAME;         
 
         /*
          *  Return a NAME token, maybe.
          *  If the name is actually a keyword,
          *  we will return that token code instead.
          */
-        pz_token   = pzScan;
+        pz_token = pzScan;
         pzScan   = (char*)pz;
     }
 
@@ -578,7 +538,7 @@ assembleHereString( char* pzScan )
     /*
      *  Skip white space up to the marker or EOL
      */
-    while (isspace( *pzScan )) {
+    while (IS_WHITESPACE( *pzScan )) {
         if (*pzScan++ == '\n')
             AG_ABEND( aprf( zErrMsg, pzProg, "HereString missing the mark",
                             pCurCtx->pzCtxFname, pCurCtx->lineNo ));
@@ -589,7 +549,7 @@ assembleHereString( char* pzScan )
      */
     {
         char* pz = zMark;
-        while (ISNAMECHAR( *pzScan )) {
+        while (IS_VARIABLE_NAME( *pzScan )) {
             if (++markLen >= sizeof(zMark))
                 AG_ABEND( aprf( zErrMsg, pzProg, "HereString mark "
                                 STR( MAX_HEREMARK_LEN ) " or more chars",
@@ -629,7 +589,7 @@ assembleHereString( char* pzScan )
      *  DO copy characters
      */
     while (  (strncmp( pzScan, zMark, markLen ) != 0)
-          || ISNAMECHAR( pzScan[ markLen ]) )  {
+          || IS_VARIABLE_NAME( pzScan[ markLen ]) )  {
 
         for (;;) {
             switch (*(pzDest++) = *(pzScan++)) {

@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.25 2007/10/28 19:27:54 bkorb Exp $
+ *  $Id: agShell.c,v 4.26 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-10-28 11:29:13 bkorb"
- *  Last Committed:    $Date: 2007/10/28 19:27:54 $
+ *  Time-stamp:        "2007-11-04 17:32:38 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  Manage a server shell process
  *
@@ -506,7 +506,7 @@ loadData( void )
      *  Trim off all trailing white space and shorten the buffer
      *  to the size actually used.
      */
-    while ((pzScan > pzText) && isspace( pzScan[-1] )) pzScan--;
+    while ((pzScan > pzText) && IS_WHITESPACE(pzScan[-1])) pzScan--;
     textSize = (pzScan - pzText) + 1;
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {

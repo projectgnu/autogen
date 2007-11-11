@@ -1,6 +1,6 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.32 2007/10/30 22:01:02 bkorb Exp $
+#$Id: optcode.tpl,v 4.33 2007/11/11 06:13:28 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
 # Time-stamp:      "2007-10-28 16:25:42 bkorb"
@@ -149,7 +149,7 @@ tSCC zCopyrightNotice[] =
 
 (emit (def-file-line "copyright.text" extract-fmt))
 (kr-string (shell (string-append
-"set -x ; ${CLexe} --fill <<\\_EOF_\n" tmp-text "\n_EOF_\nset +x\n"
+"${CLexe} --fill <<\\_EOF_\n" tmp-text "\n_EOF_"
 ))) =];[=
 
 ENDIF "copyright notes"

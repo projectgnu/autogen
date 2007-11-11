@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2007-07-04 11:31:28 bkorb"
+# Time-stamp:        "2007-11-10 17:11:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2007/11/11 06:13:28 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -23,7 +23,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: string.test,v 4.9 2007/10/07 16:54:54 bkorb Exp $
+# $Id: string.test,v 4.10 2007/11/11 06:13:28 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -96,7 +96,7 @@ char zExpect[] = "'\f\r\b\v\t\a\n\n"
        "#endif /* .\n"
        "and it'll be a \"hassle\"."
        "\001\002\003\377\n'";
-#define expectSize (sizeof(zExpect) - 1)
+#define expectSize ((int)(sizeof(zExpect) - 1))
 int checkStr( char* pz, char const* pzWhat );
 int checkStr( char* pz, char const* pzWhat )
 {
@@ -127,7 +127,7 @@ int checkStr( char* pz, char const* pzWhat )
         res = 1;
     } else if (*pzR != '\0') {
         fprintf( stderr, "%s has %d residual characters:\n==>%s<==\n",
-                 pzWhat, strlen(pzR), pzR );
+                 pzWhat, (int)strlen(pzR), pzR );
         res = 1;
     }
     return res;
@@ -216,7 +216,7 @@ string =
 \#endif /* .
 '
     "and it'll be a \"hassle\"."
-    "\001\002\003\377\n'";
+    "\001\x02\X03\377\n'";
 
 _EOF_
 

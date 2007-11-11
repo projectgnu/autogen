@@ -1,6 +1,6 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2007-07-04 10:29:53 bkorb"
-# $Id: bootstrap.dir,v 4.9 2007/10/07 16:54:54 bkorb Exp $
+# Time-stamp:      "2007-11-04 10:13:32 bkorb"
+# $Id: bootstrap.dir,v 4.10 2007/11/11 06:13:28 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -26,7 +26,7 @@ AGexe=${AGexe-autogen}
 noag=`if ${AGexe} -v > /dev/null 2>&1 ; then echo false ; else echo true ; fi`
 
 case "$1" in
-( *genshell.c )
+*genshell.c )
   #  We were probably invoked by make
   #
   $noag && test -f genshell.c && exit 0
@@ -34,8 +34,12 @@ case "$1" in
   ${AGexe} -L. genshell.def
   ;;
 
-( *libopts.texi )
+*libopts.texi )
   $noag && test -f libopts.texi && exit 0
   ${AGexe} -Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def
+  ;;
+
+* )
+  char-mapper autogen.map
   ;;
 esac

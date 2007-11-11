@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcFor.c,v 4.18 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: funcFor.c,v 4.19 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:26:24 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 17:39:56 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module implements the FOR text macro.
  *
@@ -506,7 +506,7 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
      */
     pzSrc  += 2;
     srcLen -= 3;
-    while (isspace( *++pzSrc ))  srcLen--;
+    while (IS_WHITESPACE(*++pzSrc))  srcLen--;
     if (*pzSrc == NUL)
         AG_ABEND_IN( pT, pMac, "FOR x IN ... has no list" );
 
@@ -538,7 +538,7 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
             /*
              *  Clean up trailing commas
              */
-            while (isspace( *pz ))  pz++;
+            while (IS_WHITESPACE(*pz))  pz++;
             if (*pz == ',')
                 pz++;
             break;
@@ -573,7 +573,7 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
         /*
          *  Clean up trailing white space
          */
-        while (isspace( *pz ))  pz++;
+        while (IS_WHITESPACE(*pz))  pz++;
 
         /*
          *  IF there is a previous entry, link its twin to this one.
@@ -794,11 +794,11 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pMac->ozName = pT->pNext - pT->pzTemplText;
     if (*pzSrc == '.') {
         *(pzCopy++) = *(pzSrc++);
-        if (! ISNAMECHAR( *pzSrc ))
+        if (! IS_VAR_FIRST_CHAR(*pzSrc))
             pzCopy--; /* force an error */
     }
 
-    while (ISNAMECHAR( *pzSrc )) *(pzCopy++) = *(pzSrc++);
+    while (IS_VALUE_NAME(*pzSrc)) *(pzCopy++) = *(pzSrc++);
     *(pzCopy++) = NUL;
 
     if (pT->pzTemplText[ pMac->ozName ] == NUL)
@@ -807,7 +807,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     /*
      *  Skip space to the start of the text following the iterator name
      */
-    while (isspace( *pzSrc )) pzSrc++;
+    while (IS_WHITESPACE(*pzSrc)) pzSrc++;
     srcLen -= pzSrc - (char*)pMac->ozText;
 
     /* * * * *
@@ -823,7 +823,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  FOR foo IN ...  -> no text, but we create an array of text values
      */
     else if (   (strneqvcmp( pzSrc, "in", 2 ) == 0)
-             && isspace( pzSrc[2] )) {
+             && IS_WHITESPACE(pzSrc[2])) {
         load_ForIn( pzSrc, srcLen, pT, pMac );
     }
 

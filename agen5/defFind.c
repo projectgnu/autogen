@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.14 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: defFind.c,v 4.15 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:15:50 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 17:03:19 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module locates definitions.
  *
@@ -75,7 +75,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
      *  '[$]' means the last entry of whatever index number
      */
     if (*pzScan == '$') {
-        while (isspace( *++pzScan )) ;
+        while (IS_WHITESPACE(*++pzScan )) ;
         if (*pzScan != ']')
             return NULL;
 
@@ -88,14 +88,14 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
     /*
      *  '[nn]' means the specified index number
      */
-    if (isdigit( *pzScan )) {
+    if (IS_DEC_DIGIT(*pzScan)) {
         char* pz;
         idx = strtol( pzScan, &pz, 0 );
 
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (isspace( *pz )) pz++;
+        while (IS_WHITESPACE(*pz )) pz++;
         if (*pz != ']')
             return NULL;
     }
@@ -107,10 +107,10 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         char* pzDef = pzScan;
         char const* pzVal;
 
-        if (! isalpha( *pzScan ))
+        if (! IS_VAR_FIRST_CHAR(*pzScan))
             return NULL;
 
-        while (ISNAMECHAR( *pzScan )) pzScan++;
+        while (IS_VALUE_NAME(*pzScan)) pzScan++;
 
         /*
          *  Temporarily remove the character under *pzScan and
@@ -126,7 +126,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (isspace( *pzScan )) pzScan++;
+        while (IS_WHITESPACE(*pzScan )) pzScan++;
         if (*pzScan != ']')
             return NULL;
 
@@ -222,7 +222,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  Before anything, skip a leading '.' as a special hack to force
      *  a current context lookup.
      */
-    while (isspace( *pzS )) {
+    while (IS_WHITESPACE(*pzS )) {
         if (--srcLen <= 0) {
             pzS = zNil;
             break;
@@ -241,7 +241,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  but an index may also start with a number.  The full number
      *  validation will happen in findEntryByIndex().
      */
-    while (isspace( *pzS )) {
+    while (IS_WHITESPACE(*pzS )) {
         if (--srcLen <= 0) {
             pzS = zNil;
             break;
@@ -251,7 +251,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
 
     switch (state) {
     case CN_START_NAME:
-        if (! isalpha( *pzS ))
+        if (! IS_VAR_FIRST_CHAR(*pzS))
             return badName( pzDst, pzOri, stLen );
         state = CN_NAME_ENDED;  /* we found the start of our first name */
         break;  /* fall through to name/number consumption code */
@@ -296,7 +296,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
          *  Numbers and #define-d names are handled at the end of the switch.
          *  '$' and ']' are handled immediately below.
          */
-        if (isalnum( *pzS ))
+        if (IS_ALPHANUMERIC(*pzS))
             break;
 
         /*
@@ -344,15 +344,15 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  Whatever, the next token must be a name or a number.
      */
     assert((state == CN_NAME_ENDED) || (state == CN_INDEX_CLOSE));
-    assert( isalnum( *pzS ));
+    assert( IS_ALPHANUMERIC(*pzS));
 
     /*
      *  Copy the name/number.  We already know the first character is valid.
      *  However, we must *NOT* downcase #define names...
      */
-    while (ISNAMECHAR( *pzS )) {
+    while (IS_VALUE_NAME(*pzS)) {
         char ch = *(pzS++);
-        if ((state != CN_INDEX_CLOSE) && isupper( ch ))
+        if ((state != CN_INDEX_CLOSE) && IS_UPPER_CASE(ch))
             *(pzD++) = tolower( ch );
 
         else switch ( ch ) { /* force the separator chars to be '_' */
@@ -472,7 +472,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
         /*
          *  We have to find a specific entry in a list.
          */
-        while (isspace( *++pcBrace )) ;
+        while (IS_WHITESPACE(*++pcBrace )) ;
 
         pE = findEntryByIndex( pE, pcBrace );
         if (pE == NULL)
@@ -664,7 +664,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
         /*
          *  We have to find a specific entry in a list.
          */
-        while (isspace( *++pcBrace )) ;
+        while (IS_WHITESPACE(*++pcBrace)) ;
 
         pE = findEntryByIndex( pE, pcBrace );
         if (pE == NULL)

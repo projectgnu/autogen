@@ -1,11 +1,11 @@
 /*
  *  agTempl.c
- *  $Id: tpProcess.c,v 4.17 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: tpProcess.c,v 4.18 2007/11/11 06:13:28 bkorb Exp $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2007-07-06 12:09:05 bkorb"
- * Last Committed:    $Date: 2007/10/07 16:54:54 $
+ * Time-stamp:        "2007-11-10 15:55:33 bkorb"
+ * Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  * This file is part of AutoGen.
  * AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -161,6 +161,30 @@ doStdoutTemplate( tTemplate* pTF )
 }
 
 
+LOCAL tOutSpec *
+nextOutSpec(tOutSpec * pOS)
+{
+    tOutSpec * res = pOS->pNext;
+    /*
+     *  The format is either something inside of zFileFormat, we did not
+     *  allocate it.  If it is specifically zSuffix + strlen + 1, then
+     *  is it part of the pOS allocation.  Otherwise, we deallocate it.
+     */
+    if ((pOS->pzFileFmt < zFileFormat) ||
+        (pOS->pzFileFmt >= zFileFormat + sizeof(zFileFormat))) {
+        char const * pz = pOS->zSuffix + strlen(pOS->zSuffix) + 1;
+        if (pOS->pzFileFmt != pz)
+            AGFREE(pOS->pzFileFmt);
+    }
+
+    if (pOS->deallocFmt)
+        AGFREE(pOS->pzFileFmt);
+
+    AGFREE(pOS);
+    return res;
+}
+
+
 LOCAL void
 processTemplate( tTemplate* pTF )
 {
@@ -176,7 +200,7 @@ processTemplate( tTemplate* pTF )
         return;
     }
 
-    for (;;) {
+    do  {
         tOutSpec*  pOS    = pOutSpecList;
 
         /*
@@ -216,9 +240,9 @@ processTemplate( tTemplate* pTF )
              *  We got here by a long jump.  Close/purge the open files.
              */
             do  {
-                closeOutput( AG_TRUE );  /* discard output */
+                closeOutput(AG_TRUE);  /* discard output */
             } while (pCurFp->pPrev != NULL);
-            pzLastScheme = NULL; /* "problem" implies requested exit. */
+            pzLastScheme = NULL; /* "problem" means "drop current output". */
             break;
 
         default:
@@ -231,39 +255,20 @@ processTemplate( tTemplate* pTF )
              *  We got here by a long jump.  Close/purge the open files.
              */
             do  {
-                closeOutput( AG_TRUE );  /* discard output */
+                closeOutput(AG_TRUE);  /* discard output */
             } while (pCurFp->pPrev != NULL);
 
             /*
              *  On failure (or unknown jump type), we quit the program, too.
              */
             procState = PROC_STATE_ABORTING;
-            exit( EXIT_FAILURE );
+            do pOS = nextOutSpec(pOS);
+            while (pOS != NULL);
+            exit(EXIT_FAILURE);
         }
 
-        /*
-         *  Advance to the next output specification
-         *  and free the old output spec.
-         */
-        pOutSpecList = pOS->pNext;
-
-        /*
-         *  The format is either something inside of zFileFormat, we did not
-         *  allocate it.  If it is specifically zSuffix + strlen + 1, then
-         *  is it part of the pOS allocation.  Otherwise, we deallocate it.
-         */
-        if ((pOS->pzFileFmt < zFileFormat) ||
-            (pOS->pzFileFmt >= zFileFormat + sizeof(zFileFormat))) {
-            char const * pz = pOS->zSuffix + strlen(pOS->zSuffix) + 1;
-            if (pOS->pzFileFmt != pz)
-                AGFREE(pOS->pzFileFmt);
-        }
-
-        AGFREE(pOS);
-
-        if (pOutSpecList == NULL)
-            break;
-    }
+        pOutSpecList = nextOutSpec(pOS);
+    } while (pOutSpecList != NULL);
 }
 
 
@@ -335,6 +340,10 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         if (pS++ == NULL)
             pS = pzDefFile;
 
+        /*
+         *  We allow users to specify a suffix with '-' and '_', but when
+         *  stripping a suffix from the "base name", we do not recognize 'em.
+         */
         pE = strchr( pS, '.' );
         if (pE != NULL) {
             size_t len = (unsigned)(pE - pS);

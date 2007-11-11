@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.16 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: funcCase.c,v 4.17 2007/11/11 06:13:28 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:25:51 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 10:35:49 bkorb"
+ *  Last Committed:    $Date: 2007/11/11 06:13:28 $
  *
  *  This module implements the CASE text function.
  */
@@ -79,10 +79,10 @@ static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by mk-fwd */
 static void
-compile_re( regex_t* pRe, char* pzPat, int flags );
+compile_re(regex_t* pRe, char const * pzPat, int flags);
 
 static void
-upString( char* pz );
+upString(char* pz);
 
 static tSuccess
 Select_Compare( tCC* pzText, tCC* pzMatch );
@@ -136,9 +136,10 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-compile_re( regex_t* pRe, char* pzPat, int flags )
+compile_re(regex_t* pRe, char const * pzPat, int flags)
 {
-    int  rerr = regcomp( pRe, pzPat, flags );
+    void * const pat = (void *)pzPat;
+    int  rerr = regcomp(pRe, pat, flags);
     if (rerr != 0) {
         char zEr[ 128 ];
         regerror( rerr, pRe, zEr, sizeof( zEr ));
@@ -149,10 +150,9 @@ compile_re( regex_t* pRe, char* pzPat, int flags )
 
 
 static void
-upString( char* pz )
+upString(char* pz)
 {
-    while (*pz != NUL)
-        PTRUP(pz);
+    while (*pz != NUL) PTRUP(pz);
 }
 
 
@@ -490,7 +490,7 @@ Select_Match( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match re" );
-        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -572,7 +572,7 @@ Select_Match_End( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match end re" );
-        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -664,7 +664,7 @@ Select_Match_Start( tCC* pzText, tCC* pzMatch )
      */
     if (pCurMacro->funcPrivate == NULL) {
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match start re" );
-        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -762,7 +762,7 @@ Select_Match_Full( tCC* pzText, tCC* pzMatch )
             fprintf( pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
                      pzMatch, pCurMacro->res );
         }
-        compile_re(pRe, (char*)pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, pzMatch, (int)pCurMacro->res);
         pCurMacro->funcPrivate = pRe;
     }
 
@@ -1293,8 +1293,10 @@ mLoad_Select( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     *(pzCopy++) = NUL;
     pT->pNext = pzCopy;
 
-    if ((*pzScan == '"') || (*pzScan == '\''))
-        spanQuote( (char*)pzScan );
+    if ((*pzScan == '"') || (*pzScan == '\'')) {
+        void * ptr = (void *)pzScan;
+        spanQuote(ptr);
+    }
 
  selection_done:
     pMac->funcCode = (teFuncType)typ;

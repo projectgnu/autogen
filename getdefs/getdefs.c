@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.12 2007/10/28 19:27:54 bkorb Exp $
+ *  $Id: getdefs.c,v 4.13 2007/11/11 06:13:28 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *
- *  Time-stamp:        "2007-07-04 11:57:32 bkorb"
+ *  Time-stamp:        "2007-11-04 10:39:32 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -33,7 +33,7 @@ typedef int (compar_func)(const void *, const void *);
 static compar_func compar_text, compar_defname;
 
 /* START-STATIC-FORWARD */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static char*
 assignIndex( char*  pzOut,  char*  pzDef );
 

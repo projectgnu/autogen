@@ -2004,26 +2004,14 @@ programs by partitioning it with lines containing,
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
 Such options may default to either an enabled or a disabled state.  You
 may also provide an enablement prefix, too, e.g., @code{--allow-mumble}
-and @code{--prevent-mumble}.
+and @code{--prevent-mumble} (@pxref{Common Attributes}).
 
 @item
-Verify that required options are present between the minimum and
-maximum number of times on the command line.
-
-@item
-Verify that conflicting options do not appear together, and that options
-that require the presence of other options are, in fact, used in the
-presence of other options.
-
-@item
-Provides a callable routine to parse
-a text string as if it were from one of the rc/ini/config files,
-hereafter referred to as a configuration file.
-
-@item
-By adding a @samp{doc} and @samp{arg-name} attributes to each option,
-AutoGen will also be able to produce a man page and the @samp{invoking}
-section of a texinfo document.
+Verify that required options are present between the minimum and maximum
+number of times on the command line.  Verify that conflicting options do not
+appear together.  Verify that options requiring the presence of other options
+are, in fact, used in the presence of other options.
+See @xref{Common Attributes} and @xref{Option Conflict Attributes}.
 
 @item
 There are several automatically supported options.  They will have short
@@ -2072,11 +2060,30 @@ option description template or by incorporating another template.
 @end enumerate
 
 @item
-Library suppliers can specify command line options that their
-client programs will accept.  They specify option definitions
-that get @code{#include}-d into the client option definitions
-and they specify an "anchor" option that has a callback and must be invoked.
-That will give the library access to the option state for their options.
+There are several methods for handling option arguments.
+
+@itemize @bullet
+@item
+nothing (@pxref{OPT_ARG}) option argument strings are globally available.
+@item
+user supplied (@pxref{Option Argument Handling})
+@item
+stack option arguments (@pxref{Option Argument Handling})
+@item
+integer numbers (@pxref{arg-type number})
+@item
+true or false valued (@pxref{arg-type boolean})
+@item
+enumerated list of names (@pxref{arg-type keyword})
+@item
+an enumeration (membership) set (@pxref{arg-type set membership})
+@item
+a list of name/value pairs (option ``subopts'') (@pxref{arg-type hierarchy})
+@item
+validated file name (@pxref{arg-type file name})
+@item
+optional option argument (@pxref{arg-optional})
+@end itemize
 
 @item
 The generated usage text can be emitted in either AutoOpts standard
@@ -2095,6 +2102,16 @@ a localization function such as @code{gettext(3GNU)}, then the option
 processing code will be localizable (@pxref{i18n}).
 
 @item
+Provides a callable routine to parse
+a text string as if it were from one of the rc/ini/config files,
+hereafter referred to as a configuration file.
+
+@item
+By adding a @samp{doc} and @samp{arg-name} attributes to each option,
+AutoGen will also be able to produce a man page and the @samp{invoking}
+section of a texinfo document.
+
+@item
 Intermingled option processing.  AutoOpts options may be intermingled with
 command line operands and options processed with other parsing techniques.
 This is accomplished by setting the @code{allow-errors}
@@ -2104,6 +2121,13 @@ again, the current option can be set with @code{RESTART_OPT(n)}
 (@pxref{RESTART_OPT}) before calling @code{optionProcess}.
 
 See: @xref{library attributes}.
+
+@item
+Library suppliers can specify command line options that their
+client programs will accept.  They specify option definitions
+that get @code{#include}-d into the client option definitions
+and they specify an "anchor" option that has a callback and must be invoked.
+That will give the library access to the option state for their options.
 
 @item
 library options.  An AutoOpt-ed library may export its options for use in
@@ -3171,12 +3195,12 @@ is @code{#define}-d.  Watch those switch statements.
 
 @node opt-attr settable
 @subsubsection Program may set option
-If the option can be set outside of option processing.  If this
-attribute is defined, special macros for setting this particular option
-will be inserted into the interface file.  For example,
+If the option can be set outside of option processing, specify
+``@code{settable}''.  If this attribute is defined, special macros for setting
+this particular option will be inserted into the interface file.  For example,
 @code{TEMPL_DIRS} is a settable option for AutoGen, so a macro named
-@code{SET_OPT_TEMPL_DIRS(a)} appears in the interface file.  This
-attribute interacts with the @var{documentation} attribute.
+@code{SET_OPT_TEMPL_DIRS(a)} appears in the interface file.  This attribute
+interacts with the @var{documentation} attribute.
 
 @node opt-attr no-preset
 @subsubsection Option cannot be pre-configured
@@ -3388,7 +3412,6 @@ Supporting attributes for particular argument types:
 * arg-keyword::             Keyword list
 * arg-optional::            Option Argument Optional
 * arg-default::             Default Option Argument Value
-* arg-range::               Numeric Range for Argument
 @end menu
 
 @node arg-keyword
@@ -3423,14 +3446,23 @@ gets configured with @code{--disable-optional-args}.
 This specifies the default option argument value to be used when the option is
 not specified or preset.
 
-@node arg-range
-@subsubsection Numeric Range for Argument
+@node arg-type string
+@subsubsection Arg Type String
+The argument may be any arbitrary string, though your program or option
+callback procedure may place additional constraints upon it.
+
+
+@node arg-type number
+@subsubsection Arg Type Number
+The argument must be a correctly formed integer, without any trailing U's or
+L's.  AutoOpts contains a library procedure to convert the string to a number.
+If you specify range checking with @code{arg-range} (see below), then AutoOpts
+produces a special purpose procedure for this option.
+
 @cindex arg-range
-If the @code{arg-type} is @code{number}, then @code{arg-range}s may be
-specified, too.  If you specify one or more of these option attributes,
-then AutoOpts will create a callback procedure for handling it.  The
-argument value supplied for the option must match one of the range
-entries.  Each arg-range should consist of either an integer by itself
+This is used to create a callback procedure for validating the range of
+the option argument.  It must match one of the range
+entries.  Each @code{arg-range} should consist of either an integer by itself
 or an integer range.  The integer range is specified by one or two
 integers separated by the two character sequence, @code{->}.
 Be sure to quote the entire range string.  The definitions parser will
@@ -3453,19 +3485,6 @@ The argument value is required.  It may not be optional.
 The value must match one of the entries.  If it can match more than one,
 then you have redundancies, but no harm will come of it.
 @end itemize
-
-@node arg-type string
-@subsubsection Arg Type String
-The argument may be any arbitrary string, though your program or option
-callback procedure may place additional constraints upon it.
-
-
-@node arg-type number
-@subsubsection Arg Type Number
-The argument must be a correctly formed integer, without any trailing U's or
-L's.  AutoOpts contains a library procedure to convert the string to a
-number.  If you specify range checking with @code{arg-range}, then AutoOpts
-produces a special purpose procedure for this option.
 
 
 @node arg-type boolean
@@ -3765,7 +3784,7 @@ AutoOpts provides automated support for six options.  @code{help} and
 one @code{homerc} is defined @xref{program attributes}.
 
 Below are the option names and flag values.  The flags are activated if and
-only if at least one user-defined option also uses at least one flag value.
+only if at least one user-defined option also uses a flag value.
 These flags may be deleted or changed to characters of your choosing by
 specifying @code{xxx-value = "y";}, where @code{xxx} is one of the five names
 below and @code{y} is either empty or the character of your choice.  For
@@ -4618,14 +4637,7 @@ Compile @samp{myopts.c} and link your program
 with the following additional arguments:
 
 @example
-myopts.c -I$prefix/include -L $prefix/lib -lopts
-@end example
-
-@noindent
-These values can be derived from the ``autoopts-config'' script:
-
-@example
-myopts.c `autoopts-config cflags` `autoopts-config ldflags`
+`autoopts-config cflags ldflags` myopts.c
 @end example
 @end itemize
 
@@ -4634,11 +4646,11 @@ myopts.c `autoopts-config cflags` `autoopts-config ldflags`
 
 If you will be distributing (or copying) your project to a system that
 does not have AutoOpts installed, you will need to statically link the
-AutoOpts library, ``libopts'' into your program.  Add the output from
-the following to your link command:
+AutoOpts library, ``libopts'' into your program.  Get the link information
+with ``@code{static-libs}'' instead of ``@code{ldflags}'':
 
 @example
-autoopts-config static-libs
+`autoopts-config static-libs`
 @end example
 
 @node binary pre-installed
