@@ -1998,7 +1998,7 @@ saving the option state back into one, @xref{loading rcfile}.
 @item
 Config files may be partitioned.  One config file may be used by several
 programs by partitioning it with lines containing,
-``@code{[PROGRAM_NAME]}'', @xref{loading rcfile}.
+``@code{[PROGRAM_NAME]}'' or ``@code{<?program-name>}'', @xref{loading rcfile}.
 
 @item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
@@ -2061,7 +2061,6 @@ option description template or by incorporating another template.
 
 @item
 There are several methods for handling option arguments.
-
 @itemize @bullet
 @item
 nothing (@pxref{OPT_ARG}) option argument strings are globally available.
@@ -2214,7 +2213,7 @@ Extraction from autogen.texi
 Normally, however, you would compile @file{checkopt.c} as in:
 
 @example
-cc -o checkopt.o -I$prefix/include -c checkopt.c
+cc -o checkopt.o $cflags -c checkopt.c
 @end example
 
 @noindent
@@ -3057,7 +3056,7 @@ case, the @code{-} and @code{--} command line option markers are optional.
 These option attributes do not fit well with the above categories.
 
 * opt-attr settable::           Program may set option
-* opt-attr no-preset::          NOT pre-configurable
+* opt-attr no-preset::          Option cannot be pre-configured
 * opt-attr equivalence::        Option Equivalence Class
 * opt-attr default option::     Default Option
 * opt-attr documentation::      Option Sectioning Comment
@@ -3205,17 +3204,19 @@ interacts with the @var{documentation} attribute.
 @node opt-attr no-preset
 @subsubsection Option cannot be pre-configured
 @cindex configuration file
-If presetting this option is not allowed.  (Thus, environment variables
-and values set in configuration files will be ignored.)
+If presetting this option is not allowed, specify ``@code{no-preset}''.
+(Thus, environment variables and values set in configuration files will be
+ignored.)
 
 @node opt-attr equivalence
 @subsubsection Option Equivalence Class
-Generally, when several options are mutually exclusive and basically serve
-the purpose of selecting one of several processing modes, these options can
-be considered an equivalence class.  Sometimes, it is just easier to deal
-with them as such.  All members of the equivalence class must contain the
-same equivalenced-to option, including the equivalenced-to option itself.
-Thus, it must be a class member.
+Generally, when several options are mutually exclusive and basically serve the
+purpose of selecting one of several processing modes, specify the
+``@code{equivalence}'' attribute.  These options will be considered an
+equivalence class.  Sometimes, it is just easier to deal with them as such.
+All members of the equivalence class must contain the same equivalenced-to
+option, including the equivalenced-to option itself.  Thus, it must be a class
+member.
 
 For an option equivalence class, there is a single occurrence counter for
 the class.  It can be referenced with the interface macro,
@@ -3261,10 +3262,11 @@ default:    /* cannot happen */
 @subsubsection Default Option
 If your program processes its arguments in named option mode (See
 ``long-opts'' in @ref{program attributes}), then you may select @strong{one}
-of your options to be the default option.  Do so with this attribute.  The
-option so specified must have an @code{arg-type} (@pxref{Option Arguments})
-specified, but not the @code{arg-optional} (@pxref{arg-optional}) attribute.
-That is to say, the option argument must be required.
+of your options to be the default option.  Do so by using attribute
+``@code{default}'' with one of the options.  The option so specified must have
+an @code{arg-type} (@pxref{Option Arguments}) specified, but not the
+@code{arg-optional} (@pxref{arg-optional}) attribute.  That is to say, the
+option argument must be required.
 
 If you have done this, then any arguments that do not match an option
 name and do not contain an equal sign (@code{=}) will be interpreted as
@@ -3277,13 +3279,14 @@ option description text in the usage output.  Libraries may choose
 to make it settable so that the library can determine which command
 line option is the first one that pertains to the library.
 
-If present, this option disables all other attributes except @code{settable},
-@code{call-proc} and @code{flag_-ode}.  @code{settable} must be and is only
-specified if @code{call-proc}, @code{extract-code} or @code{flag-code} has
-been specified.  When present, the @code{descrip} attribute will be displayed
-only when the @code{--help} option has been specified.  It will be displayed
-flush to the left hand margin and may consist of one or more lines of text.
-The name of the option will not be printed.
+If the ``@code{documentation}'' attribute is present, then all other
+attributes are disabled except @code{settable}, @code{call-proc} and
+@code{flag_-ode}.  @code{settable} must be and is only specified if
+@code{call-proc}, @code{extract-code} or @code{flag-code} has been specified.
+When present, the @code{descrip} attribute will be displayed only when the
+@code{--help} option has been specified.  It will be displayed flush to the
+left hand margin and may consist of one or more lines of text.  The name of
+the option will not be printed.
 
 Documentation options are for clarifying the usage text and will not
 appear in generated man pages or in the generated invoking texinfo doc.
@@ -3291,11 +3294,12 @@ appear in generated man pages or in the generated invoking texinfo doc.
 @node opt-attr translators
 @subsubsection Translator Notes
 If you need to give the translators a special note about a particular option,
-please use this attribute.  It will get emitted into the generated @code{.c}
-text where the option related strings get defined.  To make a general comment
-about all of the option code, add comments to an @code{include}
-attribute (@pxref{program attributes}).  Do @strong{not} use this attribute
-globally, or it will get emitted into every option definition block.
+please use the ``@code{translators}'' attribute.  The attribute text will be
+emitted into the generated @code{.c} text where the option related strings get
+defined.  To make a general comment about all of the option code, add comments
+to an @code{include} attribute (@pxref{program attributes}).  Do @strong{not}
+use this attribute globally, or it will get emitted into every option
+definition block.
 
 @node Immediate Action
 @subsubsection Immediate Action Attributes
@@ -3448,12 +3452,16 @@ not specified or preset.
 
 @node arg-type string
 @subsubsection Arg Type String
+@code{arg-type = string;}
+
 The argument may be any arbitrary string, though your program or option
 callback procedure may place additional constraints upon it.
 
 
 @node arg-type number
 @subsubsection Arg Type Number
+@code{arg-type = number;}
+
 The argument must be a correctly formed integer, without any trailing U's or
 L's.  AutoOpts contains a library procedure to convert the string to a number.
 If you specify range checking with @code{arg-range} (see below), then AutoOpts
@@ -3489,6 +3497,8 @@ then you have redundancies, but no harm will come of it.
 
 @node arg-type boolean
 @subsubsection Arg Type Boolean
+@code{arg-type = boolean;}
+
 The argument will be interpreted and always yield either AG_TRUE or
 AG_FALSE.  False values are@:  the empty string, the number zero, or a
 string that starts with @code{f}, @code{F}, @code{n} or @code{N}
@@ -3497,6 +3507,8 @@ string that starts with @code{f}, @code{F}, @code{n} or @code{N}
 
 @node arg-type keyword
 @subsubsection Arg Type Keyword
+@code{arg-type = keyword;}
+
 The argument must match a specified list of strings (@pxref{arg-keyword}).
 Assuming you have named the option, @code{optn-name}, the strings will be
 converted into an enumeration of type @code{te_Optn_Name} with the values
@@ -3532,6 +3544,8 @@ printf( "you selected the %s keyword\n",
 
 
 @node arg-type set membership
+@code{arg-type = set;}
+
 @subsubsection Arg Type Set Membership
 The argument must be a list of names each of which must match the strings
 "@code{all}", "@code{none}" or one of the keywords (@pxref{arg-keyword})
@@ -3558,7 +3572,9 @@ AutoOpts produces a special purpose procedure for this option.
 
 @node arg-type hierarchy
 @subsubsection Arg Type Hierarchical
-Aliases: @code{hierarchy} and @code{nested}
+@code{arg-type = hierarchy;}
+@*
+@code{arg-type = nested;}
 
 This denotes an option with a structure-valued argument, a.k.a.
 ``subopts'' in @code{getopts} terminology.  The argument is parsed
@@ -3580,6 +3596,8 @@ while (val != NULL) @{
 
 @node arg-type file name
 @subsubsection Arg Type File Name
+@code{arg-type = file;}
+
 This argument type will have some validations on the argument and,
 optionally, actually open the file.  You must specify several additonal
 attributes for the option:
@@ -3708,14 +3726,14 @@ translations of option names at run time.  These are all disabled if
 be invoked before the first invocation of @code{optionProcess}.
 
 @table @samp
-@item  OPT_NO_XLAT_CFG_NAMES
-@itemx OPT_XLAT_CFG_NAMES
+@item  OPT_NO_XLAT_CFG_NAMES;
+@itemx OPT_XLAT_CFG_NAMES;
 Disable (or enable) the translations of option names for configuration files.
 If you enable translation for config files, then they will be translated for
 command line options.
 
-@item  OPT_NO_XLAT_OPT_NAMES
-@itemx OPT_XLAT_OPT_NAMES
+@item  OPT_NO_XLAT_OPT_NAMES;
+@itemx OPT_XLAT_OPT_NAMES;
 Disable (or enable) the translations of option names for command line
 processing.  If you disable the translation for command line processing,
 you will also disable it for configuration file processing.  Once translated,

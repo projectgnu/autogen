@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.22 2007/11/11 06:13:28 bkorb Exp $
- *  Time-stamp:      "2007-11-04 16:30:00 bkorb"
+ *  $Id: nested.c,v 4.23 2007/11/12 00:07:59 bkorb Exp $
+ *  Time-stamp:      "2007-11-11 10:03:24 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -278,7 +278,12 @@ scanNameEntry(char const* pzName, tOptionValue* pRes)
     size_t       nameLen = 1;
     size_t       dataLen = 0;
 
-    while (IS_OPTION_NAME(*pzScan))     { pzScan++; nameLen++; }
+    /*
+     *  Scan over characters that name a value.  These names may not end
+     *  with a colon, but they may contain colons.
+     */
+    while (IS_VALUE_NAME(*pzScan))      { pzScan++; nameLen++; }
+    if (pzScan[-1] == ':')              { pzScan--; nameLen--; }
     while (IS_HORIZ_WHITE(*pzScan))     pzScan++;
 
 re_switch:

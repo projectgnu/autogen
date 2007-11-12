@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.19 2007/10/07 16:54:54 bkorb Exp $
- * Time-stamp:      "2007-07-04 11:33:42 bkorb"
+ *  $Id: enumeration.c,v 4.20 2007/11/12 00:07:59 bkorb Exp $
+ * Time-stamp:      "2007-11-11 13:05:31 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -131,10 +131,11 @@ enumError(
             }
 
             else
-                fprintf( option_usage_fp, zFmt, *(paz_names++) );
+                fprintf(option_usage_fp, zFmt, *(paz_names++) );
         }
-        fprintf( option_usage_fp, "%s\n", *paz_names );
+        fprintf(option_usage_fp, "%s\n", *paz_names);
     }
+    fprintf(option_usage_fp, "  or an integer between 0 and %d\n", name_ct-1);
 
     /*
      *  IF we do not have a pOpts pointer, then this output is being requested
@@ -142,8 +143,9 @@ enumError(
      */
     if (pOpts != NULL)
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+
     if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP)
-        fputs( zSetMemberSettings, option_usage_fp );
+        fputs(zSetMemberSettings, option_usage_fp);
 }
 
 
@@ -155,9 +157,23 @@ findName(
     tCC* const *  paz_names,
     unsigned int  name_ct )
 {
+    /*
+     *  Return the matching index as a pointer sized integer.
+     *  The result gets stashed in a char* pointer.
+     */
     uintptr_t     res = name_ct;
     size_t        len = strlen( (char*)pzName );
     uintptr_t     idx;
+
+    if (IS_DEC_DIGIT(*pzName)) {
+        char * pz = (char *)(void *)pzName;
+        unsigned long val = strtoul(pz, &pz, 0);
+        if ((*pz == NUL) && (val < name_ct))
+            return (uintptr_t)val;
+        enumError(pOpts, pOD, paz_names, (int)name_ct);
+        return name_ct;
+    }
+
     /*
      *  Look for an exact match, but remember any partial matches.
      *  Multiple partial matches means we have an ambiguous match.
@@ -167,28 +183,26 @@ findName(
             if (paz_names[idx][len] == NUL)
                 return idx;  /* full match */
 
-            if (res != name_ct) {
-                pz_enum_err_fmt = zAmbigKey;
-                option_usage_fp = stderr;
-                enumError( pOpts, pOD, paz_names, (int)name_ct );
-            }
-            res = idx; /* save partial match */
+            res = (res != name_ct) ? ~0 : idx; /* save partial match */
         }
     }
 
-    /*
-     *  no partial match -> error
-     */
+    if (res < name_ct)
+        return res; /* partial match */
+
     if (res == name_ct) {
-        pz_enum_err_fmt = zNoKey;
-        option_usage_fp = stderr;
-        enumError( pOpts, pOD, paz_names, (int)name_ct );
+        pz_enum_err_fmt = zNoKey; /* no partial matches */
+
+    } else {
+        /*
+         *  Too many partial matches.
+         */
+        pz_enum_err_fmt = zAmbigKey;
+        res = name_ct;
     }
 
-    /*
-     *  Return the matching index as a char* pointer.
-     *  The result gets stashed in a char* pointer, so it will have to fit.
-     */
+    option_usage_fp = stderr;
+    enumError(pOpts, pOD, paz_names, (int)name_ct);
     return res;
 }
 
@@ -254,7 +268,7 @@ optionEnumerationVal(
         /*
          *  print the list of enumeration names.
          */
-        enumError( pOpts, pOD, paz_names, (int)name_ct );
+        enumError(pOpts, pOD, paz_names, (int)name_ct);
         break;
 
     case 1UL:

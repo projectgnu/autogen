@@ -1,0 +1,31 @@
+
+%guard          autoopts_internal
+%file           ag-char-map.h
+%table          option-char-classes
+
+%comment
+        This file contains the character classifications
+        used by AutoGen and AutoOpts for identifying tokens.
+%
+
+lower-case      "a-z"
+upper-case      "A-Z"
+alphabetic      +lower-case     +upper-case
+oct-digit       "0-7"
+dec-digit       "89"            +oct-digit
+hex-digit       "a-fA-F"        +dec-digit
+alphanumeric    +alphabetic     +dec-digit
+var-first-char  "_"             +alphabetic
+variable-name   +var-first-char +dec-digit
+option-name     "^-"            +variable-name
+value-name      ":"             +option-name
+horiz-white     "\t "
+compound-name   "[.]"           +value-name   +horiz-white
+whitespace      "\v\f\r\n\b"    +horiz-white
+unquotable      "!-~"           -"\"#(),;<=>[\\]`{}?*'"
+end-xml-token   "/>"            +whitespace
+graphic         "!-~"
+plus-n-space    "+"             +whitespace
+punctuation     "!-~"           -alphanumeric -"_"
+suffix-char     "-._"           +alphanumeric
+suffix-fmt      "%/"            +suffix-char

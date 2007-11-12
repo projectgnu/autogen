@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.22 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: defLex.c,v 4.23 2007/11/12 00:07:59 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:36:53 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-11 09:46:38 bkorb"
+ *  Last Committed:    $Date: 2007/11/12 00:07:59 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -396,8 +396,7 @@ alist_to_autogen_def( void )
     }
 
     /*
-     *  NUL terminate the Scheme expression, run it, then restore
-     *  the NUL-ed character.
+     *  Run the scheme expression.  The result is autogen definition text.
      */
     procState = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
@@ -414,7 +413,7 @@ alist_to_autogen_def( void )
     res_len   = AG_SCM_STRLEN( res );
     procState = PROC_STATE_LOAD_DEFS;
     pCurCtx->pzScan = pzEnd;
-    AGFREE( (void*)pzText );
+    AGFREE(pzText);
 
     /*
      *  Now, push the resulting string onto the input stack
@@ -478,7 +477,7 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
             *pRetVal = DP_EV_OTHER_NAME;
             while (IS_UNQUOTABLE(*++pz))    ;
         } else
-            *pRetVal = DP_EV_VAR_NAME;         
+            *pRetVal = DP_EV_VAR_NAME;
 
         /*
          *  Return a NAME token, maybe.
