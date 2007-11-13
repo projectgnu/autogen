@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2007-07-04 10:12:24 bkorb"
+# Time-stamp:        "2007-11-12 21:34:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: equiv.test,v 4.6 2007/10/07 16:54:54 bkorb Exp $
+# $Id: equiv.test,v 4.7 2007/11/13 05:51:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -108,13 +108,14 @@ or by a single hyphen and the flag character.
 
 The valid "omega" option keywords are:
   uno dos tres mucho
+  or an integer between 0 and 3
 _EOF_
 
 cmp -s ${testname}*.help || \
   failure "`diff ${testname}-base.help ${testname}.help`"
 
 cat > ${testname}-base.out <<_EOF_
-20 109 756 /tmp/use
+21 116 788 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2 # 0x2
@@ -201,6 +202,7 @@ The following option preset mechanisms are supported:
 
 The valid "omega" option keywords are:
   uno dos tres mucho
+  or an integer between 0 and 3
 _EOF_
 
 echo 'homerc = "$$";' >> ${testname}.def

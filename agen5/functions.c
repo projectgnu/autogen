@@ -1,9 +1,9 @@
 
 /*
- *  $Id: functions.c,v 4.15 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: functions.c,v 4.16 2007/11/13 05:51:35 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:26:40 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-04 17:52:23 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:51:35 $
  *
  *  This module implements text functions.
  *

@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.14 2007/10/07 16:54:54 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.15 2007/11/13 05:51:35 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a

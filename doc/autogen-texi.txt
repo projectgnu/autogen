@@ -3544,9 +3544,9 @@ printf( "you selected the %s keyword\n",
 
 
 @node arg-type set membership
+@subsubsection Arg Type Set Membership
 @code{arg-type = set;}
 
-@subsubsection Arg Type Set Membership
 The argument must be a list of names each of which must match the strings
 "@code{all}", "@code{none}" or one of the keywords (@pxref{arg-keyword})
 specified for this option.  @code{all} will turn on all membership bits and
