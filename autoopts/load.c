@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.32 2007/11/11 06:13:28 bkorb Exp $
- *  Time-stamp:      "2007-11-04 16:43:50 bkorb"
+ *  $Id: load.c,v 4.33 2007/11/13 05:49:26 bkorb Exp $
+ *  Time-stamp:      "2007-11-12 20:38:32 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -270,7 +270,7 @@ insertEnvVal(
 
     for (;;) {
         int ch = (int)*++pzName;
-        if (! IS_VALUE_NAME(ch))
+        if (! IS_VALUE_NAME_CHAR(ch))
             break;
         *(pzDir++) = (char)ch;
     }
@@ -304,16 +304,16 @@ mungeString( char* pzTxt, tOptionLoadMode mode )
     if (mode == OPTION_LOAD_KEEP)
         return;
 
-    if (IS_WHITESPACE(*pzTxt)) {
+    if (IS_WHITESPACE_CHAR(*pzTxt)) {
         char* pzS = pzTxt;
         char* pzD = pzTxt;
-        while (IS_WHITESPACE(*++pzS))  ;
+        while (IS_WHITESPACE_CHAR(*++pzS))  ;
         while ((*(pzD++) = *(pzS++)) != NUL)   ;
         pzE = pzD-1;
     } else
         pzE = pzTxt + strlen( pzTxt );
 
-    while ((pzE > pzTxt) && IS_WHITESPACE(pzE[-1]))  pzE--;
+    while ((pzE > pzTxt) && IS_WHITESPACE_CHAR(pzE[-1]))  pzE--;
     *pzE = NUL;
 
     if (mode == OPTION_LOAD_UNCOOKED)
@@ -363,11 +363,11 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode )
      *  because we'll have to skip over an immediately following ':' or '='
      *  (and the white space following *that*).
      */
-    space_break = IS_WHITESPACE(*pzEnd);
+    space_break = IS_WHITESPACE_CHAR(*pzEnd);
     *(pzEnd++) = NUL;
-    while (IS_WHITESPACE(*pzEnd))  pzEnd++;
+    while (IS_WHITESPACE_CHAR(*pzEnd))  pzEnd++;
     if (space_break && ((*pzEnd == ':') || (*pzEnd == '=')))
-        while (IS_WHITESPACE(*++pzEnd))  ;
+        while (IS_WHITESPACE_CHAR(*++pzEnd))  ;
 
     return pzEnd;
 }
@@ -387,7 +387,7 @@ loadOptionLine(
     tDirection  direction,
     tOptionLoadMode   load_mode )
 {
-    while (IS_WHITESPACE(*pzLine))  pzLine++;
+    while (IS_WHITESPACE_CHAR(*pzLine))  pzLine++;
 
     {
         char* pzArg = assembleArgValue( pzLine, load_mode );

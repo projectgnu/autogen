@@ -1,10 +1,10 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2007-11-04 17:44:50 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:42:32 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
- *  $Id: expFormat.c,v 4.20 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: expFormat.c,v 4.21 2007/11/13 05:49:26 bkorb Exp $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.
@@ -270,7 +270,7 @@ ag_scm_error( SCM res )
     case GH_TYPE_STRING:
         pzMsg  = ag_scm2zchars( res, "error string" );
         msgLen = AG_SCM_STRLEN( res );
-        while (IS_WHITESPACE(*pzMsg) && (--msgLen > 0)) pzMsg++;
+        while (IS_WHITESPACE_CHAR(*pzMsg) && (--msgLen > 0)) pzMsg++;
 
         /*
          *  IF the message starts with the number zero,
@@ -279,7 +279,7 @@ ag_scm_error( SCM res )
          */
         if (msgLen <= 0)
             abrt = PROBLEM;
-        else if (IS_DEC_DIGIT(*pzMsg) && (strtol(pzMsg, NULL, 0) == 0))
+        else if (IS_DEC_DIGIT_CHAR(*pzMsg) && (strtol(pzMsg, NULL, 0) == 0))
             abrt = PROBLEM;
         break;
 
@@ -527,7 +527,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      */
     {
         char* pz = (char*)lic.mi.txt_data + lic.mi.txt_size;
-        while (IS_WHITESPACE(pz[-1]) && (pz > (char*)lic.mi.txt_data))
+        while (IS_WHITESPACE_CHAR(pz[-1]) && (pz > (char*)lic.mi.txt_data))
             pz--;
         *pz = NUL;
     }

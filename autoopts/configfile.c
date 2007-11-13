@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.37 2007/11/11 06:13:28 bkorb Exp $
- *  Time-stamp:      "2007-11-04 16:43:34 bkorb"
+ *  $Id: configfile.c,v 4.38 2007/11/13 05:49:26 bkorb Exp $
+ *  Time-stamp:      "2007-11-12 20:37:43 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -443,7 +443,7 @@ filePreset(
         st.flags = OPTST_SET;
 
     do  {
-        while (IS_WHITESPACE(*pzFileText))  pzFileText++;
+        while (IS_WHITESPACE_CHAR(*pzFileText))  pzFileText++;
 
         if (IS_VAR_FIRST_CHAR(*pzFileText)) {
             pzFileText = handleConfig( pOpts, &st, pzFileText, direction );
@@ -526,8 +526,8 @@ handleConfig(
     if (pzEnd == NULL)
         return pzText + strlen(pzText);
 
-    while (IS_VALUE_NAME(*pzText)) pzText++;
-    while (IS_WHITESPACE(*pzText)) pzText++;
+    while (IS_VALUE_NAME_CHAR(*pzText)) pzText++;
+    while (IS_WHITESPACE_CHAR(*pzText)) pzText++;
     if (pzText > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
@@ -541,10 +541,10 @@ handleConfig(
      *  is an invalid format and we give up parsing the text.
      */
     if ((*pzText == '=') || (*pzText == ':')) {
-        while (IS_WHITESPACE(*++pzText))   ;
+        while (IS_WHITESPACE_CHAR(*++pzText))   ;
         if (pzText > pzEnd)
             goto name_only;
-    } else if (! IS_WHITESPACE(pzText[-1]))
+    } else if (! IS_WHITESPACE_CHAR(pzText[-1]))
         return NULL;
 
     /*
@@ -608,7 +608,7 @@ handleDirective(
     size_t name_len;
 
     if (  (strncmp( pzText+2, zProg, title_len ) != 0)
-       || (! IS_WHITESPACE(pzText[title_len+2])) )  {
+       || (! IS_WHITESPACE_CHAR(pzText[title_len+2])) )  {
         pzText = strchr( pzText+2, '>' );
         if (pzText != NULL)
             pzText++;
@@ -622,8 +622,8 @@ handleDirective(
     do  {
         pzText += title_len;
 
-        if (IS_WHITESPACE(*pzText)) {
-            while (IS_WHITESPACE(*++pzText))  ;
+        if (IS_WHITESPACE_CHAR(*pzText)) {
+            while (IS_WHITESPACE_CHAR(*++pzText))  ;
             if (  (strneqvcmp( pzText, pOpts->pzProgName, (int)name_len) == 0)
                && (pzText[name_len] == '>'))  {
                 pzText += name_len + 1;
@@ -689,7 +689,7 @@ handleStructure(
     char* pzData;
     char* pcNulPoint;
 
-    while (IS_VALUE_NAME(*pzText))  pzText++;
+    while (IS_VALUE_NAME_CHAR(*pzText))  pzText++;
     pcNulPoint = pzText;
     valu.valType = OPARG_TYPE_STRING;
 
@@ -980,7 +980,7 @@ parseAttributes(
             break;
         }
 
-        while (IS_WHITESPACE(*++pzText))   ;
+        while (IS_WHITESPACE_CHAR(*++pzText))   ;
 
         if (strncmp( pzText, zLoadType, lenLoadType ) == 0) {
             pzText = parseValueType( pzText+lenLoadType, pType );
@@ -1033,7 +1033,7 @@ parseLoadMode(
     {
         size_t len = strlen(zLoadCooked);
         if (strncmp( pzText, zLoadCooked, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 *pMode = OPTION_LOAD_COOKED;
                 return pzText + len;
             }
@@ -1044,7 +1044,7 @@ parseLoadMode(
     {
         size_t len = strlen(zLoadUncooked);
         if (strncmp( pzText, zLoadUncooked, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 *pMode = OPTION_LOAD_UNCOOKED;
                 return pzText + len;
             }
@@ -1055,7 +1055,7 @@ parseLoadMode(
     {
         size_t len = strlen(zLoadKeep);
         if (strncmp( pzText, zLoadKeep, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 *pMode = OPTION_LOAD_KEEP;
                 return pzText + len;
             }
@@ -1096,7 +1096,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeString);
         if (strncmp( pzText, zLtypeString, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_STRING;
                 return pzText + len;
             }
@@ -1107,7 +1107,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeInteger);
         if (strncmp( pzText, zLtypeInteger, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_NUMERIC;
                 return pzText + len;
             }
@@ -1118,7 +1118,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeBool);
         if (strncmp( pzText, zLtypeBool, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_BOOLEAN;
                 return pzText + len;
             }
@@ -1129,7 +1129,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeKeyword);
         if (strncmp( pzText, zLtypeKeyword, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_ENUMERATION;
                 return pzText + len;
             }
@@ -1140,7 +1140,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeSetMembership);
         if (strncmp( pzText, zLtypeSetMembership, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_MEMBERSHIP;
                 return pzText + len;
             }
@@ -1151,7 +1151,7 @@ parseValueType(
     {
         size_t len = strlen(zLtypeNest);
         if (strncmp( pzText, zLtypeNest, len ) == 0) {
-            if (IS_END_XML_TOKEN(pzText[len])) {
+            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
                 pType->valType = OPARG_TYPE_HIERARCHY;
                 return pzText + len;
             }
@@ -1173,7 +1173,7 @@ static char*
 skipUnknown( char* pzText )
 {
     for (;; pzText++) {
-        if (IS_END_XML_TOKEN(*pzText))  return pzText;
+        if (IS_END_XML_TOKEN_CHAR(*pzText))  return pzText;
         if (*pzText == NUL) return NULL;
     }
 }

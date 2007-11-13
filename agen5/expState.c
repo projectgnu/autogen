@@ -1,10 +1,10 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.21 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: expState.c,v 4.22 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:46:28 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:42:22 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
@@ -253,10 +253,10 @@ str2int_ver( char* pz )
     while (--ix >= 0) {
         unsigned int v;
         val <<= VER_UNIT_SHIFT;
-        while (IS_WHITESPACE(*pz))  pz++;
+        while (IS_WHITESPACE_CHAR(*pz))  pz++;
 
     next_number:
-        if (! IS_DEC_DIGIT(*pz)) break;
+        if (! IS_DEC_DIGIT_CHAR(*pz)) break;
         v = (unsigned int)strtoul(pz, &pz, 0) & ((1 << VER_UNIT_SHIFT) - 1);
         if (pz == NULL)
             break;
@@ -278,7 +278,7 @@ str2int_ver( char* pz )
             goto leave_str2int_ver;
 
         case '.':
-            if (! IS_DEC_DIGIT( *(++pz) ))
+            if (! IS_DEC_DIGIT_CHAR( *(++pz) ))
                 goto leave_str2int_ver;
             break;
         }

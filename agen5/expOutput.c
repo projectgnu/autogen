@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.25 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: expOutput.c,v 4.26 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:45:37 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:42:27 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module implements the output file manipulation function
  *
@@ -705,8 +705,8 @@ ag_scm_make_header_guard(SCM name)
         lpz = opz;
         do  {
             *(scan_p++) = '_';
-            while ((! IS_ALPHANUMERIC(*lpz)) && (*lpz != NUL))  lpz++;
-            while (IS_ALPHANUMERIC(*lpz))
+            while ((! IS_ALPHANUMERIC_CHAR(*lpz)) && (*lpz != NUL))  lpz++;
+            while (IS_ALPHANUMERIC_CHAR(*lpz))
                 *(scan_p++) = toupper(*(lpz++));
         } while (*lpz != NUL);
 

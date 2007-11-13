@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2007-07-04 10:11:54 bkorb"
+# Time-stamp:        "2007-11-12 21:43:01 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: keyword.test,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+# $Id: keyword.test,v 4.14 2007/11/13 05:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -99,10 +99,12 @@ The following option preset mechanisms are supported:
 
 The valid "trace" option keywords are:
   nothing templates block-macros expressions explanations
+  or an integer between 0 and 4
 The valid "sets" option keywords are:
   first       second      third       fourth      fifth       sixth
   seventh     eighth      ninth       tenth       eleventh    twelfth
   thirteenth  fourteenth  fifteenth   sixteenth   seventeenth eighteenth
+  or an integer mask with any of the lower 18 bits set
 or you may use a numeric representation.  Preceding these with a '!' will
 clear the bits, specifying 'none' will clear all bits, and 'all' will set them
 all.  Multiple entries may be passed as an option argument list.

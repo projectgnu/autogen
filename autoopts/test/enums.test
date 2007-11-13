@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-07-04 10:12:30 bkorb"
+# Time-stamp:        "2007-11-12 21:01:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: enums.test,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+# $Id: enums.test,v 4.13 2007/11/13 05:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -274,10 +274,12 @@ or by a single hyphen and the flag character.
 
 The valid "print" option keywords are:
   one two three four five six seven eight nine ten
+  or an integer between 0 and 9
 The valid "set" option keywords are:
   first      second     third      fourth     fifth      sixth      seventh
   eighth     ninth      tenth      eleventh   twelfth    thirteenth fourteenth
   fifteenth  sixteenth
+  or an integer between 0 and 15
 or you may use a numeric representation.  Preceding these with a '!' will
 clear the bits, specifying 'none' will clear all bits, and 'all' will set them
 all.  Multiple entries may be passed as an option argument list.

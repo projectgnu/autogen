@@ -1,6 +1,6 @@
 /*
  *  This file defines the string_tokenize interface
- * Time-stamp:      "2007-11-04 16:47:45 bkorb"
+ * Time-stamp:      "2007-11-12 20:40:36 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -191,7 +191,7 @@ ao_string_tokenize( char const* str )
      *  Trim leading white space.  Use "ENOENT" and a NULL return to indicate
      *  an empty string was passed.
      */
-    while (IS_WHITESPACE(*str))  str++;
+    while (IS_WHITESPACE_CHAR(*str))  str++;
     if (*str == NUL) {
     bogus_str:
         errno = ENOENT;
@@ -208,9 +208,9 @@ ao_string_tokenize( char const* str )
 
         do {
             max_token_ct++;
-            while (! IS_WHITESPACE(*++pz))
+            while (! IS_WHITESPACE_CHAR(*++pz))
                 if (*pz == NUL) goto found_nul;
-            while (IS_WHITESPACE(*pz))  pz++;
+            while (IS_WHITESPACE_CHAR(*pz))  pz++;
         } while (*pz != NUL);
 
     found_nul:
@@ -234,9 +234,9 @@ ao_string_tokenize( char const* str )
             res->tkn_list[ res->tkn_ct++ ] = pzDest;
             for (;;) {
                 int ch = (ch_t)*str;
-                if (IS_WHITESPACE(ch)) {
+                if (IS_WHITESPACE_CHAR(ch)) {
                 found_white_space:
-                    while (IS_WHITESPACE(*++str))  ;
+                    while (IS_WHITESPACE_CHAR(*++str))  ;
                     break;
                 }
 
@@ -248,7 +248,7 @@ ao_string_tokenize( char const* str )
                         errno = EINVAL;
                         return NULL;
                     }
-                    if (IS_WHITESPACE(*str))
+                    if (IS_WHITESPACE_CHAR(*str))
                         goto found_white_space;
                     break;
 
@@ -259,7 +259,7 @@ ao_string_tokenize( char const* str )
                         errno = EINVAL;
                         return NULL;
                     }
-                    if (IS_WHITESPACE(*str))
+                    if (IS_WHITESPACE_CHAR(*str))
                         goto found_white_space;
                     break;
 

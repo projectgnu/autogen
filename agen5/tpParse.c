@@ -2,10 +2,10 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.15 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: tpParse.c,v 4.16 2007/11/13 05:49:26 bkorb Exp $
  *
- * Time-stamp:        "2007-11-10 14:45:11 bkorb"
- * Last Committed:    $Date: 2007/11/11 06:13:28 $
+ * Time-stamp:        "2007-11-12 20:44:14 bkorb"
+ * Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module will load a template and return a template structure.
  *
@@ -60,7 +60,7 @@ whichFunc( tCC** ppzScan )
      *  IF the name starts with a punctuation, then it is some sort of
      *  alias.  Find the function in the alias portion of the table.
      */
-    if (IS_PUNCTUATION(*pzFuncName)) {
+    if (IS_PUNCTUATION_CHAR(*pzFuncName)) {
         hi = FUNC_ALIAS_HIGH_INDEX;
         lo = FUNC_ALIAS_LOW_INDEX;
         do  {
@@ -97,7 +97,7 @@ whichFunc( tCC** ppzScan )
             /*
              *  Make sure we matched to the end of the token.
              */
-            if (IS_VARIABLE_NAME(pzFuncName[pNT->cmpLen]))
+            if (IS_VARIABLE_NAME_CHAR(pzFuncName[pNT->cmpLen]))
                 break;
 
             /*
@@ -118,7 +118,7 @@ whichFunc( tCC** ppzScan )
     pCurMacro->ozName = (pCurTemplate->pNext - pCurTemplate->pzTemplText);
     {
         char* pzCopy = pCurTemplate->pNext;
-        while (IS_VALUE_NAME(*pzFuncName))
+        while (IS_VALUE_NAME_CHAR(*pzFuncName))
             *(pzCopy++) = *(pzFuncName++);
         /*
          *  Names are allowed to contain colons, but not end with them.
@@ -152,7 +152,7 @@ findMacroEnd( tCC** ppzMark )
     /*
      *  Set our pointers to the start of the macro text
      */
-    while (IS_WHITESPACE(*pzMark)) {
+    while (IS_WHITESPACE_CHAR(*pzMark)) {
         if (*(pzMark++) == '\n')
             templLineNo++;
     }
@@ -299,9 +299,9 @@ parseTemplate( tMacro* pM, tCC** ppzText )
             /*
              *  Strip white space from the macro
              */
-            while ((pzMark < pzMacEnd) && IS_WHITESPACE(*pzMark))
+            while ((pzMark < pzMacEnd) && IS_WHITESPACE_CHAR(*pzMark))
                 pzMark++;
-            while ((pzMacEnd > pzMark) && IS_WHITESPACE(pzMacEnd[-1]))
+            while ((pzMacEnd > pzMark) && IS_WHITESPACE_CHAR(pzMacEnd[-1]))
                 pzMacEnd--;
 
             if (pzMark != pzMacEnd) {
@@ -325,7 +325,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
              *  from the end macro marker to EOL.  Anything else on the line
              *  will suppress the feature.
              */
-            while (IS_WHITESPACE(*pz)) {
+            while (IS_WHITESPACE_CHAR(*pz)) {
                 if (*(pz++) == '\n') {
                     templLineNo++;
                     pzScan = pz;

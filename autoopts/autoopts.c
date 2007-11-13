@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.34 2007/11/11 06:13:28 bkorb Exp $
- *  Time-stamp:      "2007-11-04 16:18:25 bkorb"
+ *  $Id: autoopts.c,v 4.35 2007/11/13 05:49:26 bkorb Exp $
+ *  Time-stamp:      "2007-11-12 20:35:53 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -418,7 +418,7 @@ shortOptionFind( tOptions* pOpts, uint_t optValue, tOptState* pOptState )
      *  THEN the result is the "option" itself and the
      *       option is the specially marked "number" option.
      */
-    if (  IS_DEC_DIGIT(optValue)
+    if (  IS_DEC_DIGIT_CHAR(optValue)
        && (pOpts->specOptIdx.number_option != NO_EQUIVALENT) ) {
         pOptState->pOD = \
         pRes           = pOpts->pOptDesc + pOpts->specOptIdx.number_option;

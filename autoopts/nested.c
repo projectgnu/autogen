@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.23 2007/11/12 00:07:59 bkorb Exp $
- *  Time-stamp:      "2007-11-11 10:03:24 bkorb"
+ *  $Id: nested.c,v 4.24 2007/11/13 05:49:26 bkorb Exp $
+ *  Time-stamp:      "2007-11-12 20:39:11 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -175,12 +175,12 @@ addBoolValue( void** pp, char const* pzName, size_t nameLen,
     pNV = AGALOC( sz, "option name/bool value pair" );
     if (pNV == NULL)
         return NULL;
-    while (IS_WHITESPACE(*pzValue) && (dataLen > 0)) {
+    while (IS_WHITESPACE_CHAR(*pzValue) && (dataLen > 0)) {
         dataLen--; pzValue++;
     }
     if (dataLen == 0)
         pNV->v.boolVal = 0;
-    else if (IS_WHITESPACE(*pzValue))
+    else if (IS_WHITESPACE_CHAR(*pzValue))
         pNV->v.boolVal = atoi( pzValue );
     else switch (*pzValue) {
     case 'f':
@@ -215,7 +215,7 @@ addNumberValue( void** pp, char const* pzName, size_t nameLen,
     pNV = AGALOC( sz, "option name/bool value pair" );
     if (pNV == NULL)
         return NULL;
-    while (IS_WHITESPACE(*pzValue) && (dataLen > 0)) {
+    while (IS_WHITESPACE_CHAR(*pzValue) && (dataLen > 0)) {
         dataLen--; pzValue++;
     }
     if (dataLen == 0)
@@ -282,15 +282,15 @@ scanNameEntry(char const* pzName, tOptionValue* pRes)
      *  Scan over characters that name a value.  These names may not end
      *  with a colon, but they may contain colons.
      */
-    while (IS_VALUE_NAME(*pzScan))      { pzScan++; nameLen++; }
+    while (IS_VALUE_NAME_CHAR(*pzScan))      { pzScan++; nameLen++; }
     if (pzScan[-1] == ':')              { pzScan--; nameLen--; }
-    while (IS_HORIZ_WHITE(*pzScan))     pzScan++;
+    while (IS_HORIZ_WHITE_CHAR(*pzScan))     pzScan++;
 
 re_switch:
     switch (*pzScan) {
     case '=':
     case ':':
-        while (IS_HORIZ_WHITE( (int)*++pzScan ))  ;
+        while (IS_HORIZ_WHITE_CHAR( (int)*++pzScan ))  ;
         if ((*pzScan == '=') || (*pzScan == ':'))
             goto default_char;
         goto re_switch;
@@ -393,7 +393,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
     }
 
     pzScan++;
-    while (IS_VALUE_NAME( (int)*pzScan ))  { pzScan++; nameLen++; }
+    while (IS_VALUE_NAME_CHAR( (int)*pzScan ))  { pzScan++; nameLen++; }
     if (nameLen > 64)
         return NULL;
     valu.valType = OPARG_TYPE_STRING;
@@ -456,7 +456,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
         }
         valLen = (pzScan - pzVal);
         pzScan += nameLen + 3;
-        while (IS_WHITESPACE(*pzScan))  pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan))  pzScan++;
     }
 
     switch (valu.valType) {
@@ -623,7 +623,7 @@ optionLoadNested(char const* pzTxt, char const* pzName, size_t nameLen)
         errno = EINVAL;
         return NULL;
     }
-    while (IS_WHITESPACE(*pzTxt))  pzTxt++;
+    while (IS_WHITESPACE_CHAR(*pzTxt))  pzTxt++;
     if (*pzTxt == NUL) {
         errno = ENOENT;
         return NULL;
@@ -651,7 +651,7 @@ optionLoadNested(char const* pzTxt, char const* pzName, size_t nameLen)
      *  Scan until we hit a NUL.
      */
     do  {
-        while (IS_WHITESPACE( (int)*pzTxt ))  pzTxt++;
+        while (IS_WHITESPACE_CHAR( (int)*pzTxt ))  pzTxt++;
         if (IS_VAR_FIRST_CHAR( (int)*pzTxt )) {
             pzTxt = scanNameEntry( pzTxt, pRes );
         }

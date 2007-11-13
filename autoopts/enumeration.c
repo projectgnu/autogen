@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.20 2007/11/12 00:07:59 bkorb Exp $
- * Time-stamp:      "2007-11-11 13:05:31 bkorb"
+ *  $Id: enumeration.c,v 4.21 2007/11/13 05:49:26 bkorb Exp $
+ * Time-stamp:      "2007-11-12 21:42:14 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -32,7 +32,7 @@
 tSCC*  pz_enum_err_fmt;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 enumError(
     tOptions*     pOpts,
@@ -56,18 +56,29 @@ enumError(
     tCC* const *  paz_names,
     int           name_ct )
 {
+    static char const mask_msg[] =
+        "  or an integer mask with any of the lower %d bits set\n";
+
     size_t max_len = 0;
     size_t ttl_len = 0;
+    int    ct_down = name_ct;
+    int    hidden  = 0;
 
-    if (pOpts != NULL)
-        fprintf( option_usage_fp, pz_enum_err_fmt, pOpts->pzProgName,
-                 pOD->optArg.argString, pOD->pz_Name );
+    if (pOpts > (tOptions*)0x0FUL)
+        fprintf(option_usage_fp, pz_enum_err_fmt, pOpts->pzProgName,
+                pOD->optArg.argString, pOD->pz_Name);
 
-    fprintf( option_usage_fp, zValidKeys, pOD->pz_Name );
+    fprintf(option_usage_fp, zValidKeys, pOD->pz_Name);
 
+    /*
+     *  If the first name starts with this funny character, then we have
+     *  a first value with an unspellable name.  You cannot specify it.
+     *  So, we don't list it either.
+     */
     if (**paz_names == 0x7F) {
         paz_names++;
-        name_ct--;
+        hidden  = 1;
+        ct_down = --name_ct;
     }
 
     /*
@@ -76,14 +87,15 @@ enumError(
      */
     {
         tCC * const * paz = paz_names;
-        int   ct  = name_ct;
 
         do  {
             size_t len = strlen( *(paz++) ) + 1;
             if (len > max_len)
                 max_len = len;
             ttl_len += len;
-        } while (--ct > 0);
+        } while (--ct_down > 0);
+
+        ct_down = name_ct;
     }
 
     /*
@@ -92,7 +104,7 @@ enumError(
     if (max_len > 35) {
         do  {
             fprintf( option_usage_fp, "  %s\n", *(paz_names++) );
-        } while (--name_ct > 0);
+        } while (--ct_down > 0);
     }
 
     /*
@@ -103,7 +115,7 @@ enumError(
         do  {
             fputc( ' ', option_usage_fp );
             fputs( *(paz_names++), option_usage_fp );
-        } while (--name_ct > 0);
+        } while (--ct_down > 0);
         fputc( '\n', option_usage_fp );
     }
 
@@ -121,7 +133,8 @@ enumError(
         /*
          *  Loop through all but the last entry
          */
-        while (--name_ct > 0) {
+        ct_down = name_ct;
+        while (--ct_down > 0) {
             if (++ent_no == max_len) {
                 /*
                  *  Last entry on a line.  Start next line, too.
@@ -135,13 +148,17 @@ enumError(
         }
         fprintf(option_usage_fp, "%s\n", *paz_names);
     }
-    fprintf(option_usage_fp, "  or an integer between 0 and %d\n", name_ct-1);
+    if (pOpts == (tOptions*)0x01UL)
+        fprintf(option_usage_fp, mask_msg, name_ct);
+    else
+        fprintf(option_usage_fp, "  or an integer between %d and %d\n",
+                hidden, name_ct - 1 + hidden);
 
     /*
      *  IF we do not have a pOpts pointer, then this output is being requested
      *  by the usage procedure.  Let's not re-invoke it recursively.
      */
-    if (pOpts != NULL)
+    if (pOpts > (tOptions*)0x0FUL)
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
 
     if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP)
@@ -165,7 +182,7 @@ findName(
     size_t        len = strlen( (char*)pzName );
     uintptr_t     idx;
 
-    if (IS_DEC_DIGIT(*pzName)) {
+    if (IS_DEC_DIGIT_CHAR(*pzName)) {
         char * pz = (char *)(void *)pzName;
         unsigned long val = strtoul(pz, &pz, 0);
         if ((*pz == NUL) && (val < name_ct))
@@ -345,7 +362,7 @@ optionSetMembers(
         /*
          *  print the list of enumeration names.
          */
-        enumError( pOpts, pOD, paz_names, (int)name_ct );
+        enumError((tOptions*)0x01UL, pOD, paz_names, (int)name_ct );
         return;
 
     case 1UL:

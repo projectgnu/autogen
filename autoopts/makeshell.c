@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.24 2007/11/11 06:13:28 bkorb Exp $
- * Time-stamp:      "2007-11-04 16:38:24 bkorb"
+ *  $Id: makeshell.c,v 4.25 2007/11/13 05:49:26 bkorb Exp $
+ * Time-stamp:      "2007-11-12 20:38:43 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -792,7 +792,7 @@ emitFlag( tOptions* pOpts )
         if (SKIP_OPT(pOptDesc))
             continue;
 
-        if (IS_GRAPHIC(pOptDesc->optValue)) {
+        if (IS_GRAPHIC_CHAR(pOptDesc->optValue)) {
             printf( zOptionFlag, pOptDesc->optValue );
             printOptionAction( pOpts, pOptDesc );
         }

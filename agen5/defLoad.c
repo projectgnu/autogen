@@ -1,8 +1,8 @@
 /*
- *  $Id: defLoad.c,v 4.17 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: defLoad.c,v 4.18 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:04:16 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:50:31 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -255,7 +255,7 @@ findPlace( char* name, tCC* pzIndex )
     if (pzIndex == NULL)
         pE->index = NO_INDEX;
 
-    else if (IS_DEC_DIGIT(*pzIndex) || (*pzIndex == '-'))
+    else if (IS_DEC_DIGIT_CHAR(*pzIndex) || (*pzIndex == '-'))
         pE->index = strtol( pzIndex, NULL, 0 );
 
     else {

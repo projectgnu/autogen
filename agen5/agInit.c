@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.14 2007/11/11 06:13:28 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.15 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:      "2007-11-10 13:59:45 bkorb"
+ *  Time-stamp:      "2007-11-12 20:43:38 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -159,9 +159,9 @@ addSysEnv( char* pzEnvName )
     int i = 2;
 
     for (;;) {
-        if (IS_UPPER_CASE(pzEnvName[i]))
+        if (IS_UPPER_CASE_CHAR(pzEnvName[i]))
             pzEnvName[i] = tolower(pzEnvName[i]);
-        else if (! IS_ALPHANUMERIC(pzEnvName[i]))
+        else if (! IS_ALPHANUMERIC_CHAR(pzEnvName[i]))
             pzEnvName[i] = '_';
 
         if (pzEnvName[ ++i ] == NUL)
@@ -191,7 +191,7 @@ evalProto( tCC** ppzS, uint16_t* pProto )
 {
     tCC* pzS = *ppzS;
 
-    if (IS_ALPHABETIC(*pzS)) {
+    if (IS_ALPHABETIC_CHAR(*pzS)) {
         inet_family_map_t* pMap = inet_family_map;
         do  {
             if (strncmp( pzS, pMap->pz_name, pMap->nm_len ) == 0) {
@@ -202,7 +202,7 @@ evalProto( tCC** ppzS, uint16_t* pProto )
         } while ( (++pMap)->pz_name != NULL );
     }
 
-    return IS_DEC_DIGIT(*pzS);
+    return IS_DEC_DIGIT_CHAR(*pzS);
 }
 
 

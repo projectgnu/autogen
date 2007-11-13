@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.17 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: funcCase.c,v 4.18 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 10:35:49 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:46:56 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module implements the CASE text function.
  */
@@ -38,7 +38,7 @@
 #  endif
 #endif
 
-#define PTRUP(p) STMTS(if(IS_LOW(*(p)))*(p)=_toupper(*(p));(p)++)
+#define PTRUP(p) STMTS(if(IS_LOW(*(p))) *(p)=_toupper(*(p));(p)++)
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
 

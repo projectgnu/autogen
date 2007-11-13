@@ -1,6 +1,6 @@
 /*
- *  $Id: cook.c,v 4.12 2007/11/11 06:13:28 bkorb Exp $
- *  Time-stamp:      "2007-11-10 17:06:24 bkorb"
+ *  $Id: cook.c,v 4.13 2007/11/13 05:49:26 bkorb Exp $
+ *  Time-stamp:      "2007-11-12 20:38:05 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -83,11 +83,11 @@ ao_string_cook_escape_char( char const* pzIn, char* pRes, u_int nl )
 
     case 'x':
     case 'X':         /* HEX Escape       */
-        if (IS_HEX_DIGIT(*pzIn))  {
+        if (IS_HEX_DIGIT_CHAR(*pzIn))  {
             char z[4], *pz = z;
 
             do *(pz++) = *(pzIn++);
-            while (IS_HEX_DIGIT(*pzIn) && (pz < z + 2));
+            while (IS_HEX_DIGIT_CHAR(*pzIn) && (pz < z + 2));
             *pz = NUL;
             *pRes = (unsigned char)strtoul(z, NULL, 16);
             res += pz - z;
@@ -104,7 +104,7 @@ ao_string_cook_escape_char( char const* pzIn, char* pRes, u_int nl )
         char z[4] = { *pRes }, *pz = z + 1;
         unsigned long val;
 
-        while (IS_OCT_DIGIT(*pzIn) && (pz < z + 3))
+        while (IS_OCT_DIGIT_CHAR(*pzIn) && (pz < z + 3))
             *(pz++) = *(pzIn++);
         *pz = NUL;
         val = strtoul(z, NULL, 8);
@@ -177,7 +177,7 @@ ao_string_cook( char* pzScan, int* pLineCt )
             pzS++;
 
         scan_for_quote:
-            while (IS_WHITESPACE(*pzS))
+            while (IS_WHITESPACE_CHAR(*pzS))
                 if (*(pzS++) == '\n')
                     (*pLineCt)++;
 

@@ -1,9 +1,9 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.13 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.14 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-10 15:29:14 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:44:18 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module processes the "pseudo" macro
  *
@@ -124,7 +124,7 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
 
         } else {
             pzResult = pzSfxFmt;
-            while (IS_SUFFIX_FMT(*pzResult)) pzResult++;
+            while (IS_SUFFIX_FMT_CHAR(*pzResult)) pzResult++;
 
             if (pzSfxFmt == pzResult)
                 AG_ABEND(zEmptySpec);
@@ -180,7 +180,7 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
 
             if (str_length == 0)
                 AG_ABEND(zEmptySpec);
-            while (IS_SUFFIX_FMT(*pz))  pz++;
+            while (IS_SUFFIX_FMT_CHAR(*pz))  pz++;
 
             if ((pz - pzSfxFmt) != str_length)
                 AG_ABEND(aprf("invalid chars in suffix format:  %s", pz));
@@ -232,7 +232,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
     ag_bool line_start = AG_FALSE;
 
  skipWhiteSpace:
-    while (IS_WHITESPACE(*pzData)) {
+    while (IS_WHITESPACE_CHAR(*pzData)) {
         if (*(pzData++) == '\n') {
             line_start = AG_TRUE;
             templLineNo++;
@@ -270,7 +270,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      */
     if (IS_VAR_FIRST_CHAR(*pzData)) {
         if (strneqvcmp( pzData, zAgName, (int)sizeof(zAgName)-1 ) == 0) {
-            if (IS_WHITESPACE(pzData[ sizeof(zAgName)-1 ])) {
+            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zAgName)-1 ])) {
                 *ppzData = pzData + sizeof(zAgName);
                 return PM_EV_AUTOGEN;
             }
@@ -279,7 +279,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
         }
 
         if (strneqvcmp( pzData, zTpName, (int)sizeof(zTpName)-1 ) == 0) {
-            if (IS_WHITESPACE(pzData[ sizeof(zTpName)-1 ])) {
+            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zTpName)-1 ])) {
                 *ppzData = pzData + sizeof(zTpName)-1;
                 return PM_EV_TEMPLATE;
             }
@@ -316,7 +316,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    if (IS_PUNCTUATION( *pzData ))
+    if (IS_PUNCTUATION_CHAR( *pzData ))
         return PM_EV_MARKER;
 
     /*
@@ -342,7 +342,7 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
 
     for (;;) {
         char ch = *pzData;
-        if (! IS_PUNCTUATION(ch))
+        if (! IS_PUNCTUATION_CHAR(ch))
             break;
         *(pzMark++) = ch;
         if (++ct >= sizeof( zStartMac ))

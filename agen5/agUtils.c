@@ -1,10 +1,10 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.17 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: agUtils.c,v 4.18 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:33:05 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:43:32 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This is the main routine for autogen.
  *
@@ -374,7 +374,7 @@ skipExpression( tCC* pzSrc, size_t len )
 
  guess_again:
 
-    while (IS_WHITESPACE(*pzSrc)) pzSrc++;
+    while (IS_WHITESPACE_CHAR(*pzSrc)) pzSrc++;
     if (pzSrc >= pzEnd)
         return pzEnd;
     switch (*pzSrc) {
@@ -397,7 +397,7 @@ skipExpression( tCC* pzSrc, size_t len )
         break;
     }
 
-    while (! IS_WHITESPACE(*pzSrc))  pzSrc++;
+    while (! IS_WHITESPACE_CHAR(*pzSrc))  pzSrc++;
     return (pzSrc > pzEnd) ? pzEnd : pzSrc;
 }
 /*

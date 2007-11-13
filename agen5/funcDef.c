@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.20 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: funcDef.c,v 4.21 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:37:44 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:44:26 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -141,13 +141,13 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
             AG_ABEND_IN( pT, pMac, "no macro arg name" );
         }
 
-        while (IS_VALUE_NAME(*pzScan))  pzScan++;
-        while (IS_WHITESPACE(*pzScan))  pzScan++;
+        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan))  pzScan++;
         if (*pzScan != '=')
             continue;
-        while (IS_WHITESPACE(*++pzScan))   ;
+        while (IS_WHITESPACE_CHAR(*++pzScan))   ;
         pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
-        while (IS_WHITESPACE(*pzScan))     pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
     }
 
     /*
@@ -173,7 +173,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
      */
     for (;; pDL++ ) {
         pDL->de.pzDefName = pzScan;
-        while (IS_VALUE_NAME(*pzScan))  pzScan++;
+        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
 
         switch (*pzScan) {
         case NUL:
@@ -184,7 +184,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
 
         case ' ': case '\t': case '\n': case '\f':
             *(pzScan++) = NUL;
-            while (IS_WHITESPACE(*pzScan)) pzScan++;
+            while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
 
             /*
              *  The name was separated by space, but has no value
@@ -204,7 +204,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
          *  When we arrive here, we have just clobbered a '=' char.
          *  Now we have gather up the assigned value.
          */
-        while (IS_WHITESPACE(*pzScan))     pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
         strtransform( pDL->de.pzDefName, pDL->de.pzDefName );
         pDL->pzExpr = pzScan;
         pDL->de.valType = VALTYP_TEXT;
@@ -262,14 +262,14 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         if (*pzScan == NUL)
             break;
 
-        if (! IS_WHITESPACE(*pzScan))
+        if (! IS_WHITESPACE_CHAR(*pzScan))
             AG_ABEND_IN( pT, pMac, "no space separating entries" );
 
         /*
          *  Terminate the string value and skip over any additional space
          */
         *(pzScan++) = NUL;
-        while (IS_WHITESPACE(*pzScan))     pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
     fill_in_array_continue:;
     } fill_in_array_done:;
 
@@ -337,11 +337,11 @@ prepInvokeArgs( tMacro* pMac )
      *  the arguments to the macro
      */
     else {
-        if (! IS_WHITESPACE(*pzText))
+        if (! IS_WHITESPACE_CHAR(*pzText))
             AG_ABEND_IN( pT, pMac,
                         "The INVOKE macro name not space separated" );
         *pzText = NUL;
-        while (IS_WHITESPACE(*++pzText))  ;
+        while (IS_WHITESPACE_CHAR(*++pzText))  ;
         pMac->ozText = pzText - pT->pzTemplText;
         parseMacroArgs( pT, pMac );
         pCurTemplate = pT;
@@ -417,7 +417,7 @@ build_defs( int defCt, tDefList* pList )
         {
             char* pz = strchr( pList->pzExpr, '\n' );
             if (pz != NULL) {
-                while (IS_WHITESPACE(*++pz))  ;
+                while (IS_WHITESPACE_CHAR(*++pz))  ;
                 pList->pzExpr = pz;
                 goto retryExpression;
             }
@@ -750,7 +750,7 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         if (! IS_VAR_FIRST_CHAR( *pzSrc ))
             AG_ABEND_IN( pT, pMac, zNameNeeded );
 
-        while (IS_VALUE_NAME(*pzSrc))  *(pzCopy++) = *(pzSrc++);
+        while (IS_VALUE_NAME_CHAR(*pzSrc))  *(pzCopy++) = *(pzSrc++);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)

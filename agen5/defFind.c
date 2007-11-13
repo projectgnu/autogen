@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.15 2007/11/11 06:13:28 bkorb Exp $
+ *  $Id: defFind.c,v 4.16 2007/11/13 05:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:03:19 bkorb"
- *  Last Committed:    $Date: 2007/11/11 06:13:28 $
+ *  Time-stamp:        "2007-11-12 20:44:29 bkorb"
+ *  Last Committed:    $Date: 2007/11/13 05:49:26 $
  *
  *  This module locates definitions.
  *
@@ -75,7 +75,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
      *  '[$]' means the last entry of whatever index number
      */
     if (*pzScan == '$') {
-        while (IS_WHITESPACE(*++pzScan )) ;
+        while (IS_WHITESPACE_CHAR(*++pzScan )) ;
         if (*pzScan != ']')
             return NULL;
 
@@ -88,14 +88,14 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
     /*
      *  '[nn]' means the specified index number
      */
-    if (IS_DEC_DIGIT(*pzScan)) {
+    if (IS_DEC_DIGIT_CHAR(*pzScan)) {
         char* pz;
         idx = strtol( pzScan, &pz, 0 );
 
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (IS_WHITESPACE(*pz )) pz++;
+        while (IS_WHITESPACE_CHAR(*pz )) pz++;
         if (*pz != ']')
             return NULL;
     }
@@ -110,7 +110,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         if (! IS_VAR_FIRST_CHAR(*pzScan))
             return NULL;
 
-        while (IS_VALUE_NAME(*pzScan)) pzScan++;
+        while (IS_VALUE_NAME_CHAR(*pzScan)) pzScan++;
 
         /*
          *  Temporarily remove the character under *pzScan and
@@ -126,7 +126,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (IS_WHITESPACE(*pzScan )) pzScan++;
+        while (IS_WHITESPACE_CHAR(*pzScan )) pzScan++;
         if (*pzScan != ']')
             return NULL;
 
@@ -222,7 +222,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  Before anything, skip a leading '.' as a special hack to force
      *  a current context lookup.
      */
-    while (IS_WHITESPACE(*pzS )) {
+    while (IS_WHITESPACE_CHAR(*pzS )) {
         if (--srcLen <= 0) {
             pzS = zNil;
             break;
@@ -241,7 +241,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  but an index may also start with a number.  The full number
      *  validation will happen in findEntryByIndex().
      */
-    while (IS_WHITESPACE(*pzS )) {
+    while (IS_WHITESPACE_CHAR(*pzS )) {
         if (--srcLen <= 0) {
             pzS = zNil;
             break;
@@ -296,7 +296,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
          *  Numbers and #define-d names are handled at the end of the switch.
          *  '$' and ']' are handled immediately below.
          */
-        if (IS_ALPHANUMERIC(*pzS))
+        if (IS_ALPHANUMERIC_CHAR(*pzS))
             break;
 
         /*
@@ -344,15 +344,15 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  Whatever, the next token must be a name or a number.
      */
     assert((state == CN_NAME_ENDED) || (state == CN_INDEX_CLOSE));
-    assert( IS_ALPHANUMERIC(*pzS));
+    assert( IS_ALPHANUMERIC_CHAR(*pzS));
 
     /*
      *  Copy the name/number.  We already know the first character is valid.
      *  However, we must *NOT* downcase #define names...
      */
-    while (IS_VALUE_NAME(*pzS)) {
+    while (IS_VALUE_NAME_CHAR(*pzS)) {
         char ch = *(pzS++);
-        if ((state != CN_INDEX_CLOSE) && IS_UPPER_CASE(ch))
+        if ((state != CN_INDEX_CLOSE) && IS_UPPER_CASE_CHAR(ch))
             *(pzD++) = tolower( ch );
 
         else switch ( ch ) { /* force the separator chars to be '_' */
@@ -472,7 +472,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
         /*
          *  We have to find a specific entry in a list.
          */
-        while (IS_WHITESPACE(*++pcBrace )) ;
+        while (IS_WHITESPACE_CHAR(*++pcBrace )) ;
 
         pE = findEntryByIndex( pE, pcBrace );
         if (pE == NULL)
@@ -664,7 +664,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
         /*
          *  We have to find a specific entry in a list.
          */
-        while (IS_WHITESPACE(*++pcBrace)) ;
+        while (IS_WHITESPACE_CHAR(*++pcBrace)) ;
 
         pE = findEntryByIndex( pE, pcBrace );
         if (pE == NULL)
