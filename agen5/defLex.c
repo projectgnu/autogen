@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.24 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: defLex.c,v 4.25 2007/11/15 19:51:09 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:42:36 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-12 22:33:12 bkorb"
+ *  Last Committed:    $Date: 2007/11/15 19:51:09 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -214,9 +214,6 @@ scanAgain:
         pz_token = pCurCtx->pzScan;
 
         pCurCtx->pzScan = pz;
-
-        if (pzShellProgram == NULL)
-            pzShellProgram = getDefine( zShellEnv, AG_TRUE );
 
         lastToken = DP_EV_STRING;
         pz = runShell( (char const*)pz_token );

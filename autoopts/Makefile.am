@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-11-04 10:15:16 bkorb"
+## Time-stamp:      "2007-11-13 18:13:52 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.37 2007/11/11 06:13:28 bkorb Exp $
+## $Id: Makefile.am,v 4.38 2007/11/15 19:51:09 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -117,7 +117,7 @@ INST_SH                   = autoopts-config
 man_MANS                  = $(INST_MANS)
 m4data_DATA               = $(INST_M4DATA)
 nodist_pkgdata_DATA       = $(INST_ND_PKGDATA)
-pkgconfig_SCRIPTS         = $(INST_PKGCFG)
+pkgconfig_DATA            = $(INST_PKGCFG)
 pkgdata_DATA              = $(INST_PKGDATA)
 lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)

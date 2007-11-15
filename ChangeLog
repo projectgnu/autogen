@@ -1,3 +1,15 @@
+2007-11-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agInit.c (initialize): make sure "pzShellProgram" is initialized
+	to something reasonable at startup time.  ("reasonable" means not "csh"
+	and not "tcsh".)
+	* agen5/agShell.c (chainOpen): remove the "pzShellProgram" init code
+	* agen5/defDirect.c (doDir_shell): ditto
+	* agen5/defLex.c (scanAgain): ditto
+	* agen5/funcCase.c (XXX_Match): strip the "const" attribute from the
+	match text pointer for the compile_re call.
+	* autoopts/Makefile.am (pkgconfig): the files are DATA files
+
 2007-11-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/ag-char-map.h: new file with custom character categories

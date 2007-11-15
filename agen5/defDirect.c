@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.25 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: defDirect.c,v 4.26 2007/11/15 19:51:09 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:44:33 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-12 22:32:46 bkorb"
+ *  Last Committed:    $Date: 2007/11/15 19:51:09 $
  *
  *  This module processes definition file directives.
  *
@@ -978,9 +978,6 @@ doDir_shell( char* pzArg, char* pzScan )
      *  Save the scan pointer into the current context
      */
     pCurCtx->pzScan  = pzScan;
-
-    if (pzShellProgram == NULL)
-        pzShellProgram = getDefine( zShellEnv, AG_TRUE );
 
     /*
      *  Run the shell command.  The output text becomes the

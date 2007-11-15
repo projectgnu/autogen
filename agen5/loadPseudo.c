@@ -1,9 +1,9 @@
 
 /*
- *  $Id: loadPseudo.c,v 4.14 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: loadPseudo.c,v 4.15 2007/11/15 19:51:09 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:44:18 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-12 22:33:59 bkorb"
+ *  Last Committed:    $Date: 2007/11/15 19:51:09 $
  *
  *  This module processes the "pseudo" macro
  *
@@ -471,12 +471,12 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
      *  if it has been changed.
      */
     if (serverArgs[0] != NULL) {
-        char* pz = getenv( zShellEnv );
+        char* pz = getenv(zShellEnv);
         if ((pz != NULL) && (strcmp( pz, serverArgs[0] ) != 0)) {
-            fprintf( pfTrace, "Changing server shell from %s to %s\n",
-                     serverArgs[0], pz );
+            fprintf(pfTrace, "Changing server shell from %s to %s\n",
+                    serverArgs[0], pz);
             closeServer();
-            serverArgs[0] = pz;
+            serverArgs[0]  = pz;
             pzShellProgram = pz;
         }
     }

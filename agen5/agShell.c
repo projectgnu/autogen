@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.27 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: agShell.c,v 4.28 2007/11/15 19:51:09 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:43:35 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-12 22:27:11 bkorb"
+ *  Last Committed:    $Date: 2007/11/15 19:51:09 $
  *
  *  Manage a server shell process
  *
@@ -235,41 +235,7 @@ chainOpen( int       stdinFd,
     if (pzShell = *ppArgs,
        (pzShell == NULL) || (*pzShell == NUL)) {
 
-        if (pzShellProgram != NULL)
-            pzShell = pzShellProgram;
-
-        else {
-            static char const bin_sh[] = "/bin/sh";
-#           define sh_z (bin_sh + 5)
-
-            pzShellProgram = getenv( zShellEnv );
-            if (pzShellProgram == NULL) {
-#               ifdef __sun
-                static char const xpg_sh[] = "/usr/xpg4/bin/sh";
-#               endif
-
-            no_useful_SHELL:
-#               ifdef __sun
-                if (access(xpg_sh, X_OK) == 0)
-                    pzShellProgram = xpg_sh;
-                else
-#               endif
-                    if (access(bin_sh, X_OK) == 0)
-                         pzShellProgram = bin_sh;
-                    else pzShellProgram = sh_z;
-
-            } else {
-                char const * pze = pzShellProgram + strlen(pzShellProgram);
-                if (  ((pze - pzShellProgram) > 2)
-                   && (pze[-3] == 'c')
-                   && (pze[-2] == 's')
-                   && (pze[-1] == 'h'))  {
-                    goto no_useful_SHELL;
-                }
-            }
-            putenv( aprf( "%s=%s", zShellEnv, pzShellProgram ));
-            pzShell = pzShellProgram;
-        }
+        pzShell = pzShellProgram;
 
         *ppArgs = pzShell;
     }

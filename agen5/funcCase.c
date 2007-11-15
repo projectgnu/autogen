@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.18 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: funcCase.c,v 4.19 2007/11/15 19:51:09 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:46:56 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-15 11:24:03 bkorb"
+ *  Last Committed:    $Date: 2007/11/15 19:51:09 $
  *
  *  This module implements the CASE text function.
  */
@@ -489,8 +489,9 @@ Select_Match( tCC* pzText, tCC* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
-        regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match re" );
-        compile_re(pRe, pzMatch, (int)pCurMacro->res);
+        void *    mat = (void *)pzMatch;
+        regex_t*  pRe = AGALOC(sizeof( *pRe ), "select match re");
+        compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -571,8 +572,9 @@ Select_Match_End( tCC* pzText, tCC* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
+        void *    mat = (void *)pzMatch;
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match end re" );
-        compile_re(pRe, pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -663,8 +665,9 @@ Select_Match_Start( tCC* pzText, tCC* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
+        void *    mat = (void *)pzMatch;
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match start re" );
-        compile_re(pRe, pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
@@ -757,12 +760,14 @@ Select_Match_Full( tCC* pzText, tCC* pzMatch )
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
+        void *    mat = (void *)pzMatch;
         regex_t*  pRe = AGALOC( sizeof( *pRe ), "select match full re" );
+
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
             fprintf( pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
                      pzMatch, pCurMacro->res );
         }
-        compile_re(pRe, pzMatch, (int)pCurMacro->res);
+        compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = pRe;
     }
 
