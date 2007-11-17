@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.38 2007/11/13 05:49:26 bkorb Exp $
- *  Time-stamp:      "2007-11-12 20:37:43 bkorb"
+ *  $Id: configfile.c,v 4.39 2007/11/17 21:01:55 bkorb Exp $
+ *  Time-stamp:      "2007-11-17 01:32:00 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -65,11 +65,6 @@ parseKeyWordType(
     tOptions*     pOpts,
     char*         pzText,
     tOptionValue* pType );
-
-static char*
-parseLoadMode(
-    char*               pzText,
-    tOptionLoadMode*    pMode );
 
 static char*
 parseSetMemType(
@@ -959,45 +954,65 @@ parseAttributes(
     tOptionLoadMode*    pMode,
     tOptionValue*       pType )
 {
-    size_t lenLoadType = strlen( zLoadType );
-    size_t lenKeyWords = strlen( zKeyWords );
-    size_t lenSetMem   = strlen( zSetMembers );
+    size_t len;
 
     do  {
-        switch (*pzText) {
-        case '/': pType->valType = OPARG_TYPE_NONE;
-        case '>': return pzText;
+        if (! IS_WHITESPACE_CHAR(*pzText))
+            switch (*pzText) {
+            case '/': pType->valType = OPARG_TYPE_NONE;
+            case '>': return pzText;
+
+            default:
+            case NUL: return NULL;
+            }
+
+        while (IS_WHITESPACE_CHAR(*++pzText))     ;
+        len = 0;
+        while (IS_LOWER_CASE_CHAR(pzText[len]))   len++;
+
+        switch (find_xat_attribute_id(pzText, len)) {
+        case XAT_KWD_TYPE:
+            pzText = parseValueType( pzText+len, pType );
+            break;
+
+        case XAT_KWD_WORDS:
+            pzText = parseKeyWordType( pOpts, pzText+len, pType );
+            break;
+
+        case XAT_KWD_MEMBERS:
+            pzText = parseSetMemType( pOpts, pzText+len, pType );
+            break;
+
+        case XAT_KWD_COOKED:
+            pzText += len;
+            if (! IS_END_XML_TOKEN_CHAR(*pzText))
+                goto invalid_kwd;
+
+            *pMode = OPTION_LOAD_COOKED;
+            break;
+
+        case XAT_KWD_UNCOOKED:
+            pzText += len;
+            if (! IS_END_XML_TOKEN_CHAR(*pzText))
+                goto invalid_kwd;
+
+            *pMode = OPTION_LOAD_UNCOOKED;
+            break;
+
+        case XAT_KWD_KEEP:
+            pzText += len;
+            if (! IS_END_XML_TOKEN_CHAR(*pzText))
+                goto invalid_kwd;
+
+            *pMode = OPTION_LOAD_KEEP;
+            break;
 
         default:
-        case NUL: return NULL;
-
-        case ' ':
-        case '\t':
-        case '\n':
-        case '\f':
-        case '\r':
-        case '\v':
-            break;
+        case XAT_KWD_INVALID:
+        invalid_kwd:
+            pType->valType = OPARG_TYPE_NONE;
+            return skipUnknown( pzText );
         }
-
-        while (IS_WHITESPACE_CHAR(*++pzText))   ;
-
-        if (strncmp( pzText, zLoadType, lenLoadType ) == 0) {
-            pzText = parseValueType( pzText+lenLoadType, pType );
-            continue;
-        }
-
-        if (strncmp( pzText, zKeyWords, lenKeyWords ) == 0) {
-            pzText = parseKeyWordType( pOpts, pzText+lenKeyWords, pType );
-            continue;
-        }
-
-        if (strncmp( pzText, zSetMembers, lenSetMem ) == 0) {
-            pzText = parseSetMemType( pOpts, pzText+lenSetMem, pType );
-            continue;
-        }
-
-        pzText = parseLoadMode( pzText, pMode );
     } while (pzText != NULL);
 
     return pzText;
@@ -1015,55 +1030,6 @@ parseKeyWordType(
     char*         pzText,
     tOptionValue* pType )
 {
-    return skipUnknown( pzText );
-}
-
-
-/*  parseLoadMode
- *
- *  "pzText" points to some name character.  We check for "cooked" or
- *  "uncooked" or "keep".  This function should handle any attribute
- *  that does not have an associated value.
- */
-static char*
-parseLoadMode(
-    char*               pzText,
-    tOptionLoadMode*    pMode )
-{
-    {
-        size_t len = strlen(zLoadCooked);
-        if (strncmp( pzText, zLoadCooked, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                *pMode = OPTION_LOAD_COOKED;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-    {
-        size_t len = strlen(zLoadUncooked);
-        if (strncmp( pzText, zLoadUncooked, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                *pMode = OPTION_LOAD_UNCOOKED;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-    {
-        size_t len = strlen(zLoadKeep);
-        if (strncmp( pzText, zLoadKeep, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                *pMode = OPTION_LOAD_KEEP;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-  unknown:
     return skipUnknown( pzText );
 }
 
@@ -1093,75 +1059,52 @@ parseValueType(
     char*         pzText,
     tOptionValue* pType )
 {
-    {
-        size_t len = strlen(zLtypeString);
-        if (strncmp( pzText, zLtypeString, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_STRING;
-                return pzText + len;
-            }
-            goto unknown;
-        }
+    size_t len = 0;
+
+    if (*(pzText++) != '=')
+        goto woops;
+
+    while (IS_OPTION_NAME_CHAR(pzText[len]))  len++;
+    pzText += len;
+
+    if ((len == 0) || (! IS_END_XML_TOKEN_CHAR(*pzText))) {
+    woops:
+        pType->valType = OPARG_TYPE_NONE;
+        return skipUnknown( pzText );
     }
 
-    {
-        size_t len = strlen(zLtypeInteger);
-        if (strncmp( pzText, zLtypeInteger, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_NUMERIC;
-                return pzText + len;
-            }
-            goto unknown;
-        }
+    switch (find_value_type_id(pzText - len, len)) {
+    default:
+    case VTP_KWD_INVALID: goto woops;
+
+    case VTP_KWD_STRING:
+        pType->valType = OPARG_TYPE_STRING;
+        break;
+
+    case VTP_KWD_INTEGER:
+        pType->valType = OPARG_TYPE_NUMERIC;
+        break;
+
+    case VTP_KWD_BOOL:
+    case VTP_KWD_BOOLEAN:
+        pType->valType = OPARG_TYPE_BOOLEAN;
+        break;
+
+    case VTP_KWD_KEYWORD:
+        pType->valType = OPARG_TYPE_ENUMERATION;
+        break;
+
+    case VTP_KWD_SET:
+    case VTP_KWD_SET_MEMBERSHIP:
+        pType->valType = OPARG_TYPE_MEMBERSHIP;
+        break;
+
+    case VTP_KWD_NESTED:
+    case VTP_KWD_HIERARCHY:
+        pType->valType = OPARG_TYPE_HIERARCHY;
     }
 
-    {
-        size_t len = strlen(zLtypeBool);
-        if (strncmp( pzText, zLtypeBool, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_BOOLEAN;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-    {
-        size_t len = strlen(zLtypeKeyword);
-        if (strncmp( pzText, zLtypeKeyword, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_ENUMERATION;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-    {
-        size_t len = strlen(zLtypeSetMembership);
-        if (strncmp( pzText, zLtypeSetMembership, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_MEMBERSHIP;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-    {
-        size_t len = strlen(zLtypeNest);
-        if (strncmp( pzText, zLtypeNest, len ) == 0) {
-            if (IS_END_XML_TOKEN_CHAR(pzText[len])) {
-                pType->valType = OPARG_TYPE_HIERARCHY;
-                return pzText + len;
-            }
-            goto unknown;
-        }
-    }
-
-  unknown:
-    pType->valType = OPARG_TYPE_NONE;
-    return skipUnknown( pzText );
+    return pzText;
 }
 
 

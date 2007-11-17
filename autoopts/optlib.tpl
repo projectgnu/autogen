@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2007-10-30 10:47:39 bkorb"
+# Time-stamp:      "2007-11-17 10:30:16 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.28 2007/10/30 22:01:02 bkorb Exp $
+# $Id: optlib.tpl,v 4.29 2007/11/17 21:01:55 bkorb Exp $
 
 =][=
 
@@ -610,8 +610,11 @@ static const int
 
          IF (exist? "arg-type")                =][=
             CASE arg-type  =][=
+
             =*  num        =] \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
+               IF (exist? "scaled")            =] \
+        | OPTST_SCALED_NUM[=        ENDIF      =][=
 
             =*  bool       =] \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=

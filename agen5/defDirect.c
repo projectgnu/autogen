@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.26 2007/11/15 19:51:09 bkorb Exp $
+ *  $Id: defDirect.c,v 4.27 2007/11/17 21:01:55 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 22:32:46 bkorb"
- *  Last Committed:    $Date: 2007/11/15 19:51:09 $
+ *  Time-stamp:        "2007-11-17 09:46:24 bkorb"
+ *  Last Committed:    $Date: 2007/11/17 21:01:55 $
  *
  *  This module processes definition file directives.
  *
@@ -426,14 +426,8 @@ check_assert_str( char const* pz, char const* pzArg )
 
     while (IS_WHITESPACE_CHAR(*pz)) pz++;
 
-    if (IS_DEC_DIGIT_CHAR(*pz)) {
-        if (atoi(pz) == 0)
-            AG_ABEND( aprf( fmt, "0 (zero)", pzArg ));
-
-    } else switch (*pz) {
-    case 'f': case 'F': case 'n': case 'N': case NUL:
+    if (IS_FALSE_TYPE_CHAR(*pz))
         AG_ABEND( aprf( fmt, pz, pzArg ));
-    }
 }
 
 static char*

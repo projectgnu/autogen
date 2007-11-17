@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2007-10-28 15:21:26 bkorb"
+# Time-stamp:     "2007-11-16 22:33:09 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2007/11/01 05:24:24 $
+# Last Modified:  $Date: 2007/11/17 21:01:55 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.18 2007/11/01 05:24:24 bkorb Exp $
+# $Id: defs.in,v 4.19 2007/11/17 21:01:55 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -44,6 +44,7 @@ export progname testname
 #
 srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
+top_builddir=`cd @top_builddir@ && pwd`
 GUILE_VERSION="@GUILE_VERSION@"
 LIBGUILE_PATH="@LIBGUILE_PATH@"
 AG_VERSION="@AG_VERSION@"
@@ -201,7 +202,6 @@ f=`basename ${CLexe}`
 CLexe=`cd ${d} && pwd`/${f}
 
 builddir=`pwd`
-top_builddir=`cd ../.. && pwd`
 CFLAGS=`echo ${CFLAGS} | sed 's/-Werror//'`
 
 f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
@@ -277,8 +277,6 @@ esac
 ## Local Variables:
 ## Mode: shell-script
 ## indent-tabs-mode: nil
-## sh-indentation: 2
-## sh-basic-offset: 2
 ## End:
 
 # defs.in ends here

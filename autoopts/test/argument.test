@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-10-30 14:36:52 bkorb"
+# Time-stamp:        "2007-11-17 12:18:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: argument.test,v 4.8 2007/10/30 22:01:02 bkorb Exp $
+# $Id: argument.test,v 4.9 2007/11/17 21:01:55 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -80,6 +80,8 @@ sed '/arg-type = number/q' ${testname}.def >&3
 cat >&3 <<- _EOF_
 	    arg-range = "-1";
 	    arg-range = "3->021";
+	    arg-range = "040->0x1FFF";
+	    scaled;
 	};
 	include = '#include <stdlib.h>';
 	_EOF_
@@ -106,9 +108,11 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
+				  is scalable with a suffix: k/K/m/M/g/G/t/T
 				  it must lie in one of the ranges:
 				  -1 exactly, or
-				  3 to 17
+				  3 to 17, or
+				  32 to 8191
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
@@ -117,11 +121,17 @@ _EOF_
 cmp -s ${testname}2.hlp ${testname}2.help || \
   failure "`diff ${testname}2.hlp ${testname}2.help`"
 
-./${testname}2 -o string -s 99 > /dev/null && \
-  failure ${testname} did not handle oversized option
+./${testname}2 -o string -s 037 > /dev/null && \
+  failure ${testname} handled wrong sized option
 
-./${testname}2 -o string -s 10 > /dev/null || \
+./${testname}2 -o string -s 0x37 > /dev/null || \
   failure ${testname} did not handle its options
+
+./${testname}2 -o string -s 8k > /dev/null || \
+  failure ${testname} could not handle 8k
+
+./${testname}2 -o string -s 8K > /dev/null && \
+  failure ${testname} did handle 8K
 
 # # # # # # # # # # T E S T   3 # # # # # # # # # # #
 

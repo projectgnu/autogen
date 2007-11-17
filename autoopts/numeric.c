@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.12 2007/10/07 16:54:54 bkorb Exp $
- *  Time-stamp:      "2007-07-04 10:21:59 bkorb"
+ *  $Id: numeric.c,v 4.13 2007/11/17 21:01:55 bkorb Exp $
+ *  Time-stamp:      "2007-11-17 10:40:58 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -48,11 +48,28 @@ optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
     if ((pOD == NULL) || (pOD->optArg.argString == NULL))
         return;
 
-    val = strtol( pOD->optArg.argString, &pz, 0 );
-    if (*pz != NUL) {
-        fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->optArg.argString );
-        (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
-    }
+    val = strtol(pOD->optArg.argString, &pz, 0);
+    if (pz == pOD->optArg.argString)
+        goto bad_number;
+
+    if ((pOD->fOptState & OPTST_SCALED_NUM) != 0)
+        switch (*(pz++)) {
+        case '\0': pz--; break;
+        case 't':  val *= 1000;
+        case 'g':  val *= 1000;
+        case 'm':  val *= 1000;
+        case 'k':  val *= 1000; break;
+
+        case 'T':  val *= 1024;
+        case 'G':  val *= 1024;
+        case 'M':  val *= 1024;
+        case 'K':  val *= 1024; break;
+
+        default:   goto bad_number;
+        }
+
+    if (*pz != NUL)
+        goto bad_number;
 
     if (pOD->fOptState & OPTST_ALLOC_ARG) {
         AGFREE(pOD->optArg.argString);
@@ -60,6 +77,14 @@ optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
     }
 
     pOD->optArg.argInt = val;
+    return;
+
+bad_number:
+    fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->optArg.argString );
+    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
+        (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
+
+    pOD->optArg.argInt = ~0;
 }
 /*
  * Local Variables:

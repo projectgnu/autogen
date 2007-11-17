@@ -1,6 +1,6 @@
 /*
- *  $Id: cook.c,v 4.13 2007/11/13 05:49:26 bkorb Exp $
- *  Time-stamp:      "2007-11-12 20:38:05 bkorb"
+ *  $Id: cook.c,v 4.14 2007/11/17 21:01:55 bkorb Exp $
+ *  Time-stamp:      "2007-11-16 22:49:11 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -101,8 +101,9 @@ ao_string_cook_escape_char( char const* pzIn, char* pRes, u_int nl )
          *  IF the character copied was an octal digit,
          *  THEN set the output character to an octal value
          */
-        char z[4] = { *pRes }, *pz = z + 1;
+        char z[4], *pz = z + 1;
         unsigned long val;
+        z[0] = *pRes;
 
         while (IS_OCT_DIGIT_CHAR(*pzIn) && (pz < z + 3))
             *(pz++) = *(pzIn++);

@@ -2,7 +2,7 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2007-07-04 13:02:38 bkorb"
+## Time-stamp:      "2007-11-17 11:12:12 bkorb"
 ##              by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.30 2007/10/07 16:54:54 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.31 2007/11/17 21:01:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -96,7 +96,7 @@ cat >&3 <<- EOMakefile
 	EXTRA_DIST              = \\
 	EOMakefile
 
-find * -type f \
+find $(ls -A) -type f \
   | egrep -v '^(libopts\.c|Makefile\.am)$' \
   | ${CLexe} -I4 --spread=1 --line-sep="  \\" >&3
 exec 3>&-

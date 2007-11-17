@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcIf.c,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: funcIf.c,v 4.14 2007/11/17 21:01:55 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:26:32 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-11-17 09:42:05 bkorb"
+ *  Last Committed:    $Date: 2007/11/17 21:01:55 $
  *
  *  This module implements the _IF text function.
  *
@@ -67,7 +67,7 @@ eval_true( void )
     ag_bool res = AG_TRUE;
     tCC* pz = evalExpression( &needFree );
 
-    if (isdigit( *pz ))
+    if (IS_DEC_DIGIT_CHAR(*pz))
         res = (atoi(pz) == 0) ? AG_FALSE : AG_TRUE;
 
     else switch (*pz) {
@@ -93,7 +93,7 @@ eval_true( void )
     }
 
     if (needFree)
-        AGFREE( (void*)pz );
+        AGFREE(pz);
 
     return res;
 }

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.24 2007/11/13 05:49:26 bkorb Exp $
- *  Time-stamp:      "2007-11-12 20:39:11 bkorb"
+ *  $Id: nested.c,v 4.25 2007/11/17 21:01:55 bkorb Exp $
+ *  Time-stamp:      "2007-11-17 09:40:28 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -180,17 +180,11 @@ addBoolValue( void** pp, char const* pzName, size_t nameLen,
     }
     if (dataLen == 0)
         pNV->v.boolVal = 0;
-    else if (IS_WHITESPACE_CHAR(*pzValue))
-        pNV->v.boolVal = atoi( pzValue );
-    else switch (*pzValue) {
-    case 'f':
-    case 'F':
-    case 'n':
-    case 'N':
-        pNV->v.boolVal = 0; break;
-    default:
-        pNV->v.boolVal = 1;
-    }
+
+    else if (IS_DEC_DIGIT_CHAR(*pzValue))
+        pNV->v.boolVal = atoi(pzValue);
+
+    else pNV->v.boolVal = ! IS_FALSE_TYPE_CHAR(*pzValue);
 
     pNV->valType = OPARG_TYPE_BOOLEAN;
     pNV->pzName = (char*)(pNV + 1);
@@ -219,12 +213,12 @@ addNumberValue( void** pp, char const* pzName, size_t nameLen,
         dataLen--; pzValue++;
     }
     if (dataLen == 0)
-        pNV->v.boolVal = 0;
+        pNV->v.longVal = 0;
     else
-        pNV->v.boolVal = atoi( pzValue );
+        pNV->v.longVal = strtol(pzValue, 0, 0);
 
     pNV->valType = OPARG_TYPE_NUMERIC;
-    pNV->pzName = (char*)(pNV + 1);
+    pNV->pzName  = (char*)(pNV + 1);
     memcpy( pNV->pzName, pzName, nameLen );
     pNV->pzName[ nameLen ] = NUL;
     addArgListEntry( pp, pNV );

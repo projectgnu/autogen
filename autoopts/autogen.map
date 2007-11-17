@@ -29,3 +29,4 @@ plus-n-space    "+"           +whitespace
 punctuation     "!-~"         -alphanumeric -"_"
 suffix          "-._"         +alphanumeric
 suffix-fmt      "%/"          +suffix     
+false-type      "nNfF0\x00"

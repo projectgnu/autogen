@@ -50,10 +50,13 @@ bit[16] = { b-name = arg-optional;  b-what = 'the option arg not required'; };
 bit[17] = { b-name = imm;           b-what = 'process opt on first pass'; };
 bit[18] = { b-name = disable-imm;   b-what = 'process disablement immed.'; };
 bit[19] = { b-name = omitted;       b-what = 'compiled out of program'; };
+
 bit[20] = { b-name = must-set;      b-what = 'must be set or pre-set'; };
 bit[21] = { b-name = document;      b-what = 'opt is for doc only'; };
 bit[22] = { b-name = twice;         b-what = 'process opt twice - imm + reg'; };
 bit[23] = { b-name = disable-twice; b-what = 'process disabled option twice'; };
+
+bit[24] = { b-name = scaled-num;    b-what = 'scaled integer value'; };
 
 no-code;
 

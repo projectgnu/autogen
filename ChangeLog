@@ -1,3 +1,27 @@
+2007-11-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/aoconf.tpl (tempdir): use the one embedded in autogen
+	* autoopts/nested.c (addNumberValue): it's a number (integer) value,
+	not a boolean value.
+	* autoopts/test/getopt.test (getopts_long): not all systems have it.
+	Don't test it on all systems.
+	* autoopts/value-type.[ch]: newly generated file pair to enumerate and
+	identify config file value type keywords.
+	* autoopts/xat-attribute.[ch]: newly generated file pair for XML config
+	file entry types: type words members cooked uncooked keep
+	* autoopts/configfile.c (parseAttributes): use these gperf generated
+	files to simplify this code.
+	(parseKeyWordType): likewise
+	* autoopts/cook.c (ao_string_cook_escape_char): fix solaris CC issue
+	* autoopts/nested.c (addBoolValue): use IS_FALSE_TYPE_CHAR char test.
+	* autoopts/numeric.c (optionNumericVal): handle scaling suffix
+	* autoopts/opt-state.def (scaled-num): new marker bit for number option
+	args that may take a scaling suffix
+	* autoopts/optlib.tpl (scaled): detect and handle attribute
+	* autoopts/optmain.tpl (scale-val) detect and handle 'scaled' attribute
+	* autoopts/test/argument.test: test new feature
+	* autoopts/usage-txt.def: remove keywords now handled by gperf.
+
 2007-11-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agInit.c (initialize): make sure "pzShellProgram" is initialized

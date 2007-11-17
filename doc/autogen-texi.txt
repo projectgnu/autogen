@@ -2011,7 +2011,7 @@ Verify that required options are present between the minimum and maximum
 number of times on the command line.  Verify that conflicting options do not
 appear together.  Verify that options requiring the presence of other options
 are, in fact, used in the presence of other options.
-See @xref{Common Attributes} and @xref{Option Conflict Attributes}.
+See @xref{Common Attributes}, and @xref{Option Conflict Attributes}.
 
 @item
 There are several automatically supported options.  They will have short
@@ -3467,14 +3467,23 @@ L's.  AutoOpts contains a library procedure to convert the string to a number.
 If you specify range checking with @code{arg-range} (see below), then AutoOpts
 produces a special purpose procedure for this option.
 
+@table @samp
+@item scaled
+@cindex scaled
+@code{scaled} marks the option so that suffixes of @samp{k}, @samp{K},
+@samp{m}, @samp{M}, @samp{g}, @samp{G}, @samp{t}, and @samp{T} will multiply
+the given number by a power of 1000 or 1024.  Lower case letters scale by a
+power of 1000 and upper case scale by a power of 1024.
+
+@item arg-range
 @cindex arg-range
-This is used to create a callback procedure for validating the range of
-the option argument.  It must match one of the range
-entries.  Each @code{arg-range} should consist of either an integer by itself
-or an integer range.  The integer range is specified by one or two
-integers separated by the two character sequence, @code{->}.
-Be sure to quote the entire range string.  The definitions parser will
-not accept the range syntax as a single string token.
+@code{arg-range} is used to create a callback procedure for validating the
+range of the option argument.  It must match one of the range entries.  Each
+@code{arg-range} should consist of either an integer by itself or an integer
+range.  The integer range is specified by one or two integers separated by the
+two character sequence, @code{->}.  Be sure to quote the entire range string.
+The definitions parser will not accept the range syntax as a single string
+token.
 
 The generated procedure imposes the range constraints as follows:
 @itemize @bullet
@@ -3493,7 +3502,7 @@ The argument value is required.  It may not be optional.
 The value must match one of the entries.  If it can match more than one,
 then you have redundancies, but no harm will come of it.
 @end itemize
-
+@end table
 
 @node arg-type boolean
 @subsubsection Arg Type Boolean
@@ -3604,6 +3613,7 @@ attributes for the option:
 
 @table @samp
 @item file-exists
+@cindex file-exists
 If not specified or empty, then the directory portion of the name is checked.
 The directory must exist or the argument is rejected and the usage procedure
 is invoked.
@@ -3613,12 +3623,14 @@ existence.  If the value begins with the two letters ``no'', then the file
 must not pre-exist.  Otherwise, the file is expected to exist.
 
 @item open-file
+@cindex open-file
 If not specified or empty, the file is left alone.
 If the value begins with the four letters ``desc''[@i{riptor}], then
 @code{open(2)} is used and @code{optArg.argFd} is set.  Otherwise, the
 file is opened with @code{fopen} and @code{optArg.argFp} is set.
 
 @item file-mode
+@cindex file-mode
 If ``open-file'' is set and not empty, then you must specify the open mode.
 Set the value to the flag bits or mode string as appropriate for the open
 type.

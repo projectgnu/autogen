@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.18 2007/10/30 22:01:02 bkorb Exp $
+   $Id: usage-txt.def,v 4.19 2007/11/17 21:01:55 bkorb Exp $
  */
 
 /*
@@ -250,50 +250,6 @@ utxt = { ut-name = InvalOptDesc;
          ut-text = "AutoOpts ERROR:  invalid option descriptor for %s\n";
 };
 
-utxt = { ut-name = KeyWords;
-         ut-text = "words=";
-};
-
-utxt = { ut-name = LoadCooked;
-         ut-text = "cooked";
-};
-
-utxt = { ut-name = LoadKeep;
-         ut-text = "keep";
-};
-
-utxt = { ut-name = LoadType;
-         ut-text = "type=";
-};
-
-utxt = { ut-name = LoadUncooked;
-         ut-text = "uncooked";
-};
-
-utxt = { ut-name = LtypeInteger;
-         ut-text = "integer";
-};
-
-utxt = { ut-name = LtypeNest;
-         ut-text = "nested";
-};
-
-utxt = { ut-name = LtypeString;
-         ut-text = "string";
-};
-
-utxt = { ut-name = LtypeBool;
-         ut-text = "bool";
-};
-
-utxt = { ut-name = LtypeKeyword;
-         ut-text = "keyword";
-};
-
-utxt = { ut-name = LtypeSetMembership;
-         ut-text = "set";
-};
-
 utxt = { ut-name = Members;
          ut-text = "\t\t\t\t- is a set membership option\n";
 };
@@ -456,10 +412,6 @@ utxt = { ut-name = Req_ShrtTtl;
 
 utxt = { ut-name = SepChars;
          ut-text = "-_^";
-};
-
-utxt = { ut-name = SetMembers;
-         ut-text = "members=";
 };
 
 utxt = { ut-name = SetMemberSettings;

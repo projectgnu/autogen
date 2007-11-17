@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.25 2007/11/01 05:24:24 bkorb Exp $
- *  Time-stamp:        "2007-10-31 20:34:14 bkorb"
- *  Last Committed:    $Date: 2007/11/01 05:24:24 $
+ *  $Id: opts.def,v 4.26 2007/11/17 21:01:55 bkorb Exp $
+ *  Time-stamp:        "2007-11-17 10:27:40 bkorb"
+ *  Last Committed:    $Date: 2007/11/17 21:01:55 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -470,6 +470,8 @@ flag = {
     arg-default = 256;
     arg-range   = "-1";
     arg-range   = "1->0x1000000"; /* 16 million */
+    scaled;
+
     arg-name    = lim;
     descrip     = "Limit on increment loops";
 #ifndef XML2AG

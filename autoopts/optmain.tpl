@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2007-10-31 20:09:06 bkorb"
+# Time-stamp:      "2007-11-17 12:18:57 bkorb"
 
-# $Id: optmain.tpl,v 4.27 2007/11/01 05:24:24 bkorb Exp $
+# $Id: optmain.tpl,v 4.28 2007/11/17 21:01:55 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -748,6 +748,29 @@ ENDDEF   callback-proc-header
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE   scale-val
+
+=]
+    switch (*pzEnd) {
+    case '\0': break;
+    case 't':  val *= 1000;
+    case 'g':  val *= 1000;
+    case 'm':  val *= 1000;
+    case 'k':  val *= 1000; break;
+
+    case 'T':  val *= 1024;
+    case 'G':  val *= 1024;
+    case 'M':  val *= 1024;
+    case 'K':  val *= 1024; break;
+
+    default:   goto bad_value;
+    }
+[=
+
+ENDDEF   scale-val
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
 DEFINE range-option-code
 
 =][=
@@ -756,21 +779,21 @@ DEFINE range-option-code
     (error (string-append "range option " low-name " is not numeric")) )
 
 \=]
-    static const struct {const int rmin, rmax;} rng[ [=
-      (count "arg-range")  =] ] = {
+    static const struct {long const rmin, rmax;} rng[[=
+      (count "arg-range")  =]] = {
 [=(out-push-new)      =][=
   FOR arg-range ",\n" =]{ [=
     CASE arg-range    =][=
       *==    "->"     =][=
-             (string-substitute (get "arg-range") "->" "") =], INT_MAX[=
+             (string-substitute (get "arg-range") "->" "") =], LONG_MAX[=
 
-      ==*    "->"     =]INT_MIN, [=
+      ==*    "->"     =]LONG_MIN, [=
              (string-substitute (get "arg-range") "->" "") =][=
 
       *==*   "->"     =][=
              (string-substitute (get "arg-range") "->" ", ") =][=
 
-      ~~ -{0,1}[0-9]+ =][=arg-range=], INT_MIN[=
+      ~~ -{0,1}[0-9]+ =][=arg-range=], LONG_MIN[=
 
       *  =][= (error (string-append "Invalid range spec:  ``"
               (get "arg-range") "''" ))  =][=
@@ -779,26 +802,32 @@ DEFINE range-option-code
   ENDFOR =][=
   (shellf "${CLexe} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
-    int val;
+    long val;
     int ix;
-    char const* pzIndent = "\t\t\t\t  ";
+    char * pzEnd;
+    char const * pzIndent = "\t\t\t\t  ";
     extern FILE* option_usage_fp;
 
     if (pOptDesc == NULL) /* usage is requesting range list
                              option_usage_fp has already been set */
         goto emit_ranges;
 
-    val = atoi( pOptDesc->optArg.argString );
+    val = strtol(pOptDesc->optArg.argString, &pzEnd, 0);
+    if (pOptDesc->optArg.argString == pzEnd)
+        goto bad_value;
+[=  IF (exist? "scaled") =][= INVOKE scale-val =][= ENDIF =]
     for (ix = 0; ix < [=(count "arg-range")=]; ix++) {
         if (val < rng[ix].rmin)
             continue;  /* ranges need not be ordered. */
         if (val == rng[ix].rmin)
             goto valid_return;
-        if (rng[ix].rmax == INT_MIN)
+        if (rng[ix].rmax == LONG_MIN)
             continue;
         if (val <= rng[ix].rmax)
             goto valid_return;
     }
+
+  bad_value:
 
     option_usage_fp = stderr;
     fprintf(stderr, _("%s error:  %s option value ``%s''is out of range.\n"),
@@ -807,15 +836,23 @@ DEFINE range-option-code
 
   emit_ranges:[=
 
+  IF (exist? "scaled") =]
+    {
+        char const * pz =
+            _("%sis scalable with a suffix: k/K/m/M/g/G/t/T\n");
+        fprintf(option_usage_fp, pz, pzIndent);
+    }
+[=ENDIF =][=
+
 
   IF (> (count "arg-range") 1) =]
     fprintf( option_usage_fp, _("%sit must lie in one of the ranges:\n"),
              pzIndent );
     for ( ix=0;; ) {
-        if (rng[ix].rmax == INT_MIN)
-             fprintf(option_usage_fp, _("%s%d exactly"), pzIndent,
+        if (rng[ix].rmax == LONG_MIN)
+             fprintf(option_usage_fp, _("%s%ld exactly"), pzIndent,
                      rng[ix].rmin);
-        else fprintf(option_usage_fp, _("%s%d to %d"), pzIndent,
+        else fprintf(option_usage_fp, _("%s%ld to %ld"), pzIndent,
                       rng[ix].rmin, rng[ix].rmax );
         if (++ix >= [=(count "arg-range")=])
             break;
@@ -825,11 +862,11 @@ DEFINE range-option-code
     fputc( '\n', option_usage_fp );[=
 
   ELIF (*==* (get "arg-range") "->")  =]
-    fprintf( option_usage_fp, _("%sit must lie in the range: %d to %d\n"),
+    fprintf( option_usage_fp, _("%sit must lie in the range: %ld to %ld\n"),
              pzIndent, rng[0].rmin, rng[0].rmax );[=
 
   ELSE  =]
-    fprintf( option_usage_fp, _("%sit must be: %d exactly\n"),
+    fprintf( option_usage_fp, _("%sit must be: %ld exactly\n"),
              pzIndent, rng[0].rmin );[=
 
   ENDIF =]

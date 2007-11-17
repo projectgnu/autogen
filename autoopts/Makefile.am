@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-11-13 18:13:52 bkorb"
+## Time-stamp:      "2007-11-17 00:55:35 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.38 2007/11/15 19:51:09 bkorb Exp $
+## $Id: Makefile.am,v 4.39 2007/11/17 21:01:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -54,19 +54,23 @@ TEXI_STAMP  = texi-stamp
 
 libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
-GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h
-HDRS        = $(GENHDRS) autoopts.h proto.h ag-char-map.h
+GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h \
+	xat-attribute.h value-type.h ag-char-map.h
+HDRS        = $(GENHDRS) autoopts.h proto.h
+GEN_SRC     = value-type.c xat-attribute.c
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the
 ## documentation.
 ##
-CSRC        = \
+CSRC        = $(GEN_SRC) \
     autoopts.c  \
     boolean.c configfile.c cook.c      enumeration.c environment.c \
     file.c    genshell.c   load.c      makeshell.c   nested.c numeric.c \
     pgusage.c putshell.c   restore.c   save.c        sort.c        \
     stack.c   streqvcmp.c  text_mmap.c tokenize.c    usage.c version.c
+
+SRC         = $(HDRS) $(CSRC) $(GENSRC)
 
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
@@ -89,7 +93,7 @@ pkgconfigdir=$(libdir)/pkgconfig
 
 CLEANFILES                = tmp-* libopts.c
 DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
-MAINTAINERCLEANFILES      = $(GENHDRS) $(srcdir)/funcs.def
+MAINTAINERCLEANFILES      = $(GENHDRS) $(GENSRC) $(srcdir)/funcs.def
 m4datadir                 = $(datadir)/aclocal
 
 nodist_libopts_la_SOURCES = libopts.c
@@ -102,7 +106,7 @@ libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
 libguileopts_la_LIBADD    = libopts.la
 libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
-EXTRA_DIST = $(HDRS) $(CSRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
+EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
