@@ -1,6 +1,6 @@
 [= AutoGen5 Template rc
 
-# Time-stamp:      "2007-07-04 10:16:01 bkorb"
+# Time-stamp:      "2007-11-17 14:42:17 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,12 +28,13 @@
 
 IF (if (not (exist? "homerc"))
        (error "RC file samples only work for rc-optioned programs")  )
+
    (out-move (string-append "sample-"
                 (if (exist? "rcfile") (get "rcfile")
                     (string-append (get "prog-name") "rc")  )
    )         )
+
    (set-writable)
-   (define tmp-txt "")
 
    (exist? "copyright")
 =] [=(sprintf "%s copyright %s %s - all rights reserved"
@@ -153,17 +154,18 @@ DEFINE emit-description =][=
 =] for this option is:  [= arg-default =].  [=
       ENDIF     =][=
 
-  (set! tmp-txt (out-pop #t))
-  (if (> (string-length tmp-txt) 1)
-      (string-append
+  (define fill-txt (out-pop #t))
+  (if (defined? 'fill-txt)
+      (if (> (string-length fill-txt) 1)
+          (string-append
 
-            (shell (string-append "while read line
-            do echo ${line} | fold -s -w76 | sed 's/^/# /'
-               echo '#'
-            done <<'__EndOfText__'\n" tmp-txt "\n__EndOfText__" ))
+                (shell (string-append "while read line
+                do echo ${line} | fold -s -w76 | sed 's/^/# /'
+                   echo '#'
+                done <<'__EndOfText__'\n" fill-txt "\n__EndOfText__" ))
 
-            "\n#\n")
-      "" ) =][=
+                "\n#\n"
+  )   )   ) =][=
 
   IF (exist? "doc") =][= (prefix "# " (get "doc")) =][=
   ELSE =]# This option has not been fully documented.[=

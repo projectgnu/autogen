@@ -1,4 +1,4 @@
-2007-11-16  Bruce Korb  <bkorb@gnu.org>
+2007-11-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/aoconf.tpl (tempdir): use the one embedded in autogen
 	* autoopts/nested.c (addNumberValue): it's a number (integer) value,
