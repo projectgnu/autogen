@@ -1,6 +1,6 @@
 [= AutoGen5 Template rc
 
-# Time-stamp:      "2007-11-17 14:42:17 bkorb"
+# Time-stamp:      "2007-11-18 10:05:14 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -85,91 +85,51 @@ FOR flag                                =][=
 
 ENDFOR flag
 
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-     =][=
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE emit-description =][=
 (out-push-new)          =][=
 
-  IF (exist? "min")
-=]This option is required to appear.  [=ENDIF=][=
-
-  IF (exist? "max")
-=]This option may appear [=
-     IF % max (= "%s" "NOLIMIT")
-     =]an unlimited number of times[=ELSE
-     =]up to [=max=] times[=
-     ENDIF=].  [=
-  ENDIF=][=
-
-  IF (exist? "enabled")
-=]This option is enabled by default.  [=ENDIF=][=
-
-  IF (exist? "no-preset")
-=]This option may not be preset with environment variables[= #
-=] or in initialization (rc) files.  [=ENDIF=][=
-
-  IF (exist? "default")
-=]This option is the default option.  [=ENDIF=][=
-
-  IF (exist? "equivalence")
-=]This option is a member of the [=equivalence=] class of options.  [=ENDIF=][=
-
-  IF (exist? "flags-must")
-=]This option must appear in combination with the following options:  [=
-    FOR flags-must ", " =][=flags-must=][=ENDFOR=].  [=
-  ENDIF=][=
-
-  IF (exist? "flags-cant")
-=] This option must not appear in combination with any of the following [=#
-=]options:  [=
-    FOR flags-cant ", " =][=flags-cant=][=ENDFOR=].  [=
-  ENDIF     =][=
-
   IF (~* (get "arg-type") "key|set")
-=]This option takes a keyword as its argument[=
+=]This configuration value takes a keyword as its argument[=
 
-         IF (=* (get "arg-type") "set")
+    IF (=* (get "arg-type") "set")
 
 =] list.  Each entry turns on or off membership bits.  The bits are set by [=#
 =]name or numeric value and cleared by preceding the name or number with an [=#
-=]exclamation character ('!').  They can all be cleared with the magic name [=#
-=]"none" and they can all be set with "all".  A single option will process [=#
-=]a list of these values[=
+=]exclamation character ('!').  [=
 
-         ELSE
+    ELSE
 
-=].  The argument sets an enumeration value that can [=#
-=]be tested by comparing them against the option value macro[=
+=].  [=
 
-         ENDIF
+    ENDIF
 
-=].  The available keywords are:  [=
+=]The available keywords are:  [=
             (join ", " (stack "keyword")) =].  [=
-      ENDIF     =][=
 
-      IF (exist? "arg-default")
-=]The default [=(if (exist? "arg-name") (get "arg-name") (get "arg-type"))
-=] for this option is:  [= arg-default =].  [=
-      ENDIF     =][=
+  ELIF (=* (get "arg-type") "num")
+ =]This configuration value takes an integer number as its argument.  [=
+    IF (exist? "scaled") =]That number may be scaled with a single letter [=#
+=]suffix:  k/K/m/M/g/G/t/T  These will multiply the value by powers of [=#
+=]1000 (lower case) or 1024 (upper case).  [=
+    ENDIF   =][=
+
+  ENDIF     =][=
 
   (define fill-txt (out-pop #t))
   (if (defined? 'fill-txt)
-      (if (> (string-length fill-txt) 1)
-          (string-append
+      (string-append
 
-                (shell (string-append "while read line
-                do echo ${line} | fold -s -w76 | sed 's/^/# /'
-                   echo '#'
-                done <<'__EndOfText__'\n" fill-txt "\n__EndOfText__" ))
+         (shell (string-append "while read line
+         do echo ${line} | fold -s -w76 | sed 's/^/# /'
+            echo '#'
+         done <<'__EndOfText__'\n" fill-txt "\n__EndOfText__" ))
 
-                "\n#\n"
-  )   )   ) =][=
+         "\n#\n"
+  )   ) =][=
 
-  IF (exist? "doc") =][= (prefix "# " (get "doc")) =][=
-  ELSE =]# This option has not been fully documented.[=
-  ENDIF =][=
+  (if (exist? "doc") (prefix "# " (get "doc"))) =][=
 
 ENDDEF emit-description
 

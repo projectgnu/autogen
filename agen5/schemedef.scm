@@ -1,6 +1,6 @@
 
-;;; Time-stamp:        "2007-07-04 11:51:37 bkorb"
-;;; Last Committed:    $Date: 2007/10/07 16:54:54 $
+;;; Time-stamp:        "2007-11-18 10:35:38 bkorb"
+;;; Last Committed:    $Date: 2007/11/18 22:49:19 $
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -95,11 +95,7 @@
 (define make-tmp-dir
   (lambda () 
     (begin (if (= tmp-dir "") (set! tmp-dir (shell
-  "tmp_dir=`mktemp -d ${TMPDIR:-.}/.ag-XXXXXX` 2>/dev/null
-  test -d \"${tmp_dir}\" || {
-    tmp_dir=${TMPDIR:-.}/.ag-$$
-    mkdir ${tmp_dir} || die cannot mkdir ${tmp_dir}
-  } ; echo ${tmp_dir}" ))))
+  "mk_tmp_dir ; echo ${tmp_dir}" ))))
 
   (add-cleanup (string-append
    "test \"${VERBOSE:-false}\" = true || rm -rf " tmp-dir))

@@ -4866,8 +4866,17 @@ This will, by default, produce a sample file named,
 configuration (rc) file name with the @code{rcfile} attribute.  In that case,
 the output file will be named, @file{sample-<rcfile-name>}.  It will contain
 all of the program options not marked as @code{no-preset}.  It will also
-include information about how they are handled and the text from the
-@code{doc} attribute.
+include the text from the @code{doc} attribute.
+
+@ignore
+END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
+@ignore
+START == AO-DATA1 == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
 
 @node environrc
 @subsection environment variable presets
@@ -4920,7 +4929,7 @@ files.  Below is a ``@t{Hello, World!}'' greeting program that tries
 to load a configuration file @file{hello.conf} to see if it should use
 an alternate greeting or to personalize the salutation.
 @ignore
-END   == AUTOOPTS-DATA == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+END   == AO-DATA1 == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
@@ -4994,8 +5003,8 @@ quote processing.  This is the default and need not be specified.
 Strings are formed and concatenated if, after stripping leading and trailing
 white space, the text begins and ends with either single (') or double (")
 quote characters.  That processing is identical to the string formation used
-in AutoGen definition files (@pxref{basic expression}), except that you may not
-use backquotes.
+in AutoGen definition files (@pxref{basic expression}), except that backquotes
+are treated like ordinary characters.
 @end table
 
 And here is an example of an XML-styled value:

@@ -3,8 +3,8 @@
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2007-07-04 11:56:53 bkorb"
-## Last Committed:    $Date: 2007/10/07 16:54:54 $
+## Time-stamp:        "2007-11-18 12:17:01 bkorb"
+## Last Committed:    $Date: 2007/11/18 22:49:19 $
 ##
 ##  This file is part of AutoGen.
 ##
@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.32 2007/10/07 16:54:54 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.33 2007/11/18 22:49:19 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi
@@ -32,14 +32,11 @@ texi=autogen.texi
 #
 (setenv "SHELL" "/bin/sh")
 
-(define temp-dir (shell "
-    tempdir=`(mktemp -d ./.ag-XXXXXX) 2>/dev/null`
-    test -z \"${tempdir}\" && tempdir=.ag-$$.dir
-    test -d ${tempdir}  || mkdir ${tempdir} || die cannot mkdir ${tempdir}
-    tmpdir=`cd ${tmpdir} ; pwd` || die cannot cd ${tempdir}
-    echo ${tempdir}" ))
+(make-tmp-dir)
 
 (define texi-file-source (shell "
+    exec 2> ${tmp_dir}/ag-texi.log
+    set -x
     if [ -f autogen-texi.txt ]
     then
       echo autogen-texi.txt
@@ -486,7 +483,7 @@ as with the following example.
 @example
 [=
 
-(out-push-new (string-append temp-dir "/checkopt.def" ))
+(out-push-new (string-append tmp-dir "/checkopt.def" ))
 
 =]AutoGen Definitions options;
 prog-name     = check;
@@ -539,7 +536,7 @@ Running those commands yields:
 
 @example
 [= (texi-escape-encode (shell
-"cd ${tempdir}
+"cd ${tmp_dir}
 test -f checkopt.def || die cannot locate checkopt.def
 test -f check && rm -f check
 cat >> checkopt.def <<- _EOF_
@@ -569,7 +566,7 @@ Here is an example program that uses the following set of definitions:
 @example
 [=
 
- (out-push-new (string-append temp-dir "/default-test.def" ))
+ (out-push-new (string-append tmp-dir "/default-test.def" ))
 
 =]AutoGen Definitions options;
 
@@ -628,7 +625,7 @@ libs=\"${libs} ${LIBS}\"
 
 exec 3>&1
 (
-  cd ${tempdir}
+  cd ${tmp_dir}
   echo 'config-header = \"config.h\";' >> default-test.def
   HOME='' ${AGexe} -L${OPTDIR} -L${top_srcdir}/autoopts default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
@@ -637,12 +634,12 @@ exec 3>&1
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
-) > ${tempdir}/default-test.log 2>&1
+) > ${tmp_dir}/default-test.log 2>&1
 
 test $? -eq 0 || {
-  die Check ${tempdir}/default-test.log file
+  die Check ${tmp_dir}/default-test.log file
 }
-HOME='$HOME/.default_testrc' ${tempdir}/default-test --help | \
+HOME='$HOME/.default_testrc' ${tmp_dir}/default-test --help | \
    sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
 
 exec 3>&-" ))
@@ -666,38 +663,57 @@ cat $f
 INVOKE  get-text tag = "autoopts-data"
 
 =]
-@example[=
-(out-push-new (string-append temp-dir "/hello.c"))
+@noindent
+Doing so with getdefs' option definitions yields this sample-getdefsrc file.
+I tend to be wordy in my @code{doc} attributes:
+
+@example
+[= (texi-escape-encode (shell "
+  cd ${tmp_dir}
+  ${AGexe} -T${top_srcdir}/autoopts/rc-sample.tpl \
+           ${top_srcdir}/getdefs/opts.def >/dev/null
+  test -f sample-getdefsrc || die did not create sample-getdefsrc
+  cat sample-getdefsrc
+" )) =]
+@end example
+[=
+
+INVOKE get-text tag = "ao-data1"
 
 =]
+@example[=
+(out-push-new (string-append tmp-dir "/hello.c"))
+
+=]
+
 #include <sys/types.h>
 #include <stdio.h>
 #include <pwd.h>
 #include <string.h>
 #include <unistd.h>
 #include <autoopts/options.h>
-int main( int argc, char** argv ) {
-  char const* greeting = "Hello";
-  char const* greeted  = "World";
-  const tOptionValue* pOV = configFileLoad( "hello.conf" );
+int main(int argc, char ** argv) {
+  char const * greeting = "Hello";
+  char const * greeted  = "World";
+  tOptionValue const * pOV = configFileLoad("hello.conf");
 
   if (pOV != NULL) {
-    const tOptionValue* pGetV = optionGetValue( pOV, "greeting" );
+    const tOptionValue* pGetV = optionGetValue(pOV, "greeting");
 
     if (  (pGetV != NULL)
        && (pGetV->valType == OPARG_TYPE_STRING))
-      greeting = strdup( pGetV->v.strVal );
+      greeting = strdup(pGetV->v.strVal);
 
-    pGetV = optionGetValue( pOV, "personalize" );
+    pGetV = optionGetValue(pOV, "personalize");
     if (pGetV != NULL) {
-      struct passwd* pwe = getpwuid( getuid() );
+      struct passwd * pwe = getpwuid(getuid());
       if (pwe != NULL)
-        greeted = strdup( pwe->pw_gecos );
+        greeted = strdup(pwe->pw_gecos);
     }
 
-    optionUnloadNested( pOV ); /* deallocate config data */
+    optionUnloadNested(pOV); /* deallocate config data */
   }
-  printf( "%s, %s!\n", greeting, greeted );
+  printf("%s, %s!\n", greeting, greeted);
   return 0;
 }
 [= (texi-escape-encode (out-pop #t)) =]
@@ -720,7 +736,7 @@ will produce the following output (for me):
 
 @example
 [= (texi-escape-encode (shell "
-cd ${tempdir}
+cd ${tmp_dir}
 cc -o hello hello.c ${CFLAGS} ${LIBS} ${LDFLAGS} || \
   die cannot compile hello
 ./hello
@@ -792,18 +808,18 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-log=${tempdir}/genshellopt.log
+log=${tmp_dir}/genshellopt.log
 
 (
   set -x
   opts="-o genshellopt -DTEST_GETDEFS_OPTS ${INCLUDES}"
-  exec 3> ${tempdir}/genshellopt.def
+  exec 3> ${tmp_dir}/genshellopt.def
   cat ${top_srcdir}/getdefs/opts.def >&3
   echo "test_main = 'optionParseShell';" >&3
   echo 'config-header = "config.h";' >&3
   exec 3>&-
 
-  cd ${tempdir}
+  cd ${tmp_dir}
   # cmd="valgrind --leak-check=full ${AGexe}"
   cmd="${AGexe}"
   HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts genshellopt.def
@@ -815,20 +831,20 @@ log=${tempdir}/genshellopt.log
 
 ` =][= `
 
-test -x ${tempdir}/genshellopt || \
+test -x ${tmp_dir}/genshellopt || \
   die "NO GENSHELLOPT PROGRAM - See ${log}"
 
-${tempdir}/genshellopt --help > ${tempdir}/genshellopt.hlp
+${tmp_dir}/genshellopt --help > ${tmp_dir}/genshellopt.hlp
 
 ` =][= `
 
-${tempdir}/genshellopt -o ${tempdir}/genshellopt.sh || \
-  die cannot create ${tempdir}/genshellopt.sh
+${tmp_dir}/genshellopt -o ${tmp_dir}/genshellopt.sh || \
+  die cannot create ${tmp_dir}/genshellopt.sh
 
 ` =][= `
 
 sedcmd='s,\t,        ,g;s,\\([@{}]\\),@\\1,g'
-sed "${sedcmd}" ${tempdir}/genshellopt.hlp
+sed "${sedcmd}" ${tmp_dir}/genshellopt.hlp
 cat <<- \_EOF_
 	@end example
 
@@ -837,7 +853,7 @@ cat <<- \_EOF_
 	@example
 	_EOF_
 
-sed "${sedcmd}" ${tempdir}/genshellopt.sh
+sed "${sedcmd}" ${tmp_dir}/genshellopt.sh
 
 ` =]
 @end example
@@ -910,7 +926,7 @@ You may copy this manual under the terms of the FDL
 @page
 @contents
 @bye
-[=
+[= `chmod -r 555 ${tmp_dir} ; echo TEMP DIR IS ${tmp_dir} >/dev/tty` =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -1009,9 +1025,7 @@ ENDDEF  emit-menu-entry
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-=][=
-
-(shell "rm -rf ${tempdir}")
+=][= #
 
 ;; Local Variables:
 ;; indent-tabs-mode: nil

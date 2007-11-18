@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp:        "2007-07-04 09:29:38 bkorb"
-# Last Committed:    $Date: 2007/10/07 16:54:54 $
+# Time-stamp:        "2007-11-18 10:58:48 bkorb"
+# Last Committed:    $Date: 2007/11/18 22:49:19 $
 #
 ##
 ##  This file is part of AutoGen.
@@ -38,7 +38,7 @@ INCLUDES="@DEFS@ "$(
     do
         (\cd ${d} ; pwd)
     done | \
-    uniq | \
+    sort -u | \
     sed s/^/-I/ )
 
 # Give preference to configured SHELL

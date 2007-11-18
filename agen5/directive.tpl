@@ -1,8 +1,8 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.18 2007/10/07 16:54:54 bkorb Exp $
-# Time-stamp:        "2007-07-04 11:17:48 bkorb"
-# Last Committed:    $Date: 2007/10/07 16:54:54 $
+# $Id: directive.tpl,v 4.19 2007/11/18 22:49:19 bkorb Exp $
+# Time-stamp:        "2007-11-18 11:43:59 bkorb"
+# Last Committed:    $Date: 2007/11/18 22:49:19 $
 
 ##
 ## This file is part of AutoGen.
@@ -158,6 +158,20 @@ die() {
   echo "Killing AutoGen:  $*" >&8
   kill -TERM ${AG_pid}
   exit 1
+}
+tmp_dir=''
+mk_tmp_dir() {
+  test -d "${tmp_dir}" && return 0
+  tmp_dir=`
+    t=\`mktemp -d ${TMPDIR:-.}/.ag-XXXXXX\`
+    test -d "${t}" || {
+      t=${TMPDIR:-.}/.ag-$$
+      rm -rf ${t}
+      mkdir ${t} || die cannot mkdir ${t}
+    }
+    chmod 700 ${t} || die cannot chmod 700 ${t}
+    echo ${t}
+    ` 2>/dev/null
 }
 exec 2>&8
 AG_pid=[=
