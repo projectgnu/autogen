@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.28 2007/12/02 23:12:07 bkorb Exp $
- *  Time-stamp:        "2007-12-02 14:56:34 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:12:07 $
+ *  $Id: opts.def,v 4.29 2007/12/02 23:39:50 bkorb Exp $
+ *  Time-stamp:        "2007-12-02 15:38:40 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:39:50 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -527,6 +527,9 @@ flag = {
 	@table @samp
 	@item nothing
 	Does no tracing at all (default)
+
+	@item debug-message
+	Print messages from the "DEBUG" AutoGen macro (@pxref{DEBUG}).
 
 	@item server-shell
 	Traces all input and output to the server shell.  This includes a shell
