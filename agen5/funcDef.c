@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.23 2007/12/02 23:12:07 bkorb Exp $
+ *  $Id: funcDef.c,v 4.24 2007/12/02 23:34:55 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 15:08:28 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:12:07 $
+ *  Time-stamp:        "2007-12-02 15:28:05 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:34:55 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -355,12 +355,13 @@ prepInvokeArgs( tMacro* pMac )
  *  what:  Print debug message to trace output
  *  desc:
  *
- *      If the tracing level is at "debug-message" or above, this macro
- *      prints a debug message to trace output.  This message is not evaluated.
- *      This macro can also be used to set useful debugger breakpoints.
- *      By inserting [+DEBUG n+] into your template, you can set a debugger
- *      breakpoint on the #n case element below (in the AutoGen source) and
- *      step through the processing of interesting parts of your template.
+ *      If the tracing level is at "debug-message" or above
+ *      (@pxref{autogen trace}), this macro prints a debug message to trace
+ *      output.  This message is not evaluated.  This macro can also be used to
+ *      set useful debugger breakpoints.  By inserting [+DEBUG n+] into your
+ *      template, you can set a debugger breakpoint on the #n case element
+ *      below (in the AutoGen source) and step through the processing of
+ *      interesting parts of your template.
  *
  *      To be useful, you have to have access to the source tree where autogen
  *      was built and the template being processed.  The definitions are also
